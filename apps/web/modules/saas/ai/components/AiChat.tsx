@@ -62,10 +62,7 @@ export function AiChat({ organizationId }: { organizationId?: string }) {
 					await orpcClient.ai.chats.messages.add(
 						{
 							chatId,
-							messages: options.messages as unknown as Record<
-								string,
-								never
-							>[],
+							messages: options.messages,
 						},
 						{ signal: options.abortSignal },
 					),

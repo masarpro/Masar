@@ -19,7 +19,12 @@ export const addMessageToChat = protectedProcedure
 		description:
 			"Send all messages of the chat to the AI model to get a response",
 	})
-	.input(z.object({ chatId: z.string(), messages: z.array(z.object()) }))
+	.input(
+		z.object({
+			chatId: z.string(),
+			messages: z.array(z.any() as z.ZodType<UIMessage>),
+		}),
+	)
 	.handler(async ({ input, context }) => {
 		const { chatId, messages } = input;
 		const user = context.user;
