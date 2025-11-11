@@ -1,5 +1,16 @@
 # Changelog
 
+
+## 2025-11-11 v1.0.5
+
+### Fix formatting
+
+Ran `pnpm format` to fix formatting issues in the codebase.
+
+### Updated all dependencies
+
+Production and development dependencies have been updated to the latest versions.
+
 ## 2025-11-08 v1.0.4
 
 ### Fixed AI chat component
