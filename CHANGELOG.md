@@ -1,5 +1,11 @@
 # Changelog
 
+## 2025-11-12 v1.0.7
+
+### Fixed mobile menu closing issue
+
+Fixed an issue where the mobile menu was not closing when clicking on a menu item.
+
 ## 2025-11-11 v1.0.6
 
 ### Fix content-collections schema
