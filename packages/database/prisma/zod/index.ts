@@ -60,7 +60,7 @@ export type MemberScalarFieldEnum = z.infer<typeof MemberScalarFieldEnumSchema>;
 
 // File: InvitationScalarFieldEnum.schema.ts
 
-export const InvitationScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'email', 'role', 'status', 'expiresAt', 'inviterId'])
+export const InvitationScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'email', 'role', 'status', 'expiresAt', 'inviterId', 'createdAt'])
 
 export type InvitationScalarFieldEnum = z.infer<typeof InvitationScalarFieldEnumSchema>;
 
@@ -260,6 +260,7 @@ export const InvitationSchema = z.object({
   status: z.string(),
   expiresAt: z.date(),
   inviterId: z.string(),
+  createdAt: z.date(),
 });
 
 export type InvitationType = z.infer<typeof InvitationSchema>;

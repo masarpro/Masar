@@ -64,6 +64,7 @@ model Session {
   updatedAt DateTime
 
   @@unique([token])
+  @@index([userId])
   @@map("session")
 }
 
@@ -85,6 +86,7 @@ model Account {
   createdAt             DateTime
   updatedAt             DateTime
 
+  @@index([userId])
   @@map("account")
 }
 
@@ -97,6 +99,7 @@ model Verification {
   createdAt DateTime?
   updatedAt DateTime?
 
+  @@index([identifier])
   @@map("verification")
 }
 
@@ -114,6 +117,8 @@ model Passkey {
   aaguid       String?
   createdAt    DateTime?
 
+  @@index([userId])
+  @@index([credentialID])
   @@map("passkey")
 }
 
@@ -124,6 +129,8 @@ model TwoFactor {
   userId      String
   user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([secret])
+  @@index([userId])
   @@map("twoFactor")
 }
 
@@ -154,6 +161,8 @@ model Member {
   createdAt      DateTime
 
   @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@index([userId])
   @@map("member")
 }
 
@@ -168,6 +177,10 @@ model Invitation {
   inviterId      String
   user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
 
+  createdAt DateTime @default(now())
+
+  @@index([organizationId])
+  @@index([email])
   @@map("invitation")
 }
 

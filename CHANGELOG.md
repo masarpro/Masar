@@ -1,5 +1,40 @@
 # Changelog
 
+# 2025-12-01 v1.2.0
+
+### Better-auth 1.4 upgrade
+
+Upgraded `better-auth` from version `1.3.34` to `1.4.4`. This version introduces several breaking changes and improvements.
+
+#### Migration steps
+
+1. **Update dependencies:**
+   - Update `better-auth` to `1.4.4` in both `apps/web/package.json` and `packages/auth/package.json`
+   - Add `@better-auth/passkey` package (version `^1.4.4`) to `packages/auth/package.json`
+
+2. **Update passkey plugin imports:**
+   - In `packages/auth/auth.ts`: Change `import { passkey } from "better-auth/plugins/passkey"` to `import { passkey } from "@better-auth/passkey"`
+   - In `packages/auth/client.ts`: Change `passkeyClient` import from `better-auth/client/plugins` to `import { passkeyClient } from "@better-auth/passkey/client"`
+
+3. **Update magicLink callback signature:**
+   - Change the `sendMagicLink` callback from `async ({ email, url }, request)` to `async ({ email, url }, ctx)`
+   - Extract the request object from context: `const request = ctx?.request as Request`
+
+4. **Update database schema:**
+   - Run `pnpm db:push` or create a migration to add the following indexes:
+     - `Session`: `@@index([userId])`
+     - `Account`: `@@index([userId])`
+     - `Verification`: `@@index([identifier])`
+     - `Passkey`: `@@index([userId])` and `@@index([credentialID])`
+     - `TwoFactor`: `@@index([secret])` and `@@index([userId])`
+     - `Member`: `@@index([organizationId])` and `@@index([userId])`
+     - `Invitation`: `@@index([organizationId])` and `@@index([email])`
+   - Add `createdAt DateTime @default(now())` field to the `Invitation` model
+
+These changes improve database query performance through additional indexes and align with better-auth 1.4's new plugin architecture where passkey functionality is now a separate package.
+
+---
+
 # 2025-11-25 v1.1.4
 
 ### Fix OpenAPI schema
