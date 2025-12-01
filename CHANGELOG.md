@@ -1,5 +1,13 @@
 # Changelog
 
+# 2025-12-01 v1.2.1
+
+### Several small type issues fixed
+
+Fixed type issues in ForgotPasswordForm, SetPasswordForm, ChangePasswordForm, and OrganizationRoleSelect components.
+
+---
+
 # 2025-12-01 v1.2.0
 
 ### Better-auth 1.4 upgrade
