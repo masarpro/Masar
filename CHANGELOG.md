@@ -1,5 +1,15 @@
 # Changelog
 
+# 2025-12-03 v1.2.2
+
+### Updated next, react and react-dom for security updates
+
+A critical-severity vulnerability was found in react server components. We updated the related dependencies to the latest versions to fix the issue.
+
+Read more about the issue here: https://vercel.com/changelog/cve-2025-55182
+
+---
+
 # 2025-12-01 v1.2.1
 
 ### Several small type issues fixed
