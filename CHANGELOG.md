@@ -1,5 +1,28 @@
 # Changelog
 
+# 2025-12-04 v1.2.3
+
+### Improved admin list components
+
+#### API changes
+- Updated pagination parameters from `itemsPerPage`/`currentPage` to `limit`/`offset` for better consistency
+- Changed `searchTerm` parameter to `query` across admin list endpoints
+- Count functions now respect search queries, providing accurate pagination totals when filtering
+
+#### Search improvements
+- **Users list**: Now searches both name and email fields (case-insensitive)
+- **Organizations list**: Improved to use case-insensitive search
+- Search queries are now properly applied to both data fetching and count queries
+
+#### UI improvements
+- Replaced loading spinner with skeleton loaders for better visual feedback during data fetching
+- Fixed pagination reset logic to prevent unnecessary page resets on initial component mount
+- Improved loading state display with skeleton rows matching the table structure
+- Fixed pagination display condition to properly check for total count
+
+---
+
+
 # 2025-12-03 v1.2.2
 
 ### Updated next, react and react-dom for security updates
