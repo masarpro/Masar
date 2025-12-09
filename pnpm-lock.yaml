@@ -663,8 +663,8 @@ importers:
         specifier: ^2.53.0
         version: 2.53.0
       dodopayments:
-        specifier: ^2.5.0
-        version: 2.6.1
+        specifier: ^2.8.0
+        version: 2.8.0
       stripe:
         specifier: ^19.3.1
         version: 19.3.1(@types/node@24.10.1)
@@ -4254,8 +4254,8 @@ packages:
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
 
-  dodopayments@2.6.1:
-    resolution: {integrity: sha512-c+fFlTxWHOtysKSYd9SD2f0W06oxd+mbHSBF9PQ+vBF2sB69y1djftMp8pGWytZXCxJNFD7/M3OfJfYY31auFg==}
+  dodopayments@2.8.0:
+    resolution: {integrity: sha512-iU1ObJFpvf2tBvX9i15oG5mOFrp5m57GOpBzwi9qmq26A9BhEb8A2XogObBGdEFt5tK+ZkhVFS9x93Lt7jb+FA==}
     hasBin: true
 
   dom-serializer@2.0.0:
@@ -10687,7 +10687,7 @@ snapshots:
     dependencies:
       dequal: 2.0.3
 
-  dodopayments@2.6.1:
+  dodopayments@2.8.0:
     dependencies:
       standardwebhooks: 1.0.0
 
