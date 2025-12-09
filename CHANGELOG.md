@@ -1,5 +1,24 @@
 # Changelog
 
+# 2025-12-05 v1.2.4
+
+### Updated DodoPayments integration
+
+#### SDK upgrade
+- Updated `dodopayments` package from `^2.5.0` to `^2.8.0`
+
+#### Webhook improvements
+- Refactored webhook handler to use SDK's built-in webhook verification instead of manual signature verification
+- Moved webhook secret configuration to client initialization for better security
+- Updated webhook event types to match new SDK version:
+  - `checkout.session.completed` → `payment.succeeded`
+  - `subscription.created` → `subscription.active`
+  - `subscription.cancelled` → `subscription.expired`
+  - Added support for `subscription.plan_changed` event
+- Updated product ID extraction to use `product_cart` array structure from new SDK
+
+---
+
 # 2025-12-04 v1.2.3
 
 ### Improved admin list components
