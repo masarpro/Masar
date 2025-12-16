@@ -1,5 +1,13 @@
 # Changelog
 
+# 2025-12-16 v1.2.5
+
+### Fixed prisma-zod-generator version
+
+Pinned `prisma-zod-generator` to version `1.32.1` to prevent automatic upgrades to `1.32.2`, which contains breaking changes and is deprecated for Prisma 6.
+
+---
+
 # 2025-12-05 v1.2.4
 
 ### Updated DodoPayments integration
