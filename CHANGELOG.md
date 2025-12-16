@@ -1,5 +1,15 @@
 # Changelog
 
+# 2025-12-16 v1.2.6
+
+### Updated dependencies
+
+- Updated `next` from `16.0.7` to `16.0.10`
+- Updated `react` from `19.2.1` to `19.2.3`
+- Updated `react-dom` from `19.2.1` to `19.2.3`
+
+---
+
 # 2025-12-16 v1.2.5
 
 ### Fixed prisma-zod-generator version
