@@ -2,7 +2,7 @@
 	"dependencies": {
 		"@paralleldrive/cuid2": "^3.1.0",
 		"@prisma/adapter-pg": "^6.19.0",
-		"@prisma/client": "6.19.0",
+		"@prisma/client": "7.1.0",
 		"@repo/config": "workspace:*",
 		"drizzle-orm": "^0.44.7",
 		"drizzle-zod": "0.8.3",
@@ -15,8 +15,8 @@
 		"@types/node": "24.10.1",
 		"dotenv-cli": "^11.0.0",
 		"drizzle-kit": "^0.31.7",
-		"prisma": "6.19.0",
-		"prisma-zod-generator": "1.32.1"
+		"prisma": "7.1.0",
+		"prisma-zod-generator": "2.1.2"
 	},
 	"main": "./index.ts",
 	"name": "@repo/database",

@@ -1,5 +1,24 @@
 # Changelog
 
+# 2025-12-17 v1.2.8
+
+### Updated dependencies
+
+#### Prisma major version upgrade
+- Updated `@prisma/client` from `6.19.0` to `7.1.0`
+- Updated `prisma` from `6.19.0` to `7.1.0`
+- Updated `prisma-zod-generator` from `1.32.1` to `2.1.2`
+
+#### Prisma configuration changes
+- Moved `DATABASE_URL` configuration from `schema.prisma` datasource block to `prisma.config.ts` file
+- The `url` field is now managed through the Prisma config file for better configuration management
+
+#### Better-auth updates
+- Updated `better-auth` from `1.4.4` to `1.4.7` in both web app and auth package
+- Updated `@better-auth/passkey` from `^1.4.4` to `^1.4.7`
+
+---
+
 # 2025-12-16 v1.2.7
 
 ### TypeScript configuration improvements
