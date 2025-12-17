@@ -1,5 +1,22 @@
 # Changelog
 
+# 2025-12-16 v1.2.7
+
+### TypeScript configuration improvements
+
+#### Type safety enhancements
+- Added explicit type assertions in Creem payment provider for better type safety
+
+#### TypeScript config updates
+- Added `jsx: "preserve"` to base TypeScript configuration
+- Added `DOM.Iterable` to React library TypeScript configuration for better DOM type support
+
+#### Cleanup
+- Removed unused `test:webhook` script from payments package
+- Removed unnecessary `type-check` script from tailwind config package
+
+---
+
 # 2025-12-16 v1.2.6
 
 ### Updated dependencies

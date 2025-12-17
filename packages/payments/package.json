@@ -28,8 +28,7 @@
 	},
 	"name": "@repo/payments",
 	"scripts": {
-		"type-check": "tsc --noEmit",
-		"test:webhook": "tsx ./provider/dodopayments/test-webhook.ts"
+		"type-check": "tsc --noEmit"
 	},
 	"types": "./**/.ts",
 	"version": "0.0.0"
