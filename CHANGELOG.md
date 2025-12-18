@@ -1,5 +1,13 @@
 # Changelog
 
+# 2025-12-17 v1.2.9
+
+### Updated Prisma database push script
+
+- Updated database `push` script to remove the deprecated `--skip-generate` flag
+
+---
+
 # 2025-12-17 v1.2.8
 
 ### Updated dependencies
