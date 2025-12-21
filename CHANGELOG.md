@@ -1,5 +1,13 @@
 # Changelog
 
+# 2025-12-21 v1.2.11
+
+### Update dependencies
+
+Updated next, react and react-dom to the latest versions.
+
+---
+
 # 2025-12-21 v1.2.10
 
 ### Fixed settings item component
