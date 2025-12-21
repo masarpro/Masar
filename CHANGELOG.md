@@ -1,5 +1,13 @@
 # Changelog
 
+# 2025-12-21 v1.2.10
+
+### Fixed settings item component
+
+Fixed an issue where the settings item component didn't apply the correct layout.
+
+---
+
 # 2025-12-17 v1.2.9
 
 ### Updated Prisma database push script
