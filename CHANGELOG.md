@@ -1,5 +1,18 @@
 # Changelog
 
+# 2025-12-22 v1.2.12
+
+### Fixed Prisma configuration
+
+#### Script updates
+- Removed explicit `--schema=./prisma/schema.prisma` flags from all Prisma scripts (generate, push, migrate, studio)
+- Scripts now use Prisma's default schema location, simplifying configuration
+
+#### Configuration cleanup
+- Moved `prisma.config.ts` file to the root of the database package
+
+---
+
 # 2025-12-21 v1.2.11
 
 ### Update dependencies
