@@ -5,7 +5,7 @@ import { cn } from "@ui/lib";
 import { CloudIcon, ComputerIcon, StarIcon, WandIcon } from "lucide-react";
 import Image, { type StaticImageData } from "next/image";
 import type { JSXElementConstructor, ReactNode } from "react";
-import heroImage from "../../../../public/images/hero.svg";
+import heroImage from "../../../../public/images/feature.svg";
 
 export const featureTabs: Array<{
 	id: string;
@@ -99,7 +99,7 @@ export function Features() {
 					<small className="font-medium text-xs uppercase tracking-wider text-primary mb-4 block">
 						Incredible features
 					</small>
-					<h2 className="font-serif text-3xl lg:text-4xl xl:text-5xl font-medium">
+					<h2 className="font-serif text-2xl lg:text-3xl xl:text-4xl font-medium">
 						Features your clients will love
 					</h2>
 					<p className="mt-2 text-base lg:text-lg text-foreground/60">

@@ -25,7 +25,7 @@ export function Hero() {
 					Your revolutionary SaaS built with Next.js
 				</h1>
 
-				<p className="mt-2 text-base text-foreground/60 text-sm sm:text-lg">
+				<p className="mt-2 text-foreground/60 text-sm sm:text-lg">
 					This is a demo application built with supastarter. It will
 					save you a lot of time and effort building your next SaaS.
 				</p>
@@ -57,7 +57,7 @@ export function Hero() {
 					/>
 				</div>
 
-				<div className="mt-12 lg:mt-16 xl:mt-24 text-center">
+				<div className="mt-12 lg:mt-16 text-center">
 					<h5 className="font-semibold text-foreground/50 text-xs uppercase tracking-wider">
 						Built & shipped with these awesome tools
 					</h5>
