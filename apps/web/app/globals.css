@@ -17,7 +17,7 @@ pre.shiki {
 }
 
 #nd-sidebar {
-	@apply bg-card! top-[4.5rem] md:h-[calc(100dvh-4.5rem)]!;
+	@apply bg-card!;
 
 	button[data-search-full] {
 		@apply bg-transparent;
