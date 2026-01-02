@@ -11,7 +11,7 @@ export function Hero() {
 		<div className="relative max-w-full overflow-x-hidden bg-card">
 			<div className="container relative z-20 pt-44 pb-12 lg:pb-16">
 				<div className="mb-4 flex justify-start">
-					<div className="flex flex-wrap items-center justify-start rounded-full bg-muted p-px px-3 py-1 font-normal text-highlight text-sm">
+					<div className="flex flex-wrap items-center justify-start rounded-full bg-muted p-px px-3 py-1 font-normal text-foreground text-sm">
 						<span className="flex items-center gap-2 rounded-full font-semibold">
 							New:
 						</span>
