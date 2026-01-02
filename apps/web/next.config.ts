@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
 				protocol: "https",
 				hostname: "avatars.githubusercontent.com",
 			},
+			{
+				// placeholder images
+				protocol: "https",
+				hostname: "picsum.photos",
+			},
 		],
 	},
 	async redirects() {

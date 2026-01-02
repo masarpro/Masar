@@ -94,10 +94,7 @@ export function NavBar() {
 	return (
 		<nav
 			className={cn(
-				"fixed top-0 left-0 z-50 w-full transition-shadow duration-200",
-				!isTop || isDocsPage
-					? "bg-card/80 shadow-sm backdrop-blur-lg"
-					: "shadow-none",
+				"fixed top-0 left-0 z-50 w-full transition-shadow duration-200 bg-card",
 			)}
 			data-test="navigation"
 		>

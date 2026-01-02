@@ -1,5 +1,13 @@
 # Changelog
 
+# 2026-01-02 v1.3.0
+
+### New design
+
+- The UI design has been updated to a new, more modern look.
+
+---
+
 # 2025-12-22 v1.2.12
 
 ### Fixed Prisma configuration
