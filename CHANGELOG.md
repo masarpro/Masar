@@ -1,5 +1,27 @@
 # Changelog
 
+# 2026-01-02 v1.3.1
+
+### Drizzle schema update for better-auth
+
+Updated all drizzle schema files to be aligned with the changes in the latest better-auth version.
+
+#### Schema updates
+
+- **User table**: Added `displayUsername` field and `twoFactorEnabled` field with default value
+- **Passkey table**: Added `aaguid` field for authenticator attestation GUID
+- **Organization table**: Made `slug` field required (`notNull()`) and unique
+- **Member table**: Added default value `"member"` for `role` field and added `cuid()` default function for `id` field
+- **Invitation table**: Added `createdAt` field with default timestamp and default value `"pending"` for `status` field
+- Added performance indexes on `invitation.organizationId` and `invitation.email` fields
+
+#### Relation updates
+
+- Updated `userRelations` to include `members` relation
+- Changed `invitationRelations` from `inviter` to `user` for consistency with PostgreSQL schema
+- Reorganized relation definitions to match PostgreSQL structure
+
+---
 # 2026-01-02 v1.3.0
 
 ### New design
