@@ -1,10 +1,10 @@
 {
 	"dependencies": {
-		"@orpc/client": "^1.11.2",
-		"@orpc/json-schema": "^1.11.2",
-		"@orpc/openapi": "^1.11.2",
-		"@orpc/server": "^1.11.2",
-		"@orpc/zod": "^1.11.2",
+		"@orpc/client": "1.13.2",
+		"@orpc/json-schema": "1.13.2",
+		"@orpc/openapi": "1.13.2",
+		"@orpc/server": "1.13.2",
+		"@orpc/zod": "1.13.2",
 		"@repo/ai": "workspace:*",
 		"@repo/auth": "workspace:*",
 		"@repo/config": "workspace:*",

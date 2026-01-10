@@ -1,6 +1,18 @@
 # Changelog
 
-# 2026-01-02 v1.3.1
+## 2026-01-10 v1.3.2
+
+#### Package updates
+
+- Updated all ORPC packages (`@orpc/client`, `@orpc/tanstack-query`, `@orpc/json-schema`, `@orpc/openapi`, `@orpc/server`, `@orpc/zod`) from `^1.11.2` to `1.13.2`
+
+#### Code changes
+
+- Removed experimental prefix from `SmartCoercionPlugin` import in `packages/api/orpc/handler.ts` (changed from `experimental_SmartCoercionPlugin` to `SmartCoercionPlugin`)
+
+---
+
+## 2026-01-02 v1.3.1
 
 ### Drizzle schema update for better-auth
 
@@ -22,7 +34,7 @@ Updated all drizzle schema files to be aligned with the changes in the latest be
 - Reorganized relation definitions to match PostgreSQL structure
 
 ---
-# 2026-01-02 v1.3.0
+## 2026-01-02 v1.3.0
 
 ### New design
 
@@ -30,7 +42,7 @@ Updated all drizzle schema files to be aligned with the changes in the latest be
 
 ---
 
-# 2025-12-22 v1.2.12
+## 2025-12-22 v1.2.12
 
 ### Fixed Prisma configuration
 
@@ -43,7 +55,7 @@ Updated all drizzle schema files to be aligned with the changes in the latest be
 
 ---
 
-# 2025-12-21 v1.2.11
+## 2025-12-21 v1.2.11
 
 ### Update dependencies
 
@@ -51,7 +63,7 @@ Updated next, react and react-dom to the latest versions.
 
 ---
 
-# 2025-12-21 v1.2.10
+## 2025-12-21 v1.2.10
 
 ### Fixed settings item component
 
@@ -59,7 +71,7 @@ Fixed an issue where the settings item component didn't apply the correct layout
 
 ---
 
-# 2025-12-17 v1.2.9
+## 2025-12-17 v1.2.9
 
 ### Updated Prisma database push script
 
@@ -67,7 +79,7 @@ Fixed an issue where the settings item component didn't apply the correct layout
 
 ---
 
-# 2025-12-17 v1.2.8
+## 2025-12-17 v1.2.8
 
 ### Updated dependencies
 
@@ -86,7 +98,7 @@ Fixed an issue where the settings item component didn't apply the correct layout
 
 ---
 
-# 2025-12-16 v1.2.7
+## 2025-12-16 v1.2.7
 
 ### TypeScript configuration improvements
 
@@ -103,7 +115,7 @@ Fixed an issue where the settings item component didn't apply the correct layout
 
 ---
 
-# 2025-12-16 v1.2.6
+## 2025-12-16 v1.2.6
 
 ### Updated dependencies
 
@@ -113,7 +125,7 @@ Fixed an issue where the settings item component didn't apply the correct layout
 
 ---
 
-# 2025-12-16 v1.2.5
+## 2025-12-16 v1.2.5
 
 ### Fixed prisma-zod-generator version
 
@@ -121,7 +133,7 @@ Pinned `prisma-zod-generator` to version `1.32.1` to prevent automatic upgrades 
 
 ---
 
-# 2025-12-05 v1.2.4
+## 2025-12-05 v1.2.4
 
 ### Updated DodoPayments integration
 
@@ -140,7 +152,7 @@ Pinned `prisma-zod-generator` to version `1.32.1` to prevent automatic upgrades 
 
 ---
 
-# 2025-12-04 v1.2.3
+## 2025-12-04 v1.2.3
 
 ### Improved admin list components
 
@@ -162,8 +174,7 @@ Pinned `prisma-zod-generator` to version `1.32.1` to prevent automatic upgrades 
 
 ---
 
-
-# 2025-12-03 v1.2.2
+## 2025-12-03 v1.2.2
 
 ### Updated next, react and react-dom for security updates
 
@@ -173,7 +184,7 @@ Read more about the issue here: https://vercel.com/changelog/cve-2025-55182
 
 ---
 
-# 2025-12-01 v1.2.1
+## 2025-12-01 v1.2.1
 
 ### Several small type issues fixed
 
@@ -181,7 +192,7 @@ Fixed type issues in ForgotPasswordForm, SetPasswordForm, ChangePasswordForm, an
 
 ---
 
-# 2025-12-01 v1.2.0
+## 2025-12-01 v1.2.0
 
 ### Better-auth 1.4 upgrade
 
@@ -216,7 +227,7 @@ These changes improve database query performance through additional indexes and 
 
 ---
 
-# 2025-11-25 v1.1.4
+## 2025-11-25 v1.1.4
 
 ### Fix OpenAPI schema
 
@@ -224,7 +235,7 @@ Fixed was an issue that would cause custom OpenAPI endpoints to not be reachable
 
 ---
 
-# 2025-11-23 v1.1.3
+## 2025-11-23 v1.1.3
 
 ### Fix active sessions block
 
