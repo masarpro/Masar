@@ -11,7 +11,7 @@ All coding agent guidelines have been consolidated into a single, comprehensive 
 - `.windsurfrules` - Windsurf editor rules
 - `.cursor/rules/*.mdc` - All Cursor IDE rule files (7 files)
 
-#### New file
+#### New files
 - `agents.md` - Comprehensive 679-line guide covering:
   - Technology stack overview
   - Monorepo architecture and directory structure
@@ -27,6 +27,7 @@ All coding agent guidelines have been consolidated into a single, comprehensive 
   - Tooling & Quality standards
   - Performance optimization guidelines
   - Code review checklist
+- `claude.md` - Symlink to `agents.md` for Claude Code compatibility
 
 This consolidation provides a single source of truth for all AI coding agents working with the codebase, regardless of the IDE or tool being used.
 
