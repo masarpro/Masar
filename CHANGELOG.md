@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-01-12 v1.3.3
+
+### Consolidated agent rules into single agents.md file
+
+All coding agent guidelines have been consolidated into a single, comprehensive `agents.md` file in the repository root.
+
+#### Removed files
+- `claude.md` - Previous Claude-specific coding guide
+- `.windsurfrules` - Windsurf editor rules
+- `.cursor/rules/*.mdc` - All Cursor IDE rule files (7 files)
+
+#### New files
+- `agents.md` - Comprehensive 679-line guide covering:
+  - Technology stack overview
+  - Monorepo architecture and directory structure
+  - Import conventions and path aliases
+  - TypeScript best practices with code examples
+  - React & Next.js patterns (Server vs Client Components)
+  - API & Data Layer patterns (oRPC procedures, database queries)
+  - Authentication & Authorization patterns
+  - UI & Styling guidelines
+  - Forms & Validation patterns
+  - Internationalization
+  - Configuration management
+  - Tooling & Quality standards
+  - Performance optimization guidelines
+  - Code review checklist
+- `claude.md` - Symlink to `agents.md` for Claude Code compatibility
+
+This consolidation provides a single source of truth for all AI coding agents working with the codebase, regardless of the IDE or tool being used.
+
+---
+
 ## 2026-01-10 v1.3.2
 
 #### Package updates
