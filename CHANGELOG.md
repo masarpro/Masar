@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-01-26 v1.3.4
+
+### Enhanced organization dashboard with visual trend charts
+
+The organization dashboard now includes interactive trend charts to make the UI more visual.
+
+---
+
 ## 2026-01-12 v1.3.3
 
 ### Consolidated agent rules into single agents.md file
