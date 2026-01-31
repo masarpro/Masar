@@ -1,0 +1,1099 @@
+{
+	"admin": {
+		"menu": {
+			"organizations": "المؤسسات",
+			"users": "المستخدمون"
+		},
+		"organizations": {
+			"backToList": "العودة إلى المؤسسات",
+			"confirmDelete": {
+				"confirm": "حذف",
+				"message": "هل أنت متأكد من رغبتك في حذف هذه المؤسسة؟ لا يمكن التراجع عن هذا الإجراء.",
+				"title": "حذف المؤسسة"
+			},
+			"create": "إنشاء",
+			"delete": "حذف",
+			"deleteOrganization": {
+				"deleted": "تم حذف المؤسسة بنجاح!",
+				"deleting": "جارٍ حذف المؤسسة...",
+				"notDeleted": "تعذر حذف المؤسسة. يرجى المحاولة مرة أخرى."
+			},
+			"edit": "تعديل",
+			"form": {
+				"createTitle": "إنشاء مؤسسة",
+				"name": "اسم المؤسسة",
+				"notifications": {
+					"error": "تعذر حفظ المؤسسة. يرجى المحاولة لاحقاً.",
+					"success": "تم حفظ المؤسسة بنجاح."
+				},
+				"save": "حفظ",
+				"updateTitle": "تعديل المؤسسة"
+			},
+			"loading": "جارٍ تحميل المؤسسات...",
+			"membersCount": "{count} {count, plural, one {عضو} other {أعضاء}}",
+			"search": "البحث عن مؤسسة...",
+			"title": "إدارة المؤسسات"
+		},
+		"title": "الإدارة",
+		"users": {
+			"confirmDelete": {
+				"confirm": "حذف",
+				"message": "هل أنت متأكد من رغبتك في حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.",
+				"title": "حذف المستخدم"
+			},
+			"delete": "حذف",
+			"deleteUser": {
+				"deleted": "تم حذف المستخدم بنجاح!",
+				"deleting": "جارٍ حذف المستخدم...",
+				"notDeleted": "تعذر حذف المستخدم. يرجى المحاولة مرة أخرى."
+			},
+			"emailVerified": {
+				"verified": "تم التحقق من البريد الإلكتروني",
+				"waiting": "البريد الإلكتروني بانتظار التحقق"
+			},
+			"impersonate": "انتحال الشخصية",
+			"impersonation": {
+				"impersonating": "جارٍ انتحال شخصية {name}..."
+			},
+			"loading": "جارٍ تحميل المستخدمين...",
+			"resendVerificationMail": {
+				"error": "تعذر إعادة إرسال رسالة التحقق. يرجى المحاولة مرة أخرى.",
+				"submitting": "جارٍ إعادة إرسال رسالة التحقق...",
+				"success": "تم إرسال رسالة التحقق.",
+				"title": "إعادة إرسال رسالة التحقق"
+			},
+			"search": "البحث بالاسم أو البريد الإلكتروني...",
+			"title": "إدارة المستخدمين",
+			"assignAdminRole": "تعيين صلاحية المسؤول",
+			"removeAdminRole": "إزالة صلاحية المسؤول"
+		},
+		"description": "إدارة تطبيقك."
+	},
+	"app": {
+		"menu": {
+			"accountSettings": "إعدادات الحساب",
+			"admin": "الإدارة",
+			"aiChatbot": "روبوت الذكاء الاصطناعي",
+			"organizationSettings": "إعدادات المؤسسة",
+			"quantities": "حصر الكميات",
+			"start": "البداية"
+		},
+		"userMenu": {
+			"accountSettings": "إعدادات الحساب",
+			"colorMode": "وضع الألوان",
+			"documentation": "التوثيق",
+			"home": "الرئيسية",
+			"logout": "تسجيل الخروج"
+		}
+	},
+	"auth": {
+		"errors": {
+			"invalidEmailOrPassword": "بيانات الاعتماد المدخلة غير صحيحة. يرجى التحقق والمحاولة مرة أخرى.",
+			"unknown": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+			"userNotFound": "هذا المستخدم غير موجود",
+			"failedToCreateUser": "تعذر إنشاء المستخدم. يرجى المحاولة مرة أخرى.",
+			"failedToCreateSession": "تعذر إنشاء الجلسة. يرجى المحاولة مرة أخرى.",
+			"failedToUpdateUser": "تعذر تحديث المستخدم. يرجى المحاولة مرة أخرى.",
+			"failedToGetSession": "تعذر الحصول على الجلسة.",
+			"invalidPassword": "كلمة المرور المدخلة غير صحيحة.",
+			"invalidEmail": "البريد الإلكتروني المدخل غير صالح.",
+			"invalidToken": "الرمز المدخل غير صالح أو منتهي الصلاحية.",
+			"credentialAccountNotFound": "الحساب غير موجود.",
+			"emailCanNotBeUpdated": "تعذر تحديث البريد الإلكتروني. يرجى المحاولة مرة أخرى.",
+			"emailNotVerified": "يرجى التحقق من بريدك الإلكتروني أولاً قبل تسجيل الدخول.",
+			"failedToGetUserInfo": "تعذر تحميل معلومات المستخدم.",
+			"idTokenNotSupported": "رمز التعريف غير مدعوم.",
+			"passwordTooLong": "كلمة المرور طويلة جداً.",
+			"passwordTooShort": "كلمة المرور قصيرة جداً.",
+			"providerNotFound": "هذا المزود غير مدعوم.",
+			"socialAccountAlreadyLinked": "هذا الحساب مرتبط بالفعل بمستخدم آخر.",
+			"userEmailNotFound": "البريد الإلكتروني غير موجود.",
+			"userAlreadyExists": "هذا المستخدم موجود بالفعل.",
+			"invalidInvitation": "الدعوة غير صالحة أو منتهية الصلاحية.",
+			"sessionExpired": "انتهت صلاحية الجلسة.",
+			"failedToUnlinkLastAccount": "فشل في إلغاء ربط الحساب",
+			"accountNotFound": "الحساب غير موجود"
+		},
+		"forgotPassword": {
+			"backToSignin": "العودة لتسجيل الدخول",
+			"email": "البريد الإلكتروني",
+			"hints": {
+				"linkNotSent": {
+					"message": "نأسف، لم نتمكن من إرسال رابط إعادة تعيين كلمة المرور. يرجى المحاولة لاحقاً.",
+					"title": "لم يتم إرسال الرابط"
+				},
+				"linkSent": {
+					"message": "لقد أرسلنا لك رابطاً للمتابعة. يرجى التحقق من صندوق الوارد.",
+					"title": "تم إرسال الرابط"
+				}
+			},
+			"message": "يرجى إدخال بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.",
+			"submit": "إرسال الرابط",
+			"title": "نسيت كلمة المرور؟"
+		},
+		"login": {
+			"continueWith": "أو تابع باستخدام",
+			"createAnAccount": "إنشاء حساب",
+			"dontHaveAnAccount": "ليس لديك حساب؟",
+			"forgotPassword": "نسيت كلمة المرور؟",
+			"hints": {
+				"invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.",
+				"linkSent": {
+					"message": "لقد أرسلنا لك رابطاً للمتابعة. يرجى التحقق من صندوق الوارد.",
+					"title": "تم إرسال الرابط"
+				}
+			},
+			"loginWithPasskey": "تسجيل الدخول باستخدام مفتاح المرور",
+			"modes": {
+				"magicLink": "رابط سحري",
+				"password": "كلمة المرور"
+			},
+			"submit": "تسجيل الدخول",
+			"subtitle": "يرجى إدخال بيانات الاعتماد الخاصة بك لتسجيل الدخول.",
+			"title": "مرحباً بعودتك",
+			"sendMagicLink": "إرسال الرابط السحري"
+		},
+		"resetPassword": {
+			"backToSignin": "العودة لتسجيل الدخول",
+			"hints": {
+				"error": "نأسف، لم نتمكن من إعادة تعيين كلمة المرور. يرجى المحاولة مرة أخرى.",
+				"success": "تمت إعادة تعيين كلمة المرور بنجاح."
+			},
+			"message": "يرجى إدخال كلمة مرور جديدة.",
+			"newPassword": "كلمة المرور الجديدة",
+			"submit": "إعادة تعيين كلمة المرور",
+			"title": "إعادة تعيين كلمة المرور"
+		},
+		"signup": {
+			"alreadyHaveAccount": "لديك حساب بالفعل؟",
+			"email": "البريد الإلكتروني",
+			"hints": {
+				"signupFailed": "نأسف، لم نتمكن من إنشاء حسابك. يرجى المحاولة لاحقاً.",
+				"verifyEmail": "لقد أرسلنا لك رابطاً للتحقق من بريدك الإلكتروني. يرجى التحقق من صندوق الوارد."
+			},
+			"message": "نحن سعداء بانضمامك إلينا. يرجى ملء النموذج أدناه لإنشاء حسابك.",
+			"name": "الاسم",
+			"password": "كلمة المرور",
+			"signIn": "تسجيل الدخول",
+			"submit": "إنشاء حساب",
+			"title": "إنشاء حساب"
+		},
+		"verify": {
+			"title": "تحقق من حسابك",
+			"code": "كلمة المرور لمرة واحدة",
+			"submit": "تحقق",
+			"backToSignin": "العودة لتسجيل الدخول",
+			"message": "أدخل كلمة المرور لمرة واحدة من تطبيق المصادقة للمتابعة."
+		}
+	},
+	"blog": {
+		"description": "اقرأ أحدث الأخبار من شركتنا",
+		"title": "مدونتنا",
+		"back": "العودة للمدونة"
+	},
+	"changelog": {
+		"description": "ابقَ على اطلاع بأحدث التغييرات في منتجنا.",
+		"title": "سجل التغييرات"
+	},
+	"common": {
+		"cancel": "إلغاء",
+		"creating": "جارٍ الإنشاء...",
+		"saving": "جارٍ الحفظ...",
+		"loading": "جارٍ التحميل...",
+		"edit": "تعديل",
+		"delete": "حذف",
+		"duplicate": "نسخ",
+		"view": "عرض",
+		"confirmation": {
+			"cancel": "إلغاء",
+			"confirm": "تأكيد"
+		},
+		"menu": {
+			"blog": "المدونة",
+			"changelog": "سجل التغييرات",
+			"contact": "اتصل بنا",
+			"dashboard": "لوحة التحكم",
+			"docs": "التوثيق",
+			"faq": "الأسئلة الشائعة",
+			"login": "تسجيل الدخول",
+			"pricing": "الأسعار"
+		},
+		"tableOfContents": {
+			"title": "في هذه الصفحة"
+		},
+		"actions": {
+			"continue": "متابعة",
+			"verify": "تحقق"
+		}
+	},
+	"contact": {
+		"description": "نحن هنا لمساعدتك. يرجى استخدام النموذج أدناه للتواصل معنا.",
+		"form": {
+			"email": "البريد الإلكتروني",
+			"message": "الرسالة",
+			"name": "الاسم",
+			"notifications": {
+				"error": "نأسف، لم نتمكن من إرسال رسالتك. يرجى المحاولة لاحقاً.",
+				"success": "تم إرسال رسالتك بنجاح. سنتواصل معك في أقرب وقت ممكن."
+			},
+			"submit": "إرسال الرسالة"
+		},
+		"title": "اتصل بنا"
+	},
+	"documentation": {
+		"title": "التوثيق"
+	},
+	"faq": {
+		"description": "هل لديك أي أسئلة؟ نحن هنا لمساعدتك.",
+		"title": "الأسئلة الشائعة"
+	},
+	"mail": {
+		"common": {
+			"openLinkInBrowser": "إذا كنت تريد فتح الرابط في متصفح مختلف عن المتصفح الافتراضي، انسخ والصق هذا الرابط:",
+			"otp": "كلمة المرور لمرة واحدة",
+			"useLink": "أو استخدم الرابط التالي:"
+		},
+		"emailVerification": {
+			"body": "مرحباً،\nيرجى النقر على الرابط أدناه للتحقق من عنوان البريد الإلكتروني الجديد.",
+			"confirmEmail": "تحقق من البريد الإلكتروني",
+			"subject": "تحقق من بريدك الإلكتروني"
+		},
+		"forgotPassword": {
+			"body": "مرحباً،\nلقد طلبت إعادة تعيين كلمة المرور.\n\nانقر على الزر أدناه لإعادة تعيين كلمة المرور.",
+			"resetPassword": "إعادة تعيين كلمة المرور",
+			"subject": "إعادة تعيين كلمة المرور"
+		},
+		"magicLink": {
+			"body": "مرحباً،\nلقد طلبت بريد تسجيل الدخول.\n\nانقر على الرابط أدناه لتسجيل الدخول.",
+			"login": "تسجيل الدخول",
+			"subject": "تسجيل الدخول"
+		},
+		"newUser": {
+			"body": "مرحباً،\nشكراً لتسجيلك معنا.\n\nلبدء استخدام تطبيقنا، يرجى تأكيد بريدك الإلكتروني بالنقر على الرابط أدناه.",
+			"confirmEmail": "تأكيد البريد الإلكتروني",
+			"subject": "تأكيد بريدك الإلكتروني"
+		},
+		"newsletterSignup": {
+			"body": "شكراً لاشتراكك في نشرتنا الإخبارية. سنبقيك على اطلاع بأحدث الأخبار والتحديثات.",
+			"subject": "مرحباً بك في نشرتنا الإخبارية"
+		},
+		"organizationInvitation": {
+			"body": "لقد تمت دعوتك للانضمام إلى مؤسسة {organizationName}. انقر على الزر أدناه أو انسخ والصق الرابط في متصفحك المفضل لقبول الدعوة والانضمام للمؤسسة.",
+			"headline": "انضم إلى مؤسسة {organizationName}",
+			"join": "الانضمام للمؤسسة",
+			"subject": "لقد تمت دعوتك للانضمام إلى مؤسسة"
+		}
+	},
+	"newsletter": {
+		"email": "البريد الإلكتروني",
+		"hints": {
+			"error": {
+				"message": "تعذر الاشتراك في النشرة الإخبارية. يرجى المحاولة لاحقاً."
+			},
+			"success": {
+				"message": "شكراً لاشتراكك في نشرتنا الإخبارية. سنبقيك على اطلاع.",
+				"title": "تم الاشتراك"
+			}
+		},
+		"submit": "اشترك",
+		"subtitle": "كن من أوائل الذين يحصلون على الوصول.",
+		"title": "احصل على الوصول المبكر"
+	},
+	"onboarding": {
+		"account": {
+			"avatar": "الصورة الرمزية",
+			"avatarDescription": "انقر على الدائرة أو أسقط صورة لرفع صورتك الرمزية.",
+			"name": "الاسم"
+		},
+		"continue": "متابعة",
+		"message": "فقط بضع خطوات سريعة للبدء.",
+		"notifications": {
+			"accountSetupFailed": "نأسف، لم نتمكن من إعداد حسابك. يرجى المحاولة لاحقاً."
+		},
+		"step": "الخطوة {step} من {total}",
+		"title": "إعداد حسابك"
+	},
+	"organizations": {
+		"createForm": {
+			"name": "اسم المؤسسة",
+			"notifications": {
+				"error": "نأسف، لم نتمكن من إنشاء مؤسستك. يرجى المحاولة لاحقاً.",
+				"success": "تم إنشاء مؤسستك. يمكنك الآن دعوة الأعضاء."
+			},
+			"submit": "إنشاء المؤسسة",
+			"subtitle": "أدخل اسماً لمؤسستك للبدء. يمكنك تغيير الاسم لاحقاً في إعدادات المؤسسة.",
+			"title": "إنشاء مؤسسة"
+		},
+		"invitationAlert": {
+			"description": "تحتاج لتسجيل الدخول أو إنشاء حساب للانضمام للمؤسسة.",
+			"title": "لقد تمت دعوتك للانضمام إلى مؤسسة."
+		},
+		"invitationModal": {
+			"accept": "قبول",
+			"decline": "رفض",
+			"description": "لقد تمت دعوتك للانضمام إلى مؤسسة {organizationName}. هل تريد قبول الدعوة والانضمام للمؤسسة؟",
+			"title": "الانضمام للمؤسسة"
+		},
+		"organizationSelect": {
+			"createNewOrganization": "إنشاء مؤسسة جديدة",
+			"organizations": "المؤسسات",
+			"personalAccount": "الحساب الشخصي"
+		},
+		"organizationsGrid": {
+			"createNewOrganization": "إنشاء مؤسسة جديدة",
+			"title": "مؤسساتك"
+		},
+		"roles": {
+			"admin": "مسؤول",
+			"member": "عضو",
+			"owner": "مالك"
+		},
+		"settings": {
+			"changeName": {
+				"title": "اسم المؤسسة"
+			},
+			"deleteOrganization": {
+				"confirmation": "هل أنت متأكد من رغبتك في حذف مؤسستك؟",
+				"description": "حذف مؤسستك نهائياً. بمجرد حذف مؤسستك، لا يمكن التراجع. للتأكيد، يرجى إدخال كلمة المرور أدناه:",
+				"submit": "حذف المؤسسة",
+				"title": "حذف المؤسسة"
+			},
+			"logo": {
+				"description": "ارفع شعاراً لمؤسستك.",
+				"title": "شعار المؤسسة"
+			},
+			"members": {
+				"activeMembers": "الأعضاء النشطون",
+				"description": "عرض جميع الأعضاء النشطين والدعوات المعلقة لمؤسستك.",
+				"invitations": {
+					"empty": "لم تقم بدعوة أي أعضاء بعد.",
+					"expiresAt": "ينتهي في {date}",
+					"invitationStatus": {
+						"accepted": "مقبولة",
+						"canceled": "ملغاة",
+						"pending": "معلقة",
+						"rejected": "مرفوضة"
+					},
+					"revoke": "إلغاء الدعوة",
+					"resend": "إعادة إرسال الدعوة"
+				},
+				"inviteMember": {
+					"description": "لدعوة عضو جديد، أرسل له دعوة.",
+					"email": "البريد الإلكتروني",
+					"notifications": {
+						"error": {
+							"description": "تعذر دعوة العضو. يرجى المحاولة لاحقاً.",
+							"title": "تعذر دعوة العضو"
+						},
+						"success": {
+							"description": "تمت دعوة العضو.",
+							"title": "تمت دعوة العضو"
+						}
+					},
+					"role": "الدور",
+					"submit": "دعوة",
+					"title": "دعوة عضو"
+				},
+				"leaveOrganization": "مغادرة المؤسسة",
+				"notifications": {
+					"removeMember": {
+						"error": {
+							"description": "تعذر إزالة العضو من مؤسستك. يرجى المحاولة مرة أخرى."
+						},
+						"loading": {
+							"description": "جارٍ إزالة العضو من المؤسسة..."
+						},
+						"success": {
+							"description": "تمت إزالة العضو بنجاح من مؤسستك."
+						}
+					},
+					"revokeInvitation": {
+						"error": {
+							"description": "تعذر إلغاء الدعوة. يرجى المحاولة لاحقاً."
+						},
+						"loading": {
+							"description": "جارٍ إلغاء الدعوة..."
+						},
+						"success": {
+							"description": "تم إلغاء الدعوة."
+						}
+					},
+					"updateMembership": {
+						"error": {
+							"description": "تعذر تحديث عضوية المؤسسة. يرجى المحاولة مرة أخرى."
+						},
+						"loading": {
+							"description": "جارٍ تحديث العضوية..."
+						},
+						"success": {
+							"description": "تم تحديث العضوية بنجاح"
+						}
+					},
+					"resendInvitation": {
+						"loading": {
+							"description": "جارٍ إعادة إرسال الدعوة..."
+						},
+						"success": {
+							"description": "تم إرسال الدعوة"
+						},
+						"error": {
+							"description": "تعذر إرسال الدعوة. يرجى المحاولة مرة أخرى."
+						}
+					}
+				},
+				"pendingInvitations": "الدعوات المعلقة",
+				"removeMember": "إزالة العضو",
+				"title": "الأعضاء"
+			},
+			"notifications": {
+				"organizationDeleted": "تم حذف مؤسستك.",
+				"organizationNameNotUpdated": "تعذر تحديث اسم مؤسستك. يرجى المحاولة لاحقاً.",
+				"organizationNameUpdated": "تم تحديث اسم مؤسستك.",
+				"organizationNotDeleted": "تعذر حذف مؤسستك. يرجى المحاولة لاحقاً."
+			},
+			"subtitle": "إدارة إعدادات المؤسسة.",
+			"title": "المؤسسة",
+			"dangerZone": {
+				"title": "منطقة الخطر"
+			}
+		},
+		"start": {
+			"subtitle": "مرحباً بك في صفحة البداية لهذه المؤسسة!"
+		}
+	},
+	"pricing": {
+		"choosePlan": "اختر الخطة",
+		"contactSales": "تواصل مع المبيعات",
+		"description": "اختر الخطة التي تناسبك.",
+		"getStarted": "ابدأ الآن",
+		"month": "{count, plural, one {شهر} other {{count} أشهر}}",
+		"monthly": "شهري",
+		"products": {
+			"basic": {
+				"description": "مثالي للفرق الصغيرة.",
+				"features": {
+					"anotherFeature": "ميزة رائعة أخرى",
+					"limitedSupport": "دعم محدود"
+				},
+				"title": "أساسي"
+			},
+			"enterprise": {
+				"description": "خطة مخصصة لمتطلباتك",
+				"features": {
+					"enterpriseSupport": "دعم المؤسسات",
+					"unlimitedProjects": "مشاريع غير محدودة"
+				},
+				"title": "المؤسسات"
+			},
+			"free": {
+				"description": "ابدأ مجاناً",
+				"features": {
+					"anotherFeature": "ميزة رائعة أخرى",
+					"limitedSupport": "دعم محدود"
+				},
+				"title": "مجاني"
+			},
+			"lifetime": {
+				"description": "اشترِ مرة واحدة. استخدم للأبد.",
+				"features": {
+					"extendSupport": "دعم موسع",
+					"noRecurringCosts": "بدون تكاليف متكررة"
+				},
+				"title": "مدى الحياة"
+			},
+			"pro": {
+				"description": "الأفضل للفرق",
+				"features": {
+					"anotherFeature": "ميزة رائعة أخرى",
+					"fiveMembers": "حتى 5 أعضاء",
+					"fullSupport": "دعم كامل"
+				},
+				"title": "احترافي"
+			}
+		},
+		"purchase": "شراء",
+		"recommended": "موصى به",
+		"subscribe": "اشترك",
+		"title": "الأسعار",
+		"trialPeriod": "{days} {days, plural, one {يوم} other {أيام}} تجربة مجانية",
+		"year": "{count, plural, one {سنة} other {{count} سنوات}}",
+		"yearly": "سنوي",
+		"perSeat": "لكل مقعد"
+	},
+	"quantities": {
+		"title": "حصر الكميات",
+		"subtitle": "إدارة دراسات التكلفة وحصر الكميات",
+		"newStudy": "دراسة جديدة",
+		"createStudy": "إنشاء دراسة",
+		"empty": "لا توجد دراسات تكلفة",
+		"emptyDescription": "ابدأ بإنشاء دراسة تكلفة جديدة لمشروعك",
+		"notFound": "لم يتم العثور على الدراسة",
+		"loading": "جارٍ التحميل...",
+		"searchPlaceholder": "البحث عن دراسة...",
+		"allStatuses": "جميع الحالات",
+		"unnamed": "بدون اسم",
+		"floors": "طوابق",
+		"totalItems": "إجمالي العناصر",
+		"totalArea": "إجمالي المساحة",
+		"totalCost": "التكلفة الإجمالية",
+		"totalConcrete": "إجمالي الخرسانة",
+		"categories": "الفئات",
+		"items": "العناصر",
+		"area": "المساحة",
+		"more": "المزيد",
+		"directCost": "التكلفة المباشرة",
+		"overhead": "المصاريف الإدارية",
+		"profit": "الربح",
+		"contingency": "الطوارئ",
+		"vat": "ضريبة القيمة المضافة",
+		"includeVat": "تضمين ضريبة القيمة المضافة",
+		"total": "الإجمالي",
+		"labor": "العمالة",
+		"costBreakdown": "تفصيل التكاليف",
+		"pricingSettings": "إعدادات التسعير",
+		"projectInfo": "معلومات المشروع",
+		"costSummary": "ملخص التكاليف",
+		"deleteTitle": "حذف الدراسة",
+		"deleteDescription": "هل أنت متأكد من حذف هذه الدراسة؟ لا يمكن التراجع عن هذا الإجراء.",
+		"deleteSuccess": "تم حذف الدراسة بنجاح",
+		"deleteError": "فشل حذف الدراسة",
+		"duplicateSuccess": "تم نسخ الدراسة بنجاح",
+		"duplicateError": "فشل نسخ الدراسة",
+		"createSuccess": "تم إنشاء الدراسة بنجاح",
+		"createError": "فشل إنشاء الدراسة",
+		"status": {
+			"draft": "مسودة",
+			"in_progress": "قيد التنفيذ",
+			"inProgress": "قيد التنفيذ",
+			"completed": "مكتمل",
+			"approved": "معتمد",
+			"archived": "مؤرشف"
+		},
+		"form": {
+			"basicInfo": "المعلومات الأساسية",
+			"name": "اسم الدراسة",
+			"namePlaceholder": "أدخل اسم الدراسة",
+			"customerName": "اسم العميل",
+			"customerNamePlaceholder": "أدخل اسم العميل",
+			"projectName": "اسم المشروع",
+			"projectNamePlaceholder": "أدخل اسم المشروع",
+			"clientName": "اسم العميل",
+			"clientNamePlaceholder": "أدخل اسم العميل",
+			"projectType": "نوع المشروع",
+			"projectTypePlaceholder": "اختر نوع المشروع",
+			"description": "الوصف",
+			"descriptionPlaceholder": "أدخل وصف المشروع",
+			"dimensions": "الأبعاد",
+			"landArea": "مساحة الأرض",
+			"buildingArea": "مساحة البناء",
+			"numberOfFloors": "عدد الطوابق",
+			"finishingLevel": "مستوى التشطيب",
+			"hasBasement": "يوجد قبو",
+			"submit": "إنشاء الدراسة",
+			"cancel": "إلغاء"
+		},
+		"validation": {
+			"landArea": "مساحة الأرض مطلوبة",
+			"buildingArea": "مساحة البناء مطلوبة",
+			"numberOfFloors": "عدد الطوابق مطلوب"
+		},
+		"projectTypes": {
+			"residential": "سكني",
+			"commercial": "تجاري",
+			"industrial": "صناعي",
+			"infrastructure": "بنية تحتية",
+			"warehouse": "مستودع",
+			"mixed": "مختلط"
+		},
+		"finishingLevels": {
+			"economic": "اقتصادي",
+			"medium": "متوسط",
+			"luxury": "فاخر",
+			"superLuxury": "سوبر فاخر"
+		},
+		"overview": {
+			"title": "نظرة عامة",
+			"projectInfo": "معلومات المشروع",
+			"costSummary": "ملخص التكاليف",
+			"quickActions": "إجراءات سريعة"
+		},
+		"structural": {
+			"title": "الأعمال الإنشائية",
+			"subtitle": "حساب كميات الخرسانة والحديد للعناصر الإنشائية",
+			"description": "إدارة عناصر الهيكل الإنشائي",
+			"slabs": "البلاطات",
+			"columns": "الأعمدة",
+			"beams": "الكمرات",
+			"foundations": "القواعد",
+			"blocks": "البلوك",
+			"stairs": "السلالم",
+			"neckColumns": "الرقاب",
+			"groundBeams": "الميدات",
+			"plainConcrete": "الخرسانة العادية",
+			"addItem": "إضافة عنصر",
+			"editItem": "تعديل العنصر",
+			"deleteItem": "حذف العنصر",
+			"itemName": "اسم العنصر",
+			"itemNamePlaceholder": "أدخل اسم العنصر",
+			"quantity": "العدد",
+			"length": "الطول",
+			"width": "العرض",
+			"height": "الارتفاع",
+			"depth": "العمق",
+			"thickness": "السماكة",
+			"diameter": "القطر",
+			"spacing": "التباعد",
+			"concreteVolume": "حجم الخرسانة",
+			"concreteType": "نوع الخرسانة",
+			"steelWeight": "وزن الحديد",
+			"steelRatio": "نسبة التسليح",
+			"formworkArea": "مساحة الشدة",
+			"wastage": "الهالك",
+			"materialCost": "تكلفة المواد",
+			"laborCost": "تكلفة العمالة",
+			"calculate": "حساب",
+			"saveItem": "حفظ العنصر",
+			"noItems": "لا توجد عناصر",
+			"addFirst": "أضف العنصر الأول",
+			"totalSteel": "إجمالي الحديد",
+			"foundationType": {
+				"isolated": "منفصلة",
+				"combined": "مشتركة",
+				"strip": "شريطية",
+				"raft": "لبشة"
+			},
+			"slabType": {
+				"label": "نوع السقف",
+				"solid": "مصمت",
+				"flat": "فلات سلاب",
+				"ribbed": "هوردي",
+				"hollow_core": "هولوكور / بانيل",
+				"banded_beam": "كمرات عريضة"
+			},
+			"blockType": {
+				"label": "نوع البلوك",
+				"hollow": "مفرغ عادي",
+				"solid": "مصمت",
+				"insulated": "عازل (ساندويتش)",
+				"fire_rated": "مقاوم للحريق",
+				"lightweight": "خفيف",
+				"aac": "خرسانة خلوية"
+			},
+			"wallCategory": {
+				"label": "تصنيف الجدار",
+				"external": "جدار خارجي",
+				"internal": "جدار داخلي",
+				"partition": "فاصل خفيف",
+				"boundary": "سور",
+				"retaining": "جدار استنادي",
+				"parapet": "دروة سطح"
+			}
+		},
+		"finishing": {
+			"title": "أعمال التشطيبات",
+			"plastering": "البياض",
+			"painting": "الدهانات",
+			"flooring": "الأرضيات",
+			"ceilings": "الأسقف",
+			"doors": "الأبواب",
+			"windows": "النوافذ",
+			"description": "إدارة عناصر التشطيبات"
+		},
+		"mep": {
+			"title": "الأعمال الكهروميكانيكية",
+			"electrical": "الكهرباء",
+			"plumbing": "السباكة",
+			"hvac": "التكييف والتهوية",
+			"description": "إدارة أعمال الكهرباء والسباكة والتكييف"
+		},
+		"pricing": {
+			"title": "التسعير",
+			"description": "إدارة التسعير وعروض الأسعار"
+		},
+		"quotes": {
+			"title": "عروض الأسعار",
+			"create": "إنشاء عرض سعر",
+			"empty": "لا توجد عروض أسعار",
+			"status": {
+				"draft": "مسودة",
+				"sent": "مرسل",
+				"accepted": "مقبول",
+				"rejected": "مرفوض",
+				"expired": "منتهي"
+			}
+		},
+		"actions": {
+			"edit": "تعديل",
+			"delete": "حذف",
+			"duplicate": "نسخ",
+			"export": "تصدير",
+			"view": "عرض"
+		},
+		"notifications": {
+			"created": "تم إنشاء الدراسة بنجاح",
+			"updated": "تم تحديث الدراسة بنجاح",
+			"deleted": "تم حذف الدراسة بنجاح",
+			"error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+		},
+		"studyInfo": "بيانات الدراسة",
+		"lastUpdated": "آخر تحديث",
+		"summary": {
+			"totalCost": "التكلفة الإجمالية",
+			"totalConcrete": "إجمالي الخرسانة",
+			"totalRebar": "إجمالي الحديد",
+			"totalItems": "إجمالي العناصر"
+		},
+		"calculations": {
+			"volume": "الحجم",
+			"area": "المساحة",
+			"concreteVolume": "حجم الخرسانة",
+			"rebarWeight": "وزن الحديد",
+			"formworkArea": "مساحة الشدات",
+			"cost": "التكلفة",
+			"results": "نتائج الحسابات"
+		},
+		"units": {
+			"m3": "م³",
+			"m2": "م²",
+			"m": "م",
+			"cm": "سم",
+			"mm": "مم",
+			"kg": "كجم",
+			"ton": "طن",
+			"piece": "قطعة",
+			"sar": "ر.س"
+		},
+		"messages": {
+			"saved": "تم الحفظ بنجاح",
+			"deleted": "تم الحذف",
+			"error": "حدث خطأ",
+			"confirmDelete": "هل أنت متأكد من الحذف؟",
+			"noItems": "لا توجد عناصر",
+			"addFirst": "أضف العنصر الأول",
+			"itemCreated": "تم إضافة العنصر بنجاح",
+			"itemUpdated": "تم تحديث العنصر بنجاح",
+			"itemDeleted": "تم حذف العنصر بنجاح",
+			"itemCreateError": "فشل إضافة العنصر",
+			"itemUpdateError": "فشل تحديث العنصر",
+			"itemDeleteError": "فشل حذف العنصر"
+		},
+		"tabs": {
+			"structural": "الأعمال الإنشائية",
+			"finishing": "التشطيبات",
+			"mep": "الكهروميكانيك",
+			"pricing": "التسعير"
+		}
+	},
+	"settings": {
+		"account": {
+			"avatar": {
+				"description": "لتغيير صورتك الرمزية، انقر على الصورة في هذه المنطقة واختر ملفاً من جهازك للرفع.",
+				"notifications": {
+					"error": "تعذر تحديث الصورة الرمزية",
+					"success": "تم تحديث الصورة الرمزية بنجاح"
+				},
+				"title": "صورتك الرمزية"
+			},
+			"changeEmail": {
+				"description": "لتغيير بريدك الإلكتروني، أدخل البريد الجديد واضغط حفظ. ستحتاج لتأكيد البريد الجديد قبل تفعيله.",
+				"notifications": {
+					"error": "تعذر تحديث البريد الإلكتروني",
+					"success": "تم تحديث البريد الإلكتروني بنجاح"
+				},
+				"title": "بريدك الإلكتروني"
+			},
+			"changeName": {
+				"notifications": {
+					"error": "تعذر تحديث الاسم",
+					"success": "تم تحديث الاسم بنجاح"
+				},
+				"title": "اسمك"
+			},
+			"deleteAccount": {
+				"confirmation": "هل أنت متأكد من رغبتك في حذف حسابك؟",
+				"description": "حذف حسابك نهائياً. بمجرد حذف حسابك، لا يمكن التراجع. للتأكيد، يرجى إدخال كلمة المرور أدناه:",
+				"notifications": {
+					"error": "تعذر حذف الحساب",
+					"success": "تم حذف الحساب بنجاح"
+				},
+				"submit": "حذف الحساب",
+				"title": "حذف الحساب"
+			},
+			"language": {
+				"description": "لتغيير لغة التطبيق لحسابك، اختر لغة من القائمة واضغط حفظ.",
+				"notifications": {
+					"error": "تعذر تحديث اللغة",
+					"success": "تم تحديث اللغة بنجاح"
+				},
+				"title": "لغتك"
+			},
+			"security": {
+				"activeSessions": {
+					"description": "هذه جميع الجلسات النشطة لحسابك. انقر على X لإنهاء جلسة معينة.",
+					"title": "الجلسات النشطة",
+					"notifications": {
+						"revokeSession": {
+							"success": "تم إلغاء الجلسة"
+						}
+					},
+					"currentSession": "الجلسة الحالية"
+				},
+				"changePassword": {
+					"currentPassword": "كلمة المرور الحالية",
+					"newPassword": "كلمة المرور الجديدة",
+					"notifications": {
+						"error": "تعذر تحديث كلمة المرور",
+						"success": "تم تحديث كلمة المرور بنجاح"
+					},
+					"title": "كلمة مرورك"
+				},
+				"connectedAccounts": {
+					"connect": "ربط",
+					"disconnect": "إلغاء الربط",
+					"title": "الحسابات المرتبطة"
+				},
+				"passkeys": {
+					"description": "استخدم مفاتيح المرور كبديل آمن لكلمات المرور.",
+					"notifications": {
+						"addPasskey": {
+							"error": {
+								"title": "تعذر إضافة مفتاح المرور"
+							},
+							"success": {
+								"title": "تمت إضافة مفتاح المرور"
+							}
+						},
+						"deletePasskey": {
+							"error": {
+								"title": "تعذر حذف مفتاح المرور"
+							},
+							"loading": {
+								"title": "جارٍ حذف مفتاح المرور..."
+							},
+							"success": {
+								"title": "تم حذف مفتاح المرور"
+							}
+						}
+					},
+					"title": "مفاتيح المرور"
+				},
+				"setPassword": {
+					"description": "لم تقم بتعيين كلمة مرور بعد. لتعيينها، تحتاج للمرور بعملية إعادة تعيين كلمة المرور. انقر على الزر أدناه لإرسال بريد إعادة التعيين واتبع التعليمات.",
+					"notifications": {
+						"error": "تعذر إرسال رابط تعيين كلمة المرور. يرجى المحاولة مرة أخرى.",
+						"success": "تحقق من صندوق الوارد للحصول على رابط تعيين كلمة المرور."
+					},
+					"submit": "تعيين كلمة المرور",
+					"title": "كلمة مرورك"
+				},
+				"title": "الأمان",
+				"twoFactor": {
+					"title": "المصادقة الثنائية",
+					"description": "أضف طبقة أمان إضافية لحسابك.",
+					"dialog": {
+						"password": {
+							"title": "التحقق بكلمة المرور",
+							"description": "يرجى التحقق من حسابك بإدخال كلمة المرور:",
+							"label": "كلمة مرورك:"
+						},
+						"totpUrl": {
+							"description": "استخدم تطبيق المصادقة المفضل لديك وامسح رمز QR أو أدخل الرمز السري أدناه يدوياً لإعداد المصادقة الثنائية.",
+							"code": "أدخل الرمز المكون من 6 أرقام للتحقق من الإعداد:",
+							"title": "تفعيل المصادقة الثنائية"
+						}
+					},
+					"enable": "تفعيل المصادقة الثنائية",
+					"notifications": {
+						"verify": {
+							"success": {
+								"title": "تم تفعيل المصادقة الثنائية بنجاح."
+							}
+						},
+						"enable": {
+							"error": {
+								"title": "تعذر التحقق من حسابك بكلمة المرور المقدمة. يرجى المحاولة مرة أخرى."
+							}
+						},
+						"disable": {
+							"success": {
+								"title": "تم تعطيل المصادقة الثنائية بنجاح."
+							}
+						}
+					},
+					"disable": "تعطيل المصادقة الثنائية",
+					"enabled": "لقد قمت بتفعيل المصادقة الثنائية لحسابك."
+				}
+			},
+			"subtitle": "إدارة إعدادات حسابك الشخصي.",
+			"title": "إعدادات الحساب"
+		},
+		"billing": {
+			"createCustomerPortal": {
+				"label": "إدارة الفواتير",
+				"notifications": {
+					"error": {
+						"title": "تعذر إنشاء جلسة بوابة العملاء. يرجى المحاولة مرة أخرى."
+					}
+				}
+			},
+			"activePlan": {
+				"status": {
+					"active": "نشط",
+					"canceled": "ملغى",
+					"expired": "منتهي",
+					"incomplete": "غير مكتمل",
+					"past_due": "متأخر",
+					"paused": "متوقف",
+					"trialing": "تجريبي",
+					"unpaid": "غير مدفوع"
+				},
+				"title": "خطتك"
+			},
+			"changePlan": {
+				"description": "اختر خطة للاشتراك فيها.",
+				"title": "تغيير خطتك"
+			},
+			"title": "الفواتير"
+		},
+		"menu": {
+			"account": {
+				"billing": "الفواتير",
+				"dangerZone": "منطقة الخطر",
+				"general": "عام",
+				"security": "الأمان",
+				"title": "الحساب"
+			},
+			"organization": {
+				"billing": "الفواتير",
+				"general": "عام",
+				"members": "الأعضاء",
+				"title": "المؤسسة",
+				"dangerZone": "منطقة الخطر"
+			}
+		},
+		"save": "حفظ"
+	},
+	"start": {
+		"subtitle": "شاهد أحدث إحصائيات عملك.",
+		"welcome": "مرحباً {name}!"
+	},
+	"zod": {
+		"errors": {
+			"invalid_arguments": "وسائط الدالة غير صالحة",
+			"invalid_date": "تاريخ غير صالح",
+			"invalid_enum_value": "قيمة تعداد غير صالحة. المتوقع {- options}، المستلم '{received}'",
+			"invalid_intersection_types": "تعذر دمج نتائج التقاطع",
+			"invalid_literal": "قيمة حرفية غير صالحة، المتوقع {expected}",
+			"invalid_return_type": "نوع إرجاع الدالة غير صالح",
+			"invalid_string": {
+				"cuid": "{validation} غير صالح",
+				"datetime": "{validation} غير صالح",
+				"email": "{validation} غير صالح",
+				"endsWith": "إدخال غير صالح: يجب أن ينتهي بـ \"{endsWith}\"",
+				"regex": "غير صالح",
+				"startsWith": "إدخال غير صالح: يجب أن يبدأ بـ \"{startsWith}\"",
+				"url": "{validation} غير صالح",
+				"uuid": "{validation} غير صالح"
+			},
+			"invalid_type": "المتوقع {expected}، المستلم {received}",
+			"invalid_type_received_undefined": "مطلوب",
+			"invalid_union": "إدخال غير صالح",
+			"invalid_union_discriminator": "قيمة تمييز غير صالحة. المتوقع {- options}",
+			"not_finite": "الرقم يجب أن يكون محدوداً",
+			"not_multiple_of": "الرقم يجب أن يكون من مضاعفات {multipleOf}",
+			"too_big": {
+				"array": {
+					"exact": "المصفوفة يجب أن تحتوي على {maximum} عنصر بالضبط",
+					"inclusive": "المصفوفة يجب أن تحتوي على {maximum} عنصر كحد أقصى",
+					"not_inclusive": "المصفوفة يجب أن تحتوي على أقل من {maximum} عنصر"
+				},
+				"date": {
+					"exact": "التاريخ يجب أن يكون {- maximum, datetime} بالضبط",
+					"inclusive": "التاريخ يجب أن يكون أصغر من أو يساوي {- maximum, datetime}",
+					"not_inclusive": "التاريخ يجب أن يكون أصغر من {- maximum, datetime}"
+				},
+				"number": {
+					"exact": "الرقم يجب أن يكون {maximum} بالضبط",
+					"inclusive": "الرقم يجب أن يكون أقل من أو يساوي {maximum}",
+					"not_inclusive": "الرقم يجب أن يكون أقل من {maximum}"
+				},
+				"set": {
+					"exact": "إدخال غير صالح",
+					"inclusive": "إدخال غير صالح",
+					"not_inclusive": "إدخال غير صالح"
+				},
+				"string": {
+					"exact": "النص يجب أن يحتوي على {maximum} حرف بالضبط",
+					"inclusive": "النص يجب أن يحتوي على {maximum} حرف كحد أقصى",
+					"not_inclusive": "النص يجب أن يحتوي على أقل من {maximum} حرف"
+				}
+			},
+			"too_small": {
+				"array": {
+					"exact": "المصفوفة يجب أن تحتوي على {minimum} عنصر بالضبط",
+					"inclusive": "المصفوفة يجب أن تحتوي على {minimum} عنصر على الأقل",
+					"not_inclusive": "المصفوفة يجب أن تحتوي على أكثر من {minimum} عنصر"
+				},
+				"date": {
+					"exact": "التاريخ يجب أن يكون {- minimum, datetime} بالضبط",
+					"inclusive": "التاريخ يجب أن يكون أكبر من أو يساوي {- minimum, datetime}",
+					"not_inclusive": "التاريخ يجب أن يكون أكبر من {- minimum, datetime}"
+				},
+				"number": {
+					"exact": "الرقم يجب أن يكون {minimum} بالضبط",
+					"inclusive": "الرقم يجب أن يكون أكبر من أو يساوي {minimum}",
+					"not_inclusive": "الرقم يجب أن يكون أكبر من {minimum}"
+				},
+				"set": {
+					"exact": "إدخال غير صالح",
+					"inclusive": "إدخال غير صالح",
+					"not_inclusive": "إدخال غير صالح"
+				},
+				"string": {
+					"exact": "النص يجب أن يحتوي على {minimum} حرف بالضبط",
+					"inclusive": "النص يجب أن يحتوي على {minimum} حرف على الأقل",
+					"not_inclusive": "النص يجب أن يحتوي على أكثر من {minimum} حرف"
+				}
+			},
+			"unrecognized_keys": "مفاتيح غير معروفة في الكائن: {- keys}"
+		},
+		"types": {
+			"array": "مصفوفة",
+			"bigint": "عدد كبير",
+			"boolean": "منطقي",
+			"date": "تاريخ",
+			"float": "عشري",
+			"function": "دالة",
+			"integer": "عدد صحيح",
+			"map": "خريطة",
+			"nan": "ليس رقم",
+			"never": "أبداً",
+			"null": "فارغ",
+			"number": "رقم",
+			"object": "كائن",
+			"promise": "وعد",
+			"set": "مجموعة",
+			"string": "نص",
+			"symbol": "رمز",
+			"undefined": "غير معرف",
+			"unknown": "غير معروف",
+			"void": "فارغ"
+		},
+		"validations": {
+			"cuid": "معرف فريد",
+			"cuid2": "معرف فريد 2",
+			"datetime": "تاريخ ووقت",
+			"email": "بريد إلكتروني",
+			"emoji": "رمز تعبيري",
+			"ip": "عنوان IP",
+			"regex": "تعبير نمطي",
+			"ulid": "معرف فريد عالمي",
+			"url": "رابط",
+			"uuid": "معرف فريد عالمي"
+		}
+	},
+	"choosePlan": {
+		"title": "اختر خطتك",
+		"description": "للمتابعة، يرجى اختيار خطة."
+	}
+}
