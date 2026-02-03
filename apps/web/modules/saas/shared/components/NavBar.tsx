@@ -1,14 +1,20 @@
+// Sidebar Skin Migration
+// CSS-only changes inspired by Masar v1
+// No logic or behavior changes
 "use client";
 import { config } from "@repo/config";
 import { useSession } from "@saas/auth/hooks/use-session";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { UserMenu } from "@saas/shared/components/UserMenu";
+import { NotificationBell } from "@saas/shared/components/NotificationBell";
 import { Logo } from "@shared/components/Logo";
 import { cn } from "@ui/lib";
 import {
 	BotMessageSquareIcon,
+	Calculator,
 	ChevronRightIcon,
 	HomeIcon,
+	ReceiptIcon,
 	SettingsIcon,
 	UserCog2Icon,
 	UserCogIcon,
@@ -37,6 +43,22 @@ export function NavBar() {
 			icon: HomeIcon,
 			isActive: pathname === basePath,
 		},
+		...(activeOrganization
+			? [
+					{
+						label: t("app.menu.quantities"),
+						href: `/app/${activeOrganization.slug}/quantities`,
+						icon: Calculator,
+						isActive: pathname.includes("/quantities"),
+					},
+					{
+						label: t("app.menu.finance"),
+						href: `/app/${activeOrganization.slug}/finance`,
+						icon: ReceiptIcon,
+						isActive: pathname.includes("/finance"),
+					},
+				]
+			: []),
 		{
 			label: t("app.menu.aiChatbot"),
 			href: activeOrganization
@@ -76,7 +98,7 @@ export function NavBar() {
 	return (
 		<nav
 			className={cn("w-full", {
-				"w-full md:fixed md:top-0 md:left-0 md:h-full md:w-[280px]":
+				"w-full md:fixed md:top-0 md:start-0 md:h-full md:w-[280px]":
 					useSidebarLayout,
 			})}
 		>
@@ -123,12 +145,15 @@ export function NavBar() {
 
 					<div
 						className={cn(
-							"mr-0 ml-auto flex items-center justify-end gap-4",
+							"me-0 ms-auto flex items-center justify-end gap-4",
 							{
 								"md:hidden": useSidebarLayout,
 							},
 						)}
 					>
+						{activeOrganization && (
+							<NotificationBell organizationId={activeOrganization.id} />
+						)}
 						<UserMenu />
 					</div>
 				</div>
@@ -137,7 +162,7 @@ export function NavBar() {
 					className={cn(
 						"no-scrollbar -mx-4 -mb-4 mt-6 flex list-none items-center justify-start gap-4 overflow-x-auto px-4 text-sm",
 						{
-							"md:mx-0 md:my-4 md:flex md:flex-col md:items-stretch md:gap-1 md:px-0":
+							"md:mx-0 md:my-4 md:flex md:flex-col md:items-stretch md:gap-1 md:px-3":
 								useSidebarLayout,
 						},
 					)}
@@ -154,18 +179,24 @@ export function NavBar() {
 											: "border-transparent",
 									],
 									{
-										"md:-mx-6 md:border-b-0 md:border-l-2 md:px-6 md:py-2":
+										"md:gap-3 md:border-b-0 md:border-s-0 md:rounded-lg md:p-3 md:transition-colors md:hover:bg-muted":
 											useSidebarLayout,
+										"md:bg-primary/10 md:text-primary md:font-medium":
+											useSidebarLayout && menuItem.isActive,
 									},
 								)}
 								prefetch
 							>
 								<menuItem.icon
-									className={`size-4 shrink-0 ${
+									className={cn(
+										"size-4 shrink-0",
 										menuItem.isActive
 											? "text-primary"
-											: "opacity-50"
-									}`}
+											: "opacity-50",
+										{
+											"md:size-5": useSidebarLayout,
+										},
+									)}
 								/>
 								<span>{menuItem.label}</span>
 							</Link>
@@ -181,6 +212,11 @@ export function NavBar() {
 						},
 					)}
 				>
+					<div className="mb-2 flex items-center justify-between">
+						{activeOrganization && (
+							<NotificationBell organizationId={activeOrganization.id} />
+						)}
+					</div>
 					<UserMenu showUserName />
 				</div>
 			</div>

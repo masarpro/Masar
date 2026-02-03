@@ -13,8 +13,6 @@ export default async function proxy(req: NextRequest) {
 	const sessionCookie = getSessionCookie(req);
 
 	if (pathname.startsWith("/app")) {
-		const response = NextResponse.next();
-
 		if (!appConfig.ui.saas.enabled) {
 			return NextResponse.redirect(new URL("/", origin));
 		}
@@ -30,7 +28,30 @@ export default async function proxy(req: NextRequest) {
 			);
 		}
 
-		return response;
+		// التحقق من mustChangePassword عبر session API
+		try {
+			const sessionRes = await fetch(
+				new URL("/api/auth/get-session", origin),
+				{
+					headers: {
+						cookie: req.headers.get("cookie") || "",
+					},
+				},
+			);
+
+			if (sessionRes.ok) {
+				const session = await sessionRes.json();
+				if (session?.user?.mustChangePassword) {
+					return NextResponse.redirect(
+						new URL("/auth/change-password", origin),
+					);
+				}
+			}
+		} catch {
+			// لا نوقف الطلب في حال فشل الاتصال
+		}
+
+		return NextResponse.next();
 	}
 
 	if (pathname.startsWith("/auth")) {

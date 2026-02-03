@@ -17,6 +17,10 @@ export const config = {
 				currency: "USD",
 				label: "Deutsch",
 			},
+			ar: {
+				currency: "USD",
+				label: "العربية",
+			},
 		},
 		// The default locale is used if no locale is provided
 		defaultLocale: "en",
@@ -32,11 +36,13 @@ export const config = {
 		// Whether billing for organizations should be enabled (below you can enable it for users instead)
 		enableBilling: false,
 		// Whether the organization should be hidden from the user (use this for multi-tenant applications)
-		hideOrganization: false,
+		hideOrganization: true,
 		// Should users be able to create new organizations? Otherwise only admin users can create them
-		enableUsersToCreateOrganizations: true,
+		enableUsersToCreateOrganizations: false,
 		// Whether users should be required to be in an organization. This will redirect users to the organization page after sign in
-		requireOrganization: false,
+		requireOrganization: true,
+		// Whether to automatically create an organization for new users on signup
+		autoCreateOnSignup: true,
 		// Define forbidden organization slugs. Make sure to add all paths that you define as a route after /app/... to avoid routing issues
 		forbiddenOrganizationSlugs: [
 			"new-organization",

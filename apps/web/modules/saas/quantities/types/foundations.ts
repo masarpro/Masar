@@ -15,105 +15,107 @@ export type FoundationType =
  * بيانات القاعدة المنفصلة (المدخلات)
  */
 export interface IsolatedFoundationInput {
-	id: string;
-	name: string;
+	id?: string;
+	name?: string;
 	quantity: number;
 
 	// أبعاد القاعدة
 	length: number;      // م
 	width: number;       // م
-	depth: number;       // م
+	height: number;      // م (الارتفاع/العمق)
 
 	// الإعدادات
-	cover: number;       // غطاء خرساني (م) - افتراضي 0.075
-	hookLength: number;  // طول الرجوع (م) - افتراضي 0.40
+	cover?: number;       // غطاء خرساني (م) - افتراضي 0.075
+	hookLength?: number;  // طول الرجوع (م) - افتراضي 0.10
 
 	// التسليح السفلي (الاتجاه القصير)
-	bottomShort: { barsPerMeter: number; diameter: number };
+	bottomShort?: { barsPerMeter: number; diameter: number };
 	// التسليح السفلي (الاتجاه الطويل)
-	bottomLong: { barsPerMeter: number; diameter: number };
+	bottomLong?: { barsPerMeter: number; diameter: number };
 
 	// التسليح العلوي (اختياري)
 	topShort?: { barsPerMeter: number; diameter: number };
 	topLong?: { barsPerMeter: number; diameter: number };
+
+	// نوع الخرسانة (اختياري)
+	concreteType?: string;
 }
 
 /**
  * بيانات القاعدة المشتركة
  */
 export interface CombinedFoundationInput {
-	id: string;
-	name: string;
+	id?: string;
+	name?: string;
 	quantity: number;
 
 	// أبعاد القاعدة
 	length: number;
 	width: number;
-	depth: number;
+	height: number;  // الارتفاع/العمق
 
 	// عدد الأعمدة على القاعدة
-	columnsCount: number;
+	columnsCount?: number;
+	columnsSpacing?: number;
 	columnPositions?: { x: number; y: number }[];
 
 	// الإعدادات
-	cover: number;
-	hookLength: number;
+	cover?: number;
+	hookLength?: number;
 
 	// التسليح الرئيسي (الاتجاه الطويل)
-	mainRebar: { barsPerMeter: number; diameter: number };
+	mainRebar?: { barsPerMeter: number; diameter: number };
 	// التسليح الثانوي (الاتجاه القصير)
-	distributionRebar: { barsPerMeter: number; diameter: number };
+	distributionRebar?: { barsPerMeter: number; diameter: number };
 
 	// التسليح العلوي
 	topMainRebar?: { barsPerMeter: number; diameter: number };
 	topDistributionRebar?: { barsPerMeter: number; diameter: number };
+
+	// نوع الخرسانة
+	concreteType?: string;
 }
 
 /**
  * بيانات القاعدة الشريطية
  */
 export interface StripFoundationInput {
-	id: string;
-	name: string;
-	quantity: number;
+	id?: string;
+	name?: string;
+	quantity?: number;
 
 	// الأبعاد
-	length: number;      // الطول الكلي (م)
+	segments: Array<{ length: number }>; // قطع القاعدة الشريطية
 	width: number;       // العرض (م)
-	depth: number;       // العمق (م)
-
-	// طريقة إدخال الطول
-	lengthInput: {
-		method: 'direct' | 'segments';
-		segments?: number[];
-		directLength?: number;
-	};
+	height: number;      // الارتفاع/العمق (م)
 
 	// الإعدادات
-	cover: number;
-	hookLength: number;
+	cover?: number;
+	hookLength?: number;
 
 	// التسليح السفلي
 	bottomMain: { count: number; diameter: number };
-	bottomDistribution: { barsPerMeter: number; diameter: number };
+	bottomSecondary?: { count: number; diameter: number };
 
 	// التسليح العلوي
 	topMain?: { count: number; diameter: number };
-	topDistribution?: { barsPerMeter: number; diameter: number };
 
 	// الكانات
 	stirrups?: {
 		diameter: number;
 		spacing: number;
 	};
+
+	// نوع الخرسانة (اختياري)
+	concreteType?: string;
 }
 
 /**
  * بيانات اللبشة
  */
 export interface RaftFoundationInput {
-	id: string;
-	name: string;
+	id?: string;
+	name?: string;
 
 	// الأبعاد
 	length: number;
@@ -121,15 +123,15 @@ export interface RaftFoundationInput {
 	thickness: number;
 
 	// الإعدادات
-	cover: number;
+	cover?: number;
 
 	// التسليح السفلي
-	bottomX: { diameter: number; spacing: number };
-	bottomY: { diameter: number; spacing: number };
+	bottomX: { diameter: number; barsPerMeter: number };
+	bottomY: { diameter: number; barsPerMeter: number };
 
-	// التسليح العلوي
-	topX: { diameter: number; spacing: number };
-	topY: { diameter: number; spacing: number };
+	// التسليح العلوي (اختياري)
+	topX?: { diameter: number; barsPerMeter: number };
+	topY?: { diameter: number; barsPerMeter: number };
 
 	// حديد إضافي (تقوية عند الأعمدة)
 	additionalRebar?: {
@@ -138,6 +140,9 @@ export interface RaftFoundationInput {
 		length: number;
 		count: number;
 	}[];
+
+	// نوع الخرسانة (اختياري)
+	concreteType?: string;
 }
 
 /**

@@ -1,6 +1,7 @@
 import { passkey } from "@better-auth/passkey";
 import { config } from "@repo/config";
 import {
+	createDefaultRoles,
 	db,
 	getInvitationById,
 	getPurchasesByOrganizationId,
@@ -77,6 +78,21 @@ export const auth = betterAuth({
 				await updateSeatsInOrganizationSubscription(
 					invitation.organizationId,
 				);
+			} else if (ctx.path.startsWith("/organization/create")) {
+				const { slug } = ctx.body;
+				if (slug) {
+					try {
+						const org = await db.organization.findUnique({
+							where: { slug },
+							select: { id: true },
+						});
+						if (org) {
+							await createDefaultRoles(org.id);
+						}
+					} catch (e) {
+						logger.error("Failed to create default roles", e);
+					}
+				}
 			} else if (ctx.path.startsWith("/organization/remove-member")) {
 				const { organizationId } = ctx.body;
 
@@ -86,8 +102,42 @@ export const auth = betterAuth({
 
 				await updateSeatsInOrganizationSubscription(organizationId);
 			}
+
+			// تحديث lastLoginAt بعد تسجيل الدخول الناجح
+			if (
+				ctx.path.startsWith("/sign-in") ||
+				ctx.path.startsWith("/magic-link/verify")
+			) {
+				const userId = ctx.context.session?.session?.userId;
+				if (userId) {
+					try {
+						await db.user.update({
+							where: { id: userId },
+							data: { lastLoginAt: new Date() },
+						});
+					} catch {
+						// لا نوقف الدخول بسبب خطأ في التحديث
+					}
+				}
+			}
 		}),
 		before: createAuthMiddleware(async (ctx) => {
+			// التحقق من حالة الحساب قبل تسجيل الدخول
+			if (
+				ctx.path.startsWith("/sign-in/email") ||
+				ctx.path.startsWith("/sign-in/magic-link")
+			) {
+				const { email } = ctx.body;
+				if (email) {
+					const user = await getUserByEmail(email);
+					if (user && user.isActive === false) {
+						throw new Error(
+							"ACCOUNT_DISABLED",
+						);
+					}
+				}
+			}
+
 			if (
 				ctx.path.startsWith("/delete-user") ||
 				ctx.path.startsWith("/organization/delete")
@@ -125,6 +175,24 @@ export const auth = betterAuth({
 				required: false,
 			},
 			locale: {
+				type: "string",
+				required: false,
+			},
+			isActive: {
+				type: "boolean",
+				required: false,
+				defaultValue: true,
+			},
+			mustChangePassword: {
+				type: "boolean",
+				required: false,
+				defaultValue: false,
+			},
+			accountType: {
+				type: "string",
+				required: false,
+			},
+			lastLoginAt: {
 				type: "string",
 				required: false,
 			},

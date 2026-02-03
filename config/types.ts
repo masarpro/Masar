@@ -13,6 +13,7 @@ export type Config = {
 		enableUsersToCreateOrganizations: boolean;
 		requireOrganization: boolean;
 		hideOrganization: boolean;
+		autoCreateOnSignup: boolean;
 		forbiddenOrganizationSlugs: string[];
 	};
 	users: {

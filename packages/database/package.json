@@ -4,8 +4,10 @@
 		"@prisma/adapter-pg": "^6.19.0",
 		"@prisma/client": "7.1.0",
 		"@repo/config": "workspace:*",
+		"@sindresorhus/slugify": "^2.2.1",
 		"drizzle-orm": "^0.44.7",
 		"drizzle-zod": "0.8.3",
+		"nanoid": "^5.1.5",
 		"pg": "^8.16.0",
 		"zod": "^4.1.12"
 	},
@@ -21,7 +23,7 @@
 	"main": "./index.ts",
 	"name": "@repo/database",
 	"scripts": {
-		"generate": "dotenv -c -e ../../.env -- prisma generate --no-hints",
+		"generate": "dotenv -c -e ../../.env -- prisma generate --no-hints && node fix-zod-import.js",
 		"push": "dotenv -c -e ../../.env -- prisma db push",
 		"migrate": "dotenv -c -e ../../.env -- prisma migrate dev",
 		"studio": "dotenv -c -e ../../.env -- prisma studio",

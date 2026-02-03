@@ -88,7 +88,7 @@ export function calculateNetArea(
 	grossArea: number,
 	openings: SlabOpening[] = [],
 ): number {
-	const openingsArea = openings.reduce((sum, o) => sum + (o.area || o.width * o.length), 0);
+	const openingsArea = openings.reduce((sum, o) => sum + (o.area || ((o.dimensions.width || 0) * (o.dimensions.length || 0))), 0);
 	return Math.max(0, grossArea - openingsArea);
 }
 
@@ -224,8 +224,8 @@ export function calculateIsolatedFoundation(
 		height,
 		cover = 0.075,
 		hookLength = 0.10,
-		bottomShort,
-		bottomLong,
+		bottomShort = { barsPerMeter: 5, diameter: 16 },
+		bottomLong = { barsPerMeter: 5, diameter: 16 },
 		topShort,
 		topLong,
 		concreteType = 'C30',
@@ -355,7 +355,8 @@ export interface CombinedFootingResult extends IsolatedFoundationResult {
 export function calculateCombinedFoundation(
 	input: CombinedFoundationInput,
 ): CombinedFootingResult {
-	const { columnsCount, columnsSpacing } = input;
+	const columnsCount = input.columnsCount || 2;
+	const columnsSpacing = input.columnsSpacing || 3;
 
 	// حساب الطول الكلي للقاعدة
 	const totalLength = input.length || (columnsCount - 1) * columnsSpacing + 2 * 0.5;
@@ -1147,7 +1148,7 @@ export function calculateRibbedSlab(slab: RibbedSlab): EnhancedSlabResult {
 	const {
 		dimensions,
 		openings = [],
-		ribbed,
+		system,
 		reinforcement,
 		concreteType = 'C30',
 	} = slab;
@@ -1156,7 +1157,7 @@ export function calculateRibbedSlab(slab: RibbedSlab): EnhancedSlabResult {
 	const netArea = calculateNetArea(grossArea, openings);
 
 	// حسابات الهوردي
-	const { ribWidth, ribSpacing, blockHeight, toppingThickness } = ribbed;
+	const { ribWidth, ribSpacing, ribDepth: blockHeight, toppingThickness } = system;
 	const ribWidthM = ribWidth / 100;
 	const ribSpacingM = ribSpacing / 100;
 	const blockHeightM = blockHeight / 100;
@@ -1181,15 +1182,16 @@ export function calculateRibbedSlab(slab: RibbedSlab): EnhancedSlabResult {
 	const rebarDetails: RebarDetail[] = [];
 	const cover = SLAB_DEFAULTS.cover;
 
-	if (reinforcement.inputMethod === 'grid' && reinforcement.grid) {
-		const { grid } = reinforcement;
+	// حديد الأعصاب من reinforcement.ribs
+	if (reinforcement.ribs) {
+		const { ribs } = reinforcement;
 
 		// حديد الأعصاب السفلي
 		const ribBarLength = dimensions.length + 0.8;
-		const ribBarsCount = ribsCount * (grid.bottom.xDirection.count || 2);
+		const ribBarsCount = ribsCount * ribs.bottom.count;
 		rebarDetails.push(
 			calculateRebarLayer(
-				grid.bottom.xDirection.diameter,
+				ribs.bottom.diameter,
 				ribBarLength,
 				ribBarsCount,
 				'حديد أعصاب سفلي',
@@ -1197,18 +1199,19 @@ export function calculateRibbedSlab(slab: RibbedSlab): EnhancedSlabResult {
 			)
 		);
 
-		// الشبكة العلوية
-		const topXLength = dimensions.width - 2 * cover + 0.4;
-		const topXCount = calculateBarCount(dimensions.length - 2 * cover, grid.bottom.yDirection.spacing);
-		rebarDetails.push(
-			calculateRebarLayer(
-				grid.bottom.yDirection.diameter,
-				topXLength,
-				topXCount,
-				'شبكة علوية',
-				'الطبقة العلوية'
-			)
-		);
+		// حديد الأعصاب العلوي
+		if (ribs.top?.enabled) {
+			const topRibBarsCount = ribsCount * ribs.top.count;
+			rebarDetails.push(
+				calculateRebarLayer(
+					ribs.top.diameter,
+					ribBarLength,
+					topRibBarsCount,
+					'حديد أعصاب علوي',
+					'الأعصاب'
+				)
+			);
+		}
 	}
 
 	// إجماليات الحديد
@@ -1280,7 +1283,7 @@ export function calculateFlatSlab(slab: FlatSlab): EnhancedSlabResult {
 		dimensions,
 		openings = [],
 		thickness,
-		dropPanel,
+		dropPanels,
 		reinforcement,
 		concreteType = 'C30',
 	} = slab;
@@ -1292,8 +1295,10 @@ export function calculateFlatSlab(slab: FlatSlab): EnhancedSlabResult {
 	let concreteVolume = netArea * thickness;
 
 	// إضافة drop panels
-	if (dropPanel) {
-		const dropVolume = dropPanel.length * dropPanel.width * dropPanel.depth * (dropPanel.count || 1);
+	if (dropPanels) {
+		// Estimate number of drop panels based on area (one per ~36 sqm)
+		const estimatedCount = Math.ceil(netArea / 36);
+		const dropVolume = dropPanels.width * dropPanels.width * dropPanels.extraThickness * estimatedCount;
 		concreteVolume += dropVolume;
 	}
 
@@ -1362,8 +1367,8 @@ export function calculateHollowCoreSlab(slab: HollowCoreSlab): EnhancedSlabResul
 	const {
 		dimensions,
 		openings = [],
-		hollowCore,
-		toppingThickness,
+		panels,
+		topping,
 		concreteType = 'C30',
 	} = slab;
 
@@ -1371,14 +1376,13 @@ export function calculateHollowCoreSlab(slab: HollowCoreSlab): EnhancedSlabResul
 	const netArea = calculateNetArea(grossArea, openings);
 
 	// حسابات البانيل
-	const { panelWidth, panelThickness } = hollowCore;
-	const panelWidthM = panelWidth;
+	const panelWidthM = panels.width;
 
 	// عدد الألواح
 	const panelsCount = Math.ceil(dimensions.width / panelWidthM);
 
 	// حجم الخرسانة (الطبقة العلوية فقط)
-	const toppingM = toppingThickness / 100;
+	const toppingM = topping?.thickness || 0.05;
 	const concreteVolume = netArea * toppingM;
 
 	const formworkArea = 0; // لا يوجد شدات للهولوكور

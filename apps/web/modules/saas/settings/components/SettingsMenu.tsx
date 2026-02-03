@@ -39,7 +39,7 @@ export function SettingsMenu({
 								<Link
 									href={subitem.href}
 									className={cn(
-										"lg:-ml-0.5 flex items-center gap-2 border-b-2 py-1.5 text-sm lg:border-b-0 lg:border-l-2 lg:pl-2",
+										"lg:-ms-0.5 flex items-center gap-2 border-b-2 py-1.5 text-sm lg:border-b-0 lg:border-s-2 lg:ps-2",
 										isActiveMenuItem(subitem.href)
 											? "border-primary font-bold"
 											: "border-transparent",

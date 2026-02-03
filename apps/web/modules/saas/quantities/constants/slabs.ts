@@ -29,49 +29,33 @@ export const SLAB_TYPE_INFO: Record<SlabType, {
 		color: 'blue',
 	},
 	flat: {
-		nameAr: 'فلات سلاب',
+		nameAr: 'سقف مسطح (فلات)',
 		nameEn: 'Flat Slab',
-		description: 'بلاطة مسطحة بدون كمرات - مع/بدون تكثيف',
+		description: 'سقف مسطح بدون كمرات - مع/بدون تكثيف',
 		icon: '▭',
 		color: 'purple',
 	},
 	ribbed: {
-		nameAr: 'هوردي',
+		nameAr: 'سقف هوردي',
 		nameEn: 'Ribbed/Hordi Slab',
 		description: 'أعصاب خرسانية مع بلوك هوردي وطبقة علوية',
 		icon: '▤',
 		color: 'orange',
 	},
 	hollow_core: {
-		nameAr: 'بانيل / هولوكور',
+		nameAr: 'سقف هولوكور',
 		nameEn: 'Hollow-core Panels',
 		description: 'ألواح مسبقة الصب مجوفة',
 		icon: '▦',
 		color: 'green',
 	},
 	banded_beam: {
-		nameAr: 'كمرات عريضة',
+		nameAr: 'سقف كمرات عريضة',
 		nameEn: 'Banded Beam Slab',
-		description: 'بلاطة مع كمرات مخفية/عريضة',
+		description: 'سقف مع كمرات مخفية/عريضة',
 		icon: '▦',
 		color: 'indigo',
 	},
-};
-
-// أطوال أسياخ المصنع (حسب السوق السعودي)
-export const STOCK_LENGTHS: Record<number, number> = {
-	6: 12,
-	8: 6,    // 8 مم يأتي بطول 6 متر فقط
-	10: 12,
-	12: 12,
-	14: 12,
-	16: 12,
-	18: 12,
-	20: 12,
-	22: 12,
-	25: 12,
-	28: 12,
-	32: 12,
 };
 
 // مقاسات بلوك الهوردي الشائعة (سم)

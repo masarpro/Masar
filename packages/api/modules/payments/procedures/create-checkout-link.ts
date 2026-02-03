@@ -25,7 +25,7 @@ export const createCheckoutLink = protectedProcedure
 			type: z.enum(["one-time", "subscription"]),
 			productId: z.string(),
 			redirectUrl: z.string().optional(),
-			organizationId: z.string().optional(),
+			organizationId: z.string().nullish(),
 		}),
 	)
 	.handler(

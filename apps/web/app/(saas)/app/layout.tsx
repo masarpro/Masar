@@ -1,6 +1,7 @@
 import { config } from "@repo/config";
 import { createPurchasesHelper } from "@repo/payments/lib/helper";
 import { getOrganizationList, getSession } from "@saas/auth/lib/server";
+import { autoCreateOrganizationIfNeeded } from "@saas/organizations/lib/auto-create-organization";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { attemptAsync } from "es-toolkit";
 import { redirect } from "next/navigation";
@@ -20,7 +21,29 @@ export default async function Layout({ children }: PropsWithChildren) {
 		redirect("/onboarding");
 	}
 
-	const organizations = await getOrganizationList();
+	// إذا يجب تغيير كلمة المرور، وجّه لصفحة التغيير
+	if ((session.user as any).mustChangePassword) {
+		redirect("/auth/change-password");
+	}
+
+	let organizations = await getOrganizationList();
+
+	// Auto-create organization if enabled and user has no organizations
+	if (
+		config.organizations.enable &&
+		config.organizations.autoCreateOnSignup &&
+		organizations.length === 0
+	) {
+		const newOrg = await autoCreateOrganizationIfNeeded(session);
+		if (newOrg) {
+			redirect(`/app/${newOrg.slug}`);
+		}
+	}
+
+	// Refresh organization list after potential auto-creation
+	if (organizations.length === 0) {
+		organizations = await getOrganizationList();
+	}
 
 	if (
 		config.organizations.enable &&
@@ -46,7 +69,9 @@ export default async function Layout({ children }: PropsWithChildren) {
 		!hasFreePlan
 	) {
 		const organizationId = config.organizations.enable
-			? session?.session.activeOrganizationId || organizations?.at(0)?.id
+			? (session?.session.activeOrganizationId ??
+					organizations?.at(0)?.id ??
+					undefined)
 			: undefined;
 
 		const [error, data] = await attemptAsync(() =>

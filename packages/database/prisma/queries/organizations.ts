@@ -1,6 +1,8 @@
 import type { z } from "zod";
 import { db } from "../client";
 import type { OrganizationSchema } from "../zod";
+import slugify from "@sindresorhus/slugify";
+import { nanoid } from "nanoid";
 
 export async function getOrganizations({
 	limit,
@@ -144,5 +146,89 @@ export async function updateOrganization(
 			id: organization.id,
 		},
 		data: organization,
+	});
+}
+
+/**
+ * Get the count of organizations a user belongs to
+ */
+export async function getUserOrganizationsCount(userId: string) {
+	return db.member.count({
+		where: { userId },
+	});
+}
+
+/**
+ * Generate a unique organization slug
+ */
+export async function generateUniqueSlug(name: string): Promise<string> {
+	const baseSlug = slugify(name, { lowercase: true });
+
+	let slug = baseSlug;
+
+	for (let i = 0; i < 5; i++) {
+		const existing = await db.organization.findUnique({
+			where: { slug },
+			select: { id: true },
+		});
+
+		if (!existing) {
+			return slug;
+		}
+
+		slug = `${baseSlug}-${nanoid(5)}`;
+	}
+
+	// Fallback: use nanoid only
+	return nanoid(10);
+}
+
+/**
+ * Create an organization for a user (used for auto-creation on signup)
+ */
+export async function createOrganizationForUser({
+	userId,
+	userName,
+	organizationName,
+}: {
+	userId: string;
+	userName: string;
+	organizationName?: string;
+}) {
+	const name = organizationName || `منشأة ${userName}` || "منشأتي";
+	const slug = await generateUniqueSlug(name);
+	const now = new Date();
+
+	return db.$transaction(async (tx) => {
+		// Create the organization
+		const organization = await tx.organization.create({
+			data: {
+				name,
+				slug,
+				createdAt: now,
+				ownerId: userId,
+			},
+		});
+
+		// Create the membership with owner role
+		await tx.member.create({
+			data: {
+				organizationId: organization.id,
+				userId,
+				role: "owner",
+				createdAt: now,
+			},
+		});
+
+		// Update user's organizationId
+		await tx.user.update({
+			where: { id: userId },
+			data: {
+				organizationId: organization.id,
+				accountType: "OWNER",
+			},
+		});
+
+		return organization;
 	});
 }

@@ -7,6 +7,11 @@ import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 export default async function NewOrganizationPage() {
+	// Block access when auto-create is enabled
+	if (config.organizations.autoCreateOnSignup) {
+		redirect("/app");
+	}
+
 	const organizations = await getOrganizationList();
 
 	if (

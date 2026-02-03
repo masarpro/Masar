@@ -32,6 +32,9 @@ export interface SlabBase {
 	// حالة الإكمال
 	isComplete: boolean;
 
+	// نوع الخرسانة
+	concreteType?: string;
+
 	// ملاحظات
 	notes?: string;
 }

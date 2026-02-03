@@ -1,7 +1,7 @@
 import { isOrganizationAdmin } from "@repo/auth/lib/helper";
 import { getActiveOrganization, getSession } from "@saas/auth/lib/server";
 import { InviteMemberForm } from "@saas/organizations/components/InviteMemberForm";
-import { OrganizationMembersBlock } from "@saas/organizations/components/OrganizationMembersBlock";
+import { TeamManagementTabs } from "@saas/organizations/components/TeamManagementTabs";
 import { SettingsList } from "@saas/shared/components/SettingsList";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -26,12 +26,17 @@ export default async function OrganizationSettingsPage({
 		return notFound();
 	}
 
+	const userIsAdmin = isOrganizationAdmin(organization, session?.user);
+
 	return (
 		<SettingsList>
-			{isOrganizationAdmin(organization, session?.user) && (
+			{userIsAdmin && (
 				<InviteMemberForm organizationId={organization.id} />
 			)}
-			<OrganizationMembersBlock organizationId={organization.id} />
+			<TeamManagementTabs
+				organizationId={organization.id}
+				isAdmin={userIsAdmin}
+			/>
 		</SettingsList>
 	);
 }

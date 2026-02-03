@@ -4,12 +4,67 @@
 @import "@repo/tailwind-config/theme.css";
 @import "@repo/tailwind-config/tailwind-animate.css";
 
+/* Saudi Riyal Currency Symbol - ensure font is not overridden by RTL rules */
+[dir="rtl"] i.sr,
+[dir="rtl"] i.sr::before,
+[dir="rtl"] .icon-SR,
+[dir="rtl"] .icon-SR::before,
+[dir="rtl"] [class*="sr-symbol"],
+[dir="rtl"] [class*="sr-symbol"]::before {
+	font-family: "saudi riyal symbol" !important;
+	font-style: normal;
+}
+
 @source "../node_modules/fumadocs-ui/dist/**/*.js";
 
 @variant dark (&:where(.dark, .dark *));
 
 body {
 	letter-spacing: -0.02em;
+}
+
+/* RTL Support - IBM Plex Sans Arabic */
+[dir="rtl"] body {
+	font-family: var(--font-arabic-sans), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+	letter-spacing: 0;
+	font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* Apply Arabic font to all text elements in RTL */
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6,
+[dir="rtl"] p,
+[dir="rtl"] span,
+[dir="rtl"] a,
+[dir="rtl"] button,
+[dir="rtl"] input,
+[dir="rtl"] textarea,
+[dir="rtl"] select,
+[dir="rtl"] label {
+	font-family: var(--font-arabic-sans), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Headings weight adjustments for Arabic */
+[dir="rtl"] h1 {
+	font-weight: 700;
+}
+
+[dir="rtl"] h2 {
+	font-weight: 600;
+}
+
+[dir="rtl"] h3,
+[dir="rtl"] h4 {
+	font-weight: 500;
+}
+
+/* Flip directional icons for RTL */
+[dir="rtl"] .rtl-flip {
+	transform: scaleX(-1);
 }
 
 pre.shiki {
@@ -43,4 +98,127 @@ div[role="tablist"].bg-secondary {
 
 input[cmdk-input] {
 	@apply border-none focus-visible:ring-0;
+}
+
+/* Print Styles for Financial Templates */
+@media print {
+	/* Page setup */
+	@page {
+		size: A4;
+		margin: 20mm;
+	}
+
+	/* Hide non-printable elements */
+	.print\:hidden,
+	[data-print-hidden="true"] {
+		display: none !important;
+	}
+
+	/* Reset print-specific styles */
+	body {
+		-webkit-print-color-adjust: exact !important;
+		print-color-adjust: exact !important;
+		color-adjust: exact !important;
+	}
+
+	/* Preserve colors and backgrounds */
+	* {
+		-webkit-print-color-adjust: exact !important;
+		print-color-adjust: exact !important;
+		color-adjust: exact !important;
+	}
+
+	/* Template card styling */
+	.print\:shadow-none {
+		box-shadow: none !important;
+	}
+
+	.print\:rounded-none {
+		border-radius: 0 !important;
+	}
+
+	.print\:border-none {
+		border: none !important;
+	}
+
+	/* Page break handling */
+	.print-page-break-before {
+		page-break-before: always;
+		break-before: page;
+	}
+
+	.print-page-break-after {
+		page-break-after: always;
+		break-after: page;
+	}
+
+	.print-avoid-break {
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
+	/* Keep table headers with content */
+	thead {
+		display: table-header-group;
+	}
+
+	tr {
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
+	/* Ensure signature section stays together */
+	.signature-section {
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
+	/* Keep totals section together */
+	.totals-section {
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
+	/* Preserve background colors in print */
+	[style*="background-color"] {
+		-webkit-print-color-adjust: exact !important;
+		print-color-adjust: exact !important;
+	}
+
+	/* Ensure table header colors are preserved */
+	table thead tr {
+		-webkit-print-color-adjust: exact !important;
+		print-color-adjust: exact !important;
+	}
+
+	/* Fix for alternating row colors */
+	table tbody tr:nth-child(even) {
+		-webkit-print-color-adjust: exact !important;
+		print-color-adjust: exact !important;
+	}
+
+	/* Links should not show underlines in print */
+	a {
+		text-decoration: none !important;
+	}
+
+	/* QR Code visibility */
+	.qr-code-container {
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
+	/* Bank details section */
+	.bank-details-section {
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
+	/* Footer always at bottom of last page */
+	.template-footer {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+	}
 }

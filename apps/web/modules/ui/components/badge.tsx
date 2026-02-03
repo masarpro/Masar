@@ -5,17 +5,23 @@ import type React from "react";
 
 export const badge = cva(
 	[
-		"inline-block",
+		"inline-flex",
+		"items-center",
 		"rounded-full",
-		"px-3",
-		"py-1",
+		"px-2.5",
+		"py-0.5",
 		"text-xs",
-		"uppercase",
 		"font-semibold",
-		"leading-tight",
+		"transition-colors",
 	],
 	{
 		variants: {
+			variant: {
+				default: ["bg-primary", "text-primary-foreground"],
+				secondary: ["bg-secondary", "text-secondary-foreground"],
+				destructive: ["bg-destructive", "text-destructive-foreground"],
+				outline: ["border", "border-input", "text-foreground"],
+			},
 			status: {
 				success: ["bg-emerald-500/10", "text-emerald-500"],
 				info: ["bg-primary/10", "text-primary"],
@@ -24,7 +30,7 @@ export const badge = cva(
 			},
 		},
 		defaultVariants: {
-			status: "info",
+			variant: "default",
 		},
 	},
 );
@@ -35,10 +41,11 @@ export type BadgeProps = React.HtmlHTMLAttributes<HTMLDivElement> &
 export const Badge = ({
 	children,
 	className,
+	variant,
 	status,
 	...props
 }: BadgeProps) => (
-	<span className={cn(badge({ status }), className)} {...props}>
+	<span className={cn(badge({ variant, status }), className)} {...props}>
 		{children}
 	</span>
 );

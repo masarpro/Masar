@@ -14,6 +14,336 @@ generator zod {
   config   = "./zod-generator.config.json"
 }
 
+// نوع الحساب
+enum AccountType {
+  OWNER           // مالك المنشأة
+  EMPLOYEE        // موظف داخلي
+  PROJECT_CLIENT  // عميل مشروع (بوابة المالك)
+}
+
+// نوع الدور
+enum RoleType {
+  OWNER              // مالك المنشأة
+  PROJECT_MANAGER    // مدير مشاريع
+  ACCOUNTANT         // محاسب
+  ENGINEER           // مهندس
+  SUPERVISOR         // مراقب/مشرف
+  CUSTOM             // مخصص
+}
+
+// حالة الدعوة
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
+// ═══════════════════════════════════════════════════════════
+// PROJECTS MODULE - إدارة المشاريع
+// ═══════════════════════════════════════════════════════════
+
+// حالة المشروع
+enum ProjectStatus {
+  ACTIVE      // نشط
+  ON_HOLD     // معلق
+  COMPLETED   // مكتمل
+  ARCHIVED    // مؤرشف (محذوف)
+}
+
+// دور العضو في المشروع
+enum ProjectRole {
+  MANAGER     // مدير المشروع
+  ENGINEER    // مهندس
+  SUPERVISOR  // مشرف ميداني
+  ACCOUNTANT  // محاسب المشروع
+  VIEWER      // مشاهد
+}
+
+// ═══════════════════════════════════════════════════════════
+// FIELD EXECUTION ENUMS - التنفيذ الميداني
+// ═══════════════════════════════════════════════════════════
+
+// خطورة المشكلة
+enum IssueSeverity {
+  LOW       // منخفضة
+  MEDIUM    // متوسطة
+  HIGH      // عالية
+  CRITICAL  // حرجة
+}
+
+// حالة المشكلة
+enum IssueStatus {
+  OPEN         // مفتوحة
+  IN_PROGRESS  // قيد المعالجة
+  RESOLVED     // تم الحل
+  CLOSED       // مغلقة
+}
+
+// فئة الصورة
+enum PhotoCategory {
+  PROGRESS   // تقدم العمل
+  ISSUE      // مشكلة
+  EQUIPMENT  // معدات
+  MATERIAL   // مواد
+  SAFETY     // سلامة
+  OTHER      // أخرى
+}
+
+// حالة الطقس
+enum WeatherCondition {
+  SUNNY   // مشمس
+  CLOUDY  // غائم
+  RAINY   // ممطر
+  WINDY   // عاصف
+  DUSTY   // مغبر
+  HOT     // حار
+  COLD    // بارد
+}
+
+// نوع المشروع
+enum ProjectType {
+  RESIDENTIAL     // سكني
+  COMMERCIAL      // تجاري
+  INDUSTRIAL      // صناعي
+  INFRASTRUCTURE  // بنية تحتية
+  MIXED           // مختلط
+}
+
+// ═══════════════════════════════════════════════════════════
+// PROJECT FINANCE - المالية والمستخلصات
+// ═══════════════════════════════════════════════════════════
+
+// فئة المصروفات
+enum ExpenseCategory {
+  MATERIALS      // مواد
+  LABOR          // عمالة
+  EQUIPMENT      // معدات
+  SUBCONTRACTOR  // مقاول من الباطن
+  TRANSPORT      // نقل
+  MISC           // متنوعة
+}
+
+// حالة المستخلص
+enum ClaimStatus {
+  DRAFT       // مسودة
+  SUBMITTED   // مقدم
+  APPROVED    // معتمد
+  PAID        // مدفوع
+  REJECTED    // مرفوض
+}
+
+// ═══════════════════════════════════════════════════════════
+// DOCUMENTS & APPROVALS - الوثائق والاعتمادات
+// ═══════════════════════════════════════════════════════════
+
+// مجلدات الوثائق
+enum DocumentFolder {
+  CONTRACT    // العقد
+  DRAWINGS    // المخططات
+  CLAIMS      // المستخلصات
+  LETTERS     // الخطابات
+  PHOTOS      // الصور
+  OTHER       // أخرى
+}
+
+// حالة الاعتماد
+enum ApprovalStatus {
+  PENDING     // قيد الانتظار
+  APPROVED    // معتمد
+  REJECTED    // مرفوض
+  CANCELLED   // ملغي
+}
+
+// حالة الموافق
+enum ApproverStatus {
+  PENDING     // لم يقرر بعد
+  APPROVED    // وافق
+  REJECTED    // رفض
+}
+
+// حالة المرحلة الزمنية (Phase 10)
+enum MilestoneStatus {
+  PLANNED       // مخطط
+  IN_PROGRESS   // قيد التنفيذ
+  COMPLETED     // مكتمل
+  DELAYED       // متأخر
+}
+
+// قنوات المحادثات
+enum MessageChannel {
+  TEAM        // محادثة الفريق الداخلية
+  OWNER       // محادثة المالك الرسمية
+}
+
+// أنواع الإشعارات
+enum NotificationType {
+  // الاعتمادات
+  APPROVAL_REQUESTED  // طلب اعتماد
+  APPROVAL_DECIDED    // قرار اعتماد
+
+  // المستندات
+  DOCUMENT_CREATED    // وثيقة جديدة
+
+  // التقارير الميدانية
+  DAILY_REPORT_CREATED  // تقرير يومي جديد
+
+  // المشاكل
+  ISSUE_CREATED       // مشكلة جديدة
+  ISSUE_CRITICAL      // مشكلة حرجة
+
+  // المالية
+  EXPENSE_CREATED     // مصروف جديد
+  CLAIM_CREATED       // مستخلص جديد
+  CLAIM_STATUS_CHANGED // تغيير حالة مستخلص
+
+  // أوامر التغيير
+  CHANGE_ORDER_CREATED   // أمر تغيير جديد
+  CHANGE_ORDER_APPROVED  // اعتماد أمر تغيير
+  CHANGE_ORDER_REJECTED  // رفض أمر تغيير
+
+  // المالك
+  OWNER_MESSAGE       // رسالة من/إلى المالك
+
+  // الفريق
+  TEAM_MEMBER_ADDED   // إضافة عضو للفريق
+  TEAM_MEMBER_REMOVED // إزالة عضو من الفريق
+
+  // عام
+  SYSTEM              // إشعار نظام
+}
+
+// إجراءات سجل التدقيق
+enum AuditAction {
+  DOC_CREATED         // إنشاء وثيقة
+  APPROVAL_REQUESTED  // طلب اعتماد
+  APPROVAL_DECIDED    // قرار اعتماد
+  MESSAGE_SENT        // إرسال رسالة
+  TOKEN_CREATED       // إنشاء رمز وصول
+  TOKEN_REVOKED       // إلغاء رمز وصول
+  CLAIM_STATUS_CHANGED // تغيير حالة مستخلص
+  EXPENSE_CREATED     // إنشاء مصروف
+  ATTACHMENT_CREATED  // رفع مرفق
+  // Phase 11 - Change Orders
+  CO_CREATED          // إنشاء أمر تغيير
+  CO_SUBMITTED        // تقديم أمر تغيير
+  CO_APPROVED         // اعتماد أمر تغيير
+  CO_REJECTED         // رفض أمر تغيير
+  CO_IMPLEMENTED      // تنفيذ أمر تغيير
+}
+
+// قنوات الإشعار
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+}
+
+// حالة تسليم الإشعار
+enum DeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+// نوع المرفق
+enum AttachmentOwnerType {
+  DOCUMENT
+  PHOTO
+  EXPENSE
+  ISSUE
+  MESSAGE
+  CLAIM
+  CHANGE_ORDER   // أمر تغيير (Phase 11)
+  CLIENT         // مرفقات العميل
+}
+
+// نوع العميل
+enum ClientType {
+  INDIVIDUAL    // فردي
+  COMMERCIAL    // تجاري (شركة)
+}
+
+// ═══════════════════════════════════════════════════════════
+// ORGANIZATION FINANCE ENUMS - المالية المؤسسية
+// ═══════════════════════════════════════════════════════════
+
+// فئات المصروفات الشاملة لشركات المقاولات
+enum OrgExpenseCategory {
+  // مصروفات المشاريع
+  MATERIALS              // مواد بناء
+  LABOR                  // عمالة
+  EQUIPMENT_RENTAL       // إيجار معدات
+  EQUIPMENT_PURCHASE     // شراء معدات
+  SUBCONTRACTOR          // مقاول من الباطن
+  TRANSPORT              // نقل ولوجستيات
+  // مصروفات إدارية
+  SALARIES               // رواتب
+  RENT                   // إيجار مكتب
+  UTILITIES              // كهرباء وماء
+  COMMUNICATIONS         // اتصالات وانترنت
+  INSURANCE              // تأمين
+  LICENSES               // تراخيص ورسوم
+  BANK_FEES              // رسوم بنكية
+  // مصروفات تشغيلية
+  FUEL                   // وقود
+  MAINTENANCE            // صيانة
+  SUPPLIES               // مستلزمات مكتبية
+  MARKETING              // تسويق
+  TRAINING               // تدريب
+  TRAVEL                 // سفر
+  HOSPITALITY            // ضيافة
+  // مصروفات مالية
+  LOAN_PAYMENT           // سداد قرض
+  TAXES                  // ضرائب
+  ZAKAT                  // زكاة
+  // أخرى
+  REFUND                 // مرتجعات
+  MISC                   // متنوعة
+  CUSTOM                 // مخصص (مع customCategory)
+}
+
+// نوع الحساب المالي
+enum FinanceAccountType {
+  BANK      // حساب بنكي
+  CASH_BOX  // صندوق نقدي
+}
+
+// حالة المعاملة المالية
+enum FinanceTransactionStatus {
+  PENDING    // معلقة
+  COMPLETED  // مكتملة
+  CANCELLED  // ملغية
+}
+
+// طريقة الدفع
+enum PaymentMethod {
+  CASH           // نقدي
+  BANK_TRANSFER  // تحويل بنكي
+  CHEQUE         // شيك
+  CREDIT_CARD    // بطاقة ائتمان
+  OTHER          // أخرى
+}
+
+// حالة أمر التغيير (Phase 11)
+enum ChangeOrderStatus {
+  DRAFT         // مسودة
+  SUBMITTED     // مقدم للاعتماد
+  APPROVED      // معتمد
+  REJECTED      // مرفوض
+  IMPLEMENTED   // منفذ
+}
+
+// تصنيف أمر التغيير (Phase 11)
+enum ChangeOrderCategory {
+  SCOPE_CHANGE    // تغيير نطاق
+  CLIENT_REQUEST  // طلب العميل
+  SITE_CONDITION  // ظروف الموقع
+  DESIGN_CHANGE   // تغيير تصميمي
+  MATERIAL_CHANGE // تغيير مواد
+  REGULATORY      // متطلبات تنظيمية
+  OTHER           // أخرى
+}
+
 model User {
   id                 String       @id @default(cuid())
   name               String
@@ -40,6 +370,94 @@ model User {
   members            Member[]
   twofactors         TwoFactor[]
   aiChats            AiChat[]
+  costStudies        CostStudy[]      @relation("CostStudyCreator")
+  projectsCreated    Project[]        @relation("ProjectCreator")
+
+  // علاقات التنفيذ الميداني
+  dailyReportsCreated   ProjectDailyReport[]    @relation("DailyReportCreator")
+  photosUploaded        ProjectPhoto[]          @relation("PhotoUploader")
+  issuesCreated         ProjectIssue[]          @relation("IssueCreator")
+  issuesAssigned        ProjectIssue[]          @relation("IssueAssignee")
+  progressUpdatesCreated ProjectProgressUpdate[] @relation("ProgressUpdateCreator")
+
+  // علاقات المالية
+  expensesCreated       ProjectExpense[]        @relation("ExpenseCreator")
+  claimsCreated         ProjectClaim[]          @relation("ClaimCreator")
+
+  // علاقات الوثائق والاعتمادات
+  documentsCreated         ProjectDocument[]          @relation("DocumentCreator")
+  approvalsRequested       ProjectApproval[]          @relation("ApprovalRequester")
+  approverAssignments      ProjectApprovalApprover[]  @relation("ApprovalApprover")
+  auditLogs                ProjectAuditLog[]          @relation("AuditActor")
+  messagesSent             ProjectMessage[]           @relation("MessageSender")
+  notifications            Notification[]             @relation("NotificationRecipient")
+
+  // علاقات بوابة المالك
+  ownerAccessesCreated     ProjectOwnerAccess[]       @relation("OwnerAccessCreator")
+
+  // المرفقات (Phase 6)
+  attachmentsUploaded      Attachment[]               @relation("AttachmentUploader")
+
+  // Phase 7 - Differentiation
+  templatesCreated         ProjectTemplate[]          @relation("TemplateCreator")
+  alertsAcknowledged       ProjectAlert[]             @relation("AlertAcknowledger")
+  digestSubscriptions      DigestSubscription[]       @relation("DigestSubscriber")
+
+  // Phase 8 - Integrations & Exports
+  deliveryLogsSent         MessageDeliveryLog[]       @relation("DeliveryLogSender")
+  shareLinksCreated        ShareLink[]                @relation("ShareLinkCreator")
+
+  // Phase 11 - Change Orders
+  changeOrdersRequested    ProjectChangeOrder[]       @relation("ChangeOrderRequester")
+  changeOrdersDecided      ProjectChangeOrder[]       @relation("ChangeOrderDecider")
+  changeOrdersImplemented  ProjectChangeOrder[]       @relation("ChangeOrderImplementer")
+
+  // Finance Module - المالية
+  clientsCreated           Client[]                   @relation("ClientCreator")
+  quotationsCreated        Quotation[]                @relation("QuotationCreator")
+  invoicesCreated          FinanceInvoice[]           @relation("InvoiceCreator")
+  invoicePaymentsCreated   FinanceInvoicePayment[]    @relation("InvoicePaymentCreator")
+  openDocumentsCreated     OpenDocument[]             @relation("OpenDocumentCreator")
+  financeTemplatesCreated  FinanceTemplate[]          @relation("FinanceTemplateCreator")
+
+  // Organization Finance - المالية المؤسسية
+  bankAccountsCreated      OrganizationBank[]         @relation("BankAccountCreator")
+  orgExpensesCreated       FinanceExpense[]           @relation("ExpenseCreator")
+  orgPaymentsCreated       FinancePayment[]           @relation("PaymentCreator")
+  orgTransfersCreated      FinanceTransfer[]          @relation("TransferCreator")
+
+  // علاقات فريق المشروع
+  projectMemberships       ProjectMember[]            @relation("ProjectMemberUser")
+  projectMembersAssigned   ProjectMember[]            @relation("ProjectMemberAssigner")
+
+  // ═══ حقول نظام مسار الجديدة ═══
+
+  // نوع الحساب
+  accountType          AccountType @default(EMPLOYEE)
+
+  // حالة الحساب
+  isActive             Boolean     @default(true)
+  mustChangePassword   Boolean     @default(false)
+  lastLoginAt          DateTime?
+
+  // الدور داخل المنظمة (علاقة جديدة)
+  organizationRoleId   String?
+  organizationRole     Role?       @relation(fields: [organizationRoleId], references: [id])
+
+  // صلاحيات مخصصة تتجاوز الدور
+  customPermissions    Json?
+
+  // من أنشأ هذا الحساب
+  createdById          String?
+  createdBy            User?       @relation("UserCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdUsers         User[]      @relation("UserCreator")
+
+  // علاقات المنظمة الجديدة
+  organizationOwned    Organization? @relation("OrganizationOwner")
+  employeeOf           Organization? @relation("OrganizationEmployees", fields: [organizationId], references: [id])
+  organizationId       String?
+
+  // ═══ نهاية حقول مسار ═══
 
   @@unique([email])
   @@unique([username])
@@ -145,6 +563,52 @@ model Organization {
   invitations        Invitation[]
   purchases          Purchase[]
   aiChats            AiChat[]
+  costStudies        CostStudy[]
+  projects           Project[]
+
+  // ═══ حقول نظام مسار الجديدة ═══
+
+  // المالك الرئيسي (واحد فقط لكل منظمة)
+  ownerId              String?     @unique
+  owner                User?       @relation("OrganizationOwner", fields: [ownerId], references: [id])
+
+  // الموظفين
+  employees            User[]      @relation("OrganizationEmployees")
+
+  // الأدوار
+  roles                Role[]
+
+  // معلومات المقاولات السعودية
+  commercialRegister   String?     // السجل التجاري
+  taxNumber            String?     // الرقم الضريبي
+  contractorClass      String?     // تصنيف المقاول (أ، ب، ج)
+
+  // معلومات الاتصال
+  phone                String?
+  address              String?
+  city                 String?
+
+  // الإعدادات
+  currency             String      @default("SAR")
+  timezone             String      @default("Asia/Riyadh")
+
+  // Phase 8 - Integration Settings
+  integrationSettings  OrganizationIntegrationSettings?
+
+  // Finance Module - المالية
+  clients              Client[]
+  quotations           Quotation[]
+  financeInvoices      FinanceInvoice[]
+  openDocuments        OpenDocument[]
+  financeTemplates     FinanceTemplate[]
+
+  // Organization Finance - المالية المؤسسية
+  bankAccounts         OrganizationBank[]
+  financeExpenses      FinanceExpense[]
+  financePayments      FinancePayment[]
+  financeTransfers     FinanceTransfer[]
+
+  // ═══ نهاية حقول مسار ═══
 
   @@unique([slug])
   @@map("organization")
@@ -183,6 +647,70 @@ model Invitation {
   @@map("invitation")
 }
 
+// ═══════════════════════════════════════════════════════════
+// جدول الأدوار
+// ═══════════════════════════════════════════════════════════
+model Role {
+  id              String       @id @default(cuid())
+
+  // المعلومات الأساسية
+  name            String                        // اسم الدور (بالعربي)
+  nameEn          String?                       // اسم الدور (بالإنجليزي)
+  description     String?                       // وصف الدور
+
+  // نوع الدور
+  type            RoleType     @default(CUSTOM)
+  isSystem        Boolean      @default(false)  // أدوار النظام لا يمكن حذفها
+
+  // الصلاحيات (JSON)
+  permissions     Json
+
+  // العلاقات
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  users           User[]
+
+  // التواريخ
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([organizationId, name])
+  @@map("role")
+}
+
+// ═══════════════════════════════════════════════════════════
+// جدول دعوات المستخدمين
+// ═══════════════════════════════════════════════════════════
+model UserInvitation {
+  id              String           @id @default(cuid())
+
+  // معلومات الدعوة
+  email           String
+  name            String?
+
+  // الدور المخصص
+  roleId          String
+
+  // رمز الدعوة
+  token           String           @unique
+  expiresAt       DateTime
+
+  // الحالة
+  status          InvitationStatus @default(PENDING)
+
+  // المنظمة
+  organizationId  String
+
+  // من أرسل الدعوة
+  invitedById     String
+
+  // التواريخ
+  createdAt       DateTime         @default(now())
+  acceptedAt      DateTime?
+
+  @@map("user_invitation")
+}
+
 enum PurchaseType {
   SUBSCRIPTION
   ONE_TIME
@@ -219,4 +747,1714 @@ model AiChat {
   updatedAt      DateTime      @updatedAt
 
   @@map("ai_chat")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// QUANTITIES MODULE - حصر الكميات ودراسة التكلفة
+// ═══════════════════════════════════════════════════════════════════════════
+
+// دراسة التكلفة الرئيسية
+model CostStudy {
+  id             String       @id @default(cuid())
+  organizationId String       @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // من أنشأ الدراسة
+  createdById    String       @map("created_by")
+  createdBy      User         @relation("CostStudyCreator", fields: [createdById], references: [id])
+
+  // معلومات الدراسة
+  name           String?
+  customerName   String?      @map("customer_name")
+  customerId     String?      @map("customer_id")
+
+  // بيانات المشروع الأساسية
+  projectType    String       @map("project_type")
+  landArea       Float        @map("land_area")
+  buildingArea   Float        @map("building_area")
+  numberOfFloors Int          @map("number_of_floors")
+  hasBasement    Boolean      @default(false) @map("has_basement")
+  finishingLevel String       @map("finishing_level")
+
+  // ملخص التكاليف
+  structuralCost     Float @default(0) @map("structural_cost")
+  finishingCost      Float @default(0) @map("finishing_cost")
+  mepCost            Float @default(0) @map("mep_cost")
+  laborCost          Float @default(0) @map("labor_cost")
+  overheadPercent    Float @default(5) @map("overhead_percent")
+  profitPercent      Float @default(10) @map("profit_percent")
+  contingencyPercent Float @default(3) @map("contingency_percent")
+  vatIncluded        Boolean @default(true) @map("vat_included")
+  totalCost          Float @default(0) @map("total_cost")
+
+  status String  @default("draft")
+  notes  String? @db.Text
+
+  // العلاقات
+  structuralItems StructuralItem[]
+  finishingItems  FinishingItem[]
+  mepItems        MEPItem[]
+  laborItems      LaborItem[]
+  quotes          Quote[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([organizationId])
+  @@index([createdById])
+  @@map("cost_studies")
+}
+
+// بنود الأعمال الإنشائية
+model StructuralItem {
+  id          String    @id @default(cuid())
+  costStudyId String    @map("cost_study_id")
+  costStudy   CostStudy @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
+
+  category    String
+  subCategory String?   @map("sub_category")
+  name        String
+  description String?   @db.Text
+
+  dimensions     Json?
+  quantity       Float @default(0)
+  unit           String
+
+  concreteVolume Float? @map("concrete_volume")
+  concreteType   String?  @map("concrete_type")
+  steelWeight    Float? @map("steel_weight")
+  steelRatio     Float? @map("steel_ratio")
+  wastagePercent Float  @default(10) @map("wastage_percent")
+
+  materialCost Float @default(0) @map("material_cost")
+  laborCost    Float @default(0) @map("labor_cost")
+  totalCost    Float @default(0) @map("total_cost")
+
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([costStudyId])
+  @@map("structural_items")
+}
+
+// بنود التشطيبات
+model FinishingItem {
+  id          String    @id @default(cuid())
+  costStudyId String    @map("cost_study_id")
+  costStudy   CostStudy @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
+
+  category       String
+  subCategory    String?  @map("sub_category")
+  name           String
+  description    String?  @db.Text
+
+  area           Float  @default(0)
+  unit           String
+  wastagePercent Float  @default(8) @map("wastage_percent")
+
+  qualityLevel  String  @default("medium") @map("quality_level")
+  materialPrice Float @default(0) @map("material_price")
+  laborPrice    Float @default(0) @map("labor_price")
+
+  materialCost Float @default(0) @map("material_cost")
+  laborCost    Float @default(0) @map("labor_cost")
+  totalCost    Float @default(0) @map("total_cost")
+
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([costStudyId])
+  @@map("finishing_items")
+}
+
+// بنود أعمال الكهرباء والسباكة والتكييف
+model MEPItem {
+  id          String    @id @default(cuid())
+  costStudyId String    @map("cost_study_id")
+  costStudy   CostStudy @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
+
+  category    String
+  itemType    String    @map("item_type")
+  name        String
+  description String?   @db.Text
+
+  quantity  Float @default(0)
+  unit      String
+  unitPrice Float @default(0) @map("unit_price")
+  totalCost Float @default(0) @map("total_cost")
+
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([costStudyId])
+  @@map("mep_items")
+}
+
+// بنود العمالة
+model LaborItem {
+  id          String    @id @default(cuid())
+  costStudyId String    @map("cost_study_id")
+  costStudy   CostStudy @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
+
+  laborType    String @map("labor_type")
+  workerType   String @map("worker_type")
+  name         String
+
+  quantity     Int
+  dailyRate    Float @map("daily_rate")
+  durationDays Int     @map("duration_days")
+
+  insuranceCost Float @default(0) @map("insurance_cost")
+  housingCost   Float @default(0) @map("housing_cost")
+  otherCosts    Float @default(0) @map("other_costs")
+  totalCost     Float @default(0) @map("total_cost")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([costStudyId])
+  @@map("labor_items")
+}
+
+// عروض الأسعار
+model Quote {
+  id          String    @id @default(cuid())
+  costStudyId String    @map("cost_study_id")
+  costStudy   CostStudy @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
+
+  quoteNumber String @unique @map("quote_number")
+  quoteType   String @map("quote_type")
+
+  clientName    String  @map("client_name")
+  clientCompany String? @map("client_company")
+  clientPhone   String? @map("client_phone")
+  clientEmail   String? @map("client_email")
+  clientAddress String? @map("client_address") @db.Text
+
+  subtotal       Float @default(0)
+  overheadAmount Float @default(0) @map("overhead_amount")
+  profitAmount   Float @default(0) @map("profit_amount")
+  vatAmount      Float @default(0) @map("vat_amount")
+  totalAmount    Float @default(0) @map("total_amount")
+
+  validUntil           DateTime @map("valid_until")
+  paymentTerms         String?  @map("payment_terms") @db.Text
+  deliveryTerms        String?  @map("delivery_terms") @db.Text
+  showUnitPrices       Boolean  @default(true) @map("show_unit_prices")
+  showQuantities       Boolean  @default(true) @map("show_quantities")
+  showItemDescriptions Boolean  @default(true) @map("show_item_descriptions")
+  includeTerms         Boolean  @default(true) @map("include_terms")
+  includeCoverPage     Boolean  @default(true) @map("include_cover_page")
+  selectedCategories   Json?    @map("selected_categories")
+  termsAndConditions   String?  @map("terms_and_conditions") @db.Text
+  notes                String?  @db.Text
+
+  pdfUrl String? @map("pdf_url")
+  status String  @default("draft")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([costStudyId])
+  @@map("quotes")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PROJECTS MODULE - إدارة المشاريع
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Project {
+  id              String         @id @default(cuid())
+  organizationId  String         @map("organization_id")
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // المعلومات الأساسية
+  name            String
+  slug            String
+  description     String?        @db.Text
+
+  // الحالة والنوع
+  status          ProjectStatus  @default(ACTIVE)
+  type            ProjectType?
+
+  // العميل والموقع
+  clientName      String?        @map("client_name")
+  location        String?
+
+  // المالية
+  contractValue   Decimal?       @map("contract_value") @db.Decimal(15, 2)
+
+  // التقدم (0-100)
+  progress        Float          @default(0)
+
+  // الجدول الزمني
+  startDate       DateTime?      @map("start_date")
+  endDate         DateTime?      @map("end_date")
+
+  // من أنشأ المشروع
+  createdById     String         @map("created_by")
+  createdBy       User           @relation("ProjectCreator", fields: [createdById], references: [id])
+
+  // التواريخ
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  // علاقات التنفيذ الميداني
+  dailyReports    ProjectDailyReport[]
+  photos          ProjectPhoto[]
+  issues          ProjectIssue[]
+  progressUpdates ProjectProgressUpdate[]
+
+  // علاقات المالية
+  expenses        ProjectExpense[]
+  claims          ProjectClaim[]
+
+  // علاقات الوثائق والاعتمادات والمحادثات
+  documents       ProjectDocument[]
+  auditLogs       ProjectAuditLog[]
+  messages        ProjectMessage[]
+
+  // علاقات بوابة المالك
+  ownerAccesses   ProjectOwnerAccess[]
+  milestones      ProjectMilestone[]
+
+  // Phase 7 - Differentiation
+  templatesFromThis ProjectTemplate[]    @relation("TemplateSource")
+  alerts            ProjectAlert[]
+  digestSubscriptions DigestSubscription[]
+
+  // Phase 8 - Integrations & Exports
+  messageDeliveryLogs MessageDeliveryLog[]
+  shareLinks          ShareLink[]
+
+  // Phase 11 - Change Orders
+  changeOrders        ProjectChangeOrder[]
+
+  // فريق المشروع
+  members             ProjectMember[]
+
+  // Finance Module - المالية
+  quotations          Quotation[]
+  financeInvoices     FinanceInvoice[]
+  openDocuments       OpenDocument[]
+
+  // Organization Finance - المالية المؤسسية (ربط بالمشروع)
+  orgExpenses         FinanceExpense[]   @relation("ProjectOrgExpenses")
+  orgPayments         FinancePayment[]   @relation("ProjectOrgPayments")
+
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+  @@index([createdById])
+  @@index([status])
+  @@map("projects")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PROJECT TEAM MEMBERS - فريق المشروع
+// ═══════════════════════════════════════════════════════════════════════════
+
+model ProjectMember {
+  id           String      @id @default(cuid())
+  projectId    String      @map("project_id")
+  project      Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId       String      @map("user_id")
+  user         User        @relation("ProjectMemberUser", fields: [userId], references: [id], onDelete: Cascade)
+  role         ProjectRole @default(VIEWER)
+  assignedAt   DateTime    @default(now()) @map("assigned_at")
+  assignedById String      @map("assigned_by")
+  assignedBy   User        @relation("ProjectMemberAssigner", fields: [assignedById], references: [id])
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+  @@map("project_members")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FIELD EXECUTION MODELS - التنفيذ الميداني
+// ═══════════════════════════════════════════════════════════════════════════
+
+// التقرير اليومي
+model ProjectDailyReport {
+  id          String           @id @default(cuid())
+  projectId   String           @map("project_id")
+  project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // تاريخ التقرير
+  reportDate  DateTime         @map("report_date") @db.Date
+
+  // معلومات العمل
+  manpower    Int              @default(0)     // عدد العمال
+  equipment   String?          @db.Text        // المعدات المستخدمة
+  workDone    String           @db.Text        // الأعمال المنجزة
+  blockers    String?          @db.Text        // العوائق
+
+  // الطقس
+  weather     WeatherCondition @default(SUNNY)
+
+  // من أنشأ التقرير
+  createdById String           @map("created_by")
+  createdBy   User             @relation("DailyReportCreator", fields: [createdById], references: [id])
+
+  // التواريخ
+  createdAt   DateTime         @default(now()) @map("created_at")
+
+  @@unique([projectId, reportDate])
+  @@index([projectId, reportDate])
+  @@map("project_daily_reports")
+}
+
+// صور المشروع
+model ProjectPhoto {
+  id           String        @id @default(cuid())
+  projectId    String        @map("project_id")
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // معلومات الصورة
+  url          String        // رابط الصورة
+  caption      String?       // وصف الصورة
+  category     PhotoCategory @default(PROGRESS)
+
+  // تاريخ الالتقاط
+  takenAt      DateTime      @default(now()) @map("taken_at")
+
+  // من رفع الصورة
+  uploadedById String        @map("uploaded_by")
+  uploadedBy   User          @relation("PhotoUploader", fields: [uploadedById], references: [id])
+
+  // التواريخ
+  createdAt    DateTime      @default(now()) @map("created_at")
+
+  @@index([projectId, createdAt])
+  @@map("project_photos")
+}
+
+// مشاكل المشروع
+model ProjectIssue {
+  id          String        @id @default(cuid())
+  projectId   String        @map("project_id")
+  project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // معلومات المشكلة
+  title       String
+  description String        @db.Text
+  severity    IssueSeverity @default(MEDIUM)
+  status      IssueStatus   @default(OPEN)
+
+  // الموعد النهائي والمسؤول
+  dueDate     DateTime?     @map("due_date")
+  assigneeId  String?       @map("assignee_id")
+  assignee    User?         @relation("IssueAssignee", fields: [assigneeId], references: [id])
+
+  // من أنشأ المشكلة
+  createdById String        @map("created_by")
+  createdBy   User          @relation("IssueCreator", fields: [createdById], references: [id])
+
+  // تاريخ الحل
+  resolvedAt  DateTime?     @map("resolved_at")
+
+  // التواريخ
+  createdAt   DateTime      @default(now()) @map("created_at")
+
+  @@index([projectId, status])
+  @@map("project_issues")
+}
+
+// تحديثات التقدم
+model ProjectProgressUpdate {
+  id          String   @id @default(cuid())
+  projectId   String   @map("project_id")
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // نسبة التقدم (0-100)
+  progress    Float
+  phaseLabel  String?  @map("phase_label")  // تسمية المرحلة (اختياري)
+  note        String?  @db.Text             // ملاحظة
+
+  // من أضاف التحديث
+  createdById String   @map("created_by")
+  createdBy   User     @relation("ProgressUpdateCreator", fields: [createdById], references: [id])
+
+  // التواريخ
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([projectId, createdAt])
+  @@map("project_progress_updates")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PROJECT FINANCE MODELS - نماذج المالية
+// ═══════════════════════════════════════════════════════════════════════════
+
+// مصروفات المشروع
+model ProjectExpense {
+  id              String          @id @default(cuid())
+  organizationId  String          @map("organization_id")
+  projectId       String          @map("project_id")
+  project         Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  date            DateTime        @db.Date
+  category        ExpenseCategory
+  amount          Decimal         @db.Decimal(15, 2)
+  vendorName      String?         @map("vendor_name")
+  note            String?         @db.Text
+  attachmentUrl   String?         @map("attachment_url")
+
+  createdById     String          @map("created_by")
+  createdBy       User            @relation("ExpenseCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  @@index([organizationId, projectId, date])
+  @@index([organizationId, projectId, category])
+  @@map("project_expenses")
+}
+
+// المستخلصات (الدفعات المرحلية)
+model ProjectClaim {
+  id              String       @id @default(cuid())
+  organizationId  String       @map("organization_id")
+  projectId       String       @map("project_id")
+  project         Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  claimNo         Int          @map("claim_no")
+  periodStart     DateTime?    @map("period_start") @db.Date
+  periodEnd       DateTime?    @map("period_end") @db.Date
+  amount          Decimal      @db.Decimal(15, 2)
+  dueDate         DateTime?    @map("due_date") @db.Date
+  status          ClaimStatus  @default(DRAFT)
+  note            String?      @db.Text
+
+  createdById     String       @map("created_by")
+  createdBy       User         @relation("ClaimCreator", fields: [createdById], references: [id])
+
+  approvedAt      DateTime?    @map("approved_at")
+  paidAt          DateTime?    @map("paid_at")
+
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  // Phase 11 - Change Orders linked to this claim
+  changeOrders    ProjectChangeOrder[]
+
+  @@unique([projectId, claimNo])
+  @@index([organizationId, projectId, status])
+  @@index([organizationId, projectId, dueDate])
+  @@map("project_claims")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DOCUMENTS & APPROVALS MODELS - الوثائق والاعتمادات
+// ═══════════════════════════════════════════════════════════════════════════
+
+// وثائق المشروع
+model ProjectDocument {
+  id              String         @id @default(cuid())
+  organizationId  String         @map("organization_id")
+  projectId       String         @map("project_id")
+  project         Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  folder          DocumentFolder
+  title           String
+  description     String?        @db.Text
+  fileUrl         String         @map("file_url")
+  version         Int            @default(1)
+
+  createdById     String         @map("created_by")
+  createdBy       User           @relation("DocumentCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  // العلاقات
+  approvals       ProjectApproval[]
+
+  @@index([organizationId, projectId, folder, createdAt])
+  @@map("project_documents")
+}
+
+// طلبات الاعتماد
+model ProjectApproval {
+  id              String           @id @default(cuid())
+  organizationId  String           @map("organization_id")
+  projectId       String           @map("project_id")
+
+  documentId      String           @map("document_id")
+  document        ProjectDocument  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  status          ApprovalStatus   @default(PENDING)
+  note            String?          @db.Text
+
+  requestedById   String           @map("requested_by")
+  requestedBy     User             @relation("ApprovalRequester", fields: [requestedById], references: [id])
+  requestedAt     DateTime         @default(now()) @map("requested_at")
+
+  decidedAt       DateTime?        @map("decided_at")
+  decisionNote    String?          @map("decision_note") @db.Text
+
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  // العلاقات
+  approvers       ProjectApprovalApprover[]
+
+  @@index([organizationId, projectId, status])
+  @@map("project_approvals")
+}
+
+// المُعتمدين على طلب الاعتماد
+model ProjectApprovalApprover {
+  id              String          @id @default(cuid())
+  approvalId      String          @map("approval_id")
+  approval        ProjectApproval @relation(fields: [approvalId], references: [id], onDelete: Cascade)
+
+  userId          String          @map("user_id")
+  user            User            @relation("ApprovalApprover", fields: [userId], references: [id])
+
+  status          ApproverStatus  @default(PENDING)
+  decidedAt       DateTime?       @map("decided_at")
+  note            String?         @db.Text
+
+  @@unique([approvalId, userId])
+  @@map("project_approval_approvers")
+}
+
+// سجل التدقيق
+model ProjectAuditLog {
+  id              String      @id @default(cuid())
+  organizationId  String      @map("organization_id")
+  projectId       String      @map("project_id")
+  project         Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  actorId         String      @map("actor_id")
+  actor           User        @relation("AuditActor", fields: [actorId], references: [id])
+
+  action          AuditAction
+  entityType      String      @map("entity_type")  // document, approval, message
+  entityId        String      @map("entity_id")
+  metadata        Json?
+
+  createdAt       DateTime    @default(now()) @map("created_at")
+
+  @@index([organizationId, projectId, createdAt])
+  @@map("project_audit_logs")
+}
+
+// رسائل المشروع
+model ProjectMessage {
+  id              String         @id @default(cuid())
+  organizationId  String         @map("organization_id")
+  projectId       String         @map("project_id")
+  project         Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  channel         MessageChannel
+  senderId        String         @map("sender_id")
+  sender          User           @relation("MessageSender", fields: [senderId], references: [id])
+
+  content         String         @db.Text
+  isUpdate        Boolean        @default(false) @map("is_update")  // تحديث رسمي
+
+  createdAt       DateTime       @default(now()) @map("created_at")
+
+  @@index([organizationId, projectId, channel, createdAt])
+  @@map("project_messages")
+}
+
+// الإشعارات
+model Notification {
+  id              String              @id @default(cuid())
+  organizationId  String              @map("organization_id")
+  userId          String              @map("user_id")
+  user            User                @relation("NotificationRecipient", fields: [userId], references: [id], onDelete: Cascade)
+
+  type            NotificationType
+  title           String
+  body            String?             @db.Text
+
+  projectId       String?             @map("project_id")
+  entityType      String?             @map("entity_type")
+  entityId        String?             @map("entity_id")
+
+  // Phase 6: Notification channels
+  channel         NotificationChannel @default(IN_APP)
+  deliveryStatus  DeliveryStatus      @default(PENDING) @map("delivery_status")
+  dedupeKey       String?             @unique @map("dedupe_key") // منع التكرار
+  metadata        Json?               // بيانات إضافية للتوجيه
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+  readAt          DateTime?           @map("read_at")
+  sentAt          DateTime?           @map("sent_at") // تاريخ الإرسال للبريد
+
+  @@index([organizationId, userId, readAt, createdAt])
+  @@index([channel, deliveryStatus])
+  @@map("notifications")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// OWNER PORTAL - بوابة المالك
+// ═══════════════════════════════════════════════════════════════════════════
+
+// وصول مالك المشروع (رابط Token)
+model ProjectOwnerAccess {
+  id              String    @id @default(cuid())
+  organizationId  String    @map("organization_id")
+  projectId       String    @map("project_id")
+  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  token           String    @unique
+  label           String?   // تسمية الوصول مثل "مالك المشروع"
+
+  expiresAt       DateTime? @map("expires_at")
+  isRevoked       Boolean   @default(false) @map("is_revoked")
+
+  createdById     String    @map("created_by")
+  createdBy       User      @relation("OwnerAccessCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@index([organizationId, projectId])
+  @@index([token])
+  @@map("project_owner_access")
+}
+
+// مراحل المشروع (للجدول الزمني - Phase 10)
+model ProjectMilestone {
+  id              String          @id @default(cuid())
+  organizationId  String          @map("organization_id")
+  projectId       String          @map("project_id")
+  project         Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  title           String
+  description     String?         @db.Text
+  orderIndex      Int             @default(0) @map("order_index")
+
+  // التواريخ المخططة
+  plannedStart    DateTime?       @map("planned_start") @db.Date
+  plannedEnd      DateTime?       @map("planned_end") @db.Date
+
+  // التواريخ الفعلية
+  actualStart     DateTime?       @map("actual_start") @db.Date
+  actualEnd       DateTime?       @map("actual_end") @db.Date
+
+  // الحالة والتقدم
+  status          MilestoneStatus @default(PLANNED)
+  progress        Float           @default(0) // 0-100
+  isCritical      Boolean         @default(false) @map("is_critical")
+
+  // للتوافق مع الإصدارات السابقة
+  plannedDate     DateTime?       @map("planned_date") @db.Date
+  actualDate      DateTime?       @map("actual_date") @db.Date
+  isCompleted     Boolean         @default(false) @map("is_completed")
+  sortOrder       Int             @default(0) @map("sort_order")
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  // Phase 11 - Change Orders linked to this milestone
+  changeOrders    ProjectChangeOrder[]
+
+  @@index([organizationId, projectId])
+  @@index([organizationId, projectId, status])
+  @@index([organizationId, projectId, orderIndex])
+  @@map("project_milestones")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ATTACHMENTS - المرفقات (Phase 6)
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Attachment {
+  id              String              @id @default(cuid())
+  organizationId  String              @map("organization_id")
+  projectId       String?             @map("project_id")
+
+  // ربط المرفق بالكيان الأصلي
+  ownerType       AttachmentOwnerType @map("owner_type")
+  ownerId         String              @map("owner_id")
+
+  // معلومات الملف
+  fileName        String              @map("file_name")
+  fileSize        Int                 @map("file_size") // بالبايت
+  mimeType        String              @map("mime_type")
+  storagePath     String              @map("storage_path") // مسار S3
+
+  // للمنع من التكرار
+  uploadId        String?             @unique @map("upload_id") // idempotency key
+
+  uploadedById    String              @map("uploaded_by")
+  uploadedBy      User                @relation("AttachmentUploader", fields: [uploadedById], references: [id])
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  @@index([organizationId, projectId])
+  @@index([ownerType, ownerId])
+  @@index([uploadedById])
+  @@map("attachments")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PHASE 7 - DIFFERENTIATION & INTELLIGENCE LAYER
+// ═══════════════════════════════════════════════════════════════════════════
+
+// نوع التنبيه الذكي
+enum AlertType {
+  MISSING_DAILY_REPORT   // تقرير يومي مفقود
+  STALE_PROGRESS         // تقدم قديم
+  OVERDUE_PAYMENT        // دفعة متأخرة
+  COST_OVERRUN_RISK      // خطر تجاوز التكلفة
+  TOO_MANY_OPEN_ISSUES   // مشاكل مفتوحة كثيرة
+}
+
+// خطورة التنبيه
+enum AlertSeverity {
+  INFO      // معلومة
+  WARN      // تحذير
+  CRITICAL  // حرج
+}
+
+// تكرار الملخص
+enum DigestFrequency {
+  WEEKLY    // أسبوعي
+}
+
+// نوع عنصر القالب
+enum TemplateItemType {
+  MILESTONE   // مرحلة
+  CHECKLIST   // قائمة مهام
+}
+
+// قوالب المشاريع
+model ProjectTemplate {
+  id              String    @id @default(cuid())
+  organizationId  String    @map("organization_id")
+
+  name            String
+  description     String?   @db.Text
+
+  // المشروع المصدر (اختياري)
+  sourceProjectId String?   @map("source_project_id")
+  sourceProject   Project?  @relation("TemplateSource", fields: [sourceProjectId], references: [id], onDelete: SetNull)
+
+  createdById     String    @map("created_by")
+  createdBy       User      @relation("TemplateCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // العناصر
+  items           ProjectTemplateItem[]
+
+  @@index([organizationId])
+  @@map("project_templates")
+}
+
+// عناصر قالب المشروع
+model ProjectTemplateItem {
+  id              String           @id @default(cuid())
+  templateId      String           @map("template_id")
+  template        ProjectTemplate  @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  type            TemplateItemType
+  title           String
+  description     String?          @db.Text
+  sortOrder       Int              @default(0) @map("sort_order")
+  metadata        Json?            // بيانات إضافية
+
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  @@index([templateId, sortOrder])
+  @@map("project_template_items")
+}
+
+// تنبيهات المشروع الذكية
+model ProjectAlert {
+  id              String        @id @default(cuid())
+  organizationId  String        @map("organization_id")
+  projectId       String        @map("project_id")
+  project         Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  type            AlertType
+  severity        AlertSeverity
+  title           String
+  description     String?       @db.Text
+
+  // منع التكرار
+  dedupeKey       String        @unique @map("dedupe_key")
+
+  // الاطلاع
+  acknowledgedAt    DateTime?   @map("acknowledged_at")
+  acknowledgedById  String?     @map("acknowledged_by")
+  acknowledgedBy    User?       @relation("AlertAcknowledger", fields: [acknowledgedById], references: [id])
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  @@index([organizationId, projectId, createdAt])
+  @@index([organizationId, projectId, type])
+  @@map("project_alerts")
+}
+
+// اشتراكات الملخص
+model DigestSubscription {
+  id              String          @id @default(cuid())
+  organizationId  String          @map("organization_id")
+  userId          String          @map("user_id")
+  user            User            @relation("DigestSubscriber", fields: [userId], references: [id], onDelete: Cascade)
+
+  projectId       String?         @map("project_id") // null = كل المشاريع
+  project         Project?        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  frequency       DigestFrequency @default(WEEKLY)
+  channel         NotificationChannel @default(IN_APP)
+  isEnabled       Boolean         @default(true) @map("is_enabled")
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  @@unique([organizationId, userId, projectId])
+  @@index([organizationId, userId])
+  @@map("digest_subscriptions")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PHASE 8 - INTEGRATIONS & EXPORTS
+// ═══════════════════════════════════════════════════════════════════════════
+
+// قناة الرسائل الخارجية
+enum MessagingChannel {
+  EMAIL
+  WHATSAPP
+  SMS
+}
+
+// حالة تسليم الرسالة
+enum MessageDeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+  SKIPPED
+}
+
+// نوع المورد المشارك
+enum ShareResourceType {
+  UPDATE_PDF
+  CLAIM_PDF
+  DOCUMENT
+  PHOTO_ALBUM
+  ICS
+  WEEKLY_REPORT
+}
+
+// إعدادات التكامل للمنظمة
+model OrganizationIntegrationSettings {
+  id                String            @id @default(cuid())
+  organizationId    String            @unique @map("organization_id")
+  organization      Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // تفعيل القنوات
+  emailEnabled      Boolean           @default(true) @map("email_enabled")
+  whatsappEnabled   Boolean           @default(false) @map("whatsapp_enabled")
+  smsEnabled        Boolean           @default(false) @map("sms_enabled")
+
+  // القناة الافتراضية
+  defaultChannel    MessagingChannel  @default(EMAIL) @map("default_channel")
+
+  // إشعارات المالك
+  ownerNotifyOnOfficialUpdate Boolean @default(true) @map("owner_notify_on_official_update")
+  ownerNotifyOnPaymentDue     Boolean @default(true) @map("owner_notify_on_payment_due")
+
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  @@map("organization_integration_settings")
+}
+
+// سجل تسليم الرسائل
+model MessageDeliveryLog {
+  id              String                @id @default(cuid())
+  organizationId  String                @map("organization_id")
+  projectId       String?               @map("project_id")
+  project         Project?              @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  channel         MessagingChannel
+  recipient       String                // رقم الهاتف أو البريد
+  subject         String?               // عنوان البريد
+  content         String?               @db.Text
+
+  status          MessageDeliveryStatus @default(PENDING)
+  provider        String?               // اسم المزود المستخدم
+  errorMessage    String?               @db.Text
+
+  sentById        String?               @map("sent_by")
+  sentBy          User?                 @relation("DeliveryLogSender", fields: [sentById], references: [id])
+
+  createdAt       DateTime              @default(now()) @map("created_at")
+
+  @@index([organizationId, projectId, createdAt])
+  @@index([organizationId, channel, status])
+  @@map("message_delivery_logs")
+}
+
+// روابط المشاركة
+model ShareLink {
+  id              String            @id @default(cuid())
+  token           String            @unique
+  organizationId  String            @map("organization_id")
+  projectId       String            @map("project_id")
+  project         Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  resourceType    ShareResourceType @map("resource_type")
+  resourceId      String?           @map("resource_id") // nullable for ICS
+
+  expiresAt       DateTime?         @map("expires_at")
+  isRevoked       Boolean           @default(false) @map("is_revoked")
+
+  createdById     String            @map("created_by")
+  createdBy       User              @relation("ShareLinkCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  @@index([organizationId, projectId])
+  @@index([token])
+  @@map("share_links")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PHASE 11 - CHANGE ORDERS (أوامر التغيير)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// أمر التغيير
+model ProjectChangeOrder {
+  id              String              @id @default(cuid())
+  organizationId  String              @map("organization_id")
+  projectId       String              @map("project_id")
+  project         Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // الرقم التسلسلي (فريد لكل مشروع)
+  coNo            Int                 @map("co_no")
+
+  // المعلومات الأساسية
+  title           String
+  description     String?             @db.Text
+  category        ChangeOrderCategory @default(OTHER)
+  status          ChangeOrderStatus   @default(DRAFT)
+
+  // الأثر المالي والزمني
+  costImpact      Decimal?            @map("cost_impact") @db.Decimal(15, 2) // موجب أو سالب
+  currency        String?             @default("SAR")
+  timeImpactDays  Int?                @map("time_impact_days") // موجب أو سالب
+
+  // الربط الاختياري
+  milestoneId     String?             @map("milestone_id")
+  milestone       ProjectMilestone?   @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  claimId         String?             @map("claim_id")
+  claim           ProjectClaim?       @relation(fields: [claimId], references: [id], onDelete: SetNull)
+
+  // طلب الاعتماد
+  requestedById   String              @map("requested_by")
+  requestedBy     User                @relation("ChangeOrderRequester", fields: [requestedById], references: [id])
+  requestedAt     DateTime?           @map("requested_at")
+
+  // قرار الاعتماد
+  decidedById     String?             @map("decided_by")
+  decidedBy       User?               @relation("ChangeOrderDecider", fields: [decidedById], references: [id])
+  decidedAt       DateTime?           @map("decided_at")
+  decisionNote    String?             @map("decision_note") @db.Text
+
+  // التنفيذ
+  implementedAt   DateTime?           @map("implemented_at")
+  implementedById String?             @map("implemented_by")
+  implementedBy   User?               @relation("ChangeOrderImplementer", fields: [implementedById], references: [id])
+
+  // التواريخ
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  @@unique([organizationId, projectId, coNo])
+  @@index([organizationId, projectId, status])
+  @@index([organizationId, projectId, coNo])
+  @@index([milestoneId])
+  @@index([claimId])
+  @@map("project_change_orders")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FINANCE MODULE - المالية (عروض الأسعار، الفواتير، المستندات)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// حالة عرض السعر
+enum QuotationStatus {
+  DRAFT         // مسودة
+  SENT          // مرسل
+  VIEWED        // تمت المشاهدة
+  ACCEPTED      // مقبول
+  REJECTED      // مرفوض
+  EXPIRED       // منتهي الصلاحية
+  CONVERTED     // تم تحويله لفاتورة
+}
+
+// حالة الفاتورة
+enum FinanceInvoiceStatus {
+  DRAFT         // مسودة
+  SENT          // مرسلة
+  VIEWED        // تمت المشاهدة
+  PARTIALLY_PAID // مدفوعة جزئياً
+  PAID          // مدفوعة
+  OVERDUE       // متأخرة
+  CANCELLED     // ملغية
+}
+
+// نوع الفاتورة
+enum InvoiceType {
+  STANDARD      // عادية
+  TAX           // ضريبية (VAT)
+  SIMPLIFIED    // مبسطة
+}
+
+// نوع المستند المفتوح
+enum OpenDocumentType {
+  LETTER        // خطاب
+  AGREEMENT     // اتفاقية
+  CERTIFICATE   // شهادة
+  MEMO          // مذكرة
+  OTHER         // أخرى
+}
+
+// نوع قالب المالية
+enum FinanceTemplateType {
+  QUOTATION     // عرض سعر
+  INVOICE       // فاتورة
+  LETTER        // خطاب
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CLIENT - العملاء
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Client {
+  id              String       @id @default(cuid())
+  organizationId  String       @map("organization_id")
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // نوع العميل
+  clientType      ClientType   @default(INDIVIDUAL) @map("client_type")
+
+  // المعلومات الأساسية - للأفراد
+  firstName       String?      @map("first_name")   // الاسم الأول (للأفراد)
+  lastName        String?      @map("last_name")    // الاسم الأخير (للأفراد)
+
+  // المعلومات الأساسية - للشركات
+  businessName    String?      @map("business_name") // الاسم التجاري (للشركات)
+
+  // الحقول القديمة (للتوافق) + الجديدة
+  name            String                    // اسم العميل/الجهة (محسوب تلقائياً)
+  company         String?                   // اسم الشركة (سيُهمل - استخدم businessName)
+
+  // الاتصال
+  phone           String?                   // رقم الهاتف الثابت
+  mobile          String?                   // رقم الجوال
+  email           String?
+
+  // العنوان الرئيسي
+  address         String?       @db.Text    // العنوان القديم (للتوافق)
+  streetAddress1  String?       @map("street_address_1")  // عنوان الشارع 1
+  streetAddress2  String?       @map("street_address_2")  // عنوان الشارع 2
+  city            String?                   // المدينة
+  region          String?                   // المنطقة
+  postalCode      String?       @map("postal_code")       // الرمز البريدي
+  country         String        @default("SA")            // البلد
+
+  // العنوان الثانوي (JSON)
+  secondaryAddress Json?        @map("secondary_address")
+
+  // رقم الكود (تلقائي: C-001, C-002, ...)
+  code            String?       @unique     // رقم العميل
+
+  // العملة ولغة العرض
+  currency        String        @default("SAR")          // العملة
+  displayLanguage String        @default("ar") @map("display_language") // لغة العرض
+
+  // التصنيفات
+  classification  String[]      @default([])              // VIP, عادي, شركة, جهة حكومية, مقاول
+
+  // المعلومات الضريبية
+  taxNumber       String?       @map("tax_number")  // الرقم الضريبي
+  crNumber        String?       @map("cr_number")   // السجل التجاري
+
+  // ملاحظات
+  notes           String?       @db.Text
+  isActive        Boolean       @default(true) @map("is_active")
+
+  // من أنشأ
+  createdById     String        @map("created_by")
+  createdBy       User          @relation("ClientCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  // العلاقات
+  quotations      Quotation[]
+  invoices        FinanceInvoice[]
+  contacts        ClientContact[]   // جهات الاتصال
+  payments        FinancePayment[]  @relation("ClientPayments")  // المقبوضات
+
+  @@index([organizationId])
+  @@index([organizationId, name])
+  @@index([organizationId, code])
+  @@index([organizationId, clientType])
+  @@map("clients")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CLIENT CONTACTS - جهات اتصال العملاء
+// ═══════════════════════════════════════════════════════════════════════════
+
+model ClientContact {
+  id              String       @id @default(cuid())
+  clientId        String       @map("client_id")
+  client          Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  // معلومات جهة الاتصال
+  name            String                    // الاسم
+  position        String?                   // المنصب/الوظيفة
+  phone           String?                   // رقم الهاتف
+  mobile          String?                   // رقم الجوال
+  email           String?                   // البريد الإلكتروني
+
+  // إعدادات
+  isPrimary       Boolean       @default(false) @map("is_primary") // جهة الاتصال الرئيسية
+  notes           String?       @db.Text
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  @@index([clientId])
+  @@map("client_contacts")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// QUOTATION - عروض الأسعار
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Quotation {
+  id              String          @id @default(cuid())
+  organizationId  String          @map("organization_id")
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // الرقم التسلسلي (QT-2024-0001)
+  quotationNo     String          @unique @map("quotation_no")
+
+  // ربط اختياري بالعميل المحفوظ
+  clientId        String?         @map("client_id")
+  client          Client?         @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
+  // معلومات العميل (تُنسخ من العميل أو تُدخل يدوياً)
+  clientName      String          @map("client_name")
+  clientCompany   String?         @map("client_company")
+  clientPhone     String?         @map("client_phone")
+  clientEmail     String?         @map("client_email")
+  clientAddress   String?         @map("client_address") @db.Text
+  clientTaxNumber String?         @map("client_tax_number")
+
+  // ربط اختياري بالمشروع
+  projectId       String?         @map("project_id")
+  project         Project?        @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  // الحالة
+  status          QuotationStatus @default(DRAFT)
+
+  // المبالغ
+  subtotal        Decimal         @default(0) @db.Decimal(15, 2)
+  discountPercent Decimal         @default(0) @map("discount_percent") @db.Decimal(5, 2)
+  discountAmount  Decimal         @default(0) @map("discount_amount") @db.Decimal(15, 2)
+  vatPercent      Decimal         @default(15) @map("vat_percent") @db.Decimal(5, 2)
+  vatAmount       Decimal         @default(0) @map("vat_amount") @db.Decimal(15, 2)
+  totalAmount     Decimal         @default(0) @map("total_amount") @db.Decimal(15, 2)
+
+  // تاريخ انتهاء الصلاحية
+  validUntil      DateTime        @map("valid_until")
+
+  // الشروط
+  paymentTerms    String?         @map("payment_terms") @db.Text
+  deliveryTerms   String?         @map("delivery_terms") @db.Text
+  warrantyTerms   String?         @map("warranty_terms") @db.Text
+  notes           String?         @db.Text
+
+  // القالب المستخدم
+  templateId      String?         @map("template_id")
+  template        FinanceTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  // تتبع المشاهدة
+  viewedAt        DateTime?       @map("viewed_at")
+  sentAt          DateTime?       @map("sent_at")
+  acceptedAt      DateTime?       @map("accepted_at")
+  rejectedAt      DateTime?       @map("rejected_at")
+
+  // من أنشأ
+  createdById     String          @map("created_by")
+  createdBy       User            @relation("QuotationCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  // العلاقات
+  items           QuotationItem[]
+  invoices        FinanceInvoice[] // الفواتير المحولة من هذا العرض
+
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([organizationId, clientId])
+  @@index([organizationId, projectId])
+  @@map("quotations")
+}
+
+// بنود عرض السعر
+model QuotationItem {
+  id              String      @id @default(cuid())
+  quotationId     String      @map("quotation_id")
+  quotation       Quotation   @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+
+  // المعلومات الأساسية
+  description     String      @db.Text
+  quantity        Decimal     @default(1) @db.Decimal(15, 3)
+  unit            String?
+  unitPrice       Decimal     @default(0) @map("unit_price") @db.Decimal(15, 2)
+  totalPrice      Decimal     @default(0) @map("total_price") @db.Decimal(15, 2)
+
+  // الترتيب
+  sortOrder       Int         @default(0) @map("sort_order")
+
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  @@index([quotationId, sortOrder])
+  @@map("quotation_items")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INVOICE - الفواتير
+// ═══════════════════════════════════════════════════════════════════════════
+
+model FinanceInvoice {
+  id              String               @id @default(cuid())
+  organizationId  String               @map("organization_id")
+  organization    Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // الرقم التسلسلي (INV-2024-0001)
+  invoiceNo       String               @unique @map("invoice_no")
+
+  // نوع الفاتورة
+  invoiceType     InvoiceType          @default(STANDARD) @map("invoice_type")
+
+  // ربط اختياري بالعميل المحفوظ
+  clientId        String?              @map("client_id")
+  client          Client?              @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
+  // معلومات العميل (تُنسخ من العميل أو تُدخل يدوياً)
+  clientName      String               @map("client_name")
+  clientCompany   String?              @map("client_company")
+  clientPhone     String?              @map("client_phone")
+  clientEmail     String?              @map("client_email")
+  clientAddress   String?              @map("client_address") @db.Text
+  clientTaxNumber String?              @map("client_tax_number")
+
+  // ربط بالمشروع وعرض السعر (اختياري)
+  projectId       String?              @map("project_id")
+  project         Project?             @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  quotationId     String?              @map("quotation_id")
+  quotation       Quotation?           @relation(fields: [quotationId], references: [id], onDelete: SetNull)
+
+  // الحالة
+  status          FinanceInvoiceStatus @default(DRAFT)
+
+  // التواريخ
+  issueDate       DateTime             @map("issue_date") @db.Date
+  dueDate         DateTime             @map("due_date") @db.Date
+
+  // المبالغ
+  subtotal        Decimal              @default(0) @db.Decimal(15, 2)
+  discountPercent Decimal              @default(0) @map("discount_percent") @db.Decimal(5, 2)
+  discountAmount  Decimal              @default(0) @map("discount_amount") @db.Decimal(15, 2)
+  vatPercent      Decimal              @default(15) @map("vat_percent") @db.Decimal(5, 2)
+  vatAmount       Decimal              @default(0) @map("vat_amount") @db.Decimal(15, 2)
+  totalAmount     Decimal              @default(0) @map("total_amount") @db.Decimal(15, 2)
+  paidAmount      Decimal              @default(0) @map("paid_amount") @db.Decimal(15, 2)
+
+  // حقول ZATCA للفاتورة الضريبية
+  sellerTaxNumber String?              @map("seller_tax_number")  // الرقم الضريبي للبائع
+  qrCode          String?              @map("qr_code") @db.Text    // QR Code محتوى
+  zatcaUuid       String?              @map("zatca_uuid")          // UUID للفاتورة
+  zatcaHash       String?              @map("zatca_hash")          // Hash للفاتورة
+  zatcaSignature  String?              @map("zatca_signature") @db.Text // التوقيع الرقمي
+
+  // الشروط والملاحظات
+  paymentTerms    String?              @map("payment_terms") @db.Text
+  notes           String?              @db.Text
+
+  // القالب المستخدم
+  templateId      String?              @map("template_id")
+  template        FinanceTemplate?     @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  // تتبع المشاهدة والإرسال
+  viewedAt        DateTime?            @map("viewed_at")
+  sentAt          DateTime?            @map("sent_at")
+
+  // من أنشأ
+  createdById     String               @map("created_by")
+  createdBy       User                 @relation("InvoiceCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @updatedAt @map("updated_at")
+
+  // العلاقات
+  items           FinanceInvoiceItem[]
+  payments        FinanceInvoicePayment[]
+  directPayments  FinancePayment[]         @relation("InvoiceDirectPayments")  // المقبوضات المباشرة
+
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([organizationId, clientId])
+  @@index([organizationId, projectId])
+  @@index([organizationId, invoiceType])
+  @@index([organizationId, dueDate])
+  @@map("finance_invoices")
+}
+
+// بنود الفاتورة
+model FinanceInvoiceItem {
+  id              String         @id @default(cuid())
+  invoiceId       String         @map("invoice_id")
+  invoice         FinanceInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  // المعلومات الأساسية
+  description     String         @db.Text
+  quantity        Decimal        @default(1) @db.Decimal(15, 3)
+  unit            String?
+  unitPrice       Decimal        @default(0) @map("unit_price") @db.Decimal(15, 2)
+  totalPrice      Decimal        @default(0) @map("total_price") @db.Decimal(15, 2)
+
+  // الترتيب
+  sortOrder       Int            @default(0) @map("sort_order")
+
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  @@index([invoiceId, sortOrder])
+  @@map("finance_invoice_items")
+}
+
+// مدفوعات الفاتورة
+model FinanceInvoicePayment {
+  id              String         @id @default(cuid())
+  invoiceId       String         @map("invoice_id")
+  invoice         FinanceInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  // معلومات الدفعة
+  amount          Decimal        @db.Decimal(15, 2)
+  paymentDate     DateTime       @map("payment_date") @db.Date
+  paymentMethod   String?        @map("payment_method") // نقدي، تحويل، شيك
+  referenceNo     String?        @map("reference_no")   // رقم التحويل أو الشيك
+  notes           String?        @db.Text
+
+  // من سجل الدفعة
+  createdById     String         @map("created_by")
+  createdBy       User           @relation("InvoicePaymentCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime       @default(now()) @map("created_at")
+
+  @@index([invoiceId])
+  @@map("finance_invoice_payments")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// OPEN DOCUMENT - المستندات المفتوحة (خطابات، اتفاقيات، شهادات)
+// ═══════════════════════════════════════════════════════════════════════════
+
+model OpenDocument {
+  id              String           @id @default(cuid())
+  organizationId  String           @map("organization_id")
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // الرقم التسلسلي
+  documentNo      String           @unique @map("document_no")
+
+  // النوع
+  documentType    OpenDocumentType @default(OTHER) @map("document_type")
+
+  // العنوان والمحتوى
+  title           String
+  content         String           @db.Text
+
+  // ربط اختياري بالعميل والمشروع
+  clientId        String?          @map("client_id")
+  projectId       String?          @map("project_id")
+  project         Project?         @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  // معلومات العميل (تُنسخ أو تُدخل يدوياً)
+  recipientName   String?          @map("recipient_name")
+  recipientCompany String?         @map("recipient_company")
+  recipientAddress String?         @map("recipient_address") @db.Text
+
+  // القالب المستخدم
+  templateId      String?          @map("template_id")
+  template        FinanceTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  // من أنشأ
+  createdById     String           @map("created_by")
+  createdBy       User             @relation("OpenDocumentCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@index([organizationId])
+  @@index([organizationId, documentType])
+  @@index([organizationId, projectId])
+  @@map("open_documents")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FINANCE TEMPLATE - قوالب المالية (عروض الأسعار، الفواتير، الخطابات)
+// ═══════════════════════════════════════════════════════════════════════════
+
+model FinanceTemplate {
+  id              String              @id @default(cuid())
+  organizationId  String              @map("organization_id")
+  organization    Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // المعلومات الأساسية
+  name            String
+  description     String?             @db.Text
+  templateType    FinanceTemplateType @map("template_type")
+
+  // هل هو القالب الافتراضي لهذا النوع؟
+  isDefault       Boolean             @default(false) @map("is_default")
+
+  // محتوى القالب (JSON) - تخزين عناصر السحب والإفلات
+  content         Json                @default("{}")
+
+  // إعدادات القالب
+  settings        Json                @default("{}")  // ألوان، خطوط، إلخ
+
+  // من أنشأ
+  createdById     String              @map("created_by")
+  createdBy       User                @relation("FinanceTemplateCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  // العلاقات
+  quotations      Quotation[]
+  invoices        FinanceInvoice[]
+  openDocuments   OpenDocument[]
+
+  @@index([organizationId])
+  @@index([organizationId, templateType])
+  @@index([organizationId, templateType, isDefault])
+  @@map("finance_templates")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ORGANIZATION FINANCE - المالية المؤسسية (الحسابات، المصروفات، المقبوضات)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// الحسابات البنكية والصناديق النقدية
+model OrganizationBank {
+  id              String              @id @default(cuid())
+  organizationId  String              @map("organization_id")
+  organization    Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // معلومات الحساب
+  name            String              // اسم الحساب (مثل: البنك الأهلي - حساب جاري)
+  accountNumber   String?             @map("account_number")  // رقم الحساب
+  bankName        String?             @map("bank_name")       // اسم البنك
+  iban            String?             // رقم الآيبان
+
+  // نوع الحساب
+  accountType     FinanceAccountType  @default(BANK) @map("account_type")
+
+  // الرصيد
+  balance         Decimal             @default(0) @db.Decimal(15, 2)
+  currency        String              @default("SAR")
+
+  // الحالة
+  isActive        Boolean             @default(true) @map("is_active")
+  isDefault       Boolean             @default(false) @map("is_default")
+
+  // ملاحظات
+  notes           String?             @db.Text
+
+  // من أنشأ
+  createdById     String              @map("created_by")
+  createdBy       User                @relation("BankAccountCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  // العلاقات
+  expensesFrom    FinanceExpense[]    @relation("ExpenseSourceAccount")
+  paymentsTo      FinancePayment[]    @relation("PaymentDestinationAccount")
+  transfersFrom   FinanceTransfer[]   @relation("TransferSource")
+  transfersTo     FinanceTransfer[]   @relation("TransferDestination")
+
+  @@index([organizationId])
+  @@index([organizationId, accountType])
+  @@index([organizationId, isActive])
+  @@map("organization_banks")
+}
+
+// مصروفات المؤسسة
+model FinanceExpense {
+  id              String                    @id @default(cuid())
+  organizationId  String                    @map("organization_id")
+  organization    Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // الرقم التسلسلي (EXP-2024-0001)
+  expenseNo       String                    @unique @map("expense_no")
+
+  // الفئة
+  category        OrgExpenseCategory
+  customCategory  String?                   @map("custom_category")  // إذا كانت CUSTOM
+
+  // الوصف والمبلغ
+  description     String?                   @db.Text
+  amount          Decimal                   @db.Decimal(15, 2)
+
+  // التاريخ
+  date            DateTime                  @db.Date
+
+  // الحساب المصدر
+  sourceAccountId String                    @map("source_account_id")
+  sourceAccount   OrganizationBank          @relation("ExpenseSourceAccount", fields: [sourceAccountId], references: [id])
+
+  // معلومات المورد
+  vendorName      String?                   @map("vendor_name")
+  vendorTaxNumber String?                   @map("vendor_tax_number")
+
+  // ربط اختياري بالمشروع
+  projectId       String?                   @map("project_id")
+  project         Project?                  @relation("ProjectOrgExpenses", fields: [projectId], references: [id], onDelete: SetNull)
+
+  // رقم فاتورة المورد
+  invoiceRef      String?                   @map("invoice_ref")
+
+  // طريقة الدفع
+  paymentMethod   PaymentMethod             @default(BANK_TRANSFER) @map("payment_method")
+  referenceNo     String?                   @map("reference_no")  // رقم التحويل/الشيك
+
+  // الحالة
+  status          FinanceTransactionStatus  @default(COMPLETED)
+
+  // ملاحظات
+  notes           String?                   @db.Text
+
+  // من أنشأ
+  createdById     String                    @map("created_by")
+  createdBy       User                      @relation("ExpenseCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime                  @default(now()) @map("created_at")
+  updatedAt       DateTime                  @updatedAt @map("updated_at")
+
+  @@index([organizationId, date])
+  @@index([organizationId, category])
+  @@index([organizationId, projectId])
+  @@index([organizationId, sourceAccountId])
+  @@map("finance_expenses")
+}
+
+// المقبوضات / سندات القبض
+model FinancePayment {
+  id                   String                    @id @default(cuid())
+  organizationId       String                    @map("organization_id")
+  organization         Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // الرقم التسلسلي (RCV-2024-0001)
+  paymentNo            String                    @unique @map("payment_no")
+
+  // المبلغ والتاريخ
+  amount               Decimal                   @db.Decimal(15, 2)
+  date                 DateTime                  @db.Date
+
+  // الحساب الوجهة
+  destinationAccountId String                    @map("destination_account_id")
+  destinationAccount   OrganizationBank          @relation("PaymentDestinationAccount", fields: [destinationAccountId], references: [id])
+
+  // العميل (اختياري - إما من قائمة العملاء أو اسم يدوي)
+  clientId             String?                   @map("client_id")
+  client               Client?                   @relation("ClientPayments", fields: [clientId], references: [id], onDelete: SetNull)
+  clientName           String?                   @map("client_name")  // للحالات بدون عميل مسجل
+
+  // ربط اختياري بالمشروع
+  projectId            String?                   @map("project_id")
+  project              Project?                  @relation("ProjectOrgPayments", fields: [projectId], references: [id], onDelete: SetNull)
+
+  // ربط اختياري بالفاتورة
+  invoiceId            String?                   @map("invoice_id")
+  invoice              FinanceInvoice?           @relation("InvoiceDirectPayments", fields: [invoiceId], references: [id], onDelete: SetNull)
+
+  // طريقة الدفع
+  paymentMethod        PaymentMethod             @default(CASH) @map("payment_method")
+  referenceNo          String?                   @map("reference_no")
+
+  // الحالة
+  status               FinanceTransactionStatus  @default(COMPLETED)
+
+  // الوصف والملاحظات
+  description          String?                   @db.Text
+  notes                String?                   @db.Text
+
+  // من أنشأ
+  createdById          String                    @map("created_by")
+  createdBy            User                      @relation("PaymentCreator", fields: [createdById], references: [id])
+
+  createdAt            DateTime                  @default(now()) @map("created_at")
+  updatedAt            DateTime                  @updatedAt @map("updated_at")
+
+  @@index([organizationId, date])
+  @@index([organizationId, clientId])
+  @@index([organizationId, projectId])
+  @@index([organizationId, destinationAccountId])
+  @@map("finance_payments")
+}
+
+// التحويلات بين الحسابات
+model FinanceTransfer {
+  id             String                    @id @default(cuid())
+  organizationId String                    @map("organization_id")
+  organization   Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // الرقم التسلسلي (TRF-2024-0001)
+  transferNo     String                    @unique @map("transfer_no")
+
+  // المبلغ والتاريخ
+  amount         Decimal                   @db.Decimal(15, 2)
+  date           DateTime                  @db.Date
+
+  // الحساب المصدر والوجهة
+  fromAccountId  String                    @map("from_account_id")
+  fromAccount    OrganizationBank          @relation("TransferSource", fields: [fromAccountId], references: [id])
+  toAccountId    String                    @map("to_account_id")
+  toAccount      OrganizationBank          @relation("TransferDestination", fields: [toAccountId], references: [id])
+
+  // الحالة
+  status         FinanceTransactionStatus  @default(COMPLETED)
+
+  // الوصف والملاحظات
+  description    String?                   @db.Text
+  notes          String?                   @db.Text
+  referenceNo    String?                   @map("reference_no")
+
+  // من أنشأ
+  createdById    String                    @map("created_by")
+  createdBy      User                      @relation("TransferCreator", fields: [createdById], references: [id])
+
+  createdAt      DateTime                  @default(now()) @map("created_at")
+  updatedAt      DateTime                  @updatedAt @map("updated_at")
+
+  @@index([organizationId, date])
+  @@index([organizationId, fromAccountId])
+  @@index([organizationId, toAccountId])
+  @@map("finance_transfers")
 }

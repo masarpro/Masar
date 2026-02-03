@@ -28,9 +28,13 @@
 			"@prisma/client",
 			"@prisma/engines",
 			"@swc/core",
+			"esbuild",
 			"prisma",
 			"prisma-zod-generator",
 			"sharp"
 		]
+	},
+	"dependencies": {
+		"@sindresorhus/slugify": "^3.0.0"
 	}
 }

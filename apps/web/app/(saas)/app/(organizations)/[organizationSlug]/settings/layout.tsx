@@ -7,6 +7,7 @@ import { PageHeader } from "@saas/shared/components/PageHeader";
 import { SidebarContentLayout } from "@saas/shared/components/SidebarContentLayout";
 import {
 	CreditCardIcon,
+	LinkIcon,
 	Settings2Icon,
 	TriangleAlertIcon,
 	Users2Icon,
@@ -66,6 +67,17 @@ export default async function SettingsLayout({
 								href: `${organizationSettingsBasePath}/billing`,
 								icon: (
 									<CreditCardIcon className="size-4 opacity-50" />
+								),
+							},
+						]
+					: []),
+				...(userIsOrganizationAdmin
+					? [
+							{
+								title: t("settings.menu.organization.integrations"),
+								href: `${organizationSettingsBasePath}/integrations`,
+								icon: (
+									<LinkIcon className="size-4 opacity-50" />
 								),
 							},
 						]
