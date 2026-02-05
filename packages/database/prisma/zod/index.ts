@@ -1491,7 +1491,7 @@ export const OrganizationFinanceSettingsSchema = z.object({
   thankYouMessage: z.string().nullish(),
   defaultVatPercent: z.instanceof(Prisma.Decimal, {
   message: "Field 'defaultVatPercent' must be a Decimal. Location: ['Models', 'OrganizationFinanceSettings']",
-}).default(15),
+}).default(new Prisma.Decimal(15)),
   defaultCurrency: z.string().default("SAR"),
   defaultPaymentTerms: z.string().nullish(),
   defaultDeliveryTerms: z.string().nullish(),
@@ -1656,7 +1656,7 @@ export const QuotationSchema = z.object({
 }),
   vatPercent: z.instanceof(Prisma.Decimal, {
   message: "Field 'vatPercent' must be a Decimal. Location: ['Models', 'Quotation']",
-}).default(15),
+}).default(new Prisma.Decimal(15)),
   vatAmount: z.instanceof(Prisma.Decimal, {
   message: "Field 'vatAmount' must be a Decimal. Location: ['Models', 'Quotation']",
 }),
@@ -1689,7 +1689,7 @@ export const QuotationItemSchema = z.object({
   description: z.string(),
   quantity: z.instanceof(Prisma.Decimal, {
   message: "Field 'quantity' must be a Decimal. Location: ['Models', 'QuotationItem']",
-}).default(1),
+}).default(new Prisma.Decimal(1)),
   unit: z.string().nullish(),
   unitPrice: z.instanceof(Prisma.Decimal, {
   message: "Field 'unitPrice' must be a Decimal. Location: ['Models', 'QuotationItem']",
@@ -1735,7 +1735,7 @@ export const FinanceInvoiceSchema = z.object({
 }),
   vatPercent: z.instanceof(Prisma.Decimal, {
   message: "Field 'vatPercent' must be a Decimal. Location: ['Models', 'FinanceInvoice']",
-}).default(15),
+}).default(new Prisma.Decimal(15)),
   vatAmount: z.instanceof(Prisma.Decimal, {
   message: "Field 'vatAmount' must be a Decimal. Location: ['Models', 'FinanceInvoice']",
 }),
@@ -1771,7 +1771,7 @@ export const FinanceInvoiceItemSchema = z.object({
   description: z.string(),
   quantity: z.instanceof(Prisma.Decimal, {
   message: "Field 'quantity' must be a Decimal. Location: ['Models', 'FinanceInvoiceItem']",
-}).default(1),
+}).default(new Prisma.Decimal(1)),
   unit: z.string().nullish(),
   unitPrice: z.instanceof(Prisma.Decimal, {
   message: "Field 'unitPrice' must be a Decimal. Location: ['Models', 'FinanceInvoiceItem']",

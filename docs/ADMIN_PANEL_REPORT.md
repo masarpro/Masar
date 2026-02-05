@@ -25,6 +25,7 @@
 ### ما هو Supastarter؟
 
 Supastarter هو قالب SaaS جاهز مبني على Next.js يوفر:
+
 - نظام مصادقة متكامل
 - إدارة المنظمات والفرق
 - نظام اشتراكات ودفع
@@ -33,7 +34,7 @@ Supastarter هو قالب SaaS جاهز مبني على Next.js يوفر:
 ### الحالة الراهنة للوحة Admin
 
 | الميزة | الحالة | الملاحظات |
-|--------|--------|-----------|
+| ------ | ------ | --------- |
 | إدارة المستخدمين | ✅ موجود | كامل الوظائف |
 | إدارة المنظمات | ✅ موجود | كامل الوظائف |
 | إدارة الاشتراكات | ❌ غير موجود | يتم عبر Stripe Dashboard |
@@ -46,7 +47,7 @@ Supastarter هو قالب SaaS جاهز مبني على Next.js يوفر:
 
 ### المسارات (Routes)
 
-```
+```text
 apps/web/app/(saas)/app/(account)/admin/
 ├── layout.tsx                    # التخطيط الرئيسي
 ├── users/
@@ -59,7 +60,7 @@ apps/web/app/(saas)/app/(account)/admin/
 
 ### المكونات (Components)
 
-```
+```text
 apps/web/modules/saas/admin/
 ├── component/
 │   ├── EmailVerified.tsx         # مؤشر تحقق البريد
@@ -74,7 +75,7 @@ apps/web/modules/saas/admin/
 
 ### الـ API Routes
 
-```
+```text
 packages/api/modules/admin/
 ├── router.ts                     # الموجه الرئيسي
 └── procedures/
@@ -87,7 +88,8 @@ packages/api/modules/admin/
 
 ## تحليل قسم إدارة المستخدمين
 
-### الموقع
+### موقع ملفات المستخدمين
+
 - **الصفحة**: `/app/admin/users`
 - **المكون**: `apps/web/modules/saas/admin/component/users/UserList.tsx`
 - **API**: `packages/api/modules/admin/procedures/list-users.ts`
@@ -95,6 +97,7 @@ packages/api/modules/admin/
 ### الوظائف المتاحة
 
 #### 1. عرض قائمة المستخدمين
+
 ```typescript
 // API Endpoint
 GET /admin/users?query=&limit=10&offset=0
@@ -107,6 +110,7 @@ GET /admin/users?query=&limit=10&offset=0
 ```
 
 **البيانات المعروضة**:
+
 - صورة المستخدم (Avatar)
 - الاسم
 - البريد الإلكتروني
@@ -114,6 +118,7 @@ GET /admin/users?query=&limit=10&offset=0
 - الدور (Admin/User)
 
 #### 2. البحث والتصفية
+
 - بحث نصي بالاسم أو البريد
 - Debounce 300ms لتحسين الأداء
 - ترقيم صفحات (10 مستخدمين/صفحة)
@@ -121,7 +126,7 @@ GET /admin/users?query=&limit=10&offset=0
 #### 3. الإجراءات على المستخدم
 
 | الإجراء | الدالة | الوصف |
-|---------|--------|-------|
+| ------- | ------ | ----- |
 | محاكاة المستخدم | `impersonateUser()` | تسجيل الدخول كمستخدم آخر |
 | إعادة إرسال التحقق | `resendVerificationMail()` | للمستخدمين غير المؤكدين |
 | تعيين Admin | `assignAdminRole()` | ترقية لصلاحية مشرف |
@@ -169,14 +174,16 @@ export const adminProcedure = protectedProcedure.use(
 
 ## تحليل قسم إدارة المنظمات
 
-### الموقع
+### موقع ملفات المنظمات
+
 - **الصفحة**: `/app/admin/organizations`
 - **المكون**: `apps/web/modules/saas/admin/component/organizations/OrganizationList.tsx`
 - **API**: `packages/api/modules/admin/procedures/list-organizations.ts`
 
-### الوظائف المتاحة
+### الوظائف المتاحة للمنظمات
 
 #### 1. عرض قائمة المنظمات
+
 ```typescript
 // API Endpoint
 GET /admin/organizations?query=&limit=10&offset=0
@@ -189,6 +196,7 @@ GET /admin/organizations?query=&limit=10&offset=0
 ```
 
 **البيانات المعروضة**:
+
 - شعار المنظمة
 - اسم المنظمة
 - عدد الأعضاء
@@ -196,7 +204,7 @@ GET /admin/organizations?query=&limit=10&offset=0
 #### 2. الإجراءات على المنظمة
 
 | الإجراء | الوصف |
-|---------|-------|
+| ------- | ----- |
 | إنشاء منظمة | `/app/admin/organizations/new` |
 | تعديل منظمة | `/app/admin/organizations/[id]` |
 | حذف منظمة | حذف نهائي مع تأكيد |
@@ -218,7 +226,7 @@ const deleteOrganization = async (id: string) => {
 
 ### مزودي الدفع المدعومين
 
-```
+```text
 packages/payments/provider/
 ├── stripe/           # Stripe (الأكثر شيوعاً)
 ├── lemonsqueezy/     # Lemonsqueezy
@@ -247,14 +255,14 @@ CREATE TABLE purchase (
 ### أنواع الاشتراكات
 
 | النوع | الوصف |
-|-------|-------|
+| ----- | ----- |
 | `SUBSCRIPTION` | اشتراك متكرر (شهري/سنوي) |
 | `ONE_TIME` | دفعة واحدة |
 
 ### حالات الاشتراك (Stripe)
 
 | الحالة | الوصف |
-|--------|-------|
+| ------ | ----- |
 | `active` | نشط ويدفع |
 | `trialing` | في فترة تجريبية |
 | `past_due` | متأخر في الدفع |
@@ -322,7 +330,7 @@ deletePurchaseBySubscriptionId(subscriptionId) // حذف مشتري
 
 ### تدفق إنشاء اشتراك
 
-```
+```text
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 │   المستخدم   │────▶│  التطبيق    │────▶│   Stripe    │
 └─────────────┘     └─────────────┘     └─────────────┘
@@ -344,7 +352,7 @@ deletePurchaseBySubscriptionId(subscriptionId) // حذف مشتري
 
 ### تدفق التحقق من الصلاحيات
 
-```
+```text
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 │   Request   │────▶│ protectedProcedure │────▶│ adminProcedure │
 └─────────────┘     └─────────────┘     └─────────────┘
@@ -365,7 +373,7 @@ deletePurchaseBySubscriptionId(subscriptionId) // حذف مشتري
 ### ما هو غير موجود في لوحة Admin
 
 | الميزة | الحالة | التأثير |
-|--------|--------|---------|
+| ------ | ------ | ------- |
 | قائمة المشتركين | ❌ | لا يمكن رؤية من يدفع |
 | تفاصيل الاشتراك | ❌ | لا يمكن رؤية الخطط |
 | إلغاء اشتراك | ❌ | يجب استخدام Stripe |
@@ -378,7 +386,7 @@ deletePurchaseBySubscriptionId(subscriptionId) // حذف مشتري
 ### المقارنة مع المنافسين
 
 | الميزة | Supastarter | SaaS Boilerplate | ShipFast |
-|--------|-------------|------------------|----------|
+| ------ | ----------- | ---------------- | -------- |
 | إدارة المستخدمين | ✅ | ✅ | ✅ |
 | إدارة الاشتراكات | ❌ | ✅ | ✅ |
 | Dashboard إحصائي | ❌ | ✅ | ✅ |
@@ -391,10 +399,11 @@ deletePurchaseBySubscriptionId(subscriptionId) // حذف مشتري
 ### للإدارة الحالية (بدون تطوير)
 
 #### 1. استخدام Stripe Dashboard
-**الرابط**: https://dashboard.stripe.com
+
+**الرابط**: <https://dashboard.stripe.com>
 
 | المهمة | المكان في Stripe |
-|--------|------------------|
+| ------ | ---------------- |
 | رؤية المشتركين | Customers → All |
 | إدارة الاشتراكات | Billing → Subscriptions |
 | تقارير الإيرادات | Reports → Revenue |
@@ -403,7 +412,7 @@ deletePurchaseBySubscriptionId(subscriptionId) // حذف مشتري
 #### 2. أدوات تحليل خارجية
 
 | الأداة | الوصف | التكلفة |
-|--------|-------|---------|
+| ------ | ----- | ------- |
 | [Baremetrics](https://baremetrics.com) | تحليلات SaaS متقدمة | من $50/شهر |
 | [ChartMogul](https://chartmogul.com) | تحليلات الإيرادات | من $99/شهر |
 | [ProfitWell](https://profitwell.com) | تحليلات مجانية | مجاني |
@@ -436,20 +445,20 @@ stripe subscriptions list --status=active > subscriptions.json
 
 #### الأولوية المتوسطة
 
-3. **إدارة الخطط** `/app/admin/plans`
+1. **إدارة الخطط** `/app/admin/plans`
    - عرض الخطط المتاحة
    - ربط مع Stripe Products
 
-4. **تقارير الإيرادات** `/app/admin/reports`
+2. **تقارير الإيرادات** `/app/admin/reports`
    - إيرادات شهرية/سنوية
    - مقارنة الفترات
    - تصدير CSV
 
 #### الأولوية المنخفضة
 
-5. **سجل النشاطات** (Audit Log)
-6. **إشعارات المشرف** (Admin Notifications)
-7. **إدارة الكوبونات** (Coupons)
+1. **سجل النشاطات** (Audit Log)
+2. **إشعارات المشرف** (Admin Notifications)
+3. **إدارة الكوبونات** (Coupons)
 
 ---
 
@@ -459,7 +468,7 @@ stripe subscriptions list --status=active > subscriptions.json
 
 #### الملفات المطلوبة
 
-```
+```text
 apps/web/app/(saas)/app/(account)/admin/
 ├── page.tsx                      # Dashboard رئيسي (جديد)
 └── subscriptions/
@@ -508,7 +517,7 @@ Response: {
 
 ### المرحلة 2: إدارة متقدمة (2-3 أسابيع)
 
-```
+```text
 apps/web/app/(saas)/app/(account)/admin/
 ├── plans/
 │   └── page.tsx                  # إدارة الخطط
@@ -648,7 +657,7 @@ export const listSubscriptions = adminProcedure
 ### التوصية النهائية
 
 | للاستخدام الفوري | للمدى الطويل |
-|------------------|--------------|
+| ---------------- | ------------ |
 | استخدم Stripe Dashboard | ابنِ لوحة اشتراكات مخصصة |
 | اربط Baremetrics/ChartMogul | أضف Dashboard إحصائي |
 | صدّر تقارير يدوية | أتمت التقارير |
@@ -656,6 +665,7 @@ export const listSubscriptions = adminProcedure
 ### هل تريد أن أبدأ ببناء لوحة الاشتراكات؟
 
 يمكنني البدء بـ:
+
 1. إنشاء صفحة `/app/admin/subscriptions`
 2. إنشاء Dashboard إحصائي في `/app/admin`
 3. إضافة API endpoints للإحصائيات
