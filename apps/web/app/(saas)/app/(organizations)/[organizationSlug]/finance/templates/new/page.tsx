@@ -33,7 +33,8 @@ export default async function CreateTemplatePage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.templates.create")}
+			sectionKey="templates"
+			pageTitle={t("finance.templates.create")}
 		>
 			<TemplateEditor
 				organizationId={activeOrganization.id}

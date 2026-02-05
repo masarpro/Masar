@@ -113,41 +113,25 @@ export function FinanceReports({
 
 	return (
 		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-				<div className="flex items-center gap-3">
-					<div className="p-2 bg-primary/10 rounded-xl">
-						<BarChart3 className="h-6 w-6 text-primary" />
-					</div>
-					<div>
-						<h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-							{t("finance.reports.title")}
-						</h1>
-						<p className="text-sm text-slate-500 dark:text-slate-400">
-							{t("finance.reports.description")}
-						</p>
-					</div>
+			{/* Date Range Filter */}
+			<div className="flex items-center justify-end gap-4">
+				<div>
+					<Label className="text-xs">{t("finance.reports.from")}</Label>
+					<Input
+						type="date"
+						value={startDate}
+						onChange={(e) => setStartDate(e.target.value)}
+						className="rounded-xl h-9 w-36"
+					/>
 				</div>
-				{/* Date Range Filter */}
-				<div className="flex items-center gap-4">
-					<div>
-						<Label className="text-xs">{t("finance.reports.from")}</Label>
-						<Input
-							type="date"
-							value={startDate}
-							onChange={(e) => setStartDate(e.target.value)}
-							className="rounded-xl h-9 w-36"
-						/>
-					</div>
-					<div>
-						<Label className="text-xs">{t("finance.reports.to")}</Label>
-						<Input
-							type="date"
-							value={endDate}
-							onChange={(e) => setEndDate(e.target.value)}
-							className="rounded-xl h-9 w-36"
-						/>
-					</div>
+				<div>
+					<Label className="text-xs">{t("finance.reports.to")}</Label>
+					<Input
+						type="date"
+						value={endDate}
+						onChange={(e) => setEndDate(e.target.value)}
+						className="rounded-xl h-9 w-36"
+					/>
 				</div>
 			</div>
 

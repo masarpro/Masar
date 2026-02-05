@@ -257,40 +257,6 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 				</Card>
 			</div>
 
-			{/* Header */}
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-				<div className="flex items-center gap-3">
-					<div className="p-2 bg-primary/10 rounded-xl">
-						<Building className="h-6 w-6 text-primary" />
-					</div>
-					<div>
-						<h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-							{t("finance.banks.title")}
-						</h1>
-						<p className="text-sm text-slate-500 dark:text-slate-400">
-							{t("finance.banks.description")}
-						</p>
-					</div>
-				</div>
-				<div className="flex gap-2">
-					<Button
-						variant="outline"
-						onClick={() => router.push(`/app/${organizationSlug}/finance/expenses/transfer`)}
-						className="rounded-xl"
-					>
-						<ArrowLeftRight className="h-4 w-4 me-2" />
-						{t("finance.banks.transfer")}
-					</Button>
-					<Button
-						onClick={() => setQuickDialogOpen(true)}
-						className="rounded-xl"
-					>
-						<Plus className="h-4 w-4 me-2" />
-						{t("finance.banks.addAccount")}
-					</Button>
-				</div>
-			</div>
-
 			{/* Filters */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-4">

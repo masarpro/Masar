@@ -33,7 +33,8 @@ export default async function EditClientPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.clients.editClient")}
+			sectionKey="clients"
+			pageTitle={t("finance.clients.editClient")}
 		>
 			<ClientForm
 				organizationId={activeOrganization.id}

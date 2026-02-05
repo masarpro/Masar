@@ -257,6 +257,12 @@ export const OrganizationIntegrationSettingsScalarFieldEnumSchema = z.enum(['id'
 
 export type OrganizationIntegrationSettingsScalarFieldEnum = z.infer<typeof OrganizationIntegrationSettingsScalarFieldEnumSchema>;
 
+// File: OrganizationFinanceSettingsScalarFieldEnum.schema.ts
+
+export const OrganizationFinanceSettingsScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'companyNameAr', 'companyNameEn', 'logo', 'address', 'addressEn', 'phone', 'email', 'website', 'taxNumber', 'commercialReg', 'bankName', 'bankNameEn', 'accountName', 'iban', 'accountNumber', 'swiftCode', 'headerText', 'footerText', 'thankYouMessage', 'defaultVatPercent', 'defaultCurrency', 'defaultPaymentTerms', 'defaultDeliveryTerms', 'defaultWarrantyTerms', 'quotationValidityDays', 'createdAt', 'updatedAt'])
+
+export type OrganizationFinanceSettingsScalarFieldEnum = z.infer<typeof OrganizationFinanceSettingsScalarFieldEnumSchema>;
+
 // File: MessageDeliveryLogScalarFieldEnum.schema.ts
 
 export const MessageDeliveryLogScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'channel', 'recipient', 'subject', 'content', 'status', 'provider', 'errorMessage', 'sentById', 'createdAt'])
@@ -1457,6 +1463,45 @@ export const OrganizationIntegrationSettingsSchema = z.object({
 });
 
 export type OrganizationIntegrationSettingsType = z.infer<typeof OrganizationIntegrationSettingsSchema>;
+
+
+// File: OrganizationFinanceSettings.schema.ts
+
+export const OrganizationFinanceSettingsSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  companyNameAr: z.string().nullish(),
+  companyNameEn: z.string().nullish(),
+  logo: z.string().nullish(),
+  address: z.string().nullish(),
+  addressEn: z.string().nullish(),
+  phone: z.string().nullish(),
+  email: z.string().nullish(),
+  website: z.string().nullish(),
+  taxNumber: z.string().nullish(),
+  commercialReg: z.string().nullish(),
+  bankName: z.string().nullish(),
+  bankNameEn: z.string().nullish(),
+  accountName: z.string().nullish(),
+  iban: z.string().nullish(),
+  accountNumber: z.string().nullish(),
+  swiftCode: z.string().nullish(),
+  headerText: z.string().nullish(),
+  footerText: z.string().nullish(),
+  thankYouMessage: z.string().nullish(),
+  defaultVatPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'defaultVatPercent' must be a Decimal. Location: ['Models', 'OrganizationFinanceSettings']",
+}).default(15),
+  defaultCurrency: z.string().default("SAR"),
+  defaultPaymentTerms: z.string().nullish(),
+  defaultDeliveryTerms: z.string().nullish(),
+  defaultWarrantyTerms: z.string().nullish(),
+  quotationValidityDays: z.number().int().default(30),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type OrganizationFinanceSettingsType = z.infer<typeof OrganizationFinanceSettingsSchema>;
 
 
 // File: MessageDeliveryLog.schema.ts

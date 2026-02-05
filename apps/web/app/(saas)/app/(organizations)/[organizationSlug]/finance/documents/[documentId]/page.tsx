@@ -33,7 +33,8 @@ export default async function EditDocumentPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.documents.edit")}
+			sectionKey="documents"
+			pageTitle={t("finance.documents.edit")}
 		>
 			<DocumentEditor
 				organizationId={activeOrganization.id}

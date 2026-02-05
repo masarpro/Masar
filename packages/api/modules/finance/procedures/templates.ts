@@ -6,6 +6,7 @@ import {
 	updateFinanceTemplate,
 	setDefaultFinanceTemplate,
 	deleteFinanceTemplate,
+	createDefaultTemplatesForOrganization,
 } from "@repo/database";
 import { z } from "zod";
 import { ORPCError } from "@orpc/server";
@@ -212,6 +213,32 @@ export const deleteFinanceTemplateProcedure = protectedProcedure
 		});
 
 		await deleteFinanceTemplate(input.id, input.organizationId);
+
+		return { success: true };
+	});
+
+export const seedDefaultTemplates = protectedProcedure
+	.route({
+		method: "POST",
+		path: "/finance/templates/seed",
+		tags: ["Finance", "Templates"],
+		summary: "Seed default templates for an organization",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "quotations",
+		});
+
+		await createDefaultTemplatesForOrganization(
+			input.organizationId,
+			context.user.id,
+		);
 
 		return { success: true };
 	});

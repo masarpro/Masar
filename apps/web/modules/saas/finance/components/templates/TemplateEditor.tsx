@@ -28,6 +28,11 @@ import { toast } from "sonner";
 import { ComponentsPanel, type ElementType } from "./ComponentsPanel";
 import { TemplateCanvas, type TemplateElement } from "./TemplateCanvas";
 import { PropertiesPanel, type TemplateSettings } from "./PropertiesPanel";
+import {
+	getQuotationElements,
+	getInvoiceElements,
+	DEFAULT_TEMPLATE_SETTINGS,
+} from "../../lib/default-templates";
 
 interface TemplateEditorProps {
 	organizationId: string;
@@ -192,15 +197,34 @@ export function TemplateEditor({
 	useEffect(() => {
 		if (existingTemplate && templateId) {
 			setTemplateName(existingTemplate.name);
-			setTemplateType(existingTemplate.templateType.toLowerCase() as "quotation" | "invoice" | "letter");
+			const type = existingTemplate.templateType.toLowerCase() as "quotation" | "invoice" | "letter";
+			setTemplateType(type);
+
 			const content = existingTemplate.content as { elements?: TemplateElement[] } | null;
-			if (content?.elements) {
-				setElements(content.elements);
-				setHistory([content.elements]);
-				setHistoryIndex(0);
+
+			// تحديد العناصر المناسبة
+			let elementsToUse: TemplateElement[];
+			if (content?.elements && Array.isArray(content.elements) && content.elements.length > 0) {
+				elementsToUse = content.elements;
+			} else {
+				// تحميل العناصر الافتراضية بناءً على نوع القالب
+				if (type === "quotation") {
+					elementsToUse = getQuotationElements();
+				} else if (type === "invoice") {
+					elementsToUse = getInvoiceElements();
+				} else {
+					elementsToUse = defaultElements; // للرسائل
+				}
 			}
-			if (existingTemplate.settings) {
-				setSettings({ ...defaultSettings, ...(existingTemplate.settings as Partial<TemplateSettings>) });
+
+			setElements(elementsToUse);
+			setHistory([elementsToUse]);
+			setHistoryIndex(0);
+
+			// تحميل الإعدادات
+			const settings = existingTemplate.settings as Partial<TemplateSettings> | null;
+			if (settings && Object.keys(settings).length > 0) {
+				setSettings({ ...defaultSettings, ...settings });
 			}
 		}
 	}, [existingTemplate, templateId]);

@@ -52,9 +52,17 @@ import {
 	Receipt,
 	FileSignature,
 	Palette,
+	Eye,
+	Shield,
 } from "lucide-react";
+import { Badge } from "@ui/components/badge";
 import Link from "next/link";
 import { formatDate } from "../../lib/utils";
+import {
+	getQuotationElements,
+	getInvoiceElements,
+	DEFAULT_TEMPLATE_SETTINGS,
+} from "../../lib/default-templates";
 
 interface TemplatesListProps {
 	organizationId: string;
@@ -77,6 +85,13 @@ const templateTypeIcons: Record<string, React.ReactNode> = {
 	QUOTATION: <FileSignature className="h-5 w-5" />,
 	INVOICE: <Receipt className="h-5 w-5" />,
 	LETTER: <FileText className="h-5 w-5" />,
+};
+
+// دالة مساعدة للحصول على العناصر الافتراضية حسب نوع القالب
+const getDefaultElements = (type: "QUOTATION" | "INVOICE" | "LETTER") => {
+	if (type === "QUOTATION") return getQuotationElements();
+	if (type === "INVOICE") return getInvoiceElements();
+	return []; // LETTER - بدون عناصر افتراضية
 };
 
 export function TemplatesList({
@@ -113,6 +128,8 @@ export function TemplatesList({
 				name: formData.name,
 				description: formData.description || undefined,
 				templateType: formData.templateType,
+				content: { elements: getDefaultElements(formData.templateType) },
+				settings: DEFAULT_TEMPLATE_SETTINGS,
 			});
 		},
 		onSuccess: () => {
@@ -192,6 +209,24 @@ export function TemplatesList({
 		},
 	});
 
+	// Seed default templates mutation
+	const seedMutation = useMutation({
+		mutationFn: async () => {
+			return orpcClient.finance.templates.seed({
+				organizationId,
+			});
+		},
+		onSuccess: () => {
+			toast.success(t("finance.templates.seedSuccess"));
+			queryClient.invalidateQueries({
+				queryKey: ["finance", "templates"],
+			});
+		},
+		onError: (error: any) => {
+			toast.error(error.message || t("finance.templates.seedError"));
+		},
+	});
+
 	const resetForm = () => {
 		setFormData(emptyFormData);
 	};
@@ -228,29 +263,6 @@ export function TemplatesList({
 
 	return (
 		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-				<div className="flex items-center gap-3">
-					<div className="p-2 bg-primary/10 rounded-xl">
-						<FileText className="h-6 w-6 text-primary" />
-					</div>
-					<div>
-						<h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-							{t("finance.templates.title")}
-						</h1>
-						<p className="text-sm text-slate-500 dark:text-slate-400">
-							{t("finance.templates.description")}
-						</p>
-					</div>
-				</div>
-				<Button asChild className="rounded-xl">
-					<Link href={`/app/${organizationSlug}/finance/templates/new`}>
-						<Plus className="h-4 w-4 me-2" />
-						{t("finance.templates.addTemplate")}
-					</Link>
-				</Button>
-			</div>
-
 			{/* Filters */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-4">
@@ -305,9 +317,26 @@ export function TemplatesList({
 			) : templates.length === 0 ? (
 				<div className="text-center py-20">
 					<FileText className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-					<p className="text-slate-500 dark:text-slate-400">
+					<p className="text-slate-500 dark:text-slate-400 mb-4">
 						{t("finance.templates.noTemplates")}
 					</p>
+					<Button
+						onClick={() => seedMutation.mutate()}
+						disabled={seedMutation.isPending}
+						className="rounded-xl"
+					>
+						{seedMutation.isPending ? (
+							<>
+								<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin me-2" />
+								{t("common.loading")}
+							</>
+						) : (
+							<>
+								<Plus className="h-4 w-4 me-2" />
+								{t("finance.templates.seedDefaultTemplates")}
+							</>
+						)}
+					</Button>
 				</div>
 			) : (
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -341,7 +370,13 @@ export function TemplatesList({
 													{template.name}
 												</h3>
 												{template.isDefault && (
-													<Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+													<>
+														<Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+														<Badge variant="outline" className="text-xs px-1.5 py-0">
+															<Shield className="h-3 w-3 me-1" />
+															{t("finance.templates.systemTemplate")}
+														</Badge>
+													</>
 												)}
 											</div>
 											<p className="text-xs text-slate-500 dark:text-slate-400">
@@ -356,33 +391,41 @@ export function TemplatesList({
 											</Button>
 										</DropdownMenuTrigger>
 										<DropdownMenuContent align="end" className="rounded-xl">
-											<DropdownMenuItem asChild>
-												<Link href={`/app/${organizationSlug}/finance/templates/${template.id}`}>
-													<Palette className="h-4 w-4 me-2" />
-													{t("finance.templates.design")}
-												</Link>
-											</DropdownMenuItem>
-											<DropdownMenuItem onClick={() => handleOpenEdit(template)}>
-												<Pencil className="h-4 w-4 me-2" />
-												{t("common.edit")}
-											</DropdownMenuItem>
-											{!template.isDefault && (
-												<DropdownMenuItem
-													onClick={() => setDefaultMutation.mutate(template.id)}
-													disabled={setDefaultMutation.isPending}
-												>
-													<Star className="h-4 w-4 me-2" />
-													{t("finance.templates.setAsDefault")}
+											{/* Default templates: only view/preview */}
+											{template.isDefault ? (
+												<DropdownMenuItem asChild>
+													<Link href={`/app/${organizationSlug}/finance/templates/${template.id}?preview=true`}>
+														<Eye className="h-4 w-4 me-2" />
+														{t("finance.templates.preview")}
+													</Link>
 												</DropdownMenuItem>
-											)}
-											{!template.isDefault && (
-												<DropdownMenuItem
-													onClick={() => setDeleteTemplateId(template.id)}
-													className="text-red-600"
-												>
-													<Trash2 className="h-4 w-4 me-2" />
-													{t("common.delete")}
-												</DropdownMenuItem>
+											) : (
+												<>
+													<DropdownMenuItem asChild>
+														<Link href={`/app/${organizationSlug}/finance/templates/${template.id}`}>
+															<Palette className="h-4 w-4 me-2" />
+															{t("finance.templates.design")}
+														</Link>
+													</DropdownMenuItem>
+													<DropdownMenuItem onClick={() => handleOpenEdit(template)}>
+														<Pencil className="h-4 w-4 me-2" />
+														{t("common.edit")}
+													</DropdownMenuItem>
+													<DropdownMenuItem
+														onClick={() => setDefaultMutation.mutate(template.id)}
+														disabled={setDefaultMutation.isPending}
+													>
+														<Star className="h-4 w-4 me-2" />
+														{t("finance.templates.setAsDefault")}
+													</DropdownMenuItem>
+													<DropdownMenuItem
+														onClick={() => setDeleteTemplateId(template.id)}
+														className="text-red-600"
+													>
+														<Trash2 className="h-4 w-4 me-2" />
+														{t("common.delete")}
+													</DropdownMenuItem>
+												</>
 											)}
 										</DropdownMenuContent>
 									</DropdownMenu>

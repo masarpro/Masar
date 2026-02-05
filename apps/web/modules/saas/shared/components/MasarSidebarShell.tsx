@@ -11,7 +11,7 @@
 
 import { cn } from "@ui/lib";
 import { ChevronDown, ChevronLeft, Menu } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // ============================================
 // Types (Props-based API)
@@ -78,6 +78,22 @@ export function MasarSidebarShell({
 }: MasarSidebarShellProps) {
 	// Local state for open submenus (visual only)
 	const [openMenus, setOpenMenus] = useState<string[]>([]);
+
+	// Auto-expand parent menu when a child item is active
+	useEffect(() => {
+		if (!activeId) return;
+
+		// Find the parent of the active item
+		for (const item of items) {
+			if (item.children?.some((child) => child.id === activeId)) {
+				// If this parent's menu is not open, open it
+				if (!openMenus.includes(item.id)) {
+					setOpenMenus((prev) => [...prev, item.id]);
+				}
+				break;
+			}
+		}
+	}, [activeId, items]);
 
 	// Toggle submenu open/closed
 	const toggleMenu = (menuId: string) => {

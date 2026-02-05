@@ -36,11 +36,7 @@ export default async function FinancePage({
 	const userName = session?.user?.name ?? "";
 
 	return (
-		<FinanceShell
-			organizationSlug={organizationSlug}
-			title={t("finance.title")}
-			subtitle={t("finance.subtitle")}
-		>
+		<FinanceShell organizationSlug={organizationSlug}>
 			<FinanceDashboard
 				organizationId={activeOrganization.id}
 				userName={userName}

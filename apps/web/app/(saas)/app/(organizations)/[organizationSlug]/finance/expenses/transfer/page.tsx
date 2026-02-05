@@ -33,8 +33,8 @@ export default async function TransferPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.transfers.create")}
-			subtitle={t("finance.transfers.createSubtitle")}
+			sectionKey="expenses"
+			pageTitle={t("finance.transfers.create")}
 		>
 			<TransferForm
 				organizationId={activeOrganization.id}

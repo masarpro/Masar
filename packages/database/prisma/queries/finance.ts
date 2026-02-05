@@ -1713,6 +1713,7 @@ export async function createFinanceTemplate(data: {
 
 /**
  * Update a template
+ * Note: Default templates cannot be modified
  */
 export async function updateFinanceTemplate(
 	id: string,
@@ -1726,11 +1727,16 @@ export async function updateFinanceTemplate(
 ) {
 	const existing = await db.financeTemplate.findFirst({
 		where: { id, organizationId },
-		select: { id: true },
+		select: { id: true, isDefault: true },
 	});
 
 	if (!existing) {
 		throw new Error("Template not found");
+	}
+
+	// Prevent modification of default templates
+	if (existing.isDefault) {
+		throw new Error("Cannot modify default template. Create a custom template instead.");
 	}
 
 	return db.financeTemplate.update({
@@ -1790,4 +1796,82 @@ export async function deleteFinanceTemplate(id: string, organizationId: string) 
 	}
 
 	return db.financeTemplate.delete({ where: { id } });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ORGANIZATION FINANCE SETTINGS - إعدادات المالية للمؤسسة
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Get organization finance settings
+ */
+export async function getOrganizationFinanceSettings(organizationId: string) {
+	return db.organizationFinanceSettings.findUnique({
+		where: { organizationId },
+	});
+}
+
+/**
+ * Get or create organization finance settings (ensures settings always exist)
+ */
+export async function getOrCreateOrganizationFinanceSettings(
+	organizationId: string,
+) {
+	let settings = await db.organizationFinanceSettings.findUnique({
+		where: { organizationId },
+	});
+
+	if (!settings) {
+		// Create default settings
+		settings = await db.organizationFinanceSettings.create({
+			data: {
+				organizationId,
+			},
+		});
+	}
+
+	return settings;
+}
+
+/**
+ * Update organization finance settings
+ */
+export async function updateOrganizationFinanceSettings(
+	organizationId: string,
+	data: {
+		companyNameAr?: string;
+		companyNameEn?: string;
+		logo?: string;
+		address?: string;
+		addressEn?: string;
+		phone?: string;
+		email?: string;
+		website?: string;
+		taxNumber?: string;
+		commercialReg?: string;
+		bankName?: string;
+		bankNameEn?: string;
+		accountName?: string;
+		iban?: string;
+		accountNumber?: string;
+		swiftCode?: string;
+		headerText?: string;
+		footerText?: string;
+		thankYouMessage?: string;
+		defaultVatPercent?: number;
+		defaultCurrency?: string;
+		defaultPaymentTerms?: string;
+		defaultDeliveryTerms?: string;
+		defaultWarrantyTerms?: string;
+		quotationValidityDays?: number;
+	},
+) {
+	return db.organizationFinanceSettings.upsert({
+		where: { organizationId },
+		create: {
+			organizationId,
+			...data,
+		},
+		update: data,
+	});
 }

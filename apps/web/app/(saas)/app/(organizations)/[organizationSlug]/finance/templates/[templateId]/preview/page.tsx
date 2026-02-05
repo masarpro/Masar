@@ -33,8 +33,8 @@ export default async function TemplatePreviewPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.templates.editor.preview")}
-			hideNavigation
+			sectionKey="templates"
+			pageTitle={t("finance.templates.editor.preview")}
 		>
 			<TemplatePreview
 				organizationId={activeOrganization.id}

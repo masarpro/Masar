@@ -29,8 +29,14 @@ export default async function CreateQuotationPage({
 		return notFound();
 	}
 
+	const t = await getTranslations();
+
 	return (
-		<FinanceShell organizationSlug={organizationSlug}>
+		<FinanceShell
+			organizationSlug={organizationSlug}
+			sectionKey="quotations"
+			pageTitle={t("finance.quotations.create")}
+		>
 			<QuotationForm
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}

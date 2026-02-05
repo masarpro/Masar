@@ -1,5 +1,6 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { QuotationsList } from "@saas/finance/components/quotations/QuotationsList";
+import { QuotationsHeaderActions } from "@saas/finance/components/quotations/QuotationsHeaderActions";
 import { FinanceShell } from "@saas/finance/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -30,7 +31,11 @@ export default async function QuotationsPage({
 	}
 
 	return (
-		<FinanceShell organizationSlug={organizationSlug}>
+		<FinanceShell
+			organizationSlug={organizationSlug}
+			sectionKey="quotations"
+			headerActions={<QuotationsHeaderActions organizationSlug={organizationSlug} />}
+		>
 			<QuotationsList
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}

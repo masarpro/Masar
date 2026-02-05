@@ -80,25 +80,6 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 
 	return (
 		<div className="space-y-6">
-			{/* Header with gradient */}
-			<div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-l from-blue-500/10 via-blue-500/5 to-transparent border border-border/50">
-				<div className="flex items-center gap-3">
-					<div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
-						<FileText className="h-5 w-5 text-blue-500" />
-					</div>
-					<div>
-						<h1 className="text-lg font-bold">{t("finance.quotations.title")}</h1>
-						<p className="text-xs text-muted-foreground">{t("finance.quotations.subtitle")}</p>
-					</div>
-				</div>
-				<Button asChild className="rounded-xl">
-					<Link href={`${basePath}/new`}>
-						<Plus className="h-4 w-4 me-2" />
-						{t("finance.quotations.create")}
-					</Link>
-				</Button>
-			</div>
-
 			{/* Search and Filter Bar */}
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">

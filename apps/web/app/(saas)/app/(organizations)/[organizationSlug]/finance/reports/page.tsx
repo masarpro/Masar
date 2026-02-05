@@ -22,7 +22,6 @@ export default async function ReportsPage({
 	params: Promise<{ organizationSlug: string }>;
 }) {
 	const { organizationSlug } = await params;
-	const t = await getTranslations();
 
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
@@ -33,8 +32,7 @@ export default async function ReportsPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.reports.title")}
-			subtitle={t("finance.reports.subtitle")}
+			sectionKey="reports"
 		>
 			<FinanceReports
 				organizationId={activeOrganization.id}

@@ -184,30 +184,6 @@ export function ExpensesList({
 				</CardContent>
 			</Card>
 
-			{/* Header */}
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-				<div className="flex items-center gap-3">
-					<div className="p-2 bg-primary/10 rounded-xl">
-						<TrendingDown className="h-6 w-6 text-primary" />
-					</div>
-					<div>
-						<h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-							{t("finance.expenses.title")}
-						</h1>
-						<p className="text-sm text-slate-500 dark:text-slate-400">
-							{t("finance.expenses.description")}
-						</p>
-					</div>
-				</div>
-				<Button
-					onClick={() => router.push(`/app/${organizationSlug}/finance/expenses/new`)}
-					className="rounded-xl"
-				>
-					<Plus className="h-4 w-4 me-2" />
-					{t("finance.expenses.create")}
-				</Button>
-			</div>
-
 			{/* Filters */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-4">

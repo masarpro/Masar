@@ -33,7 +33,8 @@ export default async function CreateDocumentPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.documents.create")}
+			sectionKey="documents"
+			pageTitle={t("finance.documents.create")}
 		>
 			<CreateDocumentForm
 				organizationId={activeOrganization.id}

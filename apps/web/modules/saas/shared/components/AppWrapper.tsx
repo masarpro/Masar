@@ -23,6 +23,18 @@ import {
 	SettingsIcon,
 	UserCog2Icon,
 	UserCogIcon,
+	// Finance sub-section icons
+	Wallet,
+	FileSpreadsheet,
+	FileText,
+	CreditCard,
+	Banknote,
+	Users,
+	FolderOpen,
+	Layout,
+	BarChart3,
+	Settings,
+	Building,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -74,6 +86,74 @@ export function AppWrapper({ children }: PropsWithChildren) {
 						href: `/app/${activeOrganization.slug}/finance`,
 						icon: ReceiptIcon,
 						isActive: pathname.includes("/finance"),
+						children: [
+							{
+								id: "finance-dashboard",
+								label: t("finance.shell.sections.dashboard"),
+								href: `/app/${activeOrganization.slug}/finance`,
+								icon: Wallet,
+							},
+							{
+								id: "finance-quotations",
+								label: t("finance.shell.sections.quotations"),
+								href: `/app/${activeOrganization.slug}/finance/quotations`,
+								icon: FileSpreadsheet,
+							},
+							{
+								id: "finance-invoices",
+								label: t("finance.shell.sections.invoices"),
+								href: `/app/${activeOrganization.slug}/finance/invoices`,
+								icon: FileText,
+							},
+							{
+								id: "finance-expenses",
+								label: t("finance.shell.sections.expenses"),
+								href: `/app/${activeOrganization.slug}/finance/expenses`,
+								icon: CreditCard,
+							},
+							{
+								id: "finance-payments",
+								label: t("finance.shell.sections.payments"),
+								href: `/app/${activeOrganization.slug}/finance/payments`,
+								icon: Banknote,
+							},
+							{
+								id: "finance-clients",
+								label: t("finance.shell.sections.clients"),
+								href: `/app/${activeOrganization.slug}/finance/clients`,
+								icon: Users,
+							},
+							{
+								id: "finance-banks",
+								label: t("finance.shell.sections.banks"),
+								href: `/app/${activeOrganization.slug}/finance/banks`,
+								icon: Building,
+							},
+							{
+								id: "finance-documents",
+								label: t("finance.shell.sections.documents"),
+								href: `/app/${activeOrganization.slug}/finance/documents`,
+								icon: FolderOpen,
+							},
+							{
+								id: "finance-templates",
+								label: t("finance.shell.sections.templates"),
+								href: `/app/${activeOrganization.slug}/finance/templates`,
+								icon: Layout,
+							},
+							{
+								id: "finance-reports",
+								label: t("finance.shell.sections.reports"),
+								href: `/app/${activeOrganization.slug}/finance/reports`,
+								icon: BarChart3,
+							},
+							{
+								id: "finance-settings",
+								label: t("finance.shell.sections.settings"),
+								href: `/app/${activeOrganization.slug}/finance/settings`,
+								icon: Settings,
+							},
+						],
 					},
 				]
 			: []),
@@ -117,14 +197,47 @@ export function AppWrapper({ children }: PropsWithChildren) {
 			: []),
 	];
 
-	// Find active item ID
-	const activeId = menuItems.find((item) => item.isActive)?.id;
+	// Find active item ID (checks children first for more specific matching)
+	const findActiveId = (): string | undefined => {
+		for (const item of menuItems) {
+			// Check children first (more specific)
+			if (item.children) {
+				for (const child of item.children) {
+					// Special case: dashboard is exact match to /finance
+					if (child.id === "finance-dashboard") {
+						const financeBase = `/app/${activeOrganization?.slug}/finance`;
+						if (pathname === financeBase || pathname === `${financeBase}/`) {
+							return child.id;
+						}
+					} else if (child.href && pathname.startsWith(child.href)) {
+						return child.id;
+					}
+				}
+			}
+			// Then check parent
+			if (item.isActive) return item.id;
+		}
+		return undefined;
+	};
+	const activeId = findActiveId();
 
-	// Handle item click - navigate to href
+	// Handle item click - navigate to href (searches both items and children)
 	const handleItemClick = (item: { id: string; label: string }) => {
+		// Search in main items
 		const menuItem = menuItems.find((m) => m.id === item.id);
 		if (menuItem?.href) {
 			router.push(menuItem.href);
+			return;
+		}
+		// Search in children
+		for (const mainItem of menuItems) {
+			if (mainItem.children) {
+				const child = mainItem.children.find((c) => c.id === item.id);
+				if (child?.href) {
+					router.push(child.href);
+					return;
+				}
+			}
 		}
 	};
 

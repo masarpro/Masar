@@ -53,6 +53,7 @@ import {
 	updateFinanceTemplateProcedure,
 	setDefaultTemplateProcedure,
 	deleteFinanceTemplateProcedure,
+	seedDefaultTemplates,
 } from "./procedures/templates";
 
 import {
@@ -103,6 +104,11 @@ import {
 } from "./procedures/transfers";
 
 import { getOrgFinanceDashboardProcedure } from "./procedures/org-finance-dashboard";
+
+import {
+	getOrgFinanceSettingsProcedure,
+	updateOrgFinanceSettingsProcedure,
+} from "./procedures/org-finance-settings";
 
 export const financeRouter = {
 	// Dashboard
@@ -170,6 +176,7 @@ export const financeRouter = {
 		update: updateFinanceTemplateProcedure,
 		setDefault: setDefaultTemplateProcedure,
 		delete: deleteFinanceTemplateProcedure,
+		seed: seedDefaultTemplates,
 	},
 
 	// Reports
@@ -229,4 +236,10 @@ export const financeRouter = {
 
 	// Organization Finance Dashboard
 	orgDashboard: getOrgFinanceDashboardProcedure,
+
+	// Organization Finance Settings (إعدادات المالية)
+	settings: {
+		get: getOrgFinanceSettingsProcedure,
+		update: updateOrgFinanceSettingsProcedure,
+	},
 };

@@ -2,16 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
-import { Label } from "@ui/components/label";
 import { Badge } from "@ui/components/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
+import { Card, CardContent } from "@ui/components/card";
 import {
 	Table,
 	TableBody,
@@ -20,13 +18,6 @@ import {
 	TableHeader,
 	TableRow,
 } from "@ui/components/table";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogFooter,
-} from "@ui/components/dialog";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -44,11 +35,9 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@ui/components/dropdown-menu";
-import { Tabs, TabsList, TabsTrigger } from "@ui/components/tabs";
 import { toast } from "sonner";
 import {
 	Search,
-	Plus,
 	MoreVertical,
 	Pencil,
 	Trash2,
@@ -61,35 +50,12 @@ import {
 	CheckCircle,
 	XCircle,
 	Eye,
-	Hash,
-	ChevronDown,
 } from "lucide-react";
 
 interface ClientsListProps {
 	organizationId: string;
 	organizationSlug: string;
 }
-
-// نموذج الإضافة السريعة (حقول أساسية فقط)
-interface QuickClientFormData {
-	clientType: "INDIVIDUAL" | "COMMERCIAL";
-	firstName: string;
-	lastName: string;
-	businessName: string;
-	phone: string;
-	mobile: string;
-	email: string;
-}
-
-const emptyQuickFormData: QuickClientFormData = {
-	clientType: "INDIVIDUAL",
-	firstName: "",
-	lastName: "",
-	businessName: "",
-	phone: "",
-	mobile: "",
-	email: "",
-};
 
 export function ClientsList({
 	organizationId,
@@ -102,9 +68,7 @@ export function ClientsList({
 	// State
 	const [searchQuery, setSearchQuery] = useState("");
 	const [showActiveOnly, setShowActiveOnly] = useState<boolean | undefined>(undefined);
-	const [quickDialogOpen, setQuickDialogOpen] = useState(false);
 	const [deleteClientId, setDeleteClientId] = useState<string | null>(null);
-	const [quickFormData, setQuickFormData] = useState<QuickClientFormData>(emptyQuickFormData);
 
 	// Fetch clients
 	const { data, isLoading } = useQuery(
@@ -118,43 +82,6 @@ export function ClientsList({
 	);
 
 	const clients = data?.clients ?? [];
-
-	// Quick create mutation (للإضافة السريعة)
-	const quickCreateMutation = useMutation({
-		mutationFn: async () => {
-			const name =
-				quickFormData.clientType === "COMMERCIAL"
-					? quickFormData.businessName
-					: `${quickFormData.firstName} ${quickFormData.lastName}`.trim();
-
-			if (!name) {
-				throw new Error(t("finance.clients.errors.nameRequired"));
-			}
-
-			return orpcClient.finance.clients.create({
-				organizationId,
-				clientType: quickFormData.clientType,
-				firstName: quickFormData.firstName || undefined,
-				lastName: quickFormData.lastName || undefined,
-				businessName: quickFormData.businessName || undefined,
-				name,
-				phone: quickFormData.phone || undefined,
-				mobile: quickFormData.mobile || undefined,
-				email: quickFormData.email || undefined,
-			});
-		},
-		onSuccess: (newClient) => {
-			toast.success(t("finance.clients.createSuccess"));
-			setQuickDialogOpen(false);
-			resetQuickForm();
-			queryClient.invalidateQueries({
-				queryKey: ["finance", "clients"],
-			});
-		},
-		onError: (error: any) => {
-			toast.error(error.message || t("finance.clients.createError"));
-		},
-	});
 
 	// Delete mutation
 	const deleteMutation = useMutation({
@@ -196,53 +123,8 @@ export function ClientsList({
 		},
 	});
 
-	const resetQuickForm = () => {
-		setQuickFormData(emptyQuickFormData);
-	};
-
-	const handleQuickSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		quickCreateMutation.mutate();
-	};
-
 	return (
 		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-				<div className="flex items-center gap-3">
-					<div className="p-2 bg-primary/10 rounded-xl">
-						<Users className="h-6 w-6 text-primary" />
-					</div>
-					<div>
-						<h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-							{t("finance.clients.title")}
-						</h1>
-						<p className="text-sm text-slate-500 dark:text-slate-400">
-							{t("finance.clients.description")}
-						</p>
-					</div>
-				</div>
-				<div className="flex gap-2">
-					<Button
-						variant="outline"
-						onClick={() => setQuickDialogOpen(true)}
-						className="rounded-xl"
-					>
-						<Plus className="h-4 w-4 me-2" />
-						{t("finance.clients.quickAdd")}
-					</Button>
-					<Button
-						onClick={() =>
-							router.push(`/app/${organizationSlug}/finance/clients/new`)
-						}
-						className="rounded-xl"
-					>
-						<Plus className="h-4 w-4 me-2" />
-						{t("finance.clients.addClient")}
-					</Button>
-				</div>
-			</div>
-
 			{/* Filters */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-4">
@@ -478,153 +360,6 @@ export function ClientsList({
 					)}
 				</CardContent>
 			</Card>
-
-			{/* Quick Add Dialog */}
-			<Dialog open={quickDialogOpen} onOpenChange={setQuickDialogOpen}>
-				<DialogContent className="sm:max-w-lg rounded-2xl">
-					<DialogHeader>
-						<DialogTitle>{t("finance.clients.quickAdd")}</DialogTitle>
-					</DialogHeader>
-					<form onSubmit={handleQuickSubmit} className="space-y-4">
-						{/* نوع العميل */}
-						<div>
-							<Label className="mb-2 block">{t("finance.clients.clientType")}</Label>
-							<Tabs
-								value={quickFormData.clientType}
-								onValueChange={(value) =>
-									setQuickFormData({
-										...quickFormData,
-										clientType: value as "INDIVIDUAL" | "COMMERCIAL",
-									})
-								}
-								className="w-full"
-							>
-								<TabsList className="grid w-full grid-cols-2 rounded-xl">
-									<TabsTrigger value="INDIVIDUAL" className="rounded-xl">
-										<User className="h-4 w-4 me-2" />
-										{t("finance.clients.types.individual")}
-									</TabsTrigger>
-									<TabsTrigger value="COMMERCIAL" className="rounded-xl">
-										<Building2 className="h-4 w-4 me-2" />
-										{t("finance.clients.types.commercial")}
-									</TabsTrigger>
-								</TabsList>
-							</Tabs>
-						</div>
-
-						{/* حقول الاسم */}
-						{quickFormData.clientType === "INDIVIDUAL" ? (
-							<div className="grid gap-4 sm:grid-cols-2">
-								<div>
-									<Label>{t("finance.clients.firstName")} *</Label>
-									<Input
-										value={quickFormData.firstName}
-										onChange={(e) =>
-											setQuickFormData({
-												...quickFormData,
-												firstName: e.target.value,
-											})
-										}
-										placeholder={t("finance.clients.firstNamePlaceholder")}
-										required
-										className="rounded-xl mt-1"
-									/>
-								</div>
-								<div>
-									<Label>{t("finance.clients.lastName")} *</Label>
-									<Input
-										value={quickFormData.lastName}
-										onChange={(e) =>
-											setQuickFormData({
-												...quickFormData,
-												lastName: e.target.value,
-											})
-										}
-										placeholder={t("finance.clients.lastNamePlaceholder")}
-										required
-										className="rounded-xl mt-1"
-									/>
-								</div>
-							</div>
-						) : (
-							<div>
-								<Label>{t("finance.clients.businessName")} *</Label>
-								<Input
-									value={quickFormData.businessName}
-									onChange={(e) =>
-										setQuickFormData({
-											...quickFormData,
-											businessName: e.target.value,
-										})
-									}
-									placeholder={t("finance.clients.businessNamePlaceholder")}
-									required
-									className="rounded-xl mt-1"
-								/>
-							</div>
-						)}
-
-						{/* الاتصال */}
-						<div className="grid gap-4 sm:grid-cols-2">
-							<div>
-								<Label>{t("finance.clients.mobile")}</Label>
-								<Input
-									value={quickFormData.mobile}
-									onChange={(e) =>
-										setQuickFormData({
-											...quickFormData,
-											mobile: e.target.value,
-										})
-									}
-									placeholder="05XXXXXXXX"
-									className="rounded-xl mt-1"
-									dir="ltr"
-								/>
-							</div>
-							<div>
-								<Label>{t("finance.clients.email")}</Label>
-								<Input
-									type="email"
-									value={quickFormData.email}
-									onChange={(e) =>
-										setQuickFormData({
-											...quickFormData,
-											email: e.target.value,
-										})
-									}
-									placeholder="email@example.com"
-									className="rounded-xl mt-1"
-									dir="ltr"
-								/>
-							</div>
-						</div>
-
-						<div className="text-sm text-slate-500 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl">
-							{t("finance.clients.quickAddHint")}
-						</div>
-
-						<DialogFooter>
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => setQuickDialogOpen(false)}
-								className="rounded-xl"
-							>
-								{t("common.cancel")}
-							</Button>
-							<Button
-								type="submit"
-								disabled={quickCreateMutation.isPending}
-								className="rounded-xl"
-							>
-								{quickCreateMutation.isPending
-									? t("common.saving")
-									: t("finance.clients.addClient")}
-							</Button>
-						</DialogFooter>
-					</form>
-				</DialogContent>
-			</Dialog>
 
 			{/* Delete Confirmation */}
 			<AlertDialog

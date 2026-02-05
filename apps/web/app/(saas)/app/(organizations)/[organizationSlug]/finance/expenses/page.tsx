@@ -1,5 +1,6 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { ExpensesList } from "@saas/finance/components/expenses/ExpensesList";
+import { ExpensesHeaderActions } from "@saas/finance/components/expenses/ExpensesHeaderActions";
 import { FinanceShell } from "@saas/finance/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -22,7 +23,6 @@ export default async function ExpensesPage({
 	params: Promise<{ organizationSlug: string }>;
 }) {
 	const { organizationSlug } = await params;
-	const t = await getTranslations();
 
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
@@ -33,8 +33,8 @@ export default async function ExpensesPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.expenses.title")}
-			subtitle={t("finance.expenses.subtitle")}
+			sectionKey="expenses"
+			headerActions={<ExpensesHeaderActions organizationSlug={organizationSlug} />}
 		>
 			<ExpensesList
 				organizationId={activeOrganization.id}

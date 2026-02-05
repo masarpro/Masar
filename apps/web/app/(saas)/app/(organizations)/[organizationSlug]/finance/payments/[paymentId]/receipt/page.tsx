@@ -33,8 +33,8 @@ export default async function ReceiptPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.receipt.title")}
-			hideNavigation
+			sectionKey="payments"
+			pageTitle={t("finance.receipt.title")}
 		>
 			<ReceiptVoucher
 				organizationId={activeOrganization.id}

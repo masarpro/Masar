@@ -1,5 +1,6 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { TemplatesList } from "@saas/finance/components/templates/TemplatesList";
+import { TemplatesHeaderActions } from "@saas/finance/components/templates/TemplatesHeaderActions";
 import { FinanceShell } from "@saas/finance/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -22,7 +23,6 @@ export default async function TemplatesPage({
 	params: Promise<{ organizationSlug: string }>;
 }) {
 	const { organizationSlug } = await params;
-	const t = await getTranslations();
 
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
@@ -33,8 +33,8 @@ export default async function TemplatesPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.templates.title")}
-			subtitle={t("finance.templates.subtitle")}
+			sectionKey="templates"
+			headerActions={<TemplatesHeaderActions organizationSlug={organizationSlug} />}
 		>
 			<TemplatesList
 				organizationId={activeOrganization.id}

@@ -1,5 +1,5 @@
 export { FinanceShell, type FinanceShellProps } from "./FinanceShell";
-export { FinancePageHeader } from "./FinancePageHeader";
+export { FinanceSubPageHeader, type FinanceSubPageHeaderProps } from "./FinanceSubPageHeader";
 export { FinanceNavigation } from "./FinanceNavigation";
 export {
 	FINANCE_NAV_SECTIONS,

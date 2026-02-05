@@ -8,7 +8,6 @@ import { BalanceCards } from "./BalanceCards";
 import { CashFlowCard } from "./CashFlowCard";
 import { ActionCards } from "./ActionCards";
 import { StatsCards } from "./StatsCards";
-import { TabsBar } from "./TabsBar";
 import { RecentDocumentsTable } from "./RecentDocumentsTable";
 import { DeadlinesCard } from "./DeadlinesCard";
 
@@ -59,13 +58,12 @@ export function FinanceDashboard({
 			{/* 4. Quick Action Cards (Quotations, Invoices, Expenses, Payments) */}
 			<ActionCards organizationSlug={orgSlug} />
 
-			{/* 5. Tabs Bar (Documents, Clients, Templates, Reports, Banks, Settings) */}
-			<TabsBar organizationSlug={orgSlug} />
+			<hr className="border-border" />
 
-			{/* 6. Stats Cards (Quotations, Invoices, Outstanding, Clients) */}
+			{/* 5. Stats Cards (Quotations, Invoices, Outstanding, Clients) */}
 			<StatsCards stats={stats} />
 
-			{/* 7. Bottom Section (Recent Documents + Deadlines) */}
+			{/* 6. Bottom Section (Recent Documents + Deadlines) */}
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 				<div className="lg:col-span-2">
 					<RecentDocumentsTable

@@ -62,11 +62,18 @@ import {
 	CheckCircle,
 	XCircle,
 } from "lucide-react";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@ui/components/dialog";
 import { cn } from "@ui/lib";
 import { ClientSelector, type Client } from "../shared/ClientSelector";
 import { InlineClientForm } from "../clients/InlineClientForm";
 import { StatusBadge } from "../shared/StatusBadge";
 import { formatCurrency, formatDateFull } from "../../lib/utils";
+import { TemplateRenderer } from "../templates/renderer";
 
 interface QuotationFormProps {
 	organizationId: string;
@@ -150,6 +157,7 @@ export function QuotationForm({
 	const [visibleColumns, setVisibleColumns] = useState<ColumnKey[]>(DEFAULT_VISIBLE_COLUMNS);
 	const [showInlineClientForm, setShowInlineClientForm] = useState(false);
 	const [isInitialized, setIsInitialized] = useState(mode === "create");
+	const [showPreviewDialog, setShowPreviewDialog] = useState(false);
 
 	// Fetch existing quotation for edit mode
 	const { data: existingQuotation, isLoading: isLoadingQuotation } = useQuery({
@@ -211,6 +219,20 @@ export function QuotationForm({
 		}),
 	);
 	const members = membersData?.users ?? [];
+
+	// Fetch default template for quotations
+	const { data: defaultTemplate } = useQuery(
+		orpc.finance.templates.getDefault.queryOptions({
+			input: { organizationId, templateType: "QUOTATION" },
+		}),
+	);
+
+	// Fetch organization finance settings
+	const { data: orgSettings } = useQuery(
+		orpc.finance.settings.get.queryOptions({
+			input: { organizationId },
+		}),
+	);
 
 	// Calculations
 	const calculateItemTotal = (item: QuotationItem) => {
@@ -604,30 +626,18 @@ export function QuotationForm({
 						</DropdownMenu>
 					)}
 
-					<Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-						<SelectTrigger className="w-[130px] rounded-lg h-9 text-sm hidden sm:flex">
-							<Layout className="h-4 w-4 me-2 text-muted-foreground" />
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent className="rounded-xl">
-							<SelectItem value="default">{t("finance.templates.default")}</SelectItem>
-							<SelectItem value="modern">{t("finance.templates.modern")}</SelectItem>
-							<SelectItem value="classic">{t("finance.templates.classic")}</SelectItem>
-						</SelectContent>
-					</Select>
+					{/* Template Badge (read-only) */}
+					<Badge variant="outline" className="hidden sm:flex h-9 px-3 rounded-lg">
+						<Layout className="h-4 w-4 me-2 text-muted-foreground" />
+						{defaultTemplate?.name || t("finance.templates.default")}
+					</Badge>
 
 					<Button
 						type="button"
 						variant="outline"
 						size="icon"
 						className="rounded-lg h-9 w-9"
-						onClick={() => {
-							if (mode === "edit" && quotationId) {
-								router.push(`${basePath}/${quotationId}/preview`);
-							} else {
-								toast.info(t("finance.actions.previewComingSoon"));
-							}
-						}}
+						onClick={() => setShowPreviewDialog(true)}
 					>
 						<Eye className="h-4 w-4" />
 					</Button>
@@ -833,13 +843,7 @@ export function QuotationForm({
 					{/* Preview Button */}
 					<button
 						type="button"
-						onClick={() => {
-							if (mode === "edit" && quotationId) {
-								router.push(`${basePath}/${quotationId}/preview`);
-							} else {
-								toast.info(t("finance.actions.previewComingSoon"));
-							}
-						}}
+						onClick={() => setShowPreviewDialog(true)}
 						className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-muted/50 hover:bg-muted text-foreground transition-all duration-200"
 					>
 						<div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
@@ -1274,6 +1278,87 @@ export function QuotationForm({
 					)}
 				</div>
 			</div>
+
+			{/* Preview Dialog */}
+			<Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
+				<DialogContent className="max-w-4xl max-h-[90vh] overflow-auto p-0">
+					<DialogHeader className="p-4 border-b sticky top-0 bg-background z-10">
+						<DialogTitle className="flex items-center gap-2">
+							<Eye className="h-5 w-5" />
+							{t("finance.actions.preview")}
+						</DialogTitle>
+					</DialogHeader>
+					<div className="bg-slate-100 dark:bg-slate-900 p-4 min-h-[60vh]">
+						<div className="bg-white dark:bg-card rounded-xl shadow-lg overflow-hidden">
+							<TemplateRenderer
+								data={{
+									quotationNo: quotationNumber,
+									createdAt: quotationDate,
+									validUntil: (() => {
+										const validDate = new Date(quotationDate);
+										validDate.setDate(validDate.getDate() + (orgSettings?.quotationValidityDays || 30));
+										return validDate.toISOString();
+									})(),
+									status: existingQuotation?.status || "DRAFT",
+									clientName,
+									clientCompany,
+									clientPhone,
+									clientEmail,
+									clientAddress,
+									clientTaxNumber,
+									items: items
+										.filter((item) => item.description.trim())
+										.map((item) => ({
+											description: item.description,
+											quantity: item.quantity,
+											unit: item.unit,
+											unitPrice: item.unitPrice,
+											totalPrice: item.quantity * item.unitPrice,
+										})),
+									subtotal,
+									discountPercent: includeDiscount && discountType === "percent" ? globalDiscountPercent : 0,
+									discountAmount: globalDiscountValue,
+									vatPercent: includeTax ? globalVatPercent : 0,
+									vatAmount: taxAmount,
+									totalAmount,
+									paymentTerms: paymentTerms || orgSettings?.defaultPaymentTerms,
+									deliveryTerms: deliveryTerms || orgSettings?.defaultDeliveryTerms,
+									warrantyTerms: warrantyTerms || orgSettings?.defaultWarrantyTerms,
+									notes,
+								}}
+								template={{
+									elements: (defaultTemplate?.content as { elements?: any[] })?.elements || [],
+									settings: (defaultTemplate?.settings as any) || {},
+								}}
+								organization={{
+									name: orgSettings?.companyNameAr || undefined,
+									nameAr: orgSettings?.companyNameAr || undefined,
+									nameEn: orgSettings?.companyNameEn || undefined,
+									logo: orgSettings?.logo || undefined,
+									address: orgSettings?.address || undefined,
+									addressAr: orgSettings?.address || undefined,
+									addressEn: orgSettings?.addressEn || undefined,
+									phone: orgSettings?.phone || undefined,
+									email: orgSettings?.email || undefined,
+									website: orgSettings?.website || undefined,
+									taxNumber: orgSettings?.taxNumber || undefined,
+									commercialReg: orgSettings?.commercialReg || undefined,
+									bankName: orgSettings?.bankName || undefined,
+									bankNameEn: orgSettings?.bankNameEn || undefined,
+									accountName: orgSettings?.accountName || undefined,
+									iban: orgSettings?.iban || undefined,
+									accountNumber: orgSettings?.accountNumber || undefined,
+									swiftCode: orgSettings?.swiftCode || undefined,
+									headerText: orgSettings?.headerText || undefined,
+									footerText: orgSettings?.footerText || undefined,
+									thankYouMessage: orgSettings?.thankYouMessage || undefined,
+								}}
+								documentType="quotation"
+							/>
+						</div>
+					</div>
+				</DialogContent>
+			</Dialog>
 		</form>
 	);
 }

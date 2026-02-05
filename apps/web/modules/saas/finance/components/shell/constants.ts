@@ -10,6 +10,7 @@ import {
 	FolderOpen,
 	Layout,
 	BarChart3,
+	Settings,
 } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════════
@@ -87,6 +88,12 @@ export const FINANCE_NAV_SECTIONS: FinanceNavSection[] = [
 		path: "reports",
 		labelKey: "finance.shell.sections.reports",
 		icon: BarChart3,
+	},
+	{
+		id: "settings",
+		path: "settings",
+		labelKey: "finance.shell.sections.settings",
+		icon: Settings,
 	},
 ];
 

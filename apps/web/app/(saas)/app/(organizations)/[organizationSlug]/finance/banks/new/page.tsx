@@ -33,8 +33,8 @@ export default async function NewBankPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.banks.create")}
-			subtitle={t("finance.banks.createSubtitle")}
+			sectionKey="banks"
+			pageTitle={t("finance.banks.create")}
 		>
 			<BankForm
 				organizationId={activeOrganization.id}

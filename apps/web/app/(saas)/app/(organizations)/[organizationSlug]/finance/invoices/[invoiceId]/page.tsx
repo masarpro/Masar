@@ -33,7 +33,8 @@ export default async function EditInvoicePage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.invoices.edit")}
+			sectionKey="invoices"
+			pageTitle={t("finance.invoices.edit")}
 		>
 			<InvoiceEditor
 				organizationId={activeOrganization.id}

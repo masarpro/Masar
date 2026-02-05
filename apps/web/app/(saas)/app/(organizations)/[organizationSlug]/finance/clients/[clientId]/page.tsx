@@ -33,7 +33,8 @@ export default async function ClientDetailPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.clients.viewClient")}
+			sectionKey="clients"
+			pageTitle={t("finance.clients.viewClient")}
 		>
 			<ClientDetail
 				organizationId={activeOrganization.id}

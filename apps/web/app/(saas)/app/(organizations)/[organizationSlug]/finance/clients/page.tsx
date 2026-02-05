@@ -1,6 +1,7 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { ClientsList } from "@saas/finance/components/clients/ClientsList";
 import { FinanceShell } from "@saas/finance/components/shell";
+import { ClientsHeaderActions } from "@saas/finance/components/clients/ClientsHeaderActions";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -22,7 +23,6 @@ export default async function ClientsPage({
 	params: Promise<{ organizationSlug: string }>;
 }) {
 	const { organizationSlug } = await params;
-	const t = await getTranslations();
 
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
@@ -33,8 +33,13 @@ export default async function ClientsPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.clients.title")}
-			subtitle={t("finance.clients.subtitle")}
+			sectionKey="clients"
+			headerActions={
+				<ClientsHeaderActions
+					organizationSlug={organizationSlug}
+					organizationId={activeOrganization.id}
+				/>
+			}
 		>
 			<ClientsList
 				organizationId={activeOrganization.id}

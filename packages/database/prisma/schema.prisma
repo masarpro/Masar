@@ -595,6 +595,9 @@ model Organization {
   // Phase 8 - Integration Settings
   integrationSettings  OrganizationIntegrationSettings?
 
+  // Phase 9 - Finance Settings (for invoices and quotations)
+  financeSettings      OrganizationFinanceSettings?
+
   // Finance Module - المالية
   clients              Client[]
   quotations           Quotation[]
@@ -1670,6 +1673,55 @@ model OrganizationIntegrationSettings {
   updatedAt         DateTime          @updatedAt @map("updated_at")
 
   @@map("organization_integration_settings")
+}
+
+// إعدادات مالية للمنظمة (للفواتير وعروض الأسعار)
+model OrganizationFinanceSettings {
+  id              String        @id @default(cuid())
+  organizationId  String        @unique @map("organization_id")
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // بيانات الشركة
+  companyNameAr   String?       @map("company_name_ar")    // اسم الشركة بالعربي
+  companyNameEn   String?       @map("company_name_en")    // اسم الشركة بالإنجليزي
+  logo            String?                                   // URL الشعار
+  address         String?                                   // العنوان
+  addressEn       String?       @map("address_en")         // العنوان بالإنجليزي
+  phone           String?                                   // الهاتف
+  email           String?                                   // البريد الإلكتروني
+  website         String?                                   // الموقع الإلكتروني
+  taxNumber       String?       @map("tax_number")         // الرقم الضريبي
+  commercialReg   String?       @map("commercial_reg")     // السجل التجاري
+
+  // البيانات البنكية الافتراضية (للفواتير)
+  bankName        String?       @map("bank_name")          // اسم البنك
+  bankNameEn      String?       @map("bank_name_en")       // اسم البنك بالإنجليزي
+  accountName     String?       @map("account_name")       // اسم الحساب
+  iban            String?                                   // رقم الآيبان
+  accountNumber   String?       @map("account_number")     // رقم الحساب
+  swiftCode       String?       @map("swift_code")         // رمز السويفت
+
+  // إعدادات الطباعة
+  headerText      String?       @map("header_text")        // نص أعلى الصفحة
+  footerText      String?       @map("footer_text")        // نص أسفل الصفحة
+  thankYouMessage String?       @map("thank_you_message")  // رسالة الشكر
+
+  // إعدادات الضريبة والعملة
+  defaultVatPercent   Decimal   @default(15) @map("default_vat_percent")  // نسبة الضريبة الافتراضية
+  defaultCurrency     String    @default("SAR") @map("default_currency")  // العملة الافتراضية
+
+  // الشروط الافتراضية
+  defaultPaymentTerms   String?   @map("default_payment_terms")   // شروط الدفع
+  defaultDeliveryTerms  String?   @map("default_delivery_terms")  // شروط التسليم
+  defaultWarrantyTerms  String?   @map("default_warranty_terms")  // شروط الضمان
+
+  // تاريخ صلاحية عرض السعر
+  quotationValidityDays Int       @default(30) @map("quotation_validity_days")
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  @@map("organization_finance_settings")
 }
 
 // سجل تسليم الرسائل

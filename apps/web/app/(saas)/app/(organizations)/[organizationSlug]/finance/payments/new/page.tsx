@@ -36,8 +36,8 @@ export default async function NewPaymentPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.payments.create")}
-			subtitle={t("finance.payments.createSubtitle")}
+			sectionKey="payments"
+			pageTitle={t("finance.payments.create")}
 		>
 			<PaymentForm
 				organizationId={activeOrganization.id}

@@ -33,8 +33,8 @@ export default async function PaymentDetailPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.payments.details")}
-			subtitle={t("finance.payments.detailsSubtitle")}
+			sectionKey="payments"
+			pageTitle={t("finance.payments.details")}
 		>
 			<PaymentDetail
 				organizationId={activeOrganization.id}

@@ -36,8 +36,8 @@ export default async function NewExpensePage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.expenses.create")}
-			subtitle={t("finance.expenses.createSubtitle")}
+			sectionKey="expenses"
+			pageTitle={t("finance.expenses.create")}
 		>
 			<ExpenseForm
 				organizationId={activeOrganization.id}

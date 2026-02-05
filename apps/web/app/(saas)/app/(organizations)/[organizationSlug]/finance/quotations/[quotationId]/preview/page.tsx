@@ -33,8 +33,8 @@ export default async function QuotationPreviewPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.quotations.preview")}
-			hideNavigation
+			sectionKey="quotations"
+			pageTitle={t("finance.quotations.preview")}
 		>
 			<QuotationPreview
 				organizationId={activeOrganization.id}

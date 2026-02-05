@@ -33,8 +33,8 @@ export default async function InvoicePreviewPage({
 	return (
 		<FinanceShell
 			organizationSlug={organizationSlug}
-			title={t("finance.invoices.preview")}
-			hideNavigation
+			sectionKey="invoices"
+			pageTitle={t("finance.invoices.preview")}
 		>
 			<InvoicePreview
 				organizationId={activeOrganization.id}
