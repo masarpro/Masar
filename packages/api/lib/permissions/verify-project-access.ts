@@ -180,6 +180,7 @@ function getPermissionErrorMessage(section: keyof Permissions, action: string): 
 			invoices: "ليس لديك صلاحية إدارة الفواتير",
 			payments: "ليس لديك صلاحية إدارة المدفوعات",
 			reports: "ليس لديك صلاحية عرض التقارير المالية",
+			settings: "ليس لديك صلاحية تعديل الإعدادات المالية",
 		},
 		employees: {
 			view: "ليس لديك صلاحية عرض الموظفين",

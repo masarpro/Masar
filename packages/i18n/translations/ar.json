@@ -2335,6 +2335,8 @@
 				"dropHintSecondary": "أو انقر على أي مكون لإضافته",
 				"dropHereToAdd": "اسحب هنا للإضافة في نهاية القالب",
 				"canvasTitle": "معاينة القالب",
+				"livePreview": "معاينة حية",
+				"companyDataNotice": "بيانات الشركة (الشعار، الرأس، التذييل) تُجلب تلقائياً من إعدادات المالية ولا يمكن تعديلها من هنا",
 				"selectElementToEdit": "اختر عنصر لتعديل خصائصه",
 				"templateNamePlaceholder": "أدخل اسم القالب",
 				"basicComponents": "المكونات الأساسية",

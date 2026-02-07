@@ -121,6 +121,10 @@ interface TemplateRendererProps {
 	organization?: OrganizationData;
 	documentType?: "quotation" | "invoice";
 	className?: string;
+	// Interactive mode props
+	interactive?: boolean;
+	selectedElementId?: string | null;
+	onElementClick?: (elementId: string | null) => void;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -141,6 +145,9 @@ export function TemplateRenderer({
 	organization,
 	documentType,
 	className = "",
+	interactive = false,
+	selectedElementId = null,
+	onElementClick,
 }: TemplateRendererProps) {
 	const t = useTranslations();
 	const locale = useLocale();
@@ -377,6 +384,36 @@ export function TemplateRenderer({
 		{ id: "7", type: "signature", order: 7, enabled: true, settings: {} },
 	] as TemplateElement[];
 
+	// Wrap element with interactive container if needed
+	const renderInteractiveElement = (element: TemplateElement) => {
+		const content = renderElement(element);
+		if (!interactive) return content;
+
+		const isSelected = selectedElementId === element.id;
+		return (
+			<div
+				key={element.id}
+				className={`relative cursor-pointer transition-all rounded-lg ${
+					isSelected
+						? "ring-2 ring-primary ring-offset-2 bg-primary/5"
+						: "hover:ring-1 hover:ring-primary/50"
+				}`}
+				onClick={(e) => {
+					e.stopPropagation();
+					onElementClick?.(element.id);
+				}}
+			>
+				{/* Selection indicator */}
+				{isSelected && (
+					<div className="absolute -top-2 start-2 bg-primary text-white text-xs px-2 py-0.5 rounded-full z-10">
+						{t(`finance.templates.editor.elementTypes.${element.type}`)}
+					</div>
+				)}
+				{content}
+			</div>
+		);
+	};
+
 	return (
 		<div
 			className={`p-8 ${className}`}
@@ -385,8 +422,9 @@ export function TemplateRenderer({
 				fontFamily,
 			}}
 			dir={locale === "ar" ? "rtl" : "ltr"}
+			onClick={() => interactive && onElementClick?.(null)}
 		>
-			{defaultElements.map(renderElement)}
+			{defaultElements.map(renderInteractiveElement)}
 
 			{/* Notes section (if present) */}
 			{data.notes && (

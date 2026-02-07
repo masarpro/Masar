@@ -196,8 +196,12 @@ export function OrganizationFinanceSettings({
 			toast.success(t("finance.settings.updateSuccess"));
 			setFormData({});
 			setHasChanges(false);
+			// Invalidate all finance settings queries
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "settings"],
+				predicate: (query) => {
+					const key = query.queryKey as string[];
+					return key.some((k) => typeof k === "string" && k.includes("settings"));
+				},
 			});
 		},
 		onError: (error: any) => {

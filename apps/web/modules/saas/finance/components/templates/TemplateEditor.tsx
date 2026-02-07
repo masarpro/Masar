@@ -26,13 +26,16 @@ import {
 import Link from "next/link";
 import { toast } from "sonner";
 import { ComponentsPanel, type ElementType } from "./ComponentsPanel";
-import { TemplateCanvas, type TemplateElement } from "./TemplateCanvas";
+import { type TemplateElement } from "./TemplateCanvas";
+import { InteractivePreview } from "./InteractivePreview";
 import { PropertiesPanel, type TemplateSettings } from "./PropertiesPanel";
 import {
 	getQuotationElements,
 	getInvoiceElements,
 	DEFAULT_TEMPLATE_SETTINGS,
 } from "../../lib/default-templates";
+import { getSampleData } from "../../lib/sample-preview-data";
+import type { OrganizationData } from "./renderer/TemplateRenderer";
 
 interface TemplateEditorProps {
 	organizationId: string;
@@ -178,7 +181,6 @@ export function TemplateEditor({
 	const [elements, setElements] = useState<TemplateElement[]>(defaultElements);
 	const [settings, setSettings] = useState<TemplateSettings>(defaultSettings);
 	const [selectedElement, setSelectedElement] = useState<string | null>(null);
-	const [isDragging, setIsDragging] = useState(false);
 
 	// History for undo/redo
 	const [history, setHistory] = useState<TemplateElement[][]>([defaultElements]);
@@ -192,6 +194,41 @@ export function TemplateEditor({
 				: skipToken,
 		}),
 	);
+
+	// Fetch organization finance settings for preview
+	const { data: orgSettings } = useQuery(
+		orpc.finance.settings.get.queryOptions({
+			input: { organizationId },
+		}),
+	);
+
+	// Prepare organization data for preview
+	const organizationData: OrganizationData = {
+		name: orgSettings?.companyNameAr ?? "",
+		nameAr: orgSettings?.companyNameAr ?? undefined,
+		nameEn: orgSettings?.companyNameEn ?? undefined,
+		logo: orgSettings?.logo ?? undefined,
+		address: orgSettings?.address ?? undefined,
+		addressAr: orgSettings?.address ?? undefined,
+		addressEn: orgSettings?.addressEn ?? undefined,
+		phone: orgSettings?.phone ?? undefined,
+		email: orgSettings?.email ?? undefined,
+		website: orgSettings?.website ?? undefined,
+		taxNumber: orgSettings?.taxNumber ?? undefined,
+		commercialReg: orgSettings?.commercialReg ?? undefined,
+		bankName: orgSettings?.bankName ?? undefined,
+		bankNameEn: orgSettings?.bankNameEn ?? undefined,
+		accountName: orgSettings?.accountName ?? undefined,
+		iban: orgSettings?.iban ?? undefined,
+		accountNumber: orgSettings?.accountNumber ?? undefined,
+		swiftCode: orgSettings?.swiftCode ?? undefined,
+		headerText: orgSettings?.headerText ?? undefined,
+		footerText: orgSettings?.footerText ?? undefined,
+		thankYouMessage: orgSettings?.thankYouMessage ?? undefined,
+	};
+
+	// Get sample data for preview
+	const sampleData = getSampleData(templateType, settings);
 
 	// Initialize state from loaded template
 	useEffect(() => {
@@ -292,8 +329,8 @@ export function TemplateEditor({
 	}, [history, historyIndex]);
 
 	// Element operations
-	const handleDragStart = useCallback((elementType: ElementType) => {
-		setIsDragging(true);
+	const handleDragStart = useCallback((_elementType: ElementType) => {
+		// Drag started - could add visual feedback here
 	}, []);
 
 	const handleAddElement = useCallback((elementType: ElementType) => {
@@ -312,7 +349,6 @@ export function TemplateEditor({
 	}, [elements, addToHistory]);
 
 	const handleDropElement = useCallback((elementType: ElementType, targetIndex?: number) => {
-		setIsDragging(false);
 		const sortedElements = [...elements].sort((a, b) => a.order - b.order);
 
 		const newElement: TemplateElement = {
@@ -494,20 +530,16 @@ export function TemplateEditor({
 					onAddElement={handleAddElement}
 				/>
 
-				{/* Canvas (Center) */}
-				<TemplateCanvas
+				{/* Interactive Preview (Center) */}
+				<InteractivePreview
 					elements={elements}
+					settings={settings}
 					selectedElement={selectedElement}
 					onSelectElement={setSelectedElement}
-					onMoveElement={handleMoveElement}
-					onToggleElement={handleToggleElement}
-					onRemoveElement={handleRemoveElement}
 					onDropElement={handleDropElement}
-					templateSettings={{
-						backgroundColor: settings.backgroundColor,
-						primaryColor: settings.primaryColor,
-						fontFamily: settings.fontFamily,
-					}}
+					templateType={templateType}
+					organization={organizationData}
+					sampleData={sampleData}
 				/>
 
 				{/* Properties Panel (Right) */}

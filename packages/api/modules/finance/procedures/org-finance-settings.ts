@@ -86,7 +86,7 @@ export const updateOrgFinanceSettingsProcedure = protectedProcedure
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "organization",
+			section: "finance",
 			action: "settings",
 		});
 

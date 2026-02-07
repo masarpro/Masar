@@ -396,7 +396,7 @@ export function TemplatesList({
 												<DropdownMenuItem asChild>
 													<Link href={`/app/${organizationSlug}/finance/templates/${template.id}?preview=true`}>
 														<Eye className="h-4 w-4 me-2" />
-														{t("finance.templates.preview")}
+														{t("finance.actions.preview")}
 													</Link>
 												</DropdownMenuItem>
 											) : (

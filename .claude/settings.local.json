@@ -73,7 +73,8 @@
       "WebFetch(domain:cdn.jsdelivr.net)",
       "WebFetch(domain:unpkg.com)",
       "Bash(if exist \".next\" rmdir /s /q .next)",
-      "Bash(if exist \"apps\\\\web\\\\.next\" rmdir /s /q \"apps\\\\web\\\\.next\")"
+      "Bash(if exist \"apps\\\\web\\\\.next\" rmdir /s /q \"apps\\\\web\\\\.next\")",
+      "Bash(git -C \"H:\\\\Masar\\\\supastarter-nextjs-3\" log --oneline -20)"
     ]
   }
 }

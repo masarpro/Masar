@@ -25,6 +25,7 @@ export interface FinancePermissions {
 	invoices: boolean;
 	payments: boolean;
 	reports: boolean;
+	settings: boolean;
 }
 
 export interface EmployeesPermissions {
@@ -95,6 +96,7 @@ export function createEmptyPermissions(): Permissions {
 			invoices: false,
 			payments: false,
 			reports: false,
+			settings: false,
 		},
 		employees: {
 			view: false,
@@ -143,6 +145,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			invoices: true,
 			payments: true,
 			reports: true,
+			settings: true,
 		},
 		employees: {
 			view: true,
@@ -185,6 +188,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			invoices: false,
 			payments: false,
 			reports: true,
+			settings: false,
 		},
 		employees: {
 			view: true,
@@ -227,6 +231,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			invoices: true,
 			payments: true,
 			reports: true,
+			settings: true,
 		},
 		employees: {
 			view: true,
@@ -269,6 +274,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			invoices: false,
 			payments: false,
 			reports: false,
+			settings: false,
 		},
 		employees: {
 			view: false,
@@ -311,6 +317,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			invoices: false,
 			payments: false,
 			reports: false,
+			settings: false,
 		},
 		employees: {
 			view: false,
@@ -353,6 +360,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			invoices: false,
 			payments: false,
 			reports: false,
+			settings: false,
 		},
 		employees: {
 			view: false,

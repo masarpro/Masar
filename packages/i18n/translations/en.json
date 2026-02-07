@@ -2437,6 +2437,8 @@
 				"dropHintSecondary": "Or click any component to add it",
 				"dropHereToAdd": "Drop here to add at the end",
 				"canvasTitle": "Template Preview",
+				"livePreview": "Live Preview",
+				"companyDataNotice": "Company data (logo, header, footer) is automatically loaded from Finance Settings and cannot be edited here",
 				"selectElementToEdit": "Select an element to edit its properties",
 				"templateNamePlaceholder": "Enter template name",
 				"basicComponents": "Basic Components",
