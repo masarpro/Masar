@@ -1713,7 +1713,6 @@ export async function createFinanceTemplate(data: {
 
 /**
  * Update a template
- * Note: Default templates cannot be modified
  */
 export async function updateFinanceTemplate(
 	id: string,
@@ -1727,16 +1726,11 @@ export async function updateFinanceTemplate(
 ) {
 	const existing = await db.financeTemplate.findFirst({
 		where: { id, organizationId },
-		select: { id: true, isDefault: true },
+		select: { id: true },
 	});
 
 	if (!existing) {
 		throw new Error("Template not found");
-	}
-
-	// Prevent modification of default templates
-	if (existing.isDefault) {
-		throw new Error("Cannot modify default template. Create a custom template instead.");
 	}
 
 	return db.financeTemplate.update({

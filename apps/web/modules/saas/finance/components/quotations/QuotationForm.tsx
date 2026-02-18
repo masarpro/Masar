@@ -131,6 +131,8 @@ export function QuotationForm({
 	});
 	const [salesRepId, setSalesRepId] = useState<string | undefined>();
 	const [selectedTemplate, setSelectedTemplate] = useState<string>("default");
+	// بيانات مخصصة للعناصر القابلة للتعديل في القالب
+	const [customElementData, setCustomElementData] = useState<Record<string, { content?: string }>>({});
 
 	// Terms
 	const [paymentTerms, setPaymentTerms] = useState("");
@@ -208,6 +210,11 @@ export function QuotationForm({
 				setTermsOpen(true);
 			}
 
+			// تحميل القالب المحدد
+			if (existingQuotation.templateId) {
+				setSelectedTemplate(existingQuotation.templateId);
+			}
+
 			setIsInitialized(true);
 		}
 	}, [existingQuotation, mode, isInitialized]);
@@ -220,12 +227,25 @@ export function QuotationForm({
 	);
 	const members = membersData?.users ?? [];
 
+	// Fetch all templates for quotations
+	const { data: templatesData } = useQuery(
+		orpc.finance.templates.list.queryOptions({
+			input: { organizationId, templateType: "QUOTATION" },
+		}),
+	);
+	const templates = templatesData?.templates ?? [];
+
 	// Fetch default template for quotations
 	const { data: defaultTemplate } = useQuery(
 		orpc.finance.templates.getDefault.queryOptions({
 			input: { organizationId, templateType: "QUOTATION" },
 		}),
 	);
+
+	// Get the selected template (or default)
+	const activeTemplate = selectedTemplate === "default" || !selectedTemplate
+		? defaultTemplate
+		: templates.find(t => t.id === selectedTemplate) || defaultTemplate;
 
 	// Fetch organization finance settings
 	const { data: orgSettings } = useQuery(
@@ -281,6 +301,7 @@ export function QuotationForm({
 				deliveryTerms,
 				warrantyTerms,
 				notes,
+				templateId: selectedTemplate !== "default" ? selectedTemplate : activeTemplate?.id,
 				vatPercent: includeTax ? globalVatPercent : 0,
 				discountPercent: includeDiscount && discountType === "percent" ? globalDiscountPercent : 0,
 				items: items
@@ -319,6 +340,7 @@ export function QuotationForm({
 				deliveryTerms: deliveryTerms || undefined,
 				warrantyTerms: warrantyTerms || undefined,
 				notes: notes || undefined,
+				templateId: selectedTemplate !== "default" ? selectedTemplate : activeTemplate?.id,
 				vatPercent: includeTax ? globalVatPercent : 0,
 				discountPercent: includeDiscount && discountType === "percent" ? globalDiscountPercent : 0,
 			};
@@ -626,11 +648,28 @@ export function QuotationForm({
 						</DropdownMenu>
 					)}
 
-					{/* Template Badge (read-only) */}
-					<Badge variant="outline" className="hidden sm:flex h-9 px-3 rounded-lg">
-						<Layout className="h-4 w-4 me-2 text-muted-foreground" />
-						{defaultTemplate?.name || t("finance.templates.default")}
-					</Badge>
+					{/* Template Selector */}
+					<Select
+						value={selectedTemplate}
+						onValueChange={setSelectedTemplate}
+					>
+						<SelectTrigger className="hidden sm:flex w-[180px] h-9 rounded-lg">
+							<Layout className="h-4 w-4 me-2 text-muted-foreground" />
+							<SelectValue placeholder={t("finance.templates.select")} />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="default">
+								{defaultTemplate?.name || t("finance.templates.default")}
+							</SelectItem>
+							{templates
+								.filter(t => t.id !== defaultTemplate?.id)
+								.map((template) => (
+									<SelectItem key={template.id} value={template.id}>
+										{template.name}
+									</SelectItem>
+								))}
+						</SelectContent>
+					</Select>
 
 					<Button
 						type="button"
@@ -1147,6 +1186,41 @@ export function QuotationForm({
 							</div>
 						</CollapsibleContent>
 					</Collapsible>
+
+					{/* Custom Template Elements - حقول العناصر المخصصة من القالب */}
+					{activeTemplate?.content && (() => {
+						const templateContent = activeTemplate.content as { elements?: Array<{ id: string; type: string; enabled: boolean; order: number; settings: Record<string, unknown> }> };
+						const editableElements = (templateContent.elements || [])
+							.filter((el) => el.enabled && el.type === "text" && el.settings?.isEditable !== false)
+							.sort((a, b) => a.order - b.order); // ترتيب حسب order في القالب
+						if (editableElements.length === 0) return null;
+						return (
+							<div className="mt-3 space-y-3">
+								<h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+									<FileText className="h-4 w-4" />
+									{t("finance.quotations.customFields")}
+								</h4>
+								{editableElements.map((element) => (
+									<div key={element.id} className="space-y-1">
+										<Label className="text-sm">
+											{(element.settings.label as string) || t("finance.templates.editor.elementTypes.text")}
+										</Label>
+										<Textarea
+											value={customElementData[element.id]?.content || (element.settings.content as string) || ""}
+											onChange={(e) => setCustomElementData(prev => ({
+												...prev,
+												[element.id]: { content: e.target.value }
+											}))}
+											placeholder={(element.settings.placeholder as string) || ""}
+											rows={2}
+											disabled={!isEditable}
+											className="rounded-lg text-sm"
+										/>
+									</div>
+								))}
+							</div>
+						);
+					})()}
 				</div>
 
 				{/* Totals Card - 2 columns */}
@@ -1327,9 +1401,10 @@ export function QuotationForm({
 									notes,
 								}}
 								template={{
-									elements: (defaultTemplate?.content as { elements?: any[] })?.elements || [],
-									settings: (defaultTemplate?.settings as any) || {},
+									elements: (activeTemplate?.content as { elements?: any[] })?.elements || [],
+									settings: (activeTemplate?.settings as any) || {},
 								}}
+								customElementData={customElementData}
 								organization={{
 									name: orgSettings?.companyNameAr || undefined,
 									nameAr: orgSettings?.companyNameAr || undefined,

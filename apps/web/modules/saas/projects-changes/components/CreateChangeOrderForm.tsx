@@ -75,7 +75,7 @@ export function CreateChangeOrderForm({
 	const [category, setCategory] = useState<ChangeOrderCategory>("OTHER");
 	const [costImpact, setCostImpact] = useState("");
 	const [timeImpactDays, setTimeImpactDays] = useState("");
-	const [milestoneId, setMilestoneId] = useState<string>("");
+	const [milestoneId, setMilestoneId] = useState<string>("none");
 
 	// Reset form when dialog opens/closes or edit data changes
 	useEffect(() => {
@@ -89,7 +89,7 @@ export function CreateChangeOrderForm({
 					? String(editData.timeImpactDays)
 					: "",
 			);
-			setMilestoneId(editData.milestoneId ?? "");
+			setMilestoneId(editData.milestoneId ?? "none");
 		} else if (open && !editData) {
 			setTitle("");
 			setDescription("");
@@ -128,7 +128,7 @@ export function CreateChangeOrderForm({
 			timeImpactDays: timeImpactDays
 				? Number.parseInt(timeImpactDays, 10)
 				: undefined,
-			milestoneId: milestoneId || undefined,
+			milestoneId: milestoneId === "none" ? undefined : milestoneId,
 		});
 	};
 
@@ -254,7 +254,7 @@ export function CreateChangeOrderForm({
 									<SelectValue placeholder={t("changeOrders.form.selectMilestone")} />
 								</SelectTrigger>
 								<SelectContent>
-									<SelectItem value="">
+									<SelectItem value="none">
 										{t("changeOrders.form.noMilestone")}
 									</SelectItem>
 									{milestones.map((m: { id: string; title: string }) => (

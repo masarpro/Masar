@@ -7,9 +7,6 @@ import { attemptAsync } from "es-toolkit";
 import { redirect } from "next/navigation";
 import type { PropsWithChildren } from "react";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 export default async function Layout({ children }: PropsWithChildren) {
 	const session = await getSession();
 
@@ -38,11 +35,6 @@ export default async function Layout({ children }: PropsWithChildren) {
 		if (newOrg) {
 			redirect(`/app/${newOrg.slug}`);
 		}
-	}
-
-	// Refresh organization list after potential auto-creation
-	if (organizations.length === 0) {
-		organizations = await getOrganizationList();
 	}
 
 	if (

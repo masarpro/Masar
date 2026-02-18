@@ -1,0 +1,33 @@
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+
+@source "../../node_modules/fumadocs-ui/dist/**/*.js";
+
+pre.shiki {
+	@apply mb-4 rounded-lg p-6;
+}
+
+#nd-sidebar {
+	@apply bg-card!;
+
+	button[data-search-full] {
+		@apply bg-transparent;
+	}
+}
+
+#nd-page .prose {
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		a {
+			@apply no-underline!;
+		}
+	}
+}
+
+div[role="tablist"].bg-secondary {
+	@apply bg-muted!;
+}

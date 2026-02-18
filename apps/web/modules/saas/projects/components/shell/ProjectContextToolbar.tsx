@@ -4,11 +4,18 @@ import { Button } from "@ui/components/button";
 import { cn } from "@ui/lib";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getContextActions, getCurrentRouteSegment } from "./constants";
+import { getContextActions } from "./constants";
+import { useProjectRole } from "../../hooks/use-project-role";
 
 interface ProjectContextToolbarProps {
 	organizationSlug: string;
 	projectId: string;
+}
+
+// Map context action routes to their parent section for visibility checks
+function getActionSection(href: string): string {
+	const parts = href.split("/");
+	return parts[0] ?? "";
 }
 
 export function ProjectContextToolbar({
@@ -18,15 +25,21 @@ export function ProjectContextToolbar({
 	const pathname = usePathname();
 	const basePath = `/app/${organizationSlug}/projects/${projectId}`;
 	const actions = getContextActions(pathname);
+	const { canViewSection } = useProjectRole();
 
-	// Don't render if no actions
-	if (actions.length === 0) {
+	// Filter actions based on role visibility
+	const visibleActions = actions.filter((action) => {
+		const section = getActionSection(action.href);
+		return canViewSection(section);
+	});
+
+	if (visibleActions.length === 0) {
 		return null;
 	}
 
 	return (
-		<div className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50/50 px-4 py-2.5 dark:border-slate-800 dark:bg-slate-900/50">
-			{actions.map((action) => (
+		<div className="flex flex-wrap items-center gap-2 border-b border-slate-200/50 dark:border-slate-800/50 bg-white/50 dark:bg-slate-900/30 backdrop-blur-sm px-4 py-2.5">
+			{visibleActions.map((action) => (
 				<Button
 					key={action.id}
 					variant={action.variant === "primary" ? "primary" : "outline"}

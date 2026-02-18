@@ -10,6 +10,7 @@ import {
 	AlertCircleIcon,
 	ClockIcon,
 } from "lucide-react";
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
 interface SharePageProps {
@@ -133,10 +134,13 @@ export default async function SharePage({ params }: SharePageProps) {
 							{(resource.data as unknown as { url: string; caption?: string }[]).map(
 								(photo, index) => (
 									<div key={index} className="relative aspect-square">
-										<img
+										<Image
 											src={photo.url}
 											alt={photo.caption || `Photo ${index + 1}`}
-											className="w-full h-full object-cover rounded-lg"
+											fill
+											sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+											className="object-cover rounded-lg"
+											unoptimized
 										/>
 									</div>
 								),

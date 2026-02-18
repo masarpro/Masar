@@ -1,3 +1,15 @@
 {
-	"extends": "@repo/tsconfig/base.json"
+	"extends": "@repo/tsconfig/base.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"allowJs": false
+	},
+	"exclude": [
+		"node_modules",
+		"dist",
+		".next",
+		"build",
+		"apps/web/postcss.config.cjs",
+		"packages/database/fix-zod-import.js"
+	]
 }

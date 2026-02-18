@@ -397,29 +397,34 @@ export async function getFieldTimeline(
 
 	// Combine and sort by createdAt
 	interface TimelineItem {
-		type: "report" | "photo" | "issue" | "progress";
+		id: string;
+		type: "DAILY_REPORT" | "PHOTO" | "ISSUE" | "PROGRESS_UPDATE";
 		data: Record<string, unknown>;
 		createdAt: Date;
 	}
 
 	const timeline: TimelineItem[] = [
-		...reports.map((r: { createdAt: Date; [key: string]: unknown }) => ({
-			type: "report" as const,
+		...reports.map((r: { id: string; createdAt: Date; [key: string]: unknown }) => ({
+			id: r.id,
+			type: "DAILY_REPORT" as const,
 			data: r as Record<string, unknown>,
 			createdAt: r.createdAt,
 		})),
-		...photos.map((p: { createdAt: Date; [key: string]: unknown }) => ({
-			type: "photo" as const,
+		...photos.map((p: { id: string; createdAt: Date; [key: string]: unknown }) => ({
+			id: p.id,
+			type: "PHOTO" as const,
 			data: p as Record<string, unknown>,
 			createdAt: p.createdAt,
 		})),
-		...issues.map((i: { createdAt: Date; [key: string]: unknown }) => ({
-			type: "issue" as const,
+		...issues.map((i: { id: string; createdAt: Date; [key: string]: unknown }) => ({
+			id: i.id,
+			type: "ISSUE" as const,
 			data: i as Record<string, unknown>,
 			createdAt: i.createdAt,
 		})),
-		...progressUpdates.map((u: { createdAt: Date; [key: string]: unknown }) => ({
-			type: "progress" as const,
+		...progressUpdates.map((u: { id: string; createdAt: Date; [key: string]: unknown }) => ({
+			id: u.id,
+			type: "PROGRESS_UPDATE" as const,
 			data: u as Record<string, unknown>,
 			createdAt: u.createdAt,
 		})),

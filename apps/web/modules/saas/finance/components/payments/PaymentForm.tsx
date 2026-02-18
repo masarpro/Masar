@@ -28,6 +28,7 @@ interface PaymentFormProps {
 	defaultClientId?: string;
 	defaultProjectId?: string;
 	defaultInvoiceId?: string;
+	redirectPath?: string;
 }
 
 const PAYMENT_METHODS = [
@@ -44,6 +45,7 @@ export function PaymentForm({
 	defaultClientId,
 	defaultProjectId,
 	defaultInvoiceId,
+	redirectPath,
 }: PaymentFormProps) {
 	const t = useTranslations();
 	const router = useRouter();
@@ -133,7 +135,7 @@ export function PaymentForm({
 			toast.success(t("finance.payments.createSuccess"));
 			queryClient.invalidateQueries({ queryKey: ["finance", "orgPayments"] });
 			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
-			router.push(`/app/${organizationSlug}/finance/payments`);
+			router.push(redirectPath || `/app/${organizationSlug}/finance/payments`);
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.payments.createError"));
@@ -383,37 +385,76 @@ export function PaymentForm({
 				</CardContent>
 			</Card>
 
-			{/* Project & Invoice Link */}
-			<Card className="rounded-2xl">
-				<CardHeader>
-					<CardTitle className="flex items-center gap-2">
-						<FileText className="h-5 w-5" />
-						{t("finance.payments.linkToProject")}
-					</CardTitle>
-				</CardHeader>
-				<CardContent className="space-y-6">
-					<div className="grid gap-6 sm:grid-cols-2">
-						<div>
-							<Label>{t("finance.payments.selectProject")}</Label>
-							<Select
-								value={formData.projectId || "none"}
-								onValueChange={(value) =>
-									setFormData({ ...formData, projectId: value === "none" ? "" : value })
-								}
-							>
-								<SelectTrigger className="rounded-xl mt-1">
-									<SelectValue placeholder={t("finance.payments.selectProjectPlaceholder")} />
-								</SelectTrigger>
-								<SelectContent className="rounded-xl">
-									<SelectItem value="none">{t("finance.payments.noProject")}</SelectItem>
-									{projects.map((project) => (
-										<SelectItem key={project.id} value={project.id}>
-											{project.name}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
+			{/* Project & Invoice Link - hidden when defaultProjectId is set */}
+			{!defaultProjectId ? (
+				<Card className="rounded-2xl">
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2">
+							<FileText className="h-5 w-5" />
+							{t("finance.payments.linkToProject")}
+						</CardTitle>
+					</CardHeader>
+					<CardContent className="space-y-6">
+						<div className="grid gap-6 sm:grid-cols-2">
+							<div>
+								<Label>{t("finance.payments.selectProject")}</Label>
+								<Select
+									value={formData.projectId || "none"}
+									onValueChange={(value) =>
+										setFormData({ ...formData, projectId: value === "none" ? "" : value })
+									}
+								>
+									<SelectTrigger className="rounded-xl mt-1">
+										<SelectValue placeholder={t("finance.payments.selectProjectPlaceholder")} />
+									</SelectTrigger>
+									<SelectContent className="rounded-xl">
+										<SelectItem value="none">{t("finance.payments.noProject")}</SelectItem>
+										{projects.map((project) => (
+											<SelectItem key={project.id} value={project.id}>
+												{project.name}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+							<div>
+								<Label>{t("finance.payments.selectInvoice")}</Label>
+								<Select
+									value={formData.invoiceId || "none"}
+									onValueChange={(value) =>
+										setFormData({ ...formData, invoiceId: value === "none" ? "" : value })
+									}
+								>
+									<SelectTrigger className="rounded-xl mt-1">
+										<SelectValue placeholder={t("finance.payments.selectInvoicePlaceholder")} />
+									</SelectTrigger>
+									<SelectContent className="rounded-xl">
+										<SelectItem value="none">{t("finance.payments.noInvoice")}</SelectItem>
+										{invoices.map((invoice) => (
+											<SelectItem key={invoice.id} value={invoice.id}>
+												<span className="inline-flex items-center gap-1">
+													{invoice.invoiceNo} - <Currency amount={Number(invoice.totalAmount)} />
+												</span>
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
 						</div>
+						<p className="text-sm text-slate-500">
+							{t("finance.payments.projectLinkHint")}
+						</p>
+					</CardContent>
+				</Card>
+			) : (
+				<Card className="rounded-2xl">
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2">
+							<FileText className="h-5 w-5" />
+							{t("finance.payments.linkToProject")}
+						</CardTitle>
+					</CardHeader>
+					<CardContent className="space-y-6">
 						<div>
 							<Label>{t("finance.payments.selectInvoice")}</Label>
 							<Select
@@ -437,12 +478,9 @@ export function PaymentForm({
 								</SelectContent>
 							</Select>
 						</div>
-					</div>
-					<p className="text-sm text-slate-500">
-						{t("finance.payments.projectLinkHint")}
-					</p>
-				</CardContent>
-			</Card>
+					</CardContent>
+				</Card>
+			)}
 
 			{/* Notes */}
 			<Card className="rounded-2xl">

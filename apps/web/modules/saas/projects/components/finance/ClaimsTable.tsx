@@ -104,7 +104,7 @@ export function ClaimsTable({
 }: ClaimsTableProps) {
 	const t = useTranslations();
 	const queryClient = useQueryClient();
-	const basePath = `/app/${organizationSlug}/projects/${projectId}/finance`;
+	const basePath = `/app/${organizationSlug}/projects/${projectId}/finance/claims`;
 
 	const updateStatusMutation = useMutation({
 		...orpc.projectFinance.updateClaimStatus.mutationOptions(),
@@ -140,7 +140,7 @@ export function ClaimsTable({
 					{t("finance.claims.empty")}
 				</p>
 				<Button asChild className="rounded-xl">
-					<Link href={`${basePath}/new-claim`}>
+					<Link href={`${basePath}/new`}>
 						<Plus className="me-2 h-4 w-4" />
 						{t("finance.claims.new")}
 					</Link>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@ui/components/badge";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 interface PhotoGridProps {
@@ -40,11 +41,14 @@ export function PhotoGrid({ photos }: PhotoGridProps) {
 				const id = photo.id as string;
 
 				return (
-					<div key={id} className="group relative overflow-hidden rounded-xl">
-						<img
+					<div key={id} className="group relative aspect-square overflow-hidden rounded-xl">
+						<Image
 							src={url}
 							alt={caption || t("projects.field.photo")}
-							className="aspect-square w-full object-cover transition-transform group-hover:scale-105"
+							fill
+							sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+							className="object-cover transition-transform group-hover:scale-105"
+							unoptimized
 						/>
 						<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 						<div className="absolute bottom-0 left-0 right-0 p-2 opacity-0 transition-opacity group-hover:opacity-100">

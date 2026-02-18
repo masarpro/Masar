@@ -56,6 +56,8 @@ import { Currency } from "../shared/Currency";
 interface PaymentsListProps {
 	organizationId: string;
 	organizationSlug: string;
+	projectId?: string;
+	basePath?: string;
 }
 
 const PAYMENT_METHODS = [
@@ -69,6 +71,8 @@ const PAYMENT_METHODS = [
 export function PaymentsList({
 	organizationId,
 	organizationSlug,
+	projectId,
+	basePath: customBasePath,
 }: PaymentsListProps) {
 	const t = useTranslations();
 	const router = useRouter();
@@ -78,12 +82,15 @@ export function PaymentsList({
 	const [searchQuery, setSearchQuery] = useState("");
 	const [deletePaymentId, setDeletePaymentId] = useState<string | null>(null);
 
+	const effectiveBasePath = customBasePath || `/app/${organizationSlug}/finance/payments`;
+
 	// Fetch payments
 	const { data, isLoading } = useQuery(
 		orpc.finance.orgPayments.list.queryOptions({
 			input: {
 				organizationId,
 				query: searchQuery || undefined,
+				projectId,
 			},
 		}),
 	);
@@ -200,7 +207,7 @@ export function PaymentsList({
 									<TableHead>{t("finance.payments.paymentNo")}</TableHead>
 									<TableHead>{t("finance.payments.date")}</TableHead>
 									<TableHead>{t("finance.payments.client")}</TableHead>
-									<TableHead>{t("finance.payments.project")}</TableHead>
+									{!projectId && <TableHead>{t("finance.payments.project")}</TableHead>}
 									<TableHead>{t("finance.payments.method")}</TableHead>
 									<TableHead>{t("finance.payments.account")}</TableHead>
 									<TableHead>{t("finance.payments.status")}</TableHead>
@@ -235,9 +242,11 @@ export function PaymentsList({
 												</span>
 											</div>
 										</TableCell>
-										<TableCell>
-											{payment.project?.name || <span className="text-slate-400">-</span>}
-										</TableCell>
+										{!projectId && (
+											<TableCell>
+												{payment.project?.name || <span className="text-slate-400">-</span>}
+											</TableCell>
+										)}
 										<TableCell>
 											<Badge className={`rounded-lg ${getPaymentMethodColor(payment.paymentMethod)}`}>
 												{getPaymentMethodLabel(payment.paymentMethod)}
@@ -270,7 +279,7 @@ export function PaymentsList({
 													<DropdownMenuItem
 														onClick={() =>
 															router.push(
-																`/app/${organizationSlug}/finance/payments/${payment.id}`,
+																`${effectiveBasePath}/${payment.id}`,
 															)
 														}
 													>
@@ -280,7 +289,7 @@ export function PaymentsList({
 													<DropdownMenuItem
 														onClick={() =>
 															router.push(
-																`/app/${organizationSlug}/finance/payments/${payment.id}/receipt`,
+																`${effectiveBasePath}/${payment.id}/receipt`,
 															)
 														}
 													>
@@ -290,7 +299,7 @@ export function PaymentsList({
 													<DropdownMenuItem
 														onClick={() =>
 															router.push(
-																`/app/${organizationSlug}/finance/payments/${payment.id}`,
+																`${effectiveBasePath}/${payment.id}`,
 															)
 														}
 													>

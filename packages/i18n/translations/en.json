@@ -247,7 +247,8 @@
 		"medium": "Medium",
 		"large": "Large",
 		"viewAll": "View All",
-		"completed": "Completed"
+		"completed": "Completed",
+		"hidden": "Hidden"
 	},
 	"contact": {
 		"description": "We are here to help you. Please use the form below to get in touch with us.",
@@ -546,6 +547,7 @@
 	"projects": {
 		"title": "Projects",
 		"subtitle": "Manage your construction projects",
+		"greeting": "Welcome",
 		"newProject": "New Project",
 		"newProjectSubtitle": "Add a new project to track",
 		"projectDetails": "Project Details",
@@ -615,7 +617,20 @@
 			"insights": "Smart Alerts",
 			"officialUpdates": "Official Updates",
 			"timeline": "Timeline",
-			"changeOrders": "Change Orders"
+			"changeOrders": "Change Orders",
+			"collected": "Collected",
+			"cashFlow": "Cash Flow",
+			"expenseDistribution": "Expense Distribution",
+			"noFinancialData": "No financial data yet",
+			"noExpenseData": "No expenses yet",
+			"projectPhotos": "Project Photos",
+			"noPhotosYet": "No photos yet",
+			"lastUpdate": "Last update",
+			"photos": "photos",
+			"minutesAgo": "{count} min ago",
+			"hoursAgo": "{count} hours ago",
+			"yesterday": "Yesterday",
+			"daysAgo": "{count} days ago"
 		},
 		"field": {
 			"title": "Field Execution",
@@ -663,6 +678,8 @@
 			"captionPlaceholder": "Add a caption...",
 			"addPhoto": "Add Photo",
 			"photo": "Photo",
+			"issue": "Issue",
+			"progressUpdate": "Progress Update",
 			"photoCategory": {
 				"PROGRESS": "Progress",
 				"ISSUE": "Issue",
@@ -845,7 +862,43 @@
 			"timeline": "Timeline",
 			"chat": "Chat",
 			"lastReport": "Last Report",
-			"viewAll": "View All"
+			"viewAll": "View All",
+			"noRecentActivity": "No recent activity",
+			"upcomingDeadlines": "Upcoming Deadlines",
+			"noDeadlines": "No upcoming deadlines",
+			"nav": {
+				"field": "Field Execution",
+				"fieldNew": "New Report",
+				"finance": "Finance",
+				"financeNew": "New Expense",
+				"documents": "Documents",
+				"documentsNew": "New Document",
+				"timeline": "Timeline",
+				"timelineNew": "New Milestone"
+			}
+		},
+		"viewAs": {
+			"button": "View As",
+			"default": "Default",
+			"exit": "Exit Preview",
+			"previewMode": "Preview Mode"
+		},
+		"sections": {
+			"overview": "Overview",
+			"field": "Field Execution",
+			"supervisor": "Supervisor Mode",
+			"finance": "Finance",
+			"finance_expenses": "Expenses",
+			"finance_payments": "Payments",
+			"finance_claims": "Claims",
+			"timeline": "Timeline",
+			"changes": "Change Orders",
+			"documents": "Documents",
+			"chat": "Chat",
+			"updates": "Official Updates",
+			"owner": "Owner Portal",
+			"insights": "Insights",
+			"team": "Team"
 		},
 		"team": {
 			"title": "Project Team",
@@ -878,7 +931,8 @@
 				"SUPERVISOR": "Can add field reports and photos",
 				"ACCOUNTANT": "Can manage financial aspects",
 				"VIEWER": "View-only access to the project"
-			}
+			},
+			"rolePermissions": "Role Permissions"
 		}
 	},
 	"notifications": {
@@ -1725,76 +1779,6 @@
 			"progressUpdated": "Progress updated"
 		}
 	},
-	"finance": {
-		"title": "Finance",
-		"subtitle": "Manage project expenses and claims",
-		"summary": {
-			"contractValue": "Contract Value",
-			"expenses": "Actual Expenses",
-			"remaining": "Remaining",
-			"claimsPaid": "Claims Paid"
-		},
-		"claims": {
-			"title": "Claims",
-			"new": "New Claim",
-			"newSubtitle": "Create a new project claim",
-			"claimNo": "Claim No.",
-			"period": "Period",
-			"periodStart": "Period Start",
-			"periodEnd": "Period End",
-			"amount": "Amount",
-			"dueDate": "Due Date",
-			"status": "Status",
-			"note": "Notes",
-			"notePlaceholder": "Add optional notes...",
-			"create": "Create Claim",
-			"empty": "No claims yet"
-		},
-		"expenses": {
-			"title": "Expenses",
-			"new": "Add Expense",
-			"newSubtitle": "Record a new project expense",
-			"date": "Date",
-			"category": "Category",
-			"selectCategory": "Select category",
-			"allCategories": "All Categories",
-			"filterByCategory": "Filter by category",
-			"amount": "Amount",
-			"vendor": "Vendor",
-			"vendorPlaceholder": "Enter vendor name",
-			"note": "Notes",
-			"notePlaceholder": "Add optional notes...",
-			"create": "Add Expense",
-			"empty": "No expenses yet"
-		},
-		"status": {
-			"DRAFT": "Draft",
-			"SUBMITTED": "Submitted",
-			"APPROVED": "Approved",
-			"PAID": "Paid",
-			"REJECTED": "Rejected"
-		},
-		"category": {
-			"MATERIALS": "Materials",
-			"LABOR": "Labor",
-			"EQUIPMENT": "Equipment",
-			"SUBCONTRACTOR": "Subcontractor",
-			"TRANSPORT": "Transport",
-			"MISC": "Miscellaneous"
-		},
-		"validation": {
-			"requiredFields": "Please fill in all required fields",
-			"amountRequired": "Amount is required"
-		},
-		"notifications": {
-			"expenseCreated": "Expense added successfully",
-			"expenseCreateError": "Failed to add expense",
-			"claimCreated": "Claim created successfully",
-			"claimCreateError": "Failed to create claim",
-			"statusUpdated": "Status updated successfully",
-			"statusUpdateError": "Failed to update status"
-		}
-	},
 	"changeOrders": {
 		"title": "Change Orders",
 		"subtitle": "Manage project change orders",
@@ -2200,6 +2184,7 @@
 			"warrantyTermsPlaceholder": "e.g., 1 year warranty on all work",
 			"notes": "Notes",
 			"notesPlaceholder": "Add any additional notes",
+			"customFields": "Custom Template Fields",
 			"notFound": "Quotation not found",
 			"taxNumber": "Tax Number",
 			"createSuccess": "Quotation created successfully",
@@ -2524,12 +2509,28 @@
 					"layout": "Header Layout",
 					"showThankYouMessage": "Show Thank You Message",
 					"showYear": "Show Year",
-					"showZatcaCompliance": "Show ZATCA Compliance"
+					"showZatcaCompliance": "Show ZATCA Compliance",
+					"textLabel": "Field Label",
+					"textLabelPlaceholder": "Example: Special Notes",
+					"textPlaceholder": "Placeholder text for user",
+					"textPlaceholderHint": "Shown when creating quotation",
+					"defaultContent": "Default Content",
+					"defaultContentPlaceholder": "Text shown if user doesn't enter anything",
+					"isEditable": "Editable when creating"
 				},
 				"layouts": {
 					"modern": "Modern",
 					"classic": "Classic",
 					"minimal": "Minimal"
+				},
+				"actions": {
+					"moveUp": "Move Up",
+					"moveDown": "Move Down",
+					"increaseHeight": "Increase Height",
+					"decreaseHeight": "Decrease Height",
+					"hide": "Hide Element",
+					"show": "Show Element",
+					"delete": "Delete Element"
 				}
 			},
 			"preview": {
@@ -2690,6 +2691,7 @@
 		"banks": {
 			"title": "Bank Accounts",
 			"subtitle": "Manage bank accounts and cash boxes",
+			"addBank": "Add Bank",
 			"description": "Manage all bank accounts and cash boxes",
 			"create": "Add Account",
 			"createSubtitle": "Add a new bank account or cash box",
@@ -2757,10 +2759,17 @@
 		"expenses": {
 			"title": "Expenses",
 			"subtitle": "Manage organization expenses",
+			"newSubtitle": "Record a new project expense",
 			"description": "Record and track all organization expenses",
 			"new": "Add Expense",
 			"create": "Add Expense",
 			"createSubtitle": "Record a new expense",
+			"selectCategory": "Select category",
+			"allCategories": "All Categories",
+			"vendorPlaceholder": "Enter vendor name",
+			"note": "Notes",
+			"notePlaceholder": "Add optional notes...",
+			"empty": "No expenses yet",
 			"edit": "Edit Expense",
 			"details": "Expense Details",
 			"basicInfo": "Basic Information",
@@ -2845,6 +2854,7 @@
 			"title": "Payments",
 			"subtitle": "Manage payments and receipts",
 			"description": "Record payments received from clients",
+			"new": "Add Payment",
 			"create": "Add Payment",
 			"createSubtitle": "Record a new payment from a client",
 			"edit": "Edit Payment",
@@ -3128,7 +3138,61 @@
 			"vat": "VAT",
 			"total": "Total",
 			"calculation": "Calculation",
-			"itemsDiscount": "Items Discount"
+			"itemsDiscount": "Items Discount",
+			"contractValue": "Contract Value",
+			"expenses": "Actual Expenses",
+			"remaining": "Remaining",
+			"claimsPaid": "Claims Paid",
+			"payments": "Payments"
+		},
+		"nav": {
+			"summary": "Summary",
+			"expensesDescription": "Project expenses from unified finance system",
+			"paymentsDescription": "Project payments from unified finance system",
+			"claimsDescription": "Financial claims and milestones"
+		},
+		"claims": {
+			"title": "Claims",
+			"new": "New Claim",
+			"newSubtitle": "Create a new project claim",
+			"claimNo": "Claim No.",
+			"period": "Period",
+			"periodStart": "Period Start",
+			"periodEnd": "Period End",
+			"amount": "Amount",
+			"dueDate": "Due Date",
+			"status": "Status",
+			"note": "Notes",
+			"notePlaceholder": "Add optional notes...",
+			"create": "Create Claim",
+			"empty": "No claims yet"
+		},
+		"status": {
+			"DRAFT": "Draft",
+			"SUBMITTED": "Submitted",
+			"APPROVED": "Approved",
+			"PAID": "Paid",
+			"REJECTED": "Rejected"
+		},
+		"category": {
+			"MATERIALS": "Materials",
+			"LABOR": "Labor",
+			"EQUIPMENT": "Equipment",
+			"SUBCONTRACTOR": "Subcontractor",
+			"TRANSPORT": "Transport",
+			"MISC": "Miscellaneous"
+		},
+		"validation": {
+			"requiredFields": "Please fill in all required fields",
+			"amountRequired": "Amount is required"
+		},
+		"notifications": {
+			"expenseCreated": "Expense added successfully",
+			"expenseCreateError": "Failed to add expense",
+			"claimCreated": "Claim created successfully",
+			"claimCreateError": "Failed to create claim",
+			"statusUpdated": "Status updated successfully",
+			"statusUpdateError": "Failed to update status"
 		},
 		"zatca": {
 			"title": "ZATCA Compliance",

@@ -249,7 +249,8 @@
 		"medium": "متوسط",
 		"large": "كبير",
 		"viewAll": "عرض الكل",
-		"completed": "مكتمل"
+		"completed": "مكتمل",
+		"hidden": "مخفي"
 	},
 	"contact": {
 		"description": "نحن هنا لمساعدتك. يرجى استخدام النموذج أدناه للتواصل معنا.",
@@ -548,6 +549,7 @@
 	"projects": {
 		"title": "المشاريع",
 		"subtitle": "إدارة مشاريع المقاولات",
+		"greeting": "مرحباً بك",
 		"newProject": "مشروع جديد",
 		"newProjectSubtitle": "أضف مشروع جديد لمتابعته",
 		"projectDetails": "تفاصيل المشروع",
@@ -617,7 +619,20 @@
 			"insights": "التنبيهات الذكية",
 			"officialUpdates": "التحديثات الرسمية",
 			"timeline": "الجدول الزمني",
-			"changeOrders": "أوامر التغيير"
+			"changeOrders": "أوامر التغيير",
+			"collected": "المحصّل",
+			"cashFlow": "التدفق المالي",
+			"expenseDistribution": "توزيع المصروفات",
+			"noFinancialData": "لا توجد بيانات مالية بعد",
+			"noExpenseData": "لا توجد مصروفات بعد",
+			"projectPhotos": "صور المشروع",
+			"noPhotosYet": "لا توجد صور بعد",
+			"lastUpdate": "آخر تحديث",
+			"photos": "صورة",
+			"minutesAgo": "منذ {count} دقيقة",
+			"hoursAgo": "منذ {count} ساعة",
+			"yesterday": "أمس",
+			"daysAgo": "منذ {count} يوم"
 		},
 		"field": {
 			"title": "التنفيذ الميداني",
@@ -665,6 +680,8 @@
 			"captionPlaceholder": "أضف وصفاً للصورة...",
 			"addPhoto": "إضافة الصورة",
 			"photo": "صورة",
+			"issue": "مشكلة",
+			"progressUpdate": "تحديث تقدم",
 			"photoCategory": {
 				"PROGRESS": "تقدم العمل",
 				"ISSUE": "مشكلة",
@@ -847,7 +864,43 @@
 			"timeline": "الجدول الزمني",
 			"chat": "المحادثات",
 			"lastReport": "آخر تقرير",
-			"viewAll": "عرض الكل"
+			"viewAll": "عرض الكل",
+			"noRecentActivity": "لا توجد أنشطة حديثة",
+			"upcomingDeadlines": "المواعيد القادمة",
+			"noDeadlines": "لا توجد مواعيد قادمة",
+			"nav": {
+				"field": "التنفيذ الميداني",
+				"fieldNew": "تقرير جديد",
+				"finance": "المالية",
+				"financeNew": "مصروف جديد",
+				"documents": "الوثائق",
+				"documentsNew": "وثيقة جديدة",
+				"timeline": "الجدول الزمني",
+				"timelineNew": "مرحلة جديدة"
+			}
+		},
+		"viewAs": {
+			"button": "العرض كـ",
+			"default": "افتراضي",
+			"exit": "إنهاء المعاينة",
+			"previewMode": "وضع المعاينة"
+		},
+		"sections": {
+			"overview": "نظرة عامة",
+			"field": "التنفيذ الميداني",
+			"supervisor": "وضع المشرف",
+			"finance": "المالية",
+			"finance_expenses": "المصروفات",
+			"finance_payments": "المقبوضات",
+			"finance_claims": "المستخلصات",
+			"timeline": "الجدول الزمني",
+			"changes": "أوامر التغيير",
+			"documents": "الوثائق",
+			"chat": "المحادثات",
+			"updates": "التحديثات الرسمية",
+			"owner": "بوابة المالك",
+			"insights": "التحليلات",
+			"team": "فريق العمل"
 		},
 		"team": {
 			"title": "فريق المشروع",
@@ -880,7 +933,8 @@
 				"SUPERVISOR": "يمكنه إضافة التقارير الميدانية والصور",
 				"ACCOUNTANT": "يمكنه إدارة الجوانب المالية",
 				"VIEWER": "يمكنه عرض المشروع فقط"
-			}
+			},
+			"rolePermissions": "صلاحيات الأدوار"
 		}
 	},
 	"notifications": {
@@ -1747,76 +1801,6 @@
 			"progressUpdated": "تم تحديث التقدم"
 		}
 	},
-	"finance": {
-		"title": "المالية",
-		"subtitle": "إدارة مصروفات ومستخلصات المشروع",
-		"summary": {
-			"contractValue": "قيمة العقد",
-			"expenses": "المصروفات الفعلية",
-			"remaining": "المتبقي",
-			"claimsPaid": "المستخلصات المدفوعة"
-		},
-		"claims": {
-			"title": "المستخلصات",
-			"new": "مستخلص جديد",
-			"newSubtitle": "إنشاء مستخلص جديد للمشروع",
-			"claimNo": "رقم المستخلص",
-			"period": "الفترة",
-			"periodStart": "بداية الفترة",
-			"periodEnd": "نهاية الفترة",
-			"amount": "المبلغ",
-			"dueDate": "تاريخ الاستحقاق",
-			"status": "الحالة",
-			"note": "ملاحظات",
-			"notePlaceholder": "أضف ملاحظات اختيارية...",
-			"create": "إنشاء المستخلص",
-			"empty": "لا توجد مستخلصات"
-		},
-		"expenses": {
-			"title": "المصاريف",
-			"new": "إضافة مصروف",
-			"newSubtitle": "تسجيل مصروف جديد للمشروع",
-			"date": "التاريخ",
-			"category": "الفئة",
-			"selectCategory": "اختر الفئة",
-			"allCategories": "جميع الفئات",
-			"filterByCategory": "تصفية حسب الفئة",
-			"amount": "المبلغ",
-			"vendor": "المورد",
-			"vendorPlaceholder": "أدخل اسم المورد",
-			"note": "ملاحظات",
-			"notePlaceholder": "أضف ملاحظات اختيارية...",
-			"create": "إضافة المصروف",
-			"empty": "لا توجد مصاريف"
-		},
-		"status": {
-			"DRAFT": "مسودة",
-			"SUBMITTED": "مقدم",
-			"APPROVED": "معتمد",
-			"PAID": "مدفوع",
-			"REJECTED": "مرفوض"
-		},
-		"category": {
-			"MATERIALS": "مواد",
-			"LABOR": "عمالة",
-			"EQUIPMENT": "معدات",
-			"SUBCONTRACTOR": "مقاول من الباطن",
-			"TRANSPORT": "نقل",
-			"MISC": "متنوعة"
-		},
-		"validation": {
-			"requiredFields": "يرجى ملء جميع الحقول المطلوبة",
-			"amountRequired": "المبلغ مطلوب"
-		},
-		"notifications": {
-			"expenseCreated": "تم إضافة المصروف بنجاح",
-			"expenseCreateError": "فشل إضافة المصروف",
-			"claimCreated": "تم إنشاء المستخلص بنجاح",
-			"claimCreateError": "فشل إنشاء المستخلص",
-			"statusUpdated": "تم تحديث الحالة بنجاح",
-			"statusUpdateError": "فشل تحديث الحالة"
-		}
-	},
 	"changeOrders": {
 		"title": "أوامر التغيير",
 		"subtitle": "إدارة أوامر التغيير للمشروع",
@@ -2156,6 +2140,7 @@
 			"warrantyTermsPlaceholder": "مثال: ضمان سنة على الأعمال",
 			"notes": "ملاحظات",
 			"notesPlaceholder": "أضف أي ملاحظات إضافية",
+			"customFields": "حقول القالب المخصصة",
 			"save": "حفظ عرض السعر",
 			"createSuccess": "تم إنشاء عرض السعر بنجاح",
 			"createError": "حدث خطأ أثناء إنشاء عرض السعر",
@@ -2422,12 +2407,28 @@
 					"layout": "تخطيط الرأس",
 					"showThankYouMessage": "إظهار رسالة الشكر",
 					"showYear": "إظهار السنة",
-					"showZatcaCompliance": "إظهار التوافق مع هيئة الزكاة"
+					"showZatcaCompliance": "إظهار التوافق مع هيئة الزكاة",
+					"textLabel": "عنوان الحقل",
+					"textLabelPlaceholder": "مثال: ملاحظات خاصة",
+					"textPlaceholder": "نص توضيحي للمستخدم",
+					"textPlaceholderHint": "يظهر عند إنشاء عرض السعر",
+					"defaultContent": "المحتوى الافتراضي",
+					"defaultContentPlaceholder": "النص الذي سيظهر إذا لم يدخل المستخدم شيئاً",
+					"isEditable": "قابل للتعديل عند الإنشاء"
 				},
 				"layouts": {
 					"modern": "عصري",
 					"classic": "كلاسيكي",
 					"minimal": "بسيط"
+				},
+				"actions": {
+					"moveUp": "تحريك للأعلى",
+					"moveDown": "تحريك للأسفل",
+					"increaseHeight": "زيادة الارتفاع",
+					"decreaseHeight": "تقليل الارتفاع",
+					"hide": "إخفاء العنصر",
+					"show": "إظهار العنصر",
+					"delete": "حذف العنصر"
 				}
 			},
 			"preview": {
@@ -2565,6 +2566,7 @@
 		"banks": {
 			"title": "الحسابات البنكية",
 			"subtitle": "إدارة الحسابات البنكية والصندوق النقدي",
+			"addBank": "إضافة بنك",
 			"description": "إدارة جميع الحسابات البنكية وصناديق النقد",
 			"create": "إضافة حساب",
 			"createSubtitle": "إضافة حساب بنكي أو صندوق نقدي جديد",
@@ -2632,10 +2634,17 @@
 		"expenses": {
 			"title": "المصروفات",
 			"subtitle": "إدارة مصروفات المؤسسة",
+			"newSubtitle": "تسجيل مصروف جديد للمشروع",
 			"description": "تسجيل ومتابعة جميع مصروفات المؤسسة",
 			"new": "إضافة مصروف",
 			"create": "إضافة مصروف",
 			"createSubtitle": "تسجيل مصروف جديد",
+			"selectCategory": "اختر الفئة",
+			"allCategories": "جميع الفئات",
+			"vendorPlaceholder": "أدخل اسم المورد",
+			"note": "ملاحظات",
+			"notePlaceholder": "أضف ملاحظات اختيارية...",
+			"empty": "لا توجد مصاريف",
 			"edit": "تعديل المصروف",
 			"details": "تفاصيل المصروف",
 			"basicInfo": "المعلومات الأساسية",
@@ -2720,6 +2729,7 @@
 			"title": "المقبوضات",
 			"subtitle": "إدارة المقبوضات وسندات القبض",
 			"description": "تسجيل الدفعات المستلمة من العملاء",
+			"new": "إضافة مقبوض",
 			"create": "إضافة مقبوض",
 			"createSubtitle": "تسجيل دفعة جديدة من عميل",
 			"edit": "تعديل المقبوض",
@@ -2996,7 +3006,61 @@
 			"vat": "ضريبة القيمة المضافة",
 			"total": "الإجمالي",
 			"calculation": "الحساب",
-			"itemsDiscount": "خصم البنود"
+			"itemsDiscount": "خصم البنود",
+			"contractValue": "قيمة العقد",
+			"expenses": "المصروفات الفعلية",
+			"remaining": "المتبقي",
+			"claimsPaid": "المستخلصات المدفوعة",
+			"payments": "المقبوضات"
+		},
+		"nav": {
+			"summary": "الملخص",
+			"expensesDescription": "مصروفات المشروع من النظام المالي الموحد",
+			"paymentsDescription": "مقبوضات المشروع من النظام المالي الموحد",
+			"claimsDescription": "المستخلصات والمطالبات المالية"
+		},
+		"claims": {
+			"title": "المستخلصات",
+			"new": "مستخلص جديد",
+			"newSubtitle": "إنشاء مستخلص جديد للمشروع",
+			"claimNo": "رقم المستخلص",
+			"period": "الفترة",
+			"periodStart": "بداية الفترة",
+			"periodEnd": "نهاية الفترة",
+			"amount": "المبلغ",
+			"dueDate": "تاريخ الاستحقاق",
+			"status": "الحالة",
+			"note": "ملاحظات",
+			"notePlaceholder": "أضف ملاحظات اختيارية...",
+			"create": "إنشاء المستخلص",
+			"empty": "لا توجد مستخلصات"
+		},
+		"status": {
+			"DRAFT": "مسودة",
+			"SUBMITTED": "مقدم",
+			"APPROVED": "معتمد",
+			"PAID": "مدفوع",
+			"REJECTED": "مرفوض"
+		},
+		"category": {
+			"MATERIALS": "مواد",
+			"LABOR": "عمالة",
+			"EQUIPMENT": "معدات",
+			"SUBCONTRACTOR": "مقاول من الباطن",
+			"TRANSPORT": "نقل",
+			"MISC": "متنوعة"
+		},
+		"validation": {
+			"requiredFields": "يرجى ملء جميع الحقول المطلوبة",
+			"amountRequired": "المبلغ مطلوب"
+		},
+		"notifications": {
+			"expenseCreated": "تم إضافة المصروف بنجاح",
+			"expenseCreateError": "فشل إضافة المصروف",
+			"claimCreated": "تم إنشاء المستخلص بنجاح",
+			"claimCreateError": "فشل إنشاء المستخلص",
+			"statusUpdated": "تم تحديث الحالة بنجاح",
+			"statusUpdateError": "فشل تحديث الحالة"
 		},
 		"actions": {
 			"preview": "معاينة",

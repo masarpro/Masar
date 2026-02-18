@@ -1,3 +1,4 @@
+import "../fumadocs.css";
 import { Footer } from "@marketing/shared/components/Footer";
 import { NavBar } from "@marketing/shared/components/NavBar";
 import { config } from "@repo/config";

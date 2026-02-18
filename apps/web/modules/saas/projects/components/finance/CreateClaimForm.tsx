@@ -27,7 +27,7 @@ export function CreateClaimForm({
 	const t = useTranslations();
 	const router = useRouter();
 	const queryClient = useQueryClient();
-	const basePath = `/app/${organizationSlug}/projects/${projectId}/finance`;
+	const basePath = `/app/${organizationSlug}/projects/${projectId}/finance/claims`;
 
 	const [periodStart, setPeriodStart] = useState("");
 	const [periodEnd, setPeriodEnd] = useState("");

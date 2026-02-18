@@ -47,10 +47,12 @@ export async function Document({
 			)}
 		>
 			<head>
-				{/* Saudi Riyal Currency Symbol Font */}
+				{/* Saudi Riyal Currency Symbol Font - pinned version for performance */}
+				<link rel="dns-prefetch" href="https://unpkg.com" />
+				<link rel="preconnect" href="https://unpkg.com" crossOrigin="anonymous" />
 				<link
 					rel="stylesheet"
-					href="https://unpkg.com/saudi-riyal-symbol@latest/dist/saudi-riyal-symbol.min.css"
+					href="https://unpkg.com/saudi-riyal-symbol@1.0.1/dist/saudi-riyal-symbol.min.css"
 					crossOrigin="anonymous"
 				/>
 			</head>

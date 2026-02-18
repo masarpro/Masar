@@ -127,7 +127,7 @@ export const createOrgPaymentProcedure = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "create",
+			action: "payments",
 		});
 
 		return createPayment({
@@ -175,7 +175,7 @@ export const updateOrgPaymentProcedure = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "update",
+			action: "payments",
 		});
 
 		const { organizationId, id, ...data } = input;
@@ -202,7 +202,7 @@ export const deleteOrgPaymentProcedure = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "delete",
+			action: "payments",
 		});
 
 		return deletePayment(input.id, input.organizationId);

@@ -44,6 +44,12 @@ export async function getOrganizationProjects(
 			where,
 			include: {
 				createdBy: { select: { id: true, name: true } },
+				photos: {
+					take: 1,
+					orderBy: { createdAt: "desc" },
+					select: { url: true },
+				},
+				_count: { select: { members: true } },
 			},
 			orderBy: { createdAt: "desc" },
 			take: options?.limit ?? 50,
@@ -203,22 +209,28 @@ export async function deleteProject(id: string, organizationId: string) {
  * Get project statistics for an organization
  */
 export async function getProjectStats(organizationId: string) {
-	const [total, active, onHold, completed, totalValue] = await Promise.all([
-		db.project.count({ where: { organizationId } }),
-		db.project.count({ where: { organizationId, status: "ACTIVE" } }),
-		db.project.count({ where: { organizationId, status: "ON_HOLD" } }),
-		db.project.count({ where: { organizationId, status: "COMPLETED" } }),
+	const [statusGroups, totalValue] = await Promise.all([
+		db.project.groupBy({
+			by: ["status"],
+			where: { organizationId },
+			_count: { id: true },
+		}),
 		db.project.aggregate({
 			where: { organizationId },
 			_sum: { contractValue: true },
 		}),
 	]);
 
+	const countByStatus = (status: string) =>
+		statusGroups.find((g) => g.status === status)?._count.id ?? 0;
+
+	const total = statusGroups.reduce((sum, g) => sum + g._count.id, 0);
+
 	return {
 		total,
-		active,
-		onHold,
-		completed,
+		active: countByStatus("ACTIVE"),
+		onHold: countByStatus("ON_HOLD"),
+		completed: countByStatus("COMPLETED"),
 		totalValue: totalValue._sum.contractValue
 			? Number(totalValue._sum.contractValue)
 			: 0,

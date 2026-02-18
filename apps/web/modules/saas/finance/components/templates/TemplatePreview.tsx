@@ -4,17 +4,14 @@ import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Button } from "@ui/components/button";
-import { Card, CardContent } from "@ui/components/card";
-import { Printer, Download, ArrowLeft, Loader2 } from "lucide-react";
+import { Printer, Download, ArrowLeft, Loader2, ZoomInIcon, ZoomOutIcon, RotateCcwIcon } from "lucide-react";
 import Link from "next/link";
-import { HeaderComponent } from "./components/HeaderComponent";
-import { ClientInfoComponent } from "./components/ClientInfoComponent";
-import { ItemsTableComponent } from "./components/ItemsTableComponent";
-import { TotalsComponent } from "./components/TotalsComponent";
-import { TermsComponent } from "./components/TermsComponent";
-import { SignatureComponent } from "./components/SignatureComponent";
-import { BankDetailsComponent } from "./components/BankDetailsComponent";
+import { useState, useCallback } from "react";
+import { TemplateRenderer } from "./renderer/TemplateRenderer";
 import type { TemplateElement } from "./TemplateCanvas";
+import type { TemplateSettings } from "./PropertiesPanel";
+import type { OrganizationData, QuotationData, InvoiceData } from "./renderer/TemplateRenderer";
+import { getSampleData } from "../../lib/sample-preview-data";
 
 interface TemplatePreviewProps {
 	organizationId: string;
@@ -22,14 +19,13 @@ interface TemplatePreviewProps {
 	templateId: string;
 }
 
-interface TemplateSettings {
-	backgroundColor?: string;
-	primaryColor?: string;
-	fontFamily?: string;
-	fontSize?: string;
-	vatPercent?: number;
-	currency?: string;
-}
+// A4 dimensions in mm
+const A4_WIDTH_MM = 210;
+const A4_HEIGHT_MM = 297;
+// Convert to pixels (assuming 96 DPI for screen)
+const MM_TO_PX = 3.7795275591;
+const A4_WIDTH_PX = A4_WIDTH_MM * MM_TO_PX;
+const A4_HEIGHT_PX = A4_HEIGHT_MM * MM_TO_PX;
 
 export function TemplatePreview({
 	organizationId,
@@ -38,12 +34,32 @@ export function TemplatePreview({
 }: TemplatePreviewProps) {
 	const t = useTranslations();
 	const basePath = `/app/${organizationSlug}/finance/templates`;
+	const [scale, setScale] = useState(0.7);
 
 	const { data: template, isLoading } = useQuery(
 		orpc.finance.templates.getById.queryOptions({
 			input: { organizationId, id: templateId },
 		}),
 	);
+
+	// Fetch organization finance settings for preview
+	const { data: orgSettings } = useQuery(
+		orpc.finance.settings.get.queryOptions({
+			input: { organizationId },
+		}),
+	);
+
+	const handleZoomIn = useCallback(() => {
+		setScale((prev) => Math.min(prev + 0.1, 1.5));
+	}, []);
+
+	const handleZoomOut = useCallback(() => {
+		setScale((prev) => Math.max(prev - 0.1, 0.3));
+	}, []);
+
+	const handleResetZoom = useCallback(() => {
+		setScale(0.7);
+	}, []);
 
 	if (isLoading) {
 		return (
@@ -77,126 +93,47 @@ export function TemplatePreview({
 	const content = template.content as { elements?: TemplateElement[] } | null;
 	const elements = content?.elements || [];
 	const settings = (template.settings || {}) as TemplateSettings;
-	const sortedElements = [...elements]
-		.filter((el) => el.enabled)
-		.sort((a, b) => a.order - b.order);
+	const templateType = template.templateType.toLowerCase() as "quotation" | "invoice" | "letter";
 
-	const primaryColor = settings.primaryColor || "#3b82f6";
-	const backgroundColor = settings.backgroundColor || "#ffffff";
-	const fontFamily = settings.fontFamily || "inherit";
-	const currency = settings.currency || "SAR";
-	const vatPercent = settings.vatPercent || 15;
+	// Prepare organization data for renderer
+	const organizationData: OrganizationData = {
+		name: orgSettings?.companyNameAr ?? "",
+		nameAr: orgSettings?.companyNameAr ?? undefined,
+		nameEn: orgSettings?.companyNameEn ?? undefined,
+		logo: orgSettings?.logo ?? undefined,
+		address: orgSettings?.address ?? undefined,
+		addressAr: orgSettings?.address ?? undefined,
+		addressEn: orgSettings?.addressEn ?? undefined,
+		phone: orgSettings?.phone ?? undefined,
+		email: orgSettings?.email ?? undefined,
+		website: orgSettings?.website ?? undefined,
+		taxNumber: orgSettings?.taxNumber ?? undefined,
+		commercialReg: orgSettings?.commercialReg ?? undefined,
+		bankName: orgSettings?.bankName ?? undefined,
+		bankNameEn: orgSettings?.bankNameEn ?? undefined,
+		accountName: orgSettings?.accountName ?? undefined,
+		iban: orgSettings?.iban ?? undefined,
+		accountNumber: orgSettings?.accountNumber ?? undefined,
+		swiftCode: orgSettings?.swiftCode ?? undefined,
+		headerText: orgSettings?.headerText ?? undefined,
+		footerText: orgSettings?.footerText ?? undefined,
+		thankYouMessage: orgSettings?.thankYouMessage ?? undefined,
+	};
 
-	const renderElement = (element: TemplateElement) => {
-		const elementSettings = element.settings || {};
+	// Get sample data for preview
+	const sampleData = getSampleData(templateType, settings);
 
-		switch (element.type) {
-			case "header":
-				return (
-					<HeaderComponent
-						key={element.id}
-						settings={elementSettings as { showLogo?: boolean; showCompanyName?: boolean; showAddress?: boolean }}
-						primaryColor={primaryColor}
-					/>
-				);
-			case "clientInfo":
-				return (
-					<ClientInfoComponent
-						key={element.id}
-						settings={elementSettings as { showTaxNumber?: boolean; showEmail?: boolean; showPhone?: boolean }}
-						primaryColor={primaryColor}
-					/>
-				);
-			case "itemsTable":
-				return (
-					<ItemsTableComponent
-						key={element.id}
-						settings={elementSettings as { showQuantity?: boolean; showUnit?: boolean; showUnitPrice?: boolean }}
-						primaryColor={primaryColor}
-						currency={currency}
-					/>
-				);
-			case "totals":
-				return (
-					<TotalsComponent
-						key={element.id}
-						settings={elementSettings as { showDiscount?: boolean; showVat?: boolean }}
-						totals={{
-							subtotal: 15000,
-							discountPercent: 5,
-							discountAmount: 750,
-							vatPercent: vatPercent,
-							vatAmount: (15000 - 750) * (vatPercent / 100),
-							total: (15000 - 750) * (1 + vatPercent / 100),
-						}}
-						primaryColor={primaryColor}
-						currency={currency}
-					/>
-				);
-			case "terms":
-				return (
-					<TermsComponent
-						key={element.id}
-						settings={elementSettings as { showPaymentTerms?: boolean; showDeliveryTerms?: boolean; showWarrantyTerms?: boolean }}
-						primaryColor={primaryColor}
-					/>
-				);
-			case "signature":
-				return (
-					<SignatureComponent
-						key={element.id}
-						settings={elementSettings as { showDate?: boolean }}
-						primaryColor={primaryColor}
-					/>
-				);
-			case "qrCode":
-				return (
-					<div key={element.id} className="py-4 flex justify-center">
-						<div
-							className="w-32 h-32 border-2 rounded-lg flex items-center justify-center text-slate-400"
-							style={{ borderColor: primaryColor }}
-						>
-							QR Code
-						</div>
-					</div>
-				);
-			case "footer":
-				return (
-					<div
-						key={element.id}
-						className="py-4 mt-8 border-t text-center text-sm text-slate-500"
-						style={{ borderColor: primaryColor }}
-					>
-						<p>{t("finance.templates.preview.companyName")} - {new Date().getFullYear()}</p>
-					</div>
-				);
-			case "text":
-				return (
-					<div key={element.id} className="py-4">
-						<p className="text-slate-600">
-							{(elementSettings as { content?: string }).content || t("finance.templates.editor.elementDescriptions.text")}
-						</p>
-					</div>
-				);
-			case "image":
-				return (
-					<div key={element.id} className="py-4 flex justify-center">
-						<div className="w-48 h-32 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
-							{t("finance.templates.editor.elementTypes.image")}
-						</div>
-					</div>
-				);
-			case "bankDetails":
-				return (
-					<BankDetailsComponent
-						key={element.id}
-						settings={elementSettings as { showBankName?: boolean; showIban?: boolean; showAccountName?: boolean; showSwiftCode?: boolean }}
-						primaryColor={primaryColor}
-					/>
-				);
-			default:
-				return null;
-		}
+	// Prepare template config for renderer
+	const templateConfig = {
+		elements,
+		settings: {
+			backgroundColor: settings.backgroundColor,
+			primaryColor: settings.primaryColor,
+			fontFamily: settings.fontFamily,
+			fontSize: settings.fontSize,
+			vatPercent: settings.vatPercent,
+			currency: settings.currency,
+		},
 	};
 
 	return (
@@ -209,7 +146,39 @@ export function TemplatePreview({
 						{t("finance.templates.editor.title")}
 					</Button>
 				</Link>
-				<div className="flex gap-2">
+				<div className="flex items-center gap-2">
+					{/* Zoom Controls */}
+					<div className="flex items-center gap-1 border-e pe-2 me-2">
+						<Button
+							variant="ghost"
+							size="icon"
+							className="h-8 w-8"
+							onClick={handleZoomOut}
+							disabled={scale <= 0.3}
+						>
+							<ZoomOutIcon className="h-4 w-4" />
+						</Button>
+						<span className="text-xs text-slate-500 w-12 text-center">
+							{Math.round(scale * 100)}%
+						</span>
+						<Button
+							variant="ghost"
+							size="icon"
+							className="h-8 w-8"
+							onClick={handleZoomIn}
+							disabled={scale >= 1.5}
+						>
+							<ZoomInIcon className="h-4 w-4" />
+						</Button>
+						<Button
+							variant="ghost"
+							size="icon"
+							className="h-8 w-8"
+							onClick={handleResetZoom}
+						>
+							<RotateCcwIcon className="h-4 w-4" />
+						</Button>
+					</div>
 					<Button variant="outline" onClick={handlePrint} className="rounded-xl">
 						<Printer className="h-4 w-4 me-2" />
 						{t("finance.actions.print")}
@@ -223,30 +192,63 @@ export function TemplatePreview({
 
 			{/* Template Name */}
 			<div className="text-center print:hidden">
-				<h2 className="text-lg font-semibold text-slate-900">{template.name}</h2>
+				<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{template.name}</h2>
 				<p className="text-sm text-slate-500">
-					{t(`finance.templates.types.${template.templateType.toLowerCase()}`)}
+					{t(`finance.templates.types.${templateType}`)}
 				</p>
 			</div>
 
-			{/* Preview Content */}
-			<Card className="rounded-2xl max-w-4xl mx-auto print:shadow-none print:rounded-none print:border-none">
-				<CardContent
-					className="p-8 print:p-4"
+			{/* Preview Container */}
+			<div className="bg-slate-100 dark:bg-slate-900 rounded-2xl p-6 overflow-auto print:bg-transparent print:p-0 print:rounded-none">
+				<div
+					className="mx-auto print:mx-0"
 					style={{
-						backgroundColor,
-						fontFamily,
+						width: A4_WIDTH_PX * scale,
+						minHeight: A4_HEIGHT_PX * scale,
 					}}
 				>
-					{sortedElements.length === 0 ? (
-						<div className="text-center py-20 text-slate-500">
-							<p>{t("finance.templates.editor.dropHint")}</p>
-						</div>
-					) : (
-						sortedElements.map(renderElement)
-					)}
-				</CardContent>
-			</Card>
+					{/* A4 Paper */}
+					<div
+						className="bg-white shadow-2xl print:shadow-none"
+						style={{
+							width: A4_WIDTH_PX,
+							minHeight: A4_HEIGHT_PX,
+							transform: `scale(${scale})`,
+							transformOrigin: "top left",
+						}}
+					>
+						<TemplateRenderer
+							data={sampleData}
+							template={templateConfig}
+							organization={organizationData}
+							documentType={templateType === "letter" ? "quotation" : templateType}
+							interactive={false}
+						/>
+					</div>
+				</div>
+			</div>
+
+			{/* Print styles */}
+			<style jsx global>{`
+				@media print {
+					body * {
+						visibility: hidden;
+					}
+					.print\\:hidden {
+						display: none !important;
+					}
+					[data-print-area],
+					[data-print-area] * {
+						visibility: visible;
+					}
+					[data-print-area] {
+						position: absolute;
+						left: 0;
+						top: 0;
+						width: 100%;
+					}
+				}
+			`}</style>
 		</div>
 	);
 }

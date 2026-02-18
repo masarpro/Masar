@@ -1,6 +1,4 @@
 @import "tailwindcss";
-@import "fumadocs-ui/css/neutral.css";
-@import "fumadocs-ui/css/preset.css";
 @import "@repo/tailwind-config/theme.css";
 @import "@repo/tailwind-config/tailwind-animate.css";
 
@@ -14,8 +12,6 @@
 	font-family: "saudi riyal symbol" !important;
 	font-style: normal;
 }
-
-@source "../node_modules/fumadocs-ui/dist/**/*.js";
 
 @variant dark (&:where(.dark, .dark *));
 
@@ -65,35 +61,6 @@ body {
 /* Flip directional icons for RTL */
 [dir="rtl"] .rtl-flip {
 	transform: scaleX(-1);
-}
-
-pre.shiki {
-	@apply mb-4 rounded-lg p-6;
-}
-
-#nd-sidebar {
-	@apply bg-card!;
-
-	button[data-search-full] {
-		@apply bg-transparent;
-	}
-}
-
-#nd-page .prose {
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		a {
-			@apply no-underline!;
-		}
-	}
-}
-
-div[role="tablist"].bg-secondary {
-	@apply bg-muted!;
 }
 
 input[cmdk-input] {

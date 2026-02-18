@@ -74,7 +74,12 @@
       "WebFetch(domain:unpkg.com)",
       "Bash(if exist \".next\" rmdir /s /q .next)",
       "Bash(if exist \"apps\\\\web\\\\.next\" rmdir /s /q \"apps\\\\web\\\\.next\")",
-      "Bash(git -C \"H:\\\\Masar\\\\supastarter-nextjs-3\" log --oneline -20)"
+      "Bash(git -C \"H:\\\\Masar\\\\supastarter-nextjs-3\" log --oneline -20)",
+      "mcp__ide__getDiagnostics",
+      "Bash(git status:*)",
+      "Bash(npx prisma migrate status:*)",
+      "Bash(pnpm tsx:*)",
+      "Bash(pnpm dlx:*)"
     ]
   }
 }

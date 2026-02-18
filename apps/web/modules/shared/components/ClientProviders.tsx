@@ -26,13 +26,11 @@ export function ClientProviders({ children }: PropsWithChildren) {
 					defaultTheme={config.ui.defaultTheme}
 					themes={config.ui.enabledThemes}
 				>
-					<ApiClientProvider>
-						{children}
+					{children}
 
-						<Toaster position="top-right" />
-						<ConsentBanner />
-						<AnalyticsScript />
-					</ApiClientProvider>
+					<Toaster position="top-right" />
+					<ConsentBanner />
+					<AnalyticsScript />
 				</ThemeProvider>
 			</ProgressProvider>
 		</ApiClientProvider>

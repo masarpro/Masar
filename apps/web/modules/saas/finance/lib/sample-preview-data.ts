@@ -120,7 +120,6 @@ export function getSampleQuotationData(settings?: Partial<TemplateSettings>): Sa
 		paymentTerms: "الدفع خلال 30 يوم من تاريخ الفاتورة",
 		deliveryTerms: "التسليم خلال أسبوعين من تاريخ الموافقة",
 		warrantyTerms: "ضمان لمدة سنة على جميع الخدمات",
-		notes: "نشكركم على ثقتكم بنا ونتطلع للعمل معكم",
 	};
 }
 
@@ -179,7 +178,6 @@ export function getSampleInvoiceData(settings?: Partial<TemplateSettings>): Samp
 		totalAmount,
 		paidAmount: 0,
 		paymentTerms: "الدفع خلال 15 يوم من تاريخ الفاتورة",
-		notes: "شكراً لتعاملكم معنا",
 		sellerTaxNumber: "300111222333003",
 	};
 }

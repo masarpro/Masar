@@ -2,13 +2,11 @@
 
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { StatsTile } from "@saas/start/components/StatsTile";
-import { StatsTileChart } from "@saas/start/components/StatsTileChart";
 import { apiClient } from "@shared/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
-import type { ChartConfig } from "@ui/components/chart";
 import {
 	AlertTriangle,
 	ArrowRight,
@@ -63,24 +61,6 @@ function formatDate(date: Date | string): string {
 		day: "numeric",
 	});
 }
-
-const projectChartConfig = {
-	count: {
-		label: "المشاريع",
-		color: "#3b82f6",
-	},
-} satisfies ChartConfig;
-
-const financialChartConfig = {
-	expenses: {
-		label: "المصروفات",
-		color: "#ef4444",
-	},
-	claims: {
-		label: "المستخلصات",
-		color: "#10b981",
-	},
-} satisfies ChartConfig;
 
 export function Dashboard() {
 	const t = useTranslations();
@@ -160,12 +140,6 @@ export function Dashboard() {
 			</div>
 		);
 	}
-
-	const projectData = [
-		{ status: "active", count: stats?.projects.active ?? 0 },
-		{ status: "onHold", count: stats?.projects.onHold ?? 0 },
-		{ status: "completed", count: stats?.projects.completed ?? 0 },
-	];
 
 	return (
 		<div className="space-y-6">

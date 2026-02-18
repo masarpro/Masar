@@ -7,6 +7,15 @@ import nextIntlPlugin from "next-intl/plugin";
 const withNextIntl = nextIntlPlugin("./modules/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+	experimental: {
+		optimizePackageImports: [
+			"lucide-react",
+			"recharts",
+			"date-fns",
+			"es-toolkit",
+			"@radix-ui/react-icons",
+		],
+	},
 	transpilePackages: ["@repo/api", "@repo/auth", "@repo/database"],
 	images: {
 		remotePatterns: [

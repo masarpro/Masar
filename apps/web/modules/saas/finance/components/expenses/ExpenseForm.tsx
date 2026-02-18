@@ -27,6 +27,7 @@ interface ExpenseFormProps {
 	organizationSlug: string;
 	defaultSourceAccountId?: string;
 	defaultProjectId?: string;
+	redirectPath?: string;
 }
 
 // فئات المصروفات
@@ -72,6 +73,7 @@ export function ExpenseForm({
 	organizationSlug,
 	defaultSourceAccountId,
 	defaultProjectId,
+	redirectPath,
 }: ExpenseFormProps) {
 	const t = useTranslations();
 	const router = useRouter();
@@ -145,7 +147,7 @@ export function ExpenseForm({
 			toast.success(t("finance.expenses.createSuccess"));
 			queryClient.invalidateQueries({ queryKey: ["finance", "expenses"] });
 			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
-			router.push(`/app/${organizationSlug}/finance/expenses`);
+			router.push(redirectPath || `/app/${organizationSlug}/finance/expenses`);
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.expenses.createError"));
@@ -404,38 +406,40 @@ export function ExpenseForm({
 				</CardContent>
 			</Card>
 
-			{/* Project Link */}
-			<Card className="rounded-2xl">
-				<CardHeader>
-					<CardTitle>{t("finance.expenses.projectLink")}</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<div>
-						<Label>{t("finance.expenses.selectProject")}</Label>
-						<Select
-							value={formData.projectId || "none"}
-							onValueChange={(value) =>
-								setFormData({ ...formData, projectId: value === "none" ? "" : value })
-							}
-						>
-							<SelectTrigger className="rounded-xl mt-1">
-								<SelectValue placeholder={t("finance.expenses.selectProjectPlaceholder")} />
-							</SelectTrigger>
-							<SelectContent className="rounded-xl">
-								<SelectItem value="none">{t("finance.expenses.noProject")}</SelectItem>
-								{projects.map((project) => (
-									<SelectItem key={project.id} value={project.id}>
-										{project.name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-						<p className="text-sm text-slate-500 mt-1">
-							{t("finance.expenses.projectLinkHint")}
-						</p>
-					</div>
-				</CardContent>
-			</Card>
+			{/* Project Link - hidden when defaultProjectId is set */}
+			{!defaultProjectId && (
+				<Card className="rounded-2xl">
+					<CardHeader>
+						<CardTitle>{t("finance.expenses.projectLink")}</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<div>
+							<Label>{t("finance.expenses.selectProject")}</Label>
+							<Select
+								value={formData.projectId || "none"}
+								onValueChange={(value) =>
+									setFormData({ ...formData, projectId: value === "none" ? "" : value })
+								}
+							>
+								<SelectTrigger className="rounded-xl mt-1">
+									<SelectValue placeholder={t("finance.expenses.selectProjectPlaceholder")} />
+								</SelectTrigger>
+								<SelectContent className="rounded-xl">
+									<SelectItem value="none">{t("finance.expenses.noProject")}</SelectItem>
+									{projects.map((project) => (
+										<SelectItem key={project.id} value={project.id}>
+											{project.name}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+							<p className="text-sm text-slate-500 mt-1">
+								{t("finance.expenses.projectLinkHint")}
+							</p>
+						</div>
+					</CardContent>
+				</Card>
+			)}
 
 			{/* Notes */}
 			<Card className="rounded-2xl">

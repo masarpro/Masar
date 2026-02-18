@@ -1,10 +1,29 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@ui/lib";
-import { InfoIcon, ZoomInIcon, ZoomOutIcon, RotateCcwIcon } from "lucide-react";
+import {
+	InfoIcon,
+	ZoomInIcon,
+	ZoomOutIcon,
+	RotateCcwIcon,
+	ChevronUpIcon,
+	ChevronDownIcon,
+	ArrowUpIcon,
+	ArrowDownIcon,
+	Trash2Icon,
+	EyeIcon,
+	EyeOffIcon,
+	GripVerticalIcon,
+} from "lucide-react";
 import { Button } from "@ui/components/button";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@ui/components/tooltip";
 import { TemplateRenderer } from "./renderer/TemplateRenderer";
 import type { TemplateElement } from "./TemplateCanvas";
 import type { TemplateSettings } from "./PropertiesPanel";
@@ -21,6 +40,10 @@ interface InteractivePreviewProps {
 	selectedElement: string | null;
 	onSelectElement: (id: string | null) => void;
 	onDropElement: (elementType: ElementType, targetIndex?: number) => void;
+	onMoveElement?: (id: string, direction: "up" | "down") => void;
+	onResizeElement?: (id: string, action: "increase" | "decrease") => void;
+	onRemoveElement?: (id: string) => void;
+	onToggleElement?: (id: string) => void;
 	templateType: "quotation" | "invoice" | "letter";
 	organization?: OrganizationData;
 	sampleData: QuotationData | InvoiceData;
@@ -40,6 +63,10 @@ export function InteractivePreview({
 	selectedElement,
 	onSelectElement,
 	onDropElement,
+	onMoveElement,
+	onResizeElement,
+	onRemoveElement,
+	onToggleElement,
 	templateType,
 	organization,
 	sampleData,
@@ -47,6 +74,22 @@ export function InteractivePreview({
 	const t = useTranslations();
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [scale, setScale] = useState(0.6); // Default zoom level
+
+	// Get selected element data and position info
+	const selectedElementData = useMemo(() => {
+		if (!selectedElement) return null;
+		const sortedElements = [...elements].sort((a, b) => a.order - b.order);
+		const index = sortedElements.findIndex((el) => el.id === selectedElement);
+		const element = sortedElements[index];
+		if (!element) return null;
+		return {
+			element,
+			index,
+			isFirst: index === 0,
+			isLast: index === sortedElements.length - 1,
+			total: sortedElements.length,
+		};
+	}, [selectedElement, elements]);
 
 	const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
 		e.preventDefault();
@@ -167,6 +210,160 @@ export function InteractivePreview({
 					</span>
 				</div>
 			</div>
+
+			{/* Floating Element Toolbar */}
+			{selectedElementData && (
+				<TooltipProvider delayDuration={300}>
+					<div className="px-4 py-2 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-b border-primary/20">
+						<div className="flex items-center justify-between">
+							{/* Element Info */}
+							<div className="flex items-center gap-3">
+								<div className="flex items-center gap-2">
+									<GripVerticalIcon className="h-4 w-4 text-primary/60" />
+									<span className="text-sm font-medium text-primary">
+										{t(`finance.templates.editor.elementTypes.${selectedElementData.element.type}`)}
+									</span>
+								</div>
+								<span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+									{selectedElementData.index + 1} / {selectedElementData.total}
+								</span>
+								{!selectedElementData.element.enabled && (
+									<span className="text-xs text-orange-600 bg-orange-100 dark:bg-orange-950 px-2 py-0.5 rounded-full">
+										{t("common.hidden")}
+									</span>
+								)}
+							</div>
+
+							{/* Actions */}
+							<div className="flex items-center gap-1">
+								{/* Move Controls */}
+								<div className="flex items-center gap-0.5 border-e pe-2 me-1">
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-8 w-8 text-primary hover:bg-primary/20"
+												onClick={() => onMoveElement?.(selectedElementData.element.id, "up")}
+												disabled={selectedElementData.isFirst}
+											>
+												<ArrowUpIcon className="h-4 w-4" />
+											</Button>
+										</TooltipTrigger>
+										<TooltipContent side="bottom">
+											{t("finance.templates.editor.actions.moveUp")}
+										</TooltipContent>
+									</Tooltip>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-8 w-8 text-primary hover:bg-primary/20"
+												onClick={() => onMoveElement?.(selectedElementData.element.id, "down")}
+												disabled={selectedElementData.isLast}
+											>
+												<ArrowDownIcon className="h-4 w-4" />
+											</Button>
+										</TooltipTrigger>
+										<TooltipContent side="bottom">
+											{t("finance.templates.editor.actions.moveDown")}
+										</TooltipContent>
+									</Tooltip>
+								</div>
+
+								{/* Height Controls */}
+								<div className="flex items-center gap-0.5 border-e pe-2 me-1">
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-8 w-8 text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-950"
+												onClick={() => onResizeElement?.(selectedElementData.element.id, "increase")}
+											>
+												<ChevronUpIcon className="h-4 w-4" />
+											</Button>
+										</TooltipTrigger>
+										<TooltipContent side="bottom">
+											{t("finance.templates.editor.actions.increaseHeight")}
+										</TooltipContent>
+									</Tooltip>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-8 w-8 text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-950"
+												onClick={() => onResizeElement?.(selectedElementData.element.id, "decrease")}
+												disabled={((selectedElementData.element.settings.minHeight as number) || 0) <= 0}
+											>
+												<ChevronDownIcon className="h-4 w-4" />
+											</Button>
+										</TooltipTrigger>
+										<TooltipContent side="bottom">
+											{t("finance.templates.editor.actions.decreaseHeight")}
+										</TooltipContent>
+									</Tooltip>
+									{((selectedElementData.element.settings.minHeight as number) || 0) > 0 && (
+										<span className="text-xs text-emerald-600 bg-emerald-100 dark:bg-emerald-950 px-1.5 py-0.5 rounded ms-1">
+											+{selectedElementData.element.settings.minHeight as number}px
+										</span>
+									)}
+								</div>
+
+								{/* Toggle Visibility */}
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											variant="ghost"
+											size="icon"
+											className={cn(
+												"h-8 w-8",
+												selectedElementData.element.enabled
+													? "text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-950"
+													: "text-orange-600 hover:bg-orange-100 dark:hover:bg-orange-950"
+											)}
+											onClick={() => onToggleElement?.(selectedElementData.element.id)}
+										>
+											{selectedElementData.element.enabled ? (
+												<EyeIcon className="h-4 w-4" />
+											) : (
+												<EyeOffIcon className="h-4 w-4" />
+											)}
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent side="bottom">
+										{selectedElementData.element.enabled
+											? t("finance.templates.editor.actions.hide")
+											: t("finance.templates.editor.actions.show")}
+									</TooltipContent>
+								</Tooltip>
+
+								{/* Delete */}
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											variant="ghost"
+											size="icon"
+											className="h-8 w-8 text-destructive hover:bg-destructive/10"
+											onClick={() => {
+												onRemoveElement?.(selectedElementData.element.id);
+												onSelectElement(null);
+											}}
+										>
+											<Trash2Icon className="h-4 w-4" />
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent side="bottom">
+										{t("finance.templates.editor.actions.delete")}
+									</TooltipContent>
+								</Tooltip>
+							</div>
+						</div>
+					</div>
+				</TooltipProvider>
+			)}
 
 			{/* Preview Container */}
 			<div className="flex-1 overflow-auto p-6">

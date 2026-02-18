@@ -528,15 +528,21 @@ export async function getExpensesSummaryByCategory(
 	organizationId: string,
 	dateFrom?: Date,
 	dateTo?: Date,
+	projectId?: string,
 ) {
 	const where: {
 		organizationId: string;
 		status: FinanceTransactionStatus;
+		projectId?: string;
 		date?: { gte?: Date; lte?: Date };
 	} = {
 		organizationId,
 		status: "COMPLETED",
 	};
+
+	if (projectId) {
+		where.projectId = projectId;
+	}
 
 	if (dateFrom || dateTo) {
 		where.date = {};

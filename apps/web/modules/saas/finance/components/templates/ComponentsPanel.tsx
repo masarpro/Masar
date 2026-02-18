@@ -85,7 +85,7 @@ export function ComponentsPanel({
 	};
 
 	return (
-		<div className="w-[280px] border-e bg-muted/30 p-4 overflow-y-auto">
+		<div className="w-[240px] border-e bg-muted/30 p-4 overflow-y-auto">
 			<Card className="rounded-2xl border-0 shadow-none bg-transparent">
 				<CardHeader className="px-0 pt-0">
 					<CardTitle className="text-base">
@@ -101,7 +101,7 @@ export function ComponentsPanel({
 						<h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
 							{t("finance.templates.editor.basicComponents")}
 						</h3>
-						<div className="grid grid-cols-2 gap-2">
+						<div className="flex flex-col gap-2">
 							{basicComponents.map((component) => {
 								const Icon = component.icon;
 								return (
@@ -111,7 +111,7 @@ export function ComponentsPanel({
 										onDragStart={(e) => handleDragStart(e, component.id)}
 										onClick={() => onAddElement(component.id)}
 										className={cn(
-											"flex flex-col items-center gap-2 p-3 rounded-xl border-2 border-dashed border-muted",
+											"flex items-center gap-3 p-3 rounded-xl border-2 border-dashed border-muted",
 											"bg-background hover:bg-muted/50 hover:border-primary/50",
 											"cursor-grab active:cursor-grabbing transition-all duration-200",
 											"group",
@@ -120,7 +120,7 @@ export function ComponentsPanel({
 										<div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:scale-110 transition-transform">
 											<Icon className="h-5 w-5" />
 										</div>
-										<span className="text-xs font-medium text-center">
+										<span className="text-sm font-medium">
 											{t(`finance.templates.editor.elementTypes.${component.id}`)}
 										</span>
 									</div>
@@ -134,7 +134,7 @@ export function ComponentsPanel({
 						<h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
 							{t("finance.templates.editor.advancedComponents")}
 						</h3>
-						<div className="grid grid-cols-2 gap-2">
+						<div className="flex flex-col gap-2">
 							{advancedComponents.map((component) => {
 								const Icon = component.icon;
 								return (
@@ -144,7 +144,7 @@ export function ComponentsPanel({
 										onDragStart={(e) => handleDragStart(e, component.id)}
 										onClick={() => onAddElement(component.id)}
 										className={cn(
-											"flex flex-col items-center gap-2 p-3 rounded-xl border-2 border-dashed border-muted",
+											"flex items-center gap-3 p-3 rounded-xl border-2 border-dashed border-muted",
 											"bg-background hover:bg-muted/50 hover:border-purple-500/50",
 											"cursor-grab active:cursor-grabbing transition-all duration-200",
 											"group",
@@ -153,7 +153,7 @@ export function ComponentsPanel({
 										<div className="p-2 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
 											<Icon className="h-5 w-5" />
 										</div>
-										<span className="text-xs font-medium text-center">
+										<span className="text-sm font-medium">
 											{t(`finance.templates.editor.elementTypes.${component.id}`)}
 										</span>
 									</div>

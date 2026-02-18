@@ -61,6 +61,8 @@ import { Currency } from "../shared/Currency";
 interface ExpensesListProps {
 	organizationId: string;
 	organizationSlug: string;
+	projectId?: string;
+	basePath?: string;
 }
 
 // فئات المصروفات
@@ -96,6 +98,8 @@ const EXPENSE_CATEGORIES = [
 export function ExpensesList({
 	organizationId,
 	organizationSlug,
+	projectId,
+	basePath: customBasePath,
 }: ExpensesListProps) {
 	const t = useTranslations();
 	const router = useRouter();
@@ -106,6 +110,8 @@ export function ExpensesList({
 	const [categoryFilter, setCategoryFilter] = useState<string | undefined>(undefined);
 	const [deleteExpenseId, setDeleteExpenseId] = useState<string | null>(null);
 
+	const effectiveBasePath = customBasePath || `/app/${organizationSlug}/finance/expenses`;
+
 	// Fetch expenses
 	const { data, isLoading } = useQuery(
 		orpc.finance.expenses.list.queryOptions({
@@ -113,6 +119,7 @@ export function ExpensesList({
 				organizationId,
 				query: searchQuery || undefined,
 				category: categoryFilter as any,
+				projectId,
 			},
 		}),
 	);
@@ -120,7 +127,7 @@ export function ExpensesList({
 	// Fetch expenses summary
 	const { data: summaryData } = useQuery(
 		orpc.finance.expenses.getSummary.queryOptions({
-			input: { organizationId },
+			input: { organizationId, projectId },
 		}),
 	);
 
@@ -304,7 +311,7 @@ export function ExpensesList({
 													<DropdownMenuItem
 														onClick={() =>
 															router.push(
-																`/app/${organizationSlug}/finance/expenses/${expense.id}`,
+																`${effectiveBasePath}/${expense.id}`,
 															)
 														}
 													>
@@ -314,7 +321,7 @@ export function ExpensesList({
 													<DropdownMenuItem
 														onClick={() =>
 															router.push(
-																`/app/${organizationSlug}/finance/expenses/${expense.id}`,
+																`${effectiveBasePath}/${expense.id}`,
 															)
 														}
 													>

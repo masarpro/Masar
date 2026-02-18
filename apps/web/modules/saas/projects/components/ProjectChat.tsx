@@ -12,6 +12,7 @@ import {
 	User,
 	Shield,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState, useRef, useEffect } from "react";
@@ -163,10 +164,13 @@ export function ProjectChat({
 							>
 								<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
 									{message.sender.image ? (
-										<img
+										<Image
 											src={message.sender.image}
 											alt={message.sender.name}
-											className="h-9 w-9 rounded-full object-cover"
+											width={36}
+											height={36}
+											className="rounded-full object-cover"
+											unoptimized
 										/>
 									) : (
 										<User className="h-4 w-4 text-slate-500" />

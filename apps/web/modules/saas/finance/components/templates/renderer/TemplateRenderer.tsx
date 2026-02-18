@@ -115,12 +115,23 @@ export interface TemplateConfig {
 	};
 }
 
+// بيانات مخصصة للعناصر القابلة للتعديل
+export interface CustomElementData {
+	[elementId: string]: {
+		content?: string;
+		label?: string;
+		[key: string]: unknown;
+	};
+}
+
 interface TemplateRendererProps {
 	data: QuotationData | InvoiceData;
 	template: TemplateConfig;
 	organization?: OrganizationData;
 	documentType?: "quotation" | "invoice";
 	className?: string;
+	// بيانات مخصصة للعناصر (مثل النص الحر)
+	customElementData?: CustomElementData;
 	// Interactive mode props
 	interactive?: boolean;
 	selectedElementId?: string | null;
@@ -145,6 +156,7 @@ export function TemplateRenderer({
 	organization,
 	documentType,
 	className = "",
+	customElementData = {},
 	interactive = false,
 	selectedElementId = null,
 	onElementClick,
@@ -155,6 +167,11 @@ export function TemplateRenderer({
 	// Extract template configuration
 	const elements = template?.elements || [];
 	const settings = template?.settings || {};
+
+	// Helper: الحصول على محتوى العنصر (من البيانات المخصصة أو الإعدادات الافتراضية)
+	const getElementContent = (elementId: string, defaultContent?: string) => {
+		return customElementData[elementId]?.content ?? defaultContent ?? "";
+	};
 
 	// Get settings with defaults
 	const primaryColor = settings.primaryColor || "#3b82f6";
@@ -343,10 +360,18 @@ export function TemplateRenderer({
 				);
 
 			case "text":
+				const textContent = getElementContent(
+					element.id,
+					(elementSettings as { content?: string }).content
+				);
+				const textLabel = (elementSettings as { label?: string }).label;
 				return (
 					<div key={element.id} className="py-4">
-						<p className="text-slate-600">
-							{(elementSettings as { content?: string }).content || ""}
+						{textLabel && (
+							<h4 className="text-sm font-medium text-slate-700 mb-2">{textLabel}</h4>
+						)}
+						<p className="text-slate-600 whitespace-pre-line">
+							{textContent || (interactive ? t("finance.templates.editor.elementTypes.text") : "")}
 						</p>
 					</div>
 				);
@@ -390,6 +415,8 @@ export function TemplateRenderer({
 		if (!interactive) return content;
 
 		const isSelected = selectedElementId === element.id;
+		const minHeight = (element.settings?.minHeight as number) || 0;
+
 		return (
 			<div
 				key={element.id}
@@ -398,6 +425,10 @@ export function TemplateRenderer({
 						? "ring-2 ring-primary ring-offset-2 bg-primary/5"
 						: "hover:ring-1 hover:ring-primary/50"
 				}`}
+				style={{
+					minHeight: minHeight > 0 ? `${minHeight}px` : undefined,
+					paddingBottom: minHeight > 0 ? `${Math.min(minHeight / 4, 20)}px` : undefined,
+				}}
 				onClick={(e) => {
 					e.stopPropagation();
 					onElementClick?.(element.id);
@@ -407,6 +438,12 @@ export function TemplateRenderer({
 				{isSelected && (
 					<div className="absolute -top-2 start-2 bg-primary text-white text-xs px-2 py-0.5 rounded-full z-10">
 						{t(`finance.templates.editor.elementTypes.${element.type}`)}
+					</div>
+				)}
+				{/* Height indicator when resized */}
+				{isSelected && minHeight > 0 && (
+					<div className="absolute -top-2 end-2 bg-emerald-500 text-white text-xs px-2 py-0.5 rounded-full z-10">
+						+{minHeight}px
 					</div>
 				)}
 				{content}

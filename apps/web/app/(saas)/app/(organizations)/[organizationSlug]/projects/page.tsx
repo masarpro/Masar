@@ -1,7 +1,6 @@
-import { getActiveOrganization } from "@saas/auth/lib/server";
+import { getActiveOrganization, getSession } from "@saas/auth/lib/server";
 import { ProjectsList } from "@saas/projects/components/ProjectsList";
-import { PageHeader } from "@saas/shared/components/PageHeader";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata({
@@ -22,7 +21,11 @@ export default async function ProjectsPage({
 	params: Promise<{ organizationSlug: string }>;
 }) {
 	const { organizationSlug } = await params;
-	const t = await getTranslations();
+	const session = await getSession();
+
+	if (!session?.user) {
+		redirect("/auth/login");
+	}
 
 	const activeOrganization = await getActiveOrganization(
 		organizationSlug as string,
@@ -33,12 +36,11 @@ export default async function ProjectsPage({
 	}
 
 	return (
-		<div>
-			<PageHeader
-				title={t("projects.title")}
-				subtitle={t("projects.subtitle")}
+		<div className="px-4 py-6 sm:px-6">
+			<ProjectsList
+				organizationId={activeOrganization.id}
+				userName={session.user.name ?? undefined}
 			/>
-			<ProjectsList organizationId={activeOrganization.id} />
 		</div>
 	);
 }

@@ -143,6 +143,7 @@ export const getExpensesSummary = protectedProcedure
 			organizationId: z.string(),
 			dateFrom: z.coerce.date().optional(),
 			dateTo: z.coerce.date().optional(),
+			projectId: z.string().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -155,6 +156,7 @@ export const getExpensesSummary = protectedProcedure
 			input.organizationId,
 			input.dateFrom,
 			input.dateTo,
+			input.projectId,
 		);
 	});
 
@@ -189,7 +191,7 @@ export const createExpenseProcedure = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "create",
+			action: "payments",
 		});
 
 		return createExpense({
@@ -241,7 +243,7 @@ export const updateExpenseProcedure = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "update",
+			action: "payments",
 		});
 
 		const { organizationId, id, ...data } = input;
@@ -268,7 +270,7 @@ export const deleteExpenseProcedure = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "delete",
+			action: "payments",
 		});
 
 		return deleteExpense(input.id, input.organizationId);

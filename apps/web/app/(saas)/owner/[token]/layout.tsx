@@ -12,6 +12,7 @@ import {
 	AlertTriangle,
 	FileDiff,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -106,10 +107,13 @@ export default function OwnerPortalLayout({
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
 							{summary?.organization?.logo ? (
-								<img
+								<Image
 									src={summary.organization.logo}
 									alt={summary.organization.name}
-									className="h-10 w-10 rounded-xl object-cover"
+									width={40}
+									height={40}
+									className="rounded-xl object-cover"
+									unoptimized
 								/>
 							) : (
 								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">

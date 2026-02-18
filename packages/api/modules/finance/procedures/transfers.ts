@@ -112,7 +112,7 @@ export const createTransferProcedure = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "create",
+			action: "payments",
 		});
 
 		return createTransfer({
@@ -147,7 +147,7 @@ export const cancelTransferProcedure = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "delete",
+			action: "payments",
 		});
 
 		return cancelTransfer(input.id, input.organizationId);

@@ -12,29 +12,51 @@ export async function getProjectFinanceSummary(
 	organizationId: string,
 	projectId: string,
 ) {
-	// Get project contract value
-	const project = await db.project.findFirst({
-		where: { id: projectId, organizationId },
-		select: { contractValue: true },
-	});
+	// Get upcoming claims date range
+	const thirtyDaysFromNow = new Date();
+	thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+	// Run all queries in parallel
+	const [project, expensesTotal, paymentsTotal, claimsData, upcomingClaims] =
+		await Promise.all([
+			// Get project contract value
+			db.project.findFirst({
+				where: { id: projectId, organizationId },
+				select: { contractValue: true },
+			}),
+			// Get total expenses from unified FinanceExpense (filtered by projectId)
+			db.financeExpense.aggregate({
+				where: { organizationId, projectId, status: "COMPLETED" },
+				_sum: { amount: true },
+			}),
+			// Get total payments from unified FinancePayment (filtered by projectId)
+			db.financePayment.aggregate({
+				where: { organizationId, projectId, status: "COMPLETED" },
+				_sum: { amount: true },
+			}),
+			// Get claims summary
+			db.projectClaim.groupBy({
+				by: ["status"],
+				where: { organizationId, projectId },
+				_sum: { amount: true },
+				_count: true,
+			}),
+			// Get upcoming claims (due within 30 days)
+			db.projectClaim.aggregate({
+				where: {
+					organizationId,
+					projectId,
+					status: { in: ["SUBMITTED", "APPROVED"] },
+					dueDate: { lte: thirtyDaysFromNow },
+				},
+				_sum: { amount: true },
+				_count: true,
+			}),
+		]);
 
 	if (!project) {
 		throw new Error("Project not found");
 	}
-
-	// Get total expenses
-	const expensesTotal = await db.projectExpense.aggregate({
-		where: { organizationId, projectId },
-		_sum: { amount: true },
-	});
-
-	// Get claims summary
-	const claimsData = await db.projectClaim.groupBy({
-		by: ["status"],
-		where: { organizationId, projectId },
-		_sum: { amount: true },
-		_count: true,
-	});
 
 	// Calculate claims totals
 	let claimsTotal = 0;
@@ -63,21 +85,6 @@ export async function getProjectFinanceSummary(
 		}
 	}
 
-	// Get upcoming claims (due within 30 days)
-	const thirtyDaysFromNow = new Date();
-	thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-
-	const upcomingClaims = await db.projectClaim.aggregate({
-		where: {
-			organizationId,
-			projectId,
-			status: { in: ["SUBMITTED", "APPROVED"] },
-			dueDate: { lte: thirtyDaysFromNow },
-		},
-		_sum: { amount: true },
-		_count: true,
-	});
-
 	const contractValue = project.contractValue
 		? Number(project.contractValue)
 		: 0;
@@ -86,9 +93,14 @@ export async function getProjectFinanceSummary(
 		: 0;
 	const remaining = contractValue - actualExpenses;
 
+	const totalPayments = paymentsTotal._sum.amount
+		? Number(paymentsTotal._sum.amount)
+		: 0;
+
 	return {
 		contractValue,
 		actualExpenses,
+		totalPayments,
 		remaining,
 		claimsTotal,
 		claimsPaid,

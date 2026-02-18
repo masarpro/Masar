@@ -30,20 +30,15 @@ export function QuotationPreview({
 		}),
 	);
 
-	// Fetch template (from quotation or default)
-	const templateId = quotation?.templateId;
-	const { data: linkedTemplate } = useQuery({
-		...orpc.finance.templates.getById.queryOptions({
-			input: { organizationId, id: templateId! },
-		}),
-		enabled: !!templateId,
-	});
+	// القالب يأتي مع بيانات عرض السعر مباشرة
+	const linkedTemplate = quotation?.template;
 
+	// Fetch default template only if quotation has no template
 	const { data: defaultTemplate, isLoading: isLoadingDefaultTemplate } = useQuery({
 		...orpc.finance.templates.getDefault.queryOptions({
 			input: { organizationId, templateType: "QUOTATION" },
 		}),
-		enabled: !templateId,
+		enabled: !linkedTemplate,
 	});
 
 	// Fetch organization finance settings
@@ -54,10 +49,10 @@ export function QuotationPreview({
 	);
 
 	// Use linked template or default
-	const template = templateId ? linkedTemplate : defaultTemplate;
+	const template = linkedTemplate || defaultTemplate;
 
 	const isLoading = isLoadingQuotation || isLoadingSettings ||
-		(templateId ? false : isLoadingDefaultTemplate);
+		(!linkedTemplate && isLoadingDefaultTemplate);
 
 	if (isLoading) {
 		return (

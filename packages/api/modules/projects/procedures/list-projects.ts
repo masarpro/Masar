@@ -45,6 +45,8 @@ export const listProjects = protectedProcedure
 					? Number(project.contractValue)
 					: null,
 				progress: Number(project.progress),
+				memberCount: (project as any)._count?.members ?? 0,
+				photos: (project as any).photos ?? [],
 			})),
 			total: result.total,
 			stats,

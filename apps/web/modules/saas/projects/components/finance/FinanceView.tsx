@@ -2,14 +2,14 @@
 
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@ui/components/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
-import { Plus } from "lucide-react";
+import { Card, CardContent } from "@ui/components/card";
+import {
+	TrendingDown,
+	TrendingUp,
+	Receipt,
+} from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { ClaimsTable } from "./ClaimsTable";
-import { ExpensesTable } from "./ExpensesTable";
 import { FinanceSummary } from "./FinanceSummary";
 
 interface FinanceViewProps {
@@ -27,11 +27,6 @@ export function FinanceView({
 	const basePath = `/app/${organizationSlug}/projects/${projectId}`;
 	const financePath = `${basePath}/finance`;
 
-	const [activeTab, setActiveTab] = useState<"claims" | "expenses">("claims");
-	const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
-		undefined,
-	);
-
 	// Fetch summary data
 	const { data: summary, isLoading: summaryLoading } = useQuery(
 		orpc.projectFinance.getSummary.queryOptions({
@@ -39,42 +34,7 @@ export function FinanceView({
 		}),
 	);
 
-	// Fetch claims
-	const {
-		data: claimsData,
-		isLoading: claimsLoading,
-		refetch: refetchClaims,
-	} = useQuery(
-		orpc.projectFinance.listClaims.queryOptions({
-			input: { organizationId, projectId },
-		}),
-	);
-
-	// Fetch expenses
-	const {
-		data: expensesData,
-		isLoading: expensesLoading,
-		refetch: refetchExpenses,
-	} = useQuery(
-		orpc.projectFinance.listExpenses.queryOptions({
-			input: {
-				organizationId,
-				projectId,
-				category: selectedCategory as
-					| "MATERIALS"
-					| "LABOR"
-					| "EQUIPMENT"
-					| "SUBCONTRACTOR"
-					| "TRANSPORT"
-					| "MISC"
-					| undefined,
-			},
-		}),
-	);
-
-	const isLoading = summaryLoading || claimsLoading || expensesLoading;
-
-	if (isLoading) {
+	if (summaryLoading) {
 		return (
 			<div className="flex items-center justify-center py-20">
 				<div className="relative">
@@ -85,73 +45,78 @@ export function FinanceView({
 		);
 	}
 
+	const sections = [
+		{
+			title: t("finance.expenses.title"),
+			description: t("finance.nav.expensesDescription"),
+			icon: TrendingDown,
+			href: `${financePath}/expenses`,
+			newHref: `${financePath}/expenses/new`,
+			newLabel: t("finance.expenses.new"),
+			iconBg: "bg-red-100 dark:bg-red-900/50",
+			iconColor: "text-red-600 dark:text-red-400",
+			value: summary?.actualExpenses ?? 0,
+		},
+		{
+			title: t("finance.payments.title"),
+			description: t("finance.nav.paymentsDescription"),
+			icon: TrendingUp,
+			href: `${financePath}/payments`,
+			newHref: `${financePath}/payments/new`,
+			newLabel: t("finance.payments.new"),
+			iconBg: "bg-green-100 dark:bg-green-900/50",
+			iconColor: "text-green-600 dark:text-green-400",
+			value: summary?.totalPayments ?? 0,
+		},
+		{
+			title: t("finance.claims.title"),
+			description: t("finance.nav.claimsDescription"),
+			icon: Receipt,
+			href: `${financePath}/claims`,
+			newHref: `${financePath}/claims/new`,
+			newLabel: t("finance.claims.new"),
+			iconBg: "bg-amber-100 dark:bg-amber-900/50",
+			iconColor: "text-amber-600 dark:text-amber-400",
+			value: summary?.claimsPaid ?? 0,
+		},
+	];
+
 	return (
 		<div className="space-y-6">
 			{/* Summary Cards */}
 			<FinanceSummary
 				contractValue={summary?.contractValue ?? 0}
 				actualExpenses={summary?.actualExpenses ?? 0}
+				totalPayments={summary?.totalPayments ?? 0}
 				remaining={summary?.remaining ?? 0}
 				claimsPaid={summary?.claimsPaid ?? 0}
 			/>
 
-			{/* Tabs Section */}
-			<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-				<Tabs
-					value={activeTab}
-					onValueChange={(v) => setActiveTab(v as "claims" | "expenses")}
-				>
-					<div className="mb-6 flex items-center justify-between">
-						<TabsList className="rounded-xl bg-slate-100 dark:bg-slate-800">
-							<TabsTrigger
-								value="claims"
-								className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900"
-							>
-								{t("finance.claims.title")}
-							</TabsTrigger>
-							<TabsTrigger
-								value="expenses"
-								className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900"
-							>
-								{t("finance.expenses.title")}
-							</TabsTrigger>
-						</TabsList>
-
-						{activeTab === "claims" && (
-							<Button asChild className="rounded-xl">
-								<Link href={`${financePath}/new-claim`}>
-									<Plus className="me-2 h-4 w-4" />
-									{t("finance.claims.new")}
-								</Link>
-							</Button>
-						)}
-					</div>
-
-					<TabsContent value="claims" className="mt-0">
-						<ClaimsTable
-							organizationId={organizationId}
-							organizationSlug={organizationSlug}
-							projectId={projectId}
-							claims={claimsData?.claims ?? []}
-							onRefresh={() => {
-								refetchClaims();
-							}}
-						/>
-					</TabsContent>
-
-					<TabsContent value="expenses" className="mt-0">
-						<ExpensesTable
-							organizationSlug={organizationSlug}
-							projectId={projectId}
-							expenses={expensesData?.expenses ?? []}
-							selectedCategory={selectedCategory}
-							onCategoryChange={(cat) => {
-								setSelectedCategory(cat);
-								refetchExpenses();
-							}}
-						/>
-					</TabsContent>
-				</Tabs>
+			{/* Quick Navigation */}
+			<div className="grid gap-4 sm:grid-cols-3">
+				{sections.map((section) => (
+					<Link key={section.title} href={section.href}>
+						<Card className="rounded-2xl transition-shadow hover:shadow-md cursor-pointer h-full">
+							<CardContent className="p-5">
+								<div className="flex items-start gap-3">
+									<div className={`rounded-xl ${section.iconBg} p-2.5`}>
+										<section.icon
+											className={`h-5 w-5 ${section.iconColor}`}
+										/>
+									</div>
+									<div className="min-w-0 flex-1">
+										<h3 className="font-semibold text-slate-900 dark:text-slate-100">
+											{section.title}
+										</h3>
+										<p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+											{section.description}
+										</p>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+					</Link>
+				))}
 			</div>
 		</div>
 	);

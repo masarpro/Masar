@@ -170,7 +170,14 @@ export function MasarSidebarShell({
 			return (
 				<button
 					type="button"
-					onClick={() => toggleMenu(item.id)}
+					onClick={() => {
+						// Navigate to the parent page
+						handleItemClick(item);
+						// Open the submenu if not already open
+						if (!isMenuOpen(item.id)) {
+							toggleMenu(item.id);
+						}
+					}}
 					className={itemClasses}
 					aria-expanded={isMenuOpen(item.id)}
 					aria-controls={`submenu-${item.id}`}

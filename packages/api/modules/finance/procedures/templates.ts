@@ -161,9 +161,15 @@ export const updateFinanceTemplateProcedure = protectedProcedure
 
 		const { organizationId, id, ...data } = input;
 
-		const template = await updateFinanceTemplate(id, organizationId, data);
-
-		return template;
+		try {
+			const template = await updateFinanceTemplate(id, organizationId, data);
+			return template;
+		} catch (error) {
+			if (error instanceof Error && error.message === "Template not found") {
+				throw new ORPCError("NOT_FOUND", { message: "القالب غير موجود" });
+			}
+			throw error;
+		}
 	});
 
 export const setDefaultTemplateProcedure = protectedProcedure

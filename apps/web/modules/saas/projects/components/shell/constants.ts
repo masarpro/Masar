@@ -81,8 +81,36 @@ export const NAVIGATION_GROUPS: NavGroup[] = [
 		label: "المالية",
 		labelEn: "Finance",
 		icon: Banknote,
-		routes: [],
-		directLink: "finance",
+		routes: [
+			{
+				id: "finance-summary",
+				path: "finance",
+				label: "الملخص",
+				labelEn: "Summary",
+				icon: Banknote,
+			},
+			{
+				id: "finance-expenses",
+				path: "finance/expenses",
+				label: "المصروفات",
+				labelEn: "Expenses",
+				icon: Receipt,
+			},
+			{
+				id: "finance-payments",
+				path: "finance/payments",
+				label: "المقبوضات",
+				labelEn: "Payments",
+				icon: Banknote,
+			},
+			{
+				id: "finance-claims",
+				path: "finance/claims",
+				label: "المستخلصات",
+				labelEn: "Claims",
+				icon: ClipboardList,
+			},
+		],
 	},
 	{
 		id: "planning",
@@ -218,19 +246,49 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 	// Finance pages
 	finance: [
 		{
-			id: "new-claim",
-			label: "مستخلص جديد",
-			labelEn: "New Claim",
-			icon: Receipt,
-			href: "finance/new-claim",
+			id: "new-expense",
+			label: "إضافة مصروف",
+			labelEn: "Add Expense",
+			icon: Banknote,
+			href: "finance/expenses/new",
 			variant: "primary",
 		},
+		{
+			id: "new-payment",
+			label: "إضافة مقبوض",
+			labelEn: "Add Payment",
+			icon: Receipt,
+			href: "finance/payments/new",
+		},
+	],
+	"finance/expenses": [
 		{
 			id: "new-expense",
 			label: "إضافة مصروف",
 			labelEn: "Add Expense",
 			icon: Banknote,
-			href: "finance/new-expense",
+			href: "finance/expenses/new",
+			variant: "primary",
+		},
+	],
+	"finance/payments": [
+		{
+			id: "new-payment",
+			label: "إضافة مقبوض",
+			labelEn: "Add Payment",
+			icon: Receipt,
+			href: "finance/payments/new",
+			variant: "primary",
+		},
+	],
+	"finance/claims": [
+		{
+			id: "new-claim",
+			label: "مستخلص جديد",
+			labelEn: "New Claim",
+			icon: ClipboardList,
+			href: "finance/claims/new",
+			variant: "primary",
 		},
 	],
 	// Documents page
@@ -312,12 +370,19 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * Get the current route segment from pathname
+ * Get the current route segment(s) from pathname
+ * Supports nested paths like "finance/expenses"
  */
 export function getCurrentRouteSegment(pathname: string): string {
-	// Extract the segment after /projects/[projectId]/
-	const match = pathname.match(/\/projects\/[^/]+\/([^/?]+)/);
-	return match?.[1] ?? "";
+	// Extract everything after /projects/[projectId]/
+	const match = pathname.match(/\/projects\/[^/]+\/(.+?)(?:\?|$)/);
+	if (match) {
+		// Remove trailing slashes
+		return match[1].replace(/\/$/, "");
+	}
+	// Try single segment
+	const singleMatch = pathname.match(/\/projects\/[^/]+\/([^/?]+)/);
+	return singleMatch?.[1] ?? "";
 }
 
 /**
@@ -332,7 +397,8 @@ export function getActiveNavGroup(pathname: string): NavGroup | null {
 		if (group.directLink === segment) {
 			return group;
 		}
-		if (group.routes.some((route) => route.path === segment)) {
+		// Check if segment matches or starts with a route path
+		if (group.routes.some((route) => segment === route.path || segment.startsWith(`${route.path}/`))) {
 			return group;
 		}
 	}
@@ -344,13 +410,35 @@ export function getActiveNavGroup(pathname: string): NavGroup | null {
  */
 export function isRouteActive(pathname: string, routePath: string): boolean {
 	const segment = getCurrentRouteSegment(pathname);
-	return segment === routePath;
+	return segment === routePath || segment.startsWith(`${routePath}/`);
 }
 
 /**
  * Get context actions for current route
+ * Supports nested paths - tries exact match first, then parent segment
  */
 export function getContextActions(pathname: string): ContextAction[] {
 	const segment = getCurrentRouteSegment(pathname);
-	return CONTEXT_ACTIONS[segment] ?? CONTEXT_ACTIONS[""] ?? [];
+
+	// Try exact match first
+	if (CONTEXT_ACTIONS[segment]) {
+		return CONTEXT_ACTIONS[segment];
+	}
+
+	// Try parent segment (e.g., "finance/expenses/new" → "finance/expenses" → "finance")
+	const parts = segment.split("/");
+	while (parts.length > 1) {
+		parts.pop();
+		const parentSegment = parts.join("/");
+		if (CONTEXT_ACTIONS[parentSegment]) {
+			return CONTEXT_ACTIONS[parentSegment];
+		}
+	}
+
+	// Try single segment
+	if (parts.length === 1 && CONTEXT_ACTIONS[parts[0]]) {
+		return CONTEXT_ACTIONS[parts[0]];
+	}
+
+	return CONTEXT_ACTIONS[""] ?? [];
 }

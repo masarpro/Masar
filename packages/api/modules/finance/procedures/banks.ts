@@ -1,15 +1,15 @@
 import {
-	getOrganizationBankAccounts,
+	createBankAccount,
+	deleteBankAccount,
 	getBankAccountById,
 	getOrganizationBalancesSummary,
-	createBankAccount,
-	updateBankAccount,
+	getOrganizationBankAccounts,
 	setDefaultBankAccount,
-	deleteBankAccount,
+	updateBankAccount,
 } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { protectedProcedure } from "../../../orpc/procedures";
 
 // Enums
 const financeAccountTypeEnum = z.enum(["BANK", "CASH_BOX"]);
@@ -131,7 +131,7 @@ export const createBankAccountProcedure = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "create",
+			action: "settings",
 		});
 
 		return createBankAccount({
@@ -176,7 +176,7 @@ export const updateBankAccountProcedure = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "update",
+			action: "settings",
 		});
 
 		const { organizationId, id, ...data } = input;
@@ -203,7 +203,7 @@ export const setDefaultBankAccountProcedure = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "update",
+			action: "settings",
 		});
 
 		return setDefaultBankAccount(input.id, input.organizationId);
@@ -228,7 +228,7 @@ export const deleteBankAccountProcedure = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "delete",
+			action: "settings",
 		});
 
 		return deleteBankAccount(input.id, input.organizationId);

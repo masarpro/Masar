@@ -3,13 +3,18 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import dynamic from "next/dynamic";
 import { FinanceHeader } from "./FinanceHeader";
 import { BalanceCards } from "./BalanceCards";
-import { CashFlowCard } from "./CashFlowCard";
 import { ActionCards } from "./ActionCards";
 import { StatsCards } from "./StatsCards";
 import { RecentDocumentsTable } from "./RecentDocumentsTable";
 import { DeadlinesCard } from "./DeadlinesCard";
+
+const CashFlowCard = dynamic(
+	() => import("./CashFlowCard").then((m) => ({ default: m.CashFlowCard })),
+	{ ssr: false },
+);
 
 interface FinanceDashboardProps {
 	organizationId: string;

@@ -224,7 +224,8 @@ export function TemplateEditor({
 		swiftCode: orgSettings?.swiftCode ?? undefined,
 		headerText: orgSettings?.headerText ?? undefined,
 		footerText: orgSettings?.footerText ?? undefined,
-		thankYouMessage: orgSettings?.thankYouMessage ?? undefined,
+		// لا نعرض رسالة الشكر في محرر القوالب - تظهر فقط في المستندات الفعلية
+		thankYouMessage: undefined,
 	};
 
 	// Get sample data for preview
@@ -390,6 +391,33 @@ export function TemplateEditor({
 		addToHistory(newElements);
 	}, [elements, addToHistory]);
 
+	const handleResizeElement = useCallback((id: string, action: "increase" | "decrease") => {
+		const newElements = elements.map((el) => {
+			if (el.id !== id) return el;
+
+			const currentHeight = (el.settings.minHeight as number) || 0;
+			const step = 20; // بكسل
+
+			let newHeight: number;
+			if (action === "increase") {
+				newHeight = currentHeight + step;
+			} else {
+				newHeight = Math.max(0, currentHeight - step);
+			}
+
+			return {
+				...el,
+				settings: {
+					...el.settings,
+					minHeight: newHeight,
+				},
+			};
+		});
+
+		setElements(newElements);
+		addToHistory(newElements);
+	}, [elements, addToHistory]);
+
 	const handleToggleElement = useCallback((id: string) => {
 		const newElements = elements.map((el) =>
 			el.id === id ? { ...el, enabled: !el.enabled } : el
@@ -537,6 +565,10 @@ export function TemplateEditor({
 					selectedElement={selectedElement}
 					onSelectElement={setSelectedElement}
 					onDropElement={handleDropElement}
+					onMoveElement={handleMoveElement}
+					onResizeElement={handleResizeElement}
+					onRemoveElement={handleRemoveElement}
+					onToggleElement={handleToggleElement}
 					templateType={templateType}
 					organization={organizationData}
 					sampleData={sampleData}

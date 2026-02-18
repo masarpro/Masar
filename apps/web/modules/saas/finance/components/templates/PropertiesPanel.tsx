@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
 import { Label } from "@ui/components/label";
 import { Input } from "@ui/components/input";
+import { Textarea } from "@ui/components/textarea";
 import { Button } from "@ui/components/button";
 import { Switch } from "@ui/components/switch";
 import {
@@ -461,6 +462,51 @@ export function PropertiesPanel({
 										checked={(selectedElement.settings.showYear as boolean) ?? true}
 										onCheckedChange={(checked) =>
 											onUpdateElement(selectedElement.id, { showYear: checked })
+										}
+									/>
+								</div>
+							</div>
+						)}
+
+						{selectedElement.type === "text" && (
+							<div className="space-y-4">
+								<div className="space-y-2">
+									<Label>{t("finance.templates.editor.settings.textLabel")}</Label>
+									<Input
+										value={(selectedElement.settings.label as string) ?? ""}
+										onChange={(e) =>
+											onUpdateElement(selectedElement.id, { label: e.target.value })
+										}
+										placeholder={t("finance.templates.editor.settings.textLabelPlaceholder")}
+									/>
+								</div>
+								<div className="space-y-2">
+									<Label>{t("finance.templates.editor.settings.textPlaceholder")}</Label>
+									<Input
+										value={(selectedElement.settings.placeholder as string) ?? ""}
+										onChange={(e) =>
+											onUpdateElement(selectedElement.id, { placeholder: e.target.value })
+										}
+										placeholder={t("finance.templates.editor.settings.textPlaceholderHint")}
+									/>
+								</div>
+								<div className="space-y-2">
+									<Label>{t("finance.templates.editor.settings.defaultContent")}</Label>
+									<Textarea
+										value={(selectedElement.settings.content as string) ?? ""}
+										onChange={(e) =>
+											onUpdateElement(selectedElement.id, { content: e.target.value })
+										}
+										placeholder={t("finance.templates.editor.settings.defaultContentPlaceholder")}
+										rows={3}
+									/>
+								</div>
+								<div className="flex items-center justify-between">
+									<Label>{t("finance.templates.editor.settings.isEditable")}</Label>
+									<Switch
+										checked={(selectedElement.settings.isEditable as boolean) ?? true}
+										onCheckedChange={(checked) =>
+											onUpdateElement(selectedElement.id, { isEditable: checked })
 										}
 									/>
 								</div>

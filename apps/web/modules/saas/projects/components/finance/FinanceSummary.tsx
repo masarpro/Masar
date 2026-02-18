@@ -1,11 +1,12 @@
 "use client";
 
-import { Banknote, Receipt, TrendingDown, Wallet } from "lucide-react";
+import { Banknote, Receipt, TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 interface FinanceSummaryProps {
 	contractValue: number;
 	actualExpenses: number;
+	totalPayments?: number;
 	remaining: number;
 	claimsPaid: number;
 }
@@ -22,6 +23,7 @@ function formatCurrency(value: number): string {
 export function FinanceSummary({
 	contractValue,
 	actualExpenses,
+	totalPayments,
 	remaining,
 	claimsPaid,
 }: FinanceSummaryProps) {
@@ -48,6 +50,20 @@ export function FinanceSummary({
 			textColor: "text-red-700 dark:text-red-300",
 			labelColor: "text-red-600 dark:text-red-400",
 		},
+		...(totalPayments !== undefined
+			? [
+					{
+						title: t("finance.summary.payments"),
+						value: totalPayments,
+						icon: TrendingUp,
+						bgColor: "bg-green-50 dark:bg-green-950/30",
+						iconBg: "bg-green-100 dark:bg-green-900/50",
+						iconColor: "text-green-600 dark:text-green-400",
+						textColor: "text-green-700 dark:text-green-300",
+						labelColor: "text-green-600 dark:text-green-400",
+					},
+				]
+			: []),
 		{
 			title: t("finance.summary.remaining"),
 			value: remaining,
@@ -71,7 +87,7 @@ export function FinanceSummary({
 	];
 
 	return (
-		<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+		<div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
 			{cards.map((card) => (
 				<div key={card.title} className={`rounded-2xl ${card.bgColor} p-5`}>
 					<div className="flex items-center gap-3">

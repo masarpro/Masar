@@ -1,7 +1,21 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { ProjectOverview } from "@saas/projects/components/ProjectOverview";
+import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+
+const ProjectOverview = dynamic(
+	() =>
+		import("@saas/projects/components/ProjectOverview").then((m) => ({
+			default: m.ProjectOverview,
+		})),
+	{
+		loading: () => (
+			<div className="flex min-h-[40vh] items-center justify-center">
+				<div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+			</div>
+		),
+	},
+);
 
 export async function generateMetadata() {
 	const t = await getTranslations();
