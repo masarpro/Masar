@@ -2,21 +2,22 @@
 
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
-import { Badge } from "@ui/components/badge";
+import { Progress } from "@ui/components/progress";
 import {
 	AlertTriangle,
-	Calendar,
 	Camera,
 	Clock,
+	FileDiff,
 	FileText,
 	TrendingUp,
-	Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { DailyReportCard } from "./DailyReportCard";
 import { IssueCard } from "./IssueCard";
 import { PhotoGrid } from "./PhotoGrid";
+import { ProgressUpdateForm } from "../forms/ProgressUpdateForm";
 
 interface FieldTimelineProps {
 	organizationId: string;
@@ -40,6 +41,7 @@ export function FieldTimeline({
 }: FieldTimelineProps) {
 	const t = useTranslations();
 	const basePath = `/app/${organizationSlug}/projects/${projectId}`;
+	const [showProgressForm, setShowProgressForm] = useState(false);
 
 	const { data, isLoading } = useQuery(
 		orpc.projectField.getTimeline.queryOptions({
@@ -47,6 +49,15 @@ export function FieldTimeline({
 				organizationId,
 				projectId,
 				limit: 50,
+			},
+		}),
+	);
+
+	const { data: project } = useQuery(
+		orpc.projects.getById.queryOptions({
+			input: {
+				id: projectId,
+				organizationId,
 			},
 		}),
 	);
@@ -63,39 +74,40 @@ export function FieldTimeline({
 	}
 
 	const timeline = data?.timeline ?? [];
+	const currentProgress = project?.progress ?? 0;
 
 	// Quick action buttons
 	const quickActions = [
 		{
 			label: t("projects.field.newReport"),
 			icon: FileText,
-			href: `${basePath}/field/new-report`,
+			href: `${basePath}/execution/new-report`,
 			color: "bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400",
 		},
 		{
 			label: t("projects.field.uploadPhoto"),
 			icon: Camera,
-			href: `${basePath}/field/upload`,
+			href: `${basePath}/execution/upload`,
 			color: "bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400",
 		},
 		{
 			label: t("projects.field.newIssue"),
 			icon: AlertTriangle,
-			href: `${basePath}/field/new-issue`,
+			href: `${basePath}/execution/new-issue`,
 			color: "bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400",
 		},
 		{
-			label: t("projects.field.updateProgress"),
-			icon: TrendingUp,
-			href: `${basePath}/supervisor`,
-			color: "bg-amber-50 text-amber-600 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400",
+			label: t("changeOrders.title"),
+			icon: FileDiff,
+			href: `${basePath}/changes`,
+			color: "bg-purple-50 text-purple-600 hover:bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400",
 		},
 	];
 
 	return (
 		<div className="space-y-6">
 			{/* Quick Actions */}
-			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+			<div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
 				{quickActions.map((action) => (
 					<Link key={action.label} href={action.href}>
 						<div
@@ -106,7 +118,45 @@ export function FieldTimeline({
 						</div>
 					</Link>
 				))}
+				<button
+					type="button"
+					onClick={() => setShowProgressForm(!showProgressForm)}
+					className="flex items-center gap-3 rounded-xl p-4 transition-colors bg-amber-50 text-amber-600 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400"
+				>
+					<TrendingUp className="h-5 w-5" />
+					<span className="text-sm font-medium">
+						{t("projects.field.updateProgress")}
+					</span>
+				</button>
 			</div>
+
+			{/* Progress Card */}
+			<div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+				<div className="mb-3 flex items-center justify-between">
+					<span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+						{t("projects.field.currentProgress")}
+					</span>
+					<span className="text-3xl font-bold text-teal-600 dark:text-teal-400">
+						{Math.round(currentProgress)}%
+					</span>
+				</div>
+				<Progress value={currentProgress} className="h-4" />
+			</div>
+
+			{/* Progress Update Form (Collapsible) */}
+			{showProgressForm && (
+				<div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+					<h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
+						{t("projects.field.updateProgress")}
+					</h2>
+					<ProgressUpdateForm
+						organizationId={organizationId}
+						projectId={projectId}
+						currentProgress={currentProgress}
+						onSuccess={() => setShowProgressForm(false)}
+					/>
+				</div>
+			)}
 
 			{/* Timeline */}
 			<div className="space-y-4">

@@ -1,5 +1,6 @@
 import { db } from "../client";
-import type { ProjectStatus, ProjectType } from "../generated/client";
+import type { ContractStatus, PaymentMethod, PaymentTermType, ProjectStatus, ProjectType } from "../generated/client";
+import { generateContractNo } from "./project-contract";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Project Queries - استعلامات المشاريع
@@ -114,7 +115,16 @@ export async function generateUniqueProjectSlug(
 }
 
 /**
- * Create a new project
+ * Generate the next project number for an organization (PRJ-001, PRJ-002, ...)
+ */
+export async function generateProjectNo(organizationId: string): Promise<string> {
+	const count = await db.project.count({ where: { organizationId } });
+	const nextNum = count + 1;
+	return `PRJ-${String(nextNum).padStart(3, "0")}`;
+}
+
+/**
+ * Create a new project (optionally with contract data)
  */
 export async function createProject(data: {
 	organizationId: string;
@@ -127,15 +137,45 @@ export async function createProject(data: {
 	contractValue?: number;
 	startDate?: Date;
 	endDate?: Date;
+	// Contract fields (optional)
+	contractNo?: string | null;
+	contractStatus?: ContractStatus;
+	signedDate?: Date | null;
+	retentionPercent?: number | null;
+	retentionCap?: number | null;
+	retentionReleaseDays?: number | null;
+	contractNotes?: string | null;
+	// New contract fields
+	includesVat?: boolean;
+	vatPercent?: number | null;
+	paymentMethod?: PaymentMethod | null;
+	performanceBondPercent?: number | null;
+	performanceBondAmount?: number | null;
+	insuranceRequired?: boolean;
+	insuranceDetails?: string | null;
+	scopeOfWork?: string | null;
+	penaltyPercent?: number | null;
+	penaltyCapPercent?: number | null;
+	// Payment terms
+	paymentTerms?: Array<{
+		type: PaymentTermType;
+		label?: string | null;
+		percent?: number | null;
+		amount?: number | null;
+		sortOrder?: number;
+	}>;
 }) {
 	const slug = await generateUniqueProjectSlug(data.organizationId, data.name);
+	const projectNo = await generateProjectNo(data.organizationId);
 
-	return db.project.create({
+	// Create the project first
+	const project = await db.project.create({
 		data: {
 			organizationId: data.organizationId,
 			createdById: data.createdById,
 			name: data.name,
 			slug,
+			projectNo,
 			description: data.description,
 			type: data.type,
 			clientName: data.clientName,
@@ -150,6 +190,60 @@ export async function createProject(data: {
 			createdBy: { select: { id: true, name: true } },
 		},
 	});
+
+	// If contractValue is provided, create a ProjectContract record
+	if (data.contractValue != null) {
+		try {
+			const contractNo = data.contractNo || await generateContractNo(data.organizationId);
+
+			const contract = await db.projectContract.create({
+				data: {
+					organizationId: data.organizationId,
+					projectId: project.id,
+					createdById: data.createdById,
+					contractNo,
+					status: data.contractStatus ?? "DRAFT",
+					value: data.contractValue,
+					currency: "SAR",
+					signedDate: data.signedDate ?? null,
+					startDate: data.startDate ?? null,
+					endDate: data.endDate ?? null,
+					retentionPercent: data.retentionPercent ?? null,
+					retentionCap: data.retentionCap ?? null,
+					retentionReleaseDays: data.retentionReleaseDays ?? null,
+					notes: data.contractNotes ?? null,
+					includesVat: data.includesVat ?? false,
+					vatPercent: data.vatPercent ?? null,
+					paymentMethod: data.paymentMethod ?? null,
+					performanceBondPercent: data.performanceBondPercent ?? null,
+					performanceBondAmount: data.performanceBondAmount ?? null,
+					insuranceRequired: data.insuranceRequired ?? false,
+					insuranceDetails: data.insuranceDetails ?? null,
+					scopeOfWork: data.scopeOfWork ?? null,
+					penaltyPercent: data.penaltyPercent ?? null,
+					penaltyCapPercent: data.penaltyCapPercent ?? null,
+				},
+			});
+
+			// Create payment terms if provided
+			if (data.paymentTerms && data.paymentTerms.length > 0) {
+				await db.contractPaymentTerm.createMany({
+					data: data.paymentTerms.map((term, index) => ({
+						contractId: contract.id,
+						type: term.type,
+						label: term.label ?? null,
+						percent: term.percent ?? null,
+						amount: term.amount ?? null,
+						sortOrder: term.sortOrder ?? index,
+					})),
+				});
+			}
+		} catch (err) {
+			console.error("[createProject] Failed to create contract:", err);
+		}
+	}
+
+	return project;
 }
 
 /**

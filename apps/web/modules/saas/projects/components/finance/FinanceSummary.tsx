@@ -9,6 +9,8 @@ interface FinanceSummaryProps {
 	totalPayments?: number;
 	remaining: number;
 	claimsPaid: number;
+	adjustedContractValue?: number;
+	changeOrdersImpact?: number;
 }
 
 function formatCurrency(value: number): string {
@@ -26,6 +28,8 @@ export function FinanceSummary({
 	totalPayments,
 	remaining,
 	claimsPaid,
+	adjustedContractValue,
+	changeOrdersImpact,
 }: FinanceSummaryProps) {
 	const t = useTranslations();
 
@@ -87,21 +91,33 @@ export function FinanceSummary({
 	];
 
 	return (
-		<div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+		<div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
 			{cards.map((card) => (
-				<div key={card.title} className={`rounded-2xl ${card.bgColor} p-5`}>
-					<div className="flex items-center gap-3">
-						<div className={`rounded-xl ${card.iconBg} p-2.5`}>
-							<card.icon className={`h-5 w-5 ${card.iconColor}`} />
+				<div
+					key={card.title}
+					className={`flex min-w-0 flex-1 rounded-2xl border border-slate-200/60 shadow-lg shadow-black/5 ${card.bgColor} p-4 dark:border-slate-700/50 sm:p-5`}
+				>
+					<div className="flex min-w-0 items-center gap-3">
+						<div className={`shrink-0 rounded-xl ${card.iconBg} p-2.5`}>
+							<card.icon className={`h-5 w-5 shrink-0 ${card.iconColor}`} />
 						</div>
-						<div className="min-w-0 flex-1">
-							<p className={`text-xs ${card.labelColor}`}>{card.title}</p>
+						<div className="min-w-0 flex-1 overflow-hidden">
+							<p className={`truncate text-xs ${card.labelColor}`}>{card.title}</p>
 							<p
-								className={`truncate text-lg font-semibold ${card.textColor}`}
+								className={`truncate text-base font-semibold sm:text-lg ${card.textColor}`}
 								title={formatCurrency(card.value)}
 							>
 								{formatCurrency(card.value)}
 							</p>
+							{card.title === t("finance.summary.contractValue") &&
+								adjustedContractValue !== undefined &&
+								adjustedContractValue > 0 &&
+								changeOrdersImpact !== 0 && (
+									<p className="mt-0.5 truncate text-xs text-teal-600 dark:text-teal-400">
+										{t("projects.contract.summary.adjustedValue")}:{" "}
+										{formatCurrency(adjustedContractValue)}
+									</p>
+								)}
 						</div>
 					</div>
 				</div>

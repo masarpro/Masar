@@ -38,3 +38,5 @@ export * from "./finance-reports";
 export * from "./org-finance";
 // Seed Templates
 export * from "./seed-templates";
+// Project Contract
+export * from "./project-contract";

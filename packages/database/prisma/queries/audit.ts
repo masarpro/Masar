@@ -12,7 +12,8 @@ export type AuditEntityType =
 	| "attachment"
 	| "issue"
 	| "photo"
-	| "report";
+	| "report"
+	| "contract";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Audit Log Queries - سجل التدقيق

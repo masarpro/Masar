@@ -64,7 +64,7 @@ export function IssueForm({
 
 			toast.success(t("projects.field.issueCreated"));
 			queryClient.invalidateQueries({ queryKey: ["projectField"] });
-			router.push(`${basePath}/field`);
+			router.push(`${basePath}/execution`);
 		} catch {
 			toast.error(t("projects.field.issueCreateError"));
 		}
@@ -80,7 +80,7 @@ export function IssueForm({
 					asChild
 					className="shrink-0 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
 				>
-					<Link href={`${basePath}/field`}>
+					<Link href={`${basePath}/execution`}>
 						<ChevronLeft className="h-5 w-5" />
 					</Link>
 				</Button>
@@ -165,7 +165,7 @@ export function IssueForm({
 					<Button
 						type="button"
 						variant="outline"
-						onClick={() => router.push(`${basePath}/field`)}
+						onClick={() => router.push(`${basePath}/execution`)}
 						className="rounded-xl"
 					>
 						{t("common.cancel")}

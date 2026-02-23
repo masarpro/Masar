@@ -230,6 +230,13 @@ enum AuditAction {
   CO_APPROVED         // اعتماد أمر تغيير
   CO_REJECTED         // رفض أمر تغيير
   CO_IMPLEMENTED      // تنفيذ أمر تغيير
+  // عقود مقاولي الباطن
+  SUBCONTRACT_CREATED  // إنشاء عقد مقاول باطن
+  SUBCONTRACT_UPDATED  // تعديل عقد مقاول باطن
+  SUBCONTRACT_DELETED  // حذف عقد مقاول باطن
+  // العقد الرئيسي
+  CONTRACT_CREATED     // إنشاء عقد رئيسي
+  CONTRACT_UPDATED     // تعديل عقد رئيسي
 }
 
 // قنوات الإشعار
@@ -344,6 +351,23 @@ enum ChangeOrderCategory {
   OTHER           // أخرى
 }
 
+// حالة العقد الرئيسي
+enum ContractStatus {
+  DRAFT      // مسودة
+  ACTIVE     // فعال
+  SUSPENDED  // معلق
+  CLOSED     // مغلق
+}
+
+// نوع شرط الدفع
+enum PaymentTermType {
+  ADVANCE    // دفعة مقدمة
+  MILESTONE  // دفعة مرحلة
+  MONTHLY    // دفعة شهرية
+  COMPLETION // عند الإنهاء
+  CUSTOM     // مخصص
+}
+
 model User {
   id                 String       @id @default(cuid())
   name               String
@@ -383,6 +407,8 @@ model User {
   // علاقات المالية
   expensesCreated       ProjectExpense[]        @relation("ExpenseCreator")
   claimsCreated         ProjectClaim[]          @relation("ClaimCreator")
+  subcontractsCreated   SubcontractContract[]   @relation("SubcontractCreator")
+  contractsCreated      ProjectContract[]       @relation("ContractCreator")
 
   // علاقات الوثائق والاعتمادات
   documentsCreated         ProjectDocument[]          @relation("DocumentCreator")
@@ -402,6 +428,9 @@ model User {
   templatesCreated         ProjectTemplate[]          @relation("TemplateCreator")
   alertsAcknowledged       ProjectAlert[]             @relation("AlertAcknowledger")
   digestSubscriptions      DigestSubscription[]       @relation("DigestSubscriber")
+
+  // تتبع آخر قراءة للدردشة
+  chatLastReads            ChatLastRead[]             @relation("ChatLastReadUser")
 
   // Phase 8 - Integrations & Exports
   deliveryLogsSent         MessageDeliveryLog[]       @relation("DeliveryLogSender")
@@ -977,6 +1006,7 @@ model Project {
   // المعلومات الأساسية
   name            String
   slug            String
+  projectNo       String?        @map("project_no")
   description     String?        @db.Text
 
   // الحالة والنوع
@@ -1012,8 +1042,10 @@ model Project {
   progressUpdates ProjectProgressUpdate[]
 
   // علاقات المالية
-  expenses        ProjectExpense[]
-  claims          ProjectClaim[]
+  expenses              ProjectExpense[]
+  claims                ProjectClaim[]
+  subcontractContracts  SubcontractContract[]
+  contract              ProjectContract?
 
   // علاقات الوثائق والاعتمادات والمحادثات
   documents       ProjectDocument[]
@@ -1206,6 +1238,9 @@ model ProjectExpense {
   note            String?         @db.Text
   attachmentUrl   String?         @map("attachment_url")
 
+  subcontractContractId  String?               @map("subcontract_contract_id")
+  subcontractContract    SubcontractContract?   @relation("SubcontractExpenses", fields: [subcontractContractId], references: [id], onDelete: SetNull)
+
   createdById     String          @map("created_by")
   createdBy       User            @relation("ExpenseCreator", fields: [createdById], references: [id])
 
@@ -1248,6 +1283,124 @@ model ProjectClaim {
   @@index([organizationId, projectId, status])
   @@index([organizationId, projectId, dueDate])
   @@map("project_claims")
+}
+
+// عقود مقاولي الباطن
+model SubcontractContract {
+  id              String    @id @default(cuid())
+  organizationId  String    @map("organization_id")
+  projectId       String    @map("project_id")
+  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  name            String
+  startDate       DateTime? @map("start_date") @db.Date
+  endDate         DateTime? @map("end_date") @db.Date
+  value           Decimal   @db.Decimal(15, 2)
+  notes           String?   @db.Text
+
+  createdById     String    @map("created_by")
+  createdBy       User      @relation("SubcontractCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  expenses        ProjectExpense[] @relation("SubcontractExpenses")
+
+  @@index([organizationId, projectId])
+  @@map("subcontract_contracts")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PROJECT CONTRACT - العقد الرئيسي
+// ═══════════════════════════════════════════════════════════════════════════
+
+model ProjectContract {
+  id              String          @id @default(cuid())
+  organizationId  String          @map("organization_id")
+  projectId       String          @unique @map("project_id")
+  project         Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // معلومات العقد
+  contractNo      String?         @map("contract_no")
+  title           String?
+  clientName      String?         @map("client_name")
+  description     String?         @db.Text
+
+  // الحالة
+  status          ContractStatus  @default(DRAFT)
+
+  // القيمة
+  value           Decimal         @db.Decimal(15, 2)
+  currency        String          @default("SAR")
+
+  // التواريخ
+  signedDate      DateTime?       @map("signed_date") @db.Date
+  startDate       DateTime?       @map("start_date") @db.Date
+  endDate         DateTime?       @map("end_date") @db.Date
+
+  // الاحتفاظ (Retention)
+  retentionPercent    Decimal?    @map("retention_percent") @db.Decimal(5, 2)
+  retentionCap        Decimal?    @map("retention_cap") @db.Decimal(15, 2)
+  retentionReleaseDays Int?       @map("retention_release_days")
+
+  // الضريبة (VAT)
+  includesVat       Boolean         @default(false) @map("includes_vat")
+  vatPercent        Decimal?        @map("vat_percent") @db.Decimal(5, 2)
+
+  // طريقة الدفع
+  paymentMethod     PaymentMethod?  @map("payment_method")
+
+  // ضمان حسن الأداء (Performance Bond)
+  performanceBondPercent  Decimal?  @map("performance_bond_percent") @db.Decimal(5, 2)
+  performanceBondAmount   Decimal?  @map("performance_bond_amount") @db.Decimal(15, 2)
+
+  // التأمين
+  insuranceRequired Boolean         @default(false) @map("insurance_required")
+  insuranceDetails  String?         @map("insurance_details") @db.Text
+
+  // نطاق العمل
+  scopeOfWork       String?         @map("scope_of_work") @db.Text
+
+  // غرامات التأخير
+  penaltyPercent    Decimal?        @map("penalty_percent") @db.Decimal(5, 2)
+  penaltyCapPercent Decimal?        @map("penalty_cap_percent") @db.Decimal(5, 2)
+
+  // ملاحظات
+  notes           String?         @db.Text
+
+  // من أنشأ العقد
+  createdById     String          @map("created_by")
+  createdBy       User            @relation("ContractCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  // العلاقات
+  paymentTerms    ContractPaymentTerm[]
+  changeOrders    ProjectChangeOrder[]
+
+  @@index([organizationId, projectId])
+  @@map("project_contracts")
+}
+
+model ContractPaymentTerm {
+  id          String           @id @default(cuid())
+  contractId  String           @map("contract_id")
+  contract    ProjectContract  @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  type        PaymentTermType
+  label       String?
+  percent     Decimal?         @db.Decimal(5, 2)
+  amount      Decimal?         @db.Decimal(15, 2)
+  dueDate     DateTime?        @map("due_date") @db.Date
+  milestoneId String?          @map("milestone_id")
+  sortOrder   Int              @default(0) @map("sort_order")
+
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  @@index([contractId])
+  @@map("contract_payment_terms")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1365,6 +1518,21 @@ model ProjectMessage {
 
   @@index([organizationId, projectId, channel, createdAt])
   @@map("project_messages")
+}
+
+// تتبع آخر قراءة للدردشة
+model ChatLastRead {
+  id              String         @id @default(cuid())
+  organizationId  String         @map("organization_id")
+  projectId       String         @map("project_id")
+  userId          String         @map("user_id")
+  user            User           @relation("ChatLastReadUser", fields: [userId], references: [id])
+  channel         MessageChannel
+  lastReadAt      DateTime       @default(now()) @map("last_read_at")
+
+  @@unique([projectId, userId, channel])
+  @@index([organizationId, projectId, userId])
+  @@map("chat_last_reads")
 }
 
 // الإشعارات
@@ -1804,6 +1972,8 @@ model ProjectChangeOrder {
   milestone       ProjectMilestone?   @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
   claimId         String?             @map("claim_id")
   claim           ProjectClaim?       @relation(fields: [claimId], references: [id], onDelete: SetNull)
+  contractId      String?             @map("contract_id")
+  contract        ProjectContract?    @relation(fields: [contractId], references: [id], onDelete: SetNull)
 
   // طلب الاعتماد
   requestedById   String              @map("requested_by")
@@ -1830,6 +2000,7 @@ model ProjectChangeOrder {
   @@index([organizationId, projectId, coNo])
   @@index([milestoneId])
   @@index([claimId])
+  @@index([contractId])
   @@map("project_change_orders")
 }
 

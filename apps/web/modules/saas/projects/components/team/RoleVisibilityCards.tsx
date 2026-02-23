@@ -59,7 +59,6 @@ const roleCardColors: Record<ProjectRole, { bg: string; iconBg: string; iconColo
 const ALL_SECTIONS = [
 	"overview",
 	"field",
-	"supervisor",
 	"finance",
 	"finance/expenses",
 	"finance/payments",

@@ -13,6 +13,18 @@ import {
 	canRoleViewSection,
 } from "../lib/role-visibility";
 
+export interface ProjectData {
+	id: string;
+	name: string;
+	status: string;
+	progress: number;
+	contractValue?: number | null;
+	clientName?: string | null;
+	location?: string | null;
+	startDate?: Date | string | null;
+	endDate?: Date | string | null;
+}
+
 interface ProjectRoleContextValue {
 	/** The user's actual role in this project */
 	actualRole: ProjectRole;
@@ -28,6 +40,8 @@ interface ProjectRoleContextValue {
 	canViewSection: (section: string) => boolean;
 	/** Whether the user is a manager (can use View As) */
 	isManager: boolean;
+	/** The project data from the shell */
+	projectData: ProjectData | null;
 }
 
 const ProjectRoleContext = createContext<ProjectRoleContextValue | null>(null);
@@ -35,11 +49,13 @@ const ProjectRoleContext = createContext<ProjectRoleContextValue | null>(null);
 interface ProjectRoleProviderProps {
 	children: ReactNode;
 	actualRole: ProjectRole;
+	projectData?: ProjectData;
 }
 
 export function ProjectRoleProvider({
 	children,
 	actualRole,
+	projectData: projectDataProp,
 }: ProjectRoleProviderProps) {
 	const [viewAsRole, setViewAsRole] = useState<ProjectRole | null>(null);
 
@@ -68,6 +84,7 @@ export function ProjectRoleProvider({
 		setViewAs,
 		canViewSection,
 		isManager,
+		projectData: projectDataProp ?? null,
 	};
 
 	return createElement(ProjectRoleContext.Provider, { value }, children);
@@ -89,6 +106,7 @@ export function useProjectRole(): ProjectRoleContextValue {
 			canViewSection: (section: string) =>
 				canRoleViewSection("VIEWER", section),
 			isManager: false,
+			projectData: null,
 		};
 	}
 	return context;

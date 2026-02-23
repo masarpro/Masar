@@ -17,7 +17,7 @@ export async function getProjectFinanceSummary(
 	thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
 	// Run all queries in parallel
-	const [project, expensesTotal, paymentsTotal, claimsData, upcomingClaims] =
+	const [project, expensesTotal, paymentsTotal, claimsData, upcomingClaims, approvedCOImpact] =
 		await Promise.all([
 			// Get project contract value
 			db.project.findFirst({
@@ -51,6 +51,16 @@ export async function getProjectFinanceSummary(
 				},
 				_sum: { amount: true },
 				_count: true,
+			}),
+			// Get approved change orders cost impact
+			db.projectChangeOrder.aggregate({
+				where: {
+					organizationId,
+					projectId,
+					status: { in: ["APPROVED", "IMPLEMENTED"] },
+					costImpact: { not: null },
+				},
+				_sum: { costImpact: true },
 			}),
 		]);
 
@@ -91,7 +101,11 @@ export async function getProjectFinanceSummary(
 	const actualExpenses = expensesTotal._sum.amount
 		? Number(expensesTotal._sum.amount)
 		: 0;
-	const remaining = contractValue - actualExpenses;
+	const changeOrdersImpact = approvedCOImpact._sum.costImpact
+		? Number(approvedCOImpact._sum.costImpact)
+		: 0;
+	const adjustedContractValue = contractValue + changeOrdersImpact;
+	const remaining = adjustedContractValue - actualExpenses;
 
 	const totalPayments = paymentsTotal._sum.amount
 		? Number(paymentsTotal._sum.amount)
@@ -99,6 +113,8 @@ export async function getProjectFinanceSummary(
 
 	return {
 		contractValue,
+		adjustedContractValue,
+		changeOrdersImpact,
 		actualExpenses,
 		totalPayments,
 		remaining,
@@ -174,6 +190,7 @@ export async function createProjectExpense(data: {
 	vendorName?: string;
 	note?: string;
 	attachmentUrl?: string;
+	subcontractContractId?: string;
 }) {
 	// Verify project belongs to organization
 	const project = await db.project.findFirst({
@@ -196,6 +213,7 @@ export async function createProjectExpense(data: {
 			vendorName: data.vendorName,
 			note: data.note,
 			attachmentUrl: data.attachmentUrl,
+			subcontractContractId: data.subcontractContractId,
 		},
 		include: {
 			createdBy: { select: { id: true, name: true } },
@@ -391,6 +409,7 @@ export async function updateProjectExpense(
 		vendorName?: string | null;
 		note?: string | null;
 		attachmentUrl?: string | null;
+		subcontractContractId?: string | null;
 	},
 ) {
 	const existing = await db.projectExpense.findFirst({
@@ -411,6 +430,7 @@ export async function updateProjectExpense(
 			vendorName: data.vendorName,
 			note: data.note,
 			attachmentUrl: data.attachmentUrl,
+			subcontractContractId: data.subcontractContractId,
 		},
 		include: {
 			createdBy: { select: { id: true, name: true } },
@@ -504,4 +524,203 @@ export async function updateProjectClaim(
 			createdBy: { select: { id: true, name: true } },
 		},
 	});
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Subcontract Contract Queries - عقود مقاولي الباطن
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Get all subcontract contracts for a project
+ */
+export async function getSubcontractContracts(
+	organizationId: string,
+	projectId: string,
+) {
+	const contracts = await db.subcontractContract.findMany({
+		where: { organizationId, projectId },
+		include: {
+			createdBy: { select: { id: true, name: true } },
+			expenses: {
+				select: { id: true, amount: true, date: true },
+			},
+		},
+		orderBy: { createdAt: "desc" },
+	});
+
+	return contracts.map((contract) => {
+		const totalPaid = contract.expenses.reduce(
+			(sum, e) => sum + Number(e.amount),
+			0,
+		);
+		return {
+			...contract,
+			value: Number(contract.value),
+			totalPaid,
+			remaining: Number(contract.value) - totalPaid,
+			expenseCount: contract.expenses.length,
+		};
+	});
+}
+
+/**
+ * Get a single subcontract contract by ID with full expenses
+ */
+export async function getSubcontractContractById(
+	id: string,
+	organizationId: string,
+	projectId: string,
+) {
+	const contract = await db.subcontractContract.findFirst({
+		where: { id, organizationId, projectId },
+		include: {
+			createdBy: { select: { id: true, name: true } },
+			expenses: {
+				include: {
+					createdBy: { select: { id: true, name: true } },
+				},
+				orderBy: { date: "desc" },
+			},
+		},
+	});
+
+	if (!contract) return null;
+
+	const totalPaid = contract.expenses.reduce(
+		(sum, e) => sum + Number(e.amount),
+		0,
+	);
+
+	return {
+		...contract,
+		value: Number(contract.value),
+		totalPaid,
+		remaining: Number(contract.value) - totalPaid,
+		expenses: contract.expenses.map((e) => ({
+			...e,
+			amount: Number(e.amount),
+		})),
+	};
+}
+
+/**
+ * Create a new subcontract contract
+ */
+export async function createSubcontractContract(data: {
+	organizationId: string;
+	projectId: string;
+	createdById: string;
+	name: string;
+	startDate?: Date;
+	endDate?: Date;
+	value: number;
+	notes?: string;
+}) {
+	// Verify project belongs to organization
+	const project = await db.project.findFirst({
+		where: { id: data.projectId, organizationId: data.organizationId },
+		select: { id: true },
+	});
+
+	if (!project) {
+		throw new Error("المشروع غير موجود");
+	}
+
+	return db.subcontractContract.create({
+		data: {
+			organizationId: data.organizationId,
+			projectId: data.projectId,
+			createdById: data.createdById,
+			name: data.name,
+			startDate: data.startDate ?? null,
+			endDate: data.endDate ?? null,
+			value: data.value,
+			notes: data.notes ?? null,
+		},
+		include: {
+			createdBy: { select: { id: true, name: true } },
+		},
+	});
+}
+
+/**
+ * Update a subcontract contract
+ */
+export async function updateSubcontractContract(
+	id: string,
+	organizationId: string,
+	projectId: string,
+	data: {
+		name?: string;
+		startDate?: Date | null;
+		endDate?: Date | null;
+		value?: number;
+		notes?: string | null;
+	},
+) {
+	const existing = await db.subcontractContract.findFirst({
+		where: { id, organizationId, projectId },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("العقد غير موجود");
+	}
+
+	return db.subcontractContract.update({
+		where: { id },
+		data: {
+			name: data.name,
+			startDate: data.startDate,
+			endDate: data.endDate,
+			value: data.value,
+			notes: data.notes,
+		},
+		include: {
+			createdBy: { select: { id: true, name: true } },
+		},
+	});
+}
+
+/**
+ * Delete a subcontract contract
+ */
+export async function deleteSubcontractContract(
+	id: string,
+	organizationId: string,
+	projectId: string,
+) {
+	const existing = await db.subcontractContract.findFirst({
+		where: { id, organizationId, projectId },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("العقد غير موجود");
+	}
+
+	return db.subcontractContract.delete({
+		where: { id },
+	});
+}
+
+/**
+ * Get expenses grouped by category for donut chart
+ */
+export async function getExpensesByCategory(
+	organizationId: string,
+	projectId: string,
+) {
+	const result = await db.projectExpense.groupBy({
+		by: ["category"],
+		where: { organizationId, projectId },
+		_sum: { amount: true },
+		_count: true,
+	});
+
+	return result.map((group) => ({
+		category: group.category,
+		total: group._sum.amount ? Number(group._sum.amount) : 0,
+		count: group._count,
+	}));
 }

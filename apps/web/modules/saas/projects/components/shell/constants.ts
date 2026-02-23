@@ -1,8 +1,8 @@
 import type { LucideIcon } from "lucide-react";
 import {
+	Home,
 	FileText,
 	Banknote,
-	Calendar,
 	MessageSquare,
 	MoreHorizontal,
 	Camera,
@@ -22,6 +22,14 @@ import {
 // NAVIGATION TYPES
 // ═══════════════════════════════════════════════════════════════
 
+export interface ProjectNavSection {
+	id: string;
+	path: string;
+	labelKey: string;
+	icon: LucideIcon;
+	section: string; // for canViewSection() check
+}
+
 export interface NavRoute {
 	id: string;
 	path: string;
@@ -36,7 +44,7 @@ export interface NavGroup {
 	labelEn: string;
 	icon: LucideIcon;
 	routes: NavRoute[];
-	directLink?: string; // For groups with single direct link (like Finance)
+	directLink?: string;
 	isOverflow?: boolean;
 }
 
@@ -50,7 +58,77 @@ export interface ContextAction {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// NAVIGATION GROUPS CONFIGURATION
+// FLAT NAVIGATION SECTIONS (pill-style, matches finance pattern)
+// ═══════════════════════════════════════════════════════════════
+
+export const PROJECT_NAV_SECTIONS: ProjectNavSection[] = [
+	{
+		id: "overview",
+		path: "",
+		labelKey: "projects.shell.sections.overview",
+		icon: Home,
+		section: "overview",
+	},
+	{
+		id: "execution",
+		path: "execution",
+		labelKey: "projects.shell.sections.execution",
+		icon: FileText,
+		section: "execution",
+	},
+	{
+		id: "expenses",
+		path: "finance/expenses",
+		labelKey: "projects.shell.sections.expenses",
+		icon: Receipt,
+		section: "finance/expenses",
+	},
+	{
+		id: "payments",
+		path: "finance/payments",
+		labelKey: "projects.shell.sections.payments",
+		icon: Banknote,
+		section: "finance/payments",
+	},
+	{
+		id: "claims",
+		path: "finance/claims",
+		labelKey: "projects.shell.sections.claims",
+		icon: ClipboardList,
+		section: "finance/claims",
+	},
+	{
+		id: "documents",
+		path: "documents",
+		labelKey: "projects.shell.sections.documents",
+		icon: FolderKanban,
+		section: "documents",
+	},
+	{
+		id: "owner",
+		path: "owner",
+		labelKey: "projects.shell.sections.owner",
+		icon: Key,
+		section: "owner",
+	},
+	{
+		id: "insights",
+		path: "insights",
+		labelKey: "projects.shell.sections.insights",
+		icon: BarChart3,
+		section: "insights",
+	},
+	{
+		id: "team",
+		path: "team",
+		labelKey: "projects.shell.sections.team",
+		icon: Users,
+		section: "team",
+	},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// NAVIGATION GROUPS CONFIGURATION (legacy, kept for backward compat)
 // ═══════════════════════════════════════════════════════════════
 
 export const NAVIGATION_GROUPS: NavGroup[] = [
@@ -59,20 +137,14 @@ export const NAVIGATION_GROUPS: NavGroup[] = [
 		label: "التنفيذ",
 		labelEn: "Execution",
 		icon: FileText,
+		directLink: "execution",
 		routes: [
 			{
-				id: "field",
-				path: "field",
-				label: "التقارير الميدانية",
-				labelEn: "Field Reports",
+				id: "execution",
+				path: "execution",
+				label: "التنفيذ",
+				labelEn: "Execution",
 				icon: FileText,
-			},
-			{
-				id: "supervisor",
-				path: "supervisor",
-				label: "وضع المشرف",
-				labelEn: "Supervisor Mode",
-				icon: Users,
 			},
 		],
 	},
@@ -113,28 +185,6 @@ export const NAVIGATION_GROUPS: NavGroup[] = [
 		],
 	},
 	{
-		id: "planning",
-		label: "التخطيط",
-		labelEn: "Planning",
-		icon: Calendar,
-		routes: [
-			{
-				id: "timeline",
-				path: "timeline",
-				label: "الجدول الزمني",
-				labelEn: "Timeline",
-				icon: Calendar,
-			},
-			{
-				id: "changes",
-				path: "changes",
-				label: "أوامر التغيير",
-				labelEn: "Change Orders",
-				icon: FileDiff,
-			},
-		],
-	},
-	{
 		id: "communication",
 		label: "التواصل",
 		labelEn: "Communication",
@@ -146,13 +196,6 @@ export const NAVIGATION_GROUPS: NavGroup[] = [
 				label: "الوثائق",
 				labelEn: "Documents",
 				icon: FolderKanban,
-			},
-			{
-				id: "chat",
-				path: "chat",
-				label: "المحادثة",
-				labelEn: "Chat",
-				icon: MessageSquare,
 			},
 			{
 				id: "updates",
@@ -196,18 +239,112 @@ export const NAVIGATION_GROUPS: NavGroup[] = [
 ];
 
 // ═══════════════════════════════════════════════════════════════
+// ADAPTIVE NAVIGATION GROUP CONFIG
+// ═══════════════════════════════════════════════════════════════
+
+export type NavGroupType = "direct" | "popover";
+
+export interface NavGroupConfig {
+	id: string;
+	labelKey: string; // i18n key under projects.shell.navigation
+	icon: LucideIcon;
+	type: NavGroupType;
+	/** Section IDs from PROJECT_NAV_SECTIONS that belong to this group */
+	sectionIds: string[];
+	/** For "direct" groups, which section to link to */
+	directSectionId?: string;
+	/** Whether this is the overflow "More" group */
+	isOverflow?: boolean;
+	/** Mobile-specific: whether to show in bottom dock */
+	showInMobileDock?: boolean;
+	/** Mobile-specific: use Sheet instead of Popover */
+	mobileSheet?: boolean;
+}
+
+export const NAV_GROUP_CONFIG: NavGroupConfig[] = [
+	{
+		id: "overview",
+		labelKey: "projects.shell.navigation.overview",
+		icon: Home,
+		type: "direct",
+		sectionIds: ["overview"],
+		directSectionId: "overview",
+		showInMobileDock: true,
+	},
+	{
+		id: "execution",
+		labelKey: "projects.shell.navigation.execution",
+		icon: FileText,
+		type: "direct",
+		sectionIds: ["execution"],
+		directSectionId: "execution",
+		showInMobileDock: true,
+	},
+	{
+		id: "finance",
+		labelKey: "projects.shell.navigation.finance",
+		icon: Banknote,
+		type: "popover",
+		sectionIds: ["expenses", "payments", "claims"],
+		showInMobileDock: true,
+	},
+	{
+		id: "workspace",
+		labelKey: "projects.shell.navigation.workspace",
+		icon: FolderKanban,
+		type: "direct",
+		sectionIds: ["documents"],
+		directSectionId: "documents",
+		showInMobileDock: true,
+	},
+	{
+		id: "more",
+		labelKey: "projects.shell.navigation.more",
+		icon: MoreHorizontal,
+		type: "popover",
+		sectionIds: ["owner", "insights", "team"],
+		isOverflow: true,
+		showInMobileDock: true,
+		mobileSheet: true,
+	},
+];
+
+/** Glassmorphism shared CSS classes */
+export const GLASS_CLASSES = {
+	bar: "bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-white/20 shadow-lg",
+	barHover: "hover:bg-white/80 dark:hover:bg-slate-900/70",
+} as const;
+
+/**
+ * Filter groups based on visible sections, returning only groups
+ * that have at least one visible section.
+ */
+export function getVisibleGroups(
+	canViewSection: (section: string) => boolean,
+): Array<NavGroupConfig & { visibleSections: ProjectNavSection[] }> {
+	return NAV_GROUP_CONFIG.map((group) => {
+		const visibleSections = PROJECT_NAV_SECTIONS.filter(
+			(s) => group.sectionIds.includes(s.id) && canViewSection(s.section),
+		);
+		return { ...group, visibleSections };
+	}).filter((group) => group.visibleSections.length > 0);
+}
+
+// ═══════════════════════════════════════════════════════════════
 // CONTEXT ACTIONS PER ROUTE
 // ═══════════════════════════════════════════════════════════════
 
 export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
-	// Overview page
-	"": [
+	// Overview page - Quick Actions are now in the overview bento grid
+	"": [],
+	// Execution page (field + timeline combined)
+	execution: [
 		{
 			id: "new-report",
 			label: "تقرير جديد",
 			labelEn: "New Report",
 			icon: FileText,
-			href: "field/new-report",
+			href: "execution/new-report",
 			variant: "primary",
 		},
 		{
@@ -215,32 +352,28 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 			label: "رفع صورة",
 			labelEn: "Upload Photo",
 			icon: Camera,
-			href: "field/upload",
-		},
-	],
-	// Field pages
-	field: [
-		{
-			id: "new-report",
-			label: "تقرير جديد",
-			labelEn: "New Report",
-			icon: FileText,
-			href: "field/new-report",
-			variant: "primary",
-		},
-		{
-			id: "upload-photo",
-			label: "رفع صورة",
-			labelEn: "Upload Photo",
-			icon: Camera,
-			href: "field/upload",
+			href: "execution/upload",
 		},
 		{
 			id: "new-issue",
 			label: "مشكلة جديدة",
 			labelEn: "New Issue",
 			icon: AlertTriangle,
-			href: "field/new-issue",
+			href: "execution/new-issue",
+		},
+		{
+			id: "new-milestone",
+			label: "إضافة مرحلة",
+			labelEn: "Add Milestone",
+			icon: Plus,
+			href: "execution?action=new",
+		},
+		{
+			id: "change-orders",
+			label: "أوامر التغيير",
+			labelEn: "Change Orders",
+			icon: FileDiff,
+			href: "changes",
 		},
 	],
 	// Finance pages
@@ -302,17 +435,6 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 			variant: "primary",
 		},
 	],
-	// Timeline page
-	timeline: [
-		{
-			id: "new-milestone",
-			label: "إضافة مرحلة",
-			labelEn: "Add Milestone",
-			icon: Plus,
-			href: "timeline?action=new",
-			variant: "primary",
-		},
-	],
 	// Changes page
 	changes: [
 		{
@@ -324,8 +446,6 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 			variant: "primary",
 		},
 	],
-	// Chat page
-	chat: [],
 	// Updates page
 	updates: [
 		{
@@ -345,17 +465,6 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 			labelEn: "Add Member",
 			icon: Users,
 			href: "team?action=add",
-			variant: "primary",
-		},
-	],
-	// Supervisor page
-	supervisor: [
-		{
-			id: "update-progress",
-			label: "تحديث التقدم",
-			labelEn: "Update Progress",
-			icon: ClipboardList,
-			href: "supervisor?action=update",
 			variant: "primary",
 		},
 	],
@@ -383,6 +492,32 @@ export function getCurrentRouteSegment(pathname: string): string {
 	// Try single segment
 	const singleMatch = pathname.match(/\/projects\/[^/]+\/([^/?]+)/);
 	return singleMatch?.[1] ?? "";
+}
+
+/**
+ * Get section href for project navigation
+ */
+export function getProjectSectionHref(
+	organizationSlug: string,
+	projectId: string,
+	sectionPath: string,
+): string {
+	const basePath = `/app/${organizationSlug}/projects/${projectId}`;
+	return sectionPath ? `${basePath}/${sectionPath}` : basePath;
+}
+
+/**
+ * Check if a project navigation section is active
+ */
+export function isProjectSectionActive(
+	pathname: string,
+	sectionPath: string,
+): boolean {
+	const segment = getCurrentRouteSegment(pathname);
+	if (sectionPath === "") {
+		return segment === "";
+	}
+	return segment === sectionPath || segment.startsWith(`${sectionPath}/`);
 }
 
 /**

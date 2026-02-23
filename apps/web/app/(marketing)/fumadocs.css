@@ -1,3 +1,5 @@
+@import "tailwindcss";
+@import "@repo/tailwind-config/theme.css";
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
 

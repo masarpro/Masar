@@ -1,7 +1,8 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
@@ -12,20 +13,17 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@ui/components/select";
-import {
-	ChevronLeft,
-	FileText,
-	Calendar,
-	Loader2,
-	MapPin,
-	User,
-	Banknote,
-} from "lucide-react";
+import { Textarea } from "@ui/components/textarea";
+import { ChevronLeft, FolderPlus, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import {
+	ContractFormSections,
+	type ContractFormRef,
+} from "./finance/contract/ContractFormSections";
 
 interface CreateProjectFormProps {
 	organizationId: string;
@@ -62,22 +60,43 @@ export function CreateProjectForm({
 }: CreateProjectFormProps) {
 	const t = useTranslations();
 	const router = useRouter();
+	const contractRef = useRef<ContractFormRef>(null);
 
-	const [formData, setFormData] = useState({
+	// ─── Project Info state ─────────────────────────────────
+	const [projectData, setProjectData] = useState({
 		name: "",
 		clientName: "",
 		location: "",
-		contractValue: "",
-		startDate: "",
-		endDate: "",
 		type: "",
 		description: "",
 	});
 
+	// ─── Queries ────────────────────────────────────────────
+	const { data: nextNoData } = useQuery(
+		orpc.projects.getNextProjectNo.queryOptions({
+			input: { organizationId },
+		}),
+	);
+
+	const { data: nextContractNoData } = useQuery(
+		orpc.projectContract.getNextNo.queryOptions({
+			input: { organizationId },
+		}),
+	);
+
+	// ─── Handlers ───────────────────────────────────────────
+	const updateProjectField = useCallback(
+		(field: string, value: string) => {
+			setProjectData((prev) => ({ ...prev, [field]: value }));
+		},
+		[],
+	);
+
+	// ─── Mutation ───────────────────────────────────────────
 	const createMutation = useMutation(
 		orpc.projects.create.mutationOptions({
 			onSuccess: (data) => {
-				toast.success(t("projects.createSuccess"));
+				toast.success(t("projects.createProject.success"));
 				router.push(`/app/${organizationSlug}/projects/${data.id}`);
 			},
 			onError: () => {
@@ -89,36 +108,97 @@ export function CreateProjectForm({
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (!formData.name.trim()) {
-			toast.error(t("projects.validation.nameRequired"));
+		if (!projectData.name.trim()) {
+			toast.error(t("projects.createProject.projectNameRequired"));
 			return;
 		}
 
-		const contractValue = formData.contractValue
-			? parseFloat(formData.contractValue)
-			: undefined;
+		const contractData = contractRef.current?.getFormData();
+		if (!contractData) return;
+
+		const contractVal =
+			contractData.contractValue > 0
+				? contractData.contractValue
+				: undefined;
 
 		createMutation.mutate({
 			organizationId,
-			name: formData.name,
-			clientName: formData.clientName || undefined,
-			location: formData.location || undefined,
-			contractValue:
-				contractValue && !isNaN(contractValue) ? contractValue : undefined,
-			startDate: formData.startDate ? new Date(formData.startDate) : undefined,
-			endDate: formData.endDate ? new Date(formData.endDate) : undefined,
-			type: (formData.type as
-				| "RESIDENTIAL"
-				| "COMMERCIAL"
-				| "INDUSTRIAL"
-				| "INFRASTRUCTURE"
-				| "MIXED") || undefined,
-			description: formData.description || undefined,
+			name: projectData.name,
+			clientName: projectData.clientName || undefined,
+			location: projectData.location || undefined,
+			type:
+				(projectData.type as
+					| "RESIDENTIAL"
+					| "COMMERCIAL"
+					| "INDUSTRIAL"
+					| "INFRASTRUCTURE"
+					| "MIXED") || undefined,
+			description: projectData.description || undefined,
+			contractValue: contractVal,
+			startDate: contractData.startDate
+				? new Date(contractData.startDate)
+				: undefined,
+			endDate: contractData.endDate
+				? new Date(contractData.endDate)
+				: undefined,
+			// Contract fields
+			contractNo: nextContractNoData?.contractNo || undefined,
+			contractStatus:
+				(contractData.contractStatus as
+					| "DRAFT"
+					| "ACTIVE"
+					| "SUSPENDED"
+					| "CLOSED") || undefined,
+			signedDate: contractData.signedDate
+				? new Date(contractData.signedDate)
+				: undefined,
+			retentionPercent: contractData.retentionPercent ?? undefined,
+			retentionCap: contractData.retentionCap ?? undefined,
+			retentionReleaseDays:
+				contractData.retentionReleaseDays ?? undefined,
+			contractNotes: contractData.contractNotes || undefined,
+			includesVat: contractData.includesVat || undefined,
+			vatPercent: contractData.vatPercent ?? undefined,
+			paymentMethod:
+				(contractData.paymentMethod as
+					| "CASH"
+					| "BANK_TRANSFER"
+					| "CHEQUE"
+					| "CREDIT_CARD"
+					| "OTHER") || undefined,
+			performanceBondPercent:
+				contractData.performanceBondPercent ?? undefined,
+			performanceBondAmount:
+				contractData.performanceBondAmount ?? undefined,
+			insuranceRequired: contractData.insuranceRequired || undefined,
+			insuranceDetails: contractData.insuranceDetails || undefined,
+			scopeOfWork: contractData.scopeOfWork || undefined,
+			penaltyPercent: contractData.penaltyPercent ?? undefined,
+			penaltyCapPercent: contractData.penaltyCapPercent ?? undefined,
+			paymentTerms:
+				contractData.paymentTerms.length > 0
+					? contractData.paymentTerms.map((term) => ({
+							type: term.type as
+								| "ADVANCE"
+								| "MILESTONE"
+								| "MONTHLY"
+								| "COMPLETION"
+								| "CUSTOM",
+							label: term.label,
+							percent: term.percent ?? undefined,
+							amount: term.amount ?? undefined,
+							sortOrder: term.sortOrder,
+						}))
+					: undefined,
 		});
 	};
 
+	// ─── Render ─────────────────────────────────────────────
 	return (
-		<form onSubmit={handleSubmit} className="space-y-6">
+		<form
+			onSubmit={handleSubmit}
+			className="mx-auto max-w-3xl space-y-6 pb-40"
+		>
 			{/* Header */}
 			<div className="flex items-center gap-4">
 				<Button
@@ -131,103 +211,75 @@ export function CreateProjectForm({
 						<ChevronLeft className="h-5 w-5 text-slate-500" />
 					</Link>
 				</Button>
-				<div>
-					<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-						{t("projects.newProject")}
-					</h1>
-					<p className="text-slate-500 dark:text-slate-400">
-						{t("projects.newProjectSubtitle")}
-					</p>
+				<div className="flex flex-1 items-center gap-3">
+					<div>
+						<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+							{t("projects.createProject.title")}
+						</h1>
+						<p className="text-sm text-slate-500 dark:text-slate-400">
+							{t("projects.newProjectSubtitle")}
+						</p>
+					</div>
+					<div className="flex gap-2">
+						{nextNoData?.projectNo && (
+							<Badge
+								variant="outline"
+								className="rounded-lg border-indigo-200 bg-indigo-50 px-3 py-1 font-mono text-sm text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300"
+							>
+								{nextNoData.projectNo}
+							</Badge>
+						)}
+					</div>
 				</div>
 			</div>
 
-			<div className="grid gap-6 lg:grid-cols-2">
-				{/* Basic Info Card */}
-				<div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-					<div className="border-b border-slate-100 p-5 dark:border-slate-800">
-						<div className="flex items-center gap-3">
-							<div className="rounded-xl bg-slate-100 p-2.5 dark:bg-slate-800">
-								<FileText className="h-5 w-5 text-slate-600 dark:text-slate-300" />
-							</div>
-							<h2 className="text-lg font-medium text-slate-900 dark:text-slate-100">
-								{t("projects.form.name")}
-							</h2>
+			{/* ═══ Section 1: Project Info ═══════════════════════ */}
+			<div className="overflow-hidden rounded-2xl border border-indigo-200/50 bg-indigo-50/50 dark:border-indigo-800/30 dark:bg-indigo-950/20">
+				<div className="border-b border-indigo-200/50 p-5 dark:border-indigo-800/30">
+					<div className="flex items-center gap-3">
+						<div className="rounded-xl bg-indigo-100 p-2.5 dark:bg-indigo-900/50">
+							<FolderPlus className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
 						</div>
+						<h2 className="text-lg font-medium text-indigo-900 dark:text-indigo-100">
+							{t("projects.createProject.projectInfo")}
+						</h2>
 					</div>
+				</div>
 
-					<div className="space-y-5 p-5">
+				<div className="space-y-5 p-5">
+					<div className="grid gap-5 sm:grid-cols-2">
 						<div className="space-y-2">
-							<Label
-								htmlFor="name"
-								className="text-sm font-medium text-slate-700 dark:text-slate-300"
-							>
-								{t("projects.form.name")} *
+							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+								{t("projects.createProject.projectName")} *
 							</Label>
 							<Input
-								id="name"
-								value={formData.name}
+								value={projectData.name}
 								onChange={(e) =>
-									setFormData({ ...formData, name: e.target.value })
+									updateProjectField("name", e.target.value)
 								}
-								placeholder={t("projects.form.namePlaceholder")}
-								className="rounded-xl border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50"
+								placeholder={t(
+									"projects.form.namePlaceholder",
+								)}
+								className="rounded-xl border-indigo-200/60 bg-white dark:border-indigo-800/40 dark:bg-slate-900/50"
 								required
 							/>
 						</div>
-
 						<div className="space-y-2">
-							<Label
-								htmlFor="clientName"
-								className="text-sm font-medium text-slate-700 dark:text-slate-300"
-							>
-								<User className="mb-0.5 inline h-4 w-4 me-1" />
-								{t("projects.form.clientName")}
-							</Label>
-							<Input
-								id="clientName"
-								value={formData.clientName}
-								onChange={(e) =>
-									setFormData({ ...formData, clientName: e.target.value })
-								}
-								placeholder={t("projects.form.clientNamePlaceholder")}
-								className="rounded-xl border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50"
-							/>
-						</div>
-
-						<div className="space-y-2">
-							<Label
-								htmlFor="location"
-								className="text-sm font-medium text-slate-700 dark:text-slate-300"
-							>
-								<MapPin className="mb-0.5 inline h-4 w-4 me-1" />
-								{t("projects.form.location")}
-							</Label>
-							<Input
-								id="location"
-								value={formData.location}
-								onChange={(e) =>
-									setFormData({ ...formData, location: e.target.value })
-								}
-								placeholder={t("projects.form.locationPlaceholder")}
-								className="rounded-xl border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50"
-							/>
-						</div>
-
-						<div className="space-y-2">
-							<Label
-								htmlFor="type"
-								className="text-sm font-medium text-slate-700 dark:text-slate-300"
-							>
-								{t("projects.form.type")}
+							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+								{t("projects.createProject.projectType")}
 							</Label>
 							<Select
-								value={formData.type}
+								value={projectData.type}
 								onValueChange={(value) =>
-									setFormData({ ...formData, type: value })
+									updateProjectField("type", value)
 								}
 							>
-								<SelectTrigger className="rounded-xl border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50">
-									<SelectValue placeholder={t("projects.form.typePlaceholder")} />
+								<SelectTrigger className="rounded-xl border-indigo-200/60 bg-white dark:border-indigo-800/40 dark:bg-slate-900/50">
+									<SelectValue
+										placeholder={t(
+											"projects.form.typePlaceholder",
+										)}
+									/>
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
 									{PROJECT_TYPES.map((type) => (
@@ -237,7 +289,9 @@ export function CreateProjectForm({
 											className="rounded-lg"
 										>
 											<div className="flex items-center gap-2">
-												<div className={`h-2 w-2 rounded-full ${type.color}`} />
+												<div
+													className={`h-2 w-2 rounded-full ${type.color}`}
+												/>
 												{t(type.labelKey)}
 											</div>
 										</SelectItem>
@@ -246,108 +300,75 @@ export function CreateProjectForm({
 							</Select>
 						</div>
 					</div>
-				</div>
 
-				{/* Financial & Timeline Card */}
-				<div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-					<div className="border-b border-slate-100 p-5 dark:border-slate-800">
-						<div className="flex items-center gap-3">
-							<div className="rounded-xl bg-slate-100 p-2.5 dark:bg-slate-800">
-								<Calendar className="h-5 w-5 text-slate-600 dark:text-slate-300" />
-							</div>
-							<h2 className="text-lg font-medium text-slate-900 dark:text-slate-100">
-								{t("projects.overview.contractValue")}
-							</h2>
+					<div className="grid gap-5 sm:grid-cols-2">
+						<div className="space-y-2">
+							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+								{t("projects.createProject.clientName")}
+							</Label>
+							<Input
+								value={projectData.clientName}
+								onChange={(e) =>
+									updateProjectField(
+										"clientName",
+										e.target.value,
+									)
+								}
+								placeholder={t(
+									"projects.form.clientNamePlaceholder",
+								)}
+								className="rounded-xl border-indigo-200/60 bg-white dark:border-indigo-800/40 dark:bg-slate-900/50"
+							/>
+						</div>
+						<div className="space-y-2">
+							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+								{t("projects.createProject.location")}
+							</Label>
+							<Input
+								value={projectData.location}
+								onChange={(e) =>
+									updateProjectField(
+										"location",
+										e.target.value,
+									)
+								}
+								placeholder={t(
+									"projects.form.locationPlaceholder",
+								)}
+								className="rounded-xl border-indigo-200/60 bg-white dark:border-indigo-800/40 dark:bg-slate-900/50"
+							/>
 						</div>
 					</div>
 
-					<div className="space-y-5 p-5">
-						<div className="space-y-2">
-							<Label
-								htmlFor="contractValue"
-								className="text-sm font-medium text-slate-700 dark:text-slate-300"
-							>
-								<Banknote className="mb-0.5 inline h-4 w-4 me-1" />
-								{t("projects.form.contractValue")}
-							</Label>
-							<div className="relative">
-								<Input
-									id="contractValue"
-									type="number"
-									step="0.01"
-									min="0"
-									value={formData.contractValue}
-									onChange={(e) =>
-										setFormData({ ...formData, contractValue: e.target.value })
-									}
-									placeholder="0.00"
-									className="rounded-xl border-slate-200 bg-slate-50 pl-12 dark:border-slate-700 dark:bg-slate-800/50"
-								/>
-								<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500">
-									ر.س
-								</span>
-							</div>
-						</div>
-
-						<div className="space-y-2">
-							<Label
-								htmlFor="startDate"
-								className="text-sm font-medium text-slate-700 dark:text-slate-300"
-							>
-								{t("projects.form.startDate")}
-							</Label>
-							<Input
-								id="startDate"
-								type="date"
-								value={formData.startDate}
-								onChange={(e) =>
-									setFormData({ ...formData, startDate: e.target.value })
-								}
-								className="rounded-xl border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50"
-							/>
-						</div>
-
-						<div className="space-y-2">
-							<Label
-								htmlFor="endDate"
-								className="text-sm font-medium text-slate-700 dark:text-slate-300"
-							>
-								{t("projects.form.endDate")}
-							</Label>
-							<Input
-								id="endDate"
-								type="date"
-								value={formData.endDate}
-								onChange={(e) =>
-									setFormData({ ...formData, endDate: e.target.value })
-								}
-								className="rounded-xl border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50"
-							/>
-						</div>
-
-						<div className="space-y-2">
-							<Label
-								htmlFor="description"
-								className="text-sm font-medium text-slate-700 dark:text-slate-300"
-							>
-								{t("projects.form.description")}
-							</Label>
-							<textarea
-								id="description"
-								value={formData.description}
-								onChange={(e) =>
-									setFormData({ ...formData, description: e.target.value })
-								}
-								placeholder={t("projects.form.descriptionPlaceholder")}
-								rows={3}
-								className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800/50"
-							/>
-						</div>
+					<div className="space-y-2">
+						<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+							{t("projects.createProject.description")}
+						</Label>
+						<Textarea
+							value={projectData.description}
+							onChange={(e) =>
+								updateProjectField(
+									"description",
+									e.target.value,
+								)
+							}
+							placeholder={t(
+								"projects.form.descriptionPlaceholder",
+							)}
+							rows={3}
+							className="rounded-xl border-indigo-200/60 bg-white dark:border-indigo-800/40 dark:bg-slate-900/50"
+						/>
 					</div>
 				</div>
 			</div>
 
-			{/* Submit Buttons */}
+			{/* ═══ Sections 2-4: Contract (shared component) ═══ */}
+			<ContractFormSections
+				ref={contractRef}
+				contractNo={nextContractNoData?.contractNo}
+			/>
+
+			{/* ═══ Submit Buttons ════════════════════════════════ */}
 			<div className="flex justify-end gap-3 pt-2">
 				<Button
 					type="button"
@@ -355,7 +376,7 @@ export function CreateProjectForm({
 					onClick={() => router.back()}
 					className="rounded-xl border-slate-200 px-6 dark:border-slate-700"
 				>
-					{t("projects.form.cancel")}
+					{t("projects.createProject.cancel")}
 				</Button>
 				<Button
 					type="submit"
@@ -368,7 +389,7 @@ export function CreateProjectForm({
 							{t("common.creating")}
 						</>
 					) : (
-						t("projects.form.submit")
+						t("projects.createProject.submit")
 					)}
 				</Button>
 			</div>

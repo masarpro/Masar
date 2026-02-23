@@ -3,6 +3,7 @@ import {
 	sendMessage,
 	createNotifications,
 	logAuditEvent,
+	linkAttachmentsToOwner,
 	db,
 } from "@repo/database";
 import { z } from "zod";
@@ -25,6 +26,7 @@ export const sendMessageProcedure = protectedProcedure
 			channel: MessageChannelEnum,
 			content: z.string().min(1, "الرسالة مطلوبة"),
 			isUpdate: z.boolean().optional().default(false),
+			attachmentIds: z.array(z.string()).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -57,6 +59,16 @@ export const sendMessageProcedure = protectedProcedure
 				isUpdate: input.isUpdate,
 			},
 		);
+
+		// Link attachments to message if provided
+		if (input.attachmentIds?.length) {
+			await linkAttachmentsToOwner(
+				input.organizationId,
+				input.attachmentIds,
+				"MESSAGE",
+				message.id,
+			);
+		}
 
 		// Log audit event for OWNER channel messages
 		if (input.channel === "OWNER") {

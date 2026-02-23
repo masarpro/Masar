@@ -311,7 +311,7 @@ export function Dashboard() {
 									{overdueMilestones.map((m: Milestone) => (
 										<Link
 											key={m.id}
-											href={`/app/${organizationSlug}/projects/${m.project.id}/timeline`}
+											href={`/app/${organizationSlug}/projects/${m.project.id}/execution`}
 											className="flex items-center justify-between rounded-lg bg-white/50 p-3 transition-colors hover:bg-white dark:bg-slate-900/50 dark:hover:bg-slate-900"
 										>
 											<div>
@@ -357,7 +357,7 @@ export function Dashboard() {
 									{upcomingMilestones.map((m: Milestone) => (
 										<Link
 											key={m.id}
-											href={`/app/${organizationSlug}/projects/${m.project.id}/timeline`}
+											href={`/app/${organizationSlug}/projects/${m.project.id}/execution`}
 											className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50"
 										>
 											<div>

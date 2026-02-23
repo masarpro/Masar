@@ -8,7 +8,7 @@ type MessageChannel = "TEAM" | "OWNER";
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * List messages for a project channel
+ * List messages for a project channel (with attachments)
  */
 export async function listMessages(
 	organizationId: string,
@@ -42,8 +42,34 @@ export async function listMessages(
 		db.projectMessage.count({ where }),
 	]);
 
+	// Batch-fetch attachments for these messages
+	const messageIds = messages.map((m) => m.id);
+	const attachments =
+		messageIds.length > 0
+			? await db.attachment.findMany({
+					where: {
+						ownerType: "MESSAGE",
+						ownerId: { in: messageIds },
+					},
+					orderBy: { createdAt: "asc" },
+				})
+			: [];
+
+	// Map attachments to messages
+	const attachmentMap = new Map<string, typeof attachments>();
+	for (const att of attachments) {
+		const existing = attachmentMap.get(att.ownerId) || [];
+		existing.push(att);
+		attachmentMap.set(att.ownerId, existing);
+	}
+
+	const messagesWithAttachments = messages.reverse().map((m) => ({
+		...m,
+		attachments: attachmentMap.get(m.id) || [],
+	}));
+
 	return {
-		items: messages.reverse(), // Reverse to show oldest first in UI
+		items: messagesWithAttachments,
 		total,
 		page,
 		pageSize,
@@ -126,9 +152,7 @@ export async function getLatestMessage(
 }
 
 /**
- * Count unread messages for a user in a channel (messages after last visit)
- * Note: This is a simplified version. A proper implementation would track
- * user's last read timestamp per channel.
+ * Count total messages in a channel
  */
 export async function countChannelMessages(
 	organizationId: string,
@@ -140,6 +164,68 @@ export async function countChannelMessages(
 			organizationId,
 			projectId,
 			channel,
+		},
+	});
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Unread Tracking - تتبع الرسائل غير المقروءة
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Get unread message count for a user across all channels in a project
+ */
+export async function getUnreadChatCount(
+	organizationId: string,
+	projectId: string,
+	userId: string,
+) {
+	const lastReads = await db.chatLastRead.findMany({
+		where: { organizationId, projectId, userId },
+	});
+
+	const channels: MessageChannel[] = ["TEAM", "OWNER"];
+	let totalUnread = 0;
+
+	for (const channel of channels) {
+		const lastRead = lastReads.find((lr) => lr.channel === channel);
+		const lastReadAt = lastRead?.lastReadAt ?? new Date(0);
+
+		const count = await db.projectMessage.count({
+			where: {
+				organizationId,
+				projectId,
+				channel,
+				createdAt: { gt: lastReadAt },
+				senderId: { not: userId },
+			},
+		});
+		totalUnread += count;
+	}
+
+	return totalUnread;
+}
+
+/**
+ * Mark a channel as read for a user
+ */
+export async function markChannelAsRead(
+	organizationId: string,
+	projectId: string,
+	userId: string,
+	channel: MessageChannel,
+) {
+	return db.chatLastRead.upsert({
+		where: {
+			projectId_userId_channel: { projectId, userId, channel },
+		},
+		update: { lastReadAt: new Date(), organizationId },
+		create: {
+			organizationId,
+			projectId,
+			userId,
+			channel,
+			lastReadAt: new Date(),
 		},
 	});
 }

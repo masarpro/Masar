@@ -23,6 +23,7 @@ import { projectUpdatesRouter } from "../modules/project-updates/router";
 import { projectsRouter } from "../modules/projects/router";
 import { projectTimelineRouter } from "../modules/project-timeline/router";
 import { projectChangeOrdersRouter } from "../modules/project-change-orders/router";
+import { projectContractRouter } from "../modules/project-contract/router";
 import { projectTeamRouter } from "../modules/project-team/router";
 import { dashboardRouter } from "../modules/dashboard/router";
 import { financeRouter } from "../modules/finance/router";
@@ -63,6 +64,8 @@ export const router = publicProcedure.router({
 	projectTimeline: projectTimelineRouter,
 	// Phase 11 - Change Orders
 	projectChangeOrders: projectChangeOrdersRouter,
+	// Project Contract
+	projectContract: projectContractRouter,
 	// Phase 12 - Dashboard
 	dashboard: dashboardRouter,
 	// Project Team Management

@@ -28,6 +28,7 @@ export const createExpense = protectedProcedure
 			vendorName: z.string().optional(),
 			note: z.string().optional(),
 			attachmentUrl: z.string().url().optional(),
+			subcontractContractId: z.string().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -49,6 +50,7 @@ export const createExpense = protectedProcedure
 			vendorName: input.vendorName,
 			note: input.note,
 			attachmentUrl: input.attachmentUrl,
+			subcontractContractId: input.subcontractContractId,
 		});
 
 		// Notify project accountants (fire and forget)

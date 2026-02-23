@@ -597,6 +597,81 @@
 			"submit": "إنشاء المشروع",
 			"cancel": "إلغاء"
 		},
+		"createProject": {
+			"title": "إنشاء مشروع جديد",
+			"projectInfo": "بيانات المشروع",
+			"contractInfo": "بيانات العقد",
+			"retentionInfo": "الاحتفاظ",
+			"projectName": "اسم المشروع",
+			"projectNameRequired": "اسم المشروع مطلوب",
+			"contractValueRequired": "قيمة العقد مطلوبة",
+			"projectType": "نوع المشروع",
+			"clientName": "اسم العميل",
+			"location": "الموقع",
+			"description": "وصف المشروع",
+			"contractValue": "قيمة العقد",
+			"contractNo": "رقم العقد",
+			"signedDate": "تاريخ التوقيع",
+			"startDate": "تاريخ البداية",
+			"endDate": "تاريخ النهاية",
+			"contractNotes": "ملاحظات العقد",
+			"contractStatus": "حالة العقد",
+			"retentionPercent": "نسبة الاحتفاظ %",
+			"retentionCap": "سقف الاحتفاظ",
+			"retentionReleaseDays": "أيام الإفراج",
+			"submit": "إنشاء المشروع",
+			"cancel": "إلغاء",
+			"success": "تم إنشاء المشروع بنجاح",
+			"nextProjectNo": "رقم المشروع",
+			"vatToggle": "شامل ضريبة القيمة المضافة (15%)",
+			"valueBeforeVat": "القيمة قبل الضريبة",
+			"valueWithVat": "القيمة شاملة الضريبة",
+			"vatAmount": "مبلغ الضريبة",
+			"paymentMethod": "طريقة الدفع",
+			"scopeOfWork": "نطاق العمل",
+			"scopeOfWorkPlaceholder": "وصف نطاق العمل والأعمال المطلوبة...",
+			"paymentTermsSection": "شروط وجدول الدفع",
+			"addPaymentTerm": "إضافة دفعة",
+			"removePaymentTerm": "حذف",
+			"termType": "نوع الدفعة",
+			"termLabel": "الوصف",
+			"termPercent": "النسبة %",
+			"termAmount": "المبلغ",
+			"totalPercent": "إجمالي النسب",
+			"guaranteesSection": "الضمانات والاحتفاظ",
+			"performanceBond": "ضمان حسن الأداء",
+			"performanceBondPercent": "نسبة ضمان الأداء %",
+			"performanceBondAmount": "مبلغ الضمان",
+			"insurance": "التأمين",
+			"insuranceRequired": "يتطلب تأمين",
+			"insuranceDetails": "تفاصيل التأمين",
+			"insuranceDetailsPlaceholder": "نوع التأمين والتغطية...",
+			"penalties": "غرامات التأخير",
+			"penaltyPercent": "نسبة الغرامة اليومية %",
+			"penaltyCapPercent": "سقف الغرامة من قيمة العقد %",
+			"retentionAmount": "مبلغ الاحتفاظ المحسوب",
+			"summaryStrip": "ملخص العقد",
+			"paymentMethods": {
+				"CASH": "نقدي",
+				"BANK_TRANSFER": "تحويل بنكي",
+				"CHEQUE": "شيك",
+				"CREDIT_CARD": "بطاقة ائتمان",
+				"OTHER": "أخرى"
+			},
+			"termTypes": {
+				"ADVANCE": "دفعة مقدمة",
+				"MILESTONE": "دفعة مرحلة",
+				"MONTHLY": "شهرية",
+				"COMPLETION": "عند الإنهاء",
+				"CUSTOM": "مخصص"
+			},
+			"contractStatuses": {
+				"DRAFT": "مسودة",
+				"ACTIVE": "فعال",
+				"SUSPENDED": "معلق",
+				"CLOSED": "مغلق"
+			}
+		},
 		"overview": {
 			"progress": "نسبة الإنجاز",
 			"daysRemaining": "الأيام المتبقية",
@@ -721,17 +796,8 @@
 			"saveProgress": "حفظ التقدم",
 			"progressUpdated": "تم تحديث التقدم",
 			"progressUpdateError": "فشل تحديث التقدم",
-			"noPhase": "بدون مرحلة"
-		},
-		"supervisor": {
-			"title": "وضع المشرف",
-			"currentProgress": "التقدم الحالي",
-			"dailyReport": "تقرير يومي",
-			"uploadPhoto": "رفع صورة",
-			"reportIssue": "الإبلاغ عن مشكلة",
-			"updateProgress": "تحديث التقدم",
-			"backToProject": "العودة للمشروع",
-			"viewTimeline": "عرض الجدول الزمني"
+			"noPhase": "بدون مرحلة",
+			"currentProgress": "التقدم الحالي"
 		},
 		"validation": {
 			"nameRequired": "اسم المشروع مطلوب"
@@ -773,7 +839,7 @@
 			"noAuditLogs": "لا يوجد سجل"
 		},
 		"chat": {
-			"title": "المحادثات",
+			"title": "المحادثة",
 			"description": "تواصل مع فريق المشروع",
 			"teamChannel": "محادثة الفريق",
 			"teamChannelDescription": "محادثة داخلية مع فريق العمل",
@@ -781,11 +847,88 @@
 			"ownerChannel": "محادثة المالك",
 			"ownerChannelDescription": "محادثة رسمية مع مالك المشروع",
 			"ownerChannelNote": "هذه قناة رسمية - جميع الرسائل ستصل لمالك المشروع",
-			"noMessages": "لا توجد رسائل",
+			"noMessages": "لا توجد رسائل بعد",
+			"startConversation": "ابدأ محادثة مع فريق المشروع",
 			"messagePlaceholder": "اكتب رسالتك...",
 			"refresh": "تحديث",
 			"sendError": "فشل إرسال الرسالة",
-			"markAsOfficialUpdate": "تعليم كتحديث رسمي"
+			"markAsOfficialUpdate": "تعليم كتحديث رسمي",
+			"officialUpdate": "تحديث رسمي",
+			"uploadError": "فشل رفع الملف",
+			"attachFile": "إرفاق ملف",
+			"fullScreen": "ملء الشاشة",
+			"exitFullScreen": "الخروج من ملء الشاشة"
+		},
+		"contract": {
+			"title": "العقد",
+			"save": "حفظ",
+			"saved": "تم حفظ بيانات العقد",
+			"editContract": "تعديل العقد",
+			"saveChanges": "حفظ التعديلات",
+			"cancelEdit": "إلغاء",
+			"saving": "جاري الحفظ...",
+			"summary": {
+				"originalValue": "القيمة الأصلية",
+				"changeOrders": "أوامر التغيير",
+				"adjustedValue": "القيمة المعدّلة",
+				"retentionHeld": "محجوزات الضمان"
+			},
+			"info": {
+				"title": "معلومات العقد",
+				"contractNo": "رقم العقد",
+				"contractTitle": "عنوان العقد",
+				"clientName": "اسم العميل",
+				"value": "قيمة العقد",
+				"signedDate": "تاريخ التوقيع",
+				"startDate": "تاريخ البداية",
+				"endDate": "تاريخ النهاية",
+				"description": "الوصف",
+				"notes": "ملاحظات"
+			},
+			"status": {
+				"DRAFT": "مسودة",
+				"ACTIVE": "نشط",
+				"SUSPENDED": "معلق",
+				"CLOSED": "مغلق"
+			},
+			"retention": {
+				"title": "محجوزات الضمان",
+				"percent": "نسبة الحجز (%)",
+				"cap": "الحد الأقصى للحجز",
+				"releaseDays": "أيام الإفراج",
+				"amount": "مبلغ الحجز"
+			},
+			"paymentTerms": {
+				"title": "شروط الدفع",
+				"addTerm": "إضافة شرط",
+				"noTerms": "لا توجد شروط دفع",
+				"saved": "تم حفظ شروط الدفع",
+				"type": "النوع",
+				"label": "الوصف",
+				"percent": "النسبة (%)",
+				"amount": "المبلغ",
+				"dueDate": "تاريخ الاستحقاق",
+				"types": {
+					"ADVANCE": "دفعة مقدمة",
+					"MILESTONE": "مرحلة إنجاز",
+					"MONTHLY": "شهري",
+					"COMPLETION": "عند الإنجاز",
+					"CUSTOM": "مخصص"
+				}
+			}
+		},
+		"contractBar": {
+			"noContract": "لا يوجد عقد لهذا المشروع",
+			"addContract": "أضف العقد الآن",
+			"contractValue": "قيمة العقد",
+			"adjustedValue": "المعدلة",
+			"duration": "المدة",
+			"days": "يوم",
+			"retention": "الاحتفاظ",
+			"viewContract": "عرض العقد",
+			"daysRemaining": "{days} يوم متبقي",
+			"daysOverdue": "متأخر {days} يوم",
+			"of": "من"
 		},
 		"insights": {
 			"title": "التنبيهات الذكية",
@@ -844,7 +987,26 @@
 				"finance": "المالية",
 				"planning": "التخطيط",
 				"communication": "التواصل",
+				"workspace": "المساحة",
 				"more": "المزيد"
+			},
+			"sections": {
+				"overview": "نظرة عامة",
+				"execution": "التنفيذ",
+				"field": "الميداني",
+				"finance": "المالية",
+				"expenses": "المصروفات",
+				"payments": "المقبوضات",
+				"claims": "المستخلصات",
+				"timeline": "الجدول",
+				"changes": "أوامر التغيير",
+				"documents": "الوثائق",
+				"chat": "المحادثة",
+				"updates": "التحديثات",
+				"owner": "بوابة المالك",
+				"insights": "التحليلات",
+				"team": "فريق العمل",
+				"contract": "العقد"
 			}
 		},
 		"commandCenter": {
@@ -868,6 +1030,42 @@
 			"noRecentActivity": "لا توجد أنشطة حديثة",
 			"upcomingDeadlines": "المواعيد القادمة",
 			"noDeadlines": "لا توجد مواعيد قادمة",
+			"completion": "نسبة الإنجاز",
+			"lastUpdated": "آخر تحديث",
+			"daysLeft": "الأيام المتبقية",
+			"onTrack": "في الموعد",
+			"atRisk": "معرض للتأخير",
+			"delayed": "متأخر",
+			"budget": "قيمة العقد",
+			"overspendWarning": "تجاوز 80% من الميزانية",
+			"scheduleSnapshot": "لمحة عن الجدول",
+			"currentPhase": "المرحلة الحالية",
+			"nextMilestone": "المرحلة التالية",
+			"financeSummary": "الملخص المالي",
+			"thisMonthExpenses": "مصروفات هذا الشهر",
+			"pendingClaims": "مستخلصات معلقة",
+			"openFinance": "فتح المالية",
+			"viewSchedule": "عرض الجدول",
+			"quickDocuments": "الوثائق",
+			"noDocumentsYet": "لا توجد وثائق بعد",
+			"ownerPortal": "بوابة المالك",
+			"enabled": "مفعّل",
+			"disabled": "معطّل",
+			"activeLinks": "{count} روابط نشطة",
+			"copyLink": "نسخ الرابط",
+			"manage": "إدارة",
+			"dailyReport": "تقرير يومي",
+			"addExpense": "إضافة مصروف",
+			"reportIssue": "الإبلاغ عن مشكلة",
+			"timelineChart": "الجدول الزمني للمشروع",
+			"projectStatusChart": "حالة المشروع",
+			"plannedProgress": "المخطط",
+			"actualProgress": "الفعلي",
+			"activityPulse": "نبض النشاط",
+			"totalInteractions": "هذا الأسبوع",
+			"reports": "التقارير",
+			"photos": "الصور",
+			"issues": "المشاكل",
 			"nav": {
 				"field": "التنفيذ الميداني",
 				"fieldNew": "تقرير جديد",
@@ -888,7 +1086,6 @@
 		"sections": {
 			"overview": "نظرة عامة",
 			"field": "التنفيذ الميداني",
-			"supervisor": "وضع المشرف",
 			"finance": "المالية",
 			"finance_expenses": "المصروفات",
 			"finance_payments": "المقبوضات",
@@ -1799,6 +1996,92 @@
 			"started": "تم بدء المرحلة",
 			"completed": "تم إنهاء المرحلة",
 			"progressUpdated": "تم تحديث التقدم"
+		},
+		"gantt": {
+			"title": "مخطط جانت",
+			"viewCards": "بطاقات",
+			"viewGantt": "جانت",
+			"milestones": "المراحل",
+			"status": "الحالة",
+			"health": "الصحة",
+			"planned": "المخطط",
+			"actual": "الفعلي",
+			"critical": "حرجة",
+			"todayLine": "اليوم",
+			"noDates": "لا توجد تواريخ",
+			"noDatesDescription": "حدد تواريخ مخططة للمراحل لعرض مخطط جانت",
+			"noResults": "لا توجد مراحل تطابق الفلاتر الحالية",
+			"zoom": {
+				"week": "أسبوع",
+				"month": "شهر",
+				"quarter": "ربع سنة"
+			},
+			"filterStatus": "تصفية حسب الحالة",
+			"filterHealth": "تصفية حسب الصحة",
+			"allStatuses": "جميع الحالات",
+			"allHealth": "جميع حالات الصحة",
+			"today": "اليوم",
+			"legend": "دليل الألوان",
+			"dragToResize": "اسحب لتغيير المدة",
+			"dragToMove": "اسحب لإعادة الجدولة",
+			"rescheduleSuccess": "تمت إعادة جدولة المرحلة بنجاح",
+			"rescheduleFailed": "فشلت إعادة جدولة المرحلة"
+		},
+		"contract": {
+			"title": "العقد الرئيسي",
+			"noContract": "لم يتم إدخال بيانات العقد بعد",
+			"save": "حفظ العقد",
+			"saved": "تم حفظ العقد بنجاح",
+			"info": {
+				"title": "معلومات العقد",
+				"contractNo": "رقم العقد",
+				"contractTitle": "عنوان العقد",
+				"clientName": "اسم العميل",
+				"value": "قيمة العقد",
+				"signedDate": "تاريخ التوقيع",
+				"startDate": "تاريخ البداية",
+				"endDate": "تاريخ النهاية",
+				"notes": "ملاحظات",
+				"description": "وصف العقد"
+			},
+			"status": {
+				"DRAFT": "مسودة",
+				"ACTIVE": "فعال",
+				"SUSPENDED": "معلق",
+				"CLOSED": "مغلق"
+			},
+			"paymentTerms": {
+				"title": "شروط الدفع",
+				"addTerm": "إضافة شرط",
+				"noTerms": "لا توجد شروط دفع",
+				"type": "النوع",
+				"label": "الوصف",
+				"percent": "النسبة",
+				"amount": "المبلغ",
+				"dueDate": "تاريخ الاستحقاق",
+				"saved": "تم حفظ شروط الدفع",
+				"removeTerm": "حذف",
+				"types": {
+					"ADVANCE": "دفعة مقدمة",
+					"MILESTONE": "دفعة مرحلة",
+					"MONTHLY": "دفعة شهرية",
+					"COMPLETION": "عند الإنهاء",
+					"CUSTOM": "مخصص"
+				}
+			},
+			"retention": {
+				"title": "الاحتفاظ (Retention)",
+				"percent": "نسبة الاحتفاظ",
+				"cap": "الحد الأقصى",
+				"releaseDays": "أيام الإفراج بعد التسليم",
+				"amount": "مبلغ الاحتفاظ المحسوب"
+			},
+			"summary": {
+				"originalValue": "القيمة الأصلية",
+				"changeOrders": "أوامر التغيير",
+				"adjustedValue": "القيمة المعدلة",
+				"retentionHeld": "المحتجز"
+			}
 		}
 	},
 	"changeOrders": {
@@ -3060,7 +3343,12 @@
 			"claimCreated": "تم إنشاء المستخلص بنجاح",
 			"claimCreateError": "فشل إنشاء المستخلص",
 			"statusUpdated": "تم تحديث الحالة بنجاح",
-			"statusUpdateError": "فشل تحديث الحالة"
+			"statusUpdateError": "فشل تحديث الحالة",
+			"subcontractCreated": "تم إنشاء العقد بنجاح",
+			"subcontractCreateError": "فشل إنشاء العقد",
+			"subcontractUpdated": "تم تحديث العقد بنجاح",
+			"subcontractDeleted": "تم حذف العقد بنجاح",
+			"subcontractDeleteError": "فشل حذف العقد"
 		},
 		"actions": {
 			"preview": "معاينة",
@@ -3072,6 +3360,46 @@
 			"convertToTax": "تحويل لفاتورة ضريبية",
 			"print": "طباعة",
 			"downloadPdf": "تحميل PDF"
+		},
+		"projectHub": {
+			"title": "مالية المشروع",
+			"tabs": {
+				"expenses": "المصروفات",
+				"subcontracts": "مقاولو الباطن"
+			}
+		},
+		"categoryChart": {
+			"title": "توزيع المصروفات",
+			"noData": "لا توجد مصروفات بعد"
+		},
+		"subcontracts": {
+			"title": "مقاولو الباطن",
+			"new": "عقد جديد",
+			"empty": "لا توجد عقود باطن",
+			"emptyAction": "أضف أول عقد باطن",
+			"name": "اسم المقاول",
+			"namePlaceholder": "أدخل اسم المقاول أو وصف العقد",
+			"value": "قيمة العقد",
+			"startDate": "تاريخ البداية",
+			"endDate": "تاريخ الانتهاء",
+			"notes": "ملاحظات",
+			"notesPlaceholder": "ملاحظات إضافية حول العقد",
+			"paid": "المدفوع",
+			"remaining": "المتبقي",
+			"progress": "نسبة الإنجاز",
+			"statusActive": "نشط",
+			"statusCompleted": "منتهي",
+			"totalValue": "إجمالي قيمة العقود",
+			"totalPaid": "إجمالي المدفوع",
+			"detail": "تفاصيل العقد",
+			"payments": "الدفعات",
+			"addPayment": "إضافة دفعة",
+			"noPayments": "لا توجد دفعات بعد",
+			"deleteConfirm": "هل أنت متأكد من حذف هذا العقد؟ سيتم فك ربط جميع المصروفات المرتبطة.",
+			"deleteTitle": "حذف العقد",
+			"contract": "العقد",
+			"duration": "المدة",
+			"selectContract": "اختر العقد المرتبط"
 		}
 	}
 }

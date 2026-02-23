@@ -31,6 +31,7 @@ export const updateExpense = protectedProcedure
 			vendorName: z.string().nullable().optional(),
 			note: z.string().nullable().optional(),
 			attachmentUrl: z.string().url().nullable().optional(),
+			subcontractContractId: z.string().nullable().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -54,6 +55,7 @@ export const updateExpense = protectedProcedure
 					vendorName: input.vendorName,
 					note: input.note,
 					attachmentUrl: input.attachmentUrl,
+					subcontractContractId: input.subcontractContractId,
 				},
 			);
 

@@ -3,16 +3,16 @@
 import type { ReactNode } from "react";
 import { ProjectHeader, type ProjectHeaderProps } from "./ProjectHeader";
 import { ProjectNavigation } from "./ProjectNavigation";
-import { ProjectContextToolbar } from "./ProjectContextToolbar";
-import { RecentUpdatesStrip } from "./RecentUpdatesStrip";
 import { ProjectRoleProvider } from "../../hooks/use-project-role";
 import type { ProjectRole } from "../../lib/role-visibility";
+import { FloatingChatButton } from "../chat/FloatingChatButton";
 
 export interface ProjectShellProps {
 	project: ProjectHeaderProps["project"];
 	organizationSlug: string;
 	organizationId: string;
 	userRole?: ProjectRole;
+	userName?: string;
 	children: ReactNode;
 }
 
@@ -21,45 +21,43 @@ export function ProjectShell({
 	organizationSlug,
 	organizationId,
 	userRole = "VIEWER",
+	userName,
 	children,
 }: ProjectShellProps) {
 	return (
-		<ProjectRoleProvider actualRole={userRole}>
+		<ProjectRoleProvider actualRole={userRole} projectData={project}>
 			<div className="flex min-h-0 flex-1 flex-col" dir="rtl">
-				{/* Header Section - Glass Morphism */}
-				<div className="border-b border-white/20 dark:border-slate-700/30 bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm px-4 py-4 sm:px-6">
+				{/* Header Section - Matches Finance section style */}
+				<div className="px-4 py-4 sm:px-6">
 					<ProjectHeader
 						project={project}
 						organizationSlug={organizationSlug}
+						organizationId={organizationId}
+						userName={userName}
 					/>
 				</div>
 
-				{/* Recent Updates Strip */}
-				<RecentUpdatesStrip
-					organizationId={organizationId}
-					projectId={project.id}
-				/>
-
 				{/* Navigation */}
-				<div className="bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm">
-					<div className="px-4 sm:px-6">
-						<ProjectNavigation
-							organizationSlug={organizationSlug}
-							projectId={project.id}
-						/>
+				<div className="px-4 sm:px-6">
+					<ProjectNavigation
+						organizationSlug={organizationSlug}
+						projectId={project.id}
+					/>
+				</div>
+
+				{/* Page Content */}
+				<div className="flex-1 overflow-y-auto h-full">
+					<div className="px-4 py-4 pb-20 md:pb-4 sm:px-6 h-full">
+						{children}
 					</div>
 				</div>
 
-				{/* Context Actions Toolbar */}
-				<ProjectContextToolbar
+				{/* Floating Chat Button */}
+				<FloatingChatButton
+					organizationId={organizationId}
 					organizationSlug={organizationSlug}
 					projectId={project.id}
 				/>
-
-				{/* Page Content */}
-				<div className="flex-1 overflow-y-auto">
-					<div className="px-4 py-6 sm:px-6">{children}</div>
-				</div>
 			</div>
 		</ProjectRoleProvider>
 	);

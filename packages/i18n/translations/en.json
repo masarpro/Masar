@@ -595,6 +595,81 @@
 			"submit": "Create Project",
 			"cancel": "Cancel"
 		},
+		"createProject": {
+			"title": "Create New Project",
+			"projectInfo": "Project Information",
+			"contractInfo": "Contract Information",
+			"retentionInfo": "Retention",
+			"projectName": "Project Name",
+			"projectNameRequired": "Project name is required",
+			"contractValueRequired": "Contract value is required",
+			"projectType": "Project Type",
+			"clientName": "Client Name",
+			"location": "Location",
+			"description": "Description",
+			"contractValue": "Contract Value",
+			"contractNo": "Contract Number",
+			"signedDate": "Signed Date",
+			"startDate": "Start Date",
+			"endDate": "End Date",
+			"contractNotes": "Contract Notes",
+			"contractStatus": "Contract Status",
+			"retentionPercent": "Retention %",
+			"retentionCap": "Retention Cap",
+			"retentionReleaseDays": "Release Days",
+			"submit": "Create Project",
+			"cancel": "Cancel",
+			"success": "Project created successfully",
+			"nextProjectNo": "Project No.",
+			"vatToggle": "Includes VAT (15%)",
+			"valueBeforeVat": "Value Before VAT",
+			"valueWithVat": "Value Including VAT",
+			"vatAmount": "VAT Amount",
+			"paymentMethod": "Payment Method",
+			"scopeOfWork": "Scope of Work",
+			"scopeOfWorkPlaceholder": "Describe scope of work and required activities...",
+			"paymentTermsSection": "Payment Terms & Schedule",
+			"addPaymentTerm": "Add Payment Term",
+			"removePaymentTerm": "Remove",
+			"termType": "Term Type",
+			"termLabel": "Description",
+			"termPercent": "Percent %",
+			"termAmount": "Amount",
+			"totalPercent": "Total Percent",
+			"guaranteesSection": "Guarantees & Retention",
+			"performanceBond": "Performance Bond",
+			"performanceBondPercent": "Performance Bond %",
+			"performanceBondAmount": "Bond Amount",
+			"insurance": "Insurance",
+			"insuranceRequired": "Insurance Required",
+			"insuranceDetails": "Insurance Details",
+			"insuranceDetailsPlaceholder": "Insurance type and coverage...",
+			"penalties": "Delay Penalties",
+			"penaltyPercent": "Daily Penalty %",
+			"penaltyCapPercent": "Penalty Cap % of Contract",
+			"retentionAmount": "Computed Retention Amount",
+			"summaryStrip": "Contract Summary",
+			"paymentMethods": {
+				"CASH": "Cash",
+				"BANK_TRANSFER": "Bank Transfer",
+				"CHEQUE": "Cheque",
+				"CREDIT_CARD": "Credit Card",
+				"OTHER": "Other"
+			},
+			"termTypes": {
+				"ADVANCE": "Advance Payment",
+				"MILESTONE": "Milestone",
+				"MONTHLY": "Monthly",
+				"COMPLETION": "Completion",
+				"CUSTOM": "Custom"
+			},
+			"contractStatuses": {
+				"DRAFT": "Draft",
+				"ACTIVE": "Active",
+				"SUSPENDED": "Suspended",
+				"CLOSED": "Closed"
+			}
+		},
 		"overview": {
 			"progress": "Progress",
 			"daysRemaining": "Days Remaining",
@@ -719,17 +794,8 @@
 			"saveProgress": "Save Progress",
 			"progressUpdated": "Progress updated",
 			"progressUpdateError": "Failed to update progress",
-			"noPhase": "No phase"
-		},
-		"supervisor": {
-			"title": "Supervisor Mode",
-			"currentProgress": "Current Progress",
-			"dailyReport": "Daily Report",
-			"uploadPhoto": "Upload Photo",
-			"reportIssue": "Report Issue",
-			"updateProgress": "Update Progress",
-			"backToProject": "Back to Project",
-			"viewTimeline": "View Timeline"
+			"noPhase": "No phase",
+			"currentProgress": "Current Progress"
 		},
 		"validation": {
 			"nameRequired": "Project name is required"
@@ -779,11 +845,88 @@
 			"ownerChannel": "Owner Chat",
 			"ownerChannelDescription": "Official communication with project owner",
 			"ownerChannelNote": "This is an official channel - all messages will be visible to the owner",
-			"noMessages": "No messages",
+			"noMessages": "No messages yet",
+			"startConversation": "Start a conversation with the project team",
 			"messagePlaceholder": "Type your message...",
 			"refresh": "Refresh",
 			"sendError": "Failed to send message",
-			"markAsOfficialUpdate": "Mark as official update"
+			"markAsOfficialUpdate": "Mark as official update",
+			"officialUpdate": "Official Update",
+			"uploadError": "Failed to upload file",
+			"attachFile": "Attach file",
+			"fullScreen": "Full screen",
+			"exitFullScreen": "Exit full screen"
+		},
+		"contract": {
+			"title": "Contract",
+			"save": "Save",
+			"saved": "Contract data saved",
+			"editContract": "Edit Contract",
+			"saveChanges": "Save Changes",
+			"cancelEdit": "Cancel",
+			"saving": "Saving...",
+			"summary": {
+				"originalValue": "Original Value",
+				"changeOrders": "Change Orders",
+				"adjustedValue": "Adjusted Value",
+				"retentionHeld": "Retention Held"
+			},
+			"info": {
+				"title": "Contract Information",
+				"contractNo": "Contract No.",
+				"contractTitle": "Contract Title",
+				"clientName": "Client Name",
+				"value": "Contract Value",
+				"signedDate": "Signed Date",
+				"startDate": "Start Date",
+				"endDate": "End Date",
+				"description": "Description",
+				"notes": "Notes"
+			},
+			"status": {
+				"DRAFT": "Draft",
+				"ACTIVE": "Active",
+				"SUSPENDED": "Suspended",
+				"CLOSED": "Closed"
+			},
+			"retention": {
+				"title": "Retention",
+				"percent": "Retention (%)",
+				"cap": "Retention Cap",
+				"releaseDays": "Release Days",
+				"amount": "Retention Amount"
+			},
+			"paymentTerms": {
+				"title": "Payment Terms",
+				"addTerm": "Add Term",
+				"noTerms": "No payment terms",
+				"saved": "Payment terms saved",
+				"type": "Type",
+				"label": "Label",
+				"percent": "Percent (%)",
+				"amount": "Amount",
+				"dueDate": "Due Date",
+				"types": {
+					"ADVANCE": "Advance Payment",
+					"MILESTONE": "Milestone",
+					"MONTHLY": "Monthly",
+					"COMPLETION": "On Completion",
+					"CUSTOM": "Custom"
+				}
+			}
+		},
+		"contractBar": {
+			"noContract": "No contract for this project",
+			"addContract": "Add Contract Now",
+			"contractValue": "Contract Value",
+			"adjustedValue": "Adjusted",
+			"duration": "Duration",
+			"days": "days",
+			"retention": "Retention",
+			"viewContract": "View Contract",
+			"daysRemaining": "{days} days remaining",
+			"daysOverdue": "{days} days overdue",
+			"of": "of"
 		},
 		"insights": {
 			"title": "Smart Alerts",
@@ -842,7 +985,26 @@
 				"finance": "Finance",
 				"planning": "Planning",
 				"communication": "Communication",
+				"workspace": "Workspace",
 				"more": "More"
+			},
+			"sections": {
+				"overview": "Overview",
+				"execution": "Execution",
+				"field": "Field",
+				"finance": "Finance",
+				"expenses": "Expenses",
+				"payments": "Payments",
+				"claims": "Claims",
+				"timeline": "Timeline",
+				"changes": "Change Orders",
+				"documents": "Documents",
+				"chat": "Chat",
+				"updates": "Updates",
+				"owner": "Owner Portal",
+				"insights": "Insights",
+				"team": "Team",
+				"contract": "Contract"
 			}
 		},
 		"commandCenter": {
@@ -866,6 +1028,42 @@
 			"noRecentActivity": "No recent activity",
 			"upcomingDeadlines": "Upcoming Deadlines",
 			"noDeadlines": "No upcoming deadlines",
+			"completion": "Completion",
+			"lastUpdated": "Last Updated",
+			"daysLeft": "Days Left",
+			"onTrack": "On Track",
+			"atRisk": "At Risk",
+			"delayed": "Delayed",
+			"budget": "Contract Value",
+			"overspendWarning": "Over 80% of budget spent",
+			"scheduleSnapshot": "Schedule Snapshot",
+			"currentPhase": "Current Phase",
+			"nextMilestone": "Next Milestone",
+			"financeSummary": "Finance Summary",
+			"thisMonthExpenses": "This Month Expenses",
+			"pendingClaims": "Pending Claims",
+			"openFinance": "Open Finance",
+			"viewSchedule": "View Schedule",
+			"quickDocuments": "Documents",
+			"noDocumentsYet": "No documents yet",
+			"ownerPortal": "Owner Portal",
+			"enabled": "Enabled",
+			"disabled": "Disabled",
+			"activeLinks": "{count} active links",
+			"copyLink": "Copy Link",
+			"manage": "Manage",
+			"dailyReport": "Daily Report",
+			"addExpense": "Add Expense",
+			"reportIssue": "Report Issue",
+			"timelineChart": "Project Timeline",
+			"projectStatusChart": "Project Status",
+			"plannedProgress": "Planned",
+			"actualProgress": "Actual",
+			"activityPulse": "Activity Pulse",
+			"totalInteractions": "this week",
+			"reports": "Reports",
+			"photos": "Photos",
+			"issues": "Issues",
 			"nav": {
 				"field": "Field Execution",
 				"fieldNew": "New Report",
@@ -886,7 +1084,6 @@
 		"sections": {
 			"overview": "Overview",
 			"field": "Field Execution",
-			"supervisor": "Supervisor Mode",
 			"finance": "Finance",
 			"finance_expenses": "Expenses",
 			"finance_payments": "Payments",
@@ -1777,6 +1974,92 @@
 			"started": "Milestone started",
 			"completed": "Milestone completed",
 			"progressUpdated": "Progress updated"
+		},
+		"gantt": {
+			"title": "Gantt Chart",
+			"viewCards": "Cards",
+			"viewGantt": "Gantt",
+			"milestones": "Milestones",
+			"status": "Status",
+			"health": "Health",
+			"planned": "Planned",
+			"actual": "Actual",
+			"critical": "Critical",
+			"todayLine": "Today",
+			"noDates": "No dates set",
+			"noDatesDescription": "Set planned dates on your milestones to see the Gantt chart",
+			"noResults": "No milestones match the current filters",
+			"zoom": {
+				"week": "Week",
+				"month": "Month",
+				"quarter": "Quarter"
+			},
+			"filterStatus": "Filter by status",
+			"filterHealth": "Filter by health",
+			"allStatuses": "All statuses",
+			"allHealth": "All health",
+			"today": "Today",
+			"legend": "Color Legend",
+			"dragToResize": "Drag to resize",
+			"dragToMove": "Drag to reschedule",
+			"rescheduleSuccess": "Milestone rescheduled successfully",
+			"rescheduleFailed": "Failed to reschedule milestone"
+		},
+		"contract": {
+			"title": "Main Contract",
+			"noContract": "No contract data entered yet",
+			"save": "Save Contract",
+			"saved": "Contract saved successfully",
+			"info": {
+				"title": "Contract Information",
+				"contractNo": "Contract No.",
+				"contractTitle": "Contract Title",
+				"clientName": "Client Name",
+				"value": "Contract Value",
+				"signedDate": "Signed Date",
+				"startDate": "Start Date",
+				"endDate": "End Date",
+				"notes": "Notes",
+				"description": "Contract Description"
+			},
+			"status": {
+				"DRAFT": "Draft",
+				"ACTIVE": "Active",
+				"SUSPENDED": "Suspended",
+				"CLOSED": "Closed"
+			},
+			"paymentTerms": {
+				"title": "Payment Terms",
+				"addTerm": "Add Term",
+				"noTerms": "No payment terms",
+				"type": "Type",
+				"label": "Description",
+				"percent": "Percentage",
+				"amount": "Amount",
+				"dueDate": "Due Date",
+				"saved": "Payment terms saved",
+				"removeTerm": "Remove",
+				"types": {
+					"ADVANCE": "Advance Payment",
+					"MILESTONE": "Milestone Payment",
+					"MONTHLY": "Monthly Payment",
+					"COMPLETION": "On Completion",
+					"CUSTOM": "Custom"
+				}
+			},
+			"retention": {
+				"title": "Retention",
+				"percent": "Retention %",
+				"cap": "Maximum Cap",
+				"releaseDays": "Release Days After Delivery",
+				"amount": "Calculated Retention Amount"
+			},
+			"summary": {
+				"originalValue": "Original Value",
+				"changeOrders": "Change Orders",
+				"adjustedValue": "Adjusted Value",
+				"retentionHeld": "Retention Held"
+			}
 		}
 	},
 	"changeOrders": {
@@ -3192,7 +3475,12 @@
 			"claimCreated": "Claim created successfully",
 			"claimCreateError": "Failed to create claim",
 			"statusUpdated": "Status updated successfully",
-			"statusUpdateError": "Failed to update status"
+			"statusUpdateError": "Failed to update status",
+			"subcontractCreated": "Contract created successfully",
+			"subcontractCreateError": "Failed to create contract",
+			"subcontractUpdated": "Contract updated successfully",
+			"subcontractDeleted": "Contract deleted successfully",
+			"subcontractDeleteError": "Failed to delete contract"
 		},
 		"zatca": {
 			"title": "ZATCA Compliance",
@@ -3237,6 +3525,46 @@
 			"templates": "Templates",
 			"reports": "Reports",
 			"clients": "Clients"
+		},
+		"projectHub": {
+			"title": "Project Finance",
+			"tabs": {
+				"expenses": "Expenses",
+				"subcontracts": "Subcontractors"
+			}
+		},
+		"categoryChart": {
+			"title": "Expenses Breakdown",
+			"noData": "No expenses yet"
+		},
+		"subcontracts": {
+			"title": "Subcontractors",
+			"new": "New Contract",
+			"empty": "No subcontract contracts",
+			"emptyAction": "Add first subcontract",
+			"name": "Contractor Name",
+			"namePlaceholder": "Enter contractor name or contract description",
+			"value": "Contract Value",
+			"startDate": "Start Date",
+			"endDate": "End Date",
+			"notes": "Notes",
+			"notesPlaceholder": "Additional notes about the contract",
+			"paid": "Paid",
+			"remaining": "Remaining",
+			"progress": "Progress",
+			"statusActive": "Active",
+			"statusCompleted": "Completed",
+			"totalValue": "Total Contract Value",
+			"totalPaid": "Total Paid",
+			"detail": "Contract Details",
+			"payments": "Payments",
+			"addPayment": "Add Payment",
+			"noPayments": "No payments yet",
+			"deleteConfirm": "Are you sure you want to delete this contract? All linked expenses will be unlinked.",
+			"deleteTitle": "Delete Contract",
+			"contract": "Contract",
+			"duration": "Duration",
+			"selectContract": "Select linked contract"
 		}
 	}
 }

@@ -1,4 +1,4 @@
-import { createChangeOrder, logAuditEvent, getProjectById } from "@repo/database";
+import { createChangeOrder, logAuditEvent, getProjectById, getProjectContract, db } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -61,6 +61,18 @@ export const createChangeOrderProcedure = protectedProcedure
 				requestedById: context.user.id,
 			},
 		);
+
+		// Auto-link CO to project contract if exists (fire and forget)
+		getProjectContract(input.organizationId, input.projectId)
+			.then(async (contract) => {
+				if (contract) {
+					await db.projectChangeOrder.update({
+						where: { id: changeOrder.id },
+						data: { contractId: contract.id },
+					});
+				}
+			})
+			.catch(() => {});
 
 		// Log audit event
 		await logAuditEvent(input.organizationId, input.projectId, {

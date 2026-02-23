@@ -1,7 +1,7 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
@@ -15,7 +15,7 @@ import {
 import { Textarea } from "@ui/components/textarea";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -33,21 +33,35 @@ export function CreateExpenseForm({
 }: CreateExpenseFormProps) {
 	const t = useTranslations();
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const queryClient = useQueryClient();
 	const basePath = `/app/${organizationSlug}/projects/${projectId}/finance`;
 
+	const defaultContractId = searchParams.get("contractId") || "";
+
 	const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-	const [category, setCategory] = useState<string>("");
+	const [category, setCategory] = useState<string>(
+		defaultContractId ? "SUBCONTRACTOR" : "",
+	);
 	const [amount, setAmount] = useState("");
 	const [vendorName, setVendorName] = useState("");
 	const [note, setNote] = useState("");
+	const [subcontractContractId, setSubcontractContractId] = useState(defaultContractId);
+
+	// Fetch subcontract contracts for linking
+	const { data: contracts } = useQuery({
+		...orpc.projectFinance.listSubcontracts.queryOptions({
+			input: { organizationId, projectId },
+		}),
+		enabled: category === "SUBCONTRACTOR",
+	});
 
 	const createMutation = useMutation({
 		...orpc.projectFinance.createExpense.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("finance.notifications.expenseCreated"));
 			queryClient.invalidateQueries({ queryKey: ["projectFinance"] });
-			router.push(basePath);
+			router.push(`${basePath}/expenses`);
 		},
 		onError: () => {
 			toast.error(t("finance.notifications.expenseCreateError"));
@@ -76,6 +90,10 @@ export function CreateExpenseForm({
 			amount: Number.parseFloat(amount),
 			vendorName: vendorName || undefined,
 			note: note || undefined,
+			subcontractContractId:
+				category === "SUBCONTRACTOR" && subcontractContractId
+					? subcontractContractId
+					: undefined,
 		});
 	};
 
@@ -98,7 +116,7 @@ export function CreateExpenseForm({
 					asChild
 					className="shrink-0 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
 				>
-					<Link href={basePath}>
+					<Link href={`${basePath}/expenses`}>
 						<ChevronLeft className="h-5 w-5 text-slate-500" />
 					</Link>
 				</Button>
@@ -132,7 +150,16 @@ export function CreateExpenseForm({
 
 					<div className="space-y-2">
 						<Label htmlFor="category">{t("finance.expenses.category")}</Label>
-						<Select value={category} onValueChange={setCategory} required>
+						<Select
+							value={category}
+							onValueChange={(val) => {
+								setCategory(val);
+								if (val !== "SUBCONTRACTOR") {
+									setSubcontractContractId("");
+								}
+							}}
+							required
+						>
 							<SelectTrigger className="rounded-xl">
 								<SelectValue
 									placeholder={t("finance.expenses.selectCategory")}
@@ -147,6 +174,33 @@ export function CreateExpenseForm({
 							</SelectContent>
 						</Select>
 					</div>
+
+					{/* Subcontract Contract Selector */}
+					{category === "SUBCONTRACTOR" && contracts && contracts.length > 0 && (
+						<div className="space-y-2">
+							<Label htmlFor="contract">
+								{t("finance.subcontracts.selectContract")}
+							</Label>
+							<Select
+								value={subcontractContractId || "none"}
+								onValueChange={(val) =>
+									setSubcontractContractId(val === "none" ? "" : val)
+								}
+							>
+								<SelectTrigger className="rounded-xl">
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="none">-</SelectItem>
+									{contracts.map((c) => (
+										<SelectItem key={c.id} value={c.id}>
+											{c.name}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+					)}
 
 					<div className="space-y-2">
 						<Label htmlFor="amount">{t("finance.expenses.amount")}</Label>
@@ -194,7 +248,7 @@ export function CreateExpenseForm({
 						className="flex-1 rounded-xl"
 						asChild
 					>
-						<Link href={basePath}>{t("common.cancel")}</Link>
+						<Link href={`${basePath}/expenses`}>{t("common.cancel")}</Link>
 					</Button>
 					<Button
 						type="submit"

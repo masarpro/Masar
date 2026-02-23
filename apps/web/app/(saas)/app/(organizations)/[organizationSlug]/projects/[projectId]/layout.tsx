@@ -64,12 +64,15 @@ export default async function ProjectLayout({
 		endDate: project.endDate,
 	};
 
+	const userName = session?.user?.name ?? "";
+
 	return (
 		<ProjectShell
 			project={projectData}
 			organizationSlug={organizationSlug}
 			organizationId={organization.id}
 			userRole={userRole}
+			userName={userName}
 		>
 			{children}
 		</ProjectShell>

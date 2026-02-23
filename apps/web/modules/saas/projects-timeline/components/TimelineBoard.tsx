@@ -6,13 +6,23 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Card } from "@ui/components/card";
 import { Progress } from "@ui/components/progress";
-import { PlusIcon, CalendarIcon, AlertTriangleIcon } from "lucide-react";
+import {
+	PlusIcon,
+	CalendarIcon,
+	AlertTriangleIcon,
+	LayoutListIcon,
+	GanttChartIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { MilestoneCard } from "./MilestoneCard";
 import { CreateMilestoneForm } from "./CreateMilestoneForm";
 import { TimelineHealthBadge } from "./TimelineHealthBadge";
+import { GanttView } from "./gantt";
+import type { GanttMilestone } from "./gantt";
+
+type ViewMode = "cards" | "gantt";
 
 interface TimelineBoardProps {
 	projectId: string;
@@ -22,6 +32,7 @@ export function TimelineBoard({ projectId }: TimelineBoardProps) {
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 	const { activeOrganization } = useActiveOrganization();
+	const [viewMode, setViewMode] = useState<ViewMode>("cards");
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
 	const [editingMilestone, setEditingMilestone] = useState<{
 		id: string;
@@ -236,6 +247,59 @@ export function TimelineBoard({ projectId }: TimelineBoardProps) {
 		},
 	});
 
+	// Reschedule mutation (for Gantt drag)
+	const rescheduleMutation = useMutation({
+		mutationFn: async ({
+			milestoneId,
+			plannedStart,
+			plannedEnd,
+		}: {
+			milestoneId: string;
+			plannedStart: string;
+			plannedEnd: string;
+		}) => {
+			if (!activeOrganization?.id) throw new Error("No organization");
+			return apiClient.projectTimeline.updateMilestone({
+				organizationId: activeOrganization.id,
+				projectId,
+				milestoneId,
+				plannedStart,
+				plannedEnd,
+			});
+		},
+		onSuccess: () => {
+			toast.success(t("timeline.gantt.rescheduleSuccess"));
+			queryClient.invalidateQueries({ queryKey });
+			queryClient.invalidateQueries({
+				queryKey: ["project-timeline-health"],
+			});
+		},
+		onError: (error: Error) => {
+			toast.error(t("timeline.gantt.rescheduleFailed"));
+		},
+	});
+
+	const handleRescheduleMilestone = useCallback(
+		(milestoneId: string, plannedStart: string, plannedEnd: string) => {
+			rescheduleMutation.mutate({ milestoneId, plannedStart, plannedEnd });
+		},
+		[rescheduleMutation],
+	);
+
+	const handleGanttEditMilestone = useCallback(
+		(milestone: GanttMilestone) => {
+			setEditingMilestone({
+				id: milestone.id,
+				title: milestone.title,
+				description: milestone.description,
+				plannedStart: milestone.plannedStart,
+				plannedEnd: milestone.plannedEnd,
+				isCritical: milestone.isCritical,
+			});
+		},
+		[],
+	);
+
 	if (isLoadingMilestones) {
 		return (
 			<div className="space-y-4">
@@ -313,57 +377,89 @@ export function TimelineBoard({ projectId }: TimelineBoardProps) {
 				</Card>
 			)}
 
-			{/* Add Milestone Button */}
-			<div className="flex justify-end">
+			{/* Action Bar: Add Milestone + View Toggle */}
+			<div className="flex items-center justify-between gap-2">
+				{/* View Toggle */}
+				<div className="flex items-center gap-1 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-lg p-1">
+					<Button
+						size="sm"
+						variant={viewMode === "cards" ? "primary" : "ghost"}
+						onClick={() => setViewMode("cards")}
+						className="h-7 px-3 text-xs"
+					>
+						<LayoutListIcon className="h-3.5 w-3.5 me-1.5" />
+						{t("timeline.gantt.viewCards")}
+					</Button>
+					<Button
+						size="sm"
+						variant={viewMode === "gantt" ? "primary" : "ghost"}
+						onClick={() => setViewMode("gantt")}
+						className="h-7 px-3 text-xs"
+					>
+						<GanttChartIcon className="h-3.5 w-3.5 me-1.5" />
+						{t("timeline.gantt.viewGantt")}
+					</Button>
+				</div>
+
 				<Button onClick={() => setIsCreateOpen(true)}>
-					<PlusIcon className="h-4 w-4 mr-2" />
+					<PlusIcon className="h-4 w-4 me-2" />
 					{t("timeline.addMilestone")}
 				</Button>
 			</div>
 
-			{/* Milestones List */}
-			{milestones.length === 0 ? (
-				<Card className="p-12 text-center">
-					<CalendarIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-					<h3 className="text-lg font-semibold mb-2">
-						{t("timeline.emptyTitle")}
-					</h3>
-					<p className="text-muted-foreground mb-4">
-						{t("timeline.emptyDescription")}
-					</p>
-					<Button onClick={() => setIsCreateOpen(true)}>
-						<PlusIcon className="h-4 w-4 mr-2" />
-						{t("timeline.addMilestone")}
-					</Button>
-				</Card>
+			{/* Content based on view mode */}
+			{viewMode === "cards" ? (
+				<>
+					{milestones.length === 0 ? (
+						<Card className="p-12 text-center">
+							<CalendarIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+							<h3 className="text-lg font-semibold mb-2">
+								{t("timeline.emptyTitle")}
+							</h3>
+							<p className="text-muted-foreground mb-4">
+								{t("timeline.emptyDescription")}
+							</p>
+							<Button onClick={() => setIsCreateOpen(true)}>
+								<PlusIcon className="h-4 w-4 me-2" />
+								{t("timeline.addMilestone")}
+							</Button>
+						</Card>
+					) : (
+						<div className="space-y-4">
+							{milestones.map((milestone) => (
+								<MilestoneCard
+									key={milestone.id}
+									milestone={milestone}
+									onStart={() => startMutation.mutate(milestone.id)}
+									onComplete={() => completeMutation.mutate(milestone.id)}
+									onUpdateProgress={(progress) =>
+										progressMutation.mutate({
+											milestoneId: milestone.id,
+											progress,
+										})
+									}
+									onEdit={() => setEditingMilestone(milestone)}
+									onDelete={() => {
+										if (confirm(t("timeline.confirmDelete"))) {
+											deleteMutation.mutate(milestone.id);
+										}
+									}}
+									isLoading={
+										startMutation.isPending ||
+										completeMutation.isPending ||
+										progressMutation.isPending
+									}
+								/>
+							))}
+						</div>
+					)}
+				</>
 			) : (
-				<div className="space-y-4">
-					{milestones.map((milestone) => (
-						<MilestoneCard
-							key={milestone.id}
-							milestone={milestone}
-							onStart={() => startMutation.mutate(milestone.id)}
-							onComplete={() => completeMutation.mutate(milestone.id)}
-							onUpdateProgress={(progress) =>
-								progressMutation.mutate({
-									milestoneId: milestone.id,
-									progress,
-								})
-							}
-							onEdit={() => setEditingMilestone(milestone)}
-							onDelete={() => {
-								if (confirm(t("timeline.confirmDelete"))) {
-									deleteMutation.mutate(milestone.id);
-								}
-							}}
-							isLoading={
-								startMutation.isPending ||
-								completeMutation.isPending ||
-								progressMutation.isPending
-							}
-						/>
-					))}
-				</div>
+				<GanttView
+					milestones={milestones as GanttMilestone[]}
+					onEditMilestone={handleGanttEditMilestone}
+					onRescheduleMilestone={handleRescheduleMilestone}
+				/>
 			)}
 
 			{/* Create Form */}

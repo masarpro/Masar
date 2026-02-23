@@ -1,5 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { SupervisorMode } from "@saas/projects/components/supervisor/SupervisorMode";
+import { DailyReportForm } from "@saas/projects/components/forms/DailyReportForm";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -7,11 +7,11 @@ export async function generateMetadata() {
 	const t = await getTranslations();
 
 	return {
-		title: t("projects.supervisor.title"),
+		title: t("projects.field.newReport"),
 	};
 }
 
-export default async function SupervisorPage({
+export default async function NewReportPage({
 	params,
 }: {
 	params: Promise<{ organizationSlug: string; projectId: string }>;
@@ -27,10 +27,12 @@ export default async function SupervisorPage({
 	}
 
 	return (
-		<SupervisorMode
-			organizationId={activeOrganization.id}
-			organizationSlug={organizationSlug}
-			projectId={projectId}
-		/>
+		<div>
+			<DailyReportForm
+				organizationId={activeOrganization.id}
+				organizationSlug={organizationSlug}
+				projectId={projectId}
+			/>
+		</div>
 	);
 }
