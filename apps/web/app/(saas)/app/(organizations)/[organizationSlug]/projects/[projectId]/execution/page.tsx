@@ -1,5 +1,6 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { FieldTimeline } from "@saas/projects/components/field/FieldTimeline";
+import { ProjectPhotosCard } from "@saas/projects/components/field/ProjectPhotosCard";
 import { TimelineBoard } from "@saas/projects-timeline/components/TimelineBoard";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -32,6 +33,15 @@ export default async function ExecutionPage({
 			{/* Timeline Section */}
 			<section>
 				<TimelineBoard projectId={projectId} />
+			</section>
+
+			{/* Project Photos */}
+			<section>
+				<ProjectPhotosCard
+					organizationId={activeOrganization.id}
+					organizationSlug={organizationSlug}
+					projectId={projectId}
+				/>
 			</section>
 
 			{/* Divider */}

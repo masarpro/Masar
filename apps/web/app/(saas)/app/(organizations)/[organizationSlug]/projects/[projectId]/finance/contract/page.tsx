@@ -30,6 +30,7 @@ export default async function ProjectContractPage({
 		<div>
 			<ProjectContractView
 				organizationId={activeOrganization.id}
+				organizationSlug={organizationSlug}
 				projectId={projectId}
 			/>
 		</div>

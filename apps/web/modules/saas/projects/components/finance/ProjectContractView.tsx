@@ -3,7 +3,8 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
-import { Loader2, Pencil, Save, X } from "lucide-react";
+import { FileDiff, Loader2, Pencil, Save, X } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -15,13 +16,16 @@ import {
 
 interface ProjectContractViewProps {
 	organizationId: string;
+	organizationSlug: string;
 	projectId: string;
 }
 
 export function ProjectContractView({
 	organizationId,
+	organizationSlug,
 	projectId,
 }: ProjectContractViewProps) {
+	const basePath = `/app/${organizationSlug}/projects/${projectId}`;
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 	const contractRef = useRef<ContractFormRef>(null);
@@ -189,13 +193,25 @@ export function ProjectContractView({
 					{t("projects.contract.title")}
 				</h2>
 				{!isEditing ? (
-					<Button
-						onClick={() => setIsEditing(true)}
-						className="rounded-xl bg-teal-600 px-6 text-white hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-600"
-					>
-						<Pencil className="ml-2 h-4 w-4" />
-						{t("projects.contract.editContract")}
-					</Button>
+					<div className="flex gap-2">
+						<Button
+							asChild
+							variant="outline"
+							className="rounded-xl border-purple-200 px-5 text-purple-600 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-400 dark:hover:bg-purple-900/30"
+						>
+							<Link href={`${basePath}/changes`}>
+								<FileDiff className="ml-2 h-4 w-4" />
+								{t("changeOrders.title")}
+							</Link>
+						</Button>
+						<Button
+							onClick={() => setIsEditing(true)}
+							className="rounded-xl bg-teal-600 px-6 text-white hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-600"
+						>
+							<Pencil className="ml-2 h-4 w-4" />
+							{t("projects.contract.editContract")}
+						</Button>
+					</div>
 				) : (
 					<div className="flex gap-2">
 						<Button

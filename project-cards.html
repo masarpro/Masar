@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بطاقات حالة المشروع - مسار</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4F3F0;
+    --card: #FFFFFF;
+    --card-alt: #F9F9F7;
+    --border: #E8E6E1;
+    --border-light: #F0EEEA;
+    --text: #1A1A1A;
+    --text2: #555;
+    --text3: #999;
+    --green: #22C55E;
+    --green-d: #15803D;
+    --green-l: #DCFCE7;
+    --blue: #3B82F6;
+    --blue-l: #DBEAFE;
+    --orange: #F59E0B;
+    --orange-l: #FEF3C7;
+    --red: #EF4444;
+    --red-l: #FEE2E2;
+    --teal: #14B8A6;
+    --purple: #8B5CF6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 28px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* === 3 CARDS GRID === */
+  .cards-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 1400px;
+    align-items: stretch;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.03);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Card Header */
+  .card-head {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .card-head-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .card-head-title .ch-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+  .card-head-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 14px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .card-body {
+    padding: 16px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ===== CARD 1: التنفيذ ===== */
+
+  /* Donut + Legend Row */
+  .exec-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .donut-wrap {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    flex-shrink: 0;
+  }
+  .donut-wrap svg { transform: rotate(-90deg); }
+  .donut-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    text-align: center;
+  }
+  .donut-center .d-pct {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text);
+  }
+  .donut-center .d-lbl {
+    font-size: 9px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+
+  .exec-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+  }
+  .el-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text2);
+  }
+  .el-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .el-val {
+    margin-right: auto;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text);
+    direction: ltr;
+  }
+
+  /* Phases Mini */
+  .phases-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    margin-bottom: 2px;
+    letter-spacing: 0.3px;
+  }
+  .phases {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ph {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    background: var(--card-alt);
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+  }
+  .ph-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .ph-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ph-bar {
+    width: 56px; height: 5px;
+    background: #EAEAEA;
+    border-radius: 3px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .ph-bar-fill { height: 100%; border-radius: 3px; }
+  .ph-pct {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text2);
+    width: 28px;
+    text-align: left;
+    direction: ltr;
+    flex-shrink: 0;
+  }
+
+  /* Health chips at bottom */
+  .card-foot {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .hchip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .hchip.g { background: var(--green-l); color: var(--green-d); }
+  .hchip.w { background: var(--orange-l); color: #B45309; }
+  .hchip.r { background: var(--red-l); color: var(--red); }
+
+  /* ===== CARD 2: المالية ===== */
+
+  /* Top 4 numbers row */
+  .fin-kpis {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .fkpi {
+    padding: 10px 12px;
+    background: var(--card-alt);
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+  }
+  .fkpi-label {
+    font-size: 10px;
+    color: var(--text3);
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .fkpi-val {
+    font-size: 15px;
+    font-weight: 700;
+    direction: ltr;
+    text-align: right;
+    line-height: 1.2;
+  }
+  .fkpi-sub {
+    font-size: 9px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+
+  /* Budget bar */
+  .budget-section { display: flex; flex-direction: column; gap: 6px; }
+  .budget-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text3);
+  }
+  .budget-header strong {
+    color: var(--text);
+    font-size: 11px;
+    direction: ltr;
+  }
+  .bbar {
+    width: 100%;
+    height: 24px;
+    background: #F1F5F9;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+  }
+  .bbar-seg {
+    height: 100%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .bbar-seg span {
+    font-size: 8px; font-weight: 600; color: #fff;
+    white-space: nowrap;
+  }
+  .bbar-legend {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .bbar-li {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 10px; color: var(--text2);
+  }
+  .bbar-d {
+    width: 6px; height: 6px; border-radius: 1px;
+  }
+
+  /* Next Payment */
+  .npay {
+    background: linear-gradient(135deg, #F0FDF4, #ECFDF5);
+    border: 1px solid #BBF7D0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    position: relative;
+    overflow: hidden;
+    margin-top: auto;
+  }
+  .npay::before {
+    content: '';
+    position: absolute;
+    top: -15px; left: -15px;
+    width: 60px; height: 60px;
+    background: radial-gradient(circle, rgba(34,197,94,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .npay-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+  }
+  .npay-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--green-d);
+  }
+  .npay-badge {
+    font-size: 9px;
+    background: var(--green);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .npay-amount {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--green-d);
+    direction: ltr;
+    text-align: right;
+    position: relative;
+    z-index: 1;
+  }
+  .npay-cond {
+    font-size: 10px;
+    color: #16A34A;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed #BBF7D0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== CARD 3: الجدول الزمني ===== */
+
+  /* S-Curve */
+  .scurve-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .scurve-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+  .sc-leg {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text2);
+    font-weight: 500;
+  }
+  .sc-line {
+    width: 20px; height: 3px; border-radius: 2px;
+  }
+  .sc-line.dash {
+    background: repeating-linear-gradient(90deg, var(--blue) 0px, var(--blue) 4px, transparent 4px, transparent 7px);
+  }
+  .sc-line.solid { background: var(--teal); }
+
+  .scurve-chart {
+    position: relative;
+    flex: 1;
+    min-height: 160px;
+  }
+  .sc-y {
+    position: absolute;
+    right: 0; top: 0; bottom: 20px;
+    width: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .sc-y span {
+    font-size: 9px;
+    color: var(--text3);
+    text-align: left;
+    direction: ltr;
+    line-height: 1;
+  }
+  .sc-svg-area {
+    position: absolute;
+    right: 34px; left: 0;
+    top: 0; bottom: 0;
+  }
+  .sc-svg-area svg {
+    width: 100%; height: 100%;
+  }
+
+  .sc-x {
+    display: flex;
+    justify-content: space-between;
+    padding-right: 34px;
+    margin-top: 4px;
+  }
+  .sc-x span {
+    font-size: 9px;
+    color: var(--text3);
+    text-align: center;
+  }
+
+  /* Timeline bar */
+  .tl-section {
+    margin-top: 8px;
+  }
+  .tl-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tl-pct-txt {
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .tl-track {
+    flex: 1;
+    height: 7px;
+    background: #E5E7EB;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .tl-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue), var(--teal));
+    border-radius: 4px;
+    position: relative;
+  }
+  .tl-fill::after {
+    content: '';
+    position: absolute;
+    left: 0; top: -3.5px;
+    width: 14px; height: 14px;
+    background: var(--teal);
+    border: 2.5px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    transform: translateX(-50%);
+  }
+  .tl-dates {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+  }
+  .tl-dates span {
+    font-size: 9px;
+    color: var(--text3);
+  }
+
+  /* Stats row at bottom of timeline card */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-top: auto;
+  }
+  .st-item {
+    text-align: center;
+    padding: 8px 6px;
+    background: var(--card-alt);
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+  }
+  .st-val {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+    direction: ltr;
+  }
+  .st-lbl {
+    font-size: 9px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+
+  @media (max-width: 1100px) {
+    .cards-row {
+      grid-template-columns: 1fr;
+      max-width: 480px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="cards-row">
+
+  <!-- ============================== -->
+  <!-- CARD 1: التنفيذ والمراحل       -->
+  <!-- ============================== -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-head-title">
+        <span class="ch-icon" style="background:var(--blue-l);color:var(--blue);">📊</span>
+        التنفيذ والمراحل
+      </div>
+      <div class="card-head-badge" style="background:var(--green-l);color:var(--green-d);">
+        <span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;"></span>
+        نشط
+      </div>
+    </div>
+
+    <div class="card-body">
+      <!-- Donut + Legend -->
+      <div class="exec-top">
+        <div class="donut-wrap">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle cx="55" cy="55" r="42" fill="none" stroke="#F1F5F9" stroke-width="12"/>
+            <circle cx="55" cy="55" r="42" fill="none" stroke="#22C55E" stroke-width="12"
+              stroke-dasharray="79.2 184.8" stroke-dashoffset="0" stroke-linecap="round"/>
+            <circle cx="55" cy="55" r="42" fill="none" stroke="#3B82F6" stroke-width="12"
+              stroke-dasharray="39.6 224.4" stroke-dashoffset="-79.2" stroke-linecap="round"/>
+          </svg>
+          <div class="donut-center">
+            <div class="d-pct">30%</div>
+            <div class="d-lbl">الإنجاز</div>
+          </div>
+        </div>
+        <div class="exec-legend">
+          <div class="el-item">
+            <span class="el-dot" style="background:var(--green);"></span>
+            مكتمل
+            <span class="el-val">30%</span>
+          </div>
+          <div class="el-item">
+            <span class="el-dot" style="background:var(--blue);"></span>
+            قيد التنفيذ
+            <span class="el-val">15%</span>
+          </div>
+          <div class="el-item">
+            <span class="el-dot" style="background:#E5E7EB;"></span>
+            لم يبدأ
+            <span class="el-val">55%</span>
+          </div>
+          <div style="height:1px;background:var(--border-light);margin:2px 0;"></div>
+          <div class="el-item">
+            <span class="el-dot" style="background:var(--purple);border-radius:50%;"></span>
+            مكتمل: 2/5
+            <span class="el-val" style="color:var(--text2);">مراحل</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phases -->
+      <div>
+        <div class="phases-title">المراحل التنفيذية</div>
+        <div class="phases">
+          <div class="ph">
+            <span class="ph-dot" style="background:var(--green);"></span>
+            <span class="ph-name">أعمال الحفر والتسوية</span>
+            <div class="ph-bar"><div class="ph-bar-fill" style="width:100%;background:var(--green);"></div></div>
+            <span class="ph-pct">100%</span>
+          </div>
+          <div class="ph">
+            <span class="ph-dot" style="background:var(--green);"></span>
+            <span class="ph-name">أعمال القواعد والأساسات</span>
+            <div class="ph-bar"><div class="ph-bar-fill" style="width:100%;background:var(--green);"></div></div>
+            <span class="ph-pct">100%</span>
+          </div>
+          <div class="ph">
+            <span class="ph-dot" style="background:var(--blue);"></span>
+            <span class="ph-name">أعمال الهيكل الإنشائي</span>
+            <div class="ph-bar"><div class="ph-bar-fill" style="width:45%;background:var(--blue);"></div></div>
+            <span class="ph-pct">45%</span>
+          </div>
+          <div class="ph">
+            <span class="ph-dot" style="background:var(--orange);"></span>
+            <span class="ph-name">تأسيس الكهرباء والسباكة</span>
+            <div class="ph-bar"><div class="ph-bar-fill" style="width:10%;background:var(--orange);"></div></div>
+            <span class="ph-pct">10%</span>
+          </div>
+          <div class="ph">
+            <span class="ph-dot" style="background:#D1D5DB;"></span>
+            <span class="ph-name">أعمال التشطيبات</span>
+            <div class="ph-bar"><div class="ph-bar-fill" style="width:0%;"></div></div>
+            <span class="ph-pct">0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-foot">
+      <span class="hchip g">✓ على المسار</span>
+      <span class="hchip w">⚠ 1 معرضة للتأخر</span>
+    </div>
+  </div>
+
+  <!-- ============================== -->
+  <!-- CARD 2: المالية والميزانية      -->
+  <!-- ============================== -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-head-title">
+        <span class="ch-icon" style="background:var(--green-l);color:var(--green-d);">💰</span>
+        المالية والميزانية
+      </div>
+      <div class="card-head-badge" style="background:var(--blue-l);color:var(--blue);">
+        قيمة العقد: 1.5M
+      </div>
+    </div>
+
+    <div class="card-body">
+      <!-- 4 KPIs -->
+      <div class="fin-kpis">
+        <div class="fkpi">
+          <div class="fkpi-label">المصروف الفعلي</div>
+          <div class="fkpi-val" style="color:var(--red);">285,000</div>
+          <div class="fkpi-sub">19% من العقد</div>
+        </div>
+        <div class="fkpi">
+          <div class="fkpi-label">المقبوضات</div>
+          <div class="fkpi-val" style="color:var(--green);">150,000</div>
+          <div class="fkpi-sub">دفعة مقدمة 10%</div>
+        </div>
+        <div class="fkpi">
+          <div class="fkpi-label">المتبقي من العقد</div>
+          <div class="fkpi-val" style="color:var(--text);">1,350,000</div>
+          <div class="fkpi-sub">90% من قيمة العقد</div>
+        </div>
+        <div class="fkpi">
+          <div class="fkpi-label">الاحتفاظ</div>
+          <div class="fkpi-val" style="color:var(--orange);">15,000</div>
+          <div class="fkpi-sub">10% من المستخلصات</div>
+        </div>
+      </div>
+
+      <!-- Budget Bar -->
+      <div class="budget-section">
+        <div class="budget-header">
+          <span>الميزانية المستخدمة</span>
+          <strong>285K / 1.5M ر.س</strong>
+        </div>
+        <div class="bbar">
+          <div class="bbar-seg" style="width:12%;background:linear-gradient(90deg,#16A34A,#22C55E);"><span>مواد</span></div>
+          <div class="bbar-seg" style="width:4%;background:linear-gradient(90deg,#2563EB,#3B82F6);"></div>
+          <div class="bbar-seg" style="width:3%;background:linear-gradient(90deg,#D97706,#F59E0B);"></div>
+        </div>
+        <div class="bbar-legend">
+          <div class="bbar-li"><span class="bbar-d" style="background:var(--green);"></span>مواد</div>
+          <div class="bbar-li"><span class="bbar-d" style="background:var(--blue);"></span>عمالة</div>
+          <div class="bbar-li"><span class="bbar-d" style="background:var(--orange);"></span>مقاولين</div>
+          <div class="bbar-li"><span class="bbar-d" style="background:#E5E7EB;"></span>متبقي 81%</div>
+        </div>
+      </div>
+
+      <!-- Profit & Cash -->
+      <div class="fin-kpis">
+        <div class="fkpi">
+          <div class="fkpi-label">صافي الربح المتوقع</div>
+          <div class="fkpi-val" style="color:var(--green-d);">315,000</div>
+          <div class="fkpi-sub">هامش 21%</div>
+        </div>
+        <div class="fkpi">
+          <div class="fkpi-label">التدفق النقدي</div>
+          <div class="fkpi-val" style="color:var(--red);">-135,000</div>
+          <div class="fkpi-sub">مقبوضات - مصروفات</div>
+        </div>
+      </div>
+
+      <!-- Next Payment -->
+      <div class="npay">
+        <div class="npay-top">
+          <span class="npay-title">💳 الدفعة القادمة</span>
+          <span class="npay-badge">مرحلية</span>
+        </div>
+        <div class="npay-amount">150,000 ر.س</div>
+        <div class="npay-cond">
+          📌 عند الانتهاء من صب الدور الأرضي
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================== -->
+  <!-- CARD 3: الجدول الزمني          -->
+  <!-- ============================== -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-head-title">
+        <span class="ch-icon" style="background:#EFF6FF;color:var(--blue);">📈</span>
+        الجدول الزمني
+      </div>
+      <div class="card-head-badge" style="background:var(--green-l);color:var(--green-d);">
+        <span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;animation:pulse 2s infinite;"></span>
+        في الموعد
+      </div>
+    </div>
+
+    <div class="card-body">
+      <!-- Legend -->
+      <div class="scurve-legend-row">
+        <div class="sc-leg">
+          <span class="sc-line dash"></span>
+          المخطط
+        </div>
+        <div class="sc-leg">
+          <span class="sc-line solid"></span>
+          الفعلي
+        </div>
+        <span style="margin-right:auto;font-size:11px;color:var(--text3);">الإنجاز: <strong style="color:var(--green);">30%</strong></span>
+      </div>
+
+      <!-- S-Curve Chart -->
+      <div class="scurve-wrap">
+        <div class="scurve-chart">
+          <div class="sc-y">
+            <span>100%</span>
+            <span>75%</span>
+            <span>50%</span>
+            <span>25%</span>
+            <span>0%</span>
+          </div>
+          <div class="sc-svg-area">
+            <svg viewBox="0 0 1000 220" preserveAspectRatio="none">
+              <!-- Grid -->
+              <line x1="0" y1="0" x2="1000" y2="0" stroke="#F1F5F9" stroke-width="1"/>
+              <line x1="0" y1="55" x2="1000" y2="55" stroke="#F1F5F9" stroke-width="1"/>
+              <line x1="0" y1="110" x2="1000" y2="110" stroke="#F1F5F9" stroke-width="1"/>
+              <line x1="0" y1="165" x2="1000" y2="165" stroke="#F1F5F9" stroke-width="1"/>
+              <line x1="0" y1="220" x2="1000" y2="220" stroke="#E8E6E1" stroke-width="1"/>
+
+              <!-- Planned S-Curve (dashed) -->
+              <path d="M 0,218
+                C 40,216 70,213 83,210
+                C 120,204 150,195 167,186
+                C 210,170 240,152 250,142
+                C 290,120 320,100 333,88
+                C 370,68 400,52 417,42
+                C 460,28 490,20 500,16
+                C 550,10 600,6 667,3
+                C 730,1.5 800,0.8 917,0.3
+                C 960,0.1 1000,0 1000,0"
+                fill="none" stroke="#3B82F6" stroke-width="2.5"
+                stroke-dasharray="7,5" opacity="0.6"
+                stroke-linecap="round"/>
+
+              <!-- Actual area fill -->
+              <path d="M 0,218
+                C 40,216 65,214 83,211
+                C 120,206 150,199 167,192
+                C 210,182 240,172 260,162
+                L 260,220 L 0,220 Z"
+                fill="url(#aGrad)" opacity="0.2"/>
+
+              <!-- Actual line -->
+              <path d="M 0,218
+                C 40,216 65,214 83,211
+                C 120,206 150,199 167,192
+                C 210,182 240,172 260,162"
+                fill="none" stroke="#14B8A6" stroke-width="3"
+                stroke-linecap="round"/>
+
+              <!-- Current dot -->
+              <circle cx="260" cy="162" r="5.5" fill="#14B8A6" stroke="#fff" stroke-width="2.5"
+                filter="url(#glow)"/>
+
+              <!-- Today line -->
+              <line x1="260" y1="0" x2="260" y2="220" stroke="#14B8A6" stroke-width="1"
+                stroke-dasharray="3,3" opacity="0.25"/>
+
+              <defs>
+                <linearGradient id="aGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#14B8A6" stop-opacity="0.5"/>
+                  <stop offset="100%" stop-color="#14B8A6" stop-opacity="0"/>
+                </linearGradient>
+                <filter id="glow">
+                  <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#14B8A6" flood-opacity="0.35"/>
+                </filter>
+              </defs>
+            </svg>
+          </div>
+        </div>
+        <div class="sc-x">
+          <span>M1</span><span>M2</span><span>M3</span><span>M4</span><span>M5</span><span>M6</span>
+          <span>M7</span><span>M8</span><span>M9</span><span>M10</span><span>M11</span><span>M12</span>
+        </div>
+      </div>
+
+      <!-- Timeline bar -->
+      <div class="tl-section">
+        <div class="tl-row">
+          <span class="tl-pct-txt" style="color:var(--teal);">30%</span>
+          <div class="tl-track">
+            <div class="tl-fill" style="width:30%;"></div>
+          </div>
+          <span class="tl-pct-txt" style="color:var(--text3);">100%</span>
+        </div>
+        <div class="tl-dates">
+          <span>٢٣ فبراير ٢٠٢٦</span>
+          <span>٣١ يوليو ٢٠٢٦</span>
+        </div>
+      </div>
+
+      <!-- Bottom stats -->
+      <div class="stats-row">
+        <div class="st-item">
+          <div class="st-val" style="color:var(--teal);">157</div>
+          <div class="st-lbl">يوم متبقي</div>
+        </div>
+        <div class="st-item">
+          <div class="st-val" style="color:var(--blue);">30%</div>
+          <div class="st-lbl">الفعلي</div>
+        </div>
+        <div class="st-item">
+          <div class="st-val" style="color:var(--text2);">100%</div>
+          <div class="st-lbl">المخطط</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+</style>
+
+</body>
+</html>

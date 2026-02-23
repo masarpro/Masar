@@ -368,13 +368,6 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 			icon: Plus,
 			href: "execution?action=new",
 		},
-		{
-			id: "change-orders",
-			label: "أوامر التغيير",
-			labelEn: "Change Orders",
-			icon: FileDiff,
-			href: "changes",
-		},
 	],
 	// Finance pages
 	finance: [
@@ -412,6 +405,15 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 			icon: Receipt,
 			href: "finance/payments/new",
 			variant: "primary",
+		},
+	],
+	"finance/contract": [
+		{
+			id: "change-orders",
+			label: "أوامر التغيير",
+			labelEn: "Change Orders",
+			icon: FileDiff,
+			href: "changes",
 		},
 	],
 	"finance/claims": [

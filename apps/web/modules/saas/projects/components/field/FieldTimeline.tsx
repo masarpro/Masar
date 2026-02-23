@@ -7,7 +7,6 @@ import {
 	AlertTriangle,
 	Camera,
 	Clock,
-	FileDiff,
 	FileText,
 	TrendingUp,
 } from "lucide-react";
@@ -95,12 +94,6 @@ export function FieldTimeline({
 			icon: AlertTriangle,
 			href: `${basePath}/execution/new-issue`,
 			color: "bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400",
-		},
-		{
-			label: t("changeOrders.title"),
-			icon: FileDiff,
-			href: `${basePath}/changes`,
-			color: "bg-purple-50 text-purple-600 hover:bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400",
 		},
 	];
 

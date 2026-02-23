@@ -4,11 +4,12 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useProjectRole } from "../hooks/use-project-role";
-import { FinanceSummary } from "./finance/FinanceSummary";
 import { ExpenseCategoryChart } from "./finance/ExpenseCategoryChart";
 import { QuickActions } from "./overview/QuickActions";
-import { ProjectStatusChart } from "./overview/ProjectStatusChart";
 import { ProjectTimelineChart } from "./overview/ProjectTimelineChart";
+import { ExecutionPhasesCard } from "./overview/ExecutionPhasesCard";
+import { FinanceBudgetCard } from "./overview/FinanceBudgetCard";
+import { TimelineScheduleCard } from "./overview/TimelineScheduleCard";
 import { ActivityPulseCard } from "./overview/ActivityPulseCard";
 import { RecentActivitiesCard } from "./overview/RecentActivitiesCard";
 import { QuickDocumentsCard } from "./overview/QuickDocumentsCard";
@@ -55,27 +56,28 @@ export function ProjectOverview({
 
 	return (
 		<div className="space-y-6">
-			{/* Summary Cards - same as finance page */}
+			{/* Three Overview Cards: Execution, Finance, Timeline */}
 			{canViewSection("finance") && (
-				<>
-					<FinanceSummary
+				<div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+					<ExecutionPhasesCard
+						organizationId={organizationId}
+						projectId={projectId}
+						projectProgress={projectData?.progress}
+						projectStatus={projectData?.status}
+					/>
+					<FinanceBudgetCard
 						contractValue={financeSummary?.contractValue ?? 0}
 						actualExpenses={financeSummary?.actualExpenses ?? 0}
 						totalPayments={financeSummary?.totalPayments ?? 0}
 						remaining={financeSummary?.remaining ?? 0}
 						claimsPaid={financeSummary?.claimsPaid ?? 0}
-						adjustedContractValue={financeSummary?.adjustedContractValue}
-						changeOrdersImpact={financeSummary?.changeOrdersImpact}
 					/>
-					<hr className="my-4 border-slate-200 dark:border-slate-700" />
-				</>
-			)}
-
-			{/* Project Status Chart - Same design as Finance page CashFlowCard */}
-			{canViewSection("finance") && (
-				<ProjectStatusChart
-					projectProgress={projectData?.progress}
-				/>
+					<TimelineScheduleCard
+						projectProgress={projectData?.progress}
+						startDate={projectData?.startDate}
+						endDate={projectData?.endDate}
+					/>
+				</div>
 			)}
 
 			{/* Quick Actions */}
