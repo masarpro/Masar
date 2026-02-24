@@ -155,6 +155,7 @@ export function ProjectContractView({
 						organizationId,
 						projectId,
 						terms: data.paymentTerms.map((term) => ({
+							id: term.id ?? undefined,
 							type: VALID_TERM_TYPES.includes(term.type)
 								? (term.type as
 										| "ADVANCE"

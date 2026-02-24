@@ -565,6 +565,81 @@ export async function getExpensesSummaryByCategory(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// SUBCONTRACT PAYMENTS FOR ORG FINANCE - دفعات الباطن على مستوى المنظمة
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Get subcontract payments at organization level (for unified expenses view)
+ */
+export async function getOrganizationSubcontractPayments(
+	organizationId: string,
+	options?: {
+		projectId?: string;
+		status?: FinanceTransactionStatus;
+		dateFrom?: Date;
+		dateTo?: Date;
+		query?: string;
+		limit?: number;
+		offset?: number;
+	},
+) {
+	const where: Record<string, unknown> = { organizationId };
+
+	if (options?.projectId) {
+		where.contract = { projectId: options.projectId };
+	}
+
+	if (options?.status) {
+		where.status = options.status;
+	}
+
+	if (options?.dateFrom || options?.dateTo) {
+		const dateFilter: Record<string, Date> = {};
+		if (options?.dateFrom) dateFilter.gte = options.dateFrom;
+		if (options?.dateTo) dateFilter.lte = options.dateTo;
+		where.date = dateFilter;
+	}
+
+	if (options?.query) {
+		where.OR = [
+			{ paymentNo: { contains: options.query, mode: "insensitive" } },
+			{ description: { contains: options.query, mode: "insensitive" } },
+			{
+				contract: {
+					name: { contains: options.query, mode: "insensitive" },
+				},
+			},
+		];
+	}
+
+	const [payments, total] = await Promise.all([
+		db.subcontractPayment.findMany({
+			where: where as any,
+			include: {
+				contract: {
+					select: {
+						id: true,
+						name: true,
+						contractNo: true,
+						project: { select: { id: true, name: true, slug: true } },
+					},
+				},
+				sourceAccount: {
+					select: { id: true, name: true, accountType: true },
+				},
+				createdBy: { select: { id: true, name: true } },
+			},
+			orderBy: { date: "desc" },
+			take: options?.limit ?? 50,
+			skip: options?.offset ?? 0,
+		}),
+		db.subcontractPayment.count({ where: where as any }),
+	]);
+
+	return { payments, total };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // FINANCE PAYMENT QUERIES - استعلامات المقبوضات
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -707,6 +782,7 @@ export async function createPayment(data: {
 	clientName?: string;
 	projectId?: string;
 	invoiceId?: string;
+	contractTermId?: string;
 	paymentMethod?: PaymentMethod;
 	referenceNo?: string;
 	description?: string;
@@ -728,6 +804,7 @@ export async function createPayment(data: {
 				clientName: data.clientName,
 				projectId: data.projectId,
 				invoiceId: data.invoiceId,
+				contractTermId: data.contractTermId,
 				paymentMethod: data.paymentMethod ?? "CASH",
 				referenceNo: data.referenceNo,
 				status: "COMPLETED",

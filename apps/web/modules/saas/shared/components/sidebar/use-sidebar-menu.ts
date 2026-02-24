@@ -16,8 +16,11 @@ import {
 	FileText,
 	FolderKanban,
 	FolderOpen,
+	Hammer,
 	HomeIcon,
+	Key,
 	Layout,
+	Receipt,
 	ReceiptIcon,
 	Settings,
 	SettingsIcon,
@@ -58,7 +61,17 @@ export function useSidebarMenu(): {
 		: "/app";
 	const orgPrefix = basePath;
 
+	// Extract projectId from pathname when inside a project
+	const projectId = useMemo(() => {
+		const match = pathname.match(/\/projects\/([^/]+)/);
+		return match?.[1] ?? null;
+	}, [pathname]);
+
 	const items = useMemo<SidebarMenuItem[]>(() => {
+		const projectBase = projectId
+			? `${orgPrefix}/projects/${projectId}`
+			: null;
+
 		return [
 			{
 				id: "start",
@@ -82,6 +95,66 @@ export function useSidebarMenu(): {
 							href: `${orgPrefix}/projects`,
 							icon: FolderKanban,
 							isActive: pathname.includes("/projects"),
+							...(projectBase
+								? {
+										children: [
+											{
+												id: "project-overview",
+												label: t("projects.shell.sections.overview"),
+												href: projectBase,
+												icon: HomeIcon,
+											},
+											{
+												id: "project-execution",
+												label: t("projects.shell.sections.execution"),
+												href: `${projectBase}/execution`,
+												icon: FileText,
+											},
+											{
+												id: "project-subcontracts",
+												label: t("projects.shell.sections.subcontracts"),
+												href: `${projectBase}/finance/subcontracts`,
+												icon: Hammer,
+											},
+											{
+												id: "project-expenses",
+												label: t("projects.shell.sections.expenses"),
+												href: `${projectBase}/finance/expenses`,
+												icon: Receipt,
+											},
+											{
+												id: "project-payments",
+												label: t("projects.shell.sections.paymentsAndClaims"),
+												href: `${projectBase}/finance/claims`,
+												icon: Banknote,
+											},
+											{
+												id: "project-documents",
+												label: t("projects.shell.sections.documents"),
+												href: `${projectBase}/documents`,
+												icon: FolderOpen,
+											},
+											{
+												id: "project-owner",
+												label: t("projects.shell.sections.owner"),
+												href: `${projectBase}/owner`,
+												icon: Key,
+											},
+											{
+												id: "project-insights",
+												label: t("projects.shell.sections.insights"),
+												href: `${projectBase}/insights`,
+												icon: BarChart3,
+											},
+											{
+												id: "project-team",
+												label: t("projects.shell.sections.team"),
+												href: `${projectBase}/team`,
+												icon: Users,
+											},
+										],
+									}
+								: {}),
 						},
 						{
 							id: "finance",
@@ -207,6 +280,7 @@ export function useSidebarMenu(): {
 		activeOrganization,
 		isOrganizationAdmin,
 		user?.role,
+		projectId,
 	]);
 
 	const activeId = useMemo(() => {
@@ -214,8 +288,14 @@ export function useSidebarMenu(): {
 			? `/app/${activeOrganization.slug}/finance`
 			: undefined;
 
+		const projectBase = projectId && activeOrganization
+			? `/app/${activeOrganization.slug}/projects/${projectId}`
+			: undefined;
+
 		for (const item of items) {
 			if (item.children) {
+				// For children, find the best (longest) match
+				let bestMatch: { id: string; length: number } | null = null;
 				for (const child of item.children) {
 					if (child.id === "finance-dashboard" && financeBase) {
 						if (
@@ -224,15 +304,25 @@ export function useSidebarMenu(): {
 						) {
 							return child.id;
 						}
+					} else if (child.id === "project-overview" && projectBase) {
+						if (
+							pathname === projectBase ||
+							pathname === `${projectBase}/`
+						) {
+							return child.id;
+						}
 					} else if (child.href && pathname.startsWith(child.href)) {
-						return child.id;
+						if (!bestMatch || child.href.length > bestMatch.length) {
+							bestMatch = { id: child.id, length: child.href.length };
+						}
 					}
 				}
+				if (bestMatch) return bestMatch.id;
 			}
 			if (item.isActive) return item.id;
 		}
 		return undefined;
-	}, [items, pathname, activeOrganization]);
+	}, [items, pathname, activeOrganization, projectId]);
 
 	return { items, activeId };
 }

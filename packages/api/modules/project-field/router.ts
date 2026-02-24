@@ -2,6 +2,7 @@ import { addProgressUpdateProcedure } from "./procedures/add-progress-update";
 import { createDailyReportProcedure } from "./procedures/create-daily-report";
 import { createIssueProcedure } from "./procedures/create-issue";
 import { createPhotoProcedure } from "./procedures/create-photo";
+import { deletePhotoProcedure } from "./procedures/delete-photo";
 import { getFieldTimelineProcedure } from "./procedures/get-field-timeline";
 import { listDailyReportsProcedure } from "./procedures/list-daily-reports";
 import { listIssuesProcedure } from "./procedures/list-issues";
@@ -17,6 +18,7 @@ export const projectFieldRouter = {
 	// Photos
 	createPhoto: createPhotoProcedure,
 	listPhotos: listPhotosProcedure,
+	deletePhoto: deletePhotoProcedure,
 
 	// Issues
 	createIssue: createIssueProcedure,

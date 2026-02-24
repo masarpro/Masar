@@ -7,7 +7,7 @@ import {
 	getChangeOrder,
 	createNotification,
 	logAuditEvent,
-	db,
+	getOrganizationAdminUserIds,
 } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
@@ -59,17 +59,11 @@ export const submitChangeOrderProcedure = protectedProcedure
 			});
 
 			// Notify org admins/managers about new submission
-			const admins = await db.member.findMany({
-				where: {
-					organizationId: input.organizationId,
-					role: { in: ["owner", "admin"] },
-				},
-				select: { userId: true },
-			});
+			const adminUserIds = await getOrganizationAdminUserIds(input.organizationId);
 
-			for (const admin of admins) {
-				if (admin.userId !== context.user.id) {
-					await createNotification(input.organizationId, admin.userId, {
+			for (const adminUserId of adminUserIds) {
+				if (adminUserId !== context.user.id) {
+					await createNotification(input.organizationId, adminUserId, {
 						type: "APPROVAL_REQUESTED",
 						title: "طلب اعتماد أمر تغيير",
 						body: `تم تقديم أمر تغيير جديد: ${changeOrder.title}`,

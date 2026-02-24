@@ -17,6 +17,7 @@ export const setPaymentTerms = protectedProcedure
 			projectId: z.string(),
 			terms: z.array(
 				z.object({
+					id: z.string().nullish(),
 					type: z.enum([
 						"ADVANCE",
 						"MILESTONE",

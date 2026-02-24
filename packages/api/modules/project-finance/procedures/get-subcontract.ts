@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { getSubcontractContractById } from "@repo/database";
+import { getSubcontractById } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -26,7 +26,7 @@ export const getSubcontract = protectedProcedure
 			{ section: "projects", action: "viewFinance" },
 		);
 
-		const contract = await getSubcontractContractById(
+		const contract = await getSubcontractById(
 			input.contractId,
 			input.organizationId,
 			input.projectId,

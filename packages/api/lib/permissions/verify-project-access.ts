@@ -17,6 +17,7 @@ export interface ProjectAccessResult {
 		organizationId: string;
 	};
 	permissions: Permissions;
+	/** @deprecated Use `permissions` field instead. Kept for backwards compatibility. */
 	membership: {
 		role: string;
 	};

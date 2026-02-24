@@ -8,6 +8,7 @@ import {
 	createNotification,
 	generateDedupeKey,
 	db,
+	getOrganizationAdminUserIds,
 	type CreateNotificationInput,
 } from "@repo/database";
 import type { NotificationType, ProjectRole } from "@repo/database/prisma/generated/client";
@@ -496,16 +497,10 @@ export async function getProjectAccountants(
 
 /**
  * Get organization admins for notifications
+ * Uses the new RBAC system (Role model) instead of Member.role
  */
 export async function getOrganizationAdmins(
 	organizationId: string,
 ): Promise<string[]> {
-	const admins = await db.member.findMany({
-		where: {
-			organizationId,
-			role: { in: ["owner", "admin"] },
-		},
-		select: { userId: true },
-	});
-	return admins.map((a) => a.userId);
+	return getOrganizationAdminUserIds(organizationId);
 }

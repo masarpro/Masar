@@ -150,12 +150,12 @@ export function ExecutionPhasesCard({
 					<div className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/40">
 						<BarChart3 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
 					</div>
-					<h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+					<h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-200">
 						{t("projects.commandCenter.executionAndPhases")}
 					</h3>
 				</div>
 				<span
-					className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold ${statusStyle.bgClass} ${statusStyle.textClass}`}
+					className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${statusStyle.bgClass} ${statusStyle.textClass}`}
 				>
 					<span
 						className={`h-1.5 w-1.5 rounded-full ${statusStyle.dotClass}`}
@@ -215,7 +215,7 @@ export function ExecutionPhasesCard({
 							<div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
 								{overallProgress}%
 							</div>
-							<div className="text-[9px] text-slate-400">
+							<div className="text-[10px] text-slate-400">
 								{t("projects.commandCenter.achievement")}
 							</div>
 						</div>
@@ -223,42 +223,42 @@ export function ExecutionPhasesCard({
 
 					{/* Legend */}
 					<div className="flex flex-1 flex-col gap-1.5">
-						<div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+						<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
 							<span className="h-2 w-2 shrink-0 rounded-sm bg-emerald-500" />
 							{t("projects.commandCenter.completedLabel")}
 							<span
-								className="mr-auto text-xs font-bold text-slate-800 dark:text-slate-200"
+								className="mr-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
 								dir="ltr"
 							>
 								{completedPct}%
 							</span>
 						</div>
-						<div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+						<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
 							<span className="h-2 w-2 shrink-0 rounded-sm bg-blue-500" />
 							{t("projects.commandCenter.inProgressLabel")}
 							<span
-								className="mr-auto text-xs font-bold text-slate-800 dark:text-slate-200"
+								className="mr-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
 								dir="ltr"
 							>
 								{inProgressPct}%
 							</span>
 						</div>
-						<div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+						<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
 							<span className="h-2 w-2 shrink-0 rounded-sm bg-slate-200 dark:bg-slate-600" />
 							{t("projects.commandCenter.notStartedLabel")}
 							<span
-								className="mr-auto text-xs font-bold text-slate-800 dark:text-slate-200"
+								className="mr-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
 								dir="ltr"
 							>
 								{notStartedPct}%
 							</span>
 						</div>
 						<div className="my-0.5 h-px bg-slate-100 dark:bg-slate-800" />
-						<div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+						<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
 							<span className="h-2 w-2 shrink-0 rounded-full bg-violet-500" />
 							{t("projects.commandCenter.completedLabel")}:{" "}
 							{completedCount}/{totalMilestones}
-							<span className="mr-auto text-xs text-slate-400">
+							<span className="mr-auto text-[13px] text-slate-400">
 								{t("projects.commandCenter.phasesLabel")}
 							</span>
 						</div>
@@ -268,7 +268,7 @@ export function ExecutionPhasesCard({
 				{/* Milestones List */}
 				{totalMilestones > 0 ? (
 					<div>
-						<div className="mb-1.5 text-[11px] font-semibold tracking-wide text-slate-400">
+						<div className="mb-1.5 text-xs font-semibold tracking-wide text-slate-400">
 							{t("projects.commandCenter.executionPhases")}
 						</div>
 						<div className="flex flex-col gap-1.5">
@@ -280,7 +280,7 @@ export function ExecutionPhasesCard({
 									<span
 										className={`h-1.5 w-1.5 shrink-0 rounded-full ${getStatusDotColor(milestone.status)}`}
 									/>
-									<span className="flex-1 truncate text-[11px] font-medium text-slate-700 dark:text-slate-300">
+									<span className="flex-1 truncate text-xs font-medium text-slate-700 dark:text-slate-300">
 										{milestone.title}
 									</span>
 									<div className="h-[5px] w-14 shrink-0 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
@@ -292,7 +292,7 @@ export function ExecutionPhasesCard({
 										/>
 									</div>
 									<span
-										className="w-7 shrink-0 text-left text-[10px] font-semibold text-slate-500 dark:text-slate-400"
+										className="w-7 shrink-0 text-left text-[11px] font-semibold text-slate-500 dark:text-slate-400"
 										dir="ltr"
 									>
 										{Math.round(milestone.progress)}%
@@ -304,7 +304,7 @@ export function ExecutionPhasesCard({
 				) : (
 					<div className="flex flex-1 flex-col items-center justify-center gap-2 py-4">
 						<Clock className="h-8 w-8 text-slate-300 dark:text-slate-600" />
-						<p className="text-xs text-slate-400">
+						<p className="text-[13px] text-slate-400">
 							{t("projects.commandCenter.noMilestones")}
 						</p>
 					</div>
@@ -314,26 +314,26 @@ export function ExecutionPhasesCard({
 			{/* Footer - Health Chips */}
 			<div className="flex flex-wrap gap-1.5 border-t border-slate-100 px-5 py-3 dark:border-slate-800">
 				{onTrackCount > 0 && (
-					<span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+					<span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
 						<CheckCircle2 className="h-3 w-3" />
 						{onTrackCount} {t("projects.commandCenter.onTrack")}
 					</span>
 				)}
 				{atRiskCount > 0 && (
-					<span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+					<span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
 						<AlertTriangle className="h-3 w-3" />
 						{atRiskCount} {t("projects.commandCenter.atRiskCount")}
 					</span>
 				)}
 				{delayedCount > 0 && (
-					<span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-semibold text-red-700 dark:bg-red-900/30 dark:text-red-400">
+					<span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700 dark:bg-red-900/30 dark:text-red-400">
 						<AlertTriangle className="h-3 w-3" />
 						{delayedCount}{" "}
 						{t("projects.commandCenter.delayed")}
 					</span>
 				)}
 				{totalMilestones === 0 && (
-					<span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+					<span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
 						{t("projects.commandCenter.noMilestones")}
 					</span>
 				)}

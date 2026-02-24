@@ -145,6 +145,26 @@ export async function createPhoto(data: {
 	});
 }
 
+/**
+ * Delete a photo by ID (must belong to project)
+ */
+export async function deletePhoto(photoId: string, projectId: string) {
+	const existing = await db.projectPhoto.findFirst({
+		where: { id: photoId, projectId },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("الصورة غير موجودة أو لا تنتمي لهذا المشروع");
+	}
+
+	const deleted = await db.projectPhoto.delete({
+		where: { id: photoId },
+	});
+
+	return deleted;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Issue Queries - المشاكل
 // ═══════════════════════════════════════════════════════════════════════════

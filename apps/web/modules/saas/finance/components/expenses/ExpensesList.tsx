@@ -53,7 +53,7 @@ import {
 	Eye,
 	Calendar,
 	Building,
-	FileText,
+	Hammer,
 } from "lucide-react";
 import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
@@ -108,31 +108,35 @@ export function ExpensesList({
 	// State
 	const [searchQuery, setSearchQuery] = useState("");
 	const [categoryFilter, setCategoryFilter] = useState<string | undefined>(undefined);
+	const [projectFilter, setProjectFilter] = useState<string | undefined>(projectId);
 	const [deleteExpenseId, setDeleteExpenseId] = useState<string | null>(null);
 
 	const effectiveBasePath = customBasePath || `/app/${organizationSlug}/finance/expenses`;
 
-	// Fetch expenses
+	// Fetch unified expenses + subcontract payments
 	const { data, isLoading } = useQuery(
-		orpc.finance.expenses.list.queryOptions({
+		orpc.finance.expenses.listUnified.queryOptions({
 			input: {
 				organizationId,
 				query: searchQuery || undefined,
 				category: categoryFilter as any,
-				projectId,
+				projectId: projectFilter,
 			},
 		}),
 	);
 
-	// Fetch expenses summary
-	const { data: summaryData } = useQuery(
-		orpc.finance.expenses.getSummary.queryOptions({
-			input: { organizationId, projectId },
+	// Fetch projects for filter
+	const { data: projectsData } = useQuery(
+		orpc.projects.list.queryOptions({
+			input: { organizationId },
 		}),
 	);
 
-	const expenses = data?.expenses ?? [];
-	const totalExpenses = summaryData?.reduce((acc, item) => acc + item.total, 0) ?? 0;
+	const items = data?.items ?? [];
+	const grandTotal = data?.grandTotal ?? 0;
+	const expensesTotal = data?.expensesTotal ?? 0;
+	const subcontractTotal = data?.subcontractTotal ?? 0;
+	const projects = projectsData?.projects ?? [];
 
 	// Delete mutation
 	const deleteMutation = useMutation({
@@ -166,30 +170,67 @@ export function ExpensesList({
 			UTILITIES: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-400",
 			FUEL: "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-400",
 			MAINTENANCE: "bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-400",
+			SUBCONTRACTOR: "bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-400",
 		};
 		return colors[category] || "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
 	};
 
 	return (
 		<div className="space-y-6">
-			{/* Summary Card */}
-			<Card className="rounded-2xl">
-				<CardContent className="p-4">
-					<div className="flex items-center gap-3">
-						<div className="p-2 bg-red-100 dark:bg-red-900/50 rounded-xl">
-							<TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
+			{/* Summary Cards */}
+			<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+				<Card className="rounded-2xl">
+					<CardContent className="p-4">
+						<div className="flex items-center gap-3">
+							<div className="p-2 bg-red-100 dark:bg-red-900/50 rounded-xl">
+								<TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
+							</div>
+							<div>
+								<p className="text-sm text-slate-500 dark:text-slate-400">
+									{t("finance.expenses.totalExpenses")}
+								</p>
+								<p className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+									<Currency amount={grandTotal} />
+								</p>
+							</div>
 						</div>
-						<div>
-							<p className="text-sm text-slate-500 dark:text-slate-400">
-								{t("finance.expenses.totalExpenses")}
-							</p>
-							<p className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-								<Currency amount={totalExpenses} />
-							</p>
+					</CardContent>
+				</Card>
+				<Card className="rounded-2xl">
+					<CardContent className="p-4">
+						<div className="flex items-center gap-3">
+							<div className="p-2 bg-orange-100 dark:bg-orange-900/50 rounded-xl">
+								<TrendingDown className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+							</div>
+							<div>
+								<p className="text-sm text-slate-500 dark:text-slate-400">
+									{t("finance.expenses.directExpenses")}
+								</p>
+								<p className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+									<Currency amount={expensesTotal} />
+								</p>
+							</div>
 						</div>
-					</div>
-				</CardContent>
-			</Card>
+					</CardContent>
+				</Card>
+				<Card className="rounded-2xl">
+					<CardContent className="p-4">
+						<div className="flex items-center gap-3">
+							<div className="p-2 bg-teal-100 dark:bg-teal-900/50 rounded-xl">
+								<Hammer className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+							</div>
+							<div>
+								<p className="text-sm text-slate-500 dark:text-slate-400">
+									{t("finance.expenses.subcontractPayments")}
+								</p>
+								<p className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+									<Currency amount={subcontractTotal} />
+								</p>
+							</div>
+						</div>
+					</CardContent>
+				</Card>
+			</div>
 
 			{/* Filters */}
 			<Card className="rounded-2xl">
@@ -222,6 +263,26 @@ export function ExpensesList({
 								))}
 							</SelectContent>
 						</Select>
+						{!projectId && (
+							<Select
+								value={projectFilter || "all"}
+								onValueChange={(value) =>
+									setProjectFilter(value === "all" ? undefined : value)
+								}
+							>
+								<SelectTrigger className="w-[200px] rounded-xl">
+									<SelectValue placeholder={t("finance.expenses.filterByProject")} />
+								</SelectTrigger>
+								<SelectContent className="rounded-xl">
+									<SelectItem value="all">{t("finance.expenses.allProjects")}</SelectItem>
+									{projects.map((project) => (
+										<SelectItem key={project.id} value={project.id}>
+											{project.name}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						)}
 					</div>
 				</CardContent>
 			</Card>
@@ -236,7 +297,7 @@ export function ExpensesList({
 								<div className="absolute top-0 left-0 w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
 							</div>
 						</div>
-					) : expenses.length === 0 ? (
+					) : items.length === 0 ? (
 						<div className="text-center py-20">
 							<TrendingDown className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
 							<p className="text-slate-500 dark:text-slate-400">
@@ -251,93 +312,124 @@ export function ExpensesList({
 								<TableRow>
 									<TableHead>{t("finance.expenses.expenseNo")}</TableHead>
 									<TableHead>{t("finance.expenses.date")}</TableHead>
+									<TableHead>{t("finance.expenses.type")}</TableHead>
 									<TableHead>{t("finance.expenses.category")}</TableHead>
 									<TableHead>{t("finance.expenses.description")}</TableHead>
 									<TableHead>{t("finance.expenses.vendor")}</TableHead>
 									<TableHead>{t("finance.expenses.account")}</TableHead>
+									{!projectId && (
+										<TableHead>{t("finance.expenses.project")}</TableHead>
+									)}
 									<TableHead className="text-end">{t("finance.expenses.amount")}</TableHead>
 									<TableHead className="w-[50px]" />
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{expenses.map((expense) => (
+								{items.map((item) => (
 									<TableRow
-										key={expense.id}
+										key={`${item._type}-${item.id}`}
 										className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
 									>
 										<TableCell>
 											<Badge variant="outline" className="rounded-lg font-mono">
-												{expense.expenseNo}
+												{item.refNo}
 											</Badge>
 										</TableCell>
 										<TableCell>
 											<div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
 												<Calendar className="h-4 w-4" />
-												{formatDate(new Date(expense.date))}
+												{formatDate(new Date(item.date))}
 											</div>
 										</TableCell>
 										<TableCell>
-											<Badge className={`rounded-lg ${getCategoryColor(expense.category)}`}>
-												{getCategoryLabel(expense.category)}
+											{item._type === "subcontract_payment" ? (
+												<Badge className="rounded-lg bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-400 border-0">
+													<Hammer className="h-3 w-3 me-1" />
+													{t("finance.expenses.subcontractBadge")}
+												</Badge>
+											) : (
+												<Badge variant="outline" className="rounded-lg">
+													{t("finance.expenses.expenseBadge")}
+												</Badge>
+											)}
+										</TableCell>
+										<TableCell>
+											<Badge className={`rounded-lg ${getCategoryColor(item.category)}`}>
+												{getCategoryLabel(item.category)}
 											</Badge>
 										</TableCell>
 										<TableCell>
 											<span className="line-clamp-1">
-												{expense.description || "-"}
+												{item.description || item.contractName || "-"}
 											</span>
 										</TableCell>
 										<TableCell>
-											{expense.vendorName || <span className="text-slate-400">-</span>}
+											{item.vendorName || <span className="text-slate-400">-</span>}
 										</TableCell>
 										<TableCell>
-											<div className="flex items-center gap-2">
-												<Building className="h-4 w-4 text-slate-400" />
-												<span className="text-sm">{expense.sourceAccount?.name}</span>
-											</div>
+											{item.sourceAccount ? (
+												<div className="flex items-center gap-2">
+													<Building className="h-4 w-4 text-slate-400" />
+													<span className="text-sm">{item.sourceAccount.name}</span>
+												</div>
+											) : (
+												<span className="text-slate-400">-</span>
+											)}
 										</TableCell>
+										{!projectId && (
+											<TableCell>
+												{item.project ? (
+													<span className="text-sm">{item.project.name}</span>
+												) : (
+													<span className="text-slate-400">-</span>
+												)}
+											</TableCell>
+										)}
 										<TableCell className="text-end">
 											<span className="font-semibold text-red-600 dark:text-red-400">
-												-<Currency amount={Number(expense.amount)} />
+												-<Currency amount={item.amount} />
 											</span>
 										</TableCell>
 										<TableCell onClick={(e) => e.stopPropagation()}>
-											<DropdownMenu>
-												<DropdownMenuTrigger asChild>
-													<Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-														<MoreVertical className="h-4 w-4" />
-													</Button>
-												</DropdownMenuTrigger>
-												<DropdownMenuContent align="end" className="rounded-xl">
-													<DropdownMenuItem
-														onClick={() =>
-															router.push(
-																`${effectiveBasePath}/${expense.id}`,
-															)
-														}
-													>
-														<Eye className="h-4 w-4 me-2" />
-														{t("common.view")}
-													</DropdownMenuItem>
-													<DropdownMenuItem
-														onClick={() =>
-															router.push(
-																`${effectiveBasePath}/${expense.id}`,
-															)
-														}
-													>
-														<Pencil className="h-4 w-4 me-2" />
-														{t("common.edit")}
-													</DropdownMenuItem>
-													<DropdownMenuSeparator />
-													<DropdownMenuItem
-														onClick={() => setDeleteExpenseId(expense.id)}
-														className="text-red-600"
-													>
-														<Trash2 className="h-4 w-4 me-2" />
-														{t("common.delete")}
-													</DropdownMenuItem>
-												</DropdownMenuContent>
-											</DropdownMenu>
+											{item._type === "expense" ? (
+												<DropdownMenu>
+													<DropdownMenuTrigger asChild>
+														<Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+															<MoreVertical className="h-4 w-4" />
+														</Button>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent align="end" className="rounded-xl">
+														<DropdownMenuItem
+															onClick={() =>
+																router.push(
+																	`${effectiveBasePath}/${item.id}`,
+																)
+															}
+														>
+															<Eye className="h-4 w-4 me-2" />
+															{t("common.view")}
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															onClick={() =>
+																router.push(
+																	`${effectiveBasePath}/${item.id}`,
+																)
+															}
+														>
+															<Pencil className="h-4 w-4 me-2" />
+															{t("common.edit")}
+														</DropdownMenuItem>
+														<DropdownMenuSeparator />
+														<DropdownMenuItem
+															onClick={() => setDeleteExpenseId(item.id)}
+															className="text-red-600"
+														>
+															<Trash2 className="h-4 w-4 me-2" />
+															{t("common.delete")}
+														</DropdownMenuItem>
+													</DropdownMenuContent>
+												</DropdownMenu>
+											) : null}
 										</TableCell>
 									</TableRow>
 								))}

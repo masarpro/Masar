@@ -12,6 +12,7 @@ export async function verifyOrganizationMembership(
 
 	return {
 		organization: membership.organization,
+		/** @deprecated Use permissions from getUserPermissions() instead. This is kept only for Better Auth compatibility. */
 		role: membership.role,
 	};
 }

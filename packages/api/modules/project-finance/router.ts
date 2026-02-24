@@ -6,6 +6,7 @@ import { deleteExpense } from "./procedures/delete-expense";
 import { deleteSubcontract } from "./procedures/delete-subcontract";
 import { getExpensesByCategoryProcedure } from "./procedures/get-expenses-by-category";
 import { getFinanceSummary } from "./procedures/get-finance-summary";
+import { getPaymentsClaimsTimelineProcedure } from "./procedures/get-payments-claims-timeline";
 import { getSubcontract } from "./procedures/get-subcontract";
 import { listClaims } from "./procedures/list-claims";
 import { listExpenses } from "./procedures/list-expenses";
@@ -32,4 +33,5 @@ export const projectFinanceRouter = {
 	updateSubcontract,
 	deleteSubcontract,
 	getExpensesByCategory: getExpensesByCategoryProcedure,
+	getPaymentsClaimsTimeline: getPaymentsClaimsTimelineProcedure,
 };

@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server";
 import {
 	sendMessage,
 	createNotifications,
@@ -30,23 +29,14 @@ export const sendMessageProcedure = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		const { project, membership } = await verifyProjectAccess(
+		const { project } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,
 			context.user.id,
 			{ section: "projects", action: "view" },
 		);
 
-		// For OWNER channel, restrict to certain roles (admin, owner, manager)
-		if (input.channel === "OWNER") {
-			// Check if user has permission to post in owner channel
-			// For now, allow all org members but mark as official update only for managers
-			if (!["admin", "owner", "member"].includes(membership.role)) {
-				throw new ORPCError("FORBIDDEN", {
-					message: "ليس لديك صلاحية للكتابة في قناة المالك",
-				});
-			}
-		}
+		// OWNER channel access is already verified by verifyProjectAccess above
 
 		// Send message
 		const message = await sendMessage(

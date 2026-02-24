@@ -79,12 +79,12 @@ export function TimelineScheduleCard({
 					<div className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/40">
 						<TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400" />
 					</div>
-					<h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+					<h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-200">
 						{t("projects.commandCenter.timeline")}
 					</h3>
 				</div>
 				<span
-					className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold ${
+					className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
 						isOnTrack
 							? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
 							: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
@@ -103,15 +103,15 @@ export function TimelineScheduleCard({
 			<div className="flex flex-1 flex-col gap-3 p-5">
 				{/* Legend Row */}
 				<div className="flex items-center gap-3.5">
-					<div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+					<div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
 						<span className="inline-block h-[3px] w-5 rounded-full border-[1.5px] border-dashed border-blue-500 bg-transparent" />
 						{t("projects.commandCenter.plannedProgress")}
 					</div>
-					<div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+					<div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
 						<span className="inline-block h-[3px] w-5 rounded-full bg-teal-500" />
 						{t("projects.commandCenter.actualProgress")}
 					</div>
-					<span className="mr-auto text-[11px] text-slate-400">
+					<span className="mr-auto text-xs text-slate-400">
 						{t("projects.commandCenter.achievement")}:{" "}
 						<strong className="text-emerald-500">
 							{projectProgress}%
@@ -186,7 +186,7 @@ export function TimelineScheduleCard({
 				{/* Timeline Progress Bar */}
 				<div className="mt-1">
 					<div className="flex items-center gap-2.5">
-						<span className="text-[11px] font-semibold text-teal-600">
+						<span className="text-xs font-semibold text-teal-600">
 							{projectProgress}%
 						</span>
 						<div className="relative h-[7px] flex-1 overflow-visible rounded-full bg-slate-200 dark:bg-slate-700">
@@ -205,15 +205,15 @@ export function TimelineScheduleCard({
 								}}
 							/>
 						</div>
-						<span className="text-[11px] font-semibold text-slate-400">
+						<span className="text-xs font-semibold text-slate-400">
 							100%
 						</span>
 					</div>
 					<div className="mt-1 flex justify-between">
-						<span className="text-[9px] text-slate-400">
+						<span className="text-[10px] text-slate-400">
 							{formatDate(startDate)}
 						</span>
-						<span className="text-[9px] text-slate-400">
+						<span className="text-[10px] text-slate-400">
 							{formatDate(endDate)}
 						</span>
 					</div>
@@ -223,34 +223,34 @@ export function TimelineScheduleCard({
 				<div className="mt-auto grid grid-cols-3 gap-1.5">
 					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2 text-center dark:border-slate-800 dark:bg-slate-800/50">
 						<div
-							className="text-base font-bold text-teal-600"
+							className="text-[17px] font-bold text-teal-600"
 							dir="ltr"
 						>
 							{daysRemaining}
 						</div>
-						<div className="text-[9px] text-slate-400">
+						<div className="text-[10px] text-slate-400">
 							{t("projects.commandCenter.daysRemaining")}
 						</div>
 					</div>
 					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2 text-center dark:border-slate-800 dark:bg-slate-800/50">
 						<div
-							className="text-base font-bold text-blue-500"
+							className="text-[17px] font-bold text-blue-500"
 							dir="ltr"
 						>
 							{projectProgress}%
 						</div>
-						<div className="text-[9px] text-slate-400">
+						<div className="text-[10px] text-slate-400">
 							{t("projects.commandCenter.actualProgress")}
 						</div>
 					</div>
 					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2 text-center dark:border-slate-800 dark:bg-slate-800/50">
 						<div
-							className="text-base font-bold text-slate-500 dark:text-slate-400"
+							className="text-[17px] font-bold text-slate-500 dark:text-slate-400"
 							dir="ltr"
 						>
 							100%
 						</div>
-						<div className="text-[9px] text-slate-400">
+						<div className="text-[10px] text-slate-400">
 							{t("projects.commandCenter.plannedProgress")}
 						</div>
 					</div>

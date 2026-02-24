@@ -5,6 +5,7 @@ import {
 	updateExpense,
 	deleteExpense,
 	getExpensesSummaryByCategory,
+	getOrganizationSubcontractPayments,
 } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
@@ -274,4 +275,126 @@ export const deleteExpenseProcedure = protectedProcedure
 		});
 
 		return deleteExpense(input.id, input.organizationId);
+	});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LIST EXPENSES WITH SUBCONTRACT PAYMENTS (UNIFIED)
+// ═══════════════════════════════════════════════════════════════════════════
+export const listExpensesWithSubcontracts = protectedProcedure
+	.route({
+		method: "GET",
+		path: "/finance/expenses-unified",
+		tags: ["Finance", "Expenses"],
+		summary: "List expenses + subcontract payments unified",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			category: orgExpenseCategoryEnum.optional(),
+			sourceAccountId: z.string().optional(),
+			projectId: z.string().optional(),
+			status: financeTransactionStatusEnum.optional(),
+			dateFrom: z.coerce.date().optional(),
+			dateTo: z.coerce.date().optional(),
+			query: z.string().optional(),
+			limit: z.number().optional().default(50),
+			offset: z.number().optional().default(0),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "view",
+		});
+
+		// Fetch both in parallel
+		const [expensesResult, subPaymentsResult] = await Promise.all([
+			getOrganizationExpenses(input.organizationId, {
+				category: input.category,
+				sourceAccountId: input.sourceAccountId,
+				projectId: input.projectId,
+				status: input.status,
+				dateFrom: input.dateFrom,
+				dateTo: input.dateTo,
+				query: input.query,
+				limit: 200, // fetch more so we can merge and re-sort
+				offset: 0,
+			}),
+			// Only fetch subcontract payments if no category filter (or if category is SUBCONTRACTOR)
+			!input.category || input.category === "SUBCONTRACTOR"
+				? getOrganizationSubcontractPayments(input.organizationId, {
+						projectId: input.projectId,
+						status: input.status,
+						dateFrom: input.dateFrom,
+						dateTo: input.dateTo,
+						query: input.query,
+						limit: 200,
+						offset: 0,
+					})
+				: { payments: [], total: 0 },
+		]);
+
+		// Normalize expenses
+		const normalizedExpenses = expensesResult.expenses.map((e) => ({
+			_type: "expense" as const,
+			id: e.id,
+			refNo: e.expenseNo,
+			date: e.date,
+			category: e.category,
+			description: e.description,
+			amount: Number(e.amount),
+			vendorName: e.vendorName,
+			status: e.status,
+			sourceAccount: e.sourceAccount,
+			project: e.project,
+			createdBy: e.createdBy,
+			// Subcontract-specific fields
+			contractName: null as string | null,
+			contractNo: null as string | null,
+		}));
+
+		// Normalize subcontract payments
+		const normalizedSubPayments = subPaymentsResult.payments.map((p) => ({
+			_type: "subcontract_payment" as const,
+			id: p.id,
+			refNo: p.paymentNo,
+			date: p.date,
+			category: "SUBCONTRACTOR" as const,
+			description: p.description,
+			amount: Number(p.amount),
+			vendorName: p.contract.name,
+			status: p.status,
+			sourceAccount: p.sourceAccount,
+			project: p.contract.project,
+			createdBy: p.createdBy,
+			contractName: p.contract.name,
+			contractNo: p.contract.contractNo,
+		}));
+
+		// Merge and sort by date descending
+		const unified = [...normalizedExpenses, ...normalizedSubPayments].sort(
+			(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+		);
+
+		// Apply pagination
+		const paged = unified.slice(input.offset, input.offset + input.limit);
+		const total = expensesResult.total + subPaymentsResult.total;
+
+		// Compute combined summary
+		const expensesTotal = normalizedExpenses.reduce(
+			(sum, e) => sum + e.amount,
+			0,
+		);
+		const subcontractTotal = normalizedSubPayments.reduce(
+			(sum, p) => sum + p.amount,
+			0,
+		);
+
+		return {
+			items: paged,
+			total,
+			expensesTotal,
+			subcontractTotal,
+			grandTotal: expensesTotal + subcontractTotal,
+		};
 	});

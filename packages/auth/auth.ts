@@ -7,6 +7,7 @@ import {
 	getPurchasesByOrganizationId,
 	getPurchasesByUserId,
 	getUserByEmail,
+	assignRoleToUser,
 } from "@repo/database";
 import type { Locale } from "@repo/i18n";
 import { logger } from "@repo/logs";
@@ -78,6 +79,40 @@ export const auth = betterAuth({
 				await updateSeatsInOrganizationSubscription(
 					invitation.organizationId,
 				);
+
+				// Map invitation role to new Role type and assign organizationRoleId
+				const userId = ctx.context.session?.session?.userId;
+				if (userId) {
+					try {
+						const invRole = invitation.role?.toUpperCase();
+						// Map Better Auth roles to RoleType
+						const roleTypeMap: Record<string, string> = {
+							OWNER: "OWNER",
+							ADMIN: "OWNER",
+							MEMBER: "ENGINEER",
+						};
+						const targetType = roleTypeMap[invRole ?? "MEMBER"] ?? "ENGINEER";
+
+						const role = await db.role.findFirst({
+							where: {
+								organizationId: invitation.organizationId,
+								type: targetType as any,
+								isSystem: true,
+							},
+						});
+						if (role) {
+							await assignRoleToUser(userId, role.id);
+						}
+
+						// Also set organizationId on the user
+						await db.user.update({
+							where: { id: userId },
+							data: { organizationId: invitation.organizationId },
+						});
+					} catch (e) {
+						logger.error("Failed to assign role on invitation accept", e);
+					}
+				}
 			} else if (ctx.path.startsWith("/organization/create")) {
 				const { slug } = ctx.body;
 				if (slug) {
@@ -87,7 +122,13 @@ export const auth = betterAuth({
 							select: { id: true },
 						});
 						if (org) {
-							await createDefaultRoles(org.id);
+							const roles = await createDefaultRoles(org.id);
+							// Assign OWNER role to the creating user
+							const userId = ctx.context.session?.session?.userId;
+							const ownerRole = roles.find((r) => r.type === "OWNER");
+							if (userId && ownerRole) {
+								await assignRoleToUser(userId, ownerRole.id);
+							}
 						}
 					} catch (e) {
 						logger.error("Failed to create default roles", e);

@@ -27,6 +27,7 @@ import { projectContractRouter } from "../modules/project-contract/router";
 import { projectTeamRouter } from "../modules/project-team/router";
 import { dashboardRouter } from "../modules/dashboard/router";
 import { financeRouter } from "../modules/finance/router";
+import { subcontractsRouter } from "../modules/subcontracts/router";
 import { quantitiesRouter } from "../modules/quantities/router";
 import { rolesRouter } from "../modules/roles/router";
 import { usersRouter } from "../modules/users/router";
@@ -72,6 +73,8 @@ export const router = publicProcedure.router({
 	projectTeam: projectTeamRouter,
 	// Finance Module - المالية
 	finance: financeRouter,
+	// Subcontract Management - مقاولو الباطن
+	subcontracts: subcontractsRouter,
 });
 
 export type ApiRouterClient = RouterClient<typeof router>;

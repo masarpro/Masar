@@ -34,6 +34,12 @@ export function FinanceDashboard({
 		}),
 	);
 
+	const { data: orgData } = useQuery(
+		orpc.finance.orgDashboard.queryOptions({
+			input: { organizationId },
+		}),
+	);
+
 	if (isLoading) {
 		return (
 			<div className="flex items-center justify-center py-20">
@@ -49,13 +55,21 @@ export function FinanceDashboard({
 	const recentQuotations = data?.recentQuotations ?? [];
 	const recentInvoices = data?.recentInvoices ?? [];
 
+	const cashBalance = orgData?.balances.totalCashBalance ?? 0;
+	const bankBalance = orgData?.balances.totalBankBalance ?? 0;
+	const netProfit = (orgData?.payments.total ?? 0) - (orgData?.expenses.total ?? 0);
+
 	return (
 		<div className="space-y-6" dir="rtl">
 			{/* 1. Header - Modern design with date and greeting */}
 			<FinanceHeader userName={userName} />
 
 			{/* 2. Balance Cards (Cash, Bank, Net Profit) */}
-			<BalanceCards />
+			<BalanceCards
+				cashBalance={cashBalance}
+				bankBalance={bankBalance}
+				netProfit={netProfit}
+			/>
 
 			{/* 3. Cash Flow Chart */}
 			<CashFlowCard />

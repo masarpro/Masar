@@ -309,23 +309,15 @@ export function generateDedupeKey(
 
 /**
  * Notify project managers/admins of an event
- * Helper to get users with management permissions
+ * Uses the new RBAC system (Role model) instead of Member.role
  */
 export async function notifyProjectManagers(
 	organizationId: string,
 	projectId: string,
 	data: CreateNotificationInput,
 ) {
-	// Get organization members with admin/owner roles
-	const members = await db.member.findMany({
-		where: {
-			organizationId,
-			role: { in: ["owner", "admin"] },
-		},
-		select: { userId: true },
-	});
-
-	const userIds = members.map((m) => m.userId);
+	const { getOrganizationAdminUserIds } = await import("./permissions");
+	const userIds = await getOrganizationAdminUserIds(organizationId);
 
 	if (userIds.length === 0) return { count: 0 };
 

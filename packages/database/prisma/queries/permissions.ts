@@ -3,7 +3,6 @@ import { Prisma } from "../generated/client";
 import {
 	type Permissions,
 	createEmptyPermissions,
-	DEFAULT_ROLE_PERMISSIONS,
 } from "../permissions";
 
 /**
@@ -24,13 +23,6 @@ export async function getUserWithPermissions(
 					permissions: true,
 				},
 			},
-			members: {
-				where: { organizationId },
-				select: {
-					role: true,
-				},
-				take: 1,
-			},
 		},
 	});
 
@@ -43,7 +35,6 @@ export async function getUserWithPermissions(
 		name: user.name,
 		email: user.email,
 		role: user.organizationRole,
-		memberRole: user.members[0]?.role ?? null,
 		customPermissions: user.customPermissions as unknown as Permissions | null,
 	};
 }
@@ -61,20 +52,13 @@ export async function getEffectivePermissions(
 		return createEmptyPermissions();
 	}
 
-	// Start with role permissions
+	// Start with role permissions (sole source of truth)
 	let basePermissions: Permissions = createEmptyPermissions();
 
 	if (user.role?.permissions) {
 		basePermissions = user.role.permissions as unknown as Permissions;
-	} else if (user.memberRole) {
-		// Fallback to member role
-		const role = user.memberRole.toUpperCase();
-		if (role === "OWNER" || role === "ADMIN") {
-			basePermissions = DEFAULT_ROLE_PERMISSIONS.OWNER;
-		} else if (role in DEFAULT_ROLE_PERMISSIONS) {
-			basePermissions = DEFAULT_ROLE_PERMISSIONS[role];
-		}
 	}
+	// No legacy Member.role fallback — organizationRoleId is the sole source of truth
 
 	// Merge with custom permissions if any
 	if (user.customPermissions) {
@@ -163,10 +147,28 @@ export async function getOrganizationUsersWithPermissions(
 		id: member.user.id,
 		name: member.user.name,
 		email: member.user.email,
-		memberRole: member.role,
 		organizationRole: member.user.organizationRole,
 		hasCustomPermissions: !!member.user.customPermissions,
 	}));
+}
+
+/**
+ * Get user IDs of organization admins (OWNER + PROJECT_MANAGER roles)
+ * Replaces the old pattern of querying Member.role for "owner"/"admin"
+ */
+export async function getOrganizationAdminUserIds(
+	organizationId: string,
+): Promise<string[]> {
+	const users = await db.user.findMany({
+		where: {
+			organizationId,
+			organizationRole: {
+				type: { in: ["OWNER", "PROJECT_MANAGER"] },
+			},
+		},
+		select: { id: true },
+	});
+	return users.map((u) => u.id);
 }
 
 // Helper function to merge permissions

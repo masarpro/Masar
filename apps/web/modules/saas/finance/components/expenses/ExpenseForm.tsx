@@ -147,6 +147,7 @@ export function ExpenseForm({
 			toast.success(t("finance.expenses.createSuccess"));
 			queryClient.invalidateQueries({ queryKey: ["finance", "expenses"] });
 			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
+			queryClient.invalidateQueries({ queryKey: ["projectFinance"] });
 			router.push(redirectPath || `/app/${organizationSlug}/finance/expenses`);
 		},
 		onError: (error: any) => {

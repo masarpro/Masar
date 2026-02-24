@@ -186,11 +186,12 @@ export async function upsertProjectContract(data: {
 }
 
 /**
- * Set contract payment terms (delete-and-recreate)
+ * Set contract payment terms (upsert-based to preserve IDs for linked payments)
  */
 export async function setContractPaymentTerms(
 	contractId: string,
 	terms: Array<{
+		id?: string | null;
 		type: "ADVANCE" | "MILESTONE" | "MONTHLY" | "COMPLETION" | "CUSTOM";
 		label?: string | null;
 		percent?: number | null;
@@ -201,25 +202,45 @@ export async function setContractPaymentTerms(
 	}>,
 ) {
 	return db.$transaction(async (tx) => {
-		// Delete existing terms
+		// Collect IDs of terms that should be kept
+		const incomingIds = terms
+			.map((t) => t.id)
+			.filter((id): id is string => !!id);
+
+		// Delete only terms NOT in the incoming list
 		await tx.contractPaymentTerm.deleteMany({
-			where: { contractId },
+			where: {
+				contractId,
+				...(incomingIds.length > 0
+					? { id: { notIn: incomingIds } }
+					: {}),
+			},
 		});
 
-		// Create new terms
-		if (terms.length > 0) {
-			await tx.contractPaymentTerm.createMany({
-				data: terms.map((term, index) => ({
-					contractId,
-					type: term.type,
-					label: term.label ?? null,
-					percent: term.percent ?? null,
-					amount: term.amount ?? null,
-					dueDate: term.dueDate ?? null,
-					milestoneId: term.milestoneId ?? null,
-					sortOrder: term.sortOrder ?? index,
-				})),
-			});
+		// Upsert each term: update existing, create new
+		for (let i = 0; i < terms.length; i++) {
+			const term = terms[i];
+			const data = {
+				type: term.type,
+				label: term.label ?? null,
+				percent: term.percent ?? null,
+				amount: term.amount ?? null,
+				dueDate: term.dueDate ?? null,
+				milestoneId: term.milestoneId ?? null,
+				sortOrder: term.sortOrder ?? i,
+			};
+
+			if (term.id) {
+				await tx.contractPaymentTerm.upsert({
+					where: { id: term.id },
+					update: data,
+					create: { ...data, contractId },
+				});
+			} else {
+				await tx.contractPaymentTerm.create({
+					data: { ...data, contractId },
+				});
+			}
 		}
 
 		// Return updated terms
@@ -234,6 +255,140 @@ export async function setContractPaymentTerms(
 			amount: term.amount ? Number(term.amount) : null,
 		}));
 	});
+}
+
+/**
+ * Get payment terms with progress (paid amount, remaining, etc.)
+ * Uses two-step query to avoid nested include issues with PrismaPg adapter.
+ */
+export async function getPaymentTermsWithProgress(
+	organizationId: string,
+	projectId: string,
+) {
+	// Step 1: Get contract with payment terms (simple include, no nesting)
+	const contract = await db.projectContract.findFirst({
+		where: { organizationId, projectId },
+		include: {
+			paymentTerms: {
+				orderBy: { sortOrder: "asc" },
+			},
+		},
+	});
+
+	if (!contract) return null;
+
+	const termIds = contract.paymentTerms.map((t) => t.id);
+
+	// Step 2: Fetch payments linked to these terms separately
+	const payments =
+		termIds.length > 0
+			? await db.financePayment.findMany({
+					where: {
+						contractTermId: { in: termIds },
+						status: "COMPLETED",
+					},
+					orderBy: { date: "desc" },
+					select: {
+						id: true,
+						contractTermId: true,
+						paymentNo: true,
+						amount: true,
+						date: true,
+						paymentMethod: true,
+						referenceNo: true,
+						description: true,
+						destinationAccount: {
+							select: { id: true, name: true },
+						},
+						createdBy: { select: { id: true, name: true } },
+					},
+				})
+			: [];
+
+	// Group payments by contractTermId
+	const paymentsByTermId = new Map<string, typeof payments>();
+	for (const p of payments) {
+		if (!p.contractTermId) continue;
+		const existing = paymentsByTermId.get(p.contractTermId) ?? [];
+		existing.push(p);
+		paymentsByTermId.set(p.contractTermId, existing);
+	}
+
+	const contractValue = Number(contract.value);
+	const totalWithVat = contract.includesVat
+		? contractValue * 1.15
+		: contractValue;
+
+	let totalPaidAll = 0;
+	let totalRequiredAll = 0;
+	let nextIncompleteTermId: string | null = null;
+
+	const terms = contract.paymentTerms.map((term) => {
+		const termAmount = term.amount
+			? Number(term.amount)
+			: term.percent
+				? (totalWithVat * Number(term.percent)) / 100
+				: 0;
+
+		const termPayments = paymentsByTermId.get(term.id) ?? [];
+		const paidAmount = termPayments.reduce(
+			(sum, p) => sum + Number(p.amount),
+			0,
+		);
+		const remainingAmount = Math.max(0, termAmount - paidAmount);
+		const progressPercent =
+			termAmount > 0
+				? Math.min(100, (paidAmount / termAmount) * 100)
+				: 0;
+		const isComplete = termAmount > 0 && paidAmount >= termAmount;
+
+		totalPaidAll += paidAmount;
+		totalRequiredAll += termAmount;
+
+		if (!isComplete && !nextIncompleteTermId) {
+			nextIncompleteTermId = term.id;
+		}
+
+		return {
+			id: term.id,
+			type: term.type,
+			label: term.label,
+			percent: term.percent ? Number(term.percent) : null,
+			amount: termAmount,
+			sortOrder: term.sortOrder,
+			paidAmount,
+			remainingAmount,
+			progressPercent,
+			isComplete,
+			payments: termPayments.map((p) => ({
+				id: p.id,
+				paymentNo: p.paymentNo,
+				amount: Number(p.amount),
+				date: p.date,
+				paymentMethod: p.paymentMethod,
+				referenceNo: p.referenceNo,
+				description: p.description,
+				destinationAccount: p.destinationAccount,
+				createdBy: p.createdBy,
+			})),
+		};
+	});
+
+	return {
+		contractId: contract.id,
+		contractValue,
+		totalWithVat,
+		clientName: contract.clientName,
+		currency: contract.currency,
+		totalPaid: totalPaidAll,
+		totalRequired: totalRequiredAll,
+		overallProgress:
+			totalRequiredAll > 0
+				? Math.min(100, (totalPaidAll / totalRequiredAll) * 100)
+				: 0,
+		nextIncompleteTermId,
+		terms,
+	};
 }
 
 /**

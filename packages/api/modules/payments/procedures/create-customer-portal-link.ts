@@ -1,10 +1,12 @@
 import { ORPCError } from "@orpc/client";
-import { getOrganizationMembership, getPurchaseById } from "@repo/database";
+import { getPurchaseById } from "@repo/database";
+import { hasPermission } from "@repo/database/prisma/permissions";
 import { logger } from "@repo/logs";
 import { createCustomerPortalLink as createCustomerPortalLinkFn } from "@repo/payments";
 import { z } from "zod";
 import { localeMiddleware } from "../../../orpc/middleware/locale-middleware";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { getUserPermissions } from "../../../lib/permissions/get-user-permissions";
 
 export const createCustomerPortalLink = protectedProcedure
 	.use(localeMiddleware)
@@ -31,12 +33,11 @@ export const createCustomerPortalLink = protectedProcedure
 			}
 
 			if (purchase.organizationId) {
-				const userOrganizationMembership =
-					await getOrganizationMembership(
-						purchase.organizationId,
-						user.id,
-					);
-				if (userOrganizationMembership?.role !== "owner") {
+				const permissions = await getUserPermissions(
+					user.id,
+					purchase.organizationId,
+				);
+				if (!hasPermission(permissions, "settings", "billing")) {
 					throw new ORPCError("FORBIDDEN");
 				}
 			}

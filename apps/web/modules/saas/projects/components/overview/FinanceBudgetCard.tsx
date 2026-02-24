@@ -68,11 +68,11 @@ export function FinanceBudgetCard({
 					<div className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-900/40">
 						<Wallet className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
 					</div>
-					<h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+					<h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-200">
 						{t("projects.commandCenter.financeAndBudget")}
 					</h3>
 				</div>
-				<span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-[11px] font-semibold text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+				<span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
 					{t("projects.commandCenter.budget")}:{" "}
 					{formatCompact(contractValue)}
 				</span>
@@ -84,68 +84,68 @@ export function FinanceBudgetCard({
 				<div className="grid grid-cols-2 gap-2">
 					{/* Actual Expenses */}
 					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2.5 dark:border-slate-800 dark:bg-slate-800/50">
-						<div className="truncate text-[10px] text-slate-400">
+						<div className="truncate text-[11px] text-slate-400">
 							{t("projects.commandCenter.actualExpensesLabel")}
 						</div>
 						<div
-							className="text-[15px] font-bold leading-tight text-red-500"
+							className="text-base font-bold leading-tight text-red-500"
 							dir="ltr"
 							style={{ textAlign: "right" }}
 						>
 							{formatNumber(actualExpenses)}
 						</div>
-						<div className="text-[9px] text-slate-400">
+						<div className="text-[10px] text-slate-400">
 							{expensePct}%{" "}
 							{t("projects.commandCenter.ofContract")}
 						</div>
 					</div>
 					{/* Payments Received */}
 					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2.5 dark:border-slate-800 dark:bg-slate-800/50">
-						<div className="truncate text-[10px] text-slate-400">
+						<div className="truncate text-[11px] text-slate-400">
 							{t("projects.commandCenter.receipts")}
 						</div>
 						<div
-							className="text-[15px] font-bold leading-tight text-emerald-500"
+							className="text-base font-bold leading-tight text-emerald-500"
 							dir="ltr"
 							style={{ textAlign: "right" }}
 						>
 							{formatNumber(totalPayments)}
 						</div>
-						<div className="text-[9px] text-slate-400">
+						<div className="text-[10px] text-slate-400">
 							{t("projects.commandCenter.advancePayment")}{" "}
 							{paymentPct}%
 						</div>
 					</div>
 					{/* Remaining */}
 					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2.5 dark:border-slate-800 dark:bg-slate-800/50">
-						<div className="truncate text-[10px] text-slate-400">
+						<div className="truncate text-[11px] text-slate-400">
 							{t("projects.commandCenter.remainingContract")}
 						</div>
 						<div
-							className="text-[15px] font-bold leading-tight text-slate-700 dark:text-slate-200"
+							className="text-base font-bold leading-tight text-slate-700 dark:text-slate-200"
 							dir="ltr"
 							style={{ textAlign: "right" }}
 						>
 							{formatNumber(remaining)}
 						</div>
-						<div className="text-[9px] text-slate-400">
+						<div className="text-[10px] text-slate-400">
 							{remainingPct}%{" "}
 							{t("projects.commandCenter.ofContract")}
 						</div>
 					</div>
 					{/* Retention */}
 					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2.5 dark:border-slate-800 dark:bg-slate-800/50">
-						<div className="truncate text-[10px] text-slate-400">
+						<div className="truncate text-[11px] text-slate-400">
 							{t("projects.commandCenter.retention")}
 						</div>
 						<div
-							className="text-[15px] font-bold leading-tight text-amber-500"
+							className="text-base font-bold leading-tight text-amber-500"
 							dir="ltr"
 							style={{ textAlign: "right" }}
 						>
 							{formatNumber(retentionAmount)}
 						</div>
-						<div className="text-[9px] text-slate-400">
+						<div className="text-[10px] text-slate-400">
 							{retentionPct}%{" "}
 							{t("projects.commandCenter.ofClaims")}
 						</div>
@@ -154,12 +154,12 @@ export function FinanceBudgetCard({
 
 				{/* Budget Bar */}
 				<div className="flex flex-col gap-1.5">
-					<div className="flex justify-between text-[10px] text-slate-400">
+					<div className="flex justify-between text-[11px] text-slate-400">
 						<span>
 							{t("projects.commandCenter.budgetUsed")}
 						</span>
 						<strong
-							className="text-[11px] text-slate-700 dark:text-slate-300"
+							className="text-xs text-slate-700 dark:text-slate-300"
 							dir="ltr"
 						>
 							{formatCompact(actualExpenses)} /{" "}
@@ -175,7 +175,7 @@ export function FinanceBudgetCard({
 								}}
 							>
 								{budgetBarPct >= 8 && (
-									<span className="text-[8px] font-semibold text-white">
+									<span className="text-[9px] font-semibold text-white">
 										{expensePct}%
 									</span>
 								)}
@@ -183,13 +183,13 @@ export function FinanceBudgetCard({
 						)}
 					</div>
 					<div className="flex flex-wrap gap-2.5">
-						<div className="flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400">
+						<div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
 							<span className="h-1.5 w-1.5 rounded-sm bg-emerald-500" />
 							{t(
 								"projects.commandCenter.actualExpensesLabel",
 							)}
 						</div>
-						<div className="flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400">
+						<div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
 							<span className="h-1.5 w-1.5 rounded-sm bg-slate-200 dark:bg-slate-600" />
 							{t("projects.commandCenter.remaining")}{" "}
 							{remainingPct}%
@@ -200,34 +200,34 @@ export function FinanceBudgetCard({
 				{/* Profit & Cash Flow */}
 				<div className="grid grid-cols-2 gap-2">
 					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2.5 dark:border-slate-800 dark:bg-slate-800/50">
-						<div className="truncate text-[10px] text-slate-400">
+						<div className="truncate text-[11px] text-slate-400">
 							{t("projects.commandCenter.expectedProfit")}
 						</div>
 						<div
-							className="text-[15px] font-bold leading-tight text-emerald-700 dark:text-emerald-400"
+							className="text-base font-bold leading-tight text-emerald-700 dark:text-emerald-400"
 							dir="ltr"
 							style={{ textAlign: "right" }}
 						>
 							{formatNumber(expectedProfit)}
 						</div>
-						<div className="text-[9px] text-slate-400">
+						<div className="text-[10px] text-slate-400">
 							{t("projects.commandCenter.margin")}{" "}
 							{profitMargin}%
 						</div>
 					</div>
 					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2.5 dark:border-slate-800 dark:bg-slate-800/50">
-						<div className="truncate text-[10px] text-slate-400">
+						<div className="truncate text-[11px] text-slate-400">
 							{t("projects.commandCenter.cashFlow")}
 						</div>
 						<div
-							className={`text-[15px] font-bold leading-tight ${cashFlow >= 0 ? "text-emerald-500" : "text-red-500"}`}
+							className={`text-base font-bold leading-tight ${cashFlow >= 0 ? "text-emerald-500" : "text-red-500"}`}
 							dir="ltr"
 							style={{ textAlign: "right" }}
 						>
 							{cashFlow < 0 ? "-" : ""}
 							{formatNumber(cashFlow)}
 						</div>
-						<div className="text-[9px] text-slate-400">
+						<div className="text-[10px] text-slate-400">
 							{t(
 								"projects.commandCenter.receiptsMinusExpenses",
 							)}
@@ -241,11 +241,11 @@ export function FinanceBudgetCard({
 					<div className="relative flex items-center justify-between">
 						<div className="flex items-center gap-1.5">
 							<CreditCard className="h-3.5 w-3.5 text-emerald-700 dark:text-emerald-400" />
-							<span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+							<span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
 								{t("projects.commandCenter.nextPayment")}
 							</span>
 						</div>
-						<span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[9px] font-semibold text-white">
+						<span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-semibold text-white">
 							{t("projects.commandCenter.milestonePayment")}
 						</span>
 					</div>

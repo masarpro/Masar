@@ -1,5 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { ProjectClaimsView } from "@saas/projects/components/finance/ProjectClaimsView";
+import { PaymentsClaimsHub } from "@saas/projects/components/finance/payments/PaymentsClaimsHub";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -7,7 +7,7 @@ export async function generateMetadata() {
 	const t = await getTranslations();
 
 	return {
-		title: t("finance.claims.title"),
+		title: t("paymentsHub.title"),
 	};
 }
 
@@ -28,7 +28,7 @@ export default async function ProjectClaimsPage({
 
 	return (
 		<div>
-			<ProjectClaimsView
+			<PaymentsClaimsHub
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}
 				projectId={projectId}

@@ -10,7 +10,7 @@
 "use client";
 
 import { cn } from "@ui/lib";
-import { ChevronDown, ChevronLeft, Menu } from "lucide-react";
+import { ChevronDown, ChevronRight, Menu } from "lucide-react";
 import { useState, useEffect } from "react";
 
 // ============================================
@@ -239,7 +239,7 @@ export function MasarSidebarShell({
 				<div
 					className={cn(
 						"flex h-16 items-center border-b border-border px-4",
-						collapsed ? "justify-center" : "justify-between",
+						collapsed ? "justify-end" : "justify-between",
 					)}
 				>
 					{!collapsed && header && (
@@ -269,7 +269,7 @@ export function MasarSidebarShell({
 						aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
 					>
 						{collapsed ? (
-							<ChevronLeft className="size-5 rtl-flip" />
+							<ChevronRight className="size-5 rtl-flip" />
 						) : (
 							<Menu className="size-5" />
 						)}
@@ -305,7 +305,7 @@ export function MasarSidebarShell({
 									)}
 								>
 									<div className="overflow-hidden">
-										<div className="me-4 mt-1 space-y-1 border-e-2 border-border pe-3">
+										<div className="ms-4 mt-1 space-y-1 border-s-2 border-border ps-3">
 											{item.children.map((child) => (
 												<div key={child.id}>
 													{renderMenuItem(child, true)}

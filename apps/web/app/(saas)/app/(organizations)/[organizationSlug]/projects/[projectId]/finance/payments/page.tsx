@@ -1,5 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { PaymentsList } from "@saas/finance/components/payments/PaymentsList";
+import { PaymentsClaimsHub } from "@saas/projects/components/finance/payments/PaymentsClaimsHub";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -7,7 +7,7 @@ export async function generateMetadata() {
 	const t = await getTranslations();
 
 	return {
-		title: t("finance.payments.title"),
+		title: t("paymentsHub.title"),
 	};
 }
 
@@ -26,15 +26,12 @@ export default async function ProjectPaymentsPage({
 		return notFound();
 	}
 
-	const basePath = `/app/${organizationSlug}/projects/${projectId}/finance/payments`;
-
 	return (
 		<div>
-			<PaymentsList
+			<PaymentsClaimsHub
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}
 				projectId={projectId}
-				basePath={basePath}
 			/>
 		</div>
 	);

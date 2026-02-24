@@ -14,7 +14,7 @@ import {
 	SelectValue,
 } from "@ui/components/select";
 import { Textarea } from "@ui/components/textarea";
-import { ChevronLeft, FolderPlus, Loader2 } from "lucide-react";
+import { Building2, ChevronLeft, FolderPlus, Loader2, Phone, Mail, CreditCard, UserPlus, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
@@ -24,6 +24,11 @@ import {
 	ContractFormSections,
 	type ContractFormRef,
 } from "./finance/contract/ContractFormSections";
+import {
+	ClientSelector,
+	type Client,
+} from "@saas/finance/components/shared/ClientSelector";
+import { InlineClientForm } from "@saas/finance/components/clients/InlineClientForm";
 
 interface CreateProjectFormProps {
 	organizationId: string;
@@ -65,11 +70,42 @@ export function CreateProjectForm({
 	// ─── Project Info state ─────────────────────────────────
 	const [projectData, setProjectData] = useState({
 		name: "",
-		clientName: "",
 		location: "",
 		type: "",
 		description: "",
 	});
+
+	// ─── Client state ──────────────────────────────────────
+	const [clientId, setClientId] = useState<string | undefined>();
+	const [clientName, setClientName] = useState("");
+	const [clientCompany, setClientCompany] = useState("");
+	const [clientPhone, setClientPhone] = useState("");
+	const [clientEmail, setClientEmail] = useState("");
+	const [clientTaxNumber, setClientTaxNumber] = useState("");
+	const [showInlineClientForm, setShowInlineClientForm] = useState(false);
+
+	const clearClient = useCallback(() => {
+		setClientId(undefined);
+		setClientName("");
+		setClientCompany("");
+		setClientPhone("");
+		setClientEmail("");
+		setClientTaxNumber("");
+	}, []);
+
+	const handleClientSelect = useCallback((client: Client | null) => {
+		if (client) {
+			setClientId(client.id);
+			setClientName(client.name);
+			setClientCompany(client.company ?? "");
+			setClientPhone(client.phone ?? "");
+			setClientEmail(client.email ?? "");
+			setClientTaxNumber(client.taxNumber ?? "");
+			setShowInlineClientForm(false);
+		} else {
+			clearClient();
+		}
+	}, [clearClient]);
 
 	// ─── Queries ────────────────────────────────────────────
 	const { data: nextNoData } = useQuery(
@@ -124,7 +160,8 @@ export function CreateProjectForm({
 		createMutation.mutate({
 			organizationId,
 			name: projectData.name,
-			clientName: projectData.clientName || undefined,
+			clientId: clientId || undefined,
+			clientName: clientName || undefined,
 			location: projectData.location || undefined,
 			type:
 				(projectData.type as
@@ -301,43 +338,127 @@ export function CreateProjectForm({
 						</div>
 					</div>
 
-					<div className="grid gap-5 sm:grid-cols-2">
-						<div className="space-y-2">
-							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-								{t("projects.createProject.clientName")}
-							</Label>
-							<Input
-								value={projectData.clientName}
-								onChange={(e) =>
-									updateProjectField(
-										"clientName",
-										e.target.value,
-									)
-								}
-								placeholder={t(
-									"projects.form.clientNamePlaceholder",
-								)}
-								className="rounded-xl border-indigo-200/60 bg-white dark:border-indigo-800/40 dark:bg-slate-900/50"
-							/>
+					{/* ─── Client Section ─── */}
+					<div className="space-y-3">
+						<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+							{t("projects.createProject.clientName")}
+						</Label>
+						<div className="flex items-center gap-3">
+							<div className="flex-1">
+								<ClientSelector
+									organizationId={organizationId}
+									onSelect={handleClientSelect}
+									selectedClientId={clientId}
+								/>
+							</div>
+							<Button
+								type="button"
+								variant={showInlineClientForm ? "secondary" : "outline"}
+								size="sm"
+								className="rounded-xl gap-2 shrink-0"
+								onClick={() => {
+									setShowInlineClientForm(!showInlineClientForm);
+									if (!showInlineClientForm) {
+										clearClient();
+									}
+								}}
+							>
+								<UserPlus className="h-4 w-4" />
+								{t("finance.clients.new")}
+							</Button>
 						</div>
-						<div className="space-y-2">
-							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-								{t("projects.createProject.location")}
-							</Label>
-							<Input
-								value={projectData.location}
-								onChange={(e) =>
-									updateProjectField(
-										"location",
-										e.target.value,
-									)
-								}
-								placeholder={t(
-									"projects.form.locationPlaceholder",
-								)}
-								className="rounded-xl border-indigo-200/60 bg-white dark:border-indigo-800/40 dark:bg-slate-900/50"
+
+						{showInlineClientForm ? (
+							<InlineClientForm
+								organizationId={organizationId}
+								onSuccess={(client) => {
+									setClientId(client.id);
+									setClientName(client.name);
+									setClientCompany(client.company ?? "");
+									setClientPhone(client.phone ?? "");
+									setClientEmail(client.email ?? "");
+									setClientTaxNumber(client.taxNumber ?? "");
+									setShowInlineClientForm(false);
+								}}
+								onCancel={() => setShowInlineClientForm(false)}
 							/>
-						</div>
+						) : clientId && clientName ? (
+							<div className="rounded-xl border border-indigo-200/60 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/30 dark:to-indigo-950/30 overflow-hidden">
+								<div className="flex items-center justify-between p-3 border-b border-blue-100 dark:border-blue-900/50">
+									<div className="flex items-center gap-3">
+										<div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
+											{clientName.charAt(0).toUpperCase()}
+										</div>
+										<div>
+											<p className="font-semibold text-sm text-foreground">{clientName}</p>
+											{clientCompany && clientCompany !== clientName && (
+												<p className="text-xs text-muted-foreground flex items-center gap-1">
+													<Building2 className="h-3 w-3" />
+													{clientCompany}
+												</p>
+											)}
+										</div>
+									</div>
+									<Button
+										type="button"
+										variant="ghost"
+										size="icon"
+										onClick={clearClient}
+										className="h-8 w-8 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+									>
+										<X className="h-4 w-4" />
+									</Button>
+								</div>
+								{(clientPhone || clientEmail || clientTaxNumber) && (
+									<div className="p-3 flex flex-wrap gap-3">
+										{clientPhone && (
+											<div className="flex items-center gap-2 text-sm">
+												<div className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+													<Phone className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+												</div>
+												<span className="text-muted-foreground text-xs">{clientPhone}</span>
+											</div>
+										)}
+										{clientEmail && (
+											<div className="flex items-center gap-2 text-sm">
+												<div className="w-6 h-6 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+													<Mail className="h-3 w-3 text-violet-600 dark:text-violet-400" />
+												</div>
+												<span className="text-muted-foreground text-xs">{clientEmail}</span>
+											</div>
+										)}
+										{clientTaxNumber && (
+											<div className="flex items-center gap-2 text-sm">
+												<div className="w-6 h-6 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+													<CreditCard className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+												</div>
+												<span className="text-muted-foreground text-xs font-mono">{clientTaxNumber}</span>
+											</div>
+										)}
+									</div>
+								)}
+							</div>
+						) : null}
+					</div>
+
+					{/* ─── Location ─── */}
+					<div className="space-y-2">
+						<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+							{t("projects.createProject.location")}
+						</Label>
+						<Input
+							value={projectData.location}
+							onChange={(e) =>
+								updateProjectField(
+									"location",
+									e.target.value,
+								)
+							}
+							placeholder={t(
+								"projects.form.locationPlaceholder",
+							)}
+							className="rounded-xl border-indigo-200/60 bg-white dark:border-indigo-800/40 dark:bg-slate-900/50"
+						/>
 					</div>
 
 					<div className="space-y-2">

@@ -7,53 +7,41 @@ import { withQuery } from "ufo";
 
 const intlMiddleware = createMiddleware(routing);
 
-export default async function proxy(req: NextRequest) {
+const AUTH_REQUIRED_PATHS = [
+	"/onboarding",
+	"/new-organization",
+	"/choose-plan",
+	"/organization-invitation",
+];
+
+export default function middleware(req: NextRequest) {
 	const { pathname, origin } = req.nextUrl;
 
-	const sessionCookie = getSessionCookie(req);
+	// 1. Public token routes — always pass through
+	if (pathname.startsWith("/owner") || pathname.startsWith("/share")) {
+		return NextResponse.next();
+	}
 
+	// 2. /app/* — SaaS core (auth required)
 	if (pathname.startsWith("/app")) {
 		if (!appConfig.ui.saas.enabled) {
 			return NextResponse.redirect(new URL("/", origin));
 		}
 
+		const sessionCookie = getSessionCookie(req);
 		if (!sessionCookie) {
 			return NextResponse.redirect(
 				new URL(
-					withQuery("/auth/login", {
-						redirectTo: pathname,
-					}),
+					withQuery("/auth/login", { redirectTo: pathname }),
 					origin,
 				),
 			);
 		}
 
-		// التحقق من mustChangePassword عبر session API
-		try {
-			const sessionRes = await fetch(
-				new URL("/api/auth/get-session", origin),
-				{
-					headers: {
-						cookie: req.headers.get("cookie") || "",
-					},
-				},
-			);
-
-			if (sessionRes.ok) {
-				const session = await sessionRes.json();
-				if (session?.user?.mustChangePassword) {
-					return NextResponse.redirect(
-						new URL("/auth/change-password", origin),
-					);
-				}
-			}
-		} catch {
-			// لا نوقف الطلب في حال فشل الاتصال
-		}
-
 		return NextResponse.next();
 	}
 
+	// 3. /auth/* — pass through (SaaS must be enabled)
 	if (pathname.startsWith("/auth")) {
 		if (!appConfig.ui.saas.enabled) {
 			return NextResponse.redirect(new URL("/", origin));
@@ -62,17 +50,22 @@ export default async function proxy(req: NextRequest) {
 		return NextResponse.next();
 	}
 
-	const pathsWithoutLocale = [
-		"/onboarding",
-		"/new-organization",
-		"/choose-plan",
-		"/organization-invitation",
-	];
+	// 4. Pre-login SaaS paths (auth required)
+	if (AUTH_REQUIRED_PATHS.some((path) => pathname.startsWith(path))) {
+		const sessionCookie = getSessionCookie(req);
+		if (!sessionCookie) {
+			return NextResponse.redirect(
+				new URL(
+					withQuery("/auth/login", { redirectTo: pathname }),
+					origin,
+				),
+			);
+		}
 
-	if (pathsWithoutLocale.some((path) => pathname.startsWith(path))) {
 		return NextResponse.next();
 	}
 
+	// 5. Marketing / locale routes — fallthrough
 	if (!appConfig.ui.marketing.enabled) {
 		return NextResponse.redirect(new URL("/app", origin));
 	}
@@ -82,6 +75,6 @@ export default async function proxy(req: NextRequest) {
 
 export const config = {
 	matcher: [
-		"/((?!api|image-proxy|images|fonts|_next/static|_next/image|favicon.ico|icon.png|sitemap.xml|robots.txt).*)",
+		"/((?!api|image-proxy|images|fonts|_next/static|_next/image|favicon\\.ico|icon\\.png|sitemap\\.xml|robots\\.txt).*)",
 	],
 };

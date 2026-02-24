@@ -25,6 +25,7 @@ export const createProjectProcedure = protectedProcedure
 				])
 				.optional(),
 			clientName: z.string().optional(),
+			clientId: z.string().optional(),
 			location: z.string().optional(),
 			contractValue: z.number().min(0).optional(),
 			startDate: z.coerce.date().optional(),
@@ -87,6 +88,7 @@ export const createProjectProcedure = protectedProcedure
 			description: input.description,
 			type: input.type,
 			clientName: input.clientName,
+			clientId: input.clientId,
 			location: input.location,
 			contractValue: input.contractValue,
 			startDate: input.startDate,

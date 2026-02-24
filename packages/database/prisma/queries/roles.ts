@@ -48,19 +48,38 @@ export async function createRole(data: {
 	});
 }
 
+// الأدوار الافتراضية
+const DEFAULT_ROLES: Array<{ type: RoleType; isSystem: boolean }> = [
+	{ type: "OWNER", isSystem: true },
+	{ type: "PROJECT_MANAGER", isSystem: true },
+	{ type: "ACCOUNTANT", isSystem: true },
+	{ type: "ENGINEER", isSystem: true },
+	{ type: "SUPERVISOR", isSystem: true },
+];
+
 // إنشاء الأدوار الافتراضية لمنظمة جديدة
 export async function createDefaultRoles(organizationId: string) {
-	const roles: Array<{ type: RoleType; isSystem: boolean }> = [
-		{ type: "PROJECT_MANAGER", isSystem: true },
-		{ type: "ACCOUNTANT", isSystem: true },
-		{ type: "ENGINEER", isSystem: true },
-		{ type: "SUPERVISOR", isSystem: true },
-	];
+	return createDefaultRolesInTx(db, organizationId);
+}
 
+// إنشاء الأدوار الافتراضية داخل transaction
+export async function createDefaultRolesInTx(
+	tx: Parameters<Parameters<typeof db.$transaction>[0]>[0] | typeof db,
+	organizationId: string,
+) {
 	const createdRoles = [];
 
-	for (const role of roles) {
-		const created = await db.role.create({
+	for (const role of DEFAULT_ROLES) {
+		// Skip if this role type already exists for this org
+		const existing = await tx.role.findFirst({
+			where: { organizationId, type: role.type },
+		});
+		if (existing) {
+			createdRoles.push(existing);
+			continue;
+		}
+
+		const created = await tx.role.create({
 			data: {
 				name: ROLE_NAMES_AR[role.type] ?? role.type,
 				nameEn: role.type.replace(/_/g, " ").toLowerCase(),

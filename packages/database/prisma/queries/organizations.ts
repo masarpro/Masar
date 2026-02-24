@@ -3,6 +3,7 @@ import { db } from "../client";
 import type { OrganizationSchema } from "../zod";
 import slugify from "@sindresorhus/slugify";
 import { nanoid } from "nanoid";
+import { createDefaultRolesInTx } from "./roles";
 
 export async function getOrganizations({
 	limit,
@@ -210,7 +211,7 @@ export async function createOrganizationForUser({
 			},
 		});
 
-		// Create the membership with owner role
+		// Create the membership with owner role (Better Auth requires this)
 		await tx.member.create({
 			data: {
 				organizationId: organization.id,
@@ -220,12 +221,17 @@ export async function createOrganizationForUser({
 			},
 		});
 
-		// Update user's organizationId
+		// Create default roles (including OWNER)
+		const defaultRoles = await createDefaultRolesInTx(tx, organization.id);
+		const ownerRole = defaultRoles.find((r) => r.type === "OWNER");
+
+		// Update user's organizationId and assign OWNER role
 		await tx.user.update({
 			where: { id: userId },
 			data: {
 				organizationId: organization.id,
 				accountType: "OWNER",
+				organizationRoleId: ownerRole?.id,
 			},
 		});
 

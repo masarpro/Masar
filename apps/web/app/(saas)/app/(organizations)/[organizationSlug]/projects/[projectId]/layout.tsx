@@ -1,4 +1,5 @@
-import { getProjectById, getProjectMemberRole } from "@repo/database";
+import { getProjectById, getProjectMemberRole, getEffectivePermissions } from "@repo/database";
+import { hasPermission } from "@repo/database/prisma/permissions";
 import { getActiveOrganization, getSession } from "@saas/auth/lib/server";
 import { ProjectShell } from "@saas/projects/components/shell";
 import { notFound, redirect } from "next/navigation";
@@ -37,16 +38,14 @@ export default async function ProjectLayout({
 		return notFound();
 	}
 
-	// If user has no project-level role, check org-level role
-	// Organization owners/admins get MANAGER access to all projects
+	// If user has no project-level role, check org-level permissions
+	// Users with manageTeam permission get MANAGER access to all projects
 	let userRole: ProjectRole = "VIEWER";
 	if (projectMemberRole) {
 		userRole = projectMemberRole as ProjectRole;
 	} else {
-		const orgMember = organization.members?.find(
-			(m: { userId: string }) => m.userId === session.user.id,
-		);
-		if (orgMember && (orgMember.role === "owner" || orgMember.role === "admin")) {
+		const permissions = await getEffectivePermissions(session.user.id, organization.id);
+		if (hasPermission(permissions, "projects", "manageTeam")) {
 			userRole = "MANAGER";
 		}
 	}

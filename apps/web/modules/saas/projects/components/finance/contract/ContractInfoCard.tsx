@@ -14,15 +14,21 @@ import {
 	SelectValue,
 } from "@ui/components/select";
 import { Textarea } from "@ui/components/textarea";
-import { Save } from "lucide-react";
+import { Building2, CreditCard, Mail, Phone, Save, UserPlus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import {
+	ClientSelector,
+	type Client,
+} from "@saas/finance/components/shared/ClientSelector";
+import { InlineClientForm } from "@saas/finance/components/clients/InlineClientForm";
 
 interface ContractData {
 	contractNo?: string | null;
 	title?: string | null;
 	clientName?: string | null;
+	clientId?: string | null;
 	description?: string | null;
 	status: string;
 	value: number;
@@ -57,7 +63,6 @@ export function ContractInfoCard({
 
 	const [contractNo, setContractNo] = useState(data?.contractNo ?? "");
 	const [title, setTitle] = useState(data?.title ?? "");
-	const [clientName, setClientName] = useState(data?.clientName ?? "");
 	const [description, setDescription] = useState(data?.description ?? "");
 	const [status, setStatus] = useState(data?.status ?? "DRAFT");
 	const [value, setValue] = useState(data?.value?.toString() ?? "0");
@@ -69,6 +74,38 @@ export function ContractInfoCard({
 	);
 	const [endDate, setEndDate] = useState(toDateInputValue(data?.endDate));
 	const [notes, setNotes] = useState(data?.notes ?? "");
+
+	// ─── Client state ──────────────────────────────────────
+	const [clientId, setClientId] = useState<string | undefined>(data?.clientId ?? undefined);
+	const [clientName, setClientName] = useState(data?.clientName ?? "");
+	const [clientCompany, setClientCompany] = useState("");
+	const [clientPhone, setClientPhone] = useState("");
+	const [clientEmail, setClientEmail] = useState("");
+	const [clientTaxNumber, setClientTaxNumber] = useState("");
+	const [showInlineClientForm, setShowInlineClientForm] = useState(false);
+
+	const clearClient = useCallback(() => {
+		setClientId(undefined);
+		setClientName("");
+		setClientCompany("");
+		setClientPhone("");
+		setClientEmail("");
+		setClientTaxNumber("");
+	}, []);
+
+	const handleClientSelect = useCallback((client: Client | null) => {
+		if (client) {
+			setClientId(client.id);
+			setClientName(client.name);
+			setClientCompany(client.company ?? "");
+			setClientPhone(client.phone ?? "");
+			setClientEmail(client.email ?? "");
+			setClientTaxNumber(client.taxNumber ?? "");
+			setShowInlineClientForm(false);
+		} else {
+			clearClient();
+		}
+	}, [clearClient]);
 
 	const { mutate: upsert, isPending } = useMutation({
 		...orpc.projectContract.upsert.mutationOptions(),
@@ -90,6 +127,14 @@ export function ContractInfoCard({
 		},
 	});
 
+	const { mutate: updateProject } = useMutation(
+		orpc.projects.update.mutationOptions({
+			onError: (error) => {
+				console.error("[ContractInfoCard] Failed to update project client:", error);
+			},
+		}),
+	);
+
 	const handleSave = () => {
 		upsert({
 			organizationId,
@@ -104,6 +149,14 @@ export function ContractInfoCard({
 			startDate: startDate ? new Date(startDate) : null,
 			endDate: endDate ? new Date(endDate) : null,
 			notes: notes || null,
+		});
+
+		// Also update the project's clientId and clientName
+		updateProject({
+			organizationId,
+			id: projectId,
+			clientId: clientId ?? null,
+			clientName: clientName || undefined,
 		});
 	};
 
@@ -138,14 +191,105 @@ export function ContractInfoCard({
 					</div>
 				</div>
 
-				{/* Row 2: Client Name + Status */}
+				{/* Row 2: Client + Status */}
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 					<div className="space-y-2">
 						<Label>{t("projects.contract.info.clientName")}</Label>
-						<Input
-							value={clientName}
-							onChange={(e) => setClientName(e.target.value)}
-						/>
+						<div className="flex items-center gap-2">
+							<div className="flex-1">
+								<ClientSelector
+									organizationId={organizationId}
+									onSelect={handleClientSelect}
+									selectedClientId={clientId}
+								/>
+							</div>
+							<Button
+								type="button"
+								variant={showInlineClientForm ? "secondary" : "outline"}
+								size="sm"
+								className="rounded-xl gap-2 shrink-0"
+								onClick={() => {
+									setShowInlineClientForm(!showInlineClientForm);
+									if (!showInlineClientForm) {
+										clearClient();
+									}
+								}}
+							>
+								<UserPlus className="h-4 w-4" />
+							</Button>
+						</div>
+
+						{showInlineClientForm ? (
+							<InlineClientForm
+								organizationId={organizationId}
+								onSuccess={(client) => {
+									setClientId(client.id);
+									setClientName(client.name);
+									setClientCompany(client.company ?? "");
+									setClientPhone(client.phone ?? "");
+									setClientEmail(client.email ?? "");
+									setClientTaxNumber(client.taxNumber ?? "");
+									setShowInlineClientForm(false);
+								}}
+								onCancel={() => setShowInlineClientForm(false)}
+							/>
+						) : clientId && clientName ? (
+							<div className="rounded-xl border bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/30 dark:to-indigo-950/30 overflow-hidden">
+								<div className="flex items-center justify-between p-3 border-b border-blue-100 dark:border-blue-900/50">
+									<div className="flex items-center gap-3">
+										<div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
+											{clientName.charAt(0).toUpperCase()}
+										</div>
+										<div>
+											<p className="font-semibold text-sm text-foreground">{clientName}</p>
+											{clientCompany && clientCompany !== clientName && (
+												<p className="text-xs text-muted-foreground flex items-center gap-1">
+													<Building2 className="h-3 w-3" />
+													{clientCompany}
+												</p>
+											)}
+										</div>
+									</div>
+									<Button
+										type="button"
+										variant="ghost"
+										size="icon"
+										onClick={clearClient}
+										className="h-8 w-8 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+									>
+										<X className="h-4 w-4" />
+									</Button>
+								</div>
+								{(clientPhone || clientEmail || clientTaxNumber) && (
+									<div className="p-3 flex flex-wrap gap-3">
+										{clientPhone && (
+											<div className="flex items-center gap-2 text-sm">
+												<div className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+													<Phone className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+												</div>
+												<span className="text-muted-foreground text-xs">{clientPhone}</span>
+											</div>
+										)}
+										{clientEmail && (
+											<div className="flex items-center gap-2 text-sm">
+												<div className="w-6 h-6 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+													<Mail className="h-3 w-3 text-violet-600 dark:text-violet-400" />
+												</div>
+												<span className="text-muted-foreground text-xs">{clientEmail}</span>
+											</div>
+										)}
+										{clientTaxNumber && (
+											<div className="flex items-center gap-2 text-sm">
+												<div className="w-6 h-6 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+													<CreditCard className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+												</div>
+												<span className="text-muted-foreground text-xs font-mono">{clientTaxNumber}</span>
+											</div>
+										)}
+									</div>
+								)}
+							</div>
+						) : null}
 					</div>
 					<div className="space-y-2">
 						<Label>{t("projects.contract.status.DRAFT").replace("مسودة", "الحالة")}</Label>

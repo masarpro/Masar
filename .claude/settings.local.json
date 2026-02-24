@@ -86,7 +86,11 @@
       "Bash(head:*)",
       "Bash(cd \"H:\\\\Masar\\\\supastarter-nextjs-3\" && npx tsx -e \"\nimport { db } from './packages/database/prisma/client';\nasync function main\\(\\) {\n  const count = await db.project.count\\(\\);\n  console.log\\('count:', count\\);\n  const p = await db.project.findFirst\\({ select: { id: true, projectNo: true } }\\);\n  console.log\\('first:', JSON.stringify\\(p\\)\\);\n}\nmain\\(\\).catch\\(e => console.error\\('ERR:', e.message\\)\\).finally\\(\\(\\) => process.exit\\(0\\)\\);\n\" 2>&1)",
       "Bash(cd \"H:\\\\Masar\\\\supastarter-nextjs-3\" && npx --package tsx tsx -e \"\nimport { db } from './packages/database/prisma/client';\nasync function main\\(\\) {\n  const count = await db.project.count\\(\\);\n  console.log\\('count:', count\\);\n}\nmain\\(\\).catch\\(e => console.error\\('ERR:', e.message\\)\\).finally\\(\\(\\) => process.exit\\(0\\)\\);\n\" 2>&1)",
-      "Bash(where tsx:*)"
+      "Bash(where tsx:*)",
+      "Bash(cd \"H:/Masar/supastarter-nextjs-3\" && git checkout -- packages/database/prisma/zod/index.ts && git stash pop 2>&1)",
+      "Bash(cd H:/Masar/supastarter-nextjs-3 && npx -y tsx -e \"console.log\\('test'\\)\" 2>&1)",
+      "Bash(cd H:/Masar/supastarter-nextjs-3 && node_modules/.bin/tsx -e \"console.log\\('test'\\)\" 2>&1)",
+      "Bash(cd H:\\\\Masar\\\\supastarter-nextjs-3:*)"
     ]
   }
 }

@@ -2,13 +2,11 @@
 
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { ExpenseCategoryChart } from "./ExpenseCategoryChart";
 import { ExpensesTable } from "./ExpensesTable";
 import { FinanceSummary } from "./FinanceSummary";
-import { SubcontractsTab } from "./SubcontractsTab";
 
 interface ProjectFinanceHubProps {
 	organizationId: string;
@@ -23,6 +21,7 @@ export function ProjectFinanceHub({
 }: ProjectFinanceHubProps) {
 	const t = useTranslations();
 	const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
+	const [searchQuery, setSearchQuery] = useState("");
 
 	const { data: summary, isLoading: summaryLoading } = useQuery(
 		orpc.projectFinance.getSummary.queryOptions({
@@ -53,6 +52,26 @@ export function ProjectFinanceHub({
 		}),
 	);
 
+	// Client-side search filter
+	const allExpenses =
+		expensesData?.expenses?.map((e) => ({
+			...e,
+			date: new Date(e.date),
+			createdAt: new Date(e.createdAt),
+			amount: typeof e.amount === "number" ? e.amount : Number(e.amount),
+		})) ?? [];
+
+	const filteredExpenses = searchQuery
+		? allExpenses.filter((e) => {
+				const q = searchQuery.toLowerCase();
+				return (
+					(e.vendorName && e.vendorName.toLowerCase().includes(q)) ||
+					(e.description && e.description.toLowerCase().includes(q)) ||
+					(e.note && e.note.toLowerCase().includes(q))
+				);
+			})
+		: allExpenses;
+
 	if (summaryLoading) {
 		return (
 			<div className="flex items-center justify-center py-20">
@@ -77,44 +96,20 @@ export function ProjectFinanceHub({
 				changeOrdersImpact={summary?.changeOrdersImpact}
 			/>
 
-			{/* Main Content: Tabs + Chart */}
+			{/* Main Content: Expenses + Chart */}
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_280px]">
-				{/* Tabs */}
-				<Tabs defaultValue="expenses" className="min-w-0">
-					<TabsList className="mb-4 w-full justify-start">
-						<TabsTrigger value="expenses">
-							{t("finance.projectHub.tabs.expenses")}
-						</TabsTrigger>
-						<TabsTrigger value="subcontracts">
-							{t("finance.projectHub.tabs.subcontracts")}
-						</TabsTrigger>
-					</TabsList>
-
-					<TabsContent value="expenses">
-						<ExpensesTable
-							organizationSlug={organizationSlug}
-							projectId={projectId}
-							expenses={
-								expensesData?.expenses?.map((e) => ({
-									...e,
-									date: new Date(e.date),
-									createdAt: new Date(e.createdAt),
-									amount: typeof e.amount === "number" ? e.amount : Number(e.amount),
-								})) ?? []
-							}
-							selectedCategory={selectedCategory}
-							onCategoryChange={setSelectedCategory}
-						/>
-					</TabsContent>
-
-					<TabsContent value="subcontracts">
-						<SubcontractsTab
-							organizationId={organizationId}
-							organizationSlug={organizationSlug}
-							projectId={projectId}
-						/>
-					</TabsContent>
-				</Tabs>
+				{/* Expenses Table */}
+				<ExpensesTable
+					organizationId={organizationId}
+					organizationSlug={organizationSlug}
+					projectId={projectId}
+					expenses={filteredExpenses}
+					isLoading={expensesLoading}
+					selectedCategory={selectedCategory}
+					onCategoryChange={setSelectedCategory}
+					searchQuery={searchQuery}
+					onSearchChange={setSearchQuery}
+				/>
 
 				{/* Donut Chart */}
 				<div className="hidden lg:block">

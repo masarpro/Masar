@@ -1,5 +1,9 @@
 import { db } from "../client";
-import type { ClaimStatus, ExpenseCategory } from "../generated/client";
+import type {
+	ClaimStatus,
+	ExpenseCategory,
+	OrgExpenseCategory,
+} from "../generated/client";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Project Finance Queries - استعلامات المالية
@@ -17,7 +21,7 @@ export async function getProjectFinanceSummary(
 	thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
 	// Run all queries in parallel
-	const [project, expensesTotal, paymentsTotal, claimsData, upcomingClaims, approvedCOImpact] =
+	const [project, expensesTotal, paymentsTotal, claimsData, upcomingClaims, approvedCOImpact, subcontractPaymentsTotal] =
 		await Promise.all([
 			// Get project contract value
 			db.project.findFirst({
@@ -62,6 +66,15 @@ export async function getProjectFinanceSummary(
 				},
 				_sum: { costImpact: true },
 			}),
+			// Get total subcontract payments (دفعات مقاولي الباطن)
+			db.subcontractPayment.aggregate({
+				where: {
+					organizationId,
+					contract: { projectId },
+					status: "COMPLETED",
+				},
+				_sum: { amount: true },
+			}),
 		]);
 
 	if (!project) {
@@ -98,9 +111,13 @@ export async function getProjectFinanceSummary(
 	const contractValue = project.contractValue
 		? Number(project.contractValue)
 		: 0;
-	const actualExpenses = expensesTotal._sum.amount
+	const financeExpenses = expensesTotal._sum.amount
 		? Number(expensesTotal._sum.amount)
 		: 0;
+	const subcontractExpenses = subcontractPaymentsTotal._sum.amount
+		? Number(subcontractPaymentsTotal._sum.amount)
+		: 0;
+	const actualExpenses = financeExpenses + subcontractExpenses;
 	const changeOrdersImpact = approvedCOImpact._sum.costImpact
 		? Number(approvedCOImpact._sum.costImpact)
 		: 0;
@@ -116,6 +133,7 @@ export async function getProjectFinanceSummary(
 		adjustedContractValue,
 		changeOrdersImpact,
 		actualExpenses,
+		subcontractExpenses,
 		totalPayments,
 		remaining,
 		claimsTotal,
@@ -131,7 +149,7 @@ export async function getProjectFinanceSummary(
 }
 
 /**
- * Get project expenses with pagination and filters
+ * Get project expenses from unified FinanceExpense + SubcontractPayment
  */
 export async function getProjectExpenses(
 	organizationId: string,
@@ -144,37 +162,169 @@ export async function getProjectExpenses(
 		offset?: number;
 	},
 ) {
-	const where: {
-		organizationId: string;
-		projectId: string;
-		category?: ExpenseCategory;
-		date?: { gte?: Date; lte?: Date };
-	} = { organizationId, projectId };
+	// Map old project categories to org expense categories
+	const categoryMap: Record<string, OrgExpenseCategory> = {
+		MATERIALS: "MATERIALS",
+		LABOR: "LABOR",
+		EQUIPMENT: "EQUIPMENT_RENTAL",
+		TRANSPORT: "TRANSPORT",
+		MISC: "MISC",
+	};
 
-	if (options?.category) {
-		where.category = options.category;
+	// Build FinanceExpense where clause
+	const expenseWhere: Record<string, unknown> = {
+		organizationId,
+		projectId,
+	};
+
+	if (
+		options?.category &&
+		options.category !== "SUBCONTRACTOR" &&
+		categoryMap[options.category]
+	) {
+		expenseWhere.category = categoryMap[options.category];
 	}
 
 	if (options?.dateFrom || options?.dateTo) {
-		where.date = {};
-		if (options.dateFrom) where.date.gte = options.dateFrom;
-		if (options.dateTo) where.date.lte = options.dateTo;
+		const dateFilter: Record<string, Date> = {};
+		if (options?.dateFrom) dateFilter.gte = options.dateFrom;
+		if (options?.dateTo) dateFilter.lte = options.dateTo;
+		expenseWhere.date = dateFilter;
 	}
 
-	const [expenses, total] = await Promise.all([
-		db.projectExpense.findMany({
-			where,
-			include: {
-				createdBy: { select: { id: true, name: true } },
-			},
-			orderBy: { date: "desc" },
-			take: options?.limit ?? 50,
-			skip: options?.offset ?? 0,
-		}),
-		db.projectExpense.count({ where }),
+	// Build SubcontractPayment where clause
+	const subWhere: Record<string, unknown> = {
+		organizationId,
+		contract: { projectId },
+	};
+	if (options?.dateFrom || options?.dateTo) {
+		const dateFilter: Record<string, Date> = {};
+		if (options?.dateFrom) dateFilter.gte = options.dateFrom;
+		if (options?.dateTo) dateFilter.lte = options.dateTo;
+		subWhere.date = dateFilter;
+	}
+
+	// If filtering by SUBCONTRACTOR, only show subcontract payments
+	const isSubcontractorOnly = options?.category === "SUBCONTRACTOR";
+	const isOtherCategory =
+		options?.category &&
+		options.category !== "SUBCONTRACTOR" &&
+		categoryMap[options.category];
+
+	const [expenseResults, subResults] = await Promise.all([
+		isSubcontractorOnly
+			? { expenses: [], total: 0 }
+			: (async () => {
+					const [expenses, total] = await Promise.all([
+						db.financeExpense.findMany({
+							where: expenseWhere as any,
+							include: {
+								sourceAccount: {
+									select: { id: true, name: true },
+								},
+								createdBy: { select: { id: true, name: true } },
+							},
+							orderBy: { date: "desc" },
+							take: 200,
+							skip: 0,
+						}),
+						db.financeExpense.count({ where: expenseWhere as any }),
+					]);
+					return { expenses, total };
+				})(),
+		isOtherCategory
+			? { payments: [], total: 0 }
+			: (async () => {
+					const [payments, total] = await Promise.all([
+						db.subcontractPayment.findMany({
+							where: subWhere as any,
+							include: {
+								contract: {
+									select: { id: true, name: true, contractNo: true },
+								},
+								sourceAccount: {
+									select: { id: true, name: true },
+								},
+								createdBy: { select: { id: true, name: true } },
+							},
+							orderBy: { date: "desc" },
+							take: 200,
+							skip: 0,
+						}),
+						db.subcontractPayment.count({ where: subWhere as any }),
+					]);
+					return { payments, total };
+				})(),
 	]);
 
-	return { expenses, total };
+	// Normalize and merge
+	const normalizedExpenses = (
+		"expenses" in expenseResults ? expenseResults.expenses : []
+	).map((e) => ({
+		_type: "expense" as const,
+		id: e.id,
+		date: e.date,
+		category: "MATERIALS" as ExpenseCategory, // map back for UI
+		orgCategory: e.category,
+		amount: e.amount,
+		vendorName: e.vendorName,
+		note: e.description,
+		description: e.description,
+		createdBy: e.createdBy,
+		createdAt: e.createdAt,
+		sourceAccount: e.sourceAccount,
+	}));
+
+	// Map org categories back to project-level categories for UI display
+	for (const exp of normalizedExpenses) {
+		const reverseMap: Record<string, ExpenseCategory> = {
+			MATERIALS: "MATERIALS",
+			LABOR: "LABOR",
+			EQUIPMENT_RENTAL: "EQUIPMENT",
+			EQUIPMENT_PURCHASE: "EQUIPMENT",
+			TRANSPORT: "TRANSPORT",
+			SUBCONTRACTOR: "SUBCONTRACTOR",
+			MISC: "MISC",
+		};
+		exp.category = reverseMap[exp.orgCategory] ?? "MISC";
+	}
+
+	const normalizedSub = (
+		"payments" in subResults ? subResults.payments : []
+	).map((p) => ({
+		_type: "subcontract_payment" as const,
+		id: p.id,
+		date: p.date,
+		category: "SUBCONTRACTOR" as ExpenseCategory,
+		orgCategory: "SUBCONTRACTOR" as OrgExpenseCategory,
+		amount: p.amount,
+		vendorName: p.contract.name,
+		note: p.description,
+		description: p.description,
+		createdBy: p.createdBy,
+		createdAt: p.createdAt,
+		sourceAccount: p.sourceAccount,
+	}));
+
+	const merged = [...normalizedExpenses, ...normalizedSub].sort(
+		(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+	);
+
+	// Apply pagination
+	const limit = options?.limit ?? 50;
+	const offset = options?.offset ?? 0;
+	const paged = merged.slice(offset, offset + limit);
+
+	const expTotal =
+		"expenses" in expenseResults
+			? (expenseResults as { total: number }).total
+			: 0;
+	const subTotal =
+		"payments" in subResults
+			? (subResults as { total: number }).total
+			: 0;
+
+	return { expenses: paged, total: expTotal + subTotal };
 }
 
 /**
@@ -527,182 +677,10 @@ export async function updateProjectClaim(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Subcontract Contract Queries - عقود مقاولي الباطن
-// ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Get all subcontract contracts for a project
- */
-export async function getSubcontractContracts(
-	organizationId: string,
-	projectId: string,
-) {
-	const contracts = await db.subcontractContract.findMany({
-		where: { organizationId, projectId },
-		include: {
-			createdBy: { select: { id: true, name: true } },
-			expenses: {
-				select: { id: true, amount: true, date: true },
-			},
-		},
-		orderBy: { createdAt: "desc" },
-	});
-
-	return contracts.map((contract) => {
-		const totalPaid = contract.expenses.reduce(
-			(sum, e) => sum + Number(e.amount),
-			0,
-		);
-		return {
-			...contract,
-			value: Number(contract.value),
-			totalPaid,
-			remaining: Number(contract.value) - totalPaid,
-			expenseCount: contract.expenses.length,
-		};
-	});
-}
-
-/**
- * Get a single subcontract contract by ID with full expenses
- */
-export async function getSubcontractContractById(
-	id: string,
-	organizationId: string,
-	projectId: string,
-) {
-	const contract = await db.subcontractContract.findFirst({
-		where: { id, organizationId, projectId },
-		include: {
-			createdBy: { select: { id: true, name: true } },
-			expenses: {
-				include: {
-					createdBy: { select: { id: true, name: true } },
-				},
-				orderBy: { date: "desc" },
-			},
-		},
-	});
-
-	if (!contract) return null;
-
-	const totalPaid = contract.expenses.reduce(
-		(sum, e) => sum + Number(e.amount),
-		0,
-	);
-
-	return {
-		...contract,
-		value: Number(contract.value),
-		totalPaid,
-		remaining: Number(contract.value) - totalPaid,
-		expenses: contract.expenses.map((e) => ({
-			...e,
-			amount: Number(e.amount),
-		})),
-	};
-}
-
-/**
- * Create a new subcontract contract
- */
-export async function createSubcontractContract(data: {
-	organizationId: string;
-	projectId: string;
-	createdById: string;
-	name: string;
-	startDate?: Date;
-	endDate?: Date;
-	value: number;
-	notes?: string;
-}) {
-	// Verify project belongs to organization
-	const project = await db.project.findFirst({
-		where: { id: data.projectId, organizationId: data.organizationId },
-		select: { id: true },
-	});
-
-	if (!project) {
-		throw new Error("المشروع غير موجود");
-	}
-
-	return db.subcontractContract.create({
-		data: {
-			organizationId: data.organizationId,
-			projectId: data.projectId,
-			createdById: data.createdById,
-			name: data.name,
-			startDate: data.startDate ?? null,
-			endDate: data.endDate ?? null,
-			value: data.value,
-			notes: data.notes ?? null,
-		},
-		include: {
-			createdBy: { select: { id: true, name: true } },
-		},
-	});
-}
-
-/**
- * Update a subcontract contract
- */
-export async function updateSubcontractContract(
-	id: string,
-	organizationId: string,
-	projectId: string,
-	data: {
-		name?: string;
-		startDate?: Date | null;
-		endDate?: Date | null;
-		value?: number;
-		notes?: string | null;
-	},
-) {
-	const existing = await db.subcontractContract.findFirst({
-		where: { id, organizationId, projectId },
-		select: { id: true },
-	});
-
-	if (!existing) {
-		throw new Error("العقد غير موجود");
-	}
-
-	return db.subcontractContract.update({
-		where: { id },
-		data: {
-			name: data.name,
-			startDate: data.startDate,
-			endDate: data.endDate,
-			value: data.value,
-			notes: data.notes,
-		},
-		include: {
-			createdBy: { select: { id: true, name: true } },
-		},
-	});
-}
-
-/**
- * Delete a subcontract contract
- */
-export async function deleteSubcontractContract(
-	id: string,
-	organizationId: string,
-	projectId: string,
-) {
-	const existing = await db.subcontractContract.findFirst({
-		where: { id, organizationId, projectId },
-		select: { id: true },
-	});
-
-	if (!existing) {
-		throw new Error("العقد غير موجود");
-	}
-
-	return db.subcontractContract.delete({
-		where: { id },
-	});
-}
+// Subcontract Contract Queries - moved to subcontract.ts
+// Old functions (getSubcontractContracts, getSubcontractContractById,
+// createSubcontractContract, updateSubcontractContract, deleteSubcontractContract)
+// are now exported from packages/database/prisma/queries/subcontract.ts
 
 /**
  * Get expenses grouped by category for donut chart
@@ -711,16 +689,60 @@ export async function getExpensesByCategory(
 	organizationId: string,
 	projectId: string,
 ) {
-	const result = await db.projectExpense.groupBy({
-		by: ["category"],
-		where: { organizationId, projectId },
-		_sum: { amount: true },
-		_count: true,
-	});
+	// Use FinanceExpense (unified) instead of ProjectExpense
+	const [financeResult, subcontractTotal] = await Promise.all([
+		db.financeExpense.groupBy({
+			by: ["category"],
+			where: { organizationId, projectId, status: "COMPLETED" },
+			_sum: { amount: true },
+			_count: true,
+		}),
+		db.subcontractPayment.aggregate({
+			where: {
+				organizationId,
+				contract: { projectId },
+				status: "COMPLETED",
+			},
+			_sum: { amount: true },
+			_count: true,
+		}),
+	]);
 
-	return result.map((group) => ({
-		category: group.category,
-		total: group._sum.amount ? Number(group._sum.amount) : 0,
-		count: group._count,
+	// Map org categories back to simpler project categories
+	const categoryMap: Record<string, string> = {
+		MATERIALS: "MATERIALS",
+		LABOR: "LABOR",
+		EQUIPMENT_RENTAL: "EQUIPMENT",
+		EQUIPMENT_PURCHASE: "EQUIPMENT",
+		TRANSPORT: "TRANSPORT",
+		SUBCONTRACTOR: "SUBCONTRACTOR",
+	};
+
+	const grouped = new Map<string, { total: number; count: number }>();
+	for (const group of financeResult) {
+		const mappedCat = categoryMap[group.category] ?? "MISC";
+		const existing = grouped.get(mappedCat) ?? { total: 0, count: 0 };
+		existing.total += group._sum.amount ? Number(group._sum.amount) : 0;
+		existing.count += group._count;
+		grouped.set(mappedCat, existing);
+	}
+
+	// Add subcontract payments as SUBCONTRACTOR category
+	if (subcontractTotal._count > 0) {
+		const existing = grouped.get("SUBCONTRACTOR") ?? {
+			total: 0,
+			count: 0,
+		};
+		existing.total += subcontractTotal._sum.amount
+			? Number(subcontractTotal._sum.amount)
+			: 0;
+		existing.count += subcontractTotal._count;
+		grouped.set("SUBCONTRACTOR", existing);
+	}
+
+	return Array.from(grouped.entries()).map(([category, data]) => ({
+		category,
+		total: data.total,
+		count: data.count,
 	}));
 }

@@ -86,6 +86,7 @@ import {
 	createExpenseProcedure,
 	updateExpenseProcedure,
 	deleteExpenseProcedure,
+	listExpensesWithSubcontracts,
 } from "./procedures/expenses";
 
 import {
@@ -210,6 +211,7 @@ export const financeRouter = {
 	// Expenses (المصروفات)
 	expenses: {
 		list: listExpenses,
+		listUnified: listExpensesWithSubcontracts,
 		getById: getExpense,
 		getSummary: getExpensesSummary,
 		create: createExpenseProcedure,

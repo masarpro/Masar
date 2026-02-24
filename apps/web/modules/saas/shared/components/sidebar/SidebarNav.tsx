@@ -183,7 +183,7 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 								className="grid transition-all duration-200 ease-out data-[state=closed]:grid-rows-[0fr] data-[state=closed]:opacity-0 data-[state=open]:grid-rows-[1fr] data-[state=open]:opacity-100"
 							>
 								<div className="overflow-hidden">
-									<div className="me-4 mt-1 space-y-1 border-e-2 border-border pe-3">
+									<div className="ms-4 mt-1 space-y-1 border-s-2 border-border ps-3">
 									{item.children.map((child) => {
 										const childHref = child.href;
 										const childActive = child.id === activeId;

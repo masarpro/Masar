@@ -57,6 +57,7 @@ const CONTRACT_STATUSES = [
 // ─── Types ──────────────────────────────────────────────────
 type PaymentTermRow = {
 	id: string;
+	dbId?: string; // database ID for existing terms
 	type: (typeof TERM_TYPES)[number];
 	label: string;
 	percent: string;
@@ -84,6 +85,7 @@ export interface ContractFormData {
 	penaltyPercent: number | null;
 	penaltyCapPercent: number | null;
 	paymentTerms: Array<{
+		id?: string;
 		type: string;
 		label: string | null;
 		percent: number | null;
@@ -175,6 +177,7 @@ export const ContractFormSections = forwardRef<
 	const [paymentTerms, setPaymentTerms] = useState<PaymentTermRow[]>(
 		initialData?.paymentTerms?.map((term) => ({
 			id: term.id ?? crypto.randomUUID(),
+			dbId: term.id ?? undefined,
 			type: term.type as (typeof TERM_TYPES)[number],
 			label: term.label ?? "",
 			percent: term.percent?.toString() ?? "",
@@ -302,6 +305,7 @@ export const ContractFormSections = forwardRef<
 				paymentTerms: paymentTerms.map((term, idx) => {
 					const pct = parseFloat(term.percent);
 					return {
+						id: term.dbId,
 						type: term.type,
 						label: term.label || null,
 						percent: isNaN(pct) ? null : pct,

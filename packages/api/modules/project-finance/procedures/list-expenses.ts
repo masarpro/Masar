@@ -8,7 +8,7 @@ export const listExpenses = protectedProcedure
 		method: "GET",
 		path: "/projects/{projectId}/finance/expenses",
 		tags: ["Project Finance"],
-		summary: "List project expenses",
+		summary: "List project expenses (unified from FinanceExpense + SubcontractPayment)",
 	})
 	.input(
 		z.object({
@@ -31,7 +31,6 @@ export const listExpenses = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		// Verify membership, project access, and permission to view finance
 		await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,

@@ -1,18 +1,31 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Progress } from "@ui/components/progress";
+import {
+	AlertDialog,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@ui/components/alert-dialog";
+import { Button } from "@ui/components/button";
 import {
 	AlertTriangle,
 	Camera,
 	Clock,
 	FileText,
+	Trash2,
 	TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useProjectRole } from "../../hooks/use-project-role";
 import { DailyReportCard } from "./DailyReportCard";
 import { IssueCard } from "./IssueCard";
 import { PhotoGrid } from "./PhotoGrid";
@@ -39,8 +52,34 @@ export function FieldTimeline({
 	projectId,
 }: FieldTimelineProps) {
 	const t = useTranslations();
+	const queryClient = useQueryClient();
+	const { isManager } = useProjectRole();
 	const basePath = `/app/${organizationSlug}/projects/${projectId}`;
 	const [showProgressForm, setShowProgressForm] = useState(false);
+	const [photoToDelete, setPhotoToDelete] = useState<{ id: string } | null>(
+		null,
+	);
+
+	const deletePhotoMutation = useMutation({
+		...orpc.projectField.deletePhoto.mutationOptions(),
+		onSuccess: () => {
+			toast.success(t("projects.field.photoDeleted"));
+			setPhotoToDelete(null);
+			queryClient.invalidateQueries({ queryKey: ["projectField"] });
+		},
+		onError: () => {
+			toast.error(t("projects.field.photoDeleteError"));
+		},
+	});
+
+	const handleDeletePhoto = () => {
+		if (!photoToDelete) return;
+		deletePhotoMutation.mutate({
+			organizationId,
+			projectId,
+			photoId: photoToDelete.id,
+		});
+	};
 
 	const { data, isLoading } = useQuery(
 		orpc.projectField.getTimeline.queryOptions({
@@ -72,7 +111,18 @@ export function FieldTimeline({
 		);
 	}
 
-	const timeline = data?.timeline ?? [];
+	const rawTimeline = data?.timeline ?? [];
+	const TYPE_MAP = {
+		DAILY_REPORT: "report",
+		PHOTO: "photo",
+		ISSUE: "issue",
+		PROGRESS_UPDATE: "progress",
+	} as const;
+	const timeline = rawTimeline.map((item) => ({
+		...item,
+		type: (TYPE_MAP[item.type as keyof typeof TYPE_MAP] ??
+			item.type.toLowerCase()) as "report" | "photo" | "issue" | "progress",
+	}));
 	const currentProgress = project?.progress ?? 0;
 
 	// Quick action buttons
@@ -168,11 +218,55 @@ export function FieldTimeline({
 						</p>
 					</div>
 				) : (
-					<div className="space-y-4">
-						{timeline.map((item, index) => (
-							<TimelineItem key={`${item.type}-${item.data.id}`} item={item} />
-						))}
-					</div>
+					<>
+						<div className="space-y-4">
+							{timeline.map((item) => (
+								<TimelineItem
+									key={`${item.type}-${item.data.id}`}
+									item={item}
+									isManager={isManager}
+									onDeletePhoto={
+										item.type === "photo"
+											? () =>
+													setPhotoToDelete({
+														id: item.data.id as string,
+													})
+											: undefined
+									}
+								/>
+							))}
+						</div>
+						{/* Delete photo confirmation */}
+						<AlertDialog
+							open={!!photoToDelete}
+							onOpenChange={(open) => !open && setPhotoToDelete(null)}
+						>
+							<AlertDialogContent>
+								<AlertDialogHeader>
+									<AlertDialogTitle>
+										{t("projects.field.deletePhoto")}
+									</AlertDialogTitle>
+									<AlertDialogDescription>
+										{t("projects.field.deletePhotoConfirm")}
+									</AlertDialogDescription>
+								</AlertDialogHeader>
+								<AlertDialogFooter>
+									<AlertDialogCancel>
+										{t("common.cancel")}
+									</AlertDialogCancel>
+									<Button
+										variant="destructive"
+										onClick={handleDeletePhoto}
+										disabled={deletePhotoMutation.isPending}
+									>
+										{deletePhotoMutation.isPending
+											? t("common.saving")
+											: t("projects.field.deletePhoto")}
+									</Button>
+								</AlertDialogFooter>
+							</AlertDialogContent>
+						</AlertDialog>
+					</>
 				)}
 			</div>
 		</div>
@@ -181,12 +275,16 @@ export function FieldTimeline({
 
 function TimelineItem({
 	item,
+	isManager,
+	onDeletePhoto,
 }: {
 	item: {
 		type: "report" | "photo" | "issue" | "progress";
 		data: Record<string, unknown>;
 		createdAt: Date;
 	};
+	isManager: boolean;
+	onDeletePhoto?: () => void;
 }) {
 	const t = useTranslations();
 
@@ -195,12 +293,24 @@ function TimelineItem({
 			return <DailyReportCard report={item.data} />;
 		case "photo":
 			return (
-				<div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-					<div className="mb-3 flex items-center gap-2 text-sm text-slate-500">
-						<Camera className="h-4 w-4" />
-						<span>{t("projects.field.photoUploaded")}</span>
-						<span className="text-slate-400">•</span>
-						<span>{formatDate(item.createdAt)}</span>
+				<div className="relative rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+					<div className="mb-3 flex items-center justify-between gap-2">
+						<div className="flex items-center gap-2 text-sm text-slate-500">
+							<Camera className="h-4 w-4" />
+							<span>{t("projects.field.photoUploaded")}</span>
+							<span className="text-slate-400">•</span>
+							<span>{formatDate(item.createdAt)}</span>
+						</div>
+						{isManager && onDeletePhoto && (
+							<button
+								type="button"
+								onClick={onDeletePhoto}
+								className="flex size-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+								aria-label={t("projects.field.deletePhoto")}
+							>
+								<Trash2 className="h-4 w-4" />
+							</button>
+						)}
 					</div>
 					<PhotoGrid photos={[item.data]} />
 				</div>

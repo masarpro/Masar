@@ -1,8 +1,9 @@
 "use client";
 
 import { Badge } from "@ui/components/badge";
-import Image from "next/image";
+import { ImageIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
 interface PhotoGridProps {
 	photos: Record<string, unknown>[];
@@ -25,6 +26,53 @@ function getCategoryColor(category: string) {
 	}
 }
 
+function PhotoGridItem({
+	photo,
+	t,
+}: {
+	photo: Record<string, unknown>;
+	t: ReturnType<typeof useTranslations>;
+}) {
+	const [imgError, setImgError] = useState(false);
+	const url = photo.url as string;
+	const caption = photo.caption as string | undefined;
+	const category = photo.category as string;
+	const id = photo.id as string;
+
+	const imageSrc =
+		url?.startsWith("http") || url?.startsWith("//")
+			? url
+			: url?.startsWith("/")
+				? `${typeof window !== "undefined" ? window.location.origin : ""}${url}`
+				: url;
+
+	return (
+		<div className="group relative aspect-square overflow-hidden rounded-xl">
+			{!imgError && imageSrc ? (
+				<img
+					src={imageSrc}
+					alt={caption || t("projects.field.photo")}
+					className="size-full object-cover transition-transform group-hover:scale-105"
+					onError={() => setImgError(true)}
+				/>
+			) : (
+				<div className="flex size-full items-center justify-center bg-slate-200 dark:bg-slate-700">
+					<ImageIcon className="h-8 w-8 text-slate-400" />
+				</div>
+			)}
+			<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+			<div className="absolute bottom-0 left-0 right-0 p-2 opacity-0 transition-opacity group-hover:opacity-100">
+				{caption && (
+					<p className="truncate text-sm text-white">{caption}</p>
+				)}
+				<Badge variant="secondary" className={getCategoryColor(category)}>
+					{t(`projects.field.photoCategory.${category}`)}
+				</Badge>
+			</div>
+		</div>
+	);
+}
+
 export function PhotoGrid({ photos }: PhotoGridProps) {
 	const t = useTranslations();
 
@@ -34,34 +82,9 @@ export function PhotoGrid({ photos }: PhotoGridProps) {
 
 	return (
 		<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-			{photos.map((photo) => {
-				const url = photo.url as string;
-				const caption = photo.caption as string | undefined;
-				const category = photo.category as string;
-				const id = photo.id as string;
-
-				return (
-					<div key={id} className="group relative aspect-square overflow-hidden rounded-xl">
-						<Image
-							src={url}
-							alt={caption || t("projects.field.photo")}
-							fill
-							sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
-							className="object-cover transition-transform group-hover:scale-105"
-							unoptimized
-						/>
-						<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-						<div className="absolute bottom-0 left-0 right-0 p-2 opacity-0 transition-opacity group-hover:opacity-100">
-							{caption && (
-								<p className="truncate text-sm text-white">{caption}</p>
-							)}
-							<Badge variant="secondary" className={getCategoryColor(category)}>
-								{t(`projects.field.photoCategory.${category}`)}
-							</Badge>
-						</div>
-					</div>
-				);
-			})}
+			{photos.map((photo) => (
+				<PhotoGridItem key={String(photo.id)} photo={photo} t={t} />
+			))}
 		</div>
 	);
 }

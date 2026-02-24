@@ -231,9 +231,13 @@ enum AuditAction {
   CO_REJECTED         // رفض أمر تغيير
   CO_IMPLEMENTED      // تنفيذ أمر تغيير
   // عقود مقاولي الباطن
-  SUBCONTRACT_CREATED  // إنشاء عقد مقاول باطن
-  SUBCONTRACT_UPDATED  // تعديل عقد مقاول باطن
-  SUBCONTRACT_DELETED  // حذف عقد مقاول باطن
+  SUBCONTRACT_CREATED          // إنشاء عقد مقاول باطن
+  SUBCONTRACT_UPDATED          // تعديل عقد مقاول باطن
+  SUBCONTRACT_DELETED          // حذف عقد مقاول باطن
+  SUBCONTRACT_CO_CREATED       // إنشاء أمر تغيير باطن
+  SUBCONTRACT_CO_UPDATED       // تعديل أمر تغيير باطن
+  SUBCONTRACT_CO_DELETED       // حذف أمر تغيير باطن
+  SUBCONTRACT_PAYMENT_CREATED  // إنشاء دفعة مقاول باطن
   // العقد الرئيسي
   CONTRACT_CREATED     // إنشاء عقد رئيسي
   CONTRACT_UPDATED     // تعديل عقد رئيسي
@@ -407,7 +411,9 @@ model User {
   // علاقات المالية
   expensesCreated       ProjectExpense[]        @relation("ExpenseCreator")
   claimsCreated         ProjectClaim[]          @relation("ClaimCreator")
-  subcontractsCreated   SubcontractContract[]   @relation("SubcontractCreator")
+  subcontractsCreated        SubcontractContract[]   @relation("SubcontractCreator")
+  subcontractCOsCreated      SubcontractChangeOrder[] @relation("SubcontractCOCreator")
+  subcontractPaymentsCreated SubcontractPayment[]     @relation("SubcontractPaymentCreator")
   contractsCreated      ProjectContract[]       @relation("ContractCreator")
 
   // علاقات الوثائق والاعتمادات
@@ -1015,6 +1021,8 @@ model Project {
 
   // العميل والموقع
   clientName      String?        @map("client_name")
+  clientId        String?        @map("client_id")
+  client          Client?        @relation("ClientProjects", fields: [clientId], references: [id])
   location        String?
 
   // المالية
@@ -1083,6 +1091,7 @@ model Project {
   @@unique([organizationId, slug])
   @@index([organizationId])
   @@index([createdById])
+  @@index([clientId])
   @@index([status])
   @@map("projects")
 }
@@ -1285,29 +1294,166 @@ model ProjectClaim {
   @@map("project_claims")
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// SUBCONTRACT MANAGEMENT - إدارة مقاولي الباطن
+// ═══════════════════════════════════════════════════════════════════════════
+
+// حالة عقد الباطن
+enum SubcontractStatus {
+  DRAFT         // مسودة
+  ACTIVE        // فعال
+  SUSPENDED     // معلق
+  COMPLETED     // مكتمل
+  TERMINATED    // ملغى
+}
+
+// نوع المقاول
+enum ContractorType {
+  COMPANY       // شركة
+  INDIVIDUAL    // فرد
+}
+
+// حالة أمر تغيير الباطن
+enum SubcontractCOStatus {
+  DRAFT         // مسودة
+  SUBMITTED     // مقدم
+  APPROVED      // معتمد
+  REJECTED      // مرفوض
+}
+
 // عقود مقاولي الباطن
 model SubcontractContract {
-  id              String    @id @default(cuid())
-  organizationId  String    @map("organization_id")
-  projectId       String    @map("project_id")
-  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id              String              @id @default(cuid())
+  organizationId  String              @map("organization_id")
+  projectId       String              @map("project_id")
+  project         Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
+  // رقم العقد التسلسلي
+  contractNo      String?             @map("contract_no")
+
+  // معلومات المقاول
   name            String
-  startDate       DateTime? @map("start_date") @db.Date
-  endDate         DateTime? @map("end_date") @db.Date
-  value           Decimal   @db.Decimal(15, 2)
-  notes           String?   @db.Text
+  contractorType  ContractorType      @default(COMPANY) @map("contractor_type")
+  companyName     String?             @map("company_name")
+  phone           String?
+  email           String?
+  taxNumber       String?             @map("tax_number")
+  crNumber        String?             @map("cr_number")
 
-  createdById     String    @map("created_by")
-  createdBy       User      @relation("SubcontractCreator", fields: [createdById], references: [id])
+  // تفاصيل العقد
+  status          SubcontractStatus   @default(DRAFT)
+  value           Decimal             @db.Decimal(15, 2)
+  startDate       DateTime?           @map("start_date") @db.Date
+  endDate         DateTime?           @map("end_date") @db.Date
+  signedDate      DateTime?           @map("signed_date") @db.Date
+  scopeOfWork     String?             @map("scope_of_work") @db.Text
+  notes           String?             @db.Text
 
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  // الضريبة والاحتفاظ
+  includesVat     Boolean             @default(false) @map("includes_vat")
+  vatPercent      Decimal?            @map("vat_percent") @db.Decimal(5, 2)
+  retentionPercent Decimal?           @map("retention_percent") @db.Decimal(5, 2)
 
-  expenses        ProjectExpense[] @relation("SubcontractExpenses")
+  // طريقة الدفع والمرفقات
+  paymentMethod   PaymentMethod?      @map("payment_method")
+  attachmentUrl   String?             @map("attachment_url")
+
+  createdById     String              @map("created_by")
+  createdBy       User                @relation("SubcontractCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  // العلاقات
+  expenses        ProjectExpense[]    @relation("SubcontractExpenses")
+  paymentTerms    SubcontractPaymentTerm[]
+  changeOrders    SubcontractChangeOrder[]
+  payments        SubcontractPayment[]
 
   @@index([organizationId, projectId])
+  @@index([organizationId, projectId, status])
   @@map("subcontract_contracts")
+}
+
+// مراحل دفع عقد الباطن
+model SubcontractPaymentTerm {
+  id              String              @id @default(cuid())
+  contractId      String              @map("contract_id")
+  contract        SubcontractContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  type            PaymentTermType     @default(MILESTONE)
+  label           String?
+  percent         Decimal?            @db.Decimal(5, 2)
+  amount          Decimal?            @db.Decimal(15, 2)
+  dueDate         DateTime?           @map("due_date") @db.Date
+  sortOrder       Int                 @default(0) @map("sort_order")
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  // ربط الدفعات
+  payments        SubcontractPayment[] @relation("SubcontractTermPayments")
+
+  @@index([contractId])
+  @@map("subcontract_payment_terms")
+}
+
+// أوامر تغيير مقاول الباطن
+model SubcontractChangeOrder {
+  id              String              @id @default(cuid())
+  contractId      String              @map("contract_id")
+  contract        SubcontractContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  orderNo         Int                 @map("order_no")
+  description     String              @db.Text
+  amount          Decimal             @db.Decimal(15, 2)
+  status          SubcontractCOStatus @default(DRAFT)
+  approvedDate    DateTime?           @map("approved_date") @db.Date
+  attachmentUrl   String?             @map("attachment_url")
+
+  createdById     String              @map("created_by")
+  createdBy       User                @relation("SubcontractCOCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  @@index([contractId])
+  @@map("subcontract_change_orders")
+}
+
+// دفعات مقاول الباطن (صادرة)
+model SubcontractPayment {
+  id              String              @id @default(cuid())
+  organizationId  String              @map("organization_id")
+  contractId      String              @map("contract_id")
+  contract        SubcontractContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  // ربط اختياري بمرحلة دفع
+  termId          String?             @map("term_id")
+  term            SubcontractPaymentTerm? @relation("SubcontractTermPayments", fields: [termId], references: [id], onDelete: SetNull)
+
+  paymentNo       String              @map("payment_no")
+  amount          Decimal             @db.Decimal(15, 2)
+  date            DateTime            @db.Date
+  paymentMethod   PaymentMethod?      @map("payment_method")
+  referenceNo     String?             @map("reference_no")
+  description     String?
+  notes           String?             @db.Text
+  status          FinanceTransactionStatus @default(COMPLETED)
+
+  // حساب المصدر (الحساب البنكي الذي تم الصرف منه)
+  sourceAccountId String?             @map("source_account_id")
+  sourceAccount   OrganizationBank?   @relation("SubcontractPaymentSource", fields: [sourceAccountId], references: [id], onDelete: SetNull)
+
+  createdById     String              @map("created_by")
+  createdBy       User                @relation("SubcontractPaymentCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  @@index([organizationId, contractId])
+  @@index([contractId, termId])
+  @@map("subcontract_payments")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1395,6 +1541,9 @@ model ContractPaymentTerm {
   dueDate     DateTime?        @map("due_date") @db.Date
   milestoneId String?          @map("milestone_id")
   sortOrder   Int              @default(0) @map("sort_order")
+
+  // الدفعات المرتبطة بهذه المرحلة
+  payments    FinancePayment[] @relation("TermPayments")
 
   createdAt   DateTime         @default(now()) @map("created_at")
   updatedAt   DateTime         @updatedAt @map("updated_at")
@@ -2123,6 +2272,7 @@ model Client {
   invoices        FinanceInvoice[]
   contacts        ClientContact[]   // جهات الاتصال
   payments        FinancePayment[]  @relation("ClientPayments")  // المقبوضات
+  projects        Project[]         @relation("ClientProjects")  // المشاريع
 
   @@index([organizationId])
   @@index([organizationId, name])
@@ -2519,8 +2669,9 @@ model OrganizationBank {
   // العلاقات
   expensesFrom    FinanceExpense[]    @relation("ExpenseSourceAccount")
   paymentsTo      FinancePayment[]    @relation("PaymentDestinationAccount")
-  transfersFrom   FinanceTransfer[]   @relation("TransferSource")
-  transfersTo     FinanceTransfer[]   @relation("TransferDestination")
+  transfersFrom         FinanceTransfer[]    @relation("TransferSource")
+  transfersTo           FinanceTransfer[]    @relation("TransferDestination")
+  subcontractPayments   SubcontractPayment[] @relation("SubcontractPaymentSource")
 
   @@index([organizationId])
   @@index([organizationId, accountType])
@@ -2617,6 +2768,10 @@ model FinancePayment {
   invoiceId            String?                   @map("invoice_id")
   invoice              FinanceInvoice?           @relation("InvoiceDirectPayments", fields: [invoiceId], references: [id], onDelete: SetNull)
 
+  // ربط اختياري بمرحلة دفع في العقد
+  contractTermId       String?                   @map("contract_term_id")
+  contractTerm         ContractPaymentTerm?      @relation("TermPayments", fields: [contractTermId], references: [id], onDelete: SetNull)
+
   // طريقة الدفع
   paymentMethod        PaymentMethod             @default(CASH) @map("payment_method")
   referenceNo          String?                   @map("reference_no")
@@ -2639,6 +2794,7 @@ model FinancePayment {
   @@index([organizationId, clientId])
   @@index([organizationId, projectId])
   @@index([organizationId, destinationAccountId])
+  @@index([contractTermId])
   @@map("finance_payments")
 }
 

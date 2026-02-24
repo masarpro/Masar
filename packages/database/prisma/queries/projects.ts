@@ -133,6 +133,7 @@ export async function createProject(data: {
 	description?: string;
 	type?: ProjectType;
 	clientName?: string;
+	clientId?: string;
 	location?: string;
 	contractValue?: number;
 	startDate?: Date;
@@ -179,6 +180,7 @@ export async function createProject(data: {
 			description: data.description,
 			type: data.type,
 			clientName: data.clientName,
+			clientId: data.clientId,
 			location: data.location,
 			contractValue: data.contractValue,
 			startDate: data.startDate,
@@ -258,6 +260,7 @@ export async function updateProject(
 		status: ProjectStatus;
 		type: ProjectType;
 		clientName: string;
+		clientId: string | null;
 		location: string;
 		contractValue: number;
 		progress: number;

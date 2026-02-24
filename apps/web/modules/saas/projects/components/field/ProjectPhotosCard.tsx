@@ -1,7 +1,7 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
 import {
 	Camera,
@@ -10,11 +10,23 @@ import {
 	ImageIcon,
 	Loader2,
 	Plus,
+	Trash2,
 	X,
 } from "lucide-react";
-import Image from "next/image";
+import {
+	AlertDialog,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@ui/components/alert-dialog";
+import { Button } from "@ui/components/button";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import { useProjectRole } from "../../hooks/use-project-role";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Lightbox from "yet-another-react-lightbox";
 import Captions from "yet-another-react-lightbox/plugins/captions";
@@ -80,12 +92,39 @@ export function ProjectPhotosCard({
 	projectId,
 }: ProjectPhotosCardProps) {
 	const t = useTranslations();
+	const queryClient = useQueryClient();
+	const { isManager } = useProjectRole();
 	const basePath = `/app/${organizationSlug}/projects/${projectId}`;
 	const [activeCategory, setActiveCategory] = useState<
 		PhotoCategory | "ALL"
 	>("ALL");
 	const [lightboxIndex, setLightboxIndex] = useState(-1);
 	const [viewMode, setViewMode] = useState<"date" | "category">("date");
+	const [photoToDelete, setPhotoToDelete] = useState<{
+		id: string;
+		caption: string | null;
+	} | null>(null);
+
+	const deleteMutation = useMutation({
+		...orpc.projectField.deletePhoto.mutationOptions(),
+		onSuccess: () => {
+			toast.success(t("projects.field.photoDeleted"));
+			setPhotoToDelete(null);
+			queryClient.invalidateQueries({ queryKey: ["projectField"] });
+		},
+		onError: () => {
+			toast.error(t("projects.field.photoDeleteError"));
+		},
+	});
+
+	const handleDeletePhoto = () => {
+		if (!photoToDelete) return;
+		deleteMutation.mutate({
+			organizationId,
+			projectId,
+			photoId: photoToDelete.id,
+		});
+	};
 
 	// Fetch all photos
 	const { data, isLoading } = useQuery(
@@ -329,6 +368,15 @@ export function ProjectPhotosCard({
 											onClick={() =>
 												openLightbox(photo.id)
 											}
+											onDelete={
+												isManager
+													? () =>
+															setPhotoToDelete({
+																id: photo.id,
+																caption: photo.caption,
+															})
+													: undefined
+											}
 											t={t}
 										/>
 									))}
@@ -364,6 +412,15 @@ export function ProjectPhotosCard({
 											onClick={() =>
 												openLightbox(photo.id)
 											}
+											onDelete={
+												isManager
+													? () =>
+															setPhotoToDelete({
+																id: photo.id,
+																caption: photo.caption,
+															})
+													: undefined
+											}
 											t={t}
 										/>
 									))}
@@ -373,6 +430,35 @@ export function ProjectPhotosCard({
 					</div>
 				)}
 			</div>
+
+			{/* Delete confirmation */}
+			<AlertDialog
+				open={!!photoToDelete}
+				onOpenChange={(open) => !open && setPhotoToDelete(null)}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							{t("projects.field.deletePhoto")}
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							{t("projects.field.deletePhotoConfirm")}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+						<Button
+							variant="destructive"
+							onClick={handleDeletePhoto}
+							disabled={deleteMutation.isPending}
+						>
+							{deleteMutation.isPending
+								? t("common.saving")
+								: t("projects.field.deletePhoto")}
+						</Button>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 
 			{/* Lightbox */}
 			<Lightbox
@@ -418,28 +504,45 @@ interface PhotoThumbnailProps {
 		createdAt: Date;
 	};
 	onClick: () => void;
+	onDelete?: () => void;
 	t: ReturnType<typeof useTranslations>;
 }
 
-function PhotoThumbnail({ photo, onClick, t }: PhotoThumbnailProps) {
+function PhotoThumbnail({ photo, onClick, onDelete, t }: PhotoThumbnailProps) {
+	const [imgError, setImgError] = useState(false);
+
+	// Ensure URL is absolute (handle relative paths)
+	const imageSrc =
+		photo.url.startsWith("http") || photo.url.startsWith("//")
+			? photo.url
+			: photo.url.startsWith("/")
+				? `${typeof window !== "undefined" ? window.location.origin : ""}${photo.url}`
+				: photo.url;
+
 	return (
-		<button
-			type="button"
-			onClick={onClick}
-			className="group relative aspect-square overflow-hidden rounded-xl border border-slate-100 bg-slate-50 transition-all hover:border-violet-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-800/50 dark:hover:border-violet-700"
-		>
-			<Image
-				src={photo.url}
-				alt={photo.caption || t("projects.field.photo")}
-				fill
-				sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, 16vw"
-				className="object-cover transition-transform duration-300 group-hover:scale-110"
-				unoptimized
-			/>
+		<div className="group relative aspect-square overflow-hidden rounded-xl border border-slate-100 bg-slate-50 transition-all hover:border-violet-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-800/50 dark:hover:border-violet-700">
+			<button
+				type="button"
+				onClick={onClick}
+				className="absolute inset-0 size-full"
+			>
+				{!imgError ? (
+					<img
+						src={imageSrc}
+						alt={photo.caption || t("projects.field.photo")}
+						className="absolute inset-0 size-full object-cover transition-transform duration-300 group-hover:scale-110"
+						onError={() => setImgError(true)}
+					/>
+				) : (
+					<div className="flex size-full items-center justify-center bg-slate-200 dark:bg-slate-700">
+						<ImageIcon className="h-8 w-8 text-slate-400" />
+					</div>
+				)}
+			</button>
 			{/* Hover overlay */}
-			<div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+			<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
 			{/* Category badge */}
-			<div className="absolute bottom-0 left-0 right-0 flex items-end justify-between p-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+			<div className="pointer-events-none absolute bottom-0 left-0 right-0 flex items-end justify-between p-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
 				<Badge
 					variant="secondary"
 					className={`${getCategoryColor(photo.category)} border text-[9px]`}
@@ -448,11 +551,26 @@ function PhotoThumbnail({ photo, onClick, t }: PhotoThumbnailProps) {
 				</Badge>
 			</div>
 			{/* Expand icon on hover */}
-			<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+			<div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
 				<div className="rounded-full bg-white/20 p-2 backdrop-blur-sm">
 					<ImageIcon className="h-4 w-4 text-white" />
 				</div>
 			</div>
-		</button>
+			{/* Delete button - project manager only */}
+			{onDelete && (
+				<button
+					type="button"
+					onClick={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+						onDelete();
+					}}
+					className="absolute end-1.5 top-1.5 flex size-7 items-center justify-center rounded-lg bg-red-500/90 text-white opacity-0 transition-opacity duration-200 hover:bg-red-600 group-hover:opacity-100"
+					aria-label={t("projects.field.deletePhoto")}
+				>
+					<Trash2 className="h-3.5 w-3.5" />
+				</button>
+			)}
+		</div>
 	);
 }

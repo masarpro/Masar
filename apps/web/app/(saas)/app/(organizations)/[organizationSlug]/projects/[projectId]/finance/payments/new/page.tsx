@@ -1,5 +1,6 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { PaymentForm } from "@saas/finance/components/payments/PaymentForm";
+import { ProjectPaymentForm } from "@saas/projects/components/finance/ProjectPaymentForm";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -7,7 +8,7 @@ export async function generateMetadata() {
 	const t = await getTranslations();
 
 	return {
-		title: t("finance.payments.new"),
+		title: t("projectPayments.newPayment"),
 	};
 }
 
@@ -30,12 +31,14 @@ export default async function NewProjectPaymentPage({
 
 	return (
 		<div>
-			<PaymentForm
-				organizationId={activeOrganization.id}
-				organizationSlug={organizationSlug}
-				defaultProjectId={projectId}
-				redirectPath={redirectPath}
-			/>
+			<Suspense>
+				<ProjectPaymentForm
+					organizationId={activeOrganization.id}
+					organizationSlug={organizationSlug}
+					projectId={projectId}
+					redirectPath={redirectPath}
+				/>
+			</Suspense>
 		</div>
 	);
 }

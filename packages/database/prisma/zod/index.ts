@@ -127,7 +127,7 @@ export type QuoteScalarFieldEnum = z.infer<typeof QuoteScalarFieldEnumSchema>;
 
 // File: ProjectScalarFieldEnum.schema.ts
 
-export const ProjectScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'name', 'slug', 'projectNo', 'description', 'status', 'type', 'clientName', 'location', 'contractValue', 'progress', 'startDate', 'endDate', 'createdById', 'createdAt', 'updatedAt'])
+export const ProjectScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'name', 'slug', 'projectNo', 'description', 'status', 'type', 'clientName', 'clientId', 'location', 'contractValue', 'progress', 'startDate', 'endDate', 'createdById', 'createdAt', 'updatedAt'])
 
 export type ProjectScalarFieldEnum = z.infer<typeof ProjectScalarFieldEnumSchema>;
 
@@ -175,9 +175,27 @@ export type ProjectClaimScalarFieldEnum = z.infer<typeof ProjectClaimScalarField
 
 // File: SubcontractContractScalarFieldEnum.schema.ts
 
-export const SubcontractContractScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'name', 'startDate', 'endDate', 'value', 'notes', 'createdById', 'createdAt', 'updatedAt'])
+export const SubcontractContractScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'contractNo', 'name', 'contractorType', 'companyName', 'phone', 'email', 'taxNumber', 'crNumber', 'status', 'value', 'startDate', 'endDate', 'signedDate', 'scopeOfWork', 'notes', 'includesVat', 'vatPercent', 'retentionPercent', 'paymentMethod', 'attachmentUrl', 'createdById', 'createdAt', 'updatedAt'])
 
 export type SubcontractContractScalarFieldEnum = z.infer<typeof SubcontractContractScalarFieldEnumSchema>;
+
+// File: SubcontractPaymentTermScalarFieldEnum.schema.ts
+
+export const SubcontractPaymentTermScalarFieldEnumSchema = z.enum(['id', 'contractId', 'type', 'label', 'percent', 'amount', 'dueDate', 'sortOrder', 'createdAt', 'updatedAt'])
+
+export type SubcontractPaymentTermScalarFieldEnum = z.infer<typeof SubcontractPaymentTermScalarFieldEnumSchema>;
+
+// File: SubcontractChangeOrderScalarFieldEnum.schema.ts
+
+export const SubcontractChangeOrderScalarFieldEnumSchema = z.enum(['id', 'contractId', 'orderNo', 'description', 'amount', 'status', 'approvedDate', 'attachmentUrl', 'createdById', 'createdAt', 'updatedAt'])
+
+export type SubcontractChangeOrderScalarFieldEnum = z.infer<typeof SubcontractChangeOrderScalarFieldEnumSchema>;
+
+// File: SubcontractPaymentScalarFieldEnum.schema.ts
+
+export const SubcontractPaymentScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'contractId', 'termId', 'paymentNo', 'amount', 'date', 'paymentMethod', 'referenceNo', 'description', 'notes', 'status', 'sourceAccountId', 'createdById', 'createdAt', 'updatedAt'])
+
+export type SubcontractPaymentScalarFieldEnum = z.infer<typeof SubcontractPaymentScalarFieldEnumSchema>;
 
 // File: ProjectContractScalarFieldEnum.schema.ts
 
@@ -373,7 +391,7 @@ export type FinanceExpenseScalarFieldEnum = z.infer<typeof FinanceExpenseScalarF
 
 // File: FinancePaymentScalarFieldEnum.schema.ts
 
-export const FinancePaymentScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'paymentNo', 'amount', 'date', 'destinationAccountId', 'clientId', 'clientName', 'projectId', 'invoiceId', 'paymentMethod', 'referenceNo', 'status', 'description', 'notes', 'createdById', 'createdAt', 'updatedAt'])
+export const FinancePaymentScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'paymentNo', 'amount', 'date', 'destinationAccountId', 'clientId', 'clientName', 'projectId', 'invoiceId', 'contractTermId', 'paymentMethod', 'referenceNo', 'status', 'description', 'notes', 'createdById', 'createdAt', 'updatedAt'])
 
 export type FinancePaymentScalarFieldEnum = z.infer<typeof FinancePaymentScalarFieldEnumSchema>;
 
@@ -497,11 +515,17 @@ export const ClaimStatusSchema = z.enum(['DRAFT', 'SUBMITTED', 'APPROVED', 'PAID
 
 export type ClaimStatus = z.infer<typeof ClaimStatusSchema>;
 
-// File: ContractStatus.schema.ts
+// File: ContractorType.schema.ts
 
-export const ContractStatusSchema = z.enum(['DRAFT', 'ACTIVE', 'SUSPENDED', 'CLOSED'])
+export const ContractorTypeSchema = z.enum(['COMPANY', 'INDIVIDUAL'])
 
-export type ContractStatus = z.infer<typeof ContractStatusSchema>;
+export type ContractorType = z.infer<typeof ContractorTypeSchema>;
+
+// File: SubcontractStatus.schema.ts
+
+export const SubcontractStatusSchema = z.enum(['DRAFT', 'ACTIVE', 'SUSPENDED', 'COMPLETED', 'TERMINATED'])
+
+export type SubcontractStatus = z.infer<typeof SubcontractStatusSchema>;
 
 // File: PaymentMethod.schema.ts
 
@@ -514,6 +538,24 @@ export type PaymentMethod = z.infer<typeof PaymentMethodSchema>;
 export const PaymentTermTypeSchema = z.enum(['ADVANCE', 'MILESTONE', 'MONTHLY', 'COMPLETION', 'CUSTOM'])
 
 export type PaymentTermType = z.infer<typeof PaymentTermTypeSchema>;
+
+// File: SubcontractCOStatus.schema.ts
+
+export const SubcontractCOStatusSchema = z.enum(['DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED'])
+
+export type SubcontractCOStatus = z.infer<typeof SubcontractCOStatusSchema>;
+
+// File: FinanceTransactionStatus.schema.ts
+
+export const FinanceTransactionStatusSchema = z.enum(['PENDING', 'COMPLETED', 'CANCELLED'])
+
+export type FinanceTransactionStatus = z.infer<typeof FinanceTransactionStatusSchema>;
+
+// File: ContractStatus.schema.ts
+
+export const ContractStatusSchema = z.enum(['DRAFT', 'ACTIVE', 'SUSPENDED', 'CLOSED'])
+
+export type ContractStatus = z.infer<typeof ContractStatusSchema>;
 
 // File: DocumentFolder.schema.ts
 
@@ -535,7 +577,7 @@ export type ApproverStatus = z.infer<typeof ApproverStatusSchema>;
 
 // File: AuditAction.schema.ts
 
-export const AuditActionSchema = z.enum(['DOC_CREATED', 'APPROVAL_REQUESTED', 'APPROVAL_DECIDED', 'MESSAGE_SENT', 'TOKEN_CREATED', 'TOKEN_REVOKED', 'CLAIM_STATUS_CHANGED', 'EXPENSE_CREATED', 'ATTACHMENT_CREATED', 'CO_CREATED', 'CO_SUBMITTED', 'CO_APPROVED', 'CO_REJECTED', 'CO_IMPLEMENTED', 'SUBCONTRACT_CREATED', 'SUBCONTRACT_UPDATED', 'SUBCONTRACT_DELETED', 'CONTRACT_CREATED', 'CONTRACT_UPDATED'])
+export const AuditActionSchema = z.enum(['DOC_CREATED', 'APPROVAL_REQUESTED', 'APPROVAL_DECIDED', 'MESSAGE_SENT', 'TOKEN_CREATED', 'TOKEN_REVOKED', 'CLAIM_STATUS_CHANGED', 'EXPENSE_CREATED', 'ATTACHMENT_CREATED', 'CO_CREATED', 'CO_SUBMITTED', 'CO_APPROVED', 'CO_REJECTED', 'CO_IMPLEMENTED', 'SUBCONTRACT_CREATED', 'SUBCONTRACT_UPDATED', 'SUBCONTRACT_DELETED', 'SUBCONTRACT_CO_CREATED', 'SUBCONTRACT_CO_UPDATED', 'SUBCONTRACT_CO_DELETED', 'SUBCONTRACT_PAYMENT_CREATED', 'CONTRACT_CREATED', 'CONTRACT_UPDATED'])
 
 export type AuditAction = z.infer<typeof AuditActionSchema>;
 
@@ -676,12 +718,6 @@ export type FinanceAccountType = z.infer<typeof FinanceAccountTypeSchema>;
 export const OrgExpenseCategorySchema = z.enum(['MATERIALS', 'LABOR', 'EQUIPMENT_RENTAL', 'EQUIPMENT_PURCHASE', 'SUBCONTRACTOR', 'TRANSPORT', 'SALARIES', 'RENT', 'UTILITIES', 'COMMUNICATIONS', 'INSURANCE', 'LICENSES', 'BANK_FEES', 'FUEL', 'MAINTENANCE', 'SUPPLIES', 'MARKETING', 'TRAINING', 'TRAVEL', 'HOSPITALITY', 'LOAN_PAYMENT', 'TAXES', 'ZAKAT', 'REFUND', 'MISC', 'CUSTOM'])
 
 export type OrgExpenseCategory = z.infer<typeof OrgExpenseCategorySchema>;
-
-// File: FinanceTransactionStatus.schema.ts
-
-export const FinanceTransactionStatusSchema = z.enum(['PENDING', 'COMPLETED', 'CANCELLED'])
-
-export type FinanceTransactionStatus = z.infer<typeof FinanceTransactionStatusSchema>;
 
 // File: User.schema.ts
 
@@ -1100,6 +1136,7 @@ export const ProjectSchema = z.object({
   status: ProjectStatusSchema.default("ACTIVE"),
   type: ProjectTypeSchema.nullish(),
   clientName: z.string().nullish(),
+  clientId: z.string().nullish(),
   location: z.string().nullish(),
   contractValue: z.instanceof(Prisma.Decimal, {
   message: "Field 'contractValue' must be a Decimal. Location: ['Models', 'Project']",
@@ -1250,19 +1287,107 @@ export const SubcontractContractSchema = z.object({
   id: z.string(),
   organizationId: z.string(),
   projectId: z.string(),
+  contractNo: z.string().nullish(),
   name: z.string(),
-  startDate: z.date().nullish(),
-  endDate: z.date().nullish(),
+  contractorType: ContractorTypeSchema.default("COMPANY"),
+  companyName: z.string().nullish(),
+  phone: z.string().nullish(),
+  email: z.string().nullish(),
+  taxNumber: z.string().nullish(),
+  crNumber: z.string().nullish(),
+  status: SubcontractStatusSchema.default("DRAFT"),
   value: z.instanceof(Prisma.Decimal, {
   message: "Field 'value' must be a Decimal. Location: ['Models', 'SubcontractContract']",
 }),
+  startDate: z.date().nullish(),
+  endDate: z.date().nullish(),
+  signedDate: z.date().nullish(),
+  scopeOfWork: z.string().nullish(),
   notes: z.string().nullish(),
+  includesVat: z.boolean(),
+  vatPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'vatPercent' must be a Decimal. Location: ['Models', 'SubcontractContract']",
+}).nullish(),
+  retentionPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'retentionPercent' must be a Decimal. Location: ['Models', 'SubcontractContract']",
+}).nullish(),
+  paymentMethod: PaymentMethodSchema.nullish(),
+  attachmentUrl: z.string().nullish(),
   createdById: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
 
 export type SubcontractContractType = z.infer<typeof SubcontractContractSchema>;
+
+
+// File: SubcontractPaymentTerm.schema.ts
+
+export const SubcontractPaymentTermSchema = z.object({
+  id: z.string(),
+  contractId: z.string(),
+  type: PaymentTermTypeSchema.default("MILESTONE"),
+  label: z.string().nullish(),
+  percent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'percent' must be a Decimal. Location: ['Models', 'SubcontractPaymentTerm']",
+}).nullish(),
+  amount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'amount' must be a Decimal. Location: ['Models', 'SubcontractPaymentTerm']",
+}).nullish(),
+  dueDate: z.date().nullish(),
+  sortOrder: z.number().int(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type SubcontractPaymentTermType = z.infer<typeof SubcontractPaymentTermSchema>;
+
+
+// File: SubcontractChangeOrder.schema.ts
+
+export const SubcontractChangeOrderSchema = z.object({
+  id: z.string(),
+  contractId: z.string(),
+  orderNo: z.number().int(),
+  description: z.string(),
+  amount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'amount' must be a Decimal. Location: ['Models', 'SubcontractChangeOrder']",
+}),
+  status: SubcontractCOStatusSchema.default("DRAFT"),
+  approvedDate: z.date().nullish(),
+  attachmentUrl: z.string().nullish(),
+  createdById: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type SubcontractChangeOrderType = z.infer<typeof SubcontractChangeOrderSchema>;
+
+
+// File: SubcontractPayment.schema.ts
+
+export const SubcontractPaymentSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  contractId: z.string(),
+  termId: z.string().nullish(),
+  paymentNo: z.string(),
+  amount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'amount' must be a Decimal. Location: ['Models', 'SubcontractPayment']",
+}),
+  date: z.date(),
+  paymentMethod: PaymentMethodSchema.nullish(),
+  referenceNo: z.string().nullish(),
+  description: z.string().nullish(),
+  notes: z.string().nullish(),
+  status: FinanceTransactionStatusSchema.default("COMPLETED"),
+  sourceAccountId: z.string().nullish(),
+  createdById: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type SubcontractPaymentType = z.infer<typeof SubcontractPaymentSchema>;
 
 
 // File: ProjectContract.schema.ts
@@ -2067,6 +2192,7 @@ export const FinancePaymentSchema = z.object({
   clientName: z.string().nullish(),
   projectId: z.string().nullish(),
   invoiceId: z.string().nullish(),
+  contractTermId: z.string().nullish(),
   paymentMethod: PaymentMethodSchema.default("CASH"),
   referenceNo: z.string().nullish(),
   status: FinanceTransactionStatusSchema.default("COMPLETED"),

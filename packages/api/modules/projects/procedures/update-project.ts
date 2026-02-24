@@ -28,6 +28,7 @@ export const updateProjectProcedure = protectedProcedure
 				])
 				.optional(),
 			clientName: z.string().optional(),
+			clientId: z.string().nullable().optional(),
 			location: z.string().optional(),
 			contractValue: z.number().positive().optional(),
 			progress: z.number().min(0).max(100).optional(),
@@ -51,6 +52,7 @@ export const updateProjectProcedure = protectedProcedure
 				status: input.status,
 				type: input.type,
 				clientName: input.clientName,
+				clientId: input.clientId,
 				location: input.location,
 				contractValue: input.contractValue,
 				progress: input.progress,

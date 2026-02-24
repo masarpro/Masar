@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@ui/lib";
-import { ChevronLeft, Menu } from "lucide-react";
+import { ChevronRight, Menu } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useSidebar } from "./sidebar-context";
@@ -20,7 +20,7 @@ export function SidebarHeader({ collapsed, headerExtra }: SidebarHeaderProps) {
 			<div
 				className={cn(
 					"flex h-16 items-center border-b border-border px-4",
-					collapsed ? "justify-center" : "justify-between",
+					collapsed ? "justify-end" : "justify-between",
 				)}
 			>
 				{!collapsed && (
@@ -40,7 +40,7 @@ export function SidebarHeader({ collapsed, headerExtra }: SidebarHeaderProps) {
 					aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
 				>
 					{collapsed ? (
-						<ChevronLeft className="size-5 rtl-flip" />
+						<ChevronRight className="size-5 rtl-flip" />
 					) : (
 						<Menu className="size-5" />
 					)}
