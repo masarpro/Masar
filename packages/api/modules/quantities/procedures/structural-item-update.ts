@@ -38,7 +38,7 @@ export const structuralItemUpdate = protectedProcedure
 		await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "quantities", action: "edit" },
+			{ section: "pricing", action: "studies" },
 		);
 
 		// Verify the study exists and belongs to the organization

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
-	FileText,
 	Receipt,
 	TrendingDown,
 	TrendingUp,
@@ -29,18 +28,8 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 	const t = useTranslations();
 	const basePath = `/app/${organizationSlug}/finance`;
 
-	// Main 4 sections with cards
+	// Main 3 sections with cards
 	const mainSections: MainSection[] = [
-		{
-			id: "quotations",
-			icon: FileText,
-			browsePath: `${basePath}/quotations`,
-			createPath: `${basePath}/quotations/new`,
-			iconColor: "text-blue-500 dark:text-blue-400",
-			bgColor: "bg-blue-50/80 dark:bg-blue-950/30",
-			hoverBg: "hover:bg-blue-100 dark:hover:bg-blue-900/50",
-			borderColor: "border-blue-200/50 dark:border-blue-800/50",
-		},
 		{
 			id: "invoices",
 			icon: Receipt,
@@ -74,7 +63,7 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 	];
 
 	return (
-		<div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+		<div className="grid grid-cols-3 gap-4">
 			{mainSections.map((section) => {
 				const Icon = section.icon;
 				return (

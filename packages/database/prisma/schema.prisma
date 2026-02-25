@@ -326,6 +326,30 @@ enum FinanceTransactionStatus {
   CANCELLED  // ملغية
 }
 
+// مصدر المصروف
+enum ExpenseSourceType {
+  MANUAL              // يدوي
+  FACILITY_PAYROLL    // رواتب المنشأة
+  FACILITY_RECURRING  // مصروفات متكررة
+  FACILITY_ASSET      // أصول المنشأة
+  PROJECT             // مشروع
+}
+
+// حالة دورة الرواتب
+enum PayrollRunStatus {
+  DRAFT      // مسودة
+  APPROVED   // معتمد
+  PAID       // مدفوع
+  CANCELLED  // ملغي
+}
+
+// حالة دورة ترحيل المصروفات
+enum ExpenseRunStatus {
+  DRAFT      // مسودة
+  POSTED     // مرحّل
+  CANCELLED  // ملغي
+}
+
 // طريقة الدفع
 enum PaymentMethod {
   CASH           // نقدي
@@ -370,6 +394,90 @@ enum PaymentTermType {
   MONTHLY    // دفعة شهرية
   COMPLETION // عند الإنهاء
   CUSTOM     // مخصص
+}
+
+// ═══════════════════════════════════════════════════════════
+// COMPANY MANAGEMENT ENUMS - إدارة المنشأة
+// ═══════════════════════════════════════════════════════════
+
+// فئات المصروفات الثابتة للمنشأة
+enum CompanyExpenseCategory {
+  RENT              // إيجار مكتب/مستودع
+  UTILITIES         // كهرباء وماء
+  COMMUNICATIONS    // اتصالات وإنترنت
+  INSURANCE         // تأمين
+  LICENSES          // تراخيص ورسوم حكومية
+  SUBSCRIPTIONS     // اشتراكات برامج/خدمات
+  MAINTENANCE       // صيانة مكاتب/معدات
+  BANK_FEES         // رسوم بنكية
+  MARKETING         // تسويق وإعلان
+  TRANSPORT         // نقل ومواصلات
+  HOSPITALITY       // ضيافة
+  OTHER             // أخرى
+}
+
+// نوع التكرار
+enum RecurrenceType {
+  MONTHLY       // شهري
+  QUARTERLY     // ربع سنوي
+  SEMI_ANNUAL   // نصف سنوي
+  ANNUAL        // سنوي
+  ONE_TIME      // مرة واحدة
+}
+
+// نوع الأصل (ملكية)
+enum AssetType {
+  OWNED         // مملوك
+  RENTED        // مستأجر
+  LEASED        // تأجير تمويلي
+}
+
+// فئة الأصل
+enum AssetCategory {
+  HEAVY_EQUIPMENT   // معدات ثقيلة (حفارات، رافعات)
+  LIGHT_EQUIPMENT   // معدات خفيفة (مثاقب، قواطع)
+  VEHICLES          // مركبات
+  TOOLS             // عدد وأدوات
+  IT_EQUIPMENT      // أجهزة حاسب وتقنية
+  FURNITURE         // أثاث مكتبي
+  SAFETY_EQUIPMENT  // معدات سلامة
+  SURVEYING         // أجهزة مساحة
+  OTHER             // أخرى
+}
+
+// حالة الأصل
+enum AssetStatus {
+  AVAILABLE     // متاح
+  IN_USE        // قيد الاستخدام
+  MAINTENANCE   // صيانة
+  RETIRED       // مستبعد
+}
+
+// نوع الموظف (المسمى الوظيفي)
+enum EmployeeType {
+  PROJECT_MANAGER     // مدير مشاريع
+  SITE_ENGINEER       // مهندس موقع
+  SUPERVISOR          // مشرف
+  ACCOUNTANT          // محاسب
+  ADMIN               // إداري
+  DRIVER              // سائق
+  TECHNICIAN          // فني
+  LABORER             // عامل
+  SECURITY            // حارس أمن
+  OTHER               // أخرى
+}
+
+// نوع الراتب
+enum SalaryType {
+  MONTHLY       // شهري
+  DAILY         // يومي
+}
+
+// حالة الموظف
+enum EmployeeStatus {
+  ACTIVE        // نشط
+  ON_LEAVE      // إجازة
+  TERMINATED    // منتهي
 }
 
 model User {
@@ -460,6 +568,20 @@ model User {
   orgExpensesCreated       FinanceExpense[]           @relation("ExpenseCreator")
   orgPaymentsCreated       FinancePayment[]           @relation("PaymentCreator")
   orgTransfersCreated      FinanceTransfer[]          @relation("TransferCreator")
+
+  // Company Management - إدارة المنشأة
+  linkedEmployees          Employee[]                 @relation("EmployeeLinkedUser")
+
+  // Payroll - الرواتب
+  payrollRunsCreated       PayrollRun[]               @relation("PayrollRunCreator")
+  payrollRunsApproved      PayrollRun[]               @relation("PayrollRunApprover")
+
+  // Expense Runs - ترحيل المصروفات
+  expenseRunsCreated       CompanyExpenseRun[]         @relation("ExpenseRunCreator")
+  expenseRunsPosted        CompanyExpenseRun[]         @relation("ExpenseRunPoster")
+
+  // Organization Audit Trail - سجل التدقيق المؤسسي
+  orgAuditActions          OrganizationAuditLog[]     @relation("OrgAuditActor")
 
   // علاقات فريق المشروع
   projectMemberships       ProjectMember[]            @relation("ProjectMemberUser")
@@ -646,6 +768,21 @@ model Organization {
   financePayments      FinancePayment[]
   financeTransfers     FinanceTransfer[]
 
+  // Company Management - إدارة المنشأة
+  companyExpenses      CompanyExpense[]
+  companyEmployees     Employee[]
+  companyAssets        CompanyAsset[]
+
+  // Payroll - الرواتب
+  payrollRuns          PayrollRun[]
+  companyExpenseRuns   CompanyExpenseRun[]
+
+  // Audit Trail - سجل التدقيق
+  orgAuditLogs         OrganizationAuditLog[]
+
+  // Atomic Sequences - التسلسلات الذرية
+  sequences            OrganizationSequence[]
+
   // ═══ نهاية حقول مسار ═══
 
   @@unique([slug])
@@ -808,22 +945,22 @@ model CostStudy {
 
   // بيانات المشروع الأساسية
   projectType    String       @map("project_type")
-  landArea       Float        @map("land_area")
-  buildingArea   Float        @map("building_area")
+  landArea       Decimal      @map("land_area") @db.Decimal(15, 4)
+  buildingArea   Decimal      @map("building_area") @db.Decimal(15, 4)
   numberOfFloors Int          @map("number_of_floors")
   hasBasement    Boolean      @default(false) @map("has_basement")
   finishingLevel String       @map("finishing_level")
 
   // ملخص التكاليف
-  structuralCost     Float @default(0) @map("structural_cost")
-  finishingCost      Float @default(0) @map("finishing_cost")
-  mepCost            Float @default(0) @map("mep_cost")
-  laborCost          Float @default(0) @map("labor_cost")
-  overheadPercent    Float @default(5) @map("overhead_percent")
-  profitPercent      Float @default(10) @map("profit_percent")
-  contingencyPercent Float @default(3) @map("contingency_percent")
+  structuralCost     Decimal @default(0) @map("structural_cost") @db.Decimal(15, 2)
+  finishingCost      Decimal @default(0) @map("finishing_cost") @db.Decimal(15, 2)
+  mepCost            Decimal @default(0) @map("mep_cost") @db.Decimal(15, 2)
+  laborCost          Decimal @default(0) @map("labor_cost") @db.Decimal(15, 2)
+  overheadPercent    Decimal @default(5) @map("overhead_percent") @db.Decimal(5, 2)
+  profitPercent      Decimal @default(10) @map("profit_percent") @db.Decimal(5, 2)
+  contingencyPercent Decimal @default(3) @map("contingency_percent") @db.Decimal(5, 2)
   vatIncluded        Boolean @default(true) @map("vat_included")
-  totalCost          Float @default(0) @map("total_cost")
+  totalCost          Decimal @default(0) @map("total_cost") @db.Decimal(15, 2)
 
   status String  @default("draft")
   notes  String? @db.Text
@@ -855,18 +992,18 @@ model StructuralItem {
   description String?   @db.Text
 
   dimensions     Json?
-  quantity       Float @default(0)
+  quantity       Decimal @default(0) @db.Decimal(15, 4)
   unit           String
 
-  concreteVolume Float? @map("concrete_volume")
+  concreteVolume Decimal? @map("concrete_volume") @db.Decimal(15, 4)
   concreteType   String?  @map("concrete_type")
-  steelWeight    Float? @map("steel_weight")
-  steelRatio     Float? @map("steel_ratio")
-  wastagePercent Float  @default(10) @map("wastage_percent")
+  steelWeight    Decimal? @map("steel_weight") @db.Decimal(15, 4)
+  steelRatio     Decimal? @map("steel_ratio") @db.Decimal(5, 2)
+  wastagePercent Decimal  @default(10) @map("wastage_percent") @db.Decimal(5, 2)
 
-  materialCost Float @default(0) @map("material_cost")
-  laborCost    Float @default(0) @map("labor_cost")
-  totalCost    Float @default(0) @map("total_cost")
+  materialCost Decimal @default(0) @map("material_cost") @db.Decimal(15, 2)
+  laborCost    Decimal @default(0) @map("labor_cost") @db.Decimal(15, 2)
+  totalCost    Decimal @default(0) @map("total_cost") @db.Decimal(15, 2)
 
   sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
@@ -887,17 +1024,17 @@ model FinishingItem {
   name           String
   description    String?  @db.Text
 
-  area           Float  @default(0)
+  area           Decimal  @default(0) @db.Decimal(15, 4)
   unit           String
-  wastagePercent Float  @default(8) @map("wastage_percent")
+  wastagePercent Decimal  @default(8) @map("wastage_percent") @db.Decimal(5, 2)
 
   qualityLevel  String  @default("medium") @map("quality_level")
-  materialPrice Float @default(0) @map("material_price")
-  laborPrice    Float @default(0) @map("labor_price")
+  materialPrice Decimal @default(0) @map("material_price") @db.Decimal(15, 2)
+  laborPrice    Decimal @default(0) @map("labor_price") @db.Decimal(15, 2)
 
-  materialCost Float @default(0) @map("material_cost")
-  laborCost    Float @default(0) @map("labor_cost")
-  totalCost    Float @default(0) @map("total_cost")
+  materialCost Decimal @default(0) @map("material_cost") @db.Decimal(15, 2)
+  laborCost    Decimal @default(0) @map("labor_cost") @db.Decimal(15, 2)
+  totalCost    Decimal @default(0) @map("total_cost") @db.Decimal(15, 2)
 
   sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
@@ -918,10 +1055,10 @@ model MEPItem {
   name        String
   description String?   @db.Text
 
-  quantity  Float @default(0)
+  quantity  Decimal @default(0) @db.Decimal(15, 4)
   unit      String
-  unitPrice Float @default(0) @map("unit_price")
-  totalCost Float @default(0) @map("total_cost")
+  unitPrice Decimal @default(0) @map("unit_price") @db.Decimal(15, 2)
+  totalCost Decimal @default(0) @map("total_cost") @db.Decimal(15, 2)
 
   sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
@@ -942,13 +1079,13 @@ model LaborItem {
   name         String
 
   quantity     Int
-  dailyRate    Float @map("daily_rate")
+  dailyRate    Decimal @map("daily_rate") @db.Decimal(15, 2)
   durationDays Int     @map("duration_days")
 
-  insuranceCost Float @default(0) @map("insurance_cost")
-  housingCost   Float @default(0) @map("housing_cost")
-  otherCosts    Float @default(0) @map("other_costs")
-  totalCost     Float @default(0) @map("total_cost")
+  insuranceCost Decimal @default(0) @map("insurance_cost") @db.Decimal(15, 2)
+  housingCost   Decimal @default(0) @map("housing_cost") @db.Decimal(15, 2)
+  otherCosts    Decimal @default(0) @map("other_costs") @db.Decimal(15, 2)
+  totalCost     Decimal @default(0) @map("total_cost") @db.Decimal(15, 2)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -972,11 +1109,11 @@ model Quote {
   clientEmail   String? @map("client_email")
   clientAddress String? @map("client_address") @db.Text
 
-  subtotal       Float @default(0)
-  overheadAmount Float @default(0) @map("overhead_amount")
-  profitAmount   Float @default(0) @map("profit_amount")
-  vatAmount      Float @default(0) @map("vat_amount")
-  totalAmount    Float @default(0) @map("total_amount")
+  subtotal       Decimal @default(0) @db.Decimal(15, 2)
+  overheadAmount Decimal @default(0) @map("overhead_amount") @db.Decimal(15, 2)
+  profitAmount   Decimal @default(0) @map("profit_amount") @db.Decimal(15, 2)
+  vatAmount      Decimal @default(0) @map("vat_amount") @db.Decimal(15, 2)
+  totalAmount    Decimal @default(0) @map("total_amount") @db.Decimal(15, 2)
 
   validUntil           DateTime @map("valid_until")
   paymentTerms         String?  @map("payment_terms") @db.Text
@@ -1087,6 +1224,11 @@ model Project {
   // Organization Finance - المالية المؤسسية (ربط بالمشروع)
   orgExpenses         FinanceExpense[]   @relation("ProjectOrgExpenses")
   orgPayments         FinancePayment[]   @relation("ProjectOrgPayments")
+
+  // Company Management - إدارة المنشأة (ربط بالمشروع)
+  companyExpenseAllocations CompanyExpenseAllocation[]
+  employeeAssignments      EmployeeProjectAssignment[]
+  assignedAssets           CompanyAsset[]              @relation("AssetCurrentProject")
 
   @@unique([organizationId, slug])
   @@index([organizationId])
@@ -2203,6 +2345,69 @@ enum FinanceTemplateType {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// سجل التدقيق المؤسسي — Organization Audit Trail
+// ═══════════════════════════════════════════════════════════════════════════
+
+enum OrgAuditAction {
+  // ── المصروفات (Expenses) ──
+  EXPENSE_CREATED           // إنشاء مصروف
+  EXPENSE_UPDATED           // تعديل مصروف
+  EXPENSE_PAID              // دفع مصروف
+  EXPENSE_CANCELLED         // إلغاء مصروف
+  EXPENSE_DELETED           // حذف مصروف
+
+  // ── الإيرادات (Payments) ──
+  PAYMENT_CREATED           // إنشاء دفعة إيراد
+  PAYMENT_UPDATED           // تعديل دفعة إيراد
+  PAYMENT_DELETED           // حذف دفعة إيراد
+
+  // ── التحويلات (Transfers) ──
+  TRANSFER_CREATED          // إنشاء تحويل
+  TRANSFER_CANCELLED        // إلغاء تحويل
+
+  // ── الحسابات البنكية (Bank Accounts) ──
+  BANK_ACCOUNT_CREATED      // إنشاء حساب بنكي
+  BANK_ACCOUNT_UPDATED      // تعديل حساب بنكي
+  BANK_ACCOUNT_SET_DEFAULT  // تعيين حساب افتراضي
+  BANK_ACCOUNT_DELETED      // حذف حساب بنكي
+
+  // ── الفواتير (Invoices) ──
+  INVOICE_CREATED           // إنشاء فاتورة
+  INVOICE_UPDATED           // تعديل فاتورة
+  INVOICE_ITEMS_UPDATED     // تعديل بنود فاتورة
+  INVOICE_STATUS_CHANGED    // تغيير حالة فاتورة
+  INVOICE_CONVERTED_TO_TAX  // تحويل لفاتورة ضريبية
+  INVOICE_PAYMENT_ADDED     // إضافة دفعة لفاتورة
+  INVOICE_PAYMENT_DELETED   // حذف دفعة من فاتورة
+  INVOICE_DELETED           // حذف فاتورة
+
+  // ── عروض الأسعار (Quotations) ──
+  QUOTATION_CREATED         // إنشاء عرض سعر
+  QUOTATION_UPDATED         // تعديل عرض سعر
+  QUOTATION_ITEMS_UPDATED   // تعديل بنود عرض سعر
+  QUOTATION_STATUS_CHANGED  // تغيير حالة عرض سعر
+  QUOTATION_DELETED         // حذف عرض سعر
+  QUOTATION_CONVERTED       // تحويل عرض سعر لفاتورة
+
+  // ── العملاء (Clients) ──
+  CLIENT_CREATED            // إنشاء عميل
+  CLIENT_UPDATED            // تعديل عميل
+  CLIENT_DELETED            // حذف عميل
+
+  // ── الرواتب (Payroll) ──
+  PAYROLL_RUN_APPROVED      // اعتماد مسير رواتب
+  PAYROLL_RUN_CANCELLED     // إلغاء مسير رواتب
+
+  // ── الإعدادات (Settings) ──
+  SETTINGS_UPDATED          // تعديل إعدادات المنشأة
+
+  // ── ZATCA ──
+  ZATCA_INVOICE_SUBMITTED   // إرسال فاتورة لهيئة الزكاة
+  ZATCA_INVOICE_CLEARED     // اعتماد فاتورة من هيئة الزكاة
+  ZATCA_INVOICE_REJECTED    // رفض فاتورة من هيئة الزكاة
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // CLIENT - العملاء
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -2649,6 +2854,7 @@ model OrganizationBank {
   accountType     FinanceAccountType  @default(BANK) @map("account_type")
 
   // الرصيد
+  openingBalance  Decimal             @default(0) @map("opening_balance") @db.Decimal(15, 2)
   balance         Decimal             @default(0) @db.Decimal(15, 2)
   currency        String              @default("SAR")
 
@@ -2672,6 +2878,9 @@ model OrganizationBank {
   transfersFrom         FinanceTransfer[]    @relation("TransferSource")
   transfersTo           FinanceTransfer[]    @relation("TransferDestination")
   subcontractPayments   SubcontractPayment[] @relation("SubcontractPaymentSource")
+
+  // Company Management - دفعات مصروفات المنشأة
+  companyExpensePayments CompanyExpensePayment[] @relation("CompanyExpensePaymentSource")
 
   @@index([organizationId])
   @@index([organizationId, accountType])
@@ -2699,9 +2908,9 @@ model FinanceExpense {
   // التاريخ
   date            DateTime                  @db.Date
 
-  // الحساب المصدر
-  sourceAccountId String                    @map("source_account_id")
-  sourceAccount   OrganizationBank          @relation("ExpenseSourceAccount", fields: [sourceAccountId], references: [id])
+  // الحساب المصدر (اختياري للمصروفات المعلقة)
+  sourceAccountId String?                   @map("source_account_id")
+  sourceAccount   OrganizationBank?         @relation("ExpenseSourceAccount", fields: [sourceAccountId], references: [id])
 
   // معلومات المورد
   vendorName      String?                   @map("vendor_name")
@@ -2721,12 +2930,25 @@ model FinanceExpense {
   // الحالة
   status          FinanceTransactionStatus  @default(COMPLETED)
 
+  // مصدر المصروف (ربط مع المنشأة)
+  sourceType      ExpenseSourceType         @default(MANUAL) @map("source_type")
+  sourceId        String?                   @map("source_id")  // ID من الجدول المصدر
+
+  // تتبع الدفعات الجزئية
+  paidAmount      Decimal                   @default(0) @db.Decimal(15, 2) @map("paid_amount")
+  dueDate         DateTime?                 @db.Date @map("due_date")
+
   // ملاحظات
   notes           String?                   @db.Text
 
   // من أنشأ
   createdById     String                    @map("created_by")
   createdBy       User                      @relation("ExpenseCreator", fields: [createdById], references: [id])
+
+  // العلاقات العكسية
+  payrollItems    PayrollRunItem[]
+  companyPayments CompanyExpensePayment[]    @relation("FinanceExpensePayments")
+  expenseRunItems CompanyExpenseRunItem[]
 
   createdAt       DateTime                  @default(now()) @map("created_at")
   updatedAt       DateTime                  @updatedAt @map("updated_at")
@@ -2735,6 +2957,9 @@ model FinanceExpense {
   @@index([organizationId, category])
   @@index([organizationId, projectId])
   @@index([organizationId, sourceAccountId])
+  @@index([organizationId, sourceType])
+  @@index([organizationId, status, dueDate])
+  @@index([organizationId, status, date])
   @@map("finance_expenses")
 }
 
@@ -2795,6 +3020,7 @@ model FinancePayment {
   @@index([organizationId, projectId])
   @@index([organizationId, destinationAccountId])
   @@index([contractTermId])
+  @@index([organizationId, status, date])
   @@map("finance_payments")
 }
 
@@ -2836,4 +3062,456 @@ model FinanceTransfer {
   @@index([organizationId, fromAccountId])
   @@index([organizationId, toAccountId])
   @@map("finance_transfers")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COMPANY MANAGEMENT - إدارة المنشأة
+// ═══════════════════════════════════════════════════════════════════════════
+
+// مصروفات المنشأة الثابتة (إيجار، كهرباء، تأمين...)
+model CompanyExpense {
+  id              String                  @id @default(cuid())
+  organizationId  String                  @map("organization_id")
+  organization    Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // المعلومات الأساسية
+  name            String                  // اسم المصروف (مثل: إيجار المكتب الرئيسي)
+  category        CompanyExpenseCategory   // فئة المصروف
+  description     String?                 @db.Text
+
+  // المبلغ والتكرار
+  amount          Decimal                 @db.Decimal(15, 2)  // المبلغ لكل فترة
+  recurrence      RecurrenceType          @default(MONTHLY)   // نوع التكرار
+
+  // المورد/الجهة
+  vendor          String?                 // اسم المورد أو الجهة
+  contractNumber  String?                 @map("contract_number")  // رقم العقد
+
+  // التواريخ
+  startDate       DateTime                @map("start_date") @db.Date
+  endDate         DateTime?               @map("end_date") @db.Date
+
+  // التذكير
+  reminderDays    Int                     @default(5) @map("reminder_days")  // تذكير قبل X يوم
+
+  // الحالة
+  isActive        Boolean                 @default(true) @map("is_active")
+  notes           String?                 @db.Text
+
+  createdAt       DateTime                @default(now()) @map("created_at")
+  updatedAt       DateTime                @updatedAt @map("updated_at")
+
+  // العلاقات
+  payments        CompanyExpensePayment[]
+  allocations     CompanyExpenseAllocation[]
+  expenseRunItems CompanyExpenseRunItem[]
+
+  @@index([organizationId])
+  @@index([organizationId, category])
+  @@index([organizationId, isActive])
+  @@map("company_expenses")
+}
+
+// دفعات المصروفات الثابتة (سجل الدفع الفعلي لكل فترة)
+model CompanyExpensePayment {
+  id              String                  @id @default(cuid())
+  expenseId       String                  @map("expense_id")
+  expense         CompanyExpense          @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+
+  // فترة الدفع
+  periodStart     DateTime                @map("period_start") @db.Date  // بداية الفترة
+  periodEnd       DateTime                @map("period_end") @db.Date    // نهاية الفترة
+
+  // المبلغ
+  amount          Decimal                 @db.Decimal(15, 2)
+
+  // حالة الدفع
+  isPaid          Boolean                 @default(false) @map("is_paid")
+  paidAt          DateTime?               @map("paid_at")
+  dueDate         DateTime                @map("due_date") @db.Date
+
+  // الحساب البنكي (اختياري)
+  bankAccountId   String?                 @map("bank_account_id")
+  bankAccount     OrganizationBank?       @relation("CompanyExpensePaymentSource", fields: [bankAccountId], references: [id])
+
+  // مرجع الدفع
+  referenceNo     String?                 @map("reference_no")
+  notes           String?                 @db.Text
+
+  // ربط بمصروف المالية عند الدفع
+  financeExpenseId String?                @map("finance_expense_id")
+  financeExpense   FinanceExpense?        @relation("FinanceExpensePayments", fields: [financeExpenseId], references: [id])
+
+  createdAt       DateTime                @default(now()) @map("created_at")
+  updatedAt       DateTime                @updatedAt @map("updated_at")
+
+  @@index([expenseId])
+  @@index([expenseId, isPaid])
+  @@index([dueDate])
+  @@index([financeExpenseId])
+  @@index([expenseId, dueDate, isPaid])
+  @@map("company_expense_payments")
+}
+
+// توزيع مصروفات المنشأة على المشاريع
+model CompanyExpenseAllocation {
+  id              String                  @id @default(cuid())
+  expenseId       String                  @map("expense_id")
+  expense         CompanyExpense          @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+
+  projectId       String                  @map("project_id")
+  project         Project                 @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // نسبة التوزيع (0-100)
+  percentage      Decimal                 @db.Decimal(5, 2)
+
+  // ملاحظات
+  notes           String?                 @db.Text
+
+  createdAt       DateTime                @default(now()) @map("created_at")
+  updatedAt       DateTime                @updatedAt @map("updated_at")
+
+  @@unique([expenseId, projectId])
+  @@index([expenseId])
+  @@index([projectId])
+  @@map("company_expense_allocations")
+}
+
+// سجل الموظفين (مبسط - غير مرتبط بحسابات المستخدمين بالضرورة)
+model Employee {
+  id              String                  @id @default(cuid())
+  organizationId  String                  @map("organization_id")
+  organization    Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // ربط اختياري بحساب مستخدم في النظام
+  linkedUserId    String?                 @map("linked_user_id")
+  linkedUser      User?                   @relation("EmployeeLinkedUser", fields: [linkedUserId], references: [id], onDelete: SetNull)
+
+  // المعلومات الأساسية
+  name            String                  // الاسم الكامل
+  employeeNo      String?                 @map("employee_no")  // رقم الموظف
+  type            EmployeeType            // المسمى الوظيفي
+  phone           String?
+  email           String?
+  nationalId      String?                 @map("national_id")  // رقم الهوية
+
+  // المعلومات المالية
+  salaryType      SalaryType              @default(MONTHLY) @map("salary_type")
+  baseSalary      Decimal                 @default(0) @db.Decimal(15, 2) @map("base_salary")
+  housingAllowance Decimal                @default(0) @db.Decimal(15, 2) @map("housing_allowance")
+  transportAllowance Decimal              @default(0) @db.Decimal(15, 2) @map("transport_allowance")
+  otherAllowances Decimal                 @default(0) @db.Decimal(15, 2) @map("other_allowances")
+  gosiSubscription Decimal                @default(0) @db.Decimal(15, 2) @map("gosi_subscription")  // اشتراك التأمينات
+
+  // التواريخ
+  joinDate        DateTime                @map("join_date") @db.Date
+  endDate         DateTime?               @map("end_date") @db.Date
+
+  // الحالة
+  status          EmployeeStatus          @default(ACTIVE)
+  notes           String?                 @db.Text
+
+  createdAt       DateTime                @default(now()) @map("created_at")
+  updatedAt       DateTime                @updatedAt @map("updated_at")
+
+  // العلاقات
+  assignments     EmployeeProjectAssignment[]
+  payrollItems    PayrollRunItem[]
+
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([organizationId, type])
+  @@map("company_employees")
+}
+
+// توزيع الموظفين على المشاريع
+model EmployeeProjectAssignment {
+  id              String                  @id @default(cuid())
+  employeeId      String                  @map("employee_id")
+  employee        Employee                @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  projectId       String                  @map("project_id")
+  project         Project                 @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // نسبة التوزيع (0-100) - كم من وقت الموظف مخصص لهذا المشروع
+  percentage      Decimal                 @db.Decimal(5, 2)
+
+  // فترة التعيين
+  startDate       DateTime                @map("start_date") @db.Date
+  endDate         DateTime?               @map("end_date") @db.Date
+
+  // الحالة
+  isActive        Boolean                 @default(true) @map("is_active")
+  notes           String?                 @db.Text
+
+  createdAt       DateTime                @default(now()) @map("created_at")
+  updatedAt       DateTime                @updatedAt @map("updated_at")
+
+  @@unique([employeeId, projectId])
+  @@index([employeeId])
+  @@index([projectId])
+  @@index([employeeId, isActive])
+  @@map("employee_project_assignments")
+}
+
+// أصول المنشأة (معدات، مركبات، أجهزة)
+model CompanyAsset {
+  id              String                  @id @default(cuid())
+  organizationId  String                  @map("organization_id")
+  organization    Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // المعلومات الأساسية
+  name            String                  // اسم الأصل
+  assetNo         String?                 @map("asset_no")  // رقم الأصل
+  category        AssetCategory           // فئة الأصل
+  type            AssetType               @default(OWNED)   // نوع الملكية
+  status          AssetStatus             @default(AVAILABLE)
+
+  // المواصفات
+  brand           String?                 // الماركة
+  model           String?                 // الموديل
+  serialNumber    String?                 @map("serial_number")  // الرقم التسلسلي
+  year            Int?                    // سنة الصنع
+  description     String?                 @db.Text
+
+  // التكاليف
+  purchasePrice   Decimal?                @db.Decimal(12, 2) @map("purchase_price")   // سعر الشراء
+  monthlyRent     Decimal?                @db.Decimal(12, 2) @map("monthly_rent")     // الإيجار الشهري (إذا مستأجر)
+  currentValue    Decimal?                @db.Decimal(12, 2) @map("current_value")    // القيمة الحالية
+
+  // التواريخ
+  purchaseDate    DateTime?               @map("purchase_date") @db.Date
+  warrantyExpiry  DateTime?               @map("warranty_expiry") @db.Date
+  insuranceExpiry DateTime?               @map("insurance_expiry") @db.Date
+
+  // التعيين الحالي
+  currentProjectId String?                @map("current_project_id")
+  currentProject   Project?               @relation("AssetCurrentProject", fields: [currentProjectId], references: [id], onDelete: SetNull)
+  assignedAt       DateTime?              @map("assigned_at")
+
+  // ملاحظات
+  notes           String?                 @db.Text
+
+  createdAt       DateTime                @default(now()) @map("created_at")
+  updatedAt       DateTime                @updatedAt @map("updated_at")
+
+  @@index([organizationId])
+  @@index([organizationId, category])
+  @@index([organizationId, status])
+  @@index([organizationId, currentProjectId])
+  @@map("company_assets")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PAYROLL RUNS - دورات الرواتب
+// ═══════════════════════════════════════════════════════════════════════════
+
+model PayrollRun {
+  id              String              @id @default(cuid())
+  organizationId  String              @map("organization_id")
+  organization    Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // رقم الدورة (PAY-2026-01)
+  runNo           String              @map("run_no")
+
+  // الشهر والسنة
+  month           Int
+  year            Int
+
+  // الإجماليات
+  totalBaseSalary   Decimal           @default(0) @db.Decimal(15, 2) @map("total_base_salary")
+  totalAllowances   Decimal           @default(0) @db.Decimal(15, 2) @map("total_allowances")
+  totalDeductions   Decimal           @default(0) @db.Decimal(15, 2) @map("total_deductions")
+  totalNetSalary    Decimal           @default(0) @db.Decimal(15, 2) @map("total_net_salary")
+  employeeCount     Int               @default(0) @map("employee_count")
+
+  // الحالة
+  status          PayrollRunStatus    @default(DRAFT)
+
+  // الاعتماد
+  approvedById    String?             @map("approved_by")
+  approvedBy      User?               @relation("PayrollRunApprover", fields: [approvedById], references: [id])
+  approvedAt      DateTime?           @map("approved_at")
+
+  // الإنشاء
+  createdById     String              @map("created_by")
+  createdBy       User                @relation("PayrollRunCreator", fields: [createdById], references: [id])
+  notes           String?             @db.Text
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  // العلاقات
+  items           PayrollRunItem[]
+
+  @@unique([organizationId, runNo])
+  @@unique([organizationId, month, year])
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@map("payroll_runs")
+}
+
+model PayrollRunItem {
+  id              String              @id @default(cuid())
+  payrollRunId    String              @map("payroll_run_id")
+  payrollRun      PayrollRun          @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+
+  // الموظف
+  employeeId      String              @map("employee_id")
+  employee        Employee            @relation(fields: [employeeId], references: [id])
+
+  // تفاصيل الراتب
+  baseSalary          Decimal         @default(0) @db.Decimal(15, 2) @map("base_salary")
+  housingAllowance    Decimal         @default(0) @db.Decimal(15, 2) @map("housing_allowance")
+  transportAllowance  Decimal         @default(0) @db.Decimal(15, 2) @map("transport_allowance")
+  otherAllowances     Decimal         @default(0) @db.Decimal(15, 2) @map("other_allowances")
+
+  // الخصومات
+  gosiDeduction       Decimal         @default(0) @db.Decimal(15, 2) @map("gosi_deduction")
+  otherDeductions     Decimal         @default(0) @db.Decimal(15, 2) @map("other_deductions")
+
+  // صافي الراتب
+  netSalary           Decimal         @default(0) @db.Decimal(15, 2) @map("net_salary")
+
+  // ربط بمصروف المالية (عند الاعتماد)
+  financeExpenseId    String?         @map("finance_expense_id")
+  financeExpense      FinanceExpense? @relation(fields: [financeExpenseId], references: [id])
+
+  notes           String?             @db.Text
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  @@unique([payrollRunId, employeeId])
+  @@index([payrollRunId])
+  @@index([employeeId])
+  @@index([financeExpenseId])
+  @@map("payroll_run_items")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// دورة ترحيل مصروفات المنشأة — Company Expense Run
+// ═══════════════════════════════════════════════════════════════════════════
+
+model CompanyExpenseRun {
+  id              String              @id @default(cuid())
+  organizationId  String              @map("organization_id")
+  organization    Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // رقم الدورة (FEXP-2026-01)
+  runNo           String              @map("run_no")
+
+  // الشهر والسنة
+  month           Int
+  year            Int
+
+  // الإجماليات
+  totalAmount       Decimal           @default(0) @db.Decimal(15, 2) @map("total_amount")
+  itemCount         Int               @default(0) @map("item_count")
+
+  // الحالة
+  status          ExpenseRunStatus    @default(DRAFT)
+
+  // الترحيل
+  postedById      String?             @map("posted_by")
+  postedBy        User?               @relation("ExpenseRunPoster", fields: [postedById], references: [id])
+  postedAt        DateTime?           @map("posted_at")
+
+  // الإنشاء
+  createdById     String              @map("created_by")
+  createdBy       User                @relation("ExpenseRunCreator", fields: [createdById], references: [id])
+  notes           String?             @db.Text
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  // العلاقات
+  items           CompanyExpenseRunItem[]
+
+  @@unique([organizationId, runNo])
+  @@unique([organizationId, month, year])
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@map("company_expense_runs")
+}
+
+model CompanyExpenseRunItem {
+  id                String              @id @default(cuid())
+  expenseRunId      String              @map("expense_run_id")
+  expenseRun        CompanyExpenseRun    @relation(fields: [expenseRunId], references: [id], onDelete: Cascade)
+
+  // المصروف المصدر
+  companyExpenseId  String              @map("company_expense_id")
+  companyExpense    CompanyExpense      @relation(fields: [companyExpenseId], references: [id])
+
+  // بيانات البند
+  name              String              // اسم المصروف
+  category          String              // فئة المصروف
+  vendor            String?             // المورد
+  originalAmount    Decimal             @default(0) @db.Decimal(15, 2) @map("original_amount")
+  amount            Decimal             @default(0) @db.Decimal(15, 2) // المبلغ القابل للتعديل
+
+  // ربط بمصروف المالية (عند الترحيل)
+  financeExpenseId  String?             @map("finance_expense_id")
+  financeExpense    FinanceExpense?     @relation(fields: [financeExpenseId], references: [id])
+
+  notes             String?             @db.Text
+
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+
+  @@unique([expenseRunId, companyExpenseId])
+  @@index([expenseRunId])
+  @@index([companyExpenseId])
+  @@index([financeExpenseId])
+  @@map("company_expense_run_items")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// سجل التدقيق المؤسسي — Organization Audit Log
+// الاحتفاظ: 7 سنوات كحد أدنى (نظام الزكاة والضريبة السعودي)
+// ═══════════════════════════════════════════════════════════════════════════
+
+model OrganizationAuditLog {
+  id              String          @id @default(cuid())
+
+  organizationId  String          @map("organization_id")
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  actorId         String          @map("actor_id")
+  actor           User            @relation("OrgAuditActor", fields: [actorId], references: [id])
+
+  action          OrgAuditAction
+
+  entityType      String          @map("entity_type")   // e.g. "expense", "invoice", "bank_account"
+  entityId        String          @map("entity_id")
+
+  metadata        Json?           @db.JsonB              // arbitrary JSON (amounts, old/new values, etc.)
+  ipAddress       String?         @map("ip_address")
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  @@index([organizationId, createdAt])
+  @@index([organizationId, entityType, entityId])
+  @@map("organization_audit_logs")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// تسلسلات الترقيم الذرية — Atomic Number Sequences
+// يمنع تكرار أرقام الفواتير/المصروفات/المدفوعات تحت التزامن
+// ═══════════════════════════════════════════════════════════════════════════
+
+model OrganizationSequence {
+  id              String       @id @default(cuid())
+
+  organizationId  String       @map("organization_id")
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  sequenceKey     String       @map("sequence_key")   // e.g. "INV-2026", "EXP-2026", "QT-2026"
+  currentValue    Int          @default(0) @map("current_value")
+
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  @@unique([organizationId, sequenceKey])
+  @@map("organization_sequences")
 }

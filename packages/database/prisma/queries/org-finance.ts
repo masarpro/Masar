@@ -1,9 +1,11 @@
 import { db } from "../client";
+import { Prisma } from "../generated/client";
 import type {
 	FinanceAccountType,
 	OrgExpenseCategory,
 	FinanceTransactionStatus,
 	PaymentMethod,
+	ExpenseSourceType,
 } from "../generated/client";
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -105,29 +107,37 @@ export async function getBankAccountById(id: string, organizationId: string) {
 }
 
 /**
- * Get total balances summary for organization
+ * Get total balances summary for organization.
+ * Uses DB-side groupBy aggregation to avoid JS floating-point drift across many accounts.
  */
 export async function getOrganizationBalancesSummary(organizationId: string) {
-	const accounts = await db.organizationBank.findMany({
-		where: { organizationId, isActive: true },
-		select: {
-			id: true,
-			name: true,
-			accountType: true,
-			balance: true,
-			currency: true,
-		},
-	});
+	const [accounts, grouped] = await Promise.all([
+		db.organizationBank.findMany({
+			where: { organizationId, isActive: true },
+			select: {
+				id: true,
+				name: true,
+				accountType: true,
+				balance: true,
+				currency: true,
+			},
+		}),
+		db.organizationBank.groupBy({
+			by: ["accountType"],
+			where: { organizationId, isActive: true },
+			_sum: { balance: true },
+		}),
+	]);
 
 	let totalBankBalance = 0;
 	let totalCashBalance = 0;
 
-	for (const account of accounts) {
-		const balance = Number(account.balance);
-		if (account.accountType === "BANK") {
-			totalBankBalance += balance;
+	for (const group of grouped) {
+		const sum = Number(group._sum.balance ?? 0);
+		if (group.accountType === "BANK") {
+			totalBankBalance = sum;
 		} else {
-			totalCashBalance += balance;
+			totalCashBalance = sum;
 		}
 	}
 
@@ -136,6 +146,123 @@ export async function getOrganizationBalancesSummary(organizationId: string) {
 		totalBankBalance,
 		totalCashBalance,
 		totalBalance: totalBankBalance + totalCashBalance,
+	};
+}
+
+/**
+ * Reconcile a bank account: compare stored balance against computed balance
+ * from all balance-affecting transactions.
+ *
+ * Read-only — never auto-corrects. Returns a discrepancy report.
+ *
+ * Computation:
+ *   computedBalance = openingBalance + paymentsIn - expensesOut - subcontractPaymentsOut + transfersIn - transfersOut
+ *
+ * Status filters (matching the mutation logic in this file):
+ *   - Payments: COMPLETED only (balance incremented on create, decremented on delete)
+ *   - Expenses: non-CANCELLED with paidAmount > 0 (balance decremented per paidAmount)
+ *   - SubcontractPayments: COMPLETED only (balance decremented on create via subcontract.ts)
+ *   - Transfers: COMPLETED only (cancelled transfers have balances reversed)
+ */
+export async function reconcileBankAccount(
+	accountId: string,
+	organizationId: string,
+) {
+	const ZERO = new Prisma.Decimal(0);
+
+	// 1. Fetch the bank account (org-isolated)
+	const account = await db.organizationBank.findFirst({
+		where: { id: accountId, organizationId },
+		select: { id: true, balance: true, openingBalance: true },
+	});
+
+	if (!account) {
+		throw new Error("Bank account not found");
+	}
+
+	// 2. DB-side aggregation for each balance component
+	const [paymentsAgg, expensesAgg, subcontractPaymentsAgg, transfersOutAgg, transfersInAgg] =
+		await Promise.all([
+			// Payments IN: COMPLETED payments crediting this account
+			db.financePayment.aggregate({
+				where: {
+					organizationId,
+					destinationAccountId: accountId,
+					status: "COMPLETED",
+				},
+				_sum: { amount: true },
+			}),
+			// Expenses OUT: non-CANCELLED expenses debiting this account (by paidAmount)
+			db.financeExpense.aggregate({
+				where: {
+					organizationId,
+					sourceAccountId: accountId,
+					status: { not: "CANCELLED" },
+				},
+				_sum: { paidAmount: true },
+			}),
+			// SubcontractPayments OUT: COMPLETED subcontract payments from this account
+			db.subcontractPayment.aggregate({
+				where: {
+					organizationId,
+					sourceAccountId: accountId,
+					status: "COMPLETED",
+				},
+				_sum: { amount: true },
+			}),
+			// Transfers OUT: COMPLETED transfers from this account
+			db.financeTransfer.aggregate({
+				where: {
+					organizationId,
+					fromAccountId: accountId,
+					status: "COMPLETED",
+				},
+				_sum: { amount: true },
+			}),
+			// Transfers IN: COMPLETED transfers to this account
+			db.financeTransfer.aggregate({
+				where: {
+					organizationId,
+					toAccountId: accountId,
+					status: "COMPLETED",
+				},
+				_sum: { amount: true },
+			}),
+		]);
+
+	const openingBalance = account.openingBalance ?? ZERO;
+	const paymentsIn = paymentsAgg._sum.amount ?? ZERO;
+	const expensesOut = expensesAgg._sum.paidAmount ?? ZERO;
+	const subcontractPaymentsOut = subcontractPaymentsAgg._sum.amount ?? ZERO;
+	const transfersOut = transfersOutAgg._sum.amount ?? ZERO;
+	const transfersIn = transfersInAgg._sum.amount ?? ZERO;
+
+	// 3. Compute expected balance using Decimal arithmetic
+	const computedBalance = new Prisma.Decimal(openingBalance)
+		.add(paymentsIn)
+		.sub(expensesOut)
+		.sub(subcontractPaymentsOut)
+		.add(transfersIn)
+		.sub(transfersOut);
+
+	// 4. Delta and tolerance check (1 halala = 0.01 SAR)
+	const storedBalance = account.balance;
+	const delta = new Prisma.Decimal(storedBalance).sub(computedBalance);
+	const isBalanced = delta.abs().lte(new Prisma.Decimal("0.01"));
+
+	return {
+		storedBalance,
+		computedBalance,
+		delta,
+		isBalanced,
+		components: {
+			openingBalance,
+			paymentsIn,
+			expensesOut,
+			subcontractPaymentsOut,
+			transfersIn,
+			transfersOut,
+		},
 	};
 }
 
@@ -283,27 +410,8 @@ export async function deleteBankAccount(id: string, organizationId: string) {
 export async function generateExpenseNumber(
 	organizationId: string,
 ): Promise<string> {
-	const year = new Date().getFullYear();
-	const prefix = `EXP-${year}-`;
-
-	const lastExpense = await db.financeExpense.findFirst({
-		where: {
-			organizationId,
-			expenseNo: { startsWith: prefix },
-		},
-		orderBy: { expenseNo: "desc" },
-		select: { expenseNo: true },
-	});
-
-	let nextNumber = 1;
-	if (lastExpense) {
-		const lastNumber = parseInt(lastExpense.expenseNo.replace(prefix, ""), 10);
-		if (!isNaN(lastNumber)) {
-			nextNumber = lastNumber + 1;
-		}
-	}
-
-	return `${prefix}${nextNumber.toString().padStart(4, "0")}`;
+	const { generateAtomicNo } = await import("./sequences");
+	return generateAtomicNo(organizationId, "EXP");
 }
 
 /**
@@ -316,6 +424,7 @@ export async function getOrganizationExpenses(
 		sourceAccountId?: string;
 		projectId?: string;
 		status?: FinanceTransactionStatus;
+		sourceType?: ExpenseSourceType;
 		dateFrom?: Date;
 		dateTo?: Date;
 		query?: string;
@@ -323,40 +432,19 @@ export async function getOrganizationExpenses(
 		offset?: number;
 	},
 ) {
-	const where: {
-		organizationId: string;
-		category?: OrgExpenseCategory;
-		sourceAccountId?: string;
-		projectId?: string;
-		status?: FinanceTransactionStatus;
-		date?: { gte?: Date; lte?: Date };
-		OR?: Array<{
-			expenseNo?: { contains: string; mode: "insensitive" };
-			description?: { contains: string; mode: "insensitive" };
-			vendorName?: { contains: string; mode: "insensitive" };
-		}>;
-	} = { organizationId };
+	const where: Record<string, unknown> = { organizationId };
 
-	if (options?.category) {
-		where.category = options.category;
-	}
-
-	if (options?.sourceAccountId) {
-		where.sourceAccountId = options.sourceAccountId;
-	}
-
-	if (options?.projectId) {
-		where.projectId = options.projectId;
-	}
-
-	if (options?.status) {
-		where.status = options.status;
-	}
+	if (options?.category) where.category = options.category;
+	if (options?.sourceAccountId) where.sourceAccountId = options.sourceAccountId;
+	if (options?.projectId) where.projectId = options.projectId;
+	if (options?.status) where.status = options.status;
+	if (options?.sourceType) where.sourceType = options.sourceType;
 
 	if (options?.dateFrom || options?.dateTo) {
-		where.date = {};
-		if (options.dateFrom) where.date.gte = options.dateFrom;
-		if (options.dateTo) where.date.lte = options.dateTo;
+		const date: Record<string, Date> = {};
+		if (options.dateFrom) date.gte = options.dateFrom;
+		if (options.dateTo) date.lte = options.dateTo;
+		where.date = date;
 	}
 
 	if (options?.query) {
@@ -401,6 +489,7 @@ export async function getExpenseById(id: string, organizationId: string) {
 
 /**
  * Create a new expense and deduct from account balance
+ * When status is PENDING (obligation), no balance deduction occurs
  */
 export async function createExpense(data: {
 	organizationId: string;
@@ -410,16 +499,33 @@ export async function createExpense(data: {
 	description?: string;
 	amount: number;
 	date: Date;
-	sourceAccountId: string;
+	sourceAccountId?: string;
 	vendorName?: string;
 	vendorTaxNumber?: string;
 	projectId?: string;
 	invoiceRef?: string;
 	paymentMethod?: PaymentMethod;
 	referenceNo?: string;
+	status?: FinanceTransactionStatus;
+	sourceType?: ExpenseSourceType;
+	sourceId?: string;
+	dueDate?: Date;
 	notes?: string;
 }) {
 	const expenseNo = await generateExpenseNumber(data.organizationId);
+	const status = data.status ?? "COMPLETED";
+	const isCompleted = status === "COMPLETED";
+
+	// Layer 1: Early balance check (UX — fast fail before transaction)
+	if (isCompleted && data.sourceAccountId) {
+		const account = await db.organizationBank.findFirst({
+			where: { id: data.sourceAccountId, organizationId: data.organizationId },
+			select: { balance: true },
+		});
+		if (!account || Number(account.balance) < data.amount) {
+			throw new Error("الرصيد غير كافي في الحساب المصدر");
+		}
+	}
 
 	return db.$transaction(async (tx) => {
 		// Create the expense
@@ -433,28 +539,183 @@ export async function createExpense(data: {
 				description: data.description,
 				amount: data.amount,
 				date: data.date,
-				sourceAccountId: data.sourceAccountId,
+				sourceAccountId: data.sourceAccountId ?? null,
 				vendorName: data.vendorName,
 				vendorTaxNumber: data.vendorTaxNumber,
 				projectId: data.projectId,
 				invoiceRef: data.invoiceRef,
 				paymentMethod: data.paymentMethod ?? "BANK_TRANSFER",
 				referenceNo: data.referenceNo,
-				status: "COMPLETED",
+				status,
+				sourceType: data.sourceType ?? "MANUAL",
+				sourceId: data.sourceId,
+				paidAmount: isCompleted ? data.amount : 0,
+				dueDate: data.dueDate,
 				notes: data.notes,
 			},
 		});
 
-		// Deduct from account balance
-		await tx.organizationBank.update({
-			where: { id: data.sourceAccountId },
-			data: {
-				balance: { decrement: data.amount },
-			},
-		});
+		// Only deduct from account balance if COMPLETED and sourceAccountId is provided
+		if (isCompleted && data.sourceAccountId) {
+			// Layer 2: Atomic guard — prevents negative balance under concurrency
+			const updated = await tx.organizationBank.updateMany({
+				where: { id: data.sourceAccountId, balance: { gte: data.amount } },
+				data: { balance: { decrement: data.amount } },
+			});
+			if (updated.count === 0) {
+				throw new Error("الرصيد غير كافي في الحساب المصدر");
+			}
+		}
 
 		return expense;
 	});
+}
+
+/**
+ * Pay a PENDING expense (full or partial)
+ */
+export async function payExpense(data: {
+	expenseId: string;
+	organizationId: string;
+	sourceAccountId: string;
+	paymentMethod?: PaymentMethod;
+	referenceNo?: string;
+	amount?: number; // if not provided, pays the full remaining amount
+}) {
+	const expense = await db.financeExpense.findFirst({
+		where: { id: data.expenseId, organizationId: data.organizationId },
+		select: { id: true, amount: true, paidAmount: true, status: true, sourceAccountId: true },
+	});
+
+	if (!expense) {
+		throw new Error("Expense not found");
+	}
+
+	if (expense.status === "COMPLETED") {
+		throw new Error("Expense is already fully paid");
+	}
+
+	if (expense.status === "CANCELLED") {
+		throw new Error("Cannot pay a cancelled expense");
+	}
+
+	const totalAmount = Number(expense.amount);
+	const currentPaid = Number(expense.paidAmount);
+	const remaining = totalAmount - currentPaid;
+	const payAmount = data.amount ?? remaining;
+
+	if (payAmount <= 0) {
+		throw new Error("Payment amount must be positive");
+	}
+
+	if (payAmount > remaining) {
+		throw new Error(`Payment amount (${payAmount}) exceeds remaining (${remaining})`);
+	}
+
+	// Layer 1: Early balance check (UX — fast fail before transaction)
+	const sourceAccount = await db.organizationBank.findFirst({
+		where: { id: data.sourceAccountId, organizationId: data.organizationId },
+		select: { balance: true },
+	});
+	if (!sourceAccount) {
+		throw new Error("الحساب المصدر غير موجود");
+	}
+	if (Number(sourceAccount.balance) < payAmount) {
+		throw new Error("الرصيد غير كافي في الحساب المصدر");
+	}
+
+	const newPaidAmount = currentPaid + payAmount;
+	const isFullyPaid = newPaidAmount >= totalAmount;
+
+	return db.$transaction(async (tx) => {
+		// Update the expense
+		const updated = await tx.financeExpense.update({
+			where: { id: data.expenseId },
+			data: {
+				paidAmount: newPaidAmount,
+				status: isFullyPaid ? "COMPLETED" : "PENDING",
+				sourceAccountId: data.sourceAccountId,
+				paymentMethod: data.paymentMethod ?? "BANK_TRANSFER",
+				referenceNo: data.referenceNo,
+			},
+		});
+
+		// Layer 2: Atomic guard — prevents negative balance under concurrency
+		const balanceUpdate = await tx.organizationBank.updateMany({
+			where: { id: data.sourceAccountId, balance: { gte: payAmount } },
+			data: { balance: { decrement: payAmount } },
+		});
+		if (balanceUpdate.count === 0) {
+			throw new Error("الرصيد غير كافي في الحساب المصدر");
+		}
+
+		return updated;
+	});
+}
+
+/**
+ * Cancel a PENDING expense
+ */
+export async function cancelExpense(id: string, organizationId: string) {
+	const existing = await db.financeExpense.findFirst({
+		where: { id, organizationId },
+		select: { id: true, status: true, paidAmount: true, sourceAccountId: true },
+	});
+
+	if (!existing) {
+		throw new Error("Expense not found");
+	}
+
+	if (existing.status === "CANCELLED") {
+		throw new Error("Expense is already cancelled");
+	}
+
+	// If there were partial payments, restore them to the account
+	const paidAmount = Number(existing.paidAmount);
+
+	return db.$transaction(async (tx) => {
+		const updated = await tx.financeExpense.update({
+			where: { id },
+			data: { status: "CANCELLED" },
+		});
+
+		if (paidAmount > 0 && existing.sourceAccountId) {
+			await tx.organizationBank.update({
+				where: { id: existing.sourceAccountId },
+				data: {
+					balance: { increment: paidAmount },
+				},
+			});
+		}
+
+		return updated;
+	});
+}
+
+/**
+ * Get computed payment status for an expense
+ */
+export function getExpensePaymentStatus(expense: {
+	amount: number | { toString(): string };
+	paidAmount: number | { toString(): string };
+	status: string;
+	dueDate?: Date | null;
+}): "PENDING" | "PARTIAL" | "PAID" | "OVERDUE" | "CANCELLED" {
+	if (expense.status === "CANCELLED") return "CANCELLED";
+
+	const total = Number(expense.amount);
+	const paid = Number(expense.paidAmount);
+
+	if (paid >= total) return "PAID";
+
+	if (expense.status === "PENDING" || paid < total) {
+		if (expense.dueDate && new Date(expense.dueDate) < new Date()) {
+			return paid > 0 ? "OVERDUE" : "OVERDUE";
+		}
+		return paid > 0 ? "PARTIAL" : "PENDING";
+	}
+
+	return "PAID";
 }
 
 /**
@@ -494,27 +755,34 @@ export async function updateExpense(
 
 /**
  * Delete an expense and restore account balance
+ * Blocks deletion of facility-generated expenses
  */
 export async function deleteExpense(id: string, organizationId: string) {
 	const existing = await db.financeExpense.findFirst({
 		where: { id, organizationId },
-		select: { id: true, amount: true, sourceAccountId: true, status: true },
+		select: { id: true, amount: true, paidAmount: true, sourceAccountId: true, status: true, sourceType: true },
 	});
 
 	if (!existing) {
 		throw new Error("Expense not found");
 	}
 
+	// Block deletion of facility-generated expenses from finance side
+	if (existing.sourceType !== "MANUAL") {
+		throw new Error("Cannot delete facility-generated expenses. Cancel from the source module instead.");
+	}
+
 	return db.$transaction(async (tx) => {
 		// Delete the expense
 		await tx.financeExpense.delete({ where: { id } });
 
-		// Restore account balance if it was completed
-		if (existing.status === "COMPLETED") {
+		// Restore only the paid amount to account balance
+		const restoreAmount = Number(existing.paidAmount);
+		if (restoreAmount > 0 && existing.sourceAccountId) {
 			await tx.organizationBank.update({
 				where: { id: existing.sourceAccountId },
 				data: {
-					balance: { increment: Number(existing.amount) },
+					balance: { increment: restoreAmount },
 				},
 			});
 		}
@@ -649,27 +917,8 @@ export async function getOrganizationSubcontractPayments(
 export async function generatePaymentNumber(
 	organizationId: string,
 ): Promise<string> {
-	const year = new Date().getFullYear();
-	const prefix = `RCV-${year}-`;
-
-	const lastPayment = await db.financePayment.findFirst({
-		where: {
-			organizationId,
-			paymentNo: { startsWith: prefix },
-		},
-		orderBy: { paymentNo: "desc" },
-		select: { paymentNo: true },
-	});
-
-	let nextNumber = 1;
-	if (lastPayment) {
-		const lastNumber = parseInt(lastPayment.paymentNo.replace(prefix, ""), 10);
-		if (!isNaN(lastNumber)) {
-			nextNumber = lastNumber + 1;
-		}
-	}
-
-	return `${prefix}${nextNumber.toString().padStart(4, "0")}`;
+	const { generateAtomicNo } = await import("./sequences");
+	return generateAtomicNo(organizationId, "RCV");
 }
 
 /**
@@ -897,27 +1146,8 @@ export async function deletePayment(id: string, organizationId: string) {
 export async function generateTransferNumber(
 	organizationId: string,
 ): Promise<string> {
-	const year = new Date().getFullYear();
-	const prefix = `TRF-${year}-`;
-
-	const lastTransfer = await db.financeTransfer.findFirst({
-		where: {
-			organizationId,
-			transferNo: { startsWith: prefix },
-		},
-		orderBy: { transferNo: "desc" },
-		select: { transferNo: true },
-	});
-
-	let nextNumber = 1;
-	if (lastTransfer) {
-		const lastNumber = parseInt(lastTransfer.transferNo.replace(prefix, ""), 10);
-		if (!isNaN(lastNumber)) {
-			nextNumber = lastNumber + 1;
-		}
-	}
-
-	return `${prefix}${nextNumber.toString().padStart(4, "0")}`;
+	const { generateAtomicNo } = await import("./sequences");
+	return generateAtomicNo(organizationId, "TRF");
 }
 
 /**
@@ -1046,6 +1276,11 @@ export async function createTransfer(data: {
 			throw new Error("Destination account not found");
 		}
 
+		// Layer 1: Early balance check (UX — fast fail)
+		if (Number(fromAccount.balance) < data.amount) {
+			throw new Error("الرصيد غير كافي في الحساب المصدر");
+		}
+
 		// Create the transfer
 		const transfer = await tx.financeTransfer.create({
 			data: {
@@ -1063,17 +1298,20 @@ export async function createTransfer(data: {
 			},
 		});
 
-		// Update account balances
-		await Promise.all([
-			tx.organizationBank.update({
-				where: { id: data.fromAccountId },
-				data: { balance: { decrement: data.amount } },
-			}),
-			tx.organizationBank.update({
-				where: { id: data.toAccountId },
-				data: { balance: { increment: data.amount } },
-			}),
-		]);
+		// Layer 2: Atomic guard — prevents negative balance under concurrency
+		const balanceUpdate = await tx.organizationBank.updateMany({
+			where: { id: data.fromAccountId, balance: { gte: data.amount } },
+			data: { balance: { decrement: data.amount } },
+		});
+		if (balanceUpdate.count === 0) {
+			throw new Error("الرصيد غير كافي في الحساب المصدر");
+		}
+
+		// Increment destination account
+		await tx.organizationBank.update({
+			where: { id: data.toAccountId },
+			data: { balance: { increment: data.amount } },
+		});
 
 		return transfer;
 	});
@@ -1152,8 +1390,10 @@ export async function getOrgFinanceDashboard(
 		balancesSummary,
 		expensesTotal,
 		paymentsTotal,
+		subcontractPaymentsTotal,
 		recentExpenses,
 		recentPayments,
+		pendingObligations,
 	] = await Promise.all([
 		getOrganizationBalancesSummary(organizationId),
 		db.financeExpense.aggregate({
@@ -1166,6 +1406,15 @@ export async function getOrgFinanceDashboard(
 			_count: true,
 		}),
 		db.financePayment.aggregate({
+			where: {
+				organizationId,
+				status: "COMPLETED",
+				...(hasDateFilter && { date: dateFilter }),
+			},
+			_sum: { amount: true },
+			_count: true,
+		}),
+		db.subcontractPayment.aggregate({
 			where: {
 				organizationId,
 				status: "COMPLETED",
@@ -1191,6 +1440,14 @@ export async function getOrgFinanceDashboard(
 			orderBy: { createdAt: "desc" },
 			take: 5,
 		}),
+		db.financeExpense.aggregate({
+			where: {
+				organizationId,
+				status: "PENDING",
+			},
+			_sum: { amount: true },
+			_count: true,
+		}),
 	]);
 
 	return {
@@ -1202,6 +1459,16 @@ export async function getOrgFinanceDashboard(
 		payments: {
 			total: Number(paymentsTotal._sum.amount) || 0,
 			count: paymentsTotal._count,
+		},
+		subcontractPayments: {
+			total: Number(subcontractPaymentsTotal._sum.amount) || 0,
+			count: subcontractPaymentsTotal._count,
+		},
+		totalMoneyOut: (Number(expensesTotal._sum.amount) || 0)
+			+ (Number(subcontractPaymentsTotal._sum.amount) || 0),
+		pendingObligations: {
+			total: Number(pendingObligations._sum.amount) || 0,
+			count: pendingObligations._count,
 		},
 		recentExpenses,
 		recentPayments,

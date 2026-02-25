@@ -15,6 +15,16 @@ export const protectedProcedure = publicProcedure.use(
 			throw new ORPCError("UNAUTHORIZED");
 		}
 
+		// Block deactivated users immediately — even with a valid session cookie,
+		// a user whose isActive was set to false by an org admin must be rejected.
+		// BetterAuth includes isActive via additionalFields and freshAge:0 ensures
+		// the value is always re-read from the DB on every request.
+		if (session.user.isActive === false) {
+			throw new ORPCError("UNAUTHORIZED", {
+				message: "تم تعطيل حسابك. تواصل مع مدير المنظمة.",
+			});
+		}
+
 		return await next({
 			context: {
 				session: session.session,

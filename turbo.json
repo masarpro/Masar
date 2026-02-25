@@ -26,6 +26,10 @@
 			"cache": false,
 			"dependsOn": ["^generate", "^build"],
 			"persistent": true
+		},
+		"test": {
+			"cache": false,
+			"dependsOn": ["^generate"]
 		}
 	}
 }

@@ -1,5 +1,5 @@
 // Finance Module Router
-// Includes: Clients, Quotations, Invoices, Open Documents, Templates, Reports
+// Includes: Clients, Invoices, Open Documents, Templates, Reports
 // + Banks, Expenses, Payments, Transfers (Organization Finance)
 
 import { listClients } from "./procedures/list-clients";
@@ -14,16 +14,6 @@ import {
 	deleteClientContactProcedure,
 	setClientContactAsPrimaryProcedure,
 } from "./procedures/update-client";
-
-import { listQuotations, getQuotation } from "./procedures/list-quotations";
-import {
-	createQuotationProcedure,
-	updateQuotationProcedure,
-	updateQuotationItemsProcedure,
-	updateQuotationStatusProcedure,
-	deleteQuotationProcedure,
-	convertQuotationToInvoiceProcedure,
-} from "./procedures/create-quotation";
 
 import { listInvoices, getInvoice } from "./procedures/list-invoices";
 import {
@@ -77,6 +67,7 @@ import {
 	updateBankAccountProcedure,
 	setDefaultBankAccountProcedure,
 	deleteBankAccountProcedure,
+	reconcileBankAccountProcedure,
 } from "./procedures/banks";
 
 import {
@@ -86,6 +77,8 @@ import {
 	createExpenseProcedure,
 	updateExpenseProcedure,
 	deleteExpenseProcedure,
+	payExpenseProcedure,
+	cancelExpenseProcedure,
 	listExpensesWithSubcontracts,
 } from "./procedures/expenses";
 
@@ -131,18 +124,6 @@ export const financeRouter = {
 			delete: deleteClientContactProcedure,
 			setPrimary: setClientContactAsPrimaryProcedure,
 		},
-	},
-
-	// Quotations
-	quotations: {
-		list: listQuotations,
-		getById: getQuotation,
-		create: createQuotationProcedure,
-		update: updateQuotationProcedure,
-		updateItems: updateQuotationItemsProcedure,
-		updateStatus: updateQuotationStatusProcedure,
-		delete: deleteQuotationProcedure,
-		convertToInvoice: convertQuotationToInvoiceProcedure,
 	},
 
 	// Invoices
@@ -202,6 +183,7 @@ export const financeRouter = {
 		list: listBankAccounts,
 		getById: getBankAccount,
 		getSummary: getBalancesSummary,
+		reconcile: reconcileBankAccountProcedure,
 		create: createBankAccountProcedure,
 		update: updateBankAccountProcedure,
 		setDefault: setDefaultBankAccountProcedure,
@@ -217,6 +199,8 @@ export const financeRouter = {
 		create: createExpenseProcedure,
 		update: updateExpenseProcedure,
 		delete: deleteExpenseProcedure,
+		pay: payExpenseProcedure,
+		cancel: cancelExpenseProcedure,
 	},
 
 	// Payments / Receipts (المقبوضات / سندات القبض)

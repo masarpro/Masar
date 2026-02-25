@@ -54,9 +54,17 @@ import {
 	Calendar,
 	Building,
 	Hammer,
+	CreditCard,
+	Users,
+	RotateCcw,
+	Package,
+	FolderOpen,
+	Clock,
+	AlertCircle,
 } from "lucide-react";
 import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
+import { PayExpenseDialog } from "./PayExpenseDialog";
 
 interface ExpensesListProps {
 	organizationId: string;
@@ -108,8 +116,16 @@ export function ExpensesList({
 	// State
 	const [searchQuery, setSearchQuery] = useState("");
 	const [categoryFilter, setCategoryFilter] = useState<string | undefined>(undefined);
+	const [sourceTypeFilter, setSourceTypeFilter] = useState<string | undefined>(undefined);
 	const [projectFilter, setProjectFilter] = useState<string | undefined>(projectId);
 	const [deleteExpenseId, setDeleteExpenseId] = useState<string | null>(null);
+	const [payExpense, setPayExpense] = useState<{
+		id: string;
+		expenseNo: string;
+		amount: number | string;
+		paidAmount: number | string;
+		description?: string | null;
+	} | null>(null);
 
 	const effectiveBasePath = customBasePath || `/app/${organizationSlug}/finance/expenses`;
 
@@ -173,6 +189,55 @@ export function ExpensesList({
 			SUBCONTRACTOR: "bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-400",
 		};
 		return colors[category] || "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
+	};
+
+	const getSourceTypeIcon = (sourceType: string) => {
+		switch (sourceType) {
+			case "FACILITY_PAYROLL": return <Users className="h-3 w-3 me-1" />;
+			case "FACILITY_RECURRING": return <RotateCcw className="h-3 w-3 me-1" />;
+			case "FACILITY_ASSET": return <Package className="h-3 w-3 me-1" />;
+			case "PROJECT": return <FolderOpen className="h-3 w-3 me-1" />;
+			default: return <CreditCard className="h-3 w-3 me-1" />;
+		}
+	};
+
+	const getSourceTypeColor = (sourceType: string) => {
+		switch (sourceType) {
+			case "FACILITY_PAYROLL": return "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-400";
+			case "FACILITY_RECURRING": return "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400";
+			case "FACILITY_ASSET": return "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-400";
+			case "PROJECT": return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400";
+			default: return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
+		}
+	};
+
+	const getPaymentStatusBadge = (item: typeof items[number]) => {
+		if (item._type !== "expense") return null;
+		const expense = item as any;
+		const status = expense.status;
+		const paidAmount = Number(expense.paidAmount ?? 0);
+		const totalAmount = Number(expense.amount ?? 0);
+		const dueDate = expense.dueDate;
+
+		if (status === "CANCELLED") {
+			return <Badge className="rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-0">{t("finance.expenses.paymentStatus.cancelled")}</Badge>;
+		}
+		if (paidAmount >= totalAmount && status === "COMPLETED") {
+			return <Badge className="rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400 border-0">{t("finance.expenses.paymentStatus.paid")}</Badge>;
+		}
+		if (status === "PENDING" && paidAmount > 0) {
+			if (dueDate && new Date(dueDate) < new Date()) {
+				return <Badge className="rounded-lg bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400 border-0"><AlertCircle className="h-3 w-3 me-1" />{t("finance.expenses.paymentStatus.overdue")}</Badge>;
+			}
+			return <Badge className="rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400 border-0">{t("finance.expenses.paymentStatus.partial")}</Badge>;
+		}
+		if (status === "PENDING") {
+			if (dueDate && new Date(dueDate) < new Date()) {
+				return <Badge className="rounded-lg bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400 border-0"><AlertCircle className="h-3 w-3 me-1" />{t("finance.expenses.paymentStatus.overdue")}</Badge>;
+			}
+			return <Badge className="rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400 border-0"><Clock className="h-3 w-3 me-1" />{t("finance.expenses.paymentStatus.pending")}</Badge>;
+		}
+		return <Badge className="rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400 border-0">{t("finance.expenses.paymentStatus.paid")}</Badge>;
 	};
 
 	return (
@@ -263,6 +328,24 @@ export function ExpensesList({
 								))}
 							</SelectContent>
 						</Select>
+						<Select
+							value={sourceTypeFilter || "all"}
+							onValueChange={(value) =>
+								setSourceTypeFilter(value === "all" ? undefined : value)
+							}
+						>
+							<SelectTrigger className="w-[200px] rounded-xl">
+								<SelectValue placeholder={t("finance.expenses.filterBySource")} />
+							</SelectTrigger>
+							<SelectContent className="rounded-xl">
+								<SelectItem value="all">{t("common.all")}</SelectItem>
+								<SelectItem value="MANUAL">{t("finance.expenses.sourceTypes.manual")}</SelectItem>
+								<SelectItem value="FACILITY_PAYROLL">{t("finance.expenses.sourceTypes.facility_payroll")}</SelectItem>
+								<SelectItem value="FACILITY_RECURRING">{t("finance.expenses.sourceTypes.facility_recurring")}</SelectItem>
+								<SelectItem value="FACILITY_ASSET">{t("finance.expenses.sourceTypes.facility_asset")}</SelectItem>
+								<SelectItem value="PROJECT">{t("finance.expenses.sourceTypes.project")}</SelectItem>
+							</SelectContent>
+						</Select>
 						{!projectId && (
 							<Select
 								value={projectFilter || "all"}
@@ -313,14 +396,15 @@ export function ExpensesList({
 									<TableHead>{t("finance.expenses.expenseNo")}</TableHead>
 									<TableHead>{t("finance.expenses.date")}</TableHead>
 									<TableHead>{t("finance.expenses.type")}</TableHead>
+									<TableHead>{t("finance.expenses.source")}</TableHead>
 									<TableHead>{t("finance.expenses.category")}</TableHead>
 									<TableHead>{t("finance.expenses.description")}</TableHead>
-									<TableHead>{t("finance.expenses.vendor")}</TableHead>
 									<TableHead>{t("finance.expenses.account")}</TableHead>
 									{!projectId && (
 										<TableHead>{t("finance.expenses.project")}</TableHead>
 									)}
 									<TableHead className="text-end">{t("finance.expenses.amount")}</TableHead>
+									<TableHead>{t("finance.expenses.paymentStatusLabel")}</TableHead>
 									<TableHead className="w-[50px]" />
 								</TableRow>
 							</TableHeader>
@@ -354,6 +438,16 @@ export function ExpensesList({
 											)}
 										</TableCell>
 										<TableCell>
+											{item._type === "expense" ? (
+												<Badge className={`rounded-lg border-0 ${getSourceTypeColor((item as any).sourceType ?? "MANUAL")}`}>
+													{getSourceTypeIcon((item as any).sourceType ?? "MANUAL")}
+													{t(`finance.expenses.sourceTypes.${((item as any).sourceType ?? "MANUAL").toLowerCase()}`)}
+												</Badge>
+											) : (
+												<span className="text-slate-400">-</span>
+											)}
+										</TableCell>
+										<TableCell>
 											<Badge className={`rounded-lg ${getCategoryColor(item.category)}`}>
 												{getCategoryLabel(item.category)}
 											</Badge>
@@ -362,9 +456,6 @@ export function ExpensesList({
 											<span className="line-clamp-1">
 												{item.description || item.contractName || "-"}
 											</span>
-										</TableCell>
-										<TableCell>
-											{item.vendorName || <span className="text-slate-400">-</span>}
 										</TableCell>
 										<TableCell>
 											{item.sourceAccount ? (
@@ -389,6 +480,9 @@ export function ExpensesList({
 											<span className="font-semibold text-red-600 dark:text-red-400">
 												-<Currency amount={item.amount} />
 											</span>
+										</TableCell>
+										<TableCell>
+											{getPaymentStatusBadge(item)}
 										</TableCell>
 										<TableCell onClick={(e) => e.stopPropagation()}>
 											{item._type === "expense" ? (
@@ -419,6 +513,24 @@ export function ExpensesList({
 															<Pencil className="h-4 w-4 me-2" />
 															{t("common.edit")}
 														</DropdownMenuItem>
+														{(item as any).status === "PENDING" && (
+															<>
+																<DropdownMenuSeparator />
+																<DropdownMenuItem
+																	onClick={() => setPayExpense({
+																		id: item.id,
+																		expenseNo: item.refNo,
+																		amount: item.amount,
+																		paidAmount: (item as any).paidAmount ?? 0,
+																		description: item.description,
+																	})}
+																	className="text-emerald-600"
+																>
+																	<CreditCard className="h-4 w-4 me-2" />
+																	{t("finance.expenses.pay")}
+																</DropdownMenuItem>
+															</>
+														)}
 														<DropdownMenuSeparator />
 														<DropdownMenuItem
 															onClick={() => setDeleteExpenseId(item.id)}
@@ -438,6 +550,14 @@ export function ExpensesList({
 					)}
 				</CardContent>
 			</Card>
+
+			{/* Pay Expense Dialog */}
+			<PayExpenseDialog
+				open={!!payExpense}
+				onOpenChange={(open) => !open && setPayExpense(null)}
+				expense={payExpense}
+				organizationId={organizationId}
+			/>
 
 			{/* Delete Confirmation */}
 			<AlertDialog

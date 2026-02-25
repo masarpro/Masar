@@ -17,7 +17,7 @@ interface OverdueInvoice {
 
 interface UpcomingDeadline {
 	id: string;
-	type: "quotation" | "invoice";
+	type: "invoice";
 	documentNo: string;
 	clientName: string;
 	dueDate: string | Date;
@@ -42,13 +42,6 @@ export function FinanceAlerts({
 	const mockUpcomingDeadlines: UpcomingDeadline[] = upcomingDeadlines.length
 		? upcomingDeadlines
 		: [
-				{
-					id: "1",
-					type: "quotation",
-					documentNo: "QT-2024-001",
-					clientName: "شركة الأفق",
-					dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-				},
 				{
 					id: "2",
 					type: "invoice",
@@ -148,10 +141,7 @@ export function FinanceAlerts({
 
 					<div className="space-y-2">
 						{mockUpcomingDeadlines.slice(0, 3).map((deadline) => {
-							const path =
-								deadline.type === "quotation"
-									? `${basePath}/quotations/${deadline.id}`
-									: `${basePath}/invoices/${deadline.id}`;
+							const path = `${basePath}/invoices/${deadline.id}`;
 							const daysUntil = Math.ceil(
 								(new Date(deadline.dueDate).getTime() - Date.now()) /
 									(1000 * 60 * 60 * 24),

@@ -59,7 +59,7 @@ const TableHead = ({
 }: React.ThHTMLAttributes<HTMLTableCellElement>) => (
 	<th
 		className={cn(
-			"h-12 px-4 text-left align-middle font-medium text-foreground/60 [&:has([role=checkbox])]:pr-0",
+			"h-12 px-4 text-start align-middle font-medium text-foreground/60 [&:has([role=checkbox])]:pe-0",
 			className,
 		)}
 		{...props}
@@ -72,7 +72,7 @@ const TableCell = ({
 }: React.TdHTMLAttributes<HTMLTableCellElement>) => (
 	<td
 		className={cn(
-			"p-4 align-middle [&:has([role=checkbox])]:pr-0",
+			"p-4 align-middle [&:has([role=checkbox])]:pe-0",
 			className,
 		)}
 		{...props}

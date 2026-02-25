@@ -34,7 +34,7 @@ export const deleteAttachmentProcedure = protectedProcedure
 		);
 
 		// Rate limit check
-		rateLimitChecker(user.id, "deleteAttachment", RATE_LIMITS.WRITE);
+		await rateLimitChecker(user.id, "deleteAttachment", RATE_LIMITS.WRITE);
 
 		// Verify attachment exists and belongs to organization
 		const attachment = await getAttachment(

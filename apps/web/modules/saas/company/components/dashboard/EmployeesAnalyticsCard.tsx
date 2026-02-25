@@ -1,0 +1,191 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+import { PieChart, Pie, Cell } from "recharts";
+import { ChartContainer } from "@ui/components/chart";
+import { Users } from "lucide-react";
+
+interface EmployeesAnalyticsCardProps {
+	employees: {
+		totalActive: number;
+		totalTerminated: number;
+		totalOnLeave: number;
+		totalMonthlySalaries: number;
+		totalMonthlyGosi: number;
+		totalMonthlyCost: number;
+	};
+	formatCurrency: (amount: number) => string;
+}
+
+const COLORS = {
+	active: "#10b981",
+	onLeave: "#f59e0b",
+	terminated: "#64748b",
+};
+
+export function EmployeesAnalyticsCard({
+	employees,
+	formatCurrency,
+}: EmployeesAnalyticsCardProps) {
+	const t = useTranslations();
+
+	const total =
+		employees.totalActive + employees.totalOnLeave + employees.totalTerminated;
+
+	const chartData = [
+		{ name: "active", value: employees.totalActive, color: COLORS.active },
+		{ name: "onLeave", value: employees.totalOnLeave, color: COLORS.onLeave },
+		{
+			name: "terminated",
+			value: employees.totalTerminated,
+			color: COLORS.terminated,
+		},
+	].filter((d) => d.value > 0);
+
+	const legendItems = [
+		{
+			label: t("company.employees.active"),
+			value: employees.totalActive,
+			color: COLORS.active,
+		},
+		{
+			label: t("company.employees.onLeave"),
+			value: employees.totalOnLeave,
+			color: COLORS.onLeave,
+		},
+		{
+			label: t("company.employees.terminated"),
+			value: employees.totalTerminated,
+			color: COLORS.terminated,
+		},
+	];
+
+	const isEmpty = total === 0;
+
+	return (
+		<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-5">
+			{/* Header */}
+			<div className="flex items-center gap-3 mb-5">
+				<div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+					<Users className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+				</div>
+				<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+					{t("company.dashboard.employeeAnalytics")}
+				</h3>
+			</div>
+
+			{isEmpty ? (
+				<div className="flex items-center justify-center h-[180px] text-sm text-slate-400 dark:text-slate-500">
+					{t("company.dashboard.noData")}
+				</div>
+			) : (
+				<>
+					{/* Chart */}
+					<div className="flex justify-center mb-4">
+						<ChartContainer
+							config={{}}
+							className="h-[160px] w-[160px] !aspect-square"
+						>
+							<PieChart>
+								<Pie
+									data={chartData}
+									cx="50%"
+									cy="50%"
+									innerRadius={40}
+									outerRadius={70}
+									paddingAngle={2}
+									dataKey="value"
+									strokeWidth={0}
+								>
+									{chartData.map((entry) => (
+										<Cell key={entry.name} fill={entry.color} />
+									))}
+								</Pie>
+								<text
+									x="50%"
+									y="46%"
+									textAnchor="middle"
+									dominantBaseline="middle"
+									className="fill-slate-900 dark:fill-slate-100 text-2xl font-bold"
+									style={{ fontSize: "24px", fontWeight: 700 }}
+								>
+									{total}
+								</text>
+								<text
+									x="50%"
+									y="60%"
+									textAnchor="middle"
+									dominantBaseline="middle"
+									className="fill-slate-500 dark:fill-slate-400"
+									style={{ fontSize: "11px" }}
+								>
+									{t("company.dashboard.employee")}
+								</text>
+							</PieChart>
+						</ChartContainer>
+					</div>
+
+					{/* Legend */}
+					<div className="space-y-2 mb-4">
+						{legendItems.map((item) => (
+							<div
+								key={item.label}
+								className="flex items-center justify-between text-sm"
+							>
+								<div className="flex items-center gap-2">
+									<div
+										className="w-2.5 h-2.5 rounded-full shrink-0"
+										style={{ backgroundColor: item.color }}
+									/>
+									<span className="text-slate-600 dark:text-slate-400">
+										{item.label}
+									</span>
+								</div>
+								<span className="font-semibold text-slate-900 dark:text-slate-100">
+									{item.value}
+								</span>
+							</div>
+						))}
+					</div>
+
+					{/* Footer */}
+					<div className="border-t border-slate-200/60 dark:border-slate-700/40 pt-3 space-y-1.5">
+						<div className="flex items-center justify-between text-xs">
+							<span className="text-slate-500 dark:text-slate-400">
+								{t("company.dashboard.salaries")}
+							</span>
+							<span
+								className="font-semibold text-slate-700 dark:text-slate-300"
+								dir="ltr"
+							>
+								{formatCurrency(employees.totalMonthlySalaries)}
+							</span>
+						</div>
+						<div className="flex items-center justify-between text-xs">
+							<span className="text-slate-500 dark:text-slate-400">
+								{t("company.dashboard.gosi")}
+							</span>
+							<span
+								className="font-semibold text-slate-700 dark:text-slate-300"
+								dir="ltr"
+							>
+								{formatCurrency(employees.totalMonthlyGosi)}
+							</span>
+						</div>
+						<div className="flex items-center justify-between text-sm mt-2">
+							<span className="font-bold text-slate-900 dark:text-slate-100">
+								{t("company.dashboard.totalMonthlyCost")}
+							</span>
+							<span
+								className="font-bold text-slate-900 dark:text-slate-100"
+								dir="ltr"
+							>
+								{formatCurrency(employees.totalMonthlyCost)}
+							</span>
+						</div>
+					</div>
+				</>
+			)}
+		</div>
+	);
+}

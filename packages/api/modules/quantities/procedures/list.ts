@@ -23,7 +23,7 @@ export const list = protectedProcedure
 		await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "quantities", action: "view" },
+			{ section: "pricing", action: "view" },
 		);
 
 		const result = await getOrganizationCostStudies(input.organizationId, {

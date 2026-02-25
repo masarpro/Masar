@@ -3,7 +3,6 @@
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import {
-	FileText,
 	Receipt,
 	LayoutTemplate,
 	Users,
@@ -28,13 +27,6 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 	const basePath = `/app/${organizationSlug}/finance`;
 
 	const actions: QuickAction[] = [
-		{
-			id: "quotation",
-			icon: FileText,
-			href: `${basePath}/quotations/new`,
-			color: "text-blue-600 dark:text-blue-400",
-			bgColor: "bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50",
-		},
 		{
 			id: "invoice",
 			icon: Receipt,
@@ -77,7 +69,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			<h2 className="text-sm font-medium text-muted-foreground">
 				{t("finance.dashboard.quickActions")}
 			</h2>
-			<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+			<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
 				{actions.map((action) => {
 					const Icon = action.icon;
 					return (

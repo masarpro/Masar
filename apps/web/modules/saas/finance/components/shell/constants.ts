@@ -3,7 +3,6 @@ import {
 	Wallet,
 	Users,
 	FileText,
-	FileSpreadsheet,
 	Banknote,
 	CreditCard,
 	Building,
@@ -46,12 +45,6 @@ export const FINANCE_NAV_SECTIONS: FinanceNavSection[] = [
 		path: "invoices",
 		labelKey: "finance.shell.sections.invoices",
 		icon: FileText,
-	},
-	{
-		id: "quotations",
-		path: "quotations",
-		labelKey: "finance.shell.sections.quotations",
-		icon: FileSpreadsheet,
 	},
 	{
 		id: "payments",

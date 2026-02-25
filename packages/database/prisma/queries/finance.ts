@@ -444,30 +444,8 @@ export async function setClientContactAsPrimary(id: string, clientId: string) {
 export async function generateQuotationNumber(
 	organizationId: string,
 ): Promise<string> {
-	const year = new Date().getFullYear();
-	const prefix = `QT-${year}-`;
-
-	const lastQuotation = await db.quotation.findFirst({
-		where: {
-			organizationId,
-			quotationNo: { startsWith: prefix },
-		},
-		orderBy: { quotationNo: "desc" },
-		select: { quotationNo: true },
-	});
-
-	let nextNumber = 1;
-	if (lastQuotation) {
-		const lastNumber = parseInt(
-			lastQuotation.quotationNo.replace(prefix, ""),
-			10,
-		);
-		if (!isNaN(lastNumber)) {
-			nextNumber = lastNumber + 1;
-		}
-	}
-
-	return `${prefix}${nextNumber.toString().padStart(4, "0")}`;
+	const { generateAtomicNo } = await import("./sequences");
+	return generateAtomicNo(organizationId, "QT");
 }
 
 /**
@@ -815,27 +793,8 @@ export async function deleteQuotation(id: string, organizationId: string) {
 export async function generateInvoiceNumber(
 	organizationId: string,
 ): Promise<string> {
-	const year = new Date().getFullYear();
-	const prefix = `INV-${year}-`;
-
-	const lastInvoice = await db.financeInvoice.findFirst({
-		where: {
-			organizationId,
-			invoiceNo: { startsWith: prefix },
-		},
-		orderBy: { invoiceNo: "desc" },
-		select: { invoiceNo: true },
-	});
-
-	let nextNumber = 1;
-	if (lastInvoice) {
-		const lastNumber = parseInt(lastInvoice.invoiceNo.replace(prefix, ""), 10);
-		if (!isNaN(lastNumber)) {
-			nextNumber = lastNumber + 1;
-		}
-	}
-
-	return `${prefix}${nextNumber.toString().padStart(4, "0")}`;
+	const { generateAtomicNo } = await import("./sequences");
+	return generateAtomicNo(organizationId, "INV");
 }
 
 /**
@@ -1412,30 +1371,9 @@ export async function generateDocumentNumber(
 	organizationId: string,
 	type: OpenDocumentType,
 ): Promise<string> {
-	const year = new Date().getFullYear();
-	const prefix = `DOC-${type.substring(0, 3).toUpperCase()}-${year}-`;
-
-	const lastDocument = await db.openDocument.findFirst({
-		where: {
-			organizationId,
-			documentNo: { startsWith: prefix },
-		},
-		orderBy: { documentNo: "desc" },
-		select: { documentNo: true },
-	});
-
-	let nextNumber = 1;
-	if (lastDocument) {
-		const lastNumber = parseInt(
-			lastDocument.documentNo.replace(prefix, ""),
-			10,
-		);
-		if (!isNaN(lastNumber)) {
-			nextNumber = lastNumber + 1;
-		}
-	}
-
-	return `${prefix}${nextNumber.toString().padStart(4, "0")}`;
+	const { generateAtomicNo } = await import("./sequences");
+	const prefix = `DOC-${type.substring(0, 3).toUpperCase()}`;
+	return generateAtomicNo(organizationId, prefix);
 }
 
 /**

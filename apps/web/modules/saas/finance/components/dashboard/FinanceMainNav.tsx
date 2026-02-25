@@ -1,7 +1,6 @@
 "use client";
 
 import {
-	FileText,
 	Receipt,
 	LayoutTemplate,
 	Users,
@@ -32,16 +31,6 @@ export function FinanceMainNav({ organizationSlug }: FinanceMainNavProps) {
 	const basePath = `/app/${organizationSlug}/finance`;
 
 	const sections: NavSection[] = [
-		{
-			id: "quotations",
-			icon: FileText,
-			browsePath: `${basePath}/quotations`,
-			createPath: `${basePath}/quotations/new`,
-			iconColor: "text-blue-500 dark:text-blue-400",
-			bgColor: "bg-blue-50/80 dark:bg-blue-950/30",
-			hoverBg: "hover:bg-blue-100 dark:hover:bg-blue-900/50",
-			borderColor: "border-blue-200/50 dark:border-blue-800/50",
-		},
 		{
 			id: "invoices",
 			icon: Receipt,
@@ -94,7 +83,7 @@ export function FinanceMainNav({ organizationSlug }: FinanceMainNavProps) {
 	];
 
 	return (
-		<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+		<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
 			{sections.map((section) => {
 				const Icon = section.icon;
 				return (

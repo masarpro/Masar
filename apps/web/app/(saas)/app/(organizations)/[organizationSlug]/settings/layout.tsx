@@ -1,19 +1,9 @@
 import { isOrganizationAdmin } from "@repo/auth/lib/helper";
 import { config } from "@repo/config";
 import { getActiveOrganization, getSession } from "@saas/auth/lib/server";
-import { OrganizationLogo } from "@saas/organizations/components/OrganizationLogo";
-import { SettingsMenu } from "@saas/settings/components/SettingsMenu";
-import { PageHeader } from "@saas/shared/components/PageHeader";
-import { SidebarContentLayout } from "@saas/shared/components/SidebarContentLayout";
-import {
-	CreditCardIcon,
-	LinkIcon,
-	Settings2Icon,
-	TriangleAlertIcon,
-	Users2Icon,
-} from "lucide-react";
+import { SettingsHeader } from "@saas/settings/components/shell/SettingsHeader";
+import { SettingsNavigation } from "@saas/settings/components/shell/SettingsNavigation";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
 import type { PropsWithChildren } from "react";
 
 export default async function SettingsLayout({
@@ -22,7 +12,6 @@ export default async function SettingsLayout({
 }: PropsWithChildren<{
 	params: Promise<{ organizationSlug: string }>;
 }>) {
-	const t = await getTranslations();
 	const session = await getSession();
 	const { organizationSlug } = await params;
 	const organization = await getActiveOrganization(organizationSlug);
@@ -36,80 +25,24 @@ export default async function SettingsLayout({
 		session?.user,
 	);
 
-	const organizationSettingsBasePath = `/app/${organizationSlug}/settings`;
-
-	const menuItems = [
-		{
-			title: t("settings.menu.organization.title"),
-			avatar: (
-				<OrganizationLogo
-					name={organization.name}
-					logoUrl={organization.logo}
-				/>
-			),
-			items: [
-				{
-					title: t("settings.menu.organization.general"),
-					href: `${organizationSettingsBasePath}/general`,
-					icon: <Settings2Icon className="size-4 opacity-50" />,
-				},
-				{
-					title: t("settings.menu.organization.members"),
-					href: `${organizationSettingsBasePath}/members`,
-					icon: <Users2Icon className="size-4 opacity-50" />,
-				},
-				...(config.organizations.enable &&
-				config.organizations.enableBilling &&
-				userIsOrganizationAdmin
-					? [
-							{
-								title: t("settings.menu.organization.billing"),
-								href: `${organizationSettingsBasePath}/billing`,
-								icon: (
-									<CreditCardIcon className="size-4 opacity-50" />
-								),
-							},
-						]
-					: []),
-				...(userIsOrganizationAdmin
-					? [
-							{
-								title: t("settings.menu.organization.integrations"),
-								href: `${organizationSettingsBasePath}/integrations`,
-								icon: (
-									<LinkIcon className="size-4 opacity-50" />
-								),
-							},
-						]
-					: []),
-				...(userIsOrganizationAdmin
-					? [
-							{
-								title: t(
-									"settings.menu.organization.dangerZone",
-								),
-								href: `${organizationSettingsBasePath}/danger-zone`,
-								icon: (
-									<TriangleAlertIcon className="size-4 opacity-50" />
-								),
-							},
-						]
-					: []),
-			],
-		},
-	];
+	const billingEnabled =
+		config.organizations.enable &&
+		config.organizations.enableBilling &&
+		userIsOrganizationAdmin;
 
 	return (
-		<>
-			<PageHeader
-				title={t("organizations.settings.title")}
-				subtitle={t("organizations.settings.subtitle")}
+		<div>
+			<div className="px-4 md:px-6 lg:px-8 pt-4 space-y-4">
+				<SettingsHeader
+					userName={session?.user?.name ?? undefined}
+				/>
+			</div>
+			<SettingsNavigation
+				organizationSlug={organizationSlug}
+				isAdmin={userIsOrganizationAdmin}
+				billingEnabled={billingEnabled}
 			/>
-			<SidebarContentLayout
-				sidebar={<SettingsMenu menuItems={menuItems} />}
-			>
-				{children}
-			</SidebarContentLayout>
-		</>
+			<div className="px-4 md:px-6 lg:px-8 py-6">{children}</div>
+		</div>
 	);
 }

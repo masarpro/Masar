@@ -4,6 +4,7 @@ import {
 	createPayment,
 	updatePayment,
 	deletePayment,
+	orgAuditLog,
 } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
@@ -131,7 +132,7 @@ export const createOrgPaymentProcedure = protectedProcedure
 			action: "payments",
 		});
 
-		return createPayment({
+		const payment = await createPayment({
 			organizationId: input.organizationId,
 			createdById: context.user.id,
 			amount: input.amount,
@@ -147,6 +148,17 @@ export const createOrgPaymentProcedure = protectedProcedure
 			description: input.description,
 			notes: input.notes,
 		});
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "PAYMENT_CREATED",
+			entityType: "payment",
+			entityId: payment.id,
+			metadata: { amount: input.amount, destinationAccountId: input.destinationAccountId },
+		});
+
+		return payment;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -182,7 +194,18 @@ export const updateOrgPaymentProcedure = protectedProcedure
 
 		const { organizationId, id, ...data } = input;
 
-		return updatePayment(id, organizationId, data);
+		const payment = await updatePayment(id, organizationId, data);
+
+		orgAuditLog({
+			organizationId,
+			actorId: context.user.id,
+			action: "PAYMENT_UPDATED",
+			entityType: "payment",
+			entityId: id,
+			metadata: data,
+		});
+
+		return payment;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -207,5 +230,15 @@ export const deleteOrgPaymentProcedure = protectedProcedure
 			action: "payments",
 		});
 
-		return deletePayment(input.id, input.organizationId);
+		const result = await deletePayment(input.id, input.organizationId);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "PAYMENT_DELETED",
+			entityType: "payment",
+			entityId: input.id,
+		});
+
+		return result;
 	});

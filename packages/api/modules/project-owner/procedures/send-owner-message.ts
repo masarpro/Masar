@@ -3,6 +3,7 @@ import { getOwnerContextByToken, sendOwnerPortalMessage, createNotifications } f
 import { z } from "zod";
 import { publicProcedure } from "../../../orpc/procedures";
 import { db } from "@repo/database";
+import { enforceRateLimit, RATE_LIMITS } from "../../../lib/rate-limit";
 
 export const sendOwnerMessageProcedure = publicProcedure
 	.route({
@@ -19,6 +20,10 @@ export const sendOwnerMessageProcedure = publicProcedure
 		}),
 	)
 	.handler(async ({ input }) => {
+		// STRICT rate limit (5/min) for write operations — prevents message spam
+		// and notification flooding to all org members
+		await enforceRateLimit(`token:${input.token}:sendOwnerMessage`, RATE_LIMITS.STRICT);
+
 		// Validate token
 		const context = await getOwnerContextByToken(input.token);
 

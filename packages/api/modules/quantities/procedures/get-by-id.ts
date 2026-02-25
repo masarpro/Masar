@@ -21,7 +21,7 @@ export const getById = protectedProcedure
 		await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "quantities", action: "view" },
+			{ section: "pricing", action: "view" },
 		);
 
 		const costStudy = await getCostStudyById(input.id, input.organizationId);

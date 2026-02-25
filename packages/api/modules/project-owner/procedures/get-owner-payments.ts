@@ -2,6 +2,7 @@ import { ORPCError } from "@orpc/server";
 import { getOwnerContextByToken, getOwnerPayments } from "@repo/database";
 import { z } from "zod";
 import { publicProcedure } from "../../../orpc/procedures";
+import { rateLimitToken } from "../../../lib/rate-limit";
 
 export const getOwnerPaymentsProcedure = publicProcedure
 	.route({
@@ -16,6 +17,9 @@ export const getOwnerPaymentsProcedure = publicProcedure
 		}),
 	)
 	.handler(async ({ input }) => {
+		// Rate limit before any DB work to throttle brute-force and spam
+		await rateLimitToken(input.token, "getOwnerPayments");
+
 		// Validate token
 		const context = await getOwnerContextByToken(input.token);
 

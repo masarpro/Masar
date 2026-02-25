@@ -4,7 +4,7 @@
  */
 
 import { ORPCError } from "@orpc/server";
-import { validateAttachment } from "@repo/database";
+import { validateAttachment, validateFileName } from "@repo/database";
 import { getSignedUploadUrl } from "@repo/storage";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
@@ -51,13 +51,20 @@ export const createUploadUrlProcedure = protectedProcedure
 		);
 
 		// Rate limit check
-		rateLimitChecker(user.id, "createUploadUrl", RATE_LIMITS.UPLOAD);
+		await rateLimitChecker(user.id, "createUploadUrl", RATE_LIMITS.UPLOAD);
 
-		// Validate file type and size
+		// Validate file name (double extensions, dangerous types)
+		const nameCheck = validateFileName(input.fileName);
+		if (!nameCheck.valid) {
+			throw new ORPCError("BAD_REQUEST", { message: nameCheck.error });
+		}
+
+		// Validate file type, size, and extension-MIME consistency
 		const validation = validateAttachment(
 			input.ownerType,
 			input.mimeType,
 			input.fileSize,
+			input.fileName,
 		);
 
 		if (!validation.valid) {

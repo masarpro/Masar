@@ -19,8 +19,9 @@ import {
 	SelectValue,
 } from "@ui/components/select";
 import { toast } from "sonner";
-import { Save, Building, Wallet, TrendingDown } from "lucide-react";
+import { Save, Building, Wallet, TrendingDown, Clock } from "lucide-react";
 import { Currency } from "../shared/Currency";
+import { Switch } from "@ui/components/switch";
 
 interface ExpenseFormProps {
 	organizationId: string;
@@ -80,12 +81,14 @@ export function ExpenseForm({
 	const queryClient = useQueryClient();
 
 	// Form state
+	const [isObligation, setIsObligation] = useState(false);
 	const [formData, setFormData] = useState({
 		category: "MISC" as typeof EXPENSE_CATEGORIES[number],
 		customCategory: "",
 		description: "",
 		amount: "",
 		date: new Date().toISOString().split("T")[0],
+		dueDate: "",
 		sourceAccountId: defaultSourceAccountId || "",
 		vendorName: "",
 		vendorTaxNumber: "",
@@ -119,7 +122,7 @@ export function ExpenseForm({
 	// Create mutation
 	const createMutation = useMutation({
 		mutationFn: async () => {
-			if (!formData.sourceAccountId) {
+			if (!isObligation && !formData.sourceAccountId) {
 				throw new Error(t("finance.expenses.errors.accountRequired"));
 			}
 			if (!formData.amount || parseFloat(formData.amount) <= 0) {
@@ -133,13 +136,15 @@ export function ExpenseForm({
 				description: formData.description || undefined,
 				amount: parseFloat(formData.amount),
 				date: new Date(formData.date),
-				sourceAccountId: formData.sourceAccountId,
+				sourceAccountId: isObligation ? undefined : formData.sourceAccountId,
 				vendorName: formData.vendorName || undefined,
 				vendorTaxNumber: formData.vendorTaxNumber || undefined,
 				projectId: formData.projectId || undefined,
 				invoiceRef: formData.invoiceRef || undefined,
 				paymentMethod: formData.paymentMethod,
 				referenceNo: formData.referenceNo || undefined,
+				status: isObligation ? "PENDING" : undefined,
+				dueDate: isObligation && formData.dueDate ? new Date(formData.dueDate) : undefined,
 				notes: formData.notes || undefined,
 			});
 		},
@@ -246,6 +251,38 @@ export function ExpenseForm({
 						/>
 					</div>
 
+					{/* Obligation Toggle */}
+					<div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+						<div className="flex items-center gap-3">
+							<div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-lg">
+								<Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+							</div>
+							<div>
+								<p className="text-sm font-medium">{t("finance.expenses.recordObligation")}</p>
+								<p className="text-xs text-slate-500">{t("finance.expenses.recordObligationHint")}</p>
+							</div>
+						</div>
+						<Switch
+							checked={isObligation}
+							onCheckedChange={setIsObligation}
+						/>
+					</div>
+
+					{/* Due Date (only for obligations) */}
+					{isObligation && (
+						<div>
+							<Label>{t("finance.expenses.dueDate")}</Label>
+							<Input
+								type="date"
+								value={formData.dueDate}
+								onChange={(e) =>
+									setFormData({ ...formData, dueDate: e.target.value })
+								}
+								className="rounded-xl mt-1 max-w-xs"
+							/>
+						</div>
+					)}
+
 					{/* Description */}
 					<div>
 						<Label>{t("finance.expenses.description")}</Label>
@@ -262,14 +299,17 @@ export function ExpenseForm({
 				</CardContent>
 			</Card>
 
-			{/* Source Account */}
-			<Card className="rounded-2xl">
+			{/* Source Account - optional for obligations */}
+			<Card className={`rounded-2xl ${isObligation ? "opacity-60" : ""}`}>
 				<CardHeader>
-					<CardTitle>{t("finance.expenses.sourceAccount")}</CardTitle>
+					<CardTitle>{t("finance.expenses.sourceAccount")} {!isObligation && "*"}</CardTitle>
+					{isObligation && (
+						<p className="text-sm text-amber-600 dark:text-amber-400">{t("finance.expenses.accountOptionalForObligation")}</p>
+					)}
 				</CardHeader>
 				<CardContent className="space-y-6">
 					<div>
-						<Label>{t("finance.expenses.selectAccount")} *</Label>
+						<Label>{t("finance.expenses.selectAccount")} {!isObligation && "*"}</Label>
 						<Select
 							value={formData.sourceAccountId}
 							onValueChange={(value) =>

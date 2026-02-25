@@ -11,7 +11,6 @@ import {
 	Landmark,
 	TrendingUp,
 	TrendingDown,
-	FileText,
 	Receipt,
 	Clock,
 	Users,
@@ -22,10 +21,6 @@ import { formatCurrency } from "../../lib/utils";
 import { Currency } from "../shared/Currency";
 
 interface FinanceStats {
-	quotations: {
-		total: number;
-		totalValue: number;
-	};
 	invoices: {
 		total: number;
 		totalValue: number;
@@ -182,23 +177,7 @@ export function FinanceOverviewPanel({ stats }: FinanceOverviewPanelProps) {
 			</div>
 
 			{/* Row 2 - Small Stats */}
-			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-				{/* Quotations */}
-				<div className="rounded-xl bg-blue-50/80 dark:bg-blue-950/30 p-4 border border-blue-100/50 dark:border-blue-900/50">
-					<div className="flex items-center gap-2 mb-2">
-						<FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-						<span className="text-xs font-medium text-blue-600 dark:text-blue-400">
-							{t("finance.stats.quotations")}
-						</span>
-					</div>
-					<p className="text-xl font-bold text-blue-700 dark:text-blue-300">
-						{stats?.quotations.total ?? 0}
-					</p>
-					<p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-1">
-						<Currency amount={stats?.quotations.totalValue ?? 0} />
-					</p>
-				</div>
-
+			<div className="grid grid-cols-3 gap-3">
 				{/* Invoices */}
 				<div className="rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 p-4 border border-emerald-100/50 dark:border-emerald-900/50">
 					<div className="flex items-center gap-2 mb-2">

@@ -216,6 +216,44 @@ export async function linkAttachmentsToOwner(
 // Validation Helpers
 // ═══════════════════════════════════════════════════════════════════════════
 
+// Blocked MIME types (security risk)
+const BLOCKED_MIME_TYPES = new Set([
+	"image/svg+xml",
+	"text/html",
+	"application/xhtml+xml",
+	"application/javascript",
+	"text/javascript",
+]);
+
+// Dangerous file extensions (executable or script)
+const DANGEROUS_EXTENSIONS = new Set([
+	"exe", "bat", "cmd", "com", "msi", "scr", "pif",
+	"js", "vbs", "wsf", "wsh", "ps1", "sh", "bash",
+	"svg", "html", "htm", "xhtml", "hta",
+]);
+
+// Extension → allowed MIME types mapping for consistency checks
+const EXTENSION_MIME_MAP: Record<string, string[]> = {
+	pdf: ["application/pdf"],
+	doc: ["application/msword"],
+	docx: ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+	xls: ["application/vnd.ms-excel"],
+	xlsx: ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+	jpg: ["image/jpeg"],
+	jpeg: ["image/jpeg"],
+	png: ["image/png"],
+	webp: ["image/webp"],
+	heic: ["image/heic"],
+};
+
+// Magic byte signatures for file type verification
+const MAGIC_SIGNATURES: Array<{ mime: string; bytes: number[] }> = [
+	{ mime: "image/png", bytes: [0x89, 0x50, 0x4e, 0x47] }, // \x89PNG
+	{ mime: "image/jpeg", bytes: [0xff, 0xd8, 0xff] }, // \xFF\xD8\xFF
+	{ mime: "application/pdf", bytes: [0x25, 0x50, 0x44, 0x46] }, // %PDF
+	{ mime: "image/webp", bytes: [0x52, 0x49, 0x46, 0x46] }, // RIFF (WebP)
+];
+
 // Allowed MIME types per owner type
 const ALLOWED_MIME_TYPES: Record<AttachmentOwnerType, string[]> = {
 	DOCUMENT: [
@@ -234,6 +272,7 @@ const ALLOWED_MIME_TYPES: Record<AttachmentOwnerType, string[]> = {
 	MESSAGE: ["image/jpeg", "image/png", "image/webp", "application/pdf"],
 	CLAIM: ["application/pdf", "image/jpeg", "image/png"],
 	CHANGE_ORDER: ["application/pdf", "image/jpeg", "image/png", "image/webp"],
+	CLIENT: ["application/pdf", "image/jpeg", "image/png", "image/webp"],
 };
 
 // Max file sizes (in bytes)
@@ -245,16 +284,52 @@ const MAX_FILE_SIZES: Record<AttachmentOwnerType, number> = {
 	MESSAGE: 10 * 1024 * 1024, // 10MB
 	CLAIM: 20 * 1024 * 1024, // 20MB
 	CHANGE_ORDER: 20 * 1024 * 1024, // 20MB
+	CLIENT: 10 * 1024 * 1024, // 10MB
 };
 
 /**
- * Validate file type and size
+ * Validate file name for security issues:
+ * - Double extensions (invoice.pdf.exe)
+ * - Dangerous extensions (svg, exe, bat, etc.)
+ */
+export function validateFileName(fileName: string): { valid: boolean; error?: string } {
+	const normalized = fileName.trim().toLowerCase();
+
+	// Split on dots — more than 2 parts means double extension (e.g. "file.pdf.exe")
+	const parts = normalized.split(".");
+	if (parts.length > 2) {
+		// Check if any non-final part is a dangerous extension
+		for (let i = 1; i < parts.length - 1; i++) {
+			if (DANGEROUS_EXTENSIONS.has(parts[i])) {
+				return { valid: false, error: "اسم الملف يحتوي على امتداد مزدوج مشبوه" };
+			}
+		}
+	}
+
+	// Check final extension against dangerous list
+	const ext = parts[parts.length - 1];
+	if (DANGEROUS_EXTENSIONS.has(ext)) {
+		return { valid: false, error: `امتداد الملف غير مسموح: .${ext}` };
+	}
+
+	return { valid: true };
+}
+
+/**
+ * Validate file type, size, extension-MIME consistency, and blocked types
  */
 export function validateAttachment(
 	ownerType: AttachmentOwnerType,
 	mimeType: string,
 	fileSize: number,
+	fileName?: string,
 ): { valid: boolean; error?: string } {
+	// 1. Block dangerous MIME types (SVG, HTML, JS)
+	if (BLOCKED_MIME_TYPES.has(mimeType)) {
+		return { valid: false, error: "نوع الملف محظور لأسباب أمنية" };
+	}
+
+	// 2. Check allowed MIME types per owner type
 	const allowedTypes = ALLOWED_MIME_TYPES[ownerType];
 	if (!allowedTypes.includes(mimeType)) {
 		return {
@@ -263,6 +338,20 @@ export function validateAttachment(
 		};
 	}
 
+	// 3. Extension-MIME consistency check
+	if (fileName) {
+		const ext = fileName.split(".").pop()?.toLowerCase();
+		if (ext && EXTENSION_MIME_MAP[ext]) {
+			if (!EXTENSION_MIME_MAP[ext].includes(mimeType)) {
+				return {
+					valid: false,
+					error: `امتداد الملف (.${ext}) لا يتطابق مع نوع المحتوى (${mimeType})`,
+				};
+			}
+		}
+	}
+
+	// 4. File size check
 	const maxSize = MAX_FILE_SIZES[ownerType];
 	if (fileSize > maxSize) {
 		const maxSizeMB = Math.round(maxSize / (1024 * 1024));
@@ -272,5 +361,61 @@ export function validateAttachment(
 		};
 	}
 
+	return { valid: true };
+}
+
+/**
+ * Validate file header (magic bytes) against claimed MIME type.
+ * Pass the first 8+ bytes of the file content.
+ * Returns valid=true if no signature match is expected (e.g. .docx, .xlsx)
+ * or if the signature matches the claimed type.
+ */
+export function validateFileHeader(
+	headerBytes: Uint8Array,
+	claimedMimeType: string,
+): { valid: boolean; error?: string; detectedType?: string } {
+	if (headerBytes.length < 4) {
+		return { valid: false, error: "بيانات ترويسة الملف غير كافية للتحقق" };
+	}
+
+	// Find a matching signature in the header
+	for (const sig of MAGIC_SIGNATURES) {
+		const matches = sig.bytes.every((b, i) => headerBytes[i] === b);
+		if (matches) {
+			// WebP special case: RIFF header shared with other formats,
+			// check for WEBP at offset 8
+			if (sig.mime === "image/webp") {
+				if (
+					headerBytes.length >= 12 &&
+					headerBytes[8] === 0x57 && // W
+					headerBytes[9] === 0x45 && // E
+					headerBytes[10] === 0x42 && // B
+					headerBytes[11] === 0x50 // P
+				) {
+					if (claimedMimeType !== "image/webp") {
+						return {
+							valid: false,
+							detectedType: "image/webp",
+							error: `محتوى الملف (image/webp) لا يتطابق مع النوع المُعلن (${claimedMimeType})`,
+						};
+					}
+					return { valid: true, detectedType: "image/webp" };
+				}
+				// RIFF but not WebP — skip this signature
+				continue;
+			}
+
+			if (claimedMimeType !== sig.mime) {
+				return {
+					valid: false,
+					detectedType: sig.mime,
+					error: `محتوى الملف (${sig.mime}) لا يتطابق مع النوع المُعلن (${claimedMimeType})`,
+				};
+			}
+			return { valid: true, detectedType: sig.mime };
+		}
+	}
+
+	// No known signature matched — allow (covers .docx, .xlsx, .heic, etc.)
 	return { valid: true };
 }

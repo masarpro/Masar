@@ -70,7 +70,11 @@ export async function updateOrgUser(
 		throw new Error("لا يمكن تعديل حساب المالك");
 	}
 
-	return await db.user.update({
+	// When deactivating a user (isActive: true -> false), immediately invalidate
+	// all their sessions so they lose access on the very next request.
+	const isBeingDeactivated = data.isActive === false && user.isActive === true;
+
+	const updated = await db.user.update({
 		where: { id },
 		data: {
 			name: data.name,
@@ -82,6 +86,12 @@ export async function updateOrgUser(
 		},
 		include: { organizationRole: true },
 	});
+
+	if (isBeingDeactivated) {
+		await db.session.deleteMany({ where: { userId: id } });
+	}
+
+	return updated;
 }
 
 // تعطيل/تفعيل موظف
@@ -91,10 +101,20 @@ export async function toggleUserActive(id: string, organizationId: string) {
 	if (user.accountType === "OWNER")
 		throw new Error("لا يمكن تعطيل حساب المالك");
 
-	return await db.user.update({
+	const newIsActive = !user.isActive;
+
+	const updated = await db.user.update({
 		where: { id },
-		data: { isActive: !user.isActive },
+		data: { isActive: newIsActive },
 	});
+
+	// When toggling to inactive, immediately invalidate all sessions so the
+	// user loses access on the very next request — not after session expiry.
+	if (!newIsActive) {
+		await db.session.deleteMany({ where: { userId: id } });
+	}
+
+	return updated;
 }
 
 // حذف موظف

@@ -43,7 +43,7 @@ export const quoteCreate = protectedProcedure
 		await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "quantities", action: "pricing" },
+			{ section: "pricing", action: "pricing" },
 		);
 
 		// Verify the study exists and belongs to the organization
@@ -85,7 +85,7 @@ export const quoteGetById = protectedProcedure
 		await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "quantities", action: "view" },
+			{ section: "pricing", action: "view" },
 		);
 
 		const quote = await getQuoteById(input.id);
@@ -147,7 +147,7 @@ export const quoteUpdate = protectedProcedure
 		await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "quantities", action: "pricing" },
+			{ section: "pricing", action: "pricing" },
 		);
 
 		// Verify the quote exists and belongs to the organization
@@ -189,7 +189,7 @@ export const quoteDelete = protectedProcedure
 		await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "quantities", action: "pricing" },
+			{ section: "pricing", action: "pricing" },
 		);
 
 		// Verify the quote exists and belongs to the organization
@@ -222,7 +222,7 @@ export const quoteList = protectedProcedure
 		await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "quantities", action: "view" },
+			{ section: "pricing", action: "view" },
 		);
 
 		// Verify the study exists and belongs to the organization

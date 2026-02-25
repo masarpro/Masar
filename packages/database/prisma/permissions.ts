@@ -19,6 +19,13 @@ export interface QuantitiesPermissions {
 	pricing: boolean;
 }
 
+export interface PricingPermissions {
+	view: boolean;
+	studies: boolean;
+	quotations: boolean;
+	pricing: boolean;
+}
+
 export interface FinancePermissions {
 	view: boolean;
 	quotations: boolean;
@@ -35,6 +42,13 @@ export interface EmployeesPermissions {
 	delete: boolean;
 	payroll: boolean;
 	attendance: boolean;
+}
+
+export interface CompanyPermissions {
+	view: boolean;
+	expenses: boolean;
+	assets: boolean;
+	reports: boolean;
 }
 
 export interface SettingsPermissions {
@@ -54,8 +68,10 @@ export interface ReportsPermissions {
 export interface Permissions {
 	projects: ProjectPermissions;
 	quantities: QuantitiesPermissions;
+	pricing: PricingPermissions;
 	finance: FinancePermissions;
 	employees: EmployeesPermissions;
+	company: CompanyPermissions;
 	settings: SettingsPermissions;
 	reports: ReportsPermissions;
 }
@@ -90,6 +106,12 @@ export function createEmptyPermissions(): Permissions {
 			delete: false,
 			pricing: false,
 		},
+		pricing: {
+			view: false,
+			studies: false,
+			quotations: false,
+			pricing: false,
+		},
 		finance: {
 			view: false,
 			quotations: false,
@@ -105,6 +127,12 @@ export function createEmptyPermissions(): Permissions {
 			delete: false,
 			payroll: false,
 			attendance: false,
+		},
+		company: {
+			view: false,
+			expenses: false,
+			assets: false,
+			reports: false,
 		},
 		settings: {
 			organization: false,
@@ -139,6 +167,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			delete: true,
 			pricing: true,
 		},
+		pricing: {
+			view: true,
+			studies: true,
+			quotations: true,
+			pricing: true,
+		},
 		finance: {
 			view: true,
 			quotations: true,
@@ -154,6 +188,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			delete: true,
 			payroll: true,
 			attendance: true,
+		},
+		company: {
+			view: true,
+			expenses: true,
+			assets: true,
+			reports: true,
 		},
 		settings: {
 			organization: true,
@@ -182,6 +222,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			delete: false,
 			pricing: true,
 		},
+		pricing: {
+			view: true,
+			studies: true,
+			quotations: true,
+			pricing: true,
+		},
 		finance: {
 			view: true,
 			quotations: true,
@@ -197,6 +243,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			delete: false,
 			payroll: false,
 			attendance: true,
+		},
+		company: {
+			view: true,
+			expenses: false,
+			assets: true,
+			reports: true,
 		},
 		settings: {
 			organization: false,
@@ -225,6 +277,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			delete: false,
 			pricing: true,
 		},
+		pricing: {
+			view: true,
+			studies: false,
+			quotations: true,
+			pricing: true,
+		},
 		finance: {
 			view: true,
 			quotations: true,
@@ -240,6 +298,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			delete: false,
 			payroll: true,
 			attendance: false,
+		},
+		company: {
+			view: true,
+			expenses: true,
+			assets: true,
+			reports: true,
 		},
 		settings: {
 			organization: false,
@@ -268,6 +332,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			delete: false,
 			pricing: false,
 		},
+		pricing: {
+			view: true,
+			studies: true,
+			quotations: false,
+			pricing: false,
+		},
 		finance: {
 			view: false,
 			quotations: false,
@@ -283,6 +353,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			delete: false,
 			payroll: false,
 			attendance: false,
+		},
+		company: {
+			view: false,
+			expenses: false,
+			assets: false,
+			reports: false,
 		},
 		settings: {
 			organization: false,
@@ -311,6 +387,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			delete: false,
 			pricing: false,
 		},
+		pricing: {
+			view: true,
+			studies: false,
+			quotations: false,
+			pricing: false,
+		},
 		finance: {
 			view: false,
 			quotations: false,
@@ -326,6 +408,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			delete: false,
 			payroll: false,
 			attendance: false,
+		},
+		company: {
+			view: false,
+			expenses: false,
+			assets: false,
+			reports: false,
 		},
 		settings: {
 			organization: false,
@@ -354,6 +442,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			delete: false,
 			pricing: false,
 		},
+		pricing: {
+			view: false,
+			studies: false,
+			quotations: false,
+			pricing: false,
+		},
 		finance: {
 			view: false,
 			quotations: false,
@@ -369,6 +463,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			delete: false,
 			payroll: false,
 			attendance: false,
+		},
+		company: {
+			view: false,
+			expenses: false,
+			assets: false,
+			reports: false,
 		},
 		settings: {
 			organization: false,

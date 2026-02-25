@@ -90,7 +90,22 @@
       "Bash(cd \"H:/Masar/supastarter-nextjs-3\" && git checkout -- packages/database/prisma/zod/index.ts && git stash pop 2>&1)",
       "Bash(cd H:/Masar/supastarter-nextjs-3 && npx -y tsx -e \"console.log\\('test'\\)\" 2>&1)",
       "Bash(cd H:/Masar/supastarter-nextjs-3 && node_modules/.bin/tsx -e \"console.log\\('test'\\)\" 2>&1)",
-      "Bash(cd H:\\\\Masar\\\\supastarter-nextjs-3:*)"
+      "Bash(cd H:\\\\Masar\\\\supastarter-nextjs-3:*)",
+      "Bash(cd:*)",
+      "Bash(cd H:/Masar/supastarter-nextjs-3/packages/database && dotenv -c -e ../../.env -- prisma db push --accept-data-loss 2>&1)",
+      "Bash(cd H:/Masar/supastarter-nextjs-3 && npx tsx packages/database/verify-precision.ts 2>&1)",
+      "Bash(cd H:/Masar/supastarter-nextjs-3 && npx ts-node --esm packages/database/verify-precision.ts 2>&1 || npx --yes tsx packages/database/verify-precision.ts 2>&1)",
+      "Bash(which psql:*)",
+      "Bash(cd H:/Masar/supastarter-nextjs-3/packages/database && npx prisma validate --schema prisma/schema.prisma 2>&1)",
+      "Bash(cd H:/Masar/supastarter-nextjs-3 && pnpm -v 2>&1)",
+      "Bash(cd H:/Masar/supastarter-nextjs-3/packages/api && npx vitest run 2>&1)",
+      "Bash(cd H:/Masar/supastarter-nextjs-3/packages/database && npx vitest run 2>&1)",
+      "Bash(cd /h/Masar/supastarter-nextjs-3/packages/database && npx vitest run 2>&1)",
+      "Bash(cd /h/Masar/supastarter-nextjs-3/packages/api && npx vitest run 2>&1)",
+      "Bash(cd /h/Masar/supastarter-nextjs-3/packages/database && npx prisma validate 2>&1)",
+      "Bash(cd \"H:/Masar/supastarter-nextjs-3/packages/database\" && dotenv -c -e ../../.env -- npx prisma db push --accept-data-loss 2>&1)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)"
     ]
   }
 }

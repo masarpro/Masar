@@ -4,8 +4,11 @@ import {
 	createExpense,
 	updateExpense,
 	deleteExpense,
+	payExpense,
+	cancelExpense,
 	getExpensesSummaryByCategory,
 	getOrganizationSubcontractPayments,
+	orgAuditLog,
 } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
@@ -55,6 +58,14 @@ const financeTransactionStatusEnum = z.enum([
 	"CANCELLED",
 ]);
 
+const expenseSourceTypeEnum = z.enum([
+	"MANUAL",
+	"FACILITY_PAYROLL",
+	"FACILITY_RECURRING",
+	"FACILITY_ASSET",
+	"PROJECT",
+]);
+
 // ═══════════════════════════════════════════════════════════════════════════
 // LIST EXPENSES
 // ═══════════════════════════════════════════════════════════════════════════
@@ -72,6 +83,7 @@ export const listExpenses = protectedProcedure
 			sourceAccountId: z.string().optional(),
 			projectId: z.string().optional(),
 			status: financeTransactionStatusEnum.optional(),
+			sourceType: expenseSourceTypeEnum.optional(),
 			dateFrom: z.coerce.date().optional(),
 			dateTo: z.coerce.date().optional(),
 			query: z.string().optional(),
@@ -90,6 +102,7 @@ export const listExpenses = protectedProcedure
 			sourceAccountId: input.sourceAccountId,
 			projectId: input.projectId,
 			status: input.status,
+			sourceType: input.sourceType,
 			dateFrom: input.dateFrom,
 			dateTo: input.dateTo,
 			query: input.query,
@@ -179,15 +192,27 @@ export const createExpenseProcedure = protectedProcedure
 			description: z.string().optional(),
 			amount: z.number().positive(),
 			date: z.coerce.date(),
-			sourceAccountId: z.string(),
+			sourceAccountId: z.string().optional(),
 			vendorName: z.string().optional(),
 			vendorTaxNumber: z.string().optional(),
 			projectId: z.string().optional(),
 			invoiceRef: z.string().optional(),
 			paymentMethod: paymentMethodEnum.optional().default("BANK_TRANSFER"),
 			referenceNo: z.string().optional(),
+			status: financeTransactionStatusEnum.optional(),
+			sourceType: expenseSourceTypeEnum.optional(),
+			dueDate: z.coerce.date().optional(),
 			notes: z.string().optional(),
-		}),
+		}).refine(
+			(data) => {
+				// sourceAccountId is required when status is not PENDING
+				if (data.status !== "PENDING" && !data.sourceAccountId) {
+					return false;
+				}
+				return true;
+			},
+			{ message: "sourceAccountId is required for non-pending expenses", path: ["sourceAccountId"] },
+		),
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
@@ -195,7 +220,7 @@ export const createExpenseProcedure = protectedProcedure
 			action: "payments",
 		});
 
-		return createExpense({
+		const expense = await createExpense({
 			organizationId: input.organizationId,
 			createdById: context.user.id,
 			category: input.category,
@@ -210,8 +235,22 @@ export const createExpenseProcedure = protectedProcedure
 			invoiceRef: input.invoiceRef,
 			paymentMethod: input.paymentMethod,
 			referenceNo: input.referenceNo,
+			status: input.status,
+			sourceType: input.sourceType,
+			dueDate: input.dueDate,
 			notes: input.notes,
 		});
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "EXPENSE_CREATED",
+			entityType: "expense",
+			entityId: expense.id,
+			metadata: { amount: input.amount, category: input.category, status: input.status ?? "COMPLETED" },
+		});
+
+		return expense;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -249,7 +288,18 @@ export const updateExpenseProcedure = protectedProcedure
 
 		const { organizationId, id, ...data } = input;
 
-		return updateExpense(id, organizationId, data);
+		const expense = await updateExpense(id, organizationId, data);
+
+		orgAuditLog({
+			organizationId,
+			actorId: context.user.id,
+			action: "EXPENSE_UPDATED",
+			entityType: "expense",
+			entityId: id,
+			metadata: data,
+		});
+
+		return expense;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -274,7 +324,99 @@ export const deleteExpenseProcedure = protectedProcedure
 			action: "payments",
 		});
 
-		return deleteExpense(input.id, input.organizationId);
+		const result = await deleteExpense(input.id, input.organizationId);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "EXPENSE_DELETED",
+			entityType: "expense",
+			entityId: input.id,
+		});
+
+		return result;
+	});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PAY EXPENSE (full or partial)
+// ═══════════════════════════════════════════════════════════════════════════
+export const payExpenseProcedure = protectedProcedure
+	.route({
+		method: "POST",
+		path: "/finance/expenses/{id}/pay",
+		tags: ["Finance", "Expenses"],
+		summary: "Pay a pending expense (full or partial)",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			id: z.string(),
+			sourceAccountId: z.string(),
+			paymentMethod: paymentMethodEnum.optional(),
+			referenceNo: z.string().optional(),
+			amount: z.number().positive().optional(),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "payments",
+		});
+
+		const expense = await payExpense({
+			expenseId: input.id,
+			organizationId: input.organizationId,
+			sourceAccountId: input.sourceAccountId,
+			paymentMethod: input.paymentMethod,
+			referenceNo: input.referenceNo,
+			amount: input.amount,
+		});
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "EXPENSE_PAID",
+			entityType: "expense",
+			entityId: input.id,
+			metadata: { amount: input.amount, sourceAccountId: input.sourceAccountId, newStatus: expense.status },
+		});
+
+		return expense;
+	});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CANCEL EXPENSE
+// ═══════════════════════════════════════════════════════════════════════════
+export const cancelExpenseProcedure = protectedProcedure
+	.route({
+		method: "POST",
+		path: "/finance/expenses/{id}/cancel",
+		tags: ["Finance", "Expenses"],
+		summary: "Cancel a pending expense",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			id: z.string(),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "payments",
+		});
+
+		const expense = await cancelExpense(input.id, input.organizationId);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "EXPENSE_CANCELLED",
+			entityType: "expense",
+			entityId: input.id,
+		});
+
+		return expense;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════

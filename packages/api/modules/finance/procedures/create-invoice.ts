@@ -7,6 +7,7 @@ import {
 	deleteInvoicePayment,
 	deleteInvoice,
 	getInvoiceById,
+	orgAuditLog,
 } from "@repo/database";
 import { z } from "zod";
 import { ORPCError } from "@orpc/server";
@@ -92,6 +93,15 @@ export const createInvoiceProcedure = protectedProcedure
 			items: input.items,
 		});
 
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "INVOICE_CREATED",
+			entityType: "invoice",
+			entityId: invoice.id,
+			metadata: { invoiceType: input.invoiceType, clientName: input.clientName, totalAmount: Number(invoice.totalAmount) },
+		});
+
 		return {
 			...invoice,
 			subtotal: Number(invoice.subtotal),
@@ -157,6 +167,14 @@ export const updateInvoiceProcedure = protectedProcedure
 			dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
 		});
 
+		orgAuditLog({
+			organizationId,
+			actorId: context.user.id,
+			action: "INVOICE_UPDATED",
+			entityType: "invoice",
+			entityId: id,
+		});
+
 		return invoice;
 	});
 
@@ -185,6 +203,15 @@ export const updateInvoiceItemsProcedure = protectedProcedure
 			input.organizationId,
 			input.items,
 		);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "INVOICE_ITEMS_UPDATED",
+			entityType: "invoice",
+			entityId: input.id,
+			metadata: { itemCount: input.items.length },
+		});
 
 		return {
 			...invoice,
@@ -235,6 +262,15 @@ export const updateInvoiceStatusProcedure = protectedProcedure
 			input.organizationId,
 			input.status,
 		);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "INVOICE_STATUS_CHANGED",
+			entityType: "invoice",
+			entityId: input.id,
+			metadata: { newStatus: input.status },
+		});
 
 		return invoice;
 	});
@@ -298,6 +334,14 @@ export const convertToTaxInvoiceProcedure = protectedProcedure
 			qrCode,
 		});
 
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "INVOICE_CONVERTED_TO_TAX",
+			entityType: "invoice",
+			entityId: input.id,
+		});
+
 		return updatedInvoice;
 	});
 
@@ -338,6 +382,15 @@ export const addInvoicePaymentProcedure = protectedProcedure
 			},
 		);
 
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "INVOICE_PAYMENT_ADDED",
+			entityType: "invoice",
+			entityId: input.id,
+			metadata: { amount: input.amount, paymentId: payment.id },
+		});
+
 		return {
 			...payment,
 			amount: Number(payment.amount),
@@ -370,6 +423,15 @@ export const deleteInvoicePaymentProcedure = protectedProcedure
 			input.organizationId,
 		);
 
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "INVOICE_PAYMENT_DELETED",
+			entityType: "invoice",
+			entityId: input.invoiceId,
+			metadata: { paymentId: input.paymentId },
+		});
+
 		return { success: true };
 	});
 
@@ -393,6 +455,14 @@ export const deleteInvoiceProcedure = protectedProcedure
 		});
 
 		await deleteInvoice(input.id, input.organizationId);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "INVOICE_DELETED",
+			entityType: "invoice",
+			entityId: input.id,
+		});
 
 		return { success: true };
 	});

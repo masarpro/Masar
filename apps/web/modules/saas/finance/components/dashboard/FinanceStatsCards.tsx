@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import {
-	FileText,
 	Receipt,
 	Users,
 	TrendingUp,
@@ -12,10 +11,6 @@ import { Currency } from "../shared/Currency";
 
 interface FinanceStatsCardsProps {
 	stats: {
-		quotations: {
-			total: number;
-			totalValue: number;
-		};
 		invoices: {
 			total: number;
 			totalValue: number;
@@ -33,26 +28,7 @@ export function FinanceStatsCards({ stats }: FinanceStatsCardsProps) {
 	const t = useTranslations();
 
 	return (
-		<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-			<div className="rounded-2xl bg-blue-50 dark:bg-blue-950/30 p-5">
-				<div className="flex items-center justify-between">
-					<div>
-						<p className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide">
-							{t("finance.stats.quotations")}
-						</p>
-						<p className="text-3xl font-semibold mt-2 text-blue-700 dark:text-blue-300">
-							{stats.quotations.total}
-						</p>
-						<p className="text-sm text-blue-600/70 mt-1">
-							<Currency amount={stats.quotations.totalValue} />
-						</p>
-					</div>
-					<div className="p-3 rounded-2xl bg-blue-200/50 dark:bg-blue-800/30">
-						<FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-					</div>
-				</div>
-			</div>
-
+		<div className="grid grid-cols-3 gap-4">
 			<div className="rounded-2xl bg-green-50 dark:bg-green-950/30 p-5">
 				<div className="flex items-center justify-between">
 					<div>

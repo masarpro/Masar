@@ -5,6 +5,7 @@ import {
 	updateQuotationStatus,
 	deleteQuotation,
 	convertQuotationToInvoice,
+	orgAuditLog,
 } from "@repo/database";
 import { z } from "zod";
 import { ORPCError } from "@orpc/server";
@@ -49,7 +50,7 @@ export const createQuotationProcedure = protectedProcedure
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "finance",
+			section: "pricing",
 			action: "quotations",
 		});
 
@@ -73,6 +74,15 @@ export const createQuotationProcedure = protectedProcedure
 			vatPercent: input.vatPercent,
 			discountPercent: input.discountPercent,
 			items: input.items,
+		});
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "QUOTATION_CREATED",
+			entityType: "quotation",
+			entityId: quotation.id,
+			metadata: { clientName: input.clientName, totalAmount: Number(quotation.totalAmount) },
 		});
 
 		return {
@@ -123,7 +133,7 @@ export const updateQuotationProcedure = protectedProcedure
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "finance",
+			section: "pricing",
 			action: "quotations",
 		});
 
@@ -136,6 +146,14 @@ export const updateQuotationProcedure = protectedProcedure
 			templateId: data.templateId ?? undefined,
 			clientEmail: data.clientEmail || undefined,
 			validUntil: data.validUntil ? new Date(data.validUntil) : undefined,
+		});
+
+		orgAuditLog({
+			organizationId,
+			actorId: context.user.id,
+			action: "QUOTATION_UPDATED",
+			entityType: "quotation",
+			entityId: id,
 		});
 
 		return quotation;
@@ -157,7 +175,7 @@ export const updateQuotationItemsProcedure = protectedProcedure
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "finance",
+			section: "pricing",
 			action: "quotations",
 		});
 
@@ -166,6 +184,15 @@ export const updateQuotationItemsProcedure = protectedProcedure
 			input.organizationId,
 			input.items,
 		);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "QUOTATION_ITEMS_UPDATED",
+			entityType: "quotation",
+			entityId: input.id,
+			metadata: { itemCount: input.items.length },
+		});
 
 		return {
 			...quotation,
@@ -207,7 +234,7 @@ export const updateQuotationStatusProcedure = protectedProcedure
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "finance",
+			section: "pricing",
 			action: "quotations",
 		});
 
@@ -216,6 +243,15 @@ export const updateQuotationStatusProcedure = protectedProcedure
 			input.organizationId,
 			input.status,
 		);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "QUOTATION_STATUS_CHANGED",
+			entityType: "quotation",
+			entityId: input.id,
+			metadata: { newStatus: input.status },
+		});
 
 		return quotation;
 	});
@@ -235,11 +271,19 @@ export const deleteQuotationProcedure = protectedProcedure
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "finance",
+			section: "pricing",
 			action: "quotations",
 		});
 
 		await deleteQuotation(input.id, input.organizationId);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "QUOTATION_DELETED",
+			entityType: "quotation",
+			entityId: input.id,
+		});
 
 		return { success: true };
 	});
@@ -276,6 +320,15 @@ export const convertQuotationToInvoiceProcedure = protectedProcedure
 				invoiceType: input.invoiceType,
 			},
 		);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "QUOTATION_CONVERTED",
+			entityType: "quotation",
+			entityId: input.id,
+			metadata: { invoiceId: invoice.id, invoiceType: input.invoiceType },
+		});
 
 		return {
 			...invoice,

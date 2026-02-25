@@ -120,56 +120,46 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 								)
 							}
 						>
-							<CollapsibleTrigger asChild>
+							<div
+								className={cn(
+									"w-full flex items-center justify-between rounded-lg transition-all duration-200 ease-out relative",
+									"hover:bg-muted",
+									isActive &&
+										"bg-primary/10 dark:bg-primary/20 text-primary font-medium",
+									"p-3",
+								)}
+							>
 								{item.href ? (
 									<Link
 										href={item.href}
 										onClick={closeMobile}
-										className={cn(
-											"w-full flex items-center justify-between rounded-lg transition-all duration-200 ease-out relative",
-											"hover:bg-muted",
-											isActive &&
-												"bg-primary/10 dark:bg-primary/20 text-primary font-medium",
-											"p-3",
-										)}
+										className="flex flex-1 min-w-0 items-center gap-3"
 									>
-										<div className="flex items-center gap-3">
-											<item.icon
-												className={cn(
-													"size-5 shrink-0",
-													isActive && "text-primary",
-												)}
-											/>
-											<span>{item.label}</span>
-										</div>
-										<ChevronDown
+										<item.icon
 											className={cn(
-												"size-4 shrink-0 transition-transform duration-200 ease-out",
-												isOpen && "rotate-180",
+												"size-5 shrink-0",
+												isActive && "text-primary",
 											)}
 										/>
+										<span>{item.label}</span>
 									</Link>
 								) : (
+									<div className="flex flex-1 min-w-0 items-center gap-3">
+										<item.icon
+											className={cn(
+												"size-5 shrink-0",
+												isActive && "text-primary",
+											)}
+										/>
+										<span>{item.label}</span>
+									</div>
+								)}
+								<CollapsibleTrigger asChild>
 									<button
 										type="button"
 										aria-label={item.label}
-										className={cn(
-											"w-full flex items-center justify-between rounded-lg transition-all duration-200 ease-out relative",
-											"hover:bg-muted",
-											isActive &&
-												"bg-primary/10 dark:bg-primary/20 text-primary font-medium",
-											"p-3",
-										)}
+										className="shrink-0 rounded p-1 hover:bg-muted-foreground/20"
 									>
-										<div className="flex items-center gap-3">
-											<item.icon
-												className={cn(
-													"size-5 shrink-0",
-													isActive && "text-primary",
-												)}
-											/>
-											<span>{item.label}</span>
-										</div>
 										<ChevronDown
 											className={cn(
 												"size-4 shrink-0 transition-transform duration-200 ease-out",
@@ -177,14 +167,14 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 											)}
 										/>
 									</button>
-								)}
-							</CollapsibleTrigger>
+								</CollapsibleTrigger>
+							</div>
 							<CollapsibleContent
 								className="grid transition-all duration-200 ease-out data-[state=closed]:grid-rows-[0fr] data-[state=closed]:opacity-0 data-[state=open]:grid-rows-[1fr] data-[state=open]:opacity-100"
 							>
 								<div className="overflow-hidden">
 									<div className="ms-4 mt-1 space-y-1 border-s-2 border-border ps-3">
-									{item.children.map((child) => {
+									{(item.children ?? []).map((child) => {
 										const childHref = child.href;
 										const childActive = child.id === activeId;
 										return childHref ? (

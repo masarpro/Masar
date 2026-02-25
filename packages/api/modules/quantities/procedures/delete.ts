@@ -21,7 +21,7 @@ export const deleteCostStudy = protectedProcedure
 		await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "quantities", action: "delete" },
+			{ section: "pricing", action: "studies" },
 		);
 
 		try {

@@ -38,7 +38,7 @@ export function NavBar() {
 
 	const menuItems = [
 		{
-			label: t("app.menu.start"),
+			label: t("app.menu.home"),
 			href: basePath,
 			icon: HomeIcon,
 			isActive: pathname === basePath,

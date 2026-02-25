@@ -3,6 +3,7 @@ import {
 	getTransferById,
 	createTransfer,
 	cancelTransfer,
+	orgAuditLog,
 } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
@@ -115,7 +116,7 @@ export const createTransferProcedure = protectedProcedure
 			action: "payments",
 		});
 
-		return createTransfer({
+		const transfer = await createTransfer({
 			organizationId: input.organizationId,
 			createdById: context.user.id,
 			amount: input.amount,
@@ -126,6 +127,17 @@ export const createTransferProcedure = protectedProcedure
 			notes: input.notes,
 			referenceNo: input.referenceNo,
 		});
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "TRANSFER_CREATED",
+			entityType: "transfer",
+			entityId: transfer.id,
+			metadata: { amount: input.amount, fromAccountId: input.fromAccountId, toAccountId: input.toAccountId },
+		});
+
+		return transfer;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -150,5 +162,15 @@ export const cancelTransferProcedure = protectedProcedure
 			action: "payments",
 		});
 
-		return cancelTransfer(input.id, input.organizationId);
+		const transfer = await cancelTransfer(input.id, input.organizationId);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "TRANSFER_CANCELLED",
+			entityType: "transfer",
+			entityId: input.id,
+		});
+
+		return transfer;
 	});

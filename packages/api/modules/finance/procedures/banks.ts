@@ -4,8 +4,10 @@ import {
 	getBankAccountById,
 	getOrganizationBalancesSummary,
 	getOrganizationBankAccounts,
+	reconcileBankAccount,
 	setDefaultBankAccount,
 	updateBankAccount,
+	orgAuditLog,
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
@@ -134,7 +136,7 @@ export const createBankAccountProcedure = protectedProcedure
 			action: "settings",
 		});
 
-		return createBankAccount({
+		const account = await createBankAccount({
 			organizationId: input.organizationId,
 			createdById: context.user.id,
 			name: input.name,
@@ -147,6 +149,17 @@ export const createBankAccountProcedure = protectedProcedure
 			isDefault: input.isDefault,
 			notes: input.notes,
 		});
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "BANK_ACCOUNT_CREATED",
+			entityType: "bank_account",
+			entityId: account.id,
+			metadata: { name: input.name, accountType: input.accountType },
+		});
+
+		return account;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -181,7 +194,18 @@ export const updateBankAccountProcedure = protectedProcedure
 
 		const { organizationId, id, ...data } = input;
 
-		return updateBankAccount(id, organizationId, data);
+		const account = await updateBankAccount(id, organizationId, data);
+
+		orgAuditLog({
+			organizationId,
+			actorId: context.user.id,
+			action: "BANK_ACCOUNT_UPDATED",
+			entityType: "bank_account",
+			entityId: id,
+			metadata: data,
+		});
+
+		return account;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -206,7 +230,17 @@ export const setDefaultBankAccountProcedure = protectedProcedure
 			action: "settings",
 		});
 
-		return setDefaultBankAccount(input.id, input.organizationId);
+		const account = await setDefaultBankAccount(input.id, input.organizationId);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "BANK_ACCOUNT_SET_DEFAULT",
+			entityType: "bank_account",
+			entityId: input.id,
+		});
+
+		return account;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -231,5 +265,57 @@ export const deleteBankAccountProcedure = protectedProcedure
 			action: "settings",
 		});
 
-		return deleteBankAccount(input.id, input.organizationId);
+		const result = await deleteBankAccount(input.id, input.organizationId);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "BANK_ACCOUNT_DELETED",
+			entityType: "bank_account",
+			entityId: input.id,
+		});
+
+		return result;
+	});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RECONCILE BANK ACCOUNT (read-only diagnostic)
+// ═══════════════════════════════════════════════════════════════════════════
+export const reconcileBankAccountProcedure = protectedProcedure
+	.route({
+		method: "GET",
+		path: "/finance/banks/{id}/reconcile",
+		tags: ["Finance", "Banks"],
+		summary: "Reconcile a bank account (read-only report)",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			id: z.string(),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		// Gated to finance.settings (OWNER + ACCOUNTANT only)
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "settings",
+		});
+
+		const result = await reconcileBankAccount(input.id, input.organizationId);
+
+		// Convert Prisma.Decimal to number for JSON serialization
+		return {
+			storedBalance: Number(result.storedBalance),
+			computedBalance: Number(result.computedBalance),
+			delta: Number(result.delta),
+			isBalanced: result.isBalanced,
+			components: {
+				openingBalance: Number(result.components.openingBalance),
+				paymentsIn: Number(result.components.paymentsIn),
+				expensesOut: Number(result.components.expensesOut),
+				subcontractPaymentsOut: Number(result.components.subcontractPaymentsOut),
+				transfersIn: Number(result.components.transfersIn),
+				transfersOut: Number(result.components.transfersOut),
+			},
+		};
 	});

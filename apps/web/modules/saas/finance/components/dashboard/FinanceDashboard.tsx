@@ -52,12 +52,11 @@ export function FinanceDashboard({
 	}
 
 	const stats = data?.stats;
-	const recentQuotations = data?.recentQuotations ?? [];
 	const recentInvoices = data?.recentInvoices ?? [];
 
 	const cashBalance = orgData?.balances.totalCashBalance ?? 0;
 	const bankBalance = orgData?.balances.totalBankBalance ?? 0;
-	const netProfit = (orgData?.payments.total ?? 0) - (orgData?.expenses.total ?? 0);
+	const netProfit = (orgData?.payments.total ?? 0) - (orgData?.totalMoneyOut ?? 0);
 
 	return (
 		<div className="space-y-6" dir="rtl">
@@ -74,19 +73,18 @@ export function FinanceDashboard({
 			{/* 3. Cash Flow Chart */}
 			<CashFlowCard />
 
-			{/* 4. Quick Action Cards (Quotations, Invoices, Expenses, Payments) */}
+			{/* 4. Quick Action Cards (Invoices, Expenses, Payments) */}
 			<ActionCards organizationSlug={orgSlug} />
 
 			<hr className="border-border" />
 
-			{/* 5. Stats Cards (Quotations, Invoices, Outstanding, Clients) */}
+			{/* 5. Stats Cards (Invoices, Outstanding, Clients) */}
 			<StatsCards stats={stats} />
 
 			{/* 6. Bottom Section (Recent Documents + Deadlines) */}
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 				<div className="lg:col-span-2">
 					<RecentDocumentsTable
-						quotations={recentQuotations}
 						invoices={recentInvoices}
 						organizationSlug={orgSlug}
 					/>

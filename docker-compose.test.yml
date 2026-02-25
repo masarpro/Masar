@@ -1,0 +1,16 @@
+## Test database — `docker compose -f docker-compose.test.yml up -d`
+## Then set: DATABASE_URL_TEST="postgresql://masar:masar_test_pw@localhost:5433/masar_test"
+services:
+  masar-test-db:
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: masar
+      POSTGRES_PASSWORD: masar_test_pw
+      POSTGRES_DB: masar_test
+    volumes:
+      - masar_test_data:/var/lib/postgresql/data
+
+volumes:
+  masar_test_data:

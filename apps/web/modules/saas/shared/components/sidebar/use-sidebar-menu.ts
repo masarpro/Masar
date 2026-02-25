@@ -8,7 +8,6 @@ import { useMemo } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
 	BarChart3,
-	BotMessageSquareIcon,
 	Building,
 	Calculator,
 	CreditCard,
@@ -24,11 +23,11 @@ import {
 	ReceiptIcon,
 	Settings,
 	SettingsIcon,
-	UserCog2Icon,
 	UserCogIcon,
 	Users,
 	Wallet,
 	Banknote,
+	Building2,
 } from "lucide-react";
 
 export interface SidebarMenuChild {
@@ -75,20 +74,13 @@ export function useSidebarMenu(): {
 		return [
 			{
 				id: "start",
-				label: t("app.menu.start"),
+				label: t("app.menu.home"),
 				href: basePath,
 				icon: HomeIcon,
 				isActive: pathname === basePath,
 			},
 			...(activeOrganization
 				? [
-						{
-							id: "quantities",
-							label: t("app.menu.quantities"),
-							href: `${orgPrefix}/quantities`,
-							icon: Calculator,
-							isActive: pathname.includes("/quantities"),
-						},
 						{
 							id: "projects",
 							label: t("app.menu.projects"),
@@ -170,12 +162,6 @@ export function useSidebarMenu(): {
 									icon: Wallet,
 								},
 								{
-									id: "finance-quotations",
-									label: t("finance.shell.sections.quotations"),
-									href: `${orgPrefix}/finance/quotations`,
-									icon: FileSpreadsheet,
-								},
-								{
 									id: "finance-invoices",
 									label: t("finance.shell.sections.invoices"),
 									href: `${orgPrefix}/finance/invoices`,
@@ -231,17 +217,74 @@ export function useSidebarMenu(): {
 								},
 							],
 						},
+						{
+							id: "pricing",
+							label: t("app.menu.pricing"),
+							href: `${orgPrefix}/pricing`,
+							icon: Calculator,
+							isActive: pathname.includes("/pricing"),
+							children: [
+								{
+									id: "pricing-dashboard",
+									label: t("pricing.shell.sections.dashboard"),
+									href: `${orgPrefix}/pricing`,
+									icon: HomeIcon,
+								},
+								{
+									id: "pricing-studies",
+									label: t("pricing.shell.sections.studies"),
+									href: `${orgPrefix}/pricing/studies`,
+									icon: Calculator,
+								},
+								{
+									id: "pricing-quotations",
+									label: t("pricing.shell.sections.quotations"),
+									href: `${orgPrefix}/pricing/quotations`,
+									icon: FileSpreadsheet,
+								},
+							],
+						},
+						{
+							id: "company",
+							label: t("app.menu.company"),
+							href: `${orgPrefix}/company`,
+							icon: Building2,
+							isActive: pathname.includes("/company"),
+							children: [
+								{
+									id: "company-dashboard",
+									label: t("company.nav.dashboard"),
+									href: `${orgPrefix}/company`,
+									icon: HomeIcon,
+								},
+								{
+									id: "company-employees",
+									label: t("company.nav.employees"),
+									href: `${orgPrefix}/company/employees`,
+									icon: Users,
+								},
+								{
+									id: "company-expenses",
+									label: t("company.nav.expenses"),
+									href: `${orgPrefix}/company/expenses`,
+									icon: CreditCard,
+								},
+								{
+									id: "company-assets",
+									label: t("company.nav.assets"),
+									href: `${orgPrefix}/company/assets`,
+									icon: Hammer,
+								},
+								{
+									id: "company-reports",
+									label: t("company.nav.reports"),
+									href: `${orgPrefix}/company/reports`,
+									icon: BarChart3,
+								},
+							],
+						},
 					]
 				: []),
-			{
-				id: "chatbot",
-				label: t("app.menu.aiChatbot"),
-				href: activeOrganization
-					? `${orgPrefix}/chatbot`
-					: "/app/chatbot",
-				icon: BotMessageSquareIcon,
-				isActive: pathname.includes("/chatbot"),
-			},
 			...(activeOrganization && isOrganizationAdmin
 				? [
 						{
@@ -253,13 +296,6 @@ export function useSidebarMenu(): {
 						},
 					]
 				: []),
-			{
-				id: "accountSettings",
-				label: t("app.menu.accountSettings"),
-				href: "/app/settings",
-				icon: UserCog2Icon,
-				isActive: pathname.startsWith("/app/settings/"),
-			},
 			...(user?.role === "admin"
 				? [
 						{
@@ -288,6 +324,14 @@ export function useSidebarMenu(): {
 			? `/app/${activeOrganization.slug}/finance`
 			: undefined;
 
+		const companyBase = activeOrganization
+			? `/app/${activeOrganization.slug}/company`
+			: undefined;
+
+		const pricingBase = activeOrganization
+			? `/app/${activeOrganization.slug}/pricing`
+			: undefined;
+
 		const projectBase = projectId && activeOrganization
 			? `/app/${activeOrganization.slug}/projects/${projectId}`
 			: undefined;
@@ -301,6 +345,20 @@ export function useSidebarMenu(): {
 						if (
 							pathname === financeBase ||
 							pathname === `${financeBase}/`
+						) {
+							return child.id;
+						}
+					} else if (child.id === "pricing-dashboard" && pricingBase) {
+						if (
+							pathname === pricingBase ||
+							pathname === `${pricingBase}/`
+						) {
+							return child.id;
+						}
+					} else if (child.id === "company-dashboard" && companyBase) {
+						if (
+							pathname === companyBase ||
+							pathname === `${companyBase}/`
 						) {
 							return child.id;
 						}

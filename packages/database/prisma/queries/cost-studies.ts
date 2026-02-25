@@ -213,7 +213,7 @@ export async function duplicateCostStudy(
 					subCategory: item.subCategory,
 					name: item.name,
 					description: item.description,
-					dimensions: item.dimensions,
+					dimensions: item.dimensions ?? undefined,
 					quantity: item.quantity,
 					unit: item.unit,
 					concreteVolume: item.concreteVolume,

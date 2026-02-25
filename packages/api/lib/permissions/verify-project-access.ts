@@ -17,7 +17,15 @@ export interface ProjectAccessResult {
 		organizationId: string;
 	};
 	permissions: Permissions;
-	/** @deprecated Use `permissions` field instead. Kept for backwards compatibility. */
+	/**
+	 * @deprecated DO NOT use for authorization decisions.
+	 *
+	 * This carries BetterAuth's Member.role ("owner"/"admin"/"member") which is
+	 * frozen — kept only because BetterAuth requires the field internally.
+	 *
+	 * Authorization source of truth: `permissions` field above, resolved via
+	 * User.organizationRoleId → Role.permissions (see getUserPermissions).
+	 */
 	membership: {
 		role: string;
 	};
@@ -105,6 +113,7 @@ export async function verifyOrganizationAccess(
 		slug: string | null;
 	};
 	permissions: Permissions;
+	/** @deprecated DO NOT use for authorization. BetterAuth Member.role is frozen. Use `permissions` instead. */
 	membership: {
 		role: string;
 	};
@@ -175,6 +184,12 @@ function getPermissionErrorMessage(section: keyof Permissions, action: string): 
 			delete: "ليس لديك صلاحية حذف دراسات الكميات",
 			pricing: "ليس لديك صلاحية إدارة التسعير",
 		},
+		pricing: {
+			view: "ليس لديك صلاحية عرض قسم التسعير",
+			studies: "ليس لديك صلاحية إدارة دراسات الكميات",
+			quotations: "ليس لديك صلاحية إدارة عروض الأسعار",
+			pricing: "ليس لديك صلاحية إدارة التسعير",
+		},
 		finance: {
 			view: "ليس لديك صلاحية عرض البيانات المالية",
 			quotations: "ليس لديك صلاحية إدارة عروض الأسعار",
@@ -190,6 +205,12 @@ function getPermissionErrorMessage(section: keyof Permissions, action: string): 
 			delete: "ليس لديك صلاحية حذف الموظفين",
 			payroll: "ليس لديك صلاحية إدارة الرواتب",
 			attendance: "ليس لديك صلاحية إدارة الحضور",
+		},
+		company: {
+			view: "ليس لديك صلاحية عرض بيانات المنشأة",
+			expenses: "ليس لديك صلاحية إدارة مصروفات المنشأة",
+			assets: "ليس لديك صلاحية إدارة أصول المنشأة",
+			reports: "ليس لديك صلاحية عرض تقارير المنشأة",
 		},
 		settings: {
 			organization: "ليس لديك صلاحية تعديل إعدادات المنظمة",

@@ -62,10 +62,22 @@ const nextConfig: NextConfig = {
 				key: "Permissions-Policy",
 				value: "camera=(), microphone=(), geolocation=()",
 			},
+			{
+				// HSTS — enforce HTTPS for all routes. No preload yet until
+				// domain is verified on hstspreload.org.
+				key: "Strict-Transport-Security",
+				value: "max-age=31536000; includeSubDomains",
+			},
 		];
 
+		// Full CSP for authenticated app and auth routes. Permissive enough for
+		// Next.js (unsafe-inline/unsafe-eval needed for dev and inline scripts)
+		// while blocking framing, base-uri hijacking, and form-action abuse.
+		const appCsp =
+			"default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
+
 		return [
-			// SaaS app routes — no cache, strict framing
+			// SaaS app routes — no cache, strict framing, full CSP
 			{
 				source: "/app/:path*",
 				headers: [
@@ -76,7 +88,7 @@ const nextConfig: NextConfig = {
 					},
 					{
 						key: "Content-Security-Policy",
-						value: "frame-ancestors 'none'",
+						value: appCsp,
 					},
 					{
 						key: "Cache-Control",
@@ -84,7 +96,7 @@ const nextConfig: NextConfig = {
 					},
 				],
 			},
-			// Auth routes — no cache, deny framing
+			// Auth routes — no cache, deny framing, full CSP
 			{
 				source: "/auth/:path*",
 				headers: [
@@ -92,6 +104,10 @@ const nextConfig: NextConfig = {
 					{
 						key: "X-Frame-Options",
 						value: "DENY",
+					},
+					{
+						key: "Content-Security-Policy",
+						value: appCsp,
 					},
 					{
 						key: "Cache-Control",
@@ -164,6 +180,27 @@ const nextConfig: NextConfig = {
 			{
 				source: "/app/admin",
 				destination: "/app/admin/users",
+				permanent: true,
+			},
+			// Pricing restructure redirects (permanent)
+			{
+				source: "/app/:slug/finance/quotations",
+				destination: "/app/:slug/pricing/quotations",
+				permanent: true,
+			},
+			{
+				source: "/app/:slug/finance/quotations/:path*",
+				destination: "/app/:slug/pricing/quotations/:path*",
+				permanent: true,
+			},
+			{
+				source: "/app/:slug/quantities",
+				destination: "/app/:slug/pricing/studies",
+				permanent: true,
+			},
+			{
+				source: "/app/:slug/quantities/:path*",
+				destination: "/app/:slug/pricing/studies/:path*",
 				permanent: true,
 			},
 		];

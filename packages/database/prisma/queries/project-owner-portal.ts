@@ -433,9 +433,9 @@ export async function getOwnerPortalOfficialUpdates(
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Create a milestone
+ * Create a milestone (legacy owner-portal version using sortOrder/plannedDate)
  */
-export async function createMilestone(
+export async function ownerCreateMilestone(
 	organizationId: string,
 	projectId: string,
 	data: {
@@ -464,9 +464,9 @@ export async function createMilestone(
 }
 
 /**
- * Update a milestone
+ * Update a milestone (legacy owner-portal version)
  */
-export async function updateMilestone(
+export async function ownerUpdateMilestone(
 	organizationId: string,
 	projectId: string,
 	milestoneId: string,
@@ -490,9 +490,9 @@ export async function updateMilestone(
 }
 
 /**
- * Delete a milestone
+ * Delete a milestone (legacy owner-portal version)
  */
-export async function deleteMilestone(
+export async function ownerDeleteMilestone(
 	organizationId: string,
 	projectId: string,
 	milestoneId: string,

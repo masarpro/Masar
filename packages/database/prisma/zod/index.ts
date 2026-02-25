@@ -379,13 +379,13 @@ export type FinanceTemplateScalarFieldEnum = z.infer<typeof FinanceTemplateScala
 
 // File: OrganizationBankScalarFieldEnum.schema.ts
 
-export const OrganizationBankScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'name', 'accountNumber', 'bankName', 'iban', 'accountType', 'balance', 'currency', 'isActive', 'isDefault', 'notes', 'createdById', 'createdAt', 'updatedAt'])
+export const OrganizationBankScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'name', 'accountNumber', 'bankName', 'iban', 'accountType', 'openingBalance', 'balance', 'currency', 'isActive', 'isDefault', 'notes', 'createdById', 'createdAt', 'updatedAt'])
 
 export type OrganizationBankScalarFieldEnum = z.infer<typeof OrganizationBankScalarFieldEnumSchema>;
 
 // File: FinanceExpenseScalarFieldEnum.schema.ts
 
-export const FinanceExpenseScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'expenseNo', 'category', 'customCategory', 'description', 'amount', 'date', 'sourceAccountId', 'vendorName', 'vendorTaxNumber', 'projectId', 'invoiceRef', 'paymentMethod', 'referenceNo', 'status', 'notes', 'createdById', 'createdAt', 'updatedAt'])
+export const FinanceExpenseScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'expenseNo', 'category', 'customCategory', 'description', 'amount', 'date', 'sourceAccountId', 'vendorName', 'vendorTaxNumber', 'projectId', 'invoiceRef', 'paymentMethod', 'referenceNo', 'status', 'sourceType', 'sourceId', 'paidAmount', 'dueDate', 'notes', 'createdById', 'createdAt', 'updatedAt'])
 
 export type FinanceExpenseScalarFieldEnum = z.infer<typeof FinanceExpenseScalarFieldEnumSchema>;
 
@@ -400,6 +400,78 @@ export type FinancePaymentScalarFieldEnum = z.infer<typeof FinancePaymentScalarF
 export const FinanceTransferScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'transferNo', 'amount', 'date', 'fromAccountId', 'toAccountId', 'status', 'description', 'notes', 'referenceNo', 'createdById', 'createdAt', 'updatedAt'])
 
 export type FinanceTransferScalarFieldEnum = z.infer<typeof FinanceTransferScalarFieldEnumSchema>;
+
+// File: CompanyExpenseScalarFieldEnum.schema.ts
+
+export const CompanyExpenseScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'name', 'category', 'description', 'amount', 'recurrence', 'vendor', 'contractNumber', 'startDate', 'endDate', 'reminderDays', 'isActive', 'notes', 'createdAt', 'updatedAt'])
+
+export type CompanyExpenseScalarFieldEnum = z.infer<typeof CompanyExpenseScalarFieldEnumSchema>;
+
+// File: CompanyExpensePaymentScalarFieldEnum.schema.ts
+
+export const CompanyExpensePaymentScalarFieldEnumSchema = z.enum(['id', 'expenseId', 'periodStart', 'periodEnd', 'amount', 'isPaid', 'paidAt', 'dueDate', 'bankAccountId', 'referenceNo', 'notes', 'financeExpenseId', 'createdAt', 'updatedAt'])
+
+export type CompanyExpensePaymentScalarFieldEnum = z.infer<typeof CompanyExpensePaymentScalarFieldEnumSchema>;
+
+// File: CompanyExpenseAllocationScalarFieldEnum.schema.ts
+
+export const CompanyExpenseAllocationScalarFieldEnumSchema = z.enum(['id', 'expenseId', 'projectId', 'percentage', 'notes', 'createdAt', 'updatedAt'])
+
+export type CompanyExpenseAllocationScalarFieldEnum = z.infer<typeof CompanyExpenseAllocationScalarFieldEnumSchema>;
+
+// File: EmployeeScalarFieldEnum.schema.ts
+
+export const EmployeeScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'linkedUserId', 'name', 'employeeNo', 'type', 'phone', 'email', 'nationalId', 'salaryType', 'baseSalary', 'housingAllowance', 'transportAllowance', 'otherAllowances', 'gosiSubscription', 'joinDate', 'endDate', 'status', 'notes', 'createdAt', 'updatedAt'])
+
+export type EmployeeScalarFieldEnum = z.infer<typeof EmployeeScalarFieldEnumSchema>;
+
+// File: EmployeeProjectAssignmentScalarFieldEnum.schema.ts
+
+export const EmployeeProjectAssignmentScalarFieldEnumSchema = z.enum(['id', 'employeeId', 'projectId', 'percentage', 'startDate', 'endDate', 'isActive', 'notes', 'createdAt', 'updatedAt'])
+
+export type EmployeeProjectAssignmentScalarFieldEnum = z.infer<typeof EmployeeProjectAssignmentScalarFieldEnumSchema>;
+
+// File: CompanyAssetScalarFieldEnum.schema.ts
+
+export const CompanyAssetScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'name', 'assetNo', 'category', 'type', 'status', 'brand', 'model', 'serialNumber', 'year', 'description', 'purchasePrice', 'monthlyRent', 'currentValue', 'purchaseDate', 'warrantyExpiry', 'insuranceExpiry', 'currentProjectId', 'assignedAt', 'notes', 'createdAt', 'updatedAt'])
+
+export type CompanyAssetScalarFieldEnum = z.infer<typeof CompanyAssetScalarFieldEnumSchema>;
+
+// File: PayrollRunScalarFieldEnum.schema.ts
+
+export const PayrollRunScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'runNo', 'month', 'year', 'totalBaseSalary', 'totalAllowances', 'totalDeductions', 'totalNetSalary', 'employeeCount', 'status', 'approvedById', 'approvedAt', 'createdById', 'notes', 'createdAt', 'updatedAt'])
+
+export type PayrollRunScalarFieldEnum = z.infer<typeof PayrollRunScalarFieldEnumSchema>;
+
+// File: PayrollRunItemScalarFieldEnum.schema.ts
+
+export const PayrollRunItemScalarFieldEnumSchema = z.enum(['id', 'payrollRunId', 'employeeId', 'baseSalary', 'housingAllowance', 'transportAllowance', 'otherAllowances', 'gosiDeduction', 'otherDeductions', 'netSalary', 'financeExpenseId', 'notes', 'createdAt', 'updatedAt'])
+
+export type PayrollRunItemScalarFieldEnum = z.infer<typeof PayrollRunItemScalarFieldEnumSchema>;
+
+// File: CompanyExpenseRunScalarFieldEnum.schema.ts
+
+export const CompanyExpenseRunScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'runNo', 'month', 'year', 'totalAmount', 'itemCount', 'status', 'postedById', 'postedAt', 'createdById', 'notes', 'createdAt', 'updatedAt'])
+
+export type CompanyExpenseRunScalarFieldEnum = z.infer<typeof CompanyExpenseRunScalarFieldEnumSchema>;
+
+// File: CompanyExpenseRunItemScalarFieldEnum.schema.ts
+
+export const CompanyExpenseRunItemScalarFieldEnumSchema = z.enum(['id', 'expenseRunId', 'companyExpenseId', 'name', 'category', 'vendor', 'originalAmount', 'amount', 'financeExpenseId', 'notes', 'createdAt', 'updatedAt'])
+
+export type CompanyExpenseRunItemScalarFieldEnum = z.infer<typeof CompanyExpenseRunItemScalarFieldEnumSchema>;
+
+// File: OrganizationAuditLogScalarFieldEnum.schema.ts
+
+export const OrganizationAuditLogScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'actorId', 'action', 'entityType', 'entityId', 'metadata', 'ipAddress', 'createdAt'])
+
+export type OrganizationAuditLogScalarFieldEnum = z.infer<typeof OrganizationAuditLogScalarFieldEnumSchema>;
+
+// File: OrganizationSequenceScalarFieldEnum.schema.ts
+
+export const OrganizationSequenceScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'sequenceKey', 'currentValue', 'updatedAt'])
+
+export type OrganizationSequenceScalarFieldEnum = z.infer<typeof OrganizationSequenceScalarFieldEnumSchema>;
 
 // File: SortOrder.schema.ts
 
@@ -719,6 +791,78 @@ export const OrgExpenseCategorySchema = z.enum(['MATERIALS', 'LABOR', 'EQUIPMENT
 
 export type OrgExpenseCategory = z.infer<typeof OrgExpenseCategorySchema>;
 
+// File: ExpenseSourceType.schema.ts
+
+export const ExpenseSourceTypeSchema = z.enum(['MANUAL', 'FACILITY_PAYROLL', 'FACILITY_RECURRING', 'FACILITY_ASSET', 'PROJECT'])
+
+export type ExpenseSourceType = z.infer<typeof ExpenseSourceTypeSchema>;
+
+// File: CompanyExpenseCategory.schema.ts
+
+export const CompanyExpenseCategorySchema = z.enum(['RENT', 'UTILITIES', 'COMMUNICATIONS', 'INSURANCE', 'LICENSES', 'SUBSCRIPTIONS', 'MAINTENANCE', 'BANK_FEES', 'MARKETING', 'TRANSPORT', 'HOSPITALITY', 'OTHER'])
+
+export type CompanyExpenseCategory = z.infer<typeof CompanyExpenseCategorySchema>;
+
+// File: RecurrenceType.schema.ts
+
+export const RecurrenceTypeSchema = z.enum(['MONTHLY', 'QUARTERLY', 'SEMI_ANNUAL', 'ANNUAL', 'ONE_TIME'])
+
+export type RecurrenceType = z.infer<typeof RecurrenceTypeSchema>;
+
+// File: EmployeeType.schema.ts
+
+export const EmployeeTypeSchema = z.enum(['PROJECT_MANAGER', 'SITE_ENGINEER', 'SUPERVISOR', 'ACCOUNTANT', 'ADMIN', 'DRIVER', 'TECHNICIAN', 'LABORER', 'SECURITY', 'OTHER'])
+
+export type EmployeeType = z.infer<typeof EmployeeTypeSchema>;
+
+// File: SalaryType.schema.ts
+
+export const SalaryTypeSchema = z.enum(['MONTHLY', 'DAILY'])
+
+export type SalaryType = z.infer<typeof SalaryTypeSchema>;
+
+// File: EmployeeStatus.schema.ts
+
+export const EmployeeStatusSchema = z.enum(['ACTIVE', 'ON_LEAVE', 'TERMINATED'])
+
+export type EmployeeStatus = z.infer<typeof EmployeeStatusSchema>;
+
+// File: AssetCategory.schema.ts
+
+export const AssetCategorySchema = z.enum(['HEAVY_EQUIPMENT', 'LIGHT_EQUIPMENT', 'VEHICLES', 'TOOLS', 'IT_EQUIPMENT', 'FURNITURE', 'SAFETY_EQUIPMENT', 'SURVEYING', 'OTHER'])
+
+export type AssetCategory = z.infer<typeof AssetCategorySchema>;
+
+// File: AssetType.schema.ts
+
+export const AssetTypeSchema = z.enum(['OWNED', 'RENTED', 'LEASED'])
+
+export type AssetType = z.infer<typeof AssetTypeSchema>;
+
+// File: AssetStatus.schema.ts
+
+export const AssetStatusSchema = z.enum(['AVAILABLE', 'IN_USE', 'MAINTENANCE', 'RETIRED'])
+
+export type AssetStatus = z.infer<typeof AssetStatusSchema>;
+
+// File: PayrollRunStatus.schema.ts
+
+export const PayrollRunStatusSchema = z.enum(['DRAFT', 'APPROVED', 'PAID', 'CANCELLED'])
+
+export type PayrollRunStatus = z.infer<typeof PayrollRunStatusSchema>;
+
+// File: ExpenseRunStatus.schema.ts
+
+export const ExpenseRunStatusSchema = z.enum(['DRAFT', 'POSTED', 'CANCELLED'])
+
+export type ExpenseRunStatus = z.infer<typeof ExpenseRunStatusSchema>;
+
+// File: OrgAuditAction.schema.ts
+
+export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED', 'EXPENSE_PAID', 'EXPENSE_CANCELLED', 'EXPENSE_DELETED', 'PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'TRANSFER_CREATED', 'TRANSFER_CANCELLED', 'BANK_ACCOUNT_CREATED', 'BANK_ACCOUNT_UPDATED', 'BANK_ACCOUNT_SET_DEFAULT', 'BANK_ACCOUNT_DELETED', 'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_ITEMS_UPDATED', 'INVOICE_STATUS_CHANGED', 'INVOICE_CONVERTED_TO_TAX', 'INVOICE_PAYMENT_ADDED', 'INVOICE_PAYMENT_DELETED', 'INVOICE_DELETED', 'QUOTATION_CREATED', 'QUOTATION_UPDATED', 'QUOTATION_ITEMS_UPDATED', 'QUOTATION_STATUS_CHANGED', 'QUOTATION_DELETED', 'QUOTATION_CONVERTED', 'CLIENT_CREATED', 'CLIENT_UPDATED', 'CLIENT_DELETED', 'PAYROLL_RUN_APPROVED', 'PAYROLL_RUN_CANCELLED', 'SETTINGS_UPDATED', 'ZATCA_INVOICE_SUBMITTED', 'ZATCA_INVOICE_CLEARED', 'ZATCA_INVOICE_REJECTED'])
+
+export type OrgAuditAction = z.infer<typeof OrgAuditActionSchema>;
+
 // File: User.schema.ts
 
 export const UserSchema = z.object({
@@ -967,20 +1111,40 @@ export const CostStudySchema = z.object({
   customerName: z.string().nullish(),
   customerId: z.string().nullish(),
   projectType: z.string(),
-  landArea: z.number(),
-  buildingArea: z.number(),
+  landArea: z.instanceof(Prisma.Decimal, {
+  message: "Field 'landArea' must be a Decimal. Location: ['Models', 'CostStudy']",
+}),
+  buildingArea: z.instanceof(Prisma.Decimal, {
+  message: "Field 'buildingArea' must be a Decimal. Location: ['Models', 'CostStudy']",
+}),
   numberOfFloors: z.number().int(),
   hasBasement: z.boolean(),
   finishingLevel: z.string(),
-  structuralCost: z.number(),
-  finishingCost: z.number(),
-  mepCost: z.number(),
-  laborCost: z.number(),
-  overheadPercent: z.number().default(5.0),
-  profitPercent: z.number().default(10.0),
-  contingencyPercent: z.number().default(3.0),
+  structuralCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'structuralCost' must be a Decimal. Location: ['Models', 'CostStudy']",
+}),
+  finishingCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'finishingCost' must be a Decimal. Location: ['Models', 'CostStudy']",
+}),
+  mepCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'mepCost' must be a Decimal. Location: ['Models', 'CostStudy']",
+}),
+  laborCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'laborCost' must be a Decimal. Location: ['Models', 'CostStudy']",
+}),
+  overheadPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'overheadPercent' must be a Decimal. Location: ['Models', 'CostStudy']",
+}).default(5),
+  profitPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'profitPercent' must be a Decimal. Location: ['Models', 'CostStudy']",
+}).default(10),
+  contingencyPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'contingencyPercent' must be a Decimal. Location: ['Models', 'CostStudy']",
+}).default(3),
   vatIncluded: z.boolean().default(true),
-  totalCost: z.number(),
+  totalCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalCost' must be a Decimal. Location: ['Models', 'CostStudy']",
+}),
   status: z.string().default("draft"),
   notes: z.string().nullish(),
   createdAt: z.date(),
@@ -1000,16 +1164,32 @@ export const StructuralItemSchema = z.object({
   name: z.string(),
   description: z.string().nullish(),
   dimensions: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
-  quantity: z.number(),
+  quantity: z.instanceof(Prisma.Decimal, {
+  message: "Field 'quantity' must be a Decimal. Location: ['Models', 'StructuralItem']",
+}),
   unit: z.string(),
-  concreteVolume: z.number().nullish(),
+  concreteVolume: z.instanceof(Prisma.Decimal, {
+  message: "Field 'concreteVolume' must be a Decimal. Location: ['Models', 'StructuralItem']",
+}).nullish(),
   concreteType: z.string().nullish(),
-  steelWeight: z.number().nullish(),
-  steelRatio: z.number().nullish(),
-  wastagePercent: z.number().default(10.0),
-  materialCost: z.number(),
-  laborCost: z.number(),
-  totalCost: z.number(),
+  steelWeight: z.instanceof(Prisma.Decimal, {
+  message: "Field 'steelWeight' must be a Decimal. Location: ['Models', 'StructuralItem']",
+}).nullish(),
+  steelRatio: z.instanceof(Prisma.Decimal, {
+  message: "Field 'steelRatio' must be a Decimal. Location: ['Models', 'StructuralItem']",
+}).nullish(),
+  wastagePercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'wastagePercent' must be a Decimal. Location: ['Models', 'StructuralItem']",
+}).default(10),
+  materialCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'materialCost' must be a Decimal. Location: ['Models', 'StructuralItem']",
+}),
+  laborCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'laborCost' must be a Decimal. Location: ['Models', 'StructuralItem']",
+}),
+  totalCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalCost' must be a Decimal. Location: ['Models', 'StructuralItem']",
+}),
   sortOrder: z.number().int(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -1027,15 +1207,29 @@ export const FinishingItemSchema = z.object({
   subCategory: z.string().nullish(),
   name: z.string(),
   description: z.string().nullish(),
-  area: z.number(),
+  area: z.instanceof(Prisma.Decimal, {
+  message: "Field 'area' must be a Decimal. Location: ['Models', 'FinishingItem']",
+}),
   unit: z.string(),
-  wastagePercent: z.number().default(8.0),
+  wastagePercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'wastagePercent' must be a Decimal. Location: ['Models', 'FinishingItem']",
+}).default(8),
   qualityLevel: z.string().default("medium"),
-  materialPrice: z.number(),
-  laborPrice: z.number(),
-  materialCost: z.number(),
-  laborCost: z.number(),
-  totalCost: z.number(),
+  materialPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'materialPrice' must be a Decimal. Location: ['Models', 'FinishingItem']",
+}),
+  laborPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'laborPrice' must be a Decimal. Location: ['Models', 'FinishingItem']",
+}),
+  materialCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'materialCost' must be a Decimal. Location: ['Models', 'FinishingItem']",
+}),
+  laborCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'laborCost' must be a Decimal. Location: ['Models', 'FinishingItem']",
+}),
+  totalCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalCost' must be a Decimal. Location: ['Models', 'FinishingItem']",
+}),
   sortOrder: z.number().int(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -1053,10 +1247,16 @@ export const MEPItemSchema = z.object({
   itemType: z.string(),
   name: z.string(),
   description: z.string().nullish(),
-  quantity: z.number(),
+  quantity: z.instanceof(Prisma.Decimal, {
+  message: "Field 'quantity' must be a Decimal. Location: ['Models', 'MEPItem']",
+}),
   unit: z.string(),
-  unitPrice: z.number(),
-  totalCost: z.number(),
+  unitPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'unitPrice' must be a Decimal. Location: ['Models', 'MEPItem']",
+}),
+  totalCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalCost' must be a Decimal. Location: ['Models', 'MEPItem']",
+}),
   sortOrder: z.number().int(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -1074,12 +1274,22 @@ export const LaborItemSchema = z.object({
   workerType: z.string(),
   name: z.string(),
   quantity: z.number().int(),
-  dailyRate: z.number(),
+  dailyRate: z.instanceof(Prisma.Decimal, {
+  message: "Field 'dailyRate' must be a Decimal. Location: ['Models', 'LaborItem']",
+}),
   durationDays: z.number().int(),
-  insuranceCost: z.number(),
-  housingCost: z.number(),
-  otherCosts: z.number(),
-  totalCost: z.number(),
+  insuranceCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'insuranceCost' must be a Decimal. Location: ['Models', 'LaborItem']",
+}),
+  housingCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'housingCost' must be a Decimal. Location: ['Models', 'LaborItem']",
+}),
+  otherCosts: z.instanceof(Prisma.Decimal, {
+  message: "Field 'otherCosts' must be a Decimal. Location: ['Models', 'LaborItem']",
+}),
+  totalCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalCost' must be a Decimal. Location: ['Models', 'LaborItem']",
+}),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -1099,11 +1309,21 @@ export const QuoteSchema = z.object({
   clientPhone: z.string().nullish(),
   clientEmail: z.string().nullish(),
   clientAddress: z.string().nullish(),
-  subtotal: z.number(),
-  overheadAmount: z.number(),
-  profitAmount: z.number(),
-  vatAmount: z.number(),
-  totalAmount: z.number(),
+  subtotal: z.instanceof(Prisma.Decimal, {
+  message: "Field 'subtotal' must be a Decimal. Location: ['Models', 'Quote']",
+}),
+  overheadAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'overheadAmount' must be a Decimal. Location: ['Models', 'Quote']",
+}),
+  profitAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'profitAmount' must be a Decimal. Location: ['Models', 'Quote']",
+}),
+  vatAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'vatAmount' must be a Decimal. Location: ['Models', 'Quote']",
+}),
+  totalAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalAmount' must be a Decimal. Location: ['Models', 'Quote']",
+}),
   validUntil: z.date(),
   paymentTerms: z.string().nullish(),
   deliveryTerms: z.string().nullish(),
@@ -2132,6 +2352,9 @@ export const OrganizationBankSchema = z.object({
   bankName: z.string().nullish(),
   iban: z.string().nullish(),
   accountType: FinanceAccountTypeSchema.default("BANK"),
+  openingBalance: z.instanceof(Prisma.Decimal, {
+  message: "Field 'openingBalance' must be a Decimal. Location: ['Models', 'OrganizationBank']",
+}),
   balance: z.instanceof(Prisma.Decimal, {
   message: "Field 'balance' must be a Decimal. Location: ['Models', 'OrganizationBank']",
 }),
@@ -2160,7 +2383,7 @@ export const FinanceExpenseSchema = z.object({
   message: "Field 'amount' must be a Decimal. Location: ['Models', 'FinanceExpense']",
 }),
   date: z.date(),
-  sourceAccountId: z.string(),
+  sourceAccountId: z.string().nullish(),
   vendorName: z.string().nullish(),
   vendorTaxNumber: z.string().nullish(),
   projectId: z.string().nullish(),
@@ -2168,6 +2391,12 @@ export const FinanceExpenseSchema = z.object({
   paymentMethod: PaymentMethodSchema.default("BANK_TRANSFER"),
   referenceNo: z.string().nullish(),
   status: FinanceTransactionStatusSchema.default("COMPLETED"),
+  sourceType: ExpenseSourceTypeSchema.default("MANUAL"),
+  sourceId: z.string().nullish(),
+  paidAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'paidAmount' must be a Decimal. Location: ['Models', 'FinanceExpense']",
+}),
+  dueDate: z.date().nullish(),
   notes: z.string().nullish(),
   createdById: z.string(),
   createdAt: z.date(),
@@ -2228,4 +2457,313 @@ export const FinanceTransferSchema = z.object({
 });
 
 export type FinanceTransferType = z.infer<typeof FinanceTransferSchema>;
+
+
+// File: CompanyExpense.schema.ts
+
+export const CompanyExpenseSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  name: z.string(),
+  category: CompanyExpenseCategorySchema,
+  description: z.string().nullish(),
+  amount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'amount' must be a Decimal. Location: ['Models', 'CompanyExpense']",
+}),
+  recurrence: RecurrenceTypeSchema.default("MONTHLY"),
+  vendor: z.string().nullish(),
+  contractNumber: z.string().nullish(),
+  startDate: z.date(),
+  endDate: z.date().nullish(),
+  reminderDays: z.number().int().default(5),
+  isActive: z.boolean().default(true),
+  notes: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type CompanyExpenseType = z.infer<typeof CompanyExpenseSchema>;
+
+
+// File: CompanyExpensePayment.schema.ts
+
+export const CompanyExpensePaymentSchema = z.object({
+  id: z.string(),
+  expenseId: z.string(),
+  periodStart: z.date(),
+  periodEnd: z.date(),
+  amount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'amount' must be a Decimal. Location: ['Models', 'CompanyExpensePayment']",
+}),
+  isPaid: z.boolean(),
+  paidAt: z.date().nullish(),
+  dueDate: z.date(),
+  bankAccountId: z.string().nullish(),
+  referenceNo: z.string().nullish(),
+  notes: z.string().nullish(),
+  financeExpenseId: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type CompanyExpensePaymentType = z.infer<typeof CompanyExpensePaymentSchema>;
+
+
+// File: CompanyExpenseAllocation.schema.ts
+
+export const CompanyExpenseAllocationSchema = z.object({
+  id: z.string(),
+  expenseId: z.string(),
+  projectId: z.string(),
+  percentage: z.instanceof(Prisma.Decimal, {
+  message: "Field 'percentage' must be a Decimal. Location: ['Models', 'CompanyExpenseAllocation']",
+}),
+  notes: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type CompanyExpenseAllocationType = z.infer<typeof CompanyExpenseAllocationSchema>;
+
+
+// File: Employee.schema.ts
+
+export const EmployeeSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  linkedUserId: z.string().nullish(),
+  name: z.string(),
+  employeeNo: z.string().nullish(),
+  type: EmployeeTypeSchema,
+  phone: z.string().nullish(),
+  email: z.string().nullish(),
+  nationalId: z.string().nullish(),
+  salaryType: SalaryTypeSchema.default("MONTHLY"),
+  baseSalary: z.instanceof(Prisma.Decimal, {
+  message: "Field 'baseSalary' must be a Decimal. Location: ['Models', 'Employee']",
+}),
+  housingAllowance: z.instanceof(Prisma.Decimal, {
+  message: "Field 'housingAllowance' must be a Decimal. Location: ['Models', 'Employee']",
+}),
+  transportAllowance: z.instanceof(Prisma.Decimal, {
+  message: "Field 'transportAllowance' must be a Decimal. Location: ['Models', 'Employee']",
+}),
+  otherAllowances: z.instanceof(Prisma.Decimal, {
+  message: "Field 'otherAllowances' must be a Decimal. Location: ['Models', 'Employee']",
+}),
+  gosiSubscription: z.instanceof(Prisma.Decimal, {
+  message: "Field 'gosiSubscription' must be a Decimal. Location: ['Models', 'Employee']",
+}),
+  joinDate: z.date(),
+  endDate: z.date().nullish(),
+  status: EmployeeStatusSchema.default("ACTIVE"),
+  notes: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type EmployeeModel = z.infer<typeof EmployeeSchema>;
+
+// File: EmployeeProjectAssignment.schema.ts
+
+export const EmployeeProjectAssignmentSchema = z.object({
+  id: z.string(),
+  employeeId: z.string(),
+  projectId: z.string(),
+  percentage: z.instanceof(Prisma.Decimal, {
+  message: "Field 'percentage' must be a Decimal. Location: ['Models', 'EmployeeProjectAssignment']",
+}),
+  startDate: z.date(),
+  endDate: z.date().nullish(),
+  isActive: z.boolean().default(true),
+  notes: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type EmployeeProjectAssignmentType = z.infer<typeof EmployeeProjectAssignmentSchema>;
+
+
+// File: CompanyAsset.schema.ts
+
+export const CompanyAssetSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  name: z.string(),
+  assetNo: z.string().nullish(),
+  category: AssetCategorySchema,
+  type: AssetTypeSchema.default("OWNED"),
+  status: AssetStatusSchema.default("AVAILABLE"),
+  brand: z.string().nullish(),
+  model: z.string().nullish(),
+  serialNumber: z.string().nullish(),
+  year: z.number().int().nullish(),
+  description: z.string().nullish(),
+  purchasePrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'purchasePrice' must be a Decimal. Location: ['Models', 'CompanyAsset']",
+}).nullish(),
+  monthlyRent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'monthlyRent' must be a Decimal. Location: ['Models', 'CompanyAsset']",
+}).nullish(),
+  currentValue: z.instanceof(Prisma.Decimal, {
+  message: "Field 'currentValue' must be a Decimal. Location: ['Models', 'CompanyAsset']",
+}).nullish(),
+  purchaseDate: z.date().nullish(),
+  warrantyExpiry: z.date().nullish(),
+  insuranceExpiry: z.date().nullish(),
+  currentProjectId: z.string().nullish(),
+  assignedAt: z.date().nullish(),
+  notes: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type CompanyAssetType = z.infer<typeof CompanyAssetSchema>;
+
+
+// File: PayrollRun.schema.ts
+
+export const PayrollRunSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  runNo: z.string(),
+  month: z.number().int(),
+  year: z.number().int(),
+  totalBaseSalary: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalBaseSalary' must be a Decimal. Location: ['Models', 'PayrollRun']",
+}),
+  totalAllowances: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalAllowances' must be a Decimal. Location: ['Models', 'PayrollRun']",
+}),
+  totalDeductions: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalDeductions' must be a Decimal. Location: ['Models', 'PayrollRun']",
+}),
+  totalNetSalary: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalNetSalary' must be a Decimal. Location: ['Models', 'PayrollRun']",
+}),
+  employeeCount: z.number().int(),
+  status: PayrollRunStatusSchema.default("DRAFT"),
+  approvedById: z.string().nullish(),
+  approvedAt: z.date().nullish(),
+  createdById: z.string(),
+  notes: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type PayrollRunType = z.infer<typeof PayrollRunSchema>;
+
+
+// File: PayrollRunItem.schema.ts
+
+export const PayrollRunItemSchema = z.object({
+  id: z.string(),
+  payrollRunId: z.string(),
+  employeeId: z.string(),
+  baseSalary: z.instanceof(Prisma.Decimal, {
+  message: "Field 'baseSalary' must be a Decimal. Location: ['Models', 'PayrollRunItem']",
+}),
+  housingAllowance: z.instanceof(Prisma.Decimal, {
+  message: "Field 'housingAllowance' must be a Decimal. Location: ['Models', 'PayrollRunItem']",
+}),
+  transportAllowance: z.instanceof(Prisma.Decimal, {
+  message: "Field 'transportAllowance' must be a Decimal. Location: ['Models', 'PayrollRunItem']",
+}),
+  otherAllowances: z.instanceof(Prisma.Decimal, {
+  message: "Field 'otherAllowances' must be a Decimal. Location: ['Models', 'PayrollRunItem']",
+}),
+  gosiDeduction: z.instanceof(Prisma.Decimal, {
+  message: "Field 'gosiDeduction' must be a Decimal. Location: ['Models', 'PayrollRunItem']",
+}),
+  otherDeductions: z.instanceof(Prisma.Decimal, {
+  message: "Field 'otherDeductions' must be a Decimal. Location: ['Models', 'PayrollRunItem']",
+}),
+  netSalary: z.instanceof(Prisma.Decimal, {
+  message: "Field 'netSalary' must be a Decimal. Location: ['Models', 'PayrollRunItem']",
+}),
+  financeExpenseId: z.string().nullish(),
+  notes: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type PayrollRunItemType = z.infer<typeof PayrollRunItemSchema>;
+
+
+// File: CompanyExpenseRun.schema.ts
+
+export const CompanyExpenseRunSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  runNo: z.string(),
+  month: z.number().int(),
+  year: z.number().int(),
+  totalAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalAmount' must be a Decimal. Location: ['Models', 'CompanyExpenseRun']",
+}),
+  itemCount: z.number().int(),
+  status: ExpenseRunStatusSchema.default("DRAFT"),
+  postedById: z.string().nullish(),
+  postedAt: z.date().nullish(),
+  createdById: z.string(),
+  notes: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type CompanyExpenseRunType = z.infer<typeof CompanyExpenseRunSchema>;
+
+
+// File: CompanyExpenseRunItem.schema.ts
+
+export const CompanyExpenseRunItemSchema = z.object({
+  id: z.string(),
+  expenseRunId: z.string(),
+  companyExpenseId: z.string(),
+  name: z.string(),
+  category: z.string(),
+  vendor: z.string().nullish(),
+  originalAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'originalAmount' must be a Decimal. Location: ['Models', 'CompanyExpenseRunItem']",
+}),
+  amount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'amount' must be a Decimal. Location: ['Models', 'CompanyExpenseRunItem']",
+}),
+  financeExpenseId: z.string().nullish(),
+  notes: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type CompanyExpenseRunItemType = z.infer<typeof CompanyExpenseRunItemSchema>;
+
+
+// File: OrganizationAuditLog.schema.ts
+
+export const OrganizationAuditLogSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  actorId: z.string(),
+  action: OrgAuditActionSchema,
+  entityType: z.string(),
+  entityId: z.string(),
+  metadata: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  ipAddress: z.string().nullish(),
+  createdAt: z.date(),
+});
+
+export type OrganizationAuditLogType = z.infer<typeof OrganizationAuditLogSchema>;
+
+
+// File: OrganizationSequence.schema.ts
+
+export const OrganizationSequenceSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  sequenceKey: z.string(),
+  currentValue: z.number().int(),
+  updatedAt: z.date(),
+});
+
+export type OrganizationSequenceType = z.infer<typeof OrganizationSequenceSchema>;
 

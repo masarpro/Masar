@@ -28,7 +28,7 @@ export const create = protectedProcedure
 		await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "quantities", action: "create" },
+			{ section: "pricing", action: "studies" },
 		);
 
 		const study = await createCostStudy({

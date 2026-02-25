@@ -36,7 +36,7 @@ export const update = protectedProcedure
 		await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "quantities", action: "edit" },
+			{ section: "pricing", action: "studies" },
 		);
 
 		const { id, organizationId, ...data } = input;
