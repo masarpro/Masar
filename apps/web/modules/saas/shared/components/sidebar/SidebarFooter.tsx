@@ -12,7 +12,7 @@ interface SidebarFooterProps {
 
 export function SidebarFooter({ collapsed }: SidebarFooterProps) {
 	return (
-		<div className="mt-auto border-t border-border bg-card p-3">
+		<div className="mt-auto border-t border-border bg-background p-3">
 			<UserMenu showUserName={!collapsed} />
 			<div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-3">
 				{!collapsed && <SidebarClock />}

@@ -49,7 +49,7 @@ export function AppSidebar({ headerExtra }: AppSidebarProps) {
 				className={cn(
 					"fixed top-0 z-50 h-full start-0",
 					"flex flex-col",
-					"bg-card border-e border-border shadow-lg",
+					"bg-background border-e border-border",
 					"transition-all duration-300 ease-out",
 					collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED,
 					!showSidebar && "hidden",
@@ -66,7 +66,7 @@ export function AppSidebar({ headerExtra }: AppSidebarProps) {
 					type="button"
 					onClick={toggleMobile}
 					className={cn(
-						"fixed start-4 top-4 z-30 rounded-lg border border-border bg-card p-2 shadow-lg",
+						"fixed start-4 top-4 z-30 rounded-lg border border-border bg-background p-2",
 						"transition-opacity duration-200 ease-out",
 						mobileOpen && "pointer-events-none opacity-0",
 					)}

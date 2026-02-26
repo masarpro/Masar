@@ -43,7 +43,7 @@ export function ExecutionPhasesCard({
 	const milestones = milestonesData?.milestones ?? [];
 	const health = healthData?.health;
 
-	// Calculate percentages from milestone statuses
+	// Single source of truth: all values derived from milestones for consistency
 	const totalMilestones = milestones.length;
 	const completedCount = milestones.filter(
 		(m) => m.status === "COMPLETED",
@@ -55,6 +55,7 @@ export function ExecutionPhasesCard({
 		(m) => m.status === "PLANNED",
 	).length;
 
+	// Status breakdown percentages (must sum to 100)
 	const completedPct =
 		totalMilestones > 0
 			? Math.round((completedCount / totalMilestones) * 100)
@@ -63,21 +64,40 @@ export function ExecutionPhasesCard({
 		totalMilestones > 0
 			? Math.round((inProgressCount / totalMilestones) * 100)
 			: 0;
-	const notStartedPct = Math.max(0, 100 - completedPct - inProgressPct);
+	const notStartedPct =
+		totalMilestones > 0
+			? Math.max(0, 100 - completedPct - inProgressPct)
+			: 0;
 
-	// Overall progress from health API or fallback to project progress
-	const overallProgress = health?.overallProgress ?? projectProgress ?? 0;
+	// Overall progress: derive from milestones when available (avg of progress bars)
+	const overallProgress =
+		totalMilestones > 0
+			? Math.round(
+					milestones.reduce((sum, m) => sum + (m.progress ?? 0), 0) /
+						totalMilestones,
+				)
+			: health?.overallProgress ?? projectProgress ?? 0;
 
-	// Donut SVG calculations
+	// Donut SVG calculations (completed + inProgress + notStarted = 100%)
 	const radius = 42;
 	const circumference = 2 * Math.PI * radius;
 	const completedDash = (completedPct / 100) * circumference;
 	const inProgressDash = (inProgressPct / 100) * circumference;
+	const notStartedDash = (notStartedPct / 100) * circumference;
 
-	// Health stats from API
-	const onTrackCount = health?.onTrack ?? 0;
-	const atRiskCount = health?.atRisk ?? 0;
-	const delayedCount = health?.delayed ?? 0;
+	// Health stats: derive from milestones when available for consistency
+	const onTrackCount =
+		totalMilestones > 0
+			? milestones.filter((m) => m.healthStatus === "ON_TRACK").length
+			: health?.onTrack ?? 0;
+	const atRiskCount =
+		totalMilestones > 0
+			? milestones.filter((m) => m.healthStatus === "AT_RISK").length
+			: health?.atRisk ?? 0;
+	const delayedCount =
+		totalMilestones > 0
+			? milestones.filter((m) => m.healthStatus === "DELAYED").length
+			: health?.delayed ?? 0;
 
 	// Milestone status → dot color
 	function getStatusDotColor(status: string): string {
@@ -207,6 +227,19 @@ export function ExecutionPhasesCard({
 									strokeWidth="12"
 									strokeDasharray={`${inProgressDash} ${circumference - inProgressDash}`}
 									strokeDashoffset={-completedDash}
+									strokeLinecap="round"
+								/>
+							)}
+							{notStartedPct > 0 && (
+								<circle
+									cx="55"
+									cy="55"
+									r={radius}
+									fill="none"
+									stroke="#94a3b8"
+									strokeWidth="12"
+									strokeDasharray={`${notStartedDash} ${circumference - notStartedDash}`}
+									strokeDashoffset={-(completedDash + inProgressDash)}
 									strokeLinecap="round"
 								/>
 							)}

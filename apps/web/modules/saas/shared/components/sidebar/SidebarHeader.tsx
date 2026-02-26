@@ -19,22 +19,23 @@ export function SidebarHeader({ collapsed, headerExtra }: SidebarHeaderProps) {
 		<>
 			<div
 				className={cn(
-					"flex h-16 items-center border-b border-border px-4",
-					collapsed ? "justify-end" : "justify-between",
+					"relative flex h-16 items-center border-b border-border px-4",
+					"justify-end",
 				)}
 			>
 				{!collapsed && (
-					<div className="flex items-center gap-3">
-						<Link href="/app" className="block">
-							<Logo />
-						</Link>
-					</div>
+					<Link
+						href="/app"
+						className="absolute inset-0 flex items-center justify-center text-foreground"
+					>
+						<Logo />
+					</Link>
 				)}
 				<button
 					type="button"
 					onClick={toggleCollapsed}
 					className={cn(
-						"rounded-lg p-2 transition-colors duration-200 ease-out hover:bg-muted",
+						"relative z-10 rounded-lg p-2 transition-colors duration-200 ease-out hover:bg-muted",
 						"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
 					)}
 					aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}

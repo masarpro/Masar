@@ -105,7 +105,8 @@
       "Bash(cd /h/Masar/supastarter-nextjs-3/packages/database && npx prisma validate 2>&1)",
       "Bash(cd \"H:/Masar/supastarter-nextjs-3/packages/database\" && dotenv -c -e ../../.env -- npx prisma db push --accept-data-loss 2>&1)",
       "Bash(mkdir:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(python3:*)"
     ]
   }
 }

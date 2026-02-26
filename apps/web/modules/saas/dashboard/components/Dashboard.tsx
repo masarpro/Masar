@@ -393,20 +393,25 @@ export function Dashboard() {
 			</div>
 
 			{/* ═══ PROJECTS - Compact horizontal cards (image + info) ═══ */}
-			{(() => {
-				const COLS = 6;
-				const useScroll = projects.length > 4;
-				const firstRowProjects = projects.slice(0, COLS - 1);
-				const secondRowProjects = projects.slice(COLS - 1, 5);
-				const firstRowEmptyCount = Math.max(0, COLS - 1 - firstRowProjects.length);
-				const secondRowEmptyCount = Math.max(0, COLS - secondRowProjects.length);
+			<div className="rounded-xl bg-white p-6 shadow-sm dark:bg-slate-900/50 dark:shadow-none">
+				<h2 className="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-200">
+					{t("dashboard.activeProjects")}
+				</h2>
+				{(() => {
+					const COLS = 4;
+					const useScroll = projects.length > 4;
+					const firstRowProjects = projects.slice(0, COLS);
+					const secondRowProjects = projects.slice(COLS, COLS * 2);
+					const firstRowEmptyCount = Math.max(0, COLS - firstRowProjects.length);
+					const secondRowEmptyCount = Math.max(0, COLS - secondRowProjects.length);
 
-				const cardBaseClass = `${glassCard} flex flex-row overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-500 group`;
-				const cardSizeClass = useScroll
-					? "h-[88px] w-[280px] min-w-[280px] shrink-0"
-					: "h-[88px] min-w-0";
+					const projectCardBase =
+						"rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-900/20 flex flex-row overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-500 group";
+					const cardSizeClass = useScroll
+						? "h-[88px] w-[340px] min-w-[340px] shrink-0"
+						: "h-[88px] min-w-0";
 
-				const renderProjectCard = (project: (typeof projects)[0], i: number) => {
+					const renderProjectCard = (project: (typeof projects)[0], i: number) => {
 					const progress = Math.round(project.progress ?? 0);
 					const contractValue = project.contractValue ?? 0;
 					const days = daysRemaining(project.endDate);
@@ -415,7 +420,7 @@ export function Dashboard() {
 						<Link
 							key={project.id}
 							href={`/app/${organizationSlug}/projects/${project.id}`}
-							className={`${cardBaseClass} ${cardSizeClass}`}
+							className={`${projectCardBase} ${cardSizeClass}`}
 							style={{ animationDelay: `${160 + i * 70}ms` }}
 						>
 							{/* Square image */}
@@ -429,10 +434,7 @@ export function Dashboard() {
 										loading="lazy"
 									/>
 								) : (
-									<div
-										className="flex h-full w-full items-center justify-center"
-										style={{ background: i % 2 === 0 ? "linear-gradient(135deg, #10b98120, #3b82f620)" : "linear-gradient(135deg, #3b82f620, #10b98120)" }}
-									>
+									<div className="flex h-full w-full items-center justify-center bg-slate-200/50 dark:bg-slate-700/50">
 										<span className="text-2xl font-bold text-slate-300 dark:text-slate-600">
 											{(project.name || "?")[0]}
 										</span>
@@ -453,10 +455,10 @@ export function Dashboard() {
 							</div>
 							{/* Info section */}
 							<div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 p-2.5">
-								<h3 className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">
+								<h3 className="wrap-break-word text-sm font-bold text-slate-900 dark:text-slate-100 line-clamp-2">
 									{project.name || t("projects.unnamed")}
 								</h3>
-								<p className="truncate text-[10px] text-slate-500 dark:text-slate-400">
+								<p className="wrap-break-word text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2">
 									{project.clientName || "—"}
 								</p>
 								<div className="mt-2 flex items-center gap-2 text-[9px] text-slate-500 dark:text-slate-400">
@@ -471,50 +473,46 @@ export function Dashboard() {
 					);
 				};
 
-				const newProjectButton = (
-					<Link
-						href={`/app/${organizationSlug}/projects/new`}
-						className={`flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 transition-all duration-300 hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 animate-in fade-in slide-in-from-bottom-3 duration-500 ${useScroll ? "h-[88px] w-[120px] min-w-[120px] shrink-0" : "h-[88px] min-w-0"}`}
-						style={{ animationDelay: "300ms" }}
-					>
-						<div className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-dashed border-slate-300 dark:border-slate-600 transition-colors group-hover:border-emerald-500">
-							<Plus className="h-5 w-5 text-slate-400" />
-						</div>
-						<span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
-							{t("projects.newProject")}
-						</span>
-					</Link>
-				);
+					const newProjectButton = (
+						<Link
+							href={`/app/${organizationSlug}/projects/new`}
+							className={`flex shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-slate-200 transition-all duration-300 hover:border-emerald-500 hover:bg-emerald-50/50 dark:border-slate-700 dark:hover:bg-emerald-900/10 ${useScroll ? "h-[88px] w-14" : "h-[88px] w-14"}`}
+							title={t("projects.newProject")}
+						>
+							<Plus className="h-6 w-6 text-slate-400" />
+						</Link>
+					);
 
-				if (useScroll) {
-					return (
-						<div className="overflow-x-auto pb-2">
-							<div className="flex w-max gap-3">
-								{projects.map((p, i) => renderProjectCard(p, i))}
-								{newProjectButton}
+					if (useScroll) {
+						return (
+							<div className="overflow-x-auto pb-2">
+								<div className="flex w-max items-stretch gap-3">
+									{projects.map((p, i) => renderProjectCard(p, i))}
+									{newProjectButton}
+								</div>
 							</div>
+						);
+					}
+
+					return (
+						<div className="grid w-full grid-cols-[repeat(4,minmax(0,1fr))_auto] gap-3">
+							{firstRowProjects.map((p, i) => renderProjectCard(p, i))}
+							{Array.from({ length: firstRowEmptyCount }).map((_, idx) => (
+								<div key={`empty1-${idx}`} className="h-[88px] rounded-xl border border-dashed border-slate-200 bg-slate-50/30 dark:border-slate-700 dark:bg-slate-900/20" aria-hidden />
+							))}
+							{newProjectButton}
+							{secondRowProjects.length > 0 && (
+								<>
+									{secondRowProjects.map((p, i) => renderProjectCard(p, i + firstRowProjects.length))}
+									{Array.from({ length: secondRowEmptyCount }).map((_, idx) => (
+										<div key={`empty2-${idx}`} className="h-[88px] rounded-xl border border-dashed border-slate-200 bg-slate-50/30 dark:border-slate-700 dark:bg-slate-900/20" aria-hidden />
+									))}
+								</>
+							)}
 						</div>
 					);
-				}
-
-				return (
-					<div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-						{firstRowProjects.map((p, i) => renderProjectCard(p, i))}
-						{Array.from({ length: firstRowEmptyCount }).map((_, idx) => (
-							<div key={`empty1-${idx}`} className="h-[88px] rounded-xl border border-dashed border-slate-200 bg-slate-50/30 dark:border-slate-700 dark:bg-slate-900/20" aria-hidden />
-						))}
-						{newProjectButton}
-						{secondRowProjects.length > 0 && (
-							<>
-								{secondRowProjects.map((p, i) => renderProjectCard(p, i + firstRowProjects.length))}
-								{Array.from({ length: secondRowEmptyCount }).map((_, idx) => (
-									<div key={`empty2-${idx}`} className="h-[88px] rounded-xl border border-dashed border-slate-200 bg-slate-50/30 dark:border-slate-700 dark:bg-slate-900/20" aria-hidden />
-								))}
-							</>
-						)}
-					</div>
-				);
-			})()}
+				})()}
+			</div>
 
 			{/* ═══ QUICK ACTIONS - Finance-style two-section cards ═══ */}
 			<div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
