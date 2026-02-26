@@ -3559,6 +3559,7 @@
 			"referenceNoPlaceholder": "Transfer or cheque number",
 			"additionalNotes": "Additional Notes",
 			"notesPlaceholder": "Add notes about the expense...",
+			"attachInvoice": "Attach Invoice",
 			"expenseNo": "Expense Number",
 			"date": "Date",
 			"category": "Category",

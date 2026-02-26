@@ -65,12 +65,14 @@ import {
 import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
 import { PayExpenseDialog } from "./PayExpenseDialog";
+import { AddExpenseDialog } from "./AddExpenseDialog";
 
 interface ExpensesListProps {
 	organizationId: string;
 	organizationSlug: string;
 	projectId?: string;
 	basePath?: string;
+	hideAddButton?: boolean;
 }
 
 // فئات المصروفات
@@ -108,6 +110,7 @@ export function ExpensesList({
 	organizationSlug,
 	projectId,
 	basePath: customBasePath,
+	hideAddButton,
 }: ExpensesListProps) {
 	const t = useTranslations();
 	const router = useRouter();
@@ -119,6 +122,7 @@ export function ExpensesList({
 	const [sourceTypeFilter, setSourceTypeFilter] = useState<string | undefined>(undefined);
 	const [projectFilter, setProjectFilter] = useState<string | undefined>(projectId);
 	const [deleteExpenseId, setDeleteExpenseId] = useState<string | null>(null);
+	const [showAddDialog, setShowAddDialog] = useState(false);
 	const [payExpense, setPayExpense] = useState<{
 		id: string;
 		expenseNo: string;
@@ -297,78 +301,86 @@ export function ExpensesList({
 				</Card>
 			</div>
 
-			{/* Filters */}
-			<Card className="rounded-2xl">
-				<CardContent className="p-4">
-					<div className="flex flex-col sm:flex-row gap-4">
-						<div className="flex-1 relative">
-							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-							<Input
-								placeholder={t("finance.expenses.searchPlaceholder")}
-								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
-								className="ps-10 rounded-xl"
-							/>
-						</div>
+			{/* Filters & Actions */}
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+				<div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
+					<div className="relative flex-1 max-w-xs">
+						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+						<Input
+							placeholder={t("finance.expenses.searchPlaceholder")}
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+							className="ps-10 rounded-xl"
+						/>
+					</div>
+					<Select
+						value={categoryFilter || "all"}
+						onValueChange={(value) =>
+							setCategoryFilter(value === "all" ? undefined : value)
+						}
+					>
+						<SelectTrigger className="w-48 rounded-xl">
+							<SelectValue placeholder={t("finance.expenses.filterByCategory")} />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="all">{t("common.all")}</SelectItem>
+							{EXPENSE_CATEGORIES.map((category) => (
+								<SelectItem key={category} value={category}>
+									{getCategoryLabel(category)}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					<Select
+						value={sourceTypeFilter || "all"}
+						onValueChange={(value) =>
+							setSourceTypeFilter(value === "all" ? undefined : value)
+						}
+					>
+						<SelectTrigger className="w-48 rounded-xl">
+							<SelectValue placeholder={t("finance.expenses.filterBySource")} />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="all">{t("common.all")}</SelectItem>
+							<SelectItem value="MANUAL">{t("finance.expenses.sourceTypes.manual")}</SelectItem>
+							<SelectItem value="FACILITY_PAYROLL">{t("finance.expenses.sourceTypes.facility_payroll")}</SelectItem>
+							<SelectItem value="FACILITY_RECURRING">{t("finance.expenses.sourceTypes.facility_recurring")}</SelectItem>
+							<SelectItem value="FACILITY_ASSET">{t("finance.expenses.sourceTypes.facility_asset")}</SelectItem>
+							<SelectItem value="PROJECT">{t("finance.expenses.sourceTypes.project")}</SelectItem>
+						</SelectContent>
+					</Select>
+					{!projectId && (
 						<Select
-							value={categoryFilter || "all"}
+							value={projectFilter || "all"}
 							onValueChange={(value) =>
-								setCategoryFilter(value === "all" ? undefined : value)
+								setProjectFilter(value === "all" ? undefined : value)
 							}
 						>
-							<SelectTrigger className="w-[200px] rounded-xl">
-								<SelectValue placeholder={t("finance.expenses.filterByCategory")} />
+							<SelectTrigger className="w-48 rounded-xl">
+								<SelectValue placeholder={t("finance.expenses.filterByProject")} />
 							</SelectTrigger>
 							<SelectContent className="rounded-xl">
-								<SelectItem value="all">{t("common.all")}</SelectItem>
-								{EXPENSE_CATEGORIES.map((category) => (
-									<SelectItem key={category} value={category}>
-										{getCategoryLabel(category)}
+								<SelectItem value="all">{t("finance.expenses.allProjects")}</SelectItem>
+								{projects.map((project) => (
+									<SelectItem key={project.id} value={project.id}>
+										{project.name}
 									</SelectItem>
 								))}
 							</SelectContent>
 						</Select>
-						<Select
-							value={sourceTypeFilter || "all"}
-							onValueChange={(value) =>
-								setSourceTypeFilter(value === "all" ? undefined : value)
-							}
-						>
-							<SelectTrigger className="w-[200px] rounded-xl">
-								<SelectValue placeholder={t("finance.expenses.filterBySource")} />
-							</SelectTrigger>
-							<SelectContent className="rounded-xl">
-								<SelectItem value="all">{t("common.all")}</SelectItem>
-								<SelectItem value="MANUAL">{t("finance.expenses.sourceTypes.manual")}</SelectItem>
-								<SelectItem value="FACILITY_PAYROLL">{t("finance.expenses.sourceTypes.facility_payroll")}</SelectItem>
-								<SelectItem value="FACILITY_RECURRING">{t("finance.expenses.sourceTypes.facility_recurring")}</SelectItem>
-								<SelectItem value="FACILITY_ASSET">{t("finance.expenses.sourceTypes.facility_asset")}</SelectItem>
-								<SelectItem value="PROJECT">{t("finance.expenses.sourceTypes.project")}</SelectItem>
-							</SelectContent>
-						</Select>
-						{!projectId && (
-							<Select
-								value={projectFilter || "all"}
-								onValueChange={(value) =>
-									setProjectFilter(value === "all" ? undefined : value)
-								}
-							>
-								<SelectTrigger className="w-[200px] rounded-xl">
-									<SelectValue placeholder={t("finance.expenses.filterByProject")} />
-								</SelectTrigger>
-								<SelectContent className="rounded-xl">
-									<SelectItem value="all">{t("finance.expenses.allProjects")}</SelectItem>
-									{projects.map((project) => (
-										<SelectItem key={project.id} value={project.id}>
-											{project.name}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						)}
-					</div>
-				</CardContent>
-			</Card>
+					)}
+				</div>
+
+				{!hideAddButton && (
+					<Button
+						className="rounded-xl"
+						onClick={() => setShowAddDialog(true)}
+					>
+						<Plus className="me-2 h-4 w-4" />
+						{t("finance.expenses.new")}
+					</Button>
+				)}
+			</div>
 
 			{/* Expenses Table */}
 			<Card className="rounded-2xl">
@@ -381,13 +393,24 @@ export function ExpensesList({
 							</div>
 						</div>
 					) : items.length === 0 ? (
-						<div className="text-center py-20">
-							<TrendingDown className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-							<p className="text-slate-500 dark:text-slate-400">
+						<div className="flex flex-col items-center justify-center py-12 text-center">
+							<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
+								<TrendingDown className="h-8 w-8 text-slate-400" />
+							</div>
+							<p className="mb-4 text-slate-500 dark:text-slate-400">
 								{searchQuery
 									? t("finance.expenses.noSearchResults")
 									: t("finance.expenses.noExpenses")}
 							</p>
+							{!searchQuery && !hideAddButton && (
+								<Button
+									className="rounded-xl"
+									onClick={() => setShowAddDialog(true)}
+								>
+									<Plus className="me-2 h-4 w-4" />
+									{t("finance.expenses.new")}
+								</Button>
+							)}
 						</div>
 					) : (
 						<Table>
@@ -589,6 +612,14 @@ export function ExpensesList({
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
+
+			{/* Add Expense Dialog */}
+			<AddExpenseDialog
+				open={showAddDialog}
+				onOpenChange={setShowAddDialog}
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+			/>
 		</div>
 	);
 }

@@ -100,7 +100,7 @@ export function TimelineScheduleCard({
 			</div>
 
 			{/* Body */}
-			<div className="flex flex-1 flex-col gap-3 p-5">
+			<div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden p-5">
 				{/* Legend Row */}
 				<div className="flex items-center gap-3.5">
 					<div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
@@ -120,38 +120,40 @@ export function TimelineScheduleCard({
 				</div>
 
 				{/* S-Curve Chart */}
-				<ChartContainer
-					config={chartConfig}
-					className="h-[160px] w-full"
-				>
-					<LineChart
-						accessibilityLayer
-						data={S_CURVE_DATA}
-						margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+				<div className="min-h-0 w-full overflow-hidden">
+					<ChartContainer
+						config={chartConfig}
+						className="aspect-auto h-[140px] w-full min-w-0"
 					>
-						<CartesianGrid
-							strokeDasharray="3 3"
-							vertical={false}
-							className="stroke-slate-200 dark:stroke-slate-700"
-						/>
-						<XAxis
-							dataKey="period"
-							tickLine={false}
-							axisLine={false}
-							tickMargin={8}
-							fontSize={9}
-							tick={{ fill: "currentColor" }}
-						/>
-						<YAxis
-							tickLine={false}
-							axisLine={false}
-							tickMargin={4}
-							fontSize={9}
-							tickFormatter={(v) => `${v}%`}
-							domain={[0, 100]}
-							width={32}
-							tick={{ fill: "currentColor" }}
-						/>
+						<LineChart
+							accessibilityLayer
+							data={S_CURVE_DATA}
+							margin={{ top: 4, right: 4, left: 0, bottom: 4 }}
+						>
+							<CartesianGrid
+								strokeDasharray="3 3"
+								vertical={false}
+								className="stroke-slate-200 dark:stroke-slate-700"
+							/>
+							<XAxis
+								dataKey="period"
+								tickLine={false}
+								axisLine={false}
+								tickMargin={4}
+								fontSize={8}
+								interval="preserveStartEnd"
+								tick={{ fill: "currentColor" }}
+							/>
+							<YAxis
+								tickLine={false}
+								axisLine={false}
+								tickMargin={2}
+								fontSize={8}
+								tickFormatter={(v) => `${v}%`}
+								domain={[0, 100]}
+								width={28}
+								tick={{ fill: "currentColor" }}
+							/>
 						<ChartTooltip
 							content={
 								<ChartTooltipContent
@@ -182,9 +184,10 @@ export function TimelineScheduleCard({
 						/>
 					</LineChart>
 				</ChartContainer>
+				</div>
 
 				{/* Timeline Progress Bar */}
-				<div className="mt-1">
+				<div className="mt-1 min-w-0">
 					<div className="flex items-center gap-2.5">
 						<span className="text-xs font-semibold text-teal-600">
 							{projectProgress}%
@@ -209,11 +212,11 @@ export function TimelineScheduleCard({
 							100%
 						</span>
 					</div>
-					<div className="mt-1 flex justify-between">
-						<span className="text-[10px] text-slate-400">
+					<div className="mt-1 flex justify-between gap-2">
+						<span className="min-w-0 truncate text-[10px] text-slate-400">
 							{formatDate(startDate)}
 						</span>
-						<span className="text-[10px] text-slate-400">
+						<span className="min-w-0 truncate text-right text-[10px] text-slate-400">
 							{formatDate(endDate)}
 						</span>
 					</div>

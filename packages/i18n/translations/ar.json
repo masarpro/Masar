@@ -490,7 +490,7 @@
 			}
 		},
 		"start": {
-			"subtitle": "مرحباً بك في صفحة البداية لهذه المؤسسة!"
+			"subtitle": "مرحباً بك في الصفحة الرئيسية لمنشأتك!"
 		}
 	},
 	"pricing": {
@@ -3393,6 +3393,7 @@
 			"referenceNoPlaceholder": "رقم التحويل أو الشيك",
 			"additionalNotes": "ملاحظات إضافية",
 			"notesPlaceholder": "أضف ملاحظات حول المصروف...",
+			"attachInvoice": "إرفاق الفاتورة",
 			"expenseNo": "رقم المصروف",
 			"date": "التاريخ",
 			"category": "الفئة",
