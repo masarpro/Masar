@@ -25,6 +25,7 @@ import {
 	updateCompanyExpenseProcedure,
 	deactivateCompanyExpenseProcedure,
 	getCompanyExpenseSummaryProcedure,
+	getCompanyExpenseDashboardDataProcedure,
 	getUpcomingPaymentsProcedure,
 } from "./procedures/company-expenses";
 
@@ -111,6 +112,7 @@ export const companyRouter = {
 		update: updateCompanyExpenseProcedure,
 		deactivate: deactivateCompanyExpenseProcedure,
 		getSummary: getCompanyExpenseSummaryProcedure,
+		getDashboardData: getCompanyExpenseDashboardDataProcedure,
 		getUpcoming: getUpcomingPaymentsProcedure,
 		// Payments
 		payments: {

@@ -2612,7 +2612,64 @@
 		"viewProjects": "عرض المشاريع",
 		"quantities": "حصر الكميات",
 		"settings": "الإعدادات",
-		"viewAll": "عرض الكل"
+		"viewAll": "عرض الكل",
+		"kpi": {
+			"bankBalance": "رصيد البنك",
+			"cashBalance": "الصندوق",
+			"netProfit": "صافي الربح",
+			"totalIncome": "المقبوضات",
+			"totalExpenses": "المصروفات",
+			"thisMonth": "هذا الشهر",
+			"vsLastMonth": "عن الشهر الماضي"
+		},
+		"project": {
+			"contractValue": "قيمة العقد",
+			"spent": "المصروف",
+			"daysLeft": "يوم متبقي",
+			"daysShort": "يوم",
+			"budget": "الميزانية"
+		},
+		"actions": {
+			"addExpense": "إضافة مصروف",
+			"expenses": "المصروفات",
+			"addPayment": "إضافة دفعة",
+			"payments": "المقبوضات",
+			"createInvoice": "إنشاء فاتورة",
+			"invoices": "الفواتير",
+			"newQuotation": "عرض سعر جديد",
+			"pricing": "التسعير",
+			"calculateQuantities": "حساب الكميات",
+			"quantityStudies": "دراسات الكميات",
+			"dailyReport": "تقرير يومي",
+			"execution": "التنفيذ",
+			"manageCompany": "المنشأة",
+			"company": "الشركة",
+			"documents": "المستندات",
+			"files": "الملفات"
+		},
+		"cashFlow": {
+			"title": "التدفق النقدي — آخر ٧ أيام",
+			"goToFinance": "المالية",
+			"income": "المقبوضات",
+			"expenses": "المصروفات",
+			"net": "صافي"
+		},
+		"expenseBreakdown": {
+			"title": "مصاريف المنشأة",
+			"details": "التفاصيل",
+			"monthlyTrend": "الاتجاه الشهري",
+			"noData": "لا توجد مصروفات مسجلة",
+			"months": {
+				"1": "يناير", "2": "فبراير", "3": "مارس", "4": "أبريل", "5": "مايو", "6": "يونيو",
+				"7": "يوليو", "8": "أغسطس", "9": "سبتمبر", "10": "أكتوبر", "11": "نوفمبر", "12": "ديسمبر"
+			}
+		},
+		"recentActivity": {
+			"title": "آخر التحديثات"
+		},
+		"upcomingPayments": {
+			"title": "الدفعات القادمة"
+		}
 	},
 	"finance": {
 		"title": "المالية",

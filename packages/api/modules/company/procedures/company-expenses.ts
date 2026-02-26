@@ -5,6 +5,7 @@ import {
 	updateCompanyExpense,
 	deactivateCompanyExpense,
 	getCompanyExpenseSummary,
+	getCompanyExpenseDashboardData,
 	getUpcomingCompanyPayments,
 } from "@repo/database";
 import { z } from "zod";
@@ -198,6 +199,26 @@ export const getCompanyExpenseSummaryProcedure = protectedProcedure
 		});
 
 		return getCompanyExpenseSummary(input.organizationId);
+	});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GET COMPANY EXPENSE DASHBOARD DATA
+// ═══════════════════════════════════════════════════════════════════════════
+export const getCompanyExpenseDashboardDataProcedure = protectedProcedure
+	.route({
+		method: "GET",
+		path: "/company/expenses/dashboard",
+		tags: ["Company", "Expenses"],
+		summary: "Get company expense data for dashboard (byCategory + monthly)",
+	})
+	.input(z.object({ organizationId: z.string() }))
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "company",
+			action: "view",
+		});
+
+		return getCompanyExpenseDashboardData(input.organizationId);
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════

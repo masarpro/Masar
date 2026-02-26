@@ -2629,7 +2629,64 @@
 		"viewProjects": "View Projects",
 		"quantities": "Quantities",
 		"settings": "Settings",
-		"viewAll": "View All"
+		"viewAll": "View All",
+		"kpi": {
+			"bankBalance": "Bank Balance",
+			"cashBalance": "Cash Balance",
+			"netProfit": "Net Profit",
+			"totalIncome": "Income",
+			"totalExpenses": "Expenses",
+			"thisMonth": "This month",
+			"vsLastMonth": "vs last month"
+		},
+		"project": {
+			"contractValue": "Contract Value",
+			"spent": "Spent",
+			"daysLeft": "Days Left",
+			"daysShort": "days",
+			"budget": "Budget"
+		},
+		"actions": {
+			"addExpense": "Add Expense",
+			"expenses": "Expenses",
+			"addPayment": "Add Payment",
+			"payments": "Payments",
+			"createInvoice": "Create Invoice",
+			"invoices": "Invoices",
+			"newQuotation": "New Quotation",
+			"pricing": "Pricing",
+			"calculateQuantities": "Quantities",
+			"quantityStudies": "Quantity Studies",
+			"dailyReport": "Daily Report",
+			"execution": "Execution",
+			"manageCompany": "Establishment",
+			"company": "Company",
+			"documents": "Documents",
+			"files": "Files"
+		},
+		"cashFlow": {
+			"title": "Cash Flow — Last 7 Days",
+			"goToFinance": "Finance",
+			"income": "Income",
+			"expenses": "Expenses",
+			"net": "Net"
+		},
+		"expenseBreakdown": {
+			"title": "Company Expenses",
+			"details": "Details",
+			"monthlyTrend": "Monthly Trend",
+			"noData": "No expenses recorded",
+			"months": {
+				"1": "Jan", "2": "Feb", "3": "Mar", "4": "Apr", "5": "May", "6": "Jun",
+				"7": "Jul", "8": "Aug", "9": "Sep", "10": "Oct", "11": "Nov", "12": "Dec"
+			}
+		},
+		"recentActivity": {
+			"title": "Recent Updates"
+		},
+		"upcomingPayments": {
+			"title": "Upcoming Payments"
+		}
 	},
 	"finance": {
 		"title": "Finance",

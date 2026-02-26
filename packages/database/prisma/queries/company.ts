@@ -427,6 +427,32 @@ export async function getCompanyExpenseSummary(organizationId: string) {
 	};
 }
 
+/**
+ * Get company expense data for dashboard: byCategory (pie) + monthly amounts (bars)
+ */
+export async function getCompanyExpenseDashboardData(organizationId: string) {
+	const [summary, runs] = await Promise.all([
+		getCompanyExpenseSummary(organizationId),
+		db.companyExpenseRun.findMany({
+			where: { organizationId, status: "POSTED" },
+			select: { month: true, year: true, totalAmount: true },
+			orderBy: [{ year: "desc" }, { month: "desc" }],
+			take: 6,
+		}),
+	]);
+
+	const monthlyExpenses = [...runs].reverse().map((r) => ({
+		month: r.month,
+		year: r.year,
+		amount: Number(r.totalAmount),
+	}));
+
+	return {
+		...summary,
+		monthlyExpenses,
+	};
+}
+
 export async function getUpcomingCompanyPayments(organizationId: string, daysAhead = 30) {
 	const futureDate = new Date();
 	futureDate.setDate(futureDate.getDate() + daysAhead);
