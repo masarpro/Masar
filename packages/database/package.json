@@ -1,13 +1,13 @@
 {
 	"dependencies": {
-		"@paralleldrive/cuid2": "^3.1.0",
-		"@prisma/adapter-pg": "^6.19.0",
-		"@prisma/client": "7.1.0",
+		"@paralleldrive/cuid2": "^3.3.0",
+		"@prisma/adapter-pg": "^7.4.1",
+		"@prisma/client": "7.4.1",
 		"@repo/config": "workspace:*",
-		"@sindresorhus/slugify": "^2.2.1",
+		"@sindresorhus/slugify": "^3.0.0",
 		"nanoid": "^5.1.5",
-		"pg": "^8.16.0",
-		"zod": "^4.1.12"
+		"pg": "^8.19.0",
+		"zod": "^4.3.6"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.3.5",
