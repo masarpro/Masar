@@ -22,7 +22,6 @@ export default async function CreditNotePage({
 	params: Promise<{ organizationSlug: string; invoiceId: string }>;
 }) {
 	const { organizationSlug, invoiceId } = await params;
-	const t = await getTranslations();
 
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
@@ -31,11 +30,7 @@ export default async function CreditNotePage({
 	}
 
 	return (
-		<FinanceShell
-			organizationSlug={organizationSlug}
-			sectionKey="invoices"
-			pageTitle={t("finance.invoices.creditNote.title")}
-		>
+		<FinanceShell organizationSlug={organizationSlug}>
 			<CreditNoteForm
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}

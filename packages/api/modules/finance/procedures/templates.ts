@@ -7,6 +7,7 @@ import {
 	setDefaultFinanceTemplate,
 	deleteFinanceTemplate,
 	createDefaultTemplatesForOrganization,
+	seedAdditionalInvoiceTemplates,
 } from "@repo/database";
 import { z } from "zod";
 import { ORPCError } from "@orpc/server";
@@ -242,6 +243,12 @@ export const seedDefaultTemplates = protectedProcedure
 		});
 
 		await createDefaultTemplatesForOrganization(
+			input.organizationId,
+			context.user.id,
+		);
+
+		// Also seed additional invoice templates
+		await seedAdditionalInvoiceTemplates(
 			input.organizationId,
 			context.user.id,
 		);

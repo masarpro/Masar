@@ -14,6 +14,7 @@ import {
 	orgAuditLog,
 	getEntityOrgAuditLogs,
 	getOrganizationFinanceSettings,
+	updateInvoiceNotes,
 } from "@repo/database";
 import { z } from "zod";
 import { ORPCError } from "@orpc/server";
@@ -263,7 +264,6 @@ export const updateInvoiceStatusProcedure = protectedProcedure
 				"SENT",
 				"VIEWED",
 				"OVERDUE",
-				"CANCELLED",
 			]),
 		}),
 	)
@@ -836,6 +836,56 @@ export const createCreditNoteProcedure = protectedProcedure
 				unitPrice: Number(item.unitPrice),
 				totalPrice: Number(item.totalPrice),
 			})),
+		};
+	});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UPDATE INVOICE NOTES — تحديث ملاحظات الفاتورة (بدون قيود الحالة)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const updateInvoiceNotesProcedure = protectedProcedure
+	.route({
+		method: "PUT",
+		path: "/finance/invoices/{id}/notes",
+		tags: ["Finance", "Invoices"],
+		summary: "Update invoice notes (any status)",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			id: z.string(),
+			notes: z.string(),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "invoices",
+		});
+
+		const invoice = await updateInvoiceNotes(
+			input.id,
+			input.organizationId,
+			input.notes,
+		);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "INVOICE_NOTES_UPDATED",
+			entityType: "invoice",
+			entityId: input.id,
+		});
+
+		return {
+			...invoice,
+			subtotal: Number(invoice.subtotal),
+			discountPercent: Number(invoice.discountPercent),
+			discountAmount: Number(invoice.discountAmount),
+			vatPercent: Number(invoice.vatPercent),
+			vatAmount: Number(invoice.vatAmount),
+			totalAmount: Number(invoice.totalAmount),
+			paidAmount: Number(invoice.paidAmount),
 		};
 	});
 

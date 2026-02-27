@@ -20,6 +20,23 @@ interface ItemsTableComponentProps {
 		showUnitPrice?: boolean;
 		showRowNumbers?: boolean;
 		alternatingColors?: boolean;
+		// Custom colors
+		headerBackground?: string;
+		headerTextColor?: string;
+		alternateRowColor?: string;
+		rowNumberColor?: string;
+		rowBorderColor?: string;
+		headerRowNumberColor?: string;
+		borderRadius?: string;
+		// Header style
+		headerStyle?: "filled" | "underline";
+		headerBorderColor?: string;
+		headerBorderWidth?: string;
+		// Row number style
+		rowNumberStyle?: "default" | "circle";
+		rowNumberBackground?: string;
+		// Border spacing
+		borderSpacing?: string;
 	};
 	items?: Item[];
 	primaryColor?: string;
@@ -40,6 +57,19 @@ export function ItemsTableComponent({
 		showUnitPrice = true,
 		showRowNumbers = true,
 		alternatingColors = true,
+		headerBackground,
+		headerTextColor,
+		alternateRowColor,
+		rowNumberColor,
+		rowBorderColor,
+		headerRowNumberColor,
+		borderRadius = "0",
+		headerStyle = "filled",
+		headerBorderColor,
+		headerBorderWidth = "2px",
+		rowNumberStyle = "default",
+		rowNumberBackground,
+		borderSpacing,
 	} = settings;
 
 	const defaultItems: Item[] = [
@@ -74,7 +104,6 @@ export function ItemsTableComponent({
 
 	const displayItems = items && items.length > 0 ? items : defaultItems;
 
-	// Format number with proper locale
 	const formatNumber = (num: number) => {
 		return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
 			minimumFractionDigits: 0,
@@ -82,67 +111,202 @@ export function ItemsTableComponent({
 		}).format(num);
 	};
 
-	// Calculate column count for RTL direction handling
-	const columnCount = 2 + (showQuantity ? 1 : 0) + (showUnit ? 1 : 0) + (showUnitPrice ? 1 : 0) + (showRowNumbers ? 1 : 0);
+	// Header colors
+	const hdrBg = headerBackground || primaryColor;
+	const hdrText = headerTextColor || "#ffffff";
+	const hdrNumColor = headerRowNumberColor || hdrText;
+
+	// Determine if underline style
+	const isUnderline = headerStyle === "underline";
+
+	// Row number renderer
+	const renderRowNumber = (num: number) => {
+		if (rowNumberStyle === "circle") {
+			return (
+				<span
+					className="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold"
+					style={{
+						background: rowNumberBackground || `${primaryColor}15`,
+						color: rowNumberColor || primaryColor,
+					}}
+				>
+					{formatNumber(num)}
+				</span>
+			);
+		}
+		return (
+			<span
+				className="font-medium"
+				style={{ color: rowNumberColor || undefined }}
+			>
+				{formatNumber(num)}
+			</span>
+		);
+	};
 
 	return (
 		<div className="py-4">
-			<table className="w-full border-collapse" dir={locale === "ar" ? "rtl" : "ltr"}>
+			<table
+				className="w-full"
+				style={{
+					borderCollapse: borderSpacing ? "separate" : "collapse",
+					borderSpacing: borderSpacing ? `0 ${borderSpacing}` : undefined,
+				}}
+				dir={locale === "ar" ? "rtl" : "ltr"}
+			>
 				<thead>
-					<tr style={{ backgroundColor: primaryColor }} className="text-white">
+					<tr
+						style={
+							isUnderline
+								? { borderBottom: `${headerBorderWidth} solid ${headerBorderColor || primaryColor}` }
+								: { backgroundColor: hdrBg }
+						}
+						className={isUnderline ? "" : "text-white"}
+					>
 						{showRowNumbers && (
-							<th className="py-3 px-4 text-center font-medium text-sm first:rounded-tr-lg rtl:first:rounded-tl-lg rtl:first:rounded-tr-none w-12">
+							<th
+								className="py-3 px-4 text-center font-medium text-sm w-12"
+								style={
+									isUnderline
+										? {
+												color: headerTextColor || "#94a3b8",
+												fontWeight: 600,
+												fontSize: "12px",
+											}
+										: {
+												color: hdrNumColor,
+												borderTopRightRadius: borderRadius,
+											}
+								}
+							>
 								#
 							</th>
 						)}
-						<th className={`py-3 px-4 font-medium text-sm ${locale === "ar" ? "text-start" : "text-start"} ${!showRowNumbers ? "first:rounded-tr-lg rtl:first:rounded-tl-lg rtl:first:rounded-tr-none" : ""}`}>
+						<th
+							className={`py-3 px-4 font-medium text-sm text-start`}
+							style={
+								isUnderline
+									? {
+											color: headerTextColor || "#94a3b8",
+											fontWeight: 600,
+											fontSize: "12px",
+										}
+									: {
+											color: hdrText,
+											borderTopRightRadius:
+												!showRowNumbers ? borderRadius : undefined,
+										}
+							}
+						>
 							{t("finance.templates.preview.description")}
 						</th>
 						{showQuantity && (
-							<th className="py-3 px-4 text-center font-medium text-sm w-20">
+							<th
+								className="py-3 px-4 text-center font-medium text-sm w-20"
+								style={
+									isUnderline
+										? {
+												color: headerTextColor || "#94a3b8",
+												fontWeight: 600,
+												fontSize: "12px",
+											}
+										: { color: hdrText }
+								}
+							>
 								{t("finance.templates.preview.quantity")}
 							</th>
 						)}
 						{showUnit && (
-							<th className="py-3 px-4 text-center font-medium text-sm w-24">
+							<th
+								className="py-3 px-4 text-center font-medium text-sm w-24"
+								style={
+									isUnderline
+										? {
+												color: headerTextColor || "#94a3b8",
+												fontWeight: 600,
+												fontSize: "12px",
+											}
+										: { color: hdrText }
+								}
+							>
 								{t("finance.templates.preview.unitCol")}
 							</th>
 						)}
 						{showUnitPrice && (
-							<th className="py-3 px-4 text-end font-medium text-sm w-32">
+							<th
+								className="py-3 px-4 text-end font-medium text-sm w-32"
+								style={
+									isUnderline
+										? {
+												color: headerTextColor || "#94a3b8",
+												fontWeight: 600,
+												fontSize: "12px",
+											}
+										: { color: hdrText }
+								}
+							>
 								{t("finance.templates.preview.unitPrice")}
 							</th>
 						)}
-						<th className="py-3 px-4 text-end font-medium text-sm last:rounded-tl-lg rtl:last:rounded-tr-lg rtl:last:rounded-tl-none w-32">
+						<th
+							className="py-3 px-4 text-end font-medium text-sm w-32"
+							style={
+								isUnderline
+									? {
+											color: headerTextColor || "#94a3b8",
+											fontWeight: 600,
+											fontSize: "12px",
+										}
+									: {
+											color: hdrText,
+											borderTopLeftRadius: borderRadius,
+										}
+							}
+						>
 							{t("finance.templates.preview.total")}
 						</th>
 					</tr>
 				</thead>
 				<tbody>
 					{displayItems.map((item, index) => {
-						const rowBgColor = alternatingColors
-							? index % 2 === 0
-								? "bg-slate-50"
-								: "bg-white"
-							: "bg-white";
+						const isEven = index % 2 === 0;
+						const rowBg = alternatingColors
+							? isEven
+								? alternateRowColor || "#f8fafc"
+								: "#ffffff"
+							: "#ffffff";
+						const rowBorder = rowBorderColor || "#f1f5f9";
 
 						return (
-							<tr key={index} className={`${rowBgColor} border-b border-slate-100`}>
+							<tr
+								key={index}
+								style={{
+									backgroundColor: rowBg,
+									borderBottom: `1px solid ${rowBorder}`,
+								}}
+							>
 								{showRowNumbers && (
-									<td className="py-3 px-4 text-center text-sm text-slate-600 font-medium">
-										{formatNumber(index + 1)}
+									<td className="py-3 px-4 text-center text-sm">
+										{renderRowNumber(index + 1)}
 									</td>
 								)}
 								<td className="py-3 px-4 text-sm text-slate-900">
 									<span>{item.description}</span>
-									{item.descriptionEn && item.descriptionEn !== item.description && (
-										<span className="block text-xs text-slate-400 mt-0.5" dir="ltr">
-											{item.descriptionEn}
-										</span>
-									)}
+									{item.descriptionEn &&
+										item.descriptionEn !== item.description && (
+											<span
+												className="block text-xs text-slate-400 mt-0.5"
+												dir="ltr"
+											>
+												{item.descriptionEn}
+											</span>
+										)}
 								</td>
 								{showQuantity && (
-									<td className="py-3 px-4 text-center text-sm text-slate-600 font-medium" dir="ltr">
+									<td
+										className="py-3 px-4 text-center text-sm text-slate-600 font-medium"
+										dir="ltr"
+									>
 										{formatNumber(item.quantity)}
 									</td>
 								)}
@@ -152,12 +316,18 @@ export function ItemsTableComponent({
 									</td>
 								)}
 								{showUnitPrice && (
-									<td className="py-3 px-4 text-end text-sm text-slate-600" dir="ltr">
-										<Currency amount={item.unitPrice} currency={currency} />
+									<td
+										className="py-3 px-4 text-end text-sm text-slate-600"
+										dir="ltr"
+									>
+										<Currency amount={item.unitPrice} />
 									</td>
 								)}
-								<td className="py-3 px-4 text-end text-sm font-semibold text-slate-900" dir="ltr">
-									<Currency amount={item.totalPrice} currency={currency} />
+								<td
+									className="py-3 px-4 text-end text-sm font-semibold text-slate-900"
+									dir="ltr"
+								>
+									<Currency amount={item.totalPrice} />
 								</td>
 							</tr>
 						);

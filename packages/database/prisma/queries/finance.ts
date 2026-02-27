@@ -1561,12 +1561,18 @@ export async function createCreditNote(data: {
 	const invoiceNo = await generateInvoiceNumber(data.organizationId);
 	const totals = calculateInvoiceTotals(data.items, original.discountPercent, original.vatPercent);
 
+	// Negate amounts for credit note (ZATCA: credit notes are reversals)
+	const negSubtotal = totals.subtotal.neg();
+	const negDiscountAmount = totals.discountAmount.neg();
+	const negVatAmount = totals.vatAmount.neg();
+	const negTotalAmount = totals.totalAmount.neg();
+
 	const itemsData = data.items.map((item, index) => ({
 		description: item.description,
 		quantity: item.quantity,
 		unit: item.unit,
 		unitPrice: item.unitPrice,
-		totalPrice: totals.itemTotals[index],
+		totalPrice: totals.itemTotals[index].neg(),
 		sortOrder: index,
 	}));
 
@@ -1591,12 +1597,12 @@ export async function createCreditNote(data: {
 			dueDate: new Date(),
 			paymentTerms: null,
 			notes: data.reason,
-			subtotal: totals.subtotal,
+			subtotal: negSubtotal,
 			discountPercent: original.discountPercent,
-			discountAmount: totals.discountAmount,
+			discountAmount: negDiscountAmount,
 			vatPercent: original.vatPercent,
-			vatAmount: totals.vatAmount,
-			totalAmount: totals.totalAmount,
+			vatAmount: negVatAmount,
+			totalAmount: negTotalAmount,
 			paidAmount: 0,
 			sellerName: data.sellerName,
 			sellerTaxNumber: data.sellerTaxNumber,
@@ -1609,6 +1615,29 @@ export async function createCreditNote(data: {
 			},
 		},
 		include: { items: true },
+	});
+}
+
+/**
+ * Update only the notes field of an invoice (no status restriction)
+ */
+export async function updateInvoiceNotes(
+	id: string,
+	organizationId: string,
+	notes: string,
+) {
+	const existing = await db.financeInvoice.findFirst({
+		where: { id, organizationId },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("Invoice not found");
+	}
+
+	return db.financeInvoice.update({
+		where: { id },
+		data: { notes },
 	});
 }
 

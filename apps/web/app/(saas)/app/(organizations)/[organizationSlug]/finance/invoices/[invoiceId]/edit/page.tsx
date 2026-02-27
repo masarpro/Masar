@@ -1,5 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { InvoiceEditor } from "@saas/finance/components/invoices/InvoiceEditor";
+import { CreateInvoiceForm } from "@saas/finance/components/invoices/CreateInvoiceForm";
 import { FinanceShell } from "@saas/finance/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -22,7 +22,6 @@ export default async function EditInvoicePage({
 	params: Promise<{ organizationSlug: string; invoiceId: string }>;
 }) {
 	const { organizationSlug, invoiceId } = await params;
-	const t = await getTranslations();
 
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
@@ -31,12 +30,8 @@ export default async function EditInvoicePage({
 	}
 
 	return (
-		<FinanceShell
-			organizationSlug={organizationSlug}
-			sectionKey="invoices"
-			pageTitle={t("finance.invoices.edit")}
-		>
-			<InvoiceEditor
+		<FinanceShell organizationSlug={organizationSlug}>
+			<CreateInvoiceForm
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}
 				invoiceId={invoiceId}

@@ -22,7 +22,6 @@ export default async function InvoicePreviewPage({
 	params: Promise<{ organizationSlug: string; invoiceId: string }>;
 }) {
 	const { organizationSlug, invoiceId } = await params;
-	const t = await getTranslations();
 
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
@@ -31,11 +30,7 @@ export default async function InvoicePreviewPage({
 	}
 
 	return (
-		<FinanceShell
-			organizationSlug={organizationSlug}
-			sectionKey="invoices"
-			pageTitle={t("finance.invoices.preview")}
-		>
+		<FinanceShell organizationSlug={organizationSlug}>
 			<InvoicePreview
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}

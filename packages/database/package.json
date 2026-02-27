@@ -30,7 +30,8 @@
 		"type-check": "tsc --noEmit",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"test:coverage": "vitest run --coverage"
+		"test:coverage": "vitest run --coverage",
+		"seed-templates": "dotenv -c -e ../../.env -- npx tsx seed-additional-templates.ts"
 	},
 	"types": "./**/.tsx",
 	"version": "0.0.0"

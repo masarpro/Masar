@@ -13,14 +13,6 @@ import {
 	SelectValue,
 } from "@ui/components/select";
 import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@ui/components/table";
-import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
@@ -46,12 +38,13 @@ import {
 	Edit,
 	Trash2,
 	CreditCard,
-	QrCode,
 	Printer,
 	Copy,
 	FileCheck,
 	FileMinus,
-	Send,
+	FileText,
+	ArrowRight,
+	ChevronLeft,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -181,280 +174,300 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 	}
 
 	return (
-		<div className="space-y-6">
-			{/* Status Tabs */}
-			<div className="flex items-center gap-2 flex-wrap">
-				{STATUS_TABS.map((tab) => (
-					<button
-						key={tab.key}
-						type="button"
-						onClick={() => handleStatusChange(tab.filterValue)}
-						className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors ${
-							statusFilter === tab.filterValue
-								? "bg-primary text-primary-foreground shadow-sm"
-								: "bg-slate-100 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700/50"
-						}`}
-					>
-						{t(`finance.invoices.statusTabs.${tab.key}`)}
-					</button>
-				))}
-			</div>
+		<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-slate-100/40 to-slate-50 dark:from-slate-950 dark:via-slate-900/40 dark:to-slate-950">
+			<div className="space-y-5 max-w-6xl mx-auto">
 
-			{/* Search and Filter Bar */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-				<div className="flex flex-1 items-center gap-3 flex-wrap">
-					<div className="relative flex-1 min-w-[200px] max-w-md">
-						<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-						<Input
-							placeholder={t("finance.invoices.searchPlaceholder")}
-							value={searchTerm}
-							onChange={(e) => {
-								setSearchTerm(e.target.value);
-								setCurrentPage(1);
-							}}
-							className="pr-10 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl"
-						/>
+				{/* ─── Header ─────────────────────────────────────────── */}
+				<div className="sticky top-0 z-20 py-3 px-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50">
+					<div className="flex items-center justify-between gap-3 max-w-6xl mx-auto">
+						<div className="flex items-center gap-3 min-w-0">
+							<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border shadow-sm">
+								<Link href={`/app/${organizationSlug}/finance`}>
+									<ArrowRight className="h-4 w-4" />
+								</Link>
+							</Button>
+							<div className="min-w-0">
+								<nav className="flex items-center gap-1 text-[11px] text-muted-foreground mb-0.5">
+									<Link href={`/app/${organizationSlug}/finance`} className="hover:text-foreground transition-colors">{t("finance.title")}</Link>
+									<ChevronLeft className="h-3 w-3 shrink-0" />
+									<span className="text-foreground font-medium">{t("finance.invoices.title")}</span>
+								</nav>
+								<h1 className="text-base font-bold leading-tight truncate">{t("finance.invoices.title")}</h1>
+							</div>
+						</div>
+						<Button asChild size="sm" className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.45)] transition-all">
+							<Link href={`${basePath}/new`}>
+								<Plus className="h-3.5 w-3.5 me-1.5" />
+								{t("finance.invoices.create")}
+							</Link>
+						</Button>
 					</div>
-					{/* Status dropdown */}
-					<Select value={statusFilter} onValueChange={handleStatusChange}>
-						<SelectTrigger className="w-[160px] bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
-							<SelectValue placeholder={t("finance.invoices.allStatuses")} />
-						</SelectTrigger>
-						<SelectContent className="rounded-xl">
-							<SelectItem value="all">{t("finance.invoices.allStatuses")}</SelectItem>
-							<SelectItem value="DRAFT">{t("finance.invoices.status.draft")}</SelectItem>
-							<SelectItem value="ISSUED">{t("finance.invoices.status.issued")}</SelectItem>
-							<SelectItem value="SENT">{t("finance.invoices.status.sent")}</SelectItem>
-							<SelectItem value="PARTIALLY_PAID">{t("finance.invoices.status.partially_paid")}</SelectItem>
-							<SelectItem value="PAID">{t("finance.invoices.status.paid")}</SelectItem>
-							<SelectItem value="OVERDUE">{t("finance.invoices.status.overdue")}</SelectItem>
-							<SelectItem value="CANCELLED">{t("finance.invoices.status.cancelled")}</SelectItem>
-						</SelectContent>
-					</Select>
-					{/* Type filter */}
-					<Select value={typeFilter} onValueChange={handleTypeChange}>
-						<SelectTrigger className="w-[160px] bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
-							<SelectValue placeholder={t("finance.invoices.allTypes")} />
-						</SelectTrigger>
-						<SelectContent className="rounded-xl">
-							<SelectItem value="all">{t("finance.invoices.allTypes")}</SelectItem>
-							<SelectItem value="STANDARD">{t("finance.invoices.types.standard")}</SelectItem>
-							<SelectItem value="TAX">{t("finance.invoices.types.tax")}</SelectItem>
-							<SelectItem value="SIMPLIFIED">{t("finance.invoices.types.simplified")}</SelectItem>
-							<SelectItem value="CREDIT_NOTE">{t("finance.invoices.types.credit_note")}</SelectItem>
-						</SelectContent>
-					</Select>
 				</div>
-			</div>
 
-			{/* Invoices Table */}
-			{invoices.length > 0 ? (
-				<>
-					<div className="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-						<Table>
-							<TableHeader>
-								<TableRow className="bg-slate-50 dark:bg-slate-900/50">
-									<TableHead className="font-medium">{t("finance.invoices.columns.number")}</TableHead>
-									<TableHead className="font-medium">{t("finance.invoices.columns.client")}</TableHead>
-									<TableHead className="font-medium">{t("finance.invoices.columns.date")}</TableHead>
-									<TableHead className="font-medium">{t("finance.invoices.columns.dueDate")}</TableHead>
-									<TableHead className="font-medium">{t("finance.invoices.columns.amount")}</TableHead>
-									<TableHead className="font-medium">{t("finance.invoices.columns.paid")}</TableHead>
-									<TableHead className="font-medium">{t("finance.invoices.columns.status")}</TableHead>
-									<TableHead className="w-[50px]" />
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{invoices.map((invoice) => {
-									const overdue = isOverdue(invoice.dueDate) &&
-										invoice.status !== "PAID" &&
-										invoice.status !== "CANCELLED";
+				{/* ─── Status Tabs ─────────────────────────────────────── */}
+				<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] px-4 py-3">
+					<div className="flex items-center gap-2 flex-wrap">
+						{STATUS_TABS.map((tab) => (
+							<button
+								key={tab.key}
+								type="button"
+								onClick={() => handleStatusChange(tab.filterValue)}
+								className={`px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all ${
+									statusFilter === tab.filterValue
+										? "bg-primary text-primary-foreground shadow-[0_2px_8px_hsl(var(--primary)/0.3)]"
+										: "bg-slate-100/80 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-700/50"
+								}`}
+							>
+								{t(`finance.invoices.statusTabs.${tab.key}`)}
+							</button>
+						))}
+					</div>
+				</div>
 
-									const isDraft = invoice.status === "DRAFT";
-									const isPaid = invoice.status === "PAID";
-									const isCancelled = invoice.status === "CANCELLED";
-									const canAddPayment = !isDraft && !isPaid && !isCancelled;
-									const canCreditNote = !isDraft && !isCancelled;
+				{/* ─── Search and Filter ───────────────────────────────── */}
+				<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] px-5 py-3.5">
+					<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+						<div className="relative flex-1 min-w-[200px]">
+							<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+							<Input
+								placeholder={t("finance.invoices.searchPlaceholder")}
+								value={searchTerm}
+								onChange={(e) => {
+									setSearchTerm(e.target.value);
+									setCurrentPage(1);
+								}}
+								className="pr-10 rounded-xl h-9 border-slate-200/80 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background"
+							/>
+						</div>
+						<Select value={statusFilter} onValueChange={handleStatusChange}>
+							<SelectTrigger className="w-[160px] rounded-xl h-9 border-slate-200/80 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30">
+								<SelectValue placeholder={t("finance.invoices.allStatuses")} />
+							</SelectTrigger>
+							<SelectContent className="rounded-xl">
+								<SelectItem value="all">{t("finance.invoices.allStatuses")}</SelectItem>
+								<SelectItem value="DRAFT">{t("finance.invoices.status.draft")}</SelectItem>
+								<SelectItem value="ISSUED">{t("finance.invoices.status.issued")}</SelectItem>
+								<SelectItem value="SENT">{t("finance.invoices.status.sent")}</SelectItem>
+								<SelectItem value="PARTIALLY_PAID">{t("finance.invoices.status.partially_paid")}</SelectItem>
+								<SelectItem value="PAID">{t("finance.invoices.status.paid")}</SelectItem>
+								<SelectItem value="OVERDUE">{t("finance.invoices.status.overdue")}</SelectItem>
+								<SelectItem value="CANCELLED">{t("finance.invoices.status.cancelled")}</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+				</div>
 
-									return (
-										<TableRow
-											key={invoice.id}
-											className={`hover:bg-slate-50 dark:hover:bg-slate-900/50 ${
-												overdue ? "bg-red-50/50 dark:bg-red-950/20" : ""
-											}`}
-										>
-											<TableCell className="font-medium">
-												<Link
-													href={`${basePath}/${invoice.id}`}
-													className="text-primary hover:underline flex items-center gap-2"
+				{/* ─── Invoices Table ──────────────────────────────────── */}
+				{invoices.length > 0 ? (
+					<>
+						<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
+							<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
+								<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-900/40 dark:to-amber-800/20 flex items-center justify-center">
+									<FileText className="h-[15px] w-[15px] text-amber-500" />
+								</div>
+								<span className="text-sm font-semibold text-foreground">{t("finance.invoices.title")}</span>
+								<span className="px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[11px] font-bold">{totalCount}</span>
+							</div>
+							<div className="overflow-x-auto">
+								<table className="w-full text-sm">
+									<thead>
+										<tr className="border-b bg-slate-50/80 dark:bg-slate-800/30">
+											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.number")}</th>
+											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.client")}</th>
+											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.date")}</th>
+											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.dueDate")}</th>
+											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.amount")}</th>
+											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.paid")}</th>
+											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.status")}</th>
+											<th className="p-3 w-10" />
+										</tr>
+									</thead>
+									<tbody>
+										{invoices.map((invoice) => {
+											const overdue = isOverdue(invoice.dueDate) &&
+												invoice.status !== "PAID" &&
+												invoice.status !== "CANCELLED";
+
+											const isDraft = invoice.status === "DRAFT";
+											const isPaid = invoice.status === "PAID";
+											const isCancelled = invoice.status === "CANCELLED";
+											const canAddPayment = !isDraft && !isPaid && !isCancelled;
+											const canCreditNote = !isDraft && !isCancelled;
+
+											return (
+												<tr
+													key={invoice.id}
+													className={`border-b border-slate-50 dark:border-slate-800/30 last:border-0 hover:bg-primary/[0.02] transition-colors ${
+														overdue ? "bg-red-50/50 dark:bg-red-950/20" : ""
+													}`}
 												>
-													{invoice.invoiceNo}
-													{invoice.invoiceType === "TAX" && (
-														<QrCode className="h-3 w-3 text-green-600" />
-													)}
-													{invoice.invoiceType === "CREDIT_NOTE" && (
-														<span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400">
-															{t("finance.invoices.types.credit_note")}
-														</span>
-													)}
-												</Link>
-											</TableCell>
-											<TableCell>
-												<div>
-													<p className="font-medium text-slate-900 dark:text-slate-100">
-														{invoice.clientName}
-													</p>
-													{invoice.clientCompany && (
-														<p className="text-sm text-slate-500">
-															{invoice.clientCompany}
-														</p>
-													)}
-												</div>
-											</TableCell>
-											<TableCell className="text-slate-600 dark:text-slate-400">
-												{formatDate(invoice.issueDate)}
-											</TableCell>
-											<TableCell className={overdue ? "text-red-600 font-medium" : "text-slate-600 dark:text-slate-400"}>
-												{formatDate(invoice.dueDate)}
-											</TableCell>
-											<TableCell className="font-semibold">
-												<Currency amount={invoice.totalAmount} />
-											</TableCell>
-											<TableCell className="text-green-600 font-medium">
-												<Currency amount={invoice.paidAmount} />
-											</TableCell>
-											<TableCell>
-												<StatusBadge
-													status={overdue && invoice.status !== "PAID" ? "OVERDUE" : invoice.status}
-													type="invoice"
-												/>
-											</TableCell>
-											<TableCell>
-												<DropdownMenu>
-													<DropdownMenuTrigger asChild>
-														<Button variant="ghost" size="icon" className="h-8 w-8">
-															<MoreHorizontal className="h-4 w-4" />
-														</Button>
-													</DropdownMenuTrigger>
-													<DropdownMenuContent align="end" className="rounded-xl">
-														{/* View — always */}
-														<DropdownMenuItem asChild>
-															<Link href={`${basePath}/${invoice.id}`}>
-																<Eye className="h-4 w-4 me-2" />
-																{t("finance.actions.preview")}
-															</Link>
-														</DropdownMenuItem>
-
-														{/* Edit — only DRAFT */}
-														{isDraft && (
-															<DropdownMenuItem asChild>
-																<Link href={`${basePath}/${invoice.id}/edit`}>
-																	<Edit className="h-4 w-4 me-2" />
-																	{t("finance.actions.edit")}
-																</Link>
-															</DropdownMenuItem>
-														)}
-
-														{/* Print — always */}
-														<DropdownMenuItem asChild>
-															<Link href={`${basePath}/${invoice.id}/preview`}>
-																<Printer className="h-4 w-4 me-2" />
-																{t("finance.actions.print")}
-															</Link>
-														</DropdownMenuItem>
-
-														<DropdownMenuSeparator />
-
-														{/* Add Payment — only non-DRAFT, non-PAID, non-CANCELLED */}
-														{canAddPayment && (
-															<DropdownMenuItem
-																onClick={() => router.push(`${basePath}/${invoice.id}`)}
-															>
-																<CreditCard className="h-4 w-4 me-2" />
-																{t("finance.actions.addPayment")}
-															</DropdownMenuItem>
-														)}
-
-														{/* Issue — only DRAFT */}
-														{isDraft && (
-															<DropdownMenuItem
-																onClick={() => setIssueInvoiceId(invoice.id)}
-															>
-																<FileCheck className="h-4 w-4 me-2" />
-																{t("finance.actions.issue")}
-															</DropdownMenuItem>
-														)}
-
-														{/* Credit Note — only non-DRAFT, non-CANCELLED */}
-														{canCreditNote && (
-															<DropdownMenuItem
-																onClick={() => router.push(`${basePath}/${invoice.id}/credit-note`)}
-															>
-																<FileMinus className="h-4 w-4 me-2" />
-																{t("finance.actions.creditNote")}
-															</DropdownMenuItem>
-														)}
-
-														{/* Duplicate — always */}
-														<DropdownMenuItem
-															onClick={() => duplicateMutation.mutate(invoice.id)}
-															disabled={duplicateMutation.isPending}
+													<td className="p-3 font-medium">
+														<Link
+															href={`${basePath}/${invoice.id}`}
+															className="text-primary hover:underline flex items-center gap-2"
 														>
-															<Copy className="h-4 w-4 me-2" />
-															{t("finance.actions.duplicate")}
-														</DropdownMenuItem>
+															{invoice.invoiceNo}
+															{invoice.invoiceType === "CREDIT_NOTE" && (
+																<span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400">
+																	{t("finance.invoices.types.credit_note")}
+																</span>
+															)}
+														</Link>
+													</td>
+													<td className="p-3">
+														<div>
+															<p className="font-medium text-foreground">{invoice.clientName}</p>
+															{invoice.clientCompany && (
+																<p className="text-xs text-muted-foreground">{invoice.clientCompany}</p>
+															)}
+														</div>
+													</td>
+													<td className="p-3 text-muted-foreground">{formatDate(invoice.issueDate)}</td>
+													<td className={`p-3 ${overdue ? "text-red-600 font-medium" : "text-muted-foreground"}`}>
+														{formatDate(invoice.dueDate)}
+													</td>
+													<td className="p-3 font-semibold">
+														<Currency amount={invoice.totalAmount} />
+													</td>
+													<td className="p-3 text-green-600 font-medium">
+														<Currency amount={invoice.paidAmount} />
+													</td>
+													<td className="p-3">
+														<StatusBadge
+															status={overdue && invoice.status !== "PAID" ? "OVERDUE" : invoice.status}
+															type="invoice"
+														/>
+													</td>
+													<td className="p-3">
+														<DropdownMenu>
+															<DropdownMenuTrigger asChild>
+																<Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
+																	<MoreHorizontal className="h-4 w-4" />
+																</Button>
+															</DropdownMenuTrigger>
+															<DropdownMenuContent align="end" className="rounded-xl">
+																{/* View — always */}
+																<DropdownMenuItem asChild>
+																	<Link href={`${basePath}/${invoice.id}`}>
+																		<Eye className="h-4 w-4 me-2" />
+																		{t("finance.actions.preview")}
+																	</Link>
+																</DropdownMenuItem>
 
-														<DropdownMenuSeparator />
+																{/* Edit — only DRAFT */}
+																{isDraft && (
+																	<DropdownMenuItem asChild>
+																		<Link href={`${basePath}/${invoice.id}/edit`}>
+																			<Edit className="h-4 w-4 me-2" />
+																			{t("finance.actions.edit")}
+																		</Link>
+																	</DropdownMenuItem>
+																)}
 
-														{/* Delete — only DRAFT */}
-														{isDraft && (
-															<DropdownMenuItem
-																className="text-red-600"
-																onClick={() => setDeleteInvoiceId(invoice.id)}
-															>
-																<Trash2 className="h-4 w-4 me-2" />
-																{t("finance.actions.delete")}
-															</DropdownMenuItem>
-														)}
-													</DropdownMenuContent>
-												</DropdownMenu>
-											</TableCell>
-										</TableRow>
-									);
-								})}
-							</TableBody>
-						</Table>
+																{/* Print — always */}
+																<DropdownMenuItem asChild>
+																	<Link href={`${basePath}/${invoice.id}/preview`}>
+																		<Printer className="h-4 w-4 me-2" />
+																		{t("finance.actions.print")}
+																	</Link>
+																</DropdownMenuItem>
+
+																<DropdownMenuSeparator />
+
+																{/* Add Payment — only non-DRAFT, non-PAID, non-CANCELLED */}
+																{canAddPayment && (
+																	<DropdownMenuItem
+																		onClick={() => router.push(`${basePath}/${invoice.id}`)}
+																	>
+																		<CreditCard className="h-4 w-4 me-2" />
+																		{t("finance.actions.addPayment")}
+																	</DropdownMenuItem>
+																)}
+
+																{/* Issue — only DRAFT */}
+																{isDraft && (
+																	<DropdownMenuItem
+																		onClick={() => setIssueInvoiceId(invoice.id)}
+																	>
+																		<FileCheck className="h-4 w-4 me-2" />
+																		{t("finance.actions.issue")}
+																	</DropdownMenuItem>
+																)}
+
+																{/* Credit Note — only non-DRAFT, non-CANCELLED */}
+																{canCreditNote && (
+																	<DropdownMenuItem
+																		onClick={() => router.push(`${basePath}/${invoice.id}/credit-note`)}
+																	>
+																		<FileMinus className="h-4 w-4 me-2" />
+																		{t("finance.actions.creditNote")}
+																	</DropdownMenuItem>
+																)}
+
+																{/* Duplicate — always */}
+																<DropdownMenuItem
+																	onClick={() => duplicateMutation.mutate(invoice.id)}
+																	disabled={duplicateMutation.isPending}
+																>
+																	<Copy className="h-4 w-4 me-2" />
+																	{t("finance.actions.duplicate")}
+																</DropdownMenuItem>
+
+																<DropdownMenuSeparator />
+
+																{/* Delete — only DRAFT */}
+																{isDraft && (
+																	<DropdownMenuItem
+																		className="text-red-600"
+																		onClick={() => setDeleteInvoiceId(invoice.id)}
+																	>
+																		<Trash2 className="h-4 w-4 me-2" />
+																		{t("finance.actions.delete")}
+																	</DropdownMenuItem>
+																)}
+															</DropdownMenuContent>
+														</DropdownMenu>
+													</td>
+												</tr>
+											);
+										})}
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						{/* Pagination */}
+						{totalCount > PAGE_SIZE && (
+							<Pagination
+								totalItems={totalCount}
+								itemsPerPage={PAGE_SIZE}
+								currentPage={currentPage}
+								onChangeCurrentPage={setCurrentPage}
+							/>
+						)}
+					</>
+				) : (
+					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
+						<div className="flex flex-col items-center justify-center py-16 text-center">
+							<div className="p-5 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800/50 dark:to-slate-800/30 mb-5">
+								<Receipt className="h-12 w-12 text-slate-400 dark:text-slate-500" />
+							</div>
+							<h3 className="text-lg font-medium text-foreground">
+								{t("finance.invoices.empty")}
+							</h3>
+							<p className="text-muted-foreground mt-2 max-w-sm text-sm">
+								{t("finance.invoices.emptyDescription")}
+							</p>
+							<Button asChild className="mt-5 rounded-[10px] h-9 px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.45)] transition-all">
+								<Link href={`${basePath}/new`}>
+									<Plus className="ml-2 h-4 w-4" />
+									{t("finance.invoices.create")}
+								</Link>
+							</Button>
+						</div>
 					</div>
-
-					{/* Pagination */}
-					{totalCount > PAGE_SIZE && (
-						<Pagination
-							totalItems={totalCount}
-							itemsPerPage={PAGE_SIZE}
-							currentPage={currentPage}
-							onChangeCurrentPage={setCurrentPage}
-						/>
-					)}
-				</>
-			) : (
-				<div className="flex flex-col items-center justify-center py-16 text-center">
-					<div className="p-5 rounded-2xl bg-slate-100 dark:bg-slate-800/50 mb-5">
-						<Receipt className="h-12 w-12 text-slate-400 dark:text-slate-500" />
-					</div>
-					<h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">
-						{t("finance.invoices.empty")}
-					</h3>
-					<p className="text-slate-500 dark:text-slate-400 mt-2 max-w-sm text-sm">
-						{t("finance.invoices.emptyDescription")}
-					</p>
-					<Button asChild className="mt-5 rounded-xl">
-						<Link href={`${basePath}/new`}>
-							<Plus className="ml-2 h-4 w-4" />
-							{t("finance.invoices.create")}
-						</Link>
-					</Button>
-				</div>
-			)}
+				)}
+			</div>
 
 			{/* Delete Confirmation Dialog */}
 			<AlertDialog open={!!deleteInvoiceId} onOpenChange={() => setDeleteInvoiceId(null)}>

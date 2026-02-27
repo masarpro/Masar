@@ -31,11 +31,7 @@ export default async function CreateInvoicePage({
 	}
 
 	return (
-		<FinanceShell
-			organizationSlug={organizationSlug}
-			sectionKey="invoices"
-			pageTitle={t("finance.invoices.create")}
-		>
+		<FinanceShell organizationSlug={organizationSlug}>
 			<CreateInvoiceForm
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}

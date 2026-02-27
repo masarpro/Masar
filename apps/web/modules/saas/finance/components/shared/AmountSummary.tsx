@@ -42,7 +42,7 @@ export function AmountSummary({
 						{t("finance.summary.discount")} ({discountPercent}%)
 					</span>
 					<span className="font-medium text-red-600">
-						-<Currency amount={discountAmount} />
+						<Currency amount={-Math.abs(discountAmount)} />
 					</span>
 				</div>
 			)}

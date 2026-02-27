@@ -3043,7 +3043,9 @@
 			"downloadPdf": "تحميل PDF",
 			"duplicate": "نسخ",
 			"creditNote": "إشعار دائن",
-			"issue": "إصدار"
+			"issue": "إصدار",
+			"printComingSoon": "الطباعة ستكون متاحة قريباً",
+			"addNote": "إضافة ملاحظة"
 		},
 		"paymentMethods": {
 			"cash": "نقدي",
@@ -3305,6 +3307,9 @@
 			"deleteConfirmDescription": "هل أنت متأكد من حذف هذه الفاتورة؟ لا يمكن التراجع عن هذا الإجراء.",
 			"deleteSuccess": "تم حذف الفاتورة بنجاح",
 			"deleteError": "حدث خطأ أثناء حذف الفاتورة",
+			"addNoteTitle": "إضافة ملاحظة",
+			"noteUpdateSuccess": "تم تحديث الملاحظة بنجاح",
+			"noteUpdateError": "حدث خطأ أثناء تحديث الملاحظة",
 			"issuedAtDateTime": "تاريخ ووقت الإصدار",
 			"overdueLabel": "متأخرة",
 			"zatcaQrTitle": "رمز الفاتورة الضريبية",
@@ -3331,6 +3336,8 @@
 			"taxNumber": "الرقم الضريبي",
 			"clientAddress": "العنوان",
 			"addressPlaceholder": "أدخل عنوان العميل",
+			"details": "تفاصيل الفاتورة",
+			"previewAvailableAfterSave": "المعاينة ستكون متاحة بعد حفظ الفاتورة",
 			"settings": "إعدادات الفاتورة",
 			"invoiceType": "نوع الفاتورة",
 			"types": {
@@ -3513,7 +3520,10 @@
 				"clientTaxNumberRequired": "الرقم الضريبي للعميل مطلوب للفاتورة الضريبية",
 				"validItemsRequired": "يجب أن تحتوي الفاتورة على بند واحد على الأقل بكمية وسعر أكبر من صفر",
 				"issueDateRequired": "تاريخ الإصدار مطلوب"
-			}
+			},
+			"paid": "المدفوع",
+			"remaining": "المتبقي",
+			"invoiceType": "نوع الفاتورة"
 		},
 		"documents": {
 			"title": "المستندات المفتوحة",
@@ -3595,7 +3605,9 @@
 				"accountName": "اسم الحساب",
 				"swiftCode": "رمز السويفت",
 				"sampleBankName": "بنك الراجحي",
-				"sampleAccountName": "اسم الشركة"
+				"sampleAccountName": "اسم الشركة",
+				"page": "صفحة",
+				"of": "من"
 			},
 			"systemTemplate": "قالب النظام",
 			"cannotModifyDefault": "لا يمكن تعديل القالب الافتراضي. يمكنك إنشاء قالب مخصص بدلاً من ذلك.",

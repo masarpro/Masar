@@ -107,7 +107,9 @@
       "Bash(mkdir:*)",
       "Bash(cp:*)",
       "Bash(python3:*)",
-      "Bash(cd /h/Masar/supastarter-nextjs-3/packages/database && pnpm test -- __tests__/invoice-calculations.test.ts 2>&1)"
+      "Bash(cd /h/Masar/supastarter-nextjs-3/packages/database && pnpm test -- __tests__/invoice-calculations.test.ts 2>&1)",
+      "Bash(cd H:\\\\Masar\\\\supastarter-nextjs-3\\\\apps\\\\web\\\\app\\\\\\(saas\\)\\\\app\\\\\\(organizations\\)\\\\[organizationSlug]\\\\finance:*)",
+      "Bash(xxd:*)"
     ]
   }
 }

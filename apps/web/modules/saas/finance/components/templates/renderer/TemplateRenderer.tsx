@@ -50,6 +50,7 @@ export interface InvoiceData {
 	invoiceNo: string;
 	issueDate: Date | string;
 	dueDate: Date | string;
+	issuedAt?: Date | string | null;
 	status: string;
 	invoiceType: string;
 	clientName: string;
@@ -72,9 +73,13 @@ export interface InvoiceData {
 	vatAmount: number;
 	totalAmount: number;
 	paidAmount?: number;
+	remainingAmount?: number;
 	paymentTerms?: string;
 	notes?: string;
 	sellerTaxNumber?: string;
+	// ZATCA
+	qrCode?: string | null;
+	zatcaUuid?: string | null;
 }
 
 export interface OrganizationData {
@@ -108,6 +113,7 @@ export interface TemplateConfig {
 	settings?: {
 		backgroundColor?: string;
 		primaryColor?: string;
+		secondaryColor?: string;
 		fontFamily?: string;
 		fontSize?: string;
 		vatPercent?: number;
@@ -175,6 +181,7 @@ export function TemplateRenderer({
 
 	// Get settings with defaults
 	const primaryColor = settings.primaryColor || "#3b82f6";
+	const secondaryColor = settings.secondaryColor;
 	const backgroundColor = settings.backgroundColor || "#ffffff";
 	const fontFamily = settings.fontFamily || "inherit";
 	const currency = settings.currency || "SAR";
@@ -202,6 +209,7 @@ export function TemplateRenderer({
 		phone: organization?.phone,
 		email: organization?.email,
 		taxNumber: organization?.taxNumber,
+		commercialReg: (organization as any)?.commercialReg,
 	};
 
 	// Prepare client info
@@ -223,6 +231,7 @@ export function TemplateRenderer({
 		validUntil: isInvoice(data)
 			? new Date(data.dueDate).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US")
 			: new Date(data.validUntil).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US"),
+		invoiceType: isInvoice(data) ? data.invoiceType : undefined,
 	};
 
 	// Prepare items
@@ -235,6 +244,7 @@ export function TemplateRenderer({
 	}));
 
 	// Prepare totals
+	const paidAmount = isInvoice(data) ? Number(data.paidAmount ?? 0) : 0;
 	const totals = {
 		subtotal: Number(data.subtotal),
 		discountPercent: Number(data.discountPercent),
@@ -242,6 +252,8 @@ export function TemplateRenderer({
 		vatPercent: Number(data.vatPercent) || vatPercent,
 		vatAmount: Number(data.vatAmount),
 		total: Number(data.totalAmount),
+		paidAmount,
+		remainingAmount: Number(data.totalAmount) - paidAmount,
 	};
 
 	// Prepare terms
@@ -273,6 +285,8 @@ export function TemplateRenderer({
 						companyInfo={companyInfo}
 						documentType={docType}
 						primaryColor={primaryColor}
+						secondaryColor={secondaryColor}
+						documentInfo={documentInfo}
 					/>
 				);
 
@@ -284,6 +298,7 @@ export function TemplateRenderer({
 						clientInfo={clientInfo}
 						documentInfo={documentInfo}
 						primaryColor={primaryColor}
+						secondaryColor={secondaryColor}
 					/>
 				);
 
@@ -356,25 +371,94 @@ export function TemplateRenderer({
 						settings={elementSettings as any}
 						organization={organization}
 						primaryColor={primaryColor}
+						secondaryColor={secondaryColor}
 					/>
 				);
 
-			case "text":
+			case "text": {
+				// Handle info-bar layout (used by Bold Professional template)
+				const textSettings = elementSettings as {
+					layout?: string;
+					background?: string;
+					textColor?: string;
+					fontSize?: string;
+					fields?: string[];
+					dividerColor?: string;
+					padding?: string;
+					content?: string;
+					label?: string;
+				};
+
+				if (textSettings.layout === "info-bar") {
+					const barFields = textSettings.fields || [];
+					const fieldValues: Record<string, string> = {
+						invoiceType: documentInfo.invoiceType || t("finance.templates.preview.invoice"),
+						issueDate: documentInfo.date,
+						dueDate: documentInfo.validUntil,
+					};
+					const fieldLabels: Record<string, string> = {
+						invoiceType: t("finance.invoices.invoiceType"),
+						issueDate: t("finance.templates.preview.date"),
+						dueDate: t("finance.templates.preview.validUntil"),
+					};
+
+					return (
+						<div
+							key={element.id}
+							className="flex items-center justify-around"
+							style={{
+								background: textSettings.background || primaryColor,
+								color: textSettings.textColor || "#ffffff",
+								fontSize: textSettings.fontSize || "12px",
+								padding: textSettings.padding || "8px 28px",
+							}}
+						>
+							{barFields.map((field, i) => (
+								<>
+									{i > 0 && (
+										<div
+											key={`div-${field}`}
+											className="w-px self-stretch"
+											style={{
+												background:
+													textSettings.dividerColor ||
+													"rgba(255,255,255,0.3)",
+											}}
+										/>
+									)}
+									<div key={field}>
+										<span className="opacity-70">
+											{fieldLabels[field] || field}:
+										</span>{" "}
+										<strong>{fieldValues[field] || ""}</strong>
+									</div>
+								</>
+							))}
+						</div>
+					);
+				}
+
 				const textContent = getElementContent(
 					element.id,
-					(elementSettings as { content?: string }).content
+					textSettings.content
 				);
-				const textLabel = (elementSettings as { label?: string }).label;
+				const textLabel = textSettings.label;
 				return (
 					<div key={element.id} className="py-4">
 						{textLabel && (
-							<h4 className="text-sm font-medium text-slate-700 mb-2">{textLabel}</h4>
+							<h4 className="text-sm font-medium text-slate-700 mb-2">
+								{textLabel}
+							</h4>
 						)}
 						<p className="text-slate-600 whitespace-pre-line">
-							{textContent || (interactive ? t("finance.templates.editor.elementTypes.text") : "")}
+							{textContent ||
+								(interactive
+									? t("finance.templates.editor.elementTypes.text")
+									: "")}
 						</p>
 					</div>
 				);
+			}
 
 			case "image":
 				const imageUrl = (elementSettings as { imageUrl?: string }).imageUrl;

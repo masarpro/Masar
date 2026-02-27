@@ -29,6 +29,7 @@ import {
 	duplicateInvoiceProcedure,
 	createCreditNoteProcedure,
 	getInvoiceActivityProcedure,
+	updateInvoiceNotesProcedure,
 } from "./procedures/create-invoice";
 
 import {
@@ -145,6 +146,7 @@ export const financeRouter = {
 		issue: issueInvoiceProcedure,
 		duplicate: duplicateInvoiceProcedure,
 		createCreditNote: createCreditNoteProcedure,
+		updateNotes: updateInvoiceNotesProcedure,
 		getActivity: getInvoiceActivityProcedure,
 	},
 

@@ -1,6 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { InvoicesList } from "@saas/finance/components/invoices/InvoicesList";
-import { InvoicesHeaderActions } from "@saas/finance/components/invoices/InvoicesHeaderActions";
 import { FinanceShell } from "@saas/finance/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -31,11 +30,7 @@ export default async function InvoicesPage({
 	}
 
 	return (
-		<FinanceShell
-			organizationSlug={organizationSlug}
-			sectionKey="invoices"
-			headerActions={<InvoicesHeaderActions organizationSlug={organizationSlug} />}
-		>
+		<FinanceShell organizationSlug={organizationSlug}>
 			<InvoicesList
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}

@@ -140,7 +140,7 @@ export function getSampleInvoiceData(settings?: Partial<TemplateSettings>): Samp
 		issueDate: new Date(),
 		dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
 		status: "ISSUED",
-		invoiceType: "STANDARD",
+		invoiceType: "TAX",
 		clientName: "محمد عبدالرحمن",
 		clientCompany: "مؤسسة الرواد للتجارة",
 		clientPhone: "0509876543",
