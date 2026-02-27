@@ -29,6 +29,7 @@ import { dashboardRouter } from "../modules/dashboard/router";
 import { financeRouter } from "../modules/finance/router";
 import { subcontractsRouter } from "../modules/subcontracts/router";
 import { companyRouter } from "../modules/company/router";
+import { projectExecutionRouter } from "../modules/project-execution/router";
 import { pricingRouter } from "../modules/pricing/router";
 import { rolesRouter } from "../modules/roles/router";
 import { usersRouter } from "../modules/users/router";
@@ -79,6 +80,8 @@ export const router = publicProcedure.router({
 	subcontracts: subcontractsRouter,
 	// Company Management - إدارة المنشأة
 	company: companyRouter,
+	// Phase 13 - Execution Module
+	projectExecution: projectExecutionRouter,
 });
 
 export type ApiRouterClient = RouterClient<typeof router>;

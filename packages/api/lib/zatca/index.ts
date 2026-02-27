@@ -25,3 +25,4 @@
 
 export { generateZatcaQR, validateZatcaQR, type ZatcaQRInput } from "./qr-generator";
 export { encodeZatcaTLV, decodeZatcaTLV, type ZatcaTLVData } from "./tlv-encoder";
+export { generateZatcaQRImage } from "./qr-image";

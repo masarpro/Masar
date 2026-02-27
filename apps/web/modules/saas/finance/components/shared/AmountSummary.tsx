@@ -10,6 +10,8 @@ interface AmountSummaryProps {
 	vatPercent: number;
 	vatAmount: number;
 	totalAmount: number;
+	paidAmount?: number;
+	remainingAmount?: number;
 }
 
 export function AmountSummary({
@@ -19,8 +21,11 @@ export function AmountSummary({
 	vatPercent,
 	vatAmount,
 	totalAmount,
+	paidAmount,
+	remainingAmount,
 }: AmountSummaryProps) {
 	const t = useTranslations();
+	const taxableAmount = subtotal - discountAmount;
 
 	return (
 		<div className="w-full max-w-sm space-y-2 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50">
@@ -42,6 +47,15 @@ export function AmountSummary({
 				</div>
 			)}
 
+			{discountPercent > 0 && (
+				<div className="flex justify-between text-sm">
+					<span className="text-slate-600 dark:text-slate-400">
+						{t("finance.summary.taxableAmount")}
+					</span>
+					<span className="font-medium"><Currency amount={taxableAmount} /></span>
+				</div>
+			)}
+
 			<div className="flex justify-between text-sm">
 				<span className="text-slate-600 dark:text-slate-400">
 					{t("finance.summary.vat")} ({vatPercent}%)
@@ -51,7 +65,7 @@ export function AmountSummary({
 
 			<div className="border-t border-slate-200 dark:border-slate-700 pt-2 mt-2">
 				<div className="flex justify-between">
-					<span className="font-semibold text-slate-900 dark:text-slate-100">
+					<span className="font-bold text-lg text-slate-900 dark:text-slate-100">
 						{t("finance.summary.total")}
 					</span>
 					<span className="font-bold text-lg text-primary">
@@ -59,6 +73,35 @@ export function AmountSummary({
 					</span>
 				</div>
 			</div>
+
+			{paidAmount != null && paidAmount > 0 && (
+				<>
+					<div className="flex justify-between text-sm text-green-600 dark:text-green-400 pt-1">
+						<span>{t("finance.summary.paidAmount")}</span>
+						<span>-<Currency amount={paidAmount} /></span>
+					</div>
+					<div className="flex justify-between font-bold">
+						<span
+							className={
+								(remainingAmount ?? 0) > 0
+									? "text-red-600 dark:text-red-400"
+									: "text-green-600 dark:text-green-400"
+							}
+						>
+							{t("finance.summary.remainingAmount")}
+						</span>
+						<span
+							className={
+								(remainingAmount ?? 0) > 0
+									? "text-red-600 dark:text-red-400"
+									: "text-green-600 dark:text-green-400"
+							}
+						>
+							<Currency amount={remainingAmount ?? 0} />
+						</span>
+					</div>
+				</>
+			)}
 		</div>
 	);
 }

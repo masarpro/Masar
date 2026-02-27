@@ -59,6 +59,7 @@ import {
 import { ItemsEditor } from "../shared/ItemsEditor";
 import { AmountSummary } from "../shared/AmountSummary";
 import { ClientSelector, type Client } from "../shared/ClientSelector";
+import { InlineClientForm } from "../clients/InlineClientForm";
 import { StatusBadge } from "../shared/StatusBadge";
 import { calculateTotals, formatDate } from "../../lib/utils";
 import { Currency } from "../shared/Currency";
@@ -99,6 +100,7 @@ export function InvoiceEditor({
 	const [projectId, setProjectId] = useState<string | undefined>();
 	const [issueDate, setIssueDate] = useState("");
 	const [dueDate, setDueDate] = useState("");
+	const [paymentTermsDays, setPaymentTermsDays] = useState<number | "">(30);
 	const [paymentTerms, setPaymentTerms] = useState("");
 	const [notes, setNotes] = useState("");
 	const [vatPercent, setVatPercent] = useState(15);
@@ -117,6 +119,8 @@ export function InvoiceEditor({
 
 	// Delete payment dialog
 	const [deletePaymentId, setDeletePaymentId] = useState<string | null>(null);
+	// New client dialog
+	const [showNewClientDialog, setShowNewClientDialog] = useState(false);
 
 	// Fetch invoice data
 	const { data: invoice, isLoading } = useQuery(
@@ -124,6 +128,14 @@ export function InvoiceEditor({
 			input: { organizationId, id: invoiceId },
 		}),
 	);
+
+	// Redirect if not DRAFT
+	useEffect(() => {
+		if (invoice && invoice.status !== "DRAFT") {
+			toast.error(t("finance.invoices.notEditable"));
+			router.replace(`${basePath}/${invoiceId}`);
+		}
+	}, [invoice, basePath, invoiceId, router, t]);
 
 	// Initialize form with invoice data
 	useEffect(() => {
@@ -154,6 +166,15 @@ export function InvoiceEditor({
 			);
 		}
 	}, [invoice]);
+
+	// Auto-compute dueDate when paymentTermsDays or issueDate changes
+	useEffect(() => {
+		if (paymentTermsDays !== "" && paymentTermsDays > 0 && issueDate) {
+			const date = new Date(issueDate);
+			date.setDate(date.getDate() + paymentTermsDays);
+			setDueDate(date.toISOString().split("T")[0]);
+		}
+	}, [paymentTermsDays, issueDate]);
 
 	// Fetch projects for dropdown
 	const { data: projectsData } = useQuery(
@@ -484,9 +505,23 @@ export function InvoiceEditor({
 				{/* Client Information */}
 				<Card className="lg:col-span-2 rounded-2xl">
 					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
-							<User className="h-5 w-5" />
-							{t("finance.invoices.clientInfo")}
+						<CardTitle className="flex items-center justify-between">
+							<span className="flex items-center gap-2">
+								<User className="h-5 w-5" />
+								{t("finance.invoices.clientInfo")}
+							</span>
+							{isEditable && (
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									onClick={() => setShowNewClientDialog(true)}
+									className="rounded-xl"
+								>
+									<Plus className="h-4 w-4 me-2" />
+									{t("finance.clients.addClient")}
+								</Button>
+							)}
 						</CardTitle>
 					</CardHeader>
 					<CardContent className="space-y-4">
@@ -624,12 +659,32 @@ export function InvoiceEditor({
 								className="rounded-xl mt-1"
 							/>
 						</div>
+						{isEditable && (
+							<div>
+								<Label>{t("finance.invoices.paymentTermsDays")}</Label>
+								<Input
+									type="number"
+									min="1"
+									max="365"
+									value={paymentTermsDays}
+									onChange={(e) => {
+										const val = e.target.value;
+										setPaymentTermsDays(val === "" ? "" : Number(val));
+									}}
+									placeholder="30"
+									className="rounded-xl mt-1"
+								/>
+							</div>
+						)}
 						<div>
 							<Label>{t("finance.invoices.dueDate")}</Label>
 							<Input
 								type="date"
 								value={dueDate}
-								onChange={(e) => setDueDate(e.target.value)}
+								onChange={(e) => {
+									setDueDate(e.target.value);
+									setPaymentTermsDays("");
+								}}
 								readOnly={!isEditable}
 								className="rounded-xl mt-1"
 							/>
@@ -940,6 +995,23 @@ export function InvoiceEditor({
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
+
+			{/* New Client Dialog */}
+			<Dialog open={showNewClientDialog} onOpenChange={setShowNewClientDialog}>
+				<DialogContent className="sm:max-w-lg rounded-2xl max-h-[90vh] overflow-y-auto">
+					<DialogHeader>
+						<DialogTitle>{t("finance.clients.addClient")}</DialogTitle>
+					</DialogHeader>
+					<InlineClientForm
+						organizationId={organizationId}
+						onSuccess={(client) => {
+							handleClientSelect(client);
+							setShowNewClientDialog(false);
+						}}
+						onCancel={() => setShowNewClientDialog(false)}
+					/>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

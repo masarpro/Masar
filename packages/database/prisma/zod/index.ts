@@ -257,9 +257,39 @@ export const ProjectOwnerAccessScalarFieldEnumSchema = z.enum(['id', 'organizati
 
 export type ProjectOwnerAccessScalarFieldEnum = z.infer<typeof ProjectOwnerAccessScalarFieldEnumSchema>;
 
+// File: ProjectCalendarScalarFieldEnum.schema.ts
+
+export const ProjectCalendarScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'name', 'workDays', 'holidays', 'defaultHoursPerDay', 'isDefault', 'createdAt', 'updatedAt'])
+
+export type ProjectCalendarScalarFieldEnum = z.infer<typeof ProjectCalendarScalarFieldEnumSchema>;
+
+// File: ProjectActivityScalarFieldEnum.schema.ts
+
+export const ProjectActivityScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'milestoneId', 'title', 'description', 'wbsCode', 'plannedStart', 'plannedEnd', 'duration', 'actualStart', 'actualEnd', 'status', 'progress', 'isCritical', 'weight', 'assigneeId', 'calendarId', 'orderIndex', 'notes', 'createdAt', 'updatedAt'])
+
+export type ProjectActivityScalarFieldEnum = z.infer<typeof ProjectActivityScalarFieldEnumSchema>;
+
+// File: ActivityDependencyScalarFieldEnum.schema.ts
+
+export const ActivityDependencyScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'predecessorId', 'successorId', 'dependencyType', 'lagDays', 'createdAt'])
+
+export type ActivityDependencyScalarFieldEnum = z.infer<typeof ActivityDependencyScalarFieldEnumSchema>;
+
+// File: ActivityChecklistScalarFieldEnum.schema.ts
+
+export const ActivityChecklistScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'activityId', 'title', 'isCompleted', 'completedAt', 'completedById', 'orderIndex', 'createdAt', 'updatedAt'])
+
+export type ActivityChecklistScalarFieldEnum = z.infer<typeof ActivityChecklistScalarFieldEnumSchema>;
+
+// File: ProjectBaselineScalarFieldEnum.schema.ts
+
+export const ProjectBaselineScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'name', 'description', 'snapshotDate', 'snapshotData', 'isActive', 'createdById', 'createdAt'])
+
+export type ProjectBaselineScalarFieldEnum = z.infer<typeof ProjectBaselineScalarFieldEnumSchema>;
+
 // File: ProjectMilestoneScalarFieldEnum.schema.ts
 
-export const ProjectMilestoneScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'title', 'description', 'orderIndex', 'plannedStart', 'plannedEnd', 'actualStart', 'actualEnd', 'status', 'progress', 'isCritical', 'plannedDate', 'actualDate', 'isCompleted', 'sortOrder', 'createdAt', 'updatedAt'])
+export const ProjectMilestoneScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'title', 'description', 'orderIndex', 'plannedStart', 'plannedEnd', 'actualStart', 'actualEnd', 'status', 'progress', 'isCritical', 'weight', 'color', 'progressMethod', 'baselineStartDate', 'baselineEndDate', 'calendarId', 'plannedDate', 'actualDate', 'isCompleted', 'sortOrder', 'createdAt', 'updatedAt'])
 
 export type ProjectMilestoneScalarFieldEnum = z.infer<typeof ProjectMilestoneScalarFieldEnumSchema>;
 
@@ -349,7 +379,7 @@ export type QuotationItemScalarFieldEnum = z.infer<typeof QuotationItemScalarFie
 
 // File: FinanceInvoiceScalarFieldEnum.schema.ts
 
-export const FinanceInvoiceScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'invoiceNo', 'invoiceType', 'clientId', 'clientName', 'clientCompany', 'clientPhone', 'clientEmail', 'clientAddress', 'clientTaxNumber', 'projectId', 'quotationId', 'status', 'issueDate', 'dueDate', 'subtotal', 'discountPercent', 'discountAmount', 'vatPercent', 'vatAmount', 'totalAmount', 'paidAmount', 'sellerTaxNumber', 'qrCode', 'zatcaUuid', 'zatcaHash', 'zatcaSignature', 'paymentTerms', 'notes', 'templateId', 'viewedAt', 'sentAt', 'createdById', 'createdAt', 'updatedAt'])
+export const FinanceInvoiceScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'invoiceNo', 'invoiceType', 'clientId', 'clientName', 'clientCompany', 'clientPhone', 'clientEmail', 'clientAddress', 'clientTaxNumber', 'projectId', 'quotationId', 'status', 'issueDate', 'dueDate', 'subtotal', 'discountPercent', 'discountAmount', 'vatPercent', 'vatAmount', 'totalAmount', 'paidAmount', 'sellerName', 'sellerAddress', 'sellerPhone', 'relatedInvoiceId', 'issuedAt', 'sellerTaxNumber', 'qrCode', 'zatcaUuid', 'zatcaHash', 'zatcaSignature', 'paymentTerms', 'notes', 'templateId', 'viewedAt', 'sentAt', 'createdById', 'createdAt', 'updatedAt'])
 
 export type FinanceInvoiceScalarFieldEnum = z.infer<typeof FinanceInvoiceScalarFieldEnumSchema>;
 
@@ -677,11 +707,29 @@ export const DeliveryStatusSchema = z.enum(['PENDING', 'SENT', 'FAILED'])
 
 export type DeliveryStatus = z.infer<typeof DeliveryStatusSchema>;
 
+// File: ActivityStatus.schema.ts
+
+export const ActivityStatusSchema = z.enum(['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'DELAYED', 'ON_HOLD', 'CANCELLED'])
+
+export type ActivityStatus = z.infer<typeof ActivityStatusSchema>;
+
+// File: DependencyType.schema.ts
+
+export const DependencyTypeSchema = z.enum(['FINISH_TO_START', 'START_TO_START', 'FINISH_TO_FINISH', 'START_TO_FINISH'])
+
+export type DependencyType = z.infer<typeof DependencyTypeSchema>;
+
 // File: MilestoneStatus.schema.ts
 
-export const MilestoneStatusSchema = z.enum(['PLANNED', 'IN_PROGRESS', 'COMPLETED', 'DELAYED'])
+export const MilestoneStatusSchema = z.enum(['PLANNED', 'IN_PROGRESS', 'COMPLETED', 'DELAYED', 'CANCELLED'])
 
 export type MilestoneStatus = z.infer<typeof MilestoneStatusSchema>;
+
+// File: ProgressMethod.schema.ts
+
+export const ProgressMethodSchema = z.enum(['MANUAL', 'CHECKLIST', 'ACTIVITIES'])
+
+export type ProgressMethod = z.infer<typeof ProgressMethodSchema>;
 
 // File: AttachmentOwnerType.schema.ts
 
@@ -757,13 +805,13 @@ export type QuotationStatus = z.infer<typeof QuotationStatusSchema>;
 
 // File: InvoiceType.schema.ts
 
-export const InvoiceTypeSchema = z.enum(['STANDARD', 'TAX', 'SIMPLIFIED'])
+export const InvoiceTypeSchema = z.enum(['STANDARD', 'TAX', 'SIMPLIFIED', 'CREDIT_NOTE', 'DEBIT_NOTE'])
 
 export type InvoiceType = z.infer<typeof InvoiceTypeSchema>;
 
 // File: FinanceInvoiceStatus.schema.ts
 
-export const FinanceInvoiceStatusSchema = z.enum(['DRAFT', 'SENT', 'VIEWED', 'PARTIALLY_PAID', 'PAID', 'OVERDUE', 'CANCELLED'])
+export const FinanceInvoiceStatusSchema = z.enum(['DRAFT', 'ISSUED', 'SENT', 'VIEWED', 'PARTIALLY_PAID', 'PAID', 'OVERDUE', 'CANCELLED'])
 
 export type FinanceInvoiceStatus = z.infer<typeof FinanceInvoiceStatusSchema>;
 
@@ -859,7 +907,7 @@ export type ExpenseRunStatus = z.infer<typeof ExpenseRunStatusSchema>;
 
 // File: OrgAuditAction.schema.ts
 
-export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED', 'EXPENSE_PAID', 'EXPENSE_CANCELLED', 'EXPENSE_DELETED', 'PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'TRANSFER_CREATED', 'TRANSFER_CANCELLED', 'BANK_ACCOUNT_CREATED', 'BANK_ACCOUNT_UPDATED', 'BANK_ACCOUNT_SET_DEFAULT', 'BANK_ACCOUNT_DELETED', 'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_ITEMS_UPDATED', 'INVOICE_STATUS_CHANGED', 'INVOICE_CONVERTED_TO_TAX', 'INVOICE_PAYMENT_ADDED', 'INVOICE_PAYMENT_DELETED', 'INVOICE_DELETED', 'QUOTATION_CREATED', 'QUOTATION_UPDATED', 'QUOTATION_ITEMS_UPDATED', 'QUOTATION_STATUS_CHANGED', 'QUOTATION_DELETED', 'QUOTATION_CONVERTED', 'CLIENT_CREATED', 'CLIENT_UPDATED', 'CLIENT_DELETED', 'PAYROLL_RUN_APPROVED', 'PAYROLL_RUN_CANCELLED', 'SETTINGS_UPDATED', 'ZATCA_INVOICE_SUBMITTED', 'ZATCA_INVOICE_CLEARED', 'ZATCA_INVOICE_REJECTED'])
+export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED', 'EXPENSE_PAID', 'EXPENSE_CANCELLED', 'EXPENSE_DELETED', 'PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'TRANSFER_CREATED', 'TRANSFER_CANCELLED', 'BANK_ACCOUNT_CREATED', 'BANK_ACCOUNT_UPDATED', 'BANK_ACCOUNT_SET_DEFAULT', 'BANK_ACCOUNT_DELETED', 'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_ITEMS_UPDATED', 'INVOICE_STATUS_CHANGED', 'INVOICE_CONVERTED_TO_TAX', 'INVOICE_PAYMENT_ADDED', 'INVOICE_PAYMENT_DELETED', 'INVOICE_DELETED', 'INVOICE_ISSUED', 'INVOICE_DUPLICATED', 'INVOICE_CREDIT_NOTE_CREATED', 'QUOTATION_CREATED', 'QUOTATION_UPDATED', 'QUOTATION_ITEMS_UPDATED', 'QUOTATION_STATUS_CHANGED', 'QUOTATION_DELETED', 'QUOTATION_CONVERTED', 'CLIENT_CREATED', 'CLIENT_UPDATED', 'CLIENT_DELETED', 'PAYROLL_RUN_APPROVED', 'PAYROLL_RUN_CANCELLED', 'SETTINGS_UPDATED', 'ZATCA_INVOICE_SUBMITTED', 'ZATCA_INVOICE_CLEARED', 'ZATCA_INVOICE_REJECTED'])
 
 export type OrgAuditAction = z.infer<typeof OrgAuditActionSchema>;
 
@@ -1827,6 +1875,106 @@ export const ProjectOwnerAccessSchema = z.object({
 export type ProjectOwnerAccessType = z.infer<typeof ProjectOwnerAccessSchema>;
 
 
+// File: ProjectCalendar.schema.ts
+
+export const ProjectCalendarSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  projectId: z.string(),
+  name: z.string(),
+  workDays: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10"),
+  holidays: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").default("[]"),
+  defaultHoursPerDay: z.number().default(8.0),
+  isDefault: z.boolean(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type ProjectCalendarType = z.infer<typeof ProjectCalendarSchema>;
+
+
+// File: ProjectActivity.schema.ts
+
+export const ProjectActivitySchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  projectId: z.string(),
+  milestoneId: z.string(),
+  title: z.string(),
+  description: z.string().nullish(),
+  wbsCode: z.string().nullish(),
+  plannedStart: z.date().nullish(),
+  plannedEnd: z.date().nullish(),
+  duration: z.number().int().nullish(),
+  actualStart: z.date().nullish(),
+  actualEnd: z.date().nullish(),
+  status: ActivityStatusSchema.default("NOT_STARTED"),
+  progress: z.number(),
+  isCritical: z.boolean(),
+  weight: z.number().nullish(),
+  assigneeId: z.string().nullish(),
+  calendarId: z.string().nullish(),
+  orderIndex: z.number().int(),
+  notes: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type ProjectActivityType = z.infer<typeof ProjectActivitySchema>;
+
+
+// File: ActivityDependency.schema.ts
+
+export const ActivityDependencySchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  projectId: z.string(),
+  predecessorId: z.string(),
+  successorId: z.string(),
+  dependencyType: DependencyTypeSchema.default("FINISH_TO_START"),
+  lagDays: z.number().int(),
+  createdAt: z.date(),
+});
+
+export type ActivityDependencyType = z.infer<typeof ActivityDependencySchema>;
+
+
+// File: ActivityChecklist.schema.ts
+
+export const ActivityChecklistSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  activityId: z.string(),
+  title: z.string(),
+  isCompleted: z.boolean(),
+  completedAt: z.date().nullish(),
+  completedById: z.string().nullish(),
+  orderIndex: z.number().int(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type ActivityChecklistType = z.infer<typeof ActivityChecklistSchema>;
+
+
+// File: ProjectBaseline.schema.ts
+
+export const ProjectBaselineSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  projectId: z.string(),
+  name: z.string(),
+  description: z.string().nullish(),
+  snapshotDate: z.date(),
+  snapshotData: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10"),
+  isActive: z.boolean(),
+  createdById: z.string(),
+  createdAt: z.date(),
+});
+
+export type ProjectBaselineType = z.infer<typeof ProjectBaselineSchema>;
+
+
 // File: ProjectMilestone.schema.ts
 
 export const ProjectMilestoneSchema = z.object({
@@ -1843,6 +1991,12 @@ export const ProjectMilestoneSchema = z.object({
   status: MilestoneStatusSchema.default("PLANNED"),
   progress: z.number(),
   isCritical: z.boolean(),
+  weight: z.number().nullish(),
+  color: z.string().nullish(),
+  progressMethod: ProgressMethodSchema.default("MANUAL"),
+  baselineStartDate: z.date().nullish(),
+  baselineEndDate: z.date().nullish(),
+  calendarId: z.string().nullish(),
   plannedDate: z.date().nullish(),
   actualDate: z.date().nullish(),
   isCompleted: z.boolean(),
@@ -2241,6 +2395,11 @@ export const FinanceInvoiceSchema = z.object({
   paidAmount: z.instanceof(Prisma.Decimal, {
   message: "Field 'paidAmount' must be a Decimal. Location: ['Models', 'FinanceInvoice']",
 }),
+  sellerName: z.string().nullish(),
+  sellerAddress: z.string().nullish(),
+  sellerPhone: z.string().nullish(),
+  relatedInvoiceId: z.string().nullish(),
+  issuedAt: z.date().nullish(),
   sellerTaxNumber: z.string().nullish(),
   qrCode: z.string().nullish(),
   zatcaUuid: z.string().nullish(),

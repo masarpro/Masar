@@ -7,14 +7,21 @@ import {
 	deleteInvoicePayment,
 	deleteInvoice,
 	getInvoiceById,
+	issueInvoice,
+	duplicateInvoice,
+	createCreditNote,
+	calculateInvoiceTotals,
 	orgAuditLog,
+	getEntityOrgAuditLogs,
+	getOrganizationFinanceSettings,
 } from "@repo/database";
 import { z } from "zod";
 import { ORPCError } from "@orpc/server";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { generateZatcaQR } from "../../../lib/zatca";
+import { generateZatcaQR, generateZatcaQRImage } from "../../../lib/zatca";
 import { db } from "@repo/database/prisma/client";
+import crypto from "crypto";
 
 const invoiceItemSchema = z.object({
 	description: z.string().min(1, "وصف البند مطلوب"),
@@ -175,7 +182,16 @@ export const updateInvoiceProcedure = protectedProcedure
 			entityId: id,
 		});
 
-		return invoice;
+		return {
+			...invoice,
+			subtotal: Number(invoice.subtotal),
+			discountPercent: Number(invoice.discountPercent),
+			discountAmount: Number(invoice.discountAmount),
+			vatPercent: Number(invoice.vatPercent),
+			vatAmount: Number(invoice.vatAmount),
+			totalAmount: Number(invoice.totalAmount),
+			paidAmount: Number(invoice.paidAmount),
+		};
 	});
 
 export const updateInvoiceItemsProcedure = protectedProcedure
@@ -272,7 +288,16 @@ export const updateInvoiceStatusProcedure = protectedProcedure
 			metadata: { newStatus: input.status },
 		});
 
-		return invoice;
+		return {
+			...invoice,
+			subtotal: Number(invoice.subtotal),
+			discountPercent: Number(invoice.discountPercent),
+			discountAmount: Number(invoice.discountAmount),
+			vatPercent: Number(invoice.vatPercent),
+			vatAmount: Number(invoice.vatAmount),
+			totalAmount: Number(invoice.totalAmount),
+			paidAmount: Number(invoice.paidAmount),
+		};
 	});
 
 export const convertToTaxInvoiceProcedure = protectedProcedure
@@ -314,18 +339,27 @@ export const convertToTaxInvoiceProcedure = protectedProcedure
 
 		if (!org?.taxNumber) {
 			throw new ORPCError("BAD_REQUEST", {
-				message: "الرقم الضريبي للمنشأة غير موجود. يرجى إضافته في إعدادات المنظمة",
+				message: "الرقم الضريبي للمنشأة غير موجود. يرجى إضافته في إعدادات المالية",
+			});
+		}
+
+		// Validate VAT number format (ZATCA requires exactly 15 digits)
+		const cleanVatNo = org.taxNumber.replace(/[\s\-]/g, "");
+		if (!/^\d{15}$/.test(cleanVatNo)) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: `الرقم الضريبي يجب أن يكون 15 رقماً بالضبط (بدون رموز أو مسافات). الرقم الحالي: "${org.taxNumber}". يرجى تصحيحه في إعدادات المالية`,
 			});
 		}
 
 		// Generate ZATCA QR code
-		const qrCode = generateZatcaQR({
+		const tlvBase64 = generateZatcaQR({
 			sellerName: org.name,
-			vatNumber: org.taxNumber,
+			vatNumber: cleanVatNo,
 			timestamp: invoice.issueDate,
 			totalWithVat: Number(invoice.totalAmount),
 			vatAmount: Number(invoice.vatAmount),
 		});
+		const qrCode = await generateZatcaQRImage(tlvBase64);
 
 		// Update invoice
 		const updatedInvoice = await updateInvoice(input.id, input.organizationId, {
@@ -342,7 +376,16 @@ export const convertToTaxInvoiceProcedure = protectedProcedure
 			entityId: input.id,
 		});
 
-		return updatedInvoice;
+		return {
+			...updatedInvoice,
+			subtotal: Number(updatedInvoice.subtotal),
+			discountPercent: Number(updatedInvoice.discountPercent),
+			discountAmount: Number(updatedInvoice.discountAmount),
+			vatPercent: Number(updatedInvoice.vatPercent),
+			vatAmount: Number(updatedInvoice.vatAmount),
+			totalAmount: Number(updatedInvoice.totalAmount),
+			paidAmount: Number(updatedInvoice.paidAmount),
+		};
 	});
 
 export const addInvoicePaymentProcedure = protectedProcedure
@@ -465,4 +508,365 @@ export const deleteInvoiceProcedure = protectedProcedure
 		});
 
 		return { success: true };
+	});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ISSUE INVOICE — إصدار الفاتورة رسمياً
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const issueInvoiceProcedure = protectedProcedure
+	.route({
+		method: "POST",
+		path: "/finance/invoices/{id}/issue",
+		tags: ["Finance", "Invoices"],
+		summary: "Issue an invoice (DRAFT → ISSUED)",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			id: z.string(),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "invoices",
+		});
+
+		// Get the invoice
+		const invoice = await getInvoiceById(input.id, input.organizationId);
+		if (!invoice) {
+			throw new ORPCError("NOT_FOUND", { message: "الفاتورة غير موجودة" });
+		}
+
+		if (invoice.status !== "DRAFT") {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "لا يمكن إصدار فاتورة ليست في حالة مسودة",
+			});
+		}
+
+		// ─── Gather seller info from Finance Settings + Organization ────────
+		const [org, financeSettings] = await Promise.all([
+			db.organization.findUnique({
+				where: { id: input.organizationId },
+				select: { name: true, taxNumber: true },
+			}),
+			getOrganizationFinanceSettings(input.organizationId),
+		]);
+
+		// Resolve seller fields: finance settings take priority, fallback to org
+		const sellerName = financeSettings?.companyNameAr || org?.name || "";
+		const sellerTaxNumber = financeSettings?.taxNumber || org?.taxNumber || "";
+		const sellerAddress = financeSettings?.address || "";
+		const sellerPhone = financeSettings?.phone || "";
+
+		// ─── Validation gate ─────────────────────────────────────────────
+		if (!sellerName) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "اسم المنشأة مطلوب. يرجى إضافته في إعدادات المالية (صفحة الإعدادات ← بيانات المنشأة)",
+			});
+		}
+
+		if (!invoice.clientName) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "اسم العميل مطلوب لإصدار الفاتورة",
+			});
+		}
+
+		if (invoice.invoiceType === "TAX" && !invoice.clientTaxNumber) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "الرقم الضريبي للعميل مطلوب للفاتورة الضريبية (B2B)",
+			});
+		}
+
+		const validItems = invoice.items.filter(
+			(item) => Number(item.quantity) > 0 && Number(item.unitPrice) > 0,
+		);
+		if (validItems.length === 0) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "يجب أن تحتوي الفاتورة على بند واحد على الأقل بكمية وسعر أكبر من صفر",
+			});
+		}
+
+		if (!invoice.issueDate) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "تاريخ الإصدار مطلوب",
+			});
+		}
+
+		// ─── Generate QR for all invoices when tax number is available ───
+		let qrCode: string | undefined;
+		if (sellerTaxNumber) {
+			const cleanTaxNumber = sellerTaxNumber.replace(/[\s\-]/g, "");
+			if (!/^\d{15}$/.test(cleanTaxNumber)) {
+				// Only throw for TAX/SIMPLIFIED — for STANDARD just skip QR
+				if (invoice.invoiceType === "TAX" || invoice.invoiceType === "SIMPLIFIED") {
+					throw new ORPCError("BAD_REQUEST", {
+						message: `الرقم الضريبي يجب أن يكون 15 رقماً بالضبط (بدون رموز أو مسافات). الرقم الحالي: "${sellerTaxNumber}". يرجى تصحيحه في إعدادات المالية`,
+					});
+				}
+			} else {
+				const totals = calculateInvoiceTotals(
+					invoice.items.map((i) => ({ quantity: i.quantity, unitPrice: i.unitPrice })),
+					invoice.discountPercent,
+					invoice.vatPercent,
+				);
+
+				const tlvBase64 = generateZatcaQR({
+					sellerName,
+					vatNumber: cleanTaxNumber,
+					timestamp: invoice.issueDate,
+					totalWithVat: Number(totals.totalAmount),
+					vatAmount: Number(totals.vatAmount),
+				});
+				qrCode = await generateZatcaQRImage(tlvBase64);
+			}
+		} else if (invoice.invoiceType === "TAX" || invoice.invoiceType === "SIMPLIFIED") {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "الرقم الضريبي مطلوب للفاتورة الضريبية/المبسطة. يرجى إضافته في إعدادات المالية (صفحة الإعدادات ← بيانات المنشأة)",
+			});
+		}
+
+		const zatcaUuid = crypto.randomUUID();
+
+		const issuedInvoice = await issueInvoice(input.id, input.organizationId, {
+			sellerName,
+			sellerTaxNumber: sellerTaxNumber ? sellerTaxNumber.replace(/[\s\-]/g, "") : undefined,
+			sellerAddress: sellerAddress || undefined,
+			sellerPhone: sellerPhone || undefined,
+			qrCode,
+			zatcaUuid,
+		});
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "INVOICE_ISSUED",
+			entityType: "invoice",
+			entityId: input.id,
+			metadata: { invoiceType: invoice.invoiceType, totalAmount: Number(issuedInvoice.totalAmount) },
+		});
+
+		return {
+			...issuedInvoice,
+			subtotal: Number(issuedInvoice.subtotal),
+			discountPercent: Number(issuedInvoice.discountPercent),
+			discountAmount: Number(issuedInvoice.discountAmount),
+			vatPercent: Number(issuedInvoice.vatPercent),
+			vatAmount: Number(issuedInvoice.vatAmount),
+			totalAmount: Number(issuedInvoice.totalAmount),
+			paidAmount: Number(issuedInvoice.paidAmount),
+			items: issuedInvoice.items.map((item) => ({
+				...item,
+				quantity: Number(item.quantity),
+				unitPrice: Number(item.unitPrice),
+				totalPrice: Number(item.totalPrice),
+			})),
+		};
+	});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DUPLICATE INVOICE — نسخ الفاتورة
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const duplicateInvoiceProcedure = protectedProcedure
+	.route({
+		method: "POST",
+		path: "/finance/invoices/{id}/duplicate",
+		tags: ["Finance", "Invoices"],
+		summary: "Duplicate an invoice as a new DRAFT",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			id: z.string(),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "invoices",
+		});
+
+		const newInvoice = await duplicateInvoice(
+			input.id,
+			input.organizationId,
+			context.user.id,
+		);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "INVOICE_DUPLICATED",
+			entityType: "invoice",
+			entityId: input.id,
+			metadata: { newInvoiceId: newInvoice.id, newInvoiceNo: newInvoice.invoiceNo },
+		});
+
+		return {
+			...newInvoice,
+			subtotal: Number(newInvoice.subtotal),
+			discountPercent: Number(newInvoice.discountPercent),
+			discountAmount: Number(newInvoice.discountAmount),
+			vatPercent: Number(newInvoice.vatPercent),
+			vatAmount: Number(newInvoice.vatAmount),
+			totalAmount: Number(newInvoice.totalAmount),
+			paidAmount: Number(newInvoice.paidAmount),
+			items: newInvoice.items.map((item) => ({
+				...item,
+				quantity: Number(item.quantity),
+				unitPrice: Number(item.unitPrice),
+				totalPrice: Number(item.totalPrice),
+			})),
+		};
+	});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CREATE CREDIT NOTE — إنشاء إشعار دائن
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const createCreditNoteProcedure = protectedProcedure
+	.route({
+		method: "POST",
+		path: "/finance/invoices/{id}/credit-note",
+		tags: ["Finance", "Invoices"],
+		summary: "Create a credit note for an invoice",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			id: z.string(),
+			reason: z.string().min(1, "سبب الإشعار الدائن مطلوب"),
+			items: z.array(
+				z.object({
+					description: z.string().min(1),
+					quantity: z.number().positive(),
+					unit: z.string().optional(),
+					unitPrice: z.number().min(0),
+				}),
+			).min(1, "يجب إضافة بند واحد على الأقل"),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "invoices",
+		});
+
+		// Get org + finance settings for seller info
+		const [orgCN, financeSettingsCN] = await Promise.all([
+			db.organization.findUnique({
+				where: { id: input.organizationId },
+				select: { name: true, taxNumber: true },
+			}),
+			getOrganizationFinanceSettings(input.organizationId),
+		]);
+
+		// Resolve seller fields: finance settings take priority
+		const cnSellerName = financeSettingsCN?.companyNameAr || orgCN?.name || "";
+		const cnSellerTaxNumber = financeSettingsCN?.taxNumber || orgCN?.taxNumber || "";
+		const cnSellerAddress = financeSettingsCN?.address || "";
+		const cnSellerPhone = financeSettingsCN?.phone || "";
+
+		// Get original invoice to check its type
+		const original = await getInvoiceById(input.id, input.organizationId);
+		if (!original) {
+			throw new ORPCError("NOT_FOUND", { message: "الفاتورة الأصلية غير موجودة" });
+		}
+
+		// Generate QR for credit note if original was TAX/SIMPLIFIED
+		let qrCode: string | undefined;
+		const cleanCnTaxNumber = cnSellerTaxNumber ? cnSellerTaxNumber.replace(/[\s\-]/g, "") : "";
+		if (
+			(original.invoiceType === "TAX" || original.invoiceType === "SIMPLIFIED") &&
+			cleanCnTaxNumber &&
+			/^\d{15}$/.test(cleanCnTaxNumber)
+		) {
+			const totals = calculateInvoiceTotals(
+				input.items,
+				original.discountPercent,
+				original.vatPercent,
+			);
+
+			const tlvBase64 = generateZatcaQR({
+				sellerName: cnSellerName,
+				vatNumber: cleanCnTaxNumber,
+				timestamp: new Date(),
+				totalWithVat: Number(totals.totalAmount),
+				vatAmount: Number(totals.vatAmount),
+			});
+			qrCode = await generateZatcaQRImage(tlvBase64);
+		}
+
+		const creditNote = await createCreditNote({
+			organizationId: input.organizationId,
+			createdById: context.user.id,
+			originalInvoiceId: input.id,
+			reason: input.reason,
+			items: input.items,
+			qrCode,
+			zatcaUuid: crypto.randomUUID(),
+			sellerName: cnSellerName || undefined,
+			sellerTaxNumber: cnSellerTaxNumber || undefined,
+			sellerAddress: cnSellerAddress || undefined,
+			sellerPhone: cnSellerPhone || undefined,
+		});
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "INVOICE_CREDIT_NOTE_CREATED",
+			entityType: "invoice",
+			entityId: input.id,
+			metadata: { creditNoteId: creditNote.id, creditNoteNo: creditNote.invoiceNo },
+		});
+
+		return {
+			...creditNote,
+			subtotal: Number(creditNote.subtotal),
+			discountPercent: Number(creditNote.discountPercent),
+			discountAmount: Number(creditNote.discountAmount),
+			vatPercent: Number(creditNote.vatPercent),
+			vatAmount: Number(creditNote.vatAmount),
+			totalAmount: Number(creditNote.totalAmount),
+			paidAmount: Number(creditNote.paidAmount),
+			items: creditNote.items.map((item) => ({
+				...item,
+				quantity: Number(item.quantity),
+				unitPrice: Number(item.unitPrice),
+				totalPrice: Number(item.totalPrice),
+			})),
+		};
+	});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GET INVOICE ACTIVITY — سجل نشاط الفاتورة
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const getInvoiceActivityProcedure = protectedProcedure
+	.route({
+		method: "GET",
+		path: "/finance/invoices/{id}/activity",
+		tags: ["Finance", "Invoices"],
+		summary: "Get audit trail for an invoice",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			id: z.string(),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "view",
+		});
+
+		const logs = await getEntityOrgAuditLogs(
+			input.organizationId,
+			"invoice",
+			input.id,
+		);
+
+		return { logs };
 	});

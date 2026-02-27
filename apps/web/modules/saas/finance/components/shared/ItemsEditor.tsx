@@ -3,8 +3,40 @@
 import { useTranslations } from "next-intl";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@ui/components/select";
+import { Plus, Trash2 } from "lucide-react";
 import { Currency } from "./Currency";
+
+const UNIT_KEYS = [
+	"m", "m2", "m3", "ton", "kg", "liter",
+	"piece", "lumpsum", "workday", "workhour",
+	"trip", "load", "roll", "carton", "set", "service",
+] as const;
+
+const UNIT_VALUES: Record<string, string> = {
+	m: "م",
+	m2: "م²",
+	m3: "م³",
+	ton: "طن",
+	kg: "كجم",
+	liter: "لتر",
+	piece: "قطعة",
+	lumpsum: "مقطوعية",
+	workday: "يوم عمل",
+	workhour: "ساعة عمل",
+	trip: "رحلة",
+	load: "حمولة",
+	roll: "لفة",
+	carton: "كرتون",
+	set: "مجموعة",
+	service: "خدمة",
+};
 
 interface Item {
 	id: string;
@@ -22,6 +54,11 @@ interface ItemsEditorProps {
 
 export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorProps) {
 	const t = useTranslations();
+
+	const units = UNIT_KEYS.map((key) => ({
+		value: UNIT_VALUES[key],
+		label: t(`finance.units.${key}`),
+	}));
 
 	const addItem = () => {
 		const newItem: Item = {
@@ -59,13 +96,14 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 
 			{/* Items */}
 			<div className="space-y-3">
-				{items.map((item, index) => (
+				{items.map((item) => (
 					<div
 						key={item.id}
 						className="grid gap-3 sm:grid-cols-12 items-start p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50"
 					>
 						{/* Description */}
 						<div className="sm:col-span-5">
+							<span className="text-xs text-slate-500 sm:hidden mb-1 block">{t("finance.items.description")}</span>
 							<Input
 								value={item.description}
 								onChange={(e) =>
@@ -79,6 +117,7 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 
 						{/* Quantity */}
 						<div className="sm:col-span-2">
+							<span className="text-xs text-slate-500 sm:hidden mb-1 block">{t("finance.items.quantity")}</span>
 							<Input
 								type="number"
 								min="0"
@@ -94,17 +133,36 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 
 						{/* Unit */}
 						<div className="sm:col-span-1">
-							<Input
-								value={item.unit}
-								onChange={(e) => updateItem(item.id, { unit: e.target.value })}
-								placeholder={t("finance.items.unitPlaceholder")}
-								disabled={readOnly}
-								className="rounded-lg text-center"
-							/>
+							<span className="text-xs text-slate-500 sm:hidden mb-1 block">{t("finance.items.unit")}</span>
+							{readOnly ? (
+								<Input
+									value={item.unit}
+									disabled
+									className="rounded-lg text-center"
+								/>
+							) : (
+								<Select
+									value={item.unit || "_empty"}
+									onValueChange={(v) => updateItem(item.id, { unit: v === "_empty" ? "" : v })}
+								>
+									<SelectTrigger className="rounded-lg h-10 text-xs px-1">
+										<SelectValue placeholder={t("finance.items.unitPlaceholder")} />
+									</SelectTrigger>
+									<SelectContent className="rounded-xl">
+										<SelectItem value="_empty">-</SelectItem>
+										{units.map((u) => (
+											<SelectItem key={u.value} value={u.value}>
+												{u.label}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							)}
 						</div>
 
 						{/* Unit Price */}
 						<div className="sm:col-span-2">
+							<span className="text-xs text-slate-500 sm:hidden mb-1 block">{t("finance.items.unitPrice")}</span>
 							<Input
 								type="number"
 								min="0"
@@ -120,9 +178,12 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 
 						{/* Total */}
 						<div className="sm:col-span-2 flex items-center justify-between sm:justify-center gap-2">
-							<span className="font-semibold text-slate-900 dark:text-slate-100">
-								<Currency amount={item.quantity * item.unitPrice} />
-							</span>
+							<div>
+								<span className="text-xs text-slate-500 sm:hidden mb-1 block">{t("finance.items.total")}</span>
+								<span className="font-semibold text-slate-900 dark:text-slate-100">
+									<Currency amount={item.quantity * item.unitPrice} />
+								</span>
+							</div>
 							{!readOnly && items.length > 1 && (
 								<Button
 									type="button"

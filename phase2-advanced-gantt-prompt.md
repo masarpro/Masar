@@ -1,0 +1,1206 @@
+# Phase 2: الوضع المتقدم — جانت تفاعلي احترافي | PLAN MODE
+
+> **الوضع:** PLAN MODE — لا تكتب كود. حلل الوضع الحالي بعد Phase 1 وقدم خطة تنفيذ تفصيلية كاملة.
+
+---
+
+## ملخص Phase 1 المكتمل (ما بُني)
+
+### Schema (5 models جديدة + 4 enums)
+```prisma
+// Models الجديدة التي أُضيفت في Phase 1:
+model ProjectActivity {
+  id, milestoneId, projectId, name, description
+  plannedStart, plannedEnd, actualStart, actualEnd
+  progress (Decimal), status (ActivityStatus)
+  sortOrder, assigneeId, wbsCode, duration
+  isCritical (Boolean), notes
+}
+
+model ActivityDependency {
+  id, predecessorType (DependencyNodeType), predecessorId
+  successorType (DependencyNodeType), successorId
+  dependencyType (DependencyType: FS|SS|FF|SF)
+  lagDays (Int), projectId
+}
+
+model ProjectBaseline {
+  id, projectId, name, snapshotDate
+  snapshotData (Json), isActive (Boolean)
+  createdBy
+}
+
+model ProjectCalendar {
+  id, projectId, name
+  workDays (Json), holidays (Json)
+  defaultHoursPerDay (Decimal), isDefault (Boolean)
+}
+
+model ActivityChecklist {
+  id, activityId, title
+  isCompleted (Boolean), completedAt, completedBy, sortOrder
+}
+
+// Enums المضافة:
+enum ActivityStatus { NOT_STARTED, IN_PROGRESS, COMPLETED, DELAYED, ON_HOLD, CANCELLED }
+enum DependencyType { FINISH_TO_START, START_TO_START, FINISH_TO_FINISH, START_TO_FINISH }
+enum ProgressMethod { MANUAL, CHECKLIST, ACTIVITIES, QUANTITY }
+enum DependencyNodeType { MILESTONE, ACTIVITY }
+
+// تحديثات على ProjectMilestone:
+// + weight, calendarId, baselineStartDate, baselineEndDate
+// + progressMethod, color
+// + progress تحوّل من Float إلى Decimal
+// + CANCELLED أُضيف لـ MilestoneStatus
+```
+
+### API (28 procedure جديدة تحت projectExecution router)
+```
+// الأنشطة (7):
+projectExecution.listActivities
+projectExecution.createActivity
+projectExecution.updateActivity
+projectExecution.deleteActivity
+projectExecution.reorderActivities
+projectExecution.updateActivityProgress
+projectExecution.bulkUpdateProgress
+
+// العلاقات (4):
+projectExecution.listDependencies
+projectExecution.createDependency
+projectExecution.deleteDependency
+projectExecution.validateDependencies
+
+// خط الأساس (5):
+projectExecution.createBaseline
+projectExecution.listBaselines
+projectExecution.getBaseline
+projectExecution.setActiveBaseline
+projectExecution.deleteBaseline
+
+// التقويم (2):
+projectExecution.getCalendar
+projectExecution.upsertCalendar
+
+// Checklists (5):
+projectExecution.listChecklists
+projectExecution.createChecklistItem
+projectExecution.toggleChecklistItem
+projectExecution.deleteChecklistItem
+projectExecution.reorderChecklist
+
+// التحليلات (5):
+projectExecution.getDashboard
+projectExecution.getCriticalPath
+projectExecution.getLookahead
+projectExecution.getDelayAnalysis
+projectExecution.getPlannedVsActual
+```
+
+### CPM Algorithm
+```
+// ملف: packages/api/lib/cpm.ts
+// يحسب: ES, EF, LS, LF, Total Float لكل نشاط
+// يحدد: المسار الحرج (أنشطة بـ Total Float = 0)
+// يدعم: FS, SS, FF, SF + Lag/Lead
+// يكشف: الحلقات (Cycle Detection via DFS)
+```
+
+### UI المبني (17 ملف — Simple Mode فقط)
+```
+apps/web/modules/saas/projects-execution/
+├── execution-types.ts
+├── milestone-templates.ts (4 قوالب: فيلا، عمارة، مستودع، تجديد)
+├── hooks/
+│   ├── use-execution-data.ts
+│   └── use-milestone-actions.ts
+├── shared/
+│   ├── ExecutionViewToggle.tsx      ← زر التبديل بين Simple/Advanced
+│   ├── ConfirmDeleteDialog.tsx
+│   └── MilestoneForm.tsx
+└── simple-mode/
+    ├── ExecutionDashboard.tsx        ← الصفحة الرئيسية (Simple)
+    ├── HealthStatStrip.tsx           ← 4 KPI cards
+    ├── EnhancedMilestoneCard.tsx     ← بطاقة مرحلة قابلة للتوسع
+    ├── MilestoneCardHeader.tsx
+    ├── MilestoneProgressRow.tsx      ← Slider للتقدم
+    ├── MilestoneActivityChecklist.tsx ← Checklist مع إضافة مباشرة
+    ├── MilestoneLinkedItems.tsx       ← صور + تقارير + مشاكل
+    ├── MilestoneTableView.tsx
+    └── MilestoneTemplateDialog.tsx
+```
+
+### مكونات Gantt القديمة (12 ملف في projects-timeline — لا تزال موجودة)
+```
+apps/web/modules/saas/projects-timeline/
+├── components/
+│   ├── GanttChart.tsx            ← المكون الرئيسي (عرض فقط، لا تفاعل)
+│   ├── GanttContainer.tsx        ← حاوية مع تمرير
+│   ├── GanttRow.tsx              ← صف واحد (مرحلة فقط، لا أنشطة)
+│   ├── GanttSidebar.tsx          ← شريط جانبي بسيط
+│   ├── GanttTimeHeader.tsx       ← محور زمني
+│   ├── GanttTodayMarker.tsx      ← خط اليوم
+│   ├── GanttToolbar.tsx          ← أدوات تحكم أساسية
+│   ├── GanttTooltip.tsx          ← تلميحات
+│   └── GanttView.tsx             ← العرض الكامل
+├── utilities.ts                  ← دوال حساب التواريخ
+└── hooks/
+    ├── useGanttDrag.ts           ← سحب أساسي (محدود)
+    └── useGanttZoom.ts           ← تكبير/تصغير
+```
+
+### الصفحة الحالية
+```
+/projects/[projectId]/execution → ExecutionDashboard (Simple Mode)
+/projects/[projectId]/timeline  → GanttView القديم (عرض فقط)
+```
+
+---
+
+## المطلوب في Phase 2
+
+بناء **الوضع المتقدم (Advanced Mode)** الذي يُفعّل من زر `ExecutionViewToggle` الموجود في Phase 1. الوضع المتقدم يتكون من:
+
+1. **جانت تفاعلي جديد** (يُستبدل/يُعاد بناء الجانت القديم بالكامل)
+2. **Lookahead View** (خطة 2-6 أسابيع)
+3. **تحليلات وتقارير** (Planned vs Actual, Delay Analysis, S-Curve)
+4. **إعدادات التقويم**
+5. **إدارة خطوط الأساس**
+
+---
+
+## Sub-Phase 2A: الجانت التفاعلي المتقدم
+
+### القرار المعماري: بناء Custom مع SVG
+
+**لا نستخدم مكتبة جانت خارجية.** نبني custom لأن:
+- تحكم كامل في RTL والعربية
+- تكامل مباشر مع بيانات مسار (Activities, Dependencies, Baselines)
+- لا اعتمادات خارجية ثقيلة
+- تصميم متوافق مع shadcn/ui وتايلوند
+
+**هيكل المكون الرئيسي:**
+
+```
+<AdvancedGanttView>                    ← الصفحة الكاملة
+  <GanttToolbar />                     ← أدوات: زوم، مقياس زمن، فلاتر، أزرار
+  <GanttSplitPane>                     ← حاوية مقسومة أفقياً (resizable)
+    <GanttTable />                     ← الجانب الأيسر: جدول WBS
+    <GanttChart>                       ← الجانب الأيمن: الرسم البياني
+      <GanttTimeScale />               ← محور زمني (يوم/أسبوع/شهر)
+      <GanttCanvas>                    ← منطقة الرسم (SVG)
+        <GanttGridLines />             ← خطوط الشبكة العمودية
+        <GanttTodayLine />             ← خط اليوم
+        <GanttWeekendShading />        ← تظليل أيام العطلة
+        <GanttBaselineLayer />         ← طبقة خط الأساس (شفافة)
+        <GanttBarLayer>                ← طبقة الأشرطة
+          <GanttMilestoneBar />        ← شريط مرحلة (ملخص)
+          <GanttActivityBar />         ← شريط نشاط (قابل للسحب)
+          <GanttProgressOverlay />     ← تقدم داخل الشريط
+        </GanttBarLayer>
+        <GanttDependencyLayer>         ← طبقة خطوط العلاقات
+          <DependencyArrow />          ← سهم ربط
+        </GanttDependencyLayer>
+        <GanttDragPreview />           ← معاينة أثناء السحب
+      </GanttCanvas>
+    </GanttChart>
+  </GanttSplitPane>
+  <GanttDetailPanel />                 ← لوحة تفاصيل (تفتح عند النقر)
+</AdvancedGanttView>
+```
+
+### المواصفات التفصيلية لكل مكون
+
+#### 1. `GanttToolbar` — شريط الأدوات العلوي
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ [⬅ الوضع الأساسي]  📊 الجدول الزمني المتقدم                        │
+│                                                                     │
+│ مقياس: [يوم|أسبوع|شهر|ربع]  🔍[-][+]  📅اليوم                     │
+│                                                                     │
+│ عرض: [☑ مسار حرج] [☑ خط أساس] [☐ عقود باطن]                       │
+│                                                                     │
+│ [💾 اعتماد خطة]  [📊 تحليلات ▼]  [📋 Lookahead]  [⚙️ إعدادات]     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**الوظائف:**
+- `timeScale`: day | week | month | quarter — يغيّر دقة المحور الزمني
+- `zoomLevel`: 50% - 200% — يغيّر عرض كل وحدة زمنية (بالبكسل)
+- `goToToday`: يمرر لليوم الحالي
+- `showCriticalPath`: toggle — يلوّن الأنشطة الحرجة بالأحمر
+- `showBaseline`: toggle — يعرض أشرطة خط الأساس
+- `showSubcontractors`: toggle — يعرض طبقة مقاولي الباطن
+- `createBaseline`: يفتح dialog إنشاء baseline
+- `analysisMenu`: dropdown لـ (Planned vs Actual, S-Curve, Delay Analysis)
+- `settingsMenu`: يفتح إعدادات التقويم
+
+**State management:**
+```typescript
+// استخدام React Context لحالة الجانت المشتركة
+interface GanttContextState {
+  // عرض
+  timeScale: 'day' | 'week' | 'month' | 'quarter';
+  zoomLevel: number;           // pixels per day
+  scrollDate: Date;            // التاريخ الحالي في الـ viewport
+  showCriticalPath: boolean;
+  showBaseline: boolean;
+  showSubcontractors: boolean;
+  activeBaselineId: string | null;
+  
+  // بيانات
+  milestones: MilestoneWithActivities[];
+  dependencies: Dependency[];
+  criticalPath: string[];      // IDs of critical activities
+  baselineData: BaselineSnapshot | null;
+  calendar: ProjectCalendar;
+  
+  // تفاعل
+  selectedItemId: string | null;
+  selectedItemType: 'milestone' | 'activity' | null;
+  dragState: DragState | null;
+  dependencyDrawState: DependencyDrawState | null;
+  expandedMilestones: Set<string>;
+  
+  // حالات محسوبة (من CPM)
+  cpmResults: Map<string, CPMResult>;  // activityId → {ES, EF, LS, LF, TF}
+}
+```
+
+#### 2. `GanttSplitPane` — الحاوية المنقسمة
+
+```
+┌──────────────────────┬──────────────────────────────────────────────┐
+│    GanttTable         │              GanttChart                      │
+│    (resizable)        │                                              │
+│    min: 250px         │              (scrollable)                    │
+│    max: 500px         │                                              │
+│    default: 350px     │                                              │
+│                       │                                              │
+│  ◄──── drag handle ──►│                                              │
+└──────────────────────┴──────────────────────────────────────────────┘
+```
+
+**المواصفات:**
+- فاصل قابل للسحب (drag handle) بين الجدول والرسم
+- التمرير العمودي متزامن بين الطرفين (scroll sync)
+- التمرير الأفقي في الرسم فقط
+- RTL: الجدول على اليمين والرسم على اليسار
+- ارتفاع الصف: 40px ثابت
+
+#### 3. `GanttTable` — جدول WBS (الجانب الأيمن في RTL)
+
+```
+┌──────────────────────────────────────┐
+│ # │ اسم النشاط           │ مدة │ %  │
+├───┼───────────────────────┼─────┼────┤
+│   │ ▼ أعمال الهيكل       │ 30d │ 50 │ ← مرحلة (bold, قابل للطي)
+│   │   1.1 حفر الأساسات   │  5d │100 │ ← نشاط
+│   │   1.2 صب النظافة     │  3d │100 │
+│   │   1.3 تسليح القواعد  │  7d │ 60 │ ← 🔴 حرج
+│   │   1.4 صب القواعد     │  5d │  0 │ ← 🔴 حرج
+│   │   1.5 عزل الأساسات   │  4d │  0 │
+│   │ ▼ أعمال التشطيبات    │ 45d │  0 │
+│   │   2.1 اللياسة        │ 10d │  0 │
+│   │   2.2 البلاط         │ 15d │  0 │
+└───┴───────────────────────┴─────┴────┘
+```
+
+**الأعمدة (configurable):**
+
+| العمود | عرض افتراضي | قابل للإخفاء | الوصف |
+|--------|-------------|-------------|-------|
+| WBS # | 50px | لا | ترقيم تلقائي (1, 1.1, 1.2...) |
+| اسم النشاط | flex | لا | اسم المرحلة/النشاط مع indent |
+| المدة | 60px | نعم | بالأيام العمل |
+| التقدم % | 50px | نعم | inline editable |
+| البداية | 90px | نعم | تاريخ البداية المخططة |
+| النهاية | 90px | نعم | تاريخ النهاية المخططة |
+| المسؤول | 80px | نعم | اسم أو avatar |
+| Total Float | 60px | نعم | أيام المرونة |
+| الحالة | 70px | نعم | badge ملون |
+
+**التفاعلات:**
+- **نقر على ▼/▶**: طي/فتح المرحلة
+- **نقر مزدوج على اسم**: تحرير inline
+- **نقر مزدوج على تقدم %**: تحرير inline
+- **نقر يمين**: context menu (تحرير/حذف/إضافة نشاط/إضافة علاقة)
+- **نقر على صف**: تحديد + عرض التفاصيل في GanttDetailPanel
+- **ألوان الصفوف:**
+  - أبيض: عادي
+  - أحمر خفيف: نشاط على المسار الحرج
+  - أخضر خفيف: مكتمل 100%
+  - أصفر خفيف: متأخر
+
+#### 4. `GanttChart` (SVG Canvas) — منطقة الرسم البياني
+
+**محور زمني `GanttTimeScale`:**
+
+```
+مقياس يومي:
+┌────┬────┬────┬────┬────┬────┬────┬────┬────┐
+│    فبراير 2026                              │  ← الشهر
+├────┼────┼────┼────┼────┼────┼────┼────┼────┤
+│ 27 │ 28 │ 01 │ 02 │ 03 │ 04 │ 05 │ 06 │ 07│  ← اليوم
+│ خم │ جم │ سب │ أح │ اث │ ثل │ أر │ خم │ جم│  ← يوم الأسبوع
+└────┴────┴────┴────┴────┴────┴────┴────┴────┘
+      ░░░░            ░░░░                 ░░░░  ← تظليل أيام العطلة
+
+مقياس أسبوعي:
+┌───────────┬───────────┬───────────┬───────────┐
+│    فبراير 2026        │       مارس 2026        │
+├───────────┼───────────┼───────────┼───────────┤
+│  أسبوع 9  │ أسبوع 10 │ أسبوع 11  │ أسبوع 12  │
+└───────────┴───────────┴───────────┴───────────┘
+
+مقياس شهري:
+┌───────────────┬───────────────┬───────────────┐
+│          2026                                  │
+├───────────────┼───────────────┼───────────────┤
+│    فبراير     │     مارس      │    أبريل      │
+└───────────────┴───────────────┴───────────────┘
+```
+
+**حساب البكسل:**
+```typescript
+interface TimeScaleConfig {
+  day:     { pixelsPerUnit: 40, headerRow1: 'month', headerRow2: 'day' };
+  week:    { pixelsPerUnit: 120, headerRow1: 'month', headerRow2: 'week' };
+  month:   { pixelsPerUnit: 200, headerRow1: 'year', headerRow2: 'month' };
+  quarter: { pixelsPerUnit: 300, headerRow1: 'year', headerRow2: 'quarter' };
+}
+
+// موقع X لتاريخ معين:
+function dateToX(date: Date, startDate: Date, pixelsPerDay: number): number {
+  const diffDays = differenceInCalendarDays(date, startDate);
+  return diffDays * pixelsPerDay;
+}
+
+// التكبير يغيّر pixelsPerUnit:
+// zoomLevel 50% → pixelsPerUnit * 0.5
+// zoomLevel 200% → pixelsPerUnit * 2.0
+```
+
+**أشرطة الجانت `GanttBarLayer`:**
+
+```
+شريط مرحلة (Summary Bar):
+┌═══════════════════════════════════════┐
+│▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░│  ← لون المرحلة + تقدم
+└═══════════════════════════════════════┘
+ ◄──────── planned range ────────►
+
+شريط نشاط (Activity Bar):
+┌───────────────────────┐
+│████████████░░░░░░░░░░░│  ← لون النشاط + تقدم
+└───────────────────────┘
+ ⬤                      ⬤  ← نقاط سحب (drag handles)
+
+شريط خط أساس (Baseline Bar — أسفل النشاط):
+┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐
+│░░░░░░░░░░░░░░░░░░░░░░░░│  ← رمادي شفاف، خط متقطع
+└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘
+
+نشاط حرج (Critical):
+┌───────────────────────┐
+│████████████░░░░░░░░░░░│  ← أحمر بدل اللون العادي
+└───────────────────────┘
+```
+
+**مواصفات الأشرطة:**
+
+```typescript
+interface GanttBarConfig {
+  // المرحلة (Summary)
+  milestone: {
+    height: 28,
+    y_offset: 6,          // من أعلى الصف (صف = 40px)
+    borderRadius: 4,
+    progressColor: 'fill with milestone.color',
+    remainingColor: 'lighter shade of milestone.color',
+    border: '1px solid darker shade',
+    label: 'inside bar if width > 100px, else tooltip',
+  },
+  
+  // النشاط
+  activity: {
+    height: 22,
+    y_offset: 9,
+    borderRadius: 3,
+    progressColor: '#3B82F6',       // أزرق
+    criticalColor: '#EF4444',       // أحمر للحرج
+    completedColor: '#10B981',      // أخضر للمكتمل
+    remainingColor: '#E5E7EB',      // رمادي فاتح
+    dragHandleSize: 8,              // نقاط السحب على الأطراف
+  },
+  
+  // خط الأساس
+  baseline: {
+    height: 8,
+    y_offset: 30,                   // أسفل شريط النشاط
+    color: 'rgba(156, 163, 175, 0.5)', // رمادي شفاف
+    borderStyle: 'dashed',
+  }
+}
+```
+
+#### 5. `GanttDependencyLayer` — خطوط العلاقات
+
+```
+Finish-to-Start (FS):
+  ┌──────────┐
+  │ النشاط A │──┐
+  └──────────┘  │
+                └──►┌──────────┐
+                    │ النشاط B │
+                    └──────────┘
+
+Start-to-Start (SS):
+  ┌──────────┐
+  │ النشاط A │
+  └──────────┘
+  │
+  └──►┌──────────┐
+      │ النشاط B │
+      └──────────┘
+
+Finish-to-Finish (FF):
+  ┌──────────┐
+  │ النشاط A │──┐
+  └──────────┘  │
+      ┌─────────┘
+      │ ┌──────────┐
+      └►│ النشاط B │
+        └──────────┘
+
+مع Lag (+3 أيام):
+  ┌──────────┐
+  │ النشاط A │──┐
+  └──────────┘  │ +3d
+                └──►┌──────────┐
+                    │ النشاط B │
+                    └──────────┘
+```
+
+**رسم السهم (SVG Path):**
+```typescript
+function drawDependencyArrow(
+  pred: { x: number, y: number, width: number },  // إحداثيات شريط السابق
+  succ: { x: number, y: number, width: number },  // إحداثيات شريط اللاحق
+  type: DependencyType,
+  lagDays: number,
+  pixelsPerDay: number,
+  isCritical: boolean
+): string {
+  // إرجاع SVG path string
+  // الخط: solid للعلاقات العادية، bold أحمر للمسار الحرج
+  // السهم: مثلث صغير عند نقطة الوصول
+  // Routing: خطوط عمودية + أفقية (لا خطوط مائلة)
+  //          مع تجنب التقاطع مع أشرطة أخرى (أساسي)
+}
+```
+
+**تفاعل إنشاء علاقة جديدة:**
+1. المستخدم يضغط على نقطة الخروج (●) في نهاية شريط النشاط
+2. يسحب لشريط نشاط آخر
+3. يظهر خط متقطع أثناء السحب
+4. عند الإفلات على نشاط: يفتح dialog سريع لاختيار نوع العلاقة + Lag
+5. يتم إنشاء العلاقة عبر `projectExecution.createDependency`
+6. يُعاد حساب CPM والمسار الحرج
+7. تتحدث الأشرطة تلقائياً (auto-schedule)
+
+#### 6. Drag & Drop على الأشرطة
+
+**ثلاث عمليات سحب:**
+
+```
+1) سحب الشريط كاملاً (Move):
+   ┌──────────┐
+   │ ████████ │  →→→  ┌──────────┐
+   └──────────┘       │ ████████ │
+                      └──────────┘
+   التأثير: تغيير plannedStart و plannedEnd (المدة ثابتة)
+
+2) سحب الحافة اليمنى (Resize End):
+   ┌──────────┐           ┌──────────────────┐
+   │ ████████ │→→→        │ ████████████████ │
+   └──────────┘           └──────────────────┘
+   التأثير: تغيير plannedEnd والمدة (البداية ثابتة)
+
+3) سحب الحافة اليسرى (Resize Start):
+        ┌──────────┐   ┌──────────────────┐
+        │ ████████ │   │ ████████████████ │
+        └──────────┘   └──────────────────┘
+   التأثير: تغيير plannedStart والمدة (النهاية ثابتة)
+```
+
+**منطق السحب:**
+```typescript
+interface DragState {
+  itemId: string;
+  itemType: 'milestone' | 'activity';
+  dragType: 'move' | 'resize-start' | 'resize-end';
+  originalStart: Date;
+  originalEnd: Date;
+  currentStart: Date;
+  currentEnd: Date;
+  snappedDate: Date;         // Snap to day
+  isValid: boolean;          // هل الموقع الجديد صالح (لا يكسر constraints)
+  affectedItems: string[];   // IDs of items that will auto-move
+}
+
+// أثناء السحب:
+// 1. Snap to nearest day
+// 2. تحقق من constraints
+// 3. حساب تأثير على الأنشطة التابعة (preview)
+// 4. عرض tooltip بالتواريخ الجديدة
+// 5. عرض خطوط إرشادية (snap lines)
+
+// عند الإفلات:
+// 1. updateActivity(id, { plannedStart, plannedEnd })
+// 2. إعادة حساب CPM
+// 3. auto-schedule للأنشطة المتأثرة
+// 4. تحديث الـ UI
+```
+
+**قواعد السحب:**
+- المراحل (Summary bars): **لا تُسحب مباشرة** — تتحرك تلقائياً بناءً على أنشطتها
+- الأنشطة: قابلة للسحب بالكامل
+- Snap: دائماً يلتصق ببداية/نهاية يوم عمل
+- Constraints: لا يمكن نقل نشاط لقبل predecessor + lag
+- أيام العطلة: يتم تخطيها (الحساب بأيام العمل فقط)
+
+#### 7. `GanttDetailPanel` — لوحة التفاصيل
+
+```
+┌─────────────────────────────────────────────┐
+│  تسليح القواعد                    [✕ إغلاق] │
+│                                             │
+│  ┌─ معلومات أساسية ──────────────────────┐ │
+│  │ الحالة: 🔵 قيد التنفيذ                │ │
+│  │ البداية: 5 مارس 2026                  │ │
+│  │ النهاية: 12 مارس 2026                 │ │
+│  │ المدة: 7 أيام عمل                     │ │
+│  │ التقدم: [████████░░] 60%              │ │
+│  │ المسؤول: خالد                         │ │
+│  │ المسار الحرج: ✅ نعم                  │ │
+│  │ Total Float: 0 أيام                   │ │
+│  └────────────────────────────────────────┘ │
+│                                             │
+│  ┌─ مقارنة بالأساس ──────────────────────┐ │
+│  │ Baseline: 3 مارس - 10 مارس           │ │
+│  │ الفعلي:  5 مارس - (قيد التنفيذ)      │ │
+│  │ الفرق: +2 أيام تأخير في البداية       │ │
+│  └────────────────────────────────────────┘ │
+│                                             │
+│  ┌─ العلاقات ─────────────────────────────┐ │
+│  │ ← يعتمد على: صب النظافة (FS)          │ │
+│  │ → يتبعه: صب القواعد (FS)              │ │
+│  │ [+ إضافة علاقة]                        │ │
+│  └────────────────────────────────────────┘ │
+│                                             │
+│  ┌─ Checklist ────────────────────────────┐ │
+│  │ ☑ توريد الحديد                        │ │
+│  │ ☑ تركيب القواعد                       │ │
+│  │ ☐ فحص وربط                            │ │
+│  │ ☐ اعتماد المهندس                     │ │
+│  └────────────────────────────────────────┘ │
+│                                             │
+│  ┌─ مرفقات ───────────────────────────────┐ │
+│  │ 📷 3 صور  📋 1 تقرير  ⚠️ 1 مشكلة     │ │
+│  └────────────────────────────────────────┘ │
+│                                             │
+│  [✏️ تحرير]  [🗑️ حذف]                      │
+└─────────────────────────────────────────────┘
+```
+
+**المواصفات:**
+- يظهر عند النقر على صف/شريط في الجانت
+- يفتح كـ side drawer (300px) من اليسار (في RTL)
+- يمكن إغلاقه بزر X أو النقر خارجه
+- يدعم تحرير inline للتقدم والتواريخ
+- يعرض العلاقات مع links للانتقال للنشاط المرتبط
+
+---
+
+## Sub-Phase 2B: Lookahead View
+
+**صفحة مستقلة أو Tab: `/projects/[projectId]/execution/lookahead`**
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ 📋 خطة الأسابيع القادمة                    مدى: [2|4|6] أسابيع    │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│ 🔴 هذا الأسبوع — 27 فبراير → 5 مارس                                │
+│ ┌─────────────────────────────────────────────────────────────────┐ │
+│ │ ⚡ تسليح القواعد    60%→100%   خالد   🔴 متأخر 2 يوم          │ │
+│ │    المطلوب: إنهاء الربط + فحص المهندس                          │ │
+│ │    ⚠️ مشكلة مفتوحة: نقص حديد ∅16                               │ │
+│ ├─────────────────────────────────────────────────────────────────┤ │
+│ │ 🆕 صب القواعد       بدء يوم الأربعاء   خالد   FS← تسليح      │ │
+│ │    شرط البدء: اعتماد تسليح القواعد                             │ │
+│ └─────────────────────────────────────────────────────────────────┘ │
+│                                                                     │
+│ 🟡 الأسبوع القادم — 6 → 12 مارس                                    │
+│ ┌─────────────────────────────────────────────────────────────────┐ │
+│ │ 🔄 صب القواعد       0%→60%    خالد                             │ │
+│ │ 🆕 عزل الأساسات     بدء يوم الأحد   سعد    FS+2d← صب         │ │
+│ └─────────────────────────────────────────────────────────────────┘ │
+│                                                                     │
+│ ⚪ الأسبوع الثالث — 13 → 19 مارس                                   │
+│ ┌─────────────────────────────────────────────────────────────────┐ │
+│ │ 🔄 عزل الأساسات     0%→100%   سعد                             │ │
+│ └─────────────────────────────────────────────────────────────────┘ │
+│                                                                     │
+│ ⚪ الأسبوع الرابع — 20 → 26 مارس                                   │
+│ ┌─────────────────────────────────────────────────────────────────┐ │
+│ │ 🆕 أعمدة الأرضي     بدء     أحمد    FS← عزل                   │ │
+│ └─────────────────────────────────────────────────────────────────┘ │
+│                                                                     │
+│ ┌─ ملخص ──────────────────────────────────────────────────────── ┐ │
+│ │ 📊 أنشطة هذه الفترة: 5  │  🔴 متأخر: 1  │  ⚡ حرج: 3        │ │
+│ │ 🏗️ مقاولي باطن مطلوبين: سباكة (أسبوع 3)                      │ │
+│ │ 📦 توريدات مطلوبة: حديد ∅16 (قبل 5 مارس)                      │ │
+│ └─────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**مصدر البيانات:** `projectExecution.getLookahead(projectId, weeks)`
+- يجلب الأنشطة التي تبدأ/تنتهي/مستمرة خلال الفترة المحددة
+- يرتبها أسبوعياً
+- يُلحق بكل نشاط: المشاكل المفتوحة + العلاقات + التنبيهات
+
+---
+
+## Sub-Phase 2C: تحليلات وتقارير
+
+### 1. Planned vs Actual (مخطط S-Curve)
+
+**صفحة: `/projects/[projectId]/execution/analysis`**
+
+```
+┌────────────────────────────────────────────────────────┐
+│  📈 منحنى التقدم (S-Curve)                             │
+│                                                        │
+│  100%│                                    ___──── Plan │
+│      │                              __──/              │
+│      │                         __──/   /               │
+│   50%│                    __──/       /  ← Actual      │
+│      │               __──/          /                  │
+│      │          __──/              /                    │
+│      │     __──/                 /                      │
+│    0%│────/                                            │
+│      └──────────────────────────────────────── الزمن   │
+│       فبراير    مارس     أبريل     مايو                │
+│                                                        │
+│  📊 الخلاصة:                                           │
+│  • التقدم الفعلي: 35%  |  المخطط: 42%  |  فرق: -7%   │
+│  • تاريخ الانتهاء المخطط: 15 مايو                      │
+│  • تاريخ الانتهاء المتوقع: 28 مايو (+13 يوم)          │
+└────────────────────────────────────────────────────────┘
+```
+
+**حساب S-Curve:**
+```typescript
+// لكل يوم من بداية المشروع للنهاية:
+// Planned% = Σ(weight × planned_progress_at_date) / Σ(weight)
+// Actual%  = Σ(weight × actual_progress_at_date) / Σ(weight)
+
+// planned_progress_at_date:
+//   إذا date < plannedStart → 0%
+//   إذا date > plannedEnd → 100%
+//   وإلا → (date - plannedStart) / (plannedEnd - plannedStart) × 100%
+
+// actual_progress_at_date:
+//   آخر قيمة progress مسجلة قبل أو في هذا التاريخ
+```
+
+**مكتبة الرسم:** `recharts` (موجودة في المشروع)
+
+### 2. تقرير تحليل التأخيرات
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│  📋 تحليل التأخيرات                                            │
+│                                                                │
+│  إجمالي: 5 أنشطة متأخرة من أصل 24                             │
+│                                                                │
+│  ┌───────────┬──────┬──────────┬───────────┬──────────────────┐│
+│  │ النشاط    │ تأخر │ السبب    │ التأثير   │ على المسار الحرج││
+│  ├───────────┼──────┼──────────┼───────────┼──────────────────┤│
+│  │ تسليح     │ 3d   │ توريد    │ صب+عزل   │ ✅ نعم           ││
+│  │ القواعد   │      │          │ يتأخران  │                  ││
+│  ├───────────┼──────┼──────────┼───────────┼──────────────────┤│
+│  │ تركيب     │ 1d   │ طقس     │ لا تأثير  │ ❌ لا            ││
+│  │ القوالب   │      │          │ (float=5) │                  ││
+│  └───────────┴──────┴──────────┴───────────┴──────────────────┘│
+│                                                                │
+│  📊 أسباب التأخير (Pie Chart):                                 │
+│  🟥 توريد: 40%  🟧 مقاول باطن: 25%  🟨 طقس: 20%  🟦 اعتماد: 15%│
+│                                                                │
+│  ⚠️ التأثير على تاريخ الانتهاء: +5 أيام                        │
+└────────────────────────────────────────────────────────────────┘
+```
+
+**مصدر البيانات:** `projectExecution.getDelayAnalysis`
+
+### 3. إعدادات التقويم
+
+**Dialog أو صفحة:**
+```
+┌────────────────────────────────────────────────────────┐
+│  ⚙️ تقويم العمل                                        │
+│                                                        │
+│  أيام العمل:                                           │
+│  [☑ أحد] [☑ اثنين] [☑ ثلاثاء] [☑ أربعاء] [☑ خميس]   │
+│  [☐ جمعة] [☐ سبت]                                     │
+│                                                        │
+│  ساعات العمل اليومية: [8] ساعات                        │
+│                                                        │
+│  الإجازات الرسمية:                                     │
+│  ┌──────────────┬────────────┬────────┐                │
+│  │ المناسبة     │ من         │ إلى    │                │
+│  ├──────────────┼────────────┼────────┤                │
+│  │ عيد الفطر    │ 30 مارس   │ 5 أبريل│                │
+│  │ عيد الأضحى   │ 5 يونيو   │ 10 يون │                │
+│  │ اليوم الوطني │ 23 سبتمبر │ 23 سبت │                │
+│  └──────────────┴────────────┴────────┘                │
+│  [+ إضافة إجازة]                                       │
+│                                                        │
+│  إجازات مخصصة (توقف عمل):                              │
+│  ┌──────────────┬────────────┬────────┐                │
+│  │ السبب        │ من         │ إلى    │                │
+│  ├──────────────┼────────────┼────────┤                │
+│  │ موجة حر     │ 15 يوليو  │ 20 يول │                │
+│  └──────────────┴────────────┴────────┘                │
+│  [+ إضافة توقف]                                        │
+│                                                        │
+│  [حفظ]  [إلغاء]                                        │
+└────────────────────────────────────────────────────────┘
+```
+
+### 4. إدارة خطوط الأساس
+
+**Dialog:**
+```
+┌────────────────────────────────────────────────────────┐
+│  📊 خطوط الأساس                                        │
+│                                                        │
+│  ┌──────────────────┬───────────┬─────────┬──────────┐ │
+│  │ الاسم            │ التاريخ   │ الحالة  │          │ │
+│  ├──────────────────┼───────────┼─────────┼──────────┤ │
+│  │ الخطة الأصلية    │ 27 فبراير│ ✅ فعّال │ [عرض]   │ │
+│  │ بعد أمر تغيير #1│ 15 مارس  │ ⬜ غير   │ [تفعيل] │ │
+│  └──────────────────┴───────────┴─────────┴──────────┘ │
+│                                                        │
+│  [💾 اعتماد خطة جديدة]                                 │
+│                                                        │
+│  عند الاعتماد:                                         │
+│  الاسم: [_________________________]                    │
+│  سيتم حفظ نسخة كاملة من المراحل والأنشطة والتواريخ    │
+│  الحالية كخط أساس جديد.                                │
+│                                                        │
+│  [اعتماد]  [إلغاء]                                     │
+└────────────────────────────────────────────────────────┘
+```
+
+---
+
+## هيكل الملفات المطلوب
+
+```
+apps/web/modules/saas/projects-execution/
+├── (الموجود من Phase 1 — لا تعدّله إلا عند الضرورة)
+│   ├── execution-types.ts          ← أضف الأنواع الجديدة للجانت هنا
+│   ├── milestone-templates.ts
+│   ├── hooks/
+│   │   ├── use-execution-data.ts
+│   │   └── use-milestone-actions.ts
+│   ├── shared/
+│   │   ├── ExecutionViewToggle.tsx  ← يجب أن يربط بـ Advanced Mode
+│   │   ├── ConfirmDeleteDialog.tsx
+│   │   └── MilestoneForm.tsx
+│   └── simple-mode/
+│       └── (... كما هو)
+│
+├── advanced-mode/                   ← ★ كل ملفات Phase 2 هنا
+│   ├── context/
+│   │   └── GanttContext.tsx          ← React Context + Provider + reducer
+│   │
+│   ├── hooks/
+│   │   ├── useGanttDrag.ts           ← منطق السحب (move, resize-start, resize-end)
+│   │   ├── useGanttZoom.ts           ← تكبير/تصغير + scroll wheel
+│   │   ├── useGanttScroll.ts         ← تمرير متزامن + go-to-today
+│   │   ├── useDependencyDraw.ts      ← رسم علاقة جديدة بالسحب
+│   │   ├── useAutoSchedule.ts        ← حساب CPM + إعادة جدولة بعد التعديل
+│   │   ├── useGanttKeyboard.ts       ← اختصارات (Delete, Ctrl+Z, arrows)
+│   │   └── useGanttSelection.ts      ← تحديد صف/شريط + multi-select
+│   │
+│   ├── components/
+│   │   ├── AdvancedGanttView.tsx      ← المكون الرئيسي (يجمع كل شيء)
+│   │   ├── GanttToolbar.tsx           ← شريط الأدوات العلوي
+│   │   ├── GanttSplitPane.tsx         ← الحاوية المنقسمة (resizable)
+│   │   │
+│   │   ├── table/
+│   │   │   ├── GanttTable.tsx         ← جدول WBS كامل
+│   │   │   ├── GanttTableHeader.tsx   ← رأس الجدول (أعمدة)
+│   │   │   ├── GanttTableRow.tsx      ← صف (مرحلة أو نشاط)
+│   │   │   └── GanttInlineEdit.tsx    ← تحرير inline (اسم، تقدم، تواريخ)
+│   │   │
+│   │   ├── chart/
+│   │   │   ├── GanttCanvas.tsx        ← SVG container + viewBox
+│   │   │   ├── GanttTimeScale.tsx     ← محور زمني (يوم/أسبوع/شهر)
+│   │   │   ├── GanttGridLines.tsx     ← خطوط شبكة عمودية
+│   │   │   ├── GanttTodayLine.tsx     ← خط اليوم الحالي
+│   │   │   ├── GanttWeekendShading.tsx← تظليل أيام العطلة
+│   │   │   ├── GanttMilestoneBar.tsx  ← شريط مرحلة (summary)
+│   │   │   ├── GanttActivityBar.tsx   ← شريط نشاط (interactive)
+│   │   │   ├── GanttBaselineBar.tsx   ← شريط خط أساس (شفاف)
+│   │   │   ├── GanttProgressFill.tsx  ← تعبئة التقدم داخل الشريط
+│   │   │   ├── GanttDragPreview.tsx   ← معاينة أثناء السحب
+│   │   │   └── GanttBarTooltip.tsx    ← تلميح عند التمرير
+│   │   │
+│   │   ├── dependencies/
+│   │   │   ├── DependencyLayer.tsx    ← طبقة SVG لكل خطوط العلاقات
+│   │   │   ├── DependencyArrow.tsx    ← سهم واحد (SVG path)
+│   │   │   ├── DependencyDrawLine.tsx ← خط مؤقت أثناء إنشاء علاقة
+│   │   │   └── DependencyDialog.tsx   ← dialog اختيار نوع + lag
+│   │   │
+│   │   ├── panels/
+│   │   │   ├── GanttDetailPanel.tsx   ← لوحة تفاصيل النشاط (drawer)
+│   │   │   ├── BaselineManager.tsx    ← dialog إدارة خطوط الأساس
+│   │   │   └── CalendarSettings.tsx   ← dialog إعدادات التقويم
+│   │   │
+│   │   └── analysis/
+│   │       ├── SCurveChart.tsx        ← رسم S-Curve (recharts)
+│   │       ├── DelayAnalysisView.tsx  ← جدول + pie chart التأخيرات
+│   │       └── PlannedVsActualTable.tsx ← جدول مقارنة تفصيلي
+│   │
+│   └── utils/
+│       ├── gantt-date-utils.ts        ← حسابات التواريخ وأيام العمل
+│       ├── gantt-geometry.ts          ← dateToX, xToDate, حساب أبعاد
+│       ├── gantt-dependency-routing.ts← حساب مسار أسهم العلاقات
+│       ├── gantt-colors.ts            ← ألوان حسب الحالة والنوع
+│       └── gantt-export.ts            ← تصدير الجانت كـ PNG (مستقبلي)
+│
+├── lookahead/
+│   ├── LookaheadView.tsx              ← صفحة Lookahead الرئيسية
+│   ├── LookaheadWeekGroup.tsx         ← مجموعة أسبوع
+│   ├── LookaheadActivityCard.tsx      ← بطاقة نشاط في Lookahead
+│   └── LookaheadSummary.tsx           ← ملخص أسفل الصفحة
+│
+└── analysis/
+    └── AnalysisPage.tsx               ← صفحة تجمع SCurve + Delays + Table
+
+// === الصفحات (Pages) ===
+apps/web/app/(saas)/app/(organizations)/[organizationSlug]/
+  projects/[projectId]/execution/
+    ├── page.tsx                        ← (موجود) يعرض Simple أو Advanced حسب Toggle
+    ├── advanced/page.tsx               ← ★ صفحة الجانت المتقدم
+    ├── lookahead/page.tsx              ← ★ صفحة Lookahead
+    └── analysis/page.tsx               ← ★ صفحة التحليلات
+```
+
+**ملفات تُعدّل (ليست جديدة):**
+
+```
+1. execution-types.ts                    ← إضافة أنواع الجانت والتحليلات
+2. ExecutionViewToggle.tsx               ← ربط التبديل بالصفحة الجديدة
+3. execution/page.tsx                    ← إضافة navigation للصفحات الفرعية
+4. apps/web/modules/saas/shared/sidebar  ← إضافة روابط Lookahead + Analysis
+5. packages/i18n/translations/ar.json    ← مفاتيح ترجمة Phase 2
+6. packages/i18n/translations/en.json    ← مفاتيح ترجمة Phase 2
+```
+
+---
+
+## قواعد تقنية حرجة
+
+### 1. الأداء (Performance)
+
+```typescript
+// الجانت يجب أن يعمل بسلاسة مع 200+ نشاط
+
+// ✅ SVG Virtualization:
+// فقط ارسم الأشرطة المرئية في viewport (± buffer)
+// استخدم IntersectionObserver أو حساب يدوي
+
+// ✅ مكونات مع React.memo:
+const GanttActivityBar = React.memo(({ activity, ...props }) => {
+  // يُعاد الرسم فقط عند تغيير بيانات النشاط
+});
+
+// ✅ حساب CPM على الخادم:
+// لا تحسب CPM في المتصفح
+// استخدم projectExecution.getCriticalPath
+// وأضف نتائجه في GanttContext
+
+// ✅ Debounce عمليات السحب:
+// أرسل API call فقط عند الإفلات (drop)، ليس أثناء السحب
+
+// ✅ Optimistic Updates:
+// حدّث UI فوراً → أرسل API → تراجع عند الخطأ
+```
+
+### 2. RTL (عربي)
+
+```typescript
+// الجانت في RTL:
+// - الجدول على اليمين، الرسم على اليسار
+// - المحور الزمني يتدفق من اليمين لليسار
+//   (الماضي يمين، المستقبل يسار)
+// - أسهم العلاقات تعكس اتجاهها
+// - التمرير الأفقي معكوس
+
+// استخدم CSS logical properties:
+// margin-inline-start بدل margin-left
+// padding-inline-end بدل padding-right
+
+// في SVG: استخدم transform="scale(-1, 1)" مع ضبط text-anchor
+// أو احسب الإحداثيات بشكل يدعم الاتجاهين
+
+// ⚠️ مهم: date-fns locale يجب أن يكون ar-SA
+```
+
+### 3. التكامل مع Phase 1
+
+```typescript
+// ExecutionViewToggle.tsx يجب أن:
+// - في Simple Mode: يبقى في /execution (يعرض ExecutionDashboard)
+// - في Advanced Mode: يتنقل لـ /execution/advanced (يعرض AdvancedGanttView)
+// - الحالة تُحفظ في localStorage أو URL param
+
+// البيانات مشتركة:
+// - نفس الـ milestones و activities من Phase 1 API
+// - نفس الـ dependencies و baselines
+// - أي تعديل في الجانت ينعكس في Simple Mode والعكس
+```
+
+### 4. الموبايل
+
+```typescript
+// الجانت المتقدم لا يعمل على شاشات صغيرة
+// عند width < 768px:
+// - أظهر رسالة: "الجدول الزمني المتقدم يعمل بشكل أفضل على شاشة أكبر"
+// - زر "الانتقال للوضع الأساسي"
+// - أو عرض مبسط: قائمة أنشطة مع تواريخ (بدون رسم بياني)
+```
+
+### 5. Undo/Redo (مؤجل لكن جهّز البنية)
+
+```typescript
+// لا تبني Undo/Redo الآن، لكن صمم الـ state management بطريقة تدعمه:
+// - كل عملية تعديل تُمرر عبر dispatch(action)
+// - الـ reducer يسجل الحالة السابقة
+// - مستقبلاً: أضف history stack
+```
+
+---
+
+## الترجمة المطلوبة (i18n)
+
+```json
+{
+  "execution.advanced": {
+    "title": "الجدول الزمني المتقدم",
+    "toolbar": {
+      "timeScale": "مقياس الزمن",
+      "day": "يوم",
+      "week": "أسبوع", 
+      "month": "شهر",
+      "quarter": "ربع سنوي",
+      "zoomIn": "تكبير",
+      "zoomOut": "تصغير",
+      "goToToday": "اليوم",
+      "showCriticalPath": "المسار الحرج",
+      "showBaseline": "خط الأساس",
+      "showSubcontractors": "مقاولي الباطن",
+      "createBaseline": "اعتماد الخطة",
+      "analysis": "تحليلات",
+      "settings": "إعدادات التقويم"
+    },
+    "table": {
+      "wbs": "#",
+      "name": "النشاط",
+      "duration": "المدة",
+      "progress": "التقدم",
+      "start": "البداية",
+      "end": "النهاية",
+      "assignee": "المسؤول",
+      "float": "مرونة",
+      "status": "الحالة"
+    },
+    "bar": {
+      "critical": "نشاط حرج",
+      "onTrack": "على المسار",
+      "delayed": "متأخر",
+      "completed": "مكتمل",
+      "baseline": "خط الأساس"
+    },
+    "dependency": {
+      "title": "إضافة علاقة",
+      "type": "نوع العلاقة",
+      "fs": "نهاية ← بداية (FS)",
+      "ss": "بداية ← بداية (SS)",
+      "ff": "نهاية ← نهاية (FF)",
+      "sf": "بداية ← نهاية (SF)",
+      "lag": "فترة انتظار (أيام)",
+      "lead": "تداخل (أيام سالبة)",
+      "circularError": "لا يمكن إنشاء علاقة دائرية",
+      "predecessor": "يعتمد على",
+      "successor": "يتبعه"
+    },
+    "detail": {
+      "info": "معلومات أساسية",
+      "baselineComparison": "مقارنة بالأساس",
+      "relationships": "العلاقات",
+      "checklist": "قائمة الفحص",
+      "attachments": "المرفقات",
+      "edit": "تحرير",
+      "delete": "حذف",
+      "variance": "الفرق",
+      "daysEarly": "متقدم {{count}} يوم",
+      "daysLate": "متأخر {{count}} يوم",
+      "totalFloat": "المرونة الكلية"
+    },
+    "baseline": {
+      "title": "خطوط الأساس",
+      "create": "اعتماد خطة جديدة",
+      "name": "اسم الخطة",
+      "date": "تاريخ الاعتماد",
+      "active": "فعّال",
+      "activate": "تفعيل",
+      "view": "عرض",
+      "confirmCreate": "سيتم حفظ نسخة كاملة من الخطة الحالية كخط أساس."
+    },
+    "calendar": {
+      "title": "تقويم العمل",
+      "workDays": "أيام العمل",
+      "hoursPerDay": "ساعات العمل اليومية",
+      "officialHolidays": "الإجازات الرسمية",
+      "customStoppages": "توقفات مخصصة",
+      "addHoliday": "إضافة إجازة",
+      "addStoppage": "إضافة توقف",
+      "occasion": "المناسبة",
+      "reason": "السبب",
+      "from": "من",
+      "to": "إلى",
+      "sunday": "أحد", "monday": "اثنين", "tuesday": "ثلاثاء",
+      "wednesday": "أربعاء", "thursday": "خميس",
+      "friday": "جمعة", "saturday": "سبت"
+    },
+    "lookahead": {
+      "title": "خطة الأسابيع القادمة",
+      "range": "المدى",
+      "weeks": "أسابيع",
+      "thisWeek": "هذا الأسبوع",
+      "nextWeek": "الأسبوع القادم",
+      "weekN": "الأسبوع {{n}}",
+      "summary": "ملخص",
+      "activitiesInPeriod": "أنشطة هذه الفترة",
+      "delayedCount": "متأخر",
+      "criticalCount": "حرج",
+      "requiredSubcontractors": "مقاولي باطن مطلوبين",
+      "requiredSupplies": "توريدات مطلوبة",
+      "startCondition": "شرط البدء",
+      "required": "المطلوب"
+    },
+    "analysis": {
+      "title": "التحليلات",
+      "sCurve": "منحنى التقدم",
+      "delayAnalysis": "تحليل التأخيرات",
+      "plannedVsActual": "المخطط مقابل الفعلي",
+      "planned": "المخطط",
+      "actual": "الفعلي",
+      "variance": "الفرق",
+      "expectedCompletion": "تاريخ الانتهاء المتوقع",
+      "plannedCompletion": "تاريخ الانتهاء المخطط",
+      "delayImpact": "التأثير على الانتهاء",
+      "delayReasons": "أسباب التأخير",
+      "supply": "توريد", "subcontractor": "مقاول باطن",
+      "approval": "اعتماد", "weather": "طقس",
+      "design": "تصميم", "owner": "المالك",
+      "financial": "مالي", "other": "أخرى"
+    },
+    "mobile": {
+      "desktopRecommended": "الجدول الزمني المتقدم يعمل بشكل أفضل على شاشة أكبر",
+      "switchToSimple": "الانتقال للوضع الأساسي"
+    }
+  }
+}
+```
+
+---
+
+## ترتيب التنفيذ المقترح
+
+```
+Sub-Phase 2A-1: البنية الأساسية (يوم 1-2)
+  → GanttContext + types + utils (date, geometry, colors)
+  → GanttSplitPane + GanttTable (static, no interaction)
+  → GanttCanvas + GanttTimeScale + GanttGridLines + GanttTodayLine
+
+Sub-Phase 2A-2: الأشرطة (يوم 2-3)
+  → GanttMilestoneBar + GanttActivityBar + GanttProgressFill
+  → GanttBaselineBar + GanttWeekendShading
+  → GanttBarTooltip
+  → ربط البيانات من API
+
+Sub-Phase 2A-3: التفاعل (يوم 3-5)
+  → useGanttDrag (move, resize)
+  → GanttDragPreview
+  → useGanttZoom + useGanttScroll
+  → useGanttSelection + useGanttKeyboard
+  → GanttToolbar (كامل)
+
+Sub-Phase 2A-4: العلاقات (يوم 5-6)
+  → DependencyLayer + DependencyArrow
+  → dependency-routing.ts
+  → useDependencyDraw + DependencyDrawLine
+  → DependencyDialog
+  → تلوين المسار الحرج
+
+Sub-Phase 2A-5: اللوحات (يوم 6-7)
+  → GanttDetailPanel
+  → BaselineManager
+  → CalendarSettings
+  → AdvancedGanttView (تجميع)
+  → الصفحة advanced/page.tsx
+
+Sub-Phase 2B: Lookahead (يوم 7-8)
+  → LookaheadView + WeekGroup + ActivityCard + Summary
+  → lookahead/page.tsx
+
+Sub-Phase 2C: التحليلات (يوم 8-9)
+  → SCurveChart + DelayAnalysisView + PlannedVsActualTable
+  → AnalysisPage
+  → analysis/page.tsx
+
+Sub-Phase 2D: التكامل والتلميع (يوم 9-10)
+  → ربط ExecutionViewToggle
+  → RTL testing
+  → i18n (ar + en)
+  → Mobile fallback
+  → تحديث Sidebar navigation
+```
+
+---
+
+## الإخراج المطلوب (PLAN MODE)
+
+قدّم خطة تفصيلية تشمل:
+
+1. **قائمة كل الملفات** التي ستُنشأ أو تُعدّل مع وصف التغيير لكل ملف
+2. **ترتيب التنفيذ** الدقيق (أي ملف يُنشأ أولاً ولماذا)
+3. **القرارات التقنية** التي تحتاج حسم:
+   - هل نستبدل مكونات الجانت القديمة (projects-timeline) أم نبقيها كـ fallback؟
+   - هل نستخدم CSS Grid أو Flexbox للـ Split Pane؟
+   - هل نستخدم SVG أو Canvas أو DOM للأشرطة؟
+   - كيف نتعامل مع RTL في المحور الزمني؟
+4. **تقدير الجهد** لكل Sub-Phase
+5. **المخاطر والتحديات** المتوقعة (خصوصاً RTL + Performance + Drag interaction)
+6. **الاعتماديات** بين الملفات (ما الذي يجب أن يوجد قبل بناء ملف معين)
+
+**لا تكتب كود. فقط خطة.**

@@ -25,6 +25,10 @@ import {
 	addInvoicePaymentProcedure,
 	deleteInvoicePaymentProcedure,
 	deleteInvoiceProcedure,
+	issueInvoiceProcedure,
+	duplicateInvoiceProcedure,
+	createCreditNoteProcedure,
+	getInvoiceActivityProcedure,
 } from "./procedures/create-invoice";
 
 import {
@@ -138,6 +142,10 @@ export const financeRouter = {
 		addPayment: addInvoicePaymentProcedure,
 		deletePayment: deleteInvoicePaymentProcedure,
 		delete: deleteInvoiceProcedure,
+		issue: issueInvoiceProcedure,
+		duplicate: duplicateInvoiceProcedure,
+		createCreditNote: createCreditNoteProcedure,
+		getActivity: getInvoiceActivityProcedure,
 	},
 
 	// Open Documents

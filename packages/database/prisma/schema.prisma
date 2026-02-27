@@ -168,6 +168,30 @@ enum MilestoneStatus {
   IN_PROGRESS   // قيد التنفيذ
   COMPLETED     // مكتمل
   DELAYED       // متأخر
+  CANCELLED     // ملغي
+}
+
+// Phase 13 - Execution Module
+enum ActivityStatus {
+  NOT_STARTED   // لم يبدأ
+  IN_PROGRESS   // قيد التنفيذ
+  COMPLETED     // مكتمل
+  DELAYED       // متأخر
+  ON_HOLD       // معلق
+  CANCELLED     // ملغي
+}
+
+enum DependencyType {
+  FINISH_TO_START   // نهاية - بداية
+  START_TO_START    // بداية - بداية
+  FINISH_TO_FINISH  // نهاية - نهاية
+  START_TO_FINISH   // بداية - نهاية
+}
+
+enum ProgressMethod {
+  MANUAL      // يدوي
+  CHECKLIST   // قائمة مهام
+  ACTIVITIES  // من الأنشطة
 }
 
 // قنوات المحادثات
@@ -579,6 +603,11 @@ model User {
   // Expense Runs - ترحيل المصروفات
   expenseRunsCreated       CompanyExpenseRun[]         @relation("ExpenseRunCreator")
   expenseRunsPosted        CompanyExpenseRun[]         @relation("ExpenseRunPoster")
+
+  // Phase 13 - Execution Module
+  activityAssignments      ProjectActivity[]           @relation("ActivityAssignee")
+  checklistsCompleted      ActivityChecklist[]          @relation("ChecklistCompleter")
+  baselinesCreated         ProjectBaseline[]            @relation("BaselineCreator")
 
   // Organization Audit Trail - سجل التدقيق المؤسسي
   orgAuditActions          OrganizationAuditLog[]     @relation("OrgAuditActor")
@@ -1200,6 +1229,11 @@ model Project {
   // علاقات بوابة المالك
   ownerAccesses   ProjectOwnerAccess[]
   milestones      ProjectMilestone[]
+
+  // Phase 13 - Execution Module
+  activities  ProjectActivity[]
+  baselines   ProjectBaseline[]
+  calendars   ProjectCalendar[]
 
   // Phase 7 - Differentiation
   templatesFromThis ProjectTemplate[]    @relation("TemplateSource")
@@ -1883,6 +1917,123 @@ model ProjectOwnerAccess {
   @@map("project_owner_access")
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// PHASE 13 - EXECUTION MODULE
+// ═══════════════════════════════════════════════════════════════════════════
+
+// تقويم المشروع
+model ProjectCalendar {
+  id                 String            @id @default(cuid())
+  organizationId     String            @map("organization_id")
+  projectId          String            @map("project_id")
+  project            Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name               String
+  workDays           Json              @map("work_days")    // [0,1,2,3,4] = Sun-Thu
+  holidays           Json              @default("[]")
+  defaultHoursPerDay Float             @default(8) @map("default_hours_per_day")
+  isDefault          Boolean           @default(false) @map("is_default")
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+  milestones         ProjectMilestone[]
+  activities         ProjectActivity[]
+  @@index([organizationId, projectId])
+  @@map("project_calendars")
+}
+
+// أنشطة المشروع
+model ProjectActivity {
+  id              String           @id @default(cuid())
+  organizationId  String           @map("organization_id")
+  projectId       String           @map("project_id")
+  project         Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  milestoneId     String           @map("milestone_id")
+  milestone       ProjectMilestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  title           String
+  description     String?          @db.Text
+  wbsCode         String?          @map("wbs_code")
+  plannedStart    DateTime?        @map("planned_start") @db.Date
+  plannedEnd      DateTime?        @map("planned_end") @db.Date
+  duration        Int?
+  actualStart     DateTime?        @map("actual_start") @db.Date
+  actualEnd       DateTime?        @map("actual_end") @db.Date
+  status          ActivityStatus   @default(NOT_STARTED)
+  progress        Float            @default(0)
+  isCritical      Boolean          @default(false) @map("is_critical")
+  weight          Float?
+  assigneeId      String?          @map("assignee_id")
+  assignee        User?            @relation("ActivityAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  calendarId      String?          @map("calendar_id")
+  calendar        ProjectCalendar? @relation(fields: [calendarId], references: [id], onDelete: SetNull)
+  orderIndex      Int              @default(0) @map("order_index")
+  notes           String?          @db.Text
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  checklists      ActivityChecklist[]
+  predecessorOf   ActivityDependency[] @relation("DependencyPredecessor")
+  successorOf     ActivityDependency[] @relation("DependencySuccessor")
+  @@index([organizationId, projectId])
+  @@index([organizationId, projectId, milestoneId])
+  @@index([organizationId, projectId, status])
+  @@index([milestoneId, orderIndex])
+  @@map("project_activities")
+}
+
+// اعتماديات الأنشطة
+model ActivityDependency {
+  id              String          @id @default(cuid())
+  organizationId  String          @map("organization_id")
+  projectId       String          @map("project_id")
+  predecessorId   String          @map("predecessor_id")
+  predecessor     ProjectActivity @relation("DependencyPredecessor", fields: [predecessorId], references: [id], onDelete: Cascade)
+  successorId     String          @map("successor_id")
+  successor       ProjectActivity @relation("DependencySuccessor", fields: [successorId], references: [id], onDelete: Cascade)
+  dependencyType  DependencyType  @default(FINISH_TO_START) @map("dependency_type")
+  lagDays         Int             @default(0) @map("lag_days")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  @@unique([predecessorId, successorId])
+  @@index([organizationId, projectId])
+  @@index([predecessorId])
+  @@index([successorId])
+  @@map("activity_dependencies")
+}
+
+// قوائم مراجعة الأنشطة
+model ActivityChecklist {
+  id              String          @id @default(cuid())
+  organizationId  String          @map("organization_id")
+  activityId      String          @map("activity_id")
+  activity        ProjectActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  title           String
+  isCompleted     Boolean         @default(false) @map("is_completed")
+  completedAt     DateTime?       @map("completed_at")
+  completedById   String?         @map("completed_by")
+  completedBy     User?           @relation("ChecklistCompleter", fields: [completedById], references: [id], onDelete: SetNull)
+  orderIndex      Int             @default(0) @map("order_index")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  @@index([activityId, orderIndex])
+  @@map("activity_checklists")
+}
+
+// خطوط الأساس
+model ProjectBaseline {
+  id              String   @id @default(cuid())
+  organizationId  String   @map("organization_id")
+  projectId       String   @map("project_id")
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name            String
+  description     String?  @db.Text
+  snapshotDate    DateTime @default(now()) @map("snapshot_date") @db.Date
+  snapshotData    Json     @map("snapshot_data")
+  isActive        Boolean  @default(false) @map("is_active")
+  createdById     String   @map("created_by")
+  createdBy       User     @relation("BaselineCreator", fields: [createdById], references: [id])
+  createdAt       DateTime @default(now()) @map("created_at")
+  @@index([organizationId, projectId])
+  @@index([organizationId, projectId, isActive])
+  @@map("project_baselines")
+}
+
 // مراحل المشروع (للجدول الزمني - Phase 10)
 model ProjectMilestone {
   id              String          @id @default(cuid())
@@ -1906,6 +2057,16 @@ model ProjectMilestone {
   status          MilestoneStatus @default(PLANNED)
   progress        Float           @default(0) // 0-100
   isCritical      Boolean         @default(false) @map("is_critical")
+
+  // Phase 13 - Execution Module
+  weight            Float?
+  color             String?
+  progressMethod    ProgressMethod    @default(MANUAL) @map("progress_method")
+  baselineStartDate DateTime?         @map("baseline_start_date") @db.Date
+  baselineEndDate   DateTime?         @map("baseline_end_date") @db.Date
+  calendarId        String?           @map("calendar_id")
+  calendar          ProjectCalendar?  @relation(fields: [calendarId], references: [id], onDelete: SetNull)
+  activities        ProjectActivity[]
 
   // للتوافق مع الإصدارات السابقة
   plannedDate     DateTime?       @map("planned_date") @db.Date
@@ -2313,6 +2474,7 @@ enum QuotationStatus {
 // حالة الفاتورة
 enum FinanceInvoiceStatus {
   DRAFT         // مسودة
+  ISSUED        // صادرة (تم الإصدار الرسمي)
   SENT          // مرسلة
   VIEWED        // تمت المشاهدة
   PARTIALLY_PAID // مدفوعة جزئياً
@@ -2326,6 +2488,8 @@ enum InvoiceType {
   STANDARD      // عادية
   TAX           // ضريبية (VAT)
   SIMPLIFIED    // مبسطة
+  CREDIT_NOTE   // إشعار دائن
+  DEBIT_NOTE    // إشعار مدين
 }
 
 // نوع المستند المفتوح
@@ -2380,6 +2544,9 @@ enum OrgAuditAction {
   INVOICE_PAYMENT_ADDED     // إضافة دفعة لفاتورة
   INVOICE_PAYMENT_DELETED   // حذف دفعة من فاتورة
   INVOICE_DELETED           // حذف فاتورة
+  INVOICE_ISSUED            // إصدار فاتورة رسمياً
+  INVOICE_DUPLICATED        // نسخ فاتورة
+  INVOICE_CREDIT_NOTE_CREATED // إنشاء إشعار دائن
 
   // ── عروض الأسعار (Quotations) ──
   QUOTATION_CREATED         // إنشاء عرض سعر
@@ -2661,6 +2828,19 @@ model FinanceInvoice {
   totalAmount     Decimal              @default(0) @map("total_amount") @db.Decimal(15, 2)
   paidAmount      Decimal              @default(0) @map("paid_amount") @db.Decimal(15, 2)
 
+  // بيانات البائع المجمدة عند الإصدار
+  sellerName      String?              @map("seller_name")        // اسم البائع/المنشأة
+  sellerAddress   String?              @map("seller_address") @db.Text // عنوان البائع
+  sellerPhone     String?              @map("seller_phone")       // هاتف البائع
+
+  // ربط إشعار دائن/مدين بالفاتورة الأصلية
+  relatedInvoiceId String?             @map("related_invoice_id")
+  relatedInvoice   FinanceInvoice?     @relation("CreditNoteRelation", fields: [relatedInvoiceId], references: [id], onDelete: SetNull)
+  creditNotes      FinanceInvoice[]    @relation("CreditNoteRelation")
+
+  // تاريخ الإصدار الرسمي
+  issuedAt        DateTime?            @map("issued_at")
+
   // حقول ZATCA للفاتورة الضريبية
   sellerTaxNumber String?              @map("seller_tax_number")  // الرقم الضريبي للبائع
   qrCode          String?              @map("qr_code") @db.Text    // QR Code محتوى
@@ -2698,6 +2878,7 @@ model FinanceInvoice {
   @@index([organizationId, projectId])
   @@index([organizationId, invoiceType])
   @@index([organizationId, dueDate])
+  @@index([relatedInvoiceId])
   @@map("finance_invoices")
 }
 

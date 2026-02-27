@@ -1,7 +1,6 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { FieldTimeline } from "@saas/projects/components/field/FieldTimeline";
-import { ProjectPhotosCard } from "@saas/projects/components/field/ProjectPhotosCard";
-import { TimelineBoard } from "@saas/projects-timeline/components/TimelineBoard";
+import { ExecutionDashboard } from "@saas/projects-execution/components";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -30,24 +29,15 @@ export default async function ExecutionPage({
 
 	return (
 		<div className="space-y-8">
-			{/* Timeline Section */}
+			{/* Execution Dashboard */}
 			<section>
-				<TimelineBoard projectId={projectId} />
-			</section>
-
-			{/* Project Photos */}
-			<section>
-				<ProjectPhotosCard
-					organizationId={activeOrganization.id}
-					organizationSlug={organizationSlug}
-					projectId={projectId}
-				/>
+				<ExecutionDashboard projectId={projectId} />
 			</section>
 
 			{/* Divider */}
 			<div className="border-t border-slate-200 dark:border-slate-700" />
 
-			{/* Field Section */}
+			{/* Field Activity Feed */}
 			<section>
 				<FieldTimeline
 					organizationId={activeOrganization.id}

@@ -36,7 +36,10 @@ export const getOrgFinanceSettingsProcedure = protectedProcedure
 			input.organizationId,
 		);
 
-		return settings;
+		return {
+			...settings,
+			defaultVatPercent: Number(settings.defaultVatPercent),
+		};
 	});
 
 /**
@@ -105,5 +108,8 @@ export const updateOrgFinanceSettingsProcedure = protectedProcedure
 			cleanData,
 		);
 
-		return settings;
+		return {
+			...settings,
+			defaultVatPercent: Number(settings.defaultVatPercent),
+		};
 	});

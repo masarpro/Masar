@@ -1,5 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { InvoiceEditor } from "@saas/finance/components/invoices/InvoiceEditor";
+import { InvoiceView } from "@saas/finance/components/invoices/InvoiceView";
 import { FinanceShell } from "@saas/finance/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -12,11 +12,11 @@ export async function generateMetadata({
 	const t = await getTranslations();
 
 	return {
-		title: t("finance.invoices.edit"),
+		title: t("finance.invoices.view"),
 	};
 }
 
-export default async function EditInvoicePage({
+export default async function ViewInvoicePage({
 	params,
 }: {
 	params: Promise<{ organizationSlug: string; invoiceId: string }>;
@@ -34,9 +34,9 @@ export default async function EditInvoicePage({
 		<FinanceShell
 			organizationSlug={organizationSlug}
 			sectionKey="invoices"
-			pageTitle={t("finance.invoices.edit")}
+			pageTitle={t("finance.invoices.view")}
 		>
-			<InvoiceEditor
+			<InvoiceView
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}
 				invoiceId={invoiceId}

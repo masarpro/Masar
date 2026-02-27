@@ -23,7 +23,7 @@ export const updateMilestoneProcedure = protectedProcedure
 			plannedEnd: z.string().datetime().optional().nullable(),
 			isCritical: z.boolean().optional(),
 			status: z
-				.enum(["PLANNED", "IN_PROGRESS", "COMPLETED", "DELAYED"])
+				.enum(["PLANNED", "IN_PROGRESS", "COMPLETED", "DELAYED", "CANCELLED"])
 				.optional(),
 		}),
 	)

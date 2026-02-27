@@ -1,4 +1,5 @@
 import { db } from "../client";
+import { Prisma } from "../generated/client";
 import type {
 	QuotationStatus,
 	FinanceInvoiceStatus,
@@ -7,6 +8,53 @@ import type {
 	FinanceTemplateType,
 	ClientType,
 } from "../generated/client";
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INVOICE CALCULATION HELPERS — حسابات الفاتورة (Decimal-safe)
+// ═══════════════════════════════════════════════════════════════════════════
+
+const D = (v: number | string | Prisma.Decimal) => new Prisma.Decimal(v);
+const ZERO = D(0);
+const HUNDRED = D(100);
+const ROUND_HALF_UP = Prisma.Decimal.ROUND_HALF_UP;
+
+/**
+ * Single source of truth for invoice total calculations using Prisma.Decimal.
+ * All amounts are rounded to 2 decimal places using ROUND_HALF_UP.
+ */
+export function calculateInvoiceTotals(
+	items: Array<{ quantity: number | Prisma.Decimal; unitPrice: number | Prisma.Decimal }>,
+	discountPercent: number | Prisma.Decimal = 0,
+	vatPercent: number | Prisma.Decimal = 15,
+) {
+	const dp = D(discountPercent);
+	const vp = D(vatPercent);
+
+	let subtotal = ZERO;
+	const itemTotals: Prisma.Decimal[] = [];
+
+	for (const item of items) {
+		const qty = D(item.quantity);
+		const price = D(item.unitPrice);
+		const total = qty.mul(price).toDecimalPlaces(2, ROUND_HALF_UP);
+		itemTotals.push(total);
+		subtotal = subtotal.add(total);
+	}
+
+	const discountAmount = subtotal.mul(dp).div(HUNDRED).toDecimalPlaces(2, ROUND_HALF_UP);
+	const afterDiscount = subtotal.sub(discountAmount);
+	const vatAmount = afterDiscount.mul(vp).div(HUNDRED).toDecimalPlaces(2, ROUND_HALF_UP);
+	const totalAmount = afterDiscount.add(vatAmount);
+
+	return {
+		subtotal,
+		discountAmount,
+		afterDiscount,
+		vatAmount,
+		totalAmount,
+		itemTotals,
+	};
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CLIENT QUERIES - استعلامات العملاء
@@ -894,6 +942,13 @@ export async function getInvoiceById(id: string, organizationId: string) {
 					createdBy: { select: { id: true, name: true } },
 				},
 			},
+			relatedInvoice: {
+				select: { id: true, invoiceNo: true, invoiceType: true, totalAmount: true, status: true },
+			},
+			creditNotes: {
+				select: { id: true, invoiceNo: true, invoiceType: true, totalAmount: true, status: true, createdAt: true },
+				orderBy: { createdAt: "desc" },
+			},
 		},
 	});
 }
@@ -931,27 +986,19 @@ export async function createInvoice(data: {
 }) {
 	const invoiceNo = await generateInvoiceNumber(data.organizationId);
 
-	// Calculate totals
-	let subtotal = 0;
-	const itemsData = data.items.map((item, index) => {
-		const totalPrice = item.quantity * item.unitPrice;
-		subtotal += totalPrice;
-		return {
-			description: item.description,
-			quantity: item.quantity,
-			unit: item.unit,
-			unitPrice: item.unitPrice,
-			totalPrice,
-			sortOrder: index,
-		};
-	});
-
+	// Calculate totals using Decimal
 	const discountPercent = data.discountPercent ?? 0;
-	const discountAmount = (subtotal * discountPercent) / 100;
-	const afterDiscount = subtotal - discountAmount;
 	const vatPercent = data.vatPercent ?? 15;
-	const vatAmount = (afterDiscount * vatPercent) / 100;
-	const totalAmount = afterDiscount + vatAmount;
+	const totals = calculateInvoiceTotals(data.items, discountPercent, vatPercent);
+
+	const itemsData = data.items.map((item, index) => ({
+		description: item.description,
+		quantity: item.quantity,
+		unit: item.unit,
+		unitPrice: item.unitPrice,
+		totalPrice: totals.itemTotals[index],
+		sortOrder: index,
+	}));
 
 	return db.financeInvoice.create({
 		data: {
@@ -974,12 +1021,12 @@ export async function createInvoice(data: {
 			paymentTerms: data.paymentTerms,
 			notes: data.notes,
 			templateId: data.templateId,
-			subtotal,
+			subtotal: totals.subtotal,
 			discountPercent,
-			discountAmount,
+			discountAmount: totals.discountAmount,
 			vatPercent,
-			vatAmount,
-			totalAmount,
+			vatAmount: totals.vatAmount,
+			totalAmount: totals.totalAmount,
 			paidAmount: 0,
 			sellerTaxNumber: data.sellerTaxNumber,
 			items: {
@@ -1025,11 +1072,16 @@ export async function updateInvoice(
 ) {
 	const existing = await db.financeInvoice.findFirst({
 		where: { id, organizationId },
-		select: { id: true },
+		select: { id: true, status: true },
 	});
 
 	if (!existing) {
 		throw new Error("Invoice not found");
+	}
+
+	// Edit lock: only DRAFT invoices can be edited
+	if (existing.status !== "DRAFT") {
+		throw new Error("لا يمكن تعديل فاتورة تم إصدارها. يمكنك فقط تعديل الفواتير في حالة مسودة.");
 	}
 
 	return db.financeInvoice.update({
@@ -1054,48 +1106,43 @@ export async function updateInvoiceItems(
 ) {
 	const existing = await db.financeInvoice.findFirst({
 		where: { id, organizationId },
-		select: { id: true, discountPercent: true, vatPercent: true },
+		select: { id: true, status: true, discountPercent: true, vatPercent: true },
 	});
 
 	if (!existing) {
 		throw new Error("Invoice not found");
 	}
 
+	// Edit lock: only DRAFT invoices can be edited
+	if (existing.status !== "DRAFT") {
+		throw new Error("لا يمكن تعديل بنود فاتورة تم إصدارها. يمكنك فقط تعديل الفواتير في حالة مسودة.");
+	}
+
 	// Delete existing items and create new ones
 	await db.financeInvoiceItem.deleteMany({ where: { invoiceId: id } });
 
-	let subtotal = 0;
-	const itemsData = items.map((item, index) => {
-		const totalPrice = item.quantity * item.unitPrice;
-		subtotal += totalPrice;
-		return {
-			invoiceId: id,
-			description: item.description,
-			quantity: item.quantity,
-			unit: item.unit,
-			unitPrice: item.unitPrice,
-			totalPrice,
-			sortOrder: index,
-		};
-	});
+	// Recalculate totals using Decimal
+	const totals = calculateInvoiceTotals(items, existing.discountPercent, existing.vatPercent);
+
+	const itemsData = items.map((item, index) => ({
+		invoiceId: id,
+		description: item.description,
+		quantity: item.quantity,
+		unit: item.unit,
+		unitPrice: item.unitPrice,
+		totalPrice: totals.itemTotals[index],
+		sortOrder: index,
+	}));
 
 	await db.financeInvoiceItem.createMany({ data: itemsData });
-
-	// Recalculate totals
-	const discountPercent = Number(existing.discountPercent);
-	const discountAmount = (subtotal * discountPercent) / 100;
-	const afterDiscount = subtotal - discountAmount;
-	const vatPercent = Number(existing.vatPercent);
-	const vatAmount = (afterDiscount * vatPercent) / 100;
-	const totalAmount = afterDiscount + vatAmount;
 
 	return db.financeInvoice.update({
 		where: { id },
 		data: {
-			subtotal,
-			discountAmount,
-			vatAmount,
-			totalAmount,
+			subtotal: totals.subtotal,
+			discountAmount: totals.discountAmount,
+			vatAmount: totals.vatAmount,
+			totalAmount: totals.totalAmount,
 		},
 		include: { items: { orderBy: { sortOrder: "asc" } } },
 	});
@@ -1170,7 +1217,7 @@ export async function addInvoicePayment(
 	} else if (newPaidAmount > 0) {
 		newStatus = "PARTIALLY_PAID";
 	} else {
-		newStatus = "SENT";
+		newStatus = "ISSUED";
 	}
 
 	// Create payment and update invoice in transaction
@@ -1235,7 +1282,7 @@ export async function deleteInvoicePayment(
 	} else if (newPaidAmount > 0) {
 		newStatus = "PARTIALLY_PAID";
 	} else {
-		newStatus = "SENT";
+		newStatus = "ISSUED";
 	}
 
 	return db.$transaction(async (tx) => {
@@ -1341,6 +1388,231 @@ export async function convertQuotationToInvoice(
 }
 
 /**
+ * Issue an invoice — transitions from DRAFT to ISSUED
+ * Recalculates totals, freezes seller snapshot, stores QR/UUID/issuedAt
+ */
+export async function issueInvoice(
+	id: string,
+	organizationId: string,
+	data: {
+		sellerName: string;
+		sellerTaxNumber?: string;
+		sellerAddress?: string;
+		sellerPhone?: string;
+		qrCode?: string;
+		zatcaUuid?: string;
+	},
+) {
+	return db.$transaction(async (tx) => {
+		const invoice = await tx.financeInvoice.findFirst({
+			where: { id, organizationId },
+			include: { items: true },
+		});
+
+		if (!invoice) {
+			throw new Error("الفاتورة غير موجودة");
+		}
+
+		if (invoice.status !== "DRAFT") {
+			throw new Error("لا يمكن إصدار فاتورة ليست في حالة مسودة");
+		}
+
+		// Recalculate totals
+		const totals = calculateInvoiceTotals(
+			invoice.items.map((i) => ({ quantity: i.quantity, unitPrice: i.unitPrice })),
+			invoice.discountPercent,
+			invoice.vatPercent,
+		);
+
+		// Update item totals
+		for (let idx = 0; idx < invoice.items.length; idx++) {
+			await tx.financeInvoiceItem.update({
+				where: { id: invoice.items[idx].id },
+				data: { totalPrice: totals.itemTotals[idx] },
+			});
+		}
+
+		// Update invoice with frozen totals, seller snapshot, and ZATCA data
+		return tx.financeInvoice.update({
+			where: { id },
+			data: {
+				status: "ISSUED",
+				issuedAt: new Date(),
+				subtotal: totals.subtotal,
+				discountAmount: totals.discountAmount,
+				vatAmount: totals.vatAmount,
+				totalAmount: totals.totalAmount,
+				sellerName: data.sellerName,
+				sellerTaxNumber: data.sellerTaxNumber,
+				sellerAddress: data.sellerAddress,
+				sellerPhone: data.sellerPhone,
+				qrCode: data.qrCode,
+				zatcaUuid: data.zatcaUuid,
+			},
+			include: { items: { orderBy: { sortOrder: "asc" } } },
+		});
+	});
+}
+
+/**
+ * Duplicate an invoice — creates a new DRAFT copy with fresh number
+ */
+export async function duplicateInvoice(
+	id: string,
+	organizationId: string,
+	createdById: string,
+) {
+	const original = await db.financeInvoice.findFirst({
+		where: { id, organizationId },
+		include: { items: { orderBy: { sortOrder: "asc" } } },
+	});
+
+	if (!original) {
+		throw new Error("الفاتورة غير موجودة");
+	}
+
+	const invoiceNo = await generateInvoiceNumber(organizationId);
+	const today = new Date();
+	const dueDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+	return db.financeInvoice.create({
+		data: {
+			organizationId,
+			createdById,
+			invoiceNo,
+			invoiceType: original.invoiceType === "CREDIT_NOTE" || original.invoiceType === "DEBIT_NOTE"
+				? "STANDARD"
+				: original.invoiceType,
+			clientId: original.clientId,
+			clientName: original.clientName,
+			clientCompany: original.clientCompany,
+			clientPhone: original.clientPhone,
+			clientEmail: original.clientEmail,
+			clientAddress: original.clientAddress,
+			clientTaxNumber: original.clientTaxNumber,
+			projectId: original.projectId,
+			status: "DRAFT",
+			issueDate: today,
+			dueDate,
+			paymentTerms: original.paymentTerms,
+			notes: original.notes,
+			templateId: original.templateId,
+			subtotal: original.subtotal,
+			discountPercent: original.discountPercent,
+			discountAmount: original.discountAmount,
+			vatPercent: original.vatPercent,
+			vatAmount: original.vatAmount,
+			totalAmount: original.totalAmount,
+			paidAmount: 0,
+			items: {
+				create: original.items.map((item) => ({
+					description: item.description,
+					quantity: item.quantity,
+					unit: item.unit,
+					unitPrice: item.unitPrice,
+					totalPrice: item.totalPrice,
+					sortOrder: item.sortOrder,
+				})),
+			},
+		},
+		include: { items: true },
+	});
+}
+
+/**
+ * Create a credit note linked to an original invoice
+ */
+export async function createCreditNote(data: {
+	organizationId: string;
+	createdById: string;
+	originalInvoiceId: string;
+	reason: string;
+	items: Array<{
+		description: string;
+		quantity: number;
+		unit?: string;
+		unitPrice: number;
+	}>;
+	qrCode?: string;
+	zatcaUuid?: string;
+	sellerName?: string;
+	sellerTaxNumber?: string;
+	sellerAddress?: string;
+	sellerPhone?: string;
+}) {
+	const original = await db.financeInvoice.findFirst({
+		where: { id: data.originalInvoiceId, organizationId: data.organizationId },
+		select: {
+			id: true, status: true, clientId: true, clientName: true,
+			clientCompany: true, clientPhone: true, clientEmail: true,
+			clientAddress: true, clientTaxNumber: true, projectId: true,
+			vatPercent: true, discountPercent: true,
+		},
+	});
+
+	if (!original) {
+		throw new Error("الفاتورة الأصلية غير موجودة");
+	}
+
+	if (original.status === "DRAFT" || original.status === "CANCELLED") {
+		throw new Error("لا يمكن إنشاء إشعار دائن لفاتورة مسودة أو ملغية");
+	}
+
+	const invoiceNo = await generateInvoiceNumber(data.organizationId);
+	const totals = calculateInvoiceTotals(data.items, original.discountPercent, original.vatPercent);
+
+	const itemsData = data.items.map((item, index) => ({
+		description: item.description,
+		quantity: item.quantity,
+		unit: item.unit,
+		unitPrice: item.unitPrice,
+		totalPrice: totals.itemTotals[index],
+		sortOrder: index,
+	}));
+
+	return db.financeInvoice.create({
+		data: {
+			organizationId: data.organizationId,
+			createdById: data.createdById,
+			invoiceNo,
+			invoiceType: "CREDIT_NOTE",
+			relatedInvoiceId: data.originalInvoiceId,
+			clientId: original.clientId,
+			clientName: original.clientName,
+			clientCompany: original.clientCompany,
+			clientPhone: original.clientPhone,
+			clientEmail: original.clientEmail,
+			clientAddress: original.clientAddress,
+			clientTaxNumber: original.clientTaxNumber,
+			projectId: original.projectId,
+			status: "ISSUED",
+			issuedAt: new Date(),
+			issueDate: new Date(),
+			dueDate: new Date(),
+			paymentTerms: null,
+			notes: data.reason,
+			subtotal: totals.subtotal,
+			discountPercent: original.discountPercent,
+			discountAmount: totals.discountAmount,
+			vatPercent: original.vatPercent,
+			vatAmount: totals.vatAmount,
+			totalAmount: totals.totalAmount,
+			paidAmount: 0,
+			sellerName: data.sellerName,
+			sellerTaxNumber: data.sellerTaxNumber,
+			sellerAddress: data.sellerAddress,
+			sellerPhone: data.sellerPhone,
+			qrCode: data.qrCode,
+			zatcaUuid: data.zatcaUuid,
+			items: {
+				create: itemsData,
+			},
+		},
+		include: { items: true },
+	});
+}
+
+/**
  * Delete an invoice
  */
 export async function deleteInvoice(id: string, organizationId: string) {
@@ -1353,8 +1625,8 @@ export async function deleteInvoice(id: string, organizationId: string) {
 		throw new Error("Invoice not found");
 	}
 
-	if (existing.status === "PAID" || existing.status === "PARTIALLY_PAID") {
-		throw new Error("Cannot delete an invoice with payments");
+	if (existing.status !== "DRAFT") {
+		throw new Error("لا يمكن حذف فاتورة تم إصدارها. يمكنك فقط حذف الفواتير في حالة مسودة.");
 	}
 
 	return db.financeInvoice.delete({ where: { id } });

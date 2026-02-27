@@ -23,6 +23,8 @@ export * from "./integrations";
 export * from "./shares";
 // Phase 10
 export * from "./project-timeline";
+// Phase 13 - Execution Module
+export * from "./project-execution";
 // Phase 11
 export * from "./project-change-orders";
 // Phase 12
