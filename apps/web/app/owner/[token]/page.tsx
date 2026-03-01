@@ -125,10 +125,10 @@ export default function OwnerPortalSummary() {
 						{t("ownerPortal.progress")}
 					</h3>
 					<span className="text-2xl font-bold text-teal-600 dark:text-teal-400">
-						{Math.round(Number(project.progress))}%
+						{Math.round(Number(Number(project.progress)))}%
 					</span>
 				</div>
-				<Progress value={Number(project.progress)} className="h-3" />
+				<Progress value={Number(Number(project.progress))} className="h-3" />
 			</div>
 
 			{/* KPI Cards */}
@@ -143,7 +143,7 @@ export default function OwnerPortalSummary() {
 								{t("ownerPortal.progress")}
 							</p>
 							<p className="text-xl font-semibold text-teal-700 dark:text-teal-300">
-								{Math.round(project.progress)}%
+								{Math.round(Number(project.progress))}%
 							</p>
 						</div>
 					</div>
