@@ -1,23 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { useTranslations } from "next-intl";
-import { Button } from "@ui/components/button";
-import { Plus } from "lucide-react";
+// Header actions for templates page
+// The "Add Template" button was removed because the new flow
+// starts from the preset gallery's "Customize" buttons.
 
 interface TemplatesHeaderActionsProps {
 	organizationSlug: string;
 }
 
-export function TemplatesHeaderActions({ organizationSlug }: TemplatesHeaderActionsProps) {
-	const t = useTranslations();
-
-	return (
-		<Button asChild className="rounded-xl">
-			<Link href={`/app/${organizationSlug}/finance/templates/new`}>
-				<Plus className="h-4 w-4 me-2" />
-				{t("finance.templates.addTemplate")}
-			</Link>
-		</Button>
-	);
+export function TemplatesHeaderActions(_props: TemplatesHeaderActionsProps) {
+	return null;
 }

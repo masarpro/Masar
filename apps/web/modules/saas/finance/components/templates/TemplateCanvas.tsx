@@ -19,6 +19,7 @@ import {
 	CreditCardIcon,
 	GalleryHorizontalEndIcon,
 	LandmarkIcon,
+	ClipboardListIcon,
 	GripVerticalIcon,
 	ChevronUpIcon,
 	ChevronDownIcon,
@@ -53,6 +54,7 @@ interface TemplateCanvasProps {
 
 const elementIcons: Record<ElementType, React.ComponentType<{ className?: string }>> = {
 	header: Building2Icon,
+	documentMeta: ClipboardListIcon,
 	clientInfo: FileTextIcon,
 	itemsTable: TableIcon,
 	totals: CalculatorIcon,

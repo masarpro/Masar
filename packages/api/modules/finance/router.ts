@@ -109,6 +109,8 @@ import {
 	updateOrgFinanceSettingsProcedure,
 } from "./procedures/org-finance-settings";
 
+import { createFinanceLogoUploadUrl } from "./procedures/create-finance-logo-upload-url";
+
 export const financeRouter = {
 	// Dashboard
 	dashboard: getFinanceDashboard,
@@ -237,5 +239,6 @@ export const financeRouter = {
 	settings: {
 		get: getOrgFinanceSettingsProcedure,
 		update: updateOrgFinanceSettingsProcedure,
+		createLogoUploadUrl: createFinanceLogoUploadUrl,
 	},
 };

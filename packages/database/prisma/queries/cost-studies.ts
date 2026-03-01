@@ -196,6 +196,7 @@ export async function duplicateCostStudy(
 				numberOfFloors: original.numberOfFloors,
 				hasBasement: original.hasBasement,
 				finishingLevel: original.finishingLevel,
+				buildingConfig: original.buildingConfig ?? undefined,
 				overheadPercent: original.overheadPercent,
 				profitPercent: original.profitPercent,
 				contingencyPercent: original.contingencyPercent,
@@ -238,10 +239,21 @@ export async function duplicateCostStudy(
 					subCategory: item.subCategory,
 					name: item.name,
 					description: item.description,
+					floorId: item.floorId,
+					floorName: item.floorName,
 					area: item.area,
+					length: item.length,
+					height: item.height,
+					width: item.width,
+					perimeter: item.perimeter,
+					quantity: item.quantity,
 					unit: item.unit,
-					wastagePercent: item.wastagePercent,
+					calculationMethod: item.calculationMethod,
+					calculationData: item.calculationData ?? undefined,
 					qualityLevel: item.qualityLevel,
+					brand: item.brand,
+					specifications: item.specifications,
+					wastagePercent: item.wastagePercent,
 					materialPrice: item.materialPrice,
 					laborPrice: item.laborPrice,
 					materialCost: item.materialCost,
@@ -457,10 +469,21 @@ export async function createFinishingItem(data: {
 	subCategory?: string;
 	name: string;
 	description?: string;
-	area: number;
+	floorId?: string;
+	floorName?: string;
+	area?: number;
+	length?: number;
+	height?: number;
+	width?: number;
+	perimeter?: number;
+	quantity?: number;
 	unit: string;
-	wastagePercent?: number;
+	calculationMethod?: string;
+	calculationData?: unknown;
 	qualityLevel?: string;
+	brand?: string;
+	specifications?: string;
+	wastagePercent?: number;
 	materialPrice?: number;
 	laborPrice?: number;
 	materialCost?: number;
@@ -474,10 +497,21 @@ export async function createFinishingItem(data: {
 			subCategory: data.subCategory,
 			name: data.name,
 			description: data.description,
+			floorId: data.floorId,
+			floorName: data.floorName,
 			area: data.area,
+			length: data.length,
+			height: data.height,
+			width: data.width,
+			perimeter: data.perimeter,
+			quantity: data.quantity,
 			unit: data.unit,
-			wastagePercent: data.wastagePercent ?? 8,
-			qualityLevel: data.qualityLevel ?? "medium",
+			calculationMethod: data.calculationMethod,
+			calculationData: data.calculationData as object,
+			qualityLevel: data.qualityLevel,
+			brand: data.brand,
+			specifications: data.specifications,
+			wastagePercent: data.wastagePercent ?? 0,
 			materialPrice: data.materialPrice ?? 0,
 			laborPrice: data.laborPrice ?? 0,
 			materialCost: data.materialCost ?? 0,
@@ -498,10 +532,21 @@ export async function createFinishingItemsBatch(
 		subCategory?: string;
 		name: string;
 		description?: string;
-		area: number;
+		floorId?: string;
+		floorName?: string;
+		area?: number;
+		length?: number;
+		height?: number;
+		width?: number;
+		perimeter?: number;
+		quantity?: number;
 		unit: string;
-		wastagePercent?: number;
+		calculationMethod?: string;
+		calculationData?: unknown;
 		qualityLevel?: string;
+		brand?: string;
+		specifications?: string;
+		wastagePercent?: number;
 		materialPrice?: number;
 		laborPrice?: number;
 		materialCost?: number;
@@ -516,10 +561,21 @@ export async function createFinishingItemsBatch(
 			subCategory: item.subCategory,
 			name: item.name,
 			description: item.description,
+			floorId: item.floorId,
+			floorName: item.floorName,
 			area: item.area,
+			length: item.length,
+			height: item.height,
+			width: item.width,
+			perimeter: item.perimeter,
+			quantity: item.quantity,
 			unit: item.unit,
-			wastagePercent: item.wastagePercent ?? 8,
-			qualityLevel: item.qualityLevel ?? "medium",
+			calculationMethod: item.calculationMethod,
+			calculationData: item.calculationData as object,
+			qualityLevel: item.qualityLevel,
+			brand: item.brand,
+			specifications: item.specifications,
+			wastagePercent: item.wastagePercent ?? 0,
 			materialPrice: item.materialPrice ?? 0,
 			laborPrice: item.laborPrice ?? 0,
 			materialCost: item.materialCost ?? 0,
@@ -531,12 +587,87 @@ export async function createFinishingItemsBatch(
 	await recalculateCostStudyTotals(costStudyId);
 }
 
+export async function updateFinishingItem(
+	id: string,
+	costStudyId: string,
+	data: Partial<{
+		category: string;
+		subCategory: string;
+		name: string;
+		description: string;
+		floorId: string;
+		floorName: string;
+		area: number;
+		length: number;
+		height: number;
+		width: number;
+		perimeter: number;
+		quantity: number;
+		unit: string;
+		calculationMethod: string;
+		calculationData: unknown;
+		qualityLevel: string;
+		brand: string;
+		specifications: string;
+		wastagePercent: number;
+		materialPrice: number;
+		laborPrice: number;
+		materialCost: number;
+		laborCost: number;
+		totalCost: number;
+		sortOrder: number;
+	}>,
+) {
+	const item = await db.finishingItem.update({
+		where: { id },
+		data: data as object,
+	});
+
+	await recalculateCostStudyTotals(costStudyId);
+
+	return item;
+}
+
 export async function deleteFinishingItem(id: string, costStudyId: string) {
 	await db.finishingItem.delete({
 		where: { id },
 	});
 
 	await recalculateCostStudyTotals(costStudyId);
+}
+
+export async function reorderFinishingItems(
+	costStudyId: string,
+	items: Array<{ id: string; sortOrder: number }>,
+) {
+	await db.$transaction(
+		items.map((item) =>
+			db.finishingItem.update({
+				where: { id: item.id },
+				data: { sortOrder: item.sortOrder },
+			}),
+		),
+	);
+}
+
+export async function updateBuildingConfig(
+	id: string,
+	organizationId: string,
+	buildingConfig: unknown,
+) {
+	const existing = await db.costStudy.findFirst({
+		where: { id, organizationId },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("Cost study not found");
+	}
+
+	return db.costStudy.update({
+		where: { id },
+		data: { buildingConfig: buildingConfig as object },
+	});
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

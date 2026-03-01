@@ -95,7 +95,7 @@ export function InvoicePreview({
 
 			{/* ─── A4 Invoice Document ─────────────────────────── */}
 			<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] max-w-[210mm] mx-auto print:shadow-none print:rounded-none print:border-none print:max-w-none print:bg-white">
-				<div className="min-h-[297mm] print:text-black">
+				<div className="min-h-[297mm] print:min-h-0 print:text-black">
 					<InvoiceDocument
 						invoice={invoice}
 						options={{

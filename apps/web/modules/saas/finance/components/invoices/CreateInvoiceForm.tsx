@@ -311,10 +311,10 @@ export function CreateInvoiceForm({
 		}
 	}, [invoice]);
 
-	// Fetch templates for invoices
+	// Fetch all templates (all types available for invoices)
 	const { data: templatesData } = useQuery(
 		orpc.finance.templates.list.queryOptions({
-			input: { organizationId, templateType: "INVOICE" },
+			input: { organizationId },
 		}),
 	);
 	const templates = templatesData?.templates ?? [];

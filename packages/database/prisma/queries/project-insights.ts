@@ -115,7 +115,7 @@ export async function computeProjectAlerts(
 			: 0;
 		const contractValue = Number(project.contractValue);
 		const expenseRatio = totalExpenses / contractValue;
-		const progressRatio = project.progress / 100;
+		const progressRatio = Number(project.progress) / 100;
 
 		// Risk: expenses > 80% while progress < 70%
 		if (expenseRatio > 0.8 && progressRatio < 0.7) {

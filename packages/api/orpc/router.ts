@@ -32,6 +32,7 @@ import { companyRouter } from "../modules/company/router";
 import { projectExecutionRouter } from "../modules/project-execution/router";
 import { pricingRouter } from "../modules/pricing/router";
 import { rolesRouter } from "../modules/roles/router";
+import { superAdminRouter } from "../modules/super-admin/router";
 import { usersRouter } from "../modules/users/router";
 import { publicProcedure } from "./procedures";
 
@@ -82,6 +83,8 @@ export const router = publicProcedure.router({
 	company: companyRouter,
 	// Phase 13 - Execution Module
 	projectExecution: projectExecutionRouter,
+	// Super Admin Panel
+	superAdmin: superAdminRouter,
 });
 
 export type ApiRouterClient = RouterClient<typeof router>;

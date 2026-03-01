@@ -99,7 +99,7 @@ export const generateWeeklyReportProcedure = protectedProcedure
 		}
 
 		// Calculate progress (simplified - would need actual progress tracking)
-		const progress = project.progress || 0;
+		const progress = Number(project.progress) || 0;
 
 		// Generate PDF
 		const pdfBuffer = await generateWeeklyReportPDF(

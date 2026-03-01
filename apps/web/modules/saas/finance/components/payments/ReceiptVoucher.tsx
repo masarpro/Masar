@@ -138,8 +138,8 @@ export function ReceiptVoucher({
 			</div>
 
 			{/* Receipt Voucher */}
-			<div ref={printRef} className="print:m-0">
-				<Card className="rounded-2xl print:rounded-none print:shadow-none print:border-2 print:border-black max-w-2xl mx-auto">
+			<div ref={printRef} className="receipt-print-area print:m-0">
+				<Card className="rounded-2xl print:rounded-none print:shadow-none print:border-2 print:border-black max-w-[210mm] mx-auto">
 					<CardContent className="p-8">
 						{/* Header */}
 						<div className="text-center border-b-2 border-dashed border-slate-300 pb-6 mb-6">
@@ -252,11 +252,11 @@ export function ReceiptVoucher({
 					.print\\:hidden {
 						display: none !important;
 					}
-					div[ref="printRef"],
-					div[ref="printRef"] * {
+					.receipt-print-area,
+					.receipt-print-area * {
 						visibility: visible;
 					}
-					div[ref="printRef"] {
+					.receipt-print-area {
 						position: absolute;
 						left: 0;
 						top: 0;

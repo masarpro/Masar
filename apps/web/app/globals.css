@@ -71,8 +71,8 @@ input[cmdk-input] {
 @media print {
 	/* Page setup */
 	@page {
-		size: A4;
-		margin: 10mm;
+		size: A4 portrait;
+		margin: 15mm 10mm;
 	}
 
 	/* Hide non-printable elements */
@@ -181,11 +181,32 @@ input[cmdk-input] {
 		break-inside: avoid;
 	}
 
-	/* Footer always at bottom of last page */
-	.template-footer {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
+	/* Client info card — keep together */
+	.client-info-card {
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
+	/* Individual item rows — keep together */
+	.invoice-item-row {
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
+	/* QR + Signature — keep together */
+	.qr-signature-section {
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
+	/* Allow page break after items table */
+	.items-table-wrapper {
+		break-after: auto;
+	}
+
+	/* Preserve watermark colors in print */
+	[data-watermark] {
+		-webkit-print-color-adjust: exact !important;
+		print-color-adjust: exact !important;
 	}
 }

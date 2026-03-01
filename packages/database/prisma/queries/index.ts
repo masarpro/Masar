@@ -56,3 +56,7 @@ export * from "./expense-runs";
 export * from "./org-audit";
 // Atomic Sequences
 export * from "./sequences";
+// Super Admin
+export * from "./super-admin";
+// Plan Config
+export * from "./plan-config";

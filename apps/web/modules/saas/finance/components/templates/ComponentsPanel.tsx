@@ -17,11 +17,13 @@ import {
 	CreditCardIcon,
 	GalleryHorizontalEndIcon,
 	LandmarkIcon,
+	ClipboardListIcon,
 } from "lucide-react";
 import { cn } from "@ui/lib";
 
 export type ElementType =
 	| "header"
+	| "documentMeta"
 	| "clientInfo"
 	| "itemsTable"
 	| "totals"
@@ -45,6 +47,7 @@ interface ComponentDefinition {
 const components: ComponentDefinition[] = [
 	// Basic components
 	{ id: "header", icon: Building2Icon, category: "basic" },
+	{ id: "documentMeta", icon: ClipboardListIcon, category: "basic" },
 	{ id: "clientInfo", icon: FileTextIcon, category: "basic" },
 	{ id: "text", icon: TypeIcon, category: "basic" },
 	{ id: "itemsTable", icon: TableIcon, category: "basic" },

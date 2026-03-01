@@ -4,7 +4,15 @@ import { SettingsMenu } from "@saas/settings/components/SettingsMenu";
 import { PageHeader } from "@saas/shared/components/PageHeader";
 import { SidebarContentLayout } from "@saas/shared/components/SidebarContentLayout";
 import { Logo } from "@shared/components/Logo";
-import { Building2Icon, UsersIcon } from "lucide-react";
+import {
+	Building2Icon,
+	ClipboardListIcon,
+	CreditCardIcon,
+	DollarSignIcon,
+	LayoutDashboardIcon,
+	Settings2Icon,
+	UsersIcon,
+} from "lucide-react";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import type { PropsWithChildren } from "react";
@@ -41,6 +49,13 @@ export default async function AdminLayout({ children }: PropsWithChildren) {
 								title: t("admin.title"),
 								items: [
 									{
+										title: t("admin.menu.dashboard"),
+										href: "/app/admin",
+										icon: (
+											<LayoutDashboardIcon className="size-4 opacity-50" />
+										),
+									},
+									{
 										title: t("admin.menu.users"),
 										href: "/app/admin/users",
 										icon: (
@@ -60,6 +75,34 @@ export default async function AdminLayout({ children }: PropsWithChildren) {
 												},
 											]
 										: []),
+									{
+										title: t("admin.menu.plans"),
+										href: "/app/admin/plans",
+										icon: (
+											<Settings2Icon className="size-4 opacity-50" />
+										),
+									},
+									{
+										title: t("admin.menu.revenue"),
+										href: "/app/admin/revenue",
+										icon: (
+											<DollarSignIcon className="size-4 opacity-50" />
+										),
+									},
+									{
+										title: t("admin.menu.subscriptions"),
+										href: "/app/admin/subscriptions",
+										icon: (
+											<CreditCardIcon className="size-4 opacity-50" />
+										),
+									},
+									{
+										title: t("admin.menu.logs"),
+										href: "/app/admin/logs",
+										icon: (
+											<ClipboardListIcon className="size-4 opacity-50" />
+										),
+									},
 								],
 							},
 						]}

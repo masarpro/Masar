@@ -6,24 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { Button } from "@ui/components/button";
-import { Input } from "@ui/components/input";
-import { Label } from "@ui/components/label";
-import { Textarea } from "@ui/components/textarea";
 import { Card, CardContent } from "@ui/components/card";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@ui/components/select";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogFooter,
-} from "@ui/components/dialog";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -42,56 +25,34 @@ import {
 } from "@ui/components/dropdown-menu";
 import { toast } from "sonner";
 import {
-	Plus,
 	MoreVertical,
 	Pencil,
 	Trash2,
 	FileText,
 	Star,
-	StarOff,
 	Receipt,
 	FileSignature,
 	Palette,
-	Eye,
-	Shield,
+	Sparkles,
 } from "lucide-react";
 import { Badge } from "@ui/components/badge";
 import Link from "next/link";
 import { formatDate } from "../../lib/utils";
 import {
-	getQuotationElements,
-	getInvoiceElements,
-	DEFAULT_TEMPLATE_SETTINGS,
+	getAllPresetTemplates,
+	type DefaultTemplateConfig,
 } from "../../lib/default-templates";
+import { TemplateThumbnail } from "./TemplateThumbnail";
 
 interface TemplatesListProps {
 	organizationId: string;
 	organizationSlug: string;
 }
 
-interface TemplateFormData {
-	name: string;
-	description: string;
-	templateType: "QUOTATION" | "INVOICE" | "LETTER";
-}
-
-const emptyFormData: TemplateFormData = {
-	name: "",
-	description: "",
-	templateType: "QUOTATION",
-};
-
 const templateTypeIcons: Record<string, React.ReactNode> = {
-	QUOTATION: <FileSignature className="h-5 w-5" />,
-	INVOICE: <Receipt className="h-5 w-5" />,
-	LETTER: <FileText className="h-5 w-5" />,
-};
-
-// دالة مساعدة للحصول على العناصر الافتراضية حسب نوع القالب
-const getDefaultElements = (type: "QUOTATION" | "INVOICE" | "LETTER") => {
-	if (type === "QUOTATION") return getQuotationElements();
-	if (type === "INVOICE") return getInvoiceElements();
-	return []; // LETTER - بدون عناصر افتراضية
+	QUOTATION: <FileSignature className="h-4 w-4" />,
+	INVOICE: <Receipt className="h-4 w-4" />,
+	LETTER: <FileText className="h-4 w-4" />,
 };
 
 export function TemplatesList({
@@ -101,14 +62,10 @@ export function TemplatesList({
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 
-	// State
-	const [filterType, setFilterType] = useState<"ALL" | "QUOTATION" | "INVOICE" | "LETTER">("ALL");
-	const [dialogOpen, setDialogOpen] = useState(false);
-	const [editingTemplate, setEditingTemplate] = useState<{ id: string; templateType: string } | null>(null);
+	const [filterType, setFilterType] = useState<"ALL" | "QUOTATION" | "INVOICE">("ALL");
 	const [deleteTemplateId, setDeleteTemplateId] = useState<string | null>(null);
-	const [formData, setFormData] = useState<TemplateFormData>(emptyFormData);
 
-	// Fetch templates
+	// Fetch user's custom templates
 	const { data, isLoading } = useQuery(
 		orpc.finance.templates.list.queryOptions({
 			input: {
@@ -120,55 +77,8 @@ export function TemplatesList({
 
 	const templates = data?.templates ?? [];
 
-	// Create mutation
-	const createMutation = useMutation({
-		mutationFn: async () => {
-			return orpcClient.finance.templates.create({
-				organizationId,
-				name: formData.name,
-				description: formData.description || undefined,
-				templateType: formData.templateType,
-				content: { elements: getDefaultElements(formData.templateType) },
-				settings: DEFAULT_TEMPLATE_SETTINGS,
-			});
-		},
-		onSuccess: () => {
-			toast.success(t("finance.templates.createSuccess"));
-			setDialogOpen(false);
-			resetForm();
-			queryClient.invalidateQueries({
-				queryKey: ["finance", "templates"],
-			});
-		},
-		onError: (error: any) => {
-			toast.error(error.message || t("finance.templates.createError"));
-		},
-	});
-
-	// Update mutation
-	const updateMutation = useMutation({
-		mutationFn: async () => {
-			if (!editingTemplate) return;
-			return orpcClient.finance.templates.update({
-				organizationId,
-				id: editingTemplate.id,
-				name: formData.name,
-				description: formData.description || undefined,
-			});
-		},
-		onSuccess: () => {
-			toast.success(t("finance.templates.updateSuccess"));
-			setDialogOpen(false);
-			setEditingTemplate(null);
-			resetForm();
-			queryClient.invalidateQueries({
-				queryKey: ["finance", "templates"],
-			});
-		},
-		onError: (error: any) => {
-			toast.error(error.message || t("finance.templates.updateError"));
-		},
-	});
+	// Filter out system default templates to show only user-created ones
+	const customTemplates = templates.filter((t) => !t.isDefault);
 
 	// Set default mutation
 	const setDefaultMutation = useMutation({
@@ -209,61 +119,14 @@ export function TemplatesList({
 		},
 	});
 
-	// Seed default templates mutation
-	const seedMutation = useMutation({
-		mutationFn: async () => {
-			return orpcClient.finance.templates.seed({
-				organizationId,
-			});
-		},
-		onSuccess: () => {
-			toast.success(t("finance.templates.seedSuccess"));
-			queryClient.invalidateQueries({
-				queryKey: ["finance", "templates"],
-			});
-		},
-		onError: (error: any) => {
-			toast.error(error.message || t("finance.templates.seedError"));
-		},
-	});
+	// Get all preset templates (always show all presets regardless of filter)
+	const allPresets = getAllPresetTemplates();
 
-	const resetForm = () => {
-		setFormData(emptyFormData);
-	};
-
-	const handleOpenCreate = () => {
-		setEditingTemplate(null);
-		resetForm();
-		setDialogOpen(true);
-	};
-
-	const handleOpenEdit = (template: typeof templates[0]) => {
-		setEditingTemplate({ id: template.id, templateType: template.templateType });
-		setFormData({
-			name: template.name,
-			description: template.description ?? "",
-			templateType: template.templateType as TemplateFormData["templateType"],
-		});
-		setDialogOpen(true);
-	};
-
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!formData.name.trim()) {
-			toast.error(t("finance.templates.errors.nameRequired"));
-			return;
-		}
-
-		if (editingTemplate) {
-			updateMutation.mutate();
-		} else {
-			createMutation.mutate();
-		}
-	};
+	const basePath = `/app/${organizationSlug}/finance`;
 
 	return (
-		<div className="space-y-6">
-			{/* Filters */}
+		<div className="space-y-8">
+			{/* Type Filter */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-4">
 					<div className="flex gap-2">
@@ -276,15 +139,6 @@ export function TemplatesList({
 							{t("common.all")}
 						</Button>
 						<Button
-							variant={filterType === "QUOTATION" ? "primary" : "outline"}
-							size="sm"
-							onClick={() => setFilterType("QUOTATION")}
-							className="rounded-xl"
-						>
-							<FileSignature className="h-4 w-4 me-2" />
-							{t("finance.templates.types.quotation")}
-						</Button>
-						<Button
 							variant={filterType === "INVOICE" ? "primary" : "outline"}
 							size="sm"
 							onClick={() => setFilterType("INVOICE")}
@@ -294,246 +148,176 @@ export function TemplatesList({
 							{t("finance.templates.types.invoice")}
 						</Button>
 						<Button
-							variant={filterType === "LETTER" ? "primary" : "outline"}
+							variant={filterType === "QUOTATION" ? "primary" : "outline"}
 							size="sm"
-							onClick={() => setFilterType("LETTER")}
+							onClick={() => setFilterType("QUOTATION")}
 							className="rounded-xl"
 						>
-							<FileText className="h-4 w-4 me-2" />
-							{t("finance.templates.types.letter")}
+							<FileSignature className="h-4 w-4 me-2" />
+							{t("finance.templates.types.quotation")}
 						</Button>
 					</div>
 				</CardContent>
 			</Card>
 
-			{/* Templates Grid */}
-			{isLoading ? (
-				<div className="flex items-center justify-center py-20">
-					<div className="relative">
-						<div className="w-12 h-12 border-4 border-primary/20 rounded-full" />
-						<div className="absolute top-0 left-0 w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-					</div>
+			{/* Section A: Preset Gallery */}
+			<div className="space-y-4">
+				<div className="flex items-center gap-2">
+					<Sparkles className="h-5 w-5 text-primary" />
+					<h2 className="text-lg font-semibold">
+						{t("finance.templates.presetGallery")}
+					</h2>
 				</div>
-			) : templates.length === 0 ? (
-				<div className="text-center py-20">
-					<FileText className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-					<p className="text-slate-500 dark:text-slate-400 mb-4">
-						{t("finance.templates.noTemplates")}
-					</p>
-					<Button
-						onClick={() => seedMutation.mutate()}
-						disabled={seedMutation.isPending}
-						className="rounded-xl"
-					>
-						{seedMutation.isPending ? (
-							<>
-								<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin me-2" />
-								{t("common.loading")}
-							</>
-						) : (
-							<>
-								<Plus className="h-4 w-4 me-2" />
-								{t("finance.templates.seedDefaultTemplates")}
-							</>
-						)}
-					</Button>
-				</div>
-			) : (
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{templates.map((template) => (
-						<Card
-							key={template.id}
-							className={`rounded-2xl transition-all ${
-								template.isDefault
-									? "border-2 border-primary"
-									: "hover:border-slate-300 dark:hover:border-slate-600"
-							}`}
-						>
-							<CardContent className="p-4">
-								<div className="flex items-start justify-between">
-									<Link
-										href={`/app/${organizationSlug}/finance/templates/${template.id}`}
-										className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-									>
-										<div
-											className={`p-2 rounded-xl ${
-												template.isDefault
-													? "bg-primary/10 text-primary"
-													: "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
-											}`}
-										>
-											{templateTypeIcons[template.templateType]}
-										</div>
-										<div>
-											<div className="flex items-center gap-2">
-												<h3 className="font-medium text-slate-900 dark:text-slate-100">
-													{template.name}
-												</h3>
-												{template.isDefault && (
-													<>
-														<Star className="h-4 w-4 text-amber-500 fill-amber-500" />
-														<Badge variant="outline" className="text-xs px-1.5 py-0">
-															<Shield className="h-3 w-3 me-1" />
-															{t("finance.templates.systemTemplate")}
-														</Badge>
-													</>
-												)}
-											</div>
-											<p className="text-xs text-slate-500 dark:text-slate-400">
-												{t(`finance.templates.types.${template.templateType.toLowerCase()}`)}
-											</p>
-										</div>
-									</Link>
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-												<MoreVertical className="h-4 w-4" />
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent align="end" className="rounded-xl">
-											{/* Default templates: only view/preview */}
-											{template.isDefault ? (
-												<DropdownMenuItem asChild>
-													<Link href={`/app/${organizationSlug}/finance/templates/${template.id}?preview=true`}>
-														<Eye className="h-4 w-4 me-2" />
-														{t("finance.actions.preview")}
-													</Link>
-												</DropdownMenuItem>
-											) : (
-												<>
-													<DropdownMenuItem asChild>
-														<Link href={`/app/${organizationSlug}/finance/templates/${template.id}`}>
-															<Palette className="h-4 w-4 me-2" />
-															{t("finance.templates.design")}
-														</Link>
-													</DropdownMenuItem>
-													<DropdownMenuItem onClick={() => handleOpenEdit(template)}>
-														<Pencil className="h-4 w-4 me-2" />
-														{t("common.edit")}
-													</DropdownMenuItem>
-													<DropdownMenuItem
-														onClick={() => setDefaultMutation.mutate(template.id)}
-														disabled={setDefaultMutation.isPending}
-													>
-														<Star className="h-4 w-4 me-2" />
-														{t("finance.templates.setAsDefault")}
-													</DropdownMenuItem>
-													<DropdownMenuItem
-														onClick={() => setDeleteTemplateId(template.id)}
-														className="text-red-600"
-													>
-														<Trash2 className="h-4 w-4 me-2" />
-														{t("common.delete")}
-													</DropdownMenuItem>
-												</>
-											)}
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</div>
-								{template.description && (
-									<p className="mt-3 text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
-										{template.description}
-									</p>
-								)}
-								<div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-									<p className="text-xs text-slate-400 dark:text-slate-500">
-										{t("finance.templates.createdAt")}: {formatDate(template.createdAt)}
-									</p>
-								</div>
-							</CardContent>
-						</Card>
+
+				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+					{allPresets.map((preset) => (
+						<PresetCard
+							key={preset.key}
+							preset={preset}
+							basePath={basePath}
+							t={t}
+						/>
 					))}
 				</div>
-			)}
+			</div>
 
-			{/* Create/Edit Dialog */}
-			<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-				<DialogContent className="sm:max-w-md rounded-2xl">
-					<DialogHeader>
-						<DialogTitle>
-							{editingTemplate
-								? t("finance.templates.editTemplate")
-								: t("finance.templates.addTemplate")}
-						</DialogTitle>
-					</DialogHeader>
-					<form onSubmit={handleSubmit} className="space-y-4">
-						<div>
-							<Label>{t("finance.templates.name")} *</Label>
-							<Input
-								value={formData.name}
-								onChange={(e) =>
-									setFormData({ ...formData, name: e.target.value })
-								}
-								placeholder={t("finance.templates.namePlaceholder")}
-								required
-								className="rounded-xl mt-1"
-							/>
+			{/* Section B: My Custom Templates */}
+			<div className="space-y-4">
+				<div className="flex items-center gap-2">
+					<Palette className="h-5 w-5 text-primary" />
+					<h2 className="text-lg font-semibold">
+						{t("finance.templates.myTemplates")}
+					</h2>
+				</div>
+
+				{isLoading ? (
+					<div className="flex items-center justify-center py-12">
+						<div className="relative">
+							<div className="w-10 h-10 border-4 border-primary/20 rounded-full" />
+							<div className="absolute top-0 left-0 w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
 						</div>
-						{!editingTemplate && (
-							<div>
-								<Label>{t("finance.templates.type")} *</Label>
-								<Select
-									value={formData.templateType}
-									onValueChange={(v) =>
-										setFormData({
-											...formData,
-											templateType: v as TemplateFormData["templateType"],
-										})
-									}
-								>
-									<SelectTrigger className="rounded-xl mt-1">
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent className="rounded-xl">
-										<SelectItem value="QUOTATION">
-											{t("finance.templates.types.quotation")}
-										</SelectItem>
-										<SelectItem value="INVOICE">
-											{t("finance.templates.types.invoice")}
-										</SelectItem>
-										<SelectItem value="LETTER">
-											{t("finance.templates.types.letter")}
-										</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-						)}
-						<div>
-							<Label>{t("finance.templates.description")}</Label>
-							<Textarea
-								value={formData.description}
-								onChange={(e) =>
-									setFormData({ ...formData, description: e.target.value })
-								}
-								placeholder={t("finance.templates.descriptionPlaceholder")}
-								rows={3}
-								className="rounded-xl mt-1"
-							/>
-						</div>
-						<DialogFooter>
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => setDialogOpen(false)}
-								className="rounded-xl"
+					</div>
+				) : customTemplates.length === 0 ? (
+					<Card className="rounded-2xl border-dashed">
+						<CardContent className="p-8 text-center">
+							<FileText className="h-10 w-10 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+							<p className="text-sm text-slate-500 dark:text-slate-400">
+								{t("finance.templates.noCustomTemplates")}
+							</p>
+						</CardContent>
+					</Card>
+				) : (
+					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+						{customTemplates.map((template) => (
+							<Card
+								key={template.id}
+								className="rounded-2xl group transition-all hover:border-slate-300 dark:hover:border-slate-600"
 							>
-								{t("common.cancel")}
-							</Button>
-							<Button
-								type="submit"
-								disabled={createMutation.isPending || updateMutation.isPending}
-								className="rounded-xl"
-							>
-								{createMutation.isPending || updateMutation.isPending
-									? t("common.saving")
-									: editingTemplate
-										? t("common.save")
-										: t("finance.templates.addTemplate")}
-							</Button>
-						</DialogFooter>
-					</form>
-				</DialogContent>
-			</Dialog>
+								<CardContent className="p-4">
+									{/* Thumbnail */}
+									<Link href={`${basePath}/templates/${template.id}`}>
+										<div
+											className="relative w-full bg-slate-50 dark:bg-slate-900 rounded-lg overflow-hidden mb-3 border"
+											style={{ aspectRatio: "210 / 297", maxHeight: "200px" }}
+										>
+											<TemplateThumbnail
+												elements={
+													(template.content as any)?.elements ?? []
+												}
+												settings={
+													(template.settings as any) ?? {
+														backgroundColor: "#ffffff",
+														primaryColor: "#3b82f6",
+														fontFamily: "Cairo",
+														fontSize: "14px",
+														lineHeight: "1.6",
+														pageSize: "A4",
+														orientation: "portrait",
+														margins: "20mm",
+														vatPercent: 15,
+														currency: "SAR",
+													}
+												}
+												templateType={
+													template.templateType as "QUOTATION" | "INVOICE"
+												}
+											/>
+										</div>
+									</Link>
+
+									{/* Info */}
+									<div className="flex items-start justify-between">
+										<div className="min-w-0 flex-1">
+											<h3 className="font-medium text-sm truncate">
+												{template.name}
+											</h3>
+											<div className="flex items-center gap-1.5 mt-1">
+												<Badge
+													variant="outline"
+													className="text-[10px] px-1.5 py-0"
+												>
+													{templateTypeIcons[template.templateType]}
+													<span className="ms-1">
+														{t(
+															`finance.templates.types.${template.templateType.toLowerCase()}`,
+														)}
+													</span>
+												</Badge>
+											</div>
+											<p className="text-xs text-muted-foreground mt-1.5">
+												{formatDate(template.createdAt)}
+											</p>
+										</div>
+
+										<DropdownMenu>
+											<DropdownMenuTrigger asChild>
+												<Button
+													variant="ghost"
+													size="sm"
+													className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+												>
+													<MoreVertical className="h-4 w-4" />
+												</Button>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent
+												align="end"
+												className="rounded-xl"
+											>
+												<DropdownMenuItem asChild>
+													<Link
+														href={`${basePath}/templates/${template.id}`}
+													>
+														<Pencil className="h-4 w-4 me-2" />
+														{t("common.edit")}
+													</Link>
+												</DropdownMenuItem>
+												<DropdownMenuItem
+													onClick={() =>
+														setDefaultMutation.mutate(template.id)
+													}
+													disabled={setDefaultMutation.isPending}
+												>
+													<Star className="h-4 w-4 me-2" />
+													{t("finance.templates.setAsDefault")}
+												</DropdownMenuItem>
+												<DropdownMenuItem
+													onClick={() =>
+														setDeleteTemplateId(template.id)
+													}
+													className="text-red-600"
+												>
+													<Trash2 className="h-4 w-4 me-2" />
+													{t("common.delete")}
+												</DropdownMenuItem>
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</div>
+								</CardContent>
+							</Card>
+						))}
+					</div>
+				)}
+			</div>
 
 			{/* Delete Confirmation */}
 			<AlertDialog
@@ -568,5 +352,57 @@ export function TemplatesList({
 				</AlertDialogContent>
 			</AlertDialog>
 		</div>
+	);
+}
+
+// Preset card sub-component
+function PresetCard({
+	preset,
+	basePath,
+	t,
+}: {
+	preset: DefaultTemplateConfig;
+	basePath: string;
+	t: ReturnType<typeof useTranslations>;
+}) {
+	return (
+		<Card className="rounded-2xl group transition-all hover:border-primary/50 hover:shadow-md">
+			<CardContent className="p-4">
+				{/* Thumbnail */}
+				<div
+					className="relative w-full bg-slate-50 dark:bg-slate-900 rounded-lg overflow-hidden mb-3 border"
+					style={{ aspectRatio: "210 / 297", maxHeight: "200px" }}
+				>
+					<TemplateThumbnail
+						elements={preset.elements}
+						settings={preset.settings}
+						templateType={preset.templateType}
+					/>
+				</div>
+
+				{/* Info */}
+				<div className="space-y-2">
+					<div className="flex items-start justify-between gap-2">
+						<div className="min-w-0">
+							<h3 className="font-medium text-sm">{preset.nameAr}</h3>
+							<p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+								{preset.descriptionAr}
+							</p>
+						</div>
+						<div
+							className="w-5 h-5 rounded-full shrink-0 border border-white shadow-sm"
+							style={{ backgroundColor: preset.settings.primaryColor }}
+						/>
+					</div>
+
+					<Button asChild size="sm" className="w-full rounded-xl mt-1">
+						<Link href={`${basePath}/templates/new?preset=${preset.key}`}>
+							<Palette className="h-4 w-4 me-2" />
+							{t("finance.templates.customize")}
+						</Link>
+					</Button>
+				</div>
+			</CardContent>
+		</Card>
 	);
 }

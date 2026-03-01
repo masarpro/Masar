@@ -4,6 +4,7 @@ import { webhookHandler as paymentsWebhookHandler } from "@repo/payments";
 import { getBaseUrl } from "@repo/utils";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { bodyLimit } from "hono/body-limit";
 import { logger as honoLogger } from "hono/logger";
 import { openApiHandler, rpcHandler } from "./orpc/handler";
 
@@ -11,6 +12,8 @@ export const app = new Hono()
 	.basePath("/api")
 	// Logger middleware
 	.use(honoLogger((message, ...rest) => logger.log(message, ...rest)))
+	// Body limit (10MB for base64 image payloads)
+	.use(bodyLimit({ maxSize: 10 * 1024 * 1024 }))
 	// Cors middleware
 	.use(
 		cors({

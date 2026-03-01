@@ -105,7 +105,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 
 	if (!asset) return null;
 
-	const formatCurrency = (amount: number | string | null | undefined) => {
+	const formatCurrency = (amount: number | string | null | undefined | unknown) => {
 		if (!amount) return "-";
 		return new Intl.NumberFormat("ar-SA").format(Number(amount)) + " ر.س";
 	};

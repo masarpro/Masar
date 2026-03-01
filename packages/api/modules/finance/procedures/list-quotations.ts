@@ -57,6 +57,7 @@ export const listQuotations = protectedProcedure
 				vatPercent: Number(q.vatPercent),
 				vatAmount: Number(q.vatAmount),
 				totalAmount: Number(q.totalAmount),
+				invoices: q.invoices,
 			})),
 			total: result.total,
 		};

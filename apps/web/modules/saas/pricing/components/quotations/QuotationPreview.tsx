@@ -175,7 +175,7 @@ export function QuotationPreview({
 			)}
 
 			{/* Preview Content using TemplateRenderer */}
-			<Card className="rounded-2xl max-w-4xl mx-auto print:shadow-none print:rounded-none print:border-none">
+			<Card className="rounded-2xl max-w-[210mm] min-h-[297mm] mx-auto print:shadow-none print:rounded-none print:border-none print:min-h-0 print:max-w-none">
 				<CardContent className="p-0 print:p-0">
 					<TemplateRenderer
 						data={quotationData}

@@ -3,6 +3,7 @@ import {
 	getPurchasesByUserId,
 } from "@repo/database";
 import { z } from "zod";
+import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
 
 export const listPurchases = protectedProcedure
@@ -21,6 +22,8 @@ export const listPurchases = protectedProcedure
 	)
 	.handler(async ({ input: { organizationId }, context: { user } }) => {
 		if (organizationId) {
+			await verifyOrganizationAccess(organizationId, user.id);
+
 			const purchases =
 				await getPurchasesByOrganizationId(organizationId);
 

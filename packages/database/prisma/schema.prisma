@@ -40,6 +40,53 @@ enum InvitationStatus {
 }
 
 // ═══════════════════════════════════════════════════════════
+// SUBSCRIPTION & BILLING - الاشتراكات والفوترة
+// ═══════════════════════════════════════════════════════════
+
+// حالة المنظمة
+enum OrgStatus {
+  ACTIVE       // يعمل بشكل طبيعي
+  TRIALING     // في فترة تجريبية
+  SUSPENDED    // موقوف (عدم دفع)
+  CANCELLED    // ملغي
+  PAST_DUE     // متأخر بالدفع
+}
+
+// نوع الخطة
+enum PlanType {
+  FREE         // مجاني
+  PRO          // احترافي
+}
+
+// حالة الاشتراك
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+  INCOMPLETE
+  PAUSED
+}
+
+// إعدادات الخطط
+model PlanConfig {
+  id             String    @id @default(cuid())
+  plan           PlanType  @unique
+  name           Json      // { en: string, ar: string }
+  maxUsers       Int
+  maxProjects    Int
+  maxStorageGB   Int
+  monthlyPrice   Int       @default(0)
+  yearlyPrice    Int       @default(0)
+  features       Json      // { en: string[], ar: string[] }
+  isActive       Boolean   @default(true)
+  updatedAt      DateTime  @updatedAt
+  createdAt      DateTime  @default(now())
+  @@map("plan_config")
+}
+
+// ═══════════════════════════════════════════════════════════
 // PROJECTS MODULE - إدارة المشاريع
 // ═══════════════════════════════════════════════════════════
 
@@ -643,6 +690,9 @@ model User {
   employeeOf           Organization? @relation("OrganizationEmployees", fields: [organizationId], references: [id])
   organizationId       String?
 
+  // Super Admin Actions
+  superAdminActions    SuperAdminLog[]    @relation("SuperAdminActions")
+
   // ═══ نهاية حقول مسار ═══
 
   @@unique([email])
@@ -812,9 +862,41 @@ model Organization {
   // Atomic Sequences - التسلسلات الذرية
   sequences            OrganizationSequence[]
 
+  // ═══ Subscription & Billing - الاشتراكات والفوترة ═══
+  status               OrgStatus          @default(TRIALING)
+  plan                 PlanType           @default(FREE)
+  planName             String?
+  stripeSubscriptionId String?            @unique
+  stripeProductId      String?
+  stripePriceId        String?
+  subscriptionStatus   SubscriptionStatus @default(TRIALING)
+  maxUsers             Int                @default(3)
+  maxProjects          Int                @default(2)
+  maxStorage           Int                @default(1)
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  trialEndsAt          DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  lastPaymentAt        DateTime?
+  lastPaymentAmount    Decimal?           @db.Decimal(15, 2)
+  billingEmail         String?
+
+  // ═══ Super Admin Override ═══
+  isFreeOverride       Boolean            @default(false)
+  overrideReason       String?
+  overrideBy           String?
+  overrideAt           DateTime?
+
+  // ═══ New Relations ═══
+  subscriptionEvents   SubscriptionEvent[]
+  superAdminLogs       SuperAdminLog[]     @relation("SuperAdminOrgTarget")
+
   // ═══ نهاية حقول مسار ═══
 
   @@unique([slug])
+  @@index([status])
+  @@index([plan])
+  @@index([subscriptionStatus])
   @@map("organization")
 }
 
@@ -938,6 +1020,48 @@ model Purchase {
   @@map("purchase")
 }
 
+// ═══════════════════════════════════════════════════════════
+// SUBSCRIPTION EVENTS - أحداث الاشتراكات
+// ═══════════════════════════════════════════════════════════
+
+model SubscriptionEvent {
+  id              String       @id @default(cuid())
+  organizationId  String       @map("organization_id")
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  eventType       String       @map("event_type")
+  stripeEventId   String       @unique @map("stripe_event_id")
+  data            Json         @db.JsonB
+  processedAt     DateTime     @default(now()) @map("processed_at")
+
+  @@index([organizationId])
+  @@index([eventType])
+  @@map("subscription_events")
+}
+
+// ═══════════════════════════════════════════════════════════
+// SUPER ADMIN LOG - سجل المشرف العام
+// ═══════════════════════════════════════════════════════════
+
+model SuperAdminLog {
+  id          String        @id @default(cuid())
+  adminId     String        @map("admin_id")
+  admin       User          @relation("SuperAdminActions", fields: [adminId], references: [id])
+  action      String
+  targetType  String        @map("target_type")
+  targetId    String        @map("target_id")
+  targetOrg   Organization? @relation("SuperAdminOrgTarget", fields: [targetOrgId], references: [id])
+  targetOrgId String?       @map("target_org_id")
+  details     Json?         @db.JsonB
+  ipAddress   String?       @map("ip_address")
+  createdAt   DateTime      @default(now()) @map("created_at")
+
+  @@index([adminId])
+  @@index([targetId])
+  @@index([targetOrgId])
+  @@index([createdAt])
+  @@map("super_admin_logs")
+}
+
 model AiChat {
   id             String        @id @default(cuid())
   organizationId String?
@@ -990,6 +1114,9 @@ model CostStudy {
   contingencyPercent Decimal @default(3) @map("contingency_percent") @db.Decimal(5, 2)
   vatIncluded        Boolean @default(true) @map("vat_included")
   totalCost          Decimal @default(0) @map("total_cost") @db.Decimal(15, 2)
+
+  // إعدادات المبنى للتشطيبات
+  buildingConfig Json? @db.JsonB @map("building_config")
 
   status String  @default("draft")
   notes  String? @db.Text
@@ -1048,28 +1175,49 @@ model FinishingItem {
   costStudyId String    @map("cost_study_id")
   costStudy   CostStudy @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
 
+  // التصنيف
   category       String
   subCategory    String?  @map("sub_category")
   name           String
   description    String?  @db.Text
 
-  area           Decimal  @default(0) @db.Decimal(15, 4)
-  unit           String
-  wastagePercent Decimal  @default(8) @map("wastage_percent") @db.Decimal(5, 2)
+  // ربط بالدور
+  floorId   String? @map("floor_id")
+  floorName String? @map("floor_name")
 
-  qualityLevel  String  @default("medium") @map("quality_level")
-  materialPrice Decimal @default(0) @map("material_price") @db.Decimal(15, 2)
-  laborPrice    Decimal @default(0) @map("labor_price") @db.Decimal(15, 2)
+  // القياسات
+  area      Decimal? @db.Decimal(15, 2)
+  length    Decimal? @db.Decimal(15, 2)
+  height    Decimal? @db.Decimal(15, 2)
+  width     Decimal? @db.Decimal(15, 2)
+  perimeter Decimal? @db.Decimal(15, 2)
+  quantity  Decimal? @db.Decimal(15, 2)
+  unit      String   @default("m2")
 
-  materialCost Decimal @default(0) @map("material_cost") @db.Decimal(15, 2)
-  laborCost    Decimal @default(0) @map("labor_cost") @db.Decimal(15, 2)
-  totalCost    Decimal @default(0) @map("total_cost") @db.Decimal(15, 2)
+  // الحساب الذكي
+  calculationMethod String? @map("calculation_method")
+  calculationData   Json?   @db.JsonB @map("calculation_data")
+
+  // الجودة والمواصفات
+  qualityLevel   String?  @map("quality_level")
+  brand          String?
+  specifications String?  @db.Text
+
+  // التكاليف
+  wastagePercent Decimal? @default(0) @map("wastage_percent") @db.Decimal(5, 2)
+  materialPrice  Decimal? @default(0) @map("material_price") @db.Decimal(15, 2)
+  laborPrice     Decimal? @default(0) @map("labor_price") @db.Decimal(15, 2)
+  materialCost   Decimal  @default(0) @map("material_cost") @db.Decimal(15, 2)
+  laborCost      Decimal  @default(0) @map("labor_cost") @db.Decimal(15, 2)
+  totalCost      Decimal  @default(0) @map("total_cost") @db.Decimal(15, 2)
 
   sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([costStudyId])
+  @@index([costStudyId, category])
+  @@index([costStudyId, floorId])
   @@map("finishing_items")
 }
 
@@ -1195,7 +1343,7 @@ model Project {
   contractValue   Decimal?       @map("contract_value") @db.Decimal(15, 2)
 
   // التقدم (0-100)
-  progress        Float          @default(0)
+  progress        Decimal        @default(0) @db.Decimal(5, 2)
 
   // الجدول الزمني
   startDate       DateTime?      @map("start_date")
@@ -1390,7 +1538,7 @@ model ProjectProgressUpdate {
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   // نسبة التقدم (0-100)
-  progress    Float
+  progress    Decimal  @db.Decimal(5, 2)
   phaseLabel  String?  @map("phase_label")  // تسمية المرحلة (اختياري)
   note        String?  @db.Text             // ملاحظة
 
@@ -1930,7 +2078,7 @@ model ProjectCalendar {
   name               String
   workDays           Json              @map("work_days")    // [0,1,2,3,4] = Sun-Thu
   holidays           Json              @default("[]")
-  defaultHoursPerDay Float             @default(8) @map("default_hours_per_day")
+  defaultHoursPerDay Decimal           @default(8) @map("default_hours_per_day") @db.Decimal(5, 2)
   isDefault          Boolean           @default(false) @map("is_default")
   createdAt          DateTime          @default(now()) @map("created_at")
   updatedAt          DateTime          @updatedAt @map("updated_at")
@@ -1957,9 +2105,9 @@ model ProjectActivity {
   actualStart     DateTime?        @map("actual_start") @db.Date
   actualEnd       DateTime?        @map("actual_end") @db.Date
   status          ActivityStatus   @default(NOT_STARTED)
-  progress        Float            @default(0)
+  progress        Decimal          @default(0) @db.Decimal(5, 2)
   isCritical      Boolean          @default(false) @map("is_critical")
-  weight          Float?
+  weight          Decimal?         @db.Decimal(5, 2)
   assigneeId      String?          @map("assignee_id")
   assignee        User?            @relation("ActivityAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
   calendarId      String?          @map("calendar_id")
@@ -2055,11 +2203,11 @@ model ProjectMilestone {
 
   // الحالة والتقدم
   status          MilestoneStatus @default(PLANNED)
-  progress        Float           @default(0) // 0-100
+  progress        Decimal         @default(0) @db.Decimal(5, 2) // 0-100
   isCritical      Boolean         @default(false) @map("is_critical")
 
   // Phase 13 - Execution Module
-  weight            Float?
+  weight            Decimal?      @db.Decimal(5, 2)
   color             String?
   progressMethod    ProgressMethod    @default(MANUAL) @map("progress_method")
   baselineStartDate DateTime?         @map("baseline_start_date") @db.Date

@@ -1,7 +1,9 @@
 "use client";
 
+import { Fragment } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { HeaderComponent } from "../components/HeaderComponent";
+import { DocumentMetaComponent } from "../components/DocumentMetaComponent";
 import { ClientInfoComponent } from "../components/ClientInfoComponent";
 import { ItemsTableComponent } from "../components/ItemsTableComponent";
 import { TotalsComponent } from "../components/TotalsComponent";
@@ -108,6 +110,14 @@ export interface OrganizationData {
 	thankYouMessage?: string;
 }
 
+export interface BankData {
+	bankName?: string | null;
+	accountName?: string | null;
+	iban?: string | null;
+	accountNumber?: string | null;
+	swiftCode?: string | null;
+}
+
 export interface TemplateConfig {
 	elements?: TemplateElement[];
 	settings?: {
@@ -118,6 +128,12 @@ export interface TemplateConfig {
 		fontSize?: string;
 		vatPercent?: number;
 		currency?: string;
+		logoSize?: number;
+		logoBackground?: boolean;
+		headerImage?: string;
+		footerImage?: string;
+		showWatermark?: boolean;
+		watermarkOpacity?: number;
 	};
 }
 
@@ -138,6 +154,8 @@ interface TemplateRendererProps {
 	className?: string;
 	// بيانات مخصصة للعناصر (مثل النص الحر)
 	customElementData?: CustomElementData;
+	// Bank accounts for bank selection
+	banks?: Array<{ id: string; name: string; bankName?: string | null; iban?: string | null; accountNumber?: string | null }>;
 	// Interactive mode props
 	interactive?: boolean;
 	selectedElementId?: string | null;
@@ -163,6 +181,7 @@ export function TemplateRenderer({
 	documentType,
 	className = "",
 	customElementData = {},
+	banks,
 	interactive = false,
 	selectedElementId = null,
 	onElementClick,
@@ -186,6 +205,12 @@ export function TemplateRenderer({
 	const fontFamily = settings.fontFamily || "inherit";
 	const currency = settings.currency || "SAR";
 	const vatPercent = settings.vatPercent || data.vatPercent || 15;
+	const logoSize = settings.logoSize ?? 64;
+	const logoBackground = false;
+	const headerImage = settings.headerImage;
+	const footerImage = settings.footerImage;
+	const showWatermark = settings.showWatermark;
+	const watermarkOpacity = settings.watermarkOpacity ?? 5;
 
 	// Determine document type
 	const docType = documentType || (isInvoice(data) ? "invoice" : "quotation");
@@ -263,14 +288,35 @@ export function TemplateRenderer({
 		warrantyTerms: !isInvoice(data) ? (data as QuotationData).warrantyTerms : undefined,
 	};
 
-	// Bank details
-	const bankDetails = {
-		bankName: locale === "ar" ? organization?.bankName : organization?.bankNameEn || organization?.bankName,
-		accountName: organization?.accountName,
-		iban: organization?.iban,
-		accountNumber: organization?.accountNumber,
-		swiftCode: organization?.swiftCode,
+	// Bank details — use selected bank if available, otherwise fall back to organization defaults
+	const getBankDetails = () => {
+		// Check if any bankDetails element has a selectedBankId
+		const bankElement = elements.find((el) => el.type === "bankDetails" && el.enabled);
+		const selectedBankId = bankElement?.settings?.selectedBankId as string | undefined;
+
+		if (selectedBankId && banks?.length) {
+			const selectedBank = banks.find((b) => b.id === selectedBankId);
+			if (selectedBank) {
+				return {
+					bankName: selectedBank.bankName || selectedBank.name || undefined,
+					accountName: selectedBank.name || undefined,
+					iban: selectedBank.iban || undefined,
+					accountNumber: selectedBank.accountNumber || undefined,
+					swiftCode: undefined,
+				};
+			}
+		}
+
+		return {
+			bankName: locale === "ar" ? organization?.bankName : organization?.bankNameEn || organization?.bankName,
+			accountName: organization?.accountName,
+			iban: organization?.iban,
+			accountNumber: organization?.accountNumber,
+			swiftCode: organization?.swiftCode,
+		};
 	};
+
+	const bankDetails = getBankDetails();
 
 	// Render individual element
 	const renderElement = (element: TemplateElement) => {
@@ -287,6 +333,21 @@ export function TemplateRenderer({
 						primaryColor={primaryColor}
 						secondaryColor={secondaryColor}
 						documentInfo={documentInfo}
+						logoSize={logoSize}
+						logoBackground={logoBackground}
+						qrCode={isInvoice(data) ? data.qrCode : null}
+					/>
+				);
+
+			case "documentMeta":
+				return (
+					<DocumentMetaComponent
+						key={element.id}
+						settings={elementSettings as any}
+						documentInfo={documentInfo}
+						primaryColor={primaryColor}
+						secondaryColor={secondaryColor}
+						documentType={docType}
 					/>
 				);
 
@@ -296,9 +357,11 @@ export function TemplateRenderer({
 						key={element.id}
 						settings={elementSettings as any}
 						clientInfo={clientInfo}
+						companyInfo={companyInfo}
 						documentInfo={documentInfo}
 						primaryColor={primaryColor}
 						secondaryColor={secondaryColor}
+						qrCode={isInvoice(data) ? data.qrCode : null}
 					/>
 				);
 
@@ -414,10 +477,9 @@ export function TemplateRenderer({
 							}}
 						>
 							{barFields.map((field, i) => (
-								<>
+								<Fragment key={field}>
 									{i > 0 && (
 										<div
-											key={`div-${field}`}
 											className="w-px self-stretch"
 											style={{
 												background:
@@ -426,13 +488,13 @@ export function TemplateRenderer({
 											}}
 										/>
 									)}
-									<div key={field}>
+									<div>
 										<span className="opacity-70">
 											{fieldLabels[field] || field}:
 										</span>{" "}
 										<strong>{fieldValues[field] || ""}</strong>
 									</div>
-								</>
+								</Fragment>
 							))}
 						</div>
 					);
@@ -535,9 +597,41 @@ export function TemplateRenderer({
 		);
 	};
 
+	// Group totals + qrCode side by side when adjacent
+	const renderGroupedElements = () => {
+		const result: React.ReactNode[] = [];
+		let i = 0;
+		while (i < defaultElements.length) {
+			const el = defaultElements[i];
+			const nextEl = i + 1 < defaultElements.length ? defaultElements[i + 1] : null;
+
+			// If totals followed by qrCode, render them side by side
+			// In RTL: first child goes to the right, so totals (flex-1) goes right, qrCode goes left
+			// We want: qrCode on the right, totals on the left → so in RTL flex: totals first, qrCode second
+			if (el.type === "totals" && nextEl?.type === "qrCode" && el.enabled && nextEl.enabled) {
+				result.push(
+					<div key={`group-${el.id}-${nextEl.id}`} className="flex items-start justify-between">
+						<div className="shrink-0 pt-4">
+							{renderInteractiveElement(nextEl)}
+						</div>
+						<div className="shrink-0 pt-4">
+							{renderInteractiveElement(el)}
+						</div>
+					</div>
+				);
+				i += 2;
+				continue;
+			}
+
+			result.push(renderInteractiveElement(el));
+			i++;
+		}
+		return result;
+	};
+
 	return (
 		<div
-			className={`p-8 ${className}`}
+			className={`relative ${className}`}
 			style={{
 				backgroundColor,
 				fontFamily,
@@ -545,23 +639,51 @@ export function TemplateRenderer({
 			dir={locale === "ar" ? "rtl" : "ltr"}
 			onClick={() => interactive && onElementClick?.(null)}
 		>
-			{defaultElements.map(renderInteractiveElement)}
+			{/* Header Image (full-bleed) */}
+			{headerImage && (
+				<img src={headerImage} alt="" className="w-full block" />
+			)}
 
-			{/* Notes section (if present) */}
-			{data.notes && (
-				<div className="mt-4 pt-4 border-t border-slate-200">
-					<h4 className="text-sm font-medium text-slate-700 mb-2">
-						{t("finance.quotations.notes")}:
-					</h4>
-					<p className="text-sm text-slate-600 whitespace-pre-line">{data.notes}</p>
+			{/* Watermark overlay */}
+			{showWatermark && organization?.logo && (
+				<div
+					className="absolute inset-0 flex items-center justify-center pointer-events-none"
+					data-watermark
+				>
+					<img
+						src={organization.logo}
+						alt=""
+						className="w-64 h-64 object-contain"
+						style={{ opacity: watermarkOpacity / 100 }}
+					/>
 				</div>
 			)}
 
-			{/* Thank you message */}
-			{organization?.thankYouMessage && (
-				<div className="mt-6 text-center">
-					<p className="text-sm text-slate-600">{organization.thankYouMessage}</p>
-				</div>
+			{/* Content */}
+			<div className={`px-14 ${headerImage ? "pt-4" : "pt-10"} ${footerImage ? "pb-4" : "pb-10"}`}>
+				{renderGroupedElements()}
+
+				{/* Notes section (if present) */}
+				{data.notes && (
+					<div className="mt-4 pt-4 border-t border-slate-200">
+						<h4 className="text-sm font-medium text-slate-700 mb-2">
+							{t("finance.quotations.notes")}:
+						</h4>
+						<p className="text-sm text-slate-600 whitespace-pre-line">{data.notes}</p>
+					</div>
+				)}
+
+				{/* Thank you message */}
+				{organization?.thankYouMessage && (
+					<div className="mt-6 text-center">
+						<p className="text-sm text-slate-600">{organization.thankYouMessage}</p>
+					</div>
+				)}
+			</div>
+
+			{/* Footer Image (full-bleed) */}
+			{footerImage && (
+				<img src={footerImage} alt="" className="w-full block" />
 			)}
 		</div>
 	);

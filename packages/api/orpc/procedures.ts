@@ -43,3 +43,13 @@ export const adminProcedure = protectedProcedure.use(
 		return await next();
 	},
 );
+
+export const subscriptionProcedure = protectedProcedure.use(
+	async ({ context, next }) => {
+		const { checkSubscription } = await import(
+			"./middleware/subscription-middleware"
+		);
+		await checkSubscription(context);
+		return await next();
+	},
+);

@@ -3,26 +3,22 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, FileText } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { formatCurrency, formatNumber } from "../../lib/utils";
+import { useState } from "react";
+import { getGroupedCategories } from "../../lib/finishing-categories";
+import type { BuildingConfig } from "../../lib/finishing-types";
+import { BuildingConfigPanel } from "./finishing/BuildingConfigPanel";
+import { FinishingGroupSection } from "./finishing/FinishingGroupSection";
+import { FinishingSummary } from "./finishing/FinishingSummary";
+import { QuickAddTemplates } from "./finishing/QuickAddTemplates";
 
 interface FinishingItemsEditorProps {
 	organizationId: string;
 	organizationSlug: string;
 	studyId: string;
 }
-
-const FINISHING_CATEGORIES = [
-	{ key: "plastering", icon: "🏗️" },
-	{ key: "painting", icon: "🎨" },
-	{ key: "flooring", icon: "🪨" },
-	{ key: "ceilings", icon: "⬆️" },
-	{ key: "doors", icon: "🚪" },
-	{ key: "windows", icon: "🪟" },
-];
 
 export function FinishingItemsEditor({
 	organizationId,
@@ -31,6 +27,7 @@ export function FinishingItemsEditor({
 }: FinishingItemsEditorProps) {
 	const t = useTranslations();
 	const basePath = `/app/${organizationSlug}/pricing/studies/${studyId}`;
+	const [templatesOpen, setTemplatesOpen] = useState(false);
 
 	const { data: study, isLoading } = useQuery(
 		orpc.pricing.studies.getById.queryOptions({
@@ -57,129 +54,80 @@ export function FinishingItemsEditor({
 		);
 	}
 
-	// Group items by category
-	const itemsByCategory = FINISHING_CATEGORIES.map((cat) => ({
-		...cat,
-		items: study.finishingItems.filter((item) => item.category === cat.key),
-		totalCost: study.finishingItems
-			.filter((item) => item.category === cat.key)
-			.reduce((sum, item) => sum + item.totalCost, 0),
-		totalArea: study.finishingItems
-			.filter((item) => item.category === cat.key)
-			.reduce((sum, item) => sum + item.area, 0),
+	const buildingConfig = study.buildingConfig as BuildingConfig | null;
+	const finishingItems = study.finishingItems.map((item) => ({
+		...item,
+		area: item.area != null ? Number(item.area) : null,
+		quantity: item.quantity != null ? Number(item.quantity) : null,
+		length: item.length != null ? Number(item.length) : null,
+		totalCost: Number(item.totalCost),
+		wastagePercent: item.wastagePercent != null ? Number(item.wastagePercent) : null,
+		materialPrice: item.materialPrice != null ? Number(item.materialPrice) : null,
+		laborPrice: item.laborPrice != null ? Number(item.laborPrice) : null,
+		calculationData: item.calculationData as Record<string, unknown> | null,
 	}));
+	const groupedCategories = getGroupedCategories();
 
 	return (
 		<div className="space-y-6">
+			{/* Header */}
 			<div className="flex items-center gap-4">
 				<Button variant="ghost" size="icon" asChild>
 					<Link href={basePath}>
 						<ArrowLeft className="h-4 w-4" />
 					</Link>
 				</Button>
+				<h1 className="text-xl font-bold">
+					{t("pricing.studies.finishing.title")}
+				</h1>
 			</div>
+
+			{/* Building Config */}
+			<BuildingConfigPanel
+				organizationId={organizationId}
+				studyId={studyId}
+				initialConfig={buildingConfig}
+			/>
 
 			{/* Summary */}
-			<Card>
-				<CardContent className="pt-6">
-					<div className="grid gap-4 sm:grid-cols-3">
-						<div>
-							<p className="text-sm text-muted-foreground">
-								{t("pricing.studies.totalItems")}
-							</p>
-							<p className="text-2xl font-bold">
-								{study.finishingItems.length}
-							</p>
-						</div>
-						<div>
-							<p className="text-sm text-muted-foreground">
-								{t("pricing.studies.totalArea")}
-							</p>
-							<p className="text-2xl font-bold">
-								{formatNumber(
-									study.finishingItems.reduce(
-										(sum, item) => sum + item.area,
-										0
-									)
-								)}{" "}
-								م²
-							</p>
-						</div>
-						<div>
-							<p className="text-sm text-muted-foreground">
-								{t("pricing.studies.totalCost")}
-							</p>
-							<p className="text-2xl font-bold">
-								{formatCurrency(study.finishingCost)}
-							</p>
-						</div>
-					</div>
-				</CardContent>
-			</Card>
+			<FinishingSummary
+				totalItems={finishingItems.length}
+				totalCost={Number(study.finishingCost)}
+			/>
 
-			{/* Categories */}
-			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-				{itemsByCategory.map((category) => (
-					<Card key={category.key}>
-						<CardHeader className="pb-2">
-							<CardTitle className="flex items-center justify-between text-base">
-								<span className="flex items-center gap-2">
-									<span>{category.icon}</span>
-									{t(`pricing.studies.finishing.${category.key}`)}
-								</span>
-								<Button variant="ghost" size="icon" className="h-8 w-8">
-									<Plus className="h-4 w-4" />
-								</Button>
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<div className="space-y-2">
-								<div className="flex justify-between text-sm">
-									<span className="text-muted-foreground">
-										{t("pricing.studies.items")}
-									</span>
-									<span>{category.items.length}</span>
-								</div>
-								<div className="flex justify-between text-sm">
-									<span className="text-muted-foreground">
-										{t("pricing.studies.area")}
-									</span>
-									<span>{formatNumber(category.totalArea)} م²</span>
-								</div>
-								<div className="flex justify-between text-sm">
-									<span className="text-muted-foreground">
-										{t("pricing.studies.totalCost")}
-									</span>
-									<span className="font-medium">
-										{formatCurrency(category.totalCost)}
-									</span>
-								</div>
-							</div>
+			{/* Quick Templates */}
+			<Button
+				variant="outline"
+				onClick={() => setTemplatesOpen(true)}
+				className="w-full sm:w-auto"
+			>
+				<FileText className="h-4 w-4 me-2" />
+				{t("pricing.studies.finishing.quickTemplates")}
+			</Button>
 
-							{category.items.length > 0 && (
-								<div className="mt-4 space-y-2 border-t pt-4">
-									{category.items.slice(0, 3).map((item) => (
-										<div
-											key={item.id}
-											className="flex justify-between text-sm"
-										>
-											<span className="truncate max-w-[60%]">
-												{item.name}
-											</span>
-											<span>{formatCurrency(item.totalCost)}</span>
-										</div>
-									))}
-									{category.items.length > 3 && (
-										<p className="text-xs text-muted-foreground">
-											+{category.items.length - 3} {t("pricing.studies.more")}
-										</p>
-									)}
-								</div>
-							)}
-						</CardContent>
-					</Card>
+			{/* Groups */}
+			<div className="space-y-8">
+				{groupedCategories.map(({ group, categories }) => (
+					<FinishingGroupSection
+						key={group.id}
+						group={group}
+						categories={categories}
+						items={finishingItems}
+						organizationId={organizationId}
+						studyId={studyId}
+						buildingConfig={buildingConfig}
+					/>
 				))}
 			</div>
+
+			{/* Quick Templates Dialog */}
+			<QuickAddTemplates
+				open={templatesOpen}
+				onOpenChange={setTemplatesOpen}
+				organizationId={organizationId}
+				studyId={studyId}
+				buildingConfig={buildingConfig}
+			/>
 		</div>
 	);
 }

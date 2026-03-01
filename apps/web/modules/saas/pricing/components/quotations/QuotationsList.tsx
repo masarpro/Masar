@@ -158,10 +158,22 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 										<Currency amount={quotation.totalAmount} />
 									</TableCell>
 									<TableCell>
-										<StatusBadge
-											status={quotation.status}
-											type="quotation"
-										/>
+										<div className="flex flex-col gap-1">
+											<StatusBadge
+												status={quotation.status}
+												type="quotation"
+											/>
+											{/* Show linked invoice for converted quotations */}
+											{quotation.status === "CONVERTED" && (quotation as any).invoices?.[0] && (
+												<Link
+													href={`/app/${organizationSlug}/finance/invoices/${(quotation as any).invoices[0].id}`}
+													className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+												>
+													<FileText className="h-3 w-3" />
+													{(quotation as any).invoices[0].invoiceNo}
+												</Link>
+											)}
+										</div>
 									</TableCell>
 									<TableCell>
 										<DropdownMenu>
@@ -183,18 +195,16 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 														{t("finance.actions.edit")}
 													</Link>
 												</DropdownMenuItem>
-												{quotation.status === "DRAFT" && (
-													<DropdownMenuItem>
-														<Send className="h-4 w-4 me-2" />
-														{t("finance.actions.send")}
-													</DropdownMenuItem>
-												)}
-												{(quotation.status === "ACCEPTED" || quotation.status === "SENT") && (
-													<DropdownMenuItem>
+												<DropdownMenuItem>
+													<Send className="h-4 w-4 me-2" />
+													{t("finance.actions.send")}
+												</DropdownMenuItem>
+												<DropdownMenuItem asChild>
+													<Link href={`/app/${organizationSlug}/finance/invoices/new?quotationId=${quotation.id}`}>
 														<ArrowRightLeft className="h-4 w-4 me-2" />
 														{t("finance.actions.convertToInvoice")}
-													</DropdownMenuItem>
-												)}
+													</Link>
+												</DropdownMenuItem>
 												<DropdownMenuSeparator />
 												<DropdownMenuItem className="text-destructive">
 													<Trash2 className="h-4 w-4 me-2" />

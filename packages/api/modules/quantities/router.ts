@@ -9,6 +9,10 @@ import { structuralItemCreate } from "./procedures/structural-item-create";
 import { structuralItemUpdate } from "./procedures/structural-item-update";
 import { structuralItemDelete } from "./procedures/structural-item-delete";
 import { finishingItemCreate, finishingItemCreateBatch } from "./procedures/finishing-item-create";
+import { finishingItemUpdate } from "./procedures/finishing-item-update";
+import { finishingItemDelete } from "./procedures/finishing-item-delete";
+import { finishingItemReorder } from "./procedures/finishing-item-reorder";
+import { buildingConfigUpdate } from "./procedures/building-config-update";
 import { mepItemCreate, mepItemCreateBatch } from "./procedures/mep-item-create";
 import { quoteCreate, quoteGetById, quoteUpdate, quoteDelete, quoteList } from "./procedures/quote-create";
 
@@ -28,6 +32,12 @@ export const quantitiesRouter = {
 	finishingItem: {
 		create: finishingItemCreate,
 		createBatch: finishingItemCreateBatch,
+		update: finishingItemUpdate,
+		delete: finishingItemDelete,
+		reorder: finishingItemReorder,
+	},
+	buildingConfig: {
+		update: buildingConfigUpdate,
 	},
 	mepItem: {
 		create: mepItemCreate,

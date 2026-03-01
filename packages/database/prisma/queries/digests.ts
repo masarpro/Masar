@@ -211,7 +211,7 @@ export async function generateWeeklyDigest(
 		})),
 		progressUpdates: progressUpdates.map((p) => ({
 			id: p.id,
-			progress: p.progress,
+			progress: Number(p.progress),
 			phaseLabel: p.phaseLabel,
 			projectName: p.project.name,
 			createdByName: p.createdBy.name,

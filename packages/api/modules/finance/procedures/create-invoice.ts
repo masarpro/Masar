@@ -101,6 +101,14 @@ export const createInvoiceProcedure = protectedProcedure
 			items: input.items,
 		});
 
+		// If created from a quotation, update its status to CONVERTED
+		if (input.quotationId) {
+			await db.quotation.update({
+				where: { id: input.quotationId },
+				data: { status: "CONVERTED" },
+			});
+		}
+
 		orgAuditLog({
 			organizationId: input.organizationId,
 			actorId: context.user.id,

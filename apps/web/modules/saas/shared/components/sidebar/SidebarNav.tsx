@@ -113,10 +113,8 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 							key={item.id}
 							open={isOpen}
 							onOpenChange={(open) =>
-								setOpenMenus((prev) =>
-									open
-										? [...prev, item.id]
-										: prev.filter((id) => id !== item.id),
+								setOpenMenus(
+									open ? [item.id] : [],
 								)
 							}
 						>
@@ -235,8 +233,8 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 								if (hasChildren) {
 									setOpenMenus((prev) =>
 										prev.includes(item.id)
-											? prev.filter((id) => id !== item.id)
-											: [...prev, item.id],
+											? []
+											: [item.id],
 									);
 								}
 							}}

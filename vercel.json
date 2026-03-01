@@ -1,0 +1,17 @@
+{
+	"$schema": "https://openapi.vercel.sh/vercel.json",
+	"framework": "nextjs",
+	"installCommand": "pnpm install",
+	"regions": ["fra1"],
+	"functions": {
+		"apps/web/app/api/**/*.ts": {
+			"maxDuration": 30
+		}
+	},
+	"crons": [
+		{
+			"path": "/api/health",
+			"schedule": "*/5 * * * *"
+		}
+	]
+}

@@ -1,4 +1,5 @@
 export { HeaderComponent } from "./HeaderComponent";
+export { DocumentMetaComponent } from "./DocumentMetaComponent";
 export { ClientInfoComponent } from "./ClientInfoComponent";
 export { ItemsTableComponent } from "./ItemsTableComponent";
 export { TotalsComponent } from "./TotalsComponent";

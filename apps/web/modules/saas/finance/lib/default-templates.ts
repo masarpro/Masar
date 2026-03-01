@@ -25,9 +25,16 @@ export interface TemplateSettings {
 	margins: string;
 	vatPercent: number;
 	currency: string;
+	logoSize?: number; // Logo size in px (40-120), default 64
+	logoBackground?: boolean; // Whether to show colored background behind logo, default true
+	headerImage?: string; // base64 data URL for letterhead header
+	footerImage?: string; // base64 data URL for letterhead footer
+	showWatermark?: boolean; // Show company logo as watermark
+	watermarkOpacity?: number; // 1-20, default 5
 }
 
 export interface DefaultTemplateConfig {
+	key: string;
 	name: string;
 	nameAr: string;
 	nameEn: string;
@@ -74,26 +81,40 @@ export const getQuotationElements = (): TemplateElement[] => [
 			showCompanyName: true,
 			showAddress: true,
 			showBilingualName: true,
+			showCrNumber: true,
 			layout: "modern",
+		},
+	},
+	{
+		id: generateId(),
+		type: "documentMeta",
+		enabled: true,
+		order: 2,
+		settings: {
+			showDocumentNumber: true,
+			showDate: true,
+			showDueDate: true,
+			layout: "centered",
 		},
 	},
 	{
 		id: generateId(),
 		type: "clientInfo",
 		enabled: true,
-		order: 2,
+		order: 3,
 		settings: {
 			showTaxNumber: true,
 			showEmail: true,
 			showPhone: true,
 			showCompanyName: true,
+			showCompanyInfo: true,
 		},
 	},
 	{
 		id: generateId(),
 		type: "itemsTable",
 		enabled: true,
-		order: 3,
+		order: 4,
 		settings: {
 			showQuantity: true,
 			showUnit: true,
@@ -106,7 +127,7 @@ export const getQuotationElements = (): TemplateElement[] => [
 		id: generateId(),
 		type: "totals",
 		enabled: true,
-		order: 4,
+		order: 5,
 		settings: {
 			showDiscount: true,
 			showVat: true,
@@ -116,9 +137,19 @@ export const getQuotationElements = (): TemplateElement[] => [
 	},
 	{
 		id: generateId(),
+		type: "qrCode",
+		enabled: true,
+		order: 6,
+		settings: {
+			size: "medium",
+			showZatcaCompliance: false,
+		},
+	},
+	{
+		id: generateId(),
 		type: "terms",
 		enabled: true,
-		order: 5,
+		order: 7,
 		settings: {
 			showPaymentTerms: true,
 			showDeliveryTerms: true,
@@ -131,7 +162,7 @@ export const getQuotationElements = (): TemplateElement[] => [
 		id: generateId(),
 		type: "signature",
 		enabled: true,
-		order: 6,
+		order: 8,
 		settings: {
 			showDate: true,
 			showStampArea: true,
@@ -142,7 +173,7 @@ export const getQuotationElements = (): TemplateElement[] => [
 		id: generateId(),
 		type: "bankDetails",
 		enabled: true,
-		order: 7,
+		order: 9,
 		settings: {
 			showBankName: true,
 			showIban: true,
@@ -152,19 +183,9 @@ export const getQuotationElements = (): TemplateElement[] => [
 	},
 	{
 		id: generateId(),
-		type: "qrCode",
-		enabled: true,
-		order: 8,
-		settings: {
-			size: "medium",
-			showZatcaCompliance: true,
-		},
-	},
-	{
-		id: generateId(),
 		type: "footer",
 		enabled: true,
-		order: 9,
+		order: 10,
 		settings: {
 			showThankYouMessage: true,
 			showYear: true,
@@ -186,26 +207,40 @@ export const getInvoiceElements = (): TemplateElement[] => [
 			showCompanyName: true,
 			showAddress: true,
 			showBilingualName: true,
+			showCrNumber: true,
 			layout: "modern",
+		},
+	},
+	{
+		id: generateId(),
+		type: "documentMeta",
+		enabled: true,
+		order: 2,
+		settings: {
+			showDocumentNumber: true,
+			showDate: true,
+			showDueDate: true,
+			layout: "centered",
 		},
 	},
 	{
 		id: generateId(),
 		type: "clientInfo",
 		enabled: true,
-		order: 2,
+		order: 3,
 		settings: {
 			showTaxNumber: true,
 			showEmail: true,
 			showPhone: true,
 			showCompanyName: true,
+			showCompanyInfo: true,
 		},
 	},
 	{
 		id: generateId(),
 		type: "itemsTable",
 		enabled: true,
-		order: 3,
+		order: 4,
 		settings: {
 			showQuantity: true,
 			showUnit: true,
@@ -218,7 +253,7 @@ export const getInvoiceElements = (): TemplateElement[] => [
 		id: generateId(),
 		type: "totals",
 		enabled: true,
-		order: 4,
+		order: 5,
 		settings: {
 			showDiscount: true,
 			showVat: true,
@@ -228,9 +263,19 @@ export const getInvoiceElements = (): TemplateElement[] => [
 	},
 	{
 		id: generateId(),
+		type: "qrCode",
+		enabled: true,
+		order: 6,
+		settings: {
+			size: "medium",
+			showZatcaCompliance: false,
+		},
+	},
+	{
+		id: generateId(),
 		type: "bankDetails",
 		enabled: true,
-		order: 5,
+		order: 7,
 		settings: {
 			showBankName: true,
 			showIban: true,
@@ -242,7 +287,7 @@ export const getInvoiceElements = (): TemplateElement[] => [
 		id: generateId(),
 		type: "terms",
 		enabled: true,
-		order: 6,
+		order: 8,
 		settings: {
 			showPaymentTerms: true,
 			showDeliveryTerms: false,
@@ -253,7 +298,7 @@ export const getInvoiceElements = (): TemplateElement[] => [
 		id: generateId(),
 		type: "signature",
 		enabled: true,
-		order: 7,
+		order: 9,
 		settings: {
 			showDate: true,
 			showStampArea: true,
@@ -262,19 +307,9 @@ export const getInvoiceElements = (): TemplateElement[] => [
 	},
 	{
 		id: generateId(),
-		type: "qrCode",
-		enabled: true,
-		order: 8,
-		settings: {
-			size: "medium",
-			showZatcaCompliance: true,
-		},
-	},
-	{
-		id: generateId(),
 		type: "footer",
 		enabled: true,
-		order: 9,
+		order: 10,
 		settings: {
 			showThankYouMessage: true,
 			showYear: true,
@@ -287,6 +322,7 @@ export const getInvoiceElements = (): TemplateElement[] => [
  */
 export function getUniversalQuotationTemplate(): DefaultTemplateConfig {
 	return {
+		key: "professional-quotation",
 		name: "قالب عرض سعر مهني",
 		nameAr: "قالب عرض سعر مهني",
 		nameEn: "Professional Quotation Template",
@@ -304,6 +340,7 @@ export function getUniversalQuotationTemplate(): DefaultTemplateConfig {
  */
 export function getUniversalInvoiceTemplate(): DefaultTemplateConfig {
 	return {
+		key: "professional-universal",
 		name: "قالب فاتورة مهني",
 		nameAr: "قالب فاتورة مهني",
 		nameEn: "Professional Invoice Template",
@@ -325,6 +362,7 @@ export function getUniversalInvoiceTemplate(): DefaultTemplateConfig {
  * Elegant classic design with navy + gold accents
  */
 export const INVOICE_TEMPLATE_CLASSIC_LUXURY: DefaultTemplateConfig = {
+	key: "classic-luxury",
 	name: "الكلاسيكي الفاخر",
 	nameAr: "الكلاسيكي الفاخر",
 	nameEn: "Classic Luxury",
@@ -367,35 +405,49 @@ export const INVOICE_TEMPLATE_CLASSIC_LUXURY: DefaultTemplateConfig = {
 				titleSize: "large",
 				subtitleText: "TAX INVOICE",
 				subtitleStyle: "gold-caps",
+				showDocumentNumber: true,
+				showDocumentDate: true,
+				showTitleInHeader: false,
+			},
+		},
+		{
+			id: "el_classic_docmeta",
+			type: "documentMeta",
+			enabled: false,
+			order: 2,
+			settings: {
+				showDocumentNumber: true,
+				showDate: true,
+				showDueDate: true,
+				layout: "bar",
+				showDocumentTypeLabel: true,
 			},
 		},
 		{
 			id: "el_classic_invoicemeta",
 			type: "clientInfo",
 			enabled: true,
-			order: 2,
+			order: 3,
 			settings: {
-				showInvoiceNumber: true,
-				showInvoiceType: true,
-				showIssueDate: true,
-				showDueDate: true,
-				showStatus: true,
 				showTaxNumber: true,
 				showEmail: true,
 				showPhone: true,
 				showCompanyName: true,
 				showAddress: true,
-				layout: "bordered-right",
+				showCompanyInfo: false,
+				layout: "client-with-qr",
 				clientBackground: "#f8f7f4",
 				borderColor: "#c9a84c",
 				labelStyle: "gold-small",
+				showQrCode: true,
+				qrSize: "large",
 			},
 		},
 		{
 			id: "el_classic_items",
 			type: "itemsTable",
 			enabled: true,
-			order: 3,
+			order: 4,
 			settings: {
 				showRowNumbers: true,
 				showQuantity: true,
@@ -414,7 +466,7 @@ export const INVOICE_TEMPLATE_CLASSIC_LUXURY: DefaultTemplateConfig = {
 			id: "el_classic_totals",
 			type: "totals",
 			enabled: true,
-			order: 4,
+			order: 5,
 			settings: {
 				showDiscount: true,
 				showVat: true,
@@ -427,7 +479,6 @@ export const INVOICE_TEMPLATE_CLASSIC_LUXURY: DefaultTemplateConfig = {
 				showRemainingAmount: true,
 				paidColor: "#16a34a",
 				remainingColor: "#dc2626",
-				layout: "left-aligned",
 				width: "220px",
 			},
 		},
@@ -435,7 +486,7 @@ export const INVOICE_TEMPLATE_CLASSIC_LUXURY: DefaultTemplateConfig = {
 			id: "el_classic_bank",
 			type: "bankDetails",
 			enabled: true,
-			order: 5,
+			order: 6,
 			settings: {
 				showBankName: true,
 				showIban: true,
@@ -449,7 +500,7 @@ export const INVOICE_TEMPLATE_CLASSIC_LUXURY: DefaultTemplateConfig = {
 			id: "el_classic_terms",
 			type: "terms",
 			enabled: true,
-			order: 6,
+			order: 7,
 			settings: {
 				showPaymentTerms: true,
 				showDeliveryTerms: false,
@@ -458,20 +509,6 @@ export const INVOICE_TEMPLATE_CLASSIC_LUXURY: DefaultTemplateConfig = {
 				layout: "card",
 				background: "#f8f7f4",
 				borderRadius: "6px",
-			},
-		},
-		{
-			id: "el_classic_qr",
-			type: "qrCode",
-			enabled: true,
-			order: 7,
-			settings: {
-				size: "medium",
-				showZatcaCompliance: true,
-				showLabel: true,
-				labelText: "رمز الفاتورة الضريبية",
-				borderRadius: "6px",
-				background: "#f0f0f0",
 			},
 		},
 		{
@@ -510,6 +547,7 @@ export const INVOICE_TEMPLATE_CLASSIC_LUXURY: DefaultTemplateConfig = {
  * Clean modern design with orange sidebar accent
  */
 export const INVOICE_TEMPLATE_MODERN_MINIMAL: DefaultTemplateConfig = {
+	key: "modern-minimal",
 	name: "العصري البسيط",
 	nameAr: "العصري البسيط",
 	nameEn: "Modern Minimal",
@@ -544,6 +582,7 @@ export const INVOICE_TEMPLATE_MODERN_MINIMAL: DefaultTemplateConfig = {
 				showAddress: true,
 				showBilingualName: true,
 				showTaxNumber: true,
+				showCrNumber: true,
 				showPhone: true,
 				showEmail: true,
 				layout: "modern",
@@ -558,19 +597,29 @@ export const INVOICE_TEMPLATE_MODERN_MINIMAL: DefaultTemplateConfig = {
 			},
 		},
 		{
-			id: "el_modern_invoicemeta",
-			type: "clientInfo",
+			id: "el_modern_docmeta",
+			type: "documentMeta",
 			enabled: true,
 			order: 2,
 			settings: {
-				showInvoiceNumber: true,
-				showIssueDate: true,
+				showDocumentNumber: true,
+				showDate: true,
 				showDueDate: true,
+				layout: "card",
+			},
+		},
+		{
+			id: "el_modern_invoicemeta",
+			type: "clientInfo",
+			enabled: true,
+			order: 3,
+			settings: {
 				showTaxNumber: true,
 				showEmail: false,
 				showPhone: true,
 				showCompanyName: true,
 				showAddress: true,
+				showCompanyInfo: true,
 				layout: "two-cards",
 				invoiceCardBackground: "#fafafa",
 				clientCardBackground: "#fff7ed",
@@ -584,7 +633,7 @@ export const INVOICE_TEMPLATE_MODERN_MINIMAL: DefaultTemplateConfig = {
 			id: "el_modern_items",
 			type: "itemsTable",
 			enabled: true,
-			order: 3,
+			order: 4,
 			settings: {
 				showRowNumbers: true,
 				showQuantity: true,
@@ -607,7 +656,7 @@ export const INVOICE_TEMPLATE_MODERN_MINIMAL: DefaultTemplateConfig = {
 			id: "el_modern_totals",
 			type: "totals",
 			enabled: true,
-			order: 4,
+			order: 5,
 			settings: {
 				showDiscount: true,
 				showVat: true,
@@ -627,10 +676,20 @@ export const INVOICE_TEMPLATE_MODERN_MINIMAL: DefaultTemplateConfig = {
 			},
 		},
 		{
+			id: "el_modern_qr",
+			type: "qrCode",
+			enabled: true,
+			order: 6,
+			settings: {
+				size: "medium",
+				showZatcaCompliance: false,
+			},
+		},
+		{
 			id: "el_modern_bank",
 			type: "bankDetails",
 			enabled: true,
-			order: 5,
+			order: 7,
 			settings: {
 				showBankName: true,
 				showIban: true,
@@ -644,7 +703,7 @@ export const INVOICE_TEMPLATE_MODERN_MINIMAL: DefaultTemplateConfig = {
 			id: "el_modern_terms",
 			type: "terms",
 			enabled: true,
-			order: 6,
+			order: 8,
 			settings: {
 				showPaymentTerms: true,
 				showDeliveryTerms: false,
@@ -656,24 +715,10 @@ export const INVOICE_TEMPLATE_MODERN_MINIMAL: DefaultTemplateConfig = {
 			},
 		},
 		{
-			id: "el_modern_qr",
-			type: "qrCode",
-			enabled: true,
-			order: 7,
-			settings: {
-				size: "small",
-				showZatcaCompliance: false,
-				borderRadius: "8px",
-				borderStyle: "dashed",
-				borderColor: "#e0e0e0",
-				background: "#fafafa",
-			},
-		},
-		{
 			id: "el_modern_footer",
 			type: "footer",
 			enabled: true,
-			order: 8,
+			order: 9,
 			settings: {
 				showThankYouMessage: true,
 				thankYouText: "شكراً لتعاملكم معنا",
@@ -696,6 +741,7 @@ export const INVOICE_TEMPLATE_MODERN_MINIMAL: DefaultTemplateConfig = {
  * Bold design with dark header and green accents
  */
 export const INVOICE_TEMPLATE_BOLD_PROFESSIONAL: DefaultTemplateConfig = {
+	key: "bold-professional",
 	name: "الاحترافي الجريء",
 	nameAr: "الاحترافي الجريء",
 	nameEn: "Bold Professional",
@@ -730,6 +776,7 @@ export const INVOICE_TEMPLATE_BOLD_PROFESSIONAL: DefaultTemplateConfig = {
 				showAddress: true,
 				showBilingualName: true,
 				showTaxNumber: true,
+				showCrNumber: true,
 				showPhone: true,
 				layout: "dark-block",
 				blockBackground:
@@ -744,19 +791,15 @@ export const INVOICE_TEMPLATE_BOLD_PROFESSIONAL: DefaultTemplateConfig = {
 			},
 		},
 		{
-			id: "el_bold_metabar",
-			type: "text",
+			id: "el_bold_docmeta",
+			type: "documentMeta",
 			enabled: true,
 			order: 2,
 			settings: {
-				layout: "info-bar",
-				background: "#10b981",
-				textColor: "#ffffff",
-				fontSize: "9px",
-				fields: ["invoiceType", "issueDate", "dueDate"],
-				dividerStyle: "vertical-line",
-				dividerColor: "rgba(255,255,255,0.3)",
-				padding: "8px 28px",
+				showDocumentNumber: true,
+				showDate: true,
+				showDueDate: true,
+				layout: "bar",
 			},
 		},
 		{
@@ -770,6 +813,7 @@ export const INVOICE_TEMPLATE_BOLD_PROFESSIONAL: DefaultTemplateConfig = {
 				showPhone: true,
 				showCompanyName: true,
 				showAddress: true,
+				showCompanyInfo: true,
 				layout: "highlight-card",
 				background: "#f0fdf4",
 				borderColor: "#bbf7d0",
@@ -825,30 +869,26 @@ export const INVOICE_TEMPLATE_BOLD_PROFESSIONAL: DefaultTemplateConfig = {
 			},
 		},
 		{
+			id: "el_bold_qr",
+			type: "qrCode",
+			enabled: true,
+			order: 6,
+			settings: {
+				size: "medium",
+				showZatcaCompliance: false,
+			},
+		},
+		{
 			id: "el_bold_bank",
 			type: "bankDetails",
 			enabled: true,
-			order: 6,
+			order: 7,
 			settings: {
 				showBankName: true,
 				showIban: true,
 				showAccountName: false,
 				layout: "inline",
 				fontSize: "8px",
-			},
-		},
-		{
-			id: "el_bold_qr",
-			type: "qrCode",
-			enabled: true,
-			order: 7,
-			settings: {
-				size: "medium",
-				showZatcaCompliance: true,
-				borderRadius: "10px",
-				borderColor: "#e2e8f0",
-				background: "#f8fafc",
-				position: "left",
 			},
 		},
 		{
@@ -900,6 +940,133 @@ export const INVOICE_TEMPLATE_BOLD_PROFESSIONAL: DefaultTemplateConfig = {
 };
 
 /**
+ * Template 4: لدي ورقة مؤسسة جاهزة — Company Letterhead
+ * For companies with pre-designed letterhead (header/footer as images)
+ */
+export const INVOICE_TEMPLATE_COMPANY_LETTERHEAD: DefaultTemplateConfig = {
+	key: "company-letterhead",
+	name: "لدي ورقة مؤسسة جاهزة",
+	nameAr: "لدي ورقة مؤسسة جاهزة",
+	nameEn: "Company Letterhead",
+	description: "استخدم ورق مؤسستك الرسمي الجاهز",
+	descriptionAr:
+		"ارفع صورة ورقك الرسمي وقص منها رأس وتذييل الصفحة — مثالي للشركات التي لديها ورق رسمي مصمم مسبقاً",
+	descriptionEn:
+		"Upload your official letterhead and crop header and footer — perfect for companies with pre-designed stationery",
+	templateType: "INVOICE",
+	settings: {
+		backgroundColor: "#ffffff",
+		primaryColor: "#374151",
+		fontFamily: "Cairo",
+		fontSize: "14px",
+		lineHeight: "1.6",
+		pageSize: "A4",
+		orientation: "portrait",
+		margins: "20mm",
+		vatPercent: 15,
+		currency: "SAR",
+	},
+	elements: [
+		{
+			id: "el_letterhead_docmeta",
+			type: "documentMeta",
+			enabled: true,
+			order: 1,
+			settings: {
+				showDocumentNumber: true,
+				showDate: true,
+				showDueDate: true,
+				layout: "centered",
+			},
+		},
+		{
+			id: "el_letterhead_client",
+			type: "clientInfo",
+			enabled: true,
+			order: 2,
+			settings: {
+				showTaxNumber: true,
+				showEmail: true,
+				showPhone: true,
+				showCompanyName: true,
+				showCompanyInfo: true,
+			},
+		},
+		{
+			id: "el_letterhead_items",
+			type: "itemsTable",
+			enabled: true,
+			order: 3,
+			settings: {
+				showQuantity: true,
+				showUnit: true,
+				showUnitPrice: true,
+				showRowNumbers: true,
+				alternatingColors: true,
+			},
+		},
+		{
+			id: "el_letterhead_totals",
+			type: "totals",
+			enabled: true,
+			order: 4,
+			settings: {
+				showDiscount: true,
+				showVat: true,
+				showAmountInWords: true,
+				highlightTotal: true,
+				showPaidAmount: true,
+				showRemainingAmount: true,
+			},
+		},
+		{
+			id: "el_letterhead_qr",
+			type: "qrCode",
+			enabled: true,
+			order: 5,
+			settings: {
+				size: "medium",
+				showZatcaCompliance: false,
+			},
+		},
+		{
+			id: "el_letterhead_bank",
+			type: "bankDetails",
+			enabled: true,
+			order: 6,
+			settings: {
+				showBankName: true,
+				showIban: true,
+				showAccountName: true,
+				showSwiftCode: false,
+			},
+		},
+		{
+			id: "el_letterhead_terms",
+			type: "terms",
+			enabled: true,
+			order: 7,
+			settings: {
+				showPaymentTerms: true,
+				showDeliveryTerms: false,
+				showWarrantyTerms: false,
+			},
+		},
+		{
+			id: "el_letterhead_signature",
+			type: "signature",
+			enabled: true,
+			order: 8,
+			settings: {
+				showDate: true,
+				showStampArea: true,
+				twoColumns: true,
+			},
+		},
+	],
+};
+
+/**
  * Get all available invoice templates
  */
 export function getAllInvoiceTemplates(): DefaultTemplateConfig[] {
@@ -908,7 +1075,29 @@ export function getAllInvoiceTemplates(): DefaultTemplateConfig[] {
 		INVOICE_TEMPLATE_CLASSIC_LUXURY,
 		INVOICE_TEMPLATE_MODERN_MINIMAL,
 		INVOICE_TEMPLATE_BOLD_PROFESSIONAL,
+		INVOICE_TEMPLATE_COMPANY_LETTERHEAD,
 	];
+}
+
+/**
+ * Get all preset templates (invoices + quotations)
+ */
+export function getAllPresetTemplates(): DefaultTemplateConfig[] {
+	return [
+		getUniversalInvoiceTemplate(),
+		INVOICE_TEMPLATE_CLASSIC_LUXURY,
+		INVOICE_TEMPLATE_MODERN_MINIMAL,
+		INVOICE_TEMPLATE_BOLD_PROFESSIONAL,
+		INVOICE_TEMPLATE_COMPANY_LETTERHEAD,
+		getUniversalQuotationTemplate(),
+	];
+}
+
+/**
+ * Get a preset template by its key
+ */
+export function getPresetByKey(key: string): DefaultTemplateConfig | undefined {
+	return getAllPresetTemplates().find((t) => t.key === key);
 }
 
 /**

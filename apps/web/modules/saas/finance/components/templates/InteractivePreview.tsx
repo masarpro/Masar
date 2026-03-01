@@ -148,6 +148,8 @@ export function InteractivePreview({
 			fontSize: settings.fontSize,
 			vatPercent: settings.vatPercent,
 			currency: settings.currency,
+			logoSize: (settings as any).logoSize,
+			logoBackground: (settings as any).logoBackground,
 		},
 	};
 

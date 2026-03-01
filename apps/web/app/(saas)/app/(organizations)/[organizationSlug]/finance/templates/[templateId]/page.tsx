@@ -1,5 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { TemplateEditor } from "@saas/finance/components/templates/TemplateEditor";
+import { TemplateCustomizer } from "@saas/finance/components/templates/TemplateCustomizer";
 import { FinanceShell } from "@saas/finance/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -36,7 +36,7 @@ export default async function EditTemplatePage({
 			sectionKey="templates"
 			pageTitle={t("finance.templates.edit")}
 		>
-			<TemplateEditor
+			<TemplateCustomizer
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}
 				templateId={templateId}

@@ -14,6 +14,12 @@ import type {
 	SetSubscriptionSeats,
 	WebhookHandler,
 } from "../../types";
+import {
+	checkEventProcessed,
+	handleInvoicePaid,
+	handlePaymentFailed,
+	syncOrganizationFromSubscription,
+} from "../../webhook-handlers";
 
 let stripeClient: Stripe | null = null;
 
@@ -75,6 +81,8 @@ export const createCheckoutLink: CreateCheckoutLink = async (options) => {
 						trial_period_days: trialPeriodDays,
 					},
 				}),
+		allow_promotion_codes: true,
+		billing_address_collection: "required",
 		metadata,
 	});
 
@@ -149,11 +157,28 @@ export const webhookHandler: WebhookHandler = async (req) => {
 	}
 
 	try {
+		// Idempotency check for subscription events
+		const isProcessed = await checkEventProcessed(event.id);
+		if (isProcessed) {
+			return new Response("Event already processed.", { status: 200 });
+		}
+
 		switch (event.type) {
 			case "checkout.session.completed": {
 				const { mode, metadata, customer, id } = event.data.object;
 
 				if (mode === "subscription") {
+					// For subscription checkouts, sync org from the subscription
+					const subscriptionId = event.data.object.subscription as string;
+					if (subscriptionId && metadata?.organization_id) {
+						const subscription = await stripeClient.subscriptions.retrieve(subscriptionId);
+						await syncOrganizationFromSubscription(
+							metadata.organization_id,
+							subscription,
+							event.id,
+							event.type,
+						);
+					}
 					break;
 				}
 
@@ -211,10 +236,21 @@ export const webhookHandler: WebhookHandler = async (req) => {
 					userId: metadata?.user_id,
 				});
 
+				// Sync org subscription state
+				if (metadata?.organization_id) {
+					await syncOrganizationFromSubscription(
+						metadata.organization_id,
+						event.data.object,
+						event.id,
+						event.type,
+					);
+				}
+
 				break;
 			}
 			case "customer.subscription.updated": {
 				const subscriptionId = event.data.object.id;
+				const metadata = event.data.object.metadata;
 
 				const existingPurchase =
 					await getPurchaseBySubscriptionId(subscriptionId);
@@ -227,11 +263,69 @@ export const webhookHandler: WebhookHandler = async (req) => {
 					});
 				}
 
+				// Sync org subscription state
+				if (metadata?.organization_id) {
+					await syncOrganizationFromSubscription(
+						metadata.organization_id,
+						event.data.object,
+						event.id,
+						event.type,
+					);
+				}
+
 				break;
 			}
 			case "customer.subscription.deleted": {
+				const metadata = event.data.object.metadata;
+
 				await deletePurchaseBySubscriptionId(event.data.object.id);
 
+				// Update org to CANCELLED
+				if (metadata?.organization_id) {
+					await syncOrganizationFromSubscription(
+						metadata.organization_id,
+						event.data.object,
+						event.id,
+						event.type,
+					);
+				}
+
+				break;
+			}
+
+			case "invoice.paid": {
+				await handleInvoicePaid(event.data.object, event.id);
+				break;
+			}
+
+			case "invoice.payment_failed": {
+				await handlePaymentFailed(event.data.object, event.id);
+				break;
+			}
+
+			case "customer.subscription.paused": {
+				const metadata = event.data.object.metadata;
+				if (metadata?.organization_id) {
+					await syncOrganizationFromSubscription(
+						metadata.organization_id,
+						event.data.object,
+						event.id,
+						event.type,
+					);
+				}
+				break;
+			}
+
+			case "customer.subscription.resumed": {
+				const metadata = event.data.object.metadata;
+				if (metadata?.organization_id) {
+					await syncOrganizationFromSubscription(
+						metadata.organization_id,
+						event.data.object,
+						event.id,
+						event.type,
+					);
+				}
 				break;
 			}
 

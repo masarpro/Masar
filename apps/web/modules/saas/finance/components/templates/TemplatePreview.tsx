@@ -133,6 +133,8 @@ export function TemplatePreview({
 			fontSize: settings.fontSize,
 			vatPercent: settings.vatPercent,
 			currency: settings.currency,
+			logoSize: (settings as any).logoSize,
+			logoBackground: (settings as any).logoBackground,
 		},
 	};
 
@@ -209,6 +211,7 @@ export function TemplatePreview({
 				>
 					{/* A4 Paper */}
 					<div
+						data-print-area
 						className="bg-white shadow-2xl print:shadow-none"
 						style={{
 							width: A4_WIDTH_PX,
@@ -246,6 +249,8 @@ export function TemplatePreview({
 						left: 0;
 						top: 0;
 						width: 100%;
+						transform: none !important;
+						min-height: auto !important;
 					}
 				}
 			`}</style>

@@ -36,6 +36,7 @@ export default async function EditQuotationPage({
 			organizationSlug={organizationSlug}
 			sectionKey="quotations"
 			pageTitle={t("pricing.quotations.edit")}
+			hideSubPageHeader
 		>
 			<QuotationForm
 				organizationId={activeOrganization.id}

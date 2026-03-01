@@ -145,7 +145,7 @@ export function ItemsTableComponent({
 	};
 
 	return (
-		<div className="py-4">
+		<div className="py-4 items-table-wrapper">
 			<table
 				className="w-full"
 				style={{
@@ -280,6 +280,7 @@ export function ItemsTableComponent({
 						return (
 							<tr
 								key={index}
+								className="invoice-item-row"
 								style={{
 									backgroundColor: rowBg,
 									borderBottom: `1px solid ${rowBorder}`,

@@ -198,6 +198,12 @@ export function InvoiceDocument({
 			fontSize: templateSettings.fontSize,
 			vatPercent: templateSettings.vatPercent,
 			currency: templateSettings.currency,
+			logoSize: (templateSettings as any).logoSize,
+			logoBackground: (templateSettings as any).logoBackground,
+			headerImage: (templateSettings as any).headerImage,
+			footerImage: (templateSettings as any).footerImage,
+			showWatermark: (templateSettings as any).showWatermark,
+			watermarkOpacity: (templateSettings as any).watermarkOpacity,
 		},
 	};
 

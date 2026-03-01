@@ -41,9 +41,9 @@ async function recalculateMilestoneProgress(
 		let weightedProgress = 0;
 
 		for (const a of activities) {
-			const w = a.weight ?? 1;
+			const w = Number(a.weight ?? 1);
 			totalWeight += w;
-			weightedProgress += a.progress * w;
+			weightedProgress += Number(a.progress) * w;
 		}
 
 		const newProgress =
@@ -564,7 +564,7 @@ export async function createBaseline(
 			actualStart: m.actualStart,
 			actualEnd: m.actualEnd,
 			status: m.status,
-			progress: m.progress,
+			progress: Number(m.progress),
 		})),
 		activities: activities.map((a) => ({
 			id: a.id,
@@ -576,7 +576,7 @@ export async function createBaseline(
 			actualStart: a.actualStart,
 			actualEnd: a.actualEnd,
 			status: a.status,
-			progress: a.progress,
+			progress: Number(a.progress),
 			duration: a.duration,
 		})),
 		capturedAt: new Date().toISOString(),
@@ -864,7 +864,7 @@ export async function getExecutionDashboard(
 	const overallProgress =
 		totalMilestones > 0
 			? Math.round(
-					milestones.reduce((sum, m) => sum + m.progress, 0) /
+					milestones.reduce((sum, m) => sum + Number(m.progress), 0) /
 						totalMilestones,
 				)
 			: 0;

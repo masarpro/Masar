@@ -14,27 +14,70 @@ import {
 	getPaginationRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
+import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import { Card } from "@ui/components/card";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@ui/components/dropdown-menu";
 import { Input } from "@ui/components/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@ui/components/select";
 import { Skeleton } from "@ui/components/skeleton";
-import { Table, TableBody, TableCell, TableRow } from "@ui/components/table";
-import { EditIcon, MoreVerticalIcon, PlusIcon, TrashIcon } from "lucide-react";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@ui/components/table";
+import {
+	BanIcon,
+	CheckCircleIcon,
+	CrownIcon,
+	EditIcon,
+	GaugeIcon,
+	MoreVerticalIcon,
+	PlusIcon,
+	RefreshCwIcon,
+	TrashIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { withQuery } from "ufo";
 import { useDebounceValue } from "usehooks-ts";
+import { ChangePlanDialog } from "./ChangePlanDialog";
+import { FreeOverrideDialog } from "./FreeOverrideDialog";
+import { SuspendOrgDialog } from "./SuspendOrgDialog";
+import { UpdateLimitsDialog } from "./UpdateLimitsDialog";
 
 const ITEMS_PER_PAGE = 10;
+
+const STATUS_BADGE: Record<string, "success" | "warning" | "error" | "info"> = {
+	ACTIVE: "success",
+	TRIALING: "info",
+	SUSPENDED: "error",
+	CANCELLED: "error",
+	PAST_DUE: "warning",
+};
+
+const PLAN_BADGE: Record<string, "success" | "warning" | "error" | "info"> = {
+	FREE: "info",
+	PRO: "success",
+};
 
 export function OrganizationList() {
 	const t = useTranslations();
@@ -48,14 +91,36 @@ export function OrganizationList() {
 		"query",
 		parseAsString.withDefault(""),
 	);
+	const [statusFilter, setStatusFilter] = useQueryState(
+		"status",
+		parseAsString.withDefault(""),
+	);
+	const [planFilter, setPlanFilter] = useQueryState(
+		"plan",
+		parseAsString.withDefault(""),
+	);
 	const [debouncedSearchTerm, setDebouncedSearchTerm] = useDebounceValue(
 		searchTerm,
 		300,
-		{
-			leading: true,
-			trailing: false,
-		},
+		{ leading: true, trailing: false },
 	);
+
+	// Dialog states
+	const [changePlanOrg, setChangePlanOrg] = useState<{
+		id: string;
+		plan: string;
+	} | null>(null);
+	const [suspendOrg, setSuspendOrg] = useState<string | null>(null);
+	const [freeOverrideOrg, setFreeOverrideOrg] = useState<{
+		id: string;
+		isFreeOverride: boolean;
+	} | null>(null);
+	const [updateLimitsOrg, setUpdateLimitsOrg] = useState<{
+		id: string;
+		maxUsers: number;
+		maxProjects: number;
+		maxStorage: number;
+	} | null>(null);
 
 	const previousSearchTermRef = useRef(debouncedSearchTerm);
 
@@ -75,11 +140,13 @@ export function OrganizationList() {
 	}, [searchTerm]);
 
 	const { data, isLoading } = useQuery(
-		orpc.admin.organizations.list.queryOptions({
+		orpc.superAdmin.organizations.list.queryOptions({
 			input: {
 				limit: ITEMS_PER_PAGE,
 				offset: (currentPage - 1) * ITEMS_PER_PAGE,
-				query: debouncedSearchTerm,
+				query: debouncedSearchTerm || undefined,
+				status: (statusFilter as any) || undefined,
+				plan: (planFilter as any) || undefined,
 			},
 		}),
 	);
@@ -100,35 +167,55 @@ export function OrganizationList() {
 				const { error } = await authClient.organization.delete({
 					organizationId: id,
 				});
-
-				if (error) {
-					throw error;
-				}
+				if (error) throw error;
 			},
 			{
 				loading: t("admin.organizations.deleteOrganization.deleting"),
 				success: () => {
 					queryClient.invalidateQueries({
-						queryKey: orpc.admin.organizations.list.key(),
+						queryKey:
+							orpc.superAdmin.organizations.list.key(),
 					});
-					return t("admin.organizations.deleteOrganization.deleted");
+					return t(
+						"admin.organizations.deleteOrganization.deleted",
+					);
 				},
-				error: t("admin.organizations.deleteOrganization.notDeleted"),
+				error: t(
+					"admin.organizations.deleteOrganization.notDeleted",
+				),
 			},
 		);
 	};
 
-	const columns: ColumnDef<
-		NonNullable<typeof data>["organizations"][number]
-	>[] = useMemo(
+	const activateOrganization = async (id: string) => {
+		toast.promise(
+			orpc.superAdmin.organizations.activate.call({
+				organizationId: id,
+			}),
+			{
+				loading: t("admin.organizations.activating"),
+				success: () => {
+					queryClient.invalidateQueries({
+						queryKey:
+							orpc.superAdmin.organizations.list.key(),
+					});
+					return t("admin.organizations.activated");
+				},
+				error: t("admin.organizations.activateFailed"),
+			},
+		);
+	};
+
+	type OrgRow = NonNullable<typeof data>["organizations"][number];
+
+	const columns: ColumnDef<OrgRow>[] = useMemo(
 		() => [
 			{
-				accessorKey: "user",
-				header: "",
-				accessorFn: (row) => row.name,
+				accessorKey: "name",
+				header: t("admin.organizations.name"),
 				cell: ({
 					row: {
-						original: { id, name, logo, membersCount },
+						original: { id, name, logo, _count },
 					},
 				}) => (
 					<div className="flex items-center gap-2">
@@ -140,23 +227,106 @@ export function OrganizationList() {
 							>
 								{name}
 							</Link>
-							<small>
-								{t("admin.organizations.membersCount", {
-									count: membersCount,
-								})}
+							<small className="text-muted-foreground">
+								{_count.members}{" "}
+								{t("admin.organizations.members")} &middot;{" "}
+								{_count.projects}{" "}
+								{t("admin.organizations.projects")}
 							</small>
 						</div>
 					</div>
 				),
 			},
 			{
-				accessorKey: "actions",
-				header: "",
+				accessorKey: "owner",
+				header: t("admin.organizations.owner"),
 				cell: ({
 					row: {
-						original: { id },
+						original: { owner },
 					},
-				}) => {
+				}) =>
+					owner ? (
+						<div className="text-sm">
+							<p className="font-medium">{owner.name}</p>
+							<p className="text-muted-foreground text-xs">
+								{owner.email}
+							</p>
+						</div>
+					) : (
+						<span className="text-muted-foreground">-</span>
+					),
+			},
+			{
+				accessorKey: "createdAt",
+				header: t("admin.organizations.createdAt"),
+				cell: ({
+					row: {
+						original: { createdAt },
+					},
+				}) => (
+					<span className="text-sm">
+						{new Date(createdAt).toLocaleDateString()}
+					</span>
+				),
+			},
+			{
+				accessorKey: "plan",
+				header: t("admin.organizations.planCol"),
+				cell: ({
+					row: {
+						original: { plan, isFreeOverride },
+					},
+				}) => (
+					<div className="flex items-center gap-1">
+						<Badge status={PLAN_BADGE[plan] ?? "info"}>
+							{plan}
+						</Badge>
+						{isFreeOverride && (
+							<CrownIcon className="size-3 text-amber-500" />
+						)}
+					</div>
+				),
+			},
+			{
+				accessorKey: "status",
+				header: t("admin.organizations.statusCol"),
+				cell: ({
+					row: {
+						original: { status },
+					},
+				}) => (
+					<Badge status={STATUS_BADGE[status] ?? "info"}>
+						{status}
+					</Badge>
+				),
+			},
+			{
+				accessorKey: "lastPaymentAmount",
+				header: t("admin.organizations.lastPayment"),
+				cell: ({
+					row: {
+						original: { lastPaymentAmount, lastPaymentAt },
+					},
+				}) =>
+					lastPaymentAmount ? (
+						<div className="text-sm">
+							<p>{Number(lastPaymentAmount).toLocaleString()} SAR</p>
+							{lastPaymentAt && (
+								<p className="text-muted-foreground text-xs">
+									{new Date(
+										lastPaymentAt,
+									).toLocaleDateString()}
+								</p>
+							)}
+						</div>
+					) : (
+						<span className="text-muted-foreground">-</span>
+					),
+			},
+			{
+				accessorKey: "actions",
+				header: "",
+				cell: ({ row: { original: org } }) => {
 					return (
 						<div className="flex flex-row justify-end gap-2">
 							<DropdownMenu>
@@ -168,13 +338,76 @@ export function OrganizationList() {
 								<DropdownMenuContent>
 									<DropdownMenuItem asChild>
 										<Link
-											href={getOrganizationEditPath(id)}
+											href={getOrganizationEditPath(
+												org.id,
+											)}
 											className="flex items-center"
 										>
-											<EditIcon className="mr-2 size-4" />
+											<EditIcon className="me-2 size-4" />
 											{t("admin.organizations.edit")}
 										</Link>
 									</DropdownMenuItem>
+									<DropdownMenuSeparator />
+									<DropdownMenuItem
+										onClick={() =>
+											setChangePlanOrg({
+												id: org.id,
+												plan: org.plan,
+											})
+										}
+									>
+										<RefreshCwIcon className="me-2 size-4" />
+										{t("admin.organizations.changePlan")}
+									</DropdownMenuItem>
+									{org.status !== "SUSPENDED" ? (
+										<DropdownMenuItem
+											onClick={() =>
+												setSuspendOrg(org.id)
+											}
+										>
+											<BanIcon className="me-2 size-4" />
+											{t("admin.organizations.suspend")}
+										</DropdownMenuItem>
+									) : (
+										<DropdownMenuItem
+											onClick={() =>
+												activateOrganization(org.id)
+											}
+										>
+											<CheckCircleIcon className="me-2 size-4" />
+											{t("admin.organizations.activate")}
+										</DropdownMenuItem>
+									)}
+									<DropdownMenuItem
+										onClick={() =>
+											setFreeOverrideOrg({
+												id: org.id,
+												isFreeOverride:
+													org.isFreeOverride,
+											})
+										}
+									>
+										<CrownIcon className="me-2 size-4" />
+										{t(
+											"admin.organizations.freeOverride",
+										)}
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() =>
+											setUpdateLimitsOrg({
+												id: org.id,
+												maxUsers: org.maxUsers,
+												maxProjects: org.maxProjects,
+												maxStorage: 1,
+											})
+										}
+									>
+										<GaugeIcon className="me-2 size-4" />
+										{t(
+											"admin.organizations.updateLimits",
+										)}
+									</DropdownMenuItem>
+									<DropdownMenuSeparator />
 									<DropdownMenuItem
 										onClick={() =>
 											confirm({
@@ -189,12 +422,14 @@ export function OrganizationList() {
 												),
 												destructive: true,
 												onConfirm: () =>
-													deleteOrganization(id),
+													deleteOrganization(
+														org.id,
+													),
 											})
 										}
 									>
 										<span className="flex items-center text-destructive hover:text-destructive">
-											<TrashIcon className="mr-2 size-4" />
+											<TrashIcon className="me-2 size-4" />
 											{t("admin.organizations.delete")}
 										</span>
 									</DropdownMenuItem>
@@ -222,96 +457,203 @@ export function OrganizationList() {
 	});
 
 	return (
-		<Card className="p-6">
-			<div className="mb-4 flex items-center justify-between gap-6">
-				<h2 className="font-semibold text-2xl">
-					{t("admin.organizations.title")}
-				</h2>
+		<>
+			<Card className="p-6">
+				<div className="mb-4 flex items-center justify-between gap-6">
+					<h2 className="font-semibold text-2xl">
+						{t("admin.organizations.title")}
+					</h2>
+					<Button asChild>
+						<Link href={getAdminPath("/organizations/new")}>
+							<PlusIcon className="me-1.5 size-4" />
+							{t("admin.organizations.create")}
+						</Link>
+					</Button>
+				</div>
 
-				<Button asChild>
-					<Link href={getAdminPath("/organizations/new")}>
-						<PlusIcon className="mr-1.5 size-4" />
-						{t("admin.organizations.create")}
-					</Link>
-				</Button>
-			</div>
-			<Input
-				type="search"
-				placeholder={t("admin.organizations.search")}
-				value={searchTerm}
-				onChange={(e) => setSearchTerm(e.target.value)}
-				className="mb-4"
-			/>
+				<div className="mb-4 flex flex-wrap gap-2">
+					<Input
+						type="search"
+						placeholder={t("admin.organizations.search")}
+						value={searchTerm}
+						onChange={(e) => setSearchTerm(e.target.value)}
+						className="max-w-xs"
+					/>
+					<Select
+						value={statusFilter || "all"}
+						onValueChange={(v) =>
+							setStatusFilter(v === "all" ? "" : v)
+						}
+					>
+						<SelectTrigger className="w-40">
+							<SelectValue
+								placeholder={t(
+									"admin.organizations.filterStatus",
+								)}
+							/>
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="all">
+								{t("admin.organizations.allStatuses")}
+							</SelectItem>
+							<SelectItem value="ACTIVE">Active</SelectItem>
+							<SelectItem value="TRIALING">Trialing</SelectItem>
+							<SelectItem value="SUSPENDED">
+								Suspended
+							</SelectItem>
+							<SelectItem value="PAST_DUE">Past Due</SelectItem>
+							<SelectItem value="CANCELLED">
+								Cancelled
+							</SelectItem>
+						</SelectContent>
+					</Select>
+					<Select
+						value={planFilter || "all"}
+						onValueChange={(v) =>
+							setPlanFilter(v === "all" ? "" : v)
+						}
+					>
+						<SelectTrigger className="w-40">
+							<SelectValue
+								placeholder={t(
+									"admin.organizations.filterPlan",
+								)}
+							/>
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="all">
+								{t("admin.organizations.allPlans")}
+							</SelectItem>
+							<SelectItem value="FREE">Free</SelectItem>
+							<SelectItem value="PRO">Pro</SelectItem>
+						</SelectContent>
+					</Select>
+				</div>
 
-			<div className="rounded-md border">
-				<Table>
-					<TableBody>
-						{isLoading ? (
-							Array.from({ length: ITEMS_PER_PAGE }).map(
-								(_, index) => (
-									<TableRow key={`skeleton-${index}`}>
-										<TableCell className="py-2">
-											<div className="flex items-center gap-2">
-												<Skeleton className="size-10 rounded-md" />
-												<div className="flex-1 space-y-2">
-													<Skeleton className="h-4 w-32" />
-													<Skeleton className="h-3 w-24" />
-												</div>
-											</div>
-										</TableCell>
-										<TableCell className="py-2">
-											<div className="flex justify-end">
-												<Skeleton className="size-9 rounded-md" />
-											</div>
-										</TableCell>
-									</TableRow>
-								),
-							)
-						) : table.getRowModel().rows?.length ? (
-							table.getRowModel().rows.map((row) => (
-								<TableRow
-									key={row.id}
-									data-state={
-										row.getIsSelected() && "selected"
-									}
-									className="group"
-								>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell
-											key={cell.id}
-											className="py-2 group-first:rounded-t-md group-last:rounded-b-md"
-										>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext(),
-											)}
-										</TableCell>
-									))}
-								</TableRow>
-							))
-						) : (
+				<div className="rounded-md border">
+					<Table>
+						<TableHeader>
 							<TableRow>
-								<TableCell
-									colSpan={columns.length}
-									className="h-24 text-center"
-								>
-									<p>No results.</p>
-								</TableCell>
+								{table
+									.getHeaderGroups()
+									.map((headerGroup) =>
+										headerGroup.headers.map((header) => (
+											<TableHead key={header.id}>
+												{flexRender(
+													header.column.columnDef
+														.header,
+													header.getContext(),
+												)}
+											</TableHead>
+										)),
+									)}
 							</TableRow>
-						)}
-					</TableBody>
-				</Table>
-			</div>
+						</TableHeader>
+						<TableBody>
+							{isLoading ? (
+								Array.from({ length: ITEMS_PER_PAGE }).map(
+									(_, index) => (
+										<TableRow key={`skeleton-${index}`}>
+											<TableCell className="py-2">
+												<div className="flex items-center gap-2">
+													<Skeleton className="size-10 rounded-md" />
+													<div className="flex-1 space-y-2">
+														<Skeleton className="h-4 w-32" />
+														<Skeleton className="h-3 w-24" />
+													</div>
+												</div>
+											</TableCell>
+											<TableCell>
+												<Skeleton className="h-5 w-16" />
+											</TableCell>
+											<TableCell>
+												<Skeleton className="h-5 w-16" />
+											</TableCell>
+											<TableCell>
+												<Skeleton className="h-4 w-20" />
+											</TableCell>
+											<TableCell>
+												<Skeleton className="size-9 rounded-md" />
+											</TableCell>
+										</TableRow>
+									),
+								)
+							) : table.getRowModel().rows?.length ? (
+								table.getRowModel().rows.map((row) => (
+									<TableRow key={row.id} className="group">
+										{row.getVisibleCells().map((cell) => (
+											<TableCell
+												key={cell.id}
+												className="py-2"
+											>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext(),
+												)}
+											</TableCell>
+										))}
+									</TableRow>
+								))
+							) : (
+								<TableRow>
+									<TableCell
+										colSpan={columns.length}
+										className="h-24 text-center"
+									>
+										<p>No results.</p>
+									</TableCell>
+								</TableRow>
+							)}
+						</TableBody>
+					</Table>
+				</div>
 
-			{!!data?.total && data.total > ITEMS_PER_PAGE && (
-				<Pagination
-					className="mt-4"
-					totalItems={data.total}
-					itemsPerPage={ITEMS_PER_PAGE}
-					currentPage={currentPage}
-					onChangeCurrentPage={setCurrentPage}
+				{!!data?.total && data.total > ITEMS_PER_PAGE && (
+					<Pagination
+						className="mt-4"
+						totalItems={data.total}
+						itemsPerPage={ITEMS_PER_PAGE}
+						currentPage={currentPage}
+						onChangeCurrentPage={setCurrentPage}
+					/>
+				)}
+			</Card>
+
+			{changePlanOrg && (
+				<ChangePlanDialog
+					open={!!changePlanOrg}
+					onOpenChange={(open) => !open && setChangePlanOrg(null)}
+					organizationId={changePlanOrg.id}
+					currentPlan={changePlanOrg.plan}
 				/>
 			)}
-		</Card>
+			{suspendOrg && (
+				<SuspendOrgDialog
+					open={!!suspendOrg}
+					onOpenChange={(open) => !open && setSuspendOrg(null)}
+					organizationId={suspendOrg}
+				/>
+			)}
+			{freeOverrideOrg && (
+				<FreeOverrideDialog
+					open={!!freeOverrideOrg}
+					onOpenChange={(open) =>
+						!open && setFreeOverrideOrg(null)
+					}
+					organizationId={freeOverrideOrg.id}
+					currentOverride={freeOverrideOrg.isFreeOverride}
+				/>
+			)}
+			{updateLimitsOrg && (
+				<UpdateLimitsDialog
+					open={!!updateLimitsOrg}
+					onOpenChange={(open) =>
+						!open && setUpdateLimitsOrg(null)
+					}
+					organizationId={updateLimitsOrg.id}
+					currentLimits={updateLimitsOrg}
+				/>
+			)}
+		</>
 	);
 }

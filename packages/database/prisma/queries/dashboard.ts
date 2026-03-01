@@ -213,7 +213,7 @@ export async function getFinancialSummaryByProject(organizationId: string) {
 		id: p.id,
 		name: p.name,
 		contractValue: p.contractValue ? Number(p.contractValue) : 0,
-		progress: p.progress,
+		progress: Number(p.progress),
 		totalExpenses: expensesMap.get(p.id) ?? 0,
 		totalPaidClaims: claimsMap.get(p.id) ?? 0,
 	}));

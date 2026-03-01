@@ -12,6 +12,8 @@ interface FooterElementProps {
 		showPageNumber?: boolean;
 		showPhone?: boolean;
 		showEmail?: boolean;
+		showAddress?: boolean;
+		showWebsite?: boolean;
 		// Layout & accent
 		layout?: "default" | "dark-bar";
 		accentStyle?: "none" | "gradient-line" | "bottom-bar";
@@ -36,13 +38,12 @@ export function FooterElement({
 }: FooterElementProps) {
 	const t = useTranslations();
 	const {
-		showYear = true,
-		showThankYouMessage = true,
-		thankYouText,
 		showCompanyInfo = false,
 		showPageNumber = false,
 		showPhone = false,
 		showEmail = false,
+		showAddress = false,
+		showWebsite = false,
 		layout = "default",
 		accentStyle = "none",
 		background,
@@ -57,8 +58,6 @@ export function FooterElement({
 		organization?.nameAr ||
 		organization?.name ||
 		t("finance.templates.preview.companyName");
-	const currentYear = new Date().getFullYear();
-	const footerText = organization?.footerText;
 	const accent = secondaryColor || primaryColor;
 
 	// ─── Dark Bar Layout ─────────────────────────────────────────────────
@@ -75,8 +74,10 @@ export function FooterElement({
 					style={{ color: textColor || "#64748b" }}
 				>
 					{showCompanyInfo && companyName}
+					{showAddress && organization?.address && ` — ${organization.address}`}
 					{showPhone && organization?.phone && ` | ${organization.phone}`}
 					{showEmail && organization?.email && ` | ${organization.email}`}
+					{showWebsite && organization?.website && ` | ${organization.website}`}
 				</span>
 				{showPageNumber && (
 					<span
@@ -91,7 +92,7 @@ export function FooterElement({
 		);
 	}
 
-	// ─── Default Layout (enhanced) ───────────────────────────────────────
+	// ─── Default Layout ───────────────────────────────────────────────────
 	return (
 		<div className="mt-8">
 			{/* Gradient line accent (top) */}
@@ -115,35 +116,14 @@ export function FooterElement({
 					color: textColor || undefined,
 				}}
 			>
-				{/* Custom footer text */}
-				{footerText && (
-					<p className="text-sm text-slate-600">{footerText}</p>
-				)}
-
-				{/* Thank you message */}
-				{showThankYouMessage && (
-					<p
-						className="text-sm"
-						style={{ color: textColor || "#64748b" }}
-					>
-						{thankYouText ||
-							organization?.thankYouMessage ||
-							t("finance.templates.preview.thankYouMessage")}
-					</p>
-				)}
-
-				{/* Company, contact, year */}
+				{/* Company name row */}
 				<div
 					className="flex items-center justify-between text-[10px]"
 					style={{ color: textColor || "#a1a1aa" }}
 				>
 					<span>
 						{showCompanyInfo && companyName}
-						{showCompanyInfo &&
-							organization?.address &&
-							` — ${organization.address}`}
 						{!showCompanyInfo && companyName}
-						{showYear && ` - ${currentYear}`}
 					</span>
 					{showPageNumber && (
 						<span>
@@ -154,19 +134,24 @@ export function FooterElement({
 				</div>
 
 				{/* Contact info row */}
-				{(showPhone || showEmail) &&
-					(organization?.phone || organization?.email || organization?.website) && (
+				{(showAddress || showPhone || showEmail || showWebsite) &&
+					(organization?.address || organization?.phone || organization?.email || organization?.website) && (
 						<div
 							className="flex items-center justify-center gap-4 text-xs"
 							style={{ color: textColor || "#a1a1aa" }}
 						>
+							{showAddress && organization?.address && (
+								<span>{organization.address}</span>
+							)}
 							{showPhone && organization?.phone && (
 								<span>{organization.phone}</span>
 							)}
 							{showEmail && organization?.email && (
 								<span>{organization.email}</span>
 							)}
-							{organization?.website && <span>{organization.website}</span>}
+							{showWebsite && organization?.website && (
+								<span>{organization.website}</span>
+							)}
 						</div>
 					)}
 			</div>

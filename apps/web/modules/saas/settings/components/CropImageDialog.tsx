@@ -18,11 +18,25 @@ export function CropImageDialog({
 	open,
 	onOpenChange,
 	onCrop,
+	aspectRatio = 1,
+	maxWidth = 256,
+	maxHeight = 256,
+	title,
+	saveLabel = "Save",
+	outputType,
+	quality,
 }: {
 	image: File | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onCrop: (croppedImage: Blob | null) => void;
+	aspectRatio?: number;
+	maxWidth?: number;
+	maxHeight?: number;
+	title?: string;
+	saveLabel?: string;
+	outputType?: string;
+	quality?: number;
 }) {
 	const cropperRef = useRef<ReactCropperElement>(null);
 
@@ -32,10 +46,10 @@ export function CropImageDialog({
 		const imageBlob = await new Promise<Blob | null>((resolve) => {
 			cropper
 				?.getCroppedCanvas({
-					maxWidth: 256,
-					maxHeight: 256,
+					maxWidth,
+					maxHeight,
 				})
-				.toBlob(resolve);
+				.toBlob(resolve, outputType, quality);
 		});
 
 		return imageBlob;
@@ -50,15 +64,15 @@ export function CropImageDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle />
+					<DialogTitle>{title}</DialogTitle>
 				</DialogHeader>
 				<div>
 					{imageSrc && (
 						<Cropper
 							src={imageSrc}
 							style={{ width: "100%" }}
-							initialAspectRatio={1}
-							aspectRatio={1}
+							initialAspectRatio={Number.isNaN(aspectRatio) ? undefined : aspectRatio}
+							aspectRatio={Number.isNaN(aspectRatio) ? undefined : aspectRatio}
 							guides={true}
 							ref={cropperRef}
 						/>
@@ -71,7 +85,7 @@ export function CropImageDialog({
 							onOpenChange(false);
 						}}
 					>
-						Save
+						{saveLabel}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

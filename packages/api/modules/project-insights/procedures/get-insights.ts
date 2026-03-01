@@ -33,7 +33,7 @@ export const getInsights = protectedProcedure
 			project: project ? {
 				id: project.id,
 				name: project.name,
-				progress: project.progress,
+				progress: Number(project.progress),
 			} : null,
 			activeAlerts: insights.activeAlerts,
 			acknowledgedAlerts: insights.acknowledgedAlerts,

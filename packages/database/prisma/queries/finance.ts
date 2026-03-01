@@ -549,6 +549,7 @@ export async function getOrganizationQuotations(
 				client: { select: { id: true, name: true, company: true } },
 				project: { select: { id: true, name: true, slug: true } },
 				createdBy: { select: { id: true, name: true } },
+				invoices: { select: { id: true, invoiceNo: true, status: true } },
 				_count: { select: { items: true } },
 			},
 			orderBy: { createdAt: "desc" },

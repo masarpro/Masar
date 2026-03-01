@@ -122,7 +122,7 @@ export function TotalsComponent({
 	}
 
 	return (
-		<div className="py-4">
+		<div className="py-4 totals-section">
 			<div className={`flex ${justifyClass}`}>
 				<div
 					style={{

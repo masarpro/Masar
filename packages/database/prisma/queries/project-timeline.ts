@@ -1,5 +1,5 @@
 import { db } from "../client";
-import type { MilestoneStatus } from "../generated/client";
+import type { Prisma, MilestoneStatus } from "../generated/client";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Project Timeline Queries (Phase 10)
@@ -26,7 +26,7 @@ export interface TimelineHealth {
 function calculateMilestoneHealth(milestone: {
 	plannedEnd: Date | null;
 	actualEnd: Date | null;
-	progress: number;
+	progress: number | Prisma.Decimal;
 	status: MilestoneStatus;
 }): TimelineHealthStatus {
 	const today = new Date();
@@ -54,7 +54,7 @@ function calculateMilestoneHealth(milestone: {
 	const daysUntilDeadline = Math.ceil(
 		(plannedEnd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
 	);
-	if (daysUntilDeadline <= 7 && milestone.progress < 80) {
+	if (daysUntilDeadline <= 7 && Number(milestone.progress) < 80) {
 		return "AT_RISK";
 	}
 
@@ -224,7 +224,7 @@ export async function markActual(
 	}
 
 	// Update progress if provided
-	let progress = existing.progress;
+	let progress = Number(existing.progress);
 	if (data.progress !== undefined) {
 		progress = Math.min(100, Math.max(0, data.progress));
 	}
@@ -329,7 +329,7 @@ export async function getTimelineHealth(
 
 	for (const milestone of milestones) {
 		const healthStatus = calculateMilestoneHealth(milestone);
-		totalProgress += milestone.progress;
+		totalProgress += Number(milestone.progress);
 
 		if (milestone.status === "COMPLETED") {
 			completed++;

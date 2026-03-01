@@ -11,6 +11,12 @@ export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted', 'ReadC
 
 export type TransactionIsolationLevel = z.infer<typeof TransactionIsolationLevelSchema>;
 
+// File: PlanConfigScalarFieldEnum.schema.ts
+
+export const PlanConfigScalarFieldEnumSchema = z.enum(['id', 'plan', 'name', 'maxUsers', 'maxProjects', 'maxStorageGB', 'monthlyPrice', 'yearlyPrice', 'features', 'isActive', 'updatedAt', 'createdAt'])
+
+export type PlanConfigScalarFieldEnum = z.infer<typeof PlanConfigScalarFieldEnumSchema>;
+
 // File: UserScalarFieldEnum.schema.ts
 
 export const UserScalarFieldEnumSchema = z.enum(['id', 'name', 'email', 'emailVerified', 'image', 'createdAt', 'updatedAt', 'username', 'role', 'banned', 'banReason', 'banExpires', 'onboardingComplete', 'paymentsCustomerId', 'locale', 'displayUsername', 'twoFactorEnabled', 'accountType', 'isActive', 'mustChangePassword', 'lastLoginAt', 'organizationRoleId', 'customPermissions', 'createdById', 'organizationId'])
@@ -49,7 +55,7 @@ export type TwoFactorScalarFieldEnum = z.infer<typeof TwoFactorScalarFieldEnumSc
 
 // File: OrganizationScalarFieldEnum.schema.ts
 
-export const OrganizationScalarFieldEnumSchema = z.enum(['id', 'name', 'slug', 'logo', 'createdAt', 'metadata', 'paymentsCustomerId', 'ownerId', 'commercialRegister', 'taxNumber', 'contractorClass', 'phone', 'address', 'city', 'currency', 'timezone'])
+export const OrganizationScalarFieldEnumSchema = z.enum(['id', 'name', 'slug', 'logo', 'createdAt', 'metadata', 'paymentsCustomerId', 'ownerId', 'commercialRegister', 'taxNumber', 'contractorClass', 'phone', 'address', 'city', 'currency', 'timezone', 'status', 'plan', 'planName', 'stripeSubscriptionId', 'stripeProductId', 'stripePriceId', 'subscriptionStatus', 'maxUsers', 'maxProjects', 'maxStorage', 'currentPeriodStart', 'currentPeriodEnd', 'trialEndsAt', 'cancelAtPeriodEnd', 'lastPaymentAt', 'lastPaymentAmount', 'billingEmail', 'isFreeOverride', 'overrideReason', 'overrideBy', 'overrideAt'])
 
 export type OrganizationScalarFieldEnum = z.infer<typeof OrganizationScalarFieldEnumSchema>;
 
@@ -83,6 +89,18 @@ export const PurchaseScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'us
 
 export type PurchaseScalarFieldEnum = z.infer<typeof PurchaseScalarFieldEnumSchema>;
 
+// File: SubscriptionEventScalarFieldEnum.schema.ts
+
+export const SubscriptionEventScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'eventType', 'stripeEventId', 'data', 'processedAt'])
+
+export type SubscriptionEventScalarFieldEnum = z.infer<typeof SubscriptionEventScalarFieldEnumSchema>;
+
+// File: SuperAdminLogScalarFieldEnum.schema.ts
+
+export const SuperAdminLogScalarFieldEnumSchema = z.enum(['id', 'adminId', 'action', 'targetType', 'targetId', 'targetOrgId', 'details', 'ipAddress', 'createdAt'])
+
+export type SuperAdminLogScalarFieldEnum = z.infer<typeof SuperAdminLogScalarFieldEnumSchema>;
+
 // File: AiChatScalarFieldEnum.schema.ts
 
 export const AiChatScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'userId', 'title', 'messages', 'createdAt', 'updatedAt'])
@@ -91,7 +109,7 @@ export type AiChatScalarFieldEnum = z.infer<typeof AiChatScalarFieldEnumSchema>;
 
 // File: CostStudyScalarFieldEnum.schema.ts
 
-export const CostStudyScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'createdById', 'name', 'customerName', 'customerId', 'projectType', 'landArea', 'buildingArea', 'numberOfFloors', 'hasBasement', 'finishingLevel', 'structuralCost', 'finishingCost', 'mepCost', 'laborCost', 'overheadPercent', 'profitPercent', 'contingencyPercent', 'vatIncluded', 'totalCost', 'status', 'notes', 'createdAt', 'updatedAt'])
+export const CostStudyScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'createdById', 'name', 'customerName', 'customerId', 'projectType', 'landArea', 'buildingArea', 'numberOfFloors', 'hasBasement', 'finishingLevel', 'structuralCost', 'finishingCost', 'mepCost', 'laborCost', 'overheadPercent', 'profitPercent', 'contingencyPercent', 'vatIncluded', 'totalCost', 'buildingConfig', 'status', 'notes', 'createdAt', 'updatedAt'])
 
 export type CostStudyScalarFieldEnum = z.infer<typeof CostStudyScalarFieldEnumSchema>;
 
@@ -103,7 +121,7 @@ export type StructuralItemScalarFieldEnum = z.infer<typeof StructuralItemScalarF
 
 // File: FinishingItemScalarFieldEnum.schema.ts
 
-export const FinishingItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'category', 'subCategory', 'name', 'description', 'area', 'unit', 'wastagePercent', 'qualityLevel', 'materialPrice', 'laborPrice', 'materialCost', 'laborCost', 'totalCost', 'sortOrder', 'createdAt', 'updatedAt'])
+export const FinishingItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'category', 'subCategory', 'name', 'description', 'floorId', 'floorName', 'area', 'length', 'height', 'width', 'perimeter', 'quantity', 'unit', 'calculationMethod', 'calculationData', 'qualityLevel', 'brand', 'specifications', 'wastagePercent', 'materialPrice', 'laborPrice', 'materialCost', 'laborCost', 'totalCost', 'sortOrder', 'createdAt', 'updatedAt'])
 
 export type FinishingItemScalarFieldEnum = z.infer<typeof FinishingItemScalarFieldEnumSchema>;
 
@@ -509,17 +527,17 @@ export const SortOrderSchema = z.enum(['asc', 'desc'])
 
 export type SortOrder = z.infer<typeof SortOrderSchema>;
 
-// File: NullableJsonNullValueInput.schema.ts
-
-export const NullableJsonNullValueInputSchema = z.enum(['DbNull', 'JsonNull'])
-
-export type NullableJsonNullValueInput = z.infer<typeof NullableJsonNullValueInputSchema>;
-
 // File: JsonNullValueInput.schema.ts
 
 export const JsonNullValueInputSchema = z.enum(['JsonNull'])
 
 export type JsonNullValueInput = z.infer<typeof JsonNullValueInputSchema>;
+
+// File: NullableJsonNullValueInput.schema.ts
+
+export const NullableJsonNullValueInputSchema = z.enum(['DbNull', 'JsonNull'])
+
+export type NullableJsonNullValueInput = z.infer<typeof NullableJsonNullValueInputSchema>;
 
 // File: QueryMode.schema.ts
 
@@ -539,11 +557,29 @@ export const NullsOrderSchema = z.enum(['first', 'last'])
 
 export type NullsOrder = z.infer<typeof NullsOrderSchema>;
 
+// File: PlanType.schema.ts
+
+export const PlanTypeSchema = z.enum(['FREE', 'PRO'])
+
+export type PlanType = z.infer<typeof PlanTypeSchema>;
+
 // File: AccountType.schema.ts
 
 export const AccountTypeSchema = z.enum(['OWNER', 'EMPLOYEE', 'PROJECT_CLIENT'])
 
 export type AccountType = z.infer<typeof AccountTypeSchema>;
+
+// File: OrgStatus.schema.ts
+
+export const OrgStatusSchema = z.enum(['ACTIVE', 'TRIALING', 'SUSPENDED', 'CANCELLED', 'PAST_DUE'])
+
+export type OrgStatus = z.infer<typeof OrgStatusSchema>;
+
+// File: SubscriptionStatus.schema.ts
+
+export const SubscriptionStatusSchema = z.enum(['TRIALING', 'ACTIVE', 'PAST_DUE', 'CANCELED', 'UNPAID', 'INCOMPLETE', 'PAUSED'])
+
+export type SubscriptionStatus = z.infer<typeof SubscriptionStatusSchema>;
 
 // File: RoleType.schema.ts
 
@@ -911,6 +947,26 @@ export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED'
 
 export type OrgAuditAction = z.infer<typeof OrgAuditActionSchema>;
 
+// File: PlanConfig.schema.ts
+
+export const PlanConfigSchema = z.object({
+  id: z.string(),
+  plan: PlanTypeSchema,
+  name: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10"),
+  maxUsers: z.number().int(),
+  maxProjects: z.number().int(),
+  maxStorageGB: z.number().int(),
+  monthlyPrice: z.number().int(),
+  yearlyPrice: z.number().int(),
+  features: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10"),
+  isActive: z.boolean().default(true),
+  updatedAt: z.date(),
+  createdAt: z.date(),
+});
+
+export type PlanConfigType = z.infer<typeof PlanConfigSchema>;
+
+
 // File: User.schema.ts
 
 export const UserSchema = z.object({
@@ -1047,6 +1103,29 @@ export const OrganizationSchema = z.object({
   city: z.string().nullish(),
   currency: z.string().default("SAR"),
   timezone: z.string().default("Asia/Riyadh"),
+  status: OrgStatusSchema.default("TRIALING"),
+  plan: PlanTypeSchema.default("FREE"),
+  planName: z.string().nullish(),
+  stripeSubscriptionId: z.string().nullish(),
+  stripeProductId: z.string().nullish(),
+  stripePriceId: z.string().nullish(),
+  subscriptionStatus: SubscriptionStatusSchema.default("TRIALING"),
+  maxUsers: z.number().int().default(3),
+  maxProjects: z.number().int().default(2),
+  maxStorage: z.number().int().default(1),
+  currentPeriodStart: z.date().nullish(),
+  currentPeriodEnd: z.date().nullish(),
+  trialEndsAt: z.date().nullish(),
+  cancelAtPeriodEnd: z.boolean(),
+  lastPaymentAt: z.date().nullish(),
+  lastPaymentAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'lastPaymentAmount' must be a Decimal. Location: ['Models', 'Organization']",
+}).nullish(),
+  billingEmail: z.string().nullish(),
+  isFreeOverride: z.boolean(),
+  overrideReason: z.string().nullish(),
+  overrideBy: z.string().nullish(),
+  overrideAt: z.date().nullish(),
 });
 
 export type OrganizationType = z.infer<typeof OrganizationSchema>;
@@ -1134,6 +1213,37 @@ export const PurchaseSchema = z.object({
 
 export type PurchaseModel = z.infer<typeof PurchaseSchema>;
 
+// File: SubscriptionEvent.schema.ts
+
+export const SubscriptionEventSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  eventType: z.string(),
+  stripeEventId: z.string(),
+  data: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10"),
+  processedAt: z.date(),
+});
+
+export type SubscriptionEventType = z.infer<typeof SubscriptionEventSchema>;
+
+
+// File: SuperAdminLog.schema.ts
+
+export const SuperAdminLogSchema = z.object({
+  id: z.string(),
+  adminId: z.string(),
+  action: z.string(),
+  targetType: z.string(),
+  targetId: z.string(),
+  targetOrgId: z.string().nullish(),
+  details: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  ipAddress: z.string().nullish(),
+  createdAt: z.date(),
+});
+
+export type SuperAdminLogType = z.infer<typeof SuperAdminLogSchema>;
+
+
 // File: AiChat.schema.ts
 
 export const AiChatSchema = z.object({
@@ -1182,17 +1292,18 @@ export const CostStudySchema = z.object({
 }),
   overheadPercent: z.instanceof(Prisma.Decimal, {
   message: "Field 'overheadPercent' must be a Decimal. Location: ['Models', 'CostStudy']",
-}).default(5),
+}).default(new Prisma.Decimal(5)),
   profitPercent: z.instanceof(Prisma.Decimal, {
   message: "Field 'profitPercent' must be a Decimal. Location: ['Models', 'CostStudy']",
-}).default(10),
+}).default(new Prisma.Decimal(10)),
   contingencyPercent: z.instanceof(Prisma.Decimal, {
   message: "Field 'contingencyPercent' must be a Decimal. Location: ['Models', 'CostStudy']",
-}).default(3),
+}).default(new Prisma.Decimal(3)),
   vatIncluded: z.boolean().default(true),
   totalCost: z.instanceof(Prisma.Decimal, {
   message: "Field 'totalCost' must be a Decimal. Location: ['Models', 'CostStudy']",
 }),
+  buildingConfig: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
   status: z.string().default("draft"),
   notes: z.string().nullish(),
   createdAt: z.date(),
@@ -1228,7 +1339,7 @@ export const StructuralItemSchema = z.object({
 }).nullish(),
   wastagePercent: z.instanceof(Prisma.Decimal, {
   message: "Field 'wastagePercent' must be a Decimal. Location: ['Models', 'StructuralItem']",
-}).default(10),
+}).default(new Prisma.Decimal(10)),
   materialCost: z.instanceof(Prisma.Decimal, {
   message: "Field 'materialCost' must be a Decimal. Location: ['Models', 'StructuralItem']",
 }),
@@ -1255,20 +1366,41 @@ export const FinishingItemSchema = z.object({
   subCategory: z.string().nullish(),
   name: z.string(),
   description: z.string().nullish(),
+  floorId: z.string().nullish(),
+  floorName: z.string().nullish(),
   area: z.instanceof(Prisma.Decimal, {
   message: "Field 'area' must be a Decimal. Location: ['Models', 'FinishingItem']",
-}),
-  unit: z.string(),
+}).nullish(),
+  length: z.instanceof(Prisma.Decimal, {
+  message: "Field 'length' must be a Decimal. Location: ['Models', 'FinishingItem']",
+}).nullish(),
+  height: z.instanceof(Prisma.Decimal, {
+  message: "Field 'height' must be a Decimal. Location: ['Models', 'FinishingItem']",
+}).nullish(),
+  width: z.instanceof(Prisma.Decimal, {
+  message: "Field 'width' must be a Decimal. Location: ['Models', 'FinishingItem']",
+}).nullish(),
+  perimeter: z.instanceof(Prisma.Decimal, {
+  message: "Field 'perimeter' must be a Decimal. Location: ['Models', 'FinishingItem']",
+}).nullish(),
+  quantity: z.instanceof(Prisma.Decimal, {
+  message: "Field 'quantity' must be a Decimal. Location: ['Models', 'FinishingItem']",
+}).nullish(),
+  unit: z.string().default("m2"),
+  calculationMethod: z.string().nullish(),
+  calculationData: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  qualityLevel: z.string().nullish(),
+  brand: z.string().nullish(),
+  specifications: z.string().nullish(),
   wastagePercent: z.instanceof(Prisma.Decimal, {
   message: "Field 'wastagePercent' must be a Decimal. Location: ['Models', 'FinishingItem']",
-}).default(8),
-  qualityLevel: z.string().default("medium"),
+}).nullish(),
   materialPrice: z.instanceof(Prisma.Decimal, {
   message: "Field 'materialPrice' must be a Decimal. Location: ['Models', 'FinishingItem']",
-}),
+}).nullish(),
   laborPrice: z.instanceof(Prisma.Decimal, {
   message: "Field 'laborPrice' must be a Decimal. Location: ['Models', 'FinishingItem']",
-}),
+}).nullish(),
   materialCost: z.instanceof(Prisma.Decimal, {
   message: "Field 'materialCost' must be a Decimal. Location: ['Models', 'FinishingItem']",
 }),
@@ -1409,7 +1541,9 @@ export const ProjectSchema = z.object({
   contractValue: z.instanceof(Prisma.Decimal, {
   message: "Field 'contractValue' must be a Decimal. Location: ['Models', 'Project']",
 }).nullish(),
-  progress: z.number(),
+  progress: z.instanceof(Prisma.Decimal, {
+  message: "Field 'progress' must be a Decimal. Location: ['Models', 'Project']",
+}),
   startDate: z.date().nullish(),
   endDate: z.date().nullish(),
   createdById: z.string(),
@@ -1491,7 +1625,9 @@ export type ProjectIssueType = z.infer<typeof ProjectIssueSchema>;
 export const ProjectProgressUpdateSchema = z.object({
   id: z.string(),
   projectId: z.string(),
-  progress: z.number(),
+  progress: z.instanceof(Prisma.Decimal, {
+  message: "Field 'progress' must be a Decimal. Location: ['Models', 'ProjectProgressUpdate']",
+}),
   phaseLabel: z.string().nullish(),
   note: z.string().nullish(),
   createdById: z.string(),
@@ -1884,7 +2020,9 @@ export const ProjectCalendarSchema = z.object({
   name: z.string(),
   workDays: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10"),
   holidays: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").default("[]"),
-  defaultHoursPerDay: z.number().default(8.0),
+  defaultHoursPerDay: z.instanceof(Prisma.Decimal, {
+  message: "Field 'defaultHoursPerDay' must be a Decimal. Location: ['Models', 'ProjectCalendar']",
+}).default(new Prisma.Decimal(8)),
   isDefault: z.boolean(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -1909,9 +2047,13 @@ export const ProjectActivitySchema = z.object({
   actualStart: z.date().nullish(),
   actualEnd: z.date().nullish(),
   status: ActivityStatusSchema.default("NOT_STARTED"),
-  progress: z.number(),
+  progress: z.instanceof(Prisma.Decimal, {
+  message: "Field 'progress' must be a Decimal. Location: ['Models', 'ProjectActivity']",
+}),
   isCritical: z.boolean(),
-  weight: z.number().nullish(),
+  weight: z.instanceof(Prisma.Decimal, {
+  message: "Field 'weight' must be a Decimal. Location: ['Models', 'ProjectActivity']",
+}).nullish(),
   assigneeId: z.string().nullish(),
   calendarId: z.string().nullish(),
   orderIndex: z.number().int(),
@@ -1989,9 +2131,13 @@ export const ProjectMilestoneSchema = z.object({
   actualStart: z.date().nullish(),
   actualEnd: z.date().nullish(),
   status: MilestoneStatusSchema.default("PLANNED"),
-  progress: z.number(),
+  progress: z.instanceof(Prisma.Decimal, {
+  message: "Field 'progress' must be a Decimal. Location: ['Models', 'ProjectMilestone']",
+}),
   isCritical: z.boolean(),
-  weight: z.number().nullish(),
+  weight: z.instanceof(Prisma.Decimal, {
+  message: "Field 'weight' must be a Decimal. Location: ['Models', 'ProjectMilestone']",
+}).nullish(),
   color: z.string().nullish(),
   progressMethod: ProgressMethodSchema.default("MANUAL"),
   baselineStartDate: z.date().nullish(),
@@ -2140,7 +2286,7 @@ export const OrganizationFinanceSettingsSchema = z.object({
   thankYouMessage: z.string().nullish(),
   defaultVatPercent: z.instanceof(Prisma.Decimal, {
   message: "Field 'defaultVatPercent' must be a Decimal. Location: ['Models', 'OrganizationFinanceSettings']",
-}).default(15),
+}).default(new Prisma.Decimal(15)),
   defaultCurrency: z.string().default("SAR"),
   defaultPaymentTerms: z.string().nullish(),
   defaultDeliveryTerms: z.string().nullish(),
@@ -2306,7 +2452,7 @@ export const QuotationSchema = z.object({
 }),
   vatPercent: z.instanceof(Prisma.Decimal, {
   message: "Field 'vatPercent' must be a Decimal. Location: ['Models', 'Quotation']",
-}).default(15),
+}).default(new Prisma.Decimal(15)),
   vatAmount: z.instanceof(Prisma.Decimal, {
   message: "Field 'vatAmount' must be a Decimal. Location: ['Models', 'Quotation']",
 }),
@@ -2339,7 +2485,7 @@ export const QuotationItemSchema = z.object({
   description: z.string(),
   quantity: z.instanceof(Prisma.Decimal, {
   message: "Field 'quantity' must be a Decimal. Location: ['Models', 'QuotationItem']",
-}).default(1),
+}).default(new Prisma.Decimal(1)),
   unit: z.string().nullish(),
   unitPrice: z.instanceof(Prisma.Decimal, {
   message: "Field 'unitPrice' must be a Decimal. Location: ['Models', 'QuotationItem']",
@@ -2385,7 +2531,7 @@ export const FinanceInvoiceSchema = z.object({
 }),
   vatPercent: z.instanceof(Prisma.Decimal, {
   message: "Field 'vatPercent' must be a Decimal. Location: ['Models', 'FinanceInvoice']",
-}).default(15),
+}).default(new Prisma.Decimal(15)),
   vatAmount: z.instanceof(Prisma.Decimal, {
   message: "Field 'vatAmount' must be a Decimal. Location: ['Models', 'FinanceInvoice']",
 }),
@@ -2426,7 +2572,7 @@ export const FinanceInvoiceItemSchema = z.object({
   description: z.string(),
   quantity: z.instanceof(Prisma.Decimal, {
   message: "Field 'quantity' must be a Decimal. Location: ['Models', 'FinanceInvoiceItem']",
-}).default(1),
+}).default(new Prisma.Decimal(1)),
   unit: z.string().nullish(),
   unitPrice: z.instanceof(Prisma.Decimal, {
   message: "Field 'unitPrice' must be a Decimal. Location: ['Models', 'FinanceInvoiceItem']",

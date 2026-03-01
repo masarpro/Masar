@@ -9,6 +9,8 @@ export interface PricingShellProps {
 	sectionKey?: string;
 	pageTitle?: string;
 	headerActions?: ReactNode;
+	/** When true, hides the sub-page header (breadcrumb bar) */
+	hideSubPageHeader?: boolean;
 }
 
 export function PricingShell({
@@ -17,12 +19,13 @@ export function PricingShell({
 	sectionKey,
 	pageTitle,
 	headerActions,
+	hideSubPageHeader = false,
 }: PricingShellProps) {
 	return (
 		<div className="flex min-h-0 flex-1 flex-col">
 			{/* Page Content */}
 			<div className="flex-1 px-4 pt-2 pb-6 sm:px-6">
-				{sectionKey && (
+				{sectionKey && !hideSubPageHeader && (
 					<PricingSubPageHeader
 						organizationSlug={organizationSlug}
 						sectionKey={sectionKey}
