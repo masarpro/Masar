@@ -56,7 +56,7 @@ const navItemClasses = (isActive: boolean, isSubItem: boolean, collapsed: boolea
 		"hover:bg-muted",
 		isActive &&
 			"bg-primary/10 dark:bg-primary/20 text-primary font-medium",
-		isSubItem ? "p-2.5 text-sm" : "p-3",
+		isSubItem ? "px-2.5 py-3 text-sm" : "p-3",
 		isSubItem && !isActive && "text-muted-foreground",
 		collapsed && !isSubItem && "justify-center",
 	);

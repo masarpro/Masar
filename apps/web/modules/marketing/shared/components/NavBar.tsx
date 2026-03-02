@@ -94,15 +94,18 @@ export function NavBar() {
 	return (
 		<nav
 			className={cn(
-				"fixed top-0 left-0 z-50 w-full transition-shadow duration-200 bg-card",
+				"fixed top-0 left-0 z-50 w-full transition-all duration-300",
+				!isTop || isDocsPage
+					? "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm"
+					: "bg-transparent",
 			)}
 			data-test="navigation"
 		>
 			<div className="container">
 				<div
 					className={cn(
-						"flex items-center justify-stretch gap-6 transition-[padding] duration-200",
-						!isTop || isDocsPage ? "py-4" : "py-6",
+						"flex items-center justify-stretch gap-6 transition-[padding] duration-300",
+						!isTop || isDocsPage ? "py-3" : "py-5",
 					)}
 				>
 					<div className="flex flex-1 justify-start">
@@ -193,9 +196,9 @@ export function NavBar() {
 							(user ? (
 								<Button
 									key="dashboard"
-									className="hidden lg:flex"
+									className="hidden lg:flex shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-300"
 									asChild
-									variant="secondary"
+									variant="primary"
 								>
 									<NextLink href="/app">
 										{t("common.menu.dashboard")}
@@ -204,9 +207,9 @@ export function NavBar() {
 							) : (
 								<Button
 									key="login"
-									className="hidden lg:flex"
+									className="hidden lg:flex hover:-translate-y-0.5 transition-all duration-300"
 									asChild
-									variant="secondary"
+									variant="ghost"
 								>
 									<NextLink href="/auth/login" prefetch>
 										{t("common.menu.login")}

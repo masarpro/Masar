@@ -1,10 +1,11 @@
 "use client";
 
 import { cn } from "@ui/lib";
-import { ChevronRight, Menu } from "lucide-react";
+import { ChevronRight, Menu, X } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useSidebar } from "./sidebar-context";
+import { useIsMobile } from "./use-is-mobile";
 import { Logo } from "@shared/components/Logo";
 
 interface SidebarHeaderProps {
@@ -13,7 +14,13 @@ interface SidebarHeaderProps {
 }
 
 export function SidebarHeader({ collapsed, headerExtra }: SidebarHeaderProps) {
-	const { toggleCollapsed } = useSidebar();
+	const { toggleCollapsed, setMobileOpen } = useSidebar();
+	const isMobile = useIsMobile();
+
+	// On mobile: close sidebar. On desktop: toggle collapsed state.
+	const handleToggle = isMobile
+		? () => setMobileOpen(false)
+		: toggleCollapsed;
 
 	return (
 		<>
@@ -33,14 +40,22 @@ export function SidebarHeader({ collapsed, headerExtra }: SidebarHeaderProps) {
 				)}
 				<button
 					type="button"
-					onClick={toggleCollapsed}
+					onClick={handleToggle}
 					className={cn(
 						"relative z-10 rounded-lg p-2 transition-colors duration-200 ease-out hover:bg-muted",
 						"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
 					)}
-					aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+					aria-label={
+						isMobile
+							? "Close sidebar"
+							: collapsed
+								? "Expand sidebar"
+								: "Collapse sidebar"
+					}
 				>
-					{collapsed ? (
+					{isMobile ? (
+						<X className="size-5" />
+					) : collapsed ? (
 						<ChevronRight className="size-5 rtl-flip" />
 					) : (
 						<Menu className="size-5" />

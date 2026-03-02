@@ -25,16 +25,16 @@ export function Features() {
 	const t = useTranslations();
 
 	return (
-		<section id="features" className="scroll-my-20 py-12 lg:py-16 xl:py-24">
+		<section id="features" className="scroll-my-20 py-16 lg:py-20 xl:py-28">
 			<div className="container">
-				<div className="mb-8 max-w-3xl">
-					<small className="mb-4 block font-medium text-xs uppercase tracking-wider text-primary">
+				<div className="mb-10 max-w-3xl">
+					<small className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 border border-primary/20 px-3 py-1 font-semibold text-xs uppercase tracking-wider text-primary">
 						{t("features.label")}
 					</small>
-					<h2 className="font-serif font-medium text-2xl lg:text-3xl xl:text-4xl leading-tighter text-foreground">
+					<h2 className="font-serif font-medium text-3xl sm:text-4xl leading-tighter text-foreground">
 						{t("features.title")}
 					</h2>
-					<p className="mt-2 text-base text-foreground/60 lg:text-lg">
+					<p className="mt-3 text-base text-foreground/60 lg:text-lg">
 						{t("features.description")}
 					</p>
 				</div>
@@ -45,10 +45,10 @@ export function Features() {
 						return (
 							<div
 								key={key}
-								className="rounded-2xl bg-card p-6 lg:p-8"
+								className="group relative overflow-hidden rounded-2xl border border-border/50 bg-card/80 backdrop-blur-sm p-6 lg:p-8 transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-2 after:absolute after:bottom-0 after:start-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-500 hover:after:w-full"
 							>
-								<div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/10">
-									<Icon className="size-6 text-primary" />
+								<div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary/10 transition-colors duration-300 group-hover:bg-primary/15">
+									<Icon className="size-7 text-primary" />
 								</div>
 								<h3 className="font-medium text-foreground text-lg">
 									{t(`features.items.${key}.title`)}

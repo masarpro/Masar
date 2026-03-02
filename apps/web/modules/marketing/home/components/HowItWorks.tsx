@@ -3,15 +3,19 @@
 import { useTranslations } from "next-intl";
 
 const stepKeys = ["1", "2", "3"] as const;
+const arabicNumerals = ["١", "٢", "٣"];
 
 export function HowItWorks() {
 	const t = useTranslations();
 
 	return (
-		<section className="py-12 lg:py-16 xl:py-24 bg-card">
+		<section className="relative py-16 lg:py-20 xl:py-28 overflow-hidden">
+			{/* Subtle gradient background */}
+			<div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-primary/[0.03] to-transparent" />
+
 			<div className="container">
-				<div className="mb-8 text-center">
-					<small className="mb-4 block font-medium text-xs uppercase tracking-wider text-primary">
+				<div className="mb-12 text-center">
+					<small className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 border border-primary/20 px-3 py-1 font-semibold text-xs uppercase tracking-wider text-primary">
 						{t("howItWorks.label")}
 					</small>
 					<h2 className="font-serif font-medium text-2xl md:text-3xl lg:text-4xl leading-tighter text-foreground">
@@ -19,11 +23,14 @@ export function HowItWorks() {
 					</h2>
 				</div>
 
-				<div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-					{stepKeys.map((key) => (
-						<div key={key} className="text-center">
-							<div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-xl">
-								{key}
+				<div className="relative grid grid-cols-1 gap-8 md:grid-cols-3">
+					{/* Connecting line between steps (desktop only) */}
+					<div className="hidden md:block absolute top-8 start-[16.67%] end-[16.67%] h-px bg-border -z-10" />
+
+					{stepKeys.map((key, i) => (
+						<div key={key} className="group text-center">
+							<div className="relative mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl bg-primary/10 border-2 border-primary/20 text-primary text-2xl font-bold transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/20">
+								{arabicNumerals[i]}
 							</div>
 							<h3 className="font-medium text-foreground text-lg">
 								{t(`howItWorks.steps.${key}.title`)}

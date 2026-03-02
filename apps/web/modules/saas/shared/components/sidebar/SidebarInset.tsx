@@ -25,7 +25,8 @@ export function SidebarInset({ children, className }: SidebarInsetProps) {
 	return (
 		<div
 			className={cn(
-				"flex-1 py-4",
+				"flex-1",
+				isMobile ? "py-2" : "py-4",
 				config.ui.saas.useSidebarLayout && "min-h-[calc(100vh)]",
 				needsSidebarMargin && [
 					"pe-4",
@@ -36,7 +37,8 @@ export function SidebarInset({ children, className }: SidebarInsetProps) {
 		>
 			<main
 				className={cn(
-					"py-6 rounded-3xl bg-card px-4 md:p-8 min-h-full w-full",
+					"rounded-3xl bg-card min-h-full w-full",
+					isMobile ? "px-3 py-4" : "p-8",
 				)}
 			>
 				<div className="container px-0">{children}</div>

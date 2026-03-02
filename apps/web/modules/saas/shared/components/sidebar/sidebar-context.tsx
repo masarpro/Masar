@@ -30,15 +30,16 @@ export function SidebarProvider({
 	const [collapsed, setCollapsedState] = useState(defaultCollapsed);
 	const [mobileOpen, setMobileOpen] = useState(false);
 
-	// Close sidebar when viewport shrinks below xl (prevents overlap on resize)
+	// Close mobile sidebar when viewport grows above xl (switching to desktop mode)
 	useEffect(() => {
-		const handler = () => {
-			if (window.innerWidth < XL_BREAKPOINT) {
+		const mq = window.matchMedia(`(min-width: ${XL_BREAKPOINT}px)`);
+		const handler = (e: MediaQueryListEvent) => {
+			if (e.matches) {
 				setMobileOpen(false);
 			}
 		};
-		window.addEventListener("resize", handler);
-		return () => window.removeEventListener("resize", handler);
+		mq.addEventListener("change", handler);
+		return () => mq.removeEventListener("change", handler);
 	}, []);
 
 	// Hydrate from localStorage
