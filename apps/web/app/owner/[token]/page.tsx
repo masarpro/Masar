@@ -125,17 +125,10 @@ export default function OwnerPortalSummary() {
 						{t("ownerPortal.progress")}
 					</h3>
 					<span className="text-2xl font-bold text-teal-600 dark:text-teal-400">
-<<<<<<< HEAD
-						{Math.round(Number(Number(project.progress)))}%
-					</span>
-				</div>
-				<Progress value={Number(Number(project.progress))} className="h-3" />
-=======
 						{Math.round(Number(project.progress))}%
 					</span>
 				</div>
 				<Progress value={Number(project.progress)} className="h-3" />
->>>>>>> 85a88cb3 (fix: resolve all remaining TypeScript build errors)
 			</div>
 
 			{/* KPI Cards */}
