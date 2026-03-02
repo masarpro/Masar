@@ -410,7 +410,117 @@
 	},
 	"faq": {
 		"description": "Do you have any questions? We have got you covered.",
-		"title": "Frequently asked questions"
+		"title": "Frequently asked questions",
+		"items": {
+			"1": {
+				"question": "Do I need technical experience?",
+				"answer": "No. Masar is designed to be easy for anyone."
+			},
+			"2": {
+				"question": "Does it fully support Arabic?",
+				"answer": "Yes, built in Arabic from the ground up — interface, reports, and invoices."
+			},
+			"3": {
+				"question": "Are invoices ZATCA compliant?",
+				"answer": "Yes, compliant with Phase 1 e-invoicing requirements."
+			},
+			"4": {
+				"question": "How many projects can I add?",
+				"answer": "On the Professional plan, unlimited."
+			},
+			"5": {
+				"question": "Can the owner track the project?",
+				"answer": "Yes, the Owner Portal gives them direct access to updates and reports."
+			},
+			"6": {
+				"question": "Is my data secure?",
+				"answer": "Each company's data is fully isolated with encryption and multi-level permissions."
+			}
+		}
+	},
+	"features": {
+		"title": "Everything you need in one place",
+		"description": "Tools designed for Saudi contractor workflows",
+		"label": "Features",
+		"items": {
+			"1": { "title": "Comprehensive Dashboard", "description": "Project status, budget, and timeline — all at a glance." },
+			"2": { "title": "Field Execution", "description": "Daily reports, photos, issues, and progress — directly from site." },
+			"3": { "title": "Finance & Invoicing", "description": "Expenses, claims, payments, and invoices — connected automatically." },
+			"4": { "title": "Contractors & Contracts", "description": "Subcontracts, change orders, and payment terms — organized and tracked." },
+			"5": { "title": "Owner Portal", "description": "Owners access project updates directly — no manual reports needed." },
+			"6": { "title": "Smart Permissions", "description": "Each user sees only what's relevant to their role." }
+		}
+	},
+	"finalCta": {
+		"title": "Ready to organize your projects?",
+		"description": "Start free today — no credit card needed.",
+		"cta": "Start Now",
+		"note": "No credit card required • Cancel anytime"
+	},
+	"hero": {
+		"badge": "🇸🇦 Built for Saudi Market",
+		"title": "Projects scattered?",
+		"titleHighlight": "Masar unifies them.",
+		"description": "One platform for finances, execution, contractors, and documents — no complexity.",
+		"cta": "Start Free",
+		"secondary": "Explore Features"
+	},
+	"howItWorks": {
+		"title": "Three steps to get started",
+		"label": "How it Works",
+		"steps": {
+			"1": { "title": "Sign up & create your company", "description": "Free account in one minute." },
+			"2": { "title": "Add your projects", "description": "Create projects and assign your team." },
+			"3": { "title": "Start managing", "description": "Track everything from one place." }
+		}
+	},
+	"landingPricing": {
+		"title": "Clear pricing, no surprises",
+		"label": "Pricing",
+		"free": {
+			"name": "Free",
+			"description": "Try the platform yourself",
+			"price": "0 SAR",
+			"features": {
+				"1": "Full system overview",
+				"2": "Demo project",
+				"3": "All features (read-only)"
+			},
+			"cta": "Start Free"
+		},
+		"pro": {
+			"name": "Professional",
+			"description": "All features, no limits",
+			"price": "199 SAR / month",
+			"badge": "Most Popular",
+			"features": {
+				"1": "Unlimited projects",
+				"2": "All advanced features",
+				"3": "Owner portal",
+				"4": "Invoices & claims",
+				"5": "Priority support",
+				"6": "Continuous updates"
+			},
+			"cta": "Subscribe Now"
+		}
+	},
+	"painPoints": {
+		"title": "Challenges every contractor knows",
+		"label": "The Problem",
+		"items": {
+			"1": "Information scattered between WhatsApp, Excel, and email",
+			"2": "Site supervisors can't access the data they need",
+			"3": "Expenses get lost and invoices are delayed",
+			"4": "Foreign software is complex and doesn't fit our workflows",
+			"5": "Owner reports take forever and start from scratch each time",
+			"6": "Tracking actual vs. planned progress is nearly impossible"
+		},
+		"solution": "Masar solves these challenges — in one platform"
+	},
+	"zatca": {
+		"title": "ZATCA Compliant",
+		"description": "E-invoicing compliant with ZATCA Phase 1.",
+		"badge": "✓ ZATCA Phase 1"
 	},
 	"mail": {
 		"common": {

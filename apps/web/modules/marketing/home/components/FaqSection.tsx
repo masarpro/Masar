@@ -9,31 +9,10 @@ import {
 import { cn } from "@ui/lib";
 import { useTranslations } from "next-intl";
 
+const faqKeys = ["1", "2", "3", "4", "5", "6"] as const;
+
 export function FaqSection({ className }: { className?: string }) {
 	const t = useTranslations();
-
-	const items = [
-		{
-			question: "What is the refund policy?",
-			answer: "We offer a 30-day money-back guarantee if you're not happy with our product.",
-		},
-		{
-			question: "How do I cancel my subscription?",
-			answer: "You can cancel your subscription by visiting the billing page.",
-		},
-		{
-			question: "Can I change my plan?",
-			answer: "Yes, you can change your plan at any time by visiting the billing page.",
-		},
-		{
-			question: "Do you offer a free trial?",
-			answer: "Yes, we offer a 14-day free trial.",
-		},
-	];
-
-	if (!items) {
-		return null;
-	}
 
 	return (
 		<section
@@ -42,9 +21,9 @@ export function FaqSection({ className }: { className?: string }) {
 		>
 			<div className="container max-w-3xl">
 				<div className="mb-6 text-center">
-					<h1 className="mb-2 font-serif font-medium text-xl md:text-2xl lg:text-3xl xl:text-4xl leading-tighter text-foreground">
+					<h2 className="mb-2 font-serif font-medium text-xl md:text-2xl lg:text-3xl xl:text-4xl leading-tighter text-foreground">
 						{t("faq.title")}
-					</h1>
+					</h2>
 					<p className="text-foreground/60 text-sm sm:text-lg">
 						{t("faq.description")}
 					</p>
@@ -54,17 +33,17 @@ export function FaqSection({ className }: { className?: string }) {
 					collapsible
 					className="w-full space-y-2"
 				>
-					{items.map((item, i) => (
+					{faqKeys.map((key) => (
 						<AccordionItem
-							key={`faq-item-${i}`}
-							value={`item-${i}`}
+							key={key}
+							value={`item-${key}`}
 							className="rounded-lg bg-card shadow-none border-none px-4 lg:px-6"
 						>
-							<AccordionTrigger className="text-left font-medium text-base hover:no-underline">
-								{item.question}
+							<AccordionTrigger className="text-start font-medium text-base hover:no-underline">
+								{t(`faq.items.${key}.question`)}
 							</AccordionTrigger>
 							<AccordionContent className="text-foreground/60">
-								{item.answer}
+								{t(`faq.items.${key}.answer`)}
 							</AccordionContent>
 						</AccordionItem>
 					))}
