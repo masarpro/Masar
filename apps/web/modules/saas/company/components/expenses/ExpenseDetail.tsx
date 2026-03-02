@@ -184,7 +184,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.expenses.amount")}</p>
-							<p className="text-lg font-bold text-blue-700 dark:text-blue-300">{formatCurrency(expense.amount)}</p>
+							<p className="text-lg font-bold text-blue-700 dark:text-blue-300">{formatCurrency(Number(expense.amount))}</p>
 						</div>
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.expenses.recurrence")}</p>
@@ -256,7 +256,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 										{new Date(payment.periodStart).toLocaleDateString("ar-SA")} -{" "}
 										{new Date(payment.periodEnd).toLocaleDateString("ar-SA")}
 									</TableCell>
-									<TableCell className="font-semibold text-slate-700 dark:text-slate-300">{formatCurrency(payment.amount)}</TableCell>
+									<TableCell className="font-semibold text-slate-700 dark:text-slate-300">{formatCurrency(Number(payment.amount))}</TableCell>
 									<TableCell className="text-slate-700 dark:text-slate-300">{new Date(payment.dueDate).toLocaleDateString("ar-SA")}</TableCell>
 									<TableCell>
 										{payment.isPaid ? (

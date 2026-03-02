@@ -75,7 +75,7 @@ export function TimelineHealthBadge({
 }
 
 interface MilestoneStatusBadgeProps {
-	status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "DELAYED";
+	status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "DELAYED" | "CANCELLED";
 	size?: "sm" | "md" | "lg";
 }
 
@@ -117,6 +117,15 @@ export function MilestoneStatusBadge({
 					className={`bg-red-500 hover:bg-red-600 ${sizeClasses[size]}`}
 				>
 					{t("timeline.status.delayed")}
+				</Badge>
+			);
+		case "CANCELLED":
+			return (
+				<Badge
+					variant="default"
+					className={`bg-gray-500 hover:bg-gray-600 ${sizeClasses[size]}`}
+				>
+					{t("execution.milestone.cancelled")}
 				</Badge>
 			);
 		case "PLANNED":

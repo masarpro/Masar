@@ -62,7 +62,7 @@ export function ProjectOverview({
 					<ExecutionPhasesCard
 						organizationId={organizationId}
 						projectId={projectId}
-						projectProgress={projectData?.progress}
+						projectProgress={projectData?.progress != null ? Number(projectData.progress) : undefined}
 						projectStatus={projectData?.status}
 					/>
 					<FinanceBudgetCard
@@ -73,7 +73,7 @@ export function ProjectOverview({
 						claimsPaid={financeSummary?.claimsPaid ?? 0}
 					/>
 					<TimelineScheduleCard
-						projectProgress={projectData?.progress}
+						projectProgress={projectData?.progress != null ? Number(projectData.progress) : undefined}
 						startDate={projectData?.startDate}
 						endDate={projectData?.endDate}
 					/>

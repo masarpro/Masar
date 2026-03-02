@@ -86,7 +86,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 						{t("company.dashboard.totalSalaries")}
 					</p>
 					<p className="text-xl font-bold text-blue-700 dark:text-blue-300">
-						{formatCurrency(data.employees.totalMonthlyCost)}
+						{formatCurrency(Number(data.employees.totalMonthlyCost))}
 					</p>
 				</div>
 
@@ -104,7 +104,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 						{t("company.dashboard.totalExpenses")}
 					</p>
 					<p className="text-xl font-bold text-orange-700 dark:text-orange-300">
-						{formatCurrency(data.expenses.totalMonthlyAmount)}
+						{formatCurrency(Number(data.expenses.totalMonthlyAmount))}
 					</p>
 				</div>
 
@@ -122,7 +122,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 						{t("company.dashboard.assetValue")}
 					</p>
 					<p className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
-						{formatCurrency(data.assets.totalValue)}
+						{formatCurrency(Number(data.assets.totalValue))}
 					</p>
 				</div>
 
@@ -137,7 +137,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 						{t("company.dashboard.totalMonthlyCost")}
 					</p>
 					<p className="text-xl font-bold text-red-700 dark:text-red-300">
-						{formatCurrency(data.totalMonthlyCost)}
+						{formatCurrency(Number(data.totalMonthlyCost))}
 					</p>
 				</div>
 			</div>
@@ -156,7 +156,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 								</h3>
 							</div>
 							<ul className="space-y-2">
-								{data.alerts.upcomingPaymentsList.map((payment: { expense: { id: string; name: string }; dueDate: string }) => (
+								{data.alerts.upcomingPaymentsList.map((payment: { expense: { id: string; name: string }; dueDate: Date }) => (
 									<li key={payment.expense.id} className="flex justify-between text-sm">
 										<span className="text-orange-800 dark:text-orange-200">{payment.expense.name}</span>
 										<span className="text-orange-600/70 dark:text-orange-400/70 text-xs">
@@ -179,11 +179,11 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 								</h3>
 							</div>
 							<ul className="space-y-2">
-								{data.alerts.expiringInsuranceList.map((asset: { id: string; name: string; insuranceExpiry: string }) => (
+								{data.alerts.expiringInsuranceList.map((asset: { id: string; name: string; insuranceExpiry: Date | null }) => (
 									<li key={asset.id} className="flex justify-between text-sm">
 										<span className="text-red-800 dark:text-red-200">{asset.name}</span>
 										<span className="text-red-600/70 dark:text-red-400/70 text-xs">
-											{new Date(asset.insuranceExpiry).toLocaleDateString("ar-SA")}
+											{asset.insuranceExpiry ? new Date(asset.insuranceExpiry).toLocaleDateString("ar-SA") : ""}
 										</span>
 									</li>
 								))}

@@ -34,7 +34,7 @@ export function PricingDashboard({
 		}),
 	);
 
-	const studies = studiesData?.studies ?? [];
+	const studies = studiesData?.costStudies ?? [];
 	const quotations = quotationsData?.quotations ?? [];
 
 	const totalStudies = studies.length;

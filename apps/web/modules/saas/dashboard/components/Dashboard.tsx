@@ -412,7 +412,7 @@ export function Dashboard() {
 						: "h-[88px] min-w-0";
 
 					const renderProjectCard = (project: (typeof projects)[0], i: number) => {
-					const progress = Math.round(project.progress ?? 0);
+					const progress = Math.round(Number(project.progress ?? 0));
 					const contractValue = project.contractValue ?? 0;
 					const days = daysRemaining(project.endDate);
 					const coverImageUrl = (project as { photos?: { url: string }[] }).photos?.[0]?.url;
@@ -872,7 +872,7 @@ export function Dashboard() {
 							</span>
 						</div>
 						{upcomingMilestones && upcomingMilestones.length > 0 ? (
-							upcomingMilestones.slice(0, 2).map((m: Milestone) => (
+							upcomingMilestones.slice(0, 2).map((m) => (
 								<Link
 									key={m.id}
 									href={`/app/${organizationSlug}/projects/${m.project.id}/execution`}
@@ -887,7 +887,7 @@ export function Dashboard() {
 										</p>
 									</div>
 									<span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
-										{m.progress}%
+										{Number(m.progress)}%
 									</span>
 								</Link>
 							))

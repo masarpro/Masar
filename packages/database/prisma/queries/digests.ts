@@ -15,26 +15,34 @@ export async function subscribeToDigest(data: {
 	frequency?: DigestFrequency;
 	channel?: NotificationChannel;
 }) {
-	return db.digestSubscription.upsert({
+	// Find existing subscription
+	const existing = await db.digestSubscription.findFirst({
 		where: {
-			organizationId_userId_projectId: {
-				organizationId: data.organizationId,
-				userId: data.userId,
-				projectId: data.projectId ?? null,
-			},
+			organizationId: data.organizationId,
+			userId: data.userId,
+			projectId: data.projectId ?? null,
 		},
-		create: {
+	});
+
+	if (existing) {
+		return db.digestSubscription.update({
+			where: { id: existing.id },
+			data: {
+				isEnabled: true,
+				frequency: data.frequency,
+				channel: data.channel,
+			},
+		});
+	}
+
+	return db.digestSubscription.create({
+		data: {
 			organizationId: data.organizationId,
 			userId: data.userId,
 			projectId: data.projectId,
 			frequency: data.frequency ?? "WEEKLY",
 			channel: data.channel ?? "IN_APP",
 			isEnabled: true,
-		},
-		update: {
-			isEnabled: true,
-			frequency: data.frequency,
-			channel: data.channel,
 		},
 	});
 }

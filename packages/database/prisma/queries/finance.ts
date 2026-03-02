@@ -295,7 +295,7 @@ export async function updateClient(
 		region: string;
 		postalCode: string;
 		country: string;
-		secondaryAddress: object | null;
+		secondaryAddress: Record<string, unknown> | null;
 		code: string;
 		currency: string;
 		displayLanguage: string;
@@ -317,7 +317,7 @@ export async function updateClient(
 
 	return db.client.update({
 		where: { id },
-		data,
+		data: data as Parameters<typeof db.client.update>[0]["data"],
 		include: {
 			contacts: true,
 		},

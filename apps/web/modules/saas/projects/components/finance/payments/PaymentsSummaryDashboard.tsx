@@ -58,9 +58,9 @@ export function PaymentsSummaryDashboard({
 		);
 	}
 
-	const contractValue = financeSummary?.adjustedContractValue ?? financeSummary?.contractValue ?? 0;
-	const totalCollected = financeSummary?.totalPayments ?? 0;
-	const totalClaims = (financeSummary?.claimsApproved ?? 0) + (financeSummary?.claimsPaid ?? 0) + (financeSummary?.claimsSubmitted ?? 0);
+	const contractValue = Number(financeSummary?.adjustedContractValue ?? financeSummary?.contractValue ?? 0);
+	const totalCollected = Number(financeSummary?.totalPayments ?? 0);
+	const totalClaims = Number(financeSummary?.claimsApproved ?? 0) + Number(financeSummary?.claimsPaid ?? 0) + Number(financeSummary?.claimsSubmitted ?? 0);
 	const outstanding = contractValue - totalCollected;
 	const collectionPercent = contractValue > 0 ? Math.min(100, (totalCollected / contractValue) * 100) : 0;
 

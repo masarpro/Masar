@@ -5,7 +5,7 @@
 /**
  * Convert an array of objects to CSV string
  */
-export function objectsToCsv<T extends Record<string, unknown>>(
+export function objectsToCsv<T extends object>(
 	data: T[],
 	columns: { key: keyof T; header: string }[],
 ): string {
@@ -123,9 +123,8 @@ export function generateClaimsCsv(
 export interface IssueCSVRow {
 	title: string;
 	description: string | null;
-	priority: string;
+	severity: string;
 	status: string;
-	category: string;
 	createdAt: Date;
 	resolvedAt: Date | null;
 	reportedBy: string;
@@ -140,9 +139,8 @@ export function generateIssuesCsv(
 			? [
 					{ key: "title" as const, header: "العنوان" },
 					{ key: "description" as const, header: "الوصف" },
-					{ key: "priority" as const, header: "الأولوية" },
+					{ key: "severity" as const, header: "الأولوية" },
 					{ key: "status" as const, header: "الحالة" },
-					{ key: "category" as const, header: "الفئة" },
 					{ key: "createdAt" as const, header: "تاريخ الإنشاء" },
 					{ key: "resolvedAt" as const, header: "تاريخ الحل" },
 					{ key: "reportedBy" as const, header: "بلّغ بواسطة" },
@@ -150,9 +148,8 @@ export function generateIssuesCsv(
 			: [
 					{ key: "title" as const, header: "Title" },
 					{ key: "description" as const, header: "Description" },
-					{ key: "priority" as const, header: "Priority" },
+					{ key: "severity" as const, header: "Severity" },
 					{ key: "status" as const, header: "Status" },
-					{ key: "category" as const, header: "Category" },
 					{ key: "createdAt" as const, header: "Created At" },
 					{ key: "resolvedAt" as const, header: "Resolved At" },
 					{ key: "reportedBy" as const, header: "Reported By" },

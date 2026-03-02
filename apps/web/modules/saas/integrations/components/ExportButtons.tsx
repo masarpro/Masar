@@ -101,7 +101,6 @@ export function ExportButtons({ projectId }: ExportButtonsProps) {
 			return apiClient.exports.generateCalendarICS({
 				organizationId: activeOrganization.id,
 				projectId,
-				includePayments: true,
 				includeMilestones: true,
 				includeClaims: true,
 			});

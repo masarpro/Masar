@@ -70,7 +70,7 @@ export function LookaheadActivityCard({ activity }: LookaheadActivityCardProps) 
 				{activity.assignee && <span>{activity.assignee.name}</span>}
 			</div>
 
-			<Progress value={activity.progress} className="h-1.5" />
+			<Progress value={Number(activity.progress)} className="h-1.5" />
 		</div>
 	);
 }

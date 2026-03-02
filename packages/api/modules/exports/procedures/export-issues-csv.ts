@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { db } from "@repo/database";
+import { db, type IssueStatus, type IssueSeverity } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
@@ -17,7 +17,7 @@ export const exportIssuesCsvProcedure = protectedProcedure
 			organizationId: z.string(),
 			projectId: z.string(),
 			status: z.string().optional(),
-			priority: z.string().optional(),
+			severity: z.string().optional(),
 			language: z.enum(["ar", "en"]).optional().default("ar"),
 		}),
 	)
@@ -35,26 +35,26 @@ export const exportIssuesCsvProcedure = protectedProcedure
 		const where: {
 			projectId: string;
 			project: { organizationId: string };
-			status?: string;
-			priority?: string;
+			status?: IssueStatus;
+			severity?: IssueSeverity;
 		} = {
 			projectId: input.projectId,
 			project: { organizationId: input.organizationId },
 		};
 
 		if (input.status) {
-			where.status = input.status;
+			where.status = input.status as IssueStatus;
 		}
 
-		if (input.priority) {
-			where.priority = input.priority;
+		if (input.severity) {
+			where.severity = input.severity as IssueSeverity;
 		}
 
 		// Get issues
 		const issues = await db.projectIssue.findMany({
 			where,
 			include: {
-				reportedByUser: { select: { name: true } },
+				createdBy: { select: { name: true } },
 			},
 			orderBy: { createdAt: "desc" },
 		});
@@ -63,12 +63,11 @@ export const exportIssuesCsvProcedure = protectedProcedure
 		const csvData = issues.map((i) => ({
 			title: i.title,
 			description: i.description,
-			priority: i.priority,
+			severity: i.severity,
 			status: i.status,
-			category: i.category,
 			createdAt: i.createdAt,
 			resolvedAt: i.resolvedAt,
-			reportedBy: i.reportedByUser?.name || "",
+			reportedBy: i.createdBy?.name || "",
 		}));
 
 		const csv = generateIssuesCsv(csvData, input.language);

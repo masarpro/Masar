@@ -85,11 +85,11 @@ export function FinanceView({
 		<div className="space-y-6">
 			{/* Summary Cards */}
 			<FinanceSummary
-				contractValue={summary?.contractValue ?? 0}
-				actualExpenses={summary?.actualExpenses ?? 0}
-				totalPayments={summary?.totalPayments ?? 0}
-				remaining={summary?.remaining ?? 0}
-				claimsPaid={summary?.claimsPaid ?? 0}
+				contractValue={Number(summary?.contractValue ?? 0)}
+				actualExpenses={Number(summary?.actualExpenses ?? 0)}
+				totalPayments={Number(summary?.totalPayments ?? 0)}
+				remaining={Number(summary?.remaining ?? 0)}
+				claimsPaid={Number(summary?.claimsPaid ?? 0)}
 			/>
 
 			{/* Quick Navigation */}

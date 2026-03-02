@@ -102,14 +102,6 @@ export const publishOfficialUpdate = protectedProcedure
 				senderId: context.user.id,
 				content,
 				isUpdate: true,
-				metadata: {
-					type: "OFFICIAL_UPDATE",
-					headline: input.headline,
-					progress: input.progress,
-					phaseLabel: input.phaseLabel,
-					photoIds: input.photoIds,
-					nextPayment: input.nextPayment,
-				},
 			},
 			include: {
 				sender: { select: { id: true, name: true } },

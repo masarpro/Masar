@@ -244,7 +244,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 		0,
 	);
 	const totalDeductions = items.reduce((sum, item) => sum + Number(item.gosiDeduction ?? 0), 0);
-	const netTotal = Number(run.netTotal ?? 0);
+	const netTotal = Number(run.totalNetSalary ?? 0);
 
 	return (
 		<div className="space-y-6" dir="rtl">
@@ -282,14 +282,14 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 							<div className="flex items-center gap-2">
 								{getStatusBadge(run.status)}
 							</div>
-							{run.createdByUser && (
+							{run.createdBy && (
 								<p className="text-xs text-slate-500 dark:text-slate-400">
-									{t("company.payroll.createdBy")}: {run.createdByUser.name ?? run.createdByUser.email}
+									{t("company.payroll.createdBy")}: {run.createdBy.name}
 								</p>
 							)}
-							{run.approvedByUser && (
+							{run.approvedBy && (
 								<p className="text-xs text-slate-500 dark:text-slate-400">
-									{t("company.payroll.approvedBy")}: {run.approvedByUser.name ?? run.approvedByUser.email}
+									{t("company.payroll.approvedBy")}: {run.approvedBy.name}
 								</p>
 							)}
 							{run.notes && (
@@ -477,22 +477,22 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 										{item.employee?.employeeNo ?? "-"}
 									</TableCell>
 									<TableCell className="text-right text-slate-700 dark:text-slate-300 font-medium">
-										{formatCurrency(item.baseSalary ?? 0)}
+										{formatCurrency(Number(item.baseSalary ?? 0))}
 									</TableCell>
 									<TableCell className="text-right text-slate-600 dark:text-slate-300">
-										{formatCurrency(item.housingAllowance ?? 0)}
+										{formatCurrency(Number(item.housingAllowance ?? 0))}
 									</TableCell>
 									<TableCell className="text-right text-slate-600 dark:text-slate-300">
-										{formatCurrency(item.transportAllowance ?? 0)}
+										{formatCurrency(Number(item.transportAllowance ?? 0))}
 									</TableCell>
 									<TableCell className="text-right text-slate-600 dark:text-slate-300">
-										{formatCurrency(item.otherAllowances ?? 0)}
+										{formatCurrency(Number(item.otherAllowances ?? 0))}
 									</TableCell>
 									<TableCell className="text-right text-red-600 dark:text-red-400">
-										{formatCurrency(item.gosiDeduction ?? 0)}
+										{formatCurrency(Number(item.gosiDeduction ?? 0))}
 									</TableCell>
 									<TableCell className="text-right font-semibold text-slate-900 dark:text-slate-100">
-										{formatCurrency(item.netSalary ?? 0)}
+										{formatCurrency(Number(item.netSalary ?? 0))}
 									</TableCell>
 									<TableCell className="text-right">
 										{item.financeExpense?.status ? (

@@ -18,7 +18,7 @@ export function MilestoneProgressRow({
 	isLoading,
 }: MilestoneProgressRowProps) {
 	const t = useTranslations();
-	const [localProgress, setLocalProgress] = useState(milestone.progress);
+	const [localProgress, setLocalProgress] = useState(Number(milestone.progress));
 
 	const isAutoCalculated = milestone.progressMethod === "ACTIVITIES";
 	const isChecklist = milestone.progressMethod === "CHECKLIST";
@@ -36,20 +36,20 @@ export function MilestoneProgressRow({
 					{t("timeline.progress")}
 				</span>
 				<span className="text-2xl font-bold text-teal-600">
-					{Math.round(isDisabled ? milestone.progress : localProgress)}%
+					{Math.round(isDisabled ? Number(milestone.progress) : localProgress)}%
 				</span>
 			</div>
 
 			{isAutoCalculated ? (
 				<div>
-					<Progress value={milestone.progress} className="h-2" />
+					<Progress value={Number(milestone.progress)} className="h-2" />
 					<p className="text-xs text-muted-foreground mt-1">
 						{t("execution.milestone.progressAutoCalculated")}
 					</p>
 				</div>
 			) : isChecklist ? (
 				<div>
-					<Progress value={milestone.progress} className="h-2" />
+					<Progress value={Number(milestone.progress)} className="h-2" />
 					<p className="text-xs text-muted-foreground mt-1">
 						{t("execution.milestone.progressFromChecklist")}
 					</p>

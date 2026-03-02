@@ -101,12 +101,13 @@ export const generateUpdateDraft = protectedProcedure
 		const blockers = latestReport?.blockers;
 
 		// Generate headline
+		const progressNum = Number(progress);
 		let headline = `تحديث مشروع ${project.name}`;
-		if (progress >= 100) {
+		if (progressNum >= 100) {
 			headline = `تم اكتمال مشروع ${project.name}`;
-		} else if (progress >= 75) {
+		} else if (progressNum >= 75) {
 			headline = `مشروع ${project.name} - المراحل النهائية`;
-		} else if (progress >= 50) {
+		} else if (progressNum >= 50) {
 			headline = `مشروع ${project.name} - تجاوز منتصف الطريق`;
 		}
 
@@ -119,7 +120,7 @@ export const generateUpdateDraft = protectedProcedure
 		return {
 			draft: {
 				headline,
-				progress: Math.round(progress),
+				progress: Math.round(progressNum),
 				phaseLabel,
 				workDoneSummary,
 				blockers: blockers || null,

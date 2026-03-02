@@ -84,28 +84,28 @@ export function CompanyReports({ organizationId }: CompanyReportsProps) {
 					<TableBody>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
 							<TableCell className="font-medium text-slate-900 dark:text-slate-100">{t("company.reports.salariesAndAllowances")}</TableCell>
-							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(dashboard.employees.totalMonthlySalaries)}</TableCell>
-							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(dashboard.employees.totalMonthlySalaries * 12)}</TableCell>
+							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(Number(dashboard.employees.totalMonthlySalaries))}</TableCell>
+							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(Number(dashboard.employees.totalMonthlySalaries) * 12)}</TableCell>
 						</TableRow>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
 							<TableCell className="font-medium text-slate-900 dark:text-slate-100">{t("company.reports.gosiContributions")}</TableCell>
-							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(dashboard.employees.totalMonthlyGosi)}</TableCell>
-							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(dashboard.employees.totalMonthlyGosi * 12)}</TableCell>
+							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(Number(dashboard.employees.totalMonthlyGosi))}</TableCell>
+							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(Number(dashboard.employees.totalMonthlyGosi) * 12)}</TableCell>
 						</TableRow>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
 							<TableCell className="font-medium text-slate-900 dark:text-slate-100">{t("company.reports.recurringExpenses")}</TableCell>
-							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(dashboard.expenses.totalMonthlyAmount)}</TableCell>
-							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(dashboard.expenses.totalAnnualAmount)}</TableCell>
+							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(Number(dashboard.expenses.totalMonthlyAmount))}</TableCell>
+							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(Number(dashboard.expenses.totalAnnualAmount))}</TableCell>
 						</TableRow>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
 							<TableCell className="font-medium text-slate-900 dark:text-slate-100">{t("company.reports.assetRentals")}</TableCell>
-							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(dashboard.assets.totalMonthlyRent)}</TableCell>
-							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(dashboard.assets.totalMonthlyRent * 12)}</TableCell>
+							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(Number(dashboard.assets.totalMonthlyRent))}</TableCell>
+							<TableCell className="text-slate-700 dark:text-slate-300">{formatCurrency(Number(dashboard.assets.totalMonthlyRent) * 12)}</TableCell>
 						</TableRow>
 						<TableRow className="border-t-2 border-slate-200/50 dark:border-slate-600/50 hover:bg-transparent">
 							<TableCell className="font-bold text-slate-900 dark:text-slate-100">{t("company.reports.totalOverhead")}</TableCell>
-							<TableCell className="font-bold text-red-600 dark:text-red-400">{formatCurrency(dashboard.totalMonthlyCost)}</TableCell>
-							<TableCell className="font-bold text-red-600 dark:text-red-400">{formatCurrency(dashboard.totalMonthlyCost * 12)}</TableCell>
+							<TableCell className="font-bold text-red-600 dark:text-red-400">{formatCurrency(Number(dashboard.totalMonthlyCost))}</TableCell>
+							<TableCell className="font-bold text-red-600 dark:text-red-400">{formatCurrency(Number(dashboard.totalMonthlyCost) * 12)}</TableCell>
 						</TableRow>
 					</TableBody>
 				</Table>
@@ -187,7 +187,7 @@ export function CompanyReports({ organizationId }: CompanyReportsProps) {
 						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
 							<Banknote className="h-4 w-4 text-blue-600 dark:text-blue-400" />
 						</div>
-						<p className="text-xl font-bold text-blue-700 dark:text-blue-300">{formatCurrency(dashboard.employees.totalMonthlyCost)}</p>
+						<p className="text-xl font-bold text-blue-700 dark:text-blue-300">{formatCurrency(Number(dashboard.employees.totalMonthlyCost))}</p>
 						<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.reports.totalLabor")}</p>
 					</div>
 				</div>
@@ -222,14 +222,14 @@ export function CompanyReports({ organizationId }: CompanyReportsProps) {
 						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
 							<Banknote className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
 						</div>
-						<p className="text-xl font-bold text-indigo-700 dark:text-indigo-300">{formatCurrency(dashboard.assets.totalValue)}</p>
+						<p className="text-xl font-bold text-indigo-700 dark:text-indigo-300">{formatCurrency(Number(dashboard.assets.totalValue))}</p>
 						<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.totalValue")}</p>
 					</div>
 					<div className="text-center p-4 rounded-xl bg-orange-50/80 dark:bg-orange-900/20 border border-orange-100/50 dark:border-orange-800/30">
 						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
 							<Wrench className="h-4 w-4 text-orange-600 dark:text-orange-400" />
 						</div>
-						<p className="text-xl font-bold text-orange-700 dark:text-orange-300">{formatCurrency(dashboard.assets.totalMonthlyRent)}</p>
+						<p className="text-xl font-bold text-orange-700 dark:text-orange-300">{formatCurrency(Number(dashboard.assets.totalMonthlyRent))}</p>
 						<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.monthlyRent")}</p>
 					</div>
 				</div>

@@ -40,7 +40,7 @@ export function KpiStrip({ project, financeSummary }: KpiStripProps) {
 					</span>
 				</div>
 				<p className="text-2xl font-bold text-teal-600 dark:text-teal-400">
-					{Math.round(project.progress)}%
+					{Math.round(Number(project.progress))}%
 				</p>
 			</div>
 

@@ -25,12 +25,6 @@ export const getSharedResourceProcedure = publicProcedure
 			});
 		}
 
-		// Increment access count
-		await db.shareLink.update({
-			where: { token: input.token },
-			data: { accessCount: { increment: 1 } },
-		});
-
 		// Get the resource data based on type
 		const resourceData = await getSharedResourceData({
 			organizationId: shareLink.organizationId,

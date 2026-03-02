@@ -75,7 +75,6 @@ export function ActivityDetailSheet({ onClose }: ActivityDetailSheetProps) {
 			if (!organizationId || !selectedId) return null;
 			return apiClient.projectExecution.listChecklists({
 				organizationId,
-				projectId,
 				activityId: selectedId,
 			});
 		},
@@ -87,9 +86,8 @@ export function ActivityDetailSheet({ onClose }: ActivityDetailSheetProps) {
 			if (!organizationId) throw new Error("No org");
 			return apiClient.projectExecution.toggleChecklistItem({
 				organizationId,
-				projectId,
-				checklistItemId: params.checklistItemId,
-				isCompleted: params.isCompleted,
+				activityId: selectedId!,
+				checklistId: params.checklistItemId,
 			});
 		},
 		onSuccess: () => {
@@ -156,10 +154,10 @@ export function ActivityDetailSheet({ onClose }: ActivityDetailSheetProps) {
 								<div className="flex items-center justify-between text-sm">
 									<span>{t("execution.advanced.wbs.progress")}</span>
 									<span className="font-medium">
-										{selectedActivity.progress}%
+										{Number(selectedActivity.progress)}%
 									</span>
 								</div>
-								<Progress value={selectedActivity.progress} className="h-2" />
+								<Progress value={Number(selectedActivity.progress)} className="h-2" />
 							</div>
 						</div>
 

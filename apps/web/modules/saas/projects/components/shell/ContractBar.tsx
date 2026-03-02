@@ -127,16 +127,16 @@ function ContractBarInner({
 								{t("projects.contractBar.contractValue")}:
 							</span>
 							<span className="font-semibold">
-								{formatCurrency(summary?.originalValue ?? 0)}
+								{formatCurrency(Number(summary?.originalValue ?? 0))}
 							</span>
-							{summary?.adjustedValue !== summary?.originalValue && (
+							{Number(summary?.adjustedValue ?? 0) !== Number(summary?.originalValue ?? 0) && (
 								<>
 									<span className="text-muted-foreground mx-1">←</span>
 									<span className="text-muted-foreground">
 										{t("projects.contractBar.adjustedValue")}:
 									</span>
 									<span className="font-semibold text-teal-600 dark:text-teal-400">
-										{formatCurrency(summary?.adjustedValue ?? 0)}
+										{formatCurrency(Number(summary?.adjustedValue ?? 0))}
 									</span>
 								</>
 							)}
@@ -204,7 +204,7 @@ function ContractBarInner({
 							{t(`projects.contract.status.${contract.status}`)}
 						</Badge>
 						<span className="text-sm font-semibold truncate">
-							{formatCurrency(summary?.originalValue ?? 0)}
+							{formatCurrency(Number(summary?.originalValue ?? 0))}
 						</span>
 					</div>
 					<div className="flex items-center gap-2 text-xs shrink-0">

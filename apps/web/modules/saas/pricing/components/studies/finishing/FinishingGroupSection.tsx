@@ -62,7 +62,7 @@ export function FinishingGroupSection({
 	studyId,
 	buildingConfig,
 }: FinishingGroupSectionProps) {
-	const IconComponent = (LucideIcons as Record<string, React.ComponentType<{ className?: string }>>)[
+	const IconComponent = (LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[
 		group.icon
 	] ?? LucideIcons.Box;
 	const borderColor = GROUP_COLORS[group.color] ?? "border-gray-500";

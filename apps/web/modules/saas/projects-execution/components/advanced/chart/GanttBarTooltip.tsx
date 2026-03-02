@@ -37,7 +37,7 @@ export const GanttBarTooltip = memo(function GanttBarTooltip({
 						style={{ backgroundColor: statusColor }}
 					/>
 					<span>{t(`execution.activity.status.${activity.status}`)}</span>
-					<span className="ms-auto">{activity.progress}%</span>
+					<span className="ms-auto">{Number(activity.progress)}%</span>
 				</div>
 				<div className="flex items-center gap-2 text-muted-foreground mt-1">
 					<span>

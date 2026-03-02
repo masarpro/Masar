@@ -56,14 +56,14 @@ export function DirectAreaCalculator({
 				<div className="space-y-4">
 					<div className="flex gap-2">
 						<Button
-							variant={useDirectArea ? "default" : "outline"}
+							variant={useDirectArea ? "primary" : "outline"}
 							size="sm"
 							onClick={() => setUseDirectArea(true)}
 						>
 							مساحة مباشرة
 						</Button>
 						<Button
-							variant={!useDirectArea ? "default" : "outline"}
+							variant={!useDirectArea ? "primary" : "outline"}
 							size="sm"
 							onClick={() => setUseDirectArea(false)}
 						>

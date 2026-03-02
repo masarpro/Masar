@@ -448,7 +448,7 @@ export function ProjectPhotosCard({
 					<AlertDialogFooter>
 						<AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
 						<Button
-							variant="destructive"
+							variant="error"
 							onClick={handleDeletePhoto}
 							disabled={deleteMutation.isPending}
 						>

@@ -67,7 +67,7 @@ export const WbsMilestoneRow = memo(function WbsMilestoneRow({
 
 			{/* Progress */}
 			<div className="w-[60px] shrink-0 px-2 text-center text-xs font-semibold">
-				{milestone.progress}%
+				{Number(milestone.progress)}%
 			</div>
 		</div>
 	);

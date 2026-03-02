@@ -222,15 +222,15 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.purchasePrice")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(asset.purchasePrice)}</p>
+							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(asset.purchasePrice))}</p>
 						</div>
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.monthlyRent")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(asset.monthlyRent)}</p>
+							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(asset.monthlyRent))}</p>
 						</div>
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.assets.currentValue")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(asset.currentValue)}</p>
+							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(asset.currentValue))}</p>
 						</div>
 						{asset.purchaseDate && (
 							<div>

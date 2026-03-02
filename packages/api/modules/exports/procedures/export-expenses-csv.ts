@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { db } from "@repo/database";
+import { db, type ExpenseCategory } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
@@ -37,7 +37,7 @@ export const exportExpensesCsvProcedure = protectedProcedure
 			projectId: string;
 			project: { organizationId: string };
 			date?: { gte?: Date; lte?: Date };
-			category?: string;
+			category?: ExpenseCategory;
 		} = {
 			projectId: input.projectId,
 			project: { organizationId: input.organizationId },
@@ -50,14 +50,14 @@ export const exportExpensesCsvProcedure = protectedProcedure
 		}
 
 		if (input.category) {
-			where.category = input.category;
+			where.category = input.category as ExpenseCategory;
 		}
 
 		// Get expenses
 		const expenses = await db.projectExpense.findMany({
 			where,
 			include: {
-				createdByUser: { select: { name: true } },
+				createdBy: { select: { name: true } },
 			},
 			orderBy: { date: "desc" },
 		});
@@ -67,9 +67,9 @@ export const exportExpensesCsvProcedure = protectedProcedure
 			date: e.date,
 			category: e.category,
 			amount: e.amount.toNumber(),
-			vendor: e.vendor,
+			vendor: e.vendorName,
 			note: e.note,
-			createdBy: e.createdByUser?.name || "",
+			createdBy: e.createdBy?.name || "",
 		}));
 
 		const csv = generateExpensesCsv(csvData, input.language);

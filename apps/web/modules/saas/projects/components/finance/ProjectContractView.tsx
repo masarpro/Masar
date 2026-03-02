@@ -247,10 +247,10 @@ export function ProjectContractView({
 
 			{/* Summary Bar */}
 			<ContractSummaryBar
-				originalValue={summary?.originalValue ?? 0}
-				approvedCOImpact={summary?.approvedCOImpact ?? 0}
-				adjustedValue={summary?.adjustedValue ?? 0}
-				retentionAmount={summary?.retentionAmount ?? 0}
+				originalValue={Number(summary?.originalValue ?? 0)}
+				approvedCOImpact={Number(summary?.approvedCOImpact ?? 0)}
+				adjustedValue={Number(summary?.adjustedValue ?? 0)}
+				retentionAmount={Number(summary?.retentionAmount ?? 0)}
 			/>
 
 			{/* Contract Form (same as creation page) */}
@@ -338,8 +338,8 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 					<ReadOnlyField
 						label={t("projects.createProject.contractValue")}
 						value={
-							contract.value > 0
-								? `${formatCurrency(contract.value)} ر.س`
+							Number(contract.value) > 0
+								? `${formatCurrency(Number(contract.value))} ر.س`
 								: "—"
 						}
 					/>
@@ -356,7 +356,7 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 					{contract.includesVat && (
 						<ReadOnlyField
 							label={t("projects.createProject.vatToggle")}
-							value={`${formatCurrency(contract.value * 1.15)} ر.س`}
+							value={`${formatCurrency(Number(contract.value) * 1.15)} ر.س`}
 						/>
 					)}
 					{contract.paymentMethod && (
@@ -446,7 +446,7 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 										)}
 										{term.amount != null && (
 											<span className="font-mono text-sm text-slate-600 dark:text-slate-400">
-												{formatCurrency(term.amount)}{" "}
+												{formatCurrency(Number(term.amount))}{" "}
 												ر.س
 											</span>
 										)}

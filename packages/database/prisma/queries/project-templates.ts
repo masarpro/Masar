@@ -88,7 +88,7 @@ export async function createTemplate(data: {
 							title: item.title,
 							description: item.description,
 							sortOrder: item.sortOrder ?? index,
-							metadata: item.metadata,
+							metadata: item.metadata as import("../generated/client").Prisma.InputJsonValue ?? undefined,
 						})),
 					}
 				: undefined,
@@ -359,7 +359,7 @@ export async function addTemplateItem(
 			title: item.title,
 			description: item.description,
 			sortOrder: item.sortOrder ?? (maxOrder._max.sortOrder ?? 0) + 1,
-			metadata: item.metadata,
+			metadata: item.metadata as import("../generated/client").Prisma.InputJsonValue ?? undefined,
 		},
 	});
 }

@@ -111,11 +111,11 @@ export function GanttRow({
 					/>
 
 					{/* Progress fill */}
-					{milestone.progress > 0 && (
+					{Number(milestone.progress) > 0 && (
 						<rect
-							x={isRtl ? bar.x + bar.width - bar.width * (milestone.progress / 100) : bar.x}
+							x={isRtl ? bar.x + bar.width - bar.width * (Number(milestone.progress) / 100) : bar.x}
 							y={bar.y}
-							width={bar.width * (milestone.progress / 100)}
+							width={bar.width * (Number(milestone.progress) / 100)}
 							height={BAR_HEIGHT}
 							rx={4}
 							ry={4}

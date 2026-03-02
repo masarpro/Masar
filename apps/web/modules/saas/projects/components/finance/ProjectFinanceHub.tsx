@@ -87,13 +87,13 @@ export function ProjectFinanceHub({
 		<div className="space-y-6">
 			{/* Summary Cards */}
 			<FinanceSummary
-				contractValue={summary?.contractValue ?? 0}
-				actualExpenses={summary?.actualExpenses ?? 0}
-				totalPayments={summary?.totalPayments ?? 0}
-				remaining={summary?.remaining ?? 0}
-				claimsPaid={summary?.claimsPaid ?? 0}
-				adjustedContractValue={summary?.adjustedContractValue}
-				changeOrdersImpact={summary?.changeOrdersImpact}
+				contractValue={Number(summary?.contractValue ?? 0)}
+				actualExpenses={Number(summary?.actualExpenses ?? 0)}
+				totalPayments={Number(summary?.totalPayments ?? 0)}
+				remaining={Number(summary?.remaining ?? 0)}
+				claimsPaid={Number(summary?.claimsPaid ?? 0)}
+				adjustedContractValue={summary?.adjustedContractValue != null ? Number(summary.adjustedContractValue) : undefined}
+				changeOrdersImpact={summary?.changeOrdersImpact != null ? Number(summary.changeOrdersImpact) : undefined}
 			/>
 
 			{/* Main Content: Expenses + Chart */}

@@ -82,8 +82,8 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 		},
 	});
 
-	const formatCurrency = (amount: number) =>
-		new Intl.NumberFormat("ar-SA").format(amount) + " ر.س";
+	const formatCurrency = (amount: number | string) =>
+		new Intl.NumberFormat("ar-SA").format(Number(amount)) + " ر.س";
 
 	const getStatusBadge = (status: string) => {
 		switch (status) {

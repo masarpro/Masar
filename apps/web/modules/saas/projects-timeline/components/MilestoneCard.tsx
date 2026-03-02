@@ -34,8 +34,8 @@ interface Milestone {
 	plannedEnd?: Date | string | null;
 	actualStart?: Date | string | null;
 	actualEnd?: Date | string | null;
-	status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "DELAYED";
-	progress: number;
+	status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "DELAYED" | "CANCELLED";
+	progress: number | { toNumber(): number };
 	isCritical: boolean;
 	healthStatus: "ON_TRACK" | "AT_RISK" | "DELAYED";
 }
@@ -139,9 +139,9 @@ export function MilestoneCard({
 							<span className="text-muted-foreground">
 								{t("timeline.progress")}
 							</span>
-							<span className="font-medium">{Math.round(milestone.progress)}%</span>
+							<span className="font-medium">{Math.round(Number(milestone.progress))}%</span>
 						</div>
-						<Progress value={milestone.progress} className="h-2" />
+						<Progress value={Number(milestone.progress)} className="h-2" />
 					</div>
 				</div>
 
@@ -189,7 +189,7 @@ export function MilestoneCard({
 									onClick={() => {
 										const progress = prompt(
 											t("timeline.actions.enterProgress"),
-											String(milestone.progress),
+											String(Number(milestone.progress)),
 										);
 										if (progress !== null) {
 											const value = parseInt(progress, 10);

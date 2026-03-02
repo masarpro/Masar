@@ -92,7 +92,7 @@ export function TemplatePreview({
 
 	const content = template.content as { elements?: TemplateElement[] } | null;
 	const elements = content?.elements || [];
-	const settings = (template.settings || {}) as TemplateSettings;
+	const settings = (template.settings || {}) as unknown as TemplateSettings;
 	const templateType = template.templateType.toLowerCase() as "quotation" | "invoice" | "letter";
 
 	// Prepare organization data for renderer

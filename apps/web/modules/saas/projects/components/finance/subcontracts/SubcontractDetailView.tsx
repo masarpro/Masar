@@ -682,7 +682,7 @@ export function SubcontractDetailView({
 								{(["date", "amount", "term"] as const).map((field) => (
 									<Button
 										key={field}
-										variant={paymentSortBy === field ? "default" : "outline"}
+										variant={paymentSortBy === field ? "primary" : "outline"}
 										size="sm"
 										className={`h-8 rounded-lg px-2.5 text-[11px] ${
 											paymentSortBy === field

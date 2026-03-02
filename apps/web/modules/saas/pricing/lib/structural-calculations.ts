@@ -1450,11 +1450,11 @@ export function calculateBandedBeamSlab(slab: BandedBeamSlab): EnhancedSlabResul
 	const {
 		dimensions,
 		openings = [],
-		thickness,
-		bandedBeams,
+		bands: bandedBeams = [],
 		reinforcement,
 		concreteType = 'C30',
 	} = slab;
+	const thickness = dimensions.thickness;
 
 	const grossArea = dimensions.length * dimensions.width;
 	const netArea = calculateNetArea(grossArea, openings);
@@ -1464,7 +1464,7 @@ export function calculateBandedBeamSlab(slab: BandedBeamSlab): EnhancedSlabResul
 
 	// حجم الكمرات العريضة
 	const beamsVolume = bandedBeams.reduce((sum, beam) => {
-		return sum + beam.width * beam.depth * beam.length * (beam.quantity || 1);
+		return sum + beam.dimensions.width * beam.dimensions.depth * beam.dimensions.length * (beam.quantity || 1);
 	}, 0);
 
 	const concreteVolume = slabVolume + beamsVolume;

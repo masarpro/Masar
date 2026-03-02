@@ -198,23 +198,23 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.baseSalary")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(employee.baseSalary)}</p>
+							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(employee.baseSalary))}</p>
 						</div>
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.housingAllowance")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(employee.housingAllowance)}</p>
+							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(employee.housingAllowance))}</p>
 						</div>
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.transportAllowance")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(employee.transportAllowance)}</p>
+							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(employee.transportAllowance))}</p>
 						</div>
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.otherAllowances")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(employee.otherAllowances)}</p>
+							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(employee.otherAllowances))}</p>
 						</div>
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.gosiSubscription")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(employee.gosiSubscription)}</p>
+							<p className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(Number(employee.gosiSubscription))}</p>
 						</div>
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.totalCost")}</p>

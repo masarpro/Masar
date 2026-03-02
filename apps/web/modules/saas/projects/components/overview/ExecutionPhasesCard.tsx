@@ -73,7 +73,7 @@ export function ExecutionPhasesCard({
 	const overallProgress =
 		totalMilestones > 0
 			? Math.round(
-					milestones.reduce((sum, m) => sum + (m.progress ?? 0), 0) /
+					milestones.reduce((sum, m) => sum + Number(m.progress ?? 0), 0) /
 						totalMilestones,
 				)
 			: health?.overallProgress ?? projectProgress ?? 0;
@@ -320,7 +320,7 @@ export function ExecutionPhasesCard({
 										<div
 											className={`h-full rounded-full ${getBarColor(milestone.status)}`}
 											style={{
-												width: `${milestone.progress}%`,
+												width: `${Number(milestone.progress)}%`,
 											}}
 										/>
 									</div>
@@ -328,7 +328,7 @@ export function ExecutionPhasesCard({
 										className="w-7 shrink-0 text-left text-[11px] font-semibold text-slate-500 dark:text-slate-400"
 										dir="ltr"
 									>
-										{Math.round(milestone.progress)}%
+										{Math.round(Number(milestone.progress))}%
 									</span>
 								</div>
 							))}

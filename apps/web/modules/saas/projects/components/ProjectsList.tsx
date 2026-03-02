@@ -310,10 +310,10 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 													{t("projects.overview.progress")}
 												</span>
 												<span className="font-semibold text-teal-600 dark:text-teal-400">
-													{Math.round(project.progress)}%
+													{Math.round(Number(project.progress))}%
 												</span>
 											</div>
-											<Progress value={project.progress} className="h-1.5" />
+											<Progress value={Number(project.progress)} className="h-1.5" />
 										</div>
 
 										{/* Footer: Contract Value + Team */}

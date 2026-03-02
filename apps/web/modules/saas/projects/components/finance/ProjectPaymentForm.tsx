@@ -260,7 +260,7 @@ export function ProjectPaymentForm({
 													</span>
 												)}
 												<span className="font-mono text-xs text-slate-400">
-													({formatCurrency(term.remainingAmount)} ر.س {t("projectPayments.remaining")})
+													({formatCurrency(Number(term.remainingAmount))} ر.س {t("projectPayments.remaining")})
 												</span>
 											</div>
 										</SelectItem>
@@ -306,7 +306,7 @@ export function ProjectPaymentForm({
 									{t("projectPayments.required")}
 								</p>
 								<p className="font-mono text-sm font-semibold text-slate-800 dark:text-slate-200">
-									{formatCurrency(selectedTerm.amount)}{" "}
+									{formatCurrency(Number(selectedTerm.amount))}{" "}
 									ر.س
 								</p>
 							</div>
@@ -316,7 +316,7 @@ export function ProjectPaymentForm({
 								</p>
 								<p className="font-mono text-sm font-semibold text-emerald-700 dark:text-emerald-300">
 									{formatCurrency(
-										selectedTerm.paidAmount,
+										Number(selectedTerm.paidAmount),
 									)}{" "}
 									ر.س
 								</p>
@@ -327,7 +327,7 @@ export function ProjectPaymentForm({
 								</p>
 								<p className="font-mono text-sm font-bold text-blue-700 dark:text-blue-300">
 									{formatCurrency(
-										selectedTerm.remainingAmount,
+										Number(selectedTerm.remainingAmount),
 									)}{" "}
 									ر.س
 								</p>

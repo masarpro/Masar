@@ -123,7 +123,7 @@ export function FieldTimeline({
 		type: (TYPE_MAP[item.type as keyof typeof TYPE_MAP] ??
 			item.type.toLowerCase()) as "report" | "photo" | "issue" | "progress",
 	}));
-	const currentProgress = project?.progress ?? 0;
+	const currentProgress = Number(project?.progress ?? 0);
 
 	// Quick action buttons
 	const quickActions = [
@@ -255,7 +255,7 @@ export function FieldTimeline({
 										{t("common.cancel")}
 									</AlertDialogCancel>
 									<Button
-										variant="destructive"
+										variant="error"
 										onClick={handleDeletePhoto}
 										disabled={deletePhotoMutation.isPending}
 									>

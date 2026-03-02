@@ -90,7 +90,7 @@ export function ProjectUpdates({
 			organizationId,
 			projectId,
 			headline,
-			progress: draftData?.draft.progress || 0,
+			progress: Number(draftData?.draft.progress || 0),
 			phaseLabel: draftData?.draft.phaseLabel,
 			workDoneSummary: workDoneSummary || undefined,
 			blockers: blockers || undefined,
@@ -150,11 +150,11 @@ export function ProjectUpdates({
 											<span className="text-sm text-slate-500">التقدم:</span>
 											<div className="flex items-center gap-2">
 												<Progress
-													value={draftData.draft.progress}
+													value={Number(draftData.draft.progress)}
 													className="h-2 w-24"
 												/>
 												<span className="font-medium text-teal-600">
-													{draftData.draft.progress}%
+													{Number(draftData.draft.progress)}%
 												</span>
 											</div>
 										</div>
@@ -296,11 +296,11 @@ export function ProjectUpdates({
 										</span>
 										<div className="mt-1 flex items-center gap-3">
 											<Progress
-												value={draftData?.draft.progress || 0}
+												value={Number(draftData?.draft.progress || 0)}
 												className="h-3"
 											/>
 											<span className="font-bold text-teal-600">
-												{draftData?.draft.progress || 0}%
+												{Number(draftData?.draft.progress || 0)}%
 											</span>
 										</div>
 									</div>

@@ -238,7 +238,7 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 										{t(`company.assets.types.${asset.type}`)}
 									</TableCell>
 									<TableCell className="text-right font-semibold text-slate-700 dark:text-slate-300">
-										{formatCurrency(asset.currentValue ?? asset.purchasePrice)}
+										{formatCurrency(Number(asset.currentValue ?? asset.purchasePrice))}
 									</TableCell>
 									<TableCell className="text-right">{getStatusBadge(asset.status)}</TableCell>
 									<TableCell className="text-right">

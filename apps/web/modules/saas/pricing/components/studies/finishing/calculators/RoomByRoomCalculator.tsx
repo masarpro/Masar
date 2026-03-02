@@ -136,19 +136,19 @@ export function RoomByRoomCalculator({
 						>
 							<div className="flex-1 space-y-1">
 								<Label className="text-xs">{t("roomName")}</Label>
-								<Input
+								<input
 									ref={(el) => {
 										if (el) inputRefs.current.set(`${room.id}-name`, el);
 									}}
 									value={room.name}
 									onChange={(e) => updateRoom(room.id, "name", e.target.value)}
 									onKeyDown={(e) => handleKeyDown(e, room.id, "name")}
-									className="h-8 text-sm"
+									className="flex h-8 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 								/>
 							</div>
 							<div className="w-20 space-y-1">
 								<Label className="text-xs">الطول</Label>
-								<Input
+								<input
 									ref={(el) => {
 										if (el) inputRefs.current.set(`${room.id}-length`, el);
 									}}
@@ -158,14 +158,14 @@ export function RoomByRoomCalculator({
 										updateRoom(room.id, "length", parseFloat(e.target.value) || 0)
 									}
 									onKeyDown={(e) => handleKeyDown(e, room.id, "length")}
-									className="h-8 text-sm"
+									className="flex h-8 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 									placeholder="م"
 								/>
 							</div>
 							<span className="pb-1 text-muted-foreground">×</span>
 							<div className="w-20 space-y-1">
 								<Label className="text-xs">العرض</Label>
-								<Input
+								<input
 									ref={(el) => {
 										if (el) inputRefs.current.set(`${room.id}-width`, el);
 									}}
@@ -175,7 +175,7 @@ export function RoomByRoomCalculator({
 										updateRoom(room.id, "width", parseFloat(e.target.value) || 0)
 									}
 									onKeyDown={(e) => handleKeyDown(e, room.id, "width")}
-									className="h-8 text-sm"
+									className="flex h-8 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 									placeholder="م"
 								/>
 							</div>

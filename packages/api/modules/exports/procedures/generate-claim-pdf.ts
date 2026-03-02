@@ -54,9 +54,9 @@ export const generateClaimPDFProcedure = protectedProcedure
 		const pdfBuffer = await generateClaimPDF(
 			{
 				projectName: claim.project.name,
-				claimNumber: claim.claimNumber,
-				periodStart: claim.periodStart,
-				periodEnd: claim.periodEnd,
+				claimNumber: claim.claimNo,
+				periodStart: claim.periodStart ?? new Date(),
+				periodEnd: claim.periodEnd ?? new Date(),
 				amount: claim.amount.toNumber(),
 				currency: "SAR",
 				status: claim.status,
@@ -66,15 +66,15 @@ export const generateClaimPDFProcedure = protectedProcedure
 			{
 				title:
 					input.language === "ar"
-						? `مستخلص رقم ${claim.claimNumber}`
-						: `Claim #${claim.claimNumber}`,
+						? `مستخلص رقم ${claim.claimNo}`
+						: `Claim #${claim.claimNo}`,
 				language: input.language,
 			},
 		);
 
 		// Return as base64 for easy transport
 		return {
-			filename: `claim-${claim.claimNumber}.html`,
+			filename: `claim-${claim.claimNo}.html`,
 			mimeType: "text/html",
 			content: pdfBuffer.toString("base64"),
 			size: pdfBuffer.length,

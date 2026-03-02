@@ -290,7 +290,7 @@ export function PaymentsClaimsTable({
 
 										{/* Amount */}
 										<TableCell className="font-semibold">
-											{formatCurrency(item.amount)}
+											{formatCurrency(Number(item.amount))}
 										</TableCell>
 
 										{/* Milestone */}

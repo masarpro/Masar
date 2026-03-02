@@ -107,7 +107,7 @@ export const GanttActivityBar = memo(function GanttActivityBar({
 	const strokeColor = isCritical
 		? CRITICAL_PATH_COLOR
 		: STATUS_COLORS[activity.status] ?? "#94a3b8";
-	const progressWidth = (pos.width * activity.progress) / 100;
+	const progressWidth = (pos.width * Number(activity.progress)) / 100;
 
 	return (
 		<g
@@ -165,7 +165,7 @@ export const GanttActivityBar = memo(function GanttActivityBar({
 					className="text-[10px] fill-foreground font-medium"
 					style={{ pointerEvents: "none" }}
 				>
-					{activity.progress}%
+					{Number(activity.progress)}%
 				</text>
 			)}
 

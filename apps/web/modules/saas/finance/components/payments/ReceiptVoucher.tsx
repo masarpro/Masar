@@ -33,7 +33,7 @@ export function ReceiptVoucher({
 		}),
 	);
 
-	const payment = paymentData?.payment;
+	const payment = paymentData;
 
 	const handlePrint = () => {
 		window.print();

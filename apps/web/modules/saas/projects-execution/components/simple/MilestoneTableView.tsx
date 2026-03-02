@@ -71,7 +71,7 @@ export function MilestoneTableView({
 			case "status":
 				return a.status.localeCompare(b.status) * dir;
 			case "progress":
-				return (a.progress - b.progress) * dir;
+				return (Number(a.progress) - Number(b.progress)) * dir;
 			case "plannedStart": {
 				const aDate = a.plannedStart ? new Date(a.plannedStart).getTime() : 0;
 				const bDate = b.plannedStart ? new Date(b.plannedStart).getTime() : 0;
@@ -154,9 +154,9 @@ export function MilestoneTableView({
 								</TableCell>
 								<TableCell>
 									<div className="flex items-center gap-2 min-w-[100px]">
-										<Progress value={m.progress} className="h-2 flex-1" />
+										<Progress value={Number(m.progress)} className="h-2 flex-1" />
 										<span className="text-xs text-muted-foreground w-8 text-end">
-											{Math.round(m.progress)}%
+											{Math.round(Number(m.progress))}%
 										</span>
 									</div>
 								</TableCell>

@@ -56,7 +56,7 @@ export function useMilestoneActions(projectId: string) {
 			plannedStart?: string | null;
 			plannedEnd?: string | null;
 			isCritical?: boolean;
-			status?: string;
+			status?: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "DELAYED" | "CANCELLED";
 		}) => {
 			if (!organizationId) throw new Error("No organization");
 			return apiClient.projectTimeline.updateMilestone({

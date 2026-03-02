@@ -30,12 +30,13 @@ export const generateUpdatePDFProcedure = protectedProcedure
 			throw new ORPCError("FORBIDDEN");
 		}
 
-		// Get the update with project info
-		const update = await db.projectUpdate.findFirst({
+		// Get the update message (official updates stored as ProjectMessage with isUpdate=true)
+		const update = await db.projectMessage.findFirst({
 			where: {
 				id: input.updateId,
 				projectId: input.projectId,
 				project: { organizationId: input.organizationId },
+				isUpdate: true,
 			},
 			include: {
 				project: {
@@ -43,7 +44,6 @@ export const generateUpdatePDFProcedure = protectedProcedure
 						organization: true,
 					},
 				},
-				photos: true,
 			},
 		});
 
@@ -51,15 +51,23 @@ export const generateUpdatePDFProcedure = protectedProcedure
 			throw new ORPCError("NOT_FOUND", { message: "Update not found" });
 		}
 
+		// Get recent project photos for context
+		const photos = await db.projectPhoto.findMany({
+			where: { projectId: input.projectId },
+			orderBy: { createdAt: "desc" },
+			take: 4,
+			select: { url: true, caption: true },
+		});
+
 		// Generate PDF
 		const pdfBuffer = await generateUpdatePDF(
 			{
 				projectName: update.project.name,
 				updateDate: update.createdAt,
-				type: update.type,
-				title: update.title,
-				body: update.body,
-				photos: update.photos.map((p) => ({
+				type: "OFFICIAL_UPDATE",
+				title: update.content.split("\n")[0] || "تحديث المشروع",
+				body: update.content,
+				photos: photos.map((p: { url: string; caption: string | null }) => ({
 					url: p.url,
 					caption: p.caption || undefined,
 				})),
@@ -69,8 +77,8 @@ export const generateUpdatePDFProcedure = protectedProcedure
 			{
 				title:
 					input.language === "ar"
-						? `تحديث - ${update.title}`
-						: `Update - ${update.title}`,
+						? `تحديث - ${update.content.split("\n")[0] || "تحديث المشروع"}`
+						: `Update - ${update.content.split("\n")[0] || "Project Update"}`,
 				language: input.language,
 			},
 		);

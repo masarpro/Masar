@@ -16,7 +16,6 @@ export const generateCalendarICSProcedure = protectedProcedure
 		z.object({
 			organizationId: z.string(),
 			projectId: z.string(),
-			includePayments: z.boolean().optional().default(true),
 			includeMilestones: z.boolean().optional().default(true),
 			includeClaims: z.boolean().optional().default(true),
 			language: z.enum(["ar", "en"]).optional().default("ar"),
@@ -54,10 +53,11 @@ export const generateCalendarICSProcedure = protectedProcedure
 		if (input.includeMilestones) {
 			const milestones = await db.projectMilestone.findMany({
 				where: { projectId: input.projectId },
-				orderBy: { targetDate: "asc" },
+				orderBy: { plannedEnd: "asc" },
 			});
 
 			for (const milestone of milestones) {
+				if (!milestone.plannedEnd) continue;
 				events.push({
 					uid: generateEventUID(
 						"milestone",
@@ -66,7 +66,7 @@ export const generateCalendarICSProcedure = protectedProcedure
 					),
 					summary: `${isArabic ? "مرحلة: " : "Milestone: "}${milestone.title}`,
 					description: milestone.description || undefined,
-					dtstart: milestone.targetDate,
+					dtstart: milestone.plannedEnd,
 					allDay: true,
 					categories: [isArabic ? "مراحل المشروع" : "Project Milestones"],
 					status: milestone.status === "COMPLETED" ? "CONFIRMED" : "TENTATIVE",
@@ -89,7 +89,7 @@ export const generateCalendarICSProcedure = protectedProcedure
 				if (claim.dueDate) {
 					events.push({
 						uid: generateEventUID("claim", claim.id, input.organizationId),
-						summary: `${isArabic ? "مستخلص #" : "Claim #"}${claim.claimNumber}${isArabic ? " - موعد الاستحقاق" : " - Due Date"}`,
+						summary: `${isArabic ? "مستخلص #" : "Claim #"}${claim.claimNo}${isArabic ? " - موعد الاستحقاق" : " - Due Date"}`,
 						description: isArabic
 							? `المبلغ: ${claim.amount.toNumber()} ر.س\nالحالة: ${claim.status}`
 							: `Amount: ${claim.amount.toNumber()} SAR\nStatus: ${claim.status}`,
@@ -105,29 +105,6 @@ export const generateCalendarICSProcedure = protectedProcedure
 						priority: claim.status === "PAID" ? 9 : 1,
 					});
 				}
-			}
-		}
-
-		// Add payment schedule entries
-		if (input.includePayments) {
-			const paymentSchedules = await db.paymentSchedule.findMany({
-				where: { projectId: input.projectId },
-				orderBy: { dueDate: "asc" },
-			});
-
-			for (const schedule of paymentSchedules) {
-				events.push({
-					uid: generateEventUID("payment", schedule.id, input.organizationId),
-					summary: `${isArabic ? "دفعة: " : "Payment: "}${schedule.description}`,
-					description: isArabic
-						? `المبلغ: ${schedule.amount.toNumber()} ر.س\nالنسبة: ${schedule.percentage}%`
-						: `Amount: ${schedule.amount.toNumber()} SAR\nPercentage: ${schedule.percentage}%`,
-					dtstart: schedule.dueDate,
-					allDay: true,
-					categories: [isArabic ? "الدفعات" : "Payments"],
-					status: schedule.isPaid ? "CONFIRMED" : "TENTATIVE",
-					priority: schedule.isPaid ? 9 : 3,
-				});
 			}
 		}
 

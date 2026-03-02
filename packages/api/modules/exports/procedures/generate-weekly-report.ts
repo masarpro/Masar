@@ -49,10 +49,11 @@ export const generateWeeklyReportProcedure = protectedProcedure
 			throw new ORPCError("NOT_FOUND", { message: "Project not found" });
 		}
 
-		// Get updates for the week
-		const updates = await db.projectUpdate.findMany({
+		// Get official updates (messages with isUpdate=true) for the week
+		const updates = await db.projectMessage.findMany({
 			where: {
 				projectId: input.projectId,
+				isUpdate: true,
 				createdAt: {
 					gte: weekStart,
 					lte: weekEnd,
@@ -98,7 +99,7 @@ export const generateWeeklyReportProcedure = protectedProcedure
 				(expensesByCategory[category] || 0) + expense.amount.toNumber();
 		}
 
-		// Calculate progress (simplified - would need actual progress tracking)
+		// Calculate progress
 		const progress = Number(project.progress) || 0;
 
 		// Generate PDF
@@ -107,10 +108,10 @@ export const generateWeeklyReportProcedure = protectedProcedure
 				projectName: project.name,
 				weekStart,
 				weekEnd,
-				updates: updates.map((u) => ({
+				updates: updates.map((u: { createdAt: Date; channel: string; content: string }) => ({
 					date: u.createdAt,
-					type: u.type,
-					title: u.title,
+					type: u.channel,
+					title: u.content.split("\n")[0] || "تحديث",
 				})),
 				expenses: Object.entries(expensesByCategory).map(
 					([category, amount]) => ({

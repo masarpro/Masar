@@ -94,7 +94,7 @@ export function ExpensesAnalyticsCard({
 									className="fill-slate-900 dark:fill-slate-100 text-lg font-bold"
 									style={{ fontSize: "14px", fontWeight: 700 }}
 								>
-									{formatCurrency(expenses.totalMonthlyAmount)}
+									{formatCurrency(Number(expenses.totalMonthlyAmount))}
 								</text>
 								<text
 									x="50%"
@@ -159,7 +159,7 @@ export function ExpensesAnalyticsCard({
 								className="font-bold text-slate-900 dark:text-slate-100"
 								dir="ltr"
 							>
-								{formatCurrency(expenses.totalMonthlyAmount)}
+								{formatCurrency(Number(expenses.totalMonthlyAmount))}
 							</span>
 						</div>
 					</div>

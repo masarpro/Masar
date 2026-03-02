@@ -27,7 +27,7 @@ export const sendMessageProcedure = protectedProcedure
 			text: z.string(),
 			html: z.string().optional(),
 			templateKey: z.string().optional(),
-			variables: z.record(z.string()).optional(),
+			variables: z.record(z.string(), z.string()).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -80,7 +80,7 @@ export const sendMessageProcedure = protectedProcedure
 			text: input.text,
 			html: input.html,
 			templateKey: input.templateKey,
-			variables: input.variables,
+			variables: input.variables as Record<string, string> | undefined,
 		});
 
 		// Update delivery status
@@ -115,7 +115,7 @@ export const sendBulkMessages = protectedProcedure
 			text: z.string(),
 			html: z.string().optional(),
 			templateKey: z.string().optional(),
-			variables: z.record(z.string()).optional(),
+			variables: z.record(z.string(), z.string()).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -171,7 +171,7 @@ export const sendBulkMessages = protectedProcedure
 					text: input.text,
 					html: input.html,
 					templateKey: input.templateKey,
-					variables: input.variables,
+					variables: input.variables as Record<string, string> | undefined,
 				});
 
 				// Update delivery status

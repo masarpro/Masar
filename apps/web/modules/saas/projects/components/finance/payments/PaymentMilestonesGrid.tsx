@@ -220,10 +220,10 @@ function MilestoneCard({
 				{/* Amount */}
 				<div className="mb-2 flex items-center justify-between text-xs">
 					<span className="font-mono text-slate-600 dark:text-slate-400">
-						{formatCurrency(term.paidAmount)}
+						{formatCurrency(Number(term.paidAmount))}
 					</span>
 					<span className="font-mono text-slate-500">
-						/ {formatCurrency(term.amount)} ر.س
+						/ {formatCurrency(Number(term.amount))} ر.س
 					</span>
 				</div>
 
@@ -261,7 +261,7 @@ function MilestoneCard({
 											</span>
 											<span className="font-mono font-medium text-emerald-700 dark:text-emerald-300">
 												{formatCurrency(
-													payment.amount,
+													Number(payment.amount),
 												)}{" "}
 												ر.س
 											</span>

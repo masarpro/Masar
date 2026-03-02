@@ -82,8 +82,8 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 		},
 	});
 
-	const formatCurrency = (amount: number) =>
-		new Intl.NumberFormat("ar-SA").format(amount) + " ر.س";
+	const formatCurrency = (amount: number | string) =>
+		new Intl.NumberFormat("ar-SA").format(Number(amount)) + " ر.س";
 
 	const getStatusBadge = (active: boolean) => {
 		if (active) {
@@ -269,9 +269,9 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 											<span className="text-xs text-slate-400">-</span>
 										)}
 									</TableCell>
-									<TableCell className="text-right">{getStatusBadge(expense.active)}</TableCell>
+									<TableCell className="text-right">{getStatusBadge(expense.isActive)}</TableCell>
 									<TableCell className="text-right">
-										{expense.active && (
+										{expense.isActive && (
 											<Button
 												variant="ghost"
 												size="icon"

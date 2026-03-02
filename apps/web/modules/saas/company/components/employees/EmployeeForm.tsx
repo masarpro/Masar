@@ -73,7 +73,7 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 	});
 
 	const form = useForm<FormValues>({
-		resolver: zodResolver(formSchema),
+		resolver: zodResolver(formSchema) as any,
 		defaultValues: {
 			name: "",
 			employeeNo: "",

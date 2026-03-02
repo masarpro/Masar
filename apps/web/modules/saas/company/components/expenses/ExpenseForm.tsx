@@ -73,7 +73,7 @@ export function ExpenseForm({ organizationId, organizationSlug, expenseId }: Exp
 	});
 
 	const form = useForm<FormValues>({
-		resolver: zodResolver(formSchema),
+		resolver: zodResolver(formSchema) as any,
 		defaultValues: {
 			name: "",
 			category: "RENT",

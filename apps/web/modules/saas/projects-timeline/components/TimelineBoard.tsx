@@ -456,7 +456,7 @@ export function TimelineBoard({ projectId }: TimelineBoardProps) {
 				</>
 			) : (
 				<GanttView
-					milestones={milestones as GanttMilestone[]}
+					milestones={milestones as unknown as GanttMilestone[]}
 					onEditMilestone={handleGanttEditMilestone}
 					onRescheduleMilestone={handleRescheduleMilestone}
 				/>

@@ -880,7 +880,7 @@ export const updateInvoiceNotesProcedure = protectedProcedure
 		orgAuditLog({
 			organizationId: input.organizationId,
 			actorId: context.user.id,
-			action: "INVOICE_NOTES_UPDATED",
+			action: "INVOICE_UPDATED",
 			entityType: "invoice",
 			entityId: input.id,
 		});

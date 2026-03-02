@@ -66,7 +66,7 @@ export function GanttTooltip({ milestone, x, y, visible, locale }: GanttTooltipP
 					)}
 					<div className="flex justify-between gap-4">
 						<span>{t("timeline.progress")}:</span>
-						<span className="font-medium">{Math.round(milestone.progress)}%</span>
+						<span className="font-medium">{Math.round(Number(milestone.progress))}%</span>
 					</div>
 				</div>
 			</div>

@@ -62,7 +62,7 @@ export function EditPayrollItemDialog({
 	const t = useTranslations();
 
 	const form = useForm<EditPayrollItemFormValues>({
-		resolver: zodResolver(editPayrollItemSchema),
+		resolver: zodResolver(editPayrollItemSchema) as any,
 		defaultValues: {
 			baseSalary: 0,
 			housingAllowance: 0,

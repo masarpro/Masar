@@ -163,7 +163,7 @@ export function AssetsAnalyticsCard({
 								className="font-semibold text-slate-700 dark:text-slate-300"
 								dir="ltr"
 							>
-								{formatCurrency(assets.totalMonthlyRent)}
+								{formatCurrency(Number(assets.totalMonthlyRent))}
 							</span>
 						</div>
 						<div className="flex items-center justify-between text-sm mt-2">
@@ -174,7 +174,7 @@ export function AssetsAnalyticsCard({
 								className="font-bold text-slate-900 dark:text-slate-100"
 								dir="ltr"
 							>
-								{formatCurrency(assets.totalValue)}
+								{formatCurrency(Number(assets.totalValue))}
 							</span>
 						</div>
 					</div>

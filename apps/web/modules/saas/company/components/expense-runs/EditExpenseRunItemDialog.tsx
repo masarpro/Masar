@@ -58,7 +58,7 @@ export function EditExpenseRunItemDialog({
 	const t = useTranslations();
 
 	const form = useForm<EditExpenseRunItemFormValues>({
-		resolver: zodResolver(editExpenseRunItemSchema),
+		resolver: zodResolver(editExpenseRunItemSchema) as any,
 		defaultValues: {
 			amount: 0,
 			notes: "",
@@ -101,7 +101,7 @@ export function EditExpenseRunItemDialog({
 								{t("company.expenseRuns.originalAmount")}
 							</p>
 							<p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-								{formatCurrency(item.originalAmount ?? 0)}
+								{formatCurrency(Number(item.originalAmount ?? 0))}
 							</p>
 						</div>
 

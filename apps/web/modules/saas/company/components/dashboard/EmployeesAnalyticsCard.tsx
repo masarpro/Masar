@@ -158,7 +158,7 @@ export function EmployeesAnalyticsCard({
 								className="font-semibold text-slate-700 dark:text-slate-300"
 								dir="ltr"
 							>
-								{formatCurrency(employees.totalMonthlySalaries)}
+								{formatCurrency(Number(employees.totalMonthlySalaries))}
 							</span>
 						</div>
 						<div className="flex items-center justify-between text-xs">
@@ -169,7 +169,7 @@ export function EmployeesAnalyticsCard({
 								className="font-semibold text-slate-700 dark:text-slate-300"
 								dir="ltr"
 							>
-								{formatCurrency(employees.totalMonthlyGosi)}
+								{formatCurrency(Number(employees.totalMonthlyGosi))}
 							</span>
 						</div>
 						<div className="flex items-center justify-between text-sm mt-2">
@@ -180,7 +180,7 @@ export function EmployeesAnalyticsCard({
 								className="font-bold text-slate-900 dark:text-slate-100"
 								dir="ltr"
 							>
-								{formatCurrency(employees.totalMonthlyCost)}
+								{formatCurrency(Number(employees.totalMonthlyCost))}
 							</span>
 						</div>
 					</div>

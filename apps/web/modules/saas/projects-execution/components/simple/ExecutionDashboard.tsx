@@ -239,13 +239,13 @@ export function ExecutionDashboard({ projectId }: ExecutionDashboardProps) {
 				</div>
 			) : view === "table" ? (
 				<MilestoneTableView
-					milestones={milestones as ExecutionMilestone[]}
+					milestones={milestones as unknown as unknown as ExecutionMilestone[]}
 					onEdit={(m) => setEditingMilestone(m)}
 					onDelete={(id) => setDeletingMilestoneId(id)}
 				/>
 			) : (
 				<div className="space-y-3">
-					{(milestones as ExecutionMilestone[]).map((milestone) => (
+					{(milestones as unknown as ExecutionMilestone[]).map((milestone) => (
 						<EnhancedMilestoneCard
 							key={milestone.id}
 							milestone={milestone}

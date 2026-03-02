@@ -129,7 +129,7 @@ export function ProjectPaymentsView({
 								{t("projectPayments.totalRequired")}
 							</p>
 							<p className="font-mono text-sm font-semibold text-slate-800 dark:text-slate-200">
-								{formatCurrency(data.totalRequired)} ر.س
+								{formatCurrency(Number(data.totalRequired))} ر.س
 							</p>
 						</div>
 						<div className="rounded-xl bg-white/60 p-3 dark:bg-slate-900/30">
@@ -137,7 +137,7 @@ export function ProjectPaymentsView({
 								{t("projectPayments.totalPaid")}
 							</p>
 							<p className="font-mono text-sm font-semibold text-emerald-700 dark:text-emerald-300">
-								{formatCurrency(data.totalPaid)} ر.س
+								{formatCurrency(Number(data.totalPaid))} ر.س
 							</p>
 						</div>
 						<div className="rounded-xl bg-white/60 p-3 dark:bg-slate-900/30">
@@ -146,7 +146,7 @@ export function ProjectPaymentsView({
 							</p>
 							<p className="font-mono text-sm font-semibold text-amber-700 dark:text-amber-300">
 								{formatCurrency(
-									data.totalRequired - data.totalPaid,
+									Number(data.totalRequired) - Number(data.totalPaid),
 								)}{" "}
 								ر.س
 							</p>
@@ -285,11 +285,11 @@ function TermCard({
 					<div className="mb-1 flex justify-between text-xs text-slate-500">
 						<span>
 							{t("projectPayments.paid")}:{" "}
-							{formatCurrency(term.paidAmount)} ر.س
+							{formatCurrency(Number(term.paidAmount))} ر.س
 						</span>
 						<span>
 							{t("projectPayments.required")}:{" "}
-							{formatCurrency(term.amount)} ر.س
+							{formatCurrency(Number(term.amount))} ر.س
 							{term.percent != null && ` (${term.percent}%)`}
 						</span>
 					</div>
@@ -297,10 +297,10 @@ function TermCard({
 						value={term.progressPercent}
 						className={`h-2 ${progressBg} ${progressColor}`}
 					/>
-					{term.remainingAmount > 0 && (
+					{Number(term.remainingAmount) > 0 && (
 						<p className="mt-1 text-xs text-slate-400">
 							{t("projectPayments.remaining")}:{" "}
-							{formatCurrency(term.remainingAmount)} ر.س
+							{formatCurrency(Number(term.remainingAmount))} ر.س
 						</p>
 					)}
 				</div>
@@ -349,7 +349,7 @@ function TermCard({
 											</div>
 											<span className="font-mono text-sm font-medium text-emerald-700 dark:text-emerald-300">
 												{formatCurrency(
-													payment.amount,
+													Number(payment.amount),
 												)}{" "}
 												ر.س
 											</span>

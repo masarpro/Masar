@@ -424,10 +424,10 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 										{item.vendor ?? "-"}
 									</TableCell>
 									<TableCell className="text-right text-slate-600 dark:text-slate-300">
-										{formatCurrency(item.originalAmount ?? 0)}
+										{formatCurrency(Number(item.originalAmount ?? 0))}
 									</TableCell>
 									<TableCell className="text-right font-semibold text-slate-900 dark:text-slate-100">
-										{formatCurrency(item.amount ?? 0)}
+										{formatCurrency(Number(item.amount ?? 0))}
 									</TableCell>
 									<TableCell className="text-right">
 										{item.financeExpense?.status ? (

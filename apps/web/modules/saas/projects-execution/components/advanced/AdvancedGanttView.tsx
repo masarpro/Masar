@@ -189,7 +189,7 @@ export function AdvancedGanttView({ projectId }: AdvancedGanttViewProps) {
 					actualStart: a.actualStart ? new Date(a.actualStart) : null,
 					actualEnd: a.actualEnd ? new Date(a.actualEnd) : null,
 					status: a.status ?? "NOT_STARTED",
-					progress: a.progress ?? 0,
+					progress: Number(a.progress ?? 0),
 					isCritical: a.isCritical ?? false,
 					orderIndex: a.orderIndex ?? 0,
 					assignee: a.assignee ?? null,
@@ -205,7 +205,7 @@ export function AdvancedGanttView({ projectId }: AdvancedGanttViewProps) {
 				actualStart: m.actualStart ? new Date(m.actualStart) : null,
 				actualEnd: m.actualEnd ? new Date(m.actualEnd) : null,
 				status: m.status ?? "PLANNED",
-				progress: m.progress ?? 0,
+				progress: Number(m.progress ?? 0),
 				isCritical: m.isCritical ?? false,
 				children,
 			};
@@ -501,7 +501,7 @@ export function AdvancedGanttView({ projectId }: AdvancedGanttViewProps) {
 					(calendarData as any)?.calendar?.workDays ?? [0, 1, 2, 3, 4]
 				}
 				initialHoursPerDay={
-					(calendarData as any)?.calendar?.defaultHoursPerDay ?? 8
+					Number((calendarData as any)?.calendar?.defaultHoursPerDay ?? 8)
 				}
 				onSave={(workDays, hoursPerDay) =>
 					upsertCalendarMutation.mutate({ workDays, hoursPerDay })

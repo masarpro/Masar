@@ -86,7 +86,7 @@ export const WbsActivityRow = memo(function WbsActivityRow({
 
 			{/* Progress */}
 			<div className="w-[60px] shrink-0 px-2 text-center text-xs">
-				{activity.progress}%
+				{Number(activity.progress)}%
 			</div>
 		</div>
 	);

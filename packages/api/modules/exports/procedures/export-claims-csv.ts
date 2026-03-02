@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { db } from "@repo/database";
+import { db, type ClaimStatus } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
@@ -34,27 +34,27 @@ export const exportClaimsCsvProcedure = protectedProcedure
 		const where: {
 			projectId: string;
 			project: { organizationId: string };
-			status?: string;
+			status?: ClaimStatus;
 		} = {
 			projectId: input.projectId,
 			project: { organizationId: input.organizationId },
 		};
 
 		if (input.status) {
-			where.status = input.status;
+			where.status = input.status as ClaimStatus;
 		}
 
 		// Get claims
 		const claims = await db.projectClaim.findMany({
 			where,
-			orderBy: { claimNumber: "desc" },
+			orderBy: { claimNo: "desc" },
 		});
 
 		// Transform to CSV format
 		const csvData = claims.map((c) => ({
-			claimNumber: c.claimNumber,
-			periodStart: c.periodStart,
-			periodEnd: c.periodEnd,
+			claimNumber: c.claimNo,
+			periodStart: c.periodStart ?? new Date(),
+			periodEnd: c.periodEnd ?? new Date(),
 			amount: c.amount.toNumber(),
 			status: c.status,
 			dueDate: c.dueDate,
