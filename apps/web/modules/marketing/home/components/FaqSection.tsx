@@ -18,12 +18,15 @@ function FAQItem({
 	onToggle: () => void;
 }) {
 	return (
-		<div style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+		<div style={{ borderBottom: "1px solid var(--lp-faq-divider)" }}>
 			<button
 				onClick={onToggle}
 				className="w-full flex items-center justify-between py-6 bg-transparent border-none cursor-pointer text-start gap-4"
 			>
-				<span className="text-white text-[17px] font-semibold flex-1">
+				<span
+					className="text-[17px] font-semibold flex-1"
+					style={{ color: "var(--lp-text)" }}
+				>
 					{question}
 				</span>
 				<span
@@ -31,10 +34,10 @@ function FAQItem({
 					style={{
 						background: isOpen
 							? "linear-gradient(135deg, #10B981, #06B6D4)"
-							: "rgba(255,255,255,0.06)",
+							: "var(--lp-card-bg)",
 						color: isOpen
 							? "white"
-							: "rgba(255,255,255,0.4)",
+							: "var(--lp-text-subtle)",
 						transform: isOpen
 							? "rotate(45deg)"
 							: "rotate(0deg)",
@@ -53,7 +56,10 @@ function FAQItem({
 						"cubic-bezier(0.16,1,0.3,1)",
 				}}
 			>
-				<p className="text-white/50 text-[15px] leading-[1.8] pb-6">
+				<p
+					className="text-[15px] leading-[1.8] pb-6"
+					style={{ color: "var(--lp-text-muted)" }}
+				>
 					{answer}
 				</p>
 			</div>
@@ -69,7 +75,7 @@ export function FaqSection({ className }: { className?: string }) {
 		<section
 			className={cn("scroll-mt-20 py-28 px-6", className)}
 			id="faq"
-			style={{ background: "#050508" }}
+			style={{ background: "var(--lp-bg)" }}
 		>
 			<div className="max-w-[700px] mx-auto">
 				{/* Header */}
@@ -92,7 +98,10 @@ export function FaqSection({ className }: { className?: string }) {
 						/>
 						{t("faq.title")}
 					</div>
-					<h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3] text-white">
+					<h2
+						className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3]"
+						style={{ color: "var(--lp-text)" }}
+					>
 						{t("faq.title")}
 					</h2>
 				</div>
@@ -101,8 +110,8 @@ export function FaqSection({ className }: { className?: string }) {
 				<div
 					className="rounded-3xl px-6 sm:px-9 py-2"
 					style={{
-						background: "rgba(255,255,255,0.02)",
-						border: "1px solid rgba(255,255,255,0.06)",
+						background: "var(--lp-faq-card-bg)",
+						border: "1px solid var(--lp-faq-card-border)",
 					}}
 				>
 					{faqKeys.map((key, i) => (

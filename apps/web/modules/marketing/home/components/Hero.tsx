@@ -93,6 +93,7 @@ function ParticleField() {
 		<canvas
 			ref={canvasRef}
 			className="absolute inset-0 w-full h-full pointer-events-none"
+			style={{ opacity: "var(--lp-effects-opacity)" }}
 		/>
 	);
 }
@@ -101,7 +102,10 @@ export function Hero() {
 	const t = useTranslations();
 
 	return (
-		<section className="relative min-h-screen overflow-hidden flex items-center pt-36 pb-24 px-6">
+		<section
+			className="relative min-h-screen overflow-hidden flex items-center pt-36 pb-24 px-6"
+			style={{ background: "var(--lp-bg)" }}
+		>
 			<MeshBackground />
 			<ParticleField />
 			{/* Radial vignette */}
@@ -109,7 +113,7 @@ export function Hero() {
 				className="absolute inset-0 pointer-events-none"
 				style={{
 					background:
-						"radial-gradient(ellipse at center, transparent 30%, #050508 75%)",
+						"radial-gradient(ellipse at center, transparent 40%, var(--lp-bg) 80%)",
 				}}
 			/>
 
@@ -135,7 +139,9 @@ export function Hero() {
 					{/* Title */}
 					<div className="animate-fade-in-delay-1">
 						<h1 className="text-4xl sm:text-5xl lg:text-[62px] font-black leading-[1.12] mb-7">
-							<span className="text-white">{t("hero.title")}</span>
+							<span style={{ color: "var(--lp-text)" }}>
+								{t("hero.title")}
+							</span>
 							<br />
 							<span className="shimmer-hero">
 								{t("hero.titleHighlight")}
@@ -145,7 +151,10 @@ export function Hero() {
 
 					{/* Subtitle */}
 					<div className="animate-fade-in-delay-2">
-						<p className="text-lg sm:text-xl text-white/50 leading-[1.8] mb-12 max-w-[580px]">
+						<p
+							className="text-lg sm:text-xl leading-[1.8] mb-12 max-w-[580px]"
+							style={{ color: "var(--lp-text-muted)" }}
+						>
 							{t("hero.description")}
 						</p>
 					</div>
@@ -181,7 +190,7 @@ export function Hero() {
 											className="w-10 h-10 rounded-full flex items-center justify-center text-sm text-white font-bold"
 											style={{
 												background: `linear-gradient(135deg, ${color}, ${color}99)`,
-												border: "3px solid #050508",
+												border: `3px solid var(--lp-avatar-ring)`,
 												marginInlineStart:
 													i > 0 ? -10 : 0,
 												boxShadow: `0 0 12px ${color}33`,
@@ -207,7 +216,12 @@ export function Hero() {
 										</span>
 									))}
 								</div>
-								<p className="text-white/35 text-[13px] font-medium">
+								<p
+									className="text-[13px] font-medium"
+									style={{
+										color: "var(--lp-text-subtle)",
+									}}
+								>
 									{t("hero.proof")}
 								</p>
 							</div>

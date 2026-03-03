@@ -18,7 +18,10 @@ export default async function Home({
 	setRequestLocale(locale);
 
 	return (
-		<div className="bg-[#050508] text-white overflow-x-hidden -mt-[72px]">
+		<div
+			className="overflow-x-hidden -mt-[72px]"
+			style={{ background: "var(--lp-bg)", color: "var(--lp-text)" }}
+		>
 			<Hero />
 			<PainPoints />
 			<Features />

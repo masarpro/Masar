@@ -13,11 +13,17 @@ export function Footer() {
 		<footer
 			className={cn(
 				"border-t py-12 text-sm",
-				isHomePage
-					? "border-white/[0.04] text-white/[0.18]"
-					: "border-border/50 bg-muted/50 text-foreground/60",
+				!isHomePage && "border-border/50 bg-muted/50 text-foreground/60",
 			)}
-			style={isHomePage ? { background: "#050508" } : undefined}
+			style={
+				isHomePage
+					? {
+							background: "var(--lp-footer-bg)",
+							borderColor: "var(--lp-footer-border)",
+							color: "var(--lp-footer-text)",
+						}
+					: undefined
+			}
 		>
 			<div
 				className={cn(
@@ -37,11 +43,14 @@ export function Footer() {
 							>
 								م
 							</div>
-							<span className="text-[17px] font-bold text-white/35">
+							<span
+								className="text-[17px] font-bold"
+								style={{ color: "var(--lp-footer-brand)" }}
+							>
 								مسار
 							</span>
 						</div>
-						<p className="text-white/[0.18] text-[13px]">
+						<p className="text-[13px]" style={{ color: "var(--lp-footer-text)" }}>
 							© {new Date().getFullYear()} {config.appName} — جميع الحقوق محفوظة
 						</p>
 					</>

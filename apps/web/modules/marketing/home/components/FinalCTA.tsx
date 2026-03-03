@@ -11,7 +11,7 @@ export function FinalCTA() {
 			className="relative overflow-hidden py-40 px-6 text-center"
 			style={{
 				background:
-					"linear-gradient(180deg, #050508, #06091A, #050508)",
+					"linear-gradient(180deg, var(--lp-bg), var(--lp-bg-section), var(--lp-bg))",
 			}}
 		>
 			{/* Decorative gradient orbs */}
@@ -26,6 +26,7 @@ export function FinalCTA() {
 					background:
 						"radial-gradient(circle, rgba(16,185,129,0.12), transparent 60%)",
 					filter: "blur(100px)",
+					opacity: "var(--lp-effects-opacity)",
 				}}
 			/>
 			<div
@@ -39,6 +40,7 @@ export function FinalCTA() {
 					background:
 						"radial-gradient(circle, rgba(6,182,212,0.08), transparent 60%)",
 					filter: "blur(80px)",
+					opacity: "var(--lp-effects-opacity)",
 				}}
 			/>
 			<div
@@ -54,14 +56,21 @@ export function FinalCTA() {
 						"radial-gradient(circle, rgba(59,130,246,0.1), transparent 60%)",
 					filter: "blur(50px)",
 					animation: "landingPulse 4s infinite",
+					opacity: "var(--lp-effects-opacity)",
 				}}
 			/>
 
 			<div className="max-w-[700px] mx-auto relative z-[2]">
-				<h2 className="text-4xl sm:text-5xl lg:text-[52px] font-black leading-[1.15] mb-6 text-white">
+				<h2
+					className="text-4xl sm:text-5xl lg:text-[52px] font-black leading-[1.15] mb-6"
+					style={{ color: "var(--lp-text)" }}
+				>
 					{t("finalCta.title")}
 				</h2>
-				<p className="text-white/40 text-lg leading-[1.8] mb-12">
+				<p
+					className="text-lg leading-[1.8] mb-12"
+					style={{ color: "var(--lp-text-subtle)" }}
+				>
 					{t("finalCta.description")}
 				</p>
 				<Link
@@ -71,7 +80,10 @@ export function FinalCTA() {
 					{t("finalCta.cta")}
 					<span className="text-[22px] rtl-flip">→</span>
 				</Link>
-				<p className="text-white/20 text-[13px] mt-6">
+				<p
+					className="text-[13px] mt-6"
+					style={{ color: "var(--lp-text-faint)" }}
+				>
 					{t("finalCta.note")}
 				</p>
 			</div>

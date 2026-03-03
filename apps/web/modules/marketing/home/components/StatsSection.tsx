@@ -111,7 +111,12 @@ function StatCard({
 				{count}
 				{suffix}
 			</div>
-			<p className="text-white/40 text-sm font-medium">{label}</p>
+			<p
+				className="text-sm font-medium"
+				style={{ color: "var(--lp-text-subtle)" }}
+			>
+				{label}
+			</p>
 		</div>
 	);
 }
@@ -123,9 +128,9 @@ export function StatsSection() {
 		<section
 			className="relative py-24 px-6"
 			style={{
-				background: "#050508",
-				borderTop: "1px solid rgba(255,255,255,0.04)",
-				borderBottom: "1px solid rgba(255,255,255,0.04)",
+				background: "var(--lp-bg)",
+				borderTop: `1px solid var(--lp-card-border)`,
+				borderBottom: `1px solid var(--lp-card-border)`,
 			}}
 		>
 			<div className="max-w-[1000px] mx-auto">

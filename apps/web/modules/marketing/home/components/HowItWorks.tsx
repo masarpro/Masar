@@ -19,7 +19,7 @@ export function HowItWorks() {
 			className="relative py-28 px-6"
 			style={{
 				background:
-					"linear-gradient(180deg, #050508 0%, #060A14 100%)",
+					"linear-gradient(180deg, var(--lp-bg) 0%, var(--lp-bg-section) 100%)",
 			}}
 		>
 			<div className="max-w-[1000px] mx-auto">
@@ -43,7 +43,10 @@ export function HowItWorks() {
 						/>
 						{t("howItWorks.label")}
 					</div>
-					<h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3] text-white">
+					<h2
+						className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3]"
+						style={{ color: "var(--lp-text)" }}
+					>
 						{t("howItWorks.title")}
 					</h2>
 				</div>
@@ -57,13 +60,13 @@ export function HowItWorks() {
 								key={key}
 								className="landing-step-card"
 								style={{
-									background: `linear-gradient(135deg, ${s.color}15, ${s.accent}08, rgba(255,255,255,0.02))`,
+									background: `linear-gradient(135deg, ${s.color}15, ${s.accent}08, var(--lp-card-border))`,
 								}}
 							>
 								<div
 									className="rounded-[22px] p-8 sm:p-10 h-full text-center"
 									style={{
-										background: "rgba(5,5,8,0.85)",
+										background: "var(--lp-step-inner)",
 										backdropFilter: "blur(20px)",
 									}}
 								>
@@ -91,12 +94,22 @@ export function HowItWorks() {
 									>
 										{s.num}
 									</div>
-									<h3 className="text-[19px] font-bold mb-3 text-white">
+									<h3
+										className="text-[19px] font-bold mb-3"
+										style={{
+											color: "var(--lp-text)",
+										}}
+									>
 										{t(
 											`howItWorks.steps.${key}.title`,
 										)}
 									</h3>
-									<p className="text-white/40 text-sm leading-[1.75]">
+									<p
+										className="text-sm leading-[1.75]"
+										style={{
+											color: "var(--lp-text-subtle)",
+										}}
+									>
 										{t(
 											`howItWorks.steps.${key}.description`,
 										)}

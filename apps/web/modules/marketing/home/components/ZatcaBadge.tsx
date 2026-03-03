@@ -10,20 +10,19 @@ export function ZatcaBadge() {
 			className="py-20 px-6"
 			style={{
 				background:
-					"linear-gradient(180deg, #050508, #06091A)",
+					"linear-gradient(180deg, var(--lp-bg), var(--lp-bg-section))",
 			}}
 		>
 			<div
 				className="max-w-[800px] mx-auto relative rounded-[28px] p-[2px] overflow-hidden"
 				style={{
-					background:
-						"linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,182,212,0.1), rgba(255,255,255,0.03))",
+					background: "var(--lp-zatca-outer)",
 				}}
 			>
 				<div
 					className="rounded-[26px] p-10 sm:p-12 flex items-center gap-8 flex-wrap justify-center"
 					style={{
-						background: "rgba(5,5,8,0.95)",
+						background: "var(--lp-zatca-inner)",
 						backdropFilter: "blur(20px)",
 					}}
 				>
@@ -42,10 +41,16 @@ export function ZatcaBadge() {
 
 					{/* Text */}
 					<div className="flex-1 min-w-[220px]">
-						<h3 className="text-[21px] font-bold mb-2 text-white">
+						<h3
+							className="text-[21px] font-bold mb-2"
+							style={{ color: "var(--lp-text)" }}
+						>
 							{t("zatca.title")}
 						</h3>
-						<p className="text-white/40 text-sm leading-[1.75]">
+						<p
+							className="text-sm leading-[1.75]"
+							style={{ color: "var(--lp-text-subtle)" }}
+						>
 							{t("zatca.description")}
 						</p>
 					</div>

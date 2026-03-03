@@ -21,7 +21,7 @@ export function PainPoints() {
 			className="relative py-28 px-6"
 			style={{
 				background:
-					"linear-gradient(180deg, #050508 0%, #0A0A12 50%, #050508 100%)",
+					"linear-gradient(180deg, var(--lp-bg) 0%, var(--lp-bg-alt) 50%, var(--lp-bg) 100%)",
 			}}
 		>
 			{/* Decorative glow */}
@@ -31,6 +31,7 @@ export function PainPoints() {
 					background:
 						"radial-gradient(circle, rgba(239,68,68,0.06), transparent 70%)",
 					filter: "blur(80px)",
+					opacity: "var(--lp-effects-opacity)",
 				}}
 			/>
 
@@ -55,7 +56,10 @@ export function PainPoints() {
 						/>
 						{t("painPoints.label")}
 					</div>
-					<h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3] max-w-[650px] mx-auto text-white">
+					<h2
+						className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3] max-w-[650px] mx-auto"
+						style={{ color: "var(--lp-text)" }}
+					>
 						{t("painPoints.title")}
 					</h2>
 				</div>
@@ -65,14 +69,7 @@ export function PainPoints() {
 					{items.map((key, i) => {
 						const pain = pains[i];
 						return (
-							<div
-								key={key}
-								className="landing-pain-card"
-								style={{
-									borderColor: "rgba(255,255,255,0.04)",
-									background: `linear-gradient(160deg, ${pain.color}06, rgba(255,255,255,0.01))`,
-								}}
-							>
+							<div key={key} className="landing-pain-card">
 								{/* Top accent line */}
 								<div
 									className="absolute top-0 start-0 w-[60px] h-[2px] rounded-ss-[22px]"
@@ -83,7 +80,12 @@ export function PainPoints() {
 								<span className="text-3xl block mb-3.5">
 									{pain.emoji}
 								</span>
-								<p className="text-white/60 text-[15px] leading-[1.75] font-medium">
+								<p
+									className="text-[15px] leading-[1.75] font-medium"
+									style={{
+										color: "var(--lp-text-muted)",
+									}}
+								>
 									{t(`painPoints.items.${key}`)}
 								</p>
 							</div>

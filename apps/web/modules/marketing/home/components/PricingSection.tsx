@@ -10,7 +10,7 @@ export function PricingSection() {
 		<section
 			id="pricing"
 			className="scroll-mt-16 relative py-28 px-6"
-			style={{ background: "#050508" }}
+			style={{ background: "var(--lp-bg)" }}
 		>
 			<div className="max-w-[900px] mx-auto">
 				{/* Header */}
@@ -33,7 +33,10 @@ export function PricingSection() {
 						/>
 						{t("landingPricing.label")}
 					</div>
-					<h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3] text-white">
+					<h2
+						className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3]"
+						style={{ color: "var(--lp-text)" }}
+					>
 						{t("landingPricing.title")}
 					</h2>
 				</div>
@@ -44,14 +47,20 @@ export function PricingSection() {
 					<div
 						className="landing-price-card"
 						style={{
-							background: "rgba(255,255,255,0.02)",
-							border: "1px solid rgba(255,255,255,0.06)",
+							background: "var(--lp-price-free-bg)",
+							border: `1px solid var(--lp-price-free-border)`,
 						}}
 					>
-						<h3 className="text-[22px] font-bold mb-1.5 text-white">
+						<h3
+							className="text-[22px] font-bold mb-1.5"
+							style={{ color: "var(--lp-text)" }}
+						>
 							{t("landingPricing.free.name")}
 						</h3>
-						<p className="text-white/35 text-sm mb-7">
+						<p
+							className="text-sm mb-7"
+							style={{ color: "var(--lp-text-subtle)" }}
+						>
 							{t("landingPricing.free.description")}
 						</p>
 						<div
@@ -59,6 +68,7 @@ export function PricingSection() {
 							style={{
 								fontFamily:
 									"'Space Grotesk', sans-serif",
+								color: "var(--lp-text)",
 							}}
 						>
 							{t("landingPricing.free.price")}
@@ -67,11 +77,12 @@ export function PricingSection() {
 							{[1, 2, 3].map((i) => (
 								<li
 									key={i}
-									className="text-white/50 text-sm py-2.5 flex items-center gap-2.5"
+									className="text-sm py-2.5 flex items-center gap-2.5"
 									style={{
+										color: "var(--lp-text-muted)",
 										borderBottom:
 											i < 3
-												? "1px solid rgba(255,255,255,0.04)"
+												? `1px solid var(--lp-card-border)`
 												: "none",
 									}}
 								>
@@ -96,11 +107,9 @@ export function PricingSection() {
 					<div
 						className="landing-price-card"
 						style={{
-							background:
-								"linear-gradient(160deg, rgba(16,185,129,0.08), rgba(6,182,212,0.03), rgba(10,10,18,0.98))",
-							border: "2px solid rgba(16,185,129,0.2)",
-							boxShadow:
-								"0 0 100px rgba(16,185,129,0.06), 0 0 40px rgba(6,182,212,0.04)",
+							background: "var(--lp-price-pro-bg)",
+							border: `2px solid var(--lp-price-pro-border-color)`,
+							boxShadow: "var(--lp-price-pro-shadow)",
 						}}
 					>
 						{/* Badge */}
@@ -117,10 +126,16 @@ export function PricingSection() {
 							{t("landingPricing.pro.badge")}
 						</div>
 
-						<h3 className="text-[22px] font-bold mb-1.5 text-white">
+						<h3
+							className="text-[22px] font-bold mb-1.5"
+							style={{ color: "var(--lp-text)" }}
+						>
 							{t("landingPricing.pro.name")}
 						</h3>
-						<p className="text-white/35 text-sm mb-7">
+						<p
+							className="text-sm mb-7"
+							style={{ color: "var(--lp-text-subtle)" }}
+						>
 							{t("landingPricing.pro.description")}
 						</p>
 						<div className="mb-7 flex items-baseline gap-1">
@@ -138,11 +153,12 @@ export function PricingSection() {
 							{[1, 2, 3, 4, 5, 6].map((i) => (
 								<li
 									key={i}
-									className="text-white/55 text-sm py-2.5 flex items-center gap-2.5"
+									className="text-sm py-2.5 flex items-center gap-2.5"
 									style={{
+										color: "var(--lp-text-muted)",
 										borderBottom:
 											i < 6
-												? "1px solid rgba(255,255,255,0.05)"
+												? `1px solid var(--lp-card-border)`
 												: "none",
 									}}
 								>

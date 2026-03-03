@@ -104,6 +104,115 @@ input[cmdk-input] {
 }
 
 /* ═══════════════════════════════════════════════
+   Landing Page — Theme-Aware Variables
+   ═══════════════════════════════════════════════ */
+@layer base {
+	:root {
+		--lp-bg: var(--background);
+		--lp-bg-alt: #ececea;
+		--lp-bg-section: #e9e8e4;
+		--lp-text: var(--foreground);
+		--lp-text-muted: rgba(28,30,30,0.55);
+		--lp-text-subtle: rgba(28,30,30,0.38);
+		--lp-text-faint: rgba(28,30,30,0.2);
+		--lp-card-bg: rgba(255,255,255,0.75);
+		--lp-card-bg-solid: #ffffff;
+		--lp-card-border: rgba(0,0,0,0.07);
+		--lp-glow-card-bg: rgba(255,255,255,0.85);
+		--lp-avatar-ring: var(--background);
+		--lp-orb-opacity: 0.35;
+		--lp-effects-opacity: 0.4;
+		--lp-pain-hover-shadow: 0 20px 40px rgba(0,0,0,0.06);
+		--lp-step-inner: rgba(255,255,255,0.9);
+		--lp-price-free-bg: rgba(0,0,0,0.02);
+		--lp-price-free-border: rgba(0,0,0,0.07);
+		--lp-price-pro-bg: linear-gradient(160deg, rgba(16,185,129,0.06), rgba(6,182,212,0.03), rgba(255,255,255,0.95));
+		--lp-price-pro-border-color: rgba(16,185,129,0.3);
+		--lp-price-pro-shadow: 0 0 60px rgba(16,185,129,0.06), 0 0 30px rgba(6,182,212,0.04);
+		--lp-faq-card-bg: rgba(0,0,0,0.025);
+		--lp-faq-card-border: rgba(0,0,0,0.06);
+		--lp-faq-divider: rgba(0,0,0,0.07);
+		--lp-zatca-outer: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,182,212,0.12), rgba(0,0,0,0.03));
+		--lp-zatca-inner: rgba(255,255,255,0.92);
+		--lp-ghost-bg: rgba(0,0,0,0.03);
+		--lp-ghost-border: rgba(0,0,0,0.1);
+		--lp-ghost-color: var(--foreground);
+		--lp-ghost-hover-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 0 40px rgba(16,185,129,0.06);
+		/* NavBar */
+		--lp-nav-scrolled-bg: rgba(242,241,237,0.85);
+		--lp-nav-scrolled-border: rgba(0,0,0,0.06);
+		--lp-nav-link: rgba(28,30,30,0.55);
+		--lp-nav-link-hover: #10B981;
+		--lp-nav-link-hover-bg: rgba(16,185,129,0.05);
+		--lp-nav-link-active: var(--foreground);
+		--lp-nav-btn-text: var(--foreground);
+		--lp-nav-btn-border: rgba(0,0,0,0.1);
+		--lp-nav-btn-hover-bg: rgba(0,0,0,0.05);
+		--lp-nav-login: rgba(28,30,30,0.7);
+		--lp-nav-login-hover: var(--foreground);
+		--lp-nav-signup-border: rgba(16,185,129,0.2);
+		--lp-nav-signup-shadow: 0 0 24px rgba(16,185,129,0.15);
+		/* Footer */
+		--lp-footer-bg: var(--background);
+		--lp-footer-border: rgba(0,0,0,0.06);
+		--lp-footer-brand: rgba(28,30,30,0.5);
+		--lp-footer-text: rgba(28,30,30,0.25);
+	}
+
+	.dark {
+		--lp-bg: #050508;
+		--lp-bg-alt: #0A0A12;
+		--lp-bg-section: #06091A;
+		--lp-text: #ffffff;
+		--lp-text-muted: rgba(255,255,255,0.5);
+		--lp-text-subtle: rgba(255,255,255,0.35);
+		--lp-text-faint: rgba(255,255,255,0.18);
+		--lp-card-bg: rgba(255,255,255,0.02);
+		--lp-card-bg-solid: rgba(10,10,18,0.92);
+		--lp-card-border: rgba(255,255,255,0.06);
+		--lp-glow-card-bg: rgba(10,10,18,0.92);
+		--lp-avatar-ring: #050508;
+		--lp-orb-opacity: 1;
+		--lp-effects-opacity: 1;
+		--lp-pain-hover-shadow: 0 24px 48px rgba(0,0,0,0.3);
+		--lp-step-inner: rgba(5,5,8,0.85);
+		--lp-price-free-bg: rgba(255,255,255,0.02);
+		--lp-price-free-border: rgba(255,255,255,0.06);
+		--lp-price-pro-bg: linear-gradient(160deg, rgba(16,185,129,0.08), rgba(6,182,212,0.03), rgba(10,10,18,0.98));
+		--lp-price-pro-border-color: rgba(16,185,129,0.2);
+		--lp-price-pro-shadow: 0 0 100px rgba(16,185,129,0.06), 0 0 40px rgba(6,182,212,0.04);
+		--lp-faq-card-bg: rgba(255,255,255,0.02);
+		--lp-faq-card-border: rgba(255,255,255,0.06);
+		--lp-faq-divider: rgba(255,255,255,0.06);
+		--lp-zatca-outer: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,182,212,0.1), rgba(255,255,255,0.03));
+		--lp-zatca-inner: rgba(5,5,8,0.95);
+		--lp-ghost-bg: rgba(255,255,255,0.03);
+		--lp-ghost-border: rgba(255,255,255,0.1);
+		--lp-ghost-color: #ffffff;
+		--lp-ghost-hover-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(16,185,129,0.08);
+		/* NavBar */
+		--lp-nav-scrolled-bg: rgba(5,5,8,0.8);
+		--lp-nav-scrolled-border: rgba(255,255,255,0.06);
+		--lp-nav-link: rgba(255,255,255,0.55);
+		--lp-nav-link-hover: #10B981;
+		--lp-nav-link-hover-bg: rgba(16,185,129,0.05);
+		--lp-nav-link-active: #ffffff;
+		--lp-nav-btn-text: #ffffff;
+		--lp-nav-btn-border: rgba(255,255,255,0.1);
+		--lp-nav-btn-hover-bg: rgba(255,255,255,0.05);
+		--lp-nav-login: rgba(255,255,255,0.7);
+		--lp-nav-login-hover: #ffffff;
+		--lp-nav-signup-border: rgba(255,255,255,0.1);
+		--lp-nav-signup-shadow: 0 0 24px rgba(16,185,129,0.25);
+		/* Footer */
+		--lp-footer-bg: #050508;
+		--lp-footer-border: rgba(255,255,255,0.04);
+		--lp-footer-brand: rgba(255,255,255,0.35);
+		--lp-footer-text: rgba(255,255,255,0.18);
+	}
+}
+
+/* ═══════════════════════════════════════════════
    Landing Page Premium Effects
    ═══════════════════════════════════════════════ */
 
@@ -125,11 +234,9 @@ input[cmdk-input] {
 }
 
 .landing-orb {
-	position: absolute;
-	border-radius: 50%;
-	pointer-events: none;
-	filter: blur(120px);
-	will-change: transform;
+	position: absolute; border-radius: 50%; pointer-events: none;
+	filter: blur(120px); will-change: transform;
+	opacity: var(--lp-orb-opacity);
 }
 .landing-orb-1 {
 	width: 800px; height: 800px; top: -20%; right: -10%;
@@ -154,11 +261,15 @@ input[cmdk-input] {
 
 /* Noise Texture Overlay */
 .landing-noise {
-	position: absolute; inset: 0; opacity: 0.035; mix-blend-mode: overlay;
+	position: absolute; inset: 0;
+	opacity: var(--lp-effects-opacity);
+	mix-blend-mode: overlay;
 	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 	background-repeat: repeat; background-size: 256px 256px;
 	pointer-events: none;
 }
+:root .landing-noise { opacity: 0.015; }
+.dark .landing-noise { opacity: 0.035; }
 
 /* Perspective Grid */
 @keyframes gridShift {
@@ -167,6 +278,7 @@ input[cmdk-input] {
 }
 .landing-grid {
 	position: absolute; inset: 0;
+	opacity: var(--lp-effects-opacity);
 	background-image:
 		linear-gradient(rgba(16,185,129,0.04) 1px, transparent 1px),
 		linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
@@ -177,13 +289,12 @@ input[cmdk-input] {
 }
 
 /* Horizontal Glow Line */
-@keyframes lineGlow {
-	0% { opacity: 0.3; } 100% { opacity: 0.8; }
-}
+@keyframes lineGlow { 0% { opacity: 0.3; } 100% { opacity: 0.8; } }
 .landing-glow-line {
 	position: absolute; top: 65%; left: 0; right: 0; height: 1px;
 	background: linear-gradient(90deg, transparent, rgba(16,185,129,0.15), rgba(59,130,246,0.15), rgba(139,92,246,0.1), transparent);
 	animation: lineGlow 4s ease-in-out infinite alternate;
+	opacity: var(--lp-effects-opacity);
 }
 
 /* Shimmer Text Effects */
@@ -191,38 +302,26 @@ input[cmdk-input] {
 	0% { background-position: -200% center; }
 	100% { background-position: 200% center; }
 }
-
 @utility shimmer-hero {
 	background: linear-gradient(90deg, #10B981 0%, #06B6D4 20%, #3B82F6 40%, #8B5CF6 55%, #06B6D4 70%, #10B981 85%, #34D399 100%);
 	background-size: 200% auto;
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	background-clip: text;
-	animation: shimmerText 5s linear infinite;
+	-webkit-background-clip: text; -webkit-text-fill-color: transparent;
+	background-clip: text; animation: shimmerText 5s linear infinite;
 }
-
 @utility shimmer-green {
 	background: linear-gradient(90deg, #10B981, #06B6D4, #10B981, #34D399, #10B981);
 	background-size: 200% auto;
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	background-clip: text;
-	animation: shimmerText 4s linear infinite;
+	-webkit-background-clip: text; -webkit-text-fill-color: transparent;
+	background-clip: text; animation: shimmerText 4s linear infinite;
 }
 
 /* Premium Button Effects */
-@keyframes btnShine {
-	0% { left: -100%; }
-	100% { left: 200%; }
-}
+@keyframes btnShine { 0% { left: -100%; } 100% { left: 200%; } }
 @keyframes btnPulseGlow {
 	0%, 100% { box-shadow: 0 0 20px rgba(16,185,129,0.2), 0 0 60px rgba(16,185,129,0.05); }
 	50% { box-shadow: 0 0 30px rgba(16,185,129,0.35), 0 0 80px rgba(16,185,129,0.1); }
 }
-@keyframes btnRainbow {
-	0% { background-position: 0% 50%; }
-	100% { background-position: 200% 50%; }
-}
+@keyframes btnRainbow { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
 
 .btn-premium {
 	position: relative; display: inline-flex; align-items: center; gap: 12px;
@@ -236,30 +335,29 @@ input[cmdk-input] {
 	background: linear-gradient(135deg, #10B981, #059669, #06B6D4);
 	background-size: 200% 200%;
 	animation: btnRainbow 4s ease infinite, btnPulseGlow 3s ease-in-out infinite;
-	color: white;
-	border: 1px solid rgba(255,255,255,0.1);
+	color: white; border: 1px solid rgba(255,255,255,0.1);
 }
 .btn-premium-primary::before {
 	content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
 	background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-	transform: skewX(-20deg);
-	animation: btnShine 4s ease-in-out infinite;
+	transform: skewX(-20deg); animation: btnShine 4s ease-in-out infinite;
 }
 .btn-premium-primary::after {
 	content: ''; position: absolute; inset: -2px; border-radius: 22px; z-index: -1;
 	background: linear-gradient(135deg, #10B981, #06B6D4, #3B82F6, #8B5CF6);
-	background-size: 300% 300%;
-	animation: btnRainbow 3s ease infinite;
+	background-size: 300% 300%; animation: btnRainbow 3s ease infinite;
 	filter: blur(8px); opacity: 0.4;
 }
 .btn-premium-primary:hover {
 	transform: translateY(-4px) scale(1.02);
 	box-shadow: 0 24px 80px rgba(16,185,129,0.4), 0 0 120px rgba(6,182,212,0.15);
 }
+
+/* Ghost button — theme aware */
 .btn-premium-ghost {
-	background: rgba(255,255,255,0.03);
-	color: white;
-	border: 1px solid rgba(255,255,255,0.1);
+	background: var(--lp-ghost-bg);
+	color: var(--lp-ghost-color);
+	border: 1px solid var(--lp-ghost-border);
 	backdrop-filter: blur(20px);
 }
 .btn-premium-ghost::before {
@@ -271,7 +369,7 @@ input[cmdk-input] {
 .btn-premium-ghost:hover {
 	transform: translateY(-4px);
 	border-color: rgba(16,185,129,0.25);
-	box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(16,185,129,0.08);
+	box-shadow: var(--lp-ghost-hover-shadow);
 }
 
 /* Landing Pulse Animation */
@@ -292,17 +390,17 @@ input[cmdk-input] {
 	animation: landingPulse 2s infinite;
 }
 
-/* Pain Cards */
+/* Pain Cards — theme aware */
 .landing-pain-card {
-	background: rgba(255,255,255,0.02);
-	border: 1px solid rgba(255,255,255,0.05);
+	background: var(--lp-card-bg);
+	border: 1px solid var(--lp-card-border);
 	border-radius: 22px; padding: 30px;
 	transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
 	position: relative; overflow: hidden;
 }
 .landing-pain-card:hover {
 	transform: translateY(-6px);
-	box-shadow: 0 24px 48px rgba(0,0,0,0.3);
+	box-shadow: var(--lp-pain-hover-shadow);
 }
 
 /* Step Cards */
@@ -320,20 +418,29 @@ input[cmdk-input] {
 }
 .landing-price-card:hover { transform: translateY(-6px); }
 
-/* Glow Card Wrapper */
+/* Glow Card Wrapper — theme aware */
 .landing-glow-card {
 	position: relative; border-radius: 28px; padding: 2px;
 	transition: all 0.7s cubic-bezier(0.16,1,0.3,1);
 }
 .landing-glow-card-inner {
 	border-radius: 26px; padding: 36px; height: 100%;
-	background: rgba(10,10,18,0.92);
+	background: var(--lp-glow-card-bg);
 	backdrop-filter: blur(40px);
 	transition: all 0.5s ease;
 }
 
-/* Logo Light Variant for Dark Backgrounds */
-.logo-light svg path[fill="#404040"] {
+/* NavBar Button Overrides for Landing Page */
+.lp-nav-buttons button {
+	color: var(--lp-nav-btn-text);
+	border-color: var(--lp-nav-btn-border);
+}
+.lp-nav-buttons button:hover {
+	background-color: var(--lp-nav-btn-hover-bg);
+}
+
+/* Logo Light Variant (dark mode only) */
+.dark .logo-light svg path[fill="#404040"] {
 	fill: #ffffff;
 }
 

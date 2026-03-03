@@ -68,14 +68,14 @@ export function NavBar() {
 			label: t("common.menu.faq"),
 			href: "/#faq",
 		},
-		{
-			label: t("common.menu.blog"),
-			href: "/blog",
-		},
-		{
-			label: t("common.menu.changelog"),
-			href: "/changelog",
-		},
+		// {
+		// 	label: t("common.menu.blog"),
+		// 	href: "/blog",
+		// },
+		// {
+		// 	label: t("common.menu.changelog"),
+		// 	href: "/changelog",
+		// },
 		...(config.contactForm.enabled
 			? [
 					{
@@ -105,8 +105,8 @@ export function NavBar() {
 			style={
 				!isTop && isHomePage
 					? {
-							background: "rgba(5,5,8,0.8)",
-							borderColor: "rgba(255,255,255,0.06)",
+							background: "var(--lp-nav-scrolled-bg)",
+							borderColor: "var(--lp-nav-scrolled-border)",
 						}
 					: undefined
 			}
@@ -138,15 +138,37 @@ export function NavBar() {
 								href={menuItem.href}
 								className={cn(
 									"block px-4 py-2 font-medium text-sm rounded-[10px] transition-all duration-300",
-									isHomePage
-										? "text-white/55 hover:text-[#10B981] hover:bg-[rgba(16,185,129,0.05)]"
-										: "text-foreground/80",
-									isMenuItemActive(menuItem.href)
-										? isHomePage
-											? "font-bold text-white"
-											: "font-bold text-foreground"
-										: "",
+									!isHomePage && "text-foreground/80",
+									!isHomePage &&
+										isMenuItemActive(menuItem.href) &&
+										"font-bold text-foreground",
 								)}
+								style={
+									isHomePage
+										? {
+												color: isMenuItemActive(menuItem.href)
+													? "var(--lp-nav-link-active)"
+													: "var(--lp-nav-link)",
+												fontWeight: isMenuItemActive(menuItem.href)
+													? 700
+													: undefined,
+											}
+										: undefined
+								}
+								onMouseEnter={(e) => {
+									if (isHomePage) {
+										e.currentTarget.style.color = "var(--lp-nav-link-hover)";
+										e.currentTarget.style.backgroundColor = "var(--lp-nav-link-hover-bg)";
+									}
+								}}
+								onMouseLeave={(e) => {
+									if (isHomePage) {
+										e.currentTarget.style.color = isMenuItemActive(menuItem.href)
+											? "var(--lp-nav-link-active)"
+											: "var(--lp-nav-link)";
+										e.currentTarget.style.backgroundColor = "transparent";
+									}
+								}}
 								prefetch
 							>
 								{menuItem.label}
@@ -157,8 +179,7 @@ export function NavBar() {
 						<div
 						className={cn(
 							"flex flex-1 items-center justify-end gap-3",
-							isHomePage &&
-								"[&_button]:text-white [&_button]:border-white/10 [&_button:hover]:bg-white/5",
+							isHomePage && "lp-nav-buttons",
 						)}
 					>
 						<ColorModeToggle />
@@ -234,7 +255,16 @@ export function NavBar() {
 									<NextLink
 										key="login-home"
 										href="/auth/login"
-										className="hidden lg:block px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors duration-300"
+										className="hidden lg:block px-4 py-2 text-sm font-medium transition-colors duration-300"
+										style={{
+											color: "var(--lp-nav-login)",
+										}}
+										onMouseEnter={(e) => {
+											e.currentTarget.style.color = "var(--lp-nav-login-hover)";
+										}}
+										onMouseLeave={(e) => {
+											e.currentTarget.style.color = "var(--lp-nav-login)";
+										}}
 										prefetch
 									>
 										{t("common.menu.login")}
@@ -246,9 +276,9 @@ export function NavBar() {
 										style={{
 											background:
 												"linear-gradient(135deg, #10B981, #059669)",
-											border: "1px solid rgba(255,255,255,0.1)",
+											border: `1px solid var(--lp-nav-signup-border)`,
 											boxShadow:
-												"0 0 24px rgba(16,185,129,0.25)",
+												"var(--lp-nav-signup-shadow)",
 										}}
 									>
 										{t("common.menu.signup")}

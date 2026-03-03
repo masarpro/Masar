@@ -4,12 +4,12 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 const features = [
-	{ icon: "📊", color: "#10B981", span: "wide" },
-	{ icon: "🏗️", color: "#3B82F6", span: "normal" },
-	{ icon: "💰", color: "#F59E0B", span: "normal" },
-	{ icon: "📋", color: "#8B5CF6", span: "normal" },
-	{ icon: "👷", color: "#EF4444", span: "normal" },
-	{ icon: "🔐", color: "#06B6D4", span: "wide" },
+	{ icon: "📊", color: "#10B981" },
+	{ icon: "🏗️", color: "#3B82F6" },
+	{ icon: "💰", color: "#F59E0B" },
+	{ icon: "📋", color: "#8B5CF6" },
+	{ icon: "👷", color: "#EF4444" },
+	{ icon: "🔐", color: "#06B6D4" },
 ];
 
 const featureKeys = ["1", "2", "3", "4", "5", "6"] as const;
@@ -32,7 +32,7 @@ export function Features() {
 			className="scroll-my-20 relative py-28 px-6"
 			style={{
 				background:
-					"linear-gradient(180deg, #050508 0%, #06091A 50%, #050508 100%)",
+					"linear-gradient(180deg, var(--lp-bg) 0%, var(--lp-bg-section) 50%, var(--lp-bg) 100%)",
 			}}
 		>
 			{/* Background glow */}
@@ -42,6 +42,7 @@ export function Features() {
 					background:
 						"conic-gradient(from 0deg, rgba(16,185,129,0.04), rgba(59,130,246,0.04), rgba(139,92,246,0.03), rgba(16,185,129,0.04))",
 					filter: "blur(120px)",
+					opacity: "var(--lp-effects-opacity)",
 				}}
 			/>
 
@@ -66,10 +67,16 @@ export function Features() {
 						/>
 						{t("features.label")}
 					</div>
-					<h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3] max-w-[550px] mx-auto text-white">
+					<h2
+						className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3] max-w-[550px] mx-auto"
+						style={{ color: "var(--lp-text)" }}
+					>
 						{t("features.title")}
 					</h2>
-					<p className="text-white/40 text-[17px] mt-4 max-w-[480px] mx-auto">
+					<p
+						className="text-[17px] mt-4 max-w-[480px] mx-auto"
+						style={{ color: "var(--lp-text-subtle)" }}
+					>
 						{t("features.description")}
 					</p>
 				</div>
@@ -87,19 +94,15 @@ export function Features() {
 								style={{
 									background: isActive
 										? `linear-gradient(135deg, ${f.color}90, ${f.color}20, ${f.color}70)`
-										: "linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))",
-									gridColumn:
-										f.span === "wide"
-											? undefined
-											: undefined,
+										: `linear-gradient(135deg, var(--lp-card-border), transparent)`,
 								}}
 							>
 								<div
 									className="landing-glow-card-inner"
 									style={{
 										background: isActive
-											? `linear-gradient(160deg, ${f.color}14, rgba(10,10,18,0.96))`
-											: "rgba(10,10,18,0.92)",
+											? `linear-gradient(160deg, ${f.color}14, var(--lp-glow-card-bg))`
+											: undefined,
 									}}
 								>
 									{/* Icon */}
@@ -116,10 +119,20 @@ export function Features() {
 									>
 										{f.icon}
 									</div>
-									<h3 className="text-[19px] font-bold mb-2.5 text-white">
+									<h3
+										className="text-[19px] font-bold mb-2.5"
+										style={{
+											color: "var(--lp-text)",
+										}}
+									>
 										{t(`features.items.${key}.title`)}
 									</h3>
-									<p className="text-white/45 text-sm leading-[1.75]">
+									<p
+										className="text-sm leading-[1.75]"
+										style={{
+											color: "var(--lp-text-muted)",
+										}}
+									>
 										{t(
 											`features.items.${key}.description`,
 										)}
