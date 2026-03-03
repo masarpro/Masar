@@ -36,6 +36,17 @@ export function AppSidebar({ headerExtra }: AppSidebarProps) {
 	// On mobile, always show expanded sidebar (not collapsed icon-only version)
 	const effectiveCollapsed = isMobile ? false : collapsed;
 
+	// Determine correct transform direction for hiding sidebar off-screen
+	// In RTL (start-0 = right:0): translate-x-full slides right → off-screen
+	// In LTR (start-0 = left:0): -translate-x-full slides left → off-screen
+	// When isMobile is true, we're guaranteed to be in the browser
+	const sidebarHidden = isMobile && !mobileOpen;
+	let hideTransformClass: string | undefined;
+	if (sidebarHidden) {
+		const isRtl = document.documentElement.dir === "rtl";
+		hideTransformClass = isRtl ? "translate-x-full" : "-translate-x-full";
+	}
+
 	return (
 		<>
 			{/* Overlay backdrop: renders always on mobile for smooth fade transition */}
@@ -71,10 +82,8 @@ export function AppSidebar({ headerExtra }: AppSidebarProps) {
 						: effectiveCollapsed
 							? SIDEBAR_WIDTH_COLLAPSED
 							: SIDEBAR_WIDTH_EXPANDED,
-					// Mobile: slide off-screen when closed (RTL-aware)
-					isMobile &&
-						!mobileOpen &&
-						"-translate-x-full rtl:translate-x-full",
+					// Mobile: slide off-screen when closed (direction-aware)
+					hideTransformClass,
 				)}
 			>
 				<SidebarHeader

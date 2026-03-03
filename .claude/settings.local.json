@@ -111,7 +111,8 @@
       "Bash(cd H:\\\\Masar\\\\supastarter-nextjs-3\\\\apps\\\\web\\\\app\\\\\\(saas\\)\\\\app\\\\\\(organizations\\)\\\\[organizationSlug]\\\\finance:*)",
       "Bash(xxd:*)",
       "Bash(rm:*)",
-      "Bash(pnpm:*)"
+      "Bash(pnpm:*)",
+      "Bash(npx next:*)"
     ]
   }
 }

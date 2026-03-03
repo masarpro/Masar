@@ -9,6 +9,10 @@ export const config = {
 		// Define all locales here that should be available in the app
 		// You need to define a label that is shown in the language selector and a currency that should be used for pricing with this locale
 		locales: {
+			ar: {
+				currency: "USD",
+				label: "العربية",
+			},
 			en: {
 				currency: "USD",
 				label: "English",
@@ -16,10 +20,6 @@ export const config = {
 			de: {
 				currency: "USD",
 				label: "Deutsch",
-			},
-			ar: {
-				currency: "USD",
-				label: "العربية",
 			},
 		},
 		// The default locale is used if no locale is provided

@@ -15,7 +15,7 @@ export function Hero() {
 				<div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
 				<div className="absolute top-20 end-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
 				<div className="absolute bottom-20 start-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-				<div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,_var(--foreground)_1px,_transparent_0)] bg-[size:24px_24px] opacity-[0.04]" />
+				<div className="absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,_var(--foreground)_1px,_transparent_0)] [background-size:24px_24px] opacity-[0.04]" />
 			</div>
 
 			<div className="container relative z-20 pt-44 pb-24 lg:pb-36">

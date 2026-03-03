@@ -168,6 +168,11 @@ const nextConfig: NextConfig = {
 	async redirects() {
 		return [
 			{
+				source: "/",
+				destination: "/ar",
+				permanent: true,
+			},
+			{
 				source: "/app/settings",
 				destination: "/app/settings/general",
 				permanent: true,

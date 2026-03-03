@@ -3,7 +3,6 @@
 import { useTranslations } from "next-intl";
 
 const stepKeys = ["1", "2", "3"] as const;
-const arabicNumerals = ["١", "٢", "٣"];
 
 export function HowItWorks() {
 	const t = useTranslations();
@@ -27,10 +26,10 @@ export function HowItWorks() {
 					{/* Connecting line between steps (desktop only) */}
 					<div className="hidden md:block absolute top-8 start-[16.67%] end-[16.67%] h-px bg-border -z-10" />
 
-					{stepKeys.map((key, i) => (
+					{stepKeys.map((key) => (
 						<div key={key} className="group text-center">
 							<div className="relative mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl bg-primary/10 border-2 border-primary/20 text-primary text-2xl font-bold transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/20">
-								{arabicNumerals[i]}
+								{key}
 							</div>
 							<h3 className="font-medium text-foreground text-lg">
 								{t(`howItWorks.steps.${key}.title`)}
