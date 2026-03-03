@@ -4,6 +4,7 @@ import { getActiveOrganization } from "@saas/auth/lib/server";
 import { activeOrganizationQueryKey } from "@saas/organizations/lib/api";
 import { SubscriptionGuard } from "@saas/payments/components/SubscriptionGuard";
 import { AppWrapper } from "@saas/shared/components/AppWrapper";
+import { AssistantWrapper } from "@saas/shared/components/ai-assistant/AssistantWrapper";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { getServerQueryClient } from "@shared/lib/server";
 import { notFound, redirect } from "next/navigation";
@@ -54,14 +55,16 @@ export default async function OrganizationLayout({
 	}
 
 	return (
-		<AppWrapper>
-			<SubscriptionGuard
-				orgStatus={orgSubscription?.status ?? "ACTIVE"}
-				orgPlan={orgSubscription?.plan ?? null}
-				trialEndsAt={orgSubscription?.trialEndsAt?.toISOString() ?? null}
-			>
-				{children}
-			</SubscriptionGuard>
-		</AppWrapper>
+		<AssistantWrapper organizationName={organization.name}>
+			<AppWrapper>
+				<SubscriptionGuard
+					orgStatus={orgSubscription?.status ?? "ACTIVE"}
+					orgPlan={orgSubscription?.plan ?? null}
+					trialEndsAt={orgSubscription?.trialEndsAt?.toISOString() ?? null}
+				>
+					{children}
+				</SubscriptionGuard>
+			</AppWrapper>
+		</AssistantWrapper>
 	);
 }

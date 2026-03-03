@@ -5554,5 +5554,37 @@
 		"suspendedDescription": "تم إيقاف حسابك بسبب مشاكل في الدفع. يرجى ترقية خطتك أو التواصل مع الدعم لاستعادة الوصول.",
 		"upgradeNow": "ترقية الآن",
 		"contactSupport": "تواصل مع الدعم"
+	},
+	"assistant": {
+		"title": "مساعد مسار",
+		"placeholder": "اسأل مساعد مسار...",
+		"newChat": "محادثة جديدة",
+		"close": "إغلاق",
+		"send": "إرسال",
+		"thinking": "يفكر...",
+		"welcome": "مرحباً! كيف أقدر أساعدك؟",
+		"contextBadge": {
+			"dashboard": "لوحة التحكم",
+			"projects": "المشاريع",
+			"project-overview": "نظرة عامة",
+			"project-execution": "التنفيذ",
+			"project-finance": "مالية المشروع",
+			"project-timeline": "الجدول الزمني",
+			"project-documents": "المستندات",
+			"project-chat": "المحادثات",
+			"project-field": "العمل الميداني",
+			"project-changes": "أوامر التغيير",
+			"project-team": "الفريق",
+			"project-insights": "التحليلات",
+			"project-owner": "بوابة المالك",
+			"finance": "المالية",
+			"quantities": "حصر الكميات",
+			"company": "إدارة المنشأة",
+			"settings": "الإعدادات",
+			"notifications": "الإشعارات",
+			"chatbot": "المحادثة الذكية",
+			"unknown": "عام"
+		},
+		"shortcut": "Ctrl+K"
 	}
 }

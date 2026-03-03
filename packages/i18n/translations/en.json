@@ -5796,5 +5796,37 @@
 		"suspendedDescription": "Your account has been suspended due to payment issues. Please upgrade your plan or contact support to restore access.",
 		"upgradeNow": "Upgrade Now",
 		"contactSupport": "Contact Support"
+	},
+	"assistant": {
+		"title": "Masar Assistant",
+		"placeholder": "Ask Masar Assistant...",
+		"newChat": "New Chat",
+		"close": "Close",
+		"send": "Send",
+		"thinking": "Thinking...",
+		"welcome": "Hello! How can I help you?",
+		"contextBadge": {
+			"dashboard": "Dashboard",
+			"projects": "Projects",
+			"project-overview": "Overview",
+			"project-execution": "Execution",
+			"project-finance": "Project Finance",
+			"project-timeline": "Timeline",
+			"project-documents": "Documents",
+			"project-chat": "Chat",
+			"project-field": "Field Work",
+			"project-changes": "Change Orders",
+			"project-team": "Team",
+			"project-insights": "Insights",
+			"project-owner": "Owner Portal",
+			"finance": "Finance",
+			"quantities": "Quantity Surveying",
+			"company": "Company Management",
+			"settings": "Settings",
+			"notifications": "Notifications",
+			"chatbot": "AI Chat",
+			"unknown": "General"
+		},
+		"shortcut": "Ctrl+K"
 	}
 }

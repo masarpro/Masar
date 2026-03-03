@@ -146,7 +146,10 @@ export function Hero() {
 								{t("hero.title")}
 							</span>
 							<br />
-							<span className="whitespace-nowrap" style={{ color: "#10B981" }}>
+							<span
+								className="block whitespace-nowrap text-[clamp(0.9rem,2.8vw,2rem)] font-bold mt-3"
+								style={{ color: "#10B981" }}
+							>
 								{t("hero.titleHighlight")}
 							</span>
 						</h1>
