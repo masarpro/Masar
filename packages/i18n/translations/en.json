@@ -5827,6 +5827,31 @@
 			"chatbot": "AI Chat",
 			"unknown": "General"
 		},
-		"shortcut": "Ctrl+K"
+		"shortcut": "Ctrl+K",
+		"expand": "Expand",
+		"collapse": "Collapse",
+		"copy": "Copy",
+		"copied": "Copied",
+		"error": "An error occurred",
+		"errorRetry": "Try again or start a new chat",
+		"newMessages": "New messages",
+		"charLimit": "Maximum 2000 characters",
+		"tools": {
+			"queryProjects": "Searching projects...",
+			"queryFinance": "Reviewing financials...",
+			"queryExecution": "Checking execution...",
+			"queryTimeline": "Checking timeline...",
+			"navigateTo": "Preparing link...",
+			"queryCompany": "Reviewing company data..."
+		},
+		"history": {
+			"title": "Chat History",
+			"empty": "No previous chats",
+			"delete": "Delete",
+			"confirmDelete": "Sure?",
+			"loadError": "Failed to load chat",
+			"saving": "Saving...",
+			"saved": "Saved"
+		}
 	}
 }

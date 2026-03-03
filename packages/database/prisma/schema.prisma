@@ -1069,11 +1069,14 @@ model AiChat {
   userId         String?
   user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
   title          String?
+  type           String        @default("CHATBOT")
   /// [ChatMessages]
   messages       Json          @default("[]")
+  metadata       Json?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
+  @@index([organizationId, userId, type])
   @@map("ai_chat")
 }
 

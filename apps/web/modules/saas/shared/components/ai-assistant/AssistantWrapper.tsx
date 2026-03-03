@@ -1,9 +1,12 @@
 "use client";
 
-import type { PropsWithChildren } from "react";
-import { AssistantPanel } from "./AssistantPanel";
+import { Suspense, lazy, type PropsWithChildren } from "react";
 import { AssistantProvider } from "./AssistantProvider";
 import { FloatingAssistantButton } from "./FloatingAssistantButton";
+
+const AssistantPanel = lazy(() =>
+  import("./AssistantPanel").then((m) => ({ default: m.AssistantPanel })),
+);
 
 export function AssistantWrapper({
   children,
@@ -13,7 +16,9 @@ export function AssistantWrapper({
     <AssistantProvider organizationName={organizationName}>
       {children}
       <FloatingAssistantButton />
-      <AssistantPanel />
+      <Suspense fallback={null}>
+        <AssistantPanel />
+      </Suspense>
     </AssistantProvider>
   );
 }

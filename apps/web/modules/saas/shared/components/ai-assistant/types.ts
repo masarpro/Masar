@@ -39,6 +39,13 @@ export interface QuickAction {
   prompt: string;
 }
 
+export interface SavedChat {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AssistantContextType {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
@@ -47,4 +54,13 @@ export interface AssistantContextType {
   quickActions: QuickAction[];
   organizationSlug: string;
   organizationName: string;
+  userName: string;
+  unreadCount: number;
+  incrementUnread: () => void;
+  activeChatId: string | null;
+  setActiveChatId: (id: string | null) => void;
+  savedChats: SavedChat[];
+  refreshChats: () => void;
+  isLoadingChats: boolean;
+  deleteChat: (id: string) => Promise<void>;
 }

@@ -4,6 +4,8 @@ import { orpcClient } from "@shared/lib/orpc-client";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { getServerQueryClient } from "@shared/lib/server";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AiDemoPage() {
 	const queryClient = getServerQueryClient();
 

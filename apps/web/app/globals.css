@@ -524,6 +524,34 @@ input[cmdk-input] {
 	}
 }
 
+/* ═══════════════════════════════════════════════
+   AI Assistant Styles
+   ═══════════════════════════════════════════════ */
+@keyframes fadeInUp {
+	from { opacity: 0; transform: translateY(8px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+@utility animate-fade-in-up {
+	animation: fadeInUp 0.3s ease-out forwards;
+	opacity: 0;
+}
+
+/* Assistant scrollbar */
+.assistant-messages::-webkit-scrollbar {
+	width: 4px;
+}
+.assistant-messages::-webkit-scrollbar-track {
+	background: transparent;
+}
+.assistant-messages::-webkit-scrollbar-thumb {
+	background: hsl(var(--muted-foreground) / 0.2);
+	border-radius: 4px;
+}
+.assistant-messages::-webkit-scrollbar-thumb:hover {
+	background: hsl(var(--muted-foreground) / 0.3);
+}
+
 /* Print Styles for Financial Templates */
 @media print {
 	/* Page setup */

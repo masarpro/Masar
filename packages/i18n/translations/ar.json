@@ -5585,6 +5585,31 @@
 			"chatbot": "المحادثة الذكية",
 			"unknown": "عام"
 		},
-		"shortcut": "Ctrl+K"
+		"shortcut": "Ctrl+K",
+		"expand": "تكبير",
+		"collapse": "تصغير",
+		"copy": "نسخ",
+		"copied": "تم النسخ",
+		"error": "حدث خطأ",
+		"errorRetry": "حاول مرة أخرى أو ابدأ محادثة جديدة",
+		"newMessages": "رسائل جديدة",
+		"charLimit": "الحد الأقصى 2000 حرف",
+		"tools": {
+			"queryProjects": "يبحث في المشاريع...",
+			"queryFinance": "يراجع البيانات المالية...",
+			"queryExecution": "يتحقق من التنفيذ...",
+			"queryTimeline": "يراجع الجدول الزمني...",
+			"navigateTo": "يجهز الرابط...",
+			"queryCompany": "يراجع بيانات المنشأة..."
+		},
+		"history": {
+			"title": "المحادثات السابقة",
+			"empty": "لا توجد محادثات سابقة",
+			"delete": "حذف",
+			"confirmDelete": "تأكيد؟",
+			"loadError": "فشل تحميل المحادثة",
+			"saving": "يحفظ...",
+			"saved": "تم الحفظ"
+		}
 	}
 }
