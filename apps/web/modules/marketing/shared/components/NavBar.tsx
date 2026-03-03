@@ -54,6 +54,7 @@ export function NavBar() {
 	}, [localePathname]);
 
 	const isDocsPage = localePathname.startsWith("/docs");
+	const isHomePage = localePathname === "/" || localePathname === "";
 
 	const menuItems: {
 		label: string;
@@ -94,11 +95,21 @@ export function NavBar() {
 	return (
 		<nav
 			className={cn(
-				"fixed top-0 left-0 z-50 w-full transition-all duration-300",
+				"fixed top-0 left-0 z-50 w-full transition-all duration-500",
 				!isTop || isDocsPage
-					? "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm"
+					? isHomePage
+						? "backdrop-blur-2xl border-b shadow-sm"
+						: "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm"
 					: "bg-transparent",
 			)}
+			style={
+				!isTop && isHomePage
+					? {
+							background: "rgba(5,5,8,0.8)",
+							borderColor: "rgba(255,255,255,0.06)",
+						}
+					: undefined
+			}
 			data-test="navigation"
 		>
 			<div className="container">
@@ -111,7 +122,10 @@ export function NavBar() {
 					<div className="flex flex-1 justify-start">
 						<LocaleLink
 							href="/"
-							className="block hover:no-underline active:no-underline"
+							className={cn(
+								"block hover:no-underline active:no-underline",
+								isHomePage && "logo-light",
+							)}
 						>
 							<Logo />
 						</LocaleLink>
@@ -123,9 +137,14 @@ export function NavBar() {
 								key={menuItem.href}
 								href={menuItem.href}
 								className={cn(
-									"block px-3 py-2 font-medium text-foreground/80 text-sm",
+									"block px-4 py-2 font-medium text-sm rounded-[10px] transition-all duration-300",
+									isHomePage
+										? "text-white/55 hover:text-[#10B981] hover:bg-[rgba(16,185,129,0.05)]"
+										: "text-foreground/80",
 									isMenuItemActive(menuItem.href)
-										? "font-bold text-foreground"
+										? isHomePage
+											? "font-bold text-white"
+											: "font-bold text-foreground"
 										: "",
 								)}
 								prefetch
@@ -135,7 +154,13 @@ export function NavBar() {
 						))}
 					</div>
 
-					<div className="flex flex-1 items-center justify-end gap-3">
+						<div
+						className={cn(
+							"flex flex-1 items-center justify-end gap-3",
+							isHomePage &&
+								"[&_button]:text-white [&_button]:border-white/10 [&_button:hover]:bg-white/5",
+						)}
+					>
 						<ColorModeToggle />
 						{config.i18n.enabled && (
 							<Suspense>
@@ -204,6 +229,31 @@ export function NavBar() {
 										{t("common.menu.dashboard")}
 									</NextLink>
 								</Button>
+							) : isHomePage ? (
+								<>
+									<NextLink
+										key="login-home"
+										href="/auth/login"
+										className="hidden lg:block px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors duration-300"
+										prefetch
+									>
+										{t("common.menu.login")}
+									</NextLink>
+									<NextLink
+										key="signup-home"
+										href="/auth/signup"
+										className="hidden lg:block px-6 py-2.5 rounded-[14px] text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 relative overflow-hidden"
+										style={{
+											background:
+												"linear-gradient(135deg, #10B981, #059669)",
+											border: "1px solid rgba(255,255,255,0.1)",
+											boxShadow:
+												"0 0 24px rgba(16,185,129,0.25)",
+										}}
+									>
+										{t("common.menu.signup")}
+									</NextLink>
+								</>
 							) : (
 								<Button
 									key="login"

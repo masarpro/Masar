@@ -1,22 +1,14 @@
 "use client";
 
-import {
-	AlertTriangleIcon,
-	ClockIcon,
-	FileSpreadsheetIcon,
-	GlobeIcon,
-	ReceiptIcon,
-	UserXIcon,
-} from "lucide-react";
 import { useTranslations } from "next-intl";
 
-const icons = [
-	FileSpreadsheetIcon,
-	UserXIcon,
-	ReceiptIcon,
-	GlobeIcon,
-	ClockIcon,
-	AlertTriangleIcon,
+const pains = [
+	{ emoji: "😤", color: "#EF4444" },
+	{ emoji: "📱", color: "#F59E0B" },
+	{ emoji: "💸", color: "#EC4899" },
+	{ emoji: "🤯", color: "#8B5CF6" },
+	{ emoji: "📄", color: "#3B82F6" },
+	{ emoji: "⏰", color: "#EF4444" },
 ];
 
 export function PainPoints() {
@@ -25,29 +17,73 @@ export function PainPoints() {
 	const items = ["1", "2", "3", "4", "5", "6"] as const;
 
 	return (
-		<section className="py-16 lg:py-20 xl:py-28 bg-muted/30">
-			<div className="container">
-				<div className="mb-10">
-					<small className="mb-4 inline-flex items-center gap-2 rounded-full bg-destructive/10 border border-destructive/20 px-3 py-1 font-semibold text-xs uppercase tracking-wider text-destructive">
+		<section
+			className="relative py-28 px-6"
+			style={{
+				background:
+					"linear-gradient(180deg, #050508 0%, #0A0A12 50%, #050508 100%)",
+			}}
+		>
+			{/* Decorative glow */}
+			<div
+				className="absolute top-1/2 end-[-5%] w-[400px] h-[400px] rounded-full pointer-events-none -translate-y-1/2"
+				style={{
+					background:
+						"radial-gradient(circle, rgba(239,68,68,0.06), transparent 70%)",
+					filter: "blur(80px)",
+				}}
+			/>
+
+			<div className="max-w-[1200px] mx-auto relative">
+				{/* Header */}
+				<div className="text-center mb-16">
+					<div
+						className="landing-section-label"
+						style={{
+							background:
+								"linear-gradient(135deg, rgba(239,68,68,0.06), rgba(236,72,153,0.04))",
+							border: "1px solid rgba(239,68,68,0.12)",
+							color: "#EF4444",
+						}}
+					>
+						<span
+							className="landing-dot"
+							style={{
+								background:
+									"linear-gradient(135deg, #EF4444, #EC4899)",
+							}}
+						/>
 						{t("painPoints.label")}
-					</small>
-					<h2 className="font-serif font-medium text-2xl md:text-3xl lg:text-4xl leading-tighter text-foreground">
+					</div>
+					<h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3] max-w-[650px] mx-auto text-white">
 						{t("painPoints.title")}
 					</h2>
 				</div>
 
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+				{/* Cards Grid */}
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 					{items.map((key, i) => {
-						const Icon = icons[i];
+						const pain = pains[i];
 						return (
 							<div
 								key={key}
-								className="group flex items-start gap-4 rounded-2xl border border-border/50 bg-card p-5 lg:p-6 transition-all duration-300 hover:border-destructive/30 hover:shadow-lg hover:shadow-destructive/5 hover:-translate-y-1"
+								className="landing-pain-card"
+								style={{
+									borderColor: "rgba(255,255,255,0.04)",
+									background: `linear-gradient(160deg, ${pain.color}06, rgba(255,255,255,0.01))`,
+								}}
 							>
-								<div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-destructive/10 transition-colors duration-300 group-hover:bg-destructive/15">
-									<Icon className="size-5 text-destructive" />
-								</div>
-								<p className="text-foreground/80 text-sm lg:text-base">
+								{/* Top accent line */}
+								<div
+									className="absolute top-0 start-0 w-[60px] h-[2px] rounded-ss-[22px]"
+									style={{
+										background: `linear-gradient(90deg, ${pain.color}50, transparent)`,
+									}}
+								/>
+								<span className="text-3xl block mb-3.5">
+									{pain.emoji}
+								</span>
+								<p className="text-white/60 text-[15px] leading-[1.75] font-medium">
 									{t(`painPoints.items.${key}`)}
 								</p>
 							</div>
@@ -55,9 +91,12 @@ export function PainPoints() {
 					})}
 				</div>
 
-				<div className="mt-10 text-center">
-					<p className="font-bold text-primary text-xl">
-						{t("painPoints.solution")}
+				{/* Solution */}
+				<div className="text-center mt-14">
+					<p className="text-[22px] font-bold">
+						<span className="shimmer-green">
+							{t("painPoints.solution")}
+						</span>
 					</p>
 				</div>
 			</div>

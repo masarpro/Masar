@@ -1,7 +1,5 @@
 "use client";
 
-import { Button } from "@ui/components/button";
-import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
@@ -9,33 +7,73 @@ export function FinalCTA() {
 	const t = useTranslations();
 
 	return (
-		<section className="relative overflow-hidden py-24 lg:py-32">
-			{/* Decorative background */}
-			<div className="absolute inset-0 -z-10">
-				<div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-primary/5 to-transparent" />
-				<div className="absolute top-1/2 start-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl" />
-			</div>
+		<section
+			className="relative overflow-hidden py-40 px-6 text-center"
+			style={{
+				background:
+					"linear-gradient(180deg, #050508, #06091A, #050508)",
+			}}
+		>
+			{/* Decorative gradient orbs */}
+			<div
+				className="absolute pointer-events-none"
+				style={{
+					top: "40%",
+					left: "30%",
+					width: 500,
+					height: 500,
+					borderRadius: "50%",
+					background:
+						"radial-gradient(circle, rgba(16,185,129,0.12), transparent 60%)",
+					filter: "blur(100px)",
+				}}
+			/>
+			<div
+				className="absolute pointer-events-none"
+				style={{
+					top: "50%",
+					left: "60%",
+					width: 400,
+					height: 400,
+					borderRadius: "50%",
+					background:
+						"radial-gradient(circle, rgba(6,182,212,0.08), transparent 60%)",
+					filter: "blur(80px)",
+				}}
+			/>
+			<div
+				className="absolute pointer-events-none"
+				style={{
+					top: "45%",
+					left: "45%",
+					transform: "translate(-50%,-50%)",
+					width: 250,
+					height: 250,
+					borderRadius: "50%",
+					background:
+						"radial-gradient(circle, rgba(59,130,246,0.1), transparent 60%)",
+					filter: "blur(50px)",
+					animation: "landingPulse 4s infinite",
+				}}
+			/>
 
-			<div className="container max-w-3xl">
-				<div className="text-center">
-					<h2 className="font-serif font-medium text-3xl sm:text-4xl lg:text-5xl leading-tighter text-foreground">
-						{t("finalCta.title")}
-					</h2>
-					<p className="mt-4 text-foreground/60 text-sm sm:text-base">
-						{t("finalCta.description")}
-					</p>
-					<div className="mt-8">
-						<Button size="lg" variant="primary" asChild className="h-14 px-10 text-lg font-bold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-1 transition-all duration-300">
-							<Link href="/auth/signup">
-								{t("finalCta.cta")}
-								<ArrowRightIcon className="ms-2 size-4" />
-							</Link>
-						</Button>
-					</div>
-					<p className="mt-5 text-foreground/40 text-xs">
-						{t("finalCta.note")}
-					</p>
-				</div>
+			<div className="max-w-[700px] mx-auto relative z-[2]">
+				<h2 className="text-4xl sm:text-5xl lg:text-[52px] font-black leading-[1.15] mb-6 text-white">
+					{t("finalCta.title")}
+				</h2>
+				<p className="text-white/40 text-lg leading-[1.8] mb-12">
+					{t("finalCta.description")}
+				</p>
+				<Link
+					href="/auth/signup"
+					className="btn-premium btn-premium-primary !py-[22px] !px-[60px] !text-[19px] !rounded-[22px]"
+				>
+					{t("finalCta.cta")}
+					<span className="text-[22px] rtl-flip">→</span>
+				</Link>
+				<p className="text-white/20 text-[13px] mt-6">
+					{t("finalCta.note")}
+				</p>
 			</div>
 		</section>
 	);

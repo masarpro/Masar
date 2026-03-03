@@ -373,7 +373,8 @@
 			"docs": "Docs",
 			"faq": "FAQ",
 			"login": "Login",
-			"pricing": "Pricing"
+			"pricing": "Pricing",
+			"signup": "Start Free"
 		},
 		"tableOfContents": {
 			"title": "On this page"
@@ -463,7 +464,8 @@
 		"titleHighlight": "Masar unifies them.",
 		"description": "One platform for finances, execution, contractors, and documents — no complexity.",
 		"cta": "Start Free",
-		"secondary": "Explore Features"
+		"secondary": "Explore Features",
+		"proof": "Saudi contractors already using Masar"
 	},
 	"howItWorks": {
 		"title": "Three steps to get started",
@@ -516,6 +518,12 @@
 			"6": "Tracking actual vs. planned progress is nearly impossible"
 		},
 		"solution": "Masar solves these challenges — in one platform"
+	},
+	"stats": {
+		"endpoints": "System Operations",
+		"models": "Data Models",
+		"pages": "Integrated Pages",
+		"arabic": "Full Arabic Support"
 	},
 	"zatca": {
 		"title": "ZATCA Compliant",

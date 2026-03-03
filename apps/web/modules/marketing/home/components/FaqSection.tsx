@@ -1,56 +1,122 @@
 "use client";
 
-import {
-	Accordion,
-	AccordionContent,
-	AccordionItem,
-	AccordionTrigger,
-} from "@ui/components/accordion";
 import { cn } from "@ui/lib";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
 const faqKeys = ["1", "2", "3", "4", "5", "6"] as const;
 
+function FAQItem({
+	question,
+	answer,
+	isOpen,
+	onToggle,
+}: {
+	question: string;
+	answer: string;
+	isOpen: boolean;
+	onToggle: () => void;
+}) {
+	return (
+		<div style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+			<button
+				onClick={onToggle}
+				className="w-full flex items-center justify-between py-6 bg-transparent border-none cursor-pointer text-start gap-4"
+			>
+				<span className="text-white text-[17px] font-semibold flex-1">
+					{question}
+				</span>
+				<span
+					className="w-8 h-8 rounded-[10px] flex items-center justify-center text-lg shrink-0 transition-all duration-[400ms]"
+					style={{
+						background: isOpen
+							? "linear-gradient(135deg, #10B981, #06B6D4)"
+							: "rgba(255,255,255,0.06)",
+						color: isOpen
+							? "white"
+							: "rgba(255,255,255,0.4)",
+						transform: isOpen
+							? "rotate(45deg)"
+							: "rotate(0deg)",
+						transitionTimingFunction:
+							"cubic-bezier(0.16,1,0.3,1)",
+					}}
+				>
+					+
+				</span>
+			</button>
+			<div
+				className="overflow-hidden transition-[max-height] duration-[400ms]"
+				style={{
+					maxHeight: isOpen ? 200 : 0,
+					transitionTimingFunction:
+						"cubic-bezier(0.16,1,0.3,1)",
+				}}
+			>
+				<p className="text-white/50 text-[15px] leading-[1.8] pb-6">
+					{answer}
+				</p>
+			</div>
+		</div>
+	);
+}
+
 export function FaqSection({ className }: { className?: string }) {
 	const t = useTranslations();
+	const [openFaq, setOpenFaq] = useState<number | null>(null);
 
 	return (
 		<section
-			className={cn("scroll-mt-20 py-16 lg:py-20 xl:py-28", className)}
+			className={cn("scroll-mt-20 py-28 px-6", className)}
 			id="faq"
+			style={{ background: "#050508" }}
 		>
-			<div className="container max-w-3xl">
-				<div className="mb-8 text-center">
-					<small className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 border border-primary/20 px-3 py-1 font-semibold text-xs uppercase tracking-wider text-primary">
+			<div className="max-w-[700px] mx-auto">
+				{/* Header */}
+				<div className="text-center mb-16">
+					<div
+						className="landing-section-label"
+						style={{
+							background:
+								"linear-gradient(135deg, rgba(139,92,246,0.06), rgba(59,130,246,0.04))",
+							border: "1px solid rgba(139,92,246,0.12)",
+							color: "#8B5CF6",
+						}}
+					>
+						<span
+							className="landing-dot"
+							style={{
+								background:
+									"linear-gradient(135deg, #8B5CF6, #3B82F6)",
+							}}
+						/>
 						{t("faq.title")}
-					</small>
-					<h2 className="mb-2 font-serif font-medium text-xl md:text-2xl lg:text-3xl xl:text-4xl leading-tighter text-foreground">
+					</div>
+					<h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3] text-white">
 						{t("faq.title")}
 					</h2>
-					<p className="text-foreground/60 text-sm sm:text-lg">
-						{t("faq.description")}
-					</p>
 				</div>
-				<Accordion
-					type="single"
-					collapsible
-					className="w-full space-y-2"
+
+				{/* FAQ Items */}
+				<div
+					className="rounded-3xl px-6 sm:px-9 py-2"
+					style={{
+						background: "rgba(255,255,255,0.02)",
+						border: "1px solid rgba(255,255,255,0.06)",
+					}}
 				>
-					{faqKeys.map((key) => (
-						<AccordionItem
+					{faqKeys.map((key, i) => (
+						<FAQItem
 							key={key}
-							value={`item-${key}`}
-							className="rounded-xl border border-border/50 bg-card shadow-none px-4 lg:px-6 transition-colors duration-200 hover:bg-muted/50 data-[state=open]:border-primary/20"
-						>
-							<AccordionTrigger className="text-start font-medium text-base hover:no-underline">
-								{t(`faq.items.${key}.question`)}
-							</AccordionTrigger>
-							<AccordionContent className="text-foreground/60">
-								{t(`faq.items.${key}.answer`)}
-							</AccordionContent>
-						</AccordionItem>
+							question={t(`faq.items.${key}.question`)}
+							answer={t(`faq.items.${key}.answer`)}
+							isOpen={openFaq === i}
+							onToggle={() =>
+								setOpenFaq(openFaq === i ? null : i)
+							}
+						/>
 					))}
-				</Accordion>
+				</div>
 			</div>
 		</section>
 	);
