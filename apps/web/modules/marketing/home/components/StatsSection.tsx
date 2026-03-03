@@ -97,7 +97,6 @@ function StatCard({
 					filter: "blur(25px)",
 				}}
 			/>
-			<div className="text-lg mb-3">{icon}</div>
 			<div
 				className="text-5xl font-black mb-2"
 				style={{

@@ -138,9 +138,9 @@ export function PricingSection() {
 						>
 							{t("landingPricing.pro.description")}
 						</p>
-						<div className="mb-7 flex items-baseline gap-1">
+						<div className="mb-7 flex items-baseline gap-1 overflow-hidden">
 							<span
-								className="text-[44px] font-black shimmer-green"
+								className="text-[clamp(28px,5vw,36px)] font-black shimmer-green"
 								style={{
 									fontFamily:
 										"'Space Grotesk', sans-serif",

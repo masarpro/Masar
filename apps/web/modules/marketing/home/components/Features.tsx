@@ -105,20 +105,6 @@ export function Features() {
 											: undefined,
 									}}
 								>
-									{/* Icon */}
-									<div
-										className="w-[54px] h-[54px] rounded-2xl flex items-center justify-center text-[26px] mb-5"
-										style={{
-											background: `linear-gradient(135deg, ${f.color}12, ${f.color}06)`,
-											border: `1px solid ${f.color}25`,
-											boxShadow: isActive
-												? `0 0 30px ${f.color}20, 0 0 60px ${f.color}08`
-												: "none",
-											transition: "all 0.4s",
-										}}
-									>
-										{f.icon}
-									</div>
 									<h3
 										className="text-[19px] font-bold mb-2.5"
 										style={{

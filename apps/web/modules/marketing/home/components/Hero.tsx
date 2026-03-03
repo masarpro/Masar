@@ -103,9 +103,13 @@ export function Hero() {
 
 	return (
 		<section
-			className="relative min-h-screen overflow-hidden flex items-center pt-36 pb-24 px-6"
+			className="relative min-h-screen overflow-hidden flex items-center pt-36 pb-12 px-6"
 			style={{ background: "var(--lp-bg)" }}
 		>
+			{/* Light mode animated background */}
+			<div className="landing-light-bg">
+				<div className="landing-light-blob" />
+			</div>
 			<MeshBackground />
 			<ParticleField />
 			{/* Radial vignette */}
@@ -129,7 +133,6 @@ export function Hero() {
 								border: "1px solid rgba(16,185,129,0.15)",
 							}}
 						>
-							<span className="text-base">🇸🇦</span>
 							<span className="text-[#10B981] text-sm font-semibold">
 								{t("hero.badge")}
 							</span>
@@ -138,12 +141,12 @@ export function Hero() {
 
 					{/* Title */}
 					<div className="animate-fade-in-delay-1">
-						<h1 className="text-4xl sm:text-5xl lg:text-[62px] font-black leading-[1.12] mb-7">
+						<h1 className="text-[clamp(1.4rem,4.5vw,3.875rem)] font-black leading-[1.12] mb-7">
 							<span style={{ color: "var(--lp-text)" }}>
 								{t("hero.title")}
 							</span>
 							<br />
-							<span className="shimmer-hero">
+							<span className="whitespace-nowrap" style={{ color: "#10B981" }}>
 								{t("hero.titleHighlight")}
 							</span>
 						</h1>
@@ -152,7 +155,7 @@ export function Hero() {
 					{/* Subtitle */}
 					<div className="animate-fade-in-delay-2">
 						<p
-							className="text-lg sm:text-xl leading-[1.8] mb-12 max-w-[580px]"
+							className="text-[clamp(0.75rem,2vw,1.25rem)] leading-[1.8] mb-12 whitespace-nowrap"
 							style={{ color: "var(--lp-text-muted)" }}
 						>
 							{t("hero.description")}

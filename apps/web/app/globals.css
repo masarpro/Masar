@@ -213,6 +213,67 @@ input[cmdk-input] {
 }
 
 /* ═══════════════════════════════════════════════
+   Light Mode Animated Background
+   ═══════════════════════════════════════════════ */
+@keyframes lightFloat1 {
+	0%, 100% { transform: translate(0, 0) scale(1); }
+	50% { transform: translate(40px, -30px) scale(1.05); }
+}
+@keyframes lightFloat2 {
+	0%, 100% { transform: translate(0, 0) scale(1); }
+	50% { transform: translate(-35px, 25px) scale(1.08); }
+}
+@keyframes lightFloat3 {
+	0%, 100% { transform: translate(0, 0) scale(1); }
+	50% { transform: translate(25px, 35px) scale(0.95); }
+}
+
+.landing-light-bg {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	overflow: hidden;
+	opacity: 1;
+	transition: opacity 0.3s;
+}
+.dark .landing-light-bg {
+	opacity: 0;
+}
+.landing-light-bg::before,
+.landing-light-bg::after,
+.landing-light-blob {
+	content: '';
+	position: absolute;
+	border-radius: 50%;
+	filter: blur(100px);
+	pointer-events: none;
+}
+.landing-light-bg::before {
+	width: 600px;
+	height: 600px;
+	top: -10%;
+	right: -5%;
+	background: radial-gradient(circle, rgba(16,185,129,0.08), rgba(6,182,212,0.04), transparent 70%);
+	animation: lightFloat1 20s ease-in-out infinite;
+}
+.landing-light-bg::after {
+	width: 500px;
+	height: 500px;
+	bottom: 0%;
+	left: -5%;
+	background: radial-gradient(circle, rgba(107,114,128,0.06), rgba(16,185,129,0.03), transparent 70%);
+	animation: lightFloat2 25s ease-in-out infinite;
+}
+.landing-light-blob {
+	width: 400px;
+	height: 400px;
+	top: 40%;
+	left: 40%;
+	background: radial-gradient(circle, rgba(16,185,129,0.05), rgba(209,213,219,0.04), transparent 70%);
+	animation: lightFloat3 22s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════
    Landing Page Premium Effects
    ═══════════════════════════════════════════════ */
 
@@ -450,6 +511,16 @@ input[cmdk-input] {
 		justify-content: center;
 		padding: 16px 32px;
 		font-size: 15px;
+	}
+	.btn-premium-primary {
+		animation: btnRainbow 4s ease infinite;
+	}
+	.btn-premium-primary::before {
+		animation: none;
+	}
+	.btn-premium-primary::after {
+		animation: none;
+		display: none;
 	}
 }
 

@@ -18,7 +18,7 @@ export function PainPoints() {
 
 	return (
 		<section
-			className="relative py-28 px-6"
+			className="relative py-16 px-6"
 			style={{
 				background:
 					"linear-gradient(180deg, var(--lp-bg) 0%, var(--lp-bg-alt) 50%, var(--lp-bg) 100%)",
@@ -77,16 +77,19 @@ export function PainPoints() {
 										background: `linear-gradient(90deg, ${pain.color}50, transparent)`,
 									}}
 								/>
-								<span className="text-3xl block mb-3.5">
-									{pain.emoji}
-								</span>
+								<h3
+									className="text-[17px] font-semibold mb-2"
+									style={{ color: "var(--lp-text)" }}
+								>
+									{t(`painPoints.items.${key}.title`)}
+								</h3>
 								<p
-									className="text-[15px] leading-[1.75] font-medium"
+									className="text-[14px] leading-[1.75] font-medium"
 									style={{
 										color: "var(--lp-text-muted)",
 									}}
 								>
-									{t(`painPoints.items.${key}`)}
+									{t(`painPoints.items.${key}.description`)}
 								</p>
 							</div>
 						);

@@ -507,17 +507,17 @@
 		}
 	},
 	"painPoints": {
-		"title": "Challenges every contractor knows",
+		"title": "Real challenges holding back construction companies",
 		"label": "The Problem",
 		"items": {
-			"1": "Information scattered between WhatsApp, Excel, and email",
-			"2": "Site supervisors can't access the data they need",
-			"3": "Expenses get lost and invoices are delayed",
-			"4": "Foreign software is complex and doesn't fit our workflows",
-			"5": "Owner reports take forever and start from scratch each time",
-			"6": "Tracking actual vs. planned progress is nearly impossible"
+			"1": { "title": "Scattered Tools", "description": "Managing projects via WhatsApp and scattered spreadsheets causes information loss and delayed decisions." },
+			"2": { "title": "No Financial Visibility", "description": "No clear view of project status: ahead or behind? Profitable or losing?" },
+			"3": { "title": "Weak Field Tracking", "description": "Site reports, photos, and notes are not accurately linked to actual project progress." },
+			"4": { "title": "Multiple Disconnected Systems", "description": "Separate software for invoicing, accounting, and projects with no real integration." },
+			"5": { "title": "Hard to Track Performance", "description": "Monitoring actual vs. planned progress relies on inaccurate manual methods." },
+			"6": { "title": "Systems Not Built for the Local Market", "description": "Foreign systems that don't reflect the way business works in the Saudi market." }
 		},
-		"solution": "Masar solves these challenges — in one platform"
+		"solution": "Masar unifies financial management, execution, and site operations in one integrated platform."
 	},
 	"stats": {
 		"endpoints": "System Operations",
