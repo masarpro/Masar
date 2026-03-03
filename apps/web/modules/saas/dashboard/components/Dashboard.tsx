@@ -225,7 +225,6 @@ export function Dashboard() {
 	const cashBalance = orgFinance?.balances?.totalCashBalance ?? 0;
 	const totalIncome = orgFinance?.payments?.total ?? 0;
 	const totalExpenses = orgFinance?.totalMoneyOut ?? stats?.financials?.totalExpenses ?? 0;
-	const netProfit = totalIncome - totalExpenses;
 	const projects = projectsData?.projects ?? [];
 
 	// KPI data
@@ -245,14 +244,6 @@ export function Dashboard() {
 			iconColor: "text-blue-600 dark:text-blue-400",
 			bgColor: "bg-blue-100 dark:bg-blue-900/30",
 			valueColor: "text-blue-600 dark:text-blue-400",
-		},
-		{
-			label: t("dashboard.kpi.netProfit"),
-			value: netProfit,
-			icon: TrendingUp,
-			iconColor: "text-emerald-600 dark:text-emerald-400",
-			bgColor: "bg-emerald-100 dark:bg-emerald-900/30",
-			valueColor: "text-emerald-600 dark:text-emerald-400",
 		},
 		{
 			label: t("dashboard.kpi.totalIncome"),
