@@ -69,7 +69,7 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 				return (
 					<div
 						key={section.id}
-						className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:shadow-xl"
+						className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:shadow-xl"
 					>
 						{/* Browse Section (Top) */}
 						<Link
@@ -77,11 +77,11 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 							className={`flex flex-col items-center gap-2 p-4 ${section.bgColor} ${section.hoverBg} transition-colors border-b ${section.borderColor}`}
 						>
 							<div
-								className={`p-3 rounded-xl bg-white/60 dark:bg-slate-800/60 ${section.iconColor}`}
+								className={`p-3 rounded-xl bg-card/60 ${section.iconColor}`}
 							>
 								<Icon className="h-6 w-6" />
 							</div>
-							<span className="text-sm font-medium text-slate-700 dark:text-slate-200 text-center">
+							<span className="text-sm font-medium text-foreground/80 text-center">
 								{t(`finance.dashboard.nav.${section.id}`)}
 							</span>
 						</Link>
@@ -89,7 +89,7 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 						{/* Create Section (Bottom) */}
 						<Link
 							href={section.createPath}
-							className="flex items-center justify-center gap-2 p-3 bg-white/50 dark:bg-slate-800/30 hover:bg-white/80 dark:hover:bg-slate-800/50 transition-colors"
+							className="flex items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
 						>
 							<Plus className={`h-4 w-4 ${section.iconColor}`} />
 							<span className={`text-xs font-medium ${section.iconColor}`}>

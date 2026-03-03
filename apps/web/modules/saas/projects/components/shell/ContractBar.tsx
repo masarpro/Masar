@@ -17,10 +17,10 @@ interface ContractBarProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-	DRAFT: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+	DRAFT: "bg-muted text-muted-foreground",
 	ACTIVE: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
 	SUSPENDED: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300",
-	CLOSED: "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400",
+	CLOSED: "bg-muted text-muted-foreground",
 };
 
 function formatCurrency(value: number): string {

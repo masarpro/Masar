@@ -8,7 +8,7 @@ import { TrendingUp, Clock, Banknote, AlertTriangle } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 const glassCard =
-	"backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-xl shadow-sm p-3";
+	"backdrop-blur-xl bg-card/80 border border-border/50 rounded-xl shadow-sm p-3";
 
 interface KpiStripProps {
 	project: {
@@ -35,7 +35,7 @@ export function KpiStrip({ project, financeSummary }: KpiStripProps) {
 			<div className={glassCard}>
 				<div className="flex items-center gap-2 mb-1">
 					<TrendingUp className="h-4 w-4 text-teal-500" />
-					<span className="text-[11px] text-slate-500 dark:text-slate-400">
+					<span className="text-[11px] text-muted-foreground">
 						{t("projects.commandCenter.completion")}
 					</span>
 				</div>
@@ -48,12 +48,12 @@ export function KpiStrip({ project, financeSummary }: KpiStripProps) {
 			<div className={glassCard}>
 				<div className="flex items-center gap-2 mb-1">
 					<Clock className="h-4 w-4 text-blue-500" />
-					<span className="text-[11px] text-slate-500 dark:text-slate-400">
+					<span className="text-[11px] text-muted-foreground">
 						{t("projects.commandCenter.daysLeft")}
 					</span>
 				</div>
 				<div className="flex items-center gap-2">
-					<p className="text-2xl font-bold text-slate-800 dark:text-slate-200">
+					<p className="text-2xl font-bold text-foreground">
 						{daysRemaining !== null ? Math.abs(daysRemaining) : "-"}
 					</p>
 					{daysRemaining !== null && (
@@ -78,7 +78,7 @@ export function KpiStrip({ project, financeSummary }: KpiStripProps) {
 			<div className={glassCard}>
 				<div className="flex items-center gap-2 mb-1">
 					<Banknote className="h-4 w-4 text-emerald-500" />
-					<span className="text-[11px] text-slate-500 dark:text-slate-400">
+					<span className="text-[11px] text-muted-foreground">
 						{t("projects.commandCenter.budget")}
 					</span>
 				</div>
@@ -91,13 +91,13 @@ export function KpiStrip({ project, financeSummary }: KpiStripProps) {
 			<div className={glassCard}>
 				<div className="flex items-center gap-2 mb-1">
 					<AlertTriangle
-						className={`h-4 w-4 ${expenseRatio > 80 ? "text-red-500" : "text-slate-400"}`}
+						className={`h-4 w-4 ${expenseRatio > 80 ? "text-red-500" : "text-muted-foreground"}`}
 					/>
-					<span className="text-[11px] text-slate-500 dark:text-slate-400">
+					<span className="text-[11px] text-muted-foreground">
 						{t("projects.commandCenter.expenses")}
 					</span>
 				</div>
-				<p className={`text-2xl font-bold ${expenseRatio > 80 ? "text-red-600 dark:text-red-400" : "text-slate-800 dark:text-slate-200"}`}>
+				<p className={`text-2xl font-bold ${expenseRatio > 80 ? "text-red-600 dark:text-red-400" : "text-foreground"}`}>
 					{formatCurrencyCompact(actualExpenses)}
 				</p>
 				{expenseRatio > 80 && (

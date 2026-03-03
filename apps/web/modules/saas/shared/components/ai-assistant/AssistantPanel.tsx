@@ -2,9 +2,10 @@
 
 import { cn } from "@ui/lib";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import { useLocale, useTranslations } from "next-intl";
 import { History, Maximize2, Minimize2, RotateCcw, Sparkles, X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAssistant } from "./AssistantProvider";
 import { AssistantContextBadge } from "./AssistantContextBadge";
 import { AssistantInput } from "./AssistantInput";
@@ -52,28 +53,27 @@ export function AssistantPanel() {
     locale,
   };
 
+  const contextBodyRef = useRef(contextBody);
+  contextBodyRef.current = contextBody;
+
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/ai/assistant",
+        prepareSendMessagesRequest({ messages }) {
+          return {
+            body: {
+              messages,
+              context: contextBodyRef.current,
+            },
+          };
+        },
+      }),
+    [],
+  );
+
   const { messages, setMessages, status, sendMessage, error } = useChat({
-    transport: {
-      async sendMessages({ messages: msgs, abortSignal }) {
-        const response = await fetch("/api/ai/assistant", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: msgs, context: contextBody }),
-          signal: abortSignal,
-        });
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error || `HTTP ${response.status}`);
-        }
-        if (!response.body) {
-          throw new Error("No response body");
-        }
-        return response.body as ReadableStream;
-      },
-      reconnectToStream() {
-        throw new Error("Unsupported");
-      },
-    },
+    transport,
   });
 
   const isLoading = status === "streaming" || status === "submitted";

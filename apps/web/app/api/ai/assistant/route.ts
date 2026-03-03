@@ -125,6 +125,9 @@ export async function POST(request: Request) {
       tools,
       stopWhen: stepCountIs(5),
       maxOutputTokens: 2000,
+      onError: ({ error }) => {
+        console.error("[Assistant Stream Error]", error);
+      },
     });
 
     return result.toUIMessageStreamResponse();

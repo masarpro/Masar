@@ -500,11 +500,6 @@ input[cmdk-input] {
 	background-color: var(--lp-nav-btn-hover-bg);
 }
 
-/* Logo Light Variant (dark mode only) */
-.dark .logo-light svg path[fill="#404040"] {
-	fill: #ffffff;
-}
-
 /* Responsive overrides for landing */
 @media (max-width: 768px) {
 	.btn-premium {

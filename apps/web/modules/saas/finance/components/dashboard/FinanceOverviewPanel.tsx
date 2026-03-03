@@ -70,11 +70,11 @@ export function FinanceOverviewPanel({ stats }: FinanceOverviewPanelProps) {
 	const t = useTranslations();
 
 	return (
-		<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-6 space-y-6">
+		<div className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 p-6 space-y-6">
 			{/* Row 1 - Main Balances */}
 			<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 				{/* Cash Balance */}
-				<div className="rounded-xl bg-white/50 dark:bg-slate-800/50 p-4 border border-slate-200/50 dark:border-slate-700/50">
+				<div className="rounded-xl bg-card/60 p-4 border border-border/50">
 					<div className="flex items-center justify-between mb-3">
 						<div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
 							<Wallet className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
@@ -99,16 +99,16 @@ export function FinanceOverviewPanel({ stats }: FinanceOverviewPanelProps) {
 							</div>
 						)}
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-xs font-medium text-muted-foreground mb-1">
 						{t("finance.dashboard.overview.cashBalance")}
 					</p>
-					<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+					<p className="text-2xl font-bold text-foreground">
 						<Currency amount={mockBalances.cashBalance} />
 					</p>
 				</div>
 
 				{/* Bank Balance */}
-				<div className="rounded-xl bg-white/50 dark:bg-slate-800/50 p-4 border border-slate-200/50 dark:border-slate-700/50">
+				<div className="rounded-xl bg-card/60 p-4 border border-border/50">
 					<div className="flex items-center justify-between mb-3">
 						<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
 							<Landmark className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -133,16 +133,16 @@ export function FinanceOverviewPanel({ stats }: FinanceOverviewPanelProps) {
 							</div>
 						)}
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-xs font-medium text-muted-foreground mb-1">
 						{t("finance.dashboard.overview.bankBalance")}
 					</p>
-					<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+					<p className="text-2xl font-bold text-foreground">
 						<Currency amount={mockBalances.bankBalance} />
 					</p>
 				</div>
 
 				{/* Net Profit */}
-				<div className="rounded-xl bg-white/50 dark:bg-slate-800/50 p-4 border border-slate-200/50 dark:border-slate-700/50">
+				<div className="rounded-xl bg-card/60 p-4 border border-border/50">
 					<div className="flex items-center justify-between mb-3">
 						<div className="p-2 rounded-lg bg-violet-100 dark:bg-violet-900/30">
 							<TrendingUp className="h-5 w-5 text-violet-600 dark:text-violet-400" />
@@ -167,10 +167,10 @@ export function FinanceOverviewPanel({ stats }: FinanceOverviewPanelProps) {
 							</div>
 						)}
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-xs font-medium text-muted-foreground mb-1">
 						{t("finance.dashboard.overview.netProfit")}
 					</p>
-					<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+					<p className="text-2xl font-bold text-foreground">
 						<Currency amount={mockBalances.netProfit} />
 					</p>
 				</div>
@@ -228,12 +228,12 @@ export function FinanceOverviewPanel({ stats }: FinanceOverviewPanelProps) {
 			</div>
 
 			{/* Row 3 - Sparkline Chart */}
-			<div className="rounded-xl bg-white/50 dark:bg-slate-800/50 p-4 border border-slate-200/50 dark:border-slate-700/50">
+			<div className="rounded-xl bg-card/60 p-4 border border-border/50">
 				<div className="flex items-center justify-between mb-4">
-					<h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">
+					<h3 className="text-sm font-medium text-foreground/80">
 						{t("finance.dashboard.overview.cashFlow")}
 					</h3>
-					<span className="text-xs text-slate-500 dark:text-slate-400">
+					<span className="text-xs text-muted-foreground">
 						{t("finance.dashboard.overview.last7Days")}
 					</span>
 				</div>

@@ -129,7 +129,7 @@ const cashFlowChartConfig: ChartConfig = {
 
 // Glass card style constant
 const glassCard =
-	"backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5";
+	"backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5";
 
 export function Dashboard() {
 	const t = useTranslations();
@@ -374,7 +374,7 @@ export function Dashboard() {
 							style={{ animationDelay: `${i * 60}ms` }}
 						>
 							<div className="flex items-center justify-between mb-2">
-								<span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<span className="text-xs font-medium text-muted-foreground">
 									{kpi.label}
 								</span>
 								<div className={`p-1.5 rounded-lg ${kpi.bgColor}`}>
@@ -384,7 +384,7 @@ export function Dashboard() {
 							<p className={`text-lg font-bold ${kpi.valueColor}`}>
 								<Currency amount={kpi.value} />
 							</p>
-							<p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
+							<p className="text-[10px] text-muted-foreground/70 mt-1">
 								{kpi.sub ?? t("dashboard.kpi.vsLastMonth")}
 							</p>
 						</div>
@@ -393,8 +393,8 @@ export function Dashboard() {
 			</div>
 
 			{/* ═══ PROJECTS - Compact horizontal cards (image + info) ═══ */}
-			<div className="rounded-xl bg-white p-6 shadow-sm dark:bg-slate-900/50 dark:shadow-none">
-				<h2 className="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-200">
+			<div className="rounded-xl bg-card p-6 shadow-sm">
+				<h2 className="mb-4 text-lg font-semibold text-foreground">
 					{t("dashboard.activeProjects")}
 				</h2>
 				{(() => {
@@ -406,7 +406,7 @@ export function Dashboard() {
 					const secondRowEmptyCount = Math.max(0, COLS - secondRowProjects.length);
 
 					const projectCardBase =
-						"rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-900/20 flex flex-row overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-500 group";
+						"rounded-2xl border border-border bg-muted/30 flex flex-row overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-500 group";
 					const cardSizeClass = useScroll
 						? "h-[88px] w-[340px] min-w-[340px] shrink-0"
 						: "h-[88px] min-w-0";
@@ -424,7 +424,7 @@ export function Dashboard() {
 							style={{ animationDelay: `${160 + i * 70}ms` }}
 						>
 							{/* Square image */}
-							<div className="relative h-[88px] w-[88px] shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800">
+							<div className="relative h-[88px] w-[88px] shrink-0 overflow-hidden bg-muted">
 								{coverImageUrl ? (
 									// eslint-disable-next-line @next/next/no-img-element
 									<img
@@ -434,8 +434,8 @@ export function Dashboard() {
 										loading="lazy"
 									/>
 								) : (
-									<div className="flex h-full w-full items-center justify-center bg-slate-200/50 dark:bg-slate-700/50">
-										<span className="text-2xl font-bold text-slate-300 dark:text-slate-600">
+									<div className="flex h-full w-full items-center justify-center bg-muted/50">
+										<span className="text-2xl font-bold text-muted-foreground/50">
 											{(project.name || "?")[0]}
 										</span>
 									</div>
@@ -449,21 +449,21 @@ export function Dashboard() {
 										{t(`projects.status.${project.status}`)}
 									</Badge>
 								</div>
-								<div className="absolute end-1 top-1 rounded-full bg-white/90 px-1.5 py-0.5 text-[9px] font-bold text-slate-700 dark:bg-slate-900/90 dark:text-slate-200">
+								<div className="absolute end-1 top-1 rounded-full bg-card/90 px-1.5 py-0.5 text-[9px] font-bold text-foreground">
 									{progress}%
 								</div>
 							</div>
 							{/* Info section */}
 							<div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 p-2.5">
-								<h3 className="wrap-break-word text-sm font-bold text-slate-900 dark:text-slate-100 line-clamp-2">
+								<h3 className="wrap-break-word text-sm font-bold text-foreground line-clamp-2">
 									{project.name || t("projects.unnamed")}
 								</h3>
-								<p className="wrap-break-word text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2">
+								<p className="wrap-break-word text-[10px] text-muted-foreground line-clamp-2">
 									{project.clientName || "—"}
 								</p>
-								<div className="mt-2 flex items-center gap-2 text-[9px] text-slate-500 dark:text-slate-400">
+								<div className="mt-2 flex items-center gap-2 text-[9px] text-muted-foreground">
 									<span title={t("dashboard.project.contractValue")}>
-										<Currency amount={contractValue} className="text-[10px] font-semibold text-slate-700 dark:text-slate-300" />
+										<Currency amount={contractValue} className="text-[10px] font-semibold text-foreground/80" />
 									</span>
 									<span>•</span>
 									<span>{days} {t("dashboard.project.daysShort")}</span>
@@ -476,10 +476,10 @@ export function Dashboard() {
 					const newProjectButton = (
 						<Link
 							href={`/app/${organizationSlug}/projects/new`}
-							className={`flex shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-slate-200 transition-all duration-300 hover:border-emerald-500 hover:bg-emerald-50/50 dark:border-slate-700 dark:hover:bg-emerald-900/10 ${useScroll ? "h-[88px] w-14" : "h-[88px] w-14"}`}
+							className={`flex shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-border transition-all duration-300 hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 ${useScroll ? "h-[88px] w-14" : "h-[88px] w-14"}`}
 							title={t("projects.newProject")}
 						>
-							<Plus className="h-6 w-6 text-slate-400" />
+							<Plus className="h-6 w-6 text-muted-foreground" />
 						</Link>
 					);
 
@@ -498,14 +498,14 @@ export function Dashboard() {
 						<div className="grid w-full grid-cols-[repeat(4,minmax(0,1fr))_auto] gap-3">
 							{firstRowProjects.map((p, i) => renderProjectCard(p, i))}
 							{Array.from({ length: firstRowEmptyCount }).map((_, idx) => (
-								<div key={`empty1-${idx}`} className="h-[88px] rounded-xl border border-dashed border-slate-200 bg-slate-50/30 dark:border-slate-700 dark:bg-slate-900/20" aria-hidden />
+								<div key={`empty1-${idx}`} className="h-[88px] rounded-xl border border-dashed border-border bg-muted/30" aria-hidden />
 							))}
 							{newProjectButton}
 							{secondRowProjects.length > 0 && (
 								<>
 									{secondRowProjects.map((p, i) => renderProjectCard(p, i + firstRowProjects.length))}
 									{Array.from({ length: secondRowEmptyCount }).map((_, idx) => (
-										<div key={`empty2-${idx}`} className="h-[88px] rounded-xl border border-dashed border-slate-200 bg-slate-50/30 dark:border-slate-700 dark:bg-slate-900/20" aria-hidden />
+										<div key={`empty2-${idx}`} className="h-[88px] rounded-xl border border-dashed border-border bg-muted/30" aria-hidden />
 									))}
 								</>
 							)}
@@ -524,15 +524,15 @@ export function Dashboard() {
 							<Link
 								key={i}
 								href={action.browsePath}
-								className={`overflow-hidden rounded-2xl border border-white/20 bg-white/70 shadow-lg shadow-black/5 backdrop-blur-xl transition-all duration-300 hover:shadow-xl dark:border-slate-700/30 dark:bg-slate-900/70 animate-in fade-in slide-in-from-bottom-3 flex flex-col items-center justify-center gap-2 p-4 ${action.bgColor} ${action.hoverBg}`}
+								className={`overflow-hidden rounded-2xl border border-border/50 bg-card/80 shadow-lg shadow-black/5 backdrop-blur-xl transition-all duration-300 hover:shadow-xl animate-in fade-in slide-in-from-bottom-3 flex flex-col items-center justify-center gap-2 p-4 ${action.bgColor} ${action.hoverBg}`}
 								style={{ animationDelay: `${280 + i * 35}ms` }}
 							>
 								<div
-									className={`rounded-xl bg-white/60 p-3 dark:bg-slate-800/60 ${action.iconColor}`}
+									className={`rounded-xl bg-card/60 p-3 ${action.iconColor}`}
 								>
 									<Icon className="h-6 w-6" />
 								</div>
-								<span className="text-center text-sm font-medium text-slate-700 dark:text-slate-200">
+								<span className="text-center text-sm font-medium text-foreground/80">
 									{action.sectionLabel}
 								</span>
 							</Link>
@@ -541,7 +541,7 @@ export function Dashboard() {
 					return (
 						<div
 							key={i}
-							className="overflow-hidden rounded-2xl border border-white/20 bg-white/70 shadow-lg shadow-black/5 backdrop-blur-xl transition-all duration-300 hover:shadow-xl dark:border-slate-700/30 dark:bg-slate-900/70 animate-in fade-in slide-in-from-bottom-3"
+							className="overflow-hidden rounded-2xl border border-border/50 bg-card/80 shadow-lg shadow-black/5 backdrop-blur-xl transition-all duration-300 hover:shadow-xl animate-in fade-in slide-in-from-bottom-3"
 							style={{ animationDelay: `${280 + i * 35}ms` }}
 						>
 							{/* Section (Top) */}
@@ -550,18 +550,18 @@ export function Dashboard() {
 								className={`flex flex-col items-center gap-2 border-b p-4 transition-colors ${action.bgColor} ${action.hoverBg} ${action.borderColor}`}
 							>
 								<div
-									className={`rounded-xl bg-white/60 p-3 dark:bg-slate-800/60 ${action.iconColor}`}
+									className={`rounded-xl bg-card/60 p-3 ${action.iconColor}`}
 								>
 									<Icon className="h-6 w-6" />
 								</div>
-								<span className="text-center text-sm font-medium text-slate-700 dark:text-slate-200">
+								<span className="text-center text-sm font-medium text-foreground/80">
 									{action.sectionLabel}
 								</span>
 							</Link>
 							{/* Action (Bottom) */}
 							<Link
 								href={action.createPath}
-								className="flex items-center justify-center gap-2 bg-white/50 p-3 transition-colors hover:bg-white/80 dark:bg-slate-800/30 dark:hover:bg-slate-800/50"
+								className="flex items-center justify-center gap-2 bg-card/50 p-3 transition-colors hover:bg-card/80"
 							>
 								<Plus className={`h-4 w-4 ${action.iconColor}`} />
 								<span className={`text-xs font-medium ${action.iconColor}`}>
@@ -583,8 +583,8 @@ export function Dashboard() {
 					{/* Header */}
 					<div className="flex items-center justify-between mb-3">
 						<div className="flex items-center gap-1.5">
-							<DollarSign className="h-3.5 w-3.5 text-slate-400" />
-							<span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+							<DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
+							<span className="text-[11px] font-semibold text-muted-foreground">
 								{t("dashboard.cashFlow.title")}
 							</span>
 						</div>
@@ -603,19 +603,19 @@ export function Dashboard() {
 							<span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 block">
 								<Currency amount={totalIncomeChart} />
 							</span>
-							<span className="text-[9px] text-slate-500">{t("dashboard.cashFlow.income")}</span>
+							<span className="text-[9px] text-muted-foreground">{t("dashboard.cashFlow.income")}</span>
 						</div>
 						<div className="text-center p-2 rounded-lg bg-red-50 dark:bg-red-900/20">
 							<span className="text-sm font-bold text-red-600 dark:text-red-400 block">
 								<Currency amount={totalExpenseChart} />
 							</span>
-							<span className="text-[9px] text-slate-500">{t("dashboard.cashFlow.expenses")}</span>
+							<span className="text-[9px] text-muted-foreground">{t("dashboard.cashFlow.expenses")}</span>
 						</div>
 						<div className="text-center p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
 							<span className="text-sm font-bold text-blue-600 dark:text-blue-400 block">
 								<Currency amount={netChart} />
 							</span>
-							<span className="text-[9px] text-slate-500">{t("dashboard.cashFlow.net")}</span>
+							<span className="text-[9px] text-muted-foreground">{t("dashboard.cashFlow.net")}</span>
 						</div>
 					</div>
 
@@ -678,7 +678,7 @@ export function Dashboard() {
 							<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
 								<Receipt className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
 							</div>
-							<span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+							<span className="text-sm font-semibold text-foreground">
 								{t("dashboard.expenseBreakdown.title")}
 							</span>
 						</div>
@@ -695,7 +695,7 @@ export function Dashboard() {
 					<div className="flex flex-1 min-h-0 flex-col gap-3 px-4 pb-4">
 						{expenseBreakdown.length === 0 && monthlyExpenses.length === 0 ? (
 							<div className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
-								<p className="text-sm text-slate-500 dark:text-slate-400">
+								<p className="text-sm text-muted-foreground">
 									{t("dashboard.expenseBreakdown.noData")}
 								</p>
 								<Link
@@ -735,14 +735,14 @@ export function Dashboard() {
 													</PieChart>
 												</ChartContainer>
 												<div className="absolute inset-0 flex items-center justify-center">
-													<span className="text-lg font-bold text-slate-700 dark:text-slate-200">
+													<span className="text-lg font-bold text-foreground/80">
 														{expenseBreakdown.reduce((s, e) => s + e.value, 0)}%
 													</span>
 												</div>
 											</>
 										) : (
-											<div className="flex h-full w-full items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800/50">
-												<span className="text-2xl font-bold text-slate-300 dark:text-slate-600">—</span>
+											<div className="flex h-full w-full items-center justify-center rounded-full bg-muted/50">
+												<span className="text-2xl font-bold text-muted-foreground/50">—</span>
 											</div>
 										)}
 									</div>
@@ -753,8 +753,8 @@ export function Dashboard() {
 													className="h-2 w-2 shrink-0 rounded-full"
 													style={{ background: entry.color }}
 												/>
-												<span className="flex-1 truncate text-xs text-slate-600 dark:text-slate-300">{entry.name}</span>
-												<span className="text-xs font-bold tabular-nums text-slate-800 dark:text-slate-100">{entry.value}%</span>
+												<span className="flex-1 truncate text-xs text-foreground/80">{entry.name}</span>
+												<span className="text-xs font-bold tabular-nums text-foreground">{entry.value}%</span>
 											</div>
 										))}
 									</div>
@@ -762,9 +762,9 @@ export function Dashboard() {
 
 								{/* Monthly trend - compact horizontal bars */}
 								<div className="shrink-0 space-y-2">
-									<div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400">
+									<div className="flex items-center justify-between text-[10px] text-muted-foreground">
 										<span>{t("dashboard.expenseBreakdown.monthlyTrend")}</span>
-										<span className="font-medium text-slate-700 dark:text-slate-200">
+										<span className="font-medium text-foreground/80">
 											<Currency amount={monthlyExpenses[monthlyExpenses.length - 1]?.amount ?? 0} className="text-xs" />
 										</span>
 									</div>
@@ -776,24 +776,24 @@ export function Dashboard() {
 												const isCurrent = idx === monthlyExpenses.length - 1;
 												return (
 													<div key={idx} className="flex flex-1 flex-col items-center gap-1">
-														<div className="relative h-12 w-full min-w-[20px] overflow-hidden rounded-md bg-slate-100 dark:bg-slate-800/50">
+														<div className="relative h-12 w-full min-w-[20px] overflow-hidden rounded-md bg-muted/50">
 															<div
 																className={`absolute bottom-0 left-0 right-0 rounded-t-md transition-all duration-500 ${
 																	isCurrent
 																		? "bg-gradient-to-t from-emerald-500 to-emerald-400"
-																		: "bg-slate-300/60 dark:bg-slate-600/40"
+																		: "bg-muted-foreground/20"
 																}`}
 																style={{ height: `${Math.max(pct, 8)}%` }}
 															/>
 														</div>
-														<span className={`text-[9px] ${isCurrent ? "font-semibold text-emerald-600 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"}`}>
+														<span className={`text-[9px] ${isCurrent ? "font-semibold text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>
 															{m.month}
 														</span>
 													</div>
 												);
 											})
 										) : (
-											<div className="flex w-full items-center justify-center py-4 text-[10px] text-slate-400">
+											<div className="flex w-full items-center justify-center py-4 text-[10px] text-muted-foreground">
 												{t("dashboard.expenseBreakdown.noData")}
 											</div>
 										)}
@@ -811,8 +811,8 @@ export function Dashboard() {
 				>
 					<div className="flex items-center justify-between mb-3">
 						<div className="flex items-center gap-1.5">
-							<Bell className="h-3.5 w-3.5 text-slate-400" />
-							<span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+							<Bell className="h-3.5 w-3.5 text-muted-foreground" />
+							<span className="text-[11px] font-semibold text-muted-foreground">
 								{t("dashboard.recentActivity.title")}
 							</span>
 						</div>
@@ -839,17 +839,17 @@ export function Dashboard() {
 								return (
 									<div
 										key={`${activity.type}-${activity.id}-${idx}`}
-										className="flex items-start gap-2 py-2 border-b border-slate-100 dark:border-slate-800 last:border-0 animate-in fade-in slide-in-from-right-2 duration-300"
+										className="flex items-start gap-2 py-2 border-b border-border/50 last:border-0 animate-in fade-in slide-in-from-right-2 duration-300"
 										style={{ animationDelay: `${620 + idx * 50}ms` }}
 									>
 										<div className={`w-6 h-6 rounded-md ${config.bg} flex items-center justify-center shrink-0`}>
 											<ActivityIcon className={`h-3 w-3 ${config.color}`} />
 										</div>
 										<div className="min-w-0">
-											<p className="text-[10px] font-medium text-slate-700 dark:text-slate-300 truncate">
+											<p className="text-[10px] font-medium text-foreground/80 truncate">
 												{activity.title}
 											</p>
-											<p className="text-[8px] text-slate-400">
+											<p className="text-[8px] text-muted-foreground">
 												{formatRelativeTime(activity.createdAt)}
 											</p>
 										</div>
@@ -857,17 +857,17 @@ export function Dashboard() {
 								);
 							})
 						) : (
-							<p className="text-center text-[11px] text-slate-400 py-4">
+							<p className="text-center text-[11px] text-muted-foreground py-4">
 								{t("dashboard.noRecentActivities")}
 							</p>
 						)}
 					</div>
 
 					{/* Upcoming Payments/Milestones */}
-					<div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+					<div className="mt-3 pt-3 border-t border-border/50">
 						<div className="flex items-center gap-1.5 mb-2">
-							<Clock className="h-3 w-3 text-slate-400" />
-							<span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+							<Clock className="h-3 w-3 text-muted-foreground" />
+							<span className="text-[10px] font-semibold text-muted-foreground">
 								{t("dashboard.upcomingPayments.title")}
 							</span>
 						</div>
@@ -876,13 +876,13 @@ export function Dashboard() {
 								<Link
 									key={m.id}
 									href={`/app/${organizationSlug}/projects/${m.project.id}/execution`}
-									className="flex items-center justify-between p-2 rounded-md bg-slate-50/80 dark:bg-slate-800/30 mb-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors"
+									className="flex items-center justify-between p-2 rounded-md bg-muted/40 mb-1.5 hover:bg-muted/60 transition-colors"
 								>
 									<div>
-										<p className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">
+										<p className="text-[10px] font-semibold text-foreground/80">
 											{m.project.name}
 										</p>
-										<p className="text-[8px] text-slate-400">
+										<p className="text-[8px] text-muted-foreground">
 											{m.title} — {m.plannedEnd ? formatDate(m.plannedEnd) : ""}
 										</p>
 									</div>
@@ -892,7 +892,7 @@ export function Dashboard() {
 								</Link>
 							))
 						) : (
-							<p className="text-center text-[10px] text-slate-400 py-2">
+							<p className="text-center text-[10px] text-muted-foreground py-2">
 								{t("dashboard.noUpcomingMilestones")}
 							</p>
 						)}
