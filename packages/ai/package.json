@@ -3,7 +3,9 @@
 		"@ai-sdk/anthropic": "^2.0.44",
 		"@ai-sdk/openai": "^2.0.65",
 		"@ai-sdk/react": "^2.0.93",
+		"@repo/database": "workspace:*",
 		"ai": "^5.0.93",
+		"zod": "^4.1.12",
 		"openai": "^6.9.0"
 	},
 	"devDependencies": {

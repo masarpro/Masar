@@ -1,5 +1,6 @@
 "use client";
 
+import { useChat } from "@ai-sdk/react";
 import { useLocale, useTranslations } from "next-intl";
 import { RotateCcw, Sparkles, X } from "lucide-react";
 import { useCallback, useState } from "react";
@@ -9,75 +10,100 @@ import { AssistantInput } from "./AssistantInput";
 import { AssistantMessages } from "./AssistantMessages";
 import { AssistantQuickActions } from "./AssistantQuickActions";
 
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-}
-
 export function AssistantPanel() {
-  const { isOpen, setIsOpen, pageContext, quickActions } = useAssistant();
+  const {
+    isOpen,
+    setIsOpen,
+    pageContext,
+    quickActions,
+    organizationSlug,
+    organizationName,
+  } = useAssistant();
   const t = useTranslations("assistant");
   const locale = useLocale();
+  const [inputValue, setInputValue] = useState("");
 
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const contextBody = {
+    organizationSlug,
+    organizationName,
+    currentPage: pageContext.route,
+    currentSection: pageContext.section,
+    projectId: pageContext.projectId,
+    projectName: pageContext.projectName,
+    locale,
+  };
+
+  const { messages, setMessages, status, sendMessage } = useChat({
+    transport: {
+      async sendMessages({ messages: msgs, abortSignal }) {
+        const response = await fetch("/api/ai/assistant", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: msgs, context: contextBody }),
+          signal: abortSignal,
+        });
+        if (!response.body) {
+          throw new Error("No response body");
+        }
+        return response.body as ReadableStream;
+      },
+      reconnectToStream() {
+        throw new Error("Unsupported");
+      },
+    },
+  });
+
+  const isLoading = status === "streaming" || status === "submitted";
 
   const handleSubmit = useCallback(() => {
-    const text = input.trim();
+    const text = inputValue.trim();
     if (!text || isLoading) return;
-
-    const userMsg: Message = {
-      id: crypto.randomUUID(),
-      role: "user",
-      content: text,
-    };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput("");
-    setIsLoading(true);
-
-    // Temporary mock response
-    setTimeout(() => {
-      const assistantMsg: Message = {
-        id: crypto.randomUUID(),
-        role: "assistant",
-        content: "مرحباً! أنا مساعد مسار، سأكون جاهز قريباً لمساعدتك. 🚀",
-      };
-      setMessages((prev) => [...prev, assistantMsg]);
-      setIsLoading(false);
-    }, 1500);
-  }, [input, isLoading]);
+    sendMessage({ text });
+    setInputValue("");
+  }, [inputValue, isLoading, sendMessage]);
 
   const handleQuickAction = useCallback(
     (prompt: string) => {
-      setInput("");
-      const userMsg: Message = {
-        id: crypto.randomUUID(),
-        role: "user",
-        content: prompt,
-      };
-      setMessages((prev) => [...prev, userMsg]);
-      setIsLoading(true);
-
-      setTimeout(() => {
-        const assistantMsg: Message = {
-          id: crypto.randomUUID(),
-          role: "assistant",
-          content: "مرحباً! أنا مساعد مسار، سأكون جاهز قريباً لمساعدتك. 🚀",
-        };
-        setMessages((prev) => [...prev, assistantMsg]);
-        setIsLoading(false);
-      }, 1500);
+      sendMessage({ text: prompt });
     },
-    [],
+    [sendMessage],
   );
 
   const handleNewChat = useCallback(() => {
     setMessages([]);
-    setInput("");
-    setIsLoading(false);
-  }, []);
+    setInputValue("");
+  }, [setMessages]);
+
+  // Map messages to the format AssistantMessages expects
+  const mappedMessages = messages.map((msg) => {
+    const textContent =
+      msg.parts
+        ?.filter(
+          (p): p is { type: "text"; text: string } => p.type === "text",
+        )
+        .map((p) => p.text)
+        .join("") ?? "";
+
+    // Extract tool invocations from parts (tool parts have type "tool-{name}" or "dynamic-tool")
+    const toolInvocations: { toolName: string; state: "call" | "result" | "partial-call" }[] = [];
+    for (const p of msg.parts ?? []) {
+      if (p.type.startsWith("tool-")) {
+        const part = p as { type: string; state?: string; toolName?: string };
+        const toolName = part.toolName ?? p.type.replace("tool-", "");
+        toolInvocations.push({
+          toolName,
+          state: (part.state as "call" | "result" | "partial-call") ?? "result",
+        });
+      }
+    }
+
+    return {
+      id: msg.id,
+      role: msg.role as "user" | "assistant",
+      content: textContent,
+      toolInvocations: toolInvocations.length > 0 ? toolInvocations : undefined,
+    };
+  });
 
   if (!isOpen) return null;
 
@@ -116,21 +142,24 @@ export function AssistantPanel() {
 
       {/* Body */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        {messages.length === 0 ? (
+        {mappedMessages.length === 0 ? (
           <AssistantQuickActions
             actions={quickActions}
             locale={locale}
             onAction={handleQuickAction}
           />
         ) : (
-          <AssistantMessages messages={messages} isLoading={isLoading} />
+          <AssistantMessages
+            messages={mappedMessages}
+            isLoading={isLoading}
+          />
         )}
       </div>
 
       {/* Input */}
       <AssistantInput
-        value={input}
-        onChange={setInput}
+        value={inputValue}
+        onChange={setInputValue}
         onSubmit={handleSubmit}
         isLoading={isLoading}
       />
