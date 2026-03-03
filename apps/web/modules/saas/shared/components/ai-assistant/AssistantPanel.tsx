@@ -61,6 +61,10 @@ export function AssistantPanel() {
           body: JSON.stringify({ messages: msgs, context: contextBody }),
           signal: abortSignal,
         });
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
         if (!response.body) {
           throw new Error("No response body");
         }
