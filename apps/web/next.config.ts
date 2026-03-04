@@ -7,6 +7,7 @@ import nextIntlPlugin from "next-intl/plugin";
 const withNextIntl = nextIntlPlugin("./modules/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+	serverExternalPackages: ["@prisma/client", "@prisma/adapter-pg"],
 	experimental: {
 		optimizePackageImports: [
 			"lucide-react",
