@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
@@ -11,7 +11,6 @@ import { FinanceLogoUpload } from "@saas/finance/components/settings/FinanceLogo
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
-import { Textarea } from "@ui/components/textarea";
 import {
 	Select,
 	SelectContent,
@@ -20,7 +19,15 @@ import {
 	SelectValue,
 } from "@ui/components/select";
 import { toast } from "sonner";
-import { Save, Loader2 } from "lucide-react";
+import {
+	Save,
+	Loader2,
+	ImageIcon,
+	Building2,
+	MapPin,
+	Phone,
+	Receipt,
+} from "lucide-react";
 
 const CURRENCIES = [
 	{ value: "SAR", label: "SAR", labelAr: "ريال سعودي" },
@@ -34,6 +41,21 @@ const CURRENCIES = [
 	{ value: "EGP", label: "EGP", labelAr: "جنيه مصري" },
 	{ value: "GBP", label: "GBP", labelAr: "جنيه إسترليني" },
 ];
+
+function SectionTitle({
+	icon: Icon,
+	children,
+}: {
+	icon: React.ComponentType<{ className?: string }>;
+	children: React.ReactNode;
+}) {
+	return (
+		<span className="flex items-center gap-2">
+			<Icon className="h-4 w-4 text-primary" />
+			{children}
+		</span>
+	);
+}
 
 export function CompanyInfoSettings() {
 	const t = useTranslations();
@@ -58,6 +80,24 @@ export function CompanyInfoSettings() {
 	useEffect(() => {
 		setHasChanges(Object.keys(formData).length > 0);
 	}, [formData]);
+
+	// Compose address preview from structured fields
+	const composedAddress = useMemo(() => {
+		const parts = [
+			getFieldValue("buildingNumber"),
+			getFieldValue("street"),
+			getFieldValue("secondaryNumber"),
+			getFieldValue("postalCode"),
+			getFieldValue("city"),
+		].filter(Boolean);
+		return parts.join("، ");
+	}, [
+		getFieldValue("buildingNumber"),
+		getFieldValue("street"),
+		getFieldValue("secondaryNumber"),
+		getFieldValue("postalCode"),
+		getFieldValue("city"),
+	]);
 
 	const updateMutation = useMutation({
 		mutationFn: async () => {
@@ -102,9 +142,13 @@ export function CompanyInfoSettings() {
 
 	return (
 		<>
-			{/* Company Logo */}
+			{/* 1. Logo Section */}
 			<SettingsItem
-				title={t("finance.settings.logoSection")}
+				title={
+					<SectionTitle icon={ImageIcon}>
+						{t("finance.settings.logoSection")}
+					</SectionTitle>
+				}
 				description={t("finance.settings.logoSectionDescription")}
 			>
 				<FinanceLogoUpload
@@ -115,9 +159,13 @@ export function CompanyInfoSettings() {
 				/>
 			</SettingsItem>
 
-			{/* Company Identity */}
+			{/* 2. Organization Identity */}
 			<SettingsItem
-				title={t("finance.settings.companyInfo")}
+				title={
+					<SectionTitle icon={Building2}>
+						{t("finance.settings.companyInfo")}
+					</SectionTitle>
+				}
 				description={t("finance.settings.companyInfoDescription")}
 			>
 				<div className="space-y-4">
@@ -175,9 +223,100 @@ export function CompanyInfoSettings() {
 				</div>
 			</SettingsItem>
 
-			{/* Contact Info */}
+			{/* 3. National Address */}
 			<SettingsItem
-				title={t("finance.settings.contactInfo")}
+				title={
+					<SectionTitle icon={MapPin}>
+						{t("finance.settings.nationalAddress")}
+					</SectionTitle>
+				}
+				description={t("finance.settings.nationalAddressDescription")}
+			>
+				<div className="space-y-4">
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+						<div className="space-y-1.5">
+							<Label>{t("finance.settings.buildingNumber")}</Label>
+							<Input
+								value={getFieldValue("buildingNumber")}
+								onChange={(e) =>
+									handleFieldChange("buildingNumber", e.target.value)
+								}
+								placeholder={t("finance.settings.buildingNumberPlaceholder")}
+								dir="ltr"
+								className="text-left"
+							/>
+						</div>
+						<div className="space-y-1.5">
+							<Label>{t("finance.settings.street")}</Label>
+							<Input
+								value={getFieldValue("street")}
+								onChange={(e) =>
+									handleFieldChange("street", e.target.value)
+								}
+								placeholder={t("finance.settings.streetPlaceholder")}
+								dir="rtl"
+							/>
+						</div>
+					</div>
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+						<div className="space-y-1.5">
+							<Label>{t("finance.settings.secondaryNumber")}</Label>
+							<Input
+								value={getFieldValue("secondaryNumber")}
+								onChange={(e) =>
+									handleFieldChange("secondaryNumber", e.target.value)
+								}
+								placeholder={t("finance.settings.secondaryNumberPlaceholder")}
+								dir="ltr"
+								className="text-left"
+							/>
+						</div>
+						<div className="space-y-1.5">
+							<Label>{t("finance.settings.postalCode")}</Label>
+							<Input
+								value={getFieldValue("postalCode")}
+								onChange={(e) =>
+									handleFieldChange("postalCode", e.target.value)
+								}
+								placeholder={t("finance.settings.postalCodePlaceholder")}
+								dir="ltr"
+								className="text-left"
+							/>
+						</div>
+					</div>
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+						<div className="space-y-1.5">
+							<Label>{t("finance.settings.city")}</Label>
+							<Input
+								value={getFieldValue("city")}
+								onChange={(e) =>
+									handleFieldChange("city", e.target.value)
+								}
+								placeholder={t("finance.settings.cityPlaceholder")}
+								dir="rtl"
+							/>
+						</div>
+					</div>
+					{composedAddress && (
+						<div className="rounded-lg border border-border bg-muted/50 p-3">
+							<p className="text-xs text-muted-foreground mb-1">
+								{t("finance.settings.addressPreview")}
+							</p>
+							<p className="text-sm" dir="rtl">
+								{composedAddress}
+							</p>
+						</div>
+					)}
+				</div>
+			</SettingsItem>
+
+			{/* 4. Contact Info */}
+			<SettingsItem
+				title={
+					<SectionTitle icon={Phone}>
+						{t("finance.settings.contactInfo")}
+					</SectionTitle>
+				}
 				description={t("finance.settings.contactInfoDescription")}
 			>
 				<div className="space-y-4">
@@ -220,40 +359,16 @@ export function CompanyInfoSettings() {
 							className="text-left"
 						/>
 					</div>
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-						<div className="space-y-1.5">
-							<Label>{t("finance.settings.address")}</Label>
-							<Textarea
-								value={getFieldValue("address")}
-								onChange={(e) =>
-									handleFieldChange("address", e.target.value)
-								}
-								placeholder={t("finance.settings.addressPlaceholder")}
-								rows={3}
-								dir="rtl"
-								className="resize-none"
-							/>
-						</div>
-						<div className="space-y-1.5">
-							<Label>{t("finance.settings.addressEn")}</Label>
-							<Textarea
-								value={getFieldValue("addressEn")}
-								onChange={(e) =>
-									handleFieldChange("addressEn", e.target.value)
-								}
-								placeholder={t("finance.settings.addressEnPlaceholder")}
-								rows={3}
-								dir="ltr"
-								className="resize-none text-left"
-							/>
-						</div>
-					</div>
 				</div>
 			</SettingsItem>
 
-			{/* Tax & Currency */}
+			{/* 5. Tax & Currency */}
 			<SettingsItem
-				title={t("finance.settings.taxAndCurrency")}
+				title={
+					<SectionTitle icon={Receipt}>
+						{t("finance.settings.taxAndCurrency")}
+					</SectionTitle>
+				}
 				description={t("finance.settings.taxAndCurrencyDescription")}
 			>
 				<div className="space-y-4">

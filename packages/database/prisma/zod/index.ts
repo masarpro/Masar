@@ -349,7 +349,7 @@ export type OrganizationIntegrationSettingsScalarFieldEnum = z.infer<typeof Orga
 
 // File: OrganizationFinanceSettingsScalarFieldEnum.schema.ts
 
-export const OrganizationFinanceSettingsScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'companyNameAr', 'companyNameEn', 'logo', 'address', 'addressEn', 'phone', 'email', 'website', 'taxNumber', 'commercialReg', 'bankName', 'bankNameEn', 'accountName', 'iban', 'accountNumber', 'swiftCode', 'headerText', 'footerText', 'thankYouMessage', 'defaultVatPercent', 'defaultCurrency', 'defaultPaymentTerms', 'defaultDeliveryTerms', 'defaultWarrantyTerms', 'quotationValidityDays', 'createdAt', 'updatedAt'])
+export const OrganizationFinanceSettingsScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'companyNameAr', 'companyNameEn', 'logo', 'address', 'addressEn', 'buildingNumber', 'street', 'secondaryNumber', 'postalCode', 'city', 'phone', 'email', 'website', 'taxNumber', 'commercialReg', 'bankName', 'bankNameEn', 'accountName', 'iban', 'accountNumber', 'swiftCode', 'headerText', 'footerText', 'thankYouMessage', 'defaultVatPercent', 'defaultCurrency', 'defaultPaymentTerms', 'defaultDeliveryTerms', 'defaultWarrantyTerms', 'quotationValidityDays', 'createdAt', 'updatedAt'])
 
 export type OrganizationFinanceSettingsScalarFieldEnum = z.infer<typeof OrganizationFinanceSettingsScalarFieldEnumSchema>;
 
@@ -2296,6 +2296,11 @@ export const OrganizationFinanceSettingsSchema = z.object({
   logo: z.string().nullish(),
   address: z.string().nullish(),
   addressEn: z.string().nullish(),
+  buildingNumber: z.string().nullish(),
+  street: z.string().nullish(),
+  secondaryNumber: z.string().nullish(),
+  postalCode: z.string().nullish(),
+  city: z.string().nullish(),
   phone: z.string().nullish(),
   email: z.string().nullish(),
   website: z.string().nullish(),

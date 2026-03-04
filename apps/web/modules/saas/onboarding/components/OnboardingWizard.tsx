@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
 import { WIZARD_STEPS } from "../lib/wizard-steps";
 import { WizardShell } from "./WizardShell";
+import { WizardModalShell } from "./WizardModalShell";
 import { WelcomeStep } from "./steps/WelcomeStep";
 import { CompanyInfoStep } from "./steps/CompanyInfoStep";
 import { TemplateStep } from "./steps/TemplateStep";
@@ -20,12 +21,16 @@ interface OnboardingWizardProps {
 	organizationId: string;
 	organizationSlug: string;
 	organizationName: string;
+	variant?: "page" | "modal";
+	onDismiss?: () => void;
 }
 
 export function OnboardingWizard({
 	organizationId,
 	organizationSlug,
 	organizationName,
+	variant = "page",
+	onDismiss,
 }: OnboardingWizardProps) {
 	const t = useTranslations();
 	const router = useRouter();
@@ -76,6 +81,16 @@ export function OnboardingWizard({
 			await clearCache();
 			queryClient.invalidateQueries();
 
+			if (variant === "modal") {
+				onDismiss?.();
+				if (createdProjectId && createdProjectSlug) {
+					router.replace(
+						`/app/${organizationSlug}/projects/${createdProjectSlug}`,
+					);
+				}
+				return;
+			}
+
 			if (createdProjectId && createdProjectSlug) {
 				router.replace(
 					`/app/${organizationSlug}/projects/${createdProjectSlug}`,
@@ -84,7 +99,10 @@ export function OnboardingWizard({
 				router.replace(`/app/${organizationSlug}`);
 			}
 		} catch {
-			// Still redirect even if API call fails
+			if (variant === "modal") {
+				onDismiss?.();
+				return;
+			}
 			router.replace(`/app/${organizationSlug}`);
 		}
 	}, [
@@ -96,6 +114,8 @@ export function OnboardingWizard({
 		createdProjectSlug,
 		queryClient,
 		router,
+		variant,
+		onDismiss,
 	]);
 
 	const stepComponents = [
@@ -144,8 +164,10 @@ export function OnboardingWizard({
 		/>,
 	];
 
+	const Shell = variant === "modal" ? WizardModalShell : WizardShell;
+
 	return (
-		<WizardShell
+		<Shell
 			currentStep={currentStep}
 			totalSteps={WIZARD_STEPS.length}
 			onPrevious={currentStep > 0 && currentStep < WIZARD_STEPS.length - 1 ? handlePrevious : undefined}
@@ -155,6 +177,6 @@ export function OnboardingWizard({
 			})}
 		>
 			{stepComponents[currentStep]}
-		</WizardShell>
+		</Shell>
 	);
 }

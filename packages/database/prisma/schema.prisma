@@ -2467,6 +2467,14 @@ model OrganizationFinanceSettings {
   logo            String?                                   // URL الشعار
   address         String?                                   // العنوان
   addressEn       String?       @map("address_en")         // العنوان بالإنجليزي
+
+  // العنوان الوطني (حقول منظمة)
+  buildingNumber  String?       @map("building_number")    // رقم المبنى
+  street          String?                                   // الشارع
+  secondaryNumber String?       @map("secondary_number")   // الرقم الفرعي
+  postalCode      String?       @map("postal_code")        // الرمز البريدي
+  city            String?                                   // المدينة
+
   phone           String?                                   // الهاتف
   email           String?                                   // البريد الإلكتروني
   website         String?                                   // الموقع الإلكتروني

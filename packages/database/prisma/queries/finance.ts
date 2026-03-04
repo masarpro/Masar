@@ -2078,6 +2078,11 @@ export async function updateOrganizationFinanceSettings(
 		logo?: string;
 		address?: string;
 		addressEn?: string;
+		buildingNumber?: string;
+		street?: string;
+		secondaryNumber?: string;
+		postalCode?: string;
+		city?: string;
 		phone?: string;
 		email?: string;
 		website?: string;
@@ -2100,12 +2105,41 @@ export async function updateOrganizationFinanceSettings(
 		quotationValidityDays?: number;
 	},
 ) {
+	const addressFields = ["buildingNumber", "street", "secondaryNumber", "postalCode", "city"] as const;
+	const hasAddressField = addressFields.some((f) => data[f] !== undefined);
+
+	let finalData = { ...data };
+
+	if (hasAddressField) {
+		// Fetch current settings to merge with new values
+		const current = await db.organizationFinanceSettings.findUnique({
+			where: { organizationId },
+			select: { buildingNumber: true, street: true, secondaryNumber: true, postalCode: true, city: true },
+		});
+
+		const merged = {
+			buildingNumber: data.buildingNumber ?? current?.buildingNumber ?? "",
+			street: data.street ?? current?.street ?? "",
+			secondaryNumber: data.secondaryNumber ?? current?.secondaryNumber ?? "",
+			postalCode: data.postalCode ?? current?.postalCode ?? "",
+			city: data.city ?? current?.city ?? "",
+		};
+
+		// Auto-compose Arabic address
+		const parts = [merged.buildingNumber, merged.street, merged.secondaryNumber, merged.postalCode, merged.city].filter(Boolean);
+		finalData.address = parts.join("، ");
+
+		// Auto-compose English address
+		const partsEn = [merged.buildingNumber, merged.street, merged.secondaryNumber, merged.postalCode, merged.city].filter(Boolean);
+		finalData.addressEn = partsEn.join(", ");
+	}
+
 	return db.organizationFinanceSettings.upsert({
 		where: { organizationId },
 		create: {
 			organizationId,
-			...data,
+			...finalData,
 		},
-		update: data,
+		update: finalData,
 	});
 }

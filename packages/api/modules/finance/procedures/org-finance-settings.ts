@@ -61,6 +61,12 @@ export const updateOrgFinanceSettingsProcedure = subscriptionProcedure
 			logo: z.string().optional(),
 			address: z.string().optional(),
 			addressEn: z.string().optional(),
+			// National address fields
+			buildingNumber: z.string().optional(),
+			street: z.string().optional(),
+			secondaryNumber: z.string().optional(),
+			postalCode: z.string().optional(),
+			city: z.string().optional(),
 			phone: z.string().optional(),
 			email: z.string().email().optional().or(z.literal("")),
 			website: z.string().optional(),

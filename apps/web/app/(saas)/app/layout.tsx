@@ -14,10 +14,6 @@ export default async function Layout({ children }: PropsWithChildren) {
 		redirect("/auth/login");
 	}
 
-	if (config.users.enableOnboarding && !session.user.onboardingComplete) {
-		redirect("/onboarding");
-	}
-
 	// إذا يجب تغيير كلمة المرور، وجّه لصفحة التغيير
 	if ((session.user as any).mustChangePassword) {
 		redirect("/auth/change-password");
