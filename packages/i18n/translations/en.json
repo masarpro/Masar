@@ -594,7 +594,91 @@
 			"accountSetupFailed": "We are sorry, but we were unable to set up your account. Please try again later."
 		},
 		"step": "Step {step} / {total}",
-		"title": "Set up your account"
+		"title": "Set up your account",
+		"wizard": {
+			"welcome": {
+				"title": "Welcome to Masar",
+				"subtitle": "Set up your company in 3 minutes and start managing your projects",
+				"cta": "Let's get started",
+				"step1": "Company Info",
+				"step2": "Invoice Template",
+				"step3": "First Project"
+			},
+			"companyInfo": {
+				"title": "Company Info",
+				"subtitle": "This information will appear on your invoices and reports",
+				"name": "Company Name",
+				"namePlaceholder": "e.g. ABC Construction Company",
+				"commercialRegister": "Commercial Register No.",
+				"taxNumber": "Tax Number (VAT)",
+				"taxNumberHint": "15 digits, starts with 3 — required for ZATCA invoices",
+				"contractorClass": "Contractor Class",
+				"city": "City",
+				"address": "Address",
+				"phone": "Phone Number",
+				"logo": "Company Logo",
+				"logoHint": "PNG or JPG, max 2MB",
+				"logoUpload": "Drag logo here or click to upload"
+			},
+			"template": {
+				"title": "Choose Invoice Template",
+				"subtitle": "You can change and customize it later in settings",
+				"selected": "Selected",
+				"preview": "Preview",
+				"noTemplates": "Loading templates..."
+			},
+			"firstProject": {
+				"title": "Create Your First Project",
+				"subtitle": "Add your first project to get started right away",
+				"projectName": "Project Name",
+				"projectNamePlaceholder": "e.g. Villa Riyadh - Al Narjis",
+				"ownerName": "Owner/Client Name",
+				"estimatedBudget": "Estimated Budget (SAR)",
+				"city": "Project City",
+				"managerNote": "You will be assigned as the project manager automatically"
+			},
+			"inviteTeam": {
+				"title": "Invite Your Team",
+				"subtitle": "Add your engineer or accountant's email to get started together",
+				"emailPlaceholder": "Email address",
+				"role": "Role",
+				"member": "Member",
+				"admin": "Admin",
+				"addAnother": "Add another person",
+				"skip": "Skip this step",
+				"invite": "Invite & Complete",
+				"sent": "Sent",
+				"failed": "Failed"
+			},
+			"completion": {
+				"title": "You're all set!",
+				"subtitle": "Everything is set up and ready to use",
+				"companyInfo": "Company Info",
+				"template": "Invoice Template",
+				"project": "First Project",
+				"team": "Team Members",
+				"skipped": "Skipped",
+				"invitesSent": "{count} invitations sent",
+				"goToProject": "Go to your first project",
+				"goToDashboard": "Or go to dashboard"
+			},
+			"nav": {
+				"next": "Next",
+				"previous": "Previous",
+				"skip": "Skip",
+				"finish": "Finish"
+			}
+		},
+		"checklist": {
+			"title": "Complete your setup",
+			"companyInfo": "Company Info",
+			"firstProject": "First Project",
+			"firstQuantity": "Add first quantity item",
+			"firstInvoice": "Create first invoice",
+			"firstExpense": "Record first expense",
+			"zatcaInfo": "Complete ZATCA info",
+			"dismiss": "Dismiss"
+		}
 	},
 	"organizations": {
 		"createForm": {

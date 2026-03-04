@@ -9,6 +9,7 @@ import {
 	getExpensesSummaryByCategory,
 	getOrganizationSubcontractPayments,
 	orgAuditLog,
+	db,
 } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
@@ -249,6 +250,12 @@ export const createExpenseProcedure = subscriptionProcedure
 			entityId: expense.id,
 			metadata: { amount: input.amount, category: input.category, status: input.status ?? "COMPLETED" },
 		});
+
+		// Update onboarding checklist
+		await db.onboardingProgress.updateMany({
+			where: { organizationId: input.organizationId, firstExpenseRecorded: false },
+			data: { firstExpenseRecorded: true },
+		}).catch(() => {});
 
 		return expense;
 	});

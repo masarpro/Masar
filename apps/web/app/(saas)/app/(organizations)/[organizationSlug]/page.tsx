@@ -1,4 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
+import { DashboardChecklist } from "@saas/onboarding/components/DashboardChecklist";
 import OrganizationStart from "@saas/organizations/components/OrganizationStart";
 import { PageHeader } from "@saas/shared/components/PageHeader";
 import { notFound } from "next/navigation";
@@ -43,6 +44,7 @@ export default async function OrganizationPage({
 				subtitle={t("organizations.start.subtitle")}
 			/>
 
+			<DashboardChecklist />
 			<OrganizationStart />
 		</div>
 	);

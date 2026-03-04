@@ -1,6 +1,6 @@
 import { config } from "@repo/config";
 import { db } from "@repo/database";
-import { getActiveOrganization } from "@saas/auth/lib/server";
+import { getActiveOrganization, getSession } from "@saas/auth/lib/server";
 import { activeOrganizationQueryKey } from "@saas/organizations/lib/api";
 import { SubscriptionGuard } from "@saas/payments/components/SubscriptionGuard";
 import { AppWrapper } from "@saas/shared/components/AppWrapper";
@@ -24,6 +24,24 @@ export default async function OrganizationLayout({
 
 	if (!organization) {
 		return notFound();
+	}
+
+	// Redirect owners who haven't completed onboarding
+	if (config.users.enableOnboarding) {
+		const session = await getSession();
+		if (session && !session.user.onboardingComplete) {
+			// Check if user is the org owner (not an invited member)
+			const member = await db.member.findFirst({
+				where: {
+					organizationId: organization.id,
+					userId: session.user.id,
+				},
+				select: { role: true },
+			});
+			if (member?.role === "owner") {
+				redirect("/onboarding");
+			}
+		}
 	}
 
 	const queryClient = getServerQueryClient();

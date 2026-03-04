@@ -1,7 +1,9 @@
 import { config } from "@repo/config";
-import { getSession } from "@saas/auth/lib/server";
-import { OnboardingForm } from "@saas/onboarding/components/OnboardingForm";
-import { AuthWrapper } from "@saas/shared/components/AuthWrapper";
+import {
+	getSession,
+	getOrganizationList,
+} from "@saas/auth/lib/server";
+import { OnboardingWizard } from "@saas/onboarding/components/OnboardingWizard";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -27,9 +29,19 @@ export default async function OnboardingPage() {
 		redirect("/app");
 	}
 
+	// Get user's organization (auto-created on signup)
+	const organizations = await getOrganizationList();
+	const organization = organizations[0];
+
+	if (!organization) {
+		redirect("/app");
+	}
+
 	return (
-		<AuthWrapper>
-			<OnboardingForm />
-		</AuthWrapper>
+		<OnboardingWizard
+			organizationId={organization.id}
+			organizationSlug={organization.slug ?? ""}
+			organizationName={organization.name}
+		/>
 	);
 }

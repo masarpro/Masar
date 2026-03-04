@@ -34,6 +34,7 @@ import { pricingRouter } from "../modules/pricing/router";
 import { rolesRouter } from "../modules/roles/router";
 import { superAdminRouter } from "../modules/super-admin/router";
 import { usersRouter } from "../modules/users/router";
+import { onboardingRouter } from "../modules/onboarding/router";
 import { publicProcedure } from "./procedures";
 
 export const router = publicProcedure.router({
@@ -85,6 +86,8 @@ export const router = publicProcedure.router({
 	projectExecution: projectExecutionRouter,
 	// Super Admin Panel
 	superAdmin: superAdminRouter,
+	// Onboarding - الإعداد الأولي
+	onboarding: onboardingRouter,
 });
 
 export type ApiRouterClient = RouterClient<typeof router>;

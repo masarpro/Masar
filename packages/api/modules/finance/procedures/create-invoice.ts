@@ -119,6 +119,12 @@ export const createInvoiceProcedure = subscriptionProcedure
 			metadata: { invoiceType: input.invoiceType, clientName: input.clientName, totalAmount: Number(invoice.totalAmount) },
 		});
 
+		// Update onboarding checklist
+		await db.onboardingProgress.updateMany({
+			where: { organizationId: input.organizationId, firstInvoiceCreated: false },
+			data: { firstInvoiceCreated: true },
+		}).catch(() => {});
+
 		return {
 			...invoice,
 			subtotal: Number(invoice.subtotal),

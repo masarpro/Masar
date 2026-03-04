@@ -1,4 +1,4 @@
-import { createCostStudy } from "@repo/database";
+import { createCostStudy, db } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -44,6 +44,12 @@ export const create = subscriptionProcedure
 			hasBasement: input.hasBasement,
 			finishingLevel: input.finishingLevel,
 		});
+
+		// Update onboarding checklist
+		await db.onboardingProgress.updateMany({
+			where: { organizationId: input.organizationId, firstQuantityAdded: false },
+			data: { firstQuantityAdded: true },
+		}).catch(() => {});
 
 		return {
 			...study,

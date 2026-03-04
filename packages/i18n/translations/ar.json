@@ -598,7 +598,91 @@
 			"accountSetupFailed": "نأسف، لم نتمكن من إعداد حسابك. يرجى المحاولة لاحقاً."
 		},
 		"step": "الخطوة {step} من {total}",
-		"title": "إعداد حسابك"
+		"title": "إعداد حسابك",
+		"wizard": {
+			"welcome": {
+				"title": "مرحباً بك في مسار",
+				"subtitle": "جهّز منشأتك في 3 دقائق وابدأ بإدارة مشاريعك",
+				"cta": "يلا نبدأ",
+				"step1": "بيانات المنشأة",
+				"step2": "قالب الفواتير",
+				"step3": "أول مشروع"
+			},
+			"companyInfo": {
+				"title": "بيانات المنشأة",
+				"subtitle": "هذه البيانات ستظهر في فواتيرك وتقاريرك",
+				"name": "اسم المنشأة",
+				"namePlaceholder": "مثال: شركة البناء المتميز للمقاولات",
+				"commercialRegister": "رقم السجل التجاري",
+				"taxNumber": "الرقم الضريبي (VAT)",
+				"taxNumberHint": "15 رقم، يبدأ بـ 3 — مطلوب لفواتير ZATCA",
+				"contractorClass": "تصنيف المقاول",
+				"city": "المدينة",
+				"address": "العنوان",
+				"phone": "رقم الهاتف",
+				"logo": "شعار المنشأة",
+				"logoHint": "PNG أو JPG، حد أقصى 2 ميغابايت",
+				"logoUpload": "اسحب الشعار هنا أو اضغط للرفع"
+			},
+			"template": {
+				"title": "اختر قالب الفواتير",
+				"subtitle": "يمكنك تغييره وتخصيصه لاحقاً من الإعدادات",
+				"selected": "مُختار",
+				"preview": "معاينة",
+				"noTemplates": "جارٍ تحميل القوالب..."
+			},
+			"firstProject": {
+				"title": "أنشئ أول مشروع",
+				"subtitle": "أضف مشروعك الأول لتبدأ العمل مباشرة",
+				"projectName": "اسم المشروع",
+				"projectNamePlaceholder": "مثال: فيلا الرياض - حي النرجس",
+				"ownerName": "اسم المالك/العميل",
+				"estimatedBudget": "الميزانية التقديرية (ر.س)",
+				"city": "مدينة المشروع",
+				"managerNote": "سيتم تعيينك كمدير للمشروع تلقائياً"
+			},
+			"inviteTeam": {
+				"title": "ادعُ فريق عملك",
+				"subtitle": "أضف بريد المهندس أو المحاسب ليبدأوا معك",
+				"emailPlaceholder": "البريد الإلكتروني",
+				"role": "الدور",
+				"member": "عضو",
+				"admin": "مشرف",
+				"addAnother": "أضف شخص آخر",
+				"skip": "تخطي هذه الخطوة",
+				"invite": "دعوة وإكمال",
+				"sent": "تم الإرسال",
+				"failed": "فشل الإرسال"
+			},
+			"completion": {
+				"title": "منشأتك جاهزة!",
+				"subtitle": "كل شيء مُعد وجاهز للاستخدام",
+				"companyInfo": "بيانات المنشأة",
+				"template": "قالب الفواتير",
+				"project": "أول مشروع",
+				"team": "فريق العمل",
+				"skipped": "تم التخطي",
+				"invitesSent": "{count} دعوة أُرسلت",
+				"goToProject": "انطلق لمشروعك الأول",
+				"goToDashboard": "أو اذهب للوحة التحكم"
+			},
+			"nav": {
+				"next": "التالي",
+				"previous": "السابق",
+				"skip": "تخطي",
+				"finish": "إنهاء"
+			}
+		},
+		"checklist": {
+			"title": "أكمل إعداد منشأتك",
+			"companyInfo": "بيانات المنشأة",
+			"firstProject": "أول مشروع",
+			"firstQuantity": "أضف أول بند كميات",
+			"firstInvoice": "أنشئ أول فاتورة",
+			"firstExpense": "سجّل أول مصروف",
+			"zatcaInfo": "أكمل بيانات ZATCA",
+			"dismiss": "إخفاء"
+		}
 	},
 	"organizations": {
 		"createForm": {
