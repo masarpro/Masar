@@ -83,7 +83,7 @@ export const config = {
 	// Mails
 	mails: {
 		// the from address for mails
-		from: process.env.MAIL_FROM || "noreply@masar.app",
+		from: process.env.MAIL_FROM || '"مسار | Masar" <noreply@app-masar.com>',
 	},
 	// Frontend
 	ui: {
