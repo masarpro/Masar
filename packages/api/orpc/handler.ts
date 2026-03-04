@@ -23,16 +23,9 @@ export const rpcHandler = new RPCHandler(router, {
 	clientInterceptors: [
 		onError(async (error) => {
 			logger.error(error);
-			// Report unexpected errors to Sentry
 			const code = (error as any)?.code;
 			if (!EXPECTED_ERROR_CODES.has(code)) {
-				try {
-					// @ts-expect-error — @sentry/nextjs is provided by the host app (apps/web)
-					const Sentry = await import("@sentry/nextjs");
-					Sentry.captureException(error);
-				} catch {
-					// Sentry not available (e.g., development)
-				}
+				console.error("[API Error]", error);
 			}
 		}),
 	],
@@ -76,13 +69,7 @@ export const openApiHandler = new OpenAPIHandler(router, {
 			logger.error(error);
 			const code = (error as any)?.code;
 			if (!EXPECTED_ERROR_CODES.has(code)) {
-				try {
-					// @ts-expect-error — @sentry/nextjs is provided by the host app (apps/web)
-					const Sentry = await import("@sentry/nextjs");
-					Sentry.captureException(error);
-				} catch {
-					// Sentry not available
-				}
+				console.error("[API Error]", error);
 			}
 		}),
 	],

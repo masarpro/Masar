@@ -891,6 +891,7 @@ model Organization {
   subscriptionEvents   SubscriptionEvent[]
   superAdminLogs       SuperAdminLog[]     @relation("SuperAdminOrgTarget")
   aiChatUsage          AiChatUsage?
+  onboardingProgress   OnboardingProgress?
 
   // ═══ نهاية حقول مسار ═══
 
@@ -3861,4 +3862,39 @@ model AiChatUsage {
   updatedAt       DateTime     @updatedAt @map("updated_at")
 
   @@map("ai_chat_usage")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// تقدم الإعداد الأولي — Onboarding Progress
+// ═══════════════════════════════════════════════════════════════════════════
+
+model OnboardingProgress {
+  id               String       @id @default(cuid())
+  organizationId   String       @unique @map("organization_id")
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // خطوات الـ Wizard
+  companyInfoDone      Boolean  @default(false) @map("company_info_done")
+  logoDone             Boolean  @default(false) @map("logo_done")
+  templateDone         Boolean  @default(false) @map("template_done")
+  firstProjectDone     Boolean  @default(false) @map("first_project_done")
+  teamInviteDone       Boolean  @default(false) @map("team_invite_done")
+  wizardCompleted      Boolean  @default(false) @map("wizard_completed")
+  wizardCompletedAt    DateTime?               @map("wizard_completed_at")
+  wizardSkippedSteps   Json?                   @map("wizard_skipped_steps")
+
+  // خطوات الـ Checklist (ما بعد الـ Wizard)
+  firstQuantityAdded   Boolean  @default(false) @map("first_quantity_added")
+  firstInvoiceCreated  Boolean  @default(false) @map("first_invoice_created")
+  firstExpenseRecorded Boolean  @default(false) @map("first_expense_recorded")
+  zatcaInfoComplete    Boolean  @default(false) @map("zatca_info_complete")
+
+  // إخفاء الـ Checklist
+  checklistDismissed   Boolean  @default(false) @map("checklist_dismissed")
+  checklistDismissedAt DateTime?               @map("checklist_dismissed_at")
+
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt      @map("updated_at")
+
+  @@map("onboarding_progress")
 }

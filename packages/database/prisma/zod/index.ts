@@ -527,6 +527,12 @@ export const AiChatUsageScalarFieldEnumSchema = z.enum(['id', 'organizationId', 
 
 export type AiChatUsageScalarFieldEnum = z.infer<typeof AiChatUsageScalarFieldEnumSchema>;
 
+// File: OnboardingProgressScalarFieldEnum.schema.ts
+
+export const OnboardingProgressScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'companyInfoDone', 'logoDone', 'templateDone', 'firstProjectDone', 'teamInviteDone', 'wizardCompleted', 'wizardCompletedAt', 'wizardSkippedSteps', 'firstQuantityAdded', 'firstInvoiceCreated', 'firstExpenseRecorded', 'zatcaInfoComplete', 'checklistDismissed', 'checklistDismissedAt', 'createdAt', 'updatedAt'])
+
+export type OnboardingProgressScalarFieldEnum = z.infer<typeof OnboardingProgressScalarFieldEnumSchema>;
+
 // File: SortOrder.schema.ts
 
 export const SortOrderSchema = z.enum(['asc', 'desc'])
@@ -3091,4 +3097,30 @@ export const AiChatUsageSchema = z.object({
 });
 
 export type AiChatUsageType = z.infer<typeof AiChatUsageSchema>;
+
+
+// File: OnboardingProgress.schema.ts
+
+export const OnboardingProgressSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  companyInfoDone: z.boolean(),
+  logoDone: z.boolean(),
+  templateDone: z.boolean(),
+  firstProjectDone: z.boolean(),
+  teamInviteDone: z.boolean(),
+  wizardCompleted: z.boolean(),
+  wizardCompletedAt: z.date().nullish(),
+  wizardSkippedSteps: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  firstQuantityAdded: z.boolean(),
+  firstInvoiceCreated: z.boolean(),
+  firstExpenseRecorded: z.boolean(),
+  zatcaInfoComplete: z.boolean(),
+  checklistDismissed: z.boolean(),
+  checklistDismissedAt: z.date().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type OnboardingProgressType = z.infer<typeof OnboardingProgressSchema>;
 
