@@ -533,6 +533,18 @@ export const OnboardingProgressScalarFieldEnumSchema = z.enum(['id', 'organizati
 
 export type OnboardingProgressScalarFieldEnum = z.infer<typeof OnboardingProgressScalarFieldEnumSchema>;
 
+// File: ActivationCodeScalarFieldEnum.schema.ts
+
+export const ActivationCodeScalarFieldEnumSchema = z.enum(['id', 'code', 'description', 'planType', 'durationDays', 'maxUsers', 'maxProjects', 'maxStorageGB', 'isActive', 'maxUses', 'usedCount', 'createdById', 'createdAt', 'updatedAt', 'expiresAt'])
+
+export type ActivationCodeScalarFieldEnum = z.infer<typeof ActivationCodeScalarFieldEnumSchema>;
+
+// File: ActivationCodeUsageScalarFieldEnum.schema.ts
+
+export const ActivationCodeUsageScalarFieldEnumSchema = z.enum(['id', 'codeId', 'organizationId', 'activatedById', 'activatedAt', 'planExpiresAt'])
+
+export type ActivationCodeUsageScalarFieldEnum = z.infer<typeof ActivationCodeUsageScalarFieldEnumSchema>;
+
 // File: SortOrder.schema.ts
 
 export const SortOrderSchema = z.enum(['asc', 'desc'])
@@ -3123,4 +3135,41 @@ export const OnboardingProgressSchema = z.object({
 });
 
 export type OnboardingProgressType = z.infer<typeof OnboardingProgressSchema>;
+
+
+// File: ActivationCode.schema.ts
+
+export const ActivationCodeSchema = z.object({
+  id: z.string(),
+  code: z.string(),
+  description: z.string().nullish(),
+  planType: PlanTypeSchema.default("PRO"),
+  durationDays: z.number().int().default(90),
+  maxUsers: z.number().int().default(50),
+  maxProjects: z.number().int().default(100),
+  maxStorageGB: z.number().int().default(50),
+  isActive: z.boolean().default(true),
+  maxUses: z.number().int().default(1),
+  usedCount: z.number().int(),
+  createdById: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  expiresAt: z.date().nullish(),
+});
+
+export type ActivationCodeType = z.infer<typeof ActivationCodeSchema>;
+
+
+// File: ActivationCodeUsage.schema.ts
+
+export const ActivationCodeUsageSchema = z.object({
+  id: z.string(),
+  codeId: z.string(),
+  organizationId: z.string(),
+  activatedById: z.string(),
+  activatedAt: z.date(),
+  planExpiresAt: z.date(),
+});
+
+export type ActivationCodeUsageType = z.infer<typeof ActivationCodeUsageSchema>;
 

@@ -25,6 +25,7 @@ import {
 	updatePlan,
 	syncPlanToStripe,
 } from "./procedures/plans";
+import { activationCodesRouter } from "../activation-codes/router";
 
 export const superAdminRouter = {
 	dashboard: {
@@ -60,4 +61,5 @@ export const superAdminRouter = {
 		update: updatePlan,
 		syncToStripe: syncPlanToStripe,
 	},
+	activationCodes: activationCodesRouter,
 };

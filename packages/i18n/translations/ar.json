@@ -7,7 +7,8 @@
 			"plans": "الخطط",
 			"revenue": "الإيرادات",
 			"subscriptions": "الاشتراكات",
-			"logs": "سجل الأنشطة"
+			"logs": "سجل الأنشطة",
+			"activationCodes": "أكواد التفعيل"
 		},
 		"dashboard": {
 			"title": "لوحة تحكم المشرف",
@@ -199,6 +200,50 @@
 			"title": "إدارة المستخدمين",
 			"assignAdminRole": "تعيين صلاحية المسؤول",
 			"removeAdminRole": "إزالة صلاحية المسؤول"
+		},
+		"activationCodes": {
+			"title": "أكواد التفعيل",
+			"createCode": "إنشاء كود جديد",
+			"description": "ملاحظة داخلية",
+			"descriptionPlaceholder": "مثال: كود بيتا - شركة الإنشاءات",
+			"durationDays": "مدة الاشتراك",
+			"duration30": "30 يوم",
+			"duration90": "90 يوم",
+			"duration180": "180 يوم",
+			"duration365": "سنة كاملة",
+			"maxUses": "عدد الاستخدامات",
+			"maxUsers": "الحد الأقصى للمستخدمين",
+			"maxProjects": "الحد الأقصى للمشاريع",
+			"maxStorageGB": "التخزين (GB)",
+			"expiresAt": "تاريخ انتهاء صلاحية الكود",
+			"create": "إنشاء",
+			"creating": "جارٍ الإنشاء...",
+			"created": "تم إنشاء الكود بنجاح!",
+			"createFailed": "فشل في إنشاء الكود",
+			"code": "الكود",
+			"uses": "الاستخدام",
+			"validity": "الصلاحية",
+			"status": "الحالة",
+			"createdAt": "تاريخ الإنشاء",
+			"actions": "إجراءات",
+			"active": "نشط",
+			"inactive": "معطّل",
+			"expired": "منتهي",
+			"copyCode": "نسخ الكود",
+			"copied": "تم نسخ الكود!",
+			"usageDetails": "تفاصيل الاستخدامات",
+			"deactivate": "تعطيل",
+			"deactivated": "تم تعطيل الكود",
+			"deactivateFailed": "فشل في تعطيل الكود",
+			"noUsages": "لم يتم استخدام هذا الكود بعد",
+			"organization": "المنظمة",
+			"activatedBy": "تم التفعيل بواسطة",
+			"activatedAt": "تاريخ التفعيل",
+			"planExpiresAt": "ينتهي الاشتراك في",
+			"noExpiry": "بدون انتهاء",
+			"noCodes": "لا توجد أكواد تفعيل",
+			"days": "يوم",
+			"unlimited": "غير محدود"
 		},
 		"description": "إدارة تطبيقك."
 	},
@@ -2595,7 +2640,45 @@
 	},
 	"choosePlan": {
 		"title": "اختر خطتك",
-		"description": "للمتابعة، يرجى اختيار خطة."
+		"description": "للمتابعة، يرجى اختيار خطة.",
+		"free": {
+			"name": "مجاني",
+			"price": "مجاناً",
+			"currentPlan": "الخطة الحالية",
+			"features": {
+				"users": "مستخدم واحد",
+				"viewOnly": "عرض فقط",
+				"noProjects": "بدون مشاريع"
+			}
+		},
+		"pro": {
+			"name": "احترافي",
+			"popular": "الأكثر شيوعاً",
+			"price": "299 ر.س / شهر",
+			"contactUs": "تواصل معنا للترقية",
+			"features": {
+				"users": "حتى 50 مستخدم",
+				"projects": "حتى 100 مشروع",
+				"storage": "50GB تخزين",
+				"reports": "جميع التقارير",
+				"support": "دعم أولوية"
+			}
+		},
+		"or": "أو",
+		"haveCode": "لديك كود تفعيل؟",
+		"enterCode": "أدخل الكود",
+		"codePlaceholder": "MASAR-XXXX-XXXX-XXXX",
+		"verify": "تحقق",
+		"verifying": "جارٍ التحقق...",
+		"codeValid": "الكود صالح!",
+		"codeDetails": "تفاصيل الكود",
+		"plan": "الخطة",
+		"duration": "المدة",
+		"daysUnit": "يوم",
+		"activateCode": "تفعيل الكود",
+		"activating": "جارٍ التفعيل...",
+		"activateSuccess": "تم تفعيل الكود بنجاح! جارٍ التحويل...",
+		"activateFailed": "فشل في تفعيل الكود"
 	},
 	"upload": {
 		"selectFile": "اختر ملف",

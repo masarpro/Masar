@@ -7,7 +7,8 @@
 			"plans": "Plans",
 			"revenue": "Revenue",
 			"subscriptions": "Subscriptions",
-			"logs": "Activity Logs"
+			"logs": "Activity Logs",
+			"activationCodes": "Activation Codes"
 		},
 		"dashboard": {
 			"title": "Admin Dashboard",
@@ -199,6 +200,50 @@
 			"title": "Manage users",
 			"assignAdminRole": "Assign admin role",
 			"removeAdminRole": "Remove admin role"
+		},
+		"activationCodes": {
+			"title": "Activation Codes",
+			"createCode": "Create New Code",
+			"description": "Internal Note",
+			"descriptionPlaceholder": "e.g. Beta code - Saudi Construction Co.",
+			"durationDays": "Subscription Duration",
+			"duration30": "30 Days",
+			"duration90": "90 Days",
+			"duration180": "180 Days",
+			"duration365": "1 Year",
+			"maxUses": "Max Uses",
+			"maxUsers": "Max Users",
+			"maxProjects": "Max Projects",
+			"maxStorageGB": "Storage (GB)",
+			"expiresAt": "Code Expiry Date",
+			"create": "Create",
+			"creating": "Creating...",
+			"created": "Code created successfully!",
+			"createFailed": "Failed to create code",
+			"code": "Code",
+			"uses": "Usage",
+			"validity": "Validity",
+			"status": "Status",
+			"createdAt": "Created At",
+			"actions": "Actions",
+			"active": "Active",
+			"inactive": "Inactive",
+			"expired": "Expired",
+			"copyCode": "Copy Code",
+			"copied": "Code copied!",
+			"usageDetails": "Usage Details",
+			"deactivate": "Deactivate",
+			"deactivated": "Code deactivated",
+			"deactivateFailed": "Failed to deactivate code",
+			"noUsages": "This code has not been used yet",
+			"organization": "Organization",
+			"activatedBy": "Activated By",
+			"activatedAt": "Activated At",
+			"planExpiresAt": "Plan Expires At",
+			"noExpiry": "No Expiry",
+			"noCodes": "No activation codes",
+			"days": "days",
+			"unlimited": "Unlimited"
 		},
 		"description": "Manage your application."
 	},
@@ -2617,7 +2662,45 @@
 	},
 	"choosePlan": {
 		"title": "Choose your plan",
-		"description": "To continue, please select a plan."
+		"description": "To continue, please select a plan.",
+		"free": {
+			"name": "Free",
+			"price": "Free",
+			"currentPlan": "Current Plan",
+			"features": {
+				"users": "1 User",
+				"viewOnly": "View only",
+				"noProjects": "No projects"
+			}
+		},
+		"pro": {
+			"name": "Professional",
+			"popular": "Most Popular",
+			"price": "299 SAR / month",
+			"contactUs": "Contact us to upgrade",
+			"features": {
+				"users": "Up to 50 users",
+				"projects": "Up to 100 projects",
+				"storage": "50GB storage",
+				"reports": "All reports",
+				"support": "Priority support"
+			}
+		},
+		"or": "or",
+		"haveCode": "Have an activation code?",
+		"enterCode": "Enter code",
+		"codePlaceholder": "MASAR-XXXX-XXXX-XXXX",
+		"verify": "Verify",
+		"verifying": "Verifying...",
+		"codeValid": "Code is valid!",
+		"codeDetails": "Code Details",
+		"plan": "Plan",
+		"duration": "Duration",
+		"daysUnit": "days",
+		"activateCode": "Activate Code",
+		"activating": "Activating...",
+		"activateSuccess": "Code activated successfully! Redirecting...",
+		"activateFailed": "Failed to activate code"
 	},
 	"upload": {
 		"selectFile": "Select File",

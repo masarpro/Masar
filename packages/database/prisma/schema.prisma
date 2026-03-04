@@ -693,6 +693,10 @@ model User {
   // Super Admin Actions
   superAdminActions    SuperAdminLog[]    @relation("SuperAdminActions")
 
+  // Activation Codes - أكواد التفعيل
+  createdActivationCodes  ActivationCode[]
+  activationCodeUsages    ActivationCodeUsage[]
+
   // ═══ نهاية حقول مسار ═══
 
   @@unique([email])
@@ -892,6 +896,9 @@ model Organization {
   superAdminLogs       SuperAdminLog[]     @relation("SuperAdminOrgTarget")
   aiChatUsage          AiChatUsage?
   onboardingProgress   OnboardingProgress?
+
+  // Activation Codes - أكواد التفعيل
+  activationCodeUsages  ActivationCodeUsage[]
 
   // ═══ نهاية حقول مسار ═══
 
@@ -3897,4 +3904,57 @@ model OnboardingProgress {
   updatedAt  DateTime @updatedAt      @map("updated_at")
 
   @@map("onboarding_progress")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// أكواد التفعيل — Activation Codes
+// ═══════════════════════════════════════════════════════════════════════════
+
+model ActivationCode {
+  id              String    @id @default(cuid())
+  code            String    @unique
+  description     String?
+
+  // إعدادات الخطة
+  planType        PlanType  @default(PRO)
+  durationDays    Int       @default(90)
+  maxUsers        Int       @default(50)
+  maxProjects     Int       @default(100)
+  maxStorageGB    Int       @default(50)
+
+  // الاستخدام
+  isActive        Boolean   @default(true)
+  maxUses         Int       @default(1)
+  usedCount       Int       @default(0)
+
+  // من أنشأه
+  createdById     String
+  createdBy       User      @relation(fields: [createdById], references: [id])
+
+  // الاستخدامات
+  usages          ActivationCodeUsage[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  expiresAt       DateTime?
+
+  @@index([code])
+  @@index([isActive])
+  @@map("activation_codes")
+}
+
+model ActivationCodeUsage {
+  id              String         @id @default(cuid())
+  codeId          String
+  code            ActivationCode @relation(fields: [codeId], references: [id])
+  organizationId  String
+  organization    Organization   @relation(fields: [organizationId], references: [id])
+  activatedById   String
+  activatedBy     User           @relation(fields: [activatedById], references: [id])
+  activatedAt     DateTime       @default(now())
+  planExpiresAt   DateTime
+
+  @@index([codeId])
+  @@index([organizationId])
+  @@map("activation_code_usages")
 }

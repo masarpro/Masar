@@ -90,7 +90,7 @@ export const config = {
 		// the themes that should be available in the app
 		enabledThemes: ["light", "dark"],
 		// the default theme
-		defaultTheme: "light",
+		defaultTheme: "dark",
 		// the saas part of the application
 		saas: {
 			// whether the saas part should be enabled (otherwise all routes will be redirect to the marketing page)

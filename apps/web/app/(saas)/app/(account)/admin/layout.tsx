@@ -9,6 +9,7 @@ import {
 	ClipboardListIcon,
 	CreditCardIcon,
 	DollarSignIcon,
+	KeyIcon,
 	LayoutDashboardIcon,
 	Settings2Icon,
 	UsersIcon,
@@ -101,6 +102,13 @@ export default async function AdminLayout({ children }: PropsWithChildren) {
 										href: "/app/admin/logs",
 										icon: (
 											<ClipboardListIcon className="size-4 opacity-50" />
+										),
+									},
+									{
+										title: t("admin.menu.activationCodes"),
+										href: "/app/admin/activation-codes",
+										icon: (
+											<KeyIcon className="size-4 opacity-50" />
 										),
 									},
 								],
