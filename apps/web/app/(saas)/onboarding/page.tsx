@@ -3,6 +3,7 @@ import {
 	getSession,
 	getOrganizationList,
 } from "@saas/auth/lib/server";
+import { autoCreateOrganizationIfNeeded } from "@saas/organizations/lib/auto-create-organization";
 import { OnboardingWizard } from "@saas/onboarding/components/OnboardingWizard";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -29,8 +30,16 @@ export default async function OnboardingPage() {
 		redirect("/app");
 	}
 
-	// Get user's organization (auto-created on signup)
-	const organizations = await getOrganizationList();
+	// Get user's organization, or auto-create one if needed
+	let organizations = await getOrganizationList();
+
+	if (organizations.length === 0 && config.organizations.autoCreateOnSignup) {
+		const newOrg = await autoCreateOrganizationIfNeeded(session);
+		if (newOrg) {
+			organizations = await getOrganizationList();
+		}
+	}
+
 	const organization = organizations[0];
 
 	if (!organization) {
