@@ -1,0 +1,75 @@
+import { updateSubcontractClaimStatus, db, logAuditEvent } from "@repo/database";
+import { ORPCError } from "@orpc/server";
+import { z } from "zod";
+import { subscriptionProcedure } from "../../../orpc/procedures";
+import { verifyProjectAccess } from "../../../lib/permissions";
+
+export const updateSubcontractClaimStatusProcedure = subscriptionProcedure
+	.route({
+		method: "PATCH",
+		path: "/projects/{projectId}/subcontracts/claims/{claimId}/status",
+		tags: ["Subcontract Claims"],
+		summary: "Update subcontract claim status",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			projectId: z.string(),
+			claimId: z.string(),
+			status: z.enum([
+				"DRAFT", "SUBMITTED", "UNDER_REVIEW", "APPROVED",
+				"PARTIALLY_PAID", "PAID", "REJECTED", "CANCELLED",
+			]),
+			rejectionReason: z.string().optional(),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyProjectAccess(
+			input.projectId,
+			input.organizationId,
+			context.user.id,
+			{ section: "finance", action: "payments" },
+		);
+
+		try {
+			const claim = await updateSubcontractClaimStatus(
+				input.claimId,
+				input.organizationId,
+				input.status as any,
+				{
+					rejectionReason: input.rejectionReason,
+					approvedById: input.status === "APPROVED" ? context.user.id : undefined,
+				},
+			);
+
+			logAuditEvent(input.organizationId, input.projectId, {
+				actorId: context.user.id,
+				action: "SUBCONTRACT_CLAIM_STATUS_CHANGED",
+				entityType: "subcontract_claim",
+				entityId: input.claimId,
+				metadata: { newStatus: input.status },
+			}).catch(() => {});
+
+			return {
+				...claim,
+				grossAmount: Number(claim.grossAmount),
+				retentionAmount: Number(claim.retentionAmount),
+				advanceDeduction: Number(claim.advanceDeduction),
+				vatAmount: Number(claim.vatAmount),
+				netAmount: Number(claim.netAmount),
+				paidAmount: Number(claim.paidAmount),
+			};
+		} catch (error) {
+			if (error instanceof Error) {
+				if (error.message === "CLAIM_NOT_FOUND") {
+					throw new ORPCError("NOT_FOUND", { message: "المستخلص غير موجود" });
+				}
+				if (error.message.startsWith("INVALID_TRANSITION:")) {
+					throw new ORPCError("BAD_REQUEST", {
+						message: "لا يمكن تغيير حالة المستخلص بهذا الشكل",
+					});
+				}
+			}
+			throw error;
+		}
+	});

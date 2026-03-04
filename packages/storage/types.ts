@@ -9,6 +9,7 @@ export type GetSignedUploadUrlHandler = (
 	path: string,
 	options: {
 		bucket: string;
+		contentType?: string;
 	},
 ) => Promise<string>;
 
@@ -19,3 +20,10 @@ export type GetSignedUrlHander = (
 		expiresIn?: number;
 	},
 ) => Promise<string>;
+
+export type DeleteFileHandler = (
+	path: string,
+	options: {
+		bucket: string;
+	},
+) => Promise<void>;

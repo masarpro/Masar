@@ -2,6 +2,7 @@ import { db } from "../client";
 
 // Type definitions for document enums
 type DocumentFolder = "CONTRACT" | "DRAWINGS" | "CLAIMS" | "LETTERS" | "PHOTOS" | "OTHER";
+type DocumentUploadType = "FILE" | "URL";
 type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
 type ApproverStatus = "PENDING" | "APPROVED" | "REJECTED";
 
@@ -105,7 +106,13 @@ export async function createDocument(
 		folder: DocumentFolder;
 		title: string;
 		description?: string;
-		fileUrl: string;
+		fileUrl?: string | null;
+		uploadType?: DocumentUploadType;
+		fileName?: string;
+		fileSize?: number;
+		mimeType?: string;
+		storagePath?: string;
+		thumbnailPath?: string;
 		createdById: string;
 	},
 ) {
@@ -117,6 +124,12 @@ export async function createDocument(
 			title: data.title,
 			description: data.description,
 			fileUrl: data.fileUrl,
+			uploadType: data.uploadType || "FILE",
+			fileName: data.fileName,
+			fileSize: data.fileSize,
+			mimeType: data.mimeType,
+			storagePath: data.storagePath,
+			thumbnailPath: data.thumbnailPath,
 			createdById: data.createdById,
 		},
 		include: {

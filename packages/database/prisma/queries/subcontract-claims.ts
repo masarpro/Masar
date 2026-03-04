@@ -1,0 +1,734 @@
+import { db } from "../client";
+import { Prisma } from "../generated/client";
+import type {
+	SubcontractClaimStatus,
+	SubcontractClaimType,
+	PaymentMethod,
+} from "../generated/client";
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Subcontract Claims Queries - مستخلصات الباطن
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * List subcontract claims with optional filters
+ */
+export async function getSubcontractClaims(
+	organizationId: string,
+	filters?: {
+		contractId?: string;
+		projectId?: string;
+		status?: SubcontractClaimStatus;
+	},
+) {
+	const where: Prisma.SubcontractClaimWhereInput = { organizationId };
+
+	if (filters?.contractId) where.contractId = filters.contractId;
+	if (filters?.status) where.status = filters.status;
+	if (filters?.projectId) {
+		where.contract = { projectId: filters.projectId };
+	}
+
+	const claims = await db.subcontractClaim.findMany({
+		where,
+		include: {
+			contract: {
+				select: { id: true, name: true, companyName: true, projectId: true, value: true },
+			},
+			createdBy: { select: { id: true, name: true } },
+			_count: { select: { items: true, payments: true } },
+		},
+		orderBy: { createdAt: "desc" },
+	});
+
+	return claims.map((claim) => ({
+		...claim,
+		grossAmount: Number(claim.grossAmount),
+		retentionAmount: Number(claim.retentionAmount),
+		advanceDeduction: Number(claim.advanceDeduction),
+		vatAmount: Number(claim.vatAmount),
+		netAmount: Number(claim.netAmount),
+		paidAmount: Number(claim.paidAmount),
+		outstanding: Number(claim.netAmount) - Number(claim.paidAmount),
+		contract: {
+			...claim.contract,
+			value: Number(claim.contract.value),
+		},
+	}));
+}
+
+/**
+ * Get a single subcontract claim with full details
+ */
+export async function getSubcontractClaimById(
+	id: string,
+	organizationId: string,
+) {
+	const claim = await db.subcontractClaim.findUnique({
+		where: { id, organizationId },
+		include: {
+			contract: {
+				select: {
+					id: true, name: true, companyName: true, projectId: true,
+					value: true, retentionPercent: true, vatPercent: true,
+					advancePaymentPercent: true, advancePaymentAmount: true,
+					retentionCapPercent: true,
+				},
+			},
+			items: {
+				include: {
+					contractItem: {
+						select: { id: true, itemCode: true, description: true, descriptionEn: true, unit: true },
+					},
+				},
+				orderBy: { contractItem: { sortOrder: "asc" } },
+			},
+			payments: {
+				orderBy: { date: "asc" },
+				select: {
+					id: true, paymentNo: true, amount: true, date: true,
+					paymentMethod: true, description: true, notes: true,
+					createdBy: { select: { id: true, name: true } },
+				},
+			},
+			createdBy: { select: { id: true, name: true } },
+			approvedBy: { select: { id: true, name: true } },
+		},
+	});
+
+	if (!claim) return null;
+
+	return {
+		...claim,
+		grossAmount: Number(claim.grossAmount),
+		retentionAmount: Number(claim.retentionAmount),
+		advanceDeduction: Number(claim.advanceDeduction),
+		vatAmount: Number(claim.vatAmount),
+		netAmount: Number(claim.netAmount),
+		paidAmount: Number(claim.paidAmount),
+		outstanding: Number(claim.netAmount) - Number(claim.paidAmount),
+		contract: {
+			...claim.contract,
+			value: Number(claim.contract.value),
+			retentionPercent: claim.contract.retentionPercent ? Number(claim.contract.retentionPercent) : null,
+			vatPercent: claim.contract.vatPercent ? Number(claim.contract.vatPercent) : null,
+			advancePaymentPercent: claim.contract.advancePaymentPercent ? Number(claim.contract.advancePaymentPercent) : null,
+			advancePaymentAmount: claim.contract.advancePaymentAmount ? Number(claim.contract.advancePaymentAmount) : null,
+			retentionCapPercent: claim.contract.retentionCapPercent ? Number(claim.contract.retentionCapPercent) : null,
+		},
+		items: claim.items.map((item) => ({
+			...item,
+			contractQty: Number(item.contractQty),
+			unitPrice: Number(item.unitPrice),
+			prevCumulativeQty: Number(item.prevCumulativeQty),
+			thisQty: Number(item.thisQty),
+			thisAmount: Number(item.thisAmount),
+			cumulativeQty: Number(item.prevCumulativeQty) + Number(item.thisQty),
+			remainingQty: Number(item.contractQty) - Number(item.prevCumulativeQty) - Number(item.thisQty),
+			completionPercent: Number(item.contractQty) > 0
+				? Math.round(((Number(item.prevCumulativeQty) + Number(item.thisQty)) / Number(item.contractQty)) * 10000) / 100
+				: 0,
+		})),
+		payments: claim.payments.map((p) => ({
+			...p,
+			amount: Number(p.amount),
+		})),
+	};
+}
+
+/**
+ * Create a new subcontract claim with items
+ */
+export async function createSubcontractClaim(data: {
+	organizationId: string;
+	contractId: string;
+	createdById: string;
+	title: string;
+	periodStart: Date;
+	periodEnd: Date;
+	claimType?: SubcontractClaimType;
+	notes?: string | null;
+	items: Array<{
+		contractItemId: string;
+		thisQty: number;
+	}>;
+}) {
+	return db.$transaction(async (tx) => {
+		// 1. Get contract details
+		const contract = await tx.subcontractContract.findUnique({
+			where: { id: data.contractId, organizationId: data.organizationId },
+			select: {
+				id: true, value: true,
+				retentionPercent: true, vatPercent: true,
+				advancePaymentPercent: true, advancePaymentAmount: true,
+				retentionCapPercent: true,
+			},
+		});
+		if (!contract) throw new Error("CONTRACT_NOT_FOUND");
+
+		// 2. Check no pending claims (SUBMITTED or UNDER_REVIEW)
+		const pendingClaim = await tx.subcontractClaim.findFirst({
+			where: {
+				contractId: data.contractId,
+				status: { in: ["SUBMITTED", "UNDER_REVIEW"] },
+			},
+			select: { id: true, claimNo: true },
+		});
+		if (pendingClaim) {
+			throw new Error("PENDING_CLAIM_EXISTS");
+		}
+
+		// 3. Get next claimNo
+		const lastClaim = await tx.subcontractClaim.findFirst({
+			where: { contractId: data.contractId },
+			orderBy: { claimNo: "desc" },
+			select: { claimNo: true },
+		});
+		const claimNo = (lastClaim?.claimNo ?? 0) + 1;
+
+		// 4. Get contract items for validation and pricing
+		const contractItems = await tx.subcontractItem.findMany({
+			where: {
+				contractId: data.contractId,
+				id: { in: data.items.map((i) => i.contractItemId) },
+			},
+		});
+		const itemMap = new Map(contractItems.map((i) => [i.id, i]));
+
+		// 5. Compute prevCumulativeQty for each item from approved claims
+		const approvedClaimItems = await tx.subcontractClaimItem.findMany({
+			where: {
+				claim: {
+					contractId: data.contractId,
+					status: { in: ["APPROVED", "PARTIALLY_PAID", "PAID"] },
+				},
+				contractItemId: { in: data.items.map((i) => i.contractItemId) },
+			},
+			select: { contractItemId: true, thisQty: true },
+		});
+
+		const prevQtyMap = new Map<string, Prisma.Decimal>();
+		for (const ci of approvedClaimItems) {
+			const current = prevQtyMap.get(ci.contractItemId) ?? new Prisma.Decimal(0);
+			prevQtyMap.set(ci.contractItemId, current.add(ci.thisQty));
+		}
+
+		// 6. Build claim items and compute amounts
+		let grossAmount = new Prisma.Decimal(0);
+		const claimItemsData: Array<{
+			organizationId: string;
+			contractItemId: string;
+			contractQty: Prisma.Decimal;
+			unitPrice: Prisma.Decimal;
+			prevCumulativeQty: Prisma.Decimal;
+			thisQty: Prisma.Decimal;
+			thisAmount: Prisma.Decimal;
+		}> = [];
+
+		for (const item of data.items) {
+			if (item.thisQty <= 0) continue;
+
+			const contractItem = itemMap.get(item.contractItemId);
+			if (!contractItem) throw new Error(`ITEM_NOT_FOUND:${item.contractItemId}`);
+
+			const prevCumQty = prevQtyMap.get(item.contractItemId) ?? new Prisma.Decimal(0);
+			const thisQty = new Prisma.Decimal(item.thisQty);
+			const cumulativeQty = prevCumQty.add(thisQty);
+
+			// Validate: cumulative cannot exceed contract qty
+			if (cumulativeQty.gt(contractItem.contractQty)) {
+				throw new Error(`QTY_EXCEEDS_REMAINING:${item.contractItemId}`);
+			}
+
+			const thisAmount = thisQty.mul(contractItem.unitPrice);
+			grossAmount = grossAmount.add(thisAmount);
+
+			claimItemsData.push({
+				organizationId: data.organizationId,
+				contractItemId: item.contractItemId,
+				contractQty: contractItem.contractQty,
+				unitPrice: contractItem.unitPrice,
+				prevCumulativeQty: prevCumQty,
+				thisQty,
+				thisAmount,
+			});
+		}
+
+		if (claimItemsData.length === 0) {
+			throw new Error("NO_ITEMS_ADDED");
+		}
+
+		// 7. Calculate deductions
+		const retentionPercent = contract.retentionPercent
+			? Number(contract.retentionPercent)
+			: 0;
+		let retentionAmount = grossAmount
+			.mul(retentionPercent)
+			.div(100);
+
+		// Check retention cap
+		if (contract.retentionCapPercent) {
+			const capPercent = Number(contract.retentionCapPercent);
+			const capAmount = new Prisma.Decimal(Number(contract.value))
+				.mul(capPercent)
+				.div(100);
+
+			// Get total retention already held
+			const prevRetention = await tx.subcontractClaim.aggregate({
+				where: {
+					contractId: data.contractId,
+					status: { in: ["APPROVED", "PARTIALLY_PAID", "PAID"] },
+				},
+				_sum: { retentionAmount: true },
+			});
+			const totalRetentionSoFar = prevRetention._sum.retentionAmount ?? new Prisma.Decimal(0);
+			const remainingCap = capAmount.sub(totalRetentionSoFar);
+
+			if (remainingCap.lte(0)) {
+				retentionAmount = new Prisma.Decimal(0);
+			} else if (retentionAmount.gt(remainingCap)) {
+				retentionAmount = remainingCap;
+			}
+		}
+
+		// 8. Advance deduction
+		let advanceDeduction = new Prisma.Decimal(0);
+		if (contract.advancePaymentPercent && contract.advancePaymentAmount) {
+			const advPercent = Number(contract.advancePaymentPercent);
+			advanceDeduction = grossAmount.mul(advPercent).div(100);
+
+			// Don't exceed remaining unrecovered advance
+			const prevAdvDeduction = await tx.subcontractClaim.aggregate({
+				where: {
+					contractId: data.contractId,
+					status: { in: ["APPROVED", "PARTIALLY_PAID", "PAID"] },
+				},
+				_sum: { advanceDeduction: true },
+			});
+			const totalRecovered = prevAdvDeduction._sum.advanceDeduction ?? new Prisma.Decimal(0);
+			const remainingAdvance = contract.advancePaymentAmount.sub(totalRecovered);
+
+			if (remainingAdvance.lte(0)) {
+				advanceDeduction = new Prisma.Decimal(0);
+			} else if (advanceDeduction.gt(remainingAdvance)) {
+				advanceDeduction = remainingAdvance;
+			}
+		}
+
+		// 9. VAT
+		const vatPercent = contract.vatPercent ? Number(contract.vatPercent) : 0;
+		const taxableAmount = grossAmount.sub(retentionAmount).sub(advanceDeduction);
+		const vatAmount = taxableAmount.mul(vatPercent).div(100);
+
+		// 10. Net amount
+		const netAmount = grossAmount
+			.sub(retentionAmount)
+			.sub(advanceDeduction)
+			.add(vatAmount);
+
+		// 11. Create claim + items
+		const claim = await tx.subcontractClaim.create({
+			data: {
+				organizationId: data.organizationId,
+				contractId: data.contractId,
+				createdById: data.createdById,
+				claimNo,
+				title: data.title,
+				periodStart: data.periodStart,
+				periodEnd: data.periodEnd,
+				claimType: data.claimType ?? "INTERIM",
+				notes: data.notes,
+				grossAmount,
+				retentionAmount,
+				advanceDeduction,
+				vatAmount,
+				netAmount,
+				items: {
+					create: claimItemsData.map((item) => ({
+						organizationId: item.organizationId,
+						contractItemId: item.contractItemId,
+						contractQty: item.contractQty,
+						unitPrice: item.unitPrice,
+						prevCumulativeQty: item.prevCumulativeQty,
+						thisQty: item.thisQty,
+						thisAmount: item.thisAmount,
+					})),
+				},
+			},
+			include: {
+				items: true,
+			},
+		});
+
+		return claim;
+	});
+}
+
+/**
+ * Update a subcontract claim (DRAFT only)
+ */
+export async function updateSubcontractClaim(
+	id: string,
+	organizationId: string,
+	data: {
+		title?: string;
+		periodStart?: Date;
+		periodEnd?: Date;
+		claimType?: SubcontractClaimType;
+		notes?: string | null;
+		items?: Array<{
+			contractItemId: string;
+			thisQty: number;
+		}>;
+	},
+) {
+	return db.$transaction(async (tx) => {
+		const claim = await tx.subcontractClaim.findUnique({
+			where: { id, organizationId },
+			include: { contract: true },
+		});
+		if (!claim) throw new Error("CLAIM_NOT_FOUND");
+		if (claim.status !== "DRAFT") throw new Error("CLAIM_NOT_DRAFT");
+
+		const updateData: Record<string, unknown> = {};
+		if (data.title !== undefined) updateData.title = data.title;
+		if (data.periodStart !== undefined) updateData.periodStart = data.periodStart;
+		if (data.periodEnd !== undefined) updateData.periodEnd = data.periodEnd;
+		if (data.claimType !== undefined) updateData.claimType = data.claimType;
+		if (data.notes !== undefined) updateData.notes = data.notes;
+
+		// If items are being updated, recalculate everything
+		if (data.items) {
+			// Delete existing items
+			await tx.subcontractClaimItem.deleteMany({ where: { claimId: id } });
+
+			// Get contract items
+			const contractItems = await tx.subcontractItem.findMany({
+				where: {
+					contractId: claim.contractId,
+					id: { in: data.items.map((i) => i.contractItemId) },
+				},
+			});
+			const itemMap = new Map(contractItems.map((i) => [i.id, i]));
+
+			// Get prev cumulative from approved claims
+			const approvedClaimItems = await tx.subcontractClaimItem.findMany({
+				where: {
+					claim: {
+						contractId: claim.contractId,
+						status: { in: ["APPROVED", "PARTIALLY_PAID", "PAID"] },
+						id: { not: id },
+					},
+					contractItemId: { in: data.items.map((i) => i.contractItemId) },
+				},
+				select: { contractItemId: true, thisQty: true },
+			});
+
+			const prevQtyMap = new Map<string, Prisma.Decimal>();
+			for (const ci of approvedClaimItems) {
+				const current = prevQtyMap.get(ci.contractItemId) ?? new Prisma.Decimal(0);
+				prevQtyMap.set(ci.contractItemId, current.add(ci.thisQty));
+			}
+
+			let grossAmount = new Prisma.Decimal(0);
+			const claimItemsData: Prisma.SubcontractClaimItemCreateManyInput[] = [];
+
+			for (const item of data.items) {
+				if (item.thisQty <= 0) continue;
+				const contractItem = itemMap.get(item.contractItemId);
+				if (!contractItem) continue;
+
+				const prevCumQty = prevQtyMap.get(item.contractItemId) ?? new Prisma.Decimal(0);
+				const thisQty = new Prisma.Decimal(item.thisQty);
+				const cumulativeQty = prevCumQty.add(thisQty);
+
+				if (cumulativeQty.gt(contractItem.contractQty)) {
+					throw new Error(`QTY_EXCEEDS_REMAINING:${item.contractItemId}`);
+				}
+
+				const thisAmount = thisQty.mul(contractItem.unitPrice);
+				grossAmount = grossAmount.add(thisAmount);
+
+				claimItemsData.push({
+					organizationId,
+					claimId: id,
+					contractItemId: item.contractItemId,
+					contractQty: contractItem.contractQty,
+					unitPrice: contractItem.unitPrice,
+					prevCumulativeQty: prevCumQty,
+					thisQty,
+					thisAmount,
+				});
+			}
+
+			if (claimItemsData.length === 0) throw new Error("NO_ITEMS_ADDED");
+
+			// Recalculate deductions
+			const contract = claim.contract;
+			const retentionPercent = contract.retentionPercent ? Number(contract.retentionPercent) : 0;
+			let retentionAmount = grossAmount.mul(retentionPercent).div(100);
+
+			if (contract.retentionCapPercent) {
+				const capAmount = new Prisma.Decimal(Number(contract.value))
+					.mul(Number(contract.retentionCapPercent)).div(100);
+				const prevRetention = await tx.subcontractClaim.aggregate({
+					where: {
+						contractId: claim.contractId,
+						status: { in: ["APPROVED", "PARTIALLY_PAID", "PAID"] },
+						id: { not: id },
+					},
+					_sum: { retentionAmount: true },
+				});
+				const totalRetentionSoFar = prevRetention._sum.retentionAmount ?? new Prisma.Decimal(0);
+				const remainingCap = capAmount.sub(totalRetentionSoFar);
+				if (remainingCap.lte(0)) retentionAmount = new Prisma.Decimal(0);
+				else if (retentionAmount.gt(remainingCap)) retentionAmount = remainingCap;
+			}
+
+			let advanceDeduction = new Prisma.Decimal(0);
+			if (contract.advancePaymentPercent && contract.advancePaymentAmount) {
+				advanceDeduction = grossAmount.mul(Number(contract.advancePaymentPercent)).div(100);
+				const prevAdv = await tx.subcontractClaim.aggregate({
+					where: {
+						contractId: claim.contractId,
+						status: { in: ["APPROVED", "PARTIALLY_PAID", "PAID"] },
+						id: { not: id },
+					},
+					_sum: { advanceDeduction: true },
+				});
+				const totalRecovered = prevAdv._sum.advanceDeduction ?? new Prisma.Decimal(0);
+				const remaining = contract.advancePaymentAmount.sub(totalRecovered);
+				if (remaining.lte(0)) advanceDeduction = new Prisma.Decimal(0);
+				else if (advanceDeduction.gt(remaining)) advanceDeduction = remaining;
+			}
+
+			const vatPercent = contract.vatPercent ? Number(contract.vatPercent) : 0;
+			const taxable = grossAmount.sub(retentionAmount).sub(advanceDeduction);
+			const vatAmount = taxable.mul(vatPercent).div(100);
+			const netAmount = grossAmount.sub(retentionAmount).sub(advanceDeduction).add(vatAmount);
+
+			updateData.grossAmount = grossAmount;
+			updateData.retentionAmount = retentionAmount;
+			updateData.advanceDeduction = advanceDeduction;
+			updateData.vatAmount = vatAmount;
+			updateData.netAmount = netAmount;
+
+			await tx.subcontractClaimItem.createMany({ data: claimItemsData });
+		}
+
+		return tx.subcontractClaim.update({
+			where: { id },
+			data: updateData,
+			include: { items: true },
+		});
+	});
+}
+
+/**
+ * Update subcontract claim status with workflow validation
+ */
+export async function updateSubcontractClaimStatus(
+	id: string,
+	organizationId: string,
+	newStatus: SubcontractClaimStatus,
+	options?: {
+		rejectionReason?: string;
+		approvedById?: string;
+	},
+) {
+	const claim = await db.subcontractClaim.findUnique({
+		where: { id, organizationId },
+		select: { status: true },
+	});
+	if (!claim) throw new Error("CLAIM_NOT_FOUND");
+
+	// Validate workflow transitions
+	const allowedTransitions: Record<string, string[]> = {
+		DRAFT: ["SUBMITTED"],
+		SUBMITTED: ["UNDER_REVIEW", "APPROVED", "REJECTED"],
+		UNDER_REVIEW: ["APPROVED", "REJECTED"],
+		APPROVED: ["PARTIALLY_PAID", "PAID"],
+		REJECTED: ["DRAFT"],
+		PARTIALLY_PAID: ["PAID"],
+		PAID: [],
+		CANCELLED: [],
+	};
+
+	const allowed = allowedTransitions[claim.status] ?? [];
+	if (!allowed.includes(newStatus)) {
+		throw new Error(`INVALID_TRANSITION:${claim.status}:${newStatus}`);
+	}
+
+	const updateData: Record<string, unknown> = { status: newStatus };
+
+	if (newStatus === "SUBMITTED") {
+		updateData.submittedAt = new Date();
+	} else if (newStatus === "APPROVED") {
+		updateData.approvedAt = new Date();
+		if (options?.approvedById) updateData.approvedById = options.approvedById;
+	} else if (newStatus === "REJECTED") {
+		updateData.rejectionReason = options?.rejectionReason ?? null;
+	} else if (newStatus === "DRAFT") {
+		// Return to draft: clear submission/approval data
+		updateData.submittedAt = null;
+		updateData.approvedAt = null;
+		updateData.approvedById = null;
+		updateData.rejectionReason = null;
+	}
+
+	return db.subcontractClaim.update({
+		where: { id },
+		data: updateData,
+	});
+}
+
+/**
+ * Delete a subcontract claim (DRAFT only)
+ */
+export async function deleteSubcontractClaim(
+	id: string,
+	organizationId: string,
+) {
+	const claim = await db.subcontractClaim.findUnique({
+		where: { id, organizationId },
+		select: { status: true },
+	});
+	if (!claim) throw new Error("CLAIM_NOT_FOUND");
+	if (claim.status !== "DRAFT") throw new Error("CLAIM_NOT_DRAFT");
+
+	return db.subcontractClaim.delete({ where: { id } });
+}
+
+/**
+ * Get financial summary for a contract
+ */
+export async function getSubcontractClaimSummary(
+	contractId: string,
+	organizationId: string,
+) {
+	const contract = await db.subcontractContract.findUnique({
+		where: { id: contractId, organizationId },
+		select: { value: true },
+	});
+	if (!contract) throw new Error("CONTRACT_NOT_FOUND");
+
+	const claimsAgg = await db.subcontractClaim.aggregate({
+		where: {
+			contractId,
+			organizationId,
+			status: { in: ["APPROVED", "PARTIALLY_PAID", "PAID"] },
+		},
+		_sum: {
+			grossAmount: true,
+			netAmount: true,
+			paidAmount: true,
+			retentionAmount: true,
+			advanceDeduction: true,
+		},
+	});
+
+	const contractValue = Number(contract.value);
+	const totalClaimed = Number(claimsAgg._sum.grossAmount ?? 0);
+	const totalNetClaimed = Number(claimsAgg._sum.netAmount ?? 0);
+	const totalPaid = Number(claimsAgg._sum.paidAmount ?? 0);
+	const totalRetentionHeld = Number(claimsAgg._sum.retentionAmount ?? 0);
+	const totalAdvanceRecovered = Number(claimsAgg._sum.advanceDeduction ?? 0);
+
+	return {
+		contractValue,
+		totalClaimed,
+		totalNetClaimed,
+		totalPaid,
+		totalRetentionHeld,
+		totalAdvanceRecovered,
+		totalOutstanding: totalNetClaimed - totalPaid,
+		completionPercent: contractValue > 0
+			? Math.round((totalClaimed / contractValue) * 10000) / 100
+			: 0,
+		remainingContractValue: contractValue - totalClaimed,
+	};
+}
+
+/**
+ * Add a payment to an approved claim
+ */
+export async function addSubcontractClaimPayment(data: {
+	organizationId: string;
+	claimId: string;
+	createdById: string;
+	amount: number;
+	date: Date;
+	paymentMethod: PaymentMethod;
+	sourceAccountId?: string | null;
+	description?: string | null;
+}) {
+	return db.$transaction(async (tx) => {
+		// 1. Get claim
+		const claim = await tx.subcontractClaim.findUnique({
+			where: { id: data.claimId, organizationId: data.organizationId },
+			select: {
+				id: true, contractId: true, netAmount: true, paidAmount: true,
+				status: true, claimNo: true,
+			},
+		});
+		if (!claim) throw new Error("CLAIM_NOT_FOUND");
+
+		if (!["APPROVED", "PARTIALLY_PAID"].includes(claim.status)) {
+			throw new Error("CLAIM_NOT_PAYABLE");
+		}
+
+		// 2. Validate amount
+		const maxPayable = Number(claim.netAmount) - Number(claim.paidAmount);
+		if (data.amount > maxPayable + 0.01) {
+			throw new Error(`AMOUNT_EXCEEDS_OUTSTANDING:${maxPayable}`);
+		}
+
+		// 3. Generate payment number
+		const paymentCount = await tx.subcontractPayment.count({
+			where: { contractId: claim.contractId },
+		});
+		const paymentNo = `PAY-${String(paymentCount + 1).padStart(4, "0")}`;
+
+		// 4. Create payment
+		const payment = await tx.subcontractPayment.create({
+			data: {
+				organizationId: data.organizationId,
+				contractId: claim.contractId,
+				claimId: data.claimId,
+				createdById: data.createdById,
+				paymentNo,
+				amount: data.amount,
+				date: data.date,
+				paymentMethod: data.paymentMethod,
+				sourceAccountId: data.sourceAccountId,
+				description: data.description,
+			},
+		});
+
+		// 5. Update claim paidAmount and status
+		const newPaidAmount = Number(claim.paidAmount) + data.amount;
+		const newStatus = newPaidAmount >= Number(claim.netAmount) - 0.01
+			? "PAID"
+			: "PARTIALLY_PAID";
+
+		await tx.subcontractClaim.update({
+			where: { id: data.claimId },
+			data: {
+				paidAmount: newPaidAmount,
+				status: newStatus as SubcontractClaimStatus,
+			},
+		});
+
+		// 6. Deduct from bank account if specified
+		if (data.sourceAccountId) {
+			await tx.organizationBank.update({
+				where: { id: data.sourceAccountId },
+				data: {
+					balance: { decrement: data.amount },
+				},
+			});
+		}
+
+		return { ...payment, amount: Number(payment.amount) };
+	});
+}

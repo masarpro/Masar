@@ -28,6 +28,7 @@ import { projectTeamRouter } from "../modules/project-team/router";
 import { dashboardRouter } from "../modules/dashboard/router";
 import { financeRouter } from "../modules/finance/router";
 import { subcontractsRouter } from "../modules/subcontracts/router";
+import { projectPaymentsRouter } from "../modules/project-payments/router";
 import { companyRouter } from "../modules/company/router";
 import { projectExecutionRouter } from "../modules/project-execution/router";
 import { pricingRouter } from "../modules/pricing/router";
@@ -81,6 +82,8 @@ export const router = publicProcedure.router({
 	finance: financeRouter,
 	// Subcontract Management - مقاولو الباطن
 	subcontracts: subcontractsRouter,
+	// Project Payments - دفعات المشروع
+	projectPayments: projectPaymentsRouter,
 	// Company Management - إدارة المنشأة
 	company: companyRouter,
 	// Phase 13 - Execution Module

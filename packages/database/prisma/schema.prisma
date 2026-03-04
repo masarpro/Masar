@@ -194,6 +194,12 @@ enum DocumentFolder {
   OTHER       // أخرى
 }
 
+// نوع رفع الوثيقة
+enum DocumentUploadType {
+  FILE   // ملف مرفوع
+  URL    // رابط خارجي
+}
+
 // حالة الاعتماد
 enum ApprovalStatus {
   PENDING     // قيد الانتظار
@@ -287,6 +293,7 @@ enum NotificationType {
 // إجراءات سجل التدقيق
 enum AuditAction {
   DOC_CREATED         // إنشاء وثيقة
+  DOC_DELETED         // حذف وثيقة
   APPROVAL_REQUESTED  // طلب اعتماد
   APPROVAL_DECIDED    // قرار اعتماد
   MESSAGE_SENT        // إرسال رسالة
@@ -312,6 +319,10 @@ enum AuditAction {
   // العقد الرئيسي
   CONTRACT_CREATED     // إنشاء عقد رئيسي
   CONTRACT_UPDATED     // تعديل عقد رئيسي
+  // دفعات المشروع
+  PROJECT_PAYMENT_CREATED  // إنشاء دفعة مشروع
+  PROJECT_PAYMENT_UPDATED  // تعديل دفعة مشروع
+  PROJECT_PAYMENT_DELETED  // حذف دفعة مشروع
 }
 
 // قنوات الإشعار
@@ -467,6 +478,13 @@ enum PaymentTermType {
   CUSTOM     // مخصص
 }
 
+// حالة مرحلة الدفع
+enum PaymentTermStatus {
+  PENDING        // لم يتم الدفع
+  PARTIALLY_PAID // مدفوع جزئياً
+  FULLY_PAID     // مدفوع بالكامل
+}
+
 // ═══════════════════════════════════════════════════════════
 // COMPANY MANAGEMENT ENUMS - إدارة المنشأة
 // ═══════════════════════════════════════════════════════════
@@ -593,6 +611,7 @@ model User {
   subcontractsCreated        SubcontractContract[]   @relation("SubcontractCreator")
   subcontractCOsCreated      SubcontractChangeOrder[] @relation("SubcontractCOCreator")
   subcontractPaymentsCreated SubcontractPayment[]     @relation("SubcontractPaymentCreator")
+  projectPaymentsCreated     ProjectPayment[]         @relation("ProjectPaymentCreator")
   contractsCreated      ProjectContract[]       @relation("ContractCreator")
 
   // علاقات الوثائق والاعتمادات
@@ -850,6 +869,9 @@ model Organization {
   financeExpenses      FinanceExpense[]
   financePayments      FinancePayment[]
   financeTransfers     FinanceTransfer[]
+
+  // Project Payments - دفعات المشروع
+  projectPayments      ProjectPayment[]
 
   // Company Management - إدارة المنشأة
   companyExpenses      CompanyExpense[]
@@ -1419,6 +1441,9 @@ model Project {
   orgExpenses         FinanceExpense[]   @relation("ProjectOrgExpenses")
   orgPayments         FinancePayment[]   @relation("ProjectOrgPayments")
 
+  // Project Payments - دفعات المشروع
+  projectPayments     ProjectPayment[]
+
   // Company Management - إدارة المنشأة (ربط بالمشروع)
   companyExpenseAllocations CompanyExpenseAllocation[]
   employeeAssignments      EmployeeProjectAssignment[]
@@ -1878,8 +1903,14 @@ model ContractPaymentTerm {
   milestoneId String?          @map("milestone_id")
   sortOrder   Int              @default(0) @map("sort_order")
 
+  // حالة الدفع والمبلغ المدفوع
+  status      PaymentTermStatus @default(PENDING)
+  paidAmount  Decimal           @default(0) @db.Decimal(15, 2) @map("paid_amount")
+  note        String?           @db.Text
+
   // الدفعات المرتبطة بهذه المرحلة
-  payments    FinancePayment[] @relation("TermPayments")
+  payments        FinancePayment[]   @relation("TermPayments")
+  projectPayments ProjectPayment[]   @relation("TermProjectPayments")
 
   createdAt   DateTime         @default(now()) @map("created_at")
   updatedAt   DateTime         @updatedAt @map("updated_at")
@@ -1889,32 +1920,91 @@ model ContractPaymentTerm {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// PROJECT PAYMENTS - دفعات المشروع
+// ═══════════════════════════════════════════════════════════════════════════
+
+model ProjectPayment {
+  id                   String              @id @default(cuid())
+  organizationId       String              @map("organization_id")
+  organization         Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  projectId            String              @map("project_id")
+  project              Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // ربط اختياري بمرحلة دفع في العقد
+  contractTermId       String?             @map("contract_term_id")
+  contractTerm         ContractPaymentTerm? @relation("TermProjectPayments", fields: [contractTermId], references: [id], onDelete: SetNull)
+
+  // الرقم التسلسلي
+  paymentNo            String              @map("payment_no")
+
+  // المبلغ والتاريخ
+  amount               Decimal             @db.Decimal(15, 2)
+  date                 DateTime            @db.Date
+
+  // طريقة الدفع
+  paymentMethod        PaymentMethod       @default(CASH) @map("payment_method")
+  referenceNo          String?             @map("reference_no")
+
+  // الوصف والملاحظات
+  description          String?
+  note                 String?             @db.Text
+
+  // الحساب الوجهة (اختياري)
+  destinationAccountId String?             @map("destination_account_id")
+  destinationAccount   OrganizationBank?   @relation("ProjectPaymentDestination", fields: [destinationAccountId], references: [id], onDelete: SetNull)
+
+  // من أنشأ
+  createdById          String              @map("created_by")
+  createdBy            User                @relation("ProjectPaymentCreator", fields: [createdById], references: [id])
+
+  createdAt            DateTime            @default(now()) @map("created_at")
+  updatedAt            DateTime            @updatedAt @map("updated_at")
+
+  @@unique([projectId, paymentNo])
+  @@index([organizationId])
+  @@index([projectId])
+  @@index([contractTermId])
+  @@map("project_payments")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // DOCUMENTS & APPROVALS MODELS - الوثائق والاعتمادات
 // ═══════════════════════════════════════════════════════════════════════════
 
 // وثائق المشروع
 model ProjectDocument {
-  id              String         @id @default(cuid())
-  organizationId  String         @map("organization_id")
-  projectId       String         @map("project_id")
-  project         Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id              String             @id @default(cuid())
+  organizationId  String             @map("organization_id")
+  projectId       String             @map("project_id")
+  project         Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   folder          DocumentFolder
   title           String
-  description     String?        @db.Text
-  fileUrl         String         @map("file_url")
-  version         Int            @default(1)
+  description     String?            @db.Text
+  fileUrl         String?            @map("file_url")
+  version         Int                @default(1)
 
-  createdById     String         @map("created_by")
-  createdBy       User           @relation("DocumentCreator", fields: [createdById], references: [id])
+  // حقول الملف المرفوع
+  fileName        String?            @map("file_name")
+  fileSize        Int?               @map("file_size")
+  mimeType        String?            @map("mime_type")
+  storagePath     String?            @map("storage_path")
+  thumbnailPath   String?            @map("thumbnail_path")
+  uploadType      DocumentUploadType @default(FILE) @map("upload_type")
 
-  createdAt       DateTime       @default(now()) @map("created_at")
-  updatedAt       DateTime       @updatedAt @map("updated_at")
+  createdById     String             @map("created_by")
+  createdBy       User               @relation("DocumentCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
 
   // العلاقات
   approvals       ProjectApproval[]
 
   @@index([organizationId, projectId, folder, createdAt])
+  @@index([projectId, folder])
+  @@index([organizationId, projectId])
   @@map("project_documents")
 }
 
@@ -3227,6 +3317,7 @@ model OrganizationBank {
   transfersFrom         FinanceTransfer[]    @relation("TransferSource")
   transfersTo           FinanceTransfer[]    @relation("TransferDestination")
   subcontractPayments   SubcontractPayment[] @relation("SubcontractPaymentSource")
+  projectPaymentsTo     ProjectPayment[]     @relation("ProjectPaymentDestination")
 
   // Company Management - دفعات مصروفات المنشأة
   companyExpensePayments CompanyExpensePayment[] @relation("CompanyExpensePaymentSource")

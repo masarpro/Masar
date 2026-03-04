@@ -87,7 +87,7 @@ export const PROJECT_NAV_SECTIONS: ProjectNavSection[] = [
 	{
 		id: "payments",
 		path: "finance/claims",
-		labelKey: "projects.shell.sections.paymentsAndClaims",
+		labelKey: "projects.shell.sections.payments",
 		icon: Banknote,
 		section: "finance/claims",
 	},
@@ -423,15 +423,8 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 			label: "دفعة جديدة",
 			labelEn: "New Payment",
 			icon: Receipt,
-			href: "finance/payments/new",
+			href: "finance/claims",
 			variant: "primary",
-		},
-		{
-			id: "new-claim",
-			label: "مستخلص جديد",
-			labelEn: "New Claim",
-			icon: ClipboardList,
-			href: "finance/claims/new",
 		},
 	],
 	"finance/contract": [
@@ -459,15 +452,8 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 			label: "دفعة جديدة",
 			labelEn: "New Payment",
 			icon: Receipt,
-			href: "finance/payments/new",
+			href: "finance/claims",
 			variant: "primary",
-		},
-		{
-			id: "new-claim",
-			label: "مستخلص جديد",
-			labelEn: "New Claim",
-			icon: ClipboardList,
-			href: "finance/claims/new",
 		},
 	],
 	// Documents page

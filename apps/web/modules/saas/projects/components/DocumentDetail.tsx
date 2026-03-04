@@ -15,8 +15,14 @@ import {
 	User,
 	Calendar,
 	History,
+	Download,
+	Trash2,
+	Eye,
+	File,
+	Image,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -29,6 +35,7 @@ import {
 } from "@ui/components/dialog";
 import { Label } from "@ui/components/label";
 import { Textarea } from "@ui/components/textarea";
+import { DocumentViewer } from "./documents/DocumentViewer";
 
 interface DocumentDetailProps {
 	organizationId: string;
@@ -37,14 +44,12 @@ interface DocumentDetailProps {
 	documentId: string;
 }
 
-const FOLDER_LABELS: Record<string, string> = {
-	CONTRACT: "العقد",
-	DRAWINGS: "المخططات",
-	CLAIMS: "المستخلصات",
-	LETTERS: "الخطابات",
-	PHOTOS: "الصور",
-	OTHER: "أخرى",
-};
+function formatFileSize(bytes?: number | null): string {
+	if (!bytes) return "";
+	if (bytes < 1024) return `${bytes} B`;
+	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 const FOLDER_COLORS: Record<string, string> = {
 	CONTRACT: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
@@ -87,6 +92,8 @@ function getActionLabel(action: string) {
 	switch (action) {
 		case "DOC_CREATED":
 			return "إنشاء الوثيقة";
+		case "DOC_DELETED":
+			return "حذف الوثيقة";
 		case "APPROVAL_REQUESTED":
 			return "طلب اعتماد";
 		case "APPROVAL_DECIDED":
@@ -102,11 +109,13 @@ export function DocumentDetail({
 	projectId,
 	documentId,
 }: DocumentDetailProps) {
-	const t = useTranslations();
+	const t = useTranslations("projects.documents");
 	const queryClient = useQueryClient();
+	const router = useRouter();
 	const basePath = `/app/${organizationSlug}/projects/${projectId}`;
 	const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
 	const [decisionNote, setDecisionNote] = useState("");
+	const [showViewer, setShowViewer] = useState(false);
 
 	const { data: document, isLoading } = useQuery(
 		orpc.projectDocuments.get.queryOptions({
@@ -121,16 +130,65 @@ export function DocumentDetail({
 	const actOnApprovalMutation = useMutation(
 		orpc.projectDocuments.actOnApproval.mutationOptions({
 			onSuccess: () => {
-				toast.success(t("projects.documents.approvalActionSuccess"));
+				toast.success(t("approvalActionSuccess"));
 				queryClient.invalidateQueries({
 					queryKey: [["projectDocuments", "get"]],
 				});
 			},
 			onError: (error) => {
-				toast.error(error.message || t("projects.documents.approvalActionError"));
+				toast.error(error.message || t("approvalActionError"));
 			},
 		}),
 	);
+
+	const deleteMutation = useMutation(
+		orpc.projectDocuments.delete.mutationOptions({
+			onSuccess: () => {
+				toast.success(t("deleteSuccess"));
+				router.push(`${basePath}/documents`);
+			},
+			onError: (error) => {
+				toast.error(error.message || t("deleteError"));
+			},
+		}),
+	);
+
+	const downloadUrlMutation = useMutation(
+		orpc.projectDocuments.getDownloadUrl.mutationOptions({}),
+	);
+
+	const handleDownload = async () => {
+		if (!document) return;
+
+		if (document.uploadType === "URL" && document.fileUrl) {
+			window.open(document.fileUrl, "_blank");
+			return;
+		}
+
+		try {
+			const result = await downloadUrlMutation.mutateAsync({
+				organizationId,
+				projectId,
+				documentId,
+			});
+			const link = window.document.createElement("a");
+			link.href = result.downloadUrl;
+			link.download = result.fileName || document.title;
+			link.target = "_blank";
+			link.click();
+		} catch {
+			toast.error(t("downloadError"));
+		}
+	};
+
+	const handleDelete = () => {
+		if (!confirm(t("deleteConfirm"))) return;
+		deleteMutation.mutate({
+			organizationId,
+			projectId,
+			documentId,
+		});
+	};
 
 	if (isLoading) {
 		return (
@@ -150,11 +208,11 @@ export function DocumentDetail({
 					<FileText className="h-12 w-12 text-slate-400" />
 				</div>
 				<p className="mb-4 text-lg text-muted-foreground">
-					{t("projects.documents.notFound")}
+					{t("notFound")}
 				</p>
 				<Button asChild className="rounded-xl">
 					<Link href={`${basePath}/documents`}>
-						{t("projects.documents.backToDocuments")}
+						{t("backToDocuments")}
 					</Link>
 				</Button>
 			</div>
@@ -163,6 +221,7 @@ export function DocumentDetail({
 
 	const latestApproval = document.approvals?.[0];
 	const hasPendingApproval = latestApproval?.status === "PENDING";
+	const isImage = document.mimeType?.startsWith("image/");
 
 	const handleApprovalAction = (decision: "APPROVED" | "REJECTED") => {
 		if (!latestApproval) return;
@@ -199,7 +258,7 @@ export function DocumentDetail({
 								{document.title}
 							</h1>
 							<Badge className={`border-0 ${FOLDER_COLORS[document.folder]}`}>
-								{FOLDER_LABELS[document.folder]}
+								{t(`folders.${document.folder}`)}
 							</Badge>
 						</div>
 						{document.description && (
@@ -207,12 +266,42 @@ export function DocumentDetail({
 						)}
 					</div>
 				</div>
-				<Button asChild className="rounded-xl">
-					<a href={document.fileUrl} target="_blank" rel="noopener noreferrer">
-						<ExternalLink className="h-4 w-4 me-2" />
-						{t("projects.documents.openFile")}
-					</a>
-				</Button>
+				<div className="flex items-center gap-2">
+					<Button
+						variant="outline"
+						className="rounded-xl"
+						onClick={() => setShowViewer(true)}
+					>
+						<Eye className="h-4 w-4 me-2" />
+						{t("view")}
+					</Button>
+					<Button
+						variant="outline"
+						className="rounded-xl"
+						onClick={handleDownload}
+						disabled={downloadUrlMutation.isPending}
+					>
+						<Download className="h-4 w-4 me-2" />
+						{t("download")}
+					</Button>
+					{document.uploadType === "URL" && document.fileUrl && (
+						<Button asChild className="rounded-xl">
+							<a href={document.fileUrl} target="_blank" rel="noopener noreferrer">
+								<ExternalLink className="h-4 w-4 me-2" />
+								{t("openFile")}
+							</a>
+						</Button>
+					)}
+					<Button
+						variant="outline"
+						className="rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20"
+						onClick={handleDelete}
+						disabled={deleteMutation.isPending}
+					>
+						<Trash2 className="h-4 w-4 me-2" />
+						{t("delete")}
+					</Button>
+				</div>
 			</div>
 
 			{/* Document Info */}
@@ -222,7 +311,7 @@ export function DocumentDetail({
 					{/* File Info Card */}
 					<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
 						<h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
-							{t("projects.documents.fileInfo")}
+							{t("fileInfo")}
 						</h2>
 						<div className="grid gap-4 sm:grid-cols-2">
 							<div className="flex items-center gap-3">
@@ -230,7 +319,7 @@ export function DocumentDetail({
 									<User className="h-4 w-4 text-slate-500" />
 								</div>
 								<div>
-									<p className="text-xs text-slate-500">{t("projects.documents.createdBy")}</p>
+									<p className="text-xs text-slate-500">{t("createdBy")}</p>
 									<p className="font-medium text-slate-900 dark:text-slate-100">
 										{document.createdBy.name}
 									</p>
@@ -241,12 +330,42 @@ export function DocumentDetail({
 									<Calendar className="h-4 w-4 text-slate-500" />
 								</div>
 								<div>
-									<p className="text-xs text-slate-500">{t("projects.documents.createdAt")}</p>
+									<p className="text-xs text-slate-500">{t("createdAt")}</p>
 									<p className="font-medium text-slate-900 dark:text-slate-100">
 										{new Date(document.createdAt).toLocaleDateString("ar-SA")}
 									</p>
 								</div>
 							</div>
+							{document.fileName && (
+								<div className="flex items-center gap-3">
+									<div className="rounded-lg bg-slate-100 p-2 dark:bg-slate-800">
+										{isImage ? (
+											<Image className="h-4 w-4 text-pink-500" />
+										) : (
+											<File className="h-4 w-4 text-blue-500" />
+										)}
+									</div>
+									<div>
+										<p className="text-xs text-slate-500">{t("fileName")}</p>
+										<p className="font-medium text-slate-900 dark:text-slate-100">
+											{document.fileName}
+										</p>
+									</div>
+								</div>
+							)}
+							{document.fileSize && (
+								<div className="flex items-center gap-3">
+									<div className="rounded-lg bg-slate-100 p-2 dark:bg-slate-800">
+										<FileText className="h-4 w-4 text-slate-500" />
+									</div>
+									<div>
+										<p className="text-xs text-slate-500">{t("fileSize")}</p>
+										<p className="font-medium text-slate-900 dark:text-slate-100">
+											{formatFileSize(document.fileSize)}
+										</p>
+									</div>
+								</div>
+							)}
 						</div>
 					</div>
 
@@ -255,22 +374,21 @@ export function DocumentDetail({
 						<div className="mb-4 flex items-center justify-between">
 							<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
 								<Shield className="inline h-5 w-5 me-2 text-slate-400" />
-								{t("projects.documents.approvals")}
+								{t("approvals")}
 							</h2>
 							{!hasPendingApproval && (
 								<Dialog open={isApprovalDialogOpen} onOpenChange={setIsApprovalDialogOpen}>
 									<DialogTrigger asChild>
 										<Button variant="outline" className="rounded-xl">
-											{t("projects.documents.requestApproval")}
+											{t("requestApproval")}
 										</Button>
 									</DialogTrigger>
 									<DialogContent>
 										<DialogHeader>
-											<DialogTitle>{t("projects.documents.requestApproval")}</DialogTitle>
+											<DialogTitle>{t("requestApproval")}</DialogTitle>
 										</DialogHeader>
-										{/* Simplified - would need approver selection in real implementation */}
 										<p className="text-sm text-slate-500">
-											{t("projects.documents.requestApprovalDescription")}
+											{t("requestApprovalDescription")}
 										</p>
 									</DialogContent>
 								</Dialog>
@@ -346,7 +464,7 @@ export function DocumentDetail({
 							</div>
 						) : (
 							<p className="text-center text-sm text-slate-500 py-8">
-								{t("projects.documents.noApprovals")}
+								{t("noApprovals")}
 							</p>
 						)}
 					</div>
@@ -356,7 +474,7 @@ export function DocumentDetail({
 				<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
 					<h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
 						<History className="inline h-5 w-5 me-2 text-slate-400" />
-						{t("projects.documents.auditLog")}
+						{t("auditLog")}
 					</h2>
 					{document.auditLogs && document.auditLogs.length > 0 ? (
 						<div className="space-y-3">
@@ -377,11 +495,22 @@ export function DocumentDetail({
 						</div>
 					) : (
 						<p className="text-center text-sm text-slate-500 py-4">
-							{t("projects.documents.noAuditLogs")}
+							{t("noAuditLogs")}
 						</p>
 					)}
 				</div>
 			</div>
+
+			{/* Document Viewer Dialog */}
+			{showViewer && (
+				<DocumentViewer
+					organizationId={organizationId}
+					projectId={projectId}
+					document={document}
+					open={showViewer}
+					onClose={() => setShowViewer(false)}
+				/>
+			)}
 		</div>
 	);
 }

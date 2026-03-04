@@ -1,4 +1,4 @@
-import { createDocument, createNotifications, logAuditEvent } from "@repo/database";
+import { createDocument, logAuditEvent } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -26,8 +26,23 @@ export const createDocumentProcedure = subscriptionProcedure
 			folder: DocumentFolderEnum,
 			title: z.string().min(1, "العنوان مطلوب"),
 			description: z.string().optional(),
-			fileUrl: z.string().url("رابط الملف غير صحيح"),
-		}),
+			// URL upload
+			fileUrl: z.string().url().optional(),
+			// File upload fields
+			uploadType: z.enum(["FILE", "URL"]).default("FILE"),
+			fileName: z.string().optional(),
+			fileSize: z.number().int().optional(),
+			mimeType: z.string().optional(),
+			storagePath: z.string().optional(),
+			thumbnailPath: z.string().optional(),
+		}).refine(
+			(data) => {
+				if (data.uploadType === "URL") return !!data.fileUrl;
+				if (data.uploadType === "FILE") return !!data.storagePath;
+				return false;
+			},
+			{ message: "يجب توفير رابط أو ملف مرفوع" },
+		),
 	)
 	.handler(async ({ input, context }) => {
 		await verifyProjectAccess(
@@ -45,13 +60,19 @@ export const createDocumentProcedure = subscriptionProcedure
 				folder: input.folder,
 				title: input.title,
 				description: input.description,
-				fileUrl: input.fileUrl,
+				fileUrl: input.fileUrl || null,
+				uploadType: input.uploadType,
+				fileName: input.fileName,
+				fileSize: input.fileSize,
+				mimeType: input.mimeType,
+				storagePath: input.storagePath,
+				thumbnailPath: input.thumbnailPath,
 				createdById: context.user.id,
 			},
 		);
 
 		// Log audit event
-		await logAuditEvent(input.organizationId, input.projectId, {
+		logAuditEvent(input.organizationId, input.projectId, {
 			actorId: context.user.id,
 			action: "DOC_CREATED",
 			entityType: "document",
