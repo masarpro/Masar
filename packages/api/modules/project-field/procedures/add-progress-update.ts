@@ -1,9 +1,9 @@
 import { addProgressUpdate } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const addProgressUpdateProcedure = protectedProcedure
+export const addProgressUpdateProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-field/progress-updates",

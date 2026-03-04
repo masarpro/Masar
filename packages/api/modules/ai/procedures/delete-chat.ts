@@ -1,10 +1,10 @@
 import { ORPCError } from "@orpc/client";
 import { deleteAiChat, getAiChatById } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
 
-export const deleteChat = protectedProcedure
+export const deleteChat = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/ai/chats/{id}",

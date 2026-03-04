@@ -6,11 +6,11 @@
 import { ORPCError } from "@orpc/server";
 import { getAttachment, deleteAttachment } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { rateLimitChecker, RATE_LIMITS } from "../../../lib/rate-limit";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 
-export const deleteAttachmentProcedure = protectedProcedure
+export const deleteAttachmentProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/attachments/delete",

@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { updateActivity } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const updateActivityProcedure = protectedProcedure
+export const updateActivityProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/project-execution/activities/{activityId}",

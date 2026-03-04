@@ -1,6 +1,6 @@
 import { createProjectClaim, getProjectById } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import {
 	notifyClaimCreated,
@@ -8,7 +8,7 @@ import {
 	getProjectManagers,
 } from "../../notifications/lib/notification-service";
 
-export const createClaim = protectedProcedure
+export const createClaim = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/projects/{projectId}/finance/claims",

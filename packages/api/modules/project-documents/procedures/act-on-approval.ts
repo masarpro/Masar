@@ -6,10 +6,10 @@ import {
 	getApproval,
 } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const actOnApprovalProcedure = protectedProcedure
+export const actOnApprovalProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/projects/{projectId}/approvals/{approvalId}/act",

@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { getCostStudyById, recalculateCostStudyTotals } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const recalculate = protectedProcedure
+export const recalculate = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/quantities/{id}/recalculate",

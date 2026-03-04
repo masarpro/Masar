@@ -1,10 +1,10 @@
 import { createDailyReport, getProjectById } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { notifyDailyReportCreated } from "../../notifications/lib/notification-service";
 
-export const createDailyReportProcedure = protectedProcedure
+export const createDailyReportProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-field/daily-reports",

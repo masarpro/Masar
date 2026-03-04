@@ -1,10 +1,10 @@
 import { createIssue, getProjectById } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { notifyIssueCreated } from "../../notifications/lib/notification-service";
 
-export const createIssueProcedure = protectedProcedure
+export const createIssueProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-field/issues",

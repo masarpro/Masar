@@ -113,7 +113,8 @@
       "Bash(rm:*)",
       "Bash(pnpm:*)",
       "Bash(npx next:*)",
-      "Bash(npx vercel:*)"
+      "Bash(npx vercel:*)",
+      "Bash(do:*)"
     ]
   }
 }

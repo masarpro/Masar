@@ -1,6 +1,6 @@
 import { createDocument, createNotifications, logAuditEvent } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
 const DocumentFolderEnum = z.enum([
@@ -12,7 +12,7 @@ const DocumentFolderEnum = z.enum([
 	"OTHER",
 ]);
 
-export const createDocumentProcedure = protectedProcedure
+export const createDocumentProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/projects/{projectId}/documents",

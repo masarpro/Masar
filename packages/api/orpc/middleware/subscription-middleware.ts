@@ -41,20 +41,29 @@ export async function checkSubscription(context: {
 		});
 	}
 
-	// Check trial expiration
+	// Check trial expiration — lazy update to FREE
 	if (
 		org.status === "TRIALING" &&
 		org.trialEndsAt &&
 		new Date() > org.trialEndsAt
 	) {
-		// Lazy update: mark as FREE instead of blocking
 		await db.organization.update({
 			where: { id: orgId },
 			data: { status: "ACTIVE", plan: "FREE" },
 		});
-		// Don't block — per-feature gates will handle limits
+		throw new ORPCError("FORBIDDEN", {
+			message:
+				"انتهت الفترة التجريبية. يرجى ترقية اشتراكك للمتابعة.",
+			data: { code: "UPGRADE_REQUIRED" },
+		});
 	}
 
-	// NOTE: Blanket FREE plan block removed.
-	// Per-feature gates (feature-gate.ts) now handle granular access control.
+	// Block FREE plan from write operations
+	if (org.plan === "FREE") {
+		throw new ORPCError("FORBIDDEN", {
+			message:
+				"هذه الميزة متاحة في الخطة الاحترافية فقط. يرجى ترقية اشتراكك.",
+			data: { code: "UPGRADE_REQUIRED" },
+		});
+	}
 }

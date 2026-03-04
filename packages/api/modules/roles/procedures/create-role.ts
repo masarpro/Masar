@@ -2,9 +2,9 @@ import { createRole as createRoleQuery } from "@repo/database";
 import type { Permissions } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const createRole = protectedProcedure
+export const createRole = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/roles",

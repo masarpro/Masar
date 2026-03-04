@@ -1,13 +1,13 @@
 import { createChangeOrder, logAuditEvent, getProjectById, getProjectContract, db } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import {
 	notifyChangeOrderCreated,
 	getProjectManagers,
 } from "../../notifications/lib/notification-service";
 
-export const createChangeOrderProcedure = protectedProcedure
+export const createChangeOrderProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-change-orders/create",

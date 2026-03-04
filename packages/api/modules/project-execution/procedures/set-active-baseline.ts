@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { setActiveBaseline } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const setActiveBaselineProcedure = protectedProcedure
+export const setActiveBaselineProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/project-execution/baselines/{baselineId}/activate",

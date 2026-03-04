@@ -1,12 +1,12 @@
 import { ORPCError } from "@orpc/server";
 import { db, type ExpenseCategory } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { generateExpensesCsv } from "../lib/csv-generator";
 
-export const exportExpensesCsvProcedure = protectedProcedure
+export const exportExpensesCsvProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/exports/expenses-csv",

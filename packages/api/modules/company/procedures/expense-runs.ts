@@ -11,7 +11,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 
 const expenseRunStatusEnum = z.enum([
 	"DRAFT",
@@ -84,7 +84,7 @@ export const getExpenseRunByIdProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // CREATE EXPENSE RUN
 // ═══════════════════════════════════════════════════════════════════════════
-export const createExpenseRunProcedure = protectedProcedure
+export const createExpenseRunProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/expense-runs",
@@ -124,7 +124,7 @@ export const createExpenseRunProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // POPULATE EXPENSE RUN
 // ═══════════════════════════════════════════════════════════════════════════
-export const populateExpenseRunProcedure = protectedProcedure
+export const populateExpenseRunProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/expense-runs/{id}/populate",
@@ -149,7 +149,7 @@ export const populateExpenseRunProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // POST EXPENSE RUN TO FINANCE
 // ═══════════════════════════════════════════════════════════════════════════
-export const postExpenseRunProcedure = protectedProcedure
+export const postExpenseRunProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/expense-runs/{id}/post",
@@ -177,7 +177,7 @@ export const postExpenseRunProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // CANCEL EXPENSE RUN
 // ═══════════════════════════════════════════════════════════════════════════
-export const cancelExpenseRunProcedure = protectedProcedure
+export const cancelExpenseRunProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/expense-runs/{id}/cancel",
@@ -202,7 +202,7 @@ export const cancelExpenseRunProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // UPDATE EXPENSE RUN ITEM
 // ═══════════════════════════════════════════════════════════════════════════
-export const updateExpenseRunItemProcedure = protectedProcedure
+export const updateExpenseRunItemProcedure = subscriptionProcedure
 	.route({
 		method: "PATCH",
 		path: "/company/expense-runs/items/{itemId}",
@@ -232,7 +232,7 @@ export const updateExpenseRunItemProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // DELETE EXPENSE RUN ITEM
 // ═══════════════════════════════════════════════════════════════════════════
-export const deleteExpenseRunItemProcedure = protectedProcedure
+export const deleteExpenseRunItemProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/company/expense-runs/items/{itemId}",

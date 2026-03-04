@@ -1,10 +1,10 @@
 import { upsertProjectContract, auditLog } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const upsertContract = protectedProcedure
+export const upsertContract = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/projects/{projectId}/contract",

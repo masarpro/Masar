@@ -1,8 +1,8 @@
 import { reorderChecklist } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const reorderChecklistProcedure = protectedProcedure
+export const reorderChecklistProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-execution/checklists/reorder",

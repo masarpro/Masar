@@ -1,9 +1,9 @@
 import { updateSubcontractChangeOrder, logAuditEvent } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const updateSubcontractChangeOrderProcedure = protectedProcedure
+export const updateSubcontractChangeOrderProcedure = subscriptionProcedure
 	.route({
 		method: "PATCH",
 		path: "/projects/{projectId}/subcontracts/{contractId}/change-orders/{changeOrderId}",

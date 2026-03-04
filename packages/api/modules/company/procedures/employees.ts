@@ -9,7 +9,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 
 const employeeTypeEnum = z.enum([
 	"PROJECT_MANAGER", "SITE_ENGINEER", "SUPERVISOR", "ACCOUNTANT",
@@ -83,7 +83,7 @@ export const getEmployeeByIdProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // CREATE EMPLOYEE
 // ═══════════════════════════════════════════════════════════════════════════
-export const createEmployeeProcedure = protectedProcedure
+export const createEmployeeProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/employees",
@@ -128,7 +128,7 @@ export const createEmployeeProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // UPDATE EMPLOYEE
 // ═══════════════════════════════════════════════════════════════════════════
-export const updateEmployeeProcedure = protectedProcedure
+export const updateEmployeeProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/company/employees/{id}",
@@ -171,7 +171,7 @@ export const updateEmployeeProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // TERMINATE EMPLOYEE
 // ═══════════════════════════════════════════════════════════════════════════
-export const terminateEmployeeProcedure = protectedProcedure
+export const terminateEmployeeProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/employees/{id}/terminate",

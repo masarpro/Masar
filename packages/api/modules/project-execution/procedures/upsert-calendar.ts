@@ -1,9 +1,9 @@
 import { upsertCalendar } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const upsertCalendarProcedure = protectedProcedure
+export const upsertCalendarProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-execution/calendar",

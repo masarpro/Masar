@@ -10,7 +10,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 
 const expenseCategoryEnum = z.enum([
 	"RENT", "UTILITIES", "COMMUNICATIONS", "INSURANCE", "LICENSES",
@@ -86,7 +86,7 @@ export const getCompanyExpenseByIdProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // CREATE COMPANY EXPENSE
 // ═══════════════════════════════════════════════════════════════════════════
-export const createCompanyExpenseProcedure = protectedProcedure
+export const createCompanyExpenseProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/expenses",
@@ -121,7 +121,7 @@ export const createCompanyExpenseProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // UPDATE COMPANY EXPENSE
 // ═══════════════════════════════════════════════════════════════════════════
-export const updateCompanyExpenseProcedure = protectedProcedure
+export const updateCompanyExpenseProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/company/expenses/{id}",
@@ -159,7 +159,7 @@ export const updateCompanyExpenseProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // DEACTIVATE COMPANY EXPENSE
 // ═══════════════════════════════════════════════════════════════════════════
-export const deactivateCompanyExpenseProcedure = protectedProcedure
+export const deactivateCompanyExpenseProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/expenses/{id}/deactivate",

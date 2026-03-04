@@ -1,10 +1,10 @@
 import { ORPCError } from "@orpc/server";
 import { deleteProjectClaim, db } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const deleteClaim = protectedProcedure
+export const deleteClaim = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/projects/{projectId}/finance/claims/{claimId}",

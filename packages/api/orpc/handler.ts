@@ -9,10 +9,31 @@ import { config } from "@repo/config";
 import { logger } from "@repo/logs";
 import { router } from "./router";
 
+// Error codes that are expected and should NOT be reported to Sentry
+const EXPECTED_ERROR_CODES = new Set([
+	"UNAUTHORIZED",
+	"FORBIDDEN",
+	"BAD_REQUEST",
+	"NOT_FOUND",
+	"TOO_MANY_REQUESTS",
+	"CONFLICT",
+]);
+
 export const rpcHandler = new RPCHandler(router, {
 	clientInterceptors: [
-		onError((error) => {
+		onError(async (error) => {
 			logger.error(error);
+			// Report unexpected errors to Sentry
+			const code = (error as any)?.code;
+			if (!EXPECTED_ERROR_CODES.has(code)) {
+				try {
+					// @ts-expect-error — @sentry/nextjs is provided by the host app (apps/web)
+					const Sentry = await import("@sentry/nextjs");
+					Sentry.captureException(error);
+				} catch {
+					// Sentry not available (e.g., development)
+				}
+			}
 		}),
 	],
 });
@@ -51,8 +72,18 @@ export const openApiHandler = new OpenAPIHandler(router, {
 		}),
 	],
 	clientInterceptors: [
-		onError((error) => {
+		onError(async (error) => {
 			logger.error(error);
+			const code = (error as any)?.code;
+			if (!EXPECTED_ERROR_CODES.has(code)) {
+				try {
+					// @ts-expect-error — @sentry/nextjs is provided by the host app (apps/web)
+					const Sentry = await import("@sentry/nextjs");
+					Sentry.captureException(error);
+				} catch {
+					// Sentry not available
+				}
+			}
 		}),
 	],
 });

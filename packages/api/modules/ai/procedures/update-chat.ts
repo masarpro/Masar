@@ -1,10 +1,10 @@
 import { ORPCError } from "@orpc/client";
 import { getAiChatById, updateAiChat } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
 
-export const updateChat = protectedProcedure
+export const updateChat = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/ai/chats/{id}",

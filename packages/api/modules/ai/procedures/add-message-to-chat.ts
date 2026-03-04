@@ -7,10 +7,10 @@ import {
 } from "@repo/ai";
 import { getAiChatById, updateAiChat } from "@repo/database";
 import z from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
 
-export const addMessageToChat = protectedProcedure
+export const addMessageToChat = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/ai/chats/{chatId}/messages",
@@ -26,6 +26,10 @@ export const addMessageToChat = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
+		// Strict rate limit for AI messages (5/min)
+		const { rateLimitChecker, RATE_LIMITS } = await import("../../../lib/rate-limit");
+		await rateLimitChecker(context.user.id, "ai.chats.messages.add", RATE_LIMITS.STRICT);
+
 		const { chatId, messages } = input;
 		const user = context.user;
 

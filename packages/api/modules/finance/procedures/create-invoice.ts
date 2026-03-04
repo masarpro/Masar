@@ -18,7 +18,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { ORPCError } from "@orpc/server";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { generateZatcaQR, generateZatcaQRImage } from "../../../lib/zatca";
@@ -32,7 +32,7 @@ const invoiceItemSchema = z.object({
 	unitPrice: z.number().min(0, "السعر يجب أن يكون صفر أو أكبر"),
 });
 
-export const createInvoiceProcedure = protectedProcedure
+export const createInvoiceProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/invoices",
@@ -137,7 +137,7 @@ export const createInvoiceProcedure = protectedProcedure
 		};
 	});
 
-export const updateInvoiceProcedure = protectedProcedure
+export const updateInvoiceProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/invoices/{id}",
@@ -204,7 +204,7 @@ export const updateInvoiceProcedure = protectedProcedure
 		};
 	});
 
-export const updateInvoiceItemsProcedure = protectedProcedure
+export const updateInvoiceItemsProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/invoices/{id}/items",
@@ -257,7 +257,7 @@ export const updateInvoiceItemsProcedure = protectedProcedure
 		};
 	});
 
-export const updateInvoiceStatusProcedure = protectedProcedure
+export const updateInvoiceStatusProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/invoices/{id}/status",
@@ -309,7 +309,7 @@ export const updateInvoiceStatusProcedure = protectedProcedure
 		};
 	});
 
-export const convertToTaxInvoiceProcedure = protectedProcedure
+export const convertToTaxInvoiceProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/invoices/{id}/convert-to-tax",
@@ -399,7 +399,7 @@ export const convertToTaxInvoiceProcedure = protectedProcedure
 		};
 	});
 
-export const addInvoicePaymentProcedure = protectedProcedure
+export const addInvoicePaymentProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/invoices/{id}/payments",
@@ -451,7 +451,7 @@ export const addInvoicePaymentProcedure = protectedProcedure
 		};
 	});
 
-export const deleteInvoicePaymentProcedure = protectedProcedure
+export const deleteInvoicePaymentProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/finance/invoices/{invoiceId}/payments/{paymentId}",
@@ -489,7 +489,7 @@ export const deleteInvoicePaymentProcedure = protectedProcedure
 		return { success: true };
 	});
 
-export const deleteInvoiceProcedure = protectedProcedure
+export const deleteInvoiceProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/finance/invoices/{id}",
@@ -525,7 +525,7 @@ export const deleteInvoiceProcedure = protectedProcedure
 // ISSUE INVOICE — إصدار الفاتورة رسمياً
 // ═══════════════════════════════════════════════════════════════════════════
 
-export const issueInvoiceProcedure = protectedProcedure
+export const issueInvoiceProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/invoices/{id}/issue",
@@ -680,7 +680,7 @@ export const issueInvoiceProcedure = protectedProcedure
 // DUPLICATE INVOICE — نسخ الفاتورة
 // ═══════════════════════════════════════════════════════════════════════════
 
-export const duplicateInvoiceProcedure = protectedProcedure
+export const duplicateInvoiceProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/invoices/{id}/duplicate",
@@ -736,7 +736,7 @@ export const duplicateInvoiceProcedure = protectedProcedure
 // CREATE CREDIT NOTE — إنشاء إشعار دائن
 // ═══════════════════════════════════════════════════════════════════════════
 
-export const createCreditNoteProcedure = protectedProcedure
+export const createCreditNoteProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/invoices/{id}/credit-note",
@@ -854,7 +854,7 @@ export const createCreditNoteProcedure = protectedProcedure
 // UPDATE INVOICE NOTES — تحديث ملاحظات الفاتورة (بدون قيود الحالة)
 // ═══════════════════════════════════════════════════════════════════════════
 
-export const updateInvoiceNotesProcedure = protectedProcedure
+export const updateInvoiceNotesProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/invoices/{id}/notes",
@@ -904,7 +904,7 @@ export const updateInvoiceNotesProcedure = protectedProcedure
 // GET INVOICE ACTIVITY — سجل نشاط الفاتورة
 // ═══════════════════════════════════════════════════════════════════════════
 
-export const getInvoiceActivityProcedure = protectedProcedure
+export const getInvoiceActivityProcedure = subscriptionProcedure
 	.route({
 		method: "GET",
 		path: "/finance/invoices/{id}/activity",

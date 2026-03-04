@@ -11,7 +11,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 
 const payrollRunStatusEnum = z.enum([
 	"DRAFT",
@@ -85,7 +85,7 @@ export const getPayrollRun = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // CREATE PAYROLL RUN
 // ═══════════════════════════════════════════════════════════════════════════
-export const createPayrollRunProcedure = protectedProcedure
+export const createPayrollRunProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/payroll",
@@ -126,7 +126,7 @@ export const createPayrollRunProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // POPULATE PAYROLL RUN
 // ═══════════════════════════════════════════════════════════════════════════
-export const populatePayrollRunProcedure = protectedProcedure
+export const populatePayrollRunProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/payroll/{id}/populate",
@@ -151,7 +151,7 @@ export const populatePayrollRunProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // APPROVE PAYROLL RUN
 // ═══════════════════════════════════════════════════════════════════════════
-export const approvePayrollRunProcedure = protectedProcedure
+export const approvePayrollRunProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/payroll/{id}/approve",
@@ -179,7 +179,7 @@ export const approvePayrollRunProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // CANCEL PAYROLL RUN
 // ═══════════════════════════════════════════════════════════════════════════
-export const cancelPayrollRunProcedure = protectedProcedure
+export const cancelPayrollRunProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/payroll/{id}/cancel",
@@ -204,7 +204,7 @@ export const cancelPayrollRunProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // UPDATE PAYROLL RUN ITEM
 // ═══════════════════════════════════════════════════════════════════════════
-export const updatePayrollRunItemProcedure = protectedProcedure
+export const updatePayrollRunItemProcedure = subscriptionProcedure
 	.route({
 		method: "PATCH",
 		path: "/company/payroll/items/{itemId}",
@@ -242,7 +242,7 @@ export const updatePayrollRunItemProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // DELETE PAYROLL RUN ITEM
 // ═══════════════════════════════════════════════════════════════════════════
-export const deletePayrollRunItemProcedure = protectedProcedure
+export const deletePayrollRunItemProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/company/payroll/items/{itemId}",

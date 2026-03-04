@@ -300,7 +300,9 @@ export async function enforceRateLimit(
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Create a rate limit checker for use in ORPC procedures
+ * Create a rate limit checker for use in ORPC procedures.
+ * Throws ORPCError(TOO_MANY_REQUESTS) instead of RateLimitError
+ * so ORPC returns a proper 429 response.
  */
 export async function rateLimitChecker(
 	userId: string,
@@ -308,7 +310,14 @@ export async function rateLimitChecker(
 	config: RateLimitConfig = RATE_LIMITS.WRITE,
 ): Promise<void> {
 	const key = createRateLimitKey(userId, procedureName);
-	await enforceRateLimit(key, config);
+	const result = await checkRateLimit(key, config);
+	if (!result.allowed) {
+		const { ORPCError } = await import("@orpc/server");
+		const retrySeconds = Math.ceil((result.retryAfterMs || 0) / 1000);
+		throw new ORPCError("TOO_MANY_REQUESTS", {
+			message: `تم تجاوز الحد المسموح من الطلبات. يرجى المحاولة بعد ${retrySeconds} ثانية`,
+		});
+	}
 }
 
 /**

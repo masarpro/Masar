@@ -1,9 +1,9 @@
 import { createSubcontractContract, logAuditEvent } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const createSubcontractProcedure = protectedProcedure
+export const createSubcontractProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/projects/{projectId}/subcontracts",

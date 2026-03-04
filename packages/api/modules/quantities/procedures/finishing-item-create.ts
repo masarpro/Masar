@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/server";
 import { createFinishingItem, createFinishingItemsBatch, getCostStudyById } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
 export const finishingItemSchema = z.object({
 	category: z.string(),
@@ -49,7 +49,7 @@ function convertFinishingItemDecimals(item: Record<string, unknown>) {
 	};
 }
 
-export const finishingItemCreate = protectedProcedure
+export const finishingItemCreate = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/quantities/{costStudyId}/finishing-items",
@@ -83,7 +83,7 @@ export const finishingItemCreate = protectedProcedure
 		return convertFinishingItemDecimals(item as unknown as Record<string, unknown>);
 	});
 
-export const finishingItemCreateBatch = protectedProcedure
+export const finishingItemCreateBatch = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/quantities/{costStudyId}/finishing-items/batch",

@@ -1,10 +1,10 @@
 import { updateClaimStatus, getProjectById, db } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { notifyClaimStatusChanged } from "../../notifications/lib/notification-service";
 
-export const updateClaimStatusProcedure = protectedProcedure
+export const updateClaimStatusProcedure = subscriptionProcedure
 	.route({
 		method: "PATCH",
 		path: "/projects/{projectId}/finance/claims/{claimId}/status",

@@ -1,6 +1,6 @@
 import { createClient } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 
 // نوع العميل
@@ -18,7 +18,7 @@ const secondaryAddressSchema = z
 	})
 	.optional();
 
-export const createClientProcedure = protectedProcedure
+export const createClientProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/clients",

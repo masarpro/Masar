@@ -1,9 +1,9 @@
 import { ORPCError } from "@orpc/server";
 import { toggleChecklistItem } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const toggleChecklistItemProcedure = protectedProcedure
+export const toggleChecklistItemProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/project-execution/checklists/{checklistId}/toggle",

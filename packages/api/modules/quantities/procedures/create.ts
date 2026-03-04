@@ -1,9 +1,9 @@
 import { createCostStudy } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const create = protectedProcedure
+export const create = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/quantities",

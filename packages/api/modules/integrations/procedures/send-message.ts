@@ -5,12 +5,12 @@ import {
 	updateMessageDeliveryStatus,
 } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { sendMessage, isChannelConfigured } from "../../../lib/messaging/send";
 import type { MessagingChannel } from "../../../lib/messaging/types";
 
-export const sendMessageProcedure = protectedProcedure
+export const sendMessageProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/integrations/send",
@@ -31,6 +31,10 @@ export const sendMessageProcedure = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
+		// Message rate limit (30/min)
+		const { rateLimitChecker, RATE_LIMITS } = await import("../../../lib/rate-limit");
+		await rateLimitChecker(context.user.id, "integrations.sendMessage", RATE_LIMITS.MESSAGE);
+
 		await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
@@ -98,7 +102,7 @@ export const sendMessageProcedure = protectedProcedure
 		};
 	});
 
-export const sendBulkMessages = protectedProcedure
+export const sendBulkMessages = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/integrations/send-bulk",
@@ -119,6 +123,10 @@ export const sendBulkMessages = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
+		// Strict rate limit for bulk messages (5/min)
+		const { rateLimitChecker, RATE_LIMITS } = await import("../../../lib/rate-limit");
+		await rateLimitChecker(context.user.id, "integrations.sendBulkMessages", RATE_LIMITS.STRICT);
+
 		await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,

@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { updateMilestone, deleteMilestone, reorderMilestones } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const updateMilestoneProcedure = protectedProcedure
+export const updateMilestoneProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/project-timeline/milestones/{milestoneId}",
@@ -65,7 +65,7 @@ export const updateMilestoneProcedure = protectedProcedure
 		}
 	});
 
-export const deleteMilestoneProcedure = protectedProcedure
+export const deleteMilestoneProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/project-timeline/milestones/{milestoneId}",
@@ -100,7 +100,7 @@ export const deleteMilestoneProcedure = protectedProcedure
 		}
 	});
 
-export const reorderMilestonesProcedure = protectedProcedure
+export const reorderMilestonesProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-timeline/milestones/reorder",

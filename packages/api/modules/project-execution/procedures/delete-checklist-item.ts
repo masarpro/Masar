@@ -1,9 +1,9 @@
 import { ORPCError } from "@orpc/server";
 import { deleteChecklistItem } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const deleteChecklistItemProcedure = protectedProcedure
+export const deleteChecklistItemProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/project-execution/checklists/{checklistId}",

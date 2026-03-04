@@ -1,9 +1,9 @@
 import { subscribeToDigest, getUserDigestSubscriptions } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const subscribeDigest = protectedProcedure
+export const subscribeDigest = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/digests/subscribe",
@@ -38,7 +38,7 @@ export const subscribeDigest = protectedProcedure
 		};
 	});
 
-export const listSubscriptions = protectedProcedure
+export const listSubscriptions = subscriptionProcedure
 	.route({
 		method: "GET",
 		path: "/digests/subscriptions",

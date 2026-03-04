@@ -2,11 +2,11 @@ import { ORPCError } from "@orpc/server";
 import { deletePhoto, getProjectMemberRole } from "@repo/database";
 import { hasPermission } from "@repo/database/prisma/permissions";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { getUserPermissions } from "../../../lib/permissions/get-user-permissions";
 
-export const deletePhotoProcedure = protectedProcedure
+export const deletePhotoProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/project-field/photos/{photoId}",

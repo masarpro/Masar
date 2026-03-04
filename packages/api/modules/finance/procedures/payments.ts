@@ -7,7 +7,7 @@ import {
 	orgAuditLog,
 } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 
 // Enums
@@ -102,7 +102,7 @@ export const getOrgPayment = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // CREATE PAYMENT (سند قبض)
 // ═══════════════════════════════════════════════════════════════════════════
-export const createOrgPaymentProcedure = protectedProcedure
+export const createOrgPaymentProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/org-payments",
@@ -164,7 +164,7 @@ export const createOrgPaymentProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // UPDATE PAYMENT
 // ═══════════════════════════════════════════════════════════════════════════
-export const updateOrgPaymentProcedure = protectedProcedure
+export const updateOrgPaymentProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/org-payments/{id}",
@@ -211,7 +211,7 @@ export const updateOrgPaymentProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // DELETE PAYMENT
 // ═══════════════════════════════════════════════════════════════════════════
-export const deleteOrgPaymentProcedure = protectedProcedure
+export const deleteOrgPaymentProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/finance/org-payments/{id}",

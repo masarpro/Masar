@@ -11,7 +11,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { ORPCError } from "@orpc/server";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 
 export const listFinanceTemplates = protectedProcedure
@@ -99,7 +99,7 @@ export const getDefaultTemplate = protectedProcedure
 		return template;
 	});
 
-export const createFinanceTemplateProcedure = protectedProcedure
+export const createFinanceTemplateProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/templates",
@@ -137,7 +137,7 @@ export const createFinanceTemplateProcedure = protectedProcedure
 		return template;
 	});
 
-export const updateFinanceTemplateProcedure = protectedProcedure
+export const updateFinanceTemplateProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/templates/{id}",
@@ -173,7 +173,7 @@ export const updateFinanceTemplateProcedure = protectedProcedure
 		}
 	});
 
-export const setDefaultTemplateProcedure = protectedProcedure
+export const setDefaultTemplateProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/templates/{id}/set-default",
@@ -200,7 +200,7 @@ export const setDefaultTemplateProcedure = protectedProcedure
 		return template;
 	});
 
-export const deleteFinanceTemplateProcedure = protectedProcedure
+export const deleteFinanceTemplateProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/finance/templates/{id}",
@@ -224,7 +224,7 @@ export const deleteFinanceTemplateProcedure = protectedProcedure
 		return { success: true };
 	});
 
-export const seedDefaultTemplates = protectedProcedure
+export const seedDefaultTemplates = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/templates/seed",

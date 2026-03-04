@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { deleteDependency } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const deleteDependencyProcedure = protectedProcedure
+export const deleteDependencyProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/project-execution/dependencies/{dependencyId}",

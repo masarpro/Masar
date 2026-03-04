@@ -9,7 +9,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { ORPCError } from "@orpc/server";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
 
@@ -20,7 +20,7 @@ const quotationItemSchema = z.object({
 	unitPrice: z.number().min(0, "السعر يجب أن يكون صفر أو أكبر"),
 });
 
-export const createQuotationProcedure = protectedProcedure
+export const createQuotationProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/quotations",
@@ -103,7 +103,7 @@ export const createQuotationProcedure = protectedProcedure
 		};
 	});
 
-export const updateQuotationProcedure = protectedProcedure
+export const updateQuotationProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/quotations/{id}",
@@ -160,7 +160,7 @@ export const updateQuotationProcedure = protectedProcedure
 		return quotation;
 	});
 
-export const updateQuotationItemsProcedure = protectedProcedure
+export const updateQuotationItemsProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/quotations/{id}/items",
@@ -212,7 +212,7 @@ export const updateQuotationItemsProcedure = protectedProcedure
 		};
 	});
 
-export const updateQuotationStatusProcedure = protectedProcedure
+export const updateQuotationStatusProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/quotations/{id}/status",
@@ -257,7 +257,7 @@ export const updateQuotationStatusProcedure = protectedProcedure
 		return quotation;
 	});
 
-export const deleteQuotationProcedure = protectedProcedure
+export const deleteQuotationProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/finance/quotations/{id}",
@@ -289,7 +289,7 @@ export const deleteQuotationProcedure = protectedProcedure
 		return { success: true };
 	});
 
-export const convertQuotationToInvoiceProcedure = protectedProcedure
+export const convertQuotationToInvoiceProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/quotations/{id}/convert",

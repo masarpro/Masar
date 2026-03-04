@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { toggleUserActive as toggleUserActiveQuery } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const toggleUserActive = protectedProcedure
+export const toggleUserActive = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/org-users/{id}/toggle-active",

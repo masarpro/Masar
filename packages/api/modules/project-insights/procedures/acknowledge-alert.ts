@@ -1,9 +1,9 @@
 import { acknowledgeAlert } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const acknowledgeAlertProcedure = protectedProcedure
+export const acknowledgeAlertProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/projects/:projectId/insights/:alertId/acknowledge",

@@ -1,11 +1,11 @@
 import { ORPCError } from "@orpc/server";
 import { updateIntegrationSettings } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { isChannelConfigured } from "../../../lib/messaging/send";
 
-export const updateSettings = protectedProcedure
+export const updateSettings = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/integrations/settings",

@@ -1,3 +1,4 @@
+import { withSentryConfig } from "@sentry/nextjs";
 import { withContentCollections } from "@content-collections/next";
 // @ts-expect-error - PrismaPlugin is not typed
 import { PrismaPlugin } from "@prisma/nextjs-monorepo-workaround-plugin";
@@ -225,4 +226,14 @@ const nextConfig: NextConfig = {
 	},
 };
 
-export default withContentCollections(withNextIntl(nextConfig));
+export default withSentryConfig(
+	withContentCollections(withNextIntl(nextConfig)),
+	{
+		org: process.env.SENTRY_ORG,
+		project: process.env.SENTRY_PROJECT,
+		silent: !process.env.CI,
+		sourcemaps: {
+			deleteSourcemapsAfterUpload: true,
+		},
+	},
+);

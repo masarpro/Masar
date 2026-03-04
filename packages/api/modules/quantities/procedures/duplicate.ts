@@ -3,9 +3,9 @@ import { duplicateCostStudy as duplicateCostStudyQuery } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const duplicate = protectedProcedure
+export const duplicate = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/quantities/{id}/duplicate",

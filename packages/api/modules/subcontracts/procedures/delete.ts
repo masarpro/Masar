@@ -1,9 +1,9 @@
 import { deleteSubcontractContract, logAuditEvent } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const deleteSubcontractProcedure = protectedProcedure
+export const deleteSubcontractProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/projects/{projectId}/subcontracts/{contractId}",

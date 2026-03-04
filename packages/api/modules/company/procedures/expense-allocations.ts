@@ -5,7 +5,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LIST EXPENSE ALLOCATIONS
@@ -35,7 +35,7 @@ export const listExpenseAllocations = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // SET EXPENSE ALLOCATIONS (replace all)
 // ═══════════════════════════════════════════════════════════════════════════
-export const setExpenseAllocationsProcedure = protectedProcedure
+export const setExpenseAllocationsProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/company/expenses/{expenseId}/allocations",

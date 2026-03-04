@@ -6,7 +6,7 @@ import {
 	orgAuditLog,
 } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 
 // Enums
@@ -91,7 +91,7 @@ export const getTransfer = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // CREATE TRANSFER
 // ═══════════════════════════════════════════════════════════════════════════
-export const createTransferProcedure = protectedProcedure
+export const createTransferProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/transfers",
@@ -143,7 +143,7 @@ export const createTransferProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // CANCEL TRANSFER
 // ═══════════════════════════════════════════════════════════════════════════
-export const cancelTransferProcedure = protectedProcedure
+export const cancelTransferProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/transfers/{id}/cancel",

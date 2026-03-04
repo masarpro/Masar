@@ -7,9 +7,9 @@ import {
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const createOrgUser = protectedProcedure
+export const createOrgUser = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/org-users",

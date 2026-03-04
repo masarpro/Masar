@@ -1,10 +1,10 @@
 import { setSubcontractPaymentTerms, getSubcontractById } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const setSubcontractPaymentTermsProcedure = protectedProcedure
+export const setSubcontractPaymentTermsProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/projects/{projectId}/subcontracts/{contractId}/payment-terms",

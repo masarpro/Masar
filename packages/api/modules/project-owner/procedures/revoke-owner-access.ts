@@ -1,9 +1,9 @@
 import { revokeOwnerAccess, logAuditEvent } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const revokeOwnerAccessProcedure = protectedProcedure
+export const revokeOwnerAccessProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/projects/{projectId}/owner-access/{accessId}/revoke",

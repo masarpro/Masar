@@ -7,7 +7,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LIST EMPLOYEE ASSIGNMENTS
@@ -62,7 +62,7 @@ export const listProjectAssignments = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // CREATE ASSIGNMENT
 // ═══════════════════════════════════════════════════════════════════════════
-export const createAssignmentProcedure = protectedProcedure
+export const createAssignmentProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/employees/{employeeId}/assignments",
@@ -97,7 +97,7 @@ export const createAssignmentProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // UPDATE ASSIGNMENT
 // ═══════════════════════════════════════════════════════════════════════════
-export const updateAssignmentProcedure = protectedProcedure
+export const updateAssignmentProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/company/employee-assignments/{id}",
@@ -128,7 +128,7 @@ export const updateAssignmentProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // REMOVE ASSIGNMENT
 // ═══════════════════════════════════════════════════════════════════════════
-export const removeAssignmentProcedure = protectedProcedure
+export const removeAssignmentProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/company/employee-assignments/{id}",

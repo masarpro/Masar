@@ -2,10 +2,10 @@ import { ORPCError } from "@orpc/server";
 import { config } from "@repo/config";
 import { getSignedUploadUrl } from "@repo/storage";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
 
-export const createFinanceLogoUploadUrl = protectedProcedure
+export const createFinanceLogoUploadUrl = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/settings/logo-upload-url",

@@ -1,11 +1,11 @@
 import { ORPCError } from "@orpc/server";
 import { addProjectMember, getProjectById } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { notifyTeamMemberAdded } from "../../notifications/lib/notification-service";
 
-export const addMember = protectedProcedure
+export const addMember = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/projects/{projectId}/team",

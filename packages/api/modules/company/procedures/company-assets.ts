@@ -11,7 +11,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 
 const assetCategoryEnum = z.enum([
 	"HEAVY_EQUIPMENT", "LIGHT_EQUIPMENT", "VEHICLES", "TOOLS",
@@ -87,7 +87,7 @@ export const getAssetByIdProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // CREATE ASSET
 // ═══════════════════════════════════════════════════════════════════════════
-export const createAssetProcedure = protectedProcedure
+export const createAssetProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/assets",
@@ -127,7 +127,7 @@ export const createAssetProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // UPDATE ASSET
 // ═══════════════════════════════════════════════════════════════════════════
-export const updateAssetProcedure = protectedProcedure
+export const updateAssetProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/company/assets/{id}",
@@ -170,7 +170,7 @@ export const updateAssetProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // DEACTIVATE (RETIRE) ASSET
 // ═══════════════════════════════════════════════════════════════════════════
-export const deactivateAssetProcedure = protectedProcedure
+export const deactivateAssetProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/assets/{id}/retire",
@@ -195,7 +195,7 @@ export const deactivateAssetProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // ASSIGN ASSET TO PROJECT
 // ═══════════════════════════════════════════════════════════════════════════
-export const assignAssetToProjectProcedure = protectedProcedure
+export const assignAssetToProjectProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/assets/{id}/assign",
@@ -221,7 +221,7 @@ export const assignAssetToProjectProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // RETURN ASSET TO WAREHOUSE
 // ═══════════════════════════════════════════════════════════════════════════
-export const returnAssetProcedure = protectedProcedure
+export const returnAssetProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/assets/{id}/return",

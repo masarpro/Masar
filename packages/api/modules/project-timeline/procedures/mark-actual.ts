@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { markActual } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const markActualProcedure = protectedProcedure
+export const markActualProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-timeline/milestones/{milestoneId}/actual",
@@ -49,7 +49,7 @@ export const markActualProcedure = protectedProcedure
 		}
 	});
 
-export const startMilestoneProcedure = protectedProcedure
+export const startMilestoneProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-timeline/milestones/{milestoneId}/start",
@@ -87,7 +87,7 @@ export const startMilestoneProcedure = protectedProcedure
 		}
 	});
 
-export const completeMilestoneProcedure = protectedProcedure
+export const completeMilestoneProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-timeline/milestones/{milestoneId}/complete",

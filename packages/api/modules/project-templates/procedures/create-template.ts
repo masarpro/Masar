@@ -1,9 +1,9 @@
 import { createTemplate, createTemplateFromProject } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const createTemplateProcedure = protectedProcedure
+export const createTemplateProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-templates",

@@ -1,4 +1,4 @@
-import { encodeZatcaTLV, type ZatcaTLVData } from "./tlv-encoder";
+import { encodeZatcaTLV, decodeZatcaTLV, type ZatcaTLVData } from "./tlv-encoder";
 
 /**
  * Convert Uint8Array to Base64 string
@@ -104,7 +104,6 @@ export function validateZatcaQR(base64Content: string): ZatcaTLVData {
 	}
 
 	// Try to decode TLV
-	const { decodeZatcaTLV } = require("./tlv-encoder");
 	const data = decodeZatcaTLV(bytes);
 
 	// Validate required fields

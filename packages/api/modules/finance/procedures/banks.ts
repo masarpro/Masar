@@ -11,7 +11,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 
 // Enums
 const financeAccountTypeEnum = z.enum(["BANK", "CASH_BOX"]);
@@ -109,7 +109,7 @@ export const getBalancesSummary = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // CREATE BANK ACCOUNT
 // ═══════════════════════════════════════════════════════════════════════════
-export const createBankAccountProcedure = protectedProcedure
+export const createBankAccountProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/banks",
@@ -165,7 +165,7 @@ export const createBankAccountProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // UPDATE BANK ACCOUNT
 // ═══════════════════════════════════════════════════════════════════════════
-export const updateBankAccountProcedure = protectedProcedure
+export const updateBankAccountProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/banks/{id}",
@@ -211,7 +211,7 @@ export const updateBankAccountProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // SET DEFAULT BANK ACCOUNT
 // ═══════════════════════════════════════════════════════════════════════════
-export const setDefaultBankAccountProcedure = protectedProcedure
+export const setDefaultBankAccountProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/banks/{id}/set-default",
@@ -246,7 +246,7 @@ export const setDefaultBankAccountProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // DELETE BANK ACCOUNT
 // ═══════════════════════════════════════════════════════════════════════════
-export const deleteBankAccountProcedure = protectedProcedure
+export const deleteBankAccountProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/finance/banks/{id}",

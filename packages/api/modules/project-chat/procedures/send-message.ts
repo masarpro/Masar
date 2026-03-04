@@ -6,12 +6,12 @@ import {
 	db,
 } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
 const MessageChannelEnum = z.enum(["TEAM", "OWNER"]);
 
-export const sendMessageProcedure = protectedProcedure
+export const sendMessageProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/projects/{projectId}/chat",
@@ -29,6 +29,10 @@ export const sendMessageProcedure = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
+		// Message rate limit (30/min)
+		const { rateLimitChecker, RATE_LIMITS } = await import("../../../lib/rate-limit");
+		await rateLimitChecker(context.user.id, "project-chat.sendMessage", RATE_LIMITS.MESSAGE);
+
 		const { project } = await verifyProjectAccess(
 			input.projectId,
 			input.organizationId,

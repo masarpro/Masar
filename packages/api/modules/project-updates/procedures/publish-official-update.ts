@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const publishOfficialUpdate = protectedProcedure
+export const publishOfficialUpdate = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/projects/:projectId/updates/publish",

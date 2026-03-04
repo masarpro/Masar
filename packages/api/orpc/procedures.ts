@@ -25,6 +25,12 @@ export const protectedProcedure = publicProcedure.use(
 			});
 		}
 
+		// Rate limit: READ preset (60/min per user)
+		const { rateLimitChecker, RATE_LIMITS } = await import(
+			"../lib/rate-limit"
+		);
+		await rateLimitChecker(session.user.id, "global", RATE_LIMITS.READ);
+
 		return await next({
 			context: {
 				session: session.session,
@@ -50,6 +56,13 @@ export const subscriptionProcedure = protectedProcedure.use(
 			"./middleware/subscription-middleware"
 		);
 		await checkSubscription(context);
+
+		// Rate limit: WRITE preset (20/min per user)
+		const { rateLimitChecker, RATE_LIMITS } = await import(
+			"../lib/rate-limit"
+		);
+		await rateLimitChecker(context.user.id, "global-write", RATE_LIMITS.WRITE);
+
 		return await next();
 	},
 );

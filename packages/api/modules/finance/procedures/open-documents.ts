@@ -7,7 +7,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { ORPCError } from "@orpc/server";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 
 export const listOpenDocuments = protectedProcedure
@@ -74,7 +74,7 @@ export const getOpenDocument = protectedProcedure
 		return document;
 	});
 
-export const createOpenDocumentProcedure = protectedProcedure
+export const createOpenDocumentProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/documents",
@@ -118,7 +118,7 @@ export const createOpenDocumentProcedure = protectedProcedure
 		return document;
 	});
 
-export const updateOpenDocumentProcedure = protectedProcedure
+export const updateOpenDocumentProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/documents/{id}",
@@ -158,7 +158,7 @@ export const updateOpenDocumentProcedure = protectedProcedure
 		return document;
 	});
 
-export const deleteOpenDocumentProcedure = protectedProcedure
+export const deleteOpenDocumentProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/finance/documents/{id}",

@@ -1,9 +1,9 @@
 import { createPhoto } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const createPhotoProcedure = protectedProcedure
+export const createPhotoProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-field/photos",
@@ -24,6 +24,10 @@ export const createPhotoProcedure = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
+		// Upload rate limit (10/min)
+		const { rateLimitChecker, RATE_LIMITS } = await import("../../../lib/rate-limit");
+		await rateLimitChecker(context.user.id, "project-field.createPhoto", RATE_LIMITS.UPLOAD);
+
 		// Verify membership, project access, and permission
 		await verifyProjectAccess(
 			input.projectId,

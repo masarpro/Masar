@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { reorderFinishingItems, getCostStudyById } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const finishingItemReorder = protectedProcedure
+export const finishingItemReorder = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/quantities/{costStudyId}/finishing-items/reorder",

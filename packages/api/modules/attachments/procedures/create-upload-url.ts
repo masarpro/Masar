@@ -7,7 +7,7 @@ import { ORPCError } from "@orpc/server";
 import { validateAttachment, validateFileName } from "@repo/database";
 import { getSignedUploadUrl } from "@repo/storage";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { rateLimitChecker, RATE_LIMITS } from "../../../lib/rate-limit";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 
@@ -23,7 +23,7 @@ const AttachmentOwnerTypeEnum = z.enum([
 // Get bucket name from config or default
 const ATTACHMENTS_BUCKET = process.env.S3_ATTACHMENTS_BUCKET || "attachments";
 
-export const createUploadUrlProcedure = protectedProcedure
+export const createUploadUrlProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/attachments/upload-url",

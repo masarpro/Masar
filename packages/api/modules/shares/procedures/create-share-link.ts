@@ -1,9 +1,9 @@
 import { createShareLink } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const createShareLinkProcedure = protectedProcedure
+export const createShareLinkProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/shares/create",

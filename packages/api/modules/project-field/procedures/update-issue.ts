@@ -1,9 +1,9 @@
 import { updateIssue } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const updateIssueProcedure = protectedProcedure
+export const updateIssueProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/project-field/issues/{id}",

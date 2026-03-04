@@ -1,10 +1,10 @@
 import { ORPCError } from "@orpc/server";
 import { updateChangeOrder, deleteChangeOrder } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const updateChangeOrderProcedure = protectedProcedure
+export const updateChangeOrderProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-change-orders/{changeOrderId}/update",
@@ -77,7 +77,7 @@ export const updateChangeOrderProcedure = protectedProcedure
 		}
 	});
 
-export const deleteChangeOrderProcedure = protectedProcedure
+export const deleteChangeOrderProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-change-orders/{changeOrderId}/delete",

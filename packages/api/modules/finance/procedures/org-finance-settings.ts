@@ -7,7 +7,7 @@ import {
 	updateOrganizationFinanceSettings,
 } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 
 /**
@@ -45,7 +45,7 @@ export const getOrgFinanceSettingsProcedure = protectedProcedure
 /**
  * Update organization finance settings
  */
-export const updateOrgFinanceSettingsProcedure = protectedProcedure
+export const updateOrgFinanceSettingsProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/settings",

@@ -8,7 +8,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LIST EXPENSE PAYMENTS
@@ -45,7 +45,7 @@ export const listExpensePayments = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // CREATE EXPENSE PAYMENT
 // ═══════════════════════════════════════════════════════════════════════════
-export const createExpensePaymentProcedure = protectedProcedure
+export const createExpensePaymentProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/expenses/{expenseId}/payments",
@@ -80,7 +80,7 @@ export const createExpensePaymentProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // MARK PAYMENT AS PAID
 // ═══════════════════════════════════════════════════════════════════════════
-export const markPaymentPaidProcedure = protectedProcedure
+export const markPaymentPaidProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/expense-payments/{id}/mark-paid",
@@ -114,7 +114,7 @@ export const markPaymentPaidProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // UPDATE EXPENSE PAYMENT
 // ═══════════════════════════════════════════════════════════════════════════
-export const updateExpensePaymentProcedure = protectedProcedure
+export const updateExpensePaymentProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/company/expense-payments/{id}",
@@ -147,7 +147,7 @@ export const updateExpensePaymentProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // DELETE EXPENSE PAYMENT
 // ═══════════════════════════════════════════════════════════════════════════
-export const deleteExpensePaymentProcedure = protectedProcedure
+export const deleteExpensePaymentProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/company/expense-payments/{id}",
@@ -172,7 +172,7 @@ export const deleteExpensePaymentProcedure = protectedProcedure
 // ═══════════════════════════════════════════════════════════════════════════
 // GENERATE MONTHLY PAYMENTS
 // ═══════════════════════════════════════════════════════════════════════════
-export const generateMonthlyPaymentsProcedure = protectedProcedure
+export const generateMonthlyPaymentsProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/company/expenses/{expenseId}/generate-payments",

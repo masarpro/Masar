@@ -6,9 +6,9 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const updateRole = protectedProcedure
+export const updateRole = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/roles/{id}",

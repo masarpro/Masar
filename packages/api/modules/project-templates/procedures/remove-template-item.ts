@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { removeTemplateItem } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const removeTemplateItemProcedure = protectedProcedure
+export const removeTemplateItemProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/project-templates/{templateId}/items/{itemId}",

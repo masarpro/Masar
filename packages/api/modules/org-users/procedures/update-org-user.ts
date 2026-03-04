@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { updateOrgUser as updateOrgUserQuery } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const updateOrgUser = protectedProcedure
+export const updateOrgUser = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/org-users/{id}",

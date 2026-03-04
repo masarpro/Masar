@@ -1,11 +1,11 @@
 import { ORPCError } from "@orpc/client";
 import { createAiChat, db } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
 
-export const createChat = protectedProcedure
+export const createChat = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/ai/chats",
@@ -20,6 +20,10 @@ export const createChat = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
+		// Strict rate limit for AI chat creation (5/min)
+		const { rateLimitChecker, RATE_LIMITS } = await import("../../../lib/rate-limit");
+		await rateLimitChecker(context.user.id, "ai.chats.create", RATE_LIMITS.STRICT);
+
 		const { title, organizationId } = input;
 		const user = context.user;
 

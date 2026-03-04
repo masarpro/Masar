@@ -10,13 +10,13 @@ import {
 	getOrganizationAdminUserIds,
 } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
 /**
  * Submit a change order for approval (DRAFT -> SUBMITTED)
  */
-export const submitChangeOrderProcedure = protectedProcedure
+export const submitChangeOrderProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-change-orders/{changeOrderId}/submit",
@@ -93,7 +93,7 @@ export const submitChangeOrderProcedure = protectedProcedure
 /**
  * Approve a change order (SUBMITTED -> APPROVED)
  */
-export const approveChangeOrderProcedure = protectedProcedure
+export const approveChangeOrderProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-change-orders/{changeOrderId}/approve",
@@ -177,7 +177,7 @@ export const approveChangeOrderProcedure = protectedProcedure
 /**
  * Reject a change order (SUBMITTED -> REJECTED)
  */
-export const rejectChangeOrderProcedure = protectedProcedure
+export const rejectChangeOrderProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-change-orders/{changeOrderId}/reject",
@@ -261,7 +261,7 @@ export const rejectChangeOrderProcedure = protectedProcedure
 /**
  * Mark a change order as implemented (APPROVED -> IMPLEMENTED)
  */
-export const markImplementedProcedure = protectedProcedure
+export const markImplementedProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/project-change-orders/{changeOrderId}/implement",

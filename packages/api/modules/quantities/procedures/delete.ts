@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { deleteCostStudy as deleteCostStudyQuery } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const deleteCostStudy = protectedProcedure
+export const deleteCostStudy = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/quantities/{id}",

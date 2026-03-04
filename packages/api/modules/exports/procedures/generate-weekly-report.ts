@@ -1,12 +1,12 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { generateWeeklyReportPDF } from "../lib/pdf-generator";
 
-export const generateWeeklyReportProcedure = protectedProcedure
+export const generateWeeklyReportProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/exports/weekly-report",

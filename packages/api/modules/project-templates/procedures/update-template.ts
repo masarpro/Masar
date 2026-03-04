@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { updateTemplate } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const updateTemplateProcedure = protectedProcedure
+export const updateTemplateProcedure = subscriptionProcedure
 	.route({
 		method: "PATCH",
 		path: "/project-templates/{id}",

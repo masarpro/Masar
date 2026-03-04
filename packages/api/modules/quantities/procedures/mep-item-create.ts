@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/server";
 import { createMEPItem, createMEPItemsBatch, getCostStudyById } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
 const mepItemSchema = z.object({
 	category: z.string(),
@@ -15,7 +15,7 @@ const mepItemSchema = z.object({
 	totalCost: z.number().default(0),
 });
 
-export const mepItemCreate = protectedProcedure
+export const mepItemCreate = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/quantities/{costStudyId}/mep-items",
@@ -55,7 +55,7 @@ export const mepItemCreate = protectedProcedure
 		};
 	});
 
-export const mepItemCreateBatch = protectedProcedure
+export const mepItemCreateBatch = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/quantities/{costStudyId}/mep-items/batch",

@@ -1,10 +1,10 @@
 import { ORPCError } from "@orpc/server";
 import { updateProject } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const updateProjectProcedure = protectedProcedure
+export const updateProjectProcedure = subscriptionProcedure
 	.route({
 		method: "PATCH",
 		path: "/projects/{id}",

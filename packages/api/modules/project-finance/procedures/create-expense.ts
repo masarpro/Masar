@@ -1,10 +1,10 @@
 import { createProjectExpense, getProjectById } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { notifyExpenseCreated, getProjectAccountants } from "../../notifications/lib/notification-service";
 
-export const createExpense = protectedProcedure
+export const createExpense = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/projects/{projectId}/finance/expenses",

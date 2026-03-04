@@ -1,10 +1,10 @@
 import { createProject } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
 
-export const createProjectProcedure = protectedProcedure
+export const createProjectProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/projects",

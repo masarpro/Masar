@@ -6,7 +6,7 @@
 import { createAttachment, auditLog, validateAttachment, validateFileName, validateFileHeader } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { rateLimitChecker, RATE_LIMITS } from "../../../lib/rate-limit";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 
@@ -19,7 +19,7 @@ const AttachmentOwnerTypeEnum = z.enum([
 	"CLAIM",
 ]);
 
-export const finalizeUploadProcedure = protectedProcedure
+export const finalizeUploadProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/attachments/finalize",

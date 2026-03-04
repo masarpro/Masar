@@ -1,11 +1,11 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
 import { generateICS, generateEventUID, type ICSEvent } from "../lib/ics-generator";
 
-export const generateCalendarICSProcedure = protectedProcedure
+export const generateCalendarICSProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/exports/calendar-ics",

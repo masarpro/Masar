@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { createQuote, getCostStudyById, getQuoteById, updateQuote, deleteQuote as deleteQuoteQuery, getQuotesByCostStudyId } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const quoteCreate = protectedProcedure
+export const quoteCreate = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/quantities/{costStudyId}/quotes",
@@ -68,7 +68,7 @@ export const quoteCreate = protectedProcedure
 		};
 	});
 
-export const quoteGetById = protectedProcedure
+export const quoteGetById = subscriptionProcedure
 	.route({
 		method: "GET",
 		path: "/quantities/quotes/{id}",
@@ -106,7 +106,7 @@ export const quoteGetById = protectedProcedure
 		};
 	});
 
-export const quoteUpdate = protectedProcedure
+export const quoteUpdate = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/quantities/quotes/{id}",
@@ -172,7 +172,7 @@ export const quoteUpdate = protectedProcedure
 		};
 	});
 
-export const quoteDelete = protectedProcedure
+export const quoteDelete = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/quantities/quotes/{id}",
@@ -205,7 +205,7 @@ export const quoteDelete = protectedProcedure
 		return { success: true };
 	});
 
-export const quoteList = protectedProcedure
+export const quoteList = subscriptionProcedure
 	.route({
 		method: "GET",
 		path: "/quantities/{costStudyId}/quotes",

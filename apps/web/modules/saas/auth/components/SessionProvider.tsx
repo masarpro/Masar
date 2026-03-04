@@ -1,4 +1,5 @@
 "use client";
+import * as Sentry from "@sentry/nextjs";
 import { authClient } from "@repo/auth/client";
 import { sessionQueryKey, useSessionQuery } from "@saas/auth/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
@@ -14,6 +15,15 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 	useEffect(() => {
 		if (session && !loaded) {
 			setLoaded(true);
+		}
+		// Set Sentry user context when session is available
+		if (session?.user) {
+			Sentry.setUser({
+				id: session.user.id,
+				email: session.user.email,
+			});
+		} else if (loaded && !session) {
+			Sentry.setUser(null);
 		}
 	}, [session]);
 

@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import { updateStructuralItem, getCostStudyById } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const structuralItemUpdate = protectedProcedure
+export const structuralItemUpdate = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/quantities/{costStudyId}/structural-items/{id}",

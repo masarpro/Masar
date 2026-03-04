@@ -1,10 +1,10 @@
 import { ORPCError } from "@orpc/server";
 import { revokeShareLink } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const revokeShareLinkProcedure = protectedProcedure
+export const revokeShareLinkProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/shares/revoke",

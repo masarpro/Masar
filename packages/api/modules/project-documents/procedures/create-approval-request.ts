@@ -7,10 +7,10 @@ import {
 	db,
 } from "@repo/database";
 import { z } from "zod";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const createApprovalRequestProcedure = protectedProcedure
+export const createApprovalRequestProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/projects/{projectId}/documents/{documentId}/approvals",

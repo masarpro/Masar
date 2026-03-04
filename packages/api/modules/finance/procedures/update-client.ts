@@ -10,7 +10,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { ORPCError } from "@orpc/server";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 
 // نوع العميل
@@ -29,7 +29,7 @@ const secondaryAddressSchema = z
 	.nullable()
 	.optional();
 
-export const updateClientProcedure = protectedProcedure
+export const updateClientProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/clients/{id}",
@@ -90,7 +90,7 @@ export const updateClientProcedure = protectedProcedure
 		return client;
 	});
 
-export const deleteClientProcedure = protectedProcedure
+export const deleteClientProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/finance/clients/{id}",
@@ -114,7 +114,7 @@ export const deleteClientProcedure = protectedProcedure
 		return { success: true };
 	});
 
-export const getClient = protectedProcedure
+export const getClient = subscriptionProcedure
 	.route({
 		method: "GET",
 		path: "/finance/clients/{id}",
@@ -146,7 +146,7 @@ export const getClient = protectedProcedure
 // CLIENT CONTACTS PROCEDURES - إجراءات جهات الاتصال
 // ═══════════════════════════════════════════════════════════════════════════
 
-export const listClientContacts = protectedProcedure
+export const listClientContacts = subscriptionProcedure
 	.route({
 		method: "GET",
 		path: "/finance/clients/{clientId}/contacts",
@@ -175,7 +175,7 @@ export const listClientContacts = protectedProcedure
 		return contacts;
 	});
 
-export const createClientContactProcedure = protectedProcedure
+export const createClientContactProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/finance/clients/{clientId}/contacts",
@@ -221,7 +221,7 @@ export const createClientContactProcedure = protectedProcedure
 		return contact;
 	});
 
-export const updateClientContactProcedure = protectedProcedure
+export const updateClientContactProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/clients/{clientId}/contacts/{contactId}",
@@ -264,7 +264,7 @@ export const updateClientContactProcedure = protectedProcedure
 		return contact;
 	});
 
-export const deleteClientContactProcedure = protectedProcedure
+export const deleteClientContactProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
 		path: "/finance/clients/{clientId}/contacts/{contactId}",
@@ -295,7 +295,7 @@ export const deleteClientContactProcedure = protectedProcedure
 		return { success: true };
 	});
 
-export const setClientContactAsPrimaryProcedure = protectedProcedure
+export const setClientContactAsPrimaryProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/finance/clients/{clientId}/contacts/{contactId}/primary",

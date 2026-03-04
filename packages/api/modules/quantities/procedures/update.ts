@@ -3,9 +3,9 @@ import { updateCostStudy as updateCostStudyQuery } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const update = protectedProcedure
+export const update = subscriptionProcedure
 	.route({
 		method: "PUT",
 		path: "/quantities/{id}",
