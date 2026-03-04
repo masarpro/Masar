@@ -226,14 +226,17 @@ const nextConfig: NextConfig = {
 	},
 };
 
-export default withSentryConfig(
-	withContentCollections(withNextIntl(nextConfig)),
-	{
-		org: process.env.SENTRY_ORG,
-		project: process.env.SENTRY_PROJECT,
-		silent: !process.env.CI,
-		sourcemaps: {
-			deleteSourcemapsAfterUpload: true,
-		},
-	},
-);
+const wrappedConfig = withContentCollections(withNextIntl(nextConfig));
+
+const finalConfig = process.env.SENTRY_AUTH_TOKEN
+	? withSentryConfig(wrappedConfig, {
+			org: process.env.SENTRY_ORG,
+			project: process.env.SENTRY_PROJECT,
+			silent: !process.env.CI,
+			sourcemaps: {
+				deleteSourcemapsAfterUpload: true,
+			},
+		})
+	: wrappedConfig;
+
+export default finalConfig;
