@@ -15,6 +15,7 @@ import {
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess, verifyProjectAccess } from "../../../lib/permissions";
+import { enforceFeatureAccess } from "../../../lib/feature-gate";
 
 export const getFinanceDashboard = protectedProcedure
 	.route({
@@ -112,6 +113,8 @@ export const getFinanceRevenueByPeriod = protectedProcedure
 			action: "reports",
 		});
 
+		await enforceFeatureAccess(input.organizationId, "reports.detailed", context.user);
+
 		const revenue = await getRevenueByPeriod(
 			input.organizationId,
 			new Date(input.startDate),
@@ -139,6 +142,8 @@ export const getFinanceRevenueByProject = protectedProcedure
 			action: "reports",
 		});
 
+		await enforceFeatureAccess(input.organizationId, "reports.detailed", context.user);
+
 		const revenue = await getRevenueByProject(input.organizationId);
 
 		return revenue;
@@ -162,6 +167,8 @@ export const getFinanceRevenueByClient = protectedProcedure
 			section: "finance",
 			action: "reports",
 		});
+
+		await enforceFeatureAccess(input.organizationId, "reports.detailed", context.user);
 
 		const revenue = await getRevenueByClient(input.organizationId, input.limit);
 
@@ -187,6 +194,8 @@ export const getFinanceConversionRate = protectedProcedure
 			section: "finance",
 			action: "reports",
 		});
+
+		await enforceFeatureAccess(input.organizationId, "reports.detailed", context.user);
 
 		const rate = await getQuotationConversionRate(
 			input.organizationId,

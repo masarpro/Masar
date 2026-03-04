@@ -2,6 +2,7 @@ import { createProject } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { enforceFeatureAccess } from "../../../lib/feature-gate";
 
 export const createProjectProcedure = protectedProcedure
 	.route({
@@ -80,6 +81,9 @@ export const createProjectProcedure = protectedProcedure
 			context.user.id,
 			{ section: "projects", action: "create" },
 		);
+
+		// Feature gate: check project creation limit
+		await enforceFeatureAccess(input.organizationId, "projects.create", context.user);
 
 		const project = await createProject({
 			organizationId: input.organizationId,

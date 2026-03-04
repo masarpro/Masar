@@ -9,27 +9,29 @@ export interface PlanDefinition {
 	monthlyPrice: number; // SAR
 	yearlyPrice: number; // SAR
 	features: { en: string[]; ar: string[] };
-	isReadOnly?: boolean;
 }
 
 export const STRIPE_PLANS: Record<PlanType, PlanDefinition> = {
 	FREE: {
 		type: "FREE",
 		name: { en: "Free", ar: "مجاني" },
-		maxUsers: 1,
-		maxProjects: 0,
+		maxUsers: 2,
+		maxProjects: 1,
 		maxStorageGB: 0,
 		monthlyPrice: 0,
 		yearlyPrice: 0,
-		isReadOnly: true,
 		features: {
 			en: [
-				"View-only demo access",
-				"1 user",
+				"1 project",
+				"2 users",
+				"10 AI chat sessions",
+				"Basic project management",
 			],
 			ar: [
-				"وصول تجريبي للعرض فقط",
-				"مستخدم واحد",
+				"مشروع واحد",
+				"مستخدمين اثنين",
+				"10 محادثات ذكاء اصطناعي",
+				"إدارة مشاريع أساسية",
 			],
 		},
 	},
@@ -39,24 +41,30 @@ export const STRIPE_PLANS: Record<PlanType, PlanDefinition> = {
 		maxUsers: 50,
 		maxProjects: 100,
 		maxStorageGB: 50,
-		monthlyPrice: 299,
-		yearlyPrice: 2990,
+		monthlyPrice: 199,
+		yearlyPrice: 1990,
 		features: {
 			en: [
 				"Up to 50 users",
 				"Up to 100 projects",
 				"50 GB storage",
 				"All reports & analytics",
+				"PDF & CSV exports",
+				"AI chatbot — unlimited",
+				"Owner portal",
+				"ZATCA e-invoicing",
 				"Priority support",
-				"API access",
 			],
 			ar: [
 				"حتى 50 مستخدمين",
 				"حتى 100 مشروع",
 				"50 جيجابايت تخزين",
 				"جميع التقارير والتحليلات",
+				"تصدير PDF و CSV",
+				"شات الذكاء الاصطناعي — بلا حدود",
+				"بوابة المالك",
+				"فوترة زاتكا الإلكترونية",
 				"دعم ذو أولوية",
-				"الوصول لواجهة API",
 			],
 		},
 	},

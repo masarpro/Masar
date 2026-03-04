@@ -201,13 +201,19 @@ export async function createOrganizationForUser({
 	const now = new Date();
 
 	return db.$transaction(async (tx) => {
-		// Create the organization
+		// Create the organization with 7-day trial (PRO limits)
+		const trialEndsAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 		const organization = await tx.organization.create({
 			data: {
 				name,
 				slug,
 				createdAt: now,
 				ownerId: userId,
+				status: "TRIALING",
+				plan: "FREE",
+				trialEndsAt,
+				maxUsers: 50,
+				maxProjects: 100,
 			},
 		});
 

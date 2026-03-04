@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
 import { AddUserDialog } from "./AddUserDialog";
 
 export function UsersListPage() {
@@ -89,10 +90,12 @@ export function UsersListPage() {
 		<div dir="rtl">
 			<div className="mb-4 flex items-center justify-between">
 				<h2 className="font-bold text-lg">المستخدمين</h2>
-				<Button onClick={() => setShowAddDialog(true)} size="sm">
-					<UserPlusIcon className="ml-2 size-4" />
-					إضافة مستخدم
-				</Button>
+				<UpgradeGate feature="members.invite">
+					<Button onClick={() => setShowAddDialog(true)} size="sm">
+						<UserPlusIcon className="ml-2 size-4" />
+						إضافة مستخدم
+					</Button>
+				</UpgradeGate>
 			</div>
 
 			<Card>

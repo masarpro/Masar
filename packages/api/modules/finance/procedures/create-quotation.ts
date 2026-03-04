@@ -11,6 +11,7 @@ import { z } from "zod";
 import { ORPCError } from "@orpc/server";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { enforceFeatureAccess } from "../../../lib/feature-gate";
 
 const quotationItemSchema = z.object({
 	description: z.string().min(1, "وصف البند مطلوب"),
@@ -309,6 +310,8 @@ export const convertQuotationToInvoiceProcedure = protectedProcedure
 			section: "finance",
 			action: "invoices",
 		});
+
+		await enforceFeatureAccess(input.organizationId, "quotation.export", context.user);
 
 		const invoice = await convertQuotationToInvoice(
 			input.id,

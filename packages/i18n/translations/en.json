@@ -5790,12 +5790,61 @@
 	},
 	"subscription": {
 		"trialEnding": "Your trial ends in {days} days. Upgrade now to keep access.",
+		"trialBanner": "Masar Pro Trial — {days} days remaining",
 		"pastDue": "Your payment is past due. Please update your payment method to avoid service interruption.",
 		"freePlan": "You are on the Free plan. Subscribe now to start managing your projects.",
+		"freePlanBanner": "You are on the Free plan — some features are limited",
 		"suspended": "Account Suspended",
 		"suspendedDescription": "Your account has been suspended due to payment issues. Please upgrade your plan or contact support to restore access.",
 		"upgradeNow": "Upgrade Now",
 		"contactSupport": "Contact Support"
+	},
+	"featureGate": {
+		"title": "This feature requires a subscription",
+		"upgradeCta": "Upgrade to Pro — 199 SAR/month",
+		"later": "Later"
+	},
+	"planData": {
+		"free": {
+			"title": "Free",
+			"description": "Start managing your projects",
+			"features": {
+				"oneProject": "1 project",
+				"twoUsers": "2 users",
+				"aiChats": "10 AI chat sessions",
+				"basicManagement": "Basic project management"
+			}
+		},
+		"pro": {
+			"title": "Pro",
+			"description": "All features, unlimited",
+			"features": {
+				"fiftyUsers": "Up to 50 users",
+				"hundredProjects": "Up to 100 projects",
+				"unlimitedAi": "AI chatbot — unlimited",
+				"exports": "PDF & CSV exports",
+				"ownerPortal": "Owner portal",
+				"zatca": "ZATCA e-invoicing",
+				"reports": "All reports & analytics",
+				"support": "Priority support"
+			}
+		},
+		"enterprise": {
+			"title": "Enterprise",
+			"description": "For large organizations",
+			"features": {
+				"unlimitedProjects": "Unlimited projects",
+				"enterpriseSupport": "Dedicated enterprise support"
+			}
+		},
+		"lifetime": {
+			"title": "Lifetime",
+			"description": "One-time payment",
+			"features": {
+				"noRecurringCosts": "No recurring costs",
+				"extendSupport": "Extended support"
+			}
+		}
 	},
 	"assistant": {
 		"title": "Masar Assistant",

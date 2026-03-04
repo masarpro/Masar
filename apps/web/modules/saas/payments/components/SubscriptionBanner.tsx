@@ -1,9 +1,13 @@
 "use client";
 
 import { Button } from "@ui/components/button";
-import { AlertTriangleIcon, ClockIcon, LockIcon } from "lucide-react";
+import { AlertTriangleIcon, ClockIcon, SparklesIcon, XIcon, ZapIcon } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useState } from "react";
+
+const DISMISS_KEY = "masar_banner_dismissed_at";
+const DISMISS_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
 export function SubscriptionBanner({
 	type,
@@ -13,6 +17,25 @@ export function SubscriptionBanner({
 	trialEndsAt?: string | null;
 }) {
 	const t = useTranslations();
+	const [dismissed, setDismissed] = useState(false);
+
+	useEffect(() => {
+		try {
+			const dismissedAt = localStorage.getItem(DISMISS_KEY);
+			if (dismissedAt && Date.now() - Number(dismissedAt) < DISMISS_DURATION) {
+				setDismissed(true);
+			}
+		} catch {}
+	}, []);
+
+	const handleDismiss = useCallback(() => {
+		setDismissed(true);
+		try {
+			localStorage.setItem(DISMISS_KEY, String(Date.now()));
+		} catch {}
+	}, []);
+
+	if (dismissed && type !== "past_due") return null;
 
 	const daysLeft = trialEndsAt
 		? Math.max(
@@ -26,20 +49,20 @@ export function SubscriptionBanner({
 
 	const styles = {
 		past_due: "border-destructive/20 bg-destructive/10 text-destructive",
-		trial_ending: "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400",
-		free_plan: "border-blue-500/20 bg-blue-500/10 text-blue-700 dark:text-blue-400",
+		trial_ending: "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+		free_plan: "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400",
 	};
 
 	const icons = {
 		past_due: <AlertTriangleIcon className="size-5" />,
-		trial_ending: <ClockIcon className="size-5" />,
-		free_plan: <LockIcon className="size-5" />,
+		trial_ending: <SparklesIcon className="size-5" />,
+		free_plan: <ZapIcon className="size-5" />,
 	};
 
 	const messages = {
 		past_due: t("subscription.pastDue"),
-		trial_ending: t("subscription.trialEnding", { days: daysLeft }),
-		free_plan: t("subscription.freePlan"),
+		trial_ending: t("subscription.trialBanner", { days: daysLeft }),
+		free_plan: t("subscription.freePlanBanner"),
 	};
 
 	const buttonVariants: Record<string, "error" | "primary"> = {
@@ -56,11 +79,23 @@ export function SubscriptionBanner({
 				{icons[type]}
 				<span>{messages[type]}</span>
 			</div>
-			<Button asChild size="sm" variant={buttonVariants[type]}>
-				<Link href="/choose-plan">
-					{t("subscription.upgradeNow")}
-				</Link>
-			</Button>
+			<div className="flex items-center gap-2">
+				<Button asChild size="sm" variant={buttonVariants[type]}>
+					<Link href="/choose-plan">
+						{t("subscription.upgradeNow")}
+					</Link>
+				</Button>
+				{type !== "past_due" && (
+					<Button
+						variant="ghost"
+						size="icon"
+						className="size-8"
+						onClick={handleDismiss}
+					>
+						<XIcon className="size-4" />
+					</Button>
+				)}
+			</div>
 		</div>
 	);
 }

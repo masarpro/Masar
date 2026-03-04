@@ -521,6 +521,12 @@ export const OrganizationSequenceScalarFieldEnumSchema = z.enum(['id', 'organiza
 
 export type OrganizationSequenceScalarFieldEnum = z.infer<typeof OrganizationSequenceScalarFieldEnumSchema>;
 
+// File: AiChatUsageScalarFieldEnum.schema.ts
+
+export const AiChatUsageScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'totalChats', 'updatedAt'])
+
+export type AiChatUsageScalarFieldEnum = z.infer<typeof AiChatUsageScalarFieldEnumSchema>;
+
 // File: SortOrder.schema.ts
 
 export const SortOrderSchema = z.enum(['asc', 'desc'])
@@ -3073,4 +3079,16 @@ export const OrganizationSequenceSchema = z.object({
 });
 
 export type OrganizationSequenceType = z.infer<typeof OrganizationSequenceSchema>;
+
+
+// File: AiChatUsage.schema.ts
+
+export const AiChatUsageSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  totalChats: z.number().int(),
+  updatedAt: z.date(),
+});
+
+export type AiChatUsageType = z.infer<typeof AiChatUsageSchema>;
 

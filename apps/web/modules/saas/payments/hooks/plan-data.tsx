@@ -16,35 +16,43 @@ export function usePlanData() {
 		}
 	> = {
 		free: {
-			title: t("pricing.products.free.title"),
-			description: t("pricing.products.free.description"),
+			title: t("planData.free.title"),
+			description: t("planData.free.description"),
 			features: [
-				t("pricing.products.free.features.anotherFeature"),
-				t("pricing.products.free.features.limitedSupport"),
+				t("planData.free.features.oneProject"),
+				t("planData.free.features.twoUsers"),
+				t("planData.free.features.aiChats"),
+				t("planData.free.features.basicManagement"),
 			],
 		},
 		pro: {
-			title: t("pricing.products.pro.title"),
-			description: t("pricing.products.pro.description"),
+			title: t("planData.pro.title"),
+			description: t("planData.pro.description"),
 			features: [
-				t("pricing.products.pro.features.anotherFeature"),
-				t("pricing.products.pro.features.fullSupport"),
+				t("planData.pro.features.fiftyUsers"),
+				t("planData.pro.features.hundredProjects"),
+				t("planData.pro.features.unlimitedAi"),
+				t("planData.pro.features.exports"),
+				t("planData.pro.features.ownerPortal"),
+				t("planData.pro.features.zatca"),
+				t("planData.pro.features.reports"),
+				t("planData.pro.features.support"),
 			],
 		},
 		enterprise: {
-			title: t("pricing.products.enterprise.title"),
-			description: t("pricing.products.enterprise.description"),
+			title: t("planData.enterprise.title"),
+			description: t("planData.enterprise.description"),
 			features: [
-				t("pricing.products.enterprise.features.unlimitedProjects"),
-				t("pricing.products.enterprise.features.enterpriseSupport"),
+				t("planData.enterprise.features.unlimitedProjects"),
+				t("planData.enterprise.features.enterpriseSupport"),
 			],
 		},
 		lifetime: {
-			title: t("pricing.products.lifetime.title"),
-			description: t("pricing.products.lifetime.description"),
+			title: t("planData.lifetime.title"),
+			description: t("planData.lifetime.description"),
 			features: [
-				t("pricing.products.lifetime.features.noRecurringCosts"),
-				t("pricing.products.lifetime.features.extendSupport"),
+				t("planData.lifetime.features.noRecurringCosts"),
+				t("planData.lifetime.features.extendSupport"),
 			],
 		},
 	};

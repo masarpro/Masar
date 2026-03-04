@@ -20,6 +20,7 @@ import { z } from "zod";
 import { ORPCError } from "@orpc/server";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { generateZatcaQR, generateZatcaQRImage } from "../../../lib/zatca";
 import { db } from "@repo/database/prisma/client";
 import crypto from "crypto";
@@ -326,6 +327,8 @@ export const convertToTaxInvoiceProcedure = protectedProcedure
 			section: "finance",
 			action: "invoices",
 		});
+
+		await enforceFeatureAccess(input.organizationId, "zatca.qr", context.user);
 
 		// Get the invoice
 		const invoice = await getInvoiceById(input.id, input.organizationId);

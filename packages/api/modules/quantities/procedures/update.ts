@@ -2,6 +2,7 @@ import { ORPCError } from "@orpc/server";
 import { updateCostStudy as updateCostStudyQuery } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { protectedProcedure } from "../../../orpc/procedures";
 
 export const update = protectedProcedure
@@ -38,6 +39,8 @@ export const update = protectedProcedure
 			context.user.id,
 			{ section: "pricing", action: "studies" },
 		);
+
+		await enforceFeatureAccess(input.organizationId, "cost-study.save", context.user);
 
 		const { id, organizationId, ...data } = input;
 

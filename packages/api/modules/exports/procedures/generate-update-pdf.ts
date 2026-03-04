@@ -3,6 +3,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
+import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { generateUpdatePDF } from "../lib/pdf-generator";
 
 export const generateUpdatePDFProcedure = protectedProcedure
@@ -29,6 +30,8 @@ export const generateUpdatePDFProcedure = protectedProcedure
 		if (!membership) {
 			throw new ORPCError("FORBIDDEN");
 		}
+
+		await enforceFeatureAccess(input.organizationId, "export.pdf", context.user);
 
 		// Get the update message (official updates stored as ProjectMessage with isUpdate=true)
 		const update = await db.projectMessage.findFirst({

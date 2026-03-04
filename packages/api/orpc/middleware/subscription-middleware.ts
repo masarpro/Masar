@@ -47,15 +47,14 @@ export async function checkSubscription(context: {
 		org.trialEndsAt &&
 		new Date() > org.trialEndsAt
 	) {
-		throw new ORPCError("FORBIDDEN", {
-			message: "trial_expired",
+		// Lazy update: mark as FREE instead of blocking
+		await db.organization.update({
+			where: { id: orgId },
+			data: { status: "ACTIVE", plan: "FREE" },
 		});
+		// Don't block — per-feature gates will handle limits
 	}
 
-	// FREE plan is read-only — block write operations
-	if (org.plan === "FREE") {
-		throw new ORPCError("FORBIDDEN", {
-			message: "free_plan_read_only",
-		});
-	}
+	// NOTE: Blanket FREE plan block removed.
+	// Per-feature gates (feature-gate.ts) now handle granular access control.
 }

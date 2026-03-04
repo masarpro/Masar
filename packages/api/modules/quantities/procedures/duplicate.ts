@@ -2,6 +2,7 @@ import { ORPCError } from "@orpc/server";
 import { duplicateCostStudy as duplicateCostStudyQuery } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { protectedProcedure } from "../../../orpc/procedures";
 
 export const duplicate = protectedProcedure
@@ -23,6 +24,8 @@ export const duplicate = protectedProcedure
 			context.user.id,
 			{ section: "pricing", action: "studies" },
 		);
+
+		await enforceFeatureAccess(input.organizationId, "cost-study.save", context.user);
 
 		try {
 			const study = await duplicateCostStudyQuery(

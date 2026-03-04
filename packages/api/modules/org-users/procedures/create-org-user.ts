@@ -6,6 +6,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { protectedProcedure } from "../../../orpc/procedures";
 
 export const createOrgUser = protectedProcedure
@@ -30,6 +31,9 @@ export const createOrgUser = protectedProcedure
 			context.user.id,
 			{ section: "settings", action: "users" },
 		);
+
+		// Feature gate: check member invite limit
+		await enforceFeatureAccess(input.organizationId, "members.invite", context.user);
 
 		// التحقق من عدم وجود المستخدم مسبقاً
 		const existingUser = await getUserByEmail(input.email);

@@ -890,6 +890,7 @@ model Organization {
   // ═══ New Relations ═══
   subscriptionEvents   SubscriptionEvent[]
   superAdminLogs       SuperAdminLog[]     @relation("SuperAdminOrgTarget")
+  aiChatUsage          AiChatUsage?
 
   // ═══ نهاية حقول مسار ═══
 
@@ -3846,4 +3847,18 @@ model OrganizationSequence {
 
   @@unique([organizationId, sequenceKey])
   @@map("organization_sequences")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// استخدام محادثات الذكاء الاصطناعي — AI Chat Usage Tracking
+// ═══════════════════════════════════════════════════════════════════════════
+
+model AiChatUsage {
+  id              String       @id @default(cuid())
+  organizationId  String       @unique @map("organization_id")
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  totalChats      Int          @default(0) @map("total_chats")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  @@map("ai_chat_usage")
 }

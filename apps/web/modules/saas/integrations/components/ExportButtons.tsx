@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
 
 interface ExportButtonsProps {
 	projectId: string;
@@ -149,6 +150,7 @@ export function ExportButtons({ projectId }: ExportButtonsProps) {
 		exportWeeklyReport.isPending;
 
 	return (
+		<UpgradeGate feature="export.pdf">
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button variant="outline" disabled={isLoading}>
@@ -181,5 +183,6 @@ export function ExportButtons({ projectId }: ExportButtonsProps) {
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
+		</UpgradeGate>
 	);
 }

@@ -1,8 +1,9 @@
 import { ORPCError } from "@orpc/client";
-import { createAiChat } from "@repo/database";
+import { createAiChat, db } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
+import { enforceFeatureAccess } from "../../../lib/feature-gate";
 
 export const createChat = protectedProcedure
 	.route({
@@ -31,6 +32,9 @@ export const createChat = protectedProcedure
 			if (!membership) {
 				throw new ORPCError("FORBIDDEN");
 			}
+
+			// Feature gate: check AI chat limit
+			await enforceFeatureAccess(organizationId, "ai.chat", user);
 		}
 
 		const chat = await createAiChat({
@@ -41,6 +45,15 @@ export const createChat = protectedProcedure
 
 		if (!chat) {
 			throw new ORPCError("INTERNAL_SERVER_ERROR");
+		}
+
+		// Track AI chat usage for the organization
+		if (organizationId) {
+			await db.aiChatUsage.upsert({
+				where: { organizationId },
+				update: { totalChats: { increment: 1 } },
+				create: { organizationId, totalChats: 1 },
+			});
 		}
 
 		return { chat };

@@ -37,6 +37,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
 
 interface OwnerAccessManagementProps {
 	organizationId: string;
@@ -127,10 +128,12 @@ export function OwnerAccessManagement({
 						{t("ownerAccess.description")}
 					</p>
 				</div>
-				<Button onClick={() => setIsCreateDialogOpen(true)} className="rounded-xl">
-					<Plus className="h-4 w-4 me-2" />
-					{t("ownerAccess.createLink")}
-				</Button>
+				<UpgradeGate feature="owner-portal.activate">
+					<Button onClick={() => setIsCreateDialogOpen(true)} className="rounded-xl">
+						<Plus className="h-4 w-4 me-2" />
+						{t("ownerAccess.createLink")}
+					</Button>
+				</UpgradeGate>
 			</div>
 
 			{/* Access Links List */}

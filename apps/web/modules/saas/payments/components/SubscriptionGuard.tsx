@@ -22,10 +22,9 @@ export function SubscriptionGuard({
 	// Warning states
 	const showPastDueBanner = orgStatus === "PAST_DUE";
 	const showTrialBanner =
-		orgStatus === "TRIALING" &&
-		trialEndsAt &&
-		new Date(trialEndsAt).getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000;
-	const showFreePlanBanner = orgPlan === "FREE";
+		orgStatus === "TRIALING" && !!trialEndsAt;
+	const showFreePlanBanner =
+		orgPlan === "FREE" && orgStatus !== "TRIALING";
 
 	return (
 		<>

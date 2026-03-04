@@ -30,6 +30,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
 import { ProjectsHeader } from "./ProjectsHeader";
 
 interface ProjectsListProps {
@@ -230,15 +231,17 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 						</SelectContent>
 					</Select>
 				</div>
-				<Button
-					asChild
-					className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-				>
-					<Link href={`${basePath}/new`}>
-						<Plus className="ml-2 h-4 w-4" />
-						{t("projects.newProject")}
-					</Link>
-				</Button>
+				<UpgradeGate feature="projects.create">
+					<Button
+						asChild
+						className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+					>
+						<Link href={`${basePath}/new`}>
+							<Plus className="ml-2 h-4 w-4" />
+							{t("projects.newProject")}
+						</Link>
+					</Button>
+				</UpgradeGate>
 			</div>
 
 			{/* Grid of Projects - Glass Morphism Cards */}

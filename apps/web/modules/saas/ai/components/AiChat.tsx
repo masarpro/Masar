@@ -3,6 +3,8 @@
 import { type UIMessage, useChat } from "@ai-sdk/react";
 import { eventIteratorToStream } from "@orpc/client";
 import { SidebarContentLayout } from "@saas/shared/components/SidebarContentLayout";
+import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
+import { useOrganizationPlan } from "@saas/shared/hooks/use-organization-plan";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import {
@@ -24,6 +26,7 @@ export function AiChat({ organizationId }: { organizationId?: string }) {
 	const formatter = useFormatter();
 	const queryClient = useQueryClient();
 	const [input, setInput] = useState("");
+	const { isFree, limits } = useOrganizationPlan();
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	const { data, status: chatsStatus } = useQuery(
 		orpc.ai.chats.list.queryOptions({
@@ -174,16 +177,24 @@ export function AiChat({ organizationId }: { organizationId?: string }) {
 		<SidebarContentLayout
 			sidebar={
 				<div>
-					<Button
-						variant="light"
-						size="sm"
-						className="mb-4 flex w-full items-center gap-2"
-						loading={createChatMutation.isPending}
-						onClick={createNewChat}
-					>
-						<PlusIcon className="size-4" />
-						New chat
-					</Button>
+					<UpgradeGate feature="ai.chat">
+						<Button
+							variant="light"
+							size="sm"
+							className="mb-4 flex w-full items-center gap-2"
+							loading={createChatMutation.isPending}
+							onClick={createNewChat}
+						>
+							<PlusIcon className="size-4" />
+							New chat
+						</Button>
+					</UpgradeGate>
+
+					{isFree && (
+						<p className="mb-3 text-xs text-muted-foreground text-center">
+							{`استخدمت ${limits.aiChats.used} من ${limits.aiChats.max} محادثات`}
+						</p>
+					)}
 
 					{sortedChats.map((chat) => (
 						<div className="relative" key={chat.id}>

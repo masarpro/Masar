@@ -3,6 +3,7 @@ import { db, type IssueStatus, type IssueSeverity } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
+import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { generateIssuesCsv } from "../lib/csv-generator";
 
 export const exportIssuesCsvProcedure = protectedProcedure
@@ -30,6 +31,8 @@ export const exportIssuesCsvProcedure = protectedProcedure
 		if (!membership) {
 			throw new ORPCError("FORBIDDEN");
 		}
+
+		await enforceFeatureAccess(input.organizationId, "export.pdf", context.user);
 
 		// Build where clause
 		const where: {
