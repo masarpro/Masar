@@ -11,6 +11,19 @@ import { updateSubcontractChangeOrderProcedure } from "./procedures/update-chang
 import { deleteSubcontractChangeOrderProcedure } from "./procedures/delete-change-order";
 import { createSubcontractPaymentProcedure } from "./procedures/create-payment";
 import { generateSubcontractNoProcedure } from "./procedures/generate-contract-no";
+import { getSubcontractClaimProcedure } from "./procedures/get-claim";
+import { listSubcontractClaimsProcedure } from "./procedures/list-claims";
+import { createSubcontractClaimProcedure } from "./procedures/create-claim";
+import { updateSubcontractClaimProcedure } from "./procedures/update-claim";
+import { deleteSubcontractClaimProcedure } from "./procedures/delete-claim";
+import { updateSubcontractClaimStatusProcedure } from "./procedures/update-claim-status";
+import { addSubcontractClaimPaymentProcedure } from "./procedures/add-claim-payment";
+import { getSubcontractClaimSummaryProcedure } from "./procedures/get-claim-summary";
+import { listSubcontractItemsProcedure } from "./procedures/list-items";
+import { createSubcontractItemProcedure } from "./procedures/create-item";
+import { updateSubcontractItemProcedure } from "./procedures/update-item";
+import { deleteSubcontractItemProcedure } from "./procedures/delete-item";
+import { copySubcontractItemsProcedure } from "./procedures/copy-items";
 
 export const subcontractsRouter = {
 	list: listSubcontracts,
@@ -26,4 +39,19 @@ export const subcontractsRouter = {
 	deleteChangeOrder: deleteSubcontractChangeOrderProcedure,
 	createPayment: createSubcontractPaymentProcedure,
 	generateContractNo: generateSubcontractNoProcedure,
+	// Claims
+	getClaim: getSubcontractClaimProcedure,
+	listClaims: listSubcontractClaimsProcedure,
+	createClaim: createSubcontractClaimProcedure,
+	updateClaim: updateSubcontractClaimProcedure,
+	deleteClaim: deleteSubcontractClaimProcedure,
+	updateClaimStatus: updateSubcontractClaimStatusProcedure,
+	addClaimPayment: addSubcontractClaimPaymentProcedure,
+	getClaimSummary: getSubcontractClaimSummaryProcedure,
+	// Items
+	listItems: listSubcontractItemsProcedure,
+	createItem: createSubcontractItemProcedure,
+	updateItem: updateSubcontractItemProcedure,
+	deleteItem: deleteSubcontractItemProcedure,
+	copyItems: copySubcontractItemsProcedure,
 };

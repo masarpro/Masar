@@ -44,6 +44,9 @@ export * from "./seed-templates";
 export * from "./project-contract";
 // Subcontract Management
 export * from "./subcontract";
+// Subcontract Claims & Items
+export * from "./subcontract-claims";
+export * from "./subcontract-items";
 // Project Payments
 export * from "./project-payments";
 // Payments & Claims Timeline

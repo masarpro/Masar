@@ -316,6 +316,16 @@ enum AuditAction {
   SUBCONTRACT_CO_UPDATED       // تعديل أمر تغيير باطن
   SUBCONTRACT_CO_DELETED       // حذف أمر تغيير باطن
   SUBCONTRACT_PAYMENT_CREATED  // إنشاء دفعة مقاول باطن
+  // بنود ومستخلصات مقاول الباطن
+  SUBCONTRACT_ITEM_CREATED           // إنشاء بند
+  SUBCONTRACT_ITEM_UPDATED           // تعديل بند
+  SUBCONTRACT_ITEM_DELETED           // حذف بند
+  SUBCONTRACT_ITEMS_COPIED           // نسخ بنود
+  SUBCONTRACT_CLAIM_CREATED          // إنشاء مستخلص
+  SUBCONTRACT_CLAIM_UPDATED          // تعديل مستخلص
+  SUBCONTRACT_CLAIM_DELETED          // حذف مستخلص
+  SUBCONTRACT_CLAIM_STATUS_CHANGED   // تغيير حالة مستخلص
+  SUBCONTRACT_CLAIM_PAYMENT_ADDED    // إضافة دفعة لمستخلص
   // العقد الرئيسي
   CONTRACT_CREATED     // إنشاء عقد رئيسي
   CONTRACT_UPDATED     // تعديل عقد رئيسي
@@ -611,6 +621,9 @@ model User {
   subcontractsCreated        SubcontractContract[]   @relation("SubcontractCreator")
   subcontractCOsCreated      SubcontractChangeOrder[] @relation("SubcontractCOCreator")
   subcontractPaymentsCreated SubcontractPayment[]     @relation("SubcontractPaymentCreator")
+  subcontractItemsCreated    SubcontractItem[]        @relation("SubcontractItemCreator")
+  subcontractClaimsCreated   SubcontractClaim[]       @relation("SubcontractClaimCreator")
+  subcontractClaimsApproved  SubcontractClaim[]       @relation("SubcontractClaimApprover")
   projectPaymentsCreated     ProjectPayment[]         @relation("ProjectPaymentCreator")
   contractsCreated      ProjectContract[]       @relation("ContractCreator")
 
@@ -1682,6 +1695,25 @@ enum SubcontractCOStatus {
   REJECTED      // مرفوض
 }
 
+// حالة مستخلص الباطن
+enum SubcontractClaimStatus {
+  DRAFT           // مسودة
+  SUBMITTED       // مقدم
+  UNDER_REVIEW    // قيد المراجعة
+  APPROVED        // معتمد
+  REJECTED        // مرفوض
+  PARTIALLY_PAID  // مدفوع جزئياً
+  PAID            // مدفوع بالكامل
+  CANCELLED       // ملغى
+}
+
+// نوع المستخلص
+enum SubcontractClaimType {
+  INTERIM    // مستخلص جاري
+  FINAL      // مستخلص ختامي
+  RETENTION  // استرداد محتجزات
+}
+
 // عقود مقاولي الباطن
 model SubcontractContract {
   id              String              @id @default(cuid())
@@ -1714,6 +1746,11 @@ model SubcontractContract {
   includesVat     Boolean             @default(false) @map("includes_vat")
   vatPercent      Decimal?            @map("vat_percent") @db.Decimal(5, 2)
   retentionPercent Decimal?           @map("retention_percent") @db.Decimal(5, 2)
+  retentionCapPercent Decimal?        @map("retention_cap_percent") @db.Decimal(5, 2)
+
+  // الدفعة المقدمة
+  advancePaymentPercent Decimal?      @map("advance_payment_percent") @db.Decimal(5, 2)
+  advancePaymentAmount  Decimal?      @map("advance_payment_amount") @db.Decimal(15, 2)
 
   // طريقة الدفع والمرفقات
   paymentMethod   PaymentMethod?      @map("payment_method")
@@ -1730,6 +1767,8 @@ model SubcontractContract {
   paymentTerms    SubcontractPaymentTerm[]
   changeOrders    SubcontractChangeOrder[]
   payments        SubcontractPayment[]
+  items           SubcontractItem[]
+  claims          SubcontractClaim[]
 
   @@index([organizationId, projectId])
   @@index([organizationId, projectId, status])
@@ -1793,6 +1832,10 @@ model SubcontractPayment {
   termId          String?             @map("term_id")
   term            SubcontractPaymentTerm? @relation("SubcontractTermPayments", fields: [termId], references: [id], onDelete: SetNull)
 
+  // ربط اختياري بمستخلص
+  claimId         String?             @map("claim_id")
+  claim           SubcontractClaim?   @relation("SubcontractClaimPayments", fields: [claimId], references: [id], onDelete: SetNull)
+
   paymentNo       String              @map("payment_no")
   amount          Decimal             @db.Decimal(15, 2)
   date            DateTime            @db.Date
@@ -1815,6 +1858,107 @@ model SubcontractPayment {
   @@index([organizationId, contractId])
   @@index([contractId, termId])
   @@map("subcontract_payments")
+}
+
+// بنود عقد الباطن (BOQ)
+model SubcontractItem {
+  id              String              @id @default(cuid())
+  organizationId  String              @map("organization_id")
+  contractId      String              @map("contract_id")
+  contract        SubcontractContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  itemCode        String?             @map("item_code")
+  description     String
+  descriptionEn   String?             @map("description_en")
+  unit            String
+  contractQty     Decimal             @map("contract_qty") @db.Decimal(15, 4)
+  unitPrice       Decimal             @map("unit_price") @db.Decimal(15, 2)
+  totalAmount     Decimal             @map("total_amount") @db.Decimal(15, 2)
+  sortOrder       Int                 @default(0) @map("sort_order")
+  category        String?
+  isLumpSum       Boolean             @default(false) @map("is_lump_sum")
+
+  createdById     String              @map("created_by")
+  createdBy       User                @relation("SubcontractItemCreator", fields: [createdById], references: [id])
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  claimItems      SubcontractClaimItem[]
+
+  @@index([contractId])
+  @@index([organizationId, contractId])
+  @@map("subcontract_items")
+}
+
+// مستخلصات عقد الباطن
+model SubcontractClaim {
+  id                String                  @id @default(cuid())
+  organizationId    String                  @map("organization_id")
+  contractId        String                  @map("contract_id")
+  contract          SubcontractContract     @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  claimNo           Int                     @map("claim_no")
+  title             String
+  claimType         SubcontractClaimType    @default(INTERIM) @map("claim_type")
+  status            SubcontractClaimStatus  @default(DRAFT)
+
+  periodStart       DateTime                @map("period_start") @db.Date
+  periodEnd         DateTime                @map("period_end") @db.Date
+
+  // المبالغ
+  grossAmount       Decimal                 @default(0) @map("gross_amount") @db.Decimal(15, 2)
+  retentionAmount   Decimal                 @default(0) @map("retention_amount") @db.Decimal(15, 2)
+  advanceDeduction  Decimal                 @default(0) @map("advance_deduction") @db.Decimal(15, 2)
+  vatAmount         Decimal                 @default(0) @map("vat_amount") @db.Decimal(15, 2)
+  netAmount         Decimal                 @default(0) @map("net_amount") @db.Decimal(15, 2)
+  paidAmount        Decimal                 @default(0) @map("paid_amount") @db.Decimal(15, 2)
+
+  notes             String?                 @db.Text
+  rejectionReason   String?                 @map("rejection_reason") @db.Text
+
+  submittedAt       DateTime?               @map("submitted_at")
+  approvedAt        DateTime?               @map("approved_at")
+  approvedById      String?                 @map("approved_by")
+  approvedBy        User?                   @relation("SubcontractClaimApprover", fields: [approvedById], references: [id])
+
+  createdById       String                  @map("created_by")
+  createdBy         User                    @relation("SubcontractClaimCreator", fields: [createdById], references: [id])
+
+  createdAt         DateTime                @default(now()) @map("created_at")
+  updatedAt         DateTime                @updatedAt @map("updated_at")
+
+  items             SubcontractClaimItem[]
+  payments          SubcontractPayment[]    @relation("SubcontractClaimPayments")
+
+  @@index([contractId])
+  @@index([organizationId])
+  @@index([organizationId, contractId, status])
+  @@map("subcontract_claims")
+}
+
+// بنود مستخلص الباطن
+model SubcontractClaimItem {
+  id                String              @id @default(cuid())
+  organizationId    String              @map("organization_id")
+  claimId           String              @map("claim_id")
+  claim             SubcontractClaim    @relation(fields: [claimId], references: [id], onDelete: Cascade)
+
+  contractItemId    String              @map("contract_item_id")
+  contractItem      SubcontractItem     @relation(fields: [contractItemId], references: [id], onDelete: Cascade)
+
+  contractQty       Decimal             @map("contract_qty") @db.Decimal(15, 4)
+  unitPrice         Decimal             @map("unit_price") @db.Decimal(15, 2)
+  prevCumulativeQty Decimal             @default(0) @map("prev_cumulative_qty") @db.Decimal(15, 4)
+  thisQty           Decimal             @map("this_qty") @db.Decimal(15, 4)
+  thisAmount        Decimal             @map("this_amount") @db.Decimal(15, 2)
+
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+
+  @@index([claimId])
+  @@index([contractItemId])
+  @@map("subcontract_claim_items")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
