@@ -10,12 +10,14 @@ import {
 import {
 	Download,
 	X,
-	ExternalLink,
-	File,
+	Loader2,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
+import Lightbox from "yet-another-react-lightbox";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import "yet-another-react-lightbox/styles.css";
 
 interface DocumentViewerProps {
 	organizationId: string;
@@ -28,13 +30,20 @@ interface DocumentViewerProps {
 		fileSize?: number | null;
 		mimeType?: string | null;
 		storagePath?: string | null;
-		uploadType?: string;
-		fileUrl?: string | null;
 		createdAt: string | Date;
 	};
 	open: boolean;
 	onClose: () => void;
 }
+
+const OFFICE_MIME_TYPES = [
+	"application/msword",
+	"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	"application/vnd.ms-excel",
+	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	"application/vnd.ms-powerpoint",
+	"application/vnd.openxmlformats-officedocument.presentationml.presentation",
+];
 
 function formatFileSize(bytes?: number | null): string {
 	if (!bytes) return "";
@@ -64,11 +73,6 @@ export function DocumentViewer({
 			return;
 		}
 
-		if (doc.uploadType === "URL" && doc.fileUrl) {
-			setFileUrl(doc.fileUrl);
-			return;
-		}
-
 		if (doc.storagePath) {
 			setIsLoadingUrl(true);
 			downloadUrlMutation
@@ -79,95 +83,107 @@ export function DocumentViewer({
 		}
 	}, [open, doc.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-	const handleDownload = () => {
+	const handleDownload = useCallback(() => {
 		if (!fileUrl) return;
 		const link = window.document.createElement("a");
 		link.href = fileUrl;
 		link.download = doc.fileName || doc.title;
-		link.target = "_blank";
 		link.click();
-	};
+	}, [fileUrl, doc.fileName, doc.title]);
 
 	const isImage = doc.mimeType?.startsWith("image/");
 	const isPdf = doc.mimeType === "application/pdf";
-	const isExternalUrl = doc.uploadType === "URL";
+	const isOffice = doc.mimeType ? OFFICE_MIME_TYPES.includes(doc.mimeType) : false;
+	const isViewableInGoogleViewer = isPdf || isOffice;
 
-	return (
-		<Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-			<DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 gap-0">
-				{/* Minimal Header: title + close */}
-				<div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-					<h2 className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
-						{doc.title}
-					</h2>
-					<Button
-						variant="ghost"
-						size="icon"
-						className="h-8 w-8 shrink-0 rounded-lg"
-						onClick={onClose}
-					>
-						<X className="h-4 w-4" />
-					</Button>
-				</div>
+	// --- Image → Lightbox ---
+	if (isImage) {
+		return (
+			<Lightbox
+				open={open}
+				close={onClose}
+				slides={fileUrl ? [{ src: fileUrl, alt: doc.title }] : []}
+				plugins={[Zoom]}
+				carousel={{ finite: true }}
+				render={{
+					buttonPrev: () => null,
+					buttonNext: () => null,
+				}}
+				toolbar={{
+					buttons: [
+						<button
+							key="download"
+							type="button"
+							className="yarl__button"
+							onClick={handleDownload}
+							title={t("download")}
+						>
+							<Download className="h-5 w-5" />
+						</button>,
+						"close",
+					],
+				}}
+				styles={{
+					container: { backgroundColor: "rgba(0, 0, 0, 0.9)" },
+				}}
+			/>
+		);
+	}
 
-				{/* File Content */}
-				<div className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-950">
-					{isLoadingUrl ? (
-						<div className="flex h-full items-center justify-center">
-							<div className="relative">
-								<div className="h-12 w-12 rounded-full border-4 border-primary/20" />
-								<div className="absolute left-0 top-0 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-							</div>
-						</div>
-					) : !fileUrl ? (
-						<div className="flex h-full flex-col items-center justify-center gap-3 text-slate-500">
-							<File className="h-16 w-16 text-slate-300" />
-							<p className="text-sm">{t("noPreview")}</p>
-						</div>
-					) : isImage ? (
-						<div className="flex h-full items-center justify-center p-4">
-							{/* eslint-disable-next-line @next/next/no-img-element */}
-							<img
-								src={fileUrl}
-								alt={doc.title}
-								className="max-h-full max-w-full rounded-lg object-contain shadow-lg"
-							/>
-						</div>
-					) : isPdf ? (
-						<iframe
-							src={fileUrl}
-							className="h-full w-full"
-							title={doc.title}
-							sandbox="allow-same-origin allow-scripts allow-forms"
-						/>
-					) : isExternalUrl ? (
-						<div className="flex h-full flex-col items-center justify-center gap-4">
-							<ExternalLink className="h-16 w-16 text-slate-300" />
-							<p className="text-sm text-slate-500">{t("externalLinkPreview")}</p>
+	// --- PDF / Office → Google Drive Viewer Dialog ---
+	if (isViewableInGoogleViewer) {
+		const googleViewerUrl = fileUrl
+			? `https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`
+			: null;
+
+		return (
+			<Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+				<DialogContent className="max-w-5xl h-[90vh] flex flex-col p-0 gap-0">
+					{/* Header */}
+					<div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
+						<h2 className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+							{doc.title}
+						</h2>
+						<div className="flex items-center gap-2">
 							<Button
 								variant="outline"
-								className="rounded-xl"
-								onClick={() => window.open(fileUrl, "_blank")}
+								size="sm"
+								className="rounded-lg"
+								onClick={handleDownload}
+								disabled={!fileUrl}
 							>
-								<ExternalLink className="h-4 w-4 me-2" />
-								{t("openInNewTab")}
-							</Button>
-						</div>
-					) : (
-						<div className="flex h-full flex-col items-center justify-center gap-4">
-							<File className="h-16 w-16 text-slate-300" />
-							<p className="text-sm text-slate-500">{t("noPreview")}</p>
-							<Button variant="outline" className="rounded-xl" onClick={handleDownload}>
-								<Download className="h-4 w-4 me-2" />
+								<Download className="h-4 w-4 me-1" />
 								{t("download")}
 							</Button>
+							<Button
+								variant="ghost"
+								size="icon"
+								className="h-8 w-8 shrink-0 rounded-lg"
+								onClick={onClose}
+							>
+								<X className="h-4 w-4" />
+							</Button>
 						</div>
-					)}
-				</div>
+					</div>
 
-				{/* Minimal Footer: download + file info */}
-				<div className="flex items-center justify-between border-t border-slate-200 px-4 py-3 dark:border-slate-700">
-					<div className="flex items-center gap-2 text-xs text-slate-500 min-w-0">
+					{/* Content */}
+					<div className="flex-1 overflow-hidden bg-slate-100 dark:bg-slate-950">
+						{isLoadingUrl || !googleViewerUrl ? (
+							<div className="flex h-full items-center justify-center">
+								<Loader2 className="h-8 w-8 animate-spin text-primary" />
+							</div>
+						) : (
+							<iframe
+								src={googleViewerUrl}
+								className="h-full w-full border-0"
+								title={doc.title}
+								allowFullScreen
+							/>
+						)}
+					</div>
+
+					{/* Footer */}
+					<div className="flex items-center gap-2 border-t border-slate-200 px-4 py-2 text-xs text-slate-500 dark:border-slate-700">
 						{doc.fileName && (
 							<span className="truncate max-w-[200px]">{doc.fileName}</span>
 						)}
@@ -178,14 +194,31 @@ export function DocumentViewer({
 							</>
 						)}
 					</div>
+				</DialogContent>
+			</Dialog>
+		);
+	}
+
+	// --- Other file types → Download-only Dialog ---
+	return (
+		<Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+			<DialogContent className="max-w-md">
+				<div className="flex flex-col items-center gap-4 py-6 text-center">
+					<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+						{doc.title}
+					</p>
+					<p className="text-sm text-slate-500">{t("noPreview")}</p>
 					<Button
 						variant="outline"
-						size="sm"
-						className="shrink-0 rounded-lg"
+						className="rounded-xl"
 						onClick={handleDownload}
-						disabled={!fileUrl}
+						disabled={!fileUrl || isLoadingUrl}
 					>
-						<Download className="h-4 w-4 me-1" />
+						{isLoadingUrl ? (
+							<Loader2 className="h-4 w-4 me-2 animate-spin" />
+						) : (
+							<Download className="h-4 w-4 me-2" />
+						)}
 						{t("download")}
 					</Button>
 				</div>

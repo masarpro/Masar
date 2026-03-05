@@ -18,22 +18,21 @@ import {
 	File,
 	FileText,
 	Image,
+	FileSpreadsheet,
+	Presentation,
 	CheckCircle,
 	Clock,
 	XCircle,
-	LayoutGrid,
-	List,
 	MoreVertical,
 	Download,
 	Eye,
 	Trash2,
 	Shield,
-	ExternalLink,
 	Info,
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { DocumentViewer } from "./documents/DocumentViewer";
 
@@ -75,84 +74,33 @@ function getApprovalStatusBadge(status?: string) {
 	}
 }
 
-/** Thumbnail component that lazily fetches a signed URL for images */
-function DocumentThumbnail({
-	doc,
-	organizationId,
-	projectId,
-}: {
-	doc: any;
-	organizationId: string;
-	projectId: string;
-}) {
-	const [imgUrl, setImgUrl] = useState<string | null>(null);
-	const [loading, setLoading] = useState(true);
-
-	const downloadUrlMutation = useMutation(
-		orpc.projectDocuments.getDownloadUrl.mutationOptions({}),
-	);
-
-	useEffect(() => {
-		if (!doc.storagePath || !doc.mimeType?.startsWith("image/")) {
-			setLoading(false);
-			return;
-		}
-		downloadUrlMutation
-			.mutateAsync({ organizationId, projectId, documentId: doc.id })
-			.then((res) => setImgUrl(res.downloadUrl))
-			.catch(() => {})
-			.finally(() => setLoading(false));
-	}, [doc.id]); // eslint-disable-line react-hooks/exhaustive-deps
-
-	const isImage = doc.mimeType?.startsWith("image/");
-	const isPdf = doc.mimeType === "application/pdf";
-	const isExternal = doc.uploadType === "URL";
-
-	// Loading skeleton
-	if (loading && isImage) {
-		return (
-			<div className="flex h-full w-full items-center justify-center bg-slate-100 dark:bg-slate-800 animate-pulse">
-				<Image className="h-8 w-8 text-slate-300 dark:text-slate-600" />
-			</div>
-		);
+/** Returns an icon + background color based on mime type */
+function getFileTypeIcon(mimeType?: string | null) {
+	if (mimeType?.startsWith("image/")) {
+		return { icon: Image, bg: "bg-pink-100 dark:bg-pink-950/30", color: "text-pink-500" };
 	}
-
-	// Image with signed URL
-	if (isImage && imgUrl) {
-		return (
-			/* eslint-disable-next-line @next/next/no-img-element */
-			<img
-				src={imgUrl}
-				alt={doc.title}
-				className="h-full w-full object-cover"
-			/>
-		);
+	if (mimeType === "application/pdf") {
+		return { icon: FileText, bg: "bg-red-100 dark:bg-red-950/30", color: "text-red-500" };
 	}
-
-	// PDF icon
-	if (isPdf) {
-		return (
-			<div className="flex h-full w-full items-center justify-center bg-red-50 dark:bg-red-950/20">
-				<FileText className="h-10 w-10 text-red-400 dark:text-red-500" />
-			</div>
-		);
+	if (
+		mimeType === "application/msword" ||
+		mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+	) {
+		return { icon: FileText, bg: "bg-blue-100 dark:bg-blue-950/30", color: "text-blue-500" };
 	}
-
-	// External link icon
-	if (isExternal) {
-		return (
-			<div className="flex h-full w-full items-center justify-center bg-blue-50 dark:bg-blue-950/20">
-				<ExternalLink className="h-10 w-10 text-blue-400 dark:text-blue-500" />
-			</div>
-		);
+	if (
+		mimeType === "application/vnd.ms-excel" ||
+		mimeType === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+	) {
+		return { icon: FileSpreadsheet, bg: "bg-green-100 dark:bg-green-950/30", color: "text-green-500" };
 	}
-
-	// Generic file icon
-	return (
-		<div className="flex h-full w-full items-center justify-center bg-slate-100 dark:bg-slate-800">
-			<File className="h-10 w-10 text-slate-300 dark:text-slate-600" />
-		</div>
-	);
+	if (
+		mimeType === "application/vnd.ms-powerpoint" ||
+		mimeType === "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+	) {
+		return { icon: Presentation, bg: "bg-orange-100 dark:bg-orange-950/30", color: "text-orange-500" };
+	}
+	return { icon: File, bg: "bg-slate-100 dark:bg-slate-800", color: "text-slate-400" };
 }
 
 const FOLDER_COLORS: Record<string, string> = {
@@ -175,7 +123,6 @@ export function DocumentsList({
 
 	const [selectedFolder, setSelectedFolder] = useState<string | undefined>(undefined);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 	const [viewerDoc, setViewerDoc] = useState<any>(null);
 
 	const { data, isLoading } = useQuery(
@@ -203,18 +150,30 @@ export function DocumentsList({
 		}),
 	);
 
+	const downloadUrlMutation = useMutation(
+		orpc.projectDocuments.getDownloadUrl.mutationOptions({}),
+	);
+
 	const handleDelete = useCallback((docId: string) => {
 		if (!confirm(t("deleteConfirm"))) return;
 		deleteMutation.mutate({ organizationId, projectId, documentId: docId });
 	}, [deleteMutation, organizationId, projectId, t]);
 
-	const handleDownload = useCallback((doc: any) => {
-		if (doc.uploadType === "URL" && doc.fileUrl) {
-			window.open(doc.fileUrl, "_blank");
-		} else {
-			window.open(`${basePath}/documents/${doc.id}`, "_blank");
+	const handleDownload = useCallback(async (doc: any) => {
+		try {
+			const result = await downloadUrlMutation.mutateAsync({
+				organizationId,
+				projectId,
+				documentId: doc.id,
+			});
+			const link = window.document.createElement("a");
+			link.href = result.downloadUrl;
+			link.download = doc.fileName || doc.title;
+			link.click();
+		} catch {
+			toast.error(t("downloadError"));
 		}
-	}, [basePath]);
+	}, [downloadUrlMutation, organizationId, projectId, t]);
 
 	const FOLDER_TABS = [
 		{ key: undefined, labelKey: "folders.ALL" },
@@ -233,30 +192,12 @@ export function DocumentsList({
 				<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
 					{t("title")}
 				</h1>
-				<div className="flex items-center gap-2">
-					<div className="flex rounded-lg border border-slate-200 dark:border-slate-700">
-						<button
-							type="button"
-							onClick={() => setViewMode("grid")}
-							className={`rounded-s-lg p-2 ${viewMode === "grid" ? "bg-primary text-primary-foreground" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}
-						>
-							<LayoutGrid className="h-4 w-4" />
-						</button>
-						<button
-							type="button"
-							onClick={() => setViewMode("list")}
-							className={`rounded-e-lg p-2 ${viewMode === "list" ? "bg-primary text-primary-foreground" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}
-						>
-							<List className="h-4 w-4" />
-						</button>
-					</div>
-					<Button asChild className="rounded-xl">
-						<Link href={`${basePath}/documents/new`}>
-							<Plus className="h-4 w-4 me-2" />
-							{t("addDocument")}
-						</Link>
-					</Button>
-				</div>
+				<Button asChild className="rounded-xl">
+					<Link href={`${basePath}/documents/new`}>
+						<Plus className="h-4 w-4 me-2" />
+						{t("addDocument")}
+					</Link>
+				</Button>
 			</div>
 
 			{/* Search and Filters */}
@@ -291,16 +232,18 @@ export function DocumentsList({
 
 			{/* Content */}
 			{isLoading ? (
-				<div className={viewMode === "grid" ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3" : "space-y-3"}>
-					{Array.from({ length: 6 }).map((_, i) => (
+				<div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+					{Array.from({ length: 8 }).map((_, i) => (
 						<div
 							key={i}
-							className="animate-pulse overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+							className="animate-pulse rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900"
 						>
-							<div className="aspect-[4/3] bg-slate-200 dark:bg-slate-700" />
-							<div className="p-3">
-								<div className="mb-2 h-4 w-3/4 rounded bg-slate-200 dark:bg-slate-700" />
-								<div className="h-3 w-1/2 rounded bg-slate-200 dark:bg-slate-700" />
+							<div className="flex items-center gap-3">
+								<div className="h-10 w-10 rounded-lg bg-slate-200 dark:bg-slate-700" />
+								<div className="flex-1 space-y-1.5">
+									<div className="h-3.5 w-3/4 rounded bg-slate-200 dark:bg-slate-700" />
+									<div className="h-3 w-1/2 rounded bg-slate-200 dark:bg-slate-700" />
+								</div>
 							</div>
 						</div>
 					))}
@@ -323,173 +266,101 @@ export function DocumentsList({
 						</Link>
 					</Button>
 				</div>
-			) : viewMode === "grid" ? (
-				/* ─── Grid View ─── */
-				<div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-					{data.items.map((doc) => (
-						<div
-							key={doc.id}
-							className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white transition-all hover:shadow-lg hover:scale-[1.01] dark:border-slate-800 dark:bg-slate-900"
-						>
-							{/* Dropdown - top-start (RTL = left) */}
-							<div className="absolute start-2 top-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<Button
-											variant="secondary"
-											size="icon"
-											className="h-7 w-7 rounded-lg bg-white/80 backdrop-blur-sm shadow-sm dark:bg-slate-900/80"
-										>
-											<MoreVertical className="h-3.5 w-3.5" />
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent align="start">
-										<DropdownMenuItem onClick={() => setViewerDoc(doc)}>
-											<Eye className="h-4 w-4 me-2" />
-											{t("view")}
-										</DropdownMenuItem>
-										<DropdownMenuItem onClick={() => handleDownload(doc)}>
-											<Download className="h-4 w-4 me-2" />
-											{t("download")}
-										</DropdownMenuItem>
-										<DropdownMenuItem asChild>
-											<Link href={`${basePath}/documents/${doc.id}`}>
-												<Info className="h-4 w-4 me-2" />
-												{t("details")}
-											</Link>
-										</DropdownMenuItem>
-										<DropdownMenuItem asChild>
-											<Link href={`${basePath}/documents/${doc.id}`}>
-												<Shield className="h-4 w-4 me-2" />
-												{t("requestApproval")}
-											</Link>
-										</DropdownMenuItem>
-										<DropdownMenuSeparator />
-										<DropdownMenuItem
-											className="text-red-600 focus:text-red-600"
-											onClick={() => handleDelete(doc.id)}
-										>
-											<Trash2 className="h-4 w-4 me-2" />
-											{t("delete")}
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</div>
-
-							{/* Approval badge - top-end */}
-							{doc.approvals?.[0] && (
-								<div className="absolute end-2 top-2 z-10">
-									{getApprovalStatusBadge(doc.approvals[0].status)}
-								</div>
-							)}
-
-							{/* Thumbnail area (60%) — click opens viewer */}
-							<button
-								type="button"
-								onClick={() => setViewerDoc(doc)}
-								className="block w-full aspect-[4/3] overflow-hidden cursor-pointer"
-							>
-								<DocumentThumbnail
-									doc={doc}
-									organizationId={organizationId}
-									projectId={projectId}
-								/>
-							</button>
-
-							{/* Info area (40%) */}
-							<div className="p-3">
-								<h3 className="truncate text-sm font-medium text-slate-900 group-hover:text-primary dark:text-slate-100">
-									{doc.title}
-								</h3>
-								<div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
-									<Badge className={`border-0 text-[10px] px-1.5 py-0 ${FOLDER_COLORS[doc.folder]}`}>
-										{t(`folders.${doc.folder}`)}
-									</Badge>
-									{doc.fileSize && (
-										<>
-											<span className="text-slate-300">•</span>
-											<span>{formatFileSize(doc.fileSize)}</span>
-										</>
-									)}
-								</div>
-							</div>
-						</div>
-					))}
-				</div>
 			) : (
-				/* ─── List View ─── */
-				<div className="space-y-2">
-					{data.items.map((doc) => (
-						<div
-							key={doc.id}
-							className="group flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-primary/50 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900"
-						>
-							<button
-								type="button"
-								onClick={() => setViewerDoc(doc)}
-								className="shrink-0 h-11 w-11 overflow-hidden rounded-lg"
+				/* ─── Compact Grid ─── */
+				<div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+					{data.items.map((doc) => {
+						const { icon: FileIcon, bg, color } = getFileTypeIcon(doc.mimeType);
+						return (
+							<div
+								key={doc.id}
+								className="group relative flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 transition-all hover:border-primary/50 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900"
 							>
-								<DocumentThumbnail
-									doc={doc}
-									organizationId={organizationId}
-									projectId={projectId}
-								/>
-							</button>
+								{/* File icon — click opens viewer */}
+								<button
+									type="button"
+									onClick={() => setViewerDoc(doc)}
+									className={`shrink-0 flex h-10 w-10 items-center justify-center rounded-lg ${bg} cursor-pointer`}
+								>
+									<FileIcon className={`h-5 w-5 ${color}`} />
+								</button>
 
-							<Link
-								href={`${basePath}/documents/${doc.id}`}
-								className="min-w-0 flex-1"
-							>
-								<h3 className="truncate font-medium text-slate-900 group-hover:text-primary dark:text-slate-100">
-									{doc.title}
-								</h3>
-								<div className="flex items-center gap-2 text-xs text-slate-500">
-									<Badge className={`border-0 text-[10px] px-1.5 py-0 ${FOLDER_COLORS[doc.folder]}`}>
-										{t(`folders.${doc.folder}`)}
-									</Badge>
-									<span>{new Date(doc.createdAt).toLocaleDateString("ar-SA")}</span>
-									{doc.fileSize && (
-										<span>{formatFileSize(doc.fileSize)}</span>
-									)}
+								{/* Name + meta — click opens viewer */}
+								<button
+									type="button"
+									onClick={() => setViewerDoc(doc)}
+									className="min-w-0 flex-1 text-start cursor-pointer"
+								>
+									<p className="truncate text-sm font-medium text-slate-900 group-hover:text-primary dark:text-slate-100">
+										{doc.title}
+									</p>
+									<div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+										<Badge className={`border-0 text-[10px] px-1.5 py-0 ${FOLDER_COLORS[doc.folder]}`}>
+											{t(`folders.${doc.folder}`)}
+										</Badge>
+										{doc.fileSize && (
+											<>
+												<span className="text-slate-300">•</span>
+												<span>{formatFileSize(doc.fileSize)}</span>
+											</>
+										)}
+									</div>
+								</button>
+
+								{/* Approval badge */}
+								{doc.approvals?.[0] && (
+									<div className="shrink-0">
+										{getApprovalStatusBadge(doc.approvals[0].status)}
+									</div>
+								)}
+
+								{/* Dropdown */}
+								<div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-7 w-7 rounded-lg"
+											>
+												<MoreVertical className="h-3.5 w-3.5" />
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="end">
+											<DropdownMenuItem onClick={() => setViewerDoc(doc)}>
+												<Eye className="h-4 w-4 me-2" />
+												{t("view")}
+											</DropdownMenuItem>
+											<DropdownMenuItem onClick={() => handleDownload(doc)}>
+												<Download className="h-4 w-4 me-2" />
+												{t("download")}
+											</DropdownMenuItem>
+											<DropdownMenuItem asChild>
+												<Link href={`${basePath}/documents/${doc.id}`}>
+													<Info className="h-4 w-4 me-2" />
+													{t("details")}
+												</Link>
+											</DropdownMenuItem>
+											<DropdownMenuItem asChild>
+												<Link href={`${basePath}/documents/${doc.id}`}>
+													<Shield className="h-4 w-4 me-2" />
+													{t("requestApproval")}
+												</Link>
+											</DropdownMenuItem>
+											<DropdownMenuSeparator />
+											<DropdownMenuItem
+												className="text-red-600 focus:text-red-600"
+												onClick={() => handleDelete(doc.id)}
+											>
+												<Trash2 className="h-4 w-4 me-2" />
+												{t("delete")}
+											</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
 								</div>
-							</Link>
-
-							<div className="flex shrink-0 items-center gap-2">
-								{doc.approvals?.[0] && getApprovalStatusBadge(doc.approvals[0].status)}
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
-											<MoreVertical className="h-4 w-4" />
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent align="end">
-										<DropdownMenuItem onClick={() => setViewerDoc(doc)}>
-											<Eye className="h-4 w-4 me-2" />
-											{t("view")}
-										</DropdownMenuItem>
-										<DropdownMenuItem onClick={() => handleDownload(doc)}>
-											<Download className="h-4 w-4 me-2" />
-											{t("download")}
-										</DropdownMenuItem>
-										<DropdownMenuItem asChild>
-											<Link href={`${basePath}/documents/${doc.id}`}>
-												<Info className="h-4 w-4 me-2" />
-												{t("details")}
-											</Link>
-										</DropdownMenuItem>
-										<DropdownMenuSeparator />
-										<DropdownMenuItem
-											className="text-red-600 focus:text-red-600"
-											onClick={() => handleDelete(doc.id)}
-										>
-											<Trash2 className="h-4 w-4 me-2" />
-											{t("delete")}
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
 							</div>
-						</div>
-					))}
+						);
+					})}
 				</div>
 			)}
 

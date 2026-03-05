@@ -26,10 +26,8 @@ export const createDocumentProcedure = subscriptionProcedure
 			folder: DocumentFolderEnum,
 			title: z.string().min(1, "العنوان مطلوب"),
 			description: z.string().optional(),
-			// URL upload
-			fileUrl: z.string().url().optional(),
-			// File upload fields
 			uploadType: z.enum(["FILE", "URL"]).default("FILE"),
+			fileUrl: z.string().url().optional(),
 			fileName: z.string().optional(),
 			fileSize: z.number().int().optional(),
 			mimeType: z.string().optional(),
@@ -41,7 +39,7 @@ export const createDocumentProcedure = subscriptionProcedure
 				if (data.uploadType === "FILE") return !!data.storagePath;
 				return false;
 			},
-			{ message: "يجب توفير رابط أو ملف مرفوع" },
+			{ message: "يجب رفع ملف" },
 		),
 	)
 	.handler(async ({ input, context }) => {

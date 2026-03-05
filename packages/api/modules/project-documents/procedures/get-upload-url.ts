@@ -12,6 +12,13 @@ const ALLOWED_MIME_TYPES = [
 	"image/png",
 	"image/webp",
 	"application/pdf",
+	// Office formats
+	"application/msword",
+	"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	"application/vnd.ms-excel",
+	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	"application/vnd.ms-powerpoint",
+	"application/vnd.openxmlformats-officedocument.presentationml.presentation",
 ];
 
 export const getUploadUrlProcedure = subscriptionProcedure
@@ -48,7 +55,7 @@ export const getUploadUrlProcedure = subscriptionProcedure
 		// Validate mime type
 		if (!ALLOWED_MIME_TYPES.includes(input.mimeType)) {
 			throw new ORPCError("BAD_REQUEST", {
-				message: "نوع الملف غير مدعوم. الأنواع المسموحة: JPEG, PNG, WebP, PDF",
+				message: "نوع الملف غير مدعوم. الأنواع المسموحة: JPEG, PNG, WebP, PDF, Word, Excel, PowerPoint",
 			});
 		}
 
@@ -63,22 +70,11 @@ export const getUploadUrlProcedure = subscriptionProcedure
 			? `documents/${input.organizationId}/${input.projectId}/thumbnails/${uploadId}_thumb.webp`
 			: null;
 
-		// DEBUG: Log all inputs
-		console.log("[DOC-UPLOAD-DEBUG] === getUploadUrl called ===");
-		console.log("[DOC-UPLOAD-DEBUG] Bucket:", DOCUMENTS_BUCKET);
-		console.log("[DOC-UPLOAD-DEBUG] S3_ATTACHMENTS_BUCKET env:", process.env.S3_ATTACHMENTS_BUCKET);
-		console.log("[DOC-UPLOAD-DEBUG] storagePath:", storagePath);
-		console.log("[DOC-UPLOAD-DEBUG] mimeType:", input.mimeType);
-		console.log("[DOC-UPLOAD-DEBUG] fileName:", input.fileName);
-		console.log("[DOC-UPLOAD-DEBUG] fileSize:", input.fileSize);
-
 		// Get signed upload URL
 		const uploadUrl = await getSignedUploadUrl(storagePath, {
 			bucket: DOCUMENTS_BUCKET,
 			contentType: input.mimeType,
 		});
-
-		console.log("[DOC-UPLOAD-DEBUG] Generated uploadUrl:", uploadUrl);
 
 		// Get thumbnail upload URL if image
 		let thumbnailUploadUrl: string | null = null;
@@ -87,7 +83,6 @@ export const getUploadUrlProcedure = subscriptionProcedure
 				bucket: DOCUMENTS_BUCKET,
 				contentType: "image/webp",
 			});
-			console.log("[DOC-UPLOAD-DEBUG] Generated thumbnailUploadUrl:", thumbnailUploadUrl);
 		}
 
 		return {

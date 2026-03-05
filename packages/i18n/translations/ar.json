@@ -1704,7 +1704,7 @@
 			"dragAndDrop": "اسحب الملف وأفلته هنا أو انقر للاختيار",
 			"dropHere": "أفلت الملف هنا",
 			"maxFileSize": "الحد الأقصى 25 ميجابايت",
-			"supportedFormats": "JPEG, PNG, WebP, PDF",
+			"supportedFormats": "JPEG, PNG, WebP, PDF, Word, Excel, PowerPoint",
 			"uploading": "جاري الرفع",
 			"processing": "جاري المعالجة",
 			"uploadSuccess": "تم الرفع بنجاح",

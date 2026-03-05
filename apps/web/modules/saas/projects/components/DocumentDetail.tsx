@@ -10,7 +10,6 @@ import {
 	Clock,
 	XCircle,
 	FileText,
-	ExternalLink,
 	Shield,
 	User,
 	Calendar,
@@ -160,11 +159,6 @@ export function DocumentDetail({
 	const handleDownload = async () => {
 		if (!document) return;
 
-		if (document.uploadType === "URL" && document.fileUrl) {
-			window.open(document.fileUrl, "_blank");
-			return;
-		}
-
 		try {
 			const result = await downloadUrlMutation.mutateAsync({
 				organizationId,
@@ -174,7 +168,6 @@ export function DocumentDetail({
 			const link = window.document.createElement("a");
 			link.href = result.downloadUrl;
 			link.download = result.fileName || document.title;
-			link.target = "_blank";
 			link.click();
 		} catch {
 			toast.error(t("downloadError"));
@@ -284,14 +277,6 @@ export function DocumentDetail({
 						<Download className="h-4 w-4 me-2" />
 						{t("download")}
 					</Button>
-					{document.uploadType === "URL" && document.fileUrl && (
-						<Button asChild className="rounded-xl">
-							<a href={document.fileUrl} target="_blank" rel="noopener noreferrer">
-								<ExternalLink className="h-4 w-4 me-2" />
-								{t("openFile")}
-							</a>
-						</Button>
-					)}
 					<Button
 						variant="outline"
 						className="rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20"

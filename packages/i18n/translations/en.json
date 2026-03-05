@@ -1747,7 +1747,7 @@
 			"dragAndDrop": "Drag and drop a file here, or click to select",
 			"dropHere": "Drop the file here",
 			"maxFileSize": "Max 25MB",
-			"supportedFormats": "JPEG, PNG, WebP, PDF",
+			"supportedFormats": "JPEG, PNG, WebP, PDF, Word, Excel, PowerPoint",
 			"uploading": "Uploading",
 			"processing": "Processing",
 			"uploadSuccess": "Uploaded successfully",

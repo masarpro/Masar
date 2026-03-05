@@ -87,7 +87,7 @@ const nextConfig: NextConfig = {
 			"style-src 'self' 'unsafe-inline'",
 			`img-src 'self' https: data: blob: https://*.supabase.co ${supabaseStorage}`,
 			`connect-src 'self' blob: https://*.supabase.co ${supabaseStorage}`,
-			`frame-src 'self' ${supabaseStorage} blob:`,
+			`frame-src 'self' ${supabaseStorage} https://docs.google.com blob:`,
 			"font-src 'self'",
 			"frame-ancestors 'none'",
 			"base-uri 'self'",

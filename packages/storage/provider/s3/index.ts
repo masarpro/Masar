@@ -55,18 +55,6 @@ export const getSignedUploadUrl: GetSignedUploadUrlHandler = async (
 ) => {
 	const s3Client = getS3Client();
 
-	// DEBUG: Log S3 client configuration
-	const s3Endpoint = process.env.S3_ENDPOINT;
-	const s3Region = process.env.S3_REGION || "auto";
-	console.log("[UPLOAD-DEBUG] S3 Config:", {
-		endpoint: s3Endpoint,
-		region: s3Region,
-		forcePathStyle: true,
-		bucket,
-		key: path,
-		contentType: contentType || "application/octet-stream",
-	});
-
 	try {
 		const signedUrl = await getS3SignedUrl(
 			s3Client,
@@ -80,14 +68,8 @@ export const getSignedUploadUrl: GetSignedUploadUrlHandler = async (
 			},
 		);
 
-		// DEBUG: Log the generated presigned URL
-		console.log("[UPLOAD-DEBUG] Generated presigned URL:", signedUrl);
-		console.log("[UPLOAD-DEBUG] URL hostname:", new URL(signedUrl).hostname);
-		console.log("[UPLOAD-DEBUG] URL pathname:", new URL(signedUrl).pathname);
-
 		return signedUrl;
 	} catch (e) {
-		console.error("[UPLOAD-DEBUG] Error generating presigned URL:", e);
 		logger.error(e);
 
 		throw new Error("Could not get signed upload url");

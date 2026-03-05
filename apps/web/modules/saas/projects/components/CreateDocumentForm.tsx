@@ -13,7 +13,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@ui/components/select";
-import { ChevronLeft, Upload, Link2 } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -36,8 +36,6 @@ const FOLDER_OPTIONS = [
 	{ value: "OTHER", labelKey: "folders.OTHER" },
 ];
 
-type UploadTab = "file" | "url";
-
 export function CreateDocumentForm({
 	organizationId,
 	organizationSlug,
@@ -49,12 +47,10 @@ export function CreateDocumentForm({
 	const queryClient = useQueryClient();
 	const basePath = `/app/${organizationSlug}/projects/${projectId}`;
 
-	const [activeTab, setActiveTab] = useState<UploadTab>("file");
 	const [formData, setFormData] = useState({
 		folder: "",
 		title: "",
 		description: "",
-		fileUrl: "",
 	});
 
 	// File upload state
@@ -89,41 +85,24 @@ export function CreateDocumentForm({
 			return;
 		}
 
-		if (activeTab === "url" && !formData.fileUrl) {
+		if (!fileData) {
 			toast.error(t("requiredFields"));
 			return;
 		}
 
-		if (activeTab === "file" && !fileData) {
-			toast.error(t("requiredFields"));
-			return;
-		}
-
-		if (activeTab === "file" && fileData) {
-			createMutation.mutate({
-				organizationId,
-				projectId,
-				folder: formData.folder as any,
-				title: formData.title,
-				description: formData.description || undefined,
-				uploadType: "FILE",
-				storagePath: fileData.storagePath,
-				thumbnailPath: fileData.thumbnailPath ?? undefined,
-				fileName: fileData.fileName,
-				fileSize: fileData.fileSize,
-				mimeType: fileData.mimeType,
-			});
-		} else {
-			createMutation.mutate({
-				organizationId,
-				projectId,
-				folder: formData.folder as any,
-				title: formData.title,
-				description: formData.description || undefined,
-				uploadType: "URL",
-				fileUrl: formData.fileUrl,
-			});
-		}
+		createMutation.mutate({
+			organizationId,
+			projectId,
+			folder: formData.folder as any,
+			title: formData.title,
+			description: formData.description || undefined,
+			uploadType: "FILE",
+			storagePath: fileData.storagePath,
+			thumbnailPath: fileData.thumbnailPath ?? undefined,
+			fileName: fileData.fileName,
+			fileSize: fileData.fileSize,
+			mimeType: fileData.mimeType,
+		});
 	};
 
 	return (
@@ -188,65 +167,15 @@ export function CreateDocumentForm({
 							/>
 						</div>
 
-						{/* Upload Tab Switcher */}
-						<div className="space-y-3 sm:col-span-2">
-							<Label>{t("fileSource")}</Label>
-							<div className="flex gap-2">
-								<button
-									type="button"
-									onClick={() => setActiveTab("file")}
-									className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
-										activeTab === "file"
-											? "bg-primary text-primary-foreground"
-											: "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
-									}`}
-								>
-									<Upload className="h-4 w-4" />
-									{t("uploadFile")}
-								</button>
-								<button
-									type="button"
-									onClick={() => setActiveTab("url")}
-									className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
-										activeTab === "url"
-											? "bg-primary text-primary-foreground"
-											: "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
-									}`}
-								>
-									<Link2 className="h-4 w-4" />
-									{t("externalLink")}
-								</button>
-							</div>
-
-							{/* File Upload Zone */}
-							{activeTab === "file" && (
-								<FileUploadZone
-									organizationId={organizationId}
-									projectId={projectId}
-									onUploadComplete={(data) => setFileData(data)}
-									onRemove={() => setFileData(null)}
-								/>
-							)}
-
-							{/* URL Input */}
-							{activeTab === "url" && (
-								<div className="space-y-2">
-									<Input
-										id="fileUrl"
-										type="url"
-										value={formData.fileUrl}
-										onChange={(e) =>
-											setFormData((prev) => ({ ...prev, fileUrl: e.target.value }))
-										}
-										placeholder="https://..."
-										className="rounded-xl"
-										dir="ltr"
-									/>
-									<p className="text-xs text-slate-500">
-										{t("fileUrlHint")}
-									</p>
-								</div>
-							)}
+						{/* File Upload Zone */}
+						<div className="space-y-2 sm:col-span-2">
+							<Label>{t("uploadFile")} *</Label>
+							<FileUploadZone
+								organizationId={organizationId}
+								projectId={projectId}
+								onUploadComplete={(data) => setFileData(data)}
+								onRemove={() => setFileData(null)}
+							/>
 						</div>
 
 						<div className="space-y-2 sm:col-span-2">
