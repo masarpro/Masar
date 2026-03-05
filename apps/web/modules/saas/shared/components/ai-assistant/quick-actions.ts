@@ -32,9 +32,9 @@ const quickActionsMap: Record<string, QuickAction[]> = {
     { id: "timeline-guide", labelAr: "كيف أحدث الجدول؟", labelEn: "How to update?", icon: "HelpCircle", prompt: "كيف أحدث الجدول الزمني للمشروع؟" },
   ],
   "project-documents": [
-    { id: "recent-docs", labelAr: "مستندات حديثة", labelEn: "Recent documents", icon: "FileText", prompt: "ما آخر المستندات المرفوعة؟" },
-    { id: "upload-guide", labelAr: "كيف أرفع مستند؟", labelEn: "How to upload?", icon: "Upload", prompt: "كيف أرفع مستند جديد للمشروع؟" },
-    { id: "missing-docs", labelAr: "مستندات ناقصة", labelEn: "Missing documents", icon: "FileWarning", prompt: "هل فيه مستندات ناقصة أو مطلوبة؟" },
+    { id: "recent-docs", labelAr: "ملفات حديثة", labelEn: "Recent files", icon: "FileText", prompt: "ما آخر الملفات المرفوعة؟" },
+    { id: "upload-guide", labelAr: "كيف أرفع ملف؟", labelEn: "How to upload?", icon: "Upload", prompt: "كيف أرفع ملف جديد للمشروع؟" },
+    { id: "missing-docs", labelAr: "ملفات ناقصة", labelEn: "Missing files", icon: "FileWarning", prompt: "هل فيه ملفات ناقصة أو مطلوبة؟" },
   ],
   "project-chat": [
     { id: "chat-summary", labelAr: "ملخص المحادثات", labelEn: "Chat summary", icon: "MessageSquare", prompt: "أعطني ملخص لآخر المحادثات في المشروع" },

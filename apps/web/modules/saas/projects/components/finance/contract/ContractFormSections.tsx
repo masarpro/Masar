@@ -61,6 +61,7 @@ type PaymentTermRow = {
 	type: (typeof TERM_TYPES)[number];
 	label: string;
 	percent: string;
+	amount: string;
 };
 
 export interface ContractFormData {
@@ -181,6 +182,7 @@ export const ContractFormSections = forwardRef<
 			type: term.type as (typeof TERM_TYPES)[number],
 			label: term.label ?? "",
 			percent: term.percent?.toString() ?? "",
+			amount: term.amount?.toString() ?? "",
 		})) ?? [],
 	);
 
@@ -232,8 +234,12 @@ export const ContractFormSections = forwardRef<
 	);
 
 	const termsTotalAmount = useMemo(
-		() => (totalWithVat * termsTotalPercent) / 100,
-		[totalWithVat, termsTotalPercent],
+		() =>
+			paymentTerms.reduce((sum, term) => {
+				const amt = parseFloat(term.amount);
+				return sum + (isNaN(amt) ? 0 : amt);
+			}, 0),
+		[paymentTerms],
 	);
 
 	// ─── Handlers ───────────────────────────────────────
@@ -252,6 +258,7 @@ export const ContractFormSections = forwardRef<
 				type: "MILESTONE" as const,
 				label: "",
 				percent: "",
+				amount: "",
 			},
 		]);
 	}, []);
@@ -263,10 +270,29 @@ export const ContractFormSections = forwardRef<
 	const updatePaymentTerm = useCallback(
 		(id: string, field: keyof PaymentTermRow, value: string) => {
 			setPaymentTerms((prev) =>
-				prev.map((t) => (t.id === id ? { ...t, [field]: value } : t)),
+				prev.map((t) => {
+					if (t.id !== id) return t;
+					const updated = { ...t, [field]: value };
+
+					if (field === "percent" && totalWithVat > 0) {
+						const pct = parseFloat(value);
+						updated.amount =
+							!isNaN(pct) && value !== ""
+								? ((totalWithVat * pct) / 100).toFixed(2)
+								: "";
+					} else if (field === "amount" && totalWithVat > 0) {
+						const amt = parseFloat(value);
+						updated.percent =
+							!isNaN(amt) && value !== ""
+								? ((amt / totalWithVat) * 100).toFixed(2)
+								: "";
+					}
+
+					return updated;
+				}),
 			);
 		},
-		[],
+		[totalWithVat],
 	);
 
 	// ─── Ref ────────────────────────────────────────────
@@ -304,13 +330,13 @@ export const ContractFormSections = forwardRef<
 					: null,
 				paymentTerms: paymentTerms.map((term, idx) => {
 					const pct = parseFloat(term.percent);
+					const amt = parseFloat(term.amount);
 					return {
 						id: term.dbId,
 						type: term.type,
 						label: term.label || null,
 						percent: isNaN(pct) ? null : pct,
-						amount:
-							!isNaN(pct) ? (totalWithVat * pct) / 100 : null,
+						amount: isNaN(amt) ? null : amt,
 						sortOrder: idx,
 					};
 				}),
@@ -598,126 +624,133 @@ export const ContractFormSections = forwardRef<
 						</div>
 					)}
 
-					{paymentTerms.map((term) => {
-						const termPct = parseFloat(term.percent);
-						const termAmount = !isNaN(termPct)
-							? (totalWithVat * termPct) / 100
-							: 0;
+					{paymentTerms.map((term) => (
+						<div
+							key={term.id}
+							className="grid grid-cols-[1fr_1.5fr_0.7fr_1fr_auto] items-end gap-3 rounded-xl border border-violet-100 bg-white p-3 dark:border-violet-800/30 dark:bg-slate-900/40"
+						>
+							<div className="space-y-1">
+								<Label className="text-xs text-slate-500">
+									{t(
+										"projects.createProject.termType",
+									)}
+								</Label>
+								<Select
+									value={term.type}
+									onValueChange={(val) =>
+										updatePaymentTerm(
+											term.id,
+											"type",
+											val,
+										)
+									}
+								>
+									<SelectTrigger className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 text-xs dark:border-violet-800/40 dark:bg-slate-800/50">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent className="rounded-xl">
+										{TERM_TYPES.map((tt) => (
+											<SelectItem
+												key={tt}
+												value={tt}
+												className="rounded-lg text-xs"
+											>
+												{t(
+													`projects.createProject.termTypes.${tt}`,
+												)}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
 
-						return (
-							<div
-								key={term.id}
-								className="grid grid-cols-[1fr_1.5fr_0.7fr_1fr_auto] items-end gap-3 rounded-xl border border-violet-100 bg-white p-3 dark:border-violet-800/30 dark:bg-slate-900/40"
-							>
-								<div className="space-y-1">
-									<Label className="text-xs text-slate-500">
-										{t(
-											"projects.createProject.termType",
-										)}
-									</Label>
-									<Select
-										value={term.type}
-										onValueChange={(val) =>
-											updatePaymentTerm(
-												term.id,
-												"type",
-												val,
-											)
-										}
-									>
-										<SelectTrigger className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 text-xs dark:border-violet-800/40 dark:bg-slate-800/50">
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent className="rounded-xl">
-											{TERM_TYPES.map((tt) => (
-												<SelectItem
-													key={tt}
-													value={tt}
-													className="rounded-lg text-xs"
-												>
-													{t(
-														`projects.createProject.termTypes.${tt}`,
-													)}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-								</div>
+							<div className="space-y-1">
+								<Label className="text-xs text-slate-500">
+									{t(
+										"projects.createProject.termLabel",
+									)}
+								</Label>
+								<Input
+									value={term.label}
+									onChange={(e) =>
+										updatePaymentTerm(
+											term.id,
+											"label",
+											e.target.value,
+										)
+									}
+									className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 text-xs dark:border-violet-800/40 dark:bg-slate-800/50"
+								/>
+							</div>
 
-								<div className="space-y-1">
-									<Label className="text-xs text-slate-500">
-										{t(
-											"projects.createProject.termLabel",
-										)}
-									</Label>
+							<div className="space-y-1">
+								<Label className="text-xs text-slate-500">
+									{t(
+										"projects.createProject.termPercent",
+									)}
+								</Label>
+								<div className="relative">
 									<Input
-										value={term.label}
+										type="number"
+										step="0.01"
+										min="0"
+										max="100"
+										value={term.percent}
 										onChange={(e) =>
 											updatePaymentTerm(
 												term.id,
-												"label",
+												"percent",
 												e.target.value,
 											)
 										}
-										className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 text-xs dark:border-violet-800/40 dark:bg-slate-800/50"
+										className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 pl-6 text-xs dark:border-violet-800/40 dark:bg-slate-800/50"
 									/>
+									<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+										%
+									</span>
 								</div>
-
-								<div className="space-y-1">
-									<Label className="text-xs text-slate-500">
-										{t(
-											"projects.createProject.termPercent",
-										)}
-									</Label>
-									<div className="relative">
-										<Input
-											type="number"
-											step="0.01"
-											min="0"
-											max="100"
-											value={term.percent}
-											onChange={(e) =>
-												updatePaymentTerm(
-													term.id,
-													"percent",
-													e.target.value,
-												)
-											}
-											className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 pl-6 text-xs dark:border-violet-800/40 dark:bg-slate-800/50"
-										/>
-										<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
-											%
-										</span>
-									</div>
-								</div>
-
-								<div className="space-y-1">
-									<Label className="text-xs text-slate-500">
-										{t(
-											"projects.createProject.termAmount",
-										)}
-									</Label>
-									<div className="flex h-9 items-center rounded-lg bg-violet-50 px-3 font-mono text-xs font-medium text-violet-700 dark:bg-violet-950/30 dark:text-violet-300">
-										{termAmount > 0
-											? formatNumber(termAmount)
-											: "—"}
-									</div>
-								</div>
-
-								<Button
-									type="button"
-									variant="ghost"
-									size="icon"
-									onClick={() =>
-										removePaymentTerm(term.id)
-									}
-									className="h-9 w-9 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
-								>
-									<Trash2 className="h-4 w-4" />
-								</Button>
 							</div>
-						);
-					})}
+
+							<div className="space-y-1">
+								<Label className="text-xs text-slate-500">
+									{t(
+										"projects.createProject.termAmount",
+									)}
+								</Label>
+								<div className="relative">
+									<Input
+										type="number"
+										step="0.01"
+										min="0"
+										value={term.amount}
+										onChange={(e) =>
+											updatePaymentTerm(
+												term.id,
+												"amount",
+												e.target.value,
+											)
+										}
+										className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 pl-12 font-mono text-xs dark:border-violet-800/40 dark:bg-slate-800/50"
+									/>
+									<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+										ر.س
+									</span>
+								</div>
+							</div>
+
+							<Button
+								type="button"
+								variant="ghost"
+								size="icon"
+								onClick={() =>
+									removePaymentTerm(term.id)
+								}
+								className="h-9 w-9 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
+							>
+								<Trash2 className="h-4 w-4" />
+							</Button>
+						</div>
+					))}
 
 					{paymentTerms.length > 0 && (
 						<div

@@ -42,6 +42,12 @@ const nextConfig: NextConfig = {
 				pathname: "/**",
 			},
 			{
+				// Supabase Storage - document files
+				protocol: "https",
+				hostname: "mbivfenbnvkquxajwbju.storage.supabase.co",
+				pathname: "/**",
+			},
+			{
 				// localhost for development
 				protocol: "http",
 				hostname: "localhost",
@@ -74,8 +80,19 @@ const nextConfig: NextConfig = {
 		// Full CSP for authenticated app and auth routes. Permissive enough for
 		// Next.js (unsafe-inline/unsafe-eval needed for dev and inline scripts)
 		// while blocking framing, base-uri hijacking, and form-action abuse.
-		const appCsp =
-			"default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob: https://*.supabase.co https://*.storage.supabase.co; connect-src 'self' blob: https://*.supabase.co https://*.storage.supabase.co; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
+		const supabaseStorage = "https://mbivfenbnvkquxajwbju.storage.supabase.co";
+		const appCsp = [
+			"default-src 'self'",
+			"script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+			"style-src 'self' 'unsafe-inline'",
+			`img-src 'self' https: data: blob: https://*.supabase.co ${supabaseStorage}`,
+			`connect-src 'self' blob: https://*.supabase.co ${supabaseStorage}`,
+			`frame-src 'self' ${supabaseStorage} blob:`,
+			"font-src 'self'",
+			"frame-ancestors 'none'",
+			"base-uri 'self'",
+			"form-action 'self'",
+		].join("; ");
 
 		return [
 			// SaaS app routes — no cache, strict framing, full CSP

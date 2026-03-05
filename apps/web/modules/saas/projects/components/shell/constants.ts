@@ -194,8 +194,8 @@ export const NAVIGATION_GROUPS: NavGroup[] = [
 			{
 				id: "documents",
 				path: "documents",
-				label: "الوثائق",
-				labelEn: "Documents",
+				label: "ملفات المشروع",
+				labelEn: "Project Files",
 				icon: FolderKanban,
 			},
 			{
@@ -460,8 +460,8 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 	documents: [
 		{
 			id: "new-document",
-			label: "إضافة وثيقة",
-			labelEn: "Add Document",
+			label: "إضافة ملف",
+			labelEn: "Add File",
 			icon: FolderKanban,
 			href: "documents/new",
 			variant: "primary",

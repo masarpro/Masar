@@ -39,6 +39,7 @@ interface PaymentTerm {
 interface PaymentTermsCardProps {
 	organizationId: string;
 	projectId: string;
+	contractValue?: number;
 	terms: Array<{
 		id: string;
 		type: string;
@@ -58,6 +59,7 @@ function toDateInputValue(date: string | Date | null | undefined): string {
 export function PaymentTermsCard({
 	organizationId,
 	projectId,
+	contractValue = 0,
 	terms: initialTerms,
 }: PaymentTermsCardProps) {
 	const t = useTranslations();
@@ -112,9 +114,26 @@ export function PaymentTermsCard({
 		value: string,
 	) => {
 		setTerms((prev) =>
-			prev.map((term, i) =>
-				i === index ? { ...term, [field]: value } : term,
-			),
+			prev.map((term, i) => {
+				if (i !== index) return term;
+				const updated = { ...term, [field]: value };
+
+				if (field === "percent" && contractValue > 0) {
+					const pct = parseFloat(value);
+					updated.amount =
+						!isNaN(pct) && value !== ""
+							? ((contractValue * pct) / 100).toFixed(2)
+							: "";
+				} else if (field === "amount" && contractValue > 0) {
+					const amt = parseFloat(value);
+					updated.percent =
+						!isNaN(amt) && value !== ""
+							? ((amt / contractValue) * 100).toFixed(2)
+							: "";
+				}
+
+				return updated;
+			}),
 		);
 	};
 
