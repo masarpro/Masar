@@ -63,11 +63,22 @@ export const getUploadUrlProcedure = subscriptionProcedure
 			? `documents/${input.organizationId}/${input.projectId}/thumbnails/${uploadId}_thumb.webp`
 			: null;
 
+		// DEBUG: Log all inputs
+		console.log("[DOC-UPLOAD-DEBUG] === getUploadUrl called ===");
+		console.log("[DOC-UPLOAD-DEBUG] Bucket:", DOCUMENTS_BUCKET);
+		console.log("[DOC-UPLOAD-DEBUG] S3_ATTACHMENTS_BUCKET env:", process.env.S3_ATTACHMENTS_BUCKET);
+		console.log("[DOC-UPLOAD-DEBUG] storagePath:", storagePath);
+		console.log("[DOC-UPLOAD-DEBUG] mimeType:", input.mimeType);
+		console.log("[DOC-UPLOAD-DEBUG] fileName:", input.fileName);
+		console.log("[DOC-UPLOAD-DEBUG] fileSize:", input.fileSize);
+
 		// Get signed upload URL
 		const uploadUrl = await getSignedUploadUrl(storagePath, {
 			bucket: DOCUMENTS_BUCKET,
 			contentType: input.mimeType,
 		});
+
+		console.log("[DOC-UPLOAD-DEBUG] Generated uploadUrl:", uploadUrl);
 
 		// Get thumbnail upload URL if image
 		let thumbnailUploadUrl: string | null = null;
@@ -76,6 +87,7 @@ export const getUploadUrlProcedure = subscriptionProcedure
 				bucket: DOCUMENTS_BUCKET,
 				contentType: "image/webp",
 			});
+			console.log("[DOC-UPLOAD-DEBUG] Generated thumbnailUploadUrl:", thumbnailUploadUrl);
 		}
 
 		return {
