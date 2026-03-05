@@ -32,7 +32,7 @@ interface LeadLinkedTabProps {
 	organizationSlug: string;
 	costStudy?: {
 		id: string;
-		name: string;
+		name: string | null;
 		totalCost: number;
 		projectType?: string | null;
 		createdAt: string | Date;
@@ -118,7 +118,7 @@ export function LeadLinkedTab({
 										href={`${basePath}/studies/${costStudy.id}`}
 										className="text-sm font-medium text-primary hover:underline"
 									>
-										{costStudy.name}
+										{costStudy.name ?? "—"}
 									</Link>
 									<div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
 										<span>{new Intl.NumberFormat("en-SA").format(costStudy.totalCost)} ر.س</span>

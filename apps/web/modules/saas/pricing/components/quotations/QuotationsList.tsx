@@ -147,13 +147,13 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 													{quotation.clientCompany}
 												</p>
 											)}
-											{(quotation as any).lead && (
+											{quotation.lead && (
 												<Link
-													href={`/app/${organizationSlug}/pricing/leads/${(quotation as any).lead.id}`}
+													href={`/app/${organizationSlug}/pricing/leads/${quotation.lead.id}`}
 													className="mt-1 inline-flex items-center gap-1 rounded-md border border-border bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
 												>
 													<UserSearch className="h-3 w-3" />
-													{(quotation as any).lead.name}
+													{quotation.lead.name}
 												</Link>
 											)}
 										</div>
