@@ -2771,6 +2771,8 @@
 		},
 		"invalidLink": "Invalid Link",
 		"invalidLinkDescription": "This access link is invalid or has been revoked.",
+		"tokenExpired": "Access link has expired",
+		"tokenExpiredDescription": "Please contact the contractor for a new access link.",
 		"footer": "Powered by Masar",
 		"currentPhase": "Current Phase",
 		"progress": "Progress",
@@ -2850,7 +2852,20 @@
 		"confirmRevoke": "Revoke",
 		"revokeSuccess": "Access link revoked",
 		"revokeError": "Failed to revoke access",
-		"createError": "Failed to create access link"
+		"createError": "Failed to create access link",
+		"expired": "Expired",
+		"expiringSoon": "Expiring soon",
+		"expiresAt": "Expires on",
+		"renewLink": "Renew",
+		"renewTitle": "Renew Access Link",
+		"renewDescription": "Choose the new validity period for the link.",
+		"renewSuccess": "Link renewed successfully",
+		"renewError": "Failed to renew link",
+		"expiryDuration": "Validity period",
+		"days7": "7 days",
+		"days30": "30 days",
+		"days60": "60 days",
+		"days90": "90 days"
 	},
 	"integrations": {
 		"settings": {

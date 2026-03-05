@@ -1,9 +1,9 @@
-import { ORPCError } from "@orpc/server";
 import { getOwnerContextByToken, sendOwnerPortalMessage, createNotifications } from "@repo/database";
 import { z } from "zod";
 import { publicProcedure } from "../../../orpc/procedures";
 import { db } from "@repo/database";
 import { enforceRateLimit, RATE_LIMITS } from "../../../lib/rate-limit";
+import { throwOwnerTokenError } from "../helpers";
 
 export const sendOwnerMessageProcedure = publicProcedure
 	.route({
@@ -25,16 +25,16 @@ export const sendOwnerMessageProcedure = publicProcedure
 		await enforceRateLimit(`token:${input.token}:sendOwnerMessage`, RATE_LIMITS.STRICT);
 
 		// Validate token
-		const context = await getOwnerContextByToken(input.token);
+		const result = await getOwnerContextByToken(input.token);
 
-		if (!context) {
-			throw new ORPCError("FORBIDDEN", { message: "رابط الوصول غير صالح أو منتهي الصلاحية" });
+		if (!result.ok) {
+			throwOwnerTokenError(result.reason);
 		}
 
 		// Send message
 		const message = await sendOwnerPortalMessage(
-			context.organizationId,
-			context.projectId,
+			result.organizationId,
+			result.projectId,
 			{
 				content: input.content,
 				senderName: input.senderName,
@@ -44,7 +44,7 @@ export const sendOwnerMessageProcedure = publicProcedure
 		// Notify team members about the message
 		const teamMembers = await db.member.findMany({
 			where: {
-				organizationId: context.organizationId,
+				organizationId: result.organizationId,
 			},
 			select: { userId: true },
 			take: 20,
@@ -52,13 +52,13 @@ export const sendOwnerMessageProcedure = publicProcedure
 
 		if (teamMembers.length > 0) {
 			await createNotifications(
-				context.organizationId,
+				result.organizationId,
 				teamMembers.map((m) => m.userId),
 				{
 					type: "OWNER_MESSAGE",
 					title: "رسالة من مالك المشروع",
-					body: `رسالة جديدة في مشروع: ${context.project.name}`,
-					projectId: context.projectId,
+					body: `رسالة جديدة في مشروع: ${result.project.name}`,
+					projectId: result.projectId,
 					entityType: "message",
 					entityId: message.id,
 				},

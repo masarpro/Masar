@@ -2749,6 +2749,8 @@
 		},
 		"invalidLink": "رابط غير صالح",
 		"invalidLinkDescription": "هذا الرابط غير صالح أو تم إلغاؤه.",
+		"tokenExpired": "انتهت صلاحية رابط الوصول",
+		"tokenExpiredDescription": "يرجى التواصل مع المقاول للحصول على رابط جديد.",
 		"footer": "بدعم من مسار",
 		"currentPhase": "المرحلة الحالية",
 		"progress": "نسبة الإنجاز",
@@ -2828,7 +2830,20 @@
 		"confirmRevoke": "إلغاء",
 		"revokeSuccess": "تم إلغاء رابط الوصول",
 		"revokeError": "فشل إلغاء الوصول",
-		"createError": "فشل إنشاء رابط الوصول"
+		"createError": "فشل إنشاء رابط الوصول",
+		"expired": "منتهي الصلاحية",
+		"expiringSoon": "ينتهي قريباً",
+		"expiresAt": "ينتهي في",
+		"renewLink": "تجديد",
+		"renewTitle": "تجديد رابط الوصول",
+		"renewDescription": "اختر مدة الصلاحية الجديدة للرابط.",
+		"renewSuccess": "تم تجديد الرابط بنجاح",
+		"renewError": "فشل تجديد الرابط",
+		"expiryDuration": "مدة الصلاحية",
+		"days7": "7 أيام",
+		"days30": "30 يوم",
+		"days60": "60 يوم",
+		"days90": "90 يوم"
 	},
 	"integrations": {
 		"settings": {

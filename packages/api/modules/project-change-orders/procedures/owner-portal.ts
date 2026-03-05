@@ -6,6 +6,8 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { publicProcedure } from "../../../orpc/procedures";
+import { rateLimitToken } from "../../../lib/rate-limit";
+import { throwOwnerTokenError } from "../../project-owner/helpers";
 
 /**
  * List change orders for owner portal (token-based access)
@@ -25,23 +27,24 @@ export const listChangeOrdersForOwnerProcedure = publicProcedure
 		}),
 	)
 	.handler(async ({ input }) => {
-		// Validate token
-		const context = await getOwnerContextByToken(input.token);
+		// Rate limit before any DB work
+		await rateLimitToken(input.token, "ownerListChangeOrders");
 
-		if (!context) {
-			throw new ORPCError("UNAUTHORIZED", { message: "رمز الوصول غير صالح" });
+		// Validate token
+		const result = await getOwnerContextByToken(input.token);
+
+		if (!result.ok) {
+			throwOwnerTokenError(result.reason);
 		}
 
-		const result = await listChangeOrdersForOwner(
-			context.project.organizationId,
-			context.project.id,
+		return await listChangeOrdersForOwner(
+			result.project.organizationId,
+			result.project.id,
 			{
 				page: input.page,
 				pageSize: input.pageSize,
 			},
 		);
-
-		return result;
 	});
 
 /**
@@ -61,16 +64,19 @@ export const getChangeOrderForOwnerProcedure = publicProcedure
 		}),
 	)
 	.handler(async ({ input }) => {
-		// Validate token
-		const context = await getOwnerContextByToken(input.token);
+		// Rate limit before any DB work
+		await rateLimitToken(input.token, "ownerGetChangeOrder");
 
-		if (!context) {
-			throw new ORPCError("UNAUTHORIZED", { message: "رمز الوصول غير صالح" });
+		// Validate token
+		const result = await getOwnerContextByToken(input.token);
+
+		if (!result.ok) {
+			throwOwnerTokenError(result.reason);
 		}
 
 		const changeOrder = await getChangeOrderForOwner(
-			context.project.organizationId,
-			context.project.id,
+			result.project.organizationId,
+			result.project.id,
 			input.changeOrderId,
 		);
 

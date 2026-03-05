@@ -1,7 +1,8 @@
-import { ORPCError } from "@orpc/server";
 import { getOwnerContextByToken, getOwnerPortalOfficialUpdates } from "@repo/database";
 import { z } from "zod";
 import { publicProcedure } from "../../../orpc/procedures";
+import { rateLimitToken } from "../../../lib/rate-limit";
+import { throwOwnerTokenError } from "../helpers";
 
 export const listOfficialUpdatesProcedure = publicProcedure
 	.route({
@@ -17,22 +18,25 @@ export const listOfficialUpdatesProcedure = publicProcedure
 		}),
 	)
 	.handler(async ({ input }) => {
-		// Validate token
-		const context = await getOwnerContextByToken(input.token);
+		// Rate limit before any DB work
+		await rateLimitToken(input.token, "listOfficialUpdates");
 
-		if (!context) {
-			throw new ORPCError("FORBIDDEN", { message: "رابط الوصول غير صالح أو منتهي الصلاحية" });
+		// Validate token
+		const result = await getOwnerContextByToken(input.token);
+
+		if (!result.ok) {
+			throwOwnerTokenError(result.reason);
 		}
 
 		// Get official updates
 		const updates = await getOwnerPortalOfficialUpdates(
-			context.organizationId,
-			context.projectId,
+			result.organizationId,
+			result.projectId,
 			{ limit: input.limit },
 		);
 
 		return {
-			projectName: context.project.name,
+			projectName: result.project.name,
 			updates,
 		};
 	});

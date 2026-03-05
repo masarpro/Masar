@@ -4,6 +4,7 @@ import { publicProcedure } from "../../orpc/procedures";
 import { createOwnerAccessProcedure } from "./procedures/create-owner-access";
 import { listOwnerAccessProcedure } from "./procedures/list-owner-access";
 import { revokeOwnerAccessProcedure } from "./procedures/revoke-owner-access";
+import { renewOwnerAccessProcedure } from "./procedures/renew-owner-access";
 import { sendOfficialUpdateProcedure } from "./procedures/send-official-update";
 
 // Portal procedures (token-based, public)
@@ -19,6 +20,7 @@ export const projectOwnerRouter = publicProcedure.router({
 	createAccess: createOwnerAccessProcedure,
 	listAccess: listOwnerAccessProcedure,
 	revokeAccess: revokeOwnerAccessProcedure,
+	renewAccess: renewOwnerAccessProcedure,
 	sendOfficialUpdate: sendOfficialUpdateProcedure,
 
 	// Portal (token-based) endpoints

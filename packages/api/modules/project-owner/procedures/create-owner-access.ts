@@ -16,7 +16,7 @@ export const createOwnerAccessProcedure = subscriptionProcedure
 			organizationId: z.string(),
 			projectId: z.string(),
 			label: z.string().optional(),
-			expiresInDays: z.number().int().positive().max(365).optional().default(90),
+			expiresInDays: z.number().int().min(1).max(90).optional().default(30),
 		}),
 	)
 	.handler(async ({ input, context }) => {

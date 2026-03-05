@@ -10,6 +10,7 @@ import {
 	Home,
 	MessageSquare,
 	AlertTriangle,
+	Clock,
 	FileDiff,
 } from "lucide-react";
 import Image from "next/image";
@@ -68,7 +69,29 @@ export default function OwnerPortalLayout({
 		},
 	];
 
-	// Show error state
+	// Detect token expired vs invalid from error message
+	const isTokenExpired = error?.message?.includes("TOKEN_EXPIRED");
+
+	// Show expired token page
+	if (isTokenExpired) {
+		return (
+			<div className="flex min-h-screen items-center justify-center bg-slate-50 p-4 dark:bg-slate-950">
+				<div className="w-full max-w-md rounded-2xl border border-amber-200 bg-white p-8 text-center dark:border-amber-900 dark:bg-slate-900">
+					<div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
+						<Clock className="h-8 w-8 text-amber-600 dark:text-amber-400" />
+					</div>
+					<h1 className="mb-2 text-xl font-semibold text-slate-900 dark:text-slate-100">
+						{t("ownerPortal.tokenExpired")}
+					</h1>
+					<p className="text-slate-500">
+						{t("ownerPortal.tokenExpiredDescription")}
+					</p>
+				</div>
+			</div>
+		);
+	}
+
+	// Show error state (invalid/revoked)
 	if (error || (!isLoading && !summary)) {
 		return (
 			<div className="flex min-h-screen items-center justify-center bg-slate-50 p-4 dark:bg-slate-950">

@@ -1,8 +1,8 @@
-import { ORPCError } from "@orpc/server";
 import { getOwnerContextByToken, getOwnerMessages } from "@repo/database";
 import { z } from "zod";
 import { publicProcedure } from "../../../orpc/procedures";
 import { rateLimitToken } from "../../../lib/rate-limit";
+import { throwOwnerTokenError } from "../helpers";
 
 export const listOwnerMessagesProcedure = publicProcedure
 	.route({
@@ -23,16 +23,16 @@ export const listOwnerMessagesProcedure = publicProcedure
 		await rateLimitToken(input.token, "listOwnerMessages");
 
 		// Validate token
-		const context = await getOwnerContextByToken(input.token);
+		const result = await getOwnerContextByToken(input.token);
 
-		if (!context) {
-			throw new ORPCError("FORBIDDEN", { message: "رابط الوصول غير صالح أو منتهي الصلاحية" });
+		if (!result.ok) {
+			throwOwnerTokenError(result.reason);
 		}
 
 		// Get messages
 		const messages = await getOwnerMessages(
-			context.organizationId,
-			context.projectId,
+			result.organizationId,
+			result.projectId,
 			{
 				page: input.page,
 				pageSize: input.pageSize,
@@ -40,7 +40,7 @@ export const listOwnerMessagesProcedure = publicProcedure
 		);
 
 		return {
-			projectName: context.project.name,
+			projectName: result.project.name,
 			...messages,
 		};
 	});

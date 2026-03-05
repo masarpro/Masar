@@ -25,13 +25,20 @@ import {
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
 import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@ui/components/select";
+import {
 	Copy,
 	ExternalLink,
 	Key,
 	Link2,
 	Plus,
+	RefreshCw,
 	Trash2,
-	UserCircle,
 	Users,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -45,6 +52,16 @@ interface OwnerAccessManagementProps {
 	projectId: string;
 }
 
+function getExpiryStatus(expiresAt: string | Date | null | undefined) {
+	if (!expiresAt) return "expired" as const;
+	const expiry = new Date(expiresAt);
+	const now = new Date();
+	if (expiry < now) return "expired" as const;
+	const daysLeft = (expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+	if (daysLeft < 7) return "expiring_soon" as const;
+	return "valid" as const;
+}
+
 export function OwnerAccessManagement({
 	organizationId,
 	organizationSlug,
@@ -54,23 +71,25 @@ export function OwnerAccessManagement({
 	const queryClient = useQueryClient();
 	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 	const [newLinkLabel, setNewLinkLabel] = useState("");
+	const [newLinkDays, setNewLinkDays] = useState("30");
 	const [createdToken, setCreatedToken] = useState<string | null>(null);
 	const [revokeTarget, setRevokeTarget] = useState<string | null>(null);
+	const [renewTarget, setRenewTarget] = useState<string | null>(null);
+	const [renewDays, setRenewDays] = useState("30");
 
-	const { data: accessList, isLoading } = useQuery(
-		orpc.projectOwner.listAccess.queryOptions({ input: { organizationId, projectId } }),
-	);
+	const listQueryOptions = orpc.projectOwner.listAccess.queryOptions({ input: { organizationId, projectId } });
+
+	const { data: accessList, isLoading } = useQuery(listQueryOptions);
 
 	const createMutation = useMutation({
 		...orpc.projectOwner.createAccess.mutationOptions(),
 		onSuccess: (data) => {
 			setCreatedToken(data.token);
 			setNewLinkLabel("");
-			queryClient.invalidateQueries({
-				queryKey: orpc.projectOwner.listAccess.queryOptions({ input: { organizationId, projectId } }).queryKey,
-			});
+			setNewLinkDays("30");
+			queryClient.invalidateQueries({ queryKey: listQueryOptions.queryKey });
 		},
-		onError: (error) => {
+		onError: () => {
 			toast.error(t("ownerAccess.createError"));
 		},
 	});
@@ -80,12 +99,22 @@ export function OwnerAccessManagement({
 		onSuccess: () => {
 			toast.success(t("ownerAccess.revokeSuccess"));
 			setRevokeTarget(null);
-			queryClient.invalidateQueries({
-				queryKey: orpc.projectOwner.listAccess.queryOptions({ input: { organizationId, projectId } }).queryKey,
-			});
+			queryClient.invalidateQueries({ queryKey: listQueryOptions.queryKey });
 		},
-		onError: (error) => {
+		onError: () => {
 			toast.error(t("ownerAccess.revokeError"));
+		},
+	});
+
+	const renewMutation = useMutation({
+		...orpc.projectOwner.renewAccess.mutationOptions(),
+		onSuccess: () => {
+			toast.success(t("ownerAccess.renewSuccess"));
+			setRenewTarget(null);
+			queryClient.invalidateQueries({ queryKey: listQueryOptions.queryKey });
+		},
+		onError: () => {
+			toast.error(t("ownerAccess.renewError"));
 		},
 	});
 
@@ -94,6 +123,7 @@ export function OwnerAccessManagement({
 			organizationId,
 			projectId,
 			label: newLinkLabel || undefined,
+			expiresInDays: parseInt(newLinkDays, 10),
 		});
 	};
 
@@ -110,6 +140,16 @@ export function OwnerAccessManagement({
 
 	const handleRevoke = (id: string) => {
 		revokeMutation.mutate({ organizationId, projectId, accessId: id });
+	};
+
+	const handleRenew = () => {
+		if (!renewTarget) return;
+		renewMutation.mutate({
+			organizationId,
+			projectId,
+			accessId: renewTarget,
+			expiresInDays: parseInt(renewDays, 10),
+		});
 	};
 
 	const portalUrl = createdToken
@@ -153,76 +193,119 @@ export function OwnerAccessManagement({
 					</div>
 				) : (
 					<div className="divide-y divide-slate-100 dark:divide-slate-800">
-						{accessList.map((access) => (
-							<div
-								key={access.id}
-								className="flex items-center justify-between p-4"
-							>
-								<div className="flex items-center gap-4">
-									<div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-										<Key className="h-5 w-5 text-primary" />
-									</div>
-									<div>
-										<div className="flex items-center gap-2">
-											<span className="font-medium text-slate-900 dark:text-slate-100">
-												{access.label || t("ownerAccess.defaultLabel")}
-											</span>
-											{access.isRevoked ? (
-												<Badge className="border-0 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
-													{t("ownerAccess.revoked")}
-												</Badge>
-											) : (
-												<Badge className="border-0 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-													{t("ownerAccess.active")}
-												</Badge>
-											)}
+						{accessList.map((access) => {
+							const expiryStatus = getExpiryStatus(access.expiresAt);
+							return (
+								<div
+									key={access.id}
+									className="flex items-center justify-between p-4"
+								>
+									<div className="flex items-center gap-4">
+										<div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+											<Key className="h-5 w-5 text-primary" />
 										</div>
-										<div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
-											<span>
-												{t("ownerAccess.createdAt")}: {new Date(access.createdAt).toLocaleDateString("ar-SA")}
-											</span>
-											<span>•</span>
-											<span>
-												{t("ownerAccess.createdBy")}: {access.createdBy.name}
-											</span>
+										<div>
+											<div className="flex items-center gap-2">
+												<span className="font-medium text-slate-900 dark:text-slate-100">
+													{access.label || t("ownerAccess.defaultLabel")}
+												</span>
+												{access.isRevoked ? (
+													<Badge className="border-0 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+														{t("ownerAccess.revoked")}
+													</Badge>
+												) : expiryStatus === "expired" ? (
+													<Badge className="border-0 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+														{t("ownerAccess.expired")}
+													</Badge>
+												) : expiryStatus === "expiring_soon" ? (
+													<Badge className="border-0 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+														{t("ownerAccess.expiringSoon")}
+													</Badge>
+												) : (
+													<Badge className="border-0 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+														{t("ownerAccess.active")}
+													</Badge>
+												)}
+											</div>
+											<div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+												<span>
+													{t("ownerAccess.createdAt")}: {new Date(access.createdAt).toLocaleDateString("ar-SA")}
+												</span>
+												<span>•</span>
+												<span>
+													{t("ownerAccess.createdBy")}: {access.createdBy.name}
+												</span>
+												{access.expiresAt && (
+													<>
+														<span>•</span>
+														<span className={
+															expiryStatus === "expired"
+																? "text-red-600 dark:text-red-400"
+																: expiryStatus === "expiring_soon"
+																	? "text-amber-600 dark:text-amber-400"
+																	: ""
+														}>
+															{t("ownerAccess.expiresAt")}: {new Date(access.expiresAt).toLocaleDateString("ar-SA")}
+														</span>
+													</>
+												)}
+											</div>
 										</div>
 									</div>
-								</div>
 
-								<div className="flex items-center gap-2">
-									{!access.isRevoked && (
-										<>
-											<Button
-												variant="outline"
-												size="sm"
-												onClick={() => handleCopyLink(access.token)}
-												className="rounded-lg"
-											>
-												<Copy className="h-4 w-4 me-1" />
-												{t("ownerAccess.copyLink")}
-											</Button>
-											<Button
-												variant="outline"
-												size="sm"
-												onClick={() => handleOpenPortal(access.token)}
-												className="rounded-lg"
-											>
-												<ExternalLink className="h-4 w-4 me-1" />
-												{t("ownerAccess.openPortal")}
-											</Button>
-											<Button
-												variant="ghost"
-												size="sm"
-												onClick={() => setRevokeTarget(access.id)}
-												className="rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50"
-											>
-												<Trash2 className="h-4 w-4" />
-											</Button>
-										</>
-									)}
+									<div className="flex items-center gap-2">
+										{!access.isRevoked && (
+											<>
+												{(expiryStatus === "expired" || expiryStatus === "expiring_soon") && (
+													<Button
+														variant="outline"
+														size="sm"
+														onClick={() => {
+															setRenewTarget(access.id);
+															setRenewDays("30");
+														}}
+														className="rounded-lg text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+													>
+														<RefreshCw className="h-4 w-4 me-1" />
+														{t("ownerAccess.renewLink")}
+													</Button>
+												)}
+												{expiryStatus !== "expired" && (
+													<>
+														<Button
+															variant="outline"
+															size="sm"
+															onClick={() => handleCopyLink(access.token)}
+															className="rounded-lg"
+														>
+															<Copy className="h-4 w-4 me-1" />
+															{t("ownerAccess.copyLink")}
+														</Button>
+														<Button
+															variant="outline"
+															size="sm"
+															onClick={() => handleOpenPortal(access.token)}
+															className="rounded-lg"
+														>
+															<ExternalLink className="h-4 w-4 me-1" />
+															{t("ownerAccess.openPortal")}
+														</Button>
+													</>
+												)}
+												<Button
+													variant="ghost"
+													size="sm"
+													onClick={() => setRevokeTarget(access.id)}
+													className="rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50"
+												>
+													<Trash2 className="h-4 w-4" />
+												</Button>
+											</>
+										)}
+									</div>
 								</div>
-							</div>
-						))}
+							);
+						})}
 					</div>
 				)}
 			</div>
@@ -246,6 +329,20 @@ export function OwnerAccessManagement({
 								onChange={(e) => setNewLinkLabel(e.target.value)}
 								placeholder={t("ownerAccess.labelPlaceholder")}
 							/>
+						</div>
+						<div className="space-y-2">
+							<Label>{t("ownerAccess.expiryDuration")}</Label>
+							<Select value={newLinkDays} onValueChange={setNewLinkDays}>
+								<SelectTrigger>
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="7">{t("ownerAccess.days7")}</SelectItem>
+									<SelectItem value="30">{t("ownerAccess.days30")}</SelectItem>
+									<SelectItem value="60">{t("ownerAccess.days60")}</SelectItem>
+									<SelectItem value="90">{t("ownerAccess.days90")}</SelectItem>
+								</SelectContent>
+							</Select>
 						</div>
 					</div>
 
@@ -326,6 +423,50 @@ export function OwnerAccessManagement({
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
+
+			{/* Renew Dialog */}
+			<Dialog open={!!renewTarget} onOpenChange={() => setRenewTarget(null)}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>{t("ownerAccess.renewTitle")}</DialogTitle>
+						<DialogDescription>
+							{t("ownerAccess.renewDescription")}
+						</DialogDescription>
+					</DialogHeader>
+
+					<div className="space-y-4 py-4">
+						<div className="space-y-2">
+							<Label>{t("ownerAccess.expiryDuration")}</Label>
+							<Select value={renewDays} onValueChange={setRenewDays}>
+								<SelectTrigger>
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="7">{t("ownerAccess.days7")}</SelectItem>
+									<SelectItem value="30">{t("ownerAccess.days30")}</SelectItem>
+									<SelectItem value="60">{t("ownerAccess.days60")}</SelectItem>
+									<SelectItem value="90">{t("ownerAccess.days90")}</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+					</div>
+
+					<DialogFooter>
+						<Button
+							variant="outline"
+							onClick={() => setRenewTarget(null)}
+						>
+							{t("common.cancel")}
+						</Button>
+						<Button
+							onClick={handleRenew}
+							disabled={renewMutation.isPending}
+						>
+							{renewMutation.isPending ? t("common.loading") : t("ownerAccess.renewLink")}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

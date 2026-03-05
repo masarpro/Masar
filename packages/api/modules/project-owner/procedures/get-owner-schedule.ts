@@ -1,8 +1,8 @@
-import { ORPCError } from "@orpc/server";
 import { getOwnerContextByToken, getOwnerSchedule } from "@repo/database";
 import { z } from "zod";
 import { publicProcedure } from "../../../orpc/procedures";
 import { rateLimitToken } from "../../../lib/rate-limit";
+import { throwOwnerTokenError } from "../helpers";
 
 export const getOwnerScheduleProcedure = publicProcedure
 	.route({
@@ -21,22 +21,22 @@ export const getOwnerScheduleProcedure = publicProcedure
 		await rateLimitToken(input.token, "getOwnerSchedule");
 
 		// Validate token
-		const context = await getOwnerContextByToken(input.token);
+		const result = await getOwnerContextByToken(input.token);
 
-		if (!context) {
-			throw new ORPCError("FORBIDDEN", { message: "رابط الوصول غير صالح أو منتهي الصلاحية" });
+		if (!result.ok) {
+			throwOwnerTokenError(result.reason);
 		}
 
 		// Get schedule
 		const milestones = await getOwnerSchedule(
-			context.organizationId,
-			context.projectId,
+			result.organizationId,
+			result.projectId,
 		);
 
 		return {
-			projectName: context.project.name,
-			startDate: context.project.startDate,
-			endDate: context.project.endDate,
+			projectName: result.project.name,
+			startDate: result.project.startDate,
+			endDate: result.project.endDate,
 			milestones,
 		};
 	});

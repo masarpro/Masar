@@ -85,10 +85,41 @@ export async function revokeOwnerAccess(
 	});
 }
 
+export type OwnerTokenFailReason = "NOT_FOUND" | "REVOKED" | "EXPIRED";
+
+export type OwnerContextResult =
+	| {
+			ok: true;
+			accessId: string;
+			organizationId: string;
+			projectId: string;
+			project: {
+				id: string;
+				name: string;
+				slug: string;
+				status: string;
+				clientName: string | null;
+				location: string | null;
+				progress: unknown;
+				contractValue: unknown;
+				startDate: Date | null;
+				endDate: Date | null;
+				organizationId: string;
+				organization: { name: string; logo: string | null };
+			};
+			label: string | null;
+	  }
+	| { ok: false; reason: OwnerTokenFailReason };
+
 /**
  * Get owner context by token (validates token and returns project info)
+ *
+ * Returns a discriminated result so callers can show different error
+ * messages for expired vs invalid/revoked tokens.
  */
-export async function getOwnerContextByToken(token: string) {
+export async function getOwnerContextByToken(
+	token: string,
+): Promise<OwnerContextResult> {
 	const access = await db.projectOwnerAccess.findUnique({
 		where: { token },
 		include: {
@@ -114,26 +145,38 @@ export async function getOwnerContextByToken(token: string) {
 	});
 
 	if (!access) {
-		return null;
+		return { ok: false, reason: "NOT_FOUND" };
 	}
 
 	// Check if revoked
 	if (access.isRevoked) {
-		return null;
+		return { ok: false, reason: "REVOKED" };
 	}
 
-	// Check if expired
-	if (access.expiresAt && access.expiresAt < new Date()) {
-		return null;
+	// Check if expired — null expiresAt is treated as expired for security
+	if (!access.expiresAt || access.expiresAt < new Date()) {
+		return { ok: false, reason: "EXPIRED" };
 	}
 
 	return {
+		ok: true,
 		accessId: access.id,
 		organizationId: access.organizationId,
 		projectId: access.projectId,
 		project: access.project,
 		label: access.label,
 	};
+}
+
+/**
+ * @deprecated Use getOwnerContextByToken which returns discriminated result.
+ * This wrapper preserves the old null-return behavior for callers not yet migrated.
+ */
+export async function getOwnerContextByTokenLegacy(token: string) {
+	const result = await getOwnerContextByToken(token);
+	if (!result.ok) return null;
+	const { ok, ...context } = result;
+	return context;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
