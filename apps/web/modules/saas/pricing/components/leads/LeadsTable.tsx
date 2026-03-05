@@ -1,0 +1,270 @@
+"use client";
+
+import { orpc } from "@shared/lib/orpc-query-utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@ui/components/alert-dialog";
+import { Button } from "@ui/components/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@ui/components/dropdown-menu";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@ui/components/table";
+import { Edit, Eye, MoreHorizontal, Plus, Trash2, UserSearch } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import { formatDate } from "@saas/finance/lib/utils";
+import { LeadPriorityIndicator } from "./LeadPriorityIndicator";
+import { LeadStatusBadge } from "./LeadStatusBadge";
+
+interface LeadsTableProps {
+	leads: Array<{
+		id: string;
+		name: string;
+		phone?: string | null;
+		email?: string | null;
+		company?: string | null;
+		projectType?: string | null;
+		projectLocation?: string | null;
+		estimatedArea?: number | null;
+		estimatedValue?: number | null;
+		status: string;
+		priority: string;
+		createdAt: string | Date;
+		assignedTo?: { id: string; name: string; image?: string | null } | null;
+		_count?: { files: number; activities: number };
+	}>;
+	organizationId: string;
+	organizationSlug: string;
+}
+
+export function LeadsTable({ leads, organizationId, organizationSlug }: LeadsTableProps) {
+	const t = useTranslations();
+	const router = useRouter();
+	const queryClient = useQueryClient();
+	const [deleteId, setDeleteId] = useState<string | null>(null);
+	const basePath = `/app/${organizationSlug}/pricing/leads`;
+
+	const deleteMutation = useMutation(
+		orpc.pricing.leads.delete.mutationOptions({
+			onSuccess: () => {
+				toast.success(t("pricing.leads.messages.deleteSuccess"));
+				queryClient.invalidateQueries({
+					queryKey: orpc.pricing.leads.list.queryOptions({ input: { organizationId } }).queryKey,
+				});
+				queryClient.invalidateQueries({
+					queryKey: orpc.pricing.leads.getStats.queryOptions({ input: { organizationId } }).queryKey,
+				});
+				setDeleteId(null);
+			},
+			onError: () => {
+				toast.error(t("pricing.leads.messages.deleteError"));
+			},
+		}),
+	);
+
+	const handleDelete = () => {
+		if (!deleteId) return;
+		deleteMutation.mutate({ organizationId, leadId: deleteId });
+	};
+
+	if (leads.length === 0) {
+		return (
+			<div className="flex flex-col items-center justify-center py-16 text-center">
+				<div className="mb-5 rounded-2xl bg-muted/50 p-5">
+					<UserSearch className="h-12 w-12 text-muted-foreground" />
+				</div>
+				<h3 className="text-lg font-medium text-foreground">
+					{t("pricing.leads.empty")}
+				</h3>
+				<p className="mt-2 max-w-sm text-sm text-muted-foreground">
+					{t("pricing.leads.emptyDescription")}
+				</p>
+				<Button asChild className="mt-5 rounded-xl">
+					<Link href={`${basePath}/new`}>
+						<Plus className="me-2 h-4 w-4" />
+						{t("pricing.leads.create")}
+					</Link>
+				</Button>
+			</div>
+		);
+	}
+
+	return (
+		<>
+			<div className="overflow-hidden rounded-2xl border border-border">
+				<Table>
+					<TableHeader>
+						<TableRow className="bg-muted/30">
+							<TableHead className="font-medium">{t("pricing.leads.columns.client")}</TableHead>
+							<TableHead className="font-medium">{t("pricing.leads.columns.project")}</TableHead>
+							<TableHead className="font-medium">{t("pricing.leads.columns.value")}</TableHead>
+							<TableHead className="font-medium">{t("pricing.leads.columns.status")}</TableHead>
+							<TableHead className="font-medium">{t("pricing.leads.columns.priority")}</TableHead>
+							<TableHead className="font-medium">{t("pricing.leads.columns.assignedTo")}</TableHead>
+							<TableHead className="font-medium">{t("pricing.leads.columns.date")}</TableHead>
+							<TableHead className="w-[50px]" />
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{leads.map((lead) => (
+							<TableRow
+								key={lead.id}
+								className="cursor-pointer hover:bg-muted/20"
+								onClick={() => router.push(`${basePath}/${lead.id}`)}
+							>
+								<TableCell>
+									<div>
+										<p className="font-medium text-foreground">{lead.name}</p>
+										{lead.company && (
+											<p className="text-sm text-muted-foreground truncate max-w-[200px]">
+												{lead.company}
+											</p>
+										)}
+										{lead.phone && (
+											<p className="text-xs text-muted-foreground" dir="ltr">
+												{lead.phone}
+											</p>
+										)}
+									</div>
+								</TableCell>
+								<TableCell>
+									{lead.projectType ? (
+										<div>
+											<span className="inline-flex items-center rounded-md bg-muted/50 px-2 py-0.5 text-xs font-medium">
+												{t(`pricing.leads.projectType.${lead.projectType}`)}
+											</span>
+											{lead.projectLocation && (
+												<p className="mt-0.5 text-xs text-muted-foreground truncate max-w-[150px]">
+													{lead.projectLocation}
+												</p>
+											)}
+										</div>
+									) : (
+										<span className="text-muted-foreground">—</span>
+									)}
+								</TableCell>
+								<TableCell>
+									{lead.estimatedValue ? (
+										<div>
+											<p className="font-medium text-foreground">
+												{new Intl.NumberFormat("en-SA").format(lead.estimatedValue)}
+											</p>
+											{lead.estimatedArea && (
+												<p className="text-xs text-muted-foreground">
+													{new Intl.NumberFormat("en-SA").format(lead.estimatedArea)} {t("pricing.leads.area")}
+												</p>
+											)}
+										</div>
+									) : (
+										<span className="text-muted-foreground">—</span>
+									)}
+								</TableCell>
+								<TableCell>
+									<LeadStatusBadge status={lead.status} size="sm" />
+								</TableCell>
+								<TableCell>
+									<LeadPriorityIndicator priority={lead.priority} />
+								</TableCell>
+								<TableCell>
+									{lead.assignedTo ? (
+										<span className="text-sm text-foreground">
+											{lead.assignedTo.name}
+										</span>
+									) : (
+										<span className="text-sm text-muted-foreground">
+											{t("pricing.leads.unassigned")}
+										</span>
+									)}
+								</TableCell>
+								<TableCell className="text-sm text-muted-foreground">
+									{formatDate(lead.createdAt)}
+								</TableCell>
+								<TableCell>
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-8 w-8 rounded-lg"
+												onClick={(e) => e.stopPropagation()}
+											>
+												<MoreHorizontal className="h-4 w-4" />
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="end" className="rounded-xl">
+											<DropdownMenuItem asChild>
+												<Link href={`${basePath}/${lead.id}`}>
+													<Eye className="me-2 h-4 w-4" />
+													{t("pricing.leads.actions.view")}
+												</Link>
+											</DropdownMenuItem>
+											<DropdownMenuItem asChild>
+												<Link href={`${basePath}/${lead.id}/edit`}>
+													<Edit className="me-2 h-4 w-4" />
+													{t("pricing.leads.actions.edit")}
+												</Link>
+											</DropdownMenuItem>
+											<DropdownMenuSeparator />
+											<DropdownMenuItem
+												className="text-destructive"
+												onClick={(e) => {
+													e.stopPropagation();
+													setDeleteId(lead.id);
+												}}
+											>
+												<Trash2 className="me-2 h-4 w-4" />
+												{t("pricing.leads.actions.delete")}
+											</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</div>
+
+			<AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>{t("pricing.leads.messages.deleteConfirm")}</AlertDialogTitle>
+						<AlertDialogDescription>
+							{t("pricing.leads.messages.deleteConfirmDescription")}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>{t("pricing.leads.form.cancel")}</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={handleDelete}
+							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+						>
+							{t("pricing.leads.actions.delete")}
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+		</>
+	);
+}

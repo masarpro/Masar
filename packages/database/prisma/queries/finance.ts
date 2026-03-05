@@ -550,6 +550,7 @@ export async function getOrganizationQuotations(
 				project: { select: { id: true, name: true, slug: true } },
 				createdBy: { select: { id: true, name: true } },
 				invoices: { select: { id: true, invoiceNo: true, status: true } },
+				lead: { select: { id: true, name: true, status: true } },
 				_count: { select: { items: true } },
 			},
 			orderBy: { createdAt: "desc" },

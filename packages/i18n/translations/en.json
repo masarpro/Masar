@@ -888,7 +888,8 @@
 			"sections": {
 				"dashboard": "Dashboard",
 				"studies": "Cost Studies",
-				"quotations": "Quotations"
+				"quotations": "Quotations",
+				"leads": "Leads"
 			}
 		},
 		"quotations": {
@@ -1431,6 +1432,193 @@
 				"finishing": "Finishing",
 				"mep": "MEP",
 				"pricing": "Pricing"
+			}
+		},
+		"leads": {
+			"title": "Leads",
+			"subtitle": "Manage leads and opportunities before contracting",
+			"create": "New Lead",
+			"edit": "Edit Lead",
+			"searchPlaceholder": "Search by name, phone, or company...",
+			"allStatuses": "All Statuses",
+			"allSources": "All Sources",
+			"allPriorities": "All Priorities",
+			"resetFilters": "Reset",
+			"empty": "No leads yet",
+			"emptyDescription": "You haven't added any leads yet. Start by adding your first lead.",
+			"status": {
+				"NEW": "New",
+				"STUDYING": "Studying",
+				"QUOTED": "Quoted",
+				"NEGOTIATING": "Negotiating",
+				"WON": "Won",
+				"LOST": "Lost"
+			},
+			"source": {
+				"REFERRAL": "Referral",
+				"SOCIAL_MEDIA": "Social Media",
+				"WEBSITE": "Website",
+				"DIRECT": "Direct",
+				"EXHIBITION": "Exhibition",
+				"OTHER": "Other"
+			},
+			"priority": {
+				"NORMAL": "Normal",
+				"HIGH": "High",
+				"URGENT": "Urgent"
+			},
+			"clientType": {
+				"INDIVIDUAL": "Individual",
+				"COMMERCIAL": "Company"
+			},
+			"projectType": {
+				"RESIDENTIAL": "Residential",
+				"COMMERCIAL": "Commercial",
+				"INDUSTRIAL": "Industrial",
+				"INFRASTRUCTURE": "Infrastructure",
+				"MIXED": "Mixed"
+			},
+			"columns": {
+				"client": "Client",
+				"project": "Project",
+				"value": "Value",
+				"status": "Status",
+				"priority": "Priority",
+				"assignedTo": "Assigned To",
+				"date": "Date Added",
+				"actions": "Actions"
+			},
+			"stats": {
+				"total": "Total Leads",
+				"open": "In Progress",
+				"won": "Won",
+				"estimatedValue": "Est. Value"
+			},
+			"form": {
+				"clientInfo": "Client Information",
+				"projectInfo": "Project Details",
+				"name": "Full Name",
+				"namePlaceholder": "Enter client name",
+				"phone": "Phone",
+				"phonePlaceholder": "05xxxxxxxx",
+				"email": "Email",
+				"emailPlaceholder": "example@email.com",
+				"company": "Company Name",
+				"companyPlaceholder": "Enter company name",
+				"clientType": "Client Type",
+				"projectType": "Project Type",
+				"selectProjectType": "Select project type",
+				"projectLocation": "Project Location",
+				"projectLocationPlaceholder": "e.g. Riyadh - Al Narjis",
+				"estimatedArea": "Estimated Area (m²)",
+				"estimatedValue": "Estimated Value (SAR)",
+				"source": "Lead Source",
+				"priority": "Priority",
+				"assignedTo": "Assigned To",
+				"selectAssignee": "Select assignee",
+				"noAssignee": "Unassigned",
+				"notes": "Notes",
+				"notesPlaceholder": "Add any notes...",
+				"submit": "Add Lead",
+				"cancel": "Cancel"
+			},
+			"messages": {
+				"createSuccess": "Lead added successfully",
+				"createError": "Error adding lead",
+				"deleteSuccess": "Lead deleted",
+				"deleteError": "Error deleting lead",
+				"deleteConfirm": "Are you sure you want to delete this lead?",
+				"deleteConfirmDescription": "All related files and activities will be deleted. This action cannot be undone.",
+				"cannotDeleteWon": "Cannot delete a contracted lead"
+			},
+			"actions": {
+				"view": "View Details",
+				"edit": "Edit",
+				"delete": "Delete"
+			},
+			"pagination": {
+				"previous": "Previous",
+				"next": "Next",
+				"pageOf": "Page {page} of {total}"
+			},
+			"unassigned": "Unassigned",
+			"area": "m²",
+			"detail": {
+				"tabs": {
+					"info": "Info",
+					"files": "Files",
+					"activity": "Activity",
+					"linked": "Linked"
+				},
+				"notFound": "Lead not found",
+				"changeStatus": "Change Status",
+				"newStatus": "New Status",
+				"updateStatus": "Update Status",
+				"statusUpdated": "Status updated successfully",
+				"statusUpdateError": "Error updating status",
+				"lostReason": "Lost Reason",
+				"lostReasonPlaceholder": "Describe why this lead was lost...",
+				"lostReasonRequired": "Lost reason is required",
+				"managementInfo": "Management Info",
+				"createdBy": "Created By",
+				"createdAt": "Created At",
+				"updatedAt": "Last Updated",
+				"updateSuccess": "Lead updated successfully",
+				"updateError": "Error updating lead",
+				"saveChanges": "Save Changes",
+				"addComment": "Add Comment",
+				"commentPlaceholder": "Write your comment here...",
+				"commentHint": "Ctrl+Enter to send",
+				"commentError": "Error adding comment",
+				"activityLog": "Activity Log",
+				"noActivity": "No activity yet",
+				"activity": {
+					"from": "from",
+					"to": "to",
+					"fileUploaded": "File uploaded",
+					"costStudyLinked": "Cost study linked",
+					"costStudyUnlinked": "Cost study unlinked",
+					"quotationLinked": "Quotation linked",
+					"quotationUnlinked": "Quotation unlinked",
+					"created": "Lead created"
+				},
+				"uploadFile": "Upload File",
+				"files": "Files",
+				"noFiles": "No files attached",
+				"fileName": "File Name",
+				"fileCategory": "Category",
+				"fileSize": "Size",
+				"fileUploader": "Uploaded By",
+				"fileDate": "Date",
+				"fileDeleted": "File deleted",
+				"fileDeleteError": "Error deleting file",
+				"deleteFileConfirm": "Are you sure you want to delete this file?",
+				"deleteFileDescription": "This action cannot be undone.",
+				"uploadError": "Error uploading file",
+				"uploadSuccess": "File uploaded successfully",
+				"uploading": "Uploading",
+				"fileTooLarge": "File too large (max 50MB)",
+				"invalidFileType": "Unsupported file type",
+				"dragAndDrop": "Drag file here or click to browse",
+				"dropHere": "Drop file here",
+				"supportedFormats": "Images, PDF, Word, Excel, PowerPoint, DWG",
+				"retry": "Retry",
+				"categories": {
+					"BLUEPRINT": "Blueprints",
+					"STRUCTURE": "Structural",
+					"SITE_PHOTO": "Site Photos",
+					"SCOPE": "Scope of Work",
+					"OTHER": "Other"
+				},
+				"costStudy": "Cost Study",
+				"quotation": "Quotation",
+				"noCostStudy": "No cost study linked",
+				"noQuotation": "No quotation linked",
+				"unlink": "Unlink",
+				"unlinked": "Unlinked successfully",
+				"unlinkError": "Error unlinking",
+				"unlinkConfirm": "Are you sure you want to unlink?",
+				"unlinkDescription": "This will only unlink the item, not delete it."
 			}
 		}
 	},
@@ -3604,6 +3792,8 @@
 			"pricing": "Pricing",
 			"calculateQuantities": "Quantities",
 			"quantityStudies": "Quantity Studies",
+			"leads": "Leads",
+			"newLead": "New Lead",
 			"dailyReport": "Daily Report",
 			"execution": "Execution",
 			"manageCompany": "Establishment",

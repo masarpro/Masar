@@ -14,6 +14,8 @@ import {
 	convertQuotationToInvoiceProcedure,
 } from "../finance/procedures/create-quotation";
 
+import { leadsRouter } from "./procedures/leads/router";
+
 export const pricingRouter = {
 	// Cost Studies (دراسات الكميات) — all existing quantities routes
 	studies: { ...quantitiesRouter },
@@ -29,4 +31,7 @@ export const pricingRouter = {
 		delete: deleteQuotationProcedure,
 		convertToInvoice: convertQuotationToInvoiceProcedure,
 	},
+
+	// Leads (العملاء المحتملون) — lead management procedures
+	leads: leadsRouter,
 };

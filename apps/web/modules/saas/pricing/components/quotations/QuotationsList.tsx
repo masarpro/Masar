@@ -36,6 +36,7 @@ import {
 	Trash2,
 	ArrowRightLeft,
 	Send,
+	UserSearch,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -145,6 +146,15 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 												<p className="text-sm text-muted-foreground">
 													{quotation.clientCompany}
 												</p>
+											)}
+											{(quotation as any).lead && (
+												<Link
+													href={`/app/${organizationSlug}/pricing/leads/${(quotation as any).lead.id}`}
+													className="mt-1 inline-flex items-center gap-1 rounded-md border border-border bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+												>
+													<UserSearch className="h-3 w-3" />
+													{(quotation as any).lead.name}
+												</Link>
 											)}
 										</div>
 									</TableCell>

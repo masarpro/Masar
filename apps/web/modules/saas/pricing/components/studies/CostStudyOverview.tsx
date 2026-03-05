@@ -8,17 +8,20 @@ import {
 	Building2,
 	Calculator,
 	ChevronLeft,
+	ExternalLink,
 	Hammer,
 	Layers,
 	MapPin,
 	PaintBucket,
 	Receipt,
 	Sparkles,
+	UserSearch,
 	Wrench,
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { formatCurrency } from "../../lib/utils";
+import { LeadStatusBadge } from "../leads/LeadStatusBadge";
 
 interface CostStudyOverviewProps {
 	organizationId: string;
@@ -242,6 +245,36 @@ export function CostStudyOverview({
 					</div>
 				</div>
 			</div>
+
+			{/* Linked Lead Card */}
+			{(study as any).lead && (
+				<div className="rounded-2xl border border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-950/20 p-4">
+					<div className="flex items-center justify-between">
+						<div className="flex items-center gap-3">
+							<div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-900/50">
+								<UserSearch className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+							</div>
+							<div>
+								<p className="text-xs text-muted-foreground">{t("pricing.leads.detail.costStudy") ? t("pricing.leads.title") : "العميل المحتمل"}</p>
+								<p className="font-medium text-foreground">{(study as any).lead.name}</p>
+								{(study as any).lead.phone && (
+									<p className="text-xs text-muted-foreground" dir="ltr">{(study as any).lead.phone}</p>
+								)}
+							</div>
+						</div>
+						<div className="flex items-center gap-3">
+							<LeadStatusBadge status={(study as any).lead.status} size="sm" />
+							<Link
+								href={`/app/${organizationSlug}/pricing/leads/${(study as any).lead.id}`}
+								className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+							>
+								{t("pricing.leads.actions.view")}
+								<ExternalLink className="h-3 w-3" />
+							</Link>
+						</div>
+					</div>
+				</div>
+			)}
 
 			{/* Sections Grid */}
 			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

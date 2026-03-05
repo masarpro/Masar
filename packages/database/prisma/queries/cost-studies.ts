@@ -38,6 +38,7 @@ export async function getOrganizationCostStudies(
 			where,
 			include: {
 				createdBy: { select: { id: true, name: true } },
+				lead: { select: { id: true, name: true, status: true } },
 				_count: {
 					select: {
 						structuralItems: true,
@@ -71,6 +72,7 @@ export async function getCostStudyById(id: string, organizationId: string) {
 			laborItems: true,
 			quotes: { orderBy: { createdAt: "desc" } },
 			createdBy: { select: { id: true, name: true, email: true } },
+			lead: { select: { id: true, name: true, phone: true, status: true, priority: true } },
 		},
 	});
 }

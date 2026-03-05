@@ -29,6 +29,7 @@ import {
 	Layers,
 	Calendar,
 	Boxes,
+	UserSearch,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -49,6 +50,7 @@ interface CostStudyCardProps {
 		status: string;
 		totalCost: number;
 		createdAt: Date;
+		lead?: { id: string; name: string; status: string } | null;
 		_count: {
 			structuralItems: number;
 			finishingItems: number;
@@ -179,6 +181,16 @@ export function CostStudyCard({
 								<p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
 									{study.customerName}
 								</p>
+							)}
+							{study.lead && (
+								<Link
+									href={basePath.replace("/pricing/studies", "/pricing/leads/") + study.lead.id}
+									className="mt-1 inline-flex items-center gap-1 rounded-md border border-border bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+									onClick={(e) => e.stopPropagation()}
+								>
+									<UserSearch className="h-3 w-3" />
+									{study.lead.name}
+								</Link>
 							)}
 						</div>
 						<DropdownMenu>

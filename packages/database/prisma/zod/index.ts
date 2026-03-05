@@ -557,6 +557,24 @@ export const OnboardingProgressScalarFieldEnumSchema = z.enum(['id', 'organizati
 
 export type OnboardingProgressScalarFieldEnum = z.infer<typeof OnboardingProgressScalarFieldEnumSchema>;
 
+// File: LeadScalarFieldEnum.schema.ts
+
+export const LeadScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'createdById', 'name', 'phone', 'email', 'company', 'clientType', 'projectType', 'projectLocation', 'estimatedArea', 'estimatedValue', 'status', 'source', 'priority', 'assignedToId', 'expectedCloseDate', 'lostReason', 'notes', 'costStudyId', 'quotationId', 'convertedProjectId', 'createdAt', 'updatedAt'])
+
+export type LeadScalarFieldEnum = z.infer<typeof LeadScalarFieldEnumSchema>;
+
+// File: LeadFileScalarFieldEnum.schema.ts
+
+export const LeadFileScalarFieldEnumSchema = z.enum(['id', 'leadId', 'organizationId', 'createdById', 'name', 'fileUrl', 'storagePath', 'fileSize', 'mimeType', 'category', 'description', 'createdAt'])
+
+export type LeadFileScalarFieldEnum = z.infer<typeof LeadFileScalarFieldEnumSchema>;
+
+// File: LeadActivityScalarFieldEnum.schema.ts
+
+export const LeadActivityScalarFieldEnumSchema = z.enum(['id', 'leadId', 'organizationId', 'createdById', 'type', 'content', 'metadata', 'createdAt'])
+
+export type LeadActivityScalarFieldEnum = z.infer<typeof LeadActivityScalarFieldEnumSchema>;
+
 // File: ActivationCodeScalarFieldEnum.schema.ts
 
 export const ActivationCodeScalarFieldEnumSchema = z.enum(['id', 'code', 'description', 'planType', 'durationDays', 'maxUsers', 'maxProjects', 'maxStorageGB', 'isActive', 'maxUses', 'usedCount', 'createdById', 'createdAt', 'updatedAt', 'expiresAt'])
@@ -1018,6 +1036,36 @@ export type ExpenseRunStatus = z.infer<typeof ExpenseRunStatusSchema>;
 export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED', 'EXPENSE_PAID', 'EXPENSE_CANCELLED', 'EXPENSE_DELETED', 'PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'TRANSFER_CREATED', 'TRANSFER_CANCELLED', 'BANK_ACCOUNT_CREATED', 'BANK_ACCOUNT_UPDATED', 'BANK_ACCOUNT_SET_DEFAULT', 'BANK_ACCOUNT_DELETED', 'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_ITEMS_UPDATED', 'INVOICE_STATUS_CHANGED', 'INVOICE_CONVERTED_TO_TAX', 'INVOICE_PAYMENT_ADDED', 'INVOICE_PAYMENT_DELETED', 'INVOICE_DELETED', 'INVOICE_ISSUED', 'INVOICE_DUPLICATED', 'INVOICE_CREDIT_NOTE_CREATED', 'QUOTATION_CREATED', 'QUOTATION_UPDATED', 'QUOTATION_ITEMS_UPDATED', 'QUOTATION_STATUS_CHANGED', 'QUOTATION_DELETED', 'QUOTATION_CONVERTED', 'CLIENT_CREATED', 'CLIENT_UPDATED', 'CLIENT_DELETED', 'PAYROLL_RUN_APPROVED', 'PAYROLL_RUN_CANCELLED', 'SETTINGS_UPDATED', 'ZATCA_INVOICE_SUBMITTED', 'ZATCA_INVOICE_CLEARED', 'ZATCA_INVOICE_REJECTED'])
 
 export type OrgAuditAction = z.infer<typeof OrgAuditActionSchema>;
+
+// File: LeadStatus.schema.ts
+
+export const LeadStatusSchema = z.enum(['NEW', 'STUDYING', 'QUOTED', 'NEGOTIATING', 'WON', 'LOST'])
+
+export type LeadStatus = z.infer<typeof LeadStatusSchema>;
+
+// File: LeadSource.schema.ts
+
+export const LeadSourceSchema = z.enum(['REFERRAL', 'SOCIAL_MEDIA', 'WEBSITE', 'DIRECT', 'EXHIBITION', 'OTHER'])
+
+export type LeadSource = z.infer<typeof LeadSourceSchema>;
+
+// File: LeadPriority.schema.ts
+
+export const LeadPrioritySchema = z.enum(['NORMAL', 'HIGH', 'URGENT'])
+
+export type LeadPriority = z.infer<typeof LeadPrioritySchema>;
+
+// File: LeadFileCategory.schema.ts
+
+export const LeadFileCategorySchema = z.enum(['BLUEPRINT', 'STRUCTURE', 'SITE_PHOTO', 'SCOPE', 'OTHER'])
+
+export type LeadFileCategory = z.infer<typeof LeadFileCategorySchema>;
+
+// File: LeadActivityType.schema.ts
+
+export const LeadActivityTypeSchema = z.enum(['COMMENT', 'STATUS_CHANGE', 'FILE_UPLOADED', 'FILE_DELETED', 'COST_STUDY_LINKED', 'COST_STUDY_UNLINKED', 'QUOTATION_LINKED', 'QUOTATION_UNLINKED', 'ASSIGNED', 'CONVERTED'])
+
+export type LeadActivityType = z.infer<typeof LeadActivityTypeSchema>;
 
 // File: PlanConfig.schema.ts
 
@@ -3336,6 +3384,77 @@ export const OnboardingProgressSchema = z.object({
 
 export type OnboardingProgressType = z.infer<typeof OnboardingProgressSchema>;
 
+
+// File: Lead.schema.ts
+
+export const LeadSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  createdById: z.string(),
+  name: z.string(),
+  phone: z.string().nullish(),
+  email: z.string().nullish(),
+  company: z.string().nullish(),
+  clientType: ClientTypeSchema.default("INDIVIDUAL"),
+  projectType: ProjectTypeSchema.nullish(),
+  projectLocation: z.string().nullish(),
+  estimatedArea: z.instanceof(Prisma.Decimal, {
+  message: "Field 'estimatedArea' must be a Decimal. Location: ['Models', 'Lead']",
+}).nullish(),
+  estimatedValue: z.instanceof(Prisma.Decimal, {
+  message: "Field 'estimatedValue' must be a Decimal. Location: ['Models', 'Lead']",
+}).nullish(),
+  status: LeadStatusSchema.default("NEW"),
+  source: LeadSourceSchema.default("DIRECT"),
+  priority: LeadPrioritySchema.default("NORMAL"),
+  assignedToId: z.string().nullish(),
+  expectedCloseDate: z.date().nullish(),
+  lostReason: z.string().nullish(),
+  notes: z.string().nullish(),
+  costStudyId: z.string().nullish(),
+  quotationId: z.string().nullish(),
+  convertedProjectId: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type LeadType = z.infer<typeof LeadSchema>;
+
+
+// File: LeadFile.schema.ts
+
+export const LeadFileSchema = z.object({
+  id: z.string(),
+  leadId: z.string(),
+  organizationId: z.string(),
+  createdById: z.string(),
+  name: z.string(),
+  fileUrl: z.string(),
+  storagePath: z.string(),
+  fileSize: z.number().int().nullish(),
+  mimeType: z.string().nullish(),
+  category: LeadFileCategorySchema.default("OTHER"),
+  description: z.string().nullish(),
+  createdAt: z.date(),
+});
+
+export type LeadFileType = z.infer<typeof LeadFileSchema>;
+
+
+// File: LeadActivity.schema.ts
+
+export const LeadActivitySchema = z.object({
+  id: z.string(),
+  leadId: z.string(),
+  organizationId: z.string(),
+  createdById: z.string(),
+  type: LeadActivityTypeSchema.default("COMMENT"),
+  content: z.string().nullish(),
+  metadata: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  createdAt: z.date(),
+});
+
+export type LeadActivityModel = z.infer<typeof LeadActivitySchema>;
 
 // File: ActivationCode.schema.ts
 

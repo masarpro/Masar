@@ -725,6 +725,12 @@ model User {
   // Super Admin Actions
   superAdminActions    SuperAdminLog[]    @relation("SuperAdminActions")
 
+  // العملاء المحتملون (Leads)
+  leadsCreated           Lead[]         @relation("LeadCreatedBy")
+  leadsAssigned          Lead[]         @relation("LeadAssignedTo")
+  leadFiles              LeadFile[]     @relation("LeadFileCreatedBy")
+  leadActivities         LeadActivity[] @relation("LeadActivityCreatedBy")
+
   // Activation Codes - أكواد التفعيل
   createdActivationCodes  ActivationCode[]
   activationCodeUsages    ActivationCodeUsage[]
@@ -931,6 +937,9 @@ model Organization {
   superAdminLogs       SuperAdminLog[]     @relation("SuperAdminOrgTarget")
   aiChatUsage          AiChatUsage?
   onboardingProgress   OnboardingProgress?
+
+  // العملاء المحتملون (Leads)
+  leads                 Lead[]
 
   // Activation Codes - أكواد التفعيل
   activationCodeUsages  ActivationCodeUsage[]
@@ -1174,6 +1183,7 @@ model CostStudy {
   mepItems        MEPItem[]
   laborItems      LaborItem[]
   quotes          Quote[]
+  lead            Lead?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -2873,6 +2883,55 @@ enum QuotationStatus {
   CONVERTED     // تم تحويله لفاتورة
 }
 
+// ═══════════════════════════════════════════════════════════
+// Leads Enums — العملاء المحتملون
+// ═══════════════════════════════════════════════════════════
+
+enum LeadStatus {
+  NEW           // جديد — الاستفسار وصل ولم يُعالج بعد
+  STUDYING      // قيد الدراسة — نعمل على دراسة التكلفة
+  QUOTED        // تم تقديم العرض — أُرسل عرض السعر للعميل
+  NEGOTIATING   // تفاوض — العميل يناقش الشروط
+  WON           // ربحنا — وُقّع العقد وتحوّل لمشروع
+  LOST          // خسرنا — لم يتم التعاقد
+}
+
+enum LeadSource {
+  REFERRAL      // توصية من شخص
+  SOCIAL_MEDIA  // وسائل التواصل الاجتماعي
+  WEBSITE       // الموقع الإلكتروني
+  DIRECT        // تواصل مباشر
+  EXHIBITION    // معرض أو فعالية
+  OTHER         // أخرى
+}
+
+enum LeadPriority {
+  NORMAL        // عادي
+  HIGH          // مهم
+  URGENT        // عاجل
+}
+
+enum LeadFileCategory {
+  BLUEPRINT     // مخطط معماري
+  STRUCTURE     // مخطط إنشائي
+  SITE_PHOTO    // صورة موقع
+  SCOPE         // وصف نطاق العمل
+  OTHER         // أخرى
+}
+
+enum LeadActivityType {
+  COMMENT              // تعليق يدوي
+  STATUS_CHANGE        // تغيير الحالة
+  FILE_UPLOADED        // رُفع ملف جديد
+  FILE_DELETED         // حُذف ملف
+  COST_STUDY_LINKED    // ربط دراسة تكلفة
+  COST_STUDY_UNLINKED  // فك ربط دراسة تكلفة
+  QUOTATION_LINKED     // ربط عرض سعر
+  QUOTATION_UNLINKED   // فك ربط عرض سعر
+  ASSIGNED             // تعيين مسؤول
+  CONVERTED            // تحويل لمشروع فعلي
+}
+
 // حالة الفاتورة
 enum FinanceInvoiceStatus {
   DRAFT         // مسودة
@@ -3150,6 +3209,7 @@ model Quotation {
   // العلاقات
   items           QuotationItem[]
   invoices        FinanceInvoice[] // الفواتير المحولة من هذا العرض
+  lead            Lead?
 
   @@index([organizationId])
   @@index([organizationId, status])
@@ -4147,6 +4207,106 @@ model OnboardingProgress {
   updatedAt  DateTime @updatedAt      @map("updated_at")
 
   @@map("onboarding_progress")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// العملاء المحتملون (Leads) — نظام إدارة الفرص قبل التعاقد
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Lead {
+  id             String       @id @default(cuid())
+  organizationId String
+  createdById    String
+
+  // البيانات الأساسية للعميل المحتمل
+  name           String                           // الاسم الكامل
+  phone          String?
+  email          String?
+  company        String?                          // اسم الشركة/المؤسسة
+  clientType     ClientType   @default(INDIVIDUAL)
+
+  // تفاصيل المشروع المتوقع
+  projectType    ProjectType?
+  projectLocation String?
+  estimatedArea  Decimal?                         // المساحة التقديرية م²
+  estimatedValue Decimal?                         // القيمة التقديرية SAR
+
+  // إدارة الفرصة
+  status         LeadStatus   @default(NEW)
+  source         LeadSource   @default(DIRECT)
+  priority       LeadPriority @default(NORMAL)
+  assignedToId   String?
+  expectedCloseDate DateTime?                     // التاريخ المتوقع للإغلاق
+  lostReason     String?                          // سبب الخسارة (عند LOST)
+  notes          String?
+
+  // الربط بالكيانات الأخرى في قسم التسعير
+  costStudyId    String?      @unique             // دراسة التكلفة المرتبطة
+  quotationId    String?      @unique             // عرض السعر الرسمي المرتبط
+
+  // الربط بالمشروع بعد التحويل
+  convertedProjectId String?  @unique
+
+  // العلاقات
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy      User         @relation("LeadCreatedBy",    fields: [createdById],  references: [id])
+  assignedTo     User?        @relation("LeadAssignedTo",   fields: [assignedToId], references: [id])
+  costStudy      CostStudy?   @relation(fields: [costStudyId],  references: [id])
+  quotation      Quotation?   @relation(fields: [quotationId],  references: [id])
+
+  files          LeadFile[]
+  activities     LeadActivity[]
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([organizationId, assignedToId])
+  @@index([createdById])
+}
+
+model LeadFile {
+  id             String          @id @default(cuid())
+  leadId         String
+  organizationId String
+  createdById    String
+
+  name           String                           // اسم الملف الأصلي
+  fileUrl        String                           // رابط S3
+  storagePath    String                           // المسار الداخلي في S3
+  fileSize       Int?                             // الحجم بالبايت
+  mimeType       String?                          // image/pdf/dwg...
+  category       LeadFileCategory @default(OTHER)
+  description    String?
+
+  lead           Lead @relation(fields: [leadId],         references: [id], onDelete: Cascade)
+  createdBy      User @relation("LeadFileCreatedBy", fields: [createdById], references: [id])
+
+  createdAt      DateTime @default(now())
+
+  @@index([leadId])
+  @@index([organizationId])
+}
+
+model LeadActivity {
+  id             String           @id @default(cuid())
+  leadId         String
+  organizationId String
+  createdById    String
+
+  type           LeadActivityType @default(COMMENT)
+  content        String?          // نص التعليق (فارغ لأحداث النظام)
+  metadata       Json?            // { oldStatus, newStatus, fileId, fileName, ... }
+
+  lead           Lead @relation(fields: [leadId],             references: [id], onDelete: Cascade)
+  createdBy      User @relation("LeadActivityCreatedBy", fields: [createdById], references: [id])
+
+  createdAt      DateTime @default(now())
+
+  @@index([leadId])
+  @@index([leadId, createdAt])
+  @@index([organizationId])
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

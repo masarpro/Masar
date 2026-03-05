@@ -892,7 +892,8 @@
 			"sections": {
 				"dashboard": "الرئيسية",
 				"studies": "دراسات الكميات",
-				"quotations": "عروض الأسعار"
+				"quotations": "عروض الأسعار",
+				"leads": "العملاء المحتملون"
 			}
 		},
 		"quotations": {
@@ -1388,6 +1389,193 @@
 				"finishing": "التشطيبات",
 				"mep": "الكهروميكانيك",
 				"pricing": "التسعير"
+			}
+		},
+		"leads": {
+			"title": "العملاء المحتملون",
+			"subtitle": "إدارة الفرص والعملاء المحتملين قبل التعاقد",
+			"create": "عميل محتمل جديد",
+			"edit": "تعديل العميل المحتمل",
+			"searchPlaceholder": "بحث بالاسم أو الهاتف أو الشركة...",
+			"allStatuses": "كل الحالات",
+			"allSources": "كل المصادر",
+			"allPriorities": "كل الأولويات",
+			"resetFilters": "إعادة تعيين",
+			"empty": "لا يوجد عملاء محتملون",
+			"emptyDescription": "لم تقم بإضافة أي عميل محتمل بعد. ابدأ بإضافة أول عميل.",
+			"status": {
+				"NEW": "جديد",
+				"STUDYING": "قيد الدراسة",
+				"QUOTED": "تم التسعير",
+				"NEGOTIATING": "تفاوض",
+				"WON": "تم التعاقد",
+				"LOST": "خسرنا"
+			},
+			"source": {
+				"REFERRAL": "توصية",
+				"SOCIAL_MEDIA": "تواصل اجتماعي",
+				"WEBSITE": "الموقع",
+				"DIRECT": "مباشر",
+				"EXHIBITION": "معرض",
+				"OTHER": "أخرى"
+			},
+			"priority": {
+				"NORMAL": "عادي",
+				"HIGH": "مهم",
+				"URGENT": "عاجل"
+			},
+			"clientType": {
+				"INDIVIDUAL": "فرد",
+				"COMMERCIAL": "شركة"
+			},
+			"projectType": {
+				"RESIDENTIAL": "سكني",
+				"COMMERCIAL": "تجاري",
+				"INDUSTRIAL": "صناعي",
+				"INFRASTRUCTURE": "بنية تحتية",
+				"MIXED": "مختلط"
+			},
+			"columns": {
+				"client": "العميل",
+				"project": "المشروع",
+				"value": "القيمة",
+				"status": "الحالة",
+				"priority": "الأولوية",
+				"assignedTo": "المسؤول",
+				"date": "تاريخ الإضافة",
+				"actions": "الإجراءات"
+			},
+			"stats": {
+				"total": "إجمالي العملاء",
+				"open": "قيد المتابعة",
+				"won": "تم التعاقد",
+				"estimatedValue": "القيمة التقديرية"
+			},
+			"form": {
+				"clientInfo": "بيانات العميل",
+				"projectInfo": "تفاصيل المشروع",
+				"name": "الاسم الكامل",
+				"namePlaceholder": "أدخل اسم العميل",
+				"phone": "رقم الهاتف",
+				"phonePlaceholder": "05xxxxxxxx",
+				"email": "البريد الإلكتروني",
+				"emailPlaceholder": "example@email.com",
+				"company": "اسم الشركة / المؤسسة",
+				"companyPlaceholder": "أدخل اسم الشركة",
+				"clientType": "نوع العميل",
+				"projectType": "نوع المشروع",
+				"selectProjectType": "اختر نوع المشروع",
+				"projectLocation": "موقع المشروع",
+				"projectLocationPlaceholder": "مثال: الرياض - حي النرجس",
+				"estimatedArea": "المساحة التقديرية (م²)",
+				"estimatedValue": "القيمة التقديرية (ر.س)",
+				"source": "مصدر العميل",
+				"priority": "الأولوية",
+				"assignedTo": "المسؤول",
+				"selectAssignee": "اختر المسؤول",
+				"noAssignee": "بدون تعيين",
+				"notes": "ملاحظات",
+				"notesPlaceholder": "أضف أي ملاحظات...",
+				"submit": "إضافة عميل محتمل",
+				"cancel": "إلغاء"
+			},
+			"messages": {
+				"createSuccess": "تم إضافة العميل المحتمل بنجاح",
+				"createError": "حدث خطأ أثناء إضافة العميل المحتمل",
+				"deleteSuccess": "تم حذف العميل المحتمل",
+				"deleteError": "حدث خطأ أثناء الحذف",
+				"deleteConfirm": "هل أنت متأكد من حذف هذا العميل المحتمل؟",
+				"deleteConfirmDescription": "سيتم حذف جميع الملفات والنشاطات المرتبطة. لا يمكن التراجع عن هذا الإجراء.",
+				"cannotDeleteWon": "لا يمكن حذف عميل محتمل تم التعاقد معه"
+			},
+			"actions": {
+				"view": "عرض التفاصيل",
+				"edit": "تعديل",
+				"delete": "حذف"
+			},
+			"pagination": {
+				"previous": "السابق",
+				"next": "التالي",
+				"pageOf": "صفحة {page} من {total}"
+			},
+			"unassigned": "غير معيّن",
+			"area": "م²",
+			"detail": {
+				"tabs": {
+					"info": "البيانات",
+					"files": "الملفات",
+					"activity": "النشاط",
+					"linked": "المرتبطات"
+				},
+				"notFound": "العميل المحتمل غير موجود",
+				"changeStatus": "تغيير الحالة",
+				"newStatus": "الحالة الجديدة",
+				"updateStatus": "تحديث الحالة",
+				"statusUpdated": "تم تحديث الحالة بنجاح",
+				"statusUpdateError": "حدث خطأ أثناء تحديث الحالة",
+				"lostReason": "سبب الخسارة",
+				"lostReasonPlaceholder": "اذكر سبب خسارة هذا العميل...",
+				"lostReasonRequired": "يجب ذكر سبب الخسارة",
+				"managementInfo": "معلومات الإدارة",
+				"createdBy": "أنشأه",
+				"createdAt": "تاريخ الإنشاء",
+				"updatedAt": "آخر تحديث",
+				"updateSuccess": "تم تحديث البيانات بنجاح",
+				"updateError": "حدث خطأ أثناء التحديث",
+				"saveChanges": "حفظ التغييرات",
+				"addComment": "إضافة تعليق",
+				"commentPlaceholder": "اكتب تعليقك هنا...",
+				"commentHint": "Ctrl+Enter للإرسال",
+				"commentError": "حدث خطأ أثناء إضافة التعليق",
+				"activityLog": "سجل النشاط",
+				"noActivity": "لا يوجد نشاط بعد",
+				"activity": {
+					"from": "من",
+					"to": "إلى",
+					"fileUploaded": "تم رفع ملف",
+					"costStudyLinked": "تم ربط دراسة تكاليف",
+					"costStudyUnlinked": "تم فك ربط دراسة التكاليف",
+					"quotationLinked": "تم ربط عرض سعر",
+					"quotationUnlinked": "تم فك ربط عرض السعر",
+					"created": "تم إنشاء العميل المحتمل"
+				},
+				"uploadFile": "رفع ملف",
+				"files": "الملفات",
+				"noFiles": "لا يوجد ملفات مرفقة",
+				"fileName": "اسم الملف",
+				"fileCategory": "التصنيف",
+				"fileSize": "الحجم",
+				"fileUploader": "رفعه",
+				"fileDate": "التاريخ",
+				"fileDeleted": "تم حذف الملف",
+				"fileDeleteError": "حدث خطأ أثناء حذف الملف",
+				"deleteFileConfirm": "هل أنت متأكد من حذف هذا الملف؟",
+				"deleteFileDescription": "لا يمكن التراجع عن هذا الإجراء.",
+				"uploadError": "حدث خطأ أثناء رفع الملف",
+				"uploadSuccess": "تم رفع الملف بنجاح",
+				"uploading": "جاري الرفع",
+				"fileTooLarge": "حجم الملف كبير جداً (الحد الأقصى 50MB)",
+				"invalidFileType": "نوع الملف غير مدعوم",
+				"dragAndDrop": "اسحب الملف هنا أو اضغط للاختيار",
+				"dropHere": "أفلت الملف هنا",
+				"supportedFormats": "صور، PDF، Word، Excel، PowerPoint، DWG",
+				"retry": "إعادة المحاولة",
+				"categories": {
+					"BLUEPRINT": "مخططات",
+					"STRUCTURE": "إنشائي",
+					"SITE_PHOTO": "صور الموقع",
+					"SCOPE": "نطاق العمل",
+					"OTHER": "أخرى"
+				},
+				"costStudy": "دراسة التكاليف",
+				"quotation": "عرض السعر",
+				"noCostStudy": "لم يتم ربط دراسة تكاليف",
+				"noQuotation": "لم يتم ربط عرض سعر",
+				"unlink": "فك الربط",
+				"unlinked": "تم فك الربط بنجاح",
+				"unlinkError": "حدث خطأ أثناء فك الربط",
+				"unlinkConfirm": "هل أنت متأكد من فك الربط؟",
+				"unlinkDescription": "سيتم فك الربط فقط ولن يتم حذف العنصر المرتبط."
 			}
 		}
 	},
@@ -3582,6 +3770,8 @@
 			"pricing": "التسعير",
 			"calculateQuantities": "حساب الكميات",
 			"quantityStudies": "دراسات الكميات",
+			"leads": "العملاء المحتملون",
+			"newLead": "عميل محتمل جديد",
 			"dailyReport": "تقرير يومي",
 			"execution": "التنفيذ",
 			"manageCompany": "المنشأة",

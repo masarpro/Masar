@@ -24,6 +24,7 @@ export interface PricingPermissions {
 	studies: boolean;
 	quotations: boolean;
 	pricing: boolean;
+	leads: boolean;
 }
 
 export interface FinancePermissions {
@@ -111,6 +112,7 @@ export function createEmptyPermissions(): Permissions {
 			studies: false,
 			quotations: false,
 			pricing: false,
+			leads: false,
 		},
 		finance: {
 			view: false,
@@ -172,6 +174,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			studies: true,
 			quotations: true,
 			pricing: true,
+			leads: true,
 		},
 		finance: {
 			view: true,
@@ -227,6 +230,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			studies: true,
 			quotations: true,
 			pricing: true,
+			leads: true,
 		},
 		finance: {
 			view: true,
@@ -282,6 +286,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			studies: false,
 			quotations: true,
 			pricing: true,
+			leads: true,
 		},
 		finance: {
 			view: true,
@@ -337,6 +342,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			studies: true,
 			quotations: false,
 			pricing: false,
+			leads: false,
 		},
 		finance: {
 			view: false,
@@ -392,6 +398,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			studies: false,
 			quotations: false,
 			pricing: false,
+			leads: false,
 		},
 		finance: {
 			view: false,
@@ -447,6 +454,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			studies: false,
 			quotations: false,
 			pricing: false,
+			leads: false,
 		},
 		finance: {
 			view: false,

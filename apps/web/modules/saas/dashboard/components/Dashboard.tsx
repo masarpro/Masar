@@ -33,6 +33,7 @@ import {
 	Receipt,
 	TrendingDown,
 	TrendingUp,
+	UserSearch,
 	Wallet,
 } from "lucide-react";
 import Link from "next/link";
@@ -324,6 +325,17 @@ export function Dashboard() {
 			borderColor: "border-amber-200/50 dark:border-amber-800/50",
 		},
 		{
+			icon: UserSearch,
+			sectionLabel: t("dashboard.actions.leads"),
+			actionLabel: t("dashboard.actions.newLead"),
+			browsePath: `/app/${organizationSlug}/pricing/leads`,
+			createPath: `/app/${organizationSlug}/pricing/leads/new`,
+			iconColor: "text-pink-500 dark:text-pink-400",
+			bgColor: "bg-pink-50/80 dark:bg-pink-950/30",
+			hoverBg: "hover:bg-pink-100 dark:hover:bg-pink-900/50",
+			borderColor: "border-pink-200/50 dark:border-pink-800/50",
+		},
+		{
 			icon: ClipboardList,
 			sectionLabel: t("dashboard.actions.dailyReport"),
 			actionLabel: t("dashboard.actions.dailyReport"),
@@ -509,7 +521,7 @@ export function Dashboard() {
 			</div>
 
 			{/* ═══ QUICK ACTIONS - Finance-style two-section cards ═══ */}
-			<div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+			<div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">
 				{quickActions.map((action, i) => {
 					const Icon = action.icon;
 					const isSingleSection = "singleSection" in action && action.singleSection;

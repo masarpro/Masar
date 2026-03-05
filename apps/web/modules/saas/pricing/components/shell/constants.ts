@@ -3,6 +3,7 @@ import {
 	Calculator,
 	FileSpreadsheet,
 	HomeIcon,
+	UserSearch,
 } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════════
@@ -38,6 +39,12 @@ export const PRICING_NAV_SECTIONS: PricingNavSection[] = [
 		path: "quotations",
 		labelKey: "pricing.shell.sections.quotations",
 		icon: FileSpreadsheet,
+	},
+	{
+		id: "leads",
+		path: "leads",
+		labelKey: "pricing.shell.sections.leads",
+		icon: UserSearch,
 	},
 ];
 
