@@ -3,7 +3,6 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
-import { Card, CardContent } from "@ui/components/card";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
 import {
@@ -14,7 +13,18 @@ import {
 	SelectValue,
 } from "@ui/components/select";
 import { Textarea } from "@ui/components/textarea";
-import { Loader2 } from "lucide-react";
+import {
+	Banknote,
+	Building2,
+	FolderKanban,
+	Loader2,
+	MapPin,
+	Phone,
+	Mail,
+	Settings2,
+	User,
+	UserPlus,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
@@ -100,107 +110,146 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 	};
 
 	return (
-		<form onSubmit={handleSubmit} className="space-y-6">
-			{/* Client Information */}
-			<Card className="rounded-2xl">
-				<CardContent className="p-6 space-y-4">
-					<h3 className="text-base font-semibold text-foreground">
-						{t("pricing.leads.form.clientInfo")}
-					</h3>
+		<form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
+			{/* Section 1: Client Information */}
+			<div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
+				<div className="h-1 w-full bg-blue-500" />
+				<div className="p-6 space-y-5">
+					<div className="flex items-center gap-3">
+						<div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/30">
+							<User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+						</div>
+						<div>
+							<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+								{t("pricing.leads.form.clientInfo")}
+							</h3>
+							<p className="text-xs text-slate-500 dark:text-slate-400">
+								{t("pricing.leads.form.clientInfoDescription")}
+							</p>
+						</div>
+					</div>
 
 					<div>
-						<Label htmlFor="name">{t("pricing.leads.form.name")} *</Label>
+						<Label htmlFor="name" className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.name")} *</Label>
 						<Input
 							id="name"
 							value={formData.name}
 							onChange={(e) => update("name", e.target.value)}
 							placeholder={t("pricing.leads.form.namePlaceholder")}
-							className="mt-1.5 rounded-xl"
+							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 							required
 						/>
 					</div>
 
 					<div className="grid gap-4 sm:grid-cols-2">
 						<div>
-							<Label htmlFor="phone">{t("pricing.leads.form.phone")}</Label>
+							<Label htmlFor="phone" className="text-slate-700 dark:text-slate-300">
+								<span className="inline-flex items-center gap-1.5">
+									<Phone className="h-3.5 w-3.5 text-slate-400" />
+									{t("pricing.leads.form.phone")}
+								</span>
+							</Label>
 							<Input
 								id="phone"
 								value={formData.phone}
 								onChange={(e) => update("phone", e.target.value)}
 								placeholder={t("pricing.leads.form.phonePlaceholder")}
-								className="mt-1.5 rounded-xl"
+								className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 								dir="ltr"
 							/>
 						</div>
 						<div>
-							<Label htmlFor="email">{t("pricing.leads.form.email")}</Label>
+							<Label htmlFor="email" className="text-slate-700 dark:text-slate-300">
+								<span className="inline-flex items-center gap-1.5">
+									<Mail className="h-3.5 w-3.5 text-slate-400" />
+									{t("pricing.leads.form.email")}
+								</span>
+							</Label>
 							<Input
 								id="email"
 								type="email"
 								value={formData.email}
 								onChange={(e) => update("email", e.target.value)}
 								placeholder={t("pricing.leads.form.emailPlaceholder")}
-								className="mt-1.5 rounded-xl"
+								className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 								dir="ltr"
 							/>
 						</div>
 					</div>
 
 					<div>
-						<Label htmlFor="company">{t("pricing.leads.form.company")}</Label>
+						<Label htmlFor="company" className="text-slate-700 dark:text-slate-300">
+							<span className="inline-flex items-center gap-1.5">
+								<Building2 className="h-3.5 w-3.5 text-slate-400" />
+								{t("pricing.leads.form.company")}
+							</span>
+						</Label>
 						<Input
 							id="company"
 							value={formData.company}
 							onChange={(e) => update("company", e.target.value)}
 							placeholder={t("pricing.leads.form.companyPlaceholder")}
-							className="mt-1.5 rounded-xl"
+							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 						/>
 					</div>
 
 					<div>
-						<Label>{t("pricing.leads.form.clientType")}</Label>
-						<div className="mt-1.5 flex gap-4">
-							<label className="flex items-center gap-2 cursor-pointer">
-								<input
-									type="radio"
-									name="clientType"
-									value="INDIVIDUAL"
-									checked={formData.clientType === "INDIVIDUAL"}
-									onChange={(e) => update("clientType", e.target.value)}
-									className="accent-primary"
-								/>
-								<span className="text-sm">{t("pricing.leads.clientType.INDIVIDUAL")}</span>
-							</label>
-							<label className="flex items-center gap-2 cursor-pointer">
-								<input
-									type="radio"
-									name="clientType"
-									value="COMMERCIAL"
-									checked={formData.clientType === "COMMERCIAL"}
-									onChange={(e) => update("clientType", e.target.value)}
-									className="accent-primary"
-								/>
-								<span className="text-sm">{t("pricing.leads.clientType.COMMERCIAL")}</span>
-							</label>
+						<Label className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.clientType")}</Label>
+						<div className="mt-2 flex gap-3">
+							<button
+								type="button"
+								onClick={() => update("clientType", "INDIVIDUAL")}
+								className={`flex-1 flex items-center justify-center gap-2 rounded-xl border-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
+									formData.clientType === "INDIVIDUAL"
+										? "border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400"
+										: "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600"
+								}`}
+							>
+								<User className="h-4 w-4" />
+								{t("pricing.leads.clientType.INDIVIDUAL")}
+							</button>
+							<button
+								type="button"
+								onClick={() => update("clientType", "COMMERCIAL")}
+								className={`flex-1 flex items-center justify-center gap-2 rounded-xl border-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
+									formData.clientType === "COMMERCIAL"
+										? "border-violet-500 bg-violet-50 dark:bg-violet-950/30 text-violet-700 dark:text-violet-400"
+										: "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600"
+								}`}
+							>
+								<Building2 className="h-4 w-4" />
+								{t("pricing.leads.clientType.COMMERCIAL")}
+							</button>
 						</div>
 					</div>
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 
-			{/* Project Details */}
-			<Card className="rounded-2xl">
-				<CardContent className="p-6 space-y-4">
-					<h3 className="text-base font-semibold text-foreground">
-						{t("pricing.leads.form.projectInfo")}
-					</h3>
+			{/* Section 2: Project Details */}
+			<div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
+				<div className="h-1 w-full bg-violet-500" />
+				<div className="p-6 space-y-5">
+					<div className="flex items-center gap-3">
+						<div className="p-2.5 rounded-xl bg-violet-50 dark:bg-violet-950/30">
+							<FolderKanban className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+						</div>
+						<div>
+							<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+								{t("pricing.leads.form.projectInfo")}
+							</h3>
+							<p className="text-xs text-slate-500 dark:text-slate-400">
+								{t("pricing.leads.form.projectInfoDescription")}
+							</p>
+						</div>
+					</div>
 
 					<div>
-						<Label>{t("pricing.leads.form.projectType")}</Label>
+						<Label className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.projectType")}</Label>
 						<Select
 							value={formData.projectType || "none"}
 							onValueChange={(v) => update("projectType", v === "none" ? "" : v)}
 						>
-							<SelectTrigger className="mt-1.5 rounded-xl">
+							<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
 								<SelectValue placeholder={t("pricing.leads.form.selectProjectType")} />
 							</SelectTrigger>
 							<SelectContent className="rounded-xl">
@@ -215,50 +264,88 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 					</div>
 
 					<div>
-						<Label htmlFor="projectLocation">{t("pricing.leads.form.projectLocation")}</Label>
+						<Label htmlFor="projectLocation" className="text-slate-700 dark:text-slate-300">
+							<span className="inline-flex items-center gap-1.5">
+								<MapPin className="h-3.5 w-3.5 text-slate-400" />
+								{t("pricing.leads.form.projectLocation")}
+							</span>
+						</Label>
 						<Input
 							id="projectLocation"
 							value={formData.projectLocation}
 							onChange={(e) => update("projectLocation", e.target.value)}
 							placeholder={t("pricing.leads.form.projectLocationPlaceholder")}
-							className="mt-1.5 rounded-xl"
+							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 						/>
 					</div>
 
 					<div className="grid gap-4 sm:grid-cols-2">
 						<div>
-							<Label htmlFor="estimatedArea">{t("pricing.leads.form.estimatedArea")}</Label>
-							<Input
-								id="estimatedArea"
-								type="number"
-								min="0"
-								step="any"
-								value={formData.estimatedArea}
-								onChange={(e) => update("estimatedArea", e.target.value)}
-								className="mt-1.5 rounded-xl"
-								dir="ltr"
-							/>
+							<Label htmlFor="estimatedArea" className="text-slate-700 dark:text-slate-300">
+								{t("pricing.leads.form.estimatedArea")}
+							</Label>
+							<div className="relative mt-1.5">
+								<Input
+									id="estimatedArea"
+									type="number"
+									min="0"
+									step="any"
+									value={formData.estimatedArea}
+									onChange={(e) => update("estimatedArea", e.target.value)}
+									className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 pe-12"
+									dir="ltr"
+								/>
+								<span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">م²</span>
+							</div>
 						</div>
 						<div>
-							<Label htmlFor="estimatedValue">{t("pricing.leads.form.estimatedValue")}</Label>
-							<Input
-								id="estimatedValue"
-								type="number"
-								min="0"
-								step="any"
-								value={formData.estimatedValue}
-								onChange={(e) => update("estimatedValue", e.target.value)}
-								className="mt-1.5 rounded-xl"
-								dir="ltr"
-							/>
+							<Label htmlFor="estimatedValue" className="text-slate-700 dark:text-slate-300">
+								<span className="inline-flex items-center gap-1.5">
+									<Banknote className="h-3.5 w-3.5 text-slate-400" />
+									{t("pricing.leads.form.estimatedValue")}
+								</span>
+							</Label>
+							<div className="relative mt-1.5">
+								<Input
+									id="estimatedValue"
+									type="number"
+									min="0"
+									step="any"
+									value={formData.estimatedValue}
+									onChange={(e) => update("estimatedValue", e.target.value)}
+									className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 pe-12"
+									dir="ltr"
+								/>
+								<span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">ر.س</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{/* Section 3: Management Settings */}
+			<div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
+				<div className="h-1 w-full bg-teal-500" />
+				<div className="p-6 space-y-5">
+					<div className="flex items-center gap-3">
+						<div className="p-2.5 rounded-xl bg-teal-50 dark:bg-teal-950/30">
+							<Settings2 className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+						</div>
+						<div>
+							<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+								{t("pricing.leads.form.managementInfo")}
+							</h3>
+							<p className="text-xs text-slate-500 dark:text-slate-400">
+								{t("pricing.leads.form.managementInfoDescription")}
+							</p>
 						</div>
 					</div>
 
 					<div className="grid gap-4 sm:grid-cols-3">
 						<div>
-							<Label>{t("pricing.leads.form.source")}</Label>
+							<Label className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.source")}</Label>
 							<Select value={formData.source} onValueChange={(v) => update("source", v)}>
-								<SelectTrigger className="mt-1.5 rounded-xl">
+								<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
@@ -271,9 +358,9 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 							</Select>
 						</div>
 						<div>
-							<Label>{t("pricing.leads.form.priority")}</Label>
+							<Label className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.priority")}</Label>
 							<Select value={formData.priority} onValueChange={(v) => update("priority", v)}>
-								<SelectTrigger className="mt-1.5 rounded-xl">
+								<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
@@ -286,12 +373,17 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 							</Select>
 						</div>
 						<div>
-							<Label>{t("pricing.leads.form.assignedTo")}</Label>
+							<Label className="text-slate-700 dark:text-slate-300">
+								<span className="inline-flex items-center gap-1.5">
+									<UserPlus className="h-3.5 w-3.5 text-slate-400" />
+									{t("pricing.leads.form.assignedTo")}
+								</span>
+							</Label>
 							<Select
 								value={formData.assignedToId || "none"}
 								onValueChange={(v) => update("assignedToId", v === "none" ? "" : v)}
 							>
-								<SelectTrigger className="mt-1.5 rounded-xl">
+								<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
 									<SelectValue placeholder={t("pricing.leads.form.selectAssignee")} />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
@@ -307,32 +399,32 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 					</div>
 
 					<div>
-						<Label htmlFor="notes">{t("pricing.leads.form.notes")}</Label>
+						<Label htmlFor="notes" className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.notes")}</Label>
 						<Textarea
 							id="notes"
 							value={formData.notes}
 							onChange={(e) => update("notes", e.target.value)}
 							placeholder={t("pricing.leads.form.notesPlaceholder")}
-							className="mt-1.5 rounded-xl"
+							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 min-h-[80px]"
 							rows={3}
 						/>
 					</div>
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 
 			{/* Actions */}
-			<div className="flex items-center justify-end gap-3">
+			<div className="flex items-center justify-end gap-3 pt-2">
 				<Button
 					type="button"
 					variant="outline"
-					className="rounded-xl"
+					className="rounded-xl border-slate-200 dark:border-slate-700"
 					onClick={() => router.back()}
 				>
 					{t("pricing.leads.form.cancel")}
 				</Button>
 				<Button
 					type="submit"
-					className="rounded-xl"
+					className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
 					disabled={createMutation.isPending}
 				>
 					{createMutation.isPending && (

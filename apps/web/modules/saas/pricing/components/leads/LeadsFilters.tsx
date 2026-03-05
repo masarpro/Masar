@@ -44,19 +44,19 @@ export function LeadsFilters({
 	const hasActiveFilters = search || status || source || priority;
 
 	return (
-		<div className="flex flex-wrap items-center gap-2">
+		<div className="flex flex-wrap items-center gap-3">
 			<div className="relative flex-1 min-w-[200px] max-w-md">
-				<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+				<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 				<Input
 					placeholder={t("pricing.leads.searchPlaceholder")}
 					value={search}
 					onChange={(e) => onSearchChange(e.target.value)}
-					className="pr-10 bg-muted/50 border-border rounded-xl"
+					className="pr-10 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-700"
 				/>
 			</div>
 
 			<Select value={status || "all"} onValueChange={(v) => onStatusChange(v === "all" ? "" : v)}>
-				<SelectTrigger className="w-[140px] bg-muted/50 border-border rounded-xl">
+				<SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
 					<SelectValue placeholder={t("pricing.leads.allStatuses")} />
 				</SelectTrigger>
 				<SelectContent className="rounded-xl">
@@ -70,7 +70,7 @@ export function LeadsFilters({
 			</Select>
 
 			<Select value={source || "all"} onValueChange={(v) => onSourceChange(v === "all" ? "" : v)}>
-				<SelectTrigger className="w-[140px] bg-muted/50 border-border rounded-xl">
+				<SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
 					<SelectValue placeholder={t("pricing.leads.allSources")} />
 				</SelectTrigger>
 				<SelectContent className="rounded-xl">
@@ -84,7 +84,7 @@ export function LeadsFilters({
 			</Select>
 
 			<Select value={priority || "all"} onValueChange={(v) => onPriorityChange(v === "all" ? "" : v)}>
-				<SelectTrigger className="w-[130px] bg-muted/50 border-border rounded-xl">
+				<SelectTrigger className="w-[130px] bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
 					<SelectValue placeholder={t("pricing.leads.allPriorities")} />
 				</SelectTrigger>
 				<SelectContent className="rounded-xl">
@@ -102,7 +102,7 @@ export function LeadsFilters({
 					variant="ghost"
 					size="sm"
 					onClick={onReset}
-					className="gap-1.5 rounded-xl text-muted-foreground"
+					className="gap-1.5 rounded-xl text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
 				>
 					<RotateCcw className="h-3.5 w-3.5" />
 					{t("pricing.leads.resetFilters")}

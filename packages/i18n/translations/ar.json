@@ -1453,7 +1453,10 @@
 			},
 			"form": {
 				"clientInfo": "بيانات العميل",
+				"clientInfoDescription": "المعلومات الأساسية للعميل المحتمل",
 				"projectInfo": "تفاصيل المشروع",
+				"projectInfoDescription": "تفاصيل المشروع المتوقع والقيمة التقديرية",
+				"managementInfoDescription": "إعدادات المتابعة والأولوية والتعيين",
 				"name": "الاسم الكامل",
 				"namePlaceholder": "أدخل اسم العميل",
 				"phone": "رقم الهاتف",

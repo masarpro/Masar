@@ -3,14 +3,14 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
-import { Plus } from "lucide-react";
+import { Plus, UserSearch } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useDebounceValue } from "usehooks-ts";
 import { LeadStatsCards } from "./LeadStatsCards";
 import { LeadsFilters } from "./LeadsFilters";
-import { LeadsTable } from "./LeadsTable";
+import { LeadCard } from "./LeadCard";
 
 interface LeadsListPageProps {
 	organizationId: string;
@@ -29,7 +29,7 @@ export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPag
 
 	const [debouncedSearch] = useDebounceValue(search, 300);
 
-	const { data, isLoading } = useQuery(
+	const { data, isLoading, refetch } = useQuery(
 		orpc.pricing.leads.list.queryOptions({
 			input: {
 				organizationId,
@@ -56,41 +56,33 @@ export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPag
 		setPage(1);
 	};
 
+	const leads = data?.items ?? [];
+
 	return (
 		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-xl font-bold text-foreground">
-						{t("pricing.leads.title")}
-					</h1>
-					<p className="text-sm text-muted-foreground">
-						{t("pricing.leads.subtitle")}
-					</p>
-				</div>
-				<Button asChild className="rounded-xl gap-1.5">
+			{/* Stats */}
+			<LeadStatsCards organizationId={organizationId} />
+
+			{/* Search and Filter Bar */}
+			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+				<LeadsFilters
+					search={search}
+					status={status}
+					source={source}
+					priority={priority}
+					onSearchChange={handleFilterChange(setSearch)}
+					onStatusChange={handleFilterChange(setStatus)}
+					onSourceChange={handleFilterChange(setSource)}
+					onPriorityChange={handleFilterChange(setPriority)}
+					onReset={handleReset}
+				/>
+				<Button asChild className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors shrink-0">
 					<Link href={`${basePath}/new`}>
-						<Plus className="h-4 w-4" />
+						<Plus className="me-2 h-4 w-4" />
 						{t("pricing.leads.create")}
 					</Link>
 				</Button>
 			</div>
-
-			{/* Stats */}
-			<LeadStatsCards organizationId={organizationId} />
-
-			{/* Filters */}
-			<LeadsFilters
-				search={search}
-				status={status}
-				source={source}
-				priority={priority}
-				onSearchChange={handleFilterChange(setSearch)}
-				onStatusChange={handleFilterChange(setStatus)}
-				onSourceChange={handleFilterChange(setSource)}
-				onPriorityChange={handleFilterChange(setPriority)}
-				onReset={handleReset}
-			/>
 
 			{/* Loading */}
 			{isLoading ? (
@@ -100,28 +92,39 @@ export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPag
 						<div className="absolute left-0 top-0 h-16 w-16 animate-spin rounded-full border-4 border-primary border-t-transparent" />
 					</div>
 				</div>
-			) : (
+			) : leads.length > 0 ? (
 				<>
-					{/* Table */}
-					<LeadsTable
-						leads={data?.items ?? []}
-						organizationId={organizationId}
-						organizationSlug={organizationSlug}
-					/>
+					{/* Card Grid */}
+					<div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+						{leads.map((lead, index) => (
+							<div
+								key={lead.id}
+								className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+								style={{ animationDelay: `${index * 50}ms` }}
+							>
+								<LeadCard
+									lead={lead}
+									basePath={basePath}
+									organizationId={organizationId}
+									onDelete={refetch}
+								/>
+							</div>
+						))}
+					</div>
 
 					{/* Pagination */}
 					{data && data.totalPages > 1 && (
-						<div className="flex items-center justify-center gap-4">
+						<div className="flex items-center justify-center gap-4 pt-2">
 							<Button
 								variant="outline"
 								size="sm"
-								className="rounded-xl"
+								className="rounded-xl border-slate-200 dark:border-slate-800"
 								disabled={page <= 1}
 								onClick={() => setPage((p) => p - 1)}
 							>
 								{t("pricing.leads.pagination.previous")}
 							</Button>
-							<span className="text-sm text-muted-foreground">
+							<span className="text-sm text-slate-500 dark:text-slate-400">
 								{t("pricing.leads.pagination.pageOf", {
 									page: data.page,
 									total: data.totalPages,
@@ -130,7 +133,7 @@ export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPag
 							<Button
 								variant="outline"
 								size="sm"
-								className="rounded-xl"
+								className="rounded-xl border-slate-200 dark:border-slate-800"
 								disabled={page >= data.totalPages}
 								onClick={() => setPage((p) => p + 1)}
 							>
@@ -139,6 +142,25 @@ export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPag
 						</div>
 					)}
 				</>
+			) : (
+				/* Empty State */
+				<div className="flex flex-col items-center justify-center py-16 text-center">
+					<div className="p-5 rounded-2xl bg-slate-100 dark:bg-slate-800/50 mb-5">
+						<UserSearch className="h-12 w-12 text-slate-400 dark:text-slate-500" />
+					</div>
+					<h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">
+						{t("pricing.leads.empty")}
+					</h3>
+					<p className="text-slate-500 dark:text-slate-400 mt-2 max-w-sm text-sm">
+						{t("pricing.leads.emptyDescription")}
+					</p>
+					<Button asChild className="mt-5 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200">
+						<Link href={`${basePath}/new`}>
+							<Plus className="me-2 h-4 w-4" />
+							{t("pricing.leads.create")}
+						</Link>
+					</Button>
+				</div>
 			)}
 		</div>
 	);

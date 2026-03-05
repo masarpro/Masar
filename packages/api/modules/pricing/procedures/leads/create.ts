@@ -1,5 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@repo/database";
+import type { ClientType, LeadPriority, LeadSource, LeadStatus, ProjectType } from "@repo/database/prisma/generated/client";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../../lib/permissions";
 import { subscriptionProcedure } from "../../../../orpc/procedures";
@@ -63,29 +64,29 @@ export const create = subscriptionProcedure
 				organizationId: input.organizationId,
 				createdById: context.user.id,
 				name: input.name,
-				phone: input.phone,
-				email: input.email || null,
-				company: input.company,
-				clientType: input.clientType as any,
-				projectType: input.projectType as any,
-				projectLocation: input.projectLocation,
-				estimatedArea: input.estimatedArea,
-				estimatedValue: input.estimatedValue,
-				status: input.status as any,
-				source: input.source as any,
-				priority: input.priority as any,
-				assignedToId: input.assignedToId,
+				phone: input.phone || undefined,
+				email: input.email || undefined,
+				company: input.company || undefined,
+				clientType: (input.clientType ?? "INDIVIDUAL") as ClientType,
+				projectType: input.projectType ? (input.projectType as ProjectType) : undefined,
+				projectLocation: input.projectLocation || undefined,
+				estimatedArea: input.estimatedArea ?? undefined,
+				estimatedValue: input.estimatedValue ?? undefined,
+				status: (input.status ?? "NEW") as LeadStatus,
+				source: (input.source ?? "DIRECT") as LeadSource,
+				priority: (input.priority ?? "NORMAL") as LeadPriority,
+				assignedToId: input.assignedToId || undefined,
 				expectedCloseDate: input.expectedCloseDate
 					? new Date(input.expectedCloseDate)
 					: undefined,
-				notes: input.notes,
+				notes: input.notes || undefined,
 				activities: {
 					create: {
 						organizationId: input.organizationId,
 						createdById: context.user.id,
-						type: "COMMENT",
+						type: "STATUS_CHANGE",
 						content: null,
-						metadata: { system: true, event: "CREATED" },
+						metadata: { system: true, event: "CREATED", newStatus: input.status ?? "NEW" },
 					},
 				},
 			},

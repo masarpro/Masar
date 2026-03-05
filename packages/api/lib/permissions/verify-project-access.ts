@@ -189,6 +189,7 @@ function getPermissionErrorMessage(section: keyof Permissions, action: string): 
 			studies: "ليس لديك صلاحية إدارة دراسات الكميات",
 			quotations: "ليس لديك صلاحية إدارة عروض الأسعار",
 			pricing: "ليس لديك صلاحية إدارة التسعير",
+			leads: "ليس لديك صلاحية إدارة العملاء المحتملين",
 		},
 		finance: {
 			view: "ليس لديك صلاحية عرض البيانات المالية",
