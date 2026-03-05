@@ -10,6 +10,7 @@ import { unlinkCostStudy } from "./unlink-cost-study";
 import { linkQuotation } from "./link-quotation";
 import { unlinkQuotation } from "./unlink-quotation";
 import { getStats } from "./get-stats";
+import { convertToProject } from "./convert-to-project";
 import { getUploadUrl } from "./files/get-upload-url";
 import { saveFile } from "./files/save-file";
 import { deleteFile } from "./files/delete-file";
@@ -27,6 +28,7 @@ export const leadsRouter = {
 	linkQuotation,
 	unlinkQuotation,
 	getStats,
+	convertToProject,
 	files: {
 		getUploadUrl,
 		saveFile,

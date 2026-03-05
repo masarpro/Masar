@@ -1456,6 +1456,7 @@
 				"clientInfoDescription": "المعلومات الأساسية للعميل المحتمل",
 				"projectInfo": "تفاصيل المشروع",
 				"projectInfoDescription": "تفاصيل المشروع المتوقع والقيمة التقديرية",
+				"managementInfo": "إعدادات الإدارة",
 				"managementInfoDescription": "إعدادات المتابعة والأولوية والتعيين",
 				"name": "الاسم الكامل",
 				"namePlaceholder": "أدخل اسم العميل",
@@ -1480,7 +1481,8 @@
 				"notes": "ملاحظات",
 				"notesPlaceholder": "أضف أي ملاحظات...",
 				"submit": "إضافة عميل محتمل",
-				"cancel": "إلغاء"
+				"cancel": "إلغاء",
+				"expectedCloseDate": "التاريخ المتوقع للإغلاق"
 			},
 			"messages": {
 				"createSuccess": "تم إضافة العميل المحتمل بنجاح",
@@ -1489,7 +1491,10 @@
 				"deleteError": "حدث خطأ أثناء الحذف",
 				"deleteConfirm": "هل أنت متأكد من حذف هذا العميل المحتمل؟",
 				"deleteConfirmDescription": "سيتم حذف جميع الملفات والنشاطات المرتبطة. لا يمكن التراجع عن هذا الإجراء.",
-				"cannotDeleteWon": "لا يمكن حذف عميل محتمل تم التعاقد معه"
+				"cannotDeleteWon": "لا يمكن حذف عميل محتمل تم التعاقد معه",
+				"convertSuccess": "تم تحويل العميل المحتمل إلى مشروع بنجاح",
+				"convertError": "حدث خطأ أثناء التحويل",
+				"alreadyConverted": "تم تحويل هذا العميل المحتمل مسبقاً"
 			},
 			"actions": {
 				"view": "عرض التفاصيل",
@@ -1578,7 +1583,15 @@
 				"unlinked": "تم فك الربط بنجاح",
 				"unlinkError": "حدث خطأ أثناء فك الربط",
 				"unlinkConfirm": "هل أنت متأكد من فك الربط؟",
-				"unlinkDescription": "سيتم فك الربط فقط ولن يتم حذف العنصر المرتبط."
+				"unlinkDescription": "سيتم فك الربط فقط ولن يتم حذف العنصر المرتبط.",
+				"linkCostStudy": "ربط دراسة تكاليف",
+				"linkQuotation": "ربط عرض سعر",
+				"link": "ربط",
+				"noStudiesAvailable": "لا توجد دراسات تكاليف متاحة",
+				"noQuotationsAvailable": "لا توجد عروض أسعار متاحة",
+				"convertToProject": "تحويل لمشروع",
+				"convertDescription": "سيتم إنشاء مشروع جديد من بيانات هذا العميل المحتمل وتحديث حالته إلى 'تم التعاقد'.",
+				"projectName": "اسم المشروع"
 			}
 		}
 	},

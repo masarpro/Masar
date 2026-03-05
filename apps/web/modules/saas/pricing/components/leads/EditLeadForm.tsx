@@ -16,6 +16,7 @@ import { Textarea } from "@ui/components/textarea";
 import {
 	Banknote,
 	Building2,
+	CalendarDays,
 	FolderKanban,
 	Loader2,
 	MapPin,
@@ -49,6 +50,7 @@ interface EditLeadFormProps {
 		priority: string;
 		assignedToId?: string | null;
 		notes?: string | null;
+		expectedCloseDate?: string | Date | null;
 	};
 }
 
@@ -75,6 +77,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 		priority: lead.priority,
 		assignedToId: lead.assignedToId || "",
 		notes: lead.notes || "",
+		expectedCloseDate: lead.expectedCloseDate ? new Date(lead.expectedCloseDate).toISOString().split("T")[0] : "",
 	});
 
 	const updateMutation = useMutation(
@@ -118,6 +121,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 			priority: formData.priority as any,
 			assignedToId: formData.assignedToId || null,
 			notes: formData.notes || undefined,
+			expectedCloseDate: formData.expectedCloseDate || null,
 		});
 	};
 
@@ -412,6 +416,23 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 								</SelectContent>
 							</Select>
 						</div>
+					</div>
+
+					<div>
+						<Label htmlFor="expectedCloseDate" className="text-slate-700 dark:text-slate-300">
+							<span className="inline-flex items-center gap-1.5">
+								<CalendarDays className="h-3.5 w-3.5 text-slate-400" />
+								{t("pricing.leads.form.expectedCloseDate")}
+							</span>
+						</Label>
+						<Input
+							id="expectedCloseDate"
+							type="date"
+							value={formData.expectedCloseDate}
+							onChange={(e) => update("expectedCloseDate", e.target.value)}
+							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
+							dir="ltr"
+						/>
 					</div>
 
 					<div>

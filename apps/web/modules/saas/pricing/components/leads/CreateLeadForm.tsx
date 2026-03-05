@@ -16,6 +16,7 @@ import { Textarea } from "@ui/components/textarea";
 import {
 	Banknote,
 	Building2,
+	CalendarDays,
 	FolderKanban,
 	Loader2,
 	MapPin,
@@ -59,6 +60,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 		priority: "NORMAL" as string,
 		assignedToId: "" as string,
 		notes: "",
+		expectedCloseDate: "",
 	});
 
 	const createMutation = useMutation(
@@ -73,8 +75,13 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 				});
 				router.push(`/app/${organizationSlug}/pricing/leads/${data.id}`);
 			},
-			onError: () => {
-				toast.error(t("pricing.leads.messages.createError"));
+			onError: (error: any) => {
+				const msg = error?.message || error?.data?.message;
+				if (msg === "subscription_required" || msg?.includes("الخطة الاحترافية")) {
+					toast.error("هذه الميزة متاحة في الخطة الاحترافية فقط");
+				} else {
+					toast.error(msg || t("pricing.leads.messages.createError"));
+				}
 			},
 		}),
 	);
@@ -102,6 +109,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 			priority: formData.priority as any,
 			assignedToId: formData.assignedToId || undefined,
 			notes: formData.notes || undefined,
+			expectedCloseDate: formData.expectedCloseDate || undefined,
 		});
 	};
 
@@ -396,6 +404,23 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 								</SelectContent>
 							</Select>
 						</div>
+					</div>
+
+					<div>
+						<Label htmlFor="expectedCloseDate" className="text-slate-700 dark:text-slate-300">
+							<span className="inline-flex items-center gap-1.5">
+								<CalendarDays className="h-3.5 w-3.5 text-slate-400" />
+								{t("pricing.leads.form.expectedCloseDate")}
+							</span>
+						</Label>
+						<Input
+							id="expectedCloseDate"
+							type="date"
+							value={formData.expectedCloseDate}
+							onChange={(e) => update("expectedCloseDate", e.target.value)}
+							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
+							dir="ltr"
+						/>
 					</div>
 
 					<div>

@@ -25,6 +25,8 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { formatDate } from "@saas/finance/lib/utils";
+import { LinkCostStudyDialog } from "./LinkCostStudyDialog";
+import { LinkQuotationDialog } from "./LinkQuotationDialog";
 
 interface LeadLinkedTabProps {
 	leadId: string;
@@ -56,6 +58,8 @@ export function LeadLinkedTab({
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 	const [unlinkType, setUnlinkType] = useState<"costStudy" | "quotation" | null>(null);
+	const [showLinkCS, setShowLinkCS] = useState(false);
+	const [showLinkQ, setShowLinkQ] = useState(false);
 	const basePath = `/app/${organizationSlug}/pricing`;
 
 	const invalidate = () => {
@@ -140,6 +144,10 @@ export function LeadLinkedTab({
 						<div className="flex flex-col items-center py-6 text-center">
 							<Calculator className="h-10 w-10 text-muted-foreground/40 mb-2" />
 							<p className="text-sm text-muted-foreground">{t("pricing.leads.detail.noCostStudy")}</p>
+							<Button variant="outline" size="sm" className="mt-3 rounded-xl" onClick={() => setShowLinkCS(true)}>
+								<Link2 className="me-2 h-4 w-4" />
+								{t("pricing.leads.detail.linkCostStudy")}
+							</Button>
 						</div>
 					)}
 				</CardContent>
@@ -189,6 +197,10 @@ export function LeadLinkedTab({
 						<div className="flex flex-col items-center py-6 text-center">
 							<FileSpreadsheet className="h-10 w-10 text-muted-foreground/40 mb-2" />
 							<p className="text-sm text-muted-foreground">{t("pricing.leads.detail.noQuotation")}</p>
+							<Button variant="outline" size="sm" className="mt-3 rounded-xl" onClick={() => setShowLinkQ(true)}>
+								<Link2 className="me-2 h-4 w-4" />
+								{t("pricing.leads.detail.linkQuotation")}
+							</Button>
 						</div>
 					)}
 				</CardContent>
@@ -214,6 +226,20 @@ export function LeadLinkedTab({
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
+
+			{/* Link Dialogs */}
+			<LinkCostStudyDialog
+				open={showLinkCS}
+				onOpenChange={setShowLinkCS}
+				leadId={leadId}
+				organizationId={organizationId}
+			/>
+			<LinkQuotationDialog
+				open={showLinkQ}
+				onOpenChange={setShowLinkQ}
+				leadId={leadId}
+				organizationId={organizationId}
+			/>
 		</div>
 	);
 }

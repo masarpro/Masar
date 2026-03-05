@@ -4,6 +4,7 @@ import { Card, CardContent } from "@ui/components/card";
 import {
 	Building2,
 	Calendar,
+	CalendarDays,
 	Mail,
 	MapPin,
 	Phone,
@@ -30,6 +31,7 @@ interface LeadInfoTabProps {
 		priority: string;
 		notes?: string | null;
 		lostReason?: string | null;
+		expectedCloseDate?: string | Date | null;
 		createdAt: string | Date;
 		updatedAt: string | Date;
 		createdBy: { id: string; name: string };
@@ -140,6 +142,13 @@ export function LeadInfoTab({ lead }: LeadInfoTabProps) {
 							label={t("pricing.leads.detail.updatedAt")}
 							value={formatDate(lead.updatedAt)}
 						/>
+						{lead.expectedCloseDate && (
+							<InfoRow
+								icon={CalendarDays}
+								label={t("pricing.leads.form.expectedCloseDate")}
+								value={formatDate(lead.expectedCloseDate)}
+							/>
+						)}
 					</div>
 
 					{lead.notes && (

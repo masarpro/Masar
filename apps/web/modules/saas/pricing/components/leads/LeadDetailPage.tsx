@@ -23,6 +23,7 @@ import { LeadFilesTab } from "./LeadFilesTab";
 import { LeadHeader } from "./LeadHeader";
 import { LeadInfoTab } from "./LeadInfoTab";
 import { LeadLinkedTab } from "./LeadLinkedTab";
+import { ConvertToProjectDialog } from "./ConvertToProjectDialog";
 import { UpdateLeadStatusDialog } from "./UpdateLeadStatusDialog";
 
 interface LeadDetailPageProps {
@@ -38,6 +39,7 @@ export function LeadDetailPage({ leadId, organizationId, organizationSlug }: Lea
 	const [activeTab, setActiveTab] = useState("info");
 	const [showStatusDialog, setShowStatusDialog] = useState(false);
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+	const [showConvertDialog, setShowConvertDialog] = useState(false);
 
 	const { data: lead, isLoading } = useQuery(
 		orpc.pricing.leads.getById.queryOptions({
@@ -83,6 +85,7 @@ export function LeadDetailPage({ leadId, organizationId, organizationSlug }: Lea
 				organizationSlug={organizationSlug}
 				onChangeStatus={() => setShowStatusDialog(true)}
 				onDelete={() => setShowDeleteDialog(true)}
+				onConvert={() => setShowConvertDialog(true)}
 			/>
 
 			<Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -153,6 +156,16 @@ export function LeadDetailPage({ leadId, organizationId, organizationSlug }: Lea
 				leadId={leadId}
 				organizationId={organizationId}
 				currentStatus={lead.status}
+			/>
+
+			{/* Convert to Project Dialog */}
+			<ConvertToProjectDialog
+				open={showConvertDialog}
+				onOpenChange={setShowConvertDialog}
+				leadId={leadId}
+				leadName={lead.name}
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
 			/>
 
 			{/* Delete Dialog */}

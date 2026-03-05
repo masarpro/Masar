@@ -10,6 +10,7 @@ import {
 } from "@ui/components/dropdown-menu";
 import {
 	Edit,
+	FolderKanban,
 	MoreHorizontal,
 	RefreshCw,
 	Trash2,
@@ -26,13 +27,15 @@ interface LeadHeaderProps {
 		company?: string | null;
 		status: string;
 		priority: string;
+		convertedProjectId?: string | null;
 	};
 	organizationSlug: string;
 	onChangeStatus: () => void;
 	onDelete: () => void;
+	onConvert: () => void;
 }
 
-export function LeadHeader({ lead, organizationSlug, onChangeStatus, onDelete }: LeadHeaderProps) {
+export function LeadHeader({ lead, organizationSlug, onChangeStatus, onDelete, onConvert }: LeadHeaderProps) {
 	const t = useTranslations();
 	const basePath = `/app/${organizationSlug}/pricing/leads`;
 
@@ -59,6 +62,18 @@ export function LeadHeader({ lead, organizationSlug, onChangeStatus, onDelete }:
 					<RefreshCw className="me-2 h-4 w-4" />
 					{t("pricing.leads.detail.changeStatus")}
 				</Button>
+
+				{!lead.convertedProjectId && lead.status !== "LOST" && lead.status !== "WON" && (
+					<Button
+						variant="outline"
+						size="sm"
+						className="rounded-xl border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/30"
+						onClick={onConvert}
+					>
+						<FolderKanban className="me-2 h-4 w-4" />
+						{t("pricing.leads.detail.convertToProject")}
+					</Button>
+				)}
 
 				<Button asChild size="sm" className="rounded-xl">
 					<Link href={`${basePath}/${lead.id}/edit`}>

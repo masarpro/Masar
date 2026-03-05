@@ -4,7 +4,6 @@ import type { ClientType, LeadPriority, LeadSource, LeadStatus, ProjectType } fr
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../../lib/permissions";
 import { subscriptionProcedure } from "../../../../orpc/procedures";
-import { verifyOrganizationMembership } from "../../../organizations/lib/membership";
 
 export const create = subscriptionProcedure
 	.route({
@@ -46,13 +45,13 @@ export const create = subscriptionProcedure
 			{ section: "pricing", action: "leads" },
 		);
 
-		// Verify assignedTo user is a member of the organization
+		// Verify assignedTo user belongs to the organization
 		if (input.assignedToId) {
-			const assigneeMembership = await verifyOrganizationMembership(
-				input.organizationId,
-				input.assignedToId,
-			);
-			if (!assigneeMembership) {
+			const assignee = await db.user.findFirst({
+				where: { id: input.assignedToId, organizationId: input.organizationId },
+				select: { id: true },
+			});
+			if (!assignee) {
 				throw new ORPCError("BAD_REQUEST", {
 					message: "المستخدم المعيّن ليس عضواً في هذه المنظمة",
 				});

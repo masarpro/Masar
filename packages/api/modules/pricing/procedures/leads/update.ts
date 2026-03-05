@@ -3,7 +3,6 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../../lib/permissions";
 import { subscriptionProcedure } from "../../../../orpc/procedures";
-import { verifyOrganizationMembership } from "../../../organizations/lib/membership";
 
 export const update = subscriptionProcedure
 	.route({
@@ -55,13 +54,13 @@ export const update = subscriptionProcedure
 			});
 		}
 
-		// Verify new assignee if changed
+		// Verify new assignee belongs to the organization
 		if (input.assignedToId !== undefined && input.assignedToId !== null) {
-			const assigneeMembership = await verifyOrganizationMembership(
-				input.organizationId,
-				input.assignedToId,
-			);
-			if (!assigneeMembership) {
+			const assignee = await db.user.findFirst({
+				where: { id: input.assignedToId, organizationId: input.organizationId },
+				select: { id: true },
+			});
+			if (!assignee) {
 				throw new ORPCError("BAD_REQUEST", {
 					message: "المستخدم المعيّن ليس عضواً في هذه المنظمة",
 				});

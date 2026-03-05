@@ -1499,6 +1499,7 @@
 				"clientInfoDescription": "Basic information about the potential client",
 				"projectInfo": "Project Details",
 				"projectInfoDescription": "Expected project details and estimated value",
+				"managementInfo": "Management Settings",
 				"managementInfoDescription": "Follow-up, priority, and assignment settings",
 				"name": "Full Name",
 				"namePlaceholder": "Enter client name",
@@ -1523,7 +1524,8 @@
 				"notes": "Notes",
 				"notesPlaceholder": "Add any notes...",
 				"submit": "Add Lead",
-				"cancel": "Cancel"
+				"cancel": "Cancel",
+				"expectedCloseDate": "Expected Close Date"
 			},
 			"messages": {
 				"createSuccess": "Lead added successfully",
@@ -1532,7 +1534,10 @@
 				"deleteError": "Error deleting lead",
 				"deleteConfirm": "Are you sure you want to delete this lead?",
 				"deleteConfirmDescription": "All related files and activities will be deleted. This action cannot be undone.",
-				"cannotDeleteWon": "Cannot delete a contracted lead"
+				"cannotDeleteWon": "Cannot delete a contracted lead",
+				"convertSuccess": "Lead successfully converted to a project",
+				"convertError": "Error converting lead",
+				"alreadyConverted": "This lead has already been converted"
 			},
 			"actions": {
 				"view": "View Details",
@@ -1621,7 +1626,15 @@
 				"unlinked": "Unlinked successfully",
 				"unlinkError": "Error unlinking",
 				"unlinkConfirm": "Are you sure you want to unlink?",
-				"unlinkDescription": "This will only unlink the item, not delete it."
+				"unlinkDescription": "This will only unlink the item, not delete it.",
+				"linkCostStudy": "Link Cost Study",
+				"linkQuotation": "Link Quotation",
+				"link": "Link",
+				"noStudiesAvailable": "No cost studies available",
+				"noQuotationsAvailable": "No quotations available",
+				"convertToProject": "Convert to Project",
+				"convertDescription": "A new project will be created from this lead's data and the status will be updated to 'Won'.",
+				"projectName": "Project Name"
 			}
 		}
 	},
