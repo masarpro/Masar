@@ -1,6 +1,7 @@
 "use client";
 
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import { EmptyProjectsState } from "./EmptyProjectsState";
 import { Currency } from "@saas/finance/components/shared/Currency";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { apiClient } from "@shared/lib/api-client";
@@ -388,7 +389,9 @@ export function Dashboard() {
 				<h2 className="mb-4 text-lg font-semibold text-foreground">
 					{t("dashboard.activeProjects")}
 				</h2>
-				{(() => {
+				{projects.length === 0 ? (
+				<EmptyProjectsState organizationSlug={organizationSlug} />
+			) : (() => {
 					const COLS = 4;
 					const useScroll = projects.length > 4;
 					const firstRowProjects = projects.slice(0, COLS);

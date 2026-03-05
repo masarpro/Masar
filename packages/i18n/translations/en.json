@@ -3633,6 +3633,11 @@
 		},
 		"upcomingPayments": {
 			"title": "Upcoming Payments"
+		},
+		"emptyProjects": {
+			"title": "Create Your First Project",
+			"description": "Start managing your projects efficiently — add your first project now",
+			"cta": "New Project"
 		}
 	},
 	"finance": {
