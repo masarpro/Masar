@@ -81,7 +81,14 @@ export function LeadDetailPage({ leadId, organizationId, organizationSlug }: Lea
 	return (
 		<div className="space-y-6">
 			<LeadHeader
-				lead={lead}
+				lead={{
+					...lead,
+					phone: lead.phone ?? undefined,
+					email: lead.email ?? undefined,
+					estimatedValue: lead.estimatedValue ?? undefined,
+					projectLocation: lead.projectLocation ?? undefined,
+					assignedTo: lead.assignedTo ?? undefined,
+				}}
 				organizationSlug={organizationSlug}
 				onChangeStatus={() => setShowStatusDialog(true)}
 				onDelete={() => setShowDeleteDialog(true)}

@@ -2,6 +2,7 @@
 
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
@@ -22,6 +23,7 @@ import {
 	MapPin,
 	Phone,
 	Mail,
+	Paperclip,
 	Settings2,
 	User,
 	UserPlus,
@@ -30,6 +32,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { type PendingFile, PendingFilesUpload } from "./PendingFilesUpload";
 
 interface CreateLeadFormProps {
 	organizationId: string;
@@ -63,10 +66,67 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 		expectedCloseDate: "",
 	});
 
+	const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
+	const [isUploadingFiles, setIsUploadingFiles] = useState(false);
+
+	const getUploadUrlMutation = useMutation(
+		orpc.pricing.leads.files.getUploadUrl.mutationOptions({}),
+	);
+
+	const saveFileMutation = useMutation(
+		orpc.pricing.leads.files.saveFile.mutationOptions({}),
+	);
+
 	const createMutation = useMutation(
 		orpc.pricing.leads.create.mutationOptions({
-			onSuccess: (data) => {
-				toast.success(t("pricing.leads.messages.createSuccess"));
+			onSuccess: async (data) => {
+				// Upload pending files after lead creation
+				if (pendingFiles.length > 0) {
+					setIsUploadingFiles(true);
+					let uploadedCount = 0;
+					for (const pf of pendingFiles) {
+						try {
+							const uploadData = await getUploadUrlMutation.mutateAsync({
+								organizationId,
+								leadId: data.id,
+								fileName: pf.name,
+								mimeType: pf.mimeType,
+								fileSize: pf.size,
+							});
+
+							await fetch(uploadData.uploadUrl, {
+								method: "PUT",
+								body: pf.file,
+								headers: { "Content-Type": pf.mimeType },
+							});
+
+							await saveFileMutation.mutateAsync({
+								organizationId,
+								leadId: data.id,
+								name: pf.name,
+								storagePath: uploadData.storagePath,
+								fileSize: pf.size,
+								mimeType: pf.mimeType,
+								category: pf.category as any,
+							});
+							uploadedCount++;
+						} catch (e) {
+							console.error("Failed to upload file:", pf.name, e);
+						}
+					}
+					setIsUploadingFiles(false);
+
+					if (uploadedCount > 0) {
+						toast.success(
+							t("pricing.leads.messages.createSuccess") + ` (${uploadedCount} ${t("pricing.leads.detail.files")})`,
+						);
+					} else {
+						toast.success(t("pricing.leads.messages.createSuccess"));
+					}
+				} else {
+					toast.success(t("pricing.leads.messages.createSuccess"));
+				}
+
 				queryClient.invalidateQueries({
 					queryKey: orpc.pricing.leads.list.queryOptions({ input: { organizationId } }).queryKey,
 				});
@@ -116,6 +176,8 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 	const update = (field: string, value: string) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 	};
+
+	const isSubmitting = createMutation.isPending || isUploadingFiles;
 
 	return (
 		<form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
@@ -437,6 +499,36 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 				</div>
 			</div>
 
+			{/* Section 4: Project Files (Optional) */}
+			<div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
+				<div className="h-1 w-full bg-amber-500" />
+				<div className="p-6 space-y-4">
+					<div className="flex items-center gap-3">
+						<div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30">
+							<Paperclip className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+						</div>
+						<div className="flex items-center gap-2">
+							<div>
+								<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+									{t("pricing.leads.form.projectFiles")}
+								</h3>
+								<p className="text-xs text-slate-500 dark:text-slate-400">
+									{t("pricing.leads.form.projectFilesDescription")}
+								</p>
+							</div>
+							<Badge variant="secondary" className="text-[10px] h-5 shrink-0">
+								{t("pricing.leads.form.optional")}
+							</Badge>
+						</div>
+					</div>
+
+					<PendingFilesUpload
+						files={pendingFiles}
+						onFilesChange={setPendingFiles}
+					/>
+				</div>
+			</div>
+
 			{/* Actions */}
 			<div className="flex items-center justify-end gap-3 pt-2">
 				<Button
@@ -450,12 +542,14 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 				<Button
 					type="submit"
 					className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
-					disabled={createMutation.isPending}
+					disabled={isSubmitting}
 				>
-					{createMutation.isPending && (
+					{isSubmitting && (
 						<Loader2 className="me-2 h-4 w-4 animate-spin" />
 					)}
-					{t("pricing.leads.form.submit")}
+					{isUploadingFiles
+						? t("pricing.leads.form.uploadingFiles")
+						: t("pricing.leads.form.submit")}
 				</Button>
 			</div>
 		</form>

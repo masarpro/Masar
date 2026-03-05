@@ -484,6 +484,25 @@
 			}
 		}
 	},
+	"aiFeature": {
+		"label": "AI-Powered 🤖",
+		"title": "Ask Masar... It Answers",
+		"description": "A smart assistant that understands your projects and helps you make faster decisions",
+		"bullets": {
+			"1": "Ask about any project status in Arabic",
+			"2": "Get instant financial reports",
+			"3": "Analyze your team and contractor performance",
+			"4": "Smart alerts for problems before they happen"
+		},
+		"chatHeader": "Masar AI Assistant",
+		"chatStatus": "Online now",
+		"chat": {
+			"1": "What are the expenses on the Riyadh Villas project this month?",
+			"2": "Riyadh Villas project expenses for March:\nMaterials: 45,000 SAR\nLabor: 32,000 SAR\nEquipment: 18,000 SAR\n\nTotal: 95,000 SAR — 12% under planned budget ✅",
+			"3": "Which projects are behind schedule?"
+		},
+		"cta": "Try the AI Assistant for free"
+	},
 	"features": {
 		"title": "Everything you need in one place",
 		"description": "Tools designed for Saudi contractor workflows",
@@ -1525,7 +1544,11 @@
 				"notesPlaceholder": "Add any notes...",
 				"submit": "Add Lead",
 				"cancel": "Cancel",
-				"expectedCloseDate": "Expected Close Date"
+				"expectedCloseDate": "Expected Close Date",
+				"projectFiles": "Project Files",
+				"projectFilesDescription": "Attach blueprints, photos, and project-related files (more can be added later)",
+				"optional": "Optional",
+				"uploadingFiles": "Uploading files..."
 			},
 			"messages": {
 				"createSuccess": "Lead added successfully",
@@ -1550,6 +1573,7 @@
 				"pageOf": "Page {page} of {total}"
 			},
 			"unassigned": "Unassigned",
+			"noValue": "No value",
 			"area": "m²",
 			"detail": {
 				"tabs": {
@@ -1627,6 +1651,10 @@
 				"unlinkError": "Error unlinking",
 				"unlinkConfirm": "Are you sure you want to unlink?",
 				"unlinkDescription": "This will only unlink the item, not delete it.",
+				"opportunityPath": "Opportunity Path",
+				"copyPhone": "Copy Phone",
+				"copyEmail": "Copy Email",
+				"copied": "Copied",
 				"linkCostStudy": "Link Cost Study",
 				"linkQuotation": "Link Quotation",
 				"link": "Link",

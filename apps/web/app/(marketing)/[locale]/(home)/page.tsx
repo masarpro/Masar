@@ -1,3 +1,4 @@
+import { AiFeatureSection } from "@marketing/home/components/AiFeatureSection";
 import { FaqSection } from "@marketing/home/components/FaqSection";
 import { Features } from "@marketing/home/components/Features";
 import { FinalCTA } from "@marketing/home/components/FinalCTA";
@@ -25,6 +26,7 @@ export default async function Home({
 			<Hero />
 			<PainPoints />
 			<Features />
+			<AiFeatureSection />
 			<StatsSection />
 			<HowItWorks />
 			<PricingSection />

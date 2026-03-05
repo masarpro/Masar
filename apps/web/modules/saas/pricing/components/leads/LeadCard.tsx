@@ -20,9 +20,9 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@ui/components/alert-dialog";
+import { cn } from "@ui/lib";
 import {
 	Building2,
-	Calendar,
 	Eye,
 	MapPin,
 	MoreVertical,
@@ -70,6 +70,17 @@ const STATUS_ACCENT: Record<string, string> = {
 	LOST: "bg-red-400",
 };
 
+function getStatusProgress(status: string): string {
+	const map: Record<string, string> = {
+		NEW: "16%",
+		STUDYING: "33%",
+		QUOTED: "50%",
+		NEGOTIATING: "75%",
+		WON: "100%",
+	};
+	return map[status] ?? "0%";
+}
+
 export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardProps) {
 	const t = useTranslations();
 	const queryClient = useQueryClient();
@@ -111,47 +122,45 @@ export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardP
 
 	return (
 		<>
-			<div className="group relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-sm">
+			<div className="group relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg">
 				{/* Top accent line */}
 				<div className={`h-1 w-full ${accent}`} />
 
 				{/* Card Header */}
 				<div className="p-4 pb-3">
 					<div className="flex items-start justify-between gap-3">
-						<div className="flex-1 min-w-0">
-							<Link
-								href={`${basePath}/${lead.id}`}
-								className="group/link inline-block"
-							>
-								<h3 className="font-medium text-slate-900 dark:text-slate-100 line-clamp-1 group-hover/link:text-slate-600 dark:group-hover/link:text-slate-300 transition-colors">
-									{lead.name}
-								</h3>
-							</Link>
-							{lead.company && (
-								<div className="flex items-center gap-1.5 mt-0.5">
-									<Building2 className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
-									<p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">
-										{lead.company}
-									</p>
-								</div>
-							)}
-							{lead.phone && (
-								<div className="flex items-center gap-1.5 mt-0.5">
-									<Phone className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
-									<p className="text-xs text-slate-500 dark:text-slate-400" dir="ltr">
-										{lead.phone}
-									</p>
-								</div>
-							)}
+						<div className="flex items-center gap-2 flex-1 min-w-0">
+							{/* Avatar */}
+							<div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-semibold shrink-0">
+								{lead.name.charAt(0).toUpperCase()}
+							</div>
+							<div className="min-w-0">
+								<Link
+									href={`${basePath}/${lead.id}`}
+									className="group/link inline-block"
+								>
+									<h3 className="font-medium text-slate-900 dark:text-slate-100 line-clamp-1 group-hover/link:text-slate-600 dark:group-hover/link:text-slate-300 transition-colors">
+										{lead.name}
+									</h3>
+								</Link>
+								{lead.company && (
+									<div className="flex items-center gap-1 mt-0.5">
+										<Building2 className="h-3 w-3 text-slate-400 dark:text-slate-500 shrink-0" />
+										<p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
+											{lead.company}
+										</p>
+									</div>
+								)}
+							</div>
 						</div>
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<Button
 									variant="ghost"
 									size="icon"
-									className="h-8 w-8 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+									className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
 								>
-									<MoreVertical className="h-4 w-4 text-slate-500" />
+									<MoreVertical className="h-3.5 w-3.5 text-slate-500" />
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end" className="rounded-xl w-40">
@@ -188,44 +197,73 @@ export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardP
 
 				{/* Card Details */}
 				<div className="px-4 pb-3">
-					<div className="flex flex-wrap items-center gap-3 text-sm text-slate-600 dark:text-slate-400">
-						{lead.projectType && (
-							<span className="inline-flex items-center rounded-md bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-300">
-								{t(`pricing.leads.projectType.${lead.projectType}`)}
-							</span>
+					<div className="space-y-1.5">
+						{lead.phone && (
+							<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+								<Phone className="h-3 w-3 shrink-0" />
+								<span dir="ltr">{lead.phone}</span>
+							</div>
 						)}
 						{lead.projectLocation && (
-							<div className="flex items-center gap-1">
-								<MapPin className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
-								<span className="text-xs truncate max-w-[120px]">{lead.projectLocation}</span>
+							<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+								<MapPin className="h-3 w-3 shrink-0" />
+								<span className="truncate">{lead.projectLocation}</span>
+							</div>
+						)}
+						{lead.projectType && (
+							<div className="flex items-center gap-1.5 text-xs">
+								<Building2 className="h-3 w-3 shrink-0 text-slate-400 dark:text-slate-500" />
+								<span className="inline-flex items-center rounded-md bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-[10px] font-medium text-slate-600 dark:text-slate-300">
+									{t(`pricing.leads.projectType.${lead.projectType}`)}
+								</span>
 							</div>
 						)}
 					</div>
 				</div>
 
 				{/* Card Footer */}
-				<div className="px-4 pb-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+				<div className="px-4 pb-3 pt-3 border-t border-dashed border-slate-100 dark:border-slate-800">
 					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-							{lead.assignedTo ? (
-								<div className="flex items-center gap-1">
-									<User className="h-3.5 w-3.5" />
-									<span className="truncate max-w-[80px]">{lead.assignedTo.name}</span>
-								</div>
-							) : null}
-							{lead.assignedTo && <span>·</span>}
-							<div className="flex items-center gap-1">
-								<Calendar className="h-3.5 w-3.5" />
-								<span>{createdDate}</span>
-							</div>
+						{/* Estimated Value */}
+						<div>
+							{estimatedValue ? (
+								<p className="text-sm font-semibold text-primary">
+									{estimatedValue} <span className="text-xs font-normal text-muted-foreground">ر.س</span>
+								</p>
+							) : (
+								<p className="text-xs text-muted-foreground">{t("pricing.leads.noValue")}</p>
+							)}
 						</div>
-						{estimatedValue && (
-							<span className="text-base font-semibold text-slate-900 dark:text-slate-100">
-								{estimatedValue} <span className="text-xs font-normal text-slate-500">ر.س</span>
-							</span>
-						)}
+
+						{/* Assignee + Date */}
+						<div className="flex items-center gap-2">
+							{lead.assignedTo && (
+								<div
+									className="h-5 w-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-medium"
+									title={lead.assignedTo.name}
+								>
+									{lead.assignedTo.name?.charAt(0)}
+								</div>
+							)}
+							<span className="text-[10px] text-muted-foreground">{createdDate}</span>
+						</div>
 					</div>
 				</div>
+
+				{/* Status Progress Bar */}
+				{lead.status !== "LOST" && (
+					<div className="px-4 pb-3">
+						<div className="h-0.5 bg-muted rounded-full overflow-hidden">
+							<div
+								className={cn(
+									"h-full rounded-full transition-all",
+									lead.status === "WON" ? "bg-green-500" : "bg-primary",
+								)}
+								style={{ width: getStatusProgress(lead.status) }}
+							/>
+						</div>
+					</div>
+				)}
 			</div>
 
 			<AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

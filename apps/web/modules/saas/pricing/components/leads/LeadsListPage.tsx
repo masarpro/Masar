@@ -3,18 +3,33 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
-import { Plus, UserSearch } from "lucide-react";
+import { cn } from "@ui/lib";
+import {
+	Banknote,
+	ChevronLeft,
+	Clock,
+	Plus,
+	TrendingUp,
+	Users,
+	UserSearch,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useDebounceValue } from "usehooks-ts";
-import { LeadStatsCards } from "./LeadStatsCards";
 import { LeadsFilters } from "./LeadsFilters";
 import { LeadCard } from "./LeadCard";
 
 interface LeadsListPageProps {
 	organizationId: string;
 	organizationSlug: string;
+}
+
+function formatCurrency(amount: number): string {
+	return new Intl.NumberFormat("en-SA", {
+		style: "decimal",
+		maximumFractionDigits: 0,
+	}).format(amount);
 }
 
 export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPageProps) {
@@ -28,6 +43,12 @@ export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPag
 	const [page, setPage] = useState(1);
 
 	const [debouncedSearch] = useDebounceValue(search, 300);
+
+	const { data: stats } = useQuery(
+		orpc.pricing.leads.getStats.queryOptions({
+			input: { organizationId },
+		}),
+	);
 
 	const { data, isLoading, refetch } = useQuery(
 		orpc.pricing.leads.list.queryOptions({
@@ -57,32 +78,105 @@ export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPag
 	};
 
 	const leads = data?.items ?? [];
+	const openCount = stats
+		? (stats.byStatus.NEW ?? 0) +
+			(stats.byStatus.STUDYING ?? 0) +
+			(stats.byStatus.QUOTED ?? 0) +
+			(stats.byStatus.NEGOTIATING ?? 0)
+		: 0;
 
 	return (
 		<div className="space-y-6">
-			{/* Stats */}
-			<LeadStatsCards organizationId={organizationId} />
+			{/* Hero Header */}
+			<div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-slate-900 via-slate-800 to-slate-900 p-6">
+				{/* Decorative Background */}
+				<div className="absolute inset-0 opacity-10">
+					<div className="absolute top-0 right-0 w-64 h-64 bg-blue-500 rounded-full blur-3xl" />
+					<div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500 rounded-full blur-3xl" />
+				</div>
 
-			{/* Search and Filter Bar */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-				<LeadsFilters
-					search={search}
-					status={status}
-					source={source}
-					priority={priority}
-					onSearchChange={handleFilterChange(setSearch)}
-					onStatusChange={handleFilterChange(setStatus)}
-					onSourceChange={handleFilterChange(setSource)}
-					onPriorityChange={handleFilterChange(setPriority)}
-					onReset={handleReset}
-				/>
-				<Button asChild className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors shrink-0">
-					<Link href={`${basePath}/new`}>
-						<Plus className="me-2 h-4 w-4" />
-						{t("pricing.leads.create")}
-					</Link>
-				</Button>
+				<div className="relative flex items-center justify-between">
+					<div>
+						{/* Breadcrumb */}
+						<div className="flex items-center gap-2 text-slate-400 text-sm mb-2">
+							<span>{t("pricing.title")}</span>
+							<ChevronLeft className="h-3 w-3" />
+							<span className="text-white">{t("pricing.leads.title")}</span>
+						</div>
+						<h1 className="text-2xl font-bold text-white">
+							{t("pricing.leads.title")}
+						</h1>
+						<p className="text-slate-400 text-sm mt-1">
+							{t("pricing.leads.subtitle")}
+						</p>
+					</div>
+					<Button asChild size="lg" className="gap-2">
+						<Link href={`${basePath}/new`}>
+							<Plus className="h-4 w-4" />
+							{t("pricing.leads.create")}
+						</Link>
+					</Button>
+				</div>
+
+				{/* Stats Row */}
+				{stats && (
+					<div className="relative grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
+						{/* Total */}
+						<div className="bg-white/10 backdrop-blur rounded-xl p-3 border border-white/10">
+							<div className="flex items-center gap-2 text-slate-300 text-xs mb-1">
+								<Users className="h-3 w-3" />
+								{t("pricing.leads.stats.total")}
+							</div>
+							<p className="text-2xl font-bold text-white">{stats.total}</p>
+						</div>
+
+						{/* Open */}
+						<div className="bg-white/10 backdrop-blur rounded-xl p-3 border border-white/10">
+							<div className="flex items-center gap-2 text-slate-300 text-xs mb-1">
+								<Clock className="h-3 w-3" />
+								{t("pricing.leads.stats.open")}
+							</div>
+							<p className="text-2xl font-bold text-white">{openCount}</p>
+						</div>
+
+						{/* Won */}
+						<div className="bg-green-500/20 backdrop-blur rounded-xl p-3 border border-green-500/20">
+							<div className="flex items-center gap-2 text-green-300 text-xs mb-1">
+								<TrendingUp className="h-3 w-3" />
+								{t("pricing.leads.stats.won")}
+							</div>
+							<p className="text-2xl font-bold text-green-400">
+								{stats.byStatus?.WON ?? 0}
+							</p>
+						</div>
+
+						{/* Estimated Value */}
+						<div className="bg-blue-500/20 backdrop-blur rounded-xl p-3 border border-blue-500/20">
+							<div className="flex items-center gap-2 text-blue-300 text-xs mb-1">
+								<Banknote className="h-3 w-3" />
+								{t("pricing.leads.stats.estimatedValue")}
+							</div>
+							<p className="text-lg font-bold text-blue-300">
+								{formatCurrency(stats.openEstimatedValue)} <span className="text-xs font-normal">ر.س</span>
+							</p>
+						</div>
+					</div>
+				)}
 			</div>
+
+			{/* Filters */}
+			<LeadsFilters
+				search={search}
+				status={status}
+				source={source}
+				priority={priority}
+				stats={stats}
+				onSearchChange={handleFilterChange(setSearch)}
+				onStatusChange={handleFilterChange(setStatus)}
+				onSourceChange={handleFilterChange(setSource)}
+				onPriorityChange={handleFilterChange(setPriority)}
+				onReset={handleReset}
+			/>
 
 			{/* Loading */}
 			{isLoading ? (
