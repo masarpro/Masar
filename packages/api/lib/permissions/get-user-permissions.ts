@@ -112,7 +112,7 @@ function fillMissingSections(
 			studies: q.create || q.edit,
 			quotations: f.quotations,
 			pricing: q.pricing,
-			leads: false,
+			leads: q.view || f.view,
 		};
 	}
 
