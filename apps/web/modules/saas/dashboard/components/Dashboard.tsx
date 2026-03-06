@@ -1,6 +1,7 @@
 "use client";
 
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import { HomeDashboardSkeleton } from "@saas/shared/components/skeletons";
 import { EmptyProjectsState } from "./EmptyProjectsState";
 import { Currency } from "@saas/finance/components/shared/Currency";
 import { orpc } from "@shared/lib/orpc-query-utils";
@@ -213,7 +214,7 @@ export function Dashboard() {
 	});
 
 	if (statsLoading) {
-		return null;
+		return <HomeDashboardSkeleton />;
 	}
 
 	const bankBalance = orgFinance?.balances?.totalBankBalance ?? 0;

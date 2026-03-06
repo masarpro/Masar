@@ -67,6 +67,7 @@ import {
 	X,
 } from "lucide-react";
 import Link from "next/link";
+import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface SubcontractDetailViewProps {
 	organizationId: string;
@@ -408,7 +409,11 @@ export function SubcontractDetailView({
 		return result;
 	}, [contract?.payments, paymentSearch, paymentSortBy, paymentSortOrder]);
 
-	if (isLoading || !contract) {
+	if (isLoading) {
+		return <DetailPageSkeleton />;
+	}
+
+	if (!contract) {
 		return null;
 	}
 

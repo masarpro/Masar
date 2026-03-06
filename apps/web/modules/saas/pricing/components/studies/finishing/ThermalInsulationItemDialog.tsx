@@ -20,6 +20,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@ui/components/select";
+import { Copy } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -50,11 +51,18 @@ interface ThermalItemData {
 	totalCost: number;
 }
 
+interface SiblingItem {
+	area?: number | null;
+	length?: number | null;
+	calculationData?: Record<string, unknown> | null;
+}
+
 interface ThermalInsulationItemDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	organizationId: string;
 	studyId: string;
+	siblingItems?: SiblingItem[];
 	editItem?: ThermalItemData;
 }
 
@@ -63,6 +71,7 @@ export function ThermalInsulationItemDialog({
 	onOpenChange,
 	organizationId,
 	studyId,
+	siblingItems,
 	editItem,
 }: ThermalInsulationItemDialogProps) {
 	const t = useTranslations("pricing.studies.finishing.thermal");
@@ -76,6 +85,7 @@ export function ThermalInsulationItemDialog({
 	const [materialKey, setMaterialKey] = useState<ThermalMaterialKey>("xps");
 	const [customMaterialName, setCustomMaterialName] = useState("");
 	const [thickness, setThickness] = useState(50);
+	const [wastagePercent, setWastagePercent] = useState(8);
 	const [areaInput, setAreaInput] = useState<number | "">("");
 	const [lengthInput, setLengthInput] = useState<number | "">("");
 	const [widthInput, setWidthInput] = useState<number | "">("");
@@ -92,6 +102,7 @@ export function ThermalInsulationItemDialog({
 			setMaterialKey((cd?.materialType as ThermalMaterialKey) ?? "xps");
 			setCustomMaterialName((cd?.customMaterialName as string) ?? "");
 			setThickness((cd?.thickness as number) ?? 50);
+			setWastagePercent(editItem.wastagePercent ?? THERMAL_INSULATION_MATERIALS[(cd?.materialType as ThermalMaterialKey) ?? "xps"]?.wastagePercent ?? 8);
 			setDeductions((cd?.deductions as number) ?? 0);
 
 			// Restore area/length/width from breakdown or item
@@ -112,6 +123,7 @@ export function ThermalInsulationItemDialog({
 			setMaterialKey("xps");
 			setCustomMaterialName("");
 			setThickness(50);
+			setWastagePercent(THERMAL_INSULATION_MATERIALS.xps.wastagePercent);
 			setAreaInput("");
 			setLengthInput("");
 			setWidthInput("");
@@ -119,11 +131,18 @@ export function ThermalInsulationItemDialog({
 		}
 	}, [open, editItem]);
 
-	// When material changes, update thickness default
+	// Reset deductions when wall locations are deselected
+	useEffect(() => {
+		const hasWalls = locations.includes("ext_walls") || locations.includes("basement_walls");
+		if (!hasWalls) setDeductions(0);
+	}, [locations]);
+
+	// When material changes, update thickness and wastage defaults
 	useEffect(() => {
 		const mat = THERMAL_INSULATION_MATERIALS[materialKey];
 		if (mat) {
 			setThickness(mat.defaultThickness);
+			setWastagePercent(mat.wastagePercent);
 		}
 	}, [materialKey]);
 
@@ -146,8 +165,9 @@ export function ThermalInsulationItemDialog({
 			deductions: deductionVal,
 			materialKey,
 			thickness,
+			wastagePercent,
 		});
-	}, [grossArea, deductionVal, materialKey, thickness]);
+	}, [grossArea, deductionVal, materialKey, thickness, wastagePercent]);
 
 	const mat = THERMAL_INSULATION_MATERIALS[materialKey];
 
@@ -219,7 +239,7 @@ export function ThermalInsulationItemDialog({
 			width: typeof widthInput === "number" && widthInput > 0 ? widthInput : undefined,
 			quantity: finalQuantity,
 			unit: "m2",
-			wastagePercent: mat?.wastagePercent ?? 10,
+			wastagePercent,
 			calculationMethod: "thermal_insulation_professional",
 			calculationData,
 			materialPrice: 0,
@@ -247,6 +267,22 @@ export function ThermalInsulationItemDialog({
 
 	const isPending = createMutation.isPending || updateMutation.isPending;
 	const hasNetArea = (calculation?.netArea ?? 0) > 0;
+	const showDeductions = locations.includes("ext_walls") || locations.includes("basement_walls");
+
+	// Copy quantities from waterproofing sibling
+	const canCopyFromSibling = !isEdit && siblingItems && siblingItems.length > 0;
+	const handleCopyFromSibling = () => {
+		if (!siblingItems || siblingItems.length === 0) return;
+		const first = siblingItems[0];
+		const cd = first.calculationData as Record<string, unknown> | undefined;
+		const breakdown = cd?.breakdown as Record<string, number> | undefined;
+		const area = breakdown?.netArea ?? (first.area ? Number(first.area) : 0);
+		if (area > 0) {
+			setAreaInput(area);
+			setLengthInput("");
+			setWidthInput("");
+		}
+	};
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -258,6 +294,20 @@ export function ThermalInsulationItemDialog({
 				</DialogHeader>
 
 				<div className="space-y-4">
+					{/* Copy from sibling */}
+					{canCopyFromSibling && (
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							className="w-full"
+							onClick={handleCopyFromSibling}
+						>
+							<Copy className="h-4 w-4 me-2" />
+							{tFinishing("copyFromWaterproofing")}
+						</Button>
+					)}
+
 					{/* Name */}
 					<div className="space-y-1">
 						<Label className="text-sm">{t("name")}</Label>
@@ -396,28 +446,29 @@ export function ThermalInsulationItemDialog({
 						</div>
 					</div>
 
-					{/* Deductions */}
+					{/* Deductions — only for wall locations */}
+					{showDeductions && (
+						<div className="space-y-1">
+							<Label className="text-sm">{t("deductions")} (م²)</Label>
+							<Input
+								type="number"
+								value={deductions}
+								onChange={(e) => {
+									const val = parseFloat(e.target.value);
+									setDeductions(Number.isNaN(val) ? "" : val);
+								}}
+							/>
+							<p className="text-xs text-muted-foreground">{t("deductionsHint")}</p>
+						</div>
+					)}
+
+					{/* Wastage */}
 					<div className="space-y-1">
-						<Label className="text-sm">{t("deductions")} (م²)</Label>
+						<Label className="text-sm">{t("wastage")} %</Label>
 						<Input
 							type="number"
-							value={deductions}
-							onChange={(e) => {
-								const val = parseFloat(e.target.value);
-								setDeductions(Number.isNaN(val) ? "" : val);
-							}}
-						/>
-						<p className="text-xs text-muted-foreground">{t("deductionsHint")}</p>
-					</div>
-
-					{/* Wastage (read-only) */}
-					<div className="space-y-1">
-						<Label className="text-sm">{t("wastage")}</Label>
-						<Input
-							type="text"
-							value={`${mat?.wastagePercent ?? 10}%`}
-							readOnly
-							className="bg-muted"
+							value={wastagePercent}
+							onChange={(e) => setWastagePercent(parseFloat(e.target.value) || 0)}
 						/>
 						<p className="text-xs text-muted-foreground">{t("autoByMaterial")}</p>
 					</div>

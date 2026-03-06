@@ -44,6 +44,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
 
 interface OwnerAccessManagementProps {
@@ -178,7 +179,7 @@ export function OwnerAccessManagement({
 
 			{/* Access Links List */}
 			<div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-				{isLoading ? null : !accessList?.length ? (
+				{isLoading ? <ListTableSkeleton /> : !accessList?.length ? (
 					<div className="flex flex-col items-center justify-center py-12 text-slate-500">
 						<Users className="h-12 w-12 mb-3 text-slate-300" />
 						<p className="font-medium">{t("ownerAccess.noLinks")}</p>

@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { toast } from "sonner";
 import {
 	PaymentsClaimsFilters,
@@ -224,7 +225,7 @@ export function PaymentsClaimsTable({
 			/>
 
 			{/* Table */}
-			{isLoading ? null : items.length === 0 ? (
+			{isLoading ? <ListTableSkeleton /> : items.length === 0 ? (
 				<div className="flex flex-col items-center justify-center py-12 text-center">
 					<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
 						<FileText className="h-8 w-8 text-slate-400" />

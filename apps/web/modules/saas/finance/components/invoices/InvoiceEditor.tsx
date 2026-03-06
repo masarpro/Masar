@@ -64,6 +64,7 @@ import { InlineClientForm } from "../clients/InlineClientForm";
 import { StatusBadge } from "../shared/StatusBadge";
 import { calculateTotals, formatDate } from "../../lib/utils";
 import { Currency } from "../shared/Currency";
+import { EditorPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface InvoiceEditorProps {
 	organizationId: string;
@@ -399,7 +400,7 @@ export function InvoiceEditor({
 	};
 
 	if (isLoading) {
-		return null;
+		return <EditorPageSkeleton />;
 	}
 
 	if (!invoice) {

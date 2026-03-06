@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { StudyHeaderCard } from "./StudyHeaderCard";
 import { SummaryStatsCards } from "./SummaryStatsCards";
 import { StructuralAccordion } from "./StructuralAccordion";
+import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
 
 interface StructuralItemsEditorProps {
 	organizationId: string;
@@ -35,7 +36,7 @@ export function StructuralItemsEditor({
 	);
 
 	if (isLoading) {
-		return null;
+		return <StudyEditorSkeleton />;
 	}
 
 	if (!study) {

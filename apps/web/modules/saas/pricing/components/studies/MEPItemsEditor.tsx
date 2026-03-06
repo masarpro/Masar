@@ -8,6 +8,7 @@ import { ArrowLeft, Plus } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { formatCurrency } from "../../lib/utils";
+import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
 
 interface MEPItemsEditorProps {
 	organizationId: string;
@@ -39,7 +40,7 @@ export function MEPItemsEditor({
 	);
 
 	if (isLoading) {
-		return null;
+		return <StudyEditorSkeleton />;
 	}
 
 	if (!study) {

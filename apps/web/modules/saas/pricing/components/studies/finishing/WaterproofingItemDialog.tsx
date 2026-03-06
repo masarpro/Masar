@@ -21,6 +21,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@ui/components/select";
+import { Copy } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -51,11 +52,18 @@ interface WaterproofingItemData {
 	totalCost: number;
 }
 
+interface SiblingItem {
+	area?: number | null;
+	length?: number | null;
+	calculationData?: Record<string, unknown> | null;
+}
+
 interface WaterproofingItemDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	organizationId: string;
 	studyId: string;
+	siblingItems?: SiblingItem[];
 	editItem?: WaterproofingItemData;
 }
 
@@ -64,6 +72,7 @@ export function WaterproofingItemDialog({
 	onOpenChange,
 	organizationId,
 	studyId,
+	siblingItems,
 	editItem,
 }: WaterproofingItemDialogProps) {
 	const t = useTranslations("pricing.studies.finishing.waterproofing");
@@ -79,6 +88,7 @@ export function WaterproofingItemDialog({
 	const [thickness, setThickness] = useState(4);
 	const [layers, setLayers] = useState(1);
 	const [includesPrimer, setIncludesPrimer] = useState(false);
+	const [wastagePercent, setWastagePercent] = useState(15);
 	const [areaInput, setAreaInput] = useState<number | "">("");
 	const [lengthInput, setLengthInput] = useState<number | "">("");
 	const [widthInput, setWidthInput] = useState<number | "">("");
@@ -96,6 +106,7 @@ export function WaterproofingItemDialog({
 			setThickness((cd?.thickness as number) ?? 4);
 			setLayers((cd?.layers as number) ?? 1);
 			setIncludesPrimer((cd?.includesPrimer as boolean) ?? false);
+			setWastagePercent(editItem.wastagePercent ?? WATERPROOFING_MATERIALS[(cd?.materialType as WaterproofingMaterialKey) ?? "bitumen_rolls"]?.wastagePercent ?? 15);
 			setAreaInput(editItem.area || "");
 			setLengthInput(editItem.length || "");
 			setWidthInput(editItem.width || "");
@@ -107,6 +118,7 @@ export function WaterproofingItemDialog({
 			setThickness(4);
 			setLayers(1);
 			setIncludesPrimer(false);
+			setWastagePercent(WATERPROOFING_MATERIALS.bitumen_rolls.wastagePercent);
 			setAreaInput("");
 			setLengthInput("");
 			setWidthInput("");
@@ -118,6 +130,7 @@ export function WaterproofingItemDialog({
 		const mat = WATERPROOFING_MATERIALS[materialKey];
 		if (mat) {
 			setThickness(mat.defaultThickness);
+			setWastagePercent(mat.wastagePercent);
 		}
 	}, [materialKey]);
 
@@ -138,8 +151,9 @@ export function WaterproofingItemDialog({
 			materialKey,
 			layers,
 			includesPrimer,
+			wastagePercent,
 		});
-	}, [computedArea, materialKey, layers, includesPrimer]);
+	}, [computedArea, materialKey, layers, includesPrimer, wastagePercent]);
 
 	const mat = WATERPROOFING_MATERIALS[materialKey];
 
@@ -209,7 +223,7 @@ export function WaterproofingItemDialog({
 			width: typeof widthInput === "number" && widthInput > 0 ? widthInput : undefined,
 			quantity: finalQuantity,
 			unit: "m2",
-			wastagePercent: mat?.wastagePercent ?? 10,
+			wastagePercent,
 			calculationMethod: "waterproofing_professional",
 			calculationData,
 			materialPrice: 0,
@@ -237,6 +251,21 @@ export function WaterproofingItemDialog({
 
 	const isPending = createMutation.isPending || updateMutation.isPending;
 
+	// Copy quantities from thermal insulation sibling
+	const canCopyFromSibling = !isEdit && siblingItems && siblingItems.length > 0;
+	const handleCopyFromSibling = () => {
+		if (!siblingItems || siblingItems.length === 0) return;
+		const first = siblingItems[0];
+		const cd = first.calculationData as Record<string, unknown> | undefined;
+		const breakdown = cd?.breakdown as Record<string, number> | undefined;
+		const area = breakdown?.grossArea ?? breakdown?.netArea ?? (first.area ? Number(first.area) : 0);
+		if (area > 0) {
+			setAreaInput(area);
+			setLengthInput("");
+			setWidthInput("");
+		}
+	};
+
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
@@ -247,6 +276,20 @@ export function WaterproofingItemDialog({
 				</DialogHeader>
 
 				<div className="space-y-4">
+					{/* Copy from sibling */}
+					{canCopyFromSibling && (
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							className="w-full"
+							onClick={handleCopyFromSibling}
+						>
+							<Copy className="h-4 w-4 me-2" />
+							{tFinishing("copyFromThermal")}
+						</Button>
+					)}
+
 					{/* Name */}
 					<div className="space-y-1">
 						<Label className="text-sm">{t("name")}</Label>
@@ -390,14 +433,13 @@ export function WaterproofingItemDialog({
 						</div>
 					</div>
 
-					{/* Wastage (read-only) */}
+					{/* Wastage */}
 					<div className="space-y-1">
-						<Label className="text-sm">{t("wastage")}</Label>
+						<Label className="text-sm">{t("wastage")} %</Label>
 						<Input
-							type="text"
-							value={`${mat?.wastagePercent ?? 10}%`}
-							readOnly
-							className="bg-muted"
+							type="number"
+							value={wastagePercent}
+							onChange={(e) => setWastagePercent(parseFloat(e.target.value) || 0)}
 						/>
 						<p className="text-xs text-muted-foreground">{t("autoByMaterial")}</p>
 					</div>

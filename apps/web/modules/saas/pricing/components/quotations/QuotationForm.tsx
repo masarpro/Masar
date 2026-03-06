@@ -68,6 +68,7 @@ import { StatusBadge } from "@saas/finance/components/shared/StatusBadge";
 import { AmountSummary } from "@saas/finance/components/shared/AmountSummary";
 import { calculateTotals } from "@saas/finance/lib/utils";
 import { TemplateRenderer } from "@saas/finance/components/templates/renderer";
+import { EditorPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface QuotationFormProps {
 	organizationId: string;
@@ -533,7 +534,7 @@ export function QuotationForm({
 
 	// Loading state for edit mode
 	if (mode === "edit" && isLoadingQuotation) {
-		return null;
+		return <EditorPageSkeleton />;
 	}
 
 	// Not found state for edit mode

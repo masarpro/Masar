@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { CardGridSkeleton } from "@saas/shared/components/skeletons";
 
 interface ProjectTemplatesProps {
 	organizationId: string;
@@ -72,7 +73,7 @@ export function ProjectTemplates({
 	};
 
 	if (isLoading) {
-		return null;
+		return <CardGridSkeleton />;
 	}
 
 	return (

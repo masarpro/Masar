@@ -26,6 +26,7 @@ import { useTranslations } from "next-intl";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { CostStudyCard } from "./CostStudyCard";
 import { formatCurrency } from "../../lib/utils";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 interface QuantitiesListProps {
 	organizationId: string;
@@ -59,7 +60,7 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 	};
 
 	if (isLoading) {
-		return null;
+		return <ListTableSkeleton />;
 	}
 
 	return (

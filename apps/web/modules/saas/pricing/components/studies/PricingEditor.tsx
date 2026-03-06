@@ -11,6 +11,7 @@ import { ArrowLeft, FileText, Plus } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { formatCurrency, formatNumber } from "../../lib/utils";
+import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
 
 interface PricingEditorProps {
 	organizationId: string;
@@ -36,7 +37,7 @@ export function PricingEditor({
 	);
 
 	if (isLoading) {
-		return null;
+		return <StudyEditorSkeleton />;
 	}
 
 	if (!study) {

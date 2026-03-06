@@ -8,6 +8,7 @@ import { Card, CardContent } from "@ui/components/card";
 import { Printer, Download, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { TemplateRenderer } from "@saas/finance/components/templates/renderer";
+import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface QuotationPreviewProps {
 	organizationId: string;
@@ -55,7 +56,7 @@ export function QuotationPreview({
 		(!linkedTemplate && isLoadingDefaultTemplate);
 
 	if (isLoading) {
-		return null;
+		return <PreviewPageSkeleton />;
 	}
 
 	if (!quotation) {

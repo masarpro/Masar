@@ -1,5 +1,6 @@
 "use client";
 
+import { ProjectOverviewSkeleton } from "@saas/shared/components/skeletons";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -44,7 +45,7 @@ export function ProjectOverview({
 	);
 
 	if (summaryLoading) {
-		return null;
+		return <ProjectOverviewSkeleton />;
 	}
 
 	return (

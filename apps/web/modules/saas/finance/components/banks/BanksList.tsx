@@ -68,6 +68,7 @@ import {
 	Banknote,
 } from "lucide-react";
 import { Currency } from "../shared/Currency";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 interface BanksListProps {
 	organizationId: string;
@@ -305,7 +306,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 			{/* Accounts Table */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-0">
-					{isLoading ? null : accounts.length === 0 ? (
+					{isLoading ? <ListTableSkeleton /> : accounts.length === 0 ? (
 						<div className="text-center py-20">
 							<Building className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
 							<p className="text-slate-500 dark:text-slate-400">

@@ -38,6 +38,7 @@ import {
 	Trash2,
 } from "lucide-react";
 import Link from "next/link";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { SubcontractItemSheet } from "./SubcontractItemSheet";
 import { SubcontractTabs } from "./SubcontractTabs";
 
@@ -183,7 +184,7 @@ export function SubcontractItemsView({
 		items?.reduce((sum, item) => sum + item.totalAmount, 0) ?? 0;
 
 	if (isLoading) {
-		return null;
+		return <ListTableSkeleton />;
 	}
 
 	return (

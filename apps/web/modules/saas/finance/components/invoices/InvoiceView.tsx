@@ -63,6 +63,7 @@ import { Currency } from "../shared/Currency";
 import { formatDate, formatDateTime } from "../../lib/utils";
 import { InvoiceDocument } from "./InvoiceDocument";
 import Link from "next/link";
+import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Types
@@ -280,7 +281,7 @@ export function InvoiceView({
 	// ─── Loading / Not found ─────────────────────────────────────────────
 
 	if (isLoading) {
-		return null;
+		return <PreviewPageSkeleton />;
 	}
 
 	if (!invoice) {
@@ -853,7 +854,7 @@ function ActivityTabContent({
 	const logs = data?.logs ?? [];
 
 	if (isLoading) {
-		return null;
+		return <PreviewPageSkeleton />;
 	}
 
 	if (logs.length === 0) {

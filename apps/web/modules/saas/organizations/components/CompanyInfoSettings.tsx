@@ -28,6 +28,7 @@ import {
 	Phone,
 	Receipt,
 } from "lucide-react";
+import { SettingsPageSkeleton } from "@saas/shared/components/skeletons";
 
 const CURRENCIES = [
 	{ value: "SAR", label: "SAR", labelAr: "ريال سعودي" },
@@ -133,7 +134,7 @@ export function CompanyInfoSettings() {
 	};
 
 	if (!organizationId || isLoading) {
-		return null;
+		return <SettingsPageSkeleton />;
 	}
 
 	return (

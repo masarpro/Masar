@@ -29,6 +29,7 @@ import { useProjectRole } from "../../hooks/use-project-role";
 import { DailyReportCard } from "./DailyReportCard";
 import { IssueCard } from "./IssueCard";
 import { PhotoGrid } from "./PhotoGrid";
+import { MinimalSkeleton } from "@saas/shared/components/skeletons";
 import { ProgressUpdateForm } from "../forms/ProgressUpdateForm";
 
 interface FieldTimelineProps {
@@ -101,7 +102,7 @@ export function FieldTimeline({
 	);
 
 	if (isLoading) {
-		return null;
+		return <MinimalSkeleton />;
 	}
 
 	const rawTimeline = data?.timeline ?? [];

@@ -67,11 +67,12 @@ export function calculateWaterproofingQuantity(params: {
 	materialKey: WaterproofingMaterialKey;
 	layers: number;
 	includesPrimer: boolean;
+	wastagePercent: number;
 }) {
 	const mat = WATERPROOFING_MATERIALS[params.materialKey];
 	const overlapArea = params.area * ((mat?.overlapPercent || 0) / 100);
 	const effectiveArea = (params.area + overlapArea) * params.layers;
-	const wastageArea = effectiveArea * ((mat?.wastagePercent || 10) / 100);
+	const wastageArea = effectiveArea * (params.wastagePercent / 100);
 	const finalQuantity = effectiveArea + wastageArea;
 	const primerArea = params.includesPrimer ? params.area * 1.05 : 0;
 
@@ -82,7 +83,7 @@ export function calculateWaterproofingQuantity(params: {
 		wastageArea,
 		finalQuantity,
 		primerArea,
-		wastagePercent: mat?.wastagePercent || 10,
+		wastagePercent: params.wastagePercent,
 		overlapPercent: mat?.overlapPercent || 0,
 	};
 }
@@ -157,10 +158,11 @@ export function calculateThermalQuantity(params: {
 	deductions: number;
 	materialKey: ThermalMaterialKey;
 	thickness: number;
+	wastagePercent: number;
 }) {
 	const mat = THERMAL_INSULATION_MATERIALS[params.materialKey];
 	const netArea = Math.max(0, params.grossArea - params.deductions);
-	const wastagePercent = mat?.wastagePercent || 10;
+	const wastagePercent = params.wastagePercent;
 	const wastageArea = netArea * (wastagePercent / 100);
 	const finalQuantity = netArea + wastageArea;
 	const volumeM3 = finalQuantity * (params.thickness / 1000);

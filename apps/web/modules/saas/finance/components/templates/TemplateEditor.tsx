@@ -36,6 +36,7 @@ import {
 } from "../../lib/default-templates";
 import { getSampleData } from "../../lib/sample-preview-data";
 import type { OrganizationData } from "./renderer/TemplateRenderer";
+import { EditorPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface TemplateEditorProps {
 	organizationId: string;
@@ -467,7 +468,7 @@ export function TemplateEditor({
 
 	// Show loading state when fetching existing template
 	if (templateId && isLoadingTemplate) {
-		return null;
+		return <EditorPageSkeleton />;
 	}
 
 	return (

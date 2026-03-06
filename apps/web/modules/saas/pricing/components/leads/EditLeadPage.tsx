@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { EditLeadForm } from "./EditLeadForm";
+import { FormPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface EditLeadPageProps {
 	leadId: string;
@@ -31,7 +32,7 @@ export function EditLeadPage({ leadId, organizationId, organizationSlug }: EditL
 	const isLoading = leadLoading || membersLoading;
 
 	if (isLoading) {
-		return null;
+		return <FormPageSkeleton />;
 	}
 
 	if (!lead) {

@@ -82,6 +82,7 @@ export function FinishingGroupSection({
 						key={category.id}
 						category={category}
 						items={items.filter((item) => item.category === category.id)}
+						allGroupItems={items}
 						organizationId={organizationId}
 						studyId={studyId}
 						buildingConfig={buildingConfig}

@@ -61,6 +61,7 @@ import {
 	type DefaultTemplateConfig,
 } from "../../lib/default-templates";
 import { getSampleData } from "../../lib/sample-preview-data";
+import { EditorPageSkeleton } from "@saas/shared/components/skeletons";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONSTANTS
@@ -417,7 +418,7 @@ export function TemplateCustomizer({
 	// ── Loading state ──────────────────────────────────────────────────────
 
 	if (templateId && isLoadingTemplate) {
-		return null;
+		return <EditorPageSkeleton />;
 	}
 
 	// ── Render ──────────────────────────────────────────────────────────────

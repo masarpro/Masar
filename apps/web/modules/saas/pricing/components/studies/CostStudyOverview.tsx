@@ -22,6 +22,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { formatCurrency } from "../../lib/utils";
 import { LeadStatusBadge } from "../leads/LeadStatusBadge";
+import { StudyOverviewSkeleton } from "@saas/shared/components/skeletons";
 
 interface CostStudyOverviewProps {
 	organizationId: string;
@@ -70,7 +71,7 @@ export function CostStudyOverview({
 	);
 
 	if (isLoading) {
-		return null;
+		return <StudyOverviewSkeleton />;
 	}
 
 	if (!study) {

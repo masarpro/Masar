@@ -36,6 +36,7 @@ import {
 	TrendingUp,
 } from "lucide-react";
 import { Currency } from "../shared/Currency";
+import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface BankDetailProps {
 	organizationId: string;
@@ -167,7 +168,7 @@ export function BankDetail({
 	};
 
 	if (isLoading) {
-		return null;
+		return <DetailPageSkeleton />;
 	}
 
 	if (!account) {

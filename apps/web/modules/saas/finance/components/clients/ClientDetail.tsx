@@ -41,6 +41,7 @@ import {
 	Hash,
 } from "lucide-react";
 import { formatDateArabic } from "../../lib/utils";
+import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface ClientDetailProps {
 	organizationId: string;
@@ -125,7 +126,7 @@ export function ClientDetail({
 	});
 
 	if (isLoading) {
-		return null;
+		return <DetailPageSkeleton />;
 	}
 
 	if (!client) {

@@ -38,6 +38,7 @@ import {
 	Clock,
 } from "lucide-react";
 import Link from "next/link";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { SubcontractTabs } from "./SubcontractTabs";
 
 interface SubcontractClaimsListViewProps {
@@ -124,7 +125,7 @@ export function SubcontractClaimsListView({
 	});
 
 	if (isLoading) {
-		return null;
+		return <ListTableSkeleton />;
 	}
 
 	const totalClaimed = summary?.totalClaimed ?? 0;

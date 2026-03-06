@@ -23,6 +23,7 @@ import {
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 interface ProjectPaymentsViewProps {
 	organizationId: string;
@@ -52,7 +53,7 @@ export function ProjectPaymentsView({
 	);
 
 	if (isLoading) {
-		return null;
+		return <ListTableSkeleton />;
 	}
 
 	if (error || !data || data.terms.length === 0) {

@@ -23,6 +23,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { Hammer, Plus, Receipt, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { AddExpenseDialog } from "./AddExpenseDialog";
 
 interface Expense {
@@ -186,7 +187,7 @@ export function ExpensesTable({
 				</div>
 
 				{/* Table */}
-				{isLoading ? null : expenses.length === 0 ? (
+				{isLoading ? <ListTableSkeleton /> : expenses.length === 0 ? (
 					<div className="flex flex-col items-center justify-center py-12 text-center">
 						<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
 							<Receipt className="h-8 w-8 text-slate-400" />

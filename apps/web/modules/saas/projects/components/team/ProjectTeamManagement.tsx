@@ -44,6 +44,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 interface ProjectTeamManagementProps {
 	organizationId: string;
@@ -202,7 +203,7 @@ export function ProjectTeamManagement({
 
 			{/* Team Members List */}
 			<div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-				{isLoading ? null : !teamData?.members.length ? (
+				{isLoading ? <ListTableSkeleton /> : !teamData?.members.length ? (
 					<div className="flex flex-col items-center justify-center py-12 text-slate-500">
 						<Users className="h-12 w-12 mb-3 text-slate-300" />
 						<p className="font-medium">{t("projects.team.noMembers")}</p>

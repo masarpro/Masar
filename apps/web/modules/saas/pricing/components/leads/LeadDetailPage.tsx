@@ -25,6 +25,7 @@ import { LeadInfoTab } from "./LeadInfoTab";
 import { LeadLinkedTab } from "./LeadLinkedTab";
 import { ConvertToProjectDialog } from "./ConvertToProjectDialog";
 import { UpdateLeadStatusDialog } from "./UpdateLeadStatusDialog";
+import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface LeadDetailPageProps {
 	leadId: string;
@@ -63,7 +64,7 @@ export function LeadDetailPage({ leadId, organizationId, organizationSlug }: Lea
 	);
 
 	if (isLoading) {
-		return null;
+		return <DetailPageSkeleton />;
 	}
 
 	if (!lead) {

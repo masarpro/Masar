@@ -12,6 +12,7 @@ import type { TemplateElement } from "./TemplateCanvas";
 import type { TemplateSettings } from "./PropertiesPanel";
 import type { OrganizationData, QuotationData, InvoiceData } from "./renderer/TemplateRenderer";
 import { getSampleData } from "../../lib/sample-preview-data";
+import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface TemplatePreviewProps {
 	organizationId: string;
@@ -62,7 +63,7 @@ export function TemplatePreview({
 	}, []);
 
 	if (isLoading) {
-		return null;
+		return <PreviewPageSkeleton />;
 	}
 
 	if (!template) {

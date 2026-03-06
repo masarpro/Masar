@@ -34,6 +34,7 @@ import {
 } from "@ui/components/dialog";
 import { Label } from "@ui/components/label";
 import { Textarea } from "@ui/components/textarea";
+import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 import { DocumentViewer } from "./documents/DocumentViewer";
 
 interface DocumentDetailProps {
@@ -184,7 +185,7 @@ export function DocumentDetail({
 	};
 
 	if (isLoading) {
-		return null;
+		return <DetailPageSkeleton />;
 	}
 
 	if (!document) {

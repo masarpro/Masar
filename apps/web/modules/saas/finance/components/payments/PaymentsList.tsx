@@ -52,6 +52,7 @@ import {
 } from "lucide-react";
 import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 interface PaymentsListProps {
 	organizationId: string;
@@ -184,7 +185,7 @@ export function PaymentsList({
 			{/* Payments Table */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-0">
-					{isLoading ? null : payments.length === 0 ? (
+					{isLoading ? <ListTableSkeleton /> : payments.length === 0 ? (
 						<div className="text-center py-20">
 							<TrendingUp className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
 							<p className="text-slate-500 dark:text-slate-400">

@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { Save, Building, Wallet, TrendingUp, User, FileText, Printer, Calendar } from "lucide-react";
 import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
+import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface PaymentDetailProps {
 	organizationId: string;
@@ -139,7 +140,7 @@ export function PaymentDetail({
 	};
 
 	if (isLoading) {
-		return null;
+		return <DetailPageSkeleton />;
 	}
 
 	if (!payment) {

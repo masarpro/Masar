@@ -80,6 +80,7 @@ import { InlineClientForm } from "../clients/InlineClientForm";
 import { StatusBadge } from "../shared/StatusBadge";
 import { Currency } from "../shared/Currency";
 import { calculateTotals, formatDate } from "../../lib/utils";
+import { FormPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface CreateInvoiceFormProps {
 	organizationId: string;
@@ -700,7 +701,7 @@ export function CreateInvoiceForm({
 
 	// Loading state for edit mode
 	if (isEditMode && isLoadingInvoice) {
-		return null;
+		return <FormPageSkeleton />;
 	}
 
 	return (

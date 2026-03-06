@@ -14,6 +14,7 @@ import { useDebounceValue } from "usehooks-ts";
 import { LeadsFilters } from "./LeadsFilters";
 import { LeadCard } from "./LeadCard";
 import { LeadStatsCards } from "./LeadStatsCards";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 interface LeadsListPageProps {
 	organizationId: string;
@@ -87,7 +88,7 @@ export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPag
 			/>
 
 			{/* Loading */}
-			{isLoading ? null : leads.length > 0 ? (
+			{isLoading ? <ListTableSkeleton /> : leads.length > 0 ? (
 				<>
 					{/* Card Grid */}
 					<div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

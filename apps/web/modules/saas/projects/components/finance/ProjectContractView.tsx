@@ -7,6 +7,7 @@ import { FileDiff, Loader2, Pencil, Save, X } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
+import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 import { toast } from "sonner";
 import { ContractSummaryBar } from "./contract/ContractSummaryBar";
 import {
@@ -176,7 +177,7 @@ export function ProjectContractView({
 	};
 
 	if (contractLoading || summaryLoading) {
-		return null;
+		return <DetailPageSkeleton />;
 	}
 
 	return (

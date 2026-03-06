@@ -39,6 +39,7 @@ import {
 	CreditCard,
 } from "lucide-react";
 import { cn } from "@ui/lib";
+import { FormPageSkeleton } from "@saas/shared/components/skeletons";
 
 // Types
 export type ClientType = "INDIVIDUAL" | "COMMERCIAL";
@@ -306,7 +307,7 @@ export function ClientForm({
 	const isPending = createMutation.isPending || updateMutation.isPending;
 
 	if (mode === "edit" && isLoadingClient) {
-		return null;
+		return <FormPageSkeleton />;
 	}
 
 	return (

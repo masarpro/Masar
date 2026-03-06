@@ -56,6 +56,7 @@ import {
 	Trash2,
 	X,
 } from "lucide-react";
+import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 import { SubcontractTabs } from "./SubcontractTabs";
 
 interface SubcontractClaimDetailViewProps {
@@ -214,7 +215,7 @@ export function SubcontractClaimDetailView({
 	}
 
 	if (isLoading) {
-		return null;
+		return <DetailPageSkeleton />;
 	}
 
 	if (!claim) {

@@ -15,6 +15,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 interface ProjectUpdatesProps {
 	organizationId: string;
@@ -101,7 +102,7 @@ export function ProjectUpdates({
 	};
 
 	if (isLoading) {
-		return null;
+		return <ListTableSkeleton />;
 	}
 
 	return (

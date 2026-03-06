@@ -10,6 +10,7 @@ import { Card, CardContent } from "@ui/components/card";
 import { Printer, ArrowLeft, Download } from "lucide-react";
 import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
+import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface ReceiptVoucherProps {
 	organizationId: string;
@@ -99,7 +100,7 @@ export function ReceiptVoucher({
 	};
 
 	if (isLoading) {
-		return null;
+		return <PreviewPageSkeleton />;
 	}
 
 	if (!payment) {

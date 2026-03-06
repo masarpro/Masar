@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 
 interface ProjectInsightsProps {
 	organizationId: string;
@@ -116,7 +117,7 @@ export function ProjectInsights({
 	};
 
 	if (isLoading) {
-		return null;
+		return <DashboardSkeleton />;
 	}
 
 	return (

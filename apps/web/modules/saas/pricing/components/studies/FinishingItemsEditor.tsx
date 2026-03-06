@@ -13,6 +13,7 @@ import { BuildingConfigPanel } from "./finishing/BuildingConfigPanel";
 import { FinishingGroupSection } from "./finishing/FinishingGroupSection";
 import { FinishingSummary } from "./finishing/FinishingSummary";
 import { QuickAddTemplates } from "./finishing/QuickAddTemplates";
+import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
 
 interface FinishingItemsEditorProps {
 	organizationId: string;
@@ -39,7 +40,7 @@ export function FinishingItemsEditor({
 	);
 
 	if (isLoading) {
-		return null;
+		return <StudyEditorSkeleton />;
 	}
 
 	if (!study) {

@@ -6,6 +6,7 @@ import { Button } from "@ui/components/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { ClaimsTable } from "./ClaimsTable";
 
 interface ProjectClaimsViewProps {
@@ -33,7 +34,7 @@ export function ProjectClaimsView({
 	);
 
 	if (isLoading) {
-		return null;
+		return <ListTableSkeleton />;
 	}
 
 	return (

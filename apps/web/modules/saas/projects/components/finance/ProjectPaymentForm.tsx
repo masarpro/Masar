@@ -28,6 +28,7 @@ import {
 	Banknote,
 	ArrowRight,
 } from "lucide-react";
+import { FormPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface ProjectPaymentFormProps {
 	organizationId: string;
@@ -189,7 +190,7 @@ export function ProjectPaymentForm({
 	};
 
 	if (termsLoading) {
-		return null;
+		return <FormPageSkeleton />;
 	}
 
 	return (

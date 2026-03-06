@@ -31,6 +31,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
+import { CardGridSkeleton } from "@saas/shared/components/skeletons";
 import { ProjectsHeader } from "./ProjectsHeader";
 
 interface ProjectsListProps {
@@ -111,7 +112,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 	const basePath = `/app/${activeOrganization?.slug}/projects`;
 
 	if (isLoading) {
-		return null;
+		return <CardGridSkeleton />;
 	}
 
 	return (

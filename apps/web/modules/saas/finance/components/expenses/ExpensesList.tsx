@@ -66,6 +66,7 @@ import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
 import { PayExpenseDialog } from "./PayExpenseDialog";
 import { AddExpenseDialog } from "./AddExpenseDialog";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 interface ExpensesListProps {
 	organizationId: string;
@@ -385,7 +386,7 @@ export function ExpensesList({
 			{/* Expenses Table */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-0">
-					{isLoading ? null : items.length === 0 ? (
+					{isLoading ? <ListTableSkeleton /> : items.length === 0 ? (
 						<div className="flex flex-col items-center justify-center py-12 text-center">
 							<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
 								<TrendingDown className="h-8 w-8 text-slate-400" />

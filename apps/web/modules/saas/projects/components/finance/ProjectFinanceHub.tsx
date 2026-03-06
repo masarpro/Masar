@@ -4,6 +4,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { ExpenseCategoryChart } from "./ExpenseCategoryChart";
 import { ExpensesTable } from "./ExpensesTable";
 import { FinanceSummary } from "./FinanceSummary";
@@ -73,7 +74,7 @@ export function ProjectFinanceHub({
 		: allExpenses;
 
 	if (summaryLoading) {
-		return null;
+		return <DashboardSkeleton />;
 	}
 
 	return (

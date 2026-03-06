@@ -3,6 +3,7 @@
 import { useRef, useEffect } from "react";
 import { MessageSquare, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { MinimalSkeleton } from "@saas/shared/components/skeletons";
 import { ChatBubble } from "./ChatBubble";
 
 interface ChatAttachment {
@@ -44,7 +45,7 @@ export function ChatMessageList({
 	}, [messages]);
 
 	if (isLoading) {
-		return null;
+		return <MinimalSkeleton />;
 	}
 
 	if (!messages.length) {

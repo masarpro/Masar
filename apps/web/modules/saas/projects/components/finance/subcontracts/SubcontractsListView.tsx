@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { useMemo, useState } from "react";
 
 interface SubcontractsListViewProps {
@@ -138,7 +139,7 @@ export function SubcontractsListView({
 	};
 
 	if (isLoading) {
-		return null;
+		return <ListTableSkeleton />;
 	}
 
 	return (

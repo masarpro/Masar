@@ -44,6 +44,7 @@ import { useTranslations } from "next-intl";
 import { formatDate } from "@saas/finance/lib/utils";
 import { Currency } from "@saas/finance/components/shared/Currency";
 import { StatusBadge } from "@saas/finance/components/shared/StatusBadge";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 interface QuotationsListProps {
 	organizationId: string;
@@ -69,7 +70,7 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 	const quotations = data?.quotations ?? [];
 
 	if (isLoading) {
-		return null;
+		return <ListTableSkeleton />;
 	}
 
 	return (

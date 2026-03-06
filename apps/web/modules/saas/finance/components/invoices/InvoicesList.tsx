@@ -55,6 +55,7 @@ import { formatDate, isOverdue } from "../../lib/utils";
 import { Currency } from "../shared/Currency";
 import { StatusBadge } from "../shared/StatusBadge";
 import { Pagination } from "@saas/shared/components/Pagination";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 interface InvoicesListProps {
 	organizationId: string;
@@ -163,7 +164,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 	});
 
 	if (isLoading) {
-		return null;
+		return <ListTableSkeleton />;
 	}
 
 	return (

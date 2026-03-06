@@ -7,6 +7,7 @@ import { Button } from "@ui/components/button";
 import { Printer, ArrowRight, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { InvoiceDocument } from "./InvoiceDocument";
+import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface InvoicePreviewProps {
 	organizationId: string;
@@ -29,7 +30,7 @@ export function InvoicePreview({
 	);
 
 	if (isLoading) {
-		return null;
+		return <PreviewPageSkeleton />;
 	}
 
 	if (!invoice) {

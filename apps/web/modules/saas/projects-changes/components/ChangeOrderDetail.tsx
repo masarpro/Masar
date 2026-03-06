@@ -37,6 +37,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 import { CreateChangeOrderForm } from "./CreateChangeOrderForm";
 
 type ChangeOrderStatus =
@@ -275,7 +276,7 @@ export function ChangeOrderDetail({
 	});
 
 	if (isLoading) {
-		return null;
+		return <DetailPageSkeleton />;
 	}
 
 	if (!changeOrder) {

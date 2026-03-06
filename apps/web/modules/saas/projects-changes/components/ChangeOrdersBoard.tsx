@@ -35,6 +35,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { CardGridSkeleton } from "@saas/shared/components/skeletons";
 import { CreateChangeOrderForm } from "./CreateChangeOrderForm";
 
 type ChangeOrderStatus =
@@ -337,7 +338,7 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 
 			{/* Change Orders Table */}
 			<Card>
-				{isLoading ? null : changeOrders.length === 0 ? (
+				{isLoading ? <CardGridSkeleton /> : changeOrders.length === 0 ? (
 					<div className="flex flex-col items-center justify-center py-20 text-center">
 						<FileTextIcon className="h-16 w-16 text-slate-300 dark:text-slate-600" />
 						<p className="mt-4 text-lg font-medium text-slate-900 dark:text-slate-100">

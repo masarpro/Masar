@@ -1,9 +1,5 @@
-import { Skeleton } from "@ui/components/skeleton";
+import { MinimalSkeleton } from "@saas/shared/components/skeletons";
 
 export default function Loading() {
-	return (
-		<div className="flex min-h-[30vh] items-center justify-center">
-			<Skeleton className="h-6 w-32" />
-		</div>
-	);
+	return <MinimalSkeleton />;
 }

@@ -33,6 +33,7 @@ import {
 	Loader2,
 	Save,
 } from "lucide-react";
+import { FormPageSkeleton } from "@saas/shared/components/skeletons";
 import { SubcontractTabs } from "./SubcontractTabs";
 
 interface SubcontractClaimFormProps {
@@ -334,7 +335,7 @@ export function SubcontractClaimForm({
 			{/* Step 2 — Items Table */}
 			{step === 2 && (
 				<>
-					{itemsLoading ? null : !items?.length ? (
+					{itemsLoading ? <FormPageSkeleton /> : !items?.length ? (
 						<div className="rounded-xl border border-dashed p-12 text-center">
 							<p className="text-muted-foreground">
 								لا توجد بنود في هذا العقد. أضف بنود أولاً من صفحة البنود.

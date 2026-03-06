@@ -10,6 +10,7 @@ import { ActionCards } from "./ActionCards";
 import { StatsCards } from "./StatsCards";
 import { RecentDocumentsTable } from "./RecentDocumentsTable";
 import { DeadlinesCard } from "./DeadlinesCard";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 
 const CashFlowCard = dynamic(
 	() => import("./CashFlowCard").then((m) => ({ default: m.CashFlowCard })),
@@ -41,7 +42,7 @@ export function FinanceDashboard({
 	);
 
 	if (isLoading) {
-		return null;
+		return <DashboardSkeleton />;
 	}
 
 	const stats = data?.stats;

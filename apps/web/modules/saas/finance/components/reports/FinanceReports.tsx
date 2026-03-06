@@ -28,6 +28,7 @@ import {
 	Building2,
 } from "lucide-react";
 import { Currency } from "../shared/Currency";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 
 interface FinanceReportsProps {
 	organizationId: string;
@@ -245,7 +246,7 @@ export function FinanceReports({
 						</CardHeader>
 						<CardContent>
 							{isLoadingRevenue ? (
-								null
+								<DashboardSkeleton />
 							) : !revenueByPeriod || revenueByPeriod.length === 0 ? (
 								<div className="text-center py-10 text-slate-500">
 									{t("finance.reports.noData")}
@@ -291,7 +292,7 @@ export function FinanceReports({
 						</CardHeader>
 						<CardContent>
 							{isLoadingProject ? (
-								null
+								<DashboardSkeleton />
 							) : !revenueByProject || revenueByProject.length === 0 ? (
 								<div className="text-center py-10 text-slate-500">
 									{t("finance.reports.noData")}
@@ -341,7 +342,7 @@ export function FinanceReports({
 						</CardHeader>
 						<CardContent>
 							{isLoadingClient ? (
-								null
+								<DashboardSkeleton />
 							) : !revenueByClient || revenueByClient.length === 0 ? (
 								<div className="text-center py-10 text-slate-500">
 									{t("finance.reports.noData")}
@@ -397,7 +398,7 @@ export function FinanceReports({
 							</CardHeader>
 							<CardContent>
 								{isLoadingQuotationStats ? (
-									null
+									<DashboardSkeleton />
 								) : !quotationStats || quotationStats.length === 0 ? (
 									<div className="text-center py-10 text-slate-500">
 										{t("finance.reports.noData")}
@@ -440,7 +441,7 @@ export function FinanceReports({
 							</CardHeader>
 							<CardContent>
 								{isLoadingInvoiceStats ? (
-									null
+									<DashboardSkeleton />
 								) : !invoiceStats || invoiceStats.length === 0 ? (
 									<div className="text-center py-10 text-slate-500">
 										{t("finance.reports.noData")}

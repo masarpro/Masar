@@ -51,6 +51,7 @@ import {
 	XCircle,
 	Eye,
 } from "lucide-react";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 interface ClientsListProps {
 	organizationId: string;
@@ -171,7 +172,7 @@ export function ClientsList({
 			{/* Clients Table */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-0">
-					{isLoading ? null : clients.length === 0 ? (
+					{isLoading ? <ListTableSkeleton /> : clients.length === 0 ? (
 						<div className="text-center py-20">
 							<Users className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
 							<p className="text-slate-500 dark:text-slate-400">

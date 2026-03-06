@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { FinanceSummary } from "./FinanceSummary";
 
 interface FinanceViewProps {
@@ -35,7 +36,7 @@ export function FinanceView({
 	);
 
 	if (summaryLoading) {
-		return null;
+		return <DashboardSkeleton />;
 	}
 
 	const sections = [

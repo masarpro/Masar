@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
+import { MinimalSkeleton } from "@saas/shared/components/skeletons";
 
 interface ProjectChatProps {
 	organizationId: string;
@@ -141,7 +142,7 @@ export function ProjectChat({
 
 			{/* Messages Area */}
 			<div className="flex-1 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-				{isLoading ? null : !messages?.items?.length ? (
+				{isLoading ? <MinimalSkeleton /> : !messages?.items?.length ? (
 					<div className="flex h-full flex-col items-center justify-center text-center">
 						<div className="mb-3 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
 							<MessageSquare className="h-10 w-10 text-slate-400" />

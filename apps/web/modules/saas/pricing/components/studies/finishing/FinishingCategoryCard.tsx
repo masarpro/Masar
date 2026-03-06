@@ -13,6 +13,7 @@ import type { BuildingConfig } from "../../../lib/finishing-types";
 import { formatCurrency } from "../../../lib/utils";
 import { AddEditFinishingItemDialog } from "./AddEditFinishingItemDialog";
 import { FinishingItemRow } from "./FinishingItemRow";
+import { PlasterItemDialog } from "./PlasterItemDialog";
 import { ThermalInsulationItemDialog } from "./ThermalInsulationItemDialog";
 import { WaterproofingItemDialog } from "./WaterproofingItemDialog";
 
@@ -42,6 +43,7 @@ interface FinishingItem {
 interface FinishingCategoryCardProps {
 	category: FinishingCategoryConfig;
 	items: FinishingItem[];
+	allGroupItems?: FinishingItem[];
 	organizationId: string;
 	studyId: string;
 	buildingConfig?: BuildingConfig | null;
@@ -50,6 +52,7 @@ interface FinishingCategoryCardProps {
 export function FinishingCategoryCard({
 	category,
 	items,
+	allGroupItems,
 	organizationId,
 	studyId,
 	buildingConfig,
@@ -164,12 +167,45 @@ export function FinishingCategoryCard({
 				</CardContent>
 			</Card>
 
-			{category.id === "FINISHING_WATERPROOFING" ? (
+			{category.id === "FINISHING_INTERNAL_PLASTER" || category.id === "FINISHING_EXTERNAL_PLASTER" ? (
+				<PlasterItemDialog
+					open={dialogOpen}
+					onOpenChange={setDialogOpen}
+					organizationId={organizationId}
+					studyId={studyId}
+					plasterType={
+						category.id === "FINISHING_INTERNAL_PLASTER"
+							? "internal_plaster"
+							: "external_plaster"
+					}
+					editItem={
+						editItem
+							? {
+									...editItem,
+									subCategory: editItem.subCategory ?? undefined,
+									floorId: editItem.floorId ?? undefined,
+									floorName: editItem.floorName ?? undefined,
+									area: editItem.area ?? undefined,
+									length: editItem.length ?? undefined,
+									width: (editItem as unknown as { width?: number | null }).width ?? undefined,
+									quantity: editItem.quantity ?? undefined,
+									wastagePercent: editItem.wastagePercent ?? 0,
+									materialPrice: editItem.materialPrice ?? 0,
+									laborPrice: editItem.laborPrice ?? 0,
+									calculationMethod: editItem.calculationMethod ?? undefined,
+									calculationData: (editItem.calculationData as Record<string, unknown>) ?? undefined,
+									totalCost: editItem.totalCost,
+								}
+							: undefined
+					}
+				/>
+			) : category.id === "FINISHING_WATERPROOFING" ? (
 				<WaterproofingItemDialog
 					open={dialogOpen}
 					onOpenChange={setDialogOpen}
 					organizationId={organizationId}
 					studyId={studyId}
+					siblingItems={allGroupItems?.filter((i) => i.category === "FINISHING_THERMAL_INSULATION")}
 					editItem={
 						editItem
 							? {
@@ -197,6 +233,7 @@ export function FinishingCategoryCard({
 					onOpenChange={setDialogOpen}
 					organizationId={organizationId}
 					studyId={studyId}
+					siblingItems={allGroupItems?.filter((i) => i.category === "FINISHING_WATERPROOFING")}
 					editItem={
 						editItem
 							? {
