@@ -582,7 +582,8 @@
 	},
 	"hero": {
 		"badge": "🇸🇦 Built for the Saudi Market",
-		"title": "Masar — Complete Construction Management System",
+		"titleBrand": "Masar",
+		"titleDesc": "Complete Construction Management System",
 		"subtitle": "From quantity takeoff to project handover — in one system",
 		"description": "Organize pricing, contracts, execution, and finance — your entire team in one system, no fragmentation.",
 		"cta": "Start Free",

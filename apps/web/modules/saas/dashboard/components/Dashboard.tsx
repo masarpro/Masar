@@ -374,7 +374,7 @@ export function Dashboard() {
 					return (
 						<div
 							key={i}
-							className={`${glassCard} p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-500`}
+							className={`${glassCard} masar-glow p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-500`}
 							style={{ animationDelay: `${i * 60}ms` }}
 						>
 							<div className="flex items-center justify-between mb-2">

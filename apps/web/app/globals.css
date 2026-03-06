@@ -15,6 +15,16 @@
 
 @variant dark (&:where(.dark, .dark *));
 
+/* Masar Card Glow — financial KPI cards */
+.masar-glow {
+	transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+.masar-glow:hover {
+	border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+	box-shadow: 0 0 20px color-mix(in srgb, var(--primary) 15%, transparent);
+	transform: translateY(-2px);
+}
+
 body {
 	letter-spacing: -0.02em;
 }

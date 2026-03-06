@@ -141,9 +141,18 @@ export function Hero() {
 
 					{/* Title */}
 					<div className="animate-fade-in-delay-1">
-						<h1 className="text-[clamp(1.4rem,4.5vw,3.875rem)] font-black leading-[1.12] mb-4">
-							<span style={{ color: "var(--lp-text)" }}>
-								{t("hero.title")}
+						<h1 className="flex items-baseline gap-3 flex-wrap mb-4">
+							<span
+								className="text-[clamp(2.2rem,6vw,5rem)] font-black leading-[1.1]"
+								style={{ color: "var(--lp-text)" }}
+							>
+								{t("hero.titleBrand")}
+							</span>
+							<span
+								className="text-[clamp(1rem,2.5vw,1.75rem)] font-bold leading-[1.3]"
+								style={{ color: "var(--lp-text)" }}
+							>
+								{t("hero.titleDesc")}
 							</span>
 						</h1>
 					</div>
