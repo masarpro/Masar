@@ -1,6 +1,5 @@
 "use client";
 
-import { authClient } from "@repo/auth/client";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
@@ -774,14 +773,10 @@ function ActivationCodeSection({
 
 	const activateMutation = useMutation({
 		mutationFn: async (codeValue: string) => {
-			// Ensure the active organization is set in the session
-			// before calling activate (which needs activeOrganizationId)
-			if (organizationSlug) {
-				await authClient.organization.setActive({
-					organizationSlug,
-				});
-			}
-			return orpc.activationCodes.activate.call({ code: codeValue });
+			return orpc.activationCodes.activate.call({
+				code: codeValue,
+				organizationSlug: organizationSlug || undefined,
+			});
 		},
 		onSuccess: (data) => {
 			toast.success(t("choosePlan.activateSuccess"));

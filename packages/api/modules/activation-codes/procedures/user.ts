@@ -1,7 +1,7 @@
 import { ORPCError } from "@orpc/client";
 import { db } from "@repo/database";
 import { protectedProcedure } from "../../../orpc/procedures";
-import { codeInput } from "../schema";
+import { activateInput, codeInput } from "../schema";
 
 export const validate = protectedProcedure
 	.route({
@@ -58,9 +58,21 @@ export const activate = protectedProcedure
 		tags: ["Activation Codes"],
 		summary: "Activate a code on the current organization",
 	})
-	.input(codeInput)
+	.input(activateInput)
 	.handler(async ({ input, context }) => {
-		const orgId = context.session.activeOrganizationId;
+		let orgId = context.session.activeOrganizationId;
+
+		// Fallback: resolve org from slug if activeOrganizationId is not set
+		if (!orgId && input.organizationSlug) {
+			const orgBySlug = await db.organization.findFirst({
+				where: { slug: input.organizationSlug },
+				select: { id: true },
+			});
+			if (orgBySlug) {
+				orgId = orgBySlug.id;
+			}
+		}
+
 		if (!orgId) {
 			throw new ORPCError("BAD_REQUEST", {
 				message: "لم يتم تحديد المنظمة",

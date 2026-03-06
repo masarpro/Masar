@@ -26,3 +26,8 @@ export const codeIdInput = z.object({
 export const codeInput = z.object({
 	code: z.string().min(1).max(20).transform((v) => v.toUpperCase().trim()),
 });
+
+export const activateInput = z.object({
+	code: z.string().min(1).max(20).transform((v) => v.toUpperCase().trim()),
+	organizationSlug: z.string().optional(),
+});
