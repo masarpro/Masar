@@ -29,7 +29,7 @@ function getStatusBadge(status: string, t: (key: string) => string) {
 	switch (status) {
 		case "ACTIVE":
 			return (
-				<Badge className="border-0 bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400">
+				<Badge className="border-0 bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">
 					{t("projects.status.ACTIVE")}
 				</Badge>
 			);
@@ -124,7 +124,7 @@ export default function OwnerPortalSummary() {
 					<h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
 						{t("ownerPortal.progress")}
 					</h3>
-					<span className="text-2xl font-bold text-teal-600 dark:text-teal-400">
+					<span className="text-2xl font-bold text-sky-600 dark:text-sky-400">
 						{Math.round(Number(project.progress))}%
 					</span>
 				</div>
@@ -133,16 +133,16 @@ export default function OwnerPortalSummary() {
 
 			{/* KPI Cards */}
 			<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-				<div className="rounded-2xl bg-teal-50 p-5 dark:bg-teal-950/30">
+				<div className="rounded-2xl bg-sky-50 p-5 dark:bg-sky-950/30">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-teal-100 p-2.5 dark:bg-teal-900/50">
-							<TrendingUp className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+						<div className="rounded-xl bg-sky-100 p-2.5 dark:bg-sky-900/50">
+							<TrendingUp className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 						</div>
 						<div>
-							<p className="text-xs text-teal-600 dark:text-teal-400">
+							<p className="text-xs text-sky-600 dark:text-sky-400">
 								{t("ownerPortal.progress")}
 							</p>
-							<p className="text-xl font-semibold text-teal-700 dark:text-teal-300">
+							<p className="text-xl font-semibold text-sky-700 dark:text-sky-300">
 								{Math.round(Number(project.progress))}%
 							</p>
 						</div>

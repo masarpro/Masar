@@ -345,11 +345,11 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 
 			{/* Section 3: Management Settings */}
 			<div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
-				<div className="h-1 w-full bg-teal-500" />
+				<div className="h-1 w-full bg-sky-500" />
 				<div className="p-6 space-y-5">
 					<div className="flex items-center gap-3">
-						<div className="p-2.5 rounded-xl bg-teal-50 dark:bg-teal-950/30">
-							<Settings2 className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+						<div className="p-2.5 rounded-xl bg-sky-50 dark:bg-sky-950/30">
+							<Settings2 className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 						</div>
 						<div>
 							<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">

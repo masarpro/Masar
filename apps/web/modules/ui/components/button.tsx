@@ -12,6 +12,7 @@ const buttonVariants = cva(
 			variant: {
 				primary:
 					"bg-primary text-primary-foreground hover:bg-primary/90",
+				cta: "bg-[var(--cta)] text-[var(--cta-foreground)] hover:bg-[var(--cta)]/90 shadow-sm shadow-red-500/20",
 				error: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
 				outline:
 					"border border-secondary/15 bg-transparent text-secondary hover:bg-secondary/10",

@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 
 const steps = [
-	{ num: "01", color: "#10B981", accent: "#06B6D4" },
+	{ num: "01", color: "#0ea5e9", accent: "#06B6D4" },
 	{ num: "02", color: "#3B82F6", accent: "#8B5CF6" },
 	{ num: "03", color: "#F59E0B", accent: "#EF4444" },
 ];

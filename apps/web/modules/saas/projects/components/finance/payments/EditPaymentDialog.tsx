@@ -228,7 +228,7 @@ export function EditPaymentDialog({
 						<Button
 							type="submit"
 							disabled={updateMutation.isPending}
-							className="bg-emerald-600 hover:bg-emerald-700"
+							className="bg-sky-600 hover:bg-sky-700"
 						>
 							{updateMutation.isPending ? (
 								<Loader2 className="ml-1.5 h-4 w-4 animate-spin" />

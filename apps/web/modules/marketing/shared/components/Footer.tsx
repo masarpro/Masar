@@ -38,7 +38,7 @@ export function Footer() {
 								className="w-8 h-8 rounded-[10px] flex items-center justify-center text-base font-black text-white"
 								style={{
 									background:
-										"linear-gradient(135deg, #10B981, #06B6D4)",
+										"linear-gradient(135deg, #0ea5e9, #06B6D4)",
 								}}
 							>
 								م

@@ -275,7 +275,7 @@ export function NavBar() {
 										className="hidden lg:block px-6 py-2.5 rounded-[14px] text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 relative overflow-hidden"
 										style={{
 											background:
-												"linear-gradient(135deg, #10B981, #059669)",
+												"linear-gradient(135deg, #0ea5e9, #0284c7)",
 											border: `1px solid var(--lp-nav-signup-border)`,
 											boxShadow:
 												"var(--lp-nav-signup-shadow)",

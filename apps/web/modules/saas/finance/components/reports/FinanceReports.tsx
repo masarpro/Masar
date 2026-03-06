@@ -520,7 +520,7 @@ function StatusIndicator({
 		ACCEPTED: "bg-green-500",
 		REJECTED: "bg-red-500",
 		EXPIRED: "bg-amber-500",
-		CONVERTED: "bg-teal-500",
+		CONVERTED: "bg-sky-500",
 		// Invoice statuses
 		PARTIALLY_PAID: "bg-amber-500",
 		PAID: "bg-green-500",

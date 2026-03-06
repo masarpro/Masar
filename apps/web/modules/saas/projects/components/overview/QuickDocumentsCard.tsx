@@ -31,8 +31,8 @@ export function QuickDocumentsCard({
 		<div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 flex flex-col">
 			<div className="flex items-center justify-between mb-3">
 				<div className="flex items-center gap-2">
-					<div className="rounded-xl bg-teal-100 dark:bg-teal-900/50 p-2">
-						<FolderOpen className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+					<div className="rounded-xl bg-sky-100 dark:bg-sky-900/50 p-2">
+						<FolderOpen className="h-4 w-4 text-sky-600 dark:text-sky-400" />
 					</div>
 					<h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
 						{t("projects.commandCenter.quickDocuments")}

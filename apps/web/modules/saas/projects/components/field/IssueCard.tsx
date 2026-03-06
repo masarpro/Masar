@@ -38,7 +38,7 @@ function getStatusColor(status: string) {
 		case "IN_PROGRESS":
 			return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
 		case "RESOLVED":
-			return "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400";
+			return "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400";
 		case "CLOSED":
 			return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
 		default:

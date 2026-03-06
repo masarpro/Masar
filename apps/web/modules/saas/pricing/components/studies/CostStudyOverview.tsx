@@ -41,9 +41,9 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; dot: string }> =
 		dot: "bg-amber-500",
 	},
 	completed: {
-		bg: "bg-teal-50 dark:bg-teal-950/50",
-		text: "text-teal-700 dark:text-teal-400",
-		dot: "bg-teal-500",
+		bg: "bg-sky-50 dark:bg-sky-950/50",
+		text: "text-sky-700 dark:text-sky-400",
+		dot: "bg-sky-500",
 	},
 	approved: {
 		bg: "bg-indigo-50 dark:bg-indigo-950/50",
@@ -136,10 +136,10 @@ export function CostStudyOverview({
 			href: `${basePath}/pricing`,
 			count: study.quotes.length,
 			cost: study.totalCost,
-			accent: "bg-teal-500",
-			bg: "bg-teal-50 dark:bg-teal-950/30",
-			iconBg: "bg-teal-100 dark:bg-teal-900/50",
-			iconColor: "text-teal-600 dark:text-teal-400",
+			accent: "bg-sky-500",
+			bg: "bg-sky-50 dark:bg-sky-950/30",
+			iconBg: "bg-sky-100 dark:bg-sky-900/50",
+			iconColor: "text-sky-600 dark:text-sky-400",
 		},
 	];
 
@@ -191,7 +191,7 @@ export function CostStudyOverview({
 					<div className="w-px h-10 bg-slate-200 dark:bg-slate-700" />
 					<div className="text-center">
 						<p className="text-xs text-slate-500 dark:text-slate-400">{t("pricing.studies.totalCost")}</p>
-						<p className="text-lg font-semibold text-teal-600 dark:text-teal-400">
+						<p className="text-lg font-semibold text-sky-600 dark:text-sky-400">
 							{formatCurrency(study.totalCost)}
 						</p>
 					</div>
@@ -353,9 +353,9 @@ export function CostStudyOverview({
 									<span className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(study.mepCost)}</span>
 								</div>
 
-								<div className="flex items-center justify-between p-3 rounded-xl bg-teal-50 dark:bg-teal-950/30">
+								<div className="flex items-center justify-between p-3 rounded-xl bg-sky-50 dark:bg-sky-950/30">
 									<div className="flex items-center gap-3">
-										<Building2 className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+										<Building2 className="h-4 w-4 text-sky-600 dark:text-sky-400" />
 										<span className="text-slate-700 dark:text-slate-300">{t("pricing.studies.labor")}</span>
 									</div>
 									<span className="font-medium text-slate-900 dark:text-slate-100">{formatCurrency(study.laborCost)}</span>

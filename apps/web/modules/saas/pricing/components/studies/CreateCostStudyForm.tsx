@@ -40,7 +40,7 @@ const PROJECT_TYPES = [
 	{ value: "commercial", labelKey: "pricing.studies.projectTypes.commercial", color: "bg-violet-500" },
 	{ value: "industrial", labelKey: "pricing.studies.projectTypes.industrial", color: "bg-orange-500" },
 	{ value: "warehouse", labelKey: "pricing.studies.projectTypes.warehouse", color: "bg-slate-500" },
-	{ value: "mixed", labelKey: "pricing.studies.projectTypes.mixed", color: "bg-teal-500" },
+	{ value: "mixed", labelKey: "pricing.studies.projectTypes.mixed", color: "bg-sky-500" },
 ];
 
 const FINISHING_LEVELS = [

@@ -179,7 +179,7 @@ export function FieldTimeline({
 					<span className="text-sm font-medium text-slate-600 dark:text-slate-400">
 						{t("projects.field.currentProgress")}
 					</span>
-					<span className="text-3xl font-bold text-teal-600 dark:text-teal-400">
+					<span className="text-3xl font-bold text-sky-600 dark:text-sky-400">
 						{Math.round(currentProgress)}%
 					</span>
 				</div>
@@ -321,8 +321,8 @@ function TimelineItem({
 			return (
 				<div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-teal-100 p-2.5 dark:bg-teal-900/50">
-							<TrendingUp className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+						<div className="rounded-xl bg-sky-100 p-2.5 dark:bg-sky-900/50">
+							<TrendingUp className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 						</div>
 						<div className="flex-1">
 							<p className="font-medium text-slate-900 dark:text-slate-100">

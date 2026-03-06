@@ -95,15 +95,15 @@ export function ProjectPaymentsView({
 			</h2>
 
 			{/* Summary Card */}
-			<div className="overflow-hidden rounded-2xl border border-emerald-200/50 bg-gradient-to-l from-emerald-50/80 to-teal-50/80 dark:border-emerald-800/30 dark:from-emerald-950/20 dark:to-teal-950/20">
+			<div className="overflow-hidden rounded-2xl border border-sky-200/50 bg-gradient-to-l from-sky-50/80 to-sky-50/80 dark:border-sky-800/30 dark:from-sky-950/20 dark:to-sky-950/20">
 				<div className="p-5">
 					<div className="mb-4 flex items-center justify-between">
 						<div className="flex items-center gap-3">
-							<div className="rounded-xl bg-emerald-100 p-2.5 dark:bg-emerald-900/50">
-								<Banknote className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+							<div className="rounded-xl bg-sky-100 p-2.5 dark:bg-sky-900/50">
+								<Banknote className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 							</div>
 							<div>
-								<h3 className="text-lg font-medium text-emerald-900 dark:text-emerald-100">
+								<h3 className="text-lg font-medium text-sky-900 dark:text-sky-100">
 									{t("projectPayments.summary")}
 								</h3>
 								<p className="text-sm text-slate-500">
@@ -112,7 +112,7 @@ export function ProjectPaymentsView({
 							</div>
 						</div>
 						<div className="text-left">
-							<p className="font-mono text-2xl font-bold text-emerald-700 dark:text-emerald-300">
+							<p className="font-mono text-2xl font-bold text-sky-700 dark:text-sky-300">
 								{data.overallProgress.toFixed(0)}%
 							</p>
 						</div>
@@ -120,7 +120,7 @@ export function ProjectPaymentsView({
 
 					<Progress
 						value={data.overallProgress}
-						className="mb-3 h-3 bg-emerald-100 dark:bg-emerald-900/40 [&>div]:bg-emerald-500"
+						className="mb-3 h-3 bg-sky-100 dark:bg-sky-900/40 [&>div]:bg-sky-500"
 					/>
 
 					<div className="grid grid-cols-3 gap-4">
@@ -136,7 +136,7 @@ export function ProjectPaymentsView({
 							<p className="text-xs text-slate-500">
 								{t("projectPayments.totalPaid")}
 							</p>
-							<p className="font-mono text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+							<p className="font-mono text-sm font-semibold text-sky-700 dark:text-sky-300">
 								{formatCurrency(Number(data.totalPaid))} ر.س
 							</p>
 						</div>
@@ -209,19 +209,19 @@ function TermCard({
 	const [isOpen, setIsOpen] = useState(false);
 
 	const statusColor = term.isComplete
-		? "border-emerald-200/50 bg-emerald-50/50 dark:border-emerald-800/30 dark:bg-emerald-950/20"
+		? "border-sky-200/50 bg-sky-50/50 dark:border-sky-800/30 dark:bg-sky-950/20"
 		: isNext
 			? "border-blue-200/50 bg-blue-50/50 dark:border-blue-800/30 dark:bg-blue-950/20"
 			: "border-slate-200/50 bg-slate-50/50 dark:border-slate-700/30 dark:bg-slate-900/20";
 
 	const progressColor = term.isComplete
-		? "[&>div]:bg-emerald-500"
+		? "[&>div]:bg-sky-500"
 		: isNext
 			? "[&>div]:bg-blue-500"
 			: "[&>div]:bg-slate-400";
 
 	const progressBg = term.isComplete
-		? "bg-emerald-100 dark:bg-emerald-900/40"
+		? "bg-sky-100 dark:bg-sky-900/40"
 		: isNext
 			? "bg-blue-100 dark:bg-blue-900/40"
 			: "bg-slate-200 dark:bg-slate-700/40";
@@ -233,7 +233,7 @@ function TermCard({
 			: Circle;
 
 	const statusIconColor = term.isComplete
-		? "text-emerald-500"
+		? "text-sky-500"
 		: isNext
 			? "text-blue-500"
 			: "text-slate-400";
@@ -252,7 +252,7 @@ function TermCard({
 							variant="outline"
 							className={`rounded-lg text-xs ${
 								term.isComplete
-									? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
+									? "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-300"
 									: isNext
 										? "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300"
 										: "border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
@@ -274,7 +274,7 @@ function TermCard({
 						)}
 					</div>
 					{term.isComplete && (
-						<span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+						<span className="text-xs font-medium text-sky-600 dark:text-sky-400">
 							{t("projectPayments.completed")}
 						</span>
 					)}
@@ -347,7 +347,7 @@ function TermCard({
 													)}
 												</span>
 											</div>
-											<span className="font-mono text-sm font-medium text-emerald-700 dark:text-emerald-300">
+											<span className="font-mono text-sm font-medium text-sky-700 dark:text-sky-300">
 												{formatCurrency(
 													Number(payment.amount),
 												)}{" "}

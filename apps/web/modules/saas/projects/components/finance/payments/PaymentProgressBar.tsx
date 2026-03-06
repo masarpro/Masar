@@ -31,13 +31,13 @@ export function PaymentProgressBar({
 				<span className="text-slate-600 dark:text-slate-400">
 					{t("projectPayments.collectionProgress")}
 				</span>
-				<span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+				<span className="font-mono font-semibold text-sky-600 dark:text-sky-400">
 					{collectionPercent}%
 				</span>
 			</div>
 			<Progress
 				value={collectionPercent}
-				className="h-2.5 bg-slate-100 dark:bg-slate-800 [&>div]:bg-emerald-500"
+				className="h-2.5 bg-slate-100 dark:bg-slate-800 [&>div]:bg-sky-500"
 			/>
 			<div className="mt-2 flex items-center justify-between text-xs text-slate-500">
 				<span>

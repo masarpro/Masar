@@ -34,12 +34,12 @@ export function KpiStrip({ project, financeSummary }: KpiStripProps) {
 			{/* Completion % */}
 			<div className={glassCard}>
 				<div className="flex items-center gap-2 mb-1">
-					<TrendingUp className="h-4 w-4 text-teal-500" />
+					<TrendingUp className="h-4 w-4 text-sky-500" />
 					<span className="text-[11px] text-muted-foreground">
 						{t("projects.commandCenter.completion")}
 					</span>
 				</div>
-				<p className="text-2xl font-bold text-teal-600 dark:text-teal-400">
+				<p className="text-2xl font-bold text-sky-600 dark:text-sky-400">
 					{Math.round(Number(project.progress))}%
 				</p>
 			</div>
@@ -77,12 +77,12 @@ export function KpiStrip({ project, financeSummary }: KpiStripProps) {
 			{/* Contract Value */}
 			<div className={glassCard}>
 				<div className="flex items-center gap-2 mb-1">
-					<Banknote className="h-4 w-4 text-emerald-500" />
+					<Banknote className="h-4 w-4 text-sky-500" />
 					<span className="text-[11px] text-muted-foreground">
 						{t("projects.commandCenter.budget")}
 					</span>
 				</div>
-				<p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+				<p className="text-2xl font-bold text-sky-600 dark:text-sky-400">
 					{formatCurrencyCompact(contractValue)}
 				</p>
 			</div>

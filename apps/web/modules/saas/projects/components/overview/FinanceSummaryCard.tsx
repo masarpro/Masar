@@ -64,7 +64,7 @@ export function FinanceSummaryCard({
 	return (
 		<div className={`${glassCard} p-4 flex flex-col h-full`}>
 			<div className="flex items-center gap-2 mb-3">
-				<Banknote className="h-4 w-4 text-emerald-500" />
+				<Banknote className="h-4 w-4 text-sky-500" />
 				<h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
 					{t("projects.commandCenter.financeSummary")}
 				</h3>

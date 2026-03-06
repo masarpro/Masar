@@ -139,7 +139,7 @@ export function PaymentsTable({
 									<TableCell className="text-sm">
 										{formatDate(payment.date)}
 									</TableCell>
-									<TableCell className="font-semibold text-emerald-700 dark:text-emerald-400">
+									<TableCell className="font-semibold text-sky-700 dark:text-sky-400">
 										{formatCurrency(payment.amount)}
 									</TableCell>
 									<TableCell>

@@ -129,7 +129,7 @@ export function GanttView({
 					<span>{t("timeline.status.planned")}</span>
 				</div>
 				<div className="flex items-center gap-1.5">
-					<div className="w-3 h-3 rounded-sm bg-teal-500/30 border border-teal-500" />
+					<div className="w-3 h-3 rounded-sm bg-sky-500/30 border border-sky-500" />
 					<span>{t("timeline.status.inProgress")}</span>
 				</div>
 				<div className="flex items-center gap-1.5">

@@ -281,7 +281,7 @@ export function CreatePaymentDialog({
 						<Button
 							type="submit"
 							disabled={createMutation.isPending}
-							className="bg-emerald-600 hover:bg-emerald-700"
+							className="bg-sky-600 hover:bg-sky-700"
 						>
 							{createMutation.isPending ? (
 								<Loader2 className="ml-1.5 h-4 w-4 animate-spin" />

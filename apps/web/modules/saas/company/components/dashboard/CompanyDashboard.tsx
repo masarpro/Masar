@@ -111,17 +111,17 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 				{/* Asset Value */}
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-							<Package className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
+							<Package className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 						</div>
-						<span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+						<span className="text-xs text-sky-600 dark:text-sky-400 font-medium">
 							{data.assets.total} {t("company.dashboard.totalAssets")}
 						</span>
 					</div>
 					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 						{t("company.dashboard.assetValue")}
 					</p>
-					<p className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
+					<p className="text-xl font-bold text-sky-700 dark:text-sky-300">
 						{formatCurrency(Number(data.assets.totalValue))}
 					</p>
 				</div>
@@ -215,11 +215,11 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 					{t("company.dashboard.assetOverview")}
 				</h3>
 				<div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-					<div className="text-center p-3 rounded-xl bg-emerald-50/80 dark:bg-emerald-900/20 border border-emerald-100/50 dark:border-emerald-800/30">
-						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-							<CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+					<div className="text-center p-3 rounded-xl bg-sky-50/80 dark:bg-sky-900/20 border border-sky-100/50 dark:border-sky-800/30">
+						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
+							<CheckCircle2 className="h-4 w-4 text-sky-600 dark:text-sky-400" />
 						</div>
-						<p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">{data.assets.available}</p>
+						<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">{data.assets.available}</p>
 						<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.dashboard.available")}</p>
 					</div>
 					<div className="text-center p-3 rounded-xl bg-blue-50/80 dark:bg-blue-900/20 border border-blue-100/50 dark:border-blue-800/30">

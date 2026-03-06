@@ -47,7 +47,7 @@ export function FreePaymentsSection({
 				<h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
 					{t("projectPayments.freePayments")}
 				</h3>
-				<span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+				<span className="text-sm font-medium text-sky-600 dark:text-sky-400">
 					{t("projectPayments.total")}: {formatCurrency(totalCollected)}
 				</span>
 			</div>

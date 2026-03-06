@@ -52,12 +52,12 @@ export function CashFlowCard() {
 						<linearGradient id="cashFlowGradient" x1="0" y1="0" x2="0" y2="1">
 							<stop
 								offset="0%"
-								stopColor="#14b8a6"
+								stopColor="#0ea5e9"
 								stopOpacity={0.4}
 							/>
 							<stop
 								offset="100%"
-								stopColor="#14b8a6"
+								stopColor="#0ea5e9"
 								stopOpacity={0}
 							/>
 						</linearGradient>
@@ -81,7 +81,7 @@ export function CashFlowCard() {
 						dataKey="amount"
 						type="natural"
 						fill="url(#cashFlowGradient)"
-						stroke="#14b8a6"
+						stroke="#0ea5e9"
 						strokeWidth={2}
 					/>
 				</AreaChart>

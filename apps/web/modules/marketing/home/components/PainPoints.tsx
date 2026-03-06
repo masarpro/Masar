@@ -99,7 +99,7 @@ export function PainPoints() {
 				{/* Solution */}
 				<div className="text-center mt-14">
 					<p className="text-[22px] font-bold">
-						<span className="shimmer-green">
+						<span className="shimmer-blue">
 							{t("painPoints.solution")}
 						</span>
 					</p>

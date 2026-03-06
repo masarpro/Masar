@@ -102,7 +102,7 @@ function getStatusBadge(status: ChangeOrderStatus, t: (key: string) => string) {
 		SUBMITTED:
 			"bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
 		APPROVED:
-			"bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+			"bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
 		REJECTED: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
 		IMPLEMENTED:
 			"bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
@@ -249,14 +249,14 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 
 					<Card className="p-4">
 						<div className="flex items-center gap-3">
-							<div className="rounded-xl bg-emerald-100 p-2.5 dark:bg-emerald-900/50">
-								<DollarSignIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+							<div className="rounded-xl bg-sky-100 p-2.5 dark:bg-sky-900/50">
+								<DollarSignIcon className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 							</div>
 							<div>
-								<p className="text-xs text-emerald-600 dark:text-emerald-400">
+								<p className="text-xs text-sky-600 dark:text-sky-400">
 									{t("changeOrders.stats.costImpact")}
 								</p>
-								<p className="text-lg font-semibold text-emerald-700 dark:text-emerald-300">
+								<p className="text-lg font-semibold text-sky-700 dark:text-sky-300">
 									{formatCurrency(stats.totalCostImpact)}
 								</p>
 							</div>
@@ -397,7 +397,7 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 											<span
 												className={
 													Number(co.costImpact) >= 0
-														? "text-emerald-600 dark:text-emerald-400"
+														? "text-sky-600 dark:text-sky-400"
 														: "text-red-600 dark:text-red-400"
 												}
 											>

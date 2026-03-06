@@ -153,7 +153,7 @@ export function ProjectUpdates({
 													value={Number(draftData.draft.progress)}
 													className="h-2 w-24"
 												/>
-												<span className="font-medium text-teal-600">
+												<span className="font-medium text-sky-600">
 													{Number(draftData.draft.progress)}%
 												</span>
 											</div>
@@ -299,7 +299,7 @@ export function ProjectUpdates({
 												value={Number(draftData?.draft.progress || 0)}
 												className="h-3"
 											/>
-											<span className="font-bold text-teal-600">
+											<span className="font-bold text-sky-600">
 												{Number(draftData?.draft.progress || 0)}%
 											</span>
 										</div>

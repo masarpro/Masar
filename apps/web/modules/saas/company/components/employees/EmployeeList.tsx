@@ -89,7 +89,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 		switch (status) {
 			case "ACTIVE":
 				return (
-					<Badge className="bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400 border-0 text-[10px] px-2 py-0.5">
+					<Badge className="bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 border-0 text-[10px] px-2 py-0.5">
 						{t("company.employees.statusActive")}
 					</Badge>
 				);
@@ -117,14 +117,14 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 				<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
 					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 						<div className="flex items-center justify-between mb-3">
-							<div className="p-2 rounded-lg bg-teal-100 dark:bg-teal-900/30">
-								<Users className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+							<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
+								<Users className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 							</div>
 						</div>
 						<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 							{t("company.employees.active")}
 						</p>
-						<p className="text-2xl font-bold text-teal-700 dark:text-teal-300">
+						<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">
 							{summary.totalActive}
 						</p>
 					</div>

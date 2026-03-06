@@ -103,7 +103,7 @@ export function ExecutionPhasesCard({
 	function getStatusDotColor(status: string): string {
 		switch (status) {
 			case "COMPLETED":
-				return "bg-emerald-500";
+				return "bg-sky-500";
 			case "IN_PROGRESS":
 				return "bg-blue-500";
 			case "DELAYED":
@@ -117,7 +117,7 @@ export function ExecutionPhasesCard({
 	function getBarColor(status: string): string {
 		switch (status) {
 			case "COMPLETED":
-				return "bg-emerald-500";
+				return "bg-sky-500";
 			case "IN_PROGRESS":
 				return "bg-blue-500";
 			case "DELAYED":
@@ -134,9 +134,9 @@ export function ExecutionPhasesCard({
 	> = {
 		ACTIVE: {
 			label: t("projects.commandCenter.active"),
-			bgClass: "bg-emerald-50 dark:bg-emerald-900/30",
-			textClass: "text-emerald-700 dark:text-emerald-400",
-			dotClass: "bg-emerald-500",
+			bgClass: "bg-sky-50 dark:bg-sky-900/30",
+			textClass: "text-sky-700 dark:text-sky-400",
+			dotClass: "bg-sky-500",
 		},
 		ON_HOLD: {
 			label: t("projects.commandCenter.atRisk"),
@@ -257,7 +257,7 @@ export function ExecutionPhasesCard({
 					{/* Legend */}
 					<div className="flex flex-1 flex-col gap-1.5">
 						<div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-							<span className="h-2 w-2 shrink-0 rounded-sm bg-emerald-500" />
+							<span className="h-2 w-2 shrink-0 rounded-sm bg-sky-500" />
 							{t("projects.commandCenter.completedLabel")}
 							<span
 								className="mr-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
@@ -347,7 +347,7 @@ export function ExecutionPhasesCard({
 			{/* Footer - Health Chips */}
 			<div className="flex flex-wrap gap-1.5 border-t border-slate-100 px-5 py-3 dark:border-slate-800">
 				{onTrackCount > 0 && (
-					<span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+					<span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-semibold text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">
 						<CheckCircle2 className="h-3 w-3" />
 						{onTrackCount} {t("projects.commandCenter.onTrack")}
 					</span>

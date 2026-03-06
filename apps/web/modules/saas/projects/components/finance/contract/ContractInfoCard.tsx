@@ -264,8 +264,8 @@ export function ContractInfoCard({
 									<div className="p-3 flex flex-wrap gap-3">
 										{clientPhone && (
 											<div className="flex items-center gap-2 text-sm">
-												<div className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-													<Phone className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+												<div className="w-6 h-6 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
+													<Phone className="h-3 w-3 text-sky-600 dark:text-sky-400" />
 												</div>
 												<span className="text-muted-foreground text-xs">{clientPhone}</span>
 											</div>

@@ -31,9 +31,9 @@ export function ZatcaBadge() {
 						className="w-[72px] h-[72px] rounded-[20px] flex items-center justify-center text-4xl shrink-0"
 						style={{
 							background:
-								"linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.06))",
-							border: "1px solid rgba(16,185,129,0.15)",
-							boxShadow: "0 0 30px rgba(16,185,129,0.08)",
+								"linear-gradient(135deg, rgba(14,165,233,0.1), rgba(6,182,212,0.06))",
+							border: "1px solid rgba(14,165,233,0.15)",
+							boxShadow: "0 0 30px rgba(14,165,233,0.08)",
 						}}
 					>
 						🏛️
@@ -57,12 +57,12 @@ export function ZatcaBadge() {
 
 					{/* Badge */}
 					<div
-						className="shrink-0 rounded-[14px] px-6 py-3 text-[#10B981] font-bold text-[13px]"
+						className="shrink-0 rounded-[14px] px-6 py-3 text-[#0ea5e9] font-bold text-[13px]"
 						style={{
 							background:
-								"linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.06))",
-							border: "1px solid rgba(16,185,129,0.2)",
-							boxShadow: "0 0 20px rgba(16,185,129,0.06)",
+								"linear-gradient(135deg, rgba(14,165,233,0.1), rgba(6,182,212,0.06))",
+							border: "1px solid rgba(14,165,233,0.2)",
+							boxShadow: "0 0 20px rgba(14,165,233,0.06)",
 						}}
 					>
 						{t("zatca.badge")}

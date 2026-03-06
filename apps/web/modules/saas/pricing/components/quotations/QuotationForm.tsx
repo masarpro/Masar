@@ -791,8 +791,8 @@ export function QuotationForm({
 					{/* Details Card */}
 					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
 						<div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
-							<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/40 dark:to-emerald-800/20 flex items-center justify-center">
-								<Calendar className="h-[15px] w-[15px] text-emerald-500" />
+							<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-sky-100 to-sky-50 dark:from-sky-900/40 dark:to-sky-800/20 flex items-center justify-center">
+								<Calendar className="h-[15px] w-[15px] text-sky-500" />
 							</div>
 							<span className="text-sm font-semibold text-foreground">{t("pricing.quotations.detailsMetadata")}</span>
 						</div>
@@ -849,10 +849,10 @@ export function QuotationForm({
 							</div>
 
 							{/* Project Link */}
-							<div className={`flex items-center justify-between px-4 py-3 rounded-xl border transition-all ${showProjectLink ? "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/40" : "bg-slate-50/50 dark:bg-slate-800/30 border-dashed border-slate-300 dark:border-slate-700"}`}>
+							<div className={`flex items-center justify-between px-4 py-3 rounded-xl border transition-all ${showProjectLink ? "bg-sky-50/50 dark:bg-sky-900/10 border-sky-200 dark:border-sky-800/40" : "bg-slate-50/50 dark:bg-slate-800/30 border-dashed border-slate-300 dark:border-slate-700"}`}>
 								<div className="flex items-center gap-2">
-									<FolderOpen className={`h-4 w-4 ${showProjectLink ? "text-emerald-500" : "text-muted-foreground"}`} />
-									<span className={`text-sm font-medium ${showProjectLink ? "text-emerald-700 dark:text-emerald-400" : "text-muted-foreground"}`}>{t("pricing.quotations.project")}</span>
+									<FolderOpen className={`h-4 w-4 ${showProjectLink ? "text-sky-500" : "text-muted-foreground"}`} />
+									<span className={`text-sm font-medium ${showProjectLink ? "text-sky-700 dark:text-sky-400" : "text-muted-foreground"}`}>{t("pricing.quotations.project")}</span>
 								</div>
 								<Switch checked={showProjectLink} onCheckedChange={(checked) => { setShowProjectLink(checked); if (!checked) setProjectId(undefined); }} disabled={!isEditable} />
 							</div>
@@ -873,7 +873,7 @@ export function QuotationForm({
 							{/* Currency + VAT badges */}
 							<div className="flex items-center gap-2 pt-1">
 								<Badge variant="secondary" className="text-xs font-medium">{currency}</Badge>
-								<div className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/40 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+								<div className="px-2.5 py-1 rounded-lg bg-sky-50 dark:bg-sky-900/30 border border-sky-200 dark:border-sky-800/40 text-xs font-bold text-sky-700 dark:text-sky-400">
 									{t("pricing.quotations.vatPercent")} {vatPercent}%
 								</div>
 							</div>
@@ -978,7 +978,7 @@ export function QuotationForm({
 										)}
 										{isColumnVisible("total") && (
 											<td className="p-2 text-center">
-												<div className={`px-2 py-1.5 rounded-[10px] text-sm font-bold font-mono ${(item.quantity * item.unitPrice) > 0 ? "bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/30 text-emerald-700 dark:text-emerald-400" : "text-muted-foreground"}`}>
+												<div className={`px-2 py-1.5 rounded-[10px] text-sm font-bold font-mono ${(item.quantity * item.unitPrice) > 0 ? "bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800/30 text-sky-700 dark:text-sky-400" : "text-muted-foreground"}`}>
 													{formatCurrency(item.quantity * item.unitPrice)}
 												</div>
 											</td>

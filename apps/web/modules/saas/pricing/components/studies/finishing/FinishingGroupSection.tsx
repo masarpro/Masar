@@ -38,10 +38,10 @@ interface FinishingGroupSectionProps {
 }
 
 const GROUP_COLORS: Record<string, string> = {
-	emerald: "border-emerald-500",
+	emerald: "border-sky-500",
 	amber: "border-amber-500",
 	blue: "border-blue-500",
-	teal: "border-teal-500",
+	teal: "border-sky-500",
 	cyan: "border-cyan-500",
 	gray: "border-gray-500",
 	orange: "border-orange-500",

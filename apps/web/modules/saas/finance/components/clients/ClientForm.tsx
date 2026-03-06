@@ -319,10 +319,10 @@ export function ClientForm({
 	return (
 		<form onSubmit={handleSubmit} className="pb-28 lg:pb-6 space-y-4">
 			{/* Header */}
-			<div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-l from-emerald-500/10 via-emerald-500/5 to-transparent border border-border/50">
+			<div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-l from-sky-500/10 via-sky-500/5 to-transparent border border-border/50">
 				<div className="flex items-center gap-3">
-					<div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-						<User className="h-5 w-5 text-emerald-500" />
+					<div className="w-10 h-10 rounded-xl bg-sky-500/10 flex items-center justify-center">
+						<User className="h-5 w-5 text-sky-500" />
 					</div>
 					<div>
 						<h1 className="text-lg font-bold">
@@ -559,13 +559,13 @@ export function ClientForm({
 						<button
 							type="submit"
 							disabled={isPending}
-							className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-foreground transition-all duration-200 disabled:opacity-50"
+							className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-foreground transition-all duration-200 disabled:opacity-50"
 						>
-							<div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+							<div className="w-8 h-8 rounded-lg bg-sky-500/20 flex items-center justify-center">
 								{isPending ? (
-									<Loader2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 animate-spin" />
+									<Loader2 className="h-4 w-4 text-sky-600 dark:text-sky-400 animate-spin" />
 								) : (
-									<Save className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+									<Save className="h-4 w-4 text-sky-600 dark:text-sky-400" />
 								)}
 							</div>
 							<span className="text-sm font-medium">
@@ -649,7 +649,7 @@ export function ClientForm({
 					<Button type="button" variant="outline" size="lg" className="rounded-xl flex-1" onClick={() => router.back()}>
 						{t("common.cancel")}
 					</Button>
-					<Button type="submit" size="lg" className="rounded-xl flex-1 bg-emerald-600 hover:bg-emerald-700" disabled={isPending}>
+					<Button type="submit" size="lg" className="rounded-xl flex-1 bg-sky-600 hover:bg-sky-700" disabled={isPending}>
 						{isPending ? (
 							<Loader2 className="h-4 w-4 me-2 animate-spin" />
 						) : (

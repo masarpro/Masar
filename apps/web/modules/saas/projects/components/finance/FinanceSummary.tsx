@@ -72,11 +72,11 @@ export function FinanceSummary({
 			title: t("finance.summary.remaining"),
 			value: remaining,
 			icon: Wallet,
-			bgColor: "bg-teal-50 dark:bg-teal-950/30",
-			iconBg: "bg-teal-100 dark:bg-teal-900/50",
-			iconColor: "text-teal-600 dark:text-teal-400",
-			textColor: "text-teal-700 dark:text-teal-300",
-			labelColor: "text-teal-600 dark:text-teal-400",
+			bgColor: "bg-sky-50 dark:bg-sky-950/30",
+			iconBg: "bg-sky-100 dark:bg-sky-900/50",
+			iconColor: "text-sky-600 dark:text-sky-400",
+			textColor: "text-sky-700 dark:text-sky-300",
+			labelColor: "text-sky-600 dark:text-sky-400",
 		},
 		{
 			title: t("finance.summary.claimsPaid"),
@@ -113,7 +113,7 @@ export function FinanceSummary({
 								adjustedContractValue !== undefined &&
 								adjustedContractValue > 0 &&
 								changeOrdersImpact !== 0 && (
-									<p className="mt-0.5 truncate text-xs text-teal-600 dark:text-teal-400">
+									<p className="mt-0.5 truncate text-xs text-sky-600 dark:text-sky-400">
 										{t("projects.contract.summary.adjustedValue")}:{" "}
 										{formatCurrency(adjustedContractValue)}
 									</p>

@@ -43,7 +43,7 @@ export function BuiltForConstruction() {
 				className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-[50%] pointer-events-none"
 				style={{
 					background:
-						"radial-gradient(ellipse, rgba(16,185,129,0.06), transparent 70%)",
+						"radial-gradient(ellipse, rgba(14,165,233,0.06), transparent 70%)",
 					filter: "blur(100px)",
 					opacity: "var(--lp-effects-opacity)",
 				}}
@@ -56,16 +56,16 @@ export function BuiltForConstruction() {
 						className="landing-section-label"
 						style={{
 							background:
-								"linear-gradient(135deg, rgba(16,185,129,0.06), rgba(6,182,212,0.04))",
-							border: "1px solid rgba(16,185,129,0.12)",
-							color: "#10B981",
+								"linear-gradient(135deg, rgba(14,165,233,0.06), rgba(6,182,212,0.04))",
+							border: "1px solid rgba(14,165,233,0.12)",
+							color: "#0ea5e9",
 						}}
 					>
 						<span
 							className="landing-dot"
 							style={{
 								background:
-									"linear-gradient(135deg, #10B981, #06B6D4)",
+									"linear-gradient(135deg, #0ea5e9, #06B6D4)",
 							}}
 						/>
 						{t("builtForConstruction.badge")}
@@ -92,7 +92,7 @@ export function BuiltForConstruction() {
 							className="absolute top-[28px] start-[10%] end-[10%] h-[2px]"
 							style={{
 								background:
-									"linear-gradient(to left, rgba(16,185,129,0.5), rgba(6,182,212,0.3), rgba(16,185,129,0.5))",
+									"linear-gradient(to left, rgba(14,165,233,0.5), rgba(6,182,212,0.3), rgba(14,165,233,0.5))",
 							}}
 						/>
 
@@ -106,23 +106,23 @@ export function BuiltForConstruction() {
 									{/* Number */}
 									<span
 										className="text-[13px] font-bold mb-2"
-										style={{ color: "#10B981" }}
+										style={{ color: "#0ea5e9" }}
 									>
 										{stage.num}
 									</span>
 
 									{/* Icon circle */}
 									<div
-										className="w-14 h-14 rounded-full flex items-center justify-center mb-3 transition-shadow duration-300 group-hover:shadow-[0_0_24px_rgba(16,185,129,0.3)]"
+										className="w-14 h-14 rounded-full flex items-center justify-center mb-3 transition-shadow duration-300 group-hover:shadow-[0_0_24px_rgba(14,165,233,0.3)]"
 										style={{
 											background:
-												"rgba(16,185,129,0.10)",
-											border: "2px solid rgba(16,185,129,0.25)",
+												"rgba(14,165,233,0.10)",
+											border: "2px solid rgba(14,165,233,0.25)",
 										}}
 									>
 										<Icon
 											size={26}
-											color="#10B981"
+											color="#0ea5e9"
 											strokeWidth={1.8}
 										/>
 									</div>
@@ -163,7 +163,7 @@ export function BuiltForConstruction() {
 						className="absolute end-[27px] top-[28px] bottom-[28px] w-[2px]"
 						style={{
 							background:
-								"linear-gradient(to bottom, rgba(16,185,129,0.5), rgba(6,182,212,0.3), rgba(16,185,129,0.5))",
+								"linear-gradient(to bottom, rgba(14,165,233,0.5), rgba(6,182,212,0.3), rgba(14,165,233,0.5))",
 						}}
 					/>
 
@@ -180,7 +180,7 @@ export function BuiltForConstruction() {
 										<span
 											className="text-[12px] font-bold"
 											style={{
-												color: "#10B981",
+												color: "#0ea5e9",
 											}}
 										>
 											{stage.num}
@@ -212,13 +212,13 @@ export function BuiltForConstruction() {
 										className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
 										style={{
 											background:
-												"rgba(16,185,129,0.10)",
-											border: "2px solid rgba(16,185,129,0.25)",
+												"rgba(14,165,233,0.10)",
+											border: "2px solid rgba(14,165,233,0.25)",
 										}}
 									>
 										<Icon
 											size={24}
-											color="#10B981"
+											color="#0ea5e9"
 											strokeWidth={1.8}
 										/>
 									</div>
@@ -231,7 +231,7 @@ export function BuiltForConstruction() {
 				{/* Flow text */}
 				<p
 					className="text-center text-[15px] mt-12 mb-16 max-w-[600px] mx-auto"
-					style={{ color: "rgba(16,185,129,0.7)" }}
+					style={{ color: "rgba(14,165,233,0.7)" }}
 				>
 					{t("builtForConstruction.flowText")}
 				</p>
@@ -243,9 +243,9 @@ export function BuiltForConstruction() {
 						className="landing-glow-card md:order-1"
 						style={{
 							background:
-								"linear-gradient(135deg, rgba(16,185,129,0.25), rgba(6,182,212,0.12), rgba(16,185,129,0.25))",
+								"linear-gradient(135deg, rgba(14,165,233,0.25), rgba(6,182,212,0.12), rgba(14,165,233,0.25))",
 							boxShadow:
-								"0 0 30px rgba(16,185,129,0.08)",
+								"0 0 30px rgba(14,165,233,0.08)",
 						}}
 					>
 						<div className="landing-glow-card-inner">
@@ -265,7 +265,7 @@ export function BuiltForConstruction() {
 									>
 										<Check
 											size={18}
-											color="#10B981"
+											color="#0ea5e9"
 											className="mt-0.5 shrink-0"
 										/>
 										<span

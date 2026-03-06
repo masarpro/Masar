@@ -154,19 +154,19 @@ export function CompanyReports({ organizationId }: CompanyReportsProps) {
 			{/* Workforce Summary */}
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-5">
 				<div className="flex items-center gap-3 mb-5">
-					<div className="p-2 rounded-lg bg-teal-100 dark:bg-teal-900/30">
-						<Users className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+					<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
+						<Users className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 					</div>
 					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
 						{t("company.reports.workforceSummary")}
 					</h3>
 				</div>
 				<div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-					<div className="text-center p-4 rounded-xl bg-teal-50/80 dark:bg-teal-900/20 border border-teal-100/50 dark:border-teal-800/30">
-						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
-							<CheckCircle2 className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+					<div className="text-center p-4 rounded-xl bg-sky-50/80 dark:bg-sky-900/20 border border-sky-100/50 dark:border-sky-800/30">
+						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
+							<CheckCircle2 className="h-4 w-4 text-sky-600 dark:text-sky-400" />
 						</div>
-						<p className="text-2xl font-bold text-teal-700 dark:text-teal-300">{dashboard.employees.totalActive}</p>
+						<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">{dashboard.employees.totalActive}</p>
 						<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.employees.active")}</p>
 					</div>
 					<div className="text-center p-4 rounded-xl bg-amber-50/80 dark:bg-amber-900/20 border border-amber-100/50 dark:border-amber-800/30">
@@ -196,19 +196,19 @@ export function CompanyReports({ organizationId }: CompanyReportsProps) {
 			{/* Asset Overview */}
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-5">
 				<div className="flex items-center gap-3 mb-5">
-					<div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-						<Package className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+					<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
+						<Package className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 					</div>
 					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
 						{t("company.reports.assetOverview")}
 					</h3>
 				</div>
 				<div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-					<div className="text-center p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-900/20 border border-emerald-100/50 dark:border-emerald-800/30">
-						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-							<CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+					<div className="text-center p-4 rounded-xl bg-sky-50/80 dark:bg-sky-900/20 border border-sky-100/50 dark:border-sky-800/30">
+						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
+							<CheckCircle2 className="h-4 w-4 text-sky-600 dark:text-sky-400" />
 						</div>
-						<p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">{dashboard.assets.available}</p>
+						<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">{dashboard.assets.available}</p>
 						<p className="text-xs text-slate-500 dark:text-slate-400">{t("company.dashboard.available")}</p>
 					</div>
 					<div className="text-center p-4 rounded-xl bg-blue-50/80 dark:bg-blue-900/20 border border-blue-100/50 dark:border-blue-800/30">

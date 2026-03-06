@@ -32,7 +32,7 @@ const chartConfig: ChartConfig = {
 	},
 	actual: {
 		label: "Actual",
-		color: "#14b8a6",
+		color: "#0ea5e9",
 	},
 };
 
@@ -64,7 +64,7 @@ export function ProjectTimelineChart({
 						</span>
 					</div>
 					<div className="flex items-center gap-1.5">
-						<div className="h-2.5 w-2.5 rounded-full bg-teal-500" />
+						<div className="h-2.5 w-2.5 rounded-full bg-sky-500" />
 						<span className="text-[10px] text-slate-500 dark:text-slate-400">
 							{t("projects.commandCenter.actualProgress")}
 						</span>
@@ -85,8 +85,8 @@ export function ProjectTimelineChart({
 								<stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
 							</linearGradient>
 							<linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
-								<stop offset="0%" stopColor="#14b8a6" stopOpacity={0.3} />
-								<stop offset="100%" stopColor="#14b8a6" stopOpacity={0} />
+								<stop offset="0%" stopColor="#0ea5e9" stopOpacity={0.3} />
+								<stop offset="100%" stopColor="#0ea5e9" stopOpacity={0} />
 							</linearGradient>
 						</defs>
 						<CartesianGrid vertical={false} strokeDasharray="3 3" />
@@ -126,7 +126,7 @@ export function ProjectTimelineChart({
 							dataKey="actual"
 							type="monotone"
 							fill="url(#actualGradient)"
-							stroke="#14b8a6"
+							stroke="#0ea5e9"
 							strokeWidth={2}
 							connectNulls
 						/>

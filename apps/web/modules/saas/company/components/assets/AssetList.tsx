@@ -70,7 +70,7 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 
 	const getStatusBadge = (status: string) => {
 		const styles: Record<string, string> = {
-			AVAILABLE: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400",
+			AVAILABLE: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
 			IN_USE: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
 			MAINTENANCE: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
 			RETIRED: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
@@ -89,14 +89,14 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 				<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
 					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 						<div className="flex items-center justify-between mb-3">
-							<div className="p-2 rounded-lg bg-teal-100 dark:bg-teal-900/30">
-								<CheckCircle2 className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+							<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
+								<CheckCircle2 className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 							</div>
 						</div>
 						<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 							{t("company.assets.available")}
 						</p>
-						<p className="text-2xl font-bold text-teal-700 dark:text-teal-300">
+						<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">
 							{summary.available}
 						</p>
 					</div>

@@ -112,7 +112,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 
 	const getStatusStyle = (status: string) => {
 		const styles: Record<string, string> = {
-			AVAILABLE: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400",
+			AVAILABLE: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
 			IN_USE: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
 			MAINTENANCE: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
 			RETIRED: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
@@ -211,8 +211,8 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 			{/* Financial */}
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
 				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-					<div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-						<Banknote className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+					<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
+						<Banknote className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 					</div>
 					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
 						{t("company.assets.financialInfo")}

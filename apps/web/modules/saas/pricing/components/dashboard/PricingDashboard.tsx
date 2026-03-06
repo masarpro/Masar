@@ -82,8 +82,8 @@ export function PricingDashboard({
 				<Card className="rounded-2xl">
 					<CardContent className="p-4">
 						<div className="flex items-center gap-3">
-							<div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-								<TrendingUp className="h-5 w-5 text-emerald-500" />
+							<div className="w-10 h-10 rounded-xl bg-sky-500/10 flex items-center justify-center">
+								<TrendingUp className="h-5 w-5 text-sky-500" />
 							</div>
 							<div>
 								<p className="text-2xl font-bold">{acceptanceRate}%</p>

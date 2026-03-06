@@ -385,7 +385,7 @@ export function CreditNoteForm({
 				{activeItems.length > 0 && (
 					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] p-5">
 						<div className="flex items-center gap-3 mb-4">
-							<div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-sm">
+							<div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center shadow-sm">
 								<Calculator className="h-4.5 w-4.5 text-white" />
 							</div>
 							<h3 className="font-semibold text-slate-900 dark:text-slate-100">

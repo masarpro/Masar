@@ -48,7 +48,7 @@ export function ProjectContextToolbar({
 					className={cn(
 						"gap-1.5 rounded-lg text-sm",
 						action.variant === "primary" &&
-							"bg-teal-600 hover:bg-teal-700 dark:bg-teal-600 dark:hover:bg-teal-700",
+							"bg-sky-600 hover:bg-sky-700 dark:bg-sky-600 dark:hover:bg-sky-700",
 					)}
 				>
 					<Link href={`${basePath}/${action.href}`}>

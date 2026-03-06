@@ -49,7 +49,7 @@ export function SubscriptionBanner({
 
 	const styles = {
 		past_due: "border-destructive/20 bg-destructive/10 text-destructive",
-		trial_ending: "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+		trial_ending: "border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-400",
 		free_plan: "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400",
 	};
 

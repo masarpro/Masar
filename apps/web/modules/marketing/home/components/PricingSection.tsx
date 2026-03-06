@@ -86,7 +86,7 @@ export function PricingSection() {
 												: "none",
 									}}
 								>
-									<span className="text-[#10B981]">
+									<span className="text-[#0ea5e9]">
 										✓
 									</span>
 									{t(
@@ -117,9 +117,9 @@ export function PricingSection() {
 							className="absolute -top-3.5 start-6 px-5 py-1.5 rounded-full text-xs font-bold text-white"
 							style={{
 								background:
-									"linear-gradient(135deg, #10B981, #06B6D4)",
+									"linear-gradient(135deg, #0ea5e9, #06B6D4)",
 								boxShadow:
-									"0 4px 20px rgba(16,185,129,0.3), 0 0 40px rgba(6,182,212,0.1)",
+									"0 4px 20px rgba(14,165,233,0.3), 0 0 40px rgba(6,182,212,0.1)",
 								letterSpacing: "0.5px",
 							}}
 						>
@@ -140,7 +140,7 @@ export function PricingSection() {
 						</p>
 						<div className="mb-7 flex items-baseline gap-1 overflow-hidden">
 							<span
-								className="text-[clamp(28px,5vw,36px)] font-black shimmer-green"
+								className="text-[clamp(28px,5vw,36px)] font-black shimmer-blue"
 								style={{
 									fontFamily:
 										"'Space Grotesk', sans-serif",
@@ -165,7 +165,7 @@ export function PricingSection() {
 									<span
 										style={{
 											background:
-												"linear-gradient(135deg, #10B981, #06B6D4)",
+												"linear-gradient(135deg, #0ea5e9, #06B6D4)",
 											WebkitBackgroundClip: "text",
 											WebkitTextFillColor:
 												"transparent",

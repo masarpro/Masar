@@ -207,7 +207,7 @@ export function ProjectContractView({
 						</Button>
 						<Button
 							onClick={() => setIsEditing(true)}
-							className="rounded-xl bg-teal-600 px-6 text-white hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-600"
+							className="rounded-xl bg-sky-600 px-6 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600"
 						>
 							<Pencil className="ml-2 h-4 w-4" />
 							{t("projects.contract.editContract")}
@@ -227,7 +227,7 @@ export function ProjectContractView({
 						<Button
 							onClick={handleSave}
 							disabled={isSaving}
-							className="rounded-xl bg-teal-600 px-6 text-white hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-600"
+							className="rounded-xl bg-sky-600 px-6 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600"
 						>
 							{isSaving ? (
 								<>
@@ -320,14 +320,14 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 	return (
 		<div className="space-y-6">
 			{/* Contract Details */}
-			<div className="overflow-hidden rounded-2xl border border-teal-200/50 bg-teal-50/50 dark:border-teal-800/30 dark:bg-teal-950/20">
-				<div className="border-b border-teal-200/50 p-5 dark:border-teal-800/30">
+			<div className="overflow-hidden rounded-2xl border border-sky-200/50 bg-sky-50/50 dark:border-sky-800/30 dark:bg-sky-950/20">
+				<div className="border-b border-sky-200/50 p-5 dark:border-sky-800/30">
 					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-medium text-teal-900 dark:text-teal-100">
+						<h3 className="text-lg font-medium text-sky-900 dark:text-sky-100">
 							{t("projects.createProject.contractInfo")}
 						</h3>
 						{contract.contractNo && (
-							<span className="rounded-lg border border-teal-200 bg-teal-50 px-3 py-1 font-mono text-sm text-teal-700 dark:border-teal-800 dark:bg-teal-950/40 dark:text-teal-300">
+							<span className="rounded-lg border border-sky-200 bg-sky-50 px-3 py-1 font-mono text-sm text-sky-700 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-300">
 								{contract.contractNo}
 							</span>
 						)}
@@ -400,7 +400,7 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 				</div>
 
 				{contract.scopeOfWork && (
-					<div className="border-t border-teal-200/50 p-5 dark:border-teal-800/30">
+					<div className="border-t border-sky-200/50 p-5 dark:border-sky-800/30">
 						<p className="mb-1 text-xs text-slate-500">
 							{t("projects.createProject.scopeOfWork")}
 						</p>

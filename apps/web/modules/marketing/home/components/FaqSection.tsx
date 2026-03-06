@@ -33,7 +33,7 @@ function FAQItem({
 					className="w-8 h-8 rounded-[10px] flex items-center justify-center text-lg shrink-0 transition-all duration-[400ms]"
 					style={{
 						background: isOpen
-							? "linear-gradient(135deg, #10B981, #06B6D4)"
+							? "linear-gradient(135deg, #0ea5e9, #06B6D4)"
 							: "var(--lp-card-bg)",
 						color: isOpen
 							? "white"

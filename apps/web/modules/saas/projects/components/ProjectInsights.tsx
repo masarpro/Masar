@@ -220,8 +220,8 @@ export function ProjectInsights({
 					</div>
 				) : (
 					<div className="flex flex-col items-center justify-center py-12 text-center">
-						<div className="mb-4 rounded-2xl bg-teal-100 p-4 dark:bg-teal-900/30">
-							<Check className="h-8 w-8 text-teal-600 dark:text-teal-400" />
+						<div className="mb-4 rounded-2xl bg-sky-100 p-4 dark:bg-sky-900/30">
+							<Check className="h-8 w-8 text-sky-600 dark:text-sky-400" />
 						</div>
 						<p className="text-slate-600 dark:text-slate-400">
 							لا توجد تنبيهات نشطة
@@ -243,7 +243,7 @@ export function ProjectInsights({
 								key={alert.id}
 								className="flex items-center gap-3 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-500 dark:bg-slate-800/30"
 							>
-								<Check className="h-4 w-4 text-teal-500" />
+								<Check className="h-4 w-4 text-sky-500" />
 								<span>{alert.title}</span>
 								<span className="ms-auto text-xs">
 									{alert.acknowledgedAt

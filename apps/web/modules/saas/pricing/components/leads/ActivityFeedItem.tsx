@@ -34,7 +34,7 @@ const TYPE_CONFIG: Record<string, { icon: typeof MessageSquare; color: string }>
 	COST_STUDY_UNLINKED: { icon: Unlink, color: "text-red-500 bg-red-100 dark:bg-red-950/40" },
 	QUOTATION_LINKED: { icon: Link2, color: "text-green-500 bg-green-100 dark:bg-green-950/40" },
 	QUOTATION_UNLINKED: { icon: Unlink, color: "text-red-500 bg-red-100 dark:bg-red-950/40" },
-	CREATED: { icon: UserCircle, color: "text-emerald-500 bg-emerald-100 dark:bg-emerald-950/40" },
+	CREATED: { icon: UserCircle, color: "text-sky-500 bg-sky-100 dark:bg-sky-950/40" },
 };
 
 export function ActivityFeedItem({ activity }: ActivityFeedItemProps) {

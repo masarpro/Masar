@@ -41,7 +41,7 @@ const stats = [
 		value: 500,
 		suffix: "+",
 		icon: "⚡",
-		color: "#10B981",
+		color: "#0ea5e9",
 		labelKey: "stats.endpoints",
 	},
 	{

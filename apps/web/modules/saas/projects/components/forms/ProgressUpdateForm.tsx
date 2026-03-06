@@ -65,7 +65,7 @@ export function ProgressUpdateForm({
 			<div className="space-y-4">
 				<div className="flex items-center justify-between">
 					<Label>{t("projects.field.progressLabel")}</Label>
-					<span className="text-2xl font-bold text-teal-600 dark:text-teal-400">
+					<span className="text-2xl font-bold text-sky-600 dark:text-sky-400">
 						{progress}%
 					</span>
 				</div>

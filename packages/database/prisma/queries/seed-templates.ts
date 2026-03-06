@@ -559,10 +559,10 @@ function getAdditionalInvoiceTemplates(): AdditionalTemplate[] {
 		{
 			name: "الاحترافي الجريء",
 			description:
-				"تصميم جريء واحترافي مع هيدر داكن ولمسات خضراء — مثالي لشركات المقاولات",
+				"تصميم جريء واحترافي مع هيدر داكن ولمسات زرقاء — مثالي لشركات المقاولات",
 			settings: {
 				backgroundColor: "#ffffff",
-				primaryColor: "#10b981",
+				primaryColor: "#0ea5e9",
 				secondaryColor: "#0f172a",
 				fontFamily: "Cairo",
 				fontSize: "14px",
@@ -574,16 +574,16 @@ function getAdditionalInvoiceTemplates(): AdditionalTemplate[] {
 				currency: "SAR",
 			},
 			elements: [
-				{ id: "el_bold_header", type: "header", enabled: true, order: 1, settings: { showLogo: true, showCompanyName: true, showAddress: true, showBilingualName: true, showTaxNumber: true, showPhone: true, layout: "dark-block", blockBackground: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", blockTextColor: "#ffffff", titleSize: "xlarge", subtitleText: "TAX INVOICE", subtitleColor: "#10b981", showInvoiceNumberBadge: true, badgeBackground: "rgba(16,185,129,0.15)", badgeColor: "#10b981" } },
-				{ id: "el_bold_metabar", type: "text", enabled: true, order: 2, settings: { layout: "info-bar", background: "#10b981", textColor: "#ffffff", fontSize: "9px", fields: ["invoiceType", "issueDate", "dueDate"], dividerStyle: "vertical-line", dividerColor: "rgba(255,255,255,0.3)", padding: "8px 28px" } },
-				{ id: "el_bold_client", type: "clientInfo", enabled: true, order: 3, settings: { showTaxNumber: true, showEmail: true, showPhone: true, showCompanyName: true, showAddress: true, layout: "highlight-card", background: "#f0fdf4", borderColor: "#bbf7d0", borderRadius: "8px", labelStyle: "green-dot", labelColor: "#10b981" } },
-				{ id: "el_bold_items", type: "itemsTable", enabled: true, order: 4, settings: { showRowNumbers: true, showQuantity: true, showUnit: true, showUnitPrice: true, showTotal: true, alternatingColors: false, headerBackground: "#0f172a", headerTextColor: "#ffffff", rowNumberColor: "#10b981", rowBorderColor: "#f1f5f9", headerRowNumberColor: "#10b981", borderRadius: "6px" } },
-				{ id: "el_bold_totals", type: "totals", enabled: true, order: 5, settings: { showDiscount: true, showVat: true, showAmountInWords: false, highlightTotal: true, layout: "card", background: "#f8fafc", borderColor: "#e2e8f0", borderRadius: "10px", totalDivider: "gradient", totalDividerGradient: "linear-gradient(90deg, #10b981, #059669)", totalFontSize: "13px", totalColor: "#10b981", showPaidAmount: true, showRemainingAmount: true, paidColor: "#16a34a", remainingColor: "#ef4444", width: "220px" } },
+				{ id: "el_bold_header", type: "header", enabled: true, order: 1, settings: { showLogo: true, showCompanyName: true, showAddress: true, showBilingualName: true, showTaxNumber: true, showPhone: true, layout: "dark-block", blockBackground: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", blockTextColor: "#ffffff", titleSize: "xlarge", subtitleText: "TAX INVOICE", subtitleColor: "#0ea5e9", showInvoiceNumberBadge: true, badgeBackground: "rgba(14,165,233,0.15)", badgeColor: "#0ea5e9" } },
+				{ id: "el_bold_metabar", type: "text", enabled: true, order: 2, settings: { layout: "info-bar", background: "#0ea5e9", textColor: "#ffffff", fontSize: "9px", fields: ["invoiceType", "issueDate", "dueDate"], dividerStyle: "vertical-line", dividerColor: "rgba(255,255,255,0.3)", padding: "8px 28px" } },
+				{ id: "el_bold_client", type: "clientInfo", enabled: true, order: 3, settings: { showTaxNumber: true, showEmail: true, showPhone: true, showCompanyName: true, showAddress: true, layout: "highlight-card", background: "#f0f9ff", borderColor: "#bae6fd", borderRadius: "8px", labelStyle: "green-dot", labelColor: "#0ea5e9" } },
+				{ id: "el_bold_items", type: "itemsTable", enabled: true, order: 4, settings: { showRowNumbers: true, showQuantity: true, showUnit: true, showUnitPrice: true, showTotal: true, alternatingColors: false, headerBackground: "#0f172a", headerTextColor: "#ffffff", rowNumberColor: "#0ea5e9", rowBorderColor: "#f1f5f9", headerRowNumberColor: "#0ea5e9", borderRadius: "6px" } },
+				{ id: "el_bold_totals", type: "totals", enabled: true, order: 5, settings: { showDiscount: true, showVat: true, showAmountInWords: false, highlightTotal: true, layout: "card", background: "#f8fafc", borderColor: "#e2e8f0", borderRadius: "10px", totalDivider: "gradient", totalDividerGradient: "linear-gradient(90deg, #0ea5e9, #0284c7)", totalFontSize: "13px", totalColor: "#0ea5e9", showPaidAmount: true, showRemainingAmount: true, paidColor: "#16a34a", remainingColor: "#ef4444", width: "220px" } },
 				{ id: "el_bold_bank", type: "bankDetails", enabled: true, order: 6, settings: { showBankName: true, showIban: true, showAccountName: false, layout: "inline", fontSize: "8px" } },
 				{ id: "el_bold_qr", type: "qrCode", enabled: true, order: 7, settings: { size: "medium", showZatcaCompliance: true, borderRadius: "10px", borderColor: "#e2e8f0", background: "#f8fafc", position: "left" } },
 				{ id: "el_bold_terms", type: "terms", enabled: true, order: 8, settings: { showPaymentTerms: true, showNotes: true, layout: "card", background: "#f8fafc", borderRadius: "6px" } },
 				{ id: "el_bold_signature", type: "signature", enabled: true, order: 9, settings: { showDate: false, showStampArea: true, twoColumns: false, lineColor: "#0f172a", lineWidth: "2px", labelAr: "التوقيع والختم", labelEn: "Authorized Signature", showBilingualLabel: true } },
-				{ id: "el_bold_footer", type: "footer", enabled: true, order: 10, settings: { showThankYouMessage: false, showYear: false, showCompanyInfo: true, showPageNumber: true, layout: "dark-bar", background: "#0f172a", textColor: "#64748b", pageNumberColor: "#10b981" } },
+				{ id: "el_bold_footer", type: "footer", enabled: true, order: 10, settings: { showThankYouMessage: false, showYear: false, showCompanyInfo: true, showPageNumber: true, layout: "dark-bar", background: "#0f172a", textColor: "#64748b", pageNumberColor: "#0ea5e9" } },
 			],
 		},
 	];

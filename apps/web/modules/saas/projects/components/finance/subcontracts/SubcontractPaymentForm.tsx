@@ -228,10 +228,10 @@ export function SubcontractPaymentForm({
 										</p>
 									</div>
 									<div>
-										<p className="text-emerald-500">
+										<p className="text-sky-500">
 											{t("subcontracts.payment.alreadyPaid")}
 										</p>
-										<p className="font-semibold text-emerald-700 dark:text-emerald-300">
+										<p className="font-semibold text-sky-700 dark:text-sky-300">
 											{formatCurrency(
 												selectedTerm.paidAmount,
 											)}

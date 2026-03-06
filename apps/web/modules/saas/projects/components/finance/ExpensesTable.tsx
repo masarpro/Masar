@@ -88,7 +88,7 @@ function getCategoryBadge(
 		},
 		SUBCONTRACTOR: {
 			className:
-				"bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400",
+				"bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
 			label: t("finance.category.SUBCONTRACTOR"),
 		},
 		TRANSPORT: {
@@ -108,7 +108,7 @@ function getCategoryBadge(
 		<div className="flex items-center gap-1.5">
 			<Badge className={`border-0 ${config.className}`}>{config.label}</Badge>
 			{_type === "subcontract_payment" && (
-				<Badge className="border-0 bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400 px-1.5">
+				<Badge className="border-0 bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 px-1.5">
 					<Hammer className="h-3 w-3" />
 				</Badge>
 			)}

@@ -28,7 +28,7 @@ export function OnboardingFloatingButton() {
 				onClick={openModal}
 				aria-label={t("onboarding.modal.setupOrg")}
 				className={cn(
-					"flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95",
+					"flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-sky-600 text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95",
 					showReminder && "animate-bounce",
 				)}
 			>

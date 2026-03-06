@@ -58,7 +58,7 @@ function getTypeBadge(
 ) {
 	if (type === "payment") {
 		return (
-			<Badge className="border-0 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+			<Badge className="border-0 bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">
 				<Banknote className="ml-1 h-3 w-3" />
 				{t("paymentsHub.typePayment")}
 			</Badge>
@@ -110,7 +110,7 @@ function getStatusBadge(
 		},
 		APPROVED: {
 			className:
-				"bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400",
+				"bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
 			label: t("finance.status.APPROVED"),
 		},
 		PAID: {

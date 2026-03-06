@@ -67,21 +67,21 @@ export function FinanceStatsCards({ stats }: FinanceStatsCardsProps) {
 				</div>
 			</div>
 
-			<div className="rounded-2xl bg-teal-50 dark:bg-teal-950/30 p-5">
+			<div className="rounded-2xl bg-sky-50 dark:bg-sky-950/30 p-5">
 				<div className="flex items-center justify-between">
 					<div>
-						<p className="text-xs font-medium text-teal-600 dark:text-teal-400 uppercase tracking-wide">
+						<p className="text-xs font-medium text-sky-600 dark:text-sky-400 uppercase tracking-wide">
 							{t("finance.stats.clients")}
 						</p>
-						<p className="text-3xl font-semibold mt-2 text-teal-700 dark:text-teal-300">
+						<p className="text-3xl font-semibold mt-2 text-sky-700 dark:text-sky-300">
 							{stats.clients.total}
 						</p>
-						<p className="text-sm text-teal-600/70 mt-1">
+						<p className="text-sm text-sky-600/70 mt-1">
 							{t("finance.stats.activeClients")}
 						</p>
 					</div>
-					<div className="p-3 rounded-2xl bg-teal-200/50 dark:bg-teal-800/30">
-						<Users className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+					<div className="p-3 rounded-2xl bg-sky-200/50 dark:bg-sky-800/30">
+						<Users className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 					</div>
 				</div>
 			</div>

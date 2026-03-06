@@ -19,7 +19,7 @@ interface AssetsAnalyticsCardProps {
 }
 
 const COLORS = {
-	available: "#10b981",
+	available: "#0ea5e9",
 	inUse: "#3b82f6",
 	maintenance: "#f97316",
 	retired: "#64748b",

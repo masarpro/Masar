@@ -76,8 +76,8 @@ export function FinanceOverviewPanel({ stats }: FinanceOverviewPanelProps) {
 				{/* Cash Balance */}
 				<div className="rounded-xl bg-card/60 p-4 border border-border/50">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-							<Wallet className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
+							<Wallet className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 						</div>
 						{mockBalances.cashTrend && (
 							<div
@@ -179,17 +179,17 @@ export function FinanceOverviewPanel({ stats }: FinanceOverviewPanelProps) {
 			{/* Row 2 - Small Stats */}
 			<div className="grid grid-cols-3 gap-3">
 				{/* Invoices */}
-				<div className="rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 p-4 border border-emerald-100/50 dark:border-emerald-900/50">
+				<div className="rounded-xl bg-sky-50/80 dark:bg-sky-950/30 p-4 border border-sky-100/50 dark:border-sky-900/50">
 					<div className="flex items-center gap-2 mb-2">
-						<Receipt className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-						<span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+						<Receipt className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+						<span className="text-xs font-medium text-sky-600 dark:text-sky-400">
 							{t("finance.stats.invoices")}
 						</span>
 					</div>
-					<p className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
+					<p className="text-xl font-bold text-sky-700 dark:text-sky-300">
 						{stats?.invoices.total ?? 0}
 					</p>
-					<p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 mt-1">
+					<p className="text-xs text-sky-600/70 dark:text-sky-400/70 mt-1">
 						<Currency amount={stats?.invoices.totalValue ?? 0} />
 					</p>
 				</div>
@@ -211,17 +211,17 @@ export function FinanceOverviewPanel({ stats }: FinanceOverviewPanelProps) {
 				</div>
 
 				{/* Clients */}
-				<div className="rounded-xl bg-teal-50/80 dark:bg-teal-950/30 p-4 border border-teal-100/50 dark:border-teal-900/50">
+				<div className="rounded-xl bg-sky-50/80 dark:bg-sky-950/30 p-4 border border-sky-100/50 dark:border-sky-900/50">
 					<div className="flex items-center gap-2 mb-2">
-						<Users className="h-4 w-4 text-teal-600 dark:text-teal-400" />
-						<span className="text-xs font-medium text-teal-600 dark:text-teal-400">
+						<Users className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+						<span className="text-xs font-medium text-sky-600 dark:text-sky-400">
 							{t("finance.stats.clients")}
 						</span>
 					</div>
-					<p className="text-xl font-bold text-teal-700 dark:text-teal-300">
+					<p className="text-xl font-bold text-sky-700 dark:text-sky-300">
 						{stats?.clients.total ?? 0}
 					</p>
-					<p className="text-xs text-teal-600/70 dark:text-teal-400/70 mt-1">
+					<p className="text-xs text-sky-600/70 dark:text-sky-400/70 mt-1">
 						{t("finance.stats.activeClients")}
 					</p>
 				</div>

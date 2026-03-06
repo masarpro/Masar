@@ -70,8 +70,8 @@ export function SCurveChart({ data }: SCurveChartProps) {
 						type="monotone"
 						dataKey="actual"
 						name={t("execution.analysis.sCurve.actual")}
-						stroke="#14b8a6"
-						fill="#14b8a6"
+						stroke="#0ea5e9"
+						fill="#0ea5e9"
 						fillOpacity={0.15}
 						strokeWidth={2}
 					/>

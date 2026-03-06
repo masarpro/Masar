@@ -97,14 +97,14 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 					</div>
 				</div>
 
-				<div className="group relative rounded-2xl bg-teal-50 dark:bg-teal-950/30 p-5 transition-all duration-200 hover:bg-teal-100 dark:hover:bg-teal-900/30">
+				<div className="group relative rounded-2xl bg-sky-50 dark:bg-sky-950/30 p-5 transition-all duration-200 hover:bg-sky-100 dark:hover:bg-sky-900/30">
 					<div className="flex items-center justify-between">
 						<div>
-							<p className="text-xs font-medium text-teal-600 dark:text-teal-400 uppercase tracking-wide">{t("pricing.studies.stats.completed")}</p>
-							<p className="text-3xl font-semibold mt-2 text-teal-700 dark:text-teal-300">{stats.completed}</p>
+							<p className="text-xs font-medium text-sky-600 dark:text-sky-400 uppercase tracking-wide">{t("pricing.studies.stats.completed")}</p>
+							<p className="text-3xl font-semibold mt-2 text-sky-700 dark:text-sky-300">{stats.completed}</p>
 						</div>
-						<div className="p-3 rounded-2xl bg-teal-200/50 dark:bg-teal-800/30">
-							<CheckCircle2 className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+						<div className="p-3 rounded-2xl bg-sky-200/50 dark:bg-sky-800/30">
+							<CheckCircle2 className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 						</div>
 					</div>
 				</div>

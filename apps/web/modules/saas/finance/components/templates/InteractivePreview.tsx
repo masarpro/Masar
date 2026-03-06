@@ -281,7 +281,7 @@ export function InteractivePreview({
 											<Button
 												variant="ghost"
 												size="icon"
-												className="h-8 w-8 text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-950"
+												className="h-8 w-8 text-sky-600 hover:bg-sky-100 dark:hover:bg-sky-950"
 												onClick={() => onResizeElement?.(selectedElementData.element.id, "increase")}
 											>
 												<ChevronUpIcon className="h-4 w-4" />
@@ -296,7 +296,7 @@ export function InteractivePreview({
 											<Button
 												variant="ghost"
 												size="icon"
-												className="h-8 w-8 text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-950"
+												className="h-8 w-8 text-sky-600 hover:bg-sky-100 dark:hover:bg-sky-950"
 												onClick={() => onResizeElement?.(selectedElementData.element.id, "decrease")}
 												disabled={((selectedElementData.element.settings.minHeight as number) || 0) <= 0}
 											>
@@ -308,7 +308,7 @@ export function InteractivePreview({
 										</TooltipContent>
 									</Tooltip>
 									{((selectedElementData.element.settings.minHeight as number) || 0) > 0 && (
-										<span className="text-xs text-emerald-600 bg-emerald-100 dark:bg-emerald-950 px-1.5 py-0.5 rounded ms-1">
+										<span className="text-xs text-sky-600 bg-sky-100 dark:bg-sky-950 px-1.5 py-0.5 rounded ms-1">
 											+{selectedElementData.element.settings.minHeight as number}px
 										</span>
 									)}

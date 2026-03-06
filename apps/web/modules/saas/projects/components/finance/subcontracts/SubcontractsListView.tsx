@@ -53,8 +53,8 @@ const STATUS_STYLES: Record<
 		text: "text-slate-600 dark:text-slate-400",
 	},
 	ACTIVE: {
-		bg: "bg-emerald-100 dark:bg-emerald-900/40",
-		text: "text-emerald-700 dark:text-emerald-300",
+		bg: "bg-sky-100 dark:bg-sky-900/40",
+		text: "text-sky-700 dark:text-sky-300",
 	},
 	SUSPENDED: {
 		bg: "bg-amber-100 dark:bg-amber-900/40",
@@ -216,16 +216,16 @@ export function SubcontractsListView({
 							</div>
 						</div>
 					</div>
-					<div className="rounded-xl bg-teal-50 p-4 dark:bg-teal-950/30">
+					<div className="rounded-xl bg-sky-50 p-4 dark:bg-sky-950/30">
 						<div className="flex items-center gap-2">
-							<div className="rounded-lg bg-teal-100 p-2 dark:bg-teal-900/50">
-								<Wallet className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+							<div className="rounded-lg bg-sky-100 p-2 dark:bg-sky-900/50">
+								<Wallet className="h-4 w-4 text-sky-600 dark:text-sky-400" />
 							</div>
 							<div className="min-w-0 flex-1">
-								<p className="text-xs text-teal-600 dark:text-teal-400">
+								<p className="text-xs text-sky-600 dark:text-sky-400">
 									{t("subcontracts.summary.remaining")}
 								</p>
-								<p className="truncate text-sm font-semibold text-teal-700 dark:text-teal-300">
+								<p className="truncate text-sm font-semibold text-sky-700 dark:text-sky-300">
 									{formatCurrency(summary.remaining)}
 								</p>
 							</div>

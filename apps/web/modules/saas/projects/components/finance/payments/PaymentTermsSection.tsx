@@ -71,7 +71,7 @@ const STATUS_CONFIG: Record<string, { icon: typeof CheckCircle2; label: string; 
 	FULLY_PAID: {
 		icon: CheckCircle2,
 		label: "مدفوع بالكامل",
-		color: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+		color: "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
 	},
 };
 
@@ -116,7 +116,7 @@ export function PaymentTermsSection({
 									<span className="text-slate-500">
 										{formatCurrency(term.paidAmount)} / {formatCurrency(termAmount)}
 									</span>
-									<span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+									<span className="font-mono font-semibold text-sky-600 dark:text-sky-400">
 										{paidPercent}%
 									</span>
 								</div>
@@ -126,7 +126,7 @@ export function PaymentTermsSection({
 								<div className="border-t border-slate-100 px-4 pb-4 pt-3 dark:border-slate-800">
 									<Progress
 										value={paidPercent}
-										className="mb-4 h-2 bg-slate-100 dark:bg-slate-800 [&>div]:bg-emerald-500"
+										className="mb-4 h-2 bg-slate-100 dark:bg-slate-800 [&>div]:bg-sky-500"
 									/>
 									<PaymentsTable
 										organizationId={organizationId}

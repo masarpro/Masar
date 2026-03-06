@@ -76,9 +76,9 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; dot: string }> =
 		dot: "bg-amber-500",
 	},
 	completed: {
-		bg: "bg-teal-50 dark:bg-teal-950/50",
-		text: "text-teal-700 dark:text-teal-400",
-		dot: "bg-teal-500",
+		bg: "bg-sky-50 dark:bg-sky-950/50",
+		text: "text-sky-700 dark:text-sky-400",
+		dot: "bg-sky-500",
 	},
 	approved: {
 		bg: "bg-indigo-50 dark:bg-indigo-950/50",
@@ -91,7 +91,7 @@ const PROJECT_TYPE_COLORS: Record<string, { accent: string; bg: string }> = {
 	residential: { accent: "bg-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
 	commercial: { accent: "bg-violet-500", bg: "bg-violet-50 dark:bg-violet-950/30" },
 	industrial: { accent: "bg-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
-	mixed: { accent: "bg-teal-500", bg: "bg-teal-50 dark:bg-teal-950/30" },
+	mixed: { accent: "bg-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
 };
 
 export function CostStudyCard({

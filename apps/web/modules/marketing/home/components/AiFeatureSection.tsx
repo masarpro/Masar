@@ -13,7 +13,7 @@ import {
 import Link from "next/link";
 
 const bulletIcons = [MessageSquareText, BarChart3, Users, BellRing] as const;
-const bulletColors = ["#10B981", "#3B82F6", "#8B5CF6", "#F59E0B"] as const;
+const bulletColors = ["#0ea5e9", "#3B82F6", "#8B5CF6", "#F59E0B"] as const;
 
 interface ChatMsg {
 	role: "user" | "ai";
@@ -76,7 +76,7 @@ export function AiFeatureSection() {
 				className="absolute top-[20%] left-1/4 w-[600px] h-[600px] rounded-full pointer-events-none"
 				style={{
 					background:
-						"radial-gradient(circle, rgba(16,185,129,0.06), transparent 70%)",
+						"radial-gradient(circle, rgba(14,165,233,0.06), transparent 70%)",
 					filter: "blur(80px)",
 					opacity: "var(--lp-effects-opacity)",
 				}}

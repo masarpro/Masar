@@ -67,7 +67,7 @@ export function ProjectPaymentsPage({
 				</div>
 				<Button
 					size="sm"
-					className="rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600"
+					className="rounded-xl bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600"
 					onClick={() => setCreateOpen(true)}
 				>
 					<Plus className="ml-1.5 h-4 w-4" />

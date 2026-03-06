@@ -64,7 +64,7 @@ interface ProjectPhotosCardProps {
 function getCategoryColor(category: string) {
 	switch (category) {
 		case "PROGRESS":
-			return "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400 border-teal-200 dark:border-teal-800";
+			return "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 border-sky-200 dark:border-sky-800";
 		case "ISSUE":
 			return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800";
 		case "EQUIPMENT":

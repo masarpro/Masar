@@ -76,7 +76,7 @@ function getStatusBadge(
 		},
 		APPROVED: {
 			className:
-				"bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400",
+				"bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
 			label: t("finance.status.APPROVED"),
 		},
 		PAID: {

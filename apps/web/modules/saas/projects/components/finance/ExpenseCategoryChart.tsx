@@ -21,7 +21,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 	MATERIALS: "#3b82f6",
 	LABOR: "#f59e0b",
 	EQUIPMENT: "#a855f7",
-	SUBCONTRACTOR: "#14b8a6",
+	SUBCONTRACTOR: "#0ea5e9",
 	TRANSPORT: "#f97316",
 	MISC: "#64748b",
 };

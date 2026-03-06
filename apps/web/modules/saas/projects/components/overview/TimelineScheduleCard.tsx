@@ -28,7 +28,7 @@ const S_CURVE_DATA = [
 
 const chartConfig: ChartConfig = {
 	planned: { label: "المخطط", color: "#3b82f6" },
-	actual: { label: "الفعلي", color: "#14b8a6" },
+	actual: { label: "الفعلي", color: "#0ea5e9" },
 };
 
 interface TimelineScheduleCardProps {
@@ -86,12 +86,12 @@ export function TimelineScheduleCard({
 				<span
 					className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
 						isOnTrack
-							? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+							? "bg-sky-50 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400"
 							: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
 					}`}
 				>
 					<span
-						className={`h-1.5 w-1.5 animate-pulse rounded-full ${isOnTrack ? "bg-emerald-500" : "bg-amber-500"}`}
+						className={`h-1.5 w-1.5 animate-pulse rounded-full ${isOnTrack ? "bg-sky-500" : "bg-amber-500"}`}
 					/>
 					{isOnTrack
 						? t("projects.commandCenter.onTrack")
@@ -108,12 +108,12 @@ export function TimelineScheduleCard({
 						{t("projects.commandCenter.plannedProgress")}
 					</div>
 					<div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
-						<span className="inline-block h-[3px] w-5 rounded-full bg-teal-500" />
+						<span className="inline-block h-[3px] w-5 rounded-full bg-sky-500" />
 						{t("projects.commandCenter.actualProgress")}
 					</div>
 					<span className="mr-auto text-xs text-slate-400">
 						{t("projects.commandCenter.achievement")}:{" "}
-						<strong className="text-emerald-500">
+						<strong className="text-sky-500">
 							{projectProgress}%
 						</strong>
 					</span>
@@ -176,7 +176,7 @@ export function TimelineScheduleCard({
 						<Line
 							type="monotone"
 							dataKey="actual"
-							stroke="#14b8a6"
+							stroke="#0ea5e9"
 							strokeWidth={2.5}
 							dot={false}
 							activeDot={{ r: 4, strokeWidth: 2 }}
@@ -189,19 +189,19 @@ export function TimelineScheduleCard({
 				{/* Timeline Progress Bar */}
 				<div className="mt-1 min-w-0">
 					<div className="flex items-center gap-2.5">
-						<span className="text-xs font-semibold text-teal-600">
+						<span className="text-xs font-semibold text-sky-600">
 							{projectProgress}%
 						</span>
 						<div className="relative h-[7px] flex-1 overflow-visible rounded-full bg-slate-200 dark:bg-slate-700">
 							<div
-								className="h-full rounded-full bg-gradient-to-l from-teal-500 to-blue-500"
+								className="h-full rounded-full bg-gradient-to-l from-sky-500 to-blue-500"
 								style={{
 									width: `${projectProgress}%`,
 								}}
 							/>
 							{/* Progress indicator dot */}
 							<div
-								className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full border-[2.5px] border-white bg-teal-500 shadow-md dark:border-slate-900"
+								className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full border-[2.5px] border-white bg-sky-500 shadow-md dark:border-slate-900"
 								style={{
 									left: `${projectProgress}%`,
 									transform: `translateX(-50%) translateY(-50%)`,
@@ -226,7 +226,7 @@ export function TimelineScheduleCard({
 				<div className="mt-auto grid grid-cols-3 gap-1.5">
 					<div className="rounded-lg border border-slate-100 bg-slate-50/80 p-2 text-center dark:border-slate-800 dark:bg-slate-800/50">
 						<div
-							className="text-[17px] font-bold text-teal-600"
+							className="text-[17px] font-bold text-sky-600"
 							dir="ltr"
 						>
 							{daysRemaining}

@@ -35,7 +35,7 @@ export function MilestoneProgressRow({
 				<span className="text-sm text-muted-foreground">
 					{t("timeline.progress")}
 				</span>
-				<span className="text-2xl font-bold text-teal-600">
+				<span className="text-2xl font-bold text-sky-600">
 					{Math.round(isDisabled ? Number(milestone.progress) : localProgress)}%
 				</span>
 			</div>

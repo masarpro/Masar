@@ -24,7 +24,7 @@ export function FinalCTA() {
 					height: 500,
 					borderRadius: "50%",
 					background:
-						"radial-gradient(circle, rgba(16,185,129,0.12), transparent 60%)",
+						"radial-gradient(circle, rgba(14,165,233,0.12), transparent 60%)",
 					filter: "blur(100px)",
 					opacity: "var(--lp-effects-opacity)",
 				}}

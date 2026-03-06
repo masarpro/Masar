@@ -155,12 +155,12 @@ export function InlineClientForm({
 	};
 
 	return (
-		<div className="rounded-xl border bg-gradient-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/30 dark:to-teal-950/30 overflow-hidden">
+		<div className="rounded-xl border bg-gradient-to-br from-sky-50/50 to-sky-50/50 dark:from-sky-950/30 dark:to-sky-950/30 overflow-hidden">
 			{/* Header */}
-			<div className="flex items-center justify-between p-3 border-b border-emerald-100 dark:border-emerald-900/50 bg-emerald-500/5">
+			<div className="flex items-center justify-between p-3 border-b border-sky-100 dark:border-sky-900/50 bg-sky-500/5">
 				<div className="flex items-center gap-2">
-					<div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-						<Building2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+					<div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center">
+						<Building2 className="h-4 w-4 text-sky-600 dark:text-sky-400" />
 					</div>
 					<span className="font-semibold text-sm">{t("finance.clients.addClient")}</span>
 				</div>
@@ -332,7 +332,7 @@ export function InlineClientForm({
 						onClick={handleSubmit}
 						disabled={createMutation.isPending || !businessName.trim()}
 						size="sm"
-						className="flex-1 rounded-lg bg-emerald-600 hover:bg-emerald-700"
+						className="flex-1 rounded-lg bg-sky-600 hover:bg-sky-700"
 					>
 						{createMutation.isPending ? (
 							<Loader2 className="h-4 w-4 me-2 animate-spin" />

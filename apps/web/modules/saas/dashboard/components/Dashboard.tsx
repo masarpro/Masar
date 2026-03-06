@@ -110,7 +110,7 @@ const cashFlowData = [
 ];
 
 const COMPANY_EXPENSE_COLORS: Record<string, string> = {
-	RENT: "#10b981",
+	RENT: "#0ea5e9",
 	UTILITIES: "#3b82f6",
 	COMMUNICATIONS: "#8b5cf6",
 	INSURANCE: "#f59e0b",
@@ -119,13 +119,13 @@ const COMPANY_EXPENSE_COLORS: Record<string, string> = {
 	MAINTENANCE: "#84cc16",
 	BANK_FEES: "#6366f1",
 	MARKETING: "#f97316",
-	TRANSPORT: "#14b8a6",
+	TRANSPORT: "#0ea5e9",
 	HOSPITALITY: "#a855f7",
 	OTHER: "#6b7280",
 };
 
 const cashFlowChartConfig: ChartConfig = {
-	income: { label: "المقبوضات", color: "#10b981" },
+	income: { label: "المقبوضات", color: "#0ea5e9" },
 	expense: { label: "المصروفات", color: "#ef4444" },
 };
 
@@ -235,9 +235,9 @@ export function Dashboard() {
 			label: t("dashboard.kpi.bankBalance"),
 			value: bankBalance,
 			icon: Landmark,
-			iconColor: "text-emerald-600 dark:text-emerald-400",
-			bgColor: "bg-emerald-100 dark:bg-emerald-900/30",
-			valueColor: "text-emerald-600 dark:text-emerald-400",
+			iconColor: "text-sky-600 dark:text-sky-400",
+			bgColor: "bg-sky-100 dark:bg-sky-900/30",
+			valueColor: "text-sky-600 dark:text-sky-400",
 		},
 		{
 			label: t("dashboard.kpi.cashBalance"),
@@ -251,9 +251,9 @@ export function Dashboard() {
 			label: t("dashboard.kpi.totalIncome"),
 			value: totalIncome,
 			icon: ArrowDownRight,
-			iconColor: "text-emerald-600 dark:text-emerald-400",
-			bgColor: "bg-emerald-100 dark:bg-emerald-900/30",
-			valueColor: "text-emerald-600 dark:text-emerald-400",
+			iconColor: "text-sky-600 dark:text-sky-400",
+			bgColor: "bg-sky-100 dark:bg-sky-900/30",
+			valueColor: "text-sky-600 dark:text-sky-400",
 			sub: t("dashboard.kpi.thisMonth"),
 		},
 		{
@@ -286,10 +286,10 @@ export function Dashboard() {
 			actionLabel: t("dashboard.actions.addPayment"),
 			browsePath: `/app/${organizationSlug}/finance/payments`,
 			createPath: `/app/${organizationSlug}/finance/payments/new`,
-			iconColor: "text-teal-500 dark:text-teal-400",
-			bgColor: "bg-teal-50/80 dark:bg-teal-950/30",
-			hoverBg: "hover:bg-teal-100 dark:hover:bg-teal-900/50",
-			borderColor: "border-teal-200/50 dark:border-teal-800/50",
+			iconColor: "text-sky-500 dark:text-sky-400",
+			bgColor: "bg-sky-50/80 dark:bg-sky-950/30",
+			hoverBg: "hover:bg-sky-100 dark:hover:bg-sky-900/50",
+			borderColor: "border-sky-200/50 dark:border-sky-800/50",
 		},
 		{
 			icon: Receipt,
@@ -297,10 +297,10 @@ export function Dashboard() {
 			actionLabel: t("dashboard.actions.createInvoice"),
 			browsePath: `/app/${organizationSlug}/finance/invoices`,
 			createPath: `/app/${organizationSlug}/finance/invoices/new`,
-			iconColor: "text-emerald-500 dark:text-emerald-400",
-			bgColor: "bg-emerald-50/80 dark:bg-emerald-950/30",
-			hoverBg: "hover:bg-emerald-100 dark:hover:bg-emerald-900/50",
-			borderColor: "border-emerald-200/50 dark:border-emerald-800/50",
+			iconColor: "text-sky-500 dark:text-sky-400",
+			bgColor: "bg-sky-50/80 dark:bg-sky-950/30",
+			hoverBg: "hover:bg-sky-100 dark:hover:bg-sky-900/50",
+			borderColor: "border-sky-200/50 dark:border-sky-800/50",
 		},
 		{
 			icon: FilePlus2,
@@ -448,10 +448,10 @@ export function Dashboard() {
 								)}
 								<div
 									className="absolute top-0 right-0 left-0 h-[2px]"
-									style={{ background: i % 2 === 0 ? "#10b981" : "#3b82f6" }}
+									style={{ background: i % 2 === 0 ? "#0ea5e9" : "#3b82f6" }}
 								/>
 								<div className="absolute start-1 top-1">
-									<Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0 text-[8px] px-1 py-0">
+									<Badge className="bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 border-0 text-[8px] px-1 py-0">
 										{t(`projects.status.${project.status}`)}
 									</Badge>
 								</div>
@@ -482,7 +482,7 @@ export function Dashboard() {
 					const newProjectButton = (
 						<Link
 							href={`/app/${organizationSlug}/projects/new`}
-							className={`flex shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-border transition-all duration-300 hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 ${useScroll ? "h-[88px] w-14" : "h-[88px] w-14"}`}
+							className={`flex shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-border transition-all duration-300 hover:border-sky-500 hover:bg-sky-50/50 dark:hover:bg-sky-900/10 ${useScroll ? "h-[88px] w-14" : "h-[88px] w-14"}`}
 							title={t("projects.newProject")}
 						>
 							<Plus className="h-6 w-6 text-muted-foreground" />
@@ -596,7 +596,7 @@ export function Dashboard() {
 						</div>
 						<Link
 							href={`/app/${organizationSlug}/finance`}
-							className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-md hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors"
+							className="flex items-center gap-1 text-[10px] text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 px-2 py-1 rounded-md hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors"
 						>
 							<span>{t("dashboard.cashFlow.goToFinance")}</span>
 							<ChevronLeft className="h-3 w-3" />
@@ -605,8 +605,8 @@ export function Dashboard() {
 
 					{/* Chips */}
 					<div className="grid grid-cols-3 gap-2 mb-3">
-						<div className="text-center p-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20">
-							<span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 block">
+						<div className="text-center p-2 rounded-lg bg-sky-50 dark:bg-sky-900/20">
+							<span className="text-sm font-bold text-sky-600 dark:text-sky-400 block">
 								<Currency amount={totalIncomeChart} />
 							</span>
 							<span className="text-[9px] text-muted-foreground">{t("dashboard.cashFlow.income")}</span>
@@ -633,8 +633,8 @@ export function Dashboard() {
 						>
 							<defs>
 								<linearGradient id="dashIncomeGrad" x1="0" y1="0" x2="0" y2="1">
-									<stop offset="0%" stopColor="#10b981" stopOpacity={0.22} />
-									<stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+									<stop offset="0%" stopColor="#0ea5e9" stopOpacity={0.22} />
+									<stop offset="100%" stopColor="#0ea5e9" stopOpacity={0} />
 								</linearGradient>
 								<linearGradient id="dashExpenseGrad" x1="0" y1="0" x2="0" y2="1">
 									<stop offset="0%" stopColor="#ef4444" stopOpacity={0.12} />
@@ -656,7 +656,7 @@ export function Dashboard() {
 							<Area
 								type="monotone"
 								dataKey="income"
-								stroke="#10b981"
+								stroke="#0ea5e9"
 								fill="url(#dashIncomeGrad)"
 								strokeWidth={2}
 								dot={false}
@@ -681,8 +681,8 @@ export function Dashboard() {
 					{/* Compact header */}
 					<div className="flex shrink-0 items-center justify-between px-4 pt-3 pb-2">
 						<div className="flex items-center gap-2">
-							<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
-								<Receipt className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+							<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-sky-500/20 to-sky-500/20">
+								<Receipt className="h-4 w-4 text-sky-600 dark:text-sky-400" />
 							</div>
 							<span className="text-sm font-semibold text-foreground">
 								{t("dashboard.expenseBreakdown.title")}
@@ -690,7 +690,7 @@ export function Dashboard() {
 						</div>
 						<Link
 							href={`/app/${organizationSlug}/company/expenses`}
-							className="flex items-center gap-1 rounded-lg bg-emerald-500/10 px-2.5 py-1.5 text-xs font-medium text-emerald-600 transition-colors hover:bg-emerald-500/20 dark:text-emerald-400"
+							className="flex items-center gap-1 rounded-lg bg-sky-500/10 px-2.5 py-1.5 text-xs font-medium text-sky-600 transition-colors hover:bg-sky-500/20 dark:text-sky-400"
 						>
 							{t("dashboard.expenseBreakdown.details")}
 							<ChevronLeft className="h-3.5 w-3.5" />
@@ -706,7 +706,7 @@ export function Dashboard() {
 								</p>
 								<Link
 									href={`/app/${organizationSlug}/company/expenses`}
-									className="text-xs font-medium text-emerald-600 hover:underline dark:text-emerald-400"
+									className="text-xs font-medium text-sky-600 hover:underline dark:text-sky-400"
 								>
 									{t("dashboard.expenseBreakdown.details")}
 								</Link>
@@ -786,13 +786,13 @@ export function Dashboard() {
 															<div
 																className={`absolute bottom-0 left-0 right-0 rounded-t-md transition-all duration-500 ${
 																	isCurrent
-																		? "bg-gradient-to-t from-emerald-500 to-emerald-400"
+																		? "bg-gradient-to-t from-sky-500 to-sky-400"
 																		: "bg-muted-foreground/20"
 																}`}
 																style={{ height: `${Math.max(pct, 8)}%` }}
 															/>
 														</div>
-														<span className={`text-[9px] ${isCurrent ? "font-semibold text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>
+														<span className={`text-[9px] ${isCurrent ? "font-semibold text-sky-600 dark:text-sky-400" : "text-muted-foreground"}`}>
 															{m.month}
 														</span>
 													</div>
@@ -824,7 +824,7 @@ export function Dashboard() {
 						</div>
 						<Link
 							href={`/app/${organizationSlug}/projects`}
-							className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-md hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors"
+							className="flex items-center gap-1 text-[10px] text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 px-2 py-1 rounded-md hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors"
 						>
 							<span>{t("dashboard.viewAll")}</span>
 							<ChevronLeft className="h-3 w-3" />
@@ -837,7 +837,7 @@ export function Dashboard() {
 							activities.slice(0, 4).map((activity: Activity, idx: number) => {
 								const iconConfig = {
 									change_order: { bg: "bg-amber-50 dark:bg-amber-900/20", color: "text-amber-500", icon: TrendingUp },
-									claim: { bg: "bg-emerald-50 dark:bg-emerald-900/20", color: "text-emerald-500", icon: Receipt },
+									claim: { bg: "bg-sky-50 dark:bg-sky-900/20", color: "text-sky-500", icon: Receipt },
 									issue: { bg: "bg-red-50 dark:bg-red-900/20", color: "text-red-500", icon: AlertTriangle },
 								};
 								const config = iconConfig[activity.type] ?? iconConfig.issue;

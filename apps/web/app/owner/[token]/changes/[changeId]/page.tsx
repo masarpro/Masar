@@ -43,7 +43,7 @@ function formatCurrency(value: number | string | null | undefined): string {
 function getStatusBadge(status: ChangeOrderStatus, t: (key: string) => string) {
 	const colors: Record<ChangeOrderStatus, string> = {
 		APPROVED:
-			"bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+			"bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
 		IMPLEMENTED:
 			"bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
 	};
@@ -142,8 +142,8 @@ export default function OwnerChangeOrderDetailPage() {
 			<div className="grid gap-4 sm:grid-cols-2">
 				<Card className="p-5">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-emerald-100 p-3 dark:bg-emerald-900/50">
-							<Banknote className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+						<div className="rounded-xl bg-sky-100 p-3 dark:bg-sky-900/50">
+							<Banknote className="h-6 w-6 text-sky-600 dark:text-sky-400" />
 						</div>
 						<div>
 							<p className="text-sm text-slate-500 dark:text-slate-400">
@@ -153,7 +153,7 @@ export default function OwnerChangeOrderDetailPage() {
 								<p
 									className={`text-xl font-semibold ${
 										Number(changeOrder.costImpact) >= 0
-											? "text-emerald-600 dark:text-emerald-400"
+											? "text-sky-600 dark:text-sky-400"
 											: "text-red-600 dark:text-red-400"
 									}`}
 								>
@@ -209,8 +209,8 @@ export default function OwnerChangeOrderDetailPage() {
 					{/* Decision */}
 					{changeOrder.decidedAt && (
 						<div className="flex items-start gap-3">
-							<div className="rounded-full bg-emerald-100 p-2 dark:bg-emerald-900/50">
-								<FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+							<div className="rounded-full bg-sky-100 p-2 dark:bg-sky-900/50">
+								<FileText className="h-4 w-4 text-sky-600 dark:text-sky-400" />
 							</div>
 							<div>
 								<p className="font-medium text-slate-900 dark:text-slate-100">

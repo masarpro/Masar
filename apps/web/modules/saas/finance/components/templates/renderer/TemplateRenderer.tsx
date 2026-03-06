@@ -588,7 +588,7 @@ export function TemplateRenderer({
 				)}
 				{/* Height indicator when resized */}
 				{isSelected && minHeight > 0 && (
-					<div className="absolute -top-2 end-2 bg-emerald-500 text-white text-xs px-2 py-0.5 rounded-full z-10">
+					<div className="absolute -top-2 end-2 bg-sky-500 text-white text-xs px-2 py-0.5 rounded-full z-10">
 						+{minHeight}px
 					</div>
 				)}

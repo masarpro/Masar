@@ -135,7 +135,7 @@ function ContractBarInner({
 									<span className="text-muted-foreground">
 										{t("projects.contractBar.adjustedValue")}:
 									</span>
-									<span className="font-semibold text-teal-600 dark:text-teal-400">
+									<span className="font-semibold text-sky-600 dark:text-sky-400">
 										{formatCurrency(Number(summary?.adjustedValue ?? 0))}
 									</span>
 								</>

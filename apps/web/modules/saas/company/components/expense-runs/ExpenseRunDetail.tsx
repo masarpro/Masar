@@ -55,7 +55,7 @@ const STATUS_STYLES: Record<string, string> = {
 
 const FINANCE_STATUS_STYLES: Record<string, string> = {
 	PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400",
-	COMPLETED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400",
+	COMPLETED: "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400",
 	CANCELLED: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400",
 };
 

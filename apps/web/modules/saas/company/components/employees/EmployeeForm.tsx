@@ -233,8 +233,8 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 				{/* Financial Info */}
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
 					<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
-						<div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-							<Banknote className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
+							<Banknote className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 						</div>
 						<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
 							{t("company.employees.financialInfo")}

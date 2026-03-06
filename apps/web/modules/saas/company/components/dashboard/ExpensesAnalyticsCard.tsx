@@ -24,8 +24,8 @@ const CATEGORY_COLORS: Record<string, string> = {
 	SUBSCRIPTIONS: "#ec4899",
 	MAINTENANCE: "#f97316",
 	BANK_FEES: "#64748b",
-	MARKETING: "#10b981",
-	TRANSPORT: "#14b8a6",
+	MARKETING: "#0ea5e9",
+	TRANSPORT: "#38bdf8",
 	HOSPITALITY: "#a855f7",
 	OTHER: "#94a3b8",
 };

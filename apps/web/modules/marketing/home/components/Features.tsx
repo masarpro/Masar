@@ -23,10 +23,10 @@ interface FeatureConfig {
 }
 
 const features: FeatureConfig[] = [
-	{ icon: LayoutDashboard, color: "#10B981", subCount: 3 },
+	{ icon: LayoutDashboard, color: "#0ea5e9", subCount: 3 },
 	{ icon: HardHat, color: "#3B82F6", subCount: 3 },
 	{ icon: Receipt, color: "#F59E0B", subCount: 3 },
-	{ icon: Calculator, color: "#10B981", isNew: true, subCount: 3 },
+	{ icon: Calculator, color: "#0ea5e9", isNew: true, subCount: 3 },
 	{ icon: FileSignature, color: "#8B5CF6", subCount: 3 },
 	{ icon: UserCheck, color: "#EF4444", subCount: 3 },
 	{ icon: ShieldCheck, color: "#06B6D4", subCount: 2 },
@@ -60,7 +60,7 @@ export function Features() {
 				className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[1000px] h-[600px] rounded-[50%] pointer-events-none"
 				style={{
 					background:
-						"conic-gradient(from 0deg, rgba(16,185,129,0.04), rgba(59,130,246,0.04), rgba(139,92,246,0.03), rgba(16,185,129,0.04))",
+						"conic-gradient(from 0deg, rgba(14,165,233,0.04), rgba(59,130,246,0.04), rgba(139,92,246,0.03), rgba(14,165,233,0.04))",
 					filter: "blur(120px)",
 					opacity: "var(--lp-effects-opacity)",
 				}}
@@ -73,16 +73,16 @@ export function Features() {
 						className="landing-section-label"
 						style={{
 							background:
-								"linear-gradient(135deg, rgba(16,185,129,0.06), rgba(6,182,212,0.04))",
-							border: "1px solid rgba(16,185,129,0.12)",
-							color: "#10B981",
+								"linear-gradient(135deg, rgba(14,165,233,0.06), rgba(6,182,212,0.04))",
+							border: "1px solid rgba(14,165,233,0.12)",
+							color: "#0ea5e9",
 						}}
 					>
 						<span
 							className="landing-dot"
 							style={{
 								background:
-									"linear-gradient(135deg, #10B981, #06B6D4)",
+									"linear-gradient(135deg, #0ea5e9, #06B6D4)",
 							}}
 						/>
 						{t("features.label")}
@@ -121,12 +121,12 @@ export function Features() {
 								style={{
 									background:
 										f.isNew && !isActive
-											? "linear-gradient(135deg, rgba(16,185,129,0.25), rgba(6,182,212,0.15), rgba(16,185,129,0.25))"
+											? "linear-gradient(135deg, rgba(14,165,233,0.25), rgba(6,182,212,0.15), rgba(14,165,233,0.25))"
 											: isActive
 												? `linear-gradient(135deg, ${f.color}90, ${f.color}20, ${f.color}70)`
 												: "linear-gradient(135deg, var(--lp-card-border), transparent)",
 									boxShadow: f.isNew
-										? "0 0 30px rgba(16,185,129,0.12)"
+										? "0 0 30px rgba(14,165,233,0.12)"
 										: undefined,
 								}}
 							>
@@ -144,10 +144,10 @@ export function Features() {
 											className="absolute top-4 end-4 text-[11px] font-bold px-3 py-1 rounded-full z-10"
 											style={{
 												background:
-													"linear-gradient(135deg, #10B981, #06B6D4)",
+													"linear-gradient(135deg, #0ea5e9, #06B6D4)",
 												color: "#ffffff",
 												boxShadow:
-													"0 0 20px rgba(16,185,129,0.3)",
+													"0 0 20px rgba(14,165,233,0.3)",
 											}}
 										>
 											{t("features.newBadge")}
@@ -159,13 +159,13 @@ export function Features() {
 										className="w-[48px] h-[48px] rounded-xl flex items-center justify-center mb-5"
 										style={{
 											background:
-												"rgba(16,185,129,0.10)",
-											border: "1px solid rgba(16,185,129,0.15)",
+												"rgba(14,165,233,0.10)",
+											border: "1px solid rgba(14,165,233,0.15)",
 										}}
 									>
 										<Icon
 											size={28}
-											color="#10B981"
+											color="#0ea5e9"
 											strokeWidth={1.8}
 										/>
 									</div>
@@ -205,7 +205,7 @@ export function Features() {
 												>
 													<Check
 														size={16}
-														color="#10B981"
+														color="#0ea5e9"
 														className="mt-0.5 shrink-0"
 													/>
 													<span
@@ -226,7 +226,7 @@ export function Features() {
 									{/* Learn More */}
 									<span
 										className="inline-flex items-center gap-1.5 text-[13px] font-semibold group cursor-pointer"
-										style={{ color: "#10B981" }}
+										style={{ color: "#0ea5e9" }}
 									>
 										{t("features.learnMore")}
 										<ArrowLeft

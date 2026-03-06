@@ -51,7 +51,7 @@ function getStatusBadge(status: string, t: (key: string) => string) {
 	switch (status) {
 		case "ACTIVE":
 			return (
-				<Badge className="bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400 border-0 text-[10px] px-2 py-0.5">
+				<Badge className="bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 border-0 text-[10px] px-2 py-0.5">
 					{t("projects.status.ACTIVE")}
 				</Badge>
 			);
@@ -74,7 +74,7 @@ function getStatusBadge(status: string, t: (key: string) => string) {
 
 const coverGradients = [
 	"from-blue-400 to-indigo-500",
-	"from-emerald-400 to-teal-500",
+	"from-sky-400 to-sky-500",
 	"from-amber-400 to-orange-500",
 	"from-violet-400 to-purple-500",
 	"from-rose-400 to-pink-500",
@@ -146,11 +146,11 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 				{/* Active Projects */}
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-teal-100 dark:bg-teal-900/30">
-							<Clock className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
+							<Clock className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 						</div>
 						{stats.total > 0 && (
-							<div className="flex items-center gap-0.5 text-xs text-teal-600 dark:text-teal-400">
+							<div className="flex items-center gap-0.5 text-xs text-sky-600 dark:text-sky-400">
 								<TrendingUp className="h-3 w-3" />
 								<span>{Math.round((stats.active / stats.total) * 100)}%</span>
 							</div>
@@ -159,7 +159,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 						{t("projects.stats.active")}
 					</p>
-					<p className="text-2xl font-bold text-teal-700 dark:text-teal-300">
+					<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">
 						{stats.active}
 					</p>
 				</div>
@@ -167,11 +167,11 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 				{/* Completed Projects */}
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-							<CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
+							<CheckCircle2 className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 						</div>
 						{stats.total > 0 && (
-							<div className="flex items-center gap-0.5 text-xs text-emerald-600 dark:text-emerald-400">
+							<div className="flex items-center gap-0.5 text-xs text-sky-600 dark:text-sky-400">
 								<CheckCircle2 className="h-3 w-3" />
 								<span>{Math.round((stats.completed / stats.total) * 100)}%</span>
 							</div>
@@ -180,7 +180,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 						{t("projects.stats.completed")}
 					</p>
-					<p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">
+					<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">
 						{stats.completed}
 					</p>
 				</div>
@@ -312,7 +312,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 												<span className="text-slate-500 dark:text-slate-400">
 													{t("projects.overview.progress")}
 												</span>
-												<span className="font-semibold text-teal-600 dark:text-teal-400">
+												<span className="font-semibold text-sky-600 dark:text-sky-400">
 													{Math.round(Number(project.progress))}%
 												</span>
 											</div>

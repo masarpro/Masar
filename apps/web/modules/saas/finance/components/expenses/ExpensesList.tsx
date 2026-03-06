@@ -189,8 +189,8 @@ export function ExpensesList({
 			RENT: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400",
 			UTILITIES: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-400",
 			FUEL: "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-400",
-			MAINTENANCE: "bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-400",
-			SUBCONTRACTOR: "bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-400",
+			MAINTENANCE: "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400",
+			SUBCONTRACTOR: "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400",
 		};
 		return colors[category] || "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
 	};
@@ -210,7 +210,7 @@ export function ExpensesList({
 			case "FACILITY_PAYROLL": return "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-400";
 			case "FACILITY_RECURRING": return "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400";
 			case "FACILITY_ASSET": return "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-400";
-			case "PROJECT": return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400";
+			case "PROJECT": return "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400";
 			default: return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
 		}
 	};
@@ -227,7 +227,7 @@ export function ExpensesList({
 			return <Badge className="rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-0">{t("finance.expenses.paymentStatus.cancelled")}</Badge>;
 		}
 		if (paidAmount >= totalAmount && status === "COMPLETED") {
-			return <Badge className="rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400 border-0">{t("finance.expenses.paymentStatus.paid")}</Badge>;
+			return <Badge className="rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400 border-0">{t("finance.expenses.paymentStatus.paid")}</Badge>;
 		}
 		if (status === "PENDING" && paidAmount > 0) {
 			if (dueDate && new Date(dueDate) < new Date()) {
@@ -241,7 +241,7 @@ export function ExpensesList({
 			}
 			return <Badge className="rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400 border-0"><Clock className="h-3 w-3 me-1" />{t("finance.expenses.paymentStatus.pending")}</Badge>;
 		}
-		return <Badge className="rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400 border-0">{t("finance.expenses.paymentStatus.paid")}</Badge>;
+		return <Badge className="rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400 border-0">{t("finance.expenses.paymentStatus.paid")}</Badge>;
 	};
 
 	return (
@@ -285,8 +285,8 @@ export function ExpensesList({
 				<Card className="rounded-2xl">
 					<CardContent className="p-4">
 						<div className="flex items-center gap-3">
-							<div className="p-2 bg-teal-100 dark:bg-teal-900/50 rounded-xl">
-								<Hammer className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+							<div className="p-2 bg-sky-100 dark:bg-sky-900/50 rounded-xl">
+								<Hammer className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 							</div>
 							<div>
 								<p className="text-sm text-slate-500 dark:text-slate-400">
@@ -450,7 +450,7 @@ export function ExpensesList({
 										</TableCell>
 										<TableCell>
 											{item._type === "subcontract_payment" ? (
-												<Badge className="rounded-lg bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-400 border-0">
+												<Badge className="rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400 border-0">
 													<Hammer className="h-3 w-3 me-1" />
 													{t("finance.expenses.subcontractBadge")}
 												</Badge>
@@ -547,7 +547,7 @@ export function ExpensesList({
 																		paidAmount: (item as any).paidAmount ?? 0,
 																		description: item.description,
 																	})}
-																	className="text-emerald-600"
+																	className="text-sky-600"
 																>
 																	<CreditCard className="h-4 w-4 me-2" />
 																	{t("finance.expenses.pay")}

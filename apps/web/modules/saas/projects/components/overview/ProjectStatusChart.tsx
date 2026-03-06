@@ -34,7 +34,7 @@ const chartConfig: ChartConfig = {
 	},
 	actual: {
 		label: "الفعلي",
-		color: "#14b8a6",
+		color: "#0ea5e9",
 	},
 };
 
@@ -64,8 +64,8 @@ export function ProjectStatusChart({ projectProgress }: ProjectStatusChartProps)
 	> = {
 		on_track: {
 			label: t("projects.commandCenter.onTrack"),
-			className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400",
-			dotColor: "bg-emerald-500",
+			className: "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400",
+			dotColor: "bg-sky-500",
 		},
 		at_risk: {
 			label: t("projects.commandCenter.atRisk"),
@@ -118,7 +118,7 @@ export function ProjectStatusChart({ projectProgress }: ProjectStatusChartProps)
 					</span>
 				</div>
 				<div className="flex items-center gap-2">
-					<div className="h-0.5 w-6 rounded-full bg-teal-500" />
+					<div className="h-0.5 w-6 rounded-full bg-sky-500" />
 					<span className="text-slate-600 dark:text-slate-400">
 						{t("projects.commandCenter.actualProgress")}
 					</span>
@@ -178,7 +178,7 @@ export function ProjectStatusChart({ projectProgress }: ProjectStatusChartProps)
 					<Line
 						type="monotone"
 						dataKey="actual"
-						stroke="#14b8a6"
+						stroke="#0ea5e9"
 						strokeWidth={2.5}
 						dot={false}
 						activeDot={{ r: 4, strokeWidth: 2 }}

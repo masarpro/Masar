@@ -25,9 +25,9 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; dot: string }> =
 		dot: "bg-orange-500",
 	},
 	WON: {
-		bg: "bg-teal-50 dark:bg-teal-950/50",
-		text: "text-teal-700 dark:text-teal-400",
-		dot: "bg-teal-500",
+		bg: "bg-sky-50 dark:bg-sky-950/50",
+		text: "text-sky-700 dark:text-sky-400",
+		dot: "bg-sky-500",
 	},
 	LOST: {
 		bg: "bg-red-50 dark:bg-red-950/50",

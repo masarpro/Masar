@@ -206,7 +206,7 @@ export function ProjectPaymentForm({
 						{termsData.terms.map((term) => {
 							const isActive = term.id === selectedTermId;
 							const progressColor = term.isComplete
-								? "bg-emerald-500"
+								? "bg-sky-500"
 								: term.id === termsData.nextIncompleteTermId
 									? "bg-blue-500"
 									: "bg-slate-300 dark:bg-slate-600";
@@ -314,7 +314,7 @@ export function ProjectPaymentForm({
 								<p className="text-xs text-slate-500">
 									{t("projectPayments.alreadyPaid")}
 								</p>
-								<p className="font-mono text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+								<p className="font-mono text-sm font-semibold text-sky-700 dark:text-sky-300">
 									{formatCurrency(
 										Number(selectedTerm.paidAmount),
 									)}{" "}
@@ -341,8 +341,8 @@ export function ProjectPaymentForm({
 			<div className="overflow-hidden rounded-2xl border border-slate-200/50 bg-white dark:border-slate-700/30 dark:bg-slate-900/50">
 				<div className="border-b border-slate-200/50 p-5 dark:border-slate-700/30">
 					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-emerald-100 p-2.5 dark:bg-emerald-900/50">
-							<TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+						<div className="rounded-xl bg-sky-100 p-2.5 dark:bg-sky-900/50">
+							<TrendingUp className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 						</div>
 						<h3 className="text-base font-medium text-slate-900 dark:text-slate-100">
 							{t("projectPayments.paymentDetails")}
@@ -641,7 +641,7 @@ export function ProjectPaymentForm({
 				<Button
 					type="submit"
 					disabled={createMutation.isPending}
-					className="rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600"
+					className="rounded-xl bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600"
 				>
 					{createMutation.isPending ? (
 						<>

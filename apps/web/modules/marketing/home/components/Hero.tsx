@@ -31,7 +31,7 @@ function ParticleField() {
 		let h: number;
 		let animId: number;
 		const colors = [
-			"16,185,129",
+			"14,165,233",
 			"59,130,246",
 			"139,92,246",
 			"6,182,212",
@@ -129,11 +129,11 @@ export function Hero() {
 							className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full"
 							style={{
 								background:
-									"linear-gradient(135deg, rgba(16,185,129,0.08), rgba(6,182,212,0.06))",
-								border: "1px solid rgba(16,185,129,0.15)",
+									"linear-gradient(135deg, rgba(14,165,233,0.08), rgba(6,182,212,0.06))",
+								border: "1px solid rgba(14,165,233,0.15)",
 							}}
 						>
-							<span className="text-[#10B981] text-sm font-semibold">
+							<span className="text-[#0ea5e9] text-sm font-semibold">
 								{t("hero.badge")}
 							</span>
 						</div>
@@ -157,11 +157,11 @@ export function Hero() {
 						</h1>
 					</div>
 
-					{/* Subtitle — emerald */}
+					{/* Subtitle — sky blue */}
 					<div className="animate-fade-in-delay-1">
 						<p
 							className="text-[clamp(1rem,2.8vw,1.75rem)] font-semibold leading-[1.4] mb-4"
-							style={{ color: "#10B981" }}
+							style={{ color: "#0ea5e9" }}
 						>
 							{t("hero.subtitle")}
 						</p>
@@ -211,7 +211,7 @@ export function Hero() {
 					<div className="animate-fade-in-delay-4 mt-0">
 						<div className="flex items-center gap-4">
 							<div className="flex">
-								{["#10B981", "#3B82F6", "#F59E0B", "#8B5CF6"].map(
+								{["#0ea5e9", "#3B82F6", "#F59E0B", "#8B5CF6"].map(
 									(color, i) => (
 										<div
 											key={color}

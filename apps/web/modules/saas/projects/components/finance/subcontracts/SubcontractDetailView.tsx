@@ -86,7 +86,7 @@ function formatCurrency(value: number): string {
 
 const STATUS_STYLES: Record<string, { bg: string; text: string }> = {
 	DRAFT: { bg: "bg-slate-100 dark:bg-slate-800", text: "text-slate-600 dark:text-slate-400" },
-	ACTIVE: { bg: "bg-emerald-100 dark:bg-emerald-900/40", text: "text-emerald-700 dark:text-emerald-300" },
+	ACTIVE: { bg: "bg-sky-100 dark:bg-sky-900/40", text: "text-sky-700 dark:text-sky-300" },
 	SUSPENDED: { bg: "bg-amber-100 dark:bg-amber-900/40", text: "text-amber-700 dark:text-amber-300" },
 	COMPLETED: { bg: "bg-blue-100 dark:bg-blue-900/40", text: "text-blue-700 dark:text-blue-300" },
 	TERMINATED: { bg: "bg-red-100 dark:bg-red-900/40", text: "text-red-700 dark:text-red-300" },
@@ -95,7 +95,7 @@ const STATUS_STYLES: Record<string, { bg: string; text: string }> = {
 const CO_STATUS_STYLES: Record<string, { bg: string; text: string }> = {
 	DRAFT: { bg: "bg-slate-100 dark:bg-slate-800", text: "text-slate-600 dark:text-slate-400" },
 	SUBMITTED: { bg: "bg-blue-100 dark:bg-blue-900/40", text: "text-blue-700 dark:text-blue-300" },
-	APPROVED: { bg: "bg-emerald-100 dark:bg-emerald-900/40", text: "text-emerald-700 dark:text-emerald-300" },
+	APPROVED: { bg: "bg-sky-100 dark:bg-sky-900/40", text: "text-sky-700 dark:text-sky-300" },
 	REJECTED: { bg: "bg-red-100 dark:bg-red-900/40", text: "text-red-700 dark:text-red-300" },
 };
 
@@ -593,11 +593,11 @@ export function SubcontractDetailView({
 								{coImpact >= 0 ? "+" : ""}{formatCurrency(coImpact)}
 							</p>
 						</div>
-						<div className="rounded-xl bg-emerald-50 p-3 dark:bg-emerald-950/20">
-							<p className="text-[10px] font-medium uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
+						<div className="rounded-xl bg-sky-50 p-3 dark:bg-sky-950/20">
+							<p className="text-[10px] font-medium uppercase tracking-wide text-sky-600 dark:text-sky-400">
 								{t("subcontracts.detail.totalPaid")}
 							</p>
-							<p className="mt-1 text-lg font-bold text-emerald-700 dark:text-emerald-300">
+							<p className="mt-1 text-lg font-bold text-sky-700 dark:text-sky-300">
 								{formatCurrency(totalPaid)}
 							</p>
 						</div>
@@ -617,13 +617,13 @@ export function SubcontractDetailView({
 							<span className="text-slate-500">
 								{t("subcontracts.detail.adjustedValue")}: <span className="font-semibold text-slate-700 dark:text-slate-300">{formatCurrency(adjustedValue)}</span>
 							</span>
-							<span className={`font-bold ${isOverBudget ? "text-red-600" : "text-emerald-600"}`}>
+							<span className={`font-bold ${isOverBudget ? "text-red-600" : "text-sky-600"}`}>
 								{progress.toFixed(1)}%
 							</span>
 						</div>
 						<div className="h-3 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
 							<div
-								className={`h-full rounded-full transition-all ${isOverBudget ? "bg-red-500" : progress >= 100 ? "bg-emerald-500" : "bg-orange-500"}`}
+								className={`h-full rounded-full transition-all ${isOverBudget ? "bg-red-500" : progress >= 100 ? "bg-sky-500" : "bg-orange-500"}`}
 								style={{ width: `${Math.min(progress, 100)}%` }}
 							/>
 						</div>
@@ -644,8 +644,8 @@ export function SubcontractDetailView({
 				<div className="flex flex-col gap-3 border-b border-slate-100 p-5 dark:border-slate-800">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
-							<div className="rounded-lg bg-emerald-100 p-2 dark:bg-emerald-900/30">
-								<Banknote className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+							<div className="rounded-lg bg-sky-100 p-2 dark:bg-sky-900/30">
+								<Banknote className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 							</div>
 							<div>
 								<h2 className="font-semibold text-slate-800 dark:text-slate-200">
@@ -658,7 +658,7 @@ export function SubcontractDetailView({
 						</div>
 						<Button
 							size="sm"
-							className="rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600"
+							className="rounded-xl bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600"
 							onClick={() => setShowPaymentForm(!showPaymentForm)}
 						>
 							<Plus className="ml-1.5 h-4 w-4" />
@@ -771,7 +771,7 @@ export function SubcontractDetailView({
 								</span>
 								<span>
 									<span className="text-slate-500">{t("subcontracts.detail.remaining")}: </span>
-									<span className={`font-bold ${isOverBudget ? "text-red-600" : "text-emerald-600"}`}>{formatCurrency(remaining)}</span>
+									<span className={`font-bold ${isOverBudget ? "text-red-600" : "text-sky-600"}`}>{formatCurrency(remaining)}</span>
 								</span>
 							</div>
 						</div>
@@ -795,9 +795,9 @@ export function SubcontractDetailView({
 
 				{/* Inline Payment Form */}
 				{showPaymentForm && (
-					<div className="border-t border-emerald-200 bg-emerald-50/50 p-5 dark:border-emerald-800/30 dark:bg-emerald-950/10">
+					<div className="border-t border-sky-200 bg-sky-50/50 p-5 dark:border-sky-800/30 dark:bg-sky-950/10">
 						<form onSubmit={handlePaymentSubmit} className="space-y-4">
-							<h3 className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+							<h3 className="text-sm font-semibold text-sky-700 dark:text-sky-300">
 								{t("subcontracts.detail.newPaymentForm")}
 							</h3>
 
@@ -969,7 +969,7 @@ export function SubcontractDetailView({
 								<Button
 									type="submit"
 									size="sm"
-									className="rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+									className="rounded-lg bg-sky-600 text-white hover:bg-sky-700"
 									disabled={createPaymentMutation.isPending}
 								>
 									{createPaymentMutation.isPending ? (
@@ -1008,7 +1008,7 @@ export function SubcontractDetailView({
 								<div key={term.id} className="flex items-center gap-4 px-5 py-3">
 									{/* Status icon */}
 									{term.isComplete ? (
-										<CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
+										<CheckCircle2 className="h-5 w-5 shrink-0 text-sky-500" />
 									) : isNext ? (
 										<Clock className="h-5 w-5 shrink-0 text-blue-500" />
 									) : (
@@ -1031,7 +1031,7 @@ export function SubcontractDetailView({
 										<div className="mt-1 flex items-center gap-2">
 											<div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
 												<div
-													className={`h-full rounded-full transition-all ${term.isComplete ? "bg-emerald-500" : isNext ? "bg-blue-500" : "bg-slate-400"}`}
+													className={`h-full rounded-full transition-all ${term.isComplete ? "bg-sky-500" : isNext ? "bg-blue-500" : "bg-slate-400"}`}
 													style={{ width: `${term.progressPercent}%` }}
 												/>
 											</div>
@@ -1108,7 +1108,7 @@ export function SubcontractDetailView({
 											</p>
 										</div>
 										<div className="flex items-center gap-2">
-											<span className={`font-semibold ${co.amount >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+											<span className={`font-semibold ${co.amount >= 0 ? "text-sky-600" : "text-red-600"}`}>
 												{co.amount >= 0 ? "+" : ""}
 												{formatCurrency(co.amount)}
 											</span>
