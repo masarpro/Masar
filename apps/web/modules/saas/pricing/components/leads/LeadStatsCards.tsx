@@ -59,8 +59,8 @@ export function LeadStatsCards({ organizationId }: LeadStatsCardsProps) {
 			label: t("pricing.leads.stats.won"),
 			value: String(stats.byStatus.WON ?? 0),
 			icon: CheckCircle2,
-			iconBg: "bg-sky-50 dark:bg-sky-900/30",
-			iconColor: "text-sky-600 dark:text-sky-400",
+			iconBg: "bg-teal-50 dark:bg-teal-900/30",
+			iconColor: "text-teal-600 dark:text-teal-400",
 		},
 		{
 			label: t("pricing.leads.stats.estimatedValue"),

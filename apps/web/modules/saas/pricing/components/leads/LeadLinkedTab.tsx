@@ -107,8 +107,8 @@ export function LeadLinkedTab({
 			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
 				<div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
 					<h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-						<div className="h-[30px] w-[30px] rounded-lg bg-sky-50 dark:bg-sky-950/30 flex items-center justify-center">
-							<Calculator className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+						<div className="h-[30px] w-[30px] rounded-lg bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
+							<Calculator className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
 						</div>
 						{t("pricing.leads.detail.costStudy")}
 					</h3>
