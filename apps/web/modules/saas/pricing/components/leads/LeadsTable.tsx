@@ -113,17 +113,17 @@ export function LeadsTable({ leads, organizationId, organizationSlug }: LeadsTab
 
 	return (
 		<>
-			<div className="overflow-hidden rounded-2xl border border-border">
+			<div className="overflow-x-auto rounded-2xl border border-border">
 				<Table>
 					<TableHeader>
 						<TableRow className="bg-muted/30">
 							<TableHead className="font-medium">{t("pricing.leads.columns.client")}</TableHead>
-							<TableHead className="font-medium">{t("pricing.leads.columns.project")}</TableHead>
+							<TableHead className="hidden sm:table-cell font-medium">{t("pricing.leads.columns.project")}</TableHead>
 							<TableHead className="font-medium">{t("pricing.leads.columns.value")}</TableHead>
 							<TableHead className="font-medium">{t("pricing.leads.columns.status")}</TableHead>
 							<TableHead className="font-medium">{t("pricing.leads.columns.priority")}</TableHead>
-							<TableHead className="font-medium">{t("pricing.leads.columns.assignedTo")}</TableHead>
-							<TableHead className="font-medium">{t("pricing.leads.columns.date")}</TableHead>
+							<TableHead className="hidden sm:table-cell font-medium">{t("pricing.leads.columns.assignedTo")}</TableHead>
+							<TableHead className="hidden sm:table-cell font-medium">{t("pricing.leads.columns.date")}</TableHead>
 							<TableHead className="w-[50px]" />
 						</TableRow>
 					</TableHeader>
@@ -149,7 +149,7 @@ export function LeadsTable({ leads, organizationId, organizationSlug }: LeadsTab
 										)}
 									</div>
 								</TableCell>
-								<TableCell>
+								<TableCell className="hidden sm:table-cell">
 									{lead.projectType ? (
 										<div>
 											<span className="inline-flex items-center rounded-md bg-muted/50 px-2 py-0.5 text-xs font-medium">
@@ -187,7 +187,7 @@ export function LeadsTable({ leads, organizationId, organizationSlug }: LeadsTab
 								<TableCell>
 									<LeadPriorityIndicator priority={lead.priority} />
 								</TableCell>
-								<TableCell>
+								<TableCell className="hidden sm:table-cell">
 									{lead.assignedTo ? (
 										<span className="text-sm text-foreground">
 											{lead.assignedTo.name}
@@ -198,7 +198,7 @@ export function LeadsTable({ leads, organizationId, organizationSlug }: LeadsTab
 										</span>
 									)}
 								</TableCell>
-								<TableCell className="text-sm text-muted-foreground">
+								<TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
 									{formatDate(lead.createdAt)}
 								</TableCell>
 								<TableCell>

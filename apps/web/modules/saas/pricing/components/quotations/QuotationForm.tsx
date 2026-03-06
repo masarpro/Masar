@@ -1085,7 +1085,7 @@ export function QuotationForm({
 				</div>
 
 				{/* ─── Mobile Bottom Bar ───────────────────────────────── */}
-				<div className="fixed bottom-0 inset-x-0 z-50 sm:hidden backdrop-blur-xl bg-white/90 dark:bg-slate-900/90 border-t shadow-[0_-4px_20px_rgba(0,0,0,0.06)] p-4 safe-area-inset-bottom">
+				<div className="fixed bottom-0 inset-x-0 z-50 sm:hidden backdrop-blur-xl bg-white/90 dark:bg-slate-900/90 border-t shadow-[0_-4px_20px_rgba(0,0,0,0.06)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
 					<div className="flex items-center justify-between gap-3">
 						<div>
 							<p className="text-[11px] text-muted-foreground">{t("finance.summary.total")}</p>

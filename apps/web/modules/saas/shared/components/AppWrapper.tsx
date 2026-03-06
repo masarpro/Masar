@@ -18,7 +18,7 @@ export function AppWrapper({ children }: PropsWithChildren) {
 
 	return (
 		<SidebarProvider>
-			<div className="flex min-h-screen">
+			<div className="flex min-h-screen overflow-x-hidden">
 				<AppSidebar headerExtra={headerExtra} />
 				<SidebarInset>{children}</SidebarInset>
 			</div>

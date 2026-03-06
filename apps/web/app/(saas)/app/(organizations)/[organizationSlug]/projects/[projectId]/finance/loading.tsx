@@ -1,7 +1,28 @@
-export default function ProjectFinanceLoading() {
+import { Skeleton } from "@ui/components/skeleton";
+
+export default function Loading() {
 	return (
-		<div className="flex min-h-[40vh] items-center justify-center">
-			<div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+		<div className="space-y-6">
+			<Skeleton className="h-8 w-48" />
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+				{Array.from({ length: 4 }).map((_, i) => (
+					<div key={i} className="rounded-xl border border-border p-5 space-y-3">
+						<Skeleton className="h-4 w-20" />
+						<Skeleton className="h-8 w-28" />
+						<Skeleton className="h-3 w-24" />
+					</div>
+				))}
+			</div>
+			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+				<div className="rounded-xl border border-border p-6 space-y-4">
+					<Skeleton className="h-5 w-32" />
+					<Skeleton className="h-48 w-full rounded-lg" />
+				</div>
+				<div className="rounded-xl border border-border p-6 space-y-4">
+					<Skeleton className="h-5 w-32" />
+					<Skeleton className="h-48 w-full rounded-lg" />
+				</div>
+			</div>
 		</div>
 	);
 }

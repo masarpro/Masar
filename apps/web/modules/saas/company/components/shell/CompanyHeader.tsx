@@ -34,7 +34,7 @@ export function CompanyHeader({ userName }: CompanyHeaderProps) {
 
 	return (
 		<div
-			className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50"
+			className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50"
 			dir="rtl"
 		>
 			<div className="flex items-center gap-3">
@@ -52,7 +52,7 @@ export function CompanyHeader({ userName }: CompanyHeaderProps) {
 				</div>
 			</div>
 
-			<div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
+			<div className="hidden sm:flex items-center gap-1.5 text-foreground font-medium text-sm">
 				<Clock className="h-4 w-4" />
 				<span className="tabular-nums">{formatTime(currentTime)}</span>
 			</div>

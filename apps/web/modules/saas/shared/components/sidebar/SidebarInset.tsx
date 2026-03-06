@@ -20,7 +20,7 @@ export function SidebarInset({ children, className }: SidebarInsetProps) {
 	return (
 		<div
 			className={cn(
-				"flex-1 py-2 xl:py-4",
+				"flex-1 py-2 xl:py-4 min-w-0",
 				config.ui.saas.useSidebarLayout && "min-h-[calc(100vh)]",
 				config.ui.saas.useSidebarLayout && [
 					"xl:pe-4",
@@ -31,7 +31,7 @@ export function SidebarInset({ children, className }: SidebarInsetProps) {
 		>
 			<main
 				className={cn(
-					"rounded-3xl bg-background min-h-full w-full",
+					"rounded-3xl bg-background min-h-full w-full overflow-x-hidden",
 					"px-3 py-4 xl:px-8 xl:py-8",
 				)}
 			>

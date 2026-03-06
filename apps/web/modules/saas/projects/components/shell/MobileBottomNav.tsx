@@ -179,7 +179,7 @@ function MobilePopoverSlot({
 			>
 				<div className="relative">
 					<Icon className="h-5 w-5" />
-					<ChevronUp className="absolute -top-1.5 -left-1.5 h-2.5 w-2.5 opacity-60" />
+					<ChevronUp className="absolute -top-1.5 -start-1.5 h-2.5 w-2.5 opacity-60" />
 				</div>
 				<span className="text-[10px] font-medium leading-tight truncate">
 					{t(group.labelKey)}
@@ -226,7 +226,7 @@ function MobileSheetSlot({
 			>
 				<div className="relative">
 					<Icon className="h-5 w-5" />
-					<ChevronUp className="absolute -top-1.5 -left-1.5 h-2.5 w-2.5 opacity-60" />
+					<ChevronUp className="absolute -top-1.5 -start-1.5 h-2.5 w-2.5 opacity-60" />
 				</div>
 				<span className="text-[10px] font-medium leading-tight truncate">
 					{t(group.labelKey)}

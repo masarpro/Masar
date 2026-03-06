@@ -73,7 +73,7 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 			<div className="flex items-center justify-center py-20">
 				<div className="relative">
 					<div className="w-16 h-16 border-4 border-primary/20 rounded-full" />
-					<div className="absolute top-0 left-0 w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+					<div className="absolute top-0 start-0 w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
 				</div>
 			</div>
 		);
@@ -85,12 +85,12 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
 					<div className="relative flex-1 max-w-md">
-						<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+						<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 						<Input
 							placeholder={t("pricing.quotations.searchPlaceholder")}
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
-							className="pr-10 bg-muted/50 border-border rounded-xl"
+							className="pe-10 bg-muted/50 border-border rounded-xl"
 						/>
 					</div>
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -113,14 +113,14 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 
 			{/* Quotations Table */}
 			{quotations.length > 0 ? (
-				<div className="rounded-2xl border border-border overflow-hidden">
+				<div className="rounded-2xl border border-border overflow-x-auto">
 					<Table>
 						<TableHeader>
 							<TableRow className="bg-muted/30">
 								<TableHead className="font-medium">{t("pricing.quotations.columns.number")}</TableHead>
 								<TableHead className="font-medium">{t("pricing.quotations.columns.client")}</TableHead>
-								<TableHead className="font-medium">{t("pricing.quotations.columns.date")}</TableHead>
-								<TableHead className="font-medium">{t("pricing.quotations.columns.validUntil")}</TableHead>
+								<TableHead className="hidden sm:table-cell font-medium">{t("pricing.quotations.columns.date")}</TableHead>
+								<TableHead className="hidden sm:table-cell font-medium">{t("pricing.quotations.columns.validUntil")}</TableHead>
 								<TableHead className="font-medium">{t("pricing.quotations.columns.amount")}</TableHead>
 								<TableHead className="font-medium">{t("pricing.quotations.columns.status")}</TableHead>
 								<TableHead className="w-[50px]" />
@@ -158,10 +158,10 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 											)}
 										</div>
 									</TableCell>
-									<TableCell className="text-muted-foreground">
+									<TableCell className="hidden sm:table-cell text-muted-foreground">
 										{formatDate(quotation.createdAt)}
 									</TableCell>
-									<TableCell className="text-muted-foreground">
+									<TableCell className="hidden sm:table-cell text-muted-foreground">
 										{formatDate(quotation.validUntil)}
 									</TableCell>
 									<TableCell className="font-semibold">
