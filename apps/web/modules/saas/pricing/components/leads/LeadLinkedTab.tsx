@@ -13,7 +13,6 @@ import {
 	AlertDialogTitle,
 } from "@ui/components/alert-dialog";
 import { Button } from "@ui/components/button";
-import { Card, CardContent } from "@ui/components/card";
 import {
 	Calculator,
 	FileSpreadsheet,
@@ -105,17 +104,18 @@ export function LeadLinkedTab({
 	return (
 		<div className="space-y-4">
 			{/* Cost Study */}
-			<Card className="rounded-2xl">
-				<CardContent className="p-5">
-					<div className="flex items-center justify-between mb-3">
-						<h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-							<Calculator className="h-4 w-4 text-primary" />
-							{t("pricing.leads.detail.costStudy")}
-						</h3>
-					</div>
-
+			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
+				<div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
+					<h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+						<div className="h-[30px] w-[30px] rounded-lg bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
+							<Calculator className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+						</div>
+						{t("pricing.leads.detail.costStudy")}
+					</h3>
+				</div>
+				<div className="p-5">
 					{costStudy ? (
-						<div className="rounded-xl border border-border p-4">
+						<div className="rounded-xl bg-slate-50/50 dark:bg-slate-800/30 border border-slate-200/60 dark:border-slate-700/50 p-4">
 							<div className="flex items-center justify-between">
 								<div>
 									<Link
@@ -150,21 +150,22 @@ export function LeadLinkedTab({
 							</Button>
 						</div>
 					)}
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 
 			{/* Quotation */}
-			<Card className="rounded-2xl">
-				<CardContent className="p-5">
-					<div className="flex items-center justify-between mb-3">
-						<h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-							<FileSpreadsheet className="h-4 w-4 text-primary" />
-							{t("pricing.leads.detail.quotation")}
-						</h3>
-					</div>
-
+			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
+				<div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
+					<h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+						<div className="h-[30px] w-[30px] rounded-lg bg-orange-50 dark:bg-orange-950/30 flex items-center justify-center">
+							<FileSpreadsheet className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+						</div>
+						{t("pricing.leads.detail.quotation")}
+					</h3>
+				</div>
+				<div className="p-5">
 					{quotation ? (
-						<div className="rounded-xl border border-border p-4">
+						<div className="rounded-xl bg-slate-50/50 dark:bg-slate-800/30 border border-slate-200/60 dark:border-slate-700/50 p-4">
 							<div className="flex items-center justify-between">
 								<div>
 									<Link
@@ -203,8 +204,8 @@ export function LeadLinkedTab({
 							</Button>
 						</div>
 					)}
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 
 			{/* Unlink Confirmation */}
 			<AlertDialog open={!!unlinkType} onOpenChange={(open) => !open && setUnlinkType(null)}>

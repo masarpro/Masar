@@ -12,7 +12,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@ui/components/alert-dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
+import { Tabs, TabsContent } from "@ui/components/tabs";
 import { FileText, FolderOpen, Link2, Loader2, MessageSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -78,8 +78,15 @@ export function LeadDetailPage({ leadId, organizationId, organizationSlug }: Lea
 		);
 	}
 
+	const tabs = [
+		{ value: "info", icon: FileText, label: t("pricing.leads.detail.tabs.info") },
+		{ value: "files", icon: FolderOpen, label: t("pricing.leads.detail.tabs.files"), count: lead.files.length },
+		{ value: "activity", icon: MessageSquare, label: t("pricing.leads.detail.tabs.activity"), count: lead.activities.length },
+		{ value: "linked", icon: Link2, label: t("pricing.leads.detail.tabs.linked") },
+	];
+
 	return (
-		<div className="space-y-6">
+		<div className="space-y-6" dir="rtl">
 			<LeadHeader
 				lead={{
 					...lead,
@@ -95,41 +102,40 @@ export function LeadDetailPage({ leadId, organizationId, organizationSlug }: Lea
 				onConvert={() => setShowConvertDialog(true)}
 			/>
 
-			<Tabs value={activeTab} onValueChange={setActiveTab}>
-				<TabsList className="rounded-xl">
-					<TabsTrigger value="info" className="rounded-lg">
-						<FileText className="me-2 h-4 w-4" />
-						{t("pricing.leads.detail.tabs.info")}
-					</TabsTrigger>
-					<TabsTrigger value="files" className="rounded-lg">
-						<FolderOpen className="me-2 h-4 w-4" />
-						{t("pricing.leads.detail.tabs.files")}
-						{lead.files.length > 0 && (
-							<span className="ms-1.5 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-muted px-1 text-[10px] font-medium">
-								{lead.files.length}
+			{/* Glassmorphism Navigation */}
+			<nav className="flex items-center gap-1 px-2 py-1.5 rounded-2xl bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-white/20 shadow-lg overflow-x-auto" dir="rtl">
+				{tabs.map((tab) => (
+					<button
+						key={tab.value}
+						type="button"
+						onClick={() => setActiveTab(tab.value)}
+						className={
+							activeTab === tab.value
+								? "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm whitespace-nowrap transition-all bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-medium shadow-md shadow-primary/20"
+								: "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm whitespace-nowrap transition-all text-muted-foreground hover:text-foreground hover:bg-muted/60"
+						}
+					>
+						<tab.icon className="h-4 w-4" />
+						{tab.label}
+						{tab.count != null && tab.count > 0 && (
+							<span className={
+								activeTab === tab.value
+									? "inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-white/20 px-1 text-[10px] font-medium"
+									: "inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-muted px-1 text-[10px] font-medium"
+							}>
+								{tab.count}
 							</span>
 						)}
-					</TabsTrigger>
-					<TabsTrigger value="activity" className="rounded-lg">
-						<MessageSquare className="me-2 h-4 w-4" />
-						{t("pricing.leads.detail.tabs.activity")}
-						{lead.activities.length > 0 && (
-							<span className="ms-1.5 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-muted px-1 text-[10px] font-medium">
-								{lead.activities.length}
-							</span>
-						)}
-					</TabsTrigger>
-					<TabsTrigger value="linked" className="rounded-lg">
-						<Link2 className="me-2 h-4 w-4" />
-						{t("pricing.leads.detail.tabs.linked")}
-					</TabsTrigger>
-				</TabsList>
+					</button>
+				))}
+			</nav>
 
-				<TabsContent value="info" className="mt-4">
+			<Tabs value={activeTab} onValueChange={setActiveTab}>
+				<TabsContent value="info" className="mt-0">
 					<LeadInfoTab lead={lead} />
 				</TabsContent>
 
-				<TabsContent value="files" className="mt-4">
+				<TabsContent value="files" className="mt-0">
 					<LeadFilesTab
 						leadId={leadId}
 						organizationId={organizationId}
@@ -137,7 +143,7 @@ export function LeadDetailPage({ leadId, organizationId, organizationSlug }: Lea
 					/>
 				</TabsContent>
 
-				<TabsContent value="activity" className="mt-4">
+				<TabsContent value="activity" className="mt-0">
 					<LeadActivityTab
 						leadId={leadId}
 						organizationId={organizationId}
@@ -145,7 +151,7 @@ export function LeadDetailPage({ leadId, organizationId, organizationSlug }: Lea
 					/>
 				</TabsContent>
 
-				<TabsContent value="linked" className="mt-4">
+				<TabsContent value="linked" className="mt-0">
 					<LeadLinkedTab
 						leadId={leadId}
 						organizationId={organizationId}

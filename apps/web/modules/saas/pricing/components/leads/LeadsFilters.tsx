@@ -68,9 +68,9 @@ export function LeadsFilters({
 	}
 
 	return (
-		<div className="space-y-3">
+		<div className="space-y-3" dir="rtl">
 			{/* Status Tabs */}
-			<div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+			<nav className="flex items-center gap-1 px-2 py-1.5 rounded-2xl bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-white/20 shadow-lg overflow-x-auto scrollbar-hide">
 				{STATUS_TABS.map((tab) => {
 					const count = getTabCount(tab.value);
 					const isActive = status === tab.value;
@@ -80,10 +80,10 @@ export function LeadsFilters({
 							type="button"
 							onClick={() => onStatusChange(tab.value)}
 							className={cn(
-								"flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all",
+								"flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm whitespace-nowrap transition-all",
 								isActive
-									? "bg-primary text-primary-foreground font-medium"
-									: "bg-muted/60 text-muted-foreground hover:bg-muted",
+									? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-medium shadow-md shadow-primary/20"
+									: "text-muted-foreground hover:text-foreground hover:bg-muted/60",
 							)}
 						>
 							{tab.value ? t(`pricing.leads.status.${tab.value}`) : t("pricing.leads.allStatuses")}
@@ -98,7 +98,7 @@ export function LeadsFilters({
 						</button>
 					);
 				})}
-			</div>
+			</nav>
 
 			{/* Search and Secondary Filters */}
 			<div className="flex items-center gap-2 flex-wrap">

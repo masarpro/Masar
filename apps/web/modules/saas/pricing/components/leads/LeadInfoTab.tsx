@@ -1,14 +1,15 @@
 "use client";
 
-import { Card, CardContent } from "@ui/components/card";
 import {
 	Building2,
 	Calendar,
 	CalendarDays,
+	FolderKanban,
 	Mail,
 	MapPin,
 	Phone,
 	Ruler,
+	Settings,
 	Tag,
 	User,
 	Wallet,
@@ -58,11 +59,16 @@ export function LeadInfoTab({ lead }: LeadInfoTabProps) {
 	return (
 		<div className="space-y-4">
 			{/* Client Info */}
-			<Card className="rounded-2xl">
-				<CardContent className="p-5 space-y-4">
+			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
+				<div className="flex items-center gap-2 border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
+					<div className="h-[30px] w-[30px] rounded-lg bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center">
+						<User className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+					</div>
 					<h3 className="text-sm font-semibold text-foreground">
 						{t("pricing.leads.form.clientInfo")}
 					</h3>
+				</div>
+				<div className="p-5 space-y-4">
 					<div className="grid gap-4 sm:grid-cols-2">
 						<InfoRow icon={User} label={t("pricing.leads.form.name")} value={lead.name} />
 						<InfoRow icon={Phone} label={t("pricing.leads.form.phone")} value={lead.phone} dir="ltr" />
@@ -79,15 +85,20 @@ export function LeadInfoTab({ lead }: LeadInfoTabProps) {
 							value={t(`pricing.leads.source.${lead.source}`)}
 						/>
 					</div>
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 
 			{/* Project Info */}
-			<Card className="rounded-2xl">
-				<CardContent className="p-5 space-y-4">
+			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
+				<div className="flex items-center gap-2 border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
+					<div className="h-[30px] w-[30px] rounded-lg bg-violet-50 dark:bg-violet-950/30 flex items-center justify-center">
+						<FolderKanban className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+					</div>
 					<h3 className="text-sm font-semibold text-foreground">
 						{t("pricing.leads.form.projectInfo")}
 					</h3>
+				</div>
+				<div className="p-5 space-y-4">
 					<div className="grid gap-4 sm:grid-cols-2">
 						{lead.projectType && (
 							<InfoRow
@@ -112,15 +123,20 @@ export function LeadInfoTab({ lead }: LeadInfoTabProps) {
 							/>
 						)}
 					</div>
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 
 			{/* Management Info */}
-			<Card className="rounded-2xl">
-				<CardContent className="p-5 space-y-4">
+			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
+				<div className="flex items-center gap-2 border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
+					<div className="h-[30px] w-[30px] rounded-lg bg-slate-100 dark:bg-slate-800/50 flex items-center justify-center">
+						<Settings className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+					</div>
 					<h3 className="text-sm font-semibold text-foreground">
 						{t("pricing.leads.detail.managementInfo")}
 					</h3>
+				</div>
+				<div className="p-5 space-y-4">
 					<div className="grid gap-4 sm:grid-cols-2">
 						<InfoRow
 							icon={User}
@@ -152,20 +168,20 @@ export function LeadInfoTab({ lead }: LeadInfoTabProps) {
 					</div>
 
 					{lead.notes && (
-						<div className="pt-2 border-t">
+						<div className="pt-2 border-t border-slate-100 dark:border-slate-800">
 							<p className="text-xs text-muted-foreground mb-1">{t("pricing.leads.form.notes")}</p>
 							<p className="text-sm text-foreground whitespace-pre-wrap">{lead.notes}</p>
 						</div>
 					)}
 
 					{lead.lostReason && (
-						<div className="pt-2 border-t">
+						<div className="pt-2 border-t border-slate-100 dark:border-slate-800">
 							<p className="text-xs text-muted-foreground mb-1">{t("pricing.leads.detail.lostReason")}</p>
 							<p className="text-sm text-red-600 dark:text-red-400 whitespace-pre-wrap">{lead.lostReason}</p>
 						</div>
 					)}
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 		</div>
 	);
 }

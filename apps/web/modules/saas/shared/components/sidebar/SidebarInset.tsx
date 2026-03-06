@@ -31,7 +31,7 @@ export function SidebarInset({ children, className }: SidebarInsetProps) {
 		>
 			<main
 				className={cn(
-					"rounded-3xl bg-card min-h-full w-full",
+					"rounded-3xl bg-background min-h-full w-full",
 					"px-3 py-4 xl:px-8 xl:py-8",
 				)}
 			>

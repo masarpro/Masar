@@ -1,5 +1,6 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { LeadsListPage } from "@saas/pricing/components/leads/LeadsListPage";
+import { CreateLeadButton } from "@saas/pricing/components/leads/CreateLeadButton";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -33,6 +34,7 @@ export default async function LeadsPage({
 		<PricingShell
 			organizationSlug={organizationSlug}
 			sectionKey="leads"
+			headerActions={<CreateLeadButton organizationSlug={organizationSlug} />}
 		>
 			<LeadsListPage
 				organizationId={activeOrganization.id}

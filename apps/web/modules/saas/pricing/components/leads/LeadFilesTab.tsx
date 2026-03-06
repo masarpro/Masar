@@ -13,7 +13,6 @@ import {
 	AlertDialogTitle,
 } from "@ui/components/alert-dialog";
 import { Button } from "@ui/components/button";
-import { Card, CardContent } from "@ui/components/card";
 import {
 	Table,
 	TableBody,
@@ -22,7 +21,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@ui/components/table";
-import { Download, File, Image, Trash2 } from "lucide-react";
+import { Download, File, FolderOpen, Image, Trash2, Upload } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -90,26 +89,35 @@ export function LeadFilesTab({ leadId, organizationId, files }: LeadFilesTabProp
 	return (
 		<div className="space-y-4">
 			{/* Upload Zone */}
-			<Card className="rounded-2xl">
-				<CardContent className="p-5">
-					<h3 className="mb-3 text-sm font-semibold text-foreground">
+			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
+				<div className="flex items-center gap-2 border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
+					<div className="h-[30px] w-[30px] rounded-lg bg-green-50 dark:bg-green-950/30 flex items-center justify-center">
+						<Upload className="h-4 w-4 text-green-600 dark:text-green-400" />
+					</div>
+					<h3 className="text-sm font-semibold text-foreground">
 						{t("pricing.leads.detail.uploadFile")}
 					</h3>
+				</div>
+				<div className="p-5">
 					<LeadFileUploadZone
 						organizationId={organizationId}
 						leadId={leadId}
 						onUploadComplete={handleRefresh}
 					/>
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 
 			{/* File List */}
-			<Card className="rounded-2xl">
-				<CardContent className="p-5">
-					<h3 className="mb-3 text-sm font-semibold text-foreground">
+			<div className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50">
+				<div className="flex items-center gap-2 border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
+					<div className="h-[30px] w-[30px] rounded-lg bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center">
+						<FolderOpen className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+					</div>
+					<h3 className="text-sm font-semibold text-foreground">
 						{t("pricing.leads.detail.files")} ({files.length})
 					</h3>
-
+				</div>
+				<div className="p-5">
 					{files.length === 0 ? (
 						<p className="py-8 text-center text-sm text-muted-foreground">
 							{t("pricing.leads.detail.noFiles")}
@@ -118,7 +126,7 @@ export function LeadFilesTab({ leadId, organizationId, files }: LeadFilesTabProp
 						<div className="overflow-hidden rounded-xl border border-border">
 							<Table>
 								<TableHeader>
-									<TableRow className="bg-muted/30">
+									<TableRow className="bg-slate-50/80 dark:bg-slate-800/50">
 										<TableHead className="font-medium">{t("pricing.leads.detail.fileName")}</TableHead>
 										<TableHead className="font-medium">{t("pricing.leads.detail.fileCategory")}</TableHead>
 										<TableHead className="font-medium">{t("pricing.leads.detail.fileSize")}</TableHead>
@@ -170,8 +178,8 @@ export function LeadFilesTab({ leadId, organizationId, files }: LeadFilesTabProp
 							</Table>
 						</div>
 					)}
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 
 			<AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
 				<AlertDialogContent>

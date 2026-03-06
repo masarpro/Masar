@@ -61,15 +61,6 @@ interface LeadCardProps {
 	onDelete?: () => void;
 }
 
-const STATUS_ACCENT: Record<string, string> = {
-	NEW: "bg-blue-500",
-	STUDYING: "bg-amber-500",
-	QUOTED: "bg-violet-500",
-	NEGOTIATING: "bg-orange-500",
-	WON: "bg-teal-500",
-	LOST: "bg-red-400",
-};
-
 function getStatusProgress(status: string): string {
 	const map: Record<string, string> = {
 		NEW: "16%",
@@ -109,8 +100,6 @@ export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardP
 		deleteMutation.mutate({ organizationId, leadId: lead.id });
 	};
 
-	const accent = STATUS_ACCENT[lead.status] ?? "bg-slate-400";
-
 	const createdDate = new Date(lead.createdAt).toLocaleDateString("ar-SA", {
 		month: "short",
 		day: "numeric",
@@ -122,16 +111,13 @@ export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardP
 
 	return (
 		<>
-			<div className="group relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg">
-				{/* Top accent line */}
-				<div className={`h-1 w-full ${accent}`} />
-
+			<div className="group relative rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50 overflow-hidden transition-all duration-200 hover:shadow-xl">
 				{/* Card Header */}
-				<div className="p-4 pb-3">
+				<div className="border-b border-slate-100 dark:border-slate-800 px-4 py-3">
 					<div className="flex items-start justify-between gap-3">
 						<div className="flex items-center gap-2 flex-1 min-w-0">
 							{/* Avatar */}
-							<div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-semibold shrink-0">
+							<div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-sm font-semibold shrink-0">
 								{lead.name.charAt(0).toUpperCase()}
 							</div>
 							<div className="min-w-0">
@@ -222,7 +208,7 @@ export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardP
 				</div>
 
 				{/* Card Footer */}
-				<div className="px-4 pb-3 pt-3 border-t border-dashed border-slate-100 dark:border-slate-800">
+				<div className="px-4 pb-3 pt-3 border-t border-slate-100 dark:border-slate-800">
 					<div className="flex items-center justify-between">
 						{/* Estimated Value */}
 						<div>
