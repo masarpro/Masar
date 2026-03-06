@@ -26,6 +26,7 @@ export default async function ChoosePlanPage() {
 	}
 
 	let organizationId: string | undefined;
+	let organizationSlug: string | undefined;
 	if (config.organizations.enable && config.organizations.enableBilling) {
 		const organization = (await getOrganizationList()).at(0);
 
@@ -34,6 +35,7 @@ export default async function ChoosePlanPage() {
 		}
 
 		organizationId = organization.id;
+		organizationSlug = organization.slug;
 	}
 
 	const [error, purchases] = await attemptAsync(() =>
@@ -48,5 +50,5 @@ export default async function ChoosePlanPage() {
 		}
 	}
 
-	return <ChoosePlanContent />;
+	return <ChoosePlanContent organizationSlug={organizationSlug} />;
 }

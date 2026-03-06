@@ -1,5 +1,6 @@
 "use client";
 
+import { authClient } from "@repo/auth/client";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
@@ -28,7 +29,11 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function ChoosePlanContent() {
+export function ChoosePlanContent({
+	organizationSlug,
+}: {
+	organizationSlug?: string;
+}) {
 	const t = useTranslations();
 	const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">(
 		"monthly",
@@ -43,20 +48,20 @@ export function ChoosePlanContent() {
 			{/* Section 1 — Hero Header */}
 			<HeroSection />
 
-			{/* Section 2 — Plan Comparison */}
+			{/* Section 2 — Activation Code */}
+			<ActivationCodeSection organizationSlug={organizationSlug} />
+
+			{/* Section 3 — Plan Comparison */}
 			<PlansSection
 				billingPeriod={billingPeriod}
 				setBillingPeriod={setBillingPeriod}
 			/>
 
-			{/* Section 3 — Feature Cards */}
+			{/* Section 4 — Feature Cards */}
 			<FeaturesSection />
 
-			{/* Section 4 — Subscription Info */}
+			{/* Section 5 — Subscription Info */}
 			<SubscriptionInfoSection />
-
-			{/* Section 5 — Activation Code */}
-			<ActivationCodeSection />
 		</div>
 	);
 }
@@ -737,7 +742,11 @@ function SubscriptionInfoSection() {
 /* ═══════════════════════════════════════════════
    Section 5 — Activation Code
    ═══════════════════════════════════════════════ */
-function ActivationCodeSection() {
+function ActivationCodeSection({
+	organizationSlug,
+}: {
+	organizationSlug?: string;
+}) {
 	const t = useTranslations();
 	const router = useRouter();
 	const [code, setCode] = useState("");
@@ -764,8 +773,16 @@ function ActivationCodeSection() {
 	});
 
 	const activateMutation = useMutation({
-		mutationFn: (codeValue: string) =>
-			orpc.activationCodes.activate.call({ code: codeValue }),
+		mutationFn: async (codeValue: string) => {
+			// Ensure the active organization is set in the session
+			// before calling activate (which needs activeOrganizationId)
+			if (organizationSlug) {
+				await authClient.organization.setActive({
+					organizationSlug,
+				});
+			}
+			return orpc.activationCodes.activate.call({ code: codeValue });
+		},
 		onSuccess: (data) => {
 			toast.success(t("choosePlan.activateSuccess"));
 			setTimeout(() => {
