@@ -229,6 +229,14 @@ export function Dashboard() {
 	const totalExpenses = orgFinance?.totalMoneyOut ?? stats?.financials?.totalExpenses ?? 0;
 	const projects = projectsData?.projects ?? [];
 
+	// Dynamic amount color: positive=green, negative=red, zero=muted
+	const getAmountColor = (value: number, type: "income" | "expense" | "balance") => {
+		if (type === "expense") return "text-red-600 dark:text-red-400";
+		if (value > 0) return "text-green-600 dark:text-green-400";
+		if (value < 0) return "text-red-600 dark:text-red-400";
+		return "text-muted-foreground";
+	};
+
 	// KPI data
 	const kpis = [
 		{
@@ -237,7 +245,7 @@ export function Dashboard() {
 			icon: Landmark,
 			iconColor: "text-sky-600 dark:text-sky-400",
 			bgColor: "bg-sky-100 dark:bg-sky-900/30",
-			valueColor: "text-sky-600 dark:text-sky-400",
+			valueColor: getAmountColor(bankBalance, "balance"),
 		},
 		{
 			label: t("dashboard.kpi.cashBalance"),
@@ -245,7 +253,7 @@ export function Dashboard() {
 			icon: Wallet,
 			iconColor: "text-blue-600 dark:text-blue-400",
 			bgColor: "bg-blue-100 dark:bg-blue-900/30",
-			valueColor: "text-blue-600 dark:text-blue-400",
+			valueColor: getAmountColor(cashBalance, "balance"),
 		},
 		{
 			label: t("dashboard.kpi.totalIncome"),
@@ -253,7 +261,7 @@ export function Dashboard() {
 			icon: ArrowDownRight,
 			iconColor: "text-sky-600 dark:text-sky-400",
 			bgColor: "bg-sky-100 dark:bg-sky-900/30",
-			valueColor: "text-sky-600 dark:text-sky-400",
+			valueColor: getAmountColor(totalIncome, "income"),
 			sub: t("dashboard.kpi.thisMonth"),
 		},
 		{
@@ -262,7 +270,7 @@ export function Dashboard() {
 			icon: ArrowUpLeft,
 			iconColor: "text-red-600 dark:text-red-400",
 			bgColor: "bg-red-100 dark:bg-red-900/30",
-			valueColor: "text-red-600 dark:text-red-400",
+			valueColor: getAmountColor(totalExpenses, "expense"),
 			sub: t("dashboard.kpi.thisMonth"),
 		},
 	];
@@ -605,8 +613,8 @@ export function Dashboard() {
 
 					{/* Chips */}
 					<div className="grid grid-cols-3 gap-2 mb-3">
-						<div className="text-center p-2 rounded-lg bg-sky-50 dark:bg-sky-900/20">
-							<span className="text-sm font-bold text-sky-600 dark:text-sky-400 block">
+						<div className="text-center p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
+							<span className={`text-sm font-bold block ${getAmountColor(totalIncomeChart, "income")}`}>
 								<Currency amount={totalIncomeChart} />
 							</span>
 							<span className="text-[9px] text-muted-foreground">{t("dashboard.cashFlow.income")}</span>
@@ -617,8 +625,8 @@ export function Dashboard() {
 							</span>
 							<span className="text-[9px] text-muted-foreground">{t("dashboard.cashFlow.expenses")}</span>
 						</div>
-						<div className="text-center p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-							<span className="text-sm font-bold text-blue-600 dark:text-blue-400 block">
+						<div className={`text-center p-2 rounded-lg ${netChart >= 0 ? "bg-green-50 dark:bg-green-900/20" : "bg-red-50 dark:bg-red-900/20"}`}>
+							<span className={`text-sm font-bold block ${getAmountColor(netChart, "balance")}`}>
 								<Currency amount={netChart} />
 							</span>
 							<span className="text-[9px] text-muted-foreground">{t("dashboard.cashFlow.net")}</span>

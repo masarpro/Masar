@@ -17,9 +17,9 @@ export function EmptyProjectsState({
 			href={`/app/${organizationSlug}/projects/new`}
 			className="group block w-full"
 		>
-			<div className="flex h-[88px] w-full items-center gap-4 rounded-2xl border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 px-5 transition-all duration-300 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/5 hover:scale-[1.01]">
-				<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-transform duration-300 group-hover:scale-110">
-					<Building2 className="h-6 w-6 text-primary animate-pulse" />
+			<div className="flex h-[88px] w-full items-center gap-4 rounded-2xl border-2 border-dashed border-green-500 bg-gradient-to-br from-green-500/5 via-transparent to-green-500/5 px-5 transition-all duration-300 hover:border-green-600 hover:bg-green-50 hover:shadow-lg hover:shadow-green-500/5 hover:scale-[1.01]">
+				<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-100 transition-transform duration-300 group-hover:scale-110">
+					<Building2 className="h-6 w-6 text-green-600 animate-pulse" />
 				</div>
 
 				<div className="min-w-0 flex-1">

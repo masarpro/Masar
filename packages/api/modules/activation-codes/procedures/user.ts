@@ -1,7 +1,7 @@
 import { ORPCError } from "@orpc/client";
 import { db } from "@repo/database";
 import { protectedProcedure } from "../../../orpc/procedures";
-import { activateInput, codeInput } from "../schema";
+import { codeInput } from "../schema";
 
 export const validate = protectedProcedure
 	.route({
@@ -58,24 +58,24 @@ export const activate = protectedProcedure
 		tags: ["Activation Codes"],
 		summary: "Activate a code on the current organization",
 	})
-	.input(activateInput)
+	.input(codeInput)
 	.handler(async ({ input, context }) => {
 		let orgId = context.session.activeOrganizationId;
 
-		// Fallback: resolve org from slug if activeOrganizationId is not set
-		if (!orgId && input.organizationSlug) {
-			const orgBySlug = await db.organization.findFirst({
-				where: { slug: input.organizationSlug },
+		// Fallback: find the organization owned by this user
+		if (!orgId) {
+			const ownedOrg = await db.organization.findFirst({
+				where: { ownerId: context.user.id },
 				select: { id: true },
 			});
-			if (orgBySlug) {
-				orgId = orgBySlug.id;
+			if (ownedOrg) {
+				orgId = ownedOrg.id;
 			}
 		}
 
 		if (!orgId) {
 			throw new ORPCError("BAD_REQUEST", {
-				message: "لم يتم تحديد المنظمة",
+				message: "لم يتم العثور على منظمة مرتبطة بحسابك",
 			});
 		}
 

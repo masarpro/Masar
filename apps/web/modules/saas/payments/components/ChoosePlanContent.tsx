@@ -28,11 +28,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function ChoosePlanContent({
-	organizationSlug,
-}: {
-	organizationSlug?: string;
-}) {
+export function ChoosePlanContent() {
 	const t = useTranslations();
 	const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">(
 		"monthly",
@@ -48,7 +44,7 @@ export function ChoosePlanContent({
 			<HeroSection />
 
 			{/* Section 2 — Activation Code */}
-			<ActivationCodeSection organizationSlug={organizationSlug} />
+			<ActivationCodeSection />
 
 			{/* Section 3 — Plan Comparison */}
 			<PlansSection
@@ -741,11 +737,7 @@ function SubscriptionInfoSection() {
 /* ═══════════════════════════════════════════════
    Section 5 — Activation Code
    ═══════════════════════════════════════════════ */
-function ActivationCodeSection({
-	organizationSlug,
-}: {
-	organizationSlug?: string;
-}) {
+function ActivationCodeSection() {
 	const t = useTranslations();
 	const router = useRouter();
 	const [code, setCode] = useState("");
@@ -772,12 +764,8 @@ function ActivationCodeSection({
 	});
 
 	const activateMutation = useMutation({
-		mutationFn: async (codeValue: string) => {
-			return orpc.activationCodes.activate.call({
-				code: codeValue,
-				organizationSlug: organizationSlug || undefined,
-			});
-		},
+		mutationFn: (codeValue: string) =>
+			orpc.activationCodes.activate.call({ code: codeValue }),
 		onSuccess: (data) => {
 			toast.success(t("choosePlan.activateSuccess"));
 			setTimeout(() => {
