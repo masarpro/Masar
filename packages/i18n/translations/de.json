@@ -821,6 +821,102 @@
 	},
 	"choosePlan": {
 		"title": "Wähle einen Plan",
-		"description": "Um weiterzumachen, wähle bitte einen Plan aus."
+		"pageTitle": "Elevate your project management with Masar PRO",
+		"description": "Um weiterzumachen, wähle bitte einen Plan aus.",
+		"heroSubtitle": "All the tools a Saudi contractor needs in one place",
+		"heroBadge": "Upgrade your account",
+		"billingToggle": {
+			"monthly": "Monthly",
+			"yearly": "Yearly"
+		},
+		"free": {
+			"name": "Free",
+			"price": "Free",
+			"currentPlan": "Your current plan",
+			"features": {
+				"users": "Single user only",
+				"viewOnly": "View data (read only)",
+				"noProjects": "Cannot create projects",
+				"noReports": "No reports",
+				"noSupport": "No support"
+			}
+		},
+		"pro": {
+			"name": "PRO",
+			"popular": "Most Popular",
+			"priceMonthly": "299",
+			"priceYearly": "2,990",
+			"currency": "SAR",
+			"perMonth": "/ month",
+			"perYear": "/ year",
+			"yearlySaving": "Save 2 months",
+			"contactUs": "Contact us to subscribe",
+			"trialNote": "7-day free trial",
+			"features": {
+				"users": "Up to 50 users",
+				"projects": "Up to 100 active projects",
+				"storage": "50 GB storage",
+				"projectMgmt": "Full project management",
+				"pricing": "BOQ & pricing module",
+				"finance": "Invoicing & finance",
+				"gantt": "Execution & Gantt module",
+				"reports": "Comprehensive reports",
+				"zatca": "ZATCA e-invoicing",
+				"ownerPortal": "Owner Portal",
+				"support": "Priority WhatsApp support",
+				"trial": "7-day free trial"
+			}
+		},
+		"featuresSection": {
+			"title": "Everything you need to manage your projects",
+			"items": {
+				"1": { "title": "Comprehensive Project Management", "description": "Track all your projects from a single dashboard with smart alerts and KPIs" },
+				"2": { "title": "BOQ & Pricing", "description": "Professional bill of quantities and accurate pricing from price database" },
+				"3": { "title": "Invoicing & Finance", "description": "Expenses, claims, payments, and invoices — automatically connected" },
+				"4": { "title": "Interactive Gantt Chart", "description": "Plan and track your project timelines visually" },
+				"5": { "title": "Owner Portal", "description": "Owners view project updates directly via a secure link" },
+				"6": { "title": "Field Reports", "description": "Daily reports with photos and notes directly from the site" },
+				"7": { "title": "ZATCA E-Invoice", "description": "E-invoicing compliant with the Zakat, Tax and Customs Authority" },
+				"8": { "title": "Employee & Payroll Management", "description": "Record employee data and track salaries and attendance" },
+				"9": { "title": "Arabic RTL Support", "description": "Interface fully designed for Arabic right-to-left layout" }
+			}
+		},
+		"subscriptionInfo": {
+			"title": "How subscription works",
+			"steps": {
+				"1": { "title": "Contact us", "description": "Via WhatsApp or email" },
+				"2": { "title": "Choose duration", "description": "Monthly or yearly based on your needs" },
+				"3": { "title": "Instant activation", "description": "Your account is activated within minutes" }
+			},
+			"paymentMethods": "Accepted payment methods",
+			"mada": "mada",
+			"visa": "Visa",
+			"mastercard": "Mastercard",
+			"bankTransfer": "Bank Transfer",
+			"guarantees": {
+				"noContracts": "No long-term contracts — cancel anytime",
+				"secureData": "Secure and protected data",
+				"support": "Technical support available"
+			}
+		},
+		"or": "or",
+		"haveCode": "Have an activation code?",
+		"haveCodeDescription": "If you received an activation code from the Masar team, you can activate your account directly here",
+		"enterCode": "Enter code",
+		"codePlaceholder": "MASAR-XXXX-XXXX-XXXX",
+		"verify": "Verify",
+		"verifying": "Verifying...",
+		"codeValid": "Code is valid!",
+		"codeDetails": "Code Details",
+		"plan": "Plan",
+		"duration": "Duration",
+		"expiresAt": "Expires on",
+		"daysUnit": "days",
+		"activateCode": "Activate Code Now",
+		"activating": "Activating your subscription...",
+		"activateSuccess": "Masar PRO activated successfully!",
+		"activateFailed": "Failed to activate code",
+		"invalidCode": "This code is invalid or expired",
+		"alreadyPro": "Your organization already has an active PRO subscription until {date}"
 	}
 }
