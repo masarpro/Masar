@@ -141,24 +141,27 @@ export function Hero() {
 
 					{/* Title */}
 					<div className="animate-fade-in-delay-1">
-						<h1 className="text-[clamp(1.4rem,4.5vw,3.875rem)] font-black leading-[1.12] mb-7">
+						<h1 className="text-[clamp(1.4rem,4.5vw,3.875rem)] font-black leading-[1.12] mb-4">
 							<span style={{ color: "var(--lp-text)" }}>
 								{t("hero.title")}
-							</span>
-							<br />
-							<span
-								className="block whitespace-nowrap text-[clamp(0.9rem,2.8vw,2rem)] font-bold mt-3"
-								style={{ color: "#10B981" }}
-							>
-								{t("hero.titleHighlight")}
 							</span>
 						</h1>
 					</div>
 
-					{/* Subtitle */}
+					{/* Subtitle — emerald */}
+					<div className="animate-fade-in-delay-1">
+						<p
+							className="text-[clamp(1rem,2.8vw,1.75rem)] font-semibold leading-[1.4] mb-4"
+							style={{ color: "#10B981" }}
+						>
+							{t("hero.subtitle")}
+						</p>
+					</div>
+
+					{/* Description */}
 					<div className="animate-fade-in-delay-2">
 						<p
-							className="text-[clamp(0.75rem,2vw,1.25rem)] leading-[1.8] mb-12 whitespace-nowrap"
+							className="text-[clamp(0.85rem,1.8vw,1.15rem)] leading-[1.8] mb-12 max-w-2xl"
 							style={{ color: "var(--lp-text-muted)" }}
 						>
 							{t("hero.description")}
@@ -185,8 +188,18 @@ export function Hero() {
 						</div>
 					</div>
 
+					{/* Tagline */}
+					<div className="animate-fade-in-delay-3 mt-6 mb-6">
+						<p
+							className="text-sm italic"
+							style={{ color: "var(--lp-text-subtle)" }}
+						>
+							"{t("hero.tagline")}"
+						</p>
+					</div>
+
 					{/* Social Proof */}
-					<div className="animate-fade-in-delay-4 mt-12">
+					<div className="animate-fade-in-delay-4 mt-0">
 						<div className="flex items-center gap-4">
 							<div className="flex">
 								{["#10B981", "#3B82F6", "#F59E0B", "#8B5CF6"].map(

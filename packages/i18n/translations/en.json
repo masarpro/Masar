@@ -507,13 +507,71 @@
 		"title": "Everything you need in one place",
 		"description": "Tools designed for Saudi contractor workflows",
 		"label": "Features",
+		"learnMore": "Learn more",
+		"newBadge": "New",
 		"items": {
-			"1": { "title": "Comprehensive Dashboard", "description": "Project status, budget, and timeline — all at a glance." },
-			"2": { "title": "Field Execution", "description": "Daily reports, photos, issues, and progress — directly from site." },
-			"3": { "title": "Finance & Invoicing", "description": "Expenses, claims, payments, and invoices — connected automatically." },
-			"4": { "title": "Contractors & Contracts", "description": "Subcontracts, change orders, and payment terms — organized and tracked." },
-			"5": { "title": "Owner Portal", "description": "Owners access project updates directly — no manual reports needed." },
-			"6": { "title": "Smart Permissions", "description": "Each user sees only what's relevant to their role." }
+			"1": {
+				"title": "Comprehensive Dashboard",
+				"description": "Project status, budget, and timeline — all at a glance. Monitor every project in real-time with smart alerts.",
+				"sub": {
+					"1": "Real-time project status updates",
+					"2": "Financial and schedule KPIs",
+					"3": "Smart risk alerts"
+				}
+			},
+			"2": {
+				"title": "Field Execution",
+				"description": "Daily reports, photos, issues, and progress — directly from site. Record everything in the field with ease.",
+				"sub": {
+					"1": "Daily reports with photos and notes",
+					"2": "Progress tracking vs. plan",
+					"3": "Issue and blocker management"
+				}
+			},
+			"3": {
+				"title": "Finance & Invoicing",
+				"description": "Expenses, claims, payments, and invoices — connected automatically. ZATCA-compliant e-invoicing built in.",
+				"sub": {
+					"1": "ZATCA-compliant e-invoicing",
+					"2": "Expense and claims management",
+					"3": "Automated financial reports"
+				}
+			},
+			"4": {
+				"title": "Pricing & Quantity Surveying",
+				"description": "Professional BOQs and accurate project pricing. From drawings to quotation — everything in one place.",
+				"sub": {
+					"1": "Detailed bills of quantities",
+					"2": "Auto-pricing from price database",
+					"3": "Export PDF quotations"
+				}
+			},
+			"5": {
+				"title": "Contractors & Contracts",
+				"description": "Subcontracts, change orders, and payment terms — organized and tracked. Monitor subcontractor performance easily.",
+				"sub": {
+					"1": "Subcontract and line item management",
+					"2": "Change orders with approval workflows",
+					"3": "Payment and progress billing tracking"
+				}
+			},
+			"6": {
+				"title": "Owner Portal",
+				"description": "Owners access project updates directly — no manual reports needed. Secure link without account required.",
+				"sub": {
+					"1": "Direct access link for owners",
+					"2": "Real-time updates and payments",
+					"3": "Direct chat with contractor"
+				}
+			},
+			"7": {
+				"title": "Smart Permissions",
+				"description": "Each user sees only what's relevant — manager, engineer, accountant, supervisor. Multi-level security built in.",
+				"sub": {
+					"1": "Custom roles per job function",
+					"2": "Project-level permissions"
+				}
+			}
 		}
 	},
 	"finalCta": {
@@ -523,12 +581,13 @@
 		"note": "No credit card required • Cancel anytime"
 	},
 	"hero": {
-		"badge": "🇸🇦 Built for Saudi Market",
-		"title": "Projects scattered?",
-		"titleHighlight": "Masar unifies them.",
-		"description": "One platform for finances, execution, contractors, and documents — no complexity.",
+		"badge": "🇸🇦 Built for the Saudi Market",
+		"title": "Masar — Complete Construction Management System",
+		"subtitle": "From quantity takeoff to project handover — in one system",
+		"description": "Organize pricing, contracts, execution, and finance — your entire team in one system, no fragmentation.",
 		"cta": "Start Free",
 		"secondary": "Explore Features",
+		"tagline": "Because everything needs to stay on track",
 		"proof": "Saudi contractors already using Masar"
 	},
 	"howItWorks": {
@@ -582,6 +641,33 @@
 			"6": { "title": "Systems Not Built for the Local Market", "description": "Foreign systems that don't reflect the way business works in the Saudi market." }
 		},
 		"solution": "Masar unifies financial management, execution, and site operations in one integrated platform."
+	},
+	"builtForConstruction": {
+		"badge": "Why Masar?",
+		"title": "Built for Construction from the Ground Up",
+		"subtitle": "Masar is not an accounting system with a construction add-on — it was designed from day one around the Saudi contractor's 5-stage business cycle.",
+		"stages": {
+			"1": { "name": "Estimation", "description": "Quantity takeoff, cost analysis, and preparing technical & financial proposals." },
+			"2": { "name": "Contracting", "description": "Signing the contract, setting payment terms, line items, and schedule." },
+			"3": { "name": "Execution", "description": "Field reports, progress tracking, and subcontractor management." },
+			"4": { "name": "Finance", "description": "Progress claims, invoices, payments, and cash-flow tracking." },
+			"5": { "name": "Handover", "description": "Owner portal, final documentation, and completion certificates." }
+		},
+		"flowText": "Every stage is connected — data flows automatically from estimation to handover with no double entry.",
+		"comparison": {
+			"generic": {
+				"title": "Generic Systems",
+				"1": "Designed for general accounting with a project module bolted on later.",
+				"2": "Don't support the full contracting cycle from estimation to handover.",
+				"3": "Require expensive customization to fit a contractor's workflow."
+			},
+			"masar": {
+				"title": "Masar",
+				"1": "Built from the ground up around the contractor's 5-stage business cycle.",
+				"2": "Data flows automatically between estimation, contracting, execution, and finance.",
+				"3": "Ready to use out of the box — no customization or extra development needed."
+			}
+		}
 	},
 	"stats": {
 		"endpoints": "System Operations",
