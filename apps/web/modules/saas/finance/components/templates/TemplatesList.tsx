@@ -190,14 +190,7 @@ export function TemplatesList({
 					</h2>
 				</div>
 
-				{isLoading ? (
-					<div className="flex items-center justify-center py-12">
-						<div className="relative">
-							<div className="w-10 h-10 border-4 border-primary/20 rounded-full" />
-							<div className="absolute top-0 left-0 w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-						</div>
-					</div>
-				) : customTemplates.length === 0 ? (
+				{isLoading ? null : customTemplates.length === 0 ? (
 					<Card className="rounded-2xl border-dashed">
 						<CardContent className="p-8 text-center">
 							<FileText className="h-10 w-10 mx-auto text-slate-300 dark:text-slate-600 mb-3" />

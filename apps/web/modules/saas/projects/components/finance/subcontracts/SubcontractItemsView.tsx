@@ -183,11 +183,7 @@ export function SubcontractItemsView({
 		items?.reduce((sum, item) => sum + item.totalAmount, 0) ?? 0;
 
 	if (isLoading) {
-		return (
-			<div className="flex items-center justify-center py-16">
-				<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-			</div>
-		);
+		return null;
 	}
 
 	return (

@@ -409,11 +409,7 @@ export function SubcontractDetailView({
 	}, [contract?.payments, paymentSearch, paymentSortBy, paymentSortOrder]);
 
 	if (isLoading || !contract) {
-		return (
-			<div className="flex items-center justify-center py-20">
-				<Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-			</div>
-		);
+		return null;
 	}
 
 	const statusStyle = STATUS_STYLES[contract.status] ?? STATUS_STYLES.DRAFT;

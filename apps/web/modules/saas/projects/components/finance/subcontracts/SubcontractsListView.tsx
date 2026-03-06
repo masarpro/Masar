@@ -138,11 +138,7 @@ export function SubcontractsListView({
 	};
 
 	if (isLoading) {
-		return (
-			<div className="flex items-center justify-center py-20">
-				<Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-			</div>
-		);
+		return null;
 	}
 
 	return (

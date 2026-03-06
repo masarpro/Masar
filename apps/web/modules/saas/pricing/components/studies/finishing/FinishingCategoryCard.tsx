@@ -13,6 +13,8 @@ import type { BuildingConfig } from "../../../lib/finishing-types";
 import { formatCurrency } from "../../../lib/utils";
 import { AddEditFinishingItemDialog } from "./AddEditFinishingItemDialog";
 import { FinishingItemRow } from "./FinishingItemRow";
+import { ThermalInsulationItemDialog } from "./ThermalInsulationItemDialog";
+import { WaterproofingItemDialog } from "./WaterproofingItemDialog";
 
 interface FinishingItem {
 	id: string;
@@ -162,36 +164,92 @@ export function FinishingCategoryCard({
 				</CardContent>
 			</Card>
 
-			<AddEditFinishingItemDialog
-				open={dialogOpen}
-				onOpenChange={setDialogOpen}
-				organizationId={organizationId}
-				studyId={studyId}
-				category={category}
-				buildingConfig={buildingConfig}
-				editItem={
-					editItem
-						? {
-								...editItem,
-								subCategory: editItem.subCategory ?? undefined,
-								floorId: editItem.floorId ?? undefined,
-								floorName: editItem.floorName ?? undefined,
-								area: editItem.area ?? undefined,
-								quantity: editItem.quantity ?? undefined,
-								length: editItem.length ?? undefined,
-								qualityLevel: editItem.qualityLevel ?? undefined,
-								wastagePercent: editItem.wastagePercent ?? 0,
-								materialPrice: editItem.materialPrice ?? 0,
-								laborPrice: editItem.laborPrice ?? 0,
-								calculationMethod: editItem.calculationMethod ?? undefined,
-								calculationData: (editItem.calculationData as Record<string, unknown>) ?? undefined,
-								brand: editItem.brand ?? undefined,
-								specifications: editItem.specifications ?? undefined,
-								description: editItem.description ?? undefined,
-							}
-						: undefined
-				}
-			/>
+			{category.id === "FINISHING_WATERPROOFING" ? (
+				<WaterproofingItemDialog
+					open={dialogOpen}
+					onOpenChange={setDialogOpen}
+					organizationId={organizationId}
+					studyId={studyId}
+					editItem={
+						editItem
+							? {
+									...editItem,
+									subCategory: editItem.subCategory ?? undefined,
+									floorId: editItem.floorId ?? undefined,
+									floorName: editItem.floorName ?? undefined,
+									area: editItem.area ?? undefined,
+									length: editItem.length ?? undefined,
+									width: (editItem as unknown as { width?: number | null }).width ?? undefined,
+									quantity: editItem.quantity ?? undefined,
+									wastagePercent: editItem.wastagePercent ?? 0,
+									materialPrice: editItem.materialPrice ?? 0,
+									laborPrice: editItem.laborPrice ?? 0,
+									calculationMethod: editItem.calculationMethod ?? undefined,
+									calculationData: (editItem.calculationData as Record<string, unknown>) ?? undefined,
+									totalCost: editItem.totalCost,
+								}
+							: undefined
+					}
+				/>
+			) : category.id === "FINISHING_THERMAL_INSULATION" ? (
+				<ThermalInsulationItemDialog
+					open={dialogOpen}
+					onOpenChange={setDialogOpen}
+					organizationId={organizationId}
+					studyId={studyId}
+					editItem={
+						editItem
+							? {
+									...editItem,
+									subCategory: editItem.subCategory ?? undefined,
+									floorId: editItem.floorId ?? undefined,
+									floorName: editItem.floorName ?? undefined,
+									area: editItem.area ?? undefined,
+									length: editItem.length ?? undefined,
+									width: (editItem as unknown as { width?: number | null }).width ?? undefined,
+									quantity: editItem.quantity ?? undefined,
+									wastagePercent: editItem.wastagePercent ?? 0,
+									materialPrice: editItem.materialPrice ?? 0,
+									laborPrice: editItem.laborPrice ?? 0,
+									calculationMethod: editItem.calculationMethod ?? undefined,
+									calculationData: (editItem.calculationData as Record<string, unknown>) ?? undefined,
+									totalCost: editItem.totalCost,
+								}
+							: undefined
+					}
+				/>
+			) : (
+				<AddEditFinishingItemDialog
+					open={dialogOpen}
+					onOpenChange={setDialogOpen}
+					organizationId={organizationId}
+					studyId={studyId}
+					category={category}
+					buildingConfig={buildingConfig}
+					editItem={
+						editItem
+							? {
+									...editItem,
+									subCategory: editItem.subCategory ?? undefined,
+									floorId: editItem.floorId ?? undefined,
+									floorName: editItem.floorName ?? undefined,
+									area: editItem.area ?? undefined,
+									quantity: editItem.quantity ?? undefined,
+									length: editItem.length ?? undefined,
+									qualityLevel: editItem.qualityLevel ?? undefined,
+									wastagePercent: editItem.wastagePercent ?? 0,
+									materialPrice: editItem.materialPrice ?? 0,
+									laborPrice: editItem.laborPrice ?? 0,
+									calculationMethod: editItem.calculationMethod ?? undefined,
+									calculationData: (editItem.calculationData as Record<string, unknown>) ?? undefined,
+									brand: editItem.brand ?? undefined,
+									specifications: editItem.specifications ?? undefined,
+									description: editItem.description ?? undefined,
+								}
+							: undefined
+					}
+				/>
+			)}
 		</>
 	);
 }

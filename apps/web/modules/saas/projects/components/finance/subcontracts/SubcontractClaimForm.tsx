@@ -334,11 +334,7 @@ export function SubcontractClaimForm({
 			{/* Step 2 — Items Table */}
 			{step === 2 && (
 				<>
-					{itemsLoading ? (
-						<div className="flex items-center justify-center py-16">
-							<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-						</div>
-					) : !items?.length ? (
+					{itemsLoading ? null : !items?.length ? (
 						<div className="rounded-xl border border-dashed p-12 text-center">
 							<p className="text-muted-foreground">
 								لا توجد بنود في هذا العقد. أضف بنود أولاً من صفحة البنود.

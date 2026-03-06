@@ -337,14 +337,7 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 
 			{/* Change Orders Table */}
 			<Card>
-				{isLoading ? (
-					<div className="flex items-center justify-center py-20">
-						<div className="relative">
-							<div className="h-12 w-12 rounded-full border-4 border-primary/20" />
-							<div className="absolute left-0 top-0 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-						</div>
-					</div>
-				) : changeOrders.length === 0 ? (
+				{isLoading ? null : changeOrders.length === 0 ? (
 					<div className="flex flex-col items-center justify-center py-20 text-center">
 						<FileTextIcon className="h-16 w-16 text-slate-300 dark:text-slate-600" />
 						<p className="mt-4 text-lg font-medium text-slate-900 dark:text-slate-100">

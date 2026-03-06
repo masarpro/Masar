@@ -171,14 +171,7 @@ export function ClientsList({
 			{/* Clients Table */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-0">
-					{isLoading ? (
-						<div className="flex items-center justify-center py-20">
-							<div className="relative">
-								<div className="w-12 h-12 border-4 border-primary/20 rounded-full" />
-								<div className="absolute top-0 left-0 w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-							</div>
-						</div>
-					) : clients.length === 0 ? (
+					{isLoading ? null : clients.length === 0 ? (
 						<div className="text-center py-20">
 							<Users className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
 							<p className="text-slate-500 dark:text-slate-400">

@@ -417,14 +417,7 @@ export function TemplateCustomizer({
 	// ── Loading state ──────────────────────────────────────────────────────
 
 	if (templateId && isLoadingTemplate) {
-		return (
-			<div className="h-[calc(100vh-4rem)] flex items-center justify-center">
-				<div className="flex flex-col items-center gap-4">
-					<Loader2Icon className="h-8 w-8 animate-spin text-primary" />
-					<p className="text-muted-foreground">{t("common.loading")}</p>
-				</div>
-			</div>
-		);
+		return null;
 	}
 
 	// ── Render ──────────────────────────────────────────────────────────────

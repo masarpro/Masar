@@ -245,12 +245,7 @@ export function FinanceReports({
 						</CardHeader>
 						<CardContent>
 							{isLoadingRevenue ? (
-								<div className="flex items-center justify-center py-20">
-									<div className="relative">
-										<div className="w-10 h-10 border-4 border-primary/20 rounded-full" />
-										<div className="absolute top-0 left-0 w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-									</div>
-								</div>
+								null
 							) : !revenueByPeriod || revenueByPeriod.length === 0 ? (
 								<div className="text-center py-10 text-slate-500">
 									{t("finance.reports.noData")}
@@ -296,12 +291,7 @@ export function FinanceReports({
 						</CardHeader>
 						<CardContent>
 							{isLoadingProject ? (
-								<div className="flex items-center justify-center py-20">
-									<div className="relative">
-										<div className="w-10 h-10 border-4 border-primary/20 rounded-full" />
-										<div className="absolute top-0 left-0 w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-									</div>
-								</div>
+								null
 							) : !revenueByProject || revenueByProject.length === 0 ? (
 								<div className="text-center py-10 text-slate-500">
 									{t("finance.reports.noData")}
@@ -351,12 +341,7 @@ export function FinanceReports({
 						</CardHeader>
 						<CardContent>
 							{isLoadingClient ? (
-								<div className="flex items-center justify-center py-20">
-									<div className="relative">
-										<div className="w-10 h-10 border-4 border-primary/20 rounded-full" />
-										<div className="absolute top-0 left-0 w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-									</div>
-								</div>
+								null
 							) : !revenueByClient || revenueByClient.length === 0 ? (
 								<div className="text-center py-10 text-slate-500">
 									{t("finance.reports.noData")}
@@ -412,12 +397,7 @@ export function FinanceReports({
 							</CardHeader>
 							<CardContent>
 								{isLoadingQuotationStats ? (
-									<div className="flex items-center justify-center py-10">
-										<div className="relative">
-											<div className="w-10 h-10 border-4 border-primary/20 rounded-full" />
-											<div className="absolute top-0 left-0 w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-										</div>
-									</div>
+									null
 								) : !quotationStats || quotationStats.length === 0 ? (
 									<div className="text-center py-10 text-slate-500">
 										{t("finance.reports.noData")}
@@ -460,12 +440,7 @@ export function FinanceReports({
 							</CardHeader>
 							<CardContent>
 								{isLoadingInvoiceStats ? (
-									<div className="flex items-center justify-center py-10">
-										<div className="relative">
-											<div className="w-10 h-10 border-4 border-primary/20 rounded-full" />
-											<div className="absolute top-0 left-0 w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-										</div>
-									</div>
+									null
 								) : !invoiceStats || invoiceStats.length === 0 ? (
 									<div className="text-center py-10 text-slate-500">
 										{t("finance.reports.noData")}

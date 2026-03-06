@@ -186,14 +186,7 @@ export function ExpensesTable({
 				</div>
 
 				{/* Table */}
-				{isLoading ? (
-					<div className="flex items-center justify-center py-16">
-						<div className="relative">
-							<div className="h-12 w-12 rounded-full border-4 border-primary/20" />
-							<div className="absolute left-0 top-0 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-						</div>
-					</div>
-				) : expenses.length === 0 ? (
+				{isLoading ? null : expenses.length === 0 ? (
 					<div className="flex flex-col items-center justify-center py-12 text-center">
 						<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
 							<Receipt className="h-8 w-8 text-slate-400" />

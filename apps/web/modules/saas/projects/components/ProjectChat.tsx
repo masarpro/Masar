@@ -141,14 +141,7 @@ export function ProjectChat({
 
 			{/* Messages Area */}
 			<div className="flex-1 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-				{isLoading ? (
-					<div className="flex h-full items-center justify-center">
-						<div className="relative">
-							<div className="h-10 w-10 rounded-full border-4 border-primary/20" />
-							<div className="absolute left-0 top-0 h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-						</div>
-					</div>
-				) : !messages?.items?.length ? (
+				{isLoading ? null : !messages?.items?.length ? (
 					<div className="flex h-full flex-col items-center justify-center text-center">
 						<div className="mb-3 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
 							<MessageSquare className="h-10 w-10 text-slate-400" />

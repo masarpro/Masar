@@ -385,14 +385,7 @@ export function ExpensesList({
 			{/* Expenses Table */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-0">
-					{isLoading ? (
-						<div className="flex items-center justify-center py-20">
-							<div className="relative">
-								<div className="w-12 h-12 border-4 border-primary/20 rounded-full" />
-								<div className="absolute top-0 left-0 w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-							</div>
-						</div>
-					) : items.length === 0 ? (
+					{isLoading ? null : items.length === 0 ? (
 						<div className="flex flex-col items-center justify-center py-12 text-center">
 							<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
 								<TrendingDown className="h-8 w-8 text-slate-400" />

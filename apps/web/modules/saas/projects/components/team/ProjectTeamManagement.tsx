@@ -202,14 +202,7 @@ export function ProjectTeamManagement({
 
 			{/* Team Members List */}
 			<div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-				{isLoading ? (
-					<div className="flex items-center justify-center py-12">
-						<div className="relative">
-							<div className="h-10 w-10 rounded-full border-4 border-primary/20" />
-							<div className="absolute left-0 top-0 h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-						</div>
-					</div>
-				) : !teamData?.members.length ? (
+				{isLoading ? null : !teamData?.members.length ? (
 					<div className="flex flex-col items-center justify-center py-12 text-slate-500">
 						<Users className="h-12 w-12 mb-3 text-slate-300" />
 						<p className="font-medium">{t("projects.team.noMembers")}</p>

@@ -280,14 +280,7 @@ export function InvoiceView({
 	// ─── Loading / Not found ─────────────────────────────────────────────
 
 	if (isLoading) {
-		return (
-			<div className="flex items-center justify-center py-20">
-				<div className="relative">
-					<div className="w-16 h-16 border-4 border-primary/20 rounded-full" />
-					<div className="absolute top-0 inset-inline-start-0 w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-				</div>
-			</div>
-		);
+		return null;
 	}
 
 	if (!invoice) {
@@ -860,14 +853,7 @@ function ActivityTabContent({
 	const logs = data?.logs ?? [];
 
 	if (isLoading) {
-		return (
-			<div className="flex items-center justify-center py-12">
-				<div className="relative">
-					<div className="w-10 h-10 border-4 border-primary/20 rounded-full" />
-					<div className="absolute top-0 inset-inline-start-0 w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-				</div>
-			</div>
-		);
+		return null;
 	}
 
 	if (logs.length === 0) {
