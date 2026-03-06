@@ -40,14 +40,12 @@ export default async function ChoosePlanPage() {
 		getPurchases(organizationId),
 	);
 
-	if (error || !purchases) {
-		throw new Error("Failed to fetch purchases");
-	}
+	if (!error && purchases) {
+		const { activePlan } = createPurchasesHelper(purchases);
 
-	const { activePlan } = createPurchasesHelper(purchases);
-
-	if (activePlan) {
-		redirect("/app");
+		if (activePlan) {
+			redirect("/app");
+		}
 	}
 
 	return <ChoosePlanContent />;
