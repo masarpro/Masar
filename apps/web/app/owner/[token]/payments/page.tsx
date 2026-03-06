@@ -3,6 +3,7 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
+import { Skeleton } from "@ui/components/skeleton";
 import {
 	Banknote,
 	CheckCircle,
@@ -72,10 +73,17 @@ export default function OwnerPortalPayments() {
 
 	if (isLoading) {
 		return (
-			<div className="flex items-center justify-center py-20">
-				<div className="relative">
-					<div className="h-12 w-12 rounded-full border-4 border-primary/20" />
-					<div className="absolute left-0 top-0 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+			<div className="space-y-6">
+				<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+					{Array.from({ length: 4 }).map((_, i) => (
+						<Skeleton key={i} className="h-24 rounded-2xl" />
+					))}
+				</div>
+				<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 space-y-4">
+					<Skeleton className="h-5 w-36" />
+					{Array.from({ length: 4 }).map((_, i) => (
+						<Skeleton key={i} className="h-12 w-full" />
+					))}
 				</div>
 			</div>
 		);

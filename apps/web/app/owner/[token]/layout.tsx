@@ -3,6 +3,7 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
+import { Skeleton } from "@ui/components/skeleton";
 import {
 	Building2,
 	Calendar,
@@ -113,11 +114,34 @@ export default function OwnerPortalLayout({
 	// Show loading state
 	if (isLoading) {
 		return (
-			<div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
-				<div className="relative">
-					<div className="h-16 w-16 rounded-full border-4 border-primary/20" />
-					<div className="absolute left-0 top-0 h-16 w-16 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-				</div>
+			<div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+				<header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-900/80">
+					<div className="mx-auto max-w-5xl px-4 py-4">
+						<div className="flex items-center gap-3">
+							<Skeleton className="h-10 w-10 rounded-xl" />
+							<div className="space-y-1.5">
+								<Skeleton className="h-4 w-32" />
+								<Skeleton className="h-3 w-24" />
+							</div>
+						</div>
+						<div className="mt-4 flex gap-2">
+							{Array.from({ length: 5 }).map((_, i) => (
+								<Skeleton key={i} className="h-8 w-20 rounded-xl" />
+							))}
+						</div>
+					</div>
+				</header>
+				<main className="mx-auto max-w-5xl px-4 py-6">
+					<div className="space-y-6">
+						<Skeleton className="h-40 w-full rounded-2xl" />
+						<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+							{Array.from({ length: 4 }).map((_, i) => (
+								<Skeleton key={i} className="h-24 rounded-2xl" />
+							))}
+						</div>
+						<Skeleton className="h-48 w-full rounded-2xl" />
+					</div>
+				</main>
 			</div>
 		);
 	}

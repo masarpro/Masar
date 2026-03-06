@@ -3,6 +3,7 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
+import { Skeleton } from "@ui/components/skeleton";
 import {
 	CheckCircle,
 	Circle,
@@ -34,10 +35,16 @@ export default function OwnerPortalSchedule() {
 
 	if (isLoading) {
 		return (
-			<div className="flex items-center justify-center py-20">
-				<div className="relative">
-					<div className="h-12 w-12 rounded-full border-4 border-primary/20" />
-					<div className="absolute left-0 top-0 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+			<div className="space-y-6">
+				<Skeleton className="h-28 w-full rounded-2xl" />
+				<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 space-y-6">
+					<Skeleton className="h-5 w-36" />
+					{Array.from({ length: 4 }).map((_, i) => (
+						<div key={i} className="flex gap-4">
+							<Skeleton className="h-10 w-10 rounded-full shrink-0" />
+							<Skeleton className="h-20 w-full rounded-xl" />
+						</div>
+					))}
 				</div>
 			</div>
 		);

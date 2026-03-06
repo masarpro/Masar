@@ -4,6 +4,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Textarea } from "@ui/components/textarea";
+import { Skeleton } from "@ui/components/skeleton";
 import {
 	MessageSquare,
 	RefreshCw,
@@ -56,10 +57,21 @@ export default function OwnerPortalChat() {
 
 	if (isLoading) {
 		return (
-			<div className="flex items-center justify-center py-20">
-				<div className="relative">
-					<div className="h-12 w-12 rounded-full border-4 border-primary/20" />
-					<div className="absolute left-0 top-0 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+			<div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
+				<div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 px-6 py-4">
+					<Skeleton className="h-5 w-32" />
+					<Skeleton className="h-8 w-20 rounded-xl" />
+				</div>
+				<div className="h-[400px] p-6 space-y-4">
+					{Array.from({ length: 5 }).map((_, i) => (
+						<div key={i} className={`flex gap-3 ${i % 2 === 0 ? "" : "flex-row-reverse"}`}>
+							<Skeleton className="h-9 w-9 rounded-full shrink-0" />
+							<Skeleton className={`h-16 rounded-2xl ${i % 2 === 0 ? "w-3/5" : "w-2/5"}`} />
+						</div>
+					))}
+				</div>
+				<div className="border-t border-slate-200 dark:border-slate-700 p-4">
+					<Skeleton className="h-[60px] w-full rounded-xl" />
 				</div>
 			</div>
 		);

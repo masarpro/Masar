@@ -20,6 +20,7 @@ import {
 	MessageSquare,
 	Calculator,
 } from "lucide-react";
+import { Skeleton } from "@ui/components/skeleton";
 import Link from "next/link";
 import { Currency } from "@saas/finance/components/shared/Currency";
 import { AmountSummary } from "@saas/finance/components/shared/AmountSummary";
@@ -139,11 +140,11 @@ export function CreditNoteForm({
 	if (isLoading) {
 		return (
 			<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-slate-100/40 to-slate-50 dark:from-slate-950 dark:via-slate-900/40 dark:to-slate-950">
-				<div className="flex items-center justify-center py-20">
-					<div className="relative">
-						<div className="w-16 h-16 border-4 border-primary/20 rounded-full" />
-						<div className="absolute top-0 left-0 w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-					</div>
+				<div className="mx-auto max-w-4xl space-y-6 py-8">
+					<Skeleton className="h-8 w-48" />
+					<Skeleton className="h-32 w-full rounded-xl" />
+					<Skeleton className="h-48 w-full rounded-xl" />
+					<Skeleton className="h-24 w-full rounded-xl" />
 				</div>
 			</div>
 		);
