@@ -265,7 +265,7 @@ export function FloorDetailsStep({
 						key={floor.id}
 						variant={
 							floor.id === activeFloorId
-								? "default"
+								? "primary"
 								: "outline"
 						}
 						size="sm"

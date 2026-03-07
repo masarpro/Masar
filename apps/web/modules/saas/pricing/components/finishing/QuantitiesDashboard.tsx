@@ -728,7 +728,7 @@ export function QuantitiesDashboard({
 							key={tab.key ?? "all"}
 							variant={
 								groupFilter === tab.key
-									? "default"
+									? "primary"
 									: "ghost"
 							}
 							size="sm"
@@ -828,7 +828,7 @@ export function QuantitiesDashboard({
 					{/* BOM tab button */}
 					{hasAnySpecs && (
 						<Button
-							variant={dashboardView === "bom" ? "default" : "outline"}
+							variant={dashboardView === "bom" ? "primary" : "outline"}
 							size="sm"
 							className="h-9 text-sm rounded-lg"
 							onClick={() =>

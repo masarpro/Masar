@@ -96,7 +96,7 @@ export function BillOfMaterials({ items }: BillOfMaterialsProps) {
 			<div className="flex items-center justify-between">
 				<div className="flex gap-1.5">
 					<Button
-						variant={activeTab === "byItem" ? "default" : "ghost"}
+						variant={activeTab === "byItem" ? "primary" : "ghost"}
 						size="sm"
 						className="text-sm h-8 px-3.5 rounded-full"
 						onClick={() => setActiveTab("byItem")}
@@ -105,7 +105,7 @@ export function BillOfMaterials({ items }: BillOfMaterialsProps) {
 					</Button>
 					<Button
 						variant={
-							activeTab === "aggregated" ? "default" : "ghost"
+							activeTab === "aggregated" ? "primary" : "ghost"
 						}
 						size="sm"
 						className="text-sm h-8 px-3.5 rounded-full"
