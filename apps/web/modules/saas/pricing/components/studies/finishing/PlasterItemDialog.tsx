@@ -2,7 +2,6 @@
 
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import { Checkbox } from "@ui/components/checkbox";
 import {
@@ -21,13 +20,13 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@ui/components/select";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import type { BuildingConfig } from "../../../lib/finishing-types";
 import {
 	MIX_RATIOS,
-	PLASTER_FLOORS,
 	PLASTER_METHODS,
 	calculatePlasterMaterials,
 	type MixRatioKey,
@@ -41,7 +40,7 @@ interface RoomEntry {
 	shape: "rectangular" | "custom";
 	wall1: number | "";
 	wall2: number | "";
-	height: number | "";
+	heightOverride?: number | null; // null = use floor height
 	customWalls?: (number | "")[];
 }
 
@@ -79,6 +78,7 @@ interface PlasterItemDialogProps {
 	studyId: string;
 	plasterType: "internal_plaster" | "external_plaster";
 	editItem?: PlasterItemData;
+	buildingConfig?: BuildingConfig | null;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────
@@ -89,7 +89,7 @@ function makeRoom(index: number): RoomEntry {
 		shape: "rectangular",
 		wall1: "",
 		wall2: "",
-		height: 3,
+		heightOverride: null,
 	};
 }
 
@@ -101,7 +101,7 @@ function makeWindow(index: number): OpeningEntry {
 	return { name: `ش${index}`, width: "", height: 1.2, count: 1 };
 }
 
-function numVal(v: number | ""): number {
+function numVal(v: number | "" | null | undefined): number {
 	return typeof v === "number" ? v : 0;
 }
 
@@ -112,8 +112,9 @@ function roomPerimeter(r: RoomEntry): number {
 	return (numVal(r.wall1) + numVal(r.wall2)) * 2;
 }
 
-function roomWallArea(r: RoomEntry): number {
-	return roomPerimeter(r) * numVal(r.height);
+function roomWallArea(r: RoomEntry, floorHeight: number): number {
+	const h = r.heightOverride != null ? r.heightOverride : floorHeight;
+	return roomPerimeter(r) * h;
 }
 
 function roomCeilingArea(r: RoomEntry): number {
@@ -133,6 +134,7 @@ export function PlasterItemDialog({
 	studyId,
 	plasterType,
 	editItem,
+	buildingConfig,
 }: PlasterItemDialogProps) {
 	const t = useTranslations("pricing.studies.finishing.plaster");
 	const tFinishing = useTranslations("pricing.studies.finishing");
@@ -140,16 +142,26 @@ export function PlasterItemDialog({
 	const isEdit = !!editItem?.id;
 	const isInternal = plasterType === "internal_plaster";
 
+	const floors = buildingConfig?.floors ?? [];
+
 	// ─── Form state ─────────────────────────────────────
 	const [name, setName] = useState("");
 	const [plasterMethod, setPlasterMethod] = useState<PlasterMethodKey>("buoj_awtar");
 	const [thickness, setThickness] = useState(20);
 	const [mixRatio, setMixRatio] = useState<MixRatioKey>("1:6");
-	const [floorId, setFloorId] = useState<string>("ground");
+	const [floorId, setFloorId] = useState<string>("");
+	const [floorHeight, setFloorHeight] = useState(3.0);
 	const [rooms, setRooms] = useState<RoomEntry[]>([makeRoom(1)]);
 	const [doors, setDoors] = useState<OpeningEntry[]>([makeDoor(1)]);
 	const [windows, setWindows] = useState<OpeningEntry[]>([makeWindow(1)]);
 	const [includeCeiling, setIncludeCeiling] = useState(true);
+	const [editingHeightIdx, setEditingHeightIdx] = useState<number | null>(null);
+
+	// Selected floor from building config
+	const selectedFloor = useMemo(
+		() => floors.find((f) => f.id === floorId),
+		[floors, floorId],
+	);
 
 	// ─── Reset form on open ─────────────────────────────
 	useEffect(() => {
@@ -161,12 +173,18 @@ export function PlasterItemDialog({
 			setPlasterMethod((cd?.plasterMethod as PlasterMethodKey) ?? "buoj_awtar");
 			setThickness((cd?.thickness as number) ?? 20);
 			setMixRatio((cd?.mixRatio as MixRatioKey) ?? "1:6");
-			setFloorId(editItem.floorId ?? "ground");
+			setFloorId(editItem.floorId ?? floors[0]?.id ?? "");
+			setFloorHeight((cd?.floorHeight as number) ?? editItem.floorId
+				? floors.find((f) => f.id === editItem.floorId)?.height ?? 3.0
+				: 3.0);
 			setIncludeCeiling((cd?.includeCeiling as boolean) ?? true);
 
 			const cdRooms = cd?.rooms as RoomEntry[] | undefined;
 			if (cdRooms?.length) {
-				setRooms(cdRooms.map((r) => ({ ...r })));
+				setRooms(cdRooms.map((r) => ({
+					...r,
+					heightOverride: (r as unknown as { heightOverride?: number | null }).heightOverride ?? null,
+				})));
 			} else {
 				setRooms([makeRoom(1)]);
 			}
@@ -189,13 +207,23 @@ export function PlasterItemDialog({
 			setPlasterMethod("buoj_awtar");
 			setThickness(20);
 			setMixRatio(isInternal ? "1:6" : "1:4");
-			setFloorId("ground");
+			const defaultFloor = floors[0];
+			setFloorId(defaultFloor?.id ?? "");
+			setFloorHeight(defaultFloor?.height ?? 3.0);
 			setRooms([makeRoom(1)]);
 			setDoors([makeDoor(1)]);
 			setWindows([makeWindow(1)]);
 			setIncludeCeiling(true);
 		}
-	}, [open, editItem, isInternal]);
+		setEditingHeightIdx(null);
+	}, [open, editItem, isInternal, floors]);
+
+	// When floor changes, update height from building config
+	useEffect(() => {
+		if (selectedFloor) {
+			setFloorHeight(selectedFloor.height);
+		}
+	}, [selectedFloor]);
 
 	// Update thickness when method changes
 	useEffect(() => {
@@ -208,8 +236,8 @@ export function PlasterItemDialog({
 	const wastagePercent = method.wastagePercent;
 
 	const wallsGrossArea = useMemo(
-		() => rooms.reduce((s, r) => s + roomWallArea(r), 0),
-		[rooms],
+		() => rooms.reduce((s, r) => s + roomWallArea(r, floorHeight), 0),
+		[rooms, floorHeight],
 	);
 
 	const doorsArea = useMemo(
@@ -243,15 +271,13 @@ export function PlasterItemDialog({
 		});
 	}, [finalQuantity, thickness, mixRatio]);
 
-	const floorInfo = PLASTER_FLOORS.find((f) => f.id === floorId);
-
 	// ─── Row management helpers ─────────────────────────
 	const addRoom = useCallback(() => {
 		setRooms((prev) => {
 			const newIdx = prev.length;
 			const next = [...prev, makeRoom(newIdx + 1)];
 			setTimeout(() => {
-				(document.getElementById(`room-${newIdx}-name`) as HTMLInputElement)?.focus();
+				(document.getElementById(`room-${newIdx}-wall1`) as HTMLInputElement)?.focus();
 			}, 50);
 			return next;
 		});
@@ -312,10 +338,8 @@ export function PlasterItemDialog({
 	// ─── Keyboard nav for fast entry ────────────────────
 	const handleRoomKeyDown = useCallback(
 		(e: React.KeyboardEvent, rowIdx: number, colIdx: number) => {
-			const cols = isInternal
-				? ["name", "wall1", "wall2", "height"]
-				: ["name", "wall1", "height"];
-			const isLastCol = colIdx === cols.length - 1;
+			const lastCol = isInternal ? 1 : 0; // wall1(0) / wall2(1) for internal, wall1(0) for external
+			const isLastCol = colIdx === lastCol;
 			const isLastRow = rowIdx === rooms.length - 1;
 
 			if (e.key === "Enter" && isLastCol && isLastRow) {
@@ -392,13 +416,14 @@ export function PlasterItemDialog({
 			plasterMethod,
 			thickness,
 			mixRatio,
+			floorHeight,
 			includeCeiling: isInternal ? includeCeiling : false,
 			rooms: rooms.map((r) => ({
 				name: r.name,
 				shape: r.shape,
 				wall1: numVal(r.wall1),
 				wall2: numVal(r.wall2),
-				height: numVal(r.height),
+				heightOverride: r.heightOverride,
 			})),
 			doors: doors.map((d) => ({
 				name: d.name,
@@ -424,14 +449,15 @@ export function PlasterItemDialog({
 				: null,
 		};
 
-		const itemName = `${name} — ${floorInfo?.ar ?? ""}`.trim();
+		const floorName = selectedFloor?.name ?? "";
+		const itemName = `${name} — ${floorName}`.trim();
 
 		const itemData = {
 			name: itemName,
 			category: isInternal ? "FINISHING_INTERNAL_PLASTER" : "FINISHING_EXTERNAL_PLASTER",
 			subCategory: plasterType,
 			floorId,
-			floorName: floorInfo?.ar ?? "",
+			floorName,
 			area: breakdown.totalBeforeWastage || undefined,
 			quantity: breakdown.finalQuantity,
 			unit: "m2",
@@ -538,20 +564,40 @@ export function PlasterItemDialog({
 						</div>
 					</div>
 
-					{/* Floor picker */}
-					<div className="space-y-1">
-						<Label className="text-sm">{t("floor")}</Label>
-						<div className="flex flex-wrap gap-2">
-							{PLASTER_FLOORS.map((floor) => (
-								<Badge
-									key={floor.id}
-									variant={floorId === floor.id ? "default" : "outline"}
-									className="cursor-pointer select-none"
-									onClick={() => setFloorId(floor.id)}
-								>
-									{floor.ar}
-								</Badge>
-							))}
+					{/* Floor picker (dropdown) + Floor height */}
+					<div className="grid grid-cols-2 gap-3">
+						<div className="space-y-1">
+							<Label className="text-sm">{t("floor")}</Label>
+							{floors.length > 0 ? (
+								<Select value={floorId} onValueChange={setFloorId}>
+									<SelectTrigger>
+										<SelectValue placeholder={t("selectFloor")} />
+									</SelectTrigger>
+									<SelectContent>
+										{floors.map((floor) => (
+											<SelectItem key={floor.id} value={floor.id}>
+												{floor.name}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							) : (
+								<p className="text-xs text-muted-foreground pt-1">
+									{t("noFloors")}
+								</p>
+							)}
+						</div>
+						<div className="space-y-1">
+							<Label className="text-sm">{t("floorHeight")} (م)</Label>
+							<Input
+								type="number"
+								value={floorHeight || ""}
+								onChange={(e) => setFloorHeight(parseFloat(e.target.value) || 0)}
+								step="0.1"
+							/>
+							<p className="text-xs text-muted-foreground">
+								{t("floorHeightHint")}
+							</p>
 						</div>
 					</div>
 
@@ -576,77 +622,111 @@ export function PlasterItemDialog({
 							<table className="w-full text-sm">
 								<thead>
 									<tr className="border-b bg-muted/50">
-										<th className="p-2 text-right font-medium">{t("roomName")}</th>
+										<th className="p-2 text-right font-medium w-24">{t("roomName")}</th>
 										<th className="p-2 text-right font-medium">
 											{isInternal ? t("wall1") : t("facadeLength")} (م)
 										</th>
 										{isInternal && (
 											<th className="p-2 text-right font-medium">{t("wall2")} (م)</th>
 										)}
-										<th className="p-2 text-right font-medium">{t("height")} (م)</th>
-										<th className="p-2 w-10" />
+										<th className="p-2 w-20" />
 									</tr>
 								</thead>
 								<tbody>
-									{rooms.map((room, i) => (
-										<tr key={i} className="border-b last:border-0">
-											<td className="p-1">
-												<Input
-													id={`room-${i}-name`}
-													value={room.name}
-													onChange={(e) => updateRoom(i, "name", e.target.value)}
-													onKeyDown={(e) => handleRoomKeyDown(e, i, 0)}
-													className="h-8 text-sm"
-												/>
-											</td>
-											<td className="p-1">
-												<Input
-													id={`room-${i}-wall1`}
-													type="number"
-													value={room.wall1}
-													onChange={(e) => updateRoom(i, "wall1", parseNum(e.target.value))}
-													onKeyDown={(e) => handleRoomKeyDown(e, i, 1)}
-													className="h-8 text-sm"
-												/>
-											</td>
-											{isInternal && (
+									{rooms.map((room, i) => {
+										const hasOverride = room.heightOverride != null;
+										const effectiveH = hasOverride ? room.heightOverride! : floorHeight;
+										const isEditingH = editingHeightIdx === i;
+
+										return (
+											<tr key={i} className="border-b last:border-0">
+												{/* Name — auto-generated, tabIndex -1 to skip on Tab */}
 												<td className="p-1">
 													<Input
-														id={`room-${i}-wall2`}
+														id={`room-${i}-name`}
+														tabIndex={-1}
+														value={room.name}
+														onChange={(e) => updateRoom(i, "name", e.target.value)}
+														className="h-8 text-sm text-muted-foreground focus:text-foreground"
+													/>
+												</td>
+												{/* Wall 1 */}
+												<td className="p-1">
+													<Input
+														id={`room-${i}-wall1`}
 														type="number"
-														value={room.wall2}
-														onChange={(e) => updateRoom(i, "wall2", parseNum(e.target.value))}
-														onKeyDown={(e) => handleRoomKeyDown(e, i, 2)}
+														value={room.wall1}
+														onChange={(e) => updateRoom(i, "wall1", parseNum(e.target.value))}
+														onKeyDown={(e) => handleRoomKeyDown(e, i, 0)}
 														className="h-8 text-sm"
 													/>
 												</td>
-											)}
-											<td className="p-1">
-												<Input
-													id={`room-${i}-height`}
-													type="number"
-													value={room.height}
-													onChange={(e) => updateRoom(i, "height", parseNum(e.target.value))}
-													onKeyDown={(e) =>
-														handleRoomKeyDown(e, i, isInternal ? 3 : 2)
-													}
-													className="h-8 text-sm"
-												/>
-											</td>
-											<td className="p-1">
-												<Button
-													type="button"
-													variant="ghost"
-													size="icon"
-													className="h-7 w-7"
-													onClick={() => removeRoom(i)}
-													disabled={rooms.length <= 1}
-												>
-													<Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
-												</Button>
-											</td>
-										</tr>
-									))}
+												{/* Wall 2 (internal only) */}
+												{isInternal && (
+													<td className="p-1">
+														<Input
+															id={`room-${i}-wall2`}
+															type="number"
+															value={room.wall2}
+															onChange={(e) => updateRoom(i, "wall2", parseNum(e.target.value))}
+															onKeyDown={(e) => handleRoomKeyDown(e, i, 1)}
+															className="h-8 text-sm"
+														/>
+													</td>
+												)}
+												{/* Height override + delete */}
+												<td className="p-1">
+													<div className="flex items-center gap-1">
+														{isEditingH ? (
+															<Input
+																id={`room-${i}-height-edit`}
+																type="number"
+																autoFocus
+																value={effectiveH || ""}
+																onChange={(e) => {
+																	const v = parseFloat(e.target.value);
+																	updateRoom(i, "heightOverride", Number.isNaN(v) ? null : v);
+																}}
+																onBlur={() => setEditingHeightIdx(null)}
+																onKeyDown={(e) => {
+																	if (e.key === "Enter" || e.key === "Escape") {
+																		setEditingHeightIdx(null);
+																	}
+																}}
+																className="h-7 w-16 text-xs"
+																step="0.1"
+																tabIndex={-1}
+															/>
+														) : (
+															<Button
+																type="button"
+																variant="ghost"
+																size="sm"
+																className={`h-7 px-1.5 text-xs ${hasOverride ? "text-primary font-medium" : "text-muted-foreground"}`}
+																onClick={() => setEditingHeightIdx(i)}
+																title={t("editRoomHeight")}
+																tabIndex={-1}
+															>
+																<Pencil className="h-3 w-3 me-1" />
+																{effectiveH} م
+															</Button>
+														)}
+														<Button
+															type="button"
+															variant="ghost"
+															size="icon"
+															className="h-7 w-7"
+															onClick={() => removeRoom(i)}
+															disabled={rooms.length <= 1}
+															tabIndex={-1}
+														>
+															<Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
+														</Button>
+													</div>
+												</td>
+											</tr>
+										);
+									})}
 								</tbody>
 							</table>
 						</div>

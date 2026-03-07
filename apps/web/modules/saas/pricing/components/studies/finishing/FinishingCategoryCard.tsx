@@ -173,6 +173,7 @@ export function FinishingCategoryCard({
 					onOpenChange={setDialogOpen}
 					organizationId={organizationId}
 					studyId={studyId}
+					buildingConfig={buildingConfig}
 					plasterType={
 						category.id === "FINISHING_INTERNAL_PLASTER"
 							? "internal_plaster"
