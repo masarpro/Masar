@@ -32,6 +32,7 @@ interface FinishingGroupSectionProps {
 	group: FinishingGroup;
 	categories: FinishingCategoryConfig[];
 	items: FinishingItem[];
+	allStudyItems?: FinishingItem[];
 	organizationId: string;
 	studyId: string;
 	buildingConfig?: BuildingConfig | null;
@@ -58,6 +59,7 @@ export function FinishingGroupSection({
 	group,
 	categories,
 	items,
+	allStudyItems,
 	organizationId,
 	studyId,
 	buildingConfig,
@@ -82,7 +84,7 @@ export function FinishingGroupSection({
 						key={category.id}
 						category={category}
 						items={items.filter((item) => item.category === category.id)}
-						allGroupItems={items}
+						allGroupItems={allStudyItems ?? items}
 						organizationId={organizationId}
 						studyId={studyId}
 						buildingConfig={buildingConfig}

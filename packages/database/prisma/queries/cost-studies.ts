@@ -672,6 +672,64 @@ export async function updateBuildingConfig(
 	});
 }
 
+/**
+ * Get all finishing items for a cost study (for cascade update).
+ */
+export async function getFinishingItemsForCascade(costStudyId: string) {
+	return db.finishingItem.findMany({
+		where: { costStudyId },
+		select: {
+			id: true,
+			category: true,
+			floorId: true,
+			area: true,
+			quantity: true,
+			length: true,
+			unit: true,
+			wastagePercent: true,
+			materialPrice: true,
+			laborPrice: true,
+			calculationData: true,
+		},
+	});
+}
+
+/**
+ * Batch update finishing items (for cascade update after building config change).
+ */
+export async function batchUpdateFinishingItems(
+	costStudyId: string,
+	updates: Array<{
+		id: string;
+		area?: number;
+		quantity?: number;
+		length?: number;
+		totalCost: number;
+		materialCost: number;
+		laborCost: number;
+	}>,
+) {
+	if (updates.length === 0) return;
+
+	await db.$transaction(
+		updates.map((update) =>
+			db.finishingItem.update({
+				where: { id: update.id },
+				data: {
+					area: update.area,
+					quantity: update.quantity,
+					length: update.length,
+					totalCost: update.totalCost,
+					materialCost: update.materialCost,
+					laborCost: update.laborCost,
+				},
+			}),
+		),
+	);
+
+	await recalculateCostStudyTotals(costStudyId);
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // MEP Item Queries
 // ═══════════════════════════════════════════════════════════════════════════

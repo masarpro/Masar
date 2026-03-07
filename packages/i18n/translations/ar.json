@@ -1413,6 +1413,22 @@
 					"set": "طقم",
 					"lump_sum": "مقطوعية"
 				},
+				"linking": {
+					"fillFromBuilding": "تعبئة من إعدادات المبنى",
+					"selectSource": "اختر مصدر الكمية",
+					"linked": "مرتبط",
+					"linkedToBuilding": "مرتبط بإعدادات المبنى",
+					"linkedToCategory": "مرتبط ببند آخر",
+					"unlinkConfirm": "فك الربط؟ سيتحول البند إلى إدخال يدوي",
+					"unlink": "فك الربط",
+					"autoUpdated": "تم تحديث البنود المرتبطة تلقائياً",
+					"autoUpdatedCount": "تم تحديث {count} بنود مرتبطة",
+					"derivedQuantity": "الكمية المشتقة",
+					"applyLink": "ربط وتعبئة",
+					"manualEntry": "إدخال يدوي",
+					"noConfigData": "يرجى إعداد بيانات المبنى أولاً",
+					"selectFloorFirst": "اختر الدور أولاً"
+				},
 				"waterproofing": {
 					"title": "إضافة بند — العزل المائي",
 					"name": "الاسم",

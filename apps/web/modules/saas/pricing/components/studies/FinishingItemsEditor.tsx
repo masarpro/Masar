@@ -110,6 +110,7 @@ export function FinishingItemsEditor({
 						group={group}
 						categories={categories}
 						items={finishingItems}
+						allStudyItems={finishingItems}
 						organizationId={organizationId}
 						studyId={studyId}
 						buildingConfig={buildingConfig}

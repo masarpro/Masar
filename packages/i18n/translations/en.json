@@ -1456,6 +1456,22 @@
 					"set": "set",
 					"lump_sum": "lump sum"
 				},
+				"linking": {
+					"fillFromBuilding": "Fill from Building Settings",
+					"selectSource": "Select quantity source",
+					"linked": "Linked",
+					"linkedToBuilding": "Linked to building settings",
+					"linkedToCategory": "Linked to another item",
+					"unlinkConfirm": "Unlink? Item will switch to manual entry",
+					"unlink": "Unlink",
+					"autoUpdated": "Linked items updated automatically",
+					"autoUpdatedCount": "{count} linked items updated",
+					"derivedQuantity": "Derived quantity",
+					"applyLink": "Link & Fill",
+					"manualEntry": "Manual entry",
+					"noConfigData": "Please set up building data first",
+					"selectFloorFirst": "Select a floor first"
+				},
 				"waterproofing": {
 					"title": "Add Item — Waterproofing",
 					"name": "Name",

@@ -67,10 +67,16 @@ export function BuildingConfigPanel({
 		},
 	);
 
+	const tLink = useTranslations("pricing.studies.finishing.linking");
+
 	const saveMutation = useMutation(
 		orpc.pricing.studies.buildingConfig.update.mutationOptions({
-			onSuccess: () => {
+			onSuccess: (data) => {
 				toast.success(t("saved"));
+				const count = (data as { cascadeUpdatedCount?: number }).cascadeUpdatedCount ?? 0;
+				if (count > 0) {
+					toast.success(tLink("autoUpdatedCount", { count }));
+				}
 				queryClient.invalidateQueries({
 					queryKey: [["pricing", "studies", "getById"]],
 				});

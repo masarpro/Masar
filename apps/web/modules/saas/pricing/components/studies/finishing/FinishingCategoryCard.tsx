@@ -263,6 +263,7 @@ export function FinishingCategoryCard({
 					studyId={studyId}
 					category={category}
 					buildingConfig={buildingConfig}
+					allItems={allGroupItems}
 					editItem={
 						editItem
 							? {

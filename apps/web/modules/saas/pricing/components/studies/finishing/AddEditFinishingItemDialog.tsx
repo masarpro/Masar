@@ -19,12 +19,19 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@ui/components/select";
-import { Calculator } from "lucide-react";
+import { Calculator, Link2, Unlink } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import type { FinishingCategoryConfig } from "../../../lib/finishing-categories";
 import { calculateFinishingItemCost } from "../../../lib/finishing-categories";
+import {
+	getDerivationOptions,
+	computeDerivedQuantity,
+	getQuantityFromCategory,
+	type LinkedSource,
+	type DerivationOption,
+} from "../../../lib/finishing-links";
 import type { BuildingConfig, CalculatorResult } from "../../../lib/finishing-types";
 import { formatCurrency } from "../../../lib/utils";
 import {
@@ -63,6 +70,15 @@ interface FinishingItemData {
 	totalCost: number;
 }
 
+interface AllItemForLinking {
+	id: string;
+	category: string;
+	floorId?: string | null;
+	area?: number | null;
+	quantity?: number | null;
+	length?: number | null;
+}
+
 interface AddEditFinishingItemDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -71,6 +87,7 @@ interface AddEditFinishingItemDialogProps {
 	category: FinishingCategoryConfig;
 	buildingConfig?: BuildingConfig | null;
 	editItem?: FinishingItemData;
+	allItems?: AllItemForLinking[];
 }
 
 export function AddEditFinishingItemDialog({
@@ -81,6 +98,7 @@ export function AddEditFinishingItemDialog({
 	category,
 	buildingConfig,
 	editItem,
+	allItems,
 }: AddEditFinishingItemDialogProps) {
 	const t = useTranslations("pricing.studies.finishing");
 	const queryClient = useQueryClient();
@@ -97,6 +115,66 @@ export function AddEditFinishingItemDialog({
 	});
 
 	const [calculatorOpen, setCalculatorOpen] = useState(false);
+
+	// Linking
+	const derivationOptions = getDerivationOptions(category.id);
+	const hasLinking = derivationOptions.length > 0 && buildingConfig;
+	const currentLink = form.calculationData?.linkedSource as LinkedSource | undefined;
+
+	const handleApplyLink = (option: DerivationOption) => {
+		let qty: number | null = null;
+
+		if (option.sourceType === "building_config" && buildingConfig) {
+			qty = computeDerivedQuantity(
+				option.derivation,
+				buildingConfig,
+				form.floorId,
+			);
+		} else if (
+			option.sourceType === "category" &&
+			option.sourceCategoryId &&
+			allItems
+		) {
+			qty = getQuantityFromCategory(
+				option.sourceCategoryId,
+				allItems,
+				form.floorId ?? undefined,
+			);
+		}
+
+		if (qty == null || qty <= 0) return;
+
+		const linkedSource: LinkedSource = {
+			type: option.sourceType,
+			derivation: option.derivation,
+			floorId: form.floorId,
+			sourceCategoryId: option.sourceCategoryId,
+			label: option.labelAr,
+		};
+
+		setForm((prev) => ({
+			...prev,
+			area: option.unit === "m2" ? qty : prev.area,
+			length: option.unit === "m" ? qty : prev.length,
+			quantity:
+				option.unit === "piece" ? qty : prev.quantity,
+			calculationData: {
+				...prev.calculationData,
+				linkedSource,
+			},
+		}));
+	};
+
+	const handleUnlink = () => {
+		setForm((prev) => {
+			const { linkedSource: _, ...rest } =
+				(prev.calculationData ?? {}) as Record<string, unknown>;
+			return {
+				...prev,
+				calculationData: Object.keys(rest).length > 0 ? rest : undefined,
+			};
+		});
+	};
 
 	// Reset form when dialog opens
 	useEffect(() => {
@@ -311,6 +389,88 @@ export function AddEditFinishingItemDialog({
 									}
 									showAllFloors={!isEdit}
 								/>
+							</div>
+						)}
+
+						{/* Linking Section */}
+						{hasLinking && (
+							<div className="space-y-2">
+								{currentLink ? (
+									<div className="flex items-center justify-between gap-2 rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950 p-2.5">
+										<div className="flex items-center gap-2 min-w-0">
+											<Link2 className="h-4 w-4 shrink-0 text-blue-600" />
+											<span className="text-xs text-blue-700 dark:text-blue-300 truncate">
+												{currentLink.label}
+											</span>
+										</div>
+										<Button
+											variant="ghost"
+											size="sm"
+											className="h-7 text-xs shrink-0"
+											onClick={handleUnlink}
+										>
+											<Unlink className="h-3 w-3 me-1" />
+											{t("linking.unlink")}
+										</Button>
+									</div>
+								) : (
+									<div className="space-y-1.5">
+										<Label className="text-xs text-muted-foreground">
+											{t("linking.fillFromBuilding")}
+										</Label>
+										<div className="flex flex-wrap gap-1.5">
+											{derivationOptions.map((option) => {
+												let previewQty: number | null = null;
+												if (
+													option.sourceType === "building_config" &&
+													buildingConfig
+												) {
+													previewQty = computeDerivedQuantity(
+														option.derivation,
+														buildingConfig,
+														form.floorId,
+													);
+												} else if (
+													option.sourceType === "category" &&
+													option.sourceCategoryId &&
+													allItems
+												) {
+													previewQty = getQuantityFromCategory(
+														option.sourceCategoryId,
+														allItems,
+														form.floorId ?? undefined,
+													);
+												}
+
+												const isDisabled =
+													previewQty == null ||
+													previewQty <= 0 ||
+													(option.requiresFloor && !form.floorId);
+
+												return (
+													<Button
+														key={option.derivation + (option.sourceCategoryId ?? "")}
+														variant="outline"
+														size="sm"
+														className="h-auto py-1.5 px-2.5 text-xs whitespace-normal text-start"
+														disabled={isDisabled}
+														onClick={() => handleApplyLink(option)}
+													>
+														<Link2 className="h-3 w-3 me-1.5 shrink-0" />
+														<span>
+															{option.labelAr}
+															{previewQty != null && previewQty > 0 && (
+																<span className="text-muted-foreground ms-1">
+																	({previewQty} {t(`units.${option.unit}` as "units.m2")})
+																</span>
+															)}
+														</span>
+													</Button>
+												);
+											})}
+										</div>
+									</div>
+								)}
 							</div>
 						)}
 

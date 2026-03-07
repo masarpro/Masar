@@ -1,8 +1,9 @@
 "use client";
 
 import { Button } from "@ui/components/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Link2, Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import type { LinkedSource } from "../../../lib/finishing-links";
 import { formatCurrency } from "../../../lib/utils";
 
 interface FinishingItemRowProps {
@@ -17,6 +18,7 @@ interface FinishingItemRowProps {
 		qualityLevel?: string | null;
 		totalCost: number;
 		floorName?: string | null;
+		calculationData?: Record<string, unknown> | null;
 	};
 	onEdit: () => void;
 	onDelete: () => void;
@@ -27,11 +29,19 @@ export function FinishingItemRow({ item, onEdit, onDelete }: FinishingItemRowPro
 
 	const displayQty = item.area || item.quantity || item.length || 0;
 	const unitLabel = t(`units.${item.unit}` as "units.m2");
+	const linkedSource = item.calculationData?.linkedSource as LinkedSource | undefined;
 
 	return (
 		<div className="flex items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm">
 			<div className="flex-1 min-w-0">
-				<div className="font-medium truncate">{item.name}</div>
+				<div className="flex items-center gap-1.5 font-medium truncate">
+					{linkedSource && (
+						<span title={linkedSource.label}>
+							<Link2 className="h-3.5 w-3.5 shrink-0 text-blue-500" />
+						</span>
+					)}
+					{item.name}
+				</div>
 				<div className="flex items-center gap-2 text-xs text-muted-foreground">
 					{displayQty > 0 && (
 						<span>
