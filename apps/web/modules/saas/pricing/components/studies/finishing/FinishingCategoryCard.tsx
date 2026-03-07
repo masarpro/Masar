@@ -15,6 +15,7 @@ import { AddEditFinishingItemDialog } from "./AddEditFinishingItemDialog";
 import { FinishingItemRow } from "./FinishingItemRow";
 import { PlasterItemDialog } from "./PlasterItemDialog";
 import { ThermalInsulationItemDialog } from "./ThermalInsulationItemDialog";
+import { PaintItemDialog } from "./PaintItemDialog";
 import { WaterproofingItemDialog } from "./WaterproofingItemDialog";
 
 interface FinishingItem {
@@ -218,6 +219,36 @@ export function FinishingCategoryCard({
 									length: editItem.length ?? undefined,
 									width: (editItem as unknown as { width?: number | null }).width ?? undefined,
 									quantity: editItem.quantity ?? undefined,
+									wastagePercent: editItem.wastagePercent ?? 0,
+									materialPrice: editItem.materialPrice ?? 0,
+									laborPrice: editItem.laborPrice ?? 0,
+									calculationMethod: editItem.calculationMethod ?? undefined,
+									calculationData: (editItem.calculationData as Record<string, unknown>) ?? undefined,
+									totalCost: editItem.totalCost,
+								}
+							: undefined
+					}
+				/>
+			) : category.id === "FINISHING_INTERIOR_PAINT" ? (
+				<PaintItemDialog
+					open={dialogOpen}
+					onOpenChange={setDialogOpen}
+					organizationId={organizationId}
+					studyId={studyId}
+					buildingConfig={buildingConfig}
+					allStudyItems={allGroupItems}
+					editItem={
+						editItem
+							? {
+									...editItem,
+									subCategory: editItem.subCategory ?? undefined,
+									floorId: editItem.floorId ?? undefined,
+									floorName: editItem.floorName ?? undefined,
+									area: editItem.area ?? undefined,
+									length: editItem.length ?? undefined,
+									width: (editItem as unknown as { width?: number | null }).width ?? undefined,
+									quantity: editItem.quantity ?? undefined,
+									qualityLevel: editItem.qualityLevel ?? undefined,
 									wastagePercent: editItem.wastagePercent ?? 0,
 									materialPrice: editItem.materialPrice ?? 0,
 									laborPrice: editItem.laborPrice ?? 0,
