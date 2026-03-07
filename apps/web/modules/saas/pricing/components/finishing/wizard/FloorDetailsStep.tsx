@@ -259,24 +259,24 @@ export function FloorDetailsStep({
 	return (
 		<div className="space-y-4">
 			{/* Floor tabs */}
-			<div className="flex gap-1.5 overflow-x-auto pb-1">
+			<div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
 				{habitableFloors.map((floor) => (
 					<Button
 						key={floor.id}
 						variant={
 							floor.id === activeFloorId
-								? "primary"
+								? "default"
 								: "outline"
 						}
 						size="sm"
-						className="text-xs shrink-0"
+						className="text-sm shrink-0 rounded-full px-3.5"
 						onClick={() => setActiveFloorId(floor.id)}
 					>
 						{floor.name}
 						{(floor.rooms?.length ?? 0) > 0 && (
 							<Badge
 								variant="secondary"
-								className="ms-1.5 text-[10px] px-1 py-0"
+								className="ms-1.5 text-xs px-1.5 py-0 rounded-full"
 							>
 								{floor.rooms!.length}
 							</Badge>
@@ -447,13 +447,13 @@ export function FloorDetailsStep({
 						)}
 
 						{/* Quick add room buttons */}
-						<div className="flex flex-wrap gap-1">
+						<div className="flex flex-wrap gap-1.5">
 							{ROOM_PRESETS.map((preset) => (
 								<Button
 									key={preset.type}
 									variant="outline"
 									size="sm"
-									className="text-xs h-7"
+									className="text-sm h-8 rounded-lg"
 									onClick={() =>
 										addRoom(
 											activeFloorId,
@@ -462,7 +462,7 @@ export function FloorDetailsStep({
 										)
 									}
 								>
-									<Plus className="h-3 w-3 me-1" />
+									<Plus className="h-3.5 w-3.5 me-1" />
 									{preset.nameAr}
 								</Button>
 							))}
@@ -470,7 +470,7 @@ export function FloorDetailsStep({
 
 						{/* Room summary */}
 						{rooms.length > 0 && (
-							<div className="flex flex-wrap gap-3 text-xs text-muted-foreground bg-muted/50 rounded-md p-2.5">
+							<div className="flex flex-wrap gap-3 text-sm text-muted-foreground bg-muted/40 rounded-lg p-3">
 								<span>
 									{tw("roomCount")}: <b>{rooms.length}</b>
 								</span>
@@ -645,18 +645,18 @@ export function FloorDetailsStep({
 						)}
 
 						{/* Quick add opening buttons */}
-						<div className="flex flex-wrap gap-1">
+						<div className="flex flex-wrap gap-1.5">
 							{OPENING_PRESETS.map((preset) => (
 								<Button
 									key={preset.name}
 									variant="outline"
 									size="sm"
-									className="text-xs h-7"
+									className="text-sm h-8 rounded-lg"
 									onClick={() =>
 										addOpening(activeFloorId, preset)
 									}
 								>
-									<Plus className="h-3 w-3 me-1" />
+									<Plus className="h-3.5 w-3.5 me-1" />
 									{preset.name}
 								</Button>
 							))}
@@ -664,7 +664,7 @@ export function FloorDetailsStep({
 
 						{/* Opening summary */}
 						{openings.length > 0 && (
-							<div className="flex flex-wrap gap-3 text-xs text-muted-foreground bg-muted/50 rounded-md p-2.5">
+							<div className="flex flex-wrap gap-3 text-sm text-muted-foreground bg-muted/40 rounded-lg p-3">
 								<span>
 									أبواب: <b>{doorCount}</b>
 								</span>

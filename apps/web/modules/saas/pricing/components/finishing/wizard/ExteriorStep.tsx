@@ -79,7 +79,7 @@ export function ExteriorStep({ config, onChange }: ExteriorStepProps) {
 			</div>
 
 			{/* Courtyard */}
-			<div className="space-y-4 rounded-lg border p-4">
+			<div className="space-y-4 rounded-xl border p-5">
 				<div className="flex items-center justify-between">
 					<div>
 						<Label className="text-sm font-medium">

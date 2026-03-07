@@ -413,59 +413,61 @@ export function BuildingSetupWizard({
 					variant="ghost"
 					size="sm"
 					onClick={onSkip}
-					className="text-muted-foreground text-xs"
+					className="text-muted-foreground text-sm"
 				>
-					<SkipForward className="h-3.5 w-3.5 me-1" />
+					<SkipForward className="h-4 w-4 me-1.5" />
 					{tw("skip")}
 				</Button>
 			</div>
 
-			{/* Stepper */}
-			<div className="flex items-center justify-between gap-1">
+			{/* Stepper — numbered circles with connecting lines */}
+			<div className="flex items-center gap-0">
 				{STEPS.map((s, idx) => {
 					const isActive = idx === step;
 					const isDone = idx < step;
 					return (
-						<button
-							key={s.key}
-							type="button"
-							className={`flex-1 flex items-center gap-2 p-2.5 rounded-lg text-sm transition-colors ${
-								isActive
-									? "bg-primary text-primary-foreground"
-									: isDone
-										? "bg-primary/10 text-primary cursor-pointer"
-										: "bg-muted text-muted-foreground"
-							}`}
-							onClick={() => goToStep(idx)}
-							disabled={idx > step}
-						>
-							<span
-								className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-									isDone
-										? "bg-primary text-primary-foreground"
-										: isActive
-											? "bg-primary-foreground text-primary"
-											: "bg-muted-foreground/20"
-								}`}
+						<div key={s.key} className="flex items-center flex-1 last:flex-initial">
+							<button
+								type="button"
+								className="flex flex-col items-center gap-1.5"
+								onClick={() => goToStep(idx)}
+								disabled={idx > step}
 							>
-								{isDone ? (
-									<Check className="h-3.5 w-3.5" />
-								) : (
-									idx + 1
-								)}
-							</span>
-							<span className="hidden sm:inline text-xs font-medium truncate">
-								{stepTitles[idx]}
-							</span>
-						</button>
+								<span
+									className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-200 ${
+										isDone
+											? "bg-primary text-primary-foreground shadow-sm"
+											: isActive
+												? "bg-primary text-primary-foreground ring-4 ring-primary/20 shadow-sm"
+												: "bg-muted text-muted-foreground"
+									}`}
+								>
+									{isDone ? (
+										<Check className="h-4 w-4" />
+									) : (
+										idx + 1
+									)}
+								</span>
+								<span className={`hidden sm:block text-xs font-medium text-center ${
+									isActive ? "text-primary" : isDone ? "text-foreground" : "text-muted-foreground"
+								}`}>
+									{stepTitles[idx]}
+								</span>
+							</button>
+							{idx < STEPS.length - 1 && (
+								<div className={`flex-1 h-0.5 mx-2 rounded-full transition-colors duration-200 ${
+									idx < step ? "bg-primary" : "bg-muted"
+								}`} />
+							)}
+						</div>
 					);
 				})}
 			</div>
 
 			{/* Step Content */}
-			<Card>
-				<CardContent className="p-5">
-					<h2 className="text-base font-semibold mb-4">
+			<Card className="rounded-xl shadow-sm">
+				<CardContent className="p-6">
+					<h2 className="text-lg font-semibold mb-5">
 						{stepTitles[step]}
 					</h2>
 
@@ -495,8 +497,8 @@ export function BuildingSetupWizard({
 			<div className="flex items-center justify-between">
 				<div>
 					{step > 0 && (
-						<Button variant="outline" onClick={goPrev}>
-							<ArrowRight className="h-4 w-4 me-1" />
+						<Button variant="outline" className="rounded-lg" onClick={goPrev}>
+							<ArrowRight className="h-4 w-4 me-1.5" />
 							{tw("previous")}
 						</Button>
 					)}
@@ -507,7 +509,7 @@ export function BuildingSetupWizard({
 							variant="ghost"
 							size="sm"
 							onClick={goNext}
-							className="text-muted-foreground"
+							className="text-muted-foreground text-sm"
 						>
 							{tw("skipDetails")}
 						</Button>
@@ -517,25 +519,26 @@ export function BuildingSetupWizard({
 							variant="ghost"
 							size="sm"
 							onClick={goNext}
-							className="text-muted-foreground"
+							className="text-muted-foreground text-sm"
 						>
 							{tw("skipDetails")}
 						</Button>
 					)}
 					{step < 3 ? (
-						<Button onClick={goNext}>
+						<Button className="rounded-lg" onClick={goNext}>
 							{tw("next")}
-							<ArrowLeft className="h-4 w-4 ms-1" />
+							<ArrowLeft className="h-4 w-4 ms-1.5" />
 						</Button>
 					) : (
 						<Button
+							className="rounded-lg"
 							onClick={handleGenerate}
 							disabled={isGenerating}
 						>
 							{isGenerating ? (
-								<Loader2 className="h-4 w-4 me-1 animate-spin" />
+								<Loader2 className="h-4 w-4 me-1.5 animate-spin" />
 							) : (
-								<Sparkles className="h-4 w-4 me-1" />
+								<Sparkles className="h-4 w-4 me-1.5" />
 							)}
 							{tw("generate")}
 						</Button>

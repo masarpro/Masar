@@ -693,7 +693,7 @@ export function QuantitiesDashboard({
 	);
 
 	return (
-		<div className="space-y-4">
+		<div className="space-y-5">
 			{/* Building Summary */}
 			<BuildingSummaryBar
 				config={config}
@@ -722,17 +722,21 @@ export function QuantitiesDashboard({
 			{/* Toolbar */}
 			<div className="space-y-3">
 				{/* Group tabs */}
-				<div className="flex flex-wrap gap-1">
+				<div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
 					{GROUP_TABS.map((tab) => (
 						<Button
 							key={tab.key ?? "all"}
 							variant={
 								groupFilter === tab.key
-									? "secondary"
+									? "default"
 									: "ghost"
 							}
 							size="sm"
-							className="text-xs h-7 px-2"
+							className={`text-sm h-8 px-3.5 rounded-full shrink-0 transition-all duration-200 ${
+								groupFilter === tab.key
+									? ""
+									: "hover:bg-muted"
+							}`}
 							onClick={() => setGroupFilter(tab.key)}
 						>
 							{tab.key === null ? t("filterAll") : tab.label}
@@ -741,21 +745,21 @@ export function QuantitiesDashboard({
 				</div>
 
 				{/* Search + filters + stats */}
-				<div className="flex flex-wrap items-center gap-2">
+				<div className="flex flex-wrap items-center gap-2.5">
 					{/* Search */}
 					<div className="relative flex-1 min-w-[200px] max-w-sm">
-						<Search className="absolute start-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 						<Input
 							value={searchQuery}
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
 							placeholder={t("searchPlaceholder")}
-							className="ps-8 h-8 text-xs"
+							className="ps-9 h-9 text-sm rounded-lg"
 						/>
 					</div>
 
 					{/* Status filter */}
-					<div className="flex items-center gap-1">
-						<Filter className="h-3.5 w-3.5 text-muted-foreground" />
+					<div className="flex items-center gap-1.5">
+						<Filter className="h-4 w-4 text-muted-foreground" />
 						{(
 							[
 								["all", t("filterAll")],
@@ -773,7 +777,9 @@ export function QuantitiesDashboard({
 										: "ghost"
 								}
 								size="sm"
-								className="text-[10px] h-6 px-1.5"
+								className={`text-xs h-7 px-2.5 rounded-full transition-all duration-200 ${
+									statusFilter === key ? "font-medium" : ""
+								}`}
 								onClick={() =>
 									setStatusFilter(key as StatusFilter)
 								}
@@ -784,19 +790,19 @@ export function QuantitiesDashboard({
 					</div>
 
 					{/* Stats */}
-					<div className="ms-auto flex items-center gap-2 text-xs text-muted-foreground">
+					<div className="ms-auto flex items-center gap-3 text-sm text-muted-foreground">
 						<span>
-							{t("totalItems")}: {totalItems}
+							{t("totalItems")}: <strong className="text-foreground tabular-nums">{totalItems}</strong>
 						</span>
-						<span>|</span>
+						<span className="text-border">|</span>
 						<span>
-							{t("enabled")}: {enabledCount}
+							{t("enabled")}: <strong className="text-foreground tabular-nums">{enabledCount}</strong>
 						</span>
 						{disabledCount > 0 && (
 							<>
-								<span>|</span>
+								<span className="text-border">|</span>
 								<span>
-									{t("disabled")}: {disabledCount}
+									{t("disabled")}: <strong className="text-foreground tabular-nums">{disabledCount}</strong>
 								</span>
 							</>
 						)}
@@ -812,19 +818,19 @@ export function QuantitiesDashboard({
 					<Button
 						variant="outline"
 						size="sm"
-						className="h-8 text-xs"
+						className="h-9 text-sm rounded-lg"
 						onClick={() => setShowBulkEditor(true)}
 					>
-						<Settings className="h-3.5 w-3.5 me-1" />
+						<Settings className="h-4 w-4 me-1.5" />
 						{t("setSpecs")}
 					</Button>
 
 					{/* BOM tab button */}
 					{hasAnySpecs && (
 						<Button
-							variant={dashboardView === "bom" ? "secondary" : "outline"}
+							variant={dashboardView === "bom" ? "default" : "outline"}
 							size="sm"
-							className="h-8 text-xs"
+							className="h-9 text-sm rounded-lg"
 							onClick={() =>
 								setDashboardView(
 									dashboardView === "bom"
@@ -833,7 +839,7 @@ export function QuantitiesDashboard({
 								)
 							}
 						>
-							<ClipboardList className="h-3.5 w-3.5 me-1" />
+							<ClipboardList className="h-4 w-4 me-1.5" />
 							{t("billOfMaterials")}
 						</Button>
 					)}

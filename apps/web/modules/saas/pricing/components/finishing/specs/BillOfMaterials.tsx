@@ -4,7 +4,6 @@ import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import {
 	ChevronDown,
-	ChevronLeft,
 	Download,
 	Printer,
 } from "lucide-react";
@@ -85,7 +84,7 @@ export function BillOfMaterials({ items }: BillOfMaterialsProps) {
 
 	if (specItems.length === 0) {
 		return (
-			<div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground">
+			<div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
 				{t("noSpecs")}
 			</div>
 		);
@@ -95,44 +94,44 @@ export function BillOfMaterials({ items }: BillOfMaterialsProps) {
 		<div className="space-y-3">
 			{/* Tabs + actions */}
 			<div className="flex items-center justify-between">
-				<div className="flex gap-1">
+				<div className="flex gap-1.5">
 					<Button
-						variant={activeTab === "byItem" ? "secondary" : "ghost"}
+						variant={activeTab === "byItem" ? "default" : "ghost"}
 						size="sm"
-						className="text-xs h-7"
+						className="text-sm h-8 px-3.5 rounded-full"
 						onClick={() => setActiveTab("byItem")}
 					>
 						{t("byItem")}
 					</Button>
 					<Button
 						variant={
-							activeTab === "aggregated" ? "secondary" : "ghost"
+							activeTab === "aggregated" ? "default" : "ghost"
 						}
 						size="sm"
-						className="text-xs h-7"
+						className="text-sm h-8 px-3.5 rounded-full"
 						onClick={() => setActiveTab("aggregated")}
 					>
 						{t("aggregated")}
 					</Button>
 				</div>
 
-				<div className="flex items-center gap-1">
+				<div className="flex items-center gap-1.5">
 					<Button
 						variant="outline"
 						size="sm"
-						className="h-7 text-xs"
+						className="h-8 text-sm rounded-lg"
 						onClick={handleExport}
 					>
-						<Download className="h-3 w-3 me-1" />
+						<Download className="h-3.5 w-3.5 me-1.5" />
 						{t("export")}
 					</Button>
 					<Button
 						variant="outline"
 						size="sm"
-						className="h-7 text-xs"
+						className="h-8 text-sm rounded-lg"
 						onClick={handlePrint}
 					>
-						<Printer className="h-3 w-3 me-1" />
+						<Printer className="h-3.5 w-3.5 me-1.5" />
 						{t("print")}
 					</Button>
 				</div>
@@ -166,7 +165,7 @@ function ByItemView({
 	const t = useTranslations("pricing.studies.finishing.bom");
 
 	return (
-		<div className="rounded-lg border overflow-hidden print:border-0">
+		<div className="rounded-lg border overflow-hidden bg-card print:border-0">
 			{grouped.map((group) => {
 				const isCollapsed = collapsedGroups.has(group.groupKey);
 
@@ -175,18 +174,16 @@ function ByItemView({
 						{/* Group header */}
 						<button
 							type="button"
-							className="w-full flex items-center gap-2 px-3 py-2 bg-muted/30 border-b text-sm font-semibold hover:bg-muted/50 transition-colors print:bg-gray-100"
+							className="w-full flex items-center gap-2.5 px-4 py-2.5 bg-muted/40 border-b text-base font-semibold hover:bg-muted/60 transition-colors duration-200 print:bg-gray-100"
 							onClick={() => onToggleGroup(group.groupKey)}
 						>
-							{isCollapsed ? (
-								<ChevronLeft className="h-4 w-4 text-muted-foreground print:hidden" />
-							) : (
-								<ChevronDown className="h-4 w-4 text-muted-foreground print:hidden" />
-							)}
+							<ChevronDown
+								className={`h-4 w-4 text-muted-foreground transition-transform duration-200 print:hidden ${isCollapsed ? "-rotate-90" : ""}`}
+							/>
 							<span>{group.groupName}</span>
 							<Badge
 								variant="secondary"
-								className="text-[10px] h-4 px-1.5"
+								className="text-xs h-5 px-2 rounded-full"
 							>
 								{group.items.length}
 							</Badge>
@@ -207,7 +204,7 @@ function ByItemView({
 										className="border-b last:border-b-0"
 									>
 										{/* Item header */}
-										<div className="px-4 py-2 bg-muted/10 text-xs font-medium flex items-center gap-2">
+										<div className="px-5 py-2.5 bg-muted/15 text-sm font-medium flex items-center gap-2">
 											<span>
 												{spec.specTypeLabel} —{" "}
 												{item.name}
@@ -217,7 +214,7 @@ function ByItemView({
 													({item.floorName})
 												</span>
 											)}
-											<span className="text-muted-foreground ms-auto">
+											<span className="text-muted-foreground ms-auto tabular-nums" dir="ltr">
 												{formatNumber(
 													item.effectiveQuantity,
 													0,
@@ -231,9 +228,9 @@ function ByItemView({
 											{spec.subItems.map((sub) => (
 												<div
 													key={sub.id}
-													className="grid grid-cols-[1fr_60px_80px] gap-2 px-6 py-1.5 text-xs"
+													className="grid grid-cols-[1fr_70px_90px] gap-2 px-7 py-2 text-sm hover:bg-muted/10 transition-colors"
 												>
-													<div className="flex items-center gap-1.5">
+													<div className="flex items-center gap-2">
 														<span className="text-muted-foreground">
 															•
 														</span>
@@ -241,7 +238,7 @@ function ByItemView({
 															{sub.name}
 														</span>
 														{sub.isOptional && (
-															<span className="text-[10px] text-muted-foreground">
+															<span className="text-xs text-muted-foreground">
 																({t("optional")})
 															</span>
 														)}
@@ -249,7 +246,7 @@ function ByItemView({
 													<div className="text-center text-muted-foreground">
 														{sub.unit}
 													</div>
-													<div className="text-end tabular-nums font-medium">
+													<div className="text-end tabular-nums font-semibold" dir="ltr">
 														{formatNumber(
 															sub.quantity,
 															1,
@@ -286,9 +283,9 @@ function AggregatedView({
 	}
 
 	return (
-		<div className="rounded-lg border overflow-hidden print:border-0">
+		<div className="rounded-lg border overflow-hidden bg-card print:border-0">
 			{/* Header */}
-			<div className="grid grid-cols-[1fr_70px_100px_1fr] gap-2 px-3 py-2 bg-muted/50 text-xs font-medium text-muted-foreground border-b print:bg-gray-100">
+			<div className="grid grid-cols-[1fr_70px_100px_1fr] gap-2 px-4 py-2.5 bg-muted/60 text-xs font-semibold text-muted-foreground border-b uppercase tracking-wide print:bg-gray-100">
 				<div>{t("colMaterial")}</div>
 				<div className="text-center">{t("colUnit")}</div>
 				<div className="text-end">{t("colTotal")}</div>
@@ -296,26 +293,26 @@ function AggregatedView({
 			</div>
 
 			{/* Rows */}
-			{aggregated.map((mat) => (
+			{aggregated.map((mat, idx) => (
 				<div
 					key={`${mat.name}|${mat.unit}`}
-					className="grid grid-cols-[1fr_70px_100px_1fr] gap-2 px-3 py-2 border-b last:border-b-0 text-sm hover:bg-muted/10 transition-colors"
+					className={`grid grid-cols-[1fr_70px_100px_1fr] gap-2 px-4 py-2.5 border-b last:border-b-0 text-sm hover:bg-muted/30 transition-colors duration-200 ${idx % 2 === 1 ? "bg-muted/15" : ""}`}
 				>
 					<div className="font-medium">{mat.name}</div>
-					<div className="text-center text-xs text-muted-foreground">
+					<div className="text-center text-sm text-muted-foreground">
 						{mat.unit}
 					</div>
-					<div className="text-end tabular-nums font-medium">
+					<div className="text-end tabular-nums font-semibold" dir="ltr">
 						{formatNumber(mat.totalQuantity, 1)}
 					</div>
-					<div className="text-xs text-muted-foreground truncate">
+					<div className="text-sm text-muted-foreground truncate">
 						{mat.usedInItems.join("، ")}
 					</div>
 				</div>
 			))}
 
 			{/* Summary */}
-			<div className="px-3 py-2 bg-muted/30 text-xs text-muted-foreground border-t">
+			<div className="px-4 py-2.5 bg-muted/40 text-sm text-muted-foreground border-t font-medium">
 				{t("totalMaterials", { count: aggregated.length })}
 			</div>
 		</div>

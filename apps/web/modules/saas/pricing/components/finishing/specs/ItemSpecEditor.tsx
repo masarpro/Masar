@@ -113,7 +113,7 @@ export function ItemSpecEditor({
 	}
 
 	return (
-		<div className="border-t bg-muted/10 p-4 space-y-4">
+		<div className="border-t bg-muted/15 p-5 space-y-4">
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<h4 className="text-sm font-semibold">
@@ -122,19 +122,19 @@ export function ItemSpecEditor({
 				<div className="flex items-center gap-2">
 					<Button
 						size="sm"
-						className="h-7 text-xs"
+						className="h-8 text-sm"
 						onClick={handleSave}
 					>
-						<Save className="h-3 w-3 me-1" />
+						<Save className="h-3.5 w-3.5 me-1.5" />
 						{t("save")}
 					</Button>
 					<Button
 						variant="ghost"
 						size="sm"
-						className="h-7 text-xs"
+						className="h-8 text-sm"
 						onClick={onCancel}
 					>
-						<X className="h-3 w-3 me-1" />
+						<X className="h-3.5 w-3.5 me-1.5" />
 						{t("cancel")}
 					</Button>
 				</div>
@@ -142,12 +142,12 @@ export function ItemSpecEditor({
 
 			{/* Spec type selector */}
 			<div className="space-y-1.5">
-				<Label className="text-xs">{t("specType")}</Label>
+				<Label className="text-sm">{t("specType")}</Label>
 				<Select
 					value={selectedTypeKey}
 					onValueChange={handleTypeChange}
 				>
-					<SelectTrigger className="h-8 text-sm">
+					<SelectTrigger className="h-9 text-sm rounded-lg">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
@@ -162,8 +162,8 @@ export function ItemSpecEditor({
 
 			{/* Options */}
 			{allOptions.length > 0 && (
-				<div className="rounded-lg border p-3 space-y-3">
-					<h5 className="text-xs font-medium text-muted-foreground">
+				<div className="rounded-lg border p-4 space-y-3 bg-card">
+					<h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
 						{t("options")}
 					</h5>
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -204,7 +204,7 @@ function OptionField({
 	if (option.type === "boolean") {
 		return (
 			<div className="flex items-center justify-between gap-2">
-				<Label className="text-xs">{option.label}</Label>
+				<Label className="text-sm">{option.label}</Label>
 				<Switch
 					checked={value === true}
 					onCheckedChange={(checked) => onChange(checked)}
@@ -215,13 +215,13 @@ function OptionField({
 
 	if (option.type === "select" && option.options) {
 		return (
-			<div className="space-y-1">
-				<Label className="text-xs">{option.label}</Label>
+			<div className="space-y-1.5">
+				<Label className="text-sm">{option.label}</Label>
 				<Select
 					value={String(value ?? "")}
 					onValueChange={(val) => onChange(val)}
 				>
-					<SelectTrigger className="h-7 text-xs">
+					<SelectTrigger className="h-8 text-sm rounded-lg">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
@@ -254,7 +254,7 @@ function SubItemsTable({
 
 	if (effectiveQuantity <= 0) {
 		return (
-			<div className="rounded-lg border border-dashed p-4 text-center text-xs text-muted-foreground">
+			<div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
 				{noQuantityMessage}
 			</div>
 		);
@@ -262,7 +262,7 @@ function SubItemsTable({
 
 	if (subItems.length === 0) {
 		return (
-			<div className="rounded-lg border border-dashed p-4 text-center text-xs text-muted-foreground">
+			<div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
 				{t("noSubItems")}
 			</div>
 		);
@@ -271,51 +271,51 @@ function SubItemsTable({
 	const unitLabel = getUnitLabel(unit);
 
 	return (
-		<div className="rounded-lg border overflow-hidden">
-			<div className="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground">
+		<div className="rounded-lg border overflow-hidden bg-card">
+			<div className="bg-muted/50 px-4 py-2 text-sm font-medium text-muted-foreground">
 				{t("subItemsTitle", {
 					quantity: formatNumber(effectiveQuantity, 0),
 					unit: unitLabel,
 				})}
 			</div>
-			<table className="w-full text-xs">
+			<table className="w-full text-sm">
 				<thead>
 					<tr className="border-b bg-muted/20">
-						<th className="text-start px-3 py-1.5 font-medium">
+						<th className="text-start px-4 py-2 font-semibold text-xs uppercase tracking-wide text-muted-foreground">
 							{t("colMaterial")}
 						</th>
-						<th className="text-center px-2 py-1.5 font-medium w-16">
+						<th className="text-center px-2 py-2 font-semibold text-xs uppercase tracking-wide text-muted-foreground w-16">
 							{t("colUnit")}
 						</th>
-						<th className="text-center px-2 py-1.5 font-medium w-20">
+						<th className="text-center px-2 py-2 font-semibold text-xs uppercase tracking-wide text-muted-foreground w-20">
 							{t("colRate")}
 						</th>
-						<th className="text-center px-2 py-1.5 font-medium w-24">
+						<th className="text-center px-2 py-2 font-semibold text-xs uppercase tracking-wide text-muted-foreground w-24">
 							{t("colTotal")}
 						</th>
 					</tr>
 				</thead>
 				<tbody>
-					{subItems.map((sub) => (
+					{subItems.map((sub, idx) => (
 						<tr
 							key={sub.id}
-							className="border-b last:border-b-0 hover:bg-muted/10"
+							className={`border-b last:border-b-0 hover:bg-muted/20 transition-colors ${idx % 2 === 1 ? "bg-muted/10" : ""}`}
 						>
-							<td className="px-3 py-1.5">
+							<td className="px-4 py-2">
 								<span>{sub.name}</span>
 								{sub.isOptional && (
-									<span className="text-muted-foreground ms-1">
+									<span className="text-muted-foreground ms-1 text-xs">
 										({t("optional")})
 									</span>
 								)}
 							</td>
-							<td className="text-center px-2 py-1.5 text-muted-foreground">
+							<td className="text-center px-2 py-2 text-muted-foreground">
 								{sub.unit}
 							</td>
-							<td className="text-center px-2 py-1.5 tabular-nums">
+							<td className="text-center px-2 py-2 tabular-nums" dir="ltr">
 								{formatNumber(sub.ratePerUnit, 2)}
 							</td>
-							<td className="text-center px-2 py-1.5 font-medium tabular-nums">
+							<td className="text-center px-2 py-2 font-semibold tabular-nums" dir="ltr">
 								{formatNumber(sub.quantity, 1)}
 							</td>
 						</tr>

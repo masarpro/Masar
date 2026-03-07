@@ -32,7 +32,7 @@ export function CascadeNotification({
 	const manualChanges = changes.filter((c) => c.isManual);
 
 	return (
-		<Card className="border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/30 p-4 space-y-3 animate-in slide-in-from-top-2 fade-in duration-300">
+		<Card className="border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/30 rounded-xl p-5 space-y-3 animate-in slide-in-from-top-2 fade-in duration-300">
 			{/* Header */}
 			<div className="flex items-start justify-between gap-2">
 				<div className="flex items-center gap-2 text-sm font-semibold">
@@ -42,35 +42,35 @@ export function CascadeNotification({
 				<Button
 					variant="ghost"
 					size="icon"
-					className="h-6 w-6 shrink-0"
+					className="h-7 w-7 shrink-0"
 					onClick={onDismiss}
 				>
-					<X className="h-3.5 w-3.5" />
+					<X className="h-4 w-4" />
 				</Button>
 			</div>
 
 			{/* Updated items */}
 			{autoChanges.length > 0 && (
-				<div className="space-y-1">
-					<p className="text-xs text-muted-foreground font-medium">
+				<div className="space-y-1.5">
+					<p className="text-sm text-muted-foreground font-medium">
 						{t("updatedItems", { count: autoChanges.length })}
 					</p>
-					<ul className="space-y-1 text-sm">
+					<ul className="space-y-1.5 text-sm">
 						{autoChanges.slice(0, 8).map((change) => (
 							<li
 								key={change.itemKey}
 								className="flex items-center gap-2 text-muted-foreground"
 							>
-								<ArrowDown className="h-3 w-3 text-blue-500 shrink-0" />
+								<ArrowDown className="h-3.5 w-3.5 text-blue-500 shrink-0" />
 								<span className="truncate">
 									{change.itemName}
 								</span>
-								<span className="ms-auto tabular-nums text-xs whitespace-nowrap">
+								<span className="ms-auto tabular-nums text-sm whitespace-nowrap" dir="ltr">
 									<span className="line-through opacity-60">
 										{formatNumber(change.oldQuantity, 1)}
 									</span>
 									{" → "}
-									<span className="font-medium text-foreground">
+									<span className="font-semibold text-foreground">
 										{formatNumber(change.newQuantity, 1)}
 									</span>
 									{" "}
@@ -79,7 +79,7 @@ export function CascadeNotification({
 							</li>
 						))}
 						{autoChanges.length > 8 && (
-							<li className="text-xs text-muted-foreground">
+							<li className="text-sm text-muted-foreground">
 								{t("andMore", {
 									count: autoChanges.length - 8,
 								})}
@@ -91,8 +91,8 @@ export function CascadeNotification({
 
 			{/* Skipped manual items warning */}
 			{(skippedManualCount > 0 || manualChanges.length > 0) && (
-				<div className="flex items-center gap-2 rounded bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-2 text-xs">
-					<AlertTriangle className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+				<div className="flex items-center gap-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3 text-sm">
+					<AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
 					<span>
 						{t("manualSkipped", {
 							count: skippedManualCount || manualChanges.length,
@@ -103,7 +103,7 @@ export function CascadeNotification({
 
 			{/* Dismiss */}
 			<div className="flex items-center gap-2 pt-1">
-				<Button size="sm" className="text-xs" onClick={onDismiss}>
+				<Button size="sm" className="text-sm h-8 rounded-lg" onClick={onDismiss}>
 					{t("done")}
 				</Button>
 			</div>

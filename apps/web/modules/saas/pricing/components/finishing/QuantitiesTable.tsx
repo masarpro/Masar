@@ -4,7 +4,6 @@ import { Badge } from "@ui/components/badge";
 import { Checkbox } from "@ui/components/checkbox";
 import {
 	ChevronDown,
-	ChevronLeft,
 	Link2,
 	Pencil,
 	Sparkles,
@@ -18,6 +17,21 @@ import { groupMergedItems } from "../../lib/merge-quantities";
 import type { ItemSpecification } from "../../lib/specs/spec-types";
 import { formatNumber, getUnitLabel } from "../../lib/utils";
 import { QuantityRowExpanded } from "./QuantityRowExpanded";
+
+/** Map group color names to Tailwind color classes */
+const GROUP_COLOR_CLASSES: Record<string, { bg: string; border: string; badge: string }> = {
+	blue: { bg: "bg-blue-50 dark:bg-blue-950/30", border: "border-blue-500", badge: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300" },
+	green: { bg: "bg-emerald-50 dark:bg-emerald-950/30", border: "border-emerald-500", badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300" },
+	purple: { bg: "bg-purple-50 dark:bg-purple-950/30", border: "border-purple-500", badge: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300" },
+	orange: { bg: "bg-orange-50 dark:bg-orange-950/30", border: "border-orange-500", badge: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300" },
+	pink: { bg: "bg-pink-50 dark:bg-pink-950/30", border: "border-pink-500", badge: "bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300" },
+	teal: { bg: "bg-teal-50 dark:bg-teal-950/30", border: "border-teal-500", badge: "bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300" },
+	red: { bg: "bg-red-50 dark:bg-red-950/30", border: "border-red-500", badge: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" },
+	yellow: { bg: "bg-yellow-50 dark:bg-yellow-950/30", border: "border-yellow-500", badge: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300" },
+	gray: { bg: "bg-muted/40", border: "border-muted-foreground/50", badge: "bg-muted text-muted-foreground" },
+};
+
+const DEFAULT_GROUP_COLOR = GROUP_COLOR_CLASSES.gray;
 
 interface QuantitiesTableProps {
 	items: MergedQuantityItem[];
@@ -60,16 +74,16 @@ export function QuantitiesTable({
 
 	if (items.length === 0) {
 		return (
-			<div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground">
+			<div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
 				{t("noItems")}
 			</div>
 		);
 	}
 
 	return (
-		<div className="rounded-lg border overflow-hidden">
+		<div className="rounded-lg border overflow-hidden bg-card">
 			{/* Header */}
-			<div className="hidden sm:grid grid-cols-[40px_1fr_80px_90px_60px_70px_90px_80px] gap-1 px-3 py-2 bg-muted/50 text-xs font-medium text-muted-foreground border-b">
+			<div className="hidden sm:grid grid-cols-[40px_1fr_80px_100px_60px_70px_100px_90px] gap-1 px-4 py-2.5 bg-muted/60 text-xs font-semibold text-muted-foreground border-b uppercase tracking-wide">
 				<div />
 				<div>{t("colItem")}</div>
 				<div className="text-center">{t("colFloor")}</div>
@@ -85,24 +99,22 @@ export function QuantitiesTable({
 				const enabledCount = group.items.filter(
 					(i) => i.isEnabled,
 				).length;
+				const colors = GROUP_COLOR_CLASSES[group.groupColor] ?? DEFAULT_GROUP_COLOR;
 
 				return (
 					<div key={group.groupKey}>
 						{/* Group header */}
 						<button
 							type="button"
-							className="w-full flex items-center gap-2 px-3 py-2 bg-muted/30 border-b text-sm font-semibold hover:bg-muted/50 transition-colors"
+							className={`w-full flex items-center gap-2.5 px-4 py-2.5 border-b text-base font-semibold transition-all duration-200 hover:brightness-95 border-r-4 ${colors.bg} ${colors.border}`}
 							onClick={() => toggleGroup(group.groupKey)}
 						>
-							{isCollapsed ? (
-								<ChevronLeft className="h-4 w-4 text-muted-foreground" />
-							) : (
-								<ChevronDown className="h-4 w-4 text-muted-foreground" />
-							)}
+							<ChevronDown
+								className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isCollapsed ? "-rotate-90" : ""}`}
+							/>
 							<span>{group.groupName}</span>
 							<Badge
-								variant="secondary"
-								className="text-[10px] h-4 px-1.5"
+								className={`text-xs h-5 px-2 rounded-full font-medium border-0 ${colors.badge}`}
 							>
 								{enabledCount}/{group.items.length}
 							</Badge>
@@ -110,20 +122,22 @@ export function QuantitiesTable({
 
 						{/* Group items */}
 						{!isCollapsed &&
-							group.items.map((item) => {
+							group.items.map((item, idx) => {
 								const hasSpec = !!item.specData;
 								return (
 									<div key={item.key}>
 										<div
-											className={`grid grid-cols-[40px_1fr_80px_90px_60px_70px_90px_80px] gap-1 px-3 py-2 border-b items-center text-sm cursor-pointer hover:bg-muted/20 transition-colors ${
+											className={`grid grid-cols-[40px_1fr_80px_100px_60px_70px_100px_90px] gap-1 px-4 py-2.5 border-b items-center text-sm cursor-pointer transition-colors duration-200 ${
 												!item.isEnabled
 													? "opacity-50"
 													: ""
 											} ${
 												expandedKey === item.key
-													? "bg-muted/10"
-													: ""
-											}`}
+													? "bg-primary/5"
+													: idx % 2 === 1
+														? "bg-muted/20"
+														: ""
+											} hover:bg-muted/40`}
 											onClick={() =>
 												toggleRow(item.key)
 											}
@@ -151,15 +165,15 @@ export function QuantitiesTable({
 											</div>
 
 											{/* Name + spec icon */}
-											<div className="flex items-center gap-1.5 min-w-0">
-												<span className="truncate">
+											<div className="flex items-center gap-2 min-w-0">
+												<span className="truncate font-medium">
 													{item.name}
 												</span>
 												{hasSpec && (
-													<Settings className="h-3 w-3 text-green-500 shrink-0" />
+													<Settings className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
 												)}
 												{item.isStale && (
-													<HelpCircle className="h-3 w-3 text-amber-500 shrink-0" />
+													<HelpCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
 												)}
 											</div>
 
@@ -170,7 +184,7 @@ export function QuantitiesTable({
 											</div>
 
 											{/* Quantity */}
-											<div className="text-center font-medium tabular-nums">
+											<div className="text-center font-semibold tabular-nums" dir="ltr">
 												{formatNumber(
 													item.quantity,
 													1,
@@ -183,14 +197,14 @@ export function QuantitiesTable({
 											</div>
 
 											{/* Wastage */}
-											<div className="text-center text-xs text-muted-foreground">
+											<div className="text-center text-xs text-muted-foreground tabular-nums" dir="ltr">
 												{item.wastagePercent > 0
 													? `${item.wastagePercent}%`
 													: "-"}
 											</div>
 
 											{/* Effective */}
-											<div className="text-center font-medium tabular-nums">
+											<div className="text-center font-semibold tabular-nums" dir="ltr">
 												{formatNumber(
 													item.effectiveQuantity,
 													1,
@@ -227,44 +241,48 @@ export function QuantitiesTable({
 	);
 }
 
+const SOURCE_BADGE_STYLES: Record<string, string> = {
+	auto_building: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
+	auto_linked: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
+	auto_derived: "bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300",
+	manual: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
+	estimated: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",
+};
+
 const SourceBadge = memo(function SourceBadge({ source }: { source: string }) {
 	const t = useTranslations("pricing.studies.finishing.dashboard");
 	const config: Record<
 		string,
-		{ labelKey: string; icon: React.ReactNode; variant: "secondary" | "outline" }
+		{ labelKey: string; icon: React.ReactNode }
 	> = {
 		auto_building: {
 			labelKey: "sourceAutoBuilding",
-			icon: <Link2 className="h-2.5 w-2.5" />,
-			variant: "secondary",
+			icon: <Link2 className="h-3 w-3" />,
 		},
 		auto_linked: {
 			labelKey: "sourceAutoLinked",
-			icon: <Link2 className="h-2.5 w-2.5" />,
-			variant: "secondary",
+			icon: <Link2 className="h-3 w-3" />,
 		},
 		auto_derived: {
 			labelKey: "sourceAutoDerived",
-			icon: <Sparkles className="h-2.5 w-2.5" />,
-			variant: "secondary",
+			icon: <Sparkles className="h-3 w-3" />,
 		},
 		manual: {
 			labelKey: "sourceManual",
-			icon: <Pencil className="h-2.5 w-2.5" />,
-			variant: "outline",
+			icon: <Pencil className="h-3 w-3" />,
 		},
 		estimated: {
 			labelKey: "sourceEstimated",
-			icon: <HelpCircle className="h-2.5 w-2.5" />,
-			variant: "outline",
+			icon: <HelpCircle className="h-3 w-3" />,
 		},
 	};
 	const c = config[source] ?? config.manual;
+	const colorClass = SOURCE_BADGE_STYLES[source] ?? SOURCE_BADGE_STYLES.manual;
 
 	return (
 		<Badge
-			variant={c.variant}
-			className="text-[10px] h-5 gap-0.5 px-1.5"
+			variant="secondary"
+			className={`text-xs h-6 gap-1 px-2 rounded-full border-0 font-medium ${colorClass}`}
 		>
 			{c.icon}
 			{t(c.labelKey as Parameters<typeof t>[0])}

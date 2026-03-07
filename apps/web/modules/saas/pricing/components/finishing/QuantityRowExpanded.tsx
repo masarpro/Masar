@@ -79,49 +79,49 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 	};
 
 	return (
-		<div className="border-t bg-muted/20">
+		<div className="border-t bg-muted/30 border-r-2 border-primary/30">
 			{/* Tabs */}
-			<div className="flex border-b">
+			<div className="flex border-b bg-muted/20">
 				<button
 					type="button"
-					className={`px-4 py-2 text-xs font-medium transition-colors ${
+					className={`px-4 py-2.5 text-sm font-medium transition-colors duration-200 ${
 						activeTab === "details"
-							? "border-b-2 border-primary text-primary"
-							: "text-muted-foreground hover:text-foreground"
+							? "border-b-2 border-primary text-primary bg-background/50"
+							: "text-muted-foreground hover:text-foreground hover:bg-muted/30"
 					}`}
 					onClick={() => setActiveTab("details")}
 				>
-					<Calculator className="inline h-3 w-3 me-1" />
+					<Calculator className="inline h-3.5 w-3.5 me-1.5" />
 					{t("calculationDetails")}
 				</button>
 				<button
 					type="button"
-					className={`px-4 py-2 text-xs font-medium transition-colors flex items-center gap-1 ${
+					className={`px-4 py-2.5 text-sm font-medium transition-colors duration-200 flex items-center gap-1.5 ${
 						activeTab === "specs"
-							? "border-b-2 border-primary text-primary"
-							: "text-muted-foreground hover:text-foreground"
+							? "border-b-2 border-primary text-primary bg-background/50"
+							: "text-muted-foreground hover:text-foreground hover:bg-muted/30"
 					}`}
 					onClick={() => setActiveTab("specs")}
 				>
-					<Settings className="inline h-3 w-3" />
+					<Settings className="inline h-3.5 w-3.5" />
 					{tSpecs("tab")}
 					{hasSpec && (
-						<CheckCircle2 className="h-3 w-3 text-green-500" />
+						<CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
 					)}
 				</button>
 			</div>
 
 			{/* Details tab */}
 			{activeTab === "details" && (
-				<div className="px-4 py-3 space-y-3 text-sm">
+				<div className="px-5 py-4 space-y-3 text-sm">
 					{/* Calculation breakdown */}
 					{item.calculationBreakdown && (
-						<div className="space-y-1.5">
-							<h4 className="font-medium flex items-center gap-1.5 text-xs text-muted-foreground">
+						<div className="space-y-2">
+							<h4 className="font-semibold flex items-center gap-1.5 text-xs text-muted-foreground uppercase tracking-wide">
 								<Calculator className="h-3.5 w-3.5" />
 								{t("calculationDetails")}
 							</h4>
-							<div className="rounded bg-card border p-3 text-xs font-mono whitespace-pre-wrap leading-relaxed">
+							<div className="rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-4 text-sm font-mono whitespace-pre-wrap leading-relaxed" dir="ltr">
 								{item.calculationBreakdown.formula}
 							</div>
 						</div>
@@ -129,16 +129,16 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 
 					{/* Source description */}
 					{item.sourceDescription && (
-						<div className="text-xs text-muted-foreground">
+						<div className="text-sm text-muted-foreground">
 							{t("source")}: {item.sourceDescription}
 						</div>
 					)}
 
 					{/* Links — depends on */}
 					{dependsOnItem && (
-						<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-							<ArrowUp className="h-3 w-3 text-blue-500" />
-							<Link2 className="h-3 w-3" />
+						<div className="flex items-center gap-2 text-sm text-muted-foreground rounded-lg bg-blue-50/50 dark:bg-blue-950/20 p-2.5">
+							<ArrowUp className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+							<Link2 className="h-3.5 w-3.5 shrink-0" />
 							<span>
 								{t("dependsOn")}: {dependsOnItem.name}
 								{dependsOnItem.floorName
@@ -150,9 +150,9 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 
 					{/* Links — feeds */}
 					{feedsItems.length > 0 && (
-						<div className="flex items-start gap-1.5 text-xs text-muted-foreground">
-							<ArrowDown className="h-3 w-3 text-green-500 mt-0.5 shrink-0" />
-							<Link2 className="h-3 w-3 mt-0.5 shrink-0" />
+						<div className="flex items-start gap-2 text-sm text-muted-foreground rounded-lg bg-emerald-50/50 dark:bg-emerald-950/20 p-2.5">
+							<ArrowDown className="h-3.5 w-3.5 text-emerald-500 mt-0.5 shrink-0" />
+							<Link2 className="h-3.5 w-3.5 mt-0.5 shrink-0" />
 							<span>
 								{t("feedsItems")}:{" "}
 								{feedsItems
@@ -170,8 +170,8 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 
 					{/* Stale warning */}
 					{item.isStale && item.derivedQuantity != null && (
-						<div className="flex items-center gap-2 rounded bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-2 text-xs">
-							<AlertTriangle className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+						<div className="flex items-center gap-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3 text-sm">
+							<AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
 							<span>
 								{t("staleWarning", {
 									manual: formatNumber(item.quantity, 1),
@@ -184,10 +184,10 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 							<Button
 								variant="ghost"
 								size="sm"
-								className="h-6 text-xs ms-auto"
+								className="h-7 text-xs ms-auto"
 								onClick={() => onResetToAuto(item.key)}
 							>
-								<RotateCcw className="h-3 w-3 me-1" />
+								<RotateCcw className="h-3.5 w-3.5 me-1" />
 								{t("resetToAuto")}
 							</Button>
 						</div>
@@ -199,13 +199,13 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 							<Button
 								variant="outline"
 								size="sm"
-								className="h-7 text-xs"
+								className="h-8 text-sm"
 								onClick={() => {
 									setManualValue(String(item.quantity));
 									setIsEditing(true);
 								}}
 							>
-								<Edit3 className="h-3 w-3 me-1" />
+								<Edit3 className="h-3.5 w-3.5 me-1.5" />
 								{t("manualEdit")}
 							</Button>
 						)}
@@ -215,10 +215,10 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 								<Button
 									variant="ghost"
 									size="sm"
-									className="h-7 text-xs"
+									className="h-8 text-sm"
 									onClick={() => onResetToAuto(item.key)}
 								>
-									<RotateCcw className="h-3 w-3 me-1" />
+									<RotateCcw className="h-3.5 w-3.5 me-1.5" />
 									{t("resetToAuto")}
 								</Button>
 							)}
@@ -231,7 +231,8 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 									onChange={(
 										e: React.ChangeEvent<HTMLInputElement>,
 									) => setManualValue(e.target.value)}
-									className="h-7 w-28 text-sm"
+									className="h-8 w-28 text-sm"
+									dir="ltr"
 									autoFocus
 									onKeyDown={(e: React.KeyboardEvent) => {
 										if (e.key === "Enter")
@@ -242,7 +243,7 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 								/>
 								<Button
 									size="sm"
-									className="h-7 text-xs"
+									className="h-8 text-sm"
 									onClick={handleSaveManual}
 								>
 									{t("save")}
@@ -250,7 +251,7 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 								<Button
 									variant="ghost"
 									size="sm"
-									className="h-7 text-xs"
+									className="h-8 text-sm"
 									onClick={() => setIsEditing(false)}
 								>
 									{t("cancel")}
@@ -261,7 +262,7 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 						{/* Data source badge */}
 						<Badge
 							variant="secondary"
-							className="ms-auto text-[10px] h-5"
+							className="ms-auto text-xs h-6 px-2 rounded-full"
 						>
 							{t(SOURCE_LABEL_KEYS[item.dataSource] ?? "sourceManual" as Parameters<typeof t>[0])}
 						</Badge>
@@ -283,26 +284,26 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 							onCancel={() => setIsEditingSpec(false)}
 						/>
 					) : hasSpec ? (
-						<div className="px-4 py-3 space-y-2">
+						<div className="px-5 py-4 space-y-2">
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-2">
-									<CheckCircle2 className="h-4 w-4 text-green-500" />
-									<span className="text-xs font-medium">
+									<CheckCircle2 className="h-4 w-4 text-emerald-500" />
+									<span className="text-sm font-medium">
 										{existingSpec.specTypeLabel}
 									</span>
 								</div>
 								<Button
 									variant="outline"
 									size="sm"
-									className="h-7 text-xs"
+									className="h-8 text-sm"
 									onClick={() => setIsEditingSpec(true)}
 								>
-									<Settings className="h-3 w-3 me-1" />
+									<Settings className="h-3.5 w-3.5 me-1.5" />
 									{tSpecs("edit")}
 								</Button>
 							</div>
 							{existingSpec.subItems.length > 0 && (
-								<div className="text-xs text-muted-foreground">
+								<div className="text-sm text-muted-foreground">
 									{tSpecs("materialsCount", {
 										count: existingSpec.subItems.length,
 									})}
@@ -310,17 +311,17 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 							)}
 						</div>
 					) : (
-						<div className="px-4 py-4 text-center space-y-2">
-							<p className="text-xs text-muted-foreground">
+						<div className="px-5 py-6 text-center space-y-3">
+							<p className="text-sm text-muted-foreground">
 								{tSpecs("noSpecYet")}
 							</p>
 							<Button
 								variant="outline"
 								size="sm"
-								className="h-7 text-xs"
+								className="h-8 text-sm"
 								onClick={() => setIsEditingSpec(true)}
 							>
-								<Settings className="h-3 w-3 me-1" />
+								<Settings className="h-3.5 w-3.5 me-1.5" />
 								{tSpecs("setSpec")}
 							</Button>
 						</div>

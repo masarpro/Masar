@@ -23,7 +23,7 @@ export function KnowledgeNotification({
 	const t = useTranslations("pricing.studies.finishing.knowledge");
 
 	return (
-		<Card className="border-primary/30 bg-primary/5 p-4 space-y-3 animate-in slide-in-from-top-2 fade-in duration-300">
+		<Card className="border-primary/30 bg-primary/5 rounded-xl p-5 space-y-3 animate-in slide-in-from-top-2 fade-in duration-300">
 			{/* Header */}
 			<div className="flex items-start justify-between gap-2">
 				<div className="flex items-center gap-2 text-sm font-semibold">
@@ -33,10 +33,10 @@ export function KnowledgeNotification({
 				<Button
 					variant="ghost"
 					size="icon"
-					className="h-6 w-6 shrink-0"
+					className="h-7 w-7 shrink-0"
 					onClick={onDismiss}
 				>
-					<X className="h-3.5 w-3.5" />
+					<X className="h-4 w-4" />
 				</Button>
 			</div>
 
@@ -47,7 +47,7 @@ export function KnowledgeNotification({
 
 			{/* Items list */}
 			{derivedItems.length > 0 && (
-				<ul className="space-y-1 text-sm">
+				<ul className="space-y-1.5 text-sm">
 					{derivedItems.slice(0, 6).map((item) => (
 						<li
 							key={item.categoryKey}
@@ -57,14 +57,14 @@ export function KnowledgeNotification({
 							<span>
 								{getItemLabel(item.categoryKey, item.floorName)}
 							</span>
-							<span className="font-medium text-foreground ms-auto tabular-nums">
+							<span className="font-semibold text-foreground ms-auto tabular-nums" dir="ltr">
 								{formatNumber(item.quantity, 1)}{" "}
 								{getUnitLabel(item.unit)}
 							</span>
 						</li>
 					))}
 					{derivedItems.length > 6 && (
-						<li className="text-xs text-muted-foreground">
+						<li className="text-sm text-muted-foreground">
 							{t("andMore", {
 								count: derivedItems.length - 6,
 							})}
@@ -75,14 +75,14 @@ export function KnowledgeNotification({
 
 			{/* Actions */}
 			<div className="flex items-center gap-2 pt-1">
-				<Button size="sm" className="text-xs" onClick={onAccept}>
-					<Sparkles className="h-3 w-3 me-1" />
+				<Button size="sm" className="text-sm h-8 rounded-lg" onClick={onAccept}>
+					<Sparkles className="h-3.5 w-3.5 me-1.5" />
 					{t("accept")}
 				</Button>
 				<Button
 					variant="ghost"
 					size="sm"
-					className="text-xs text-muted-foreground"
+					className="text-sm text-muted-foreground"
 					onClick={onDismiss}
 				>
 					{t("dismiss")}

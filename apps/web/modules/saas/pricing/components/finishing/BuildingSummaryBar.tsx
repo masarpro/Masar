@@ -21,12 +21,12 @@ export const BuildingSummaryBar = memo(function BuildingSummaryBar({
 
 	if (!config || !config.floors?.length) {
 		return (
-			<div className="rounded-lg border border-dashed bg-muted/30 p-3 flex items-center justify-between">
+			<div className="rounded-xl border border-dashed bg-muted/30 p-4 flex items-center justify-between">
 				<span className="text-sm text-muted-foreground">
 					{t("noConfig")}
 				</span>
 				<Button variant="outline" size="sm" onClick={onEditConfig}>
-					<Settings className="h-3.5 w-3.5 me-1" />
+					<Settings className="h-3.5 w-3.5 me-1.5" />
 					{t("setupBuilding")}
 				</Button>
 			</div>
@@ -58,39 +58,46 @@ export const BuildingSummaryBar = memo(function BuildingSummaryBar({
 			: 0;
 
 	return (
-		<div className="rounded-lg border bg-card p-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+		<div className="rounded-xl border bg-card shadow-sm p-4 flex flex-wrap items-center gap-x-6 gap-y-3">
 			<Stat
-				icon={<Building2 className="h-3.5 w-3.5" />}
+				icon={<Building2 className="h-4 w-4" />}
 				label={t("buildingArea")}
 				value={`${formatNumber(totalArea, 0)} م²`}
 			/>
+			<div className="w-px h-8 bg-border hidden sm:block" />
 			<Stat
-				icon={<Layers className="h-3.5 w-3.5" />}
+				icon={<Layers className="h-4 w-4" />}
 				label={t("floors")}
 				value={`${habitableFloors.length}${hasRoof ? " + سطح" : ""}`}
 			/>
 			{bathroomCount > 0 && (
-				<Stat
-					icon={<Bath className="h-3.5 w-3.5" />}
-					label={t("bathrooms")}
-					value={`${bathroomCount}`}
-				/>
+				<>
+					<div className="w-px h-8 bg-border hidden sm:block" />
+					<Stat
+						icon={<Bath className="h-4 w-4" />}
+						label={t("bathrooms")}
+						value={`${bathroomCount}`}
+					/>
+				</>
 			)}
 			{courtyardArea > 0 && (
-				<Stat
-					icon={<Trees className="h-3.5 w-3.5" />}
-					label={t("courtyard")}
-					value={`${formatNumber(courtyardArea, 0)} م²`}
-				/>
+				<>
+					<div className="w-px h-8 bg-border hidden sm:block" />
+					<Stat
+						icon={<Trees className="h-4 w-4" />}
+						label={t("courtyard")}
+						value={`${formatNumber(courtyardArea, 0)} م²`}
+					/>
+				</>
 			)}
 			<div className="ms-auto">
 				<Button
 					variant="ghost"
 					size="sm"
 					onClick={onEditConfig}
-					className="text-xs"
+					className="text-sm"
 				>
-					<Settings className="h-3 w-3 me-1" />
+					<Settings className="h-3.5 w-3.5 me-1.5" />
 					{t("editSettings")}
 				</Button>
 			</div>
@@ -108,10 +115,10 @@ function Stat({
 	value: string;
 }) {
 	return (
-		<div className="flex items-center gap-1.5">
+		<div className="flex items-center gap-2">
 			<span className="text-muted-foreground">{icon}</span>
-			<span className="text-muted-foreground">{label}:</span>
-			<span className="font-semibold">{value}</span>
+			<span className="text-sm text-muted-foreground">{label}:</span>
+			<span className="text-lg font-bold tabular-nums" dir="ltr">{value}</span>
 		</div>
 	);
 }

@@ -179,11 +179,11 @@ export function BuildingStructureStep({
 				<Label className="text-sm font-medium">{t("floors")}</Label>
 
 				{config.floors.length > 0 && (
-					<div className="space-y-2">
+					<div className="space-y-2.5">
 						{config.floors.map((floor, index) => (
 							<div
 								key={floor.id}
-								className="flex flex-wrap items-center gap-2 rounded-lg border bg-card p-2.5"
+								className="flex flex-wrap items-center gap-2.5 rounded-lg border bg-card p-3 hover:shadow-sm transition-shadow duration-200"
 							>
 								<span className="w-6 text-center text-xs text-muted-foreground font-medium">
 									{index + 1}
@@ -307,16 +307,16 @@ export function BuildingStructureStep({
 				)}
 
 				{/* Add floor buttons */}
-				<div className="flex flex-wrap gap-1.5">
+				<div className="flex flex-wrap gap-2">
 					{FLOOR_TYPES.map((type) => (
 						<Button
 							key={type}
 							variant="outline"
 							size="sm"
-							className="text-xs"
+							className="text-sm rounded-lg"
 							onClick={() => addFloor(type)}
 						>
-							<Plus className="h-3 w-3 me-1" />
+							<Plus className="h-3.5 w-3.5 me-1.5" />
 							{t(`floorTypes.${type}`)}
 						</Button>
 					))}
@@ -325,29 +325,29 @@ export function BuildingStructureStep({
 
 			{/* Summary */}
 			{config.floors.length > 0 && (
-				<div className="rounded-lg bg-muted/50 border p-4">
+				<div className="rounded-xl bg-muted/40 border p-5">
 					<div className="grid grid-cols-3 gap-4 text-center">
 						<div>
-							<div className="text-xs text-muted-foreground">
+							<div className="text-sm text-muted-foreground">
 								{tw("totalBuildingArea")}
 							</div>
-							<div className="text-lg font-bold mt-1">
+							<div className="text-xl font-bold mt-1 tabular-nums" dir="ltr">
 								{formatNumber(totalBuildingArea, 0)} م²
 							</div>
 						</div>
-						<div>
-							<div className="text-xs text-muted-foreground">
+						<div className="border-x border-border">
+							<div className="text-sm text-muted-foreground">
 								{tw("floorCount")}
 							</div>
-							<div className="text-lg font-bold mt-1">
+							<div className="text-xl font-bold mt-1 tabular-nums">
 								{floorCount}
 							</div>
 						</div>
 						<div>
-							<div className="text-xs text-muted-foreground">
+							<div className="text-sm text-muted-foreground">
 								{tw("totalHeight")}
 							</div>
-							<div className="text-lg font-bold mt-1">
+							<div className="text-xl font-bold mt-1 tabular-nums" dir="ltr">
 								{formatNumber(totalHeight, 1)} م
 							</div>
 						</div>

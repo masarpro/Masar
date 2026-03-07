@@ -81,13 +81,13 @@ export function ManualItemAdder({ floors, onAdd }: ManualItemAdderProps) {
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				<Button variant="outline" size="sm" className="text-xs">
-					<Plus className="h-3.5 w-3.5 me-1" />
+				<Button variant="outline" size="sm" className="h-9 text-sm rounded-lg">
+					<Plus className="h-4 w-4 me-1.5" />
 					{t("addManualItem")}
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent
-				className="w-80 space-y-3"
+				className="w-80 space-y-3 p-4"
 				align="end"
 			>
 				<h4 className="text-sm font-semibold">{t("addManualItem")}</h4>
@@ -102,7 +102,7 @@ export function ManualItemAdder({ floors, onAdd }: ManualItemAdderProps) {
 						setSelectedCategory(cat ?? null);
 					}}
 				>
-					<SelectTrigger className="text-xs">
+					<SelectTrigger className="text-sm h-9 rounded-lg">
 						<SelectValue placeholder={t("selectCategory")} />
 					</SelectTrigger>
 					<SelectContent>
@@ -110,7 +110,6 @@ export function ManualItemAdder({ floors, onAdd }: ManualItemAdderProps) {
 							<SelectItem
 								key={cat.id}
 								value={cat.id}
-								className="text-xs"
 							>
 								{cat.nameAr}
 							</SelectItem>
@@ -124,7 +123,7 @@ export function ManualItemAdder({ floors, onAdd }: ManualItemAdderProps) {
 						value={selectedFloorId}
 						onValueChange={setSelectedFloorId}
 					>
-						<SelectTrigger className="text-xs">
+						<SelectTrigger className="text-sm h-9 rounded-lg">
 							<SelectValue placeholder={t("selectFloor")} />
 						</SelectTrigger>
 						<SelectContent>
@@ -132,7 +131,6 @@ export function ManualItemAdder({ floors, onAdd }: ManualItemAdderProps) {
 								<SelectItem
 									key={f.id}
 									value={f.id}
-									className="text-xs"
 								>
 									{f.name}
 								</SelectItem>
@@ -149,12 +147,13 @@ export function ManualItemAdder({ floors, onAdd }: ManualItemAdderProps) {
 							value={quantity}
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuantity(e.target.value)}
 							placeholder={t("quantity")}
-							className="text-sm flex-1"
+							className="text-sm flex-1 h-9 rounded-lg"
+							dir="ltr"
 							onKeyDown={(e: React.KeyboardEvent) => {
 								if (e.key === "Enter") handleAdd();
 							}}
 						/>
-						<span className="text-xs text-muted-foreground whitespace-nowrap">
+						<span className="text-sm text-muted-foreground whitespace-nowrap">
 							{getUnitLabel(selectedCategory.unit)}
 						</span>
 					</div>
@@ -162,7 +161,7 @@ export function ManualItemAdder({ floors, onAdd }: ManualItemAdderProps) {
 
 				<Button
 					size="sm"
-					className="w-full text-xs"
+					className="w-full text-sm h-9 rounded-lg"
 					onClick={handleAdd}
 					disabled={
 						!selectedCategory ||

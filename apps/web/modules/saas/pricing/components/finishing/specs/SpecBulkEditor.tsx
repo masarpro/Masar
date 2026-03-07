@@ -18,7 +18,6 @@ import {
 import {
 	CheckCircle2,
 	ChevronDown,
-	ChevronLeft,
 	Circle,
 	Save,
 	Settings,
@@ -287,16 +286,16 @@ export function SpecBulkEditor({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-w-4xl max-h-[85vh] flex flex-col p-0">
+			<DialogContent className="max-w-5xl max-h-[85vh] flex flex-col p-0">
 				<DialogHeader className="px-6 pt-6 pb-0">
-					<DialogTitle className="flex items-center gap-2">
+					<DialogTitle className="flex items-center gap-2 text-lg">
 						<Settings className="h-5 w-5" />
 						{tBulk("title")}
 					</DialogTitle>
 				</DialogHeader>
 
 				{/* Template selector */}
-				<div className="px-6 py-3 border-b flex flex-wrap items-center gap-2">
+				<div className="px-6 py-3 border-b bg-muted/10 flex flex-wrap items-center gap-2.5">
 					<span className="text-sm text-muted-foreground">
 						{tBulk("applyTemplate")}:
 					</span>
@@ -304,7 +303,7 @@ export function SpecBulkEditor({
 						value={selectedTemplate}
 						onValueChange={setSelectedTemplate}
 					>
-						<SelectTrigger className="h-8 w-48 text-sm">
+						<SelectTrigger className="h-9 w-52 text-sm rounded-lg">
 							<SelectValue
 								placeholder={tBulk("selectTemplate")}
 							/>
@@ -321,7 +320,7 @@ export function SpecBulkEditor({
 					<Button
 						variant="outline"
 						size="sm"
-						className="h-8 text-xs"
+						className="h-9 text-sm rounded-lg"
 						onClick={handleApplyTemplate}
 						disabled={!selectedTemplate}
 					>
@@ -330,7 +329,7 @@ export function SpecBulkEditor({
 					<Button
 						variant="ghost"
 						size="sm"
-						className="h-8 text-xs"
+						className="h-9 text-sm"
 						onClick={() => setShowSaveTemplate(true)}
 					>
 						{tBulk("saveAsTemplate")}
@@ -345,31 +344,31 @@ export function SpecBulkEditor({
 									setTemplateName(e.target.value)
 								}
 								placeholder={tBulk("templateNamePlaceholder")}
-								className="flex-1 h-8 text-sm rounded-md border px-3 bg-background"
+								className="flex-1 h-9 text-sm rounded-lg border px-3 bg-background"
 							/>
 							<Button
 								size="sm"
-								className="h-8 text-xs"
+								className="h-9 text-sm rounded-lg"
 								onClick={handleSaveAsTemplate}
 								disabled={!templateName.trim()}
 							>
-								<Save className="h-3 w-3 me-1" />
+								<Save className="h-3.5 w-3.5 me-1.5" />
 								{t("save")}
 							</Button>
 							<Button
 								variant="ghost"
 								size="sm"
-								className="h-8 text-xs"
+								className="h-9 text-sm"
 								onClick={() => setShowSaveTemplate(false)}
 							>
-								<X className="h-3 w-3" />
+								<X className="h-4 w-4" />
 							</Button>
 						</div>
 					)}
 				</div>
 
 				{/* Items list */}
-				<div className="flex-1 overflow-y-auto px-6 py-3 space-y-2">
+				<div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
 					{grouped.map((group) => {
 						const isCollapsed = collapsedGroups.has(
 							group.groupKey,
@@ -387,27 +386,25 @@ export function SpecBulkEditor({
 								{/* Group header */}
 								<button
 									type="button"
-									className="w-full flex items-center gap-2 px-3 py-2 bg-muted/30 text-sm font-semibold hover:bg-muted/50 transition-colors"
+									className="w-full flex items-center gap-2.5 px-4 py-2.5 bg-muted/40 text-base font-semibold hover:bg-muted/60 transition-colors duration-200"
 									onClick={() =>
 										toggleGroup(group.groupKey)
 									}
 								>
-									{isCollapsed ? (
-										<ChevronLeft className="h-4 w-4 text-muted-foreground" />
-									) : (
-										<ChevronDown className="h-4 w-4 text-muted-foreground" />
-									)}
+									<ChevronDown
+										className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isCollapsed ? "-rotate-90" : ""}`}
+									/>
 									<span>{group.groupName}</span>
 									<Badge
 										variant="secondary"
-										className="text-[10px] h-4 px-1.5"
+										className="text-xs h-5 px-2 rounded-full"
 									>
 										{specifiedCount}/{group.items.length}
 									</Badge>
 									<Button
 										variant="ghost"
 										size="sm"
-										className="h-6 text-[10px] ms-auto"
+										className="h-7 text-xs ms-auto"
 										onClick={(e) => {
 											e.stopPropagation();
 											handleSetAllInGroup(
@@ -423,7 +420,7 @@ export function SpecBulkEditor({
 								{!isCollapsed && (
 									<div>
 										{/* Header row */}
-										<div className="hidden sm:grid grid-cols-[1fr_160px_120px_50px] gap-2 px-3 py-1.5 bg-muted/20 text-[10px] font-medium text-muted-foreground border-b">
+										<div className="hidden sm:grid grid-cols-[1fr_180px_130px_50px] gap-2 px-4 py-2 bg-muted/20 text-xs font-semibold text-muted-foreground border-b uppercase tracking-wide">
 											<div>
 												{t("colMaterial")}
 											</div>
@@ -497,9 +494,9 @@ export function SpecBulkEditor({
 					})}
 				</div>
 
-				{/* Footer */}
-				<div className="px-6 py-3 border-t flex items-center justify-between bg-muted/20">
-					<span className="text-xs text-muted-foreground">
+				{/* Footer - sticky save */}
+				<div className="sticky bottom-0 px-6 py-4 border-t flex items-center justify-between bg-background/95 backdrop-blur-sm">
+					<span className="text-sm text-muted-foreground">
 						{tBulk("specifiedCount", {
 							count: specCount,
 							total: enabledItems.length,
@@ -509,12 +506,13 @@ export function SpecBulkEditor({
 						<Button
 							variant="ghost"
 							size="sm"
+							className="h-9 text-sm"
 							onClick={() => onOpenChange(false)}
 						>
 							{t("cancel")}
 						</Button>
-						<Button size="sm" onClick={handleSaveAll}>
-							<Save className="h-4 w-4 me-1" />
+						<Button size="sm" className="h-9 text-sm" onClick={handleSaveAll}>
+							<Save className="h-4 w-4 me-1.5" />
 							{tBulk("saveAll")}
 						</Button>
 					</div>
@@ -551,9 +549,9 @@ function BulkRow({
 
 	if (!config) {
 		return (
-			<div className="grid grid-cols-[1fr_160px_120px_50px] gap-2 px-3 py-2 border-b items-center text-sm opacity-50">
+			<div className="grid grid-cols-[1fr_180px_130px_50px] gap-2 px-4 py-2.5 border-b items-center text-sm opacity-50">
 				<span className="truncate">{item.name}</span>
-				<span className="text-center text-xs text-muted-foreground">
+				<span className="text-center text-sm text-muted-foreground">
 					{t("noSpecConfig")}
 				</span>
 				<span />
@@ -575,14 +573,14 @@ function BulkRow({
 	return (
 		<div className="border-b last:border-b-0">
 			<div
-				className="grid grid-cols-[1fr_160px_120px_50px] gap-2 px-3 py-2 items-center text-sm cursor-pointer hover:bg-muted/10 transition-colors"
+				className="grid grid-cols-[1fr_180px_130px_50px] gap-2 px-4 py-2.5 items-center text-sm cursor-pointer hover:bg-muted/20 transition-colors duration-200"
 				onClick={onToggleExpand}
 			>
 				{/* Name */}
-				<div className="flex items-center gap-1.5 min-w-0">
-					<span className="truncate">{item.name}</span>
+				<div className="flex items-center gap-2 min-w-0">
+					<span className="truncate font-medium">{item.name}</span>
 					{item.floorName && (
-						<span className="text-[10px] text-muted-foreground shrink-0">
+						<span className="text-xs text-muted-foreground shrink-0">
 							({item.floorName})
 						</span>
 					)}
@@ -596,7 +594,7 @@ function BulkRow({
 						value={entry?.specTypeKey ?? ""}
 						onValueChange={onTypeChange}
 					>
-						<SelectTrigger className="h-7 text-xs">
+						<SelectTrigger className="h-8 text-sm rounded-lg">
 							<SelectValue
 								placeholder={t("specType")}
 							/>
@@ -615,14 +613,14 @@ function BulkRow({
 				</div>
 
 				{/* Brand */}
-				<div className="text-center text-xs text-muted-foreground truncate">
+				<div className="text-center text-sm text-muted-foreground truncate">
 					{entry?.brand ?? "-"}
 				</div>
 
 				{/* Status */}
 				<div className="flex justify-center">
 					{hasSpec ? (
-						<CheckCircle2 className="h-4 w-4 text-green-500" />
+						<CheckCircle2 className="h-4 w-4 text-emerald-500" />
 					) : (
 						<Circle className="h-4 w-4 text-muted-foreground/30" />
 					)}
@@ -631,11 +629,11 @@ function BulkRow({
 
 			{/* Expanded options */}
 			{isExpanded && entry?.specTypeKey && allOptions.length > 0 && (
-				<div className="px-4 py-3 bg-muted/10 border-t space-y-2">
-					<div className="text-xs font-medium text-muted-foreground">
+				<div className="px-5 py-3.5 bg-muted/15 border-t space-y-2.5">
+					<div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
 						{t("options")}
 					</div>
-					<div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+					<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 						{allOptions.map((opt) => (
 							<InlineOption
 								key={opt.key}
@@ -669,7 +667,7 @@ function InlineOption({
 }) {
 	if (option.type === "boolean") {
 		return (
-			<label className="flex items-center gap-1.5 text-xs cursor-pointer">
+			<label className="flex items-center gap-2 text-sm cursor-pointer">
 				<input
 					type="checkbox"
 					checked={value === true}
@@ -683,15 +681,15 @@ function InlineOption({
 
 	if (option.type === "select" && option.options) {
 		return (
-			<div className="space-y-0.5">
-				<span className="text-[10px] text-muted-foreground">
+			<div className="space-y-1">
+				<span className="text-xs text-muted-foreground">
 					{option.label}
 				</span>
 				<Select
 					value={String(value ?? "")}
 					onValueChange={onChange}
 				>
-					<SelectTrigger className="h-6 text-[10px]">
+					<SelectTrigger className="h-8 text-sm rounded-lg">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>

@@ -69,7 +69,7 @@ export function ReviewStep({ config }: ReviewStepProps) {
 		<div className="space-y-4">
 			<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 				{/* Areas */}
-				<div className="rounded-lg border bg-card p-4 space-y-3">
+				<div className="rounded-xl border bg-card p-5 space-y-3">
 					<h3 className="text-sm font-semibold flex items-center gap-2">
 						<Ruler className="h-4 w-4 text-muted-foreground" />
 						المساحات
@@ -105,7 +105,7 @@ export function ReviewStep({ config }: ReviewStepProps) {
 				</div>
 
 				{/* Details */}
-				<div className="rounded-lg border bg-card p-4 space-y-3">
+				<div className="rounded-xl border bg-card p-5 space-y-3">
 					<h3 className="text-sm font-semibold flex items-center gap-2">
 						<Building2 className="h-4 w-4 text-muted-foreground" />
 						التفاصيل
@@ -152,8 +152,8 @@ export function ReviewStep({ config }: ReviewStepProps) {
 			</div>
 
 			{/* Generation preview */}
-			<div className="rounded-lg bg-primary/5 border border-primary/20 p-4 text-center">
-				<Badge variant="secondary" className="text-sm px-3 py-1">
+			<div className="rounded-xl bg-primary/5 border border-primary/20 p-5 text-center">
+				<Badge variant="secondary" className="text-sm px-4 py-1.5 rounded-full">
 					{tw("willGenerate", { count: enabledCount })}
 				</Badge>
 			</div>
