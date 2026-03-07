@@ -115,7 +115,10 @@
       "Bash(npx next:*)",
       "Bash(npx vercel:*)",
       "Bash(do:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(npx tsx:*)",
+      "Bash(mv:*)",
+      "Bash(mv calculators:*)"
     ]
   }
 }

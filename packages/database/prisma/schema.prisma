@@ -1255,6 +1255,14 @@ model FinishingItem {
   calculationMethod String? @map("calculation_method")
   calculationData   Json?   @db.JsonB @map("calculation_data")
 
+  // الربط الذكي
+  dataSource      String?   @map("data_source")
+  sourceItemId    String?   @map("source_item_id")
+  sourceFormula   String?   @map("source_formula")
+  isEnabled       Boolean   @default(true) @map("is_enabled")
+  groupKey        String?   @map("group_key")
+  scope           String?
+
   // الجودة والمواصفات
   qualityLevel   String?  @map("quality_level")
   brand          String?

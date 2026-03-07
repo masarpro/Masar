@@ -121,7 +121,7 @@ export type StructuralItemScalarFieldEnum = z.infer<typeof StructuralItemScalarF
 
 // File: FinishingItemScalarFieldEnum.schema.ts
 
-export const FinishingItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'category', 'subCategory', 'name', 'description', 'floorId', 'floorName', 'area', 'length', 'height', 'width', 'perimeter', 'quantity', 'unit', 'calculationMethod', 'calculationData', 'qualityLevel', 'brand', 'specifications', 'wastagePercent', 'materialPrice', 'laborPrice', 'materialCost', 'laborCost', 'totalCost', 'sortOrder', 'createdAt', 'updatedAt'])
+export const FinishingItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'category', 'subCategory', 'name', 'description', 'floorId', 'floorName', 'area', 'length', 'height', 'width', 'perimeter', 'quantity', 'unit', 'calculationMethod', 'calculationData', 'dataSource', 'sourceItemId', 'sourceFormula', 'isEnabled', 'groupKey', 'scope', 'qualityLevel', 'brand', 'specifications', 'wastagePercent', 'materialPrice', 'laborPrice', 'materialCost', 'laborCost', 'totalCost', 'sortOrder', 'createdAt', 'updatedAt'])
 
 export type FinishingItemScalarFieldEnum = z.infer<typeof FinishingItemScalarFieldEnumSchema>;
 
@@ -1511,6 +1511,12 @@ export const FinishingItemSchema = z.object({
   unit: z.string().default("m2"),
   calculationMethod: z.string().nullish(),
   calculationData: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  dataSource: z.string().nullish(),
+  sourceItemId: z.string().nullish(),
+  sourceFormula: z.string().nullish(),
+  isEnabled: z.boolean().default(true),
+  groupKey: z.string().nullish(),
+  scope: z.string().nullish(),
   qualityLevel: z.string().nullish(),
   brand: z.string().nullish(),
   specifications: z.string().nullish(),

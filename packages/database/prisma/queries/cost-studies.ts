@@ -491,6 +491,13 @@ export async function createFinishingItem(data: {
 	materialCost?: number;
 	laborCost?: number;
 	totalCost?: number;
+	dataSource?: string;
+	sourceItemId?: string;
+	sourceFormula?: string;
+	isEnabled?: boolean;
+	sortOrder?: number;
+	groupKey?: string;
+	scope?: string;
 }) {
 	const item = await db.finishingItem.create({
 		data: {
@@ -519,6 +526,13 @@ export async function createFinishingItem(data: {
 			materialCost: data.materialCost ?? 0,
 			laborCost: data.laborCost ?? 0,
 			totalCost: data.totalCost ?? 0,
+			dataSource: data.dataSource,
+			sourceItemId: data.sourceItemId,
+			sourceFormula: data.sourceFormula,
+			isEnabled: data.isEnabled ?? true,
+			sortOrder: data.sortOrder ?? 0,
+			groupKey: data.groupKey,
+			scope: data.scope,
 		},
 	});
 
@@ -554,6 +568,13 @@ export async function createFinishingItemsBatch(
 		materialCost?: number;
 		laborCost?: number;
 		totalCost?: number;
+		dataSource?: string;
+		sourceItemId?: string;
+		sourceFormula?: string;
+		isEnabled?: boolean;
+		sortOrder?: number;
+		groupKey?: string;
+		scope?: string;
 	}>,
 ) {
 	await db.finishingItem.createMany({
@@ -583,6 +604,13 @@ export async function createFinishingItemsBatch(
 			materialCost: item.materialCost ?? 0,
 			laborCost: item.laborCost ?? 0,
 			totalCost: item.totalCost ?? 0,
+			dataSource: item.dataSource,
+			sourceItemId: item.sourceItemId,
+			sourceFormula: item.sourceFormula,
+			isEnabled: item.isEnabled ?? true,
+			sortOrder: item.sortOrder ?? 0,
+			groupKey: item.groupKey,
+			scope: item.scope,
 		})),
 	});
 
@@ -618,6 +646,12 @@ export async function updateFinishingItem(
 		laborCost: number;
 		totalCost: number;
 		sortOrder: number;
+		dataSource: string;
+		sourceItemId: string;
+		sourceFormula: string;
+		isEnabled: boolean;
+		groupKey: string;
+		scope: string;
 	}>,
 ) {
 	const item = await db.finishingItem.update({

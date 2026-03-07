@@ -595,9 +595,18 @@
 		"title": "Three steps to get started",
 		"label": "How it Works",
 		"steps": {
-			"1": { "title": "Sign up & create your company", "description": "Free account in one minute." },
-			"2": { "title": "Add your projects", "description": "Create projects and assign your team." },
-			"3": { "title": "Start managing", "description": "Track everything from one place." }
+			"1": {
+				"title": "Sign up & create your company",
+				"description": "Free account in one minute."
+			},
+			"2": {
+				"title": "Add your projects",
+				"description": "Create projects and assign your team."
+			},
+			"3": {
+				"title": "Start managing",
+				"description": "Track everything from one place."
+			}
 		}
 	},
 	"landingPricing": {
@@ -634,12 +643,30 @@
 		"title": "Real challenges holding back construction companies",
 		"label": "The Problem",
 		"items": {
-			"1": { "title": "Scattered Tools", "description": "Managing projects via WhatsApp and scattered spreadsheets causes information loss and delayed decisions." },
-			"2": { "title": "No Financial Visibility", "description": "No clear view of project status: ahead or behind? Profitable or losing?" },
-			"3": { "title": "Weak Field Tracking", "description": "Site reports, photos, and notes are not accurately linked to actual project progress." },
-			"4": { "title": "Multiple Disconnected Systems", "description": "Separate software for invoicing, accounting, and projects with no real integration." },
-			"5": { "title": "Hard to Track Performance", "description": "Monitoring actual vs. planned progress relies on inaccurate manual methods." },
-			"6": { "title": "Systems Not Built for the Local Market", "description": "Foreign systems that don't reflect the way business works in the Saudi market." }
+			"1": {
+				"title": "Scattered Tools",
+				"description": "Managing projects via WhatsApp and scattered spreadsheets causes information loss and delayed decisions."
+			},
+			"2": {
+				"title": "No Financial Visibility",
+				"description": "No clear view of project status: ahead or behind? Profitable or losing?"
+			},
+			"3": {
+				"title": "Weak Field Tracking",
+				"description": "Site reports, photos, and notes are not accurately linked to actual project progress."
+			},
+			"4": {
+				"title": "Multiple Disconnected Systems",
+				"description": "Separate software for invoicing, accounting, and projects with no real integration."
+			},
+			"5": {
+				"title": "Hard to Track Performance",
+				"description": "Monitoring actual vs. planned progress relies on inaccurate manual methods."
+			},
+			"6": {
+				"title": "Systems Not Built for the Local Market",
+				"description": "Foreign systems that don't reflect the way business works in the Saudi market."
+			}
 		},
 		"solution": "Masar unifies financial management, execution, and site operations in one integrated platform."
 	},
@@ -648,25 +675,40 @@
 		"title": "Built for Construction from the Ground Up",
 		"subtitle": "Masar is not an accounting system with a construction add-on — it was designed from day one around the Saudi contractor's 5-stage business cycle.",
 		"stages": {
-			"1": { "name": "Estimation", "description": "Quantity takeoff, cost analysis, and preparing technical & financial proposals." },
-			"2": { "name": "Contracting", "description": "Signing the contract, setting payment terms, line items, and schedule." },
-			"3": { "name": "Execution", "description": "Field reports, progress tracking, and subcontractor management." },
-			"4": { "name": "Finance", "description": "Progress claims, invoices, payments, and cash-flow tracking." },
-			"5": { "name": "Handover", "description": "Owner portal, final documentation, and completion certificates." }
+			"1": {
+				"name": "Estimation",
+				"description": "Quantity takeoff, cost analysis, and preparing technical & financial proposals."
+			},
+			"2": {
+				"name": "Contracting",
+				"description": "Signing the contract, setting payment terms, line items, and schedule."
+			},
+			"3": {
+				"name": "Execution",
+				"description": "Field reports, progress tracking, and subcontractor management."
+			},
+			"4": {
+				"name": "Finance",
+				"description": "Progress claims, invoices, payments, and cash-flow tracking."
+			},
+			"5": {
+				"name": "Handover",
+				"description": "Owner portal, final documentation, and completion certificates."
+			}
 		},
 		"flowText": "Every stage is connected — data flows automatically from estimation to handover with no double entry.",
 		"comparison": {
 			"generic": {
-				"title": "Generic Systems",
 				"1": "Designed for general accounting with a project module bolted on later.",
 				"2": "Don't support the full contracting cycle from estimation to handover.",
-				"3": "Require expensive customization to fit a contractor's workflow."
+				"3": "Require expensive customization to fit a contractor's workflow.",
+				"title": "Generic Systems"
 			},
 			"masar": {
-				"title": "Masar",
 				"1": "Built from the ground up around the contractor's 5-stage business cycle.",
 				"2": "Data flows automatically between estimation, contracting, execution, and finance.",
-				"3": "Ready to use out of the box — no customization or extra development needed."
+				"3": "Ready to use out of the box — no customization or extra development needed.",
+				"title": "Masar"
 			}
 		}
 	},
@@ -1160,14 +1202,7 @@
 			"convertedToInvoice": "Converted to Invoice",
 			"invoiceNumber": "Invoice Number",
 			"saveAsDraft": "Save as Draft",
-			"detailsMetadata": "Document Details",
-			"documentSettings": "Document Settings",
-			"quotationDate": "Quotation Date",
-			"salesRep": "Sales Representative",
-			"validUntil": "Valid Until",
-			"create": "Create Quotation",
-			"project": "Project",
-			"date": "Date"
+			"detailsMetadata": "Document Details"
 		},
 		"studies": {
 			"title": "Quantities",
@@ -1363,6 +1398,43 @@
 						"ANNEX": "Annex",
 						"ROOF": "Roof",
 						"MEZZANINE": "Mezzanine"
+					}
+				},
+				"wizard": {
+					"title": "Building Setup",
+					"step1Title": "Building Structure",
+					"step2Title": "Floor Details",
+					"step3Title": "Exterior",
+					"step4Title": "Review & Generate",
+					"skip": "Skip — I want to enter manually",
+					"skipDetails": "Skip details",
+					"next": "Next",
+					"previous": "Previous",
+					"generate": "Generate Quantities",
+					"copyFromFloor": "Copy from another floor",
+					"addRoom": "Add Room",
+					"addOpening": "Add Opening",
+					"totalBuildingArea": "Total Building Area",
+					"floorCount": "Floor Count",
+					"totalHeight": "Total Height",
+					"roomCount": "Room Count",
+					"bathroomCount": "Bathroom Count",
+					"openingCount": "Opening Count",
+					"courtyardArea": "Courtyard Area",
+					"willGenerate": "{count} finishing items will be auto-calculated",
+					"editConfig": "Edit Building Config",
+					"roomTypes": {
+						"bedroom": "Bedroom",
+						"living": "Living Room",
+						"majlis": "Majlis",
+						"kitchen": "Kitchen",
+						"bathroom": "Bathroom",
+						"hall": "Dining Hall",
+						"corridor": "Corridor",
+						"storage": "Storage",
+						"laundry": "Laundry",
+						"maid_room": "Maid Room",
+						"other": "Other"
 					}
 				},
 				"scope": {
@@ -1653,6 +1725,53 @@
 					"package": "package",
 					"save": "Save",
 					"cancel": "Cancel"
+				},
+				"dashboard": {
+					"noConfig": "Building configuration not set up yet",
+					"setupBuilding": "Setup Building",
+					"buildingArea": "Building Area",
+					"floors": "Floors",
+					"bathrooms": "Bathrooms",
+					"courtyard": "Courtyard",
+					"editSettings": "Edit Settings",
+					"searchPlaceholder": "Search items...",
+					"filterAll": "All",
+					"filterAuto": "Auto",
+					"filterManual": "Manual",
+					"filterEstimated": "Estimated",
+					"filterDisabled": "Disabled",
+					"totalItems": "Items",
+					"enabled": "Enabled",
+					"disabled": "Disabled",
+					"addManualItem": "Add Manual Item",
+					"selectCategory": "Select Category",
+					"selectFloor": "Select Floor",
+					"quantity": "Quantity",
+					"add": "Add",
+					"noItems": "No items. Set up building configuration or add items manually.",
+					"colItem": "Item",
+					"colFloor": "Floor",
+					"colQuantity": "Quantity",
+					"colUnit": "Unit",
+					"colWastage": "Wastage",
+					"colEffective": "Effective",
+					"colSource": "Source",
+					"calculationDetails": "Calculation Details",
+					"source": "Source",
+					"dependsOn": "Depends on",
+					"feedsItems": "Feeds",
+					"staleWarning": "Manual quantity ({manual}) may not match the calculated value ({auto})",
+					"resetToAuto": "Reset to Auto",
+					"manualEdit": "Manual Edit",
+					"save": "Save",
+					"cancel": "Cancel",
+					"saved": "Saved"
+				},
+				"knowledge": {
+					"title": "Extractable data detected",
+					"accept": "Auto Calculate",
+					"dismiss": "No Thanks",
+					"andMore": "and {count} more items..."
 				}
 			},
 			"mep": {
@@ -3279,23 +3398,59 @@
 		"featuresSection": {
 			"title": "Everything you need to manage your projects",
 			"items": {
-				"1": { "title": "Comprehensive Project Management", "description": "Track all your projects from a single dashboard with smart alerts and KPIs" },
-				"2": { "title": "BOQ & Pricing", "description": "Professional bill of quantities and accurate pricing from price database" },
-				"3": { "title": "Invoicing & Finance", "description": "Expenses, claims, payments, and invoices — automatically connected" },
-				"4": { "title": "Interactive Gantt Chart", "description": "Plan and track your project timelines visually" },
-				"5": { "title": "Owner Portal", "description": "Owners view project updates directly via a secure link" },
-				"6": { "title": "Field Reports", "description": "Daily reports with photos and notes directly from the site" },
-				"7": { "title": "ZATCA E-Invoice", "description": "E-invoicing compliant with the Zakat, Tax and Customs Authority" },
-				"8": { "title": "Employee & Payroll Management", "description": "Record employee data and track salaries and attendance" },
-				"9": { "title": "Arabic RTL Support", "description": "Interface fully designed for Arabic right-to-left layout" }
+				"1": {
+					"title": "Comprehensive Project Management",
+					"description": "Track all your projects from a single dashboard with smart alerts and KPIs"
+				},
+				"2": {
+					"title": "BOQ & Pricing",
+					"description": "Professional bill of quantities and accurate pricing from price database"
+				},
+				"3": {
+					"title": "Invoicing & Finance",
+					"description": "Expenses, claims, payments, and invoices — automatically connected"
+				},
+				"4": {
+					"title": "Interactive Gantt Chart",
+					"description": "Plan and track your project timelines visually"
+				},
+				"5": {
+					"title": "Owner Portal",
+					"description": "Owners view project updates directly via a secure link"
+				},
+				"6": {
+					"title": "Field Reports",
+					"description": "Daily reports with photos and notes directly from the site"
+				},
+				"7": {
+					"title": "ZATCA E-Invoice",
+					"description": "E-invoicing compliant with the Zakat, Tax and Customs Authority"
+				},
+				"8": {
+					"title": "Employee & Payroll Management",
+					"description": "Record employee data and track salaries and attendance"
+				},
+				"9": {
+					"title": "Arabic RTL Support",
+					"description": "Interface fully designed for Arabic right-to-left layout"
+				}
 			}
 		},
 		"subscriptionInfo": {
 			"title": "How subscription works",
 			"steps": {
-				"1": { "title": "Contact us", "description": "Via WhatsApp or email" },
-				"2": { "title": "Choose duration", "description": "Monthly or yearly based on your needs" },
-				"3": { "title": "Instant activation", "description": "Your account is activated within minutes" }
+				"1": {
+					"title": "Contact us",
+					"description": "Via WhatsApp or email"
+				},
+				"2": {
+					"title": "Choose duration",
+					"description": "Monthly or yearly based on your needs"
+				},
+				"3": {
+					"title": "Instant activation",
+					"description": "Your account is activated within minutes"
+				}
 			},
 			"paymentMethods": "Accepted payment methods",
 			"mada": "mada",
@@ -4203,8 +4358,18 @@
 			"monthlyTrend": "Monthly Trend",
 			"noData": "No expenses recorded",
 			"months": {
-				"1": "Jan", "2": "Feb", "3": "Mar", "4": "Apr", "5": "May", "6": "Jun",
-				"7": "Jul", "8": "Aug", "9": "Sep", "10": "Oct", "11": "Nov", "12": "Dec"
+				"1": "Jan",
+				"2": "Feb",
+				"3": "Mar",
+				"4": "Apr",
+				"5": "May",
+				"6": "Jun",
+				"7": "Jul",
+				"8": "Aug",
+				"9": "Sep",
+				"10": "Oct",
+				"11": "Nov",
+				"12": "Dec"
 			}
 		},
 		"recentActivity": {
@@ -4548,11 +4713,30 @@
 			"paidAmount": "Paid",
 			"remainingAmount": "Remaining",
 			"balance": "Balance",
-			"status": "Status",
+			"status": {
+				"draft": "Draft",
+				"issued": "Issued",
+				"sent": "Sent",
+				"viewed": "Viewed",
+				"partially_paid": "Partially Paid",
+				"paid": "Paid",
+				"overdue": "Overdue",
+				"cancelled": "Cancelled"
+			},
 			"issueDate": "Issue Date",
 			"dueDate": "Due Date",
 			"paymentTermsDays": "Payment Terms (Days)",
-			"actions": "Actions",
+			"actions": {
+				"send": "Send",
+				"convertToTax": "Convert to Tax",
+				"cancel": "Cancel Invoice",
+				"revertToDraft": "Revert to Draft",
+				"issue": "Issue",
+				"duplicate": "Duplicate Invoice",
+				"creditNote": "Credit Note",
+				"pdf": "Download PDF",
+				"print": "Print"
+			},
 			"delete": "Delete",
 			"print": "Print",
 			"download": "Download PDF",
@@ -4591,7 +4775,26 @@
 			"taxNumber": "Tax Number",
 			"clientAddress": "Address",
 			"addressPlaceholder": "Enter client address",
-			"details": "Invoice Details",
+			"details": {
+				"metadata": "Invoice Details",
+				"invoiceNo": "Invoice No.",
+				"invoiceType": "Invoice Type",
+				"status": "Status",
+				"createdAt": "Created At",
+				"issuedAt": "Issued At",
+				"issueDate": "Invoice Date",
+				"dueDate": "Due Date",
+				"project": "Project",
+				"quotation": "Quotation",
+				"createdBy": "Created By",
+				"zatcaUuid": "Invoice UUID",
+				"links": "Links",
+				"creditNotes": "Credit Notes",
+				"noCreditNotes": "No credit notes",
+				"relatedInvoice": "Original Invoice",
+				"payments": "Payments",
+				"noPayments": "No payments"
+			},
 			"previewAvailableAfterSave": "Preview will be available after saving the invoice",
 			"settings": "Invoice Settings",
 			"invoiceType": "Invoice Type",
@@ -4634,7 +4837,6 @@
 			"cancelled": "This invoice is cancelled",
 			"selectProject": "Select Project",
 			"noProject": "No Project",
-			"project": "Project",
 			"columns": {
 				"number": "Invoice No.",
 				"client": "Client",
@@ -4665,17 +4867,6 @@
 			"currency": "Currency",
 			"attachments": "Attachments",
 			"attachmentsComingSoon": "Attachments - Coming soon",
-			"actions": {
-				"send": "Send",
-				"convertToTax": "Convert to Tax",
-				"cancel": "Cancel Invoice",
-				"revertToDraft": "Revert to Draft",
-				"issue": "Issue",
-				"duplicate": "Duplicate Invoice",
-				"creditNote": "Credit Note",
-				"pdf": "Download PDF",
-				"print": "Print"
-			},
 			"types": {
 				"standard": "Standard",
 				"tax": "Tax Invoice",
@@ -4707,26 +4898,6 @@
 				"invoice": "Invoice",
 				"details": "Details",
 				"activity": "Activity"
-			},
-			"details": {
-				"metadata": "Invoice Details",
-				"invoiceNo": "Invoice No.",
-				"invoiceType": "Invoice Type",
-				"status": "Status",
-				"createdAt": "Created At",
-				"issuedAt": "Issued At",
-				"issueDate": "Invoice Date",
-				"dueDate": "Due Date",
-				"project": "Project",
-				"quotation": "Quotation",
-				"createdBy": "Created By",
-				"zatcaUuid": "Invoice UUID",
-				"links": "Links",
-				"creditNotes": "Credit Notes",
-				"noCreditNotes": "No credit notes",
-				"relatedInvoice": "Original Invoice",
-				"payments": "Payments",
-				"noPayments": "No payments"
 			},
 			"activity": {
 				"title": "Activity Log",
@@ -4825,16 +4996,6 @@
 				"markedAsPaid": "Invoice marked as paid",
 				"convertedToTax": "Invoice converted to tax invoice"
 			},
-			"status": {
-				"draft": "Draft",
-				"issued": "Issued",
-				"sent": "Sent",
-				"viewed": "Viewed",
-				"partially_paid": "Partially Paid",
-				"paid": "Paid",
-				"overdue": "Overdue",
-				"cancelled": "Cancelled"
-			},
 			"errors": {
 				"clientRequired": "Client name is required",
 				"itemsRequired": "At least one item is required",
@@ -4847,8 +5008,7 @@
 				"issueDateRequired": "Issue date is required"
 			},
 			"paid": "Paid",
-			"remaining": "Remaining",
-			"invoiceType": "Invoice Type"
+			"remaining": "Remaining"
 		},
 		"documents": {
 			"title": "Open Documents",

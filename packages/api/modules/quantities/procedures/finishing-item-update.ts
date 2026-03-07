@@ -41,6 +41,12 @@ export const finishingItemUpdate = subscriptionProcedure
 			laborCost: z.number().optional(),
 			totalCost: z.number().optional(),
 			sortOrder: z.number().optional(),
+			dataSource: z.string().optional(),
+			sourceItemId: z.string().optional(),
+			sourceFormula: z.string().optional(),
+			isEnabled: z.boolean().optional(),
+			groupKey: z.string().optional(),
+			scope: z.string().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

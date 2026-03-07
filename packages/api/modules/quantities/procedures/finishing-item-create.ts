@@ -29,6 +29,13 @@ export const finishingItemSchema = z.object({
 	materialCost: z.number().default(0),
 	laborCost: z.number().default(0),
 	totalCost: z.number().default(0),
+	dataSource: z.string().optional(),
+	sourceItemId: z.string().optional(),
+	sourceFormula: z.string().optional(),
+	isEnabled: z.boolean().default(true),
+	sortOrder: z.number().default(0),
+	groupKey: z.string().optional(),
+	scope: z.string().optional(),
 });
 
 function convertFinishingItemDecimals(item: Record<string, unknown>) {
