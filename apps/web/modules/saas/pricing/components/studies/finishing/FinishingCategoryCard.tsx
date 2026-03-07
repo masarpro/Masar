@@ -229,7 +229,7 @@ export function FinishingCategoryCard({
 							: undefined
 					}
 				/>
-			) : category.id === "FINISHING_INTERIOR_PAINT" ? (
+			) : category.id === "FINISHING_INTERIOR_PAINT" || category.id === "FINISHING_FACADE_PAINT" || category.id === "FINISHING_BOUNDARY_PAINT" ? (
 				<PaintItemDialog
 					open={dialogOpen}
 					onOpenChange={setDialogOpen}
@@ -237,6 +237,13 @@ export function FinishingCategoryCard({
 					studyId={studyId}
 					buildingConfig={buildingConfig}
 					allStudyItems={allGroupItems}
+					paintCategory={
+						category.id === "FINISHING_INTERIOR_PAINT"
+							? "interior"
+							: category.id === "FINISHING_FACADE_PAINT"
+								? "facade"
+								: "boundary"
+					}
 					editItem={
 						editItem
 							? {

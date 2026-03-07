@@ -1,92 +1,162 @@
+export type PaintCategory = "interior" | "facade" | "boundary";
+
 export const PAINT_TYPES = {
 	plastic_latex: {
 		ar: "دهان بلاستيك (لاتكس)",
 		en: "Latex / Plastic Paint",
 		defaultCoats: 3,
-		wastagePercent: 10,
-		coverageM2PerLiter: 12,
+		defaultCoverageRate: 11,
+		applicableCategories: ["interior"] as PaintCategory[],
 	},
-	acrylic: {
-		ar: "دهان أكريليك",
-		en: "Acrylic Paint",
+	acrylic_exterior: {
+		ar: "دهان أكريليك خارجي",
+		en: "Acrylic Exterior Paint",
 		defaultCoats: 2,
-		wastagePercent: 10,
-		coverageM2PerLiter: 10,
+		defaultCoverageRate: 9,
+		applicableCategories: ["interior", "facade", "boundary"] as PaintCategory[],
 	},
-	velvet: {
-		ar: "دهان مخملي",
-		en: "Velvet Paint",
+	oil_enamel: {
+		ar: "دهان زيتي (إنامل)",
+		en: "Oil / Enamel Paint",
 		defaultCoats: 2,
-		wastagePercent: 12,
-		coverageM2PerLiter: 8,
+		defaultCoverageRate: 13,
+		applicableCategories: ["interior"] as PaintCategory[],
 	},
-	texture: {
-		ar: "دهان تكستشر",
-		en: "Texture Paint",
+	epoxy: {
+		ar: "دهان إيبوكسي",
+		en: "Epoxy Paint",
 		defaultCoats: 2,
-		wastagePercent: 15,
-		coverageM2PerLiter: 4,
+		defaultCoverageRate: 9,
+		applicableCategories: ["interior"] as PaintCategory[],
 	},
-	wood_varnish: {
-		ar: "دهان/ورنيش أخشاب",
-		en: "Wood Varnish",
+	graviato: {
+		ar: "جرافياتو",
+		en: "Graviato",
+		defaultCoats: 1,
+		defaultCoverageRate: 3.5,
+		applicableCategories: ["facade", "boundary"] as PaintCategory[],
+	},
+	elastomeric: {
+		ar: "دهان مطاطي (إلاستوميريك)",
+		en: "Elastomeric Paint",
 		defaultCoats: 2,
-		wastagePercent: 8,
-		coverageM2PerLiter: 14,
+		defaultCoverageRate: 7,
+		applicableCategories: ["facade"] as PaintCategory[],
+	},
+	other: {
+		ar: "أخرى",
+		en: "Other",
+		defaultCoats: 2,
+		defaultCoverageRate: 10,
+		applicableCategories: ["interior", "facade", "boundary"] as PaintCategory[],
 	},
 } as const;
 
 export type PaintTypeKey = keyof typeof PAINT_TYPES;
 
-export const PAINT_QUALITY_LEVELS = {
-	economy: {
-		ar: "اقتصادي (ناشونال/محلي)",
-		en: "Economy",
-		priceRange: "12–22 ر.س/م²",
+export const PAINT_BRANDS = {
+	jotun: { ar: "جوتن", en: "Jotun" },
+	jazeera: { ar: "الجزيرة", en: "Jazeera" },
+	hempel: { ar: "هيمبل", en: "Hempel" },
+	national: { ar: "ناشونال", en: "National" },
+	caparol: { ar: "كابارول", en: "Caparol" },
+	sigma: { ar: "سيجما", en: "Sigma" },
+	other: { ar: "أخرى", en: "Other" },
+} as const;
+
+export type PaintBrandKey = keyof typeof PAINT_BRANDS;
+
+export const PUTTY_TYPES = {
+	saveto_vetonit: {
+		ar: "سافيتو فيتونيت (25 كجم)",
+		en: "Saveto Vetonit (25kg)",
+		packageKg: 25,
+		defaultCoverageRate: 1.75,
 	},
-	standard: {
-		ar: "عادي (جوتن فينيل مات / الجزيرة)",
-		en: "Standard",
-		priceRange: "22–38 ر.س/م²",
+	saveto_vetonit_wr: {
+		ar: "سافيتو فيتونيت WR (25 كجم)",
+		en: "Saveto Vetonit WR (25kg)",
+		packageKg: 25,
+		defaultCoverageRate: 1.75,
 	},
-	premium: {
-		ar: "ممتاز (جوتن فينوماستيك)",
-		en: "Premium",
-		priceRange: "38–60 ر.س/م²",
+	saveto_fine: {
+		ar: "سافيتو فاين (20 كجم)",
+		en: "Saveto Fine (20kg)",
+		packageKg: 20,
+		defaultCoverageRate: 2.5,
 	},
-	luxury: {
-		ar: "فاخر (بنجامين مور / فارو آند بول)",
-		en: "Luxury",
-		priceRange: "60–120 ر.س/م²",
+	jotun_putty: {
+		ar: "معجون جوتن",
+		en: "Jotun Putty",
+		packageKg: 25,
+		defaultCoverageRate: 2.0,
+	},
+	jazeera_putty: {
+		ar: "معجون الجزيرة",
+		en: "Jazeera Putty",
+		packageKg: 25,
+		defaultCoverageRate: 2.0,
+	},
+	other: {
+		ar: "أخرى",
+		en: "Other",
+		packageKg: 25,
+		defaultCoverageRate: 2.0,
 	},
 } as const;
 
-export type PaintQualityKey = keyof typeof PAINT_QUALITY_LEVELS;
+export type PuttyTypeKey = keyof typeof PUTTY_TYPES;
+
+export function getPaintTypesForCategory(category: PaintCategory) {
+	return Object.entries(PAINT_TYPES).filter(([_, val]) =>
+		val.applicableCategories.includes(category),
+	) as [PaintTypeKey, (typeof PAINT_TYPES)[PaintTypeKey]][];
+}
 
 export function calculatePaintMaterials(params: {
 	totalArea: number;
 	paintType: PaintTypeKey;
 	coats: number;
+	paintCoverageRate: number;
+	primerCoats: number;
+	primerCoverageRate: number;
+	puttyCoats: number;
+	puttyCoverageRate: number;
+	puttyType: PuttyTypeKey;
 }) {
-	const paint = PAINT_TYPES[params.paintType];
-	const coverage = paint.coverageM2PerLiter;
-	const totalPaintArea = params.totalArea * params.coats;
-	const liters = Math.ceil(totalPaintArea / coverage);
-	const gallons = Math.ceil(liters / 3.785);
-	const drums18L = Math.ceil(liters / 18);
+	// Paint
+	const paintLiters = Math.ceil(
+		(params.totalArea * params.coats) / params.paintCoverageRate,
+	);
+	const paintDrums18L = Math.ceil(paintLiters / 18);
 
-	// Primer: 1 coat, coverage ~14 m²/L
-	const primerLiters = Math.ceil(params.totalArea / 14);
+	// Primer
+	const primerLiters =
+		params.primerCoats > 0
+			? Math.ceil(
+					(params.totalArea * params.primerCoats) / params.primerCoverageRate,
+				)
+			: 0;
+	const primerDrums18L = primerLiters > 0 ? Math.ceil(primerLiters / 18) : 0;
 
-	// Putty/filler: ~0.5 kg/m² for 2 coats
-	const puttyKg = Math.ceil(params.totalArea * 0.5);
+	// Putty
+	const puttyKg =
+		params.puttyCoats > 0
+			? Math.ceil(
+					(params.totalArea * params.puttyCoats) / params.puttyCoverageRate,
+				)
+			: 0;
+	const puttyPackages =
+		puttyKg > 0
+			? Math.ceil(puttyKg / PUTTY_TYPES[params.puttyType].packageKg)
+			: 0;
 
 	return {
-		paintLiters: liters,
-		paintGallons: gallons,
-		paintDrums18L: drums18L,
+		paintLiters,
+		paintDrums18L,
 		primerLiters,
+		primerDrums18L,
 		puttyKg,
-		totalPaintArea: Math.round(totalPaintArea * 100) / 100,
+		puttyPackages,
 	};
 }
