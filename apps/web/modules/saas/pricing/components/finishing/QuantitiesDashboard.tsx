@@ -7,6 +7,8 @@ import { Input } from "@ui/components/input";
 import {
 	Search,
 	Filter,
+	Settings,
+	ClipboardList,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -26,7 +28,12 @@ import {
 	extractKnowledgeFromItem,
 	type ExtractionResult,
 } from "../../lib/knowledge-extractor";
+import type { ItemSpecification, SavedCategorySpec, SpecificationTemplate } from "../../lib/specs/spec-types";
+import { buildItemSpec } from "../../lib/specs/spec-calculator";
+import { mapToCatalogCategory } from "../../lib/utils";
 import { BuildingSummaryBar } from "./BuildingSummaryBar";
+import { SpecBulkEditor } from "./specs/SpecBulkEditor";
+import { BillOfMaterials } from "./specs/BillOfMaterials";
 import { QuantitiesTable } from "./QuantitiesTable";
 import { ManualItemAdder } from "./ManualItemAdder";
 import { KnowledgeNotification } from "./KnowledgeNotification";
@@ -56,7 +63,7 @@ type StatusFilter =
 	| "disabled";
 
 const GROUP_TABS = [
-	{ key: null, label: "الكل" },
+	{ key: null, label: "" },
 	...Object.values(FINISHING_GROUPS)
 		.sort((a, b) => a.sortOrder - b.sortOrder)
 		.map((g) => ({ key: g.id, label: g.nameAr })),
@@ -77,6 +84,8 @@ export function QuantitiesDashboard({
 	const [groupFilter, setGroupFilter] = useState<GroupFilter>(null);
 	const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 	const [searchQuery, setSearchQuery] = useState("");
+	const [showBulkEditor, setShowBulkEditor] = useState(false);
+	const [dashboardView, setDashboardView] = useState<"quantities" | "bom">("quantities");
 
 	// Knowledge extraction state
 	const [pendingKnowledge, setPendingKnowledge] = useState<{
@@ -114,6 +123,7 @@ export function QuantitiesDashboard({
 	const totalItems = localItems.length;
 	const enabledCount = localItems.filter((i) => i.isEnabled).length;
 	const disabledCount = totalItems - enabledCount;
+	const hasAnySpecs = localItems.some((i) => i.isEnabled && i.specData);
 
 	// Filtered items
 	const filteredItems = useMemo(() => {
@@ -210,9 +220,9 @@ export function QuantitiesDashboard({
 
 		// 2. Batch-create the derived items
 		const items = result.newDerivedItems.map((d) => ({
-			category: mapDerivedCategory(d.categoryKey),
+			category: mapToCatalogCategory(d.categoryKey),
 			subCategory: d.subCategory,
-			name: getItemDisplayName(d.categoryKey),
+			name: getItemDisplayName(d.categoryKey, t),
 			floorId: d.floorId,
 			floorName: d.floorName,
 			area: d.unit === "m2" ? d.quantity : undefined,
@@ -243,7 +253,7 @@ export function QuantitiesDashboard({
 			{
 				onSuccess: () => {
 					toast.success(
-						`تم إضافة ${items.length} بنود تلقائياً`,
+						t("itemsAdded", { count: items.length }),
 					);
 				},
 			},
@@ -498,7 +508,7 @@ export function QuantitiesDashboard({
 						const autoCount = cascadeResults.filter((c) => !c.isManual).length;
 						if (autoCount > 0) {
 							toast.success(
-								`تم تحديث ${autoCount} بنود مرتبطة`,
+								t("linkedItemsUpdated", { count: autoCount }),
 							);
 						}
 						setCascadeChanges({
@@ -571,7 +581,7 @@ export function QuantitiesDashboard({
 				floorName: newItem.floorName,
 				scope: newItem.scope,
 				groupKey: "OTHER",
-				groupName: "أخرى",
+				groupName: t("groupOther"),
 				groupIcon: "Package",
 				groupColor: "gray",
 				quantity: newItem.quantity,
@@ -579,7 +589,7 @@ export function QuantitiesDashboard({
 				wastagePercent: 0,
 				effectiveQuantity: newItem.quantity,
 				dataSource: "manual",
-				sourceDescription: "إدخال يدوي",
+				sourceDescription: t("sourceManual"),
 				isEnabled: true,
 				sortOrder: localItems.length,
 				isManualOverride: false,
@@ -590,6 +600,96 @@ export function QuantitiesDashboard({
 			debouncedSave(item);
 		},
 		[localItems.length, debouncedSave],
+	);
+
+	const handleSaveSpec = useCallback(
+		(key: string, spec: ItemSpecification) => {
+			setLocalItems((prev) => {
+				const updated = prev.map((i) =>
+					i.key === key
+						? { ...i, specData: spec }
+						: i,
+				);
+				const item = updated.find((i) => i.key === key);
+				if (item?.isSaved && item.savedId) {
+					const specDescription = `${spec.specTypeLabel}${
+						spec.options?.brand
+							? ` — ${spec.options.brand}`
+							: ""
+					}`;
+					updateMutation.mutate(
+						{
+							organizationId,
+							costStudyId: studyId,
+							id: item.savedId,
+							specData: spec,
+							qualityLevel:
+								(spec.options?.qualityLevel as string) ??
+								undefined,
+							brand:
+								(spec.options?.brand as string) ?? undefined,
+							specifications: specDescription,
+						},
+						{
+							onSuccess: () => {
+								toast.success(t("saved"));
+							},
+						},
+					);
+				}
+				return updated;
+			});
+		},
+		[organizationId, studyId, updateMutation, t],
+	);
+
+	const handleBulkSaveAll = useCallback(
+		(specMap: Map<string, ItemSpecification>) => {
+			setLocalItems((prev) => {
+				const updated = prev.map((i) => {
+					const spec = specMap.get(i.key);
+					if (!spec) return i;
+					return { ...i, specData: spec };
+				});
+
+				// Persist each item that has a spec and is saved
+				for (const item of updated) {
+					const spec = specMap.get(item.key);
+					if (!spec || !item.isSaved || !item.savedId) continue;
+
+					const specDescription = `${spec.specTypeLabel}${
+						spec.options?.brand
+							? ` — ${spec.options.brand}`
+							: ""
+					}`;
+					updateMutation.mutate({
+						organizationId,
+						costStudyId: studyId,
+						id: item.savedId,
+						specData: spec,
+						qualityLevel:
+							(spec.options?.qualityLevel as string) ??
+							undefined,
+						brand:
+							(spec.options?.brand as string) ?? undefined,
+						specifications: specDescription,
+					});
+				}
+
+				toast.success(t("saved"));
+				return updated;
+			});
+		},
+		[organizationId, studyId, updateMutation, t],
+	);
+
+	const handleSaveTemplate = useCallback(
+		(_name: string, _specs: SavedCategorySpec[]) => {
+			// Template saving is handled by the parent if ORPC is available
+			// For now, just show a toast — full API integration comes with the router wiring
+			toast.success(t("templateSaved"));
+		},
+		[],
 	);
 
 	return (
@@ -635,7 +735,7 @@ export function QuantitiesDashboard({
 							className="text-xs h-7 px-2"
 							onClick={() => setGroupFilter(tab.key)}
 						>
-							{tab.label}
+							{tab.key === null ? t("filterAll") : tab.label}
 						</Button>
 					))}
 				</div>
@@ -707,15 +807,60 @@ export function QuantitiesDashboard({
 						floors={config?.floors ?? []}
 						onAdd={handleAddManualItem}
 					/>
+
+					{/* Bulk spec editor button */}
+					<Button
+						variant="outline"
+						size="sm"
+						className="h-8 text-xs"
+						onClick={() => setShowBulkEditor(true)}
+					>
+						<Settings className="h-3.5 w-3.5 me-1" />
+						{t("setSpecs")}
+					</Button>
+
+					{/* BOM tab button */}
+					{hasAnySpecs && (
+						<Button
+							variant={dashboardView === "bom" ? "secondary" : "outline"}
+							size="sm"
+							className="h-8 text-xs"
+							onClick={() =>
+								setDashboardView(
+									dashboardView === "bom"
+										? "quantities"
+										: "bom",
+								)
+							}
+						>
+							<ClipboardList className="h-3.5 w-3.5 me-1" />
+							{t("billOfMaterials")}
+						</Button>
+					)}
 				</div>
 			</div>
 
-			{/* Table */}
-			<QuantitiesTable
-				items={filteredItems}
-				onToggleEnabled={handleToggleEnabled}
-				onManualOverride={handleManualOverride}
-				onResetToAuto={handleResetToAuto}
+			{/* Content: Table or BOM */}
+			{dashboardView === "bom" ? (
+				<BillOfMaterials items={localItems} />
+			) : (
+				<QuantitiesTable
+					items={filteredItems}
+					onToggleEnabled={handleToggleEnabled}
+					onManualOverride={handleManualOverride}
+					onResetToAuto={handleResetToAuto}
+					onSaveSpec={handleSaveSpec}
+				/>
+			)}
+
+			{/* Bulk Spec Editor Dialog */}
+			<SpecBulkEditor
+				open={showBulkEditor}
+				onOpenChange={setShowBulkEditor}
+				items={localItems}
+				customTemplates={[]}
+				onSaveAll={handleBulkSaveAll}
+				onSaveTemplate={handleSaveTemplate}
 			/>
 		</div>
 	);
@@ -723,75 +868,49 @@ export function QuantitiesDashboard({
 
 // ── Helpers ──
 
-function mapDerivedCategory(key: string): string {
-	const base = key.replace(/_[a-z0-9-]+$/, "");
-	const MAP: Record<string, string> = {
-		waterproofing_foundations: "FINISHING_WATERPROOFING",
-		waterproofing_bathrooms: "FINISHING_WATERPROOFING",
-		waterproofing_roof: "FINISHING_WATERPROOFING",
-		thermal_walls: "FINISHING_THERMAL_INSULATION",
-		thermal_roof: "FINISHING_THERMAL_INSULATION",
-		internal_plaster: "FINISHING_INTERNAL_PLASTER",
-		external_plaster: "FINISHING_EXTERNAL_PLASTER",
-		interior_paint: "FINISHING_INTERIOR_PAINT",
-		facade_paint: "FINISHING_FACADE_PAINT",
-		boundary_paint: "FINISHING_BOUNDARY_PAINT",
-		flooring: "FINISHING_FLOOR_TILES",
-		wall_tiles_bathroom: "FINISHING_WALL_TILES",
-		wall_tiles_kitchen: "FINISHING_WALL_TILES",
-		false_ceiling: "FINISHING_FALSE_CEILING",
-		interior_doors: "FINISHING_INTERIOR_DOORS",
-		exterior_doors: "FINISHING_EXTERIOR_DOORS",
-		windows: "FINISHING_WINDOWS",
-		bathroom_fixtures: "FINISHING_BATHROOMS",
-		vanities: "FINISHING_MARBLE_VANITIES",
-		kitchen_cabinets: "FINISHING_KITCHEN",
-		internal_stairs: "FINISHING_INTERNAL_STAIRS",
-		external_stairs: "FINISHING_EXTERNAL_STAIRS",
-		railings: "FINISHING_RAILINGS",
-		stone_facade: "FINISHING_STONE_FACADE",
-		facade_decor: "FINISHING_FACADE_DECOR",
-		yard_paving: "FINISHING_YARD_PAVING",
-		fence_gates: "FINISHING_FENCE_GATES",
-		landscaping: "FINISHING_LANDSCAPING",
-		roof_finishing: "FINISHING_ROOF",
-		interior_decor: "FINISHING_INTERIOR_DECOR",
-	};
-	return MAP[base] ?? MAP[key] ?? key;
-}
+const ITEM_NAME_PREFIXES = [
+	"waterproofing_bathrooms",
+	"internal_plaster",
+	"interior_paint",
+	"flooring",
+	"wall_tiles_bathroom",
+	"wall_tiles_kitchen",
+	"false_ceiling",
+] as const;
 
-function getItemDisplayName(key: string): string {
-	const NAMES: Record<string, string> = {
-		waterproofing_foundations: "عزل مائي — أساسات",
-		waterproofing_roof: "عزل مائي — سطح",
-		thermal_walls: "عزل حراري — جدران",
-		thermal_roof: "عزل حراري — سطح",
-		external_plaster: "لياسة خارجية",
-		facade_paint: "دهان واجهات",
-		boundary_paint: "دهان سور",
-		interior_doors: "أبواب داخلية",
-		exterior_doors: "أبواب خارجية",
-		windows: "نوافذ ألمنيوم",
-		bathroom_fixtures: "تجهيز حمامات",
-		vanities: "مغاسل ورخاميات",
-		kitchen_cabinets: "خزائن مطبخ",
-		internal_stairs: "تكسية درج داخلي",
-		external_stairs: "تكسية درج خارجي",
-		railings: "درابزين وحواجز",
-		stone_facade: "تكسيات واجهات",
-		facade_decor: "زخارف واجهات",
-		yard_paving: "أرضيات حوش",
-		fence_gates: "بوابات سور",
-		landscaping: "تنسيق حدائق",
-		roof_finishing: "تشطيبات سطح",
-		interior_decor: "ديكورات داخلية",
-	};
-	if (key.startsWith("waterproofing_bathrooms_")) return "عزل مائي — حمامات";
-	if (key.startsWith("internal_plaster_")) return "لياسة داخلية";
-	if (key.startsWith("interior_paint_")) return "دهان داخلي";
-	if (key.startsWith("flooring_")) return "أرضيات";
-	if (key.startsWith("wall_tiles_bathroom_")) return "تكسيات جدران حمامات";
-	if (key.startsWith("wall_tiles_kitchen_")) return "سبلاش باك مطبخ";
-	if (key.startsWith("false_ceiling_")) return "أسقف مستعارة";
-	return NAMES[key] ?? key;
+const ITEM_NAME_KEYS: Record<string, string> = {
+	waterproofing_foundations: "itemName_waterproofing_foundations",
+	waterproofing_roof: "itemName_waterproofing_roof",
+	thermal_walls: "itemName_thermal_walls",
+	thermal_roof: "itemName_thermal_roof",
+	external_plaster: "itemName_external_plaster",
+	facade_paint: "itemName_facade_paint",
+	boundary_paint: "itemName_boundary_paint",
+	interior_doors: "itemName_interior_doors",
+	exterior_doors: "itemName_exterior_doors",
+	windows: "itemName_windows",
+	bathroom_fixtures: "itemName_bathroom_fixtures",
+	vanities: "itemName_vanities",
+	kitchen_cabinets: "itemName_kitchen_cabinets",
+	internal_stairs: "itemName_internal_stairs",
+	external_stairs: "itemName_external_stairs",
+	railings: "itemName_railings",
+	stone_facade: "itemName_stone_facade",
+	facade_decor: "itemName_facade_decor",
+	yard_paving: "itemName_yard_paving",
+	fence_gates: "itemName_fence_gates",
+	landscaping: "itemName_landscaping",
+	roof_finishing: "itemName_roof_finishing",
+	interior_decor: "itemName_interior_decor",
+};
+
+function getItemDisplayName(key: string, t: (key: string) => string): string {
+	// Check prefix matches first (for keys like "internal_plaster_floor-abc")
+	for (const prefix of ITEM_NAME_PREFIXES) {
+		if (key.startsWith(`${prefix}_`)) {
+			return t(`itemName_${prefix}`);
+		}
+	}
+	const tKey = ITEM_NAME_KEYS[key];
+	return tKey ? t(tKey) : key;
 }

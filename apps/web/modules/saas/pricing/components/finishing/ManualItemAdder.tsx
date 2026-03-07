@@ -22,6 +22,7 @@ import {
 	type FinishingCategoryConfig,
 } from "../../lib/finishing-categories";
 import type { SmartFloorConfig } from "../../lib/smart-building-types";
+import { getUnitLabel } from "../../lib/utils";
 
 interface ManualItemAdderProps {
 	floors: SmartFloorConfig[];
@@ -176,13 +177,3 @@ export function ManualItemAdder({ floors, onAdd }: ManualItemAdderProps) {
 	);
 }
 
-function getUnitLabel(unit: string): string {
-	const labels: Record<string, string> = {
-		m2: "م²",
-		m: "م.ط",
-		unit: "عدد",
-		set: "طقم",
-		lump_sum: "مقطوعية",
-	};
-	return labels[unit] ?? unit;
-}

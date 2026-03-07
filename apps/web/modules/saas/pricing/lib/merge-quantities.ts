@@ -29,6 +29,7 @@ export interface SavedFinishingItem {
 	scope?: string | null;
 	sortOrder?: number | null;
 	calculationData?: Record<string, unknown> | null;
+	specData?: unknown;
 }
 
 /** Merged item shown in the dashboard */
@@ -77,6 +78,9 @@ export interface MergedQuantityItem {
 	// Flags
 	isManualOverride: boolean;
 	isStale: boolean;
+
+	// Spec
+	specData?: unknown;
 }
 
 /** Build a match key for comparing derived ↔ saved */
@@ -263,6 +267,7 @@ export function mergeQuantities(
 				derivedEffective: d.effectiveQuantity,
 				isManualOverride,
 				isStale: isManualOverride,
+				specData: savedItem.specData,
 			});
 		} else {
 			// Derived only — not yet saved
@@ -331,6 +336,7 @@ export function mergeQuantities(
 			sortOrder: sortOrder++,
 			isManualOverride: false,
 			isStale: false,
+			specData: item.specData,
 		});
 	}
 

@@ -639,6 +639,7 @@ export async function updateFinishingItem(
 		qualityLevel: string;
 		brand: string;
 		specifications: string;
+		specData: unknown;
 		wastagePercent: number;
 		materialPrice: number;
 		laborPrice: number;
@@ -1015,4 +1016,147 @@ export async function getQuotesByCostStudyId(costStudyId: string) {
 		where: { costStudyId },
 		orderBy: { createdAt: "desc" },
 	});
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Specification Template Queries - قوالب المواصفات
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Get all spec templates for an organization (system + custom)
+ */
+export async function getSpecTemplates(organizationId: string) {
+	return db.specificationTemplate.findMany({
+		where: { organizationId },
+		orderBy: [{ isSystem: "desc" }, { name: "asc" }],
+	});
+}
+
+/**
+ * Create a new custom spec template
+ */
+export async function createSpecTemplate(data: {
+	name: string;
+	nameEn?: string;
+	description?: string;
+	organizationId: string;
+	createdById: string;
+	specs: unknown;
+}) {
+	return db.specificationTemplate.create({
+		data: {
+			name: data.name,
+			nameEn: data.nameEn,
+			description: data.description,
+			organizationId: data.organizationId,
+			createdById: data.createdById,
+			specs: data.specs as object,
+			isSystem: false,
+		},
+	});
+}
+
+/**
+ * Update a non-system spec template
+ */
+export async function updateSpecTemplate(
+	id: string,
+	organizationId: string,
+	data: Partial<{
+		name: string;
+		nameEn: string;
+		description: string;
+		specs: unknown;
+	}>,
+) {
+	const existing = await db.specificationTemplate.findFirst({
+		where: { id, organizationId, isSystem: false },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("Spec template not found or is a system template");
+	}
+
+	return db.specificationTemplate.update({
+		where: { id },
+		data: data as object,
+	});
+}
+
+/**
+ * Delete a non-system spec template
+ */
+export async function deleteSpecTemplate(id: string, organizationId: string) {
+	const existing = await db.specificationTemplate.findFirst({
+		where: { id, organizationId, isSystem: false },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("Spec template not found or is a system template");
+	}
+
+	return db.specificationTemplate.delete({
+		where: { id },
+	});
+}
+
+/**
+ * Set a spec template as the default for an organization
+ */
+export async function setDefaultSpecTemplate(id: string, organizationId: string) {
+	const existing = await db.specificationTemplate.findFirst({
+		where: { id, organizationId },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("Spec template not found");
+	}
+
+	await db.$transaction([
+		// Unset previous default
+		db.specificationTemplate.updateMany({
+			where: { organizationId, isDefault: true },
+			data: { isDefault: false },
+		}),
+		// Set new default
+		db.specificationTemplate.update({
+			where: { id },
+			data: { isDefault: true },
+		}),
+	]);
+
+	return db.specificationTemplate.findUnique({ where: { id } });
+}
+
+/**
+ * Batch update specData on multiple finishing items
+ */
+export async function batchUpdateFinishingItemSpecs(
+	costStudyId: string,
+	items: Array<{
+		id: string;
+		specData: unknown;
+		qualityLevel?: string;
+		brand?: string;
+		specifications?: string;
+	}>,
+) {
+	if (items.length === 0) return;
+
+	await db.$transaction(
+		items.map((item) =>
+			db.finishingItem.update({
+				where: { id: item.id },
+				data: {
+					specData: item.specData as object,
+					qualityLevel: item.qualityLevel,
+					brand: item.brand,
+					specifications: item.specifications,
+				},
+			}),
+		),
+	);
 }

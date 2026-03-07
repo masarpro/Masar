@@ -34,6 +34,7 @@ export const finishingItemUpdate = subscriptionProcedure
 			qualityLevel: z.string().optional(),
 			brand: z.string().optional(),
 			specifications: z.string().optional(),
+			specData: z.any().optional(),
 			wastagePercent: z.number().optional(),
 			materialPrice: z.number().optional(),
 			laborPrice: z.number().optional(),

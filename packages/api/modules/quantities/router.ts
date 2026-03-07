@@ -15,6 +15,12 @@ import { finishingItemReorder } from "./procedures/finishing-item-reorder";
 import { buildingConfigUpdate } from "./procedures/building-config-update";
 import { mepItemCreate, mepItemCreateBatch } from "./procedures/mep-item-create";
 import { quoteCreate, quoteGetById, quoteUpdate, quoteDelete, quoteList } from "./procedures/quote-create";
+import { specTemplateList } from "./procedures/spec-template-list";
+import { specTemplateCreate } from "./procedures/spec-template-create";
+import { specTemplateUpdate } from "./procedures/spec-template-update";
+import { specTemplateDelete } from "./procedures/spec-template-delete";
+import { specTemplateSetDefault } from "./procedures/spec-template-set-default";
+import { finishingItemBatchSpecUpdate } from "./procedures/finishing-item-batch-spec-update";
 
 export const quantitiesRouter = {
 	list,
@@ -35,6 +41,7 @@ export const quantitiesRouter = {
 		update: finishingItemUpdate,
 		delete: finishingItemDelete,
 		reorder: finishingItemReorder,
+		batchSpecUpdate: finishingItemBatchSpecUpdate,
 	},
 	buildingConfig: {
 		update: buildingConfigUpdate,
@@ -49,5 +56,12 @@ export const quantitiesRouter = {
 		getById: quoteGetById,
 		update: quoteUpdate,
 		delete: quoteDelete,
+	},
+	specTemplate: {
+		list: specTemplateList,
+		create: specTemplateCreate,
+		update: specTemplateUpdate,
+		delete: specTemplateDelete,
+		setDefault: specTemplateSetDefault,
 	},
 };

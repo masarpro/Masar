@@ -121,9 +121,15 @@ export type StructuralItemScalarFieldEnum = z.infer<typeof StructuralItemScalarF
 
 // File: FinishingItemScalarFieldEnum.schema.ts
 
-export const FinishingItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'category', 'subCategory', 'name', 'description', 'floorId', 'floorName', 'area', 'length', 'height', 'width', 'perimeter', 'quantity', 'unit', 'calculationMethod', 'calculationData', 'dataSource', 'sourceItemId', 'sourceFormula', 'isEnabled', 'groupKey', 'scope', 'qualityLevel', 'brand', 'specifications', 'wastagePercent', 'materialPrice', 'laborPrice', 'materialCost', 'laborCost', 'totalCost', 'sortOrder', 'createdAt', 'updatedAt'])
+export const FinishingItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'category', 'subCategory', 'name', 'description', 'floorId', 'floorName', 'area', 'length', 'height', 'width', 'perimeter', 'quantity', 'unit', 'calculationMethod', 'calculationData', 'dataSource', 'sourceItemId', 'sourceFormula', 'isEnabled', 'groupKey', 'scope', 'qualityLevel', 'brand', 'specifications', 'specData', 'wastagePercent', 'materialPrice', 'laborPrice', 'materialCost', 'laborCost', 'totalCost', 'sortOrder', 'createdAt', 'updatedAt'])
 
 export type FinishingItemScalarFieldEnum = z.infer<typeof FinishingItemScalarFieldEnumSchema>;
+
+// File: SpecificationTemplateScalarFieldEnum.schema.ts
+
+export const SpecificationTemplateScalarFieldEnumSchema = z.enum(['id', 'name', 'nameEn', 'description', 'organizationId', 'createdById', 'isDefault', 'isSystem', 'specs', 'createdAt', 'updatedAt'])
+
+export type SpecificationTemplateScalarFieldEnum = z.infer<typeof SpecificationTemplateScalarFieldEnumSchema>;
 
 // File: MEPItemScalarFieldEnum.schema.ts
 
@@ -1520,6 +1526,7 @@ export const FinishingItemSchema = z.object({
   qualityLevel: z.string().nullish(),
   brand: z.string().nullish(),
   specifications: z.string().nullish(),
+  specData: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
   wastagePercent: z.instanceof(Prisma.Decimal, {
   message: "Field 'wastagePercent' must be a Decimal. Location: ['Models', 'FinishingItem']",
 }).nullish(),
@@ -1544,6 +1551,25 @@ export const FinishingItemSchema = z.object({
 });
 
 export type FinishingItemType = z.infer<typeof FinishingItemSchema>;
+
+
+// File: SpecificationTemplate.schema.ts
+
+export const SpecificationTemplateSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  nameEn: z.string().nullish(),
+  description: z.string().nullish(),
+  organizationId: z.string(),
+  createdById: z.string(),
+  isDefault: z.boolean(),
+  isSystem: z.boolean(),
+  specs: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10"),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type SpecificationTemplateType = z.infer<typeof SpecificationTemplateSchema>;
 
 
 // File: MEPItem.schema.ts

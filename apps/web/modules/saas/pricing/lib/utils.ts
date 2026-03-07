@@ -115,6 +115,67 @@ export function numberToArabicWords(num: number): string {
 export { cn } from "@ui/lib";
 
 // ═══════════════════════════════════════════════════════════════
+// Unit & Scope Label Utilities
+// ═══════════════════════════════════════════════════════════════
+
+const UNIT_LABELS: Record<string, string> = {
+	m2: "م²",
+	m: "م.ط",
+	unit: "عدد",
+	set: "طقم",
+	piece: "عدد",
+	lump_sum: "مقطوعية",
+};
+
+export function getUnitLabel(unit: string): string {
+	return UNIT_LABELS[unit] ?? unit;
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// Category Mapping Utilities
+// ═══════════════════════════════════════════════════════════════
+
+const DERIVED_TO_CATALOG_MAP: Record<string, string> = {
+	waterproofing_foundations: "FINISHING_WATERPROOFING",
+	waterproofing_bathrooms: "FINISHING_WATERPROOFING",
+	waterproofing_roof: "FINISHING_WATERPROOFING",
+	thermal_walls: "FINISHING_THERMAL_INSULATION",
+	thermal_roof: "FINISHING_THERMAL_INSULATION",
+	internal_plaster: "FINISHING_INTERNAL_PLASTER",
+	external_plaster: "FINISHING_EXTERNAL_PLASTER",
+	interior_paint: "FINISHING_INTERIOR_PAINT",
+	facade_paint: "FINISHING_FACADE_PAINT",
+	boundary_paint: "FINISHING_BOUNDARY_PAINT",
+	flooring: "FINISHING_FLOOR_TILES",
+	wall_tiles_bathroom: "FINISHING_WALL_TILES",
+	wall_tiles_kitchen: "FINISHING_WALL_TILES",
+	false_ceiling: "FINISHING_FALSE_CEILING",
+	interior_doors: "FINISHING_INTERIOR_DOORS",
+	exterior_doors: "FINISHING_EXTERIOR_DOORS",
+	windows: "FINISHING_WINDOWS",
+	bathroom_fixtures: "FINISHING_BATHROOMS",
+	vanities: "FINISHING_MARBLE_VANITIES",
+	kitchen_cabinets: "FINISHING_KITCHEN",
+	internal_stairs: "FINISHING_INTERNAL_STAIRS",
+	external_stairs: "FINISHING_EXTERNAL_STAIRS",
+	railings: "FINISHING_RAILINGS",
+	stone_facade: "FINISHING_STONE_FACADE",
+	facade_decor: "FINISHING_FACADE_DECOR",
+	yard_paving: "FINISHING_YARD_PAVING",
+	fence_gates: "FINISHING_FENCE_GATES",
+	landscaping: "FINISHING_LANDSCAPING",
+	roof_finishing: "FINISHING_ROOF",
+	interior_decor: "FINISHING_INTERIOR_DECOR",
+};
+
+export function mapToCatalogCategory(key: string): string {
+	if (key.startsWith("FINISHING_")) return key;
+	const base = key.replace(/_[a-z0-9-]+$/, "");
+	return DERIVED_TO_CATALOG_MAP[base] ?? DERIVED_TO_CATALOG_MAP[key] ?? key;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // Rebar Calculation Utilities
 // ═══════════════════════════════════════════════════════════════
 

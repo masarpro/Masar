@@ -5,7 +5,7 @@ import { Card } from "@ui/components/card";
 import { Lightbulb, Sparkles, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { DerivedQuantity } from "../../lib/smart-building-types";
-import { formatNumber } from "../../lib/utils";
+import { formatNumber, getUnitLabel } from "../../lib/utils";
 
 interface KnowledgeNotificationProps {
 	notification: string;
@@ -135,12 +135,3 @@ function getItemLabel(
 	return name;
 }
 
-function getUnitLabel(unit: string): string {
-	const labels: Record<string, string> = {
-		m2: "م²",
-		m: "م.ط",
-		unit: "عدد",
-		set: "طقم",
-	};
-	return labels[unit] ?? unit;
-}

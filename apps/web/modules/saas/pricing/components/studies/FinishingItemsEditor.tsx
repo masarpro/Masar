@@ -107,6 +107,7 @@ export function FinishingItemsEditor({
 				string,
 				unknown
 			> | null,
+			specData: item.specData ?? undefined,
 		}),
 	);
 
