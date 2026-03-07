@@ -182,7 +182,6 @@ export function PaintItemDialog({
 	const isFacade = paintCategory === "facade";
 	const isBoundary = paintCategory === "boundary";
 	const showCeiling = isInterior;
-	const showPlasterLink = isInterior;
 	const showDoorsWindows = !isBoundary;
 
 	const floors = buildingConfig?.floors ?? [];
@@ -233,19 +232,26 @@ export function PaintItemDialog({
 		[floors, floorId],
 	);
 
-	// Find matching plaster item for the selected floor
-	const plasterItemForFloor = useMemo(() => {
-		if (!allStudyItems || !floorId || !showPlasterLink) return null;
-		const items = allStudyItems.filter(
-			(i) =>
-				i.category === "FINISHING_INTERNAL_PLASTER" &&
-				i.floorId === floorId,
-		);
+	// Find matching plaster items to import from
+	// Interior: internal plaster for the same floor
+	// Facade/Boundary: external plaster (no floor filter)
+	const matchingPlasterItem = useMemo(() => {
+		if (!allStudyItems) return null;
+		const plasterCategory = isInterior
+			? "FINISHING_INTERNAL_PLASTER"
+			: "FINISHING_EXTERNAL_PLASTER";
+
+		const items = allStudyItems.filter((i) => {
+			if (i.category !== plasterCategory) return false;
+			if (isInterior) return i.floorId === floorId;
+			return true;
+		});
+
 		if (items.length === 0) return null;
 		const totalArea = items.reduce((s, i) => s + (i.area ?? i.quantity ?? 0), 0);
 		const firstCd = items[0].calculationData as Record<string, unknown> | undefined;
 		return { totalArea, calculationData: firstCd };
-	}, [allStudyItems, floorId, showPlasterLink]);
+	}, [allStudyItems, floorId, isInterior]);
 
 	// ─── Reset form on open ─────────────────────────────
 	useEffect(() => {
@@ -368,8 +374,8 @@ export function PaintItemDialog({
 
 	// ─── Import from plaster ────────────────────────────
 	const handleImportFromPlaster = useCallback(() => {
-		if (!plasterItemForFloor?.calculationData) return;
-		const cd = plasterItemForFloor.calculationData;
+		if (!matchingPlasterItem?.calculationData) return;
+		const cd = matchingPlasterItem.calculationData;
 
 		const cdRooms = cd.rooms as RoomEntry[] | undefined;
 		if (cdRooms?.length) {
@@ -395,7 +401,7 @@ export function PaintItemDialog({
 		}
 
 		setLinkedToPlaster(true);
-	}, [plasterItemForFloor]);
+	}, [matchingPlasterItem]);
 
 	const handleUnlinkPlaster = useCallback(() => {
 		setLinkedToPlaster(false);
@@ -827,8 +833,8 @@ export function PaintItemDialog({
 						</div>
 					</div>
 
-					{/* 6. Link to plaster (interior only) */}
-					{showPlasterLink && plasterItemForFloor && (
+					{/* 6. Link to plaster — works for all categories */}
+					{matchingPlasterItem && (
 						<div className="rounded-lg border p-3">
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-2">
@@ -865,7 +871,7 @@ export function PaintItemDialog({
 								</Badge>
 							)}
 							<p className="text-xs text-muted-foreground mt-1">
-								{t("plasterArea")}: {plasterItemForFloor.totalArea.toFixed(2)} م²
+								{t("plasterArea")}: {matchingPlasterItem.totalArea.toFixed(2)} م²
 							</p>
 						</div>
 					)}
