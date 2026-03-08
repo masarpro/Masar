@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useMemo, useState } from "react";
-import { aggregateAllSubItems } from "../../../lib/specs/spec-calculator";
+import { aggregateAllSubItems, enrichSpecWithSellingUnits } from "../../../lib/specs/spec-calculator";
 import type {
 	AggregatedMaterial,
 	ItemSpecification,
@@ -40,10 +40,12 @@ export function BillOfMaterials({ items }: BillOfMaterialsProps) {
 		[items],
 	);
 
-	// Extract ItemSpecification[] from items
+	// Extract ItemSpecification[] from items, enriching with selling units for old data
 	const specs = useMemo(
 		() =>
-			specItems.map((i) => i.specData as ItemSpecification),
+			specItems.map((i) =>
+				enrichSpecWithSellingUnits(i.specData as ItemSpecification),
+			),
 		[specItems],
 	);
 
@@ -194,9 +196,10 @@ function ByItemView({
 						{/* Items */}
 						{!isCollapsed &&
 							group.items.map((item) => {
-								const spec =
+								const rawSpec =
 									item.specData as ItemSpecification;
-								if (!spec?.subItems?.length) return null;
+								if (!rawSpec?.subItems?.length) return null;
+								const spec = enrichSpecWithSellingUnits(rawSpec);
 
 								const unitLabel = getUnitLabel(item.unit);
 

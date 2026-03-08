@@ -187,6 +187,28 @@ export function buildItemSpec(
 }
 
 /**
+ * Enriches an ItemSpecification's subItems with selling unit data.
+ * Used for specs loaded from DB that were saved before selling units existed.
+ */
+export function enrichSpecWithSellingUnits(
+	spec: ItemSpecification,
+): ItemSpecification {
+	const enrichedSubItems = spec.subItems.map((sub) => {
+		if (sub.sellingUnit != null) return sub;
+		const sellingConfig = getSellingUnit(sub.id);
+		if (!sellingConfig) return sub;
+		return {
+			...sub,
+			sellingUnit: sellingConfig.unit,
+			sellingUnitEn: sellingConfig.unitEn,
+			sellingUnitSize: sellingConfig.size,
+			sellingQuantity: calcSellingQuantity(sub.quantity, sellingConfig.size),
+		};
+	});
+	return { ...spec, subItems: enrichedSubItems };
+}
+
+/**
  * Applies a specification template to a list of items, returning ItemSpecification[].
  */
 export function applyTemplate(
