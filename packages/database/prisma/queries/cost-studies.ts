@@ -272,14 +272,35 @@ export async function duplicateCostStudy(
 				data: original.mepItems.map((item) => ({
 					costStudyId: newStudy.id,
 					category: item.category,
+					subCategory: item.subCategory,
 					itemType: item.itemType,
 					name: item.name,
-					description: item.description,
+					floorId: item.floorId,
+					floorName: item.floorName,
+					roomId: item.roomId,
+					roomName: item.roomName,
+					scope: item.scope,
 					quantity: item.quantity,
 					unit: item.unit,
+					length: item.length,
+					area: item.area,
+					calculationMethod: item.calculationMethod,
+					calculationData: item.calculationData ?? undefined,
+					dataSource: item.dataSource,
+					sourceFormula: item.sourceFormula,
+					groupKey: item.groupKey,
+					specifications: item.specifications,
+					specData: item.specData ?? undefined,
+					qualityLevel: item.qualityLevel,
+					materialPrice: item.materialPrice,
+					laborPrice: item.laborPrice,
+					wastagePercent: item.wastagePercent,
+					materialCost: item.materialCost,
+					laborCost: item.laborCost,
 					unitPrice: item.unitPrice,
 					totalCost: item.totalCost,
 					sortOrder: item.sortOrder,
+					isEnabled: item.isEnabled,
 				})),
 			});
 		}
@@ -324,7 +345,7 @@ export async function recalculateCostStudyTotals(id: string) {
 			_sum: { totalCost: true },
 		}),
 		db.mEPItem.aggregate({
-			where: { costStudyId: id },
+			where: { costStudyId: id, isEnabled: true },
 			_sum: { totalCost: true },
 		}),
 		db.laborItem.aggregate({
@@ -772,25 +793,76 @@ export async function batchUpdateFinishingItems(
 export async function createMEPItem(data: {
 	costStudyId: string;
 	category: string;
-	itemType: string;
+	subCategory?: string;
+	itemType?: string | null;
 	name: string;
-	description?: string;
-	quantity: number;
-	unit: string;
-	unitPrice?: number;
-	totalCost?: number;
+	floorId?: string | null;
+	floorName?: string | null;
+	roomId?: string | null;
+	roomName?: string | null;
+	scope?: string;
+	quantity?: number;
+	unit?: string;
+	length?: number | null;
+	area?: number | null;
+	calculationMethod?: string;
+	calculationData?: any;
+	dataSource?: string;
+	sourceFormula?: string | null;
+	groupKey?: string | null;
+	specifications?: string | null;
+	specData?: any;
+	qualityLevel?: string | null;
+	materialPrice?: number;
+	laborPrice?: number;
+	wastagePercent?: number;
+	isEnabled?: boolean;
+	sortOrder?: number;
 }) {
+	const quantity = data.quantity ?? 0;
+	const materialPrice = data.materialPrice ?? 0;
+	const laborPrice = data.laborPrice ?? 0;
+	const wastagePercent = data.wastagePercent ?? 10;
+	const wastageMultiplier = 1 + wastagePercent / 100;
+
+	const materialCost = quantity * materialPrice * wastageMultiplier;
+	const laborCost = quantity * laborPrice;
+	const unitPrice = materialPrice + laborPrice;
+	const totalCost = materialCost + laborCost;
+
 	const item = await db.mEPItem.create({
 		data: {
 			costStudyId: data.costStudyId,
 			category: data.category,
+			subCategory: data.subCategory ?? "general",
 			itemType: data.itemType,
 			name: data.name,
-			description: data.description,
-			quantity: data.quantity,
-			unit: data.unit,
-			unitPrice: data.unitPrice ?? 0,
-			totalCost: data.totalCost ?? 0,
+			floorId: data.floorId,
+			floorName: data.floorName,
+			roomId: data.roomId,
+			roomName: data.roomName,
+			scope: data.scope ?? "per_room",
+			quantity,
+			unit: data.unit ?? "عدد",
+			length: data.length,
+			area: data.area,
+			calculationMethod: data.calculationMethod ?? "manual",
+			calculationData: data.calculationData,
+			dataSource: data.dataSource ?? "manual",
+			sourceFormula: data.sourceFormula,
+			groupKey: data.groupKey,
+			specifications: data.specifications,
+			specData: data.specData,
+			qualityLevel: data.qualityLevel,
+			materialPrice,
+			laborPrice,
+			wastagePercent,
+			materialCost,
+			laborCost,
+			unitPrice,
+			totalCost,
+			isEnabled: data.isEnabled ?? true,
+			sortOrder: data.sortOrder ?? 0,
 		},
 	});
 
@@ -803,38 +875,181 @@ export async function createMEPItemsBatch(
 	costStudyId: string,
 	items: Array<{
 		category: string;
-		itemType: string;
+		subCategory?: string;
+		itemType?: string | null;
 		name: string;
-		description?: string;
-		quantity: number;
-		unit: string;
-		unitPrice?: number;
-		totalCost?: number;
+		floorId?: string | null;
+		floorName?: string | null;
+		roomId?: string | null;
+		roomName?: string | null;
+		scope?: string;
+		quantity?: number;
+		unit?: string;
+		length?: number | null;
+		area?: number | null;
+		calculationMethod?: string;
+		calculationData?: any;
+		dataSource?: string;
+		sourceFormula?: string | null;
+		groupKey?: string | null;
+		specifications?: string | null;
+		specData?: any;
+		qualityLevel?: string | null;
+		materialPrice?: number;
+		laborPrice?: number;
+		wastagePercent?: number;
+		isEnabled?: boolean;
+		sortOrder?: number;
 	}>,
 ) {
 	await db.mEPItem.createMany({
-		data: items.map((item) => ({
-			costStudyId,
-			category: item.category,
-			itemType: item.itemType,
-			name: item.name,
-			description: item.description,
-			quantity: item.quantity,
-			unit: item.unit,
-			unitPrice: item.unitPrice ?? 0,
-			totalCost: item.totalCost ?? 0,
-		})),
+		data: items.map((item) => {
+			const quantity = item.quantity ?? 0;
+			const materialPrice = item.materialPrice ?? 0;
+			const laborPrice = item.laborPrice ?? 0;
+			const wastagePercent = item.wastagePercent ?? 10;
+			const wastageMultiplier = 1 + wastagePercent / 100;
+
+			const materialCost = quantity * materialPrice * wastageMultiplier;
+			const laborCost = quantity * laborPrice;
+			const unitPrice = materialPrice + laborPrice;
+			const totalCost = materialCost + laborCost;
+
+			return {
+				costStudyId,
+				category: item.category,
+				subCategory: item.subCategory ?? "general",
+				itemType: item.itemType,
+				name: item.name,
+				floorId: item.floorId,
+				floorName: item.floorName,
+				roomId: item.roomId,
+				roomName: item.roomName,
+				scope: item.scope ?? "per_room",
+				quantity,
+				unit: item.unit ?? "عدد",
+				length: item.length,
+				area: item.area,
+				calculationMethod: item.calculationMethod ?? "manual",
+				calculationData: item.calculationData,
+				dataSource: item.dataSource ?? "manual",
+				sourceFormula: item.sourceFormula,
+				groupKey: item.groupKey,
+				specifications: item.specifications,
+				specData: item.specData,
+				qualityLevel: item.qualityLevel,
+				materialPrice,
+				laborPrice,
+				wastagePercent,
+				materialCost,
+				laborCost,
+				unitPrice,
+				totalCost,
+				isEnabled: item.isEnabled ?? true,
+				sortOrder: item.sortOrder ?? 0,
+			};
+		}),
 	});
 
 	await recalculateCostStudyTotals(costStudyId);
 }
 
+export async function updateMEPItem(
+	id: string,
+	costStudyId: string,
+	data: {
+		category?: string;
+		subCategory?: string;
+		itemType?: string | null;
+		name?: string;
+		floorId?: string | null;
+		floorName?: string | null;
+		roomId?: string | null;
+		roomName?: string | null;
+		scope?: string;
+		quantity?: number;
+		unit?: string;
+		length?: number | null;
+		area?: number | null;
+		calculationMethod?: string;
+		calculationData?: any;
+		dataSource?: string;
+		sourceFormula?: string | null;
+		groupKey?: string | null;
+		specifications?: string | null;
+		specData?: any;
+		qualityLevel?: string | null;
+		materialPrice?: number;
+		laborPrice?: number;
+		wastagePercent?: number;
+		isEnabled?: boolean;
+		sortOrder?: number;
+	},
+) {
+	// حساب التكاليف
+	const quantity = data.quantity ?? 0;
+	const materialPrice = data.materialPrice ?? 0;
+	const laborPrice = data.laborPrice ?? 0;
+	const wastagePercent = data.wastagePercent ?? 10;
+	const wastageMultiplier = 1 + wastagePercent / 100;
+
+	const materialCost = quantity * materialPrice * wastageMultiplier;
+	const laborCost = quantity * laborPrice;
+	const unitPrice = materialPrice + laborPrice;
+	const totalCost = materialCost + laborCost;
+
+	// إذا عدّل المستخدم بند auto → يتحول لـ manual
+	const dataSource =
+		data.dataSource === "auto" && data.quantity !== undefined
+			? "manual"
+			: data.dataSource;
+
+	const item = await db.mEPItem.update({
+		where: { id },
+		data: {
+			...data,
+			dataSource: dataSource ?? undefined,
+			materialCost,
+			laborCost,
+			unitPrice,
+			totalCost,
+		},
+	});
+
+	await recalculateCostStudyTotals(costStudyId);
+	return item;
+}
+
 export async function deleteMEPItem(id: string, costStudyId: string) {
-	await db.mEPItem.delete({
+	const item = await db.mEPItem.delete({
 		where: { id },
 	});
 
 	await recalculateCostStudyTotals(costStudyId);
+	return item;
+}
+
+export async function toggleMEPItemEnabled(
+	id: string,
+	costStudyId: string,
+	isEnabled: boolean,
+) {
+	const item = await db.mEPItem.update({
+		where: { id },
+		data: { isEnabled },
+	});
+
+	await recalculateCostStudyTotals(costStudyId);
+	return item;
+}
+
+export async function deleteAutoMEPItems(costStudyId: string) {
+	return db.mEPItem.deleteMany({
+		where: {
+			costStudyId,
+			dataSource: "auto",
+		},
+	});
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

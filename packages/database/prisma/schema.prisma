@@ -1316,25 +1316,60 @@ model SpecificationTemplate {
 
 // بنود أعمال الكهرباء والسباكة والتكييف
 model MEPItem {
-  id          String    @id @default(cuid())
-  costStudyId String    @map("cost_study_id")
-  costStudy   CostStudy @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
+  id              String   @id @default(cuid())
+  costStudyId     String   @map("cost_study_id")
+  costStudy       CostStudy @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
 
-  category    String
-  itemType    String    @map("item_type")
-  name        String
-  description String?   @db.Text
+  // ─── التصنيف (Classification) ───
+  category        String    // ELECTRICAL | PLUMBING | HVAC | FIREFIGHTING | LOW_CURRENT | SPECIAL
+  subCategory     String    @default("general") @map("sub_category")
+  itemType        String?   @map("item_type")
+  name            String
 
-  quantity  Decimal @default(0) @db.Decimal(15, 4)
-  unit      String
-  unitPrice Decimal @default(0) @map("unit_price") @db.Decimal(15, 2)
-  totalCost Decimal @default(0) @map("total_cost") @db.Decimal(15, 2)
+  // ─── الموقع (Location) ───
+  floorId         String?   @map("floor_id")
+  floorName       String?   @map("floor_name")
+  roomId          String?   @map("room_id")
+  roomName        String?   @map("room_name")
+  scope           String    @default("per_room")
 
-  sortOrder Int      @default(0) @map("sort_order")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  // ─── الكميات والأبعاد (Quantities) ───
+  quantity        Decimal   @default(0) @db.Decimal(15, 2)
+  unit            String    @default("عدد")
+  length          Decimal?  @db.Decimal(15, 2)
+  area            Decimal?  @db.Decimal(15, 2)
+
+  // ─── الحساب الذكي (Smart Calculation) ───
+  calculationMethod  String   @default("manual") @map("calculation_method")
+  calculationData    Json?    @map("calculation_data")
+  dataSource         String   @default("manual") @map("data_source")
+  sourceFormula      String?  @map("source_formula")
+  groupKey           String?  @map("group_key")
+
+  // ─── المواصفات (Specifications) ───
+  specifications  String?
+  specData        Json?     @map("spec_data")
+  qualityLevel    String?   @map("quality_level")
+
+  // ─── التكاليف (Costs) ───
+  materialPrice   Decimal   @default(0) @map("material_price") @db.Decimal(15, 2)
+  laborPrice      Decimal   @default(0) @map("labor_price") @db.Decimal(15, 2)
+  wastagePercent  Decimal   @default(10) @map("wastage_percent") @db.Decimal(5, 2)
+  materialCost    Decimal   @default(0) @map("material_cost") @db.Decimal(15, 2)
+  laborCost       Decimal   @default(0) @map("labor_cost") @db.Decimal(15, 2)
+  unitPrice       Decimal   @default(0) @map("unit_price") @db.Decimal(15, 2)
+  totalCost       Decimal   @default(0) @map("total_cost") @db.Decimal(15, 2)
+
+  // ─── التحكم (Control) ───
+  sortOrder       Int       @default(0) @map("sort_order")
+  isEnabled       Boolean   @default(true) @map("is_enabled")
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
 
   @@index([costStudyId])
+  @@index([costStudyId, category])
+  @@index([costStudyId, dataSource])
   @@map("mep_items")
 }
 

@@ -69,6 +69,13 @@ export const getById = protectedProcedure
 			mepItems: costStudy.mepItems.map((item) => ({
 				...item,
 				quantity: Number(item.quantity),
+				length: item.length != null ? Number(item.length) : null,
+				area: item.area != null ? Number(item.area) : null,
+				materialPrice: Number(item.materialPrice),
+				laborPrice: Number(item.laborPrice),
+				wastagePercent: Number(item.wastagePercent),
+				materialCost: Number(item.materialCost),
+				laborCost: Number(item.laborCost),
 				unitPrice: Number(item.unitPrice),
 				totalCost: Number(item.totalCost),
 			})),

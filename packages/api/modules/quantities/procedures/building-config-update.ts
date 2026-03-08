@@ -4,6 +4,8 @@ import {
 	getCostStudyById,
 	getFinishingItemsForCascade,
 	batchUpdateFinishingItems,
+	deleteAutoMEPItems,
+	recalculateCostStudyTotals,
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
@@ -226,9 +228,22 @@ export const buildingConfigUpdate = subscriptionProcedure
 			// Cascade update is best-effort; building config save should still succeed
 		}
 
+		// ─── MEP Cascade: حذف البنود التلقائية لإعادة اشتقاقها من الـ frontend ───
+		let mepDeletedCount = 0;
+		try {
+			const result = await deleteAutoMEPItems(input.costStudyId);
+			mepDeletedCount = result.count;
+			if (mepDeletedCount > 0) {
+				await recalculateCostStudyTotals(input.costStudyId);
+			}
+		} catch {
+			// MEP cascade is best-effort
+		}
+
 		return {
 			success: true,
 			buildingConfig: updated.buildingConfig,
 			cascadeUpdatedCount: updatedCount,
+			mepDeletedCount,
 		};
 	});

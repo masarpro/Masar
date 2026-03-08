@@ -1,14 +1,18 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@ui/components/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
-import { ArrowLeft, Plus } from "lucide-react";
-import Link from "next/link";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { formatCurrency } from "../../lib/utils";
+import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
+import type { SmartBuildingConfig } from "../../lib/smart-building-types";
+import { deriveMEPQuantities } from "../../lib/mep-derivation-engine";
+import { mergeMEPQuantities } from "../../lib/mep-merge";
+import type { MEPMergedItem } from "../../types/mep";
+import { MEPBuildingRequired } from "../mep/MEPBuildingRequired";
+import { MEPDashboard } from "../mep/MEPDashboard";
+import { MEPItemDialog } from "../mep/MEPItemDialog";
 
 interface MEPItemsEditorProps {
 	organizationId: string;
@@ -16,19 +20,16 @@ interface MEPItemsEditorProps {
 	studyId: string;
 }
 
-const MEP_CATEGORIES = [
-	{ key: "electrical", icon: "⚡" },
-	{ key: "plumbing", icon: "🚿" },
-	{ key: "hvac", icon: "❄️" },
-];
-
 export function MEPItemsEditor({
 	organizationId,
 	organizationSlug,
 	studyId,
 }: MEPItemsEditorProps) {
 	const t = useTranslations();
-	const basePath = `/app/${organizationSlug}/pricing/studies/${studyId}`;
+	const queryClient = useQueryClient();
+	const [isRederiving, setIsRederiving] = useState(false);
+	const [editingItem, setEditingItem] = useState<MEPMergedItem | null>(null);
+	const [editDialogOpen, setEditDialogOpen] = useState(false);
 
 	const { data: study, isLoading } = useQuery(
 		orpc.pricing.studies.getById.queryOptions({
@@ -39,6 +40,183 @@ export function MEPItemsEditor({
 		}),
 	);
 
+	// ─── Mutations ───
+	const toggleMutation = useMutation(
+		orpc.pricing.studies.mepItem.toggleEnabled.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: [["pricing", "studies", "getById"]],
+				});
+			},
+		}),
+	);
+
+	const createBatchMutation = useMutation(
+		orpc.pricing.studies.mepItem.createBatch.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: [["pricing", "studies", "getById"]],
+				});
+			},
+		}),
+	);
+
+	const createSingleMutation = useMutation(
+		orpc.pricing.studies.mepItem.create.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: [["pricing", "studies", "getById"]],
+				});
+				toast.success("تم إضافة البند بنجاح");
+			},
+			onError: () => {
+				toast.error("حدث خطأ أثناء إضافة البند");
+			},
+		}),
+	);
+
+	// ─── Derived + Merged items ───
+	const buildingConfig = study?.buildingConfig as SmartBuildingConfig | null;
+
+	const derived = useMemo(() => {
+		if (!buildingConfig?.floors?.length) return [];
+		return deriveMEPQuantities(
+			buildingConfig,
+			(study as any)?.projectType || "RESIDENTIAL",
+		);
+	}, [buildingConfig, study]);
+
+	const savedItems = useMemo(() => {
+		if (!study?.mepItems) return [];
+		return study.mepItems.map((item) => ({
+			...item,
+			quantity: Number(item.quantity),
+			materialPrice: Number(item.materialPrice),
+			laborPrice: Number(item.laborPrice),
+			wastagePercent: Number(item.wastagePercent),
+			materialCost: Number(item.materialCost),
+			laborCost: Number(item.laborCost),
+			totalCost: Number(item.totalCost),
+			itemType: item.itemType ?? null,
+			calculationData:
+				(item.calculationData as Record<string, any> | null) ?? null,
+			specData:
+				(item.specData as Record<string, any> | null) ?? null,
+		}));
+	}, [study?.mepItems]);
+
+	const merged = useMemo(
+		() => mergeMEPQuantities(derived, savedItems),
+		[derived, savedItems],
+	);
+
+	// ─── Handlers ───
+	const handleToggleEnabled = useCallback(
+		(item: MEPMergedItem, enabled: boolean) => {
+			if (!item.id) {
+				toast.error("لا يمكن تعديل بند غير محفوظ");
+				return;
+			}
+			toggleMutation.mutate({
+				id: item.id,
+				costStudyId: studyId,
+				organizationId,
+				isEnabled: enabled,
+			});
+		},
+		[toggleMutation, studyId, organizationId],
+	);
+
+	const handleEdit = useCallback((item: MEPMergedItem) => {
+		setEditingItem(item);
+		setEditDialogOpen(true);
+	}, []);
+
+	const handleAddManual = useCallback(
+		(item: {
+			category: string;
+			subCategory: string;
+			name: string;
+			quantity: number;
+			unit: string;
+			materialPrice: number;
+			laborPrice: number;
+		}) => {
+			createSingleMutation.mutate({
+				organizationId,
+				costStudyId: studyId,
+				category: item.category,
+				subCategory: item.subCategory,
+				name: item.name,
+				quantity: item.quantity,
+				unit: item.unit,
+				materialPrice: item.materialPrice,
+				laborPrice: item.laborPrice,
+				wastagePercent: 10,
+				calculationMethod: "manual",
+				dataSource: "manual",
+				isEnabled: true,
+			});
+		},
+		[createSingleMutation, organizationId, studyId],
+	);
+
+	const handleRederive = useCallback(async () => {
+		if (!buildingConfig?.floors?.length) return;
+
+		setIsRederiving(true);
+		try {
+			// Find new items that haven't been saved yet
+			const newItems = merged.filter((i) => i.isNew && !i.isSaved);
+
+			if (newItems.length === 0) {
+				toast.info("جميع البنود محفوظة بالفعل");
+				setIsRederiving(false);
+				return;
+			}
+
+			await createBatchMutation.mutateAsync({
+				organizationId,
+				costStudyId: studyId,
+				items: newItems.map((item) => ({
+					category: item.category,
+					subCategory: item.subCategory,
+					itemType: item.itemType || undefined,
+					name: item.name,
+					floorId: item.floorId,
+					floorName: item.floorName,
+					roomId: item.roomId,
+					roomName: item.roomName,
+					scope: item.scope,
+					quantity: item.quantity,
+					unit: item.unit,
+					materialPrice: item.materialPrice,
+					laborPrice: item.laborPrice,
+					wastagePercent: item.wastagePercent,
+					calculationMethod: "auto_derived",
+					dataSource: "auto",
+					sourceFormula: item.sourceFormula,
+					groupKey: item.groupKey,
+					qualityLevel: item.qualityLevel,
+					isEnabled: true,
+				})),
+			});
+
+			toast.success(`تم حفظ ${newItems.length} بند جديد`);
+		} catch {
+			toast.error("حدث خطأ أثناء حفظ البنود");
+		} finally {
+			setIsRederiving(false);
+		}
+	}, [
+		buildingConfig,
+		merged,
+		createBatchMutation,
+		organizationId,
+		studyId,
+	]);
+
+	// ─── Loading / Not Found ───
 	if (isLoading) {
 		return <StudyEditorSkeleton />;
 	}
@@ -46,117 +224,45 @@ export function MEPItemsEditor({
 	if (!study) {
 		return (
 			<div className="text-center py-12">
-				<p className="text-muted-foreground">{t("pricing.studies.notFound")}</p>
+				<p className="text-muted-foreground">
+					{t("pricing.studies.notFound")}
+				</p>
 			</div>
 		);
 	}
 
-	// Group items by category
-	const itemsByCategory = MEP_CATEGORIES.map((cat) => ({
-		...cat,
-		items: study.mepItems.filter((item) => item.category === cat.key),
-		totalCost: study.mepItems
-			.filter((item) => item.category === cat.key)
-			.reduce((sum, item) => sum + item.totalCost, 0),
-	}));
+	// ─── No Building Config ───
+	if (!buildingConfig?.floors?.length) {
+		return (
+			<MEPBuildingRequired
+				studyId={studyId}
+				organizationSlug={organizationSlug}
+			/>
+		);
+	}
 
+	// ─── Check for new unsaved items (cascade notification) ───
+	const hasNewItems = merged.some((i) => i.isNew && !i.isSaved);
+
+	// ─── Main Dashboard ───
 	return (
-		<div className="space-y-6">
-			<div className="flex items-center gap-4">
-				<Button variant="ghost" size="icon" asChild>
-					<Link href={basePath}>
-						<ArrowLeft className="h-4 w-4" />
-					</Link>
-				</Button>
-			</div>
-
-			{/* Summary */}
-			<Card>
-				<CardContent className="pt-6">
-					<div className="grid gap-4 sm:grid-cols-3">
-						<div>
-							<p className="text-sm text-muted-foreground">
-								{t("pricing.studies.totalItems")}
-							</p>
-							<p className="text-2xl font-bold">{study.mepItems.length}</p>
-						</div>
-						<div>
-							<p className="text-sm text-muted-foreground">
-								{t("pricing.studies.categories")}
-							</p>
-							<p className="text-2xl font-bold">
-								{new Set(study.mepItems.map((item) => item.category)).size}
-							</p>
-						</div>
-						<div>
-							<p className="text-sm text-muted-foreground">
-								{t("pricing.studies.totalCost")}
-							</p>
-							<p className="text-2xl font-bold">
-								{formatCurrency(study.mepCost)}
-							</p>
-						</div>
-					</div>
-				</CardContent>
-			</Card>
-
-			{/* Categories */}
-			<div className="grid gap-4 sm:grid-cols-3">
-				{itemsByCategory.map((category) => (
-					<Card key={category.key}>
-						<CardHeader className="pb-2">
-							<CardTitle className="flex items-center justify-between text-base">
-								<span className="flex items-center gap-2">
-									<span>{category.icon}</span>
-									{t(`pricing.studies.mep.${category.key}`)}
-								</span>
-								<Button variant="ghost" size="icon" className="h-8 w-8">
-									<Plus className="h-4 w-4" />
-								</Button>
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<div className="space-y-2">
-								<div className="flex justify-between text-sm">
-									<span className="text-muted-foreground">
-										{t("pricing.studies.items")}
-									</span>
-									<span>{category.items.length}</span>
-								</div>
-								<div className="flex justify-between text-sm">
-									<span className="text-muted-foreground">
-										{t("pricing.studies.totalCost")}
-									</span>
-									<span className="font-medium">
-										{formatCurrency(category.totalCost)}
-									</span>
-								</div>
-							</div>
-
-							{category.items.length > 0 && (
-								<div className="mt-4 space-y-2 border-t pt-4">
-									{category.items.slice(0, 3).map((item) => (
-										<div
-											key={item.id}
-											className="flex justify-between text-sm"
-										>
-											<span className="truncate max-w-[60%]">
-												{item.name}
-											</span>
-											<span>{formatCurrency(item.totalCost)}</span>
-										</div>
-									))}
-									{category.items.length > 3 && (
-										<p className="text-xs text-muted-foreground">
-											+{category.items.length - 3} {t("pricing.studies.more")}
-										</p>
-									)}
-								</div>
-							)}
-						</CardContent>
-					</Card>
-				))}
-			</div>
-		</div>
+		<>
+			<MEPDashboard
+				mergedItems={merged}
+				onToggleEnabled={handleToggleEnabled}
+				onEdit={handleEdit}
+				onRederive={handleRederive}
+				isRederiving={isRederiving}
+				onAddManual={handleAddManual}
+				hasNewItems={hasNewItems}
+			/>
+			<MEPItemDialog
+				item={editingItem}
+				studyId={studyId}
+				organizationId={organizationId}
+				open={editDialogOpen}
+				onOpenChange={setEditDialogOpen}
+			/>
+		</>
 	);
 }

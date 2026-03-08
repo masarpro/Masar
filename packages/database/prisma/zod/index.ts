@@ -133,7 +133,7 @@ export type SpecificationTemplateScalarFieldEnum = z.infer<typeof SpecificationT
 
 // File: MEPItemScalarFieldEnum.schema.ts
 
-export const MEPItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'category', 'itemType', 'name', 'description', 'quantity', 'unit', 'unitPrice', 'totalCost', 'sortOrder', 'createdAt', 'updatedAt'])
+export const MEPItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'category', 'subCategory', 'itemType', 'name', 'floorId', 'floorName', 'roomId', 'roomName', 'scope', 'quantity', 'unit', 'length', 'area', 'calculationMethod', 'calculationData', 'dataSource', 'sourceFormula', 'groupKey', 'specifications', 'specData', 'qualityLevel', 'materialPrice', 'laborPrice', 'wastagePercent', 'materialCost', 'laborCost', 'unitPrice', 'totalCost', 'sortOrder', 'isEnabled', 'createdAt', 'updatedAt'])
 
 export type MEPItemScalarFieldEnum = z.infer<typeof MEPItemScalarFieldEnumSchema>;
 
@@ -1578,13 +1578,47 @@ export const MEPItemSchema = z.object({
   id: z.string(),
   costStudyId: z.string(),
   category: z.string(),
-  itemType: z.string(),
+  subCategory: z.string().default("general"),
+  itemType: z.string().nullish(),
   name: z.string(),
-  description: z.string().nullish(),
+  floorId: z.string().nullish(),
+  floorName: z.string().nullish(),
+  roomId: z.string().nullish(),
+  roomName: z.string().nullish(),
+  scope: z.string().default("per_room"),
   quantity: z.instanceof(Prisma.Decimal, {
   message: "Field 'quantity' must be a Decimal. Location: ['Models', 'MEPItem']",
 }),
-  unit: z.string(),
+  unit: z.string().default("عدد"),
+  length: z.instanceof(Prisma.Decimal, {
+  message: "Field 'length' must be a Decimal. Location: ['Models', 'MEPItem']",
+}).nullish(),
+  area: z.instanceof(Prisma.Decimal, {
+  message: "Field 'area' must be a Decimal. Location: ['Models', 'MEPItem']",
+}).nullish(),
+  calculationMethod: z.string().default("manual"),
+  calculationData: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  dataSource: z.string().default("manual"),
+  sourceFormula: z.string().nullish(),
+  groupKey: z.string().nullish(),
+  specifications: z.string().nullish(),
+  specData: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  qualityLevel: z.string().nullish(),
+  materialPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'materialPrice' must be a Decimal. Location: ['Models', 'MEPItem']",
+}),
+  laborPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'laborPrice' must be a Decimal. Location: ['Models', 'MEPItem']",
+}),
+  wastagePercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'wastagePercent' must be a Decimal. Location: ['Models', 'MEPItem']",
+}).default(new Prisma.Decimal(10)),
+  materialCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'materialCost' must be a Decimal. Location: ['Models', 'MEPItem']",
+}),
+  laborCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'laborCost' must be a Decimal. Location: ['Models', 'MEPItem']",
+}),
   unitPrice: z.instanceof(Prisma.Decimal, {
   message: "Field 'unitPrice' must be a Decimal. Location: ['Models', 'MEPItem']",
 }),
@@ -1592,6 +1626,7 @@ export const MEPItemSchema = z.object({
   message: "Field 'totalCost' must be a Decimal. Location: ['Models', 'MEPItem']",
 }),
   sortOrder: z.number().int(),
+  isEnabled: z.boolean().default(true),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

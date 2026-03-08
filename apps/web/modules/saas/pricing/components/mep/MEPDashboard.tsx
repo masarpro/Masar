@@ -1,0 +1,212 @@
+"use client";
+
+import { useMemo } from "react";
+import { Button } from "@ui/components/button";
+import { Card, CardContent } from "@ui/components/card";
+import {
+	RefreshCw,
+	Zap,
+	Droplets,
+	Wind,
+	Flame,
+	Wifi,
+	Settings,
+} from "lucide-react";
+import { formatCurrency } from "../../lib/utils";
+import {
+	MEP_CATEGORIES,
+	MEP_CATEGORY_ORDER,
+} from "../../lib/mep-categories";
+import type { MEPCategoryId, MEPMergedItem } from "../../types/mep";
+import { MEPSummaryBar } from "./MEPSummaryBar";
+import { MEPCategorySection } from "./MEPCategorySection";
+import { MEPManualAdder } from "./MEPManualAdder";
+
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
+	Zap,
+	Droplets,
+	Wind,
+	Flame,
+	Wifi,
+	Settings,
+};
+
+interface MEPDashboardProps {
+	mergedItems: MEPMergedItem[];
+	onToggleEnabled: (item: MEPMergedItem, enabled: boolean) => void;
+	onEdit: (item: MEPMergedItem) => void;
+	onRederive: () => void;
+	isRederiving?: boolean;
+	onAddManual?: (item: {
+		category: string;
+		subCategory: string;
+		name: string;
+		quantity: number;
+		unit: string;
+		materialPrice: number;
+		laborPrice: number;
+	}) => void;
+	hasNewItems?: boolean;
+}
+
+export function MEPDashboard({
+	mergedItems,
+	onToggleEnabled,
+	onEdit,
+	onRederive,
+	isRederiving,
+	onAddManual,
+	hasNewItems,
+}: MEPDashboardProps) {
+	// Group items by category
+	const categoryData = useMemo(() => {
+		const enabledTotal = mergedItems
+			.filter((i) => i.isEnabled)
+			.reduce((s, i) => s + i.totalCost, 0);
+
+		return MEP_CATEGORY_ORDER.map((catId) => {
+			const catItems = mergedItems.filter(
+				(i) => i.category === catId,
+			);
+			const enabledItems = catItems.filter((i) => i.isEnabled);
+			const catCost = enabledItems.reduce(
+				(s, i) => s + i.totalCost,
+				0,
+			);
+			const percentage =
+				enabledTotal > 0
+					? Math.round((catCost / enabledTotal) * 100)
+					: 0;
+
+			return {
+				id: catId,
+				config: MEP_CATEGORIES[catId],
+				items: catItems,
+				enabledCount: enabledItems.length,
+				totalCost: catCost,
+				percentage,
+			};
+		}).filter((c) => c.items.length > 0);
+	}, [mergedItems]);
+
+	return (
+		<div className="space-y-6">
+			{/* Summary Bar */}
+			<MEPSummaryBar items={mergedItems} />
+
+			{/* Cascade notification */}
+			{hasNewItems && (
+				<div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30 px-4 py-3 flex items-center justify-between">
+					<p className="text-sm text-amber-800 dark:text-amber-200">
+						تم تحديث إعدادات المبنى. اضغط حفظ لتحديث بنود MEP.
+					</p>
+					<Button
+						size="sm"
+						variant="outline"
+						onClick={onRederive}
+						disabled={isRederiving}
+						className="border-amber-300 text-amber-800 hover:bg-amber-100 dark:border-amber-800 dark:text-amber-200"
+					>
+						<RefreshCw
+							className={`h-3.5 w-3.5 me-1.5 ${isRederiving ? "animate-spin" : ""}`}
+						/>
+						حفظ البنود الجديدة
+					</Button>
+				</div>
+			)}
+
+			{/* Action buttons */}
+			<div className="flex items-center justify-between">
+				<h2 className="text-lg font-semibold">
+					بنود الأعمال الكهروميكانيكية
+				</h2>
+				<div className="flex items-center gap-2">
+					{onAddManual && (
+						<MEPManualAdder onAdd={onAddManual} />
+					)}
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={onRederive}
+						disabled={isRederiving}
+					>
+						<RefreshCw
+							className={`h-3.5 w-3.5 me-1.5 ${isRederiving ? "animate-spin" : ""}`}
+						/>
+						إعادة اشتقاق
+					</Button>
+				</div>
+			</div>
+
+			{/* Category Cards Overview */}
+			<div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+				{categoryData.map((cat) => {
+					const IconComp =
+						ICON_MAP[cat.config.icon] ?? Settings;
+					return (
+						<Card key={cat.id} className="overflow-hidden">
+							<CardContent className="p-3">
+								<div className="flex items-center gap-2 mb-2">
+									<div
+										className="flex items-center justify-center h-7 w-7 rounded-lg shrink-0"
+										style={{
+											backgroundColor: `${cat.config.color}20`,
+										}}
+									>
+										<IconComp
+											className="h-3.5 w-3.5"
+											style={{
+												color: cat.config.color,
+											}}
+										/>
+									</div>
+									<span className="text-xs font-medium truncate">
+										{cat.config.nameAr}
+									</span>
+								</div>
+								<div className="space-y-1">
+									<p
+										className="text-sm font-bold tabular-nums"
+										dir="ltr"
+									>
+										{formatCurrency(cat.totalCost)}
+									</p>
+									<div className="flex items-center justify-between text-xs text-muted-foreground">
+										<span>
+											{cat.enabledCount} بند
+										</span>
+										<span>{cat.percentage}%</span>
+									</div>
+								</div>
+								{/* Progress bar */}
+								<div className="mt-2 h-1 rounded-full bg-muted overflow-hidden">
+									<div
+										className="h-full rounded-full transition-all"
+										style={{
+											width: `${cat.percentage}%`,
+											backgroundColor:
+												cat.config.color,
+										}}
+									/>
+								</div>
+							</CardContent>
+						</Card>
+					);
+				})}
+			</div>
+
+			{/* Category Sections */}
+			<div className="space-y-4">
+				{categoryData.map((cat) => (
+					<MEPCategorySection
+						key={cat.id}
+						categoryId={cat.id}
+						items={cat.items}
+						onToggleEnabled={onToggleEnabled}
+						onEdit={onEdit}
+					/>
+				))}
+			</div>
+		</div>
+	);
+}

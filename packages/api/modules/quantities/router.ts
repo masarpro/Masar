@@ -14,6 +14,9 @@ import { finishingItemDelete } from "./procedures/finishing-item-delete";
 import { finishingItemReorder } from "./procedures/finishing-item-reorder";
 import { buildingConfigUpdate } from "./procedures/building-config-update";
 import { mepItemCreate, mepItemCreateBatch } from "./procedures/mep-item-create";
+import { mepItemUpdate } from "./procedures/mep-item-update";
+import { mepItemDelete } from "./procedures/mep-item-delete";
+import { mepItemToggle } from "./procedures/mep-item-toggle";
 import { quoteCreate, quoteGetById, quoteUpdate, quoteDelete, quoteList } from "./procedures/quote-create";
 import { specTemplateList } from "./procedures/spec-template-list";
 import { specTemplateCreate } from "./procedures/spec-template-create";
@@ -49,6 +52,9 @@ export const quantitiesRouter = {
 	mepItem: {
 		create: mepItemCreate,
 		createBatch: mepItemCreateBatch,
+		update: mepItemUpdate,
+		delete: mepItemDelete,
+		toggleEnabled: mepItemToggle,
 	},
 	quote: {
 		list: quoteList,

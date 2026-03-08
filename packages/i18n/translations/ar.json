@@ -1852,10 +1852,51 @@
 			},
 			"mep": {
 				"title": "الأعمال الكهروميكانيكية",
+				"subtitle": "الكهرباء والسباكة والتكييف ومكافحة الحريق",
 				"electrical": "الكهرباء",
 				"plumbing": "السباكة",
 				"hvac": "التكييف والتهوية",
-				"description": "إدارة أعمال الكهرباء والسباكة والتكييف"
+				"description": "إدارة أعمال الكهرباء والسباكة والتكييف",
+				"totalCost": "إجمالي تكلفة MEP",
+				"itemCount": "عدد البنود",
+				"enabledCount": "بنود مفعلة",
+				"disabledCount": "بنود معطلة",
+				"rederive": "إعادة اشتقاق",
+				"addManual": "إضافة بند يدوي",
+				"saveAll": "حفظ الكل",
+				"buildingRequired": {
+					"title": "إعدادات المبنى مطلوبة",
+					"description": "لاشتقاق بنود MEP تلقائياً، أنشئ إعدادات المبنى من قسم التشطيبات أولاً",
+					"action": "إنشاء إعدادات المبنى"
+				},
+				"cascade": {
+					"updated": "تم تحديث إعدادات المبنى",
+					"savePrompt": "اضغط حفظ لتحديث بنود MEP"
+				},
+				"item": {
+					"autoDerived": "مشتق تلقائياً",
+					"manual": "يدوي",
+					"estimated": "تقديري",
+					"enabled": "مفعل",
+					"disabled": "معطل",
+					"formula": "المعادلة",
+					"specs": "المواصفات",
+					"edit": "تعديل",
+					"delete": "حذف"
+				},
+				"categories": {
+					"ELECTRICAL": "الأعمال الكهربائية",
+					"PLUMBING": "الأعمال الصحية",
+					"HVAC": "التكييف والتهوية",
+					"FIREFIGHTING": "مكافحة الحريق",
+					"LOW_CURRENT": "التيار الخفيف",
+					"SPECIAL": "أنظمة خاصة"
+				},
+				"quality": {
+					"economy": "اقتصادي",
+					"standard": "متوسط",
+					"premium": "ممتاز"
+				}
 			},
 			"pricing": {
 				"title": "التسعير",
@@ -3032,10 +3073,51 @@
 		},
 		"mep": {
 			"title": "الأعمال الكهروميكانيكية",
+			"subtitle": "الكهرباء والسباكة والتكييف ومكافحة الحريق",
 			"electrical": "الكهرباء",
 			"plumbing": "السباكة",
 			"hvac": "التكييف والتهوية",
-			"description": "إدارة أعمال الكهرباء والسباكة والتكييف"
+			"description": "إدارة أعمال الكهرباء والسباكة والتكييف",
+			"totalCost": "إجمالي تكلفة MEP",
+			"itemCount": "عدد البنود",
+			"enabledCount": "بنود مفعلة",
+			"disabledCount": "بنود معطلة",
+			"rederive": "إعادة اشتقاق",
+			"addManual": "إضافة بند يدوي",
+			"saveAll": "حفظ الكل",
+			"buildingRequired": {
+				"title": "إعدادات المبنى مطلوبة",
+				"description": "لاشتقاق بنود MEP تلقائياً، أنشئ إعدادات المبنى من قسم التشطيبات أولاً",
+				"action": "إنشاء إعدادات المبنى"
+			},
+			"cascade": {
+				"updated": "تم تحديث إعدادات المبنى",
+				"savePrompt": "اضغط حفظ لتحديث بنود MEP"
+			},
+			"item": {
+				"autoDerived": "مشتق تلقائياً",
+				"manual": "يدوي",
+				"estimated": "تقديري",
+				"enabled": "مفعل",
+				"disabled": "معطل",
+				"formula": "المعادلة",
+				"specs": "المواصفات",
+				"edit": "تعديل",
+				"delete": "حذف"
+			},
+			"categories": {
+				"ELECTRICAL": "الأعمال الكهربائية",
+				"PLUMBING": "الأعمال الصحية",
+				"HVAC": "التكييف والتهوية",
+				"FIREFIGHTING": "مكافحة الحريق",
+				"LOW_CURRENT": "التيار الخفيف",
+				"SPECIAL": "أنظمة خاصة"
+			},
+			"quality": {
+				"economy": "اقتصادي",
+				"standard": "متوسط",
+				"premium": "ممتاز"
+			}
 		},
 		"pricing": {
 			"title": "التسعير",
