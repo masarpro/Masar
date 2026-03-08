@@ -231,10 +231,10 @@ function ByItemView({
 										{/* Sub-items table */}
 										<div>
 											{/* Column headers */}
-											<div className="grid grid-cols-[1fr_60px_80px_95px_70px] gap-2 px-7 py-1.5 bg-muted/30 text-xs font-semibold text-muted-foreground uppercase tracking-wide border-b">
+											<div className="grid grid-cols-[1fr_60px_90px_95px_70px] gap-2 px-7 py-1.5 bg-muted/30 text-xs font-semibold text-muted-foreground uppercase tracking-wide border-b">
 												<div>{t("colMaterial")}</div>
 												<div className="text-center">{t("colUnit")}</div>
-												<div className="text-end">{t("colTotal")}</div>
+												<div className="text-center">{t("colTotal")}</div>
 												<div className="text-center">{t("colSellingUnit")}</div>
 												<div className="text-center">{t("colSellingQty")}</div>
 											</div>
@@ -243,7 +243,7 @@ function ByItemView({
 												{spec.subItems.map((sub) => (
 													<div
 														key={sub.id}
-														className="grid grid-cols-[1fr_60px_80px_95px_70px] gap-2 px-7 py-2 text-sm hover:bg-muted/10 transition-colors"
+														className="grid grid-cols-[1fr_60px_90px_95px_70px] gap-2 px-7 py-2 text-sm hover:bg-muted/10 transition-colors"
 													>
 														<div className="flex items-center gap-2">
 															<span className="text-muted-foreground">
@@ -261,7 +261,7 @@ function ByItemView({
 														<div className="text-center text-muted-foreground">
 															{sub.unit}
 														</div>
-														<div className="text-end tabular-nums font-semibold" dir="ltr">
+														<div className="text-center tabular-nums font-semibold" dir="ltr">
 															{formatNumber(
 																sub.quantity,
 																1,
