@@ -1831,7 +1831,9 @@
 					"colMaterial": "Material",
 					"colUnit": "Unit",
 					"colRate": "Rate",
-					"colTotal": "Total"
+					"colTotal": "Total",
+					"colSellingUnit": "Selling Unit",
+					"colSellingQty": "Qty Needed"
 				},
 				"bulk": {
 					"title": "Set Specifications",
@@ -1864,6 +1866,8 @@
 					"colMaterial": "Material",
 					"colUnit": "Unit",
 					"colTotal": "Quantity",
+					"colSellingUnit": "Selling Unit",
+					"colSellingQty": "Qty Needed",
 					"colUsedIn": "Used In",
 					"totalMaterials": "{count} materials total",
 					"exportFilename": "bill_of_materials"

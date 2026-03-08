@@ -25,6 +25,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { CostStudyCard } from "./CostStudyCard";
+import { CreateCostStudyDialog } from "./CreateCostStudyForm";
 import { formatCurrency } from "../../lib/utils";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
@@ -37,6 +38,7 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 	const { activeOrganization } = useActiveOrganization();
 	const [searchTerm, setSearchTerm] = useState("");
 	const [statusFilter, setStatusFilter] = useState<string>("all");
+	const [showCreateDialog, setShowCreateDialog] = useState(false);
 
 	const { data, isLoading, refetch } = useQuery(
 		orpc.pricing.studies.list.queryOptions({
@@ -141,11 +143,9 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 						</SelectContent>
 					</Select>
 				</div>
-				<Button asChild className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors">
-					<Link href={`${basePath}/new`}>
+				<Button onClick={() => setShowCreateDialog(true)} className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors">
 						<Plus className="ml-2 h-4 w-4" />
 						{t("pricing.studies.newStudy")}
-					</Link>
 				</Button>
 			</div>
 
@@ -176,14 +176,18 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 					<p className="text-slate-500 dark:text-slate-400 mt-2 max-w-sm text-sm">
 						{t("pricing.studies.emptyDescription")}
 					</p>
-					<Button asChild className="mt-5 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200">
-						<Link href={`${basePath}/new`}>
+					<Button onClick={() => setShowCreateDialog(true)} className="mt-5 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200">
 							<Plus className="ml-2 h-4 w-4" />
 							{t("pricing.studies.newStudy")}
-						</Link>
 					</Button>
 				</div>
 			)}
+			<CreateCostStudyDialog
+				organizationId={organizationId}
+				organizationSlug={activeOrganization?.slug ?? ""}
+				open={showCreateDialog}
+				onOpenChange={setShowCreateDialog}
+			/>
 		</div>
 	);
 }

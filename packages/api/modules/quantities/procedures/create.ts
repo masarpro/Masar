@@ -17,11 +17,11 @@ export const create = subscriptionProcedure
 			customerName: z.string().optional(),
 			customerId: z.string().optional(),
 			projectType: z.string(),
-			landArea: z.number().positive(),
-			buildingArea: z.number().positive(),
-			numberOfFloors: z.number().int().positive(),
+			landArea: z.number().positive().default(1),
+			buildingArea: z.number().positive().default(1),
+			numberOfFloors: z.number().int().positive().default(1),
 			hasBasement: z.boolean().default(false),
-			finishingLevel: z.string(),
+			finishingLevel: z.string().default("medium"),
 		}),
 	)
 	.handler(async ({ input, context }) => {

@@ -293,6 +293,12 @@ function SubItemsTable({
 						<th className="text-center px-2 py-2 font-semibold text-xs uppercase tracking-wide text-muted-foreground w-24">
 							{t("colTotal")}
 						</th>
+						<th className="text-center px-2 py-2 font-semibold text-xs uppercase tracking-wide text-muted-foreground w-24">
+							{t("colSellingUnit")}
+						</th>
+						<th className="text-center px-2 py-2 font-semibold text-xs uppercase tracking-wide text-muted-foreground w-20">
+							{t("colSellingQty")}
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -317,6 +323,14 @@ function SubItemsTable({
 							</td>
 							<td className="text-center px-2 py-2 font-semibold tabular-nums" dir="ltr">
 								{formatNumber(sub.quantity, 1)}
+							</td>
+							<td className="text-center px-2 py-2 text-xs text-muted-foreground">
+								{sub.sellingUnit ?? "—"}
+							</td>
+							<td className="text-center px-2 py-2 font-semibold tabular-nums text-primary" dir="ltr">
+								{sub.sellingQuantity != null
+									? formatNumber(sub.sellingQuantity, 0)
+									: "—"}
 							</td>
 						</tr>
 					))}

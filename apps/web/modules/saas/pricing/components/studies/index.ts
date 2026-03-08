@@ -1,6 +1,6 @@
 export { QuantitiesList } from "./QuantitiesList";
 export { CostStudyCard } from "./CostStudyCard";
-export { CreateCostStudyForm } from "./CreateCostStudyForm";
+export { CreateCostStudyDialog, CreateCostStudyForm } from "./CreateCostStudyForm";
 export { CostStudyOverview } from "./CostStudyOverview";
 export { StructuralItemsEditor } from "./StructuralItemsEditor";
 export { FinishingItemsEditor } from "./FinishingItemsEditor";

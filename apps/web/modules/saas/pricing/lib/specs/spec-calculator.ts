@@ -6,6 +6,7 @@ import type {
 	SubItemRate,
 } from "./spec-types";
 import { getSpecConfig } from "./catalog";
+import { getSellingUnit, calcSellingQuantity } from "./selling-units";
 
 /**
  * Calculates sub-items for a single finishing item based on its spec and quantity.
@@ -42,6 +43,8 @@ export function calculateSubItems(
 		const adjustedRate = applyRateModifiers(rate, options, categoryKey);
 		const quantity = roundTo(adjustedRate * effectiveQuantity, 2);
 
+		const sellingConfig = getSellingUnit(rate.subItemKey);
+
 		subItems.push({
 			id: rate.subItemKey,
 			name: rate.name,
@@ -52,6 +55,12 @@ export function calculateSubItems(
 			category: rate.category,
 			isOptional: rate.isOptional,
 			brand: (options.brand as string) ?? undefined,
+			sellingUnit: sellingConfig?.unit,
+			sellingUnitEn: sellingConfig?.unitEn,
+			sellingUnitSize: sellingConfig?.size,
+			sellingQuantity: sellingConfig
+				? calcSellingQuantity(quantity, sellingConfig.size)
+				: undefined,
 		});
 	}
 
@@ -225,6 +234,9 @@ export function aggregateAllSubItems(
 			unit: string;
 			totalQuantity: number;
 			usedInItems: Set<string>;
+			sellingUnit?: string;
+			sellingUnitEn?: string;
+			sellingUnitSize?: number;
 		}
 	>();
 
@@ -242,6 +254,9 @@ export function aggregateAllSubItems(
 					unit: sub.unit,
 					totalQuantity: sub.quantity,
 					usedInItems: new Set([spec.specTypeLabel]),
+					sellingUnit: sub.sellingUnit,
+					sellingUnitEn: sub.sellingUnitEn,
+					sellingUnitSize: sub.sellingUnitSize,
 				});
 			}
 		}
@@ -253,6 +268,13 @@ export function aggregateAllSubItems(
 		unit: m.unit,
 		totalQuantity: roundTo(m.totalQuantity, 2),
 		usedInItems: Array.from(m.usedInItems),
+		sellingUnit: m.sellingUnit,
+		sellingUnitEn: m.sellingUnitEn,
+		sellingUnitSize: m.sellingUnitSize,
+		sellingQuantity:
+			m.sellingUnitSize != null
+				? calcSellingQuantity(roundTo(m.totalQuantity, 2), m.sellingUnitSize)
+				: undefined,
 	}));
 }
 

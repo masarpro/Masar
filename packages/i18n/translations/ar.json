@@ -1795,7 +1795,9 @@
 					"colMaterial": "المادة",
 					"colUnit": "الوحدة",
 					"colRate": "المعدل",
-					"colTotal": "الإجمالي"
+					"colTotal": "الإجمالي",
+					"colSellingUnit": "وحدة البيع",
+					"colSellingQty": "العدد المطلوب"
 				},
 				"bulk": {
 					"title": "تحديد المواصفات",
@@ -1828,6 +1830,8 @@
 					"colMaterial": "المادة",
 					"colUnit": "الوحدة",
 					"colTotal": "الكمية",
+					"colSellingUnit": "وحدة البيع",
+					"colSellingQty": "العدد المطلوب",
 					"colUsedIn": "مستخدم في",
 					"totalMaterials": "{count} مادة إجمالاً",
 					"exportFilename": "قائمة_المواد"

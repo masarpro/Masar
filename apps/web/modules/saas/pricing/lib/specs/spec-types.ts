@@ -31,6 +31,14 @@ export interface SpecSubItem {
 	isOptional: boolean;
 	brand?: string;
 	notes?: string;
+	/** Selling unit label in Arabic (e.g. "كيس 50 كجم") */
+	sellingUnit?: string;
+	/** Selling unit label in English (e.g. "50kg bag") */
+	sellingUnitEn?: string;
+	/** Size of one selling unit (e.g. 50 for a 50kg bag) */
+	sellingUnitSize?: number;
+	/** Number of selling units needed = Math.ceil(quantity / sellingUnitSize) */
+	sellingQuantity?: number;
 }
 
 /** Spec catalog config for one finishing category */
@@ -113,4 +121,12 @@ export interface AggregatedMaterial {
 	unit: string;
 	totalQuantity: number;
 	usedInItems: string[];
+	/** Selling unit label (e.g. "كيس 50 كجم") */
+	sellingUnit?: string;
+	/** Selling unit label in English */
+	sellingUnitEn?: string;
+	/** Size of one selling unit */
+	sellingUnitSize?: number;
+	/** Total selling units needed = Math.ceil(totalQuantity / sellingUnitSize) */
+	sellingQuantity?: number;
 }

@@ -8,6 +8,8 @@ import { Calculator, FileSpreadsheet, TrendingUp, Clock } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@ui/components/button";
 import { Plus } from "lucide-react";
+import { useState } from "react";
+import { CreateCostStudyDialog } from "@saas/pricing/components/studies/CreateCostStudyForm";
 
 interface PricingDashboardProps {
 	organizationId: string;
@@ -19,6 +21,7 @@ export function PricingDashboard({
 	organizationSlug,
 }: PricingDashboardProps) {
 	const t = useTranslations();
+	const [showCreateDialog, setShowCreateDialog] = useState(false);
 
 	// Fetch studies list
 	const { data: studiesData } = useQuery(
@@ -124,11 +127,9 @@ export function PricingDashboard({
 									{t("common.viewAll")}
 								</Link>
 							</Button>
-							<Button asChild className="rounded-xl flex-1">
-								<Link href={`${basePath}/studies/new`}>
+							<Button onClick={() => setShowCreateDialog(true)} className="rounded-xl flex-1">
 									<Plus className="h-4 w-4 me-2" />
 									{t("pricing.studies.createStudy")}
-								</Link>
 							</Button>
 						</div>
 					</CardContent>
@@ -158,6 +159,12 @@ export function PricingDashboard({
 					</CardContent>
 				</Card>
 			</div>
+			<CreateCostStudyDialog
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+				open={showCreateDialog}
+				onOpenChange={setShowCreateDialog}
+			/>
 		</div>
 	);
 }
