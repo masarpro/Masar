@@ -2,13 +2,16 @@ import { config } from "@repo/config";
 import { createPurchasesHelper } from "@repo/payments/lib/helper";
 import { getOrganizationList, getSession } from "@saas/auth/lib/server";
 import { autoCreateOrganizationIfNeeded } from "@saas/organizations/lib/auto-create-organization";
-import { orpcClient } from "@shared/lib/orpc-client";
+import { cachedListPurchases } from "@shared/lib/cached-queries";
 import { attemptAsync } from "es-toolkit";
 import { redirect } from "next/navigation";
 import type { PropsWithChildren } from "react";
 
 export default async function Layout({ children }: PropsWithChildren) {
-	const session = await getSession();
+	const [session, organizationsList] = await Promise.all([
+		getSession(),
+		getOrganizationList(),
+	]);
 
 	if (!session) {
 		redirect("/auth/login");
@@ -19,7 +22,7 @@ export default async function Layout({ children }: PropsWithChildren) {
 		redirect("/auth/change-password");
 	}
 
-	let organizations = await getOrganizationList();
+	let organizations = organizationsList;
 
 	// Auto-create organization if enabled and user has no organizations
 	if (
@@ -63,9 +66,7 @@ export default async function Layout({ children }: PropsWithChildren) {
 			: undefined;
 
 		const [error, data] = await attemptAsync(() =>
-			orpcClient.payments.listPurchases({
-				organizationId,
-			}),
+			cachedListPurchases(organizationId),
 		);
 
 		if (error) {

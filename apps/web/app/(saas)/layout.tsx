@@ -15,9 +15,11 @@ import { getLocale, getMessages } from "next-intl/server";
 import type { PropsWithChildren } from "react";
 
 export default async function SaaSLayout({ children }: PropsWithChildren) {
-	const locale = await getLocale();
-	const messages = await getMessages();
-	const session = await getSession();
+	const [locale, messages, session] = await Promise.all([
+		getLocale(),
+		getMessages(),
+		getSession(),
+	]);
 
 	if (!session) {
 		redirect("/auth/login");
@@ -25,25 +27,33 @@ export default async function SaaSLayout({ children }: PropsWithChildren) {
 
 	const queryClient = getServerQueryClient();
 
-	await queryClient.prefetchQuery({
-		queryKey: sessionQueryKey,
-		queryFn: () => session,
-	});
+	const prefetchPromises: Promise<void>[] = [
+		queryClient.prefetchQuery({
+			queryKey: sessionQueryKey,
+			queryFn: () => session,
+		}),
+	];
 
 	if (config.organizations.enable) {
-		await queryClient.prefetchQuery({
-			queryKey: organizationListQueryKey,
-			queryFn: getOrganizationList,
-		});
-	}
-
-	if (config.users.enableBilling) {
-		await queryClient.prefetchQuery(
-			orpc.payments.listPurchases.queryOptions({
-				input: {},
+		prefetchPromises.push(
+			queryClient.prefetchQuery({
+				queryKey: organizationListQueryKey,
+				queryFn: getOrganizationList,
 			}),
 		);
 	}
+
+	if (config.users.enableBilling) {
+		prefetchPromises.push(
+			queryClient.prefetchQuery(
+				orpc.payments.listPurchases.queryOptions({
+					input: {},
+				}),
+			),
+		);
+	}
+
+	await Promise.all(prefetchPromises);
 
 	return (
 		<Document locale={locale}>

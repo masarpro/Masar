@@ -41,7 +41,6 @@ export interface SidebarMenuItem {
 	label: string;
 	href?: string;
 	icon: LucideIcon;
-	isActive?: boolean;
 	children?: SidebarMenuChild[];
 }
 
@@ -76,7 +75,6 @@ export function useSidebarMenu(): {
 				label: t("app.menu.home"),
 				href: basePath,
 				icon: HomeIcon,
-				isActive: pathname === basePath,
 			},
 			...(activeOrganization
 				? [
@@ -85,7 +83,6 @@ export function useSidebarMenu(): {
 							label: t("app.menu.projects"),
 							href: `${orgPrefix}/projects`,
 							icon: FolderKanban,
-							isActive: pathname.includes("/projects"),
 							...(projectBase
 								? {
 										children: [
@@ -152,7 +149,6 @@ export function useSidebarMenu(): {
 							label: t("app.menu.finance"),
 							href: `${orgPrefix}/finance`,
 							icon: ReceiptIcon,
-							isActive: pathname.includes("/finance"),
 							children: [
 								{
 									id: "finance-dashboard",
@@ -215,7 +211,6 @@ export function useSidebarMenu(): {
 							label: t("app.menu.pricing"),
 							href: `${orgPrefix}/pricing`,
 							icon: Calculator,
-							isActive: pathname.includes("/pricing"),
 							children: [
 								{
 									id: "pricing-dashboard",
@@ -242,7 +237,6 @@ export function useSidebarMenu(): {
 							label: t("app.menu.company"),
 							href: `${orgPrefix}/company`,
 							icon: Building2,
-							isActive: pathname.includes("/company"),
 							children: [
 								{
 									id: "company-dashboard",
@@ -285,7 +279,6 @@ export function useSidebarMenu(): {
 							label: t("app.menu.organizationSettings"),
 							href: `${basePath}/settings`,
 							icon: SettingsIcon,
-							isActive: pathname.startsWith(`${basePath}/settings/`),
 						},
 					]
 				: []),
@@ -296,14 +289,12 @@ export function useSidebarMenu(): {
 							label: t("app.menu.admin"),
 							href: "/app/admin",
 							icon: UserCogIcon,
-							isActive: pathname.startsWith("/app/admin/"),
 						},
 					]
 				: []),
 		];
 	}, [
 		t,
-		pathname,
 		basePath,
 		orgPrefix,
 		activeOrganization,
@@ -370,10 +361,15 @@ export function useSidebarMenu(): {
 				}
 				if (bestMatch) return bestMatch.id;
 			}
-			if (item.isActive) return item.id;
 		}
+
+		// Leaf items: match pathname directly against known routes
+		if (pathname === basePath) return "start";
+		if (pathname.startsWith(`${basePath}/settings`)) return "orgSettings";
+		if (pathname.startsWith("/app/admin")) return "admin";
+
 		return undefined;
-	}, [items, pathname, activeOrganization, projectId]);
+	}, [items, pathname, basePath, activeOrganization, projectId]);
 
 	return { items, activeId };
 }

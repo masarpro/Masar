@@ -1,11 +1,14 @@
 import { config } from "@repo/config";
-import { db } from "@repo/database";
 import { getActiveOrganization, getSession } from "@saas/auth/lib/server";
 import { OnboardingOverlayWrapper } from "@saas/onboarding/components/OnboardingOverlayWrapper";
 import { activeOrganizationQueryKey } from "@saas/organizations/lib/api";
 import { SubscriptionGuard } from "@saas/payments/components/SubscriptionGuard";
 import { AppWrapper } from "@saas/shared/components/AppWrapper";
 import { AssistantWrapper } from "@saas/shared/components/ai-assistant/AssistantWrapper";
+import {
+	cachedGetMemberRole,
+	cachedGetOrganizationSubscription,
+} from "@shared/lib/cached-queries";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { getServerQueryClient } from "@shared/lib/server";
 import { notFound, redirect } from "next/navigation";
@@ -27,49 +30,46 @@ export default async function OrganizationLayout({
 		return notFound();
 	}
 
-	// Check if onboarding overlay should be shown (owner who hasn't completed)
-	let shouldShowOnboarding = false;
+	// Fetch session, subscription, and member role in parallel
 	const session = config.users.enableOnboarding ? await getSession() : null;
-	if (session && !session.user.onboardingComplete) {
-		const member = await db.member.findFirst({
-			where: {
-				organizationId: organization.id,
-				userId: session.user.id,
-			},
-			select: { role: true },
-		});
-		if (member?.role === "owner") {
-			shouldShowOnboarding = true;
-		}
-	}
 
-	const queryClient = getServerQueryClient();
+	const [orgSubscription, memberRole] = await Promise.all([
+		cachedGetOrganizationSubscription(organization.id),
+		session && !session.user.onboardingComplete
+			? cachedGetMemberRole(organization.id, session.user.id)
+			: Promise.resolve(null),
+	]);
 
-	await queryClient.prefetchQuery({
-		queryKey: activeOrganizationQueryKey(organizationSlug),
-		queryFn: () => organization,
-	});
-
-	if (config.users.enableBilling) {
-		await queryClient.prefetchQuery(
-			orpc.payments.listPurchases.queryOptions({
-				input: {
-					organizationId: organization.id,
-				},
-			}),
-		);
-	}
-
-	// Fetch subscription status + plan
-	const orgSubscription = await db.organization.findUnique({
-		where: { id: organization.id },
-		select: { status: true, plan: true, trialEndsAt: true },
-	});
+	const shouldShowOnboarding = memberRole?.role === "owner";
 
 	// Redirect cancelled orgs to choose-plan
 	if (orgSubscription?.status === "CANCELLED") {
 		redirect("/choose-plan");
 	}
+
+	const queryClient = getServerQueryClient();
+
+	// Prefetch queries in parallel
+	const prefetchPromises: Promise<void>[] = [
+		queryClient.prefetchQuery({
+			queryKey: activeOrganizationQueryKey(organizationSlug),
+			queryFn: () => organization,
+		}),
+	];
+
+	if (config.users.enableBilling) {
+		prefetchPromises.push(
+			queryClient.prefetchQuery(
+				orpc.payments.listPurchases.queryOptions({
+					input: {
+						organizationId: organization.id,
+					},
+				}),
+			),
+		);
+	}
+
+	await Promise.all(prefetchPromises);
 
 	return (
 		<AssistantWrapper organizationName={organization.name}>

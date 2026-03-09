@@ -68,12 +68,17 @@ export function AssistantProvider({
     }
   }, [organizationSlug]);
 
+  // Defer chat list fetch until the panel is actually opened
   useEffect(() => {
-    if (organizationSlug && organizationSlug !== fetchedSlugRef.current) {
+    if (
+      isOpen &&
+      organizationSlug &&
+      organizationSlug !== fetchedSlugRef.current
+    ) {
       fetchedSlugRef.current = organizationSlug;
       refreshChats();
     }
-  }, [organizationSlug, refreshChats]);
+  }, [isOpen, organizationSlug, refreshChats]);
 
   const deleteChat = useCallback(
     async (id: string) => {

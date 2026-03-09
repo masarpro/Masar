@@ -168,6 +168,34 @@ const getFinancialTrend = protectedProcedure
 		return getMonthlyFinancialTrend(input.organizationId);
 	});
 
+/**
+ * Combined dashboard endpoint — single auth check, all queries in parallel
+ */
+const getAll = protectedProcedure
+	.input(
+		organizationInput.extend({
+			activitiesLimit: z.number().min(1).max(50).optional().default(5),
+			upcomingLimit: z.number().min(1).max(50).optional().default(5),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		const membership = await verifyOrganizationMembership(
+			input.organizationId,
+			context.user.id,
+		);
+		if (!membership) {
+			throw new Error("Unauthorized");
+		}
+
+		const [stats, activities, upcoming] = await Promise.all([
+			getDashboardStats(input.organizationId),
+			getRecentActivities(input.organizationId, input.activitiesLimit),
+			getUpcomingMilestones(input.organizationId, input.upcomingLimit),
+		]);
+
+		return { stats, activities, upcoming };
+	});
+
 export const dashboardRouter = {
 	getStats,
 	getProjectDistribution,
@@ -177,4 +205,5 @@ export const dashboardRouter = {
 	getOverdue,
 	getActivities,
 	getFinancialTrend,
+	getAll,
 };

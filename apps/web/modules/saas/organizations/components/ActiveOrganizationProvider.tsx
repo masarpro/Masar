@@ -14,7 +14,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import nProgress from "nprogress";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, startTransition, useEffect, useState } from "react";
 import { ActiveOrganizationContext } from "../lib/active-organization-context";
 
 export function ActiveOrganizationProvider({
@@ -60,29 +60,31 @@ export function ActiveOrganizationProvider({
 			return;
 		}
 
-		await refetchActiveOrganization();
+		startTransition(async () => {
+			await refetchActiveOrganization();
 
-		if (config.organizations.enableBilling) {
-			await queryClient.prefetchQuery(
-				orpc.payments.listPurchases.queryOptions({
-					input: {
-						organizationId: newActiveOrganization.id,
+			if (config.organizations.enableBilling) {
+				await queryClient.prefetchQuery(
+					orpc.payments.listPurchases.queryOptions({
+						input: {
+							organizationId: newActiveOrganization.id,
+						},
+					}),
+				);
+			}
+
+			queryClient.setQueryData(sessionQueryKey, (data: any) => {
+				return {
+					...data,
+					session: {
+						...data?.session,
+						activeOrganizationId: newActiveOrganization.id,
 					},
-				}),
-			);
-		}
+				};
+			});
 
-		await queryClient.setQueryData(sessionQueryKey, (data: any) => {
-			return {
-				...data,
-				session: {
-					...data?.session,
-					activeOrganizationId: newActiveOrganization.id,
-				},
-			};
+			router.push(`/app/${newActiveOrganization.slug}`);
 		});
-
-		router.push(`/app/${newActiveOrganization.slug}`);
 	};
 
 	const [loaded, setLoaded] = useState(activeOrganization !== undefined);

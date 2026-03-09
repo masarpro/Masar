@@ -11,9 +11,22 @@ import {
 	UsersIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { MrrChart } from "./MrrChart";
-import { NewOrgsChart } from "./NewOrgsChart";
-import { PlanDistributionChart } from "./PlanDistributionChart";
+import dynamic from "next/dynamic";
+
+const ChartSkeleton = () => <Skeleton className="h-[300px] w-full rounded-lg" />;
+
+const MrrChart = dynamic(
+	() => import("./MrrChart").then((m) => ({ default: m.MrrChart })),
+	{ loading: ChartSkeleton, ssr: false },
+);
+const NewOrgsChart = dynamic(
+	() => import("./NewOrgsChart").then((m) => ({ default: m.NewOrgsChart })),
+	{ loading: ChartSkeleton, ssr: false },
+);
+const PlanDistributionChart = dynamic(
+	() => import("./PlanDistributionChart").then((m) => ({ default: m.PlanDistributionChart })),
+	{ loading: ChartSkeleton, ssr: false },
+);
 import { StatsCard } from "./StatsCard";
 
 export function AdminDashboard() {

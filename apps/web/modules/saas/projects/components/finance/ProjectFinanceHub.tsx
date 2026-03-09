@@ -5,7 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
-import { ExpenseCategoryChart } from "./ExpenseCategoryChart";
+import { Skeleton } from "@ui/components/skeleton";
+import dynamic from "next/dynamic";
+
+const ExpenseCategoryChart = dynamic(
+	() => import("./ExpenseCategoryChart").then((m) => ({ default: m.ExpenseCategoryChart })),
+	{ loading: () => <Skeleton className="h-[200px] w-full rounded-lg" />, ssr: false },
+);
 import { ExpensesTable } from "./ExpensesTable";
 import { FinanceSummary } from "./FinanceSummary";
 

@@ -1,5 +1,5 @@
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 export default function Loading() {
-	return <ListTableSkeleton />;
+	return <ListTableSkeleton rows={8} cols={5} />;
 }

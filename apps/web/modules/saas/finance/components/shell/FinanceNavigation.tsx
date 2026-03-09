@@ -31,6 +31,7 @@ export function FinanceNavigation({ organizationSlug }: FinanceNavigationProps) 
 							<Link
 								key={section.id}
 								href={href}
+								prefetch
 								className={cn(
 									"flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
 									isActive

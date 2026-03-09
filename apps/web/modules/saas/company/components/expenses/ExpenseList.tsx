@@ -26,6 +26,7 @@ import {
 } from "@ui/components/table";
 import { Plus, Search, XCircle, Receipt, Banknote, CalendarRange, Send } from "lucide-react";
 import { toast } from "sonner";
+import { Pagination } from "@saas/shared/components/Pagination";
 import { AddExpenseDialog } from "./AddExpenseDialog";
 
 interface ExpenseListProps {
@@ -47,6 +48,9 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 	const [categoryFilter, setCategoryFilter] = useState<string>("all");
 	const [activeFilter, setActiveFilter] = useState<string>("all");
 	const [showAddDialog, setShowAddDialog] = useState(false);
+	const [currentPage, setCurrentPage] = useState(1);
+
+	const PAGE_SIZE = 20;
 
 	const { data, isLoading } = useQuery(
 		orpc.company.expenses.list.queryOptions({
@@ -55,6 +59,8 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 				query: search || undefined,
 				category: categoryFilter !== "all" ? (categoryFilter as typeof EXPENSE_CATEGORIES[number]) : undefined,
 				isActive: activeFilter !== "all" ? activeFilter === "true" : undefined,
+				limit: PAGE_SIZE,
+				offset: (currentPage - 1) * PAGE_SIZE,
 			},
 		}),
 	);
@@ -172,11 +178,11 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 						<Input
 							placeholder={t("company.expenses.searchPlaceholder")}
 							value={search}
-							onChange={(e) => setSearch(e.target.value)}
+							onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
 							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pr-10 focus:ring-1 focus:ring-primary/30"
 						/>
 					</div>
-					<Select value={categoryFilter} onValueChange={setCategoryFilter}>
+					<Select value={categoryFilter} onValueChange={(v) => { setCategoryFilter(v); setCurrentPage(1); }}>
 						<SelectTrigger className="w-[160px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.expenses.filterCategory")} />
 						</SelectTrigger>
@@ -189,7 +195,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 							))}
 						</SelectContent>
 					</Select>
-					<Select value={activeFilter} onValueChange={setActiveFilter}>
+					<Select value={activeFilter} onValueChange={(v) => { setActiveFilter(v); setCurrentPage(1); }}>
 						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.expenses.filterStatus")} />
 						</SelectTrigger>
@@ -306,6 +312,15 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 					</TableBody>
 				</Table>
 			</div>
+
+			{(data?.total ?? 0) > PAGE_SIZE && (
+				<Pagination
+					totalItems={data?.total ?? 0}
+					itemsPerPage={PAGE_SIZE}
+					currentPage={currentPage}
+					onChangeCurrentPage={setCurrentPage}
+				/>
+			)}
 
 			{showAddDialog && (
 				<AddExpenseDialog

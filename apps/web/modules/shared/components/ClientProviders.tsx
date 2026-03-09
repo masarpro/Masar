@@ -17,7 +17,7 @@ export function ClientProviders({ children }: PropsWithChildren) {
 				color="var(--color-primary)"
 				options={{ showSpinner: false }}
 				shallowRouting
-				delay={250}
+				delay={100}
 			>
 				<ThemeProvider
 					attribute="class"

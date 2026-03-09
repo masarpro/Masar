@@ -48,6 +48,7 @@ export function SettingsNavigation({
 						<Link
 							key={section.id}
 							href={href}
+							prefetch
 							className={cn(
 								"flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 text-sm font-medium transition-all duration-200",
 								isActive

@@ -26,6 +26,7 @@ import {
 } from "@ui/components/table";
 import { Plus, Search, UserX, Users, Banknote, Clock, Shield } from "lucide-react";
 import { toast } from "sonner";
+import { Pagination } from "@saas/shared/components/Pagination";
 import { AddEmployeeDialog } from "./AddEmployeeDialog";
 
 interface EmployeeListProps {
@@ -46,6 +47,9 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 	const [statusFilter, setStatusFilter] = useState<string>("all");
 	const [typeFilter, setTypeFilter] = useState<string>("all");
 	const [showAddDialog, setShowAddDialog] = useState(false);
+	const [currentPage, setCurrentPage] = useState(1);
+
+	const PAGE_SIZE = 20;
 
 	const { data, isLoading } = useQuery(
 		orpc.company.employees.list.queryOptions({
@@ -54,6 +58,8 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 				query: search || undefined,
 				status: statusFilter !== "all" ? (statusFilter as "ACTIVE" | "ON_LEAVE" | "TERMINATED") : undefined,
 				type: typeFilter !== "all" ? (typeFilter as typeof EMPLOYEE_TYPES[number]) : undefined,
+				limit: PAGE_SIZE,
+				offset: (currentPage - 1) * PAGE_SIZE,
 			},
 		}),
 	);
@@ -181,11 +187,11 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 						<Input
 							placeholder={t("company.employees.searchPlaceholder")}
 							value={search}
-							onChange={(e) => setSearch(e.target.value)}
+							onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
 							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pr-10 focus:ring-1 focus:ring-primary/30"
 						/>
 					</div>
-					<Select value={statusFilter} onValueChange={setStatusFilter}>
+					<Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setCurrentPage(1); }}>
 						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.employees.filterStatus")} />
 						</SelectTrigger>
@@ -196,7 +202,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 							<SelectItem value="TERMINATED">{t("company.employees.statusTerminated")}</SelectItem>
 						</SelectContent>
 					</Select>
-					<Select value={typeFilter} onValueChange={setTypeFilter}>
+					<Select value={typeFilter} onValueChange={(v) => { setTypeFilter(v); setCurrentPage(1); }}>
 						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.employees.filterType")} />
 						</SelectTrigger>
@@ -322,6 +328,15 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 					</TableBody>
 				</Table>
 			</div>
+
+			{(data?.total ?? 0) > PAGE_SIZE && (
+				<Pagination
+					totalItems={data?.total ?? 0}
+					itemsPerPage={PAGE_SIZE}
+					currentPage={currentPage}
+					onChangeCurrentPage={setCurrentPage}
+				/>
+			)}
 
 			{showAddDialog && (
 				<AddEmployeeDialog

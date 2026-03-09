@@ -5,15 +5,32 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useProjectRole } from "../hooks/use-project-role";
-import { ExpenseCategoryChart } from "./finance/ExpenseCategoryChart";
+import { Skeleton } from "@ui/components/skeleton";
+import dynamic from "next/dynamic";
 import { QuickActions } from "./overview/QuickActions";
-import { ProjectTimelineChart } from "./overview/ProjectTimelineChart";
 import { ExecutionPhasesCard } from "./overview/ExecutionPhasesCard";
 import { FinanceBudgetCard } from "./overview/FinanceBudgetCard";
-import { TimelineScheduleCard } from "./overview/TimelineScheduleCard";
-import { ActivityPulseCard } from "./overview/ActivityPulseCard";
 import { RecentActivitiesCard } from "./overview/RecentActivitiesCard";
 import { QuickDocumentsCard } from "./overview/QuickDocumentsCard";
+
+const ChartSkeleton = () => <Skeleton className="h-[200px] w-full rounded-lg" />;
+
+const ExpenseCategoryChart = dynamic(
+	() => import("./finance/ExpenseCategoryChart").then((m) => ({ default: m.ExpenseCategoryChart })),
+	{ loading: ChartSkeleton, ssr: false },
+);
+const ProjectTimelineChart = dynamic(
+	() => import("./overview/ProjectTimelineChart").then((m) => ({ default: m.ProjectTimelineChart })),
+	{ loading: ChartSkeleton, ssr: false },
+);
+const TimelineScheduleCard = dynamic(
+	() => import("./overview/TimelineScheduleCard").then((m) => ({ default: m.TimelineScheduleCard })),
+	{ loading: ChartSkeleton, ssr: false },
+);
+const ActivityPulseCard = dynamic(
+	() => import("./overview/ActivityPulseCard").then((m) => ({ default: m.ActivityPulseCard })),
+	{ loading: ChartSkeleton, ssr: false },
+);
 
 interface ProjectOverviewProps {
 	organizationId: string;

@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import {
 	Users,
 	Receipt,
@@ -14,9 +15,27 @@ import {
 	Wrench,
 	Archive,
 } from "lucide-react";
-import { EmployeesAnalyticsCard } from "./EmployeesAnalyticsCard";
-import { ExpensesAnalyticsCard } from "./ExpensesAnalyticsCard";
-import { AssetsAnalyticsCard } from "./AssetsAnalyticsCard";
+import { Skeleton } from "@ui/components/skeleton";
+import dynamic from "next/dynamic";
+
+const ChartSkeleton = () => (
+	<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-5">
+		<Skeleton className="h-[320px] w-full rounded-lg" />
+	</div>
+);
+
+const EmployeesAnalyticsCard = dynamic(
+	() => import("./EmployeesAnalyticsCard").then((m) => ({ default: m.EmployeesAnalyticsCard })),
+	{ loading: ChartSkeleton, ssr: false },
+);
+const ExpensesAnalyticsCard = dynamic(
+	() => import("./ExpensesAnalyticsCard").then((m) => ({ default: m.ExpensesAnalyticsCard })),
+	{ loading: ChartSkeleton, ssr: false },
+);
+const AssetsAnalyticsCard = dynamic(
+	() => import("./AssetsAnalyticsCard").then((m) => ({ default: m.AssetsAnalyticsCard })),
+	{ loading: ChartSkeleton, ssr: false },
+);
 
 interface CompanyDashboardProps {
 	organizationId: string;
@@ -25,11 +44,12 @@ interface CompanyDashboardProps {
 export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 	const t = useTranslations();
 
-	const { data, isLoading } = useQuery(
-		orpc.company.dashboard.queryOptions({
+	const { data, isLoading } = useQuery({
+		...orpc.company.dashboard.queryOptions({
 			input: { organizationId },
 		}),
-	);
+		staleTime: STALE_TIMES.DASHBOARD_STATS,
+	});
 
 	if (isLoading) {
 		return (

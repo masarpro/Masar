@@ -42,8 +42,8 @@ export const listInvoices = protectedProcedure
 			action: "view",
 		});
 
-		// Auto-detect OVERDUE invoices
-		await db.financeInvoice.updateMany({
+		// Auto-detect OVERDUE invoices — fire-and-forget (don't block the list query)
+		void db.financeInvoice.updateMany({
 			where: {
 				organizationId: input.organizationId,
 				status: { in: ["ISSUED", "SENT", "PARTIALLY_PAID"] },

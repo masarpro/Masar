@@ -13,18 +13,21 @@ const sansFont = Inter({
 	weight: ["400", "500", "600", "700"],
 	subsets: ["latin"],
 	variable: "--font-sans",
+	display: "swap",
 });
 
 const serifFont = Libre_Baskerville({
 	weight: ["400", "700"],
 	subsets: ["latin"],
 	variable: "--font-serif",
+	display: "swap",
 });
 
 const arabicSansFont = Cairo({
 	weight: ["400", "500", "600", "700"],
 	subsets: ["arabic", "latin"],
 	variable: "--font-arabic-sans",
+	display: "swap",
 });
 
 export async function Document({

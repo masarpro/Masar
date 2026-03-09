@@ -1,6 +1,7 @@
 import type { OrganizationMetadata } from "@repo/auth";
 import { authClient } from "@repo/auth/client";
 import { orpcClient } from "@shared/lib/orpc-client";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const organizationListQueryKey = ["user", "organizations"] as const;
@@ -18,6 +19,7 @@ export const useOrganizationListQuery = () => {
 
 			return data;
 		},
+		staleTime: STALE_TIMES.ORGANIZATION,
 	});
 };
 
@@ -47,6 +49,7 @@ export const useActiveOrganizationQuery = (
 
 			return data;
 		},
+		staleTime: STALE_TIMES.ORGANIZATION,
 		enabled: options?.enabled,
 	});
 };
@@ -72,6 +75,7 @@ export const useFullOrganizationQuery = (id: string) => {
 
 			return data;
 		},
+		staleTime: STALE_TIMES.ORGANIZATION,
 	});
 };
 

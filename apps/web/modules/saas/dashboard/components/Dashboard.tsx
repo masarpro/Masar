@@ -2,10 +2,10 @@
 
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { HomeDashboardSkeleton } from "@saas/shared/components/skeletons";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { EmptyProjectsState } from "./EmptyProjectsState";
 import { Currency } from "@saas/finance/components/shared/Currency";
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { apiClient } from "@shared/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
@@ -37,6 +37,7 @@ import {
 	UserSearch,
 	Wallet,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
@@ -140,15 +141,18 @@ export function Dashboard() {
 	const organizationSlug = activeOrganization?.slug ?? "";
 	const organizationId = activeOrganization?.id ?? "";
 
-	// Dashboard stats
-	const { data: stats, isLoading: statsLoading } = useQuery({
-		queryKey: ["dashboard-stats", organizationId],
-		queryFn: async () => {
-			if (!organizationId) return null;
-			return apiClient.dashboard.getStats({ organizationId });
-		},
+	// Combined dashboard data — single API call for stats + activities + upcoming
+	const { data: dashboardData, isLoading: statsLoading } = useQuery({
+		...orpc.dashboard.getAll.queryOptions({
+			input: { organizationId, activitiesLimit: 5, upcomingLimit: 5 },
+		}),
 		enabled: !!organizationId,
+		staleTime: STALE_TIMES.DASHBOARD_STATS,
 	});
+
+	const stats = dashboardData?.stats ?? null;
+	const activities = dashboardData?.activities ?? [];
+	const upcomingMilestones = dashboardData?.upcoming ?? [];
 
 	// Org financial data (bank, cash, profit)
 	const { data: orgFinance } = useQuery(
@@ -192,26 +196,6 @@ export function Dashboard() {
 		month: t(`dashboard.expenseBreakdown.months.${m.month}`),
 		amount: m.amount,
 	}));
-
-	// Recent activities
-	const { data: activities } = useQuery({
-		queryKey: ["dashboard-activities", organizationId],
-		queryFn: async () => {
-			if (!organizationId) return [];
-			return apiClient.dashboard.getActivities({ organizationId, limit: 5 });
-		},
-		enabled: !!organizationId,
-	});
-
-	// Upcoming milestones
-	const { data: upcomingMilestones } = useQuery({
-		queryKey: ["dashboard-upcoming", organizationId],
-		queryFn: async () => {
-			if (!organizationId) return [];
-			return apiClient.dashboard.getUpcoming({ organizationId, limit: 5 });
-		},
-		enabled: !!organizationId,
-	});
 
 	if (statsLoading) {
 		return <HomeDashboardSkeleton />;
@@ -430,11 +414,12 @@ export function Dashboard() {
 							{/* Square image */}
 							<div className="relative h-[88px] w-[88px] shrink-0 overflow-hidden bg-muted">
 								{coverImageUrl ? (
-									// eslint-disable-next-line @next/next/no-img-element
-									<img
+									<Image
 										src={coverImageUrl}
 										alt={project.name || t("projects.unnamed")}
-										className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+										fill
+										className="object-cover transition-transform duration-300 group-hover:scale-105"
+										sizes="88px"
 										loading="lazy"
 									/>
 								) : (

@@ -24,6 +24,7 @@ import {
 	TableRow,
 } from "@ui/components/table";
 import { Plus, Search, Package, CheckCircle2, Banknote, Wrench } from "lucide-react";
+import { Pagination } from "@saas/shared/components/Pagination";
 import { AddAssetDialog } from "./AddAssetDialog";
 
 interface AssetListProps {
@@ -45,6 +46,9 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 	const [categoryFilter, setCategoryFilter] = useState<string>("all");
 	const [statusFilter, setStatusFilter] = useState<string>("all");
 	const [showAddDialog, setShowAddDialog] = useState(false);
+	const [currentPage, setCurrentPage] = useState(1);
+
+	const PAGE_SIZE = 20;
 
 	const { data, isLoading } = useQuery(
 		orpc.company.assets.list.queryOptions({
@@ -53,6 +57,8 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 				query: search || undefined,
 				category: categoryFilter !== "all" ? (categoryFilter as typeof ASSET_CATEGORIES[number]) : undefined,
 				status: statusFilter !== "all" ? (statusFilter as typeof ASSET_STATUSES[number]) : undefined,
+				limit: PAGE_SIZE,
+				offset: (currentPage - 1) * PAGE_SIZE,
 			},
 		}),
 	);
@@ -153,11 +159,11 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 						<Input
 							placeholder={t("company.assets.searchPlaceholder")}
 							value={search}
-							onChange={(e) => setSearch(e.target.value)}
+							onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
 							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pr-10 focus:ring-1 focus:ring-primary/30"
 						/>
 					</div>
-					<Select value={categoryFilter} onValueChange={setCategoryFilter}>
+					<Select value={categoryFilter} onValueChange={(v) => { setCategoryFilter(v); setCurrentPage(1); }}>
 						<SelectTrigger className="w-[160px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.assets.filterCategory")} />
 						</SelectTrigger>
@@ -170,7 +176,7 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 							))}
 						</SelectContent>
 					</Select>
-					<Select value={statusFilter} onValueChange={setStatusFilter}>
+					<Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setCurrentPage(1); }}>
 						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.assets.filterStatus")} />
 						</SelectTrigger>
@@ -269,6 +275,15 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 					</TableBody>
 				</Table>
 			</div>
+
+			{(data?.total ?? 0) > PAGE_SIZE && (
+				<Pagination
+					totalItems={data?.total ?? 0}
+					itemsPerPage={PAGE_SIZE}
+					currentPage={currentPage}
+					onChangeCurrentPage={setCurrentPage}
+				/>
+			)}
 
 			{showAddDialog && (
 				<AddAssetDialog

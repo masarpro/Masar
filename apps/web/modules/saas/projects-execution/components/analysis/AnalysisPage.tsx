@@ -10,7 +10,13 @@ import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { SCurveChart } from "./SCurveChart";
+import { Skeleton } from "@ui/components/skeleton";
+import dynamic from "next/dynamic";
+
+const SCurveChart = dynamic(
+	() => import("./SCurveChart").then((m) => ({ default: m.SCurveChart })),
+	{ loading: () => <Skeleton className="h-[400px] w-full rounded-lg" />, ssr: false },
+);
 import { DelayAnalysisView } from "./DelayAnalysisView";
 import { PlannedVsActualTable } from "./PlannedVsActualTable";
 

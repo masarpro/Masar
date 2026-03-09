@@ -1938,6 +1938,7 @@ model SubcontractPayment {
 
   @@index([organizationId, contractId])
   @@index([contractId, termId])
+  @@index([contractId, createdAt])
   @@map("subcontract_payments")
 }
 

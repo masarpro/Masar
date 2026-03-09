@@ -12,6 +12,9 @@ import { memo, useEffect, useState } from "react";
 import { useSidebar } from "./sidebar-context";
 import type { SidebarMenuChild, SidebarMenuItem } from "./use-sidebar-menu";
 
+/** Top-level items that benefit from eager prefetch */
+const PREFETCH_IDS = new Set(["start", "projects", "finance", "company", "pricing", "orgSettings"]);
+
 interface SidebarNavProps {
 	items: SidebarMenuItem[];
 	activeId: string | undefined;
@@ -131,6 +134,7 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 									<Link
 										href={item.href}
 										onClick={closeMobile}
+										prefetch={PREFETCH_IDS.has(item.id)}
 										className="flex flex-1 min-w-0 items-center gap-3"
 									>
 										<item.icon
@@ -214,6 +218,7 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 						key={item.id}
 						href={href}
 						onClick={closeMobile}
+						prefetch={PREFETCH_IDS.has(item.id)}
 						className={navItemClasses(isActive, false, collapsed)}
 						aria-label={collapsed ? item.label : undefined}
 					>

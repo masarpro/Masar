@@ -1,6 +1,7 @@
 "use client";
 
 import { apiClient } from "@shared/lib/api-client";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import {
@@ -27,15 +28,15 @@ export function NotificationBell({ organizationId }: NotificationBellProps) {
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 
-	// Query for unread count (refresh every 30 seconds)
+	// Query for unread count (refresh every 30 seconds via polling)
 	const { data: countData } = useQuery({
 		queryKey: ["notifications", "unreadCount", organizationId],
 		queryFn: () =>
 			apiClient.notifications.unreadCount({
 				organizationId,
 			}),
-		refetchInterval: 30000, // Refresh every 30 seconds
-		staleTime: 10000, // Consider stale after 10 seconds
+		refetchInterval: 30000,
+		staleTime: STALE_TIMES.NOTIFICATIONS,
 	});
 
 	// Query for recent notifications
@@ -46,7 +47,7 @@ export function NotificationBell({ organizationId }: NotificationBellProps) {
 				organizationId,
 				pageSize: 5,
 			}),
-		staleTime: 30000,
+		staleTime: STALE_TIMES.NOTIFICATIONS,
 	});
 
 	// Mark all as read mutation

@@ -1,5 +1,5 @@
-import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 export default function Loading() {
-	return <DashboardSkeleton />;
+	return <ListTableSkeleton rows={8} cols={5} />;
 }
