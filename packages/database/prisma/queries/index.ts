@@ -49,6 +49,10 @@ export * from "./subcontract-claims";
 export * from "./subcontract-items";
 // Project Payments
 export * from "./project-payments";
+// Project Profitability Report
+export * from "./project-profitability";
+// Cash Flow Report
+export * from "./cash-flow";
 // Payments & Claims Timeline
 export * from "./payments-claims-timeline";
 // Company Management

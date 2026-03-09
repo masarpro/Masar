@@ -65,9 +65,9 @@ const SheetContent = ({
 			{...props}
 		>
 			{children}
-			<SheetPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+			<SheetPrimitive.Close className="absolute top-4 end-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary" aria-label="إغلاق">
 				<XIcon className="size-4" />
-				<span className="sr-only">Close</span>
+				<span className="sr-only">إغلاق</span>
 			</SheetPrimitive.Close>
 		</SheetPrimitive.Content>
 	</SheetPortal>
@@ -79,7 +79,7 @@ const SheetHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cn(
-			"flex flex-col space-y-2 text-center sm:text-left",
+			"flex flex-col space-y-2 text-center sm:text-start",
 			className,
 		)}
 		{...props}

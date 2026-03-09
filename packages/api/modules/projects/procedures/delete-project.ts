@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { updateProject } from "@repo/database";
+import { deleteProject, db } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -9,7 +9,7 @@ export const deleteProjectProcedure = subscriptionProcedure
 		method: "DELETE",
 		path: "/projects/{id}",
 		tags: ["Projects"],
-		summary: "Delete (archive) a project",
+		summary: "Delete a project (only if no financial data)",
 	})
 	.input(
 		z.object({
@@ -26,20 +26,58 @@ export const deleteProjectProcedure = subscriptionProcedure
 			{ section: "projects", action: "delete" },
 		);
 
-		try {
-			// Soft delete: set status to ARCHIVED instead of hard delete
-			const project = await updateProject(input.id, input.organizationId, {
-				status: "ARCHIVED",
+		// Check for financial data before allowing hard delete
+		const [
+			expenseCount,
+			claimCount,
+			subcontractCount,
+			invoiceCount,
+			paymentCount,
+		] = await Promise.all([
+			db.financeExpense.count({
+				where: { organizationId: input.organizationId, projectId: input.id },
+			}),
+			db.projectClaim.count({
+				where: { organizationId: input.organizationId, projectId: input.id },
+			}),
+			db.subcontractContract.count({
+				where: { organizationId: input.organizationId, projectId: input.id },
+			}),
+			db.financeInvoice.count({
+				where: { organizationId: input.organizationId, projectId: input.id },
+			}),
+			db.projectPayment.count({
+				where: { organizationId: input.organizationId, projectId: input.id },
+			}),
+		]);
+
+		const totalRecords =
+			expenseCount + claimCount + subcontractCount + invoiceCount + paymentCount;
+
+		if (totalRecords > 0) {
+			throw new ORPCError("BAD_REQUEST", {
+				message:
+					"لا يمكن حذف مشروع يحتوي على بيانات مالية. استخدم الأرشفة بدلاً من ذلك.",
+				data: {
+					hasFinancialData: true,
+					counts: {
+						expenses: expenseCount,
+						claims: claimCount,
+						subcontracts: subcontractCount,
+						invoices: invoiceCount,
+						payments: paymentCount,
+					},
+				},
 			});
+		}
+
+		// No financial data — safe to hard delete
+		try {
+			await deleteProject(input.id, input.organizationId);
 
 			return {
 				success: true,
-				message: "تم أرشفة المشروع بنجاح",
-				project: {
-					id: project.id,
-					name: project.name,
-					status: project.status,
-				},
+				message: "تم حذف المشروع بنجاح",
 			};
 		} catch (error) {
 			throw new ORPCError("BAD_REQUEST", {

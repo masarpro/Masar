@@ -14,6 +14,7 @@ import { getOwnerPaymentsProcedure } from "./procedures/get-owner-payments";
 import { listOwnerMessagesProcedure } from "./procedures/list-owner-messages";
 import { sendOwnerMessageProcedure } from "./procedures/send-owner-message";
 import { listOfficialUpdatesProcedure } from "./procedures/list-official-updates";
+import { exchangeTokenProcedure } from "./procedures/exchange-token";
 
 export const projectOwnerRouter = publicProcedure.router({
 	// Internal (authenticated) endpoints
@@ -25,6 +26,7 @@ export const projectOwnerRouter = publicProcedure.router({
 
 	// Portal (token-based) endpoints
 	portal: publicProcedure.router({
+		exchangeToken: exchangeTokenProcedure,
 		getSummary: getOwnerSummaryProcedure,
 		getSchedule: getOwnerScheduleProcedure,
 		getPayments: getOwnerPaymentsProcedure,

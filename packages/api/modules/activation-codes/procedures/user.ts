@@ -1,6 +1,7 @@
 import { ORPCError } from "@orpc/client";
 import { db } from "@repo/database";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { rateLimitChecker, RATE_LIMITS } from "../../../lib/rate-limit";
 import { codeInput } from "../schema";
 
 export const validate = protectedProcedure
@@ -11,7 +12,9 @@ export const validate = protectedProcedure
 		summary: "Validate an activation code without activating",
 	})
 	.input(codeInput)
-	.handler(async ({ input }) => {
+	.handler(async ({ input, context }) => {
+		// Strict rate limit to prevent code enumeration (5/min per user)
+		await rateLimitChecker(context.user.id, "activation-codes.validate", RATE_LIMITS.STRICT);
 		const code = await db.activationCode.findUnique({
 			where: { code: input.code },
 		});

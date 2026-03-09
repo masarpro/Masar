@@ -579,6 +579,21 @@ enum EmployeeStatus {
   TERMINATED    // منتهي
 }
 
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum EmployeeChangeType {
+  SALARY_CHANGE       // تغيير راتب
+  STATUS_CHANGE       // تغيير حالة
+  POSITION_CHANGE     // تغيير المسمى الوظيفي
+  ASSIGNMENT_CHANGE   // تغيير تعيين المشروع
+  INFO_UPDATE         // تحديث بيانات عامة
+}
+
 model User {
   id                 String       @id @default(cuid())
   name               String
@@ -634,6 +649,7 @@ model User {
   auditLogs                ProjectAuditLog[]          @relation("AuditActor")
   messagesSent             ProjectMessage[]           @relation("MessageSender")
   notifications            Notification[]             @relation("NotificationRecipient")
+  notificationPreferences  NotificationPreference[]   @relation("NotificationPreferences")
 
   // علاقات بوابة المالك
   ownerAccessesCreated     ProjectOwnerAccess[]       @relation("OwnerAccessCreator")
@@ -906,6 +922,16 @@ model Organization {
 
   // Audit Trail - سجل التدقيق
   orgAuditLogs         OrganizationAuditLog[]
+
+  // Employee Change Logs - سجل تغييرات الموظفين
+  employeeChangeLogs   EmployeeChangeLog[]
+
+  // Notification Preferences - تفضيلات الإشعارات
+  notificationPreferences NotificationPreference[]
+
+  // Leave Management - إدارة الإجازات
+  leaveTypes           LeaveType[]
+  leaveRequests        LeaveRequest[]
 
   // Atomic Sequences - التسلسلات الذرية
   sequences            OrganizationSequence[]
@@ -2227,11 +2253,33 @@ model ProjectDocument {
 
   // العلاقات
   approvals       ProjectApproval[]
+  versions        DocumentVersion[]
 
   @@index([organizationId, projectId, folder, createdAt])
   @@index([projectId, folder])
   @@index([organizationId, projectId])
   @@map("project_documents")
+}
+
+// إصدارات المستندات
+model DocumentVersion {
+  id              String          @id @default(cuid())
+  documentId      String          @map("document_id")
+  document        ProjectDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  versionNumber   Int             @map("version_number")
+  fileName        String          @map("file_name")
+  fileSize        Int             @map("file_size")
+  fileType        String          @map("file_type")
+  storagePath     String          @map("storage_path")
+  uploadedBy      String          @map("uploaded_by")
+  changeNotes     String?         @map("change_notes") @db.Text
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  @@index([documentId, versionNumber])
+  @@unique([documentId, versionNumber])
+  @@map("document_versions")
 }
 
 // طلبات الاعتماد
@@ -2366,6 +2414,39 @@ model Notification {
   @@map("notifications")
 }
 
+// تفضيلات الإشعارات
+model NotificationPreference {
+  id                   String               @id @default(cuid())
+  userId               String               @map("user_id")
+  user                 User                 @relation("NotificationPreferences", fields: [userId], references: [id], onDelete: Cascade)
+  organizationId       String               @map("organization_id")
+  organization         Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // لكل نوع إشعار → قنوات مفعّلة
+  approvalRequested    NotificationChannel[] @default([IN_APP, EMAIL])
+  approvalDecided      NotificationChannel[] @default([IN_APP])
+  documentCreated      NotificationChannel[] @default([IN_APP])
+  dailyReportCreated   NotificationChannel[] @default([IN_APP])
+  issueCreated         NotificationChannel[] @default([IN_APP])
+  issueCritical        NotificationChannel[] @default([IN_APP, EMAIL])
+  expenseCreated       NotificationChannel[] @default([IN_APP])
+  claimCreated         NotificationChannel[] @default([IN_APP])
+  claimStatusChanged   NotificationChannel[] @default([IN_APP])
+  changeOrderCreated   NotificationChannel[] @default([IN_APP])
+  ownerMessage         NotificationChannel[] @default([IN_APP])
+  teamMemberAdded      NotificationChannel[] @default([IN_APP])
+
+  // إعدادات عامة
+  emailDigest          Boolean              @default(false) @map("email_digest")
+  muteAll              Boolean              @default(false) @map("mute_all")
+
+  createdAt            DateTime             @default(now()) @map("created_at")
+  updatedAt            DateTime             @updatedAt @map("updated_at")
+
+  @@unique([userId, organizationId])
+  @@map("notification_preferences")
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // OWNER PORTAL - بوابة المالك
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2388,9 +2469,27 @@ model ProjectOwnerAccess {
 
   createdAt       DateTime  @default(now()) @map("created_at")
 
+  sessions          OwnerPortalSession[]
+
   @@index([organizationId, projectId])
   @@index([token])
   @@map("project_owner_access")
+}
+
+model OwnerPortalSession {
+  id              String    @id @default(cuid())
+  sessionToken    String    @unique @map("session_token")
+  portalAccessId  String    @map("portal_access_id")
+  portalAccess    ProjectOwnerAccess @relation(fields: [portalAccessId], references: [id], onDelete: Cascade)
+  expiresAt       DateTime  @map("expires_at")
+  ipAddress       String?   @map("ip_address")
+  userAgent       String?   @map("user_agent")
+  lastAccessedAt  DateTime  @default(now()) @map("last_accessed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@index([portalAccessId])
+  @@index([expiresAt])
+  @@map("owner_portal_session")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -3097,6 +3196,10 @@ enum OrgAuditAction {
   // ── الرواتب (Payroll) ──
   PAYROLL_RUN_APPROVED      // اعتماد مسير رواتب
   PAYROLL_RUN_CANCELLED     // إلغاء مسير رواتب
+
+  // ── المشاريع (Projects) ──
+  PROJECT_ARCHIVED          // أرشفة مشروع
+  PROJECT_RESTORED          // استعادة مشروع من الأرشيف
 
   // ── الإعدادات (Settings) ──
   SETTINGS_UPDATED          // تعديل إعدادات المنشأة
@@ -3933,11 +4036,104 @@ model Employee {
   // العلاقات
   assignments     EmployeeProjectAssignment[]
   payrollItems    PayrollRunItem[]
+  changeLogs      EmployeeChangeLog[]
+  leaveRequests   LeaveRequest[]
+  leaveBalances   LeaveBalance[]
 
   @@index([organizationId])
   @@index([organizationId, status])
   @@index([organizationId, type])
   @@map("company_employees")
+}
+
+// سجل تغييرات الموظف
+model EmployeeChangeLog {
+  id              String              @id @default(cuid())
+  employeeId      String              @map("employee_id")
+  employee        Employee            @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  organizationId  String              @map("organization_id")
+  organization    Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  changedBy       String              @map("changed_by")  // userId
+  changeType      EmployeeChangeType  @map("change_type")
+  fieldName       String              @map("field_name")
+  oldValue        String?             @map("old_value")
+  newValue        String?             @map("new_value")
+  notes           String?             @db.Text
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  @@index([employeeId, createdAt])
+  @@index([organizationId, employeeId])
+  @@map("employee_change_logs")
+}
+
+// أنواع الإجازات
+model LeaveType {
+  id               String         @id @default(cuid())
+  organizationId   String         @map("organization_id")
+  organization     Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name             String
+  nameEn           String?        @map("name_en")
+  daysPerYear      Int            @map("days_per_year")
+  isPaid           Boolean        @default(true) @map("is_paid")
+  requiresApproval Boolean        @default(true) @map("requires_approval")
+  color            String?
+
+  leaves           LeaveRequest[]
+  balances         LeaveBalance[]
+
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+
+  @@unique([organizationId, name])
+  @@map("leave_types")
+}
+
+// أرصدة الإجازات
+model LeaveBalance {
+  id             String     @id @default(cuid())
+  employeeId     String     @map("employee_id")
+  employee       Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveTypeId    String     @map("leave_type_id")
+  leaveType      LeaveType  @relation(fields: [leaveTypeId], references: [id], onDelete: Cascade)
+
+  year           Int
+  totalDays      Int        @map("total_days")
+  usedDays       Int        @default(0) @map("used_days")
+  remainingDays  Int        @map("remaining_days")
+
+  @@unique([employeeId, leaveTypeId, year])
+  @@map("leave_balances")
+}
+
+// طلبات الإجازات
+model LeaveRequest {
+  id               String        @id @default(cuid())
+  employeeId       String        @map("employee_id")
+  employee         Employee      @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  organizationId   String        @map("organization_id")
+  organization     Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  leaveTypeId      String        @map("leave_type_id")
+  leaveType        LeaveType     @relation(fields: [leaveTypeId], references: [id], onDelete: Cascade)
+
+  startDate        DateTime      @map("start_date") @db.Date
+  endDate          DateTime      @map("end_date") @db.Date
+  totalDays        Int           @map("total_days")
+  reason           String?       @db.Text
+  status           LeaveStatus   @default(PENDING)
+
+  approvedBy       String?       @map("approved_by")
+  approvedAt       DateTime?     @map("approved_at")
+  rejectionReason  String?       @map("rejection_reason") @db.Text
+
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  @@index([organizationId, employeeId, status])
+  @@index([organizationId, startDate, endDate])
+  @@map("leave_requests")
 }
 
 // توزيع الموظفين على المشاريع

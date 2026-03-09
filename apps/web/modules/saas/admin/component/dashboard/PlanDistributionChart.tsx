@@ -18,6 +18,7 @@ export function PlanDistributionChart({
 			<h3 className="font-semibold text-lg mb-4">
 				{t("admin.dashboard.planDistribution")}
 			</h3>
+			<div role="img" aria-label={`${t("admin.dashboard.planDistribution")} - ${data.map(d => `${d.plan}: ${d.count}`).join(', ')}`}>
 			<ResponsiveContainer width="100%" height={300}>
 				<PieChart>
 					<Pie
@@ -40,6 +41,7 @@ export function PlanDistributionChart({
 					<Tooltip />
 				</PieChart>
 			</ResponsiveContainer>
+			</div>
 		</Card>
 	);
 }

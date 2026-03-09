@@ -25,14 +25,15 @@ export default async function OrganizationLayout({
 	const layoutStart = performance.now();
 	const { organizationSlug } = await params;
 
-	const organization = await getActiveOrganization(organizationSlug);
+	// Fetch organization and session in parallel (both are independent)
+	const [organization, session] = await Promise.all([
+		getActiveOrganization(organizationSlug),
+		config.users.enableOnboarding ? getSession() : Promise.resolve(null),
+	]);
 
 	if (!organization) {
 		return notFound();
 	}
-
-	// Fetch session, subscription, and member role in parallel
-	const session = config.users.enableOnboarding ? await getSession() : null;
 
 	const [orgSubscription, memberRole] = await Promise.all([
 		cachedGetOrganizationSubscription(organization.id),

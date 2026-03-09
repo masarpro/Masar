@@ -312,6 +312,17 @@ export async function rateLimitChecker(
 	const key = createRateLimitKey(userId, procedureName);
 	const result = await checkRateLimit(key, config);
 	if (!result.allowed) {
+		const { logBusinessEvent } = await import("@repo/logs");
+		logBusinessEvent({
+			type: "auth.rate_limited",
+			userId,
+			metadata: {
+				procedure: procedureName,
+				limit: config.maxRequests,
+				windowMs: config.windowMs,
+			},
+			severity: "warning",
+		});
 		const { ORPCError } = await import("@orpc/server");
 		const retrySeconds = Math.ceil((result.retryAfterMs || 0) / 1000);
 		throw new ORPCError("TOO_MANY_REQUESTS", {

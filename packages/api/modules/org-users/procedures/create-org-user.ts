@@ -3,7 +3,10 @@ import { auth } from "@repo/auth";
 import {
 	createOrgUser as createOrgUserQuery,
 	getUserByEmail,
+	db,
 } from "@repo/database";
+import { sendEmail } from "@repo/mail";
+import { getBaseUrl } from "@repo/utils";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
@@ -22,7 +25,7 @@ export const createOrgUser = subscriptionProcedure
 			name: z.string().min(1),
 			email: z.string().email(),
 			organizationRoleId: z.string(),
-			password: z.string().min(8),
+			password: z.string().min(8).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -43,7 +46,19 @@ export const createOrgUser = subscriptionProcedure
 			});
 		}
 
-		// إنشاء المستخدم
+		// Get organization and role names for the email
+		const [organization, role] = await Promise.all([
+			db.organization.findUnique({
+				where: { id: input.organizationId },
+				select: { name: true },
+			}),
+			db.organizationRole.findUnique({
+				where: { id: input.organizationRoleId },
+				select: { name: true },
+			}),
+		]);
+
+		// إنشاء المستخدم بحالة غير مفعّلة (ينتظر قبول الدعوة)
 		const user = await createOrgUserQuery({
 			name: input.name,
 			email: input.email,
@@ -51,21 +66,41 @@ export const createOrgUser = subscriptionProcedure
 			organizationId: input.organizationId,
 			createdById: context.user.id,
 			mustChangePassword: true,
+			isActive: false,
+			emailVerified: false,
 		});
 
-		// إنشاء حساب بكلمة مرور عبر better-auth
-		const authContext = await auth.$context;
-		const hashedPassword = await authContext.password.hash(input.password);
+		// توليد رمز الدعوة
+		const token = crypto.randomUUID();
+		const expiresAt = new Date();
+		expiresAt.setDate(expiresAt.getDate() + 7);
 
-		await authContext.adapter.create({
-			model: "account",
+		// إنشاء سجل الدعوة
+		await db.userInvitation.create({
 			data: {
-				userId: user.id,
-				accountId: user.id,
-				providerId: "credential",
-				password: hashedPassword,
-				createdAt: new Date(),
-				updatedAt: new Date(),
+				email: input.email,
+				name: input.name,
+				roleId: input.organizationRoleId,
+				token,
+				expiresAt,
+				status: "PENDING",
+				organizationId: input.organizationId,
+				invitedById: context.user.id,
+			},
+		});
+
+		// إرسال بريد الدعوة
+		const baseUrl = getBaseUrl();
+		const invitationUrl = `${baseUrl}/invitation/accept?token=${token}`;
+
+		await sendEmail({
+			to: input.email,
+			templateId: "userInvitation",
+			context: {
+				url: invitationUrl,
+				organizationName: organization?.name ?? "المنظمة",
+				inviterName: context.user.name ?? "مدير المنظمة",
+				roleName: role?.name ?? "عضو",
 			},
 		});
 

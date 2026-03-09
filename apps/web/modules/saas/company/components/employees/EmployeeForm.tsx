@@ -28,6 +28,7 @@ import {
 } from "@ui/components/select";
 import { Users, Banknote, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { FormWizard } from "../../../../ui/components/form-wizard";
 
 const EMPLOYEE_TYPES = [
 	"PROJECT_MANAGER", "SITE_ENGINEER", "SUPERVISOR", "ACCOUNTANT",
@@ -157,10 +158,11 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 
 	const isPending = createMutation.isPending || updateMutation.isPending;
 
-	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" dir="rtl">
-				{/* Basic Info */}
+	const wizardSteps = [
+		{
+			title: t("company.employees.step1Title"),
+			description: t("company.employees.step1Desc"),
+			content: (
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
 					<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
 						<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
@@ -229,8 +231,13 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 						)} />
 					</div>
 				</div>
-
-				{/* Financial Info */}
+			),
+			validate: () => form.trigger(["name", "type", "joinDate"]),
+		},
+		{
+			title: t("company.employees.step2Title"),
+			description: t("company.employees.step2Desc"),
+			content: (
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
 					<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
 						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
@@ -291,8 +298,13 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 						)} />
 					</div>
 				</div>
-
-				{/* Notes */}
+			),
+			validate: () => form.trigger(["baseSalary"]),
+		},
+		{
+			title: t("company.employees.step3Title"),
+			description: t("company.employees.step3Desc"),
+			content: (
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
 					<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
 						<div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800/50">
@@ -311,19 +323,20 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 						)} />
 					</div>
 				</div>
+			),
+		},
+	];
 
-				<div className="flex gap-3">
-					<Button
-						type="submit"
-						disabled={isPending}
-						className="rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-					>
-						{isPending
-							? t("company.common.saving")
-							: isEditing
-								? t("company.common.update")
-								: t("company.common.create")}
-					</Button>
+	return (
+		<Form {...form}>
+			<div className="space-y-6" dir="rtl">
+				<FormWizard
+					steps={wizardSteps}
+					onComplete={() => form.handleSubmit(onSubmit)()}
+					isSubmitting={isPending}
+					submitLabel={isEditing ? t("company.common.update") : t("company.common.create")}
+				/>
+				<div className="flex justify-center">
 					<Button
 						type="button"
 						variant="outline"
@@ -333,7 +346,7 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 						{t("company.common.cancel")}
 					</Button>
 				</div>
-			</form>
+			</div>
 		</Form>
 	);
 }

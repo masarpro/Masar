@@ -1,5 +1,4 @@
 import { getOrganizationInvoices, getInvoiceById, getOrganizationFinanceSettings } from "@repo/database";
-import { db } from "@repo/database/prisma/client";
 import { z } from "zod";
 import { ORPCError } from "@orpc/server";
 import { protectedProcedure } from "../../../orpc/procedures";
@@ -42,15 +41,8 @@ export const listInvoices = protectedProcedure
 			action: "view",
 		});
 
-		// Auto-detect OVERDUE invoices — fire-and-forget (don't block the list query)
-		void db.financeInvoice.updateMany({
-			where: {
-				organizationId: input.organizationId,
-				status: { in: ["ISSUED", "SENT", "PARTIALLY_PAID"] },
-				dueDate: { lt: new Date() },
-			},
-			data: { status: "OVERDUE" },
-		});
+		// OVERDUE status is updated by daily cron job:
+		// /api/cron/update-overdue-invoices
 
 		const result = await getOrganizationInvoices(input.organizationId, {
 			status: input.status,

@@ -24,6 +24,7 @@ export function NewOrgsChart({
 			<h3 className="font-semibold text-lg mb-4">
 				{t("admin.dashboard.newOrgs")}
 			</h3>
+			<div role="img" aria-label={`${t("admin.dashboard.newOrgs")} - ${data.length} شهر`}>
 			<ResponsiveContainer width="100%" height={300}>
 				<BarChart data={data}>
 					<CartesianGrid strokeDasharray="3 3" />
@@ -37,6 +38,7 @@ export function NewOrgsChart({
 					/>
 				</BarChart>
 			</ResponsiveContainer>
+			</div>
 		</Card>
 	);
 }

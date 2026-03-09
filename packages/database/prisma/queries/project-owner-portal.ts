@@ -1,5 +1,5 @@
 import { db } from "../client";
-import { randomBytes } from "crypto";
+import { randomBytes, randomUUID } from "crypto";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Owner Access Queries - وصول مالك المشروع
@@ -177,6 +177,107 @@ export async function getOwnerContextByTokenLegacy(token: string) {
 	if (!result.ok) return null;
 	const { ok, ...context } = result;
 	return context;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Owner Portal Session Management
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Create a session for an owner portal access token.
+ * Session is valid for 1 hour and can be refreshed.
+ */
+export async function createOwnerPortalSession(
+	portalAccessId: string,
+	opts?: { ipAddress?: string; userAgent?: string },
+) {
+	const sessionToken = randomUUID();
+	const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+	return db.ownerPortalSession.create({
+		data: {
+			sessionToken,
+			portalAccessId,
+			expiresAt,
+			ipAddress: opts?.ipAddress ?? null,
+			userAgent: opts?.userAgent ?? null,
+		},
+	});
+}
+
+/**
+ * Validate an owner portal session and return the context.
+ * Also refreshes lastAccessedAt and extends expiry on valid sessions.
+ */
+export async function getOwnerContextBySession(
+	sessionToken: string,
+): Promise<OwnerContextResult> {
+	const session = await db.ownerPortalSession.findUnique({
+		where: { sessionToken },
+		include: {
+			portalAccess: {
+				include: {
+					project: {
+						select: {
+							id: true,
+							name: true,
+							slug: true,
+							status: true,
+							clientName: true,
+							location: true,
+							progress: true,
+							contractValue: true,
+							startDate: true,
+							endDate: true,
+							organizationId: true,
+							organization: {
+								select: { name: true, logo: true },
+							},
+						},
+					},
+				},
+			},
+		},
+	});
+
+	if (!session) {
+		return { ok: false, reason: "NOT_FOUND" };
+	}
+
+	// Check session expiry
+	if (session.expiresAt < new Date()) {
+		return { ok: false, reason: "EXPIRED" };
+	}
+
+	const access = session.portalAccess;
+
+	// Check if underlying access is revoked
+	if (access.isRevoked) {
+		return { ok: false, reason: "REVOKED" };
+	}
+
+	// Check if underlying access has expired
+	if (!access.expiresAt || access.expiresAt < new Date()) {
+		return { ok: false, reason: "EXPIRED" };
+	}
+
+	// Refresh session: extend expiry by 1 hour and update lastAccessedAt
+	await db.ownerPortalSession.update({
+		where: { id: session.id },
+		data: {
+			lastAccessedAt: new Date(),
+			expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+		},
+	});
+
+	return {
+		ok: true,
+		accessId: access.id,
+		organizationId: access.organizationId,
+		projectId: access.projectId,
+		project: access.project,
+		label: access.label,
+	};
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

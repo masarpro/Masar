@@ -25,10 +25,13 @@ import {
 	TableHeader,
 	TableRow,
 } from "@ui/components/table";
-import { Plus, Search, XCircle, Receipt, Banknote, CalendarRange, Send } from "lucide-react";
+import { Checkbox } from "@ui/components/checkbox";
+import { Plus, Search, XCircle, Receipt, Banknote, CalendarRange, Send, Download } from "lucide-react";
 import { toast } from "sonner";
 import { Pagination } from "@saas/shared/components/Pagination";
 import { AddExpenseDialog } from "./AddExpenseDialog";
+import { BulkActionsBar } from "../../../../ui/components/bulk-actions-bar";
+import { exportTableToCsv } from "../../../../../lib/export-table";
 
 interface ExpenseListProps {
 	organizationId: string;
@@ -50,6 +53,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 	const [activeFilter, setActiveFilter] = useState<string>("all");
 	const [showAddDialog, setShowAddDialog] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
+	const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
 	const PAGE_SIZE = 20;
 
@@ -65,7 +69,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 			},
 		}),
 		staleTime: STALE_TIMES.EXPENSES,
-	);
+	});
 
 	const { data: summary } = useQuery(
 		orpc.company.expenses.getSummary.queryOptions({
@@ -90,6 +94,25 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 		},
 	});
 
+	const expenses = data?.expenses ?? [];
+	const toggleRow = (id: string) => {
+		setSelectedIds((prev) => {
+			const next = new Set(prev);
+			if (next.has(id)) next.delete(id);
+			else next.add(id);
+			return next;
+		});
+	};
+	const toggleAllPage = () => {
+		if (expenses.length > 0 && selectedIds.size === expenses.length) {
+			setSelectedIds(new Set());
+		} else {
+			setSelectedIds(new Set(expenses.map((e) => e.id)));
+		}
+	};
+	const clearSelection = () => setSelectedIds(new Set());
+	const selectedExpenses = expenses.filter((e) => selectedIds.has(e.id));
+
 	const formatCurrency = (amount: number | string) =>
 		new Intl.NumberFormat("ar-SA").format(Number(amount)) + " ر.س";
 
@@ -102,7 +125,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 			);
 		}
 		return (
-			<Badge className="bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400 border-0 text-[10px] px-2 py-0.5">
+			<Badge className="bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-500 border-0 text-[10px] px-2 py-0.5">
 				{t("company.expenses.statusInactive")}
 			</Badge>
 		);
@@ -114,7 +137,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 			QUARTERLY: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400",
 			SEMI_ANNUAL: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
 			ANNUAL: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400",
-			ONE_TIME: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
+			ONE_TIME: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-500",
 		};
 		return (
 			<Badge className={`border-0 text-[10px] px-2 py-0.5 ${styles[recurrence] ?? styles.ONE_TIME}`}>
@@ -134,7 +157,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 								<Banknote className="h-5 w-5 text-blue-600 dark:text-blue-400" />
 							</div>
 						</div>
-						<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+						<p className="text-xs font-medium text-slate-500 dark:text-slate-500 mb-1">
 							{t("company.expenses.totalMonthly")}
 						</p>
 						<p className="text-xl font-bold text-blue-700 dark:text-blue-300">
@@ -148,7 +171,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 								<CalendarRange className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
 							</div>
 						</div>
-						<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+						<p className="text-xs font-medium text-slate-500 dark:text-slate-500 mb-1">
 							{t("company.expenses.totalAnnual")}
 						</p>
 						<p className="text-xl font-bold text-indigo-700 dark:text-indigo-300">
@@ -162,7 +185,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 								<Receipt className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 							</div>
 						</div>
-						<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+						<p className="text-xs font-medium text-slate-500 dark:text-slate-500 mb-1">
 							{t("company.expenses.activeCount")}
 						</p>
 						<p className="text-2xl font-bold text-sky-700 dark:text-sky-300">
@@ -176,7 +199,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
 					<div className="relative max-w-md flex-1">
-						<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+						<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
 						<Input
 							placeholder={t("company.expenses.searchPlaceholder")}
 							value={search}
@@ -214,38 +237,45 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 						onClick={() => router.push(`/app/${organizationSlug}/company/expense-runs`)}
 						className="rounded-xl border-blue-200/50 dark:border-blue-800/30 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
 					>
-						<Send className="ml-2 h-4 w-4" />
+						<Send className="ms-2 h-4 w-4" />
 						{t("company.expenses.postToFinance")}
 					</Button>
 					<Button
 						onClick={() => setShowAddDialog(true)}
 						className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
 					>
-						<Plus className="ml-2 h-4 w-4" />
+						<Plus className="ms-2 h-4 w-4" />
 						{t("company.expenses.addExpense")}
 					</Button>
 				</div>
 			</div>
 
 			{/* Table - Glass Morphism */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-				<Table className="table-fixed w-full">
+			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden overflow-x-auto">
+				<Table className="w-full">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[20%]">{t("company.expenses.name")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[15%]">{t("company.expenses.category")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[15%]">{t("company.expenses.amount")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[14%]">{t("company.expenses.recurrenceLabel")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[16%]">{t("company.expenses.vendor")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[12%]">{t("company.expenses.status")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[8%]">{t("company.common.actions")}</TableHead>
+							<TableHead className="w-10">
+								<Checkbox
+									checked={expenses.length > 0 && selectedIds.size === expenses.length}
+									onCheckedChange={toggleAllPage}
+									aria-label={t("common.selectAll")}
+								/>
+							</TableHead>
+							<TableHead className="text-right text-slate-500 dark:text-slate-500">{t("company.expenses.name")}</TableHead>
+							<TableHead className="text-right text-slate-500 dark:text-slate-500 hidden sm:table-cell">{t("company.expenses.category")}</TableHead>
+							<TableHead className="text-right text-slate-500 dark:text-slate-500">{t("company.expenses.amount")}</TableHead>
+							<TableHead className="text-right text-slate-500 dark:text-slate-500 hidden md:table-cell">{t("company.expenses.recurrenceLabel")}</TableHead>
+							<TableHead className="text-right text-slate-500 dark:text-slate-500 hidden lg:table-cell">{t("company.expenses.vendor")}</TableHead>
+							<TableHead className="text-right text-slate-500 dark:text-slate-500 hidden sm:table-cell">{t("company.expenses.status")}</TableHead>
+							<TableHead className="text-right text-slate-500 dark:text-slate-500">{t("company.common.actions")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{isLoading ? (
 							[...Array(5)].map((_, i) => (
 								<TableRow key={i} className="border-white/10 dark:border-slate-700/30">
-									{[...Array(7)].map((_, j) => (
+									{[...Array(8)].map((_, j) => (
 										<TableCell key={j}>
 											<div className="h-4 animate-pulse rounded bg-muted" />
 										</TableCell>
@@ -260,30 +290,38 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 									style={{ animationDelay: `${index * 30}ms` }}
 									onClick={() => router.push(`/app/${organizationSlug}/company/expenses/${expense.id}`)}
 								>
+									<TableCell onClick={(e) => e.stopPropagation()}>
+										<Checkbox
+											checked={selectedIds.has(expense.id)}
+											onCheckedChange={() => toggleRow(expense.id)}
+											aria-label={`${t("common.select")} ${expense.name}`}
+										/>
+									</TableCell>
 									<TableCell className="text-right">
 										<p className="font-medium text-slate-900 dark:text-slate-100 truncate">{expense.name}</p>
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-right text-slate-600 dark:text-slate-300 hidden sm:table-cell">
 										{t(`company.expenses.categories.${expense.category}`)}
 									</TableCell>
 									<TableCell className="text-right font-semibold text-slate-700 dark:text-slate-300">
 										{formatCurrency(Number(expense.amount))}
 									</TableCell>
-									<TableCell className="text-right">{getRecurrenceBadge(expense.recurrence)}</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-right hidden md:table-cell">{getRecurrenceBadge(expense.recurrence)}</TableCell>
+									<TableCell className="text-right hidden lg:table-cell">
 										{expense.vendor ? (
 											<span className="text-slate-600 dark:text-slate-300 truncate block">{expense.vendor}</span>
 										) : (
-											<span className="text-xs text-slate-400">-</span>
+											<span className="text-xs text-slate-500">-</span>
 										)}
 									</TableCell>
-									<TableCell className="text-right">{getStatusBadge(expense.isActive)}</TableCell>
+									<TableCell className="text-right hidden sm:table-cell">{getStatusBadge(expense.isActive)}</TableCell>
 									<TableCell className="text-right">
 										{expense.isActive && (
 											<Button
 												variant="ghost"
 												size="icon"
 												className="rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
+												aria-label={t("company.expenses.deactivate")}
 												onClick={(e) => {
 													e.stopPropagation();
 													if (confirm(t("company.expenses.confirmDeactivate"))) {
@@ -299,12 +337,12 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 							))
 						) : (
 							<TableRow>
-								<TableCell colSpan={7} className="text-center py-16">
+								<TableCell colSpan={8} className="text-center py-16">
 									<div className="flex flex-col items-center">
 										<div className="mb-4 rounded-2xl bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-xl p-5">
-											<Receipt className="h-10 w-10 text-slate-400 dark:text-slate-500" />
+											<Receipt className="h-10 w-10 text-slate-500 dark:text-slate-500" />
 										</div>
-										<p className="text-sm text-slate-500 dark:text-slate-400">
+										<p className="text-sm text-slate-500 dark:text-slate-500">
 											{t("company.expenses.noExpenses")}
 										</p>
 									</div>
@@ -314,6 +352,58 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 					</TableBody>
 				</Table>
 			</div>
+
+			{/* Bulk Actions */}
+			<BulkActionsBar
+				selectedCount={selectedIds.size}
+				totalCount={expenses.length}
+				selectedIds={Array.from(selectedIds)}
+				onClearSelection={clearSelection}
+				actions={[
+					{
+						label: t("common.export"),
+						icon: <Download className="h-4 w-4 me-1.5" />,
+						onClick: () => {
+							exportTableToCsv(
+								selectedExpenses as unknown as Record<string, unknown>[],
+								[
+									{ key: "name", label: t("company.expenses.name") },
+									{ key: "category", label: t("company.expenses.category") },
+									{ key: "amount", label: t("company.expenses.amount") },
+									{ key: "recurrence", label: t("company.expenses.recurrenceLabel") },
+									{ key: "vendor", label: t("company.expenses.vendor") },
+								],
+								"expenses",
+							);
+							clearSelection();
+						},
+					},
+					{
+						label: t("company.expenses.bulkDeactivate"),
+						icon: <XCircle className="h-4 w-4 me-1.5" />,
+						variant: "destructive",
+						onClick: () => {
+							const eligible = selectedExpenses.filter((e) => e.isActive);
+							if (eligible.length === 0) {
+								toast.error(t("company.expenses.noActiveSelected"));
+								return;
+							}
+							if (confirm(t("company.expenses.bulkDeactivateConfirm", { count: eligible.length }))) {
+								Promise.allSettled(
+									eligible.map((e) =>
+										orpcClient.company.expenses.deactivate({ organizationId, id: e.id }),
+									),
+								).then(() => {
+									queryClient.invalidateQueries({ queryKey: orpc.company.expenses.list.queryOptions({ input: { organizationId } }).queryKey });
+									queryClient.invalidateQueries({ queryKey: orpc.company.expenses.getSummary.queryOptions({ input: { organizationId } }).queryKey });
+									clearSelection();
+									toast.success(t("company.expenses.bulkDeactivateSuccess"));
+								});
+							}
+						},
+					},
+				]}
+			/>
 
 			{(data?.total ?? 0) > PAGE_SIZE && (
 				<Pagination

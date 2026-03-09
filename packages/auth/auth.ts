@@ -53,7 +53,7 @@ export const auth = betterAuth({
 	},
 	session: {
 		expiresIn: config.auth.sessionCookieMaxAge,
-		freshAge: 300,
+		freshAge: 60,
 	},
 	account: {
 		accountLinking: {

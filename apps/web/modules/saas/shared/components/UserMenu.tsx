@@ -87,7 +87,7 @@ export function UserMenu({ showUserName }: { showUserName?: boolean }) {
 					<span className="flex items-center gap-2">
 						<UserAvatar name={name ?? ""} avatarUrl={image} />
 						{showUserName && (
-							<span className="text-left leading-tight">
+							<span className="text-start leading-tight">
 								<span className="font-medium text-sm">
 									{name}
 								</span>
@@ -115,7 +115,7 @@ export function UserMenu({ showUserName }: { showUserName?: boolean }) {
 				{/* Color mode selection */}
 				<DropdownMenuSub>
 					<DropdownMenuSubTrigger>
-						<SunIcon className="mr-2 size-4" />
+						<SunIcon className="me-2 size-4" />
 						{t("app.userMenu.colorMode")}
 					</DropdownMenuSubTrigger>
 					<DropdownMenuPortal>
@@ -132,7 +132,7 @@ export function UserMenu({ showUserName }: { showUserName?: boolean }) {
 										key={option.value}
 										value={option.value}
 									>
-										<option.icon className="mr-2 size-4 opacity-50" />
+										<option.icon className="me-2 size-4 opacity-50" />
 										{option.label}
 									</DropdownMenuRadioItem>
 								))}
@@ -145,27 +145,27 @@ export function UserMenu({ showUserName }: { showUserName?: boolean }) {
 
 				<DropdownMenuItem asChild>
 					<Link href="/app/settings/general">
-						<SettingsIcon className="mr-2 size-4" />
+						<SettingsIcon className="me-2 size-4" />
 						{t("app.userMenu.accountSettings")}
 					</Link>
 				</DropdownMenuItem>
 
 				<DropdownMenuItem asChild>
 					<a href="https://supastarter.dev/docs/nextjs">
-						<BookIcon className="mr-2 size-4" />
+						<BookIcon className="me-2 size-4" />
 						{t("app.userMenu.documentation")}
 					</a>
 				</DropdownMenuItem>
 
 				<DropdownMenuItem asChild>
 					<Link href="/">
-						<HomeIcon className="mr-2 size-4" />
+						<HomeIcon className="me-2 size-4" />
 						{t("app.userMenu.home")}
 					</Link>
 				</DropdownMenuItem>
 
 				<DropdownMenuItem onClick={onLogout}>
-					<LogOutIcon className="mr-2 size-4" />
+					<LogOutIcon className="me-2 size-4" />
 					{t("app.userMenu.logout")}
 				</DropdownMenuItem>
 			</DropdownMenuContent>

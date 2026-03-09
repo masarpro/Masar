@@ -241,6 +241,7 @@ export function EditPlanDialog({
 										variant="ghost"
 										size="icon"
 										onClick={() => removeFeature(index)}
+										aria-label="حذف الميزة"
 									>
 										<TrashIcon className="size-4 text-destructive" />
 									</Button>

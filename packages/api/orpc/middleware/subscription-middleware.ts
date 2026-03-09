@@ -1,5 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@repo/database";
+import { logBusinessEvent } from "@repo/logs";
 
 /**
  * Subscription middleware — checks if the active organization has a valid
@@ -51,6 +52,13 @@ export async function checkSubscription(context: {
 			where: { id: orgId },
 			data: { status: "ACTIVE", plan: "FREE" },
 		});
+		logBusinessEvent({
+			type: "subscription.expired",
+			userId: context.user.id,
+			organizationId: orgId,
+			metadata: { trialEndsAt: org.trialEndsAt.toISOString() },
+			severity: "info",
+		});
 		throw new ORPCError("FORBIDDEN", {
 			message:
 				"انتهت الفترة التجريبية. يرجى ترقية اشتراكك للمتابعة.",
@@ -60,6 +68,13 @@ export async function checkSubscription(context: {
 
 	// Block FREE plan from write operations
 	if (org.plan === "FREE") {
+		logBusinessEvent({
+			type: "subscription.limit_hit",
+			userId: context.user.id,
+			organizationId: orgId,
+			metadata: { plan: "FREE" },
+			severity: "info",
+		});
 		throw new ORPCError("FORBIDDEN", {
 			message:
 				"هذه الميزة متاحة في الخطة الاحترافية فقط. يرجى ترقية اشتراكك.",

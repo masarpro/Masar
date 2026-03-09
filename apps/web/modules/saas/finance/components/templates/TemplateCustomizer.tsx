@@ -431,8 +431,8 @@ export function TemplateCustomizer({
 			<div className="border-b bg-background px-4 py-3 flex items-center justify-between shrink-0">
 				<div className="flex items-center gap-3">
 					<Link href={`${basePath}/templates`}>
-						<Button variant="ghost" size="icon" className="rounded-xl">
-							<ArrowRightIcon className="h-5 w-5" />
+						<Button variant="ghost" size="icon" className="rounded-xl" aria-label="رجوع">
+							<ArrowRightIcon className="h-5 w-5 rtl:rotate-180" />
 						</Button>
 					</Link>
 					<div>
@@ -704,6 +704,7 @@ export function TemplateCustomizer({
 											size="icon"
 											className="absolute top-1 end-1 h-6 w-6 rounded-full bg-background/80"
 											onClick={() => handleUpdateSettings({ headerImage: undefined })}
+											aria-label="إزالة صورة الترويسة"
 										>
 											<XIcon className="h-3 w-3" />
 										</Button>
@@ -729,6 +730,7 @@ export function TemplateCustomizer({
 											size="icon"
 											className="absolute top-1 end-1 h-6 w-6 rounded-full bg-background/80"
 											onClick={() => handleUpdateSettings({ footerImage: undefined })}
+											aria-label="إزالة صورة التذييل"
 										>
 											<XIcon className="h-3 w-3" />
 										</Button>
@@ -882,6 +884,7 @@ export function TemplateCustomizer({
 								onClick={() =>
 									setZoom((z) => Math.max(30, z - 10))
 								}
+								aria-label="تصغير"
 							>
 								<ZoomOutIcon className="h-4 w-4" />
 							</Button>
@@ -895,6 +898,7 @@ export function TemplateCustomizer({
 								onClick={() =>
 									setZoom((z) => Math.min(150, z + 10))
 								}
+								aria-label="تكبير"
 							>
 								<ZoomInIcon className="h-4 w-4" />
 							</Button>

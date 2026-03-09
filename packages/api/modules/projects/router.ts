@@ -1,5 +1,9 @@
 import { createProjectProcedure } from "./procedures/create-project";
 import { deleteProjectProcedure } from "./procedures/delete-project";
+import {
+	archiveProjectProcedure,
+	restoreProjectProcedure,
+} from "./procedures/archive-project";
 import { getNextProjectNoProcedure } from "./procedures/get-next-project-no";
 import { getProject } from "./procedures/get-project";
 import { listProjects } from "./procedures/list-projects";
@@ -11,5 +15,7 @@ export const projectsRouter = {
 	getById: getProject,
 	update: updateProjectProcedure,
 	delete: deleteProjectProcedure,
+	archive: archiveProjectProcedure,
+	restore: restoreProjectProcedure,
 	getNextProjectNo: getNextProjectNoProcedure,
 };

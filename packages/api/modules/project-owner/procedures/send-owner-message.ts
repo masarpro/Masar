@@ -1,9 +1,9 @@
-import { getOwnerContextByToken, sendOwnerPortalMessage, createNotifications } from "@repo/database";
+import { sendOwnerPortalMessage, createNotifications } from "@repo/database";
 import { z } from "zod";
 import { publicProcedure } from "../../../orpc/procedures";
 import { db } from "@repo/database";
 import { enforceRateLimit, RATE_LIMITS } from "../../../lib/rate-limit";
-import { throwOwnerTokenError } from "../helpers";
+import { resolveOwnerContext, throwOwnerTokenError } from "../helpers";
 
 export const sendOwnerMessageProcedure = publicProcedure
 	.route({
@@ -14,18 +14,19 @@ export const sendOwnerMessageProcedure = publicProcedure
 	})
 	.input(
 		z.object({
-			token: z.string().min(1, "رمز الوصول مطلوب"),
+			token: z.string().min(1).optional(),
+			sessionToken: z.string().min(1).optional(),
 			content: z.string().min(1, "الرسالة مطلوبة"),
 			senderName: z.string().optional().default("مالك المشروع"),
+		}).refine((d) => d.token || d.sessionToken, {
+			message: "token or sessionToken is required",
 		}),
 	)
 	.handler(async ({ input }) => {
-		// STRICT rate limit (5/min) for write operations — prevents message spam
-		// and notification flooding to all org members
-		await enforceRateLimit(`token:${input.token}:sendOwnerMessage`, RATE_LIMITS.STRICT);
+		const authKey = input.token || input.sessionToken!;
+		await enforceRateLimit(`token:${authKey}:sendOwnerMessage`, RATE_LIMITS.STRICT);
 
-		// Validate token
-		const result = await getOwnerContextByToken(input.token);
+		const result = await resolveOwnerContext(input);
 
 		if (!result.ok) {
 			throwOwnerTokenError(result.reason);

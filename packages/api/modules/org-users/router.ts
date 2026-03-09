@@ -1,3 +1,4 @@
+import { acceptInvitation } from "./procedures/accept-invitation";
 import { createOrgUser } from "./procedures/create-org-user";
 import { deleteOrgUser } from "./procedures/delete-org-user";
 import { listOrgUsers } from "./procedures/list-org-users";
@@ -10,4 +11,5 @@ export const orgUsersRouter = {
 	update: updateOrgUser,
 	toggleActive: toggleUserActive,
 	delete: deleteOrgUser,
+	acceptInvitation: acceptInvitation,
 };

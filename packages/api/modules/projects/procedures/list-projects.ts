@@ -13,7 +13,7 @@ export const listProjects = protectedProcedure
 	.input(
 		z.object({
 			organizationId: z.string(),
-			status: z.enum(["ACTIVE", "ON_HOLD", "COMPLETED"]).optional(),
+			status: z.enum(["ACTIVE", "ON_HOLD", "COMPLETED", "ARCHIVED"]).optional(),
 			query: z.string().optional(),
 			limit: z.number().optional().default(50),
 			offset: z.number().optional().default(0),

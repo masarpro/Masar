@@ -15,7 +15,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@ui/components/select";
-import { Pencil, Plus, Trash2, Users, Banknote, Briefcase } from "lucide-react";
+import { Pencil, Plus, Trash2, Users, Banknote, Briefcase, History } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -33,9 +33,17 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 	const [assignProjectId, setAssignProjectId] = useState("");
 	const [assignPercentage, setAssignPercentage] = useState("50");
 
+	const [historyPage, setHistoryPage] = useState(1);
+
 	const { data: employee, isLoading } = useQuery(
 		orpc.company.employees.getById.queryOptions({
 			input: { organizationId, id: employeeId },
+		}),
+	);
+
+	const { data: historyData } = useQuery(
+		orpc.company.employees.history.queryOptions({
+			input: { organizationId, employeeId, page: historyPage, pageSize: 10 },
 		}),
 	);
 
@@ -322,6 +330,94 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 							</p>
 							<p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-1">
 								{t("company.employees.generalBudgetDesc")}
+							</p>
+						</div>
+					)}
+				</div>
+			</div>
+
+			{/* Change History Card */}
+			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
+				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
+					<div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30">
+						<History className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+					</div>
+					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+						{t("company.employees.changeHistory.title")}
+					</h3>
+				</div>
+				<div className="p-5">
+					{historyData && historyData.changes.length > 0 ? (
+						<>
+							<div className="overflow-x-auto">
+								<table className="w-full text-sm">
+									<thead>
+										<tr className="border-b border-slate-200 dark:border-slate-700">
+											<th className="pb-2 text-right text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.date")}</th>
+											<th className="pb-2 text-right text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.changeType")}</th>
+											<th className="pb-2 text-right text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.field")}</th>
+											<th className="pb-2 text-right text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.oldValue")}</th>
+											<th className="pb-2 text-right text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.newValue")}</th>
+										</tr>
+									</thead>
+									<tbody>
+										{historyData.changes.map((change) => (
+											<tr key={change.id} className="border-b border-slate-100 dark:border-slate-800 last:border-0">
+												<td className="py-2.5 text-slate-700 dark:text-slate-300 whitespace-nowrap">
+													{new Date(change.createdAt).toLocaleDateString("ar-SA")}
+												</td>
+												<td className="py-2.5">
+													<Badge className="border-0 text-[10px] px-2 py-0.5 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+														{t(`company.employees.changeHistory.types.${change.changeType}`)}
+													</Badge>
+												</td>
+												<td className="py-2.5 text-slate-700 dark:text-slate-300">
+													{t(`company.employees.changeHistory.fields.${change.fieldName}`)}
+												</td>
+												<td className="py-2.5 text-red-600 dark:text-red-400 line-through">
+													{change.oldValue ?? "-"}
+												</td>
+												<td className="py-2.5 text-sky-600 dark:text-sky-400 font-medium">
+													{change.newValue ?? "-"}
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+							{historyData.total > 10 && (
+								<div className="flex items-center justify-center gap-2 mt-4">
+									<Button
+										variant="outline"
+										size="sm"
+										className="rounded-xl"
+										disabled={historyPage <= 1}
+										onClick={() => setHistoryPage((p) => p - 1)}
+									>
+										{t("common.previous")}
+									</Button>
+									<span className="text-sm text-slate-500 dark:text-slate-400">
+										{historyPage} / {Math.ceil(historyData.total / 10)}
+									</span>
+									<Button
+										variant="outline"
+										size="sm"
+										className="rounded-xl"
+										disabled={historyPage >= Math.ceil(historyData.total / 10)}
+										onClick={() => setHistoryPage((p) => p + 1)}
+									>
+										{t("common.next")}
+									</Button>
+								</div>
+							)}
+						</>
+					) : (
+						<div className="rounded-xl border border-amber-200/50 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-950/20 p-4 text-center">
+							<p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+								{t("company.employees.changeHistory.noChanges")}
+							</p>
+							<p className="text-xs text-amber-600/70 dark:text-amber-400/70 mt-1">
+								{t("company.employees.changeHistory.noChangesDesc")}
 							</p>
 						</div>
 					)}

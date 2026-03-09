@@ -325,7 +325,7 @@ export function getAssistantTools(ctx: ToolContext) {
             };
 
           if (action === "phases") {
-            const milestones = await listMilestones(
+            const { items: milestones } = await listMilestones(
               ctx.organizationId,
               projectId,
             );
@@ -450,7 +450,7 @@ export function getAssistantTools(ctx: ToolContext) {
               error: "المشروع غير موجود أو لا تملك صلاحية الوصول",
             };
 
-          const [allMilestones, health] = await Promise.all([
+          const [milestonesResult, health] = await Promise.all([
             listMilestones(ctx.organizationId, projectId),
             getTimelineHealth(ctx.organizationId, projectId),
           ]);
@@ -458,7 +458,7 @@ export function getAssistantTools(ctx: ToolContext) {
           const now = new Date();
           const filterFn = filter ?? "all";
 
-          const filtered = allMilestones.filter((m) => {
+          const filtered = milestonesResult.items.filter((m) => {
             if (filterFn === "all") return true;
             if (filterFn === "completed") return m.status === "COMPLETED";
             if (filterFn === "overdue") {
@@ -488,7 +488,7 @@ export function getAssistantTools(ctx: ToolContext) {
               actualStart: m.actualStart,
               actualEnd: m.actualEnd,
             })),
-            total: allMilestones.length,
+            total: milestonesResult.items.length,
             health,
           };
         } catch (e) {

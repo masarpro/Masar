@@ -18,6 +18,8 @@ import {
 	removeAssignmentProcedure,
 } from "./procedures/employee-assignments";
 
+import { getEmployeeHistoryProcedure } from "./procedures/employee-history";
+
 import {
 	listCompanyExpenses,
 	getCompanyExpenseByIdProcedure,
@@ -80,6 +82,29 @@ import {
 	deleteExpenseRunItemProcedure,
 } from "./procedures/expense-runs";
 
+import {
+	listLeaveTypesProcedure,
+	createLeaveTypeProcedure,
+	updateLeaveTypeProcedure,
+	deleteLeaveTypeProcedure,
+	seedDefaultLeaveTypesProcedure,
+} from "./procedures/leaves/leave-types";
+
+import {
+	listLeaveBalancesProcedure,
+	adjustLeaveBalanceProcedure,
+} from "./procedures/leaves/leave-balances";
+
+import {
+	listLeaveRequestsProcedure,
+	createLeaveRequestProcedure,
+	approveLeaveRequestProcedure,
+	rejectLeaveRequestProcedure,
+	cancelLeaveRequestProcedure,
+} from "./procedures/leaves/leave-requests";
+
+import { leaveDashboardProcedure } from "./procedures/leaves/leave-dashboard";
+
 import { getCompanyDashboard } from "./procedures/dashboard";
 
 export const companyRouter = {
@@ -94,6 +119,7 @@ export const companyRouter = {
 		update: updateEmployeeProcedure,
 		terminate: terminateEmployeeProcedure,
 		getSummary: getEmployeeSummaryProcedure,
+		history: getEmployeeHistoryProcedure,
 		// Assignments
 		assignments: {
 			list: listEmployeeAssignments,
@@ -155,6 +181,29 @@ export const companyRouter = {
 		summary: expenseRunSummaryProcedure,
 		updateItem: updateExpenseRunItemProcedure,
 		deleteItem: deleteExpenseRunItemProcedure,
+	},
+
+	// Leaves - إدارة الإجازات
+	leaves: {
+		dashboard: leaveDashboardProcedure,
+		types: {
+			list: listLeaveTypesProcedure,
+			create: createLeaveTypeProcedure,
+			update: updateLeaveTypeProcedure,
+			delete: deleteLeaveTypeProcedure,
+			seedDefaults: seedDefaultLeaveTypesProcedure,
+		},
+		balances: {
+			list: listLeaveBalancesProcedure,
+			adjust: adjustLeaveBalanceProcedure,
+		},
+		requests: {
+			list: listLeaveRequestsProcedure,
+			create: createLeaveRequestProcedure,
+			approve: approveLeaveRequestProcedure,
+			reject: rejectLeaveRequestProcedure,
+			cancel: cancelLeaveRequestProcedure,
+		},
 	},
 
 	// Assets

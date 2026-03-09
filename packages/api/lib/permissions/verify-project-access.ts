@@ -1,6 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import { db, getProjectById } from "@repo/database";
 import { hasPermission, type Permissions } from "@repo/database/prisma/permissions";
+import { logBusinessEvent } from "@repo/logs";
 import { getUserPermissions } from "./get-user-permissions";
 import { verifyOrganizationMembership } from "../../modules/organizations/lib/membership";
 
@@ -73,6 +74,17 @@ export async function verifyProjectAccess(
 	// Step 4: Check required permission if provided
 	if (requiredPermission) {
 		if (!hasPermission(permissions, requiredPermission.section, requiredPermission.action)) {
+			logBusinessEvent({
+				type: "permission.denied",
+				userId,
+				organizationId,
+				metadata: {
+					section: requiredPermission.section,
+					action: requiredPermission.action,
+					projectId,
+				},
+				severity: "warning",
+			});
 			throw new ORPCError("FORBIDDEN", {
 				message: getPermissionErrorMessage(requiredPermission.section, requiredPermission.action),
 			});
@@ -132,6 +144,16 @@ export async function verifyOrganizationAccess(
 	// Step 3: Check required permission if provided
 	if (requiredPermission) {
 		if (!hasPermission(permissions, requiredPermission.section, requiredPermission.action)) {
+			logBusinessEvent({
+				type: "permission.denied",
+				userId,
+				organizationId,
+				metadata: {
+					section: requiredPermission.section,
+					action: requiredPermission.action,
+				},
+				severity: "warning",
+			});
 			throw new ORPCError("FORBIDDEN", {
 				message: getPermissionErrorMessage(requiredPermission.section, requiredPermission.action),
 			});

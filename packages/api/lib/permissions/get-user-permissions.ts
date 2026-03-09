@@ -4,6 +4,7 @@ import {
 	createEmptyPermissions,
 	DEFAULT_ROLE_PERMISSIONS,
 } from "@repo/database/prisma/permissions";
+import { logBusinessEvent } from "@repo/logs";
 
 /**
  * Get user's effective permissions within an organization.
@@ -40,6 +41,16 @@ export async function getUserPermissions(
 	// (via Better Auth invitation) would receive Org X's OWNER permissions
 	// when operating in Org Y context — a cross-tenant privilege escalation.
 	if (user.organizationId !== organizationId) {
+		logBusinessEvent({
+			type: "permission.cross_tenant",
+			userId,
+			organizationId,
+			metadata: {
+				userOrgId: user.organizationId,
+				requestedOrgId: organizationId,
+			},
+			severity: "error",
+		});
 		return createEmptyPermissions();
 	}
 

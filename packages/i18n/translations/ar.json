@@ -258,7 +258,8 @@
 			"pricing": "التسعير",
 			"projects": "المشاريع",
 			"quantities": "حصر الكميات",
-			"home": "الرئيسية"
+			"home": "الرئيسية",
+			"mainNavigation": "القائمة الرئيسية"
 		},
 		"userMenu": {
 			"accountSettings": "إعدادات الحساب",
@@ -377,6 +378,20 @@
 		"description": "ابقَ على اطلاع بأحدث التغييرات في منتجنا.",
 		"title": "سجل التغييرات"
 	},
+	"invitation": {
+		"title": "قبول الدعوة",
+		"subtitle": "تمت دعوتك للانضمام إلى {orgName}",
+		"setPassword": "تعيين كلمة المرور",
+		"confirmPassword": "تأكيد كلمة المرور",
+		"name": "الاسم (اختياري)",
+		"accept": "قبول الدعوة",
+		"expired": "هذه الدعوة منتهية الصلاحية",
+		"alreadyAccepted": "هذه الدعوة مقبولة مسبقاً",
+		"invalidToken": "رابط الدعوة غير صالح",
+		"success": "تم قبول الدعوة بنجاح! جارٍ تحويلك لتسجيل الدخول...",
+		"passwordMismatch": "كلمات المرور غير متطابقة",
+		"loading": "جارٍ التحقق من الدعوة..."
+	},
 	"common": {
 		"hello": "مرحباً",
 		"back": "رجوع",
@@ -401,6 +416,10 @@
 		"saveFirst": "يرجى حفظ عرض السعر أولاً",
 		"all": "الكل",
 		"deleting": "جارٍ الحذف...",
+		"confirm": "تأكيد",
+		"select": "تحديد",
+		"selectAll": "تحديد الكل",
+		"export": "تصدير CSV",
 		"enable": "تفعيل",
 		"disable": "تعطيل",
 		"days": "يوم",
@@ -762,6 +781,13 @@
 			"headline": "انضم إلى مؤسسة {organizationName}",
 			"join": "الانضمام للمؤسسة",
 			"subject": "لقد تمت دعوتك للانضمام إلى مؤسسة"
+		},
+		"userInvitation": {
+			"headline": "تمت دعوتك للانضمام إلى <strong>{organizationName}</strong>",
+			"body": "قام {inviterName} بدعوتك للانضمام إلى منظمة {organizationName} بدور {roleName}.",
+			"accept": "قبول الدعوة وتعيين كلمة المرور",
+			"expiry": "هذا الرابط صالح لمدة 7 أيام.",
+			"subject": "دعوة للانضمام إلى {organizationName} في مسار"
 		}
 	},
 	"newsletter": {
@@ -2225,8 +2251,15 @@
 		"status": {
 			"ACTIVE": "نشط",
 			"ON_HOLD": "معلق",
-			"COMPLETED": "مكتمل"
+			"COMPLETED": "مكتمل",
+			"ARCHIVED": "مؤرشف"
 		},
+		"archive": "أرشفة المشروع",
+		"restore": "استعادة المشروع",
+		"archiveConfirm": "هل أنت متأكد من أرشفة هذا المشروع؟ يمكنك استعادته لاحقاً.",
+		"cannotDelete": "لا يمكن حذف هذا المشروع لأنه يحتوي على بيانات مالية. يمكنك أرشفته بدلاً من ذلك.",
+		"archiveSuccess": "تم أرشفة المشروع بنجاح",
+		"restoreSuccess": "تم استعادة المشروع بنجاح",
 		"type": {
 			"RESIDENTIAL": "سكني",
 			"COMMERCIAL": "تجاري",
@@ -2550,6 +2583,20 @@
 				"LETTERS": "الخطابات",
 				"PHOTOS": "الصور",
 				"OTHER": "أخرى"
+			},
+			"versions": {
+				"title": "الإصدارات",
+				"current": "الحالي",
+				"upload": "إصدار جديد",
+				"uploadTitle": "رفع إصدار جديد",
+				"changeNotes": "ملاحظات التغيير",
+				"changeNotesPlaceholder": "صف التغييرات في هذا الإصدار...",
+				"selectFile": "اختر الملف",
+				"uploadSuccess": "تم رفع الإصدار الجديد بنجاح",
+				"uploadError": "فشل رفع الإصدار",
+				"revertConfirm": "هل أنت متأكد من الاستعادة لهذا الإصدار؟ سيتم إنشاء إصدار جديد كنسخة.",
+				"revertSuccess": "تمت الاستعادة بنجاح",
+				"noVersions": "لا توجد إصدارات مسجلة"
 			}
 		},
 		"chat": {
@@ -3400,10 +3447,72 @@
 				"title": "إعدادات المنشأة",
 				"subtitle": "إدارة إعدادات وتفضيلات المنشأة",
 				"dangerZone": "منطقة الخطر",
-				"integrations": "التكاملات"
+				"integrations": "التكاملات",
+				"notifications": "الإشعارات"
 			}
 		},
-		"save": "حفظ"
+		"save": "حفظ",
+		"notifications": {
+			"title": "تفضيلات الإشعارات",
+			"description": "تحكم في أنواع الإشعارات التي تصلك وطريقة استلامها",
+			"notificationType": "نوع الإشعار",
+			"inApp": "داخل التطبيق",
+			"email": "البريد الإلكتروني",
+			"muteAll": "كتم الكل",
+			"mutedWarning": "جميع الإشعارات مكتومة حالياً. لن تتلقى أي إشعارات.",
+			"resetDefaults": "إعادة للافتراضي",
+			"updateSuccess": "تم تحديث تفضيلات الإشعارات",
+			"types": {
+				"approvalRequested": {
+					"title": "طلبات الاعتماد",
+					"description": "عند طلب اعتماد على مستند أو قرار"
+				},
+				"approvalDecided": {
+					"title": "قرارات الاعتماد",
+					"description": "عند الموافقة أو الرفض على طلب اعتماد"
+				},
+				"documentCreated": {
+					"title": "مستندات جديدة",
+					"description": "عند إضافة مستند جديد للمشروع"
+				},
+				"dailyReportCreated": {
+					"title": "التقارير اليومية",
+					"description": "عند إضافة تقرير يومي جديد"
+				},
+				"issueCreated": {
+					"title": "مشاكل جديدة",
+					"description": "عند تسجيل مشكلة جديدة في المشروع"
+				},
+				"issueCritical": {
+					"title": "مشاكل حرجة",
+					"description": "عند تسجيل مشكلة حرجة تتطلب تدخل فوري"
+				},
+				"expenseCreated": {
+					"title": "مصروفات جديدة",
+					"description": "عند تسجيل مصروف جديد في المشروع"
+				},
+				"claimCreated": {
+					"title": "مستخلصات جديدة",
+					"description": "عند إنشاء مستخلص جديد"
+				},
+				"claimStatusChanged": {
+					"title": "تحديث المستخلصات",
+					"description": "عند تغيير حالة مستخلص"
+				},
+				"changeOrderCreated": {
+					"title": "أوامر التغيير",
+					"description": "عند إنشاء أمر تغيير جديد"
+				},
+				"ownerMessage": {
+					"title": "رسائل المالك",
+					"description": "عند استلام رسالة من أو إلى مالك المشروع"
+				},
+				"teamMemberAdded": {
+					"title": "تغييرات الفريق",
+					"description": "عند إضافتك أو إزالتك من فريق مشروع"
+				}
+			}
+		}
 	},
 	"start": {
 		"subtitle": "شاهد أحدث إحصائيات عملك.",
@@ -5001,6 +5110,14 @@
 			"issueConfirmTitle": "إصدار الفاتورة",
 			"issueConfirmDescription": "بعد إصدار الفاتورة لن يمكنك تعديلها. هل أنت متأكد؟",
 			"issueConfirmButton": "نعم، أصدر الفاتورة",
+			"bulkMarkAsSent": "تعليم كمُرسلة",
+			"bulkMarkAsSentConfirm": "تعليم {count} فاتورة كمُرسلة؟",
+			"noEligibleForSent": "لا توجد فواتير مُصدرة قابلة للتعليم كمُرسلة",
+			"bulkCancelDrafts": "إلغاء المسودات",
+			"bulkCancelConfirm": "إلغاء {count} مسودة فاتورة؟",
+			"bulkCancelWarning": "سيتم حذف المسودات المحددة. الفواتير المُصدرة لا يمكن حذفها.",
+			"noEligibleForCancel": "لا توجد مسودات قابلة للإلغاء",
+			"bulkActionSuccess": "تم تنفيذ الإجراء بنجاح",
 			"actions": {
 				"send": "إرسال",
 				"convertToTax": "تحويل لضريبية",
@@ -5428,7 +5545,42 @@
 		"reports": {
 			"title": "التقارير المالية",
 			"subtitle": "عرض التقارير والإحصائيات المالية",
-			"comingSoon": "التقارير المالية - قريباً"
+			"comingSoon": "التقارير المالية - قريباً",
+			"cashFlow": {
+				"title": "تقرير التدفقات النقدية",
+				"subtitle": "تتبع حركة الأموال الداخلة والخارجة",
+				"periodType": "نوع الفترة",
+				"weekly": "أسبوعي",
+				"monthly": "شهري",
+				"dateRange": "النطاق الزمني",
+				"from": "من",
+				"to": "إلى",
+				"project": "المشروع (اختياري)",
+				"allProjects": "كل المشاريع",
+				"apply": "تطبيق",
+				"inflows": "التدفقات الداخلة",
+				"outflows": "التدفقات الخارجة",
+				"netFlow": "صافي التدفق",
+				"clientPayments": "مدفوعات العملاء",
+				"invoicePayments": "مدفوعات الفواتير",
+				"projectExpenses": "مصروفات المشاريع",
+				"subcontractPayments": "مدفوعات مقاولي الباطن",
+				"payroll": "الرواتب",
+				"companyExpenses": "مصروفات الشركة",
+				"cumulativeBalance": "الرصيد التراكمي",
+				"period": "الفترة",
+				"total": "الإجمالي",
+				"openingBalance": "الرصيد الافتتاحي",
+				"closingBalance": "الرصيد الختامي",
+				"netCashFlow": "صافي التدفق النقدي",
+				"totalInflows": "إجمالي الداخل",
+				"totalOutflows": "إجمالي الخارج",
+				"projected": "المتوقع",
+				"expectedInflows": "تدفقات متوقعة",
+				"expectedOutflows": "مصروفات متوقعة",
+				"projectedBalance": "الرصيد المتوقع",
+				"noData": "لا توجد بيانات تدفق نقدي للفترة المحددة"
+			}
 		},
 		"settings": {
 			"title": "إعدادات المالية",
@@ -6082,6 +6234,45 @@
 			"subcontractDeleted": "تم حذف العقد بنجاح",
 			"subcontractDeleteError": "فشل حذف العقد"
 		},
+		"profitability": {
+			"title": "تقرير الربحية",
+			"subtitle": "تحليل شامل لربحية المشروع",
+			"revenue": "الإيرادات",
+			"costs": "التكاليف",
+			"profit": "الربح",
+			"baseContractValue": "قيمة العقد الأساسي",
+			"changeOrders": "أوامر التغيير",
+			"totalContractValue": "إجمالي قيمة العقد",
+			"invoicedTotal": "إجمالي الفواتير",
+			"collectedTotal": "المبالغ المحصّلة",
+			"outstandingAmount": "المبالغ المستحقة",
+			"collectionRate": "نسبة التحصيل",
+			"directExpenses": "المصروفات المباشرة",
+			"subcontractCosts": "تكاليف مقاولي الباطن",
+			"laborCosts": "تكاليف العمالة",
+			"distributedExpenses": "المصروفات الموزّعة",
+			"totalCosts": "إجمالي التكاليف",
+			"grossProfit": "إجمالي الربح",
+			"profitMargin": "نسبة الربح",
+			"realizedProfit": "الربح المُحقّق",
+			"expectedMargin": "هامش الربح المتوقع",
+			"retention": "الاحتفاظ",
+			"retentionPercent": "نسبة الاحتفاظ",
+			"retentionAmount": "مبلغ الاحتفاظ",
+			"retentionCap": "سقف الاحتفاظ",
+			"totalPaid": "إجمالي المدفوع",
+			"remaining": "المتبقي",
+			"noData": "لا توجد بيانات مالية لهذا المشروع",
+			"invoiceCount": "الفواتير",
+			"paymentCount": "المدفوعات",
+			"categoryBreakdown": "حسب الفئة",
+			"subcontractBreakdown": "تفاصيل مقاولي الباطن",
+			"dateRange": "النطاق الزمني",
+			"from": "من",
+			"to": "إلى",
+			"apply": "تطبيق",
+			"clearFilter": "مسح الفلتر"
+		},
 		"projectHub": {
 			"title": "مالية المشروع",
 			"tabs": {
@@ -6400,10 +6591,12 @@
 			"payroll": "الرواتب",
 			"expenses": "المصروفات الثابتة",
 			"assets": "الأصول والمعدات",
+			"leaves": "الإجازات",
 			"reports": "التقارير"
 		},
 		"common": {
 			"all": "الكل",
+			"viewAll": "عرض الكل",
 			"actions": "الإجراءات",
 			"save": "حفظ",
 			"saving": "جاري الحفظ...",
@@ -6466,6 +6659,12 @@
 			"joinDate": "تاريخ الالتحاق",
 			"basicInfo": "المعلومات الأساسية",
 			"financialInfo": "المعلومات المالية",
+			"step1Title": "البيانات الشخصية",
+			"step1Desc": "الاسم ومعلومات التواصل",
+			"step2Title": "البيانات المالية",
+			"step2Desc": "الراتب والبدلات",
+			"step3Title": "ملاحظات إضافية",
+			"step3Desc": "ملاحظات ومعلومات أخرى",
 			"salaryType": "نوع الراتب",
 			"monthly": "شهري",
 			"daily": "يومي",
@@ -6513,6 +6712,42 @@
 				"LABORER": "عامل",
 				"SECURITY": "حارس أمن",
 				"OTHER": "أخرى"
+			},
+			"changeHistory": {
+				"title": "سجل التغييرات",
+				"date": "التاريخ",
+				"changeType": "نوع التغيير",
+				"field": "الحقل",
+				"oldValue": "القيمة القديمة",
+				"newValue": "القيمة الجديدة",
+				"changedBy": "بواسطة",
+				"noChanges": "لا توجد تغييرات مسجلة",
+				"noChangesDesc": "سيتم تسجيل التغييرات تلقائياً عند تعديل بيانات الموظف",
+				"types": {
+					"SALARY_CHANGE": "تغيير راتب",
+					"STATUS_CHANGE": "تغيير حالة",
+					"POSITION_CHANGE": "تغيير المسمى",
+					"ASSIGNMENT_CHANGE": "تغيير تعيين",
+					"INFO_UPDATE": "تحديث بيانات"
+				},
+				"fields": {
+					"baseSalary": "الراتب الأساسي",
+					"housingAllowance": "بدل السكن",
+					"transportAllowance": "بدل النقل",
+					"otherAllowances": "بدلات أخرى",
+					"gosiSubscription": "اشتراك التأمينات",
+					"salaryType": "نوع الراتب",
+					"status": "الحالة",
+					"type": "المسمى الوظيفي",
+					"name": "الاسم",
+					"phone": "الهاتف",
+					"email": "البريد الإلكتروني",
+					"nationalId": "رقم الهوية",
+					"joinDate": "تاريخ الالتحاق",
+					"endDate": "تاريخ الانتهاء",
+					"linkedUserId": "حساب المستخدم المرتبط",
+					"notes": "الملاحظات"
+				}
 			}
 		},
 		"expenses": {
@@ -6566,6 +6801,10 @@
 			"deactivateSuccess": "تم إيقاف المصروف",
 			"deactivateError": "حدث خطأ أثناء إيقاف المصروف",
 			"confirmDeactivate": "هل أنت متأكد من إيقاف هذا المصروف؟",
+			"bulkDeactivate": "تعطيل المحدد",
+			"bulkDeactivateConfirm": "تعطيل {count} مصروف؟",
+			"bulkDeactivateSuccess": "تم تعطيل المصروفات المحددة",
+			"noActiveSelected": "لا توجد مصروفات نشطة محددة",
 			"recurrenceLabel": "التكرار",
 			"status": "الحالة",
 			"filterStatus": "الحالة",
@@ -6775,6 +7014,89 @@
 				"IN_USE": "قيد الاستخدام",
 				"MAINTENANCE": "صيانة",
 				"RETIRED": "مستبعد"
+			}
+		},
+		"leaves": {
+			"title": "إدارة الإجازات",
+			"days": "يوم",
+			"statusPending": "معلّق",
+			"statusApproved": "معتمد",
+			"statusRejected": "مرفوض",
+			"statusCancelled": "ملغي",
+			"filterStatus": "الحالة",
+			"dashboard": {
+				"onLeaveToday": "في إجازة اليوم",
+				"pendingRequests": "طلبات معلّقة",
+				"lowBalances": "أرصدة منخفضة",
+				"lowBalancesTitle": "أرصدة منخفضة",
+				"noOneOnLeave": "لا يوجد أحد في إجازة اليوم",
+				"recentRequests": "آخر الطلبات",
+				"noLowBalances": "لا توجد أرصدة منخفضة"
+			},
+			"requests": {
+				"title": "طلبات الإجازات",
+				"create": "طلب إجازة",
+				"submit": "تقديم الطلب",
+				"approve": "اعتماد",
+				"reject": "رفض",
+				"cancel": "إلغاء",
+				"employee": "الموظف",
+				"leaveType": "نوع الإجازة",
+				"startDate": "تاريخ البداية",
+				"endDate": "تاريخ النهاية",
+				"totalDays": "عدد الأيام",
+				"status": "الحالة",
+				"reason": "السبب",
+				"reasonPlaceholder": "سبب الإجازة (اختياري)",
+				"selectEmployee": "اختر الموظف",
+				"selectLeaveType": "اختر نوع الإجازة",
+				"rejectTitle": "رفض الطلب",
+				"rejectionReason": "سبب الرفض",
+				"rejectionReasonPlaceholder": "أدخل سبب رفض الطلب",
+				"confirmCancel": "هل أنت متأكد من إلغاء هذا الطلب؟",
+				"noRequests": "لا توجد طلبات إجازات",
+				"createSuccess": "تم تقديم طلب الإجازة بنجاح",
+				"createError": "حدث خطأ أثناء تقديم الطلب",
+				"approveSuccess": "تم اعتماد الطلب",
+				"rejectSuccess": "تم رفض الطلب",
+				"cancelSuccess": "تم إلغاء الطلب"
+			},
+			"balances": {
+				"title": "أرصدة الإجازات",
+				"employee": "الموظف",
+				"leaveType": "نوع الإجازة",
+				"total": "الرصيد الكلي",
+				"used": "المستخدم",
+				"remaining": "المتبقي",
+				"adjust": "تعديل الرصيد",
+				"adjustTitle": "تعديل رصيد إجازة",
+				"totalDays": "إجمالي الأيام",
+				"noBalances": "لا توجد أرصدة إجازات",
+				"adjustSuccess": "تم تعديل الرصيد بنجاح"
+			},
+			"types": {
+				"title": "أنواع الإجازات",
+				"create": "إضافة نوع إجازة",
+				"edit": "تعديل نوع الإجازة",
+				"name": "الاسم",
+				"nameEn": "الاسم بالإنجليزية",
+				"namePlaceholder": "مثال: إجازة سنوية",
+				"nameEnPlaceholder": "e.g. Annual Leave",
+				"daysPerYear": "الأيام في السنة",
+				"isPaid": "مدفوعة",
+				"requiresApproval": "تحتاج اعتماد",
+				"color": "اللون",
+				"paid": "مدفوعة",
+				"unpaid": "غير مدفوعة",
+				"yes": "نعم",
+				"no": "لا",
+				"seedDefaults": "إضافة الأنواع الافتراضية",
+				"confirmDelete": "هل أنت متأكد من حذف هذا النوع؟",
+				"noTypes": "لا توجد أنواع إجازات",
+				"createSuccess": "تم إضافة نوع الإجازة بنجاح",
+				"updateSuccess": "تم تحديث نوع الإجازة",
+				"deleteSuccess": "تم حذف نوع الإجازة",
+				"seedSuccess": "تم إضافة {count} نوع إجازة"
 			}
 		},
 		"reports": {

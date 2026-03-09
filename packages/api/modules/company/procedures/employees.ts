@@ -6,10 +6,12 @@ import {
 	terminateEmployee,
 	getEmployeeSummary,
 	generateEmployeeNo,
+	db,
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import { logEmployeeChanges } from "../lib/log-employee-change";
 
 const employeeTypeEnum = z.enum([
 	"PROJECT_MANAGER", "SITE_ENGINEER", "SUPERVISOR", "ACCOUNTANT",
@@ -165,7 +167,26 @@ export const updateEmployeeProcedure = subscriptionProcedure
 		});
 
 		const { organizationId, id, ...data } = input;
-		return updateEmployee(id, organizationId, data);
+
+		// Fetch old data before update for change logging
+		const oldEmployee = await db.employee.findFirst({
+			where: { id, organizationId },
+		});
+
+		const updated = await updateEmployee(id, organizationId, data);
+
+		// Log changes (fire-and-forget)
+		if (oldEmployee) {
+			logEmployeeChanges({
+				employeeId: id,
+				organizationId,
+				changedBy: context.user.id,
+				oldData: oldEmployee,
+				newData: updated,
+			});
+		}
+
+		return updated;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════

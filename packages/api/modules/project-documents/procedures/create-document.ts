@@ -1,4 +1,4 @@
-import { createDocument, logAuditEvent } from "@repo/database";
+import { createDocument, logAuditEvent, db } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -68,6 +68,22 @@ export const createDocumentProcedure = subscriptionProcedure
 				createdById: context.user.id,
 			},
 		);
+
+		// Create initial version record for FILE uploads
+		if (input.uploadType === "FILE" && input.storagePath && input.fileName) {
+			db.documentVersion.create({
+				data: {
+					documentId: document.id,
+					versionNumber: 1,
+					fileName: input.fileName,
+					fileSize: input.fileSize ?? 0,
+					fileType: input.mimeType ?? "",
+					storagePath: input.storagePath,
+					uploadedBy: context.user.id,
+					changeNotes: null,
+				},
+			}).catch(() => {}); // fire-and-forget
+		}
 
 		// Log audit event
 		logAuditEvent(input.organizationId, input.projectId, {

@@ -4,6 +4,7 @@ import {
 	CreditCard,
 	Link2,
 	TriangleAlert,
+	Bell,
 	type LucideIcon,
 } from "lucide-react";
 
@@ -36,6 +37,12 @@ export const SETTINGS_NAV_SECTIONS: SettingsNavSection[] = [
 		icon: CreditCard,
 		adminOnly: true,
 		condition: "billing",
+	},
+	{
+		id: "notifications",
+		path: "notifications",
+		labelKey: "settings.menu.organization.notifications",
+		icon: Bell,
 	},
 	{
 		id: "integrations",

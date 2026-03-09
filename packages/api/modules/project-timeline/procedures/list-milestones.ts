@@ -14,6 +14,8 @@ export const listMilestonesProcedure = protectedProcedure
 		z.object({
 			organizationId: z.string(),
 			projectId: z.string(),
+			limit: z.number().optional().default(50),
+			offset: z.number().optional().default(0),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -24,10 +26,11 @@ export const listMilestonesProcedure = protectedProcedure
 			{ section: "projects", action: "view" },
 		);
 
-		const milestones = await listMilestones(
+		const result = await listMilestones(
 			input.organizationId,
 			input.projectId,
+			{ limit: input.limit, offset: input.offset },
 		);
 
-		return { milestones };
+		return { milestones: result.items, total: result.total };
 	});

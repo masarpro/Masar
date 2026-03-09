@@ -459,7 +459,7 @@ function AllocationForm({
 							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70"
 						/>
 					</div>
-					<Button size="icon" variant="ghost" className="rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20" onClick={() => removeRow(i)}>
+					<Button size="icon" variant="ghost" className="rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20" aria-label="حذف البند" onClick={() => removeRow(i)}>
 						<Trash2 className="h-4 w-4 text-destructive" />
 					</Button>
 				</div>

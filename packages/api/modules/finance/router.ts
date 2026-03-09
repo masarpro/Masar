@@ -63,6 +63,9 @@ import {
 	getProjectFinance,
 } from "./procedures/dashboard";
 
+import { getProjectProfitabilityProcedure } from "./procedures/profitability";
+import { getCashFlowReportProcedure } from "./procedures/cash-flow";
+
 // Organization Finance (Banks, Expenses, Payments, Transfers)
 import {
 	listBankAccounts,
@@ -181,6 +184,8 @@ export const financeRouter = {
 		conversionRate: getFinanceConversionRate,
 		quotationStats: getFinanceQuotationStats,
 		invoiceStats: getFinanceInvoiceStats,
+		profitability: getProjectProfitabilityProcedure,
+		cashFlow: getCashFlowReportProcedure,
 	},
 
 	// Project Finance (integration)

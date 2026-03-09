@@ -20,6 +20,13 @@ export const protectedProcedure = publicProcedure.use(
 		// BetterAuth includes isActive via additionalFields and freshAge:0 ensures
 		// the value is always re-read from the DB on every request.
 		if (session.user.isActive === false) {
+			const { logBusinessEvent } = await import("@repo/logs");
+			logBusinessEvent({
+				type: "auth.deactivated_access",
+				userId: session.user.id,
+				organizationId: session.session.activeOrganizationId ?? undefined,
+				severity: "warning",
+			});
 			throw new ORPCError("UNAUTHORIZED", {
 				message: "تم تعطيل حسابك. تواصل مع مدير المنظمة.",
 			});

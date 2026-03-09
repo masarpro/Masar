@@ -1,0 +1,61 @@
+name: Build Verification
+
+on:
+  pull_request:
+    branches: [main]
+
+env:
+  DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy_no_connect"
+  BETTER_AUTH_SECRET: "test-secret-32-chars-minimum-here!!"
+
+jobs:
+  type-check:
+    name: TypeScript type check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Cache pnpm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Generate Prisma client
+        run: pnpm --filter @repo/database generate
+
+      - name: Run type check
+        run: pnpm type-check
+
+  lint:
+    name: Biome lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
+
+      - name: Run Biome check
+        run: biome ci .

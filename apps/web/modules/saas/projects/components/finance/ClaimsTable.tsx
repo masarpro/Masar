@@ -19,12 +19,16 @@ import {
 	TableHeader,
 	TableRow,
 } from "@ui/components/table";
+import { Checkbox } from "@ui/components/checkbox";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-import { FileText, Plus } from "lucide-react";
+import { FileText, Plus, Download } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { BulkActionsBar } from "../../../../ui/components/bulk-actions-bar";
+import { exportTableToCsv } from "../../../../../lib/export-table";
 
 interface Claim {
 	id: string;
@@ -105,6 +109,25 @@ export function ClaimsTable({
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 	const basePath = `/app/${organizationSlug}/projects/${projectId}/finance/claims`;
+	const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+	const toggleRow = (id: string) => {
+		setSelectedIds((prev) => {
+			const next = new Set(prev);
+			if (next.has(id)) next.delete(id);
+			else next.add(id);
+			return next;
+		});
+	};
+	const toggleAllPage = () => {
+		if (claims.length > 0 && selectedIds.size === claims.length) {
+			setSelectedIds(new Set());
+		} else {
+			setSelectedIds(new Set(claims.map((c) => c.id)));
+		}
+	};
+	const clearSelection = () => setSelectedIds(new Set());
+	const selectedClaims = claims.filter((c) => selectedIds.has(c.id));
 
 	const updateStatusMutation = useMutation({
 		...orpc.projectFinance.updateClaimStatus.mutationOptions(),
@@ -154,6 +177,13 @@ export function ClaimsTable({
 			<Table>
 				<TableHeader>
 					<TableRow className="hover:bg-transparent">
+						<TableHead className="w-10">
+							<Checkbox
+								checked={claims.length > 0 && selectedIds.size === claims.length}
+								onCheckedChange={toggleAllPage}
+								aria-label={t("common.selectAll")}
+							/>
+						</TableHead>
 						<TableHead className="text-start">
 							{t("finance.claims.claimNo")}
 						</TableHead>
@@ -174,6 +204,13 @@ export function ClaimsTable({
 				<TableBody>
 					{claims.map((claim) => (
 						<TableRow key={claim.id}>
+							<TableCell>
+								<Checkbox
+									checked={selectedIds.has(claim.id)}
+									onCheckedChange={() => toggleRow(claim.id)}
+									aria-label={`${t("common.select")} #${claim.claimNo}`}
+								/>
+							</TableCell>
 							<TableCell className="font-medium">#{claim.claimNo}</TableCell>
 							<TableCell>
 								{claim.periodStart && claim.periodEnd ? (
@@ -237,6 +274,32 @@ export function ClaimsTable({
 					))}
 				</TableBody>
 			</Table>
+
+			{/* Bulk Actions */}
+			<BulkActionsBar
+				selectedCount={selectedIds.size}
+				totalCount={claims.length}
+				selectedIds={Array.from(selectedIds)}
+				onClearSelection={clearSelection}
+				actions={[
+					{
+						label: t("common.export"),
+						icon: <Download className="h-4 w-4 me-1.5" />,
+						onClick: () => {
+							exportTableToCsv(
+								selectedClaims as unknown as Record<string, unknown>[],
+								[
+									{ key: "claimNo", label: t("finance.claims.claimNo") },
+									{ key: "amount", label: t("finance.claims.amount") },
+									{ key: "status", label: t("finance.claims.status") },
+								],
+								"claims",
+							);
+							clearSelection();
+						},
+					},
+				]}
+			/>
 		</div>
 	);
 }

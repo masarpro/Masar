@@ -258,7 +258,8 @@
 			"pricing": "Pricing",
 			"projects": "Projects",
 			"quantities": "Quantities",
-			"home": "Home"
+			"home": "Home",
+			"mainNavigation": "Main navigation"
 		},
 		"userMenu": {
 			"accountSettings": "Account settings",
@@ -377,6 +378,20 @@
 		"description": "Stay up to date with the latest changes in our product.",
 		"title": "Changelog"
 	},
+	"invitation": {
+		"title": "Accept Invitation",
+		"subtitle": "You have been invited to join {orgName}",
+		"setPassword": "Set Password",
+		"confirmPassword": "Confirm Password",
+		"name": "Name (optional)",
+		"accept": "Accept Invitation",
+		"expired": "This invitation has expired",
+		"alreadyAccepted": "This invitation has already been accepted",
+		"invalidToken": "Invalid invitation link",
+		"success": "Invitation accepted successfully! Redirecting to login...",
+		"passwordMismatch": "Passwords do not match",
+		"loading": "Verifying invitation..."
+	},
 	"common": {
 		"hello": "Hello",
 		"back": "Back",
@@ -399,6 +414,10 @@
 		"saveFirst": "Please save the quotation first",
 		"all": "All",
 		"deleting": "Deleting...",
+		"confirm": "Confirm",
+		"select": "Select",
+		"selectAll": "Select all",
+		"export": "Export CSV",
 		"enable": "Enable",
 		"disable": "Disable",
 		"days": "days",
@@ -758,6 +777,13 @@
 			"headline": "Join the organization {organizationName}",
 			"join": "Join the organization",
 			"subject": "You have been invited to join an organization"
+		},
+		"userInvitation": {
+			"headline": "You have been invited to join <strong>{organizationName}</strong>",
+			"body": "{inviterName} has invited you to join the organization {organizationName} as {roleName}.",
+			"accept": "Accept invitation and set password",
+			"expiry": "This link is valid for 7 days.",
+			"subject": "Invitation to join {organizationName} on Masar"
 		}
 	},
 	"newsletter": {
@@ -2254,8 +2280,15 @@
 		"status": {
 			"ACTIVE": "Active",
 			"ON_HOLD": "On Hold",
-			"COMPLETED": "Completed"
+			"COMPLETED": "Completed",
+			"ARCHIVED": "Archived"
 		},
+		"archive": "Archive Project",
+		"restore": "Restore Project",
+		"archiveConfirm": "Are you sure you want to archive this project? You can restore it later.",
+		"cannotDelete": "This project cannot be deleted because it contains financial data. You can archive it instead.",
+		"archiveSuccess": "Project archived successfully",
+		"restoreSuccess": "Project restored successfully",
 		"type": {
 			"RESIDENTIAL": "Residential",
 			"COMMERCIAL": "Commercial",
@@ -2579,6 +2612,20 @@
 				"LETTERS": "Letters",
 				"PHOTOS": "Photos",
 				"OTHER": "Other"
+			},
+			"versions": {
+				"title": "Versions",
+				"current": "Current",
+				"upload": "New Version",
+				"uploadTitle": "Upload New Version",
+				"changeNotes": "Change Notes",
+				"changeNotesPlaceholder": "Describe the changes in this version...",
+				"selectFile": "Select File",
+				"uploadSuccess": "New version uploaded successfully",
+				"uploadError": "Failed to upload version",
+				"revertConfirm": "Are you sure you want to revert to this version? A new version will be created as a copy.",
+				"revertSuccess": "Successfully reverted",
+				"noVersions": "No versions recorded"
 			}
 		},
 		"chat": {
@@ -3408,10 +3455,72 @@
 				"title": "Organization Settings",
 				"subtitle": "Manage organization settings and preferences",
 				"dangerZone": "Danger zone",
-				"integrations": "Integrations"
+				"integrations": "Integrations",
+				"notifications": "Notifications"
 			}
 		},
-		"save": "Save"
+		"save": "Save",
+		"notifications": {
+			"title": "Notification Preferences",
+			"description": "Control which notifications you receive and how they are delivered",
+			"notificationType": "Notification Type",
+			"inApp": "In-App",
+			"email": "Email",
+			"muteAll": "Mute All",
+			"mutedWarning": "All notifications are currently muted. You will not receive any notifications.",
+			"resetDefaults": "Reset to Defaults",
+			"updateSuccess": "Notification preferences updated",
+			"types": {
+				"approvalRequested": {
+					"title": "Approval Requests",
+					"description": "When approval is requested on a document or decision"
+				},
+				"approvalDecided": {
+					"title": "Approval Decisions",
+					"description": "When an approval request is approved or rejected"
+				},
+				"documentCreated": {
+					"title": "New Documents",
+					"description": "When a new document is added to the project"
+				},
+				"dailyReportCreated": {
+					"title": "Daily Reports",
+					"description": "When a new daily report is submitted"
+				},
+				"issueCreated": {
+					"title": "New Issues",
+					"description": "When a new issue is reported in the project"
+				},
+				"issueCritical": {
+					"title": "Critical Issues",
+					"description": "When a critical issue requiring immediate attention is reported"
+				},
+				"expenseCreated": {
+					"title": "New Expenses",
+					"description": "When a new expense is recorded in the project"
+				},
+				"claimCreated": {
+					"title": "New Claims",
+					"description": "When a new claim is created"
+				},
+				"claimStatusChanged": {
+					"title": "Claim Updates",
+					"description": "When a claim status changes"
+				},
+				"changeOrderCreated": {
+					"title": "Change Orders",
+					"description": "When a new change order is created"
+				},
+				"ownerMessage": {
+					"title": "Owner Messages",
+					"description": "When a message is received from or to the project owner"
+				},
+				"teamMemberAdded": {
+					"title": "Team Changes",
+					"description": "When you are added or removed from a project team"
+				}
+			}
+		}
 	},
 	"start": {
 		"subtitle": "See the latest stats of your awesome business.",
@@ -4963,6 +5072,14 @@
 			"issueConfirmTitle": "Issue Invoice",
 			"issueConfirmDescription": "After issuing the invoice, you will not be able to edit it. Are you sure?",
 			"issueConfirmButton": "Yes, Issue Invoice",
+			"bulkMarkAsSent": "Mark as Sent",
+			"bulkMarkAsSentConfirm": "Mark {count} invoices as sent?",
+			"noEligibleForSent": "No issued invoices eligible to be marked as sent",
+			"bulkCancelDrafts": "Cancel Drafts",
+			"bulkCancelConfirm": "Cancel {count} draft invoices?",
+			"bulkCancelWarning": "Selected drafts will be deleted. Issued invoices cannot be deleted.",
+			"noEligibleForCancel": "No drafts eligible for cancellation",
+			"bulkActionSuccess": "Action completed successfully",
 			"searchPlaceholder": "Search invoices...",
 			"allStatuses": "All Statuses",
 			"empty": "No invoices",
@@ -5601,7 +5718,42 @@
 			"exportPdf": "Export PDF",
 			"exportExcel": "Export Excel",
 			"noData": "No data available",
-			"comingSoon": "Financial reports coming soon"
+			"comingSoon": "Financial reports coming soon",
+			"cashFlow": {
+				"title": "Cash Flow Report",
+				"subtitle": "Track money in and out over time",
+				"periodType": "Period Type",
+				"weekly": "Weekly",
+				"monthly": "Monthly",
+				"dateRange": "Date Range",
+				"from": "From",
+				"to": "To",
+				"project": "Project (Optional)",
+				"allProjects": "All Projects",
+				"apply": "Apply",
+				"inflows": "Inflows",
+				"outflows": "Outflows",
+				"netFlow": "Net Flow",
+				"clientPayments": "Client Payments",
+				"invoicePayments": "Invoice Payments",
+				"projectExpenses": "Project Expenses",
+				"subcontractPayments": "Subcontract Payments",
+				"payroll": "Payroll",
+				"companyExpenses": "Company Expenses",
+				"cumulativeBalance": "Cumulative Balance",
+				"period": "Period",
+				"total": "Total",
+				"openingBalance": "Opening Balance",
+				"closingBalance": "Closing Balance",
+				"netCashFlow": "Net Cash Flow",
+				"totalInflows": "Total Inflows",
+				"totalOutflows": "Total Outflows",
+				"projected": "Projected",
+				"expectedInflows": "Expected Inflows",
+				"expectedOutflows": "Expected Outflows",
+				"projectedBalance": "Projected Balance",
+				"noData": "No cash flow data for the selected period"
+			}
 		},
 		"settings": {
 			"title": "Finance Settings",
@@ -6261,6 +6413,45 @@
 			"subcontractDeleted": "Contract deleted successfully",
 			"subcontractDeleteError": "Failed to delete contract"
 		},
+		"profitability": {
+			"title": "Profitability Report",
+			"subtitle": "Comprehensive project profitability analysis",
+			"revenue": "Revenue",
+			"costs": "Costs",
+			"profit": "Profit",
+			"baseContractValue": "Base Contract Value",
+			"changeOrders": "Change Orders",
+			"totalContractValue": "Total Contract Value",
+			"invoicedTotal": "Invoiced Total",
+			"collectedTotal": "Collected Payments",
+			"outstandingAmount": "Outstanding Amount",
+			"collectionRate": "Collection Rate",
+			"directExpenses": "Direct Expenses",
+			"subcontractCosts": "Subcontract Costs",
+			"laborCosts": "Labor Costs",
+			"distributedExpenses": "Distributed Expenses",
+			"totalCosts": "Total Costs",
+			"grossProfit": "Gross Profit",
+			"profitMargin": "Profit Margin",
+			"realizedProfit": "Realized Profit",
+			"expectedMargin": "Expected Margin",
+			"retention": "Retention",
+			"retentionPercent": "Retention Percentage",
+			"retentionAmount": "Retention Amount",
+			"retentionCap": "Retention Cap",
+			"totalPaid": "Total Paid",
+			"remaining": "Remaining",
+			"noData": "No financial data available for this project",
+			"invoiceCount": "Invoices",
+			"paymentCount": "Payments",
+			"categoryBreakdown": "By Category",
+			"subcontractBreakdown": "Subcontract Details",
+			"dateRange": "Date Range",
+			"from": "From",
+			"to": "To",
+			"apply": "Apply",
+			"clearFilter": "Clear Filter"
+		},
 		"zatca": {
 			"title": "ZATCA Compliance",
 			"taxInvoice": "Tax Invoice",
@@ -6623,10 +6814,12 @@
 			"payroll": "Payroll",
 			"expenses": "Recurring Expenses",
 			"assets": "Assets & Equipment",
+			"leaves": "Leaves",
 			"reports": "Reports"
 		},
 		"common": {
 			"all": "All",
+			"viewAll": "View All",
 			"actions": "Actions",
 			"save": "Save",
 			"saving": "Saving...",
@@ -6689,6 +6882,12 @@
 			"joinDate": "Join Date",
 			"basicInfo": "Basic Information",
 			"financialInfo": "Financial Information",
+			"step1Title": "Personal Information",
+			"step1Desc": "Name and contact details",
+			"step2Title": "Financial Information",
+			"step2Desc": "Salary and allowances",
+			"step3Title": "Additional Notes",
+			"step3Desc": "Notes and other information",
 			"salaryType": "Salary Type",
 			"monthly": "Monthly",
 			"daily": "Daily",
@@ -6736,6 +6935,42 @@
 				"LABORER": "Laborer",
 				"SECURITY": "Security",
 				"OTHER": "Other"
+			},
+			"changeHistory": {
+				"title": "Change History",
+				"date": "Date",
+				"changeType": "Change Type",
+				"field": "Field",
+				"oldValue": "Old Value",
+				"newValue": "New Value",
+				"changedBy": "Changed By",
+				"noChanges": "No changes recorded",
+				"noChangesDesc": "Changes will be automatically recorded when employee data is updated",
+				"types": {
+					"SALARY_CHANGE": "Salary Change",
+					"STATUS_CHANGE": "Status Change",
+					"POSITION_CHANGE": "Position Change",
+					"ASSIGNMENT_CHANGE": "Assignment Change",
+					"INFO_UPDATE": "Info Update"
+				},
+				"fields": {
+					"baseSalary": "Base Salary",
+					"housingAllowance": "Housing Allowance",
+					"transportAllowance": "Transport Allowance",
+					"otherAllowances": "Other Allowances",
+					"gosiSubscription": "GOSI Subscription",
+					"salaryType": "Salary Type",
+					"status": "Status",
+					"type": "Position Type",
+					"name": "Name",
+					"phone": "Phone",
+					"email": "Email",
+					"nationalId": "National ID",
+					"joinDate": "Join Date",
+					"endDate": "End Date",
+					"linkedUserId": "Linked User Account",
+					"notes": "Notes"
+				}
 			}
 		},
 		"expenses": {
@@ -6789,6 +7024,10 @@
 			"deactivateSuccess": "Expense deactivated",
 			"deactivateError": "Error deactivating expense",
 			"confirmDeactivate": "Are you sure you want to deactivate this expense?",
+			"bulkDeactivate": "Deactivate Selected",
+			"bulkDeactivateConfirm": "Deactivate {count} expenses?",
+			"bulkDeactivateSuccess": "Selected expenses deactivated",
+			"noActiveSelected": "No active expenses selected",
 			"recurrenceLabel": "Recurrence",
 			"status": "Status",
 			"filterStatus": "Status",
@@ -6884,6 +7123,89 @@
 				"IN_USE": "In Use",
 				"MAINTENANCE": "Maintenance",
 				"RETIRED": "Retired"
+			}
+		},
+		"leaves": {
+			"title": "Leave Management",
+			"days": "days",
+			"statusPending": "Pending",
+			"statusApproved": "Approved",
+			"statusRejected": "Rejected",
+			"statusCancelled": "Cancelled",
+			"filterStatus": "Status",
+			"dashboard": {
+				"onLeaveToday": "On Leave Today",
+				"pendingRequests": "Pending Requests",
+				"lowBalances": "Low Balances",
+				"lowBalancesTitle": "Low Balances",
+				"noOneOnLeave": "No one is on leave today",
+				"recentRequests": "Recent Requests",
+				"noLowBalances": "No low balances"
+			},
+			"requests": {
+				"title": "Leave Requests",
+				"create": "New Request",
+				"submit": "Submit",
+				"approve": "Approve",
+				"reject": "Reject",
+				"cancel": "Cancel",
+				"employee": "Employee",
+				"leaveType": "Leave Type",
+				"startDate": "Start Date",
+				"endDate": "End Date",
+				"totalDays": "Total Days",
+				"status": "Status",
+				"reason": "Reason",
+				"reasonPlaceholder": "Reason for leave (optional)",
+				"selectEmployee": "Select Employee",
+				"selectLeaveType": "Select Leave Type",
+				"rejectTitle": "Reject Request",
+				"rejectionReason": "Rejection Reason",
+				"rejectionReasonPlaceholder": "Enter the reason for rejection",
+				"confirmCancel": "Are you sure you want to cancel this request?",
+				"noRequests": "No leave requests",
+				"createSuccess": "Leave request submitted successfully",
+				"createError": "Error submitting leave request",
+				"approveSuccess": "Request approved",
+				"rejectSuccess": "Request rejected",
+				"cancelSuccess": "Request cancelled"
+			},
+			"balances": {
+				"title": "Leave Balances",
+				"employee": "Employee",
+				"leaveType": "Leave Type",
+				"total": "Total Balance",
+				"used": "Used",
+				"remaining": "Remaining",
+				"adjust": "Adjust Balance",
+				"adjustTitle": "Adjust Leave Balance",
+				"totalDays": "Total Days",
+				"noBalances": "No leave balances",
+				"adjustSuccess": "Balance adjusted successfully"
+			},
+			"types": {
+				"title": "Leave Types",
+				"create": "Add Leave Type",
+				"edit": "Edit Leave Type",
+				"name": "Name",
+				"nameEn": "English Name",
+				"namePlaceholder": "e.g. Annual Leave",
+				"nameEnPlaceholder": "e.g. Annual Leave",
+				"daysPerYear": "Days Per Year",
+				"isPaid": "Paid",
+				"requiresApproval": "Requires Approval",
+				"color": "Color",
+				"paid": "Paid",
+				"unpaid": "Unpaid",
+				"yes": "Yes",
+				"no": "No",
+				"seedDefaults": "Add Default Types",
+				"confirmDelete": "Are you sure you want to delete this type?",
+				"noTypes": "No leave types",
+				"createSuccess": "Leave type added successfully",
+				"updateSuccess": "Leave type updated",
+				"deleteSuccess": "Leave type deleted",
+				"seedSuccess": "Added {count} leave types"
 			}
 		},
 		"reports": {

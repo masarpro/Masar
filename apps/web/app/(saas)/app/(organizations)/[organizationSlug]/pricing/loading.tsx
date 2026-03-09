@@ -1,5 +1,5 @@
-import { CardGridSkeleton } from "@saas/shared/components/skeletons";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 export default function Loading() {
-	return <CardGridSkeleton />;
+	return <ListTableSkeleton />;
 }

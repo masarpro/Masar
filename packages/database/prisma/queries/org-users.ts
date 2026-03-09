@@ -31,15 +31,17 @@ export async function createOrgUser(data: {
 	organizationId: string;
 	createdById: string;
 	mustChangePassword?: boolean;
+	isActive?: boolean;
+	emailVerified?: boolean;
 }) {
 	return await db.user.create({
 		data: {
 			name: data.name,
 			email: data.email,
 			accountType: "EMPLOYEE",
-			isActive: true,
+			isActive: data.isActive ?? true,
 			mustChangePassword: data.mustChangePassword ?? true,
-			emailVerified: true,
+			emailVerified: data.emailVerified ?? true,
 			organizationId: data.organizationId,
 			organizationRoleId: data.organizationRoleId,
 			createdById: data.createdById,

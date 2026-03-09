@@ -28,4 +28,11 @@ if (testUrl) {
 		"[test-setup] DATABASE_URL_TEST not set — integration tests will be skipped.\n" +
 			"Pure unit tests will still run.",
 	);
+
+	// Set a dummy DATABASE_URL so the PrismaClient singleton can be constructed
+	// without throwing during module import. Pure-function tests never actually
+	// connect, so this is safe.
+	if (!process.env.DATABASE_URL) {
+		process.env.DATABASE_URL = "postgresql://dummy:dummy@localhost:5432/dummy_no_connect";
+	}
 }

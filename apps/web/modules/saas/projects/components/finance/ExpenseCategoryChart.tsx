@@ -72,6 +72,7 @@ export function ExpenseCategoryChart({
 				{t("finance.categoryChart.title")}
 			</h3>
 
+			<div role="img" aria-label={`${t("finance.categoryChart.title")} - ${data.map(d => `${t(`finance.category.${d.category}`)}: ${totalAmount > 0 ? ((d.total / totalAmount) * 100).toFixed(0) : 0}%`).join(', ')}`}>
 			<ChartContainer config={chartConfig} className="mx-auto aspect-square h-48">
 				<PieChart>
 					<ChartTooltip
@@ -130,6 +131,7 @@ export function ExpenseCategoryChart({
 					</text>
 				</PieChart>
 			</ChartContainer>
+			</div>
 
 			{/* Legend */}
 			<div className="mt-3 space-y-1.5">

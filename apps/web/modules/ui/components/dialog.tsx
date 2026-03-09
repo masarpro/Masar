@@ -41,9 +41,9 @@ const DialogContent = ({
 			{...props}
 		>
 			{children}
-			<DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+			<DialogPrimitive.Close className="absolute top-4 end-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground" aria-label="إغلاق">
 				<XIcon className="size-4" />
-				<span className="sr-only">Close</span>
+				<span className="sr-only">إغلاق</span>
 			</DialogPrimitive.Close>
 		</DialogPrimitive.Content>
 	</DialogPortal>
@@ -55,7 +55,7 @@ const DialogHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cn(
-			"flex flex-col space-y-1.5 text-center sm:text-left",
+			"flex flex-col space-y-1.5 text-center sm:text-start",
 			className,
 		)}
 		{...props}

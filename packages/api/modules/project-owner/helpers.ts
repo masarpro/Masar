@@ -1,5 +1,6 @@
 import { ORPCError } from "@orpc/server";
-import type { OwnerTokenFailReason } from "@repo/database";
+import type { OwnerTokenFailReason, OwnerContextResult } from "@repo/database";
+import { getOwnerContextByToken, getOwnerContextBySession } from "@repo/database";
 
 /**
  * Throw an appropriate ORPCError based on token validation failure reason.
@@ -22,4 +23,21 @@ export function throwOwnerTokenError(reason: OwnerTokenFailReason): never {
 				message: "TOKEN_INVALID",
 			});
 	}
+}
+
+/**
+ * Resolve owner context from either a session token or a URL token.
+ * Prefers session token when available.
+ */
+export async function resolveOwnerContext(input: {
+	token?: string;
+	sessionToken?: string;
+}): Promise<OwnerContextResult> {
+	if (input.sessionToken) {
+		return getOwnerContextBySession(input.sessionToken);
+	}
+	if (input.token) {
+		return getOwnerContextByToken(input.token);
+	}
+	return { ok: false, reason: "NOT_FOUND" };
 }

@@ -68,6 +68,12 @@ function getStatusBadge(status: string, t: (key: string) => string) {
 					{t("projects.status.COMPLETED")}
 				</Badge>
 			);
+		case "ARCHIVED":
+			return (
+				<Badge className="bg-slate-200 text-slate-500 dark:bg-slate-800/60 dark:text-slate-500 border-0 text-[10px] px-2 py-0.5">
+					{t("projects.status.ARCHIVED")}
+				</Badge>
+			);
 		default:
 			return null;
 	}
@@ -94,7 +100,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 				organizationId,
 				status:
 					statusFilter !== "all"
-						? (statusFilter as "ACTIVE" | "ON_HOLD" | "COMPLETED")
+						? (statusFilter as "ACTIVE" | "ON_HOLD" | "COMPLETED" | "ARCHIVED")
 						: undefined,
 				query: searchTerm || undefined,
 			},
@@ -222,6 +228,9 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 							<SelectItem value="COMPLETED">
 								{t("projects.status.COMPLETED")}
 							</SelectItem>
+							<SelectItem value="ARCHIVED">
+								{t("projects.status.ARCHIVED")}
+							</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>
@@ -252,7 +261,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 								className="animate-in fade-in slide-in-from-bottom-4 duration-500"
 								style={{ animationDelay: `${index * 50}ms` }}
 							>
-								<div className="group relative h-full backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
+								<div className={`group relative h-full backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${project.status === "ARCHIVED" ? "opacity-60" : ""}`}>
 									{/* Cover Image / Gradient */}
 									<div className="relative aspect-[16/9] overflow-hidden">
 										{coverPhoto ? (

@@ -64,20 +64,40 @@ function calculateMilestoneHealth(milestone: {
 /**
  * List milestones for a project
  */
-export async function listMilestones(organizationId: string, projectId: string) {
-	const milestones = await db.projectMilestone.findMany({
-		where: {
-			organizationId,
-			projectId,
-		},
-		orderBy: { orderIndex: "asc" },
-	});
+export async function listMilestones(
+	organizationId: string,
+	projectId: string,
+	options?: { limit?: number; offset?: number },
+) {
+	const limit = options?.limit ?? 50;
+	const offset = options?.offset ?? 0;
+
+	const [milestones, total] = await Promise.all([
+		db.projectMilestone.findMany({
+			where: {
+				organizationId,
+				projectId,
+			},
+			orderBy: { orderIndex: "asc" },
+			take: limit,
+			skip: offset,
+		}),
+		db.projectMilestone.count({
+			where: {
+				organizationId,
+				projectId,
+			},
+		}),
+	]);
 
 	// Add health status to each milestone
-	return milestones.map((milestone) => ({
-		...milestone,
-		healthStatus: calculateMilestoneHealth(milestone),
-	}));
+	return {
+		items: milestones.map((milestone) => ({
+			...milestone,
+			healthStatus: calculateMilestoneHealth(milestone),
+		})),
+		total,
+	};
 }
 
 /**

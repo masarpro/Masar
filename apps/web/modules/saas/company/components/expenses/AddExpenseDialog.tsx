@@ -8,12 +8,7 @@ import { orpcClient } from "@shared/lib/orpc-client";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-} from "@ui/components/dialog";
+import { ResponsiveDialog } from "@ui/components/responsive-dialog";
 import {
 	Select,
 	SelectContent,
@@ -100,19 +95,11 @@ export function AddExpenseDialog({
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent dir="rtl" className="sm:max-w-4xl p-0 gap-0 rounded-2xl overflow-hidden">
-				{/* Header */}
-				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
-					<DialogTitle className="text-base font-semibold text-right">
-						{t("company.expenses.addExpense")}
-					</DialogTitle>
-				</DialogHeader>
-
-				<form onSubmit={handleSubmit}>
+		<ResponsiveDialog open={open} onOpenChange={onOpenChange} title={t("company.expenses.addExpense")}>
+				<form onSubmit={handleSubmit} dir="rtl">
 					<div className="p-5 space-y-4">
 						{/* Row 1: Name, Category, Amount */}
-						<div className="grid grid-cols-3 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("company.expenses.name")} *
@@ -162,7 +149,7 @@ export function AddExpenseDialog({
 						</div>
 
 						{/* Row 2: Recurrence, Vendor, Contract Number */}
-						<div className="grid grid-cols-3 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("company.expenses.recurrence")} *
@@ -206,7 +193,7 @@ export function AddExpenseDialog({
 						</div>
 
 						{/* Row 3: Start Date, End Date, Reminder Days */}
-						<div className="grid grid-cols-3 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("company.expenses.startDate")} *
@@ -245,7 +232,7 @@ export function AddExpenseDialog({
 						</div>
 
 						{/* Row 4: Description, Notes */}
-						<div className="grid grid-cols-2 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("company.expenses.description")}
@@ -299,7 +286,6 @@ export function AddExpenseDialog({
 						</Button>
 					</div>
 				</form>
-			</DialogContent>
-		</Dialog>
+		</ResponsiveDialog>
 	);
 }

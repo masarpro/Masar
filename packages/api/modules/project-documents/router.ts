@@ -7,6 +7,10 @@ import { getApprovalProcedure } from "./procedures/get-approval";
 import { getUploadUrlProcedure } from "./procedures/get-upload-url";
 import { getDownloadUrlProcedure } from "./procedures/get-download-url";
 import { deleteDocumentProcedure } from "./procedures/delete-document";
+import { listVersionsProcedure } from "./procedures/list-versions";
+import { uploadVersionProcedure } from "./procedures/upload-version";
+import { getVersionDownloadUrlProcedure } from "./procedures/get-version-download-url";
+import { revertToVersionProcedure } from "./procedures/revert-to-version";
 
 export const projectDocumentsRouter = {
 	list: listDocumentsProcedure,
@@ -18,4 +22,8 @@ export const projectDocumentsRouter = {
 	createApprovalRequest: createApprovalRequestProcedure,
 	actOnApproval: actOnApprovalProcedure,
 	getApproval: getApprovalProcedure,
+	listVersions: listVersionsProcedure,
+	uploadVersion: uploadVersionProcedure,
+	getVersionDownloadUrl: getVersionDownloadUrlProcedure,
+	revertToVersion: revertToVersionProcedure,
 };

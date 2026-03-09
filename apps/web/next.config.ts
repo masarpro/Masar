@@ -75,15 +75,27 @@ const nextConfig: NextConfig = {
 				key: "Strict-Transport-Security",
 				value: "max-age=31536000; includeSubDomains",
 			},
+			{
+				key: "Cross-Origin-Opener-Policy",
+				value: "same-origin",
+			},
+			{
+				key: "Cross-Origin-Resource-Policy",
+				value: "same-origin",
+			},
+			{
+				key: "X-Permitted-Cross-Domain-Policies",
+				value: "none",
+			},
 		];
 
-		// Full CSP for authenticated app and auth routes. Permissive enough for
-		// Next.js (unsafe-inline/unsafe-eval needed for dev and inline scripts)
-		// while blocking framing, base-uri hijacking, and form-action abuse.
+		// Full CSP for authenticated app and auth routes.
+		// unsafe-eval only in development (required by Next.js HMR).
+		const isDev = process.env.NODE_ENV === "development";
 		const supabaseStorage = "https://mbivfenbnvkquxajwbju.storage.supabase.co";
 		const appCsp = [
 			"default-src 'self'",
-			"script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+			`script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
 			"style-src 'self' 'unsafe-inline'",
 			`img-src 'self' https: data: blob: https://*.supabase.co ${supabaseStorage}`,
 			`connect-src 'self' blob: https://*.supabase.co ${supabaseStorage}`,

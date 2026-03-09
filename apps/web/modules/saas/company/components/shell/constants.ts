@@ -5,6 +5,7 @@ import {
 	Package,
 	BarChart3,
 	Banknote,
+	CalendarDays,
 	type LucideIcon,
 } from "lucide-react";
 
@@ -39,6 +40,12 @@ export const COMPANY_NAV_SECTIONS: CompanyNavSection[] = [
 		path: "expenses",
 		labelKey: "company.nav.expenses",
 		icon: Receipt,
+	},
+	{
+		id: "leaves",
+		path: "leaves",
+		labelKey: "company.nav.leaves",
+		icon: CalendarDays,
 	},
 	{
 		id: "assets",

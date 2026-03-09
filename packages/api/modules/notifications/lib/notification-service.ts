@@ -11,7 +11,90 @@ import {
 	getOrganizationAdminUserIds,
 	type CreateNotificationInput,
 } from "@repo/database";
-import type { NotificationType, ProjectRole } from "@repo/database/prisma/generated/client";
+import type { NotificationType, NotificationChannel, ProjectRole } from "@repo/database/prisma/generated/client";
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Notification Type → Preference Field Mapping
+// ═══════════════════════════════════════════════════════════════════════════
+
+const notificationTypeToPreferenceField: Record<string, string> = {
+	APPROVAL_REQUESTED: "approvalRequested",
+	APPROVAL_DECIDED: "approvalDecided",
+	DOCUMENT_CREATED: "documentCreated",
+	DAILY_REPORT_CREATED: "dailyReportCreated",
+	ISSUE_CREATED: "issueCreated",
+	ISSUE_CRITICAL: "issueCritical",
+	EXPENSE_CREATED: "expenseCreated",
+	CLAIM_CREATED: "claimCreated",
+	CLAIM_STATUS_CHANGED: "claimStatusChanged",
+	CHANGE_ORDER_CREATED: "changeOrderCreated",
+	CHANGE_ORDER_APPROVED: "changeOrderCreated",
+	CHANGE_ORDER_REJECTED: "changeOrderCreated",
+	OWNER_MESSAGE: "ownerMessage",
+	TEAM_MEMBER_ADDED: "teamMemberAdded",
+	TEAM_MEMBER_REMOVED: "teamMemberAdded",
+};
+
+/**
+ * Check if a user should receive a notification based on their preferences
+ * Returns the channels the notification should be sent on (empty = skip)
+ */
+async function getUserAllowedChannels(
+	organizationId: string,
+	userId: string,
+	notificationType: NotificationType,
+): Promise<NotificationChannel[]> {
+	const prefs = await db.notificationPreference.findUnique({
+		where: {
+			userId_organizationId: { userId, organizationId },
+		},
+	});
+
+	// No preferences saved → use defaults (IN_APP for all)
+	if (!prefs) return ["IN_APP"];
+
+	// Mute all → skip
+	if (prefs.muteAll) return [];
+
+	const fieldName = notificationTypeToPreferenceField[notificationType];
+	if (!fieldName) return ["IN_APP"]; // Unknown type, default to IN_APP
+
+	const channels = (prefs as Record<string, unknown>)[fieldName] as NotificationChannel[] | undefined;
+	return channels ?? ["IN_APP"];
+}
+
+/**
+ * Filter recipients based on their notification preferences
+ * Returns only user IDs that have IN_APP enabled for this notification type
+ */
+async function filterRecipientsByPreferences(
+	organizationId: string,
+	userIds: string[],
+	notificationType: NotificationType,
+): Promise<string[]> {
+	if (userIds.length === 0) return [];
+
+	const prefs = await db.notificationPreference.findMany({
+		where: {
+			organizationId,
+			userId: { in: userIds },
+		},
+	});
+
+	const prefsMap = new Map(prefs.map((p) => [p.userId, p]));
+
+	return userIds.filter((userId) => {
+		const pref = prefsMap.get(userId);
+		if (!pref) return true; // No preferences → default to receive
+		if (pref.muteAll) return false;
+
+		const fieldName = notificationTypeToPreferenceField[notificationType];
+		if (!fieldName) return true;
+
+		const channels = (pref as Record<string, unknown>)[fieldName] as NotificationChannel[] | undefined;
+		return channels ? channels.includes("IN_APP") : true;
+	});
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Types
@@ -86,9 +169,20 @@ export async function sendNotification(
 	payload: NotificationPayload,
 ): Promise<{ count: number; skipped?: boolean }> {
 	// Filter out the actor from recipients
-	const recipients = payload.actorId
+	let recipients = payload.actorId
 		? payload.recipientIds.filter((id) => id !== payload.actorId)
 		: payload.recipientIds;
+
+	if (recipients.length === 0) {
+		return { count: 0 };
+	}
+
+	// Filter by notification preferences
+	recipients = await filterRecipientsByPreferences(
+		payload.organizationId,
+		recipients,
+		payload.type,
+	);
 
 	if (recipients.length === 0) {
 		return { count: 0 };
@@ -130,6 +224,17 @@ export async function sendNotificationToUser(
 	userId: string,
 	data: Omit<NotificationPayload, "organizationId" | "recipientIds">,
 ): Promise<void> {
+	// Check user preferences
+	const allowedChannels = await getUserAllowedChannels(
+		organizationId,
+		userId,
+		data.type,
+	);
+
+	if (!allowedChannels.includes("IN_APP")) {
+		return; // User has disabled this notification type
+	}
+
 	const notificationData: CreateNotificationInput = {
 		type: data.type,
 		title: data.title,

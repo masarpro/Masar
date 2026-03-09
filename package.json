@@ -9,6 +9,9 @@
 		"lint": "biome lint . ",
 		"check": "biome check",
 		"test": "dotenv -c -- turbo test",
+		"test:api": "pnpm --filter @repo/api test",
+		"test:db": "pnpm --filter @repo/database test",
+		"test:coverage": "dotenv -c -- turbo test -- --coverage",
 		"clean": "turbo clean",
 		"format": "biome format . --write"
 	},

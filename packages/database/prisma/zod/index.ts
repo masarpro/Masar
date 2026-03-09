@@ -263,6 +263,12 @@ export const ProjectDocumentScalarFieldEnumSchema = z.enum(['id', 'organizationI
 
 export type ProjectDocumentScalarFieldEnum = z.infer<typeof ProjectDocumentScalarFieldEnumSchema>;
 
+// File: DocumentVersionScalarFieldEnum.schema.ts
+
+export const DocumentVersionScalarFieldEnumSchema = z.enum(['id', 'documentId', 'versionNumber', 'fileName', 'fileSize', 'fileType', 'storagePath', 'uploadedBy', 'changeNotes', 'createdAt'])
+
+export type DocumentVersionScalarFieldEnum = z.infer<typeof DocumentVersionScalarFieldEnumSchema>;
+
 // File: ProjectApprovalScalarFieldEnum.schema.ts
 
 export const ProjectApprovalScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'documentId', 'status', 'note', 'requestedById', 'requestedAt', 'decidedAt', 'decisionNote', 'createdAt', 'updatedAt'])
@@ -299,11 +305,23 @@ export const NotificationScalarFieldEnumSchema = z.enum(['id', 'organizationId',
 
 export type NotificationScalarFieldEnum = z.infer<typeof NotificationScalarFieldEnumSchema>;
 
+// File: NotificationPreferenceScalarFieldEnum.schema.ts
+
+export const NotificationPreferenceScalarFieldEnumSchema = z.enum(['id', 'userId', 'organizationId', 'approvalRequested', 'approvalDecided', 'documentCreated', 'dailyReportCreated', 'issueCreated', 'issueCritical', 'expenseCreated', 'claimCreated', 'claimStatusChanged', 'changeOrderCreated', 'ownerMessage', 'teamMemberAdded', 'emailDigest', 'muteAll', 'createdAt', 'updatedAt'])
+
+export type NotificationPreferenceScalarFieldEnum = z.infer<typeof NotificationPreferenceScalarFieldEnumSchema>;
+
 // File: ProjectOwnerAccessScalarFieldEnum.schema.ts
 
 export const ProjectOwnerAccessScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'token', 'label', 'expiresAt', 'isRevoked', 'createdById', 'createdAt'])
 
 export type ProjectOwnerAccessScalarFieldEnum = z.infer<typeof ProjectOwnerAccessScalarFieldEnumSchema>;
+
+// File: OwnerPortalSessionScalarFieldEnum.schema.ts
+
+export const OwnerPortalSessionScalarFieldEnumSchema = z.enum(['id', 'sessionToken', 'portalAccessId', 'expiresAt', 'ipAddress', 'userAgent', 'lastAccessedAt', 'createdAt'])
+
+export type OwnerPortalSessionScalarFieldEnum = z.infer<typeof OwnerPortalSessionScalarFieldEnumSchema>;
 
 // File: ProjectCalendarScalarFieldEnum.schema.ts
 
@@ -502,6 +520,30 @@ export type CompanyExpenseAllocationScalarFieldEnum = z.infer<typeof CompanyExpe
 export const EmployeeScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'linkedUserId', 'name', 'employeeNo', 'type', 'phone', 'email', 'nationalId', 'salaryType', 'baseSalary', 'housingAllowance', 'transportAllowance', 'otherAllowances', 'gosiSubscription', 'joinDate', 'endDate', 'status', 'notes', 'createdAt', 'updatedAt'])
 
 export type EmployeeScalarFieldEnum = z.infer<typeof EmployeeScalarFieldEnumSchema>;
+
+// File: EmployeeChangeLogScalarFieldEnum.schema.ts
+
+export const EmployeeChangeLogScalarFieldEnumSchema = z.enum(['id', 'employeeId', 'organizationId', 'changedBy', 'changeType', 'fieldName', 'oldValue', 'newValue', 'notes', 'createdAt'])
+
+export type EmployeeChangeLogScalarFieldEnum = z.infer<typeof EmployeeChangeLogScalarFieldEnumSchema>;
+
+// File: LeaveTypeScalarFieldEnum.schema.ts
+
+export const LeaveTypeScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'name', 'nameEn', 'daysPerYear', 'isPaid', 'requiresApproval', 'color', 'createdAt', 'updatedAt'])
+
+export type LeaveTypeScalarFieldEnum = z.infer<typeof LeaveTypeScalarFieldEnumSchema>;
+
+// File: LeaveBalanceScalarFieldEnum.schema.ts
+
+export const LeaveBalanceScalarFieldEnumSchema = z.enum(['id', 'employeeId', 'leaveTypeId', 'year', 'totalDays', 'usedDays', 'remainingDays'])
+
+export type LeaveBalanceScalarFieldEnum = z.infer<typeof LeaveBalanceScalarFieldEnumSchema>;
+
+// File: LeaveRequestScalarFieldEnum.schema.ts
+
+export const LeaveRequestScalarFieldEnumSchema = z.enum(['id', 'employeeId', 'organizationId', 'leaveTypeId', 'startDate', 'endDate', 'totalDays', 'reason', 'status', 'approvedBy', 'approvedAt', 'rejectionReason', 'createdAt', 'updatedAt'])
+
+export type LeaveRequestScalarFieldEnum = z.infer<typeof LeaveRequestScalarFieldEnumSchema>;
 
 // File: EmployeeProjectAssignmentScalarFieldEnum.schema.ts
 
@@ -1007,6 +1049,18 @@ export const EmployeeStatusSchema = z.enum(['ACTIVE', 'ON_LEAVE', 'TERMINATED'])
 
 export type EmployeeStatus = z.infer<typeof EmployeeStatusSchema>;
 
+// File: EmployeeChangeType.schema.ts
+
+export const EmployeeChangeTypeSchema = z.enum(['SALARY_CHANGE', 'STATUS_CHANGE', 'POSITION_CHANGE', 'ASSIGNMENT_CHANGE', 'INFO_UPDATE'])
+
+export type EmployeeChangeType = z.infer<typeof EmployeeChangeTypeSchema>;
+
+// File: LeaveStatus.schema.ts
+
+export const LeaveStatusSchema = z.enum(['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED'])
+
+export type LeaveStatus = z.infer<typeof LeaveStatusSchema>;
+
 // File: AssetCategory.schema.ts
 
 export const AssetCategorySchema = z.enum(['HEAVY_EQUIPMENT', 'LIGHT_EQUIPMENT', 'VEHICLES', 'TOOLS', 'IT_EQUIPMENT', 'FURNITURE', 'SAFETY_EQUIPMENT', 'SURVEYING', 'OTHER'])
@@ -1039,7 +1093,7 @@ export type ExpenseRunStatus = z.infer<typeof ExpenseRunStatusSchema>;
 
 // File: OrgAuditAction.schema.ts
 
-export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED', 'EXPENSE_PAID', 'EXPENSE_CANCELLED', 'EXPENSE_DELETED', 'PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'TRANSFER_CREATED', 'TRANSFER_CANCELLED', 'BANK_ACCOUNT_CREATED', 'BANK_ACCOUNT_UPDATED', 'BANK_ACCOUNT_SET_DEFAULT', 'BANK_ACCOUNT_DELETED', 'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_ITEMS_UPDATED', 'INVOICE_STATUS_CHANGED', 'INVOICE_CONVERTED_TO_TAX', 'INVOICE_PAYMENT_ADDED', 'INVOICE_PAYMENT_DELETED', 'INVOICE_DELETED', 'INVOICE_ISSUED', 'INVOICE_DUPLICATED', 'INVOICE_CREDIT_NOTE_CREATED', 'QUOTATION_CREATED', 'QUOTATION_UPDATED', 'QUOTATION_ITEMS_UPDATED', 'QUOTATION_STATUS_CHANGED', 'QUOTATION_DELETED', 'QUOTATION_CONVERTED', 'CLIENT_CREATED', 'CLIENT_UPDATED', 'CLIENT_DELETED', 'PAYROLL_RUN_APPROVED', 'PAYROLL_RUN_CANCELLED', 'SETTINGS_UPDATED', 'ZATCA_INVOICE_SUBMITTED', 'ZATCA_INVOICE_CLEARED', 'ZATCA_INVOICE_REJECTED'])
+export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED', 'EXPENSE_PAID', 'EXPENSE_CANCELLED', 'EXPENSE_DELETED', 'PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'TRANSFER_CREATED', 'TRANSFER_CANCELLED', 'BANK_ACCOUNT_CREATED', 'BANK_ACCOUNT_UPDATED', 'BANK_ACCOUNT_SET_DEFAULT', 'BANK_ACCOUNT_DELETED', 'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_ITEMS_UPDATED', 'INVOICE_STATUS_CHANGED', 'INVOICE_CONVERTED_TO_TAX', 'INVOICE_PAYMENT_ADDED', 'INVOICE_PAYMENT_DELETED', 'INVOICE_DELETED', 'INVOICE_ISSUED', 'INVOICE_DUPLICATED', 'INVOICE_CREDIT_NOTE_CREATED', 'QUOTATION_CREATED', 'QUOTATION_UPDATED', 'QUOTATION_ITEMS_UPDATED', 'QUOTATION_STATUS_CHANGED', 'QUOTATION_DELETED', 'QUOTATION_CONVERTED', 'CLIENT_CREATED', 'CLIENT_UPDATED', 'CLIENT_DELETED', 'PAYROLL_RUN_APPROVED', 'PAYROLL_RUN_CANCELLED', 'PROJECT_ARCHIVED', 'PROJECT_RESTORED', 'SETTINGS_UPDATED', 'ZATCA_INVOICE_SUBMITTED', 'ZATCA_INVOICE_CLEARED', 'ZATCA_INVOICE_REJECTED'])
 
 export type OrgAuditAction = z.infer<typeof OrgAuditActionSchema>;
 
@@ -2226,6 +2280,24 @@ export const ProjectDocumentSchema = z.object({
 export type ProjectDocumentType = z.infer<typeof ProjectDocumentSchema>;
 
 
+// File: DocumentVersion.schema.ts
+
+export const DocumentVersionSchema = z.object({
+  id: z.string(),
+  documentId: z.string(),
+  versionNumber: z.number().int(),
+  fileName: z.string(),
+  fileSize: z.number().int(),
+  fileType: z.string(),
+  storagePath: z.string(),
+  uploadedBy: z.string(),
+  changeNotes: z.string().nullish(),
+  createdAt: z.date(),
+});
+
+export type DocumentVersionType = z.infer<typeof DocumentVersionSchema>;
+
+
 // File: ProjectApproval.schema.ts
 
 export const ProjectApprovalSchema = z.object({
@@ -2330,6 +2402,33 @@ export const NotificationSchema = z.object({
 
 export type NotificationModel = z.infer<typeof NotificationSchema>;
 
+// File: NotificationPreference.schema.ts
+
+export const NotificationPreferenceSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  organizationId: z.string(),
+  approvalRequested: z.array(NotificationChannelSchema),
+  approvalDecided: z.array(NotificationChannelSchema),
+  documentCreated: z.array(NotificationChannelSchema),
+  dailyReportCreated: z.array(NotificationChannelSchema),
+  issueCreated: z.array(NotificationChannelSchema),
+  issueCritical: z.array(NotificationChannelSchema),
+  expenseCreated: z.array(NotificationChannelSchema),
+  claimCreated: z.array(NotificationChannelSchema),
+  claimStatusChanged: z.array(NotificationChannelSchema),
+  changeOrderCreated: z.array(NotificationChannelSchema),
+  ownerMessage: z.array(NotificationChannelSchema),
+  teamMemberAdded: z.array(NotificationChannelSchema),
+  emailDigest: z.boolean(),
+  muteAll: z.boolean(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type NotificationPreferenceType = z.infer<typeof NotificationPreferenceSchema>;
+
+
 // File: ProjectOwnerAccess.schema.ts
 
 export const ProjectOwnerAccessSchema = z.object({
@@ -2345,6 +2444,22 @@ export const ProjectOwnerAccessSchema = z.object({
 });
 
 export type ProjectOwnerAccessType = z.infer<typeof ProjectOwnerAccessSchema>;
+
+
+// File: OwnerPortalSession.schema.ts
+
+export const OwnerPortalSessionSchema = z.object({
+  id: z.string(),
+  sessionToken: z.string(),
+  portalAccessId: z.string(),
+  expiresAt: z.date(),
+  ipAddress: z.string().nullish(),
+  userAgent: z.string().nullish(),
+  lastAccessedAt: z.date(),
+  createdAt: z.date(),
+});
+
+export type OwnerPortalSessionType = z.infer<typeof OwnerPortalSessionSchema>;
 
 
 // File: ProjectCalendar.schema.ts
@@ -3209,6 +3324,79 @@ export const EmployeeSchema = z.object({
 });
 
 export type EmployeeModel = z.infer<typeof EmployeeSchema>;
+
+// File: EmployeeChangeLog.schema.ts
+
+export const EmployeeChangeLogSchema = z.object({
+  id: z.string(),
+  employeeId: z.string(),
+  organizationId: z.string(),
+  changedBy: z.string(),
+  changeType: EmployeeChangeTypeSchema,
+  fieldName: z.string(),
+  oldValue: z.string().nullish(),
+  newValue: z.string().nullish(),
+  notes: z.string().nullish(),
+  createdAt: z.date(),
+});
+
+export type EmployeeChangeLogType = z.infer<typeof EmployeeChangeLogSchema>;
+
+
+// File: LeaveType.schema.ts
+
+export const LeaveTypeSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  name: z.string(),
+  nameEn: z.string().nullish(),
+  daysPerYear: z.number().int(),
+  isPaid: z.boolean().default(true),
+  requiresApproval: z.boolean().default(true),
+  color: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type LeaveTypeType = z.infer<typeof LeaveTypeSchema>;
+
+
+// File: LeaveBalance.schema.ts
+
+export const LeaveBalanceSchema = z.object({
+  id: z.string(),
+  employeeId: z.string(),
+  leaveTypeId: z.string(),
+  year: z.number().int(),
+  totalDays: z.number().int(),
+  usedDays: z.number().int(),
+  remainingDays: z.number().int(),
+});
+
+export type LeaveBalanceType = z.infer<typeof LeaveBalanceSchema>;
+
+
+// File: LeaveRequest.schema.ts
+
+export const LeaveRequestSchema = z.object({
+  id: z.string(),
+  employeeId: z.string(),
+  organizationId: z.string(),
+  leaveTypeId: z.string(),
+  startDate: z.date(),
+  endDate: z.date(),
+  totalDays: z.number().int(),
+  reason: z.string().nullish(),
+  status: LeaveStatusSchema.default("PENDING"),
+  approvedBy: z.string().nullish(),
+  approvedAt: z.date().nullish(),
+  rejectionReason: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type LeaveRequestType = z.infer<typeof LeaveRequestSchema>;
+
 
 // File: EmployeeProjectAssignment.schema.ts
 

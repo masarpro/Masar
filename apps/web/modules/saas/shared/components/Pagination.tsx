@@ -20,14 +20,15 @@ const Pagination = ({
 
 	return (
 		<div className={className}>
-			<div className="flex items-center justify-center gap-4">
+			<nav aria-label="التنقل بين الصفحات" className="flex items-center justify-center gap-4">
 				<Button
 					variant="ghost"
 					size="icon"
 					disabled={currentPage === 1}
 					onClick={() => onChangeCurrentPage(currentPage - 1)}
+					aria-label="الصفحة السابقة"
 				>
-					<ChevronLeftIcon />
+					<ChevronLeftIcon className="rtl:rotate-180" />
 				</Button>
 				<span className="text-gray-500 text-sm">
 					{currentPage * itemsPerPage - itemsPerPage + 1} -{" "}
@@ -41,10 +42,11 @@ const Pagination = ({
 					size="icon"
 					disabled={currentPage === numberOfPages}
 					onClick={() => onChangeCurrentPage(currentPage + 1)}
+					aria-label="الصفحة التالية"
 				>
-					<ChevronRightIcon />
+					<ChevronRightIcon className="rtl:rotate-180" />
 				</Button>
-			</div>
+			</nav>
 		</div>
 	);
 };

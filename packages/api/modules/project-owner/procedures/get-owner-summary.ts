@@ -1,8 +1,8 @@
-import { getOwnerContextByToken, getOwnerSummary } from "@repo/database";
+import { getOwnerSummary } from "@repo/database";
 import { z } from "zod";
 import { publicProcedure } from "../../../orpc/procedures";
 import { rateLimitToken } from "../../../lib/rate-limit";
-import { throwOwnerTokenError } from "../helpers";
+import { resolveOwnerContext, throwOwnerTokenError } from "../helpers";
 
 export const getOwnerSummaryProcedure = publicProcedure
 	.route({
@@ -13,15 +13,18 @@ export const getOwnerSummaryProcedure = publicProcedure
 	})
 	.input(
 		z.object({
-			token: z.string().min(1, "رمز الوصول مطلوب"),
+			token: z.string().min(1).optional(),
+			sessionToken: z.string().min(1).optional(),
+		}).refine((d) => d.token || d.sessionToken, {
+			message: "token or sessionToken is required",
 		}),
 	)
 	.handler(async ({ input }) => {
 		// Rate limit before any DB work to throttle brute-force and spam
-		await rateLimitToken(input.token, "getOwnerSummary");
+		await rateLimitToken(input.token || input.sessionToken!, "getOwnerSummary");
 
-		// Validate token
-		const result = await getOwnerContextByToken(input.token);
+		// Validate token or session
+		const result = await resolveOwnerContext(input);
 
 		if (!result.ok) {
 			throwOwnerTokenError(result.reason);

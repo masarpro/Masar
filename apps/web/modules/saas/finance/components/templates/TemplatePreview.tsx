@@ -153,6 +153,7 @@ export function TemplatePreview({
 							className="h-8 w-8"
 							onClick={handleZoomOut}
 							disabled={scale <= 0.3}
+							aria-label="تصغير"
 						>
 							<ZoomOutIcon className="h-4 w-4" />
 						</Button>
@@ -165,6 +166,7 @@ export function TemplatePreview({
 							className="h-8 w-8"
 							onClick={handleZoomIn}
 							disabled={scale >= 1.5}
+							aria-label="تكبير"
 						>
 							<ZoomInIcon className="h-4 w-4" />
 						</Button>
@@ -173,6 +175,7 @@ export function TemplatePreview({
 							size="icon"
 							className="h-8 w-8"
 							onClick={handleResetZoom}
+							aria-label="إعادة تعيين الحجم"
 						>
 							<RotateCcwIcon className="h-4 w-4" />
 						</Button>

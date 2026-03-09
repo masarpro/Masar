@@ -1,7 +1,7 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Skeleton } from "@ui/components/skeleton";
 import {
@@ -18,6 +18,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
+import {
+	OwnerSessionContext,
+	getSessionFromCookie,
+	setSessionCookie,
+} from "@saas/projects-owner/hooks/use-owner-session";
 
 export default function OwnerPortalLayout({
 	children,
@@ -30,10 +36,39 @@ export default function OwnerPortalLayout({
 	const t = useTranslations();
 	const basePath = `/owner/${token}`;
 
+	// Session token state: try cookie first, then exchange
+	const [sessionToken, setSessionToken] = useState<string | null>(() =>
+		getSessionFromCookie(),
+	);
+
+	// Exchange URL token for a session token on first visit
+	const exchangeMutation = useMutation(
+		orpc.projectOwner.portal.exchangeToken.mutationOptions(),
+	);
+
+	useEffect(() => {
+		if (sessionToken) return; // Already have a session
+		exchangeMutation.mutate(
+			{ token },
+			{
+				onSuccess: (data) => {
+					setSessionCookie(data.sessionToken, data.expiresAt);
+					setSessionToken(data.sessionToken);
+				},
+			},
+		);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [token]);
+
+	// Use session token for API calls when available, fall back to URL token
+	const authInput = sessionToken
+		? { sessionToken }
+		: { token };
+
 	// Validate token and get basic info
 	const { data: summary, isLoading, error } = useQuery(
 		orpc.projectOwner.portal.getSummary.queryOptions({
-			input: { token },
+			input: authInput,
 		}),
 	);
 
@@ -202,7 +237,9 @@ export default function OwnerPortalLayout({
 
 			{/* Main Content */}
 			<main className="mx-auto max-w-5xl px-4 py-6">
-				{children}
+				<OwnerSessionContext.Provider value={sessionToken}>
+					{children}
+				</OwnerSessionContext.Provider>
 			</main>
 
 			{/* Footer */}

@@ -24,10 +24,13 @@ import {
 	TableHeader,
 	TableRow,
 } from "@ui/components/table";
-import { Plus, Search, UserX, Users, Banknote, Clock, Shield } from "lucide-react";
+import { Checkbox } from "@ui/components/checkbox";
+import { Plus, Search, UserX, Users, Banknote, Clock, Shield, Download } from "lucide-react";
 import { toast } from "sonner";
 import { Pagination } from "@saas/shared/components/Pagination";
 import { AddEmployeeDialog } from "./AddEmployeeDialog";
+import { BulkActionsBar } from "../../../../ui/components/bulk-actions-bar";
+import { exportTableToCsv } from "../../../../../lib/export-table";
 
 interface EmployeeListProps {
 	organizationId: string;
@@ -48,6 +51,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 	const [typeFilter, setTypeFilter] = useState<string>("all");
 	const [showAddDialog, setShowAddDialog] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
+	const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
 	const PAGE_SIZE = 20;
 
@@ -87,6 +91,25 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 			toast.error(error.message || t("company.employees.terminateError"));
 		},
 	});
+
+	const employees = data?.employees ?? [];
+	const toggleRow = (id: string) => {
+		setSelectedIds((prev) => {
+			const next = new Set(prev);
+			if (next.has(id)) next.delete(id);
+			else next.add(id);
+			return next;
+		});
+	};
+	const toggleAllPage = () => {
+		if (employees.length > 0 && selectedIds.size === employees.length) {
+			setSelectedIds(new Set());
+		} else {
+			setSelectedIds(new Set(employees.map((e) => e.id)));
+		}
+	};
+	const clearSelection = () => setSelectedIds(new Set());
+	const selectedEmployees = employees.filter((e) => selectedIds.has(e.id));
 
 	const formatCurrency = (amount: number | string) =>
 		new Intl.NumberFormat("ar-SA").format(Number(amount)) + " ر.س";
@@ -220,7 +243,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 					onClick={() => setShowAddDialog(true)}
 					className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
 				>
-					<Plus className="ml-2 h-4 w-4" />
+					<Plus className="ms-2 h-4 w-4" />
 					{t("company.employees.addEmployee")}
 				</Button>
 			</div>
@@ -230,19 +253,26 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 				<Table className="table-fixed w-full">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[22%]">{t("company.employees.name")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[16%]">{t("company.employees.type")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[18%]">{t("company.employees.salary")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[12%]">{t("company.employees.status")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[22%]">{t("company.employees.projects")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[10%]">{t("company.common.actions")}</TableHead>
+							<TableHead className="w-10">
+								<Checkbox
+									checked={employees.length > 0 && selectedIds.size === employees.length}
+									onCheckedChange={toggleAllPage}
+									aria-label={t("common.selectAll")}
+								/>
+							</TableHead>
+							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.employees.name")}</TableHead>
+							<TableHead className="text-right text-slate-500 dark:text-slate-400 hidden sm:table-cell">{t("company.employees.type")}</TableHead>
+							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.employees.salary")}</TableHead>
+							<TableHead className="text-right text-slate-500 dark:text-slate-400 hidden md:table-cell">{t("company.employees.status")}</TableHead>
+							<TableHead className="text-right text-slate-500 dark:text-slate-400 hidden lg:table-cell">{t("company.employees.projects")}</TableHead>
+							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.common.actions")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{isLoading ? (
 							[...Array(5)].map((_, i) => (
 								<TableRow key={i} className="border-white/10 dark:border-slate-700/30">
-									{[...Array(6)].map((_, j) => (
+									{[...Array(7)].map((_, j) => (
 										<TableCell key={j}>
 											<div className="h-4 animate-pulse rounded bg-muted" />
 										</TableCell>
@@ -257,6 +287,13 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 									style={{ animationDelay: `${index * 30}ms` }}
 									onClick={() => router.push(`/app/${organizationSlug}/company/employees/${employee.id}`)}
 								>
+									<TableCell onClick={(e) => e.stopPropagation()}>
+										<Checkbox
+											checked={selectedIds.has(employee.id)}
+											onCheckedChange={() => toggleRow(employee.id)}
+											aria-label={`${t("common.select")} ${employee.name}`}
+										/>
+									</TableCell>
 									<TableCell className="text-right">
 										<div>
 											<p className="font-medium text-slate-900 dark:text-slate-100">{employee.name}</p>
@@ -265,7 +302,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 											)}
 										</div>
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-right text-slate-600 dark:text-slate-300 hidden sm:table-cell">
 										{t(`company.employees.types.${employee.type}`)}
 									</TableCell>
 									<TableCell className="text-right font-semibold text-slate-700 dark:text-slate-300">
@@ -276,8 +313,8 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 											Number(employee.otherAllowances)
 										)}
 									</TableCell>
-									<TableCell className="text-right">{getStatusBadge(employee.status)}</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-right hidden md:table-cell">{getStatusBadge(employee.status)}</TableCell>
+									<TableCell className="text-right hidden lg:table-cell">
 										{employee.assignments?.length ? (
 											<div className="flex flex-wrap gap-1">
 												{employee.assignments.map((a) => (
@@ -298,6 +335,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 												variant="ghost"
 												size="icon"
 												className="rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
+												aria-label={t("company.employees.terminate")}
 												onClick={(e) => {
 													e.stopPropagation();
 													if (confirm(t("company.employees.confirmTerminate"))) {
@@ -313,7 +351,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 							))
 						) : (
 							<TableRow>
-								<TableCell colSpan={6} className="text-center py-16">
+								<TableCell colSpan={7} className="text-center py-16">
 									<div className="flex flex-col items-center">
 										<div className="mb-4 rounded-2xl bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-xl p-5">
 											<Users className="h-10 w-10 text-slate-400 dark:text-slate-500" />
@@ -328,6 +366,34 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 					</TableBody>
 				</Table>
 			</div>
+
+			{/* Bulk Actions */}
+			<BulkActionsBar
+				selectedCount={selectedIds.size}
+				totalCount={employees.length}
+				selectedIds={Array.from(selectedIds)}
+				onClearSelection={clearSelection}
+				actions={[
+					{
+						label: t("common.export"),
+						icon: <Download className="h-4 w-4 me-1.5" />,
+						onClick: () => {
+							exportTableToCsv(
+								selectedEmployees as unknown as Record<string, unknown>[],
+								[
+									{ key: "name", label: t("company.employees.name") },
+									{ key: "employeeNo", label: t("company.employees.employeeNo") },
+									{ key: "type", label: t("company.employees.type") },
+									{ key: "baseSalary", label: t("company.employees.salary") },
+									{ key: "status", label: t("company.employees.status") },
+								],
+								"employees",
+							);
+							clearSelection();
+						},
+					},
+				]}
+			/>
 
 			{(data?.total ?? 0) > PAGE_SIZE && (
 				<Pagination

@@ -1,5 +1,6 @@
 import { ClientProviders } from "@shared/components/ClientProviders";
 import { ConsentProvider } from "@shared/components/ConsentProvider";
+import { SkipNavLink } from "@ui/components/skip-nav";
 import { cn } from "@ui/lib";
 import { Cairo, Inter, Libre_Baskerville } from "next/font/google";
 import { cookies } from "next/headers";
@@ -64,6 +65,7 @@ export async function Document({
 					"min-h-screen bg-background text-foreground antialiased",
 				)}
 			>
+				<SkipNavLink />
 				<NuqsAdapter>
 					<ConsentProvider
 						initialConsent={consentCookie?.value === "true"}

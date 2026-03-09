@@ -97,6 +97,7 @@ export function NavBar() {
 
 	return (
 		<nav
+			aria-label={t("app.menu.mainNavigation")}
 			className={cn("w-full", {
 				"w-full md:fixed md:top-0 md:start-0 md:h-full md:w-[280px]":
 					useSidebarLayout,
@@ -130,7 +131,7 @@ export function NavBar() {
 											},
 										)}
 									>
-										<ChevronRightIcon className="size-4" />
+										<ChevronRightIcon className="size-4 rtl:rotate-180" />
 									</span>
 
 									<OrganzationSelect

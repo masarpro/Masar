@@ -246,6 +246,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 											variant="ghost"
 											size="icon"
 											className="rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/50"
+											aria-label="عرض التفاصيل"
 											onClick={(e) => {
 												e.stopPropagation();
 												router.push(`/app/${organizationSlug}/company/payroll/${run.id}`);

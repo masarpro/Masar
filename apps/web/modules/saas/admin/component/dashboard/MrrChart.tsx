@@ -24,6 +24,7 @@ export function MrrChart({
 			<h3 className="font-semibold text-lg mb-4">
 				{t("admin.dashboard.mrrTrend")}
 			</h3>
+			<div role="img" aria-label={`${t("admin.dashboard.mrrTrend")} - ${data.length} نقطة بيانات`}>
 			<ResponsiveContainer width="100%" height={300}>
 				<LineChart data={data}>
 					<CartesianGrid strokeDasharray="3 3" />
@@ -43,6 +44,7 @@ export function MrrChart({
 					/>
 				</LineChart>
 			</ResponsiveContainer>
+			</div>
 		</Card>
 	);
 }

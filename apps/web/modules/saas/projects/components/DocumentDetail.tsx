@@ -1,6 +1,7 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
+import { orpcClient } from "@shared/lib/orpc-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
@@ -19,6 +20,9 @@ import {
 	Eye,
 	File,
 	Image,
+	Upload,
+	RotateCcw,
+	Layers,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -31,7 +35,9 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
+	DialogFooter,
 } from "@ui/components/dialog";
+import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
 import { Textarea } from "@ui/components/textarea";
 import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
@@ -116,6 +122,8 @@ export function DocumentDetail({
 	const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
 	const [decisionNote, setDecisionNote] = useState("");
 	const [showViewer, setShowViewer] = useState(false);
+	const [isUploadVersionOpen, setIsUploadVersionOpen] = useState(false);
+	const [versionChangeNotes, setVersionChangeNotes] = useState("");
 
 	const { data: document, isLoading } = useQuery(
 		orpc.projectDocuments.get.queryOptions({
@@ -156,6 +164,117 @@ export function DocumentDetail({
 	const downloadUrlMutation = useMutation(
 		orpc.projectDocuments.getDownloadUrl.mutationOptions({}),
 	);
+
+	const { data: versionsData } = useQuery(
+		orpc.projectDocuments.listVersions.queryOptions({
+			input: { organizationId, projectId, documentId },
+		}),
+	);
+
+	const uploadVersionMutation = useMutation({
+		mutationFn: async (data: {
+			fileName: string;
+			fileSize: number;
+			fileType: string;
+			storagePath: string;
+			changeNotes?: string;
+		}) => {
+			return orpcClient.projectDocuments.uploadVersion({
+				organizationId,
+				projectId,
+				documentId,
+				...data,
+			});
+		},
+		onSuccess: () => {
+			toast.success(t("versions.uploadSuccess"));
+			queryClient.invalidateQueries({
+				queryKey: [["projectDocuments"]],
+			});
+			setIsUploadVersionOpen(false);
+			setVersionChangeNotes("");
+		},
+		onError: (error: Error) => {
+			toast.error(error.message);
+		},
+	});
+
+	const revertMutation = useMutation({
+		mutationFn: async (versionNumber: number) => {
+			return orpcClient.projectDocuments.revertToVersion({
+				organizationId,
+				projectId,
+				documentId,
+				versionNumber,
+			});
+		},
+		onSuccess: () => {
+			toast.success(t("versions.revertSuccess"));
+			queryClient.invalidateQueries({
+				queryKey: [["projectDocuments"]],
+			});
+		},
+		onError: (error: Error) => {
+			toast.error(error.message);
+		},
+	});
+
+	const versionDownloadMutation = useMutation({
+		mutationFn: async (versionId: string) => {
+			return orpcClient.projectDocuments.getVersionDownloadUrl({
+				organizationId,
+				projectId,
+				documentId,
+				versionId,
+			});
+		},
+	});
+
+	const handleVersionDownload = async (versionId: string) => {
+		try {
+			const result = await versionDownloadMutation.mutateAsync(versionId);
+			const link = window.document.createElement("a");
+			link.href = result.downloadUrl;
+			link.download = result.fileName;
+			link.click();
+		} catch {
+			toast.error(t("downloadError"));
+		}
+	};
+
+	const handleUploadVersion = async (file: globalThis.File) => {
+		try {
+			// Get upload URL
+			const uploadData = await orpcClient.projectDocuments.getUploadUrl({
+				organizationId,
+				projectId,
+				fileName: file.name,
+				mimeType: file.type,
+				fileSize: file.size,
+			});
+
+			// Upload file to S3
+			await new Promise<void>((resolve, reject) => {
+				const xhr = new XMLHttpRequest();
+				xhr.open("PUT", uploadData.uploadUrl);
+				xhr.setRequestHeader("Content-Type", file.type);
+				xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error("Upload failed")));
+				xhr.onerror = () => reject(new Error("Upload failed"));
+				xhr.send(file);
+			});
+
+			// Create version record
+			uploadVersionMutation.mutate({
+				fileName: file.name,
+				fileSize: file.size,
+				fileType: file.type,
+				storagePath: uploadData.storagePath,
+				changeNotes: versionChangeNotes || undefined,
+			});
+		} catch {
+			toast.error(t("versions.uploadError"));
+		}
+	};
 
 	const handleDownload = async () => {
 		if (!document) return;
@@ -449,7 +568,127 @@ export function DocumentDetail({
 					</div>
 				</div>
 
-				{/* Audit Log Sidebar */}
+						{/* Versions Section */}
+					<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+						<div className="mb-4 flex items-center justify-between">
+							<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+								<Layers className="inline h-5 w-5 me-2 text-slate-400" />
+								{t("versions.title")}
+								{document.version > 1 && (
+									<Badge className="ms-2 border-0 bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">
+										v{document.version}
+									</Badge>
+								)}
+							</h2>
+							{document.uploadType === "FILE" && (
+								<Dialog open={isUploadVersionOpen} onOpenChange={setIsUploadVersionOpen}>
+									<DialogTrigger asChild>
+										<Button variant="outline" size="sm" className="rounded-xl">
+											<Upload className="h-4 w-4 me-1.5" />
+											{t("versions.upload")}
+										</Button>
+									</DialogTrigger>
+									<DialogContent>
+										<DialogHeader>
+											<DialogTitle>{t("versions.uploadTitle")}</DialogTitle>
+										</DialogHeader>
+										<div className="space-y-4">
+											<div>
+												<Label>{t("versions.changeNotes")}</Label>
+												<Textarea
+													value={versionChangeNotes}
+													onChange={(e) => setVersionChangeNotes(e.target.value)}
+													placeholder={t("versions.changeNotesPlaceholder")}
+													className="mt-1.5"
+												/>
+											</div>
+											<div>
+												<Label>{t("versions.selectFile")}</Label>
+												<Input
+													type="file"
+													className="mt-1.5"
+													onChange={(e) => {
+														const file = e.target.files?.[0];
+														if (file) handleUploadVersion(file);
+													}}
+													disabled={uploadVersionMutation.isPending}
+												/>
+											</div>
+										</div>
+									</DialogContent>
+								</Dialog>
+							)}
+						</div>
+
+						{versionsData && versionsData.versions.length > 0 ? (
+							<div className="space-y-2">
+								{versionsData.versions.map((version) => (
+									<div
+										key={version.id}
+										className={`flex items-center justify-between rounded-xl border p-3 transition-colors ${
+											version.versionNumber === versionsData.currentVersion
+												? "border-sky-200 bg-sky-50/50 dark:border-sky-800/30 dark:bg-sky-950/20"
+												: "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/30"
+										}`}
+									>
+										<div className="min-w-0 flex-1">
+											<div className="flex items-center gap-2">
+												<span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+													v{version.versionNumber}
+												</span>
+												{version.versionNumber === versionsData.currentVersion && (
+													<Badge className="border-0 bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 text-[10px]">
+														{t("versions.current")}
+													</Badge>
+												)}
+											</div>
+											<p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+												{version.fileName} • {formatFileSize(version.fileSize)} • {new Date(version.createdAt).toLocaleDateString("ar-SA")}
+											</p>
+											{version.changeNotes && (
+												<p className="text-xs text-slate-600 dark:text-slate-300 mt-1 italic">
+													{version.changeNotes}
+												</p>
+											)}
+										</div>
+										<div className="flex items-center gap-1 ms-2">
+											<Button
+												variant="ghost"
+												size="icon"
+												className="rounded-lg h-8 w-8"
+												onClick={() => handleVersionDownload(version.id)}
+												disabled={versionDownloadMutation.isPending}
+											>
+												<Download className="h-3.5 w-3.5" />
+											</Button>
+											{version.versionNumber !== versionsData.currentVersion && (
+												<Button
+													variant="ghost"
+													size="icon"
+													className="rounded-lg h-8 w-8"
+													onClick={() => {
+														if (confirm(t("versions.revertConfirm"))) {
+															revertMutation.mutate(version.versionNumber);
+														}
+													}}
+													disabled={revertMutation.isPending}
+												>
+													<RotateCcw className="h-3.5 w-3.5" />
+												</Button>
+											)}
+										</div>
+									</div>
+								))}
+							</div>
+						) : (
+							<p className="text-center text-sm text-slate-500 py-4">
+								{t("versions.noVersions")}
+							</p>
+						)}
+					</div>
+				</div>
+
+			{/* Audit Log Sidebar */}
 				<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
 					<h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
 						<History className="inline h-5 w-5 me-2 text-slate-400" />

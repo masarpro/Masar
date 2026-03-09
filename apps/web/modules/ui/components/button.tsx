@@ -6,7 +6,7 @@ import { cva } from "class-variance-authority";
 import * as React from "react";
 
 const buttonVariants = cva(
-	"flex items-center justify-center font-medium enabled:cursor-pointer transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&>svg]:mr-1.5 [&>svg]:opacity-60 [&>svg+svg]:hidden",
+	"flex items-center justify-center font-medium enabled:cursor-pointer transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&>svg]:me-1.5 [&>svg]:opacity-60 [&>svg+svg]:hidden",
 	{
 		variants: {
 			variant: {
@@ -59,7 +59,7 @@ const Button = ({
 			disabled={disabled || loading}
 			{...props}
 		>
-			{loading && <Spinner className="mr-1.5 size-4 text-inherit" />}
+			{loading && <Spinner className="me-1.5 size-4 text-inherit" />}
 			<Slottable>{children}</Slottable>
 		</Comp>
 	);

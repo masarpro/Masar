@@ -216,6 +216,7 @@ function CodeRow({
 							);
 						}}
 						title={t("admin.activationCodes.copyCode")}
+						aria-label={t("admin.activationCodes.copyCode")}
 					>
 						<ClipboardCopyIcon className="size-4" />
 					</Button>
@@ -225,6 +226,7 @@ function CodeRow({
 						className="size-8"
 						onClick={onViewUsages}
 						title={t("admin.activationCodes.usageDetails")}
+						aria-label={t("admin.activationCodes.usageDetails")}
 					>
 						<EyeIcon className="size-4" />
 					</Button>
@@ -236,6 +238,7 @@ function CodeRow({
 							onClick={() => deactivateMutation.mutate()}
 							disabled={deactivateMutation.isPending}
 							title={t("admin.activationCodes.deactivate")}
+							aria-label={t("admin.activationCodes.deactivate")}
 						>
 							<BanIcon className="size-4" />
 						</Button>

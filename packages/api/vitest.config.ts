@@ -4,13 +4,26 @@ export default defineConfig({
 	test: {
 		include: ["__tests__/**/*.test.ts"],
 		environment: "node",
+		globals: true,
 		testTimeout: 30_000,
 		hookTimeout: 30_000,
 		setupFiles: ["./__tests__/helpers/setup.ts"],
+		pool: "threads",
+		poolOptions: {
+			threads: {
+				singleThread: true,
+			},
+		},
 		coverage: {
 			provider: "v8",
-			include: ["lib/permissions/**/*.ts"],
-			exclude: ["__tests__/**"],
+			include: [
+				"lib/**/*.ts",
+				"modules/**/*.ts",
+			],
+			exclude: [
+				"__tests__/**",
+				"**/index.ts",
+			],
 			reporter: ["text", "text-summary", "json-summary", "html"],
 			reportsDirectory: "./coverage",
 			thresholds: {

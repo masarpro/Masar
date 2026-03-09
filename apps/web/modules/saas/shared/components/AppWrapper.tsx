@@ -7,6 +7,7 @@ import {
 	SidebarInset,
 	SidebarProvider,
 } from "@saas/shared/components/sidebar";
+import { SkipNavTarget } from "@ui/components/skip-nav";
 import type { PropsWithChildren } from "react";
 
 export function AppWrapper({ children }: PropsWithChildren) {
@@ -20,7 +21,10 @@ export function AppWrapper({ children }: PropsWithChildren) {
 		<SidebarProvider>
 			<div className="flex min-h-screen overflow-x-hidden">
 				<AppSidebar headerExtra={headerExtra} />
-				<SidebarInset>{children}</SidebarInset>
+				<SidebarInset>
+					<SkipNavTarget />
+					{children}
+				</SidebarInset>
 			</div>
 		</SidebarProvider>
 	);

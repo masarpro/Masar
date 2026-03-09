@@ -7,6 +7,19 @@ import { cors } from "hono/cors";
 import { bodyLimit } from "hono/body-limit";
 import { logger as honoLogger } from "hono/logger";
 import { openApiHandler, rpcHandler } from "./orpc/handler";
+import {
+	checkRateLimit,
+	createIpRateLimitKey,
+	RATE_LIMITS,
+} from "./lib/rate-limit";
+
+// Rate limit configs for auth endpoints
+const AUTH_RATE_LIMITS: Record<string, { windowMs: number; maxRequests: number }> = {
+	"/auth/sign-in": { windowMs: 60_000, maxRequests: 10 },
+	"/auth/forgot-password": { windowMs: 60_000, maxRequests: 5 },
+	"/auth/magic-link": { windowMs: 60_000, maxRequests: 5 },
+	"/auth/sign-up": { windowMs: 60_000, maxRequests: 5 },
+};
 
 export const app = new Hono()
 	.basePath("/api")
@@ -25,6 +38,30 @@ export const app = new Hono()
 			credentials: true,
 		}),
 	)
+	// Rate limiting for auth endpoints
+	.use("/auth/*", async (c, next) => {
+		const path = new URL(c.req.url).pathname.replace(/^\/api/, "");
+		const matchedRule = Object.entries(AUTH_RATE_LIMITS).find(([prefix]) =>
+			path.startsWith(prefix),
+		);
+
+		if (matchedRule) {
+			const [, limits] = matchedRule;
+			const ip =
+				c.req.header("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+			const key = createIpRateLimitKey(ip, `auth:${path}`);
+			const result = await checkRateLimit(key, limits);
+
+			if (!result.allowed) {
+				return c.json(
+					{ error: "Too many requests. Please try again later." },
+					429,
+				);
+			}
+		}
+
+		return next();
+	})
 	// Auth handler
 	.on(["POST", "GET"], "/auth/**", (c) => auth.handler(c.req.raw))
 	// Payments webhook handler

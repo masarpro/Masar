@@ -5,6 +5,7 @@ import { orpcClient } from "@shared/lib/orpc-client";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
+import { Checkbox } from "@ui/components/checkbox";
 import { Input } from "@ui/components/input";
 import {
 	Select,
@@ -46,6 +47,9 @@ import {
 	FileText,
 	ArrowRight,
 	ChevronLeft,
+	Download,
+	Send,
+	XCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -57,6 +61,8 @@ import { Currency } from "../shared/Currency";
 import { StatusBadge } from "../shared/StatusBadge";
 import { Pagination } from "@saas/shared/components/Pagination";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { BulkActionsBar } from "../../../../ui/components/bulk-actions-bar";
+import { exportTableToCsv } from "../../../../../lib/export-table";
 
 interface InvoicesListProps {
 	organizationId: string;
@@ -86,9 +92,13 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 	const [currentPage, setCurrentPage] = useState(1);
 	const basePath = `/app/${organizationSlug}/finance/invoices`;
 
+	// Row selection state
+	const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
 	// Confirmation dialog states
 	const [deleteInvoiceId, setDeleteInvoiceId] = useState<string | null>(null);
 	const [issueInvoiceId, setIssueInvoiceId] = useState<string | null>(null);
+	const [bulkConfirm, setBulkConfirm] = useState<{ title: string; description?: string; onConfirm: () => Promise<void> } | null>(null);
 
 	// Determine if the credit_note tab is selected (it's a type, not a status)
 	const isCreditNoteTab = statusFilter === "CREDIT_NOTE";
@@ -109,6 +119,25 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 
 	const invoices = data?.invoices ?? [];
 	const totalCount = data?.total ?? 0;
+
+	// Selection helpers
+	const toggleRow = (id: string) => {
+		setSelectedIds((prev) => {
+			const next = new Set(prev);
+			if (next.has(id)) next.delete(id);
+			else next.add(id);
+			return next;
+		});
+	};
+	const toggleAllPage = () => {
+		if (selectedIds.size === invoices.length) {
+			setSelectedIds(new Set());
+		} else {
+			setSelectedIds(new Set(invoices.map((inv) => inv.id)));
+		}
+	};
+	const clearSelection = () => setSelectedIds(new Set());
+	const selectedInvoices = invoices.filter((inv) => selectedIds.has(inv.id));
 
 	// Reset page on filter change
 	const handleStatusChange = (value: string) => {
@@ -177,9 +206,9 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 				<div className="sticky top-0 z-20 py-3 px-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50">
 					<div className="flex items-center justify-between gap-3 max-w-6xl mx-auto">
 						<div className="flex items-center gap-3 min-w-0">
-							<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border shadow-sm">
+							<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border shadow-sm" aria-label={t("common.back")}>
 								<Link href={`/app/${organizationSlug}/finance`}>
-									<ArrowRight className="h-4 w-4" />
+									<ArrowRight className="h-4 w-4 rtl:rotate-180" />
 								</Link>
 							</Button>
 							<div className="min-w-0">
@@ -268,12 +297,19 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 								<table className="w-full text-sm">
 									<thead>
 										<tr className="border-b bg-slate-50/80 dark:bg-slate-800/30">
+											<th className="p-3 w-10">
+												<Checkbox
+													checked={invoices.length > 0 && selectedIds.size === invoices.length}
+													onCheckedChange={toggleAllPage}
+													aria-label={t("common.selectAll")}
+												/>
+											</th>
 											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.number")}</th>
-											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.client")}</th>
-											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.date")}</th>
-											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.dueDate")}</th>
+											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide hidden sm:table-cell">{t("finance.invoices.columns.client")}</th>
+											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide hidden md:table-cell">{t("finance.invoices.columns.date")}</th>
+											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide hidden lg:table-cell">{t("finance.invoices.columns.dueDate")}</th>
 											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.amount")}</th>
-											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.paid")}</th>
+											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide hidden md:table-cell">{t("finance.invoices.columns.paid")}</th>
 											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.status")}</th>
 											<th className="p-3 w-10" />
 										</tr>
@@ -297,7 +333,14 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 														overdue ? "bg-red-50/50 dark:bg-red-950/20" : ""
 													}`}
 												>
-													<td className="p-3 font-medium">
+													<td className="p-3" onClick={(e) => e.stopPropagation()}>
+													<Checkbox
+														checked={selectedIds.has(invoice.id)}
+														onCheckedChange={() => toggleRow(invoice.id)}
+														aria-label={`${t("common.select")} ${invoice.invoiceNo ?? ""}`}
+													/>
+												</td>
+												<td className="p-3 font-medium">
 														<Link
 															href={`${basePath}/${invoice.id}`}
 															className="text-primary hover:underline flex items-center gap-2"
@@ -310,7 +353,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 															)}
 														</Link>
 													</td>
-													<td className="p-3">
+													<td className="p-3 hidden sm:table-cell">
 														<div>
 															<p className="font-medium text-foreground">{invoice.clientName}</p>
 															{invoice.clientCompany && (
@@ -318,14 +361,14 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 															)}
 														</div>
 													</td>
-													<td className="p-3 text-muted-foreground">{formatDate(invoice.issueDate)}</td>
-													<td className={`p-3 ${overdue ? "text-red-600 font-medium" : "text-muted-foreground"}`}>
+													<td className="p-3 text-muted-foreground hidden md:table-cell">{formatDate(invoice.issueDate)}</td>
+													<td className={`p-3 hidden lg:table-cell ${overdue ? "text-red-600 font-medium" : "text-muted-foreground"}`}>
 														{formatDate(invoice.dueDate)}
 													</td>
 													<td className="p-3 font-semibold">
 														<Currency amount={invoice.totalAmount} />
 													</td>
-													<td className="p-3 text-green-600 font-medium">
+													<td className="p-3 text-green-600 font-medium hidden md:table-cell">
 														<Currency amount={invoice.paidAmount} />
 													</td>
 													<td className="p-3">
@@ -337,7 +380,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 													<td className="p-3">
 														<DropdownMenu>
 															<DropdownMenuTrigger asChild>
-																<Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
+																<Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" aria-label="خيارات">
 																	<MoreHorizontal className="h-4 w-4" />
 																</Button>
 															</DropdownMenuTrigger>
@@ -432,6 +475,88 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 							</div>
 						</div>
 
+						{/* Bulk Actions */}
+						<BulkActionsBar
+							selectedCount={selectedIds.size}
+							totalCount={invoices.length}
+							selectedIds={Array.from(selectedIds)}
+							onClearSelection={clearSelection}
+							actions={[
+								{
+									label: t("common.export"),
+									icon: <Download className="h-4 w-4 me-1.5" />,
+									onClick: () => {
+										exportTableToCsv(
+											selectedInvoices as unknown as Record<string, unknown>[],
+											[
+												{ key: "invoiceNo", label: t("finance.invoices.columns.number") },
+												{ key: "clientName", label: t("finance.invoices.columns.client") },
+												{ key: "totalAmount", label: t("finance.invoices.columns.amount") },
+												{ key: "paidAmount", label: t("finance.invoices.columns.paid") },
+												{ key: "status", label: t("finance.invoices.columns.status") },
+												{ key: "issueDate", label: t("finance.invoices.columns.date") },
+												{ key: "dueDate", label: t("finance.invoices.columns.dueDate") },
+											],
+											"invoices",
+										);
+										clearSelection();
+									},
+								},
+								{
+									label: t("finance.invoices.bulkMarkAsSent"),
+									icon: <Send className="h-4 w-4 me-1.5" />,
+									onClick: () => {
+										const eligible = selectedInvoices.filter((inv) => inv.status === "ISSUED");
+										if (eligible.length === 0) {
+											toast.error(t("finance.invoices.noEligibleForSent"));
+											return;
+										}
+										setBulkConfirm({
+											title: t("finance.invoices.bulkMarkAsSentConfirm", { count: eligible.length }),
+											onConfirm: async () => {
+												await Promise.allSettled(
+													eligible.map((inv) =>
+														orpcClient.finance.invoices.issue({ organizationId, id: inv.id }),
+													),
+												);
+												queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+												clearSelection();
+												setBulkConfirm(null);
+												toast.success(t("finance.invoices.bulkActionSuccess"));
+											},
+										});
+									},
+								},
+								{
+									label: t("finance.invoices.bulkCancelDrafts"),
+									icon: <XCircle className="h-4 w-4 me-1.5" />,
+									variant: "destructive",
+									onClick: () => {
+										const eligible = selectedInvoices.filter((inv) => inv.status === "DRAFT");
+										if (eligible.length === 0) {
+											toast.error(t("finance.invoices.noEligibleForCancel"));
+											return;
+										}
+										setBulkConfirm({
+											title: t("finance.invoices.bulkCancelConfirm", { count: eligible.length }),
+											description: t("finance.invoices.bulkCancelWarning"),
+											onConfirm: async () => {
+												await Promise.allSettled(
+													eligible.map((inv) =>
+														orpcClient.finance.invoices.delete({ organizationId, id: inv.id }),
+													),
+												);
+												queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+												clearSelection();
+												setBulkConfirm(null);
+												toast.success(t("finance.invoices.bulkActionSuccess"));
+											},
+										});
+									},
+								},
+							]}
+						/>
+
 						{/* Pagination */}
 						{totalCount > PAGE_SIZE && (
 							<Pagination
@@ -500,6 +625,27 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 							className="rounded-xl"
 						>
 							{issueMutation.isPending ? t("common.saving") : t("finance.invoices.issueConfirmButton")}
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+
+			{/* Bulk Action Confirmation Dialog */}
+			<AlertDialog open={!!bulkConfirm} onOpenChange={() => setBulkConfirm(null)}>
+				<AlertDialogContent className="rounded-2xl">
+					<AlertDialogHeader>
+						<AlertDialogTitle>{bulkConfirm?.title}</AlertDialogTitle>
+						{bulkConfirm?.description && (
+							<AlertDialogDescription>{bulkConfirm.description}</AlertDialogDescription>
+						)}
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel className="rounded-xl">{t("common.cancel")}</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={() => bulkConfirm?.onConfirm()}
+							className="rounded-xl"
+						>
+							{t("common.confirm")}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

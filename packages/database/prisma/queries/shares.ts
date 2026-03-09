@@ -26,9 +26,8 @@ export async function createShareLink(data: {
 	expiresInDays?: number;
 }) {
 	const token = generateShareToken();
-	const expiresAt = data.expiresInDays
-		? new Date(Date.now() + data.expiresInDays * 24 * 60 * 60 * 1000)
-		: null;
+	const expiresInDays = data.expiresInDays ?? 7; // Default 7 days expiry
+	const expiresAt = new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000);
 
 	return db.shareLink.create({
 		data: {

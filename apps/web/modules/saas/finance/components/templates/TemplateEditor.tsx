@@ -479,8 +479,8 @@ export function TemplateEditor({
 			<div className="border-b bg-background px-4 py-3 flex items-center justify-between">
 				<div className="flex items-center gap-4">
 					<Link href={`${basePath}/templates`}>
-						<Button variant="ghost" size="icon">
-							<ArrowLeftIcon className="h-5 w-5" />
+						<Button variant="ghost" size="icon" aria-label="رجوع">
+							<ArrowLeftIcon className="h-5 w-5 rtl:rotate-180" />
 						</Button>
 					</Link>
 					<div className="flex items-center gap-3">
@@ -519,6 +519,7 @@ export function TemplateEditor({
 							size="icon"
 							onClick={undo}
 							disabled={historyIndex === 0}
+							aria-label="تراجع"
 						>
 							<Undo2Icon className="h-4 w-4" />
 						</Button>
@@ -527,6 +528,7 @@ export function TemplateEditor({
 							size="icon"
 							onClick={redo}
 							disabled={historyIndex === history.length - 1}
+							aria-label="إعادة"
 						>
 							<Redo2Icon className="h-4 w-4" />
 						</Button>

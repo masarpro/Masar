@@ -66,7 +66,7 @@ export function ExpensesAnalyticsCard({
 			) : (
 				<>
 					{/* Chart */}
-					<div className="flex justify-center mb-4">
+					<div className="flex justify-center mb-4" role="img" aria-label={`${t("company.dashboard.expenseAnalytics")} - ${chartData.map(d => `${t(`company.expenses.categories.${d.name}`)}: ${Math.round((d.value / expenses.totalMonthlyAmount) * 100)}%`).join(', ')}`}>
 						<ChartContainer
 							config={{}}
 							className="h-[160px] w-[160px] !aspect-square"
