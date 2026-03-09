@@ -11,7 +11,7 @@ export default function SaaSError({
 	reset: () => void;
 }) {
 	useEffect(() => {
-		console.error(error);
+		console.error("[SaaS Error]", error);
 	}, [error]);
 
 	return (
@@ -30,6 +30,11 @@ export default function SaaSError({
 					<a href="/app">العودة للوحة التحكم</a>
 				</Button>
 			</div>
+			{process.env.NODE_ENV === "development" && error.message && (
+				<pre className="mt-4 max-w-lg overflow-auto rounded bg-muted p-4 text-start text-xs">
+					{error.message}
+				</pre>
+			)}
 		</div>
 	);
 }

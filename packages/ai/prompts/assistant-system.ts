@@ -72,6 +72,8 @@ export function getRelevantModules(section: string): string[] {
     settings: ["settings"],
     notifications: ["projects", "finance"],
     chatbot: ["projects", "finance"],
+    leads: ["projects"],
+    pricing: ["quantities", "finance"],
   };
 
   return sectionModules[section] ?? ["projects", "finance"];
@@ -131,6 +133,8 @@ function buildDynamicContext(context: AssistantContext): string {
     settings: "الإعدادات",
     notifications: "الإشعارات",
     chatbot: "المحادثة الذكية",
+    leads: "العملاء المحتملين",
+    pricing: "التسعير",
   };
 
   let result = `## السياق الحالي

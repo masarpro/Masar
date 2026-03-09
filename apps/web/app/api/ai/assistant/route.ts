@@ -8,8 +8,33 @@ import {
   streamText,
   type AssistantContext,
   type UIMessage,
+  // Module & Tool Registry
+  getAllModules,
+  getModuleById,
+  getAISDKTools,
+  type AIModuleDefinition,
 } from "@repo/ai";
 import { db } from "@repo/database";
+
+// تسجيل كل الأدوات الجديدة
+import "@repo/ai/tools/modules";
+
+interface PageContextPayload {
+  moduleId: string;
+  pageName: string;
+  currentRoute: string;
+  pageDescription: string;
+  visibleStats?: Record<string, string | number>;
+  activeFilters?: Record<string, any>;
+  itemCount?: number;
+  tableColumns?: string[];
+  formState?: {
+    isOpen: boolean;
+    formType: string;
+    entityName: string;
+  };
+  dataSummary?: string;
+}
 
 interface ContextPayload {
   organizationSlug: string;
@@ -31,21 +56,22 @@ export async function POST(request: Request) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { messages, context } = (await request.json()) as {
+    const { messages, context, pageContext } = (await request.json()) as {
       messages: UIMessage[];
       context: ContextPayload;
+      pageContext?: PageContextPayload;
     };
 
     // Validation
     if (!Array.isArray(messages) || messages.length === 0) {
-      return Response.json(
-        { error: "الرسائل مطلوبة" },
-        { status: 400 },
-      );
+      return Response.json({ error: "الرسائل مطلوبة" }, { status: 400 });
     }
     if (messages.length > 50) {
       return Response.json(
-        { error: "تم تجاوز الحد الأقصى للرسائل (50 رسالة). ابدأ محادثة جديدة" },
+        {
+          error:
+            "تم تجاوز الحد الأقصى للرسائل (50 رسالة). ابدأ محادثة جديدة",
+        },
         { status: 400 },
       );
     }
@@ -57,10 +83,7 @@ export async function POST(request: Request) {
     });
 
     if (!organization) {
-      return Response.json(
-        { error: "المنظمة غير موجودة" },
-        { status: 404 },
-      );
+      return Response.json({ error: "المنظمة غير موجودة" }, { status: 404 });
     }
 
     // Verify user is a member of this organization
@@ -93,6 +116,12 @@ export async function POST(request: Request) {
       }
     }
 
+    // 1. تحديد الوحدة المعرفية من page context
+    const activeModule = pageContext?.moduleId
+      ? getModuleById(pageContext.moduleId)
+      : null;
+
+    // 2. بناء system prompt — يدمج النظام القديم مع الجديد
     const assistantContext: AssistantContext = {
       userName: session.user.name || "المستخدم",
       userRole: membership.role || "MANAGER",
@@ -106,14 +135,39 @@ export async function POST(request: Request) {
       projectName,
     };
 
-    const systemPrompt = buildSystemPrompt(assistantContext);
+    // بناء system prompt محسّن مع module registry + page context
+    const systemPrompt = buildEnhancedSystemPrompt(
+      assistantContext,
+      activeModule,
+      pageContext,
+    );
 
-    const tools = getAssistantTools({
+    // 3. جمع الأدوات — القديمة + الجديدة
+    const toolContext = {
       organizationId: organization.id,
       userId: session.user.id,
       organizationSlug: context.organizationSlug,
       locale: context.locale || "ar",
-    });
+      projectId: context.projectId,
+    };
+
+    // الأدوات القديمة (6 أدوات أساسية)
+    const legacyTools = getAssistantTools(toolContext);
+
+    // الأدوات الجديدة من Registry
+    const newTools = {
+      // أدوات القسم الحالي (لو موجود)
+      ...(activeModule ? getAISDKTools(toolContext, activeModule.id) : {}),
+      // أدوات أساسية دائماً متاحة
+      ...getAISDKTools(toolContext, "projects"),
+      ...getAISDKTools(toolContext, "execution"),
+      ...getAISDKTools(toolContext, "quantities"),
+      ...getAISDKTools(toolContext, "finance"),
+      ...getAISDKTools(toolContext, "leads"),
+    };
+
+    // دمج الأدوات — القديمة لها الأولوية (لتجنب تكرار الأسماء)
+    const tools = { ...newTools, ...legacyTools };
 
     // Convert UIMessages from useChat to ModelMessages for streamText
     const modelMessages = convertToModelMessages(messages);
@@ -138,4 +192,75 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
+}
+
+/**
+ * بناء system prompt محسّن يدمج Module Registry + Page Context
+ */
+function buildEnhancedSystemPrompt(
+  assistantContext: AssistantContext,
+  activeModule: AIModuleDefinition | null | undefined,
+  pageContext?: PageContextPayload,
+): string {
+  // نبدأ من system prompt القديم كأساس
+  const basePrompt = buildSystemPrompt(assistantContext);
+
+  const parts: string[] = [basePrompt];
+
+  // إضافة قائمة كل أقسام المنصة من Module Registry
+  const allModules = getAllModules();
+  parts.push(`
+## كل أقسام المنصة المتاحة:
+${allModules.map((m) => `- **${m.nameAr}** (${m.nameEn}): ${m.description}`).join("\n")}`);
+
+  // إضافة سياق الوحدة الحالية (لو موجودة ولم يكن القسم القديم يغطيها)
+  if (activeModule) {
+    parts.push(`
+## القسم الحالي: ${activeModule.nameAr}
+${activeModule.systemPrompt}
+
+### أمثلة أسئلة يمكنك مساعدة المستخدم فيها:
+${activeModule.exampleQuestions.map((q) => `- ${q}`).join("\n")}`);
+  }
+
+  // إضافة سياق الصفحة
+  if (pageContext) {
+    let contextSection = `
+## ما يراه المستخدم حالياً:
+- **الصفحة:** ${pageContext.pageName}
+- **الوصف:** ${pageContext.pageDescription}
+- **المسار:** ${pageContext.currentRoute}`;
+
+    if (
+      pageContext.visibleStats &&
+      Object.keys(pageContext.visibleStats).length > 0
+    ) {
+      contextSection += `\n- **إحصائيات معروضة:** ${JSON.stringify(pageContext.visibleStats)}`;
+    }
+
+    if (
+      pageContext.activeFilters &&
+      Object.keys(pageContext.activeFilters).length > 0
+    ) {
+      contextSection += `\n- **فلاتر مطبقة:** ${JSON.stringify(pageContext.activeFilters)}`;
+    }
+
+    if (pageContext.itemCount !== undefined) {
+      contextSection += `\n- **عدد العناصر المعروضة:** ${pageContext.itemCount}`;
+    }
+
+    if (pageContext.dataSummary) {
+      contextSection += `\n- **ملخص البيانات:** ${pageContext.dataSummary}`;
+    }
+
+    if (pageContext.formState?.isOpen) {
+      contextSection += `\n- **نموذج مفتوح:** ${pageContext.formState.entityName} (${pageContext.formState.formType})`;
+    }
+
+    contextSection += `\nاستخدم هذا السياق لتقديم إجابات دقيقة ومرتبطة بما يراه المستخدم. إذا سأل "كم عندي" أو "وش هالأرقام" — ارجع للإحصائيات المعروضة.`;
+
+    parts.push(contextSection);
+  }
+
+  return parts.join("\n\n");
 }

@@ -32,6 +32,7 @@ import { projectPaymentsRouter } from "../modules/project-payments/router";
 import { companyRouter } from "../modules/company/router";
 import { projectExecutionRouter } from "../modules/project-execution/router";
 import { pricingRouter } from "../modules/pricing/router";
+import { projectQuantitiesRouter } from "../modules/project-quantities/router";
 import { rolesRouter } from "../modules/roles/router";
 import { superAdminRouter } from "../modules/super-admin/router";
 import { usersRouter } from "../modules/users/router";
@@ -86,6 +87,8 @@ export const router = publicProcedure.router({
 	projectPayments: projectPaymentsRouter,
 	// Company Management - إدارة المنشأة
 	company: companyRouter,
+	// Project Quantities - كميات المشروع
+	projectQuantities: projectQuantitiesRouter,
 	// Phase 13 - Execution Module
 	projectExecution: projectExecutionRouter,
 	// Super Admin Panel

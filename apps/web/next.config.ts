@@ -107,7 +107,17 @@ const nextConfig: NextConfig = {
 		].join("; ");
 
 		return [
-			// SaaS app routes — no cache, strict framing, full CSP
+			// Static assets (JS, CSS, images, fonts) — immutable, long-term cache
+			{
+				source: "/_next/static/:path*",
+				headers: [
+					{
+						key: "Cache-Control",
+						value: "public, max-age=31536000, immutable",
+					},
+				],
+			},
+			// SaaS app routes — browser may cache but must revalidate (enables 304 Not Modified)
 			{
 				source: "/app/:path*",
 				headers: [
@@ -122,7 +132,7 @@ const nextConfig: NextConfig = {
 					},
 					{
 						key: "Cache-Control",
-						value: "no-store, no-cache, must-revalidate",
+						value: "private, no-cache",
 					},
 				],
 			},
@@ -190,6 +200,10 @@ const nextConfig: NextConfig = {
 					{
 						key: "X-Frame-Options",
 						value: "DENY",
+					},
+					{
+						key: "Cache-Control",
+						value: "public, s-maxage=3600, stale-while-revalidate=86400",
 					},
 				],
 			},

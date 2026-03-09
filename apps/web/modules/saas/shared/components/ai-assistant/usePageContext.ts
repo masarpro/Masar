@@ -20,10 +20,12 @@ const ORG_SECTION_MAP: Record<string, AssistantSection> = {
   projects: "projects",
   finance: "finance",
   quantities: "quantities",
+  pricing: "pricing",
   company: "company",
   settings: "settings",
   notifications: "notifications",
   chatbot: "chatbot",
+  leads: "leads",
 };
 
 export function usePageContext(): PageContext {

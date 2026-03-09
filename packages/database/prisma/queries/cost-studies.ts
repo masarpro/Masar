@@ -14,13 +14,19 @@ export async function getOrganizationCostStudies(
 		limit?: number;
 		offset?: number;
 		query?: string;
+		projectId?: string;
 	},
 ) {
 	const where: {
 		organizationId: string;
 		status?: string;
+		projectId?: string;
 		OR?: Array<{ name?: { contains: string; mode: "insensitive" }; customerName?: { contains: string; mode: "insensitive" } }>;
 	} = { organizationId };
+
+	if (options?.projectId) {
+		where.projectId = options.projectId;
+	}
 
 	if (options?.status) {
 		where.status = options.status;

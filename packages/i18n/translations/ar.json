@@ -2752,6 +2752,7 @@
 				"planning": "التخطيط",
 				"communication": "التواصل",
 				"workspace": "الملفات",
+				"quantities": "الكميات",
 				"more": "المزيد"
 			},
 			"sections": {
@@ -2764,6 +2765,7 @@
 				"paymentsAndClaims": "الدفعات",
 				"claims": "المستخلصات",
 				"subcontracts": "عقود الباطن",
+				"quantities": "الكميات والمواصفات",
 				"timeline": "الجدول",
 				"changes": "أوامر التغيير",
 				"documents": "ملفات المشروع",
@@ -7231,5 +7233,103 @@
 			"saving": "يحفظ...",
 			"saved": "تم الحفظ"
 		}
+	},
+	"projectQuantities": {
+		"title": "الكميات والمواصفات",
+		"overview": "نظرة عامة",
+		"structural": "إنشائي",
+		"finishing": "تشطيبات",
+		"mep": "ميكانيك وكهرباء وسباكة",
+		"labor": "عمالة",
+		"materials": "المواد",
+		"summary": "ملخص الكميات",
+		"totalStructural": "إجمالي الإنشائي",
+		"totalFinishing": "إجمالي التشطيبات",
+		"totalMEP": "إجمالي MEP",
+		"totalLabor": "إجمالي العمالة",
+		"grandTotal": "الإجمالي العام",
+		"grandTotalWithVat": "الإجمالي شامل ض.ق.م",
+		"byPhase": "حسب المراحل",
+		"byCategory": "حسب الفئة",
+		"byStudy": "حسب الدراسة",
+		"unassignedItems": "بنود غير مصنفة",
+		"noPhaseAssigned": "بدون مرحلة",
+		"emptyState": {
+			"title": "لا توجد كميات لهذا المشروع",
+			"description": "يمكنك إنشاء دراسة كميات جديدة أو ربط دراسة موجودة لتتبع مواد وتكاليف المشروع"
+		},
+		"actions": {
+			"createStudy": "إنشاء دراسة كميات جديدة",
+			"linkStudy": "ربط دراسة موجودة",
+			"unlinkStudy": "فك ربط الدراسة",
+			"unlinkConfirm": "هل أنت متأكد من فك ربط هذه الدراسة من المشروع؟ ستبقى الدراسة موجودة كدراسة عامة.",
+			"openStudy": "فتح الدراسة",
+			"assignToPhase": "تعيين لمرحلة",
+			"removeFromPhase": "إزالة من المرحلة",
+			"recalculate": "إعادة الحساب"
+		},
+		"linkDialog": {
+			"title": "ربط دراسة كميات بالمشروع",
+			"search": "ابحث عن دراسة...",
+			"noStudies": "لا توجد دراسات متاحة للربط",
+			"noStudiesDesc": "جميع الدراسات مرتبطة بمشاريع أخرى. يمكنك إنشاء دراسة جديدة.",
+			"link": "ربط",
+			"floors": "أدوار",
+			"area": "المساحة"
+		},
+		"createDialog": {
+			"title": "إنشاء دراسة كميات جديدة",
+			"name": "اسم الدراسة",
+			"namePlaceholder": "مثال: دراسة كميات فيلا الرياض",
+			"location": "الموقع",
+			"floors": "عدد الأدوار",
+			"area": "المساحة (م²)",
+			"overheadPercent": "نسبة المصاريف العامة (%)",
+			"profitPercent": "نسبة الربح (%)",
+			"vatPercent": "نسبة ضريبة القيمة المضافة (%)",
+			"create": "إنشاء الدراسة",
+			"projectType": "نوع المشروع",
+			"finishingLevel": "مستوى التشطيب"
+		},
+		"table": {
+			"study": "الدراسة",
+			"category": "الفئة",
+			"subcategory": "الفئة الفرعية",
+			"description": "الوصف",
+			"quantity": "الكمية",
+			"unit": "الوحدة",
+			"unitPrice": "سعر الوحدة",
+			"total": "الإجمالي",
+			"phase": "المرحلة",
+			"room": "الغرفة",
+			"item": "البند",
+			"area": "المساحة",
+			"specifications": "المواصفات",
+			"system": "النظام",
+			"jobTitle": "المسمى",
+			"count": "العدد",
+			"dailyRate": "الأجر اليومي",
+			"duration": "المدة (أيام)",
+			"section": "القسم",
+			"itemCount": "عدد البنود",
+			"subtotal": "المجموع الفرعي",
+			"name": "الاسم"
+		},
+		"studyCard": {
+			"items": "بند",
+			"linkedStudies": "الدراسات المرتبطة",
+			"noStudiesLinked": "لا توجد دراسات مرتبطة"
+		},
+		"toast": {
+			"studyLinked": "تم ربط الدراسة بالمشروع بنجاح",
+			"studyUnlinked": "تم فك ربط الدراسة من المشروع",
+			"studyCreated": "تم إنشاء الدراسة بنجاح",
+			"phaseAssigned": "تم تعيين البند للمرحلة",
+			"phaseRemoved": "تم إزالة البند من المرحلة",
+			"bulkAssigned": "تم تعيين {count} بند للمرحلة"
+		},
+		"noItems": "لا توجد بنود",
+		"noItemsDescription": "لا توجد بنود في هذا القسم من الدراسات المرتبطة بالمشروع",
+		"totalItems": "إجمالي البنود"
 	}
 }

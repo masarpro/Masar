@@ -1,4 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
+import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { QuotationsList } from "@saas/pricing/components/quotations/QuotationsList";
 import { QuotationsHeaderActions } from "@saas/pricing/components/quotations/QuotationsHeaderActions";
 import { PricingShell } from "@saas/pricing/components/shell";
@@ -31,15 +32,23 @@ export default async function QuotationsPage({
 	}
 
 	return (
-		<PricingShell
-			organizationSlug={organizationSlug}
-			sectionKey="quotations"
-			headerActions={<QuotationsHeaderActions organizationSlug={organizationSlug} />}
+		<PageContextProvider
+			moduleId="finance"
+			pageName="Quotations"
+			pageNameAr="عروض الأسعار"
+			pageDescription="عرض وإدارة عروض الأسعار"
+			visibleStats={{}}
 		>
-			<QuotationsList
-				organizationId={activeOrganization.id}
+			<PricingShell
 				organizationSlug={organizationSlug}
-			/>
-		</PricingShell>
+				sectionKey="quotations"
+				headerActions={<QuotationsHeaderActions organizationSlug={organizationSlug} />}
+			>
+				<QuotationsList
+					organizationId={activeOrganization.id}
+					organizationSlug={organizationSlug}
+				/>
+			</PricingShell>
+		</PageContextProvider>
 	);
 }

@@ -117,6 +117,12 @@ export function useSidebarMenu(): {
 												icon: Banknote,
 											},
 											{
+												id: "project-quantities",
+												label: t("projects.shell.sections.quantities"),
+												href: `${projectBase}/quantities`,
+												icon: Calculator,
+											},
+											{
 												id: "project-documents",
 												label: t("projects.shell.sections.documents"),
 												href: `${projectBase}/documents`,

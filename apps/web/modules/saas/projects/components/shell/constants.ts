@@ -17,6 +17,7 @@ import {
 	ClipboardList,
 	Receipt,
 	Hammer,
+	Calculator,
 } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════════
@@ -90,6 +91,13 @@ export const PROJECT_NAV_SECTIONS: ProjectNavSection[] = [
 		labelKey: "projects.shell.sections.payments",
 		icon: Banknote,
 		section: "finance/claims",
+	},
+	{
+		id: "quantities",
+		path: "quantities",
+		labelKey: "projects.shell.sections.quantities",
+		icon: Calculator,
+		section: "quantities",
 	},
 	{
 		id: "subcontracts",
@@ -309,6 +317,15 @@ export const NAV_GROUP_CONFIG: NavGroupConfig[] = [
 		showInMobileDock: true,
 	},
 	{
+		id: "quantities",
+		labelKey: "projects.shell.navigation.quantities",
+		icon: Calculator,
+		type: "direct",
+		sectionIds: ["quantities"],
+		directSectionId: "quantities",
+		showInMobileDock: true,
+	},
+	{
 		id: "workspace",
 		labelKey: "projects.shell.navigation.workspace",
 		icon: FolderKanban,
@@ -500,6 +517,8 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 			variant: "primary",
 		},
 	],
+	// Quantities page
+	quantities: [],
 	// Owner page
 	owner: [],
 	// Insights page

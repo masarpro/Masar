@@ -2,6 +2,7 @@
 
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { orpc } from "@shared/lib/orpc-query-utils";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { useQuery } from "@tanstack/react-query";
 
 export function useOrganizationPlan() {
@@ -14,7 +15,7 @@ export function useOrganizationPlan() {
 				? { organizationId }
 				: undefined as any,
 			enabled: !!organizationId,
-			staleTime: 30_000,
+			staleTime: STALE_TIMES.SUBSCRIPTION,
 		}),
 	);
 

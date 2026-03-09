@@ -1,4 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
+import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { FieldTimeline } from "@saas/projects/components/field/FieldTimeline";
 import { ExecutionDashboard } from "@saas/projects-execution/components";
 import { notFound } from "next/navigation";
@@ -28,23 +29,31 @@ export default async function ExecutionPage({
 	}
 
 	return (
-		<div className="space-y-8">
-			{/* Execution Dashboard */}
-			<section>
-				<ExecutionDashboard projectId={projectId} />
-			</section>
+		<PageContextProvider
+			moduleId="execution"
+			pageName="Project Execution"
+			pageNameAr="تنفيذ المشروع"
+			pageDescription="عرض لوحة التنفيذ والأنشطة الميدانية للمشروع"
+			visibleStats={{}}
+		>
+			<div className="space-y-8">
+				{/* Execution Dashboard */}
+				<section>
+					<ExecutionDashboard projectId={projectId} />
+				</section>
 
-			{/* Divider */}
-			<div className="border-t border-slate-200 dark:border-slate-700" />
+				{/* Divider */}
+				<div className="border-t border-slate-200 dark:border-slate-700" />
 
-			{/* Field Activity Feed */}
-			<section>
-				<FieldTimeline
-					organizationId={activeOrganization.id}
-					organizationSlug={organizationSlug}
-					projectId={projectId}
-				/>
-			</section>
-		</div>
+				{/* Field Activity Feed */}
+				<section>
+					<FieldTimeline
+						organizationId={activeOrganization.id}
+						organizationSlug={organizationSlug}
+						projectId={projectId}
+					/>
+				</section>
+			</div>
+		</PageContextProvider>
 	);
 }

@@ -1,4 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
+import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { FinanceView } from "@saas/projects/components/finance/FinanceView";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -27,12 +28,20 @@ export default async function FinancePage({
 	}
 
 	return (
-		<div>
-			<FinanceView
-				organizationId={activeOrganization.id}
-				organizationSlug={organizationSlug}
-				projectId={projectId}
-			/>
-		</div>
+		<PageContextProvider
+			moduleId="finance"
+			pageName="Project Finance"
+			pageNameAr="مالية المشروع"
+			pageDescription="عرض المصروفات والمطالبات والدفعات للمشروع"
+			visibleStats={{}}
+		>
+			<div>
+				<FinanceView
+					organizationId={activeOrganization.id}
+					organizationSlug={organizationSlug}
+					projectId={projectId}
+				/>
+			</div>
+		</PageContextProvider>
 	);
 }

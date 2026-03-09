@@ -13,6 +13,7 @@ import { AssistantMessages } from "./AssistantMessages";
 import { AssistantSuggestions } from "./AssistantSuggestions";
 import { AssistantHistory } from "./AssistantHistory";
 import { AssistantWelcome } from "./AssistantWelcome";
+import { usePageContextStore } from "@saas/ai/hooks/use-page-context";
 
 export function AssistantPanel() {
   const {
@@ -43,6 +44,9 @@ export function AssistantPanel() {
   const savingRef = useRef(false);
   const prevSaveLenRef = useRef(0);
 
+  // Page context from Zustand store (set by PageContextProvider on individual pages)
+  const enhancedPageContext = usePageContextStore((s) => s.context);
+
   const contextBody = {
     organizationSlug,
     organizationName,
@@ -55,16 +59,34 @@ export function AssistantPanel() {
 
   const contextBodyRef = useRef(contextBody);
   contextBodyRef.current = contextBody;
+  const enhancedPageContextRef = useRef(enhancedPageContext);
+  enhancedPageContextRef.current = enhancedPageContext;
 
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
         api: "/api/ai/assistant",
         prepareSendMessagesRequest({ messages }) {
+          const pc = enhancedPageContextRef.current;
           return {
             body: {
               messages,
               context: contextBodyRef.current,
+              // إرسال سياق الصفحة المحسّن (إن وجد)
+              pageContext: pc
+                ? {
+                    moduleId: pc.moduleId,
+                    pageName: pc.pageNameAr,
+                    currentRoute: pc.currentRoute,
+                    pageDescription: pc.pageDescription,
+                    visibleStats: pc.visibleStats,
+                    activeFilters: pc.activeFilters,
+                    itemCount: pc.itemCount,
+                    tableColumns: pc.tableColumns,
+                    formState: pc.formState,
+                    dataSummary: summarizeVisibleData(pc.visibleData),
+                  }
+                : null,
             },
           };
         },
@@ -455,4 +477,23 @@ export function AssistantPanel() {
       </div>
     </>
   );
+}
+
+/** تلخيص البيانات المرئية لإرسالها مع الرسالة */
+function summarizeVisibleData(data: Record<string, any>): string {
+  if (!data || Object.keys(data).length === 0) return "";
+
+  const parts: string[] = [];
+  for (const [key, value] of Object.entries(data)) {
+    if (value?._summary) {
+      parts.push(`${key}: ${value.totalCount} عنصر`);
+    } else if (Array.isArray(value)) {
+      parts.push(`${key}: ${value.length} عنصر`);
+    } else if (typeof value === "object" && value !== null) {
+      parts.push(`${key}: ${Object.keys(value).length} حقل`);
+    } else {
+      parts.push(`${key}: ${value}`);
+    }
+  }
+  return parts.join(" | ");
 }

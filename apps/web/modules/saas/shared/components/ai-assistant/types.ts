@@ -29,6 +29,8 @@ export type AssistantSection =
   | "settings"
   | "notifications"
   | "chatbot"
+  | "leads"
+  | "pricing"
   | "unknown";
 
 export interface QuickAction {

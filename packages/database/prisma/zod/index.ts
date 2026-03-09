@@ -109,19 +109,19 @@ export type AiChatScalarFieldEnum = z.infer<typeof AiChatScalarFieldEnumSchema>;
 
 // File: CostStudyScalarFieldEnum.schema.ts
 
-export const CostStudyScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'createdById', 'name', 'customerName', 'customerId', 'projectType', 'landArea', 'buildingArea', 'numberOfFloors', 'hasBasement', 'finishingLevel', 'structuralCost', 'finishingCost', 'mepCost', 'laborCost', 'overheadPercent', 'profitPercent', 'contingencyPercent', 'vatIncluded', 'totalCost', 'buildingConfig', 'status', 'notes', 'createdAt', 'updatedAt'])
+export const CostStudyScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'createdById', 'name', 'customerName', 'customerId', 'projectType', 'landArea', 'buildingArea', 'numberOfFloors', 'hasBasement', 'finishingLevel', 'structuralCost', 'finishingCost', 'mepCost', 'laborCost', 'overheadPercent', 'profitPercent', 'contingencyPercent', 'vatIncluded', 'totalCost', 'buildingConfig', 'status', 'notes', 'projectId', 'createdAt', 'updatedAt'])
 
 export type CostStudyScalarFieldEnum = z.infer<typeof CostStudyScalarFieldEnumSchema>;
 
 // File: StructuralItemScalarFieldEnum.schema.ts
 
-export const StructuralItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'category', 'subCategory', 'name', 'description', 'dimensions', 'quantity', 'unit', 'concreteVolume', 'concreteType', 'steelWeight', 'steelRatio', 'wastagePercent', 'materialCost', 'laborCost', 'totalCost', 'sortOrder', 'createdAt', 'updatedAt'])
+export const StructuralItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'category', 'subCategory', 'name', 'description', 'dimensions', 'quantity', 'unit', 'concreteVolume', 'concreteType', 'steelWeight', 'steelRatio', 'wastagePercent', 'materialCost', 'laborCost', 'totalCost', 'projectPhaseId', 'sortOrder', 'createdAt', 'updatedAt'])
 
 export type StructuralItemScalarFieldEnum = z.infer<typeof StructuralItemScalarFieldEnumSchema>;
 
 // File: FinishingItemScalarFieldEnum.schema.ts
 
-export const FinishingItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'category', 'subCategory', 'name', 'description', 'floorId', 'floorName', 'area', 'length', 'height', 'width', 'perimeter', 'quantity', 'unit', 'calculationMethod', 'calculationData', 'dataSource', 'sourceItemId', 'sourceFormula', 'isEnabled', 'groupKey', 'scope', 'qualityLevel', 'brand', 'specifications', 'specData', 'wastagePercent', 'materialPrice', 'laborPrice', 'materialCost', 'laborCost', 'totalCost', 'sortOrder', 'createdAt', 'updatedAt'])
+export const FinishingItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'category', 'subCategory', 'name', 'description', 'floorId', 'floorName', 'area', 'length', 'height', 'width', 'perimeter', 'quantity', 'unit', 'calculationMethod', 'calculationData', 'dataSource', 'sourceItemId', 'sourceFormula', 'isEnabled', 'groupKey', 'scope', 'qualityLevel', 'brand', 'specifications', 'specData', 'wastagePercent', 'materialPrice', 'laborPrice', 'materialCost', 'laborCost', 'totalCost', 'projectPhaseId', 'sortOrder', 'createdAt', 'updatedAt'])
 
 export type FinishingItemScalarFieldEnum = z.infer<typeof FinishingItemScalarFieldEnumSchema>;
 
@@ -133,13 +133,13 @@ export type SpecificationTemplateScalarFieldEnum = z.infer<typeof SpecificationT
 
 // File: MEPItemScalarFieldEnum.schema.ts
 
-export const MEPItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'category', 'subCategory', 'itemType', 'name', 'floorId', 'floorName', 'roomId', 'roomName', 'scope', 'quantity', 'unit', 'length', 'area', 'calculationMethod', 'calculationData', 'dataSource', 'sourceFormula', 'groupKey', 'specifications', 'specData', 'qualityLevel', 'materialPrice', 'laborPrice', 'wastagePercent', 'materialCost', 'laborCost', 'unitPrice', 'totalCost', 'sortOrder', 'isEnabled', 'createdAt', 'updatedAt'])
+export const MEPItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'category', 'subCategory', 'itemType', 'name', 'floorId', 'floorName', 'roomId', 'roomName', 'scope', 'quantity', 'unit', 'length', 'area', 'calculationMethod', 'calculationData', 'dataSource', 'sourceFormula', 'groupKey', 'specifications', 'specData', 'qualityLevel', 'materialPrice', 'laborPrice', 'wastagePercent', 'materialCost', 'laborCost', 'unitPrice', 'totalCost', 'projectPhaseId', 'sortOrder', 'isEnabled', 'createdAt', 'updatedAt'])
 
 export type MEPItemScalarFieldEnum = z.infer<typeof MEPItemScalarFieldEnumSchema>;
 
 // File: LaborItemScalarFieldEnum.schema.ts
 
-export const LaborItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'laborType', 'workerType', 'name', 'quantity', 'dailyRate', 'durationDays', 'insuranceCost', 'housingCost', 'otherCosts', 'totalCost', 'createdAt', 'updatedAt'])
+export const LaborItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'laborType', 'workerType', 'name', 'quantity', 'dailyRate', 'durationDays', 'insuranceCost', 'housingCost', 'otherCosts', 'totalCost', 'projectPhaseId', 'createdAt', 'updatedAt'])
 
 export type LaborItemScalarFieldEnum = z.infer<typeof LaborItemScalarFieldEnumSchema>;
 
@@ -1488,6 +1488,7 @@ export const CostStudySchema = z.object({
   buildingConfig: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
   status: z.string().default("draft"),
   notes: z.string().nullish(),
+  projectId: z.string().nullish(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -1531,6 +1532,7 @@ export const StructuralItemSchema = z.object({
   totalCost: z.instanceof(Prisma.Decimal, {
   message: "Field 'totalCost' must be a Decimal. Location: ['Models', 'StructuralItem']",
 }),
+  projectPhaseId: z.string().nullish(),
   sortOrder: z.number().int(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -1599,6 +1601,7 @@ export const FinishingItemSchema = z.object({
   totalCost: z.instanceof(Prisma.Decimal, {
   message: "Field 'totalCost' must be a Decimal. Location: ['Models', 'FinishingItem']",
 }),
+  projectPhaseId: z.string().nullish(),
   sortOrder: z.number().int(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -1679,6 +1682,7 @@ export const MEPItemSchema = z.object({
   totalCost: z.instanceof(Prisma.Decimal, {
   message: "Field 'totalCost' must be a Decimal. Location: ['Models', 'MEPItem']",
 }),
+  projectPhaseId: z.string().nullish(),
   sortOrder: z.number().int(),
   isEnabled: z.boolean().default(true),
   createdAt: z.date(),
@@ -1713,6 +1717,7 @@ export const LaborItemSchema = z.object({
   totalCost: z.instanceof(Prisma.Decimal, {
   message: "Field 'totalCost' must be a Decimal. Location: ['Models', 'LaborItem']",
 }),
+  projectPhaseId: z.string().nullish(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

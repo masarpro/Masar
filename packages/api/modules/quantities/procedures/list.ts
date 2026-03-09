@@ -15,6 +15,7 @@ export const list = protectedProcedure
 			organizationId: z.string(),
 			status: z.string().optional(),
 			query: z.string().optional(),
+			projectId: z.string().optional(),
 			limit: z.number().optional().default(50),
 			offset: z.number().optional().default(0),
 		}),
@@ -29,6 +30,7 @@ export const list = protectedProcedure
 		const result = await getOrganizationCostStudies(input.organizationId, {
 			status: input.status,
 			query: input.query,
+			projectId: input.projectId,
 			limit: input.limit,
 			offset: input.offset,
 		});

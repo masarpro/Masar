@@ -2781,6 +2781,7 @@
 				"planning": "Planning",
 				"communication": "Communication",
 				"workspace": "Files",
+				"quantities": "Quantities",
 				"more": "More"
 			},
 			"sections": {
@@ -2793,6 +2794,7 @@
 				"paymentsAndClaims": "Payments & Claims",
 				"claims": "Claims",
 				"subcontracts": "Subcontracts",
+				"quantities": "Quantities & Specs",
 				"timeline": "Timeline",
 				"changes": "Change Orders",
 				"documents": "Project Files",
@@ -7454,5 +7456,103 @@
 			"saving": "Saving...",
 			"saved": "Saved"
 		}
+	},
+	"projectQuantities": {
+		"title": "Quantities & Specifications",
+		"overview": "Overview",
+		"structural": "Structural",
+		"finishing": "Finishing",
+		"mep": "MEP",
+		"labor": "Labor",
+		"materials": "Materials",
+		"summary": "Quantities Summary",
+		"totalStructural": "Total Structural",
+		"totalFinishing": "Total Finishing",
+		"totalMEP": "Total MEP",
+		"totalLabor": "Total Labor",
+		"grandTotal": "Grand Total",
+		"grandTotalWithVat": "Grand Total (incl. VAT)",
+		"byPhase": "By Phase",
+		"byCategory": "By Category",
+		"byStudy": "By Study",
+		"unassignedItems": "Unassigned Items",
+		"noPhaseAssigned": "No Phase",
+		"emptyState": {
+			"title": "No quantities for this project",
+			"description": "Create a new cost study or link an existing one to track materials and costs for this project"
+		},
+		"actions": {
+			"createStudy": "Create New Cost Study",
+			"linkStudy": "Link Existing Study",
+			"unlinkStudy": "Unlink Study",
+			"unlinkConfirm": "Are you sure you want to unlink this study from the project? The study will remain as a general study.",
+			"openStudy": "Open Study",
+			"assignToPhase": "Assign to Phase",
+			"removeFromPhase": "Remove from Phase",
+			"recalculate": "Recalculate"
+		},
+		"linkDialog": {
+			"title": "Link Cost Study to Project",
+			"search": "Search for a study...",
+			"noStudies": "No available studies to link",
+			"noStudiesDesc": "All studies are linked to other projects. You can create a new one.",
+			"link": "Link",
+			"floors": "Floors",
+			"area": "Area"
+		},
+		"createDialog": {
+			"title": "Create New Cost Study",
+			"name": "Study Name",
+			"namePlaceholder": "e.g., Villa Cost Study - Riyadh",
+			"location": "Location",
+			"floors": "Number of Floors",
+			"area": "Area (m²)",
+			"overheadPercent": "Overhead (%)",
+			"profitPercent": "Profit Margin (%)",
+			"vatPercent": "VAT (%)",
+			"create": "Create Study",
+			"projectType": "Project Type",
+			"finishingLevel": "Finishing Level"
+		},
+		"table": {
+			"study": "Study",
+			"category": "Category",
+			"subcategory": "Subcategory",
+			"description": "Description",
+			"quantity": "Quantity",
+			"unit": "Unit",
+			"unitPrice": "Unit Price",
+			"total": "Total",
+			"phase": "Phase",
+			"room": "Room",
+			"item": "Item",
+			"area": "Area",
+			"specifications": "Specifications",
+			"system": "System",
+			"jobTitle": "Job Title",
+			"count": "Count",
+			"dailyRate": "Daily Rate",
+			"duration": "Duration (days)",
+			"section": "Section",
+			"itemCount": "Items",
+			"subtotal": "Subtotal",
+			"name": "Name"
+		},
+		"studyCard": {
+			"items": "items",
+			"linkedStudies": "Linked Studies",
+			"noStudiesLinked": "No studies linked"
+		},
+		"toast": {
+			"studyLinked": "Study linked to project successfully",
+			"studyUnlinked": "Study unlinked from project",
+			"studyCreated": "Study created successfully",
+			"phaseAssigned": "Item assigned to phase",
+			"phaseRemoved": "Item removed from phase",
+			"bulkAssigned": "{count} items assigned to phase"
+		},
+		"noItems": "No items",
+		"noItemsDescription": "No items in this section from the studies linked to the project",
+		"totalItems": "Total Items"
 	}
 }

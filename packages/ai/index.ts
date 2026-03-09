@@ -11,3 +11,21 @@ export * from "ai";
 export * from "./lib";
 export * from "./prompts/assistant-system";
 export * from "./tools/assistant-tools";
+
+// Module Registry
+export {
+  getAllModules,
+  getModuleById,
+  getModuleByRoute,
+  type AIModuleDefinition,
+} from "./modules/registry";
+
+// Tool Registry
+export {
+  registerTool,
+  getToolsForModule,
+  getAllRegisteredTools,
+  getAISDKTools,
+  type ToolContext as AIToolContext,
+  type AIToolRegistration,
+} from "./tools/registry";

@@ -1,6 +1,7 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Badge } from "@ui/components/badge";
 import { useQuery } from "@tanstack/react-query";
 import { differenceInDays } from "date-fns";
@@ -57,14 +58,14 @@ function ContractBarInner({
 		...orpc.projectContract.get.queryOptions({
 			input: { organizationId, projectId },
 		}),
-		staleTime: 5 * 60 * 1000,
+		staleTime: STALE_TIMES.PROJECT_DETAILS,
 	});
 
 	const { data: summary, isLoading: summaryLoading } = useQuery({
 		...orpc.projectContract.getSummary.queryOptions({
 			input: { organizationId, projectId },
 		}),
-		staleTime: 5 * 60 * 1000,
+		staleTime: STALE_TIMES.PROJECT_DETAILS,
 	});
 
 	if (contractLoading || summaryLoading) {

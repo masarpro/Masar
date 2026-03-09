@@ -1,4 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
+import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { LeadsListPage } from "@saas/pricing/components/leads/LeadsListPage";
 import { CreateLeadButton } from "@saas/pricing/components/leads/CreateLeadButton";
 import { PricingShell } from "@saas/pricing/components/shell";
@@ -31,15 +32,23 @@ export default async function LeadsPage({
 	}
 
 	return (
-		<PricingShell
-			organizationSlug={organizationSlug}
-			sectionKey="leads"
-			headerActions={<CreateLeadButton organizationSlug={organizationSlug} />}
+		<PageContextProvider
+			moduleId="leads"
+			pageName="Leads"
+			pageNameAr="العملاء المحتملين"
+			pageDescription="عرض وإدارة العملاء المحتملين وتتبع التحويلات"
+			visibleStats={{}}
 		>
-			<LeadsListPage
-				organizationId={activeOrganization.id}
+			<PricingShell
 				organizationSlug={organizationSlug}
-			/>
-		</PricingShell>
+				sectionKey="leads"
+				headerActions={<CreateLeadButton organizationSlug={organizationSlug} />}
+			>
+				<LeadsListPage
+					organizationId={activeOrganization.id}
+					organizationSlug={organizationSlug}
+				/>
+			</PricingShell>
+		</PageContextProvider>
 	);
 }

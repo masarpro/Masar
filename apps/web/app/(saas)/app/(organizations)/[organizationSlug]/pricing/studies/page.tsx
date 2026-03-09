@@ -1,4 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
+import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { QuantitiesList } from "@saas/pricing/components/studies/QuantitiesList";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { notFound } from "next/navigation";
@@ -30,11 +31,19 @@ export default async function StudiesPage({
 	}
 
 	return (
-		<PricingShell
-			organizationSlug={organizationSlug}
-			sectionKey="studies"
+		<PageContextProvider
+			moduleId="quantities"
+			pageName="Cost Studies"
+			pageNameAr="دراسات الكميات"
+			pageDescription="عرض دراسات الكميات وتحليل التكاليف"
+			visibleStats={{}}
 		>
-			<QuantitiesList organizationId={activeOrganization.id} />
-		</PricingShell>
+			<PricingShell
+				organizationSlug={organizationSlug}
+				sectionKey="studies"
+			>
+				<QuantitiesList organizationId={activeOrganization.id} />
+			</PricingShell>
+		</PageContextProvider>
 	);
 }
