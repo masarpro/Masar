@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient, skipToken } from "@tanstack/reac
 import { useRouter } from "next/navigation";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import {
@@ -197,11 +198,12 @@ export function TemplateEditor({
 	);
 
 	// Fetch organization finance settings for preview
-	const { data: orgSettings } = useQuery(
-		orpc.finance.settings.get.queryOptions({
+	const { data: orgSettings } = useQuery({
+		...orpc.finance.settings.get.queryOptions({
 			input: { organizationId },
 		}),
-	);
+		staleTime: STALE_TIMES.FINANCE_SETTINGS,
+	});
 
 	// Prepare organization data for preview
 	const organizationData: OrganizationData = {

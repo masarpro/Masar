@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
@@ -135,11 +136,12 @@ export function InvoiceEditor({
 	);
 
 	// Fetch all templates (all types available for invoices)
-	const { data: templatesData } = useQuery(
-		orpc.finance.templates.list.queryOptions({
+	const { data: templatesData } = useQuery({
+		...orpc.finance.templates.list.queryOptions({
 			input: { organizationId },
 		}),
-	);
+		staleTime: STALE_TIMES.TEMPLATES,
+	});
 	const templates = templatesData?.templates ?? [];
 
 	// Fetch default template

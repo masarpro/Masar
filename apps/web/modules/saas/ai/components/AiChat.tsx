@@ -7,6 +7,7 @@ import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
 import { useOrganizationPlan } from "@saas/shared/hooks/use-organization-plan";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { orpc } from "@shared/lib/orpc-query-utils";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import {
 	skipToken,
 	useMutation,
@@ -28,13 +29,14 @@ export function AiChat({ organizationId }: { organizationId?: string }) {
 	const [input, setInput] = useState("");
 	const { isFree, limits } = useOrganizationPlan();
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-	const { data, status: chatsStatus } = useQuery(
-		orpc.ai.chats.list.queryOptions({
+	const { data, status: chatsStatus } = useQuery({
+		...orpc.ai.chats.list.queryOptions({
 			input: {
 				organizationId,
 			},
 		}),
-	);
+		staleTime: STALE_TIMES.AI_CHATS,
+	});
 	const [chatId, setChatId] = useQueryState("chatId");
 	const currentChatQuery = useQuery(
 		orpc.ai.chats.find.queryOptions({

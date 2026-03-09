@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
@@ -88,11 +89,12 @@ export function PaymentForm({
 	);
 
 	// Fetch invoices (unpaid)
-	const { data: invoicesData } = useQuery(
-		orpc.finance.invoices.list.queryOptions({
+	const { data: invoicesData } = useQuery({
+		...orpc.finance.invoices.list.queryOptions({
 			input: { organizationId, status: "SENT" },
 		}),
-	);
+		staleTime: STALE_TIMES.INVOICES,
+	});
 
 	const accounts = accountsData?.accounts ?? [];
 	const clients = clientsData?.clients ?? [];

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Badge } from "@ui/components/badge";
@@ -52,8 +53,8 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 
 	const PAGE_SIZE = 20;
 
-	const { data, isLoading } = useQuery(
-		orpc.company.expenses.list.queryOptions({
+	const { data, isLoading } = useQuery({
+		...orpc.company.expenses.list.queryOptions({
 			input: {
 				organizationId,
 				query: search || undefined,
@@ -63,6 +64,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 				offset: (currentPage - 1) * PAGE_SIZE,
 			},
 		}),
+		staleTime: STALE_TIMES.EXPENSES,
 	);
 
 	const { data: summary } = useQuery(

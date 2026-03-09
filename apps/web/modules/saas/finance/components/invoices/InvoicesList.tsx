@@ -2,6 +2,7 @@
 
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
@@ -92,8 +93,8 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 	// Determine if the credit_note tab is selected (it's a type, not a status)
 	const isCreditNoteTab = statusFilter === "CREDIT_NOTE";
 
-	const { data, isLoading } = useQuery(
-		orpc.finance.invoices.list.queryOptions({
+	const { data, isLoading } = useQuery({
+		...orpc.finance.invoices.list.queryOptions({
 			input: {
 				organizationId,
 				status: !isCreditNoteTab && statusFilter !== "all" ? statusFilter as any : undefined,
@@ -103,7 +104,8 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 				offset: (currentPage - 1) * PAGE_SIZE,
 			},
 		}),
-	);
+		staleTime: STALE_TIMES.INVOICES,
+	});
 
 	const invoices = data?.invoices ?? [];
 	const totalCount = data?.total ?? 0;

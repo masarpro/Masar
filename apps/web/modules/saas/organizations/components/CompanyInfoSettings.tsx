@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { SettingsItem } from "@saas/shared/components/SettingsItem";
 import { FinanceLogoUpload } from "@saas/finance/components/settings/FinanceLogoUpload";
@@ -64,11 +65,12 @@ export function CompanyInfoSettings() {
 	const { activeOrganization } = useActiveOrganization();
 	const organizationId = activeOrganization?.id ?? "";
 
-	const { data: settings, isLoading } = useQuery(
-		orpc.finance.settings.get.queryOptions({
+	const { data: settings, isLoading } = useQuery({
+		...orpc.finance.settings.get.queryOptions({
 			input: { organizationId },
 		}),
-	);
+		staleTime: STALE_TIMES.FINANCE_SETTINGS,
+	});
 
 	const [formData, setFormData] = useState<Record<string, any>>({});
 	const [hasChanges, setHasChanges] = useState(false);

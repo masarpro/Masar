@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Button } from "@ui/components/button";
 import { Printer, Download, ArrowLeft, Loader2, ZoomInIcon, ZoomOutIcon, RotateCcwIcon } from "lucide-react";
 import Link from "next/link";
@@ -44,11 +45,12 @@ export function TemplatePreview({
 	);
 
 	// Fetch organization finance settings for preview
-	const { data: orgSettings } = useQuery(
-		orpc.finance.settings.get.queryOptions({
+	const { data: orgSettings } = useQuery({
+		...orpc.finance.settings.get.queryOptions({
 			input: { organizationId },
 		}),
-	);
+		staleTime: STALE_TIMES.FINANCE_SETTINGS,
+	});
 
 	const handleZoomIn = useCallback(() => {
 		setScale((prev) => Math.min(prev + 0.1, 1.5));

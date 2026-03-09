@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Badge } from "@ui/components/badge";
@@ -135,8 +136,8 @@ export function ExpensesList({
 	const effectiveBasePath = customBasePath || `/app/${organizationSlug}/finance/expenses`;
 
 	// Fetch unified expenses + subcontract payments
-	const { data, isLoading } = useQuery(
-		orpc.finance.expenses.listUnified.queryOptions({
+	const { data, isLoading } = useQuery({
+		...orpc.finance.expenses.listUnified.queryOptions({
 			input: {
 				organizationId,
 				query: searchQuery || undefined,
@@ -144,7 +145,8 @@ export function ExpensesList({
 				projectId: projectFilter,
 			},
 		}),
-	);
+		staleTime: STALE_TIMES.EXPENSES,
+	});
 
 	// Fetch projects for filter
 	const { data: projectsData } = useQuery(

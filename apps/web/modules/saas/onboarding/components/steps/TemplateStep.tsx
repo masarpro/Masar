@@ -1,6 +1,7 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { CheckCircle, Loader2 } from "lucide-react";
@@ -35,14 +36,15 @@ export function TemplateStep({
 		data: templatesData,
 		isLoading,
 		refetch,
-	} = useQuery(
-		orpc.finance.templates.list.queryOptions({
+	} = useQuery({
+		...orpc.finance.templates.list.queryOptions({
 			input: {
 				organizationId,
 				templateType: "INVOICE",
 			},
 		}),
-	);
+		staleTime: STALE_TIMES.TEMPLATES,
+	});
 
 	const templates = templatesData?.templates ?? [];
 

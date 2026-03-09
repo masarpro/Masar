@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Button } from "@ui/components/button";
 import { Card, CardContent } from "@ui/components/card";
 import {
@@ -67,14 +68,15 @@ export function TemplatesList({
 	const [deleteTemplateId, setDeleteTemplateId] = useState<string | null>(null);
 
 	// Fetch user's custom templates
-	const { data, isLoading } = useQuery(
-		orpc.finance.templates.list.queryOptions({
+	const { data, isLoading } = useQuery({
+		...orpc.finance.templates.list.queryOptions({
 			input: {
 				organizationId,
 				templateType: filterType === "ALL" ? undefined : filterType,
 			},
 		}),
-	);
+		staleTime: STALE_TIMES.TEMPLATES,
+	});
 
 	const templates = data?.templates ?? [];
 
