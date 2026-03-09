@@ -8,7 +8,7 @@ import {
 	TooltipTrigger,
 } from "@ui/components/tooltip";
 import { Bot, Pencil, Info } from "lucide-react";
-import { formatCurrency, formatNumber } from "../../lib/utils";
+import { formatNumber } from "../../lib/utils";
 import type { MEPMergedItem } from "../../types/mep";
 
 interface MEPItemRowProps {
@@ -26,7 +26,7 @@ export function MEPItemRow({
 
 	return (
 		<div
-			className={`grid grid-cols-[32px_1fr_80px_60px_90px_90px_32px] sm:grid-cols-[32px_1fr_80px_60px_90px_90px_80px_32px] items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
+			className={`grid grid-cols-[32px_1fr_80px_60px_80px_32px] sm:grid-cols-[32px_1fr_80px_60px_80px_32px] items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
 				isDisabled
 					? "bg-muted/40 opacity-60"
 					: "bg-card hover:bg-accent/50"
@@ -84,18 +84,8 @@ export function MEPItemRow({
 			{/* Unit */}
 			<span className="text-muted-foreground">{item.unit}</span>
 
-			{/* Unit Price */}
-			<span className="text-left tabular-nums" dir="ltr">
-				{formatNumber(item.materialPrice + item.laborPrice, 0)}
-			</span>
-
-			{/* Total */}
-			<span className="text-left font-medium tabular-nums" dir="ltr">
-				{formatCurrency(item.totalCost)}
-			</span>
-
-			{/* Source formula tooltip (hidden on mobile) */}
-			<div className="hidden sm:flex items-center justify-center">
+			{/* Source formula tooltip */}
+			<div className="flex items-center justify-center">
 				{item.sourceFormula && (
 					<TooltipProvider delayDuration={200}>
 						<Tooltip>

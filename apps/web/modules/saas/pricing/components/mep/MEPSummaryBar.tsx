@@ -2,15 +2,12 @@
 
 import { memo } from "react";
 import {
-	Zap,
 	Droplets,
 	Wind,
-	Flame,
-	Wifi,
 	Settings,
 	ToggleRight,
 } from "lucide-react";
-import { formatCurrency, formatNumber } from "../../lib/utils";
+import { formatNumber } from "../../lib/utils";
 import type { MEPMergedItem } from "../../types/mep";
 
 interface MEPSummaryBarProps {
@@ -23,18 +20,11 @@ export const MEPSummaryBar = memo(function MEPSummaryBar({
 	const totalItems = items.length;
 	const enabledItems = items.filter((i) => i.isEnabled);
 	const disabledItems = totalItems - enabledItems.length;
-	const totalCost = enabledItems.reduce((s, i) => s + i.totalCost, 0);
 	const autoItems = items.filter((i) => i.dataSource === "auto").length;
 	const manualItems = items.filter((i) => i.dataSource === "manual").length;
 
 	return (
 		<div className="rounded-xl border bg-card shadow-sm p-4 flex flex-wrap items-center gap-x-6 gap-y-3">
-			<Stat
-				icon={<Zap className="h-4 w-4" />}
-				label="إجمالي تكلفة MEP"
-				value={formatCurrency(totalCost)}
-			/>
-			<div className="w-px h-8 bg-border hidden sm:block" />
 			<Stat
 				icon={<Settings className="h-4 w-4" />}
 				label="عدد البنود"

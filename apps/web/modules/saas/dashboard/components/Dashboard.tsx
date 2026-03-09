@@ -408,10 +408,6 @@ export function Dashboard() {
 			) : (() => {
 					const COLS = 4;
 					const useScroll = projects.length > 4;
-					const firstRowProjects = projects.slice(0, COLS);
-					const secondRowProjects = projects.slice(COLS, COLS * 2);
-					const firstRowEmptyCount = Math.max(0, COLS - firstRowProjects.length);
-					const secondRowEmptyCount = Math.max(0, COLS - secondRowProjects.length);
 
 					const projectCardBase =
 						"rounded-2xl border border-border bg-muted/30 flex flex-row overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-500 group";
@@ -502,21 +498,11 @@ export function Dashboard() {
 						);
 					}
 
+					const gridCols = Math.min(projects.length, COLS);
 					return (
-						<div className="grid w-full grid-cols-[repeat(4,minmax(0,1fr))_auto] gap-3">
-							{firstRowProjects.map((p, i) => renderProjectCard(p, i))}
-							{Array.from({ length: firstRowEmptyCount }).map((_, idx) => (
-								<div key={`empty1-${idx}`} className="h-[88px] rounded-xl border border-dashed border-border bg-muted/30" aria-hidden />
-							))}
+						<div className="grid w-full gap-3" style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr)) auto` }}>
+							{projects.map((p, i) => renderProjectCard(p, i))}
 							{newProjectButton}
-							{secondRowProjects.length > 0 && (
-								<>
-									{secondRowProjects.map((p, i) => renderProjectCard(p, i + firstRowProjects.length))}
-									{Array.from({ length: secondRowEmptyCount }).map((_, idx) => (
-										<div key={`empty2-${idx}`} className="h-[88px] rounded-xl border border-dashed border-border bg-muted/30" aria-hidden />
-									))}
-								</>
-							)}
 						</div>
 					);
 				})()}

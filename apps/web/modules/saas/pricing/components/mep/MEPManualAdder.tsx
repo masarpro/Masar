@@ -40,8 +40,6 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 	const [subCategory, setSubCategory] = useState("");
 	const [name, setName] = useState("");
 	const [quantity, setQuantity] = useState("");
-	const [materialPrice, setMaterialPrice] = useState("");
-	const [laborPrice, setLaborPrice] = useState("");
 
 	const catConfig = category ? MEP_CATEGORIES[category] : null;
 	const subCategories = catConfig?.subCategories ?? {};
@@ -52,17 +50,14 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 		const qty = parseFloat(quantity);
 		if (Number.isNaN(qty) || qty <= 0) return;
 
-		const matPrice = parseFloat(materialPrice);
-		const labPrice = parseFloat(laborPrice);
-
 		onAdd({
 			category,
 			subCategory,
 			name,
 			quantity: qty,
 			unit: selectedSub?.defaultUnit ?? "عدد",
-			materialPrice: Number.isNaN(matPrice) ? 0 : matPrice,
-			laborPrice: Number.isNaN(labPrice) ? 0 : labPrice,
+			materialPrice: 0,
+			laborPrice: 0,
 		});
 
 		// Reset
@@ -70,8 +65,6 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 		setSubCategory("");
 		setName("");
 		setQuantity("");
-		setMaterialPrice("");
-		setLaborPrice("");
 		setOpen(false);
 	};
 
@@ -160,32 +153,6 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 						<span className="text-sm text-muted-foreground whitespace-nowrap">
 							{selectedSub?.defaultUnit ?? "عدد"}
 						</span>
-					</div>
-				)}
-
-				{/* Prices */}
-				{subCategory && (
-					<div className="grid grid-cols-2 gap-2">
-						<Input
-							type="number"
-							value={materialPrice}
-							onChange={(e) =>
-								setMaterialPrice(e.target.value)
-							}
-							placeholder="سعر المواد"
-							className="text-sm h-9 rounded-lg"
-							dir="ltr"
-						/>
-						<Input
-							type="number"
-							value={laborPrice}
-							onChange={(e) =>
-								setLaborPrice(e.target.value)
-							}
-							placeholder="سعر المصنعية"
-							className="text-sm h-9 rounded-lg"
-							dir="ltr"
-						/>
 					</div>
 				)}
 

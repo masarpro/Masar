@@ -12,7 +12,6 @@ import {
 	Wifi,
 	Settings,
 } from "lucide-react";
-import { formatCurrency } from "../../lib/utils";
 import {
 	MEP_CATEGORIES,
 	MEP_CATEGORY_ORDER,
@@ -60,31 +59,17 @@ export function MEPDashboard({
 }: MEPDashboardProps) {
 	// Group items by category
 	const categoryData = useMemo(() => {
-		const enabledTotal = mergedItems
-			.filter((i) => i.isEnabled)
-			.reduce((s, i) => s + i.totalCost, 0);
-
 		return MEP_CATEGORY_ORDER.map((catId) => {
 			const catItems = mergedItems.filter(
 				(i) => i.category === catId,
 			);
 			const enabledItems = catItems.filter((i) => i.isEnabled);
-			const catCost = enabledItems.reduce(
-				(s, i) => s + i.totalCost,
-				0,
-			);
-			const percentage =
-				enabledTotal > 0
-					? Math.round((catCost / enabledTotal) * 100)
-					: 0;
 
 			return {
 				id: catId,
 				config: MEP_CATEGORIES[catId],
 				items: catItems,
 				enabledCount: enabledItems.length,
-				totalCost: catCost,
-				percentage,
 			};
 		}).filter((c) => c.items.length > 0);
 	}, [mergedItems]);
@@ -164,31 +149,9 @@ export function MEPDashboard({
 										{cat.config.nameAr}
 									</span>
 								</div>
-								<div className="space-y-1">
-									<p
-										className="text-sm font-bold tabular-nums"
-										dir="ltr"
-									>
-										{formatCurrency(cat.totalCost)}
-									</p>
-									<div className="flex items-center justify-between text-xs text-muted-foreground">
-										<span>
-											{cat.enabledCount} بند
-										</span>
-										<span>{cat.percentage}%</span>
-									</div>
-								</div>
-								{/* Progress bar */}
-								<div className="mt-2 h-1 rounded-full bg-muted overflow-hidden">
-									<div
-										className="h-full rounded-full transition-all"
-										style={{
-											width: `${cat.percentage}%`,
-											backgroundColor:
-												cat.config.color,
-										}}
-									/>
-								</div>
+								<p className="text-sm font-medium text-muted-foreground mt-1">
+									{cat.enabledCount} بند
+								</p>
 							</CardContent>
 						</Card>
 					);

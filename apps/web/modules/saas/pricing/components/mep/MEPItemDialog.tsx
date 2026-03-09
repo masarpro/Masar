@@ -50,9 +50,6 @@ export function MEPItemDialog({
 	const [subCategory, setSubCategory] = useState("general");
 	const [quantity, setQuantity] = useState("");
 	const [unit, setUnit] = useState("");
-	const [materialPrice, setMaterialPrice] = useState("");
-	const [laborPrice, setLaborPrice] = useState("");
-	const [wastagePercent, setWastagePercent] = useState("");
 	const [qualityLevel, setQualityLevel] = useState<string>("standard");
 
 	// Populate form when item changes
@@ -63,9 +60,6 @@ export function MEPItemDialog({
 			setSubCategory(item.subCategory);
 			setQuantity(String(item.quantity));
 			setUnit(item.unit);
-			setMaterialPrice(String(item.materialPrice));
-			setLaborPrice(String(item.laborPrice));
-			setWastagePercent(String(item.wastagePercent));
 			setQualityLevel(item.qualityLevel ?? "standard");
 		}
 	}, [item]);
@@ -89,9 +83,6 @@ export function MEPItemDialog({
 		if (!item?.id) return;
 
 		const qty = parseFloat(quantity);
-		const matPrice = parseFloat(materialPrice);
-		const labPrice = parseFloat(laborPrice);
-		const wastage = parseFloat(wastagePercent);
 
 		if (Number.isNaN(qty) || qty < 0) {
 			toast.error("الكمية غير صحيحة");
@@ -107,9 +98,6 @@ export function MEPItemDialog({
 			subCategory,
 			quantity: qty,
 			unit,
-			materialPrice: Number.isNaN(matPrice) ? 0 : matPrice,
-			laborPrice: Number.isNaN(labPrice) ? 0 : labPrice,
-			wastagePercent: Number.isNaN(wastage) ? 10 : wastage,
 			qualityLevel,
 		});
 	}, [
@@ -121,9 +109,6 @@ export function MEPItemDialog({
 		subCategory,
 		quantity,
 		unit,
-		materialPrice,
-		laborPrice,
-		wastagePercent,
 		qualityLevel,
 		updateMutation,
 	]);
@@ -211,46 +196,6 @@ export function MEPItemDialog({
 							<Input
 								value={unit}
 								onChange={(e) => setUnit(e.target.value)}
-								className="text-sm"
-							/>
-						</div>
-					</div>
-
-					{/* Prices */}
-					<div className="grid grid-cols-3 gap-3">
-						<div className="space-y-1.5">
-							<Label>سعر المواد</Label>
-							<Input
-								type="number"
-								value={materialPrice}
-								onChange={(e) =>
-									setMaterialPrice(e.target.value)
-								}
-								dir="ltr"
-								className="text-sm"
-							/>
-						</div>
-						<div className="space-y-1.5">
-							<Label>سعر المصنعية</Label>
-							<Input
-								type="number"
-								value={laborPrice}
-								onChange={(e) =>
-									setLaborPrice(e.target.value)
-								}
-								dir="ltr"
-								className="text-sm"
-							/>
-						</div>
-						<div className="space-y-1.5">
-							<Label>الهدر %</Label>
-							<Input
-								type="number"
-								value={wastagePercent}
-								onChange={(e) =>
-									setWastagePercent(e.target.value)
-								}
-								dir="ltr"
 								className="text-sm"
 							/>
 						</div>
