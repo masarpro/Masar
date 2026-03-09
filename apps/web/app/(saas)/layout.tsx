@@ -15,6 +15,7 @@ import { getLocale, getMessages } from "next-intl/server";
 import type { PropsWithChildren } from "react";
 
 export default async function SaaSLayout({ children }: PropsWithChildren) {
+	const layoutStart = performance.now();
 	const [locale, messages, session] = await Promise.all([
 		getLocale(),
 		getMessages(),
@@ -54,6 +55,8 @@ export default async function SaaSLayout({ children }: PropsWithChildren) {
 	}
 
 	await Promise.all(prefetchPromises);
+
+	console.log(`[PERF] (saas)/layout.tsx: ${Math.round(performance.now() - layoutStart)}ms`);
 
 	return (
 		<Document locale={locale}>

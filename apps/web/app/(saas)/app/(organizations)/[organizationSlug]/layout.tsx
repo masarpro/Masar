@@ -22,6 +22,7 @@ export default async function OrganizationLayout({
 		organizationSlug: string;
 	}>;
 }>) {
+	const layoutStart = performance.now();
 	const { organizationSlug } = await params;
 
 	const organization = await getActiveOrganization(organizationSlug);
@@ -70,6 +71,8 @@ export default async function OrganizationLayout({
 	}
 
 	await Promise.all(prefetchPromises);
+
+	console.log(`[PERF] [organizationSlug]/layout.tsx: ${Math.round(performance.now() - layoutStart)}ms`);
 
 	return (
 		<AssistantWrapper organizationName={organization.name}>

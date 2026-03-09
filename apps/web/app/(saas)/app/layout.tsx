@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import type { PropsWithChildren } from "react";
 
 export default async function Layout({ children }: PropsWithChildren) {
+	const layoutStart = performance.now();
 	const [session, organizationsList] = await Promise.all([
 		getSession(),
 		getOrganizationList(),
@@ -81,6 +82,8 @@ export default async function Layout({ children }: PropsWithChildren) {
 			redirect("/choose-plan");
 		}
 	}
+
+	console.log(`[PERF] (saas)/app/layout.tsx: ${Math.round(performance.now() - layoutStart)}ms`);
 
 	return children;
 }
