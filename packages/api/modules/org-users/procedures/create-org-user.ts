@@ -52,7 +52,7 @@ export const createOrgUser = subscriptionProcedure
 				where: { id: input.organizationId },
 				select: { name: true },
 			}),
-			db.organizationRole.findUnique({
+			db.role.findUnique({
 				where: { id: input.organizationRoleId },
 				select: { name: true },
 			}),

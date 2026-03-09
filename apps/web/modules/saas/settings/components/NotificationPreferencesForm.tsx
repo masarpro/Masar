@@ -159,7 +159,7 @@ export function NotificationPreferencesForm({
 						{t("settings.notifications.resetDefaults")}
 					</Button>
 					<Button
-						variant={isMuted ? "default" : "outline"}
+						variant={isMuted ? "secondary" : "outline"}
 						size="sm"
 						className={`rounded-xl ${isMuted ? "bg-red-600 hover:bg-red-700 text-white" : "border-white/20 dark:border-slate-700/30"}`}
 						onClick={toggleMuteAll}

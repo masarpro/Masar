@@ -99,7 +99,7 @@ export default function AcceptInvitationPage() {
 			</div>
 
 			{error && (
-				<Alert variant="destructive" className="mb-4">
+				<Alert variant="error" className="mb-4">
 					<AlertTriangleIcon className="h-4 w-4" />
 					<AlertTitle>{error}</AlertTitle>
 				</Alert>

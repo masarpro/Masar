@@ -414,7 +414,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 							{t("common.cancel")}
 						</Button>
 						<Button
-							variant="destructive"
+							variant="error"
 							className="rounded-xl"
 							onClick={() => {
 								if (showRejectDialog) {

@@ -1,5 +1,5 @@
 import { db } from "@repo/database";
-import type { EmployeeChangeType } from "@repo/database/prisma/generated";
+import type { EmployeeChangeType } from "@repo/database";
 
 type EmployeeData = {
 	name?: string | null;

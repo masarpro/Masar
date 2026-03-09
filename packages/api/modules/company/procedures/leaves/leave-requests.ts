@@ -54,7 +54,6 @@ export const listLeaveRequestsProcedure = protectedProcedure
 				include: {
 					employee: { select: { id: true, name: true, employeeNo: true } },
 					leaveType: { select: { id: true, name: true, nameEn: true, color: true } },
-					approver: { select: { id: true, name: true } },
 				},
 				orderBy: { createdAt: "desc" },
 				take: input.limit,
