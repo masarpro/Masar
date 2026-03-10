@@ -7554,5 +7554,175 @@
 		"noItems": "No items",
 		"noItemsDescription": "No items in this section from the studies linked to the project",
 		"totalItems": "Total Items"
+	},
+	"projectBoq": {
+		"title": "Bill of Quantities",
+		"boq": "BOQ",
+		"summary": {
+			"title": "Quantities Summary",
+			"totalItems": "Total Items",
+			"pricedItems": "Priced Items",
+			"unpricedItems": "Items Need Pricing",
+			"grandTotal": "Grand Total",
+			"structural": "Structural",
+			"finishing": "Finishing",
+			"mep": "MEP",
+			"labor": "Labor",
+			"general": "General"
+		},
+		"emptyState": {
+			"title": "No BOQ items for this project",
+			"description": "You can add items manually, import from Excel, or copy from a cost study or quotation"
+		},
+		"actions": {
+			"addItem": "Add Item",
+			"bulkEntry": "Quick Entry",
+			"importExcel": "Import Excel",
+			"copyFromStudy": "Copy from Cost Study",
+			"copyFromQuotation": "Copy from Quotation",
+			"startPricing": "Start Pricing",
+			"deleteSelected": "Delete Selected",
+			"assignPhase": "Assign Phase",
+			"assignSection": "Assign Section",
+			"save": "Save",
+			"cancel": "Cancel"
+		},
+		"filters": {
+			"allSections": "All Sections",
+			"allPhases": "All Phases",
+			"allStatuses": "All Statuses",
+			"allSources": "All Sources",
+			"priced": "Priced",
+			"unpriced": "Unpriced",
+			"noPhase": "No Phase",
+			"search": "Search items..."
+		},
+		"table": {
+			"code": "Code",
+			"description": "Description",
+			"unit": "Unit",
+			"quantity": "Quantity",
+			"unitPrice": "Unit Price",
+			"totalPrice": "Total",
+			"phase": "Phase",
+			"source": "Source",
+			"section": "Section",
+			"actions": "Actions",
+			"noPrice": "No price",
+			"total": "Total"
+		},
+		"source": {
+			"MANUAL": "Manual",
+			"COST_STUDY": "Cost Study",
+			"IMPORTED": "Imported",
+			"CONTRACT": "Contract",
+			"QUOTATION": "Quotation"
+		},
+		"section": {
+			"STRUCTURAL": "Structural",
+			"FINISHING": "Finishing",
+			"MEP": "MEP",
+			"LABOR": "Labor",
+			"GENERAL": "General"
+		},
+		"createDialog": {
+			"title": "Add New Item",
+			"code": "Item Code",
+			"codePlaceholder": "e.g., A-01",
+			"description": "Description",
+			"descriptionPlaceholder": "Item description...",
+			"specifications": "Specifications",
+			"specificationsPlaceholder": "Detailed specifications...",
+			"unit": "Unit",
+			"unitPlaceholder": "e.g., m³, m², ton",
+			"quantity": "Quantity",
+			"unitPrice": "Unit Price",
+			"unitPricePlaceholder": "Leave empty to price later",
+			"section": "Section",
+			"phase": "Phase",
+			"category": "Category",
+			"notes": "Notes",
+			"create": "Add Item"
+		},
+		"bulkEntry": {
+			"title": "Add Multiple Items",
+			"defaultSection": "Default Section",
+			"defaultPhase": "Default Phase",
+			"defaultSource": "Source",
+			"addRow": "New Row",
+			"hint": "Leave the price column empty to price later",
+			"saveItems": "Save {count} items"
+		},
+		"pricing": {
+			"title": "Price Items",
+			"unpricedCount": "{count} unpriced items",
+			"totalAfterPricing": "Total After Pricing",
+			"savePrices": "Save Prices"
+		},
+		"importExcel": {
+			"title": "Import Items from Excel",
+			"step1": "Upload File",
+			"step2": "Map Columns",
+			"step3": "Preview & Import",
+			"dropzone": "Drag file here or click to select",
+			"supportedFormats": "Supports: xlsx, xls, csv",
+			"fileColumn": "File Column",
+			"masarField": "Masar Field",
+			"example": "Example",
+			"skip": "Skip",
+			"required": "Required",
+			"preview": "Preview",
+			"foundItems": "Found {count} items",
+			"pricedCount": "{count} priced",
+			"unpricedCount": "{count} unpriced",
+			"skippedRows": "{count} rows skipped — incomplete data",
+			"importItems": "Import {count} items",
+			"maxFileSize": "Max file size: 5MB",
+			"maxItems": "Maximum: 500 items"
+		},
+		"copyStudy": {
+			"title": "Copy Items from Cost Study",
+			"search": "Search studies...",
+			"noStudies": "No studies available to copy",
+			"alreadyCopied": "Items from this study have already been copied",
+			"linkedTo": "Linked to project: {name}",
+			"copy": "Copy Items",
+			"itemCount": "{count} items"
+		},
+		"copyQuotation": {
+			"title": "Copy Items from Quotation",
+			"search": "Search quotations...",
+			"noQuotations": "No quotations available",
+			"includePrices": "Copy prices with items",
+			"itemsOnly": "Copy items only (no prices — to price later)",
+			"copy": "Copy Items",
+			"itemCount": "{count} items",
+			"client": "Client"
+		},
+		"toast": {
+			"itemCreated": "Item added successfully",
+			"itemsCreated": "{count} items added successfully",
+			"itemUpdated": "Item updated",
+			"itemDeleted": "Item deleted",
+			"itemsDeleted": "{count} items deleted",
+			"pricesUpdated": "Prices updated for {count} items",
+			"phaseAssigned": "Phase assigned",
+			"copiedFromStudy": "Copied {count} items from study",
+			"copiedFromQuotation": "Copied {count} items from quotation",
+			"importedFromExcel": "Imported {count} items"
+		},
+		"confirm": {
+			"deleteItem": "Are you sure you want to delete this item?",
+			"deleteItems": "Are you sure you want to delete {count} items?",
+			"deleteTitle": "Delete Item",
+			"deleteItemsTitle": "Delete Items"
+		},
+		"unpricedWarning": "{count} items need pricing",
+		"dashboard": {
+			"items": "items",
+			"noItems": "No BOQ items added yet",
+			"estimatedCost": "Estimated Cost (from BOQ)",
+			"viewDetails": "View Details"
+		}
 	}
 }

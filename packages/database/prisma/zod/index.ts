@@ -419,6 +419,12 @@ export const ProjectChangeOrderScalarFieldEnumSchema = z.enum(['id', 'organizati
 
 export type ProjectChangeOrderScalarFieldEnum = z.infer<typeof ProjectChangeOrderScalarFieldEnumSchema>;
 
+// File: ProjectBOQItemScalarFieldEnum.schema.ts
+
+export const ProjectBOQItemScalarFieldEnumSchema = z.enum(['id', 'projectId', 'organizationId', 'sourceType', 'costStudyId', 'sourceItemId', 'quotationId', 'sortOrder', 'section', 'category', 'code', 'description', 'specifications', 'unit', 'quantity', 'unitPrice', 'totalPrice', 'projectPhaseId', 'notes', 'createdById', 'createdAt', 'updatedAt'])
+
+export type ProjectBOQItemScalarFieldEnum = z.infer<typeof ProjectBOQItemScalarFieldEnumSchema>;
+
 // File: ClientScalarFieldEnum.schema.ts
 
 export const ClientScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'clientType', 'firstName', 'lastName', 'businessName', 'name', 'company', 'phone', 'mobile', 'email', 'address', 'streetAddress1', 'streetAddress2', 'city', 'region', 'postalCode', 'country', 'secondaryAddress', 'code', 'currency', 'displayLanguage', 'classification', 'taxNumber', 'crNumber', 'notes', 'isActive', 'createdById', 'createdAt', 'updatedAt'])
@@ -964,6 +970,18 @@ export type ChangeOrderCategory = z.infer<typeof ChangeOrderCategorySchema>;
 export const ChangeOrderStatusSchema = z.enum(['DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED', 'IMPLEMENTED'])
 
 export type ChangeOrderStatus = z.infer<typeof ChangeOrderStatusSchema>;
+
+// File: BOQSourceType.schema.ts
+
+export const BOQSourceTypeSchema = z.enum(['MANUAL', 'COST_STUDY', 'IMPORTED', 'CONTRACT', 'QUOTATION'])
+
+export type BOQSourceType = z.infer<typeof BOQSourceTypeSchema>;
+
+// File: BOQSection.schema.ts
+
+export const BOQSectionSchema = z.enum(['STRUCTURAL', 'FINISHING', 'MEP', 'LABOR', 'GENERAL'])
+
+export type BOQSection = z.infer<typeof BOQSectionSchema>;
 
 // File: ClientType.schema.ts
 
@@ -2829,6 +2847,42 @@ export const ProjectChangeOrderSchema = z.object({
 });
 
 export type ProjectChangeOrderType = z.infer<typeof ProjectChangeOrderSchema>;
+
+
+// File: ProjectBOQItem.schema.ts
+
+export const ProjectBOQItemSchema = z.object({
+  id: z.string(),
+  projectId: z.string(),
+  organizationId: z.string(),
+  sourceType: BOQSourceTypeSchema.default("MANUAL"),
+  costStudyId: z.string().nullish(),
+  sourceItemId: z.string().nullish(),
+  quotationId: z.string().nullish(),
+  sortOrder: z.number().int(),
+  section: BOQSectionSchema.default("GENERAL"),
+  category: z.string().nullish(),
+  code: z.string().nullish(),
+  description: z.string(),
+  specifications: z.string().nullish(),
+  unit: z.string(),
+  quantity: z.instanceof(Prisma.Decimal, {
+  message: "Field 'quantity' must be a Decimal. Location: ['Models', 'ProjectBOQItem']",
+}),
+  unitPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'unitPrice' must be a Decimal. Location: ['Models', 'ProjectBOQItem']",
+}).nullish(),
+  totalPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalPrice' must be a Decimal. Location: ['Models', 'ProjectBOQItem']",
+}).nullish(),
+  projectPhaseId: z.string().nullish(),
+  notes: z.string().nullish(),
+  createdById: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type ProjectBOQItemType = z.infer<typeof ProjectBOQItemSchema>;
 
 
 // File: Client.schema.ts

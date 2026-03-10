@@ -594,6 +594,24 @@ enum EmployeeChangeType {
   INFO_UPDATE         // تحديث بيانات عامة
 }
 
+// مصدر بند جدول الكميات
+enum BOQSourceType {
+  MANUAL        // إدخال يدوي
+  COST_STUDY    // منسوخ من دراسة كميات
+  IMPORTED      // مستورد من Excel
+  CONTRACT      // من بنود العقد
+  QUOTATION     // منسوخ من عرض سعر
+}
+
+// قسم بند جدول الكميات
+enum BOQSection {
+  STRUCTURAL    // إنشائي
+  FINISHING     // تشطيبات
+  MEP           // ميكانيك وكهرباء وسباكة
+  LABOR         // عمالة
+  GENERAL       // عام
+}
+
 model User {
   id                 String       @id @default(cuid())
   name               String
@@ -753,6 +771,9 @@ model User {
 
   // Specification Templates
   specificationTemplates  SpecificationTemplate[] @relation("SpecTemplateCreator")
+
+  // Project BOQ Items
+  createdBOQItems         ProjectBOQItem[]        @relation("BOQItemCreator")
 
   // ═══ نهاية حقول مسار ═══
 
@@ -975,6 +996,9 @@ model Organization {
 
   // Specification Templates
   specificationTemplates  SpecificationTemplate[]
+
+  // Project BOQ Items
+  boqItems                ProjectBOQItem[]
 
   // ═══ نهاية حقول مسار ═══
 
@@ -1220,6 +1244,7 @@ model CostStudy {
   laborItems      LaborItem[]
   quotes          Quote[]
   lead            Lead?
+  boqItems        ProjectBOQItem[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -1584,6 +1609,9 @@ model Project {
 
   // دراسات الكميات المرتبطة بالمشروع
   costStudies         CostStudy[]
+
+  // جدول الكميات (BOQ)
+  boqItems            ProjectBOQItem[]
 
   // Company Management - إدارة المنشأة (ربط بالمشروع)
   companyExpenseAllocations CompanyExpenseAllocation[]
@@ -2681,6 +2709,7 @@ model ProjectMilestone {
   finishingItems   FinishingItem[]   @relation("FinishingItemPhase")
   mepItems         MEPItem[]         @relation("MEPItemPhase")
   laborItems       LaborItem[]       @relation("LaborItemPhase")
+  boqItems         ProjectBOQItem[]  @relation("BOQItemPhase")
 
   @@index([organizationId, projectId])
   @@index([organizationId, projectId, status])
@@ -3064,6 +3093,62 @@ model ProjectChangeOrder {
   @@index([claimId])
   @@index([contractId])
   @@map("project_change_orders")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PROJECT BOQ - جدول الكميات المرن
+// ═══════════════════════════════════════════════════════════════════════════
+
+model ProjectBOQItem {
+  id              String         @id @default(cuid())
+  projectId       String         @map("project_id")
+  project         Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  organizationId  String         @map("organization_id")
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // المصدر
+  sourceType      BOQSourceType  @default(MANUAL) @map("source_type")
+  costStudyId     String?        @map("cost_study_id")
+  costStudy       CostStudy?     @relation(fields: [costStudyId], references: [id], onDelete: SetNull)
+  sourceItemId    String?        @map("source_item_id")
+  quotationId     String?        @map("quotation_id")
+
+  // الترتيب
+  sortOrder       Int            @default(0) @map("sort_order")
+
+  // بيانات البند
+  section         BOQSection     @default(GENERAL)
+  category        String?
+  code            String?
+  description     String
+  specifications  String?        @db.Text
+  unit            String
+
+  // الكميات والأسعار
+  quantity        Decimal        @default(0) @db.Decimal(15, 4)
+  unitPrice       Decimal?       @map("unit_price") @db.Decimal(15, 2)
+  totalPrice      Decimal?       @map("total_price") @db.Decimal(15, 2)
+
+  // الربط بالمراحل
+  projectPhaseId  String?        @map("project_phase_id")
+  projectPhase    ProjectMilestone? @relation("BOQItemPhase", fields: [projectPhaseId], references: [id], onDelete: SetNull)
+
+  // ملاحظات
+  notes           String?        @db.Text
+
+  // التتبع
+  createdById     String?        @map("created_by_id")
+  createdBy       User?          @relation("BOQItemCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  @@index([projectId, organizationId])
+  @@index([projectId, section])
+  @@index([projectId, sourceType])
+  @@index([projectId, projectPhaseId])
+  @@index([organizationId])
+  @@index([costStudyId])
+  @@map("project_boq_items")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

@@ -12,6 +12,7 @@ import { ExecutionPhasesCard } from "./overview/ExecutionPhasesCard";
 import { FinanceBudgetCard } from "./overview/FinanceBudgetCard";
 import { RecentActivitiesCard } from "./overview/RecentActivitiesCard";
 import { QuickDocumentsCard } from "./overview/QuickDocumentsCard";
+import { BOQDashboardCard } from "./boq/boq-dashboard-card";
 
 const ChartSkeleton = () => <Skeleton className="h-[200px] w-full rounded-lg" />;
 
@@ -93,6 +94,15 @@ export function ProjectOverview({
 
 			{/* Quick Actions */}
 			<QuickActions basePath={basePath} />
+
+			{/* BOQ Dashboard Card */}
+			{canViewSection("finance") && (
+				<BOQDashboardCard
+					organizationId={organizationId}
+					projectId={projectId}
+					basePath={basePath}
+				/>
+			)}
 
 			{/* Timeline Chart - full width when field */}
 			{canViewSection("field") && (

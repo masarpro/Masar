@@ -38,6 +38,7 @@ import { superAdminRouter } from "../modules/super-admin/router";
 import { usersRouter } from "../modules/users/router";
 import { onboardingRouter } from "../modules/onboarding/router";
 import { activationCodesRouter } from "../modules/activation-codes/router";
+import { projectBoqRouter } from "../modules/project-boq/router";
 import { publicProcedure } from "./procedures";
 
 export const router = publicProcedure.router({
@@ -89,6 +90,8 @@ export const router = publicProcedure.router({
 	company: companyRouter,
 	// Project Quantities - كميات المشروع
 	projectQuantities: projectQuantitiesRouter,
+	// Project BOQ - جدول الكميات المرن
+	projectBoq: projectBoqRouter,
 	// Phase 13 - Execution Module
 	projectExecution: projectExecutionRouter,
 	// Super Admin Panel

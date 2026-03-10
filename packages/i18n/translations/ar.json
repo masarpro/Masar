@@ -7331,5 +7331,175 @@
 		"noItems": "لا توجد بنود",
 		"noItemsDescription": "لا توجد بنود في هذا القسم من الدراسات المرتبطة بالمشروع",
 		"totalItems": "إجمالي البنود"
+	},
+	"projectBoq": {
+		"title": "جدول الكميات",
+		"boq": "BOQ",
+		"summary": {
+			"title": "ملخص الكميات",
+			"totalItems": "إجمالي البنود",
+			"pricedItems": "بنود مسعّرة",
+			"unpricedItems": "بنود تحتاج تسعير",
+			"grandTotal": "الإجمالي العام",
+			"structural": "إنشائي",
+			"finishing": "تشطيبات",
+			"mep": "MEP",
+			"labor": "عمالة",
+			"general": "عام"
+		},
+		"emptyState": {
+			"title": "لا توجد بنود كميات لهذا المشروع",
+			"description": "يمكنك إضافة بنود يدوياً، استيرادها من Excel، أو نسخها من دراسة كميات أو عرض سعر"
+		},
+		"actions": {
+			"addItem": "إضافة بند",
+			"bulkEntry": "إدخال سريع",
+			"importExcel": "استيراد Excel",
+			"copyFromStudy": "نسخ من دراسة كميات",
+			"copyFromQuotation": "نسخ من عرض سعر",
+			"startPricing": "ابدأ التسعير",
+			"deleteSelected": "حذف المحدد",
+			"assignPhase": "تعيين مرحلة",
+			"assignSection": "تعيين قسم",
+			"save": "حفظ",
+			"cancel": "إلغاء"
+		},
+		"filters": {
+			"allSections": "كل الأقسام",
+			"allPhases": "كل المراحل",
+			"allStatuses": "كل الحالات",
+			"allSources": "كل المصادر",
+			"priced": "مسعّر",
+			"unpriced": "غير مسعّر",
+			"noPhase": "بدون مرحلة",
+			"search": "بحث في البنود..."
+		},
+		"table": {
+			"code": "كود",
+			"description": "الوصف",
+			"unit": "الوحدة",
+			"quantity": "الكمية",
+			"unitPrice": "سعر الوحدة",
+			"totalPrice": "الإجمالي",
+			"phase": "المرحلة",
+			"source": "المصدر",
+			"section": "القسم",
+			"actions": "إجراءات",
+			"noPrice": "بدون سعر",
+			"total": "المجموع"
+		},
+		"source": {
+			"MANUAL": "يدوي",
+			"COST_STUDY": "دراسة كميات",
+			"IMPORTED": "مستورد",
+			"CONTRACT": "عقد",
+			"QUOTATION": "عرض سعر"
+		},
+		"section": {
+			"STRUCTURAL": "إنشائي",
+			"FINISHING": "تشطيبات",
+			"MEP": "MEP",
+			"LABOR": "عمالة",
+			"GENERAL": "عام"
+		},
+		"createDialog": {
+			"title": "إضافة بند جديد",
+			"code": "كود البند",
+			"codePlaceholder": "مثال: A-01",
+			"description": "الوصف",
+			"descriptionPlaceholder": "وصف البند...",
+			"specifications": "المواصفات",
+			"specificationsPlaceholder": "المواصفات التفصيلية...",
+			"unit": "الوحدة",
+			"unitPlaceholder": "مثال: م³، م²، طن",
+			"quantity": "الكمية",
+			"unitPrice": "سعر الوحدة",
+			"unitPricePlaceholder": "اتركه فارغاً للتسعير لاحقاً",
+			"section": "القسم",
+			"phase": "المرحلة",
+			"category": "الفئة",
+			"notes": "ملاحظات",
+			"create": "إضافة البند"
+		},
+		"bulkEntry": {
+			"title": "إدخال بنود متعددة",
+			"defaultSection": "القسم الافتراضي",
+			"defaultPhase": "المرحلة الافتراضية",
+			"defaultSource": "المصدر",
+			"addRow": "صف جديد",
+			"hint": "اترك عمود السعر فارغاً إذا كنت تريد التسعير لاحقاً",
+			"saveItems": "حفظ {count} بند"
+		},
+		"pricing": {
+			"title": "تسعير البنود",
+			"unpricedCount": "{count} بند غير مسعّر",
+			"totalAfterPricing": "المجموع بعد التسعير",
+			"savePrices": "حفظ الأسعار"
+		},
+		"importExcel": {
+			"title": "استيراد بنود من Excel",
+			"step1": "رفع الملف",
+			"step2": "مطابقة الأعمدة",
+			"step3": "معاينة واستيراد",
+			"dropzone": "اسحب الملف هنا أو اضغط للاختيار",
+			"supportedFormats": "يدعم: xlsx, xls, csv",
+			"fileColumn": "عمود الملف",
+			"masarField": "حقل مسار",
+			"example": "مثال",
+			"skip": "تجاهل",
+			"required": "مطلوب",
+			"preview": "معاينة",
+			"foundItems": "تم العثور على {count} بند",
+			"pricedCount": "{count} مسعّر",
+			"unpricedCount": "{count} بدون سعر",
+			"skippedRows": "{count} صف تم تجاهله — بيانات غير مكتملة",
+			"importItems": "استيراد {count} بند",
+			"maxFileSize": "الحد الأقصى لحجم الملف: 5MB",
+			"maxItems": "الحد الأقصى: 500 بند"
+		},
+		"copyStudy": {
+			"title": "نسخ بنود من دراسة كميات",
+			"search": "ابحث عن دراسة...",
+			"noStudies": "لا توجد دراسات متاحة للنسخ",
+			"alreadyCopied": "تم نسخ بنود هذه الدراسة مسبقاً",
+			"linkedTo": "مرتبطة بمشروع: {name}",
+			"copy": "نسخ البنود",
+			"itemCount": "{count} بند"
+		},
+		"copyQuotation": {
+			"title": "نسخ بنود من عرض سعر",
+			"search": "ابحث عن عرض سعر...",
+			"noQuotations": "لا توجد عروض أسعار",
+			"includePrices": "نسخ الأسعار مع البنود",
+			"itemsOnly": "نسخ البنود فقط (بدون أسعار — للتسعير لاحقاً)",
+			"copy": "نسخ البنود",
+			"itemCount": "{count} بند",
+			"client": "العميل"
+		},
+		"toast": {
+			"itemCreated": "تم إضافة البند بنجاح",
+			"itemsCreated": "تم إضافة {count} بند بنجاح",
+			"itemUpdated": "تم تحديث البند",
+			"itemDeleted": "تم حذف البند",
+			"itemsDeleted": "تم حذف {count} بند",
+			"pricesUpdated": "تم تحديث أسعار {count} بند",
+			"phaseAssigned": "تم تعيين المرحلة",
+			"copiedFromStudy": "تم نسخ {count} بند من الدراسة",
+			"copiedFromQuotation": "تم نسخ {count} بند من عرض السعر",
+			"importedFromExcel": "تم استيراد {count} بند"
+		},
+		"confirm": {
+			"deleteItem": "هل أنت متأكد من حذف هذا البند؟",
+			"deleteItems": "هل أنت متأكد من حذف {count} بند؟",
+			"deleteTitle": "حذف بند",
+			"deleteItemsTitle": "حذف بنود"
+		},
+		"unpricedWarning": "{count} بند يحتاج تسعير",
+		"dashboard": {
+			"items": "بند",
+			"noItems": "لم يتم إضافة بنود كميات بعد",
+			"estimatedCost": "التكلفة المقدرة (من BOQ)",
+			"viewDetails": "عرض التفاصيل"
+		}
 	}
 }

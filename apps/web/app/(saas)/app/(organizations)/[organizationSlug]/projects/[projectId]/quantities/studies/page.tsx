@@ -4,20 +4,16 @@ import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
-const BOQOverview = dynamic(
+const QuantitiesOverview = dynamic(
 	() =>
-		import("@saas/projects/components/boq/BOQOverview").then((m) => ({
-			default: m.BOQOverview,
+		import("@saas/projects/components/quantities/QuantitiesOverview").then((m) => ({
+			default: m.QuantitiesOverview,
 		})),
 	{
 		loading: () => (
 			<div className="space-y-6">
 				<Skeleton className="h-8 w-48" />
-				<div className="grid grid-cols-2 gap-4">
-					<Skeleton className="h-24 rounded-xl" />
-					<Skeleton className="h-24 rounded-xl" />
-				</div>
-				<Skeleton className="h-64 rounded-xl" />
+				<Skeleton className="h-48 w-full rounded-xl" />
 			</div>
 		),
 	},
@@ -25,10 +21,10 @@ const BOQOverview = dynamic(
 
 export async function generateMetadata() {
 	const t = await getTranslations();
-	return { title: t("projectBoq.title") };
+	return { title: t("projectQuantities.title") };
 }
 
-export default async function QuantitiesPage({
+export default async function StudiesPage({
 	params,
 }: {
 	params: Promise<{ organizationSlug: string; projectId: string }>;
@@ -39,7 +35,7 @@ export default async function QuantitiesPage({
 
 	return (
 		<div>
-			<BOQOverview
+			<QuantitiesOverview
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}
 				projectId={projectId}
