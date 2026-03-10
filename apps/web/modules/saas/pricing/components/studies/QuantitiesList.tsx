@@ -4,13 +4,8 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@ui/components/select";
+import { Badge } from "@ui/components/badge";
+import { cn } from "@ui/lib";
 import {
 	Plus,
 	Search,
@@ -20,7 +15,6 @@ import {
 	CheckCircle2,
 	FileStack
 } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
@@ -118,35 +112,53 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 				</div>
 			</div>
 
-			{/* Search and Filter Bar - Clean Minimal */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-				<div className="flex flex-1 items-center gap-3">
-					<div className="relative flex-1 max-w-md">
-						<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-						<Input
-							placeholder={t("pricing.studies.searchPlaceholder")}
-							value={searchTerm}
-							onChange={(e) => setSearchTerm(e.target.value)}
-							className="pr-10 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-700"
-						/>
+			{/* Filter Tabs + Search */}
+			<div className="space-y-4">
+				<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+					{/* Status filter pills */}
+					<div className="flex items-center gap-2 flex-wrap">
+						{([
+							{ value: "all", label: t("pricing.studies.allStatuses"), count: stats.total },
+							{ value: "draft", label: t("pricing.studies.status.draft"), count: costStudies.filter(s => s.status === "draft").length },
+							{ value: "in_progress", label: t("pricing.studies.status.inProgress"), count: stats.inProgress },
+							{ value: "completed", label: t("pricing.studies.status.completed"), count: costStudies.filter(s => s.status === "completed").length },
+							{ value: "approved", label: t("pricing.studies.status.approved"), count: costStudies.filter(s => s.status === "approved").length },
+						] as const).map((tab) => (
+							<button
+								key={tab.value}
+								type="button"
+								onClick={() => setStatusFilter(tab.value)}
+								className={cn(
+									"inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors",
+									statusFilter === tab.value
+										? "bg-primary text-primary-foreground"
+										: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700",
+								)}
+							>
+								{tab.label}
+								{tab.count > 0 && (
+									<Badge variant={statusFilter === tab.value ? "secondary" : "outline"} className="h-5 min-w-[20px] px-1.5 text-[10px]">
+										{tab.count}
+									</Badge>
+								)}
+							</button>
+						))}
 					</div>
-					<Select value={statusFilter} onValueChange={setStatusFilter}>
-						<SelectTrigger className="w-[160px] bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
-							<SelectValue placeholder={t("pricing.studies.allStatuses")} />
-						</SelectTrigger>
-						<SelectContent className="rounded-xl">
-							<SelectItem value="all">{t("pricing.studies.allStatuses")}</SelectItem>
-							<SelectItem value="draft">{t("pricing.studies.status.draft")}</SelectItem>
-							<SelectItem value="in_progress">{t("pricing.studies.status.inProgress")}</SelectItem>
-							<SelectItem value="completed">{t("pricing.studies.status.completed")}</SelectItem>
-							<SelectItem value="approved">{t("pricing.studies.status.approved")}</SelectItem>
-						</SelectContent>
-					</Select>
-				</div>
-				<Button onClick={() => setShowCreateDialog(true)} className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors">
+					<Button onClick={() => setShowCreateDialog(true)} className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors shrink-0">
 						<Plus className="ml-2 h-4 w-4" />
 						{t("pricing.studies.newStudy")}
-				</Button>
+					</Button>
+				</div>
+				{/* Search */}
+				<div className="relative max-w-md">
+					<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Input
+						placeholder={t("pricing.studies.searchPlaceholder")}
+						value={searchTerm}
+						onChange={(e) => setSearchTerm(e.target.value)}
+						className="pr-10 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-700"
+					/>
+				</div>
 			</div>
 
 			{/* Grid of cost studies */}

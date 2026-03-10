@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
-import { PipelineBar } from "./PipelineBar";
 import { MarkupMethodSelector } from "./MarkupMethodSelector";
 import { UniformMarkupForm } from "./UniformMarkupForm";
 import { SectionMarkupForm } from "./SectionMarkupForm";
@@ -89,15 +88,6 @@ export function SellingPricePageContent({
 
 	return (
 		<div className="space-y-4" dir="rtl">
-			{/* Pipeline Bar */}
-			<PipelineBar
-				studyId={studyId}
-				organizationSlug={organizationSlug}
-				currentStage="selling-price"
-				stages={stages}
-				studyType={studyType}
-			/>
-
 			{/* Title */}
 			<div>
 				<h1 className="text-xl font-bold">

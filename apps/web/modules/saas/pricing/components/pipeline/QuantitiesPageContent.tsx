@@ -12,7 +12,6 @@ import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
 import { StructuralItemsEditor } from "../studies/StructuralItemsEditor";
 import { FinishingItemsEditor } from "../studies/FinishingItemsEditor";
 import { MEPItemsEditor } from "../studies/MEPItemsEditor";
-import { PipelineBar } from "./PipelineBar";
 import { ManualItemsTable } from "./ManualItemsTable";
 import { QuantitiesSummary } from "./QuantitiesSummary";
 import { StageApprovalButton } from "./StageApprovalButton";
@@ -94,19 +93,8 @@ export function QuantitiesPageContent({
 		quotation: "NOT_STARTED" as const,
 	};
 
-	const studyType = stagesData?.studyType ?? "FULL_PROJECT";
-
 	return (
 		<div className="space-y-4" dir="rtl">
-			{/* Pipeline Bar */}
-			<PipelineBar
-				studyId={studyId}
-				organizationSlug={organizationSlug}
-				currentStage="quantities"
-				stages={stages}
-				studyType={studyType}
-			/>
-
 			{/* Study Name */}
 			<div>
 				<h1 className="text-xl font-bold">{study.name || t("pricing.pipeline.quantities")}</h1>

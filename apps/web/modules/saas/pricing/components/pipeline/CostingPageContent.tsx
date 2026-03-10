@@ -8,7 +8,6 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
-import { PipelineBar } from "./PipelineBar";
 import { CostingTable } from "./CostingTable";
 import { CostingSummary } from "./CostingSummary";
 import { StageApprovalButton } from "./StageApprovalButton";
@@ -98,20 +97,10 @@ export function CostingPageContent({
 		quotation: "NOT_STARTED" as const,
 	};
 
-	const studyType = stagesData?.studyType ?? "FULL_PROJECT";
 	const hasItems = (costingItems as unknown[]).length > 0;
 
 	return (
 		<div className="space-y-4" dir="rtl">
-			{/* Pipeline Bar */}
-			<PipelineBar
-				studyId={studyId}
-				organizationSlug={organizationSlug}
-				currentStage="costing"
-				stages={stages}
-				studyType={studyType}
-			/>
-
 			{/* Title */}
 			<div className="flex items-center justify-between">
 				<div>

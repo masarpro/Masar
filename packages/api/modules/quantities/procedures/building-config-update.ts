@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/server";
+import { STUDY_ERRORS } from "../lib/error-messages";
 import {
 	updateBuildingConfig,
 	getCostStudyById,
@@ -97,17 +98,17 @@ export const buildingConfigUpdate = subscriptionProcedure
 			organizationId: z.string(),
 			costStudyId: z.string(),
 			buildingConfig: z.object({
-				totalLandArea: z.number(),
-				buildingPerimeter: z.number(),
+				totalLandArea: z.number().nonnegative(),
+				buildingPerimeter: z.number().nonnegative(),
 				floors: z.array(
 					z.object({
 						id: z.string(),
 						name: z.string(),
-						area: z.number(),
-						height: z.number(),
-						sortOrder: z.number(),
+						area: z.number().nonnegative(),
+						height: z.number().nonnegative(),
+						sortOrder: z.number().nonnegative(),
 						isRepeated: z.boolean().default(false),
-						repeatCount: z.number().default(1),
+						repeatCount: z.number().nonnegative().default(1),
 						floorType: z.enum([
 							"BASEMENT",
 							"GROUND",
@@ -120,8 +121,8 @@ export const buildingConfigUpdate = subscriptionProcedure
 							z.object({
 								id: z.string(),
 								name: z.string(),
-								length: z.number(),
-								width: z.number(),
+								length: z.number().nonnegative(),
+								width: z.number().nonnegative(),
 								type: z.string(),
 								hasFalseCeiling: z.boolean().optional(),
 							}),
@@ -131,21 +132,21 @@ export const buildingConfigUpdate = subscriptionProcedure
 								id: z.string(),
 								type: z.enum(["door", "window"]),
 								subType: z.string(),
-								width: z.number(),
-								height: z.number(),
-								count: z.number(),
+								width: z.number().nonnegative(),
+								height: z.number().nonnegative(),
+								count: z.number().nonnegative(),
 								isExternal: z.boolean(),
 								roomId: z.string().optional(),
 							}),
 						).optional(),
 					}),
 				),
-				landPerimeter: z.number().optional(),
-				fenceHeight: z.number().optional(),
+				landPerimeter: z.number().nonnegative().optional(),
+				fenceHeight: z.number().nonnegative().optional(),
 				hasCourtyard: z.boolean().optional(),
 				hasGarden: z.boolean().optional(),
-				gardenPercentage: z.number().optional(),
-				setupStep: z.number().optional(),
+				gardenPercentage: z.number().min(0).max(100).optional(),
+				setupStep: z.number().nonnegative().optional(),
 				isComplete: z.boolean().optional(),
 			}),
 		}),
@@ -160,7 +161,7 @@ export const buildingConfigUpdate = subscriptionProcedure
 		const study = await getCostStudyById(input.costStudyId, input.organizationId);
 		if (!study) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "دراسة التكلفة غير موجودة",
+				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
 

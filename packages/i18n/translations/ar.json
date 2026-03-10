@@ -1375,6 +1375,11 @@
 				"studyType": "نوع الدراسة",
 				"contractValue": "قيمة العقد",
 				"contractValuePlaceholder": "أدخل قيمة العقد",
+				"quantityMethod": "كيف تريد البدء؟",
+				"smartCalc": "حساب ذكي",
+				"smartCalcDesc": "أدخل معلومات المبنى وسنحسب لك الكميات تلقائياً",
+				"manualEntry": "إدخال يدوي",
+				"manualEntryDesc": "أضف بنود الكميات مباشرة",
 				"submit": "إنشاء الدراسة",
 				"cancel": "إلغاء"
 			},
@@ -2017,12 +2022,14 @@
 				"saveAll": "حفظ الكل",
 				"buildingRequired": {
 					"title": "إعدادات المبنى مطلوبة",
-					"description": "لاشتقاق بنود MEP تلقائياً، أنشئ إعدادات المبنى من قسم التشطيبات أولاً",
-					"action": "إنشاء إعدادات المبنى"
+					"description": "لاشتقاق بنود الأعمال الكهروميكانيكية تلقائياً، يجب أولاً إنشاء إعدادات المبنى (الطوابق والغرف) من قسم التشطيبات.",
+					"action": "الذهاب لقسم التشطيبات"
 				},
 				"cascade": {
 					"updated": "تم تحديث إعدادات المبنى",
-					"savePrompt": "اضغط حفظ لتحديث بنود MEP"
+					"savePrompt": "اضغط حفظ لتحديث بنود MEP",
+					"message": "تم تحديث إعدادات المبنى. اضغط حفظ لتحديث بنود MEP.",
+					"saveButton": "حفظ البنود الجديدة"
 				},
 				"item": {
 					"autoDerived": "مشتق تلقائياً",
@@ -2047,6 +2054,54 @@
 					"economy": "اقتصادي",
 					"standard": "متوسط",
 					"premium": "ممتاز"
+				},
+				"dashboard": {
+					"title": "بنود الأعمال الكهروميكانيكية"
+				},
+				"categoryItemCount": "{count} بند",
+				"itemDialog": {
+					"editTitle": "تعديل بند MEP",
+					"itemName": "اسم البند",
+					"category": "الفئة",
+					"subCategory": "الفئة الفرعية",
+					"quantity": "الكمية",
+					"unit": "الوحدة",
+					"qualityLevel": "مستوى الجودة",
+					"formulaReadOnly": "المعادلة (للقراءة فقط)",
+					"cancel": "إلغاء",
+					"save": "حفظ",
+					"saving": "جاري الحفظ..."
+				},
+				"manualAdder": {
+					"title": "إضافة بند MEP يدوي",
+					"addButton": "إضافة بند يدوي",
+					"selectCategory": "اختر الفئة",
+					"selectSubCategory": "اختر الفئة الفرعية",
+					"itemName": "اسم البند",
+					"quantity": "الكمية",
+					"add": "إضافة"
+				},
+				"table": {
+					"item": "البند",
+					"quantity": "الكمية",
+					"unit": "الوحدة",
+					"unitPrice": "سعر الوحدة",
+					"total": "الإجمالي",
+					"formula": "المعادلة"
+				},
+				"summary": {
+					"totalItems": "عدد البنود",
+					"enabledDisabled": "مفعل / معطل",
+					"auto": "تلقائي",
+					"manual": "يدوي"
+				},
+				"itemRow": {
+					"manualOverride": "معدّل يدوياً (الكمية الأصلية: {qty})"
+				},
+				"messages": {
+					"itemUpdated": "تم تحديث البند بنجاح",
+					"updateError": "حدث خطأ أثناء تحديث البند",
+					"invalidQuantity": "الكمية غير صحيحة"
 				}
 			},
 			"pricing": {
@@ -3244,54 +3299,6 @@
 			"doors": "الأبواب",
 			"windows": "النوافذ",
 			"description": "إدارة عناصر التشطيبات"
-		},
-		"mep": {
-			"title": "الأعمال الكهروميكانيكية",
-			"subtitle": "الكهرباء والسباكة والتكييف ومكافحة الحريق",
-			"electrical": "الكهرباء",
-			"plumbing": "السباكة",
-			"hvac": "التكييف والتهوية",
-			"description": "إدارة أعمال الكهرباء والسباكة والتكييف",
-			"totalCost": "إجمالي تكلفة MEP",
-			"itemCount": "عدد البنود",
-			"enabledCount": "بنود مفعلة",
-			"disabledCount": "بنود معطلة",
-			"rederive": "إعادة اشتقاق",
-			"addManual": "إضافة بند يدوي",
-			"saveAll": "حفظ الكل",
-			"buildingRequired": {
-				"title": "إعدادات المبنى مطلوبة",
-				"description": "لاشتقاق بنود MEP تلقائياً، أنشئ إعدادات المبنى من قسم التشطيبات أولاً",
-				"action": "إنشاء إعدادات المبنى"
-			},
-			"cascade": {
-				"updated": "تم تحديث إعدادات المبنى",
-				"savePrompt": "اضغط حفظ لتحديث بنود MEP"
-			},
-			"item": {
-				"autoDerived": "مشتق تلقائياً",
-				"manual": "يدوي",
-				"estimated": "تقديري",
-				"enabled": "مفعل",
-				"disabled": "معطل",
-				"formula": "المعادلة",
-				"specs": "المواصفات",
-				"edit": "تعديل",
-				"delete": "حذف"
-			},
-			"categories": {
-				"ELECTRICAL": "الأعمال الكهربائية",
-				"PLUMBING": "الأعمال الصحية",
-				"HVAC": "التكييف والتهوية",
-				"FIREFIGHTING": "مكافحة الحريق",
-				"LOW_CURRENT": "التيار الخفيف",
-				"SPECIAL": "أنظمة خاصة"
-			},
-			"quality": {
-				"economy": "اقتصادي",
-				"standard": "متوسط",
-				"premium": "ممتاز"
-			}
 		},
 		"pricing": {
 			"title": "التسعير",

@@ -1,5 +1,6 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { CostStudyOverview } from "@saas/pricing/components/studies/CostStudyOverview";
+import { StudyPageShell } from "@saas/pricing/components/studies/StudyPageShell";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -30,11 +31,17 @@ export default async function CostStudyPage({
 			organizationSlug={organizationSlug}
 			sectionKey="studies"
 		>
-			<CostStudyOverview
+			<StudyPageShell
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}
 				studyId={studyId}
-			/>
+			>
+				<CostStudyOverview
+					organizationId={activeOrganization.id}
+					organizationSlug={organizationSlug}
+					studyId={studyId}
+				/>
+			</StudyPageShell>
 		</PricingShell>
 	);
 }

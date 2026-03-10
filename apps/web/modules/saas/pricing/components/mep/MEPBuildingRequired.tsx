@@ -4,6 +4,7 @@ import { Button } from "@ui/components/button";
 import { Card, CardContent } from "@ui/components/card";
 import { Building2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 interface MEPBuildingRequiredProps {
 	studyId: string;
@@ -14,6 +15,7 @@ export function MEPBuildingRequired({
 	studyId,
 	organizationSlug,
 }: MEPBuildingRequiredProps) {
+	const t = useTranslations("pricing.studies.mep");
 	const finishingPath = `/app/${organizationSlug}/pricing/studies/${studyId}/finishing`;
 
 	return (
@@ -24,17 +26,16 @@ export function MEPBuildingRequired({
 				</div>
 				<div className="space-y-2">
 					<h3 className="text-lg font-semibold">
-						إعدادات المبنى مطلوبة
+						{t("buildingRequired.title")}
 					</h3>
 					<p className="text-sm text-muted-foreground max-w-md">
-						لاشتقاق بنود الأعمال الكهروميكانيكية تلقائياً، يجب أولاً
-						إنشاء إعدادات المبنى (الطوابق والغرف) من قسم التشطيبات.
+						{t("buildingRequired.description")}
 					</p>
 				</div>
 				<Button asChild>
 					<Link href={finishingPath}>
 						<ArrowLeft className="h-4 w-4 me-2" />
-						الذهاب لقسم التشطيبات
+						{t("buildingRequired.action")}
 					</Link>
 				</Button>
 			</CardContent>

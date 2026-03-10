@@ -202,7 +202,7 @@ function FinishingPricingRow({
 		orpc.pricing.studies.finishingItem.update.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 			},
 		}),

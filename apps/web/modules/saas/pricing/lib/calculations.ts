@@ -15,7 +15,7 @@ function getRebarWeightPerMeter(diameter: number): number {
 // ═══════════════════════════════════════════════════════════════
 // حسابات القواعد (Foundations)
 // ═══════════════════════════════════════════════════════════════
-export interface FoundationInput {
+export interface FoundationCalcInput {
 	quantity: number;
 	length: number; // متر
 	width: number; // متر
@@ -43,7 +43,7 @@ export interface FoundationResult {
 	totalCost: number;
 }
 
-export function calculateFoundation(data: FoundationInput): FoundationResult {
+export function calculateFoundation(data: FoundationCalcInput): FoundationResult {
 	const {
 		quantity,
 		length,
@@ -120,7 +120,7 @@ export function calculateFoundation(data: FoundationInput): FoundationResult {
 // ═══════════════════════════════════════════════════════════════
 // حسابات الأعمدة (Columns)
 // ═══════════════════════════════════════════════════════════════
-export interface ColumnInput {
+export interface ColumnCalcInput {
 	quantity: number;
 	width: number; // سم
 	depth: number; // سم
@@ -146,7 +146,7 @@ export interface ColumnResult {
 	totalCost: number;
 }
 
-export function calculateColumn(data: ColumnInput): ColumnResult {
+export function calculateColumn(data: ColumnCalcInput): ColumnResult {
 	const {
 		quantity,
 		width,
@@ -211,7 +211,7 @@ export function calculateColumn(data: ColumnInput): ColumnResult {
 // ═══════════════════════════════════════════════════════════════
 // حسابات الكمرات (Beams)
 // ═══════════════════════════════════════════════════════════════
-export interface BeamInput {
+export interface BeamCalcInput {
 	quantity: number;
 	width: number; // سم
 	height: number; // سم
@@ -240,7 +240,7 @@ export interface BeamResult {
 	totalCost: number;
 }
 
-export function calculateBeam(data: BeamInput): BeamResult {
+export function calculateBeam(data: BeamCalcInput): BeamResult {
 	const {
 		quantity,
 		width,
@@ -314,7 +314,7 @@ export function calculateBeam(data: BeamInput): BeamResult {
 // ═══════════════════════════════════════════════════════════════
 // حسابات البلاطات (Slabs)
 // ═══════════════════════════════════════════════════════════════
-export interface SlabInput {
+export interface SlabCalcInput {
 	length: number; // متر
 	width: number; // متر
 	thickness: number; // سم
@@ -346,7 +346,7 @@ export interface SlabResult {
 	totalCost: number;
 }
 
-export function calculateSlab(data: SlabInput): SlabResult {
+export function calculateSlab(data: SlabCalcInput): SlabResult {
 	const {
 		length,
 		width,
@@ -610,7 +610,7 @@ export function calculateStairs(data: StairsInput): StairsResult {
 // ═══════════════════════════════════════════════════════════════
 // حسابات الميدات (Ground Beams)
 // ═══════════════════════════════════════════════════════════════
-export function calculateGroundBeam(data: BeamInput): BeamResult {
+export function calculateGroundBeam(data: BeamCalcInput): BeamResult {
 	// الميدات مشابهة للكمرات لكن بأسعار مختلفة
 	const result = calculateBeam(data);
 
@@ -629,7 +629,7 @@ export function calculateGroundBeam(data: BeamInput): BeamResult {
 // ═══════════════════════════════════════════════════════════════
 // حسابات الرقاب (Neck Columns)
 // ═══════════════════════════════════════════════════════════════
-export function calculateNeckColumn(data: ColumnInput): ColumnResult {
+export function calculateNeckColumn(data: ColumnCalcInput): ColumnResult {
 	// الرقاب مشابهة للأعمدة لكن بأسعار مختلفة
 	const result = calculateColumn(data);
 

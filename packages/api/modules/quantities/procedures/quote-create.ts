@@ -1,8 +1,10 @@
 import { ORPCError } from "@orpc/server";
+import { STUDY_ERRORS } from "../lib/error-messages";
 import { createQuote, getCostStudyById, getQuoteById, updateQuote, deleteQuote as deleteQuoteQuery, getQuotesByCostStudyId } from "@repo/database";
 import { z } from "zod";
+import { convertQuoteDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { subscriptionProcedure } from "../../../orpc/procedures";
+import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 
 export const quoteCreate = subscriptionProcedure
 	.route({
@@ -21,11 +23,11 @@ export const quoteCreate = subscriptionProcedure
 			clientPhone: z.string().optional(),
 			clientEmail: z.string().optional(),
 			clientAddress: z.string().optional(),
-			subtotal: z.number(),
-			overheadAmount: z.number().default(0),
-			profitAmount: z.number().default(0),
-			vatAmount: z.number().default(0),
-			totalAmount: z.number(),
+			subtotal: z.number().nonnegative(),
+			overheadAmount: z.number().nonnegative().default(0),
+			profitAmount: z.number().nonnegative().default(0),
+			vatAmount: z.number().nonnegative().default(0),
+			totalAmount: z.number().nonnegative(),
 			validUntil: z.string().transform((str) => new Date(str)),
 			paymentTerms: z.string().optional(),
 			deliveryTerms: z.string().optional(),
@@ -50,7 +52,7 @@ export const quoteCreate = subscriptionProcedure
 		const study = await getCostStudyById(input.costStudyId, input.organizationId);
 		if (!study) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "دراسة التكلفة غير موجودة",
+				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
 
@@ -58,17 +60,10 @@ export const quoteCreate = subscriptionProcedure
 
 		const quote = await createQuote(data);
 
-		return {
-			...quote,
-			subtotal: Number(quote.subtotal),
-			overheadAmount: Number(quote.overheadAmount),
-			profitAmount: Number(quote.profitAmount),
-			vatAmount: Number(quote.vatAmount),
-			totalAmount: Number(quote.totalAmount),
-		};
+		return convertQuoteDecimals(quote);
 	});
 
-export const quoteGetById = subscriptionProcedure
+export const quoteGetById = protectedProcedure
 	.route({
 		method: "GET",
 		path: "/quantities/quotes/{id}",
@@ -92,18 +87,11 @@ export const quoteGetById = subscriptionProcedure
 
 		if (!quote || quote.costStudy.organizationId !== input.organizationId) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "عرض السعر غير موجود",
+				message: STUDY_ERRORS.QUOTE_NOT_FOUND,
 			});
 		}
 
-		return {
-			...quote,
-			subtotal: Number(quote.subtotal),
-			overheadAmount: Number(quote.overheadAmount),
-			profitAmount: Number(quote.profitAmount),
-			vatAmount: Number(quote.vatAmount),
-			totalAmount: Number(quote.totalAmount),
-		};
+		return convertQuoteDecimals(quote);
 	});
 
 export const quoteUpdate = subscriptionProcedure
@@ -123,11 +111,11 @@ export const quoteUpdate = subscriptionProcedure
 			clientPhone: z.string().optional(),
 			clientEmail: z.string().optional(),
 			clientAddress: z.string().optional(),
-			subtotal: z.number().optional(),
-			overheadAmount: z.number().optional(),
-			profitAmount: z.number().optional(),
-			vatAmount: z.number().optional(),
-			totalAmount: z.number().optional(),
+			subtotal: z.number().nonnegative().optional(),
+			overheadAmount: z.number().nonnegative().optional(),
+			profitAmount: z.number().nonnegative().optional(),
+			vatAmount: z.number().nonnegative().optional(),
+			totalAmount: z.number().nonnegative().optional(),
 			validUntil: z.string().transform((str) => new Date(str)).optional(),
 			paymentTerms: z.string().optional(),
 			deliveryTerms: z.string().optional(),
@@ -154,7 +142,7 @@ export const quoteUpdate = subscriptionProcedure
 		const existingQuote = await getQuoteById(input.id);
 		if (!existingQuote || existingQuote.costStudy.organizationId !== input.organizationId) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "عرض السعر غير موجود",
+				message: STUDY_ERRORS.QUOTE_NOT_FOUND,
 			});
 		}
 
@@ -162,14 +150,7 @@ export const quoteUpdate = subscriptionProcedure
 
 		const quote = await updateQuote(id, data);
 
-		return {
-			...quote,
-			subtotal: Number(quote.subtotal),
-			overheadAmount: Number(quote.overheadAmount),
-			profitAmount: Number(quote.profitAmount),
-			vatAmount: Number(quote.vatAmount),
-			totalAmount: Number(quote.totalAmount),
-		};
+		return convertQuoteDecimals(quote);
 	});
 
 export const quoteDelete = subscriptionProcedure
@@ -196,7 +177,7 @@ export const quoteDelete = subscriptionProcedure
 		const existingQuote = await getQuoteById(input.id);
 		if (!existingQuote || existingQuote.costStudy.organizationId !== input.organizationId) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "عرض السعر غير موجود",
+				message: STUDY_ERRORS.QUOTE_NOT_FOUND,
 			});
 		}
 
@@ -205,7 +186,7 @@ export const quoteDelete = subscriptionProcedure
 		return { success: true };
 	});
 
-export const quoteList = subscriptionProcedure
+export const quoteList = protectedProcedure
 	.route({
 		method: "GET",
 		path: "/quantities/{costStudyId}/quotes",
@@ -229,20 +210,15 @@ export const quoteList = subscriptionProcedure
 		const study = await getCostStudyById(input.costStudyId, input.organizationId);
 		if (!study) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "دراسة التكلفة غير موجودة",
+				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
 
 		const quotes = await getQuotesByCostStudyId(input.costStudyId);
 
 		return {
-			quotes: quotes.map((quote) => ({
-				...quote,
-				subtotal: Number(quote.subtotal),
-				overheadAmount: Number(quote.overheadAmount),
-				profitAmount: Number(quote.profitAmount),
-				vatAmount: Number(quote.vatAmount),
-				totalAmount: Number(quote.totalAmount),
-			})),
+			quotes: quotes.map((quote) =>
+				convertQuoteDecimals(quote),
+			),
 		};
 	});

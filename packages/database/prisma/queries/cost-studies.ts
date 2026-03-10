@@ -66,9 +66,32 @@ export async function getOrganizationCostStudies(
 }
 
 /**
- * Get a single cost study by ID with all related items
+ * Get a single cost study by ID — lightweight (no item arrays)
  */
 export async function getCostStudyById(id: string, organizationId: string) {
+	return db.costStudy.findFirst({
+		where: { id, organizationId },
+		include: {
+			sectionMarkups: true,
+			createdBy: { select: { id: true, name: true, email: true } },
+			lead: { select: { id: true, name: true, phone: true, status: true, priority: true } },
+			_count: {
+				select: {
+					structuralItems: true,
+					finishingItems: true,
+					mepItems: true,
+					laborItems: true,
+					quotes: true,
+				},
+			},
+		},
+	});
+}
+
+/**
+ * Get a single cost study by ID with all related items (used for duplication)
+ */
+export async function getCostStudyByIdWithItems(id: string, organizationId: string) {
 	return db.costStudy.findFirst({
 		where: { id, organizationId },
 		include: {
@@ -80,6 +103,55 @@ export async function getCostStudyById(id: string, organizationId: string) {
 			createdBy: { select: { id: true, name: true, email: true } },
 			lead: { select: { id: true, name: true, phone: true, status: true, priority: true } },
 		},
+	});
+}
+
+/**
+ * Get structural items for a cost study
+ */
+export async function getCostStudyStructuralItems(studyId: string, organizationId: string) {
+	return db.structuralItem.findMany({
+		where: { costStudyId: studyId, costStudy: { organizationId } },
+		orderBy: { sortOrder: "asc" },
+	});
+}
+
+/**
+ * Get finishing items for a cost study
+ */
+export async function getCostStudyFinishingItems(studyId: string, organizationId: string) {
+	return db.finishingItem.findMany({
+		where: { costStudyId: studyId, costStudy: { organizationId } },
+		orderBy: { sortOrder: "asc" },
+	});
+}
+
+/**
+ * Get MEP items for a cost study
+ */
+export async function getCostStudyMEPItems(studyId: string, organizationId: string) {
+	return db.mEPItem.findMany({
+		where: { costStudyId: studyId, costStudy: { organizationId } },
+		orderBy: { sortOrder: "asc" },
+	});
+}
+
+/**
+ * Get labor items for a cost study
+ */
+export async function getCostStudyLaborItems(studyId: string, organizationId: string) {
+	return db.laborItem.findMany({
+		where: { costStudyId: studyId, costStudy: { organizationId } },
+	});
+}
+
+/**
+ * Get quotes for a cost study
+ */
+export async function getCostStudyQuotes(studyId: string, organizationId: string) {
+	return db.quote.findMany({
+		where: { costStudyId: studyId, costStudy: { organizationId } },
+		orderBy: { createdAt: "desc" },
 	});
 }
 
@@ -187,7 +259,7 @@ export async function duplicateCostStudy(
 	organizationId: string,
 	createdById: string,
 ) {
-	const original = await getCostStudyById(id, organizationId);
+	const original = await getCostStudyByIdWithItems(id, organizationId);
 
 	if (!original) {
 		throw new Error("Cost study not found");
@@ -345,59 +417,61 @@ export async function duplicateCostStudy(
  * Recalculate all cost totals for a study
  */
 export async function recalculateCostStudyTotals(id: string) {
-	const [structural, finishing, mep, labor] = await Promise.all([
-		db.structuralItem.aggregate({
-			where: { costStudyId: id },
-			_sum: { totalCost: true },
-		}),
-		db.finishingItem.aggregate({
-			where: { costStudyId: id },
-			_sum: { totalCost: true },
-		}),
-		db.mEPItem.aggregate({
-			where: { costStudyId: id, isEnabled: true },
-			_sum: { totalCost: true },
-		}),
-		db.laborItem.aggregate({
-			where: { costStudyId: id },
-			_sum: { totalCost: true },
-		}),
-	]);
+	return db.$transaction(async (tx) => {
+		const [structural, finishing, mep, labor] = await Promise.all([
+			tx.structuralItem.aggregate({
+				where: { costStudyId: id },
+				_sum: { totalCost: true },
+			}),
+			tx.finishingItem.aggregate({
+				where: { costStudyId: id },
+				_sum: { totalCost: true },
+			}),
+			tx.mEPItem.aggregate({
+				where: { costStudyId: id, isEnabled: true },
+				_sum: { totalCost: true },
+			}),
+			tx.laborItem.aggregate({
+				where: { costStudyId: id },
+				_sum: { totalCost: true },
+			}),
+		]);
 
-	const structuralCost = Number(structural._sum.totalCost ?? 0);
-	const finishingCost = Number(finishing._sum.totalCost ?? 0);
-	const mepCost = Number(mep._sum.totalCost ?? 0);
-	const laborCost = Number(labor._sum.totalCost ?? 0);
+		const structuralCost = Number(structural._sum.totalCost ?? 0);
+		const finishingCost = Number(finishing._sum.totalCost ?? 0);
+		const mepCost = Number(mep._sum.totalCost ?? 0);
+		const laborCost = Number(labor._sum.totalCost ?? 0);
 
-	const study = await db.costStudy.findUnique({
-		where: { id },
-		select: {
-			overheadPercent: true,
-			profitPercent: true,
-			contingencyPercent: true,
-			vatIncluded: true,
-		},
-	});
+		const study = await tx.costStudy.findUnique({
+			where: { id },
+			select: {
+				overheadPercent: true,
+				profitPercent: true,
+				contingencyPercent: true,
+				vatIncluded: true,
+			},
+		});
 
-	if (!study) return;
+		if (!study) return;
 
-	const subtotal = structuralCost + finishingCost + mepCost + laborCost;
-	const overhead = subtotal * (Number(study.overheadPercent) / 100);
-	const profit = subtotal * (Number(study.profitPercent) / 100);
-	const contingency = subtotal * (Number(study.contingencyPercent) / 100);
-	const beforeVat = subtotal + overhead + profit + contingency;
-	const vat = study.vatIncluded ? beforeVat * 0.15 : 0;
-	const totalCost = beforeVat + vat;
+		const subtotal = structuralCost + finishingCost + mepCost + laborCost;
+		const overhead = subtotal * (Number(study.overheadPercent) / 100);
+		const profit = subtotal * (Number(study.profitPercent) / 100);
+		const contingency = subtotal * (Number(study.contingencyPercent) / 100);
+		const beforeVat = subtotal + overhead + profit + contingency;
+		const vat = study.vatIncluded ? beforeVat * 0.15 : 0;
+		const totalCost = beforeVat + vat;
 
-	await db.costStudy.update({
-		where: { id },
-		data: {
-			structuralCost,
-			finishingCost,
-			mepCost,
-			laborCost,
-			totalCost,
-		},
+		await tx.costStudy.update({
+			where: { id },
+			data: {
+				structuralCost,
+				finishingCost,
+				mepCost,
+				laborCost,
+				totalCost,
+			},
+		});
 	});
 }
 

@@ -1,6 +1,8 @@
 import { ORPCError } from "@orpc/server";
+import { STUDY_ERRORS } from "../lib/error-messages";
 import { updateMEPItem, getCostStudyById } from "@repo/database";
 import { z } from "zod";
+import { convertMEPItemDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 
@@ -25,10 +27,10 @@ export const mepItemUpdate = subscriptionProcedure
 			roomId: z.string().nullable().optional(),
 			roomName: z.string().nullable().optional(),
 			scope: z.string().optional(),
-			quantity: z.number().optional(),
+			quantity: z.number().nonnegative().optional(),
 			unit: z.string().optional(),
-			length: z.number().nullable().optional(),
-			area: z.number().nullable().optional(),
+			length: z.number().nonnegative().nullable().optional(),
+			area: z.number().nonnegative().nullable().optional(),
 			calculationMethod: z.string().optional(),
 			calculationData: z.any().optional(),
 			dataSource: z.string().optional(),
@@ -37,11 +39,11 @@ export const mepItemUpdate = subscriptionProcedure
 			specifications: z.string().nullable().optional(),
 			specData: z.any().optional(),
 			qualityLevel: z.string().nullable().optional(),
-			materialPrice: z.number().optional(),
-			laborPrice: z.number().optional(),
-			wastagePercent: z.number().optional(),
+			materialPrice: z.number().nonnegative().optional(),
+			laborPrice: z.number().nonnegative().optional(),
+			wastagePercent: z.number().min(0).max(100).optional(),
 			isEnabled: z.boolean().optional(),
-			sortOrder: z.number().optional(),
+			sortOrder: z.number().nonnegative().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -54,7 +56,7 @@ export const mepItemUpdate = subscriptionProcedure
 		const study = await getCostStudyById(input.costStudyId, input.organizationId);
 		if (!study) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "دراسة التكلفة غير موجودة",
+				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
 
@@ -62,17 +64,5 @@ export const mepItemUpdate = subscriptionProcedure
 
 		const item = await updateMEPItem(id, costStudyId, data);
 
-		return {
-			...item,
-			quantity: Number(item.quantity),
-			length: item.length != null ? Number(item.length) : null,
-			area: item.area != null ? Number(item.area) : null,
-			wastagePercent: Number(item.wastagePercent),
-			materialPrice: Number(item.materialPrice),
-			laborPrice: Number(item.laborPrice),
-			materialCost: Number(item.materialCost),
-			laborCost: Number(item.laborCost),
-			unitPrice: Number(item.unitPrice),
-			totalCost: Number(item.totalCost),
-		};
+		return convertMEPItemDecimals(item);
 	});

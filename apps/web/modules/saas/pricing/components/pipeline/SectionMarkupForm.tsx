@@ -10,6 +10,8 @@ import { Loader2, Save } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { SECTION_ORDER, SECTION_LABELS, SECTION_BG_COLORS } from "../../lib/costing-constants";
+import { formatAmount } from "../../lib/utils";
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -23,29 +25,6 @@ interface SectionMarkupFormProps {
 		sections: Array<{ section: string; cost: number; markupPercent: number; total: number }>;
 	} | null;
 	isLoading: boolean;
-}
-
-const SECTION_ORDER = ["STRUCTURAL", "FINISHING", "MEP", "LABOR", "MANUAL"];
-
-const SECTION_LABELS: Record<string, string> = {
-	STRUCTURAL: "إنشائي",
-	FINISHING: "تشطيبات",
-	MEP: "كهروميكانيكية",
-	LABOR: "عمالة",
-	MANUAL: "يدوي",
-};
-
-const SECTION_COLORS: Record<string, string> = {
-	STRUCTURAL: "bg-blue-50 border-r-blue-500",
-	FINISHING: "bg-amber-50 border-r-amber-500",
-	MEP: "bg-emerald-50 border-r-emerald-500",
-	LABOR: "bg-purple-50 border-r-purple-500",
-	MANUAL: "bg-gray-50 border-r-gray-500",
-};
-
-function fmt(n: number): string {
-	if (n === 0) return "—";
-	return n.toLocaleString("ar-SA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -165,13 +144,13 @@ export function SectionMarkupForm({
 							{sectionData.map((row) => (
 								<tr
 									key={row.section}
-									className={`border-b border-r-4 ${SECTION_COLORS[row.section] || ""}`}
+									className={`border-b border-r-4 ${SECTION_BG_COLORS[row.section] || ""}`}
 								>
 									<td className="px-3 py-2 font-medium">
 										{SECTION_LABELS[row.section] || row.section}
 									</td>
 									<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-										{fmt(row.cost)} ر.س
+										{formatAmount(row.cost)} ر.س
 									</td>
 									<td className="px-3 py-1 text-center">
 										<div className="relative">
@@ -195,7 +174,7 @@ export function SectionMarkupForm({
 										</div>
 									</td>
 									<td className="px-3 py-2 tabular-nums text-left font-medium" dir="ltr">
-										{fmt(row.total)} ر.س
+										{formatAmount(row.total)} ر.س
 									</td>
 								</tr>
 							))}
@@ -204,11 +183,11 @@ export function SectionMarkupForm({
 							<tr className="border-t-2 bg-muted/30 font-semibold">
 								<td className="px-3 py-2">{t("pricing.pipeline.costingGrandTotal")}</td>
 								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-									{fmt(grandCost)} ر.س
+									{formatAmount(grandCost)} ر.س
 								</td>
 								<td className="px-3 py-2" />
 								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-									{fmt(grandTotal)} ر.س
+									{formatAmount(grandTotal)} ر.س
 								</td>
 							</tr>
 						</tbody>

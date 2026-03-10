@@ -26,7 +26,7 @@ export function StructuralItemsEditor({
 	const t = useTranslations();
 	const basePath = `/app/${organizationSlug}/pricing/studies/${studyId}`;
 
-	const { data: study, isLoading, refetch } = useQuery(
+	const { data: study, isLoading: studyLoading } = useQuery(
 		orpc.pricing.studies.getById.queryOptions({
 			input: {
 				id: studyId,
@@ -35,7 +35,16 @@ export function StructuralItemsEditor({
 		}),
 	);
 
-	if (isLoading) {
+	const { data: structuralItems = [], refetch } = useQuery(
+		orpc.pricing.studies.getStructuralItems.queryOptions({
+			input: {
+				costStudyId: studyId,
+				organizationId,
+			},
+		}),
+	);
+
+	if (studyLoading) {
 		return <StudyEditorSkeleton />;
 	}
 
@@ -49,11 +58,11 @@ export function StructuralItemsEditor({
 
 	// Calculate summary stats
 	const structuralStats = {
-		concrete: study.structuralItems.reduce(
+		concrete: structuralItems.reduce(
 			(sum, item) => sum + (item.concreteVolume || 0),
 			0
 		),
-		rebar: study.structuralItems.reduce(
+		rebar: structuralItems.reduce(
 			(sum, item) => sum + (item.steelWeight || 0),
 			0
 		),
@@ -87,7 +96,7 @@ export function StructuralItemsEditor({
 				<StructuralAccordion
 					studyId={studyId}
 					organizationId={organizationId}
-					items={study.structuralItems.map((item) => ({
+					items={structuralItems.map((item) => ({
 						id: item.id,
 						category: item.category,
 						name: item.name,

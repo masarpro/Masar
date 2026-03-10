@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/server";
+import { STUDY_ERRORS } from "../lib/error-messages";
 import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
@@ -75,7 +76,7 @@ export const getStages = protectedProcedure
 
 		if (!study) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "الدراسة غير موجودة",
+				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
 
@@ -131,7 +132,7 @@ export const approveStage = subscriptionProcedure
 
 		if (!study) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "الدراسة غير موجودة",
+				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
 
@@ -219,7 +220,7 @@ export const reopenStage = subscriptionProcedure
 
 		if (!study) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "الدراسة غير موجودة",
+				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
 
@@ -293,7 +294,7 @@ export const assignStage = subscriptionProcedure
 		const assigneeField = ASSIGNEE_FIELD_MAP[input.stage];
 		if (!assigneeField) {
 			throw new ORPCError("BAD_REQUEST", {
-				message: "لا يمكن تعيين مسؤول لهذه المرحلة",
+				message: STUDY_ERRORS.STAGE_ASSIGN,
 			});
 		}
 

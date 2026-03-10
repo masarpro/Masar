@@ -1,6 +1,8 @@
 import { ORPCError } from "@orpc/server";
+import { STUDY_ERRORS } from "../lib/error-messages";
 import { toggleMEPItemEnabled, getCostStudyById } from "@repo/database";
 import { z } from "zod";
+import { convertMEPItemDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 
@@ -29,15 +31,11 @@ export const mepItemToggle = subscriptionProcedure
 		const study = await getCostStudyById(input.costStudyId, input.organizationId);
 		if (!study) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "دراسة التكلفة غير موجودة",
+				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
 
 		const item = await toggleMEPItemEnabled(input.id, input.costStudyId, input.isEnabled);
 
-		return {
-			...item,
-			quantity: Number(item.quantity),
-			totalCost: Number(item.totalCost),
-		};
+		return convertMEPItemDecimals(item);
 	});

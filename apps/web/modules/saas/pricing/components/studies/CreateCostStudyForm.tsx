@@ -20,7 +20,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@ui/components/select";
-import { Loader2 } from "lucide-react";
+import { Building2, Loader2, Pencil } from "lucide-react";
+import { cn } from "@ui/lib";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
@@ -56,6 +57,7 @@ export function CreateCostStudyDialog({
 		projectType: "residential",
 		studyType: "FULL_PROJECT" as "FULL_PROJECT" | "CUSTOM_ITEMS" | "LUMP_SUM_ANALYSIS",
 		contractValue: "",
+		quantityMethod: "SMART" as "SMART" | "MANUAL",
 	});
 
 	const createMutation = useMutation(
@@ -63,7 +65,12 @@ export function CreateCostStudyDialog({
 			onSuccess: (data) => {
 				toast.success(t("pricing.studies.createSuccess"));
 				onOpenChange(false);
-				router.push(`/app/${organizationSlug}/pricing/studies/${data.id}`);
+				const studyUrl = `/app/${organizationSlug}/pricing/studies/${data.id}`;
+				if (formData.quantityMethod === "MANUAL") {
+					router.push(`${studyUrl}?tab=structural`);
+				} else {
+					router.push(studyUrl);
+				}
 			},
 			onError: () => {
 				toast.error(t("pricing.studies.createError"));
@@ -188,6 +195,65 @@ export function CreateCostStudyDialog({
 							</SelectContent>
 						</Select>
 					</div>
+
+					{/* Quantity Method Selector */}
+					{formData.studyType === "FULL_PROJECT" && (
+						<div className="space-y-3">
+							<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+								{t("pricing.studies.form.quantityMethod")}
+							</Label>
+							<div className="grid grid-cols-2 gap-3">
+								<button
+									type="button"
+									onClick={() => setFormData({ ...formData, quantityMethod: "SMART" })}
+									className={cn(
+										"flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-center transition-all",
+										formData.quantityMethod === "SMART"
+											? "border-primary bg-primary/5"
+											: "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600",
+									)}
+								>
+									<Building2 className={cn(
+										"h-6 w-6",
+										formData.quantityMethod === "SMART" ? "text-primary" : "text-slate-400",
+									)} />
+									<span className={cn(
+										"text-sm font-medium",
+										formData.quantityMethod === "SMART" ? "text-primary" : "text-slate-600 dark:text-slate-400",
+									)}>
+										{t("pricing.studies.form.smartCalc")}
+									</span>
+									<span className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
+										{t("pricing.studies.form.smartCalcDesc")}
+									</span>
+								</button>
+								<button
+									type="button"
+									onClick={() => setFormData({ ...formData, quantityMethod: "MANUAL" })}
+									className={cn(
+										"flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-center transition-all",
+										formData.quantityMethod === "MANUAL"
+											? "border-primary bg-primary/5"
+											: "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600",
+									)}
+								>
+									<Pencil className={cn(
+										"h-6 w-6",
+										formData.quantityMethod === "MANUAL" ? "text-primary" : "text-slate-400",
+									)} />
+									<span className={cn(
+										"text-sm font-medium",
+										formData.quantityMethod === "MANUAL" ? "text-primary" : "text-slate-600 dark:text-slate-400",
+									)}>
+										{t("pricing.studies.form.manualEntry")}
+									</span>
+									<span className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
+										{t("pricing.studies.form.manualEntryDesc")}
+									</span>
+								</button>
+							</div>
+						</div>
+					)}
 
 					<DialogFooter className="gap-3 pt-2">
 						<Button

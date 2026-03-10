@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/server";
+import { STUDY_ERRORS } from "../lib/error-messages";
 import { reorderFinishingItems, getCostStudyById } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
@@ -18,7 +19,7 @@ export const finishingItemReorder = subscriptionProcedure
 			items: z.array(
 				z.object({
 					id: z.string(),
-					sortOrder: z.number(),
+					sortOrder: z.number().nonnegative(),
 				}),
 			),
 		}),
@@ -33,11 +34,11 @@ export const finishingItemReorder = subscriptionProcedure
 		const study = await getCostStudyById(input.costStudyId, input.organizationId);
 		if (!study) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "دراسة التكلفة غير موجودة",
+				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
 
 		await reorderFinishingItems(input.costStudyId, input.items);
 
-		return { success: true };
+		return { success: true, count: input.items.length };
 	});

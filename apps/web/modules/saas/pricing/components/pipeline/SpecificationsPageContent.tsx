@@ -14,7 +14,6 @@ import { mergeQuantities } from "../../lib/merge-quantities";
 import { deriveAllQuantities } from "../../lib/derivation-engine";
 import { SpecBulkEditor } from "../finishing/specs/SpecBulkEditor";
 import { BillOfMaterials } from "../finishing/specs/BillOfMaterials";
-import { PipelineBar } from "./PipelineBar";
 import { StructuralSpecs } from "./StructuralSpecs";
 import { StageApprovalButton } from "./StageApprovalButton";
 
@@ -55,12 +54,18 @@ export function SpecificationsPageContent({
 		}),
 	);
 
+	const { data: finishingItems = [] } = useQuery(
+		orpc.pricing.studies.getFinishingItems.queryOptions({
+			input: { costStudyId: studyId, organizationId },
+		}),
+	);
+
 	// ─── Derive finishing items for spec editor ───
 	const smartConfig = study?.buildingConfig as SmartBuildingConfig | null;
 
 	const savedFinishingItems: SavedFinishingItem[] = useMemo(() => {
-		if (!study?.finishingItems) return [];
-		return study.finishingItems.map((item) => ({
+		if (!finishingItems.length) return [];
+		return finishingItems.map((item) => ({
 			id: item.id,
 			category: item.category,
 			subCategory: item.subCategory,
@@ -86,7 +91,7 @@ export function SpecificationsPageContent({
 			calculationData: item.calculationData as Record<string, unknown> | null,
 			specData: item.specData ?? undefined,
 		}));
-	}, [study?.finishingItems]);
+	}, [finishingItems]);
 
 	const mergedItems: MergedQuantityItem[] = useMemo(() => {
 		if (!smartConfig?.floors?.length) return [];
@@ -135,19 +140,8 @@ export function SpecificationsPageContent({
 		quotation: "NOT_STARTED" as const,
 	};
 
-	const studyType = stagesData?.studyType ?? "FULL_PROJECT";
-
 	return (
 		<div className="space-y-4" dir="rtl">
-			{/* Pipeline Bar */}
-			<PipelineBar
-				studyId={studyId}
-				organizationSlug={organizationSlug}
-				currentStage="specifications"
-				stages={stages}
-				studyType={studyType}
-			/>
-
 			{/* Title */}
 			<div>
 				<h1 className="text-xl font-bold">

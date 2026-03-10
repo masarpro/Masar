@@ -175,7 +175,7 @@ export function QuantitiesDashboard({
 		orpc.pricing.studies.finishingItem.createBatch.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 			},
 		}),
@@ -185,7 +185,7 @@ export function QuantitiesDashboard({
 		orpc.pricing.studies.finishingItem.update.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 			},
 		}),
@@ -195,7 +195,7 @@ export function QuantitiesDashboard({
 		orpc.pricing.studies.buildingConfig.update.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 			},
 		}),

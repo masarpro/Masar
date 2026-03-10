@@ -5,6 +5,7 @@ import { Skeleton } from "@ui/components/skeleton";
 import { cn } from "@ui/lib";
 import { AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { formatAmount, formatPercent } from "../../lib/utils";
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -22,15 +23,6 @@ interface LumpSumAnalysisProps {
 		} | null;
 	} | null;
 	isLoading: boolean;
-}
-
-function fmt(n: number): string {
-	if (n === 0) return "—";
-	return n.toLocaleString("ar-SA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function fmtPct(n: number): string {
-	return n.toLocaleString("ar-SA", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -91,19 +83,19 @@ export function LumpSumAnalysis({
 							<tr className="border-b bg-blue-50/50">
 								<td className="px-3 py-2 font-medium">{t("pricing.pipeline.lumpSumContractValue")}</td>
 								<td className="px-3 py-2 tabular-nums text-left font-bold text-blue-700" dir="ltr">
-									{fmt(contractValue)} ر.س
+									{formatAmount(contractValue)} ر.س
 								</td>
 							</tr>
 							<tr className="border-b">
 								<td className="px-3 py-2 text-muted-foreground">{t("pricing.pipeline.totalCostLabel")}</td>
 								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-									{fmt(totalCost)} ر.س
+									{formatAmount(totalCost)} ر.س
 								</td>
 							</tr>
 							<tr className="border-b">
 								<td className="px-3 py-2 text-muted-foreground">{t("pricing.pipeline.overheadLabel")}</td>
 								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-									+ {fmt(overheadAmount)} ر.س
+									+ {formatAmount(overheadAmount)} ر.س
 								</td>
 							</tr>
 							<tr className={cn(
@@ -115,7 +107,7 @@ export function LumpSumAnalysis({
 									"px-3 py-2 tabular-nums text-left font-bold text-base",
 									isPositive ? "text-emerald-700" : "text-red-700",
 								)} dir="ltr">
-									{fmt(expectedProfit)} ر.س
+									{formatAmount(expectedProfit)} ر.س
 								</td>
 							</tr>
 						</tbody>
@@ -152,7 +144,7 @@ export function LumpSumAnalysis({
 							"text-sm font-bold tabular-nums",
 							isPositive ? "text-emerald-600" : "text-red-600",
 						)} dir="ltr">
-							{fmtPct(profitFromContract)}%
+							{formatPercent(profitFromContract)}%
 						</p>
 					</div>
 					<div className="rounded-lg border p-3 text-center">
@@ -167,7 +159,7 @@ export function LumpSumAnalysis({
 								"text-sm font-bold tabular-nums",
 								isSafe ? "text-emerald-600" : "text-amber-600",
 							)} dir="ltr">
-								{fmtPct(safetyMargin)}%
+								{formatPercent(safetyMargin)}%
 							</p>
 						</div>
 					</div>

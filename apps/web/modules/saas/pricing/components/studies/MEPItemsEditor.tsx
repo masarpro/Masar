@@ -40,12 +40,21 @@ export function MEPItemsEditor({
 		}),
 	);
 
+	const { data: mepItems = [] } = useQuery(
+		orpc.pricing.studies.getMEPItems.queryOptions({
+			input: {
+				costStudyId: studyId,
+				organizationId,
+			},
+		}),
+	);
+
 	// ─── Mutations ───
 	const toggleMutation = useMutation(
 		orpc.pricing.studies.mepItem.toggleEnabled.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 			},
 		}),
@@ -55,7 +64,7 @@ export function MEPItemsEditor({
 		orpc.pricing.studies.mepItem.createBatch.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 			},
 		}),
@@ -65,7 +74,7 @@ export function MEPItemsEditor({
 		orpc.pricing.studies.mepItem.create.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 				toast.success("تم إضافة البند بنجاح");
 			},
@@ -87,8 +96,8 @@ export function MEPItemsEditor({
 	}, [buildingConfig, study]);
 
 	const savedItems = useMemo(() => {
-		if (!study?.mepItems) return [];
-		return study.mepItems.map((item) => ({
+		if (!mepItems.length) return [];
+		return mepItems.map((item) => ({
 			...item,
 			quantity: Number(item.quantity),
 			materialPrice: Number(item.materialPrice),
@@ -103,7 +112,7 @@ export function MEPItemsEditor({
 			specData:
 				(item.specData as Record<string, any> | null) ?? null,
 		}));
-	}, [study?.mepItems]);
+	}, [mepItems]);
 
 	const merged = useMemo(
 		() => mergeMEPQuantities(derived, savedItems),

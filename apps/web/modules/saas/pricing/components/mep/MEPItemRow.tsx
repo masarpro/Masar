@@ -10,6 +10,7 @@ import {
 import { Bot, Pencil, Info } from "lucide-react";
 import { formatNumber } from "../../lib/utils";
 import type { MEPMergedItem } from "../../types/mep";
+import { useTranslations } from "next-intl";
 
 interface MEPItemRowProps {
 	item: MEPMergedItem;
@@ -23,6 +24,7 @@ export function MEPItemRow({
 	onEdit,
 }: MEPItemRowProps) {
 	const isDisabled = !item.isEnabled;
+	const t = useTranslations("pricing.studies.mep");
 
 	return (
 		<div
@@ -51,7 +53,7 @@ export function MEPItemRow({
 								<Bot className="h-3.5 w-3.5 shrink-0 text-blue-500" />
 							</TooltipTrigger>
 							<TooltipContent side="top" className="max-w-xs text-xs">
-								<p className="font-medium mb-1">مشتق تلقائياً</p>
+								<p className="font-medium mb-1">{t("item.autoDerived")}</p>
 								{item.sourceFormula && (
 									<p className="text-muted-foreground">
 										{item.sourceFormula}
@@ -68,8 +70,7 @@ export function MEPItemRow({
 								<Pencil className="h-3 w-3 shrink-0 text-amber-500" />
 							</TooltipTrigger>
 							<TooltipContent side="top" className="text-xs">
-								معدّل يدوياً (الكمية الأصلية:{" "}
-								{formatNumber(item.derivedQuantity ?? 0, 1)})
+								{t("itemRow.manualOverride", { qty: formatNumber(item.derivedQuantity ?? 0, 1) })}
 							</TooltipContent>
 						</Tooltip>
 					</TooltipProvider>

@@ -1,35 +1,10 @@
 import { ORPCError } from "@orpc/server";
+import { STUDY_ERRORS } from "../lib/error-messages";
 import { db } from "@repo/database";
 import { z } from "zod";
+import { toNum, convertCostingItemDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
-
-// ═══════════════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════════════
-
-function toNum(v: unknown): number {
-	if (v == null) return 0;
-	return Number(v);
-}
-
-function convertCostingItem(item: Record<string, unknown>) {
-	return {
-		...item,
-		quantity: toNum(item.quantity),
-		materialUnitCost: item.materialUnitCost != null ? toNum(item.materialUnitCost) : null,
-		materialTotal: item.materialTotal != null ? toNum(item.materialTotal) : null,
-		laborUnitCost: item.laborUnitCost != null ? toNum(item.laborUnitCost) : null,
-		laborQuantity: item.laborQuantity != null ? toNum(item.laborQuantity) : null,
-		laborSalary: item.laborSalary != null ? toNum(item.laborSalary) : null,
-		laborTotal: item.laborTotal != null ? toNum(item.laborTotal) : null,
-		storageCostPercent: item.storageCostPercent != null ? toNum(item.storageCostPercent) : null,
-		storageCostFixed: item.storageCostFixed != null ? toNum(item.storageCostFixed) : null,
-		storageTotal: item.storageTotal != null ? toNum(item.storageTotal) : null,
-		otherCosts: item.otherCosts != null ? toNum(item.otherCosts) : null,
-		totalCost: item.totalCost != null ? toNum(item.totalCost) : null,
-	};
-}
 
 function calculateItemTotals(data: {
 	quantity: number;
@@ -262,7 +237,7 @@ export const costingGetItems = protectedProcedure
 			orderBy: [{ section: "asc" }, { sortOrder: "asc" }],
 		});
 
-		return items.map((item) => convertCostingItem(item as unknown as Record<string, unknown>));
+		return items.map((item) => convertCostingItemDecimals(item));
 	});
 
 // ═══════════════════════════════════════════════════════════════
@@ -280,16 +255,16 @@ export const costingUpdateItem = subscriptionProcedure
 		z.object({
 			organizationId: z.string(),
 			itemId: z.string(),
-			materialUnitCost: z.number().nullable().optional(),
+			materialUnitCost: z.number().nonnegative().nullable().optional(),
 			laborType: z.enum(["PER_SQM", "PER_CBM", "PER_UNIT", "PER_LM", "LUMP_SUM", "SALARY"]).nullable().optional(),
-			laborUnitCost: z.number().nullable().optional(),
-			laborQuantity: z.number().nullable().optional(),
-			laborWorkers: z.number().int().nullable().optional(),
-			laborSalary: z.number().nullable().optional(),
-			laborMonths: z.number().int().nullable().optional(),
-			storageCostPercent: z.number().nullable().optional(),
-			storageCostFixed: z.number().nullable().optional(),
-			otherCosts: z.number().nullable().optional(),
+			laborUnitCost: z.number().nonnegative().nullable().optional(),
+			laborQuantity: z.number().nonnegative().nullable().optional(),
+			laborWorkers: z.number().int().nonnegative().nullable().optional(),
+			laborSalary: z.number().nonnegative().nullable().optional(),
+			laborMonths: z.number().int().nonnegative().nullable().optional(),
+			storageCostPercent: z.number().min(0).max(100).nullable().optional(),
+			storageCostFixed: z.number().nonnegative().nullable().optional(),
+			otherCosts: z.number().nonnegative().nullable().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -308,7 +283,7 @@ export const costingUpdateItem = subscriptionProcedure
 
 		if (!existing) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "البند غير موجود",
+				message: STUDY_ERRORS.ITEM_NOT_FOUND,
 			});
 		}
 
@@ -341,7 +316,7 @@ export const costingUpdateItem = subscriptionProcedure
 			},
 		});
 
-		return convertCostingItem(item as unknown as Record<string, unknown>);
+		return convertCostingItemDecimals(item);
 	});
 
 // ═══════════════════════════════════════════════════════════════
@@ -362,10 +337,10 @@ export const costingBulkUpdate = subscriptionProcedure
 			items: z.array(
 				z.object({
 					id: z.string(),
-					materialUnitCost: z.number().nullable().optional(),
+					materialUnitCost: z.number().nonnegative().nullable().optional(),
 					laborType: z.enum(["PER_SQM", "PER_CBM", "PER_UNIT", "PER_LM", "LUMP_SUM", "SALARY"]).nullable().optional(),
-					laborUnitCost: z.number().nullable().optional(),
-					laborQuantity: z.number().nullable().optional(),
+					laborUnitCost: z.number().nonnegative().nullable().optional(),
+					laborQuantity: z.number().nonnegative().nullable().optional(),
 				}),
 			),
 		}),
@@ -445,7 +420,7 @@ export const costingSetSectionLabor = subscriptionProcedure
 			studyId: z.string(),
 			section: z.string(),
 			laborType: z.enum(["PER_SQM", "PER_CBM", "PER_UNIT", "PER_LM", "LUMP_SUM", "SALARY"]),
-			laborUnitCost: z.number(),
+			laborUnitCost: z.number().nonnegative(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

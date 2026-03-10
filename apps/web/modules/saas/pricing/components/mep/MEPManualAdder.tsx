@@ -21,6 +21,7 @@ import {
 	MEP_CATEGORY_ORDER,
 } from "../../lib/mep-categories";
 import type { MEPCategoryId } from "../../types/mep";
+import { useTranslations } from "next-intl";
 
 interface MEPManualAdderProps {
 	onAdd: (item: {
@@ -40,6 +41,7 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 	const [subCategory, setSubCategory] = useState("");
 	const [name, setName] = useState("");
 	const [quantity, setQuantity] = useState("");
+	const t = useTranslations("pricing.studies.mep");
 
 	const catConfig = category ? MEP_CATEGORIES[category] : null;
 	const subCategories = catConfig?.subCategories ?? {};
@@ -77,11 +79,11 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 					className="h-9 text-sm rounded-lg"
 				>
 					<Plus className="h-4 w-4 me-1.5" />
-					إضافة بند يدوي
+					{t("manualAdder.addButton")}
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className="w-80 space-y-3 p-4" align="end">
-				<h4 className="text-sm font-semibold">إضافة بند MEP يدوي</h4>
+				<h4 className="text-sm font-semibold">{t("manualAdder.title")}</h4>
 
 				{/* Category select */}
 				<Select
@@ -93,7 +95,7 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 					}}
 				>
 					<SelectTrigger className="text-sm h-9 rounded-lg">
-						<SelectValue placeholder="اختر الفئة" />
+						<SelectValue placeholder={t("manualAdder.selectCategory")} />
 					</SelectTrigger>
 					<SelectContent>
 						{MEP_CATEGORY_ORDER.map((catId) => (
@@ -115,7 +117,7 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 						}}
 					>
 						<SelectTrigger className="text-sm h-9 rounded-lg">
-							<SelectValue placeholder="اختر الفئة الفرعية" />
+							<SelectValue placeholder={t("manualAdder.selectSubCategory")} />
 						</SelectTrigger>
 						<SelectContent>
 							{Object.entries(subCategories).map(
@@ -134,7 +136,7 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 					<Input
 						value={name}
 						onChange={(e) => setName(e.target.value)}
-						placeholder="اسم البند"
+						placeholder={t("manualAdder.itemName")}
 						className="text-sm h-9 rounded-lg"
 					/>
 				)}
@@ -146,7 +148,7 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 							type="number"
 							value={quantity}
 							onChange={(e) => setQuantity(e.target.value)}
-							placeholder="الكمية"
+							placeholder={t("manualAdder.quantity")}
 							className="text-sm flex-1 h-9 rounded-lg"
 							dir="ltr"
 						/>
@@ -162,7 +164,7 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 					onClick={handleAdd}
 					disabled={!category || !subCategory || !name || !quantity}
 				>
-					إضافة
+					{t("manualAdder.add")}
 				</Button>
 			</PopoverContent>
 		</Popover>

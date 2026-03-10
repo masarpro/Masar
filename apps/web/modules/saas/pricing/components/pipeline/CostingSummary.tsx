@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
 import { Skeleton } from "@ui/components/skeleton";
 import { useTranslations } from "next-intl";
+import { SECTION_LABELS } from "../../lib/costing-constants";
+import { formatAmount } from "../../lib/utils";
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -13,18 +15,6 @@ import { useTranslations } from "next-intl";
 interface CostingSummaryProps {
 	organizationId: string;
 	studyId: string;
-}
-
-const SECTION_LABELS: Record<string, string> = {
-	STRUCTURAL: "إنشائي",
-	FINISHING: "تشطيبات",
-	MEP: "كهروميكانيكية",
-	LABOR: "عمالة",
-	MANUAL: "يدوي",
-};
-
-function formatNum(n: number): string {
-	return n.toLocaleString("ar-SA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -81,16 +71,16 @@ export function CostingSummary({
 										{SECTION_LABELS[sec.section] || sec.section}
 									</td>
 									<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-										{formatNum(sec.materialTotal)}
+										{formatAmount(sec.materialTotal)}
 									</td>
 									<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-										{formatNum(sec.laborTotal)}
+										{formatAmount(sec.laborTotal)}
 									</td>
 									<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-										{formatNum(sec.storageTotal)}
+										{formatAmount(sec.storageTotal)}
 									</td>
 									<td className="px-3 py-2 tabular-nums text-left font-medium" dir="ltr">
-										{formatNum(sec.total)}
+										{formatAmount(sec.total)}
 									</td>
 								</tr>
 							))}
@@ -99,16 +89,16 @@ export function CostingSummary({
 							<tr className="border-t-2 bg-muted/30 font-semibold">
 								<td className="px-3 py-2">{t("pricing.pipeline.costingGrandTotal")}</td>
 								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-									{formatNum(data.grandTotal.material)}
+									{formatAmount(data.grandTotal.material)}
 								</td>
 								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-									{formatNum(data.grandTotal.labor)}
+									{formatAmount(data.grandTotal.labor)}
 								</td>
 								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-									{formatNum(data.grandTotal.storage)}
+									{formatAmount(data.grandTotal.storage)}
 								</td>
 								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-									{formatNum(data.grandTotal.total)}
+									{formatAmount(data.grandTotal.total)}
 								</td>
 							</tr>
 						</tbody>
@@ -121,7 +111,7 @@ export function CostingSummary({
 						{t("pricing.pipeline.costingOverhead")} ({data.overheadPercent}%)
 					</span>
 					<span className="text-sm font-medium tabular-nums" dir="ltr">
-						{formatNum(data.overheadAmount)} ر.س
+						{formatAmount(data.overheadAmount)} ر.س
 					</span>
 				</div>
 
@@ -131,7 +121,7 @@ export function CostingSummary({
 						{t("pricing.pipeline.costingTotalWithOverhead")}
 					</span>
 					<span className="text-lg font-bold text-primary tabular-nums" dir="ltr">
-						{formatNum(data.costWithOverhead)} ر.س
+						{formatAmount(data.costWithOverhead)} ر.س
 					</span>
 				</div>
 			</CardContent>

@@ -68,7 +68,7 @@ export function PricingSettingsCard({
 		orpc.pricing.studies.recalculate.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 			},
 		}),

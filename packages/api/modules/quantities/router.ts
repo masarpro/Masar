@@ -1,5 +1,10 @@
 import { list } from "./procedures/list";
 import { getById } from "./procedures/get-by-id";
+import { getStructuralItems } from "./procedures/get-structural-items";
+import { getFinishingItems } from "./procedures/get-finishing-items";
+import { getMEPItems } from "./procedures/get-mep-items";
+import { getLaborItems } from "./procedures/get-labor-items";
+import { getQuotes } from "./procedures/get-quotes";
 import { create } from "./procedures/create";
 import { update } from "./procedures/update";
 import { deleteCostStudy } from "./procedures/delete";
@@ -34,6 +39,11 @@ import { markupGetSettings, markupSetUniform, markupSetSectionMarkups, markupGet
 export const quantitiesRouter = {
 	list,
 	getById,
+	getStructuralItems,
+	getFinishingItems,
+	getMEPItems,
+	getLaborItems,
+	getQuotes,
 	create,
 	update,
 	delete: deleteCostStudy,

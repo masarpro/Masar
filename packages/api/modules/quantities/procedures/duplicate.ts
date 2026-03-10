@@ -1,6 +1,8 @@
 import { ORPCError } from "@orpc/server";
+import { STUDY_ERRORS } from "../lib/error-messages";
 import { duplicateCostStudy as duplicateCostStudyQuery } from "@repo/database";
 import { z } from "zod";
+import { convertStudyDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -34,22 +36,10 @@ export const duplicate = subscriptionProcedure
 				context.user.id,
 			);
 
-			return {
-				...study,
-				landArea: Number(study.landArea),
-				buildingArea: Number(study.buildingArea),
-				structuralCost: Number(study.structuralCost),
-				finishingCost: Number(study.finishingCost),
-				mepCost: Number(study.mepCost),
-				laborCost: Number(study.laborCost),
-				overheadPercent: Number(study.overheadPercent),
-				profitPercent: Number(study.profitPercent),
-				contingencyPercent: Number(study.contingencyPercent),
-				totalCost: Number(study.totalCost),
-			};
+			return convertStudyDecimals(study);
 		} catch {
 			throw new ORPCError("NOT_FOUND", {
-				message: "دراسة التكلفة غير موجودة",
+				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
 	});

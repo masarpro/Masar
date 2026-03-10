@@ -13,6 +13,28 @@ export function formatNumber(value: number | string, decimals = 2): string {
 	});
 }
 
+/**
+ * تنسيق مبلغ مالي — يُرجع "—" للقيم الفارغة أو الصفرية
+ * يُستخدم في جداول التكلفة والتسعير
+ */
+export function formatAmount(n: number | null | undefined, decimals = 2): string {
+	if (n == null || n === 0) return "—";
+	return n.toLocaleString("ar-SA", {
+		minimumFractionDigits: decimals,
+		maximumFractionDigits: decimals,
+	});
+}
+
+/**
+ * تنسيق نسبة مئوية
+ */
+export function formatPercent(n: number, decimals = 1): string {
+	return n.toLocaleString("ar-SA", {
+		minimumFractionDigits: decimals,
+		maximumFractionDigits: decimals,
+	});
+}
+
 export function formatDate(date: Date | string): string {
 	const dateObj = typeof date === "string" ? new Date(date) : date;
 	if (isNaN(dateObj.getTime())) return "";

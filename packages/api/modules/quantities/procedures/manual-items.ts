@@ -1,19 +1,10 @@
 import { ORPCError } from "@orpc/server";
+import { STUDY_ERRORS } from "../lib/error-messages";
 import { db } from "@repo/database";
 import { z } from "zod";
+import { convertManualItemDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
-
-// ═══════════════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════════════
-
-function convertManualItem(item: Record<string, unknown>) {
-	return {
-		...item,
-		quantity: item.quantity != null ? Number(item.quantity) : 0,
-	};
-}
 
 // ═══════════════════════════════════════════════════════════════
 // LIST
@@ -47,7 +38,7 @@ export const manualItemsList = protectedProcedure
 			orderBy: { sortOrder: "asc" },
 		});
 
-		return items.map((item) => convertManualItem(item as unknown as Record<string, unknown>));
+		return items.map((item) => convertManualItemDecimals(item));
 	});
 
 // ═══════════════════════════════════════════════════════════════
@@ -90,13 +81,13 @@ export const manualItemCreate = subscriptionProcedure
 
 		if (!study) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "الدراسة غير موجودة",
+				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
 
 		if (study.quantitiesStatus === "APPROVED") {
 			throw new ORPCError("BAD_REQUEST", {
-				message: "لا يمكن إضافة بنود بعد اعتماد الكميات",
+				message: STUDY_ERRORS.ITEMS_LOCKED,
 			});
 		}
 
@@ -120,7 +111,7 @@ export const manualItemCreate = subscriptionProcedure
 			},
 		});
 
-		return convertManualItem(item as unknown as Record<string, unknown>);
+		return convertManualItemDecimals(item);
 	});
 
 // ═══════════════════════════════════════════════════════════════
@@ -161,7 +152,7 @@ export const manualItemUpdate = subscriptionProcedure
 
 		if (!existing) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "البند غير موجود",
+				message: STUDY_ERRORS.ITEM_NOT_FOUND,
 			});
 		}
 
@@ -172,7 +163,7 @@ export const manualItemUpdate = subscriptionProcedure
 			data,
 		});
 
-		return convertManualItem(item as unknown as Record<string, unknown>);
+		return convertManualItemDecimals(item);
 	});
 
 // ═══════════════════════════════════════════════════════════════
@@ -208,7 +199,7 @@ export const manualItemDelete = subscriptionProcedure
 
 		if (!existing) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "البند غير موجود",
+				message: STUDY_ERRORS.ITEM_NOT_FOUND,
 			});
 		}
 
@@ -253,5 +244,5 @@ export const manualItemReorder = subscriptionProcedure
 			),
 		);
 
-		return { success: true };
+		return { success: true, count: input.itemIds.length };
 	});

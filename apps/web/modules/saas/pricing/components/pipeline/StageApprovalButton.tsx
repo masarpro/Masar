@@ -72,7 +72,7 @@ export function StageApprovalButton({
 			queryKey: [["pricing", "studies", "stages"]],
 		});
 		queryClient.invalidateQueries({
-			queryKey: [["pricing", "studies", "getById"]],
+			queryKey: [["pricing", "studies"]],
 		});
 	};
 

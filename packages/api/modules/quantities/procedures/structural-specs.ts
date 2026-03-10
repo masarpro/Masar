@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/server";
+import { STUDY_ERRORS } from "../lib/error-messages";
 import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
@@ -53,7 +54,7 @@ export const getStructuralSpecs = protectedProcedure
 
 		if (!study) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "الدراسة غير موجودة",
+				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
 
@@ -95,7 +96,7 @@ export const setStructuralSpecs = subscriptionProcedure
 
 		if (!study) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "الدراسة غير موجودة",
+				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
 

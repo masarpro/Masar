@@ -187,7 +187,7 @@ function MEPPricingRow({
 		orpc.pricing.studies.mepItem.update.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 			},
 		}),
@@ -197,7 +197,7 @@ function MEPPricingRow({
 		orpc.pricing.studies.mepItem.toggleEnabled.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 			},
 		}),

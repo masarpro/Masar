@@ -5,6 +5,7 @@ import { Skeleton } from "@ui/components/skeleton";
 import { cn } from "@ui/lib";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { formatAmount, formatPercent } from "../../lib/utils";
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -28,15 +29,6 @@ interface ProfitAnalysisProps {
 	profitAnalysis?: ProfitAnalysisData | null;
 	isLoading: boolean;
 	isLumpSum?: boolean;
-}
-
-function fmt(n: number): string {
-	if (n === 0) return "—";
-	return n.toLocaleString("ar-SA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function fmtPct(n: number): string {
-	return n.toLocaleString("ar-SA", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -102,7 +94,7 @@ export function ProfitAnalysis({
 							<tr className="border-b">
 								<td className="px-3 py-2 text-muted-foreground">{t("pricing.pipeline.totalCostLabel")}</td>
 								<td className="px-3 py-2 tabular-nums text-left font-medium" dir="ltr">
-									{fmt(totalCost)} ر.س
+									{formatAmount(totalCost)} ر.س
 								</td>
 							</tr>
 							{!isLumpSum && (
@@ -110,34 +102,34 @@ export function ProfitAnalysis({
 									<tr className="border-b">
 										<td className="px-3 py-2 text-muted-foreground">{t("pricing.pipeline.overheadLabel")}</td>
 										<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-											+ {fmt(overheadAmount)} ر.س
+											+ {formatAmount(overheadAmount)} ر.س
 										</td>
 									</tr>
 									<tr className="border-b">
 										<td className="px-3 py-2 text-muted-foreground">{t("pricing.pipeline.profitLabel")}</td>
 										<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-											+ {fmt(profitAmount)} ر.س
+											+ {formatAmount(profitAmount)} ر.س
 										</td>
 									</tr>
 									{contingencyAmount > 0 && (
 										<tr className="border-b">
 											<td className="px-3 py-2 text-muted-foreground">{t("pricing.pipeline.contingencyLabel")}</td>
 											<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-												+ {fmt(contingencyAmount)} ر.س
+												+ {formatAmount(contingencyAmount)} ر.س
 											</td>
 										</tr>
 									)}
 									<tr className="border-b bg-muted/30">
 										<td className="px-3 py-2 font-medium">{t("pricing.pipeline.sellingPriceBeforeVat")}</td>
 										<td className="px-3 py-2 tabular-nums text-left font-medium" dir="ltr">
-											{fmt(sellingPriceBeforeVat)} ر.س
+											{formatAmount(sellingPriceBeforeVat)} ر.س
 										</td>
 									</tr>
 									{vatAmount > 0 && (
 										<tr className="border-b">
 											<td className="px-3 py-2 text-muted-foreground">{t("pricing.pipeline.vatLabel")} (15%)</td>
 											<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-												+ {fmt(vatAmount)} ر.س
+												+ {formatAmount(vatAmount)} ر.س
 											</td>
 										</tr>
 									)}
@@ -146,7 +138,7 @@ export function ProfitAnalysis({
 							<tr className="border-t-2 bg-primary/5">
 								<td className="px-3 py-2 font-semibold">{t("pricing.pipeline.grandTotalLabel")}</td>
 								<td className="px-3 py-2 tabular-nums text-left font-bold text-primary text-base" dir="ltr">
-									{fmt(grandTotal)} ر.س
+									{formatAmount(grandTotal)} ر.س
 								</td>
 							</tr>
 						</tbody>
@@ -174,9 +166,9 @@ export function ProfitAnalysis({
 							/>
 						</div>
 						<div className="flex items-center justify-between text-xs">
-							<span className="text-blue-600 tabular-nums" dir="ltr">{fmtPct(costPct)}%</span>
+							<span className="text-blue-600 tabular-nums" dir="ltr">{formatPercent(costPct)}%</span>
 							<span className={cn("tabular-nums", isPositive ? "text-emerald-600" : "text-red-600")} dir="ltr">
-								{fmtPct(profitPct)}%
+								{formatPercent(profitPct)}%
 							</span>
 						</div>
 					</div>
@@ -190,7 +182,7 @@ export function ProfitAnalysis({
 							"text-sm font-bold tabular-nums",
 							isPositive ? "text-emerald-600" : "text-red-600",
 						)} dir="ltr">
-							{fmt(profitAmount)} ر.س
+							{formatAmount(profitAmount)} ر.س
 						</p>
 					</div>
 					<div className="rounded-lg border p-3 text-center">
@@ -199,7 +191,7 @@ export function ProfitAnalysis({
 							"text-sm font-bold tabular-nums",
 							isPositive ? "text-emerald-600" : "text-red-600",
 						)} dir="ltr">
-							{fmtPct(profitPercent)}%
+							{formatPercent(profitPercent)}%
 						</p>
 					</div>
 					{buildingArea > 0 && (
@@ -207,13 +199,13 @@ export function ProfitAnalysis({
 							<div className="rounded-lg border p-3 text-center">
 								<p className="text-xs text-muted-foreground mb-1">{t("pricing.pipeline.pricePerSqm")}</p>
 								<p className="text-sm font-bold tabular-nums" dir="ltr">
-									{fmt(pricePerSqm)} ر.س
+									{formatAmount(pricePerSqm)} ر.س
 								</p>
 							</div>
 							<div className="rounded-lg border p-3 text-center">
 								<p className="text-xs text-muted-foreground mb-1">{t("pricing.pipeline.costPerSqm")}</p>
 								<p className="text-sm font-bold tabular-nums" dir="ltr">
-									{fmt(costPerSqm)} ر.س
+									{formatAmount(costPerSqm)} ر.س
 								</p>
 							</div>
 						</>

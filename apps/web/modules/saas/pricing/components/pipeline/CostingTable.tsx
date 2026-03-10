@@ -7,6 +7,8 @@ import { cn } from "@ui/lib";
 import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { SECTION_LABELS, SECTION_COLORS } from "../../lib/costing-constants";
+import { formatAmount } from "../../lib/utils";
 import { LaborCostInput } from "./LaborCostInput";
 
 // ═══════════════════════════════════════════════════════════════
@@ -38,27 +40,6 @@ interface CostingItem {
 interface CostingTableProps {
 	organizationId: string;
 	items: CostingItem[];
-}
-
-const SECTION_LABELS: Record<string, string> = {
-	STRUCTURAL: "إنشائي",
-	FINISHING: "تشطيبات",
-	MEP: "كهروميكانيكية",
-	LABOR: "عمالة",
-	MANUAL: "يدوي",
-};
-
-const SECTION_COLORS: Record<string, string> = {
-	STRUCTURAL: "border-r-blue-500",
-	FINISHING: "border-r-amber-500",
-	MEP: "border-r-emerald-500",
-	LABOR: "border-r-purple-500",
-	MANUAL: "border-r-gray-500",
-};
-
-function fmt(n: number | null): string {
-	if (n == null || n === 0) return "—";
-	return n.toLocaleString("ar-SA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -135,7 +116,7 @@ export function CostingTable({
 								</span>
 							</h3>
 							<span className="text-sm font-medium tabular-nums" dir="ltr">
-								{fmt(sectionTotal)} ر.س
+								{formatAmount(sectionTotal)} ر.س
 							</span>
 						</div>
 
@@ -183,7 +164,7 @@ export function CostingTable({
 											</td>
 											{/* Material total */}
 											<td className="px-2 py-2 text-center tabular-nums" dir="ltr">
-												{fmt(item.materialTotal)}
+												{formatAmount(item.materialTotal)}
 											</td>
 											{/* Labor input */}
 											<td className="px-2 py-1">
@@ -200,11 +181,11 @@ export function CostingTable({
 											</td>
 											{/* Labor total */}
 											<td className="px-2 py-2 text-center tabular-nums" dir="ltr">
-												{fmt(item.laborTotal)}
+												{formatAmount(item.laborTotal)}
 											</td>
 											{/* Total cost */}
 											<td className="px-2 py-2 text-center tabular-nums font-medium" dir="ltr">
-												{fmt(item.totalCost)}
+												{formatAmount(item.totalCost)}
 											</td>
 										</tr>
 									))}

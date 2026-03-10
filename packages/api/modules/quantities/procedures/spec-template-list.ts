@@ -1,9 +1,9 @@
 import { getSpecTemplates } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { subscriptionProcedure } from "../../../orpc/procedures";
+import { protectedProcedure } from "../../../orpc/procedures";
 
-export const specTemplateList = subscriptionProcedure
+export const specTemplateList = protectedProcedure
 	.route({
 		method: "GET",
 		path: "/quantities/spec-templates",

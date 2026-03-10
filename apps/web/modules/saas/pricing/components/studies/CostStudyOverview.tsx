@@ -2,18 +2,14 @@
 
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@ui/components/button";
 import {
-	ArrowRight,
 	Building2,
 	Calculator,
-	ChevronLeft,
 	ExternalLink,
 	Hammer,
 	Layers,
 	MapPin,
 	PaintBucket,
-	Receipt,
 	Sparkles,
 	UserSearch,
 	Wrench,
@@ -22,8 +18,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { formatCurrency } from "../../lib/utils";
 import { LeadStatusBadge } from "../leads/LeadStatusBadge";
-import { StudyOverviewSkeleton } from "@saas/shared/components/skeletons";
-import { PipelineBar } from "../pipeline/PipelineBar";
+import { QuantitiesSubTabs } from "./QuantitiesSubTabs";
 
 interface CostStudyOverviewProps {
 	organizationId: string;
@@ -31,38 +26,14 @@ interface CostStudyOverviewProps {
 	studyId: string;
 }
 
-const STATUS_CONFIG: Record<string, { bg: string; text: string; dot: string }> = {
-	draft: {
-		bg: "bg-slate-100 dark:bg-slate-800",
-		text: "text-slate-600 dark:text-slate-400",
-		dot: "bg-slate-400",
-	},
-	in_progress: {
-		bg: "bg-amber-50 dark:bg-amber-950/50",
-		text: "text-amber-700 dark:text-amber-400",
-		dot: "bg-amber-500",
-	},
-	completed: {
-		bg: "bg-sky-50 dark:bg-sky-950/50",
-		text: "text-sky-700 dark:text-sky-400",
-		dot: "bg-sky-500",
-	},
-	approved: {
-		bg: "bg-indigo-50 dark:bg-indigo-950/50",
-		text: "text-indigo-700 dark:text-indigo-400",
-		dot: "bg-indigo-500",
-	},
-};
-
 export function CostStudyOverview({
 	organizationId,
 	organizationSlug,
 	studyId,
 }: CostStudyOverviewProps) {
 	const t = useTranslations();
-	const basePath = `/app/${organizationSlug}/pricing/studies/${studyId}`;
 
-	const { data: study, isLoading } = useQuery(
+	const { data: study } = useQuery(
 		orpc.pricing.studies.getById.queryOptions({
 			input: {
 				id: studyId,
@@ -71,89 +42,9 @@ export function CostStudyOverview({
 		}),
 	);
 
-	// ─── Fetch stages ───
-	const { data: stagesData } = useQuery(
-		orpc.pricing.studies.stages.get.queryOptions({
-			input: { organizationId, studyId },
-		}),
-	);
-
-	const stages = stagesData?.stages ?? {
-		quantities: "DRAFT" as const,
-		specs: "NOT_STARTED" as const,
-		costing: "NOT_STARTED" as const,
-		pricing: "NOT_STARTED" as const,
-		quotation: "NOT_STARTED" as const,
-	};
-
-	const studyType = stagesData?.studyType ?? "FULL_PROJECT";
-
-	if (isLoading) {
-		return <StudyOverviewSkeleton />;
-	}
-
 	if (!study) {
-		return (
-			<div className="flex flex-col items-center justify-center py-20 text-center">
-				<div className="relative mb-6">
-					<div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-full blur-2xl" />
-					<div className="relative p-6 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-muted-foreground/10">
-						<Calculator className="h-16 w-16 text-muted-foreground" />
-					</div>
-				</div>
-				<p className="text-muted-foreground text-lg">{t("pricing.studies.notFound")}</p>
-			</div>
-		);
+		return null;
 	}
-
-	const statusConfig = STATUS_CONFIG[study.status] || STATUS_CONFIG.draft;
-
-	const sections = [
-		{
-			title: t("pricing.studies.structural.title"),
-			icon: Hammer,
-			href: `${basePath}/quantities?tab=structural`,
-			count: study.structuralItems.length,
-			cost: study.structuralCost,
-			accent: "bg-orange-500",
-			bg: "bg-orange-50 dark:bg-orange-950/30",
-			iconBg: "bg-orange-100 dark:bg-orange-900/50",
-			iconColor: "text-orange-600 dark:text-orange-400",
-		},
-		{
-			title: t("pricing.studies.finishing.title"),
-			icon: PaintBucket,
-			href: `${basePath}/quantities?tab=finishing`,
-			count: study.finishingItems.length,
-			cost: study.finishingCost,
-			accent: "bg-violet-500",
-			bg: "bg-violet-50 dark:bg-violet-950/30",
-			iconBg: "bg-violet-100 dark:bg-violet-900/50",
-			iconColor: "text-violet-600 dark:text-violet-400",
-		},
-		{
-			title: t("pricing.studies.mep.title"),
-			icon: Wrench,
-			href: `${basePath}/quantities?tab=mep`,
-			count: study.mepItems.length,
-			cost: study.mepCost,
-			accent: "bg-sky-500",
-			bg: "bg-sky-50 dark:bg-sky-950/30",
-			iconBg: "bg-sky-100 dark:bg-sky-900/50",
-			iconColor: "text-sky-600 dark:text-sky-400",
-		},
-		{
-			title: t("pricing.studies.pricing.title"),
-			icon: Receipt,
-			href: `${basePath}/selling-price`,
-			count: study.quotes.length,
-			cost: study.totalCost,
-			accent: "bg-sky-500",
-			bg: "bg-sky-50 dark:bg-sky-950/30",
-			iconBg: "bg-sky-100 dark:bg-sky-900/50",
-			iconColor: "text-sky-600 dark:text-sky-400",
-		},
-	];
 
 	const directCosts = study.structuralCost + study.finishingCost + study.mepCost + study.laborCost;
 	const overheadAmount = directCosts * (study.overheadPercent / 100);
@@ -162,63 +53,6 @@ export function CostStudyOverview({
 
 	return (
 		<div className="space-y-6">
-			{/* Pipeline Bar */}
-			<PipelineBar
-				studyId={studyId}
-				organizationSlug={organizationSlug}
-				currentStage="quantities"
-				stages={stages}
-				studyType={studyType}
-			/>
-
-			{/* Header Section */}
-			<div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-				<div className="flex items-start gap-4">
-					<Button variant="ghost" size="icon" asChild className="rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0 mt-1">
-						<Link href={`/app/${organizationSlug}/pricing/studies`}>
-							<ChevronLeft className="h-5 w-5 text-slate-500" />
-						</Link>
-					</Button>
-					<div className="space-y-2">
-						<div className="flex items-center gap-3 flex-wrap">
-							<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-								{study.name || t("pricing.studies.unnamed")}
-							</h1>
-							<span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}>
-								<span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot}`} />
-								{t(`pricing.studies.status.${study.status}`)}
-							</span>
-						</div>
-						{study.customerName && (
-							<p className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
-								<MapPin className="h-4 w-4" />
-								{study.customerName}
-							</p>
-						)}
-					</div>
-				</div>
-
-				{/* Quick Stats */}
-				<div className="flex items-center gap-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-4">
-					<div className="text-center">
-						<p className="text-xs text-slate-500 dark:text-slate-400">{t("pricing.studies.form.buildingArea")}</p>
-						<p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{study.buildingArea} م²</p>
-					</div>
-					<div className="w-px h-10 bg-slate-200 dark:bg-slate-700" />
-					<div className="text-center">
-						<p className="text-xs text-slate-500 dark:text-slate-400">{t("pricing.studies.form.numberOfFloors")}</p>
-						<p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{study.numberOfFloors}</p>
-					</div>
-					<div className="w-px h-10 bg-slate-200 dark:bg-slate-700" />
-					<div className="text-center">
-						<p className="text-xs text-slate-500 dark:text-slate-400">{t("pricing.studies.totalCost")}</p>
-						<p className="text-lg font-semibold text-sky-600 dark:text-sky-400">
-							{formatCurrency(study.totalCost)}
-						</p>
-					</div>
-				</div>
-			</div>
-
 			{/* Project Info Cards */}
 			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
 				<div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50">
@@ -297,35 +131,12 @@ export function CostStudyOverview({
 				</div>
 			)}
 
-			{/* Sections Grid */}
-			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-				{sections.map((section) => (
-					<Link key={section.href} href={section.href}>
-						<div className={`group rounded-2xl ${section.bg} p-5 transition-all duration-200 hover:shadow-sm`}>
-							<div className={`h-1 w-12 ${section.accent} rounded-full mb-4`} />
-
-							<div className="flex items-start justify-between mb-4">
-								<div className={`p-2.5 rounded-xl ${section.iconBg}`}>
-									<section.icon className={`h-5 w-5 ${section.iconColor}`} />
-								</div>
-								<ArrowRight className="h-4 w-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-							</div>
-
-							<h3 className="font-medium text-slate-900 dark:text-slate-100 mb-3">{section.title}</h3>
-
-							<div className="flex items-end justify-between">
-								<div>
-									<p className="text-xs text-slate-500 dark:text-slate-400">{t("pricing.studies.items")}</p>
-									<p className="text-2xl font-semibold text-slate-900 dark:text-slate-100">{section.count}</p>
-								</div>
-								<p className="text-base font-semibold text-slate-700 dark:text-slate-300">
-									{formatCurrency(section.cost)}
-								</p>
-							</div>
-						</div>
-					</Link>
-				))}
-			</div>
+			{/* Quantities Sub-Tabs (editors inline) */}
+			<QuantitiesSubTabs
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+				studyId={studyId}
+			/>
 
 			{/* Cost Summary */}
 			<div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">

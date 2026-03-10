@@ -23,13 +23,16 @@ import {
 import {
 	Building2,
 	Copy,
+	Hammer,
 	MoreVertical,
+	PaintBucket,
 	Pencil,
 	Trash2,
 	Layers,
 	Calendar,
 	Boxes,
 	UserSearch,
+	Wrench,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -248,6 +251,26 @@ export function CostStudyCard({
 						</div>
 					</div>
 				</div>
+
+				{/* Per-section item counts */}
+				{totalItems > 0 && (
+					<div className="px-4 pb-3">
+						<div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+							<div className="flex items-center gap-1" title={t("pricing.studies.structural.title")}>
+								<Hammer className="h-3 w-3 text-orange-500" />
+								<span>{study._count.structuralItems}</span>
+							</div>
+							<div className="flex items-center gap-1" title={t("pricing.studies.finishing.title")}>
+								<PaintBucket className="h-3 w-3 text-violet-500" />
+								<span>{study._count.finishingItems}</span>
+							</div>
+							<div className="flex items-center gap-1" title={t("pricing.studies.mep.title")}>
+								<Wrench className="h-3 w-3 text-sky-500" />
+								<span>{study._count.mepItems}</span>
+							</div>
+						</div>
+					</div>
+				)}
 
 				{/* Card Footer */}
 				<div className="px-4 pb-4 pt-3 border-t border-slate-100 dark:border-slate-800">

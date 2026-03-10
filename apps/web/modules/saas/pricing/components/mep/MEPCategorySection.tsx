@@ -1,32 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import {
-	Zap,
-	Droplets,
-	Wind,
-	Flame,
-	Wifi,
-	Settings,
-} from "lucide-react";
+import { ChevronDown, Settings } from "lucide-react";
 import { formatCurrency } from "../../lib/utils";
 import {
 	MEP_CATEGORIES,
 	getMEPSubCategoryName,
 } from "../../lib/mep-categories";
+import { MEP_ICON_MAP } from "../../lib/mep-icons";
 import type { MEPCategoryId, MEPMergedItem } from "../../types/mep";
 import { MEPItemRow } from "./MEPItemRow";
-
-// Map icon string names to components
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
-	Zap,
-	Droplets,
-	Wind,
-	Flame,
-	Wifi,
-	Settings,
-};
+import { useTranslations } from "next-intl";
 
 interface MEPCategorySectionProps {
 	categoryId: MEPCategoryId;
@@ -44,8 +28,9 @@ export function MEPCategorySection({
 	showPricing = true,
 }: MEPCategorySectionProps) {
 	const [isOpen, setIsOpen] = useState(true);
+	const t = useTranslations("pricing.studies.mep");
 	const category = MEP_CATEGORIES[categoryId];
-	const IconComponent = ICON_MAP[category.icon] ?? Settings;
+	const IconComponent = MEP_ICON_MAP[category.icon] ?? Settings;
 
 	const enabledItems = items.filter((i) => i.isEnabled);
 	const totalCost = enabledItems.reduce((s, i) => s + i.totalCost, 0);
@@ -83,7 +68,7 @@ export function MEPCategorySection({
 					<div className="text-start">
 						<h3 className="font-semibold">{category.nameAr}</h3>
 						<p className="text-xs text-muted-foreground">
-							{items.length} بند
+							{t("categoryItemCount", { count: items.length })}
 							{showPricing && <> &middot; {formatCurrency(totalCost)}</>}
 						</p>
 					</div>
@@ -101,13 +86,13 @@ export function MEPCategorySection({
 					{/* Header row */}
 					<div className={showPricing ? "grid grid-cols-[32px_1fr_80px_60px_90px_90px_32px] sm:grid-cols-[32px_1fr_80px_60px_90px_90px_80px_32px] items-center gap-2 px-3 text-xs text-muted-foreground font-medium" : "grid grid-cols-[32px_1fr_80px_60px_80px_32px] sm:grid-cols-[32px_1fr_80px_60px_80px_32px] items-center gap-2 px-3 text-xs text-muted-foreground font-medium"}>
 						<span />
-						<span>البند</span>
-						<span className="text-left">الكمية</span>
-						<span>الوحدة</span>
-						{showPricing && <span className="text-left">سعر الوحدة</span>}
-						{showPricing && <span className="text-left">الإجمالي</span>}
+						<span>{t("table.item")}</span>
+						<span className="text-left">{t("table.quantity")}</span>
+						<span>{t("table.unit")}</span>
+						{showPricing && <span className="text-left">{t("table.unitPrice")}</span>}
+						{showPricing && <span className="text-left">{t("table.total")}</span>}
 						{showPricing && <span className="hidden sm:block text-center">
-							المعادلة
+							{t("table.formula")}
 						</span>}
 						<span />
 					</div>

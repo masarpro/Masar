@@ -1,5 +1,6 @@
 import { getOrganizationCostStudies } from "@repo/database";
 import { z } from "zod";
+import { convertStudyDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
 
@@ -37,19 +38,9 @@ export const list = protectedProcedure
 
 		// Convert Decimal to number for JSON serialization
 		return {
-			costStudies: result.costStudies.map((study) => ({
-				...study,
-				landArea: Number(study.landArea),
-				buildingArea: Number(study.buildingArea),
-				structuralCost: Number(study.structuralCost),
-				finishingCost: Number(study.finishingCost),
-				mepCost: Number(study.mepCost),
-				laborCost: Number(study.laborCost),
-				overheadPercent: Number(study.overheadPercent),
-				profitPercent: Number(study.profitPercent),
-				contingencyPercent: Number(study.contingencyPercent),
-				totalCost: Number(study.totalCost),
-			})),
+			costStudies: result.costStudies.map((study) =>
+				convertStudyDecimals(study),
+			),
 			total: result.total,
 		};
 	});

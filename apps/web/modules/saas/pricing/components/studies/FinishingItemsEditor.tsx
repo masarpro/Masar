@@ -42,6 +42,15 @@ export function FinishingItemsEditor({
 		}),
 	);
 
+	const { data: finishingItems = [] } = useQuery(
+		orpc.pricing.studies.getFinishingItems.queryOptions({
+			input: {
+				costStudyId: studyId,
+				organizationId,
+			},
+		}),
+	);
+
 	const handleWizardComplete = useCallback(
 		(cascadeInfo?: { changes: CascadeChange[]; skippedManualCount: number }) => {
 			setShowWizard(false);
@@ -72,7 +81,7 @@ export function FinishingItemsEditor({
 	const isWizardComplete = smartConfig?.isComplete === true;
 
 	// Map finishing items to SavedFinishingItem shape
-	const savedItems: SavedFinishingItem[] = study.finishingItems.map(
+	const savedItems: SavedFinishingItem[] = finishingItems.map(
 		(item) => ({
 			id: item.id,
 			category: item.category,

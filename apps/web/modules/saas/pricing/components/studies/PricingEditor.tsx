@@ -46,10 +46,33 @@ export function PricingEditor({
 		}),
 	);
 
+	const { data: rawStructuralItems = [] } = useQuery(
+		orpc.pricing.studies.getStructuralItems.queryOptions({
+			input: { costStudyId: studyId, organizationId },
+		}),
+	);
+
+	const { data: rawFinishingItems = [] } = useQuery(
+		orpc.pricing.studies.getFinishingItems.queryOptions({
+			input: { costStudyId: studyId, organizationId },
+		}),
+	);
+
+	const { data: rawMEPItems = [] } = useQuery(
+		orpc.pricing.studies.getMEPItems.queryOptions({
+			input: { costStudyId: studyId, organizationId },
+		}),
+	);
+
+	const { data: quotes = [] } = useQuery(
+		orpc.pricing.studies.getQuotes.queryOptions({
+			input: { costStudyId: studyId, organizationId },
+		}),
+	);
+
 	// Convert structural items
 	const structuralItems = useMemo(() => {
-		if (!study?.structuralItems) return [];
-		return study.structuralItems.map((item) => ({
+		return rawStructuralItems.map((item) => ({
 			id: item.id,
 			category: item.category,
 			subCategory: item.subCategory,
@@ -62,12 +85,11 @@ export function PricingEditor({
 			laborCost: Number(item.laborCost),
 			totalCost: Number(item.totalCost),
 		}));
-	}, [study?.structuralItems]);
+	}, [rawStructuralItems]);
 
 	// Convert finishing items
 	const finishingItems = useMemo(() => {
-		if (!study?.finishingItems) return [];
-		return study.finishingItems.map((item) => ({
+		return rawFinishingItems.map((item) => ({
 			id: item.id,
 			category: item.category,
 			subCategory: item.subCategory,
@@ -84,12 +106,11 @@ export function PricingEditor({
 			laborCost: Number(item.laborCost),
 			totalCost: Number(item.totalCost),
 		}));
-	}, [study?.finishingItems]);
+	}, [rawFinishingItems]);
 
 	// Convert MEP items
 	const mepItems = useMemo(() => {
-		if (!study?.mepItems) return [];
-		return study.mepItems.map((item) => ({
+		return rawMEPItems.map((item) => ({
 			id: item.id,
 			category: item.category,
 			subCategory: item.subCategory,
@@ -105,7 +126,7 @@ export function PricingEditor({
 			isEnabled: item.isEnabled,
 			dataSource: item.dataSource,
 		}));
-	}, [study?.mepItems]);
+	}, [rawMEPItems]);
 
 	if (isLoading) {
 		return <StudyEditorSkeleton />;
@@ -234,9 +255,9 @@ export function PricingEditor({
 					</Button>
 				</CardHeader>
 				<CardContent>
-					{study.quotes.length > 0 ? (
+					{quotes.length > 0 ? (
 						<div className="space-y-3">
-							{study.quotes.map((quote) => (
+							{quotes.map((quote) => (
 								<div
 									key={quote.id}
 									className="flex items-center justify-between p-3 border rounded-lg"

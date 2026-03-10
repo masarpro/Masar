@@ -1,6 +1,8 @@
 import { ORPCError } from "@orpc/server";
+import { STUDY_ERRORS } from "../lib/error-messages";
 import { updateStructuralItem, getCostStudyById } from "@repo/database";
 import { z } from "zod";
+import { convertStructuralItemDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 
@@ -21,17 +23,17 @@ export const structuralItemUpdate = subscriptionProcedure
 			name: z.string().optional(),
 			description: z.string().optional(),
 			dimensions: z.any().optional(),
-			quantity: z.number().optional(),
+			quantity: z.number().nonnegative().optional(),
 			unit: z.string().optional(),
-			concreteVolume: z.number().optional(),
+			concreteVolume: z.number().nonnegative().optional(),
 			concreteType: z.string().optional(),
-			steelWeight: z.number().optional(),
-			steelRatio: z.number().optional(),
-			wastagePercent: z.number().optional(),
-			materialCost: z.number().optional(),
-			laborCost: z.number().optional(),
-			totalCost: z.number().optional(),
-			sortOrder: z.number().optional(),
+			steelWeight: z.number().nonnegative().optional(),
+			steelRatio: z.number().nonnegative().optional(),
+			wastagePercent: z.number().min(0).max(100).optional(),
+			materialCost: z.number().nonnegative().optional(),
+			laborCost: z.number().nonnegative().optional(),
+			totalCost: z.number().nonnegative().optional(),
+			sortOrder: z.number().nonnegative().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -45,7 +47,7 @@ export const structuralItemUpdate = subscriptionProcedure
 		const study = await getCostStudyById(input.costStudyId, input.organizationId);
 		if (!study) {
 			throw new ORPCError("NOT_FOUND", {
-				message: "دراسة التكلفة غير موجودة",
+				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
 
@@ -53,15 +55,5 @@ export const structuralItemUpdate = subscriptionProcedure
 
 		const item = await updateStructuralItem(id, costStudyId, data);
 
-		return {
-			...item,
-			quantity: Number(item.quantity),
-			concreteVolume: item.concreteVolume ? Number(item.concreteVolume) : null,
-			steelWeight: item.steelWeight ? Number(item.steelWeight) : null,
-			steelRatio: item.steelRatio ? Number(item.steelRatio) : null,
-			wastagePercent: Number(item.wastagePercent),
-			materialCost: Number(item.materialCost),
-			laborCost: Number(item.laborCost),
-			totalCost: Number(item.totalCost),
-		};
+		return convertStructuralItemDecimals(item);
 	});

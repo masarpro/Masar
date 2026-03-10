@@ -184,7 +184,7 @@ export function ThermalInsulationItemDialog({
 			onSuccess: () => {
 				toast.success(tFinishing("itemSaved"));
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 				onOpenChange(false);
 			},
@@ -197,7 +197,7 @@ export function ThermalInsulationItemDialog({
 			onSuccess: () => {
 				toast.success(tFinishing("itemSaved"));
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 				onOpenChange(false);
 			},

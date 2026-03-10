@@ -1432,6 +1432,11 @@
 				"studyType": "Study Type",
 				"contractValue": "Contract Value",
 				"contractValuePlaceholder": "Enter contract value",
+				"quantityMethod": "How do you want to start?",
+				"smartCalc": "Smart Calculation",
+				"smartCalcDesc": "Enter building info and we'll calculate quantities automatically",
+				"manualEntry": "Manual Entry",
+				"manualEntryDesc": "Add quantity items directly",
 				"submit": "Create Study",
 				"cancel": "Cancel"
 			},
@@ -2046,12 +2051,14 @@
 				"saveAll": "Save All",
 				"buildingRequired": {
 					"title": "Building Configuration Required",
-					"description": "To auto-derive MEP items, create a building configuration from the Finishing section first",
-					"action": "Create Building Config"
+					"description": "To automatically derive MEP items, you must first create building settings (floors and rooms) from the Finishing section.",
+					"action": "Go to Finishing Section"
 				},
 				"cascade": {
 					"updated": "Building configuration updated",
-					"savePrompt": "Press save to update MEP items"
+					"savePrompt": "Press save to update MEP items",
+					"message": "Building settings updated. Press save to update MEP items.",
+					"saveButton": "Save New Items"
 				},
 				"item": {
 					"autoDerived": "Auto-derived",
@@ -2076,6 +2083,54 @@
 					"economy": "Economy",
 					"standard": "Standard",
 					"premium": "Premium"
+				},
+				"dashboard": {
+					"title": "MEP Work Items"
+				},
+				"categoryItemCount": "{count} items",
+				"itemDialog": {
+					"editTitle": "Edit MEP Item",
+					"itemName": "Item Name",
+					"category": "Category",
+					"subCategory": "Subcategory",
+					"quantity": "Quantity",
+					"unit": "Unit",
+					"qualityLevel": "Quality Level",
+					"formulaReadOnly": "Formula (read-only)",
+					"cancel": "Cancel",
+					"save": "Save",
+					"saving": "Saving..."
+				},
+				"manualAdder": {
+					"title": "Add Manual MEP Item",
+					"addButton": "Add Manual Item",
+					"selectCategory": "Select Category",
+					"selectSubCategory": "Select Subcategory",
+					"itemName": "Item Name",
+					"quantity": "Quantity",
+					"add": "Add"
+				},
+				"table": {
+					"item": "Item",
+					"quantity": "Quantity",
+					"unit": "Unit",
+					"unitPrice": "Unit Price",
+					"total": "Total",
+					"formula": "Formula"
+				},
+				"summary": {
+					"totalItems": "Total Items",
+					"enabledDisabled": "Enabled / Disabled",
+					"auto": "Auto",
+					"manual": "Manual"
+				},
+				"itemRow": {
+					"manualOverride": "Manually adjusted (original quantity: {qty})"
+				},
+				"messages": {
+					"itemUpdated": "Item updated successfully",
+					"updateError": "Error updating item",
+					"invalidQuantity": "Invalid quantity"
 				}
 			},
 			"pricing": {
@@ -3252,54 +3307,6 @@
 			"doors": "Doors",
 			"windows": "Windows",
 			"description": "Manage finishing elements"
-		},
-		"mep": {
-			"title": "MEP Works",
-			"subtitle": "Electrical, Plumbing, HVAC & Firefighting",
-			"electrical": "Electrical",
-			"plumbing": "Plumbing",
-			"hvac": "HVAC",
-			"description": "Manage mechanical, electrical, and plumbing works",
-			"totalCost": "Total MEP Cost",
-			"itemCount": "Item Count",
-			"enabledCount": "Enabled Items",
-			"disabledCount": "Disabled Items",
-			"rederive": "Re-derive",
-			"addManual": "Add Manual Item",
-			"saveAll": "Save All",
-			"buildingRequired": {
-				"title": "Building Configuration Required",
-				"description": "To auto-derive MEP items, create a building configuration from the Finishing section first",
-				"action": "Create Building Config"
-			},
-			"cascade": {
-				"updated": "Building configuration updated",
-				"savePrompt": "Press save to update MEP items"
-			},
-			"item": {
-				"autoDerived": "Auto-derived",
-				"manual": "Manual",
-				"estimated": "Estimated",
-				"enabled": "Enabled",
-				"disabled": "Disabled",
-				"formula": "Formula",
-				"specs": "Specifications",
-				"edit": "Edit",
-				"delete": "Delete"
-			},
-			"categories": {
-				"ELECTRICAL": "Electrical Works",
-				"PLUMBING": "Plumbing Works",
-				"HVAC": "HVAC",
-				"FIREFIGHTING": "Firefighting",
-				"LOW_CURRENT": "Low Current Systems",
-				"SPECIAL": "Special Systems"
-			},
-			"quality": {
-				"economy": "Economy",
-				"standard": "Standard",
-				"premium": "Premium"
-			}
 		},
 		"pricing": {
 			"title": "Pricing",

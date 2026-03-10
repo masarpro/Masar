@@ -75,7 +75,7 @@ export function BuildingSetupWizard({
 					toast.success(tLink("autoUpdatedCount", { count }));
 				}
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 			},
 			onError: () => {
@@ -105,7 +105,7 @@ export function BuildingSetupWizard({
 		orpc.pricing.studies.finishingItem.createBatch.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 			},
 		}),
@@ -142,7 +142,7 @@ export function BuildingSetupWizard({
 		orpc.pricing.studies.finishingItem.update.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 			},
 		}),

@@ -186,7 +186,7 @@ function StructuralPricingRow({
 		orpc.pricing.studies.structuralItem.update.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
 			},
 		}),

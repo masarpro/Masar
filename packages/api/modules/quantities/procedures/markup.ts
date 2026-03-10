@@ -1,17 +1,10 @@
 import { ORPCError } from "@orpc/server";
+import { STUDY_ERRORS } from "../lib/error-messages";
 import { db } from "@repo/database";
 import { z } from "zod";
+import { toNum } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
-
-// ═══════════════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════════════
-
-function toNum(v: unknown): number {
-	if (v == null) return 0;
-	return Number(v);
-}
 
 // ═══════════════════════════════════════════════════════════════
 // 1. GET MARKUP SETTINGS
@@ -54,7 +47,7 @@ export const markupGetSettings = protectedProcedure
 		});
 
 		if (!study) {
-			throw new ORPCError("NOT_FOUND", { message: "Study not found" });
+			throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.NOT_FOUND });
 		}
 
 		const sectionMarkups = await db.sectionMarkup.findMany({
@@ -255,7 +248,7 @@ export const markupGetProfitAnalysis = protectedProcedure
 		});
 
 		if (!study) {
-			throw new ORPCError("NOT_FOUND", { message: "Study not found" });
+			throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.NOT_FOUND });
 		}
 
 		// Get costing items grouped by section

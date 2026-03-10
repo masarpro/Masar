@@ -9,5 +9,8 @@ export { PricingEditor } from "./PricingEditor";
 
 // New components
 export { StudyHeaderCard } from "./StudyHeaderCard";
+export { StudyPageShell } from "./StudyPageShell";
+export { StudyPipelineStepper } from "./StudyPipelineStepper";
+export { QuantitiesSubTabs } from "./QuantitiesSubTabs";
 export { SummaryStatsCards } from "./SummaryStatsCards";
 export { StructuralAccordion } from "./StructuralAccordion";

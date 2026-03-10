@@ -26,6 +26,7 @@ import {
 	MEP_CATEGORY_ORDER,
 } from "../../lib/mep-categories";
 import type { MEPCategoryId, MEPMergedItem } from "../../types/mep";
+import { useTranslations } from "next-intl";
 
 interface MEPItemDialogProps {
 	item: MEPMergedItem | null;
@@ -43,6 +44,7 @@ export function MEPItemDialog({
 	onOpenChange,
 }: MEPItemDialogProps) {
 	const queryClient = useQueryClient();
+	const t = useTranslations("pricing.studies.mep");
 
 	// ─── Form state ───
 	const [name, setName] = useState("");
@@ -68,13 +70,13 @@ export function MEPItemDialog({
 		orpc.pricing.studies.mepItem.update.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies", "getById"]],
+					queryKey: [["pricing", "studies"]],
 				});
-				toast.success("تم تحديث البند بنجاح");
+				toast.success(t("messages.itemUpdated"));
 				onOpenChange(false);
 			},
 			onError: () => {
-				toast.error("حدث خطأ أثناء تحديث البند");
+				toast.error(t("messages.updateError"));
 			},
 		}),
 	);
@@ -85,7 +87,7 @@ export function MEPItemDialog({
 		const qty = parseFloat(quantity);
 
 		if (Number.isNaN(qty) || qty < 0) {
-			toast.error("الكمية غير صحيحة");
+			toast.error(t("messages.invalidQuantity"));
 			return;
 		}
 
@@ -120,13 +122,13 @@ export function MEPItemDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-lg" dir="rtl">
 				<DialogHeader>
-					<DialogTitle>تعديل بند MEP</DialogTitle>
+					<DialogTitle>{t("itemDialog.editTitle")}</DialogTitle>
 				</DialogHeader>
 
 				<div className="space-y-4 py-2">
 					{/* Name */}
 					<div className="space-y-1.5">
-						<Label>اسم البند</Label>
+						<Label>{t("itemDialog.itemName")}</Label>
 						<Input
 							value={name}
 							onChange={(e) => setName(e.target.value)}
@@ -137,7 +139,7 @@ export function MEPItemDialog({
 					{/* Category + SubCategory */}
 					<div className="grid grid-cols-2 gap-3">
 						<div className="space-y-1.5">
-							<Label>الفئة</Label>
+							<Label>{t("itemDialog.category")}</Label>
 							<Select
 								value={category}
 								onValueChange={(v) => {
@@ -158,7 +160,7 @@ export function MEPItemDialog({
 							</Select>
 						</div>
 						<div className="space-y-1.5">
-							<Label>الفئة الفرعية</Label>
+							<Label>{t("itemDialog.subCategory")}</Label>
 							<Select
 								value={subCategory}
 								onValueChange={setSubCategory}
@@ -182,7 +184,7 @@ export function MEPItemDialog({
 					{/* Quantity + Unit */}
 					<div className="grid grid-cols-2 gap-3">
 						<div className="space-y-1.5">
-							<Label>الكمية</Label>
+							<Label>{t("itemDialog.quantity")}</Label>
 							<Input
 								type="number"
 								value={quantity}
@@ -192,7 +194,7 @@ export function MEPItemDialog({
 							/>
 						</div>
 						<div className="space-y-1.5">
-							<Label>الوحدة</Label>
+							<Label>{t("itemDialog.unit")}</Label>
 							<Input
 								value={unit}
 								onChange={(e) => setUnit(e.target.value)}
@@ -203,7 +205,7 @@ export function MEPItemDialog({
 
 					{/* Quality Level */}
 					<div className="space-y-1.5">
-						<Label>مستوى الجودة</Label>
+						<Label>{t("itemDialog.qualityLevel")}</Label>
 						<Select
 							value={qualityLevel}
 							onValueChange={setQualityLevel}
@@ -213,13 +215,13 @@ export function MEPItemDialog({
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value="economy">
-									اقتصادي
+									{t("quality.economy")}
 								</SelectItem>
 								<SelectItem value="standard">
-									متوسط
+									{t("quality.standard")}
 								</SelectItem>
 								<SelectItem value="premium">
-									ممتاز
+									{t("quality.premium")}
 								</SelectItem>
 							</SelectContent>
 						</Select>
@@ -229,7 +231,7 @@ export function MEPItemDialog({
 					{item?.dataSource === "auto" && item.sourceFormula && (
 						<div className="space-y-1.5">
 							<Label className="text-muted-foreground">
-								المعادلة (للقراءة فقط)
+								{t("itemDialog.formulaReadOnly")}
 							</Label>
 							<p className="text-xs text-muted-foreground bg-muted rounded-md p-2">
 								{item.sourceFormula}
@@ -243,7 +245,7 @@ export function MEPItemDialog({
 						variant="outline"
 						onClick={() => onOpenChange(false)}
 					>
-						إلغاء
+						{t("itemDialog.cancel")}
 					</Button>
 					<Button
 						onClick={handleSave}
@@ -251,7 +253,7 @@ export function MEPItemDialog({
 							updateMutation.isPending || !name || !quantity
 						}
 					>
-						{updateMutation.isPending ? "جاري الحفظ..." : "حفظ"}
+						{updateMutation.isPending ? t("itemDialog.saving") : t("itemDialog.save")}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

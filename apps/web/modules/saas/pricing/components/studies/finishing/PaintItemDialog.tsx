@@ -549,7 +549,7 @@ export function PaintItemDialog({
 		orpc.pricing.studies.finishingItem.create.mutationOptions({
 			onSuccess: () => {
 				toast.success(tFinishing("itemSaved"));
-				queryClient.invalidateQueries({ queryKey: [["pricing", "studies", "getById"]] });
+				queryClient.invalidateQueries({ queryKey: [["pricing", "studies"]] });
 				onOpenChange(false);
 			},
 			onError: () => toast.error(tFinishing("itemSaveError")),
@@ -560,7 +560,7 @@ export function PaintItemDialog({
 		orpc.pricing.studies.finishingItem.update.mutationOptions({
 			onSuccess: () => {
 				toast.success(tFinishing("itemSaved"));
-				queryClient.invalidateQueries({ queryKey: [["pricing", "studies", "getById"]] });
+				queryClient.invalidateQueries({ queryKey: [["pricing", "studies"]] });
 				onOpenChange(false);
 			},
 			onError: () => toast.error(tFinishing("itemSaveError")),
