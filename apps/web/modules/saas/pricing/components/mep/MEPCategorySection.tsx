@@ -33,6 +33,7 @@ interface MEPCategorySectionProps {
 	items: MEPMergedItem[];
 	onToggleEnabled: (item: MEPMergedItem, enabled: boolean) => void;
 	onEdit: (item: MEPMergedItem) => void;
+	showPricing?: boolean;
 }
 
 export function MEPCategorySection({
@@ -40,6 +41,7 @@ export function MEPCategorySection({
 	items,
 	onToggleEnabled,
 	onEdit,
+	showPricing = true,
 }: MEPCategorySectionProps) {
 	const [isOpen, setIsOpen] = useState(true);
 	const category = MEP_CATEGORIES[categoryId];
@@ -81,8 +83,8 @@ export function MEPCategorySection({
 					<div className="text-start">
 						<h3 className="font-semibold">{category.nameAr}</h3>
 						<p className="text-xs text-muted-foreground">
-							{items.length} بند &middot;{" "}
-							{formatCurrency(totalCost)}
+							{items.length} بند
+							{showPricing && <> &middot; {formatCurrency(totalCost)}</>}
 						</p>
 					</div>
 				</div>
@@ -97,16 +99,16 @@ export function MEPCategorySection({
 			{isOpen && (
 				<div className="border-t px-4 py-3 space-y-4">
 					{/* Header row */}
-					<div className="grid grid-cols-[32px_1fr_80px_60px_90px_90px_32px] sm:grid-cols-[32px_1fr_80px_60px_90px_90px_80px_32px] items-center gap-2 px-3 text-xs text-muted-foreground font-medium">
+					<div className={showPricing ? "grid grid-cols-[32px_1fr_80px_60px_90px_90px_32px] sm:grid-cols-[32px_1fr_80px_60px_90px_90px_80px_32px] items-center gap-2 px-3 text-xs text-muted-foreground font-medium" : "grid grid-cols-[32px_1fr_80px_60px_80px_32px] sm:grid-cols-[32px_1fr_80px_60px_80px_32px] items-center gap-2 px-3 text-xs text-muted-foreground font-medium"}>
 						<span />
 						<span>البند</span>
 						<span className="text-left">الكمية</span>
 						<span>الوحدة</span>
-						<span className="text-left">سعر الوحدة</span>
-						<span className="text-left">الإجمالي</span>
-						<span className="hidden sm:block text-center">
+						{showPricing && <span className="text-left">سعر الوحدة</span>}
+						{showPricing && <span className="text-left">الإجمالي</span>}
+						{showPricing && <span className="hidden sm:block text-center">
 							المعادلة
-						</span>
+						</span>}
 						<span />
 					</div>
 

@@ -98,6 +98,8 @@ export async function createCostStudy(data: {
 	numberOfFloors: number;
 	hasBasement?: boolean;
 	finishingLevel: string;
+	studyType?: "FULL_PROJECT" | "CUSTOM_ITEMS" | "LUMP_SUM_ANALYSIS";
+	contractValue?: number;
 }) {
 	return db.costStudy.create({
 		data: {
@@ -112,6 +114,8 @@ export async function createCostStudy(data: {
 			numberOfFloors: data.numberOfFloors,
 			hasBasement: data.hasBasement ?? false,
 			finishingLevel: data.finishingLevel,
+			studyType: data.studyType ?? "FULL_PROJECT",
+			contractValue: data.contractValue,
 		},
 	});
 }

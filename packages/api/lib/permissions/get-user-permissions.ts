@@ -124,6 +124,15 @@ function fillMissingSections(
 			quotations: f.quotations,
 			pricing: q.pricing,
 			leads: q.view || f.view,
+			editQuantities: q.create || q.edit,
+			approveQuantities: q.create || q.edit,
+			editSpecs: q.create || q.edit,
+			approveSpecs: q.create || q.edit,
+			editCosting: q.pricing,
+			approveCosting: q.pricing,
+			editSellingPrice: q.pricing,
+			generateQuotation: f.quotations,
+			convertToProject: false,
 		};
 	}
 

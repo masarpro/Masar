@@ -46,6 +46,7 @@ interface MEPDashboardProps {
 		laborPrice: number;
 	}) => void;
 	hasNewItems?: boolean;
+	showPricing?: boolean;
 }
 
 export function MEPDashboard({
@@ -56,6 +57,7 @@ export function MEPDashboard({
 	isRederiving,
 	onAddManual,
 	hasNewItems,
+	showPricing = true,
 }: MEPDashboardProps) {
 	// Group items by category
 	const categoryData = useMemo(() => {
@@ -167,6 +169,7 @@ export function MEPDashboard({
 						items={cat.items}
 						onToggleEnabled={onToggleEnabled}
 						onEdit={onEdit}
+						showPricing={showPricing}
 					/>
 				))}
 			</div>

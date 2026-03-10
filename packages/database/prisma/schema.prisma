@@ -1000,6 +1000,11 @@ model Organization {
   // Project BOQ Items
   boqItems                ProjectBOQItem[]
 
+  // Costing & Manual Items
+  costingItems            CostingItem[]
+  manualItems             ManualItem[]
+  sectionMarkups          SectionMarkup[]
+
   // ═══ نهاية حقول مسار ═══
 
   @@unique([slug])
@@ -1237,6 +1242,32 @@ model CostStudy {
   projectId      String?  @map("project_id")
   project        Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
+  // ═══ Pipeline — مراحل الدراسة ═══
+  studyType            StudyType     @default(FULL_PROJECT) @map("study_type")
+
+  // حالة كل مرحلة
+  quantitiesStatus     StageStatus   @default(DRAFT) @map("quantities_status")
+  specsStatus          StageStatus   @default(NOT_STARTED) @map("specs_status")
+  costingStatus        StageStatus   @default(NOT_STARTED) @map("costing_status")
+  pricingStatus        StageStatus   @default(NOT_STARTED) @map("pricing_status")
+  quotationStatus      StageStatus   @default(NOT_STARTED) @map("quotation_status")
+
+  // من يعمل على كل مرحلة
+  quantitiesAssigneeId String?       @map("quantities_assignee_id")
+  specsAssigneeId      String?       @map("specs_assignee_id")
+  costingAssigneeId    String?       @map("costing_assignee_id")
+  pricingAssigneeId    String?       @map("pricing_assignee_id")
+
+  // للمقطوعية
+  contractValue        Decimal?      @map("contract_value") @db.Decimal(15, 2)
+
+  // ربط بعرض سعر مالي وبمشروع
+  generatedQuotationId String?       @map("generated_quotation_id")
+  convertedProjectId   String?       @map("converted_project_id")
+
+  // مواصفات إنشائية
+  structuralSpecs      Json?         @map("structural_specs") @db.JsonB
+
   // العلاقات
   structuralItems StructuralItem[]
   finishingItems  FinishingItem[]
@@ -1245,6 +1276,9 @@ model CostStudy {
   quotes          Quote[]
   lead            Lead?
   boqItems        ProjectBOQItem[]
+  costingItems    CostingItem[]
+  manualItems     ManualItem[]
+  sectionMarkups  SectionMarkup[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -4740,4 +4774,122 @@ model ActivationCodeUsage {
   @@index([codeId])
   @@index([organizationId])
   @@map("activation_code_usages")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PIPELINE ENUMS — مراحل دراسة الكميات والتسعير
+// ═══════════════════════════════════════════════════════════════════════════
+
+enum StudyType {
+  FULL_PROJECT
+  CUSTOM_ITEMS
+  LUMP_SUM_ANALYSIS
+}
+
+enum StageStatus {
+  NOT_STARTED
+  DRAFT
+  IN_REVIEW
+  APPROVED
+}
+
+enum LaborCostType {
+  PER_SQM
+  PER_CBM
+  PER_UNIT
+  PER_LM
+  LUMP_SUM
+  SALARY
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COSTING & MANUAL ITEMS — بنود التسعير والبنود اليدوية
+// ═══════════════════════════════════════════════════════════════════════════
+
+model CostingItem {
+  id               String          @id @default(cuid())
+  costStudyId      String          @map("cost_study_id")
+  organizationId   String          @map("organization_id")
+
+  section          String          // STRUCTURAL, FINISHING, MEP, LABOR, MANUAL
+  sourceItemId     String?         @map("source_item_id")
+  sourceItemType   String?         @map("source_item_type")
+
+  description      String
+  unit             String
+  quantity         Decimal         @db.Decimal(15, 4)
+
+  // تسعير المواد
+  materialUnitCost Decimal?        @map("material_unit_cost") @db.Decimal(15, 2)
+  materialTotal    Decimal?        @map("material_total") @db.Decimal(15, 2)
+
+  // تسعير المصنعيات
+  laborType        LaborCostType?  @map("labor_type")
+  laborUnitCost    Decimal?        @map("labor_unit_cost") @db.Decimal(15, 2)
+  laborQuantity    Decimal?        @map("labor_quantity") @db.Decimal(15, 4)
+  laborWorkers     Int?            @map("labor_workers")
+  laborSalary      Decimal?        @map("labor_salary") @db.Decimal(15, 2)
+  laborMonths      Int?            @map("labor_months")
+  laborTotal       Decimal?        @map("labor_total") @db.Decimal(15, 2)
+
+  // تشوين
+  storageCostPercent Decimal?      @map("storage_cost_percent") @db.Decimal(5, 2)
+  storageCostFixed   Decimal?      @map("storage_cost_fixed") @db.Decimal(15, 2)
+  storageTotal       Decimal?      @map("storage_total") @db.Decimal(15, 2)
+
+  // مصاريف أخرى
+  otherCosts       Decimal?        @map("other_costs") @db.Decimal(15, 2)
+
+  // إجمالي
+  totalCost        Decimal?        @map("total_cost") @db.Decimal(15, 2)
+
+  sortOrder        Int             @default(0) @map("sort_order")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  costStudy        CostStudy       @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
+  organization     Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([costStudyId, section])
+  @@index([organizationId])
+  @@map("costing_items")
+}
+
+model ManualItem {
+  id               String          @id @default(cuid())
+  costStudyId      String          @map("cost_study_id")
+  organizationId   String          @map("organization_id")
+
+  description      String
+  unit             String
+  quantity         Decimal         @db.Decimal(15, 4)
+  section          String?
+  notes            String?
+
+  sortOrder        Int             @default(0) @map("sort_order")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  costStudy        CostStudy       @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
+  organization     Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([costStudyId])
+  @@index([organizationId])
+  @@map("manual_items")
+}
+
+model SectionMarkup {
+  id               String          @id @default(cuid())
+  costStudyId      String          @map("cost_study_id")
+  organizationId   String          @map("organization_id")
+
+  section          String          // STRUCTURAL, FINISHING, MEP, LABOR
+  markupPercent    Decimal         @map("markup_percent") @db.Decimal(5, 2)
+
+  costStudy        CostStudy       @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
+  organization     Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([costStudyId, section])
+  @@index([organizationId])
+  @@map("section_markups")
 }

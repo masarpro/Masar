@@ -24,6 +24,12 @@ import { specTemplateUpdate } from "./procedures/spec-template-update";
 import { specTemplateDelete } from "./procedures/spec-template-delete";
 import { specTemplateSetDefault } from "./procedures/spec-template-set-default";
 import { finishingItemBatchSpecUpdate } from "./procedures/finishing-item-batch-spec-update";
+import { getStages, approveStage, reopenStage, assignStage } from "./procedures/stages";
+import { manualItemsList, manualItemCreate, manualItemUpdate, manualItemDelete, manualItemReorder } from "./procedures/manual-items";
+import { quantitiesSummary } from "./procedures/quantities-summary";
+import { getStructuralSpecs, setStructuralSpecs } from "./procedures/structural-specs";
+import { costingGenerateItems, costingGetItems, costingUpdateItem, costingBulkUpdate, costingSetSectionLabor, costingGetSummary } from "./procedures/costing";
+import { markupGetSettings, markupSetUniform, markupSetSectionMarkups, markupGetProfitAnalysis } from "./procedures/markup";
 
 export const quantitiesRouter = {
 	list,
@@ -69,5 +75,37 @@ export const quantitiesRouter = {
 		update: specTemplateUpdate,
 		delete: specTemplateDelete,
 		setDefault: specTemplateSetDefault,
+	},
+	stages: {
+		get: getStages,
+		approve: approveStage,
+		reopen: reopenStage,
+		assign: assignStage,
+	},
+	manualItem: {
+		list: manualItemsList,
+		create: manualItemCreate,
+		update: manualItemUpdate,
+		delete: manualItemDelete,
+		reorder: manualItemReorder,
+	},
+	quantitiesSummary,
+	structuralSpecs: {
+		get: getStructuralSpecs,
+		set: setStructuralSpecs,
+	},
+	costing: {
+		generate: costingGenerateItems,
+		getItems: costingGetItems,
+		updateItem: costingUpdateItem,
+		bulkUpdate: costingBulkUpdate,
+		setSectionLabor: costingSetSectionLabor,
+		getSummary: costingGetSummary,
+	},
+	markup: {
+		getSettings: markupGetSettings,
+		setUniform: markupSetUniform,
+		setSectionMarkups: markupSetSectionMarkups,
+		getProfitAnalysis: markupGetProfitAnalysis,
 	},
 };

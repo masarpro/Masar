@@ -10,7 +10,10 @@ import {
 	BarChart3,
 	Building,
 	Calculator,
+	ClipboardList,
 	CreditCard,
+	DollarSign,
+	FileCheck2,
 	FileSpreadsheet,
 	FileText,
 	FolderKanban,
@@ -19,6 +22,7 @@ import {
 	HomeIcon,
 	Key,
 	Layout,
+	ListChecks,
 	Receipt,
 	ReceiptIcon,
 	SettingsIcon,
@@ -61,6 +65,12 @@ export function useSidebarMenu(): {
 	// Extract projectId from pathname when inside a project
 	const projectId = useMemo(() => {
 		const match = pathname.match(/\/projects\/([^/]+)/);
+		return match?.[1] ?? null;
+	}, [pathname]);
+
+	// Extract studyId from pathname when inside a pricing study
+	const studyId = useMemo(() => {
+		const match = pathname.match(/\/pricing\/studies\/([^/]+)/);
 		return match?.[1] ?? null;
 	}, [pathname]);
 
@@ -230,6 +240,46 @@ export function useSidebarMenu(): {
 									href: `${orgPrefix}/pricing/studies`,
 									icon: Calculator,
 								},
+								...(studyId
+									? [
+											{
+												id: "study-overview",
+												label: t("pricing.pipeline.studyOverview"),
+												href: `${orgPrefix}/pricing/studies/${studyId}`,
+												icon: HomeIcon,
+											},
+											{
+												id: "study-quantities",
+												label: t("pricing.pipeline.quantities"),
+												href: `${orgPrefix}/pricing/studies/${studyId}/quantities`,
+												icon: ListChecks,
+											},
+											{
+												id: "study-specifications",
+												label: t("pricing.pipeline.specifications"),
+												href: `${orgPrefix}/pricing/studies/${studyId}/specifications`,
+												icon: ClipboardList,
+											},
+											{
+												id: "study-costing",
+												label: t("pricing.pipeline.costing"),
+												href: `${orgPrefix}/pricing/studies/${studyId}/costing`,
+												icon: Calculator,
+											},
+											{
+												id: "study-selling-price",
+												label: t("pricing.pipeline.sellingPrice"),
+												href: `${orgPrefix}/pricing/studies/${studyId}/selling-price`,
+												icon: DollarSign,
+											},
+											{
+												id: "study-quotation",
+												label: t("pricing.pipeline.quotation"),
+												href: `${orgPrefix}/pricing/studies/${studyId}/quotation`,
+												icon: FileCheck2,
+											},
+										]
+									: []),
 								{
 									id: "pricing-quotations",
 									label: t("pricing.shell.sections.quotations"),
@@ -307,6 +357,7 @@ export function useSidebarMenu(): {
 		isOrganizationAdmin,
 		user?.role,
 		projectId,
+		studyId,
 	]);
 
 	const activeId = useMemo(() => {

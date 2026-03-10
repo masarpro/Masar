@@ -22,6 +22,8 @@ export const create = subscriptionProcedure
 			numberOfFloors: z.number().int().positive().default(1),
 			hasBasement: z.boolean().default(false),
 			finishingLevel: z.string().default("medium"),
+			studyType: z.enum(["FULL_PROJECT", "CUSTOM_ITEMS", "LUMP_SUM_ANALYSIS"]).default("FULL_PROJECT"),
+			contractValue: z.number().positive().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -43,6 +45,8 @@ export const create = subscriptionProcedure
 			numberOfFloors: input.numberOfFloors,
 			hasBasement: input.hasBasement,
 			finishingLevel: input.finishingLevel,
+			studyType: input.studyType,
+			contractValue: input.contractValue,
 		});
 
 		// Update onboarding checklist

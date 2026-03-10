@@ -23,6 +23,7 @@ import { useTranslations } from "next-intl";
 import { formatCurrency } from "../../lib/utils";
 import { LeadStatusBadge } from "../leads/LeadStatusBadge";
 import { StudyOverviewSkeleton } from "@saas/shared/components/skeletons";
+import { PipelineBar } from "../pipeline/PipelineBar";
 
 interface CostStudyOverviewProps {
 	organizationId: string;
@@ -70,6 +71,23 @@ export function CostStudyOverview({
 		}),
 	);
 
+	// ─── Fetch stages ───
+	const { data: stagesData } = useQuery(
+		orpc.pricing.studies.stages.get.queryOptions({
+			input: { organizationId, studyId },
+		}),
+	);
+
+	const stages = stagesData?.stages ?? {
+		quantities: "DRAFT" as const,
+		specs: "NOT_STARTED" as const,
+		costing: "NOT_STARTED" as const,
+		pricing: "NOT_STARTED" as const,
+		quotation: "NOT_STARTED" as const,
+	};
+
+	const studyType = stagesData?.studyType ?? "FULL_PROJECT";
+
 	if (isLoading) {
 		return <StudyOverviewSkeleton />;
 	}
@@ -94,7 +112,7 @@ export function CostStudyOverview({
 		{
 			title: t("pricing.studies.structural.title"),
 			icon: Hammer,
-			href: `${basePath}/structural`,
+			href: `${basePath}/quantities?tab=structural`,
 			count: study.structuralItems.length,
 			cost: study.structuralCost,
 			accent: "bg-orange-500",
@@ -105,7 +123,7 @@ export function CostStudyOverview({
 		{
 			title: t("pricing.studies.finishing.title"),
 			icon: PaintBucket,
-			href: `${basePath}/finishing`,
+			href: `${basePath}/quantities?tab=finishing`,
 			count: study.finishingItems.length,
 			cost: study.finishingCost,
 			accent: "bg-violet-500",
@@ -116,7 +134,7 @@ export function CostStudyOverview({
 		{
 			title: t("pricing.studies.mep.title"),
 			icon: Wrench,
-			href: `${basePath}/mep`,
+			href: `${basePath}/quantities?tab=mep`,
 			count: study.mepItems.length,
 			cost: study.mepCost,
 			accent: "bg-sky-500",
@@ -127,7 +145,7 @@ export function CostStudyOverview({
 		{
 			title: t("pricing.studies.pricing.title"),
 			icon: Receipt,
-			href: `${basePath}/pricing`,
+			href: `${basePath}/selling-price`,
 			count: study.quotes.length,
 			cost: study.totalCost,
 			accent: "bg-sky-500",
@@ -144,6 +162,15 @@ export function CostStudyOverview({
 
 	return (
 		<div className="space-y-6">
+			{/* Pipeline Bar */}
+			<PipelineBar
+				studyId={studyId}
+				organizationSlug={organizationSlug}
+				currentStage="quantities"
+				stages={stages}
+				studyType={studyType}
+			/>
+
 			{/* Header Section */}
 			<div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
 				<div className="flex items-start gap-4">

@@ -54,6 +54,8 @@ export function CreateCostStudyDialog({
 		name: "",
 		customerName: "",
 		projectType: "residential",
+		studyType: "FULL_PROJECT" as "FULL_PROJECT" | "CUSTOM_ITEMS" | "LUMP_SUM_ANALYSIS",
+		contractValue: "",
 	});
 
 	const createMutation = useMutation(
@@ -77,6 +79,8 @@ export function CreateCostStudyDialog({
 			name: formData.name || undefined,
 			customerName: formData.customerName || undefined,
 			projectType: formData.projectType,
+			studyType: formData.studyType,
+			...(formData.contractValue ? { contractValue: Number(formData.contractValue) } : {}),
 		});
 	};
 
@@ -118,6 +122,46 @@ export function CreateCostStudyDialog({
 							className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 						/>
 					</div>
+
+					<div className="space-y-2">
+						<Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+							{t("pricing.studies.form.studyType")}
+						</Label>
+						<Select
+							value={formData.studyType}
+							onValueChange={(value) =>
+								setFormData({ ...formData, studyType: value as typeof formData.studyType })
+							}
+						>
+							<SelectTrigger className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent className="rounded-xl">
+								<SelectItem value="FULL_PROJECT" className="rounded-lg">{t("pricing.studies.studyTypes.fullProject")}</SelectItem>
+								<SelectItem value="CUSTOM_ITEMS" className="rounded-lg">{t("pricing.studies.studyTypes.customItems")}</SelectItem>
+								<SelectItem value="LUMP_SUM_ANALYSIS" className="rounded-lg">{t("pricing.studies.studyTypes.lumpSumAnalysis")}</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+
+					{formData.studyType === "LUMP_SUM_ANALYSIS" && (
+						<div className="space-y-2">
+							<Label htmlFor="contractValue" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+								{t("pricing.studies.form.contractValue")}
+							</Label>
+							<Input
+								id="contractValue"
+								type="number"
+								value={formData.contractValue}
+								onChange={(e) =>
+									setFormData({ ...formData, contractValue: e.target.value })
+								}
+								placeholder={t("pricing.studies.form.contractValuePlaceholder")}
+								className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
+								dir="ltr"
+							/>
+						</div>
+					)}
 
 					<div className="space-y-2">
 						<Label htmlFor="projectType" className="text-sm font-medium text-slate-700 dark:text-slate-300">

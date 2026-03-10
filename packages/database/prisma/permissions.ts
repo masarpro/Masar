@@ -25,6 +25,16 @@ export interface PricingPermissions {
 	quotations: boolean;
 	pricing: boolean;
 	leads: boolean;
+	// Pipeline stage permissions
+	editQuantities: boolean;
+	approveQuantities: boolean;
+	editSpecs: boolean;
+	approveSpecs: boolean;
+	editCosting: boolean;
+	approveCosting: boolean;
+	editSellingPrice: boolean;
+	generateQuotation: boolean;
+	convertToProject: boolean;
 }
 
 export interface FinancePermissions {
@@ -113,6 +123,15 @@ export function createEmptyPermissions(): Permissions {
 			quotations: false,
 			pricing: false,
 			leads: false,
+			editQuantities: false,
+			approveQuantities: false,
+			editSpecs: false,
+			approveSpecs: false,
+			editCosting: false,
+			approveCosting: false,
+			editSellingPrice: false,
+			generateQuotation: false,
+			convertToProject: false,
 		},
 		finance: {
 			view: false,
@@ -175,6 +194,15 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			quotations: true,
 			pricing: true,
 			leads: true,
+			editQuantities: true,
+			approveQuantities: true,
+			editSpecs: true,
+			approveSpecs: true,
+			editCosting: true,
+			approveCosting: true,
+			editSellingPrice: true,
+			generateQuotation: true,
+			convertToProject: true,
 		},
 		finance: {
 			view: true,
@@ -231,6 +259,15 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			quotations: true,
 			pricing: true,
 			leads: true,
+			editQuantities: true,
+			approveQuantities: true,
+			editSpecs: true,
+			approveSpecs: true,
+			editCosting: false,
+			approveCosting: true,
+			editSellingPrice: false,
+			generateQuotation: true,
+			convertToProject: false,
 		},
 		finance: {
 			view: true,
@@ -287,6 +324,15 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			quotations: true,
 			pricing: true,
 			leads: true,
+			editQuantities: false,
+			approveQuantities: false,
+			editSpecs: false,
+			approveSpecs: false,
+			editCosting: true,
+			approveCosting: false,
+			editSellingPrice: false,
+			generateQuotation: false,
+			convertToProject: false,
 		},
 		finance: {
 			view: true,
@@ -343,6 +389,15 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			quotations: false,
 			pricing: false,
 			leads: false,
+			editQuantities: true,
+			approveQuantities: false,
+			editSpecs: true,
+			approveSpecs: false,
+			editCosting: false,
+			approveCosting: false,
+			editSellingPrice: false,
+			generateQuotation: false,
+			convertToProject: false,
 		},
 		finance: {
 			view: false,
@@ -399,6 +454,15 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			quotations: false,
 			pricing: false,
 			leads: false,
+			editQuantities: false,
+			approveQuantities: false,
+			editSpecs: false,
+			approveSpecs: false,
+			editCosting: false,
+			approveCosting: false,
+			editSellingPrice: false,
+			generateQuotation: false,
+			convertToProject: false,
 		},
 		finance: {
 			view: false,
@@ -455,6 +519,15 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, Permissions> = {
 			quotations: false,
 			pricing: false,
 			leads: false,
+			editQuantities: false,
+			approveQuantities: false,
+			editSpecs: false,
+			approveSpecs: false,
+			editCosting: false,
+			approveCosting: false,
+			editSellingPrice: false,
+			generateQuotation: false,
+			convertToProject: false,
 		},
 		finance: {
 			view: false,

@@ -252,6 +252,27 @@ const nextConfig: NextConfig = {
 				destination: "/app/:slug/pricing/studies/:path*",
 				permanent: true,
 			},
+			// Pipeline stage redirects — old study sub-pages to new pipeline
+			{
+				source: "/app/:slug/pricing/studies/:studyId/structural",
+				destination: "/app/:slug/pricing/studies/:studyId/quantities?tab=structural",
+				permanent: true,
+			},
+			{
+				source: "/app/:slug/pricing/studies/:studyId/finishing",
+				destination: "/app/:slug/pricing/studies/:studyId/quantities?tab=finishing",
+				permanent: true,
+			},
+			{
+				source: "/app/:slug/pricing/studies/:studyId/mep",
+				destination: "/app/:slug/pricing/studies/:studyId/quantities?tab=mep",
+				permanent: true,
+			},
+			{
+				source: "/app/:slug/pricing/studies/:studyId/pricing",
+				destination: "/app/:slug/pricing/studies/:studyId/selling-price",
+				permanent: true,
+			},
 		];
 	},
 	webpack: (config, { webpack, isServer }) => {
