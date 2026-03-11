@@ -71,7 +71,7 @@ export function QuotationCustomizer({
 	const fmt = (n: number) =>
 		Number(n).toLocaleString("ar-SA", { maximumFractionDigits: 2 });
 
-	const sampleItems = (costingItems ?? []).slice(0, 5);
+	const sampleItems = ((costingItems as any) ?? []).slice(0, 5);
 
 	return (
 		<div className="rounded-xl border border-border bg-card p-5 space-y-5">
@@ -188,7 +188,7 @@ export function QuotationCustomizer({
 									</tr>
 								</thead>
 								<tbody>
-									{sampleItems.map((item, idx) => (
+									{sampleItems.map((item: any, idx: number) => (
 										<tr key={item.id} className="border-b last:border-0">
 											{config.showItemNumber && <td className="px-2 py-1.5">{idx + 1}</td>}
 											{config.showDescription && <td className="px-2 py-1.5">{item.description}</td>}

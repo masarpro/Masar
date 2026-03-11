@@ -63,8 +63,8 @@ export function StudyQuotationPageContent({
 		}),
 	);
 
-	const stages = stagesData?.stages ?? [];
-	const pricingStage = stages.find((s) => s.stage === "PRICING");
+	const stages = (stagesData as any)?.stages ?? [];
+	const pricingStage = stages.find((s: any) => s.stage === "PRICING");
 	const isPricingApproved = pricingStage?.status === "APPROVED";
 
 	const fmt = (n: number) =>
@@ -91,10 +91,10 @@ export function StudyQuotationPageContent({
 		);
 	}
 
-	const buildingArea = Number(study?.buildingArea ?? 0);
-	const totalCost = profitData?.totalCost ?? 0;
-	const grandTotal = profitData?.grandTotal ?? 0;
-	const profitPercent = profitData?.profitPercent ?? 0;
+	const buildingArea = Number((study as any)?.buildingArea ?? 0);
+	const totalCost = (profitData as any)?.totalCost ?? 0;
+	const grandTotal = (profitData as any)?.grandTotal ?? 0;
+	const profitPercent = (profitData as any)?.profitPercent ?? 0;
 
 	const handleFormatChange = (f: QuotationFormatType) => {
 		setFormat(f);
@@ -116,7 +116,7 @@ export function StudyQuotationPageContent({
 				<div className="flex flex-wrap gap-6 text-sm">
 					<div>
 						<span className="text-muted-foreground">الدراسة:</span>{" "}
-						<span className="font-medium">{study?.name ?? "—"}</span>
+						<span className="font-medium">{(study as any)?.name ?? "—"}</span>
 					</div>
 					<div>
 						<span className="text-muted-foreground">التكلفة:</span>{" "}
@@ -134,11 +134,11 @@ export function StudyQuotationPageContent({
 			</div>
 
 			{/* Existing quotes from this study */}
-			{(existingQuotes ?? []).length > 0 && (
+			{((existingQuotes as any) ?? []).length > 0 && (
 				<div className="rounded-xl border border-border bg-card p-4 space-y-3">
 					<h4 className="font-medium text-sm">عروض أسعار سابقة من هذه الدراسة</h4>
 					<div className="space-y-2">
-						{(existingQuotes ?? []).map((q) => (
+						{(existingQuotes as any ?? []).map((q: any) => (
 							<div
 								key={q.id}
 								className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-muted/50"
@@ -207,7 +207,7 @@ export function StudyQuotationPageContent({
 									<Input
 										placeholder="بناء وتشطيب فيلا سكنية حسب المواصفات المرفقة"
 										value={lumpSumDesc}
-										onChange={(e) => setLumpSumDesc(e.target.value)}
+										onChange={(e: any) => setLumpSumDesc(e.target.value)}
 										className="rounded-lg"
 									/>
 								</div>

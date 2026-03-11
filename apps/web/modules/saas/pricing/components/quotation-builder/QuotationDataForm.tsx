@@ -86,7 +86,7 @@ export function QuotationDataForm({
 	// Create mutation
 	const createMutation = useMutation(
 		orpc.pricing.studies.createStudyQuotation.mutationOptions({
-			onSuccess: (data) => {
+			onSuccess: (data: any) => {
 				toast.success("تم إنشاء عرض السعر بنجاح");
 				queryClient.invalidateQueries({
 					queryKey: ["pricing"],
@@ -107,7 +107,7 @@ export function QuotationDataForm({
 			return;
 		}
 
-		createMutation.mutate({
+		(createMutation as any).mutate({
 			organizationId,
 			studyId,
 			format,
@@ -145,7 +145,7 @@ export function QuotationDataForm({
 						<Label className="text-xs">اسم العميل *</Label>
 						<Input
 							value={clientName}
-							onChange={(e) => setClientName(e.target.value)}
+							onChange={(e: any) => setClientName(e.target.value)}
 							placeholder="أحمد محمد"
 							className="rounded-lg"
 						/>
@@ -154,7 +154,7 @@ export function QuotationDataForm({
 						<Label className="text-xs">الشركة</Label>
 						<Input
 							value={clientCompany}
-							onChange={(e) => setClientCompany(e.target.value)}
+							onChange={(e: any) => setClientCompany(e.target.value)}
 							placeholder="شركة البناء الحديث"
 							className="rounded-lg"
 						/>
@@ -163,7 +163,7 @@ export function QuotationDataForm({
 						<Label className="text-xs">الهاتف</Label>
 						<Input
 							value={clientPhone}
-							onChange={(e) => setClientPhone(e.target.value)}
+							onChange={(e: any) => setClientPhone(e.target.value)}
 							placeholder="05xxxxxxxx"
 							dir="ltr"
 							className="rounded-lg"
@@ -173,7 +173,7 @@ export function QuotationDataForm({
 						<Label className="text-xs">البريد الإلكتروني</Label>
 						<Input
 							value={clientEmail}
-							onChange={(e) => setClientEmail(e.target.value)}
+							onChange={(e: any) => setClientEmail(e.target.value)}
 							placeholder="email@example.com"
 							dir="ltr"
 							className="rounded-lg"
@@ -183,7 +183,7 @@ export function QuotationDataForm({
 						<Label className="text-xs">الرقم الضريبي</Label>
 						<Input
 							value={clientTaxNumber}
-							onChange={(e) => setClientTaxNumber(e.target.value)}
+							onChange={(e: any) => setClientTaxNumber(e.target.value)}
 							placeholder="300xxxxxxxxx"
 							dir="ltr"
 							className="rounded-lg"
@@ -195,7 +195,7 @@ export function QuotationDataForm({
 							<Input
 								type="number"
 								value={validDays}
-								onChange={(e) => setValidDays(e.target.value)}
+								onChange={(e: any) => setValidDays(e.target.value)}
 								className="h-10 w-20 rounded-lg"
 								dir="ltr"
 							/>
@@ -240,7 +240,7 @@ export function QuotationDataForm({
 								<Input
 									type="number"
 									value={discountValue}
-									onChange={(e) => setDiscountValue(e.target.value)}
+									onChange={(e: any) => setDiscountValue(e.target.value)}
 									className="h-8 w-24 rounded-lg"
 									dir="ltr"
 									placeholder={discountType === "percent" ? "%" : "ر.س"}
@@ -280,7 +280,7 @@ export function QuotationDataForm({
 						<Label className="text-xs">شروط الدفع</Label>
 						<Input
 							value={paymentTerms}
-							onChange={(e) => setPaymentTerms(e.target.value)}
+							onChange={(e: any) => setPaymentTerms(e.target.value)}
 							placeholder="50% مقدم — 50% عند الانتهاء"
 							className="rounded-lg"
 						/>
@@ -289,7 +289,7 @@ export function QuotationDataForm({
 						<Label className="text-xs">مدة التنفيذ</Label>
 						<Input
 							value={deliveryTerms}
-							onChange={(e) => setDeliveryTerms(e.target.value)}
+							onChange={(e: any) => setDeliveryTerms(e.target.value)}
 							placeholder="6 أشهر من تاريخ التعاقد"
 							className="rounded-lg"
 						/>
@@ -298,7 +298,7 @@ export function QuotationDataForm({
 						<Label className="text-xs">شروط الضمان</Label>
 						<Input
 							value={warrantyTerms}
-							onChange={(e) => setWarrantyTerms(e.target.value)}
+							onChange={(e: any) => setWarrantyTerms(e.target.value)}
 							placeholder="سنة واحدة على الأعمال"
 							className="rounded-lg"
 						/>
@@ -307,7 +307,7 @@ export function QuotationDataForm({
 						<Label className="text-xs">ملاحظات</Label>
 						<Input
 							value={notes}
-							onChange={(e) => setNotes(e.target.value)}
+							onChange={(e: any) => setNotes(e.target.value)}
 							placeholder="ملاحظات إضافية..."
 							className="rounded-lg"
 						/>
