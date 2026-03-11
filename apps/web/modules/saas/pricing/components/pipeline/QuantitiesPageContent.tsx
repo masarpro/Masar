@@ -93,6 +93,14 @@ export function QuantitiesPageContent({
 		quotation: "NOT_STARTED" as const,
 	};
 
+	const canApprove = stagesData?.canApprove ?? {
+		quantities: true,
+		specs: true,
+		costing: true,
+		pricing: true,
+		quotation: true,
+	};
+
 	return (
 		<div className="space-y-4" dir="rtl">
 			{/* Study Name */}
@@ -175,6 +183,7 @@ export function QuantitiesPageContent({
 					stage="quantities"
 					status={stages.quantities}
 					canReopen
+					canApprove={canApprove.quantities}
 				/>
 			</div>
 		</div>

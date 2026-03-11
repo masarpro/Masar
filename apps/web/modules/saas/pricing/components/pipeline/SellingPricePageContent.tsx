@@ -82,6 +82,14 @@ export function SellingPricePageContent({
 		quotation: "NOT_STARTED" as const,
 	};
 
+	const canApprove = stagesData?.canApprove ?? {
+		quantities: true,
+		specs: true,
+		costing: true,
+		pricing: true,
+		quotation: true,
+	};
+
 	const studyType = stagesData?.studyType ?? "FULL_PROJECT";
 	const method = markupSettings?.method ?? "uniform";
 	const isLumpSum = studyType === "LUMP_SUM_ANALYSIS";
@@ -149,6 +157,7 @@ export function SellingPricePageContent({
 					stage="pricing"
 					status={stages.pricing}
 					canReopen
+					canApprove={canApprove.pricing}
 				/>
 			</div>
 		</div>

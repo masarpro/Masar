@@ -49,6 +49,14 @@ export function QuantitiesSubTabs({
 		quotation: "NOT_STARTED" as const,
 	};
 
+	const canApprove = stagesData?.canApprove ?? {
+		quantities: true,
+		specs: true,
+		costing: true,
+		pricing: true,
+		quotation: true,
+	};
+
 	const handleTabChange = useCallback(
 		(tab: string) => {
 			const url = new URL(window.location.href);
@@ -124,6 +132,7 @@ export function QuantitiesSubTabs({
 					stage="quantities"
 					status={stages.quantities}
 					canReopen
+					canApprove={canApprove.quantities}
 				/>
 			</div>
 		</div>

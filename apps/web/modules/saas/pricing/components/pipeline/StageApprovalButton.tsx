@@ -23,6 +23,7 @@ interface StageApprovalButtonProps {
 	stage: StageName;
 	status: StageStatus;
 	canReopen?: boolean;
+	canApprove?: boolean;
 	className?: string;
 }
 
@@ -59,6 +60,7 @@ export function StageApprovalButton({
 	stage,
 	status,
 	canReopen = false,
+	canApprove = true,
 	className,
 }: StageApprovalButtonProps) {
 	const t = useTranslations();
@@ -161,7 +163,11 @@ export function StageApprovalButton({
 		return null;
 	}
 
-	// DRAFT or IN_REVIEW
+	// DRAFT or IN_REVIEW — check if user can approve
+	if (!canApprove) {
+		return null;
+	}
+
 	return (
 		<div className={cn("flex items-center", className)} dir="rtl">
 			<Button

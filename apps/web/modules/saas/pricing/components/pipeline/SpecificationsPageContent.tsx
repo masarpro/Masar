@@ -140,6 +140,14 @@ export function SpecificationsPageContent({
 		quotation: "NOT_STARTED" as const,
 	};
 
+	const canApprove = stagesData?.canApprove ?? {
+		quantities: true,
+		specs: true,
+		costing: true,
+		pricing: true,
+		quotation: true,
+	};
+
 	return (
 		<div className="space-y-4" dir="rtl">
 			{/* Title */}
@@ -235,6 +243,7 @@ export function SpecificationsPageContent({
 					stage="specs"
 					status={stages.specs}
 					canReopen
+					canApprove={canApprove.specs}
 				/>
 			</div>
 		</div>

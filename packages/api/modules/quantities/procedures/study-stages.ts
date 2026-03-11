@@ -1,8 +1,9 @@
 import { ORPCError } from "@orpc/server";
 import { STUDY_ERRORS } from "../lib/error-messages";
 import { db } from "@repo/database";
+import { hasPermission, type Permissions } from "@repo/database/prisma/permissions";
 import { z } from "zod";
-import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { verifyOrganizationAccess, requirePermission } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 
 // ═══════════════════════════════════════════════════════════════
@@ -38,6 +39,15 @@ const STAGE_LABELS: Record<StageType, string> = {
 	CONVERSION: "التحويل لمشروع",
 };
 
+// Fine-grained approve permissions per stage
+const STAGE_APPROVE_PERMISSION: Partial<Record<StageType, string>> = {
+	QUANTITIES: "approveQuantities",
+	SPECIFICATIONS: "approveSpecs",
+	COSTING: "approveCosting",
+	PRICING: "editSellingPrice",
+	QUOTATION: "generateQuotation",
+};
+
 // Map new StudyStage names → old CostStudy field names
 const STAGE_TO_COST_STUDY_FIELD: Partial<Record<StageType, string>> = {
 	QUANTITIES: "quantitiesStatus",
@@ -65,7 +75,7 @@ export const getStudyStages = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
 			{ section: "pricing", action: "view" },
@@ -103,16 +113,23 @@ export const getStudyStages = protectedProcedure
 
 		return {
 			entryPoint: study.entryPoint,
-			stages: study.stages.map((s) => ({
-				id: s.id,
-				stage: s.stage,
-				status: s.status,
-				assigneeId: s.assigneeId,
-				approvedById: s.approvedById,
-				approvedAt: s.approvedAt,
-				notes: s.notes,
-				sortOrder: s.sortOrder,
-			})),
+			stages: study.stages.map((s) => {
+				const approveAction = STAGE_APPROVE_PERMISSION[s.stage as StageType];
+				const canApprove = approveAction
+					? hasPermission(permissions, "pricing", approveAction)
+					: false;
+				return {
+					id: s.id,
+					stage: s.stage,
+					status: s.status,
+					assigneeId: s.assigneeId,
+					approvedById: s.approvedById,
+					approvedAt: s.approvedAt,
+					notes: s.notes,
+					sortOrder: s.sortOrder,
+					canApprove,
+				};
+			}),
 		};
 	});
 
@@ -135,11 +152,17 @@ export const approveStudyStage = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "pricing", action: "studies" },
+			{ section: "pricing", action: "view" },
 		);
+
+		// Check fine-grained approve permission for this stage
+		const approveAction = STAGE_APPROVE_PERMISSION[input.stage];
+		if (approveAction) {
+			requirePermission(permissions, "pricing", approveAction);
+		}
 
 		const study = await db.costStudy.findFirst({
 			where: {
@@ -251,11 +274,17 @@ export const reopenStudyStage = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(
+		const { permissions } = await verifyOrganizationAccess(
 			input.organizationId,
 			context.user.id,
-			{ section: "pricing", action: "studies" },
+			{ section: "pricing", action: "view" },
 		);
+
+		// Check fine-grained approve permission (reopen requires same permission)
+		const approveAction = STAGE_APPROVE_PERMISSION[input.stage];
+		if (approveAction) {
+			requirePermission(permissions, "pricing", approveAction);
+		}
 
 		const study = await db.costStudy.findFirst({
 			where: {

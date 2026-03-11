@@ -29,6 +29,16 @@ const ENTRY_POINT_START_INDEX: Record<string, number> = {
 	CUSTOM_ITEMS: 0,
 };
 
+// Map stage types to CostStudy legacy field names
+const STAGE_TO_COST_STUDY_FIELD: Record<StageType, string> = {
+	QUANTITIES: "quantitiesStatus",
+	SPECIFICATIONS: "specsStatus",
+	COSTING: "costingStatus",
+	PRICING: "pricingStatus",
+	QUOTATION: "quotationStatus",
+	CONVERSION: "quotationStatus", // No separate field for conversion
+};
+
 function getStageStatuses(entryPoint: string): Array<{ stage: StageType; status: StageStatus; sortOrder: number }> {
 	const startIndex = ENTRY_POINT_START_INDEX[entryPoint] ?? 0;
 
@@ -43,6 +53,18 @@ function getStageStatuses(entryPoint: string): Array<{ stage: StageType; status:
 		}
 		return { stage, status, sortOrder: index + 1 };
 	});
+}
+
+/** Build CostStudy legacy field updates to match StudyStage statuses */
+function getCostStudyStatusFields(stageStatuses: Array<{ stage: StageType; status: StageStatus }>): Record<string, string> {
+	const fields: Record<string, string> = {};
+	for (const { stage, status } of stageStatuses) {
+		const field = STAGE_TO_COST_STUDY_FIELD[stage];
+		if (field && stage !== "CONVERSION") {
+			fields[field] = status;
+		}
+	}
+	return fields;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -87,8 +109,11 @@ export const create = subscriptionProcedure
 			{ section: "pricing", action: "studies" },
 		);
 
+		const stageStatuses = getStageStatuses(input.entryPoint);
+		const costStudyFields = getCostStudyStatusFields(stageStatuses);
+
 		const result = await db.$transaction(async (tx) => {
-			// 1. Create the CostStudy
+			// 1. Create the CostStudy with correct stage statuses
 			const study = await tx.costStudy.create({
 				data: {
 					organizationId: input.organizationId,
@@ -105,11 +130,11 @@ export const create = subscriptionProcedure
 					studyType: input.studyType,
 					contractValue: input.contractValue,
 					entryPoint: input.entryPoint,
+					...costStudyFields,
 				},
 			});
 
 			// 2. Create 6 StudyStage records
-			const stageStatuses = getStageStatuses(input.entryPoint);
 			await tx.studyStage.createMany({
 				data: stageStatuses.map((s) => ({
 					costStudyId: study.id,

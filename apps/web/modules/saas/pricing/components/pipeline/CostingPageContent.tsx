@@ -97,6 +97,14 @@ export function CostingPageContent({
 		quotation: "NOT_STARTED" as const,
 	};
 
+	const canApprove = stagesData?.canApprove ?? {
+		quantities: true,
+		specs: true,
+		costing: true,
+		pricing: true,
+		quotation: true,
+	};
+
 	const hasItems = (costingItems as unknown[]).length > 0;
 
 	return (
@@ -191,6 +199,7 @@ export function CostingPageContent({
 					stage="costing"
 					status={stages.costing}
 					canReopen
+					canApprove={canApprove.costing}
 				/>
 			</div>
 		</div>
