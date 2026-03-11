@@ -1,7 +1,7 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 import { Building2, FileEdit, PaintBucket, Wrench } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -12,6 +12,7 @@ import { StructuralItemsEditor } from "./StructuralItemsEditor";
 import { FinishingItemsEditor } from "./FinishingItemsEditor";
 import { MEPItemsEditor } from "./MEPItemsEditor";
 import { ManualItemsTable } from "../pipeline/ManualItemsTable";
+import { ImportItemsDialog } from "./ImportItemsDialog";
 import { QuantitiesSummary } from "../pipeline/QuantitiesSummary";
 import { StageApprovalButton } from "../pipeline/StageApprovalButton";
 
@@ -31,6 +32,7 @@ export function QuantitiesSubTabs({
 	const t = useTranslations();
 	const router = useRouter();
 	const searchParams = useSearchParams();
+	const queryClient = useQueryClient();
 
 	const currentTab = searchParams.get("tab") || defaultTab || "structural";
 
@@ -41,7 +43,7 @@ export function QuantitiesSubTabs({
 		}),
 	);
 
-	const stages = stagesData?.stages ?? {
+	const stages = (stagesData as any)?.stages ?? {
 		quantities: "DRAFT" as const,
 		specs: "NOT_STARTED" as const,
 		costing: "NOT_STARTED" as const,
@@ -49,7 +51,7 @@ export function QuantitiesSubTabs({
 		quotation: "NOT_STARTED" as const,
 	};
 
-	const canApprove = stagesData?.canApprove ?? {
+	const canApprove = (stagesData as any)?.canApprove ?? {
 		quantities: true,
 		specs: true,
 		costing: true,
@@ -112,7 +114,18 @@ export function QuantitiesSubTabs({
 					/>
 				</TabsContent>
 
-				<TabsContent value="manual" className="mt-4">
+				<TabsContent value="manual" className="mt-4 space-y-4">
+					<div className="flex justify-end">
+						<ImportItemsDialog
+							organizationId={organizationId}
+							studyId={studyId}
+							onImported={() => {
+								queryClient.invalidateQueries({
+									queryKey: [["pricing", "studies", "manualItem"]],
+								});
+							}}
+						/>
+					</div>
 					<ManualItemsTable
 						organizationId={organizationId}
 						studyId={studyId}

@@ -57,6 +57,24 @@ const GOAL_TO_ENTRY_POINT: Record<StudyGoal, EntryPoint> = {
 	contract_import: "CUSTOM_ITEMS",
 };
 
+/** Maps the user-facing goal to the starting sub-page after creation */
+const GOAL_TO_START_PAGE: Record<StudyGoal, string> = {
+	full_study: "structural",
+	cost_pricing: "specifications",
+	quick_pricing: "pricing",
+	lump_sum: "costing",
+	contract_import: "quantities",
+};
+
+/** Badge labels describing which stages are included/skipped */
+const GOAL_STAGE_BADGE: Record<StudyGoal, string> = {
+	full_study: "جميع المراحل",
+	cost_pricing: "يتخطى الكميات",
+	quick_pricing: "مباشر لعرض السعر",
+	lump_sum: "يتخطى الكميات والمواصفات",
+	contract_import: "جميع المراحل",
+};
+
 const GOALS: Array<{
 	value: StudyGoal;
 	icon: typeof Building2;
@@ -148,10 +166,13 @@ export function CreateStudyPage({
 
 	const createMutation = useMutation(
 		orpc.pricing.studies.create.mutationOptions({
-			onSuccess: (data) => {
+			onSuccess: (data: any) => {
 				toast.success(t("pricing.studies.createSuccess"));
+				const startPage = selectedGoal
+					? GOAL_TO_START_PAGE[selectedGoal]
+					: "";
 				router.push(
-					`/app/${organizationSlug}/pricing/studies/${data.id}`,
+					`/app/${organizationSlug}/pricing/studies/${data.id}${startPage ? `/${startPage}` : ""}`,
 				);
 			},
 			onError: () => {
@@ -171,7 +192,7 @@ export function CreateStudyPage({
 		if (selectedGoal === "lump_sum") studyType = "LUMP_SUM_ANALYSIS";
 		if (selectedGoal === "quick_pricing" || selectedGoal === "contract_import") studyType = "CUSTOM_ITEMS";
 
-		createMutation.mutate({
+		(createMutation as any).mutate({
 			organizationId,
 			name: formData.name || undefined,
 			customerName: formData.customerName || undefined,
@@ -251,6 +272,16 @@ export function CreateStudyPage({
 										<div className="text-xs text-muted-foreground leading-relaxed">
 											{goal.description}
 										</div>
+										<div
+											className={cn(
+												"mt-1.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium leading-tight",
+												isSelected
+													? "bg-primary/10 text-primary"
+													: "bg-muted text-muted-foreground",
+											)}
+										>
+											{GOAL_STAGE_BADGE[goal.value]}
+										</div>
 									</div>
 								</button>
 							);
@@ -286,7 +317,7 @@ export function CreateStudyPage({
 								>
 									<Checkbox
 										checked={scope[item.key]}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											setScope({ ...scope, [item.key]: !!checked })
 										}
 									/>
@@ -310,7 +341,7 @@ export function CreateStudyPage({
 								<Input
 									id="name"
 									value={formData.name}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({ ...formData, name: e.target.value })
 									}
 									placeholder="مثال: فيلا الرياض - حي النرجس"
@@ -325,7 +356,7 @@ export function CreateStudyPage({
 								<Input
 									id="customerName"
 									value={formData.customerName}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({ ...formData, customerName: e.target.value })
 									}
 									placeholder={t("pricing.studies.form.customerNamePlaceholder")}
@@ -337,7 +368,7 @@ export function CreateStudyPage({
 								<Label htmlFor="projectType">{t("pricing.studies.form.projectType")}</Label>
 								<Select
 									value={formData.projectType}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										setFormData({ ...formData, projectType: value })
 									}
 								>
@@ -365,7 +396,7 @@ export function CreateStudyPage({
 										id="contractValue"
 										type="number"
 										value={formData.contractValue}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											setFormData({ ...formData, contractValue: e.target.value })
 										}
 										placeholder={t("pricing.studies.form.contractValuePlaceholder")}

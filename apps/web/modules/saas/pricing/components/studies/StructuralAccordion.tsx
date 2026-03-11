@@ -30,6 +30,7 @@ interface StructuralItem {
 	dimensions: Record<string, number>;
 	concreteVolume: number;
 	steelWeight: number;
+	totalCost: number;
 	subCategory?: string | null;
 }
 

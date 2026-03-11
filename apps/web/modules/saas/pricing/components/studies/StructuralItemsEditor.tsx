@@ -113,6 +113,7 @@ export function StructuralItemsEditor({
 						dimensions: (item.dimensions as Record<string, number>) || {},
 						concreteVolume: item.concreteVolume || 0,
 						steelWeight: item.steelWeight || 0,
+						totalCost: item.totalCost || 0,
 						subCategory: item.subCategory,
 					}))}
 					onUpdate={refetch}

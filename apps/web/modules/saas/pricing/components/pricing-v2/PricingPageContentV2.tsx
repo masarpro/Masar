@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { LumpSumAnalysisSection } from "./LumpSumAnalysisSection";
 import { ProfitAnalysisCard } from "./ProfitAnalysisCard";
 
 interface PricingPageContentV2Props {
@@ -77,7 +78,7 @@ export function PricingPageContentV2({
 
 	const { data: studyData } = useQuery(
 		orpc.pricing.studies.getById.queryOptions({
-			input: { organizationId, studyId },
+			input: { id: studyId, organizationId },
 		}),
 	);
 
@@ -1016,6 +1017,17 @@ export function PricingPageContentV2({
 			) : profitData ? (
 				<ProfitAnalysisCard data={profitData as any} />
 			) : null}
+
+			{/* ═══ Lump sum analysis (if applicable) ═══ */}
+			{(studyData as any)?.studyType === "LUMP_SUM_ANALYSIS" && (studyData as any)?.contractValue > 0 && (
+				<LumpSumAnalysisSection
+					organizationId={organizationId}
+					studyId={studyId}
+					contractValue={Number((studyData as any).contractValue)}
+					totalCost={totalCost}
+					buildingArea={buildingArea}
+				/>
+			)}
 
 			{/* ═══ Approve & navigate ═══ */}
 			<div className="flex gap-3 justify-end">
