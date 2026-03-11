@@ -279,15 +279,15 @@ export function ColumnsSection({
 		};
 
 		if (editingItemId) {
-			updateMutation.mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
+			(updateMutation as any).mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
 		} else {
-			createMutation.mutate(itemData);
+			(createMutation as any).mutate(itemData);
 		}
 	};
 
 	const handleDelete = (id: string) => {
 		if (confirm(t("pricing.studies.messages.confirmDelete"))) {
-			deleteMutation.mutate({ id, organizationId, costStudyId: studyId });
+			(deleteMutation as any).mutate({ id, organizationId, costStudyId: studyId });
 		}
 	};
 

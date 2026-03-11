@@ -58,11 +58,12 @@ export function SpecQuickTemplateBar({
 	const [scope, setScope] = useState<ScopeValue>("all");
 
 	// Fetch finishing items to get distinct floors
-	const { data: finishingItems = [] } = useQuery(
+	const { data: finishingItemsRaw = [] } = useQuery(
 		orpc.pricing.studies.getFinishingItems.queryOptions({
 			input: { costStudyId: studyId, organizationId },
 		}),
 	);
+	const finishingItems = finishingItemsRaw as any[];
 
 	const floors = useMemo(() => {
 		const map = new Map<string, string>();
@@ -76,7 +77,7 @@ export function SpecQuickTemplateBar({
 
 	const applyMutation = useMutation(
 		orpc.pricing.studies.specifications.applyTemplate.mutationOptions({
-			onSuccess: (data, variables) => {
+			onSuccess: (data: any, variables: any) => {
 				setApplied(variables.templateLevel);
 				const scopeLabel = scope === "all"
 					? ""
@@ -112,7 +113,7 @@ export function SpecQuickTemplateBar({
 			mutationInput.floorId = scope.replace("floor:", "");
 		}
 
-		applyMutation.mutate(mutationInput as Parameters<typeof applyMutation.mutate>[0]);
+		(applyMutation as any).mutate(mutationInput);
 	};
 
 	return (
@@ -123,7 +124,7 @@ export function SpecQuickTemplateBar({
 
 			{/* Scope selector */}
 			{floors.length > 1 && (
-				<Select value={scope} onValueChange={(v) => setScope(v as ScopeValue)}>
+				<Select value={scope} onValueChange={(v: any) => setScope(v as ScopeValue)}>
 					<SelectTrigger className="h-8 w-[160px] text-xs rounded-lg">
 						<SelectValue />
 					</SelectTrigger>
@@ -144,7 +145,7 @@ export function SpecQuickTemplateBar({
 				const isApplied = applied === tpl.value;
 				const isLoading =
 					applyMutation.isPending &&
-					applyMutation.variables?.templateLevel === tpl.value;
+					(applyMutation as any).variables?.templateLevel === tpl.value;
 
 				return (
 					<Button

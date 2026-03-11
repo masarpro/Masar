@@ -133,7 +133,7 @@ export function CostStudyCard({
 
 	const handleDelete = () => {
 		if (!activeOrganization) return;
-		deleteMutation.mutate({
+		(deleteMutation as any).mutate({
 			id: study.id,
 			organizationId: activeOrganization.id,
 		});
@@ -142,7 +142,7 @@ export function CostStudyCard({
 
 	const handleDuplicate = () => {
 		if (!activeOrganization) return;
-		duplicateMutation.mutate({
+		(duplicateMutation as any).mutate({
 			id: study.id,
 			organizationId: activeOrganization.id,
 		});

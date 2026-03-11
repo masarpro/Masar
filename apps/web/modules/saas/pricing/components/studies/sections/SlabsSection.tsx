@@ -509,15 +509,15 @@ export function SlabsSection({
 		};
 
 		if (editingItemId) {
-			updateMutation.mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
+			(updateMutation as any).mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
 		} else {
-			createMutation.mutate(itemData);
+			(createMutation as any).mutate(itemData);
 		}
 	};
 
 	const handleDelete = (id: string) => {
 		if (confirm(t("pricing.studies.messages.confirmDelete"))) {
-			deleteMutation.mutate({ id, organizationId, costStudyId: studyId });
+			(deleteMutation as any).mutate({ id, organizationId, costStudyId: studyId });
 		}
 	};
 
@@ -671,7 +671,7 @@ export function SlabsSection({
 											<Label className="text-sm">عرض العصب (سم)</Label>
 											<Select
 												value={formData.ribWidth.toString()}
-												onValueChange={(v) => setFormData({ ...formData, ribWidth: +v })}
+												onValueChange={(v: any) => setFormData({ ...formData, ribWidth: +v })}
 											>
 												<SelectTrigger>
 													<SelectValue />
@@ -689,7 +689,7 @@ export function SlabsSection({
 											<Label className="text-sm">محور الأعصاب (سم)</Label>
 											<Select
 												value={formData.ribSpacing.toString()}
-												onValueChange={(v) => setFormData({ ...formData, ribSpacing: +v })}
+												onValueChange={(v: any) => setFormData({ ...formData, ribSpacing: +v })}
 											>
 												<SelectTrigger>
 													<SelectValue />
@@ -707,7 +707,7 @@ export function SlabsSection({
 											<Label className="text-sm">ارتفاع البلوك (سم)</Label>
 											<Select
 												value={formData.blockHeight.toString()}
-												onValueChange={(v) => setFormData({ ...formData, blockHeight: +v })}
+												onValueChange={(v: any) => setFormData({ ...formData, blockHeight: +v })}
 											>
 												<SelectTrigger>
 													<SelectValue />
@@ -725,7 +725,7 @@ export function SlabsSection({
 											<Label className="text-sm">سماكة الطبقة العلوية (سم)</Label>
 											<Select
 												value={formData.toppingThickness.toString()}
-												onValueChange={(v) => setFormData({ ...formData, toppingThickness: +v })}
+												onValueChange={(v: any) => setFormData({ ...formData, toppingThickness: +v })}
 											>
 												<SelectTrigger>
 													<SelectValue />
@@ -774,7 +774,7 @@ export function SlabsSection({
 											<Label className="text-sm">عرض اللوح (م)</Label>
 											<Select
 												value={formData.panelWidth.toString()}
-												onValueChange={(v) => setFormData({ ...formData, panelWidth: +v })}
+												onValueChange={(v: any) => setFormData({ ...formData, panelWidth: +v })}
 											>
 												<SelectTrigger>
 													<SelectValue />
@@ -792,7 +792,7 @@ export function SlabsSection({
 											<Label className="text-sm">سماكة اللوح (سم)</Label>
 											<Select
 												value={formData.panelThickness.toString()}
-												onValueChange={(v) => setFormData({ ...formData, panelThickness: +v })}
+												onValueChange={(v: any) => setFormData({ ...formData, panelThickness: +v })}
 											>
 												<SelectTrigger>
 													<SelectValue />
@@ -810,7 +810,7 @@ export function SlabsSection({
 											<Label className="text-sm">سماكة الطبقة العلوية (سم)</Label>
 											<Select
 												value={formData.toppingThickness.toString()}
-												onValueChange={(v) => setFormData({ ...formData, toppingThickness: +v })}
+												onValueChange={(v: any) => setFormData({ ...formData, toppingThickness: +v })}
 											>
 												<SelectTrigger>
 													<SelectValue />
@@ -843,7 +843,7 @@ export function SlabsSection({
 										type="checkbox"
 										id="hasDropPanels"
 										checked={formData.hasDropPanels}
-										onChange={(e) => setFormData({ ...formData, hasDropPanels: e.target.checked })}
+										onChange={(e: any) => setFormData({ ...formData, hasDropPanels: e.target.checked })}
 										className="rounded border-purple-500"
 									/>
 									<Label htmlFor="hasDropPanels" className="text-sm font-medium text-purple-700 cursor-pointer">
@@ -858,7 +858,7 @@ export function SlabsSection({
 												type="number"
 												step="0.1"
 												value={formData.dropPanelLength}
-												onChange={(e) => setFormData({ ...formData, dropPanelLength: +e.target.value })}
+												onChange={(e: any) => setFormData({ ...formData, dropPanelLength: +e.target.value })}
 											/>
 										</div>
 										<div className="space-y-1.5">
@@ -867,7 +867,7 @@ export function SlabsSection({
 												type="number"
 												step="0.1"
 												value={formData.dropPanelWidth}
-												onChange={(e) => setFormData({ ...formData, dropPanelWidth: +e.target.value })}
+												onChange={(e: any) => setFormData({ ...formData, dropPanelWidth: +e.target.value })}
 											/>
 										</div>
 										<div className="space-y-1.5">
@@ -876,7 +876,7 @@ export function SlabsSection({
 												type="number"
 												step="0.05"
 												value={formData.dropPanelDepth}
-												onChange={(e) => setFormData({ ...formData, dropPanelDepth: +e.target.value })}
+												onChange={(e: any) => setFormData({ ...formData, dropPanelDepth: +e.target.value })}
 											/>
 										</div>
 										<div className="space-y-1.5">
@@ -885,7 +885,7 @@ export function SlabsSection({
 												type="number"
 												min={1}
 												value={formData.dropPanelCount}
-												onChange={(e) => setFormData({ ...formData, dropPanelCount: +e.target.value })}
+												onChange={(e: any) => setFormData({ ...formData, dropPanelCount: +e.target.value })}
 											/>
 										</div>
 									</div>
@@ -904,7 +904,7 @@ export function SlabsSection({
 											type="number"
 											step="0.1"
 											value={formData.bandedBeamWidth}
-											onChange={(e) => setFormData({ ...formData, bandedBeamWidth: +e.target.value })}
+											onChange={(e: any) => setFormData({ ...formData, bandedBeamWidth: +e.target.value })}
 										/>
 									</div>
 									<div className="space-y-1.5">
@@ -913,7 +913,7 @@ export function SlabsSection({
 											type="number"
 											step="0.05"
 											value={formData.bandedBeamDepth}
-											onChange={(e) => setFormData({ ...formData, bandedBeamDepth: +e.target.value })}
+											onChange={(e: any) => setFormData({ ...formData, bandedBeamDepth: +e.target.value })}
 										/>
 									</div>
 									<div className="space-y-1.5">
@@ -922,7 +922,7 @@ export function SlabsSection({
 											type="number"
 											min={1}
 											value={formData.bandedBeamCount}
-											onChange={(e) => setFormData({ ...formData, bandedBeamCount: +e.target.value })}
+											onChange={(e: any) => setFormData({ ...formData, bandedBeamCount: +e.target.value })}
 										/>
 									</div>
 								</div>
@@ -973,7 +973,7 @@ export function SlabsSection({
 											type="checkbox"
 											id="hasTopMesh"
 											checked={formData.hasTopMesh}
-											onChange={(e) => setFormData({ ...formData, hasTopMesh: e.target.checked })}
+											onChange={(e: any) => setFormData({ ...formData, hasTopMesh: e.target.checked })}
 											className="rounded border-green-500"
 										/>
 										<Label htmlFor="hasTopMesh" className="text-sm font-medium text-green-700 cursor-pointer">
@@ -1023,7 +1023,7 @@ export function SlabsSection({
 										<Label className="text-sm text-blue-700">عدد أسياخ القاع</Label>
 										<Select
 											value={formData.ribBottomBars.toString()}
-											onValueChange={(v) => setFormData({ ...formData, ribBottomBars: +v })}
+											onValueChange={(v: any) => setFormData({ ...formData, ribBottomBars: +v })}
 										>
 											<SelectTrigger className="border-blue-200">
 												<SelectValue />
@@ -1041,7 +1041,7 @@ export function SlabsSection({
 										<Label className="text-sm text-blue-700">قطر سيخ القاع</Label>
 										<Select
 											value={formData.ribBarDiameter.toString()}
-											onValueChange={(v) => setFormData({ ...formData, ribBarDiameter: +v })}
+											onValueChange={(v: any) => setFormData({ ...formData, ribBarDiameter: +v })}
 										>
 											<SelectTrigger className="border-blue-200">
 												<SelectValue />
@@ -1059,7 +1059,7 @@ export function SlabsSection({
 										<Label className="text-sm text-green-700">عدد أسياخ الرأس</Label>
 										<Select
 											value={formData.ribTopBars.toString()}
-											onValueChange={(v) => setFormData({ ...formData, ribTopBars: +v })}
+											onValueChange={(v: any) => setFormData({ ...formData, ribTopBars: +v })}
 										>
 											<SelectTrigger className="border-green-200">
 												<SelectValue />
@@ -1077,7 +1077,7 @@ export function SlabsSection({
 										<Label className="text-sm text-green-700">قطر سيخ الرأس</Label>
 										<Select
 											value={formData.ribTopBarDiameter.toString()}
-											onValueChange={(v) => setFormData({ ...formData, ribTopBarDiameter: +v })}
+											onValueChange={(v: any) => setFormData({ ...formData, ribTopBarDiameter: +v })}
 										>
 											<SelectTrigger className="border-green-200">
 												<SelectValue />
@@ -1100,7 +1100,7 @@ export function SlabsSection({
 											type="checkbox"
 											id="hasRibStirrup"
 											checked={formData.hasRibStirrup}
-											onChange={(e) => setFormData({ ...formData, hasRibStirrup: e.target.checked })}
+											onChange={(e: any) => setFormData({ ...formData, hasRibStirrup: e.target.checked })}
 											className="rounded border-gray-500"
 										/>
 										<Label htmlFor="hasRibStirrup" className="text-sm font-medium cursor-pointer">
@@ -1113,7 +1113,7 @@ export function SlabsSection({
 												<Label className="text-sm">قطر الكانة</Label>
 												<Select
 													value={formData.ribStirrupDiameter.toString()}
-													onValueChange={(v) => setFormData({ ...formData, ribStirrupDiameter: +v })}
+													onValueChange={(v: any) => setFormData({ ...formData, ribStirrupDiameter: +v })}
 												>
 													<SelectTrigger>
 														<SelectValue />
@@ -1131,7 +1131,7 @@ export function SlabsSection({
 												<Label className="text-sm">تباعد الكانات (مم)</Label>
 												<Select
 													value={formData.ribStirrupSpacing.toString()}
-													onValueChange={(v) => setFormData({ ...formData, ribStirrupSpacing: +v })}
+													onValueChange={(v: any) => setFormData({ ...formData, ribStirrupSpacing: +v })}
 												>
 													<SelectTrigger>
 														<SelectValue />
@@ -1196,7 +1196,7 @@ export function SlabsSection({
 											type="checkbox"
 											id="showFormwork"
 											checked={showFormwork}
-											onChange={(e) => setShowFormwork(e.target.checked)}
+											onChange={(e: any) => setShowFormwork(e.target.checked)}
 											className="rounded"
 										/>
 										<Label htmlFor="showFormwork" className="text-sm font-medium cursor-pointer">

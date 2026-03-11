@@ -210,7 +210,7 @@ function MEPPricingRow({
 				const mpVal = parseFloat(mp);
 				const lpVal = parseFloat(lp);
 				const wpVal = parseFloat(wp);
-				updateMutation.mutate({
+				(updateMutation as any).mutate({
 					id: item.id,
 					costStudyId: studyId,
 					organizationId,
@@ -224,7 +224,7 @@ function MEPPricingRow({
 	);
 
 	const handleToggle = (checked: boolean) => {
-		toggleMutation.mutate({
+		(toggleMutation as any).mutate({
 			id: item.id,
 			costStudyId: studyId,
 			organizationId,
@@ -245,7 +245,7 @@ function MEPPricingRow({
 			{/* Checkbox */}
 			<Checkbox
 				checked={item.isEnabled}
-				onCheckedChange={(checked) => handleToggle(checked === true)}
+				onCheckedChange={(checked: any) => handleToggle(checked === true)}
 				className="h-4 w-4"
 			/>
 
@@ -264,7 +264,7 @@ function MEPPricingRow({
 			<Input
 				type="number"
 				value={matPrice}
-				onChange={(e) => {
+				onChange={(e: any) => {
 					setMatPrice(e.target.value);
 					debouncedSave(e.target.value, labPrice, wastage);
 				}}
@@ -278,7 +278,7 @@ function MEPPricingRow({
 			<Input
 				type="number"
 				value={labPrice}
-				onChange={(e) => {
+				onChange={(e: any) => {
 					setLabPrice(e.target.value);
 					debouncedSave(matPrice, e.target.value, wastage);
 				}}
@@ -292,7 +292,7 @@ function MEPPricingRow({
 			<Input
 				type="number"
 				value={wastage}
-				onChange={(e) => {
+				onChange={(e: any) => {
 					setWastage(e.target.value);
 					debouncedSave(matPrice, labPrice, e.target.value);
 				}}

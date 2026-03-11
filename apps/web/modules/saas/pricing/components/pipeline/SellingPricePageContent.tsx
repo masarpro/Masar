@@ -74,7 +74,7 @@ export function SellingPricePageContent({
 		);
 	}
 
-	const stages = stagesData?.stages ?? {
+	const stages = (stagesData as any)?.stages ?? {
 		quantities: "DRAFT" as const,
 		specs: "NOT_STARTED" as const,
 		costing: "NOT_STARTED" as const,
@@ -82,7 +82,7 @@ export function SellingPricePageContent({
 		quotation: "NOT_STARTED" as const,
 	};
 
-	const canApprove = stagesData?.canApprove ?? {
+	const canApprove = (stagesData as any)?.canApprove ?? {
 		quantities: true,
 		specs: true,
 		costing: true,
@@ -90,8 +90,8 @@ export function SellingPricePageContent({
 		quotation: true,
 	};
 
-	const studyType = stagesData?.studyType ?? "FULL_PROJECT";
-	const method = markupSettings?.method ?? "uniform";
+	const studyType = (stagesData as any)?.studyType ?? "FULL_PROJECT";
+	const method = (markupSettings as any)?.method ?? "uniform";
 	const isLumpSum = studyType === "LUMP_SUM_ANALYSIS";
 
 	return (
@@ -99,7 +99,7 @@ export function SellingPricePageContent({
 			{/* Title */}
 			<div>
 				<h1 className="text-xl font-bold">
-					{study.name || t("pricing.pipeline.sellingPrice")}
+					{(study as any).name || t("pricing.pipeline.sellingPrice")}
 				</h1>
 				<p className="text-sm text-muted-foreground">
 					{t("pricing.pipeline.sellingPrice")} — {t("pricing.pipeline.sellingPriceDesc")}
@@ -109,7 +109,7 @@ export function SellingPricePageContent({
 			{/* Lump Sum Analysis (replaces markup forms for LUMP_SUM_ANALYSIS) */}
 			{isLumpSum ? (
 				<LumpSumAnalysis
-					profitAnalysis={profitAnalysis}
+					profitAnalysis={profitAnalysis as any}
 					isLoading={profitLoading}
 				/>
 			) : (
@@ -126,15 +126,15 @@ export function SellingPricePageContent({
 						<UniformMarkupForm
 							organizationId={organizationId}
 							studyId={studyId}
-							settings={markupSettings?.uniformSettings}
+							settings={(markupSettings as any)?.uniformSettings}
 							isLoading={markupLoading}
 						/>
 					) : (
 						<SectionMarkupForm
 							organizationId={organizationId}
 							studyId={studyId}
-							sectionMarkups={markupSettings?.sectionMarkups ?? []}
-							profitAnalysis={profitAnalysis}
+							sectionMarkups={(markupSettings as any)?.sectionMarkups ?? []}
+							profitAnalysis={profitAnalysis as any}
 							isLoading={markupLoading || profitLoading}
 						/>
 					)}
@@ -143,7 +143,7 @@ export function SellingPricePageContent({
 
 			{/* Profit Analysis - always shown */}
 			<ProfitAnalysis
-				profitAnalysis={profitAnalysis}
+				profitAnalysis={profitAnalysis as any}
 				isLoading={profitLoading}
 				isLumpSum={isLumpSum}
 			/>

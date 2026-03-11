@@ -112,7 +112,7 @@ export function ManualItemsTable({
 				setNewItem(EMPTY_NEW_ITEM);
 				setShowNewRow(false);
 			},
-			onError: (e) => toast.error(e.message || "حدث خطأ"),
+			onError: (e: any) => toast.error(e.message || "حدث خطأ"),
 		}),
 	);
 
@@ -123,7 +123,7 @@ export function ManualItemsTable({
 				invalidate();
 				setEditing(null);
 			},
-			onError: (e) => toast.error(e.message || "حدث خطأ"),
+			onError: (e: any) => toast.error(e.message || "حدث خطأ"),
 		}),
 	);
 
@@ -133,14 +133,14 @@ export function ManualItemsTable({
 				toast.success("تم حذف البند");
 				invalidate();
 			},
-			onError: (e) => toast.error(e.message || "حدث خطأ"),
+			onError: (e: any) => toast.error(e.message || "حدث خطأ"),
 		}),
 	);
 
 	// ─── Handlers ───
 	const handleCreate = () => {
 		if (!newItem.description || !newItem.quantity) return;
-		createMutation.mutate({
+		(createMutation as any).mutate({
 			organizationId,
 			studyId,
 			description: newItem.description,
@@ -153,7 +153,7 @@ export function ManualItemsTable({
 
 	const handleUpdate = () => {
 		if (!editing) return;
-		updateMutation.mutate({
+		(updateMutation as any).mutate({
 			organizationId,
 			itemId: editing.id,
 			description: editing.description,
@@ -165,7 +165,7 @@ export function ManualItemsTable({
 	};
 
 	const handleDelete = (itemId: string) => {
-		deleteMutation.mutate({ organizationId, itemId });
+		(deleteMutation as any).mutate({ organizationId, itemId });
 	};
 
 	const startEditing = (item: Record<string, unknown>) => {
@@ -222,7 +222,7 @@ export function ManualItemsTable({
 							</tr>
 						)}
 
-						{!isLoading && items.length === 0 && !showNewRow && (
+						{!isLoading && (items as any[]).length === 0 && !showNewRow && (
 							<tr>
 								<td colSpan={7} className="text-center py-8 text-muted-foreground">
 									لا توجد بنود يدوية. اضغط &quot;إضافة بند&quot; للبدء.
@@ -241,12 +241,12 @@ export function ManualItemsTable({
 										<td className="px-3 py-1.5">
 											<Input
 												value={editing.description}
-												onChange={(e) => setEditing({ ...editing, description: e.target.value })}
+												onChange={(e: any) => setEditing({ ...editing, description: e.target.value })}
 												className="h-8"
 											/>
 										</td>
 										<td className="px-3 py-1.5">
-											<Select value={editing.unit} onValueChange={(v) => setEditing({ ...editing, unit: v })}>
+											<Select value={editing.unit} onValueChange={(v: any) => setEditing({ ...editing, unit: v })}>
 												<SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
 												<SelectContent>
 													{UNITS.map((u) => (
@@ -259,13 +259,13 @@ export function ManualItemsTable({
 											<Input
 												type="number"
 												value={editing.quantity}
-												onChange={(e) => setEditing({ ...editing, quantity: e.target.value })}
+												onChange={(e: any) => setEditing({ ...editing, quantity: e.target.value })}
 												className="h-8"
 												dir="ltr"
 											/>
 										</td>
 										<td className="px-3 py-1.5">
-											<Select value={editing.section || "none"} onValueChange={(v) => setEditing({ ...editing, section: v === "none" ? "" : v })}>
+											<Select value={editing.section || "none"} onValueChange={(v: any) => setEditing({ ...editing, section: v === "none" ? "" : v })}>
 												<SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
 												<SelectContent>
 													<SelectItem value="none">—</SelectItem>
@@ -278,7 +278,7 @@ export function ManualItemsTable({
 										<td className="px-3 py-1.5">
 											<Input
 												value={editing.notes}
-												onChange={(e) => setEditing({ ...editing, notes: e.target.value })}
+												onChange={(e: any) => setEditing({ ...editing, notes: e.target.value })}
 												className="h-8"
 											/>
 										</td>
@@ -332,13 +332,13 @@ export function ManualItemsTable({
 									<Input
 										placeholder="وصف البند..."
 										value={newItem.description}
-										onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+										onChange={(e: any) => setNewItem({ ...newItem, description: e.target.value })}
 										className="h-8"
 										autoFocus
 									/>
 								</td>
 								<td className="px-3 py-1.5">
-									<Select value={newItem.unit} onValueChange={(v) => setNewItem({ ...newItem, unit: v })}>
+									<Select value={newItem.unit} onValueChange={(v: any) => setNewItem({ ...newItem, unit: v })}>
 										<SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
 										<SelectContent>
 											{UNITS.map((u) => (
@@ -352,13 +352,13 @@ export function ManualItemsTable({
 										type="number"
 										placeholder="0"
 										value={newItem.quantity}
-										onChange={(e) => setNewItem({ ...newItem, quantity: e.target.value })}
+										onChange={(e: any) => setNewItem({ ...newItem, quantity: e.target.value })}
 										className="h-8"
 										dir="ltr"
 									/>
 								</td>
 								<td className="px-3 py-1.5">
-									<Select value={newItem.section || "none"} onValueChange={(v) => setNewItem({ ...newItem, section: v === "none" ? "" : v })}>
+									<Select value={newItem.section || "none"} onValueChange={(v: any) => setNewItem({ ...newItem, section: v === "none" ? "" : v })}>
 										<SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
 										<SelectContent>
 											<SelectItem value="none">—</SelectItem>
@@ -372,7 +372,7 @@ export function ManualItemsTable({
 									<Input
 										placeholder="ملاحظات..."
 										value={newItem.notes}
-										onChange={(e) => setNewItem({ ...newItem, notes: e.target.value })}
+										onChange={(e: any) => setNewItem({ ...newItem, notes: e.target.value })}
 										className="h-8"
 									/>
 								</td>

@@ -62,7 +62,7 @@ export function CreateCostStudyDialog({
 
 	const createMutation = useMutation(
 		orpc.pricing.studies.create.mutationOptions({
-			onSuccess: (data) => {
+			onSuccess: (data: any) => {
 				toast.success(t("pricing.studies.createSuccess"));
 				onOpenChange(false);
 				const studyUrl = `/app/${organizationSlug}/pricing/studies/${data.id}`;
@@ -81,7 +81,7 @@ export function CreateCostStudyDialog({
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 
-		createMutation.mutate({
+		(createMutation as any).mutate({
 			organizationId,
 			name: formData.name || undefined,
 			customerName: formData.customerName || undefined,
@@ -107,7 +107,7 @@ export function CreateCostStudyDialog({
 						<Input
 							id="name"
 							value={formData.name}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData({ ...formData, name: e.target.value })
 							}
 							placeholder={t("pricing.studies.form.namePlaceholder")}
@@ -122,7 +122,7 @@ export function CreateCostStudyDialog({
 						<Input
 							id="customerName"
 							value={formData.customerName}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData({ ...formData, customerName: e.target.value })
 							}
 							placeholder={t("pricing.studies.form.customerNamePlaceholder")}
@@ -136,7 +136,7 @@ export function CreateCostStudyDialog({
 						</Label>
 						<Select
 							value={formData.studyType}
-							onValueChange={(value) =>
+							onValueChange={(value: any) =>
 								setFormData({ ...formData, studyType: value as typeof formData.studyType })
 							}
 						>
@@ -160,7 +160,7 @@ export function CreateCostStudyDialog({
 								id="contractValue"
 								type="number"
 								value={formData.contractValue}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({ ...formData, contractValue: e.target.value })
 								}
 								placeholder={t("pricing.studies.form.contractValuePlaceholder")}
@@ -176,7 +176,7 @@ export function CreateCostStudyDialog({
 						</Label>
 						<Select
 							value={formData.projectType}
-							onValueChange={(value) =>
+							onValueChange={(value: any) =>
 								setFormData({ ...formData, projectType: value })
 							}
 						>

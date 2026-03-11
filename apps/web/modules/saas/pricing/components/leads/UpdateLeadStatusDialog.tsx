@@ -83,7 +83,7 @@ export function UpdateLeadStatusDialog({
 			toast.error(t("pricing.leads.detail.lostReasonRequired"));
 			return;
 		}
-		mutation.mutate({
+		(mutation as any).mutate({
 			organizationId,
 			leadId,
 			status: status as any,
@@ -120,7 +120,7 @@ export function UpdateLeadStatusDialog({
 							<Label>{t("pricing.leads.detail.lostReason")} *</Label>
 							<Textarea
 								value={lostReason}
-								onChange={(e) => setLostReason(e.target.value)}
+								onChange={(e: any) => setLostReason(e.target.value)}
 								placeholder={t("pricing.leads.detail.lostReasonPlaceholder")}
 								className="mt-1.5 rounded-xl"
 								rows={3}

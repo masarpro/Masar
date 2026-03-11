@@ -27,11 +27,12 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 	const [expanded, setExpanded] = useState(true);
 	const [viewMode, setViewMode] = useState<BOMViewMode>("byItem");
 
-	const { data: bomEntries, isLoading } = useQuery(
+	const { data: bomEntriesRaw, isLoading } = useQuery(
 		orpc.pricing.studies.specifications.getBOM.queryOptions({
 			input: { organizationId, studyId },
 		}),
 	);
+	const bomEntries = bomEntriesRaw as any;
 
 	const generateMutation = useMutation(
 		orpc.pricing.studies.specifications.generateBOM.mutationOptions({
@@ -44,12 +45,12 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 	);
 
 	const handleGenerate = () => {
-		generateMutation.mutate({ organizationId, studyId });
+		(generateMutation as any).mutate({ organizationId, studyId });
 	};
 
 	// Group BOM by parentItemType then parentCategory
 	const grouped = (bomEntries ?? []).reduce(
-		(acc, entry) => {
+		(acc: any, entry: any) => {
 			const typeKey = String(entry.parentItemType);
 			if (!acc[typeKey]) acc[typeKey] = {};
 			const catKey = entry.parentCategory ?? "عام";
@@ -239,7 +240,7 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 														</tr>
 													</thead>
 													<tbody>
-														{(items ?? []).map((entry) => (
+														{(items ?? []).map((entry: any) => (
 															<tr
 																key={entry.id}
 																className="border-b last:border-0 hover:bg-muted/20"

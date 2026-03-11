@@ -88,7 +88,7 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 				{/* Category select */}
 				<Select
 					value={category}
-					onValueChange={(v) => {
+					onValueChange={(v: any) => {
 						setCategory(v as MEPCategoryId);
 						setSubCategory("");
 						setName("");
@@ -110,7 +110,7 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 				{category && (
 					<Select
 						value={subCategory}
-						onValueChange={(v) => {
+						onValueChange={(v: any) => {
 							setSubCategory(v);
 							const sub = subCategories[v];
 							if (sub) setName(sub.nameAr);
@@ -135,7 +135,7 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 				{subCategory && (
 					<Input
 						value={name}
-						onChange={(e) => setName(e.target.value)}
+						onChange={(e: any) => setName(e.target.value)}
 						placeholder={t("manualAdder.itemName")}
 						className="text-sm h-9 rounded-lg"
 					/>
@@ -147,7 +147,7 @@ export function MEPManualAdder({ onAdd }: MEPManualAdderProps) {
 						<Input
 							type="number"
 							value={quantity}
-							onChange={(e) => setQuantity(e.target.value)}
+							onChange={(e: any) => setQuantity(e.target.value)}
 							placeholder={t("manualAdder.quantity")}
 							className="text-sm flex-1 h-9 rounded-lg"
 							dir="ltr"

@@ -120,7 +120,7 @@ export function PricingItemRow({
 			<Input
 				type="number"
 				value={matPrice}
-				onChange={(e) => handleMatChange(e.target.value)}
+				onChange={(e: any) => handleMatChange(e.target.value)}
 				className="h-7 text-xs tabular-nums px-1.5"
 				dir="ltr"
 				min={0}
@@ -130,7 +130,7 @@ export function PricingItemRow({
 			<Input
 				type="number"
 				value={labPrice}
-				onChange={(e) => handleLabChange(e.target.value)}
+				onChange={(e: any) => handleLabChange(e.target.value)}
 				className="h-7 text-xs tabular-nums px-1.5"
 				dir="ltr"
 				min={0}
@@ -141,7 +141,7 @@ export function PricingItemRow({
 				<Input
 					type="number"
 					value={wastage}
-					onChange={(e) => handleWastageChange(e.target.value)}
+					onChange={(e: any) => handleWastageChange(e.target.value)}
 					className="h-7 text-xs tabular-nums px-1.5 hidden sm:block"
 					dir="ltr"
 					min={0}

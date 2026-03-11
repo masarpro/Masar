@@ -37,13 +37,13 @@ export function PricingDashboard({
 		}),
 	);
 
-	const studies = studiesData?.costStudies ?? [];
-	const quotations = quotationsData?.quotations ?? [];
+	const studies = (studiesData as any)?.costStudies ?? [];
+	const quotations = (quotationsData as any)?.quotations ?? [];
 
 	const totalStudies = studies.length;
 	const totalQuotations = quotations.length;
-	const acceptedQuotations = quotations.filter((q) => q.status === "ACCEPTED").length;
-	const pendingQuotations = quotations.filter((q) => q.status === "SENT" || q.status === "VIEWED").length;
+	const acceptedQuotations = quotations.filter((q: any) => q.status === "ACCEPTED").length;
+	const pendingQuotations = quotations.filter((q: any) => q.status === "SENT" || q.status === "VIEWED").length;
 	const acceptanceRate = totalQuotations > 0
 		? Math.round((acceptedQuotations / totalQuotations) * 100)
 		: 0;

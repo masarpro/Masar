@@ -472,14 +472,14 @@ export function PlasterItemDialog({
 		};
 
 		if (isEdit && editItem?.id) {
-			updateMutation.mutate({
+			(updateMutation as any).mutate({
 				organizationId,
 				costStudyId: studyId,
 				id: editItem.id,
 				...itemData,
 			});
 		} else {
-			createMutation.mutate({
+			(createMutation as any).mutate({
 				organizationId,
 				costStudyId: studyId,
 				...itemData,
@@ -513,7 +513,7 @@ export function PlasterItemDialog({
 					{/* Name */}
 					<div className="space-y-1">
 						<Label className="text-sm">{t("name")}</Label>
-						<Input value={name} onChange={(e) => setName(e.target.value)} />
+						<Input value={name} onChange={(e: any) => setName(e.target.value)} />
 					</div>
 
 					{/* Method + Thickness + Mix ratio */}
@@ -522,7 +522,7 @@ export function PlasterItemDialog({
 							<Label className="text-sm">{t("method")}</Label>
 							<Select
 								value={plasterMethod}
-								onValueChange={(v) => setPlasterMethod(v as PlasterMethodKey)}
+								onValueChange={(v: any) => setPlasterMethod(v as PlasterMethodKey)}
 							>
 								<SelectTrigger>
 									<SelectValue />
@@ -541,14 +541,14 @@ export function PlasterItemDialog({
 							<Input
 								type="number"
 								value={thickness || ""}
-								onChange={(e) => setThickness(parseFloat(e.target.value) || 0)}
+								onChange={(e: any) => setThickness(parseFloat(e.target.value) || 0)}
 							/>
 						</div>
 						<div className="space-y-1">
 							<Label className="text-sm">{t("mixRatio")}</Label>
 							<Select
 								value={mixRatio}
-								onValueChange={(v) => setMixRatio(v as MixRatioKey)}
+								onValueChange={(v: any) => setMixRatio(v as MixRatioKey)}
 							>
 								<SelectTrigger>
 									<SelectValue />
@@ -592,7 +592,7 @@ export function PlasterItemDialog({
 							<Input
 								type="number"
 								value={floorHeight || ""}
-								onChange={(e) => setFloorHeight(parseFloat(e.target.value) || 0)}
+								onChange={(e: any) => setFloorHeight(parseFloat(e.target.value) || 0)}
 								step="0.1"
 							/>
 							<p className="text-xs text-muted-foreground">
@@ -646,7 +646,7 @@ export function PlasterItemDialog({
 														id={`room-${i}-name`}
 														tabIndex={-1}
 														value={room.name}
-														onChange={(e) => updateRoom(i, "name", e.target.value)}
+														onChange={(e: any) => updateRoom(i, "name", e.target.value)}
 														className="h-8 text-sm text-muted-foreground focus:text-foreground"
 													/>
 												</td>
@@ -656,8 +656,8 @@ export function PlasterItemDialog({
 														id={`room-${i}-wall1`}
 														type="number"
 														value={room.wall1}
-														onChange={(e) => updateRoom(i, "wall1", parseNum(e.target.value))}
-														onKeyDown={(e) => handleRoomKeyDown(e, i, 0)}
+														onChange={(e: any) => updateRoom(i, "wall1", parseNum(e.target.value))}
+														onKeyDown={(e: any) => handleRoomKeyDown(e, i, 0)}
 														className="h-8 text-sm"
 													/>
 												</td>
@@ -668,8 +668,8 @@ export function PlasterItemDialog({
 															id={`room-${i}-wall2`}
 															type="number"
 															value={room.wall2}
-															onChange={(e) => updateRoom(i, "wall2", parseNum(e.target.value))}
-															onKeyDown={(e) => handleRoomKeyDown(e, i, 1)}
+															onChange={(e: any) => updateRoom(i, "wall2", parseNum(e.target.value))}
+															onKeyDown={(e: any) => handleRoomKeyDown(e, i, 1)}
 															className="h-8 text-sm"
 														/>
 													</td>
@@ -683,12 +683,12 @@ export function PlasterItemDialog({
 																type="number"
 																autoFocus
 																value={effectiveH || ""}
-																onChange={(e) => {
+																onChange={(e: any) => {
 																	const v = parseFloat(e.target.value);
 																	updateRoom(i, "heightOverride", Number.isNaN(v) ? null : v);
 																}}
 																onBlur={() => setEditingHeightIdx(null)}
-																onKeyDown={(e) => {
+																onKeyDown={(e: any) => {
 																	if (e.key === "Enter" || e.key === "Escape") {
 																		setEditingHeightIdx(null);
 																	}
@@ -766,8 +766,8 @@ export function PlasterItemDialog({
 												<Input
 													id={`door-${i}-name`}
 													value={door.name}
-													onChange={(e) => updateDoor(i, "name", e.target.value)}
-													onKeyDown={(e) => handleDoorKeyDown(e, i, 0)}
+													onChange={(e: any) => updateDoor(i, "name", e.target.value)}
+													onKeyDown={(e: any) => handleDoorKeyDown(e, i, 0)}
 													className="h-8 text-sm"
 												/>
 											</td>
@@ -776,8 +776,8 @@ export function PlasterItemDialog({
 													id={`door-${i}-width`}
 													type="number"
 													value={door.width}
-													onChange={(e) => updateDoor(i, "width", parseNum(e.target.value))}
-													onKeyDown={(e) => handleDoorKeyDown(e, i, 1)}
+													onChange={(e: any) => updateDoor(i, "width", parseNum(e.target.value))}
+													onKeyDown={(e: any) => handleDoorKeyDown(e, i, 1)}
 													className="h-8 text-sm"
 												/>
 											</td>
@@ -786,8 +786,8 @@ export function PlasterItemDialog({
 													id={`door-${i}-height`}
 													type="number"
 													value={door.height}
-													onChange={(e) => updateDoor(i, "height", parseNum(e.target.value))}
-													onKeyDown={(e) => handleDoorKeyDown(e, i, 2)}
+													onChange={(e: any) => updateDoor(i, "height", parseNum(e.target.value))}
+													onKeyDown={(e: any) => handleDoorKeyDown(e, i, 2)}
 													className="h-8 text-sm"
 												/>
 											</td>
@@ -796,8 +796,8 @@ export function PlasterItemDialog({
 													id={`door-${i}-count`}
 													type="number"
 													value={door.count}
-													onChange={(e) => updateDoor(i, "count", parseNum(e.target.value))}
-													onKeyDown={(e) => handleDoorKeyDown(e, i, 3)}
+													onChange={(e: any) => updateDoor(i, "count", parseNum(e.target.value))}
+													onKeyDown={(e: any) => handleDoorKeyDown(e, i, 3)}
 													className="h-8 text-sm"
 												/>
 											</td>
@@ -853,8 +853,8 @@ export function PlasterItemDialog({
 												<Input
 													id={`win-${i}-name`}
 													value={win.name}
-													onChange={(e) => updateWindow(i, "name", e.target.value)}
-													onKeyDown={(e) => handleWindowKeyDown(e, i, 0)}
+													onChange={(e: any) => updateWindow(i, "name", e.target.value)}
+													onKeyDown={(e: any) => handleWindowKeyDown(e, i, 0)}
 													className="h-8 text-sm"
 												/>
 											</td>
@@ -863,8 +863,8 @@ export function PlasterItemDialog({
 													id={`win-${i}-width`}
 													type="number"
 													value={win.width}
-													onChange={(e) => updateWindow(i, "width", parseNum(e.target.value))}
-													onKeyDown={(e) => handleWindowKeyDown(e, i, 1)}
+													onChange={(e: any) => updateWindow(i, "width", parseNum(e.target.value))}
+													onKeyDown={(e: any) => handleWindowKeyDown(e, i, 1)}
 													className="h-8 text-sm"
 												/>
 											</td>
@@ -873,8 +873,8 @@ export function PlasterItemDialog({
 													id={`win-${i}-height`}
 													type="number"
 													value={win.height}
-													onChange={(e) => updateWindow(i, "height", parseNum(e.target.value))}
-													onKeyDown={(e) => handleWindowKeyDown(e, i, 2)}
+													onChange={(e: any) => updateWindow(i, "height", parseNum(e.target.value))}
+													onKeyDown={(e: any) => handleWindowKeyDown(e, i, 2)}
 													className="h-8 text-sm"
 												/>
 											</td>
@@ -883,8 +883,8 @@ export function PlasterItemDialog({
 													id={`win-${i}-count`}
 													type="number"
 													value={win.count}
-													onChange={(e) => updateWindow(i, "count", parseNum(e.target.value))}
-													onKeyDown={(e) => handleWindowKeyDown(e, i, 3)}
+													onChange={(e: any) => updateWindow(i, "count", parseNum(e.target.value))}
+													onKeyDown={(e: any) => handleWindowKeyDown(e, i, 3)}
 													className="h-8 text-sm"
 												/>
 											</td>
@@ -914,7 +914,7 @@ export function PlasterItemDialog({
 								<Checkbox
 									id="includeCeiling"
 									checked={includeCeiling}
-									onCheckedChange={(v) => setIncludeCeiling(v === true)}
+									onCheckedChange={(v: any) => setIncludeCeiling(v === true)}
 								/>
 								<Label htmlFor="includeCeiling" className="text-sm cursor-pointer">
 									{t("includeCeiling")}

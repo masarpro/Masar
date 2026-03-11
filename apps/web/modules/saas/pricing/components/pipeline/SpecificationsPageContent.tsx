@@ -60,11 +60,11 @@ export function SpecificationsPageContent({
 	);
 
 	// ─── Derive finishing items for spec editor ───
-	const smartConfig = study?.buildingConfig as SmartBuildingConfig | null;
+	const smartConfig = (study as any)?.buildingConfig as SmartBuildingConfig | null;
 
 	const savedFinishingItems: SavedFinishingItem[] = useMemo(() => {
-		if (!finishingItems.length) return [];
-		return finishingItems.map((item) => ({
+		if (!(finishingItems as any[]).length) return [];
+		return (finishingItems as any[]).map((item: any) => ({
 			id: item.id,
 			category: item.category,
 			subCategory: item.subCategory,
@@ -123,7 +123,7 @@ export function SpecificationsPageContent({
 			const specDescription = `${spec.specTypeLabel}${
 				spec.options?.brand ? ` — ${spec.options.brand}` : ""
 			}`;
-			updateSpecMutation.mutate({
+			(updateSpecMutation as any).mutate({
 				organizationId,
 				costStudyId: studyId,
 				id: item.savedId,
@@ -149,7 +149,7 @@ export function SpecificationsPageContent({
 		);
 	}
 
-	const stages = stagesData?.stages ?? {
+	const stages = (stagesData as any)?.stages ?? {
 		quantities: "DRAFT" as const,
 		specs: "NOT_STARTED" as const,
 		costing: "NOT_STARTED" as const,
@@ -157,7 +157,7 @@ export function SpecificationsPageContent({
 		quotation: "NOT_STARTED" as const,
 	};
 
-	const canApprove = stagesData?.canApprove ?? {
+	const canApprove = (stagesData as any)?.canApprove ?? {
 		quantities: true,
 		specs: true,
 		costing: true,
@@ -170,7 +170,7 @@ export function SpecificationsPageContent({
 			{/* Title */}
 			<div>
 				<h1 className="text-xl font-bold">
-					{study.name || t("pricing.pipeline.specifications")}
+					{(study as any).name || t("pricing.pipeline.specifications")}
 				</h1>
 				<p className="text-sm text-muted-foreground">
 					{t("pricing.pipeline.specifications")} — {t("pricing.pipeline.specsDesc")}

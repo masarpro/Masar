@@ -67,12 +67,12 @@ export function UniformMarkupForm({
 					queryKey: [["pricing", "studies", "markup"]],
 				});
 			},
-			onError: (e) => toast.error(e.message),
+			onError: (e: any) => toast.error(e.message),
 		}),
 	);
 
 	const handleSave = () => {
-		saveMutation.mutate({
+		(saveMutation as any).mutate({
 			organizationId,
 			studyId,
 			overheadPercent,
@@ -125,7 +125,7 @@ export function UniformMarkupForm({
 							<Input
 								type="number"
 								value={overheadPercent}
-								onChange={(e) => {
+								onChange={(e: any) => {
 									setOverheadPercent(Number(e.target.value));
 									setDirty(true);
 								}}
@@ -146,7 +146,7 @@ export function UniformMarkupForm({
 							<Input
 								type="number"
 								value={profitPercent}
-								onChange={(e) => {
+								onChange={(e: any) => {
 									setProfitPercent(Number(e.target.value));
 									setDirty(true);
 								}}
@@ -167,7 +167,7 @@ export function UniformMarkupForm({
 							<Input
 								type="number"
 								value={contingencyPercent}
-								onChange={(e) => {
+								onChange={(e: any) => {
 									setContingencyPercent(Number(e.target.value));
 									setDirty(true);
 								}}
@@ -186,7 +186,7 @@ export function UniformMarkupForm({
 				<div className="flex items-center gap-3 mt-4 pt-3 border-t">
 					<Switch
 						checked={vatIncluded}
-						onCheckedChange={(checked) => {
+						onCheckedChange={(checked: any) => {
 							setVatIncluded(checked);
 							setDirty(true);
 						}}

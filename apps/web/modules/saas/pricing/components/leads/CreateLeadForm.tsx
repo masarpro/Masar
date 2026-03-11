@@ -79,14 +79,14 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 
 	const createMutation = useMutation(
 		orpc.pricing.leads.create.mutationOptions({
-			onSuccess: async (data) => {
+			onSuccess: async (data: any) => {
 				// Upload pending files after lead creation
 				if (pendingFiles.length > 0) {
 					setIsUploadingFiles(true);
 					let uploadedCount = 0;
 					for (const pf of pendingFiles) {
 						try {
-							const uploadData = await getUploadUrlMutation.mutateAsync({
+							const uploadData: any = await (getUploadUrlMutation as any).mutateAsync({
 								organizationId,
 								leadId: data.id,
 								fileName: pf.name,
@@ -100,7 +100,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 								headers: { "Content-Type": pf.mimeType },
 							});
 
-							await saveFileMutation.mutateAsync({
+							await (saveFileMutation as any).mutateAsync({
 								organizationId,
 								leadId: data.id,
 								name: pf.name,
@@ -154,7 +154,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 			return;
 		}
 
-		createMutation.mutate({
+		(createMutation as any).mutate({
 			organizationId,
 			name: formData.name.trim(),
 			phone: formData.phone || undefined,
@@ -204,7 +204,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 						<Input
 							id="name"
 							value={formData.name}
-							onChange={(e) => update("name", e.target.value)}
+							onChange={(e: any) => update("name", e.target.value)}
 							placeholder={t("pricing.leads.form.namePlaceholder")}
 							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 							required
@@ -222,7 +222,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 							<Input
 								id="phone"
 								value={formData.phone}
-								onChange={(e) => update("phone", e.target.value)}
+								onChange={(e: any) => update("phone", e.target.value)}
 								placeholder={t("pricing.leads.form.phonePlaceholder")}
 								className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 								dir="ltr"
@@ -239,7 +239,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 								id="email"
 								type="email"
 								value={formData.email}
-								onChange={(e) => update("email", e.target.value)}
+								onChange={(e: any) => update("email", e.target.value)}
 								placeholder={t("pricing.leads.form.emailPlaceholder")}
 								className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 								dir="ltr"
@@ -257,7 +257,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 						<Input
 							id="company"
 							value={formData.company}
-							onChange={(e) => update("company", e.target.value)}
+							onChange={(e: any) => update("company", e.target.value)}
 							placeholder={t("pricing.leads.form.companyPlaceholder")}
 							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 						/>
@@ -317,7 +317,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 						<Label className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.projectType")}</Label>
 						<Select
 							value={formData.projectType || "none"}
-							onValueChange={(v) => update("projectType", v === "none" ? "" : v)}
+							onValueChange={(v: any) => update("projectType", v === "none" ? "" : v)}
 						>
 							<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
 								<SelectValue placeholder={t("pricing.leads.form.selectProjectType")} />
@@ -343,7 +343,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 						<Input
 							id="projectLocation"
 							value={formData.projectLocation}
-							onChange={(e) => update("projectLocation", e.target.value)}
+							onChange={(e: any) => update("projectLocation", e.target.value)}
 							placeholder={t("pricing.leads.form.projectLocationPlaceholder")}
 							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 						/>
@@ -361,7 +361,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 									min="0"
 									step="any"
 									value={formData.estimatedArea}
-									onChange={(e) => update("estimatedArea", e.target.value)}
+									onChange={(e: any) => update("estimatedArea", e.target.value)}
 									className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 pe-12"
 									dir="ltr"
 								/>
@@ -382,7 +382,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 									min="0"
 									step="any"
 									value={formData.estimatedValue}
-									onChange={(e) => update("estimatedValue", e.target.value)}
+									onChange={(e: any) => update("estimatedValue", e.target.value)}
 									className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 pe-12"
 									dir="ltr"
 								/>
@@ -414,7 +414,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 					<div className="grid gap-4 sm:grid-cols-3">
 						<div>
 							<Label className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.source")}</Label>
-							<Select value={formData.source} onValueChange={(v) => update("source", v)}>
+							<Select value={formData.source} onValueChange={(v: any) => update("source", v)}>
 								<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
 									<SelectValue />
 								</SelectTrigger>
@@ -429,7 +429,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 						</div>
 						<div>
 							<Label className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.priority")}</Label>
-							<Select value={formData.priority} onValueChange={(v) => update("priority", v)}>
+							<Select value={formData.priority} onValueChange={(v: any) => update("priority", v)}>
 								<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
 									<SelectValue />
 								</SelectTrigger>
@@ -451,7 +451,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 							</Label>
 							<Select
 								value={formData.assignedToId || "none"}
-								onValueChange={(v) => update("assignedToId", v === "none" ? "" : v)}
+								onValueChange={(v: any) => update("assignedToId", v === "none" ? "" : v)}
 							>
 								<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
 									<SelectValue placeholder={t("pricing.leads.form.selectAssignee")} />
@@ -479,7 +479,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 							id="expectedCloseDate"
 							type="date"
 							value={formData.expectedCloseDate}
-							onChange={(e) => update("expectedCloseDate", e.target.value)}
+							onChange={(e: any) => update("expectedCloseDate", e.target.value)}
 							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 							dir="ltr"
 						/>
@@ -490,7 +490,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 						<Textarea
 							id="notes"
 							value={formData.notes}
-							onChange={(e) => update("notes", e.target.value)}
+							onChange={(e: any) => update("notes", e.target.value)}
 							placeholder={t("pricing.leads.form.notesPlaceholder")}
 							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 min-h-[80px]"
 							rows={3}

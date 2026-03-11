@@ -105,7 +105,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 			return;
 		}
 
-		updateMutation.mutate({
+		(updateMutation as any).mutate({
 			organizationId,
 			leadId: lead.id,
 			name: formData.name.trim(),
@@ -154,7 +154,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 						<Input
 							id="name"
 							value={formData.name}
-							onChange={(e) => update("name", e.target.value)}
+							onChange={(e: any) => update("name", e.target.value)}
 							placeholder={t("pricing.leads.form.namePlaceholder")}
 							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 							required
@@ -172,7 +172,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 							<Input
 								id="phone"
 								value={formData.phone}
-								onChange={(e) => update("phone", e.target.value)}
+								onChange={(e: any) => update("phone", e.target.value)}
 								placeholder={t("pricing.leads.form.phonePlaceholder")}
 								className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 								dir="ltr"
@@ -189,7 +189,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 								id="email"
 								type="email"
 								value={formData.email}
-								onChange={(e) => update("email", e.target.value)}
+								onChange={(e: any) => update("email", e.target.value)}
 								placeholder={t("pricing.leads.form.emailPlaceholder")}
 								className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 								dir="ltr"
@@ -207,7 +207,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 						<Input
 							id="company"
 							value={formData.company}
-							onChange={(e) => update("company", e.target.value)}
+							onChange={(e: any) => update("company", e.target.value)}
 							placeholder={t("pricing.leads.form.companyPlaceholder")}
 							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 						/>
@@ -267,7 +267,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 						<Label className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.projectType")}</Label>
 						<Select
 							value={formData.projectType || "none"}
-							onValueChange={(v) => update("projectType", v === "none" ? "" : v)}
+							onValueChange={(v: any) => update("projectType", v === "none" ? "" : v)}
 						>
 							<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
 								<SelectValue placeholder={t("pricing.leads.form.selectProjectType")} />
@@ -293,7 +293,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 						<Input
 							id="projectLocation"
 							value={formData.projectLocation}
-							onChange={(e) => update("projectLocation", e.target.value)}
+							onChange={(e: any) => update("projectLocation", e.target.value)}
 							placeholder={t("pricing.leads.form.projectLocationPlaceholder")}
 							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 						/>
@@ -311,7 +311,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 									min="0"
 									step="any"
 									value={formData.estimatedArea}
-									onChange={(e) => update("estimatedArea", e.target.value)}
+									onChange={(e: any) => update("estimatedArea", e.target.value)}
 									className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 pe-12"
 									dir="ltr"
 								/>
@@ -332,7 +332,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 									min="0"
 									step="any"
 									value={formData.estimatedValue}
-									onChange={(e) => update("estimatedValue", e.target.value)}
+									onChange={(e: any) => update("estimatedValue", e.target.value)}
 									className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 pe-12"
 									dir="ltr"
 								/>
@@ -364,7 +364,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 					<div className="grid gap-4 sm:grid-cols-3">
 						<div>
 							<Label className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.source")}</Label>
-							<Select value={formData.source} onValueChange={(v) => update("source", v)}>
+							<Select value={formData.source} onValueChange={(v: any) => update("source", v)}>
 								<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
 									<SelectValue />
 								</SelectTrigger>
@@ -379,7 +379,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 						</div>
 						<div>
 							<Label className="text-slate-700 dark:text-slate-300">{t("pricing.leads.form.priority")}</Label>
-							<Select value={formData.priority} onValueChange={(v) => update("priority", v)}>
+							<Select value={formData.priority} onValueChange={(v: any) => update("priority", v)}>
 								<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
 									<SelectValue />
 								</SelectTrigger>
@@ -401,7 +401,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 							</Label>
 							<Select
 								value={formData.assignedToId || "none"}
-								onValueChange={(v) => update("assignedToId", v === "none" ? "" : v)}
+								onValueChange={(v: any) => update("assignedToId", v === "none" ? "" : v)}
 							>
 								<SelectTrigger className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
 									<SelectValue placeholder={t("pricing.leads.form.selectAssignee")} />
@@ -429,7 +429,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 							id="expectedCloseDate"
 							type="date"
 							value={formData.expectedCloseDate}
-							onChange={(e) => update("expectedCloseDate", e.target.value)}
+							onChange={(e: any) => update("expectedCloseDate", e.target.value)}
 							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
 							dir="ltr"
 						/>
@@ -440,7 +440,7 @@ export function EditLeadForm({ organizationId, organizationSlug, members, lead }
 						<Textarea
 							id="notes"
 							value={formData.notes}
-							onChange={(e) => update("notes", e.target.value)}
+							onChange={(e: any) => update("notes", e.target.value)}
 							placeholder={t("pricing.leads.form.notesPlaceholder")}
 							className="mt-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 min-h-[80px]"
 							rows={3}

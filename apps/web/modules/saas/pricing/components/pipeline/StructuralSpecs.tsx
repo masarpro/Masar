@@ -127,7 +127,7 @@ export function StructuralSpecs({
 					queryKey: [["pricing", "studies", "structuralSpecs"]],
 				});
 			},
-			onError: (e) => toast.error(e.message || "حدث خطأ"),
+			onError: (e: any) => toast.error(e.message || "حدث خطأ"),
 		}),
 	);
 
@@ -140,7 +140,7 @@ export function StructuralSpecs({
 	);
 
 	const handleSave = () => {
-		saveMutation.mutate({
+		(saveMutation as any).mutate({
 			organizationId,
 			studyId,
 			specs,
@@ -224,7 +224,7 @@ export function StructuralSpecs({
 							</label>
 							<Select
 								value={specs[row.key] || "none"}
-								onValueChange={(v) =>
+								onValueChange={(v: any) =>
 									handleChange(row.key, v === "none" ? "" : v)
 								}
 							>

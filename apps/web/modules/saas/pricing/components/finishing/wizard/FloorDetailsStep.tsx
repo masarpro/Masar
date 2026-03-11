@@ -295,7 +295,7 @@ export function FloorDetailsStep({
 							</Label>
 							{otherFloors.length > 0 && (
 								<Select
-									onValueChange={(v) =>
+									onValueChange={(v: any) =>
 										copyRoomsFromFloor(activeFloorId, v)
 									}
 								>
@@ -338,7 +338,7 @@ export function FloorDetailsStep({
 									>
 										<Input
 											value={room.name}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												updateRoom(
 													activeFloorId,
 													room.id,
@@ -350,7 +350,7 @@ export function FloorDetailsStep({
 										/>
 										<Select
 											value={room.type}
-											onValueChange={(v) =>
+											onValueChange={(v: any) =>
 												updateRoom(
 													activeFloorId,
 													room.id,
@@ -393,7 +393,7 @@ export function FloorDetailsStep({
 										<Input
 											type="number"
 											value={room.length || ""}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												updateRoom(
 													activeFloorId,
 													room.id,
@@ -409,7 +409,7 @@ export function FloorDetailsStep({
 										<Input
 											type="number"
 											value={room.width || ""}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												updateRoom(
 													activeFloorId,
 													room.id,
@@ -505,7 +505,7 @@ export function FloorDetailsStep({
 							</Label>
 							{otherFloors.length > 0 && (
 								<Select
-									onValueChange={(v) =>
+									onValueChange={(v: any) =>
 										copyOpeningsFromFloor(
 											activeFloorId,
 											v,
@@ -550,7 +550,7 @@ export function FloorDetailsStep({
 									>
 										<Input
 											value={opening.subType}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												updateOpening(
 													activeFloorId,
 													opening.id,
@@ -563,7 +563,7 @@ export function FloorDetailsStep({
 										<Input
 											type="number"
 											value={opening.width || ""}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												updateOpening(
 													activeFloorId,
 													opening.id,
@@ -579,7 +579,7 @@ export function FloorDetailsStep({
 										<Input
 											type="number"
 											value={opening.height || ""}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												updateOpening(
 													activeFloorId,
 													opening.id,
@@ -595,7 +595,7 @@ export function FloorDetailsStep({
 										<Input
 											type="number"
 											value={opening.count || ""}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												updateOpening(
 													activeFloorId,
 													opening.id,
@@ -615,7 +615,7 @@ export function FloorDetailsStep({
 											<input
 												type="checkbox"
 												checked={opening.isExternal}
-												onChange={(e) =>
+												onChange={(e: any) =>
 													updateOpening(
 														activeFloorId,
 														opening.id,

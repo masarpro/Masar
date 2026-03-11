@@ -107,12 +107,12 @@ export function LeadsFilters({
 					<Input
 						placeholder={t("pricing.leads.searchPlaceholder")}
 						value={search}
-						onChange={(e) => onSearchChange(e.target.value)}
+						onChange={(e: any) => onSearchChange(e.target.value)}
 						className="pr-10 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-700"
 					/>
 				</div>
 
-				<Select value={source || "all"} onValueChange={(v) => onSourceChange(v === "all" ? "" : v)}>
+				<Select value={source || "all"} onValueChange={(v: any) => onSourceChange(v === "all" ? "" : v)}>
 					<SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
 						<SelectValue placeholder={t("pricing.leads.allSources")} />
 					</SelectTrigger>
@@ -126,7 +126,7 @@ export function LeadsFilters({
 					</SelectContent>
 				</Select>
 
-				<Select value={priority || "all"} onValueChange={(v) => onPriorityChange(v === "all" ? "" : v)}>
+				<Select value={priority || "all"} onValueChange={(v: any) => onPriorityChange(v === "all" ? "" : v)}>
 					<SelectTrigger className="w-[130px] bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
 						<SelectValue placeholder={t("pricing.leads.allPriorities")} />
 					</SelectTrigger>

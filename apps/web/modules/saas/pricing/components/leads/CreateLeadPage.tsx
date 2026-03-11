@@ -16,7 +16,7 @@ export function CreateLeadPage({ organizationId, organizationSlug }: CreateLeadP
 		}),
 	);
 
-	const members = membersData?.users ?? [];
+	const members = (membersData as any)?.users ?? [];
 
 	return (
 		<CreateLeadForm

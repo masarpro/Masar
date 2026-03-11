@@ -86,7 +86,7 @@ export function LeadsTable({ leads, organizationId, organizationSlug }: LeadsTab
 
 	const handleDelete = () => {
 		if (!deleteId) return;
-		deleteMutation.mutate({ organizationId, leadId: deleteId });
+		(deleteMutation as any).mutate({ organizationId, leadId: deleteId });
 	};
 
 	if (leads.length === 0) {
@@ -208,7 +208,7 @@ export function LeadsTable({ leads, organizationId, organizationSlug }: LeadsTab
 												variant="ghost"
 												size="icon"
 												className="h-8 w-8 rounded-lg"
-												onClick={(e) => e.stopPropagation()}
+												onClick={(e: any) => e.stopPropagation()}
 											>
 												<MoreHorizontal className="h-4 w-4" />
 											</Button>
@@ -229,7 +229,7 @@ export function LeadsTable({ leads, organizationId, organizationSlug }: LeadsTab
 											<DropdownMenuSeparator />
 											<DropdownMenuItem
 												className="text-destructive"
-												onClick={(e) => {
+												onClick={(e: any) => {
 													e.stopPropagation();
 													setDeleteId(lead.id);
 												}}
@@ -246,7 +246,7 @@ export function LeadsTable({ leads, organizationId, organizationSlug }: LeadsTab
 				</Table>
 			</div>
 
-			<AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+			<AlertDialog open={!!deleteId} onOpenChange={(open: any) => !open && setDeleteId(null)}>
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>{t("pricing.leads.messages.deleteConfirm")}</AlertDialogTitle>

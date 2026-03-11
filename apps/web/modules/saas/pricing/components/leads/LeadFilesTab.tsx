@@ -181,7 +181,7 @@ export function LeadFilesTab({ leadId, organizationId, files }: LeadFilesTabProp
 				</div>
 			</div>
 
-			<AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+			<AlertDialog open={!!deleteId} onOpenChange={(open: any) => !open && setDeleteId(null)}>
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>{t("pricing.leads.detail.deleteFileConfirm")}</AlertDialogTitle>
@@ -194,7 +194,7 @@ export function LeadFilesTab({ leadId, organizationId, files }: LeadFilesTabProp
 						<AlertDialogAction
 							onClick={() => {
 								if (deleteId) {
-									deleteMutation.mutate({ organizationId, leadId, fileId: deleteId });
+									(deleteMutation as any).mutate({ organizationId, leadId, fileId: deleteId });
 								}
 							}}
 							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"

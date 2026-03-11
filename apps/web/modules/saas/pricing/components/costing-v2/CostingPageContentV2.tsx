@@ -42,7 +42,7 @@ export function CostingPageContentV2({
 		}),
 	);
 
-	const stages = stagesData?.stages ?? [];
+	const stages = (stagesData as any)?.stages ?? [];
 	const specsStage = stages.find((s: { stage: string }) => s.stage === "SPECIFICATIONS");
 	const isSpecsApproved = specsStage?.status === "APPROVED";
 
@@ -60,7 +60,7 @@ export function CostingPageContentV2({
 
 	useEffect(() => {
 		if (isSpecsApproved && !generateMutation.isPending && !generateMutation.isSuccess) {
-			generateMutation.mutate({ organizationId, studyId });
+			(generateMutation as any).mutate({ organizationId, studyId });
 		}
 	}, [isSpecsApproved]);
 
@@ -91,7 +91,7 @@ export function CostingPageContentV2({
 		);
 	}
 
-	const buildingArea = Number(study?.buildingArea ?? 0);
+	const buildingArea = Number((study as any)?.buildingArea ?? 0);
 
 	return (
 		<div className="space-y-6" dir="rtl">

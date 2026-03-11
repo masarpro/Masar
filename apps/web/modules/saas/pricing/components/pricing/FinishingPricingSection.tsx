@@ -215,7 +215,7 @@ function FinishingPricingRow({
 				const mpVal = parseFloat(mp);
 				const lpVal = parseFloat(lp);
 				const wpVal = parseFloat(wp);
-				updateMutation.mutate({
+				(updateMutation as any).mutate({
 					id: item.id,
 					costStudyId: studyId,
 					organizationId,
@@ -256,7 +256,7 @@ function FinishingPricingRow({
 			<Input
 				type="number"
 				value={matPrice}
-				onChange={(e) => {
+				onChange={(e: any) => {
 					setMatPrice(e.target.value);
 					debouncedSave(e.target.value, labPrice, wastage);
 				}}
@@ -269,7 +269,7 @@ function FinishingPricingRow({
 			<Input
 				type="number"
 				value={labPrice}
-				onChange={(e) => {
+				onChange={(e: any) => {
 					setLabPrice(e.target.value);
 					debouncedSave(matPrice, e.target.value, wastage);
 				}}
@@ -282,7 +282,7 @@ function FinishingPricingRow({
 			<Input
 				type="number"
 				value={wastage}
-				onChange={(e) => {
+				onChange={(e: any) => {
 					setWastage(e.target.value);
 					debouncedSave(matPrice, labPrice, e.target.value);
 				}}

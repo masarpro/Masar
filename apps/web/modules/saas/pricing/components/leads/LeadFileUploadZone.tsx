@@ -92,7 +92,7 @@ export function LeadFileUploadZone({
 			setErrorMessage("");
 
 			try {
-				const uploadData = await getUploadUrlMutation.mutateAsync({
+				const uploadData = await (getUploadUrlMutation as any).mutateAsync({
 					organizationId,
 					leadId,
 					fileName: file.name,
@@ -113,16 +113,16 @@ export function LeadFileUploadZone({
 					});
 					xhr.addEventListener("error", () => reject(new Error("Network error")));
 					xhr.timeout = 120000;
-					xhr.open("PUT", uploadData.uploadUrl);
+					xhr.open("PUT", (uploadData as any).uploadUrl);
 					xhr.setRequestHeader("Content-Type", file.type);
 					xhr.send(file);
 				});
 
-				await saveFileMutation.mutateAsync({
+				await (saveFileMutation as any).mutateAsync({
 					organizationId,
 					leadId,
 					name: file.name,
-					storagePath: uploadData.storagePath,
+					storagePath: (uploadData as any).storagePath,
 					fileSize: file.size,
 					mimeType: file.type,
 					category: category as any,

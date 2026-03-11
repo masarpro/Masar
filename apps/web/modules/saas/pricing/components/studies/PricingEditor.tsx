@@ -37,7 +37,7 @@ export function PricingEditor({
 	const t = useTranslations();
 	const basePath = `/app/${organizationSlug}/pricing/studies/${studyId}`;
 
-	const { data: study, isLoading } = useQuery(
+	const { data: study, isLoading } = useQuery<any>(
 		orpc.pricing.studies.getById.queryOptions({
 			input: {
 				id: studyId,
@@ -46,25 +46,25 @@ export function PricingEditor({
 		}),
 	);
 
-	const { data: rawStructuralItems = [] } = useQuery(
+	const { data: rawStructuralItems = [] } = useQuery<any>(
 		orpc.pricing.studies.getStructuralItems.queryOptions({
 			input: { costStudyId: studyId, organizationId },
 		}),
 	);
 
-	const { data: rawFinishingItems = [] } = useQuery(
+	const { data: rawFinishingItems = [] } = useQuery<any>(
 		orpc.pricing.studies.getFinishingItems.queryOptions({
 			input: { costStudyId: studyId, organizationId },
 		}),
 	);
 
-	const { data: rawMEPItems = [] } = useQuery(
+	const { data: rawMEPItems = [] } = useQuery<any>(
 		orpc.pricing.studies.getMEPItems.queryOptions({
 			input: { costStudyId: studyId, organizationId },
 		}),
 	);
 
-	const { data: quotes = [] } = useQuery(
+	const { data: quotes = [] } = useQuery<any>(
 		orpc.pricing.studies.getQuotes.queryOptions({
 			input: { costStudyId: studyId, organizationId },
 		}),
@@ -72,7 +72,7 @@ export function PricingEditor({
 
 	// Convert structural items
 	const structuralItems = useMemo(() => {
-		return rawStructuralItems.map((item) => ({
+		return rawStructuralItems.map((item: any) => ({
 			id: item.id,
 			category: item.category,
 			subCategory: item.subCategory,
@@ -89,7 +89,7 @@ export function PricingEditor({
 
 	// Convert finishing items
 	const finishingItems = useMemo(() => {
-		return rawFinishingItems.map((item) => ({
+		return rawFinishingItems.map((item: any) => ({
 			id: item.id,
 			category: item.category,
 			subCategory: item.subCategory,
@@ -110,7 +110,7 @@ export function PricingEditor({
 
 	// Convert MEP items
 	const mepItems = useMemo(() => {
-		return rawMEPItems.map((item) => ({
+		return rawMEPItems.map((item: any) => ({
 			id: item.id,
 			category: item.category,
 			subCategory: item.subCategory,
@@ -257,7 +257,7 @@ export function PricingEditor({
 				<CardContent>
 					{quotes.length > 0 ? (
 						<div className="space-y-3">
-							{quotes.map((quote) => (
+							{quotes.map((quote: any) => (
 								<div
 									key={quote.id}
 									className="flex items-center justify-between p-3 border rounded-lg"

@@ -64,7 +64,7 @@ export function LaborCostInput({
 			{/* Type selector */}
 			<Select
 				value={laborType || "none"}
-				onValueChange={(v) =>
+				onValueChange={(v: any) =>
 					onChange({ laborType: v === "none" ? null : (v as LaborCostType) })
 				}
 			>
@@ -88,7 +88,7 @@ export function LaborCostInput({
 						type="number"
 						placeholder="السعر"
 						value={laborUnitCost ?? ""}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							onChange({ laborUnitCost: e.target.value ? Number(e.target.value) : null })
 						}
 						className="h-7 text-xs w-20"
@@ -99,7 +99,7 @@ export function LaborCostInput({
 						type="number"
 						placeholder="الكمية"
 						value={laborQuantity ?? ""}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							onChange({ laborQuantity: e.target.value ? Number(e.target.value) : null })
 						}
 						className="h-7 text-xs w-20"
@@ -114,7 +114,7 @@ export function LaborCostInput({
 					type="number"
 					placeholder="المبلغ المقطوع"
 					value={laborUnitCost ?? ""}
-					onChange={(e) =>
+					onChange={(e: any) =>
 						onChange({ laborUnitCost: e.target.value ? Number(e.target.value) : null })
 					}
 					className="h-7 text-xs"
@@ -129,7 +129,7 @@ export function LaborCostInput({
 						type="number"
 						placeholder="عمال"
 						value={laborWorkers ?? ""}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							onChange({ laborWorkers: e.target.value ? Number(e.target.value) : null })
 						}
 						className="h-7 text-xs"
@@ -139,7 +139,7 @@ export function LaborCostInput({
 						type="number"
 						placeholder="راتب"
 						value={laborSalary ?? ""}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							onChange({ laborSalary: e.target.value ? Number(e.target.value) : null })
 						}
 						className="h-7 text-xs"
@@ -149,7 +149,7 @@ export function LaborCostInput({
 						type="number"
 						placeholder="أشهر"
 						value={laborMonths ?? ""}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							onChange({ laborMonths: e.target.value ? Number(e.target.value) : null })
 						}
 						className="h-7 text-xs"

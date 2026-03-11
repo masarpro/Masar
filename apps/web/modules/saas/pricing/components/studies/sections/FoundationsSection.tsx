@@ -383,15 +383,15 @@ export function FoundationsSection({
 		};
 
 		if (editingItemId) {
-			updateMutation.mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
+			(updateMutation as any).mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
 		} else {
-			createMutation.mutate(itemData);
+			(createMutation as any).mutate(itemData);
 		}
 	};
 
 	const handleDelete = (id: string) => {
 		if (confirm(t("pricing.studies.messages.confirmDelete"))) {
-			deleteMutation.mutate({ id, organizationId, costStudyId: studyId });
+			(deleteMutation as any).mutate({ id, organizationId, costStudyId: studyId });
 		}
 	};
 
@@ -623,7 +623,7 @@ export function FoundationsSection({
 											type="checkbox"
 											id="hasTopMesh"
 											checked={formData.hasTopShort && formData.hasTopLong}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												setFormData({
 													...formData,
 													hasTopShort: e.target.checked,
@@ -740,7 +740,7 @@ export function FoundationsSection({
 											type="checkbox"
 											id="hasTopMeshRaft"
 											checked={formData.hasTopMesh}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												setFormData({ ...formData, hasTopMesh: e.target.checked })
 											}
 											className="rounded border-green-500"

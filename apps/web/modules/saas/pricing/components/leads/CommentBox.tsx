@@ -36,7 +36,7 @@ export function CommentBox({ leadId, organizationId }: CommentBoxProps) {
 	const handleSubmit = () => {
 		const trimmed = content.trim();
 		if (!trimmed) return;
-		mutation.mutate({ organizationId, leadId, content: trimmed });
+		(mutation as any).mutate({ organizationId, leadId, content: trimmed });
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -50,7 +50,7 @@ export function CommentBox({ leadId, organizationId }: CommentBoxProps) {
 		<div className="space-y-2">
 			<Textarea
 				value={content}
-				onChange={(e) => setContent(e.target.value)}
+				onChange={(e: any) => setContent(e.target.value)}
 				onKeyDown={handleKeyDown}
 				placeholder={t("pricing.leads.detail.commentPlaceholder")}
 				className="rounded-xl"

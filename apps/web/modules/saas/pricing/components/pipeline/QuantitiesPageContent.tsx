@@ -85,7 +85,7 @@ export function QuantitiesPageContent({
 		);
 	}
 
-	const stages = stagesData?.stages ?? {
+	const stages = (stagesData as any)?.stages ?? {
 		quantities: "DRAFT" as const,
 		specs: "NOT_STARTED" as const,
 		costing: "NOT_STARTED" as const,
@@ -93,7 +93,7 @@ export function QuantitiesPageContent({
 		quotation: "NOT_STARTED" as const,
 	};
 
-	const canApprove = stagesData?.canApprove ?? {
+	const canApprove = (stagesData as any)?.canApprove ?? {
 		quantities: true,
 		specs: true,
 		costing: true,
@@ -105,7 +105,7 @@ export function QuantitiesPageContent({
 		<div className="space-y-4" dir="rtl">
 			{/* Study Name */}
 			<div>
-				<h1 className="text-xl font-bold">{study.name || t("pricing.pipeline.quantities")}</h1>
+				<h1 className="text-xl font-bold">{(study as any).name || t("pricing.pipeline.quantities")}</h1>
 				<p className="text-sm text-muted-foreground">
 					{t("pricing.pipeline.quantities")} — {t("pricing.pipeline.quantitiesDesc")}
 				</p>

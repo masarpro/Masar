@@ -85,7 +85,7 @@ export function MEPItemsEditor({
 	);
 
 	// ─── Derived + Merged items ───
-	const buildingConfig = study?.buildingConfig as SmartBuildingConfig | null;
+	const buildingConfig = (study as any)?.buildingConfig as SmartBuildingConfig | null;
 
 	const derived = useMemo(() => {
 		if (!buildingConfig?.floors?.length) return [];
@@ -96,8 +96,8 @@ export function MEPItemsEditor({
 	}, [buildingConfig, study]);
 
 	const savedItems = useMemo(() => {
-		if (!mepItems.length) return [];
-		return mepItems.map((item) => ({
+		if (!(mepItems as any[]).length) return [];
+		return (mepItems as any[]).map((item: any) => ({
 			...item,
 			quantity: Number(item.quantity),
 			materialPrice: Number(item.materialPrice),
@@ -126,7 +126,7 @@ export function MEPItemsEditor({
 				toast.error("لا يمكن تعديل بند غير محفوظ");
 				return;
 			}
-			toggleMutation.mutate({
+			(toggleMutation as any).mutate({
 				id: item.id,
 				costStudyId: studyId,
 				organizationId,
@@ -151,7 +151,7 @@ export function MEPItemsEditor({
 			materialPrice: number;
 			laborPrice: number;
 		}) => {
-			createSingleMutation.mutate({
+			(createSingleMutation as any).mutate({
 				organizationId,
 				costStudyId: studyId,
 				category: item.category,
@@ -184,7 +184,7 @@ export function MEPItemsEditor({
 				return;
 			}
 
-			await createBatchMutation.mutateAsync({
+			await (createBatchMutation as any).mutateAsync({
 				organizationId,
 				costStudyId: studyId,
 				items: newItems.map((item) => ({

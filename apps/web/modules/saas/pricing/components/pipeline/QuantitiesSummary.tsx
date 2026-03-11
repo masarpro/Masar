@@ -33,28 +33,28 @@ export function QuantitiesSummary({
 	const sections = [
 		{
 			label: t("pricing.pipeline.summaryStructural"),
-			count: data?.structural ?? 0,
+			count: (data as any)?.structural ?? 0,
 			icon: Building2,
 			color: "text-blue-600",
 			bg: "bg-blue-50 dark:bg-blue-950/30",
 		},
 		{
 			label: t("pricing.pipeline.summaryFinishing"),
-			count: data?.finishing ?? 0,
+			count: (data as any)?.finishing ?? 0,
 			icon: PaintBucket,
 			color: "text-amber-600",
 			bg: "bg-amber-50 dark:bg-amber-950/30",
 		},
 		{
 			label: t("pricing.pipeline.summaryMep"),
-			count: data?.mep ?? 0,
+			count: (data as any)?.mep ?? 0,
 			icon: Wrench,
 			color: "text-emerald-600",
 			bg: "bg-emerald-50 dark:bg-emerald-950/30",
 		},
 		{
 			label: t("pricing.pipeline.summaryManual"),
-			count: data?.manual ?? 0,
+			count: (data as any)?.manual ?? 0,
 			icon: FileEdit,
 			color: "text-purple-600",
 			bg: "bg-purple-50 dark:bg-purple-950/30",
@@ -70,7 +70,7 @@ export function QuantitiesSummary({
 					</h3>
 					{!isLoading && (
 						<span className="text-xs text-muted-foreground">
-							{t("pricing.pipeline.totalItems")}: {data?.total ?? 0}
+							{t("pricing.pipeline.totalItems")}: {(data as any)?.total ?? 0}
 						</span>
 					)}
 				</div>

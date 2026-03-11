@@ -71,7 +71,7 @@ export function ElementHeaderRow({
 			<div className="flex-shrink-0 w-24">
 				<Input
 					value={name}
-					onChange={(e) => onNameChange(e.target.value)}
+					onChange={(e: any) => onNameChange(e.target.value)}
 					className="text-center font-bold"
 					placeholder={`${autoNamePrefix}1`}
 				/>
@@ -102,7 +102,7 @@ export function ElementHeaderRow({
 						type="number"
 						min={1}
 						value={quantity}
-						onChange={(e) => onQuantityChange(parseInt(e.target.value) || 1)}
+						onChange={(e: any) => onQuantityChange(parseInt(e.target.value) || 1)}
 						placeholder="العدد"
 						className="text-center"
 					/>

@@ -47,7 +47,7 @@ export function ConcreteTypeSelect({
 			{isCustom && onCustomValueChange && (
 				<Input
 					value={customValue || ""}
-					onChange={(e) => onCustomValueChange(e.target.value)}
+					onChange={(e: any) => onCustomValueChange(e.target.value)}
 					placeholder="مثال: C45"
 					className={compact ? "w-24" : ""}
 				/>

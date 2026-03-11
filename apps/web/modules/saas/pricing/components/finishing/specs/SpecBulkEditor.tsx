@@ -340,7 +340,7 @@ export function SpecBulkEditor({
 							<input
 								type="text"
 								value={templateName}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setTemplateName(e.target.value)
 								}
 								placeholder={tBulk("templateNamePlaceholder")}
@@ -405,7 +405,7 @@ export function SpecBulkEditor({
 										variant="ghost"
 										size="sm"
 										className="h-7 text-xs ms-auto"
-										onClick={(e) => {
+										onClick={(e: any) => {
 											e.stopPropagation();
 											handleSetAllInGroup(
 												group.groupKey,
@@ -671,7 +671,7 @@ function InlineOption({
 				<input
 					type="checkbox"
 					checked={value === true}
-					onChange={(e) => onChange(e.target.checked)}
+					onChange={(e: any) => onChange(e.target.checked)}
 					className="rounded border"
 				/>
 				{option.label}

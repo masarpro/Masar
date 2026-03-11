@@ -75,7 +75,7 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 		}),
 	);
 
-	const quotations = data?.quotations ?? [];
+	const quotations = (data as any)?.quotations ?? [];
 
 	if (isLoading) {
 		return <ListTableSkeleton />;
@@ -91,7 +91,7 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 						<Input
 							placeholder={t("pricing.quotations.searchPlaceholder")}
 							value={searchTerm}
-							onChange={(e) => setSearchTerm(e.target.value)}
+							onChange={(e: any) => setSearchTerm(e.target.value)}
 							className="pe-10 bg-muted/50 border-border rounded-xl"
 						/>
 					</div>
@@ -131,7 +131,7 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{quotations.map((quotation) => (
+							{quotations.map((quotation: any) => (
 								<TableRow key={quotation.id} className="hover:bg-muted/20">
 									<TableCell className="font-medium">
 										<Link

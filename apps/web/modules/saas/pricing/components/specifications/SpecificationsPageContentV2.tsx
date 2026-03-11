@@ -28,8 +28,8 @@ export function SpecificationsPageContentV2({
 		}),
 	);
 
-	const stages = stagesData?.stages ?? [];
-	const quantitiesStage = stages.find((s) => s.stage === "QUANTITIES");
+	const stages = (stagesData as any)?.stages ?? [];
+	const quantitiesStage = stages.find((s: any) => s.stage === "QUANTITIES");
 	const isQuantitiesApproved = quantitiesStage?.status === "APPROVED";
 
 	if (stagesLoading) {

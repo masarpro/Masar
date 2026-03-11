@@ -300,15 +300,15 @@ export function StairsSection({
 		};
 
 		if (editingItemId) {
-			updateMutation.mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
+			(updateMutation as any).mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
 		} else {
-			createMutation.mutate(itemData);
+			(createMutation as any).mutate(itemData);
 		}
 	};
 
 	const handleDelete = (id: string) => {
 		if (confirm(t("pricing.studies.messages.confirmDelete"))) {
-			deleteMutation.mutate({ id, organizationId, costStudyId: studyId });
+			(deleteMutation as any).mutate({ id, organizationId, costStudyId: studyId });
 		}
 	};
 
@@ -428,7 +428,7 @@ export function StairsSection({
 										step="0.1"
 										min={0}
 										value={formData.width}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											setFormData({ ...formData, width: +e.target.value })
 										}
 									/>
@@ -440,7 +440,7 @@ export function StairsSection({
 										step="0.1"
 										min={0}
 										value={formData.flightLength}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											setFormData({ ...formData, flightLength: +e.target.value })
 										}
 									/>
@@ -452,7 +452,7 @@ export function StairsSection({
 										step="0.1"
 										min={0}
 										value={formData.landingLength}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											setFormData({ ...formData, landingLength: +e.target.value })
 										}
 									/>
@@ -461,7 +461,7 @@ export function StairsSection({
 									<Label>{t("pricing.studies.structural.thickness")} ({t("pricing.studies.units.cm")})</Label>
 									<Select
 										value={formData.thickness.toString()}
-										onValueChange={(v) =>
+										onValueChange={(v: any) =>
 											setFormData({ ...formData, thickness: +v })
 										}
 									>
@@ -499,7 +499,7 @@ export function StairsSection({
 										type="number"
 										min={1}
 										value={formData.risersCount}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											setFormData({ ...formData, risersCount: +e.target.value })
 										}
 									/>
@@ -508,7 +508,7 @@ export function StairsSection({
 									<Label>ارتفاع القائمة ({t("pricing.studies.units.cm")})</Label>
 									<Select
 										value={formData.riserHeight.toString()}
-										onValueChange={(v) =>
+										onValueChange={(v: any) =>
 											setFormData({ ...formData, riserHeight: +v })
 										}
 									>
@@ -528,7 +528,7 @@ export function StairsSection({
 									<Label>عمق النائمة ({t("pricing.studies.units.cm")})</Label>
 									<Select
 										value={formData.treadDepth.toString()}
-										onValueChange={(v) =>
+										onValueChange={(v: any) =>
 											setFormData({ ...formData, treadDepth: +v })
 										}
 									>

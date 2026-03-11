@@ -234,14 +234,14 @@ export function WaterproofingItemDialog({
 		};
 
 		if (isEdit && editItem?.id) {
-			updateMutation.mutate({
+			(updateMutation as any).mutate({
 				organizationId,
 				costStudyId: studyId,
 				id: editItem.id,
 				...itemData,
 			});
 		} else {
-			createMutation.mutate({
+			(createMutation as any).mutate({
 				organizationId,
 				costStudyId: studyId,
 				...itemData,
@@ -295,7 +295,7 @@ export function WaterproofingItemDialog({
 						<Label className="text-sm">{t("name")}</Label>
 						<Input
 							value={name}
-							onChange={(e) => setName(e.target.value)}
+							onChange={(e: any) => setName(e.target.value)}
 						/>
 					</div>
 
@@ -321,7 +321,7 @@ export function WaterproofingItemDialog({
 						<Label className="text-sm">{t("materialType")}</Label>
 						<Select
 							value={materialKey}
-							onValueChange={(v) => setMaterialKey(v as WaterproofingMaterialKey)}
+							onValueChange={(v: any) => setMaterialKey(v as WaterproofingMaterialKey)}
 						>
 							<SelectTrigger>
 								<SelectValue />
@@ -342,7 +342,7 @@ export function WaterproofingItemDialog({
 							<Label className="text-sm">{t("otherMaterial")}</Label>
 							<Input
 								value={customMaterialName}
-								onChange={(e) => setCustomMaterialName(e.target.value)}
+								onChange={(e: any) => setCustomMaterialName(e.target.value)}
 							/>
 						</div>
 					)}
@@ -354,14 +354,14 @@ export function WaterproofingItemDialog({
 							<Input
 								type="number"
 								value={thickness || ""}
-								onChange={(e) => setThickness(parseFloat(e.target.value) || 0)}
+								onChange={(e: any) => setThickness(parseFloat(e.target.value) || 0)}
 							/>
 						</div>
 						<div className="space-y-1">
 							<Label className="text-sm">{t("layers")}</Label>
 							<Select
 								value={String(layers)}
-								onValueChange={(v) => setLayers(Number(v))}
+								onValueChange={(v: any) => setLayers(Number(v))}
 							>
 								<SelectTrigger>
 									<SelectValue />
@@ -380,7 +380,7 @@ export function WaterproofingItemDialog({
 						<Checkbox
 							id="includesPrimer"
 							checked={includesPrimer}
-							onCheckedChange={(v) => setIncludesPrimer(v === true)}
+							onCheckedChange={(v: any) => setIncludesPrimer(v === true)}
 						/>
 						<Label htmlFor="includesPrimer" className="text-sm cursor-pointer">
 							{t("includePrimer")}
@@ -396,7 +396,7 @@ export function WaterproofingItemDialog({
 								<Input
 									type="number"
 									value={areaInput}
-									onChange={(e) => {
+									onChange={(e: any) => {
 										const val = parseFloat(e.target.value);
 										setAreaInput(Number.isNaN(val) ? "" : val);
 										if (!Number.isNaN(val) && val > 0) {
@@ -411,7 +411,7 @@ export function WaterproofingItemDialog({
 								<Input
 									type="number"
 									value={lengthInput}
-									onChange={(e) => {
+									onChange={(e: any) => {
 										const val = parseFloat(e.target.value);
 										setLengthInput(Number.isNaN(val) ? "" : val);
 										if (!Number.isNaN(val) && val > 0) setAreaInput("");
@@ -423,7 +423,7 @@ export function WaterproofingItemDialog({
 								<Input
 									type="number"
 									value={widthInput}
-									onChange={(e) => {
+									onChange={(e: any) => {
 										const val = parseFloat(e.target.value);
 										setWidthInput(Number.isNaN(val) ? "" : val);
 										if (!Number.isNaN(val) && val > 0) setAreaInput("");
@@ -439,7 +439,7 @@ export function WaterproofingItemDialog({
 						<Input
 							type="number"
 							value={wastagePercent}
-							onChange={(e) => setWastagePercent(parseFloat(e.target.value) || 0)}
+							onChange={(e: any) => setWastagePercent(parseFloat(e.target.value) || 0)}
 						/>
 						<p className="text-xs text-muted-foreground">{t("autoByMaterial")}</p>
 					</div>

@@ -47,7 +47,7 @@ export function LinkCostStudyDialog({ open, onOpenChange, leadId, organizationId
 		}),
 	);
 
-	const studies = data?.costStudies ?? [];
+	const studies = (data as any)?.costStudies ?? [];
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -91,7 +91,7 @@ export function LinkCostStudyDialog({ open, onOpenChange, leadId, organizationId
 					</Button>
 					<Button
 						className="rounded-xl"
-						onClick={() => selectedId && linkMutation.mutate({ organizationId, leadId, costStudyId: selectedId })}
+						onClick={() => selectedId && (linkMutation as any).mutate({ organizationId, leadId, costStudyId: selectedId })}
 						disabled={!selectedId || linkMutation.isPending}
 					>
 						{linkMutation.isPending && <Loader2 className="me-2 h-4 w-4 animate-spin" />}

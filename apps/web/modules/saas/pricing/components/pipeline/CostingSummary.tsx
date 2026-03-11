@@ -45,6 +45,8 @@ export function CostingSummary({
 
 	if (!data) return null;
 
+	const d = data as any;
+
 	return (
 		<Card dir="rtl">
 			<CardHeader className="pb-3">
@@ -65,7 +67,7 @@ export function CostingSummary({
 							</tr>
 						</thead>
 						<tbody>
-							{data.sections.map((sec) => (
+							{d.sections.map((sec: any) => (
 								<tr key={sec.section} className="border-b">
 									<td className="px-3 py-2 font-medium">
 										{SECTION_LABELS[sec.section] || sec.section}
@@ -89,16 +91,16 @@ export function CostingSummary({
 							<tr className="border-t-2 bg-muted/30 font-semibold">
 								<td className="px-3 py-2">{t("pricing.pipeline.costingGrandTotal")}</td>
 								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-									{formatAmount(data.grandTotal.material)}
+									{formatAmount(d.grandTotal.material)}
 								</td>
 								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-									{formatAmount(data.grandTotal.labor)}
+									{formatAmount(d.grandTotal.labor)}
 								</td>
 								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-									{formatAmount(data.grandTotal.storage)}
+									{formatAmount(d.grandTotal.storage)}
 								</td>
 								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
-									{formatAmount(data.grandTotal.total)}
+									{formatAmount(d.grandTotal.total)}
 								</td>
 							</tr>
 						</tbody>
@@ -108,10 +110,10 @@ export function CostingSummary({
 				{/* Overhead row */}
 				<div className="mt-4 flex items-center justify-between border-t pt-3">
 					<span className="text-sm text-muted-foreground">
-						{t("pricing.pipeline.costingOverhead")} ({data.overheadPercent}%)
+						{t("pricing.pipeline.costingOverhead")} ({d.overheadPercent}%)
 					</span>
 					<span className="text-sm font-medium tabular-nums" dir="ltr">
-						{formatAmount(data.overheadAmount)} ر.س
+						{formatAmount(d.overheadAmount)} ر.س
 					</span>
 				</div>
 
@@ -121,7 +123,7 @@ export function CostingSummary({
 						{t("pricing.pipeline.costingTotalWithOverhead")}
 					</span>
 					<span className="text-lg font-bold text-primary tabular-nums" dir="ltr">
-						{formatAmount(data.costWithOverhead)} ر.س
+						{formatAmount(d.costWithOverhead)} ر.س
 					</span>
 				</div>
 			</CardContent>

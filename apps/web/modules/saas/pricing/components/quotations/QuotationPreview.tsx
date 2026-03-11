@@ -26,11 +26,12 @@ export function QuotationPreview({
 	const basePath = `/app/${organizationSlug}/pricing/quotations`;
 
 	// Fetch quotation data
-	const { data: quotation, isLoading: isLoadingQuotation } = useQuery(
+	const { data: quotationRaw, isLoading: isLoadingQuotation } = useQuery(
 		orpc.pricing.quotations.getById.queryOptions({
 			input: { organizationId, id: quotationId },
 		}),
 	);
+	const quotation = quotationRaw as any;
 
 	// القالب يأتي مع بيانات عرض السعر مباشرة
 	const linkedTemplate = quotation?.template;
@@ -44,12 +45,13 @@ export function QuotationPreview({
 	});
 
 	// Fetch organization finance settings
-	const { data: orgSettings, isLoading: isLoadingSettings } = useQuery({
+	const { data: orgSettingsRaw, isLoading: isLoadingSettings } = useQuery({
 		...orpc.finance.settings.get.queryOptions({
 			input: { organizationId },
 		}),
 		staleTime: STALE_TIMES.FINANCE_SETTINGS,
 	});
+	const orgSettings = orgSettingsRaw as any;
 
 	// Use linked template or default
 	const template = linkedTemplate || defaultTemplate;
@@ -91,7 +93,7 @@ export function QuotationPreview({
 		clientEmail: quotation.clientEmail ?? undefined,
 		clientAddress: quotation.clientAddress ?? undefined,
 		clientTaxNumber: quotation.clientTaxNumber ?? undefined,
-		items: quotation.items.map((item) => ({
+		items: quotation.items.map((item: any) => ({
 			description: item.description,
 			quantity: item.quantity,
 			unit: item.unit ?? undefined,

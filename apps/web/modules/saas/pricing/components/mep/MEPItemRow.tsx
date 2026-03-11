@@ -37,7 +37,7 @@ export function MEPItemRow({
 			{/* Checkbox */}
 			<Checkbox
 				checked={item.isEnabled}
-				onCheckedChange={(checked) =>
+				onCheckedChange={(checked: any) =>
 					onToggleEnabled(item, checked === true)
 				}
 				className="h-4 w-4"

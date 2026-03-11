@@ -58,7 +58,7 @@ export function CostingPageContent({
 	// ─── Generate mutation ───
 	const generateMutation = useMutation(
 		orpc.pricing.studies.costing.generate.mutationOptions({
-			onSuccess: (data) => {
+			onSuccess: (data: any) => {
 				if (data.generated > 0) {
 					toast.success(`تم توليد ${data.generated} بند للتسعير`);
 				} else {
@@ -68,12 +68,12 @@ export function CostingPageContent({
 					queryKey: [["pricing", "studies", "costing"]],
 				});
 			},
-			onError: (e) => toast.error(e.message || "حدث خطأ"),
+			onError: (e: any) => toast.error(e.message || "حدث خطأ"),
 		}),
 	);
 
 	const handleGenerate = () => {
-		generateMutation.mutate({ organizationId, studyId });
+		(generateMutation as any).mutate({ organizationId, studyId });
 	};
 
 	// ─── Loading ───
@@ -89,7 +89,7 @@ export function CostingPageContent({
 		);
 	}
 
-	const stages = stagesData?.stages ?? {
+	const stages = (stagesData as any)?.stages ?? {
 		quantities: "DRAFT" as const,
 		specs: "NOT_STARTED" as const,
 		costing: "NOT_STARTED" as const,
@@ -97,7 +97,7 @@ export function CostingPageContent({
 		quotation: "NOT_STARTED" as const,
 	};
 
-	const canApprove = stagesData?.canApprove ?? {
+	const canApprove = (stagesData as any)?.canApprove ?? {
 		quantities: true,
 		specs: true,
 		costing: true,
@@ -113,7 +113,7 @@ export function CostingPageContent({
 			<div className="flex items-center justify-between">
 				<div>
 					<h1 className="text-xl font-bold">
-						{study.name || t("pricing.pipeline.costing")}
+						{(study as any).name || t("pricing.pipeline.costing")}
 					</h1>
 					<p className="text-sm text-muted-foreground">
 						{t("pricing.pipeline.costing")} — {t("pricing.pipeline.costingDesc")}

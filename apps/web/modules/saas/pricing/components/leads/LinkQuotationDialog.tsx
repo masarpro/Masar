@@ -47,7 +47,7 @@ export function LinkQuotationDialog({ open, onOpenChange, leadId, organizationId
 		}),
 	);
 
-	const quotations = data?.quotations ?? [];
+	const quotations = (data as any)?.quotations ?? [];
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -98,7 +98,7 @@ export function LinkQuotationDialog({ open, onOpenChange, leadId, organizationId
 					</Button>
 					<Button
 						className="rounded-xl"
-						onClick={() => selectedId && linkMutation.mutate({ organizationId, leadId, quotationId: selectedId })}
+						onClick={() => selectedId && (linkMutation as any).mutate({ organizationId, leadId, quotationId: selectedId })}
 						disabled={!selectedId || linkMutation.isPending}
 					>
 						{linkMutation.isPending && <Loader2 className="me-2 h-4 w-4 animate-spin" />}

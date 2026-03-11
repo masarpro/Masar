@@ -97,7 +97,7 @@ export function LeadCard({ lead, basePath, organizationId, onDelete }: LeadCardP
 	);
 
 	const handleDelete = () => {
-		deleteMutation.mutate({ organizationId, leadId: lead.id });
+		(deleteMutation as any).mutate({ organizationId, leadId: lead.id });
 	};
 
 	const createdDate = new Date(lead.createdAt).toLocaleDateString("ar-SA", {

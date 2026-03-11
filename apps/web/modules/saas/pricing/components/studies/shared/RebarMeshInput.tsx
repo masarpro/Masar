@@ -79,7 +79,7 @@ export function RebarMeshInput({
 					<Label className="text-xs text-muted-foreground">قطر السيخ</Label>
 					<Select
 						value={diameter.toString()}
-						onValueChange={(v) => onDiameterChange(parseInt(v))}
+						onValueChange={(v: any) => onDiameterChange(parseInt(v))}
 					>
 						<SelectTrigger>
 							<SelectValue />
@@ -99,7 +99,7 @@ export function RebarMeshInput({
 					<Label className="text-xs text-muted-foreground">عدد الأسياخ/م</Label>
 					<Select
 						value={barsPerMeter.toString()}
-						onValueChange={(v) => onBarsPerMeterChange(parseInt(v))}
+						onValueChange={(v: any) => onBarsPerMeterChange(parseInt(v))}
 					>
 						<SelectTrigger>
 							<SelectValue />

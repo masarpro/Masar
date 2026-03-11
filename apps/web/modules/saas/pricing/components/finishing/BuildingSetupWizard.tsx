@@ -67,7 +67,7 @@ export function BuildingSetupWizard({
 
 	const saveMutation = useMutation(
 		orpc.pricing.studies.buildingConfig.update.mutationOptions({
-			onSuccess: (data) => {
+			onSuccess: (data: any) => {
 				const count =
 					(data as { cascadeUpdatedCount?: number })
 						.cascadeUpdatedCount ?? 0;
@@ -86,7 +86,7 @@ export function BuildingSetupWizard({
 
 	const saveConfig = useCallback(
 		(cfg: SmartBuildingConfig, stepIdx: number) => {
-			saveMutation.mutate({
+			(saveMutation as any).mutate({
 				organizationId,
 				costStudyId: studyId,
 				buildingConfig: {
@@ -158,7 +158,7 @@ export function BuildingSetupWizard({
 		};
 
 		// Save final config
-		saveMutation.mutate(
+		(saveMutation as any).mutate(
 			{
 				organizationId,
 				costStudyId: studyId,
@@ -213,7 +213,7 @@ export function BuildingSetupWizard({
 								});
 							} else {
 								// Update the saved item
-								updateMutation.mutate({
+								(updateMutation as any).mutate({
 									organizationId,
 									costStudyId: studyId,
 									id: savedItem.id,
@@ -292,7 +292,7 @@ export function BuildingSetupWizard({
 								groupKey: d.groupKey,
 								scope: d.scope,
 							}));
-							batchCreateMutation.mutate({
+							(batchCreateMutation as any).mutate({
 								organizationId,
 								costStudyId: studyId,
 								items,
@@ -358,7 +358,7 @@ export function BuildingSetupWizard({
 						scope: d.scope,
 					}));
 
-					batchCreateMutation.mutate(
+					(batchCreateMutation as any).mutate(
 						{
 							organizationId,
 							costStudyId: studyId,

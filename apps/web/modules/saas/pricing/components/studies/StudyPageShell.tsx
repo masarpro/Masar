@@ -39,8 +39,8 @@ export function StudyPageShell({
 	);
 
 	// Build stages array for stepper
-	const stagesArray = stagesData?.stages ?? [];
-	const entryPoint = stagesData?.entryPoint ?? "FROM_SCRATCH";
+	const stagesArray = (stagesData as any)?.stages ?? [];
+	const entryPoint = (stagesData as any)?.entryPoint ?? "FROM_SCRATCH";
 
 	if (isLoading) {
 		return <StudyOverviewSkeleton />;
@@ -65,7 +65,7 @@ export function StudyPageShell({
 			{/* Sidebar — desktop only */}
 			<StudySidebar
 				studyId={studyId}
-				studyName={study.name}
+				studyName={(study as any).name}
 				organizationSlug={organizationSlug}
 				stages={stagesArray}
 				entryPoint={entryPoint}
@@ -74,7 +74,7 @@ export function StudyPageShell({
 			{/* Main content area */}
 			<div className="flex-1 min-w-0 space-y-6">
 				{/* Header card */}
-				<StudyHeaderCard study={study} />
+				<StudyHeaderCard study={study as any} />
 
 				{/* Mobile stepper (hidden on lg where sidebar is shown) */}
 				<div className="lg:hidden">

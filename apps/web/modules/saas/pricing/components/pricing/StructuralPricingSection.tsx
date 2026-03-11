@@ -200,7 +200,7 @@ function StructuralPricingRow({
 				const lcVal = parseFloat(lc);
 				const materialCost = Number.isNaN(mcVal) ? 0 : mcVal;
 				const laborCost = Number.isNaN(lcVal) ? 0 : lcVal;
-				updateMutation.mutate({
+				(updateMutation as any).mutate({
 					id: item.id,
 					costStudyId: studyId,
 					organizationId,
@@ -237,7 +237,7 @@ function StructuralPricingRow({
 			<Input
 				type="number"
 				value={matCost}
-				onChange={(e) => {
+				onChange={(e: any) => {
 					setMatCost(e.target.value);
 					debouncedSave(e.target.value, labCost);
 				}}
@@ -250,7 +250,7 @@ function StructuralPricingRow({
 			<Input
 				type="number"
 				value={labCost}
-				onChange={(e) => {
+				onChange={(e: any) => {
 					setLabCost(e.target.value);
 					debouncedSave(matCost, e.target.value);
 				}}

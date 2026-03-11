@@ -209,7 +209,7 @@ export function QuantitiesDashboard({
 			...(config ?? { totalLandArea: 0, buildingPerimeter: 0, floors: [] }),
 			...result.updatedConfig,
 		};
-		configUpdateMutation.mutate({
+		(configUpdateMutation as any).mutate({
 			organizationId,
 			costStudyId: studyId,
 			buildingConfig: fullConfig,
@@ -241,7 +241,7 @@ export function QuantitiesDashboard({
 			scope: d.scope,
 		}));
 
-		saveMutation.mutate(
+		(saveMutation as any).mutate(
 			{
 				organizationId,
 				costStudyId: studyId,
@@ -315,7 +315,7 @@ export function QuantitiesDashboard({
 			}
 			saveTimerRef.current = setTimeout(() => {
 				if (item.isSaved && item.savedId) {
-					updateMutation.mutate(
+					(updateMutation as any).mutate(
 						{
 							organizationId,
 							costStudyId: studyId,
@@ -344,7 +344,7 @@ export function QuantitiesDashboard({
 						},
 					);
 				} else {
-					saveMutation.mutate(
+					(saveMutation as any).mutate(
 						{
 							organizationId,
 							costStudyId: studyId,

@@ -218,15 +218,15 @@ export function PlainConcreteSection({
 		};
 
 		if (editingItemId) {
-			updateMutation.mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
+			(updateMutation as any).mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
 		} else {
-			createMutation.mutate(itemData);
+			(createMutation as any).mutate(itemData);
 		}
 	};
 
 	const handleDelete = (id: string) => {
 		if (confirm(t("pricing.studies.messages.confirmDelete"))) {
-			deleteMutation.mutate({ id, organizationId, costStudyId: studyId });
+			(deleteMutation as any).mutate({ id, organizationId, costStudyId: studyId });
 		}
 	};
 
@@ -397,7 +397,7 @@ export function PlainConcreteSection({
 												min={0}
 												step={0.1}
 												value={formData.length || ""}
-												onChange={(e) => setFormData({ ...formData, length: parseFloat(e.target.value) || 0 })}
+												onChange={(e: any) => setFormData({ ...formData, length: parseFloat(e.target.value) || 0 })}
 												className="text-center"
 												placeholder="0.0"
 											/>
@@ -409,7 +409,7 @@ export function PlainConcreteSection({
 												min={0}
 												step={0.1}
 												value={formData.width || ""}
-												onChange={(e) => setFormData({ ...formData, width: parseFloat(e.target.value) || 0 })}
+												onChange={(e: any) => setFormData({ ...formData, width: parseFloat(e.target.value) || 0 })}
 												className="text-center"
 												placeholder="0.0"
 											/>
@@ -425,7 +425,7 @@ export function PlainConcreteSection({
 												min={0}
 												step={1}
 												value={formData.directArea || ""}
-												onChange={(e) => setFormData({ ...formData, directArea: parseFloat(e.target.value) || 0 })}
+												onChange={(e: any) => setFormData({ ...formData, directArea: parseFloat(e.target.value) || 0 })}
 												className="text-center text-lg"
 												placeholder="أدخل المساحة بالمتر المربع"
 											/>
@@ -441,7 +441,7 @@ export function PlainConcreteSection({
 										min={1}
 										step={1}
 										value={(formData.thickness * 100) || ""}
-										onChange={(e) => setFormData({ ...formData, thickness: (parseFloat(e.target.value) || 0) / 100 })}
+										onChange={(e: any) => setFormData({ ...formData, thickness: (parseFloat(e.target.value) || 0) / 100 })}
 										className="text-center"
 										placeholder="10"
 									/>

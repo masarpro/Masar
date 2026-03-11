@@ -197,12 +197,13 @@ export function QuotationForm({
 	}));
 
 	// Fetch existing quotation for edit mode
-	const { data: existingQuotation, isLoading: isLoadingQuotation } = useQuery({
+	const { data: existingQuotationRaw, isLoading: isLoadingQuotation } = useQuery({
 		...orpc.pricing.quotations.getById.queryOptions({
 			input: { organizationId, id: quotationId! },
 		}),
 		enabled: mode === "edit" && !!quotationId,
 	});
+	const existingQuotation = existingQuotationRaw as any;
 
 	// Initialize form with existing data in edit mode
 	useEffect(() => {
@@ -230,7 +231,7 @@ export function QuotationForm({
 
 			if (existingQuotation.items && existingQuotation.items.length > 0) {
 				setItems(
-					existingQuotation.items.map((item) => ({
+					existingQuotation.items.map((item: any) => ({
 						id: item.id,
 						description: item.description,
 						quantity: item.quantity,
@@ -254,20 +255,22 @@ export function QuotationForm({
 	}, [existingQuotation, mode, isInitialized]);
 
 	// Fetch organization members for sales rep
-	const { data: membersData } = useQuery(
+	const { data: membersDataRaw } = useQuery(
 		orpc.orgUsers.list.queryOptions({
 			input: { organizationId },
 		}),
 	);
+	const membersData = membersDataRaw as any;
 	const members = membersData?.users ?? [];
 
 	// Fetch organization finance settings
-	const { data: orgSettings } = useQuery({
+	const { data: orgSettingsRaw } = useQuery({
 		...orpc.finance.settings.get.queryOptions({
 			input: { organizationId },
 		}),
 		staleTime: STALE_TIMES.FINANCE_SETTINGS,
 	});
+	const orgSettings = orgSettingsRaw as any;
 
 	// Apply finance settings defaults (create mode only)
 	useEffect(() => {
@@ -284,20 +287,22 @@ export function QuotationForm({
 	}, [orgSettings, mode]);
 
 	// Fetch all templates (all types available for quotations)
-	const { data: templatesData } = useQuery({
+	const { data: templatesDataRaw } = useQuery({
 		...orpc.finance.templates.list.queryOptions({
 			input: { organizationId },
 		}),
 		staleTime: STALE_TIMES.TEMPLATES,
 	});
+	const templatesData = templatesDataRaw as any;
 	const templates = templatesData?.templates ?? [];
 
 	// Fetch default template for quotations
-	const { data: defaultTemplate } = useQuery(
+	const { data: defaultTemplateRaw } = useQuery(
 		orpc.finance.templates.getDefault.queryOptions({
 			input: { organizationId, templateType: "QUOTATION" },
 		}),
 	);
+	const defaultTemplate = defaultTemplateRaw as any;
 
 	// Auto-select the default template when it loads
 	useEffect(() => {
@@ -306,14 +311,15 @@ export function QuotationForm({
 		}
 	}, [defaultTemplate, mode]);
 
-	const activeTemplate = templates.find(tmpl => tmpl.id === selectedTemplate) || defaultTemplate;
+	const activeTemplate = templates.find((tmpl: any) => tmpl.id === selectedTemplate) || defaultTemplate;
 
 	// Fetch projects for dropdown
-	const { data: projectsData } = useQuery(
+	const { data: projectsDataRaw } = useQuery(
 		orpc.projects.list.queryOptions({
 			input: { organizationId },
 		}),
 	);
+	const projectsData = projectsDataRaw as any;
 	const projects = projectsData?.projects ?? [];
 
 	// Calculate totals using shared utility
@@ -598,7 +604,7 @@ export function QuotationForm({
 									<SelectValue placeholder={t("finance.templates.select")} />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl min-w-[220px]" align="end">
-									{templates.map((tmpl) => (
+									{templates.map((tmpl: any) => (
 										<SelectItem key={tmpl.id} value={tmpl.id}>
 											<div className="flex items-center gap-2">
 												<span
@@ -758,27 +764,27 @@ export function QuotationForm({
 								<div className="grid gap-3 sm:grid-cols-2 pt-1">
 									<div>
 										<Label className="text-xs">{t("pricing.quotations.clientName")} *</Label>
-										<Input value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder={t("pricing.quotations.clientNamePlaceholder")} required className="rounded-xl mt-1 h-9" />
+										<Input value={clientName} onChange={(e: any) => setClientName(e.target.value)} placeholder={t("pricing.quotations.clientNamePlaceholder")} required className="rounded-xl mt-1 h-9" />
 									</div>
 									<div>
 										<Label className="text-xs">{t("pricing.quotations.clientCompany")}</Label>
-										<Input value={clientCompany} onChange={(e) => setClientCompany(e.target.value)} placeholder={t("pricing.quotations.clientCompanyPlaceholder")} className="rounded-xl mt-1 h-9" />
+										<Input value={clientCompany} onChange={(e: any) => setClientCompany(e.target.value)} placeholder={t("pricing.quotations.clientCompanyPlaceholder")} className="rounded-xl mt-1 h-9" />
 									</div>
 									<div>
 										<Label className="text-xs">{t("pricing.quotations.clientPhone")}</Label>
-										<Input value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} placeholder="05xxxxxxxx" className="rounded-xl mt-1 h-9" />
+										<Input value={clientPhone} onChange={(e: any) => setClientPhone(e.target.value)} placeholder="05xxxxxxxx" className="rounded-xl mt-1 h-9" />
 									</div>
 									<div>
 										<Label className="text-xs">{t("pricing.quotations.clientEmail")}</Label>
-										<Input type="email" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} placeholder="email@example.com" className="rounded-xl mt-1 h-9" />
+										<Input type="email" value={clientEmail} onChange={(e: any) => setClientEmail(e.target.value)} placeholder="email@example.com" className="rounded-xl mt-1 h-9" />
 									</div>
 									<div>
 										<Label className="text-xs">{t("pricing.quotations.clientTaxNumber")}</Label>
-										<Input value={clientTaxNumber} onChange={(e) => setClientTaxNumber(e.target.value)} placeholder={t("pricing.quotations.taxNumberPlaceholder")} className="rounded-xl mt-1 h-9" />
+										<Input value={clientTaxNumber} onChange={(e: any) => setClientTaxNumber(e.target.value)} placeholder={t("pricing.quotations.taxNumberPlaceholder")} className="rounded-xl mt-1 h-9" />
 									</div>
 									<div>
 										<Label className="text-xs">{t("pricing.quotations.clientAddress")}</Label>
-										<Input value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} placeholder={t("pricing.quotations.addressPlaceholder")} className="rounded-xl mt-1 h-9" />
+										<Input value={clientAddress} onChange={(e: any) => setClientAddress(e.target.value)} placeholder={t("pricing.quotations.addressPlaceholder")} className="rounded-xl mt-1 h-9" />
 									</div>
 								</div>
 							)}
@@ -809,7 +815,7 @@ export function QuotationForm({
 									<Input
 										type="date"
 										value={quotationDate}
-										onChange={(e) => setQuotationDate(e.target.value)}
+										onChange={(e: any) => setQuotationDate(e.target.value)}
 										required
 										disabled={!isEditable}
 										className="rounded-xl mt-1 h-9"
@@ -820,7 +826,7 @@ export function QuotationForm({
 									<Input
 										type="date"
 										value={validUntilDate}
-										onChange={(e) => setValidUntilDate(e.target.value)}
+										onChange={(e: any) => setValidUntilDate(e.target.value)}
 										required
 										disabled={!isEditable}
 										className="rounded-xl mt-1 h-9"
@@ -851,7 +857,7 @@ export function QuotationForm({
 									<FolderOpen className={`h-4 w-4 ${showProjectLink ? "text-sky-500" : "text-muted-foreground"}`} />
 									<span className={`text-sm font-medium ${showProjectLink ? "text-sky-700 dark:text-sky-400" : "text-muted-foreground"}`}>{t("pricing.quotations.project")}</span>
 								</div>
-								<Switch checked={showProjectLink} onCheckedChange={(checked) => { setShowProjectLink(checked); if (!checked) setProjectId(undefined); }} disabled={!isEditable} />
+								<Switch checked={showProjectLink} onCheckedChange={(checked: any) => { setShowProjectLink(checked); if (!checked) setProjectId(undefined); }} disabled={!isEditable} />
 							</div>
 							{showProjectLink && (
 								<Select value={projectId ?? "none"} onValueChange={setProjectId} disabled={!isEditable}>
@@ -860,7 +866,7 @@ export function QuotationForm({
 									</SelectTrigger>
 									<SelectContent className="rounded-xl">
 										<SelectItem value="none">{t("pricing.quotations.noProject")}</SelectItem>
-										{projects.map((project) => (
+										{projects.map((project: any) => (
 											<SelectItem key={project.id} value={project.id}>{project.name}</SelectItem>
 										))}
 									</SelectContent>
@@ -944,7 +950,7 @@ export function QuotationForm({
 											<td className="p-2 align-top">
 												<textarea
 													value={item.description}
-													onChange={(e) => { updateItem(item.id, { description: e.target.value }); e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }}
+													onChange={(e: any) => { updateItem(item.id, { description: e.target.value }); e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }}
 													placeholder={t("finance.items.descriptionPlaceholder")}
 													rows={1}
 													disabled={!isEditable}
@@ -954,7 +960,7 @@ export function QuotationForm({
 										)}
 										{isColumnVisible("unit") && (
 											<td className="p-2">
-												<Select value={item.unit || "_empty"} onValueChange={(v) => updateItem(item.id, { unit: v === "_empty" ? "" : v })} disabled={!isEditable}>
+												<Select value={item.unit || "_empty"} onValueChange={(v: any) => updateItem(item.id, { unit: v === "_empty" ? "" : v })} disabled={!isEditable}>
 													<SelectTrigger className="rounded-[10px] h-9 text-xs px-1 border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30"><SelectValue placeholder={t("finance.items.unitPlaceholder")} /></SelectTrigger>
 													<SelectContent className="rounded-xl">
 														<SelectItem value="_empty">-</SelectItem>
@@ -965,12 +971,12 @@ export function QuotationForm({
 										)}
 										{isColumnVisible("unitPrice") && (
 											<td className="p-2">
-												<Input type="number" min="0" step="0.01" value={item.unitPrice || ""} onChange={(e) => updateItem(item.id, { unitPrice: Number(e.target.value) || 0 })} placeholder="0.00" disabled={!isEditable} className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
+												<Input type="number" min="0" step="0.01" value={item.unitPrice || ""} onChange={(e: any) => updateItem(item.id, { unitPrice: Number(e.target.value) || 0 })} placeholder="0.00" disabled={!isEditable} className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
 											</td>
 										)}
 										{isColumnVisible("quantity") && (
 											<td className="p-2">
-												<Input type="number" min="0" step="0.01" value={item.quantity || ""} onChange={(e) => updateItem(item.id, { quantity: Number(e.target.value) || 0 })} placeholder="1" disabled={!isEditable} className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
+												<Input type="number" min="0" step="0.01" value={item.quantity || ""} onChange={(e: any) => updateItem(item.id, { quantity: Number(e.target.value) || 0 })} placeholder="1" disabled={!isEditable} className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
 											</td>
 										)}
 										{isColumnVisible("total") && (
@@ -1035,16 +1041,16 @@ export function QuotationForm({
 							</div>
 							<div className="p-5">
 								<TabsContent value="notes" className="mt-0">
-									<Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("pricing.quotations.notesPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
+									<Textarea value={notes} onChange={(e: any) => setNotes(e.target.value)} placeholder={t("pricing.quotations.notesPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
 								</TabsContent>
 								<TabsContent value="paymentTerms" className="mt-0">
-									<Textarea value={paymentTerms} onChange={(e) => setPaymentTerms(e.target.value)} placeholder={t("pricing.quotations.paymentTermsPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
+									<Textarea value={paymentTerms} onChange={(e: any) => setPaymentTerms(e.target.value)} placeholder={t("pricing.quotations.paymentTermsPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
 								</TabsContent>
 								<TabsContent value="deliveryTerms" className="mt-0">
-									<Textarea value={deliveryTerms} onChange={(e) => setDeliveryTerms(e.target.value)} placeholder={t("pricing.quotations.deliveryTermsPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
+									<Textarea value={deliveryTerms} onChange={(e: any) => setDeliveryTerms(e.target.value)} placeholder={t("pricing.quotations.deliveryTermsPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
 								</TabsContent>
 								<TabsContent value="warrantyTerms" className="mt-0">
-									<Textarea value={warrantyTerms} onChange={(e) => setWarrantyTerms(e.target.value)} placeholder={t("pricing.quotations.warrantyTermsPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
+									<Textarea value={warrantyTerms} onChange={(e: any) => setWarrantyTerms(e.target.value)} placeholder={t("pricing.quotations.warrantyTermsPlaceholder")} rows={4} disabled={!isEditable} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
 								</TabsContent>
 							</div>
 						</Tabs>
@@ -1197,7 +1203,7 @@ export function QuotationForm({
 					</DialogHeader>
 					<InlineClientForm
 						organizationId={organizationId}
-						onSuccess={(client) => { handleClientSelect(client); setShowNewClientDialog(false); }}
+						onSuccess={(client: any) => { handleClientSelect(client); setShowNewClientDialog(false); }}
 						onCancel={() => setShowNewClientDialog(false)}
 					/>
 				</DialogContent>

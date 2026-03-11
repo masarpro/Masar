@@ -207,7 +207,7 @@ function OptionField({
 				<Label className="text-sm">{option.label}</Label>
 				<Switch
 					checked={value === true}
-					onCheckedChange={(checked) => onChange(checked)}
+					onCheckedChange={(checked: any) => onChange(checked)}
 				/>
 			</div>
 		);
@@ -219,7 +219,7 @@ function OptionField({
 				<Label className="text-sm">{option.label}</Label>
 				<Select
 					value={String(value ?? "")}
-					onValueChange={(val) => onChange(val)}
+					onValueChange={(val: any) => onChange(val)}
 				>
 					<SelectTrigger className="h-8 text-sm rounded-lg">
 						<SelectValue />

@@ -74,7 +74,7 @@ export function RebarBarsInput({
 					<Label className="text-xs text-muted-foreground">قطر السيخ</Label>
 					<Select
 						value={diameter.toString()}
-						onValueChange={(v) => onDiameterChange(parseInt(v))}
+						onValueChange={(v: any) => onDiameterChange(parseInt(v))}
 					>
 						<SelectTrigger>
 							<SelectValue />
@@ -94,7 +94,7 @@ export function RebarBarsInput({
 					<Label className="text-xs text-muted-foreground">عدد الأسياخ</Label>
 					<Select
 						value={barsCount.toString()}
-						onValueChange={(v) => onBarsCountChange(parseInt(v))}
+						onValueChange={(v: any) => onBarsCountChange(parseInt(v))}
 					>
 						<SelectTrigger>
 							<SelectValue />

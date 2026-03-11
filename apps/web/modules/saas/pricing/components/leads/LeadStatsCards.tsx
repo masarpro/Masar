@@ -30,7 +30,7 @@ export function LeadStatsCards({ organizationId }: LeadStatsCardsProps) {
 		orpc.pricing.leads.getStats.queryOptions({
 			input: { organizationId },
 		}),
-	);
+	) as { data: any };
 
 	if (!stats) return null;
 

@@ -26,7 +26,7 @@ export function StructuralItemsEditor({
 	const t = useTranslations();
 	const basePath = `/app/${organizationSlug}/pricing/studies/${studyId}`;
 
-	const { data: study, isLoading: studyLoading } = useQuery(
+	const { data: study, isLoading: studyLoading } = useQuery<any>(
 		orpc.pricing.studies.getById.queryOptions({
 			input: {
 				id: studyId,
@@ -35,7 +35,7 @@ export function StructuralItemsEditor({
 		}),
 	);
 
-	const { data: structuralItems = [], refetch } = useQuery(
+	const { data: structuralItems = [], refetch } = useQuery<any>(
 		orpc.pricing.studies.getStructuralItems.queryOptions({
 			input: {
 				costStudyId: studyId,
@@ -59,19 +59,19 @@ export function StructuralItemsEditor({
 	// Calculate summary stats
 	const structuralStats = {
 		concrete: structuralItems.reduce(
-			(sum, item) => sum + (item.concreteVolume || 0),
+			(sum: any, item: any) => sum + (item.concreteVolume || 0),
 			0
 		),
 		rebar: structuralItems.reduce(
-			(sum, item) => sum + (item.steelWeight || 0),
+			(sum: any, item: any) => sum + (item.steelWeight || 0),
 			0
 		),
 		blocks: structuralItems
-			.filter((item) => item.category === "blocks")
-			.reduce((sum, item) => sum + (item.quantity || 0), 0),
+			.filter((item: any) => item.category === "blocks")
+			.reduce((sum: any, item: any) => sum + (item.quantity || 0), 0),
 		formwork: structuralItems
-			.filter((item) => item.category !== "blocks" && item.category !== "plainConcrete")
-			.reduce((sum, item) => {
+			.filter((item: any) => item.category !== "blocks" && item.category !== "plainConcrete")
+			.reduce((sum: any, item: any) => {
 				const dims = (item.dimensions as Record<string, number>) || {};
 				return sum + (dims.formworkArea || 0);
 			}, 0),
@@ -105,7 +105,7 @@ export function StructuralItemsEditor({
 				<StructuralAccordion
 					studyId={studyId}
 					organizationId={organizationId}
-					items={structuralItems.map((item) => ({
+					items={structuralItems.map((item: any) => ({
 						id: item.id,
 						category: item.category,
 						name: item.name,

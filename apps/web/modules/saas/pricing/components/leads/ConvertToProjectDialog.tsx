@@ -83,7 +83,7 @@ export function ConvertToProjectDialog({
 						<Input
 							id="projectName"
 							value={projectName}
-							onChange={(e) => setProjectName(e.target.value)}
+							onChange={(e: any) => setProjectName(e.target.value)}
 							className="mt-1.5 rounded-xl"
 						/>
 					</div>
@@ -100,7 +100,7 @@ export function ConvertToProjectDialog({
 					<Button
 						className="rounded-xl"
 						onClick={() =>
-							convertMutation.mutate({
+							(convertMutation as any).mutate({
 								organizationId,
 								leadId,
 								projectName: projectName.trim() || undefined,

@@ -655,9 +655,9 @@ export function PaintItemDialog({
 		};
 
 		if (isEdit && editItem?.id) {
-			updateMutation.mutate({ organizationId, costStudyId: studyId, id: editItem.id, ...itemData });
+			(updateMutation as any).mutate({ organizationId, costStudyId: studyId, id: editItem.id, ...itemData });
 		} else {
-			createMutation.mutate({ organizationId, costStudyId: studyId, ...itemData });
+			(createMutation as any).mutate({ organizationId, costStudyId: studyId, ...itemData });
 		}
 	};
 
@@ -695,14 +695,14 @@ export function PaintItemDialog({
 					{/* 1. Name */}
 					<div className="space-y-1">
 						<Label className="text-sm">{t("name")}</Label>
-						<Input value={name} onChange={(e) => setName(e.target.value)} />
+						<Input value={name} onChange={(e: any) => setName(e.target.value)} />
 					</div>
 
 					{/* 2. Paint type + Coats */}
 					<div className="grid grid-cols-2 gap-3">
 						<div className="space-y-1">
 							<Label className="text-sm">{t("paintType")}</Label>
-							<Select value={paintType} onValueChange={(v) => setPaintType(v as PaintTypeKey)}>
+							<Select value={paintType} onValueChange={(v: any) => setPaintType(v as PaintTypeKey)}>
 								<SelectTrigger><SelectValue /></SelectTrigger>
 								<SelectContent>
 									{availablePaintTypes.map(([key, val]) => (
@@ -714,14 +714,14 @@ export function PaintItemDialog({
 								<Input
 									placeholder={t("customPaintType")}
 									value={customPaintTypeName}
-									onChange={(e) => setCustomPaintTypeName(e.target.value)}
+									onChange={(e: any) => setCustomPaintTypeName(e.target.value)}
 									className="mt-1"
 								/>
 							)}
 						</div>
 						<div className="space-y-1">
 							<Label className="text-sm">{t("coats")}</Label>
-							<Select value={String(coats)} onValueChange={(v) => setCoats(Number(v))}>
+							<Select value={String(coats)} onValueChange={(v: any) => setCoats(Number(v))}>
 								<SelectTrigger><SelectValue /></SelectTrigger>
 								<SelectContent>
 									<SelectItem value="1">{t("coat1")}</SelectItem>
@@ -737,7 +737,7 @@ export function PaintItemDialog({
 					<div className="grid grid-cols-2 gap-3">
 						<div className="space-y-1">
 							<Label className="text-sm">{t("paintBrand")}</Label>
-							<Select value={paintBrand} onValueChange={(v) => setPaintBrand(v as PaintBrandKey)}>
+							<Select value={paintBrand} onValueChange={(v: any) => setPaintBrand(v as PaintBrandKey)}>
 								<SelectTrigger><SelectValue /></SelectTrigger>
 								<SelectContent>
 									{Object.entries(PAINT_BRANDS).map(([key, val]) => (
@@ -749,7 +749,7 @@ export function PaintItemDialog({
 								<Input
 									placeholder={t("customBrand")}
 									value={customBrandName}
-									onChange={(e) => setCustomBrandName(e.target.value)}
+									onChange={(e: any) => setCustomBrandName(e.target.value)}
 									className="mt-1"
 								/>
 							)}
@@ -760,7 +760,7 @@ export function PaintItemDialog({
 					<div className="grid grid-cols-3 gap-3">
 						<div className="space-y-1">
 							<Label className="text-sm">{t("primerCoats")}</Label>
-							<Select value={String(primerCoats)} onValueChange={(v) => setPrimerCoats(Number(v))}>
+							<Select value={String(primerCoats)} onValueChange={(v: any) => setPrimerCoats(Number(v))}>
 								<SelectTrigger><SelectValue /></SelectTrigger>
 								<SelectContent>
 									<SelectItem value="0">0</SelectItem>
@@ -771,7 +771,7 @@ export function PaintItemDialog({
 						</div>
 						<div className="space-y-1">
 							<Label className="text-sm">{t("puttyCoats")}</Label>
-							<Select value={String(puttyCoats)} onValueChange={(v) => setPuttyCoats(Number(v))}>
+							<Select value={String(puttyCoats)} onValueChange={(v: any) => setPuttyCoats(Number(v))}>
 								<SelectTrigger><SelectValue /></SelectTrigger>
 								<SelectContent>
 									<SelectItem value="0">0</SelectItem>
@@ -783,7 +783,7 @@ export function PaintItemDialog({
 						</div>
 						<div className="space-y-1">
 							<Label className="text-sm">{t("puttyType")}</Label>
-							<Select value={puttyType} onValueChange={(v) => setPuttyType(v as PuttyTypeKey)}>
+							<Select value={puttyType} onValueChange={(v: any) => setPuttyType(v as PuttyTypeKey)}>
 								<SelectTrigger><SelectValue /></SelectTrigger>
 								<SelectContent>
 									{Object.entries(PUTTY_TYPES).map(([key, val]) => (
@@ -795,7 +795,7 @@ export function PaintItemDialog({
 								<Input
 									placeholder={t("customPuttyName")}
 									value={customPuttyName}
-									onChange={(e) => setCustomPuttyName(e.target.value)}
+									onChange={(e: any) => setCustomPuttyName(e.target.value)}
 									className="mt-1"
 								/>
 							)}
@@ -826,7 +826,7 @@ export function PaintItemDialog({
 							<Input
 								type="number"
 								value={floorHeight || ""}
-								onChange={(e) => setFloorHeight(parseFloat(e.target.value) || 0)}
+								onChange={(e: any) => setFloorHeight(parseFloat(e.target.value) || 0)}
 								step="0.1"
 							/>
 							<p className="text-xs text-muted-foreground">{t("floorHeightHint")}</p>
@@ -919,7 +919,7 @@ export function PaintItemDialog({
 														id={`paint-room-${i}-name`}
 														tabIndex={-1}
 														value={room.name}
-														onChange={(e) => updateRoom(i, "name", e.target.value)}
+														onChange={(e: any) => updateRoom(i, "name", e.target.value)}
 														className="h-8 text-sm text-muted-foreground focus:text-foreground"
 													/>
 												</td>
@@ -928,8 +928,8 @@ export function PaintItemDialog({
 														id={`paint-room-${i}-wall1`}
 														type="number"
 														value={room.wall1}
-														onChange={(e) => updateRoom(i, "wall1", parseNum(e.target.value))}
-														onKeyDown={(e) => handleRoomKeyDown(e, i, 0)}
+														onChange={(e: any) => updateRoom(i, "wall1", parseNum(e.target.value))}
+														onKeyDown={(e: any) => handleRoomKeyDown(e, i, 0)}
 														className="h-8 text-sm"
 													/>
 												</td>
@@ -939,8 +939,8 @@ export function PaintItemDialog({
 															id={`paint-room-${i}-wall2`}
 															type="number"
 															value={room.wall2}
-															onChange={(e) => updateRoom(i, "wall2", parseNum(e.target.value))}
-															onKeyDown={(e) => handleRoomKeyDown(e, i, 1)}
+															onChange={(e: any) => updateRoom(i, "wall2", parseNum(e.target.value))}
+															onKeyDown={(e: any) => handleRoomKeyDown(e, i, 1)}
 															className="h-8 text-sm"
 														/>
 													</td>
@@ -952,12 +952,12 @@ export function PaintItemDialog({
 																type="number"
 																autoFocus
 																value={effectiveH || ""}
-																onChange={(e) => {
+																onChange={(e: any) => {
 																	const v = parseFloat(e.target.value);
 																	updateRoom(i, "heightOverride", Number.isNaN(v) ? null : v);
 																}}
 																onBlur={() => setEditingHeightIdx(null)}
-																onKeyDown={(e) => {
+																onKeyDown={(e: any) => {
 																	if (e.key === "Enter" || e.key === "Escape") setEditingHeightIdx(null);
 																}}
 																className="h-7 w-16 text-xs"
@@ -1027,23 +1027,23 @@ export function PaintItemDialog({
 												<tr key={i} className="border-b last:border-0">
 													<td className="p-1">
 														<Input id={`paint-door-${i}-name`} value={door.name}
-															onChange={(e) => updateDoor(i, "name", e.target.value)}
-															onKeyDown={(e) => handleDoorKeyDown(e, i, 0)} className="h-8 text-sm" />
+															onChange={(e: any) => updateDoor(i, "name", e.target.value)}
+															onKeyDown={(e: any) => handleDoorKeyDown(e, i, 0)} className="h-8 text-sm" />
 													</td>
 													<td className="p-1">
 														<Input id={`paint-door-${i}-width`} type="number" value={door.width}
-															onChange={(e) => updateDoor(i, "width", parseNum(e.target.value))}
-															onKeyDown={(e) => handleDoorKeyDown(e, i, 1)} className="h-8 text-sm" />
+															onChange={(e: any) => updateDoor(i, "width", parseNum(e.target.value))}
+															onKeyDown={(e: any) => handleDoorKeyDown(e, i, 1)} className="h-8 text-sm" />
 													</td>
 													<td className="p-1">
 														<Input id={`paint-door-${i}-height`} type="number" value={door.height}
-															onChange={(e) => updateDoor(i, "height", parseNum(e.target.value))}
-															onKeyDown={(e) => handleDoorKeyDown(e, i, 2)} className="h-8 text-sm" />
+															onChange={(e: any) => updateDoor(i, "height", parseNum(e.target.value))}
+															onKeyDown={(e: any) => handleDoorKeyDown(e, i, 2)} className="h-8 text-sm" />
 													</td>
 													<td className="p-1">
 														<Input id={`paint-door-${i}-count`} type="number" value={door.count}
-															onChange={(e) => updateDoor(i, "count", parseNum(e.target.value))}
-															onKeyDown={(e) => handleDoorKeyDown(e, i, 3)} className="h-8 text-sm" />
+															onChange={(e: any) => updateDoor(i, "count", parseNum(e.target.value))}
+															onKeyDown={(e: any) => handleDoorKeyDown(e, i, 3)} className="h-8 text-sm" />
 													</td>
 													<td className="p-1">
 														<Button type="button" variant="ghost" size="icon" className="h-7 w-7"
@@ -1082,23 +1082,23 @@ export function PaintItemDialog({
 												<tr key={i} className="border-b last:border-0">
 													<td className="p-1">
 														<Input id={`paint-win-${i}-name`} value={win.name}
-															onChange={(e) => updateWindow(i, "name", e.target.value)}
-															onKeyDown={(e) => handleWindowKeyDown(e, i, 0)} className="h-8 text-sm" />
+															onChange={(e: any) => updateWindow(i, "name", e.target.value)}
+															onKeyDown={(e: any) => handleWindowKeyDown(e, i, 0)} className="h-8 text-sm" />
 													</td>
 													<td className="p-1">
 														<Input id={`paint-win-${i}-width`} type="number" value={win.width}
-															onChange={(e) => updateWindow(i, "width", parseNum(e.target.value))}
-															onKeyDown={(e) => handleWindowKeyDown(e, i, 1)} className="h-8 text-sm" />
+															onChange={(e: any) => updateWindow(i, "width", parseNum(e.target.value))}
+															onKeyDown={(e: any) => handleWindowKeyDown(e, i, 1)} className="h-8 text-sm" />
 													</td>
 													<td className="p-1">
 														<Input id={`paint-win-${i}-height`} type="number" value={win.height}
-															onChange={(e) => updateWindow(i, "height", parseNum(e.target.value))}
-															onKeyDown={(e) => handleWindowKeyDown(e, i, 2)} className="h-8 text-sm" />
+															onChange={(e: any) => updateWindow(i, "height", parseNum(e.target.value))}
+															onKeyDown={(e: any) => handleWindowKeyDown(e, i, 2)} className="h-8 text-sm" />
 													</td>
 													<td className="p-1">
 														<Input id={`paint-win-${i}-count`} type="number" value={win.count}
-															onChange={(e) => updateWindow(i, "count", parseNum(e.target.value))}
-															onKeyDown={(e) => handleWindowKeyDown(e, i, 3)} className="h-8 text-sm" />
+															onChange={(e: any) => updateWindow(i, "count", parseNum(e.target.value))}
+															onKeyDown={(e: any) => handleWindowKeyDown(e, i, 3)} className="h-8 text-sm" />
 													</td>
 													<td className="p-1">
 														<Button type="button" variant="ghost" size="icon" className="h-7 w-7"
@@ -1120,7 +1120,7 @@ export function PaintItemDialog({
 						<div className="space-y-1">
 							<div className="flex items-center gap-2">
 								<Checkbox id="paintIncludeCeiling" checked={includeCeiling}
-									onCheckedChange={(v) => setIncludeCeiling(v === true)} />
+									onCheckedChange={(v: any) => setIncludeCeiling(v === true)} />
 								<Label htmlFor="paintIncludeCeiling" className="text-sm cursor-pointer">
 									{t("includeCeiling")}
 								</Label>
@@ -1192,7 +1192,7 @@ export function PaintItemDialog({
 											<Input
 												type="number"
 												value={paintCoverageRate}
-												onChange={(e) => setPaintCoverageRate(parseFloat(e.target.value) || 1)}
+												onChange={(e: any) => setPaintCoverageRate(parseFloat(e.target.value) || 1)}
 												className="h-7 w-20 text-xs"
 												step="0.5"
 											/>
@@ -1209,7 +1209,7 @@ export function PaintItemDialog({
 												<Input
 													type="number"
 													value={primerCoverageRate}
-													onChange={(e) => setPrimerCoverageRate(parseFloat(e.target.value) || 1)}
+													onChange={(e: any) => setPrimerCoverageRate(parseFloat(e.target.value) || 1)}
 													className="h-7 w-20 text-xs"
 													step="0.5"
 												/>
@@ -1227,7 +1227,7 @@ export function PaintItemDialog({
 												<Input
 													type="number"
 													value={puttyCoverageRate}
-													onChange={(e) => setPuttyCoverageRate(parseFloat(e.target.value) || 0.1)}
+													onChange={(e: any) => setPuttyCoverageRate(parseFloat(e.target.value) || 0.1)}
 													className="h-7 w-20 text-xs"
 													step="0.25"
 												/>

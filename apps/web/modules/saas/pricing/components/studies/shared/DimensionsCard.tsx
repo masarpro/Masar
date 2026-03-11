@@ -56,7 +56,7 @@ export function DimensionsCard({
 						<Input
 							type="number"
 							value={dim.value || ""}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								onDimensionChange(dim.key, parseFloat(e.target.value) || 0)
 							}
 							step={dim.step || 0.1}

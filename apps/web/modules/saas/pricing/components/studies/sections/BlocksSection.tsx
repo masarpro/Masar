@@ -305,15 +305,15 @@ export function BlocksSection({
 		};
 
 		if (editingItemId) {
-			updateMutation.mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
+			(updateMutation as any).mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
 		} else {
-			createMutation.mutate(itemData);
+			(createMutation as any).mutate(itemData);
 		}
 	};
 
 	const handleDelete = (id: string) => {
 		if (confirm(t("pricing.studies.messages.confirmDelete"))) {
-			deleteMutation.mutate({ id, organizationId, costStudyId: studyId });
+			(deleteMutation as any).mutate({ id, organizationId, costStudyId: studyId });
 		}
 	};
 
@@ -436,7 +436,7 @@ export function BlocksSection({
 								<Input
 									placeholder={t("pricing.studies.structural.itemNamePlaceholder")}
 									value={formData.name}
-									onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, name: e.target.value })}
 								/>
 							</div>
 
@@ -444,7 +444,7 @@ export function BlocksSection({
 								<Label>{t("pricing.studies.structural.thickness")} ({t("pricing.studies.units.cm")})</Label>
 								<Select
 									value={formData.thickness.toString()}
-									onValueChange={(v) =>
+									onValueChange={(v: any) =>
 										setFormData({ ...formData, thickness: +v as 10 | 15 | 20 | 25 | 30 })
 									}
 								>
@@ -492,7 +492,7 @@ export function BlocksSection({
 									step="0.1"
 									min={0}
 									value={formData.length || ""}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({ ...formData, length: +e.target.value })
 									}
 								/>
@@ -504,7 +504,7 @@ export function BlocksSection({
 									step="0.1"
 									min={0}
 									value={formData.height || ""}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({ ...formData, height: +e.target.value })
 									}
 								/>
@@ -577,7 +577,7 @@ export function BlocksSection({
 													step="0.1"
 													className="w-20 h-8"
 													value={opening.width}
-													onChange={(e) =>
+													onChange={(e: any) =>
 														updateOpening(opening.id, "width", +e.target.value)
 													}
 												/>
@@ -589,7 +589,7 @@ export function BlocksSection({
 													step="0.1"
 													className="w-20 h-8"
 													value={opening.height}
-													onChange={(e) =>
+													onChange={(e: any) =>
 														updateOpening(opening.id, "height", +e.target.value)
 													}
 												/>
@@ -601,7 +601,7 @@ export function BlocksSection({
 													min={1}
 													className="w-16 h-8"
 													value={opening.quantity}
-													onChange={(e) =>
+													onChange={(e: any) =>
 														updateOpening(opening.id, "quantity", +e.target.value)
 													}
 												/>
@@ -624,7 +624,7 @@ export function BlocksSection({
 											type="checkbox"
 											id="hasLintel"
 											checked={formData.hasLintel}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												setFormData({ ...formData, hasLintel: e.target.checked })
 											}
 											className="rounded"

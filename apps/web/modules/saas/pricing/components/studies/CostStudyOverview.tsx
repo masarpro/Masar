@@ -59,7 +59,7 @@ export function CostStudyOverview({
 		CONVERSION: "convert",
 	};
 
-	const activeStage = activeStageData?.activeStage;
+	const activeStage = (activeStageData as any)?.activeStage;
 	const activeStagePath = activeStage
 		? STAGE_PATH_MAP[activeStage.stage] ?? ""
 		: null;
@@ -75,7 +75,7 @@ export function CostStudyOverview({
 						</div>
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("pricing.studies.form.projectType")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{t(`pricing.studies.projectTypes.${study.projectType}`)}</p>
+							<p className="font-medium text-slate-900 dark:text-slate-100">{t(`pricing.studies.projectTypes.${(study as any).projectType}`)}</p>
 						</div>
 					</div>
 				</div>
@@ -86,7 +86,7 @@ export function CostStudyOverview({
 						</div>
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("pricing.studies.form.numberOfFloors")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{study.numberOfFloors} {t("pricing.studies.floors")}</p>
+							<p className="font-medium text-slate-900 dark:text-slate-100">{(study as any).numberOfFloors} {t("pricing.studies.floors")}</p>
 						</div>
 					</div>
 				</div>
@@ -97,7 +97,7 @@ export function CostStudyOverview({
 						</div>
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("pricing.studies.form.buildingArea")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{study.buildingArea} م²</p>
+							<p className="font-medium text-slate-900 dark:text-slate-100">{(study as any).buildingArea} م²</p>
 						</div>
 					</div>
 				</div>
@@ -108,7 +108,7 @@ export function CostStudyOverview({
 						</div>
 						<div>
 							<p className="text-xs text-slate-500 dark:text-slate-400">{t("pricing.studies.form.finishingLevel")}</p>
-							<p className="font-medium text-slate-900 dark:text-slate-100">{t(`pricing.studies.finishingLevels.${study.finishingLevel}`)}</p>
+							<p className="font-medium text-slate-900 dark:text-slate-100">{t(`pricing.studies.finishingLevels.${(study as any).finishingLevel}`)}</p>
 						</div>
 					</div>
 				</div>
@@ -127,7 +127,7 @@ export function CostStudyOverview({
 			)}
 
 			{/* Linked Lead Card */}
-			{study.lead && (
+			{(study as any).lead && (
 				<div className="rounded-2xl border border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-950/20 p-4">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
@@ -136,16 +136,16 @@ export function CostStudyOverview({
 							</div>
 							<div>
 								<p className="text-xs text-muted-foreground">{t("pricing.leads.title")}</p>
-								<p className="font-medium text-foreground">{study.lead.name}</p>
-								{study.lead.phone && (
-									<p className="text-xs text-muted-foreground" dir="ltr">{study.lead.phone}</p>
+								<p className="font-medium text-foreground">{(study as any).lead.name}</p>
+								{(study as any).lead.phone && (
+									<p className="text-xs text-muted-foreground" dir="ltr">{(study as any).lead.phone}</p>
 								)}
 							</div>
 						</div>
 						<div className="flex items-center gap-3">
-							<LeadStatusBadge status={study.lead.status} size="sm" />
+							<LeadStatusBadge status={(study as any).lead.status} size="sm" />
 							<Link
-								href={`/app/${organizationSlug}/pricing/leads/${study.lead.id}`}
+								href={`/app/${organizationSlug}/pricing/leads/${(study as any).lead.id}`}
 								className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
 							>
 								{t("pricing.leads.actions.view")}

@@ -45,7 +45,7 @@ export function ExteriorStep({ config, onChange }: ExteriorStepProps) {
 					<Input
 						type="number"
 						value={config.landPerimeter || ""}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							onChange({
 								...config,
 								landPerimeter:
@@ -66,7 +66,7 @@ export function ExteriorStep({ config, onChange }: ExteriorStepProps) {
 					<Input
 						type="number"
 						value={config.fenceHeight ?? 3}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							onChange({
 								...config,
 								fenceHeight:
@@ -99,7 +99,7 @@ export function ExteriorStep({ config, onChange }: ExteriorStepProps) {
 					</div>
 					<Switch
 						checked={config.hasCourtyard !== false}
-						onCheckedChange={(checked) =>
+						onCheckedChange={(checked: any) =>
 							onChange({
 								...config,
 								hasCourtyard: checked,
@@ -127,7 +127,7 @@ export function ExteriorStep({ config, onChange }: ExteriorStepProps) {
 							</div>
 							<Switch
 								checked={config.hasGarden === true}
-								onCheckedChange={(checked) =>
+								onCheckedChange={(checked: any) =>
 									onChange({
 										...config,
 										hasGarden: checked,
@@ -153,7 +153,7 @@ export function ExteriorStep({ config, onChange }: ExteriorStepProps) {
 									max={100}
 									step={5}
 									value={config.gardenPercentage ?? 0}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										onChange({
 											...config,
 											gardenPercentage: parseInt(

@@ -28,7 +28,7 @@ export function EditLeadPage({ leadId, organizationId, organizationSlug }: EditL
 		}),
 	);
 
-	const members = membersData?.users ?? [];
+	const members = (membersData as any)?.users ?? [];
 	const isLoading = leadLoading || membersLoading;
 
 	if (isLoading) {
@@ -52,7 +52,7 @@ export function EditLeadPage({ leadId, organizationId, organizationSlug }: EditL
 				name: m.name,
 				image: m.image,
 			}))}
-			lead={lead}
+			lead={lead as any}
 		/>
 	);
 }

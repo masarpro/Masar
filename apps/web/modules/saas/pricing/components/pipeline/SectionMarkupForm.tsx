@@ -67,7 +67,7 @@ export function SectionMarkupForm({
 					queryKey: [["pricing", "studies", "markup"]],
 				});
 			},
-			onError: (e) => toast.error(e.message),
+			onError: (e: any) => toast.error(e.message),
 		}),
 	);
 
@@ -76,7 +76,7 @@ export function SectionMarkupForm({
 			section,
 			markupPercent,
 		}));
-		saveMutation.mutate({
+		(saveMutation as any).mutate({
 			organizationId,
 			studyId,
 			markups: markupsArray,
@@ -157,7 +157,7 @@ export function SectionMarkupForm({
 											<Input
 												type="number"
 												value={row.markupPct}
-												onChange={(e) => {
+												onChange={(e: any) => {
 													setMarkups((prev) => ({
 														...prev,
 														[row.section]: Number(e.target.value),

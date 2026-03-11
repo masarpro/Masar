@@ -134,7 +134,7 @@ export function BuildingStructureStep({
 					<Input
 						type="number"
 						value={config.totalLandArea || ""}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							onChange({
 								...config,
 								totalLandArea: parseFloat(e.target.value) || 0,
@@ -162,7 +162,7 @@ export function BuildingStructureStep({
 					<Input
 						type="number"
 						value={config.buildingPerimeter || ""}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							onChange({
 								...config,
 								buildingPerimeter:
@@ -190,7 +190,7 @@ export function BuildingStructureStep({
 								</span>
 								<Input
 									value={floor.name}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										updateFloor(
 											floor.id,
 											"name",
@@ -204,7 +204,7 @@ export function BuildingStructureStep({
 									<Input
 										type="number"
 										value={floor.area || ""}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											updateFloor(
 												floor.id,
 												"area",
@@ -222,7 +222,7 @@ export function BuildingStructureStep({
 									<Input
 										type="number"
 										value={floor.height || ""}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											updateFloor(
 												floor.id,
 												"height",
@@ -238,7 +238,7 @@ export function BuildingStructureStep({
 								</div>
 								<Select
 									value={floor.floorType}
-									onValueChange={(v) =>
+									onValueChange={(v: any) =>
 										updateFloor(floor.id, "floorType", v)
 									}
 								>
@@ -256,7 +256,7 @@ export function BuildingStructureStep({
 								<div className="flex items-center gap-1.5">
 									<Switch
 										checked={floor.isRepeated}
-										onCheckedChange={(checked) => {
+										onCheckedChange={(checked: any) => {
 											updateFloor(
 												floor.id,
 												"isRepeated",
@@ -276,7 +276,7 @@ export function BuildingStructureStep({
 										<Input
 											type="number"
 											value={floor.repeatCount}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												updateFloor(
 													floor.id,
 													"repeatCount",

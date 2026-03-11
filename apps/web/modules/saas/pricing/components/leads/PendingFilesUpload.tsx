@@ -164,7 +164,7 @@ export function PendingFilesUpload({ files, onFilesChange }: PendingFilesUploadP
 							</div>
 
 							{/* Category Select */}
-							<Select value={pf.category} onValueChange={(v) => updateCategory(pf.id, v)}>
+							<Select value={pf.category} onValueChange={(v: any) => updateCategory(pf.id, v)}>
 								<SelectTrigger className="w-[120px] h-8 text-xs rounded-lg border-slate-200 dark:border-slate-700">
 									<SelectValue />
 								</SelectTrigger>

@@ -42,7 +42,7 @@ export function MarkupMethodSelector({
 					queryKey: [["pricing", "studies", "markup"]],
 				});
 			},
-			onError: (e) => toast.error(e.message),
+			onError: (e: any) => toast.error(e.message),
 		}),
 	);
 
@@ -50,7 +50,7 @@ export function MarkupMethodSelector({
 		if (value === currentMethod) return;
 		if (value === "uniform") {
 			// When switching to uniform, set default values (which clears section markups)
-			setUniformMutation.mutate({
+			(setUniformMutation as any).mutate({
 				organizationId,
 				studyId,
 				overheadPercent: 5,

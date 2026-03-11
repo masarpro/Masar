@@ -44,15 +44,15 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 		}),
 	);
 
-	const costStudies = data?.costStudies ?? [];
+	const costStudies = (data as any)?.costStudies ?? [];
 	const basePath = `/app/${activeOrganization?.slug}/pricing/studies`;
 
 	// Calculate statistics
 	const stats = {
 		total: costStudies.length,
-		inProgress: costStudies.filter(s => s.status === "in_progress").length,
-		completed: costStudies.filter(s => s.status === "completed" || s.status === "approved").length,
-		totalValue: costStudies.reduce((sum, s) => sum + s.totalCost, 0),
+		inProgress: costStudies.filter((s: any) => s.status === "in_progress").length,
+		completed: costStudies.filter((s: any) => s.status === "completed" || s.status === "approved").length,
+		totalValue: costStudies.reduce((sum: any, s: any) => sum + s.totalCost, 0),
 	};
 
 	if (isLoading) {
@@ -119,10 +119,10 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 					<div className="flex items-center gap-2 flex-wrap">
 						{([
 							{ value: "all", label: t("pricing.studies.allStatuses"), count: stats.total },
-							{ value: "draft", label: t("pricing.studies.status.draft"), count: costStudies.filter(s => s.status === "draft").length },
+							{ value: "draft", label: t("pricing.studies.status.draft"), count: costStudies.filter((s: any) => s.status === "draft").length },
 							{ value: "in_progress", label: t("pricing.studies.status.inProgress"), count: stats.inProgress },
-							{ value: "completed", label: t("pricing.studies.status.completed"), count: costStudies.filter(s => s.status === "completed").length },
-							{ value: "approved", label: t("pricing.studies.status.approved"), count: costStudies.filter(s => s.status === "approved").length },
+							{ value: "completed", label: t("pricing.studies.status.completed"), count: costStudies.filter((s: any) => s.status === "completed").length },
+							{ value: "approved", label: t("pricing.studies.status.approved"), count: costStudies.filter((s: any) => s.status === "approved").length },
 						] as const).map((tab) => (
 							<button
 								key={tab.value}
@@ -155,7 +155,7 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 					<Input
 						placeholder={t("pricing.studies.searchPlaceholder")}
 						value={searchTerm}
-						onChange={(e) => setSearchTerm(e.target.value)}
+						onChange={(e: any) => setSearchTerm(e.target.value)}
 						className="pr-10 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-700"
 					/>
 				</div>
@@ -164,7 +164,7 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 			{/* Grid of cost studies */}
 			{costStudies.length > 0 ? (
 				<div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{costStudies.map((study, index) => (
+					{costStudies.map((study: any, index: any) => (
 						<div
 							key={study.id}
 							className="animate-in fade-in slide-in-from-bottom-4 duration-500"

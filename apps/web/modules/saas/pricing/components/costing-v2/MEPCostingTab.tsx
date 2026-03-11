@@ -71,7 +71,7 @@ export function MEPCostingTab({
 					queryKey: ["pricing", "studies", "costing"],
 				});
 			},
-			onError: (e) => toast.error(e.message || "حدث خطأ في توليد البنود"),
+			onError: (e: any) => toast.error(e.message || "حدث خطأ في توليد البنود"),
 		}),
 	);
 
@@ -107,11 +107,11 @@ export function MEPCostingTab({
 		) {
 			return;
 		}
-		const hasMepItems = (mepItems ?? []).length > 0;
-		const hasCostingItems = (costingItems ?? []).length > 0;
+		const hasMepItems = (((mepItems as any) ?? []) as any[]).length > 0;
+		const hasCostingItems = (((costingItems as any) ?? []) as any[]).length > 0;
 		if (hasMepItems && !hasCostingItems) {
 			initializedRef.current = true;
-			generateMutation.mutate({ organizationId, studyId });
+			(generateMutation as any).mutate({ organizationId, studyId });
 		} else {
 			initializedRef.current = true;
 		}
@@ -119,12 +119,12 @@ export function MEPCostingTab({
 
 	// ─── Initialize local state from fetched costing items ───
 	useEffect(() => {
-		if (!costingItems || costingItems.length === 0) return;
+		if (!costingItems || (costingItems as any).length === 0) return;
 
 		const newPrices: Record<string, ItemPrices> = {};
 		const newConfigs: Record<string, SectionConfig> = {};
 
-		for (const item of costingItems) {
+		for (const item of ((costingItems as any) ?? [] as any[])) {
 			// Detect lump-sum sections
 			const category = item.section ?? "";
 			if (
@@ -192,8 +192,8 @@ export function MEPCostingTab({
 
 	// ─── Group MEP items by category ───
 	const grouped = useMemo(() => {
-		return (mepItems ?? []).reduce(
-			(acc, item) => {
+		return ((mepItems as any) ?? []).reduce(
+			(acc: any, item: any) => {
 				const cat = item.category ?? "عام";
 				if (!acc[cat]) acc[cat] = [];
 				acc[cat].push(item);
@@ -212,8 +212,8 @@ export function MEPCostingTab({
 		const sectionItems = grouped[sectionKey] ?? [];
 		let total = 0;
 		for (const item of sectionItems) {
-			const costingItem = (costingItems ?? []).find(
-				(c) => c.sourceItemId === item.id,
+			const costingItem = ((costingItems as any) ?? []).find(
+				(c: any) => c.sourceItemId === item.id,
 			);
 			const itemKey = costingItem?.id ?? item.id;
 			const p = prices[itemKey] ?? {};
@@ -245,7 +245,7 @@ export function MEPCostingTab({
 
 		try {
 			if (config.mode === "lump_sum") {
-				await setSectionLaborMutation.mutateAsync({
+				await (setSectionLaborMutation as any).mutateAsync({
 					organizationId,
 					studyId,
 					section: sectionKey,
@@ -267,8 +267,8 @@ export function MEPCostingTab({
 				}> = [];
 
 				for (const item of sectionItems) {
-					const costingItem = (costingItems ?? []).find(
-						(c) => c.sourceItemId === item.id,
+					const costingItem = ((costingItems as any) ?? []).find(
+						(c: any) => c.sourceItemId === item.id,
 					);
 					if (!costingItem) continue;
 					const p = prices[costingItem.id] ?? {};
@@ -286,7 +286,7 @@ export function MEPCostingTab({
 					return;
 				}
 
-				await bulkUpdateMutation.mutateAsync({
+				await (bulkUpdateMutation as any).mutateAsync({
 					organizationId,
 					studyId,
 					items,
@@ -309,7 +309,7 @@ export function MEPCostingTab({
 		);
 	}
 
-	if ((mepItems ?? []).length === 0) {
+	if ((((mepItems as any) ?? []) as any[]).length === 0) {
 		return (
 			<div className="rounded-xl border border-border bg-card p-8 text-center">
 				<p className="text-muted-foreground">
@@ -405,7 +405,7 @@ export function MEPCostingTab({
 											dir="ltr"
 											placeholder="0"
 											value={config.lumpSumAmount}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												setConfig(section.key, {
 													lumpSumAmount: e.target.value,
 												})
@@ -418,7 +418,7 @@ export function MEPCostingTab({
 									{sectionItems.length > 0 && (
 										<p className="text-xs text-muted-foreground mt-2">
 											يحتوي:{" "}
-											{sectionItems.map((i) => i.name).join("، ")}
+											{sectionItems.map((i: any) => i.name).join("، ")}
 										</p>
 									)}
 								</div>
@@ -455,9 +455,9 @@ export function MEPCostingTab({
 										</tr>
 									</thead>
 									<tbody>
-										{sectionItems.map((item) => {
-											const costingItem = (costingItems ?? []).find(
-												(c) => c.sourceItemId === item.id,
+										{sectionItems.map((item: any) => {
+											const costingItem = ((costingItems as any) ?? []).find(
+												(c: any) => c.sourceItemId === item.id,
 											);
 											const itemKey = costingItem?.id ?? item.id;
 											const p = prices[itemKey] ?? {};
@@ -503,7 +503,7 @@ export function MEPCostingTab({
 															dir="ltr"
 															placeholder="0"
 															value={p.material ?? ""}
-															onChange={(e) =>
+															onChange={(e: any) =>
 																setPrices((prev) => ({
 																	...prev,
 																	[itemKey]: {
@@ -527,7 +527,7 @@ export function MEPCostingTab({
 															dir="ltr"
 															placeholder="0"
 															value={p.labor ?? ""}
-															onChange={(e) =>
+															onChange={(e: any) =>
 																setPrices((prev) => ({
 																	...prev,
 																	[itemKey]: {
@@ -551,7 +551,7 @@ export function MEPCostingTab({
 															dir="ltr"
 															placeholder="2"
 															value={p.storage ?? ""}
-															onChange={(e) =>
+															onChange={(e: any) =>
 																setPrices((prev) => ({
 																	...prev,
 																	[itemKey]: {

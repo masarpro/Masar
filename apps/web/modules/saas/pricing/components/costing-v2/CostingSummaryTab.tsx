@@ -136,15 +136,15 @@ export function CostingSummaryTab({
 			: "—";
 
 	// Derived calculations
-	const sections = useMemo(() => summary?.sections ?? [], [summary]);
-	const grandTotal = summary?.grandTotal?.total ?? 0;
-	const grandMaterial = summary?.grandTotal?.material ?? 0;
-	const grandLabor = summary?.grandTotal?.labor ?? 0;
-	const grandStorage = summary?.grandTotal?.storage ?? 0;
+	const sections = useMemo(() => (summary as any)?.sections ?? [], [summary]);
+	const grandTotal = (summary as any)?.grandTotal?.total ?? 0;
+	const grandMaterial = (summary as any)?.grandTotal?.material ?? 0;
+	const grandLabor = (summary as any)?.grandTotal?.labor ?? 0;
+	const grandStorage = (summary as any)?.grandTotal?.storage ?? 0;
 
 	const overhead = overheadPct
 		? Number(overheadPct)
-		: (summary?.overheadPercent ?? 5);
+		: ((summary as any)?.overheadPercent ?? 5);
 	const admin = adminPct ? Number(adminPct) : 3;
 	const contingency = contingencyPct ? Number(contingencyPct) : 2;
 
@@ -247,7 +247,7 @@ export function CostingSummaryTab({
 					</div>
 					{/* Segmented bar */}
 					<div className="h-6 rounded-full overflow-hidden flex" dir="ltr">
-						{sections.map((sec) => {
+						{sections.map((sec: any) => {
 							const pct = sectionPercentages[sec.section] ?? 0;
 							if (pct <= 0) return null;
 							const color =
@@ -270,7 +270,7 @@ export function CostingSummaryTab({
 					</div>
 					{/* Legend */}
 					<div className="flex flex-wrap gap-x-4 gap-y-1 mt-3">
-						{sections.map((sec) => {
+						{sections.map((sec: any) => {
 							const pct = sectionPercentages[sec.section] ?? 0;
 							if (pct <= 0) return null;
 							const dotColor =
@@ -331,7 +331,7 @@ export function CostingSummaryTab({
 							</tr>
 						</thead>
 						<tbody>
-							{sections.map((sec) => {
+							{sections.map((sec: any) => {
 								const pct = sectionPercentages[sec.section] ?? 0;
 								const perSqm =
 									buildingArea > 0
@@ -454,7 +454,7 @@ export function CostingSummaryTab({
 								dir="ltr"
 								placeholder="5"
 								value={overheadPct}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleOverheadChange(e.target.value)
 								}
 								onBlur={() => {
@@ -482,7 +482,7 @@ export function CostingSummaryTab({
 								dir="ltr"
 								placeholder="3"
 								value={adminPct}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleAdminChange(e.target.value)
 								}
 								onBlur={() => {
@@ -510,7 +510,7 @@ export function CostingSummaryTab({
 								dir="ltr"
 								placeholder="2"
 								value={contingencyPct}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleContingencyChange(e.target.value)
 								}
 								onBlur={() => {
@@ -586,7 +586,7 @@ export function CostingSummaryTab({
 			<div className="flex gap-3 justify-end">
 				<Button
 					onClick={() =>
-						approveMutation.mutate({
+						(approveMutation as any).mutate({
 							organizationId,
 							studyId,
 							stage: "COSTING",

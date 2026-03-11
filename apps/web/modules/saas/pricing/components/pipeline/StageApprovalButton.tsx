@@ -94,7 +94,7 @@ export function StageApprovalButton({
 					);
 				}
 			},
-			onError: (error) => {
+			onError: (error: any) => {
 				toast.error(error.message || "حدث خطأ");
 			},
 		}),
@@ -106,14 +106,14 @@ export function StageApprovalButton({
 				toast.success(t("pricing.pipeline.reopen"));
 				invalidateStages();
 			},
-			onError: (error) => {
+			onError: (error: any) => {
 				toast.error(error.message || "حدث خطأ");
 			},
 		}),
 	);
 
 	const handleApprove = () => {
-		approveMutation.mutate({
+		(approveMutation as any).mutate({
 			organizationId,
 			studyId,
 			stage,
@@ -121,7 +121,7 @@ export function StageApprovalButton({
 	};
 
 	const handleReopen = () => {
-		reopenMutation.mutate({
+		(reopenMutation as any).mutate({
 			organizationId,
 			studyId,
 			stage,

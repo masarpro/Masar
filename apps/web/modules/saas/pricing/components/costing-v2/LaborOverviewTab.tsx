@@ -75,8 +75,8 @@ export function LaborOverviewTab({
 
 	// Group costing items by section and filter those with labor costs
 	const grouped = useMemo(() => {
-		return (costingItems ?? []).reduce(
-			(acc, item) => {
+		return ((costingItems as any) ?? []).reduce(
+			(acc: any, item: any) => {
 				const section = item.section;
 				if (!acc[section]) acc[section] = [];
 				acc[section].push(item);
@@ -115,7 +115,7 @@ export function LaborOverviewTab({
 				quantity: number;
 			}> = [];
 
-			for (const item of items ?? []) {
+			for (const item of ((items as any) ?? [])) {
 				const laborTotal = Number(item.laborTotal ?? 0);
 				if (laborTotal > 0) {
 					sectionLaborTotal += laborTotal;
@@ -342,7 +342,7 @@ export function LaborOverviewTab({
 											<Input
 												className="h-8 w-28 rounded-lg text-sm"
 												value={w.craft}
-												onChange={(e) => updateWorker(w.id, "craft", e.target.value)}
+												onChange={(e: any) => updateWorker(w.id, "craft", e.target.value)}
 												placeholder="الحرفة"
 											/>
 										</td>
@@ -352,7 +352,7 @@ export function LaborOverviewTab({
 												className="h-8 w-16 mx-auto text-center rounded-lg"
 												dir="ltr"
 												value={w.count || ""}
-												onChange={(e) => updateWorker(w.id, "count", e.target.value)}
+												onChange={(e: any) => updateWorker(w.id, "count", e.target.value)}
 											/>
 										</td>
 										<td className="px-3 py-2">
@@ -361,7 +361,7 @@ export function LaborOverviewTab({
 												className="h-8 w-20 mx-auto text-center rounded-lg"
 												dir="ltr"
 												value={w.salary || ""}
-												onChange={(e) => updateWorker(w.id, "salary", e.target.value)}
+												onChange={(e: any) => updateWorker(w.id, "salary", e.target.value)}
 											/>
 										</td>
 										<td className="px-3 py-2">
@@ -370,7 +370,7 @@ export function LaborOverviewTab({
 												className="h-8 w-16 mx-auto text-center rounded-lg"
 												dir="ltr"
 												value={w.months || ""}
-												onChange={(e) => updateWorker(w.id, "months", e.target.value)}
+												onChange={(e: any) => updateWorker(w.id, "months", e.target.value)}
 											/>
 										</td>
 										<td className="px-3 py-2">
@@ -379,7 +379,7 @@ export function LaborOverviewTab({
 												className="h-8 w-20 mx-auto text-center rounded-lg"
 												dir="ltr"
 												value={w.insurance || ""}
-												onChange={(e) => updateWorker(w.id, "insurance", e.target.value)}
+												onChange={(e: any) => updateWorker(w.id, "insurance", e.target.value)}
 											/>
 										</td>
 										<td className="px-3 py-2">
@@ -388,7 +388,7 @@ export function LaborOverviewTab({
 												className="h-8 w-20 mx-auto text-center rounded-lg"
 												dir="ltr"
 												value={w.housing || ""}
-												onChange={(e) => updateWorker(w.id, "housing", e.target.value)}
+												onChange={(e: any) => updateWorker(w.id, "housing", e.target.value)}
 											/>
 										</td>
 										<td className="px-3 py-2 text-center font-medium" dir="ltr">

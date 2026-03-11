@@ -61,7 +61,7 @@ const GOAL_TO_ENTRY_POINT: Record<StudyGoal, EntryPoint> = {
 const GOAL_TO_START_PAGE: Record<StudyGoal, string> = {
 	full_study: "structural",
 	cost_pricing: "specifications",
-	quick_pricing: "pricing",
+	quick_pricing: "quick-pricing",
 	lump_sum: "costing",
 	contract_import: "quantities",
 };

@@ -49,7 +49,7 @@ export function StirrupsInput({
 					<Label className="text-xs text-muted-foreground">قطر الكانة</Label>
 					<Select
 						value={diameter.toString()}
-						onValueChange={(v) => onDiameterChange(parseInt(v))}
+						onValueChange={(v: any) => onDiameterChange(parseInt(v))}
 					>
 						<SelectTrigger>
 							<SelectValue />
@@ -69,7 +69,7 @@ export function StirrupsInput({
 					<Label className="text-xs text-muted-foreground">التباعد (مم)</Label>
 					<Select
 						value={spacing.toString()}
-						onValueChange={(v) => onSpacingChange(parseInt(v))}
+						onValueChange={(v: any) => onSpacingChange(parseInt(v))}
 					>
 						<SelectTrigger>
 							<SelectValue />

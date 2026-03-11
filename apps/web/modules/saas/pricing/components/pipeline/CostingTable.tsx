@@ -62,14 +62,14 @@ export function CostingTable({
 				});
 				setEditingId(null);
 			},
-			onError: (e) => toast.error(e.message || "حدث خطأ"),
+			onError: (e: any) => toast.error(e.message || "حدث خطأ"),
 		}),
 	);
 
 	const handleMaterialCostChange = useCallback(
 		(itemId: string, value: string) => {
 			const num = value ? Number(value) : null;
-			updateMutation.mutate({
+			(updateMutation as any).mutate({
 				organizationId,
 				itemId,
 				materialUnitCost: num,
@@ -80,7 +80,7 @@ export function CostingTable({
 
 	const handleLaborChange = useCallback(
 		(itemId: string, data: Record<string, unknown>) => {
-			updateMutation.mutate({
+			(updateMutation as any).mutate({
 				organizationId,
 				itemId,
 				...data,
@@ -155,8 +155,8 @@ export function CostingTable({
 												<Input
 													type="number"
 													value={item.materialUnitCost ?? ""}
-													onChange={() => setEditingId(item.id)}
-													onBlur={(e) => handleMaterialCostChange(item.id, e.target.value)}
+													onChange={(_e: any) => setEditingId(item.id)}
+													onBlur={(e: any) => handleMaterialCostChange(item.id, e.target.value)}
 													className="h-7 text-xs text-center w-full"
 													dir="ltr"
 													placeholder="—"

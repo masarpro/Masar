@@ -91,7 +91,7 @@ export function MEPItemDialog({
 			return;
 		}
 
-		updateMutation.mutate({
+		(updateMutation as any).mutate({
 			id: item.id,
 			costStudyId: studyId,
 			organizationId,
@@ -131,7 +131,7 @@ export function MEPItemDialog({
 						<Label>{t("itemDialog.itemName")}</Label>
 						<Input
 							value={name}
-							onChange={(e) => setName(e.target.value)}
+							onChange={(e: any) => setName(e.target.value)}
 							className="text-sm"
 						/>
 					</div>
@@ -142,7 +142,7 @@ export function MEPItemDialog({
 							<Label>{t("itemDialog.category")}</Label>
 							<Select
 								value={category}
-								onValueChange={(v) => {
+								onValueChange={(v: any) => {
 									setCategory(v as MEPCategoryId);
 									setSubCategory("general");
 								}}
@@ -188,7 +188,7 @@ export function MEPItemDialog({
 							<Input
 								type="number"
 								value={quantity}
-								onChange={(e) => setQuantity(e.target.value)}
+								onChange={(e: any) => setQuantity(e.target.value)}
 								dir="ltr"
 								className="text-sm"
 							/>
@@ -197,7 +197,7 @@ export function MEPItemDialog({
 							<Label>{t("itemDialog.unit")}</Label>
 							<Input
 								value={unit}
-								onChange={(e) => setUnit(e.target.value)}
+								onChange={(e: any) => setUnit(e.target.value)}
 								className="text-sm"
 							/>
 						</div>

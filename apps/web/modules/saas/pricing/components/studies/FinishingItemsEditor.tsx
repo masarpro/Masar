@@ -77,12 +77,12 @@ export function FinishingItemsEditor({
 		);
 	}
 
-	const smartConfig = study.buildingConfig as SmartBuildingConfig | null;
+	const smartConfig = (study as any).buildingConfig as SmartBuildingConfig | null;
 	const isWizardComplete = smartConfig?.isComplete === true;
 
 	// Map finishing items to SavedFinishingItem shape
-	const savedItems: SavedFinishingItem[] = finishingItems.map(
-		(item) => ({
+	const savedItems: SavedFinishingItem[] = (finishingItems as any[]).map(
+		(item: any) => ({
 			id: item.id,
 			category: item.category,
 			subCategory: item.subCategory,

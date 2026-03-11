@@ -95,9 +95,9 @@ export function LeadLinkedTab({
 
 	const handleUnlink = () => {
 		if (unlinkType === "costStudy") {
-			unlinkCostStudyMutation.mutate({ organizationId, leadId });
+			(unlinkCostStudyMutation as any).mutate({ organizationId, leadId });
 		} else if (unlinkType === "quotation") {
-			unlinkQuotationMutation.mutate({ organizationId, leadId });
+			(unlinkQuotationMutation as any).mutate({ organizationId, leadId });
 		}
 	};
 
@@ -208,7 +208,7 @@ export function LeadLinkedTab({
 			</div>
 
 			{/* Unlink Confirmation */}
-			<AlertDialog open={!!unlinkType} onOpenChange={(open) => !open && setUnlinkType(null)}>
+			<AlertDialog open={!!unlinkType} onOpenChange={(open: any) => !open && setUnlinkType(null)}>
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>{t("pricing.leads.detail.unlinkConfirm")}</AlertDialogTitle>

@@ -53,7 +53,7 @@ export function PricingSettingsCard({
 	const updateMutation = useMutation(
 		orpc.pricing.studies.update.mutationOptions({
 			onSuccess: () => {
-				recalculateMutation.mutate({
+				(recalculateMutation as any).mutate({
 					id: studyId,
 					organizationId,
 				});
@@ -81,7 +81,7 @@ export function PricingSettingsCard({
 				const ov = parseFloat(o);
 				const pv = parseFloat(p);
 				const cv = parseFloat(c);
-				updateMutation.mutate({
+				(updateMutation as any).mutate({
 					id: studyId,
 					organizationId,
 					overheadPercent: Number.isNaN(ov) ? 0 : ov,
@@ -140,7 +140,7 @@ export function PricingSettingsCard({
 								max={100}
 								step={0.5}
 								value={overhead}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleOverheadChange(e.target.value)
 								}
 								className="h-9 text-sm pl-7"
@@ -163,7 +163,7 @@ export function PricingSettingsCard({
 								max={100}
 								step={0.5}
 								value={profit}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleProfitChange(e.target.value)
 								}
 								className="h-9 text-sm pl-7"
@@ -186,7 +186,7 @@ export function PricingSettingsCard({
 								max={100}
 								step={0.5}
 								value={contingency}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleContingencyChange(e.target.value)
 								}
 								className="h-9 text-sm pl-7"

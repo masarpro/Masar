@@ -85,7 +85,7 @@ export function PricingModeDialog({
 	};
 
 	// Calculate total after pricing
-	const totalAfterPricing = (items ?? []).reduce((sum, item) => {
+	const totalAfterPricing = (items ?? []).reduce((sum: any, item: any) => {
 		const price = prices[item.id] ? Number(prices[item.id]) : 0;
 		return sum + item.quantity * price;
 	}, 0);
@@ -123,7 +123,7 @@ export function PricingModeDialog({
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{items.map((item) => {
+								{items.map((item: any) => {
 									const priceVal = prices[item.id] ? Number(prices[item.id]) : 0;
 									const lineTotal = item.quantity * priceVal;
 									return (
@@ -146,7 +146,7 @@ export function PricingModeDialog({
 													min="0"
 													step="any"
 													value={prices[item.id] ?? ""}
-													onChange={(e) =>
+													onChange={(e: any) =>
 														setPrices((prev) => ({
 															...prev,
 															[item.id]: e.target.value,

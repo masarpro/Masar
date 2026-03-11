@@ -46,7 +46,7 @@ export function LeadDetailPage({ leadId, organizationId, organizationSlug }: Lea
 		orpc.pricing.leads.getById.queryOptions({
 			input: { organizationId, leadId },
 		}),
-	);
+	) as { data: any; isLoading: boolean };
 
 	const deleteMutation = useMutation(
 		orpc.pricing.leads.delete.mutationOptions({
@@ -190,7 +190,7 @@ export function LeadDetailPage({ leadId, organizationId, organizationSlug }: Lea
 					<AlertDialogFooter>
 						<AlertDialogCancel>{t("pricing.leads.form.cancel")}</AlertDialogCancel>
 						<AlertDialogAction
-							onClick={() => deleteMutation.mutate({ organizationId, leadId })}
+							onClick={() => (deleteMutation as any).mutate({ organizationId, leadId })}
 							disabled={deleteMutation.isPending}
 							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						>

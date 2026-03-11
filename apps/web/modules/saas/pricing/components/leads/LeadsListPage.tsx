@@ -37,7 +37,7 @@ export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPag
 		orpc.pricing.leads.getStats.queryOptions({
 			input: { organizationId },
 		}),
-	);
+	) as { data: any };
 
 	const { data, isLoading, refetch } = useQuery(
 		orpc.pricing.leads.list.queryOptions({
@@ -51,7 +51,7 @@ export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPag
 				limit: 20,
 			},
 		}),
-	);
+	) as { data: any; isLoading: boolean; refetch: any };
 
 	const handleFilterChange = (setter: (v: string) => void) => (v: string) => {
 		setter(v);
@@ -92,7 +92,7 @@ export function LeadsListPage({ organizationId, organizationSlug }: LeadsListPag
 				<>
 					{/* Card Grid */}
 					<div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-						{leads.map((lead, index) => (
+						{leads.map((lead: any, index: any) => (
 							<div
 								key={lead.id}
 								className="animate-in fade-in slide-in-from-bottom-4 duration-500"
