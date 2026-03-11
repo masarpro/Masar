@@ -1,11 +1,18 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@ui/components/select";
 import { cn } from "@ui/lib";
 import { Check, Crown, Loader2, Sparkles, Wallet } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 interface SpecQuickTemplateBarProps {
@@ -40,19 +47,41 @@ const TEMPLATES = [
 	},
 ];
 
+type ScopeValue = "all" | `floor:${string}`;
+
 export function SpecQuickTemplateBar({
 	organizationId,
 	studyId,
 }: SpecQuickTemplateBarProps) {
 	const queryClient = useQueryClient();
 	const [applied, setApplied] = useState<string | null>(null);
+	const [scope, setScope] = useState<ScopeValue>("all");
+
+	// Fetch finishing items to get distinct floors
+	const { data: finishingItems = [] } = useQuery(
+		orpc.pricing.studies.getFinishingItems.queryOptions({
+			input: { costStudyId: studyId, organizationId },
+		}),
+	);
+
+	const floors = useMemo(() => {
+		const map = new Map<string, string>();
+		for (const item of finishingItems) {
+			if (item.floorId && item.floorName) {
+				map.set(item.floorId, item.floorName);
+			}
+		}
+		return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+	}, [finishingItems]);
 
 	const applyMutation = useMutation(
 		orpc.pricing.studies.specifications.applyTemplate.mutationOptions({
 			onSuccess: (data, variables) => {
 				setApplied(variables.templateLevel);
-				toast.success(`تم تطبيق قالب المواصفات — ${data.updated} بند`);
-				// Invalidate all relevant queries
+				const scopeLabel = scope === "all"
+					? ""
+					: ` — ${floors.find((f) => `floor:${f.id}` === scope)?.name ?? ""}`;
+				toast.success(`تم تطبيق قالب المواصفات — ${data.updated} بند${scopeLabel}`);
 				queryClient.invalidateQueries({
 					queryKey: ["pricing", "studies", "specifications"],
 				});
@@ -69,11 +98,47 @@ export function SpecQuickTemplateBar({
 		}),
 	);
 
+	const handleApply = (templateLevel: "economic" | "medium" | "luxury") => {
+		const mutationInput: Record<string, unknown> = {
+			organizationId,
+			studyId,
+			templateLevel,
+		};
+
+		if (scope === "all") {
+			mutationInput.scope = "all";
+		} else if (scope.startsWith("floor:")) {
+			mutationInput.scope = "floor";
+			mutationInput.floorId = scope.replace("floor:", "");
+		}
+
+		applyMutation.mutate(mutationInput as Parameters<typeof applyMutation.mutate>[0]);
+	};
+
 	return (
-		<div className="flex items-center gap-2 flex-wrap" dir="rtl">
+		<div className="flex items-center gap-3 flex-wrap" dir="rtl">
 			<span className="text-sm text-muted-foreground font-medium">
 				قالب سريع:
 			</span>
+
+			{/* Scope selector */}
+			{floors.length > 1 && (
+				<Select value={scope} onValueChange={(v) => setScope(v as ScopeValue)}>
+					<SelectTrigger className="h-8 w-[160px] text-xs rounded-lg">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">المشروع كامل</SelectItem>
+						{floors.map((floor) => (
+							<SelectItem key={floor.id} value={`floor:${floor.id}`}>
+								{floor.name}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			)}
+
+			{/* Template buttons */}
 			{TEMPLATES.map((tpl) => {
 				const Icon = tpl.icon;
 				const isApplied = applied === tpl.value;
@@ -87,13 +152,7 @@ export function SpecQuickTemplateBar({
 						variant="outline"
 						size="sm"
 						disabled={applyMutation.isPending}
-						onClick={() =>
-							applyMutation.mutate({
-								organizationId,
-								studyId,
-								templateLevel: tpl.value,
-							})
-						}
+						onClick={() => handleApply(tpl.value)}
 						className={cn(
 							"gap-1.5 rounded-lg border",
 							isApplied && tpl.border,

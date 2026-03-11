@@ -11,6 +11,7 @@ export { PricingEditor } from "./PricingEditor";
 export { StudyHeaderCard } from "./StudyHeaderCard";
 export { StudyPageShell } from "./StudyPageShell";
 export { StudyPipelineStepper } from "./StudyPipelineStepper";
+export { StudySidebar } from "./StudySidebar";
 export { QuantitiesSubTabs } from "./QuantitiesSubTabs";
 export { SummaryStatsCards } from "./SummaryStatsCards";
 export { StructuralAccordion } from "./StructuralAccordion";

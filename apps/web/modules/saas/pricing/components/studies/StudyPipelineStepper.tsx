@@ -46,7 +46,6 @@ const PIPELINE_STAGES = [
 		labelEn: "Quantities",
 		icon: Calculator,
 		path: "quantities",
-		description: "حساب كميات المشروع",
 	},
 	{
 		key: "SPECIFICATIONS" as const,
@@ -54,7 +53,6 @@ const PIPELINE_STAGES = [
 		labelEn: "Specifications",
 		icon: ClipboardList,
 		path: "specifications",
-		description: "تحديد المواصفات لكل بند",
 	},
 	{
 		key: "COSTING" as const,
@@ -62,7 +60,6 @@ const PIPELINE_STAGES = [
 		labelEn: "Costing",
 		icon: Receipt,
 		path: "costing",
-		description: "تحديد تكلفة المواد والمصنعيات",
 	},
 	{
 		key: "PRICING" as const,
@@ -70,7 +67,6 @@ const PIPELINE_STAGES = [
 		labelEn: "Pricing",
 		icon: DollarSign,
 		path: "pricing",
-		description: "تحديد سعر البيع وهامش الربح",
 	},
 	{
 		key: "QUOTATION" as const,
@@ -78,7 +74,6 @@ const PIPELINE_STAGES = [
 		labelEn: "Quotation",
 		icon: FileText,
 		path: "quotation",
-		description: "إصدار عرض السعر",
 	},
 	{
 		key: "CONVERSION" as const,
@@ -86,7 +81,6 @@ const PIPELINE_STAGES = [
 		labelEn: "Project",
 		icon: FolderKanban,
 		path: "convert",
-		description: "التحويل لمشروع تنفيذي",
 	},
 ] as const;
 
@@ -98,6 +92,13 @@ const ENTRY_POINT_START_INDEX: Record<StudyEntryPoint, number> = {
 	QUOTATION_ONLY: 4,
 	LUMP_SUM_ANALYSIS: 2,
 	CUSTOM_ITEMS: 0,
+};
+
+const STATUS_LABELS: Record<StageStatus, string> = {
+	NOT_STARTED: "لم تبدأ",
+	DRAFT: "جاري العمل",
+	IN_REVIEW: "قيد المراجعة",
+	APPROVED: "معتمد",
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -114,6 +115,8 @@ interface StudyPipelineStepperProps {
 	}>;
 	entryPoint: StudyEntryPoint;
 	currentStage?: StageType;
+	/** Optional counts per stage (e.g. number of items) */
+	stageCounts?: Partial<Record<StageType, { total?: number; completed?: number }>>;
 }
 
 function getStageStatus(
@@ -138,11 +141,11 @@ export function StudyPipelineStepper({
 	stages,
 	entryPoint,
 	currentStage,
+	stageCounts,
 }: StudyPipelineStepperProps) {
 	const pathname = usePathname();
 	const basePath = `/app/${organizationSlug}/pricing/studies/${studyId}`;
 
-	// Determine which step is currently viewed from URL
 	const getActiveFromPath = (): StageType | null => {
 		if (currentStage) return currentStage;
 		for (const stage of PIPELINE_STAGES) {
@@ -158,13 +161,13 @@ export function StudyPipelineStepper({
 			className="w-full rounded-xl border border-border/50 bg-card p-3 sm:p-4"
 			dir="rtl"
 		>
-			{/* Desktop: Horizontal stepper */}
+			{/* Desktop: Horizontal stepper with status info */}
 			<div className="hidden sm:flex items-center">
 				{PIPELINE_STAGES.map((stage, index) => {
 					const status = getStageStatus(stage.key, stages);
 					const isSkipped = isSkippedStage(index, entryPoint);
 					const isCurrent = stage.key === activeStageKey;
-					const Icon = stage.icon;
+					const counts = stageCounts?.[stage.key];
 
 					const href =
 						stage.key === "QUANTITIES"
@@ -179,7 +182,7 @@ export function StudyPipelineStepper({
 							<Link
 								href={href}
 								className={cn(
-									"flex items-center gap-2 rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 transition-all shrink-0",
+									"flex items-center gap-2 rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 transition-all shrink-0 group",
 									isCurrent && "bg-primary text-primary-foreground shadow-sm",
 									!isCurrent && isSkipped && "text-muted-foreground/50",
 									!isCurrent &&
@@ -238,10 +241,31 @@ export function StudyPipelineStepper({
 									)}
 								</div>
 
-								{/* Label */}
-								<span className="hidden sm:inline text-sm font-medium whitespace-nowrap">
-									{stage.label}
-								</span>
+								{/* Label + status subtitle */}
+								<div className="hidden sm:flex flex-col items-start">
+									<span className="text-sm font-medium whitespace-nowrap">
+										{stage.label}
+									</span>
+									{/* Status subtitle */}
+									{!isSkipped && (
+										<span
+											className={cn(
+												"text-[10px] leading-tight whitespace-nowrap",
+												isCurrent
+													? "text-primary-foreground/70"
+													: "text-muted-foreground",
+											)}
+										>
+											{status === "APPROVED" && "معتمد ✓"}
+											{status === "DRAFT" &&
+												(counts?.total
+													? `${counts.completed ?? 0} من ${counts.total}`
+													: "جاري العمل")}
+											{status === "IN_REVIEW" && "قيد المراجعة"}
+											{status === "NOT_STARTED" && "مقفل"}
+										</span>
+									)}
+								</div>
 							</Link>
 
 							{/* Connector line */}
@@ -266,7 +290,7 @@ export function StudyPipelineStepper({
 					const status = getStageStatus(stage.key, stages);
 					const isSkipped = isSkippedStage(index, entryPoint);
 					const isCurrent = stage.key === activeStageKey;
-					const Icon = stage.icon;
+					const counts = stageCounts?.[stage.key];
 
 					const href =
 						stage.key === "QUANTITIES"
@@ -314,8 +338,21 @@ export function StudyPipelineStepper({
 									index + 1
 								)}
 							</div>
-							<Icon className="h-4 w-4 shrink-0" />
-							<span className="text-sm font-medium">{stage.label}</span>
+							<span className="text-sm font-medium flex-1">{stage.label}</span>
+							{/* Mobile status badge */}
+							{!isSkipped && status !== "NOT_STARTED" && (
+								<span
+									className={cn(
+										"text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+										isCurrent && "bg-primary-foreground/20 text-primary-foreground",
+										!isCurrent && status === "APPROVED" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400",
+										!isCurrent && status === "DRAFT" && "bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400",
+										!isCurrent && status === "IN_REVIEW" && "bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400",
+									)}
+								>
+									{STATUS_LABELS[status]}
+								</span>
+							)}
 						</Link>
 					);
 				})}

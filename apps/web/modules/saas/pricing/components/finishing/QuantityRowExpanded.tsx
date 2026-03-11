@@ -11,38 +11,27 @@ import {
 	Edit3,
 	Link2,
 	RotateCcw,
-	Settings,
-	CheckCircle2,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { memo, useState } from "react";
 import type { MergedQuantityItem } from "../../lib/merge-quantities";
-import type { ItemSpecification } from "../../lib/specs/spec-types";
 import { formatNumber } from "../../lib/utils";
-import { ItemSpecEditor } from "./specs/ItemSpecEditor";
 
 interface QuantityRowExpandedProps {
 	item: MergedQuantityItem;
 	allItems: MergedQuantityItem[];
 	onManualOverride: (key: string, newQuantity: number) => void;
 	onResetToAuto: (key: string) => void;
-	onSaveSpec: (key: string, spec: ItemSpecification) => void;
 }
-
-type TabKey = "details" | "specs";
 
 export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 	item,
 	allItems,
 	onManualOverride,
 	onResetToAuto,
-	onSaveSpec,
 }: QuantityRowExpandedProps) {
 	const t = useTranslations("pricing.studies.finishing.dashboard");
-	const tSpecs = useTranslations("pricing.studies.finishing.specs");
-	const [activeTab, setActiveTab] = useState<TabKey>("details");
 	const [isEditing, setIsEditing] = useState(false);
-	const [isEditingSpec, setIsEditingSpec] = useState(false);
 	const [manualValue, setManualValue] = useState(
 		String(item.quantity),
 	);
@@ -70,50 +59,10 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 		}
 	};
 
-	const existingSpec = (item.specData as ItemSpecification | undefined) ?? null;
-	const hasSpec = existingSpec !== null;
-
-	const handleSaveSpec = (spec: ItemSpecification) => {
-		onSaveSpec(item.key, spec);
-		setIsEditingSpec(false);
-	};
-
 	return (
 		<div className="border-t bg-muted/30 border-r-2 border-primary/30">
-			{/* Tabs */}
-			<div className="flex border-b bg-muted/20">
-				<button
-					type="button"
-					className={`px-4 py-2.5 text-sm font-medium transition-colors duration-200 ${
-						activeTab === "details"
-							? "border-b-2 border-primary text-primary bg-background/50"
-							: "text-muted-foreground hover:text-foreground hover:bg-muted/30"
-					}`}
-					onClick={() => setActiveTab("details")}
-				>
-					<Calculator className="inline h-3.5 w-3.5 me-1.5" />
-					{t("calculationDetails")}
-				</button>
-				<button
-					type="button"
-					className={`px-4 py-2.5 text-sm font-medium transition-colors duration-200 flex items-center gap-1.5 ${
-						activeTab === "specs"
-							? "border-b-2 border-primary text-primary bg-background/50"
-							: "text-muted-foreground hover:text-foreground hover:bg-muted/30"
-					}`}
-					onClick={() => setActiveTab("specs")}
-				>
-					<Settings className="inline h-3.5 w-3.5" />
-					{tSpecs("tab")}
-					{hasSpec && (
-						<CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-					)}
-				</button>
-			</div>
-
-			{/* Details tab */}
-			{activeTab === "details" && (
-				<div className="px-5 py-4 space-y-3 text-sm">
+			{/* Details */}
+			<div className="px-5 py-4 space-y-3 text-sm">
 					{/* Calculation breakdown */}
 					{item.calculationBreakdown && (
 						<div className="space-y-2">
@@ -268,66 +217,6 @@ export const QuantityRowExpanded = memo(function QuantityRowExpanded({
 						</Badge>
 					</div>
 				</div>
-			)}
-
-			{/* Specs tab */}
-			{activeTab === "specs" && (
-				<div className="text-sm">
-					{isEditingSpec ? (
-						<ItemSpecEditor
-							categoryKey={item.categoryKey}
-							itemName={item.name}
-							effectiveQuantity={item.effectiveQuantity}
-							unit={item.unit}
-							existingSpec={existingSpec}
-							onSave={handleSaveSpec}
-							onCancel={() => setIsEditingSpec(false)}
-						/>
-					) : hasSpec ? (
-						<div className="px-5 py-4 space-y-2">
-							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									<CheckCircle2 className="h-4 w-4 text-emerald-500" />
-									<span className="text-sm font-medium">
-										{existingSpec.specTypeLabel}
-									</span>
-								</div>
-								<Button
-									variant="outline"
-									size="sm"
-									className="h-8 text-sm"
-									onClick={() => setIsEditingSpec(true)}
-								>
-									<Settings className="h-3.5 w-3.5 me-1.5" />
-									{tSpecs("edit")}
-								</Button>
-							</div>
-							{existingSpec.subItems.length > 0 && (
-								<div className="text-sm text-muted-foreground">
-									{tSpecs("materialsCount", {
-										count: existingSpec.subItems.length,
-									})}
-								</div>
-							)}
-						</div>
-					) : (
-						<div className="px-5 py-6 text-center space-y-3">
-							<p className="text-sm text-muted-foreground">
-								{tSpecs("noSpecYet")}
-							</p>
-							<Button
-								variant="outline"
-								size="sm"
-								className="h-8 text-sm"
-								onClick={() => setIsEditingSpec(true)}
-							>
-								<Settings className="h-3.5 w-3.5 me-1.5" />
-								{tSpecs("setSpec")}
-							</Button>
-						</div>
-					)}
-				</div>
-			)}
 		</div>
 	);
 });

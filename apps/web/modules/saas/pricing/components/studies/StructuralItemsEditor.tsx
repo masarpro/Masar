@@ -66,6 +66,15 @@ export function StructuralItemsEditor({
 			(sum, item) => sum + (item.steelWeight || 0),
 			0
 		),
+		blocks: structuralItems
+			.filter((item) => item.category === "blocks")
+			.reduce((sum, item) => sum + (item.quantity || 0), 0),
+		formwork: structuralItems
+			.filter((item) => item.category !== "blocks" && item.category !== "plainConcrete")
+			.reduce((sum, item) => {
+				const dims = (item.dimensions as Record<string, number>) || {};
+				return sum + (dims.formworkArea || 0);
+			}, 0),
 	};
 
 	return (
@@ -104,7 +113,6 @@ export function StructuralItemsEditor({
 						dimensions: (item.dimensions as Record<string, number>) || {},
 						concreteVolume: item.concreteVolume || 0,
 						steelWeight: item.steelWeight || 0,
-						totalCost: item.totalCost || 0,
 						subCategory: item.subCategory,
 					}))}
 					onUpdate={refetch}

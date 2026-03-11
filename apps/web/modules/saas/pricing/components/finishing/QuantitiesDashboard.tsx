@@ -7,8 +7,9 @@ import { Input } from "@ui/components/input";
 import {
 	Search,
 	Filter,
-	Settings,
-	ClipboardList,
+	LayoutList,
+	Layers,
+	Building2,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -28,12 +29,8 @@ import {
 	extractKnowledgeFromItem,
 	type ExtractionResult,
 } from "../../lib/knowledge-extractor";
-import type { ItemSpecification, SavedCategorySpec, SpecificationTemplate } from "../../lib/specs/spec-types";
-import { buildItemSpec } from "../../lib/specs/spec-calculator";
-import { mapToCatalogCategory } from "../../lib/utils";
+import { formatNumber, getUnitLabel, mapToCatalogCategory } from "../../lib/utils";
 import { BuildingSummaryBar } from "./BuildingSummaryBar";
-import { SpecBulkEditor } from "./specs/SpecBulkEditor";
-import { BillOfMaterials } from "./specs/BillOfMaterials";
 import { QuantitiesTable } from "./QuantitiesTable";
 import { ManualItemAdder } from "./ManualItemAdder";
 import { KnowledgeNotification } from "./KnowledgeNotification";
@@ -80,12 +77,14 @@ export function QuantitiesDashboard({
 	const t = useTranslations("pricing.studies.finishing.dashboard");
 	const queryClient = useQueryClient();
 
+	// View mode: by category, by floor, or aggregated project view
+	type ViewMode = "byCategory" | "byFloor" | "byProject";
+	const [viewMode, setViewMode] = useState<ViewMode>("byCategory");
+
 	// Filters
 	const [groupFilter, setGroupFilter] = useState<GroupFilter>(null);
 	const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 	const [searchQuery, setSearchQuery] = useState("");
-	const [showBulkEditor, setShowBulkEditor] = useState(false);
-	const [dashboardView, setDashboardView] = useState<"quantities" | "bom">("quantities");
 
 	// Knowledge extraction state
 	const [pendingKnowledge, setPendingKnowledge] = useState<{
@@ -123,8 +122,6 @@ export function QuantitiesDashboard({
 	const totalItems = localItems.length;
 	const enabledCount = localItems.filter((i) => i.isEnabled).length;
 	const disabledCount = totalItems - enabledCount;
-	const hasAnySpecs = localItems.some((i) => i.isEnabled && i.specData);
-
 	// Filtered items
 	const filteredItems = useMemo(() => {
 		let items = localItems;
@@ -602,96 +599,6 @@ export function QuantitiesDashboard({
 		[localItems.length, debouncedSave],
 	);
 
-	const handleSaveSpec = useCallback(
-		(key: string, spec: ItemSpecification) => {
-			setLocalItems((prev) => {
-				const updated = prev.map((i) =>
-					i.key === key
-						? { ...i, specData: spec }
-						: i,
-				);
-				const item = updated.find((i) => i.key === key);
-				if (item?.isSaved && item.savedId) {
-					const specDescription = `${spec.specTypeLabel}${
-						spec.options?.brand
-							? ` — ${spec.options.brand}`
-							: ""
-					}`;
-					updateMutation.mutate(
-						{
-							organizationId,
-							costStudyId: studyId,
-							id: item.savedId,
-							specData: spec,
-							qualityLevel:
-								(spec.options?.qualityLevel as string) ??
-								undefined,
-							brand:
-								(spec.options?.brand as string) ?? undefined,
-							specifications: specDescription,
-						},
-						{
-							onSuccess: () => {
-								toast.success(t("saved"));
-							},
-						},
-					);
-				}
-				return updated;
-			});
-		},
-		[organizationId, studyId, updateMutation, t],
-	);
-
-	const handleBulkSaveAll = useCallback(
-		(specMap: Map<string, ItemSpecification>) => {
-			setLocalItems((prev) => {
-				const updated = prev.map((i) => {
-					const spec = specMap.get(i.key);
-					if (!spec) return i;
-					return { ...i, specData: spec };
-				});
-
-				// Persist each item that has a spec and is saved
-				for (const item of updated) {
-					const spec = specMap.get(item.key);
-					if (!spec || !item.isSaved || !item.savedId) continue;
-
-					const specDescription = `${spec.specTypeLabel}${
-						spec.options?.brand
-							? ` — ${spec.options.brand}`
-							: ""
-					}`;
-					updateMutation.mutate({
-						organizationId,
-						costStudyId: studyId,
-						id: item.savedId,
-						specData: spec,
-						qualityLevel:
-							(spec.options?.qualityLevel as string) ??
-							undefined,
-						brand:
-							(spec.options?.brand as string) ?? undefined,
-						specifications: specDescription,
-					});
-				}
-
-				toast.success(t("saved"));
-				return updated;
-			});
-		},
-		[organizationId, studyId, updateMutation, t],
-	);
-
-	const handleSaveTemplate = useCallback(
-		(_name: string, _specs: SavedCategorySpec[]) => {
-			// Template saving is handled by the parent if ORPC is available
-			// For now, just show a toast — full API integration comes with the router wiring
-			toast.success(t("templateSaved"));
-		},
-		[],
-	);
-
 	return (
 		<div className="space-y-5">
 			{/* Building Summary */}
@@ -721,6 +628,27 @@ export function QuantitiesDashboard({
 
 			{/* Toolbar */}
 			<div className="space-y-3">
+				{/* View mode toggle */}
+				<div className="flex items-center gap-2">
+					<span className="text-sm text-muted-foreground font-medium">{t("viewMode")}:</span>
+					{([
+						["byCategory", t("viewByCategory"), LayoutList],
+						["byFloor", t("viewByFloor"), Layers],
+						["byProject", t("viewByProject"), Building2],
+					] as [string, string, typeof LayoutList][]).map(([mode, label, Icon]) => (
+						<Button
+							key={mode}
+							variant={viewMode === mode ? "secondary" : "ghost"}
+							size="sm"
+							className={`text-sm h-8 px-3 rounded-lg gap-1.5 ${viewMode === mode ? "font-medium" : ""}`}
+							onClick={() => setViewMode(mode as ViewMode)}
+						>
+							<Icon className="h-3.5 w-3.5" />
+							{label}
+						</Button>
+					))}
+				</div>
+
 				{/* Group tabs */}
 				<div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
 					{GROUP_TABS.map((tab) => (
@@ -813,61 +741,20 @@ export function QuantitiesDashboard({
 						floors={config?.floors ?? []}
 						onAdd={handleAddManualItem}
 					/>
-
-					{/* Bulk spec editor button */}
-					<Button
-						variant="outline"
-						size="sm"
-						className="h-9 text-sm rounded-lg"
-						onClick={() => setShowBulkEditor(true)}
-					>
-						<Settings className="h-4 w-4 me-1.5" />
-						{t("setSpecs")}
-					</Button>
-
-					{/* BOM tab button */}
-					{hasAnySpecs && (
-						<Button
-							variant={dashboardView === "bom" ? "primary" : "outline"}
-							size="sm"
-							className="h-9 text-sm rounded-lg"
-							onClick={() =>
-								setDashboardView(
-									dashboardView === "bom"
-										? "quantities"
-										: "bom",
-								)
-							}
-						>
-							<ClipboardList className="h-4 w-4 me-1.5" />
-							{t("billOfMaterials")}
-						</Button>
-					)}
 				</div>
 			</div>
 
-			{/* Content: Table or BOM */}
-			{dashboardView === "bom" ? (
-				<BillOfMaterials items={localItems} />
-			) : (
-				<QuantitiesTable
-					items={filteredItems}
-					onToggleEnabled={handleToggleEnabled}
-					onManualOverride={handleManualOverride}
-					onResetToAuto={handleResetToAuto}
-					onSaveSpec={handleSaveSpec}
-				/>
-			)}
-
-			{/* Bulk Spec Editor Dialog */}
-			<SpecBulkEditor
-				open={showBulkEditor}
-				onOpenChange={setShowBulkEditor}
-				items={localItems}
-				customTemplates={[]}
-				onSaveAll={handleBulkSaveAll}
-				onSaveTemplate={handleSaveTemplate}
+			{/* Content: Table */}
+			<QuantitiesTable
+				items={filteredItems}
+				viewMode={viewMode}
+				onToggleEnabled={handleToggleEnabled}
+				onManualOverride={handleManualOverride}
+				onResetToAuto={handleResetToAuto}
 			/>
+
+			{/* Aggregated Summary */}
+			<FinishingAggregatedSummary items={localItems} />
 		</div>
 	);
 }
@@ -919,4 +806,48 @@ function getItemDisplayName(key: string, t: (key: string) => string): string {
 	}
 	const tKey = ITEM_NAME_KEYS[key];
 	return tKey ? t(tKey) : key;
+}
+
+/** Aggregated summary of all finishing quantities */
+function FinishingAggregatedSummary({ items }: { items: MergedQuantityItem[] }) {
+	const t = useTranslations("pricing.studies.finishing.dashboard");
+	const enabledItems = items.filter((i) => i.isEnabled);
+
+	if (enabledItems.length === 0) return null;
+
+	// Aggregate by category+unit across all floors
+	const aggregated = new Map<string, { name: string; quantity: number; unit: string }>();
+	for (const item of enabledItems) {
+		const key = `${item.categoryKey}_${item.unit}`;
+		if (!aggregated.has(key)) {
+			aggregated.set(key, { name: item.name, quantity: 0, unit: item.unit });
+		}
+		aggregated.get(key)!.quantity += item.quantity;
+	}
+
+	const rows = Array.from(aggregated.values()).sort((a, b) => a.name.localeCompare(b.name, "ar"));
+
+	return (
+		<div className="rounded-lg border bg-card overflow-hidden">
+			<div className="px-4 py-3 bg-muted/40 border-b">
+				<h3 className="text-sm font-semibold">{t("aggregatedSummary")}</h3>
+			</div>
+			<div className="divide-y">
+				{rows.map((row) => (
+					<div key={`${row.name}_${row.unit}`} className="grid grid-cols-[1fr_120px_60px] gap-2 px-4 py-2 text-sm items-center">
+						<span className="font-medium">{row.name}</span>
+						<span className="text-center font-semibold tabular-nums" dir="ltr">
+							{formatNumber(row.quantity, 1)}
+						</span>
+						<span className="text-center text-xs text-muted-foreground">
+							{getUnitLabel(row.unit)}
+						</span>
+					</div>
+				))}
+			</div>
+			<div className="px-4 py-2.5 bg-muted/30 border-t text-xs text-muted-foreground">
+				{t("totalItems")}: <strong className="text-foreground">{rows.length}</strong>
+			</div>
+		</div>
+	);
 }

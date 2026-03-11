@@ -264,6 +264,7 @@ export function MEPItemsEditor({
 				isRederiving={isRederiving}
 				onAddManual={handleAddManual}
 				hasNewItems={hasNewItems}
+				showPricing={false}
 			/>
 			<MEPItemDialog
 				item={editingItem}

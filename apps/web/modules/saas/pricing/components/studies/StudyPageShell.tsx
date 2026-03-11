@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { StudyOverviewSkeleton } from "@saas/shared/components/skeletons";
 import { StudyHeaderCard } from "./StudyHeaderCard";
 import { StudyPipelineStepper } from "./StudyPipelineStepper";
+import { StudySidebar } from "./StudySidebar";
 
 interface StudyPageShellProps {
 	organizationId: string;
@@ -60,15 +61,34 @@ export function StudyPageShell({
 	}
 
 	return (
-		<div className="space-y-6">
-			<StudyHeaderCard study={study} />
-			<StudyPipelineStepper
+		<div className="flex gap-6" dir="rtl">
+			{/* Sidebar — desktop only */}
+			<StudySidebar
 				studyId={studyId}
+				studyName={study.name}
 				organizationSlug={organizationSlug}
 				stages={stagesArray}
 				entryPoint={entryPoint}
 			/>
-			{children}
+
+			{/* Main content area */}
+			<div className="flex-1 min-w-0 space-y-6">
+				{/* Header card */}
+				<StudyHeaderCard study={study} />
+
+				{/* Mobile stepper (hidden on lg where sidebar is shown) */}
+				<div className="lg:hidden">
+					<StudyPipelineStepper
+						studyId={studyId}
+						organizationSlug={organizationSlug}
+						stages={stagesArray}
+						entryPoint={entryPoint}
+					/>
+				</div>
+
+				{/* Page content */}
+				{children}
+			</div>
 		</div>
 	);
 }

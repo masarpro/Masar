@@ -7,20 +7,25 @@ import { cn } from "@ui/lib";
 import {
 	ChevronDown,
 	ChevronLeft,
+	LayoutList,
+	Layers,
 	Loader2,
 	Package,
 	RefreshCw,
 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 interface BOMSectionProps {
 	organizationId: string;
 	studyId: string;
 }
 
+type BOMViewMode = "byItem" | "byMaterial";
+
 export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 	const queryClient = useQueryClient();
 	const [expanded, setExpanded] = useState(true);
+	const [viewMode, setViewMode] = useState<BOMViewMode>("byItem");
 
 	const { data: bomEntries, isLoading } = useQuery(
 		orpc.pricing.studies.specifications.getBOM.queryOptions({
@@ -61,6 +66,44 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 		MEP: "كهروميكانيكية",
 	};
 
+	// Aggregate by material name + unit for "by material" view
+	const aggregatedByMaterial = useMemo(() => {
+		if (!bomEntries?.length) return [];
+		const map = new Map<string, {
+			materialName: string;
+			materialNameEn: string | null;
+			unit: string;
+			totalQuantity: number;
+			totalEffective: number;
+			usedIn: string[];
+		}>();
+
+		for (const entry of bomEntries) {
+			const key = `${entry.materialName}_${entry.unit}`;
+			if (!map.has(key)) {
+				map.set(key, {
+					materialName: entry.materialName,
+					materialNameEn: entry.materialNameEn,
+					unit: entry.unit,
+					totalQuantity: 0,
+					totalEffective: 0,
+					usedIn: [],
+				});
+			}
+			const agg = map.get(key)!;
+			agg.totalQuantity += Number(entry.quantity);
+			agg.totalEffective += Number(entry.effectiveQuantity);
+			const catLabel = entry.parentCategory ?? "عام";
+			if (!agg.usedIn.includes(catLabel)) {
+				agg.usedIn.push(catLabel);
+			}
+		}
+
+		return Array.from(map.values()).sort((a, b) =>
+			a.materialName.localeCompare(b.materialName, "ar"),
+		);
+	}, [bomEntries]);
+
 	const hasEntries = (bomEntries ?? []).length > 0;
 
 	return (
@@ -93,8 +136,40 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 
 			{expanded && (
 				<div className="px-4 pb-4 space-y-4">
-					{/* Generate / Refresh button */}
-					<div className="flex justify-end">
+					{/* Toolbar: view toggle + generate */}
+					<div className="flex items-center justify-between">
+						{hasEntries ? (
+							<div className="flex items-center gap-1 rounded-lg border p-1 bg-muted/30">
+								<button
+									type="button"
+									onClick={() => setViewMode("byItem")}
+									className={cn(
+										"flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+										viewMode === "byItem"
+											? "bg-background shadow-sm text-foreground"
+											: "text-muted-foreground hover:text-foreground",
+									)}
+								>
+									<LayoutList className="h-3.5 w-3.5" />
+									حسب البند
+								</button>
+								<button
+									type="button"
+									onClick={() => setViewMode("byMaterial")}
+									className={cn(
+										"flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+										viewMode === "byMaterial"
+											? "bg-background shadow-sm text-foreground"
+											: "text-muted-foreground hover:text-foreground",
+									)}
+								>
+									<Layers className="h-3.5 w-3.5" />
+									حسب المادة
+								</button>
+							</div>
+						) : (
+							<div />
+						)}
 						<Button
 							onClick={handleGenerate}
 							disabled={generateMutation.isPending}
@@ -126,7 +201,8 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 						</div>
 					)}
 
-					{!isLoading && hasEntries && (
+					{/* By Item View */}
+					{!isLoading && hasEntries && viewMode === "byItem" && (
 						<div className="space-y-4">
 							{Object.entries(grouped).map(([typeKey, categories]) => (
 								<div key={typeKey} className="space-y-2">
@@ -202,6 +278,75 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 									))}
 								</div>
 							))}
+						</div>
+					)}
+
+					{/* By Material View (aggregated) */}
+					{!isLoading && hasEntries && viewMode === "byMaterial" && (
+						<div className="rounded-lg border border-border overflow-hidden">
+							<div className="overflow-x-auto">
+								<table className="w-full text-sm">
+									<thead>
+										<tr className="border-b bg-muted/30 text-muted-foreground">
+											<th className="px-3 py-2.5 text-right font-medium">#</th>
+											<th className="px-3 py-2.5 text-right font-medium">المادة</th>
+											<th className="px-3 py-2.5 text-center font-medium">الوحدة</th>
+											<th className="px-3 py-2.5 text-center font-medium">إجمالي الكمية</th>
+											<th className="px-3 py-2.5 text-center font-medium">الكمية الفعلية</th>
+											<th className="px-3 py-2.5 text-right font-medium">مستخدمة في</th>
+										</tr>
+									</thead>
+									<tbody>
+										{aggregatedByMaterial.map((mat, idx) => (
+											<tr
+												key={`${mat.materialName}_${mat.unit}`}
+												className="border-b last:border-0 hover:bg-muted/20"
+											>
+												<td className="px-3 py-2 text-muted-foreground text-xs">
+													{idx + 1}
+												</td>
+												<td className="px-3 py-2 font-medium">
+													{mat.materialName}
+													{mat.materialNameEn && (
+														<span className="text-xs text-muted-foreground mr-2">
+															({mat.materialNameEn})
+														</span>
+													)}
+												</td>
+												<td className="px-3 py-2 text-center">
+													{mat.unit}
+												</td>
+												<td className="px-3 py-2 text-center" dir="ltr">
+													{mat.totalQuantity.toLocaleString("ar-SA", {
+														maximumFractionDigits: 2,
+													})}
+												</td>
+												<td className="px-3 py-2 text-center font-medium" dir="ltr">
+													{mat.totalEffective.toLocaleString("ar-SA", {
+														maximumFractionDigits: 2,
+													})}
+												</td>
+												<td className="px-3 py-2">
+													<div className="flex flex-wrap gap-1">
+														{mat.usedIn.map((cat) => (
+															<span
+																key={cat}
+																className="inline-block text-xs bg-muted px-2 py-0.5 rounded-full"
+															>
+																{cat}
+															</span>
+														))}
+													</div>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+							{/* Summary footer */}
+							<div className="bg-muted/20 px-3 py-2 text-xs text-muted-foreground border-t">
+								إجمالي المواد: {aggregatedByMaterial.length} مادة مختلفة
+							</div>
 						</div>
 					)}
 				</div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@ui/components/card";
-import { Box, Columns3 } from "lucide-react";
+import { Box, Columns3, Grid3X3, Ruler } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { formatNumber } from "../../lib/utils";
 
@@ -9,6 +9,8 @@ interface SummaryStatsCardsProps {
 	structural: {
 		concrete: number;
 		rebar: number;
+		blocks?: number;
+		formwork?: number;
 	};
 }
 
@@ -26,6 +28,7 @@ export function SummaryStatsCards({
 			color: "text-blue-600",
 			bgColor: "bg-blue-50 dark:bg-blue-950/30",
 			borderColor: "border-blue-200 dark:border-blue-800",
+			show: true,
 		},
 		{
 			title: t("pricing.studies.summary.totalRebar"),
@@ -36,11 +39,32 @@ export function SummaryStatsCards({
 			color: "text-orange-600",
 			bgColor: "bg-orange-50 dark:bg-orange-950/30",
 			borderColor: "border-orange-200 dark:border-orange-800",
+			show: true,
 		},
-	];
+		{
+			title: "إجمالي البلوك",
+			icon: Grid3X3,
+			value: formatNumber(structural.blocks ?? 0),
+			unit: "بلوكة",
+			color: "text-emerald-600",
+			bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
+			borderColor: "border-emerald-200 dark:border-emerald-800",
+			show: (structural.blocks ?? 0) > 0,
+		},
+		{
+			title: "إجمالي الطوبار",
+			icon: Ruler,
+			value: formatNumber(structural.formwork ?? 0),
+			unit: "م²",
+			color: "text-amber-600",
+			bgColor: "bg-amber-50 dark:bg-amber-950/30",
+			borderColor: "border-amber-200 dark:border-amber-800",
+			show: (structural.formwork ?? 0) > 0,
+		},
+	].filter((card) => card.show);
 
 	return (
-		<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+		<div className={`grid grid-cols-1 ${cards.length >= 4 ? 'md:grid-cols-4' : cards.length >= 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4`}>
 			{cards.map((card, index) => (
 				<Card
 					key={index}

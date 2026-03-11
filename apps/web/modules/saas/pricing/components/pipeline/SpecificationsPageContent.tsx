@@ -1,19 +1,19 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 import { Building2, PaintBucket, Wrench } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
 import type { SmartBuildingConfig } from "../../lib/smart-building-types";
 import type { SavedFinishingItem, MergedQuantityItem } from "../../lib/merge-quantities";
 import { mergeQuantities } from "../../lib/merge-quantities";
 import { deriveAllQuantities } from "../../lib/derivation-engine";
-import { SpecBulkEditor } from "../finishing/specs/SpecBulkEditor";
-import { BillOfMaterials } from "../finishing/specs/BillOfMaterials";
+import { InlineSpecEditor } from "../specifications/InlineSpecEditor";
 import { StructuralSpecs } from "./StructuralSpecs";
 import { StageApprovalButton } from "./StageApprovalButton";
 
@@ -38,7 +38,6 @@ export function SpecificationsPageContent({
 }: SpecificationsPageContentProps) {
 	const t = useTranslations();
 	const [activeTab, setActiveTab] = useState("structural");
-	const [showBulkEditor, setShowBulkEditor] = useState(false);
 
 	// ─── Fetch stages ───
 	const { data: stagesData, isLoading: stagesLoading } = useQuery(
@@ -103,20 +102,38 @@ export function SpecificationsPageContent({
 		}
 	}, [smartConfig, savedFinishingItems]);
 
-	// ─── Handlers ───
-	const handleBulkSaveAll = useCallback(
-		() => {
-			// Specs are saved inline via the editor's own mutation
-			setShowBulkEditor(false);
-		},
-		[],
+	// ─── Mutations ───
+	const queryClient = useQueryClient();
+
+	const updateSpecMutation = useMutation(
+		orpc.pricing.studies.finishingItem.update.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: [["pricing", "studies"]],
+				});
+			},
+		}),
 	);
 
-	const handleSaveTemplate = useCallback(
-		() => {
-			// Template saving handled by SpecBulkEditor internally
+	const handleSaveSpec = useCallback(
+		(key: string, spec: import("../../lib/specs/spec-types").ItemSpecification) => {
+			const item = mergedItems.find((i) => i.key === key);
+			if (!item?.isSaved || !item.savedId) return;
+
+			const specDescription = `${spec.specTypeLabel}${
+				spec.options?.brand ? ` — ${spec.options.brand}` : ""
+			}`;
+			updateSpecMutation.mutate({
+				organizationId,
+				costStudyId: studyId,
+				id: item.savedId,
+				specData: spec,
+				qualityLevel: (spec.options?.qualityLevel as string) ?? undefined,
+				brand: (spec.options?.brand as string) ?? undefined,
+				specifications: specDescription,
+			});
 		},
-		[],
+		[mergedItems, organizationId, studyId, updateSpecMutation],
 	);
 
 	// ─── Loading ───
@@ -185,41 +202,23 @@ export function SpecificationsPageContent({
 					/>
 				</TabsContent>
 
-				{/* Finishing Specs - Full page SpecBulkEditor */}
+				{/* Finishing Specs - Inline Editor */}
 				<TabsContent value="finishing" className="mt-4 space-y-4">
-					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-semibold">
-							{t("pricing.pipeline.specsFinishingTitle")}
-						</h3>
-						<div className="flex items-center gap-2">
-							<button
-								type="button"
-								onClick={() => setShowBulkEditor(true)}
-								className="text-sm text-primary hover:underline"
-							>
-								{t("pricing.pipeline.specsOpenEditor")}
-							</button>
-						</div>
-					</div>
+					<h3 className="text-lg font-semibold">
+						{t("pricing.pipeline.specsFinishingTitle")}
+					</h3>
 
-					{/* Bill of Materials inline */}
 					{mergedItems.length > 0 ? (
-						<BillOfMaterials items={mergedItems} />
+						<InlineSpecEditor
+							items={mergedItems}
+							onSaveSpec={handleSaveSpec}
+							isSaving={updateSpecMutation.isPending}
+						/>
 					) : (
 						<div className="rounded-xl border p-8 text-center text-muted-foreground">
 							<p>{t("pricing.pipeline.specsNoFinishingItems")}</p>
 						</div>
 					)}
-
-					{/* Bulk Editor Dialog */}
-					<SpecBulkEditor
-						open={showBulkEditor}
-						onOpenChange={setShowBulkEditor}
-						items={mergedItems}
-						customTemplates={[]}
-						onSaveAll={handleBulkSaveAll}
-						onSaveTemplate={handleSaveTemplate}
-					/>
 				</TabsContent>
 
 				{/* MEP Specs - simplified */}

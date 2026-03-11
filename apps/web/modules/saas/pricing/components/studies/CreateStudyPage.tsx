@@ -3,6 +3,7 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
+import { Checkbox } from "@ui/components/checkbox";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
 import {
@@ -14,10 +15,11 @@ import {
 } from "@ui/components/select";
 import { cn } from "@ui/lib";
 import {
+	ArrowLeft,
 	Building2,
 	ClipboardList,
 	DollarSign,
-	FileText,
+	FileDown,
 	Loader2,
 	Search,
 	Zap,
@@ -39,54 +41,63 @@ type EntryPoint =
 	| "LUMP_SUM_ANALYSIS"
 	| "CUSTOM_ITEMS";
 
-const ENTRY_POINTS: Array<{
-	value: EntryPoint;
+type StudyGoal =
+	| "full_study"
+	| "cost_pricing"
+	| "quick_pricing"
+	| "lump_sum"
+	| "contract_import";
+
+/** Maps the user-facing goal to the API's entryPoint */
+const GOAL_TO_ENTRY_POINT: Record<StudyGoal, EntryPoint> = {
+	full_study: "FROM_SCRATCH",
+	cost_pricing: "HAS_QUANTITIES",
+	quick_pricing: "QUOTATION_ONLY",
+	lump_sum: "LUMP_SUM_ANALYSIS",
+	contract_import: "CUSTOM_ITEMS",
+};
+
+const GOALS: Array<{
+	value: StudyGoal;
 	icon: typeof Building2;
 	title: string;
 	description: string;
-	startsFrom: string;
+	showScope: boolean;
 }> = [
 	{
-		value: "FROM_SCRATCH",
+		value: "full_study",
 		icon: Building2,
 		title: "دراسة كاملة من الصفر",
-		description: "حساب الكميات والمواصفات والتسعير",
-		startsFrom: "تبدأ من: الكميات",
+		description: "حساب الكميات والمواصفات والتسعير خطوة بخطوة",
+		showScope: true,
 	},
 	{
-		value: "HAS_QUANTITIES",
+		value: "cost_pricing",
 		icon: ClipboardList,
-		title: "لديّ كميات جاهزة",
-		description: "أريد تحديد مواصفات وتسعير",
-		startsFrom: "تبدأ من: المواصفات",
+		title: "تسعير تكلفة",
+		description: "لديّ كميات جاهزة وأريد تحديد المواصفات والتسعير",
+		showScope: true,
 	},
 	{
-		value: "HAS_SPECS",
-		icon: DollarSign,
-		title: "لديّ كميات ومواصفات",
-		description: "أريد التسعير فقط",
-		startsFrom: "تبدأ من: التكلفة",
+		value: "quick_pricing",
+		icon: Zap,
+		title: "تسعير سريع",
+		description: "إدخال بنود وأسعار مباشرة بدون تفاصيل",
+		showScope: false,
 	},
 	{
-		value: "QUOTATION_ONLY",
-		icon: FileText,
-		title: "إصدار عرض سعر",
-		description: "كل شيء جاهز أريد عرض سعر فقط",
-		startsFrom: "تبدأ من: عرض السعر",
-	},
-	{
-		value: "LUMP_SUM_ANALYSIS",
+		value: "lump_sum",
 		icon: Search,
 		title: "تحليل مقطوعية",
-		description: "لديّ عقد بمبلغ إجمالي أريد تحليله",
-		startsFrom: "مسار تحليل خاص",
+		description: "لديّ عقد بمبلغ إجمالي وأريد تحليل التكلفة الفعلية",
+		showScope: true,
 	},
 	{
-		value: "CUSTOM_ITEMS",
-		icon: Zap,
-		title: "بنود مخصصة",
-		description: "بند واحد أو عدة بنود فقط",
-		startsFrom: "مسار مبسّط",
+		value: "contract_import",
+		icon: FileDown,
+		title: "استيراد عقد وتحويل لمشروع",
+		description: "لديّ عقد متكامل وأريد تحويله لمشروع تنفيذي",
+		showScope: false,
 	},
 ];
 
@@ -94,8 +105,8 @@ const PROJECT_TYPES = [
 	{ value: "residential", label: "سكني", color: "bg-sky-500" },
 	{ value: "commercial", label: "تجاري", color: "bg-violet-500" },
 	{ value: "industrial", label: "صناعي", color: "bg-orange-500" },
-	{ value: "government", label: "حكومي", color: "bg-emerald-500" },
-	{ value: "other", label: "أخرى", color: "bg-slate-500" },
+	{ value: "warehouse", label: "مستودع", color: "bg-slate-500" },
+	{ value: "mixed", label: "مختلط", color: "bg-teal-500" },
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -114,14 +125,26 @@ export function CreateStudyPage({
 	const t = useTranslations();
 	const router = useRouter();
 
+	// Step 1: Goal selection
+	const [selectedGoal, setSelectedGoal] = useState<StudyGoal | null>(null);
+
+	// Step 2: Scope & details
+	const [scope, setScope] = useState({
+		structural: true,
+		finishing: true,
+		mep: true,
+		custom: false,
+	});
+
 	const [formData, setFormData] = useState({
 		name: "",
 		customerName: "",
 		projectType: "residential",
-		buildingArea: "",
-		numberOfFloors: "1",
-		entryPoint: "FROM_SCRATCH" as EntryPoint,
+		contractValue: "",
 	});
+
+	const selectedGoalConfig = GOALS.find((g) => g.value === selectedGoal);
+	const showScope = selectedGoalConfig?.showScope ?? false;
 
 	const createMutation = useMutation(
 		orpc.pricing.studies.create.mutationOptions({
@@ -139,148 +162,79 @@ export function CreateStudyPage({
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
+		if (!selectedGoal) return;
+
+		const entryPoint = GOAL_TO_ENTRY_POINT[selectedGoal];
+
+		// Map study goal to studyType
+		let studyType: "FULL_PROJECT" | "CUSTOM_ITEMS" | "LUMP_SUM_ANALYSIS" = "FULL_PROJECT";
+		if (selectedGoal === "lump_sum") studyType = "LUMP_SUM_ANALYSIS";
+		if (selectedGoal === "quick_pricing" || selectedGoal === "contract_import") studyType = "CUSTOM_ITEMS";
 
 		createMutation.mutate({
 			organizationId,
 			name: formData.name || undefined,
 			customerName: formData.customerName || undefined,
 			projectType: formData.projectType,
-			buildingArea: Number(formData.buildingArea) || 1,
-			numberOfFloors: Number(formData.numberOfFloors) || 1,
-			entryPoint: formData.entryPoint,
+			studyType,
+			entryPoint,
+			...(formData.contractValue ? { contractValue: Number(formData.contractValue) } : {}),
 		});
 	};
 
 	return (
-		<div className="mx-auto max-w-4xl space-y-8 py-6" dir="rtl">
+		<div className="mx-auto max-w-3xl space-y-8 py-6" dir="rtl">
 			{/* Page Header */}
-			<div>
-				<h1 className="text-2xl font-bold">{t("pricing.studies.newStudy")}</h1>
-				<p className="text-muted-foreground mt-1">
-					أنشئ دراسة تسعير جديدة واختر نقطة البداية المناسبة
-				</p>
+			<div className="flex items-center gap-3">
+				<Button
+					variant="ghost"
+					size="icon"
+					onClick={() => router.back()}
+					className="h-9 w-9 shrink-0"
+				>
+					<ArrowLeft className="h-5 w-5 rotate-180" />
+				</Button>
+				<div>
+					<h1 className="text-2xl font-bold">{t("pricing.studies.newStudy")}</h1>
+					<p className="text-muted-foreground text-sm mt-0.5">
+						اختر نوع الدراسة وحدد التفاصيل
+					</p>
+				</div>
 			</div>
 
-			<form onSubmit={handleSubmit} className="space-y-8">
-				{/* Section 1: Basic Info */}
+			<form onSubmit={handleSubmit} className="space-y-6">
+				{/* ── Question 1: What do you want to do? ── */}
 				<div className="rounded-xl border border-border bg-card p-6 space-y-5">
-					<h2 className="text-lg font-semibold">بيانات الدراسة الأساسية</h2>
-
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-						<div className="space-y-2">
-							<Label htmlFor="name">اسم الدراسة</Label>
-							<Input
-								id="name"
-								value={formData.name}
-								onChange={(e) =>
-									setFormData({ ...formData, name: e.target.value })
-								}
-								placeholder="مثال: فيلا الرياض - حي النرجس"
-								className="rounded-xl"
-							/>
-						</div>
-
-						<div className="space-y-2">
-							<Label htmlFor="customerName">اسم العميل (اختياري)</Label>
-							<Input
-								id="customerName"
-								value={formData.customerName}
-								onChange={(e) =>
-									setFormData({ ...formData, customerName: e.target.value })
-								}
-								placeholder="اسم العميل"
-								className="rounded-xl"
-							/>
-						</div>
-
-						<div className="space-y-2">
-							<Label htmlFor="projectType">نوع المشروع</Label>
-							<Select
-								value={formData.projectType}
-								onValueChange={(value) =>
-									setFormData({ ...formData, projectType: value })
-								}
-							>
-								<SelectTrigger className="rounded-xl">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent className="rounded-xl">
-									{PROJECT_TYPES.map((type) => (
-										<SelectItem key={type.value} value={type.value} className="rounded-lg">
-											<div className="flex items-center gap-2">
-												<div className={`w-2 h-2 rounded-full ${type.color}`} />
-												{type.label}
-											</div>
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</div>
-
-						<div className="space-y-2">
-							<Label htmlFor="buildingArea">المساحة (م²)</Label>
-							<Input
-								id="buildingArea"
-								type="number"
-								value={formData.buildingArea}
-								onChange={(e) =>
-									setFormData({ ...formData, buildingArea: e.target.value })
-								}
-								placeholder="0"
-								className="rounded-xl"
-								dir="ltr"
-							/>
-						</div>
-
-						<div className="space-y-2">
-							<Label htmlFor="numberOfFloors">عدد الأدوار</Label>
-							<Input
-								id="numberOfFloors"
-								type="number"
-								value={formData.numberOfFloors}
-								onChange={(e) =>
-									setFormData({ ...formData, numberOfFloors: e.target.value })
-								}
-								placeholder="1"
-								className="rounded-xl"
-								dir="ltr"
-							/>
-						</div>
+					<div>
+						<h2 className="text-lg font-semibold">ماذا تريد أن تفعل؟</h2>
+						<p className="text-sm text-muted-foreground mt-1">
+							اختر نوع العمل المناسب لاحتياجك
+						</p>
 					</div>
-				</div>
 
-				{/* Section 2: Entry Point Selection */}
-				<div className="rounded-xl border border-border bg-card p-6 space-y-5">
-					<h2 className="text-lg font-semibold">اختر نقطة البداية</h2>
-					<p className="text-sm text-muted-foreground">
-						حدد من أين تريد أن تبدأ الدراسة بناءً على البيانات المتوفرة لديك
-					</p>
-
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-						{ENTRY_POINTS.map((ep) => {
-							const Icon = ep.icon;
-							const isSelected = formData.entryPoint === ep.value;
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+						{GOALS.map((goal) => {
+							const Icon = goal.icon;
+							const isSelected = selectedGoal === goal.value;
 
 							return (
 								<button
-									key={ep.value}
+									key={goal.value}
 									type="button"
-									onClick={() =>
-										setFormData({ ...formData, entryPoint: ep.value })
-									}
+									onClick={() => setSelectedGoal(goal.value)}
 									className={cn(
-										"flex flex-col items-start gap-3 rounded-xl border-2 p-5 text-right transition-all",
+										"group flex flex-col items-start gap-3 rounded-xl border-2 p-4 text-right transition-all",
 										isSelected
 											? "border-primary bg-primary/5 shadow-sm"
-											: "border-border hover:border-muted-foreground/30 hover:bg-muted/30",
+											: "border-border hover:border-primary/30 hover:bg-muted/30",
 									)}
 								>
 									<div
 										className={cn(
-											"flex h-10 w-10 items-center justify-center rounded-lg",
+											"flex h-10 w-10 items-center justify-center rounded-xl transition-colors",
 											isSelected
-												? "bg-primary/10 text-primary"
-												: "bg-muted text-muted-foreground",
+												? "bg-primary text-primary-foreground"
+												: "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary",
 										)}
 									>
 										<Icon className="h-5 w-5" />
@@ -292,21 +246,11 @@ export function CreateStudyPage({
 												isSelected ? "text-primary" : "text-foreground",
 											)}
 										>
-											{ep.title}
+											{goal.title}
 										</div>
 										<div className="text-xs text-muted-foreground leading-relaxed">
-											{ep.description}
+											{goal.description}
 										</div>
-									</div>
-									<div
-										className={cn(
-											"text-[11px] font-medium px-2 py-0.5 rounded-full",
-											isSelected
-												? "bg-primary/10 text-primary"
-												: "bg-muted text-muted-foreground",
-										)}
-									>
-										{ep.startsFrom}
 									</div>
 								</button>
 							);
@@ -314,31 +258,153 @@ export function CreateStudyPage({
 					</div>
 				</div>
 
-				{/* Submit */}
-				<div className="flex justify-end gap-3">
-					<Button
-						type="button"
-						variant="outline"
-						onClick={() => router.back()}
-						className="rounded-xl px-6"
-					>
-						{t("common.cancel")}
-					</Button>
-					<Button
-						type="submit"
-						disabled={createMutation.isPending}
-						className="rounded-xl px-8"
-					>
-						{createMutation.isPending ? (
-							<>
-								<Loader2 className="ml-2 h-4 w-4 animate-spin" />
-								جاري الإنشاء...
-							</>
-						) : (
-							"إنشاء الدراسة"
-						)}
-					</Button>
-				</div>
+				{/* ── Question 2: Scope (only for full_study, cost_pricing, lump_sum) ── */}
+				{selectedGoal && showScope && (
+					<div className="rounded-xl border border-border bg-card p-6 space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
+						<div>
+							<h2 className="text-lg font-semibold">ما نطاق العمل؟</h2>
+							<p className="text-sm text-muted-foreground mt-1">
+								يمكن اختيار أكثر من خيار
+							</p>
+						</div>
+
+						<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+							{[
+								{ key: "structural" as const, label: "أعمال إنشائية", icon: "🏗️" },
+								{ key: "finishing" as const, label: "أعمال تشطيبات", icon: "🎨" },
+								{ key: "mep" as const, label: "كهروميكانيكية", icon: "⚡" },
+								{ key: "custom" as const, label: "بنود مخصصة", icon: "📝" },
+							].map((item) => (
+								<label
+									key={item.key}
+									className={cn(
+										"flex items-center gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all",
+										scope[item.key]
+											? "border-primary bg-primary/5"
+											: "border-border hover:border-primary/30",
+									)}
+								>
+									<Checkbox
+										checked={scope[item.key]}
+										onCheckedChange={(checked) =>
+											setScope({ ...scope, [item.key]: !!checked })
+										}
+									/>
+									<div className="flex flex-col">
+										<span className="text-sm font-medium">{item.label}</span>
+									</div>
+								</label>
+							))}
+						</div>
+					</div>
+				)}
+
+				{/* ── Section 3: Basic details (shown after goal selection) ── */}
+				{selectedGoal && (
+					<div className="rounded-xl border border-border bg-card p-6 space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
+						<h2 className="text-lg font-semibold">بيانات الدراسة</h2>
+
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+							<div className="space-y-2">
+								<Label htmlFor="name">{t("pricing.studies.form.name")}</Label>
+								<Input
+									id="name"
+									value={formData.name}
+									onChange={(e) =>
+										setFormData({ ...formData, name: e.target.value })
+									}
+									placeholder="مثال: فيلا الرياض - حي النرجس"
+									className="rounded-xl"
+								/>
+							</div>
+
+							<div className="space-y-2">
+								<Label htmlFor="customerName">
+									{t("pricing.studies.form.customerName")} (اختياري)
+								</Label>
+								<Input
+									id="customerName"
+									value={formData.customerName}
+									onChange={(e) =>
+										setFormData({ ...formData, customerName: e.target.value })
+									}
+									placeholder={t("pricing.studies.form.customerNamePlaceholder")}
+									className="rounded-xl"
+								/>
+							</div>
+
+							<div className="space-y-2">
+								<Label htmlFor="projectType">{t("pricing.studies.form.projectType")}</Label>
+								<Select
+									value={formData.projectType}
+									onValueChange={(value) =>
+										setFormData({ ...formData, projectType: value })
+									}
+								>
+									<SelectTrigger className="rounded-xl">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent className="rounded-xl">
+										{PROJECT_TYPES.map((type) => (
+											<SelectItem key={type.value} value={type.value} className="rounded-lg">
+												<div className="flex items-center gap-2">
+													<div className={`w-2 h-2 rounded-full ${type.color}`} />
+													{type.label}
+												</div>
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+
+							{/* Contract value for lump sum analysis */}
+							{selectedGoal === "lump_sum" && (
+								<div className="space-y-2">
+									<Label htmlFor="contractValue">{t("pricing.studies.form.contractValue")}</Label>
+									<Input
+										id="contractValue"
+										type="number"
+										value={formData.contractValue}
+										onChange={(e) =>
+											setFormData({ ...formData, contractValue: e.target.value })
+										}
+										placeholder={t("pricing.studies.form.contractValuePlaceholder")}
+										className="rounded-xl"
+										dir="ltr"
+									/>
+								</div>
+							)}
+						</div>
+					</div>
+				)}
+
+				{/* ── Submit ── */}
+				{selectedGoal && (
+					<div className="flex justify-end gap-3 animate-in fade-in duration-300">
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => router.back()}
+							className="rounded-xl px-6"
+						>
+							{t("common.cancel")}
+						</Button>
+						<Button
+							type="submit"
+							disabled={createMutation.isPending}
+							className="rounded-xl px-8"
+						>
+							{createMutation.isPending ? (
+								<>
+									<Loader2 className="ml-2 h-4 w-4 animate-spin" />
+									جاري الإنشاء...
+								</>
+							) : (
+								<>إنشاء الدراسة</>
+							)}
+						</Button>
+					</div>
+				)}
 			</form>
 		</div>
 	);

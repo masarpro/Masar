@@ -249,6 +249,9 @@ export const applyTemplateToAll = subscriptionProcedure
 			organizationId: z.string(),
 			studyId: z.string(),
 			templateLevel: templateLevelEnum,
+			scope: z.enum(["all", "floor", "category"]).default("all"),
+			floorId: z.string().optional(),
+			categoryKey: z.string().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -274,9 +277,21 @@ export const applyTemplateToAll = subscriptionProcedure
 			templateSpecs.map((s) => [s.categoryKey, s]),
 		);
 
-		// Fetch all enabled finishing items
+		// Build where clause based on scope
+		const where: Record<string, unknown> = {
+			costStudyId: input.studyId,
+			isEnabled: true,
+		};
+		if (input.scope === "floor" && input.floorId) {
+			where.floorId = input.floorId;
+		}
+		if (input.scope === "category" && input.categoryKey) {
+			where.category = input.categoryKey;
+		}
+
+		// Fetch matching finishing items
 		const items = await db.finishingItem.findMany({
-			where: { costStudyId: input.studyId, isEnabled: true },
+			where,
 			select: { id: true, category: true },
 		});
 

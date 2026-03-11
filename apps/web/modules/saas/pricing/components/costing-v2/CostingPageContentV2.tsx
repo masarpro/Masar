@@ -1,7 +1,7 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 import {
 	Hammer,
@@ -10,9 +10,11 @@ import {
 	Users,
 	Wrench,
 	Calculator,
+	Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@ui/components/button";
+import { useEffect, useState } from "react";
 
 import { StructuralCostingTab } from "./StructuralCostingTab";
 import { FinishingCostingTab } from "./FinishingCostingTab";
@@ -31,6 +33,8 @@ export function CostingPageContentV2({
 	organizationSlug,
 	studyId,
 }: CostingPageContentV2Props) {
+	const [activeTab, setActiveTab] = useState("structural");
+
 	// Check that SPECIFICATIONS stage is APPROVED
 	const { data: stagesData, isLoading: stagesLoading } = useQuery(
 		orpc.pricing.studies.studyStages.get.queryOptions({
@@ -39,7 +43,7 @@ export function CostingPageContentV2({
 	);
 
 	const stages = stagesData?.stages ?? [];
-	const specsStage = stages.find((s) => s.stage === "SPECIFICATIONS");
+	const specsStage = stages.find((s: { stage: string }) => s.stage === "SPECIFICATIONS");
 	const isSpecsApproved = specsStage?.status === "APPROVED";
 
 	// Also fetch study for buildingArea
@@ -49,7 +53,24 @@ export function CostingPageContentV2({
 		}),
 	);
 
-	if (stagesLoading) return null;
+	// Auto-generate costing items when entering the page
+	const generateMutation = useMutation(
+		orpc.pricing.studies.costing.generate.mutationOptions({}),
+	);
+
+	useEffect(() => {
+		if (isSpecsApproved && !generateMutation.isPending && !generateMutation.isSuccess) {
+			generateMutation.mutate({ organizationId, studyId });
+		}
+	}, [isSpecsApproved]);
+
+	if (stagesLoading) {
+		return (
+			<div className="flex justify-center py-12">
+				<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+			</div>
+		);
+	}
 
 	if (!isSpecsApproved) {
 		return (
@@ -70,9 +91,13 @@ export function CostingPageContentV2({
 		);
 	}
 
+	const buildingArea = Number(study?.buildingArea ?? 0);
+
 	return (
 		<div className="space-y-6" dir="rtl">
-			<Tabs defaultValue="structural" className="w-full">
+			{/* Hero: cost per sqm (shown after data loads) */}
+
+			<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
 				<TabsList className="grid w-full grid-cols-5 rounded-xl h-auto p-1">
 					<TabsTrigger value="structural" className="gap-1.5 rounded-lg py-2.5 text-xs sm:text-sm">
 						<Hammer className="h-4 w-4" />
@@ -100,7 +125,7 @@ export function CostingPageContentV2({
 					<StructuralCostingTab
 						organizationId={organizationId}
 						studyId={studyId}
-						buildingArea={Number(study?.buildingArea ?? 0)}
+						buildingArea={buildingArea}
 					/>
 				</TabsContent>
 
@@ -130,7 +155,7 @@ export function CostingPageContentV2({
 						organizationId={organizationId}
 						organizationSlug={organizationSlug}
 						studyId={studyId}
-						buildingArea={Number(study?.buildingArea ?? 0)}
+						buildingArea={buildingArea}
 					/>
 				</TabsContent>
 			</Tabs>
