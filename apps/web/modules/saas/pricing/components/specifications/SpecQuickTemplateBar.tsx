@@ -52,11 +52,15 @@ export function SpecQuickTemplateBar({
 			onSuccess: (data, variables) => {
 				setApplied(variables.templateLevel);
 				toast.success(`تم تطبيق قالب المواصفات — ${data.updated} بند`);
+				// Invalidate all relevant queries
 				queryClient.invalidateQueries({
 					queryKey: ["pricing", "studies", "specifications"],
 				});
 				queryClient.invalidateQueries({
 					queryKey: ["pricing", "studies", "getFinishingItems"],
+				});
+				queryClient.invalidateQueries({
+					queryKey: ["pricing", "studies", "finishingItem"],
 				});
 			},
 			onError: () => {

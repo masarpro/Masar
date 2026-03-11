@@ -144,6 +144,99 @@ export const updateItemSpec = subscriptionProcedure
 
 const templateLevelEnum = z.enum(["economic", "medium", "luxury"]);
 
+// System templates — categoryKey → specTypeKey + options for each quality level
+const SYSTEM_TEMPLATE_SPECS: Record<string, Array<{
+	categoryKey: string;
+	specTypeKey: string;
+	options: Record<string, unknown>;
+	brand?: string;
+}>> = {
+	economic: [
+		{ categoryKey: "FINISHING_WATERPROOFING", specTypeKey: "cement_flexible", options: { layers: 2, hasReinforcement: false } },
+		{ categoryKey: "FINISHING_THERMAL_INSULATION", specTypeKey: "eps_50", options: { thickness: 50, hasVaporBarrier: false } },
+		{ categoryKey: "FINISHING_INTERNAL_PLASTER", specTypeKey: "cement_manual", options: { thickness: 20, mixRatio: "1:4", meshType: "none" } },
+		{ categoryKey: "FINISHING_EXTERNAL_PLASTER", specTypeKey: "cement_manual", options: { thickness: 20, mixRatio: "1:4" } },
+		{ categoryKey: "FINISHING_INTERIOR_PAINT", specTypeKey: "plastic_matt", options: { preparation: "light_putty", coats: 2 }, brand: "National Paints" },
+		{ categoryKey: "FINISHING_FACADE_PAINT", specTypeKey: "acrylic_exterior", options: { coats: 2 }, brand: "National Paints" },
+		{ categoryKey: "FINISHING_BOUNDARY_PAINT", specTypeKey: "acrylic_exterior", options: { coats: 2 } },
+		{ categoryKey: "FINISHING_FLOOR_TILES", specTypeKey: "ceramic_40x40", options: { installation: "adhesive", hasScreed: true, groutType: "normal" } },
+		{ categoryKey: "FINISHING_WALL_TILES", specTypeKey: "ceramic_30x60", options: { installation: "adhesive", groutType: "normal" } },
+		{ categoryKey: "FINISHING_FALSE_CEILING", specTypeKey: "suspended_tiles", options: {} },
+		{ categoryKey: "FINISHING_INTERIOR_DOORS", specTypeKey: "hdf", options: {} },
+		{ categoryKey: "FINISHING_EXTERIOR_DOORS", specTypeKey: "steel_security", options: {} },
+		{ categoryKey: "FINISHING_WINDOWS", specTypeKey: "aluminum_standard", options: { hasInsectScreen: false } },
+		{ categoryKey: "FINISHING_BATHROOMS", specTypeKey: "standard_set", options: {} },
+		{ categoryKey: "FINISHING_MARBLE_VANITIES", specTypeKey: "marble_local", options: {} },
+		{ categoryKey: "FINISHING_KITCHEN", specTypeKey: "pvc_membrane", options: { countertop: "local_granite" } },
+		{ categoryKey: "FINISHING_INTERNAL_STAIRS", specTypeKey: "granite", options: { hasNosing: false } },
+		{ categoryKey: "FINISHING_EXTERNAL_STAIRS", specTypeKey: "granite", options: {} },
+		{ categoryKey: "FINISHING_RAILINGS", specTypeKey: "wrought_iron", options: {} },
+		{ categoryKey: "FINISHING_STONE_FACADE", specTypeKey: "manufactured", options: {} },
+		{ categoryKey: "FINISHING_FACADE_DECOR", specTypeKey: "gypsum_decor", options: {} },
+		{ categoryKey: "FINISHING_YARD_PAVING", specTypeKey: "interlock_6cm", options: {} },
+		{ categoryKey: "FINISHING_FENCE_GATES", specTypeKey: "iron_gate", options: { hasMotor: false } },
+		{ categoryKey: "FINISHING_LANDSCAPING", specTypeKey: "artificial_grass", options: {} },
+		{ categoryKey: "FINISHING_ROOF", specTypeKey: "waterproof_only", options: {} },
+		{ categoryKey: "FINISHING_INTERIOR_DECOR", specTypeKey: "gypsum_decor", options: {} },
+	],
+	medium: [
+		{ categoryKey: "FINISHING_WATERPROOFING", specTypeKey: "cement_flexible", options: { layers: 2, hasReinforcement: true }, brand: "Sika" },
+		{ categoryKey: "FINISHING_THERMAL_INSULATION", specTypeKey: "xps_50", options: { thickness: 50, hasVaporBarrier: false }, brand: "SABIC" },
+		{ categoryKey: "FINISHING_INTERNAL_PLASTER", specTypeKey: "cement_machine", options: { thickness: 15 } },
+		{ categoryKey: "FINISHING_EXTERNAL_PLASTER", specTypeKey: "cement_manual", options: { thickness: 20, mixRatio: "1:3" } },
+		{ categoryKey: "FINISHING_INTERIOR_PAINT", specTypeKey: "plastic_satin", options: { preparation: "full_putty", coats: 2 }, brand: "Jotun" },
+		{ categoryKey: "FINISHING_FACADE_PAINT", specTypeKey: "acrylic_exterior", options: { coats: 2 }, brand: "Jotun" },
+		{ categoryKey: "FINISHING_BOUNDARY_PAINT", specTypeKey: "acrylic_exterior", options: { coats: 2 }, brand: "Jotun" },
+		{ categoryKey: "FINISHING_FLOOR_TILES", specTypeKey: "porcelain_60x60", options: { installation: "adhesive", hasScreed: true, groutType: "normal" } },
+		{ categoryKey: "FINISHING_WALL_TILES", specTypeKey: "porcelain_60x60", options: { installation: "adhesive", groutType: "normal" } },
+		{ categoryKey: "FINISHING_FALSE_CEILING", specTypeKey: "gypsum_board_flat", options: { boardType: "standard", includesPaint: true }, brand: "Knauf" },
+		{ categoryKey: "FINISHING_INTERIOR_DOORS", specTypeKey: "wpc", options: {} },
+		{ categoryKey: "FINISHING_EXTERIOR_DOORS", specTypeKey: "steel_security", options: {} },
+		{ categoryKey: "FINISHING_WINDOWS", specTypeKey: "aluminum_thermal_break", options: { hasInsectScreen: true } },
+		{ categoryKey: "FINISHING_BATHROOMS", specTypeKey: "standard_set", options: {} },
+		{ categoryKey: "FINISHING_MARBLE_VANITIES", specTypeKey: "marble_local", options: {} },
+		{ categoryKey: "FINISHING_KITCHEN", specTypeKey: "mdf_lacquer", options: { countertop: "local_granite" } },
+		{ categoryKey: "FINISHING_INTERNAL_STAIRS", specTypeKey: "marble", options: { hasNosing: false } },
+		{ categoryKey: "FINISHING_EXTERNAL_STAIRS", specTypeKey: "granite", options: {} },
+		{ categoryKey: "FINISHING_RAILINGS", specTypeKey: "wrought_iron", options: {} },
+		{ categoryKey: "FINISHING_STONE_FACADE", specTypeKey: "natural_riyadh", options: {} },
+		{ categoryKey: "FINISHING_FACADE_DECOR", specTypeKey: "grc_decor", options: {} },
+		{ categoryKey: "FINISHING_YARD_PAVING", specTypeKey: "interlock_8cm", options: {} },
+		{ categoryKey: "FINISHING_FENCE_GATES", specTypeKey: "iron_gate", options: { hasMotor: true, hasRemote: true } },
+		{ categoryKey: "FINISHING_LANDSCAPING", specTypeKey: "artificial_grass", options: {} },
+		{ categoryKey: "FINISHING_ROOF", specTypeKey: "waterproof_tiles", options: {} },
+		{ categoryKey: "FINISHING_INTERIOR_DECOR", specTypeKey: "gypsum_decor", options: {} },
+	],
+	luxury: [
+		{ categoryKey: "FINISHING_WATERPROOFING", specTypeKey: "bitumen_rolls", options: { layers: 3, hasReinforcement: true, hasProtection: "plaster_3cm" }, brand: "Index" },
+		{ categoryKey: "FINISHING_THERMAL_INSULATION", specTypeKey: "xps_50", options: { thickness: 75, hasVaporBarrier: true }, brand: "SABIC" },
+		{ categoryKey: "FINISHING_INTERNAL_PLASTER", specTypeKey: "gypsum_machine", options: { thickness: 10 }, brand: "Knauf" },
+		{ categoryKey: "FINISHING_EXTERNAL_PLASTER", specTypeKey: "cement_machine", options: { thickness: 20, mixRatio: "1:3" } },
+		{ categoryKey: "FINISHING_INTERIOR_PAINT", specTypeKey: "acrylic", options: { preparation: "full_putty", coats: 3 }, brand: "Caparol" },
+		{ categoryKey: "FINISHING_FACADE_PAINT", specTypeKey: "elastomeric", options: { coats: 2 }, brand: "Caparol" },
+		{ categoryKey: "FINISHING_BOUNDARY_PAINT", specTypeKey: "texture_exterior", options: { coats: 1 }, brand: "Caparol" },
+		{ categoryKey: "FINISHING_FLOOR_TILES", specTypeKey: "porcelain_120x120", options: { installation: "adhesive", hasScreed: true, groutType: "normal" } },
+		{ categoryKey: "FINISHING_WALL_TILES", specTypeKey: "porcelain_80x80", options: { installation: "adhesive", groutType: "epoxy" } },
+		{ categoryKey: "FINISHING_FALSE_CEILING", specTypeKey: "gypsum_board_design", options: { boardType: "standard", includesPaint: true }, brand: "Knauf" },
+		{ categoryKey: "FINISHING_INTERIOR_DOORS", specTypeKey: "solid_wood", options: {} },
+		{ categoryKey: "FINISHING_EXTERIOR_DOORS", specTypeKey: "solid_wood_exterior", options: {} },
+		{ categoryKey: "FINISHING_WINDOWS", specTypeKey: "upvc", options: { hasInsectScreen: true }, brand: "Rehau" },
+		{ categoryKey: "FINISHING_BATHROOMS", specTypeKey: "premium_set", options: { hasBathtub: true }, brand: "TOTO" },
+		{ categoryKey: "FINISHING_MARBLE_VANITIES", specTypeKey: "quartz", options: {} },
+		{ categoryKey: "FINISHING_KITCHEN", specTypeKey: "acrylic", options: { countertop: "quartz" } },
+		{ categoryKey: "FINISHING_INTERNAL_STAIRS", specTypeKey: "marble", options: { hasNosing: true } },
+		{ categoryKey: "FINISHING_EXTERNAL_STAIRS", specTypeKey: "granite", options: { hasNosing: true } },
+		{ categoryKey: "FINISHING_RAILINGS", specTypeKey: "glass_stainless", options: {} },
+		{ categoryKey: "FINISHING_STONE_FACADE", specTypeKey: "natural_imported", options: {} },
+		{ categoryKey: "FINISHING_FACADE_DECOR", specTypeKey: "grc_decor", options: {} },
+		{ categoryKey: "FINISHING_YARD_PAVING", specTypeKey: "stamped_concrete", options: {} },
+		{ categoryKey: "FINISHING_FENCE_GATES", specTypeKey: "aluminum_gate", options: { hasMotor: true, hasRemote: true } },
+		{ categoryKey: "FINISHING_LANDSCAPING", specTypeKey: "natural_grass", options: { hasIrrigation: true } },
+		{ categoryKey: "FINISHING_ROOF", specTypeKey: "waterproof_tiles", options: {} },
+		{ categoryKey: "FINISHING_INTERIOR_DECOR", specTypeKey: "wood_decor", options: {} },
+	],
+};
+
 export const applyTemplateToAll = subscriptionProcedure
 	.route({
 		method: "POST",
@@ -174,12 +267,48 @@ export const applyTemplateToAll = subscriptionProcedure
 			throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.NOT_FOUND });
 		}
 
-		const result = await db.finishingItem.updateMany({
+		const templateSpecs = SYSTEM_TEMPLATE_SPECS[input.templateLevel] ?? [];
+
+		// Build a map of categoryKey → spec for quick lookup
+		const specByCategory = new Map(
+			templateSpecs.map((s) => [s.categoryKey, s]),
+		);
+
+		// Fetch all enabled finishing items
+		const items = await db.finishingItem.findMany({
 			where: { costStudyId: input.studyId, isEnabled: true },
-			data: { qualityLevel: input.templateLevel },
+			select: { id: true, category: true },
 		});
 
-		return { success: true, updated: result.count };
+		// Update each item with matching template spec
+		let updated = 0;
+		await db.$transaction(
+			items.map((item) => {
+				const templateSpec = specByCategory.get(item.category);
+				return db.finishingItem.update({
+					where: { id: item.id },
+					data: {
+						qualityLevel: input.templateLevel,
+						...(templateSpec
+							? {
+									specData: {
+										categoryKey: templateSpec.categoryKey,
+										specTypeKey: templateSpec.specTypeKey,
+										specTypeLabel: templateSpec.specTypeKey,
+										options: {
+											...templateSpec.options,
+											...(templateSpec.brand ? { brand: templateSpec.brand } : {}),
+										},
+									},
+								}
+							: {}),
+					},
+				});
+			}),
+		);
+		updated = items.length;
+
+		return { success: true, updated };
 	});
 
 // ═══════════════════════════════════════════════════════════════
@@ -232,6 +361,124 @@ export const applySpecToAllFloors = subscriptionProcedure
 // ═══════════════════════════════════════════════════════════════
 // 5. GENERATE BOM
 // ═══════════════════════════════════════════════════════════════
+
+// Fallback material rates per category (used when specData has no subItems)
+const CATEGORY_FALLBACK_MATERIALS: Record<string, Array<{
+	name: string; nameEn: string; unit: string; ratePerUnit: number; wastage: number;
+}>> = {
+	FINISHING_WATERPROOFING: [
+		{ name: "لفات عزل / مادة عزل", nameEn: "Waterproofing Material", unit: "م٢", ratePerUnit: 1.15, wastage: 10 },
+		{ name: "برايمر بيتومين", nameEn: "Bitumen Primer", unit: "لتر", ratePerUnit: 0.3, wastage: 5 },
+	],
+	FINISHING_THERMAL_INSULATION: [
+		{ name: "ألواح عزل حراري", nameEn: "Insulation Boards", unit: "م٢", ratePerUnit: 1.05, wastage: 5 },
+	],
+	FINISHING_INTERNAL_PLASTER: [
+		{ name: "اسمنت", nameEn: "Cement", unit: "كجم", ratePerUnit: 10, wastage: 5 },
+		{ name: "رمل", nameEn: "Sand", unit: "م٣", ratePerUnit: 0.02, wastage: 10 },
+	],
+	FINISHING_EXTERNAL_PLASTER: [
+		{ name: "اسمنت", nameEn: "Cement", unit: "كجم", ratePerUnit: 10, wastage: 5 },
+		{ name: "رمل", nameEn: "Sand", unit: "م٣", ratePerUnit: 0.02, wastage: 10 },
+	],
+	FINISHING_INTERIOR_PAINT: [
+		{ name: "برايمر", nameEn: "Primer", unit: "لتر", ratePerUnit: 0.15, wastage: 5 },
+		{ name: "دهان", nameEn: "Paint", unit: "لتر", ratePerUnit: 0.35, wastage: 5 },
+		{ name: "معجون", nameEn: "Putty", unit: "كجم", ratePerUnit: 0.5, wastage: 5 },
+	],
+	FINISHING_FACADE_PAINT: [
+		{ name: "برايمر خارجي", nameEn: "Exterior Primer", unit: "لتر", ratePerUnit: 0.15, wastage: 5 },
+		{ name: "دهان خارجي", nameEn: "Exterior Paint", unit: "لتر", ratePerUnit: 0.4, wastage: 5 },
+	],
+	FINISHING_BOUNDARY_PAINT: [
+		{ name: "برايمر خارجي", nameEn: "Exterior Primer", unit: "لتر", ratePerUnit: 0.15, wastage: 5 },
+		{ name: "دهان خارجي", nameEn: "Exterior Paint", unit: "لتر", ratePerUnit: 0.4, wastage: 5 },
+	],
+	FINISHING_FLOOR_TILES: [
+		{ name: "بلاط", nameEn: "Tiles", unit: "م٢", ratePerUnit: 1.05, wastage: 5 },
+		{ name: "لاصق بلاط", nameEn: "Tile Adhesive", unit: "كجم", ratePerUnit: 5, wastage: 5 },
+		{ name: "روبة", nameEn: "Grout", unit: "كجم", ratePerUnit: 0.5, wastage: 10 },
+	],
+	FINISHING_WALL_TILES: [
+		{ name: "بلاط جدران", nameEn: "Wall Tiles", unit: "م٢", ratePerUnit: 1.05, wastage: 5 },
+		{ name: "لاصق بلاط", nameEn: "Tile Adhesive", unit: "كجم", ratePerUnit: 5, wastage: 5 },
+		{ name: "روبة", nameEn: "Grout", unit: "كجم", ratePerUnit: 0.5, wastage: 10 },
+	],
+	FINISHING_FALSE_CEILING: [
+		{ name: "ألواح جبس / سقف مستعار", nameEn: "Gypsum Boards / Ceiling", unit: "م٢", ratePerUnit: 1.1, wastage: 5 },
+		{ name: "هيكل معدني", nameEn: "Metal Framework", unit: "م.ط", ratePerUnit: 3, wastage: 5 },
+	],
+	FINISHING_INTERIOR_DOORS: [
+		{ name: "باب داخلي بالحلق", nameEn: "Interior Door with Frame", unit: "عدد", ratePerUnit: 1, wastage: 0 },
+	],
+	FINISHING_EXTERIOR_DOORS: [
+		{ name: "باب خارجي", nameEn: "Exterior Door", unit: "عدد", ratePerUnit: 1, wastage: 0 },
+	],
+	FINISHING_WINDOWS: [
+		{ name: "نافذة", nameEn: "Window", unit: "م٢", ratePerUnit: 1, wastage: 0 },
+	],
+	FINISHING_BATHROOMS: [
+		{ name: "طقم أدوات صحية", nameEn: "Sanitary Set", unit: "طقم", ratePerUnit: 1, wastage: 0 },
+	],
+	FINISHING_KITCHEN: [
+		{ name: "مطبخ", nameEn: "Kitchen Cabinet", unit: "م.ط", ratePerUnit: 1, wastage: 0 },
+	],
+	FINISHING_STONE_FACADE: [
+		{ name: "حجر واجهات", nameEn: "Facade Stone", unit: "م٢", ratePerUnit: 1.05, wastage: 5 },
+		{ name: "اسمنت لاصق", nameEn: "Stone Adhesive", unit: "كجم", ratePerUnit: 8, wastage: 5 },
+	],
+	FINISHING_YARD_PAVING: [
+		{ name: "انترلوك / بلاط خارجي", nameEn: "Interlock / Paving", unit: "م٢", ratePerUnit: 1.05, wastage: 5 },
+		{ name: "رمل تحتي", nameEn: "Base Sand", unit: "م٣", ratePerUnit: 0.05, wastage: 10 },
+	],
+};
+
+/** Get BOM materials for a spec — tries subItems, then fallback rates by category */
+function extractBomMaterials(
+	spec: Record<string, unknown>,
+	category: string,
+): Array<{ name: string; nameEn: string | null; code: string | null; unit: string; ratePerUnit: number; wastage: number }> {
+	// Path 1: specData has pre-calculated subItems
+	const subItems = (spec.subItems ?? spec.materials ?? []) as Array<Record<string, unknown>>;
+	if (Array.isArray(subItems) && subItems.length > 0) {
+		return subItems.map((mat) => ({
+			name: String(mat.name ?? ""),
+			nameEn: mat.nameEn ? String(mat.nameEn) : null,
+			code: mat.code ? String(mat.code) : null,
+			unit: String(mat.unit ?? ""),
+			ratePerUnit: Number(mat.ratePerUnit ?? mat.consumptionRate ?? 1),
+			wastage: Number(mat.wastagePercent ?? 5),
+		}));
+	}
+
+	// Path 2: Use fallback rates based on category
+	const fallback = CATEGORY_FALLBACK_MATERIALS[category];
+	if (fallback) {
+		return fallback.map((f) => ({
+			name: f.name,
+			nameEn: f.nameEn,
+			code: null,
+			unit: f.unit,
+			ratePerUnit: f.ratePerUnit,
+			wastage: f.wastage,
+		}));
+	}
+
+	// Path 3: Single entry using the spec type label
+	const specLabel = spec.specTypeLabel ?? spec.specTypeKey;
+	if (specLabel) {
+		return [{
+			name: String(specLabel),
+			nameEn: null,
+			code: null,
+			unit: "م٢",
+			ratePerUnit: 1,
+			wastage: 5,
+		}];
+	}
+
+	return [];
+}
 
 export const generateBOM = subscriptionProcedure
 	.route({
@@ -299,27 +546,25 @@ export const generateBOM = subscriptionProcedure
 			const spec = item.specData as Record<string, unknown> | null;
 			if (!spec) continue;
 
-			const materials = (spec.materials ?? []) as Array<Record<string, unknown>>;
+			const materials = extractBomMaterials(spec, item.category);
 			const baseQty = Number(item.area ?? item.quantity ?? 0);
 
 			for (const mat of materials) {
-				const rate = Number(mat.consumptionRate ?? 1);
-				const wastage = Number(mat.wastagePercent ?? Number(item.wastagePercent ?? 0));
-				const rawQty = baseQty * rate;
-				const effectiveQty = rawQty * (1 + wastage / 100);
+				const rawQty = baseQty * mat.ratePerUnit;
+				const effectiveQty = rawQty * (1 + mat.wastage / 100);
 
 				bomEntries.push({
 					costStudyId: input.studyId,
 					parentItemId: item.id,
 					parentItemType: "FINISHING",
 					parentCategory: item.category,
-					materialName: String(mat.name ?? item.name),
-					materialNameEn: mat.nameEn ? String(mat.nameEn) : null,
-					materialCode: mat.code ? String(mat.code) : null,
+					materialName: mat.name || item.name,
+					materialNameEn: mat.nameEn,
+					materialCode: mat.code,
 					quantity: rawQty,
-					unit: String(mat.unit ?? item.unit),
-					consumptionRate: rate,
-					wastagePercent: wastage,
+					unit: mat.unit || item.unit,
+					consumptionRate: mat.ratePerUnit,
+					wastagePercent: mat.wastage,
 					effectiveQuantity: effectiveQty,
 					floorId: item.floorId,
 					floorName: item.floorName,
@@ -332,27 +577,25 @@ export const generateBOM = subscriptionProcedure
 			const spec = item.specData as Record<string, unknown> | null;
 			if (!spec) continue;
 
-			const materials = (spec.materials ?? []) as Array<Record<string, unknown>>;
+			const materials = extractBomMaterials(spec, item.category);
 			const baseQty = Number(item.quantity);
 
 			for (const mat of materials) {
-				const rate = Number(mat.consumptionRate ?? 1);
-				const wastage = Number(mat.wastagePercent ?? Number(item.wastagePercent ?? 0));
-				const rawQty = baseQty * rate;
-				const effectiveQty = rawQty * (1 + wastage / 100);
+				const rawQty = baseQty * mat.ratePerUnit;
+				const effectiveQty = rawQty * (1 + mat.wastage / 100);
 
 				bomEntries.push({
 					costStudyId: input.studyId,
 					parentItemId: item.id,
 					parentItemType: "MEP",
 					parentCategory: item.category,
-					materialName: String(mat.name ?? item.name),
-					materialNameEn: mat.nameEn ? String(mat.nameEn) : null,
-					materialCode: mat.code ? String(mat.code) : null,
+					materialName: mat.name || item.name,
+					materialNameEn: mat.nameEn,
+					materialCode: mat.code,
 					quantity: rawQty,
-					unit: String(mat.unit ?? item.unit),
-					consumptionRate: rate,
-					wastagePercent: wastage,
+					unit: mat.unit || item.unit,
+					consumptionRate: mat.ratePerUnit,
+					wastagePercent: mat.wastage,
 					effectiveQuantity: effectiveQty,
 					floorId: item.floorId,
 					floorName: item.floorName,
