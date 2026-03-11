@@ -1,5 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { PricingEditor } from "@saas/pricing/components/studies/PricingEditor";
+import { PricingPageContentV2 } from "@saas/pricing/components/pricing-v2/PricingPageContentV2";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { StudyPageShell } from "@saas/pricing/components/studies/StudyPageShell";
 import { notFound } from "next/navigation";
@@ -37,7 +37,7 @@ export default async function StudyPricingPage({
 				organizationSlug={organizationSlug}
 				studyId={studyId}
 			>
-				<PricingEditor
+				<PricingPageContentV2
 					organizationId={activeOrganization.id}
 					organizationSlug={organizationSlug}
 					studyId={studyId}

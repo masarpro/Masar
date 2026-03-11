@@ -1,8 +1,14 @@
 import type { LucideIcon } from "lucide-react";
 import {
 	Calculator,
+	ClipboardList,
+	DollarSign,
 	FileSpreadsheet,
+	FileText,
+	FolderKanban,
 	HomeIcon,
+	LayoutDashboard,
+	Receipt,
 	UserSearch,
 } from "lucide-react";
 
@@ -118,3 +124,26 @@ export function getPricingSectionHref(
 	const basePath = `/app/${organizationSlug}/pricing`;
 	return sectionPath ? `${basePath}/${sectionPath}` : basePath;
 }
+
+// ═══════════════════════════════════════════════════════════════
+// STUDY NAVIGATION (inside a study detail page)
+// ═══════════════════════════════════════════════════════════════
+
+export interface StudyNavItem {
+	id: string;
+	label: string;
+	labelEn: string;
+	path: string;
+	icon: LucideIcon;
+	stage?: string; // maps to StageType
+}
+
+export const STUDY_NAV_ITEMS: StudyNavItem[] = [
+	{ id: "overview",       label: "نظرة عامة",      labelEn: "Overview",       path: "",               icon: LayoutDashboard },
+	{ id: "quantities",     label: "الكميات",         labelEn: "Quantities",     path: "quantities",     icon: Calculator,      stage: "QUANTITIES" },
+	{ id: "specifications", label: "المواصفات",       labelEn: "Specifications", path: "specifications", icon: ClipboardList,   stage: "SPECIFICATIONS" },
+	{ id: "costing",        label: "تسعير التكلفة",    labelEn: "Costing",        path: "costing",        icon: Receipt,         stage: "COSTING" },
+	{ id: "pricing",        label: "التسعير",          labelEn: "Pricing",        path: "pricing",        icon: DollarSign,      stage: "PRICING" },
+	{ id: "quotation",      label: "عرض السعر",        labelEn: "Quotation",      path: "quotation",      icon: FileText,        stage: "QUOTATION" },
+	{ id: "convert",        label: "تحويل لمشروع",    labelEn: "Convert",        path: "convert",        icon: FolderKanban,    stage: "CONVERSION" },
+];

@@ -109,9 +109,27 @@ export type AiChatScalarFieldEnum = z.infer<typeof AiChatScalarFieldEnumSchema>;
 
 // File: CostStudyScalarFieldEnum.schema.ts
 
-export const CostStudyScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'createdById', 'name', 'customerName', 'customerId', 'projectType', 'landArea', 'buildingArea', 'numberOfFloors', 'hasBasement', 'finishingLevel', 'structuralCost', 'finishingCost', 'mepCost', 'laborCost', 'overheadPercent', 'profitPercent', 'contingencyPercent', 'vatIncluded', 'totalCost', 'buildingConfig', 'status', 'notes', 'projectId', 'studyType', 'quantitiesStatus', 'specsStatus', 'costingStatus', 'pricingStatus', 'quotationStatus', 'quantitiesAssigneeId', 'specsAssigneeId', 'costingAssigneeId', 'pricingAssigneeId', 'contractValue', 'generatedQuotationId', 'convertedProjectId', 'structuralSpecs', 'createdAt', 'updatedAt'])
+export const CostStudyScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'createdById', 'name', 'customerName', 'customerId', 'projectType', 'landArea', 'buildingArea', 'numberOfFloors', 'hasBasement', 'finishingLevel', 'structuralCost', 'finishingCost', 'mepCost', 'laborCost', 'overheadPercent', 'profitPercent', 'contingencyPercent', 'vatIncluded', 'totalCost', 'buildingConfig', 'status', 'notes', 'projectId', 'studyType', 'entryPoint', 'quantitiesStatus', 'specsStatus', 'costingStatus', 'pricingStatus', 'quotationStatus', 'quantitiesAssigneeId', 'specsAssigneeId', 'costingAssigneeId', 'pricingAssigneeId', 'contractValue', 'generatedQuotationId', 'convertedProjectId', 'structuralSpecs', 'costingMethod', 'overheadCost', 'adminCost', 'adminPercent', 'storageCostPercent', 'markupMethod', 'uniformMarkupPercent', 'createdAt', 'updatedAt'])
 
 export type CostStudyScalarFieldEnum = z.infer<typeof CostStudyScalarFieldEnumSchema>;
+
+// File: StudyStageScalarFieldEnum.schema.ts
+
+export const StudyStageScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'stage', 'status', 'assigneeId', 'approvedById', 'approvedAt', 'notes', 'sortOrder', 'createdAt', 'updatedAt'])
+
+export type StudyStageScalarFieldEnum = z.infer<typeof StudyStageScalarFieldEnumSchema>;
+
+// File: MaterialBOMScalarFieldEnum.schema.ts
+
+export const MaterialBOMScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'parentItemId', 'parentItemType', 'parentCategory', 'materialName', 'materialNameEn', 'materialCode', 'quantity', 'unit', 'consumptionRate', 'wastagePercent', 'effectiveQuantity', 'unitPrice', 'totalPrice', 'floorId', 'floorName', 'roomId', 'roomName', 'sortOrder', 'isEnabled', 'createdAt', 'updatedAt'])
+
+export type MaterialBOMScalarFieldEnum = z.infer<typeof MaterialBOMScalarFieldEnumSchema>;
+
+// File: CostingLaborScalarFieldEnum.schema.ts
+
+export const CostingLaborScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'section', 'subSection', 'laborMethod', 'description', 'unit', 'quantity', 'rate', 'durationMonths', 'insuranceCost', 'housingCost', 'transportCost', 'otherCosts', 'totalCost', 'sortOrder', 'isEnabled', 'createdAt', 'updatedAt'])
+
+export type CostingLaborScalarFieldEnum = z.infer<typeof CostingLaborScalarFieldEnumSchema>;
 
 // File: StructuralItemScalarFieldEnum.schema.ts
 
@@ -743,11 +761,35 @@ export const StudyTypeSchema = z.enum(['FULL_PROJECT', 'CUSTOM_ITEMS', 'LUMP_SUM
 
 export type StudyType = z.infer<typeof StudyTypeSchema>;
 
+// File: StudyEntryPoint.schema.ts
+
+export const StudyEntryPointSchema = z.enum(['FROM_SCRATCH', 'HAS_QUANTITIES', 'HAS_SPECS', 'QUOTATION_ONLY', 'LUMP_SUM_ANALYSIS', 'CUSTOM_ITEMS'])
+
+export type StudyEntryPoint = z.infer<typeof StudyEntryPointSchema>;
+
 // File: StageStatus.schema.ts
 
 export const StageStatusSchema = z.enum(['NOT_STARTED', 'DRAFT', 'IN_REVIEW', 'APPROVED'])
 
 export type StageStatus = z.infer<typeof StageStatusSchema>;
+
+// File: StageType.schema.ts
+
+export const StageTypeSchema = z.enum(['QUANTITIES', 'SPECIFICATIONS', 'COSTING', 'PRICING', 'QUOTATION', 'CONVERSION'])
+
+export type StageType = z.infer<typeof StageTypeSchema>;
+
+// File: BOQSectionType.schema.ts
+
+export const BOQSectionTypeSchema = z.enum(['STRUCTURAL', 'FINISHING', 'MEP', 'LABOR', 'MANUAL', 'GENERAL'])
+
+export type BOQSectionType = z.infer<typeof BOQSectionTypeSchema>;
+
+// File: LaborMethod.schema.ts
+
+export const LaborMethodSchema = z.enum(['PER_UNIT', 'PER_SQM', 'LUMP_SUM', 'MONTHLY_SALARY', 'SUBCONTRACTOR_INCLUSIVE'])
+
+export type LaborMethod = z.infer<typeof LaborMethodSchema>;
 
 // File: ProjectStatus.schema.ts
 
@@ -1009,7 +1051,7 @@ export type BOQSourceType = z.infer<typeof BOQSourceTypeSchema>;
 
 // File: BOQSection.schema.ts
 
-export const BOQSectionSchema = z.enum(['STRUCTURAL', 'FINISHING', 'MEP', 'LABOR', 'GENERAL'])
+export const BOQSectionSchema = z.enum(['STRUCTURAL', 'FINISHING', 'MEP', 'LABOR', 'MANUAL', 'GENERAL'])
 
 export type BOQSection = z.infer<typeof BOQSectionSchema>;
 
@@ -1544,6 +1586,7 @@ export const CostStudySchema = z.object({
   notes: z.string().nullish(),
   projectId: z.string().nullish(),
   studyType: StudyTypeSchema.default("FULL_PROJECT"),
+  entryPoint: StudyEntryPointSchema.default("FROM_SCRATCH"),
   quantitiesStatus: StageStatusSchema.default("DRAFT"),
   specsStatus: StageStatusSchema.default("NOT_STARTED"),
   costingStatus: StageStatusSchema.default("NOT_STARTED"),
@@ -1559,11 +1602,131 @@ export const CostStudySchema = z.object({
   generatedQuotationId: z.string().nullish(),
   convertedProjectId: z.string().nullish(),
   structuralSpecs: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  costingMethod: z.string().nullish(),
+  overheadCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'overheadCost' must be a Decimal. Location: ['Models', 'CostStudy']",
+}).nullish(),
+  adminCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'adminCost' must be a Decimal. Location: ['Models', 'CostStudy']",
+}).nullish(),
+  adminPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'adminPercent' must be a Decimal. Location: ['Models', 'CostStudy']",
+}).nullish(),
+  storageCostPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'storageCostPercent' must be a Decimal. Location: ['Models', 'CostStudy']",
+}).nullish(),
+  markupMethod: z.string().nullish(),
+  uniformMarkupPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'uniformMarkupPercent' must be a Decimal. Location: ['Models', 'CostStudy']",
+}).nullish(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
 
 export type CostStudyType = z.infer<typeof CostStudySchema>;
+
+
+// File: StudyStage.schema.ts
+
+export const StudyStageSchema = z.object({
+  id: z.string(),
+  costStudyId: z.string(),
+  stage: StageTypeSchema,
+  status: StageStatusSchema.default("NOT_STARTED"),
+  assigneeId: z.string().nullish(),
+  approvedById: z.string().nullish(),
+  approvedAt: z.date().nullish(),
+  notes: z.string().nullish(),
+  sortOrder: z.number().int(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type StudyStageType = z.infer<typeof StudyStageSchema>;
+
+
+// File: MaterialBOM.schema.ts
+
+export const MaterialBOMSchema = z.object({
+  id: z.string(),
+  costStudyId: z.string(),
+  parentItemId: z.string(),
+  parentItemType: BOQSectionTypeSchema,
+  parentCategory: z.string().nullish(),
+  materialName: z.string(),
+  materialNameEn: z.string().nullish(),
+  materialCode: z.string().nullish(),
+  quantity: z.instanceof(Prisma.Decimal, {
+  message: "Field 'quantity' must be a Decimal. Location: ['Models', 'MaterialBOM']",
+}),
+  unit: z.string(),
+  consumptionRate: z.instanceof(Prisma.Decimal, {
+  message: "Field 'consumptionRate' must be a Decimal. Location: ['Models', 'MaterialBOM']",
+}).nullish(),
+  wastagePercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'wastagePercent' must be a Decimal. Location: ['Models', 'MaterialBOM']",
+}),
+  effectiveQuantity: z.instanceof(Prisma.Decimal, {
+  message: "Field 'effectiveQuantity' must be a Decimal. Location: ['Models', 'MaterialBOM']",
+}),
+  unitPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'unitPrice' must be a Decimal. Location: ['Models', 'MaterialBOM']",
+}).nullish(),
+  totalPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalPrice' must be a Decimal. Location: ['Models', 'MaterialBOM']",
+}).nullish(),
+  floorId: z.string().nullish(),
+  floorName: z.string().nullish(),
+  roomId: z.string().nullish(),
+  roomName: z.string().nullish(),
+  sortOrder: z.number().int(),
+  isEnabled: z.boolean().default(true),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type MaterialBOMType = z.infer<typeof MaterialBOMSchema>;
+
+
+// File: CostingLabor.schema.ts
+
+export const CostingLaborSchema = z.object({
+  id: z.string(),
+  costStudyId: z.string(),
+  section: BOQSectionTypeSchema,
+  subSection: z.string().nullish(),
+  laborMethod: LaborMethodSchema,
+  description: z.string(),
+  unit: z.string(),
+  quantity: z.instanceof(Prisma.Decimal, {
+  message: "Field 'quantity' must be a Decimal. Location: ['Models', 'CostingLabor']",
+}),
+  rate: z.instanceof(Prisma.Decimal, {
+  message: "Field 'rate' must be a Decimal. Location: ['Models', 'CostingLabor']",
+}),
+  durationMonths: z.number().int().nullish(),
+  insuranceCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'insuranceCost' must be a Decimal. Location: ['Models', 'CostingLabor']",
+}).nullish(),
+  housingCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'housingCost' must be a Decimal. Location: ['Models', 'CostingLabor']",
+}).nullish(),
+  transportCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'transportCost' must be a Decimal. Location: ['Models', 'CostingLabor']",
+}).nullish(),
+  otherCosts: z.instanceof(Prisma.Decimal, {
+  message: "Field 'otherCosts' must be a Decimal. Location: ['Models', 'CostingLabor']",
+}).nullish(),
+  totalCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalCost' must be a Decimal. Location: ['Models', 'CostingLabor']",
+}),
+  sortOrder: z.number().int(),
+  isEnabled: z.boolean().default(true),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type CostingLaborType = z.infer<typeof CostingLaborSchema>;
 
 
 // File: StructuralItem.schema.ts

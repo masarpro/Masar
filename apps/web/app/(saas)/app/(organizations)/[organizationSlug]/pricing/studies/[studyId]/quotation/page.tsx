@@ -1,18 +1,17 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { StudyPageShell } from "@saas/pricing/components/studies/StudyPageShell";
-import { CostingPageContentV2 } from "@saas/pricing/components/costing-v2/CostingPageContentV2";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata() {
 	const t = await getTranslations();
 	return {
-		title: t("pricing.pipeline.costing"),
+		title: "عرض السعر",
 	};
 }
 
-export default async function CostingPage({
+export default async function QuotationPage({
 	params,
 }: {
 	params: Promise<{ organizationSlug: string; studyId: string }>;
@@ -36,11 +35,11 @@ export default async function CostingPage({
 				organizationSlug={organizationSlug}
 				studyId={studyId}
 			>
-				<CostingPageContentV2
-					organizationId={activeOrganization.id}
-					organizationSlug={organizationSlug}
-					studyId={studyId}
-				/>
+				<div className="space-y-6">
+					<div className="rounded-lg border border-dashed border-muted-foreground/25 p-12 text-center">
+						<p className="text-muted-foreground">قيد التطوير — المرحلة القادمة</p>
+					</div>
+				</div>
 			</StudyPageShell>
 		</PricingShell>
 	);

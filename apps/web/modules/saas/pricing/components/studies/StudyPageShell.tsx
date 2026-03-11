@@ -30,28 +30,16 @@ export function StudyPageShell({
 		}),
 	);
 
-	// ─── Fetch stages for stepper ───
+	// ─── Fetch stages from new StudyStage table ───
 	const { data: stagesData } = useQuery(
-		orpc.pricing.studies.stages.get.queryOptions({
+		orpc.pricing.studies.studyStages.get.queryOptions({
 			input: { organizationId, studyId },
 		}),
 	);
 
-	const stages = stagesData?.stages ?? {
-		quantities: "DRAFT" as const,
-		specs: "NOT_STARTED" as const,
-		costing: "NOT_STARTED" as const,
-		pricing: "NOT_STARTED" as const,
-		quotation: "NOT_STARTED" as const,
-	};
-
-	// Derive completed stages for the stepper
-	const completedStages: string[] = [];
-	if (stages.quantities === "APPROVED") completedStages.push("quantities");
-	if (stages.specs === "APPROVED") completedStages.push("specifications");
-	if (stages.costing === "APPROVED") completedStages.push("costing");
-	if (stages.pricing === "APPROVED") completedStages.push("selling-price");
-	if (stages.quotation === "APPROVED") completedStages.push("quotation");
+	// Build stages array for stepper
+	const stagesArray = stagesData?.stages ?? [];
+	const entryPoint = stagesData?.entryPoint ?? "FROM_SCRATCH";
 
 	if (isLoading) {
 		return <StudyOverviewSkeleton />;
@@ -77,7 +65,8 @@ export function StudyPageShell({
 			<StudyPipelineStepper
 				studyId={studyId}
 				organizationSlug={organizationSlug}
-				completedStages={completedStages}
+				stages={stagesArray}
+				entryPoint={entryPoint}
 			/>
 			{children}
 		</div>

@@ -30,11 +30,13 @@ import { specTemplateDelete } from "./procedures/spec-template-delete";
 import { specTemplateSetDefault } from "./procedures/spec-template-set-default";
 import { finishingItemBatchSpecUpdate } from "./procedures/finishing-item-batch-spec-update";
 import { getStages, approveStage, reopenStage, assignStage } from "./procedures/stages";
+import { getStudyStages, approveStudyStage, reopenStudyStage, assignStudyStage, getActiveStudyStage } from "./procedures/study-stages";
 import { manualItemsList, manualItemCreate, manualItemUpdate, manualItemDelete, manualItemReorder } from "./procedures/manual-items";
 import { quantitiesSummary } from "./procedures/quantities-summary";
 import { getStructuralSpecs, setStructuralSpecs } from "./procedures/structural-specs";
 import { costingGenerateItems, costingGetItems, costingUpdateItem, costingBulkUpdate, costingSetSectionLabor, costingGetSummary } from "./procedures/costing";
 import { markupGetSettings, markupSetUniform, markupSetSectionMarkups, markupGetProfitAnalysis } from "./procedures/markup";
+import { getSpecifications, updateItemSpec, applyTemplateToAll, applySpecToAllFloors, generateBOM, getBOM } from "./procedures/specifications";
 
 export const quantitiesRouter = {
 	list,
@@ -92,6 +94,13 @@ export const quantitiesRouter = {
 		reopen: reopenStage,
 		assign: assignStage,
 	},
+	studyStages: {
+		get: getStudyStages,
+		approve: approveStudyStage,
+		reopen: reopenStudyStage,
+		assign: assignStudyStage,
+		getActive: getActiveStudyStage,
+	},
 	manualItem: {
 		list: manualItemsList,
 		create: manualItemCreate,
@@ -117,5 +126,13 @@ export const quantitiesRouter = {
 		setUniform: markupSetUniform,
 		setSectionMarkups: markupSetSectionMarkups,
 		getProfitAnalysis: markupGetProfitAnalysis,
+	},
+	specifications: {
+		get: getSpecifications,
+		updateItem: updateItemSpec,
+		applyTemplate: applyTemplateToAll,
+		applyToFloors: applySpecToAllFloors,
+		generateBOM,
+		getBOM,
 	},
 };

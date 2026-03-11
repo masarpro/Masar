@@ -2,7 +2,9 @@
 
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@ui/components/button";
 import {
+	ArrowLeft,
 	Building2,
 	Calculator,
 	ExternalLink,
@@ -42,9 +44,30 @@ export function CostStudyOverview({
 		}),
 	);
 
+	const { data: activeStageData } = useQuery(
+		orpc.pricing.studies.studyStages.getActive.queryOptions({
+			input: { organizationId, studyId },
+		}),
+	);
+
 	if (!study) {
 		return null;
 	}
+
+	// Map stage type to path
+	const STAGE_PATH_MAP: Record<string, string> = {
+		QUANTITIES: "quantities",
+		SPECIFICATIONS: "specifications",
+		COSTING: "costing",
+		PRICING: "pricing",
+		QUOTATION: "quotation",
+		CONVERSION: "convert",
+	};
+
+	const activeStage = activeStageData?.activeStage;
+	const activeStagePath = activeStage
+		? STAGE_PATH_MAP[activeStage.stage] ?? ""
+		: null;
 
 	const directCosts = study.structuralCost + study.finishingCost + study.mepCost + study.laborCost;
 	const overheadAmount = directCosts * (study.overheadPercent / 100);
@@ -100,6 +123,18 @@ export function CostStudyOverview({
 					</div>
 				</div>
 			</div>
+
+			{/* Open Active Stage Button */}
+			{activeStagePath && (
+				<div className="flex justify-center">
+					<Button asChild className="rounded-xl px-6 gap-2">
+						<Link href={`/app/${organizationSlug}/pricing/studies/${studyId}/${activeStagePath}`}>
+							فتح المرحلة النشطة
+							<ArrowLeft className="h-4 w-4" />
+						</Link>
+					</Button>
+				</div>
+			)}
 
 			{/* Linked Lead Card */}
 			{study.lead && (

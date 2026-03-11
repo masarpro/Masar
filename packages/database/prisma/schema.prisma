@@ -609,7 +609,27 @@ enum BOQSection {
   FINISHING     // تشطيبات
   MEP           // ميكانيك وكهرباء وسباكة
   LABOR         // عمالة
+  MANUAL        // يدوي
   GENERAL       // عام
+}
+
+// قسم BOM
+enum BOQSectionType {
+  STRUCTURAL
+  FINISHING
+  MEP
+  LABOR
+  MANUAL
+  GENERAL
+}
+
+// طريقة حساب العمالة
+enum LaborMethod {
+  PER_UNIT                  // بالوحدة (ريال/م² أو ريال/م³ أو ريال/نقطة)
+  PER_SQM                   // بالمتر المسطح الشامل
+  LUMP_SUM                  // بالمقطوعية (مبلغ إجمالي)
+  MONTHLY_SALARY            // بالراتب الشهري
+  SUBCONTRACTOR_INCLUSIVE    // مقاول باطن شامل (مواد + مصنعية)
 }
 
 model User {
@@ -774,6 +794,10 @@ model User {
 
   // Project BOQ Items
   createdBOQItems         ProjectBOQItem[]        @relation("BOQItemCreator")
+
+  // Study Stages — مراحل الدراسة
+  stageAssignments        StudyStage[]            @relation("StageAssignee")
+  stageApprovals          StudyStage[]            @relation("StageApprover")
 
   // ═══ نهاية حقول مسار ═══
 
@@ -1244,6 +1268,8 @@ model CostStudy {
 
   // ═══ Pipeline — مراحل الدراسة ═══
   studyType            StudyType     @default(FULL_PROJECT) @map("study_type")
+  entryPoint           StudyEntryPoint @default(FROM_SCRATCH) @map("entry_point")
+  stages               StudyStage[]
 
   // حالة كل مرحلة
   quantitiesStatus     StageStatus   @default(DRAFT) @map("quantities_status")
@@ -1268,6 +1294,15 @@ model CostStudy {
   // مواصفات إنشائية
   structuralSpecs      Json?         @map("structural_specs") @db.JsonB
 
+  // إعدادات التسعير الجديدة
+  costingMethod          String?       @map("costing_method")         // "manual" | "database" | "import"
+  overheadCost           Decimal?      @map("overhead_cost") @db.Decimal(15, 2)
+  adminCost              Decimal?      @map("admin_cost") @db.Decimal(15, 2)
+  adminPercent           Decimal?      @map("admin_percent") @db.Decimal(5, 2)
+  storageCostPercent     Decimal?      @map("storage_cost_percent") @db.Decimal(5, 2)
+  markupMethod           String?       @map("markup_method")           // "uniform" | "per_section" | "manual"
+  uniformMarkupPercent   Decimal?      @map("uniform_markup_percent") @db.Decimal(5, 2)
+
   // العلاقات
   structuralItems StructuralItem[]
   finishingItems  FinishingItem[]
@@ -1279,6 +1314,8 @@ model CostStudy {
   costingItems    CostingItem[]
   manualItems     ManualItem[]
   sectionMarkups  SectionMarkup[]
+  materialBOM     MaterialBOM[]
+  costingLabor    CostingLabor[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -1287,6 +1324,111 @@ model CostStudy {
   @@index([organizationId, projectId])
   @@index([createdById])
   @@map("cost_studies")
+}
+
+// مراحل الدراسة الجديدة
+model StudyStage {
+  id            String      @id @default(cuid())
+  costStudyId   String      @map("cost_study_id")
+  costStudy     CostStudy   @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
+  stage         StageType
+  status        StageStatus @default(NOT_STARTED)
+  assigneeId    String?     @map("assignee_id")
+  assignee      User?       @relation("StageAssignee", fields: [assigneeId], references: [id])
+  approvedById  String?     @map("approved_by_id")
+  approvedBy    User?       @relation("StageApprover", fields: [approvedById], references: [id])
+  approvedAt    DateTime?   @map("approved_at")
+  notes         String?
+  sortOrder     Int         @default(0) @map("sort_order")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  @@unique([costStudyId, stage])
+  @@index([costStudyId])
+  @@map("study_stages")
+}
+
+// جدول المواد المُجمّع (Bill of Materials)
+model MaterialBOM {
+  id                String          @id @default(cuid())
+  costStudyId       String          @map("cost_study_id")
+  costStudy         CostStudy       @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
+
+  // ربط بالبند الأصل
+  parentItemId      String          @map("parent_item_id")
+  parentItemType    BOQSectionType  @map("parent_item_type")
+  parentCategory    String?         @map("parent_category")
+
+  // بيانات المادة
+  materialName      String          @map("material_name")
+  materialNameEn    String?         @map("material_name_en")
+  materialCode      String?         @map("material_code")
+
+  // الكميات
+  quantity          Decimal         @db.Decimal(15, 4)
+  unit              String
+  consumptionRate   Decimal?        @map("consumption_rate") @db.Decimal(10, 4)
+  wastagePercent    Decimal         @default(0) @map("wastage_percent") @db.Decimal(5, 2)
+  effectiveQuantity Decimal         @map("effective_quantity") @db.Decimal(15, 4)
+
+  // للتسعير لاحقاً
+  unitPrice         Decimal?        @map("unit_price") @db.Decimal(15, 2)
+  totalPrice        Decimal?        @map("total_price") @db.Decimal(15, 2)
+
+  // فلترة
+  floorId           String?         @map("floor_id")
+  floorName         String?         @map("floor_name")
+  roomId            String?         @map("room_id")
+  roomName          String?         @map("room_name")
+
+  sortOrder         Int             @default(0) @map("sort_order")
+  isEnabled         Boolean         @default(true) @map("is_enabled")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  @@index([costStudyId])
+  @@index([costStudyId, parentItemType])
+  @@index([parentItemId])
+  @@map("material_bom")
+}
+
+// بنود العمالة في التسعير
+model CostingLabor {
+  id              String          @id @default(cuid())
+  costStudyId     String          @map("cost_study_id")
+  costStudy       CostStudy       @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
+
+  // ربط بالقسم
+  section         BOQSectionType
+  subSection      String?         @map("sub_section")
+
+  // طريقة الحساب
+  laborMethod     LaborMethod     @map("labor_method")
+
+  // بيانات العمالة
+  description     String
+  unit            String
+  quantity        Decimal         @db.Decimal(15, 4)
+  rate            Decimal         @db.Decimal(15, 2)
+  durationMonths  Int?            @map("duration_months")
+
+  // تكاليف إضافية
+  insuranceCost   Decimal?        @map("insurance_cost") @db.Decimal(15, 2)
+  housingCost     Decimal?        @map("housing_cost") @db.Decimal(15, 2)
+  transportCost   Decimal?        @map("transport_cost") @db.Decimal(15, 2)
+  otherCosts      Decimal?        @map("other_costs") @db.Decimal(15, 2)
+
+  // الإجمالي
+  totalCost       Decimal         @map("total_cost") @db.Decimal(15, 2)
+
+  sortOrder       Int             @default(0) @map("sort_order")
+  isEnabled       Boolean         @default(true) @map("is_enabled")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  @@index([costStudyId])
+  @@index([costStudyId, section])
+  @@map("costing_labor")
 }
 
 // بنود الأعمال الإنشائية
@@ -4791,6 +4933,24 @@ enum StageStatus {
   DRAFT
   IN_REVIEW
   APPROVED
+}
+
+enum StageType {
+  QUANTITIES
+  SPECIFICATIONS
+  COSTING
+  PRICING
+  QUOTATION
+  CONVERSION
+}
+
+enum StudyEntryPoint {
+  FROM_SCRATCH        // دراسة كاملة من الصفر
+  HAS_QUANTITIES      // لديه كميات جاهزة — يبدأ من المواصفات
+  HAS_SPECS           // لديه كميات ومواصفات — يبدأ من التكلفة
+  QUOTATION_ONLY      // يريد عرض سعر فقط
+  LUMP_SUM_ANALYSIS   // تحليل مقطوعية
+  CUSTOM_ITEMS        // بنود مخصصة (بند أو بندين)
 }
 
 enum LaborCostType {

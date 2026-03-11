@@ -1,7 +1,7 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { StudyPageShell } from "@saas/pricing/components/studies/StudyPageShell";
-import { SpecificationsPageContent } from "@saas/pricing/components/pipeline/SpecificationsPageContent";
+import { SpecificationsPageContentV2 } from "@saas/pricing/components/specifications/SpecificationsPageContentV2";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -36,7 +36,7 @@ export default async function SpecificationsPage({
 				organizationSlug={organizationSlug}
 				studyId={studyId}
 			>
-				<SpecificationsPageContent
+				<SpecificationsPageContentV2
 					organizationId={activeOrganization.id}
 					organizationSlug={organizationSlug}
 					studyId={studyId}
