@@ -6,6 +6,14 @@ import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
 import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@ui/components/table";
+import {
 	CheckCircle2,
 	Loader2,
 	Package,
@@ -301,144 +309,106 @@ export function CostingSummaryTab({
 				<div className="px-4 py-3 bg-muted/30 border-b border-border">
 					<h4 className="font-semibold">ملخص تسعير التكلفة</h4>
 				</div>
-				<div className="overflow-x-auto">
-					<table className="w-full text-sm">
-						<thead>
-							<tr className="border-b bg-muted/20 text-muted-foreground">
-								<th className="px-4 py-3 text-right font-medium">
-									القسم
-								</th>
-								<th className="px-4 py-3 text-center font-medium">
-									المواد
-								</th>
-								<th className="px-4 py-3 text-center font-medium">
-									المصنعيات
-								</th>
-								<th className="px-4 py-3 text-center font-medium">
-									التشوين
-								</th>
-								<th className="px-4 py-3 text-center font-medium">
-									الإجمالي
-								</th>
-								{buildingArea > 0 && (
-									<th className="px-4 py-3 text-center font-medium">
-										م² / ر.س
-									</th>
-								)}
-								<th className="px-4 py-3 text-center font-medium">
-									النسبة %
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							{sections.map((sec: any) => {
-								const pct = sectionPercentages[sec.section] ?? 0;
-								const perSqm =
-									buildingArea > 0
-										? (sec.total ?? 0) / buildingArea
-										: 0;
-								const color =
-									SECTION_COLORS[sec.section]?.text ??
-									"text-gray-600";
-								return (
-									<tr
-										key={sec.section}
-										className="border-b last:border-0 hover:bg-muted/20"
-									>
-										<td className="px-4 py-3 font-medium">
-											<div className="flex items-center gap-2">
-												<span
-													className={`inline-block w-2 h-2 rounded-full ${SECTION_DOT_COLORS[sec.section] ?? "bg-gray-400"}`}
-												/>
-												{SECTION_LABELS[sec.section] ??
-													sec.section}
-											</div>
-										</td>
-										<td
-											className="px-4 py-3 text-center"
-											dir="ltr"
-										>
-											{formatNum(sec.materialTotal)}
-										</td>
-										<td
-											className="px-4 py-3 text-center"
-											dir="ltr"
-										>
-											{formatNum(sec.laborTotal)}
-										</td>
-										<td
-											className="px-4 py-3 text-center"
-											dir="ltr"
-										>
-											{formatNum(sec.storageTotal)}
-										</td>
-										<td
-											className="px-4 py-3 text-center font-medium"
-											dir="ltr"
-										>
-											{formatNum(sec.total)}
-										</td>
-										{buildingArea > 0 && (
-											<td
-												className="px-4 py-3 text-center text-muted-foreground"
-												dir="ltr"
-											>
-												{formatNum(perSqm)}
-											</td>
-										)}
-										<td className="px-4 py-3 text-center">
-											<div className="flex items-center justify-center gap-1.5">
-												<div className="w-12 h-1.5 rounded-full bg-muted overflow-hidden">
-													<div
-														className={`h-full rounded-full ${SECTION_COLORS[sec.section]?.bg ?? "bg-gray-400"} transition-all duration-500`}
-														style={{
-															width: `${Math.min(pct, 100)}%`,
-														}}
-													/>
-												</div>
-												<span
-													className={`text-xs font-medium ${color}`}
-													dir="ltr"
-												>
-													{formatNum(pct)}%
-												</span>
-											</div>
-										</td>
-									</tr>
-								);
-							})}
-							{/* Grand total row */}
-							<tr className="bg-muted/40 font-semibold">
-								<td className="px-4 py-3">الإجمالي</td>
-								<td className="px-4 py-3 text-center" dir="ltr">
-									{formatNum(grandMaterial)}
-								</td>
-								<td className="px-4 py-3 text-center" dir="ltr">
-									{formatNum(grandLabor)}
-								</td>
-								<td className="px-4 py-3 text-center" dir="ltr">
-									{formatNum(grandStorage)}
-								</td>
-								<td className="px-4 py-3 text-center" dir="ltr">
-									{formatNum(grandTotal)}
-								</td>
-								{buildingArea > 0 && (
-									<td
-										className="px-4 py-3 text-center"
+				<Table>
+					<TableHeader>
+						<TableRow className="bg-muted/20">
+							<TableHead className="text-right font-medium">
+								القسم
+							</TableHead>
+							<TableHead className="text-center font-medium">
+								المواد
+							</TableHead>
+							<TableHead className="text-center font-medium">
+								المصنعيات
+							</TableHead>
+							<TableHead className="text-center font-medium">
+								الإجمالي
+							</TableHead>
+							{buildingArea > 0 && (
+								<TableHead className="text-center font-medium">
+									ر.س/م²
+								</TableHead>
+							)}
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{sections.map((sec: any) => {
+							const perSqm =
+								buildingArea > 0
+									? (sec.total ?? 0) / buildingArea
+									: 0;
+							return (
+								<TableRow
+									key={sec.section}
+									className="hover:bg-muted/20"
+								>
+									<TableCell className="font-medium">
+										<div className="flex items-center gap-2">
+											<span
+												className={`inline-block w-2.5 h-2.5 rounded-full ${SECTION_DOT_COLORS[sec.section] ?? "bg-gray-400"}`}
+											/>
+											{SECTION_LABELS[sec.section] ??
+												sec.section}
+										</div>
+									</TableCell>
+									<TableCell
+										className="text-center"
 										dir="ltr"
 									>
-										{formatNum(
-											grandTotal / buildingArea,
-										)}
-									</td>
-								)}
-								<td className="px-4 py-3 text-center text-xs font-medium">
-									100%
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+										{formatNum(sec.materialTotal)}
+									</TableCell>
+									<TableCell
+										className="text-center"
+										dir="ltr"
+									>
+										{formatNum(sec.laborTotal)}
+									</TableCell>
+									<TableCell
+										className="text-center font-medium"
+										dir="ltr"
+									>
+										{formatNum(sec.total)}
+									</TableCell>
+									{buildingArea > 0 && (
+										<TableCell
+											className="text-center text-muted-foreground"
+											dir="ltr"
+										>
+											{formatNum(perSqm)}
+										</TableCell>
+									)}
+								</TableRow>
+							);
+						})}
+						{/* Grand total row */}
+						<TableRow className="bg-primary/10 font-bold border-t-2 border-primary/20">
+							<TableCell className="text-base">الإجمالي</TableCell>
+							<TableCell className="text-center text-base" dir="ltr">
+								{formatNum(grandMaterial)}
+							</TableCell>
+							<TableCell className="text-center text-base" dir="ltr">
+								{formatNum(grandLabor)}
+							</TableCell>
+							<TableCell className="text-center text-base" dir="ltr">
+								{formatNum(grandTotal)}
+							</TableCell>
+							{buildingArea > 0 && (
+								<TableCell className="text-center text-base" dir="ltr">
+									{formatNum(grandTotal / buildingArea)}
+								</TableCell>
+							)}
+						</TableRow>
+					</TableBody>
+				</Table>
+				{/* Cost per sqm highlight */}
+				{buildingArea > 0 && (
+					<div className="px-4 py-4 border-t border-border bg-muted/20 text-center">
+						<span className="text-sm text-muted-foreground">تكلفة المتر المسطح: </span>
+						<span className="text-2xl font-bold text-primary" dir="ltr">
+							{formatNum(grandTotal / buildingArea)} ر.س/م²
+						</span>
+					</div>
+				)}
 			</div>
 
 			{/* Overhead / Admin / Contingency */}

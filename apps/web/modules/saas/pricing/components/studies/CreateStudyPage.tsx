@@ -204,7 +204,7 @@ export function CreateStudyPage({
 	};
 
 	return (
-		<div className="mx-auto max-w-3xl space-y-8 py-6" dir="rtl">
+		<div className="mx-auto max-w-4xl space-y-8 py-6" dir="rtl">
 			{/* Page Header */}
 			<div className="flex items-center gap-3">
 				<Button
@@ -233,7 +233,7 @@ export function CreateStudyPage({
 						</p>
 					</div>
 
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 						{GOALS.map((goal) => {
 							const Icon = goal.icon;
 							const isSelected = selectedGoal === goal.value;
@@ -244,26 +244,26 @@ export function CreateStudyPage({
 									type="button"
 									onClick={() => setSelectedGoal(goal.value)}
 									className={cn(
-										"group flex flex-col items-start gap-3 rounded-xl border-2 p-4 text-right transition-all",
+										"group flex flex-col items-center gap-4 rounded-2xl border-2 p-6 text-center transition-all hover:shadow-lg",
 										isSelected
-											? "border-primary bg-primary/5 shadow-sm"
+											? "border-primary bg-primary/5 shadow-md"
 											: "border-border hover:border-primary/30 hover:bg-muted/30",
 									)}
 								>
 									<div
 										className={cn(
-											"flex h-10 w-10 items-center justify-center rounded-xl transition-colors",
+											"flex h-14 w-14 items-center justify-center rounded-2xl transition-colors",
 											isSelected
 												? "bg-primary text-primary-foreground"
 												: "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary",
 										)}
 									>
-										<Icon className="h-5 w-5" />
+										<Icon className="h-7 w-7" />
 									</div>
-									<div className="space-y-1">
+									<div className="space-y-1.5">
 										<div
 											className={cn(
-												"font-semibold text-sm",
+												"font-bold text-base",
 												isSelected ? "text-primary" : "text-foreground",
 											)}
 										>
@@ -274,7 +274,7 @@ export function CreateStudyPage({
 										</div>
 										<div
 											className={cn(
-												"mt-1.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium leading-tight",
+												"mt-2 inline-block rounded-full px-2.5 py-0.5 text-[10px] font-medium leading-tight",
 												isSelected
 													? "bg-primary/10 text-primary"
 													: "bg-muted text-muted-foreground",
@@ -415,6 +415,7 @@ export function CreateStudyPage({
 						<Button
 							type="button"
 							variant="outline"
+							size="lg"
 							onClick={() => router.back()}
 							className="rounded-xl px-6"
 						>
@@ -422,16 +423,20 @@ export function CreateStudyPage({
 						</Button>
 						<Button
 							type="submit"
+							size="lg"
 							disabled={createMutation.isPending}
-							className="rounded-xl px-8"
+							className="rounded-xl px-10 gap-2 text-base"
 						>
 							{createMutation.isPending ? (
 								<>
-									<Loader2 className="ml-2 h-4 w-4 animate-spin" />
+									<Loader2 className="h-4 w-4 animate-spin" />
 									جاري الإنشاء...
 								</>
 							) : (
-								<>إنشاء الدراسة</>
+								<>
+									إنشاء الدراسة
+									<ArrowLeft className="h-4 w-4" />
+								</>
 							)}
 						</Button>
 					</div>

@@ -1,5 +1,15 @@
 "use client";
 
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableFooter,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@ui/components/table";
+
 interface ProfitAnalysisData {
 	totalCost: number;
 	overheadAmount: number;
@@ -28,84 +38,86 @@ export function ProfitAnalysisCard({ data }: ProfitAnalysisCardProps) {
 	const fmt = (n: number) =>
 		Number(n).toLocaleString("ar-SA", { maximumFractionDigits: 2 });
 
-	return (
-		<div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-5 space-y-4">
-			<h4 className="font-semibold">تحليل الأرباح</h4>
+	const rows: { label: string; value: number; isSeparator?: boolean }[] = [
+		{ label: "التكلفة المباشرة", value: data.totalCost },
+		...(data.profitAmount > 0
+			? [{ label: `هامش الربح (${fmt(data.profitPercent)}%)`, value: data.profitAmount }]
+			: []),
+		...(data.overheadAmount > 0
+			? [{ label: "المصاريف الإدارية", value: data.overheadAmount }]
+			: []),
+		...(data.contingencyAmount > 0
+			? [{ label: "الاحتياط", value: data.contingencyAmount }]
+			: []),
+		{ label: "المجموع قبل الضريبة", value: data.sellingPriceBeforeVat, isSeparator: true },
+		...(data.vatAmount > 0
+			? [{ label: "ضريبة القيمة المضافة (15%)", value: data.vatAmount }]
+			: []),
+	];
 
-			<div className="space-y-2 text-sm">
-				<div className="flex items-center justify-between">
-					<span className="text-muted-foreground">إجمالي التكلفة</span>
-					<span dir="ltr">{fmt(data.totalCost)} ر.س</span>
-				</div>
-				{data.overheadAmount > 0 && (
-					<div className="flex items-center justify-between">
-						<span className="text-muted-foreground">مصاريف عامة</span>
-						<span dir="ltr">{fmt(data.overheadAmount)} ر.س</span>
-					</div>
-				)}
-				<div className="flex items-center justify-between">
-					<span className="text-muted-foreground">
-						هامش الربح ({fmt(data.profitPercent)}%)
-					</span>
-					<span dir="ltr">{fmt(data.profitAmount)} ر.س</span>
-				</div>
-				{data.contingencyAmount > 0 && (
-					<div className="flex items-center justify-between">
-						<span className="text-muted-foreground">احتياطي</span>
-						<span dir="ltr">{fmt(data.contingencyAmount)} ر.س</span>
-					</div>
-				)}
-				<div className="border-t border-primary/20 pt-2">
-					<div className="flex items-center justify-between">
-						<span className="font-medium">سعر البيع (قبل الضريبة)</span>
-						<span className="font-medium" dir="ltr">
-							{fmt(data.sellingPriceBeforeVat)} ر.س
-						</span>
-					</div>
-				</div>
-				{data.vatAmount > 0 && (
-					<div className="flex items-center justify-between">
-						<span className="text-muted-foreground">ضريبة القيمة المضافة (15%)</span>
-						<span dir="ltr">{fmt(data.vatAmount)} ر.س</span>
-					</div>
-				)}
-				<div className="border-t border-primary/20 pt-2">
-					<div className="flex items-center justify-between">
-						<span className="font-semibold text-base">الإجمالي النهائي</span>
-						<span className="text-xl font-bold text-primary" dir="ltr">
-							{fmt(data.grandTotal)} ر.س
-						</span>
-					</div>
-				</div>
+	return (
+		<div className="rounded-xl border border-border bg-card overflow-hidden">
+			<div className="p-4 pb-2">
+				<h4 className="font-semibold text-sm">ملخص التسعير النهائي</h4>
 			</div>
 
-			{/* Per sqm breakdown */}
-			{data.buildingArea > 0 && (
-				<div className="rounded-lg border border-primary/20 bg-background/50 p-3 space-y-1.5">
-					<div className="flex items-center justify-between text-sm">
-						<span className="text-muted-foreground">تكلفة المتر المربع</span>
-						<span className="font-medium" dir="ltr">
-							{fmt(data.costPerSqm)} ر.س/م²
-						</span>
-					</div>
-					<div className="flex items-center justify-between text-sm">
-						<span className="text-muted-foreground">سعر بيع المتر</span>
-						<span className="font-medium" dir="ltr">
-							{fmt(data.pricePerSqm)} ر.س/م²
-						</span>
-					</div>
-					<div className="flex items-center justify-between text-sm">
-						<span className="text-muted-foreground">صافي الربح/م²</span>
-						<span className="font-medium text-emerald-600" dir="ltr">
-							{fmt(data.pricePerSqm - data.costPerSqm)} ر.س/م²
-						</span>
-					</div>
+			<Table>
+				<TableHeader>
+					<TableRow className="bg-muted/30">
+						<TableHead className="text-right font-medium">البيان</TableHead>
+						<TableHead className="text-left font-medium w-[180px]">المبلغ</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{rows.map((row) => (
+						<TableRow
+							key={row.label}
+							className={row.isSeparator ? "border-t-2 border-primary/20 font-medium" : ""}
+						>
+							<TableCell className="py-3">{row.label}</TableCell>
+							<TableCell className="py-3 text-left" dir="ltr">
+								{fmt(row.value)} ر.س
+							</TableCell>
+						</TableRow>
+					))}
+				</TableBody>
+				<TableFooter>
+					<TableRow className="bg-primary text-primary-foreground">
+						<TableCell className="py-4 text-base font-bold">
+							الإجمالي النهائي
+						</TableCell>
+						<TableCell className="py-4 text-left text-xl font-bold" dir="ltr">
+							{fmt(data.grandTotal)} ر.س
+						</TableCell>
+					</TableRow>
+				</TableFooter>
+			</Table>
+
+			{/* Per-sqm & profit % below the table */}
+			{(data.buildingArea > 0 || data.profitPercent > 0) && (
+				<div className="px-4 py-4 border-t border-border bg-muted/20 flex items-center justify-center gap-8 flex-wrap text-sm">
+					{data.buildingArea > 0 && (
+						<div className="text-center">
+							<span className="text-muted-foreground">سعر المتر: </span>
+							<span className="font-bold text-primary text-lg" dir="ltr">
+								{fmt(data.pricePerSqm)} ر.س/م²
+							</span>
+						</div>
+					)}
+					{data.profitPercent > 0 && (
+						<div className="text-center">
+							<span className="text-muted-foreground">نسبة الربح الفعلية: </span>
+							<span className="font-bold text-emerald-600 text-lg" dir="ltr">
+								{fmt(data.profitPercent)}%
+							</span>
+						</div>
+					)}
 				</div>
 			)}
 
 			{/* Lump sum analysis */}
 			{data.lumpSumAnalysis && (
-				<div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 p-3 space-y-1.5">
+				<div className="m-4 mt-0 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 p-3 space-y-1.5">
 					<h5 className="text-sm font-medium text-amber-700 dark:text-amber-400">
 						تحليل المقطوعية
 					</h5>

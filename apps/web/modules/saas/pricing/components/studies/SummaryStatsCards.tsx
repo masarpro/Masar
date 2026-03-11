@@ -23,48 +23,44 @@ export function SummaryStatsCards({
 		{
 			title: t("pricing.studies.summary.totalConcrete"),
 			icon: Box,
-			value: formatNumber(structural.concrete),
-			unit: t("pricing.studies.units.m3"),
+			value: structural.concrete > 0 ? formatNumber(structural.concrete) : "—",
+			unit: structural.concrete > 0 ? t("pricing.studies.units.m3") : "",
 			color: "text-blue-600",
 			bgColor: "bg-blue-50 dark:bg-blue-950/30",
 			borderColor: "border-blue-200 dark:border-blue-800",
-			show: true,
 		},
 		{
 			title: t("pricing.studies.summary.totalRebar"),
 			icon: Columns3,
-			value: formatNumber(structural.rebar / 1000, 2),
-			unit: t("pricing.studies.units.ton"),
-			subValue: `(${formatNumber(structural.rebar)} ${t("pricing.studies.units.kg")})`,
+			value: structural.rebar > 0 ? formatNumber(structural.rebar / 1000, 2) : "—",
+			unit: structural.rebar > 0 ? t("pricing.studies.units.ton") : "",
+			subValue: structural.rebar > 0 ? `(${formatNumber(structural.rebar)} ${t("pricing.studies.units.kg")})` : undefined,
 			color: "text-orange-600",
 			bgColor: "bg-orange-50 dark:bg-orange-950/30",
 			borderColor: "border-orange-200 dark:border-orange-800",
-			show: true,
 		},
 		{
 			title: "إجمالي البلوك",
 			icon: Grid3X3,
-			value: formatNumber(structural.blocks ?? 0),
-			unit: "بلوكة",
+			value: (structural.blocks ?? 0) > 0 ? formatNumber(structural.blocks ?? 0) : "—",
+			unit: (structural.blocks ?? 0) > 0 ? "بلوكة" : "",
 			color: "text-emerald-600",
 			bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
 			borderColor: "border-emerald-200 dark:border-emerald-800",
-			show: (structural.blocks ?? 0) > 0,
 		},
 		{
 			title: "إجمالي الطوبار",
 			icon: Ruler,
-			value: formatNumber(structural.formwork ?? 0),
-			unit: "م²",
+			value: (structural.formwork ?? 0) > 0 ? formatNumber(structural.formwork ?? 0) : "—",
+			unit: (structural.formwork ?? 0) > 0 ? "م²" : "",
 			color: "text-amber-600",
 			bgColor: "bg-amber-50 dark:bg-amber-950/30",
 			borderColor: "border-amber-200 dark:border-amber-800",
-			show: (structural.formwork ?? 0) > 0,
 		},
-	].filter((card) => card.show);
+	];
 
 	return (
-		<div className={`grid grid-cols-1 ${cards.length >= 4 ? 'md:grid-cols-4' : cards.length >= 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4`}>
+		<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 			{cards.map((card, index) => (
 				<Card
 					key={index}

@@ -378,33 +378,33 @@ export function PricingPageContentV2({
 	return (
 		<div className="space-y-6" dir="rtl">
 			{/* ═══ Hero cost summary card ═══ */}
-			<div className="rounded-2xl bg-gradient-to-bl from-primary/15 via-primary/5 to-background border border-primary/20 p-6">
+			<div className="rounded-2xl bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-6">
 				<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
 					<div className="space-y-1">
-						<p className="text-sm text-muted-foreground font-medium">
-							إجمالي التكلفة المحسوبة
+						<p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+							التكلفة المباشرة
 						</p>
-						<p className="text-3xl font-bold text-primary" dir="ltr">
+						<p className="text-3xl font-bold text-blue-700 dark:text-blue-300" dir="ltr">
 							{profitData ? `${formatNum(totalCost)} ر.س` : "—"}
 						</p>
 					</div>
 					<div className="flex gap-6">
 						{buildingArea > 0 && (
-							<div className="text-center">
+							<div className="text-center px-4 py-2 rounded-xl bg-blue-100/50 dark:bg-blue-900/30">
 								<p className="text-xs text-muted-foreground mb-1">
-									تكلفة المتر المربع
+									تكلفة المتر المسطح
 								</p>
-								<p className="text-lg font-semibold" dir="ltr">
+								<p className="text-lg font-bold text-blue-700 dark:text-blue-300" dir="ltr">
 									{formatNum(costPerSqm)} ر.س/م²
 								</p>
 							</div>
 						)}
 						{buildingArea > 0 && (
-							<div className="text-center">
+							<div className="text-center px-4 py-2 rounded-xl bg-blue-100/50 dark:bg-blue-900/30">
 								<p className="text-xs text-muted-foreground mb-1">
 									مساحة البناء
 								</p>
-								<p className="text-lg font-semibold" dir="ltr">
+								<p className="text-lg font-bold" dir="ltr">
 									{formatNum(buildingArea)} م²
 								</p>
 							</div>
@@ -415,25 +415,39 @@ export function PricingPageContentV2({
 
 			{/* ═══ Markup method selector ═══ */}
 			<div className="rounded-xl border border-border bg-card p-4">
-				<Label className="text-sm font-medium mb-3 block">طريقة التسعير</Label>
-				<div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+				<Label className="text-sm font-medium mb-3 block">طريقة تطبيق الهامش</Label>
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
 					{methodOptions.map((opt) => (
 						<button
 							key={opt.key}
 							type="button"
 							onClick={() => setMethod(opt.key)}
 							className={cn(
-								"flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl border-2 text-sm font-medium transition-all text-center",
+								"flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-sm transition-all text-right",
 								method === opt.key
-									? "border-primary bg-primary/5 text-primary shadow-sm"
+									? "border-primary bg-primary/5 shadow-sm"
 									: "border-border hover:border-muted-foreground/30",
 							)}
 						>
-							{opt.icon}
-							<span className="font-semibold text-xs">{opt.label}</span>
-							<span className="text-[10px] text-muted-foreground leading-tight">
-								{opt.desc}
-							</span>
+							<div
+								className={cn(
+									"h-4 w-4 shrink-0 rounded-full border-2 flex items-center justify-center",
+									method === opt.key
+										? "border-primary"
+										: "border-muted-foreground/40",
+								)}
+							>
+								{method === opt.key && (
+									<div className="h-2 w-2 rounded-full bg-primary" />
+								)}
+							</div>
+							<div className="flex items-center gap-2 flex-1">
+								<span className={cn("shrink-0", method === opt.key ? "text-primary" : "text-muted-foreground")}>{opt.icon}</span>
+								<div>
+									<span className="font-semibold text-sm block">{opt.label}</span>
+									<span className="text-xs text-muted-foreground">{opt.desc}</span>
+								</div>
+							</div>
 						</button>
 					))}
 				</div>
@@ -446,52 +460,16 @@ export function PricingPageContentV2({
 						<Percent className="h-4 w-4 text-primary" />
 						<h4 className="font-semibold text-sm">نسبة موحدة على إجمالي التكلفة</h4>
 					</div>
-					<div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-						<div className="space-y-1">
-							<Label className="text-xs">مصاريف عامة (%)</Label>
-							<Input
-								type="number"
-								className="h-9 rounded-lg"
-								dir="ltr"
-								placeholder="5"
-								value={overheadPct}
-								onChange={(e: any) => setOverheadPct(e.target.value)}
-							/>
-						</div>
-						<div className="space-y-1">
-							<Label className="text-xs">هامش الربح (%)</Label>
-							<Input
-								type="number"
-								className="h-9 rounded-lg"
-								dir="ltr"
-								placeholder="15"
-								value={profitPct}
-								onChange={(e: any) => setProfitPct(e.target.value)}
-							/>
-						</div>
-						<div className="space-y-1">
-							<Label className="text-xs">احتياطي (%)</Label>
-							<Input
-								type="number"
-								className="h-9 rounded-lg"
-								dir="ltr"
-								placeholder="2"
-								value={contingencyPct}
-								onChange={(e: any) => setContingencyPct(e.target.value)}
-							/>
-						</div>
-						<div className="space-y-1">
-							<Label className="text-xs">ضريبة القيمة المضافة</Label>
-							<label className="flex items-center gap-2 h-9 cursor-pointer">
-								<input
-									type="checkbox"
-									checked={vatIncluded || isVat}
-									onChange={(e: any) => setVatIncluded(e.target.checked)}
-									className="rounded"
-								/>
-								<span className="text-sm">تشمل (15%)</span>
-							</label>
-						</div>
+					<div className="max-w-xs space-y-1">
+						<Label className="text-xs">هامش الربح (%)</Label>
+						<Input
+							type="number"
+							className="h-9 rounded-lg"
+							dir="ltr"
+							placeholder="15"
+							value={profitPct}
+							onChange={(e: any) => setProfitPct(e.target.value)}
+						/>
 					</div>
 					{/* Live preview */}
 					<div className="rounded-lg bg-muted/30 p-3 grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
@@ -515,19 +493,6 @@ export function PricingPageContentV2({
 								</p>
 							</div>
 						)}
-					</div>
-					<div className="flex justify-end">
-						<Button
-							onClick={handleSaveUniform}
-							disabled={uniformMutation.isPending}
-							className="gap-2 rounded-xl"
-							size="sm"
-						>
-							{uniformMutation.isPending && (
-								<Loader2 className="h-4 w-4 animate-spin" />
-							)}
-							حفظ الإعدادات
-						</Button>
 					</div>
 				</div>
 			)}
@@ -699,18 +664,6 @@ export function PricingPageContentV2({
 						</div>
 					)}
 
-					<div className="flex items-center gap-3">
-						<label className="flex items-center gap-2 cursor-pointer">
-							<input
-								type="checkbox"
-								checked={vatIncluded || isVat}
-								onChange={(e: any) => setVatIncluded(e.target.checked)}
-								className="rounded"
-							/>
-							<span className="text-sm">تشمل ضريبة القيمة المضافة (15%)</span>
-						</label>
-					</div>
-
 					<div className="flex justify-end">
 						<Button
 							onClick={handleSaveManualPrice}
@@ -818,20 +771,6 @@ export function PricingPageContentV2({
 								</div>
 							)}
 
-							<div className="flex items-center gap-3">
-								<label className="flex items-center gap-2 cursor-pointer">
-									<input
-										type="checkbox"
-										checked={vatIncluded || isVat}
-										onChange={(e: any) => setVatIncluded(e.target.checked)}
-										className="rounded"
-									/>
-									<span className="text-sm">
-										تشمل ضريبة القيمة المضافة (15%)
-									</span>
-								</label>
-							</div>
-
 							<div className="flex justify-end">
 								<Button
 									onClick={handleSavePerSqm}
@@ -849,6 +788,66 @@ export function PricingPageContentV2({
 					)}
 				</div>
 			)}
+
+			{/* ═══ Additional expenses ═══ */}
+			<div className="rounded-xl border border-border bg-card p-4 space-y-4">
+				<h4 className="font-semibold text-sm">المصاريف الإضافية</h4>
+				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+					<div className="space-y-1">
+						<Label className="text-xs">المصاريف الإدارية (%)</Label>
+						<Input
+							type="number"
+							className="h-9 rounded-lg"
+							dir="ltr"
+							placeholder="5"
+							value={overheadPct}
+							onChange={(e: any) => setOverheadPct(e.target.value)}
+						/>
+						<p className="text-xs text-muted-foreground" dir="ltr">
+							= {formatNum(totalCost * overhead / 100)} ر.س
+						</p>
+					</div>
+					<div className="space-y-1">
+						<Label className="text-xs">الاحتياط (%)</Label>
+						<Input
+							type="number"
+							className="h-9 rounded-lg"
+							dir="ltr"
+							placeholder="3"
+							value={contingencyPct}
+							onChange={(e: any) => setContingencyPct(e.target.value)}
+						/>
+						<p className="text-xs text-muted-foreground" dir="ltr">
+							= {formatNum(totalCost * contingency / 100)} ر.س
+						</p>
+					</div>
+					<div className="space-y-1">
+						<Label className="text-xs">ضريبة القيمة المضافة</Label>
+						<label className="flex items-center gap-2 h-9 cursor-pointer">
+							<input
+								type="checkbox"
+								checked={vatIncluded || isVat}
+								onChange={(e: any) => setVatIncluded(e.target.checked)}
+								className="rounded"
+							/>
+							<span className="text-sm">تشمل (15%)</span>
+						</label>
+					</div>
+				</div>
+				<div className="flex justify-end">
+					<Button
+						onClick={handleSaveUniform}
+						disabled={uniformMutation.isPending}
+						className="gap-2 rounded-xl"
+						size="sm"
+					>
+						{uniformMutation.isPending && (
+							<Loader2 className="h-4 w-4 animate-spin" />
+						)}
+						حفظ الإعدادات
+					</Button>
+				</div>
+			</div>
 
 			{/* ═══ Per-item price adjustment table ═══ */}
 			{itemsWithPrices.length > 0 && (

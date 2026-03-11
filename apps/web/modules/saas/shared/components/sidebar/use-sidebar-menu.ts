@@ -31,6 +31,8 @@ import {
 	Wallet,
 	Banknote,
 	Building2,
+	Zap,
+	UserPlus,
 } from "lucide-react";
 
 export interface SidebarMenuChild {
@@ -267,9 +269,9 @@ export function useSidebarMenu(): {
 												icon: Calculator,
 											},
 											{
-												id: "study-selling-price",
+												id: "study-pricing",
 												label: t("pricing.pipeline.sellingPrice"),
-												href: `${orgPrefix}/pricing/studies/${studyId}/selling-price`,
+												href: `${orgPrefix}/pricing/studies/${studyId}/pricing`,
 												icon: DollarSign,
 											},
 											{
@@ -285,6 +287,18 @@ export function useSidebarMenu(): {
 									label: t("pricing.shell.sections.quotations"),
 									href: `${orgPrefix}/pricing/quotations`,
 									icon: FileSpreadsheet,
+								},
+								{
+									id: "pricing-quick",
+									label: "التسعير السريع",
+									href: `${orgPrefix}/pricing/quick`,
+									icon: Zap,
+								},
+								{
+									id: "pricing-leads",
+									label: "العملاء المحتملون",
+									href: `${orgPrefix}/pricing/leads`,
+									icon: UserPlus,
 								},
 							],
 						},

@@ -5,8 +5,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
+import { Card, CardContent } from "@ui/components/card";
 import { cn } from "@ui/lib";
-import { Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { ChevronDown, Hammer, Loader2, Plus, Save, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -72,6 +73,7 @@ export function StructuralCostingTab({
 	const [salaryInsurance, setSalaryInsurance] = useState("");
 	const [salaryHousing, setSalaryHousing] = useState("");
 	const [initialized, setInitialized] = useState(false);
+	const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
 	// ─── Queries ───
 	const { data: items, isLoading: itemsLoading } = useQuery(
@@ -447,69 +449,85 @@ export function StructuralCostingTab({
 				</div>
 			)}
 
-			{/* ─── Subcontractor table ─── */}
+			{/* ─── Subcontractor: Expandable item cards ─── */}
 			{laborMode === "subcontractor" && (
-				<div className="rounded-xl border border-border bg-card overflow-hidden">
-					<div className="overflow-x-auto">
-						<table className="w-full text-sm">
-							<thead>
-								<tr className="border-b bg-muted/30 text-muted-foreground">
-									<th className="px-3 py-2.5 text-right font-medium">البند</th>
-									<th className="px-3 py-2.5 text-center font-medium">الكمية</th>
-									<th className="px-3 py-2.5 text-center font-medium">الوحدة</th>
-									<th className="px-3 py-2.5 text-center font-medium">سعر المادة</th>
-									<th className="px-3 py-2.5 text-center font-medium">المصنعية</th>
-									<th className="px-3 py-2.5 text-center font-medium">التشوين%</th>
-									<th className="px-3 py-2.5 text-center font-medium">الإجمالي</th>
-								</tr>
-							</thead>
-							<tbody>
-								{isLoading && (
-									<tr>
-										<td colSpan={7} className="text-center py-8">
-											<Loader2 className="h-5 w-5 animate-spin mx-auto text-muted-foreground" />
-										</td>
-									</tr>
-								)}
-								{!isLoading && (((items as any) ?? []) as any[]).length === 0 && (
-									<tr>
-										<td
-											colSpan={7}
-											className="text-center py-8 text-muted-foreground"
-										>
-											لا توجد بنود إنشائية
-										</td>
-									</tr>
-								)}
-								{(((items as any) ?? []) as any[]).map((item) => {
-									const costingItem = findCostingItem(item);
-									const key = costingItem?.id ?? item.id;
-									const p = prices[key] ?? {
-										material: "",
-										labor: "",
-										storage: "",
-									};
-									const qty = Number(item.quantity);
-									const row = computeRowTotal(qty, p, "subcontractor");
+				<div className="space-y-3">
+					{isLoading && (
+						<div className="flex justify-center py-8">
+							<Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+						</div>
+					)}
+					{!isLoading && (((items as any) ?? []) as any[]).length === 0 && (
+						<div className="text-center py-8 text-muted-foreground">
+							لا توجد بنود إنشائية
+						</div>
+					)}
+					{(((items as any) ?? []) as any[]).map((item) => {
+						const costingItem = findCostingItem(item);
+						const key = costingItem?.id ?? item.id;
+						const p = prices[key] ?? {
+							material: "",
+							labor: "",
+							storage: "",
+						};
+						const qty = Number(item.quantity);
+						const row = computeRowTotal(qty, p, "subcontractor");
+						const isExpanded = expandedItems.has(item.id);
 
-									return (
-										<tr
-											key={item.id}
-											className="border-b last:border-0 hover:bg-muted/20"
+						return (
+							<Card key={item.id} className="overflow-hidden">
+								{/* Collapsed header */}
+								<button
+									type="button"
+									onClick={() =>
+										setExpandedItems((prev) => {
+											const next = new Set(prev);
+											if (next.has(item.id)) next.delete(item.id);
+											else next.add(item.id);
+											return next;
+										})
+									}
+									className="w-full flex items-center gap-3 p-4 hover:bg-muted/20 transition-colors text-right"
+								>
+									<div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30">
+										<Hammer className="h-4 w-4 text-blue-600" />
+									</div>
+									<div className="flex-1 min-w-0">
+										<span className="font-medium text-sm truncate block">
+											{item.name}
+										</span>
+										<span className="text-xs text-muted-foreground" dir="ltr">
+											{formatNum(qty)} {item.unit}
+										</span>
+									</div>
+									<div className="text-left shrink-0">
+										<span
+											className="font-semibold text-sm"
+											dir="ltr"
 										>
-											<td className="px-3 py-2 font-medium">
-												{item.name}
-											</td>
-											<td className="px-3 py-2 text-center" dir="ltr">
-												{formatNum(qty)}
-											</td>
-											<td className="px-3 py-2 text-center">
-												{item.unit}
-											</td>
-											<td className="px-3 py-2">
+											{row.total > 0
+												? `${formatNum(row.total)} ر.س`
+												: "—"}
+										</span>
+									</div>
+									<ChevronDown
+										className={cn(
+											"h-4 w-4 text-muted-foreground transition-transform shrink-0",
+											isExpanded && "rotate-180",
+										)}
+									/>
+								</button>
+
+								{/* Expanded content */}
+								{isExpanded && (
+									<CardContent className="border-t border-border px-4 pb-4 pt-3 space-y-4">
+										{/* Price inputs grid */}
+										<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+											<div className="space-y-1">
+												<Label className="text-xs">سعر المادة (ر.س/وحدة)</Label>
 												<Input
 													type="number"
-													className="h-8 w-20 mx-auto text-center rounded-lg"
+													className="h-9 rounded-lg"
 													dir="ltr"
 													placeholder="0"
 													value={p.material}
@@ -525,11 +543,17 @@ export function StructuralCostingTab({
 														}))
 													}
 												/>
-											</td>
-											<td className="px-3 py-2">
+												{p.material && qty > 0 && (
+													<p className="text-xs text-muted-foreground" dir="ltr">
+														= {formatNum(Number(p.material) * qty)} ر.س
+													</p>
+												)}
+											</div>
+											<div className="space-y-1">
+												<Label className="text-xs">المصنعية (ر.س/وحدة)</Label>
 												<Input
 													type="number"
-													className="h-8 w-20 mx-auto text-center rounded-lg"
+													className="h-9 rounded-lg"
 													dir="ltr"
 													placeholder="0"
 													value={p.labor}
@@ -545,11 +569,17 @@ export function StructuralCostingTab({
 														}))
 													}
 												/>
-											</td>
-											<td className="px-3 py-2">
+												{p.labor && qty > 0 && (
+													<p className="text-xs text-muted-foreground" dir="ltr">
+														= {formatNum(Number(p.labor) * qty)} ر.س
+													</p>
+												)}
+											</div>
+											<div className="space-y-1">
+												<Label className="text-xs">التشوين (%)</Label>
 												<Input
 													type="number"
-													className="h-8 w-16 mx-auto text-center rounded-lg"
+													className="h-9 rounded-lg"
 													dir="ltr"
 													placeholder="2"
 													value={p.storage}
@@ -565,40 +595,31 @@ export function StructuralCostingTab({
 														}))
 													}
 												/>
-											</td>
-											<td
-												className="px-3 py-2 text-center font-medium"
-												dir="ltr"
-											>
-												{row.total > 0
-													? formatNum(row.total)
-													: "—"}
-											</td>
-										</tr>
-									);
-								})}
-							</tbody>
-							{/* Footer total */}
-							{(((items as any) ?? []) as any[]).length > 0 && subcontractorGrandTotal > 0 && (
-								<tfoot>
-									<tr className="bg-muted/40 font-semibold">
-										<td
-											colSpan={6}
-											className="px-3 py-2.5 text-left"
-										>
-											الإجمالي
-										</td>
-										<td
-											className="px-3 py-2.5 text-center"
-											dir="ltr"
-										>
-											{formatNum(subcontractorGrandTotal)} ر.س
-										</td>
-									</tr>
-								</tfoot>
-							)}
-						</table>
-					</div>
+											</div>
+										</div>
+
+										{/* Item total summary */}
+										<div className="rounded-lg bg-primary/5 p-3">
+											<div className="flex items-center justify-between">
+												<span className="text-sm font-medium">إجمالي البند</span>
+												<span className="text-lg font-bold text-primary" dir="ltr">
+													{row.total > 0 ? `${formatNum(row.total)} ر.س` : "—"}
+												</span>
+											</div>
+											{row.total > 0 && qty > 0 && (
+												<div className="flex items-center justify-between mt-1">
+													<span className="text-xs text-muted-foreground">تكلفة الوحدة</span>
+													<span className="text-xs font-medium" dir="ltr">
+														{formatNum(row.total / qty)} ر.س/{item.unit}
+													</span>
+												</div>
+											)}
+										</div>
+									</CardContent>
+								)}
+							</Card>
+						);
+					})}
 				</div>
 			)}
 

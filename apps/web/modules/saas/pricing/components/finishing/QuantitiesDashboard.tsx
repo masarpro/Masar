@@ -632,20 +632,27 @@ export function QuantitiesDashboard({
 				<div className="flex items-center gap-2">
 					<span className="text-sm text-muted-foreground font-medium">{t("viewMode")}:</span>
 					{([
-						["byCategory", t("viewByCategory"), LayoutList],
-						["byFloor", t("viewByFloor"), Layers],
-						["byProject", t("viewByProject"), Building2],
-					] as [string, string, typeof LayoutList][]).map(([mode, label, Icon]) => (
-						<Button
-							key={mode}
-							variant={viewMode === mode ? "secondary" : "ghost"}
-							size="sm"
-							className={`text-sm h-8 px-3 rounded-lg gap-1.5 ${viewMode === mode ? "font-medium" : ""}`}
-							onClick={() => setViewMode(mode as ViewMode)}
-						>
-							<Icon className="h-3.5 w-3.5" />
-							{label}
-						</Button>
+						["byCategory", t("viewByCategory"), LayoutList, false],
+						["byFloor", t("viewByFloor"), Layers, !config?.floors?.length],
+						["byProject", t("viewByProject"), Building2, false],
+					] as [string, string, typeof LayoutList, boolean][]).map(([mode, label, Icon, isDisabled]) => (
+						<div key={mode} className="relative group">
+							<Button
+								variant={viewMode === mode ? "secondary" : "ghost"}
+								size="sm"
+								className={`text-sm h-8 px-3 rounded-lg gap-1.5 ${viewMode === mode ? "font-medium" : ""} ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+								onClick={() => !isDisabled && setViewMode(mode as ViewMode)}
+								disabled={isDisabled}
+							>
+								<Icon className="h-3.5 w-3.5" />
+								{label}
+							</Button>
+							{isDisabled && (
+								<div className="absolute bottom-full mb-1 right-1/2 translate-x-1/2 px-2 py-1 text-xs bg-popover text-popover-foreground border rounded shadow-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+									سيتوفر قريباً
+								</div>
+							)}
+						</div>
 					))}
 				</div>
 
