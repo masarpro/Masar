@@ -551,6 +551,8 @@ export async function getOrganizationQuotations(
 				createdBy: { select: { id: true, name: true } },
 				invoices: { select: { id: true, invoiceNo: true, status: true } },
 				lead: { select: { id: true, name: true, status: true } },
+				costStudy: { select: { id: true, name: true } },
+				displayConfig: { select: { format: true } },
 				_count: { select: { items: true } },
 			},
 			orderBy: { createdAt: "desc" },
@@ -575,6 +577,8 @@ export async function getQuotationById(id: string, organizationId: string) {
 			template: { select: { id: true, name: true, content: true, settings: true } },
 			createdBy: { select: { id: true, name: true, email: true } },
 			items: { orderBy: { sortOrder: "asc" } },
+			costStudy: { select: { id: true, name: true } },
+			displayConfig: true,
 		},
 	});
 }

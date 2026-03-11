@@ -1,5 +1,5 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { QuotationPreview } from "@saas/pricing/components/quotations/QuotationPreview";
+import { QuotationPreviewSwitch } from "@saas/pricing/components/quotation-builder/QuotationPreviewSwitch";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -36,7 +36,7 @@ export default async function QuotationPreviewPage({
 			sectionKey="quotations"
 			pageTitle={t("pricing.quotations.preview")}
 		>
-			<QuotationPreview
+			<QuotationPreviewSwitch
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}
 				quotationId={quotationId}

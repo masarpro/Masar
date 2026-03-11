@@ -30,6 +30,15 @@ const STAGE_LABELS: Record<StageName, string> = {
 	quotation: "عرض السعر",
 };
 
+// Map old stage names → new StudyStage.stage values
+const STAGE_TO_STUDY_STAGE = {
+	quantities: "QUANTITIES",
+	specs: "SPECIFICATIONS",
+	costing: "COSTING",
+	pricing: "PRICING",
+	quotation: "QUOTATION",
+} as const;
+
 // ═══════════════════════════════════════════════════════════════
 // GET STAGES
 // ═══════════════════════════════════════════════════════════════
@@ -175,6 +184,33 @@ export const approveStage = subscriptionProcedure
 			},
 		});
 
+		// Sync to StudyStage table
+		const studyStageName = STAGE_TO_STUDY_STAGE[input.stage];
+		if (studyStageName) {
+			await db.studyStage.updateMany({
+				where: { costStudyId: input.studyId, stage: studyStageName },
+				data: {
+					status: "APPROVED",
+					approvedById: context.user.id,
+					approvedAt: new Date(),
+				},
+			});
+
+			if (stageIndex < STAGE_ORDER.length - 1) {
+				const nextStudyStageName = STAGE_TO_STUDY_STAGE[STAGE_ORDER[stageIndex + 1]];
+				if (nextStudyStageName) {
+					await db.studyStage.updateMany({
+						where: {
+							costStudyId: input.studyId,
+							stage: nextStudyStageName,
+							status: "NOT_STARTED",
+						},
+						data: { status: "DRAFT" },
+					});
+				}
+			}
+		}
+
 		return {
 			stages: {
 				quantities: updated.quantitiesStatus,
@@ -246,6 +282,33 @@ export const reopenStage = subscriptionProcedure
 				quotationStatus: true,
 			},
 		});
+
+		// Sync to StudyStage table
+		const studyStageName = STAGE_TO_STUDY_STAGE[input.stage];
+		if (studyStageName) {
+			await db.studyStage.updateMany({
+				where: { costStudyId: input.studyId, stage: studyStageName },
+				data: {
+					status: "DRAFT",
+					approvedById: null,
+					approvedAt: null,
+				},
+			});
+
+			for (let i = stageIndex + 1; i < STAGE_ORDER.length; i++) {
+				const nextStudyStageName = STAGE_TO_STUDY_STAGE[STAGE_ORDER[i]];
+				if (nextStudyStageName) {
+					await db.studyStage.updateMany({
+						where: { costStudyId: input.studyId, stage: nextStudyStageName },
+						data: {
+							status: "NOT_STARTED",
+							approvedById: null,
+							approvedAt: null,
+						},
+					});
+				}
+			}
+		}
 
 		return {
 			stages: {

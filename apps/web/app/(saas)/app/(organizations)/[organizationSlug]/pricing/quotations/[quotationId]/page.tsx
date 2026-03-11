@@ -1,5 +1,6 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { QuotationForm } from "@saas/pricing/components/quotations/QuotationForm";
+import { QuotationStudyBanner } from "@saas/pricing/components/quotation-builder/QuotationStudyBanner";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -38,12 +39,19 @@ export default async function EditQuotationPage({
 			pageTitle={t("pricing.quotations.edit")}
 			hideSubPageHeader
 		>
-			<QuotationForm
-				organizationId={activeOrganization.id}
-				organizationSlug={organizationSlug}
-				mode="edit"
-				quotationId={quotationId}
-			/>
+			<div className="space-y-4">
+				<QuotationStudyBanner
+					organizationId={activeOrganization.id}
+					organizationSlug={organizationSlug}
+					quotationId={quotationId}
+				/>
+				<QuotationForm
+					organizationId={activeOrganization.id}
+					organizationSlug={organizationSlug}
+					mode="edit"
+					quotationId={quotationId}
+				/>
+			</div>
 		</PricingShell>
 	);
 }

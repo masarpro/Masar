@@ -37,6 +37,7 @@ import { getStructuralSpecs, setStructuralSpecs } from "./procedures/structural-
 import { costingGenerateItems, costingGetItems, costingUpdateItem, costingBulkUpdate, costingSetSectionLabor, costingGetSummary } from "./procedures/costing";
 import { markupGetSettings, markupSetUniform, markupSetSectionMarkups, markupGetProfitAnalysis } from "./procedures/markup";
 import { getSpecifications, updateItemSpec, applyTemplateToAll, applySpecToAllFloors, generateBOM, getBOM } from "./procedures/specifications";
+import { createStudyQuotation } from "./procedures/create-study-quotation";
 
 export const quantitiesRouter = {
 	list,
@@ -135,4 +136,5 @@ export const quantitiesRouter = {
 		generateBOM,
 		getBOM,
 	},
+	createStudyQuotation,
 };

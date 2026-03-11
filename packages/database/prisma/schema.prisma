@@ -1309,6 +1309,7 @@ model CostStudy {
   mepItems        MEPItem[]
   laborItems      LaborItem[]
   quotes          Quote[]
+  quotations      Quotation[]
   lead            Lead?
   boqItems        ProjectBOQItem[]
   costingItems    CostingItem[]
@@ -1679,6 +1680,8 @@ model Quote {
 
   pdfUrl String? @map("pdf_url")
   status String  @default("draft")
+
+  displayConfig QuotationDisplayConfig?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -3342,6 +3345,20 @@ enum QuotationStatus {
   CONVERTED     // تم تحويله لفاتورة
 }
 
+enum QuotationFormat {
+  DETAILED_BOQ  // تفصيلي — كميات + مواصفات + سعر لكل بند
+  PER_SQM       // بالمتر المربع — مواصفات + سعر/م²
+  LUMP_SUM      // مقطوعية — مواصفات + مبلغ إجمالي فقط
+  CUSTOM        // مخصص — يختار المستخدم ما يظهر
+}
+
+enum QuotationGrouping {
+  BY_SECTION    // بحسب القسم (إنشائي، تشطيبات، MEP)
+  BY_FLOOR      // بحسب الدور
+  BY_ITEM       // بحسب نوع البند
+  FLAT          // بدون تجميع
+}
+
 // ═══════════════════════════════════════════════════════════
 // Leads Enums — العملاء المحتملون
 // ═══════════════════════════════════════════════════════════
@@ -3669,15 +3686,21 @@ model Quotation {
   createdAt       DateTime        @default(now()) @map("created_at")
   updatedAt       DateTime        @updatedAt @map("updated_at")
 
+  // ربط بالدراسة (لسحب البيانات)
+  costStudyId     String?         @map("cost_study_id")
+  costStudy       CostStudy?      @relation(fields: [costStudyId], references: [id], onDelete: SetNull)
+
   // العلاقات
   items           QuotationItem[]
   invoices        FinanceInvoice[] // الفواتير المحولة من هذا العرض
   lead            Lead?
+  displayConfig   QuotationDisplayConfig?
 
   @@index([organizationId])
   @@index([organizationId, status])
   @@index([organizationId, clientId])
   @@index([organizationId, projectId])
+  @@index([costStudyId])
   @@map("quotations")
 }
 
@@ -3702,6 +3725,56 @@ model QuotationItem {
 
   @@index([quotationId, sortOrder])
   @@map("quotation_items")
+}
+
+// إعدادات عرض عرض السعر
+model QuotationDisplayConfig {
+  id                  String              @id @default(cuid())
+  quotationId         String?             @unique @map("quotation_id")
+  quotation           Quotation?          @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  quoteId             String?             @unique @map("quote_id")
+  quote               Quote?              @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  // الصيغة
+  format              QuotationFormat     @default(DETAILED_BOQ)
+  grouping            QuotationGrouping   @default(BY_SECTION)
+
+  // الأعمدة المعروضة
+  showItemNumber      Boolean             @default(true)  @map("show_item_number")
+  showDescription     Boolean             @default(true)  @map("show_description")
+  showSpecifications  Boolean             @default(true)  @map("show_specifications")
+  showQuantity        Boolean             @default(true)  @map("show_quantity")
+  showUnit            Boolean             @default(true)  @map("show_unit")
+  showUnitPrice       Boolean             @default(true)  @map("show_unit_price")
+  showItemTotal       Boolean             @default(true)  @map("show_item_total")
+
+  // الأقسام المعروضة
+  showStructural      Boolean             @default(true)  @map("show_structural")
+  showFinishing       Boolean             @default(true)  @map("show_finishing")
+  showMEP             Boolean             @default(true)  @map("show_mep")
+  showManualItems     Boolean             @default(true)  @map("show_manual_items")
+  showMaterialDetails Boolean             @default(false) @map("show_material_details")
+
+  // المجاميع
+  showSectionSubtotal Boolean             @default(true)  @map("show_section_subtotal")
+  showSubtotal        Boolean             @default(true)  @map("show_subtotal")
+  showDiscount        Boolean             @default(true)  @map("show_discount")
+  showVAT             Boolean             @default(true)  @map("show_vat")
+  showGrandTotal      Boolean             @default(true)  @map("show_grand_total")
+  showPricePerSqm     Boolean             @default(false) @map("show_price_per_sqm")
+
+  // بيانات إضافية لصيغة المتر المربع
+  totalArea           Decimal?            @map("total_area") @db.Decimal(15, 2)
+  pricePerSqm         Decimal?            @map("price_per_sqm") @db.Decimal(15, 2)
+
+  // بيانات إضافية لصيغة المقطوعية
+  lumpSumAmount       Decimal?            @map("lump_sum_amount") @db.Decimal(15, 2)
+  lumpSumDescription  String?             @map("lump_sum_description") @db.Text
+
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+
+  @@map("quotation_display_configs")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

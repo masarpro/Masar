@@ -37,7 +37,15 @@ import {
 	ArrowRightLeft,
 	Send,
 	UserSearch,
+	FlaskConical,
 } from "lucide-react";
+
+const FORMAT_LABELS: Record<string, string> = {
+	DETAILED_BOQ: "تفصيلي",
+	PER_SQM: "م²",
+	LUMP_SUM: "مقطوعية",
+	CUSTOM: "مخصص",
+};
 import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
@@ -113,6 +121,8 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 							<TableRow className="bg-muted/30">
 								<TableHead className="font-medium">{t("pricing.quotations.columns.number")}</TableHead>
 								<TableHead className="font-medium">{t("pricing.quotations.columns.client")}</TableHead>
+								<TableHead className="hidden md:table-cell font-medium">الصيغة</TableHead>
+								<TableHead className="hidden md:table-cell font-medium">الدراسة</TableHead>
 								<TableHead className="hidden sm:table-cell font-medium">{t("pricing.quotations.columns.date")}</TableHead>
 								<TableHead className="hidden sm:table-cell font-medium">{t("pricing.quotations.columns.validUntil")}</TableHead>
 								<TableHead className="font-medium">{t("pricing.quotations.columns.amount")}</TableHead>
@@ -151,6 +161,28 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 												</Link>
 											)}
 										</div>
+									</TableCell>
+									<TableCell className="hidden md:table-cell">
+										{(quotation as any).displayConfig?.format ? (
+											<span className="inline-flex items-center rounded-md border border-border bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium">
+												{FORMAT_LABELS[(quotation as any).displayConfig.format] ?? "—"}
+											</span>
+										) : (
+											<span className="text-muted-foreground text-xs">يدوي</span>
+										)}
+									</TableCell>
+									<TableCell className="hidden md:table-cell">
+										{(quotation as any).costStudy ? (
+											<Link
+												href={`/app/${organizationSlug}/pricing/studies/${(quotation as any).costStudy.id}`}
+												className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+											>
+												<FlaskConical className="h-3 w-3" />
+												{(quotation as any).costStudy.name}
+											</Link>
+										) : (
+											<span className="text-muted-foreground text-xs">—</span>
+										)}
 									</TableCell>
 									<TableCell className="hidden sm:table-cell text-muted-foreground">
 										{formatDate(quotation.createdAt)}

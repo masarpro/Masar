@@ -457,7 +457,7 @@ export type ClientContactScalarFieldEnum = z.infer<typeof ClientContactScalarFie
 
 // File: QuotationScalarFieldEnum.schema.ts
 
-export const QuotationScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'quotationNo', 'clientId', 'clientName', 'clientCompany', 'clientPhone', 'clientEmail', 'clientAddress', 'clientTaxNumber', 'projectId', 'status', 'subtotal', 'discountPercent', 'discountAmount', 'vatPercent', 'vatAmount', 'totalAmount', 'validUntil', 'paymentTerms', 'deliveryTerms', 'warrantyTerms', 'notes', 'templateId', 'viewedAt', 'sentAt', 'acceptedAt', 'rejectedAt', 'createdById', 'createdAt', 'updatedAt'])
+export const QuotationScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'quotationNo', 'clientId', 'clientName', 'clientCompany', 'clientPhone', 'clientEmail', 'clientAddress', 'clientTaxNumber', 'projectId', 'status', 'subtotal', 'discountPercent', 'discountAmount', 'vatPercent', 'vatAmount', 'totalAmount', 'validUntil', 'paymentTerms', 'deliveryTerms', 'warrantyTerms', 'notes', 'templateId', 'viewedAt', 'sentAt', 'acceptedAt', 'rejectedAt', 'createdById', 'createdAt', 'updatedAt', 'costStudyId'])
 
 export type QuotationScalarFieldEnum = z.infer<typeof QuotationScalarFieldEnumSchema>;
 
@@ -466,6 +466,12 @@ export type QuotationScalarFieldEnum = z.infer<typeof QuotationScalarFieldEnumSc
 export const QuotationItemScalarFieldEnumSchema = z.enum(['id', 'quotationId', 'description', 'quantity', 'unit', 'unitPrice', 'totalPrice', 'sortOrder', 'createdAt', 'updatedAt'])
 
 export type QuotationItemScalarFieldEnum = z.infer<typeof QuotationItemScalarFieldEnumSchema>;
+
+// File: QuotationDisplayConfigScalarFieldEnum.schema.ts
+
+export const QuotationDisplayConfigScalarFieldEnumSchema = z.enum(['id', 'quotationId', 'quoteId', 'format', 'grouping', 'showItemNumber', 'showDescription', 'showSpecifications', 'showQuantity', 'showUnit', 'showUnitPrice', 'showItemTotal', 'showStructural', 'showFinishing', 'showMEP', 'showManualItems', 'showMaterialDetails', 'showSectionSubtotal', 'showSubtotal', 'showDiscount', 'showVAT', 'showGrandTotal', 'showPricePerSqm', 'totalArea', 'pricePerSqm', 'lumpSumAmount', 'lumpSumDescription', 'createdAt', 'updatedAt'])
+
+export type QuotationDisplayConfigScalarFieldEnum = z.infer<typeof QuotationDisplayConfigScalarFieldEnumSchema>;
 
 // File: FinanceInvoiceScalarFieldEnum.schema.ts
 
@@ -1066,6 +1072,18 @@ export type ClientType = z.infer<typeof ClientTypeSchema>;
 export const QuotationStatusSchema = z.enum(['DRAFT', 'SENT', 'VIEWED', 'ACCEPTED', 'REJECTED', 'EXPIRED', 'CONVERTED'])
 
 export type QuotationStatus = z.infer<typeof QuotationStatusSchema>;
+
+// File: QuotationFormat.schema.ts
+
+export const QuotationFormatSchema = z.enum(['DETAILED_BOQ', 'PER_SQM', 'LUMP_SUM', 'CUSTOM'])
+
+export type QuotationFormat = z.infer<typeof QuotationFormatSchema>;
+
+// File: QuotationGrouping.schema.ts
+
+export const QuotationGroupingSchema = z.enum(['BY_SECTION', 'BY_FLOOR', 'BY_ITEM', 'FLAT'])
+
+export type QuotationGrouping = z.infer<typeof QuotationGroupingSchema>;
 
 // File: InvoiceType.schema.ts
 
@@ -3202,6 +3220,7 @@ export const QuotationSchema = z.object({
   createdById: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
+  costStudyId: z.string().nullish(),
 });
 
 export type QuotationType = z.infer<typeof QuotationSchema>;
@@ -3229,6 +3248,49 @@ export const QuotationItemSchema = z.object({
 });
 
 export type QuotationItemType = z.infer<typeof QuotationItemSchema>;
+
+
+// File: QuotationDisplayConfig.schema.ts
+
+export const QuotationDisplayConfigSchema = z.object({
+  id: z.string(),
+  quotationId: z.string().nullish(),
+  quoteId: z.string().nullish(),
+  format: QuotationFormatSchema.default("DETAILED_BOQ"),
+  grouping: QuotationGroupingSchema.default("BY_SECTION"),
+  showItemNumber: z.boolean().default(true),
+  showDescription: z.boolean().default(true),
+  showSpecifications: z.boolean().default(true),
+  showQuantity: z.boolean().default(true),
+  showUnit: z.boolean().default(true),
+  showUnitPrice: z.boolean().default(true),
+  showItemTotal: z.boolean().default(true),
+  showStructural: z.boolean().default(true),
+  showFinishing: z.boolean().default(true),
+  showMEP: z.boolean().default(true),
+  showManualItems: z.boolean().default(true),
+  showMaterialDetails: z.boolean(),
+  showSectionSubtotal: z.boolean().default(true),
+  showSubtotal: z.boolean().default(true),
+  showDiscount: z.boolean().default(true),
+  showVAT: z.boolean().default(true),
+  showGrandTotal: z.boolean().default(true),
+  showPricePerSqm: z.boolean(),
+  totalArea: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalArea' must be a Decimal. Location: ['Models', 'QuotationDisplayConfig']",
+}).nullish(),
+  pricePerSqm: z.instanceof(Prisma.Decimal, {
+  message: "Field 'pricePerSqm' must be a Decimal. Location: ['Models', 'QuotationDisplayConfig']",
+}).nullish(),
+  lumpSumAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'lumpSumAmount' must be a Decimal. Location: ['Models', 'QuotationDisplayConfig']",
+}).nullish(),
+  lumpSumDescription: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type QuotationDisplayConfigType = z.infer<typeof QuotationDisplayConfigSchema>;
 
 
 // File: FinanceInvoice.schema.ts

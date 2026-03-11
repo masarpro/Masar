@@ -38,6 +38,15 @@ const STAGE_LABELS: Record<StageType, string> = {
 	CONVERSION: "التحويل لمشروع",
 };
 
+// Map new StudyStage names → old CostStudy field names
+const STAGE_TO_COST_STUDY_FIELD: Partial<Record<StageType, string>> = {
+	QUANTITIES: "quantitiesStatus",
+	SPECIFICATIONS: "specsStatus",
+	COSTING: "costingStatus",
+	PRICING: "pricingStatus",
+	QUOTATION: "quotationStatus",
+};
+
 // ═══════════════════════════════════════════════════════════════
 // GET STAGES
 // ═══════════════════════════════════════════════════════════════
@@ -194,6 +203,25 @@ export const approveStudyStage = subscriptionProcedure
 			}
 		}
 
+		// Sync to CostStudy legacy fields
+		const costStudyField = STAGE_TO_COST_STUDY_FIELD[input.stage];
+		if (costStudyField) {
+			const syncData: Record<string, string> = { [costStudyField]: "APPROVED" };
+			if (stageIndex < STAGE_ORDER.length - 1) {
+				const nextField = STAGE_TO_COST_STUDY_FIELD[STAGE_ORDER[stageIndex + 1]];
+				if (nextField) {
+					const nextStageRecord = study.stages.find((s) => s.stage === STAGE_ORDER[stageIndex + 1]);
+					if (nextStageRecord && nextStageRecord.status === "NOT_STARTED") {
+						syncData[nextField] = "DRAFT";
+					}
+				}
+			}
+			await db.costStudy.update({
+				where: { id: input.studyId },
+				data: syncData,
+			});
+		}
+
 		// Return updated stages
 		const updatedStages = await db.studyStage.findMany({
 			where: { costStudyId: input.studyId },
@@ -283,6 +311,22 @@ export const reopenStudyStage = subscriptionProcedure
 						},
 					});
 				}
+			}
+
+			// Sync to CostStudy legacy fields
+			const costStudyField = STAGE_TO_COST_STUDY_FIELD[input.stage];
+			if (costStudyField) {
+				const syncData: Record<string, string> = { [costStudyField]: "DRAFT" };
+				for (let i = stageIndex + 1; i < STAGE_ORDER.length; i++) {
+					const nextField = STAGE_TO_COST_STUDY_FIELD[STAGE_ORDER[i]];
+					if (nextField) {
+						syncData[nextField] = "NOT_STARTED";
+					}
+				}
+				await tx.costStudy.update({
+					where: { id: input.studyId },
+					data: syncData,
+				});
 			}
 		});
 
