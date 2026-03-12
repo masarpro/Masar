@@ -771,7 +771,7 @@ function NeckColumnsSection({
 						{NECK_HEIGHT_PRESETS.map((h) => (
 							<Button
 								key={h}
-								variant={neckHeight === h ? "default" : "outline"}
+								variant={neckHeight === h ? "primary" : "outline"}
 								size="sm"
 								className={`h-8 px-3 ${neckHeight === h ? "bg-amber-600 hover:bg-amber-700" : ""}`}
 								onClick={() => onNeckHeightChange(h)}
