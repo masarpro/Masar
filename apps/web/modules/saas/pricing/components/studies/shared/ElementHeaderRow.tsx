@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Input } from "@ui/components/input";
 import {
 	Select,
@@ -35,6 +35,7 @@ interface ElementHeaderRowProps {
 	showConcreteType?: boolean;
 	showSubType?: boolean;
 	className?: string;
+	rightSlot?: ReactNode;
 }
 
 export function ElementHeaderRow({
@@ -56,6 +57,7 @@ export function ElementHeaderRow({
 	showConcreteType = true,
 	showSubType = true,
 	className,
+	rightSlot,
 }: ElementHeaderRowProps) {
 	// Auto-generate name if empty
 	useEffect(() => {
@@ -70,7 +72,7 @@ export function ElementHeaderRow({
 			className={`flex flex-wrap items-center gap-3 bg-muted/30 rounded-lg p-3 border ${className || ""}`}
 		>
 			{/* Element Name */}
-			<div className="flex-shrink-0 w-24">
+			<div className="shrink-0 w-24">
 				<Input
 					value={name}
 					onChange={(e: any) => onNameChange(e.target.value)}
@@ -99,7 +101,7 @@ export function ElementHeaderRow({
 
 			{/* Quantity */}
 			{showQuantity && (
-				<div className="flex-shrink-0 w-20">
+				<div className="shrink-0 w-20">
 					<Input
 						type="number"
 						min={1}
@@ -111,9 +113,12 @@ export function ElementHeaderRow({
 				</div>
 			)}
 
+			{/* Optional right slot (e.g. floor selector) */}
+			{rightSlot && <div className="shrink-0 w-32">{rightSlot}</div>}
+
 			{/* Concrete Type */}
 			{showConcreteType && (
-				<div className="flex-shrink-0 w-28">
+				<div className="shrink-0 w-28">
 					<ConcreteTypeSelect
 						value={concreteType ?? ""}
 						onChange={onConcreteTypeChange ?? (() => {})}

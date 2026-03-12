@@ -98,20 +98,18 @@ export function CostStudyOverview({
 		entryPoint,
 	});
 
-	// Redirect FULL_STUDY / COST_PRICING studies directly to quantities page
+	// Redirect directly to the active stage page
 	const router = useRouter();
-	const shouldRedirect =
-		studyType === "FULL_PROJECT" || studyType === "COST_PRICING";
 
 	useEffect(() => {
-		if (shouldRedirect && study) {
+		if (study && activeStagePath) {
 			router.replace(
-				`/app/${organizationSlug}/pricing/studies/${studyId}/quantities`,
+				`/app/${organizationSlug}/pricing/studies/${studyId}/${activeStagePath}`,
 			);
 		}
-	}, [shouldRedirect, study, router, organizationSlug, studyId]);
+	}, [study, activeStagePath, router, organizationSlug, studyId]);
 
-	if (shouldRedirect) {
+	if (activeStagePath) {
 		return null;
 	}
 

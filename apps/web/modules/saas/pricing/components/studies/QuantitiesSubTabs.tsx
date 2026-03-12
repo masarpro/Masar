@@ -185,8 +185,10 @@ export function QuantitiesSubTabs({
 				</TabsContent>
 			</Tabs>
 
-			{/* Summary */}
-			<QuantitiesSummary organizationId={organizationId} studyId={studyId} />
+			{/* Summary - hide when only one scope is enabled */}
+			{enabledTabs.length > 1 && (
+				<QuantitiesSummary organizationId={organizationId} studyId={studyId} />
+			)}
 
 			{/* Bottom Summary Bar */}
 			<Card className="sticky bottom-0 z-10 border-t-2 border-primary/20 bg-card/95 backdrop-blur-sm">

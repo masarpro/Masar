@@ -109,7 +109,7 @@ export type AiChatScalarFieldEnum = z.infer<typeof AiChatScalarFieldEnumSchema>;
 
 // File: CostStudyScalarFieldEnum.schema.ts
 
-export const CostStudyScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'createdById', 'name', 'customerName', 'customerId', 'projectType', 'landArea', 'buildingArea', 'numberOfFloors', 'hasBasement', 'finishingLevel', 'structuralCost', 'finishingCost', 'mepCost', 'laborCost', 'overheadPercent', 'profitPercent', 'contingencyPercent', 'vatIncluded', 'totalCost', 'buildingConfig', 'status', 'notes', 'projectId', 'studyType', 'entryPoint', 'workScopes', 'quantitiesStatus', 'specsStatus', 'costingStatus', 'pricingStatus', 'quotationStatus', 'quantitiesAssigneeId', 'specsAssigneeId', 'costingAssigneeId', 'pricingAssigneeId', 'contractValue', 'generatedQuotationId', 'convertedProjectId', 'structuralSpecs', 'costingMethod', 'overheadCost', 'adminCost', 'adminPercent', 'storageCostPercent', 'markupMethod', 'uniformMarkupPercent', 'createdAt', 'updatedAt'])
+export const CostStudyScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'createdById', 'name', 'customerName', 'customerId', 'projectType', 'landArea', 'buildingArea', 'numberOfFloors', 'hasBasement', 'finishingLevel', 'structuralCost', 'finishingCost', 'mepCost', 'laborCost', 'overheadPercent', 'profitPercent', 'contingencyPercent', 'vatIncluded', 'totalCost', 'buildingConfig', 'status', 'notes', 'projectId', 'studyType', 'entryPoint', 'workScopes', 'quantitiesStatus', 'specsStatus', 'costingStatus', 'pricingStatus', 'quotationStatus', 'quantitiesAssigneeId', 'specsAssigneeId', 'costingAssigneeId', 'pricingAssigneeId', 'contractValue', 'generatedQuotationId', 'convertedProjectId', 'structuralSpecs', 'laborBreakdown', 'costingMethod', 'overheadCost', 'adminCost', 'adminPercent', 'storageCostPercent', 'markupMethod', 'uniformMarkupPercent', 'createdAt', 'updatedAt'])
 
 export type CostStudyScalarFieldEnum = z.infer<typeof CostStudyScalarFieldEnumSchema>;
 
@@ -1621,6 +1621,7 @@ export const CostStudySchema = z.object({
   generatedQuotationId: z.string().nullish(),
   convertedProjectId: z.string().nullish(),
   structuralSpecs: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  laborBreakdown: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
   costingMethod: z.string().nullish(),
   overheadCost: z.instanceof(Prisma.Decimal, {
   message: "Field 'overheadCost' must be a Decimal. Location: ['Models', 'CostStudy']",

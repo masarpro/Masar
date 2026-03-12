@@ -1250,27 +1250,37 @@ export function SlabsSection({
 									}
 									showConcreteType={false}
 									showQuantity={true}
-								/>
-							</div>
-							<div className="flex-shrink-0 w-32">
-								<Label className="text-xs mb-1 block">الدور <span className="text-destructive">*</span></Label>
-								<Select
-									value={formData.floor || undefined}
-									onValueChange={(v: string) =>
-										setFormData({ ...formData, floor: v })
+									rightSlot={
+										<div className="space-y-1">
+											<Label className="text-xs mb-1 block">
+												الدور <span className="text-destructive">*</span>
+											</Label>
+											<Select
+												value={formData.floor || undefined}
+												onValueChange={(v: string) =>
+													setFormData({ ...formData, floor: v })
+												}
+											>
+												<SelectTrigger
+													className={
+														!formData.floor
+															? "border-destructive ring-destructive/30 ring-2"
+															: ""
+													}
+												>
+													<SelectValue placeholder="⚠ اختر الدور" />
+												</SelectTrigger>
+												<SelectContent>
+													{SLAB_FLOOR_NAMES.map((floor) => (
+														<SelectItem key={floor} value={floor}>
+															{floor}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
+										</div>
 									}
-								>
-									<SelectTrigger className={!formData.floor ? "border-destructive ring-destructive/30 ring-2" : ""}>
-										<SelectValue placeholder="⚠ اختر الدور" />
-									</SelectTrigger>
-									<SelectContent>
-										{SLAB_FLOOR_NAMES.map((floor) => (
-											<SelectItem key={floor} value={floor}>
-												{floor}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
+								/>
 							</div>
 						</div>
 

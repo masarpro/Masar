@@ -115,6 +115,25 @@ export function PricingPageContentV2({
 	const costingStage = stages.find((s: { stage: string }) => s.stage === "COSTING");
 	const isCostingApproved = costingStage?.status === "APPROVED";
 
+	// Build enabled sections based on workScopes
+	const workScopes: string[] = (studyData as any)?.workScopes ?? [];
+	const enabledSections = new Set<string>();
+	if (workScopes.length === 0) {
+		// Legacy/all-scopes: show everything
+		enabledSections.add("STRUCTURAL");
+		enabledSections.add("FINISHING");
+		enabledSections.add("MEP");
+		enabledSections.add("MANUAL");
+		enabledSections.add("LABOR");
+	} else {
+		if (workScopes.includes("STRUCTURAL")) enabledSections.add("STRUCTURAL");
+		if (workScopes.includes("FINISHING")) enabledSections.add("FINISHING");
+		if (workScopes.includes("MEP")) enabledSections.add("MEP");
+		if (workScopes.includes("CUSTOM")) enabledSections.add("MANUAL");
+		// Always include LABOR (aggregates from whatever sections exist)
+		enabledSections.add("LABOR");
+	}
+
 	const totalCost = (profitData as any)?.totalCost ?? 0;
 	const buildingArea =
 		(markupSettings as any)?.buildingArea ?? (studyData as any)?.buildingArea ?? 0;
@@ -198,6 +217,12 @@ export function PricingPageContentV2({
 		itemPriceOverrides,
 	]);
 
+	// Filter items to only show enabled sections
+	const filteredItems = useMemo(
+		() => itemsWithPrices.filter((item) => enabledSections.has(item.section)),
+		[itemsWithPrices, enabledSections],
+	);
+
 	// Seed initial values from server data
 	useEffect(() => {
 		if (ms?.uniformSettings) {
@@ -265,7 +290,7 @@ export function PricingPageContentV2({
 	};
 
 	const handleSaveSections = () => {
-		const sections = (profitData as any)?.sections ?? [];
+		const sections = ((profitData as any)?.sections ?? []).filter((s: any) => enabledSections.has(s.section));
 		const markups = sections.map((s: any) => ({
 			section: s.section,
 			markupPercent: sectionMarkups[s.section]
@@ -519,7 +544,7 @@ export function PricingPageContentV2({
 								</tr>
 							</thead>
 							<tbody>
-								{((profitData as any)?.sections ?? []).map((sec: any) => {
+								{((profitData as any)?.sections ?? []).filter((sec: any) => enabledSections.has(sec.section)).map((sec: any) => {
 									const markupPct = sectionMarkups[sec.section]
 										? Number(sectionMarkups[sec.section])
 										: sec.markupPercent;
@@ -850,7 +875,7 @@ export function PricingPageContentV2({
 			</div>
 
 			{/* ═══ Per-item price adjustment table ═══ */}
-			{itemsWithPrices.length > 0 && (
+			{filteredItems.length > 0 && (
 				<div className="rounded-xl border border-border bg-card overflow-hidden">
 					<button
 						type="button"
@@ -860,7 +885,7 @@ export function PricingPageContentV2({
 						<div className="flex items-center gap-2">
 							<Calculator className="h-4 w-4 text-primary" />
 							<h4 className="font-semibold text-sm">
-								تعديل أسعار البنود ({itemsWithPrices.length} بند)
+								تعديل أسعار البنود ({filteredItems.length} بند)
 							</h4>
 						</div>
 						<ChevronDown
@@ -904,7 +929,7 @@ export function PricingPageContentV2({
 										</tr>
 									</thead>
 									<tbody>
-										{itemsWithPrices.map((item, idx) => (
+										{filteredItems.map((item, idx) => (
 											<tr
 												key={item.id}
 												className={cn(
@@ -960,12 +985,12 @@ export function PricingPageContentV2({
 											<td className="px-4 py-3" colSpan={5} />
 											<td className="px-4 py-3 text-center" dir="ltr">
 												{formatNum(
-													itemsWithPrices.reduce((s, i) => s + i.cost, 0),
+													filteredItems.reduce((s, i) => s + i.cost, 0),
 												)}
 											</td>
 											<td className="px-4 py-3 text-center" dir="ltr">
 												{formatNum(
-													itemsWithPrices.reduce(
+													filteredItems.reduce(
 														(s, i) => s + i.calculatedPrice,
 														0,
 													),
@@ -973,7 +998,7 @@ export function PricingPageContentV2({
 											</td>
 											<td className="px-4 py-3 text-center text-primary" dir="ltr">
 												{formatNum(
-													itemsWithPrices.reduce(
+													filteredItems.reduce(
 														(s, i) => s + i.sellingPrice,
 														0,
 													),

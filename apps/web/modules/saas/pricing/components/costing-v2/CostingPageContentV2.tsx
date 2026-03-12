@@ -33,7 +33,7 @@ export function CostingPageContentV2({
 	organizationSlug,
 	studyId,
 }: CostingPageContentV2Props) {
-	const [activeTab, setActiveTab] = useState("structural");
+	const [activeTab, setActiveTab] = useState("");
 
 	// Check that SPECIFICATIONS stage is APPROVED
 	const { data: stagesData, isLoading: stagesLoading } = useQuery(
@@ -93,60 +93,89 @@ export function CostingPageContentV2({
 
 	const buildingArea = Number((study as any)?.buildingArea ?? 0);
 
+	// Build enabled tabs based on workScopes
+	const workScopes: string[] = (study as any)?.workScopes ?? [];
+	const enabledTabs: string[] = [];
+	if (workScopes.length === 0) {
+		enabledTabs.push("structural", "finishing", "mep");
+	} else {
+		if (workScopes.includes("STRUCTURAL")) enabledTabs.push("structural");
+		if (workScopes.includes("FINISHING")) enabledTabs.push("finishing");
+		if (workScopes.includes("MEP")) enabledTabs.push("mep");
+	}
+	// Always include labor and summary
+	enabledTabs.push("labor", "summary");
+
+	const tabDefs = [
+		{ value: "structural", icon: Hammer, label: "إنشائي" },
+		{ value: "finishing", icon: PaintBucket, label: "تشطيبات" },
+		{ value: "mep", icon: Wrench, label: "كهروميكانيكية" },
+		{ value: "labor", icon: Users, label: "عمالة" },
+		{ value: "summary", icon: Calculator, label: "ملخص" },
+	].filter((t) => enabledTabs.includes(t.value));
+
+	const gridCols =
+		tabDefs.length === 2
+			? "grid-cols-2"
+			: tabDefs.length === 3
+				? "grid-cols-3"
+				: tabDefs.length === 4
+					? "grid-cols-4"
+					: "grid-cols-5";
+
+	// Set initial active tab to first enabled tab
+	const defaultTab = enabledTabs[0] ?? "structural";
+
 	return (
 		<div className="space-y-6" dir="rtl">
 			{/* Hero: cost per sqm (shown after data loads) */}
 
-			<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-				<TabsList className="grid w-full grid-cols-5 rounded-xl h-auto p-1">
-					<TabsTrigger value="structural" className="gap-1.5 rounded-lg py-2.5 text-xs sm:text-sm">
-						<Hammer className="h-4 w-4" />
-						<span className="hidden sm:inline">إنشائي</span>
-					</TabsTrigger>
-					<TabsTrigger value="finishing" className="gap-1.5 rounded-lg py-2.5 text-xs sm:text-sm">
-						<PaintBucket className="h-4 w-4" />
-						<span className="hidden sm:inline">تشطيبات</span>
-					</TabsTrigger>
-					<TabsTrigger value="mep" className="gap-1.5 rounded-lg py-2.5 text-xs sm:text-sm">
-						<Wrench className="h-4 w-4" />
-						<span className="hidden sm:inline">كهروميكانيكية</span>
-					</TabsTrigger>
-					<TabsTrigger value="labor" className="gap-1.5 rounded-lg py-2.5 text-xs sm:text-sm">
-						<Users className="h-4 w-4" />
-						<span className="hidden sm:inline">عمالة</span>
-					</TabsTrigger>
-					<TabsTrigger value="summary" className="gap-1.5 rounded-lg py-2.5 text-xs sm:text-sm">
-						<Calculator className="h-4 w-4" />
-						<span className="hidden sm:inline">ملخص</span>
-					</TabsTrigger>
+			<Tabs value={activeTab || defaultTab} onValueChange={setActiveTab} className="w-full">
+				<TabsList className={`grid w-full ${gridCols} rounded-xl h-auto p-1`}>
+					{tabDefs.map((tab) => {
+						const Icon = tab.icon;
+						return (
+							<TabsTrigger key={tab.value} value={tab.value} className="gap-1.5 rounded-lg py-2.5 text-xs sm:text-sm">
+								<Icon className="h-4 w-4" />
+								<span className="hidden sm:inline">{tab.label}</span>
+							</TabsTrigger>
+						);
+					})}
 				</TabsList>
 
-				<TabsContent value="structural" className="mt-4">
-					<StructuralCostingTab
-						organizationId={organizationId}
-						studyId={studyId}
-						buildingArea={buildingArea}
-					/>
-				</TabsContent>
+				{enabledTabs.includes("structural") && (
+					<TabsContent value="structural" className="mt-4">
+						<StructuralCostingTab
+							organizationId={organizationId}
+							studyId={studyId}
+							buildingArea={buildingArea}
+						/>
+					</TabsContent>
+				)}
 
-				<TabsContent value="finishing" className="mt-4">
-					<FinishingCostingTab
-						organizationId={organizationId}
-						studyId={studyId}
-					/>
-				</TabsContent>
+				{enabledTabs.includes("finishing") && (
+					<TabsContent value="finishing" className="mt-4">
+						<FinishingCostingTab
+							organizationId={organizationId}
+							studyId={studyId}
+						/>
+					</TabsContent>
+				)}
 
-				<TabsContent value="mep" className="mt-4">
-					<MEPCostingTab
-						organizationId={organizationId}
-						studyId={studyId}
-					/>
-				</TabsContent>
+				{enabledTabs.includes("mep") && (
+					<TabsContent value="mep" className="mt-4">
+						<MEPCostingTab
+							organizationId={organizationId}
+							studyId={studyId}
+						/>
+					</TabsContent>
+				)}
 
 				<TabsContent value="labor" className="mt-4">
 					<LaborOverviewTab
 						organizationId={organizationId}
 						studyId={studyId}
+						buildingArea={buildingArea}
 					/>
 				</TabsContent>
 

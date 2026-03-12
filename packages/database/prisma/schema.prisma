@@ -1294,6 +1294,7 @@ model CostStudy {
 
   // مواصفات إنشائية
   structuralSpecs      Json?         @map("structural_specs") @db.JsonB
+  laborBreakdown       Json?         @map("labor_breakdown") @db.JsonB
 
   // إعدادات التسعير الجديدة
   costingMethod          String?       @map("costing_method")         // "manual" | "database" | "import"

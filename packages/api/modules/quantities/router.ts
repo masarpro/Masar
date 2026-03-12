@@ -34,6 +34,7 @@ import { getStudyStages, approveStudyStage, reopenStudyStage, assignStudyStage, 
 import { manualItemsList, manualItemCreate, manualItemUpdate, manualItemDelete, manualItemReorder } from "./procedures/manual-items";
 import { quantitiesSummary } from "./procedures/quantities-summary";
 import { getStructuralSpecs, setStructuralSpecs } from "./procedures/structural-specs";
+import { getLaborBreakdown, setLaborBreakdown } from "./procedures/labor-breakdown";
 import { costingGenerateItems, costingGetItems, costingUpdateItem, costingBulkUpdate, costingSetSectionLabor, costingGetSummary } from "./procedures/costing";
 import { markupGetSettings, markupSetUniform, markupSetSectionMarkups, markupGetProfitAnalysis } from "./procedures/markup";
 import { getSpecifications, updateItemSpec, applyTemplateToAll, applySpecToAllFloors, generateBOM, getBOM } from "./procedures/specifications";
@@ -114,6 +115,10 @@ export const quantitiesRouter = {
 	structuralSpecs: {
 		get: getStructuralSpecs,
 		set: setStructuralSpecs,
+	},
+	laborBreakdown: {
+		get: getLaborBreakdown,
+		set: setLaborBreakdown,
 	},
 	costing: {
 		generate: costingGenerateItems,
