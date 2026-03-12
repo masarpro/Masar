@@ -115,8 +115,8 @@ export function ElementHeaderRow({
 			{showConcreteType && (
 				<div className="flex-shrink-0 w-28">
 					<ConcreteTypeSelect
-						value={concreteType}
-						onChange={onConcreteTypeChange}
+						value={concreteType ?? ""}
+						onChange={onConcreteTypeChange ?? (() => {})}
 						customValue={customConcreteType}
 						onCustomValueChange={onCustomConcreteTypeChange}
 						compact
