@@ -22,7 +22,6 @@ import {
 	Calculator,
 	X,
 	Ruler,
-	Square,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMutation } from "@tanstack/react-query";
@@ -46,21 +45,19 @@ interface PlainConcreteSectionProps {
 	}>;
 	onSave: () => void;
 	onUpdate: () => void;
+	specs?: { concreteType: string; steelGrade: string };
 }
 
 type PlainConcreteType = "blinding" | "leveling" | "fill";
-type InputMode = "dimensions" | "area";
 
 interface FormData {
 	name: string;
 	type: PlainConcreteType;
 	quantity: number;
-	inputMode: InputMode;
 	length: number;
 	width: number;
-	directArea: number;
+	area: number;
 	thickness: number;
-	concreteType: string;
 }
 
 const PLAIN_CONCRETE_TYPE_INFO: Record<PlainConcreteType, { nameAr: string; description: string; defaultThickness: number }> = {
@@ -81,6 +78,7 @@ export function PlainConcreteSection({
 	items,
 	onSave,
 	onUpdate,
+	specs,
 }: PlainConcreteSectionProps) {
 	const t = useTranslations();
 	const [isAdding, setIsAdding] = useState(false);
@@ -90,33 +88,37 @@ export function PlainConcreteSection({
 		name: "",
 		type: "blinding",
 		quantity: 1,
-		inputMode: "dimensions",
 		length: 0,
 		width: 0,
-		directArea: 0,
+		area: 0,
 		thickness: 0.10,
-		concreteType: "C15",
 	});
+
+	// عند تغيير الطول أو العرض، تُحسب المساحة تلقائياً
+	const handleLengthChange = (length: number) => {
+		const newArea = length * formData.width;
+		setFormData({ ...formData, length, area: newArea > 0 ? newArea : formData.area });
+	};
+
+	const handleWidthChange = (width: number) => {
+		const newArea = formData.length * width;
+		setFormData({ ...formData, width, area: newArea > 0 ? newArea : formData.area });
+	};
+
+	// عند إدخال المساحة مباشرة، تُفرّغ الطول والعرض
+	const handleAreaChange = (area: number) => {
+		setFormData({ ...formData, area, length: 0, width: 0 });
+	};
 
 	// حساب النتائج
 	const calculations = useMemo(() => {
-		let area: number;
+		if (formData.area <= 0 || formData.thickness <= 0) return null;
 
-		if (formData.inputMode === "area") {
-			// وضع المساحة المباشرة
-			if (formData.directArea <= 0 || formData.thickness <= 0) return null;
-			area = formData.directArea;
-		} else {
-			// وضع الأبعاد
-			if (formData.length <= 0 || formData.width <= 0 || formData.thickness <= 0) return null;
-			area = formData.length * formData.width;
-		}
-
-		const volumePerUnit = area * formData.thickness;
+		const volumePerUnit = formData.area * formData.thickness;
 		const totalVolume = volumePerUnit * formData.quantity;
 
 		return {
-			area,
+			area: formData.area,
 			volumePerUnit,
 			totalVolume,
 		};
@@ -169,12 +171,10 @@ export function PlainConcreteSection({
 			name: "",
 			type: "blinding",
 			quantity: 1,
-			inputMode: "dimensions",
 			length: 0,
 			width: 0,
-			directArea: 0,
+			area: 0,
 			thickness: 0.10,
-			concreteType: "C15",
 		});
 	};
 
@@ -190,10 +190,6 @@ export function PlainConcreteSection({
 	const handleSubmit = async () => {
 		if (!formData.name || !calculations) return;
 
-		const area = formData.inputMode === "area"
-			? formData.directArea
-			: formData.length * formData.width;
-
 		const itemData = {
 			costStudyId: studyId,
 			organizationId,
@@ -203,13 +199,13 @@ export function PlainConcreteSection({
 			quantity: formData.quantity,
 			unit: "m3",
 			dimensions: {
-				length: formData.inputMode === "dimensions" ? formData.length : 0,
-				width: formData.inputMode === "dimensions" ? formData.width : 0,
-				area: area,
+				length: formData.length,
+				width: formData.width,
+				area: formData.area,
 				thickness: formData.thickness,
 			},
 			concreteVolume: calculations.totalVolume,
-			concreteType: formData.concreteType,
+			concreteType: specs?.concreteType || "C15",
 			steelWeight: 0,
 			steelRatio: 0,
 			materialCost: 0,
@@ -246,6 +242,8 @@ export function PlainConcreteSection({
 								<TableHead className="text-right">{t("pricing.studies.structural.itemName")}</TableHead>
 								<TableHead className="text-right">النوع</TableHead>
 								<TableHead className="text-right">{t("pricing.studies.structural.quantity")}</TableHead>
+								<TableHead className="text-right">الطول</TableHead>
+								<TableHead className="text-right">العرض</TableHead>
 								<TableHead className="text-right">المساحة</TableHead>
 								<TableHead className="text-right">السماكة</TableHead>
 								<TableHead className="text-right">{t("pricing.studies.structural.concreteVolume")}</TableHead>
@@ -266,6 +264,12 @@ export function PlainConcreteSection({
 										</TableCell>
 										<TableCell>{item.quantity}</TableCell>
 										<TableCell>
+											{item.dimensions?.length ? `${formatNumber(item.dimensions.length)} م` : "-"}
+										</TableCell>
+										<TableCell>
+											{item.dimensions?.width ? `${formatNumber(item.dimensions.width)} م` : "-"}
+										</TableCell>
+										<TableCell>
 											{formatNumber(area)} {t("pricing.studies.units.m2")}
 										</TableCell>
 										<TableCell>
@@ -282,19 +286,15 @@ export function PlainConcreteSection({
 													onClick={() => {
 														setEditingItemId(item.id);
 														setIsAdding(true);
-														const hasDirectArea = item.dimensions?.area &&
-															(!item.dimensions?.length || !item.dimensions?.width);
 														setFormData({
 															name: item.name,
 															type: (item.subCategory as PlainConcreteType) || "blinding",
 															quantity: item.quantity,
-															inputMode: hasDirectArea ? "area" : "dimensions",
 															length: item.dimensions?.length || 0,
 															width: item.dimensions?.width || 0,
-															directArea: item.dimensions?.area ||
+															area: item.dimensions?.area ||
 																((item.dimensions?.length || 0) * (item.dimensions?.width || 0)),
 															thickness: item.dimensions?.thickness || 0.10,
-															concreteType: "C15",
 														});
 													}}
 													title={t("common.edit")}
@@ -343,97 +343,66 @@ export function PlainConcreteSection({
 							onSubTypeChange={handleTypeChange}
 							quantity={formData.quantity}
 							onQuantityChange={(quantity) => setFormData({ ...formData, quantity })}
-							concreteType={formData.concreteType}
-							onConcreteTypeChange={(concreteType) => setFormData({ ...formData, concreteType })}
 							showQuantity={true}
-							showConcreteType={true}
+							showConcreteType={false}
 							showSubType={true}
 						/>
 
-						{/* السطر الثاني: الأبعاد مع خيار المساحة المباشرة */}
+						{/* السطر الثاني: جميع حقول الأبعاد معاً */}
 						<div className="border rounded-lg p-4 space-y-4">
-							{/* أزرار التبديل بين الوضعين */}
 							<div className="flex items-center gap-4">
 								<Ruler className="h-5 w-5 text-primary" />
 								<h5 className="font-medium">الأبعاد</h5>
-								<div className="flex-1" />
-								<div className="flex items-center gap-2 bg-muted/50 rounded-lg p-1">
-									<button
-										type="button"
-										onClick={() => setFormData({ ...formData, inputMode: "dimensions" })}
-										className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
-											formData.inputMode === "dimensions"
-												? "bg-primary text-primary-foreground"
-												: "hover:bg-muted"
-										}`}
-									>
-										<Ruler className="h-4 w-4" />
-										طول × عرض
-									</button>
-									<button
-										type="button"
-										onClick={() => setFormData({ ...formData, inputMode: "area" })}
-										className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
-											formData.inputMode === "area"
-												? "bg-primary text-primary-foreground"
-												: "hover:bg-muted"
-										}`}
-									>
-										<Square className="h-4 w-4" />
-										مساحة جاهزة
-									</button>
-								</div>
+								<span className="text-xs text-muted-foreground">
+									أدخل الطول والعرض لحساب المساحة تلقائياً، أو أدخل المساحة مباشرة
+								</span>
 							</div>
 
-							{/* حقول الإدخال حسب الوضع */}
-							<div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-								{formData.inputMode === "dimensions" ? (
-									<>
-										{/* وضع الأبعاد: طول × عرض */}
-										<div className="space-y-1.5">
-											<Label className="text-sm text-muted-foreground">الطول (م)</Label>
-											<Input
-												type="number"
-												min={0}
-												step={0.1}
-												value={formData.length || ""}
-												onChange={(e: any) => setFormData({ ...formData, length: parseFloat(e.target.value) || 0 })}
-												className="text-center"
-												placeholder="0.0"
-											/>
-										</div>
-										<div className="space-y-1.5">
-											<Label className="text-sm text-muted-foreground">العرض (م)</Label>
-											<Input
-												type="number"
-												min={0}
-												step={0.1}
-												value={formData.width || ""}
-												onChange={(e: any) => setFormData({ ...formData, width: parseFloat(e.target.value) || 0 })}
-												className="text-center"
-												placeholder="0.0"
-											/>
-										</div>
-									</>
-								) : (
-									<>
-										{/* وضع المساحة المباشرة */}
-										<div className="space-y-1.5 md:col-span-2">
-											<Label className="text-sm text-muted-foreground">المساحة (م²)</Label>
-											<Input
-												type="number"
-												min={0}
-												step={1}
-												value={formData.directArea || ""}
-												onChange={(e: any) => setFormData({ ...formData, directArea: parseFloat(e.target.value) || 0 })}
-												className="text-center text-lg"
-												placeholder="أدخل المساحة بالمتر المربع"
-											/>
-										</div>
-									</>
-								)}
+							{/* جميع الحقول في سطر واحد */}
+							<div className="grid grid-cols-2 md:grid-cols-5 gap-4 items-end">
+								{/* الطول */}
+								<div className="space-y-1.5">
+									<Label className="text-sm text-muted-foreground">الطول (م)</Label>
+									<Input
+										type="number"
+										min={0}
+										step={0.1}
+										value={formData.length || ""}
+										onChange={(e: any) => handleLengthChange(parseFloat(e.target.value) || 0)}
+										className="text-center"
+										placeholder="0.0"
+									/>
+								</div>
 
-								{/* السماكة - مشترك في كلا الوضعين */}
+								{/* العرض */}
+								<div className="space-y-1.5">
+									<Label className="text-sm text-muted-foreground">العرض (م)</Label>
+									<Input
+										type="number"
+										min={0}
+										step={0.1}
+										value={formData.width || ""}
+										onChange={(e: any) => handleWidthChange(parseFloat(e.target.value) || 0)}
+										className="text-center"
+										placeholder="0.0"
+									/>
+								</div>
+
+								{/* المساحة */}
+								<div className="space-y-1.5">
+									<Label className="text-sm text-muted-foreground">المساحة (م²)</Label>
+									<Input
+										type="number"
+										min={0}
+										step={0.1}
+										value={formData.area || ""}
+										onChange={(e: any) => handleAreaChange(parseFloat(e.target.value) || 0)}
+										className={`text-center ${formData.length > 0 && formData.width > 0 ? "bg-muted/50 font-semibold text-primary" : ""}`}
+										placeholder="0.0"
+									/>
+								</div>
+
+								{/* السماكة */}
 								<div className="space-y-1.5">
 									<Label className="text-sm text-muted-foreground">السماكة (سم)</Label>
 									<Input
@@ -448,12 +417,17 @@ export function PlainConcreteSection({
 								</div>
 
 								{/* عرض الحجم المحسوب */}
-								{calculations && (
+								{calculations ? (
 									<div className="bg-primary/10 rounded-lg p-3 flex flex-col justify-center items-center border border-primary/20">
 										<span className="text-xs text-muted-foreground">الحجم</span>
 										<span className="font-bold text-lg text-primary">
 											{formatNumber(calculations.totalVolume)} م³
 										</span>
+									</div>
+								) : (
+									<div className="bg-muted/30 rounded-lg p-3 flex flex-col justify-center items-center border border-dashed">
+										<span className="text-xs text-muted-foreground">الحجم</span>
+										<span className="text-sm text-muted-foreground">—</span>
 									</div>
 								)}
 							</div>
@@ -507,12 +481,12 @@ export function PlainConcreteSection({
 				</Card>
 			) : (
 				<Button
+					className="w-full bg-primary/10 text-primary border-2 border-dashed border-primary/40 hover:bg-primary/20 hover:border-primary/60 transition-all"
 					variant="outline"
-					className="w-full border-dashed"
 					onClick={handleStartAdding}
 				>
-					<Plus className="h-4 w-4 ml-2" />
-					{t("pricing.studies.structural.addItem")}
+					<Plus className="h-5 w-5 ml-2" />
+					<span className="font-semibold">{t("pricing.studies.structural.addItem")}</span>
 				</Button>
 			)}
 

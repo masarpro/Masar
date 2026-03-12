@@ -1459,6 +1459,37 @@
 				"luxury": "Luxury",
 				"superLuxury": "Super Luxury"
 			},
+			"create": {
+				"selectGoal": "What do you want to do?",
+				"selectGoalDescription": "Choose the type of work that fits your needs",
+				"goals": {
+					"full_study": {
+						"title": "Full Study from Scratch",
+						"description": "Calculate quantities, specifications, and pricing step by step",
+						"badge": "All stages"
+					},
+					"cost_pricing": {
+						"title": "Cost Pricing",
+						"description": "I have quantities ready and want to set specifications and pricing",
+						"badge": "Skips quantity engine"
+					},
+					"quick_pricing": {
+						"title": "Quick Pricing",
+						"description": "Enter items and prices directly without details",
+						"badge": "Straight to quotation"
+					}
+				},
+				"selectScope": "What is the work scope?",
+				"selectScopeDescription": "You can select more than one option",
+				"scopes": {
+					"STRUCTURAL": "Structural Works",
+					"FINISHING": "Finishing Works",
+					"MEP": "MEP",
+					"CUSTOM": "Custom Items"
+				},
+				"editConfig": "Edit Study Configuration",
+				"studyConfig": "Study Configuration"
+			},
 			"overview": {
 				"title": "Overview",
 				"projectInfo": "Project Information",

@@ -53,6 +53,11 @@ const nextConfig: NextConfig = {
 				hostname: "localhost",
 				pathname: "/**",
 			},
+			{
+				// Google encrypted thumbnails
+				protocol: "https",
+				hostname: "encrypted-tbn0.gstatic.com",
+			},
 		],
 	},
 	async headers() {

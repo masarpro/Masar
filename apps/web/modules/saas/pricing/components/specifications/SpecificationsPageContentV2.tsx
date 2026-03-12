@@ -7,7 +7,6 @@ import Link from "next/link";
 import { Button } from "@ui/components/button";
 
 import { SpecificationsPageContent } from "../pipeline/SpecificationsPageContent";
-import { SpecQuickTemplateBar } from "./SpecQuickTemplateBar";
 import { BOMSection } from "./BOMSection";
 
 interface SpecificationsPageContentV2Props {
@@ -57,14 +56,6 @@ export function SpecificationsPageContentV2({
 
 	return (
 		<div className="space-y-6" dir="rtl">
-			{/* Quick template bar */}
-			<div className="rounded-xl border border-border bg-card p-4">
-				<SpecQuickTemplateBar
-					organizationId={organizationId}
-					studyId={studyId}
-				/>
-			</div>
-
 			{/* Existing specs content (editing specs per item) */}
 			<SpecificationsPageContent
 				organizationId={organizationId}

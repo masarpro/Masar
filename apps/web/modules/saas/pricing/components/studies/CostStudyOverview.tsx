@@ -16,7 +16,10 @@ import {
 	UserSearch,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useEffect } from "react";
+import { useStudyConfig } from "../../hooks/useStudyConfig";
 import { LeadStatusBadge } from "../leads/LeadStatusBadge";
 import { StudyPipelineStepper } from "./StudyPipelineStepper";
 
@@ -87,80 +90,107 @@ export function CostStudyOverview({
 	const stagesArray = (stagesData as any)?.stages ?? [];
 	const entryPoint = (stagesData as any)?.entryPoint ?? "FROM_SCRATCH";
 
+	const studyType = (study as any)?.studyType ?? "FULL_PROJECT";
+	const workScopes: string[] = (study as any)?.workScopes ?? [];
+	const { enabledStageTypes, isQuickPricing } = useStudyConfig({
+		studyType,
+		workScopes,
+		entryPoint,
+	});
+
+	// Redirect FULL_STUDY / COST_PRICING studies directly to quantities page
+	const router = useRouter();
+	const shouldRedirect =
+		studyType === "FULL_PROJECT" || studyType === "COST_PRICING";
+
+	useEffect(() => {
+		if (shouldRedirect && study) {
+			router.replace(
+				`/app/${organizationSlug}/pricing/studies/${studyId}/quantities`,
+			);
+		}
+	}, [shouldRedirect, study, router, organizationSlug, studyId]);
+
+	if (shouldRedirect) {
+		return null;
+	}
+
 	return (
 		<div className="space-y-6">
-			{/* Project Info Cards */}
-			<Card>
-				<CardContent className="p-6">
-					<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-						<div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
-							<div className="flex items-center gap-3">
-								<div className="p-2 rounded-lg bg-slate-200/50 dark:bg-slate-700/50">
-									<Building2 className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+			{/* Project Info Cards — hide for quick pricing */}
+			{!isQuickPricing && (
+				<Card>
+					<CardContent className="p-6">
+						<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+							<div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+								<div className="flex items-center gap-3">
+									<div className="p-2 rounded-lg bg-slate-200/50 dark:bg-slate-700/50">
+										<Building2 className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+									</div>
+									<div>
+										<p className="text-xs text-muted-foreground">
+											{t("pricing.studies.form.projectType")}
+										</p>
+										<p className="font-semibold text-sm">
+											{t(
+												`pricing.studies.projectTypes.${(study as any).projectType}`,
+											)}
+										</p>
+									</div>
 								</div>
-								<div>
-									<p className="text-xs text-muted-foreground">
-										{t("pricing.studies.form.projectType")}
-									</p>
-									<p className="font-semibold text-sm">
-										{t(
-											`pricing.studies.projectTypes.${(study as any).projectType}`,
-										)}
-									</p>
+							</div>
+							<div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+								<div className="flex items-center gap-3">
+									<div className="p-2 rounded-lg bg-slate-200/50 dark:bg-slate-700/50">
+										<Layers className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+									</div>
+									<div>
+										<p className="text-xs text-muted-foreground">
+											{t("pricing.studies.form.numberOfFloors")}
+										</p>
+										<p className="font-semibold text-sm">
+											{(study as any).numberOfFloors}{" "}
+											{t("pricing.studies.floors")}
+										</p>
+									</div>
+								</div>
+							</div>
+							<div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+								<div className="flex items-center gap-3">
+									<div className="p-2 rounded-lg bg-slate-200/50 dark:bg-slate-700/50">
+										<MapPin className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+									</div>
+									<div>
+										<p className="text-xs text-muted-foreground">
+											{t("pricing.studies.form.buildingArea")}
+										</p>
+										<p className="font-semibold text-sm">
+											{(study as any).buildingArea} م²
+										</p>
+									</div>
+								</div>
+							</div>
+							<div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+								<div className="flex items-center gap-3">
+									<div className="p-2 rounded-lg bg-slate-200/50 dark:bg-slate-700/50">
+										<Sparkles className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+									</div>
+									<div>
+										<p className="text-xs text-muted-foreground">
+											{t("pricing.studies.form.finishingLevel")}
+										</p>
+										<p className="font-semibold text-sm">
+											{t(
+												`pricing.studies.finishingLevels.${(study as any).finishingLevel}`,
+											)}
+										</p>
+									</div>
 								</div>
 							</div>
 						</div>
-						<div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
-							<div className="flex items-center gap-3">
-								<div className="p-2 rounded-lg bg-slate-200/50 dark:bg-slate-700/50">
-									<Layers className="h-5 w-5 text-slate-600 dark:text-slate-300" />
-								</div>
-								<div>
-									<p className="text-xs text-muted-foreground">
-										{t("pricing.studies.form.numberOfFloors")}
-									</p>
-									<p className="font-semibold text-sm">
-										{(study as any).numberOfFloors}{" "}
-										{t("pricing.studies.floors")}
-									</p>
-								</div>
-							</div>
-						</div>
-						<div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
-							<div className="flex items-center gap-3">
-								<div className="p-2 rounded-lg bg-slate-200/50 dark:bg-slate-700/50">
-									<MapPin className="h-5 w-5 text-slate-600 dark:text-slate-300" />
-								</div>
-								<div>
-									<p className="text-xs text-muted-foreground">
-										{t("pricing.studies.form.buildingArea")}
-									</p>
-									<p className="font-semibold text-sm">
-										{(study as any).buildingArea} م²
-									</p>
-								</div>
-							</div>
-						</div>
-						<div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
-							<div className="flex items-center gap-3">
-								<div className="p-2 rounded-lg bg-slate-200/50 dark:bg-slate-700/50">
-									<Sparkles className="h-5 w-5 text-slate-600 dark:text-slate-300" />
-								</div>
-								<div>
-									<p className="text-xs text-muted-foreground">
-										{t("pricing.studies.form.finishingLevel")}
-									</p>
-									<p className="font-semibold text-sm">
-										{t(
-											`pricing.studies.finishingLevels.${(study as any).finishingLevel}`,
-										)}
-									</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</CardContent>
-			</Card>
+					</CardContent>
+				</Card>
+			)}
 
 			{/* Pipeline Stepper */}
 			<StudyPipelineStepper
@@ -168,6 +198,7 @@ export function CostStudyOverview({
 				organizationSlug={organizationSlug}
 				stages={stagesArray}
 				entryPoint={entryPoint}
+				enabledStageTypes={enabledStageTypes as unknown as string[]}
 			/>
 
 			{/* Open Active Stage Button */}
@@ -188,8 +219,8 @@ export function CostStudyOverview({
 				</div>
 			)}
 
-			{/* Quick Summary */}
-			<Card>
+			{/* Quick Summary — hide for quick pricing */}
+			{!isQuickPricing && <Card>
 				<CardContent className="p-6">
 					<h3 className="text-sm font-semibold text-muted-foreground mb-4">
 						ملخص سريع
@@ -233,7 +264,7 @@ export function CostStudyOverview({
 						</div>
 					</div>
 				</CardContent>
-			</Card>
+			</Card>}
 
 			{/* Linked Lead Card */}
 			{(study as any).lead && (

@@ -7,9 +7,9 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-import { StudyHeaderCard } from "./StudyHeaderCard";
 import { SummaryStatsCards } from "./SummaryStatsCards";
 import { StructuralAccordion } from "./StructuralAccordion";
+import { BOQSummaryTable } from "./BOQSummaryTable";
 import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
 
 interface StructuralItemsEditorProps {
@@ -79,24 +79,6 @@ export function StructuralItemsEditor({
 
 	return (
 		<div className="space-y-6">
-			{/* Navigation */}
-			<div className="flex items-center gap-4">
-				<Button variant="ghost" size="icon" asChild>
-					<Link href={basePath}>
-						<ArrowLeft className="h-4 w-4" />
-					</Link>
-				</Button>
-				<div>
-					<h1 className="text-2xl font-bold">{t("pricing.studies.structural.title")}</h1>
-					<p className="text-muted-foreground text-sm">
-						{t("pricing.studies.structural.subtitle")}
-					</p>
-				</div>
-			</div>
-
-			{/* Study Header */}
-			<StudyHeaderCard study={study} />
-
 			{/* Summary Stats */}
 			<SummaryStatsCards structural={structuralStats} />
 
@@ -119,6 +101,26 @@ export function StructuralItemsEditor({
 					onUpdate={refetch}
 				/>
 			</div>
+
+			{/* BOQ Summary Table */}
+			{structuralItems.length > 0 && (
+				<BOQSummaryTable
+					items={structuralItems.map((item: any) => ({
+						id: item.id,
+						category: item.category,
+						subCategory: item.subCategory,
+						name: item.name,
+						quantity: item.quantity,
+						dimensions: (item.dimensions as Record<string, number>) || {},
+						concreteVolume: item.concreteVolume || 0,
+						steelWeight: item.steelWeight || 0,
+						totalCost: item.totalCost || 0,
+					}))}
+					studyId={studyId}
+					organizationId={organizationId}
+					studyName={(study as any)?.name}
+				/>
+			)}
 		</div>
 	);
 }

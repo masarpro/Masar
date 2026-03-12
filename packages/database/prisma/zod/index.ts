@@ -109,7 +109,7 @@ export type AiChatScalarFieldEnum = z.infer<typeof AiChatScalarFieldEnumSchema>;
 
 // File: CostStudyScalarFieldEnum.schema.ts
 
-export const CostStudyScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'createdById', 'name', 'customerName', 'customerId', 'projectType', 'landArea', 'buildingArea', 'numberOfFloors', 'hasBasement', 'finishingLevel', 'structuralCost', 'finishingCost', 'mepCost', 'laborCost', 'overheadPercent', 'profitPercent', 'contingencyPercent', 'vatIncluded', 'totalCost', 'buildingConfig', 'status', 'notes', 'projectId', 'studyType', 'entryPoint', 'quantitiesStatus', 'specsStatus', 'costingStatus', 'pricingStatus', 'quotationStatus', 'quantitiesAssigneeId', 'specsAssigneeId', 'costingAssigneeId', 'pricingAssigneeId', 'contractValue', 'generatedQuotationId', 'convertedProjectId', 'structuralSpecs', 'costingMethod', 'overheadCost', 'adminCost', 'adminPercent', 'storageCostPercent', 'markupMethod', 'uniformMarkupPercent', 'createdAt', 'updatedAt'])
+export const CostStudyScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'createdById', 'name', 'customerName', 'customerId', 'projectType', 'landArea', 'buildingArea', 'numberOfFloors', 'hasBasement', 'finishingLevel', 'structuralCost', 'finishingCost', 'mepCost', 'laborCost', 'overheadPercent', 'profitPercent', 'contingencyPercent', 'vatIncluded', 'totalCost', 'buildingConfig', 'status', 'notes', 'projectId', 'studyType', 'entryPoint', 'workScopes', 'quantitiesStatus', 'specsStatus', 'costingStatus', 'pricingStatus', 'quotationStatus', 'quantitiesAssigneeId', 'specsAssigneeId', 'costingAssigneeId', 'pricingAssigneeId', 'contractValue', 'generatedQuotationId', 'convertedProjectId', 'structuralSpecs', 'costingMethod', 'overheadCost', 'adminCost', 'adminPercent', 'storageCostPercent', 'markupMethod', 'uniformMarkupPercent', 'createdAt', 'updatedAt'])
 
 export type CostStudyScalarFieldEnum = z.infer<typeof CostStudyScalarFieldEnumSchema>;
 
@@ -763,7 +763,7 @@ export type PurchaseType = z.infer<typeof PurchaseTypeSchema>;
 
 // File: StudyType.schema.ts
 
-export const StudyTypeSchema = z.enum(['FULL_PROJECT', 'CUSTOM_ITEMS', 'LUMP_SUM_ANALYSIS'])
+export const StudyTypeSchema = z.enum(['FULL_PROJECT', 'CUSTOM_ITEMS', 'LUMP_SUM_ANALYSIS', 'FULL_STUDY', 'COST_PRICING', 'QUICK_PRICING'])
 
 export type StudyType = z.infer<typeof StudyTypeSchema>;
 
@@ -1605,6 +1605,7 @@ export const CostStudySchema = z.object({
   projectId: z.string().nullish(),
   studyType: StudyTypeSchema.default("FULL_PROJECT"),
   entryPoint: StudyEntryPointSchema.default("FROM_SCRATCH"),
+  workScopes: z.array(z.string()),
   quantitiesStatus: StageStatusSchema.default("DRAFT"),
   specsStatus: StageStatusSchema.default("NOT_STARTED"),
   costingStatus: StageStatusSchema.default("NOT_STARTED"),

@@ -68,6 +68,7 @@ interface FoundationsSectionProps {
 	}>;
 	onSave: () => void;
 	onUpdate: () => void;
+	specs?: { concreteType: string; steelGrade: string };
 }
 
 type FoundationType = "isolated" | "combined" | "strip" | "raft";
@@ -79,7 +80,6 @@ interface FormData {
 	length: number;
 	width: number;
 	height: number;
-	concreteType: string;
 	cover: number;
 	hookLength: number;
 	// حديد الفرش القصير (سفلي)
@@ -131,6 +131,7 @@ export function FoundationsSection({
 	items,
 	onSave,
 	onUpdate,
+	specs,
 }: FoundationsSectionProps) {
 	const t = useTranslations();
 	const [isAdding, setIsAdding] = useState(false);
@@ -144,7 +145,6 @@ export function FoundationsSection({
 		length: 0,
 		width: 0,
 		height: 0.6,
-		concreteType: "C30",
 		cover: 0.075,
 		hookLength: 0.10,
 		// فرش قصير سفلي
@@ -209,7 +209,7 @@ export function FoundationsSection({
 					diameter: formData.topLongDiameter,
 					barsPerMeter: formData.topLongBarsPerMeter,
 				} : undefined,
-				concreteType: formData.concreteType,
+				concreteType: specs?.concreteType || "C30",
 			};
 
 			return calculateIsolatedFoundation(input);
@@ -234,7 +234,7 @@ export function FoundationsSection({
 					diameter: formData.stirrupDiameter,
 					spacing: formData.stirrupSpacing / 1000,
 				} : undefined,
-				concreteType: formData.concreteType,
+				concreteType: specs?.concreteType || "C30",
 			};
 
 			return calculateStripFoundation(input);
@@ -264,7 +264,7 @@ export function FoundationsSection({
 					diameter: formData.topYDiameter,
 					barsPerMeter: formData.topYBarsPerMeter,
 				} : undefined,
-				concreteType: formData.concreteType,
+				concreteType: specs?.concreteType || "C30",
 			};
 
 			return calculateRaftFoundation(input);
@@ -323,7 +323,6 @@ export function FoundationsSection({
 			length: 0,
 			width: 0,
 			height: 0.6,
-			concreteType: "C30",
 			cover: 0.075,
 			hookLength: 0.10,
 			bottomShortDiameter: 16,
@@ -370,9 +369,47 @@ export function FoundationsSection({
 				length: formData.length,
 				width: formData.width,
 				height: formData.height,
+				cover: formData.cover,
+				hookLength: formData.hookLength,
+				foundationType: formData.type,
+				// للقاعدة المعزولة والمشتركة
+				...(( formData.type === "isolated" || formData.type === "combined") && {
+					bottomShortDiameter: formData.bottomShortDiameter,
+					bottomShortBarsPerMeter: formData.bottomShortBarsPerMeter,
+					bottomLongDiameter: formData.bottomLongDiameter,
+					bottomLongBarsPerMeter: formData.bottomLongBarsPerMeter,
+					hasTopShort: formData.hasTopShort ? 1 : 0,
+					topShortDiameter: formData.topShortDiameter,
+					topShortBarsPerMeter: formData.topShortBarsPerMeter,
+					hasTopLong: formData.hasTopLong ? 1 : 0,
+					topLongDiameter: formData.topLongDiameter,
+					topLongBarsPerMeter: formData.topLongBarsPerMeter,
+				}),
+				// للقاعدة الشريطية
+				...(formData.type === "strip" && {
+					bottomMainCount: formData.bottomMainCount,
+					bottomMainDiameter: formData.bottomMainDiameter,
+					hasStirrup: formData.hasStirrup ? 1 : 0,
+					stirrupDiameter: formData.stirrupDiameter,
+					stirrupSpacing: formData.stirrupSpacing,
+					segmentLength: formData.segments[0]?.length || 0,
+				}),
+				// للبشة
+				...(formData.type === "raft" && {
+					thickness: formData.thickness,
+					bottomXDiameter: formData.bottomXDiameter,
+					bottomXBarsPerMeter: formData.bottomXBarsPerMeter,
+					bottomYDiameter: formData.bottomYDiameter,
+					bottomYBarsPerMeter: formData.bottomYBarsPerMeter,
+					hasTopMesh: formData.hasTopMesh ? 1 : 0,
+					topXDiameter: formData.topXDiameter,
+					topXBarsPerMeter: formData.topXBarsPerMeter,
+					topYDiameter: formData.topYDiameter,
+					topYBarsPerMeter: formData.topYBarsPerMeter,
+				}),
 			},
 			concreteVolume: calculations.concreteVolume,
-			concreteType: formData.concreteType,
+			concreteType: specs?.concreteType || "C30",
 			steelWeight: calculations.totals.grossWeight,
 			steelRatio: calculations.concreteVolume > 0
 				? calculations.totals.grossWeight / calculations.concreteVolume
@@ -447,35 +484,34 @@ export function FoundationsSection({
 														length: item.dimensions?.length || 0,
 														width: item.dimensions?.width || 0,
 														height: item.dimensions?.height || 0.6,
-														concreteType: "C30",
-														cover: 0.075,
-														hookLength: 0.10,
-														bottomShortDiameter: 16,
-														bottomShortBarsPerMeter: 5,
-														bottomLongDiameter: 16,
-														bottomLongBarsPerMeter: 5,
-														hasTopShort: true,
-														topShortDiameter: 12,
-														topShortBarsPerMeter: 4,
-														hasTopLong: true,
-														topLongDiameter: 12,
-														topLongBarsPerMeter: 4,
-														segments: [{ length: 10 }],
-														bottomMainCount: 6,
-														bottomMainDiameter: 16,
-														hasStirrup: true,
-														stirrupDiameter: 10,
-														stirrupSpacing: 200,
-														thickness: 0.6,
-														bottomXDiameter: 16,
-														bottomXBarsPerMeter: 5,
-														bottomYDiameter: 16,
-														bottomYBarsPerMeter: 5,
-														hasTopMesh: true,
-														topXDiameter: 12,
-														topXBarsPerMeter: 4,
-														topYDiameter: 12,
-														topYBarsPerMeter: 4,
+														cover: item.dimensions?.cover || 0.075,
+														hookLength: item.dimensions?.hookLength || 0.10,
+														bottomShortDiameter: item.dimensions?.bottomShortDiameter || 16,
+														bottomShortBarsPerMeter: item.dimensions?.bottomShortBarsPerMeter || 5,
+														bottomLongDiameter: item.dimensions?.bottomLongDiameter || 16,
+														bottomLongBarsPerMeter: item.dimensions?.bottomLongBarsPerMeter || 5,
+														hasTopShort: item.dimensions?.hasTopShort !== undefined ? !!item.dimensions.hasTopShort : true,
+														topShortDiameter: item.dimensions?.topShortDiameter || 12,
+														topShortBarsPerMeter: item.dimensions?.topShortBarsPerMeter || 4,
+														hasTopLong: item.dimensions?.hasTopLong !== undefined ? !!item.dimensions.hasTopLong : true,
+														topLongDiameter: item.dimensions?.topLongDiameter || 12,
+														topLongBarsPerMeter: item.dimensions?.topLongBarsPerMeter || 4,
+														segments: [{ length: item.dimensions?.segmentLength || 10 }],
+														bottomMainCount: item.dimensions?.bottomMainCount || 6,
+														bottomMainDiameter: item.dimensions?.bottomMainDiameter || 16,
+														hasStirrup: item.dimensions?.hasStirrup !== undefined ? !!item.dimensions.hasStirrup : true,
+														stirrupDiameter: item.dimensions?.stirrupDiameter || 10,
+														stirrupSpacing: item.dimensions?.stirrupSpacing || 200,
+														thickness: item.dimensions?.thickness || 0.6,
+														bottomXDiameter: item.dimensions?.bottomXDiameter || 16,
+														bottomXBarsPerMeter: item.dimensions?.bottomXBarsPerMeter || 5,
+														bottomYDiameter: item.dimensions?.bottomYDiameter || 16,
+														bottomYBarsPerMeter: item.dimensions?.bottomYBarsPerMeter || 5,
+														hasTopMesh: item.dimensions?.hasTopMesh !== undefined ? !!item.dimensions.hasTopMesh : true,
+														topXDiameter: item.dimensions?.topXDiameter || 12,
+														topXBarsPerMeter: item.dimensions?.topXBarsPerMeter || 4,
+														topYDiameter: item.dimensions?.topYDiameter || 12,
+														topYBarsPerMeter: item.dimensions?.topYBarsPerMeter || 4,
 													});
 												}}
 												title={t("common.edit")}
@@ -526,8 +562,7 @@ export function FoundationsSection({
 							onSubTypeChange={(type) => setFormData({ ...formData, type: type as FoundationType })}
 							quantity={formData.quantity}
 							onQuantityChange={(quantity) => setFormData({ ...formData, quantity })}
-							concreteType={formData.concreteType}
-							onConcreteTypeChange={(concreteType) => setFormData({ ...formData, concreteType })}
+							showConcreteType={false}
 							showQuantity={formData.type === "isolated" || formData.type === "combined"}
 						/>
 
@@ -824,11 +859,11 @@ export function FoundationsSection({
 			) : (
 				<Button
 					variant="outline"
-					className="w-full border-dashed"
+					className="w-full bg-primary/10 text-primary border-2 border-dashed border-primary/40 hover:bg-primary/20 hover:border-primary/60 transition-all"
 					onClick={() => setIsAdding(true)}
 				>
-					<Plus className="h-4 w-4 ml-2" />
-					{t("pricing.studies.structural.addItem")}
+					<Plus className="h-5 w-5 ml-2" />
+					<span className="font-semibold">{t("pricing.studies.structural.addItem")}</span>
 				</Button>
 			)}
 

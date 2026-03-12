@@ -9,13 +9,22 @@ import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedu
 // SCHEMA
 // ═══════════════════════════════════════════════════════════════
 
-const structuralSpecsSchema = z.object({
-	concreteGrade: z.string().optional(),
+const elementSpecSchema = z.object({
+	concreteType: z.string().optional(),
 	steelGrade: z.string().optional(),
+});
+
+const structuralSpecsSchema = z.object({
+	// Per-element specs
+	elements: z.record(z.string(), elementSpecSchema).optional(),
+	// General specs
 	externalBlockType: z.string().optional(),
 	internalBlockType: z.string().optional(),
 	waterproofType: z.string().optional(),
 	thermalInsulationType: z.string().optional(),
+	// Legacy fields (kept for backward compatibility)
+	concreteGrade: z.string().optional(),
+	steelGrade: z.string().optional(),
 });
 
 // ═══════════════════════════════════════════════════════════════

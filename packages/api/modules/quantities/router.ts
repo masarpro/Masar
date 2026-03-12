@@ -38,6 +38,7 @@ import { costingGenerateItems, costingGetItems, costingUpdateItem, costingBulkUp
 import { markupGetSettings, markupSetUniform, markupSetSectionMarkups, markupGetProfitAnalysis } from "./procedures/markup";
 import { getSpecifications, updateItemSpec, applyTemplateToAll, applySpecToAllFloors, generateBOM, getBOM } from "./procedures/specifications";
 import { createStudyQuotation } from "./procedures/create-study-quotation";
+import { updateConfig } from "./procedures/update-config";
 
 export const quantitiesRouter = {
 	list,
@@ -137,4 +138,5 @@ export const quantitiesRouter = {
 		getBOM,
 	},
 	createStudyQuotation,
+	updateConfig,
 };

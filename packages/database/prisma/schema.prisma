@@ -1269,6 +1269,7 @@ model CostStudy {
   // ═══ Pipeline — مراحل الدراسة ═══
   studyType            StudyType     @default(FULL_PROJECT) @map("study_type")
   entryPoint           StudyEntryPoint @default(FROM_SCRATCH) @map("entry_point")
+  workScopes           String[]      @default([]) @map("work_scopes")
   stages               StudyStage[]
 
   // حالة كل مرحلة
@@ -4999,6 +5000,9 @@ enum StudyType {
   FULL_PROJECT
   CUSTOM_ITEMS
   LUMP_SUM_ANALYSIS
+  FULL_STUDY
+  COST_PRICING
+  QUICK_PRICING
 }
 
 enum StageStatus {

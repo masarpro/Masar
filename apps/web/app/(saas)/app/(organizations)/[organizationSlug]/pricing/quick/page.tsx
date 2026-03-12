@@ -1,11 +1,4 @@
-import { getActiveOrganization } from "@saas/auth/lib/server";
-import { PricingShell } from "@saas/pricing/components/shell";
-import { QuickPricingStandalone } from "@saas/pricing/components/pricing-v2/QuickPricingStandalone";
-import { notFound } from "next/navigation";
-
-export const metadata = {
-	title: "التسعير السريع",
-};
+import { redirect } from "next/navigation";
 
 export default async function QuickPricingPage({
 	params,
@@ -13,21 +6,5 @@ export default async function QuickPricingPage({
 	params: Promise<{ organizationSlug: string }>;
 }) {
 	const { organizationSlug } = await params;
-	const activeOrganization = await getActiveOrganization(organizationSlug);
-
-	if (!activeOrganization) {
-		return notFound();
-	}
-
-	return (
-		<PricingShell
-			organizationSlug={organizationSlug}
-			sectionKey="studies"
-		>
-			<QuickPricingStandalone
-				organizationId={activeOrganization.id}
-				organizationSlug={organizationSlug}
-			/>
-		</PricingShell>
-	);
+	redirect(`/app/${organizationSlug}/pricing/studies`);
 }

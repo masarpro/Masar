@@ -55,6 +55,7 @@ interface StairsSectionProps {
 	}>;
 	onSave: () => void;
 	onUpdate: () => void;
+	specs?: { concreteType: string; steelGrade: string };
 }
 
 interface CuttingDetail {
@@ -127,6 +128,7 @@ export function StairsSection({
 	items,
 	onSave,
 	onUpdate,
+	specs,
 }: StairsSectionProps) {
 	const t = useTranslations();
 	const [isAdding, setIsAdding] = useState(false);
@@ -147,7 +149,6 @@ export function StairsSection({
 		mainBarsPerMeter: 7, // سيخ/متر (≈ 150 مم)
 		secondaryBarDiameter: 10,
 		secondaryBarsPerMeter: 5, // سيخ/متر (≈ 200 مم)
-		concreteType: "C30",
 	});
 
 	const createMutation = useMutation(
@@ -211,7 +212,7 @@ export function StairsSection({
 			mainBarSpacing: mainBarSpacing,
 			secondaryBarDiameter: formData.secondaryBarDiameter,
 			secondaryBarSpacing: secondaryBarSpacing,
-			concreteType: formData.concreteType,
+			concreteType: specs?.concreteType || "C30",
 		});
 
 		// حساب تفاصيل القص للحديد الرئيسي والثانوي
@@ -271,7 +272,7 @@ export function StairsSection({
 				stocksNeeded: Array.from(stocksMap.values()),
 			},
 		};
-	}, [formData]);
+	}, [formData, specs]);
 
 	const handleSubmit = async () => {
 		if (!formData.name || !calculations) return;
@@ -287,11 +288,16 @@ export function StairsSection({
 				width: formData.width,
 				flightLength: formData.flightLength,
 				landingLength: formData.landingLength,
+				landingWidth: formData.landingWidth,
 				thickness: formData.thickness,
 				risersCount: formData.risersCount,
+				mainDiameter: formData.mainBarDiameter,
+				mainBarsPerMeter: formData.mainBarsPerMeter,
+				secondaryDiameter: formData.secondaryBarDiameter,
+				secondaryBarsPerMeter: formData.secondaryBarsPerMeter,
 			},
 			concreteVolume: calculations.concreteVolume,
-			concreteType: formData.concreteType,
+			concreteType: specs?.concreteType || "C30",
 			steelWeight: calculations.totals.grossWeight,
 			steelRatio: (calculations.totals.grossWeight / calculations.concreteVolume) || 0,
 			materialCost: calculations.concreteCost + calculations.rebarCost,
@@ -356,16 +362,15 @@ export function StairsSection({
 														width: item.dimensions?.width || 1.2,
 														flightLength: item.dimensions?.flightLength || 3,
 														landingLength: item.dimensions?.landingLength || 1.5,
-														landingWidth: 1.2,
+														landingWidth: item.dimensions?.landingWidth || 1.2,
 														thickness: item.dimensions?.thickness || 15,
 														risersCount: item.dimensions?.risersCount || 10,
 														riserHeight: 17,
 														treadDepth: 28,
-														mainBarDiameter: 14,
-														mainBarsPerMeter: 7,
-														secondaryBarDiameter: 10,
-														secondaryBarsPerMeter: 5,
-														concreteType: "C30",
+														mainBarDiameter: item.dimensions?.mainDiameter || 14,
+														mainBarsPerMeter: item.dimensions?.mainBarsPerMeter || 7,
+														secondaryBarDiameter: item.dimensions?.secondaryDiameter || 10,
+														secondaryBarsPerMeter: item.dimensions?.secondaryBarsPerMeter || 5,
 													});
 												}}
 												title={t("common.edit")}
@@ -409,10 +414,7 @@ export function StairsSection({
 							onNameChange={(name) => setFormData({ ...formData, name })}
 							quantity={1}
 							onQuantityChange={() => {}}
-							concreteType={formData.concreteType}
-							onConcreteTypeChange={(type) =>
-								setFormData({ ...formData, concreteType: type })
-							}
+							showConcreteType={false}
 							showQuantity={false}
 							showSubType={false}
 						/>
@@ -628,11 +630,11 @@ export function StairsSection({
 			) : (
 				<Button
 					variant="outline"
-					className="w-full border-dashed"
+					className="w-full bg-primary/10 text-primary border-2 border-dashed border-primary/40 hover:bg-primary/20 hover:border-primary/60 transition-all"
 					onClick={() => setIsAdding(true)}
 				>
-					<Plus className="h-4 w-4 ml-2" />
-					{t("pricing.studies.structural.addItem")}
+					<Plus className="h-5 w-5 ml-2" />
+					<span className="font-semibold">{t("pricing.studies.structural.addItem")}</span>
 				</Button>
 			)}
 

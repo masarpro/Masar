@@ -2,6 +2,8 @@
 
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { useSession } from "@saas/auth/hooks/use-session";
+import { orpc } from "@shared/lib/orpc-query-utils";
+import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
@@ -31,7 +33,6 @@ import {
 	Wallet,
 	Banknote,
 	Building2,
-	Zap,
 	UserPlus,
 } from "lucide-react";
 
@@ -71,10 +72,45 @@ export function useSidebarMenu(): {
 	}, [pathname]);
 
 	// Extract studyId from pathname when inside a pricing study
+	// Exclude known sub-routes like "new" that aren't real study IDs
 	const studyId = useMemo(() => {
 		const match = pathname.match(/\/pricing\/studies\/([^/]+)/);
-		return match?.[1] ?? null;
+		const id = match?.[1] ?? null;
+		if (id === "new") return null;
+		return id;
 	}, [pathname]);
+
+	// Fetch study data for sidebar filtering (only when inside a study)
+	const { data: studyData } = useQuery({
+		...orpc.pricing.studies.getById.queryOptions({
+			input: {
+				id: studyId ?? "",
+				organizationId: activeOrganization?.id ?? "",
+			},
+		}),
+		enabled: !!studyId && !!activeOrganization?.id,
+	});
+
+	const studyType = studyId ? ((studyData as any)?.studyType ?? "FULL_PROJECT") : "FULL_PROJECT";
+
+	// Determine which sidebar items to show based on study type
+	const studyEnabledStages = useMemo(() => {
+		switch (studyType) {
+			case "QUICK_PRICING":
+			case "CUSTOM_ITEMS":
+				return ["study-overview", "study-pricing", "study-quotation"];
+			case "LUMP_SUM_ANALYSIS":
+				return ["study-overview", "study-costing", "study-pricing"];
+			default:
+				return [
+					"study-quantities",
+					"study-specifications",
+					"study-costing",
+					"study-pricing",
+					"study-quotation",
+				];
+		}
+	}, [studyType]);
 
 	const items = useMemo<SidebarMenuItem[]>(() => {
 		const projectBase = projectId
@@ -280,19 +316,13 @@ export function useSidebarMenu(): {
 												href: `${orgPrefix}/pricing/studies/${studyId}/quotation`,
 												icon: FileCheck2,
 											},
-										]
+										].filter((item) => studyEnabledStages.includes(item.id))
 									: []),
 								{
 									id: "pricing-quotations",
 									label: t("pricing.shell.sections.quotations"),
 									href: `${orgPrefix}/pricing/quotations`,
 									icon: FileSpreadsheet,
-								},
-								{
-									id: "pricing-quick",
-									label: "التسعير السريع",
-									href: `${orgPrefix}/pricing/quick`,
-									icon: Zap,
 								},
 								{
 									id: "pricing-leads",
@@ -372,6 +402,7 @@ export function useSidebarMenu(): {
 		user?.role,
 		projectId,
 		studyId,
+		studyEnabledStages,
 	]);
 
 	const activeId = useMemo(() => {

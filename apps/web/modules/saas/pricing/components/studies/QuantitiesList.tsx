@@ -13,7 +13,7 @@ import {
 	TrendingUp,
 	Clock,
 	CheckCircle2,
-	FileStack
+	FileStack,
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
@@ -144,10 +144,12 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 							</button>
 						))}
 					</div>
-					<Button onClick={() => setShowCreateDialog(true)} className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors shrink-0">
-						<Plus className="ml-2 h-4 w-4" />
-						{t("pricing.studies.newStudy")}
-					</Button>
+					<div className="flex items-center gap-2 shrink-0">
+						<Button onClick={() => setShowCreateDialog(true)} className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors">
+							<Plus className="ml-2 h-4 w-4" />
+							{t("pricing.studies.newStudy")}
+						</Button>
+					</div>
 				</div>
 				{/* Search */}
 				<div className="relative max-w-md">

@@ -11,7 +11,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@ui/components/select";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, Settings2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -25,66 +25,65 @@ interface StructuralSpecsProps {
 	studyId: string;
 }
 
-interface SpecValues {
-	concreteGrade: string;
+interface ElementSpec {
+	concreteType: string;
 	steelGrade: string;
-	externalBlockType: string;
-	internalBlockType: string;
-	waterproofType: string;
-	thermalInsulationType: string;
+}
+
+interface SpecValues {
+	elements: Record<string, ElementSpec>;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// خيارات الخرسانة والحديد
+// ═══════════════════════════════════════════════════════════════
+
+const CONCRETE_OPTIONS = ["C15", "C20", "C25", "C30", "C35", "C40"];
+
+const STEEL_GRADE_OPTIONS = [
+	{ value: "40", label: "Grade 40 (280 MPa)" },
+	{ value: "60", label: "Grade 60 (420 MPa)" },
+	{ value: "80", label: "Grade 80 (520 MPa)" },
+];
+
+// ═══════════════════════════════════════════════════════════════
+// تعريف العناصر الإنشائية مع الاختيارات التلقائية
+// ═══════════════════════════════════════════════════════════════
+
+interface ElementRow {
+	id: string;
+	label: string;
+	icon: string;
+	defaultConcrete: string;
+	defaultSteel: string;
+	hasConcrete: boolean;
+	hasSteel: boolean;
+}
+
+const ELEMENT_ROWS: ElementRow[] = [
+	{ id: "plainConcrete", label: "صبة النظافة / خرسانة عادية", icon: "🧱", defaultConcrete: "C15", defaultSteel: "", hasConcrete: true, hasSteel: false },
+	{ id: "foundations", label: "القواعد والأساسات", icon: "🏗️", defaultConcrete: "C30", defaultSteel: "60", hasConcrete: true, hasSteel: true },
+	{ id: "columns", label: "الأعمدة", icon: "🏛️", defaultConcrete: "C35", defaultSteel: "60", hasConcrete: true, hasSteel: true },
+	{ id: "beams", label: "الكمرات", icon: "📏", defaultConcrete: "C30", defaultSteel: "60", hasConcrete: true, hasSteel: true },
+	{ id: "slabs", label: "البلاطات", icon: "⬛", defaultConcrete: "C30", defaultSteel: "60", hasConcrete: true, hasSteel: true },
+	{ id: "stairs", label: "السلالم", icon: "🪜", defaultConcrete: "C30", defaultSteel: "60", hasConcrete: true, hasSteel: true },
+	{ id: "blocks", label: "البلك", icon: "🧱", defaultConcrete: "", defaultSteel: "", hasConcrete: false, hasSteel: false },
+];
+
+function getDefaultElements(): Record<string, ElementSpec> {
+	const elements: Record<string, ElementSpec> = {};
+	for (const row of ELEMENT_ROWS) {
+		elements[row.id] = {
+			concreteType: row.defaultConcrete,
+			steelGrade: row.defaultSteel,
+		};
+	}
+	return elements;
 }
 
 const DEFAULT_SPECS: SpecValues = {
-	concreteGrade: "",
-	steelGrade: "",
-	externalBlockType: "",
-	internalBlockType: "",
-	waterproofType: "",
-	thermalInsulationType: "",
+	elements: getDefaultElements(),
 };
-
-const CONCRETE_GRADES = [
-	{ value: "C25/30", label: "C25/30" },
-	{ value: "C30/37", label: "C30/37" },
-	{ value: "C35/45", label: "C35/45" },
-];
-
-const STEEL_GRADES = [
-	{ value: "Grade 40", label: "Grade 40" },
-	{ value: "Grade 60", label: "Grade 60" },
-];
-
-const EXTERNAL_BLOCK_TYPES = [
-	{ value: "20cm-standard", label: "بلوك 20سم عادي" },
-	{ value: "20cm-insulated", label: "بلوك 20سم عازل" },
-	{ value: "15cm-standard", label: "بلوك 15سم عادي" },
-];
-
-const INTERNAL_BLOCK_TYPES = [
-	{ value: "15cm-standard", label: "بلوك 15سم عادي" },
-	{ value: "10cm-standard", label: "بلوك 10سم عادي" },
-];
-
-const WATERPROOF_TYPES = [
-	{ value: "bitumen-membrane", label: "لفافات بيتومينية" },
-	{ value: "liquid-membrane", label: "عزل سائل" },
-	{ value: "crystalline", label: "عزل كريستالي" },
-	{ value: "pvc-membrane", label: "أغشية PVC" },
-];
-
-const THERMAL_INSULATION_TYPES = [
-	{ value: "xps-5cm", label: "XPS 5سم" },
-	{ value: "xps-7cm", label: "XPS 7سم" },
-	{ value: "eps-5cm", label: "EPS 5سم" },
-	{ value: "polyurethane", label: "رغوة بولي يوريثين" },
-	{ value: "rockwool", label: "صوف صخري" },
-];
-
-interface SpecRow {
-	key: keyof SpecValues;
-	label: string;
-	options: { value: string; label: string }[];
-}
 
 // ═══════════════════════════════════════════════════════════════
 // COMPONENT
@@ -107,13 +106,9 @@ export function StructuralSpecs({
 
 	useEffect(() => {
 		if (data) {
+			const d = data as Record<string, any>;
 			setSpecs({
-				concreteGrade: (data as Record<string, string>).concreteGrade || "",
-				steelGrade: (data as Record<string, string>).steelGrade || "",
-				externalBlockType: (data as Record<string, string>).externalBlockType || "",
-				internalBlockType: (data as Record<string, string>).internalBlockType || "",
-				waterproofType: (data as Record<string, string>).waterproofType || "",
-				thermalInsulationType: (data as Record<string, string>).thermalInsulationType || "",
+				elements: d.elements ?? getDefaultElements(),
 			});
 		}
 	}, [data]);
@@ -131,9 +126,18 @@ export function StructuralSpecs({
 		}),
 	);
 
-	const handleChange = useCallback(
-		(key: keyof SpecValues, value: string) => {
-			setSpecs((prev) => ({ ...prev, [key]: value }));
+	const handleElementChange = useCallback(
+		(elementId: string, field: "concreteType" | "steelGrade", value: string) => {
+			setSpecs((prev) => ({
+				...prev,
+				elements: {
+					...prev.elements,
+					[elementId]: {
+						...prev.elements[elementId],
+						[field]: value,
+					},
+				},
+			}));
 			setIsDirty(true);
 		},
 		[],
@@ -147,39 +151,6 @@ export function StructuralSpecs({
 		});
 	};
 
-	const rows: SpecRow[] = [
-		{
-			key: "concreteGrade",
-			label: t("pricing.pipeline.specsConcreteGrade"),
-			options: CONCRETE_GRADES,
-		},
-		{
-			key: "steelGrade",
-			label: t("pricing.pipeline.specsSteelGrade"),
-			options: STEEL_GRADES,
-		},
-		{
-			key: "externalBlockType",
-			label: t("pricing.pipeline.specsExternalBlock"),
-			options: EXTERNAL_BLOCK_TYPES,
-		},
-		{
-			key: "internalBlockType",
-			label: t("pricing.pipeline.specsInternalBlock"),
-			options: INTERNAL_BLOCK_TYPES,
-		},
-		{
-			key: "waterproofType",
-			label: t("pricing.pipeline.specsWaterproof"),
-			options: WATERPROOF_TYPES,
-		},
-		{
-			key: "thermalInsulationType",
-			label: t("pricing.pipeline.specsThermalInsulation"),
-			options: THERMAL_INSULATION_TYPES,
-		},
-	];
-
 	if (isLoading) {
 		return (
 			<Card>
@@ -192,11 +163,12 @@ export function StructuralSpecs({
 
 	return (
 		<Card dir="rtl">
-			<CardHeader className="pb-4">
+			<CardHeader className="pb-3">
 				<div className="flex items-center justify-between">
-					<CardTitle className="text-base">
-						{t("pricing.pipeline.specsStructuralTitle")}
-					</CardTitle>
+					<div className="flex items-center gap-2">
+						<Settings2 className="h-5 w-5 text-amber-600" />
+						<CardTitle className="text-base">مواصفات الخرسانة والحديد</CardTitle>
+					</div>
 					<Button
 						size="sm"
 						onClick={handleSave}
@@ -211,41 +183,78 @@ export function StructuralSpecs({
 						{t("pricing.pipeline.specsSave")}
 					</Button>
 				</div>
+				<p className="text-sm text-muted-foreground">
+					اختيارات تلقائية بحسب نوع العنصر — يمكنك تعديلها
+				</p>
 			</CardHeader>
 			<CardContent>
-				<div className="space-y-3">
-					{rows.map((row) => (
-						<div
-							key={row.key}
-							className="grid grid-cols-[180px_1fr] items-center gap-3"
-						>
-							<label className="text-sm font-medium text-muted-foreground">
-								{row.label}
-							</label>
-							<Select
-								value={specs[row.key] || "none"}
-								onValueChange={(v: any) =>
-									handleChange(row.key, v === "none" ? "" : v)
-								}
-							>
-								<SelectTrigger className="h-9">
-									<SelectValue
-										placeholder={t("pricing.pipeline.specsSelect")}
-									/>
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="none">
-										— {t("pricing.pipeline.specsNotSet")} —
-									</SelectItem>
-									{row.options.map((opt) => (
-										<SelectItem key={opt.value} value={opt.value}>
-											{opt.label}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</div>
-					))}
+				<div className="border rounded-lg overflow-hidden">
+					<table className="w-full">
+						<thead>
+							<tr className="bg-muted/50 text-sm">
+								<th className="text-right py-2.5 px-4 font-medium">العنصر الإنشائي</th>
+								<th className="text-center py-2.5 px-4 font-medium">نوع الخرسانة</th>
+								<th className="text-center py-2.5 px-4 font-medium">رتبة الحديد</th>
+							</tr>
+						</thead>
+						<tbody>
+							{ELEMENT_ROWS.map((row, idx) => (
+								<tr
+									key={row.id}
+									className={idx % 2 === 0 ? "bg-background" : "bg-muted/20"}
+								>
+									<td className="py-2.5 px-4">
+										<div className="flex items-center gap-2">
+											<span className="text-lg">{row.icon}</span>
+											<span className="font-medium text-sm">{row.label}</span>
+										</div>
+									</td>
+									<td className="py-2 px-4">
+										{row.hasConcrete ? (
+											<div className="flex justify-center">
+												<Select
+													value={specs.elements[row.id]?.concreteType || row.defaultConcrete}
+													onValueChange={(val) => handleElementChange(row.id, "concreteType", val)}
+												>
+													<SelectTrigger className="w-28 h-8 text-center text-sm">
+														<SelectValue />
+													</SelectTrigger>
+													<SelectContent>
+														{CONCRETE_OPTIONS.map((c) => (
+															<SelectItem key={c} value={c}>{c}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+											</div>
+										) : (
+											<p className="text-center text-xs text-muted-foreground">—</p>
+										)}
+									</td>
+									<td className="py-2 px-4">
+										{row.hasSteel ? (
+											<div className="flex justify-center">
+												<Select
+													value={specs.elements[row.id]?.steelGrade || row.defaultSteel}
+													onValueChange={(val) => handleElementChange(row.id, "steelGrade", val)}
+												>
+													<SelectTrigger className="w-44 h-8 text-center text-sm">
+														<SelectValue />
+													</SelectTrigger>
+													<SelectContent>
+														{STEEL_GRADE_OPTIONS.map((s) => (
+															<SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+											</div>
+										) : (
+											<p className="text-center text-xs text-muted-foreground">—</p>
+										)}
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
 				</div>
 			</CardContent>
 		</Card>

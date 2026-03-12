@@ -1402,6 +1402,37 @@
 				"luxury": "فاخر",
 				"superLuxury": "سوبر فاخر"
 			},
+			"create": {
+				"selectGoal": "ماذا تريد أن تفعل؟",
+				"selectGoalDescription": "اختر نوع العمل المناسب لاحتياجك",
+				"goals": {
+					"full_study": {
+						"title": "دراسة كاملة من الصفر",
+						"description": "حساب الكميات والمواصفات والتسعير خطوة بخطوة",
+						"badge": "جميع المراحل"
+					},
+					"cost_pricing": {
+						"title": "تسعير تكلفة",
+						"description": "لديّ كميات جاهزة وأريد تحديد المواصفات والتسعير",
+						"badge": "يتخطى محرك الكميات"
+					},
+					"quick_pricing": {
+						"title": "تسعير سريع",
+						"description": "إدخال بنود وأسعار مباشرة بدون تفاصيل",
+						"badge": "مباشر لعرض السعر"
+					}
+				},
+				"selectScope": "ما نطاق العمل؟",
+				"selectScopeDescription": "يمكن اختيار أكثر من خيار",
+				"scopes": {
+					"STRUCTURAL": "أعمال إنشائية",
+					"FINISHING": "أعمال تشطيبات",
+					"MEP": "كهروميكانيكية",
+					"CUSTOM": "بنود مخصصة"
+				},
+				"editConfig": "تعديل صيغة الدراسة",
+				"studyConfig": "صيغة الدراسة"
+			},
 			"overview": {
 				"title": "نظرة عامة",
 				"projectInfo": "معلومات المشروع",

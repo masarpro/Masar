@@ -4,9 +4,13 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Calculator } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
 import { StudyOverviewSkeleton } from "@saas/shared/components/skeletons";
+import { useStudyConfig } from "../../hooks/useStudyConfig";
 import { StudyHeaderCard } from "./StudyHeaderCard";
+import { StudyConfigBar } from "./StudyConfigBar";
+import { EditStudyConfigDialog } from "./EditStudyConfigDialog";
 import { StudyPipelineStepper } from "./StudyPipelineStepper";
 
 interface StudyPageShellProps {
@@ -23,6 +27,7 @@ export function StudyPageShell({
 	children,
 }: StudyPageShellProps) {
 	const t = useTranslations();
+	const [editConfigOpen, setEditConfigOpen] = useState(false);
 
 	const { data: study, isLoading } = useQuery(
 		orpc.pricing.studies.getById.queryOptions({
@@ -40,6 +45,15 @@ export function StudyPageShell({
 	// Build stages array for stepper
 	const stagesArray = (stagesData as any)?.stages ?? [];
 	const entryPoint = (stagesData as any)?.entryPoint ?? "FROM_SCRATCH";
+
+	const studyType = (study as any)?.studyType ?? "FULL_PROJECT";
+	const workScopes: string[] = (study as any)?.workScopes ?? [];
+
+	const { enabledStageTypes } = useStudyConfig({
+		studyType,
+		workScopes,
+		entryPoint,
+	});
 
 	if (isLoading) {
 		return <StudyOverviewSkeleton />;
@@ -62,7 +76,18 @@ export function StudyPageShell({
 	return (
 		<div className="space-y-6" dir="rtl">
 			{/* Header card */}
-			<StudyHeaderCard study={study as any} />
+			<StudyHeaderCard
+				study={study as any}
+				organizationSlug={organizationSlug}
+			/>
+
+			{/* Study config bar */}
+			<StudyConfigBar
+				studyType={studyType}
+				workScopes={workScopes}
+				onEdit={() => setEditConfigOpen(true)}
+				canEdit
+			/>
 
 			{/* Pipeline stepper */}
 			<StudyPipelineStepper
@@ -70,10 +95,21 @@ export function StudyPageShell({
 				organizationSlug={organizationSlug}
 				stages={stagesArray}
 				entryPoint={entryPoint}
+				enabledStageTypes={enabledStageTypes as unknown as string[]}
 			/>
 
 			{/* Page content */}
 			{children}
+
+			{/* Edit config dialog */}
+			<EditStudyConfigDialog
+				open={editConfigOpen}
+				onOpenChange={setEditConfigOpen}
+				studyId={studyId}
+				organizationId={organizationId}
+				currentStudyType={studyType}
+				currentWorkScopes={workScopes}
+			/>
 		</div>
 	);
 }

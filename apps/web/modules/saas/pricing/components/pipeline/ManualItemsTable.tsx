@@ -24,6 +24,8 @@ import { toast } from "sonner";
 interface ManualItemsTableProps {
 	organizationId: string;
 	studyId: string;
+	filterSection?: string;
+	defaultSection?: string;
 }
 
 const UNITS = [
@@ -56,7 +58,7 @@ interface NewItemState {
 	notes: string;
 }
 
-const EMPTY_NEW_ITEM: NewItemState = {
+const DEFAULT_NEW_ITEM: NewItemState = {
 	description: "",
 	unit: "م²",
 	quantity: "",
@@ -80,11 +82,14 @@ interface EditingState {
 export function ManualItemsTable({
 	organizationId,
 	studyId,
+	filterSection,
+	defaultSection,
 }: ManualItemsTableProps) {
 	const t = useTranslations();
 	const queryClient = useQueryClient();
+	const emptyNewItem = { ...DEFAULT_NEW_ITEM, section: defaultSection ?? "" };
 	const [showNewRow, setShowNewRow] = useState(false);
-	const [newItem, setNewItem] = useState<NewItemState>(EMPTY_NEW_ITEM);
+	const [newItem, setNewItem] = useState<NewItemState>(emptyNewItem);
 	const [editing, setEditing] = useState<EditingState | null>(null);
 
 	// ─── Queries ───
@@ -93,6 +98,10 @@ export function ManualItemsTable({
 			input: { organizationId, studyId },
 		}),
 	);
+
+	const filteredItems = filterSection
+		? (items as Record<string, unknown>[]).filter((item) => item.section === filterSection)
+		: (items as Record<string, unknown>[]);
 
 	const invalidate = useCallback(() => {
 		queryClient.invalidateQueries({
@@ -109,7 +118,7 @@ export function ManualItemsTable({
 			onSuccess: () => {
 				toast.success("تم إضافة البند");
 				invalidate();
-				setNewItem(EMPTY_NEW_ITEM);
+				setNewItem(emptyNewItem);
 				setShowNewRow(false);
 			},
 			onError: (e: any) => toast.error(e.message || "حدث خطأ"),
@@ -222,7 +231,7 @@ export function ManualItemsTable({
 							</tr>
 						)}
 
-						{!isLoading && (items as any[]).length === 0 && !showNewRow && (
+						{!isLoading && filteredItems.length === 0 && !showNewRow && (
 							<tr>
 								<td colSpan={7} className="text-center py-8 text-muted-foreground">
 									لا توجد بنود يدوية. اضغط &quot;إضافة بند&quot; للبدء.
@@ -231,7 +240,7 @@ export function ManualItemsTable({
 						)}
 
 						{/* Existing items */}
-						{(items as Record<string, unknown>[]).map((item, idx) => {
+						{filteredItems.map((item, idx) => {
 							const isEditing = editing?.id === item.id;
 
 							if (isEditing && editing) {
@@ -391,7 +400,7 @@ export function ManualItemsTable({
 												<Save className="h-3.5 w-3.5 text-emerald-600" />
 											)}
 										</Button>
-										<Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => { setShowNewRow(false); setNewItem(EMPTY_NEW_ITEM); }}>
+										<Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => { setShowNewRow(false); setNewItem(emptyNewItem); }}>
 											<X className="h-3.5 w-3.5" />
 										</Button>
 									</div>

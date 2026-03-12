@@ -17,7 +17,7 @@ import { useTranslations } from "next-intl";
 // ═══════════════════════════════════════════════════════════════
 
 type StageStatus = "NOT_STARTED" | "DRAFT" | "IN_REVIEW" | "APPROVED";
-type StudyType = "FULL_PROJECT" | "CUSTOM_ITEMS" | "LUMP_SUM_ANALYSIS";
+type StudyType = "FULL_PROJECT" | "CUSTOM_ITEMS" | "LUMP_SUM_ANALYSIS" | "FULL_STUDY" | "COST_PRICING" | "QUICK_PRICING";
 
 type StageKey =
 	| "quantities"
@@ -161,6 +161,9 @@ export function PipelineBar({
 	const visibleStages = STAGES.filter((stage) => {
 		if (studyType === "LUMP_SUM_ANALYSIS" && stage.key === "quotation") {
 			return false;
+		}
+		if (studyType === "QUICK_PRICING" || studyType === "CUSTOM_ITEMS") {
+			return stage.key === "selling-price" || stage.key === "quotation";
 		}
 		return true;
 	});

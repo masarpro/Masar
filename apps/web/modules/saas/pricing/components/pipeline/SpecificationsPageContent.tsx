@@ -9,11 +9,13 @@ import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
+import { useStudyConfig } from "../../hooks/useStudyConfig";
 import type { SmartBuildingConfig } from "../../lib/smart-building-types";
 import type { SavedFinishingItem, MergedQuantityItem } from "../../lib/merge-quantities";
 import { mergeQuantities } from "../../lib/merge-quantities";
 import { deriveAllQuantities } from "../../lib/derivation-engine";
 import { InlineSpecEditor } from "../specifications/InlineSpecEditor";
+import { SpecQuickTemplateBar } from "../specifications/SpecQuickTemplateBar";
 import { StructuralSpecs } from "./StructuralSpecs";
 import { StageApprovalButton } from "./StageApprovalButton";
 
@@ -37,19 +39,26 @@ export function SpecificationsPageContent({
 	studyId,
 }: SpecificationsPageContentProps) {
 	const t = useTranslations();
-	const [activeTab, setActiveTab] = useState("structural");
-
-	// ─── Fetch stages ───
-	const { data: stagesData, isLoading: stagesLoading } = useQuery(
-		orpc.pricing.studies.stages.get.queryOptions({
-			input: { organizationId, studyId },
-		}),
-	);
 
 	// ─── Fetch study ───
 	const { data: study, isLoading: studyLoading } = useQuery(
 		orpc.pricing.studies.getById.queryOptions({
 			input: { id: studyId, organizationId },
+		}),
+	);
+
+	const studyTypeVal = (study as any)?.studyType ?? "FULL_PROJECT";
+	const workScopesVal: string[] = (study as any)?.workScopes ?? [];
+	const { enabledTabs } = useStudyConfig({ studyType: studyTypeVal, workScopes: workScopesVal });
+
+	// Filter spec tabs (specs has structural, finishing, mep - no manual)
+	const specTabs = enabledTabs.filter((tab) => tab !== "manual");
+	const [activeTab, setActiveTab] = useState(specTabs[0] || "structural");
+
+	// ─── Fetch stages ───
+	const { data: stagesData, isLoading: stagesLoading } = useQuery(
+		orpc.pricing.studies.stages.get.queryOptions({
+			input: { organizationId, studyId },
 		}),
 	);
 
@@ -179,20 +188,28 @@ export function SpecificationsPageContent({
 
 			{/* Tabs */}
 			<Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl">
-				<TabsList className="w-full justify-start">
-					<TabsTrigger value="structural" className="gap-1.5">
-						<Building2 className="h-3.5 w-3.5" />
-						{t("pricing.pipeline.tabStructural")}
-					</TabsTrigger>
-					<TabsTrigger value="finishing" className="gap-1.5">
-						<PaintBucket className="h-3.5 w-3.5" />
-						{t("pricing.pipeline.tabFinishing")}
-					</TabsTrigger>
-					<TabsTrigger value="mep" className="gap-1.5">
-						<Wrench className="h-3.5 w-3.5" />
-						{t("pricing.pipeline.tabMep")}
-					</TabsTrigger>
-				</TabsList>
+				{specTabs.length > 1 && (
+					<TabsList className="w-full justify-start">
+						{specTabs.includes("structural") && (
+							<TabsTrigger value="structural" className="gap-1.5">
+								<Building2 className="h-3.5 w-3.5" />
+								{t("pricing.pipeline.tabStructural")}
+							</TabsTrigger>
+						)}
+						{specTabs.includes("finishing") && (
+							<TabsTrigger value="finishing" className="gap-1.5">
+								<PaintBucket className="h-3.5 w-3.5" />
+								{t("pricing.pipeline.tabFinishing")}
+							</TabsTrigger>
+						)}
+						{specTabs.includes("mep") && (
+							<TabsTrigger value="mep" className="gap-1.5">
+								<Wrench className="h-3.5 w-3.5" />
+								{t("pricing.pipeline.tabMep")}
+							</TabsTrigger>
+						)}
+					</TabsList>
+				)}
 
 				{/* Structural Specs */}
 				<TabsContent value="structural" className="mt-4">
@@ -204,6 +221,14 @@ export function SpecificationsPageContent({
 
 				{/* Finishing Specs - Inline Editor */}
 				<TabsContent value="finishing" className="mt-4 space-y-4">
+					{/* Quick template bar - خاص بالتشطيبات فقط */}
+					<div className="rounded-xl border border-border bg-card p-4">
+						<SpecQuickTemplateBar
+							organizationId={organizationId}
+							studyId={studyId}
+						/>
+					</div>
+
 					<h3 className="text-lg font-semibold">
 						{t("pricing.pipeline.specsFinishingTitle")}
 					</h3>

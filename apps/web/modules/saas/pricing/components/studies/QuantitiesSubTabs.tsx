@@ -35,7 +35,28 @@ export function QuantitiesSubTabs({
 	const searchParams = useSearchParams();
 	const queryClient = useQueryClient();
 
-	const currentTab = searchParams.get("tab") || defaultTab || "structural";
+	// Fetch study to determine work scopes
+	const { data: study } = useQuery(
+		orpc.pricing.studies.getById.queryOptions({
+			input: { id: studyId, organizationId },
+		}),
+	);
+
+	const workScopes: string[] = (study as any)?.workScopes ?? [];
+
+	// Determine which tabs to show based on work scopes
+	const enabledTabs: string[] = [];
+	if (workScopes.length === 0) {
+		// fallback for old studies: show all
+		enabledTabs.push("structural", "finishing", "mep", "manual");
+	} else {
+		if (workScopes.includes("STRUCTURAL")) enabledTabs.push("structural");
+		if (workScopes.includes("FINISHING")) enabledTabs.push("finishing");
+		if (workScopes.includes("MEP")) enabledTabs.push("mep");
+		if (workScopes.includes("CUSTOM")) enabledTabs.push("manual");
+	}
+
+	const currentTab = searchParams.get("tab") || defaultTab || enabledTabs[0] || "structural";
 
 	// Fetch stages for the approval button
 	const { data: stagesData } = useQuery(
@@ -48,13 +69,6 @@ export function QuantitiesSubTabs({
 	const { data: summaryData } = useQuery(
 		orpc.pricing.studies.quantitiesSummary.queryOptions({
 			input: { organizationId, studyId },
-		}),
-	);
-
-	// Fetch study for last update date
-	const { data: study } = useQuery(
-		orpc.pricing.studies.getById.queryOptions({
-			input: { id: studyId, organizationId },
 		}),
 	);
 
@@ -99,24 +113,34 @@ export function QuantitiesSubTabs({
 	return (
 		<div className="space-y-4">
 			<Tabs value={currentTab} onValueChange={handleTabChange} dir="rtl">
-				<TabsList className="w-full justify-start">
-					<TabsTrigger value="structural" className="gap-1.5">
-						<Building2 className="h-3.5 w-3.5" />
-						{t("pricing.pipeline.tabStructural")}
-					</TabsTrigger>
-					<TabsTrigger value="finishing" className="gap-1.5">
-						<PaintBucket className="h-3.5 w-3.5" />
-						{t("pricing.pipeline.tabFinishing")}
-					</TabsTrigger>
-					<TabsTrigger value="mep" className="gap-1.5">
-						<Wrench className="h-3.5 w-3.5" />
-						{t("pricing.pipeline.tabMep")}
-					</TabsTrigger>
-					<TabsTrigger value="manual" className="gap-1.5">
-						<FileEdit className="h-3.5 w-3.5" />
-						{t("pricing.pipeline.tabManual")}
-					</TabsTrigger>
-				</TabsList>
+				{enabledTabs.length > 1 && (
+					<TabsList className="w-full justify-start">
+						{enabledTabs.includes("structural") && (
+							<TabsTrigger value="structural" className="gap-1.5">
+								<Building2 className="h-3.5 w-3.5" />
+								{t("pricing.pipeline.tabStructural")}
+							</TabsTrigger>
+						)}
+						{enabledTabs.includes("finishing") && (
+							<TabsTrigger value="finishing" className="gap-1.5">
+								<PaintBucket className="h-3.5 w-3.5" />
+								{t("pricing.pipeline.tabFinishing")}
+							</TabsTrigger>
+						)}
+						{enabledTabs.includes("mep") && (
+							<TabsTrigger value="mep" className="gap-1.5">
+								<Wrench className="h-3.5 w-3.5" />
+								{t("pricing.pipeline.tabMep")}
+							</TabsTrigger>
+						)}
+						{enabledTabs.includes("manual") && (
+							<TabsTrigger value="manual" className="gap-1.5">
+								<FileEdit className="h-3.5 w-3.5" />
+								{t("pricing.pipeline.tabManual")}
+							</TabsTrigger>
+						)}
+					</TabsList>
+				)}
 
 				<TabsContent value="structural" className="mt-4">
 					<StructuralItemsEditor

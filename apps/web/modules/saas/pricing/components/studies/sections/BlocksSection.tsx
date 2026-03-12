@@ -49,6 +49,8 @@ import {
 import { formatNumber, formatCurrency } from "../../../lib/utils";
 import { BLOCK_TYPES, WALL_CATEGORIES, WASTE_PERCENTAGES } from "../../../constants/blocks";
 
+const FLOOR_NAMES = ["أرضي", "أول", "ثاني", "ثالث", "رابع", "متكرر", "أخير"] as const;
+
 interface BlocksSectionProps {
 	studyId: string;
 	organizationId: string;
@@ -61,6 +63,7 @@ interface BlocksSectionProps {
 	}>;
 	onSave: () => void;
 	onUpdate: () => void;
+	specs?: { concreteType: string; steelGrade: string };
 }
 
 // أسعار البلوك والمواد
@@ -125,6 +128,7 @@ export function BlocksSection({
 	items,
 	onSave,
 	onUpdate,
+	specs,
 }: BlocksSectionProps) {
 	const t = useTranslations();
 	const [isAdding, setIsAdding] = useState(false);
@@ -133,6 +137,7 @@ export function BlocksSection({
 
 	const [formData, setFormData] = useState({
 		name: "",
+		floor: "" as string,
 		length: 0, // متر
 		height: 0, // متر
 		thickness: 20 as 10 | 15 | 20 | 25 | 30,
@@ -188,6 +193,7 @@ export function BlocksSection({
 	const resetForm = () => {
 		setFormData({
 			name: "",
+			floor: "",
 			length: 0,
 			height: 0,
 			thickness: 20,
@@ -282,7 +288,7 @@ export function BlocksSection({
 	}, [formData]);
 
 	const handleSubmit = async () => {
-		if (!formData.name || !calculations) return;
+		if (!formData.name || !formData.floor || !calculations) return;
 
 		const itemData = {
 			costStudyId: studyId,
@@ -296,6 +302,7 @@ export function BlocksSection({
 				length: formData.length,
 				height: formData.height,
 				thickness: formData.thickness,
+				floor: formData.floor,
 			},
 			concreteVolume: calculations.lintels?.concreteVolume || 0,
 			steelWeight: calculations.lintels?.rebarWeight || 0,
@@ -387,6 +394,7 @@ export function BlocksSection({
 													setIsAdding(true);
 													setFormData({
 														name: item.name,
+														floor: String(item.dimensions?.floor || ""),
 														length: item.dimensions?.length || 0,
 														height: item.dimensions?.height || 0,
 														thickness: (item.dimensions?.thickness || 20) as 10 | 15 | 20 | 25 | 30,
@@ -430,7 +438,7 @@ export function BlocksSection({
 						</div>
 
 						{/* البيانات الأساسية */}
-						<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+						<div className="grid grid-cols-2 md:grid-cols-5 gap-4">
 							<div className="col-span-2">
 								<Label>{t("pricing.studies.structural.itemName")}</Label>
 								<Input
@@ -438,6 +446,27 @@ export function BlocksSection({
 									value={formData.name}
 									onChange={(e: any) => setFormData({ ...formData, name: e.target.value })}
 								/>
+							</div>
+
+							<div>
+								<Label>الدور <span className="text-destructive">*</span></Label>
+								<Select
+									value={formData.floor || undefined}
+									onValueChange={(v: string) =>
+										setFormData({ ...formData, floor: v })
+									}
+								>
+									<SelectTrigger className={!formData.floor ? "border-destructive ring-destructive/30 ring-2" : ""}>
+										<SelectValue placeholder="⚠ اختر الدور" />
+									</SelectTrigger>
+									<SelectContent>
+										{FLOOR_NAMES.map((floor) => (
+											<SelectItem key={floor} value={floor}>
+												{floor}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
 							</div>
 
 							<div>
@@ -483,7 +512,15 @@ export function BlocksSection({
 							</div>
 						</div>
 
-						{/* أبعاد الجدار */}
+						{/* رسالة اختيار الدور */}
+						{!formData.floor && (
+							<div className="text-center py-6 text-muted-foreground border-2 border-dashed rounded-lg">
+								<p className="text-sm font-medium">يرجى اختيار الدور أولاً للمتابعة</p>
+							</div>
+						)}
+
+						{/* أبعاد الجدار والتفاصيل - تظهر فقط بعد اختيار الدور */}
+						{formData.floor && (<>
 						<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 							<div>
 								<Label>{t("pricing.studies.structural.length")} ({t("pricing.studies.units.m")})</Label>
@@ -782,13 +819,15 @@ export function BlocksSection({
 							</div>
 						)}
 
+						</>)}
+
 						<div className="flex justify-end gap-2">
 							<Button variant="outline" onClick={() => { setIsAdding(false); setEditingItemId(null); resetForm(); }}>
 								{t("pricing.studies.form.cancel")}
 							</Button>
 							<Button
 								onClick={handleSubmit}
-								disabled={createMutation.isPending || updateMutation.isPending || !formData.name || !calculations}
+								disabled={createMutation.isPending || updateMutation.isPending || !formData.name || !formData.floor || !calculations}
 							>
 								<Save className="h-4 w-4 ml-2" />
 								{editingItemId ? t("pricing.studies.structural.updateItem") : t("pricing.studies.structural.saveItem")}
@@ -799,11 +838,11 @@ export function BlocksSection({
 			) : (
 				<Button
 					variant="outline"
-					className="w-full border-dashed"
+					className="w-full bg-primary/10 text-primary border-2 border-dashed border-primary/40 hover:bg-primary/20 hover:border-primary/60 transition-all"
 					onClick={() => setIsAdding(true)}
 				>
-					<Plus className="h-4 w-4 ml-2" />
-					{t("pricing.studies.structural.addItem")}
+					<Plus className="h-5 w-5 ml-2" />
+					<span className="font-semibold">{t("pricing.studies.structural.addItem")}</span>
 				</Button>
 			)}
 

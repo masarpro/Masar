@@ -10,6 +10,8 @@ import {
 import { Badge } from "@ui/components/badge";
 import { Check, AlertCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
+import { orpc } from "@shared/lib/orpc-query-utils";
 import { cn } from "@ui/lib";
 import { formatNumber } from "../../lib/utils";
 
@@ -41,6 +43,17 @@ interface StructuralAccordionProps {
 	items: StructuralItem[];
 	onUpdate: () => void;
 }
+
+// الاختيارات التلقائية (تُستخدم كقيم افتراضية إذا لم تُحفظ مواصفات)
+const DEFAULT_ELEMENT_SPECS: Record<string, { concreteType: string; steelGrade: string }> = {
+	plainConcrete: { concreteType: "C15", steelGrade: "" },
+	foundations: { concreteType: "C30", steelGrade: "60" },
+	columns: { concreteType: "C35", steelGrade: "60" },
+	beams: { concreteType: "C30", steelGrade: "60" },
+	slabs: { concreteType: "C30", steelGrade: "60" },
+	stairs: { concreteType: "C30", steelGrade: "60" },
+	blocks: { concreteType: "", steelGrade: "" },
+};
 
 export function StructuralAccordion({
 	studyId,
@@ -95,9 +108,25 @@ export function StructuralAccordion({
 		},
 	];
 
-	// First section open by default
-	const [openItems, setOpenItems] = useState<string[]>([sections[0].id]);
+	// Only one section open at a time
+	const [openItem, setOpenItem] = useState<string>(sections[0].id);
 	const [savedSections, setSavedSections] = useState<string[]>([]);
+
+	// جلب المواصفات من قسم المواصفات (مرتبطة بالدراسة)
+	const { data: specsData } = useQuery(
+		orpc.pricing.studies.structuralSpecs.get.queryOptions({
+			input: { organizationId, studyId },
+		}),
+	);
+
+	// تحويل المواصفات المحفوظة إلى شكل مناسب لتمريرها للأقسام
+	const getSpecsForSection = (sectionId: string) => {
+		const savedElements = (specsData as any)?.elements;
+		if (savedElements && savedElements[sectionId]) {
+			return savedElements[sectionId];
+		}
+		return DEFAULT_ELEMENT_SPECS[sectionId] || { concreteType: "C30", steelGrade: "60" };
+	};
 
 	const getItemsByCategory = (category: string) =>
 		items.filter((item) => item.category === category);
@@ -111,9 +140,10 @@ export function StructuralAccordion({
 
 	return (
 		<Accordion
-			type="multiple"
-			value={openItems}
-			onValueChange={setOpenItems}
+			type="single"
+			collapsible
+			value={openItem}
+			onValueChange={(val) => setOpenItem(val)}
 			className="space-y-3"
 		>
 			{sections.map((section) => {
@@ -230,6 +260,7 @@ export function StructuralAccordion({
 								items={sectionItems}
 								onSave={() => handleSave(section.id)}
 								onUpdate={onUpdate}
+								specs={getSpecsForSection(section.id)}
 							/>
 						</AccordionContent>
 					</AccordionItem>

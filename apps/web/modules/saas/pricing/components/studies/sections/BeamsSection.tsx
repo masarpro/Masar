@@ -51,6 +51,7 @@ interface BeamsSectionProps {
 	items: Array<{
 		id: string;
 		name: string;
+		subCategory?: string | null;
 		quantity: number;
 		dimensions: Record<string, number>;
 		concreteVolume: number;
@@ -59,6 +60,7 @@ interface BeamsSectionProps {
 	}>;
 	onSave: () => void;
 	onUpdate: () => void;
+	specs?: { concreteType: string; steelGrade: string };
 }
 
 // دالة حساب تفاصيل القص
@@ -98,6 +100,7 @@ export function BeamsSection({
 	items,
 	onSave,
 	onUpdate,
+	specs,
 }: BeamsSectionProps) {
 	const t = useTranslations();
 	const [isAdding, setIsAdding] = useState(false);
@@ -106,6 +109,7 @@ export function BeamsSection({
 
 	const [formData, setFormData] = useState({
 		name: "",
+		beamType: "beam" as "beam" | "groundBeam",
 		quantity: 1,
 		width: 30, // سم
 		height: 60, // سم
@@ -116,7 +120,6 @@ export function BeamsSection({
 		bottomBarDiameter: 18,
 		stirrupDiameter: 8,
 		stirrupSpacing: 150,
-		concreteType: "C30",
 	});
 
 	// حساب النتائج مع تفاصيل القص
@@ -136,7 +139,7 @@ export function BeamsSection({
 			bottomBarDiameter: formData.bottomBarDiameter,
 			stirrupDiameter: formData.stirrupDiameter,
 			stirrupSpacing: formData.stirrupSpacing,
-			concreteType: formData.concreteType,
+			concreteType: specs?.concreteType || "C30",
 		});
 
 		// حساب تفاصيل القص
@@ -251,6 +254,7 @@ export function BeamsSection({
 			costStudyId: studyId,
 			organizationId,
 			category: "beams",
+			subCategory: formData.beamType,
 			name: formData.name,
 			quantity: formData.quantity,
 			unit: "m3",
@@ -258,9 +262,15 @@ export function BeamsSection({
 				width: formData.width,
 				height: formData.height,
 				length: formData.length,
+				topBarsCount: formData.topBarsCount,
+				topBarDiameter: formData.topBarDiameter,
+				bottomBarsCount: formData.bottomBarsCount,
+				bottomBarDiameter: formData.bottomBarDiameter,
+				stirrupDiameter: formData.stirrupDiameter,
+				stirrupSpacing: formData.stirrupSpacing,
 			},
 			concreteVolume: calculations.concreteVolume,
-			concreteType: formData.concreteType,
+			concreteType: specs?.concreteType || "C30",
 			steelWeight: calculations.totals.grossWeight,
 			steelRatio:
 				calculations.concreteVolume > 0
@@ -312,7 +322,12 @@ export function BeamsSection({
 						<TableBody>
 							{items.map((item) => (
 								<TableRow key={item.id}>
-									<TableCell className="font-medium">{item.name}</TableCell>
+									<TableCell className="font-medium">
+										{item.name}
+										{item.subCategory === "groundBeam" && (
+											<Badge variant="outline" className="mr-2 text-xs">ميدة</Badge>
+										)}
+									</TableCell>
 									<TableCell>{item.quantity}</TableCell>
 									<TableCell>
 										{item.dimensions?.width || 0}×{item.dimensions?.height || 0}{" "}
@@ -335,17 +350,17 @@ export function BeamsSection({
 													setIsAdding(true);
 													setFormData({
 														name: item.name,
+														beamType: (item.subCategory === "groundBeam" ? "groundBeam" : "beam") as "beam" | "groundBeam",
 														quantity: item.quantity,
 														width: item.dimensions?.width || 30,
 														height: item.dimensions?.height || 60,
 														length: item.dimensions?.length || 5,
-														topBarsCount: 3,
-														topBarDiameter: 16,
-														bottomBarsCount: 4,
-														bottomBarDiameter: 18,
-														stirrupDiameter: 8,
-														stirrupSpacing: 150,
-														concreteType: "C30",
+														topBarsCount: item.dimensions?.topBarsCount || 3,
+														topBarDiameter: item.dimensions?.topBarDiameter || 16,
+														bottomBarsCount: item.dimensions?.bottomBarsCount || 4,
+														bottomBarDiameter: item.dimensions?.bottomBarDiameter || 18,
+														stirrupDiameter: item.dimensions?.stirrupDiameter || 8,
+														stirrupSpacing: item.dimensions?.stirrupSpacing || 150,
 													});
 												}}
 												title={t("common.edit")}
@@ -391,11 +406,15 @@ export function BeamsSection({
 							existingCount={items.length}
 							name={formData.name}
 							onNameChange={(name) => setFormData({ ...formData, name })}
+							subTypes={[
+								{ value: "groundBeam", label: "ميدة (كمرة أرضية)" },
+								{ value: "beam", label: "كمرة عادية" },
+							]}
+							selectedSubType={formData.beamType}
+							onSubTypeChange={(type) => setFormData({ ...formData, beamType: type as "beam" | "groundBeam" })}
 							quantity={formData.quantity}
 							onQuantityChange={(quantity) => setFormData({ ...formData, quantity })}
-							concreteType={formData.concreteType}
-							onConcreteTypeChange={(concreteType) => setFormData({ ...formData, concreteType })}
-							showSubType={false}
+							showConcreteType={false}
 						/>
 
 						{/* أبعاد الكمرة */}
@@ -486,11 +505,11 @@ export function BeamsSection({
 			) : (
 				<Button
 					variant="outline"
-					className="w-full border-dashed"
+					className="w-full bg-primary/10 text-primary border-2 border-dashed border-primary/40 hover:bg-primary/20 hover:border-primary/60 transition-all"
 					onClick={() => setIsAdding(true)}
 				>
-					<Plus className="h-4 w-4 ml-2" />
-					{t("pricing.studies.structural.addItem")}
+					<Plus className="h-5 w-5 ml-2" />
+					<span className="font-semibold">{t("pricing.studies.structural.addItem")}</span>
 				</Button>
 			)}
 

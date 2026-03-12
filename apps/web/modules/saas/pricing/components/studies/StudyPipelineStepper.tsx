@@ -118,6 +118,8 @@ interface StudyPipelineStepperProps {
 	currentStage?: StageType;
 	/** Optional counts per stage (e.g. number of items) */
 	stageCounts?: Partial<Record<StageType, { total?: number; completed?: number }>>;
+	/** Optional filter: only show these stage types */
+	enabledStageTypes?: string[];
 }
 
 function getStageStatus(
@@ -143,13 +145,19 @@ export function StudyPipelineStepper({
 	entryPoint,
 	currentStage,
 	stageCounts,
+	enabledStageTypes,
 }: StudyPipelineStepperProps) {
 	const pathname = usePathname();
 	const basePath = `/app/${organizationSlug}/pricing/studies/${studyId}`;
 
+	// Filter stages if enabledStageTypes is provided
+	const visibleStages = enabledStageTypes
+		? PIPELINE_STAGES.filter((s) => enabledStageTypes.includes(s.key))
+		: PIPELINE_STAGES;
+
 	const getActiveFromPath = (): StageType | null => {
 		if (currentStage) return currentStage;
-		for (const stage of PIPELINE_STAGES) {
+		for (const stage of visibleStages) {
 			if (pathname.includes(`/${stage.path}`)) return stage.key;
 		}
 		return null;
@@ -164,7 +172,7 @@ export function StudyPipelineStepper({
 		>
 			{/* Desktop: Horizontal stepper with status info */}
 			<div className="hidden sm:flex items-center">
-				{PIPELINE_STAGES.map((stage, index) => {
+				{visibleStages.map((stage, index) => {
 					const status = getStageStatus(stage.key, stages);
 					const isSkipped = isSkippedStage(index, entryPoint);
 					const isCurrent = stage.key === activeStageKey;
@@ -309,7 +317,7 @@ export function StudyPipelineStepper({
 							)}
 
 							{/* Connector arrow */}
-							{index < PIPELINE_STAGES.length - 1 && (
+							{index < visibleStages.length - 1 && (
 								<ChevronLeft
 									className={cn(
 										"h-4 w-4 mx-1 shrink-0",
@@ -327,7 +335,7 @@ export function StudyPipelineStepper({
 
 			{/* Mobile: Horizontal icons only */}
 			<div className="flex sm:hidden items-center justify-between">
-				{PIPELINE_STAGES.map((stage, index) => {
+				{visibleStages.map((stage, index) => {
 					const status = getStageStatus(stage.key, stages);
 					const isSkipped = isSkippedStage(index, entryPoint);
 					const isCurrent = stage.key === activeStageKey;
@@ -385,7 +393,7 @@ export function StudyPipelineStepper({
 							) : (
 								<Link href={href}>{iconCircle}</Link>
 							)}
-							{index < PIPELINE_STAGES.length - 1 && (
+							{index < visibleStages.length - 1 && (
 								<ChevronLeft
 									className={cn(
 										"h-3 w-3 mx-0.5 shrink-0",

@@ -90,7 +90,7 @@ export const create = subscriptionProcedure
 			numberOfFloors: z.number().int().positive().default(1),
 			hasBasement: z.boolean().default(false),
 			finishingLevel: z.string().default("medium"),
-			studyType: z.enum(["FULL_PROJECT", "CUSTOM_ITEMS", "LUMP_SUM_ANALYSIS"]).default("FULL_PROJECT"),
+			studyType: z.enum(["FULL_PROJECT", "CUSTOM_ITEMS", "LUMP_SUM_ANALYSIS", "FULL_STUDY", "COST_PRICING", "QUICK_PRICING"]).default("FULL_PROJECT"),
 			contractValue: z.number().positive().optional(),
 			entryPoint: z.enum([
 				"FROM_SCRATCH",
@@ -100,6 +100,7 @@ export const create = subscriptionProcedure
 				"LUMP_SUM_ANALYSIS",
 				"CUSTOM_ITEMS",
 			]).default("FROM_SCRATCH"),
+			workScopes: z.array(z.enum(["STRUCTURAL", "FINISHING", "MEP", "CUSTOM"])).optional().default([]),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -109,7 +110,17 @@ export const create = subscriptionProcedure
 			{ section: "pricing", action: "studies" },
 		);
 
-		const stageStatuses = getStageStatuses(input.entryPoint);
+		// Auto-map new study types to entryPoint
+		let entryPoint = input.entryPoint;
+		if (input.studyType === "FULL_STUDY") {
+			entryPoint = "FROM_SCRATCH";
+		} else if (input.studyType === "COST_PRICING") {
+			entryPoint = "FROM_SCRATCH";
+		} else if (input.studyType === "QUICK_PRICING") {
+			entryPoint = "QUOTATION_ONLY";
+		}
+
+		const stageStatuses = getStageStatuses(entryPoint);
 		const costStudyFields = getCostStudyStatusFields(stageStatuses);
 
 		const result = await db.$transaction(async (tx) => {
@@ -129,7 +140,8 @@ export const create = subscriptionProcedure
 					finishingLevel: input.finishingLevel,
 					studyType: input.studyType,
 					contractValue: input.contractValue,
-					entryPoint: input.entryPoint,
+					entryPoint,
+					workScopes: input.workScopes,
 					...costStudyFields,
 				},
 			});

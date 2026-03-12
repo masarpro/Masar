@@ -24,10 +24,11 @@ interface ElementHeaderRowProps {
 	subTypes?: SubType[];
 	selectedSubType?: string;
 	onSubTypeChange?: (type: string) => void;
+	subTypeRequired?: boolean;
 	quantity: number;
 	onQuantityChange: (qty: number) => void;
-	concreteType: string;
-	onConcreteTypeChange: (type: string) => void;
+	concreteType?: string;
+	onConcreteTypeChange?: (type: string) => void;
 	customConcreteType?: string;
 	onCustomConcreteTypeChange?: (type: string) => void;
 	showQuantity?: boolean;
@@ -44,6 +45,7 @@ export function ElementHeaderRow({
 	subTypes,
 	selectedSubType,
 	onSubTypeChange,
+	subTypeRequired = false,
 	quantity,
 	onQuantityChange,
 	concreteType,
@@ -80,9 +82,9 @@ export function ElementHeaderRow({
 			{/* Subtype Dropdown */}
 			{showSubType && subTypes && subTypes.length > 0 && onSubTypeChange && (
 				<div className="flex-1 min-w-[150px] max-w-[200px]">
-					<Select value={selectedSubType} onValueChange={onSubTypeChange}>
-						<SelectTrigger>
-							<SelectValue placeholder="نوع العنصر" />
+					<Select value={selectedSubType || undefined} onValueChange={onSubTypeChange}>
+						<SelectTrigger className={subTypeRequired && !selectedSubType ? "border-destructive ring-destructive/30 ring-2" : ""}>
+							<SelectValue placeholder={subTypeRequired ? "⚠ اختر النوع" : "نوع العنصر"} />
 						</SelectTrigger>
 						<SelectContent>
 							{subTypes.map((t) => (
