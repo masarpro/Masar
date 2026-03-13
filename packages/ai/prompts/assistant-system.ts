@@ -146,7 +146,7 @@ function buildDynamicContext(context: AssistantContext): string {
     if (context.projectProgress != null)
       result += ` | الإنجاز: ${context.projectProgress}%`;
     if (context.projectBudget != null)
-      result += ` | الميزانية: ${context.projectBudget.toLocaleString()} ر.س`;
+      result += ` | الميزانية: ${context.projectBudget.toLocaleString("en-US")} ر.س`;
   }
 
   if (context.contextData) {

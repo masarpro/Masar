@@ -21,7 +21,7 @@ import { ChevronLeft, ChevronRight, MoreVertical, Pencil, Trash2 } from "lucide-
 import { useTranslations } from "next-intl";
 
 function formatCurrency(value: number): string {
-	return value.toLocaleString("ar-SA", {
+	return value.toLocaleString("en-US", {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
 	});
@@ -188,7 +188,7 @@ export function BOQItemsTable({
 											{item.unit}
 										</TableCell>
 										<TableCell className="text-end text-sm font-medium">
-											{item.quantity.toLocaleString("ar-SA")}
+											{item.quantity.toLocaleString("en-US")}
 										</TableCell>
 										<TableCell className="text-end text-sm">
 											{item.unitPrice != null ? (

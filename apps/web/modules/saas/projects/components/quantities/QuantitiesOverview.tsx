@@ -47,7 +47,7 @@ interface QuantitiesOverviewProps {
 }
 
 function formatCurrency(value: number): string {
-	return value.toLocaleString("ar-SA", {
+	return value.toLocaleString("en-US", {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
 	});
@@ -294,7 +294,7 @@ export function QuantitiesOverview({
 										(study.itemCounts?.finishingItems ?? 0) +
 										(study.itemCounts?.mepItems ?? 0) +
 										(study.itemCounts?.laborItems ?? 0)
-									).toLocaleString("ar-SA")}
+									).toLocaleString("en-US")}
 								</TableCell>
 								<TableCell className="font-medium text-slate-900 dark:text-slate-100">
 									{formatCurrency(Number(study.totalCost ?? 0))}

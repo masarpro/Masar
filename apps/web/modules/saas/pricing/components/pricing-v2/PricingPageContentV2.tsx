@@ -41,7 +41,7 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 const formatNum = (n: number) =>
-	Number(n).toLocaleString("ar-SA", { maximumFractionDigits: 2 });
+	Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
 export function PricingPageContentV2({
 	organizationId,
@@ -114,6 +114,10 @@ export function PricingPageContentV2({
 	const stages = (stagesData as any)?.stages ?? [];
 	const costingStage = stages.find((s: { stage: string }) => s.stage === "COSTING");
 	const isCostingApproved = costingStage?.status === "APPROVED";
+
+	// QUICK_PRICING / CUSTOM_ITEMS skip directly to pricing — costing is auto-APPROVED
+	const studyType = (studyData as any)?.studyType ?? "FULL_PROJECT";
+	const skipCostingCheck = studyType === "QUICK_PRICING" || studyType === "CUSTOM_ITEMS";
 
 	// Build enabled sections based on workScopes
 	const workScopes: string[] = (studyData as any)?.workScopes ?? [];
@@ -340,7 +344,7 @@ export function PricingPageContentV2({
 
 	if (stagesLoading) return null;
 
-	if (!isCostingApproved) {
+	if (!skipCostingCheck && !isCostingApproved) {
 		return (
 			<div
 				className="flex flex-col items-center justify-center py-16 text-center"

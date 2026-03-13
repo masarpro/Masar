@@ -1164,7 +1164,31 @@
 			"lumpSumProfitPercent": "Profit from Cost %",
 			"lumpSumSafetyMargin": "Safety Margin",
 			"lumpSumNoContract": "Contract value not set",
-			"lumpSumLossWarning": "Warning: Expected cost exceeds contract value. The project will incur a loss."
+			"lumpSumLossWarning": "Warning: Expected cost exceeds contract value. The project will incur a loss.",
+			"emptyTable": {
+				"title_structural": "Structural Items",
+				"title_finishing": "Finishing Items",
+				"title_mep": "MEP Items",
+				"category": "Category",
+				"description": "Description",
+				"unit": "Unit",
+				"quantity": "Quantity",
+				"concreteVolume": "Concrete Volume (m³)",
+				"steelWeight": "Steel Weight (kg)",
+				"subCategory": "Sub-Category",
+				"floor": "Floor",
+				"scope": "Scope",
+				"wastagePercent": "Wastage %",
+				"itemType": "Type",
+				"notes": "Notes",
+				"actions": "Actions",
+				"addRow": "Add Row",
+				"deleteRow": "Delete",
+				"noItems": "No items — add items manually",
+				"itemAdded": "Item added",
+				"itemUpdated": "Item updated",
+				"itemDeleted": "Item deleted"
+			}
 		},
 		"quotations": {
 			"title": "Quotations",

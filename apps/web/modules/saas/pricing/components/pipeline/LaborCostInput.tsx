@@ -161,7 +161,7 @@ export function LaborCostInput({
 			{/* Total display */}
 			{laborType && laborTotal != null && laborTotal > 0 && (
 				<div className="text-[10px] text-muted-foreground tabular-nums" dir="ltr">
-					= {laborTotal.toLocaleString("ar-SA", { minimumFractionDigits: 2 })} ر.س
+					= {laborTotal.toLocaleString("en-SA", { minimumFractionDigits: 2 })} ر.س
 				</div>
 			)}
 		</div>

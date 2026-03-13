@@ -17,7 +17,7 @@ export function formatCurrency(amount: number): string {
  */
 export function formatNumber(num: number | null | undefined): string {
 	if (num == null) return "0";
-	return new Intl.NumberFormat("en-SA").format(num);
+	return new Intl.NumberFormat("en-US").format(num);
 }
 
 /**
@@ -130,7 +130,7 @@ export function formatDateTime(date: Date | string | null | undefined): string {
  */
 export function formatPercent(value: number | null | undefined): string {
 	if (value == null) return "0%";
-	return `${new Intl.NumberFormat("en-SA", {
+	return `${new Intl.NumberFormat("en-US", {
 		minimumFractionDigits: 0,
 		maximumFractionDigits: 1,
 	}).format(value)}%`;

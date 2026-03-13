@@ -32,7 +32,7 @@ export function MrrChart({
 					<YAxis />
 					<Tooltip
 						formatter={(value: number) =>
-							`${value.toLocaleString()} SAR`
+							`${value.toLocaleString("en-US")} SAR`
 						}
 					/>
 					<Line

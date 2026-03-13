@@ -37,7 +37,7 @@ const STAGE_PATHS: Record<StageName, string> = {
 	quantities: "quantities",
 	specs: "specifications",
 	costing: "costing",
-	pricing: "selling-price",
+	pricing: "pricing",
 	quotation: "quotation",
 };
 

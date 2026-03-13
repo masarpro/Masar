@@ -292,7 +292,7 @@ export function aggregateBOQ(items: StructuralItem[]): BOQSummary {
 }
 
 // Helper weights map
-const REBAR_WEIGHTS_MAP: Record<number, number> = {
+export const REBAR_WEIGHTS_MAP: Record<number, number> = {
 	6: 0.222,
 	8: 0.395,
 	10: 0.617,

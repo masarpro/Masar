@@ -8,6 +8,7 @@ import { Label } from "@ui/components/label";
 import { Loader2, Save } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { formatNum } from "@saas/pricing/lib/utils";
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -117,7 +118,7 @@ export function StructuralCostingTab({
 			concrete += Number(item.concreteVolume ?? 0);
 			steel += Number(item.steelWeight ?? 0);
 		}
-		return { concrete, steel };
+		return { concrete, steel: steel / 1000 };
 	}, [items]);
 
 	// ─── Initialize from saved data ───
@@ -149,12 +150,6 @@ export function StructuralCostingTab({
 	const storagePct = Number(storagePercent) || 2;
 	const storageTotal = materialSubtotal * (storagePct / 100);
 	const grandTotal = materialSubtotal + storageTotal;
-
-	// ─── Helpers ───
-	const formatNum = (n: number | null | undefined) =>
-		n != null
-			? Number(n).toLocaleString("ar-SA", { maximumFractionDigits: 2 })
-			: "—";
 
 	// ─── Save handler ───
 	const handleSave = () => {
@@ -190,7 +185,7 @@ export function StructuralCostingTab({
 				(it: any) => it.name === ci.description || it.id === ci.sourceItemId,
 			);
 			const itemConcrete = Number(matchItem?.concreteVolume ?? 0);
-			const itemSteel = Number(matchItem?.steelWeight ?? 0);
+			const itemSteel = Number(matchItem?.steelWeight ?? 0) / 1000; // convert kg to tons
 
 			// Material cost for this item
 			const matCost = (itemConcrete * cPrice) + (itemSteel * sPrice);
@@ -200,8 +195,8 @@ export function StructuralCostingTab({
 			return {
 				id: ci.id,
 				materialUnitCost: qty > 0 ? (matCost + storageCost) / qty : 0,
-				laborUnitCost: null,
-				storageCostPercent: storagePct,
+				// Don't send laborUnitCost — preserve existing labor data from labor tab
+				// Don't send storageCostPercent — storage is already included in materialUnitCost
 			};
 		});
 

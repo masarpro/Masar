@@ -33,7 +33,7 @@ interface LinkStudyDialogProps {
 }
 
 function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("ar-SA", {
+	return new Intl.NumberFormat("en-US", {
 		style: "currency",
 		currency: "SAR",
 		minimumFractionDigits: 0,
@@ -187,7 +187,7 @@ export function LinkStudyDialog({
 												:{" "}
 												{Number(
 													study.buildingArea,
-												).toLocaleString("ar-SA")}{" "}
+												).toLocaleString("en-US")}{" "}
 												{t(
 													"projectQuantities.linkDialog.sqm",
 												)}

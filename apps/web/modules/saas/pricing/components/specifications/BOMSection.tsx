@@ -254,7 +254,7 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 																	)}
 																</td>
 																<td className="px-3 py-2 text-center" dir="ltr">
-																	{Number(entry.quantity).toLocaleString("ar-SA", {
+																	{Number(entry.quantity).toLocaleString("en-US", {
 																		maximumFractionDigits: 2,
 																	})}
 																</td>
@@ -266,7 +266,7 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 																</td>
 																<td className="px-3 py-2 text-center font-medium" dir="ltr">
 																	{Number(entry.effectiveQuantity).toLocaleString(
-																		"ar-SA",
+																		"en-US",
 																		{ maximumFractionDigits: 2 },
 																	)}
 																</td>
@@ -318,12 +318,12 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 													{mat.unit}
 												</td>
 												<td className="px-3 py-2 text-center" dir="ltr">
-													{mat.totalQuantity.toLocaleString("ar-SA", {
+													{mat.totalQuantity.toLocaleString("en-US", {
 														maximumFractionDigits: 2,
 													})}
 												</td>
 												<td className="px-3 py-2 text-center font-medium" dir="ltr">
-													{mat.totalEffective.toLocaleString("ar-SA", {
+													{mat.totalEffective.toLocaleString("en-US", {
 														maximumFractionDigits: 2,
 													})}
 												</td>

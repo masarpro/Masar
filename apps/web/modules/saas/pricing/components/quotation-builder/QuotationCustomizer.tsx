@@ -69,7 +69,7 @@ export function QuotationCustomizer({
 	};
 
 	const fmt = (n: number) =>
-		Number(n).toLocaleString("ar-SA", { maximumFractionDigits: 2 });
+		Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
 	const sampleItems = ((costingItems as any) ?? []).slice(0, 5);
 

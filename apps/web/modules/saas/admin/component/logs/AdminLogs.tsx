@@ -82,7 +82,7 @@ export function AdminLogs() {
 									<TableCell className="text-sm">
 										{new Date(
 											log.createdAt,
-										).toLocaleString()}
+										).toLocaleString("en-US")}
 									</TableCell>
 									<TableCell>{log.admin.name}</TableCell>
 									<TableCell>

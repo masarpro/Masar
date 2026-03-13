@@ -169,11 +169,11 @@ export function LeadsTable({ leads, organizationId, organizationSlug }: LeadsTab
 									{lead.estimatedValue ? (
 										<div>
 											<p className="font-medium text-foreground">
-												{new Intl.NumberFormat("en-SA").format(lead.estimatedValue)}
+												{new Intl.NumberFormat("en-US").format(lead.estimatedValue)}
 											</p>
 											{lead.estimatedArea && (
 												<p className="text-xs text-muted-foreground">
-													{new Intl.NumberFormat("en-SA").format(lead.estimatedArea)} {t("pricing.leads.area")}
+													{new Intl.NumberFormat("en-US").format(lead.estimatedArea)} {t("pricing.leads.area")}
 												</p>
 											)}
 										</div>

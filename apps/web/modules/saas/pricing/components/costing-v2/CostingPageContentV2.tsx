@@ -11,12 +11,14 @@ import {
 	Wrench,
 	Calculator,
 	Loader2,
+	Save,
+	ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@ui/components/button";
 import { useEffect, useState } from "react";
 
-import { StructuralCostingTab } from "./StructuralCostingTab";
+import { MaterialsCostingTab } from "./MaterialsCostingTab";
 import { FinishingCostingTab } from "./FinishingCostingTab";
 import { MEPCostingTab } from "./MEPCostingTab";
 import { LaborOverviewTab } from "./LaborOverviewTab";
@@ -46,12 +48,16 @@ export function CostingPageContentV2({
 	const specsStage = stages.find((s: { stage: string }) => s.stage === "SPECIFICATIONS");
 	const isSpecsApproved = specsStage?.status === "APPROVED";
 
-	// Also fetch study for buildingArea
+	// Also fetch study for buildingArea and studyType
 	const { data: study } = useQuery(
 		orpc.pricing.studies.getById.queryOptions({
 			input: { id: studyId, organizationId },
 		}),
 	);
+
+	// Study types that skip earlier stages have specs auto-APPROVED — skip the check for safety
+	const studyType = (study as any)?.studyType ?? "FULL_PROJECT";
+	const skipSpecsCheck = studyType === "QUICK_PRICING" || studyType === "CUSTOM_ITEMS";
 
 	// Auto-generate costing items when entering the page
 	const generateMutation = useMutation(
@@ -72,7 +78,7 @@ export function CostingPageContentV2({
 		);
 	}
 
-	if (!isSpecsApproved) {
+	if (!skipSpecsCheck && !isSpecsApproved) {
 		return (
 			<div className="flex flex-col items-center justify-center py-16 text-center" dir="rtl">
 				<div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 mb-4">
@@ -107,35 +113,24 @@ export function CostingPageContentV2({
 	enabledTabs.push("labor", "summary");
 
 	const tabDefs = [
-		{ value: "structural", icon: Hammer, label: "إنشائي" },
+		{ value: "structural", icon: Hammer, label: "المواد" },
 		{ value: "finishing", icon: PaintBucket, label: "تشطيبات" },
 		{ value: "mep", icon: Wrench, label: "كهروميكانيكية" },
-		{ value: "labor", icon: Users, label: "عمالة" },
+		{ value: "labor", icon: Users, label: "المصنعيات" },
 		{ value: "summary", icon: Calculator, label: "ملخص" },
 	].filter((t) => enabledTabs.includes(t.value));
-
-	const gridCols =
-		tabDefs.length === 2
-			? "grid-cols-2"
-			: tabDefs.length === 3
-				? "grid-cols-3"
-				: tabDefs.length === 4
-					? "grid-cols-4"
-					: "grid-cols-5";
 
 	// Set initial active tab to first enabled tab
 	const defaultTab = enabledTabs[0] ?? "structural";
 
 	return (
 		<div className="space-y-6" dir="rtl">
-			{/* Hero: cost per sqm (shown after data loads) */}
-
-			<Tabs value={activeTab || defaultTab} onValueChange={setActiveTab} className="w-full">
-				<TabsList className={`grid w-full ${gridCols} rounded-xl h-auto p-1`}>
+			<Tabs dir="rtl" value={activeTab || defaultTab} onValueChange={setActiveTab} className="w-full">
+				<TabsList className="flex w-full justify-start">
 					{tabDefs.map((tab) => {
 						const Icon = tab.icon;
 						return (
-							<TabsTrigger key={tab.value} value={tab.value} className="gap-1.5 rounded-lg py-2.5 text-xs sm:text-sm">
+							<TabsTrigger key={tab.value} value={tab.value} className="gap-1.5 py-2.5 text-xs sm:text-sm">
 								<Icon className="h-4 w-4" />
 								<span className="hidden sm:inline">{tab.label}</span>
 							</TabsTrigger>
@@ -145,10 +140,11 @@ export function CostingPageContentV2({
 
 				{enabledTabs.includes("structural") && (
 					<TabsContent value="structural" className="mt-4">
-						<StructuralCostingTab
+						<MaterialsCostingTab
 							organizationId={organizationId}
 							studyId={studyId}
 							buildingArea={buildingArea}
+							onNavigateToTab={setActiveTab}
 						/>
 					</TabsContent>
 				)}
@@ -177,6 +173,16 @@ export function CostingPageContentV2({
 						studyId={studyId}
 						buildingArea={buildingArea}
 					/>
+					{/* Save + Navigate button below Labor tab */}
+					<Button
+						onClick={() => setActiveTab("summary")}
+						className="w-full gap-2 py-6 text-base rounded-xl mt-4"
+						size="lg"
+					>
+						<Save className="h-5 w-5" />
+						حفظ تكلفة أسعار المصنعيات والانتقال إلى الملخص
+						<ArrowLeft className="h-4 w-4" />
+					</Button>
 				</TabsContent>
 
 				<TabsContent value="summary" className="mt-4">

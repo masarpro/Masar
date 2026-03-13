@@ -68,7 +68,7 @@ interface SubcontractClaimDetailViewProps {
 }
 
 function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("ar-SA", {
+	return new Intl.NumberFormat("en-US", {
 		style: "currency",
 		currency: "SAR",
 		minimumFractionDigits: 0,
@@ -77,7 +77,7 @@ function formatCurrency(value: number): string {
 }
 
 function formatNumber(value: number, decimals = 2): string {
-	return new Intl.NumberFormat("ar-SA", {
+	return new Intl.NumberFormat("en-US", {
 		minimumFractionDigits: 0,
 		maximumFractionDigits: decimals,
 	}).format(value);

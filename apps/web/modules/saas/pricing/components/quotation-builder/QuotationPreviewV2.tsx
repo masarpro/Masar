@@ -61,7 +61,7 @@ export function QuotationPreviewV2({
 	});
 
 	const fmt = (n: number) =>
-		Number(n).toLocaleString("ar-SA", { maximumFractionDigits: 2 });
+		Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
 	const org = orgSettings as any;
 	const isLoading = isLoadingQuotation || isLoadingSettings;

@@ -31,7 +31,7 @@ interface Props {
 }
 
 function formatCurrency(value: number): string {
-	return value.toLocaleString("ar-SA", {
+	return value.toLocaleString("en-US", {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
 	});
@@ -207,7 +207,7 @@ export function FinishingItemsView({
 										{item.name}
 									</TableCell>
 									<TableCell className="text-end text-slate-600 dark:text-slate-400">
-										{(item.area ?? item.quantity)?.toLocaleString("ar-SA") ?? "-"}
+										{(item.area ?? item.quantity)?.toLocaleString("en-US") ?? "-"}
 									</TableCell>
 									<TableCell className="text-end text-slate-600 dark:text-slate-400">
 										{item.materialPrice != null

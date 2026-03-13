@@ -310,7 +310,7 @@ export function OrganizationList() {
 				}) =>
 					lastPaymentAmount ? (
 						<div className="text-sm">
-							<p>{Number(lastPaymentAmount).toLocaleString()} SAR</p>
+							<p>{Number(lastPaymentAmount).toLocaleString("en-US")} SAR</p>
 							{lastPaymentAt && (
 								<p className="text-muted-foreground text-xs">
 									{new Date(

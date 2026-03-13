@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { formatNum } from "@saas/pricing/lib/utils";
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -68,11 +69,6 @@ interface LocalItemState {
 // ═══════════════════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════════════════
-
-const formatNum = (n: number | null | undefined) =>
-	n != null
-		? Number(n).toLocaleString("ar-SA", { maximumFractionDigits: 2 })
-		: "—";
 
 const toNum = (v: string | undefined | null): number =>
 	v != null && v !== "" ? Number(v) : 0;
@@ -368,7 +364,7 @@ export function FinishingCostingTab({
 	// ═══════════════════════════════════════════════════════════════
 
 	return (
-		<div className="space-y-4">
+		<div className="space-y-4" dir="rtl">
 			{/* ─── Toolbar: View toggle + Save button ─── */}
 			<div className="flex items-center justify-between">
 				<div className="flex gap-1 rounded-lg border border-border bg-muted/30 p-1">
@@ -778,7 +774,7 @@ export function FinishingCostingTab({
 														</span>
 														{materialTotal > 0 && (
 															<span
-																className="text-sm font-medium mr-2"
+																className="text-sm font-medium ml-2"
 																dir="ltr"
 															>
 																={" "}
@@ -816,7 +812,7 @@ export function FinishingCostingTab({
 														</span>
 														{laborTotal > 0 && (
 															<span
-																className="text-sm font-medium mr-2"
+																className="text-sm font-medium ml-2"
 																dir="ltr"
 															>
 																={" "}
@@ -856,7 +852,7 @@ export function FinishingCostingTab({
 														</span>
 														{storageTotal > 0 && (
 															<span
-																className="text-sm font-medium mr-2"
+																className="text-sm font-medium ml-2"
 																dir="ltr"
 															>
 																={" "}

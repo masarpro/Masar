@@ -31,11 +31,20 @@ export function SpecificationsPageContentV2({
 	const quantitiesStage = stages.find((s: any) => s.stage === "QUANTITIES");
 	const isQuantitiesApproved = quantitiesStage?.status === "APPROVED";
 
+	// Fetch study to check studyType for skip logic
+	const { data: studyForType } = useQuery(
+		orpc.pricing.studies.getById.queryOptions({
+			input: { id: studyId, organizationId },
+		}),
+	);
+	const studyType = (studyForType as any)?.studyType ?? "FULL_PROJECT";
+	const skipQuantitiesCheck = studyType === "QUICK_PRICING" || studyType === "CUSTOM_ITEMS";
+
 	if (stagesLoading) {
 		return null;
 	}
 
-	if (!isQuantitiesApproved) {
+	if (!skipQuantitiesCheck && !isQuantitiesApproved) {
 		return (
 			<div className="flex flex-col items-center justify-center py-16 text-center" dir="rtl">
 				<div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 mb-4">

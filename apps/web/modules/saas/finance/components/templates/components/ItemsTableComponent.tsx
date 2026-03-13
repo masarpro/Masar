@@ -105,7 +105,7 @@ export function ItemsTableComponent({
 	const displayItems = items && items.length > 0 ? items : defaultItems;
 
 	const formatNumber = (num: number) => {
-		return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
+		return new Intl.NumberFormat("en-US", {
 			minimumFractionDigits: 0,
 			maximumFractionDigits: 2,
 		}).format(num);

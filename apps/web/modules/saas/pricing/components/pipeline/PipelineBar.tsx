@@ -40,6 +40,8 @@ interface PipelineBarProps {
 	currentStage: StageKey;
 	stages: StageStatuses;
 	studyType?: StudyType;
+	/** Optional filter from useStudyConfig — replaces local studyType-based filtering */
+	enabledStageTypes?: string[];
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -76,7 +78,7 @@ const STAGES: StageConfig[] = [
 		key: "selling-price",
 		statusKey: "pricing",
 		labelKey: "pricing.pipeline.sellingPrice",
-		path: "selling-price",
+		path: "pricing",
 	},
 	{
 		key: "quotation",
@@ -148,25 +150,37 @@ function getStatusLabel(status: StageStatus, t: ReturnType<typeof useTranslation
 // COMPONENT
 // ═══════════════════════════════════════════════════════════════
 
+/** Map PipelineBar StageKey → enabledStageTypes (uppercase StageType) */
+const STAGE_KEY_TO_STAGE_TYPE: Record<StageKey, string> = {
+	quantities: "QUANTITIES",
+	specifications: "SPECIFICATIONS",
+	costing: "COSTING",
+	"selling-price": "PRICING",
+	quotation: "QUOTATION",
+};
+
 export function PipelineBar({
 	studyId,
 	organizationSlug,
 	currentStage,
 	stages,
 	studyType = "FULL_PROJECT",
+	enabledStageTypes,
 }: PipelineBarProps) {
 	const t = useTranslations();
 
-	// Filter stages based on study type
-	const visibleStages = STAGES.filter((stage) => {
-		if (studyType === "LUMP_SUM_ANALYSIS" && stage.key === "quotation") {
-			return false;
-		}
-		if (studyType === "QUICK_PRICING" || studyType === "CUSTOM_ITEMS") {
-			return stage.key === "selling-price" || stage.key === "quotation";
-		}
-		return true;
-	});
+	// Filter stages: use enabledStageTypes if provided, otherwise fall back to legacy studyType filtering
+	const visibleStages = enabledStageTypes
+		? STAGES.filter((stage) => enabledStageTypes.includes(STAGE_KEY_TO_STAGE_TYPE[stage.key]))
+		: STAGES.filter((stage) => {
+				if (studyType === "LUMP_SUM_ANALYSIS" && stage.key === "quotation") {
+					return false;
+				}
+				if (studyType === "QUICK_PRICING" || studyType === "CUSTOM_ITEMS") {
+					return stage.key === "selling-price" || stage.key === "quotation";
+				}
+				return true;
+			});
 
 	return (
 		<div className="mb-6 w-full" dir="rtl">

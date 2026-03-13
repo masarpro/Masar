@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { formatNum } from "@saas/pricing/lib/utils";
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -156,7 +157,7 @@ export function LaborOverviewTab({
 			concrete += Number(item.concreteVolume ?? 0);
 			steel += Number(item.steelWeight ?? 0);
 		}
-		return { concrete, steel };
+		return { concrete, steel: steel / 1000 };
 	}, [structuralItems]);
 
 	// ─── Initialize from saved data ───
@@ -196,12 +197,6 @@ export function LaborOverviewTab({
 
 		setInitialized(true);
 	}, [breakdownLoading, savedBreakdown, autoAggregates, buildingArea, initialized]);
-
-	// ─── Helpers ───
-	const formatNum = (n: number | null | undefined) =>
-		n != null
-			? Number(n).toLocaleString("ar-SA", { maximumFractionDigits: 2 })
-			: "—";
 
 	// ─── Row update helpers ───
 	const updateFloorRow = (id: string, field: keyof FloorRow, value: string) => {
@@ -415,7 +410,7 @@ export function LaborOverviewTab({
 	}
 
 	return (
-		<div className="space-y-4">
+		<div className="space-y-4" dir="rtl">
 			{/* ─── Labor mode selector ─── */}
 			<div className="rounded-xl border border-border bg-card p-4">
 				<Label className="text-sm font-medium mb-3 block">
@@ -674,7 +669,7 @@ export function LaborOverviewTab({
 									{formatNum(lumpSumTotal)} ر.س
 								</span>
 								{buildingArea > 0 && (
-									<span className="text-muted-foreground mr-3" dir="ltr">
+									<span className="text-muted-foreground ml-3" dir="ltr">
 										({formatNum(lumpSumTotal / buildingArea)} ر.س/م²)
 									</span>
 								)}
@@ -846,7 +841,7 @@ export function LaborOverviewTab({
 				<div className="flex items-center justify-between">
 					<span className="font-semibold">
 						إجمالي مصنعيات الإنشائي
-						<span className="text-xs font-normal text-muted-foreground mr-2">
+						<span className="text-xs font-normal text-muted-foreground ml-2">
 							({LABOR_MODES.find((m) => m.value === laborMode)?.label})
 						</span>
 					</span>

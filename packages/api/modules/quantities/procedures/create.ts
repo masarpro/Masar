@@ -121,6 +121,18 @@ export const create = subscriptionProcedure
 		}
 
 		const stageStatuses = getStageStatuses(entryPoint);
+
+		// Fix: QUICK_PRICING users are redirected to /pricing, so PRICING stage
+		// should be DRAFT (active), not APPROVED. QUOTATION_ONLY entry point
+		// marks everything before QUOTATION as APPROVED, but PRICING is the
+		// actual starting point for QUICK_PRICING.
+		if (input.studyType === "QUICK_PRICING") {
+			const pricingStage = stageStatuses.find((s) => s.stage === "PRICING");
+			if (pricingStage) {
+				pricingStage.status = "DRAFT";
+			}
+		}
+
 		const costStudyFields = getCostStudyStatusFields(stageStatuses);
 
 		const result = await db.$transaction(async (tx) => {

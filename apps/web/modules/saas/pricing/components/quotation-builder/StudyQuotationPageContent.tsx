@@ -68,7 +68,7 @@ export function StudyQuotationPageContent({
 	const isPricingApproved = pricingStage?.status === "APPROVED";
 
 	const fmt = (n: number) =>
-		Number(n).toLocaleString("ar-SA", { maximumFractionDigits: 2 });
+		Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
 	if (stagesLoading) return null;
 
@@ -173,7 +173,7 @@ export function StudyQuotationPageContent({
 								<div className="space-y-1">
 									<Label className="text-xs">المساحة الإجمالية (م²)</Label>
 									<div className="h-10 flex items-center px-3 bg-muted rounded-lg text-sm" dir="ltr">
-										{buildingArea.toLocaleString("ar-SA")} م²
+										{buildingArea.toLocaleString("en-US")} م²
 									</div>
 								</div>
 								<div className="space-y-1">

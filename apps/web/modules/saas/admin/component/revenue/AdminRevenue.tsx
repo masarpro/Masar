@@ -56,17 +56,17 @@ export function AdminRevenue() {
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 				<StatsCard
 					title={t("admin.revenue.totalRevenue")}
-					value={`${(summary?.totalRevenue ?? 0).toLocaleString()} SAR`}
+					value={`${(summary?.totalRevenue ?? 0).toLocaleString("en-US")} SAR`}
 					icon={DollarSignIcon}
 				/>
 				<StatsCard
 					title={t("admin.revenue.mrr")}
-					value={`${(summary?.mrr ?? 0).toLocaleString()} SAR`}
+					value={`${(summary?.mrr ?? 0).toLocaleString("en-US")} SAR`}
 					icon={TrendingUpIcon}
 				/>
 				<StatsCard
 					title={t("admin.revenue.arr")}
-					value={`${(summary?.arr ?? 0).toLocaleString()} SAR`}
+					value={`${(summary?.arr ?? 0).toLocaleString("en-US")} SAR`}
 					icon={TrendingUpIcon}
 					description={`${summary?.activeSubscriptions ?? 0} ${t("admin.revenue.activeSubscriptions")}`}
 				/>
@@ -83,7 +83,7 @@ export function AdminRevenue() {
 						<YAxis />
 						<Tooltip
 							formatter={(value: number) =>
-								`${value.toLocaleString()} SAR`
+								`${value.toLocaleString("en-US")} SAR`
 							}
 						/>
 						<Bar
@@ -114,7 +114,7 @@ export function AdminRevenue() {
 									</p>
 								</div>
 								<p className="font-bold">
-									{item.revenue.toLocaleString()} SAR
+									{item.revenue.toLocaleString("en-US")} SAR
 								</p>
 							</div>
 						))}

@@ -49,6 +49,11 @@ const laborBreakdownSchema = z.object({
 	concretePrice: z.number().optional(),
 	steelPrice: z.number().optional(),
 	storagePercent: z.number().optional(),
+	// Per-grade concrete prices: { "C15": 250, "C30": 350, "C35": 400 }
+	concretePrices: z.record(z.string(), z.number()).optional(),
+	steelPriceD6: z.number().optional(),
+	steelPriceD8: z.number().optional(),
+	steelPriceMain: z.number().optional(),
 });
 
 // ═══════════════════════════════════════════════════════════════

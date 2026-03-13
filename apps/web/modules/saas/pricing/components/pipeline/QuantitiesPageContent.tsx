@@ -13,6 +13,7 @@ import { useStudyConfig } from "../../hooks/useStudyConfig";
 import { StructuralItemsEditor } from "../studies/StructuralItemsEditor";
 import { FinishingItemsEditor } from "../studies/FinishingItemsEditor";
 import { MEPItemsEditor } from "../studies/MEPItemsEditor";
+import { EmptySectionTable } from "../studies/EmptySectionTable";
 import { ManualItemsTable } from "./ManualItemsTable";
 import { QuantitiesSummary } from "./QuantitiesSummary";
 import { StageApprovalButton } from "./StageApprovalButton";
@@ -153,11 +154,10 @@ export function QuantitiesPageContent({
 
 				<TabsContent value="structural" className="mt-4">
 					{isEmptyTableMode ? (
-						<ManualItemsTable
+						<EmptySectionTable
 							organizationId={organizationId}
 							studyId={studyId}
-							filterSection="إنشائي"
-							defaultSection="إنشائي"
+							sectionType="structural"
 						/>
 					) : (
 						<StructuralItemsEditor
@@ -170,11 +170,10 @@ export function QuantitiesPageContent({
 
 				<TabsContent value="finishing" className="mt-4">
 					{isEmptyTableMode ? (
-						<ManualItemsTable
+						<EmptySectionTable
 							organizationId={organizationId}
 							studyId={studyId}
-							filterSection="تشطيبات"
-							defaultSection="تشطيبات"
+							sectionType="finishing"
 						/>
 					) : (
 						<FinishingItemsEditor
@@ -187,11 +186,10 @@ export function QuantitiesPageContent({
 
 				<TabsContent value="mep" className="mt-4">
 					{isEmptyTableMode ? (
-						<ManualItemsTable
+						<EmptySectionTable
 							organizationId={organizationId}
 							studyId={studyId}
-							filterSection="كهروميكانيكية"
-							defaultSection="كهروميكانيكية"
+							sectionType="mep"
 						/>
 					) : (
 						<MEPItemsEditor

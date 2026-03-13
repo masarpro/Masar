@@ -63,7 +63,7 @@ export const createClaim = subscriptionProcedure
 							projectName: project.name,
 							claimId: claim.id,
 							claimNo: claim.claimNo,
-							amount: input.amount.toLocaleString("ar-SA"),
+							amount: input.amount.toLocaleString("en-US"),
 							creatorId: context.user.id,
 							recipientIds,
 						}).catch(() => {

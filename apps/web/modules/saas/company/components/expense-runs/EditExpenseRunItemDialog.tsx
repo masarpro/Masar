@@ -82,7 +82,7 @@ export function EditExpenseRunItemDialog({
 	if (!item) return null;
 
 	const formatCurrency = (amount: number | string) => {
-		return new Intl.NumberFormat("ar-SA", { minimumFractionDigits: 2 }).format(Number(amount)) + " ر.س";
+		return new Intl.NumberFormat("en-SA", { minimumFractionDigits: 2 }).format(Number(amount)) + " ر.س";
 	};
 
 	return (

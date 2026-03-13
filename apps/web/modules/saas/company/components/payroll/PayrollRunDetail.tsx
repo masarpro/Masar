@@ -82,7 +82,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 	);
 
 	const formatCurrency = (amount: number | string) => {
-		return new Intl.NumberFormat("ar-SA", { minimumFractionDigits: 2 }).format(Number(amount)) + " ر.س";
+		return new Intl.NumberFormat("en-US", { minimumFractionDigits: 2 }).format(Number(amount)) + " ر.س";
 	};
 
 	const getRunNo = (r: { year: number; month: number }) =>

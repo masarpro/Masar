@@ -36,7 +36,7 @@ interface ProfitAnalysisCardProps {
 
 export function ProfitAnalysisCard({ data }: ProfitAnalysisCardProps) {
 	const fmt = (n: number) =>
-		Number(n).toLocaleString("ar-SA", { maximumFractionDigits: 2 });
+		Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
 	const rows: { label: string; value: number; isSeparator?: boolean }[] = [
 		{ label: "التكلفة المباشرة", value: data.totalCost },

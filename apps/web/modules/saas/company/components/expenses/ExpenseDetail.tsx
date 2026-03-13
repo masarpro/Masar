@@ -143,7 +143,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 	if (!expense) return null;
 
 	const formatCurrency = (amount: number | string) =>
-		new Intl.NumberFormat("ar-SA").format(Number(amount)) + " ر.س";
+		new Intl.NumberFormat("en-US").format(Number(amount)) + " ر.س";
 
 	return (
 		<div className="space-y-6" dir="rtl">

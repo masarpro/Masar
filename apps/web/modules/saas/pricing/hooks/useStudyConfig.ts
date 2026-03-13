@@ -31,6 +31,14 @@ export function useStudyConfig(study: StudyConfigInput) {
 		switch (study.studyType) {
 			case "FULL_STUDY":
 			case "FULL_PROJECT": // backward compat
+				return [
+					"quantities",
+					"specifications",
+					"costing",
+					"pricing",
+					"quotation",
+					"convert",
+				] as const;
 			case "COST_PRICING":
 				return [
 					"quantities",
@@ -62,6 +70,14 @@ export function useStudyConfig(study: StudyConfigInput) {
 		switch (study.studyType) {
 			case "FULL_STUDY":
 			case "FULL_PROJECT":
+				return [
+					"QUANTITIES",
+					"SPECIFICATIONS",
+					"COSTING",
+					"PRICING",
+					"QUOTATION",
+					"CONVERSION",
+				] as const;
 			case "COST_PRICING":
 				return [
 					"QUANTITIES",
@@ -103,6 +119,8 @@ export function useStudyConfig(study: StudyConfigInput) {
 	}, [study.workScopes]);
 
 	const isEmptyTableMode = study.studyType === "COST_PRICING";
+	const isCostPricingMode = study.studyType === "COST_PRICING";
+	const skipCalculationEngines = study.studyType === "COST_PRICING";
 	const isQuickPricing =
 		study.studyType === "QUICK_PRICING" ||
 		study.studyType === "CUSTOM_ITEMS";
@@ -112,6 +130,8 @@ export function useStudyConfig(study: StudyConfigInput) {
 		enabledStageTypes,
 		enabledTabs,
 		isEmptyTableMode,
+		isCostPricingMode,
+		skipCalculationEngines,
 		isQuickPricing,
 	};
 }

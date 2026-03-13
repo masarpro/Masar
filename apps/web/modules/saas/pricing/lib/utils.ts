@@ -1,13 +1,13 @@
 export function formatCurrency(amount: number | string): string {
 	const num = typeof amount === "string" ? parseFloat(amount) : amount;
 	if (isNaN(num)) return "0 ر.س";
-	return num.toLocaleString("ar-SA") + " ر.س";
+	return num.toLocaleString("en-SA") + " ر.س";
 }
 
 export function formatNumber(value: number | string, decimals = 2): string {
 	const num = typeof value === "string" ? parseFloat(value) : value;
 	if (isNaN(num)) return "0";
-	return num.toLocaleString("ar-SA", {
+	return num.toLocaleString("en-US", {
 		minimumFractionDigits: decimals,
 		maximumFractionDigits: decimals,
 	});
@@ -19,7 +19,7 @@ export function formatNumber(value: number | string, decimals = 2): string {
  */
 export function formatAmount(n: number | null | undefined, decimals = 2): string {
 	if (n == null || n === 0) return "—";
-	return n.toLocaleString("ar-SA", {
+	return n.toLocaleString("en-US", {
 		minimumFractionDigits: decimals,
 		maximumFractionDigits: decimals,
 	});
@@ -29,10 +29,18 @@ export function formatAmount(n: number | null | undefined, decimals = 2): string
  * تنسيق نسبة مئوية
  */
 export function formatPercent(n: number, decimals = 1): string {
-	return n.toLocaleString("ar-SA", {
+	return n.toLocaleString("en-US", {
 		minimumFractionDigits: decimals,
 		maximumFractionDigits: decimals,
 	});
+}
+
+/**
+ * Format a number with Western digits (en-US) — null/undefined → "—"
+ */
+export function formatNum(n: number | null | undefined): string {
+	if (n == null) return "—";
+	return Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
 }
 
 export function formatDate(date: Date | string): string {

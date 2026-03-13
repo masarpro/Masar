@@ -4,19 +4,27 @@
  */
 
 export type SupportedCurrency = "SAR" | "USD" | "EUR" | "AED" | "KWD" | "QAR" | "BHD" | "OMR";
-export type SupportedLocale = "ar-SA" | "en-US" | "ar-EG" | "ar-AE";
+export type SupportedLocale = "ar-SA" | "en-US" | "en-SA" | "ar-EG" | "ar-AE";
+
+/**
+ * Format a number with Western digits (en-US) — null/undefined → "—"
+ */
+export function formatNum(n: number | null | undefined): string {
+	if (n == null) return "—";
+	return Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
+}
 
 /**
  * Format a number as currency
  * @param value - The numeric value to format (number, string, or null/undefined)
  * @param currency - The currency code (default: "SAR")
- * @param locale - The locale for formatting (default: "ar-SA")
+ * @param locale - The locale for formatting (default: "en-SA")
  * @returns Formatted currency string
  */
 export function formatCurrency(
 	value: number | string | null | undefined,
 	currency: SupportedCurrency = "SAR",
-	locale: SupportedLocale = "ar-SA",
+	locale: SupportedLocale = "en-SA",
 ): string {
 	if (value === null || value === undefined) {
 		return "-";
@@ -40,13 +48,13 @@ export function formatCurrency(
  * Format a number as compact currency (e.g., 1.5M SAR)
  * @param value - The numeric value to format
  * @param currency - The currency code (default: "SAR")
- * @param locale - The locale for formatting (default: "ar-SA")
+ * @param locale - The locale for formatting (default: "en-SA")
  * @returns Formatted compact currency string
  */
 export function formatCurrencyCompact(
 	value: number | string | null | undefined,
 	currency: SupportedCurrency = "SAR",
-	locale: SupportedLocale = "ar-SA",
+	locale: SupportedLocale = "en-SA",
 ): string {
 	if (value === null || value === undefined) {
 		return "-";
@@ -187,13 +195,13 @@ export function formatRelativeTime(
  * Format a number
  * @param value - The number to format
  * @param decimals - Number of decimal places (default: 2)
- * @param locale - The locale for formatting (default: "ar-SA")
+ * @param locale - The locale for formatting (default: "en-US")
  * @returns Formatted number string
  */
 export function formatNumber(
 	value: number | string | null | undefined,
 	decimals: number = 2,
-	locale: SupportedLocale = "ar-SA",
+	locale: SupportedLocale = "en-US",
 ): string {
 	if (value === null || value === undefined) {
 		return "-";
@@ -215,13 +223,13 @@ export function formatNumber(
  * Format a percentage
  * @param value - The percentage value (0-100 or 0-1)
  * @param decimals - Number of decimal places (default: 0)
- * @param locale - The locale for formatting (default: "ar-SA")
+ * @param locale - The locale for formatting (default: "en-US")
  * @returns Formatted percentage string
  */
 export function formatPercentage(
 	value: number | string | null | undefined,
 	decimals: number = 0,
-	locale: SupportedLocale = "ar-SA",
+	locale: SupportedLocale = "en-US",
 ): string {
 	if (value === null || value === undefined) {
 		return "-";
@@ -248,12 +256,12 @@ export function formatPercentage(
 /**
  * Format file size in human-readable format
  * @param bytes - The size in bytes
- * @param locale - The locale for formatting (default: "ar-SA")
+ * @param locale - The locale for formatting (default: "en-US")
  * @returns Formatted file size string
  */
 export function formatFileSize(
 	bytes: number | null | undefined,
-	locale: SupportedLocale = "ar-SA",
+	locale: SupportedLocale = "en-US",
 ): string {
 	if (bytes === null || bytes === undefined || bytes === 0) {
 		return "0 B";

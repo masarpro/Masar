@@ -364,6 +364,12 @@ export const costingBulkUpdate = subscriptionProcedure
 
 		const existingMap = new Map(existingItems.map((i) => [i.id, i]));
 
+		// ──── DEBUG: log bulkUpdate processing ────
+		console.log("=== BULK_UPDATE DEBUG ===");
+		console.log("Input items count:", input.items.length);
+		console.log("Existing items found:", existingItems.length);
+		// ──── END DEBUG ────
+
 		await db.$transaction(
 			input.items.map((update) => {
 				const existing = existingMap.get(update.id);
@@ -384,6 +390,10 @@ export const costingBulkUpdate = subscriptionProcedure
 				};
 
 				const totals = calculateItemTotals(merged);
+
+				// ──── DEBUG: log per-item calculation ────
+				console.log(`  BULK id=${update.id} | qty=${merged.quantity} | inputMUC=${update.materialUnitCost} | mergedMUC=${merged.materialUnitCost} | storagePct=${merged.storageCostPercent} | → materialTotal=${totals.materialTotal} | storageTotal=${totals.storageTotal} | totalCost=${totals.totalCost}`);
+				// ──── END DEBUG ────
 
 				return db.costingItem.update({
 					where: { id: update.id },
@@ -440,14 +450,18 @@ export const costingSetSectionLabor = subscriptionProcedure
 			},
 		});
 
+		// The caller sends the TOTAL labor cost for the section (not a per-unit
+		// rate).  Assign the full amount as a LUMP_SUM on the first item and
+		// zero-out labor on the remaining items so that getSummary totals match.
 		await db.$transaction(
-			items.map((item) => {
+			items.map((item, index) => {
+				const isFirst = index === 0;
 				const merged = {
 					quantity: Number(item.quantity),
 					materialUnitCost: item.materialUnitCost != null ? Number(item.materialUnitCost) : null,
-					laborType: input.laborType,
-					laborUnitCost: input.laborUnitCost,
-					laborQuantity: Number(item.quantity),
+					laborType: isFirst ? "LUMP_SUM" as const : null,
+					laborUnitCost: isFirst ? input.laborUnitCost : null,
+					laborQuantity: null,
 					laborWorkers: null,
 					laborSalary: null,
 					laborMonths: null,
@@ -461,9 +475,9 @@ export const costingSetSectionLabor = subscriptionProcedure
 				return db.costingItem.update({
 					where: { id: item.id },
 					data: {
-						laborType: input.laborType,
-						laborUnitCost: input.laborUnitCost,
-						laborQuantity: Number(item.quantity),
+						laborType: isFirst ? "LUMP_SUM" : null,
+						laborUnitCost: isFirst ? input.laborUnitCost : null,
+						laborQuantity: null,
 						materialTotal: totals.materialTotal,
 						laborTotal: totals.laborTotal,
 						storageTotal: totals.storageTotal,
@@ -531,6 +545,21 @@ export const costingGetSummary = protectedProcedure
 			section,
 			...data,
 		}));
+
+		// ──── DEBUG: log STRUCTURAL section details ────
+		const structItems_debug = items.filter(i => i.section === "STRUCTURAL");
+		console.log("=== GET_SUMMARY DEBUG: STRUCTURAL ===");
+		console.log("STRUCTURAL items count:", structItems_debug.length);
+		let debugMatSum = 0;
+		for (const it of structItems_debug) {
+			const mt = toNum(it.materialTotal);
+			const muc = toNum(it.materialUnitCost);
+			const qty = toNum(it.quantity);
+			debugMatSum += mt;
+			console.log(`  id=${it.id} | desc="${it.description}" | qty=${qty} | materialUnitCost=${muc} | materialTotal=${mt} | storagePct=${toNum(it.storageCostPercent)} | storageTotal=${toNum(it.storageTotal)} | totalCost=${toNum(it.totalCost)}`);
+		}
+		console.log("SUM(materialTotal) =", debugMatSum);
+		// ──── END DEBUG ────
 
 		const grandMaterial = sections.reduce((s, sec) => s + sec.materialTotal, 0);
 		const grandLabor = sections.reduce((s, sec) => s + sec.laborTotal, 0);

@@ -64,7 +64,7 @@ export const createExpense = subscriptionProcedure
 							projectId: input.projectId,
 							projectName: project.name,
 							expenseId: expense.id,
-							amount: input.amount.toLocaleString("ar-SA"),
+							amount: input.amount.toLocaleString("en-US"),
 							category: input.category,
 							creatorId: context.user.id,
 							accountantIds,

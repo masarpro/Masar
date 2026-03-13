@@ -26,7 +26,7 @@ import {
 } from "@saas/projects/hooks/use-project-boq";
 
 function formatCurrency(value: number): string {
-	return value.toLocaleString("ar-SA", {
+	return value.toLocaleString("en-US", {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
 	});
@@ -138,7 +138,7 @@ export function PricingModeDialog({
 											</TableCell>
 											<TableCell className="text-sm text-slate-500">{item.unit}</TableCell>
 											<TableCell className="text-end text-sm">
-												{item.quantity.toLocaleString("ar-SA")}
+												{item.quantity.toLocaleString("en-US")}
 											</TableCell>
 											<TableCell>
 												<Input

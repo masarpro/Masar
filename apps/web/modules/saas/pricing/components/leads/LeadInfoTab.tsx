@@ -112,7 +112,7 @@ export function LeadInfoTab({ lead }: LeadInfoTabProps) {
 							<InfoRow
 								icon={Ruler}
 								label={t("pricing.leads.form.estimatedArea")}
-								value={`${new Intl.NumberFormat("en-SA").format(lead.estimatedArea)} ${t("pricing.leads.area")}`}
+								value={`${new Intl.NumberFormat("en-US").format(lead.estimatedArea)} ${t("pricing.leads.area")}`}
 							/>
 						)}
 						{lead.estimatedValue && (

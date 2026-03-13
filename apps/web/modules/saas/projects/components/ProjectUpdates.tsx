@@ -180,7 +180,7 @@ export function ProjectUpdates({
 											</span>
 											<p className="font-medium text-indigo-700 dark:text-indigo-300">
 												المستخلص رقم {draftData.draft.nextPayment.claimNo} -{" "}
-												{draftData.draft.nextPayment.amount.toLocaleString()}{" "}
+												{draftData.draft.nextPayment.amount.toLocaleString("en-US")}{" "}
 												ر.س
 											</p>
 										</div>

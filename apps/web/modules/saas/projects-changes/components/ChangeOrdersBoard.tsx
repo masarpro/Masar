@@ -89,7 +89,7 @@ function formatCurrency(value: number | string | null | undefined): string {
 	if (value === null || value === undefined) return "-";
 	const num = typeof value === "string" ? Number.parseFloat(value) : value;
 	if (Number.isNaN(num)) return "-";
-	return new Intl.NumberFormat("ar-SA", {
+	return new Intl.NumberFormat("en-SA", {
 		style: "currency",
 		currency: "SAR",
 		minimumFractionDigits: 0,

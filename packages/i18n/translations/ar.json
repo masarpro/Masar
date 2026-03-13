@@ -1168,7 +1168,31 @@
 			"lumpSumProfitPercent": "نسبة الربح من التكلفة",
 			"lumpSumSafetyMargin": "هامش الأمان",
 			"lumpSumNoContract": "لم يتم تحديد قيمة العقد",
-			"lumpSumLossWarning": "تحذير: التكلفة المتوقعة تتجاوز قيمة العقد. المشروع سيحقق خسارة."
+			"lumpSumLossWarning": "تحذير: التكلفة المتوقعة تتجاوز قيمة العقد. المشروع سيحقق خسارة.",
+			"emptyTable": {
+				"title_structural": "البنود الإنشائية",
+				"title_finishing": "بنود التشطيبات",
+				"title_mep": "البنود الكهروميكانيكية",
+				"category": "الفئة",
+				"description": "الوصف",
+				"unit": "الوحدة",
+				"quantity": "الكمية",
+				"concreteVolume": "حجم الخرسانة (م³)",
+				"steelWeight": "وزن الحديد (كجم)",
+				"subCategory": "الفئة الفرعية",
+				"floor": "الطابق",
+				"scope": "النطاق",
+				"wastagePercent": "نسبة الهدر %",
+				"itemType": "النوع",
+				"notes": "ملاحظات",
+				"actions": "إجراءات",
+				"addRow": "إضافة صف",
+				"deleteRow": "حذف",
+				"noItems": "لا توجد بنود — أضف بنوداً يدوياً",
+				"itemAdded": "تم إضافة البند",
+				"itemUpdated": "تم تحديث البند",
+				"itemDeleted": "تم حذف البند"
+			}
 		},
 		"quotations": {
 			"title": "عروض الأسعار",

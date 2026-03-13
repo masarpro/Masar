@@ -612,5 +612,5 @@ function getUnit(unit: string): string {
 }
 
 function round(n: number): string {
-	return (Math.round(n * 10) / 10).toLocaleString("ar-SA");
+	return (Math.round(n * 10) / 10).toLocaleString("en-US");
 }

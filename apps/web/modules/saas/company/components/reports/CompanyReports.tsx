@@ -42,7 +42,7 @@ export function CompanyReports({ organizationId }: CompanyReportsProps) {
 	);
 
 	const formatCurrency = (amount: number) =>
-		new Intl.NumberFormat("ar-SA").format(amount) + " ر.س";
+		new Intl.NumberFormat("en-SA").format(amount) + " ر.س";
 
 	if (isLoading) {
 		return (

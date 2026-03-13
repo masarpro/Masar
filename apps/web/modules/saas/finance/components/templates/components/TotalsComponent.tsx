@@ -94,7 +94,7 @@ export function TotalsComponent({
 		displayTotals.remainingAmount ?? displayTotals.total - paid;
 
 	const formatPercent = (value: number) => {
-		return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
+		return new Intl.NumberFormat("en-US", {
 			style: "percent",
 			minimumFractionDigits: 0,
 			maximumFractionDigits: 2,

@@ -90,7 +90,7 @@ export function AdminDashboard() {
 				/>
 				<StatsCard
 					title={t("admin.dashboard.mrr")}
-					value={`${(churnData ? 0 : 0).toLocaleString()} SAR`}
+					value={`${(churnData ? 0 : 0).toLocaleString("en-US")} SAR`}
 					icon={DollarSignIcon}
 				/>
 				<StatsCard

@@ -1,6 +1,6 @@
 # تقرير تحليل نظام الدراسات — الوضع الحالي
 
-> تاريخ التقرير: 2026-03-12
+> تاريخ التقرير: 2026-03-13
 > الغرض: تحليل الوضع الحالي لنظام إنشاء وإدارة دراسات التسعير — بدون تنفيذ أي تغييرات
 
 ---
@@ -11,26 +11,27 @@
 
 | الحقل | النوع | القيمة الافتراضية | ملاحظات |
 |-------|-------|-------------------|---------|
-| `studyType` | `StudyType` enum | `FULL_PROJECT` | نوع الدراسة |
-| `entryPoint` | `StudyEntryPoint` enum | `FROM_SCRATCH` | نقطة البداية في المراحل |
-| `quantitiesStatus` | `StageStatus` enum | `DRAFT` | حالة مرحلة الكميات |
-| `specsStatus` | `StageStatus` enum | `NOT_STARTED` | حالة مرحلة المواصفات |
-| `costingStatus` | `StageStatus` enum | `NOT_STARTED` | حالة مرحلة التكلفة |
-| `pricingStatus` | `StageStatus` enum | `NOT_STARTED` | حالة مرحلة التسعير |
-| `quotationStatus` | `StageStatus` enum | `NOT_STARTED` | حالة مرحلة عرض السعر |
+| `studyType` | `StudyType` enum | `FULL_PROJECT` | نوع الدراسة — **محفوظ في DB** ✅ |
+| `entryPoint` | `StudyEntryPoint` enum | `FROM_SCRATCH` | نقطة البداية في المراحل — **محفوظ في DB** ✅ |
+| `workScopes` | `String[]` | `[]` | نطاقات العمل المختارة — **محفوظ في DB** ✅ |
 | `contractValue` | `Decimal(15,2)` | `null` | قيمة العقد (للمقطوعية) |
 | `costingMethod` | `String?` | `null` | `"manual"` / `"database"` / `"import"` |
 | `markupMethod` | `String?` | `null` | `"uniform"` / `"per_section"` / `"manual"` |
 
-### 1.2 قيم StudyType enum الحالية (3 قيم)
+**ملاحظة مهمة**: `workScopes` موجود كحقل `String[]` في CostStudy ويُحفظ في قاعدة البيانات. القيم المتاحة: `["STRUCTURAL", "FINISHING", "MEP", "CUSTOM"]`
+
+### 1.2 قيم StudyType enum (6 قيم)
 
 ```
-FULL_PROJECT        — دراسة كاملة
-CUSTOM_ITEMS        — بنود مخصصة
+FULL_PROJECT        — دراسة كاملة (قديم — backward compat)
+CUSTOM_ITEMS        — بنود مخصصة (قديم — backward compat)
 LUMP_SUM_ANALYSIS   — تحليل مقطوعية
+FULL_STUDY          — دراسة كاملة من الصفر (جديد)
+COST_PRICING        — تسعير تكلفة (جديد)
+QUICK_PRICING       — تسعير سريع (جديد)
 ```
 
-### 1.3 قيم StudyEntryPoint enum الحالية (6 قيم)
+### 1.3 قيم StudyEntryPoint enum (6 قيم)
 
 ```
 FROM_SCRATCH        — من الصفر (كل المراحل)
@@ -61,29 +62,28 @@ QUOTATION       — عرض السعر
 CONVERSION      — التحويل لمشروع
 ```
 
-### 1.6 هل يوجد حقل scope/نطاق عمل في CostStudy؟
+### 1.6 نموذج StudyStage (سجلات المراحل)
 
-**لا** — لا يوجد حقل `scope` أو `workScope` في نموذج `CostStudy` نفسه.
+```
+id, costStudyId, stage (StageType), status (StageStatus),
+assigneeId, approvedById, approvedAt, notes, sortOrder
+Unique: [costStudyId, stage]
+```
 
-لكن `scope` موجود في النماذج الفرعية:
-- **FinishingItem**: `scope String?` — نطاق البند (per_floor, whole_building, etc.)
-- **MEPItem**: `scope String @default("per_room")` — نطاق البند
-
-هذا يعني أن نطاق العمل المختار عند الإنشاء (إنشائي/تشطيبات/MEP/مخصص) **لا يُحفظ في قاعدة البيانات** حالياً.
+عند إنشاء دراسة يتم إنشاء **6 سجلات** StudyStage — واحد لكل مرحلة.
 
 ### 1.7 النماذج المرتبطة
 
 | النموذج | الوصف | حقول رئيسية |
 |---------|-------|-------------|
-| `StructuralItem` | بنود إنشائية | category, quantity, concreteVolume, steelWeight, totalCost |
-| `FinishingItem` | بنود تشطيبات | category, floorId, area, quantity, qualityLevel, materialPrice, laborPrice |
-| `MEPItem` | بنود كهروميكانيكية | category, itemType, floorId, roomId, scope, quantity |
+| `StructuralItem` | بنود إنشائية | category, quantity, concreteVolume, steelWeight, materialCost, laborCost, totalCost |
+| `FinishingItem` | بنود تشطيبات | category, floorId, area, quantity, qualityLevel, materialPrice, laborPrice, scope (nullable) |
+| `MEPItem` | بنود كهروميكانيكية | category, itemType, floorId, roomId, scope (default "per_room"), quantity |
 | `LaborItem` | بنود عمالة | laborType, workerType, quantity, dailyRate, durationDays |
-| `CostingItem` | بنود التكلفة | section, sourceItemId, description, quantity, materialUnitCost, laborUnitCost |
+| `CostingItem` | بنود التكلفة المُولّدة | section (STRUCTURAL/FINISHING/MEP/LABOR/MANUAL), sourceItemId, quantity, materialUnitCost, laborUnitCost, totalCost |
 | `ManualItem` | بنود يدوية | description, unit, quantity, section, notes |
 | `SectionMarkup` | هوامش القطاعات | section (STRUCTURAL/FINISHING/MEP/LABOR), markupPercent |
-| `StudyStage` | سجلات المراحل | stage (StageType), status (StageStatus), assigneeId |
-| `Quote` | عروض الأسعار | quoteNumber, quoteType, subtotal, totalAmount, status |
+| `Quote` | عروض الأسعار | quoteNumber, quoteType, subtotal, totalAmount |
 | `MaterialBOM` | قائمة المواد | materialName, quantity, unit, wastagePercent, unitPrice |
 | `CostingLabor` | عمالة التكلفة | section, laborMethod, description, quantity, rate |
 
@@ -93,131 +93,120 @@ CONVERSION      — التحويل لمشروع
 
 ### 2.1 كيف يعمل حالياً
 
-الإنشاء يتم عبر **wizard من 3 خطوات** (أحياناً خطوتين):
+يوجد تطبيقان:
+- **CreateCostStudyForm.tsx** — Dialog بخطوتين (النسخة الرئيسية)
+- **CreateStudyPage.tsx** — صفحة كاملة
 
-| الخطوة | المحتوى | ملاحظات |
-|--------|---------|---------|
-| **الخطوة 1** | اختيار هدف الدراسة (5 خيارات) | اختيار إلزامي |
-| **الخطوة 2** | اختيار نطاق العمل (4 checkboxes) | تظهر فقط لـ: full_study, cost_pricing, lump_sum |
-| **الخطوة 3** | بيانات الدراسة (اسم، عميل، نوع مشروع) | حقول أساسية |
+**Dialog — خطوتان**:
+| الخطوة | المحتوى |
+|--------|---------|
+| **الخطوة 1** | اختيار هدف الدراسة (3 خيارات) + نطاق العمل (4 checkboxes — يظهر فقط لـ FULL_STUDY و COST_PRICING) |
+| **الخطوة 2** | بيانات الدراسة (اسم، عميل، نوع مشروع) |
 
-### 2.2 خيارات الهدف (الخطوة 1) — 5 خيارات حالية
+### 2.2 خيارات الهدف — 3 أنواع
 
-| القيمة | العنوان | الوصف | يظهر النطاق؟ |
-|--------|---------|-------|-------------|
-| `full_study` | دراسة كاملة من الصفر | حساب الكميات والمواصفات والتسعير خطوة بخطوة | ✅ نعم |
-| `cost_pricing` | تسعير تكلفة | لديّ كميات جاهزة وأريد تحديد المواصفات والتسعير | ✅ نعم |
-| `quick_pricing` | تسعير سريع | إدخال بنود وأسعار مباشرة بدون تفاصيل | ❌ لا |
-| `lump_sum` | تحليل مقطوعية | لديّ عقد بمبلغ إجمالي وأريد تحليل التكلفة الفعلية | ✅ نعم |
-| `contract_import` | استيراد عقد وتحويل لمشروع | لديّ عقد متكامل وأريد تحويله لمشروع تنفيذي | ❌ لا |
+| القيمة | الأيقونة | العنوان | يظهر النطاق؟ | صفحة البداية |
+|--------|----------|---------|-------------|-------------|
+| `FULL_STUDY` | Building2 | الدراسة الشاملة | ✅ نعم | `quantities` |
+| `COST_PRICING` | ClipboardList | تسعير التكلفة | ✅ نعم | `quantities` |
+| `QUICK_PRICING` | Zap | التسعير السريع | ❌ لا | `pricing` |
 
-### 2.3 خيارات نطاق العمل (الخطوة 2)
+### 2.3 خيارات نطاق العمل (multi-select)
 
-4 خيارات (multi-select بـ checkboxes):
-- 🏗️ أعمال إنشائية (structural)
-- 🎨 أعمال تشطيبات (finishing)
-- ⚡ كهروميكانيكية (mep)
-- 📝 بنود مخصصة (custom)
+| المفتاح | الأيقونة | العنوان |
+|---------|----------|---------|
+| `STRUCTURAL` | 🏗️ | أعمال إنشائية |
+| `FINISHING` | 🎨 | تشطيبات |
+| `MEP` | ⚡ | كهروميكانيكية |
+| `CUSTOM` | 📝 | يدوي/مخصص |
 
 ### 2.4 الحقول المُرسلة عند الإنشاء
 
 ```typescript
 {
-  organizationId: string,      // إلزامي
-  name: string?,               // اختياري
-  customerName: string?,       // اختياري
-  projectType: string,         // إلزامي (residential, commercial, etc.)
-  studyType: StudyType,        // يُشتق من الهدف المختار
-  entryPoint: StudyEntryPoint, // يُشتق من الهدف المختار
-  contractValue: number?,      // فقط لـ lump_sum
-  landArea: 1,                 // قيمة افتراضية
-  buildingArea: 1,             // قيمة افتراضية
-  numberOfFloors: 1,           // قيمة افتراضية
-  hasBasement: false,          // قيمة افتراضية
-  finishingLevel: "medium",    // قيمة افتراضية
+  organizationId: string,
+  name: string,
+  customerName?: string,
+  projectType: string,           // residential, commercial, industrial, warehouse, mixed
+  studyType: "FULL_STUDY" | "COST_PRICING" | "QUICK_PRICING",
+  workScopes: string[],          // مثال: ["STRUCTURAL", "FINISHING"]
+  landArea: 1,
+  buildingArea: 1,
+  numberOfFloors: 1,
+  hasBasement: false,
+  finishingLevel: "medium",
 }
 ```
 
-### 2.5 تحويل الهدف إلى studyType و entryPoint
+### 2.5 تحويل studyType إلى entryPoint (في API create.ts)
 
-| الهدف (goal) | studyType | entryPoint |
-|-------------|-----------|------------|
-| `full_study` | `FULL_PROJECT` | `FROM_SCRATCH` |
-| `cost_pricing` | `FULL_PROJECT` | `HAS_QUANTITIES` |
-| `quick_pricing` | `CUSTOM_ITEMS` | `CUSTOM_ITEMS` |
-| `lump_sum` | `LUMP_SUM_ANALYSIS` | `LUMP_SUM_ANALYSIS` |
-| `contract_import` | `FULL_PROJECT` | `FROM_SCRATCH` |
+```typescript
+FULL_STUDY    → FROM_SCRATCH    (يبدأ من الكميات)
+COST_PRICING  → FROM_SCRATCH    (يبدأ من الكميات — ⚠️ ليس HAS_QUANTITIES!)
+QUICK_PRICING → QUOTATION_ONLY  (يبدأ من عرض السعر)
+```
 
-### 2.6 الصفحة الأولى بعد الإنشاء
+### 2.6 بعد الإنشاء — التوجيه
 
-| الهدف | الصفحة |
-|-------|--------|
-| `full_study` | `/structural` |
-| `cost_pricing` | `/specifications` |
-| `quick_pricing` | `/quick-pricing` |
-| `lump_sum` | `/costing` |
-| `contract_import` | `/quantities` |
+| studyType | التوجيه |
+|-----------|---------|
+| FULL_STUDY | `/pricing/studies/{id}/quantities` |
+| COST_PRICING | `/pricing/studies/{id}/quantities` |
+| QUICK_PRICING | `/pricing/studies/{id}/pricing` |
 
-### 2.7 فجوات الإنشاء
+### 2.7 تعديل إعدادات الدراسة (EditStudyConfigDialog)
 
-1. **نطاق العمل (scope) لا يُحفظ في DB** — يُعرض في الواجهة فقط ولا يُرسل للـ API ولا يوجد حقل له في CostStudy
-2. **تحويل الأهداف محدود** — 5 أهداف تُحوّل إلى 3 قيم studyType فقط، مما يضيع معلومات (مثلاً: full_study و cost_pricing و contract_import كلها = FULL_PROJECT)
-3. **لا يوجد تمييز بين full_study و contract_import في DB** — كلاهما FULL_PROJECT + FROM_SCRATCH
+- يوجد Dialog لتعديل studyType و workScopes بعد الإنشاء
+- يستدعي `orpc.pricing.studies.updateConfig` → API `update-config.ts`
+- يحفظ التغييرات في DB ✅
 
 ---
 
 ## 3. شريط المراحل (Pipeline)
 
-### 3.1 المراحل الحالية
+### 3.1 المراحل الحالية — StudyPipelineStepper
 
-6 مراحل معرّفة في الواجهة الأمامية (`StudyPipelineStepper`):
+6 مراحل في `PIPELINE_STAGES`:
 
-| # | المفتاح | الاسم العربي | الاسم الإنجليزي | المسار |
-|---|---------|-------------|-----------------|--------|
-| 1 | `quantities` | الكميات | Quantities | `/quantities` |
-| 2 | `specifications` | المواصفات | Specifications | `/specifications` |
-| 3 | `costing` | تسعير التكلفة | Costing | `/costing` |
-| 4 | `pricing` | التسعير | Pricing | `/pricing` |
-| 5 | `quotation` | عرض السعر | Quotation | `/quotation` |
-| 6 | `convert` | مشروع | Project | `/convert` |
-
-في الـ Backend (`stages.ts`): 5 مراحل فقط (بدون CONVERSION).
+| # | المفتاح | StageType | الاسم العربي | الأيقونة | المسار |
+|---|---------|-----------|-------------|----------|--------|
+| 1 | quantities | QUANTITIES | الكميات | Calculator | `/quantities` |
+| 2 | specifications | SPECIFICATIONS | المواصفات | ClipboardList | `/specifications` |
+| 3 | costing | COSTING | تسعير التكلفة | Receipt | `/costing` |
+| 4 | pricing | PRICING | التسعير | DollarSign | `/pricing` |
+| 5 | quotation | QUOTATION | عرض السعر | FileText | `/quotation` |
+| 6 | convert | CONVERSION | مشروع | FolderKanban | `/convert` |
 
 ### 3.2 هل هي ثابتة أم ديناميكية؟
 
-**ثابتة (Hardcoded)** — المراحل معرّفة في ثوابت:
-- Frontend: `PIPELINE_STAGES` في `StudyPipelineStepper.tsx`
-- Frontend: `STAGES` في `PipelineBar.tsx`
-- Backend: `STAGE_ORDER` في `stages.ts`
+**ديناميكية جزئياً** — المراحل معرّفة كثوابت لكن يتم **فلترتها** عبر `enabledStageTypes` prop:
+- `StudyPipelineStepper` يقبل prop `enabledStageTypes` ويفلتر المراحل المعروضة
+- `StudyPageShell` يمرر `enabledStageTypes` من `useStudyConfig` hook
 
-### 3.3 منطق الحالات
+### 3.3 منطق فلترة المراحل حسب studyType (useStudyConfig hook)
+
+| studyType | المراحل المفعّلة |
+|-----------|----------------|
+| **FULL_STUDY** / FULL_PROJECT | جميع الـ 6: quantities, specifications, costing, pricing, quotation, convert |
+| **COST_PRICING** | جميع الـ 6: quantities, specifications, costing, pricing, quotation, convert |
+| **QUICK_PRICING** / CUSTOM_ITEMS | فقط 2: pricing, quotation |
+| LUMP_SUM_ANALYSIS | فقط 2: costing, pricing |
+
+### 3.4 منطق حالات المراحل
 
 ```
-مقفل (Locked):    !isSkipped && !isCurrent && status === "NOT_STARTED"
-نشط (Active):     status === "DRAFT"
-قيد المراجعة:      status === "IN_REVIEW"
-مكتمل (Approved): status === "APPROVED"
-متخطّى (Skipped): index < entryPointStartIndex
+مقفل (Locked):    status === "NOT_STARTED" && !isSkipped && !isCurrent
+نشط (Active):     status === "DRAFT" (نقطة متحركة)
+قيد المراجعة:      status === "IN_REVIEW" (أيقونة ساعة)
+مكتمل (Approved): status === "APPROVED" (علامة ✓)
+متخطّى (Skipped): index < entryPointStartIndex (سهم ←)
 ```
 
-**عند إنشاء الدراسة** — يُحدد المراحل حسب entryPoint:
+### 3.5 PipelineBar (تطبيق ثانوي)
 
-| EntryPoint | المراحل المتخطاة | أول مرحلة نشطة |
-|------------|-------------------|-----------------|
-| `FROM_SCRATCH` | لا شيء | الكميات (#1) |
-| `HAS_QUANTITIES` | الكميات | المواصفات (#2) |
-| `HAS_SPECS` | الكميات + المواصفات | التكلفة (#3) |
-| `QUOTATION_ONLY` | الكميات → التسعير | عرض السعر (#5) |
-| `LUMP_SUM_ANALYSIS` | الكميات + المواصفات | التكلفة (#3) |
-| `CUSTOM_ITEMS` | لا شيء | الكميات (#1) |
-
-### 3.4 منطق conditional حسب studyType
-
-موجود **جزئياً** في `PipelineBar.tsx` فقط:
-- **LUMP_SUM_ANALYSIS**: يخفي مرحلة `quotation`
-- **LUMP_SUM_ANALYSIS**: يغيّر تسمية `selling-price` إلى "الربحية" (profitability)
-
-`StudyPipelineStepper` **لا يفلتر** المراحل حسب studyType — يعتمد فقط على entryPoint.
+فلترة إضافية:
+- **LUMP_SUM_ANALYSIS**: يخفي quotation، يغيّر تسمية selling-price إلى "الربحية"
+- **QUICK_PRICING / CUSTOM_ITEMS**: يعرض فقط selling-price و quotation
 
 ---
 
@@ -225,67 +214,102 @@ CONVERSION      — التحويل لمشروع
 
 ### 4.1 صفحة الكميات (Quantities)
 
-**التبويبات**: 4 تبويبات **ثابتة** دائماً:
+**الملفات**:
+- `apps/web/modules/saas/pricing/components/studies/QuantitiesSubTabs.tsx`
+- `apps/web/modules/saas/pricing/components/pipeline/QuantitiesPageContent.tsx`
 
-| التبويب | المكوّن | شكل العرض |
-|---------|--------|-----------|
-| إنشائي (Structural) | `StructuralItemsEditor` | Accordion بمجموعات حسب الفئة |
-| تشطيبات (Finishing) | `FinishingItemsEditor` | Dashboard بتسلسل طابق → فراغ → بند |
-| كهروميكانيكي (MEP) | `MEPItemsEditor` | Dashboard table مع تمكين/تعطيل |
-| يدوي (Manual) | `ManualItemsTable` | جدول HTML بسيط |
+**التبويبات — ديناميكية بناءً على workScopes** ✅:
 
-**لا يوجد أي فلترة** بناءً على studyType أو scope — كل التبويبات تظهر دائماً.
+```typescript
+// من useStudyConfig
+if (!scopes || scopes.length === 0) {
+  return ["structural", "finishing", "mep", "manual"]; // fallback للدراسات القديمة
+}
+// وإلا: فقط التبويبات المطابقة لـ workScopes
+```
+
+| workScope | التبويب المعروض | المكوّن |
+|-----------|----------------|--------|
+| STRUCTURAL | إنشائي | `StructuralItemsEditor` |
+| FINISHING | تشطيبات | `FinishingItemsEditor` |
+| MEP | كهروميكانيكي | `MEPItemsEditor` |
+| CUSTOM | يدوي | `ManualItemsTable` |
+
+**وضع الجدول الفارغ** (`isEmptyTableMode`):
+- يُفعّل عندما `studyType === "COST_PRICING"` ✅
+- يعرض `ManualItemsTable` بدلاً من المحررات الذكية
+- كل تبويب يظهر جدول يدوي فارغ مع filterSection مطابق
 
 ### 4.2 صفحة المواصفات (Specifications)
 
-**التبويبات**: 3 تبويبات ثابتة:
-- إنشائي (Structural Specs) — مكوّن مخصص
-- تشطيبات (Finishing Specs) — محرر inline مع دمج بيانات الكميات
-- كهروميكانيكي (MEP Specs) — placeholder "قريباً"
+**الملف**: `apps/web/modules/saas/pricing/components/specifications/SpecificationsPageContentV2.tsx`
 
-**لا يوجد فلترة** حسب studyType أو scope.
-**تعتمد على**: بيانات الكميات (finishing items + building config).
+**سلوك**:
+- تتحقق من اعتماد مرحلة QUANTITIES — إذا لم تُعتمد تعرض شاشة قفل
+- التبويبات تُفلتر بناءً على workScopes (تزيل "manual" من القائمة)
+- عرض BOM (قائمة المواد)
+
+**تعتمد على**: اعتماد مرحلة الكميات
 
 ### 4.3 صفحة التكلفة (Costing)
 
-**تعرض**:
-- زر إنشاء/إعادة إنشاء بنود التكلفة
-- `CostingTable` (إذا توجد بنود) أو حالة فارغة
-- `CostingSummary` (ملخص التكاليف)
+**الملف**: `apps/web/modules/saas/pricing/components/costing-v2/CostingPageContentV2.tsx`
 
-**لا يوجد فلترة** حسب studyType أو scope.
-**تعتمد على**: بيانات المواصفات.
+**التبويبات — ديناميكية بناءً على workScopes** ✅:
+```typescript
+if (workScopes.length === 0) {
+  enabledTabs = ["structural", "finishing", "mep"];
+} else {
+  // فلترة حسب workScopes
+}
+enabledTabs.push("labor", "summary"); // دائماً
+```
+
+| تبويب | المكوّن |
+|-------|--------|
+| Structural | `StructuralCostingTab` |
+| Finishing | `FinishingCostingTab` |
+| MEP | `MEPCostingTab` |
+| Labor | `LaborOverviewTab` |
+| Summary | `CostingSummaryTab` |
+
+**تعتمد على**: اعتماد مرحلة المواصفات — تولّد CostingItems تلقائياً
 
 ### 4.4 صفحة التسعير (Pricing)
 
-**تعرض**: `PricingPageContentV2`
+**الملف**: `apps/web/modules/saas/pricing/components/pricing-v2/PricingPageContentV2.tsx`
 
-**فلترة جزئية**: يتحقق من `studyType === "LUMP_SUM_ANALYSIS"` لإخفاء بعض الأقسام.
+**تعرض**:
+- بطاقة التكلفة الإجمالية والتكلفة لكل م²
+- اختيار طريقة الهوامش (4 طرق: uniform, per-section, manual price, per-sqm)
+- نماذج ديناميكية حسب الطريقة المختارة
+- قسم مصاريف إضافية (إدارية، طوارئ، ضريبة)
+- جدول تعديل الأسعار لكل بند
+- بطاقة تحليل الربحية
 
-### 4.5 صفحة سعر البيع / الربحية (Selling Price)
+**فلترة**:
+- `enabledSections` تُفلتر بناءً على workScopes ✅
+- قسم خاص لـ LUMP_SUM_ANALYSIS عندما `contractValue > 0`
 
-**هذه الصفحة الوحيدة** التي تطبّق فلترة كاملة حسب studyType:
+**تعتمد على**: اعتماد مرحلة التكلفة
 
-| studyType | ما يُعرض |
-|-----------|----------|
-| `LUMP_SUM_ANALYSIS` | مكوّن `LumpSumAnalysis` فقط |
-| أي نوع آخر | `MarkupMethodSelector` + نماذج الهوامش (uniform أو per_section) |
+### 4.5 صفحة سعر البيع (Selling Price)
 
-**تعتمد على**: بيانات التكلفة والتسعير.
+**المسار**: `/selling-price/page.tsx` → **يعيد التوجيه** إلى `/pricing`
+(ليست صفحة مستقلة — redirect فقط)
 
 ### 4.6 صفحة عرض السعر (Quotation)
 
-تعرض إدارة عروض الأسعار. لا فلترة حسب studyType.
+تعرض إدارة عروض الأسعار. لا فلترة خاصة حسب studyType.
 
-### 4.7 ملخص الفلترة الحالية
+### 4.7 ملخص الفلترة الحالية في صفحات المراحل
 
-| الصفحة | فلترة حسب studyType؟ | فلترة حسب scope؟ |
-|--------|---------------------|-----------------|
-| الكميات | ❌ لا | ❌ لا |
-| المواصفات | ❌ لا | ❌ لا |
-| التكلفة | ❌ لا | ❌ لا |
-| التسعير | ⚠️ جزئي (LUMP_SUM فقط) | ❌ لا |
-| سعر البيع | ✅ نعم (LUMP_SUM مختلف) | ❌ لا |
+| الصفحة | فلترة حسب studyType؟ | فلترة حسب workScopes؟ |
+|--------|---------------------|----------------------|
+| الكميات | ✅ نعم (isEmptyTableMode لـ COST_PRICING) | ✅ نعم (التبويبات ديناميكية) |
+| المواصفات | ❌ لا | ✅ نعم (التبويبات ديناميكية — تزيل manual) |
+| التكلفة | ❌ لا | ✅ نعم (التبويبات ديناميكية) |
+| التسعير | ⚠️ جزئي (LUMP_SUM فقط) | ✅ نعم (enabledSections) |
 | عرض السعر | ❌ لا | ❌ لا |
 
 ---
@@ -296,24 +320,40 @@ CONVERSION      — التحويل لمشروع
 
 **3 مستويات**:
 
-1. **شريط التنقل الرئيسي** (`PricingNavigation`): لوحة التحكم ← الدراسات ← عروض الأسعار ← العملاء المحتملون
-2. **Sidebar** (`use-sidebar-menu.ts`): يعرض 6 عناصر فرعية عند دخول دراسة:
-   - نظرة عامة، الكميات، المواصفات، التكلفة، التسعير، عرض السعر
-3. **شريط المراحل** (`StudyPipelineStepper`): 6 مراحل بأيقونات وحالات
+1. **PricingNavigation** (شريط علوي): لوحة التحكم ← الدراسات ← عروض الأسعار ← العملاء المحتملون
+2. **StudySidebar** (جانبي — داخل الدراسة): نظرة عامة + 6 مراحل
+3. **StudyPipelineStepper** (شريط المراحل البصري): المراحل المفعّلة فقط
 
-### 5.2 هل الروابط ثابتة أم ديناميكية؟
+### 5.2 StudySidebar
 
-**ثابتة** — كل العناصر تظهر دائماً بغض النظر عن studyType أو scope.
+**الملف**: `apps/web/modules/saas/pricing/components/studies/StudySidebar.tsx`
 
-**الاستثناء الوحيد**: `PipelineBar` يخفي مرحلة quotation لنوع LUMP_SUM_ANALYSIS.
+- يعرض عناصر التنقل بناءً على `ENTRY_POINT_START_INDEX`
+- المراحل المتخطاة (قبل entryPoint) تظهر معطّلة بصرياً
+- **لا يفلتر حسب studyType** — يعتمد فقط على entryPoint
 
-### 5.3 Sidebar
+### 5.3 StudyPageShell (الغلاف الرئيسي)
 
-يتحقق من وجود `studyId` في المسار عبر regex:
-```typescript
-pathname.match(/\/pricing\/studies\/([^/]+)/)
-```
-إذا وُجد studyId، يضيف 6 عناصر فرعية ثابتة — **بدون أي شرط** على studyType.
+**الملف**: `apps/web/modules/saas/pricing/components/studies/StudyPageShell.tsx`
+
+يعرض:
+1. **StudyHeaderCard** — اسم الدراسة، العميل، الحالة، زر الرجوع
+2. **StudyConfigBar** — شارة نوع الدراسة (ملونة) + chips نطاقات العمل + زر تعديل
+3. **StudyPipelineStepper** — المراحل المفلترة عبر `enabledStageTypes`
+4. المحتوى (children)
+
+### 5.4 StudyConfigBar
+
+**الملف**: `apps/web/modules/saas/pricing/components/studies/StudyConfigBar.tsx`
+
+يعرض:
+- شارة نوع الدراسة بألوان مختلفة:
+  - FULL_STUDY/FULL_PROJECT → أزرق
+  - COST_PRICING → كهرماني (amber)
+  - QUICK_PRICING/CUSTOM_ITEMS → أخضر زمردي
+  - LUMP_SUM_ANALYSIS → بنفسجي
+- chips لنطاقات العمل مع أيقونات emoji
+- زر تعديل (قلم) يفتح EditStudyConfigDialog
 
 ---
 
@@ -324,33 +364,27 @@ pathname.match(/\/pricing\/studies\/([^/]+)/)
 **الأنواع الرئيسية الصادرة**:
 
 ```typescript
-// نتيجة الأساسات المنعزلة
+// نتيجة الأساسات
 IsolatedFoundationResult {
-  concreteVolume: number      // حجم الخرسانة (م³)
-  plainConcreteVolume: number // خرسانة عادية (م³)
-  formworkArea: number        // مساحة الشدات (م²)
-  rebarDetails: []            // تفاصيل حديد التسليح
-  totals: {
-    netWeight, grossWeight, wasteWeight, wastePercentage,
-    stocksNeeded: [{ diameter, count, length }]
-  }
+  concreteVolume: number,       // حجم الخرسانة (م³)
+  plainConcreteVolume: number,  // خرسانة عادية (م³)
+  formworkArea: number,         // مساحة الشدات (م²)
+  rebarDetails: RebarDetail[],  // تفاصيل حديد التسليح
+  totals: { netWeight, grossWeight, wasteWeight, wastePercentage, stocksNeeded }
   costs: { concrete, rebar, ... }
 }
 
 // نتيجة البلاطات
 EnhancedSlabResult {
-  slabType: string
-  area, netArea: number
-  concreteVolume: number
-  formworkArea: number
-  blocksCount?: number
-  rebarDetails: []
-  totals: { ... }
-  costs: { ... }
+  concreteVolume: number,
+  totalRebarWeight: number,
+  formworkArea: number,
+  concreteCost, rebarCost, formworkCost, laborCost, totalCost: number,
+  rebarLayers: RebarDetail[]
 }
 ```
 
-**الأعمدة الشائعة**: الفئة، الاسم، الكمية، الوحدة، حجم الخرسانة، وزن الحديد، التكلفة الإجمالية.
+**الأعمدة الشائعة**: الفئة، الاسم، الكمية، الوحدة، حجم الخرسانة، وزن الحديد، مساحة الشدات، التكلفة.
 
 ### 6.2 محرك اشتقاق التشطيبات (derivation-engine.ts)
 
@@ -358,136 +392,147 @@ EnhancedSlabResult {
 
 ```typescript
 DerivedQuantity {
-  categoryKey: string          // مفتاح الفئة
-  subCategory?: string         // الفئة الفرعية
-  floorId?: string             // رقم الطابق
-  floorName?: string           // اسم الطابق
-  scope: "per_floor" | "whole_building" | "external" | "roof"
-  quantity: number             // الكمية
-  unit: string                 // الوحدة
-  wastagePercent: number       // نسبة الهدر
-  effectiveQuantity: number    // الكمية الفعلية
-  dataSource: DataSourceType   // مصدر البيانات
-  sourceDescription: string    // وصف المصدر
-  calculationBreakdown?: {     // تفصيل الحساب
-    type: "direct_area" | "wall_deduction" | "room_by_room" | "per_unit" | "linear" | "lump_sum" | "derived"
-    details: Record<string, unknown>
-  }
-  isEnabled: boolean
+  categoryKey: string,
+  subCategory?: string,
+  floorId?: string,
+  floorName?: string,
+  scope: "per_floor" | "whole_building" | "external" | "roof",
+  quantity: number,
+  unit: string,
+  wastagePercent: number,
+  effectiveQuantity: number,
+  dataSource: "auto_building" | "auto_linked" | "auto_derived" | "manual" | "estimated",
+  sourceDescription: string,
+  calculationBreakdown?: {
+    type: "direct_area" | "wall_deduction" | "room_by_room" | "per_unit" | "linear" | "lump_sum" | "derived",
+    details: Record<string, unknown>,
+    formula: string
+  },
+  isEnabled: boolean,
   groupKey, groupName, groupIcon, groupColor: string
 }
 ```
 
-**الأعمدة للجدول الفارغ في "تسعير تكلفة"**: الفئة، الفئة الفرعية، الطابق، النطاق، الكمية، الوحدة، نسبة الهدر، الكمية الفعلية.
+### 6.3 شكل الجدول الفارغ المطلوب لـ "تسعير تكلفة"
+
+بناءً على مخرجات المحركات، الأعمدة المطلوبة في الجدول الفارغ:
+
+**للإنشائي**: الفئة، الوصف، الوحدة، الكمية، ملاحظات
+**للتشطيبات**: الفئة، الفئة الفرعية، الطابق، النطاق، الكمية، الوحدة، نسبة الهدر
+**للكهروميكانيكي**: الفئة، الفئة الفرعية، النوع، الكمية، الوحدة
+
+**حالياً**: عند `isEmptyTableMode = true` يتم عرض `ManualItemsTable` بنفس الصيغة لجميع التبويبات (description, unit, quantity, section, notes). هذا أبسط من شكل مخرجات المحركات.
 
 ---
 
 ## 7. الفجوات المكتشفة
 
-### 7.1 إخفاء مراحل بناءً على نوع الدراسة
+### 7.1 ما يعمل بالفعل ✅
+
+| الميزة | الحالة | التفاصيل |
+|--------|--------|----------|
+| حفظ studyType في DB | ✅ يعمل | 6 قيم في enum، يُحفظ عند الإنشاء |
+| حفظ workScopes في DB | ✅ يعمل | حقل String[] في CostStudy |
+| تعديل studyType/workScopes | ✅ يعمل | EditStudyConfigDialog + update-config API |
+| فلترة مراحل Stepper | ✅ يعمل | useStudyConfig → enabledStageTypes → StudyPipelineStepper |
+| فلترة تبويبات Quantities | ✅ يعمل | useStudyConfig → enabledTabs |
+| فلترة تبويبات Costing | ✅ يعمل | workScopes filtering في CostingPageContentV2 |
+| فلترة أقسام Pricing | ✅ يعمل | enabledSections في PricingPageContentV2 |
+| فلترة تبويبات Specs | ✅ يعمل | enabledTabs في SpecificationsPageContentV2 |
+| وضع جدول فارغ COST_PRICING | ✅ يعمل جزئياً | isEmptyTableMode يعرض ManualItemsTable |
+| عرض نوع الدراسة في الواجهة | ✅ يعمل | StudyConfigBar بألوان مختلفة |
+
+### 7.2 الفجوات المتبقية
+
+#### أ. COST_PRICING — فلترة المراحل
 
 | الفجوة | التفاصيل |
 |--------|----------|
-| **Schema** | `StudyType` enum حالي: 3 قيم (FULL_PROJECT, CUSTOM_ITEMS, LUMP_SUM_ANALYSIS) — يحتاج تعديل ليشمل الأنواع الجديدة أو استخدام entryPoint بشكل أفضل |
-| **Backend stages** | إنشاء المراحل في `create.ts` يعتمد على entryPoint فقط — لا يدعم إخفاء مراحل كاملة |
-| **StudyPipelineStepper** | لا يفلتر المراحل حسب studyType — يعرض كل شيء دائماً |
-| **Sidebar** | لا يفلتر عناصر التنقل حسب studyType — يعرض 6 عناصر دائماً |
-| **PipelineBar** | يدعم إخفاء quotation لـ LUMP_SUM فقط — يحتاج توسيع |
+| **المراحل المعروضة** | COST_PRICING يعرض **جميع الـ 6 مراحل** تماماً مثل FULL_STUDY — بما فيها Quantities |
+| **المتوقع** | COST_PRICING يجب أن يتخطى مرحلة الكميات أو يعرضها بشكل مختلف (جدول فارغ فقط) |
+| **في useStudyConfig** | COST_PRICING يقع مع FULL_STUDY في نفس case — كلاهما يفعّل جميع المراحل |
+| **entryPoint** | COST_PRICING يُحوّل إلى FROM_SCRATCH (وليس HAS_QUANTITIES) |
 
-### 7.2 إخفاء تبويبات بناءً على نطاق العمل
-
-| الفجوة | التفاصيل |
-|--------|----------|
-| **Schema** | لا يوجد حقل `scope` أو `workScopes` في CostStudy — نطاق العمل لا يُحفظ |
-| **API create** | لا يقبل حقل scope/workScopes |
-| **QuantitiesSubTabs** | التبويبات الأربعة ثابتة — لا يوجد منطق إخفاء |
-| **SpecificationsPageContent** | التبويبات الثلاثة ثابتة — لا يوجد منطق إخفاء |
-
-### 7.3 جدول فارغ لنوع "تسعير تكلفة"
+#### ب. COST_PRICING — شكل الجدول الفارغ
 
 | الفجوة | التفاصيل |
 |--------|----------|
-| **Flow** | حالياً `cost_pricing` يُحوّل إلى `FULL_PROJECT + HAS_QUANTITIES` ويوجّه لـ `/specifications` |
-| **لا يوجد جدول فارغ** | يجب إنشاء واجهة تسمح بإدخال الكميات يدوياً بنفس أعمدة مخرجات محركات الحساب |
-| **البيانات المطلوبة** | الأعمدة: الفئة، الفئة الفرعية، الوصف، الوحدة، الكمية، نسبة الهدر |
+| **الحالي** | `ManualItemsTable` بأعمدة بسيطة: وصف، وحدة، كمية، قسم، ملاحظات |
+| **المطلوب** | جدول بنفس أعمدة مخرجات المحركات لكل نوع (إنشائي/تشطيبات/MEP) |
+| **الفرق** | المحركات تُخرج حقول متخصصة (concreteVolume, steelWeight, floorId, scope, wastagePercent) بينما ManualItemsTable عام |
 
-### 7.4 وضع مباشر لنوع "تسعير سريع"
+#### ج. QUICK_PRICING — التوجيه بعد الإنشاء
 
 | الفجوة | التفاصيل |
 |--------|----------|
-| **Flow** | حالياً `quick_pricing` يُحوّل إلى `CUSTOM_ITEMS + CUSTOM_ITEMS` ويوجّه لـ `/quick-pricing` |
-| **الصفحة موجودة** | `QuickPricingStandalone` — تعمل بشكل مستقل |
-| **الفجوة** | المراحل كلها تظهر في الـ stepper والـ sidebar رغم عدم الحاجة لها |
-| **المطلوب** | إخفاء كل المراحل عدا التسعير السريع، أو عدم عرض stepper أصلاً |
+| **الحالي** | يوجّه إلى `/pricing` وعدد المراحل المعروضة = 2 (pricing, quotation) ✅ |
+| **الفجوة** | هل صفحة pricing تعمل بدون بيانات costing؟ تتحقق من اعتماد COSTING stage |
+| **المطلوب** | التأكد من أن QUICK_PRICING لا يُقفل على شاشة "اعتمد المرحلة السابقة" |
+
+#### د. Sidebar لا يفلتر حسب studyType
+
+| الفجوة | التفاصيل |
+|--------|----------|
+| **الحالي** | Sidebar يعرض جميع العناصر دائماً، ويعتمد فقط على entryPoint |
+| **الفرق** | Stepper يفلتر عبر enabledStageTypes لكن Sidebar لا يستخدم نفس المنطق |
+| **المطلوب** | مزامنة Sidebar مع Stepper — إخفاء نفس المراحل |
+
+#### هـ. COST_PRICING و FULL_STUDY — نفس المراحل تماماً
+
+| الفجوة | التفاصيل |
+|--------|----------|
+| **الحالي** | useStudyConfig يُعاملهما بالضبط نفس المعاملة |
+| **المتوقع** | COST_PRICING يجب أن يتخطى محركات حساب الكميات (أو يعرض وضعاً مختلفاً) |
+| **isEmptyTableMode** | يُفعّل لـ COST_PRICING ✅ — لكن المراحل نفسها |
+
+#### و. فحص الاعتماد الخطي (Linear Approval Chain)
+
+| الفجوة | التفاصيل |
+|--------|----------|
+| **الحالي** | كل مرحلة تتحقق من اعتماد المرحلة السابقة (Specs → Quantities APPROVED، Costing → Specs APPROVED...) |
+| **المشكل** | عند تخطي مراحل (QUICK_PRICING)، هل المراحل المتخطاة تكون APPROVED تلقائياً؟ |
+| **في create.ts** | المراحل قبل entryPoint تُنشأ بحالة APPROVED تلقائياً ✅ |
 
 ---
 
-## 8. قائمة الملفات التي تحتاج تعديل
+## 8. قائمة الملفات الأساسية وحالتها
 
-### 8.1 قاعدة البيانات
+### 8.1 الملفات التي تعمل بشكل جيد ✅
 
-| الملف | التعديل المطلوب |
-|-------|----------------|
-| `packages/database/prisma/schema.prisma` | إضافة حقل `workScopes String[]` أو `workScopes Json` إلى CostStudy لحفظ نطاقات العمل المختارة. تحديث enum StudyType إذا لزم الأمر |
+| الملف | الوظيفة |
+|-------|---------|
+| `packages/database/prisma/schema.prisma` | studyType + workScopes محفوظان ✅ |
+| `packages/api/modules/quantities/procedures/create.ts` | يقبل studyType + workScopes + يُنشئ stages بشكل صحيح ✅ |
+| `packages/api/modules/quantities/procedures/update-config.ts` | يعدّل studyType + workScopes ✅ |
+| `apps/web/modules/saas/pricing/hooks/useStudyConfig.ts` | يفلتر المراحل والتبويبات ✅ |
+| `apps/web/modules/saas/pricing/components/studies/StudyConfigBar.tsx` | يعرض النوع والنطاق ✅ |
+| `apps/web/modules/saas/pricing/components/studies/EditStudyConfigDialog.tsx` | يعدّل النوع والنطاق ✅ |
 
-### 8.2 API
+### 8.2 الملفات التي تحتاج تعديل
 
-| الملف | التعديل المطلوب |
-|-------|----------------|
-| `packages/api/modules/quantities/procedures/create.ts` | إضافة `workScopes` إلى Zod schema والحفظ في DB. تعديل منطق إنشاء المراحل ليراعي نوع الدراسة |
-| `packages/api/modules/quantities/procedures/get-by-id.ts` | التأكد من إرجاع `workScopes` و `studyType` |
-| `packages/api/modules/quantities/procedures/stages.ts` | تعديل منطق المراحل ليراعي نوع الدراسة (إخفاء/إظهار) |
-
-### 8.3 واجهة الإنشاء
-
-| الملف | التعديل المطلوب |
-|-------|----------------|
-| `apps/web/modules/saas/pricing/components/studies/CreateCostStudyForm.tsx` | تقليل الخيارات من 5 إلى 3. إرسال workScopes للـ API |
-| `apps/web/modules/saas/pricing/components/studies/CreateStudyPage.tsx` | نفس التعديلات (نسخة الصفحة الكاملة) |
-
-### 8.4 شريط المراحل والتنقل
-
-| الملف | التعديل المطلوب |
-|-------|----------------|
-| `apps/web/modules/saas/pricing/components/studies/StudyPipelineStepper.tsx` | إضافة فلترة المراحل حسب studyType (إخفاء مراحل الكميات لـ COST_PRICING، إخفاء كل المراحل لـ QUICK_PRICING) |
-| `apps/web/modules/saas/pricing/components/pipeline/PipelineBar.tsx` | توسيع فلترة المراحل لتشمل الأنواع الجديدة |
-| `apps/web/modules/saas/shared/components/sidebar/use-sidebar-menu.ts` | إضافة فلترة عناصر التنقل حسب studyType |
-
-### 8.5 صفحات المراحل
-
-| الملف | التعديل المطلوب |
-|-------|----------------|
-| `apps/web/modules/saas/pricing/components/studies/QuantitiesSubTabs.tsx` | فلترة التبويبات حسب workScopes المحفوظة |
-| `apps/web/modules/saas/pricing/components/studies/QuantitiesList.tsx` | دعم عرض جدول فارغ لنوع COST_PRICING |
-| `apps/web/modules/saas/pricing/components/pipeline/QuantitiesPageContent.tsx` | فلترة التبويبات حسب workScopes |
-| `apps/web/modules/saas/pricing/components/pipeline/SpecificationsPageContent.tsx` | فلترة التبويبات حسب workScopes |
-
-### 8.6 صفحة النظرة العامة
-
-| الملف | التعديل المطلوب |
-|-------|----------------|
-| `apps/web/modules/saas/pricing/components/studies/CostStudyOverview.tsx` | عرض نوع الدراسة ونطاقات العمل |
-| `apps/web/modules/saas/pricing/components/studies/StudyHeaderCard.tsx` | إضافة عرض نوع الدراسة |
-
-### 8.7 Layout
-
-| الملف | التعديل المطلوب |
-|-------|----------------|
-| `apps/web/app/(saas)/app/(organizations)/[organizationSlug]/pricing/studies/[studyId]/layout.tsx` | تمرير studyType للمكونات الفرعية (إذا لزم الأمر) |
+| الملف | التعديل المطلوب | الأولوية |
+|-------|----------------|---------|
+| `hooks/useStudyConfig.ts` | تمييز COST_PRICING عن FULL_STUDY — ربما إزالة quantities أو تعديل مراحلها | عالية |
+| `components/studies/StudySidebar.tsx` | استخدام enabledStages من useStudyConfig لفلترة عناصر التنقل بدلاً من الاعتماد على entryPoint فقط | عالية |
+| `components/studies/QuantitiesSubTabs.tsx` | تحسين الجدول الفارغ لـ COST_PRICING ليطابق أعمدة مخرجات المحركات | متوسطة |
+| `components/pipeline/PipelineBar.tsx` | مزامنة مع useStudyConfig (حالياً يستخدم منطق فلترة خاص به) | متوسطة |
+| `components/pricing-v2/PricingPageContentV2.tsx` | التأكد من عدم قفل الصفحة لـ QUICK_PRICING بسبب فحص اعتماد Costing | متوسطة |
 
 ---
 
 ## 9. ملخص تنفيذي
 
-### الوضع الحالي:
-- النظام يدعم 3 أنواع دراسات في DB لكن يعرض 5 خيارات في الواجهة
-- نطاق العمل يُعرض عند الإنشاء لكن **لا يُحفظ** في قاعدة البيانات
-- المراحل والتبويبات **ثابتة** — لا تتكيف مع نوع الدراسة أو النطاق
-- الفلترة الوحيدة الموجودة: إخفاء مرحلة quotation وتغيير تسمية selling-price لنوع LUMP_SUM_ANALYSIS
+### الوضع الحالي — أفضل مما هو متوقع:
+- **البنية التحتية جاهزة**: studyType و workScopes محفوظان في DB ومتاحان عبر API
+- **الفلترة تعمل**: useStudyConfig hook يفلتر المراحل والتبويبات بنجاح
+- **الواجهة متكيفة جزئياً**: Stepper يفلتر المراحل، التبويبات تتكيف مع workScopes
+- **وضع الجدول الفارغ موجود**: isEmptyTableMode لـ COST_PRICING
 
-### الأولويات:
-1. **أولوية عالية**: حفظ workScopes في DB (تعديل schema + API)
-2. **أولوية عالية**: فلترة المراحل في Stepper و Sidebar حسب studyType
-3. **أولوية متوسطة**: فلترة التبويبات حسب workScopes
-4. **أولوية متوسطة**: إنشاء واجهة الجدول الفارغ لـ COST_PRICING
-5. **أولوية منخفضة**: تبسيط خيارات الإنشاء من 5 إلى 3
+### الفجوات الرئيسية:
+1. **COST_PRICING = FULL_STUDY في المراحل** — يجب التمييز بينهما
+2. **Sidebar لا يتزامن مع Stepper** — يعرض كل المراحل دائماً
+3. **الجدول الفارغ بسيط جداً** — ManualItemsTable عام ولا يطابق أعمدة المحركات
+4. **QUICK_PRICING قد يُقفل** — يحتاج التأكد من عدم فحص اعتماد مراحل سابقة
+
+### التعديلات المطلوبة — 5 ملفات فقط:
+مقارنة بالتقرير السابق (الذي قدّر 15+ ملف)، النظام الحالي يحتاج تعديلات في **5 ملفات فقط** لأن البنية التحتية جاهزة.

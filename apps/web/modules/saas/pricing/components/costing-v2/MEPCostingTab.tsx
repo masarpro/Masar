@@ -9,6 +9,7 @@ import { cn } from "@ui/lib";
 import { Loader2, Save } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { formatNum } from "@saas/pricing/lib/utils";
 
 interface MEPCostingTabProps {
 	organizationId: string;
@@ -174,12 +175,6 @@ export function MEPCostingTab({
 		});
 	}, [costingItems]);
 
-	// ─── Helpers ───
-	const formatNum = (n: number | null | undefined) =>
-		n != null
-			? Number(n).toLocaleString("ar-SA", { maximumFractionDigits: 2 })
-			: "—";
-
 	const getConfig = (sectionKey: string): SectionConfig =>
 		sectionConfigs[sectionKey] ?? { mode: "detailed", lumpSumAmount: "" };
 
@@ -320,7 +315,7 @@ export function MEPCostingTab({
 	}
 
 	return (
-		<div className="space-y-4">
+		<div className="space-y-4" dir="rtl">
 			{MEP_SECTIONS.map((section) => {
 				const sectionItems = grouped[section.key] ?? [];
 				if (

@@ -76,6 +76,8 @@ interface StudySidebarProps {
 		status: StageStatus;
 	}>;
 	entryPoint: StudyEntryPoint;
+	/** Optional filter: only show these stage types (synced with StudyPipelineStepper) */
+	enabledStageTypes?: StageType[];
 }
 
 export function StudySidebar({
@@ -84,18 +86,25 @@ export function StudySidebar({
 	organizationSlug,
 	stages,
 	entryPoint,
+	enabledStageTypes,
 }: StudySidebarProps) {
 	const pathname = usePathname();
 	const basePath = `/app/${organizationSlug}/pricing/studies/${studyId}`;
 	const studiesListPath = `/app/${organizationSlug}/pricing/studies`;
 
+	// Filter stages by enabledStageTypes (synced with StudyPipelineStepper)
+	const visibleStages = enabledStageTypes
+		? SIDEBAR_STAGES.filter((s) => enabledStageTypes.includes(s.key))
+		: SIDEBAR_STAGES;
+
 	const getStatus = (stageKey: StageType): StageStatus => {
 		return stages.find((s) => s.stage === stageKey)?.status ?? "NOT_STARTED";
 	};
 
-	const isSkipped = (index: number): boolean => {
+	const isSkipped = (stageKey: StageType): boolean => {
 		const startIndex = ENTRY_POINT_START_INDEX[entryPoint] ?? 0;
-		return index < startIndex;
+		const originalIndex = SIDEBAR_STAGES.findIndex((s) => s.key === stageKey);
+		return originalIndex < startIndex;
 	};
 
 	const isActive = (path: string): boolean => {
@@ -152,9 +161,9 @@ export function StudySidebar({
 					مراحل الدراسة
 				</p>
 
-				{SIDEBAR_STAGES.map((stage, index) => {
+				{visibleStages.map((stage) => {
 					const status = getStatus(stage.key);
-					const skipped = isSkipped(index);
+					const skipped = isSkipped(stage.key);
 					const active = isActive(stage.path);
 
 					const href =
@@ -197,7 +206,7 @@ export function StudySidebar({
 								) : status === "IN_REVIEW" && !active ? (
 									<Clock className="h-3 w-3" />
 								) : (
-									index + 1
+									stage.number
 								)}
 							</div>
 

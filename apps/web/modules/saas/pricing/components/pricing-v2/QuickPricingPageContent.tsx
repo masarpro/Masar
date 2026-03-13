@@ -62,7 +62,7 @@ const createEmptyItem = (): QuickItem => ({
 });
 
 const formatNum = (n: number) =>
-	Number(n).toLocaleString("ar-SA", { maximumFractionDigits: 2 });
+	Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
 // ═══════════════════════════════════════════════════════════════
 // COMPONENT

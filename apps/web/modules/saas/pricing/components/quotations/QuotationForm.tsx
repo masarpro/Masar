@@ -105,7 +105,7 @@ const UNIT_VALUES: Record<string, string> = {
 };
 
 const formatCurrency = (amount: number) => {
-	return new Intl.NumberFormat("ar-SA", {
+	return new Intl.NumberFormat("en-US", {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
 	}).format(amount);

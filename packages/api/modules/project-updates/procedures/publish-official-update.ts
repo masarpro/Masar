@@ -82,7 +82,7 @@ export const publishOfficialUpdate = subscriptionProcedure
 			contentParts.push("");
 			contentParts.push(`💰 الدفعة القادمة:`);
 			contentParts.push(
-				`المستخلص رقم ${input.nextPayment.claimNo} - ${input.nextPayment.amount.toLocaleString()} ر.س`,
+				`المستخلص رقم ${input.nextPayment.claimNo} - ${input.nextPayment.amount.toLocaleString("en-US")} ر.س`,
 			);
 			if (input.nextPayment.dueDate) {
 				contentParts.push(

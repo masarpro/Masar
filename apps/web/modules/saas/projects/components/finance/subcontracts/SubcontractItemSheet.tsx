@@ -244,7 +244,7 @@ export function SubcontractItemSheet({
 								{t("totalAmount")}
 							</span>
 							<span className="text-lg font-bold">
-								{new Intl.NumberFormat("ar-SA", {
+								{new Intl.NumberFormat("en-US", {
 									style: "currency",
 									currency: "SAR",
 									minimumFractionDigits: 2,

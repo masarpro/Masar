@@ -203,7 +203,7 @@ export function OrganizationDetail({
 									<span className="text-muted-foreground">{t("admin.organizations.lastPayment")}</span>
 									<span className="font-medium">
 										{org.lastPaymentAmount
-											? `${Number(org.lastPaymentAmount).toLocaleString()} SAR`
+											? `${Number(org.lastPaymentAmount).toLocaleString("en-US")} SAR`
 											: "-"}
 									</span>
 								</div>
@@ -349,7 +349,7 @@ export function OrganizationDetail({
 											<TableCell>
 												{new Date(
 													event.processedAt,
-												).toLocaleString()}
+												).toLocaleString("en-US")}
 											</TableCell>
 											<TableCell>
 												<code className="rounded bg-muted px-1.5 py-0.5 text-xs">
@@ -399,7 +399,7 @@ export function OrganizationDetail({
 											<TableCell>
 												{new Date(
 													log.createdAt,
-												).toLocaleString()}
+												).toLocaleString("en-US")}
 											</TableCell>
 											<TableCell>
 												{log.admin.name}

@@ -273,11 +273,9 @@ const nextConfig: NextConfig = {
 				destination: "/app/:slug/pricing/studies/:studyId/quantities?tab=mep",
 				permanent: true,
 			},
-			{
-				source: "/app/:slug/pricing/studies/:studyId/pricing",
-				destination: "/app/:slug/pricing/studies/:studyId/selling-price",
-				permanent: true,
-			},
+			// Removed: redirect from /pricing to /selling-price was causing an infinite loop
+			// because selling-price/page.tsx redirects back to /pricing.
+			// The actual pricing page lives at /pricing/page.tsx.
 		];
 	},
 	webpack: (config, { webpack, isServer }) => {

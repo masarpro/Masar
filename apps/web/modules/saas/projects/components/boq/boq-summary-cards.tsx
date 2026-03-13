@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@ui/components/button";
 
 function formatCurrency(value: number): string {
-	return value.toLocaleString("ar-SA", {
+	return value.toLocaleString("en-US", {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
 	});

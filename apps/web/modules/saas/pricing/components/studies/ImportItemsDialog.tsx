@@ -66,7 +66,7 @@ const EMPTY_ROW: ParsedItem = {
 };
 
 function formatNumber(value: number): string {
-	return value.toLocaleString("ar-SA", { maximumFractionDigits: 2 });
+	return value.toLocaleString("en-US", { maximumFractionDigits: 2 });
 }
 
 export function ImportItemsDialog({

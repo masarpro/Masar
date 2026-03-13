@@ -81,7 +81,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 	if (!data) return null;
 
 	const formatCurrency = (amount: number) => {
-		return new Intl.NumberFormat("ar-SA", {
+		return new Intl.NumberFormat("en-SA", {
 			style: "decimal",
 			minimumFractionDigits: 0,
 			maximumFractionDigits: 0,

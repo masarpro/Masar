@@ -697,12 +697,12 @@ export function ImportExcelDialog({
 													{item.unit}
 												</td>
 												<td className="px-3 py-2 text-xs text-slate-600 dark:text-slate-400">
-													{item.quantity.toLocaleString("ar-SA")}
+													{item.quantity.toLocaleString("en-US")}
 												</td>
 												<td className="px-3 py-2 text-xs text-slate-600 dark:text-slate-400">
 													{item.unitPrice != null
 														? item.unitPrice.toLocaleString(
-																"ar-SA",
+																"en-US",
 																{
 																	minimumFractionDigits: 2,
 																	maximumFractionDigits: 2,

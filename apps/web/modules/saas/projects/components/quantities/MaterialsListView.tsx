@@ -36,11 +36,11 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 function formatNumber(value: number): string {
-	return value.toLocaleString("ar-SA");
+	return value.toLocaleString("en-US");
 }
 
 function formatCurrency(value: number): string {
-	return value.toLocaleString("ar-SA", {
+	return value.toLocaleString("en-US", {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
 	});
