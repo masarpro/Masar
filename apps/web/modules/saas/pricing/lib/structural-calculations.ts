@@ -50,6 +50,8 @@ import type {
 	BlockType,
 } from '../types/blocks';
 
+const STRIP_MESH_THRESHOLD = 0.8;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // دوال مساعدة عامة
 // ─────────────────────────────────────────────────────────────────────────────
@@ -100,6 +102,7 @@ export interface IsolatedFoundationResult {
 	// الكميات
 	concreteVolume: number;
 	plainConcreteVolume: number;
+	leanConcreteVolume?: number;
 	formworkArea: number;
 
 	// تفاصيل الحديد
@@ -212,6 +215,98 @@ function suggestWasteUse(length: number): string {
 }
 
 /**
+ * حساب طول وصلة التراكب
+ */
+function calcLapLength(diameter: number, method: '40d' | '50d' | '60d' | 'custom', customLength?: number): number {
+	if (method === 'custom' && customLength) return customLength;
+	const d = diameter / 1000; // mm to m
+	const multiplier = method === '40d' ? 40 : method === '50d' ? 50 : 60;
+	return multiplier * d;
+}
+
+/**
+ * حساب تفاصيل حديد اللبشة (مع دعم وصلات التراكب للأسياخ الطويلة)
+ */
+interface RaftRebarSpliceInfo {
+	piecesPerBar: number;
+	splicesPerBar: number;
+	lapLength: number;
+}
+
+interface RaftRebarResult extends FoundationRebarCalculation {
+	spliceInfo?: RaftRebarSpliceInfo;
+}
+
+function calcRaftRebar(
+	direction: string,
+	diameter: number,
+	barLength: number,
+	barCount: number,
+	lapSpliceMethod: '40d' | '50d' | '60d' | 'custom' = '40d',
+	customLapLength?: number,
+): RaftRebarResult {
+	const stockLength = STOCK_LENGTHS[diameter] || 12;
+	const weight = REBAR_WEIGHTS[diameter] || 1;
+
+	// If bar fits in stock length, use simple calculation (no splices)
+	if (barLength <= stockLength) {
+		const base = calcFoundationRebar(direction, diameter, barLength, barCount, 1);
+		return base;
+	}
+
+	// Bar exceeds stock length — lap splice needed
+	const lapLength = calcLapLength(diameter, lapSpliceMethod, customLapLength);
+	const usablePerStock = stockLength - lapLength;
+	const piecesPerBar = Math.ceil(barLength / usablePerStock);
+	const splicesPerBar = piecesPerBar - 1;
+
+	// Waste: total stock purchased minus structural requirement minus overlap material
+	const totalStocksPerBar = piecesPerBar;
+	const totalStocks = barCount * totalStocksPerBar;
+
+	// The last piece is shorter
+	const usableLengthFromFirstPieces = (piecesPerBar - 1) * usablePerStock;
+	const lastPieceLength = barLength - usableLengthFromFirstPieces + lapLength;
+
+	// Total material purchased
+	const grossLengthPerBar = (piecesPerBar - 1) * stockLength + lastPieceLength;
+	const wastePerBar = grossLengthPerBar - barLength;
+
+	const netLength = barCount * barLength;
+	const grossLength = totalStocks * stockLength;
+	// Correct: last piece cut from stock, waste is the remainder
+	const wasteFromLastPiece = stockLength - lastPieceLength;
+	const totalWaste = barCount * wasteFromLastPiece;
+
+	const netWeight = netLength * weight;
+	const grossWeight = grossLength * weight;
+	const wasteWeight = totalWaste * weight;
+	const wastePercentage = grossLength > 0 ? (totalWaste / grossLength) * 100 : 0;
+
+	return {
+		direction,
+		diameter,
+		barLength: Number(barLength.toFixed(3)),
+		barCount,
+		totalBars: barCount,
+		stockLength,
+		cutsPerStock: 1, // Each stock is one piece in splice mode
+		stocksNeeded: totalStocks,
+		wastePerStock: Number((wasteFromLastPiece).toFixed(3)),
+		totalWaste: Number(totalWaste.toFixed(2)),
+		wastePercentage: Number(wastePercentage.toFixed(1)),
+		netWeight: Number(netWeight.toFixed(2)),
+		grossWeight: Number(grossWeight.toFixed(2)),
+		wasteWeight: Number(wasteWeight.toFixed(2)),
+		spliceInfo: {
+			piecesPerBar,
+			splicesPerBar,
+			lapLength: Number(lapLength.toFixed(3)),
+		},
+	};
+}
+
+/**
  * حساب القاعدة المعزولة
  */
 export function calculateIsolatedFoundation(
@@ -224,16 +319,32 @@ export function calculateIsolatedFoundation(
 		height,
 		cover = 0.075,
 		hookLength = 0.10,
+		coverBottom,
+		coverTop,
+		coverSide,
 		bottomShort = { barsPerMeter: 5, diameter: 16 },
 		bottomLong = { barsPerMeter: 5, diameter: 16 },
 		topShort,
 		topLong,
+		hasLeanConcrete = false,
+		leanConcreteThickness = 0.10,
+		hasColumnDowels = false,
+		columnDowels,
 		concreteType = 'C30',
 	} = input;
 
+	// أغطية فعلية
+	const effectiveCoverSide = coverSide ?? cover;
+	const effectiveHookLength = hookLength;
+
 	// حجم الخرسانة
 	const concreteVolume = length * width * height * quantity;
-	const plainConcreteVolume = (length + 0.2) * (width + 0.2) * 0.1 * quantity;
+	const leanConcreteVolume = hasLeanConcrete
+		? (length + 0.2) * (width + 0.2) * leanConcreteThickness * quantity
+		: 0;
+	const plainConcreteVolume = hasLeanConcrete
+		? leanConcreteVolume
+		: (length + 0.2) * (width + 0.2) * 0.1 * quantity;
 
 	// مساحة الشدات
 	const formworkArea = (2 * (length + width) * height + length * width) * quantity;
@@ -242,31 +353,45 @@ export function calculateIsolatedFoundation(
 	const rebarDetails: FoundationRebarCalculation[] = [];
 
 	// فرش قصير (سفلي)
-	const shortBarLength = calcFoundationBarLength(width, cover, hookLength);
-	const shortBarCount = calcFoundationBarCount(length, bottomShort.barsPerMeter, cover);
+	const shortBarLength = calcFoundationBarLength(width, effectiveCoverSide, effectiveHookLength);
+	const shortBarCount = calcFoundationBarCount(length, bottomShort.barsPerMeter, effectiveCoverSide);
 	rebarDetails.push(
 		calcFoundationRebar('فرش قصير', bottomShort.diameter, shortBarLength, shortBarCount, quantity)
 	);
 
 	// فرش طويل (سفلي)
-	const longBarLength = calcFoundationBarLength(length, cover, hookLength);
-	const longBarCount = calcFoundationBarCount(width, bottomLong.barsPerMeter, cover);
+	const longBarLength = calcFoundationBarLength(length, effectiveCoverSide, effectiveHookLength);
+	const longBarCount = calcFoundationBarCount(width, bottomLong.barsPerMeter, effectiveCoverSide);
 	rebarDetails.push(
 		calcFoundationRebar('فرش طويل', bottomLong.diameter, longBarLength, longBarCount, quantity)
 	);
 
-	// غطاء قصير (علوي)
+	// غطاء قصير (علوي) — uses topShort's own barsPerMeter
 	if (topShort) {
+		const topShortBarCount = calcFoundationBarCount(length, topShort.barsPerMeter, effectiveCoverSide);
 		rebarDetails.push(
-			calcFoundationRebar('غطاء قصير', topShort.diameter, shortBarLength, shortBarCount, quantity)
+			calcFoundationRebar('غطاء قصير', topShort.diameter, shortBarLength, topShortBarCount, quantity)
 		);
 	}
 
-	// غطاء طويل (علوي)
+	// غطاء طويل (علوي) — uses topLong's own barsPerMeter
 	if (topLong) {
+		const topLongBarCount = calcFoundationBarCount(width, topLong.barsPerMeter, effectiveCoverSide);
 		rebarDetails.push(
-			calcFoundationRebar('غطاء طويل', topLong.diameter, longBarLength, longBarCount, quantity)
+			calcFoundationRebar('غطاء طويل', topLong.diameter, longBarLength, topLongBarCount, quantity)
 		);
+	}
+
+	// حديد انتظار العمود
+	if (hasColumnDowels && columnDowels) {
+		const columnCount = 1; // القاعدة المنفصلة — عمود واحد
+		const totalDowels = columnCount * columnDowels.barsPerColumn;
+		const dowelLength = columnDowels.developmentLength + effectiveHookLength;
+		const dowelWeight = getRebarWeightPerMeter(columnDowels.diameter);
+		const dowelResult = calcFoundationRebar(
+			'انتظار أعمدة', columnDowels.diameter, dowelLength, totalDowels, quantity
+		);
+		rebarDetails.push(dowelResult);
 	}
 
 	// حساب الإجماليات
@@ -320,6 +445,7 @@ export function calculateIsolatedFoundation(
 	return {
 		concreteVolume: Number(concreteVolume.toFixed(3)),
 		plainConcreteVolume: Number(plainConcreteVolume.toFixed(3)),
+		leanConcreteVolume: hasLeanConcrete ? Number(leanConcreteVolume.toFixed(3)) : undefined,
 		formworkArea: Number(formworkArea.toFixed(2)),
 		rebarDetails,
 		totals: {
@@ -355,17 +481,79 @@ export interface CombinedFootingResult extends IsolatedFoundationResult {
 export function calculateCombinedFoundation(
 	input: CombinedFoundationInput,
 ): CombinedFootingResult {
-	const columnsCount = input.columnsCount || 2;
-	const columnsSpacing = input.columnsSpacing || 3;
+	const columnsCount = input.columnCount || input.columnsCount || 2;
+	const columnsSpacing = input.columnSpacing || input.columnsSpacing || 3;
 
 	// حساب الطول الكلي للقاعدة
 	const totalLength = input.length || (columnsCount - 1) * columnsSpacing + 2 * 0.5;
 
-	// استخدام حساب القاعدة المعزولة مع الطول المحسوب
-	const baseResult = calculateIsolatedFoundation({
-		...input,
+	// بناء مدخلات القاعدة المنفصلة
+	const isolatedInput: IsolatedFoundationInput = {
+		quantity: input.quantity,
 		length: totalLength,
-	});
+		width: input.width,
+		height: input.height,
+		cover: input.cover,
+		hookLength: input.hookLength,
+		coverBottom: input.coverBottom,
+		coverTop: input.coverTop,
+		coverSide: input.coverSide,
+		bottomShort: input.bottomShort,
+		bottomLong: input.bottomLong,
+		topShort: input.topShort,
+		topLong: input.topLong,
+		hasLeanConcrete: input.hasLeanConcrete,
+		leanConcreteThickness: input.leanConcreteThickness,
+		hasColumnDowels: input.hasColumnDowels,
+		columnDowels: input.hasColumnDowels && input.columnDowels ? {
+			barsPerColumn: input.columnDowels.barsPerColumn,
+			diameter: input.columnDowels.diameter,
+			developmentLength: input.columnDowels.developmentLength,
+		} : undefined,
+		concreteType: input.concreteType,
+	};
+
+	const baseResult = calculateIsolatedFoundation(isolatedInput);
+
+	// إصلاح حديد الانتظار للمشتركة — عدد الأعمدة أكبر من 1
+	if (input.hasColumnDowels && input.columnDowels && columnsCount > 1) {
+		// حذف نتيجة الانتظار من المنفصلة (عمود واحد) وإعادة حسابها
+		const dowelIdx = baseResult.rebarDetails.findIndex(r => r.direction === 'انتظار أعمدة');
+		if (dowelIdx >= 0) {
+			const hookLength = input.hookLength || 0.10;
+			const totalDowels = columnsCount * input.columnDowels.barsPerColumn;
+			const dowelLength = input.columnDowels.developmentLength + hookLength;
+			const newDowelResult = calcFoundationRebar(
+				'انتظار أعمدة', input.columnDowels.diameter, dowelLength, totalDowels, input.quantity
+			);
+			// طرح القديم وإضافة الجديد
+			const oldResult = baseResult.rebarDetails[dowelIdx];
+			baseResult.rebarDetails[dowelIdx] = newDowelResult;
+
+			// تحديث الإجماليات
+			const weightDiff = newDowelResult.grossWeight - oldResult.grossWeight;
+			const netDiff = newDowelResult.netWeight - oldResult.netWeight;
+			const wasteDiff = newDowelResult.wasteWeight - oldResult.wasteWeight;
+			baseResult.totals.netWeight = Number((baseResult.totals.netWeight + netDiff).toFixed(2));
+			baseResult.totals.grossWeight = Number((baseResult.totals.grossWeight + weightDiff).toFixed(2));
+			baseResult.totals.wasteWeight = Number((baseResult.totals.wasteWeight + wasteDiff).toFixed(2));
+			baseResult.totals.wastePercentage = baseResult.totals.grossWeight > 0
+				? Number(((baseResult.totals.wasteWeight / baseResult.totals.grossWeight) * 100).toFixed(1))
+				: 0;
+
+			// تحديث stocksNeeded
+			const stocksMap = new Map<number, { diameter: number; count: number; length: number }>();
+			baseResult.rebarDetails.forEach((r) => {
+				const existing = stocksMap.get(r.diameter);
+				if (existing) {
+					existing.count += r.stocksNeeded;
+				} else {
+					stocksMap.set(r.diameter, { diameter: r.diameter, count: r.stocksNeeded, length: r.stockLength });
+				}
+			});
+			baseResult.totals.stocksNeeded = Array.from(stocksMap.values());
+		}
+	}
 
 	return {
 		...baseResult,
@@ -379,8 +567,13 @@ export function calculateCombinedFoundation(
 // ═══════════════════════════════════════════════════════════════════════════
 
 export interface StripFoundationResult {
+	rebarMode: 'stirrups' | 'mesh';
 	totalLength: number;
 	concreteVolume: number;
+	leanConcreteVolume: number;
+	intersectionDeduction: number;
+	netConcreteVolume: number;
+	totalConcreteVolume: number;
 	plainConcreteVolume: number;
 	formworkArea: number;
 	rebarDetails: FoundationRebarCalculation[];
@@ -391,6 +584,10 @@ export interface StripFoundationResult {
 		wastePercentage: number;
 		stocksNeeded: Array<{ diameter: number; count: number; length: number }>;
 	};
+	waste: Array<{ diameter: number; length: number; count: number; suggestedUse: string }>;
+	spliceDetails: Array<{ direction: string; diameter: number; piecesPerBar: number; splicesPerBar: number; lapLength: number; totalSplices: number }>;
+	chairBarsDetail?: { diameter: number; count: number; length: number; weight: number; stocksNeeded: number };
+	columnDowelsDetail?: { totalBars: number; diameter: number; length: number; weight: number; stocksNeeded: number };
 	costs: {
 		concrete: number;
 		rebar: number;
@@ -407,57 +604,181 @@ export function calculateStripFoundation(
 	input: StripFoundationInput,
 ): StripFoundationResult {
 	const {
-		segments,
 		width,
 		height,
-		cover = 0.075,
 		hookLength = 0.10,
+		coverBottom = 0.075,
+		coverTop = 0.05,
+		coverSide = 0.05,
+		hasLeanConcrete = false,
+		leanConcreteThickness = 0.10,
 		bottomMain,
 		bottomSecondary,
 		topMain,
 		stirrups,
+		bottomMeshX,
+		bottomMeshY,
+		topMeshX,
+		topMeshY,
+		lapSpliceMethod = '40d',
+		customLapLength,
+		hasChairBars = false,
+		chairBars,
+		hasColumnDowels = false,
+		columnDowels,
+		hasIntersectionDeduction = false,
+		intersectionCount = 0,
+		intersectingStripWidth = 0,
 		concreteType = 'C30',
 	} = input;
 
-	// حساب الطول الكلي
-	const totalLength = segments.reduce((sum, seg) => sum + seg.length, 0);
+	const quantity = input.quantity || 1;
 
-	// حجم الخرسانة
-	const concreteVolume = totalLength * width * height;
-	const plainConcreteVolume = totalLength * (width + 0.2) * 0.1;
+	// الطول الكلي — backward compat: fallback to segments
+	const totalLength = input.length > 0
+		? input.length
+		: (input.segments ? input.segments.reduce((sum, seg) => sum + seg.length, 0) : 0);
 
-	// مساحة الشدات
-	const formworkArea = totalLength * 2 * height + totalLength * width;
+	// وضع التسليح
+	const rebarMode: 'stirrups' | 'mesh' = width <= STRIP_MESH_THRESHOLD ? 'stirrups' : 'mesh';
 
-	// حسابات الحديد
+	// ─── الخرسانة ───
+	const concreteVolume = totalLength * width * height * quantity;
+	const leanConcreteVolume = hasLeanConcrete ? totalLength * (width + 0.2) * leanConcreteThickness * quantity : 0;
+	const intersectionDeduction = hasIntersectionDeduction
+		? intersectionCount * intersectingStripWidth * width * height * quantity
+		: 0;
+	const netConcreteVolume = concreteVolume - intersectionDeduction;
+	const totalConcreteVolume = netConcreteVolume;
+	const plainConcreteVolume = leanConcreteVolume;
+
+	// مساحة الشدات (جوانب فقط)
+	const formworkArea = 2 * totalLength * height * quantity;
+
+	// ─── حسابات الحديد ───
 	const rebarDetails: FoundationRebarCalculation[] = [];
+	const raftRebarResults: RaftRebarResult[] = [];
 
-	// الحديد الطولي السفلي الرئيسي
-	const mainBarLength = totalLength + 0.8;
-	rebarDetails.push(
-		calcFoundationRebar('طولي سفلي رئيسي', bottomMain.diameter, mainBarLength, bottomMain.count, 1)
-	);
+	if (rebarMode === 'stirrups') {
+		// ─── وضع الكانات ───
 
-	// الحديد الطولي السفلي الثانوي
-	if (bottomSecondary) {
-		rebarDetails.push(
-			calcFoundationRebar('طولي سفلي ثانوي', bottomSecondary.diameter, mainBarLength, bottomSecondary.count, 1)
-		);
+		// الحديد الطولي: bar length with covers and hooks
+		const longBarLength = calcFoundationBarLength(totalLength, coverSide, hookLength);
+
+		// السفلي الرئيسي
+		const bottomResult = calcRaftRebar('طولي سفلي رئيسي', bottomMain.diameter, longBarLength, bottomMain.count * quantity, lapSpliceMethod, customLapLength);
+		rebarDetails.push(bottomResult);
+		raftRebarResults.push(bottomResult);
+
+		// السفلي الثانوي
+		if (bottomSecondary && bottomSecondary.count > 0) {
+			const secResult = calcRaftRebar('طولي سفلي ثانوي', bottomSecondary.diameter, longBarLength, bottomSecondary.count * quantity, lapSpliceMethod, customLapLength);
+			rebarDetails.push(secResult);
+			raftRebarResults.push(secResult);
+		}
+
+		// العلوي
+		if (topMain && topMain.count > 0) {
+			const topResult = calcRaftRebar('طولي علوي', topMain.diameter, longBarLength, topMain.count * quantity, lapSpliceMethod, customLapLength);
+			rebarDetails.push(topResult);
+			raftRebarResults.push(topResult);
+		}
+
+		// الكانات — stirrup perimeter fix
+		if (stirrups) {
+			const stirrupPerimeter = 2 * ((width - 2 * coverSide) + (height - coverBottom - coverTop)) + 2 * hookLength;
+			const stirrupCount = calculateBarCount(totalLength, stirrups.spacing) * quantity;
+			rebarDetails.push(
+				calcFoundationRebar('كانات', stirrups.diameter, stirrupPerimeter, stirrupCount, 1)
+			);
+		}
+	} else {
+		// ─── وضع الشبكة (mesh) — mirrors raft pattern ───
+
+		// شبكة سفلية — اتجاه X (أسياخ بعرض الشريط، موزعة على الطول)
+		if (bottomMeshX) {
+			const bxBarLength = calcFoundationBarLength(width, coverSide, hookLength);
+			const bxBarCount = calcFoundationBarCount(totalLength, bottomMeshX.barsPerMeter, coverSide) * quantity;
+			const bxResult = calcRaftRebar('سفلي اتجاه X', bottomMeshX.diameter, bxBarLength, bxBarCount, lapSpliceMethod, customLapLength);
+			rebarDetails.push(bxResult);
+			raftRebarResults.push(bxResult);
+		}
+
+		// شبكة سفلية — اتجاه Y (أسياخ بطول الشريط، موزعة على العرض)
+		if (bottomMeshY) {
+			const byBarLength = calcFoundationBarLength(totalLength, coverSide, hookLength);
+			const byBarCount = calcFoundationBarCount(width, bottomMeshY.barsPerMeter, coverSide) * quantity;
+			const byResult = calcRaftRebar('سفلي اتجاه Y', bottomMeshY.diameter, byBarLength, byBarCount, lapSpliceMethod, customLapLength);
+			rebarDetails.push(byResult);
+			raftRebarResults.push(byResult);
+		}
+
+		// شبكة علوية — اتجاه X
+		if (topMeshX) {
+			const txBarLength = calcFoundationBarLength(width, coverSide, hookLength);
+			const txBarCount = calcFoundationBarCount(totalLength, topMeshX.barsPerMeter, coverSide) * quantity;
+			const txResult = calcRaftRebar('علوي اتجاه X', topMeshX.diameter, txBarLength, txBarCount, lapSpliceMethod, customLapLength);
+			rebarDetails.push(txResult);
+			raftRebarResults.push(txResult);
+		}
+
+		// شبكة علوية — اتجاه Y
+		if (topMeshY) {
+			const tyBarLength = calcFoundationBarLength(totalLength, coverSide, hookLength);
+			const tyBarCount = calcFoundationBarCount(width, topMeshY.barsPerMeter, coverSide) * quantity;
+			const tyResult = calcRaftRebar('علوي اتجاه Y', topMeshY.diameter, tyBarLength, tyBarCount, lapSpliceMethod, customLapLength);
+			rebarDetails.push(tyResult);
+			raftRebarResults.push(tyResult);
+		}
+
+		// كراسي حديد (mesh only)
+		if (hasChairBars && chairBars) {
+			const chairCountX = Math.floor(totalLength / chairBars.spacingX) + 1;
+			const chairCountY = Math.floor(width / chairBars.spacingY) + 1;
+			const chairCount = chairCountX * chairCountY * quantity;
+			const avgBarDia = (
+				(bottomMeshX?.diameter || 16) + (topMeshX?.diameter || bottomMeshX?.diameter || 16)
+			) / 2 / 1000;
+			const chairLength = height - coverBottom - coverTop - 2 * avgBarDia + 2 * hookLength;
+			const chairWeight = chairCount * chairLength * (REBAR_WEIGHTS[chairBars.diameter] || 0.617);
+			const chairStockLength = STOCK_LENGTHS[chairBars.diameter] || 12;
+			const chairCutsPerStock = Math.floor(chairStockLength / chairLength) || 1;
+			const chairStocksNeeded = Math.ceil(chairCount / chairCutsPerStock);
+
+			(input as any)._chairBarsDetail = {
+				diameter: chairBars.diameter,
+				count: chairCount,
+				length: Number(chairLength.toFixed(3)),
+				weight: Number(chairWeight.toFixed(2)),
+				stocksNeeded: chairStocksNeeded,
+			};
+
+			rebarDetails.push(
+				calcFoundationRebar('كراسي حديد', chairBars.diameter, chairLength, chairCount, 1)
+			);
+		}
 	}
 
-	// الحديد العلوي
-	if (topMain) {
-		rebarDetails.push(
-			calcFoundationRebar('طولي علوي', topMain.diameter, mainBarLength, topMain.count, 1)
-		);
-	}
+	// أسياخ انتظار الأعمدة
+	let columnDowelsDetail: StripFoundationResult['columnDowelsDetail'] | undefined;
+	if (hasColumnDowels && columnDowels && columnDowels.count > 0) {
+		const totalDowelBars = columnDowels.count * columnDowels.barsPerColumn;
+		const dowelLength = columnDowels.developmentLength;
+		const dowelWeight = totalDowelBars * dowelLength * (REBAR_WEIGHTS[columnDowels.diameter] || 1);
+		const dowelStockLength = STOCK_LENGTHS[columnDowels.diameter] || 12;
+		const dowelCutsPerStock = Math.floor(dowelStockLength / dowelLength) || 1;
+		const dowelStocksNeeded = Math.ceil(totalDowelBars / dowelCutsPerStock);
 
-	// الكانات
-	if (stirrups) {
-		const stirrupLength = 2 * (width + height) - 8 * cover + 0.2;
-		const stirrupCount = calculateBarCount(totalLength, stirrups.spacing);
+		columnDowelsDetail = {
+			totalBars: totalDowelBars,
+			diameter: columnDowels.diameter,
+			length: Number(dowelLength.toFixed(3)),
+			weight: Number(dowelWeight.toFixed(2)),
+			stocksNeeded: dowelStocksNeeded,
+		};
+
 		rebarDetails.push(
-			calcFoundationRebar('كانات', stirrups.diameter, stirrupLength, stirrupCount, 1)
+			calcFoundationRebar('أسياخ انتظار', columnDowels.diameter, dowelLength, totalDowelBars, 1)
 		);
 	}
 
@@ -482,17 +803,54 @@ export function calculateStripFoundation(
 		}
 	});
 
+	// تفاصيل الفضلات مع اقتراحات الاستخدام
+	const waste: StripFoundationResult['waste'] = [];
+	rebarDetails.forEach((r) => {
+		if (r.wastePerStock > 0.01 && r.stocksNeeded > 0) {
+			waste.push({
+				diameter: r.diameter,
+				length: r.wastePerStock,
+				count: r.stocksNeeded,
+				suggestedUse: suggestWasteUse(r.wastePerStock),
+			});
+		}
+	});
+
+	// تفاصيل الوصلات
+	const spliceDetails: StripFoundationResult['spliceDetails'] = [];
+	raftRebarResults.forEach((r) => {
+		if (r.spliceInfo) {
+			spliceDetails.push({
+				direction: r.direction,
+				diameter: r.diameter,
+				piecesPerBar: r.spliceInfo.piecesPerBar,
+				splicesPerBar: r.spliceInfo.splicesPerBar,
+				lapLength: r.spliceInfo.lapLength,
+				totalSplices: r.barCount * r.spliceInfo.splicesPerBar,
+			});
+		}
+	});
+
+	// Chair bars detail (extracted from temp)
+	const chairBarsDetail: StripFoundationResult['chairBarsDetail'] = (input as any)._chairBarsDetail;
+
 	// التكاليف
 	const concretePrice = STRUCTURAL_PRICES.concrete[concreteType] || 310;
-	const concreteCost = concreteVolume * concretePrice;
+	const leanConcretePrice = STRUCTURAL_PRICES.concrete['C20'] || 250;
+	const concreteCost = totalConcreteVolume * concretePrice + leanConcreteVolume * leanConcretePrice;
 	const rebarCost = grossWeight * STRUCTURAL_PRICES.steelPerKg;
 	const formworkCost = formworkArea * STRUCTURAL_PRICES.formwork;
-	const laborCost = concreteVolume * STRUCTURAL_LABOR_PRICES.groundBeams;
+	const laborCost = totalConcreteVolume * STRUCTURAL_LABOR_PRICES.groundBeams;
 	const totalCost = concreteCost + rebarCost + formworkCost + laborCost;
 
 	return {
+		rebarMode,
 		totalLength: Number(totalLength.toFixed(2)),
-		concreteVolume: Number(concreteVolume.toFixed(3)),
+		concreteVolume: Number(netConcreteVolume.toFixed(3)),
+		leanConcreteVolume: Number(leanConcreteVolume.toFixed(3)),
+		intersectionDeduction: Number(intersectionDeduction.toFixed(3)),
+		netConcreteVolume: Number(netConcreteVolume.toFixed(3)),
+		totalConcreteVolume: Number(totalConcreteVolume.toFixed(3)),
 		plainConcreteVolume: Number(plainConcreteVolume.toFixed(3)),
 		formworkArea: Number(formworkArea.toFixed(2)),
 		rebarDetails,
@@ -503,6 +861,10 @@ export function calculateStripFoundation(
 			wastePercentage: Number(wastePercentage.toFixed(1)),
 			stocksNeeded: Array.from(stocksMap.values()),
 		},
+		waste,
+		spliceDetails,
+		chairBarsDetail,
+		columnDowelsDetail,
 		costs: {
 			concrete: Number(concreteCost.toFixed(2)),
 			rebar: Number(rebarCost.toFixed(2)),
@@ -520,6 +882,9 @@ export function calculateStripFoundation(
 export interface RaftFoundationResult {
 	area: number;
 	concreteVolume: number;
+	leanConcreteVolume: number;
+	edgeBeamConcreteVolume: number;
+	totalConcreteVolume: number;
 	plainConcreteVolume: number;
 	formworkArea: number;
 	rebarDetails: FoundationRebarCalculation[];
@@ -530,6 +895,10 @@ export interface RaftFoundationResult {
 		wastePercentage: number;
 		stocksNeeded: Array<{ diameter: number; count: number; length: number }>;
 	};
+	waste: Array<{ diameter: number; length: number; count: number; suggestedUse: string }>;
+	spliceDetails: Array<{ direction: string; diameter: number; piecesPerBar: number; splicesPerBar: number; lapLength: number; totalSplices: number }>;
+	chairBarsDetail?: { diameter: number; count: number; length: number; weight: number; stocksNeeded: number };
+	columnDowelsDetail?: { totalBars: number; diameter: number; length: number; weight: number; stocksNeeded: number };
 	costs: {
 		concrete: number;
 		rebar: number;
@@ -550,6 +919,20 @@ export function calculateRaftFoundation(
 		width,
 		thickness,
 		cover = 0.075,
+		hookLength = 0.10,
+		coverBottom = cover,
+		coverTop = cover,
+		coverSide = cover,
+		hasLeanConcrete = true,
+		leanConcreteThickness = 0.10,
+		hasEdgeBeams = false,
+		edgeBeamWidth = 0.3,
+		edgeBeamDepth = 0.3,
+		lapSpliceMethod = '40d',
+		customLapLength,
+		hasChairBars = false,
+		chairBars,
+		columnDowels,
 		bottomX,
 		bottomY,
 		topX,
@@ -559,38 +942,103 @@ export function calculateRaftFoundation(
 
 	const area = length * width;
 	const concreteVolume = area * thickness;
-	const plainConcreteVolume = area * 0.1;
+
+	// خرسانة النظافة
+	const leanConcreteVolume = hasLeanConcrete ? area * leanConcreteThickness : 0;
+
+	// تسميك الحواف (edge beams along perimeter)
+	const perimeter = 2 * (length + width);
+	const edgeBeamConcreteVolume = hasEdgeBeams ? perimeter * edgeBeamWidth * edgeBeamDepth : 0;
+
+	const totalConcreteVolume = concreteVolume + edgeBeamConcreteVolume;
+	const plainConcreteVolume = leanConcreteVolume;
+
 	const formworkArea = 2 * (length + width) * thickness;
 
 	// حسابات الحديد
 	const rebarDetails: FoundationRebarCalculation[] = [];
+	const raftRebarResults: RaftRebarResult[] = [];
 
-	// شبكة سفلية - اتجاه X
-	const bottomXBarLength = calcFoundationBarLength(width, cover, 0.10);
-	const bottomXBarCount = calcFoundationBarCount(length, bottomX.barsPerMeter, cover);
-	rebarDetails.push(
-		calcFoundationRebar('سفلي اتجاه X', bottomX.diameter, bottomXBarLength, bottomXBarCount, 1)
-	);
+	// شبكة سفلية - اتجاه X (bars run along width, spaced along length)
+	const bottomXBarLength = calcFoundationBarLength(width, coverSide, hookLength);
+	const bottomXBarCount = calcFoundationBarCount(length, bottomX.barsPerMeter, coverSide);
+	const bottomXResult = calcRaftRebar('سفلي اتجاه X', bottomX.diameter, bottomXBarLength, bottomXBarCount, lapSpliceMethod, customLapLength);
+	rebarDetails.push(bottomXResult);
+	raftRebarResults.push(bottomXResult);
 
-	// شبكة سفلية - اتجاه Y
-	const bottomYBarLength = calcFoundationBarLength(length, cover, 0.10);
-	const bottomYBarCount = calcFoundationBarCount(width, bottomY.barsPerMeter, cover);
-	rebarDetails.push(
-		calcFoundationRebar('سفلي اتجاه Y', bottomY.diameter, bottomYBarLength, bottomYBarCount, 1)
-	);
+	// شبكة سفلية - اتجاه Y (bars run along length, spaced along width)
+	const bottomYBarLength = calcFoundationBarLength(length, coverSide, hookLength);
+	const bottomYBarCount = calcFoundationBarCount(width, bottomY.barsPerMeter, coverSide);
+	const bottomYResult = calcRaftRebar('سفلي اتجاه Y', bottomY.diameter, bottomYBarLength, bottomYBarCount, lapSpliceMethod, customLapLength);
+	rebarDetails.push(bottomYResult);
+	raftRebarResults.push(bottomYResult);
 
-	// شبكة علوية - اتجاه X
+	// شبكة علوية - اتجاه X (BUG FIX: uses topX's own barsPerMeter)
 	if (topX) {
-		rebarDetails.push(
-			calcFoundationRebar('علوي اتجاه X', topX.diameter, bottomXBarLength, bottomXBarCount, 1)
-		);
+		const topXBarLength = calcFoundationBarLength(width, coverSide, hookLength);
+		const topXBarCount = calcFoundationBarCount(length, topX.barsPerMeter, coverSide);
+		const topXResult = calcRaftRebar('علوي اتجاه X', topX.diameter, topXBarLength, topXBarCount, lapSpliceMethod, customLapLength);
+		rebarDetails.push(topXResult);
+		raftRebarResults.push(topXResult);
 	}
 
-	// شبكة علوية - اتجاه Y
+	// شبكة علوية - اتجاه Y (BUG FIX: uses topY's own barsPerMeter)
 	if (topY) {
-		rebarDetails.push(
-			calcFoundationRebar('علوي اتجاه Y', topY.diameter, bottomYBarLength, bottomYBarCount, 1)
-		);
+		const topYBarLength = calcFoundationBarLength(length, coverSide, hookLength);
+		const topYBarCount = calcFoundationBarCount(width, topY.barsPerMeter, coverSide);
+		const topYResult = calcRaftRebar('علوي اتجاه Y', topY.diameter, topYBarLength, topYBarCount, lapSpliceMethod, customLapLength);
+		rebarDetails.push(topYResult);
+		raftRebarResults.push(topYResult);
+	}
+
+	// كراسي حديد (chair bars / spacers)
+	let chairBarsDetail: RaftFoundationResult['chairBarsDetail'] | undefined;
+	if (hasChairBars && chairBars) {
+		const chairCountX = Math.floor(length / chairBars.spacingX) + 1;
+		const chairCountY = Math.floor(width / chairBars.spacingY) + 1;
+		const chairCount = chairCountX * chairCountY;
+		// Chair length = thickness minus covers minus bar diameters + hooks
+		const avgBarDia = (bottomX.diameter + (topX?.diameter || bottomX.diameter)) / 2 / 1000;
+		const chairLength = thickness - coverBottom - coverTop - 2 * avgBarDia + 2 * hookLength;
+		const chairWeight = chairCount * chairLength * (REBAR_WEIGHTS[chairBars.diameter] || 0.617);
+		const chairStockLength = STOCK_LENGTHS[chairBars.diameter] || 12;
+		const chairCutsPerStock = Math.floor(chairStockLength / chairLength) || 1;
+		const chairStocksNeeded = Math.ceil(chairCount / chairCutsPerStock);
+
+		chairBarsDetail = {
+			diameter: chairBars.diameter,
+			count: chairCount,
+			length: Number(chairLength.toFixed(3)),
+			weight: Number(chairWeight.toFixed(2)),
+			stocksNeeded: chairStocksNeeded,
+		};
+
+		// Add chair bars to rebar details
+		const chairRebarDetail = calcFoundationRebar('كراسي حديد', chairBars.diameter, chairLength, chairCount, 1);
+		rebarDetails.push(chairRebarDetail);
+	}
+
+	// أسياخ انتظار الأعمدة (column dowels)
+	let columnDowelsDetail: RaftFoundationResult['columnDowelsDetail'] | undefined;
+	if (columnDowels && columnDowels.count > 0) {
+		const totalDowelBars = columnDowels.count * columnDowels.barsPerColumn;
+		const dowelLength = columnDowels.developmentLength;
+		const dowelWeight = totalDowelBars * dowelLength * (REBAR_WEIGHTS[columnDowels.diameter] || 1);
+		const dowelStockLength = STOCK_LENGTHS[columnDowels.diameter] || 12;
+		const dowelCutsPerStock = Math.floor(dowelStockLength / dowelLength) || 1;
+		const dowelStocksNeeded = Math.ceil(totalDowelBars / dowelCutsPerStock);
+
+		columnDowelsDetail = {
+			totalBars: totalDowelBars,
+			diameter: columnDowels.diameter,
+			length: Number(dowelLength.toFixed(3)),
+			weight: Number(dowelWeight.toFixed(2)),
+			stocksNeeded: dowelStocksNeeded,
+		};
+
+		// Add dowels to rebar details
+		const dowelRebarDetail = calcFoundationRebar('أسياخ انتظار', columnDowels.diameter, dowelLength, totalDowelBars, 1);
+		rebarDetails.push(dowelRebarDetail);
 	}
 
 	// حساب الإجماليات
@@ -614,17 +1062,49 @@ export function calculateRaftFoundation(
 		}
 	});
 
+	// تفاصيل الفضلات مع اقتراحات الاستخدام
+	const waste: RaftFoundationResult['waste'] = [];
+	rebarDetails.forEach((r) => {
+		if (r.wastePerStock > 0.01 && r.stocksNeeded > 0) {
+			waste.push({
+				diameter: r.diameter,
+				length: r.wastePerStock,
+				count: r.stocksNeeded,
+				suggestedUse: suggestWasteUse(r.wastePerStock),
+			});
+		}
+	});
+
+	// تفاصيل الوصلات
+	const spliceDetails: RaftFoundationResult['spliceDetails'] = [];
+	raftRebarResults.forEach((r) => {
+		if (r.spliceInfo) {
+			spliceDetails.push({
+				direction: r.direction,
+				diameter: r.diameter,
+				piecesPerBar: r.spliceInfo.piecesPerBar,
+				splicesPerBar: r.spliceInfo.splicesPerBar,
+				lapLength: r.spliceInfo.lapLength,
+				totalSplices: r.barCount * r.spliceInfo.splicesPerBar,
+			});
+		}
+	});
+
 	// التكاليف
 	const concretePrice = STRUCTURAL_PRICES.concrete[concreteType] || 310;
-	const concreteCost = concreteVolume * concretePrice;
+	const leanConcretePrice = STRUCTURAL_PRICES.concrete['C20'] || 250; // lean concrete uses C20 or lower
+	const concreteCost = totalConcreteVolume * concretePrice + leanConcreteVolume * leanConcretePrice;
 	const rebarCost = grossWeight * STRUCTURAL_PRICES.steelPerKg;
 	const formworkCost = formworkArea * STRUCTURAL_PRICES.formwork;
-	const laborCost = concreteVolume * STRUCTURAL_LABOR_PRICES.foundations;
+	const laborCost = totalConcreteVolume * STRUCTURAL_LABOR_PRICES.foundations;
 	const totalCost = concreteCost + rebarCost + formworkCost + laborCost;
 
 	return {
 		area: Number(area.toFixed(2)),
-		concreteVolume: Number(concreteVolume.toFixed(3)),
+		concreteVolume: Number(totalConcreteVolume.toFixed(3)),
+		leanConcreteVolume: Number(leanConcreteVolume.toFixed(3)),
+		edgeBeamConcreteVolume: Number(edgeBeamConcreteVolume.toFixed(3)),
+		totalConcreteVolume: Number(totalConcreteVolume.toFixed(3)),
 		plainConcreteVolume: Number(plainConcreteVolume.toFixed(3)),
 		formworkArea: Number(formworkArea.toFixed(2)),
 		rebarDetails,
@@ -635,6 +1115,10 @@ export function calculateRaftFoundation(
 			wastePercentage: Number(wastePercentage.toFixed(1)),
 			stocksNeeded: Array.from(stocksMap.values()),
 		},
+		waste,
+		spliceDetails,
+		chairBarsDetail,
+		columnDowelsDetail,
 		costs: {
 			concrete: Number(concreteCost.toFixed(2)),
 			rebar: Number(rebarCost.toFixed(2)),

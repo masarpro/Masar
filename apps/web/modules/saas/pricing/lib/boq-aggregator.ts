@@ -127,6 +127,196 @@ const SLAB_FLOOR_LABELS: Record<string, string> = {
 };
 
 // ─────────────────────────────────────────────────────────────
+// Floor Filter Types & Helpers
+// ─────────────────────────────────────────────────────────────
+
+export interface FloorFilterOption {
+	value: string;   // "all" | "foundations" | floor.id
+	label: string;   // Arabic display name
+	icon?: string;
+	sortOrder: number;
+}
+
+interface EnabledFloor {
+	id: string;
+	label: string;
+	icon?: string;
+	sortOrder: number;
+}
+
+/**
+ * Determines which floor group a structural item belongs to.
+ * Returns "foundations", a floor id, or "shared".
+ */
+export function getItemFloorGroup(
+	item: StructuralItem,
+	enabledFloors?: EnabledFloor[],
+): string {
+	const { category, subCategory, dimensions } = item;
+
+	// Always foundations
+	if (category === "plainConcrete") return "foundations";
+	if (category === "foundations") return "foundations";
+
+	// Ground beams → foundations
+	if (category === "beams" && subCategory === "groundBeam") return "foundations";
+
+	// Columns
+	if (category === "columns") {
+		if (
+			subCategory &&
+			(subCategory.endsWith("_neck") || subCategory === "neck")
+		) {
+			return "foundations";
+		}
+		// Match subCategory (floor id) to enabledFloors
+		if (subCategory && enabledFloors) {
+			const match = enabledFloors.find((f) => f.id === subCategory);
+			if (match) return match.id;
+		}
+		// Fallback: use subCategory as-is if it looks like a floor id
+		if (subCategory && subCategory !== "column") return subCategory;
+		return "ground";
+	}
+
+	// Slabs and blocks — match dimensions.floor (Arabic label) to enabledFloors
+	if (category === "slabs" || category === "blocks") {
+		const floorLabel = (dimensions as any)?.floor?.toString();
+		if (floorLabel && enabledFloors) {
+			const match = enabledFloors.find(
+				(f) =>
+					f.label === floorLabel ||
+					floorLabel.includes(f.label) ||
+					f.label.includes(floorLabel),
+			);
+			if (match) return match.id;
+		}
+		// Fallback: try to match Arabic label to FLOOR_LABELS keys
+		if (floorLabel) {
+			for (const [key, label] of Object.entries(FLOOR_LABELS)) {
+				if (floorLabel === label || floorLabel.includes(label) || label.includes(floorLabel)) {
+					return key;
+				}
+			}
+			for (const [key, label] of Object.entries(SLAB_FLOOR_LABELS)) {
+				if (floorLabel === label || floorLabel.includes(label) || label.includes(floorLabel)) {
+					return key;
+				}
+			}
+		}
+		return "ground";
+	}
+
+	// Stairs — match dimensions.floor (Arabic label) to enabledFloors, like slabs
+	if (category === "stairs") {
+		const floorLabel = (dimensions as any)?.floor?.toString();
+		if (floorLabel && enabledFloors) {
+			const match = enabledFloors.find(
+				(f) =>
+					f.label === floorLabel ||
+					floorLabel.includes(f.label) ||
+					f.label.includes(floorLabel),
+			);
+			if (match) return match.id;
+		}
+		if (floorLabel) {
+			for (const [key, label] of Object.entries(FLOOR_LABELS)) {
+				if (floorLabel === label || floorLabel.includes(label) || label.includes(floorLabel)) {
+					return key;
+				}
+			}
+		}
+		return "shared";
+	}
+
+	// Regular beams (non-ground) → shared
+	if (category === "beams") return "shared";
+
+	return "ground";
+}
+
+/**
+ * Builds the list of floor filter options based on actual items present.
+ */
+export function buildFloorFilterOptions(
+	items: StructuralItem[],
+	enabledFloors?: EnabledFloor[],
+): FloorFilterOption[] {
+	const options: FloorFilterOption[] = [
+		{ value: "all", label: "المشروع بالكامل", icon: "🏗️", sortOrder: -1 },
+	];
+
+	const presentGroups = new Set<string>();
+	for (const item of items) {
+		presentGroups.add(getItemFloorGroup(item, enabledFloors));
+	}
+
+	// Add foundations if any foundation items exist
+	if (presentGroups.has("foundations")) {
+		options.push({
+			value: "foundations",
+			label: "الأساسات",
+			icon: "🏗️",
+			sortOrder: 0,
+		});
+	}
+
+	// Add each enabled floor that has items
+	if (enabledFloors) {
+		for (const floor of enabledFloors) {
+			if (presentGroups.has(floor.id)) {
+				options.push({
+					value: floor.id,
+					label: floor.label,
+					icon: floor.icon,
+					sortOrder: floor.sortOrder,
+				});
+			}
+		}
+	} else {
+		// Fallback: use FLOOR_LABELS for any present floor keys
+		const floorKeys = Object.keys(FLOOR_LABELS);
+		floorKeys.forEach((key, idx) => {
+			if (presentGroups.has(key)) {
+				options.push({
+					value: key,
+					label: FLOOR_LABELS[key],
+					sortOrder: idx + 1,
+				});
+			}
+		});
+	}
+
+	// Sort by sortOrder
+	options.sort((a, b) => a.sortOrder - b.sortOrder);
+
+	return options;
+}
+
+/**
+ * Filters items by the selected floor value.
+ * - "all" → all items
+ * - "foundations" → only foundation-group items
+ * - floor id → items matching that floor + "shared" items (stairs, regular beams)
+ */
+export function filterItemsByFloor(
+	items: StructuralItem[],
+	floorValue: string,
+	enabledFloors?: EnabledFloor[],
+): StructuralItem[] {
+	if (floorValue === "all") return items;
+
+	return items.filter((item) => {
+		const group = getItemFloorGroup(item, enabledFloors);
+		if (floorValue === "foundations") {
+			return group === "foundations";
+		}
+		// For a specific floor, include matching items + shared items
+		return group === floorValue || group === "shared";
+	});
+}
+
+// ─────────────────────────────────────────────────────────────
 // Aggregation
 // ─────────────────────────────────────────────────────────────
 

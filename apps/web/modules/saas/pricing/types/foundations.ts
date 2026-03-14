@@ -28,6 +28,11 @@ export interface IsolatedFoundationInput {
 	cover?: number;       // غطاء خرساني (م) - افتراضي 0.075
 	hookLength?: number;  // طول الرجوع (م) - افتراضي 0.10
 
+	// أغطية منفصلة (اختياري — تستبدل cover الموحد)
+	coverBottom?: number;  // افتراضي 0.075م
+	coverTop?: number;     // افتراضي 0.05م
+	coverSide?: number;    // افتراضي 0.05م
+
 	// التسليح السفلي (الاتجاه القصير)
 	bottomShort?: { barsPerMeter: number; diameter: number };
 	// التسليح السفلي (الاتجاه الطويل)
@@ -36,6 +41,18 @@ export interface IsolatedFoundationInput {
 	// التسليح العلوي (اختياري)
 	topShort?: { barsPerMeter: number; diameter: number };
 	topLong?: { barsPerMeter: number; diameter: number };
+
+	// خرسانة النظافة
+	hasLeanConcrete?: boolean;         // افتراضي false
+	leanConcreteThickness?: number;    // افتراضي 0.10م
+
+	// حديد انتظار العمود (عمود واحد فقط)
+	hasColumnDowels?: boolean;         // افتراضي false
+	columnDowels?: {
+		barsPerColumn: number;           // 4, 6, 8
+		diameter: number;                // مم
+		developmentLength: number;       // م
+	};
 
 	// نوع الخرسانة (اختياري)
 	concreteType?: string;
@@ -57,20 +74,37 @@ export interface CombinedFoundationInput {
 	// عدد الأعمدة على القاعدة
 	columnsCount?: number;
 	columnsSpacing?: number;
-	columnPositions?: { x: number; y: number }[];
+	columnCount?: number;              // عدد الأعمدة (الافتراضي: 2)
+	columnSpacing?: number;            // المسافة بين الأعمدة (م)
 
 	// الإعدادات
 	cover?: number;
 	hookLength?: number;
 
-	// التسليح الرئيسي (الاتجاه الطويل)
-	mainRebar?: { barsPerMeter: number; diameter: number };
-	// التسليح الثانوي (الاتجاه القصير)
-	distributionRebar?: { barsPerMeter: number; diameter: number };
+	// أغطية منفصلة (اختياري)
+	coverBottom?: number;  // افتراضي 0.075م
+	coverTop?: number;     // افتراضي 0.05م
+	coverSide?: number;    // افتراضي 0.05م
+
+	// التسليح السفلي (بنفس نمط المنفصلة)
+	bottomShort?: { barsPerMeter: number; diameter: number };
+	bottomLong?: { barsPerMeter: number; diameter: number };
 
 	// التسليح العلوي
-	topMainRebar?: { barsPerMeter: number; diameter: number };
-	topDistributionRebar?: { barsPerMeter: number; diameter: number };
+	topShort?: { barsPerMeter: number; diameter: number };
+	topLong?: { barsPerMeter: number; diameter: number };
+
+	// خرسانة النظافة
+	hasLeanConcrete?: boolean;         // افتراضي true
+	leanConcreteThickness?: number;    // افتراضي 0.10م
+
+	// حديد انتظار الأعمدة
+	hasColumnDowels?: boolean;         // افتراضي false
+	columnDowels?: {
+		barsPerColumn: number;           // 4, 6, 8
+		diameter: number;                // مم
+		developmentLength: number;       // م
+	};
 
 	// نوع الخرسانة
 	concreteType?: string;
@@ -85,26 +119,68 @@ export interface StripFoundationInput {
 	quantity?: number;
 
 	// الأبعاد
-	segments: Array<{ length: number }>; // قطع القاعدة الشريطية
+	length: number;      // الطول الكلي (م)
 	width: number;       // العرض (م)
 	height: number;      // الارتفاع/العمق (م)
+
+	// backward compat — old saved items may still have segments
+	segments?: Array<{ length: number }>;
 
 	// الإعدادات
 	cover?: number;
 	hookLength?: number;
 
-	// التسليح السفلي
+	// أغطية منفصلة
+	coverBottom?: number;  // افتراضي 0.075م
+	coverTop?: number;     // افتراضي 0.05م
+	coverSide?: number;    // افتراضي 0.05م
+
+	// خرسانة النظافة
+	hasLeanConcrete?: boolean;
+	leanConcreteThickness?: number; // افتراضي 0.10م
+
+	// التسليح السفلي — وضع الكانات (stirrups)
 	bottomMain: { count: number; diameter: number };
 	bottomSecondary?: { count: number; diameter: number };
 
-	// التسليح العلوي
+	// التسليح العلوي — وضع الكانات
 	topMain?: { count: number; diameter: number };
 
-	// الكانات
+	// الكانات — وضع الكانات فقط
 	stirrups?: {
 		diameter: number;
 		spacing: number;
 	};
+
+	// التسليح السفلي — وضع الشبكة (mesh)
+	bottomMeshX?: { diameter: number; barsPerMeter: number };
+	bottomMeshY?: { diameter: number; barsPerMeter: number };
+
+	// التسليح العلوي — وضع الشبكة
+	topMeshX?: { diameter: number; barsPerMeter: number };
+	topMeshY?: { diameter: number; barsPerMeter: number };
+
+	// وصلة التراكب (mesh فقط)
+	lapSpliceMethod?: '40d' | '50d' | '60d' | 'custom';
+	customLapLength?: number;
+
+	// كراسي حديد (mesh فقط)
+	hasChairBars?: boolean;
+	chairBars?: { diameter: number; spacingX: number; spacingY: number };
+
+	// أسياخ انتظار الأعمدة
+	hasColumnDowels?: boolean;
+	columnDowels?: {
+		count: number;
+		barsPerColumn: number;
+		diameter: number;
+		developmentLength: number;
+	};
+
+	// خصم التقاطعات
+	hasIntersectionDeduction?: boolean;
+	intersectionCount?: number;
+	intersectingStripWidth?: number; // عرض الشريط المتقاطع (م)
 
 	// نوع الخرسانة (اختياري)
 	concreteType?: string;
@@ -124,6 +200,35 @@ export interface RaftFoundationInput {
 
 	// الإعدادات
 	cover?: number;
+	hookLength?: number;           // default 0.10m
+	coverBottom?: number;          // default 0.075m
+	coverTop?: number;             // default 0.075m
+	coverSide?: number;            // default 0.075m
+
+	// خرسانة النظافة
+	hasLeanConcrete?: boolean;     // default true
+	leanConcreteThickness?: number; // default 0.10m
+
+	// تسميك الحواف
+	hasEdgeBeams?: boolean;        // default false
+	edgeBeamWidth?: number;        // m (0.3-0.5)
+	edgeBeamDepth?: number;        // m (0.2-0.5)
+
+	// وصلة التراكب
+	lapSpliceMethod?: '40d' | '50d' | '60d' | 'custom';
+	customLapLength?: number;      // m, only when method='custom'
+
+	// كراسي حديد
+	hasChairBars?: boolean;
+	chairBars?: { diameter: number; spacingX: number; spacingY: number };
+
+	// أسياخ انتظار الأعمدة
+	columnDowels?: {
+		count: number;               // عدد الأعمدة
+		barsPerColumn: number;       // 4, 6, 8, etc.
+		diameter: number;            // mm
+		developmentLength: number;   // m
+	};
 
 	// التسليح السفلي
 	bottomX: { diameter: number; barsPerMeter: number };

@@ -31,7 +31,7 @@ interface LaborOverviewTabProps {
 
 type LaborMode = "per_sqm" | "per_cbm_ton" | "lump_sum" | "salary";
 
-interface FloorRow { id: string; label: string; area: string; pricePerSqm: string; }
+interface FloorRow { id: string; label: string; area: string; pricePerSqm: string; isAuto?: boolean; floorKey?: string; }
 interface ExtraRow { id: string; label: string; quantity: string; unit: string; pricePerUnit: string; }
 interface CbmTonRow { id: string; label: string; quantity: string; unit: string; pricePerUnit: string; }
 interface SalaryWorker { id: string; craft: string; count: string; salary: string; months: string; }
@@ -45,11 +45,6 @@ const LABOR_MODES: { value: LaborMode; label: string }[] = [
 	{ value: "per_cbm_ton", label: "بالمتر المكعب+الطن" },
 	{ value: "lump_sum", label: "بالمقطوعية" },
 	{ value: "salary", label: "بالراتب الشهري" },
-];
-
-const DEFAULT_FLOORS: FloorRow[] = [
-	{ id: "ground", label: "الدور الأرضي", area: "", pricePerSqm: "" },
-	{ id: "first", label: "الدور الأول", area: "", pricePerSqm: "" },
 ];
 
 const DEFAULT_EXTRAS: ExtraRow[] = [
@@ -90,7 +85,7 @@ export function LaborOverviewTab({
 
 	// ─── Labor input state ───
 	const [laborMode, setLaborMode] = useState<LaborMode>("per_sqm");
-	const [floorRows, setFloorRows] = useState<FloorRow[]>(DEFAULT_FLOORS);
+	const [floorRows, setFloorRows] = useState<FloorRow[]>([]);
 	const [extraRows, setExtraRows] = useState<ExtraRow[]>(DEFAULT_EXTRAS);
 	const [cbmRows, setCbmRows] = useState<CbmTonRow[]>(DEFAULT_CBM);
 	const [lumpSumAmount, setLumpSumAmount] = useState("");
@@ -160,6 +155,38 @@ export function LaborOverviewTab({
 		return { concrete, steel: steel / 1000 };
 	}, [structuralItems]);
 
+	// ─── Auto floor rows from slabs ───
+	const slabFloorRows = useMemo(() => {
+		const items = (structuralItems as any[]) ?? [];
+		const slabs = items.filter((item) => item.category === "slabs");
+		if (slabs.length === 0) return [];
+
+		const floorMap = new Map<string, number>();
+		for (const slab of slabs) {
+			const dims = slab.dimensions as any;
+			const floor = dims?.floor ?? "أرضي";
+			const length = Number(dims?.length ?? 0);
+			const width = Number(dims?.width ?? 0);
+			const qty = Number(slab.quantity ?? 1);
+			const area = length * width * qty;
+			floorMap.set(floor, (floorMap.get(floor) ?? 0) + area);
+		}
+
+		const rows: FloorRow[] = [];
+		for (const [floor, totalArea] of floorMap) {
+			const label = floor === "ميزانين" ? "سقف دور الميزانين" : `سقف الدور ال${floor}`;
+			rows.push({
+				id: `slab_${floor}`,
+				label,
+				area: totalArea > 0 ? String(totalArea) : "",
+				pricePerSqm: "",
+				isAuto: true,
+				floorKey: floor,
+			});
+		}
+		return rows;
+	}, [structuralItems]);
+
 	// ─── Initialize from saved data ───
 	useEffect(() => {
 		if (initialized || breakdownLoading) return;
@@ -168,13 +195,35 @@ export function LaborOverviewTab({
 		if (bd && bd.laborMode) {
 			setLaborMode(bd.laborMode);
 
-			if (bd.floorRows?.length) setFloorRows(bd.floorRows);
+			// Merge auto slab rows with saved floor rows
+			{
+				const savedRows: FloorRow[] = bd.floorRows ?? [];
+				const savedPriceMap = new Map<string, string>();
+				const manualRows: FloorRow[] = [];
+				for (const r of savedRows) {
+					if (r.floorKey) {
+						savedPriceMap.set(r.floorKey, r.pricePerSqm ?? "");
+					} else if (!r.isAuto) {
+						manualRows.push(r);
+					}
+				}
+				const merged: FloorRow[] = slabFloorRows.map((row) => ({
+					...row,
+					pricePerSqm: savedPriceMap.get(row.floorKey!) ?? row.pricePerSqm,
+				}));
+				setFloorRows([...merged, ...manualRows]);
+			}
 			if (bd.extraRows?.length) setExtraRows(bd.extraRows);
 			if (bd.cbmRows?.length) setCbmRows(bd.cbmRows);
 			if (bd.lumpSumAmount != null) setLumpSumAmount(String(bd.lumpSumAmount));
 			if (bd.salaryWorkers?.length) setSalaryWorkers(bd.salaryWorkers);
 			if (bd.salaryInsurance != null) setSalaryInsurance(String(bd.salaryInsurance));
 			if (bd.salaryHousing != null) setSalaryHousing(String(bd.salaryHousing));
+		}
+
+		// If no saved data but we have slab rows, use them
+		if (!bd?.floorRows?.length && slabFloorRows.length > 0) {
+			setFloorRows(slabFloorRows);
 		}
 
 		// Auto-populate CBM quantities from structural aggregates if empty
@@ -196,7 +245,26 @@ export function LaborOverviewTab({
 		}
 
 		setInitialized(true);
-	}, [breakdownLoading, savedBreakdown, autoAggregates, buildingArea, initialized]);
+	}, [breakdownLoading, savedBreakdown, autoAggregates, buildingArea, initialized, slabFloorRows]);
+
+	// ─── Sync auto floor rows when slabs change (after initialization) ───
+	useEffect(() => {
+		if (!initialized) return;
+		setFloorRows((prev) => {
+			const manualRows = prev.filter((r) => !r.isAuto);
+			const priceMap = new Map<string, string>();
+			for (const r of prev) {
+				if (r.isAuto && r.floorKey) {
+					priceMap.set(r.floorKey, r.pricePerSqm);
+				}
+			}
+			const updated = slabFloorRows.map((row) => ({
+				...row,
+				pricePerSqm: priceMap.get(row.floorKey!) ?? row.pricePerSqm,
+			}));
+			return [...updated, ...manualRows];
+		});
+	}, [slabFloorRows, initialized]);
 
 	// ─── Row update helpers ───
 	const updateFloorRow = (id: string, field: keyof FloorRow, value: string) => {
@@ -464,26 +532,50 @@ export function LaborOverviewTab({
 							</thead>
 							<tbody>
 								{/* Floor rows */}
+								{floorRows.length === 0 && (
+									<tr>
+										<td colSpan={5} className="px-3 py-6 text-center text-muted-foreground text-sm">
+											لا توجد أسقف مضافة في قسم الكميات. أضف أسقف لتظهر الأدوار تلقائياً، أو أضف دور يدوياً.
+										</td>
+									</tr>
+								)}
 								{floorRows.map((row) => {
 									const rowTotal = (Number(row.area) || 0) * (Number(row.pricePerSqm) || 0);
 									return (
 										<tr key={row.id} className="border-b hover:bg-muted/20">
 											<td className="px-3 py-2">
-												<Input
-													className="h-8 w-32 rounded-lg text-sm"
-													value={row.label}
-													onChange={(e: any) => updateFloorRow(row.id, "label", e.target.value)}
-												/>
+												{row.isAuto ? (
+													<span className="text-sm font-medium">{row.label}</span>
+												) : (
+													<Input
+														className="h-8 w-32 rounded-lg text-sm"
+														value={row.label}
+														onChange={(e: any) => updateFloorRow(row.id, "label", e.target.value)}
+													/>
+												)}
 											</td>
 											<td className="px-3 py-2">
-												<Input
-													type="number"
-													className="h-8 w-24 mx-auto text-center rounded-lg"
-													dir="ltr"
-													placeholder="م²"
-													value={row.area}
-													onChange={(e: any) => updateFloorRow(row.id, "area", e.target.value)}
-												/>
+												{row.isAuto ? (
+													<div className="flex items-center justify-center gap-1.5">
+														<Input
+															type="number"
+															className="h-8 w-24 text-center rounded-lg bg-muted/50"
+															dir="ltr"
+															value={row.area}
+															readOnly
+														/>
+														<span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">تلقائي</span>
+													</div>
+												) : (
+													<Input
+														type="number"
+														className="h-8 w-24 mx-auto text-center rounded-lg"
+														dir="ltr"
+														placeholder="م²"
+														value={row.area}
+														onChange={(e: any) => updateFloorRow(row.id, "area", e.target.value)}
+													/>
+												)}
 											</td>
 											<td className="px-3 py-2">
 												<Input
@@ -499,13 +591,15 @@ export function LaborOverviewTab({
 												{rowTotal > 0 ? formatNum(rowTotal) : "—"}
 											</td>
 											<td className="px-3 py-2">
-												<button
-													type="button"
-													onClick={() => removeFloorRow(row.id)}
-													className="text-muted-foreground hover:text-destructive transition-colors"
-												>
-													<Trash2 className="h-3.5 w-3.5" />
-												</button>
+												{!row.isAuto && (
+													<button
+														type="button"
+														onClick={() => removeFloorRow(row.id)}
+														className="text-muted-foreground hover:text-destructive transition-colors"
+													>
+														<Trash2 className="h-3.5 w-3.5" />
+													</button>
+												)}
 											</td>
 										</tr>
 									);

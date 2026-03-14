@@ -30,16 +30,27 @@ import {
 	Scissors,
 	ClipboardList,
 	AlertCircle,
+	Layers,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
 	aggregateBOQ,
+	buildFloorFilterOptions,
+	filterItemsByFloor,
+	getItemFloorGroup,
 	type StructuralItem,
 	type BOQSection,
 	type BOQSubGroup,
 	type BOQItemDetail,
 	type FactoryOrderEntry,
 } from "../../lib/boq-aggregator";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@ui/components/select";
 import type { CuttingDetailRow } from "../../lib/boq-recalculator";
 import {
 	exportBOQToExcel,
@@ -57,6 +68,7 @@ interface BOQSummaryTableProps {
 	studyId: string;
 	organizationId: string;
 	studyName?: string;
+	enabledFloors?: Array<{ id: string; label: string; icon?: string; sortOrder: number }>;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -74,13 +86,27 @@ export function BOQSummaryTable({
 	studyId,
 	organizationId,
 	studyName,
+	enabledFloors,
 }: BOQSummaryTableProps) {
 	const t = useTranslations();
 	const [activeTab, setActiveTab] = useState<TabKey>("summary");
 	const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
 	const [expandedCutting, setExpandedCutting] = useState<Set<string>>(new Set());
+	const [selectedFloor, setSelectedFloor] = useState<string>("all");
 
-	const summary = useMemo(() => aggregateBOQ(items), [items]);
+	const floorOptions = useMemo(
+		() => buildFloorFilterOptions(items, enabledFloors),
+		[items, enabledFloors],
+	);
+
+	const filteredItems = useMemo(
+		() => filterItemsByFloor(items, selectedFloor, enabledFloors),
+		[items, selectedFloor, enabledFloors],
+	);
+
+	const summary = useMemo(() => aggregateBOQ(filteredItems), [filteredItems]);
+
+	const selectedFloorLabel = floorOptions.find((o) => o.value === selectedFloor)?.label;
 
 	const toggleSection = (key: string) => {
 		setExpandedSections((prev) => {
@@ -119,13 +145,39 @@ export function BOQSummaryTable({
 				<Button
 					variant="outline"
 					size="sm"
-					onClick={() => exportBOQToExcel(summary, studyName)}
+					onClick={() =>
+						exportBOQToExcel(
+							summary,
+							selectedFloor !== "all" && selectedFloorLabel
+								? `${studyName || ""} - ${selectedFloorLabel}`.trim()
+								: studyName,
+						)
+					}
 					className="print:hidden"
 				>
 					<FileSpreadsheet className="h-4 w-4 ml-2" />
 					تصدير Excel
 				</Button>
 			</div>
+
+			{/* Floor Filter */}
+			{floorOptions.length > 2 && (
+				<div className="flex items-center gap-3 print:hidden">
+					<span className="text-sm font-medium text-muted-foreground">تصفية حسب الدور:</span>
+					<Select value={selectedFloor} onValueChange={setSelectedFloor}>
+						<SelectTrigger className="w-[220px]">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{floorOptions.map((option) => (
+								<SelectItem key={option.value} value={option.value}>
+									{option.icon ? `${option.icon} ` : ""}{option.label}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</div>
+			)}
 
 			{/* Tabs */}
 			<div className="flex gap-1 p-1 bg-muted rounded-lg print:hidden">
@@ -153,6 +205,8 @@ export function BOQSummaryTable({
 					expandedCutting={expandedCutting}
 					toggleSection={toggleSection}
 					toggleCutting={toggleCutting}
+					selectedFloor={selectedFloor}
+					enabledFloors={enabledFloors}
 				/>
 			)}
 
@@ -183,13 +237,30 @@ function SummaryTab({
 	expandedCutting,
 	toggleSection,
 	toggleCutting,
+	selectedFloor,
+	enabledFloors,
 }: {
 	summary: ReturnType<typeof aggregateBOQ>;
 	expandedSections: Set<string>;
 	expandedCutting: Set<string>;
 	toggleSection: (key: string) => void;
 	toggleCutting: (key: string) => void;
+	selectedFloor: string;
+	enabledFloors?: Array<{ id: string; label: string; icon?: string; sortOrder: number }>;
 }) {
+	// Floor-specific view: grouped by material
+	if (selectedFloor !== "all") {
+		return (
+			<FloorMaterialView
+				summary={summary}
+				expandedSections={expandedSections}
+				toggleSection={toggleSection}
+				enabledFloors={enabledFloors}
+			/>
+		);
+	}
+
+	// Default "all" view: grouped by structural category
 	return (
 		<div className="space-y-4">
 			{/* Sections */}
@@ -207,6 +278,305 @@ function SummaryTab({
 			{/* Grand Totals */}
 			<GrandTotalCards totals={summary.grandTotals} />
 		</div>
+	);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Floor Material View (shown when a specific floor is selected)
+// ═══════════════════════════════════════════════════════════════
+
+interface MaterialItemRow {
+	item: StructuralItem;
+	categoryLabel: string;
+}
+
+function FloorMaterialView({
+	summary,
+	expandedSections,
+	toggleSection,
+	enabledFloors,
+}: {
+	summary: ReturnType<typeof aggregateBOQ>;
+	expandedSections: Set<string>;
+	toggleSection: (key: string) => void;
+	enabledFloors?: Array<{ id: string; label: string; icon?: string; sortOrder: number }>;
+}) {
+	// Flatten all items from summary sections with their category label
+	const allItemRows: MaterialItemRow[] = [];
+	for (const section of summary.sections) {
+		for (const group of section.subGroups) {
+			for (const detail of group.items) {
+				allItemRows.push({ item: detail.item, categoryLabel: section.label });
+			}
+		}
+	}
+
+	// Split into floor-specific and shared
+	const floorRows = allItemRows.filter(
+		(d) => getItemFloorGroup(d.item, enabledFloors) !== "shared",
+	);
+	const sharedRows = allItemRows.filter(
+		(d) => getItemFloorGroup(d.item, enabledFloors) === "shared",
+	);
+
+	// Material groups from floor-specific items
+	const concreteRows = floorRows.filter((d) => d.item.concreteVolume > 0);
+	const steelRows = floorRows.filter((d) => d.item.steelWeight > 0);
+	const blockRows = floorRows.filter((d) => d.item.category === "blocks");
+
+	const totalConcrete = concreteRows.reduce((s, d) => s + d.item.concreteVolume, 0);
+	const totalSteel = steelRows.reduce((s, d) => s + d.item.steelWeight, 0);
+	const totalBlocks = blockRows.reduce((s, d) => s + d.item.quantity, 0);
+
+	return (
+		<div className="space-y-4">
+			{/* Concrete Section */}
+			{concreteRows.length > 0 && (
+				<MaterialSectionCard
+					title="الخرسانة"
+					icon={Box}
+					iconColor="text-blue-600"
+					borderColor="border-l-blue-500"
+					items={concreteRows}
+					valueAccessor={(item) => item.concreteVolume}
+					valueLabel="الحجم (م³)"
+					unit="م³"
+					total={totalConcrete}
+					isExpanded={expandedSections.has("mat-concrete")}
+					onToggle={() => toggleSection("mat-concrete")}
+				/>
+			)}
+
+			{/* Steel Section */}
+			{steelRows.length > 0 && (
+				<MaterialSectionCard
+					title="حديد التسليح"
+					icon={Columns3}
+					iconColor="text-orange-600"
+					borderColor="border-l-orange-500"
+					items={steelRows}
+					valueAccessor={(item) => item.steelWeight}
+					valueLabel="الوزن (كجم)"
+					unit="كجم"
+					total={totalSteel}
+					isExpanded={expandedSections.has("mat-steel")}
+					onToggle={() => toggleSection("mat-steel")}
+				/>
+			)}
+
+			{/* Blocks Section */}
+			{blockRows.length > 0 && (
+				<MaterialSectionCard
+					title="البلوك"
+					icon={Grid3X3}
+					iconColor="text-emerald-600"
+					borderColor="border-l-emerald-500"
+					items={blockRows}
+					valueAccessor={(item) => item.quantity}
+					valueLabel="العدد"
+					unit="بلوكة"
+					total={totalBlocks}
+					isExpanded={expandedSections.has("mat-blocks")}
+					onToggle={() => toggleSection("mat-blocks")}
+				/>
+			)}
+
+			{/* Shared Items Section */}
+			{sharedRows.length > 0 && (
+				<SharedItemsCard
+					items={sharedRows}
+					isExpanded={expandedSections.has("mat-shared")}
+					onToggle={() => toggleSection("mat-shared")}
+				/>
+			)}
+
+			{/* Grand Totals */}
+			<GrandTotalCards totals={summary.grandTotals} />
+		</div>
+	);
+}
+
+// ─────────────────────────────────────────────────────────────
+// Material Section Card
+// ─────────────────────────────────────────────────────────────
+
+function MaterialSectionCard({
+	title,
+	icon: Icon,
+	iconColor,
+	borderColor,
+	items,
+	valueAccessor,
+	valueLabel,
+	unit,
+	total,
+	isExpanded,
+	onToggle,
+}: {
+	title: string;
+	icon: React.ElementType;
+	iconColor: string;
+	borderColor: string;
+	items: MaterialItemRow[];
+	valueAccessor: (item: StructuralItem) => number;
+	valueLabel: string;
+	unit: string;
+	total: number;
+	isExpanded: boolean;
+	onToggle: () => void;
+}) {
+	return (
+		<Card className={`border-r-4 ${borderColor} overflow-hidden`}>
+			<Collapsible open={isExpanded} onOpenChange={onToggle}>
+				<CollapsibleTrigger asChild>
+					<button
+						type="button"
+						className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors"
+					>
+						<div className="flex items-center gap-3">
+							{isExpanded ? (
+								<ChevronDown className="h-4 w-4 text-muted-foreground" />
+							) : (
+								<ChevronLeft className="h-4 w-4 text-muted-foreground" />
+							)}
+							<Icon className={`h-5 w-5 ${iconColor}`} />
+							<span className="font-semibold">{title}</span>
+							<Badge variant="secondary" className="text-xs">
+								{items.length} عنصر
+							</Badge>
+						</div>
+						<span className={`text-sm font-medium ${iconColor}`}>
+							{formatNumber(total)} {unit}
+						</span>
+					</button>
+				</CollapsibleTrigger>
+				<CollapsibleContent>
+					<div className="px-4 pb-4 border-t">
+						<div className="border rounded-lg overflow-hidden mt-3">
+							<Table>
+								<TableHeader>
+									<TableRow className="bg-muted/30">
+										<TableHead className="text-right text-xs">العنصر</TableHead>
+										<TableHead className="text-right text-xs">التصنيف</TableHead>
+										<TableHead className="text-right text-xs">الكمية</TableHead>
+										<TableHead className="text-right text-xs">{valueLabel}</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{items.map(({ item, categoryLabel }) => (
+										<TableRow key={item.id}>
+											<TableCell className="text-sm font-medium">{item.name}</TableCell>
+											<TableCell className="text-sm text-muted-foreground">{categoryLabel}</TableCell>
+											<TableCell className="text-sm">{item.quantity}</TableCell>
+											<TableCell className={`text-sm font-medium ${iconColor}`}>
+												{formatNumber(valueAccessor(item))}
+											</TableCell>
+										</TableRow>
+									))}
+									{/* Subtotal */}
+									<TableRow className="bg-muted/50 font-bold border-t-2">
+										<TableCell colSpan={3}>الإجمالي</TableCell>
+										<TableCell className={iconColor}>
+											{formatNumber(total)} {unit}
+										</TableCell>
+									</TableRow>
+								</TableBody>
+							</Table>
+						</div>
+					</div>
+				</CollapsibleContent>
+			</Collapsible>
+		</Card>
+	);
+}
+
+// ─────────────────────────────────────────────────────────────
+// Shared Items Card
+// ─────────────────────────────────────────────────────────────
+
+function SharedItemsCard({
+	items,
+	isExpanded,
+	onToggle,
+}: {
+	items: MaterialItemRow[];
+	isExpanded: boolean;
+	onToggle: () => void;
+}) {
+	const totalConcrete = items.reduce((s, d) => s + d.item.concreteVolume, 0);
+	const totalSteel = items.reduce((s, d) => s + d.item.steelWeight, 0);
+
+	return (
+		<Card className="border-r-4 border-l-slate-400 overflow-hidden">
+			<Collapsible open={isExpanded} onOpenChange={onToggle}>
+				<CollapsibleTrigger asChild>
+					<button
+						type="button"
+						className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors"
+					>
+						<div className="flex items-center gap-3">
+							{isExpanded ? (
+								<ChevronDown className="h-4 w-4 text-muted-foreground" />
+							) : (
+								<ChevronLeft className="h-4 w-4 text-muted-foreground" />
+							)}
+							<Layers className="h-5 w-5 text-slate-500" />
+							<span className="font-semibold">عناصر مشتركة</span>
+							<Badge variant="secondary" className="text-xs">
+								{items.length} عنصر
+							</Badge>
+						</div>
+						<div className="flex items-center gap-4 text-sm">
+							{totalConcrete > 0 && (
+								<span className="text-blue-600 font-medium">
+									{formatNumber(totalConcrete)} م³
+								</span>
+							)}
+							{totalSteel > 0 && (
+								<span className="text-orange-600 font-medium">
+									{formatNumber(totalSteel)} كجم
+								</span>
+							)}
+						</div>
+					</button>
+				</CollapsibleTrigger>
+				<CollapsibleContent>
+					<div className="px-4 pb-4 border-t">
+						<p className="text-xs text-muted-foreground mt-2 mb-3">
+							عناصر لا تنتمي لدور محدد (مثل الكمرات)
+						</p>
+						<div className="border rounded-lg overflow-hidden">
+							<Table>
+								<TableHeader>
+									<TableRow className="bg-muted/30">
+										<TableHead className="text-right text-xs">العنصر</TableHead>
+										<TableHead className="text-right text-xs">التصنيف</TableHead>
+										<TableHead className="text-right text-xs">الكمية</TableHead>
+										<TableHead className="text-right text-xs">خرسانة (م³)</TableHead>
+										<TableHead className="text-right text-xs">حديد (كجم)</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{items.map(({ item, categoryLabel }) => (
+										<TableRow key={item.id}>
+											<TableCell className="text-sm font-medium">{item.name}</TableCell>
+											<TableCell className="text-sm text-muted-foreground">{categoryLabel}</TableCell>
+											<TableCell className="text-sm">{item.quantity}</TableCell>
+											<TableCell className="text-sm text-blue-600">
+												{formatNumber(item.concreteVolume)}
+											</TableCell>
+											<TableCell className="text-sm text-orange-600">
+												{formatNumber(item.steelWeight)}
+											</TableCell>
+										</TableRow>
+									))}
+								</TableBody>
+							</Table>
+						</div>
+					</div>
+				</CollapsibleContent>
+			</Collapsible>
+		</Card>
 	);
 }
 

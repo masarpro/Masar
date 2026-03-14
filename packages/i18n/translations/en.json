@@ -1572,10 +1572,56 @@
 					"strip": "Strip",
 					"raft": "Raft"
 				},
+				"combined": {
+					"columnInfo": "Column Information",
+					"columnCount": "Number of Columns",
+					"columnSpacing": "Column Spacing",
+					"topMeshRequired": "Required — negative moment between columns",
+					"columnNote": "Combined footing supports 2+ columns"
+				},
+				"covers": {
+					"label": "Concrete Covers",
+					"bottom": "Bottom Cover",
+					"top": "Top Cover",
+					"side": "Side Cover"
+				},
+				"leanConcrete": {
+					"label": "Lean Concrete",
+					"thickness": "Lean Concrete Thickness"
+				},
+				"columnDowels": {
+					"label": "Column Dowels",
+					"barsPerColumn": "Bars per Column",
+					"diameter": "Dowel Diameter",
+					"developmentLength": "Development Length",
+					"total": "Total: {columns} columns × {bars} bars = {total} dowels"
+				},
 				"slabType": {
 					"solid": "Solid",
 					"hollow": "Hollow Core",
 					"ribbed": "Ribbed"
+				},
+				"boq": {
+					"title": "BOQ Summary Table",
+					"floorFilter": "Filter by Floor",
+					"allFloors": "Entire Project",
+					"foundations": "Foundations",
+					"concreteSection": "Concrete",
+					"steelSection": "Reinforcement Steel",
+					"blockSection": "Blocks",
+					"sharedItems": "Shared Items",
+					"sharedItemsDesc": "Items not assigned to a specific floor (e.g. beams)",
+					"element": "Element",
+					"category": "Category",
+					"quantity": "Quantity",
+					"volume": "Volume (m³)",
+					"weight": "Weight (kg)",
+					"subtotal": "Subtotal",
+					"grandTotal": "Grand Total",
+					"exportExcel": "Export Excel",
+					"summaryTab": "Quantities Summary",
+					"factoryTab": "Factory Order",
+					"cuttingTab": "Cutting Details"
 				}
 			},
 			"finishing": {
@@ -3351,6 +3397,73 @@
 				"combined": "Combined",
 				"strip": "Strip",
 				"raft": "Raft"
+			},
+			"combined": {
+				"columnInfo": "Column Information",
+				"columnCount": "Number of Columns",
+				"columnSpacing": "Column Spacing",
+				"topMeshRequired": "Required — negative moment between columns",
+				"columnNote": "Combined footing supports 2+ columns"
+			},
+			"covers": {
+				"label": "Concrete Covers",
+				"bottom": "Bottom Cover",
+				"top": "Top Cover",
+				"side": "Side Cover"
+			},
+			"leanConcrete": {
+				"label": "Lean Concrete",
+				"thickness": "Lean Concrete Thickness"
+			},
+			"columnDowels": {
+				"label": "Column Dowels",
+				"barsPerColumn": "Bars per Column",
+				"diameter": "Dowel Diameter",
+				"developmentLength": "Development Length",
+				"total": "Total: {columns} columns × {bars} bars = {total} dowels"
+			},
+			"raft": {
+				"leanConcrete": "Lean Concrete",
+				"leanConcreteThickness": "Lean Concrete Thickness",
+				"edgeBeams": "Edge Thickening",
+				"edgeBeamWidth": "Thickening Width",
+				"edgeBeamDepth": "Extra Depth",
+				"lapSplice": "Lap Splice",
+				"lapSpliceMethod": "Splice Method",
+				"lapSpliceCustom": "Custom Length",
+				"lapSpliceNote": "Bars exceed 12m — lap splice required",
+				"chairBars": "Chair Bars (Spacers)",
+				"chairDiameter": "Chair Diameter",
+				"chairSpacing": "Chair Spacing",
+				"columnDowels": "Column Dowels",
+				"columnDowelManual": "Manual Input",
+				"columnDowelNone": "None",
+				"columnCount": "Column Count",
+				"barsPerColumn": "Bars per Column",
+				"developmentLength": "Development Length",
+				"coverBottom": "Bottom Cover",
+				"coverTop": "Top Cover",
+				"coverSide": "Side Cover",
+				"covers": "Concrete Covers",
+				"spliceDetails": "Splice Details",
+				"piecesPerBar": "Pieces per Bar"
+			},
+			"strip": {
+				"rebarMode": {
+					"stirrups": "Stirrups",
+					"mesh": "Mesh"
+				},
+				"advancedSettings": "Advanced Settings",
+				"intersectionDeduction": "Intersection Deduction",
+				"intersectionCount": "Number of Intersections",
+				"intersectingWidth": "Intersecting Strip Width",
+				"intersectionNote": "Concrete volume deducted at intersection points with other strip foundations",
+				"bottomSecondary": "Bottom Secondary",
+				"topBars": "Top Bars",
+				"bottomMesh": "Bottom Mesh",
+				"topMesh": "Top Mesh",
+				"meshMode": "Mesh Mode",
+				"stirrupsMode": "Stirrups Mode"
 			},
 			"slabType": {
 				"solid": "Solid",

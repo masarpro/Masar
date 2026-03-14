@@ -159,6 +159,12 @@ export function StructuralItemsEditor({
 					studyId={studyId}
 					organizationId={organizationId}
 					studyName={(study as any)?.name}
+					enabledFloors={isConfigComplete ? enabledFloors.map((f) => ({
+						id: f.id,
+						label: f.label,
+						icon: f.icon,
+						sortOrder: f.sortOrder,
+					})) : undefined}
 				/>
 			)}
 		</div>

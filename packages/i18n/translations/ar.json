@@ -1515,6 +1515,73 @@
 					"strip": "شريطية",
 					"raft": "لبشة"
 				},
+				"combined": {
+					"columnInfo": "معلومات الأعمدة",
+					"columnCount": "عدد الأعمدة",
+					"columnSpacing": "المسافة بين الأعمدة",
+					"topMeshRequired": "إجبارية — عزم سالب بين الأعمدة",
+					"columnNote": "القاعدة المشتركة تحمل عمودين أو أكثر"
+				},
+				"covers": {
+					"label": "الأغطية الخرسانية",
+					"bottom": "غطاء سفلي",
+					"top": "غطاء علوي",
+					"side": "غطاء جانبي"
+				},
+				"leanConcrete": {
+					"label": "خرسانة النظافة",
+					"thickness": "سماكة النظافة"
+				},
+				"columnDowels": {
+					"label": "أسياخ انتظار الأعمدة",
+					"barsPerColumn": "عدد أسياخ/عمود",
+					"diameter": "قطر سيخ الانتظار",
+					"developmentLength": "طول التماسك",
+					"total": "إجمالي: {columns} عمود × {bars} أسياخ = {total} سيخ"
+				},
+				"raft": {
+					"leanConcrete": "خرسانة النظافة",
+					"leanConcreteThickness": "سماكة النظافة",
+					"edgeBeams": "تسميك الحواف",
+					"edgeBeamWidth": "عرض التسميك",
+					"edgeBeamDepth": "العمق الإضافي",
+					"lapSplice": "وصلة التراكب",
+					"lapSpliceMethod": "طريقة التراكب",
+					"lapSpliceCustom": "طول مخصص",
+					"lapSpliceNote": "الأسياخ أطول من 12م — يلزم وصلة تراكب",
+					"chairBars": "كراسي حديد (مباعد)",
+					"chairDiameter": "قطر الكرسي",
+					"chairSpacing": "تباعد الكراسي",
+					"columnDowels": "أسياخ انتظار الأعمدة",
+					"columnDowelManual": "إدخال يدوي",
+					"columnDowelNone": "بدون",
+					"columnCount": "عدد الأعمدة",
+					"barsPerColumn": "أسياخ/عمود",
+					"developmentLength": "طول التماسك",
+					"coverBottom": "غطاء سفلي",
+					"coverTop": "غطاء علوي",
+					"coverSide": "غطاء جانبي",
+					"covers": "الأغطية الخرسانية",
+					"spliceDetails": "تفاصيل الوصلات",
+					"piecesPerBar": "قطع/سيخ"
+				},
+				"strip": {
+					"rebarMode": {
+						"stirrups": "كانات",
+						"mesh": "شبكة"
+					},
+					"advancedSettings": "إعدادات متقدمة",
+					"intersectionDeduction": "خصم التقاطعات",
+					"intersectionCount": "عدد التقاطعات",
+					"intersectingWidth": "عرض الشريط المتقاطع",
+					"intersectionNote": "يتم خصم حجم الخرسانة عند نقاط التقاطع مع القواعد الشريطية الأخرى",
+					"bottomSecondary": "حديد سفلي ثانوي",
+					"topBars": "حديد علوي",
+					"bottomMesh": "الشبكة السفلية",
+					"topMesh": "الشبكة العلوية",
+					"meshMode": "وضع الشبكة",
+					"stirrupsMode": "وضع الكانات"
+				},
 				"slabType": {
 					"label": "نوع السقف",
 					"solid": "مصمت",
@@ -1540,6 +1607,28 @@
 					"boundary": "سور",
 					"retaining": "جدار استنادي",
 					"parapet": "دروة سطح"
+				},
+				"boq": {
+					"title": "جدول الكميات الإجمالي",
+					"floorFilter": "تصفية حسب الدور",
+					"allFloors": "المشروع بالكامل",
+					"foundations": "الأساسات",
+					"concreteSection": "الخرسانة",
+					"steelSection": "حديد التسليح",
+					"blockSection": "البلوك",
+					"sharedItems": "عناصر مشتركة",
+					"sharedItemsDesc": "عناصر لا تنتمي لدور محدد (مثل الكمرات)",
+					"element": "العنصر",
+					"category": "التصنيف",
+					"quantity": "الكمية",
+					"volume": "الحجم (م³)",
+					"weight": "الوزن (كجم)",
+					"subtotal": "الإجمالي",
+					"grandTotal": "الإجمالي العام",
+					"exportExcel": "تصدير Excel",
+					"summaryTab": "ملخص الكميات",
+					"factoryTab": "طلبية المصنع",
+					"cuttingTab": "تفاصيل التفصيل"
 				}
 			},
 			"finishing": {
@@ -3322,6 +3411,73 @@
 				"combined": "مشتركة",
 				"strip": "شريطية",
 				"raft": "لبشة"
+			},
+			"combined": {
+				"columnInfo": "معلومات الأعمدة",
+				"columnCount": "عدد الأعمدة",
+				"columnSpacing": "المسافة بين الأعمدة",
+				"topMeshRequired": "إجبارية — عزم سالب بين الأعمدة",
+				"columnNote": "القاعدة المشتركة تحمل عمودين أو أكثر"
+			},
+			"covers": {
+				"label": "الأغطية الخرسانية",
+				"bottom": "غطاء سفلي",
+				"top": "غطاء علوي",
+				"side": "غطاء جانبي"
+			},
+			"leanConcrete": {
+				"label": "خرسانة النظافة",
+				"thickness": "سماكة النظافة"
+			},
+			"columnDowels": {
+				"label": "أسياخ انتظار الأعمدة",
+				"barsPerColumn": "عدد أسياخ/عمود",
+				"diameter": "قطر سيخ الانتظار",
+				"developmentLength": "طول التماسك",
+				"total": "إجمالي: {columns} عمود × {bars} أسياخ = {total} سيخ"
+			},
+			"raft": {
+				"leanConcrete": "خرسانة النظافة",
+				"leanConcreteThickness": "سماكة النظافة",
+				"edgeBeams": "تسميك الحواف",
+				"edgeBeamWidth": "عرض التسميك",
+				"edgeBeamDepth": "العمق الإضافي",
+				"lapSplice": "وصلة التراكب",
+				"lapSpliceMethod": "طريقة التراكب",
+				"lapSpliceCustom": "طول مخصص",
+				"lapSpliceNote": "الأسياخ أطول من 12م — يلزم وصلة تراكب",
+				"chairBars": "كراسي حديد (مباعد)",
+				"chairDiameter": "قطر الكرسي",
+				"chairSpacing": "تباعد الكراسي",
+				"columnDowels": "أسياخ انتظار الأعمدة",
+				"columnDowelManual": "إدخال يدوي",
+				"columnDowelNone": "بدون",
+				"columnCount": "عدد الأعمدة",
+				"barsPerColumn": "أسياخ/عمود",
+				"developmentLength": "طول التماسك",
+				"coverBottom": "غطاء سفلي",
+				"coverTop": "غطاء علوي",
+				"coverSide": "غطاء جانبي",
+				"covers": "الأغطية الخرسانية",
+				"spliceDetails": "تفاصيل الوصلات",
+				"piecesPerBar": "قطع/سيخ"
+			},
+			"strip": {
+				"rebarMode": {
+					"stirrups": "كانات",
+					"mesh": "شبكة"
+				},
+				"advancedSettings": "إعدادات متقدمة",
+				"intersectionDeduction": "خصم التقاطعات",
+				"intersectionCount": "عدد التقاطعات",
+				"intersectingWidth": "عرض الشريط المتقاطع",
+				"intersectionNote": "يتم خصم حجم الخرسانة عند نقاط التقاطع مع القواعد الشريطية الأخرى",
+				"bottomSecondary": "حديد سفلي ثانوي",
+				"topBars": "حديد علوي",
+				"bottomMesh": "الشبكة السفلية",
+				"topMesh": "الشبكة العلوية",
+				"meshMode": "وضع الشبكة",
+				"stirrupsMode": "وضع الكانات"
 			},
 			"slabType": {
 				"label": "نوع السقف",

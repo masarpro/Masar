@@ -17,6 +17,8 @@ const laborBreakdownSchema = z.object({
 		label: z.string(),
 		area: z.string(),
 		pricePerSqm: z.string(),
+		isAuto: z.boolean().optional(),
+		floorKey: z.string().optional(),
 	})).optional(),
 	extraRows: z.array(z.object({
 		id: z.string(),
