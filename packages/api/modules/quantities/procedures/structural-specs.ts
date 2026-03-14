@@ -14,9 +14,36 @@ const elementSpecSchema = z.object({
 	steelGrade: z.string().optional(),
 });
 
+const blockSpecSchema = z.object({
+	blockType: z.string(),
+	thickness: z.number().optional(),
+});
+
+const buildingConfigSchema = z.object({
+	floors: z.array(z.object({
+		id: z.string(),
+		type: z.string(),
+		label: z.string(),
+		icon: z.string(),
+		height: z.number().nonnegative(),
+		slabArea: z.number().nonnegative(),
+		sortOrder: z.number(),
+		isRepeated: z.boolean(),
+		repeatCount: z.number().nonnegative(),
+		enabled: z.boolean(),
+		hasNeckColumns: z.boolean().optional(),
+	})),
+	isComplete: z.boolean(),
+});
+
 const structuralSpecsSchema = z.object({
 	// Per-element specs
 	elements: z.record(z.string(), elementSpecSchema).optional(),
+	// Steel brand (project-wide)
+	steelBrand: z.string().optional(),
+	hasIsolatedSteel: z.boolean().optional(),
+	// Block specs per wall category
+	blockSpecs: z.record(z.string(), blockSpecSchema).optional(),
 	// General specs
 	externalBlockType: z.string().optional(),
 	internalBlockType: z.string().optional(),
@@ -25,6 +52,8 @@ const structuralSpecsSchema = z.object({
 	// Legacy fields (kept for backward compatibility)
 	concreteGrade: z.string().optional(),
 	steelGrade: z.string().optional(),
+	// Building config (structural wizard)
+	buildingConfig: buildingConfigSchema.optional(),
 });
 
 // ═══════════════════════════════════════════════════════════════

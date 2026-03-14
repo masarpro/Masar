@@ -34,6 +34,8 @@ interface ElementHeaderRowProps {
 	showQuantity?: boolean;
 	showConcreteType?: boolean;
 	showSubType?: boolean;
+	skipAutoName?: boolean;
+	namePlaceholder?: string;
 	className?: string;
 	rightSlot?: ReactNode;
 }
@@ -56,28 +58,31 @@ export function ElementHeaderRow({
 	showQuantity = true,
 	showConcreteType = true,
 	showSubType = true,
+	skipAutoName = false,
+	namePlaceholder,
 	className,
 	rightSlot,
 }: ElementHeaderRowProps) {
-	// Auto-generate name if empty
+	// Auto-generate name if empty (only on mount)
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
-		if (!name) {
+		if (!skipAutoName && !name) {
 			const autoName = `${autoNamePrefix}${existingCount + 1}`;
 			onNameChange(autoName);
 		}
-	}, [name, autoNamePrefix, existingCount, onNameChange]);
+	}, [name, autoNamePrefix, existingCount, skipAutoName]);
 
 	return (
 		<div
 			className={`flex flex-wrap items-center gap-3 bg-muted/30 rounded-lg p-3 border ${className || ""}`}
 		>
 			{/* Element Name */}
-			<div className="shrink-0 w-24">
+			<div className="shrink-0 min-w-24">
 				<Input
 					value={name}
 					onChange={(e: any) => onNameChange(e.target.value)}
 					className="text-center font-bold"
-					placeholder={`${autoNamePrefix}1`}
+					placeholder={namePlaceholder || `${autoNamePrefix}1`}
 				/>
 			</div>
 

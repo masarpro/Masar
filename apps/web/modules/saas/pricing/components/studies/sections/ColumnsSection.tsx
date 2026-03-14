@@ -65,6 +65,7 @@ interface ColumnsSectionProps {
 	onSave: () => void;
 	onUpdate: () => void;
 	specs?: { concreteType: string; steelGrade: string };
+	buildingFloors?: import("../../../types/structural-building-config").StructuralFloorConfig[];
 }
 
 interface FloorDef {
@@ -79,7 +80,7 @@ interface FloorDef {
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════
 
-const FLOORS: FloorDef[] = [
+const DEFAULT_FLOORS: FloorDef[] = [
 	{ id: "ground", label: "الدور الأرضي", icon: "🏠", hasNeckColumns: true },
 	{ id: "first", label: "الدور الأول", icon: "🏢" },
 	{ id: "mezzanine", label: "الميزانين", icon: "📐" },
@@ -957,7 +958,20 @@ export function ColumnsSection({
 	onSave,
 	onUpdate,
 	specs,
+	buildingFloors,
 }: ColumnsSectionProps) {
+	const FLOORS: FloorDef[] = buildingFloors
+		? buildingFloors
+			.filter((f) => f.enabled)
+			.sort((a, b) => a.sortOrder - b.sortOrder)
+			.map((f) => ({
+				id: f.id,
+				label: f.label,
+				icon: f.icon,
+				hasNeckColumns: f.hasNeckColumns,
+				isRepeated: f.isRepeated,
+			}))
+		: DEFAULT_FLOORS;
 	const t = useTranslations();
 	const [expandedFloors, setExpandedFloors] = useState<string[]>(["ground"]);
 	const [repeatedCount, setRepeatedCount] = useState(3);

@@ -2,15 +2,16 @@
 
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@ui/components/button";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
 import { SummaryStatsCards } from "./SummaryStatsCards";
 import { StructuralAccordion } from "./StructuralAccordion";
 import { BOQSummaryTable } from "./BOQSummaryTable";
+import { StructuralBuildingWizard } from "./StructuralBuildingWizard";
+import { StructuralBuildingConfigBar } from "./StructuralBuildingConfigBar";
 import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
+import { useStructuralBuildingConfig } from "../../hooks/useStructuralBuildingConfig";
 
 interface StructuralItemsEditorProps {
 	organizationId: string;
@@ -24,7 +25,7 @@ export function StructuralItemsEditor({
 	studyId,
 }: StructuralItemsEditorProps) {
 	const t = useTranslations();
-	const basePath = `/app/${organizationSlug}/pricing/studies/${studyId}`;
+	const [showWizard, setShowWizard] = useState<boolean | null>(null);
 
 	const { data: study, isLoading: studyLoading } = useQuery<any>(
 		orpc.pricing.studies.getById.queryOptions({
@@ -43,6 +44,14 @@ export function StructuralItemsEditor({
 			},
 		}),
 	);
+
+	const {
+		buildingConfig,
+		isConfigComplete,
+		enabledFloors,
+		saveBuildingConfig,
+		isSaving,
+	} = useStructuralBuildingConfig({ organizationId, studyId });
 
 	if (studyLoading) {
 		return <StudyEditorSkeleton />;
@@ -77,10 +86,40 @@ export function StructuralItemsEditor({
 			}, 0),
 	};
 
+	// Wizard display logic (same pattern as FinishingItemsEditor)
+	const shouldShowWizard =
+		showWizard === true ||
+		(showWizard === null && !isConfigComplete && !buildingConfig?.floors?.length);
+
+	if (shouldShowWizard) {
+		return (
+			<div className="space-y-6">
+				<SummaryStatsCards structural={structuralStats} />
+				<StructuralBuildingWizard
+					initialConfig={buildingConfig}
+					onSave={async (config) => {
+						await saveBuildingConfig(config);
+						setShowWizard(false);
+					}}
+					onSkip={() => setShowWizard(false)}
+					isSaving={isSaving}
+				/>
+			</div>
+		);
+	}
+
 	return (
 		<div className="space-y-6">
 			{/* Summary Stats */}
 			<SummaryStatsCards structural={structuralStats} />
+
+			{/* Building Config Bar */}
+			{isConfigComplete && enabledFloors.length > 0 && (
+				<StructuralBuildingConfigBar
+					floors={enabledFloors}
+					onEdit={() => setShowWizard(true)}
+				/>
+			)}
 
 			{/* Structural Items Accordion */}
 			<div className="space-y-4">
@@ -99,6 +138,7 @@ export function StructuralItemsEditor({
 						subCategory: item.subCategory,
 					}))}
 					onUpdate={refetch}
+					buildingFloors={isConfigComplete ? enabledFloors : undefined}
 				/>
 			</div>
 

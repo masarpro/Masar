@@ -524,6 +524,18 @@ export interface StairsResult {
 	totalCost: number;
 }
 
+// ثوابت حساب حديد السلالم (SBC 304)
+const STAIR_REBAR_DEFAULTS = {
+	DEV_LENGTH_MULTIPLIER: 40,      // 40d - طول التماسك
+	HOOK_MULTIPLIER: 12,            // 12d - طول الخطاف
+	TOP_BAR_EXTENSION_RATIO: 0.25,  // 0.25L - امتداد الحديد العلوي
+	CUT_LENGTH_ROUNDING: 0.05,      // تقريب لأقرب 5 سم
+};
+
+function roundUpTo5cm(length: number): number {
+	return Math.ceil(length / 0.05) * 0.05;
+}
+
 export function calculateStairs(data: StairsInput): StairsResult {
 	const {
 		width,
@@ -566,20 +578,40 @@ export function calculateStairs(data: StairsInput): StairsResult {
 
 	const concreteVolume = slabVolume + stepsVolume + landingVolume;
 
-	// حساب الحديد
+	// حساب الحديد - 4 طبقات
 	const mainBarWeight = getRebarWeightPerMeter(mainBarDiameter);
-	const mainBarsCount = Math.ceil((width * 1000) / mainBarSpacing) + 1;
-	const mainRebarWeight =
-		mainBarsCount * (flightLength + landingLength + 0.5) * mainBarWeight;
-
 	const secondaryBarWeight = getRebarWeightPerMeter(secondaryBarDiameter);
-	const secondaryBarsCount =
-		Math.ceil(((flightLength + landingLength) * 1000) / secondaryBarSpacing) +
-		1;
-	const secondaryRebarWeight =
-		secondaryBarsCount * (width + 0.3) * secondaryBarWeight;
 
-	const rebarWeight = mainRebarWeight + secondaryRebarWeight;
+	const mainDevLength = STAIR_REBAR_DEFAULTS.DEV_LENGTH_MULTIPLIER * (mainBarDiameter / 1000);
+	const mainHookLength = STAIR_REBAR_DEFAULTS.HOOK_MULTIPLIER * (mainBarDiameter / 1000);
+	const secDevLength = STAIR_REBAR_DEFAULTS.DEV_LENGTH_MULTIPLIER * (secondaryBarDiameter / 1000);
+	const secHookLength = STAIR_REBAR_DEFAULTS.HOOK_MULTIPLIER * (secondaryBarDiameter / 1000);
+
+	const totalLength = flightLength + landingLength;
+	const mainBarsCount = Math.ceil((width * 1000) / mainBarSpacing) + 1;
+	const secondaryBarsCount =
+		Math.ceil((totalLength * 1000) / secondaryBarSpacing) + 1;
+
+	// الطبقة 1: حديد سفلي رئيسي (طولي)
+	const bottomMainBarLength = roundUpTo5cm(totalLength + 2 * mainDevLength + 2 * mainHookLength);
+	const bottomMainWeight = mainBarsCount * bottomMainBarLength * mainBarWeight;
+
+	// الطبقة 2: حديد سفلي ثانوي (عرضي)
+	const bottomSecBarLength = roundUpTo5cm(width + 2 * secDevLength + 2 * secHookLength);
+	const bottomSecWeight = secondaryBarsCount * bottomSecBarLength * secondaryBarWeight;
+
+	// الطبقة 3: حديد علوي رئيسي (مساند) - قطعتان لكل سيخ عند المساند
+	const topExtension = STAIR_REBAR_DEFAULTS.TOP_BAR_EXTENSION_RATIO * flightLength;
+	const topMainPieceLength = roundUpTo5cm(topExtension + mainDevLength + mainHookLength);
+	const topMainCount = mainBarsCount * 2; // قطعتان: عند المسند العلوي والسفلي
+	const topMainWeight = topMainCount * topMainPieceLength * mainBarWeight;
+
+	// الطبقة 4: حديد علوي ثانوي (توزيع مساند)
+	const topSecBarLength = bottomSecBarLength; // نفس طول السفلي الثانوي
+	const topSecCount = 2 * (Math.ceil((topExtension * 1000) / secondaryBarSpacing) + 1);
+	const topSecWeight = topSecCount * topSecBarLength * secondaryBarWeight;
+
+	const rebarWeight = bottomMainWeight + bottomSecWeight + topMainWeight + topSecWeight;
 
 	// مساحة الشدات
 	const formworkArea = totalArea * 1.5; // السلالم تحتاج شدة أكثر

@@ -92,7 +92,7 @@ export const REBAR_RATIOS = {
 };
 
 // أسماء الأدوار
-export const SLAB_FLOOR_NAMES = ['أرضي', 'أول', 'ثاني', 'ثالث', 'رابع', 'متكرر', 'أخير'];
+export const SLAB_FLOOR_NAMES = ['أرضي', 'ميزانين', 'أول', 'ثاني', 'ثالث', 'رابع', 'متكرر', 'أخير'];
 
 // قوالب التسليح الجاهزة للكمرات
 export interface BeamReinforcementTemplate {

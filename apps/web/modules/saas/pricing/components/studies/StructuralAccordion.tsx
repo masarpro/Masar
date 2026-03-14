@@ -24,6 +24,7 @@ import {
 	BlocksSection,
 	StairsSection,
 } from "./sections";
+import type { StructuralFloorConfig } from "../../types/structural-building-config";
 
 interface StructuralItem {
 	id: string;
@@ -42,6 +43,7 @@ interface StructuralAccordionProps {
 	organizationId: string;
 	items: StructuralItem[];
 	onUpdate: () => void;
+	buildingFloors?: StructuralFloorConfig[];
 }
 
 // الاختيارات التلقائية (تُستخدم كقيم افتراضية إذا لم تُحفظ مواصفات)
@@ -60,6 +62,7 @@ export function StructuralAccordion({
 	organizationId,
 	items,
 	onUpdate,
+	buildingFloors,
 }: StructuralAccordionProps) {
 	const t = useTranslations();
 
@@ -261,6 +264,7 @@ export function StructuralAccordion({
 								onSave={() => handleSave(section.id)}
 								onUpdate={onUpdate}
 								specs={getSpecsForSection(section.id)}
+								buildingFloors={buildingFloors}
 							/>
 						</AccordionContent>
 					</AccordionItem>

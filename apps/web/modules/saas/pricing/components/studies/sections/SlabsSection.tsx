@@ -32,6 +32,7 @@ import {
 	LayoutGrid,
 	ChevronDown,
 	ChevronLeft,
+	Copy,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMutation } from "@tanstack/react-query";
@@ -63,6 +64,7 @@ import {
 	COMMON_SPACINGS,
 	SLAB_FLOOR_NAMES,
 } from "../../../constants/slabs";
+import type { StructuralFloorConfig } from "../../../types/structural-building-config";
 import {
 	ElementHeaderRow,
 	DimensionsCard,
@@ -92,6 +94,7 @@ interface SlabsSectionProps {
 	onSave: () => void;
 	onUpdate: () => void;
 	specs?: { concreteType: string; steelGrade: string };
+	buildingFloors?: StructuralFloorConfig[];
 }
 
 type SlabTypeKey = "solid" | "flat" | "ribbed" | "hollow_core" | "banded_beam";
@@ -577,25 +580,123 @@ function BeamInputRow({
 }
 
 // ═══════════════════════════════════════════════════════════════
-// المكون الرئيسي
+// Floor info type
 // ═══════════════════════════════════════════════════════════════
 
-export function SlabsSection({
+interface FloorInfo {
+	id: string;
+	label: string;
+	icon: string;
+	slabArea: number;
+	isRepeated: boolean;
+	repeatCount: number;
+	sortOrder: number;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SlabForm - inner form component for a specific floor
+// ═══════════════════════════════════════════════════════════════
+
+interface SlabFormProps {
+	floorLabel: string;
+	floorSlabArea?: number;
+	editingItem?: SlabsSectionProps["items"][0] | null;
+	onSave: () => void;
+	onCancel: () => void;
+	studyId: string;
+	organizationId: string;
+	specs?: { concreteType: string; steelGrade: string };
+	allItems: SlabsSectionProps["items"];
+	onDataSaved: () => void;
+	onDataUpdated: () => void;
+}
+
+function SlabForm({
+	floorLabel,
+	floorSlabArea,
+	editingItem,
+	onSave,
+	onCancel,
 	studyId,
 	organizationId,
-	items,
-	onSave,
-	onUpdate,
 	specs,
-}: SlabsSectionProps) {
+	allItems,
+	onDataSaved,
+	onDataUpdated,
+}: SlabFormProps) {
 	const t = useTranslations();
-	const [isAdding, setIsAdding] = useState(false);
-	const [editingItemId, setEditingItemId] = useState<string | null>(null);
+
+	// توليد اسم السقف تلقائياً حسب الدور
+	const getSlabFloorAutoName = (floor: string): string => {
+		let baseName: string;
+		if (floor === "ميزانين") {
+			baseName = "سقف دور الميزانين";
+		} else {
+			baseName = `سقف الدور ال${floor}`;
+		}
+
+		const sameFloorCount = allItems.filter(
+			(item) =>
+				String(item.dimensions?.floor || "") === floor &&
+				item.id !== editingItem?.id,
+		).length;
+
+		if (sameFloorCount > 0) {
+			return `${baseName} ${sameFloorCount + 1}`;
+		}
+		return baseName;
+	};
+
+	const [formData, setFormData] = useState<FormData>(() => {
+		if (editingItem) {
+			return {
+				...getDefaultFormData(),
+				name: editingItem.name,
+				slabType: (editingItem.subCategory as SlabTypeKey) || "solid",
+				floor: floorLabel,
+				quantity: editingItem.quantity,
+				length: editingItem.dimensions?.length || 0,
+				width: editingItem.dimensions?.width || 0,
+				thickness: editingItem.dimensions?.thickness || 15,
+				cover: editingItem.dimensions?.cover || 0.025,
+				bottomMainDiameter: editingItem.dimensions?.bottomMainDiameter || 12,
+				bottomMainBarsPerMeter: editingItem.dimensions?.bottomMainBarsPerMeter || 7,
+				bottomSecondaryDiameter: editingItem.dimensions?.bottomSecondaryDiameter || 10,
+				bottomSecondaryBarsPerMeter: editingItem.dimensions?.bottomSecondaryBarsPerMeter || 5,
+				hasTopMesh: !!(editingItem.dimensions?.hasTopMesh),
+				topMainDiameter: editingItem.dimensions?.topMainDiameter || 10,
+				topMainBarsPerMeter: editingItem.dimensions?.topMainBarsPerMeter || 5,
+				topSecondaryDiameter: editingItem.dimensions?.topSecondaryDiameter || 8,
+				topSecondaryBarsPerMeter: editingItem.dimensions?.topSecondaryBarsPerMeter || 4,
+				ribWidth: editingItem.dimensions?.ribWidth || 15,
+				ribSpacing: editingItem.dimensions?.ribSpacing || 52,
+				blockHeight: editingItem.dimensions?.blockHeight || 20,
+				toppingThickness: editingItem.dimensions?.toppingThickness || 5,
+				ribBottomBars: editingItem.dimensions?.ribBottomBars || 2,
+				ribBarDiameter: editingItem.dimensions?.ribBarDiameter || 12,
+				ribTopBars: editingItem.dimensions?.ribTopBars || 2,
+				ribTopBarDiameter: editingItem.dimensions?.ribTopBarDiameter || 10,
+				hasRibStirrup: editingItem.dimensions?.hasRibStirrup !== undefined ? !!(editingItem.dimensions.hasRibStirrup) : true,
+				ribStirrupDiameter: editingItem.dimensions?.ribStirrupDiameter || 8,
+				ribStirrupSpacing: editingItem.dimensions?.ribStirrupSpacing || 200,
+				panelWidth: editingItem.dimensions?.panelWidth || 1.2,
+				panelThickness: editingItem.dimensions?.panelThickness || 20,
+				hasDropPanels: !!(editingItem.dimensions?.hasDropPanels),
+				dropPanelLength: editingItem.dimensions?.dropPanelLength || 2,
+				dropPanelWidth: editingItem.dimensions?.dropPanelWidth || 2,
+				dropPanelDepth: editingItem.dimensions?.dropPanelDepth || 0.1,
+				dropPanelCount: editingItem.dimensions?.dropPanelCount || 4,
+				bandedBeamWidth: editingItem.dimensions?.bandedBeamWidth || 1.2,
+				bandedBeamDepth: editingItem.dimensions?.bandedBeamDepth || 0.4,
+				bandedBeamCount: editingItem.dimensions?.bandedBeamCount || 4,
+			};
+		}
+		return { ...getDefaultFormData(), floor: floorLabel, name: getSlabFloorAutoName(floorLabel) };
+	});
+
 	const [showCuttingDetails, setShowCuttingDetails] = useState(false);
 	const [showFormwork, setShowFormwork] = useState(false);
 	const [showBeamCutting, setShowBeamCutting] = useState(false);
-
-	const [formData, setFormData] = useState<FormData>(getDefaultFormData());
 
 	// كمرات السقف الصلب
 	const [slabBeams, setSlabBeams] = useState<SlabBeamDef[]>([]);
@@ -947,9 +1048,8 @@ export function SlabsSection({
 		orpc.pricing.studies.structuralItem.create.mutationOptions({
 			onSuccess: () => {
 				toast.success(t("pricing.studies.messages.itemCreated"));
-				setIsAdding(false);
-				setEditingItemId(null);
 				resetForm();
+				onDataSaved();
 				onSave();
 			},
 			onError: () => {
@@ -962,10 +1062,9 @@ export function SlabsSection({
 		orpc.pricing.studies.structuralItem.update.mutationOptions({
 			onSuccess: () => {
 				toast.success(t("pricing.studies.messages.itemUpdated"));
-				setIsAdding(false);
-				setEditingItemId(null);
 				resetForm();
-				onUpdate();
+				onDataUpdated();
+				onSave();
 			},
 			onError: () => {
 				toast.error(t("pricing.studies.messages.itemUpdateError"));
@@ -973,20 +1072,8 @@ export function SlabsSection({
 		}),
 	);
 
-	const deleteMutation = useMutation(
-		orpc.pricing.studies.structuralItem.delete.mutationOptions({
-			onSuccess: () => {
-				toast.success(t("pricing.studies.messages.itemDeleted"));
-				onUpdate();
-			},
-			onError: () => {
-				toast.error(t("pricing.studies.messages.itemDeleteError"));
-			},
-		}),
-	);
-
 	const handleSubmit = async () => {
-		if (!formData.name || !formData.slabType || !formData.floor || !calculations) return;
+		if (!formData.name || !formData.slabType || !calculations) return;
 
 		const totalConcreteVolume =
 			calculations.concreteVolume + (beamsCalcs?.totalConcrete || 0);
@@ -1005,7 +1092,7 @@ export function SlabsSection({
 				length: formData.length,
 				width: formData.width,
 				thickness: formData.thickness,
-				floor: formData.floor,
+				floor: floorLabel,
 				cover: formData.cover,
 				// تسليح الشبكة السفلية
 				bottomMainDiameter: formData.bottomMainDiameter,
@@ -1022,6 +1109,7 @@ export function SlabsSection({
 					ribWidth: formData.ribWidth,
 					ribSpacing: formData.ribSpacing,
 					blockHeight: formData.blockHeight,
+					toppingThickness: formData.toppingThickness,
 					ribBottomBars: formData.ribBottomBars,
 					ribBarDiameter: formData.ribBarDiameter,
 					ribTopBars: formData.ribTopBars,
@@ -1067,16 +1155,1528 @@ export function SlabsSection({
 					: 0),
 		};
 
-		if (editingItemId) {
+		if (editingItem) {
 			(updateMutation as any).mutate({
 				...itemData,
-				id: editingItemId,
+				id: editingItem.id,
 				costStudyId: studyId,
 			});
 		} else {
 			(createMutation as any).mutate(itemData);
 		}
 	};
+
+	return (
+		<Card className="border-dashed border-2 border-primary/50">
+			<CardContent className="p-4 space-y-4">
+				<div className="flex items-center justify-between">
+					<h4 className="font-medium">
+						{editingItem
+							? t("pricing.studies.structural.editItem")
+							: t("pricing.studies.structural.addItem")}
+					</h4>
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={onCancel}
+					>
+						<X className="h-4 w-4" />
+					</Button>
+				</div>
+
+				{/* البيانات الأساسية */}
+				<div className="flex flex-wrap items-end gap-3">
+					<div className="flex-1">
+						<ElementHeaderRow
+							autoNamePrefix={ELEMENT_PREFIXES.slabs}
+							existingCount={allItems.length}
+							skipAutoName={true}
+							namePlaceholder="اسم السقف"
+							name={formData.name}
+							onNameChange={(name) => setFormData((prev) => ({ ...prev, name }))}
+							subTypes={Object.entries(SLAB_TYPE_INFO).map(
+								([key, info]) => ({
+									value: key,
+									label: info.nameAr,
+								}),
+							)}
+							selectedSubType={formData.slabType}
+							onSubTypeChange={(type) =>
+								setFormData({
+									...formData,
+									slabType: type as SlabTypeKey,
+								})
+							}
+							subTypeRequired={true}
+							quantity={formData.quantity}
+							onQuantityChange={(quantity) =>
+								setFormData({ ...formData, quantity })
+							}
+							showConcreteType={false}
+							showQuantity={true}
+							rightSlot={
+								<div className="space-y-1">
+									<Label className="text-xs mb-1 block">
+										الدور
+									</Label>
+									<div className="flex items-center gap-2">
+										<Badge variant="secondary">{floorLabel}</Badge>
+										{floorSlabArea != null && floorSlabArea > 0 && (
+											<Badge variant="outline" className="text-xs">
+												مساحة السقف من الإعدادات: {floorSlabArea} م²
+											</Badge>
+										)}
+									</div>
+								</div>
+							}
+						/>
+					</div>
+				</div>
+
+				{/* رسالة اختيار النوع */}
+				{!formData.slabType && (
+					<div className="text-center py-6 text-muted-foreground border-2 border-dashed rounded-lg">
+						<p className="text-sm font-medium">
+							يرجى اختيار نوع السقف للمتابعة
+						</p>
+					</div>
+				)}
+
+				{/* الأبعاد - للسقف الصلب والفلات والكمرات العريضة */}
+				{(formData.slabType === "solid" ||
+					formData.slabType === "flat" ||
+					formData.slabType === "banded_beam") && (
+					<DimensionsCard
+						title="أبعاد السقف"
+						dimensions={[
+							{
+								key: "length",
+								label: "الطول",
+								value: formData.length,
+								unit: "م",
+								step: 0.1,
+							},
+							{
+								key: "width",
+								label: "العرض",
+								value: formData.width,
+								unit: "م",
+								step: 0.1,
+							},
+							{
+								key: "thickness",
+								label: "السماكة",
+								value: formData.thickness,
+								unit: "سم",
+								step: 1,
+							},
+						]}
+						onDimensionChange={(key, value) =>
+							setFormData({ ...formData, [key]: value })
+						}
+						calculatedArea={formData.length * formData.width}
+					/>
+				)}
+
+				{/* الأبعاد - للهوردي */}
+				{formData.slabType === "ribbed" && (
+					<>
+						<DimensionsCard
+							title="أبعاد السقف"
+							dimensions={[
+								{
+									key: "length",
+									label: "الطول",
+									value: formData.length,
+									unit: "م",
+									step: 0.1,
+								},
+								{
+									key: "width",
+									label: "العرض",
+									value: formData.width,
+									unit: "م",
+									step: 0.1,
+								},
+							]}
+							onDimensionChange={(key, value) =>
+								setFormData({ ...formData, [key]: value })
+							}
+							calculatedArea={formData.length * formData.width}
+						/>
+
+						{/* إعدادات الهوردي */}
+						<div className="border rounded-lg p-4 bg-orange-50/30">
+							<h5 className="font-medium mb-3 flex items-center gap-2">
+								<Package className="h-4 w-4 text-orange-600" />
+								إعدادات سقف الهوردي
+							</h5>
+							<div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+								<div className="space-y-1.5">
+									<Label className="text-sm">عرض العصب (سم)</Label>
+									<Select
+										value={formData.ribWidth.toString()}
+										onValueChange={(v: string) =>
+											setFormData({ ...formData, ribWidth: +v })
+										}
+									>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{[10, 12, 15, 18, 20].map((w) => (
+												<SelectItem key={w} value={w.toString()}>
+													{w} سم
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</div>
+								<div className="space-y-1.5">
+									<Label className="text-sm">
+										محور الأعصاب (سم)
+									</Label>
+									<Select
+										value={formData.ribSpacing.toString()}
+										onValueChange={(v: string) =>
+											setFormData({ ...formData, ribSpacing: +v })
+										}
+									>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{[40, 45, 50, 52, 55, 60, 65].map((s) => (
+												<SelectItem key={s} value={s.toString()}>
+													{s} سم
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</div>
+								<div className="space-y-1.5">
+									<Label className="text-sm">
+										ارتفاع البلوك (سم)
+									</Label>
+									<Select
+										value={formData.blockHeight.toString()}
+										onValueChange={(v: string) =>
+											setFormData({ ...formData, blockHeight: +v })
+										}
+									>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{HORDI_BLOCK_SIZES.map((b) => (
+												<SelectItem
+													key={b.nameAr}
+													value={b.height.toString()}
+												>
+													{b.height} سم ({b.nameAr})
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</div>
+								<div className="space-y-1.5">
+									<Label className="text-sm">
+										سماكة الطبقة العلوية (سم)
+									</Label>
+									<Select
+										value={formData.toppingThickness.toString()}
+										onValueChange={(v: string) =>
+											setFormData({
+												...formData,
+												toppingThickness: +v,
+											})
+										}
+									>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{COMMON_THICKNESSES.topping.map((t) => (
+												<SelectItem key={t} value={t.toString()}>
+													{t} سم
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</div>
+								<div className="bg-orange-100/50 rounded-lg p-3 flex flex-col justify-center items-center">
+									<span className="text-xs text-muted-foreground">
+										السماكة الكلية
+									</span>
+									<span className="font-bold text-lg text-orange-700">
+										{formData.blockHeight + formData.toppingThickness}{" "}
+										سم
+									</span>
+								</div>
+							</div>
+						</div>
+					</>
+				)}
+
+				{/* الأبعاد - للهولوكور */}
+				{formData.slabType === "hollow_core" && (
+					<>
+						<DimensionsCard
+							title="أبعاد السقف"
+							dimensions={[
+								{
+									key: "length",
+									label: "الطول",
+									value: formData.length,
+									unit: "م",
+									step: 0.1,
+								},
+								{
+									key: "width",
+									label: "العرض",
+									value: formData.width,
+									unit: "م",
+									step: 0.1,
+								},
+							]}
+							onDimensionChange={(key, value) =>
+								setFormData({ ...formData, [key]: value })
+							}
+							calculatedArea={formData.length * formData.width}
+						/>
+
+						{/* إعدادات الهولوكور */}
+						<div className="border rounded-lg p-4 bg-green-50/30">
+							<h5 className="font-medium mb-3 flex items-center gap-2">
+								<LayoutGrid className="h-4 w-4 text-green-600" />
+								إعدادات سقف الهولوكور
+							</h5>
+							<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+								<div className="space-y-1.5">
+									<Label className="text-sm">عرض اللوح (م)</Label>
+									<Select
+										value={formData.panelWidth.toString()}
+										onValueChange={(v: string) =>
+											setFormData({
+												...formData,
+												panelWidth: +v,
+											})
+										}
+									>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{[0.6, 1.0, 1.2].map((w) => (
+												<SelectItem key={w} value={w.toString()}>
+													{w} م
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</div>
+								<div className="space-y-1.5">
+									<Label className="text-sm">سماكة اللوح (سم)</Label>
+									<Select
+										value={formData.panelThickness.toString()}
+										onValueChange={(v: string) =>
+											setFormData({
+												...formData,
+												panelThickness: +v,
+											})
+										}
+									>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{COMMON_THICKNESSES.hollow_core.map((t) => (
+												<SelectItem key={t} value={t.toString()}>
+													{t} سم
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</div>
+								<div className="space-y-1.5">
+									<Label className="text-sm">
+										سماكة الطبقة العلوية (سم)
+									</Label>
+									<Select
+										value={formData.toppingThickness.toString()}
+										onValueChange={(v: string) =>
+											setFormData({
+												...formData,
+												toppingThickness: +v,
+											})
+										}
+									>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{COMMON_THICKNESSES.topping.map((t) => (
+												<SelectItem key={t} value={t.toString()}>
+													{t} سم
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</div>
+								<div className="bg-green-100/50 rounded-lg p-3 flex flex-col justify-center items-center">
+									<span className="text-xs text-muted-foreground">
+										عدد الألواح
+									</span>
+									<span className="font-bold text-lg text-green-700">
+										{Math.ceil(formData.width / formData.panelWidth)}{" "}
+										لوح
+									</span>
+								</div>
+							</div>
+						</div>
+					</>
+				)}
+
+				{/* إعدادات الفلات سلاب */}
+				{formData.slabType === "flat" && (
+					<div className="border rounded-lg p-4 bg-purple-50/30">
+						<div className="flex items-center gap-2 mb-3">
+							<input
+								type="checkbox"
+								id="hasDropPanels"
+								checked={formData.hasDropPanels}
+								onChange={(
+									e: React.ChangeEvent<HTMLInputElement>,
+								) =>
+									setFormData({
+										...formData,
+										hasDropPanels: e.target.checked,
+									})
+								}
+								className="rounded border-purple-500"
+							/>
+							<Label
+								htmlFor="hasDropPanels"
+								className="text-sm font-medium text-purple-700 cursor-pointer"
+							>
+								يوجد تكثيف (Drop Panels)
+							</Label>
+						</div>
+						{formData.hasDropPanels && (
+							<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+								<div className="space-y-1.5">
+									<Label className="text-sm">طول التكثيف (م)</Label>
+									<Input
+										type="number"
+										step="0.1"
+										value={formData.dropPanelLength}
+										onChange={(
+											e: React.ChangeEvent<HTMLInputElement>,
+										) =>
+											setFormData({
+												...formData,
+												dropPanelLength: +e.target.value,
+											})
+										}
+									/>
+								</div>
+								<div className="space-y-1.5">
+									<Label className="text-sm">
+										عرض التكثيف (م)
+									</Label>
+									<Input
+										type="number"
+										step="0.1"
+										value={formData.dropPanelWidth}
+										onChange={(
+											e: React.ChangeEvent<HTMLInputElement>,
+										) =>
+											setFormData({
+												...formData,
+												dropPanelWidth: +e.target.value,
+											})
+										}
+									/>
+								</div>
+								<div className="space-y-1.5">
+									<Label className="text-sm">
+										عمق إضافي (م)
+									</Label>
+									<Input
+										type="number"
+										step="0.05"
+										value={formData.dropPanelDepth}
+										onChange={(
+											e: React.ChangeEvent<HTMLInputElement>,
+										) =>
+											setFormData({
+												...formData,
+												dropPanelDepth: +e.target.value,
+											})
+										}
+									/>
+								</div>
+								<div className="space-y-1.5">
+									<Label className="text-sm">عدد التكثيفات</Label>
+									<Input
+										type="number"
+										min={1}
+										value={formData.dropPanelCount}
+										onChange={(
+											e: React.ChangeEvent<HTMLInputElement>,
+										) =>
+											setFormData({
+												...formData,
+												dropPanelCount: +e.target.value,
+											})
+										}
+									/>
+								</div>
+							</div>
+						)}
+					</div>
+				)}
+
+				{/* إعدادات الكمرات العريضة */}
+				{formData.slabType === "banded_beam" && (
+					<div className="border rounded-lg p-4 bg-indigo-50/30">
+						<h5 className="font-medium mb-3 text-indigo-700">
+							إعدادات الكمرات العريضة
+						</h5>
+						<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+							<div className="space-y-1.5">
+								<Label className="text-sm">عرض الكمرة (م)</Label>
+								<Input
+									type="number"
+									step="0.1"
+									value={formData.bandedBeamWidth}
+									onChange={(
+										e: React.ChangeEvent<HTMLInputElement>,
+									) =>
+										setFormData({
+											...formData,
+											bandedBeamWidth: +e.target.value,
+										})
+									}
+								/>
+							</div>
+							<div className="space-y-1.5">
+								<Label className="text-sm">عمق الكمرة (م)</Label>
+								<Input
+									type="number"
+									step="0.05"
+									value={formData.bandedBeamDepth}
+									onChange={(
+										e: React.ChangeEvent<HTMLInputElement>,
+									) =>
+										setFormData({
+											...formData,
+											bandedBeamDepth: +e.target.value,
+										})
+									}
+								/>
+							</div>
+							<div className="space-y-1.5">
+								<Label className="text-sm">عدد الكمرات</Label>
+								<Input
+									type="number"
+									min={1}
+									value={formData.bandedBeamCount}
+									onChange={(
+										e: React.ChangeEvent<HTMLInputElement>,
+									) =>
+										setFormData({
+											...formData,
+											bandedBeamCount: +e.target.value,
+										})
+									}
+								/>
+							</div>
+						</div>
+					</div>
+				)}
+
+				{/* تسليح السقف الصلب */}
+				{(formData.slabType === "solid" ||
+					formData.slabType === "flat" ||
+					formData.slabType === "banded_beam") && (
+					<div className="border-t pt-4 space-y-4">
+						<h4 className="font-medium flex items-center gap-2">
+							<span className="w-2 h-2 rounded-full bg-primary" />
+							تسليح السقف
+						</h4>
+
+						{/* الشبكة السفلية */}
+						<div className="space-y-3">
+							<h5 className="text-sm font-medium text-blue-700">
+								الشبكة السفلية (الفرش)
+							</h5>
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+								<RebarMeshInput
+									title="الحديد الرئيسي"
+									direction="الاتجاه الطويل"
+									diameter={formData.bottomMainDiameter}
+									onDiameterChange={(d) =>
+										setFormData({
+											...formData,
+											bottomMainDiameter: d,
+										})
+									}
+									barsPerMeter={formData.bottomMainBarsPerMeter}
+									onBarsPerMeterChange={(n) =>
+										setFormData({
+											...formData,
+											bottomMainBarsPerMeter: n,
+										})
+									}
+									colorScheme="blue"
+									availableDiameters={REBAR_DIAMETERS.filter(
+										(d) => d >= 10 && d <= 16,
+									)}
+									availableBarsPerMeter={[5, 6, 7, 8, 9, 10]}
+								/>
+								<RebarMeshInput
+									title="الحديد الثانوي"
+									direction="الاتجاه القصير"
+									diameter={formData.bottomSecondaryDiameter}
+									onDiameterChange={(d) =>
+										setFormData({
+											...formData,
+											bottomSecondaryDiameter: d,
+										})
+									}
+									barsPerMeter={
+										formData.bottomSecondaryBarsPerMeter
+									}
+									onBarsPerMeterChange={(n) =>
+										setFormData({
+											...formData,
+											bottomSecondaryBarsPerMeter: n,
+										})
+									}
+									colorScheme="blue"
+									availableDiameters={REBAR_DIAMETERS.filter(
+										(d) => d >= 8 && d <= 14,
+									)}
+									availableBarsPerMeter={[4, 5, 6, 7, 8]}
+								/>
+							</div>
+						</div>
+
+						{/* الشبكة العلوية */}
+						<div className="space-y-3">
+							<div className="flex items-center gap-2">
+								<input
+									type="checkbox"
+									id="hasTopMesh"
+									checked={formData.hasTopMesh}
+									onChange={(
+										e: React.ChangeEvent<HTMLInputElement>,
+									) =>
+										setFormData({
+											...formData,
+											hasTopMesh: e.target.checked,
+										})
+									}
+									className="rounded border-green-500"
+								/>
+								<Label
+									htmlFor="hasTopMesh"
+									className="text-sm font-medium text-green-700 cursor-pointer"
+								>
+									الشبكة العلوية (الغطاء) - للسحب السالب
+								</Label>
+							</div>
+							{formData.hasTopMesh && (
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+									<RebarMeshInput
+										title="الحديد الرئيسي"
+										direction="الاتجاه الطويل"
+										diameter={formData.topMainDiameter}
+										onDiameterChange={(d) =>
+											setFormData({
+												...formData,
+												topMainDiameter: d,
+											})
+										}
+										barsPerMeter={formData.topMainBarsPerMeter}
+										onBarsPerMeterChange={(n) =>
+											setFormData({
+												...formData,
+												topMainBarsPerMeter: n,
+											})
+										}
+										colorScheme="green"
+										availableDiameters={REBAR_DIAMETERS.filter(
+											(d) => d >= 8 && d <= 14,
+										)}
+										availableBarsPerMeter={[4, 5, 6, 7, 8]}
+									/>
+									<RebarMeshInput
+										title="الحديد الثانوي"
+										direction="الاتجاه القصير"
+										diameter={formData.topSecondaryDiameter}
+										onDiameterChange={(d) =>
+											setFormData({
+												...formData,
+												topSecondaryDiameter: d,
+											})
+										}
+										barsPerMeter={
+											formData.topSecondaryBarsPerMeter
+										}
+										onBarsPerMeterChange={(n) =>
+											setFormData({
+												...formData,
+												topSecondaryBarsPerMeter: n,
+											})
+										}
+										colorScheme="green"
+										availableDiameters={REBAR_DIAMETERS.filter(
+											(d) => d >= 8 && d <= 12,
+										)}
+										availableBarsPerMeter={[3, 4, 5, 6]}
+									/>
+								</div>
+							)}
+						</div>
+					</div>
+				)}
+
+				{/* تسليح الهوردي */}
+				{formData.slabType === "ribbed" && (
+					<div className="border-t pt-4 space-y-4">
+						<h4 className="font-medium flex items-center gap-2">
+							<span className="w-2 h-2 rounded-full bg-orange-500" />
+							تسليح الأعصاب
+						</h4>
+
+						<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+							<div className="space-y-1.5">
+								<Label className="text-sm text-blue-700">
+									عدد أسياخ القاع
+								</Label>
+								<Select
+									value={formData.ribBottomBars.toString()}
+									onValueChange={(v: string) =>
+										setFormData({
+											...formData,
+											ribBottomBars: +v,
+										})
+									}
+								>
+									<SelectTrigger className="border-blue-200">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										{[2, 3, 4].map((n) => (
+											<SelectItem key={n} value={n.toString()}>
+												{n} أسياخ
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+							<div className="space-y-1.5">
+								<Label className="text-sm text-blue-700">
+									قطر سيخ القاع
+								</Label>
+								<Select
+									value={formData.ribBarDiameter.toString()}
+									onValueChange={(v: string) =>
+										setFormData({
+											...formData,
+											ribBarDiameter: +v,
+										})
+									}
+								>
+									<SelectTrigger className="border-blue-200">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										{REBAR_DIAMETERS.filter(
+											(d) => d >= 10 && d <= 16,
+										).map((d) => (
+											<SelectItem key={d} value={d.toString()}>
+												{d} مم
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+							<div className="space-y-1.5">
+								<Label className="text-sm text-green-700">
+									عدد أسياخ الرأس
+								</Label>
+								<Select
+									value={formData.ribTopBars.toString()}
+									onValueChange={(v: string) =>
+										setFormData({
+											...formData,
+											ribTopBars: +v,
+										})
+									}
+								>
+									<SelectTrigger className="border-green-200">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										{[1, 2, 3].map((n) => (
+											<SelectItem key={n} value={n.toString()}>
+												{n} أسياخ
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+							<div className="space-y-1.5">
+								<Label className="text-sm text-green-700">
+									قطر سيخ الرأس
+								</Label>
+								<Select
+									value={formData.ribTopBarDiameter.toString()}
+									onValueChange={(v: string) =>
+										setFormData({
+											...formData,
+											ribTopBarDiameter: +v,
+										})
+									}
+								>
+									<SelectTrigger className="border-green-200">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										{REBAR_DIAMETERS.filter(
+											(d) => d >= 8 && d <= 12,
+										).map((d) => (
+											<SelectItem key={d} value={d.toString()}>
+												{d} مم
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+						</div>
+
+						{/* كانات العصب */}
+						<div className="space-y-3">
+							<div className="flex items-center gap-2">
+								<input
+									type="checkbox"
+									id="hasRibStirrup"
+									checked={formData.hasRibStirrup}
+									onChange={(
+										e: React.ChangeEvent<HTMLInputElement>,
+									) =>
+										setFormData({
+											...formData,
+											hasRibStirrup: e.target.checked,
+										})
+									}
+									className="rounded border-gray-500"
+								/>
+								<Label
+									htmlFor="hasRibStirrup"
+									className="text-sm font-medium cursor-pointer"
+								>
+									كانات العصب
+								</Label>
+							</div>
+							{formData.hasRibStirrup && (
+								<div className="grid grid-cols-2 gap-4">
+									<div className="space-y-1.5">
+										<Label className="text-sm">قطر الكانة</Label>
+										<Select
+											value={formData.ribStirrupDiameter.toString()}
+											onValueChange={(v: string) =>
+												setFormData({
+													...formData,
+													ribStirrupDiameter: +v,
+												})
+											}
+										>
+											<SelectTrigger>
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												{REBAR_DIAMETERS.filter(
+													(d) => d >= 6 && d <= 10,
+												).map((d) => (
+													<SelectItem
+														key={d}
+														value={d.toString()}
+													>
+														{d} مم
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</div>
+									<div className="space-y-1.5">
+										<Label className="text-sm">
+											تباعد الكانات (مم)
+										</Label>
+										<Select
+											value={formData.ribStirrupSpacing.toString()}
+											onValueChange={(v: string) =>
+												setFormData({
+													...formData,
+													ribStirrupSpacing: +v,
+												})
+											}
+										>
+											<SelectTrigger>
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												{[150, 200, 250, 300].map((s) => (
+													<SelectItem
+														key={s}
+														value={s.toString()}
+													>
+														{s} مم
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</div>
+								</div>
+							)}
+						</div>
+
+						{/* تسليح الطبقة العلوية */}
+						<div className="space-y-3 border-t pt-3">
+							<h5 className="text-sm font-medium text-blue-700">
+								تسليح الطبقة العلوية
+							</h5>
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+								<RebarMeshInput
+									title="الشبكة العلوية"
+									direction="الاتجاه الطويل"
+									diameter={formData.bottomSecondaryDiameter}
+									onDiameterChange={(d) =>
+										setFormData({
+											...formData,
+											bottomSecondaryDiameter: d,
+										})
+									}
+									barsPerMeter={
+										formData.bottomSecondaryBarsPerMeter
+									}
+									onBarsPerMeterChange={(n) =>
+										setFormData({
+											...formData,
+											bottomSecondaryBarsPerMeter: n,
+										})
+									}
+									colorScheme="blue"
+									availableDiameters={REBAR_DIAMETERS.filter(
+										(d) => d >= 6 && d <= 10,
+									)}
+									availableBarsPerMeter={[4, 5, 6, 7]}
+								/>
+							</div>
+						</div>
+					</div>
+				)}
+
+				{/* ═══════════════════════════════════════════════════ */}
+				{/* كمرات السقف الصلب                                */}
+				{/* ═══════════════════════════════════════════════════ */}
+				{formData.slabType === "solid" && (
+					<div className="border-t pt-4 space-y-4">
+						<div className="flex items-center justify-between">
+							<h4 className="font-medium flex items-center gap-2">
+								<span className="text-lg">📏</span>
+								كمرات السقف الصلب
+								{slabBeams.length > 0 && (
+									<Badge
+										variant="secondary"
+										className="text-xs"
+									>
+										{slabBeams.length} كمرة
+									</Badge>
+								)}
+							</h4>
+						</div>
+
+						<p className="text-xs text-muted-foreground">
+							أضف الكمرات الحاملة للسقف الصلب — يتم حساب خرسانة
+							وحديد الكمرات منفصلاً ثم إضافتها لإجمالي السقف
+						</p>
+
+						{/* قائمة الكمرات */}
+						{slabBeams.length > 0 && (
+							<div className="space-y-2">
+								{slabBeams.map((beam, idx) => (
+									<BeamInputRow
+										key={beam.id}
+										beam={beam}
+										index={idx}
+										isExpanded={expandedBeamIds.includes(
+											beam.id,
+										)}
+										onToggle={() => toggleBeam(beam.id)}
+										onChange={(updated) =>
+											updateBeam(beam.id, updated)
+										}
+										onRemove={() => removeBeam(beam.id)}
+										concreteType={
+											specs?.concreteType || "C30"
+										}
+									/>
+								))}
+							</div>
+						)}
+
+						{/* زر إضافة كمرة */}
+						<Button
+							variant="outline"
+							className="w-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-2 border-dashed border-indigo-400/40 hover:bg-indigo-500/20 hover:border-indigo-400/60 transition-all"
+							onClick={addBeam}
+						>
+							<Plus className="h-4 w-4 ml-2" />
+							<span className="font-semibold">إضافة كمرة</span>
+						</Button>
+
+						{/* ملخص الكمرات */}
+						{beamsCalcs && beamsCalcs.totalConcrete > 0 && (
+							<div className="space-y-3">
+								<div className="bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/50 rounded-lg p-3">
+									<div className="flex items-center gap-2 mb-2">
+										<span className="text-sm">📏</span>
+										<h5 className="font-semibold text-sm">
+											إجمالي كمرات السقف
+										</h5>
+									</div>
+									<div className="grid grid-cols-3 gap-4 text-sm">
+										<div>
+											<span className="text-muted-foreground">
+												خرسانة:
+											</span>
+											<span className="font-bold mr-1 text-blue-600">
+												{formatNumber(
+													beamsCalcs.totalConcrete,
+												)}{" "}
+												م³
+											</span>
+										</div>
+										<div>
+											<span className="text-muted-foreground">
+												حديد (إجمالي):
+											</span>
+											<span className="font-bold mr-1 text-orange-600">
+												{formatNumber(
+													beamsCalcs.totalGrossWeight,
+												)}{" "}
+												كجم
+											</span>
+										</div>
+										<div>
+											<span className="text-muted-foreground">
+												هالك:
+											</span>
+											<span className="font-bold mr-1 text-red-500">
+												{formatNumber(
+													beamsCalcs.wastePercentage,
+													1,
+												)}
+												%
+											</span>
+										</div>
+									</div>
+								</div>
+
+								{/* تفاصيل القص للكمرات */}
+								<div>
+									<Button
+										variant="ghost"
+										size="sm"
+										className="gap-1.5 text-xs"
+										onClick={() =>
+											setShowBeamCutting(!showBeamCutting)
+										}
+									>
+										{showBeamCutting ? (
+											<ChevronDown className="h-3 w-3" />
+										) : (
+											<ChevronLeft className="h-3 w-3" />
+										)}
+										تفاصيل قص حديد الكمرات
+									</Button>
+
+									{showBeamCutting && (
+										<div className="border rounded-lg overflow-hidden mt-2">
+											<Table>
+												<TableHeader>
+													<TableRow>
+														<TableHead className="text-right text-xs">
+															الوصف
+														</TableHead>
+														<TableHead className="text-right text-xs">
+															∅ القطر
+														</TableHead>
+														<TableHead className="text-right text-xs">
+															طول السيخ
+														</TableHead>
+														<TableHead className="text-right text-xs">
+															العدد
+														</TableHead>
+														<TableHead className="text-right text-xs">
+															أسياخ مطلوبة
+														</TableHead>
+														<TableHead className="text-right text-xs">
+															الهالك
+														</TableHead>
+														<TableHead className="text-right text-xs">
+															الوزن
+														</TableHead>
+													</TableRow>
+												</TableHeader>
+												<TableBody>
+													{beamsCalcs.allCuttingDetails.map(
+														(d, i) => (
+															<TableRow key={i}>
+																<TableCell className="text-xs">
+																	{d.description}
+																</TableCell>
+																<TableCell className="text-xs">
+																	{d.diameter} مم
+																</TableCell>
+																<TableCell className="text-xs">
+																	{d.barLength} م
+																</TableCell>
+																<TableCell className="text-xs">
+																	{d.barCount}
+																</TableCell>
+																<TableCell className="text-xs">
+																	{d.stocksNeeded} ×{" "}
+																	{d.stockLength}م
+																</TableCell>
+																<TableCell className="text-xs">
+																	{d.wastePercentage}%
+																</TableCell>
+																<TableCell className="text-xs">
+																	{formatNumber(d.weight)}{" "}
+																	كجم
+																</TableCell>
+															</TableRow>
+														),
+													)}
+												</TableBody>
+											</Table>
+
+											{/* الأسياخ المطلوبة من المصنع */}
+											<div className="bg-muted/30 p-3 border-t">
+												<h6 className="text-xs font-semibold mb-2">
+													أسياخ المصنع المطلوبة للكمرات:
+												</h6>
+												<div className="flex flex-wrap gap-3">
+													{beamsCalcs.stocksNeeded.map(
+														(s, i) => (
+															<Badge
+																key={i}
+																variant="outline"
+																className="text-xs"
+															>
+																∅{s.diameter}مم: {s.count}{" "}
+																سيخ × {s.length}م
+															</Badge>
+														),
+													)}
+												</div>
+											</div>
+										</div>
+									)}
+								</div>
+							</div>
+						)}
+					</div>
+				)}
+
+				{/* نتائج الحساب */}
+				{calculations && (
+					<div className="bg-muted/50 rounded-lg p-4 space-y-4">
+						<div className="flex items-center gap-2 mb-3">
+							<Calculator className="h-5 w-5 text-primary" />
+							<h4 className="font-medium">
+								{t("pricing.studies.calculations.results")}
+							</h4>
+						</div>
+
+						{/* البلوكات - للهوردي */}
+						{calculations.blocksCount &&
+							calculations.blocksCount > 0 && (
+								<div className="bg-orange-100/50 rounded p-3">
+									<div className="flex items-center gap-2 text-orange-700">
+										<Package className="h-4 w-4" />
+										<span className="font-medium">
+											عدد البلوكات:{" "}
+											{formatNumber(calculations.blocksCount, 0)}{" "}
+											بلوكة
+										</span>
+									</div>
+								</div>
+							)}
+
+						{/* خيار عرض الشدات */}
+						<div className="flex items-center justify-between border rounded-lg p-3 bg-background">
+							<div className="flex items-center gap-2">
+								<input
+									type="checkbox"
+									id="showFormwork"
+									checked={showFormwork}
+									onChange={(
+										e: React.ChangeEvent<HTMLInputElement>,
+									) => setShowFormwork(e.target.checked)}
+									className="rounded"
+								/>
+								<Label
+									htmlFor="showFormwork"
+									className="text-sm font-medium cursor-pointer"
+								>
+									إظهار حساب الشدات
+								</Label>
+							</div>
+							{showFormwork && calculations.formworkArea > 0 && (
+								<div className="flex items-center gap-2 text-blue-600">
+									<LayoutGrid className="h-4 w-4" />
+									<span className="font-bold">
+										{formatNumber(calculations.formworkArea)}{" "}
+										{t("pricing.studies.units.m2")}
+									</span>
+								</div>
+							)}
+						</div>
+
+						{/* إجمالي السقف (البلاطة فقط) */}
+						<CalculationResultsPanel
+							concreteVolume={calculations.concreteVolume}
+							totals={calculations.totals}
+							cuttingDetails={calculations.rebarDetails.map(
+								(detail) => ({
+									description: detail.description,
+									diameter: detail.diameter,
+									barLength: detail.barLength,
+									barCount: detail.barCount,
+									stocksNeeded: detail.stocksNeeded,
+									weight: detail.weight,
+									grossWeight: detail.weight,
+									wastePercentage: detail.wastePercentage,
+								}),
+							)}
+							showCuttingDetails={showCuttingDetails}
+							onToggleCuttingDetails={setShowCuttingDetails}
+						/>
+
+						{/* الإجمالي المجمع (سقف + كمرات) */}
+						{combinedTotals &&
+							beamsCalcs &&
+							beamsCalcs.totalConcrete > 0 && (
+								<div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+									<h5 className="font-semibold text-sm mb-3 flex items-center gap-2">
+										<Calculator className="h-4 w-4 text-primary" />
+										الإجمالي الكلي (البلاطة + الكمرات)
+									</h5>
+									<div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+										<div>
+											<span className="text-muted-foreground text-xs">
+												خرسانة البلاطة:
+											</span>
+											<p className="font-bold">
+												{formatNumber(
+													combinedTotals.slabConcrete,
+												)}{" "}
+												م³
+											</p>
+										</div>
+										<div>
+											<span className="text-muted-foreground text-xs">
+												خرسانة الكمرات:
+											</span>
+											<p className="font-bold text-indigo-600">
+												{formatNumber(
+													combinedTotals.beamConcrete,
+												)}{" "}
+												م³
+											</p>
+										</div>
+										<div>
+											<span className="text-muted-foreground text-xs">
+												حديد البلاطة:
+											</span>
+											<p className="font-bold">
+												{formatNumber(
+													combinedTotals.slabSteel,
+												)}{" "}
+												كجم
+											</p>
+										</div>
+										<div>
+											<span className="text-muted-foreground text-xs">
+												حديد الكمرات:
+											</span>
+											<p className="font-bold text-indigo-600">
+												{formatNumber(
+													combinedTotals.beamSteel,
+												)}{" "}
+												كجم
+											</p>
+										</div>
+									</div>
+									<div className="border-t mt-3 pt-3 grid grid-cols-2 gap-4">
+										<div>
+											<span className="text-muted-foreground text-xs">
+												إجمالي الخرسانة:
+											</span>
+											<p className="font-bold text-lg">
+												{formatNumber(
+													combinedTotals.totalConcrete,
+												)}{" "}
+												م³
+											</p>
+										</div>
+										<div>
+											<span className="text-muted-foreground text-xs">
+												إجمالي الحديد:
+											</span>
+											<p className="font-bold text-lg">
+												{formatNumber(
+													combinedTotals.totalSteel,
+												)}{" "}
+												كجم
+											</p>
+										</div>
+									</div>
+								</div>
+							)}
+					</div>
+				)}
+
+				{/* أزرار الحفظ والإلغاء */}
+				<div className="flex justify-end gap-2">
+					<Button
+						variant="outline"
+						onClick={onCancel}
+					>
+						{t("pricing.studies.form.cancel")}
+					</Button>
+					<Button
+						onClick={handleSubmit}
+						disabled={
+							createMutation.isPending ||
+							updateMutation.isPending ||
+							!formData.name ||
+							!formData.slabType ||
+							!calculations
+						}
+					>
+						<Save className="h-4 w-4 ml-2" />
+						{editingItem
+							? t("pricing.studies.structural.updateItem")
+							: t("pricing.studies.structural.saveItem")}
+					</Button>
+				</div>
+			</CardContent>
+		</Card>
+	);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CopyFromFloorButton
+// ═══════════════════════════════════════════════════════════════
+
+interface CopyFromFloorButtonProps {
+	currentFloor: string;
+	floors: FloorInfo[];
+	getFloorItems: (label: string, isFirst: boolean) => SlabsSectionProps["items"];
+	studyId: string;
+	organizationId: string;
+	specs?: { concreteType: string; steelGrade: string };
+	onCopied: () => void;
+}
+
+function CopyFromFloorButton({
+	currentFloor,
+	floors,
+	getFloorItems,
+	studyId,
+	organizationId,
+	specs,
+	onCopied,
+}: CopyFromFloorButtonProps) {
+	const [selectedSource, setSelectedSource] = useState<string>("");
+	const [isCopying, setIsCopying] = useState(false);
+	const createMutation = useMutation(
+		orpc.pricing.studies.structuralItem.create.mutationOptions({
+			onSuccess: () => {},
+			onError: () => toast.error("خطأ في النسخ"),
+		}),
+	);
+
+	const sourcesWithItems = floors.filter(
+		(f) =>
+			f.label !== currentFloor &&
+			getFloorItems(f.label, floors[0]?.label === f.label).length > 0,
+	);
+
+	if (sourcesWithItems.length === 0) return null;
+
+	const handleCopy = async () => {
+		if (!selectedSource) return;
+		setIsCopying(true);
+		const sourceItems = getFloorItems(
+			selectedSource,
+			floors[0]?.label === selectedSource,
+		);
+		for (const item of sourceItems) {
+			const newName =
+				item.name.replace(selectedSource, currentFloor) ||
+				`سقف الدور ال${currentFloor}`;
+			await createMutation.mutateAsync({
+				costStudyId: studyId,
+				organizationId,
+				category: "slabs",
+				subCategory: item.subCategory || "solid",
+				name: newName,
+				quantity: item.quantity,
+				unit: "m2",
+				dimensions: { ...item.dimensions, floor: currentFloor },
+				concreteVolume: item.concreteVolume,
+				concreteType: specs?.concreteType || "C30",
+				steelWeight: item.steelWeight,
+				steelRatio:
+					item.concreteVolume > 0
+						? item.steelWeight / item.concreteVolume
+						: 0,
+				materialCost: 0,
+				laborCost: 0,
+				totalCost: item.totalCost,
+			} as any);
+		}
+		setIsCopying(false);
+		setSelectedSource("");
+		toast.success(
+			`تم نسخ ${sourceItems.length} عنصر من ${selectedSource} إلى ${currentFloor}`,
+		);
+		onCopied();
+	};
+
+	return (
+		<div className="flex items-center gap-2">
+			<Select value={selectedSource} onValueChange={setSelectedSource}>
+				<SelectTrigger className="w-48 h-8 text-xs">
+					<SelectValue placeholder="نسخ من دور آخر..." />
+				</SelectTrigger>
+				<SelectContent>
+					{sourcesWithItems.map((f) => (
+						<SelectItem key={f.label} value={f.label}>
+							{f.icon} {f.label} (
+							{
+								getFloorItems(
+									f.label,
+									floors[0]?.label === f.label,
+								).length
+							}{" "}
+							عنصر)
+						</SelectItem>
+					))}
+				</SelectContent>
+			</Select>
+			{selectedSource && (
+				<Button
+					size="sm"
+					variant="outline"
+					onClick={handleCopy}
+					disabled={isCopying}
+					className="h-8 text-xs"
+				>
+					<Copy className="h-3 w-3 ml-1" />
+					نسخ
+				</Button>
+			)}
+		</div>
+	);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// المكون الرئيسي
+// ═══════════════════════════════════════════════════════════════
+
+export function SlabsSection({
+	studyId,
+	organizationId,
+	items,
+	onSave,
+	onUpdate,
+	specs,
+	buildingFloors,
+}: SlabsSectionProps) {
+	const t = useTranslations();
+
+	// ═══ Floor definitions ═══
+	const floors: FloorInfo[] = useMemo(() => {
+		if (buildingFloors) {
+			return buildingFloors
+				.filter((f) => f.enabled)
+				.sort((a, b) => a.sortOrder - b.sortOrder)
+				.map((f) => ({
+					id: f.id,
+					label: f.label,
+					icon: f.icon,
+					slabArea: f.slabArea,
+					isRepeated: f.isRepeated,
+					repeatCount: f.repeatCount,
+					sortOrder: f.sortOrder,
+				}));
+		}
+		return SLAB_FLOOR_NAMES.map((name, i) => ({
+			id: name,
+			label: name,
+			icon: "⬛",
+			slabArea: 0,
+			isRepeated: name === "متكرر",
+			repeatCount: 1,
+			sortOrder: i,
+		}));
+	}, [buildingFloors]);
+
+	// ═══ Per-floor state ═══
+	const [expandedFloors, setExpandedFloors] = useState<string[]>([
+		floors[0]?.label || "",
+	]);
+	const [addingForFloor, setAddingForFloor] = useState<string | null>(null);
+	const [editingItemId, setEditingItemId] = useState<string | null>(null);
+
+	// ═══ Item grouping ═══
+	const getFloorItems = (floorLabel: string, isFirst: boolean) => {
+		const floorItems = items.filter(
+			(i) => String(i.dimensions?.floor) === floorLabel,
+		);
+		if (isFirst) {
+			const allLabels = floors.map((f) => f.label);
+			const unassigned = items.filter(
+				(i) =>
+					!i.dimensions?.floor ||
+					!allLabels.includes(String(i.dimensions.floor)),
+			);
+			return [...floorItems, ...unassigned];
+		}
+		return floorItems;
+	};
+
+	// ═══ Delete mutation ═══
+	const deleteMutation = useMutation(
+		orpc.pricing.studies.structuralItem.delete.mutationOptions({
+			onSuccess: () => {
+				toast.success(t("pricing.studies.messages.itemDeleted"));
+				onUpdate();
+			},
+			onError: () => {
+				toast.error(t("pricing.studies.messages.itemDeleteError"));
+			},
+		}),
+	);
 
 	const handleDelete = (id: string) => {
 		if (confirm(t("pricing.studies.messages.confirmDelete"))) {
@@ -1088,1471 +2688,299 @@ export function SlabsSection({
 		}
 	};
 
-	const handleEdit = (item: (typeof items)[0]) => {
-		setEditingItemId(item.id);
-		setIsAdding(true);
-		setFormData({
-			...getDefaultFormData(),
-			name: item.name,
-			slabType: (item.subCategory as SlabTypeKey) || "solid",
-			floor: String(item.dimensions?.floor || ""),
-			quantity: item.quantity,
-			length: item.dimensions?.length || 0,
-			width: item.dimensions?.width || 0,
-			thickness: item.dimensions?.thickness || 15,
-			ribWidth: item.dimensions?.ribWidth || 15,
-			ribSpacing: item.dimensions?.ribSpacing || 52,
-			blockHeight: item.dimensions?.blockHeight || 20,
-		});
-		// إعادة تحميل الكمرات لو موجودة
-		setSlabBeams([]);
-		setExpandedBeamIds([]);
-	};
-
 	return (
-		<div className="space-y-4">
-			{/* جدول العناصر الموجودة */}
-			{items.length > 0 && (
-				<div className="border rounded-lg overflow-hidden">
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead className="text-right">
-									{t("pricing.studies.structural.itemName")}
-								</TableHead>
-								<TableHead className="text-right">النوع</TableHead>
-								<TableHead className="text-right">
-									{t("pricing.studies.structural.quantity")}
-								</TableHead>
-								<TableHead className="text-right">
-									{t("pricing.studies.area")}
-								</TableHead>
-								<TableHead className="text-right">
-									{t("pricing.studies.structural.concreteVolume")}
-								</TableHead>
-								<TableHead className="text-right">
-									{t("pricing.studies.structural.steelWeight")}
-								</TableHead>
-								<TableHead className="w-12"></TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{items.map((item) => (
-								<TableRow key={item.id}>
-									<TableCell className="font-medium">
-										{item.name}
-										{item.dimensions?.beamsCount > 0 && (
-											<Badge
-												variant="secondary"
-												className="text-xs mr-2"
-											>
-												+ {item.dimensions.beamsCount} كمرة
-											</Badge>
-										)}
-									</TableCell>
-									<TableCell>
-										<Badge variant="outline">
-											{SLAB_TYPE_INFO[item.subCategory as SlabTypeKey]
-												?.nameAr || item.subCategory}
-										</Badge>
-									</TableCell>
-									<TableCell>{item.quantity}</TableCell>
-									<TableCell>
-										{formatNumber(
-											(item.dimensions?.length || 0) *
-												(item.dimensions?.width || 0),
-										)}{" "}
-										{t("pricing.studies.units.m2")}
-									</TableCell>
-									<TableCell>
-										{formatNumber(item.concreteVolume)}{" "}
-										{t("pricing.studies.units.m3")}
-									</TableCell>
-									<TableCell>
-										{formatNumber(item.steelWeight)}{" "}
-										{t("pricing.studies.units.kg")}
-									</TableCell>
-									<TableCell>
-										<div className="flex items-center gap-1">
-											<Button
-												variant="ghost"
-												size="icon"
-												onClick={() => handleEdit(item)}
-												title={t("common.edit")}
-											>
-												<Pencil className="h-4 w-4" />
-											</Button>
-											<Button
-												variant="ghost"
-												size="icon"
-												onClick={() => handleDelete(item.id)}
-												disabled={deleteMutation.isPending}
-											>
-												<Trash2 className="h-4 w-4 text-destructive" />
-											</Button>
-										</div>
-									</TableCell>
-								</TableRow>
-							))}
-						</TableBody>
-					</Table>
-				</div>
-			)}
+		<div className="space-y-3">
+			{floors.map((floor, floorIndex) => {
+				const floorItems = getFloorItems(floor.label, floorIndex === 0);
+				const isExpanded = expandedFloors.includes(floor.label);
+				const hasItems = floorItems.length > 0;
+				const isAddingHere = addingForFloor === floor.label;
+				const editingItemInFloor = editingItemId
+					? floorItems.find((i) => i.id === editingItemId)
+					: null;
 
-			{/* نموذج الإضافة */}
-			{isAdding ? (
-				<Card className="border-dashed border-2 border-primary/50">
-					<CardContent className="p-4 space-y-4">
-						<div className="flex items-center justify-between">
-							<h4 className="font-medium">
-								{editingItemId
-									? t("pricing.studies.structural.editItem")
-									: t("pricing.studies.structural.addItem")}
-							</h4>
-							<Button
-								variant="ghost"
-								size="icon"
-								onClick={() => {
-									setIsAdding(false);
-									setEditingItemId(null);
-									resetForm();
-								}}
-							>
-								<X className="h-4 w-4" />
-							</Button>
-						</div>
+				const displayConcrete = floor.isRepeated
+					? floorItems.reduce((s, i) => s + i.concreteVolume, 0) *
+						(floor.repeatCount || 1)
+					: floorItems.reduce((s, i) => s + i.concreteVolume, 0);
+				const displaySteel = floor.isRepeated
+					? floorItems.reduce((s, i) => s + i.steelWeight, 0) *
+						(floor.repeatCount || 1)
+					: floorItems.reduce((s, i) => s + i.steelWeight, 0);
 
-						{/* البيانات الأساسية */}
-						<div className="flex flex-wrap items-end gap-3">
-							<div className="flex-1">
-								<ElementHeaderRow
-									autoNamePrefix={ELEMENT_PREFIXES.slabs}
-									existingCount={items.length}
-									name={formData.name}
-									onNameChange={(name) => setFormData({ ...formData, name })}
-									subTypes={Object.entries(SLAB_TYPE_INFO).map(
-										([key, info]) => ({
-											value: key,
-											label: info.nameAr,
-										}),
-									)}
-									selectedSubType={formData.slabType}
-									onSubTypeChange={(type) =>
-										setFormData({
-											...formData,
-											slabType: type as SlabTypeKey,
-										})
-									}
-									subTypeRequired={true}
-									quantity={formData.quantity}
-									onQuantityChange={(quantity) =>
-										setFormData({ ...formData, quantity })
-									}
-									showConcreteType={false}
-									showQuantity={true}
-									rightSlot={
-										<div className="space-y-1">
-											<Label className="text-xs mb-1 block">
-												الدور <span className="text-destructive">*</span>
-											</Label>
-											<Select
-												value={formData.floor || undefined}
-												onValueChange={(v: string) =>
-													setFormData({ ...formData, floor: v })
-												}
-											>
-												<SelectTrigger
-													className={
-														!formData.floor
-															? "border-destructive ring-destructive/30 ring-2"
-															: ""
-													}
-												>
-													<SelectValue placeholder="⚠ اختر الدور" />
-												</SelectTrigger>
-												<SelectContent>
-													{SLAB_FLOOR_NAMES.map((floor) => (
-														<SelectItem key={floor} value={floor}>
-															{floor}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</div>
-									}
-								/>
-							</div>
-						</div>
-
-						{/* رسالة اختيار النوع والدور */}
-						{(!formData.slabType || !formData.floor) && (
-							<div className="text-center py-6 text-muted-foreground border-2 border-dashed rounded-lg">
-								<p className="text-sm font-medium">
-									{!formData.slabType && !formData.floor
-										? "يرجى اختيار نوع السقف والدور للمتابعة"
-										: !formData.slabType
-											? "يرجى اختيار نوع السقف للمتابعة"
-											: "يرجى اختيار الدور للمتابعة"}
-								</p>
-							</div>
-						)}
-
-						{/* الأبعاد - للسقف الصلب والفلات والكمرات العريضة */}
-						{formData.floor && (formData.slabType === "solid" ||
-							formData.slabType === "flat" ||
-							formData.slabType === "banded_beam") && (
-							<DimensionsCard
-								title="أبعاد السقف"
-								dimensions={[
-									{
-										key: "length",
-										label: "الطول",
-										value: formData.length,
-										unit: "م",
-										step: 0.1,
-									},
-									{
-										key: "width",
-										label: "العرض",
-										value: formData.width,
-										unit: "م",
-										step: 0.1,
-									},
-									{
-										key: "thickness",
-										label: "السماكة",
-										value: formData.thickness,
-										unit: "سم",
-										step: 1,
-									},
-								]}
-								onDimensionChange={(key, value) =>
-									setFormData({ ...formData, [key]: value })
-								}
-								calculatedArea={formData.length * formData.width}
-							/>
-						)}
-
-						{/* الأبعاد - للهوردي */}
-						{formData.floor && formData.slabType === "ribbed" && (
-							<>
-								<DimensionsCard
-									title="أبعاد السقف"
-									dimensions={[
-										{
-											key: "length",
-											label: "الطول",
-											value: formData.length,
-											unit: "م",
-											step: 0.1,
-										},
-										{
-											key: "width",
-											label: "العرض",
-											value: formData.width,
-											unit: "م",
-											step: 0.1,
-										},
-									]}
-									onDimensionChange={(key, value) =>
-										setFormData({ ...formData, [key]: value })
-									}
-									calculatedArea={formData.length * formData.width}
-								/>
-
-								{/* إعدادات الهوردي */}
-								<div className="border rounded-lg p-4 bg-orange-50/30">
-									<h5 className="font-medium mb-3 flex items-center gap-2">
-										<Package className="h-4 w-4 text-orange-600" />
-										إعدادات سقف الهوردي
-									</h5>
-									<div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-										<div className="space-y-1.5">
-											<Label className="text-sm">عرض العصب (سم)</Label>
-											<Select
-												value={formData.ribWidth.toString()}
-												onValueChange={(v: string) =>
-													setFormData({ ...formData, ribWidth: +v })
-												}
-											>
-												<SelectTrigger>
-													<SelectValue />
-												</SelectTrigger>
-												<SelectContent>
-													{[10, 12, 15, 18, 20].map((w) => (
-														<SelectItem key={w} value={w.toString()}>
-															{w} سم
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</div>
-										<div className="space-y-1.5">
-											<Label className="text-sm">
-												محور الأعصاب (سم)
-											</Label>
-											<Select
-												value={formData.ribSpacing.toString()}
-												onValueChange={(v: string) =>
-													setFormData({ ...formData, ribSpacing: +v })
-												}
-											>
-												<SelectTrigger>
-													<SelectValue />
-												</SelectTrigger>
-												<SelectContent>
-													{[40, 45, 50, 52, 55, 60, 65].map((s) => (
-														<SelectItem key={s} value={s.toString()}>
-															{s} سم
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</div>
-										<div className="space-y-1.5">
-											<Label className="text-sm">
-												ارتفاع البلوك (سم)
-											</Label>
-											<Select
-												value={formData.blockHeight.toString()}
-												onValueChange={(v: string) =>
-													setFormData({ ...formData, blockHeight: +v })
-												}
-											>
-												<SelectTrigger>
-													<SelectValue />
-												</SelectTrigger>
-												<SelectContent>
-													{HORDI_BLOCK_SIZES.map((b) => (
-														<SelectItem
-															key={b.nameAr}
-															value={b.height.toString()}
-														>
-															{b.height} سم ({b.nameAr})
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</div>
-										<div className="space-y-1.5">
-											<Label className="text-sm">
-												سماكة الطبقة العلوية (سم)
-											</Label>
-											<Select
-												value={formData.toppingThickness.toString()}
-												onValueChange={(v: string) =>
-													setFormData({
-														...formData,
-														toppingThickness: +v,
-													})
-												}
-											>
-												<SelectTrigger>
-													<SelectValue />
-												</SelectTrigger>
-												<SelectContent>
-													{COMMON_THICKNESSES.topping.map((t) => (
-														<SelectItem key={t} value={t.toString()}>
-															{t} سم
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</div>
-										<div className="bg-orange-100/50 rounded-lg p-3 flex flex-col justify-center items-center">
-											<span className="text-xs text-muted-foreground">
-												السماكة الكلية
-											</span>
-											<span className="font-bold text-lg text-orange-700">
-												{formData.blockHeight + formData.toppingThickness}{" "}
-												سم
-											</span>
-										</div>
-									</div>
-								</div>
-							</>
-						)}
-
-						{/* الأبعاد - للهولوكور */}
-						{formData.floor && formData.slabType === "hollow_core" && (
-							<>
-								<DimensionsCard
-									title="أبعاد السقف"
-									dimensions={[
-										{
-											key: "length",
-											label: "الطول",
-											value: formData.length,
-											unit: "م",
-											step: 0.1,
-										},
-										{
-											key: "width",
-											label: "العرض",
-											value: formData.width,
-											unit: "م",
-											step: 0.1,
-										},
-									]}
-									onDimensionChange={(key, value) =>
-										setFormData({ ...formData, [key]: value })
-									}
-									calculatedArea={formData.length * formData.width}
-								/>
-
-								{/* إعدادات الهولوكور */}
-								<div className="border rounded-lg p-4 bg-green-50/30">
-									<h5 className="font-medium mb-3 flex items-center gap-2">
-										<LayoutGrid className="h-4 w-4 text-green-600" />
-										إعدادات سقف الهولوكور
-									</h5>
-									<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-										<div className="space-y-1.5">
-											<Label className="text-sm">عرض اللوح (م)</Label>
-											<Select
-												value={formData.panelWidth.toString()}
-												onValueChange={(v: string) =>
-													setFormData({
-														...formData,
-														panelWidth: +v,
-													})
-												}
-											>
-												<SelectTrigger>
-													<SelectValue />
-												</SelectTrigger>
-												<SelectContent>
-													{[0.6, 1.0, 1.2].map((w) => (
-														<SelectItem key={w} value={w.toString()}>
-															{w} م
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</div>
-										<div className="space-y-1.5">
-											<Label className="text-sm">سماكة اللوح (سم)</Label>
-											<Select
-												value={formData.panelThickness.toString()}
-												onValueChange={(v: string) =>
-													setFormData({
-														...formData,
-														panelThickness: +v,
-													})
-												}
-											>
-												<SelectTrigger>
-													<SelectValue />
-												</SelectTrigger>
-												<SelectContent>
-													{COMMON_THICKNESSES.hollow_core.map((t) => (
-														<SelectItem key={t} value={t.toString()}>
-															{t} سم
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</div>
-										<div className="space-y-1.5">
-											<Label className="text-sm">
-												سماكة الطبقة العلوية (سم)
-											</Label>
-											<Select
-												value={formData.toppingThickness.toString()}
-												onValueChange={(v: string) =>
-													setFormData({
-														...formData,
-														toppingThickness: +v,
-													})
-												}
-											>
-												<SelectTrigger>
-													<SelectValue />
-												</SelectTrigger>
-												<SelectContent>
-													{COMMON_THICKNESSES.topping.map((t) => (
-														<SelectItem key={t} value={t.toString()}>
-															{t} سم
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</div>
-										<div className="bg-green-100/50 rounded-lg p-3 flex flex-col justify-center items-center">
-											<span className="text-xs text-muted-foreground">
-												عدد الألواح
-											</span>
-											<span className="font-bold text-lg text-green-700">
-												{Math.ceil(formData.width / formData.panelWidth)}{" "}
-												لوح
-											</span>
-										</div>
-									</div>
-								</div>
-							</>
-						)}
-
-						{/* إعدادات الفلات سلاب */}
-						{formData.floor && formData.slabType === "flat" && (
-							<div className="border rounded-lg p-4 bg-purple-50/30">
-								<div className="flex items-center gap-2 mb-3">
-									<input
-										type="checkbox"
-										id="hasDropPanels"
-										checked={formData.hasDropPanels}
-										onChange={(
-											e: React.ChangeEvent<HTMLInputElement>,
-										) =>
-											setFormData({
-												...formData,
-												hasDropPanels: e.target.checked,
-											})
-										}
-										className="rounded border-purple-500"
-									/>
-									<Label
-										htmlFor="hasDropPanels"
-										className="text-sm font-medium text-purple-700 cursor-pointer"
+				return (
+					<div
+						key={floor.id}
+						className={`border rounded-lg overflow-hidden transition-all ${
+							hasItems
+								? "border-blue-200/50 bg-blue-50/20 dark:bg-blue-950/10"
+								: "border-border"
+						} ${
+							floor.isRepeated && hasItems
+								? "border-purple-300/50 bg-purple-50/20 dark:bg-purple-950/10"
+								: ""
+						}`}
+					>
+						{/* Floor header button */}
+						<button
+							type="button"
+							className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors"
+							onClick={() =>
+								setExpandedFloors((prev) =>
+									prev.includes(floor.label)
+										? prev.filter((f) => f !== floor.label)
+										: [...prev, floor.label],
+								)
+							}
+						>
+							<div className="flex items-center gap-3">
+								{isExpanded ? (
+									<ChevronDown className="h-4 w-4 text-muted-foreground" />
+								) : (
+									<ChevronLeft className="h-4 w-4 text-muted-foreground" />
+								)}
+								<span className="text-lg">{floor.icon}</span>
+								<span className="font-semibold">{floor.label}</span>
+								{floor.isRepeated && floor.repeatCount > 1 && (
+									<Badge
+										variant="default"
+										className="bg-purple-600 text-xs"
 									>
-										يوجد تكثيف (Drop Panels)
-									</Label>
-								</div>
-								{formData.hasDropPanels && (
-									<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-										<div className="space-y-1.5">
-											<Label className="text-sm">طول التكثيف (م)</Label>
-											<Input
-												type="number"
-												step="0.1"
-												value={formData.dropPanelLength}
-												onChange={(
-													e: React.ChangeEvent<HTMLInputElement>,
-												) =>
-													setFormData({
-														...formData,
-														dropPanelLength: +e.target.value,
-													})
-												}
-											/>
-										</div>
-										<div className="space-y-1.5">
-											<Label className="text-sm">
-												عرض التكثيف (م)
-											</Label>
-											<Input
-												type="number"
-												step="0.1"
-												value={formData.dropPanelWidth}
-												onChange={(
-													e: React.ChangeEvent<HTMLInputElement>,
-												) =>
-													setFormData({
-														...formData,
-														dropPanelWidth: +e.target.value,
-													})
-												}
-											/>
-										</div>
-										<div className="space-y-1.5">
-											<Label className="text-sm">
-												عمق إضافي (م)
-											</Label>
-											<Input
-												type="number"
-												step="0.05"
-												value={formData.dropPanelDepth}
-												onChange={(
-													e: React.ChangeEvent<HTMLInputElement>,
-												) =>
-													setFormData({
-														...formData,
-														dropPanelDepth: +e.target.value,
-													})
-												}
-											/>
-										</div>
-										<div className="space-y-1.5">
-											<Label className="text-sm">عدد التكثيفات</Label>
-											<Input
-												type="number"
-												min={1}
-												value={formData.dropPanelCount}
-												onChange={(
-													e: React.ChangeEvent<HTMLInputElement>,
-												) =>
-													setFormData({
-														...formData,
-														dropPanelCount: +e.target.value,
-													})
-												}
-											/>
-										</div>
-									</div>
+										{floor.repeatCount} أدوار
+									</Badge>
+								)}
+								{hasItems && (
+									<Badge variant="secondary" className="text-xs">
+										{floorItems.length} سقف
+									</Badge>
 								)}
 							</div>
-						)}
-
-						{/* إعدادات الكمرات العريضة */}
-						{formData.floor && formData.slabType === "banded_beam" && (
-							<div className="border rounded-lg p-4 bg-indigo-50/30">
-								<h5 className="font-medium mb-3 text-indigo-700">
-									إعدادات الكمرات العريضة
-								</h5>
-								<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-									<div className="space-y-1.5">
-										<Label className="text-sm">عرض الكمرة (م)</Label>
-										<Input
-											type="number"
-											step="0.1"
-											value={formData.bandedBeamWidth}
-											onChange={(
-												e: React.ChangeEvent<HTMLInputElement>,
-											) =>
-												setFormData({
-													...formData,
-													bandedBeamWidth: +e.target.value,
-												})
-											}
-										/>
-									</div>
-									<div className="space-y-1.5">
-										<Label className="text-sm">عمق الكمرة (م)</Label>
-										<Input
-											type="number"
-											step="0.05"
-											value={formData.bandedBeamDepth}
-											onChange={(
-												e: React.ChangeEvent<HTMLInputElement>,
-											) =>
-												setFormData({
-													...formData,
-													bandedBeamDepth: +e.target.value,
-												})
-											}
-										/>
-									</div>
-									<div className="space-y-1.5">
-										<Label className="text-sm">عدد الكمرات</Label>
-										<Input
-											type="number"
-											min={1}
-											value={formData.bandedBeamCount}
-											onChange={(
-												e: React.ChangeEvent<HTMLInputElement>,
-											) =>
-												setFormData({
-													...formData,
-													bandedBeamCount: +e.target.value,
-												})
-											}
-										/>
-									</div>
-								</div>
-							</div>
-						)}
-
-						{/* تسليح السقف الصلب */}
-						{formData.floor && (formData.slabType === "solid" ||
-							formData.slabType === "flat" ||
-							formData.slabType === "banded_beam") && (
-							<div className="border-t pt-4 space-y-4">
-								<h4 className="font-medium flex items-center gap-2">
-									<span className="w-2 h-2 rounded-full bg-primary" />
-									تسليح السقف
-								</h4>
-
-								{/* الشبكة السفلية */}
-								<div className="space-y-3">
-									<h5 className="text-sm font-medium text-blue-700">
-										الشبكة السفلية (الفرش)
-									</h5>
-									<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-										<RebarMeshInput
-											title="الحديد الرئيسي"
-											direction="الاتجاه الطويل"
-											diameter={formData.bottomMainDiameter}
-											onDiameterChange={(d) =>
-												setFormData({
-													...formData,
-													bottomMainDiameter: d,
-												})
-											}
-											barsPerMeter={formData.bottomMainBarsPerMeter}
-											onBarsPerMeterChange={(n) =>
-												setFormData({
-													...formData,
-													bottomMainBarsPerMeter: n,
-												})
-											}
-											colorScheme="blue"
-											availableDiameters={REBAR_DIAMETERS.filter(
-												(d) => d >= 10 && d <= 16,
-											)}
-											availableBarsPerMeter={[5, 6, 7, 8, 9, 10]}
-										/>
-										<RebarMeshInput
-											title="الحديد الثانوي"
-											direction="الاتجاه القصير"
-											diameter={formData.bottomSecondaryDiameter}
-											onDiameterChange={(d) =>
-												setFormData({
-													...formData,
-													bottomSecondaryDiameter: d,
-												})
-											}
-											barsPerMeter={
-												formData.bottomSecondaryBarsPerMeter
-											}
-											onBarsPerMeterChange={(n) =>
-												setFormData({
-													...formData,
-													bottomSecondaryBarsPerMeter: n,
-												})
-											}
-											colorScheme="blue"
-											availableDiameters={REBAR_DIAMETERS.filter(
-												(d) => d >= 8 && d <= 14,
-											)}
-											availableBarsPerMeter={[4, 5, 6, 7, 8]}
-										/>
-									</div>
-								</div>
-
-								{/* الشبكة العلوية */}
-								<div className="space-y-3">
-									<div className="flex items-center gap-2">
-										<input
-											type="checkbox"
-											id="hasTopMesh"
-											checked={formData.hasTopMesh}
-											onChange={(
-												e: React.ChangeEvent<HTMLInputElement>,
-											) =>
-												setFormData({
-													...formData,
-													hasTopMesh: e.target.checked,
-												})
-											}
-											className="rounded border-green-500"
-										/>
-										<Label
-											htmlFor="hasTopMesh"
-											className="text-sm font-medium text-green-700 cursor-pointer"
-										>
-											الشبكة العلوية (الغطاء) - للسحب السالب
-										</Label>
-									</div>
-									{formData.hasTopMesh && (
-										<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-											<RebarMeshInput
-												title="الحديد الرئيسي"
-												direction="الاتجاه الطويل"
-												diameter={formData.topMainDiameter}
-												onDiameterChange={(d) =>
-													setFormData({
-														...formData,
-														topMainDiameter: d,
-													})
-												}
-												barsPerMeter={formData.topMainBarsPerMeter}
-												onBarsPerMeterChange={(n) =>
-													setFormData({
-														...formData,
-														topMainBarsPerMeter: n,
-													})
-												}
-												colorScheme="green"
-												availableDiameters={REBAR_DIAMETERS.filter(
-													(d) => d >= 8 && d <= 14,
-												)}
-												availableBarsPerMeter={[4, 5, 6, 7, 8]}
-											/>
-											<RebarMeshInput
-												title="الحديد الثانوي"
-												direction="الاتجاه القصير"
-												diameter={formData.topSecondaryDiameter}
-												onDiameterChange={(d) =>
-													setFormData({
-														...formData,
-														topSecondaryDiameter: d,
-													})
-												}
-												barsPerMeter={
-													formData.topSecondaryBarsPerMeter
-												}
-												onBarsPerMeterChange={(n) =>
-													setFormData({
-														...formData,
-														topSecondaryBarsPerMeter: n,
-													})
-												}
-												colorScheme="green"
-												availableDiameters={REBAR_DIAMETERS.filter(
-													(d) => d >= 8 && d <= 12,
-												)}
-												availableBarsPerMeter={[3, 4, 5, 6]}
-											/>
-										</div>
-									)}
-								</div>
-							</div>
-						)}
-
-						{/* تسليح الهوردي */}
-						{formData.floor && formData.slabType === "ribbed" && (
-							<div className="border-t pt-4 space-y-4">
-								<h4 className="font-medium flex items-center gap-2">
-									<span className="w-2 h-2 rounded-full bg-orange-500" />
-									تسليح الأعصاب
-								</h4>
-
-								<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-									<div className="space-y-1.5">
-										<Label className="text-sm text-blue-700">
-											عدد أسياخ القاع
-										</Label>
-										<Select
-											value={formData.ribBottomBars.toString()}
-											onValueChange={(v: string) =>
-												setFormData({
-													...formData,
-													ribBottomBars: +v,
-												})
-											}
-										>
-											<SelectTrigger className="border-blue-200">
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												{[2, 3, 4].map((n) => (
-													<SelectItem key={n} value={n.toString()}>
-														{n} أسياخ
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</div>
-									<div className="space-y-1.5">
-										<Label className="text-sm text-blue-700">
-											قطر سيخ القاع
-										</Label>
-										<Select
-											value={formData.ribBarDiameter.toString()}
-											onValueChange={(v: string) =>
-												setFormData({
-													...formData,
-													ribBarDiameter: +v,
-												})
-											}
-										>
-											<SelectTrigger className="border-blue-200">
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												{REBAR_DIAMETERS.filter(
-													(d) => d >= 10 && d <= 16,
-												).map((d) => (
-													<SelectItem key={d} value={d.toString()}>
-														{d} مم
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</div>
-									<div className="space-y-1.5">
-										<Label className="text-sm text-green-700">
-											عدد أسياخ الرأس
-										</Label>
-										<Select
-											value={formData.ribTopBars.toString()}
-											onValueChange={(v: string) =>
-												setFormData({
-													...formData,
-													ribTopBars: +v,
-												})
-											}
-										>
-											<SelectTrigger className="border-green-200">
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												{[1, 2, 3].map((n) => (
-													<SelectItem key={n} value={n.toString()}>
-														{n} أسياخ
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</div>
-									<div className="space-y-1.5">
-										<Label className="text-sm text-green-700">
-											قطر سيخ الرأس
-										</Label>
-										<Select
-											value={formData.ribTopBarDiameter.toString()}
-											onValueChange={(v: string) =>
-												setFormData({
-													...formData,
-													ribTopBarDiameter: +v,
-												})
-											}
-										>
-											<SelectTrigger className="border-green-200">
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												{REBAR_DIAMETERS.filter(
-													(d) => d >= 8 && d <= 12,
-												).map((d) => (
-													<SelectItem key={d} value={d.toString()}>
-														{d} مم
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</div>
-								</div>
-
-								{/* كانات العصب */}
-								<div className="space-y-3">
-									<div className="flex items-center gap-2">
-										<input
-											type="checkbox"
-											id="hasRibStirrup"
-											checked={formData.hasRibStirrup}
-											onChange={(
-												e: React.ChangeEvent<HTMLInputElement>,
-											) =>
-												setFormData({
-													...formData,
-													hasRibStirrup: e.target.checked,
-												})
-											}
-											className="rounded border-gray-500"
-										/>
-										<Label
-											htmlFor="hasRibStirrup"
-											className="text-sm font-medium cursor-pointer"
-										>
-											كانات العصب
-										</Label>
-									</div>
-									{formData.hasRibStirrup && (
-										<div className="grid grid-cols-2 gap-4">
-											<div className="space-y-1.5">
-												<Label className="text-sm">قطر الكانة</Label>
-												<Select
-													value={formData.ribStirrupDiameter.toString()}
-													onValueChange={(v: string) =>
-														setFormData({
-															...formData,
-															ribStirrupDiameter: +v,
-														})
-													}
-												>
-													<SelectTrigger>
-														<SelectValue />
-													</SelectTrigger>
-													<SelectContent>
-														{REBAR_DIAMETERS.filter(
-															(d) => d >= 6 && d <= 10,
-														).map((d) => (
-															<SelectItem
-																key={d}
-																value={d.toString()}
-															>
-																{d} مم
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
-											</div>
-											<div className="space-y-1.5">
-												<Label className="text-sm">
-													تباعد الكانات (مم)
-												</Label>
-												<Select
-													value={formData.ribStirrupSpacing.toString()}
-													onValueChange={(v: string) =>
-														setFormData({
-															...formData,
-															ribStirrupSpacing: +v,
-														})
-													}
-												>
-													<SelectTrigger>
-														<SelectValue />
-													</SelectTrigger>
-													<SelectContent>
-														{[150, 200, 250, 300].map((s) => (
-															<SelectItem
-																key={s}
-																value={s.toString()}
-															>
-																{s} مم
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
-											</div>
-										</div>
-									)}
-								</div>
-
-								{/* تسليح الطبقة العلوية */}
-								<div className="space-y-3 border-t pt-3">
-									<h5 className="text-sm font-medium text-blue-700">
-										تسليح الطبقة العلوية
-									</h5>
-									<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-										<RebarMeshInput
-											title="الشبكة العلوية"
-											direction="الاتجاه الطويل"
-											diameter={formData.bottomSecondaryDiameter}
-											onDiameterChange={(d) =>
-												setFormData({
-													...formData,
-													bottomSecondaryDiameter: d,
-												})
-											}
-											barsPerMeter={
-												formData.bottomSecondaryBarsPerMeter
-											}
-											onBarsPerMeterChange={(n) =>
-												setFormData({
-													...formData,
-													bottomSecondaryBarsPerMeter: n,
-												})
-											}
-											colorScheme="blue"
-											availableDiameters={REBAR_DIAMETERS.filter(
-												(d) => d >= 6 && d <= 10,
-											)}
-											availableBarsPerMeter={[4, 5, 6, 7]}
-										/>
-									</div>
-								</div>
-							</div>
-						)}
-
-						{/* ═══════════════════════════════════════════════════ */}
-						{/* كمرات السقف الصلب                                */}
-						{/* ═══════════════════════════════════════════════════ */}
-						{formData.floor && formData.slabType === "solid" && (
-							<div className="border-t pt-4 space-y-4">
-								<div className="flex items-center justify-between">
-									<h4 className="font-medium flex items-center gap-2">
-										<span className="text-lg">📏</span>
-										كمرات السقف الصلب
-										{slabBeams.length > 0 && (
-											<Badge
-												variant="secondary"
-												className="text-xs"
-											>
-												{slabBeams.length} كمرة
-											</Badge>
-										)}
-									</h4>
-								</div>
-
-								<p className="text-xs text-muted-foreground">
-									أضف الكمرات الحاملة للسقف الصلب — يتم حساب خرسانة
-									وحديد الكمرات منفصلاً ثم إضافتها لإجمالي السقف
-								</p>
-
-								{/* قائمة الكمرات */}
-								{slabBeams.length > 0 && (
-									<div className="space-y-2">
-										{slabBeams.map((beam, idx) => (
-											<BeamInputRow
-												key={beam.id}
-												beam={beam}
-												index={idx}
-												isExpanded={expandedBeamIds.includes(
-													beam.id,
-												)}
-												onToggle={() => toggleBeam(beam.id)}
-												onChange={(updated) =>
-													updateBeam(beam.id, updated)
-												}
-												onRemove={() => removeBeam(beam.id)}
-												concreteType={
-													specs?.concreteType || "C30"
-												}
-											/>
-										))}
-									</div>
-								)}
-
-								{/* زر إضافة كمرة */}
-								<Button
-									variant="outline"
-									className="w-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-2 border-dashed border-indigo-400/40 hover:bg-indigo-500/20 hover:border-indigo-400/60 transition-all"
-									onClick={addBeam}
-								>
-									<Plus className="h-4 w-4 ml-2" />
-									<span className="font-semibold">إضافة كمرة</span>
-								</Button>
-
-								{/* ملخص الكمرات */}
-								{beamsCalcs && beamsCalcs.totalConcrete > 0 && (
-									<div className="space-y-3">
-										<div className="bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/50 rounded-lg p-3">
-											<div className="flex items-center gap-2 mb-2">
-												<span className="text-sm">📏</span>
-												<h5 className="font-semibold text-sm">
-													إجمالي كمرات السقف
-												</h5>
-											</div>
-											<div className="grid grid-cols-3 gap-4 text-sm">
-												<div>
-													<span className="text-muted-foreground">
-														خرسانة:
-													</span>
-													<span className="font-bold mr-1 text-blue-600">
-														{formatNumber(
-															beamsCalcs.totalConcrete,
-														)}{" "}
-														م³
-													</span>
-												</div>
-												<div>
-													<span className="text-muted-foreground">
-														حديد (إجمالي):
-													</span>
-													<span className="font-bold mr-1 text-orange-600">
-														{formatNumber(
-															beamsCalcs.totalGrossWeight,
-														)}{" "}
-														كجم
-													</span>
-												</div>
-												<div>
-													<span className="text-muted-foreground">
-														هالك:
-													</span>
-													<span className="font-bold mr-1 text-red-500">
-														{formatNumber(
-															beamsCalcs.wastePercentage,
-															1,
-														)}
-														%
-													</span>
-												</div>
-											</div>
-										</div>
-
-										{/* تفاصيل القص للكمرات */}
-										<div>
-											<Button
-												variant="ghost"
-												size="sm"
-												className="gap-1.5 text-xs"
-												onClick={() =>
-													setShowBeamCutting(!showBeamCutting)
-												}
-											>
-												{showBeamCutting ? (
-													<ChevronDown className="h-3 w-3" />
-												) : (
-													<ChevronLeft className="h-3 w-3" />
-												)}
-												تفاصيل قص حديد الكمرات
-											</Button>
-
-											{showBeamCutting && (
-												<div className="border rounded-lg overflow-hidden mt-2">
-													<Table>
-														<TableHeader>
-															<TableRow>
-																<TableHead className="text-right text-xs">
-																	الوصف
-																</TableHead>
-																<TableHead className="text-right text-xs">
-																	∅ القطر
-																</TableHead>
-																<TableHead className="text-right text-xs">
-																	طول السيخ
-																</TableHead>
-																<TableHead className="text-right text-xs">
-																	العدد
-																</TableHead>
-																<TableHead className="text-right text-xs">
-																	أسياخ مطلوبة
-																</TableHead>
-																<TableHead className="text-right text-xs">
-																	الهالك
-																</TableHead>
-																<TableHead className="text-right text-xs">
-																	الوزن
-																</TableHead>
-															</TableRow>
-														</TableHeader>
-														<TableBody>
-															{beamsCalcs.allCuttingDetails.map(
-																(d, i) => (
-																	<TableRow key={i}>
-																		<TableCell className="text-xs">
-																			{d.description}
-																		</TableCell>
-																		<TableCell className="text-xs">
-																			{d.diameter} مم
-																		</TableCell>
-																		<TableCell className="text-xs">
-																			{d.barLength} م
-																		</TableCell>
-																		<TableCell className="text-xs">
-																			{d.barCount}
-																		</TableCell>
-																		<TableCell className="text-xs">
-																			{d.stocksNeeded} ×{" "}
-																			{d.stockLength}م
-																		</TableCell>
-																		<TableCell className="text-xs">
-																			{d.wastePercentage}%
-																		</TableCell>
-																		<TableCell className="text-xs">
-																			{formatNumber(d.weight)}{" "}
-																			كجم
-																		</TableCell>
-																	</TableRow>
-																),
-															)}
-														</TableBody>
-													</Table>
-
-													{/* الأسياخ المطلوبة من المصنع */}
-													<div className="bg-muted/30 p-3 border-t">
-														<h6 className="text-xs font-semibold mb-2">
-															أسياخ المصنع المطلوبة للكمرات:
-														</h6>
-														<div className="flex flex-wrap gap-3">
-															{beamsCalcs.stocksNeeded.map(
-																(s, i) => (
-																	<Badge
-																		key={i}
-																		variant="outline"
-																		className="text-xs"
-																	>
-																		∅{s.diameter}مم: {s.count}{" "}
-																		سيخ × {s.length}م
-																	</Badge>
-																),
-															)}
-														</div>
-													</div>
-												</div>
-											)}
-										</div>
-									</div>
-								)}
-							</div>
-						)}
-
-						{/* نتائج الحساب */}
-						{formData.floor && calculations && (
-							<div className="bg-muted/50 rounded-lg p-4 space-y-4">
-								<div className="flex items-center gap-2 mb-3">
-									<Calculator className="h-5 w-5 text-primary" />
-									<h4 className="font-medium">
-										{t("pricing.studies.calculations.results")}
-									</h4>
-								</div>
-
-								{/* البلوكات - للهوردي */}
-								{calculations.blocksCount &&
-									calculations.blocksCount > 0 && (
-										<div className="bg-orange-100/50 rounded p-3">
-											<div className="flex items-center gap-2 text-orange-700">
-												<Package className="h-4 w-4" />
-												<span className="font-medium">
-													عدد البلوكات:{" "}
-													{formatNumber(calculations.blocksCount, 0)}{" "}
-													بلوكة
-												</span>
-											</div>
-										</div>
-									)}
-
-								{/* خيار عرض الشدات */}
-								<div className="flex items-center justify-between border rounded-lg p-3 bg-background">
-									<div className="flex items-center gap-2">
-										<input
-											type="checkbox"
-											id="showFormwork"
-											checked={showFormwork}
-											onChange={(
-												e: React.ChangeEvent<HTMLInputElement>,
-											) => setShowFormwork(e.target.checked)}
-											className="rounded"
-										/>
-										<Label
-											htmlFor="showFormwork"
-											className="text-sm font-medium cursor-pointer"
-										>
-											إظهار حساب الشدات
-										</Label>
-									</div>
-									{showFormwork && calculations.formworkArea > 0 && (
-										<div className="flex items-center gap-2 text-blue-600">
-											<LayoutGrid className="h-4 w-4" />
-											<span className="font-bold">
-												{formatNumber(calculations.formworkArea)}{" "}
-												{t("pricing.studies.units.m2")}
+							{hasItems && (
+								<div className="hidden sm:flex items-center gap-3 text-xs text-muted-foreground">
+									{displayConcrete > 0 && (
+										<span>
+											خرسانة:{" "}
+											<span className="font-semibold text-blue-600">
+												{formatNumber(displayConcrete)} م³
 											</span>
-										</div>
+										</span>
+									)}
+									{displaySteel > 0 && (
+										<span>
+											حديد:{" "}
+											<span className="font-semibold text-orange-600">
+												{formatNumber(displaySteel)} كجم
+											</span>
+										</span>
 									)}
 								</div>
+							)}
+						</button>
 
-								{/* إجمالي السقف (البلاطة فقط) */}
-								<CalculationResultsPanel
-									concreteVolume={calculations.concreteVolume}
-									totals={calculations.totals}
-									cuttingDetails={calculations.rebarDetails.map(
-										(detail) => ({
-											description: detail.description,
-											diameter: detail.diameter,
-											barLength: detail.barLength,
-											barCount: detail.barCount,
-											stocksNeeded: detail.stocksNeeded,
-											weight: detail.weight,
-											grossWeight: detail.weight,
-											wastePercentage: detail.wastePercentage,
-										}),
-									)}
-									showCuttingDetails={showCuttingDetails}
-									onToggleCuttingDetails={setShowCuttingDetails}
-								/>
+						{/* Floor content */}
+						{isExpanded && (
+							<div className="px-4 pb-4 space-y-3">
+								{/* Items table for this floor */}
+								{floorItems.length > 0 && (
+									<div className="border rounded-lg overflow-hidden">
+										<Table>
+											<TableHeader>
+												<TableRow>
+													<TableHead className="text-right">
+														{t(
+															"pricing.studies.structural.itemName",
+														)}
+													</TableHead>
+													<TableHead className="text-right">
+														النوع
+													</TableHead>
+													<TableHead className="text-right">
+														{t(
+															"pricing.studies.structural.quantity",
+														)}
+													</TableHead>
+													<TableHead className="text-right">
+														{t("pricing.studies.area")}
+													</TableHead>
+													<TableHead className="text-right">
+														{t(
+															"pricing.studies.structural.concreteVolume",
+														)}
+													</TableHead>
+													<TableHead className="text-right">
+														{t(
+															"pricing.studies.structural.steelWeight",
+														)}
+													</TableHead>
+													<TableHead className="w-12"></TableHead>
+												</TableRow>
+											</TableHeader>
+											<TableBody>
+												{floorItems.map((item) => (
+													<TableRow key={item.id}>
+														<TableCell className="font-medium">
+															{item.name}
+															{item.dimensions?.beamsCount >
+																0 && (
+																<Badge
+																	variant="secondary"
+																	className="text-xs mr-2"
+																>
+																	+{" "}
+																	{
+																		item.dimensions
+																			.beamsCount
+																	}{" "}
+																	كمرة
+																</Badge>
+															)}
+														</TableCell>
+														<TableCell>
+															<Badge variant="outline">
+																{SLAB_TYPE_INFO[
+																	item.subCategory as SlabTypeKey
+																]?.nameAr ||
+																	item.subCategory}
+															</Badge>
+														</TableCell>
+														<TableCell>
+															{item.quantity}
+														</TableCell>
+														<TableCell>
+															{formatNumber(
+																(item.dimensions?.length ||
+																	0) *
+																	(item.dimensions
+																		?.width || 0),
+															)}{" "}
+															{t(
+																"pricing.studies.units.m2",
+															)}
+														</TableCell>
+														<TableCell>
+															{formatNumber(
+																item.concreteVolume,
+															)}{" "}
+															{t(
+																"pricing.studies.units.m3",
+															)}
+														</TableCell>
+														<TableCell>
+															{formatNumber(
+																item.steelWeight,
+															)}{" "}
+															{t(
+																"pricing.studies.units.kg",
+															)}
+														</TableCell>
+														<TableCell>
+															<div className="flex items-center gap-1">
+																<Button
+																	variant="ghost"
+																	size="icon"
+																	onClick={() => {
+																		setEditingItemId(
+																			item.id,
+																		);
+																		setAddingForFloor(
+																			floor.label,
+																		);
+																	}}
+																	title={t(
+																		"common.edit",
+																	)}
+																>
+																	<Pencil className="h-4 w-4" />
+																</Button>
+																<Button
+																	variant="ghost"
+																	size="icon"
+																	onClick={() =>
+																		handleDelete(
+																			item.id,
+																		)
+																	}
+																	disabled={
+																		deleteMutation.isPending
+																	}
+																>
+																	<Trash2 className="h-4 w-4 text-destructive" />
+																</Button>
+															</div>
+														</TableCell>
+													</TableRow>
+												))}
+											</TableBody>
+										</Table>
+									</div>
+								)}
 
-								{/* الإجمالي المجمع (سقف + كمرات) */}
-								{combinedTotals &&
-									beamsCalcs &&
-									beamsCalcs.totalConcrete > 0 && (
-										<div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-											<h5 className="font-semibold text-sm mb-3 flex items-center gap-2">
-												<Calculator className="h-4 w-4 text-primary" />
-												الإجمالي الكلي (البلاطة + الكمرات)
-											</h5>
-											<div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-												<div>
-													<span className="text-muted-foreground text-xs">
-														خرسانة البلاطة:
-													</span>
-													<p className="font-bold">
-														{formatNumber(
-															combinedTotals.slabConcrete,
-														)}{" "}
-														م³
-													</p>
-												</div>
-												<div>
-													<span className="text-muted-foreground text-xs">
-														خرسانة الكمرات:
-													</span>
-													<p className="font-bold text-indigo-600">
-														{formatNumber(
-															combinedTotals.beamConcrete,
-														)}{" "}
-														م³
-													</p>
-												</div>
-												<div>
-													<span className="text-muted-foreground text-xs">
-														حديد البلاطة:
-													</span>
-													<p className="font-bold">
-														{formatNumber(
-															combinedTotals.slabSteel,
-														)}{" "}
-														كجم
-													</p>
-												</div>
-												<div>
-													<span className="text-muted-foreground text-xs">
-														حديد الكمرات:
-													</span>
-													<p className="font-bold text-indigo-600">
-														{formatNumber(
-															combinedTotals.beamSteel,
-														)}{" "}
-														كجم
-													</p>
-												</div>
-											</div>
-											<div className="border-t mt-3 pt-3 grid grid-cols-2 gap-4">
-												<div>
-													<span className="text-muted-foreground text-xs">
-														إجمالي الخرسانة:
-													</span>
-													<p className="font-bold text-lg">
-														{formatNumber(
-															combinedTotals.totalConcrete,
-														)}{" "}
-														م³
-													</p>
-												</div>
-												<div>
-													<span className="text-muted-foreground text-xs">
-														إجمالي الحديد:
-													</span>
-													<p className="font-bold text-lg">
-														{formatNumber(
-															combinedTotals.totalSteel,
-														)}{" "}
-														كجم
-													</p>
-												</div>
-											</div>
-										</div>
+								{/* SlabForm or Add button */}
+								{isAddingHere || editingItemInFloor ? (
+									<SlabForm
+										floorLabel={floor.label}
+										floorSlabArea={floor.slabArea}
+										editingItem={editingItemInFloor}
+										onSave={() => {
+											setAddingForFloor(null);
+											setEditingItemId(null);
+										}}
+										onCancel={() => {
+											setAddingForFloor(null);
+											setEditingItemId(null);
+										}}
+										studyId={studyId}
+										organizationId={organizationId}
+										specs={specs}
+										allItems={items}
+										onDataSaved={onSave}
+										onDataUpdated={onUpdate}
+									/>
+								) : (
+									<Button
+										variant="outline"
+										className="w-full bg-primary/10 text-primary border-2 border-dashed border-primary/40 hover:bg-primary/20 hover:border-primary/60 transition-all"
+										onClick={() =>
+											setAddingForFloor(floor.label)
+										}
+									>
+										<Plus className="h-5 w-5 ml-2" />
+										<span className="font-semibold">
+											{t(
+												"pricing.studies.structural.addItem",
+											)}
+										</span>
+									</Button>
+								)}
+
+								{/* Copy from floor button */}
+								{!isAddingHere &&
+									!editingItemInFloor &&
+									floors.filter(
+										(f) =>
+											f.label !== floor.label &&
+											getFloorItems(
+												f.label,
+												floors[0]?.label === f.label,
+											).length > 0,
+									).length > 0 && (
+										<CopyFromFloorButton
+											currentFloor={floor.label}
+											floors={floors}
+											getFloorItems={getFloorItems}
+											studyId={studyId}
+											organizationId={organizationId}
+											specs={specs}
+											onCopied={onSave}
+										/>
 									)}
 							</div>
 						)}
+					</div>
+				);
+			})}
 
-						{/* أزرار الحفظ والإلغاء */}
-						<div className="flex justify-end gap-2">
-							<Button
-								variant="outline"
-								onClick={() => {
-									setIsAdding(false);
-									setEditingItemId(null);
-									resetForm();
-								}}
-							>
-								{t("pricing.studies.form.cancel")}
-							</Button>
-							<Button
-								onClick={handleSubmit}
-								disabled={
-									createMutation.isPending ||
-									updateMutation.isPending ||
-									!formData.name ||
-									!formData.slabType ||
-									!formData.floor ||
-									!calculations
-								}
-							>
-								<Save className="h-4 w-4 ml-2" />
-								{editingItemId
-									? t("pricing.studies.structural.updateItem")
-									: t("pricing.studies.structural.saveItem")}
-							</Button>
-						</div>
-					</CardContent>
-				</Card>
-			) : (
-				<Button
-					variant="outline"
-					className="w-full bg-primary/10 text-primary border-2 border-dashed border-primary/40 hover:bg-primary/20 hover:border-primary/60 transition-all"
-					onClick={() => setIsAdding(true)}
-				>
-					<Plus className="h-5 w-5 ml-2" />
-					<span className="font-semibold">
-						{t("pricing.studies.structural.addItem")}
-					</span>
-				</Button>
-			)}
-
-			{/* ملخص العناصر */}
+			{/* Grand total summary */}
 			{items.length > 0 && (
 				<div className="bg-muted/30 rounded-lg p-4">
 					<h4 className="font-medium mb-2">

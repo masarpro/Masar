@@ -381,42 +381,23 @@ export function MaterialsCostingTab({
 			};
 		});
 
-		// ──── DEBUG: log data sent to bulkUpdate ────
-		console.log("=== MATERIALS SAVE DEBUG ===");
-		console.log("CostingItems count:", cItems.length);
-		console.log("StructuralItems count:", structItems.length);
-		console.log("UpdateItems count:", updateItems.length);
-		// Check for duplicate sourceItemIds (potential 2x bug)
-		const sourceIdCounts = new Map<string, number>();
-		for (const ci of cItems) {
-			const sid = ci.sourceItemId ?? "null";
-			sourceIdCounts.set(sid, (sourceIdCounts.get(sid) ?? 0) + 1);
-		}
-		const duplicates = [...sourceIdCounts.entries()].filter(([, c]) => c > 1);
-		if (duplicates.length > 0) {
-			console.warn("⚠️ DUPLICATE CostingItems found (same sourceItemId):", duplicates);
-		}
-		let debugMaterialTotal = 0;
+		// Scale per-item costs so their sum matches the display grandTotal
+		let rawSum = 0;
 		for (const ui of updateItems) {
 			const ci = cItems.find((c: any) => c.id === ui.id);
 			const ciQty = Number(ci?.quantity) || 1;
-			const itemMaterialTotal = ui.materialUnitCost * ciQty;
-			debugMaterialTotal += itemMaterialTotal;
-			console.log(`  Item id=${ui.id} | src=${ci?.sourceItemId} | desc="${ci?.description}" | qty=${ciQty} | materialUnitCost=${ui.materialUnitCost.toFixed(4)} | materialTotal=${itemMaterialTotal.toFixed(2)}`);
+			rawSum += ui.materialUnitCost * ciQty;
 		}
-		console.log("SUM(materialUnitCost * qty) =", debugMaterialTotal.toFixed(2));
-		console.log("Display grandTotal =", grandTotal.toFixed(2));
-		if (Math.abs(debugMaterialTotal - grandTotal) > 1) {
-			console.error("❌ MISMATCH! Frontend sum differs from display grandTotal by", (debugMaterialTotal - grandTotal).toFixed(2));
-		} else {
-			console.log("✅ Frontend sum matches display grandTotal");
-		}
-		// ──── END DEBUG ────
+		const scaleFactor = rawSum > 0 ? grandTotal / rawSum : 0;
+		const scaledItems = updateItems.map((ui: any) => ({
+			...ui,
+			materialUnitCost: ui.materialUnitCost * scaleFactor,
+		}));
 
 		(bulkUpdateMutation as any).mutate({
 			organizationId,
 			studyId,
-			items: updateItems,
+			items: scaledItems,
 		});
 	};
 
