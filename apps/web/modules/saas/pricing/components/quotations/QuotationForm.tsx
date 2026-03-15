@@ -144,7 +144,6 @@ export function QuotationForm({
 	const [salesRepId, setSalesRepId] = useState<string | undefined>();
 	const [projectId, setProjectId] = useState<string | undefined>();
 	const [showProjectLink, setShowProjectLink] = useState(false);
-	const [selectedTemplate, setSelectedTemplate] = useState<string>("default");
 	const [customElementData, setCustomElementData] = useState<Record<string, { content?: string }>>({});
 
 	// Terms
@@ -241,10 +240,6 @@ export function QuotationForm({
 				);
 			}
 
-			if (existingQuotation.templateId) {
-				setSelectedTemplate(existingQuotation.templateId);
-			}
-
 			// Open client details if we have client data
 			if (existingQuotation.clientName) {
 				setClientDetailsOpen(false);
@@ -286,16 +281,6 @@ export function QuotationForm({
 		}
 	}, [orgSettings, mode]);
 
-	// Fetch all templates (all types available for quotations)
-	const { data: templatesDataRaw } = useQuery({
-		...orpc.company.templates.list.queryOptions({
-			input: { organizationId },
-		}),
-		staleTime: STALE_TIMES.TEMPLATES,
-	});
-	const templatesData = templatesDataRaw as any;
-	const templates = templatesData?.templates ?? [];
-
 	// Fetch default template for quotations
 	const { data: defaultTemplateRaw } = useQuery(
 		orpc.company.templates.getDefault.queryOptions({
@@ -303,15 +288,6 @@ export function QuotationForm({
 		}),
 	);
 	const defaultTemplate = defaultTemplateRaw as any;
-
-	// Auto-select the default template when it loads
-	useEffect(() => {
-		if (defaultTemplate && mode === "create" && (selectedTemplate === "default" || !selectedTemplate)) {
-			setSelectedTemplate(defaultTemplate.id);
-		}
-	}, [defaultTemplate, mode]);
-
-	const activeTemplate = templates.find((tmpl: any) => tmpl.id === selectedTemplate) || defaultTemplate;
 
 	// Fetch projects for dropdown
 	const { data: projectsDataRaw } = useQuery(
@@ -411,7 +387,7 @@ export function QuotationForm({
 				deliveryTerms,
 				warrantyTerms,
 				notes,
-				templateId: activeTemplate?.id,
+				templateId: defaultTemplate?.id,
 				vatPercent,
 				discountPercent,
 				projectId: !showProjectLink || projectId === "none" ? undefined : projectId,
@@ -451,7 +427,7 @@ export function QuotationForm({
 				deliveryTerms: deliveryTerms || undefined,
 				warrantyTerms: warrantyTerms || undefined,
 				notes: notes || undefined,
-				templateId: activeTemplate?.id,
+				templateId: existingQuotation?.templateId,
 				vatPercent,
 				discountPercent,
 				projectId: !showProjectLink || projectId === "none" ? null : projectId,
@@ -598,31 +574,6 @@ export function QuotationForm({
 
 						{/* End: actions */}
 						<div className="flex items-center gap-1.5 shrink-0">
-							{/* Template Selector */}
-							<Select value={selectedTemplate || ""} onValueChange={setSelectedTemplate}>
-								<SelectTrigger className="h-8 w-auto gap-1.5 rounded-lg border-dashed text-xs px-2.5">
-									<SelectValue placeholder={t("finance.templates.select")} />
-								</SelectTrigger>
-								<SelectContent className="rounded-xl min-w-[220px]" align="end">
-									{templates.map((tmpl: any) => (
-										<SelectItem key={tmpl.id} value={tmpl.id}>
-											<div className="flex items-center gap-2">
-												<span
-													className="w-2.5 h-2.5 rounded-full shrink-0"
-													style={{ backgroundColor: (tmpl.settings as any)?.primaryColor || "#3b82f6" }}
-												/>
-												<span>{tmpl.name}</span>
-												{tmpl.id === defaultTemplate?.id && (
-													<Badge variant="secondary" className="text-[10px] h-4 px-1.5 ms-1">
-														{t("finance.templates.default")}
-													</Badge>
-												)}
-											</div>
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<div className="w-px h-5 bg-border/50" />
 							<Button
 								type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg"
 								onClick={() => setShowPreviewDialog(true)}
@@ -1161,8 +1112,8 @@ export function QuotationForm({
 									notes,
 								}}
 								template={{
-									elements: (activeTemplate?.content as { elements?: any[] })?.elements || [],
-									settings: (activeTemplate?.settings as any) || {},
+									elements: (defaultTemplate?.content as { elements?: any[] })?.elements || [],
+									settings: (defaultTemplate?.settings as any) || {},
 								}}
 								customElementData={customElementData}
 								organization={{

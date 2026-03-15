@@ -36,6 +36,7 @@ import {
 	Palette,
 	Sparkles,
 } from "lucide-react";
+import { cn } from "@ui/lib";
 import { Badge } from "@ui/components/badge";
 import Link from "next/link";
 import { formatDate } from "@saas/finance/lib/utils";
@@ -80,8 +81,8 @@ export function TemplatesList({
 
 	const templates = data?.templates ?? [];
 
-	// Filter out system default templates to show only user-created ones
-	const customTemplates = templates.filter((t) => !t.isDefault);
+	// Show all templates (including defaults)
+	const customTemplates = templates;
 
 	// Set default mutation
 	const setDefaultMutation = useMutation({
@@ -207,7 +208,10 @@ export function TemplatesList({
 						{customTemplates.map((template) => (
 							<Card
 								key={template.id}
-								className="rounded-2xl group transition-all hover:border-slate-300 dark:hover:border-slate-600"
+								className={cn(
+									"rounded-2xl group transition-all hover:border-slate-300 dark:hover:border-slate-600",
+									template.isDefault && "border-amber-300 dark:border-amber-600 ring-1 ring-amber-200 dark:ring-amber-800"
+								)}
 							>
 								<CardContent className="p-4">
 									{/* Thumbnail */}
@@ -244,9 +248,17 @@ export function TemplatesList({
 									{/* Info */}
 									<div className="flex items-start justify-between">
 										<div className="min-w-0 flex-1">
+											<div className="flex items-center gap-1.5">
 											<h3 className="font-medium text-sm truncate">
 												{template.name}
 											</h3>
+											{template.isDefault && (
+												<Badge className="text-[10px] px-1.5 py-0 bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+													<Star className="h-3 w-3 me-0.5 fill-amber-500 text-amber-500" />
+													{t("finance.templates.default")}
+												</Badge>
+											)}
+										</div>
 											<div className="flex items-center gap-1.5 mt-1">
 												<Badge
 													variant="outline"
@@ -287,24 +299,28 @@ export function TemplatesList({
 														{t("common.edit")}
 													</Link>
 												</DropdownMenuItem>
-												<DropdownMenuItem
-													onClick={() =>
-														setDefaultMutation.mutate(template.id)
-													}
-													disabled={setDefaultMutation.isPending}
-												>
-													<Star className="h-4 w-4 me-2" />
-													{t("finance.templates.setAsDefault")}
-												</DropdownMenuItem>
-												<DropdownMenuItem
-													onClick={() =>
-														setDeleteTemplateId(template.id)
-													}
-													className="text-red-600"
-												>
-													<Trash2 className="h-4 w-4 me-2" />
-													{t("common.delete")}
-												</DropdownMenuItem>
+												{!template.isDefault && (
+													<DropdownMenuItem
+														onClick={() =>
+															setDefaultMutation.mutate(template.id)
+														}
+														disabled={setDefaultMutation.isPending}
+													>
+														<Star className="h-4 w-4 me-2" />
+														{t("finance.templates.setAsDefault")}
+													</DropdownMenuItem>
+												)}
+												{!template.isDefault && (
+													<DropdownMenuItem
+														onClick={() =>
+															setDeleteTemplateId(template.id)
+														}
+														className="text-red-600"
+													>
+														<Trash2 className="h-4 w-4 me-2" />
+														{t("common.delete")}
+													</DropdownMenuItem>
+												)}
 											</DropdownMenuContent>
 										</DropdownMenu>
 									</div>

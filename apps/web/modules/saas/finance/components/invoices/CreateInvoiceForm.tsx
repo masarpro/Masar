@@ -167,7 +167,6 @@ export function CreateInvoiceForm({
 	const [showNewClientDialog, setShowNewClientDialog] = useState(false);
 	const [clientDetailsOpen, setClientDetailsOpen] = useState(false);
 	const [visibleColumns, setVisibleColumns] = useState<ColumnKey[]>(DEFAULT_VISIBLE_COLUMNS);
-	const [selectedTemplate, setSelectedTemplate] = useState<string>("default");
 	const [showPreviewDialog, setShowPreviewDialog] = useState(false);
 
 	// Payment dialog state (edit mode only)
@@ -308,20 +307,8 @@ export function CreateInvoiceForm({
 					unitPrice: item.unitPrice,
 				})),
 			);
-			if (invoice.templateId) {
-				setSelectedTemplate(invoice.templateId);
-			}
 		}
 	}, [invoice]);
-
-	// Fetch all templates (all types available for invoices)
-	const { data: templatesData } = useQuery({
-		...orpc.company.templates.list.queryOptions({
-			input: { organizationId },
-		}),
-		staleTime: STALE_TIMES.TEMPLATES,
-	});
-	const templates = templatesData?.templates ?? [];
 
 	// Fetch default template
 	const { data: defaultTemplate } = useQuery(
@@ -329,15 +316,6 @@ export function CreateInvoiceForm({
 			input: { organizationId, templateType: "INVOICE" },
 		}),
 	);
-
-	// Auto-select the default template when it loads (skip in edit mode if invoice has a template)
-	useEffect(() => {
-		if (defaultTemplate && !isEditMode && (selectedTemplate === "default" || !selectedTemplate)) {
-			setSelectedTemplate(defaultTemplate.id);
-		}
-	}, [defaultTemplate, isEditMode]);
-
-	const activeTemplate = templates.find(tmpl => tmpl.id === selectedTemplate) || defaultTemplate;
 
 	// Fetch quotation data if converting from quotation
 	const { data: quotation } = useQuery({
@@ -408,7 +386,7 @@ export function CreateInvoiceForm({
 		notes,
 		vatPercent,
 		discountPercent,
-		templateId: activeTemplate?.id,
+		templateId: defaultTemplate?.id,
 		items: items
 			.filter((item) => item.description.trim())
 			.map((item) => ({
@@ -489,7 +467,7 @@ export function CreateInvoiceForm({
 				notes,
 				vatPercent,
 				discountPercent,
-				templateId: activeTemplate?.id || null,
+				templateId: invoice?.templateId || null,
 			});
 		},
 		onSuccess: () => {
@@ -755,30 +733,6 @@ export function CreateInvoiceForm({
 
 						{/* End: actions */}
 						<div className="flex items-center gap-1.5 shrink-0">
-							<Select value={selectedTemplate || ""} onValueChange={setSelectedTemplate}>
-								<SelectTrigger className="h-8 w-auto gap-1.5 rounded-lg border-dashed text-xs px-2.5">
-									<SelectValue placeholder={t("finance.templates.select")} />
-								</SelectTrigger>
-								<SelectContent className="rounded-xl min-w-[220px]" align="end">
-									{templates.map((tmpl) => (
-										<SelectItem key={tmpl.id} value={tmpl.id}>
-											<div className="flex items-center gap-2">
-												<span
-													className="w-2.5 h-2.5 rounded-full shrink-0"
-													style={{ backgroundColor: (tmpl.settings as any)?.primaryColor || "#3b82f6" }}
-												/>
-												<span>{tmpl.name}</span>
-												{tmpl.id === defaultTemplate?.id && (
-													<Badge variant="secondary" className="text-[10px] h-4 px-1.5 ms-1">
-														{t("finance.templates.default")}
-													</Badge>
-												)}
-											</div>
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<div className="w-px h-5 bg-border/50" />
 							<Button
 								type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg"
 								onClick={() => isEditMode ? router.push(`${basePath}/${invoiceId}/preview`) : setShowPreviewDialog(true)}

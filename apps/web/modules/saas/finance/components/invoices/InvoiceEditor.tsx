@@ -6,7 +6,6 @@ import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
-import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
@@ -57,7 +56,6 @@ import {
 	QrCode,
 	Ban,
 } from "lucide-react";
-import { Badge } from "@ui/components/badge";
 import { ItemsEditor } from "../shared/ItemsEditor";
 import { AmountSummary } from "../shared/AmountSummary";
 import { ClientSelector, type Client } from "../shared/ClientSelector";
@@ -110,9 +108,6 @@ export function InvoiceEditor({
 	const [discountPercent, setDiscountPercent] = useState(0);
 	const [items, setItems] = useState<InvoiceItem[]>([]);
 
-	// Template state
-	const [selectedTemplate, setSelectedTemplate] = useState<string | undefined>();
-
 	// Payment dialog state
 	const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
 	const [newPaymentAmount, setNewPaymentAmount] = useState("");
@@ -135,21 +130,6 @@ export function InvoiceEditor({
 		}),
 	);
 
-	// Fetch all templates (all types available for invoices)
-	const { data: templatesData } = useQuery({
-		...orpc.company.templates.list.queryOptions({
-			input: { organizationId },
-		}),
-		staleTime: STALE_TIMES.TEMPLATES,
-	});
-	const templates = templatesData?.templates ?? [];
-
-	// Fetch default template
-	const { data: defaultTemplate } = useQuery(
-		orpc.company.templates.getDefault.queryOptions({
-			input: { organizationId, templateType: "INVOICE" },
-		}),
-	);
 
 	// Redirect if not DRAFT
 	useEffect(() => {
@@ -186,7 +166,6 @@ export function InvoiceEditor({
 					unitPrice: item.unitPrice,
 				})),
 			);
-			setSelectedTemplate(invoice.templateId ?? undefined);
 		}
 	}, [invoice]);
 
@@ -231,7 +210,7 @@ export function InvoiceEditor({
 				notes,
 				vatPercent,
 				discountPercent,
-				templateId: selectedTemplate || null,
+				templateId: invoice?.templateId || null,
 			});
 		},
 		onSuccess: () => {
@@ -432,31 +411,6 @@ export function InvoiceEditor({
 					<StatusBadge status={invoice.status} type="invoice" />
 				</div>
 				<div className="flex items-center gap-2">
-					{isEditable && templates.length > 0 && (
-						<Select value={selectedTemplate || ""} onValueChange={setSelectedTemplate}>
-							<SelectTrigger className="h-9 w-auto gap-1.5 rounded-xl border-dashed text-xs px-2.5">
-								<SelectValue placeholder={t("finance.templates.select")} />
-							</SelectTrigger>
-							<SelectContent className="rounded-xl min-w-[220px]" align="end">
-								{templates.map((tmpl) => (
-									<SelectItem key={tmpl.id} value={tmpl.id}>
-										<div className="flex items-center gap-2">
-											<span
-												className="w-2.5 h-2.5 rounded-full shrink-0"
-												style={{ backgroundColor: (tmpl.settings as any)?.primaryColor || "#3b82f6" }}
-											/>
-											<span>{tmpl.name}</span>
-											{tmpl.id === defaultTemplate?.id && (
-												<Badge variant="secondary" className="text-[10px] h-4 px-1.5 ms-1">
-													{t("finance.templates.default")}
-												</Badge>
-											)}
-										</div>
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					)}
 					<Button
 						variant="outline"
 						onClick={() => router.push(`${basePath}/${invoiceId}/preview`)}
