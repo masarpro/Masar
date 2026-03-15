@@ -1,7 +1,7 @@
 export { PlainConcreteSection } from "./PlainConcreteSection";
-export { FoundationsSection } from "./FoundationsSection";
+export { FoundationsSection } from "./foundations";
 export { ColumnsSection } from "./ColumnsSection";
 export { BeamsSection } from "./BeamsSection";
-export { SlabsSection } from "./SlabsSection";
+export { SlabsSection } from "./slabs";
 export { BlocksSection } from "./BlocksSection";
 export { StairsSection } from "./StairsSection";

@@ -146,6 +146,20 @@ export const BEAM_REINFORCEMENT_TEMPLATES: BeamReinforcementTemplate[] = [
 	},
 ];
 
+// أسعار ألواح الهولوكور حسب السماكة (ريال / م²)
+export const HOLLOW_CORE_PANEL_PRICES: Record<number, number> = {
+	12: 140,
+	15: 165,
+	20: 210,
+	25: 260,
+	26.5: 280,
+	32: 350,
+	40: 430,
+};
+
+// القيمة الافتراضية إذا لم يُعرف السمك
+export const HOLLOW_CORE_DEFAULT_PRICE_PER_SQM = 210;
+
 // القيم الافتراضية
 export const SLAB_DEFAULTS = {
 	cover: 0.025,           // 2.5 سم

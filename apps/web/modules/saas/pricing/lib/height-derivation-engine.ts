@@ -45,11 +45,30 @@ export interface DerivedBuildingHeights {
 	};
 }
 
+// ─── Actual slab data (optional, from structural items) ───
+
+export interface FloorSlabData {
+	floorId: string;
+	slabThickness: number;  // cm
+	beamDepth: number;      // cm
+}
+
 // ─── Main derivation function ───
 
-export function deriveHeights(config: StructuralBuildingConfig): DerivedBuildingHeights | null {
+export function deriveHeights(
+	config: StructuralBuildingConfig,
+	slabData?: FloorSlabData[],
+): DerivedBuildingHeights | null {
 	const hp = config.heightProperties;
 	if (!hp) return null;
+
+	// Index actual slab data by floorId for quick lookup
+	const slabDataByFloor = new Map<string, FloorSlabData>();
+	if (slabData) {
+		for (const sd of slabData) {
+			slabDataByFloor.set(sd.floorId, sd);
+		}
+	}
 
 	const enabledFloors = config.floors
 		.filter((f) => f.enabled)
@@ -82,8 +101,10 @@ export function deriveHeights(config: StructuralBuildingConfig): DerivedBuilding
 		let blockHeight: number | null = null;
 
 		if (floorToFloor != null && floorToFloor > 0) {
-			const slabThickness = hp.defaultSlabThickness;
-			const beamDepth = hp.defaultBeamDepth;
+			// Use actual slab data if available, otherwise fall back to defaults
+			const actualSlab = slabDataByFloor.get(floor.id);
+			const slabThickness = actualSlab?.slabThickness ?? hp.defaultSlabThickness;
+			const beamDepth = actualSlab?.beamDepth ?? hp.defaultBeamDepth;
 			const visibleBeam = Math.max(0, beamDepth - slabThickness);
 
 			columnHeight = floorToFloor * 100 - slabThickness - visibleBeam;

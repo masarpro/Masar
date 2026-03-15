@@ -5,6 +5,8 @@ import { z } from "zod";
 import { convertStructuralItemDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
+import { structuralDimensionsUnion } from "../schemas/structural-dimensions";
+import { validateStructuralBounds } from "../validators/structural-bounds";
 
 export const structuralItemCreate = subscriptionProcedure
 	.route({
@@ -21,7 +23,7 @@ export const structuralItemCreate = subscriptionProcedure
 			subCategory: z.string().optional(),
 			name: z.string(),
 			description: z.string().optional(),
-			dimensions: z.any().optional(),
+			dimensions: structuralDimensionsUnion.optional(),
 			quantity: z.number().nonnegative(),
 			unit: z.string(),
 			concreteVolume: z.number().nonnegative().optional(),
@@ -48,6 +50,14 @@ export const structuralItemCreate = subscriptionProcedure
 				message: STUDY_ERRORS.NOT_FOUND,
 			});
 		}
+
+		validateStructuralBounds({
+			category: input.category,
+			quantity: input.quantity,
+			concreteVolume: input.concreteVolume,
+			steelWeight: input.steelWeight,
+			dimensions: input.dimensions as Record<string, number | string> | undefined,
+		});
 
 		const item = await createStructuralItem({
 			costStudyId: input.costStudyId,

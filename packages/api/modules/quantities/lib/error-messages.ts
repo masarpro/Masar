@@ -10,4 +10,5 @@ export const STUDY_ERRORS = {
 	STAGE_ORDER: "Cannot approve this stage before the previous one | لا يمكن اعتماد المرحلة قبل السابقة",
 	STAGE_ASSIGN: "Cannot assign responsible for this stage | لا يمكن تعيين مسؤول لهذه المرحلة",
 	ITEMS_LOCKED: "Cannot add items after quantities approval | لا يمكن إضافة بنود بعد اعتماد الكميات",
+	BOUNDS_EXCEEDED: "Value exceeds allowed bounds | القيمة تتجاوز الحدود المسموحة",
 } as const;

@@ -5,3 +5,4 @@
 export * from './prices';
 export * from './blocks';
 export * from './slabs';
+export * from './structural-defaults';

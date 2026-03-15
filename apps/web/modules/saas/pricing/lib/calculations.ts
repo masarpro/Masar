@@ -3,6 +3,21 @@ import {
 	STRUCTURAL_LABOR_PRICES,
 	REBAR_WEIGHTS,
 } from "../constants/prices";
+import {
+	FOUNDATION_BAR_RETURN,
+	FOUNDATION_SECONDARY_RATIO,
+	COLUMN_MAIN_BAR_RETURN,
+	COLUMN_FORMWORK_MULTIPLIER,
+	STIRRUP_COVER_DEDUCTION,
+	STIRRUP_HOOK_LENGTH,
+	BEAM_BAR_RETURN,
+	BEAM_FORMWORK_MULTIPLIER,
+	BLOCKS_PER_SQM,
+	BLOCK_WASTE_FACTOR,
+	MORTAR_VOLUME_PER_SQM,
+	MORTAR_COST_PER_CUBIC_METER,
+	STAIRS_FORMWORK_MULTIPLIER,
+} from "../constants/structural-defaults";
 
 // ═══════════════════════════════════════════════════════════════
 // دالة مساعدة: وزن الحديد لكل متر طولي
@@ -63,8 +78,8 @@ export function calculateFoundation(data: FoundationCalcInput): FoundationResult
 	// حساب الحديد الرئيسي (شبكة سفلية)
 	const mainBarsCountX = Math.ceil((width * 1000) / mainBarSpacing) + 1;
 	const mainBarsCountY = Math.ceil((length * 1000) / mainBarSpacing) + 1;
-	const mainBarLengthX = length + 0.3; // إضافة الرجوع
-	const mainBarLengthY = width + 0.3;
+	const mainBarLengthX = length + FOUNDATION_BAR_RETURN; // إضافة الرجوع
+	const mainBarLengthY = width + FOUNDATION_BAR_RETURN;
 
 	// وزن الحديد الرئيسي
 	const mainBarWeight = getRebarWeightPerMeter(mainBarDiameter);
@@ -84,7 +99,7 @@ export function calculateFoundation(data: FoundationCalcInput): FoundationResult
 			secondaryBarsCountY * mainBarLengthY) *
 		secondaryBarWeight *
 		quantity *
-		0.5; // 50% للشبكة العلوية
+		FOUNDATION_SECONDARY_RATIO; // 50% للشبكة العلوية
 
 	const totalRebarWeight = mainRebarWeight + secondaryRebarWeight;
 
@@ -169,12 +184,12 @@ export function calculateColumn(data: ColumnCalcInput): ColumnResult {
 
 	// الحديد الرئيسي
 	const mainBarWeight = getRebarWeightPerMeter(mainBarDiameter);
-	const mainBarLength = height + 0.8; // رجوع علوي وسفلي
+	const mainBarLength = height + COLUMN_MAIN_BAR_RETURN; // رجوع علوي وسفلي
 	const mainRebarWeight =
 		mainBarsCount * mainBarLength * mainBarWeight * quantity;
 
 	// الكانات
-	const stirrupPerimeter = 2 * (widthM + depthM - 0.08) + 0.3; // محيط الكانة + الرجوع
+	const stirrupPerimeter = 2 * (widthM + depthM - STIRRUP_COVER_DEDUCTION) + STIRRUP_HOOK_LENGTH; // محيط الكانة + الرجوع
 	const stirrupsCount = Math.ceil((height * 1000) / stirrupSpacing) + 1;
 	const stirrupWeight = getRebarWeightPerMeter(stirrupDiameter);
 	const stirrupRebarWeight =
@@ -189,7 +204,7 @@ export function calculateColumn(data: ColumnCalcInput): ColumnResult {
 	const concretePrice = STRUCTURAL_PRICES.concrete[concreteType] || 350;
 	const concreteCost = concreteVolume * concretePrice;
 	const rebarCost = totalRebarWeight * STRUCTURAL_PRICES.steelPerKg;
-	const formworkCost = formworkArea * STRUCTURAL_PRICES.formwork * 1.5; // الأعمدة أغلى
+	const formworkCost = formworkArea * STRUCTURAL_PRICES.formwork * COLUMN_FORMWORK_MULTIPLIER; // الأعمدة أغلى
 	const laborCost = concreteVolume * STRUCTURAL_LABOR_PRICES.columns;
 	const totalCost = concreteCost + rebarCost + formworkCost + laborCost;
 
@@ -265,7 +280,7 @@ export function calculateBeam(data: BeamCalcInput): BeamResult {
 
 	// الحديد العلوي
 	const topBarWeight = getRebarWeightPerMeter(topBarDiameter);
-	const barLength = length + 0.6; // رجوع
+	const barLength = length + BEAM_BAR_RETURN; // رجوع
 	const topRebarWeight = topBarsCount * barLength * topBarWeight * quantity;
 
 	// الحديد السفلي
@@ -274,7 +289,7 @@ export function calculateBeam(data: BeamCalcInput): BeamResult {
 		bottomBarsCount * barLength * bottomBarWeight * quantity;
 
 	// الكانات
-	const stirrupPerimeter = 2 * (widthM + heightM - 0.08) + 0.3;
+	const stirrupPerimeter = 2 * (widthM + heightM - STIRRUP_COVER_DEDUCTION) + STIRRUP_HOOK_LENGTH;
 	const stirrupsCount = Math.ceil((length * 1000) / stirrupSpacing) + 1;
 	const stirrupWeight = getRebarWeightPerMeter(stirrupDiameter);
 	const stirrupRebarWeight =
@@ -291,7 +306,7 @@ export function calculateBeam(data: BeamCalcInput): BeamResult {
 	const concretePrice = STRUCTURAL_PRICES.concrete[concreteType] || 310;
 	const concreteCost = concreteVolume * concretePrice;
 	const rebarCost = totalRebarWeight * STRUCTURAL_PRICES.steelPerKg;
-	const formworkCost = formworkArea * STRUCTURAL_PRICES.formwork * 1.2;
+	const formworkCost = formworkArea * STRUCTURAL_PRICES.formwork * BEAM_FORMWORK_MULTIPLIER;
 	const laborCost = concreteVolume * STRUCTURAL_LABOR_PRICES.beams;
 	const totalCost = concreteCost + rebarCost + formworkCost + laborCost;
 
@@ -467,15 +482,14 @@ export function calculateBlocks(data: BlockInput): BlockResult {
 	const netArea = grossArea - openingsArea;
 
 	// عدد البلوكات (بلوك 40×20 سم = 12.5 بلوكة/م²)
-	const blocksPerM2 = 12.5;
-	const blocksCount = Math.ceil(netArea * blocksPerM2 * 1.05); // 5% هالك
+	const blocksCount = Math.ceil(netArea * BLOCKS_PER_SQM * BLOCK_WASTE_FACTOR); // 5% هالك
 
 	// حجم المونة (تقريبي: 0.02 م³/م²)
-	const mortarVolume = netArea * 0.02;
+	const mortarVolume = netArea * MORTAR_VOLUME_PER_SQM;
 
 	// التكلفة
 	const blockPrice = STRUCTURAL_PRICES.blocks[thickness] || 3.5;
-	const materialCost = blocksCount * blockPrice + mortarVolume * 150; // 150 ريال/م³ مونة
+	const materialCost = blocksCount * blockPrice + mortarVolume * MORTAR_COST_PER_CUBIC_METER;
 	const laborCost = netArea * STRUCTURAL_LABOR_PRICES.blocks;
 	const totalCost = materialCost + laborCost;
 
@@ -614,13 +628,13 @@ export function calculateStairs(data: StairsInput): StairsResult {
 	const rebarWeight = bottomMainWeight + bottomSecWeight + topMainWeight + topSecWeight;
 
 	// مساحة الشدات
-	const formworkArea = totalArea * 1.5; // السلالم تحتاج شدة أكثر
+	const formworkArea = totalArea * STAIRS_FORMWORK_MULTIPLIER; // السلالم تحتاج شدة أكثر
 
 	// التكلفة
 	const concretePrice = STRUCTURAL_PRICES.concrete[concreteType] || 310;
 	const concreteCost = concreteVolume * concretePrice;
 	const rebarCost = rebarWeight * STRUCTURAL_PRICES.steelPerKg;
-	const formworkCost = formworkArea * STRUCTURAL_PRICES.formwork * 1.5;
+	const formworkCost = formworkArea * STRUCTURAL_PRICES.formwork * STAIRS_FORMWORK_MULTIPLIER;
 	const laborCost = concreteVolume * STRUCTURAL_LABOR_PRICES.stairs;
 	const totalCost = concreteCost + rebarCost + formworkCost + laborCost;
 

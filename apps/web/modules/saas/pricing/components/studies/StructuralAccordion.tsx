@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import {
 	Accordion,
 	AccordionContent,
@@ -14,17 +15,52 @@ import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { cn } from "@ui/lib";
 import { formatNumber } from "../../lib/utils";
-
-import {
-	PlainConcreteSection,
-	FoundationsSection,
-	ColumnsSection,
-	BeamsSection,
-	SlabsSection,
-	BlocksSection,
-	StairsSection,
-} from "./sections";
 import type { StructuralFloorConfig, StructuralBuildingConfig } from "../../types/structural-building-config";
+
+function SectionSkeleton() {
+	return (
+		<div className="space-y-3 p-4">
+			<div className="h-8 bg-muted animate-pulse rounded" />
+			<div className="h-32 bg-muted animate-pulse rounded" />
+			<div className="h-8 bg-muted animate-pulse rounded w-1/3" />
+		</div>
+	);
+}
+
+const PlainConcreteSection = dynamic(
+	() => import("./sections/PlainConcreteSection").then(mod => ({ default: mod.PlainConcreteSection })),
+	{ loading: () => <SectionSkeleton /> },
+);
+
+const FoundationsSection = dynamic(
+	() => import("./sections/foundations/FoundationsSection").then(mod => ({ default: mod.FoundationsSection })),
+	{ loading: () => <SectionSkeleton /> },
+);
+
+const ColumnsSection = dynamic(
+	() => import("./sections/ColumnsSection").then(mod => ({ default: mod.ColumnsSection })),
+	{ loading: () => <SectionSkeleton /> },
+);
+
+const BeamsSection = dynamic(
+	() => import("./sections/BeamsSection").then(mod => ({ default: mod.BeamsSection })),
+	{ loading: () => <SectionSkeleton /> },
+);
+
+const SlabsSection = dynamic(
+	() => import("./sections/slabs/SlabsSection").then(mod => ({ default: mod.SlabsSection })),
+	{ loading: () => <SectionSkeleton /> },
+);
+
+const BlocksSection = dynamic(
+	() => import("./sections/BlocksSection").then(mod => ({ default: mod.BlocksSection })),
+	{ loading: () => <SectionSkeleton /> },
+);
+
+const StairsSection = dynamic(
+	() => import("./sections/StairsSection").then(mod => ({ default: mod.StairsSection })),
+	{ loading: () => <SectionSkeleton /> },
+);
 
 interface StructuralItem {
 	id: string;
@@ -263,6 +299,7 @@ export function StructuralAccordion({
 								studyId={studyId}
 								organizationId={organizationId}
 								items={sectionItems}
+								allItems={items}
 								onSave={() => handleSave(section.id)}
 								onUpdate={onUpdate}
 								specs={getSpecsForSection(section.id)}

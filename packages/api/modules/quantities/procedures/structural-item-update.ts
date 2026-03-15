@@ -5,6 +5,8 @@ import { z } from "zod";
 import { convertStructuralItemDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
+import { structuralDimensionsUnion } from "../schemas/structural-dimensions";
+import { validateStructuralBounds } from "../validators/structural-bounds";
 
 export const structuralItemUpdate = subscriptionProcedure
 	.route({
@@ -22,7 +24,7 @@ export const structuralItemUpdate = subscriptionProcedure
 			subCategory: z.string().optional(),
 			name: z.string().optional(),
 			description: z.string().optional(),
-			dimensions: z.any().optional(),
+			dimensions: structuralDimensionsUnion.optional(),
 			quantity: z.number().nonnegative().optional(),
 			unit: z.string().optional(),
 			concreteVolume: z.number().nonnegative().optional(),
@@ -48,6 +50,16 @@ export const structuralItemUpdate = subscriptionProcedure
 		if (!study) {
 			throw new ORPCError("NOT_FOUND", {
 				message: STUDY_ERRORS.NOT_FOUND,
+			});
+		}
+
+		if (input.quantity !== undefined || input.concreteVolume !== undefined || input.steelWeight !== undefined || input.dimensions !== undefined) {
+			validateStructuralBounds({
+				category: input.category,
+				quantity: input.quantity,
+				concreteVolume: input.concreteVolume,
+				steelWeight: input.steelWeight,
+				dimensions: input.dimensions as Record<string, number | string> | undefined,
 			});
 		}
 

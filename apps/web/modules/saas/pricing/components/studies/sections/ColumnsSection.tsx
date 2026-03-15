@@ -39,7 +39,7 @@ import { useMutation } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { toast } from "sonner";
 import { calculateColumn } from "../../../lib/calculations";
-import { getRebarWeightPerMeter } from "../../../lib/structural-calculations";
+import { getRebarWeightPerMeter, calculateColumnRebar } from "../../../lib/structural-calculations";
 import { formatNumber, ELEMENT_PREFIXES } from "../../../lib/utils";
 import { REBAR_DIAMETERS, STOCK_LENGTHS } from "../../../constants/prices";
 import {
@@ -50,6 +50,7 @@ import {
 	CalculationResultsPanel,
 } from "../shared";
 import { useHeightDerivation } from "../../../hooks/useHeightDerivation";
+import type { StructuralItemCreateInput, StructuralItemUpdateInput, StructuralItemDeleteInput } from "../../../types/structural-mutation";
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -70,6 +71,7 @@ interface ColumnsSectionProps {
 	studyId: string;
 	organizationId: string;
 	items: ItemType[];
+	allItems?: Array<{ category: string; dimensions: Record<string, any>; subCategory?: string | null }>;
 	onSave: () => void;
 	onUpdate: () => void;
 	specs?: { concreteType: string; steelGrade: string };
@@ -98,117 +100,6 @@ const DEFAULT_FLOORS: FloorDef[] = [
 ];
 
 const NECK_HEIGHT_PRESETS = [1, 1.5, 2, 3, 4];
-
-// ═══════════════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════════════
-
-function calculateCuttingDetails(
-	barLength: number,
-	barCount: number,
-	diameter: number,
-	description: string,
-) {
-	const stockLength = STOCK_LENGTHS[diameter] || 12;
-	const cutsPerStock = Math.floor(stockLength / barLength) || 1;
-	const stocksNeeded = Math.ceil(barCount / cutsPerStock);
-	const wastePerStock = stockLength - cutsPerStock * barLength;
-	const totalWaste = stocksNeeded * wastePerStock;
-	const totalLength = barCount * barLength;
-	const grossLength = stocksNeeded * stockLength;
-	const wastePercentage =
-		grossLength > 0 ? (totalWaste / grossLength) * 100 : 0;
-	const weight = totalLength * getRebarWeightPerMeter(diameter);
-
-	return {
-		description,
-		diameter,
-		barLength: Number(barLength.toFixed(2)),
-		barCount,
-		stocksNeeded,
-		wastePerStock: Number(wastePerStock.toFixed(2)),
-		totalWaste: Number(totalWaste.toFixed(2)),
-		wastePercentage: Number(wastePercentage.toFixed(1)),
-		weight: Number(weight.toFixed(2)),
-		stockLength,
-	};
-}
-
-function computeFullCalc(params: {
-	quantity: number;
-	width: number;
-	depth: number;
-	height: number;
-	mainBarsCount: number;
-	mainBarDiameter: number;
-	stirrupDiameter: number;
-	stirrupSpacing: number;
-	concreteType: string;
-}) {
-	const baseCalc = calculateColumn(params);
-
-	const mainBarLength = params.height + 0.8;
-	const widthM = params.width / 100;
-	const depthM = params.depth / 100;
-	const stirrupPerimeter = 2 * (widthM + depthM - 0.08) + 0.3;
-	const stirrupsCount =
-		Math.ceil((params.height * 1000) / params.stirrupSpacing) + 1;
-
-	const cuttingDetails = [
-		calculateCuttingDetails(
-			mainBarLength,
-			params.mainBarsCount * params.quantity,
-			params.mainBarDiameter,
-			"حديد رئيسي",
-		),
-		calculateCuttingDetails(
-			stirrupPerimeter,
-			stirrupsCount * params.quantity,
-			params.stirrupDiameter,
-			"كانات",
-		),
-	];
-
-	const netWeight = cuttingDetails.reduce((sum, d) => sum + d.weight, 0);
-	const grossWeight = cuttingDetails.reduce(
-		(sum, d) =>
-			sum +
-			d.stocksNeeded * d.stockLength * getRebarWeightPerMeter(d.diameter),
-		0,
-	);
-	const wasteWeight = grossWeight - netWeight;
-	const wastePercentage =
-		grossWeight > 0 ? (wasteWeight / grossWeight) * 100 : 0;
-
-	const stocksMap = new Map<
-		number,
-		{ diameter: number; count: number; length: number }
-	>();
-	cuttingDetails.forEach((d) => {
-		const existing = stocksMap.get(d.diameter);
-		if (existing) {
-			existing.count += d.stocksNeeded;
-		} else {
-			stocksMap.set(d.diameter, {
-				diameter: d.diameter,
-				count: d.stocksNeeded,
-				length: d.stockLength,
-			});
-		}
-	});
-
-	return {
-		...baseCalc,
-		cuttingDetails,
-		totals: {
-			netWeight: Number(netWeight.toFixed(2)),
-			grossWeight: Number(grossWeight.toFixed(2)),
-			wasteWeight: Number(wasteWeight.toFixed(2)),
-			wastePercentage: Number(wastePercentage.toFixed(1)),
-			stocksNeeded: Array.from(stocksMap.values()),
-		},
-	};
-}
 
 // ═══════════════════════════════════════════════════════════════
 // مكون الدور الواحد (بدون رقاب — الرقاب منفصلة)
@@ -261,7 +152,7 @@ function FloorColumnsPanel({
 	const calculations = useMemo(() => {
 		if (formData.width <= 0 || formData.depth <= 0 || formData.height <= 0)
 			return null;
-		return computeFullCalc({
+		return calculateColumnRebar({
 			...formData,
 			concreteType: specs?.concreteType || "C35",
 		});
@@ -356,19 +247,19 @@ function FloorColumnsPanel({
 		};
 
 		if (editingItemId) {
-			(updateMutation as any).mutate({
+			(updateMutation.mutate as (data: StructuralItemUpdateInput) => void)({
 				...itemData,
 				id: editingItemId,
 				costStudyId: studyId,
 			});
 		} else {
-			(createMutation as any).mutate(itemData);
+			(createMutation.mutate as (data: StructuralItemCreateInput) => void)(itemData);
 		}
 	};
 
 	const handleDelete = (id: string) => {
 		if (confirm(t("pricing.studies.messages.confirmDelete"))) {
-			(deleteMutation as any).mutate({
+			(deleteMutation.mutate as (data: StructuralItemDeleteInput) => void)({
 				id,
 				organizationId,
 				costStudyId: studyId,
@@ -702,7 +593,7 @@ function NeckColumnsSection({
 			const stirrupDiameter = col.dimensions?.stirrupDiameter || 8;
 			const stirrupSpacing = col.dimensions?.stirrupSpacing || 150;
 
-			const calc = computeFullCalc({
+			const calc = calculateColumnRebar({
 				quantity: col.quantity,
 				width,
 				depth,
@@ -1012,7 +903,7 @@ function CopyFromFloorButton({
 			const newName =
 				item.name.replace(sourceLabel, currentFloorLabel) ||
 				`عمود الدور ال${currentFloorLabel}`;
-			await createMutation.mutateAsync({
+			await (createMutation.mutateAsync as (data: StructuralItemCreateInput) => Promise<unknown>)({
 				costStudyId: studyId,
 				organizationId,
 				category: "columns",
@@ -1031,7 +922,7 @@ function CopyFromFloorButton({
 				materialCost: 0,
 				laborCost: 0,
 				totalCost: item.totalCost,
-			} as any);
+			});
 		}
 		setIsCopying(false);
 		setSelectedSource("");
@@ -1079,13 +970,14 @@ export function ColumnsSection({
 	studyId,
 	organizationId,
 	items,
+	allItems,
 	onSave,
 	onUpdate,
 	specs,
 	buildingFloors,
 	buildingConfig,
 }: ColumnsSectionProps) {
-	const { derivedHeights, getColumnHeight, getNeckHeight } = useHeightDerivation(buildingConfig ?? null);
+	const { derivedHeights, getColumnHeight, getNeckHeight } = useHeightDerivation(buildingConfig ?? null, allItems);
 
 	const FLOORS: FloorDef[] = buildingFloors
 		? buildingFloors
@@ -1159,7 +1051,7 @@ export function ColumnsSection({
 		let concrete = 0;
 		let steel = 0;
 		groundColumns.forEach((col) => {
-			const calc = computeFullCalc({
+			const calc = calculateColumnRebar({
 				quantity: col.quantity,
 				width: col.dimensions?.width || 30,
 				depth: col.dimensions?.depth || 30,

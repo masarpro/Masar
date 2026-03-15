@@ -20,10 +20,13 @@ import {
 	COMMON_THICKNESSES,
 	HORDI_BLOCK_SIZES,
 	REBAR_RATIOS,
+	HOLLOW_CORE_PANEL_PRICES,
+	HOLLOW_CORE_DEFAULT_PRICE_PER_SQM,
 } from '../constants/slabs';
 import { optimizedCutting } from './cutting/cutting-optimizer';
 import { REBAR_SPECIFICATIONS } from './cutting/saudi-rebar-specs';
 import type { CuttingPiece, CuttingRequest, CuttingResult } from './cutting/types';
+import { calculateColumn, calculateBeam, calculateStairs } from './calculations';
 import type {
 	IsolatedFoundationInput,
 	CombinedFoundationInput,
@@ -1443,6 +1446,12 @@ export interface EnhancedSlabResult {
 		labor: number;
 		total: number;
 	};
+	panelsCostBreakdown?: {
+		panelPricePerSqm: number;
+		panelsCost: number;
+		panelsCount: number;
+		concreteCost: number;
+	};
 }
 
 /**
@@ -2089,6 +2098,121 @@ export function calculateHollowCoreSlab(slab: HollowCoreSlab): EnhancedSlabResul
 }
 
 /**
+ * حساب الهولوكور التفصيلي (Detailed Hollow Core)
+ * يستخدم أسعار الألواح حسب السماكة بدل السعر الثابت
+ * ويحسب حديد الشبكة العلوية تفصيلياً (Φ8@200mm)
+ */
+export function calculateHollowCoreDetailed(slab: HollowCoreSlab, panelDepthCm?: number): EnhancedSlabResult {
+	const {
+		dimensions,
+		openings = [],
+		panels,
+		topping,
+		concreteType = 'C30',
+	} = slab;
+
+	const grossArea = dimensions.length * dimensions.width;
+	const netArea = calculateNetArea(grossArea, openings);
+
+	// عدد الألواح
+	const panelWidthM = panels.width;
+	const panelsCount = Math.ceil(dimensions.width / panelWidthM);
+
+	// سعر اللوح حسب السماكة
+	const depth = panelDepthCm ?? panels.thickness;
+	const panelPricePerSqm = HOLLOW_CORE_PANEL_PRICES[depth] ?? HOLLOW_CORE_DEFAULT_PRICE_PER_SQM;
+
+	// حجم الخرسانة (الطبقة العلوية فقط)
+	const toppingM = topping?.thickness || 0.05;
+	const concreteVolume = netArea * toppingM;
+
+	// حسابات حديد الشبكة العلوية — Φ8@200mm
+	const meshDiameter = 8;
+	const meshSpacing = 0.2; // م
+	const rebarDetails: RebarDetail[] = [];
+
+	const barsX = Math.ceil(dimensions.width / meshSpacing) + 1;
+	const barsY = Math.ceil(dimensions.length / meshSpacing) + 1;
+	const barLengthX = dimensions.length + 0.2; // رجوع
+	const barLengthY = dimensions.width + 0.2;
+	const weightPerMeter = getRebarWeightPerMeter(meshDiameter);
+
+	const meshWeightX = barsX * barLengthX * weightPerMeter;
+	const meshWeightY = barsY * barLengthY * weightPerMeter;
+	const meshWeight = meshWeightX + meshWeightY;
+
+	rebarDetails.push({
+		id: 'hollow-core-mesh-x',
+		description: `شبكة علوية X — Φ${meshDiameter}@${meshSpacing * 1000}mm`,
+		location: 'الطبقة العلوية',
+		diameter: meshDiameter,
+		barLength: Number(barLengthX.toFixed(2)),
+		barCount: barsX,
+		totalLength: Number((barsX * barLengthX).toFixed(2)),
+		weight: Number(meshWeightX.toFixed(2)),
+		stockLength: STOCK_LENGTHS[meshDiameter] || 6,
+		stocksNeeded: Math.ceil((barsX * barLengthX) / (STOCK_LENGTHS[meshDiameter] || 6)),
+		wastePercentage: 0,
+	});
+
+	rebarDetails.push({
+		id: 'hollow-core-mesh-y',
+		description: `شبكة علوية Y — Φ${meshDiameter}@${meshSpacing * 1000}mm`,
+		location: 'الطبقة العلوية',
+		diameter: meshDiameter,
+		barLength: Number(barLengthY.toFixed(2)),
+		barCount: barsY,
+		totalLength: Number((barsY * barLengthY).toFixed(2)),
+		weight: Number(meshWeightY.toFixed(2)),
+		stockLength: STOCK_LENGTHS[meshDiameter] || 6,
+		stocksNeeded: Math.ceil((barsY * barLengthY) / (STOCK_LENGTHS[meshDiameter] || 6)),
+		wastePercentage: 0,
+	});
+
+	const netWeight = meshWeight;
+	const grossWeight = meshWeight * 1.10; // 10% هالك
+	const wasteWeight = grossWeight - netWeight;
+	const wastePercentage = grossWeight > 0 ? (wasteWeight / grossWeight) * 100 : 0;
+
+	// التكاليف
+	const concretePrice = STRUCTURAL_PRICES.concrete[concreteType] || 310;
+	const concreteCost = concreteVolume * concretePrice;
+	const rebarCost = grossWeight * STRUCTURAL_PRICES.steelPerKg;
+	const panelsCost = netArea * panelPricePerSqm;
+	const laborCost = netArea * 50;
+	const totalCost = concreteCost + rebarCost + panelsCost + laborCost;
+
+	return {
+		slabType: 'hollow_core',
+		area: Number(grossArea.toFixed(2)),
+		netArea: Number(netArea.toFixed(2)),
+		concreteVolume: Number(concreteVolume.toFixed(3)),
+		formworkArea: 0,
+		rebarDetails,
+		totals: {
+			netWeight: Number(netWeight.toFixed(2)),
+			grossWeight: Number(grossWeight.toFixed(2)),
+			wasteWeight: Number(wasteWeight.toFixed(2)),
+			wastePercentage: Number(wastePercentage.toFixed(1)),
+			stocksNeeded: [],
+		},
+		costs: {
+			concrete: Number(concreteCost.toFixed(2)),
+			rebar: Number(rebarCost.toFixed(2)),
+			formwork: 0,
+			labor: Number(laborCost.toFixed(2)),
+			total: Number(totalCost.toFixed(2)),
+		},
+		panelsCostBreakdown: {
+			panelPricePerSqm,
+			panelsCost: Number(panelsCost.toFixed(2)),
+			panelsCount,
+			concreteCost: Number(concreteCost.toFixed(2)),
+		},
+	};
+}
+
+/**
  * حساب سقف الكمرات العريضة (Banded Beam Slab)
  */
 export function calculateBandedBeamSlab(slab: BandedBeamSlab): EnhancedSlabResult {
@@ -2341,6 +2465,451 @@ export function calculateBandedBeamSlab(slab: BandedBeamSlab): EnhancedSlabResul
 			formwork: Number(formworkCost.toFixed(2)),
 			labor: Number(laborCost.toFixed(2)),
 			total: Number(totalCost.toFixed(2)),
+		},
+	};
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// حسابات تفصيلية للأعمدة مع القص (Column Rebar Details)
+// ═══════════════════════════════════════════════════════════════════════════
+
+interface CuttingDetailResult {
+	description: string;
+	diameter: number;
+	barLength: number;
+	barCount: number;
+	stocksNeeded: number;
+	wastePerStock: number;
+	totalWaste: number;
+	wastePercentage: number;
+	weight: number;
+	stockLength: number;
+}
+
+function calcCuttingDetails(
+	barLength: number,
+	barCount: number,
+	diameter: number,
+	description: string,
+): CuttingDetailResult {
+	const stockLength = STOCK_LENGTHS[diameter] || 12;
+	const cutsPerStock = Math.floor(stockLength / barLength) || 1;
+	const stocksNeeded = Math.ceil(barCount / cutsPerStock);
+	const wastePerStock = stockLength - cutsPerStock * barLength;
+	const totalWaste = stocksNeeded * wastePerStock;
+	const totalLength = barCount * barLength;
+	const grossLength = stocksNeeded * stockLength;
+	const wastePercentage =
+		grossLength > 0 ? (totalWaste / grossLength) * 100 : 0;
+	const weight = totalLength * getRebarWeightPerMeter(diameter);
+
+	return {
+		description,
+		diameter,
+		barLength: Number(barLength.toFixed(2)),
+		barCount,
+		stocksNeeded,
+		wastePerStock: Number(wastePerStock.toFixed(2)),
+		totalWaste: Number(totalWaste.toFixed(2)),
+		wastePercentage: Number(wastePercentage.toFixed(1)),
+		weight: Number(weight.toFixed(2)),
+		stockLength,
+	};
+}
+
+function aggregateStocksFromDetails(details: CuttingDetailResult[]) {
+	const stocksMap = new Map<
+		number,
+		{ diameter: number; count: number; length: number }
+	>();
+	details.forEach((d) => {
+		const existing = stocksMap.get(d.diameter);
+		if (existing) {
+			existing.count += d.stocksNeeded;
+		} else {
+			stocksMap.set(d.diameter, {
+				diameter: d.diameter,
+				count: d.stocksNeeded,
+				length: d.stockLength,
+			});
+		}
+	});
+	return Array.from(stocksMap.values());
+}
+
+function computeRebarTotals(details: CuttingDetailResult[]) {
+	const netWeight = details.reduce((sum, d) => sum + d.weight, 0);
+	const grossWeight = details.reduce(
+		(sum, d) =>
+			sum +
+			d.stocksNeeded * d.stockLength * getRebarWeightPerMeter(d.diameter),
+		0,
+	);
+	const wasteWeight = grossWeight - netWeight;
+	const wastePercentage =
+		grossWeight > 0 ? (wasteWeight / grossWeight) * 100 : 0;
+
+	return {
+		netWeight: Number(netWeight.toFixed(2)),
+		grossWeight: Number(grossWeight.toFixed(2)),
+		wasteWeight: Number(wasteWeight.toFixed(2)),
+		wastePercentage: Number(wastePercentage.toFixed(1)),
+		stocksNeeded: aggregateStocksFromDetails(details),
+	};
+}
+
+export interface ColumnRebarInput {
+	quantity: number;
+	width: number;       // cm
+	depth: number;       // cm
+	height: number;      // m
+	mainBarsCount: number;
+	mainBarDiameter: number;
+	stirrupDiameter: number;
+	stirrupSpacing: number; // mm
+	concreteType: string;
+}
+
+export interface ColumnRebarResult {
+	concreteVolume: number;
+	concreteCost: number;
+	rebarCost: number;
+	formworkCost: number;
+	laborCost: number;
+	totalCost: number;
+	cuttingDetails: CuttingDetailResult[];
+	totals: {
+		netWeight: number;
+		grossWeight: number;
+		wasteWeight: number;
+		wastePercentage: number;
+		stocksNeeded: Array<{ diameter: number; count: number; length: number }>;
+	};
+}
+
+export function calculateColumnRebar(params: ColumnRebarInput): ColumnRebarResult {
+	const baseCalc = calculateColumn(params);
+
+	const mainBarLength = params.height + 0.8;
+	const widthM = params.width / 100;
+	const depthM = params.depth / 100;
+	const stirrupPerimeter = 2 * (widthM + depthM - 0.08) + 0.3;
+	const stirrupsCount =
+		Math.ceil((params.height * 1000) / params.stirrupSpacing) + 1;
+
+	const cuttingDetails = [
+		calcCuttingDetails(
+			mainBarLength,
+			params.mainBarsCount * params.quantity,
+			params.mainBarDiameter,
+			"حديد رئيسي",
+		),
+		calcCuttingDetails(
+			stirrupPerimeter,
+			stirrupsCount * params.quantity,
+			params.stirrupDiameter,
+			"كانات",
+		),
+	];
+
+	return {
+		...baseCalc,
+		cuttingDetails,
+		totals: computeRebarTotals(cuttingDetails),
+	};
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// حسابات تفصيلية للكمرات مع القص (Beam Rebar Details)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export interface BeamRebarInput {
+	quantity: number;
+	width: number;       // cm
+	height: number;      // cm
+	length: number;      // m
+	topBarsCount: number;
+	topBarDiameter: number;
+	bottomBarsCount: number;
+	bottomBarDiameter: number;
+	stirrupDiameter: number;
+	stirrupSpacing: number; // mm
+	concreteType: string;
+}
+
+export interface BeamRebarResult {
+	concreteVolume: number;
+	concreteCost: number;
+	rebarCost: number;
+	formworkCost: number;
+	laborCost: number;
+	totalCost: number;
+	cuttingDetails: CuttingDetailResult[];
+	totals: {
+		netWeight: number;
+		grossWeight: number;
+		wasteWeight: number;
+		wastePercentage: number;
+		stocksNeeded: Array<{ diameter: number; count: number; length: number }>;
+	};
+}
+
+export function calculateBeamRebar(params: BeamRebarInput): BeamRebarResult {
+	const baseCalc = calculateBeam({
+		quantity: params.quantity,
+		width: params.width,
+		height: params.height,
+		length: params.length,
+		topBarsCount: params.topBarsCount,
+		topBarDiameter: params.topBarDiameter,
+		bottomBarsCount: params.bottomBarsCount,
+		bottomBarDiameter: params.bottomBarDiameter,
+		stirrupDiameter: params.stirrupDiameter,
+		stirrupSpacing: params.stirrupSpacing,
+		concreteType: params.concreteType,
+	});
+
+	const barLength = params.length + 0.6;
+	const widthM = params.width / 100;
+	const heightM = params.height / 100;
+	const stirrupPerimeter = 2 * (widthM + heightM - 0.08) + 0.3;
+	const stirrupsCount =
+		Math.ceil((params.length * 1000) / params.stirrupSpacing) + 1;
+
+	const cuttingDetails = [
+		calcCuttingDetails(
+			barLength,
+			params.topBarsCount * params.quantity,
+			params.topBarDiameter,
+			"حديد علوي",
+		),
+		calcCuttingDetails(
+			barLength,
+			params.bottomBarsCount * params.quantity,
+			params.bottomBarDiameter,
+			"حديد سفلي",
+		),
+		calcCuttingDetails(
+			stirrupPerimeter,
+			stirrupsCount * params.quantity,
+			params.stirrupDiameter,
+			"كانات",
+		),
+	];
+
+	return {
+		...baseCalc,
+		cuttingDetails,
+		totals: computeRebarTotals(cuttingDetails),
+	};
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// حسابات تفصيلية للسلالم مع القص (Staircase Rebar Details)
+// ═══════════════════════════════════════════════════════════════════════════
+
+const STAIR_REBAR_CONSTS = {
+	DEV_LENGTH_MULTIPLIER: 40,
+	HOOK_MULTIPLIER: 12,
+	TOP_BAR_EXTENSION_RATIO: 0.25,
+	CUT_LENGTH_ROUNDING: 0.05,
+};
+
+function stairRoundUpTo5cm(length: number): number {
+	return Math.ceil(length / 0.05) * 0.05;
+}
+
+interface StairCuttingDetail {
+	description: string;
+	diameter: number;
+	barLength: number;
+	barCount: number;
+	stockLength: number;
+	stocksNeeded: number;
+	cutsPerStock: number;
+	wastePerStock: number;
+	totalWaste: number;
+	wastePercentage: number;
+	netWeight: number;
+	grossWeight: number;
+}
+
+function calcStairCuttingDetail(
+	description: string,
+	diameter: number,
+	barLength: number,
+	barCount: number,
+): StairCuttingDetail {
+	const stockLength = STOCK_LENGTHS[diameter] || 12;
+	const weight = REBAR_WEIGHTS[diameter] || diameter * diameter * 0.00617;
+
+	const cutsPerStock = Math.floor(stockLength / barLength) || 1;
+	const stocksNeeded = Math.ceil(barCount / cutsPerStock);
+	const wastePerStock = stockLength - cutsPerStock * barLength;
+	const totalWaste = stocksNeeded * wastePerStock;
+
+	const netLength = barCount * barLength;
+	const grossLength = stocksNeeded * stockLength;
+
+	const netWeight = netLength * weight;
+	const grossWeight = grossLength * weight;
+	const wastePercentage = grossLength > 0 ? (totalWaste / grossLength) * 100 : 0;
+
+	return {
+		description,
+		diameter,
+		barLength: Number(barLength.toFixed(3)),
+		barCount,
+		stockLength,
+		stocksNeeded,
+		cutsPerStock,
+		wastePerStock: Number(wastePerStock.toFixed(3)),
+		totalWaste: Number(totalWaste.toFixed(2)),
+		wastePercentage: Number(wastePercentage.toFixed(1)),
+		netWeight: Number(netWeight.toFixed(2)),
+		grossWeight: Number(grossWeight.toFixed(2)),
+	};
+}
+
+export interface StaircaseRebarInput {
+	width: number;
+	flightLength: number;
+	landingLength: number;
+	landingWidth: number;
+	thickness: number;
+	risersCount: number;
+	riserHeight: number;
+	treadDepth: number;
+	mainBarDiameter: number;
+	mainBarsPerMeter: number;
+	secondaryBarDiameter: number;
+	secondaryBarsPerMeter: number;
+	concreteType: string;
+}
+
+export interface StaircaseRebarResult {
+	concreteVolume: number;
+	concreteCost: number;
+	rebarCost: number;
+	laborCost: number;
+	totalCost: number;
+	cuttingDetails: StairCuttingDetail[];
+	totals: {
+		netWeight: number;
+		grossWeight: number;
+		wasteWeight: number;
+		wastePercentage: number;
+		stocksNeeded: Array<{ diameter: number; count: number; length: number }>;
+	};
+}
+
+export function calculateStaircaseRebar(params: StaircaseRebarInput): StaircaseRebarResult {
+	const mainBarSpacing = Math.round(1000 / params.mainBarsPerMeter);
+	const secondaryBarSpacing = Math.round(1000 / params.secondaryBarsPerMeter);
+
+	const baseResult = calculateStairs({
+		width: params.width,
+		flightLength: params.flightLength,
+		landingLength: params.landingLength,
+		landingWidth: params.landingWidth,
+		thickness: params.thickness,
+		risersCount: params.risersCount,
+		riserHeight: params.riserHeight,
+		treadDepth: params.treadDepth,
+		mainBarDiameter: params.mainBarDiameter,
+		mainBarSpacing,
+		secondaryBarDiameter: params.secondaryBarDiameter,
+		secondaryBarSpacing,
+		concreteType: params.concreteType,
+	});
+
+	const {
+		flightLength, landingLength, width,
+		mainBarDiameter, mainBarsPerMeter,
+		secondaryBarDiameter, secondaryBarsPerMeter,
+	} = params;
+
+	const totalLength = flightLength + landingLength;
+	const mainBarsCount = Math.ceil(width * mainBarsPerMeter) + 1;
+	const secondaryBarsCount = Math.ceil(totalLength * secondaryBarsPerMeter) + 1;
+
+	const mainDevLength = STAIR_REBAR_CONSTS.DEV_LENGTH_MULTIPLIER * (mainBarDiameter / 1000);
+	const mainHookLength = STAIR_REBAR_CONSTS.HOOK_MULTIPLIER * (mainBarDiameter / 1000);
+	const secDevLength = STAIR_REBAR_CONSTS.DEV_LENGTH_MULTIPLIER * (secondaryBarDiameter / 1000);
+	const secHookLength = STAIR_REBAR_CONSTS.HOOK_MULTIPLIER * (secondaryBarDiameter / 1000);
+
+	const topExtension = STAIR_REBAR_CONSTS.TOP_BAR_EXTENSION_RATIO * flightLength;
+	const secBarSpacing = Math.round(1000 / secondaryBarsPerMeter);
+
+	// Layer 1: Bottom main (longitudinal)
+	const bottomMainBarLength = stairRoundUpTo5cm(totalLength + 2 * mainDevLength + 2 * mainHookLength);
+	const bottomMainCutting = calcStairCuttingDetail(
+		"حديد سفلي رئيسي (طولي)",
+		mainBarDiameter,
+		bottomMainBarLength,
+		mainBarsCount,
+	);
+
+	// Layer 2: Bottom secondary (transverse)
+	const bottomSecBarLength = stairRoundUpTo5cm(width + 2 * secDevLength + 2 * secHookLength);
+	const bottomSecCutting = calcStairCuttingDetail(
+		"حديد سفلي ثانوي (عرضي)",
+		secondaryBarDiameter,
+		bottomSecBarLength,
+		secondaryBarsCount,
+	);
+
+	// Layer 3: Top main (supports)
+	const topMainPieceLength = stairRoundUpTo5cm(topExtension + mainDevLength + mainHookLength);
+	const topMainCount = mainBarsCount * 2;
+	const topMainCutting = calcStairCuttingDetail(
+		"حديد علوي رئيسي (مساند)",
+		mainBarDiameter,
+		topMainPieceLength,
+		topMainCount,
+	);
+
+	// Layer 4: Top secondary (support distribution)
+	const topSecBarLength = bottomSecBarLength;
+	const topSecCount = 2 * (Math.ceil((topExtension * 1000) / secBarSpacing) + 1);
+	const topSecCutting = calcStairCuttingDetail(
+		"حديد علوي ثانوي (توزيع مساند)",
+		secondaryBarDiameter,
+		topSecBarLength,
+		topSecCount,
+	);
+
+	const cuttingDetails = [bottomMainCutting, bottomSecCutting, topMainCutting, topSecCutting];
+
+	// Totals
+	const netWeight = cuttingDetails.reduce((sum, d) => sum + d.netWeight, 0);
+	const grossWeight = cuttingDetails.reduce((sum, d) => sum + d.grossWeight, 0);
+	const wasteWeight = grossWeight - netWeight;
+	const wastePercentage = grossWeight > 0 ? (wasteWeight / grossWeight) * 100 : 0;
+
+	const stocksMap = new Map<number, { diameter: number; count: number; length: number }>();
+	cuttingDetails.forEach((d) => {
+		const existing = stocksMap.get(d.diameter);
+		if (existing) {
+			existing.count += d.stocksNeeded;
+		} else {
+			stocksMap.set(d.diameter, {
+				diameter: d.diameter,
+				count: d.stocksNeeded,
+				length: d.stockLength,
+			});
+		}
+	});
+
+	return {
+		...baseResult,
+		cuttingDetails,
+		totals: {
+			netWeight: Number(netWeight.toFixed(2)),
+			grossWeight: Number(grossWeight.toFixed(2)),
+			wasteWeight: Number(wasteWeight.toFixed(2)),
+			wastePercentage: Number(wastePercentage.toFixed(1)),
+			stocksNeeded: Array.from(stocksMap.values()),
 		},
 	};
 }

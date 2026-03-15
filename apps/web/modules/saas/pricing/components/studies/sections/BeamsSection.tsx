@@ -34,7 +34,7 @@ import { useMutation } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { toast } from "sonner";
 import { calculateBeam } from "../../../lib/calculations";
-import { getRebarWeightPerMeter } from "../../../lib/structural-calculations";
+import { getRebarWeightPerMeter, calculateBeamRebar } from "../../../lib/structural-calculations";
 import { formatNumber, formatCurrency, ELEMENT_PREFIXES } from "../../../lib/utils";
 import { CONCRETE_TYPES, REBAR_DIAMETERS, STOCK_LENGTHS } from "../../../constants/prices";
 import {
@@ -44,6 +44,7 @@ import {
 	StirrupsInput,
 	CalculationResultsPanel,
 } from "../shared";
+import type { StructuralItemCreateInput, StructuralItemUpdateInput, StructuralItemDeleteInput } from "../../../types/structural-mutation";
 
 interface BeamsSectionProps {
 	studyId: string;
@@ -61,37 +62,6 @@ interface BeamsSectionProps {
 	onSave: () => void;
 	onUpdate: () => void;
 	specs?: { concreteType: string; steelGrade: string };
-}
-
-// دالة حساب تفاصيل القص
-function calculateCuttingDetails(
-	barLength: number,
-	barCount: number,
-	diameter: number,
-	description: string
-) {
-	const stockLength = STOCK_LENGTHS[diameter] || 12;
-	const cutsPerStock = Math.floor(stockLength / barLength) || 1;
-	const stocksNeeded = Math.ceil(barCount / cutsPerStock);
-	const wastePerStock = stockLength - cutsPerStock * barLength;
-	const totalWaste = stocksNeeded * wastePerStock;
-	const totalLength = barCount * barLength;
-	const grossLength = stocksNeeded * stockLength;
-	const wastePercentage = grossLength > 0 ? (totalWaste / grossLength) * 100 : 0;
-	const weight = totalLength * getRebarWeightPerMeter(diameter);
-
-	return {
-		description,
-		diameter,
-		barLength: Number(barLength.toFixed(2)),
-		barCount,
-		stocksNeeded,
-		wastePerStock: Number(wastePerStock.toFixed(2)),
-		totalWaste: Number(totalWaste.toFixed(2)),
-		wastePercentage: Number(wastePercentage.toFixed(1)),
-		weight: Number(weight.toFixed(2)),
-		stockLength,
-	};
 }
 
 export function BeamsSection({
@@ -128,7 +98,7 @@ export function BeamsSection({
 			return null;
 		}
 
-		const baseCalc = calculateBeam({
+		return calculateBeamRebar({
 			quantity: formData.quantity,
 			width: formData.width,
 			height: formData.height,
@@ -141,71 +111,7 @@ export function BeamsSection({
 			stirrupSpacing: formData.stirrupSpacing,
 			concreteType: specs?.concreteType || "C30",
 		});
-
-		// حساب تفاصيل القص
-		const barLength = formData.length + 0.6; // طول السيخ مع الرجوع
-		const widthM = formData.width / 100;
-		const heightM = formData.height / 100;
-		const stirrupPerimeter = 2 * (widthM + heightM - 0.08) + 0.3;
-		const stirrupsCount = Math.ceil((formData.length * 1000) / formData.stirrupSpacing) + 1;
-
-		const cuttingDetails = [
-			calculateCuttingDetails(
-				barLength,
-				formData.topBarsCount * formData.quantity,
-				formData.topBarDiameter,
-				"حديد علوي"
-			),
-			calculateCuttingDetails(
-				barLength,
-				formData.bottomBarsCount * formData.quantity,
-				formData.bottomBarDiameter,
-				"حديد سفلي"
-			),
-			calculateCuttingDetails(
-				stirrupPerimeter,
-				stirrupsCount * formData.quantity,
-				formData.stirrupDiameter,
-				"كانات"
-			),
-		];
-
-		// حساب الإجماليات
-		const netWeight = cuttingDetails.reduce((sum, d) => sum + d.weight, 0);
-		const grossWeight = cuttingDetails.reduce(
-			(sum, d) => sum + d.stocksNeeded * d.stockLength * getRebarWeightPerMeter(d.diameter),
-			0
-		);
-		const wasteWeight = grossWeight - netWeight;
-		const wastePercentage = grossWeight > 0 ? (wasteWeight / grossWeight) * 100 : 0;
-
-		// تجميع الأسياخ المطلوبة
-		const stocksMap = new Map<number, { diameter: number; count: number; length: number }>();
-		cuttingDetails.forEach((d) => {
-			const existing = stocksMap.get(d.diameter);
-			if (existing) {
-				existing.count += d.stocksNeeded;
-			} else {
-				stocksMap.set(d.diameter, {
-					diameter: d.diameter,
-					count: d.stocksNeeded,
-					length: d.stockLength,
-				});
-			}
-		});
-
-		return {
-			...baseCalc,
-			cuttingDetails,
-			totals: {
-				netWeight: Number(netWeight.toFixed(2)),
-				grossWeight: Number(grossWeight.toFixed(2)),
-				wasteWeight: Number(wasteWeight.toFixed(2)),
-				wastePercentage: Number(wastePercentage.toFixed(1)),
-				stocksNeeded: Array.from(stocksMap.values()),
-			},
-		};
-	}, [formData]);
+	}, [formData, specs]);
 
 	const createMutation = useMutation(
 		orpc.pricing.studies.structuralItem.create.mutationOptions({
@@ -282,15 +188,15 @@ export function BeamsSection({
 		};
 
 		if (editingItemId) {
-			(updateMutation as any).mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
+			(updateMutation.mutate as (data: StructuralItemUpdateInput) => void)({ ...itemData, id: editingItemId, costStudyId: studyId });
 		} else {
-			(createMutation as any).mutate(itemData);
+			(createMutation.mutate as (data: StructuralItemCreateInput) => void)(itemData);
 		}
 	};
 
 	const handleDelete = (id: string) => {
 		if (confirm(t("pricing.studies.messages.confirmDelete"))) {
-			(deleteMutation as any).mutate({ id, organizationId, costStudyId: studyId });
+			(deleteMutation.mutate as (data: StructuralItemDeleteInput) => void)({ id, organizationId, costStudyId: studyId });
 		}
 	};
 

@@ -29,6 +29,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { toast } from "sonner";
 import { formatNumber, ELEMENT_PREFIXES } from "../../../lib/utils";
 import { ElementHeaderRow } from "../shared";
+import type { StructuralItemCreateInput, StructuralItemUpdateInput, StructuralItemDeleteInput } from "../../../types/structural-mutation";
 
 interface PlainConcreteSectionProps {
 	studyId: string;
@@ -214,15 +215,15 @@ export function PlainConcreteSection({
 		};
 
 		if (editingItemId) {
-			(updateMutation as any).mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
+			(updateMutation.mutate as (data: StructuralItemUpdateInput) => void)({ ...itemData, id: editingItemId, costStudyId: studyId });
 		} else {
-			(createMutation as any).mutate(itemData);
+			(createMutation.mutate as (data: StructuralItemCreateInput) => void)(itemData);
 		}
 	};
 
 	const handleDelete = (id: string) => {
 		if (confirm(t("pricing.studies.messages.confirmDelete"))) {
-			(deleteMutation as any).mutate({ id, organizationId, costStudyId: studyId });
+			(deleteMutation.mutate as (data: StructuralItemDeleteInput) => void)({ id, organizationId, costStudyId: studyId });
 		}
 	};
 

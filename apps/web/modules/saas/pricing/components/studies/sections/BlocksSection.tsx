@@ -53,6 +53,7 @@ import { formatNumber, formatCurrency } from "../../../lib/utils";
 import { BLOCK_TYPES, WALL_CATEGORIES, WASTE_PERCENTAGES } from "../../../constants/blocks";
 import type { StructuralFloorConfig, StructuralBuildingConfig } from "../../../types/structural-building-config";
 import { useHeightDerivation } from "../../../hooks/useHeightDerivation";
+import type { StructuralItemCreateInput, StructuralItemUpdateInput, StructuralItemDeleteInput } from "../../../types/structural-mutation";
 
 const DEFAULT_FLOOR_NAMES = ["أرضي", "أول", "ثاني", "ثالث", "رابع", "متكرر", "أخير"] as const;
 
@@ -72,6 +73,7 @@ interface BlocksSectionProps {
 		dimensions: Record<string, number>;
 		totalCost: number;
 	}>;
+	allItems?: Array<{ category: string; dimensions: Record<string, any>; subCategory?: string | null }>;
 	onSave: () => void;
 	onUpdate: () => void;
 	specs?: { concreteType: string; steelGrade: string };
@@ -385,9 +387,9 @@ function BlockForm({
 		};
 
 		if (editingItemId) {
-			(updateMutation as any).mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
+			(updateMutation.mutate as (data: StructuralItemUpdateInput) => void)({ ...itemData, id: editingItemId, costStudyId: studyId });
 		} else {
-			(createMutation as any).mutate(itemData);
+			(createMutation.mutate as (data: StructuralItemCreateInput) => void)(itemData);
 		}
 	};
 
@@ -881,11 +883,11 @@ function CopyFromFloorButton({
 		const sourceItems = getFloorItems(selectedSource, floors[0]?.label === selectedSource);
 		for (const item of sourceItems) {
 			const newName = item.name.replace(selectedSource, currentFloor);
-			await (createMutation as any).mutateAsync({
+			await (createMutation.mutateAsync as (data: StructuralItemCreateInput) => Promise<unknown>)({
 				costStudyId: studyId,
 				organizationId,
 				category: "blocks",
-				subCategory: item.dimensions?.wallCategory,
+				subCategory: String(item.dimensions?.wallCategory || ""),
 				name: newName,
 				quantity: item.quantity,
 				unit: "piece",
@@ -934,13 +936,14 @@ export function BlocksSection({
 	studyId,
 	organizationId,
 	items,
+	allItems,
 	onSave,
 	onUpdate,
 	specs,
 	buildingFloors,
 	buildingConfig,
 }: BlocksSectionProps) {
-	const { getBlockHeight, getParapetBlockHeight } = useHeightDerivation(buildingConfig ?? null);
+	const { getBlockHeight, getParapetBlockHeight } = useHeightDerivation(buildingConfig ?? null, allItems);
 	const t = useTranslations();
 	const [editingItemId, setEditingItemId] = useState<string | null>(null);
 
@@ -987,7 +990,7 @@ export function BlocksSection({
 
 	const handleDelete = (id: string) => {
 		if (confirm(t("pricing.studies.messages.confirmDelete"))) {
-			(deleteMutation as any).mutate({ id, organizationId, costStudyId: studyId });
+			(deleteMutation.mutate as (data: StructuralItemDeleteInput) => void)({ id, organizationId, costStudyId: studyId });
 		}
 	};
 

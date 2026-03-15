@@ -38,6 +38,7 @@ import { useMutation } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { toast } from "sonner";
 import { calculateStairs, type StairsResult } from "../../../lib/calculations";
+import { calculateStaircaseRebar } from "../../../lib/structural-calculations";
 import { formatNumber, ELEMENT_PREFIXES } from "../../../lib/utils";
 import { STOCK_LENGTHS, REBAR_WEIGHTS } from "../../../constants/prices";
 import {
@@ -46,6 +47,7 @@ import {
 	CalculationResultsPanel,
 } from "../shared";
 import type { StructuralFloorConfig } from "../../../types/structural-building-config";
+import type { StructuralItemCreateInput, StructuralItemUpdateInput, StructuralItemDeleteInput } from "../../../types/structural-mutation";
 
 interface StairsSectionProps {
 	studyId: string;
@@ -104,125 +106,6 @@ interface ConnectionCalc {
 	goingLength: number;
 	flightLength: number;
 	calculations: EnhancedStairsResult;
-}
-
-// ثوابت حساب حديد السلالم (SBC 304)
-const STAIR_REBAR_DEFAULTS = {
-	DEV_LENGTH_MULTIPLIER: 40,      // 40d - طول التماسك
-	HOOK_MULTIPLIER: 12,            // 12d - طول الخطاف
-	TOP_BAR_EXTENSION_RATIO: 0.25,  // 0.25L - امتداد الحديد العلوي
-	CUT_LENGTH_ROUNDING: 0.05,      // تقريب لأقرب 5 سم
-};
-
-function roundUpTo5cm(length: number): number {
-	return Math.ceil(length / 0.05) * 0.05;
-}
-
-// دالة حساب تفاصيل القص
-function calculateCuttingDetail(
-	description: string,
-	diameter: number,
-	barLength: number,
-	barCount: number
-): CuttingDetail {
-	const stockLength = STOCK_LENGTHS[diameter] || 12;
-	const weight = REBAR_WEIGHTS[diameter] || diameter * diameter * 0.00617;
-
-	const cutsPerStock = Math.floor(stockLength / barLength) || 1;
-	const stocksNeeded = Math.ceil(barCount / cutsPerStock);
-	const wastePerStock = stockLength - cutsPerStock * barLength;
-	const totalWaste = stocksNeeded * wastePerStock;
-
-	const netLength = barCount * barLength;
-	const grossLength = stocksNeeded * stockLength;
-
-	const netWeight = netLength * weight;
-	const grossWeight = grossLength * weight;
-	const wastePercentage = grossLength > 0 ? (totalWaste / grossLength) * 100 : 0;
-
-	return {
-		description,
-		diameter,
-		barLength: Number(barLength.toFixed(3)),
-		barCount,
-		stockLength,
-		stocksNeeded,
-		cutsPerStock,
-		wastePerStock: Number(wastePerStock.toFixed(3)),
-		totalWaste: Number(totalWaste.toFixed(2)),
-		wastePercentage: Number(wastePercentage.toFixed(1)),
-		netWeight: Number(netWeight.toFixed(2)),
-		grossWeight: Number(grossWeight.toFixed(2)),
-	};
-}
-
-// حساب تفاصيل القص لجميع طبقات حديد السلم (4 طبقات)
-function computeStairCuttingDetails(params: {
-	flightLength: number;
-	landingLength: number;
-	width: number;
-	mainBarDiameter: number;
-	mainBarsPerMeter: number;
-	secondaryBarDiameter: number;
-	secondaryBarsPerMeter: number;
-}): CuttingDetail[] {
-	const {
-		flightLength, landingLength, width,
-		mainBarDiameter, mainBarsPerMeter,
-		secondaryBarDiameter, secondaryBarsPerMeter,
-	} = params;
-
-	const totalLength = flightLength + landingLength;
-	const mainBarsCount = Math.ceil(width * mainBarsPerMeter) + 1;
-	const secondaryBarsCount = Math.ceil(totalLength * secondaryBarsPerMeter) + 1;
-
-	const mainDevLength = STAIR_REBAR_DEFAULTS.DEV_LENGTH_MULTIPLIER * (mainBarDiameter / 1000);
-	const mainHookLength = STAIR_REBAR_DEFAULTS.HOOK_MULTIPLIER * (mainBarDiameter / 1000);
-	const secDevLength = STAIR_REBAR_DEFAULTS.DEV_LENGTH_MULTIPLIER * (secondaryBarDiameter / 1000);
-	const secHookLength = STAIR_REBAR_DEFAULTS.HOOK_MULTIPLIER * (secondaryBarDiameter / 1000);
-
-	const topExtension = STAIR_REBAR_DEFAULTS.TOP_BAR_EXTENSION_RATIO * flightLength;
-	const secondaryBarSpacing = Math.round(1000 / secondaryBarsPerMeter);
-
-	// الطبقة 1: حديد سفلي رئيسي (طولي)
-	const bottomMainBarLength = roundUpTo5cm(totalLength + 2 * mainDevLength + 2 * mainHookLength);
-	const bottomMainCutting = calculateCuttingDetail(
-		"حديد سفلي رئيسي (طولي)",
-		mainBarDiameter,
-		bottomMainBarLength,
-		mainBarsCount
-	);
-
-	// الطبقة 2: حديد سفلي ثانوي (عرضي)
-	const bottomSecBarLength = roundUpTo5cm(width + 2 * secDevLength + 2 * secHookLength);
-	const bottomSecCutting = calculateCuttingDetail(
-		"حديد سفلي ثانوي (عرضي)",
-		secondaryBarDiameter,
-		bottomSecBarLength,
-		secondaryBarsCount
-	);
-
-	// الطبقة 3: حديد علوي رئيسي (مساند)
-	const topMainPieceLength = roundUpTo5cm(topExtension + mainDevLength + mainHookLength);
-	const topMainCount = mainBarsCount * 2;
-	const topMainCutting = calculateCuttingDetail(
-		"حديد علوي رئيسي (مساند)",
-		mainBarDiameter,
-		topMainPieceLength,
-		topMainCount
-	);
-
-	// الطبقة 4: حديد علوي ثانوي (توزيع مساند)
-	const topSecBarLength = bottomSecBarLength;
-	const topSecCount = 2 * (Math.ceil((topExtension * 1000) / secondaryBarSpacing) + 1);
-	const topSecCutting = calculateCuttingDetail(
-		"حديد علوي ثانوي (توزيع مساند)",
-		secondaryBarDiameter,
-		topSecBarLength,
-		topSecCount
-	);
-
-	return [bottomMainCutting, bottomSecCutting, topMainCutting, topSecCutting];
 }
 
 export function StairsSection({
@@ -311,10 +194,7 @@ export function StairsSection({
 			const goingLength = risersCount * (autoFormData.treadDepth / 100);
 			const flightLength = Math.sqrt(goingLength ** 2 + conn.height ** 2);
 
-			const mainBarSpacing = Math.round(1000 / autoFormData.mainBarsPerMeter);
-			const secondaryBarSpacing = Math.round(1000 / autoFormData.secondaryBarsPerMeter);
-
-			const baseResult = calculateStairs({
+			const result = calculateStaircaseRebar({
 				width: autoFormData.width,
 				flightLength,
 				landingLength: autoFormData.landingLength,
@@ -324,32 +204,10 @@ export function StairsSection({
 				riserHeight: autoFormData.riserHeight,
 				treadDepth: autoFormData.treadDepth,
 				mainBarDiameter: autoFormData.mainBarDiameter,
-				mainBarSpacing,
-				secondaryBarDiameter: autoFormData.secondaryBarDiameter,
-				secondaryBarSpacing,
-				concreteType: specs?.concreteType || "C30",
-			});
-
-			// Calculate cutting details (4 layers)
-			const cuttingDetails = computeStairCuttingDetails({
-				flightLength,
-				landingLength: autoFormData.landingLength,
-				width: autoFormData.width,
-				mainBarDiameter: autoFormData.mainBarDiameter,
 				mainBarsPerMeter: autoFormData.mainBarsPerMeter,
 				secondaryBarDiameter: autoFormData.secondaryBarDiameter,
 				secondaryBarsPerMeter: autoFormData.secondaryBarsPerMeter,
-			});
-			const netWeight = cuttingDetails.reduce((sum, d) => sum + d.netWeight, 0);
-			const grossWeight = cuttingDetails.reduce((sum, d) => sum + d.grossWeight, 0);
-			const wasteWeight = grossWeight - netWeight;
-			const wastePercentage = grossWeight > 0 ? (wasteWeight / grossWeight) * 100 : 0;
-
-			const stocksMap = new Map<number, { diameter: number; count: number; length: number }>();
-			cuttingDetails.forEach(d => {
-				const existing = stocksMap.get(d.diameter);
-				if (existing) { existing.count += d.stocksNeeded; }
-				else { stocksMap.set(d.diameter, { diameter: d.diameter, count: d.stocksNeeded, length: d.stockLength }); }
+				concreteType: specs?.concreteType || "C30",
 			});
 
 			return {
@@ -357,17 +215,7 @@ export function StairsSection({
 				risersCount,
 				goingLength,
 				flightLength,
-				calculations: {
-					...baseResult,
-					cuttingDetails,
-					totals: {
-						netWeight: Number(netWeight.toFixed(2)),
-						grossWeight: Number(grossWeight.toFixed(2)),
-						wasteWeight: Number(wasteWeight.toFixed(2)),
-						wastePercentage: Number(wastePercentage.toFixed(1)),
-						stocksNeeded: Array.from(stocksMap.values()),
-					},
-				},
+				calculations: result as EnhancedStairsResult,
 			};
 		});
 	}, [isAutoMode, showAutoForm, autoFormData, stairConnections, specs]);
@@ -431,11 +279,7 @@ export function StairsSection({
 	const calculations = useMemo((): EnhancedStairsResult | null => {
 		if (formData.width <= 0 || formData.flightLength <= 0) return null;
 
-		// تحويل الأسياخ/متر إلى تباعد بالمم للحسابات
-		const mainBarSpacing = Math.round(1000 / formData.mainBarsPerMeter);
-		const secondaryBarSpacing = Math.round(1000 / formData.secondaryBarsPerMeter);
-
-		const baseResult = calculateStairs({
+		return calculateStaircaseRebar({
 			width: formData.width,
 			flightLength: formData.flightLength,
 			landingLength: formData.landingLength,
@@ -445,55 +289,11 @@ export function StairsSection({
 			riserHeight: formData.riserHeight,
 			treadDepth: formData.treadDepth,
 			mainBarDiameter: formData.mainBarDiameter,
-			mainBarSpacing: mainBarSpacing,
-			secondaryBarDiameter: formData.secondaryBarDiameter,
-			secondaryBarSpacing: secondaryBarSpacing,
-			concreteType: specs?.concreteType || "C30",
-		});
-
-		// حساب تفاصيل القص - 4 طبقات
-		const cuttingDetails = computeStairCuttingDetails({
-			flightLength: formData.flightLength,
-			landingLength: formData.landingLength,
-			width: formData.width,
-			mainBarDiameter: formData.mainBarDiameter,
 			mainBarsPerMeter: formData.mainBarsPerMeter,
 			secondaryBarDiameter: formData.secondaryBarDiameter,
 			secondaryBarsPerMeter: formData.secondaryBarsPerMeter,
-		});
-
-		// حساب الإجماليات
-		const netWeight = cuttingDetails.reduce((sum, d) => sum + d.netWeight, 0);
-		const grossWeight = cuttingDetails.reduce((sum, d) => sum + d.grossWeight, 0);
-		const wasteWeight = grossWeight - netWeight;
-		const wastePercentage = grossWeight > 0 ? (wasteWeight / grossWeight) * 100 : 0;
-
-		// تجميع الأسياخ حسب القطر
-		const stocksMap = new Map<number, { diameter: number; count: number; length: number }>();
-		cuttingDetails.forEach((d) => {
-			const existing = stocksMap.get(d.diameter);
-			if (existing) {
-				existing.count += d.stocksNeeded;
-			} else {
-				stocksMap.set(d.diameter, {
-					diameter: d.diameter,
-					count: d.stocksNeeded,
-					length: d.stockLength,
-				});
-			}
-		});
-
-		return {
-			...baseResult,
-			cuttingDetails,
-			totals: {
-				netWeight: Number(netWeight.toFixed(2)),
-				grossWeight: Number(grossWeight.toFixed(2)),
-				wasteWeight: Number(wasteWeight.toFixed(2)),
-				wastePercentage: Number(wastePercentage.toFixed(1)),
-				stocksNeeded: Array.from(stocksMap.values()),
-			},
-		};
+			concreteType: specs?.concreteType || "C30",
+		}) as EnhancedStairsResult;
 	}, [formData, specs]);
 
 	const handleSubmit = async () => {
@@ -528,9 +328,9 @@ export function StairsSection({
 		};
 
 		if (editingItemId) {
-			(updateMutation as any).mutate({ ...itemData, id: editingItemId, costStudyId: studyId });
+			(updateMutation.mutate as (data: StructuralItemUpdateInput) => void)({ ...itemData, id: editingItemId, costStudyId: studyId });
 		} else {
-			(createMutation as any).mutate(itemData);
+			(createMutation.mutate as (data: StructuralItemCreateInput) => void)(itemData);
 		}
 	};
 
@@ -570,7 +370,7 @@ export function StairsSection({
 					laborCost: calc.calculations.laborCost,
 					totalCost: calc.calculations.totalCost,
 				};
-				await (autoCreateMutation as any).mutateAsync(itemData);
+				await (autoCreateMutation.mutateAsync as (data: StructuralItemCreateInput) => Promise<unknown>)(itemData);
 			}
 			toast.success(`تم إنشاء ${autoCalculations.length} سلم بنجاح`);
 			setShowAutoForm(false);
@@ -583,7 +383,7 @@ export function StairsSection({
 
 	const handleDelete = (id: string) => {
 		if (confirm(t("pricing.studies.messages.confirmDelete"))) {
-			(deleteMutation as any).mutate({ id, organizationId, costStudyId: studyId });
+			(deleteMutation.mutate as (data: StructuralItemDeleteInput) => void)({ id, organizationId, costStudyId: studyId });
 		}
 	};
 
