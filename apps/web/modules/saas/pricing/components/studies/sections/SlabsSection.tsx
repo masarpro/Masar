@@ -921,7 +921,18 @@ function SlabForm({
 									},
 								}),
 							},
-							topping: {},
+							topping: formData.bottomSecondaryBarsPerMeter > 0 ? {
+								mesh: {
+									xDirection: {
+										diameter: formData.bottomSecondaryDiameter,
+										spacing: 1 / formData.bottomSecondaryBarsPerMeter,
+									},
+									yDirection: {
+										diameter: formData.bottomSecondaryDiameter,
+										spacing: 1 / formData.bottomSecondaryBarsPerMeter,
+									},
+								},
+							} : {},
 						},
 					};
 					return calculateRibbedSlab(input);

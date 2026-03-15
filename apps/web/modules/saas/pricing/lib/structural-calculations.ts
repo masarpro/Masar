@@ -1699,17 +1699,19 @@ export function calculateRibbedSlab(slab: RibbedSlab): EnhancedSlabResult {
 	const toppingM = toppingThickness / 100;
 
 	// عدد الأعصاب
-	const ribsCount = Math.ceil(dimensions.width / ribSpacingM);
+	const ribsCount = Math.floor(dimensions.width / ribSpacingM + 1e-9) + 1;
 
 	// حجم الخرسانة
-	const ribVolume = ribsCount * dimensions.length * ribWidthM * (blockHeightM + toppingM);
+	const ribVolume = ribsCount * dimensions.length * ribWidthM * blockHeightM;
 	const toppingVolume = netArea * toppingM;
 	const concreteVolume = ribVolume + toppingVolume;
 
 	// عدد البلوكات
-	const blockWidth = 0.4; // م
-	const blockLength = 0.2; // م
-	const blocksCount = Math.ceil(netArea / (ribSpacingM * blockLength)) * 2.5;
+	const blockWidthM = system.block.width / 100; // 40سم = 0.4م — بُعد البلوكة في اتجاه العصب
+	const blockGaps = ribsCount - 1;
+	const blocksPerGap = Math.floor(dimensions.length / blockWidthM);
+	const totalBlocks = blockGaps * blocksPerGap;
+	const blocksCount = Math.ceil(totalBlocks * (1 + SLAB_DEFAULTS.blockWaste));
 
 	const formworkArea = netArea;
 
@@ -1747,6 +1749,36 @@ export function calculateRibbedSlab(slab: RibbedSlab): EnhancedSlabResult {
 				)
 			);
 		}
+
+		// كانات الأعصاب
+		if (reinforcement.ribs.stirrups) {
+			const { diameter: stirrupDia, spacing: stirrupSpacing } = reinforcement.ribs.stirrups;
+			const stirrupsPerRib = Math.floor(dimensions.length / stirrupSpacing) + 1;
+			const stirrupPerimeter = 2 * (ribWidthM + blockHeightM)
+				+ 2 * (10 * stirrupDia / 1000)
+				+ SLAB_DEFAULTS.stirrupHook;
+			const totalStirrups = ribsCount * stirrupsPerRib;
+			rebarDetails.push(
+				calculateRebarLayer(stirrupDia, stirrupPerimeter, totalStirrups, 'كانات أعصاب', 'الأعصاب')
+			);
+		}
+	}
+
+	// شبكة الطبقة العلوية
+	if (reinforcement.topping?.mesh) {
+		const { mesh } = reinforcement.topping;
+		// اتجاه طولي (أسياخ تمتد على طول السقف)
+		const meshXCount = Math.floor(dimensions.width / mesh.xDirection.spacing) + 1;
+		const meshXLength = dimensions.length + 2 * cover;
+		rebarDetails.push(
+			calculateRebarLayer(mesh.xDirection.diameter, meshXLength, meshXCount, 'شبكة علوية - اتجاه طولي', 'الطبقة العلوية')
+		);
+		// اتجاه عرضي (أسياخ تمتد على عرض السقف)
+		const meshYCount = Math.floor(dimensions.length / mesh.yDirection.spacing) + 1;
+		const meshYLength = dimensions.width + 2 * cover;
+		rebarDetails.push(
+			calculateRebarLayer(mesh.yDirection.diameter, meshYLength, meshYCount, 'شبكة علوية - اتجاه عرضي', 'الطبقة العلوية')
+		);
 	}
 
 	// إجماليات الحديد
@@ -1780,7 +1812,7 @@ export function calculateRibbedSlab(slab: RibbedSlab): EnhancedSlabResult {
 	const concreteCost = concreteVolume * concretePrice;
 	const rebarCost = grossWeight * STRUCTURAL_PRICES.steelPerKg;
 	const formworkCost = formworkArea * STRUCTURAL_PRICES.formwork;
-	const blocksCost = blocksCount * (STRUCTURAL_PRICES.blocks[20] || 4.5);
+	const blocksCost = blocksCount * (STRUCTURAL_PRICES.blocks[blockHeight] || STRUCTURAL_PRICES.blocks[20] || 4.5);
 	const laborCost = netArea * STRUCTURAL_LABOR_PRICES.slabs * 1.2;
 	const totalCost = concreteCost + rebarCost + formworkCost + blocksCost + laborCost;
 
