@@ -97,6 +97,25 @@ export interface BeamReinforcement {
 }
 
 /**
+ * تسليح كمرة عريضة
+ */
+export interface WideBeamReinforcement {
+	top: {
+		continuous: { count: number; diameter: number };
+	};
+	bottom: {
+		continuous: { count: number; diameter: number };
+		additional?: { count: number; diameter: number };
+	};
+	stirrups: {
+		diameter: number;
+		spacingAtQuarter: number; // meters
+		spacingAtMid: number;    // meters
+		legs: number;            // 2 or 4
+	};
+}
+
+/**
  * كمرة مرتبطة بالسقف
  */
 export interface SlabBeam {
@@ -325,7 +344,7 @@ export interface BandedBeam {
 		depth: number;
 		length: number;
 	};
-	reinforcement: BeamReinforcement;
+	reinforcement: WideBeamReinforcement;
 	quantity: number;
 	volume?: number;
 }

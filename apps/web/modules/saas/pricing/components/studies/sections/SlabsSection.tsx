@@ -136,6 +136,50 @@ const getDefaultBeam = (index: number): SlabBeamDef => ({
 });
 
 // ═══════════════════════════════════════════════════════════════
+// كمرة عريضة (نموذج)
+// ═══════════════════════════════════════════════════════════════
+
+interface BandedBeamTemplateDef {
+	id: string;
+	name: string;        // "ك1", "ك2"
+	quantity: number;
+	width: number;       // meters
+	depth: number;       // meters
+	length: number;      // meters
+	bottomContCount: number;
+	bottomContDiameter: number;
+	bottomAddEnabled: boolean;
+	bottomAddCount: number;
+	bottomAddDiameter: number;
+	topContCount: number;
+	topContDiameter: number;
+	stirrupDiameter: number;
+	stirrupSpacingQuarter: number; // cm (display)
+	stirrupSpacingMid: number;    // cm
+	stirrupLegs: number;          // 2 or 4
+}
+
+const getDefaultBandedBeamTemplate = (index: number, beamLength: number): BandedBeamTemplateDef => ({
+	id: `bbt-${Date.now()}-${index}`,
+	name: `ك${index + 1}`,
+	quantity: 1,
+	width: 1.2,
+	depth: 0.4,
+	length: beamLength || 10,
+	bottomContCount: 4,
+	bottomContDiameter: 16,
+	bottomAddEnabled: false,
+	bottomAddCount: 2,
+	bottomAddDiameter: 16,
+	topContCount: 3,
+	topContDiameter: 14,
+	stirrupDiameter: 8,
+	stirrupSpacingQuarter: 7,
+	stirrupSpacingMid: 12,
+	stirrupLegs: 2,
+});
+
+// ═══════════════════════════════════════════════════════════════
 // حساب تفاصيل القص للكمرات
 // ═══════════════════════════════════════════════════════════════
 
@@ -734,6 +778,17 @@ function SlabForm({
 	const [slabBeams, setSlabBeams] = useState<SlabBeamDef[]>([]);
 	const [expandedBeamIds, setExpandedBeamIds] = useState<string[]>([]);
 
+	// نماذج الكمرات العريضة
+	const [bandedBeamTemplates, setBandedBeamTemplates] = useState<BandedBeamTemplateDef[]>(() => {
+		if (editingItem?.dimensions?.bandedBeamTemplates) {
+			try {
+				return JSON.parse(editingItem.dimensions.bandedBeamTemplates as unknown as string);
+			} catch { return []; }
+		}
+		return [];
+	});
+	const [expandedBandedIds, setExpandedBandedIds] = useState<string[]>([]);
+
 	const toggleBeam = (id: string) => {
 		setExpandedBeamIds((prev) =>
 			prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
@@ -761,6 +816,8 @@ function SlabForm({
 		setFormData(getDefaultFormData());
 		setSlabBeams([]);
 		setExpandedBeamIds([]);
+		setBandedBeamTemplates([]);
+		setExpandedBandedIds([]);
 	};
 
 	// ═══ حساب الكمرات ═══
@@ -1054,25 +1111,48 @@ function SlabForm({
 							inputMethod: "dimensions",
 						},
 						openings: [],
-						bands: Array.from(
-							{ length: formData.bandedBeamCount },
-							(_, i) => ({
-								id: `beam-${i}`,
-								name: `ك${i + 1}`,
+						bands: bandedBeamTemplates.length > 0
+							? bandedBeamTemplates.map(t => ({
+								id: t.id,
+								name: t.name,
 								direction: "x" as const,
-								dimensions: {
-									width: formData.bandedBeamWidth,
-									depth: formData.bandedBeamDepth,
-									length: formData.length,
-								},
+								dimensions: { width: t.width, depth: t.depth, length: t.length },
 								reinforcement: {
-									top: { count: 2, diameter: 16 },
-									bottom: { straight: { count: 3, diameter: 16 } },
-									stirrups: { diameter: 10, spacing: 0.2, legs: 2 },
+									top: { continuous: { count: t.topContCount, diameter: t.topContDiameter } },
+									bottom: {
+										continuous: { count: t.bottomContCount, diameter: t.bottomContDiameter },
+										...(t.bottomAddEnabled && t.bottomAddCount > 0 ? {
+											additional: { count: t.bottomAddCount, diameter: t.bottomAddDiameter },
+										} : {}),
+									},
+									stirrups: {
+										diameter: t.stirrupDiameter,
+										spacingAtQuarter: t.stirrupSpacingQuarter / 100,
+										spacingAtMid: t.stirrupSpacingMid / 100,
+										legs: t.stirrupLegs,
+									},
 								},
-								quantity: 1,
-							}),
-						),
+								quantity: t.quantity,
+							}))
+							: Array.from(
+								{ length: formData.bandedBeamCount },
+								(_, i) => ({
+									id: `beam-${i}`,
+									name: `ك${i + 1}`,
+									direction: "x" as const,
+									dimensions: {
+										width: formData.bandedBeamWidth,
+										depth: formData.bandedBeamDepth,
+										length: formData.length,
+									},
+									reinforcement: {
+										top: { continuous: { count: 2, diameter: 16 } },
+										bottom: { continuous: { count: 3, diameter: 16 } },
+										stirrups: { diameter: 10, spacingAtQuarter: 0.07, spacingAtMid: 0.12, legs: 2 },
+									},
+									quantity: 1,
+								}),
+							),
 						reinforcement: {
 							bottom: {
 								xDirection: {
@@ -1084,6 +1164,21 @@ function SlabForm({
 									spacing: 1 / formData.bottomSecondaryBarsPerMeter,
 								},
 							},
+							...(formData.hasTopMesh ? {
+								top: {
+									enabled: true,
+									xDirection: {
+										diameter: formData.topMainDiameter,
+										spacing: 1 / formData.topMainBarsPerMeter,
+										length: formData.width,
+									},
+									yDirection: {
+										diameter: formData.topSecondaryDiameter,
+										spacing: 1 / formData.topSecondaryBarsPerMeter,
+										length: formData.length,
+									},
+								},
+							} : {}),
 						},
 					};
 					return calculateBandedBeamSlab(input);
@@ -1096,7 +1191,7 @@ function SlabForm({
 			console.error("Calculation error:", error);
 			return null;
 		}
-	}, [formData]);
+	}, [formData, bandedBeamTemplates]);
 
 	// ═══ اتجاه الحديد حسب نوع السقف ═══
 	const mainDirection = calculations?.structuralType === 'ONE_WAY'
@@ -1212,6 +1307,10 @@ function SlabForm({
 						beamsConcrete: beamsCalcs?.totalConcrete || 0,
 						beamsSteel: beamsCalcs?.totalGrossWeight || 0,
 					}),
+				// بيانات نماذج الكمرات العريضة
+				...(formData.slabType === "banded_beam" && bandedBeamTemplates.length > 0 && {
+					bandedBeamTemplates: JSON.stringify(bandedBeamTemplates),
+				}),
 			},
 			concreteVolume: totalConcreteVolume,
 			concreteType: specs?.concreteType || "C30",
@@ -1759,62 +1858,195 @@ function SlabForm({
 					</div>
 				)}
 
-				{/* إعدادات الكمرات العريضة */}
+				{/* جدول الكمرات العريضة */}
 				{formData.slabType === "banded_beam" && (
-					<div className="border rounded-lg p-4 bg-indigo-50/30">
-						<h5 className="font-medium mb-3 text-indigo-700">
-							إعدادات الكمرات العريضة
-						</h5>
-						<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-							<div className="space-y-1.5">
-								<Label className="text-sm">عرض الكمرة (م)</Label>
-								<Input
-									type="number"
-									step="0.1"
-									value={formData.bandedBeamWidth}
-									onChange={(
-										e: React.ChangeEvent<HTMLInputElement>,
-									) =>
-										setFormData({
-											...formData,
-											bandedBeamWidth: +e.target.value,
-										})
-									}
-								/>
-							</div>
-							<div className="space-y-1.5">
-								<Label className="text-sm">عمق الكمرة (م)</Label>
-								<Input
-									type="number"
-									step="0.05"
-									value={formData.bandedBeamDepth}
-									onChange={(
-										e: React.ChangeEvent<HTMLInputElement>,
-									) =>
-										setFormData({
-											...formData,
-											bandedBeamDepth: +e.target.value,
-										})
-									}
-								/>
-							</div>
-							<div className="space-y-1.5">
-								<Label className="text-sm">عدد الكمرات</Label>
-								<Input
-									type="number"
-									min={1}
-									value={formData.bandedBeamCount}
-									onChange={(
-										e: React.ChangeEvent<HTMLInputElement>,
-									) =>
-										setFormData({
-											...formData,
-											bandedBeamCount: +e.target.value,
-										})
-									}
-								/>
-							</div>
+					<div className="border rounded-lg p-4 bg-indigo-50/30 space-y-3">
+						<div className="flex items-center justify-between">
+							<h5 className="font-medium text-indigo-700">
+								جدول الكمرات
+							</h5>
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={() => {
+									const newT = getDefaultBandedBeamTemplate(bandedBeamTemplates.length, formData.length);
+									setBandedBeamTemplates([...bandedBeamTemplates, newT]);
+									setExpandedBandedIds([...expandedBandedIds, newT.id]);
+								}}
+							>
+								<Plus className="h-4 w-4 ml-1" />
+								إضافة نموذج كمرة
+							</Button>
 						</div>
+
+						{bandedBeamTemplates.length === 0 && (
+							<div className="text-sm text-muted-foreground text-center py-4 border border-dashed rounded-lg">
+								لم يتم إضافة نماذج كمرات — سيتم استخدام التقدير التلقائي
+							</div>
+						)}
+
+						{bandedBeamTemplates.map((tmpl, idx) => {
+							const isExpanded = expandedBandedIds.includes(tmpl.id);
+							const updateTmpl = (updates: Partial<BandedBeamTemplateDef>) => {
+								setBandedBeamTemplates(prev => prev.map(t => t.id === tmpl.id ? { ...t, ...updates } : t));
+							};
+							return (
+								<div key={tmpl.id} className="border rounded-lg bg-white">
+									{/* Header row */}
+									<div
+										className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+										onClick={() => setExpandedBandedIds(prev =>
+											prev.includes(tmpl.id) ? prev.filter(x => x !== tmpl.id) : [...prev, tmpl.id]
+										)}
+									>
+										<div className="flex items-center gap-2">
+											{isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+											<span className="font-medium">{tmpl.name}</span>
+											<Badge variant="secondary" className="text-xs">×{tmpl.quantity}</Badge>
+											<span className="text-xs text-muted-foreground">
+												{tmpl.width}×{tmpl.depth}م — {tmpl.length}م
+											</span>
+										</div>
+										<Button
+											type="button"
+											variant="ghost"
+											size="sm"
+											className="text-red-500 hover:text-red-700"
+											onClick={(e) => {
+												e.stopPropagation();
+												setBandedBeamTemplates(prev => prev.filter(t => t.id !== tmpl.id));
+												setExpandedBandedIds(prev => prev.filter(x => x !== tmpl.id));
+											}}
+										>
+											<Trash2 className="h-4 w-4" />
+										</Button>
+									</div>
+
+									{/* Expanded content */}
+									{isExpanded && (
+										<div className="p-3 pt-0 space-y-3 border-t">
+											{/* Row 1: Basic dimensions */}
+											<div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+												<div className="space-y-1">
+													<Label className="text-xs">اسم النموذج</Label>
+													<Input value={tmpl.name} onChange={e => updateTmpl({ name: e.target.value })} />
+												</div>
+												<div className="space-y-1">
+													<Label className="text-xs">عدد التكرار</Label>
+													<Input type="number" min={1} value={tmpl.quantity} onChange={e => updateTmpl({ quantity: +e.target.value })} />
+												</div>
+												<div className="space-y-1">
+													<Label className="text-xs">طول الكمرة (م)</Label>
+													<Input type="number" step="0.1" value={tmpl.length} onChange={e => updateTmpl({ length: +e.target.value })} />
+												</div>
+												<div className="space-y-1">
+													<Label className="text-xs">عرض الكمرة (م)</Label>
+													<Input type="number" step="0.1" value={tmpl.width} onChange={e => updateTmpl({ width: +e.target.value })} />
+												</div>
+												<div className="space-y-1">
+													<Label className="text-xs">عمق الكمرة (م)</Label>
+													<Input type="number" step="0.05" value={tmpl.depth} onChange={e => updateTmpl({ depth: +e.target.value })} />
+												</div>
+											</div>
+
+											{/* Row 2: Bottom rebar */}
+											<div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+												<div className="space-y-1">
+													<Label className="text-xs">سفلي مستمر - عدد</Label>
+													<Input type="number" min={1} value={tmpl.bottomContCount} onChange={e => updateTmpl({ bottomContCount: +e.target.value })} />
+												</div>
+												<div className="space-y-1">
+													<Label className="text-xs">سفلي مستمر - قطر</Label>
+													<Select value={String(tmpl.bottomContDiameter)} onValueChange={v => updateTmpl({ bottomContDiameter: +v })}>
+														<SelectTrigger><SelectValue /></SelectTrigger>
+														<SelectContent>
+															{REBAR_DIAMETERS.map(d => <SelectItem key={d} value={String(d)}>{d} مم</SelectItem>)}
+														</SelectContent>
+													</Select>
+												</div>
+												<div className="space-y-1 flex items-end gap-2">
+													<label className="flex items-center gap-1.5 text-xs cursor-pointer">
+														<input
+															type="checkbox"
+															checked={tmpl.bottomAddEnabled}
+															onChange={e => updateTmpl({ bottomAddEnabled: e.target.checked })}
+															className="rounded"
+														/>
+														سفلي إضافي
+													</label>
+												</div>
+												{tmpl.bottomAddEnabled && (
+													<>
+														<div className="space-y-1">
+															<Label className="text-xs">إضافي - عدد</Label>
+															<Input type="number" min={1} value={tmpl.bottomAddCount} onChange={e => updateTmpl({ bottomAddCount: +e.target.value })} />
+														</div>
+														<div className="space-y-1">
+															<Label className="text-xs">إضافي - قطر</Label>
+															<Select value={String(tmpl.bottomAddDiameter)} onValueChange={v => updateTmpl({ bottomAddDiameter: +v })}>
+																<SelectTrigger><SelectValue /></SelectTrigger>
+																<SelectContent>
+																	{REBAR_DIAMETERS.map(d => <SelectItem key={d} value={String(d)}>{d} مم</SelectItem>)}
+																</SelectContent>
+															</Select>
+														</div>
+													</>
+												)}
+											</div>
+
+											{/* Row 3: Top rebar */}
+											<div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+												<div className="space-y-1">
+													<Label className="text-xs">علوي مستمر - عدد</Label>
+													<Input type="number" min={1} value={tmpl.topContCount} onChange={e => updateTmpl({ topContCount: +e.target.value })} />
+												</div>
+												<div className="space-y-1">
+													<Label className="text-xs">علوي مستمر - قطر</Label>
+													<Select value={String(tmpl.topContDiameter)} onValueChange={v => updateTmpl({ topContDiameter: +v })}>
+														<SelectTrigger><SelectValue /></SelectTrigger>
+														<SelectContent>
+															{REBAR_DIAMETERS.map(d => <SelectItem key={d} value={String(d)}>{d} مم</SelectItem>)}
+														</SelectContent>
+													</Select>
+												</div>
+											</div>
+
+											{/* Row 4: Stirrups */}
+											<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+												<div className="space-y-1">
+													<Label className="text-xs">كانات - قطر</Label>
+													<Select value={String(tmpl.stirrupDiameter)} onValueChange={v => updateTmpl({ stirrupDiameter: +v })}>
+														<SelectTrigger><SelectValue /></SelectTrigger>
+														<SelectContent>
+															{REBAR_DIAMETERS.filter(d => d <= 12).map(d => <SelectItem key={d} value={String(d)}>{d} مم</SelectItem>)}
+														</SelectContent>
+													</Select>
+												</div>
+												<div className="space-y-1">
+													<Label className="text-xs">تباعد ربع البحر (سم)</Label>
+													<Input type="number" step="1" min={1} value={tmpl.stirrupSpacingQuarter} onChange={e => updateTmpl({ stirrupSpacingQuarter: +e.target.value })} />
+												</div>
+												<div className="space-y-1">
+													<Label className="text-xs">تباعد المنتصف (سم)</Label>
+													<Input type="number" step="1" min={1} value={tmpl.stirrupSpacingMid} onChange={e => updateTmpl({ stirrupSpacingMid: +e.target.value })} />
+												</div>
+												<div className="space-y-1">
+													<Label className="text-xs">عدد الفروع</Label>
+													<Select value={String(tmpl.stirrupLegs)} onValueChange={v => updateTmpl({ stirrupLegs: +v })}>
+														<SelectTrigger><SelectValue /></SelectTrigger>
+														<SelectContent>
+															<SelectItem value="2">2 فرع</SelectItem>
+															<SelectItem value="4">4 فروع</SelectItem>
+														</SelectContent>
+													</Select>
+												</div>
+											</div>
+										</div>
+									)}
+								</div>
+							);
+						})}
 					</div>
 				)}
 

@@ -2100,44 +2100,218 @@ export function calculateBandedBeamSlab(slab: BandedBeamSlab): EnhancedSlabResul
 		concreteType = 'C30',
 	} = slab;
 	const thickness = dimensions.thickness;
+	const cover = SLAB_DEFAULTS.cover;
 
 	const grossArea = dimensions.length * dimensions.width;
 	const netArea = calculateNetArea(grossArea, openings);
 
-	// حجم الخرسانة
+	// حجم الخرسانة — bug fix: use additional depth only
 	const slabVolume = netArea * thickness;
-
-	// حجم الكمرات العريضة
-	const beamsVolume = bandedBeams.reduce((sum, beam) => {
-		return sum + beam.dimensions.width * beam.dimensions.depth * beam.dimensions.length * (beam.quantity || 1);
+	const beamsAdditionalVolume = bandedBeams.reduce((sum, beam) => {
+		const additionalDepth = Math.max(0, beam.dimensions.depth - thickness);
+		return sum + beam.dimensions.width * additionalDepth * beam.dimensions.length * (beam.quantity || 1);
 	}, 0);
+	const concreteVolume = slabVolume + beamsAdditionalVolume;
 
-	const concreteVolume = slabVolume + beamsVolume;
-	const formworkArea = netArea;
+	// الشدات — include beam side formwork
+	const beamFormwork = bandedBeams.reduce((sum, beam) => {
+		const additionalDepth = Math.max(0, beam.dimensions.depth - thickness);
+		return sum + 2 * additionalDepth * beam.dimensions.length * (beam.quantity || 1);
+	}, 0);
+	const formworkArea = netArea + beamFormwork;
 
-	// حسابات الحديد (تقديري)
+	// حسابات الحديد
 	const rebarDetails: RebarDetail[] = [];
-	const estimatedRatio = (REBAR_RATIOS.solid_two_way.typical + REBAR_RATIOS.flat_slab.typical) / 2;
-	const estimatedWeight = concreteVolume * estimatedRatio;
+	const hasSlabReinforcement = reinforcement?.bottom?.xDirection?.spacing > 0;
+	const hasBeamReinforcement = bandedBeams.length > 0 && bandedBeams.some(b => b.reinforcement?.bottom?.continuous?.count > 0);
 
-	rebarDetails.push({
-		id: 'banded-beam-estimate',
-		description: `تقديري (${estimatedRatio} كجم/م³)`,
-		location: 'البلاطة والكمرات',
-		diameter: 0,
-		barLength: 0,
-		barCount: 0,
-		totalLength: 0,
-		weight: Number(estimatedWeight.toFixed(2)),
-		stockLength: 0,
-		stocksNeeded: 0,
-		wastePercentage: 0,
-	});
+	if (hasSlabReinforcement) {
+		// ═══ Slab grid rebar — same pattern as calculateSolidSlab ═══
+		const { bottom, top } = reinforcement;
 
-	const netWeight = estimatedWeight;
-	const grossWeight = estimatedWeight * 1.15;
-	const wasteWeight = grossWeight - netWeight;
+		// سفلي X
+		const bottomXLength = dimensions.width - 2 * cover + 0.4;
+		const bottomXCount = calculateBarCount(dimensions.length - 2 * cover, bottom.xDirection.spacing);
+		rebarDetails.push(
+			calculateRebarLayer(
+				bottom.xDirection.diameter,
+				bottomXLength,
+				bottomXCount,
+				'سفلي - اتجاه X',
+				'البلاطة'
+			)
+		);
+
+		// سفلي Y
+		const bottomYLength = dimensions.length - 2 * cover + 0.4;
+		const bottomYCount = calculateBarCount(dimensions.width - 2 * cover, bottom.yDirection.spacing);
+		rebarDetails.push(
+			calculateRebarLayer(
+				bottom.yDirection.diameter,
+				bottomYLength,
+				bottomYCount,
+				'سفلي - اتجاه Y',
+				'البلاطة'
+			)
+		);
+
+		// علوي (إن وجد)
+		if (top?.enabled && top.xDirection) {
+			const topXCount = calculateBarCount(dimensions.length - 2 * cover, top.xDirection.spacing);
+			rebarDetails.push(
+				calculateRebarLayer(
+					top.xDirection.diameter,
+					bottomXLength,
+					topXCount,
+					'علوي - اتجاه X',
+					'البلاطة'
+				)
+			);
+		}
+		if (top?.enabled && top.yDirection) {
+			const topYCount = calculateBarCount(dimensions.width - 2 * cover, top.yDirection.spacing);
+			rebarDetails.push(
+				calculateRebarLayer(
+					top.yDirection.diameter,
+					bottomYLength,
+					topYCount,
+					'علوي - اتجاه Y',
+					'البلاطة'
+				)
+			);
+		}
+	}
+
+	if (hasBeamReinforcement) {
+		// ═══ Beam rebar — per template ═══
+		for (const beam of bandedBeams) {
+			const qty = beam.quantity || 1;
+			const beamLength = beam.dimensions.length;
+			const beamWidth = beam.dimensions.width;
+			const beamDepth = beam.dimensions.depth;
+			const r = beam.reinforcement;
+			const beamLabel = beam.name || 'كمرة';
+
+			// Bottom continuous
+			if (r.bottom.continuous.count > 0) {
+				const barLen = beamLength + 0.80; // 0.40m anchorage each end
+				rebarDetails.push(
+					calculateRebarLayer(
+						r.bottom.continuous.diameter,
+						barLen,
+						r.bottom.continuous.count * qty,
+						`${beamLabel} - سفلي مستمر`,
+						'الكمرات'
+					)
+				);
+			}
+
+			// Bottom additional (if present)
+			if (r.bottom.additional && r.bottom.additional.count > 0) {
+				const barLen = beamLength * 0.6 + 0.40;
+				rebarDetails.push(
+					calculateRebarLayer(
+						r.bottom.additional.diameter,
+						barLen,
+						r.bottom.additional.count * qty,
+						`${beamLabel} - سفلي إضافي`,
+						'الكمرات'
+					)
+				);
+			}
+
+			// Top continuous
+			if (r.top.continuous.count > 0) {
+				const barLen = beamLength + 0.80;
+				rebarDetails.push(
+					calculateRebarLayer(
+						r.top.continuous.diameter,
+						barLen,
+						r.top.continuous.count * qty,
+						`${beamLabel} - علوي مستمر`,
+						'الكمرات'
+					)
+				);
+			}
+
+			// Stirrups
+			if (r.stirrups.diameter > 0) {
+				const spacingQ = r.stirrups.spacingAtQuarter;
+				const spacingM = r.stirrups.spacingAtMid;
+				const stirrupsPerQuarter = spacingQ > 0 ? Math.ceil((beamLength / 4) / spacingQ) + 1 : 0;
+				const stirrupsAtMid = spacingM > 0 ? Math.ceil((beamLength / 2) / spacingM) + 1 : 0;
+				const totalStirrups = (stirrupsPerQuarter * 2 + stirrupsAtMid) * qty;
+
+				// Stirrup perimeter length
+				const d = r.stirrups.diameter;
+				const hookAllowance = 2 * 10 * d / 1000 + 0.10;
+				let stirrupLength: number;
+				if (r.stirrups.legs <= 2) {
+					stirrupLength = 2 * (beamWidth + beamDepth - 4 * cover) + hookAllowance;
+				} else {
+					// 4 legs: outer + inner stirrup
+					const outerLen = 2 * (beamWidth + beamDepth - 4 * cover) + hookAllowance;
+					const innerLen = 2 * (beamWidth / 2 + beamDepth - 4 * cover) + hookAllowance;
+					stirrupLength = outerLen + innerLen;
+				}
+
+				rebarDetails.push(
+					calculateRebarLayer(
+						d,
+						stirrupLength,
+						totalStirrups,
+						`${beamLabel} - كانات`,
+						'الكمرات'
+					)
+				);
+			}
+		}
+	}
+
+	// If no rebar data provided, fall back to estimation
+	if (rebarDetails.length === 0) {
+		const estimatedRatio = (REBAR_RATIOS.solid_two_way.typical + REBAR_RATIOS.flat_slab.typical) / 2;
+		const estimatedWeight = concreteVolume * estimatedRatio;
+		rebarDetails.push({
+			id: 'banded-beam-estimate',
+			description: `تقديري (${estimatedRatio} كجم/م³)`,
+			location: 'البلاطة والكمرات',
+			diameter: 0,
+			barLength: 0,
+			barCount: 0,
+			totalLength: 0,
+			weight: Number(estimatedWeight.toFixed(2)),
+			stockLength: 0,
+			stocksNeeded: 0,
+			wastePercentage: 0,
+		});
+	}
+
+	// إجماليات الحديد — same pattern as solid slab
+	const netWeight = rebarDetails.reduce((sum, r) => sum + r.weight, 0);
+	const grossWeight = rebarDetails.reduce((sum, r) => {
+		if (r.stockLength === 0) return sum + r.weight;
+		return sum + (r.grossWeight ?? (r.stocksNeeded * r.stockLength * (REBAR_WEIGHTS[r.diameter] || 0)));
+	}, 0);
+	const wasteWeight = Math.max(0, grossWeight - netWeight);
 	const wastePercentage = grossWeight > 0 ? (wasteWeight / grossWeight) * 100 : 0;
+
+	// تجميع الأسياخ
+	const stocksMap = new Map<number, { diameter: number; count: number; length: number }>();
+	rebarDetails.forEach((r) => {
+		if (r.diameter > 0) {
+			const existing = stocksMap.get(r.diameter);
+			if (existing) {
+				existing.count += r.stocksNeeded;
+			} else {
+				stocksMap.set(r.diameter, {
+					diameter: r.diameter,
+					count: r.stocksNeeded,
+					length: r.stockLength,
+				});
+			}
+		}
+	});
 
 	// التكاليف
 	const concretePrice = STRUCTURAL_PRICES.concrete[concreteType] || 310;
@@ -2159,7 +2333,7 @@ export function calculateBandedBeamSlab(slab: BandedBeamSlab): EnhancedSlabResul
 			grossWeight: Number(grossWeight.toFixed(2)),
 			wasteWeight: Number(wasteWeight.toFixed(2)),
 			wastePercentage: Number(wastePercentage.toFixed(1)),
-			stocksNeeded: [],
+			stocksNeeded: Array.from(stocksMap.values()),
 		},
 		costs: {
 			concrete: Number(concreteCost.toFixed(2)),
