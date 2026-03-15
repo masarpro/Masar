@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
-import { Currency } from "../../shared/Currency";
+import { Currency } from "@saas/finance/components/shared/Currency";
 
 interface Item {
 	description: string;

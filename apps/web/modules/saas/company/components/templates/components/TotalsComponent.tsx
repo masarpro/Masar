@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
-import { Currency } from "../../shared/Currency";
+import { Currency } from "@saas/finance/components/shared/Currency";
 import { getAmountInWords } from "../../../lib/default-templates";
 
 interface TotalsComponentProps {
