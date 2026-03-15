@@ -4,7 +4,6 @@ import {
 	Receipt,
 	Package,
 	BarChart3,
-	Layout,
 	type LucideIcon,
 } from "lucide-react";
 
@@ -39,12 +38,6 @@ export const COMPANY_NAV_SECTIONS: CompanyNavSection[] = [
 		path: "assets",
 		labelKey: "company.nav.assets",
 		icon: Package,
-	},
-	{
-		id: "templates",
-		path: "templates",
-		labelKey: "company.nav.templates",
-		icon: Layout,
 	},
 	{
 		id: "reports",

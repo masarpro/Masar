@@ -133,7 +133,7 @@ export function TemplateCustomizer({
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const queryClient = useQueryClient();
-	const basePath = `/app/${organizationSlug}/company`;
+	const basePath = `/app/${organizationSlug}/settings`;
 
 	const presetKey = searchParams.get("preset");
 

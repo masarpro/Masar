@@ -42,7 +42,7 @@ export function getFinanceKnowledge(locale: string): string {
 - لوحة تحكم مالية: إحصائيات الفواتير، المقبوضات، المصروفات
 - تقارير حسب الفترة
 
-### القوالب (/company/templates)
+### القوالب (/settings/templates)
 - قوالب للفواتير وعروض الأسعار
 - تخصيص التصميم والألوان والشعار
 

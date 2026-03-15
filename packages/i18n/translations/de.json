@@ -692,7 +692,8 @@
 				"general": "Allgemein",
 				"members": "Mitglieder",
 				"title": "Organisation",
-				"dangerZone": "Gefahrenzone"
+				"dangerZone": "Gefahrenzone",
+				"templates": "Vorlagen"
 			}
 		},
 		"save": "Speichern"

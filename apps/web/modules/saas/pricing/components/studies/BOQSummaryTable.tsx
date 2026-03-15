@@ -149,10 +149,15 @@ export function BOQSummaryTable({
 	};
 
 	const handlePrint = () => {
+		// Hide page title/URL from browser print headers
+		const originalTitle = document.title;
+		document.title = " ";
+
 		setShowPrintView(true);
 		requestAnimationFrame(() => {
 			requestAnimationFrame(() => {
 				window.print();
+				document.title = originalTitle;
 				setShowPrintView(false);
 			});
 		});
@@ -288,15 +293,52 @@ export function BOQSummaryTable({
 			{/* Print Styles */}
 			<style jsx global>{`
 				@media print {
+					/* Hide everything except print container */
 					body * { visibility: hidden; }
 					.boq-print-container, .boq-print-container * { visibility: visible; }
 					.boq-print-container {
-						position: absolute; left: 0; top: 0; width: 100%;
+						position: fixed;
+						left: 0;
+						top: 0;
+						width: 100%;
+						height: auto;
+						z-index: 99999;
+						background: white;
 					}
-					@page { size: A4 landscape; margin: 15mm; }
-					table { width: 100%; border-collapse: collapse; }
-					th { background-color: #f3f4f6 !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-					td, th { border: 1px solid #d1d5db; padding: 6px 10px; text-align: right; font-size: 11px; }
+
+					/* Prevent blank pages from body/html overflow */
+					html, body {
+						height: auto !important;
+						overflow: visible !important;
+						margin: 0 !important;
+						padding: 0 !important;
+					}
+
+					/* Hide sidebar, nav, app shell */
+					nav, aside, header, footer:not(.boq-print-footer),
+					[data-sidebar], [role="navigation"] {
+						display: none !important;
+					}
+
+					/* Page settings */
+					@page {
+						size: A4 landscape;
+						margin: 10mm 15mm;
+					}
+
+					/* Table styling */
+					.boq-print-container table { width: 100%; border-collapse: collapse; }
+					.boq-print-container th {
+						background-color: #f3f4f6 !important;
+						print-color-adjust: exact;
+						-webkit-print-color-adjust: exact;
+					}
+					.boq-print-container td, .boq-print-container th {
+						border: 1px solid #d1d5db;
+						padding: 8px 12px;
+						text-align: right;
+						font-size: 12px;
+					}
 					.boq-section { break-inside: avoid; }
 				}
 			`}</style>

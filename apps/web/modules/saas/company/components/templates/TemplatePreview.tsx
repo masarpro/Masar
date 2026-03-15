@@ -35,7 +35,7 @@ export function TemplatePreview({
 	templateId,
 }: TemplatePreviewProps) {
 	const t = useTranslations();
-	const basePath = `/app/${organizationSlug}/company/templates`;
+	const basePath = `/app/${organizationSlug}/settings/templates`;
 	const [scale, setScale] = useState(0.7);
 
 	const { data: template, isLoading } = useQuery(

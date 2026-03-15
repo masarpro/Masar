@@ -51,7 +51,7 @@ export function getNavigationKnowledge(locale: string, organizationSlug: string)
 - مصروفات المنشأة: /app/${org}/company/expenses
 - الرواتب: /app/${org}/company/payroll
 - ترحيل المصروفات: /app/${org}/company/expense-runs
-- القوالب: /app/${org}/company/templates
+- القوالب: /app/${org}/settings/templates
 - تقارير المنشأة: /app/${org}/company/reports
 
 ### الإعدادات

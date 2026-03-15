@@ -126,7 +126,7 @@ export function TemplatesList({
 	// Get all preset templates (always show all presets regardless of filter)
 	const allPresets = getAllPresetTemplates();
 
-	const basePath = `/app/${organizationSlug}/company`;
+	const basePath = `/app/${organizationSlug}/settings`;
 
 	return (
 		<div className="space-y-8">

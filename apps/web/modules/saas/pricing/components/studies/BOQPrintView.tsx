@@ -46,6 +46,12 @@ export function BOQPrintView({
 		commercialReg: organizationData?.commercialReg,
 	};
 
+	// Merge header settings with showTitleInHeader: false to hide document type label ("خطاب")
+	const headerSettings = {
+		...(headerElement?.settings || {}),
+		showTitleInHeader: false,
+	};
+
 	const tabLabels: Record<string, string> = {
 		summary: "ملخص الكميات",
 		factory: "طلبية المصنع",
@@ -59,29 +65,28 @@ export function BOQPrintView({
 	});
 
 	return (
-		<div className="hidden print:block boq-print-container bg-white text-black" dir="rtl">
+		<div className="boq-print-container" dir="rtl">
 			{/* Header */}
 			{headerElement && (
 				<HeaderComponent
-					settings={headerElement.settings || {}}
+					settings={headerSettings}
 					companyInfo={companyInfo}
-					documentType="letter"
 					primaryColor={primaryColor}
 					secondaryColor={secondaryColor}
 				/>
 			)}
 
 			{/* Report Title */}
-			<div className="py-4 px-2 text-center">
-				<h1 className="text-xl font-bold" style={{ color: primaryColor }}>
+			<div style={{ padding: "12px 8px", textAlign: "center" }}>
+				<h1 style={{ fontSize: "18px", fontWeight: 700, color: primaryColor, margin: 0 }}>
 					تقرير الكميات — {tabLabels[activeTab]}
 				</h1>
-				<div className="flex items-center justify-center gap-6 mt-2 text-sm text-gray-600">
+				<div style={{ display: "flex", justifyContent: "center", gap: "24px", marginTop: "6px", fontSize: "12px", color: "#4b5563" }}>
 					{studyName && <span>الدراسة: {studyName}</span>}
 					<span>تاريخ التقرير: {reportDate}</span>
 				</div>
 				{floorLabel && (
-					<div className="mt-1 text-sm text-gray-500">
+					<div style={{ marginTop: "4px", fontSize: "12px", color: "#6b7280" }}>
 						تصفية الدور: {floorLabel}
 					</div>
 				)}
@@ -101,6 +106,11 @@ export function BOQPrintView({
 					secondaryColor={secondaryColor}
 				/>
 			)}
+
+			{/* Masar branding */}
+			<div style={{ textAlign: "center", color: "#9ca3af", fontSize: "10px", marginTop: "20px", paddingTop: "8px", borderTop: "1px solid #e5e7eb" }}>
+				تم إعداد هذا التقرير بواسطة منصة مسار — app-masar.com
+			</div>
 		</div>
 	);
 }
@@ -111,21 +121,20 @@ export function BOQPrintView({
 
 function PrintSummary({ summary }: { summary: BOQSummary }) {
 	return (
-		<div className="space-y-6 px-2">
+		<div style={{ padding: "0 8px" }}>
 			{summary.sections.map((section) => (
-				<div key={section.category} className="boq-section">
-					<h3 className="text-base font-bold mb-2 flex items-center gap-2">
-						<span>{section.icon}</span>
-						{section.label}
+				<div key={section.category} className="boq-section" style={{ marginBottom: "16px" }}>
+					<h3 style={{ fontSize: "14px", fontWeight: 700, marginBottom: "6px", padding: "4px 8px", backgroundColor: "#f8fafc", borderRadius: "4px" }}>
+						{section.icon} {section.label}
 					</h3>
 					{section.subGroups.map((group) => (
-						<div key={group.key} className="mb-3">
+						<div key={group.key} style={{ marginBottom: "10px" }}>
 							{section.subGroups.length > 1 && (
-								<h4 className="text-sm font-semibold text-gray-600 mb-1">
+								<h4 style={{ fontSize: "12px", fontWeight: 600, color: "#4b5563", marginBottom: "4px" }}>
 									{group.label}
 								</h4>
 							)}
-							<table className="w-full">
+							<table>
 								<thead>
 									<tr>
 										<th>العنصر</th>
@@ -149,7 +158,7 @@ function PrintSummary({ summary }: { summary: BOQSummary }) {
 									))}
 								</tbody>
 							</table>
-							<div className="text-left text-xs font-bold mt-1 text-gray-600">
+							<div style={{ textAlign: "left", fontSize: "11px", fontWeight: 700, marginTop: "4px", color: "#4b5563" }}>
 								إجمالي القسم:
 								{section.totalConcrete > 0 && ` خرسانة ${formatNumber(section.totalConcrete)} م³`}
 								{section.totalRebar > 0 && ` | حديد ${formatNumber(section.totalRebar)} كجم`}
@@ -161,9 +170,9 @@ function PrintSummary({ summary }: { summary: BOQSummary }) {
 			))}
 
 			{/* Grand Totals */}
-			<div className="boq-section border-t-2 border-gray-400 pt-4">
-				<h3 className="text-base font-bold mb-2">الإجمالي العام</h3>
-				<table className="w-full">
+			<div className="boq-section" style={{ borderTop: "2px solid #9ca3af", paddingTop: "12px" }}>
+				<h3 style={{ fontSize: "14px", fontWeight: 700, marginBottom: "6px" }}>الإجمالي العام</h3>
+				<table>
 					<thead>
 						<tr>
 							<th>المادة</th>
@@ -174,28 +183,28 @@ function PrintSummary({ summary }: { summary: BOQSummary }) {
 					<tbody>
 						{summary.grandTotals.concrete > 0 && (
 							<tr>
-								<td className="font-bold">الخرسانة</td>
+								<td style={{ fontWeight: 700 }}>الخرسانة</td>
 								<td>{formatNumber(summary.grandTotals.concrete)}</td>
 								<td>م³</td>
 							</tr>
 						)}
 						{summary.grandTotals.rebar > 0 && (
 							<tr>
-								<td className="font-bold">حديد التسليح</td>
+								<td style={{ fontWeight: 700 }}>حديد التسليح</td>
 								<td>{formatNumber(summary.grandTotals.rebar)}</td>
 								<td>كجم ({formatNumber(summary.grandTotals.rebar / 1000, 2)} طن)</td>
 							</tr>
 						)}
 						{summary.grandTotals.blocks > 0 && (
 							<tr>
-								<td className="font-bold">البلوك</td>
+								<td style={{ fontWeight: 700 }}>البلوك</td>
 								<td>{formatNumber(summary.grandTotals.blocks)}</td>
 								<td>بلوكة</td>
 							</tr>
 						)}
 						{summary.grandTotals.formwork > 0 && (
 							<tr>
-								<td className="font-bold">الطوبار</td>
+								<td style={{ fontWeight: 700 }}>الطوبار</td>
 								<td>{formatNumber(summary.grandTotals.formwork)}</td>
 								<td>م²</td>
 							</tr>
@@ -216,8 +225,8 @@ function PrintFactory({ factoryOrder }: { factoryOrder: FactoryOrderEntry[] }) {
 	const totalWeight = factoryOrder.reduce((s, e) => s + e.weight, 0);
 
 	return (
-		<div className="px-2">
-			<table className="w-full">
+		<div style={{ padding: "0 8px" }}>
+			<table>
 				<thead>
 					<tr>
 						<th>القطر (مم)</th>
@@ -237,7 +246,7 @@ function PrintFactory({ factoryOrder }: { factoryOrder: FactoryOrderEntry[] }) {
 							<td>{formatNumber(entry.weight / 1000, 3)}</td>
 						</tr>
 					))}
-					<tr style={{ fontWeight: "bold", borderTop: "2px solid #000" }}>
+					<tr style={{ fontWeight: 700, borderTop: "2px solid #000" }}>
 						<td>الإجمالي</td>
 						<td></td>
 						<td>{totalBars}</td>
@@ -265,18 +274,18 @@ function PrintCutting({ cuttingDetails }: { cuttingDetails: CuttingDetailRow[] }
 	const sortedDiameters = Array.from(diameterGroups.keys()).sort((a, b) => a - b);
 
 	return (
-		<div className="px-2 space-y-6">
+		<div style={{ padding: "0 8px" }}>
 			{sortedDiameters.map((diameter) => {
 				const group = diameterGroups.get(diameter)!;
 				const groupWeight = group.reduce((s, d) => s + d.grossWeight, 0);
 				const groupStocks = group.reduce((s, d) => s + d.stocksNeeded, 0);
 
 				return (
-					<div key={diameter} className="boq-section">
-						<h3 className="text-sm font-bold mb-2">
+					<div key={diameter} className="boq-section" style={{ marginBottom: "16px" }}>
+						<h3 style={{ fontSize: "13px", fontWeight: 700, marginBottom: "6px", padding: "4px 8px", backgroundColor: "#f8fafc", borderRadius: "4px" }}>
 							Ø{diameter} مم — {group.length} عملية قص — {groupStocks} سيخ مصنع — {formatNumber(groupWeight)} كجم
 						</h3>
-						<table className="w-full">
+						<table>
 							<thead>
 								<tr>
 									<th>العنصر</th>

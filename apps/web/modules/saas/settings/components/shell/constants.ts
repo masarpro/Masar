@@ -5,6 +5,7 @@ import {
 	Link2,
 	TriangleAlert,
 	Bell,
+	Layout,
 	type LucideIcon,
 } from "lucide-react";
 
@@ -50,6 +51,12 @@ export const SETTINGS_NAV_SECTIONS: SettingsNavSection[] = [
 		labelKey: "settings.menu.organization.integrations",
 		icon: Link2,
 		adminOnly: true,
+	},
+	{
+		id: "templates",
+		path: "templates",
+		labelKey: "settings.menu.organization.templates",
+		icon: Layout,
 	},
 	{
 		id: "danger-zone",

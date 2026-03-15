@@ -3849,7 +3849,8 @@
 				"subtitle": "Manage organization settings and preferences",
 				"dangerZone": "Danger zone",
 				"integrations": "Integrations",
-				"notifications": "Notifications"
+				"notifications": "Notifications",
+				"templates": "Templates"
 			}
 		},
 		"save": "Save",

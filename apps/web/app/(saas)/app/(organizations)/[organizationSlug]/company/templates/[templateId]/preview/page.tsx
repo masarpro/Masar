@@ -1,20 +1,4 @@
-import { getActiveOrganization } from "@saas/auth/lib/server";
-import { TemplatePreview } from "@saas/company/components/templates/TemplatePreview";
-import { CompanyShell } from "@saas/company/components/shell";
-import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
-
-export async function generateMetadata({
-	params,
-}: {
-	params: Promise<{ organizationSlug: string; templateId: string }>;
-}) {
-	const t = await getTranslations();
-
-	return {
-		title: t("finance.templates.editor.preview"),
-	};
-}
+import { redirect } from "next/navigation";
 
 export default async function TemplatePreviewPage({
 	params,
@@ -22,24 +6,5 @@ export default async function TemplatePreviewPage({
 	params: Promise<{ organizationSlug: string; templateId: string }>;
 }) {
 	const { organizationSlug, templateId } = await params;
-	const t = await getTranslations();
-
-	const activeOrganization = await getActiveOrganization(organizationSlug);
-
-	if (!activeOrganization) {
-		return notFound();
-	}
-
-	return (
-		<CompanyShell
-			organizationSlug={organizationSlug}
-			pageTitle={t("finance.templates.editor.preview")}
-		>
-			<TemplatePreview
-				organizationId={activeOrganization.id}
-				organizationSlug={organizationSlug}
-				templateId={templateId}
-			/>
-		</CompanyShell>
-	);
+	redirect(`/app/${organizationSlug}/settings/templates/${templateId}/preview`);
 }

@@ -23,7 +23,6 @@ import {
 	Hammer,
 	HomeIcon,
 	Key,
-	Layout,
 	ListChecks,
 	Receipt,
 	ReceiptIcon,
@@ -355,12 +354,6 @@ export function useSidebarMenu(): {
 									label: t("company.nav.assets"),
 									href: `${orgPrefix}/company/assets`,
 									icon: Hammer,
-								},
-								{
-									id: "company-templates",
-									label: t("company.nav.templates"),
-									href: `${orgPrefix}/company/templates`,
-									icon: Layout,
 								},
 								{
 									id: "company-reports",

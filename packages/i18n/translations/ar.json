@@ -3884,7 +3884,8 @@
 				"subtitle": "إدارة إعدادات وتفضيلات المنشأة",
 				"dangerZone": "منطقة الخطر",
 				"integrations": "التكاملات",
-				"notifications": "الإشعارات"
+				"notifications": "الإشعارات",
+				"templates": "القوالب"
 			}
 		},
 		"save": "حفظ",
