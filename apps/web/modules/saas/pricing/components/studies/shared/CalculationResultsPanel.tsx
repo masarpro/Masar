@@ -40,6 +40,9 @@ interface CuttingDetail {
 	weight: number;
 	grossWeight?: number;
 	wastePercentage: number;
+	stockBarsPerUnit?: number;
+	splicesPerBar?: number;
+	lapSpliceLength?: number;
 }
 
 interface StockNeeded {
@@ -297,6 +300,11 @@ export function CalculationResultsPanel({
 													)}
 													<TableCell className="text-xs text-center">
 														{detail.stocksNeeded}
+														{detail.stockBarsPerUnit && detail.stockBarsPerUnit > 1 && (
+															<span className="text-orange-600 text-[10px] block">
+																({detail.stockBarsPerUnit} لكل سيخ)
+															</span>
+														)}
 													</TableCell>
 													<TableCell className="text-xs text-center font-medium">
 														{formatNumber(detail.grossWeight || detail.weight)} كجم
@@ -321,6 +329,16 @@ export function CalculationResultsPanel({
 									</TableBody>
 								</Table>
 							</div>
+						</div>
+					)}
+
+					{/* تنبيه الوصلات */}
+					{cuttingDetails.some(d => d.splicesPerBar && d.splicesPerBar > 0) && (
+						<div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mt-2 mb-2">
+							<p className="text-xs text-amber-700 dark:text-amber-300 flex items-center gap-1">
+								<AlertTriangle className="h-3 w-3 flex-shrink-0" />
+								يتضمن أسياخاً تتجاوز 12م — تم احتساب الوصلات (40d) تلقائياً حسب SBC 304
+							</p>
 						</div>
 					)}
 

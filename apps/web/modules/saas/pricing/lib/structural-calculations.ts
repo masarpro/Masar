@@ -1418,6 +1418,10 @@ export function calculateBlocksSummary(walls: Wall[]): BlocksSummary {
  */
 export interface EnhancedSlabResult {
 	slabType: string;
+	structuralType?: 'ONE_WAY' | 'TWO_WAY';
+	shortSpan?: number;
+	longSpan?: number;
+	aspectRatio?: number;
 	area: number;
 	netArea: number;
 	concreteVolume: number;
@@ -1452,15 +1456,47 @@ export function calculateRebarLayer(
 	location: string,
 ): RebarDetail {
 	const stockLength = STOCK_LENGTHS[diameter] || 12;
-	const cutsPerStock = Math.floor(stockLength / barLength) || 1;
-	const stocksNeeded = Math.ceil(barCount / cutsPerStock);
+	const weightPerMeter = REBAR_WEIGHTS[diameter] || 0;
 	const totalLength = barCount * barLength;
-	const weight = totalLength * (REBAR_WEIGHTS[diameter] || 0);
-	const wastePerStock = stockLength - cutsPerStock * barLength;
-	const totalWaste = stocksNeeded * wastePerStock;
-	const wastePercentage = (stocksNeeded * stockLength) > 0
-		? (totalWaste / (stocksNeeded * stockLength)) * 100
-		: 0;
+	const netWeight = totalLength * weightPerMeter;
+
+	if (barLength <= stockLength) {
+		// NORMAL PATH — bar fits in one stock bar
+		const cutsPerStock = Math.floor(stockLength / barLength) || 1;
+		const stocksNeeded = Math.ceil(barCount / cutsPerStock);
+		const wastePerStock = stockLength - cutsPerStock * barLength;
+		const totalWaste = stocksNeeded * wastePerStock;
+		const grossLen = stocksNeeded * stockLength;
+		const wastePercentage = grossLen > 0 ? (totalWaste / grossLen) * 100 : 0;
+		const grossWt = grossLen * weightPerMeter;
+
+		return {
+			id: `${location}-${description}`,
+			description,
+			location,
+			diameter,
+			barLength: Number(barLength.toFixed(2)),
+			barCount,
+			totalLength: Number(totalLength.toFixed(2)),
+			weight: Number(netWeight.toFixed(2)),
+			stockLength,
+			stocksNeeded,
+			wastePercentage: Number(wastePercentage.toFixed(1)),
+			grossWeight: Number(grossWt.toFixed(2)),
+		};
+	}
+
+	// SPLICE PATH — barLength > stockLength, needs lap splices
+	const lapLength = (diameter * SLAB_DEFAULTS.lapLengthFactor) / 1000;
+	const effectiveStockLength = stockLength - lapLength;
+	const stockBarsPerUnit = Math.ceil(barLength / effectiveStockLength);
+	const splicesPerBar = stockBarsPerUnit - 1;
+	const totalStockBars = stockBarsPerUnit * barCount;
+	const totalGrossLength = totalStockBars * stockLength;
+	const actualUsedPerBar = barLength + splicesPerBar * lapLength;
+	const waste = totalGrossLength - barCount * actualUsedPerBar;
+	const wastePercentage = totalGrossLength > 0 ? (waste / totalGrossLength) * 100 : 0;
+	const grossWt = totalGrossLength * weightPerMeter;
 
 	return {
 		id: `${location}-${description}`,
@@ -1470,10 +1506,15 @@ export function calculateRebarLayer(
 		barLength: Number(barLength.toFixed(2)),
 		barCount,
 		totalLength: Number(totalLength.toFixed(2)),
-		weight: Number(weight.toFixed(2)),
+		weight: Number(netWeight.toFixed(2)),
 		stockLength,
-		stocksNeeded,
-		wastePercentage: Number(wastePercentage.toFixed(1)),
+		stocksNeeded: totalStockBars,
+		wastePercentage: Number(Math.max(0, wastePercentage).toFixed(1)),
+		stockBarsPerUnit,
+		totalStockBars,
+		lapSpliceLength: Number(lapLength.toFixed(3)),
+		splicesPerBar,
+		grossWeight: Number(grossWt.toFixed(2)),
 	};
 }
 
@@ -1493,6 +1534,12 @@ export function calculateSolidSlab(slab: SolidSlab): EnhancedSlabResult {
 	const netArea = calculateNetArea(grossArea, openings);
 	const concreteVolume = netArea * thickness;
 	const formworkArea = netArea;
+
+	// Structural type detection
+	const shortSpan = Math.min(dimensions.length, dimensions.width);
+	const longSpan = Math.max(dimensions.length, dimensions.width);
+	const aspectRatio = shortSpan > 0 ? longSpan / shortSpan : 1;
+	const structuralType = aspectRatio >= 2 ? 'ONE_WAY' as const : 'TWO_WAY' as const;
 
 	// حسابات الحديد
 	const rebarDetails: RebarDetail[] = [];
@@ -1571,7 +1618,7 @@ export function calculateSolidSlab(slab: SolidSlab): EnhancedSlabResult {
 	const netWeight = rebarDetails.reduce((sum, r) => sum + r.weight, 0);
 	const grossWeight = rebarDetails.reduce((sum, r) => {
 		if (r.stockLength === 0) return sum + r.weight;
-		return sum + r.stocksNeeded * r.stockLength * (REBAR_WEIGHTS[r.diameter] || 0);
+		return sum + (r.grossWeight ?? (r.stocksNeeded * r.stockLength * (REBAR_WEIGHTS[r.diameter] || 0)));
 	}, 0);
 	const wasteWeight = Math.max(0, grossWeight - netWeight);
 	const wastePercentage = grossWeight > 0 ? (wasteWeight / grossWeight) * 100 : 0;
@@ -1603,6 +1650,10 @@ export function calculateSolidSlab(slab: SolidSlab): EnhancedSlabResult {
 
 	return {
 		slabType: 'solid',
+		structuralType,
+		shortSpan: Number(shortSpan.toFixed(2)),
+		longSpan: Number(longSpan.toFixed(2)),
+		aspectRatio: Number(aspectRatio.toFixed(2)),
 		area: Number(grossArea.toFixed(2)),
 		netArea: Number(netArea.toFixed(2)),
 		concreteVolume: Number(concreteVolume.toFixed(3)),
@@ -1702,7 +1753,7 @@ export function calculateRibbedSlab(slab: RibbedSlab): EnhancedSlabResult {
 	const netWeight = rebarDetails.reduce((sum, r) => sum + r.weight, 0);
 	const grossWeight = rebarDetails.reduce((sum, r) => {
 		if (r.stockLength === 0) return sum + r.weight;
-		return sum + r.stocksNeeded * r.stockLength * (REBAR_WEIGHTS[r.diameter] || 0);
+		return sum + (r.grossWeight ?? (r.stocksNeeded * r.stockLength * (REBAR_WEIGHTS[r.diameter] || 0)));
 	}, 0);
 	const wasteWeight = Math.max(0, grossWeight - netWeight);
 	const wastePercentage = grossWeight > 0 ? (wasteWeight / grossWeight) * 100 : 0;
@@ -1778,39 +1829,117 @@ export function calculateFlatSlab(slab: FlatSlab): EnhancedSlabResult {
 	// حجم الخرسانة
 	let concreteVolume = netArea * thickness;
 
-	// إضافة drop panels
+	// إضافة drop panels (fixed: length*width instead of width*width, user count with fallback)
 	if (dropPanels) {
-		// Estimate number of drop panels based on area (one per ~36 sqm)
-		const estimatedCount = Math.ceil(netArea / 36);
-		const dropVolume = dropPanels.width * dropPanels.width * dropPanels.extraThickness * estimatedCount;
+		const dpLength = dropPanels.length || dropPanels.width;
+		const dpCount = dropPanels.count || Math.ceil(netArea / 36);
+		const dropVolume = dpLength * dropPanels.width * dropPanels.extraThickness * dpCount;
 		concreteVolume += dropVolume;
 	}
 
 	const formworkArea = netArea;
 
-	// حسابات الحديد (تقديري بناءً على نسبة الحديد للفلات سلاب)
+	// حسابات الحديد
 	const rebarDetails: RebarDetail[] = [];
-	const estimatedRatio = REBAR_RATIOS.flat_slab.typical;
-	const estimatedWeight = concreteVolume * estimatedRatio;
+	const cover = SLAB_DEFAULTS.cover;
 
-	rebarDetails.push({
-		id: 'flat-slab-estimate',
-		description: `تقديري (${estimatedRatio} كجم/م³)`,
-		location: 'الفلات سلاب',
-		diameter: 0,
-		barLength: 0,
-		barCount: 0,
-		totalLength: 0,
-		weight: Number(estimatedWeight.toFixed(2)),
-		stockLength: 0,
-		stocksNeeded: 0,
-		wastePercentage: 0,
-	});
+	if (reinforcement.inputMethod === 'grid' && reinforcement.grid) {
+		const { grid } = reinforcement;
 
-	const netWeight = estimatedWeight;
-	const grossWeight = estimatedWeight * 1.15; // 15% هالك
-	const wasteWeight = grossWeight - netWeight;
+		// سفلي X (الاتجاه الرئيسي)
+		const bottomXLength = dimensions.width - 2 * cover + 0.4;
+		const bottomXCount = calculateBarCount(dimensions.length - 2 * cover, grid.bottom.xDirection.spacing);
+		rebarDetails.push(
+			calculateRebarLayer(
+				grid.bottom.xDirection.diameter,
+				bottomXLength,
+				bottomXCount,
+				'سفلي - اتجاه X',
+				'الفلات سلاب'
+			)
+		);
+
+		// سفلي Y (الاتجاه الثانوي)
+		const bottomYLength = dimensions.length - 2 * cover + 0.4;
+		const bottomYCount = calculateBarCount(dimensions.width - 2 * cover, grid.bottom.yDirection.spacing);
+		rebarDetails.push(
+			calculateRebarLayer(
+				grid.bottom.yDirection.diameter,
+				bottomYLength,
+				bottomYCount,
+				'سفلي - اتجاه Y',
+				'الفلات سلاب'
+			)
+		);
+
+		// علوي X (اختياري)
+		if (grid.top?.xDirection) {
+			rebarDetails.push(
+				calculateRebarLayer(
+					grid.top.xDirection.diameter,
+					bottomXLength,
+					bottomXCount,
+					'علوي - اتجاه X',
+					'الفلات سلاب'
+				)
+			);
+		}
+		// علوي Y (اختياري)
+		if (grid.top?.yDirection) {
+			rebarDetails.push(
+				calculateRebarLayer(
+					grid.top.yDirection.diameter,
+					bottomYLength,
+					bottomYCount,
+					'علوي - اتجاه Y',
+					'الفلات سلاب'
+				)
+			);
+		}
+	} else {
+		// Fallback: 140 kg/m3 estimation
+		const estimatedRatio = REBAR_RATIOS.flat_slab.typical;
+		const estimatedWeight = concreteVolume * estimatedRatio;
+		rebarDetails.push({
+			id: 'flat-slab-estimate',
+			description: `تقديري (${estimatedRatio} كجم/م³)`,
+			location: 'الفلات سلاب',
+			diameter: 0,
+			barLength: 0,
+			barCount: 0,
+			totalLength: 0,
+			weight: Number(estimatedWeight.toFixed(2)),
+			stockLength: 0,
+			stocksNeeded: 0,
+			wastePercentage: 0,
+		});
+	}
+
+	// إجماليات الحديد
+	const netWeight = rebarDetails.reduce((sum, r) => sum + r.weight, 0);
+	const grossWeight = rebarDetails.reduce((sum, r) => {
+		if (r.stockLength === 0) return sum + r.weight * 1.15; // 15% waste for estimation rows
+		return sum + (r.grossWeight ?? (r.stocksNeeded * r.stockLength * (REBAR_WEIGHTS[r.diameter] || 0)));
+	}, 0);
+	const wasteWeight = Math.max(0, grossWeight - netWeight);
 	const wastePercentage = grossWeight > 0 ? (wasteWeight / grossWeight) * 100 : 0;
+
+	// تجميع الأسياخ
+	const stocksMap = new Map<number, { diameter: number; count: number; length: number }>();
+	rebarDetails.forEach((r) => {
+		if (r.diameter > 0) {
+			const existing = stocksMap.get(r.diameter);
+			if (existing) {
+				existing.count += r.stocksNeeded;
+			} else {
+				stocksMap.set(r.diameter, {
+					diameter: r.diameter,
+					count: r.stocksNeeded,
+					length: r.stockLength,
+				});
+			}
+		}
+	});
 
 	// التكاليف
 	const concretePrice = STRUCTURAL_PRICES.concrete[concreteType] || 310;
@@ -1832,7 +1961,7 @@ export function calculateFlatSlab(slab: FlatSlab): EnhancedSlabResult {
 			grossWeight: Number(grossWeight.toFixed(2)),
 			wasteWeight: Number(wasteWeight.toFixed(2)),
 			wastePercentage: Number(wastePercentage.toFixed(1)),
-			stocksNeeded: [],
+			stocksNeeded: Array.from(stocksMap.values()),
 		},
 		costs: {
 			concrete: Number(concreteCost.toFixed(2)),

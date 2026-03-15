@@ -33,6 +33,7 @@ import {
 	ChevronDown,
 	ChevronLeft,
 	Copy,
+	AlertTriangle,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMutation } from "@tanstack/react-query";
@@ -145,27 +146,58 @@ function calculateCuttingDetails(
 	description: string,
 ) {
 	const stockLength = STOCK_LENGTHS[diameter] || 12;
-	const cutsPerStock = Math.floor(stockLength / barLength) || 1;
-	const stocksNeeded = Math.ceil(barCount / cutsPerStock);
-	const wastePerStock = stockLength - cutsPerStock * barLength;
-	const totalWaste = stocksNeeded * wastePerStock;
 	const totalLength = barCount * barLength;
-	const grossLength = stocksNeeded * stockLength;
-	const wastePercentage =
-		grossLength > 0 ? (totalWaste / grossLength) * 100 : 0;
 	const weight = totalLength * getRebarWeightPerMeter(diameter);
+
+	if (barLength <= stockLength) {
+		// NORMAL PATH — bar fits in one stock bar
+		const cutsPerStock = Math.floor(stockLength / barLength) || 1;
+		const stocksNeeded = Math.ceil(barCount / cutsPerStock);
+		const wastePerStock = stockLength - cutsPerStock * barLength;
+		const totalWaste = stocksNeeded * wastePerStock;
+		const grossLength = stocksNeeded * stockLength;
+		const wastePercentage =
+			grossLength > 0 ? (totalWaste / grossLength) * 100 : 0;
+
+		return {
+			description,
+			diameter,
+			barLength: Number(barLength.toFixed(2)),
+			barCount,
+			stocksNeeded,
+			wastePerStock: Number(wastePerStock.toFixed(2)),
+			totalWaste: Number(totalWaste.toFixed(2)),
+			wastePercentage: Number(wastePercentage.toFixed(1)),
+			weight: Number(weight.toFixed(2)),
+			stockLength,
+		};
+	}
+
+	// SPLICE PATH — barLength > stockLength, needs lap splices
+	const lapLength = (diameter * 40) / 1000;
+	const effectiveStockLength = stockLength - lapLength;
+	const stockBarsPerUnit = Math.ceil(barLength / effectiveStockLength);
+	const splicesPerBar = stockBarsPerUnit - 1;
+	const totalStockBars = stockBarsPerUnit * barCount;
+	const totalGrossLength = totalStockBars * stockLength;
+	const actualUsedPerBar = barLength + splicesPerBar * lapLength;
+	const waste = totalGrossLength - barCount * actualUsedPerBar;
+	const wastePercentage = totalGrossLength > 0 ? (waste / totalGrossLength) * 100 : 0;
 
 	return {
 		description,
 		diameter,
 		barLength: Number(barLength.toFixed(2)),
 		barCount,
-		stocksNeeded,
-		wastePerStock: Number(wastePerStock.toFixed(2)),
-		totalWaste: Number(totalWaste.toFixed(2)),
-		wastePercentage: Number(wastePercentage.toFixed(1)),
+		stocksNeeded: totalStockBars,
+		wastePerStock: 0,
+		totalWaste: Number(waste.toFixed(2)),
+		wastePercentage: Number(Math.max(0, wastePercentage).toFixed(1)),
 		weight: Number(weight.toFixed(2)),
 		stockLength,
+		stockBarsPerUnit,
+		splicesPerBar,
+		lapSpliceLength: Number(lapLength.toFixed(3)),
 	};
 }
 
@@ -896,6 +928,8 @@ function SlabForm({
 				}
 
 				case "flat": {
+					const hasRebarData = formData.bottomMainDiameter > 0 && formData.bottomMainBarsPerMeter > 0;
+
 					const input: FlatSlab = {
 						id: "temp",
 						name: formData.name || "سقف مسطح",
@@ -912,9 +946,11 @@ function SlabForm({
 						thickness: formData.thickness / 100,
 						dropPanels: formData.hasDropPanels
 							? {
+									length: formData.dropPanelLength,
 									width: formData.dropPanelWidth,
 									depth: formData.dropPanelDepth,
 									extraThickness: formData.dropPanelDepth,
+									count: formData.dropPanelCount,
 								}
 							: undefined,
 						columnGrid: {
@@ -924,9 +960,35 @@ function SlabForm({
 						},
 						hasDropPanels: formData.hasDropPanels,
 						hasCapitals: false,
-						reinforcement: {
-							inputMethod: "ratio",
-						},
+						reinforcement: hasRebarData
+							? {
+									inputMethod: "grid" as const,
+									grid: {
+										bottom: {
+											xDirection: {
+												diameter: formData.bottomMainDiameter,
+												spacing: 1 / formData.bottomMainBarsPerMeter,
+											},
+											yDirection: {
+												diameter: formData.bottomSecondaryDiameter,
+												spacing: 1 / formData.bottomSecondaryBarsPerMeter,
+											},
+										},
+										...(formData.hasTopMesh && {
+											top: {
+												xDirection: {
+													diameter: formData.topMainDiameter,
+													spacing: 1 / formData.topMainBarsPerMeter,
+												},
+												yDirection: {
+													diameter: formData.topSecondaryDiameter,
+													spacing: 1 / formData.topSecondaryBarsPerMeter,
+												},
+											},
+										}),
+									},
+								}
+							: { inputMethod: "ratio" as const },
 					};
 					return calculateFlatSlab(input);
 				}
@@ -1024,6 +1086,20 @@ function SlabForm({
 			return null;
 		}
 	}, [formData]);
+
+	// ═══ اتجاه الحديد حسب نوع السقف ═══
+	const mainDirection = calculations?.structuralType === 'ONE_WAY'
+		? t('pricing.studies.structural.shortSpanDirection')
+		: t('pricing.studies.structural.longSpanDirection');
+	const secondaryDirection = calculations?.structuralType === 'ONE_WAY'
+		? t('pricing.studies.structural.longSpanDirection')
+		: t('pricing.studies.structural.shortSpanDirection');
+	const mainLabel = calculations?.structuralType === 'ONE_WAY'
+		? t('pricing.studies.structural.mainRebar')
+		: t('pricing.studies.structural.mainRebar');
+	const secondaryLabel = calculations?.structuralType === 'ONE_WAY'
+		? t('pricing.studies.structural.distributionRebar')
+		: t('pricing.studies.structural.secondaryRebar');
 
 	// ═══ الإجماليات المجمعة (سقف + كمرات) ═══
 	const combinedTotals = useMemo(() => {
@@ -1637,6 +1713,41 @@ function SlabForm({
 					</div>
 				)}
 
+				{/* تحذيرات الفلات سلاب */}
+				{formData.slabType === "flat" && (
+					<div className="space-y-2">
+						{/* تحذير السماكة الدنيا */}
+						{(() => {
+							const longerSpan = Math.max(formData.length, formData.width);
+							const minThickness = formData.hasDropPanels
+								? (longerSpan * 1000) / 36
+								: (longerSpan * 1000) / 33;
+							return formData.thickness < minThickness && formData.length > 0 && formData.width > 0 ? (
+								<div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-3 py-2 rounded-lg text-sm">
+									{t("structural.flatSlab.minThicknessWarning", {
+										entered: formData.thickness,
+										minimum: Math.ceil(minThickness / 10),
+									})}
+								</div>
+							) : null;
+						})()}
+
+						{/* تحذير عدم وجود شبكة علوية */}
+						{!formData.hasTopMesh && (
+							<div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-3 py-2 rounded-lg text-sm">
+								{t("structural.flatSlab.noTopMeshWarning")}
+							</div>
+						)}
+
+						{/* توصية بالتكثيفات للأبحر الكبيرة */}
+						{!formData.hasDropPanels && Math.max(formData.length, formData.width) > 6 && (
+							<div className="bg-blue-50 border border-blue-200 text-blue-700 px-3 py-2 rounded-lg text-sm">
+								{t("structural.flatSlab.dropPanelRecommendation")}
+							</div>
+						)}
+					</div>
+				)}
+
 				{/* إعدادات الكمرات العريضة */}
 				{formData.slabType === "banded_beam" && (
 					<div className="border rounded-lg p-4 bg-indigo-50/30">
@@ -1713,8 +1824,8 @@ function SlabForm({
 							</h5>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 								<RebarMeshInput
-									title="الحديد الرئيسي"
-									direction="الاتجاه الطويل"
+									title={mainLabel}
+									direction={mainDirection}
 									diameter={formData.bottomMainDiameter}
 									onDiameterChange={(d) =>
 										setFormData({
@@ -1736,8 +1847,8 @@ function SlabForm({
 									availableBarsPerMeter={[5, 6, 7, 8, 9, 10]}
 								/>
 								<RebarMeshInput
-									title="الحديد الثانوي"
-									direction="الاتجاه القصير"
+									title={secondaryLabel}
+									direction={secondaryDirection}
 									diameter={formData.bottomSecondaryDiameter}
 									onDiameterChange={(d) =>
 										setFormData({
@@ -1790,8 +1901,8 @@ function SlabForm({
 							{formData.hasTopMesh && (
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 									<RebarMeshInput
-										title="الحديد الرئيسي"
-										direction="الاتجاه الطويل"
+										title={mainLabel}
+										direction={mainDirection}
 										diameter={formData.topMainDiameter}
 										onDiameterChange={(d) =>
 											setFormData({
@@ -1813,8 +1924,8 @@ function SlabForm({
 										availableBarsPerMeter={[4, 5, 6, 7, 8]}
 									/>
 									<RebarMeshInput
-										title="الحديد الثانوي"
-										direction="الاتجاه القصير"
+										title={secondaryLabel}
+										direction={secondaryDirection}
 										diameter={formData.topSecondaryDiameter}
 										onDiameterChange={(d) =>
 											setFormData({
@@ -2304,6 +2415,33 @@ function SlabForm({
 							</h4>
 						</div>
 
+						{/* نوع السقف الإنشائي */}
+						{calculations.structuralType && (
+							<div className="flex items-center gap-2 mb-2">
+								<Badge variant="outline" className={
+									calculations.structuralType === 'ONE_WAY'
+										? 'border-amber-500 text-amber-700'
+										: 'border-blue-500 text-blue-700'
+								}>
+									{calculations.structuralType === 'ONE_WAY'
+										? t('pricing.studies.structural.oneWaySlab')
+										: t('pricing.studies.structural.twoWaySlab')}
+									{` (${t('pricing.studies.structural.aspectRatio')}: ${calculations.aspectRatio})`}
+								</Badge>
+							</div>
+						)}
+
+						{/* تحذير اتجاه الحديد */}
+						{calculations.structuralType === 'ONE_WAY' &&
+						 formData.bottomMainDiameter < formData.bottomSecondaryDiameter && (
+							<div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center gap-2">
+								<AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
+								<p className="text-xs text-amber-700">
+									{t('pricing.studies.structural.rebarDirectionWarning')}
+								</p>
+							</div>
+						)}
+
 						{/* البلوكات - للهوردي */}
 						{calculations.blocksCount &&
 							calculations.blocksCount > 0 && (
@@ -2349,6 +2487,19 @@ function SlabForm({
 							)}
 						</div>
 
+						{/* شارة حساب فعلي/تقديري للفلات سلاب */}
+						{formData.slabType === "flat" && calculations && (
+							<div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+								calculations.rebarDetails[0]?.diameter > 0
+									? "bg-green-50 text-green-700 border border-green-200"
+									: "bg-amber-50 text-amber-700 border border-amber-200"
+							}`}>
+								{calculations.rebarDetails[0]?.diameter > 0
+									? t("structural.flatSlab.actualCalculation")
+									: t("structural.flatSlab.estimatedCalculation")}
+							</div>
+						)}
+
 						{/* إجمالي السقف (البلاطة فقط) */}
 						<CalculationResultsPanel
 							concreteVolume={calculations.concreteVolume}
@@ -2361,8 +2512,11 @@ function SlabForm({
 									barCount: detail.barCount,
 									stocksNeeded: detail.stocksNeeded,
 									weight: detail.weight,
-									grossWeight: detail.weight,
+									grossWeight: detail.grossWeight ?? detail.weight,
 									wastePercentage: detail.wastePercentage,
+									stockBarsPerUnit: detail.stockBarsPerUnit,
+									splicesPerBar: detail.splicesPerBar,
+									lapSpliceLength: detail.lapSpliceLength,
 								}),
 							)}
 							showCuttingDetails={showCuttingDetails}

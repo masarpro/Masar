@@ -161,9 +161,11 @@ export interface FlatSlab extends SlabBase {
 	// Drop Panels
 	hasDropPanels: boolean;
 	dropPanels?: {
+		length: number;
 		width: number;
 		depth: number;
 		extraThickness: number;
+		count: number;
 	};
 
 	// Column Capitals
@@ -176,7 +178,17 @@ export interface FlatSlab extends SlabBase {
 
 	// التسليح
 	reinforcement: {
-		inputMethod: 'strips' | 'detailed' | 'ratio';
+		inputMethod: 'strips' | 'detailed' | 'ratio' | 'grid';
+		grid?: {
+			bottom: {
+				xDirection: { diameter: number; spacing: number };
+				yDirection: { diameter: number; spacing: number };
+			};
+			top?: {
+				xDirection?: { diameter: number; spacing: number };
+				yDirection?: { diameter: number; spacing: number };
+			};
+		};
 		strips?: {
 			columnStrip: {
 				width: number;
@@ -384,6 +396,12 @@ export interface RebarDetail {
 	stockLength: number;
 	stocksNeeded: number;
 	wastePercentage: number;
+	// Splice fields (populated when barLength > stockLength)
+	stockBarsPerUnit?: number;
+	totalStockBars?: number;
+	lapSpliceLength?: number;
+	splicesPerBar?: number;
+	grossWeight?: number;
 	cutting?: {
 		cutsPerStock: number;
 		wastePerStock: number;
