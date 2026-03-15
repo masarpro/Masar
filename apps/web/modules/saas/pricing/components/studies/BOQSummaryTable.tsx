@@ -58,6 +58,11 @@ import {
 	exportCuttingDetails,
 } from "../../lib/boq-export";
 import { formatNumber } from "../../lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { orpc } from "@shared/lib/orpc-query-utils";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
+import { BOQExportDropdown } from "./BOQExportDropdown";
+import { BOQPrintView } from "./BOQPrintView";
 
 // ═══════════════════════════════════════════════════════════════
 // Props
@@ -93,6 +98,23 @@ export function BOQSummaryTable({
 	const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
 	const [expandedCutting, setExpandedCutting] = useState<Set<string>>(new Set());
 	const [selectedFloor, setSelectedFloor] = useState<string>("all");
+	const [showPrintView, setShowPrintView] = useState(false);
+
+	// Fetch default template (cached, lightweight)
+	const { data: defaultTemplate } = useQuery({
+		...orpc.company.templates.getDefault.queryOptions({
+			input: { organizationId, templateType: "QUOTATION" as const },
+		}),
+		staleTime: STALE_TIMES.TEMPLATES,
+	});
+
+	// Fetch organization settings (cached)
+	const { data: orgSettings } = useQuery({
+		...orpc.finance.settings.get.queryOptions({
+			input: { organizationId },
+		}),
+		staleTime: STALE_TIMES.FINANCE_SETTINGS,
+	});
 
 	const floorOptions = useMemo(
 		() => buildFloorFilterOptions(items, enabledFloors),
@@ -126,6 +148,36 @@ export function BOQSummaryTable({
 		});
 	};
 
+	const handlePrint = () => {
+		setShowPrintView(true);
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				window.print();
+				setShowPrintView(false);
+			});
+		});
+	};
+
+	const orgSettingsAny = orgSettings as any;
+	const templateConfig = {
+		elements: (defaultTemplate as any)?.content?.elements || [],
+		settings: (defaultTemplate as any)?.settings || {},
+	};
+	const organizationData = {
+		name: orgSettingsAny?.companyNameAr ?? undefined,
+		nameAr: orgSettingsAny?.companyNameAr ?? undefined,
+		nameEn: orgSettingsAny?.companyNameEn ?? undefined,
+		logo: orgSettingsAny?.logo ?? undefined,
+		address: orgSettingsAny?.address ?? undefined,
+		addressAr: orgSettingsAny?.address ?? undefined,
+		addressEn: orgSettingsAny?.addressEn ?? undefined,
+		phone: orgSettingsAny?.phone ?? undefined,
+		email: orgSettingsAny?.email ?? undefined,
+		website: orgSettingsAny?.website ?? undefined,
+		taxNumber: orgSettingsAny?.taxNumber ?? undefined,
+		commercialReg: orgSettingsAny?.commercialReg ?? undefined,
+	};
+
 	if (items.length === 0) return null;
 
 	const tabs: { key: TabKey; label: string; icon: React.ElementType }[] = [
@@ -142,10 +194,8 @@ export function BOQSummaryTable({
 					<ClipboardList className="h-5 w-5 text-primary" />
 					جدول الكميات الإجمالي
 				</h3>
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() =>
+				<BOQExportDropdown
+					onExcelExport={() =>
 						exportBOQToExcel(
 							summary,
 							selectedFloor !== "all" && selectedFloorLabel
@@ -153,11 +203,8 @@ export function BOQSummaryTable({
 								: studyName,
 						)
 					}
-					className="print:hidden"
-				>
-					<FileSpreadsheet className="h-4 w-4 ml-2" />
-					تصدير Excel
-				</Button>
+					onPrint={handlePrint}
+				/>
 			</div>
 
 			{/* Floor Filter */}
@@ -214,6 +261,7 @@ export function BOQSummaryTable({
 				<FactoryOrderTab
 					factoryOrder={summary.factoryOrder}
 					studyName={studyName}
+					onPrint={handlePrint}
 				/>
 			)}
 
@@ -221,8 +269,37 @@ export function BOQSummaryTable({
 				<CuttingWorkshopTab
 					cuttingDetails={summary.allCuttingDetails}
 					studyName={studyName}
+					onPrint={handlePrint}
 				/>
 			)}
+
+			{showPrintView && (
+				<BOQPrintView
+					activeTab={activeTab}
+					summary={summary}
+					studyName={studyName}
+					floorLabel={selectedFloor !== "all" ? selectedFloorLabel : undefined}
+					templateElements={templateConfig.elements}
+					templateSettings={templateConfig.settings}
+					organizationData={organizationData}
+				/>
+			)}
+
+			{/* Print Styles */}
+			<style jsx global>{`
+				@media print {
+					body * { visibility: hidden; }
+					.boq-print-container, .boq-print-container * { visibility: visible; }
+					.boq-print-container {
+						position: absolute; left: 0; top: 0; width: 100%;
+					}
+					@page { size: A4 landscape; margin: 15mm; }
+					table { width: 100%; border-collapse: collapse; }
+					th { background-color: #f3f4f6 !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+					td, th { border: 1px solid #d1d5db; padding: 6px 10px; text-align: right; font-size: 11px; }
+					.boq-section { break-inside: avoid; }
+				}
+			`}</style>
 		</div>
 	);
 }
@@ -970,9 +1047,11 @@ function GrandTotalCards({
 function FactoryOrderTab({
 	factoryOrder,
 	studyName,
+	onPrint,
 }: {
 	factoryOrder: FactoryOrderEntry[];
 	studyName?: string;
+	onPrint: () => void;
 }) {
 	const totalBars = factoryOrder.reduce((s, e) => s + e.count, 0);
 	const totalWeight = factoryOrder.reduce((s, e) => s + e.weight, 0);
@@ -994,15 +1073,11 @@ function FactoryOrderTab({
 					<Factory className="h-5 w-5 text-primary" />
 					<h4 className="font-semibold">طلبية المصنع - حديد التسليح</h4>
 				</div>
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() => exportFactoryOrder(factoryOrder, studyName)}
-					className="print:hidden"
-				>
-					<Download className="h-4 w-4 ml-2" />
-					تصدير
-				</Button>
+				<BOQExportDropdown
+					onExcelExport={() => exportFactoryOrder(factoryOrder, studyName)}
+					onPrint={onPrint}
+					label="تصدير"
+				/>
 			</div>
 
 			<Card>
@@ -1061,9 +1136,11 @@ function FactoryOrderTab({
 function CuttingWorkshopTab({
 	cuttingDetails,
 	studyName,
+	onPrint,
 }: {
 	cuttingDetails: CuttingDetailRow[];
 	studyName?: string;
+	onPrint: () => void;
 }) {
 	if (cuttingDetails.length === 0) {
 		return (
@@ -1092,15 +1169,11 @@ function CuttingWorkshopTab({
 					<Scissors className="h-5 w-5 text-primary" />
 					<h4 className="font-semibold">تفاصيل التفصيل - ورشة القص</h4>
 				</div>
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() => exportCuttingDetails(cuttingDetails, studyName)}
-					className="print:hidden"
-				>
-					<Download className="h-4 w-4 ml-2" />
-					تصدير
-				</Button>
+				<BOQExportDropdown
+					onExcelExport={() => exportCuttingDetails(cuttingDetails, studyName)}
+					onPrint={onPrint}
+					label="تصدير"
+				/>
 			</div>
 
 			{sortedDiameters.map((diameter) => {

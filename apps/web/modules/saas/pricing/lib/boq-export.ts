@@ -256,10 +256,3 @@ export async function exportCuttingDetails(cuttingDetails: CuttingDetailRow[], s
 	XLSX.writeFile(wb, fileName);
 }
 
-// ─────────────────────────────────────────────────────────────
-// PDF Export (Print-based)
-// ─────────────────────────────────────────────────────────────
-
-export function exportBOQToPDF() {
-	window.print();
-}

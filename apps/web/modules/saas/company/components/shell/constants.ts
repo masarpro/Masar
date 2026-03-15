@@ -1,11 +1,9 @@
 import {
 	LayoutDashboard,
-	Users,
+	UserCog,
 	Receipt,
 	Package,
 	BarChart3,
-	Banknote,
-	CalendarDays,
 	Layout,
 	type LucideIcon,
 } from "lucide-react";
@@ -25,28 +23,16 @@ export const COMPANY_NAV_SECTIONS: CompanyNavSection[] = [
 		icon: LayoutDashboard,
 	},
 	{
-		id: "employees",
-		path: "employees",
-		labelKey: "company.nav.employees",
-		icon: Users,
-	},
-	{
-		id: "payroll",
-		path: "payroll",
-		labelKey: "company.nav.payroll",
-		icon: Banknote,
+		id: "hr",
+		path: "hr",
+		labelKey: "company.nav.hr",
+		icon: UserCog,
 	},
 	{
 		id: "expenses",
 		path: "expenses",
 		labelKey: "company.nav.expenses",
 		icon: Receipt,
-	},
-	{
-		id: "leaves",
-		path: "leaves",
-		labelKey: "company.nav.leaves",
-		icon: CalendarDays,
 	},
 	{
 		id: "assets",
@@ -86,6 +72,9 @@ export function isSectionActive(pathname: string, sectionPath: string): boolean 
 	const segment = getCurrentCompanySegment(pathname);
 	if (sectionPath === "") {
 		return segment === "" || pathname.endsWith("/company");
+	}
+	if (sectionPath === "hr") {
+		return segment === "hr" || segment === "employees" || segment === "payroll" || segment === "leaves";
 	}
 	return segment === sectionPath;
 }

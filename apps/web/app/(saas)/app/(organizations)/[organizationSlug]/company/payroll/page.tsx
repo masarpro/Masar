@@ -1,12 +1,4 @@
-import { getActiveOrganization } from "@saas/auth/lib/server";
-import { getTranslations } from "next-intl/server";
-import { notFound } from "next/navigation";
-import { PayrollRunList } from "@saas/company/components/payroll/PayrollRunList";
-
-export async function generateMetadata() {
-	const t = await getTranslations();
-	return { title: t("company.payroll.title") };
-}
+import { redirect } from "next/navigation";
 
 export default async function PayrollPage({
 	params,
@@ -14,14 +6,5 @@ export default async function PayrollPage({
 	params: Promise<{ organizationSlug: string }>;
 }) {
 	const { organizationSlug } = await params;
-	const activeOrganization = await getActiveOrganization(organizationSlug);
-
-	if (!activeOrganization) return notFound();
-
-	return (
-		<PayrollRunList
-			organizationId={activeOrganization.id}
-			organizationSlug={organizationSlug}
-		/>
-	);
+	redirect(`/app/${organizationSlug}/company/hr?tab=payroll`);
 }
