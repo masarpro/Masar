@@ -8,23 +8,35 @@ import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
 import { Badge } from "@ui/components/badge";
 import { Switch } from "@ui/components/switch";
 import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@ui/components/collapsible";
+import {
 	Save,
 	SkipForward,
 	Plus,
 	Minus,
 	Building2,
+	ChevronDown,
+	Ruler,
+	Settings2,
 } from "lucide-react";
 import { toast } from "sonner";
 import type {
 	StructuralBuildingConfig,
 	StructuralFloorConfig,
 	StructuralFloorType,
+	BuildingHeightProperties,
+	HeightInputMode,
 } from "../../types/structural-building-config";
 import {
 	STRUCTURAL_FLOOR_DEFINITIONS,
 	getUpperFloorLabel,
 	createDefaultConfig,
 } from "../../types/structural-building-config";
+import { SAUDI_DEFAULTS } from "../../lib/height-derivation-engine";
+import { deriveHeights } from "../../lib/height-derivation-engine";
 import { formatNumber } from "../../lib/utils";
 
 // ═══════════════════════════════════════════════════════════════
@@ -57,11 +69,34 @@ export function StructuralBuildingWizard({
 		return createDefaultConfig();
 	});
 
+	const [propertiesOpen, setPropertiesOpen] = useState(false);
+
+	// Height properties (initialized from config or defaults)
+	const heightProps: BuildingHeightProperties = config.heightProperties || SAUDI_DEFAULTS;
+
+	const heightInputMode = heightProps.heightInputMode;
+
 	// Track how many upper floors exist
 	const upperFloorCount = useMemo(
 		() => config.floors.filter((f) => f.type === "upper").length,
 		[config.floors],
 	);
+
+	// ─── Height properties updater ───
+
+	const updateHeightProperties = (updates: Partial<BuildingHeightProperties>) => {
+		setConfig((prev) => ({
+			...prev,
+			heightProperties: {
+				...(prev.heightProperties || SAUDI_DEFAULTS),
+				...updates,
+			},
+		}));
+	};
+
+	const setHeightMode = (mode: HeightInputMode) => {
+		updateHeightProperties({ heightInputMode: mode });
+	};
 
 	// ─── Floor toggle helpers ───
 
@@ -174,6 +209,18 @@ export function StructuralBuildingWizard({
 		[enabledFloors],
 	);
 
+	// Live derivation preview
+	const derivation = useMemo(() => {
+		if (!config.heightProperties) return null;
+		return deriveHeights(config);
+	}, [config]);
+
+	// Computed floor-to-floor for levels mode display
+	const getCalculatedHeight = (floorId: string): string => {
+		if (!derivation?.floors[floorId]?.floorToFloorHeight) return "—";
+		return formatNumber(derivation.floors[floorId].floorToFloorHeight!) + " م";
+	};
+
 	// ─── Save ───
 
 	const handleSave = useCallback(async () => {
@@ -204,7 +251,6 @@ export function StructuralBuildingWizard({
 					<div className="flex flex-wrap gap-2">
 						{STRUCTURAL_FLOOR_DEFINITIONS.map((def) => {
 							if (def.type === "upper") {
-								// Upper floors: show add/remove controls
 								return (
 									<div key={def.type} className="flex items-center gap-1">
 										<Button
@@ -285,7 +331,32 @@ export function StructuralBuildingWizard({
 					</div>
 				</div>
 
-				{/* ── Floor details ── */}
+				{/* ── Height mode toggle ── */}
+				<div>
+					<Label className="text-base font-semibold mb-3 block">وضع الارتفاع:</Label>
+					<div className="flex gap-2">
+						<Button
+							variant={heightInputMode === "manual" ? "primary" : "outline"}
+							size="sm"
+							onClick={() => setHeightMode("manual")}
+							className="gap-1"
+						>
+							<Ruler className="h-4 w-4" />
+							ارتفاع يدوي
+						</Button>
+						<Button
+							variant={heightInputMode === "levels" ? "primary" : "outline"}
+							size="sm"
+							onClick={() => setHeightMode("levels")}
+							className="gap-1"
+						>
+							<Ruler className="h-4 w-4" />
+							مناسيب من المخططات
+						</Button>
+					</div>
+				</div>
+
+				{/* ── Floor details table ── */}
 				{enabledFloors.length > 0 && (
 					<div>
 						<Label className="text-base font-semibold mb-3 block">تفاصيل الأدوار المختارة:</Label>
@@ -294,7 +365,14 @@ export function StructuralBuildingWizard({
 								<thead className="bg-muted/50">
 									<tr>
 										<th className="text-right p-2 font-medium">الدور</th>
-										<th className="text-right p-2 font-medium">الارتفاع (م)</th>
+										{heightInputMode === "levels" ? (
+											<>
+												<th className="text-right p-2 font-medium">المنسوب (م)</th>
+												<th className="text-right p-2 font-medium">الارتفاع (محسوب)</th>
+											</>
+										) : (
+											<th className="text-right p-2 font-medium">الارتفاع (م)</th>
+										)}
 										<th className="text-right p-2 font-medium">مساحة السقف (م²)</th>
 										{enabledFloors.some((f) => f.isRepeated) && (
 											<th className="text-right p-2 font-medium">التكرار</th>
@@ -310,18 +388,40 @@ export function StructuralBuildingWizard({
 													<span className="font-medium">{floor.label}</span>
 												</span>
 											</td>
-											<td className="p-2">
-												<Input
-													type="number"
-													step="0.1"
-													min={0}
-													className="w-24 h-8"
-													value={floor.height || ""}
-													onChange={(e: any) =>
-														updateFloor(floor.id, { height: +e.target.value })
-													}
-												/>
-											</td>
+											{heightInputMode === "levels" ? (
+												<>
+													<td className="p-2">
+														<Input
+															type="number"
+															step="0.01"
+															className="w-24 h-8"
+															value={floor.finishLevel ?? ""}
+															placeholder="0.00"
+															onChange={(e: any) =>
+																updateFloor(floor.id, { finishLevel: e.target.value === "" ? undefined : +e.target.value })
+															}
+														/>
+													</td>
+													<td className="p-2">
+														<span className="text-sm text-muted-foreground bg-muted/50 rounded px-2 py-1">
+															{getCalculatedHeight(floor.id)}
+														</span>
+													</td>
+												</>
+											) : (
+												<td className="p-2">
+													<Input
+														type="number"
+														step="0.1"
+														min={0}
+														className="w-24 h-8"
+														value={floor.height || ""}
+														onChange={(e: any) =>
+															updateFloor(floor.id, { height: +e.target.value })
+														}
+													/>
+												</td>
+											)}
 											<td className="p-2">
 												<Input
 													type="number"
@@ -347,8 +447,318 @@ export function StructuralBuildingWizard({
 											)}
 										</tr>
 									))}
+									{/* Parapet row in levels mode */}
+									{heightInputMode === "levels" && heightProps.hasParapet && (
+										<tr className="border-t bg-amber-50/30 dark:bg-amber-950/10">
+											<td className="p-2">
+												<span className="flex items-center gap-2">
+													<span>🧱</span>
+													<span className="font-medium">الدروة</span>
+												</span>
+											</td>
+											<td className="p-2">
+												<Input
+													type="number"
+													step="0.01"
+													className="w-24 h-8"
+													value={heightProps.parapetLevel ?? ""}
+													placeholder="0.00"
+													onChange={(e: any) =>
+														updateHeightProperties({
+															parapetLevel: e.target.value === "" ? undefined : +e.target.value,
+														})
+													}
+												/>
+											</td>
+											<td className="p-2">
+												<span className="text-sm text-muted-foreground bg-muted/50 rounded px-2 py-1">
+													{heightProps.parapetHeight / 100} م
+												</span>
+											</td>
+											<td className="p-2">
+												<span className="text-muted-foreground text-xs">—</span>
+											</td>
+											{enabledFloors.some((f) => f.isRepeated) && (
+												<td className="p-2">
+													<span className="text-muted-foreground text-xs">—</span>
+												</td>
+											)}
+										</tr>
+									)}
 								</tbody>
 							</table>
+						</div>
+					</div>
+				)}
+
+				{/* ── Parapet toggle (manual mode) ── */}
+				{heightInputMode === "manual" && (
+					<div className="flex items-center gap-3 bg-amber-50/30 dark:bg-amber-950/10 border border-amber-200/50 rounded-lg p-3">
+						<Switch
+							checked={heightProps.hasParapet}
+							onCheckedChange={(checked) =>
+								updateHeightProperties({ hasParapet: checked })
+							}
+						/>
+						<Label className="text-sm font-medium">هل يوجد دروة سطح؟</Label>
+						{heightProps.hasParapet && (
+							<div className="flex items-center gap-2 mr-4">
+								<Label className="text-xs text-muted-foreground">ارتفاع الدروة (سم):</Label>
+								<Input
+									type="number"
+									step="10"
+									min={0}
+									className="w-20 h-8"
+									value={heightProps.parapetHeight}
+									onChange={(e: any) =>
+										updateHeightProperties({ parapetHeight: +e.target.value })
+									}
+								/>
+							</div>
+						)}
+					</div>
+				)}
+
+				{/* ── Building Properties (collapsible) ── */}
+				<Collapsible open={propertiesOpen} onOpenChange={setPropertiesOpen}>
+					<CollapsibleTrigger asChild>
+						<Button variant="outline" className="w-full justify-between" size="sm">
+							<span className="flex items-center gap-2">
+								<Settings2 className="h-4 w-4" />
+								خصائص المبنى
+							</span>
+							<ChevronDown className={`h-4 w-4 transition-transform ${propertiesOpen ? "rotate-180" : ""}`} />
+						</Button>
+					</CollapsibleTrigger>
+					<CollapsibleContent className="mt-3">
+						<div className="border rounded-lg p-4 space-y-4 bg-muted/20">
+							{/* Foundation zone */}
+							<div>
+								<h5 className="text-sm font-semibold mb-3">منطقة الأساسات</h5>
+								<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+									<div>
+										<Label className="text-xs">عمق الحفر (م)</Label>
+										<Input
+											type="number"
+											step="0.1"
+											min={0}
+											className="h-8"
+											value={heightProps.excavationDepth}
+											onChange={(e: any) =>
+												updateHeightProperties({ excavationDepth: +e.target.value })
+											}
+										/>
+									</div>
+									<div>
+										<Label className="text-xs">منسوب الشارع (م)</Label>
+										<Input
+											type="number"
+											step="0.1"
+											className="h-8"
+											value={heightProps.streetLevel}
+											onChange={(e: any) =>
+												updateHeightProperties({ streetLevel: +e.target.value })
+											}
+										/>
+									</div>
+									<div>
+										<Label className="text-xs">ارتفاع المبنى عن الشارع (سم)</Label>
+										<Input
+											type="number"
+											step="5"
+											min={0}
+											className="h-8"
+											value={heightProps.buildingElevationAboveStreet}
+											onChange={(e: any) =>
+												updateHeightProperties({ buildingElevationAboveStreet: +e.target.value })
+											}
+										/>
+									</div>
+									<div>
+										<Label className="text-xs">سمك الخرسانة العادية (سم)</Label>
+										<Input
+											type="number"
+											step="5"
+											min={0}
+											className="h-8"
+											value={heightProps.plainConcreteThickness}
+											onChange={(e: any) =>
+												updateHeightProperties({ plainConcreteThickness: +e.target.value })
+											}
+										/>
+									</div>
+									<div>
+										<Label className="text-xs">عمق القاعدة (سم)</Label>
+										<Input
+											type="number"
+											step="5"
+											min={0}
+											className="h-8"
+											value={heightProps.foundationDepth}
+											onChange={(e: any) =>
+												updateHeightProperties({ foundationDepth: +e.target.value })
+											}
+										/>
+									</div>
+									<div>
+										<Label className="text-xs">عمق الميدة (سم)</Label>
+										<Input
+											type="number"
+											step="5"
+											min={0}
+											className="h-8"
+											value={heightProps.beamDepth}
+											onChange={(e: any) =>
+												updateHeightProperties({ beamDepth: +e.target.value })
+											}
+										/>
+									</div>
+								</div>
+							</div>
+
+							{/* Slab/beam defaults */}
+							<div>
+								<h5 className="text-sm font-semibold mb-3">أبعاد افتراضية</h5>
+								<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+									<div>
+										<Label className="text-xs">سمك السقف الافتراضي (سم)</Label>
+										<Input
+											type="number"
+											step="5"
+											min={0}
+											className="h-8"
+											value={heightProps.defaultSlabThickness}
+											onChange={(e: any) =>
+												updateHeightProperties({ defaultSlabThickness: +e.target.value })
+											}
+										/>
+									</div>
+									<div>
+										<Label className="text-xs">عمق الكمرة الافتراضي (سم)</Label>
+										<Input
+											type="number"
+											step="5"
+											min={0}
+											className="h-8"
+											value={heightProps.defaultBeamDepth}
+											onChange={(e: any) =>
+												updateHeightProperties({ defaultBeamDepth: +e.target.value })
+											}
+										/>
+									</div>
+								</div>
+							</div>
+
+							{/* Finish/levels settings */}
+							{heightInputMode === "levels" && (
+								<div>
+									<h5 className="text-sm font-semibold mb-3">إعدادات المناسيب</h5>
+									<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+										<div className="flex items-center gap-2 col-span-2">
+											<Switch
+												checked={heightProps.includeFinishInLevels}
+												onCheckedChange={(checked) =>
+													updateHeightProperties({ includeFinishInLevels: checked })
+												}
+											/>
+											<Label className="text-xs">المناسيب تشمل التشطيب</Label>
+										</div>
+										<div>
+											<Label className="text-xs">سمك التشطيب (سم)</Label>
+											<Input
+												type="number"
+												step="1"
+												min={0}
+												className="h-8"
+												value={heightProps.finishThickness}
+												onChange={(e: any) =>
+													updateHeightProperties({ finishThickness: +e.target.value })
+												}
+											/>
+										</div>
+									</div>
+								</div>
+							)}
+
+							{/* Parapet settings */}
+							{heightProps.hasParapet && (
+								<div>
+									<h5 className="text-sm font-semibold mb-3">الدروة</h5>
+									<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+										<div>
+											<Label className="text-xs">ارتفاع الدروة (سم)</Label>
+											<Input
+												type="number"
+												step="10"
+												min={0}
+												className="h-8"
+												value={heightProps.parapetHeight}
+												onChange={(e: any) =>
+													updateHeightProperties({ parapetHeight: +e.target.value })
+												}
+											/>
+										</div>
+										<div>
+											<Label className="text-xs">عمق الكمرة المقلوبة (سم)</Label>
+											<Input
+												type="number"
+												step="5"
+												min={0}
+												className="h-8"
+												value={heightProps.invertedBeamDepth}
+												onChange={(e: any) =>
+													updateHeightProperties({ invertedBeamDepth: +e.target.value })
+												}
+											/>
+										</div>
+										<div>
+											<Label className="text-xs">سمك عزل السطح (سم)</Label>
+											<Input
+												type="number"
+												step="5"
+												min={0}
+												className="h-8"
+												value={heightProps.roofWaterproofingThickness}
+												onChange={(e: any) =>
+													updateHeightProperties({ roofWaterproofingThickness: +e.target.value })
+												}
+											/>
+										</div>
+									</div>
+								</div>
+							)}
+						</div>
+					</CollapsibleContent>
+				</Collapsible>
+
+				{/* ── Derivation preview ── */}
+				{derivation && (
+					<div className="bg-green-50/50 dark:bg-green-950/20 border border-green-200/50 rounded-lg p-4 space-y-2">
+						<h5 className="text-sm font-semibold flex items-center gap-2">
+							<Ruler className="h-4 w-4 text-green-600" />
+							ملخص الارتفاعات المحسوبة
+						</h5>
+						<div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+							{derivation.neckHeight != null && (
+								<div>
+									<span className="text-xs text-muted-foreground">ارتفاع الرقبة:</span>
+									<p className="font-bold">{formatNumber(derivation.neckHeight)} سم</p>
+								</div>
+							)}
+							{derivation.parapet && (
+								<div>
+									<span className="text-xs text-muted-foreground">بلوك الدروة:</span>
+									<p className="font-bold">{formatNumber(derivation.parapet.blockHeight)} سم</p>
+								</div>
+							)}
+							<div>
+								<span className="text-xs text-muted-foreground">ارتفاع المبنى:</span>
+								<p className="font-bold">{formatNumber(derivation.summary.totalBuildingHeight)} م</p>
+							</div>
+							<div>
+								<span className="text-xs text-muted-foreground">من الحفر للسطح:</span>
+								<p className="font-bold">{formatNumber(derivation.summary.excavationToRoof)} م</p>
+							</div>
 						</div>
 					</div>
 				)}

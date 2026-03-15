@@ -118,6 +118,7 @@ export function StructuralItemsEditor({
 				<StructuralBuildingConfigBar
 					floors={enabledFloors}
 					onEdit={() => setShowWizard(true)}
+					buildingConfig={buildingConfig}
 				/>
 			)}
 
@@ -139,6 +140,7 @@ export function StructuralItemsEditor({
 					}))}
 					onUpdate={refetch}
 					buildingFloors={isConfigComplete ? enabledFloors : undefined}
+					buildingConfig={isConfigComplete ? buildingConfig : undefined}
 				/>
 			</div>
 

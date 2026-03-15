@@ -4,6 +4,35 @@
 
 export type StructuralFloorType = "basement" | "ground" | "mezzanine" | "upper" | "repeated" | "annex";
 
+export type HeightInputMode = "manual" | "levels";
+
+export interface BuildingHeightProperties {
+	heightInputMode: HeightInputMode;
+	includeFinishInLevels: boolean;
+	finishThickness: number;             // cm
+	streetLevel: number;                 // m
+	excavationDepth: number;             // m
+	plainConcreteThickness: number;      // cm
+	foundationDepth: number;             // cm
+	beamDepth: number;                   // cm (tie beam)
+	buildingElevationAboveStreet: number;// cm
+	defaultSlabThickness: number;        // cm
+	defaultBeamDepth: number;            // cm (full beam)
+	hasParapet: boolean;
+	parapetHeight: number;               // cm
+	parapetLevel?: number;               // m (finish level, optional)
+	invertedBeamDepth: number;           // cm
+	roofWaterproofingThickness: number;  // cm
+}
+
+export interface DerivedFloorHeights {
+	floorToFloorHeight: number | null;   // m
+	columnHeight: number | null;         // cm
+	blockHeight: number | null;          // cm
+	neckHeight: number | null;           // cm (ground floor only)
+	isAutoCalculated: boolean;
+}
+
 export interface StructuralFloorConfig {
 	id: string;
 	type: StructuralFloorType;
@@ -16,11 +45,15 @@ export interface StructuralFloorConfig {
 	repeatCount: number;   // 1 for non-repeated
 	enabled: boolean;
 	hasNeckColumns?: boolean;
+	finishLevel?: number;  // m above datum
+	derived?: DerivedFloorHeights;
 }
 
 export interface StructuralBuildingConfig {
 	floors: StructuralFloorConfig[];
 	isComplete: boolean;
+	heightProperties?: BuildingHeightProperties;
+	heightOverrides?: Record<string, Partial<DerivedFloorHeights>>;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -71,6 +104,7 @@ export interface FloorDef {
 	icon: string;
 	hasNeckColumns?: boolean;
 	isRepeated?: boolean;
+	height?: number;
 }
 
 /** Returns FloorDef[] for columns section */
@@ -84,6 +118,7 @@ export function configToColumnFloorDefs(config: StructuralBuildingConfig): Floor
 			icon: f.icon,
 			hasNeckColumns: f.hasNeckColumns,
 			isRepeated: f.isRepeated,
+			height: f.height,
 		}));
 }
 

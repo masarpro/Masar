@@ -19,6 +19,33 @@ const blockSpecSchema = z.object({
 	thickness: z.number().optional(),
 });
 
+const heightPropertiesSchema = z.object({
+	heightInputMode: z.enum(["manual", "levels"]),
+	includeFinishInLevels: z.boolean(),
+	finishThickness: z.number().nonnegative(),
+	streetLevel: z.number(),
+	excavationDepth: z.number().nonnegative(),
+	plainConcreteThickness: z.number().nonnegative(),
+	foundationDepth: z.number().nonnegative(),
+	beamDepth: z.number().nonnegative(),
+	buildingElevationAboveStreet: z.number().nonnegative(),
+	defaultSlabThickness: z.number().nonnegative(),
+	defaultBeamDepth: z.number().nonnegative(),
+	hasParapet: z.boolean(),
+	parapetHeight: z.number().nonnegative(),
+	parapetLevel: z.number().optional(),
+	invertedBeamDepth: z.number().nonnegative(),
+	roofWaterproofingThickness: z.number().nonnegative(),
+}).optional();
+
+const derivedFloorHeightsSchema = z.object({
+	floorToFloorHeight: z.number().nullable().optional(),
+	columnHeight: z.number().nullable().optional(),
+	blockHeight: z.number().nullable().optional(),
+	neckHeight: z.number().nullable().optional(),
+	isAutoCalculated: z.boolean().optional(),
+}).partial();
+
 const buildingConfigSchema = z.object({
 	floors: z.array(z.object({
 		id: z.string(),
@@ -32,8 +59,11 @@ const buildingConfigSchema = z.object({
 		repeatCount: z.number().nonnegative(),
 		enabled: z.boolean(),
 		hasNeckColumns: z.boolean().optional(),
+		finishLevel: z.number().optional(),
 	})),
 	isComplete: z.boolean(),
+	heightProperties: heightPropertiesSchema,
+	heightOverrides: z.record(z.string(), derivedFloorHeightsSchema).optional(),
 });
 
 const structuralSpecsSchema = z.object({

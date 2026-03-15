@@ -51,7 +51,8 @@ import {
 } from "../../../lib/structural-calculations";
 import { formatNumber, formatCurrency } from "../../../lib/utils";
 import { BLOCK_TYPES, WALL_CATEGORIES, WASTE_PERCENTAGES } from "../../../constants/blocks";
-import type { StructuralFloorConfig } from "../../../types/structural-building-config";
+import type { StructuralFloorConfig, StructuralBuildingConfig } from "../../../types/structural-building-config";
+import { useHeightDerivation } from "../../../hooks/useHeightDerivation";
 
 const DEFAULT_FLOOR_NAMES = ["أرضي", "أول", "ثاني", "ثالث", "رابع", "متكرر", "أخير"] as const;
 
@@ -75,6 +76,7 @@ interface BlocksSectionProps {
 	onUpdate: () => void;
 	specs?: { concreteType: string; steelGrade: string };
 	buildingFloors?: StructuralFloorConfig[];
+	buildingConfig?: StructuralBuildingConfig | null;
 }
 
 interface FloorInfo {
@@ -158,6 +160,7 @@ interface BlockFormProps {
 	editingItemId: string | null;
 	onSaveCallback: () => void;
 	onUpdateCallback: () => void;
+	derivedBlockHeight?: number | null; // cm, from height derivation engine
 }
 
 function BlockForm({
@@ -172,9 +175,14 @@ function BlockForm({
 	editingItemId,
 	onSaveCallback,
 	onUpdateCallback,
+	derivedBlockHeight,
 }: BlockFormProps) {
 	const t = useTranslations();
 	const [showDetails, setShowDetails] = useState(false);
+
+	const defaultHeight = derivedBlockHeight != null && derivedBlockHeight > 0
+		? derivedBlockHeight / 100 // cm → m
+		: 0;
 
 	const [formData, setFormData] = useState(() => {
 		if (editingItem) {
@@ -194,7 +202,7 @@ function BlockForm({
 			name: "",
 			floor: isFloorScoped ? (floorLabel || "") : "",
 			length: 0,
-			height: 0,
+			height: defaultHeight,
 			thickness: 20 as 10 | 15 | 20 | 25 | 30,
 			blockType: "hollow" as keyof typeof BLOCK_TYPES,
 			wallCategory: "" as keyof typeof WALL_CATEGORIES | "",
@@ -544,7 +552,12 @@ function BlockForm({
 						/>
 					</div>
 					<div>
-						<Label>{t("pricing.studies.structural.height")} ({t("pricing.studies.units.m")})</Label>
+						<Label>
+							{t("pricing.studies.structural.height")} ({t("pricing.studies.units.m")})
+							{derivedBlockHeight != null && (
+								<span className="text-xs text-green-600 mr-1">(محسوب)</span>
+							)}
+						</Label>
 						<Input
 							type="number"
 							step="0.1"
@@ -925,7 +938,9 @@ export function BlocksSection({
 	onUpdate,
 	specs,
 	buildingFloors,
+	buildingConfig,
 }: BlocksSectionProps) {
+	const { getBlockHeight, getParapetBlockHeight } = useHeightDerivation(buildingConfig ?? null);
 	const t = useTranslations();
 	const [editingItemId, setEditingItemId] = useState<string | null>(null);
 
@@ -1128,6 +1143,7 @@ export function BlocksSection({
 								editingItemId={editingItemId}
 								onSaveCallback={onSave}
 								onUpdateCallback={onUpdate}
+								derivedBlockHeight={getParapetBlockHeight()}
 							/>
 						) : (
 							<Button
@@ -1214,6 +1230,7 @@ export function BlocksSection({
 										editingItemId={editingItemId}
 										onSaveCallback={onSave}
 										onUpdateCallback={onUpdate}
+										derivedBlockHeight={getBlockHeight(floor.id)}
 									/>
 								) : (
 									<div className="space-y-2">
