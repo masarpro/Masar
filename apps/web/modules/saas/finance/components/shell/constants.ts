@@ -7,7 +7,6 @@ import {
 	CreditCard,
 	Building,
 	FolderOpen,
-	Layout,
 	BarChart3,
 } from "lucide-react";
 
@@ -68,12 +67,6 @@ export const FINANCE_NAV_SECTIONS: FinanceNavSection[] = [
 		path: "documents",
 		labelKey: "finance.shell.sections.documents",
 		icon: FolderOpen,
-	},
-	{
-		id: "templates",
-		path: "templates",
-		labelKey: "finance.shell.sections.templates",
-		icon: Layout,
 	},
 	{
 		id: "reports",

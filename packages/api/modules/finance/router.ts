@@ -40,16 +40,6 @@ import {
 	deleteOpenDocumentProcedure,
 } from "./procedures/open-documents";
 
-import {
-	listFinanceTemplates,
-	getFinanceTemplate,
-	getDefaultTemplate,
-	createFinanceTemplateProcedure,
-	updateFinanceTemplateProcedure,
-	setDefaultTemplateProcedure,
-	deleteFinanceTemplateProcedure,
-	seedDefaultTemplates,
-} from "./procedures/templates";
 
 import {
 	getFinanceDashboard,
@@ -162,18 +152,6 @@ export const financeRouter = {
 		create: createOpenDocumentProcedure,
 		update: updateOpenDocumentProcedure,
 		delete: deleteOpenDocumentProcedure,
-	},
-
-	// Templates
-	templates: {
-		list: listFinanceTemplates,
-		getById: getFinanceTemplate,
-		getDefault: getDefaultTemplate,
-		create: createFinanceTemplateProcedure,
-		update: updateFinanceTemplateProcedure,
-		setDefault: setDefaultTemplateProcedure,
-		delete: deleteFinanceTemplateProcedure,
-		seed: seedDefaultTemplates,
 	},
 
 	// Reports

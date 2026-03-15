@@ -316,7 +316,7 @@ export function CreateInvoiceForm({
 
 	// Fetch all templates (all types available for invoices)
 	const { data: templatesData } = useQuery({
-		...orpc.finance.templates.list.queryOptions({
+		...orpc.company.templates.list.queryOptions({
 			input: { organizationId },
 		}),
 		staleTime: STALE_TIMES.TEMPLATES,
@@ -325,7 +325,7 @@ export function CreateInvoiceForm({
 
 	// Fetch default template
 	const { data: defaultTemplate } = useQuery(
-		orpc.finance.templates.getDefault.queryOptions({
+		orpc.company.templates.getDefault.queryOptions({
 			input: { organizationId, templateType: "INVOICE" },
 		}),
 	);

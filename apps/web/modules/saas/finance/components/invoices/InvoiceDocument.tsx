@@ -2,14 +2,14 @@
 
 import { useTranslations } from "next-intl";
 import { CreditCard } from "lucide-react";
-import { TemplateRenderer } from "../templates/renderer/TemplateRenderer";
+import { TemplateRenderer } from "@saas/company/components/templates/renderer/TemplateRenderer";
 import type {
 	InvoiceData as RendererInvoiceData,
 	OrganizationData as RendererOrganizationData,
-} from "../templates/renderer/TemplateRenderer";
-import type { TemplateElement } from "../templates/TemplateCanvas";
-import { getInvoiceElements, DEFAULT_TEMPLATE_SETTINGS } from "../../lib/default-templates";
-import type { TemplateSettings } from "../../lib/default-templates";
+} from "@saas/company/components/templates/renderer/TemplateRenderer";
+import type { TemplateElement } from "@saas/company/components/templates/TemplateCanvas";
+import { getInvoiceElements, DEFAULT_TEMPLATE_SETTINGS } from "@saas/company/lib/default-templates";
+import type { TemplateSettings } from "@saas/company/lib/default-templates";
 import { Currency } from "../shared/Currency";
 import { formatDate } from "../../lib/utils";
 

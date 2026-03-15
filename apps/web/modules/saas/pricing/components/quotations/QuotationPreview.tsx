@@ -8,7 +8,7 @@ import { Button } from "@ui/components/button";
 import { Card, CardContent } from "@ui/components/card";
 import { Printer, Download, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { TemplateRenderer } from "@saas/finance/components/templates/renderer";
+import { TemplateRenderer } from "@saas/company/components/templates/renderer";
 import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface QuotationPreviewProps {
@@ -38,7 +38,7 @@ export function QuotationPreview({
 
 	// Fetch default template only if quotation has no template
 	const { data: defaultTemplate, isLoading: isLoadingDefaultTemplate } = useQuery({
-		...orpc.finance.templates.getDefault.queryOptions({
+		...orpc.company.templates.getDefault.queryOptions({
 			input: { organizationId, templateType: "QUOTATION" },
 		}),
 		enabled: !linkedTemplate,

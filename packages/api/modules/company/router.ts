@@ -107,6 +107,17 @@ import { leaveDashboardProcedure } from "./procedures/leaves/leave-dashboard";
 
 import { getCompanyDashboard } from "./procedures/dashboard";
 
+import {
+	listFinanceTemplates,
+	getFinanceTemplate,
+	getDefaultTemplate,
+	createFinanceTemplateProcedure,
+	updateFinanceTemplateProcedure,
+	setDefaultTemplateProcedure,
+	deleteFinanceTemplateProcedure,
+	seedDefaultTemplates,
+} from "./procedures/templates";
+
 export const companyRouter = {
 	// Dashboard
 	dashboard: getCompanyDashboard,
@@ -204,6 +215,18 @@ export const companyRouter = {
 			reject: rejectLeaveRequestProcedure,
 			cancel: cancelLeaveRequestProcedure,
 		},
+	},
+
+	// Templates (القوالب)
+	templates: {
+		list: listFinanceTemplates,
+		getById: getFinanceTemplate,
+		getDefault: getDefaultTemplate,
+		create: createFinanceTemplateProcedure,
+		update: updateFinanceTemplateProcedure,
+		setDefault: setDefaultTemplateProcedure,
+		delete: deleteFinanceTemplateProcedure,
+		seed: seedDefaultTemplates,
 	},
 
 	// Assets

@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@ui/components/badge";
 import Link from "next/link";
-import { formatDate } from "../../lib/utils";
+import { formatDate } from "@saas/finance/lib/utils";
 import {
 	getAllPresetTemplates,
 	type DefaultTemplateConfig,
@@ -69,7 +69,7 @@ export function TemplatesList({
 
 	// Fetch user's custom templates
 	const { data, isLoading } = useQuery({
-		...orpc.finance.templates.list.queryOptions({
+		...orpc.company.templates.list.queryOptions({
 			input: {
 				organizationId,
 				templateType: filterType === "ALL" ? undefined : filterType,
@@ -86,7 +86,7 @@ export function TemplatesList({
 	// Set default mutation
 	const setDefaultMutation = useMutation({
 		mutationFn: async (id: string) => {
-			return orpcClient.finance.templates.setDefault({
+			return orpcClient.company.templates.setDefault({
 				organizationId,
 				id,
 			});
@@ -94,7 +94,7 @@ export function TemplatesList({
 		onSuccess: () => {
 			toast.success(t("finance.templates.setDefaultSuccess"));
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "templates"],
+				queryKey: ["company", "templates"],
 			});
 		},
 		onError: (error: any) => {
@@ -105,7 +105,7 @@ export function TemplatesList({
 	// Delete mutation
 	const deleteMutation = useMutation({
 		mutationFn: async (id: string) => {
-			return orpcClient.finance.templates.delete({
+			return orpcClient.company.templates.delete({
 				organizationId,
 				id,
 			});
@@ -114,7 +114,7 @@ export function TemplatesList({
 			toast.success(t("finance.templates.deleteSuccess"));
 			setDeleteTemplateId(null);
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "templates"],
+				queryKey: ["company", "templates"],
 			});
 		},
 		onError: (error: any) => {
@@ -125,7 +125,7 @@ export function TemplatesList({
 	// Get all preset templates (always show all presets regardless of filter)
 	const allPresets = getAllPresetTemplates();
 
-	const basePath = `/app/${organizationSlug}/finance`;
+	const basePath = `/app/${organizationSlug}/company`;
 
 	return (
 		<div className="space-y-8">

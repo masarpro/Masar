@@ -133,7 +133,7 @@ export function TemplateCustomizer({
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const queryClient = useQueryClient();
-	const basePath = `/app/${organizationSlug}/finance`;
+	const basePath = `/app/${organizationSlug}/company`;
 
 	const presetKey = searchParams.get("preset");
 
@@ -154,7 +154,7 @@ export function TemplateCustomizer({
 
 	// Fetch existing template when editing
 	const { data: existingTemplate, isLoading: isLoadingTemplate } = useQuery(
-		orpc.finance.templates.getById.queryOptions({
+		orpc.company.templates.getById.queryOptions({
 			input: templateId
 				? { organizationId, id: templateId }
 				: skipToken,
@@ -278,7 +278,7 @@ export function TemplateCustomizer({
 
 	const createMutation = useMutation({
 		mutationFn: async () => {
-			return orpcClient.finance.templates.create({
+			return orpcClient.company.templates.create({
 				organizationId,
 				name: templateName,
 				templateType,
@@ -288,7 +288,7 @@ export function TemplateCustomizer({
 		},
 		onSuccess: (data) => {
 			toast.success(t("finance.templates.createSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "templates"] });
+			queryClient.invalidateQueries({ queryKey: ["company", "templates"] });
 			router.push(`${basePath}/templates/${data.id}`);
 		},
 		onError: (error: Error) => {
@@ -298,7 +298,7 @@ export function TemplateCustomizer({
 
 	const updateMutation = useMutation({
 		mutationFn: async () => {
-			return orpcClient.finance.templates.update({
+			return orpcClient.company.templates.update({
 				organizationId,
 				id: templateId!,
 				name: templateName,
@@ -308,7 +308,7 @@ export function TemplateCustomizer({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.templates.updateSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "templates"] });
+			queryClient.invalidateQueries({ queryKey: ["company", "templates"] });
 		},
 		onError: (error: Error) => {
 			toast.error(error.message || t("finance.templates.updateError"));

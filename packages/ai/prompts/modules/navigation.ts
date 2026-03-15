@@ -38,7 +38,6 @@ export function getNavigationKnowledge(locale: string, organizationSlug: string)
 - الحسابات البنكية: /app/${org}/finance/banks
 - العملاء: /app/${org}/finance/clients
 - التقارير: /app/${org}/finance/reports
-- القوالب: /app/${org}/finance/templates
 - الإعدادات المالية: /app/${org}/finance/settings
 
 ### التسعير
@@ -52,6 +51,7 @@ export function getNavigationKnowledge(locale: string, organizationSlug: string)
 - مصروفات المنشأة: /app/${org}/company/expenses
 - الرواتب: /app/${org}/company/payroll
 - ترحيل المصروفات: /app/${org}/company/expense-runs
+- القوالب: /app/${org}/company/templates
 - تقارير المنشأة: /app/${org}/company/reports
 
 ### الإعدادات

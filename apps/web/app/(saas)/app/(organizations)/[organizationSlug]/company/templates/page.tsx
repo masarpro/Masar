@@ -1,7 +1,7 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { TemplatesList } from "@saas/finance/components/templates/TemplatesList";
-import { TemplatesHeaderActions } from "@saas/finance/components/templates/TemplatesHeaderActions";
-import { FinanceShell } from "@saas/finance/components/shell";
+import { TemplatesList } from "@saas/company/components/templates/TemplatesList";
+import { TemplatesHeaderActions } from "@saas/company/components/templates/TemplatesHeaderActions";
+import { CompanyShell } from "@saas/company/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -31,15 +31,14 @@ export default async function TemplatesPage({
 	}
 
 	return (
-		<FinanceShell
+		<CompanyShell
 			organizationSlug={organizationSlug}
-			sectionKey="templates"
 			headerActions={<TemplatesHeaderActions organizationSlug={organizationSlug} />}
 		>
 			<TemplatesList
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}
 			/>
-		</FinanceShell>
+		</CompanyShell>
 	);
 }

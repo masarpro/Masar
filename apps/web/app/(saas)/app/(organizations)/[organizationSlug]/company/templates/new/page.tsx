@@ -1,6 +1,6 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { TemplateCustomizer } from "@saas/finance/components/templates/TemplateCustomizer";
-import { FinanceShell } from "@saas/finance/components/shell";
+import { TemplateCustomizer } from "@saas/company/components/templates/TemplateCustomizer";
+import { CompanyShell } from "@saas/company/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -31,15 +31,14 @@ export default async function CreateTemplatePage({
 	}
 
 	return (
-		<FinanceShell
+		<CompanyShell
 			organizationSlug={organizationSlug}
-			sectionKey="templates"
 			pageTitle={t("finance.templates.create")}
 		>
 			<TemplateCustomizer
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}
 			/>
-		</FinanceShell>
+		</CompanyShell>
 	);
 }

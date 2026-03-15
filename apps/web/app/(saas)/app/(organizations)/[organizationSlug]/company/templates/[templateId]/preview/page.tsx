@@ -1,6 +1,6 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { TemplateCustomizer } from "@saas/finance/components/templates/TemplateCustomizer";
-import { FinanceShell } from "@saas/finance/components/shell";
+import { TemplatePreview } from "@saas/company/components/templates/TemplatePreview";
+import { CompanyShell } from "@saas/company/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -12,11 +12,11 @@ export async function generateMetadata({
 	const t = await getTranslations();
 
 	return {
-		title: t("finance.templates.edit"),
+		title: t("finance.templates.editor.preview"),
 	};
 }
 
-export default async function EditTemplatePage({
+export default async function TemplatePreviewPage({
 	params,
 }: {
 	params: Promise<{ organizationSlug: string; templateId: string }>;
@@ -31,16 +31,15 @@ export default async function EditTemplatePage({
 	}
 
 	return (
-		<FinanceShell
+		<CompanyShell
 			organizationSlug={organizationSlug}
-			sectionKey="templates"
-			pageTitle={t("finance.templates.edit")}
+			pageTitle={t("finance.templates.editor.preview")}
 		>
-			<TemplateCustomizer
+			<TemplatePreview
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}
 				templateId={templateId}
 			/>
-		</FinanceShell>
+		</CompanyShell>
 	);
 }

@@ -17,8 +17,8 @@ import { verifyOrganizationAccess } from "../../../lib/permissions";
 export const listFinanceTemplates = protectedProcedure
 	.route({
 		method: "GET",
-		path: "/finance/templates",
-		tags: ["Finance", "Templates"],
+		path: "/company/templates",
+		tags: ["Company", "Templates"],
 		summary: "List finance templates for an organization",
 	})
 	.input(
@@ -47,8 +47,8 @@ export const listFinanceTemplates = protectedProcedure
 export const getFinanceTemplate = protectedProcedure
 	.route({
 		method: "GET",
-		path: "/finance/templates/{id}",
-		tags: ["Finance", "Templates"],
+		path: "/company/templates/{id}",
+		tags: ["Company", "Templates"],
 		summary: "Get a finance template by ID",
 	})
 	.input(
@@ -75,8 +75,8 @@ export const getFinanceTemplate = protectedProcedure
 export const getDefaultTemplate = protectedProcedure
 	.route({
 		method: "GET",
-		path: "/finance/templates/default",
-		tags: ["Finance", "Templates"],
+		path: "/company/templates/default",
+		tags: ["Company", "Templates"],
 		summary: "Get the default template for a type",
 	})
 	.input(
@@ -102,8 +102,8 @@ export const getDefaultTemplate = protectedProcedure
 export const createFinanceTemplateProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
-		path: "/finance/templates",
-		tags: ["Finance", "Templates"],
+		path: "/company/templates",
+		tags: ["Company", "Templates"],
 		summary: "Create a new finance template",
 	})
 	.input(
@@ -140,8 +140,8 @@ export const createFinanceTemplateProcedure = subscriptionProcedure
 export const updateFinanceTemplateProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
-		path: "/finance/templates/{id}",
-		tags: ["Finance", "Templates"],
+		path: "/company/templates/{id}",
+		tags: ["Company", "Templates"],
 		summary: "Update a finance template",
 	})
 	.input(
@@ -176,8 +176,8 @@ export const updateFinanceTemplateProcedure = subscriptionProcedure
 export const setDefaultTemplateProcedure = subscriptionProcedure
 	.route({
 		method: "PUT",
-		path: "/finance/templates/{id}/set-default",
-		tags: ["Finance", "Templates"],
+		path: "/company/templates/{id}/set-default",
+		tags: ["Company", "Templates"],
 		summary: "Set a template as default for its type",
 	})
 	.input(
@@ -203,8 +203,8 @@ export const setDefaultTemplateProcedure = subscriptionProcedure
 export const deleteFinanceTemplateProcedure = subscriptionProcedure
 	.route({
 		method: "DELETE",
-		path: "/finance/templates/{id}",
-		tags: ["Finance", "Templates"],
+		path: "/company/templates/{id}",
+		tags: ["Company", "Templates"],
 		summary: "Delete a finance template",
 	})
 	.input(
@@ -227,8 +227,8 @@ export const deleteFinanceTemplateProcedure = subscriptionProcedure
 export const seedDefaultTemplates = subscriptionProcedure
 	.route({
 		method: "POST",
-		path: "/finance/templates/seed",
-		tags: ["Finance", "Templates"],
+		path: "/company/templates/seed",
+		tags: ["Company", "Templates"],
 		summary: "Seed default templates for an organization",
 	})
 	.input(

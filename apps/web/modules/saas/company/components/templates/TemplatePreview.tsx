@@ -35,11 +35,11 @@ export function TemplatePreview({
 	templateId,
 }: TemplatePreviewProps) {
 	const t = useTranslations();
-	const basePath = `/app/${organizationSlug}/finance/templates`;
+	const basePath = `/app/${organizationSlug}/company/templates`;
 	const [scale, setScale] = useState(0.7);
 
 	const { data: template, isLoading } = useQuery(
-		orpc.finance.templates.getById.queryOptions({
+		orpc.company.templates.getById.queryOptions({
 			input: { organizationId, id: templateId },
 		}),
 	);

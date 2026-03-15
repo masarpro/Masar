@@ -29,7 +29,7 @@ export function TemplateStep({
 
 	// Seed templates first, then list them
 	const seedMutation = useMutation(
-		orpc.finance.templates.seed.mutationOptions(),
+		orpc.company.templates.seed.mutationOptions(),
 	);
 
 	const {
@@ -37,7 +37,7 @@ export function TemplateStep({
 		isLoading,
 		refetch,
 	} = useQuery({
-		...orpc.finance.templates.list.queryOptions({
+		...orpc.company.templates.list.queryOptions({
 			input: {
 				organizationId,
 				templateType: "INVOICE",

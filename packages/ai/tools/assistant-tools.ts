@@ -534,7 +534,7 @@ export function getAssistantTools(ctx: ToolContext) {
         if (/تقرير.*مالي|finance.*report/.test(d))
           return { url: `${base}/finance/reports`, label: "التقارير المالية" };
         if (/قالب.*فاتورة|template/.test(d))
-          return { url: `${base}/finance/templates`, label: "قوالب الفواتير" };
+          return { url: `${base}/company/templates`, label: "قوالب الفواتير" };
 
         // Pricing
         if (/عرض.*سعر|quotation/.test(d))

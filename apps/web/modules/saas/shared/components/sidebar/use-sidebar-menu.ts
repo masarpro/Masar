@@ -247,12 +247,6 @@ export function useSidebarMenu(): {
 									icon: FolderOpen,
 								},
 								{
-									id: "finance-templates",
-									label: t("finance.shell.sections.templates"),
-									href: `${orgPrefix}/finance/templates`,
-									icon: Layout,
-								},
-								{
 									id: "finance-reports",
 									label: t("finance.shell.sections.reports"),
 									href: `${orgPrefix}/finance/reports`,
@@ -361,6 +355,12 @@ export function useSidebarMenu(): {
 									label: t("company.nav.assets"),
 									href: `${orgPrefix}/company/assets`,
 									icon: Hammer,
+								},
+								{
+									id: "company-templates",
+									label: t("company.nav.templates"),
+									href: `${orgPrefix}/company/templates`,
+									icon: Layout,
 								},
 								{
 									id: "company-reports",

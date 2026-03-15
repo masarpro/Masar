@@ -68,7 +68,7 @@ import { InlineClientForm } from "@saas/finance/components/clients/InlineClientF
 import { StatusBadge } from "@saas/finance/components/shared/StatusBadge";
 import { AmountSummary } from "@saas/finance/components/shared/AmountSummary";
 import { calculateTotals } from "@saas/finance/lib/utils";
-import { TemplateRenderer } from "@saas/finance/components/templates/renderer";
+import { TemplateRenderer } from "@saas/company/components/templates/renderer";
 import { EditorPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface QuotationFormProps {
@@ -288,7 +288,7 @@ export function QuotationForm({
 
 	// Fetch all templates (all types available for quotations)
 	const { data: templatesDataRaw } = useQuery({
-		...orpc.finance.templates.list.queryOptions({
+		...orpc.company.templates.list.queryOptions({
 			input: { organizationId },
 		}),
 		staleTime: STALE_TIMES.TEMPLATES,
@@ -298,7 +298,7 @@ export function QuotationForm({
 
 	// Fetch default template for quotations
 	const { data: defaultTemplateRaw } = useQuery(
-		orpc.finance.templates.getDefault.queryOptions({
+		orpc.company.templates.getDefault.queryOptions({
 			input: { organizationId, templateType: "QUOTATION" },
 		}),
 	);

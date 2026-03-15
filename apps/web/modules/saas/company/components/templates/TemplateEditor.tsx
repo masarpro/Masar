@@ -175,7 +175,7 @@ export function TemplateEditor({
 	const t = useTranslations();
 	const router = useRouter();
 	const queryClient = useQueryClient();
-	const basePath = `/app/${organizationSlug}/finance`;
+	const basePath = `/app/${organizationSlug}/company`;
 
 	// Template state
 	const [templateName, setTemplateName] = useState("");
@@ -190,7 +190,7 @@ export function TemplateEditor({
 
 	// Fetch existing template data when editing
 	const { data: existingTemplate, isLoading: isLoadingTemplate } = useQuery(
-		orpc.finance.templates.getById.queryOptions({
+		orpc.company.templates.getById.queryOptions({
 			input: templateId
 				? { organizationId, id: templateId }
 				: skipToken,
@@ -273,7 +273,7 @@ export function TemplateEditor({
 	// Create mutation
 	const createMutation = useMutation({
 		mutationFn: async () => {
-			return orpcClient.finance.templates.create({
+			return orpcClient.company.templates.create({
 				organizationId,
 				name: templateName,
 				templateType: templateType.toUpperCase() as "QUOTATION" | "INVOICE" | "LETTER",
@@ -283,7 +283,7 @@ export function TemplateEditor({
 		},
 		onSuccess: (data) => {
 			toast.success(t("finance.templates.createSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "templates"] });
+			queryClient.invalidateQueries({ queryKey: ["company", "templates"] });
 			router.push(`${basePath}/templates/${data.id}`);
 		},
 		onError: (error: Error) => {
@@ -294,7 +294,7 @@ export function TemplateEditor({
 	// Update mutation
 	const updateMutation = useMutation({
 		mutationFn: async () => {
-			return orpcClient.finance.templates.update({
+			return orpcClient.company.templates.update({
 				organizationId,
 				id: templateId!,
 				name: templateName,
@@ -304,7 +304,7 @@ export function TemplateEditor({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.templates.updateSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "templates"] });
+			queryClient.invalidateQueries({ queryKey: ["company", "templates"] });
 		},
 		onError: (error: Error) => {
 			toast.error(error.message || t("finance.templates.updateError"));
