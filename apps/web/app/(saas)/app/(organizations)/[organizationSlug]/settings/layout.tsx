@@ -12,9 +12,11 @@ export default async function SettingsLayout({
 }: PropsWithChildren<{
 	params: Promise<{ organizationSlug: string }>;
 }>) {
-	const session = await getSession();
 	const { organizationSlug } = await params;
-	const organization = await getActiveOrganization(organizationSlug);
+	const [session, organization] = await Promise.all([
+		getSession(),
+		getActiveOrganization(organizationSlug),
+	]);
 
 	if (!organization) {
 		redirect("/app");

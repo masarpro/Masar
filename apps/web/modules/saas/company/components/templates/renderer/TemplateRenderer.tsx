@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, memo } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { HeaderComponent } from "../components/HeaderComponent";
 import { DocumentMetaComponent } from "../components/DocumentMetaComponent";
@@ -174,7 +174,7 @@ function isInvoice(data: QuotationData | InvoiceData): data is InvoiceData {
 // TEMPLATE RENDERER COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════
 
-export function TemplateRenderer({
+export const TemplateRenderer = memo(function TemplateRenderer({
 	data,
 	template,
 	organization,
@@ -687,4 +687,4 @@ export function TemplateRenderer({
 			)}
 		</div>
 	);
-}
+});

@@ -11,8 +11,10 @@ export default async function CompanyLayout({
 	params: Promise<{ organizationSlug: string }>;
 }>) {
 	const { organizationSlug } = await params;
-	const session = await getSession();
-	const organization = await getActiveOrganization(organizationSlug);
+	const [session, organization] = await Promise.all([
+		getSession(),
+		getActiveOrganization(organizationSlug),
+	]);
 
 	if (!organization) {
 		redirect("/app");

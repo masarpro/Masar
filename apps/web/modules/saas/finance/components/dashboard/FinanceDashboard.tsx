@@ -11,10 +11,11 @@ import { StatsCards } from "./StatsCards";
 import { RecentDocumentsTable } from "./RecentDocumentsTable";
 import { DeadlinesCard } from "./DeadlinesCard";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { Skeleton } from "@ui/components/skeleton";
 
 const CashFlowCard = dynamic(
 	() => import("./CashFlowCard").then((m) => ({ default: m.CashFlowCard })),
-	{ ssr: false },
+	{ loading: () => <Skeleton className="h-[300px] w-full rounded-lg" />, ssr: false },
 );
 
 interface FinanceDashboardProps {
