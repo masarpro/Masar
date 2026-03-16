@@ -62,7 +62,7 @@ import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { BOQExportDropdown } from "./BOQExportDropdown";
-import { BOQPrintView } from "./BOQPrintView";
+import { printBOQ } from "./BOQPrintView";
 
 // ═══════════════════════════════════════════════════════════════
 // Props
@@ -98,15 +98,6 @@ export function BOQSummaryTable({
 	const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
 	const [expandedCutting, setExpandedCutting] = useState<Set<string>>(new Set());
 	const [selectedFloor, setSelectedFloor] = useState<string>("all");
-	const [showPrintView, setShowPrintView] = useState(false);
-
-	// Fetch default template (cached, lightweight)
-	const { data: defaultTemplate } = useQuery({
-		...orpc.company.templates.getDefault.queryOptions({
-			input: { organizationId, templateType: "QUOTATION" as const },
-		}),
-		staleTime: STALE_TIMES.TEMPLATES,
-	});
 
 	// Fetch organization settings (cached)
 	const { data: orgSettings } = useQuery({
@@ -148,39 +139,20 @@ export function BOQSummaryTable({
 		});
 	};
 
-	const handlePrint = () => {
-		// Hide page title/URL from browser print headers
-		const originalTitle = document.title;
-		document.title = " ";
-
-		setShowPrintView(true);
-		requestAnimationFrame(() => {
-			requestAnimationFrame(() => {
-				window.print();
-				document.title = originalTitle;
-				setShowPrintView(false);
-			});
-		});
-	};
-
 	const orgSettingsAny = orgSettings as any;
-	const templateConfig = {
-		elements: (defaultTemplate as any)?.content?.elements || [],
-		settings: (defaultTemplate as any)?.settings || {},
-	};
-	const organizationData = {
-		name: orgSettingsAny?.companyNameAr ?? undefined,
-		nameAr: orgSettingsAny?.companyNameAr ?? undefined,
-		nameEn: orgSettingsAny?.companyNameEn ?? undefined,
-		logo: orgSettingsAny?.logo ?? undefined,
-		address: orgSettingsAny?.address ?? undefined,
-		addressAr: orgSettingsAny?.address ?? undefined,
-		addressEn: orgSettingsAny?.addressEn ?? undefined,
-		phone: orgSettingsAny?.phone ?? undefined,
-		email: orgSettingsAny?.email ?? undefined,
-		website: orgSettingsAny?.website ?? undefined,
-		taxNumber: orgSettingsAny?.taxNumber ?? undefined,
-		commercialReg: orgSettingsAny?.commercialReg ?? undefined,
+
+	const handlePrint = () => {
+		printBOQ({
+			activeTab,
+			summary,
+			studyName,
+			floorLabel: selectedFloor !== "all" ? selectedFloorLabel : undefined,
+			organizationName: orgSettingsAny?.companyNameAr ?? undefined,
+			organizationLogo: orgSettingsAny?.logo ?? undefined,
+			organizationAddress: orgSettingsAny?.address ?? undefined,
+			organizationPhone: orgSettingsAny?.phone ?? undefined,
+			organizationEmail: orgSettingsAny?.email ?? undefined,
+		});
 	};
 
 	if (items.length === 0) return null;
@@ -278,70 +250,6 @@ export function BOQSummaryTable({
 				/>
 			)}
 
-			{showPrintView && (
-				<BOQPrintView
-					activeTab={activeTab}
-					summary={summary}
-					studyName={studyName}
-					floorLabel={selectedFloor !== "all" ? selectedFloorLabel : undefined}
-					templateElements={templateConfig.elements}
-					templateSettings={templateConfig.settings}
-					organizationData={organizationData}
-				/>
-			)}
-
-			{/* Print Styles */}
-			<style jsx global>{`
-				@media print {
-					/* Hide everything except print container */
-					body * { visibility: hidden; }
-					.boq-print-container, .boq-print-container * { visibility: visible; }
-					.boq-print-container {
-						position: fixed;
-						left: 0;
-						top: 0;
-						width: 100%;
-						height: auto;
-						z-index: 99999;
-						background: white;
-					}
-
-					/* Prevent blank pages from body/html overflow */
-					html, body {
-						height: auto !important;
-						overflow: visible !important;
-						margin: 0 !important;
-						padding: 0 !important;
-					}
-
-					/* Hide sidebar, nav, app shell */
-					nav, aside, header, footer:not(.boq-print-footer),
-					[data-sidebar], [role="navigation"] {
-						display: none !important;
-					}
-
-					/* Page settings */
-					@page {
-						size: A4 landscape;
-						margin: 10mm 15mm;
-					}
-
-					/* Table styling */
-					.boq-print-container table { width: 100%; border-collapse: collapse; }
-					.boq-print-container th {
-						background-color: #f3f4f6 !important;
-						print-color-adjust: exact;
-						-webkit-print-color-adjust: exact;
-					}
-					.boq-print-container td, .boq-print-container th {
-						border: 1px solid #d1d5db;
-						padding: 8px 12px;
-						text-align: right;
-						font-size: 12px;
-					}
-					.boq-section { break-inside: avoid; }
-				}
-			`}</style>
 		</div>
 	);
 }
