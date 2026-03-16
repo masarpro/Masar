@@ -10,10 +10,9 @@ export function middleware(request: NextRequest) {
 		return NextResponse.redirect(new URL("/auth/login", request.url));
 	}
 
-	// Logged-in user trying to access auth routes
-	if (pathname.startsWith("/auth/") && sessionCookie) {
-		return NextResponse.redirect(new URL("/app", request.url));
-	}
+	// Auth routes: always pass through.
+	// The LoginForm handles redirecting logged-in users client-side,
+	// which avoids redirect loops when session cookies are expired/stale.
 
 	return NextResponse.next();
 }
