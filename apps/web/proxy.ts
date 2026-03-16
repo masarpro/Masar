@@ -14,7 +14,7 @@ const AUTH_REQUIRED_PATHS = [
 	"/organization-invitation",
 ];
 
-export default function middleware(req: NextRequest) {
+export default function proxy(req: NextRequest) {
 	const { pathname, origin } = req.nextUrl;
 
 	// 1. Public token routes — always pass through
