@@ -62,6 +62,11 @@ const StairsSection = dynamic(
 	{ loading: () => <SectionSkeleton /> },
 );
 
+const OtherStructuralSection = dynamic(
+	() => import("./sections/other-structural/OtherStructuralSection").then(mod => ({ default: mod.OtherStructuralSection })),
+	{ loading: () => <SectionSkeleton /> },
+);
+
 interface StructuralItem {
 	id: string;
 	category: string;
@@ -146,6 +151,12 @@ export function StructuralAccordion({
 			title: t("pricing.studies.structural.stairs"),
 			icon: "🪜",
 			component: StairsSection,
+		},
+		{
+			id: "otherStructural",
+			title: t("pricing.studies.structural.otherStructural.title"),
+			icon: "🔧",
+			component: OtherStructuralSection,
 		},
 	];
 

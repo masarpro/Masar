@@ -1663,6 +1663,189 @@
 					"summaryTab": "ملخص الكميات",
 					"factoryTab": "طلبية المصنع",
 					"cuttingTab": "تفاصيل التفصيل"
+				},
+				"otherStructural": {
+					"title": "عناصر إنشائية أخرى",
+					"elementTypes": {
+						"SEPTIC_TANK": "بيارة (خزان صرف صحي)",
+						"WATER_TANK_GROUND": "خزان مياه أرضي",
+						"WATER_TANK_ELEVATED": "خزان مياه علوي",
+						"ELEVATOR_PIT": "بئر مصعد",
+						"RETAINING_WALL": "جدار استنادي",
+						"BOUNDARY_WALL": "سور خارجي",
+						"RAMP": "رامب / منحدر",
+						"DOME": "قبة",
+						"MINARET": "مأذنة (منارة)",
+						"CONCRETE_DECOR": "كرانيش وديكورات خرسانية",
+						"CUSTOM_ELEMENT": "عنصر مخصص"
+					},
+					"fields": {
+						"length": "الطول",
+						"width": "العرض",
+						"depth": "العمق",
+						"height": "الارتفاع",
+						"diameter": "القطر",
+						"quantity": "الكمية",
+						"thickness": "السماكة",
+						"shape": "الشكل",
+						"tankType": "نوع البيارة",
+						"wallType": "نوع الجدران",
+						"wallThickness": "سمك الجدار",
+						"baseThickness": "سمك القاعدة",
+						"slabThickness": "سمك السقف",
+						"advancedSettings": "إعدادات متقدمة",
+						"isDivided": "مقسم لغرفتين",
+						"elevatorType": "نوع المصعد",
+						"numberOfStops": "عدد الوقفات",
+						"floorHeight": "ارتفاع الدور",
+						"pitWidth": "عرض البئر",
+						"pitLength": "طول البئر",
+						"pitHoleDepth": "عمق الحفرة",
+						"overTravel": "المسافة العلوية",
+						"pitSlabThickness": "سمك بلاطة الحفرة",
+						"hasMachineRoom": "غرفة ماكينة",
+						"machineRoomHeight": "ارتفاع غرفة الماكينة",
+						"retainingWallType": "نوع الجدار الاستنادي",
+						"stemThickness": "سمك الجذع",
+						"baseWidth": "عرض القاعدة",
+						"boundaryWallType": "نوع السور",
+						"hasRCColumns": "أعمدة خرسانية",
+						"hasFoundation": "قاعدة شريطية",
+						"columnSpacing": "المسافة بين الأعمدة",
+						"foundationWidth": "عرض القاعدة",
+						"foundationDepth": "عمق القاعدة",
+						"rampType": "نوع الرامب",
+						"hasWalls": "جدران جانبية",
+						"wallHeight": "ارتفاع الجدار",
+						"domeType": "نوع القبة",
+						"riseHeight": "ارتفاع القبة",
+						"shellThicknessTop": "سمك القمة",
+						"shellThicknessBottom": "سمك القاعدة",
+						"hasRingBeam": "كمرة دائرية",
+						"ringBeamWidth": "عرض الكمرة",
+						"ringBeamDepth": "عمق الكمرة",
+						"hasDrum": "رقبة",
+						"drumHeight": "ارتفاع الرقبة",
+						"drumThickness": "سمك الرقبة",
+						"hasSupportColumns": "أعمدة حمل",
+						"supportColumnCount": "عدد الأعمدة",
+						"supportColumnHeight": "ارتفاع العمود",
+						"supportColumnSize": "مقطع العمود",
+						"minaretStyle": "الطراز",
+						"minaretShape": "الشكل",
+						"totalHeight": "الارتفاع الكلي",
+						"outerDiameter": "القطر الخارجي",
+						"sideLength": "طول الضلع",
+						"hasBalcony": "شرفة (صحن)",
+						"balconyCount": "عدد الشرفات",
+						"balconyProjection": "بروز الشرفة",
+						"topType": "نوع القمة",
+						"decorType": "نوع العنصر",
+						"decorMaterial": "المادة",
+						"decorUnit": "الوحدة",
+						"area": "المساحة",
+						"description": "الوصف",
+						"addDecorItem": "إضافة عنصر زخرفي"
+					},
+					"tankTypes": {
+						"SEALED": "مصمتة",
+						"OPEN": "مفتوحة",
+						"TWO_CHAMBER": "ذات غرفتين",
+						"PRECAST": "مسبقة الصب"
+					},
+					"wallTypes": {
+						"RC": "خرسانة مسلحة",
+						"BLOCK_20": "بلوك 20 سم",
+						"BLOCK_15": "بلوك 15 سم"
+					},
+					"shapes": {
+						"RECTANGULAR": "مستطيل",
+						"CYLINDRICAL": "أسطواني"
+					},
+					"elevatorTypes": {
+						"ELECTRIC_MRL": "كهربائي بدون غرفة",
+						"ELECTRIC_WITH_ROOM": "كهربائي مع غرفة",
+						"HYDRAULIC": "هيدروليكي"
+					},
+					"retainingWallTypes": {
+						"CANTILEVER": "ناتئ",
+						"GRAVITY": "جاذبية",
+						"COUNTERFORT": "ذو أضلاع"
+					},
+					"boundaryWallTypes": {
+						"BLOCK_WALL": "جدار بلوك",
+						"RC_WALL": "جدار خرساني",
+						"PRECAST": "مسبق الصب"
+					},
+					"rampTypes": {
+						"CAR_RAMP": "رامب سيارات",
+						"PEDESTRIAN_RAMP": "رامب مشاة",
+						"LOADING_RAMP": "رامب تحميل"
+					},
+					"domeTypes": {
+						"HALF_SPHERE": "نصف كروية",
+						"POINTED": "مدببة",
+						"RIBBED": "ذات أضلاع",
+						"GRC_PRECAST": "GRC مسبقة الصب"
+					},
+					"minaretShapes": {
+						"CYLINDRICAL": "أسطوانية",
+						"SQUARE": "مربعة",
+						"OCTAGONAL": "مثمنة"
+					},
+					"topTypes": {
+						"CONE": "مخروط",
+						"DOME_SMALL": "قبة صغيرة",
+						"GRC": "GRC"
+					},
+					"decorTypes": {
+						"CORNICE": "كرنيش",
+						"COLUMN_DECORATIVE": "عمود زخرفي",
+						"CAPITAL": "تاج عمود",
+						"WINDOW_FRAME": "إطار نافذة",
+						"FRONTON": "جبهة مثلثية",
+						"CORBEL": "كابولي زخرفي",
+						"PANEL": "لوحة زخرفية",
+						"BALUSTRADE": "درابزين",
+						"BALUSTER": "عمود درابزين",
+						"MASHRABIYA": "مشربية",
+						"CLADDING": "كسوة",
+						"BELT": "حزام زخرفي",
+						"OTHER_DECOR": "أخرى"
+					},
+					"decorMaterials": {
+						"GRC": "GRC",
+						"GRP": "GRP",
+						"RC": "خرسانة مسلحة",
+						"STONE": "حجر"
+					},
+					"decorUnits": {
+						"LINEAR_METER": "متر طولي",
+						"SQM": "متر مربع",
+						"PIECE": "قطعة"
+					},
+					"results": {
+						"concreteRC": "خرسانة مسلحة",
+						"concretePlain": "خرسانة عادية",
+						"steel": "حديد",
+						"formwork": "شدات",
+						"waterproofing": "عزل",
+						"excavation": "حفر",
+						"blocks": "بلوك",
+						"blockUnit": "بلوكة",
+						"component": "المكون",
+						"showBreakdown": "عرض التفصيل",
+						"totalWithQty": "الإجمالي ({qty} وحدة)"
+					},
+					"actions": {
+						"addElement": "إضافة عنصر إنشائي",
+						"selectElementType": "اختر نوع العنصر",
+						"cancel": "إلغاء"
+					},
+					"messages": {
+						"saved": "تم الحفظ بنجاح",
+						"saveError": "حدث خطأ أثناء الحفظ"
+					}
 				}
 			},
 			"finishing": {

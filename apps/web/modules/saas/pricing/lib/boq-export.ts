@@ -64,12 +64,6 @@ const STYLES = {
 		border: BORDER_THIN,
 		numFmt: "#,##0",
 	},
-	cellPercent: {
-		font: { sz: 10 },
-		alignment: { horizontal: "left", vertical: "center" } as const,
-		border: BORDER_THIN,
-		numFmt: "0.0%",
-	},
 	sectionTotal: {
 		font: { bold: true, sz: 10, color: { rgb: "1E3A5F" } },
 		fill: { fgColor: { rgb: "E0E7FF" } },
@@ -105,21 +99,23 @@ const STYLES = {
 };
 
 // ─────────────────────────────────────────────────────────────
-// Utility helpers
+// Utility helpers (no external dependency)
 // ─────────────────────────────────────────────────────────────
 
-function setCell(ws: any, r: number, c: number, value: any, style: any) {
-	const XLSX = (globalThis as any).__xlsxRef;
-	if (!XLSX) return;
-	const addr = XLSX.utils.encode_cell({ r, c });
-	ws[addr] = { v: value, t: typeof value === "number" ? "n" : "s", s: style };
+/** Convert 0-based (row, col) to "A1"-style address */
+function cellAddr(r: number, c: number): string {
+	let col = "";
+	let n = c;
+	do {
+		col = String.fromCharCode(65 + (n % 26)) + col;
+		n = Math.floor(n / 26) - 1;
+	} while (n >= 0);
+	return col + (r + 1);
 }
 
-function setCellWithType(ws: any, r: number, c: number, value: any, type: string, style: any) {
-	const XLSX = (globalThis as any).__xlsxRef;
-	if (!XLSX) return;
-	const addr = XLSX.utils.encode_cell({ r, c });
-	ws[addr] = { v: value, t: type, s: style };
+function setCell(ws: any, r: number, c: number, value: any, style: any) {
+	const addr = cellAddr(r, c);
+	ws[addr] = { v: value, t: typeof value === "number" ? "n" : "s", s: style };
 }
 
 function mergeRange(ws: any, r1: number, c1: number, r2: number, c2: number) {
@@ -128,9 +124,7 @@ function mergeRange(ws: any, r1: number, c1: number, r2: number, c2: number) {
 }
 
 function setSheetRange(ws: any, maxRow: number, maxCol: number) {
-	const XLSX = (globalThis as any).__xlsxRef;
-	if (!XLSX) return;
-	ws["!ref"] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: maxRow, c: maxCol } });
+	ws["!ref"] = `A1:${cellAddr(maxRow, maxCol)}`;
 }
 
 function setRTL(ws: any) {
@@ -142,40 +136,32 @@ function fmt(n: number, decimals = 2): number {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Main BOQ Excel Export
+// Main BOQ Excel Export (3 sheets)
 // ─────────────────────────────────────────────────────────────
 
 export async function exportBOQToExcel(summary: BOQSummary, studyName?: string) {
 	const XLSX = await import("xlsx-js-style");
-	(globalThis as any).__xlsxRef = XLSX;
 
 	const wb = XLSX.utils.book_new();
 
-	// ── Sheet 1: Summary ──
-	buildSummarySheet(wb, XLSX, summary);
+	buildSummarySheet(XLSX, wb, summary);
+	buildFactorySheet(XLSX, wb, summary.factoryOrder);
+	buildCuttingSheet(XLSX, wb, summary.allCuttingDetails);
 
-	// ── Sheet 2: Factory Order ──
-	buildFactorySheet(wb, XLSX, summary.factoryOrder);
-
-	// ── Sheet 3: Cutting Details ──
-	buildCuttingSheet(wb, XLSX, summary.allCuttingDetails);
-
-	// Download
 	const fileName = studyName
 		? `جدول_كميات_${studyName}_${new Date().toISOString().slice(0, 10)}.xlsx`
 		: `جدول_كميات_${new Date().toISOString().slice(0, 10)}.xlsx`;
 
 	XLSX.writeFile(wb, fileName);
-	delete (globalThis as any).__xlsxRef;
 }
 
 // ─────────────────────────────────────────────────────────────
 // Sheet 1: BOQ Summary
 // ─────────────────────────────────────────────────────────────
 
-function buildSummarySheet(wb: any, XLSX: any, summary: BOQSummary) {
+function buildSummarySheet(XLSX: any, wb: any, summary: BOQSummary) {
 	const ws: any = {};
-	const colCount = 6; // A–F
+	const colCount = 6;
 	const cols = ["القسم", "العنصر", "الكمية", "الخرسانة (م³)", "الحديد (كجم)", "البلوك"];
 	let row = 0;
 
@@ -216,7 +202,6 @@ function buildSummarySheet(wb: any, XLSX: any, summary: BOQSummary) {
 				row++;
 			}
 
-			// Sub-group total (only if multiple sub-groups)
 			if (section.subGroups.length > 1) {
 				setCell(ws, row, 0, "", STYLES.sectionTotal);
 				setCell(ws, row, 1, "إجمالي " + group.label, STYLES.sectionTotal);
@@ -239,7 +224,7 @@ function buildSummarySheet(wb: any, XLSX: any, summary: BOQSummary) {
 	}
 
 	// Grand total
-	row++; // blank separator
+	row++;
 	setCell(ws, row, 0, "", STYLES.grandTotal);
 	setCell(ws, row, 1, "الإجمالي العام", STYLES.grandTotal);
 	setCell(ws, row, 2, "", STYLES.grandTotal);
@@ -247,17 +232,16 @@ function buildSummarySheet(wb: any, XLSX: any, summary: BOQSummary) {
 	setCell(ws, row, 4, summary.grandTotals.rebar, STYLES.grandTotalNumber);
 	setCell(ws, row, 5, summary.grandTotals.blocks || "", STYLES.grandTotal);
 
-	// Sheet config
 	setSheetRange(ws, row, colCount - 1);
 	ws["!cols"] = [
-		{ wch: 28 }, // القسم
-		{ wch: 32 }, // العنصر
-		{ wch: 12 }, // الكمية
-		{ wch: 16 }, // الخرسانة
-		{ wch: 16 }, // الحديد
-		{ wch: 14 }, // البلوك
+		{ wch: 28 },
+		{ wch: 32 },
+		{ wch: 12 },
+		{ wch: 16 },
+		{ wch: 16 },
+		{ wch: 14 },
 	];
-	ws["!rows"] = [{ hpt: 30 }]; // title row height
+	ws["!rows"] = [{ hpt: 30 }];
 	setRTL(ws);
 	XLSX.utils.book_append_sheet(wb, ws, "ملخص الكميات");
 }
@@ -266,7 +250,7 @@ function buildSummarySheet(wb: any, XLSX: any, summary: BOQSummary) {
 // Sheet 2: Factory Order
 // ─────────────────────────────────────────────────────────────
 
-function buildFactorySheet(wb: any, XLSX: any, factoryOrder: FactoryOrderEntry[]) {
+function buildFactorySheet(XLSX: any, wb: any, factoryOrder: FactoryOrderEntry[]) {
 	const ws: any = {};
 	const colCount = 5;
 	const cols = ["القطر (مم)", "طول السيخ (م)", "عدد الأسياخ", "الوزن (كجم)", "الوزن (طن)"];
@@ -297,7 +281,7 @@ function buildFactorySheet(wb: any, XLSX: any, factoryOrder: FactoryOrderEntry[]
 	// Total row
 	const totalBars = factoryOrder.reduce((s, e) => s + e.count, 0);
 	const totalWeight = factoryOrder.reduce((s, e) => s + e.weight, 0);
-	row++; // blank separator
+	row++;
 	setCell(ws, row, 0, "الإجمالي", STYLES.grandTotal);
 	setCell(ws, row, 1, "", STYLES.grandTotal);
 	setCell(ws, row, 2, totalBars, STYLES.grandTotalNumber);
@@ -318,10 +302,10 @@ function buildFactorySheet(wb: any, XLSX: any, factoryOrder: FactoryOrderEntry[]
 }
 
 // ─────────────────────────────────────────────────────────────
-// Sheet 3: Cutting Details (grouped by diameter like PDF)
+// Sheet 3: Cutting Details (grouped by diameter)
 // ─────────────────────────────────────────────────────────────
 
-function buildCuttingSheet(wb: any, XLSX: any, allCuttingDetails: CuttingDetailRow[]) {
+function buildCuttingSheet(XLSX: any, wb: any, allCuttingDetails: CuttingDetailRow[]) {
 	const ws: any = {};
 	const colCount = 8;
 	const cols = ["العنصر", "الوصف", "طول القطعة (م)", "العدد", "أسياخ المصنع", "طول السيخ (م)", "الهالك %", "الوزن (كجم)"];
@@ -363,10 +347,10 @@ function buildCuttingSheet(wb: any, XLSX: any, allCuttingDetails: CuttingDetailR
 		// Detail rows
 		for (const d of group) {
 			const wasteStyle = d.wastePercentage > 15
-				? { ...STYLES.cellNumber, font: { ...STYLES.cellNumber.font, color: { rgb: "DC2626" }, bold: true } }
+				? { ...STYLES.cellNumber, font: { sz: 10, color: { rgb: "DC2626" }, bold: true } }
 				: d.wastePercentage > 8
-					? { ...STYLES.cellNumber, font: { ...STYLES.cellNumber.font, color: { rgb: "D97706" } } }
-					: { ...STYLES.cellNumber, font: { ...STYLES.cellNumber.font, color: { rgb: "16A34A" } } };
+					? { ...STYLES.cellNumber, font: { sz: 10, color: { rgb: "D97706" } } }
+					: { ...STYLES.cellNumber, font: { sz: 10, color: { rgb: "16A34A" } } };
 
 			setCell(ws, row, 0, d.element, STYLES.cell);
 			setCell(ws, row, 1, d.description, STYLES.cell);
@@ -388,7 +372,7 @@ function buildCuttingSheet(wb: any, XLSX: any, allCuttingDetails: CuttingDetailR
 		setCell(ws, row, 5, "", STYLES.sectionTotal);
 		setCell(ws, row, 6, "", STYLES.sectionTotal);
 		setCell(ws, row, 7, fmt(groupWeight), STYLES.sectionTotalNumber);
-		row += 2; // gap between diameter groups
+		row += 2;
 	}
 
 	// Grand total
@@ -404,14 +388,14 @@ function buildCuttingSheet(wb: any, XLSX: any, allCuttingDetails: CuttingDetailR
 
 	setSheetRange(ws, row, colCount - 1);
 	ws["!cols"] = [
-		{ wch: 22 }, // العنصر
-		{ wch: 26 }, // الوصف
-		{ wch: 16 }, // طول القطعة
-		{ wch: 10 }, // العدد
-		{ wch: 14 }, // أسياخ المصنع
-		{ wch: 14 }, // طول السيخ
-		{ wch: 12 }, // الهالك %
-		{ wch: 16 }, // الوزن
+		{ wch: 22 },
+		{ wch: 26 },
+		{ wch: 16 },
+		{ wch: 10 },
+		{ wch: 14 },
+		{ wch: 14 },
+		{ wch: 12 },
+		{ wch: 16 },
 	];
 	ws["!rows"] = [{ hpt: 30 }];
 	setRTL(ws);
@@ -424,17 +408,15 @@ function buildCuttingSheet(wb: any, XLSX: any, allCuttingDetails: CuttingDetailR
 
 export async function exportFactoryOrder(factoryOrder: FactoryOrderEntry[], studyName?: string) {
 	const XLSX = await import("xlsx-js-style");
-	(globalThis as any).__xlsxRef = XLSX;
 
 	const wb = XLSX.utils.book_new();
-	buildFactorySheet(wb, XLSX, factoryOrder);
+	buildFactorySheet(XLSX, wb, factoryOrder);
 
 	const fileName = studyName
 		? `طلبية_مصنع_${studyName}_${new Date().toISOString().slice(0, 10)}.xlsx`
 		: `طلبية_مصنع_${new Date().toISOString().slice(0, 10)}.xlsx`;
 
 	XLSX.writeFile(wb, fileName);
-	delete (globalThis as any).__xlsxRef;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -443,15 +425,13 @@ export async function exportFactoryOrder(factoryOrder: FactoryOrderEntry[], stud
 
 export async function exportCuttingDetails(cuttingDetails: CuttingDetailRow[], studyName?: string) {
 	const XLSX = await import("xlsx-js-style");
-	(globalThis as any).__xlsxRef = XLSX;
 
 	const wb = XLSX.utils.book_new();
-	buildCuttingSheet(wb, XLSX, cuttingDetails);
+	buildCuttingSheet(XLSX, wb, cuttingDetails);
 
 	const fileName = studyName
 		? `تفاصيل_قص_${studyName}_${new Date().toISOString().slice(0, 10)}.xlsx`
 		: `تفاصيل_قص_${new Date().toISOString().slice(0, 10)}.xlsx`;
 
 	XLSX.writeFile(wb, fileName);
-	delete (globalThis as any).__xlsxRef;
 }

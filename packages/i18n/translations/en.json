@@ -1691,6 +1691,189 @@
 					"summaryTab": "Quantities Summary",
 					"factoryTab": "Factory Order",
 					"cuttingTab": "Cutting Details"
+				},
+				"otherStructural": {
+					"title": "Other Structural Elements",
+					"elementTypes": {
+						"SEPTIC_TANK": "Septic Tank",
+						"WATER_TANK_GROUND": "Ground Water Tank",
+						"WATER_TANK_ELEVATED": "Elevated Water Tank",
+						"ELEVATOR_PIT": "Elevator Pit",
+						"RETAINING_WALL": "Retaining Wall",
+						"BOUNDARY_WALL": "Boundary Wall / Fence",
+						"RAMP": "Ramp",
+						"DOME": "Dome",
+						"MINARET": "Minaret",
+						"CONCRETE_DECOR": "Concrete Decorations / GRC",
+						"CUSTOM_ELEMENT": "Custom Element"
+					},
+					"fields": {
+						"length": "Length",
+						"width": "Width",
+						"depth": "Depth",
+						"height": "Height",
+						"diameter": "Diameter",
+						"quantity": "Quantity",
+						"thickness": "Thickness",
+						"shape": "Shape",
+						"tankType": "Tank Type",
+						"wallType": "Wall Type",
+						"wallThickness": "Wall Thickness",
+						"baseThickness": "Base Thickness",
+						"slabThickness": "Slab Thickness",
+						"advancedSettings": "Advanced Settings",
+						"isDivided": "Divided into two chambers",
+						"elevatorType": "Elevator Type",
+						"numberOfStops": "Number of Stops",
+						"floorHeight": "Floor Height",
+						"pitWidth": "Pit Width",
+						"pitLength": "Pit Length",
+						"pitHoleDepth": "Pit Hole Depth",
+						"overTravel": "Over Travel",
+						"pitSlabThickness": "Pit Slab Thickness",
+						"hasMachineRoom": "Machine Room",
+						"machineRoomHeight": "Machine Room Height",
+						"retainingWallType": "Retaining Wall Type",
+						"stemThickness": "Stem Thickness",
+						"baseWidth": "Base Width",
+						"boundaryWallType": "Wall Type",
+						"hasRCColumns": "RC Columns",
+						"hasFoundation": "Strip Foundation",
+						"columnSpacing": "Column Spacing",
+						"foundationWidth": "Foundation Width",
+						"foundationDepth": "Foundation Depth",
+						"rampType": "Ramp Type",
+						"hasWalls": "Side Walls",
+						"wallHeight": "Wall Height",
+						"domeType": "Dome Type",
+						"riseHeight": "Rise Height",
+						"shellThicknessTop": "Top Thickness",
+						"shellThicknessBottom": "Bottom Thickness",
+						"hasRingBeam": "Ring Beam",
+						"ringBeamWidth": "Beam Width",
+						"ringBeamDepth": "Beam Depth",
+						"hasDrum": "Drum",
+						"drumHeight": "Drum Height",
+						"drumThickness": "Drum Thickness",
+						"hasSupportColumns": "Support Columns",
+						"supportColumnCount": "Column Count",
+						"supportColumnHeight": "Column Height",
+						"supportColumnSize": "Column Size",
+						"minaretStyle": "Style",
+						"minaretShape": "Shape",
+						"totalHeight": "Total Height",
+						"outerDiameter": "Outer Diameter",
+						"sideLength": "Side Length",
+						"hasBalcony": "Balcony",
+						"balconyCount": "Balcony Count",
+						"balconyProjection": "Balcony Projection",
+						"topType": "Top Type",
+						"decorType": "Item Type",
+						"decorMaterial": "Material",
+						"decorUnit": "Unit",
+						"area": "Area",
+						"description": "Description",
+						"addDecorItem": "Add Decorative Item"
+					},
+					"tankTypes": {
+						"SEALED": "Sealed",
+						"OPEN": "Open",
+						"TWO_CHAMBER": "Two Chamber",
+						"PRECAST": "Precast"
+					},
+					"wallTypes": {
+						"RC": "Reinforced Concrete",
+						"BLOCK_20": "Block 20cm",
+						"BLOCK_15": "Block 15cm"
+					},
+					"shapes": {
+						"RECTANGULAR": "Rectangular",
+						"CYLINDRICAL": "Cylindrical"
+					},
+					"elevatorTypes": {
+						"ELECTRIC_MRL": "Electric (MRL)",
+						"ELECTRIC_WITH_ROOM": "Electric (with Room)",
+						"HYDRAULIC": "Hydraulic"
+					},
+					"retainingWallTypes": {
+						"CANTILEVER": "Cantilever",
+						"GRAVITY": "Gravity",
+						"COUNTERFORT": "Counterfort"
+					},
+					"boundaryWallTypes": {
+						"BLOCK_WALL": "Block Wall",
+						"RC_WALL": "RC Wall",
+						"PRECAST": "Precast"
+					},
+					"rampTypes": {
+						"CAR_RAMP": "Car Ramp",
+						"PEDESTRIAN_RAMP": "Pedestrian Ramp",
+						"LOADING_RAMP": "Loading Ramp"
+					},
+					"domeTypes": {
+						"HALF_SPHERE": "Half Sphere",
+						"POINTED": "Pointed",
+						"RIBBED": "Ribbed",
+						"GRC_PRECAST": "GRC Precast"
+					},
+					"minaretShapes": {
+						"CYLINDRICAL": "Cylindrical",
+						"SQUARE": "Square",
+						"OCTAGONAL": "Octagonal"
+					},
+					"topTypes": {
+						"CONE": "Cone",
+						"DOME_SMALL": "Small Dome",
+						"GRC": "GRC"
+					},
+					"decorTypes": {
+						"CORNICE": "Cornice",
+						"COLUMN_DECORATIVE": "Decorative Column",
+						"CAPITAL": "Column Capital",
+						"WINDOW_FRAME": "Window Frame",
+						"FRONTON": "Fronton",
+						"CORBEL": "Corbel",
+						"PANEL": "Decorative Panel",
+						"BALUSTRADE": "Balustrade",
+						"BALUSTER": "Baluster",
+						"MASHRABIYA": "Mashrabiya",
+						"CLADDING": "Cladding",
+						"BELT": "Decorative Belt",
+						"OTHER_DECOR": "Other"
+					},
+					"decorMaterials": {
+						"GRC": "GRC",
+						"GRP": "GRP",
+						"RC": "Reinforced Concrete",
+						"STONE": "Stone"
+					},
+					"decorUnits": {
+						"LINEAR_METER": "Linear Meter",
+						"SQM": "Square Meter",
+						"PIECE": "Piece"
+					},
+					"results": {
+						"concreteRC": "RC Concrete",
+						"concretePlain": "Plain Concrete",
+						"steel": "Steel",
+						"formwork": "Formwork",
+						"waterproofing": "Waterproofing",
+						"excavation": "Excavation",
+						"blocks": "Blocks",
+						"blockUnit": "block",
+						"component": "Component",
+						"showBreakdown": "Show Breakdown",
+						"totalWithQty": "Total ({qty} units)"
+					},
+					"actions": {
+						"addElement": "Add Structural Element",
+						"selectElementType": "Select Element Type",
+						"cancel": "Cancel"
+					},
+					"messages": {
+						"saved": "Saved successfully",
+						"saveError": "Error while saving"
+					}
 				}
 			},
 			"finishing": {

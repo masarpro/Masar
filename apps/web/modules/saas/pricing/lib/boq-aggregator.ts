@@ -76,6 +76,7 @@ const SECTION_ORDER = [
 	"beams",
 	"blocks",
 	"stairs",
+	"otherStructural",
 ];
 
 const SECTION_LABELS: Record<string, string> = {
@@ -87,6 +88,7 @@ const SECTION_LABELS: Record<string, string> = {
 	slabs: "الأسقف",
 	blocks: "البلوك",
 	stairs: "السلالم",
+	otherStructural: "عناصر إنشائية أخرى",
 };
 
 const SECTION_ICONS: Record<string, string> = {
@@ -98,6 +100,7 @@ const SECTION_ICONS: Record<string, string> = {
 	slabs: "🏠",
 	blocks: "🧱",
 	stairs: "🪜",
+	otherStructural: "🔧",
 };
 
 const FOUNDATION_TYPE_LABELS: Record<string, string> = {
@@ -232,6 +235,9 @@ export function getItemFloorGroup(
 	// Regular beams (non-ground) → shared
 	if (category === "beams") return "shared";
 
+	// Other structural → shared (not floor-specific)
+	if (category === "otherStructural") return "shared";
+
 	return "ground";
 }
 
@@ -330,6 +336,8 @@ function getSubGroupKey(item: StructuralItem): string {
 			return item.subCategory || item.dimensions?.floor?.toString() || "ground";
 		case "slabs":
 			return item.dimensions?.floor?.toString() || "ground";
+		case "otherStructural":
+			return (item.dimensions as any)?.elementType || item.name || "default";
 		default:
 			return "default";
 	}
@@ -345,6 +353,8 @@ function getSubGroupLabel(category: string, key: string): string {
 			return FLOOR_LABELS[key] || key;
 		case "slabs":
 			return SLAB_FLOOR_LABELS[key] || FLOOR_LABELS[key] || key;
+		case "otherStructural":
+			return key;
 		default:
 			return key;
 	}

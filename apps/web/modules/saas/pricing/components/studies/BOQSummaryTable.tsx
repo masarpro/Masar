@@ -172,14 +172,18 @@ export function BOQSummaryTable({
 					جدول الكميات الإجمالي
 				</h3>
 				<BOQExportDropdown
-					onExcelExport={() =>
-						exportBOQToExcel(
-							summary,
-							selectedFloor !== "all" && selectedFloorLabel
-								? `${studyName || ""} - ${selectedFloorLabel}`.trim()
-								: studyName,
-						)
-					}
+					onExcelExport={() => {
+						const label = selectedFloor !== "all" && selectedFloorLabel
+							? `${studyName || ""} - ${selectedFloorLabel}`.trim()
+							: studyName;
+						if (activeTab === "factory") {
+							exportFactoryOrder(summary.factoryOrder, label);
+						} else if (activeTab === "cutting") {
+							exportCuttingDetails(summary.allCuttingDetails, label);
+						} else {
+							exportBOQToExcel(summary, label);
+						}
+					}}
 					onPrint={handlePrint}
 				/>
 			</div>
