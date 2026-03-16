@@ -101,11 +101,11 @@ const nextConfig: NextConfig = {
 		const appCsp = [
 			"default-src 'self'",
 			`script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
-			"style-src 'self' 'unsafe-inline'",
+			"style-src 'self' 'unsafe-inline' https://unpkg.com",
 			`img-src 'self' https: data: blob: https://*.supabase.co ${supabaseStorage}`,
 			`connect-src 'self' blob: https://*.supabase.co ${supabaseStorage}`,
 			`frame-src 'self' ${supabaseStorage} https://docs.google.com blob:`,
-			"font-src 'self'",
+			"font-src 'self' https://unpkg.com",
 			"frame-ancestors 'none'",
 			"base-uri 'self'",
 			"form-action 'self'",

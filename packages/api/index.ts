@@ -30,7 +30,9 @@ export const app = new Hono()
 	// Cors middleware
 	.use(
 		cors({
-			origin: getBaseUrl(),
+			origin: [getBaseUrl(), "https://app-masar.com"].filter(
+				(v, i, a) => a.indexOf(v) === i,
+			),
 			allowHeaders: ["Content-Type", "Authorization"],
 			allowMethods: ["POST", "GET", "OPTIONS"],
 			exposeHeaders: ["Content-Length"],
