@@ -45,6 +45,7 @@ import {
 	type DefaultTemplateConfig,
 } from "../../lib/default-templates";
 import { TemplateThumbnail } from "./TemplateThumbnail";
+import type { OrganizationData } from "./renderer/TemplateRenderer";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 interface TemplatesListProps {
@@ -67,6 +68,38 @@ export function TemplatesList({
 
 	const [filterType, setFilterType] = useState<"ALL" | "QUOTATION" | "INVOICE">("ALL");
 	const [deleteTemplateId, setDeleteTemplateId] = useState<string | null>(null);
+
+	// Fetch organization finance settings for thumbnails
+	const { data: orgSettings } = useQuery({
+		...orpc.finance.settings.get.queryOptions({
+			input: { organizationId },
+		}),
+		staleTime: STALE_TIMES.FINANCE_SETTINGS,
+	});
+
+	const organizationData: OrganizationData = {
+		name: orgSettings?.companyNameAr ?? "",
+		nameAr: orgSettings?.companyNameAr ?? undefined,
+		nameEn: orgSettings?.companyNameEn ?? undefined,
+		logo: orgSettings?.logo ?? undefined,
+		address: orgSettings?.address ?? undefined,
+		addressAr: orgSettings?.address ?? undefined,
+		addressEn: orgSettings?.addressEn ?? undefined,
+		phone: orgSettings?.phone ?? undefined,
+		email: orgSettings?.email ?? undefined,
+		website: orgSettings?.website ?? undefined,
+		taxNumber: orgSettings?.taxNumber ?? undefined,
+		commercialReg: orgSettings?.commercialReg ?? undefined,
+		bankName: orgSettings?.bankName ?? undefined,
+		bankNameEn: orgSettings?.bankNameEn ?? undefined,
+		accountName: orgSettings?.accountName ?? undefined,
+		iban: orgSettings?.iban ?? undefined,
+		accountNumber: orgSettings?.accountNumber ?? undefined,
+		swiftCode: orgSettings?.swiftCode ?? undefined,
+		headerText: orgSettings?.headerText ?? undefined,
+		footerText: orgSettings?.footerText ?? undefined,
+		thankYouMessage: undefined,
+	};
 
 	// Fetch user's custom templates
 	const { data, isLoading } = useQuery({
@@ -180,6 +213,7 @@ export function TemplatesList({
 							preset={preset}
 							basePath={basePath}
 							t={t}
+							organization={organizationData}
 						/>
 					))}
 				</div>
@@ -241,6 +275,7 @@ export function TemplatesList({
 												templateType={
 													template.templateType as "QUOTATION" | "INVOICE"
 												}
+												organization={organizationData}
 											/>
 										</div>
 									</Link>
@@ -372,10 +407,12 @@ function PresetCard({
 	preset,
 	basePath,
 	t,
+	organization,
 }: {
 	preset: DefaultTemplateConfig;
 	basePath: string;
 	t: ReturnType<typeof useTranslations>;
+	organization?: OrganizationData;
 }) {
 	return (
 		<Card className="rounded-2xl group transition-all hover:border-primary/50 hover:shadow-md">
@@ -389,6 +426,7 @@ function PresetCard({
 						elements={preset.elements}
 						settings={preset.settings}
 						templateType={preset.templateType}
+						organization={organization}
 					/>
 				</div>
 
