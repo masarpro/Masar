@@ -167,7 +167,7 @@ const nextConfig: NextConfig = {
 					...securityHeaders,
 					{
 						key: "Cache-Control",
-						value: "no-store",
+						value: "private, no-cache",
 					},
 				],
 			},

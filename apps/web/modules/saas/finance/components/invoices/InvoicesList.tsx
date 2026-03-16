@@ -6,6 +6,7 @@ import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Checkbox } from "@ui/components/checkbox";
+import { EmptyState } from "@ui/components/empty-state";
 import { Input } from "@ui/components/input";
 import {
 	Select,
@@ -568,25 +569,18 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 						)}
 					</>
 				) : (
-					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
-						<div className="flex flex-col items-center justify-center py-16 text-center">
-							<div className="p-5 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800/50 dark:to-slate-800/30 mb-5">
-								<Receipt className="h-12 w-12 text-slate-400 dark:text-slate-500" />
-							</div>
-							<h3 className="text-lg font-medium text-foreground">
-								{t("finance.invoices.empty")}
-							</h3>
-							<p className="text-muted-foreground mt-2 max-w-sm text-sm">
-								{t("finance.invoices.emptyDescription")}
-							</p>
-							<Button asChild className="mt-5 rounded-[10px] h-9 px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.45)] transition-all">
-								<Link href={`${basePath}/new`}>
-									<Plus className="ml-2 h-4 w-4" />
-									{t("finance.invoices.create")}
-								</Link>
-							</Button>
-						</div>
-					</div>
+					<EmptyState
+						icon={<Receipt className="h-12 w-12" />}
+						title={t("finance.invoices.empty")}
+						description={t("finance.invoices.emptyDescription")}
+					>
+						<Button asChild className="rounded-[10px] h-9 px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.45)] transition-all">
+							<Link href={`${basePath}/new`}>
+								<Plus className="ml-2 h-4 w-4" />
+								{t("finance.invoices.create")}
+							</Link>
+						</Button>
+					</EmptyState>
 				)}
 			</div>
 

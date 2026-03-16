@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
+import { EmptyState } from "@ui/components/empty-state";
 import { Input } from "@ui/components/input";
 import {
 	Select,
@@ -188,15 +189,12 @@ export function ExpensesTable({
 
 				{/* Table */}
 				{isLoading ? <ListTableSkeleton /> : expenses.length === 0 ? (
-					<div className="flex flex-col items-center justify-center py-12 text-center">
-						<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
-							<Receipt className="h-8 w-8 text-slate-400" />
-						</div>
-						<p className="mb-4 text-slate-500 dark:text-slate-400">
-							{searchQuery
-								? t("finance.expenses.noSearchResults")
-								: t("finance.expenses.empty")}
-						</p>
+					<EmptyState
+						icon={<Receipt className="h-8 w-8" />}
+						description={searchQuery
+							? t("finance.expenses.noSearchResults")
+							: t("finance.expenses.empty")}
+					>
 						{!searchQuery && (
 							<Button
 								className="rounded-xl"
@@ -206,7 +204,7 @@ export function ExpensesTable({
 								{t("finance.expenses.new")}
 							</Button>
 						)}
-					</div>
+					</EmptyState>
 				) : (
 					<div className="rounded-xl border border-slate-200 dark:border-slate-800">
 						<Table>

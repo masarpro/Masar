@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ClipboardList, ArrowLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { EmptyState } from "@ui/components/empty-state";
 import { Skeleton } from "@ui/components/skeleton";
 
 interface BOQDashboardCardProps {
@@ -74,12 +75,10 @@ export function BOQDashboardCard({
 			{/* Body */}
 			<div className="flex flex-1 flex-col gap-3.5 p-5">
 				{isEmpty ? (
-					<div className="flex flex-col items-center justify-center py-6 text-center">
-						<ClipboardList className="h-8 w-8 text-slate-300 dark:text-slate-600 mb-2" />
-						<p className="text-sm text-slate-500">
-							{t("dashboard.noItems")}
-						</p>
-					</div>
+					<EmptyState
+						icon={<ClipboardList className="h-8 w-8" />}
+						description={t("dashboard.noItems")}
+					/>
 				) : (
 					<>
 						{/* Grand Total */}

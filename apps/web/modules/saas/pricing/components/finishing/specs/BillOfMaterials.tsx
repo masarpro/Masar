@@ -2,6 +2,7 @@
 
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 import {
 	ChevronDown,
 	Download,
@@ -95,29 +96,23 @@ export function BillOfMaterials({ items }: BillOfMaterialsProps) {
 	}
 
 	return (
-		<div className="space-y-3">
+		<Tabs value={activeTab} onValueChange={setActiveTab as (v: string) => void} className="space-y-3">
 			{/* Tabs + actions */}
 			<div className="flex items-center justify-between">
-				<div className="flex gap-1.5">
-					<Button
-						variant={activeTab === "byItem" ? "primary" : "ghost"}
-						size="sm"
-						className="text-sm h-8 px-3.5 rounded-full"
-						onClick={() => setActiveTab("byItem")}
+				<TabsList className="flex gap-1.5 border-b-0">
+					<TabsTrigger
+						value="byItem"
+						className="text-sm h-8 px-3.5 rounded-full border-b-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
 					>
 						{t("byItem")}
-					</Button>
-					<Button
-						variant={
-							activeTab === "aggregated" ? "primary" : "ghost"
-						}
-						size="sm"
-						className="text-sm h-8 px-3.5 rounded-full"
-						onClick={() => setActiveTab("aggregated")}
+					</TabsTrigger>
+					<TabsTrigger
+						value="aggregated"
+						className="text-sm h-8 px-3.5 rounded-full border-b-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
 					>
 						{t("aggregated")}
-					</Button>
-				</div>
+					</TabsTrigger>
+				</TabsList>
 
 				<div className="flex items-center gap-1.5">
 					<Button
@@ -142,16 +137,17 @@ export function BillOfMaterials({ items }: BillOfMaterialsProps) {
 			</div>
 
 			{/* Content */}
-			{activeTab === "byItem" ? (
+			<TabsContent value="byItem" className="mt-0">
 				<ByItemView
 					grouped={grouped}
 					collapsedGroups={collapsedGroups}
 					onToggleGroup={toggleGroup}
 				/>
-			) : (
+			</TabsContent>
+			<TabsContent value="aggregated" className="mt-0">
 				<AggregatedView aggregated={aggregated} />
-			)}
-		</div>
+			</TabsContent>
+		</Tabs>
 	);
 }
 

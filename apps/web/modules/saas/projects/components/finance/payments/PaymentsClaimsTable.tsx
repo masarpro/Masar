@@ -4,6 +4,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
+import { EmptyState } from "@ui/components/empty-state";
 import {
 	Select,
 	SelectContent,
@@ -226,14 +227,10 @@ export function PaymentsClaimsTable({
 
 			{/* Table */}
 			{isLoading ? <ListTableSkeleton /> : items.length === 0 ? (
-				<div className="flex flex-col items-center justify-center py-12 text-center">
-					<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
-						<FileText className="h-8 w-8 text-slate-400" />
-					</div>
-					<p className="text-sm text-slate-500 dark:text-slate-400">
-						{t("paymentsHub.noData")}
-					</p>
-				</div>
+				<EmptyState
+					icon={<FileText className="h-8 w-8" />}
+					description={t("paymentsHub.noData")}
+				/>
 			) : (
 				<>
 					<div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">

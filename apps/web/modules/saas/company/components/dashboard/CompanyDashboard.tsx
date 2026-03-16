@@ -15,6 +15,7 @@ import {
 	Wrench,
 	Archive,
 } from "lucide-react";
+import { GlassStatCard } from "@ui/components/glass-stat-card";
 import { Skeleton } from "@ui/components/skeleton";
 import dynamic from "next/dynamic";
 
@@ -92,74 +93,33 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 		<div className="space-y-6" dir="rtl">
 			{/* Statistics Cards - Glass Morphism */}
 			<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-				{/* Total Salaries */}
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
-					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-							<Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-						</div>
-						<span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-							{data.employees.totalActive} {t("company.dashboard.activeEmployees")}
-						</span>
-					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-						{t("company.dashboard.totalSalaries")}
-					</p>
-					<p className="text-xl font-bold text-blue-700 dark:text-blue-300">
-						{formatCurrency(Number(data.employees.totalMonthlyCost))}
-					</p>
-				</div>
-
-				{/* Total Expenses */}
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
-					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30">
-							<Receipt className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-						</div>
-						<span className="text-xs text-orange-600 dark:text-orange-400 font-medium">
-							{data.expenses.totalActiveExpenses} {t("company.dashboard.activeExpenses")}
-						</span>
-					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-						{t("company.dashboard.totalExpenses")}
-					</p>
-					<p className="text-xl font-bold text-orange-700 dark:text-orange-300">
-						{formatCurrency(Number(data.expenses.totalMonthlyAmount))}
-					</p>
-				</div>
-
-				{/* Asset Value */}
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
-					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-							<Package className="h-5 w-5 text-sky-600 dark:text-sky-400" />
-						</div>
-						<span className="text-xs text-sky-600 dark:text-sky-400 font-medium">
-							{data.assets.total} {t("company.dashboard.totalAssets")}
-						</span>
-					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-						{t("company.dashboard.assetValue")}
-					</p>
-					<p className="text-xl font-bold text-sky-700 dark:text-sky-300">
-						{formatCurrency(Number(data.assets.totalValue))}
-					</p>
-				</div>
-
-				{/* Total Monthly Cost */}
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
-					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30">
-							<TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
-						</div>
-					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-						{t("company.dashboard.totalMonthlyCost")}
-					</p>
-					<p className="text-xl font-bold text-red-700 dark:text-red-300">
-						{formatCurrency(Number(data.totalMonthlyCost))}
-					</p>
-				</div>
+				<GlassStatCard
+					colorScheme="blue"
+					icon={<Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
+					title={t("company.dashboard.totalSalaries")}
+					value={formatCurrency(Number(data.employees.totalMonthlyCost))}
+					badge={<>{data.employees.totalActive} {t("company.dashboard.activeEmployees")}</>}
+				/>
+				<GlassStatCard
+					colorScheme="orange"
+					icon={<Receipt className="h-5 w-5 text-orange-600 dark:text-orange-400" />}
+					title={t("company.dashboard.totalExpenses")}
+					value={formatCurrency(Number(data.expenses.totalMonthlyAmount))}
+					badge={<>{data.expenses.totalActiveExpenses} {t("company.dashboard.activeExpenses")}</>}
+				/>
+				<GlassStatCard
+					colorScheme="sky"
+					icon={<Package className="h-5 w-5 text-sky-600 dark:text-sky-400" />}
+					title={t("company.dashboard.assetValue")}
+					value={formatCurrency(Number(data.assets.totalValue))}
+					badge={<>{data.assets.total} {t("company.dashboard.totalAssets")}</>}
+				/>
+				<GlassStatCard
+					colorScheme="red"
+					icon={<TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />}
+					title={t("company.dashboard.totalMonthlyCost")}
+					value={formatCurrency(Number(data.totalMonthlyCost))}
+				/>
 			</div>
 
 			{/* Alerts Section */}

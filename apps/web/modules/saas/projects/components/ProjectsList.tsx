@@ -3,6 +3,7 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
+import { EmptyState } from "@ui/components/empty-state";
 import { Input } from "@ui/components/input";
 import {
 	Select,
@@ -346,26 +347,21 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 					})}
 				</div>
 			) : (
-				<div className="flex flex-col items-center justify-center py-16 text-center">
-					<div className="mb-5 rounded-2xl bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-xl p-5">
-						<FolderKanban className="h-12 w-12 text-slate-400 dark:text-slate-500" />
-					</div>
-					<h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">
-						{t("projects.empty")}
-					</h3>
-					<p className="mt-2 max-w-sm text-sm text-slate-500 dark:text-slate-400">
-						{t("projects.emptyDescription")}
-					</p>
+				<EmptyState
+					icon={<FolderKanban className="h-12 w-12" />}
+					title={t("projects.empty")}
+					description={t("projects.emptyDescription")}
+				>
 					<Button
 						asChild
-						className="mt-5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+						className="rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
 					>
 						<Link href={`${basePath}/new`}>
 							<Plus className="ml-2 h-4 w-4" />
 							{t("projects.newProject")}
 						</Link>
 					</Button>
-				</div>
+				</EmptyState>
 			)}
 		</div>
 	);

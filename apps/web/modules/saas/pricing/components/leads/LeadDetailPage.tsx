@@ -12,7 +12,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@ui/components/alert-dialog";
-import { Tabs, TabsContent } from "@ui/components/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 import { FileText, FolderOpen, Link2, Loader2, MessageSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -99,35 +99,25 @@ export function LeadDetailPage({ leadId, organizationId, organizationSlug }: Lea
 				onConvert={() => setShowConvertDialog(true)}
 			/>
 
-			{/* Glassmorphism Navigation */}
-			<nav className="flex items-center gap-1 px-2 py-1.5 rounded-2xl bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-white/20 shadow-lg overflow-x-auto" dir="rtl">
-				{tabs.map((tab) => (
-					<button
-						key={tab.value}
-						type="button"
-						onClick={() => setActiveTab(tab.value)}
-						className={
-							activeTab === tab.value
-								? "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm whitespace-nowrap transition-all bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-medium shadow-md shadow-primary/20"
-								: "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm whitespace-nowrap transition-all text-muted-foreground hover:text-foreground hover:bg-muted/60"
-						}
-					>
-						<tab.icon className="h-4 w-4" />
-						{tab.label}
-						{tab.count != null && tab.count > 0 && (
-							<span className={
-								activeTab === tab.value
-									? "inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-white/20 px-1 text-[10px] font-medium"
-									: "inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-muted px-1 text-[10px] font-medium"
-							}>
-								{tab.count}
-							</span>
-						)}
-					</button>
-				))}
-			</nav>
-
 			<Tabs value={activeTab} onValueChange={setActiveTab}>
+				{/* Glassmorphism Navigation */}
+				<TabsList className="flex items-center gap-1 px-2 py-1.5 rounded-2xl bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-white/20 shadow-lg overflow-x-auto border-b-0" dir="rtl">
+					{tabs.map((tab) => (
+						<TabsTrigger
+							key={tab.value}
+							value={tab.value}
+							className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm whitespace-nowrap transition-all border-b-0 text-muted-foreground hover:text-foreground hover:bg-muted/60 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:font-medium data-[state=active]:shadow-md data-[state=active]:shadow-primary/20"
+						>
+							<tab.icon className="h-4 w-4" />
+							{tab.label}
+							{tab.count != null && tab.count > 0 && (
+								<span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-muted px-1 text-[10px] font-medium data-[state=active]:bg-white/20">
+									{tab.count}
+								</span>
+							)}
+						</TabsTrigger>
+					))}
+				</TabsList>
 				<TabsContent value="info" className="mt-0">
 					<LeadInfoTab lead={lead} />
 				</TabsContent>

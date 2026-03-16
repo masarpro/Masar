@@ -100,7 +100,7 @@ export function ActiveSessionsBlock() {
 								</div>
 							</div>
 							<Button
-								variant="light"
+								variant="secondary"
 								size="icon"
 								className="shrink-0"
 								onClick={() => revokeSession(session.token)}

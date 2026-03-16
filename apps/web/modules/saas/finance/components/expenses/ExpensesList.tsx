@@ -8,6 +8,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Button } from "@ui/components/button";
+import { EmptyState } from "@ui/components/empty-state";
 import { Input } from "@ui/components/input";
 import { Badge } from "@ui/components/badge";
 import { Card, CardContent } from "@ui/components/card";
@@ -389,15 +390,12 @@ export function ExpensesList({
 			<Card className="rounded-2xl">
 				<CardContent className="p-0">
 					{isLoading ? <ListTableSkeleton /> : items.length === 0 ? (
-						<div className="flex flex-col items-center justify-center py-12 text-center">
-							<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
-								<TrendingDown className="h-8 w-8 text-slate-400" />
-							</div>
-							<p className="mb-4 text-slate-500 dark:text-slate-400">
-								{searchQuery
-									? t("finance.expenses.noSearchResults")
-									: t("finance.expenses.noExpenses")}
-							</p>
+						<EmptyState
+							icon={<TrendingDown className="h-8 w-8" />}
+							description={searchQuery
+								? t("finance.expenses.noSearchResults")
+								: t("finance.expenses.noExpenses")}
+						>
 							{!searchQuery && !hideAddButton && (
 								<Button
 									className="rounded-xl"
@@ -407,7 +405,7 @@ export function ExpensesList({
 									{t("finance.expenses.new")}
 								</Button>
 							)}
-						</div>
+						</EmptyState>
 					) : (
 						<Table>
 							<TableHeader>

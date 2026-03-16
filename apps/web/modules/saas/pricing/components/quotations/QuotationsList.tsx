@@ -3,6 +3,7 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
+import { EmptyState } from "@ui/components/empty-state";
 import { Input } from "@ui/components/input";
 import {
 	Select,
@@ -255,23 +256,18 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 					</Table>
 				</div>
 			) : (
-				<div className="flex flex-col items-center justify-center py-16 text-center">
-					<div className="p-5 rounded-2xl bg-muted/50 mb-5">
-						<FileText className="h-12 w-12 text-muted-foreground" />
-					</div>
-					<h3 className="text-lg font-medium text-foreground">
-						{t("pricing.quotations.empty")}
-					</h3>
-					<p className="text-muted-foreground mt-2 max-w-sm text-sm">
-						{t("pricing.quotations.emptyDescription")}
-					</p>
-					<Button asChild className="mt-5 rounded-xl">
+				<EmptyState
+					icon={<FileText className="h-12 w-12" />}
+					title={t("pricing.quotations.empty")}
+					description={t("pricing.quotations.emptyDescription")}
+				>
+					<Button asChild className="rounded-xl">
 						<Link href={`${basePath}/new`}>
 							<Plus className="h-4 w-4 me-2" />
 							{t("pricing.quotations.create")}
 						</Link>
 					</Button>
-				</div>
+				</EmptyState>
 			)}
 		</div>
 	);

@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
+import { UNIT_KEYS, UNIT_VALUES, formatCurrency } from "@saas/shared/lib/invoice-constants";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
@@ -91,25 +92,6 @@ type ColumnKey = "index" | "description" | "unit" | "unitPrice" | "quantity" | "
 const DEFAULT_VISIBLE_COLUMNS: ColumnKey[] = [
 	"index", "description", "unit", "unitPrice", "quantity", "total", "actions",
 ];
-
-const UNIT_KEYS = [
-	"m", "m2", "m3", "ton", "kg", "liter",
-	"piece", "lumpsum", "workday", "workhour",
-	"trip", "load", "roll", "carton", "set", "service",
-] as const;
-
-const UNIT_VALUES: Record<string, string> = {
-	m: "م", m2: "م²", m3: "م³", ton: "طن", kg: "كجم", liter: "لتر",
-	piece: "قطعة", lumpsum: "مقطوعية", workday: "يوم عمل", workhour: "ساعة عمل",
-	trip: "رحلة", load: "حمولة", roll: "لفة", carton: "كرتون", set: "مجموعة", service: "خدمة",
-};
-
-const formatCurrency = (amount: number) => {
-	return new Intl.NumberFormat("en-US", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	}).format(amount);
-};
 
 export function QuotationForm({
 	organizationId,

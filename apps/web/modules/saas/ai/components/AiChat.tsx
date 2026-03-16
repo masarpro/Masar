@@ -181,7 +181,7 @@ export function AiChat({ organizationId }: { organizationId?: string }) {
 				<div>
 					<UpgradeGate feature="ai.chat">
 						<Button
-							variant="light"
+							variant="secondary"
 							size="sm"
 							className="mb-4 flex w-full items-center gap-2"
 							loading={createChatMutation.isPending}

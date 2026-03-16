@@ -13,7 +13,7 @@ import { useSidebar } from "./sidebar-context";
 import type { SidebarMenuChild, SidebarMenuItem } from "./use-sidebar-menu";
 
 /** Top-level items that benefit from eager prefetch */
-const PREFETCH_IDS = new Set(["start", "projects", "finance", "company", "pricing", "orgSettings"]);
+const PREFETCH_IDS = new Set(["start", "projects", "finance", "company", "pricing", "orgSettings", "accountSettings"]);
 
 interface SidebarNavProps {
 	items: SidebarMenuItem[];

@@ -57,7 +57,7 @@ export function ConnectedAccountsBlock() {
 									<CheckCircle2Icon className="size-6 text-success" />
 								) : (
 									<Button
-										variant={isLinked ? "outline" : "light"}
+										variant={isLinked ? "outline" : "secondary"}
 										onClick={() =>
 											linkProvider(
 												provider as OAuthProvider,

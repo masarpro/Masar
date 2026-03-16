@@ -32,7 +32,7 @@ export function ConsentBanner() {
 					</p>
 					<div className="mt-4 flex gap-2">
 						<Button
-							variant="light"
+							variant="secondary"
 							className="flex-1"
 							onClick={() => declineCookies()}
 						>

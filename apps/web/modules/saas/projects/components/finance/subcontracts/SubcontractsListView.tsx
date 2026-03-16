@@ -4,6 +4,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
+import { EmptyState } from "@ui/components/empty-state";
 import { Input } from "@ui/components/input";
 import {
 	Select,
@@ -361,23 +362,18 @@ export function SubcontractsListView({
 
 			{/* Empty State */}
 			{(!contracts || contracts.length === 0) && (
-				<div className="flex flex-col items-center justify-center py-16 text-center">
-					<div className="mb-4 rounded-2xl bg-orange-100 p-5 dark:bg-orange-900/30">
-						<Hammer className="h-10 w-10 text-orange-500" />
-					</div>
-					<h3 className="mb-2 text-lg font-semibold text-slate-700 dark:text-slate-300">
-						{t("subcontracts.empty.title")}
-					</h3>
-					<p className="mb-6 max-w-sm text-sm text-slate-500 dark:text-slate-400">
-						{t("subcontracts.empty.description")}
-					</p>
+				<EmptyState
+					icon={<Hammer className="h-10 w-10" />}
+					title={t("subcontracts.empty.title")}
+					description={t("subcontracts.empty.description")}
+				>
 					<Link href={`${basePath}/new`}>
 						<Button className="rounded-xl bg-orange-600 text-white hover:bg-orange-700">
 							<Plus className="me-2 h-4 w-4" />
 							{t("subcontracts.empty.action")}
 						</Button>
 					</Link>
-				</div>
+				</EmptyState>
 			)}
 
 			{/* No results after filter */}

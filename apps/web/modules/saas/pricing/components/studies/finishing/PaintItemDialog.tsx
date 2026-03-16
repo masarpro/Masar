@@ -27,6 +27,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import type { BuildingConfig } from "../../../lib/finishing-types";
 import {
+	type OpeningEntry,
+	type RoomEntry,
+	calcCeilingArea,
+	calcOpeningArea,
+	calcWallArea,
+	createDoor,
+	createRoom,
+	createWindow,
+	numVal,
+} from "../../../lib/finishing-room-types";
+import {
 	PAINT_BRANDS,
 	PAINT_TYPES,
 	PUTTY_TYPES,
@@ -37,22 +48,6 @@ import {
 	type PaintTypeKey,
 	type PuttyTypeKey,
 } from "../../../lib/paint-config";
-
-// ─── Types ────────────────────────────────────────────────────
-
-interface RoomEntry {
-	name: string;
-	wall1: number | "";
-	wall2: number | "";
-	heightOverride?: number | null;
-}
-
-interface OpeningEntry {
-	name: string;
-	width: number | "";
-	height: number | "";
-	count: number | "";
-}
 
 interface PaintItemData {
 	id?: string;
@@ -122,45 +117,6 @@ const ROOM_LABEL_PREFIX: Record<PaintCategory, string> = {
 	boundary: "ج",
 };
 
-// ─── Helpers ──────────────────────────────────────────────────
-
-function makeRoom(index: number, prefix: string): RoomEntry {
-	return { name: `${prefix}${index}`, wall1: "", wall2: "", heightOverride: null };
-}
-
-function makeDoor(index: number): OpeningEntry {
-	return { name: `ب${index}`, width: "", height: 2.1, count: 1 };
-}
-
-function makeWindow(index: number): OpeningEntry {
-	return { name: `ش${index}`, width: "", height: 1.2, count: 1 };
-}
-
-function numVal(v: number | "" | null | undefined): number {
-	return typeof v === "number" ? v : 0;
-}
-
-function roomPerimeter(r: RoomEntry, category: PaintCategory): number {
-	if (category === "interior") {
-		return (numVal(r.wall1) + numVal(r.wall2)) * 2;
-	}
-	// Facade/boundary: wall1 is length only
-	return numVal(r.wall1);
-}
-
-function roomWallArea(r: RoomEntry, floorHeight: number, category: PaintCategory): number {
-	const h = r.heightOverride != null ? r.heightOverride : floorHeight;
-	return roomPerimeter(r, category) * h;
-}
-
-function roomCeilingArea(r: RoomEntry): number {
-	return numVal(r.wall1) * numVal(r.wall2);
-}
-
-function openingArea(o: OpeningEntry): number {
-	return numVal(o.width) * numVal(o.height) * numVal(o.count);
-}
-
 // ─── Component ────────────────────────────────────────────────
 
 export function PaintItemDialog({
@@ -220,9 +176,9 @@ export function PaintItemDialog({
 	const [puttyCoverageRate, setPuttyCoverageRate] = useState(1.75);
 	const [floorId, setFloorId] = useState<string>("");
 	const [floorHeight, setFloorHeight] = useState(3.0);
-	const [rooms, setRooms] = useState<RoomEntry[]>([makeRoom(1, ROOM_LABEL_PREFIX[paintCategory])]);
-	const [doors, setDoors] = useState<OpeningEntry[]>([makeDoor(1)]);
-	const [windows, setWindows] = useState<OpeningEntry[]>([makeWindow(1)]);
+	const [rooms, setRooms] = useState<RoomEntry[]>([createRoom(1, ROOM_LABEL_PREFIX[paintCategory])]);
+	const [doors, setDoors] = useState<OpeningEntry[]>([createDoor(1)]);
+	const [windows, setWindows] = useState<OpeningEntry[]>([createWindow(1)]);
 	const [includeCeiling, setIncludeCeiling] = useState(isInterior);
 	const [editingHeightIdx, setEditingHeightIdx] = useState<number | null>(null);
 	const [linkedToPlaster, setLinkedToPlaster] = useState(false);
@@ -290,21 +246,21 @@ export function PaintItemDialog({
 			if (cdRooms?.length) {
 				setRooms(cdRooms.map((r) => ({ ...r, heightOverride: r.heightOverride ?? null })));
 			} else {
-				setRooms([makeRoom(1, ROOM_LABEL_PREFIX[paintCategory])]);
+				setRooms([createRoom(1, ROOM_LABEL_PREFIX[paintCategory])]);
 			}
 
 			const cdDoors = cd?.doors as OpeningEntry[] | undefined;
 			if (cdDoors?.length) {
 				setDoors(cdDoors.map((d) => ({ ...d })));
 			} else {
-				setDoors([makeDoor(1)]);
+				setDoors([createDoor(1)]);
 			}
 
 			const cdWindows = cd?.windows as OpeningEntry[] | undefined;
 			if (cdWindows?.length) {
 				setWindows(cdWindows.map((w) => ({ ...w })));
 			} else {
-				setWindows([makeWindow(1)]);
+				setWindows([createWindow(1)]);
 			}
 		} else {
 			setName(DEFAULT_NAMES[paintCategory]);
@@ -333,15 +289,15 @@ export function PaintItemDialog({
 
 			// Pre-fill first facade/boundary segment with building perimeter if available
 			if (!isInterior && bPerimeter > 0) {
-				const firstRoom = makeRoom(1, ROOM_LABEL_PREFIX[paintCategory]);
+				const firstRoom = createRoom(1, ROOM_LABEL_PREFIX[paintCategory]);
 				firstRoom.wall1 = bPerimeter;
 				setRooms([firstRoom]);
 			} else {
-				setRooms([makeRoom(1, ROOM_LABEL_PREFIX[paintCategory])]);
+				setRooms([createRoom(1, ROOM_LABEL_PREFIX[paintCategory])]);
 			}
 
-			setDoors([makeDoor(1)]);
-			setWindows([makeWindow(1)]);
+			setDoors([createDoor(1)]);
+			setWindows([createWindow(1)]);
 			setIncludeCeiling(isInterior);
 			setLinkedToPlaster(false);
 		}
@@ -411,17 +367,17 @@ export function PaintItemDialog({
 	const wastagePercent = 10;
 
 	const wallsGrossArea = useMemo(
-		() => rooms.reduce((s, r) => s + roomWallArea(r, floorHeight, paintCategory), 0),
+		() => rooms.reduce((s, r) => s + calcWallArea(r, floorHeight, paintCategory === "interior" ? "double" : "single"), 0),
 		[rooms, floorHeight, paintCategory],
 	);
 
 	const doorsArea = useMemo(
-		() => (showDoorsWindows ? doors.reduce((s, d) => s + openingArea(d), 0) : 0),
+		() => (showDoorsWindows ? doors.reduce((s, d) => s + calcOpeningArea(d), 0) : 0),
 		[doors, showDoorsWindows],
 	);
 
 	const windowsArea = useMemo(
-		() => (showDoorsWindows ? windows.reduce((s, w) => s + openingArea(w), 0) : 0),
+		() => (showDoorsWindows ? windows.reduce((s, w) => s + calcOpeningArea(w), 0) : 0),
 		[windows, showDoorsWindows],
 	);
 
@@ -430,7 +386,7 @@ export function PaintItemDialog({
 
 	const ceilingArea = useMemo(() => {
 		if (!showCeiling || !includeCeiling) return 0;
-		return rooms.reduce((s, r) => s + roomCeilingArea(r), 0);
+		return rooms.reduce((s, r) => s + calcCeilingArea(r), 0);
 	}, [rooms, includeCeiling, showCeiling]);
 
 	const totalBeforeWastage = wallsNetArea + ceilingArea;
@@ -458,7 +414,7 @@ export function PaintItemDialog({
 	const addRoom = useCallback(() => {
 		setRooms((prev) => {
 			const newIdx = prev.length;
-			const next = [...prev, makeRoom(newIdx + 1, roomPrefix)];
+			const next = [...prev, createRoom(newIdx + 1, roomPrefix)];
 			setTimeout(() => {
 				(document.getElementById(`paint-room-${newIdx}-wall1`) as HTMLInputElement)?.focus();
 			}, 50);
@@ -477,7 +433,7 @@ export function PaintItemDialog({
 	const addDoor = useCallback(() => {
 		setDoors((prev) => {
 			const newIdx = prev.length;
-			const next = [...prev, makeDoor(newIdx + 1)];
+			const next = [...prev, createDoor(newIdx + 1)];
 			setTimeout(() => {
 				(document.getElementById(`paint-door-${newIdx}-name`) as HTMLInputElement)?.focus();
 			}, 50);
@@ -496,7 +452,7 @@ export function PaintItemDialog({
 	const addWindow = useCallback(() => {
 		setWindows((prev) => {
 			const newIdx = prev.length;
-			const next = [...prev, makeWindow(newIdx + 1)];
+			const next = [...prev, createWindow(newIdx + 1)];
 			setTimeout(() => {
 				(document.getElementById(`paint-win-${newIdx}-name`) as HTMLInputElement)?.focus();
 			}, 50);

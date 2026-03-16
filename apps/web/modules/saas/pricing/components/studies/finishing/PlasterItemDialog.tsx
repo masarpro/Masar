@@ -26,30 +26,23 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import type { BuildingConfig } from "../../../lib/finishing-types";
 import {
+	type OpeningEntry,
+	type RoomEntry,
+	calcCeilingArea,
+	calcOpeningArea,
+	calcWallArea,
+	createDoor,
+	createRoom,
+	createWindow,
+	numVal,
+} from "../../../lib/finishing-room-types";
+import {
 	MIX_RATIOS,
 	PLASTER_METHODS,
 	calculatePlasterMaterials,
 	type MixRatioKey,
 	type PlasterMethodKey,
 } from "../../../lib/plaster-config";
-
-// ─── Types ────────────────────────────────────────────────────
-
-interface RoomEntry {
-	name: string;
-	shape: "rectangular" | "custom";
-	wall1: number | "";
-	wall2: number | "";
-	heightOverride?: number | null; // null = use floor height
-	customWalls?: (number | "")[];
-}
-
-interface OpeningEntry {
-	name: string;
-	width: number | "";
-	height: number | "";
-	count: number | "";
-}
 
 interface PlasterItemData {
 	id?: string;
@@ -81,50 +74,6 @@ interface PlasterItemDialogProps {
 	buildingConfig?: BuildingConfig | null;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────
-
-function makeRoom(index: number): RoomEntry {
-	return {
-		name: `غ${index}`,
-		shape: "rectangular",
-		wall1: "",
-		wall2: "",
-		heightOverride: null,
-	};
-}
-
-function makeDoor(index: number): OpeningEntry {
-	return { name: `ب${index}`, width: "", height: 2.1, count: 1 };
-}
-
-function makeWindow(index: number): OpeningEntry {
-	return { name: `ش${index}`, width: "", height: 1.2, count: 1 };
-}
-
-function numVal(v: number | "" | null | undefined): number {
-	return typeof v === "number" ? v : 0;
-}
-
-function roomPerimeter(r: RoomEntry): number {
-	if (r.shape === "custom" && r.customWalls) {
-		return r.customWalls.reduce<number>((s, w) => s + numVal(w), 0);
-	}
-	return (numVal(r.wall1) + numVal(r.wall2)) * 2;
-}
-
-function roomWallArea(r: RoomEntry, floorHeight: number): number {
-	const h = r.heightOverride != null ? r.heightOverride : floorHeight;
-	return roomPerimeter(r) * h;
-}
-
-function roomCeilingArea(r: RoomEntry): number {
-	return numVal(r.wall1) * numVal(r.wall2);
-}
-
-function openingArea(o: OpeningEntry): number {
-	return numVal(o.width) * numVal(o.height) * numVal(o.count);
-}
-
 // ─── Component ────────────────────────────────────────────────
 
 export function PlasterItemDialog({
@@ -151,9 +100,9 @@ export function PlasterItemDialog({
 	const [mixRatio, setMixRatio] = useState<MixRatioKey>("1:6");
 	const [floorId, setFloorId] = useState<string>("");
 	const [floorHeight, setFloorHeight] = useState(3.0);
-	const [rooms, setRooms] = useState<RoomEntry[]>([makeRoom(1)]);
-	const [doors, setDoors] = useState<OpeningEntry[]>([makeDoor(1)]);
-	const [windows, setWindows] = useState<OpeningEntry[]>([makeWindow(1)]);
+	const [rooms, setRooms] = useState<RoomEntry[]>([createRoom(1)]);
+	const [doors, setDoors] = useState<OpeningEntry[]>([createDoor(1)]);
+	const [windows, setWindows] = useState<OpeningEntry[]>([createWindow(1)]);
 	const [includeCeiling, setIncludeCeiling] = useState(true);
 	const [editingHeightIdx, setEditingHeightIdx] = useState<number | null>(null);
 
@@ -186,21 +135,21 @@ export function PlasterItemDialog({
 					heightOverride: (r as unknown as { heightOverride?: number | null }).heightOverride ?? null,
 				})));
 			} else {
-				setRooms([makeRoom(1)]);
+				setRooms([createRoom(1)]);
 			}
 
 			const cdDoors = cd?.doors as OpeningEntry[] | undefined;
 			if (cdDoors?.length) {
 				setDoors(cdDoors.map((d) => ({ ...d })));
 			} else {
-				setDoors([makeDoor(1)]);
+				setDoors([createDoor(1)]);
 			}
 
 			const cdWindows = cd?.windows as OpeningEntry[] | undefined;
 			if (cdWindows?.length) {
 				setWindows(cdWindows.map((w) => ({ ...w })));
 			} else {
-				setWindows([makeWindow(1)]);
+				setWindows([createWindow(1)]);
 			}
 		} else {
 			setName(isInternal ? "لياسة داخلية (جدران وأسقف)" : "لياسة خارجية");
@@ -210,9 +159,9 @@ export function PlasterItemDialog({
 			const defaultFloor = floors[0];
 			setFloorId(defaultFloor?.id ?? "");
 			setFloorHeight(defaultFloor?.height ?? 3.0);
-			setRooms([makeRoom(1)]);
-			setDoors([makeDoor(1)]);
-			setWindows([makeWindow(1)]);
+			setRooms([createRoom(1)]);
+			setDoors([createDoor(1)]);
+			setWindows([createWindow(1)]);
 			setIncludeCeiling(true);
 		}
 		setEditingHeightIdx(null);
@@ -236,17 +185,17 @@ export function PlasterItemDialog({
 	const wastagePercent = method.wastagePercent;
 
 	const wallsGrossArea = useMemo(
-		() => rooms.reduce((s, r) => s + roomWallArea(r, floorHeight), 0),
+		() => rooms.reduce((s, r) => s + calcWallArea(r, floorHeight), 0),
 		[rooms, floorHeight],
 	);
 
 	const doorsArea = useMemo(
-		() => doors.reduce((s, d) => s + openingArea(d), 0),
+		() => doors.reduce((s, d) => s + calcOpeningArea(d), 0),
 		[doors],
 	);
 
 	const windowsArea = useMemo(
-		() => windows.reduce((s, w) => s + openingArea(w), 0),
+		() => windows.reduce((s, w) => s + calcOpeningArea(w), 0),
 		[windows],
 	);
 
@@ -255,7 +204,7 @@ export function PlasterItemDialog({
 
 	const ceilingArea = useMemo(() => {
 		if (!isInternal || !includeCeiling) return 0;
-		return rooms.reduce((s, r) => s + roomCeilingArea(r), 0);
+		return rooms.reduce((s, r) => s + calcCeilingArea(r), 0);
 	}, [rooms, isInternal, includeCeiling]);
 
 	const totalBeforeWastage = wallsNetArea + ceilingArea;
@@ -275,7 +224,7 @@ export function PlasterItemDialog({
 	const addRoom = useCallback(() => {
 		setRooms((prev) => {
 			const newIdx = prev.length;
-			const next = [...prev, makeRoom(newIdx + 1)];
+			const next = [...prev, createRoom(newIdx + 1)];
 			setTimeout(() => {
 				(document.getElementById(`room-${newIdx}-wall1`) as HTMLInputElement)?.focus();
 			}, 50);
@@ -296,7 +245,7 @@ export function PlasterItemDialog({
 	const addDoor = useCallback(() => {
 		setDoors((prev) => {
 			const newIdx = prev.length;
-			const next = [...prev, makeDoor(newIdx + 1)];
+			const next = [...prev, createDoor(newIdx + 1)];
 			setTimeout(() => {
 				(document.getElementById(`door-${newIdx}-name`) as HTMLInputElement)?.focus();
 			}, 50);
@@ -317,7 +266,7 @@ export function PlasterItemDialog({
 	const addWindow = useCallback(() => {
 		setWindows((prev) => {
 			const newIdx = prev.length;
-			const next = [...prev, makeWindow(newIdx + 1)];
+			const next = [...prev, createWindow(newIdx + 1)];
 			setTimeout(() => {
 				(document.getElementById(`win-${newIdx}-name`) as HTMLInputElement)?.focus();
 			}, 50);

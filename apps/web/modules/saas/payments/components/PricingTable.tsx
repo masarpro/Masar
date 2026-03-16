@@ -265,7 +265,7 @@ export function PricingTable({
 										{isEnterprise ? (
 											<Button
 												className="mt-4 w-full"
-												variant="light"
+												variant="secondary"
 												asChild
 											>
 												<LocaleLink href="/contact">

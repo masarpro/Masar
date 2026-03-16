@@ -170,14 +170,14 @@ export function TwoFactorBlock() {
 							{t("settings.account.security.twoFactor.enabled")}
 						</p>
 					</div>
-					<Button variant="light" onClick={verifyPassword}>
+					<Button variant="secondary" onClick={verifyPassword}>
 						<XIcon className="mr-1.5 size-4" />
 						{t("settings.account.security.twoFactor.disable")}
 					</Button>
 				</div>
 			) : (
 				<div className="flex justify-start">
-					<Button variant="light" onClick={verifyPassword}>
+					<Button variant="secondary" onClick={verifyPassword}>
 						<TabletSmartphoneIcon className="mr-1.5 size-4" />
 						{t("settings.account.security.twoFactor.enable")}
 					</Button>
