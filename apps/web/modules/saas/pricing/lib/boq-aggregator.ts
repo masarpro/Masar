@@ -2,7 +2,7 @@
 // BOQ Aggregator - تجميع بيانات جدول الكميات
 // ═══════════════════════════════════════════════════════════════
 
-import { recalculateItem, type CuttingDetailRow, type RecalcResult } from "./boq-recalculator";
+import { recalculateItem, computeOptimizedFactoryOrder, type CuttingDetailRow, type RecalcResult } from "./boq-recalculator";
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -366,7 +366,6 @@ export function aggregateBOQ(items: StructuralItem[]): BOQSummary {
 
 	const sections: BOQSection[] = [];
 	const allCuttingDetails: CuttingDetailRow[] = [];
-	const factoryMap = new Map<string, FactoryOrderEntry>();
 
 	let grandConcrete = 0;
 	let grandRebar = 0;
@@ -401,23 +400,6 @@ export function aggregateBOQ(items: StructuralItem[]): BOQSummary {
 
 			// Collect cutting details
 			allCuttingDetails.push(...recalc.cuttingDetails);
-
-			// Aggregate factory order
-			recalc.totals.stocksNeeded.forEach((stock) => {
-				const fKey = `${stock.diameter}-${stock.length}`;
-				const existing = factoryMap.get(fKey);
-				if (existing) {
-					existing.count += stock.count;
-					existing.weight += stock.count * stock.length * (REBAR_WEIGHTS_MAP[stock.diameter] || 0);
-				} else {
-					factoryMap.set(fKey, {
-						diameter: stock.diameter,
-						stockLength: stock.length,
-						count: stock.count,
-						weight: stock.count * stock.length * (REBAR_WEIGHTS_MAP[stock.diameter] || 0),
-					});
-				}
-			});
 		}
 
 		// Build sub-groups
@@ -465,8 +447,16 @@ export function aggregateBOQ(items: StructuralItem[]): BOQSummary {
 		});
 	}
 
-	// Sort factory order by diameter
-	const factoryOrder = Array.from(factoryMap.values()).sort((a, b) => a.diameter - b.diameter);
+	// Compute factory order with cross-operation remnant reuse
+	const optimizedStocks = computeOptimizedFactoryOrder(allCuttingDetails);
+	const factoryOrder = optimizedStocks
+		.map((stock) => ({
+			diameter: stock.diameter,
+			stockLength: stock.stockLength,
+			count: stock.count,
+			weight: stock.count * stock.stockLength * (REBAR_WEIGHTS_MAP[stock.diameter] || 0),
+		}))
+		.sort((a, b) => a.diameter - b.diameter);
 
 	return {
 		sections,

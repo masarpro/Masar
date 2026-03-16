@@ -49,10 +49,41 @@ function calcCutting(
 	const stockLength = STOCK_LENGTHS[diameter] || 12;
 	const weight = REBAR_WEIGHTS[diameter] || diameter * diameter * 0.00617;
 
-	const cutsPerStock = Math.floor(stockLength / barLength) || 1;
-	const stocksNeeded = Math.ceil(barCount / cutsPerStock);
-	const wastePerStock = stockLength - cutsPerStock * barLength;
-	const totalWaste = stocksNeeded * wastePerStock;
+	let stocksNeeded: number;
+	let wastePerStock: number;
+	let totalWaste: number;
+
+	if (barLength > stockLength) {
+		// Bar longer than stock — needs lap splices (SBC 304: 40d)
+		const lapLength = (diameter * 40) / 1000;
+		const effectiveStockLength = stockLength - lapLength;
+
+		// How many stock bars per piece
+		let barsPerPiece = Math.ceil((barLength - lapLength) / effectiveStockLength);
+		if (barsPerPiece < 2) barsPerPiece = 2;
+
+		// Verify: n bars with (n-1) lap joints must cover barLength
+		const lapJoints = barsPerPiece - 1;
+		const availableLength = barsPerPiece * stockLength - lapJoints * lapLength;
+		if (availableLength < barLength) {
+			barsPerPiece += 1;
+		}
+
+		stocksNeeded = barsPerPiece * barCount;
+
+		// Waste per assembled piece
+		const actualLapJoints = barsPerPiece - 1;
+		const usedPerPiece = barLength + actualLapJoints * lapLength;
+		const boughtPerPiece = barsPerPiece * stockLength;
+		wastePerStock = boughtPerPiece - usedPerPiece;
+		totalWaste = wastePerStock * barCount;
+	} else {
+		// Normal case: bar fits within stock
+		const cutsPerStock = Math.floor(stockLength / barLength) || 1;
+		stocksNeeded = Math.ceil(barCount / cutsPerStock);
+		wastePerStock = stockLength - cutsPerStock * barLength;
+		totalWaste = stocksNeeded * wastePerStock;
+	}
 
 	const netLength = barCount * barLength;
 	const grossLength = stocksNeeded * stockLength;
@@ -390,4 +421,92 @@ export function recalculateItem(
 		default:
 			return { cuttingDetails: [], totals: { netWeight: 0, grossWeight: 0, wastePercentage: 0, stocksNeeded: [] }, hasRebarParams: false };
 	}
+}
+
+// ─────────────────────────────────────────────────────────────
+// Cross-operation remnant reuse optimizer
+// ─────────────────────────────────────────────────────────────
+
+const MIN_USABLE_REMNANT = 0.3; // metres
+
+/**
+ * Computes factory order with cross-operation remnant reuse.
+ * Groups all cutting details by diameter, sorts longest-first,
+ * and tracks remnants from each operation for reuse by later ones.
+ * Returns optimized stock counts per diameter.
+ */
+export function computeOptimizedFactoryOrder(
+	details: CuttingDetailRow[],
+): { diameter: number; stockLength: number; count: number }[] {
+	// Group by diameter + stockLength
+	const groups = new Map<string, CuttingDetailRow[]>();
+	for (const d of details) {
+		const key = `${d.diameter}-${d.stockLength}`;
+		const list = groups.get(key) || [];
+		list.push(d);
+		groups.set(key, list);
+	}
+
+	const result: { diameter: number; stockLength: number; count: number }[] = [];
+
+	for (const [, group] of groups) {
+		const diameter = group[0].diameter;
+		const stockLen = group[0].stockLength;
+
+		// Sort by barLength descending — longest first uses new stock, shorter may reuse remnants
+		const sorted = [...group].sort((a, b) => b.barLength - a.barLength);
+
+		const remnants: number[] = [];
+		let totalStocks = 0;
+
+		for (const row of sorted) {
+			if (row.barLength > stockLen) {
+				// Long bars already computed with lap splices — no remnant reuse possible
+				totalStocks += row.stocksNeeded;
+				continue;
+			}
+
+			let remaining = row.barCount;
+
+			// Try to cut from available remnants first (largest remnants first)
+			remnants.sort((a, b) => b - a);
+			for (let i = 0; i < remnants.length && remaining > 0; i++) {
+				const piecesFromRemnant = Math.floor(remnants[i] / row.barLength);
+				if (piecesFromRemnant > 0) {
+					const used = Math.min(piecesFromRemnant, remaining);
+					remaining -= used;
+					const leftover = remnants[i] - used * row.barLength;
+					remnants[i] = leftover;
+				}
+			}
+			// Remove exhausted remnants
+			for (let i = remnants.length - 1; i >= 0; i--) {
+				if (remnants[i] < MIN_USABLE_REMNANT) remnants.splice(i, 1);
+			}
+
+			// Cut remaining pieces from new stock bars
+			if (remaining > 0) {
+				const cutsPerStock = Math.floor(stockLen / row.barLength) || 1;
+				const newStocks = Math.ceil(remaining / cutsPerStock);
+				totalStocks += newStocks;
+
+				// Track remnants from new stocks
+				const fullStocks = Math.floor(remaining / cutsPerStock);
+				const lastStockCuts = remaining - fullStocks * cutsPerStock;
+
+				const remnantPerFull = stockLen - cutsPerStock * row.barLength;
+				for (let s = 0; s < fullStocks; s++) {
+					if (remnantPerFull >= MIN_USABLE_REMNANT) remnants.push(remnantPerFull);
+				}
+				if (lastStockCuts > 0) {
+					const lastRemnant = stockLen - lastStockCuts * row.barLength;
+					if (lastRemnant >= MIN_USABLE_REMNANT) remnants.push(lastRemnant);
+				}
+			}
+		}
+
+		result.push({ diameter, stockLength: stockLen, count: totalStocks });
+	}
+
+	return result;
 }
