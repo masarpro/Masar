@@ -1484,6 +1484,42 @@
         "12": "ديسمبر"
       }
     },
+    "topbar": {
+      "title": "الرئيسية",
+      "search": "بحث..."
+    },
+    "companyCard": {
+      "totalBalance": "الرصيد الإجمالي"
+    },
+    "companyInfo": {
+      "title": "معلومات المنشأة",
+      "cr": "السجل التجاري",
+      "vat": "الرقم الضريبي",
+      "city": "المدينة",
+      "class": "التصنيف",
+      "status": "الحالة",
+      "active": "نشط",
+      "details": "التفاصيل"
+    },
+    "balance": {
+      "title": "الرصيد المالي",
+      "total": "الرصيد الإجمالي",
+      "income": "المقبوضات",
+      "expenses": "المصروفات",
+      "history": "سجل الرصيد",
+      "thisMonth": "هذا الشهر"
+    },
+    "upcoming": {
+      "title": "الدفعات القادمة",
+      "empty": "لا توجد دفعات مجدولة ✓"
+    },
+    "transactions": {
+      "title": "آخر الحركات"
+    },
+    "collection": {
+      "title": "المشاريع والتحصيل",
+      "rate": "تحصيل"
+    },
     "recentActivity": {
       "title": "آخر التحديثات"
     },

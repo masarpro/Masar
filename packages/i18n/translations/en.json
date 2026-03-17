@@ -1484,6 +1484,42 @@
         "12": "Dec"
       }
     },
+    "topbar": {
+      "title": "Dashboard",
+      "search": "Search..."
+    },
+    "companyCard": {
+      "totalBalance": "Total Balance"
+    },
+    "companyInfo": {
+      "title": "Company Info",
+      "cr": "CR Number",
+      "vat": "VAT Number",
+      "city": "City",
+      "class": "Classification",
+      "status": "Status",
+      "active": "Active",
+      "details": "Details"
+    },
+    "balance": {
+      "title": "Financial Balance",
+      "total": "Total Balance",
+      "income": "Income",
+      "expenses": "Expenses",
+      "history": "Balance History",
+      "thisMonth": "This Month"
+    },
+    "upcoming": {
+      "title": "Upcoming Payments",
+      "empty": "No scheduled payments ✓"
+    },
+    "transactions": {
+      "title": "Recent Transactions"
+    },
+    "collection": {
+      "title": "Projects & Collection",
+      "rate": "Collection"
+    },
     "recentActivity": {
       "title": "Recent Updates"
     },
