@@ -5,8 +5,7 @@ import { getLocale, getMessages } from "next-intl/server";
 import type { PropsWithChildren } from "react";
 
 export default async function InvitationLayout({ children }: PropsWithChildren) {
-	const locale = await getLocale();
-	const messages = await getMessages();
+	const [locale, messages] = await Promise.all([getLocale(), getMessages()]);
 
 	return (
 		<Document locale={locale}>

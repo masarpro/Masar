@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { CashFlowReport } from "@saas/finance/components/reports/CashFlowReport";
 import { FinanceShell } from "@saas/finance/components/shell";
@@ -23,6 +24,16 @@ export default async function CashFlowPage({
 }) {
 	const { organizationSlug } = await params;
 
+	return (
+		<Suspense fallback={null}>
+			<CashFlowContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function CashFlowContent({
+	organizationSlug,
+}: { organizationSlug: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

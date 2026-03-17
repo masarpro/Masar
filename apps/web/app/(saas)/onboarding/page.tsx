@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { config } from "@repo/config";
 import {
 	getSession,
@@ -20,6 +21,14 @@ export async function generateMetadata() {
 }
 
 export default async function OnboardingPage() {
+	return (
+		<Suspense fallback={null}>
+			<OnboardingPageContent />
+		</Suspense>
+	);
+}
+
+async function OnboardingPageContent() {
 	const session = await getSession();
 
 	if (!session) {

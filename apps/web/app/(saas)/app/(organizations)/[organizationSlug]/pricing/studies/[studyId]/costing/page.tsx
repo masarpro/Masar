@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { StudyPageShell } from "@saas/pricing/components/studies/StudyPageShell";
@@ -19,6 +20,14 @@ export default async function CostingPage({
 }) {
 	const { organizationSlug, studyId } = await params;
 
+	return (
+		<Suspense fallback={null}>
+			<CostingPageContent organizationSlug={organizationSlug} studyId={studyId} />
+		</Suspense>
+	);
+}
+
+async function CostingPageContent({ organizationSlug, studyId }: { organizationSlug: string; studyId: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

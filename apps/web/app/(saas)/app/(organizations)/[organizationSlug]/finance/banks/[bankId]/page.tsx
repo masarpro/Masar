@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { BankDetail } from "@saas/finance/components/banks/BankDetail";
 import { FinanceShell } from "@saas/finance/components/shell";
+import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -22,8 +24,22 @@ export default async function BankDetailPage({
 	params: Promise<{ organizationSlug: string; bankId: string }>;
 }) {
 	const { organizationSlug, bankId } = await params;
-	const t = await getTranslations();
 
+	return (
+		<Suspense fallback={<DetailPageSkeleton />}>
+			<BankDetailContent
+				organizationSlug={organizationSlug}
+				bankId={bankId}
+			/>
+		</Suspense>
+	);
+}
+
+async function BankDetailContent({
+	organizationSlug,
+	bankId,
+}: { organizationSlug: string; bankId: string }) {
+	const t = await getTranslations();
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

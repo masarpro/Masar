@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -14,6 +15,16 @@ export default async function HRPage({
 	params: Promise<{ organizationSlug: string }>;
 }) {
 	const { organizationSlug } = await params;
+	return (
+		<Suspense fallback={null}>
+			<HRPageContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function HRPageContent({
+	organizationSlug,
+}: { organizationSlug: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) return notFound();

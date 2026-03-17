@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { FinanceShell } from "@saas/finance/components/shell";
+import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
 import { Skeleton } from "@ui/components/skeleton";
 import dynamic from "next/dynamic";
 const InvoiceView = dynamic(
@@ -31,6 +33,20 @@ export default async function ViewInvoicePage({
 }) {
 	const { organizationSlug, invoiceId } = await params;
 
+	return (
+		<Suspense fallback={<PreviewPageSkeleton />}>
+			<ViewInvoiceContent
+				organizationSlug={organizationSlug}
+				invoiceId={invoiceId}
+			/>
+		</Suspense>
+	);
+}
+
+async function ViewInvoiceContent({
+	organizationSlug,
+	invoiceId,
+}: { organizationSlug: string; invoiceId: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

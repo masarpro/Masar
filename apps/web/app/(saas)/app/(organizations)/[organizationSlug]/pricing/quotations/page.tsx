@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { QuotationsList } from "@saas/pricing/components/quotations/QuotationsList";
@@ -25,6 +26,14 @@ export default async function QuotationsPage({
 }) {
 	const { organizationSlug } = await params;
 
+	return (
+		<Suspense fallback={null}>
+			<QuotationsPageContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function QuotationsPageContent({ organizationSlug }: { organizationSlug: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

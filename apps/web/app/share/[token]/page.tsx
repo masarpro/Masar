@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { apiServer } from "@shared/lib/api-server";
 import { Card } from "@ui/components/card";
 import { Badge } from "@ui/components/badge";
@@ -35,6 +36,15 @@ export async function generateMetadata({ params }: SharePageProps) {
 
 export default async function SharePage({ params }: SharePageProps) {
 	const { token } = await params;
+
+	return (
+		<Suspense fallback={null}>
+			<SharePageContent token={token} />
+		</Suspense>
+	);
+}
+
+async function SharePageContent({ token }: { token: string }) {
 	const t = await getTranslations();
 
 	let resource;

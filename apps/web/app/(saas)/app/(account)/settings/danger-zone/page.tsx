@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getSession } from "@saas/auth/lib/server";
 import { DeleteAccountForm } from "@saas/settings/components/DeleteAccountForm";
 import { SettingsList } from "@saas/shared/components/SettingsList";
@@ -13,6 +14,14 @@ export async function generateMetadata() {
 }
 
 export default async function AccountSettingsPage() {
+	return (
+		<Suspense fallback={null}>
+			<AccountSettingsPageContent />
+		</Suspense>
+	);
+}
+
+async function AccountSettingsPageContent() {
 	const session = await getSession();
 
 	if (!session) {

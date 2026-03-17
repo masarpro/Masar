@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { notFound } from "next/navigation";
 import { Skeleton } from "@ui/components/skeleton";
@@ -26,6 +27,16 @@ export default async function SettingsCreateTemplatePage({
 }) {
 	const { organizationSlug } = await params;
 
+	return (
+		<Suspense fallback={null}>
+			<SettingsCreateTemplatePageContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function SettingsCreateTemplatePageContent({
+	organizationSlug,
+}: { organizationSlug: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { DocumentEditor } from "@saas/finance/components/documents/DocumentEditor";
 import { FinanceShell } from "@saas/finance/components/shell";
+import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -22,8 +24,22 @@ export default async function EditDocumentPage({
 	params: Promise<{ organizationSlug: string; documentId: string }>;
 }) {
 	const { organizationSlug, documentId } = await params;
-	const t = await getTranslations();
 
+	return (
+		<Suspense fallback={<DetailPageSkeleton />}>
+			<EditDocumentContent
+				organizationSlug={organizationSlug}
+				documentId={documentId}
+			/>
+		</Suspense>
+	);
+}
+
+async function EditDocumentContent({
+	organizationSlug,
+	documentId,
+}: { organizationSlug: string; documentId: string }) {
+	const t = await getTranslations();
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

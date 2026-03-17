@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { InvoicePreview } from "@saas/finance/components/invoices/InvoicePreview";
 import { FinanceShell } from "@saas/finance/components/shell";
+import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -23,6 +25,20 @@ export default async function InvoicePreviewPage({
 }) {
 	const { organizationSlug, invoiceId } = await params;
 
+	return (
+		<Suspense fallback={<PreviewPageSkeleton />}>
+			<InvoicePreviewContent
+				organizationSlug={organizationSlug}
+				invoiceId={invoiceId}
+			/>
+		</Suspense>
+	);
+}
+
+async function InvoicePreviewContent({
+	organizationSlug,
+	invoiceId,
+}: { organizationSlug: string; invoiceId: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

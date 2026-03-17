@@ -1,7 +1,9 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { getTranslations } from "next-intl/server";
-import { notFound } from "next/navigation";
 import { CompanyDashboard } from "@saas/company/components/dashboard/CompanyDashboard";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
+import { Suspense } from "react";
 
 export async function generateMetadata({
 	params,
@@ -18,6 +20,17 @@ export default async function CompanyPage({
 	params: Promise<{ organizationSlug: string }>;
 }) {
 	const { organizationSlug } = await params;
+
+	return (
+		<Suspense fallback={<DashboardSkeleton />}>
+			<CompanyPageContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function CompanyPageContent({
+	organizationSlug,
+}: { organizationSlug: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) return notFound();

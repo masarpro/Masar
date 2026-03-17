@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { createPurchasesHelper } from "@repo/payments/lib/helper";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { ActivePlan } from "@saas/payments/components/ActivePlan";
@@ -24,6 +25,15 @@ export default async function BillingSettingsPage({
 	params: Promise<{ organizationSlug: string }>;
 }) {
 	const { organizationSlug } = await params;
+
+	return (
+		<Suspense fallback={null}>
+			<BillingSettingsPageContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function BillingSettingsPageContent({ organizationSlug }: { organizationSlug: string }) {
 	const organization = await getActiveOrganization(organizationSlug);
 
 	if (!organization) {

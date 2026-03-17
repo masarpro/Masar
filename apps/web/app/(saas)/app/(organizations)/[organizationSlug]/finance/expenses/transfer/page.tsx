@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { TransferForm } from "@saas/finance/components/expenses/TransferForm";
 import { FinanceShell } from "@saas/finance/components/shell";
+import { FormPageSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -22,8 +24,18 @@ export default async function TransferPage({
 	params: Promise<{ organizationSlug: string }>;
 }) {
 	const { organizationSlug } = await params;
-	const t = await getTranslations();
 
+	return (
+		<Suspense fallback={<FormPageSkeleton />}>
+			<TransferContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function TransferContent({
+	organizationSlug,
+}: { organizationSlug: string }) {
+	const t = await getTranslations();
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

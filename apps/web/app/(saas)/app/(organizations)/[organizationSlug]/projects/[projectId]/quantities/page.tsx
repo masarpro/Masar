@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { Skeleton } from "@ui/components/skeleton";
 import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 
 const BOQOverview = dynamic(
 	() =>
@@ -34,6 +36,21 @@ export default async function QuantitiesPage({
 	params: Promise<{ organizationSlug: string; projectId: string }>;
 }) {
 	const { organizationSlug, projectId } = await params;
+
+	return (
+		<Suspense fallback={<DashboardSkeleton />}>
+			<QuantitiesPageContent organizationSlug={organizationSlug} projectId={projectId} />
+		</Suspense>
+	);
+}
+
+async function QuantitiesPageContent({
+	organizationSlug,
+	projectId,
+}: {
+	organizationSlug: string;
+	projectId: string;
+}) {
 	const activeOrganization = await getActiveOrganization(organizationSlug as string);
 	if (!activeOrganization) return notFound();
 

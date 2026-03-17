@@ -1,9 +1,11 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { FieldTimeline } from "@saas/projects/components/field/FieldTimeline";
 import { ExecutionDashboard } from "@saas/projects-execution/components";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 export async function generateMetadata() {
 	const t = await getTranslations();
@@ -20,6 +22,20 @@ export default async function ExecutionPage({
 }) {
 	const { organizationSlug, projectId } = await params;
 
+	return (
+		<Suspense fallback={<ListTableSkeleton rows={6} cols={4} />}>
+			<ExecutionPageContent organizationSlug={organizationSlug} projectId={projectId} />
+		</Suspense>
+	);
+}
+
+async function ExecutionPageContent({
+	organizationSlug,
+	projectId,
+}: {
+	organizationSlug: string;
+	projectId: string;
+}) {
 	const activeOrganization = await getActiveOrganization(
 		organizationSlug as string,
 	);

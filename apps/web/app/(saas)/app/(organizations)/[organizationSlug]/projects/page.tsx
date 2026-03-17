@@ -1,8 +1,10 @@
 import { getActiveOrganization, getSession } from "@saas/auth/lib/server";
 import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { ProjectsList } from "@saas/projects/components/ProjectsList";
+import { CardGridSkeleton } from "@saas/shared/components/skeletons";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { Suspense } from "react";
 
 export async function generateMetadata({
 	params,
@@ -22,6 +24,17 @@ export default async function ProjectsPage({
 	params: Promise<{ organizationSlug: string }>;
 }) {
 	const { organizationSlug } = await params;
+
+	return (
+		<Suspense fallback={<CardGridSkeleton />}>
+			<ProjectsPageContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function ProjectsPageContent({
+	organizationSlug,
+}: { organizationSlug: string }) {
 	const session = await getSession();
 
 	if (!session?.user) {

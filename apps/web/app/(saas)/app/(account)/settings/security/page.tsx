@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { config } from "@repo/config";
 import { userAccountQueryKey, userPasskeyQueryKey } from "@saas/auth/lib/api";
 import {
@@ -25,6 +26,14 @@ export async function generateMetadata() {
 }
 
 export default async function AccountSettingsPage() {
+	return (
+		<Suspense fallback={null}>
+			<AccountSecurityPageContent />
+		</Suspense>
+	);
+}
+
+async function AccountSecurityPageContent() {
 	const session = await getSession();
 
 	if (!session) {

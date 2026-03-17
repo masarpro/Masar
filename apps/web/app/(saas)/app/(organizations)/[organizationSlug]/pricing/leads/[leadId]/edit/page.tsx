@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { EditLeadPage } from "@saas/pricing/components/leads/EditLeadPage";
 import { PricingShell } from "@saas/pricing/components/shell";
@@ -23,6 +24,14 @@ export default async function EditLeadPageRoute({
 }) {
 	const { organizationSlug, leadId } = await params;
 
+	return (
+		<Suspense fallback={null}>
+			<EditLeadPageContent organizationSlug={organizationSlug} leadId={leadId} />
+		</Suspense>
+	);
+}
+
+async function EditLeadPageContent({ organizationSlug, leadId }: { organizationSlug: string; leadId: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

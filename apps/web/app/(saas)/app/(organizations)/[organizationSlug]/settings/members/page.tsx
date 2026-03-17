@@ -5,6 +5,8 @@ import { TeamManagementTabs } from "@saas/organizations/components/TeamManagemen
 import { SettingsList } from "@saas/shared/components/SettingsList";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { Suspense } from "react";
+
 export async function generateMetadata() {
 	const t = await getTranslations();
 
@@ -18,9 +20,22 @@ export default async function OrganizationSettingsPage({
 }: {
 	params: Promise<{ organizationSlug: string }>;
 }) {
-	const session = await getSession();
 	const { organizationSlug } = await params;
-	const organization = await getActiveOrganization(organizationSlug);
+
+	return (
+		<Suspense fallback={null}>
+			<OrganizationSettingsContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function OrganizationSettingsContent({
+	organizationSlug,
+}: { organizationSlug: string }) {
+	const [session, organization] = await Promise.all([
+		getSession(),
+		getActiveOrganization(organizationSlug),
+	]);
 
 	if (!organization) {
 		return notFound();

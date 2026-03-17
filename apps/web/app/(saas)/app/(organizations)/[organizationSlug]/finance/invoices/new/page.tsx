@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { FinanceShell } from "@saas/finance/components/shell";
+import { FormPageSkeleton } from "@saas/shared/components/skeletons";
 import { Skeleton } from "@ui/components/skeleton";
 import dynamic from "next/dynamic";
 const CreateInvoiceForm = dynamic(
@@ -30,8 +32,18 @@ export default async function CreateInvoicePage({
 	params: Promise<{ organizationSlug: string }>;
 }) {
 	const { organizationSlug } = await params;
-	const t = await getTranslations();
 
+	return (
+		<Suspense fallback={<FormPageSkeleton />}>
+			<CreateInvoiceContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function CreateInvoiceContent({
+	organizationSlug,
+}: { organizationSlug: string }) {
+	const t = await getTranslations();
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

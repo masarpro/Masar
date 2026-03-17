@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { auth } from "@repo/auth";
 import { OrganizationForm } from "@saas/admin/component/organizations/OrganizationForm";
 import { getAdminPath } from "@saas/admin/lib/links";
@@ -20,6 +21,17 @@ export default async function OrganizationFormPage({
 	const { id } = await params;
 	const { backTo } = await searchParams;
 
+	return (
+		<Suspense fallback={null}>
+			<OrganizationFormPageContent id={id} backTo={backTo} />
+		</Suspense>
+	);
+}
+
+async function OrganizationFormPageContent({
+	id,
+	backTo,
+}: { id: string; backTo?: string }) {
 	const t = await getTranslations();
 	const queryClient = getServerQueryClient();
 

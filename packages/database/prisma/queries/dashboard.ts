@@ -405,57 +405,47 @@ export async function getMonthlyFinancialTrend(organizationId: string) {
 	const sixMonthsAgo = new Date();
 	sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-	const [expenses, claims] = await Promise.all([
-		db.projectExpense.findMany({
-			where: {
-				organizationId,
-				date: { gte: sixMonthsAgo },
-			},
-			select: {
-				date: true,
-				amount: true,
-			},
-		}),
-		db.projectClaim.findMany({
-			where: {
-				organizationId,
-				createdAt: { gte: sixMonthsAgo },
-			},
-			select: {
-				createdAt: true,
-				amount: true,
-				status: true,
-			},
-		}),
+	// Aggregate by month at the database level instead of fetching all rows
+	const [expensesByMonth, claimsByMonth] = await Promise.all([
+		db.$queryRaw<Array<{ month: string; total: number }>>`
+			SELECT
+				TO_CHAR(date, 'YYYY-MM') as month,
+				SUM(amount)::double precision as total
+			FROM project_expenses
+			WHERE organization_id = ${organizationId}
+			AND date >= ${sixMonthsAgo}
+			GROUP BY TO_CHAR(date, 'YYYY-MM')
+		`,
+		db.$queryRaw<Array<{ month: string; total: number }>>`
+			SELECT
+				TO_CHAR(created_at, 'YYYY-MM') as month,
+				SUM(amount)::double precision as total
+			FROM project_claims
+			WHERE organization_id = ${organizationId}
+			AND created_at >= ${sixMonthsAgo}
+			AND status = 'PAID'
+			GROUP BY TO_CHAR(created_at, 'YYYY-MM')
+		`,
 	]);
 
-	// Group by month
+	// Merge results from both queries
 	const monthlyData = new Map<string, { expenses: number; claims: number }>();
 
-	for (const expense of expenses) {
-		const monthKey = `${expense.date.getFullYear()}-${String(expense.date.getMonth() + 1).padStart(2, "0")}`;
-		const current = monthlyData.get(monthKey) ?? { expenses: 0, claims: 0 };
-		current.expenses += Number(expense.amount);
-		monthlyData.set(monthKey, current);
+	for (const row of expensesByMonth) {
+		monthlyData.set(row.month, { expenses: row.total ?? 0, claims: 0 });
 	}
 
-	for (const claim of claims) {
-		if (claim.status === "PAID") {
-			const monthKey = `${claim.createdAt.getFullYear()}-${String(claim.createdAt.getMonth() + 1).padStart(2, "0")}`;
-			const current = monthlyData.get(monthKey) ?? { expenses: 0, claims: 0 };
-			current.claims += Number(claim.amount);
-			monthlyData.set(monthKey, current);
-		}
+	for (const row of claimsByMonth) {
+		const current = monthlyData.get(row.month) ?? { expenses: 0, claims: 0 };
+		current.claims = row.total ?? 0;
+		monthlyData.set(row.month, current);
 	}
 
-	// Convert to array and sort
-	const result = Array.from(monthlyData.entries())
+	return Array.from(monthlyData.entries())
 		.map(([month, data]) => ({
 			month,
 			expenses: data.expenses,
 			claims: data.claims,
 		}))
 		.sort((a, b) => a.month.localeCompare(b.month));
-
-	return result;
 }

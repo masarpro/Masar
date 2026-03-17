@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { ReceiptVoucher } from "@saas/finance/components/payments/ReceiptVoucher";
 import { FinanceShell } from "@saas/finance/components/shell";
+import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -22,8 +24,22 @@ export default async function ReceiptPage({
 	params: Promise<{ organizationSlug: string; paymentId: string }>;
 }) {
 	const { organizationSlug, paymentId } = await params;
-	const t = await getTranslations();
 
+	return (
+		<Suspense fallback={<PreviewPageSkeleton />}>
+			<ReceiptContent
+				organizationSlug={organizationSlug}
+				paymentId={paymentId}
+			/>
+		</Suspense>
+	);
+}
+
+async function ReceiptContent({
+	organizationSlug,
+	paymentId,
+}: { organizationSlug: string; paymentId: string }) {
+	const t = await getTranslations();
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

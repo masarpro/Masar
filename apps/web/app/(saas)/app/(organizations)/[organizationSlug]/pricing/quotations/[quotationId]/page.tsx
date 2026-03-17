@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { QuotationStudyBanner } from "@saas/pricing/components/quotation-builder/QuotationStudyBanner";
 import { Skeleton } from "@ui/components/skeleton";
@@ -32,6 +33,14 @@ export default async function EditQuotationPage({
 }) {
 	const { organizationSlug, quotationId } = await params;
 
+	return (
+		<Suspense fallback={null}>
+			<EditQuotationPageContent organizationSlug={organizationSlug} quotationId={quotationId} />
+		</Suspense>
+	);
+}
+
+async function EditQuotationPageContent({ organizationSlug, quotationId }: { organizationSlug: string; quotationId: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

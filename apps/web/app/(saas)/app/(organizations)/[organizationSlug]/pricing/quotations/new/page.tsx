@@ -32,6 +32,16 @@ export default async function CreateQuotationPage({
 }) {
 	const { organizationSlug } = await params;
 
+	return (
+		<Suspense fallback={null}>
+			<CreateQuotationPageContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function CreateQuotationPageContent({
+	organizationSlug,
+}: { organizationSlug: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

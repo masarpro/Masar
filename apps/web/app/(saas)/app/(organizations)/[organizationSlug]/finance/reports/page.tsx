@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { FinanceReports } from "@saas/finance/components/reports/FinanceReports";
 import { FinanceShell } from "@saas/finance/components/shell";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -23,6 +25,16 @@ export default async function ReportsPage({
 }) {
 	const { organizationSlug } = await params;
 
+	return (
+		<Suspense fallback={<DashboardSkeleton />}>
+			<ReportsPageContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function ReportsPageContent({
+	organizationSlug,
+}: { organizationSlug: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

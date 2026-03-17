@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { auth } from "@repo/auth";
 import { getOrganizationById } from "@repo/database";
 import { OrganizationInvitationModal } from "@saas/organizations/components/OrganizationInvitationModal";
@@ -12,6 +13,16 @@ export default async function OrganizationInvitationPage({
 }) {
 	const { invitationId } = await params;
 
+	return (
+		<Suspense fallback={null}>
+			<OrganizationInvitationPageContent invitationId={invitationId} />
+		</Suspense>
+	);
+}
+
+async function OrganizationInvitationPageContent({
+	invitationId,
+}: { invitationId: string }) {
 	const invitation = await auth.api.getInvitation({
 		query: {
 			id: invitationId,

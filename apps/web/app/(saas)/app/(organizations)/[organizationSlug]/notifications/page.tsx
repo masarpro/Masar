@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { NotificationsList } from "@saas/projects/components/NotificationsList";
 import { notFound } from "next/navigation";
@@ -18,6 +19,16 @@ export default async function NotificationsPage({
 }) {
 	const { organizationSlug } = await params;
 
+	return (
+		<Suspense fallback={null}>
+			<NotificationsPageContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function NotificationsPageContent({
+	organizationSlug,
+}: { organizationSlug: string }) {
 	const activeOrganization = await getActiveOrganization(
 		organizationSlug as string,
 	);

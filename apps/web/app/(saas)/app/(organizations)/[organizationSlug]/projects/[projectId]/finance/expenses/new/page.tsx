@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { ExpenseForm } from "@saas/finance/components/expenses/ExpenseForm";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { FormPageSkeleton } from "@saas/shared/components/skeletons";
 
 export async function generateMetadata() {
 	const t = await getTranslations();
@@ -18,6 +20,20 @@ export default async function NewProjectExpensePage({
 }) {
 	const { organizationSlug, projectId } = await params;
 
+	return (
+		<Suspense fallback={<FormPageSkeleton />}>
+			<NewProjectExpensePageContent organizationSlug={organizationSlug} projectId={projectId} />
+		</Suspense>
+	);
+}
+
+async function NewProjectExpensePageContent({
+	organizationSlug,
+	projectId,
+}: {
+	organizationSlug: string;
+	projectId: string;
+}) {
 	const activeOrganization = await getActiveOrganization(
 		organizationSlug as string,
 	);

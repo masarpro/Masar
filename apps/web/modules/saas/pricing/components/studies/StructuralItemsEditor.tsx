@@ -13,7 +13,15 @@ const BOQSummaryTable = dynamic(
 		import("./BOQSummaryTable").then((m) => ({
 			default: m.BOQSummaryTable,
 		})),
-	{ ssr: false },
+	{
+		ssr: false,
+		loading: () => (
+			<div className="space-y-3 p-4 border rounded-lg animate-pulse">
+				<div className="h-8 bg-muted rounded w-1/3" />
+				<div className="h-64 bg-muted rounded" />
+			</div>
+		),
+	},
 );
 import { StructuralBuildingWizard } from "./StructuralBuildingWizard";
 import { StructuralBuildingConfigBar } from "./StructuralBuildingConfigBar";

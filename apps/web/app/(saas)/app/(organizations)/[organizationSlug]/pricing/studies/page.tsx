@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { QuantitiesList } from "@saas/pricing/components/studies/QuantitiesList";
@@ -24,6 +25,14 @@ export default async function StudiesPage({
 }) {
 	const { organizationSlug } = await params;
 
+	return (
+		<Suspense fallback={null}>
+			<StudiesPageContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function StudiesPageContent({ organizationSlug }: { organizationSlug: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

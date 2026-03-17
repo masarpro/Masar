@@ -12,26 +12,23 @@ export default async function ProjectLayout({
 }: PropsWithChildren<{
 	params: Promise<{ organizationSlug: string; projectId: string }>;
 }>) {
-	// Run session and params resolution in parallel
-	const [session, { organizationSlug, projectId }] = await Promise.all([
+	const { organizationSlug, projectId } = await params;
+
+	// Stage 1: Session + organization in parallel (both React.cache'd)
+	const [session, organization] = await Promise.all([
 		getSession(),
-		params,
+		getActiveOrganization(organizationSlug),
 	]);
 
-	if (!session?.user) {
-		redirect("/auth/login");
-	}
+	if (!session?.user) redirect("/auth/login");
+	if (!organization) redirect("/app");
 
-	const organization = await getActiveOrganization(organizationSlug);
-
-	if (!organization) {
-		redirect("/app");
-	}
-
-	// Run project fetch and role check in parallel
-	const [project, projectMemberRole] = await Promise.all([
+	// Stage 2: Project data + role + permissions all in parallel
+	// Always fetch permissions (cheap indexed query) to avoid conditional Stage 3
+	const [project, projectMemberRole, permissions] = await Promise.all([
 		getProjectById(projectId, organization.id),
 		getProjectMemberRole(projectId, session.user.id),
+		getEffectivePermissions(session.user.id, organization.id),
 	]);
 
 	if (!project) {
@@ -43,11 +40,8 @@ export default async function ProjectLayout({
 	let userRole: ProjectRole = "VIEWER";
 	if (projectMemberRole) {
 		userRole = projectMemberRole as ProjectRole;
-	} else {
-		const permissions = await getEffectivePermissions(session.user.id, organization.id);
-		if (hasPermission(permissions, "projects", "manageTeam")) {
-			userRole = "MANAGER";
-		}
+	} else if (hasPermission(permissions, "projects", "manageTeam")) {
+		userRole = "MANAGER";
 	}
 
 	// Transform project data for the shell

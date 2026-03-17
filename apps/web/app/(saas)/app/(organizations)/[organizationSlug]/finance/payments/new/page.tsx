@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PaymentForm } from "@saas/finance/components/payments/PaymentForm";
 import { FinanceShell } from "@saas/finance/components/shell";
+import { FormPageSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -25,8 +27,31 @@ export default async function NewPaymentPage({
 }) {
 	const { organizationSlug } = await params;
 	const { clientId, projectId, invoiceId } = await searchParams;
-	const t = await getTranslations();
 
+	return (
+		<Suspense fallback={<FormPageSkeleton />}>
+			<NewPaymentContent
+				organizationSlug={organizationSlug}
+				clientId={clientId}
+				projectId={projectId}
+				invoiceId={invoiceId}
+			/>
+		</Suspense>
+	);
+}
+
+async function NewPaymentContent({
+	organizationSlug,
+	clientId,
+	projectId,
+	invoiceId,
+}: {
+	organizationSlug: string;
+	clientId?: string;
+	projectId?: string;
+	invoiceId?: string;
+}) {
+	const t = await getTranslations();
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { ClientsList } from "@saas/finance/components/clients/ClientsList";
 import { FinanceShell } from "@saas/finance/components/shell";
 import { ClientsHeaderActions } from "@saas/finance/components/clients/ClientsHeaderActions";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -24,6 +26,16 @@ export default async function ClientsPage({
 }) {
 	const { organizationSlug } = await params;
 
+	return (
+		<Suspense fallback={<ListTableSkeleton />}>
+			<ClientsPageContent organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function ClientsPageContent({
+	organizationSlug,
+}: { organizationSlug: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
 
 	if (!activeOrganization) {

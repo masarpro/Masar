@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { config } from "@repo/config";
 import { getOrganizationList } from "@saas/auth/lib/server";
 import { CreateOrganizationForm } from "@saas/organizations/components/CreateOrganizationForm";
@@ -7,6 +8,14 @@ import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 export default async function NewOrganizationPage() {
+	return (
+		<Suspense fallback={null}>
+			<NewOrganizationPageContent />
+		</Suspense>
+	);
+}
+
+async function NewOrganizationPageContent() {
 	// Block access when auto-create is enabled
 	if (config.organizations.autoCreateOnSignup) {
 		redirect("/app");

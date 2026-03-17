@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { Skeleton } from "@ui/components/skeleton";
 import dynamic from "next/dynamic";
@@ -30,6 +31,21 @@ export default async function StudiesPage({
 	params: Promise<{ organizationSlug: string; projectId: string }>;
 }) {
 	const { organizationSlug, projectId } = await params;
+
+	return (
+		<Suspense fallback={null}>
+			<StudiesPageContent organizationSlug={organizationSlug} projectId={projectId} />
+		</Suspense>
+	);
+}
+
+async function StudiesPageContent({
+	organizationSlug,
+	projectId,
+}: {
+	organizationSlug: string;
+	projectId: string;
+}) {
 	const activeOrganization = await getActiveOrganization(organizationSlug as string);
 	if (!activeOrganization) return notFound();
 

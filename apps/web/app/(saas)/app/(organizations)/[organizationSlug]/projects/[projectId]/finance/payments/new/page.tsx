@@ -3,6 +3,7 @@ import { getActiveOrganization } from "@saas/auth/lib/server";
 import { ProjectPaymentForm } from "@saas/projects/components/finance/ProjectPaymentForm";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { FormPageSkeleton } from "@saas/shared/components/skeletons";
 
 export async function generateMetadata() {
 	const t = await getTranslations();
@@ -19,6 +20,20 @@ export default async function NewProjectPaymentPage({
 }) {
 	const { organizationSlug, projectId } = await params;
 
+	return (
+		<Suspense fallback={<FormPageSkeleton />}>
+			<NewProjectPaymentPageContent organizationSlug={organizationSlug} projectId={projectId} />
+		</Suspense>
+	);
+}
+
+async function NewProjectPaymentPageContent({
+	organizationSlug,
+	projectId,
+}: {
+	organizationSlug: string;
+	projectId: string;
+}) {
 	const activeOrganization = await getActiveOrganization(
 		organizationSlug as string,
 	);
@@ -31,14 +46,12 @@ export default async function NewProjectPaymentPage({
 
 	return (
 		<div>
-			<Suspense>
-				<ProjectPaymentForm
-					organizationId={activeOrganization.id}
-					organizationSlug={organizationSlug}
-					projectId={projectId}
-					redirectPath={redirectPath}
-				/>
-			</Suspense>
+			<ProjectPaymentForm
+				organizationId={activeOrganization.id}
+				organizationSlug={organizationSlug}
+				projectId={projectId}
+				redirectPath={redirectPath}
+			/>
 		</div>
 	);
 }
