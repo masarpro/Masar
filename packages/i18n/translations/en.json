@@ -1445,7 +1445,15 @@
       "manageCompany": "Establishment",
       "company": "Company",
       "documents": "Documents",
-      "files": "Files"
+      "files": "Files",
+      "overdueMilestones": "{count} overdue milestones in your projects",
+      "expiringQuotation": "Quotation #{number} expires in {days} days",
+      "upcomingPayment": "Payment due from project {project}",
+      "review": "Review",
+      "followUp": "Follow up",
+      "record": "Record",
+      "view": "View",
+      "openIssues": "{count} open issues in your projects"
     },
     "cashFlow": {
       "title": "Cash Flow — Last 7 Days",
@@ -1512,6 +1520,30 @@
         "zatcaInfo": "Complete billing info",
         "firstQuantity": "Add first quantity"
       }
+    },
+    "journey": {
+      "step1": "Company Info",
+      "step2": "First Project",
+      "step3": "First Invoice",
+      "step4": "Invite Team",
+      "step5": "AI Assistant",
+      "step6": "First QS Study",
+      "counter": "{completed} of {total}"
+    },
+    "cashflow": {
+      "empty": "No financial activity yet",
+      "emptyCta": "Create your first invoice to start tracking"
+    },
+    "learn": {
+      "title": "Learn About Masar",
+      "pricing": "How to price your project",
+      "pricing.desc": "Step-by-step guide",
+      "invoices": "Invoice & collection management",
+      "invoices.desc": "Complete financial system",
+      "ai": "Try the AI assistant",
+      "ai.desc": "6 smart tools",
+      "support": "Contact us",
+      "support.desc": "Support team"
     },
     "stats": {
       "bankBalance": {

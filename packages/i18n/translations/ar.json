@@ -1445,7 +1445,15 @@
       "manageCompany": "المنشأة",
       "company": "الشركة",
       "documents": "المستندات",
-      "files": "الملفات"
+      "files": "الملفات",
+      "overdueMilestones": "{count} مراحل متأخرة في مشاريعك",
+      "expiringQuotation": "عرض سعر #{number} ينتهي خلال {days} أيام",
+      "upcomingPayment": "دفعة مستحقة من مشروع {project}",
+      "review": "مراجعة",
+      "followUp": "متابعة",
+      "record": "تسجيل",
+      "view": "عرض",
+      "openIssues": "{count} مشاكل مفتوحة في مشاريعك"
     },
     "cashFlow": {
       "title": "التدفق النقدي — آخر ٧ أيام",
@@ -1512,6 +1520,30 @@
         "zatcaInfo": "إكمال بيانات الفوترة",
         "firstQuantity": "إضافة أول كمية"
       }
+    },
+    "journey": {
+      "step1": "بيانات المنشأة",
+      "step2": "أول مشروع",
+      "step3": "أول فاتورة",
+      "step4": "دعوة الفريق",
+      "step5": "المساعد الذكي",
+      "step6": "أول دراسة كميات",
+      "counter": "{completed} من {total}"
+    },
+    "cashflow": {
+      "empty": "لا توجد حركات مالية بعد",
+      "emptyCta": "أنشئ أول فاتورة لبدء التتبع"
+    },
+    "learn": {
+      "title": "تعرّف على مسار",
+      "pricing": "كيف تسعّر مشروعك",
+      "pricing.desc": "دليل خطوة بخطوة",
+      "invoices": "إدارة الفواتير والتحصيل",
+      "invoices.desc": "نظام مالي متكامل",
+      "ai": "جرّب المساعد الذكي",
+      "ai.desc": "6 أدوات ذكية",
+      "support": "تواصل معنا",
+      "support.desc": "فريق الدعم"
     },
     "stats": {
       "bankBalance": {
