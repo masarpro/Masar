@@ -1521,6 +1521,14 @@
         "firstQuantity": "Add first quantity"
       }
     },
+    "header": {
+      "welcome": {
+        "start": "Welcome! Complete the following steps to get started",
+        "progress": "Great! You've completed {completed} of {total} steps — keep going",
+        "almost": "Almost there! Only {remaining} steps left"
+      },
+      "greeting": "Welcome, {name}!"
+    },
     "journey": {
       "step1": "Company Info",
       "step2": "First Project",

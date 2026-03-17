@@ -5,18 +5,19 @@ import { HomeDashboardSkeleton } from "@saas/shared/components/skeletons";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Currency } from "@saas/finance/components/shared/Currency";
 import { CircleProgress } from "./CircleProgress";
-import { JourneyFlow } from "./JourneyFlow";
+import { JourneyFlow, useJourneySteps } from "./JourneyFlow";
 import { CashFlowMini } from "./CashFlowMini";
 import { DashboardTips } from "./DashboardTips";
-import { LearnMasar } from "./LearnMasar";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
+import { useSession } from "@saas/auth/hooks/use-session";
 import { Badge } from "@ui/components/badge";
 import {
 	AlertTriangle,
 	ArrowDownRight,
 	ArrowUpLeft,
 	Bell,
+	BookOpen,
 	Calculator,
 	CheckCircle2,
 	ChevronLeft,
@@ -24,6 +25,7 @@ import {
 	Clock,
 	FilePlus2,
 	HardHat,
+	HeadphonesIcon,
 	Landmark,
 	Lightbulb,
 	Plus,
@@ -87,8 +89,12 @@ interface SuggestedAction {
 export function Dashboard() {
 	const t = useTranslations();
 	const { activeOrganization } = useActiveOrganization();
+	const { user } = useSession();
 	const organizationSlug = activeOrganization?.slug ?? "";
 	const organizationId = activeOrganization?.id ?? "";
+	const orgName = activeOrganization?.name ?? "";
+	const userName = user?.name ?? "";
+	const { completedCount, totalCount, incompleteSteps } = useJourneySteps();
 
 	// Combined dashboard data — single API call for stats + activities + upcoming
 	const { data: dashboardData, isLoading: statsLoading } = useQuery({
@@ -392,12 +398,108 @@ export function Dashboard() {
 	const hiddenActions = new Set(["dailyReport", "manageCompany"]);
 	const visibleQuickActions = quickActions.filter((a) => !hiddenActions.has(a.id));
 
+	// Dynamic welcome message
+	const welcomeMessage = (() => {
+		if (completedCount === 0) return t("dashboard.header.welcome.start");
+		if (completedCount < 3)
+			return t("dashboard.header.welcome.progress", {
+				completed: completedCount,
+				total: totalCount,
+			});
+		if (completedCount < totalCount)
+			return t("dashboard.header.welcome.almost", {
+				remaining: totalCount - completedCount,
+			});
+		return "";
+	})();
+
+	// Quick links for new user header (first 2 incomplete steps + 2 learn links)
+	const learnLinks = [
+		{
+			icon: BookOpen,
+			text: t("dashboard.learn.pricing"),
+			href: `/app/${organizationSlug}/pricing/studies`,
+			type: "learn" as const,
+		},
+		{
+			icon: HeadphonesIcon,
+			text: t("dashboard.learn.support"),
+			href: "mailto:support@app-masar.com",
+			type: "learn" as const,
+		},
+	];
+
+	const headerQuickLinks = [
+		...incompleteSteps.map((s) => ({
+			icon: ChevronLeft, // placeholder — overridden by text
+			text: t(s.labelKey),
+			href: s.href,
+			type: "step" as const,
+		})),
+		...learnLinks,
+	].slice(0, 4);
+
+	// Formatted date for active user header
+	const formattedDate = new Date().toLocaleDateString("ar-SA", {
+		weekday: "long",
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
+
 	return (
 		<div className="space-y-4" dir="rtl">
-			{/* ═══ 1. JOURNEY FLOW — new user only ═══ */}
-			{isNewUser && <JourneyFlow />}
+			{/* ═══ SMART HEADER ═══ */}
+			{isNewUser ? (
+				<div className="rounded-2xl border border-blue-100/50 bg-gradient-to-l from-blue-50/40 to-sky-50/20 p-5 dark:border-blue-900/20 dark:from-blue-950/10 dark:to-sky-950/5 animate-in fade-in slide-in-from-top-3 duration-500">
+					<div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
+						{/* Right side: org name + message + JourneyFlow */}
+						<div className="flex-1 min-w-0">
+							<h1 className="text-lg font-bold text-foreground">{orgName}</h1>
+							<p className="text-sm text-muted-foreground mt-1">
+								{welcomeMessage}
+							</p>
+							<div className="mt-3">
+								<JourneyFlow compact />
+							</div>
+						</div>
 
-			{/* ═══ 2. KPI CARDS — always (with CTAs at zero) ═══ */}
+						{/* Left side: quick links */}
+						<div className="flex flex-col gap-1.5 lg:w-48 shrink-0">
+							{headerQuickLinks.map((link, i) => (
+								<Link
+									key={i}
+									href={link.href}
+									className="flex items-center gap-2 text-xs py-1.5 px-2 rounded-lg hover:bg-white/60 dark:hover:bg-white/5 transition-colors"
+								>
+									<span
+										className={`font-medium flex-1 ${
+											link.type === "step"
+												? "text-blue-700 dark:text-blue-400"
+												: "text-muted-foreground"
+										}`}
+									>
+										{link.text}
+									</span>
+									<ChevronLeft className="h-3 w-3 text-gray-300 shrink-0" />
+								</Link>
+							))}
+						</div>
+					</div>
+				</div>
+			) : (
+				<div className="flex items-center justify-between px-1">
+					<div>
+						<h1 className="text-lg font-bold text-foreground">{orgName}</h1>
+						<p className="text-sm text-muted-foreground mt-0.5">
+							{t("dashboard.header.greeting", { name: userName })}
+						</p>
+					</div>
+					<span className="text-xs text-muted-foreground">{formattedDate}</span>
+				</div>
+			)}
+
+			{/* ═══ KPI CARDS — always (with CTAs at zero) ═══ */}
 			<div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
 				{kpis.map((kpi, i) => {
 					const Icon = kpi.icon;
@@ -633,118 +735,114 @@ export function Dashboard() {
 					</div>
 				</div>
 
-				{/* Left: LearnMasar (new user) or RecentActivity (active user) */}
-				{isNewUser ? (
-					<LearnMasar organizationSlug={organizationSlug} />
-				) : (
-					<div
-						className={`${glassCard} flex flex-col overflow-hidden p-4 animate-in fade-in slide-in-from-bottom-3 duration-500`}
-						style={{ animationDelay: "520ms", maxHeight: 280 }}
-					>
-						<div className="flex items-center justify-between mb-3">
-							<div className="flex items-center gap-1.5">
-								<Bell className="h-3.5 w-3.5 text-muted-foreground" />
-								<span className="text-[11px] font-semibold text-muted-foreground">
-									{t("dashboard.recentActivity.title")}
-								</span>
-							</div>
-							<Link
-								href={`/app/${organizationSlug}/projects`}
-								className="flex items-center gap-1 text-[10px] text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 px-2 py-1 rounded-md hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors"
-							>
-								<span>{t("dashboard.viewAll")}</span>
-								<ChevronLeft className="h-3 w-3" />
-							</Link>
+				{/* Left: Recent Activity + Upcoming (always) */}
+				<div
+					className={`${glassCard} flex flex-col overflow-hidden p-4 animate-in fade-in slide-in-from-bottom-3 duration-500`}
+					style={{ animationDelay: "520ms", maxHeight: 280 }}
+				>
+					<div className="flex items-center justify-between mb-3">
+						<div className="flex items-center gap-1.5">
+							<Bell className="h-3.5 w-3.5 text-muted-foreground" />
+							<span className="text-[11px] font-semibold text-muted-foreground">
+								{t("dashboard.recentActivity.title")}
+							</span>
 						</div>
+						<Link
+							href={`/app/${organizationSlug}/projects`}
+							className="flex items-center gap-1 text-[10px] text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 px-2 py-1 rounded-md hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors"
+						>
+							<span>{t("dashboard.viewAll")}</span>
+							<ChevronLeft className="h-3 w-3" />
+						</Link>
+					</div>
 
-						{/* Activities List */}
-						<div className="flex-1 space-y-1 overflow-hidden">
-							{activities && activities.length > 0 ? (
-								activities.slice(0, 4).map((activity: Activity, idx: number) => {
-									const iconConfig = {
-										change_order: {
-											bg: "bg-amber-50 dark:bg-amber-900/20",
-											color: "text-amber-500",
-											icon: TrendingUp,
-										},
-										claim: {
-											bg: "bg-sky-50 dark:bg-sky-900/20",
-											color: "text-sky-500",
-											icon: Receipt,
-										},
-										issue: {
-											bg: "bg-red-50 dark:bg-red-900/20",
-											color: "text-red-500",
-											icon: AlertTriangle,
-										},
-									};
-									const config = iconConfig[activity.type] ?? iconConfig.issue;
-									const ActivityIcon = config.icon;
-									return (
-										<div
-											key={`${activity.type}-${activity.id}-${idx}`}
-											className="flex items-start gap-2 py-2 border-b border-border/50 last:border-0 animate-in fade-in slide-in-from-right-2 duration-300"
-											style={{ animationDelay: `${560 + idx * 50}ms` }}
-										>
-											<div
-												className={`w-6 h-6 rounded-md ${config.bg} flex items-center justify-center shrink-0`}
-											>
-												<ActivityIcon className={`h-3 w-3 ${config.color}`} />
-											</div>
-											<div className="min-w-0">
-												<p className="text-[10px] font-medium text-foreground/80 truncate">
-													{activity.title}
-												</p>
-												<p className="text-[8px] text-muted-foreground">
-													{formatRelativeTime(activity.createdAt)}
-												</p>
-											</div>
-										</div>
-									);
-								})
-							) : (
-								<p className="text-center text-[11px] text-muted-foreground py-4">
-									{t("dashboard.noRecentActivities")}
-								</p>
-							)}
-						</div>
-
-						{/* Upcoming Milestones */}
-						<div className="mt-3 pt-3 border-t border-border/50">
-							<div className="flex items-center gap-1.5 mb-2">
-								<Clock className="h-3 w-3 text-muted-foreground" />
-								<span className="text-[10px] font-semibold text-muted-foreground">
-									{t("dashboard.upcomingPayments.title")}
-								</span>
-							</div>
-							{upcomingMilestones && upcomingMilestones.length > 0 ? (
-								upcomingMilestones.slice(0, 2).map((m) => (
-									<Link
-										key={m.id}
-										href={`/app/${organizationSlug}/projects/${m.project.id}/execution`}
-										className="flex items-center justify-between p-2 rounded-md bg-muted/40 mb-1.5 hover:bg-muted/60 transition-colors"
+					{/* Activities List */}
+					<div className="flex-1 space-y-1 overflow-hidden">
+						{activities && activities.length > 0 ? (
+							activities.slice(0, 4).map((activity: Activity, idx: number) => {
+								const iconConfig = {
+									change_order: {
+										bg: "bg-amber-50 dark:bg-amber-900/20",
+										color: "text-amber-500",
+										icon: TrendingUp,
+									},
+									claim: {
+										bg: "bg-sky-50 dark:bg-sky-900/20",
+										color: "text-sky-500",
+										icon: Receipt,
+									},
+									issue: {
+										bg: "bg-red-50 dark:bg-red-900/20",
+										color: "text-red-500",
+										icon: AlertTriangle,
+									},
+								};
+								const config = iconConfig[activity.type] ?? iconConfig.issue;
+								const ActivityIcon = config.icon;
+								return (
+									<div
+										key={`${activity.type}-${activity.id}-${idx}`}
+										className="flex items-start gap-2 py-2 border-b border-border/50 last:border-0 animate-in fade-in slide-in-from-right-2 duration-300"
+										style={{ animationDelay: `${560 + idx * 50}ms` }}
 									>
-										<div>
-											<p className="text-[10px] font-semibold text-foreground/80">
-												{m.project.name}
+										<div
+											className={`w-6 h-6 rounded-md ${config.bg} flex items-center justify-center shrink-0`}
+										>
+											<ActivityIcon className={`h-3 w-3 ${config.color}`} />
+										</div>
+										<div className="min-w-0">
+											<p className="text-[10px] font-medium text-foreground/80 truncate">
+												{activity.title}
 											</p>
 											<p className="text-[8px] text-muted-foreground">
-												{m.title} — {m.plannedEnd ? formatDate(m.plannedEnd) : ""}
+												{formatRelativeTime(activity.createdAt)}
 											</p>
 										</div>
-										<span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
-											{Number(m.progress)}%
-										</span>
-									</Link>
-								))
-							) : (
-								<p className="text-center text-[10px] text-muted-foreground py-2">
-									{t("dashboard.noUpcomingMilestones")}
-								</p>
-							)}
-						</div>
+									</div>
+								);
+							})
+						) : (
+							<p className="text-center text-[11px] text-muted-foreground py-4">
+								{t("dashboard.noRecentActivities")}
+							</p>
+						)}
 					</div>
-				)}
+
+					{/* Upcoming Milestones */}
+					<div className="mt-3 pt-3 border-t border-border/50">
+						<div className="flex items-center gap-1.5 mb-2">
+							<Clock className="h-3 w-3 text-muted-foreground" />
+							<span className="text-[10px] font-semibold text-muted-foreground">
+								{t("dashboard.upcomingPayments.title")}
+							</span>
+						</div>
+						{upcomingMilestones && upcomingMilestones.length > 0 ? (
+							upcomingMilestones.slice(0, 2).map((m) => (
+								<Link
+									key={m.id}
+									href={`/app/${organizationSlug}/projects/${m.project.id}/execution`}
+									className="flex items-center justify-between p-2 rounded-md bg-muted/40 mb-1.5 hover:bg-muted/60 transition-colors"
+								>
+									<div>
+										<p className="text-[10px] font-semibold text-foreground/80">
+											{m.project.name}
+										</p>
+										<p className="text-[8px] text-muted-foreground">
+											{m.title} — {m.plannedEnd ? formatDate(m.plannedEnd) : ""}
+										</p>
+									</div>
+									<span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
+										{Number(m.progress)}%
+									</span>
+								</Link>
+							))
+						) : (
+							<p className="text-center text-[10px] text-muted-foreground py-2">
+								{t("dashboard.noUpcomingMilestones")}
+							</p>
+						)}
+					</div>
+				</div>
 			</div>
 		</div>
 	);
