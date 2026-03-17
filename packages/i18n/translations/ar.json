@@ -1415,6 +1415,8 @@
       "bankBalance": "رصيد البنك",
       "cashBalance": "الصندوق",
       "netProfit": "صافي الربح",
+      "contracts": "قيمة العقود",
+      "collection": "نسبة التحصيل",
       "totalIncome": "المقبوضات",
       "totalExpenses": "المصروفات",
       "thisMonth": "هذا الشهر",
@@ -1552,6 +1554,21 @@
       "ai.desc": "6 أدوات ذكية",
       "support": "تواصل معنا",
       "support.desc": "فريق الدعم"
+    },
+    "finance": {
+      "title": "المالية",
+      "bank": "رصيد البنك",
+      "cash": "الصندوق",
+      "income": "المقبوضات",
+      "expenses": "المصروفات",
+      "net": "صافي",
+      "addBank": "أضف حسابك البنكي",
+      "recordBalance": "سجّل رصيدك الأول",
+      "chartPlaceholder": "سيظهر الرسم البياني مع المزيد من البيانات",
+      "viewAll": "المالية"
+    },
+    "projects": {
+      "new": "جديد"
     },
     "stats": {
       "bankBalance": {

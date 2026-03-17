@@ -1415,6 +1415,8 @@
       "bankBalance": "Bank Balance",
       "cashBalance": "Cash Balance",
       "netProfit": "Net Profit",
+      "contracts": "Contract Value",
+      "collection": "Collection Rate",
       "totalIncome": "Income",
       "totalExpenses": "Expenses",
       "thisMonth": "This month",
@@ -1552,6 +1554,21 @@
       "ai.desc": "6 smart tools",
       "support": "Contact us",
       "support.desc": "Support team"
+    },
+    "finance": {
+      "title": "Finance",
+      "bank": "Bank Balance",
+      "cash": "Cash Box",
+      "income": "Income",
+      "expenses": "Expenses",
+      "net": "Net",
+      "addBank": "Add bank account",
+      "recordBalance": "Record first balance",
+      "chartPlaceholder": "Chart will appear with more data",
+      "viewAll": "Finance"
+    },
+    "projects": {
+      "new": "New"
     },
     "stats": {
       "bankBalance": {
