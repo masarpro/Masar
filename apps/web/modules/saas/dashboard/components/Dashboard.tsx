@@ -236,7 +236,7 @@ export function Dashboard() {
 		},
 		{
 			label: t("dashboard.kpi.cashBalance"), value: cashBalance, icon: Wallet,
-			iconColor: "text-gray-500 dark:text-gray-400", bgColor: "bg-gray-100 dark:bg-gray-800",
+			iconColor: "text-slate-500 dark:text-slate-400", bgColor: "bg-slate-50 dark:bg-slate-800/50",
 			valueColor: getAmountColor(cashBalance, "balance"),
 			zeroCta: t("dashboard.stats.cashBox.cta"), zeroHref: `/app/${organizationSlug}/finance`,
 			zeroCtaColor: "text-gray-500 hover:text-gray-700 dark:text-gray-400",
@@ -250,33 +250,33 @@ export function Dashboard() {
 		},
 		{
 			label: t("dashboard.kpi.totalExpenses"), value: totalExpenses, icon: ArrowUpLeft,
-			iconColor: "text-red-500 dark:text-red-400", bgColor: "bg-red-100 dark:bg-red-900/30",
+			iconColor: "text-rose-500 dark:text-rose-400", bgColor: "bg-rose-50 dark:bg-rose-900/30",
 			valueColor: getAmountColor(totalExpenses, "expense"), sub: t("dashboard.kpi.thisMonth"),
 			zeroCta: t("dashboard.stats.expenses.cta"), zeroHref: `/app/${organizationSlug}/finance/expenses`,
-			zeroCtaColor: "text-red-400 hover:text-red-500 dark:text-red-400",
+			zeroCtaColor: "text-rose-500 hover:text-rose-600 dark:text-rose-400",
 		},
 	];
 
-	// Quick Actions — semantic colors per section
+	// Quick Actions — each section gets its own color
 	const quickActions = [
 		{ id: "expenses", icon: TrendingDown, sectionLabel: t("dashboard.actions.expenses"), actionLabel: t("dashboard.actions.addExpense"),
 			browsePath: `/app/${organizationSlug}/finance/expenses`, createPath: `/app/${organizationSlug}/finance/expenses/new`,
-			iconColor: "text-red-400", iconBg: "bg-red-50 dark:bg-red-950/30", actionColor: "text-red-400" },
+			iconColor: "text-rose-500", iconBg: "bg-rose-50 dark:bg-rose-950/30", actionColor: "text-rose-500" },
 		{ id: "payments", icon: TrendingUp, sectionLabel: t("dashboard.actions.payments"), actionLabel: t("dashboard.actions.addPayment"),
 			browsePath: `/app/${organizationSlug}/finance/payments`, createPath: `/app/${organizationSlug}/finance/payments/new`,
 			iconColor: "text-emerald-500", iconBg: "bg-emerald-50 dark:bg-emerald-950/30", actionColor: "text-emerald-500" },
 		{ id: "invoices", icon: Receipt, sectionLabel: t("dashboard.actions.invoices"), actionLabel: t("dashboard.actions.createInvoice"),
 			browsePath: `/app/${organizationSlug}/finance/invoices`, createPath: `/app/${organizationSlug}/finance/invoices/new`,
-			iconColor: "text-gray-600 dark:text-gray-400", iconBg: "bg-gray-100 dark:bg-gray-800", actionColor: "text-gray-600 dark:text-gray-400" },
+			iconColor: "text-indigo-500", iconBg: "bg-indigo-50 dark:bg-indigo-950/30", actionColor: "text-indigo-500" },
 		{ id: "pricing", icon: FilePlus2, sectionLabel: t("dashboard.actions.pricing"), actionLabel: t("dashboard.actions.newQuotation"),
 			browsePath: `/app/${organizationSlug}/pricing/quotations`, createPath: `/app/${organizationSlug}/pricing/quotations/new`,
-			iconColor: "text-gray-600 dark:text-gray-400", iconBg: "bg-gray-100 dark:bg-gray-800", actionColor: "text-gray-600 dark:text-gray-400" },
+			iconColor: "text-violet-500", iconBg: "bg-violet-50 dark:bg-violet-950/30", actionColor: "text-violet-500" },
 		{ id: "quantities", icon: Calculator, sectionLabel: t("dashboard.actions.quantityStudies"), actionLabel: t("dashboard.actions.calculateQuantities"),
 			browsePath: `/app/${organizationSlug}/quantities`, createPath: `/app/${organizationSlug}/quantities`,
-			iconColor: "text-gray-600 dark:text-gray-400", iconBg: "bg-gray-100 dark:bg-gray-800", actionColor: "text-gray-600 dark:text-gray-400" },
+			iconColor: "text-cyan-600", iconBg: "bg-cyan-50 dark:bg-cyan-950/30", actionColor: "text-cyan-600" },
 		{ id: "leads", icon: UserSearch, sectionLabel: t("dashboard.actions.leads"), actionLabel: t("dashboard.actions.newLead"),
 			browsePath: `/app/${organizationSlug}/pricing/leads`, createPath: `/app/${organizationSlug}/pricing/leads/new`,
-			iconColor: "text-gray-600 dark:text-gray-400", iconBg: "bg-gray-100 dark:bg-gray-800", actionColor: "text-gray-600 dark:text-gray-400" },
+			iconColor: "text-amber-500", iconBg: "bg-amber-50 dark:bg-amber-950/30", actionColor: "text-amber-500" },
 		{ id: "dailyReport", icon: ClipboardList, sectionLabel: t("dashboard.actions.dailyReport"), actionLabel: t("dashboard.actions.dailyReport"),
 			browsePath: `/app/${organizationSlug}/projects`, createPath: `/app/${organizationSlug}/projects`,
 			iconColor: "text-gray-600 dark:text-gray-400", iconBg: "bg-gray-100 dark:bg-gray-800", actionColor: "text-gray-600 dark:text-gray-400" },
@@ -309,42 +309,30 @@ export function Dashboard() {
 
 	return (
 		<div className="space-y-4" dir="rtl">
-			{/* ═══ SMART HEADER — compact ═══ */}
+			{/* ═══ SMART HEADER ═══ */}
 			{isNewUser ? (
-				<div className="rounded-2xl border border-gray-100 bg-gray-50/50 py-3 px-4 dark:border-gray-800 dark:bg-gray-900/30 animate-in fade-in slide-in-from-top-3 duration-500">
-					{/* Row 1: org name + quick links */}
-					<div className="flex items-start justify-between gap-4">
-						<div className="min-w-0">
-							<h1 className="text-base font-bold text-foreground">{orgName}</h1>
-							<p className="text-sm text-muted-foreground mt-0.5">{welcomeMessage}</p>
-						</div>
-						<div className="flex items-center gap-3 text-xs shrink-0">
+				<div className="rounded-2xl border border-gray-200 bg-white py-4 px-5 dark:border-gray-800 dark:bg-gray-900 animate-in fade-in slide-in-from-top-3 duration-500">
+					<h1 className="text-base font-bold text-foreground">{orgName}</h1>
+					<p className="text-sm text-muted-foreground mt-0.5">{welcomeMessage}</p>
+					{/* Journey dots + quick-link chips in one row */}
+					<div className="flex items-center justify-between gap-4 mt-3">
+						<JourneyFlow compact />
+						<div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
 							{headerQuickLinks.map((link, i) => (
-								<Fragment key={i}>
-									<Link
-										href={link.href}
-										className={`font-medium whitespace-nowrap transition-colors ${
-											link.type === "step"
-												? "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
-												: "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-										}`}
-									>
-										{link.text} <span className="text-gray-300">&#x2039;</span>
-									</Link>
-									{i < headerQuickLinks.length - 1 && (
-										<span className="text-gray-200 dark:text-gray-700">|</span>
-									)}
-								</Fragment>
+								<Link
+									key={i}
+									href={link.href}
+									className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 px-3 py-1.5 rounded-full transition-colors whitespace-nowrap"
+								>
+									{link.text}
+									<ChevronLeft className="h-3 w-3 opacity-40" />
+								</Link>
 							))}
 						</div>
 					</div>
-					{/* Row 2: JourneyFlow compact */}
-					<div className="mt-2">
-						<JourneyFlow compact />
-					</div>
 				</div>
 			) : (
-				<div className="flex items-center justify-between px-1">
+				<div className="flex items-center justify-between px-1 mb-1">
 					<div>
 						<h1 className="text-base font-bold text-foreground">{orgName}</h1>
 						<p className="text-sm text-muted-foreground mt-0.5">
@@ -417,7 +405,7 @@ export function Dashboard() {
 						</h3>
 						<Link
 							href={`/app/${organizationSlug}/projects`}
-							className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+							className="flex items-center gap-0.5 text-[10px] text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
 						>
 							<span>{t("dashboard.viewAll")}</span>
 							<ChevronLeft className="h-3 w-3" />
@@ -590,7 +578,7 @@ export function Dashboard() {
 						</div>
 						<Link
 							href={`/app/${organizationSlug}/projects`}
-							className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+							className="flex items-center gap-0.5 text-[10px] text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
 						>
 							<span>{t("dashboard.viewAll")}</span>
 							<ChevronLeft className="h-3 w-3" />

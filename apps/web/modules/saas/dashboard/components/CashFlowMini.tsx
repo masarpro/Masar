@@ -82,7 +82,7 @@ export function CashFlowMini() {
 				</div>
 				<Link
 					href={`/app/${organizationSlug}/finance`}
-					className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+					className="flex items-center gap-0.5 text-[10px] text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
 				>
 					<span>{t("dashboard.cashFlow.goToFinance")}</span>
 					<ChevronLeft className="h-3 w-3" />

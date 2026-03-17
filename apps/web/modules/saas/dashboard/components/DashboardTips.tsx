@@ -88,9 +88,9 @@ export function DashboardTips({ organizationSlug }: { organizationSlug: string }
 						<span className="flex-1 text-sm text-gray-600 dark:text-gray-400">
 							{t(tip.textKey)}
 						</span>
-						<span className="flex shrink-0 items-center gap-1 text-xs font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400">
+						<span className="flex shrink-0 items-center gap-1 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700 px-3 py-1 rounded-lg border border-gray-200 dark:border-gray-700 transition-colors">
 							{t(tip.ctaKey)}
-							<ChevronLeft className="h-3 w-3" />
+							<ChevronLeft className="h-3 w-3 opacity-40" />
 						</span>
 					</Link>
 				);
