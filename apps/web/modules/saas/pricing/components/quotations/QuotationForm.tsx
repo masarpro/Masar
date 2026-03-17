@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
@@ -103,6 +103,8 @@ export function QuotationForm({
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const basePath = `/app/${organizationSlug}/pricing/quotations`;
+	const searchParams = useSearchParams();
+	const fromStudyId = searchParams.get("fromStudy");
 
 	// Client state
 	const [clientId, setClientId] = useState<string | undefined>();
@@ -185,6 +187,34 @@ export function QuotationForm({
 		enabled: mode === "edit" && !!quotationId,
 	});
 	const existingQuotation = existingQuotationRaw as any;
+
+	// Prefill items from study conversion (via sessionStorage)
+	useEffect(() => {
+		if (mode === "create" && fromStudyId) {
+			const storageKey = `quotation_prefill_${fromStudyId}`;
+			const raw = sessionStorage.getItem(storageKey);
+			if (raw) {
+				try {
+					const prefill = JSON.parse(raw);
+					if (prefill.items?.length > 0) {
+						setItems(
+							prefill.items.map((item: any, i: number) => ({
+								id: String(i + 1),
+								description: item.description ?? "",
+								quantity: Number(item.quantity ?? 1),
+								unit: item.unit ?? "",
+								unitPrice: Number(item.unitPrice ?? 0),
+							})),
+						);
+					}
+					toast.success(t("pricing.studies.quotationPrefilled"));
+				} catch {
+					/* ignore invalid JSON */
+				}
+				sessionStorage.removeItem(storageKey);
+			}
+		}
+	}, [fromStudyId, mode]);
 
 	// Initialize form with existing data in edit mode
 	useEffect(() => {

@@ -15,9 +15,12 @@ import {
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import Lightbox from "yet-another-react-lightbox";
+import dynamic from "next/dynamic";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
+const Lightbox = dynamic(() => import("yet-another-react-lightbox"), {
+	ssr: false,
+});
 
 interface DocumentViewerProps {
 	organizationId: string;

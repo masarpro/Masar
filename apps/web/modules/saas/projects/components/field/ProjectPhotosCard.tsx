@@ -28,7 +28,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { useProjectRole } from "../../hooks/use-project-role";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Lightbox from "yet-another-react-lightbox";
+import dynamic from "next/dynamic";
 import Captions from "yet-another-react-lightbox/plugins/captions";
 import Counter from "yet-another-react-lightbox/plugins/counter";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
@@ -37,6 +37,9 @@ import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/captions.css";
 import "yet-another-react-lightbox/plugins/counter.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
+const Lightbox = dynamic(() => import("yet-another-react-lightbox"), {
+	ssr: false,
+});
 
 type PhotoCategory =
 	| "PROGRESS"

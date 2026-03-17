@@ -1,6 +1,14 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { QuotationForm } from "@saas/pricing/components/quotations/QuotationForm";
 import { QuotationStudyBanner } from "@saas/pricing/components/quotation-builder/QuotationStudyBanner";
+import { Skeleton } from "@ui/components/skeleton";
+import dynamic from "next/dynamic";
+const QuotationForm = dynamic(
+	() =>
+		import("@saas/pricing/components/quotations/QuotationForm").then((m) => ({
+			default: m.QuotationForm,
+		})),
+	{ loading: () => <Skeleton className="h-96 w-full" /> },
+);
 import { PricingShell } from "@saas/pricing/components/shell";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";

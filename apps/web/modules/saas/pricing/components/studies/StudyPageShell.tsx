@@ -12,6 +12,7 @@ import { StudyHeaderCard } from "./StudyHeaderCard";
 import { StudyConfigBar } from "./StudyConfigBar";
 import { EditStudyConfigDialog } from "./EditStudyConfigDialog";
 import { StudyPipelineStepper } from "./StudyPipelineStepper";
+import { ConvertToQuotationButton } from "./ConvertToQuotationButton";
 
 interface StudyPageShellProps {
 	organizationId: string;
@@ -45,6 +46,7 @@ export function StudyPageShell({
 	// Build stages array for stepper
 	const stagesArray = (stagesData as any)?.stages ?? [];
 	const entryPoint = (stagesData as any)?.entryPoint ?? "FROM_SCRATCH";
+	const pricingStageStatus = stagesArray.find((s: any) => s.stage === "PRICING")?.status;
 
 	const studyType = (study as any)?.studyType ?? "FULL_PROJECT";
 	const workScopes: string[] = (study as any)?.workScopes ?? [];
@@ -87,6 +89,15 @@ export function StudyPageShell({
 				workScopes={workScopes}
 				onEdit={() => setEditConfigOpen(true)}
 				canEdit
+			/>
+
+			{/* Convert to quotation button */}
+			<ConvertToQuotationButton
+				studyId={studyId}
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+				studyType={studyType}
+				pricingStageStatus={pricingStageStatus}
 			/>
 
 			{/* Pipeline stepper */}

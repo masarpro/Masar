@@ -1,5 +1,3 @@
-"use client";
-
 import type { ReactNode } from "react";
 import { SubPageHeader } from "@saas/shared/components/SubPageHeader";
 import { FINANCE_NAV_SECTIONS, getSectionHref, getFinanceHomeHref } from "./constants";

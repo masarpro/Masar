@@ -4869,6 +4869,9 @@
       "duplicateError": "فشل نسخ الدراسة",
       "createSuccess": "تم إنشاء الدراسة بنجاح",
       "createError": "فشل إنشاء الدراسة",
+      "convertToQuotation": "تحويل إلى عرض سعر",
+      "convertToQuotationError": "حدث خطأ أثناء تحضير بيانات عرض السعر",
+      "quotationPrefilled": "تم تعبئة بيانات عرض السعر من الدراسة",
       "status": {
         "draft": "مسودة",
         "in_progress": "قيد التنفيذ",

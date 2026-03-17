@@ -19,8 +19,7 @@ import { getTranslations } from "next-intl/server";
 import type { PropsWithChildren } from "react";
 
 export default async function AdminLayout({ children }: PropsWithChildren) {
-	const t = await getTranslations();
-	const session = await getSession();
+	const [t, session] = await Promise.all([getTranslations(), getSession()]);
 
 	if (!session) {
 		redirect("/auth/login");

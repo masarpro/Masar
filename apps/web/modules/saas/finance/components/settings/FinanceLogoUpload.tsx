@@ -1,7 +1,14 @@
 "use client";
 
 import { config } from "@repo/config";
-import { CropImageDialog } from "@saas/settings/components/CropImageDialog";
+import dynamic from "next/dynamic";
+const CropImageDialog = dynamic(
+	() =>
+		import("@saas/settings/components/CropImageDialog").then((m) => ({
+			default: m.CropImageDialog,
+		})),
+	{ ssr: false },
+);
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

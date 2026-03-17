@@ -36,8 +36,6 @@ export function useStudyConfig(study: StudyConfigInput) {
 					"specifications",
 					"costing",
 					"pricing",
-					"quotation",
-					"convert",
 				] as const;
 			case "COST_PRICING":
 				return [
@@ -45,8 +43,6 @@ export function useStudyConfig(study: StudyConfigInput) {
 					"specifications",
 					"costing",
 					"pricing",
-					"quotation",
-					"convert",
 				] as const;
 			case "QUICK_PRICING":
 			case "CUSTOM_ITEMS": // backward compat
@@ -59,8 +55,6 @@ export function useStudyConfig(study: StudyConfigInput) {
 					"specifications",
 					"costing",
 					"pricing",
-					"quotation",
-					"convert",
 				] as const;
 		}
 	}, [study.studyType]);
@@ -75,8 +69,6 @@ export function useStudyConfig(study: StudyConfigInput) {
 					"SPECIFICATIONS",
 					"COSTING",
 					"PRICING",
-					"QUOTATION",
-					"CONVERSION",
 				] as const;
 			case "COST_PRICING":
 				return [
@@ -84,8 +76,6 @@ export function useStudyConfig(study: StudyConfigInput) {
 					"SPECIFICATIONS",
 					"COSTING",
 					"PRICING",
-					"QUOTATION",
-					"CONVERSION",
 				] as const;
 			case "QUICK_PRICING":
 			case "CUSTOM_ITEMS":
@@ -98,8 +88,6 @@ export function useStudyConfig(study: StudyConfigInput) {
 					"SPECIFICATIONS",
 					"COSTING",
 					"PRICING",
-					"QUOTATION",
-					"CONVERSION",
 				] as const;
 		}
 	}, [study.studyType]);

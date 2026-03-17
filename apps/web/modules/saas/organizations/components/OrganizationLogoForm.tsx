@@ -11,7 +11,14 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
-import { CropImageDialog } from "../../settings/components/CropImageDialog";
+import dynamic from "next/dynamic";
+const CropImageDialog = dynamic(
+	() =>
+		import("../../settings/components/CropImageDialog").then((m) => ({
+			default: m.CropImageDialog,
+		})),
+	{ ssr: false },
+);
 import { OrganizationLogo } from "./OrganizationLogo";
 
 export function OrganizationLogoForm() {

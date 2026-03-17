@@ -6,6 +6,7 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
+	useLayoutEffect,
 	useState,
 } from "react";
 
@@ -19,6 +20,7 @@ interface SidebarContextValue {
 	mobileOpen: boolean;
 	setMobileOpen: (open: boolean) => void;
 	toggleMobile: () => void;
+	ready: boolean;
 }
 
 const SidebarContext = createContext<SidebarContextValue | null>(null);
@@ -29,6 +31,7 @@ export function SidebarProvider({
 }: PropsWithChildren<{ defaultCollapsed?: boolean }>) {
 	const [collapsed, setCollapsedState] = useState(defaultCollapsed);
 	const [mobileOpen, setMobileOpen] = useState(false);
+	const [ready, setReady] = useState(false);
 
 	// Close mobile sidebar when viewport grows above xl (switching to desktop mode)
 	useEffect(() => {
@@ -42,8 +45,8 @@ export function SidebarProvider({
 		return () => mq.removeEventListener("change", handler);
 	}, []);
 
-	// Hydrate from localStorage
-	useEffect(() => {
+	// Hydrate from localStorage (useLayoutEffect to prevent flash)
+	useLayoutEffect(() => {
 		try {
 			const saved = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
 			if (saved != null) {
@@ -52,6 +55,7 @@ export function SidebarProvider({
 		} catch {
 			// Ignore parse errors
 		}
+		setReady(true);
 	}, []);
 
 	// Persist to localStorage
@@ -87,6 +91,7 @@ export function SidebarProvider({
 		mobileOpen,
 		setMobileOpen,
 		toggleMobile,
+		ready,
 	};
 
 	return (

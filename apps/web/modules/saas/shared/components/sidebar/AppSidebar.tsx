@@ -19,7 +19,7 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ headerExtra }: AppSidebarProps) {
-	const { collapsed, mobileOpen, setMobileOpen, toggleMobile } = useSidebar();
+	const { collapsed, mobileOpen, setMobileOpen, toggleMobile, ready } = useSidebar();
 	const { items, activeId } = useSidebarMenu();
 	const isMobile = useIsMobile();
 
@@ -73,6 +73,7 @@ export function AppSidebar({ headerExtra }: AppSidebarProps) {
 			<aside
 				className={cn(
 					"fixed top-0 z-[60] h-full start-0",
+					!ready && "opacity-0",
 					"flex flex-col",
 					"bg-background border-e border-border shadow-xl",
 					"transition-all duration-300 ease-out",

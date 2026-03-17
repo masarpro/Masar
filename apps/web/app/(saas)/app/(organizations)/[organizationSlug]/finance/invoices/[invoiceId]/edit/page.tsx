@@ -1,6 +1,14 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { CreateInvoiceForm } from "@saas/finance/components/invoices/CreateInvoiceForm";
 import { FinanceShell } from "@saas/finance/components/shell";
+import { Skeleton } from "@ui/components/skeleton";
+import dynamic from "next/dynamic";
+const CreateInvoiceForm = dynamic(
+	() =>
+		import("@saas/finance/components/invoices/CreateInvoiceForm").then((m) => ({
+			default: m.CreateInvoiceForm,
+		})),
+	{ loading: () => <Skeleton className="h-96 w-full" /> },
+);
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 

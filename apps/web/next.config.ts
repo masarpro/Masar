@@ -1,13 +1,18 @@
+import withBundleAnalyzer from "@next/bundle-analyzer";
 import { withContentCollections } from "@content-collections/next";
 // @ts-expect-error - PrismaPlugin is not typed
 import { PrismaPlugin } from "@prisma/nextjs-monorepo-workaround-plugin";
 import type { NextConfig } from "next";
 import nextIntlPlugin from "next-intl/plugin";
 
+const withAnalyzer = withBundleAnalyzer({
+	enabled: process.env.ANALYZE === "true",
+});
+
 const withNextIntl = nextIntlPlugin("./modules/i18n/request.ts");
 
 const nextConfig: NextConfig = {
-	serverExternalPackages: ["@prisma/client", "@prisma/adapter-pg"],
+	serverExternalPackages: ["pg", "@prisma/client", "@prisma/adapter-pg"],
 	experimental: {
 		optimizePackageImports: [
 			"lucide-react",
@@ -15,6 +20,12 @@ const nextConfig: NextConfig = {
 			"date-fns",
 			"es-toolkit",
 			"@radix-ui/react-icons",
+			"@tanstack/react-query",
+			"zod",
+			"react-hook-form",
+			"@hookform/resolvers",
+			"sonner",
+			"usehooks-ts",
 		],
 	},
 	transpilePackages: ["@repo/api", "@repo/auth", "@repo/database"],
@@ -293,4 +304,4 @@ const nextConfig: NextConfig = {
 	},
 };
 
-export default withContentCollections(withNextIntl(nextConfig));
+export default withContentCollections(withAnalyzer(withNextIntl(nextConfig)));

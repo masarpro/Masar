@@ -7,7 +7,14 @@ import { useState } from "react";
 
 import { SummaryStatsCards } from "./SummaryStatsCards";
 import { StructuralAccordion } from "./StructuralAccordion";
-import { BOQSummaryTable } from "./BOQSummaryTable";
+import dynamic from "next/dynamic";
+const BOQSummaryTable = dynamic(
+	() =>
+		import("./BOQSummaryTable").then((m) => ({
+			default: m.BOQSummaryTable,
+		})),
+	{ ssr: false },
+);
 import { StructuralBuildingWizard } from "./StructuralBuildingWizard";
 import { StructuralBuildingConfigBar } from "./StructuralBuildingConfigBar";
 import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";

@@ -41,8 +41,15 @@ import {
 	Receipt,
 	FileSignature,
 } from "lucide-react";
-import { CropImageDialog } from "@saas/settings/components/CropImageDialog";
+import dynamic from "next/dynamic";
 import Link from "next/link";
+const CropImageDialog = dynamic(
+	() =>
+		import("@saas/settings/components/CropImageDialog").then((m) => ({
+			default: m.CropImageDialog,
+		})),
+	{ ssr: false },
+);
 import { toast } from "sonner";
 import type { TemplateElement } from "./TemplateCanvas";
 import { TemplateRenderer } from "./renderer/TemplateRenderer";

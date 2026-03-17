@@ -4869,6 +4869,9 @@
       "duplicateError": "Failed to duplicate study",
       "createSuccess": "Study created successfully",
       "createError": "Failed to create study",
+      "convertToQuotation": "Convert to Quotation",
+      "convertToQuotationError": "Error preparing quotation data",
+      "quotationPrefilled": "Quotation data prefilled from study",
       "status": {
         "draft": "Draft",
         "in_progress": "In Progress",

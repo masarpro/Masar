@@ -8,7 +8,14 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { CropImageDialog } from "./CropImageDialog";
+import dynamic from "next/dynamic";
+const CropImageDialog = dynamic(
+	() =>
+		import("./CropImageDialog").then((m) => ({
+			default: m.CropImageDialog,
+		})),
+	{ ssr: false },
+);
 
 export function UserAvatarUpload({
 	onSuccess,
