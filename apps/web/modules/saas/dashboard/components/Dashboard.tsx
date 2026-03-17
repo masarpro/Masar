@@ -5,6 +5,10 @@ import { HomeDashboardSkeleton } from "@saas/shared/components/skeletons";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Currency } from "@saas/finance/components/shared/Currency";
 import { CircleProgress } from "./CircleProgress";
+import { WelcomeBanner } from "./WelcomeBanner";
+import { EstablishmentHealth } from "./EstablishmentHealth";
+import { DashboardTips } from "./DashboardTips";
+import { GettingStarted } from "./GettingStarted";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
@@ -177,6 +181,14 @@ export function Dashboard() {
 		enabled: !!organizationId,
 	});
 
+	// Onboarding progress
+	const { data: onboardingProgress } = useQuery({
+		...orpc.onboarding.getProgress.queryOptions({
+			input: { organizationId },
+		}),
+		enabled: !!organizationId,
+	});
+
 	// Derived: expense breakdown for pie chart (from byCategory)
 	const expenseBreakdown = (() => {
 		const byCat = companyExpenseData?.byCategory ?? {};
@@ -207,6 +219,9 @@ export function Dashboard() {
 	const totalIncome = orgFinance?.payments?.total ?? 0;
 	const totalExpenses = orgFinance?.totalMoneyOut ?? stats?.financials?.totalExpenses ?? 0;
 	const projects = projectsData?.projects ?? [];
+
+	// Determine if new user (no projects and no invoices created)
+	const isNewUser = !onboardingProgress?.wizardCompleted || (projects.length === 0 && !onboardingProgress?.firstInvoiceCreated);
 
 	// Suggested actions (mock data — replace with real API endpoints)
 	const suggestedActions = [
@@ -262,6 +277,8 @@ export function Dashboard() {
 			iconColor: "text-sky-600 dark:text-sky-400",
 			bgColor: "bg-sky-100 dark:bg-sky-900/30",
 			valueColor: getAmountColor(bankBalance, "balance"),
+			zeroCta: t("dashboard.stats.bankBalance.cta"),
+			zeroHref: `/app/${organizationSlug}/finance`,
 		},
 		{
 			label: t("dashboard.kpi.cashBalance"),
@@ -270,6 +287,8 @@ export function Dashboard() {
 			iconColor: "text-blue-600 dark:text-blue-400",
 			bgColor: "bg-blue-100 dark:bg-blue-900/30",
 			valueColor: getAmountColor(cashBalance, "balance"),
+			zeroCta: t("dashboard.stats.cashBox.cta"),
+			zeroHref: `/app/${organizationSlug}/finance`,
 		},
 		{
 			label: t("dashboard.kpi.totalIncome"),
@@ -279,6 +298,8 @@ export function Dashboard() {
 			bgColor: "bg-sky-100 dark:bg-sky-900/30",
 			valueColor: getAmountColor(totalIncome, "income"),
 			sub: t("dashboard.kpi.thisMonth"),
+			zeroCta: t("dashboard.stats.receivables.cta"),
+			zeroHref: `/app/${organizationSlug}/finance/invoices/new`,
 		},
 		{
 			label: t("dashboard.kpi.totalExpenses"),
@@ -288,6 +309,8 @@ export function Dashboard() {
 			bgColor: "bg-red-100 dark:bg-red-900/30",
 			valueColor: getAmountColor(totalExpenses, "expense"),
 			sub: t("dashboard.kpi.thisMonth"),
+			zeroCta: t("dashboard.stats.expenses.cta"),
+			zeroHref: `/app/${organizationSlug}/finance/expenses`,
 		},
 	];
 
@@ -386,10 +409,14 @@ export function Dashboard() {
 
 	return (
 		<div className="space-y-4" dir="rtl">
+			{/* ═══ WELCOME BANNER ═══ */}
+			<WelcomeBanner />
+
 			{/* ═══ KPI CARDS ═══ */}
 			<div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
 				{kpis.map((kpi, i) => {
 					const Icon = kpi.icon;
+					const isZero = kpi.value === 0;
 					return (
 						<div
 							key={i}
@@ -404,16 +431,38 @@ export function Dashboard() {
 									<Icon className={`h-3.5 w-3.5 ${kpi.iconColor}`} />
 								</div>
 							</div>
-							<p className={`text-lg font-bold ${kpi.valueColor}`}>
-								<Currency amount={kpi.value} />
-							</p>
-							<p className="text-[10px] text-muted-foreground/70 mt-1">
-								{kpi.sub ?? t("dashboard.kpi.vsLastMonth")}
-							</p>
+							{isZero ? (
+								<>
+									<p className="text-lg font-bold text-gray-300 dark:text-gray-600">
+										— <span className="text-sm">ر.س</span>
+									</p>
+									{kpi.zeroCta && kpi.zeroHref && (
+										<Link
+											href={kpi.zeroHref}
+											className="mt-1 flex items-center gap-0.5 text-xs font-medium text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+										>
+											{kpi.zeroCta}
+											<ChevronLeft className="h-3 w-3" />
+										</Link>
+									)}
+								</>
+							) : (
+								<>
+									<p className={`text-lg font-bold ${kpi.valueColor}`}>
+										<Currency amount={kpi.value} />
+									</p>
+									<p className="text-[10px] text-muted-foreground/70 mt-1">
+										{kpi.sub ?? t("dashboard.kpi.vsLastMonth")}
+									</p>
+								</>
+							)}
 						</div>
 					);
 				})}
 			</div>
+
+			{/* ═══ ESTABLISHMENT HEALTH ═══ */}
+			<EstablishmentHealth />
 
 			{/* ═══ SUGGESTED ACTIONS + ACTIVE PROJECTS ═══ */}
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -432,11 +481,7 @@ export function Dashboard() {
 					</div>
 					<div className="flex-1 space-y-2 overflow-y-auto px-4 pb-3">
 						{suggestedActions.length === 0 ? (
-							<div className="flex flex-1 items-center justify-center py-8">
-								<p className="text-sm text-muted-foreground">
-									{t("dashboard.suggestedActions.noActions")}
-								</p>
-							</div>
+							<DashboardTips organizationSlug={organizationSlug} />
 						) : (
 							suggestedActions.map((action) => {
 								const ActionIcon = action.icon;
@@ -596,6 +641,9 @@ export function Dashboard() {
 			</div>
 
 			{/* ═══ BOTTOM SECTION ═══ */}
+			{isNewUser ? (
+				<GettingStarted />
+			) : (
 			<div className="grid grid-cols-1 gap-4 lg:grid-cols-11 lg:items-stretch">
 				{/* Cash Flow Chart */}
 				<div
@@ -921,6 +969,7 @@ export function Dashboard() {
 					</div>
 				</div>
 			</div>
+			)}
 		</div>
 	);
 }

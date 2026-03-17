@@ -1494,6 +1494,86 @@
       "duePayment": "Payment due from {project}",
       "record": "Record",
       "noActions": "No suggested actions at this time"
+    },
+    "welcome": {
+      "title": "Welcome to Masar!",
+      "progress": "You completed {completed} of {total} steps to get started",
+      "nextStep": "Next step",
+      "skip": "Skip",
+      "hide": "Hide",
+      "greeting": "Hello {name}!",
+      "pendingActions": "You have {count} actions that need attention",
+      "allGood": "Everything is on track",
+      "steps": {
+        "companyInfo": "Set up company info",
+        "firstProject": "Create first project",
+        "firstInvoice": "Create first invoice",
+        "firstExpense": "Record first expense",
+        "zatcaInfo": "Complete billing info",
+        "firstQuantity": "Add first quantity"
+      }
+    },
+    "stats": {
+      "bankBalance": {
+        "cta": "Add your bank account"
+      },
+      "cashBox": {
+        "cta": "Record your first balance"
+      },
+      "receivables": {
+        "cta": "Create your first invoice"
+      },
+      "expenses": {
+        "cta": "Record your first expense"
+      }
+    },
+    "health": {
+      "title": "Establishment Health",
+      "completion": "Completion",
+      "profile": "Profile",
+      "finance": "Finance",
+      "projects": "Projects",
+      "team": "Team",
+      "addBank": "Add bank account",
+      "addContract": "Add contract details",
+      "inviteMember": "Invite first member",
+      "completeProfile": "Complete profile",
+      "complete": "Excellent! Your establishment is complete",
+      "hide": "Hide"
+    },
+    "tips": {
+      "quantityStudy": "Did you know you can create a full quantity study for your project?",
+      "ownerPortal": "Enable the owner portal so your client can track progress directly",
+      "template": "Customize your invoice template with your logo and company info",
+      "ai": "Try the AI assistant — it can help you manage your projects",
+      "reports": "Track your project profitability in real-time from financial reports",
+      "team": "Invite your team — engineers see execution, accountants see finance",
+      "tryNow": "Try now",
+      "activate": "Activate",
+      "customize": "Customize",
+      "try": "Try",
+      "viewReports": "View Reports",
+      "invite": "Invite"
+    },
+    "gettingStarted": {
+      "title": "Getting Started",
+      "learnMore": "Learn about Masar",
+      "step1": "Add your company info",
+      "step2": "Create your first project",
+      "step3": "Create your first invoice",
+      "step4": "Invite your team",
+      "step5": "Enable owner portal",
+      "step6": "Create your first report",
+      "start": "Start",
+      "invite": "Invite",
+      "activate": "Activate",
+      "create": "Create",
+      "guide": {
+        "pricing": "How to price your project",
+        "invoices": "Invoice & collection management",
+        "ai": "Try the AI assistant",
+        "support": "Contact us"
+      }
     }
   },
   "documentation": {
