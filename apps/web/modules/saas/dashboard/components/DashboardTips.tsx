@@ -62,7 +62,6 @@ const ALL_TIPS: Tip[] = [
 export function DashboardTips({ organizationSlug }: { organizationSlug: string }) {
 	const t = useTranslations();
 
-	// Pick 2 tips based on the day of the year so they rotate daily
 	const selectedTips = useMemo(() => {
 		const dayOfYear = Math.floor(
 			(Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) /
@@ -81,15 +80,15 @@ export function DashboardTips({ organizationSlug }: { organizationSlug: string }
 					<Link
 						key={tip.textKey}
 						href={tip.getHref(organizationSlug)}
-						className="flex items-center gap-3 rounded-xl border border-blue-100/50 bg-blue-50/50 p-3 transition-all hover:bg-blue-100/50 dark:border-blue-900/20 dark:bg-blue-950/10 dark:hover:bg-blue-950/20"
+						className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50/50 p-3 transition-all hover:bg-gray-100/60 dark:border-gray-800 dark:bg-gray-900/30 dark:hover:bg-gray-800/40"
 					>
-						<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
-							<Icon className="h-4 w-4 text-blue-500" />
+						<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-900/20">
+							<Icon className="h-4 w-4 text-amber-500" />
 						</div>
 						<span className="flex-1 text-sm text-gray-600 dark:text-gray-400">
 							{t(tip.textKey)}
 						</span>
-						<span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
+						<span className="flex shrink-0 items-center gap-1 text-xs font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400">
 							{t(tip.ctaKey)}
 							<ChevronLeft className="h-3 w-3" />
 						</span>

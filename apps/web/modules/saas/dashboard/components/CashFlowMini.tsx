@@ -19,7 +19,7 @@ const glassCard =
 	"backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5";
 
 const chartConfig: ChartConfig = {
-	inflow: { label: "المقبوضات", color: "#0ea5e9" },
+	inflow: { label: "المقبوضات", color: "#10b981" },
 	outflow: { label: "المصروفات", color: "#ef4444" },
 };
 
@@ -29,7 +29,6 @@ export function CashFlowMini() {
 	const organizationId = activeOrganization?.id ?? "";
 	const organizationSlug = activeOrganization?.slug ?? "";
 
-	// Use orgDashboard for real financial totals (always available, no feature gate)
 	const { data: orgFinance } = useQuery(
 		orpc.finance.orgDashboard.queryOptions({
 			input: { organizationId },
@@ -41,12 +40,10 @@ export function CashFlowMini() {
 	const netFlow = totalInflow - totalOutflow;
 	const hasData = totalInflow > 0 || totalOutflow > 0;
 
-	// Build chart data from recent expenses/payments for visual representation
 	const chartData = (() => {
 		const recentPayments = orgFinance?.recentPayments ?? [];
 		const recentExpenses = orgFinance?.recentExpenses ?? [];
 
-		// Group by date (last 7 entries max)
 		const dayMap = new Map<string, { inflow: number; outflow: number }>();
 
 		for (const p of recentPayments) {
@@ -70,13 +67,6 @@ export function CashFlowMini() {
 		return entries.length > 0 ? entries : null;
 	})();
 
-	const getAmountColor = (value: number, type: "income" | "expense" | "balance") => {
-		if (type === "expense") return "text-red-600 dark:text-red-400";
-		if (value > 0) return "text-green-600 dark:text-green-400";
-		if (value < 0) return "text-red-600 dark:text-red-400";
-		return "text-muted-foreground";
-	};
-
 	return (
 		<div
 			className={`${glassCard} flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-500`}
@@ -92,7 +82,7 @@ export function CashFlowMini() {
 				</div>
 				<Link
 					href={`/app/${organizationSlug}/finance`}
-					className="flex items-center gap-1 text-[10px] text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 px-2 py-1 rounded-md hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors"
+					className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
 				>
 					<span>{t("dashboard.cashFlow.goToFinance")}</span>
 					<ChevronLeft className="h-3 w-3" />
@@ -100,7 +90,6 @@ export function CashFlowMini() {
 			</div>
 
 			{!hasData ? (
-				/* Empty state */
 				<div className="flex flex-1 flex-col items-center justify-center gap-2 px-4 pb-4">
 					<div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50">
 						<DollarSign className="h-5 w-5 text-muted-foreground/50" />
@@ -110,7 +99,7 @@ export function CashFlowMini() {
 					</p>
 					<Link
 						href={`/app/${organizationSlug}/finance/invoices/new`}
-						className="flex items-center gap-1 text-xs font-medium text-blue-500 hover:text-blue-700 dark:text-blue-400 transition-colors"
+						className="flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 transition-colors"
 					>
 						<FilePlus2 className="h-3 w-3" />
 						{t("dashboard.cashflow.emptyCta")}
@@ -120,20 +109,20 @@ export function CashFlowMini() {
 				<div className="flex flex-1 flex-col px-4 pb-3">
 					{/* Summary chips */}
 					<div className="grid grid-cols-3 gap-2 mb-2">
-						<div className="text-center p-1.5 rounded-lg bg-green-50 dark:bg-green-900/20">
-							<span className={`text-xs font-bold block ${getAmountColor(totalInflow, "income")}`}>
+						<div className="text-center p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/20">
+							<span className="text-xs font-bold block text-emerald-600 dark:text-emerald-400">
 								<Currency amount={totalInflow} />
 							</span>
 							<span className="text-[8px] text-muted-foreground">{t("dashboard.cashFlow.income")}</span>
 						</div>
 						<div className="text-center p-1.5 rounded-lg bg-red-50 dark:bg-red-900/20">
-							<span className="text-xs font-bold text-red-600 dark:text-red-400 block">
+							<span className="text-xs font-bold text-red-500 dark:text-red-400 block">
 								<Currency amount={totalOutflow} />
 							</span>
 							<span className="text-[8px] text-muted-foreground">{t("dashboard.cashFlow.expenses")}</span>
 						</div>
-						<div className={`text-center p-1.5 rounded-lg ${netFlow >= 0 ? "bg-green-50 dark:bg-green-900/20" : "bg-red-50 dark:bg-red-900/20"}`}>
-							<span className={`text-xs font-bold block ${getAmountColor(netFlow, "balance")}`}>
+						<div className="text-center p-1.5 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+							<span className={`text-xs font-bold block ${netFlow >= 0 ? "text-gray-800 dark:text-gray-200" : "text-red-500 dark:text-red-400"}`}>
 								<Currency amount={netFlow} />
 							</span>
 							<span className="text-[8px] text-muted-foreground">{t("dashboard.cashFlow.net")}</span>
@@ -143,14 +132,11 @@ export function CashFlowMini() {
 					{/* Chart */}
 					{chartData && chartData.length > 1 ? (
 						<ChartContainer config={chartConfig} className="h-28 w-full flex-1">
-							<AreaChart
-								data={chartData}
-								margin={{ top: 4, right: 4, left: 4, bottom: 0 }}
-							>
+							<AreaChart data={chartData} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
 								<defs>
 									<linearGradient id="miniIncomeGrad" x1="0" y1="0" x2="0" y2="1">
-										<stop offset="0%" stopColor="#0ea5e9" stopOpacity={0.22} />
-										<stop offset="100%" stopColor="#0ea5e9" stopOpacity={0} />
+										<stop offset="0%" stopColor="#10b981" stopOpacity={0.22} />
+										<stop offset="100%" stopColor="#10b981" stopOpacity={0} />
 									</linearGradient>
 									<linearGradient id="miniExpenseGrad" x1="0" y1="0" x2="0" y2="1">
 										<stop offset="0%" stopColor="#ef4444" stopOpacity={0.12} />
@@ -158,35 +144,14 @@ export function CashFlowMini() {
 									</linearGradient>
 								</defs>
 								<CartesianGrid strokeDasharray="3 3" vertical={false} />
-								<XAxis
-									dataKey="day"
-									tickLine={false}
-									axisLine={false}
-									fontSize={8}
-									tickMargin={4}
-								/>
+								<XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={8} tickMargin={4} />
 								<YAxis hide />
 								<ChartTooltip content={<ChartTooltipContent />} />
-								<Area
-									type="monotone"
-									dataKey="inflow"
-									stroke="#0ea5e9"
-									fill="url(#miniIncomeGrad)"
-									strokeWidth={2}
-									dot={false}
-								/>
-								<Area
-									type="monotone"
-									dataKey="outflow"
-									stroke="#ef4444"
-									fill="url(#miniExpenseGrad)"
-									strokeWidth={1.5}
-									dot={false}
-								/>
+								<Area type="monotone" dataKey="inflow" stroke="#10b981" fill="url(#miniIncomeGrad)" strokeWidth={2} dot={false} />
+								<Area type="monotone" dataKey="outflow" stroke="#ef4444" fill="url(#miniExpenseGrad)" strokeWidth={1.5} dot={false} />
 							</AreaChart>
 						</ChartContainer>
 					) : (
-						/* No chart points — just show summary */
 						<div className="flex flex-1 items-center justify-center">
 							<p className="text-[10px] text-muted-foreground">
 								{t("dashboard.cashFlow.goToFinance")}
