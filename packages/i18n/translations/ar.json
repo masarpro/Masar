@@ -1484,6 +1484,16 @@
       "title": "أنشئ مشروعك الأول",
       "description": "ابدأ بإدارة مشاريعك بكفاءة — أضف مشروعك الأول الآن",
       "cta": "مشروع جديد"
+    },
+    "suggestedActions": {
+      "title": "إجراءات مقترحة",
+      "overdueInvoices": "{count} فواتير متأخرة بقيمة {amount} ر.س",
+      "collect": "تحصيل",
+      "expiringQuote": "عرض سعر #{id} ينتهي خلال {days} أيام",
+      "followUp": "متابعة",
+      "duePayment": "دفعة مستحقة من مشروع {project}",
+      "record": "تسجيل",
+      "noActions": "لا توجد إجراءات مقترحة حالياً"
     }
   },
   "documentation": {

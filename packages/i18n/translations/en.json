@@ -1484,6 +1484,16 @@
       "title": "Create Your First Project",
       "description": "Start managing your projects efficiently — add your first project now",
       "cta": "New Project"
+    },
+    "suggestedActions": {
+      "title": "Suggested Actions",
+      "overdueInvoices": "{count} overdue invoices worth {amount} SAR",
+      "collect": "Collect",
+      "expiringQuote": "Quote #{id} expires in {days} days",
+      "followUp": "Follow up",
+      "duePayment": "Payment due from {project}",
+      "record": "Record",
+      "noActions": "No suggested actions at this time"
     }
   },
   "documentation": {

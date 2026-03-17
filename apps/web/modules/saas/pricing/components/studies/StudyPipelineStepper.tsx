@@ -4,15 +4,12 @@ import { cn } from "@ui/lib";
 import {
 	Calculator,
 	Check,
-	ChevronLeft,
 	ClipboardList,
 	DollarSign,
 	FileText,
 	FolderKanban,
-	Pencil,
 	Clock,
 	Lock,
-	ArrowLeft,
 	Receipt,
 } from "lucide-react";
 import Link from "next/link";
@@ -95,13 +92,6 @@ const ENTRY_POINT_START_INDEX: Record<StudyEntryPoint, number> = {
 	CUSTOM_ITEMS: 0,
 };
 
-const STATUS_LABELS: Record<StageStatus, string> = {
-	NOT_STARTED: "لم تبدأ",
-	DRAFT: "جاري العمل",
-	IN_REVIEW: "قيد المراجعة",
-	APPROVED: "معتمد",
-};
-
 // ═══════════════════════════════════════════════════════════════
 // COMPONENT
 // ═══════════════════════════════════════════════════════════════
@@ -116,9 +106,9 @@ interface StudyPipelineStepperProps {
 	}>;
 	entryPoint: StudyEntryPoint;
 	currentStage?: StageType;
-	/** Optional counts per stage (e.g. number of items) */
-	stageCounts?: Partial<Record<StageType, { total?: number; completed?: number }>>;
-	/** Optional filter: only show these stage types */
+	stageCounts?: Partial<
+		Record<StageType, { total?: number; completed?: number }>
+	>;
 	enabledStageTypes?: string[];
 }
 
@@ -150,7 +140,6 @@ export function StudyPipelineStepper({
 	const pathname = usePathname();
 	const basePath = `/app/${organizationSlug}/pricing/studies/${studyId}`;
 
-	// Filter stages if enabledStageTypes is provided
 	const visibleStages = enabledStageTypes
 		? PIPELINE_STAGES.filter((s) => enabledStageTypes.includes(s.key))
 		: PIPELINE_STAGES;
@@ -166,12 +155,9 @@ export function StudyPipelineStepper({
 	const activeStageKey = getActiveFromPath();
 
 	return (
-		<nav
-			className="w-full rounded-xl border border-border/50 bg-card p-3 sm:p-4"
-			dir="rtl"
-		>
-			{/* Desktop: Horizontal stepper with status info */}
-			<div className="hidden sm:flex items-center">
+		<nav dir="rtl">
+			{/* Desktop */}
+			<div className="hidden sm:flex items-center justify-center gap-0">
 				{visibleStages.map((stage, index) => {
 					const status = getStageStatus(stage.key, stages);
 					const isSkipped = isSkippedStage(index, entryPoint);
@@ -185,91 +171,125 @@ export function StudyPipelineStepper({
 							? `${basePath}/quantities`
 							: `${basePath}/${stage.path}`;
 
-					// Status indicator circle
-					const statusIndicator = (
+					const StageIcon = stage.icon;
+
+					// Determine colors
+					const isApproved =
+						!isCurrent && !isSkipped && status === "APPROVED";
+					const isDraft =
+						!isCurrent && !isSkipped && status === "DRAFT";
+					const isInReview =
+						!isCurrent && !isSkipped && status === "IN_REVIEW";
+
+					// Connector line between stages
+					const connector = index < visibleStages.length - 1 && (
 						<div
 							className={cn(
-								"flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
-								isCurrent &&
-									"bg-primary-foreground/20 text-primary-foreground",
-								!isCurrent &&
-									isSkipped &&
-									"bg-muted text-muted-foreground/50",
-								!isCurrent &&
-									!isSkipped &&
-									status === "APPROVED" &&
-									"bg-emerald-200 text-emerald-700 dark:bg-emerald-800 dark:text-emerald-300",
-								!isCurrent &&
-									!isSkipped &&
-									status === "DRAFT" &&
-									"bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400",
-								!isCurrent &&
-									!isSkipped &&
-									status === "IN_REVIEW" &&
-									"bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400",
-								!isCurrent &&
-									isLocked &&
-									"bg-muted text-muted-foreground",
+								"h-[2px] w-8 lg:w-12 shrink-0",
+								isApproved || status === "APPROVED"
+									? "bg-emerald-400 dark:bg-emerald-600"
+									: "bg-border",
 							)}
-						>
-							{isSkipped ? (
-								<ArrowLeft className="h-3.5 w-3.5" />
-							) : status === "APPROVED" ? (
-								<Check className="h-3.5 w-3.5" />
-							) : status === "DRAFT" ? (
-								<span className="relative flex h-2.5 w-2.5">
-									<span
-										className={cn(
-											"animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
-											isCurrent
-												? "bg-primary-foreground"
-												: "bg-blue-500",
-										)}
-									/>
-									<span
-										className={cn(
-											"relative inline-flex rounded-full h-2.5 w-2.5",
-											isCurrent
-												? "bg-primary-foreground"
-												: "bg-blue-500",
-										)}
-									/>
-								</span>
-							) : status === "IN_REVIEW" ? (
-								<Clock className="h-3.5 w-3.5" />
-							) : isLocked ? (
-								<Lock className="h-3 w-3" />
-							) : (
-								<span>{index + 1}</span>
-							)}
-						</div>
+						/>
 					);
 
-					// Label + subtitle
-					const labelSection = (
-						<div className="hidden md:flex flex-col items-start">
-							<span className="text-sm font-medium whitespace-nowrap">
+					// Status badge text
+					const statusText = isSkipped
+						? null
+						: status === "APPROVED"
+							? counts?.total
+								? `معتمد · ${counts.total}`
+								: "معتمد"
+							: status === "DRAFT"
+								? counts?.total
+									? `${counts.completed ?? 0}/${counts.total}`
+									: "جاري العمل"
+								: status === "IN_REVIEW"
+									? "مراجعة"
+									: null;
+
+					const stageContent = (
+						<div
+							className={cn(
+								"flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl transition-all min-w-[90px]",
+								isCurrent &&
+									"bg-primary text-primary-foreground shadow-md",
+								!isCurrent &&
+									isApproved &&
+									"hover:bg-emerald-50 dark:hover:bg-emerald-950/30",
+								!isCurrent &&
+									isDraft &&
+									"hover:bg-blue-50 dark:hover:bg-blue-950/30",
+								!isCurrent &&
+									isInReview &&
+									"hover:bg-amber-50 dark:hover:bg-amber-950/30",
+								isLocked && "opacity-40 cursor-not-allowed",
+								!isCurrent &&
+									!isLocked &&
+									!isSkipped &&
+									"hover:shadow-sm",
+							)}
+						>
+							{/* Icon circle */}
+							<div
+								className={cn(
+									"flex h-10 w-10 items-center justify-center rounded-full transition-colors",
+									isCurrent &&
+										"bg-primary-foreground/20",
+									isApproved &&
+										"bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400",
+									isDraft &&
+										"bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400",
+									isInReview &&
+										"bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400",
+									isLocked &&
+										"bg-muted text-muted-foreground",
+									isSkipped &&
+										"bg-muted/50 text-muted-foreground/30",
+								)}
+							>
+								{isApproved ? (
+									<Check className="h-5 w-5" />
+								) : isLocked ? (
+									<Lock className="h-4 w-4" />
+								) : (
+									<StageIcon className="h-5 w-5" />
+								)}
+							</div>
+
+							{/* Label */}
+							<span
+								className={cn(
+									"text-xs font-medium whitespace-nowrap",
+									isCurrent && "text-primary-foreground",
+									isApproved &&
+										"text-emerald-700 dark:text-emerald-400",
+									isDraft &&
+										"text-blue-600 dark:text-blue-400",
+									isInReview &&
+										"text-amber-600 dark:text-amber-400",
+									isLocked && "text-muted-foreground",
+									isSkipped && "text-muted-foreground/40",
+								)}
+							>
 								{stage.label}
 							</span>
-							{!isSkipped && (
+
+							{/* Status text */}
+							{statusText && (
 								<span
 									className={cn(
-										"text-[10px] leading-tight whitespace-nowrap",
+										"text-[10px] leading-none",
 										isCurrent
 											? "text-primary-foreground/70"
-											: "text-muted-foreground",
+											: isApproved
+												? "text-emerald-500 dark:text-emerald-500"
+												: isDraft
+													? "text-blue-500 dark:text-blue-400"
+													: "text-muted-foreground",
 									)}
 								>
-									{status === "APPROVED" &&
-										(counts?.total
-											? `معتمد ✓ · ${counts.total} بند`
-											: "معتمد ✓")}
-									{status === "DRAFT" &&
-										(counts?.total
-											? `${counts.completed ?? 0} من ${counts.total}`
-											: "جاري العمل")}
-									{status === "IN_REVIEW" && "قيد المراجعة"}
-									{status === "NOT_STARTED" && "مقفل"}
+									{statusText}
 								</span>
 							)}
 						</div>
@@ -278,63 +298,21 @@ export function StudyPipelineStepper({
 					return (
 						<div
 							key={stage.key}
-							className="flex items-center flex-1 last:flex-initial"
+							className="flex items-center"
 						>
 							{isLocked ? (
-								<div
-									className={cn(
-										"flex items-center gap-2 rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 shrink-0",
-										"bg-muted/50 text-muted-foreground cursor-not-allowed opacity-50",
-									)}
-								>
-									{statusIndicator}
-									{labelSection}
-								</div>
+								stageContent
 							) : (
-								<Link
-									href={href}
-									className={cn(
-										"flex items-center gap-2 rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 transition-all shrink-0 group",
-										isCurrent &&
-											"bg-primary text-primary-foreground shadow-sm",
-										!isCurrent &&
-											isSkipped &&
-											"text-muted-foreground/50",
-										!isCurrent &&
-											!isSkipped &&
-											status === "APPROVED" &&
-											"bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/50",
-										!isCurrent &&
-											!isSkipped &&
-											(status === "DRAFT" ||
-												status === "IN_REVIEW") &&
-											"text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30",
-									)}
-								>
-									{statusIndicator}
-									{labelSection}
-								</Link>
+								<Link href={href}>{stageContent}</Link>
 							)}
-
-							{/* Connector arrow */}
-							{index < visibleStages.length - 1 && (
-								<ChevronLeft
-									className={cn(
-										"h-4 w-4 mx-1 shrink-0",
-										isSkippedStage(index + 1, entryPoint) ||
-											status === "APPROVED"
-											? "text-emerald-400 dark:text-emerald-600"
-											: "text-muted-foreground/30",
-									)}
-								/>
-							)}
+							{connector}
 						</div>
 					);
 				})}
 			</div>
 
-			{/* Mobile: Horizontal icons only */}
-			<div className="flex sm:hidden items-center justify-between">
+			{/* Mobile */}
+			<div className="flex sm:hidden items-center justify-center gap-1">
 				{visibleStages.map((stage, index) => {
 					const status = getStageStatus(stage.key, stages);
 					const isSkipped = isSkippedStage(index, entryPoint);
@@ -349,38 +327,64 @@ export function StudyPipelineStepper({
 
 					const StageIcon = stage.icon;
 
-					const iconCircle = (
+					const isApproved =
+						!isCurrent && !isSkipped && status === "APPROVED";
+					const isDraft =
+						!isCurrent && !isSkipped && status === "DRAFT";
+					const isInReview =
+						!isCurrent && !isSkipped && status === "IN_REVIEW";
+
+					const connector = index < visibleStages.length - 1 && (
 						<div
 							className={cn(
-								"flex h-9 w-9 items-center justify-center rounded-full transition-all",
-								isCurrent &&
-									"bg-primary text-primary-foreground shadow-sm",
-								!isCurrent &&
+								"h-[2px] w-4 shrink-0",
+								status === "APPROVED"
+									? "bg-emerald-400"
+									: "bg-border",
+							)}
+						/>
+					);
+
+					const iconCircle = (
+						<div className="flex flex-col items-center gap-1">
+							<div
+								className={cn(
+									"flex h-10 w-10 items-center justify-center rounded-full transition-all",
+									isCurrent &&
+										"bg-primary text-primary-foreground shadow-md",
+									isApproved &&
+										"bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400",
+									isDraft &&
+										"bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400",
+									isInReview &&
+										"bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400",
+									isLocked &&
+										"bg-muted/50 text-muted-foreground opacity-40",
 									isSkipped &&
-									"bg-muted/50 text-muted-foreground/30",
-								!isCurrent &&
-									!isSkipped &&
-									status === "APPROVED" &&
-									"bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400",
-								!isCurrent &&
-									!isSkipped &&
-									status === "DRAFT" &&
-									"bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400",
-								!isCurrent &&
-									!isSkipped &&
-									status === "IN_REVIEW" &&
-									"bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400",
-								isLocked &&
-									"bg-muted/50 text-muted-foreground opacity-50",
-							)}
-						>
-							{status === "APPROVED" && !isCurrent ? (
-								<Check className="h-4 w-4" />
-							) : isLocked ? (
-								<Lock className="h-3.5 w-3.5" />
-							) : (
-								<StageIcon className="h-4 w-4" />
-							)}
+										"bg-muted/50 text-muted-foreground/30",
+								)}
+							>
+								{isApproved ? (
+									<Check className="h-4 w-4" />
+								) : isLocked ? (
+									<Lock className="h-3.5 w-3.5" />
+								) : (
+									<StageIcon className="h-4 w-4" />
+								)}
+							</div>
+							<span
+								className={cn(
+									"text-[10px] font-medium whitespace-nowrap",
+									isCurrent && "text-primary",
+									isApproved &&
+										"text-emerald-600 dark:text-emerald-400",
+									isDraft &&
+										"text-blue-600 dark:text-blue-400",
+									isLocked && "text-muted-foreground/40",
+								)}
+							>
+								{stage.label}
+							</span>
 						</div>
 					);
 
@@ -393,16 +397,7 @@ export function StudyPipelineStepper({
 							) : (
 								<Link href={href}>{iconCircle}</Link>
 							)}
-							{index < visibleStages.length - 1 && (
-								<ChevronLeft
-									className={cn(
-										"h-3 w-3 mx-0.5 shrink-0",
-										status === "APPROVED"
-											? "text-emerald-400"
-											: "text-muted-foreground/30",
-									)}
-								/>
-							)}
+							{connector}
 						</div>
 					);
 				})}

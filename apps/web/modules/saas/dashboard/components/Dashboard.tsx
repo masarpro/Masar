@@ -3,8 +3,8 @@
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { HomeDashboardSkeleton } from "@saas/shared/components/skeletons";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
-import { EmptyProjectsState } from "./EmptyProjectsState";
 import { Currency } from "@saas/finance/components/shared/Currency";
+import { CircleProgress } from "./CircleProgress";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
@@ -23,6 +23,7 @@ import {
 	ArrowUpLeft,
 	Bell,
 	Calculator,
+	CheckCircle2,
 	ChevronLeft,
 	ClipboardList,
 	Clock,
@@ -30,6 +31,7 @@ import {
 	FilePlus2,
 	HardHat,
 	Landmark,
+	Lightbulb,
 	Plus,
 	Receipt,
 	TrendingDown,
@@ -37,7 +39,6 @@ import {
 	UserSearch,
 	Wallet,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
@@ -207,6 +208,43 @@ export function Dashboard() {
 	const totalExpenses = orgFinance?.totalMoneyOut ?? stats?.financials?.totalExpenses ?? 0;
 	const projects = projectsData?.projects ?? [];
 
+	// Suggested actions (mock data — replace with real API endpoints)
+	const suggestedActions = [
+		{
+			id: "overdue-invoices",
+			icon: AlertTriangle,
+			iconColor: "text-red-500",
+			bgColor: "bg-red-50 dark:bg-red-950/20",
+			text: t("dashboard.suggestedActions.overdueInvoices", { count: 3, amount: "45,000" }),
+			buttonLabel: t("dashboard.suggestedActions.collect"),
+			buttonColor: "text-red-600 bg-red-50 hover:bg-red-100 dark:text-red-400 dark:bg-red-950/30 dark:hover:bg-red-950/50",
+			href: `/app/${organizationSlug}/finance/invoices`,
+			priority: "hot" as const,
+		},
+		{
+			id: "expiring-quote",
+			icon: Clock,
+			iconColor: "text-orange-500",
+			bgColor: "bg-orange-50 dark:bg-orange-950/20",
+			text: t("dashboard.suggestedActions.expiringQuote", { id: "1042", days: 3 }),
+			buttonLabel: t("dashboard.suggestedActions.followUp"),
+			buttonColor: "text-orange-600 bg-orange-50 hover:bg-orange-100 dark:text-orange-400 dark:bg-orange-950/30 dark:hover:bg-orange-950/50",
+			href: `/app/${organizationSlug}/pricing/quotations`,
+			priority: "warm" as const,
+		},
+		{
+			id: "due-payment",
+			icon: CheckCircle2,
+			iconColor: "text-green-500",
+			bgColor: "bg-green-50 dark:bg-green-950/20",
+			text: t("dashboard.suggestedActions.duePayment", { project: projects[0]?.name ?? "—" }),
+			buttonLabel: t("dashboard.suggestedActions.record"),
+			buttonColor: "text-green-600 bg-green-50 hover:bg-green-100 dark:text-green-400 dark:bg-green-950/30 dark:hover:bg-green-950/50",
+			href: `/app/${organizationSlug}/finance/payments`,
+			priority: "normal" as const,
+		},
+	];
+
 	// Dynamic amount color: positive=green, negative=red, zero=muted
 	const getAmountColor = (value: number, type: "income" | "expense" | "balance") => {
 		if (type === "expense") return "text-red-600 dark:text-red-400";
@@ -256,96 +294,91 @@ export function Dashboard() {
 	// Quick Actions - Finance-style two-section cards (section + action)
 	const quickActions = [
 		{
+			id: "expenses",
 			icon: TrendingDown,
 			sectionLabel: t("dashboard.actions.expenses"),
 			actionLabel: t("dashboard.actions.addExpense"),
 			browsePath: `/app/${organizationSlug}/finance/expenses`,
 			createPath: `/app/${organizationSlug}/finance/expenses/new`,
-			iconColor: "text-rose-500 dark:text-rose-400",
-			bgColor: "bg-rose-50/80 dark:bg-rose-950/30",
-			hoverBg: "hover:bg-rose-100 dark:hover:bg-rose-900/50",
-			borderColor: "border-rose-200/50 dark:border-rose-800/50",
+			iconColor: "text-red-500",
+			iconBg: "bg-red-50 dark:bg-red-950/30",
 		},
 		{
+			id: "payments",
 			icon: TrendingUp,
 			sectionLabel: t("dashboard.actions.payments"),
 			actionLabel: t("dashboard.actions.addPayment"),
 			browsePath: `/app/${organizationSlug}/finance/payments`,
 			createPath: `/app/${organizationSlug}/finance/payments/new`,
-			iconColor: "text-sky-500 dark:text-sky-400",
-			bgColor: "bg-sky-50/80 dark:bg-sky-950/30",
-			hoverBg: "hover:bg-sky-100 dark:hover:bg-sky-900/50",
-			borderColor: "border-sky-200/50 dark:border-sky-800/50",
+			iconColor: "text-emerald-500",
+			iconBg: "bg-emerald-50 dark:bg-emerald-950/30",
 		},
 		{
+			id: "invoices",
 			icon: Receipt,
 			sectionLabel: t("dashboard.actions.invoices"),
 			actionLabel: t("dashboard.actions.createInvoice"),
 			browsePath: `/app/${organizationSlug}/finance/invoices`,
 			createPath: `/app/${organizationSlug}/finance/invoices/new`,
-			iconColor: "text-sky-500 dark:text-sky-400",
-			bgColor: "bg-sky-50/80 dark:bg-sky-950/30",
-			hoverBg: "hover:bg-sky-100 dark:hover:bg-sky-900/50",
-			borderColor: "border-sky-200/50 dark:border-sky-800/50",
+			iconColor: "text-blue-500",
+			iconBg: "bg-blue-50 dark:bg-blue-950/30",
 		},
 		{
+			id: "pricing",
 			icon: FilePlus2,
 			sectionLabel: t("dashboard.actions.pricing"),
 			actionLabel: t("dashboard.actions.newQuotation"),
 			browsePath: `/app/${organizationSlug}/pricing/quotations`,
 			createPath: `/app/${organizationSlug}/pricing/quotations/new`,
-			iconColor: "text-violet-500 dark:text-violet-400",
-			bgColor: "bg-violet-50/80 dark:bg-violet-950/30",
-			hoverBg: "hover:bg-violet-100 dark:hover:bg-violet-900/50",
-			borderColor: "border-violet-200/50 dark:border-violet-800/50",
+			iconColor: "text-blue-500",
+			iconBg: "bg-blue-50 dark:bg-blue-950/30",
 		},
 		{
+			id: "quantities",
 			icon: Calculator,
 			sectionLabel: t("dashboard.actions.quantityStudies"),
 			actionLabel: t("dashboard.actions.calculateQuantities"),
 			browsePath: `/app/${organizationSlug}/quantities`,
 			createPath: `/app/${organizationSlug}/quantities`,
-			iconColor: "text-amber-500 dark:text-amber-400",
-			bgColor: "bg-amber-50/80 dark:bg-amber-950/30",
-			hoverBg: "hover:bg-amber-100 dark:hover:bg-amber-900/50",
-			borderColor: "border-amber-200/50 dark:border-amber-800/50",
+			iconColor: "text-blue-500",
+			iconBg: "bg-blue-50 dark:bg-blue-950/30",
 		},
 		{
+			id: "leads",
 			icon: UserSearch,
 			sectionLabel: t("dashboard.actions.leads"),
 			actionLabel: t("dashboard.actions.newLead"),
 			browsePath: `/app/${organizationSlug}/pricing/leads`,
 			createPath: `/app/${organizationSlug}/pricing/leads/new`,
-			iconColor: "text-pink-500 dark:text-pink-400",
-			bgColor: "bg-pink-50/80 dark:bg-pink-950/30",
-			hoverBg: "hover:bg-pink-100 dark:hover:bg-pink-900/50",
-			borderColor: "border-pink-200/50 dark:border-pink-800/50",
+			iconColor: "text-blue-500",
+			iconBg: "bg-blue-50 dark:bg-blue-950/30",
 		},
+		// Hidden cards — kept in code but filtered out below
 		{
+			id: "dailyReport",
 			icon: ClipboardList,
 			sectionLabel: t("dashboard.actions.dailyReport"),
 			actionLabel: t("dashboard.actions.dailyReport"),
 			browsePath: `/app/${organizationSlug}/projects`,
 			createPath: `/app/${organizationSlug}/projects`,
-			iconColor: "text-cyan-500 dark:text-cyan-400",
-			bgColor: "bg-cyan-50/80 dark:bg-cyan-950/30",
-			hoverBg: "hover:bg-cyan-100 dark:hover:bg-cyan-900/50",
-			borderColor: "border-cyan-200/50 dark:border-cyan-800/50",
-			singleSection: true,
+			iconColor: "text-blue-500",
+			iconBg: "bg-blue-50 dark:bg-blue-950/30",
 		},
 		{
+			id: "manageCompany",
 			icon: HardHat,
 			sectionLabel: t("dashboard.actions.manageCompany"),
 			actionLabel: t("dashboard.actions.manageCompany"),
 			browsePath: `/app/${organizationSlug}/company`,
 			createPath: `/app/${organizationSlug}/company`,
-			iconColor: "text-indigo-500 dark:text-indigo-400",
-			bgColor: "bg-indigo-50/80 dark:bg-indigo-950/30",
-			hoverBg: "hover:bg-indigo-100 dark:hover:bg-indigo-900/50",
-			borderColor: "border-indigo-200/50 dark:border-indigo-800/50",
-			singleSection: true,
+			iconColor: "text-blue-500",
+			iconBg: "bg-blue-50 dark:bg-blue-950/30",
 		},
 	];
+
+	// Filter out hidden cards (facility & daily report)
+	const hiddenActions = new Set(["dailyReport", "manageCompany"]);
+	const visibleActions = quickActions.filter((a) => !hiddenActions.has(a.id));
 
 	const totalIncomeChart = cashFlowData.reduce((s, d) => s + d.income, 0);
 	const totalExpenseChart = cashFlowData.reduce((s, d) => s + d.expense, 0);
@@ -382,156 +415,166 @@ export function Dashboard() {
 				})}
 			</div>
 
-			{/* ═══ PROJECTS - Compact horizontal cards (image + info) ═══ */}
-			<div className="rounded-xl bg-card p-6 shadow-sm">
-				<h2 className="mb-4 text-lg font-semibold text-foreground">
-					{t("dashboard.activeProjects")}
-				</h2>
-				{projects.length === 0 ? (
-				<EmptyProjectsState organizationSlug={organizationSlug} />
-			) : (() => {
-					const COLS = 4;
-					const useScroll = projects.length > 4;
-
-					const projectCardBase =
-						"rounded-2xl border border-border bg-muted/30 flex flex-row overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-500 group";
-					const cardSizeClass = useScroll
-						? "h-[88px] w-[340px] min-w-[340px] shrink-0"
-						: "h-[88px] min-w-0";
-
-					const renderProjectCard = (project: (typeof projects)[0], i: number) => {
-					const progress = Math.round(Number(project.progress ?? 0));
-					const contractValue = project.contractValue ?? 0;
-					const days = daysRemaining(project.endDate);
-					const coverImageUrl = (project as { photos?: { url: string }[] }).photos?.[0]?.url;
-					return (
-						<Link
-							key={project.id}
-							href={`/app/${organizationSlug}/projects/${project.id}`}
-							className={`${projectCardBase} ${cardSizeClass}`}
-							style={{ animationDelay: `${160 + i * 70}ms` }}
-						>
-							{/* Square image */}
-							<div className="relative h-[88px] w-[88px] shrink-0 overflow-hidden bg-muted">
-								{coverImageUrl ? (
-									<Image
-										src={coverImageUrl}
-										alt={project.name || t("projects.unnamed")}
-										fill
-										className="object-cover transition-transform duration-300 group-hover:scale-105"
-										sizes="88px"
-										loading="lazy"
-									/>
-								) : (
-									<div className="flex h-full w-full items-center justify-center bg-muted/50">
-										<span className="text-2xl font-bold text-muted-foreground/50">
-											{(project.name || "?")[0]}
-										</span>
-									</div>
-								)}
-								<div
-									className="absolute top-0 right-0 left-0 h-[2px]"
-									style={{ background: i % 2 === 0 ? "#0ea5e9" : "#3b82f6" }}
-								/>
-								<div className="absolute start-1 top-1">
-									<Badge className="bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 border-0 text-[8px] px-1 py-0">
-										{t(`projects.status.${project.status}`)}
-									</Badge>
-								</div>
-								<div className="absolute end-1 top-1 rounded-full bg-card/90 px-1.5 py-0.5 text-[9px] font-bold text-foreground">
-									{progress}%
-								</div>
-							</div>
-							{/* Info section */}
-							<div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 p-2.5">
-								<h3 className="wrap-break-word text-sm font-bold text-foreground line-clamp-2">
-									{project.name || t("projects.unnamed")}
-								</h3>
-								<p className="wrap-break-word text-[10px] text-muted-foreground line-clamp-2">
-									{project.clientName || "—"}
-								</p>
-								<div className="mt-2 flex items-center gap-2 text-[9px] text-muted-foreground">
-									<span title={t("dashboard.project.contractValue")}>
-										<Currency amount={contractValue} className="text-[10px] font-semibold text-foreground/80" />
-									</span>
-									<span>•</span>
-									<span>{days} {t("dashboard.project.daysShort")}</span>
-								</div>
-							</div>
-						</Link>
-					);
-				};
-
-					const newProjectButton = (
-						<Link
-							href={`/app/${organizationSlug}/projects/new`}
-							className={`flex shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-border transition-all duration-300 hover:border-sky-500 hover:bg-sky-50/50 dark:hover:bg-sky-900/10 ${useScroll ? "h-[88px] w-14" : "h-[88px] w-14"}`}
-							title={t("projects.newProject")}
-						>
-							<Plus className="h-6 w-6 text-muted-foreground" />
-						</Link>
-					);
-
-					if (useScroll) {
-						return (
-							<div className="overflow-x-auto pb-2">
-								<div className="flex w-max items-stretch gap-3">
-									{projects.map((p, i) => renderProjectCard(p, i))}
-									{newProjectButton}
-								</div>
-							</div>
-						);
-					}
-
-					const gridCols = Math.min(projects.length, COLS);
-					return (
-						<div className="grid w-full gap-3" style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr)) auto` }}>
-							{projects.map((p, i) => renderProjectCard(p, i))}
-							{newProjectButton}
+			{/* ═══ SUGGESTED ACTIONS + ACTIVE PROJECTS ═══ */}
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+				{/* Card 1: Suggested Actions (Right side in RTL) */}
+				<div
+					className={`${glassCard} flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-500`}
+					style={{ animationDelay: "160ms", maxHeight: 260 }}
+				>
+					<div className="flex items-center gap-2 px-4 pt-3 pb-2">
+						<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
+							<Lightbulb className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
 						</div>
-					);
-				})()}
+						<h3 className="text-sm font-semibold text-foreground">
+							{t("dashboard.suggestedActions.title")}
+						</h3>
+					</div>
+					<div className="flex-1 space-y-2 overflow-y-auto px-4 pb-3">
+						{suggestedActions.length === 0 ? (
+							<div className="flex flex-1 items-center justify-center py-8">
+								<p className="text-sm text-muted-foreground">
+									{t("dashboard.suggestedActions.noActions")}
+								</p>
+							</div>
+						) : (
+							suggestedActions.map((action) => {
+								const ActionIcon = action.icon;
+								return (
+									<Link
+										key={action.id}
+										href={action.href}
+										className={`flex items-center gap-3 rounded-xl border p-3 transition-transform duration-150 hover:-translate-x-0.5 hover:shadow-sm ${
+											action.priority === "hot"
+												? "border-red-200 bg-red-50/50 dark:border-red-900/30 dark:bg-red-950/10"
+												: action.priority === "warm"
+													? "border-orange-200 bg-orange-50/50 dark:border-orange-900/30 dark:bg-orange-950/10"
+													: "border-green-200 bg-green-50/50 dark:border-green-900/30 dark:bg-green-950/10"
+										}`}
+									>
+										<div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${action.bgColor}`}>
+											<ActionIcon className={`h-4 w-4 ${action.iconColor}`} />
+										</div>
+										<span className="flex-1 text-xs font-medium text-foreground/80">
+											{action.text}
+										</span>
+										<span className={`shrink-0 rounded-lg px-3 py-1 text-xs font-bold ${action.buttonColor}`}>
+											{action.buttonLabel}
+										</span>
+									</Link>
+								);
+							})
+						)}
+					</div>
+				</div>
+
+				{/* Card 2: Active Projects (Left side in RTL) */}
+				<div
+					className={`${glassCard} flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-500`}
+					style={{ animationDelay: "220ms", maxHeight: 260 }}
+				>
+					<div className="flex items-center justify-between px-4 pt-3 pb-2">
+						<h3 className="text-sm font-semibold text-foreground">
+							{t("dashboard.activeProjects")}
+						</h3>
+						<Link
+							href={`/app/${organizationSlug}/projects`}
+							className="flex items-center gap-1 text-[10px] text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 px-2 py-1 rounded-md hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors"
+						>
+							<span>{t("dashboard.viewAll")}</span>
+							<ChevronLeft className="h-3 w-3" />
+						</Link>
+					</div>
+					<div className="flex-1 overflow-y-auto px-4 pb-3">
+						{projects.length === 0 ? (
+							<div className="flex flex-col items-center justify-center gap-3 py-6">
+								<p className="text-sm text-muted-foreground">
+									{t("dashboard.emptyProjects.description")}
+								</p>
+								<Link
+									href={`/app/${organizationSlug}/projects/new`}
+									className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+								>
+									<Plus className="h-4 w-4" />
+									{t("dashboard.emptyProjects.cta")}
+								</Link>
+							</div>
+						) : (
+							projects.slice(0, 3).map((project, idx) => {
+								const progress = Math.round(Number(project.progress ?? 0));
+								const contractValue = project.contractValue ?? 0;
+								const progressColor = progress > 80 ? "#22c55e" : "#0ea5e9";
+								return (
+									<Link
+										key={project.id}
+										href={`/app/${organizationSlug}/projects/${project.id}`}
+										className={`block py-2.5 transition-transform duration-150 hover:-translate-x-0.5 ${
+											idx < Math.min(projects.length, 3) - 1 ? "border-b border-gray-50 dark:border-gray-800/50" : ""
+										}`}
+									>
+										<div className="flex items-center gap-3">
+											<CircleProgress
+												percentage={progress}
+												size={40}
+												color={progressColor}
+											/>
+											<div className="flex-1 min-w-0">
+												<div className="flex items-center justify-between gap-2">
+													<h4 className="text-sm font-bold text-foreground truncate">
+														{project.name || t("projects.unnamed")}
+													</h4>
+													<div className="flex items-center gap-2 shrink-0">
+														<span className="font-extrabold text-sm" style={{ color: progressColor }}>
+															{progress}%
+														</span>
+														<Badge className="text-[10px] px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 border-0">
+															{t(`projects.status.${project.status}`)}
+														</Badge>
+													</div>
+												</div>
+												<p className="text-xs text-gray-400 mt-0.5">
+													<Currency amount={contractValue} />
+												</p>
+											</div>
+										</div>
+										<div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+											<div
+												className="h-full rounded-full transition-all duration-1000 ease-out"
+												style={{
+													width: `${progress}%`,
+													background: progress > 80
+														? "linear-gradient(90deg, #22c55e, #4ade80)"
+														: "linear-gradient(90deg, #0ea5e9, #38bdf8)",
+												}}
+											/>
+										</div>
+									</Link>
+								);
+							})
+						)}
+					</div>
+				</div>
 			</div>
 
-			{/* ═══ QUICK ACTIONS - Finance-style two-section cards ═══ */}
-			<div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">
-				{quickActions.map((action, i) => {
+			{/* ═══ QUICK ACTIONS - Unified card design ═══ */}
+			<div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+				{visibleActions.map((action, i) => {
 					const Icon = action.icon;
-					const isSingleSection = "singleSection" in action && action.singleSection;
-					if (isSingleSection) {
-						return (
-							<Link
-								key={i}
-								href={action.browsePath}
-								className={`overflow-hidden rounded-2xl border border-border/50 bg-card/80 shadow-lg shadow-black/5 backdrop-blur-xl transition-all duration-300 hover:shadow-xl animate-in fade-in slide-in-from-bottom-3 flex flex-col items-center justify-center gap-2 p-4 ${action.bgColor} ${action.hoverBg}`}
-								style={{ animationDelay: `${280 + i * 35}ms` }}
-							>
-								<div
-									className={`rounded-xl bg-card/60 p-3 ${action.iconColor}`}
-								>
-									<Icon className="h-6 w-6" />
-								</div>
-								<span className="text-center text-sm font-medium text-foreground/80">
-									{action.sectionLabel}
-								</span>
-							</Link>
-						);
-					}
 					return (
 						<div
-							key={i}
-							className="overflow-hidden rounded-2xl border border-border/50 bg-card/80 shadow-lg shadow-black/5 backdrop-blur-xl transition-all duration-300 hover:shadow-xl animate-in fade-in slide-in-from-bottom-3"
+							key={action.id}
+							className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900 animate-in fade-in slide-in-from-bottom-3"
 							style={{ animationDelay: `${280 + i * 35}ms` }}
 						>
 							{/* Section (Top) */}
 							<Link
 								href={action.browsePath}
-								className={`flex flex-col items-center gap-2 border-b p-4 transition-colors ${action.bgColor} ${action.hoverBg} ${action.borderColor}`}
+								className="flex flex-col items-center gap-2 border-b border-gray-200 p-4 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/50"
 							>
 								<div
-									className={`rounded-xl bg-card/60 p-3 ${action.iconColor}`}
+									className={`rounded-xl p-3 ${action.iconBg}`}
 								>
-									<Icon className="h-6 w-6" />
+									<Icon className={`h-6 w-6 ${action.iconColor}`} />
 								</div>
 								<span className="text-center text-sm font-medium text-foreground/80">
 									{action.sectionLabel}
@@ -540,10 +583,10 @@ export function Dashboard() {
 							{/* Action (Bottom) */}
 							<Link
 								href={action.createPath}
-								className="flex items-center justify-center gap-2 bg-card/50 p-3 transition-colors hover:bg-card/80"
+								className="flex items-center justify-center gap-2 p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
 							>
-								<Plus className={`h-4 w-4 ${action.iconColor}`} />
-								<span className={`text-xs font-medium ${action.iconColor}`}>
+								<Plus className="h-4 w-4 text-primary" />
+								<span className="text-sm font-medium text-primary hover:text-primary/80">
 									{action.actionLabel}
 								</span>
 							</Link>
