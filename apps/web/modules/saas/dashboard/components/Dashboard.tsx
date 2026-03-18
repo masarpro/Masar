@@ -31,19 +31,21 @@ export function Dashboard() {
 		staleTime: STALE_TIMES.DASHBOARD_STATS,
 	});
 
-	const { data: orgFinance } = useQuery(
-		orpc.finance.orgDashboard.queryOptions({
+	const { data: orgFinance, isLoading: finLoading } = useQuery({
+		...orpc.finance.orgDashboard.queryOptions({
 			input: { organizationId },
 		}),
-	);
+		enabled: !!organizationId,
+	});
 
-	const { data: projectsData } = useQuery(
-		orpc.projects.list.queryOptions({
+	const { data: projectsData, isLoading: projLoading } = useQuery({
+		...orpc.projects.list.queryOptions({
 			input: { organizationId, status: "ACTIVE" as const },
 		}),
-	);
+		enabled: !!organizationId,
+	});
 
-	if (statsLoading) {
+	if (!organizationId || statsLoading || finLoading || projLoading) {
 		return <HomeDashboardSkeleton />;
 	}
 
