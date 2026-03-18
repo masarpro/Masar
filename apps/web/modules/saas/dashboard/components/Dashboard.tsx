@@ -114,6 +114,8 @@ export function Dashboard() {
 			{/* Row 2: Quick Actions */}
 			<QuickActionsGrid organizationSlug={organizationSlug} />
 
+			<hr className="border-border/50" />
+
 			{/* Row 3: Alerts + Operational + Did You Know */}
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 				<AlertsSection
