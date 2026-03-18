@@ -90,14 +90,14 @@ export function ActiveProjectsSection({
 		);
 	}
 
-	const MAX_VISIBLE = 4;
+	const MAX_VISIBLE = 3;
 	const visibleProjects = projects.slice(0, MAX_VISIBLE);
 	const hasMore = projects.length > MAX_VISIBLE;
 
 	return (
-		<div className={`${glassCard} flex flex-col p-4 overflow-hidden`}>
+		<div className={`${glassCard} flex flex-col p-3.5 overflow-hidden`}>
 			{/* Header */}
-			<div className="flex items-center justify-between mb-3 shrink-0">
+			<div className="flex items-center justify-between mb-2.5 shrink-0">
 				<div className="flex items-center gap-2">
 					<div className="p-1.5 rounded-lg bg-primary/10">
 						<FolderOpen className="h-4 w-4 text-primary" />
@@ -119,7 +119,7 @@ export function ActiveProjectsSection({
 			</div>
 
 			{/* Project list */}
-			<div className="flex-1 overflow-y-auto min-h-0 space-y-2">
+			<div className="flex-1 overflow-y-auto min-h-0 space-y-1.5">
 				{visibleProjects.map((project, i) => {
 					const progress = Math.round(Number(project.progress ?? 0));
 					const contractValue = Number(project.contractValue ?? 0);
@@ -144,7 +144,7 @@ export function ActiveProjectsSection({
 						<Link
 							key={project.id}
 							href={`/app/${organizationSlug}/projects/${project.id}`}
-							className="group relative flex items-center gap-4 p-3 rounded-xl border border-border/30 bg-card/50 hover:bg-card hover:border-border/60 hover:shadow-md transition-all duration-300"
+							className="group relative flex items-center gap-3 p-2.5 rounded-xl border border-border/30 bg-card/50 hover:bg-card hover:border-border/60 hover:shadow-md transition-all duration-300"
 							style={{ animationDelay: `${80 + i * 50}ms` }}
 						>
 							{/* Health side bar */}
@@ -153,10 +153,10 @@ export function ActiveProjectsSection({
 							/>
 
 							{/* Progress ring */}
-							<div className="relative h-14 w-14 shrink-0 ms-2">
+							<div className="relative h-11 w-11 shrink-0 ms-2">
 								<svg
 									viewBox="0 0 36 36"
-									className="h-14 w-14 -rotate-90"
+									className="h-11 w-11 -rotate-90"
 								>
 									<circle
 										cx="18"
@@ -177,31 +177,31 @@ export function ActiveProjectsSection({
 										strokeLinecap="round"
 									/>
 								</svg>
-								<span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-foreground">
+								<span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-foreground">
 									{progress}%
 								</span>
 							</div>
 
 							{/* Info */}
 							<div className="flex-1 min-w-0">
-								<p className="text-base font-bold text-foreground truncate group-hover:text-primary transition-colors">
+								<p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">
 									{project.name || t("projects.unnamed")}
 								</p>
-								<p className="text-sm text-muted-foreground truncate">
+								<p className="text-xs text-muted-foreground truncate">
 									{project.clientName || t("dashboard.noClient")}
 								</p>
 
-								<div className="flex items-center gap-4 mt-1.5">
+								<div className="flex items-center gap-3 mt-1">
 									<div className="flex items-center gap-1">
-										<Banknote className="h-3.5 w-3.5 text-emerald-500" />
-										<span className="text-sm font-bold text-foreground">
+										<Banknote className="h-3 w-3 text-emerald-500" />
+										<span className="text-xs font-bold text-foreground">
 											<Currency amount={contractValue} />
 										</span>
 									</div>
 									{days !== null && (
 										<div className="flex items-center gap-1">
-											<Calendar className="h-3.5 w-3.5 text-blue-500" />
-											<span className="text-xs text-muted-foreground">
+											<Calendar className="h-3 w-3 text-blue-500" />
+											<span className="text-[11px] text-muted-foreground">
 												{days > 0
 													? `${days} ${t("dashboard.alerts.daysRemaining")}`
 													: t("dashboard.projectEnded")}

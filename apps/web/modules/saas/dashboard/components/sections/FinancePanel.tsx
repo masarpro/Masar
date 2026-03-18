@@ -67,21 +67,21 @@ export function FinancePanel({
 	}, [financialTrend, locale]);
 
 	return (
-		<div className={`${glassCard} flex flex-col p-4 overflow-hidden`}>
+		<div className={`${glassCard} flex flex-col p-3.5 overflow-hidden`}>
 			{/* 3 mini-cards */}
-			<div className="grid grid-cols-3 gap-2 mb-3 shrink-0">
+			<div className="grid grid-cols-3 gap-2 mb-2.5 shrink-0">
 				{/* Bank Balance */}
 				<Link
 					href={`/app/${organizationSlug}/finance/banks`}
-					className="p-3 rounded-xl bg-blue-50/80 dark:bg-blue-950/20 hover:bg-blue-100 dark:hover:bg-blue-950/30 transition-colors"
+					className="p-2.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/20 hover:bg-blue-100 dark:hover:bg-blue-950/30 transition-colors"
 				>
-					<div className="flex items-center gap-1.5 mb-1">
+					<div className="flex items-center gap-1.5 mb-0.5">
 						<Building2 className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
 						<span className="text-xs font-medium text-blue-600/80 dark:text-blue-400/80">
 							{t("dashboard.kpi.bankBalance")}
 						</span>
 					</div>
-					<p className="text-xl font-bold text-blue-700 dark:text-blue-300">
+					<p className="text-lg font-bold text-blue-700 dark:text-blue-300">
 						<Currency amount={Number(bankBalance ?? 0)} />
 					</p>
 				</Link>
@@ -89,32 +89,32 @@ export function FinancePanel({
 				{/* Cash Balance */}
 				<Link
 					href={`/app/${organizationSlug}/finance/banks`}
-					className="p-3 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/20 hover:bg-emerald-100 dark:hover:bg-emerald-950/30 transition-colors"
+					className="p-2.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/20 hover:bg-emerald-100 dark:hover:bg-emerald-950/30 transition-colors"
 				>
-					<div className="flex items-center gap-1.5 mb-1">
+					<div className="flex items-center gap-1.5 mb-0.5">
 						<Banknote className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
 						<span className="text-xs font-medium text-emerald-600/80 dark:text-emerald-400/80">
 							{t("dashboard.kpi.cashBalance")}
 						</span>
 					</div>
-					<p className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
+					<p className="text-lg font-bold text-emerald-700 dark:text-emerald-300">
 						<Currency amount={Number(cashBalance ?? 0)} />
 					</p>
 				</Link>
 
 				{/* Upcoming Payments */}
-				<div className="p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/20">
-					<div className="flex items-center gap-1.5 mb-1">
+				<div className="p-2.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/20">
+					<div className="flex items-center gap-1.5 mb-0.5">
 						<Clock className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
 						<span className="text-xs font-medium text-amber-600/80 dark:text-amber-400/80">
 							{t("dashboard.alerts.upcomingPayments")}
 						</span>
 					</div>
-					<p className="text-xl font-bold text-amber-700 dark:text-amber-300">
+					<p className="text-lg font-bold text-amber-700 dark:text-amber-300">
 						{upcomingPayments.length}
 					</p>
 					{upcomingPayments.length > 0 && (
-						<p className="text-xs text-amber-600/60 dark:text-amber-400/60 mt-0.5 truncate">
+						<p className="text-[11px] text-amber-600/60 dark:text-amber-400/60 truncate">
 							{upcomingPayments[0]?.project?.name}
 						</p>
 					)}
@@ -122,8 +122,8 @@ export function FinancePanel({
 			</div>
 
 			{/* Cash Flow Chart — always visible */}
-			<div className="flex-1 min-h-0 flex flex-col">
-				<div className="flex items-center justify-between mb-2 shrink-0">
+			<div className="flex flex-col">
+				<div className="flex items-center justify-between mb-1.5 shrink-0">
 					<span className="text-sm font-semibold text-muted-foreground">
 						{t("dashboard.financePanel.cashFlowTitle")}
 					</span>
@@ -136,7 +136,7 @@ export function FinancePanel({
 					</Link>
 				</div>
 
-				<ChartContainer config={chartConfig} className="flex-1 w-full min-h-[120px]">
+				<ChartContainer config={chartConfig} className="w-full h-[130px] aspect-auto">
 					<AreaChart
 						data={chartData}
 						margin={{ top: 4, right: 4, left: 4, bottom: 0 }}

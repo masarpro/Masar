@@ -55,17 +55,19 @@ export function Dashboard() {
 	return (
 		<div className="flex flex-col gap-5 p-4 md:p-6 lg:p-8" dir="rtl">
 			{/* Header card */}
-			<div className="rounded-2xl border border-border/50 bg-card/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between shrink-0">
+			<div className="relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-l from-primary/[0.04] via-card to-primary/[0.06] dark:from-primary/[0.08] dark:via-card dark:to-primary/[0.03] px-8 py-5 flex items-center justify-between shrink-0">
+				{/* Decorative accent */}
+				<div className="absolute inset-y-0 start-0 w-1 bg-gradient-to-b from-primary/60 via-primary/30 to-transparent rounded-full" />
 				<div>
 					<h1 className="text-xl font-bold text-foreground">
 						{t("dashboard.welcome.greeting", { name: firstName })}
 					</h1>
-					<p className="text-sm text-muted-foreground">
+					<p className="text-sm text-muted-foreground mt-0.5">
 						{t("dashboard.welcome.subtitle")}
 					</p>
 				</div>
 				<div className="hidden md:block">
-					<p className="text-sm font-semibold text-foreground">
+					<p className="text-xl font-bold text-foreground">
 						{activeOrganization?.name}
 					</p>
 				</div>
