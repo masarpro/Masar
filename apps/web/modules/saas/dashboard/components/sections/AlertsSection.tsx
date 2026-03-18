@@ -56,18 +56,19 @@ export function AlertsSection({
 		pendingSubcontractClaims > 0 ||
 		upcomingPayments.length > 0;
 
-	// "All good" state
 	if (!hasAlerts) {
 		return (
 			<div
-				className={`${glassCard} flex flex-col items-center justify-center p-4 text-center`}
+				className={`${glassCard} flex flex-col items-center justify-center p-4 text-center h-full`}
 			>
-				<CheckCircle2 className="h-10 w-10 text-emerald-500 mb-2" />
-				<p className="text-base font-semibold text-foreground">
+				<div className="p-3 rounded-full bg-emerald-50 dark:bg-emerald-950/20 mb-3">
+					<CheckCircle2 className="h-8 w-8 text-emerald-500" />
+				</div>
+				<p className="text-base font-bold text-foreground">
 					{t("dashboard.welcome.allGood")}
 				</p>
-				<p className="text-xs text-muted-foreground mt-1">
-					{t("dashboard.alerts.needsAttention")}
+				<p className="text-sm text-muted-foreground mt-1">
+					{t("dashboard.alerts.noIssues")}
 				</p>
 			</div>
 		);
@@ -123,10 +124,11 @@ export function AlertsSection({
 	}>;
 
 	const visibleAlerts = alerts.slice(0, 3);
+	const totalAlerts = alerts.reduce((s, a) => s + a.count, 0);
 
 	return (
-		<div className={`${glassCard} flex flex-col p-4`}>
-			<h3 className="text-sm font-bold text-foreground mb-3">
+		<div className={`${glassCard} flex flex-col p-4 h-full`}>
+			<h3 className="text-sm font-bold text-foreground mb-3 shrink-0">
 				{t("dashboard.alerts.needsAttention")}
 			</h3>
 			<div className="flex-1 space-y-2">
@@ -136,13 +138,13 @@ export function AlertsSection({
 						<Link
 							key={i}
 							href={alert.href}
-							className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/50 transition-colors"
+							className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors border border-border/30"
 						>
-							<div className={`p-1.5 rounded-lg ${alert.bgColor} shrink-0`}>
-								<Icon className={`h-4 w-4 ${alert.color}`} />
+							<div className={`p-2 rounded-lg ${alert.bgColor} shrink-0`}>
+								<Icon className={`h-5 w-5 ${alert.color}`} />
 							</div>
 							<div className="flex-1 min-w-0">
-								<p className="text-sm font-medium text-foreground truncate">
+								<p className="text-sm font-semibold text-foreground">
 									{alert.title}
 								</p>
 								{alert.amount != null && alert.amount > 0 && (
@@ -151,13 +153,22 @@ export function AlertsSection({
 									</p>
 								)}
 							</div>
-							<span className={`text-lg font-bold ${alert.color} shrink-0`}>
+							<span
+								className={`text-2xl font-bold ${alert.color} shrink-0`}
+							>
 								{alert.count}
 							</span>
 						</Link>
 					);
 				})}
 			</div>
+			{visibleAlerts.length < 3 && (
+				<div className="flex-1 flex items-end">
+					<p className="text-xs text-muted-foreground">
+						{t("dashboard.alerts.summary", { count: totalAlerts })}
+					</p>
+				</div>
+			)}
 		</div>
 	);
 }

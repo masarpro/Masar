@@ -1469,7 +1469,9 @@
       "pendingClaims": "Pending Claims",
       "upcomingPayments": "Upcoming Payments",
       "daysOverdue": "days overdue",
-      "daysRemaining": "days remaining"
+      "daysRemaining": "days remaining",
+      "noIssues": "No alerts at the moment",
+      "summary": "{count} alert(s) need attention"
     },
     "financial": {
       "title": "Financial Overview",
@@ -1495,7 +1497,10 @@
         "INDUSTRIAL": "Industrial",
         "INFRASTRUCTURE": "Infrastructure",
         "MIXED": "Mixed"
-      }
+      },
+      "onTrack": "On Track",
+      "warning": "Needs Attention",
+      "atRisk": "At Risk"
     },
     "cashFlow": {
       "title": "Cash Flow — Last 7 Days",
@@ -1578,7 +1583,9 @@
       "documents": "Documents & approvals"
     },
     "financePanel": {
-      "cashFlowTitle": "Cash Flow"
+      "cashFlowTitle": "Cash Flow",
+      "noTransactions": "No transactions yet",
+      "startRecording": "Start recording your first transaction"
     },
     "didYouKnow": {
       "title": "Did you know?",

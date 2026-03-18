@@ -1469,7 +1469,9 @@
       "pendingClaims": "مطالبات معلّقة",
       "upcomingPayments": "دفعات مستحقة قريباً",
       "daysOverdue": "يوم تأخير",
-      "daysRemaining": "يوم متبقي"
+      "daysRemaining": "يوم متبقي",
+      "noIssues": "لا يوجد تنبيهات حالياً",
+      "summary": "{count} تنبيه يحتاج انتباهك"
     },
     "financial": {
       "title": "الملخص المالي",
@@ -1495,7 +1497,10 @@
         "INDUSTRIAL": "صناعي",
         "INFRASTRUCTURE": "بنية تحتية",
         "MIXED": "مختلط"
-      }
+      },
+      "onTrack": "في الموعد",
+      "warning": "يحتاج متابعة",
+      "atRisk": "متأخر"
     },
     "cashFlow": {
       "title": "التدفق النقدي — آخر ٧ أيام",
@@ -1578,7 +1583,9 @@
       "documents": "مستندات وموافقات"
     },
     "financePanel": {
-      "cashFlowTitle": "التدفق النقدي"
+      "cashFlowTitle": "التدفق النقدي",
+      "noTransactions": "لا توجد حركات مالية بعد",
+      "startRecording": "ابدأ بتسجيل أول حركة"
     },
     "didYouKnow": {
       "title": "هل تعلم؟",
