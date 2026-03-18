@@ -1415,12 +1415,16 @@
       "bankBalance": "رصيد البنك",
       "cashBalance": "الصندوق",
       "netProfit": "صافي الربح",
+      "netProfitLabel": "صافي الربح",
       "contracts": "قيمة العقود",
       "collection": "نسبة التحصيل",
       "totalIncome": "المقبوضات",
       "totalExpenses": "المصروفات",
       "thisMonth": "هذا الشهر",
-      "vsLastMonth": "عن الشهر الماضي"
+      "vsLastMonth": "عن الشهر الماضي",
+      "outstanding": "المبالغ المستحقة",
+      "outstandingSubtitle": "فواتير لم تُحصّل",
+      "profitMarginLabel": "هامش الربح"
     },
     "project": {
       "contractValue": "قيمة العقد",
@@ -1456,6 +1460,41 @@
       "record": "تسجيل",
       "view": "عرض",
       "openIssues": "{count} مشاكل مفتوحة في مشاريعك"
+    },
+    "alerts": {
+      "needsAttention": "يحتاج انتباهك",
+      "overdueInvoices": "فواتير متأخرة",
+      "overdueMilestones": "مراحل متأخرة",
+      "pendingClaims": "مطالبات معلّقة",
+      "upcomingPayments": "دفعات مستحقة قريباً",
+      "daysOverdue": "يوم تأخير",
+      "daysRemaining": "يوم متبقي"
+    },
+    "financial": {
+      "title": "الملخص المالي",
+      "totalContractValue": "إجمالي العقود",
+      "totalInvoiced": "تم فوترته",
+      "totalCollected": "تم تحصيله",
+      "profitMarginLabel": "هامش الربح",
+      "revenueLabel": "الإيرادات",
+      "expensesLabel": "المصروفات",
+      "noDataForTrend": "لا توجد بيانات كافية لعرض الاتجاه المالي"
+    },
+    "operational": {
+      "title": "نظرة تشغيلية",
+      "activeProjects": "مشاريع نشطة",
+      "completedProjects": "مشاريع مكتملة",
+      "onHoldProjects": "مشاريع معلّقة",
+      "openIssues": "مشاكل مفتوحة",
+      "leadsPipeline": "خط العملاء المحتملين",
+      "projectsByType": "المشاريع حسب النوع",
+      "types": {
+        "RESIDENTIAL": "سكني",
+        "COMMERCIAL": "تجاري",
+        "INDUSTRIAL": "صناعي",
+        "INFRASTRUCTURE": "بنية تحتية",
+        "MIXED": "مختلط"
+      }
     },
     "cashFlow": {
       "title": "التدفق النقدي — آخر ٧ أيام",

@@ -399,6 +399,96 @@ export async function getRecentActivities(
 }
 
 /**
+ * Get overdue invoices (past due date, not fully paid)
+ */
+export async function getDashboardOverdueInvoices(
+	organizationId: string,
+	limit = 10,
+) {
+	return db.financeInvoice.findMany({
+		where: {
+			organizationId,
+			dueDate: { lt: new Date() },
+			status: { in: ["SENT", "VIEWED", "PARTIALLY_PAID", "OVERDUE"] },
+		},
+		select: {
+			id: true,
+			invoiceNo: true,
+			clientName: true,
+			totalAmount: true,
+			paidAmount: true,
+			dueDate: true,
+			status: true,
+		},
+		orderBy: { dueDate: "asc" },
+		take: limit,
+	});
+}
+
+/**
+ * Get leads pipeline (grouped by status)
+ */
+export async function getLeadsPipeline(organizationId: string) {
+	const result = await db.lead.groupBy({
+		by: ["status"],
+		where: { organizationId },
+		_count: { id: true },
+	});
+
+	const pipeline: Record<string, number> = {};
+	for (const row of result) {
+		pipeline[row.status] = row._count.id;
+	}
+	return pipeline;
+}
+
+/**
+ * Get pending subcontract claims count
+ */
+export async function getPendingSubcontractClaimsCount(
+	organizationId: string,
+) {
+	return db.subcontractClaim.count({
+		where: {
+			organizationId,
+			status: { in: ["DRAFT", "SUBMITTED", "UNDER_REVIEW"] },
+		},
+	});
+}
+
+/**
+ * Get invoice totals (invoiced, collected, outstanding)
+ */
+export async function getInvoiceTotals(organizationId: string) {
+	const [invoiced, collected] = await Promise.all([
+		db.financeInvoice.aggregate({
+			where: {
+				organizationId,
+				status: { notIn: ["DRAFT", "CANCELLED"] },
+			},
+			_sum: { totalAmount: true },
+		}),
+		db.financeInvoice.aggregate({
+			where: {
+				organizationId,
+				status: { notIn: ["DRAFT", "CANCELLED"] },
+			},
+			_sum: { paidAmount: true },
+		}),
+	]);
+
+	const totalInvoiced = invoiced._sum.totalAmount
+		? Number(invoiced._sum.totalAmount)
+		: 0;
+	const totalCollected = collected._sum.paidAmount
+		? Number(collected._sum.paidAmount)
+		: 0;
+	const totalOutstanding = totalInvoiced - totalCollected;
+
+	return { totalInvoiced, totalCollected, totalOutstanding };
+}
+
+/**
  * Get monthly financial trend for charts (last 6 months)
  */
 export async function getMonthlyFinancialTrend(organizationId: string) {

@@ -6,29 +6,42 @@ import { Skeleton } from "@ui/components/skeleton";
  */
 export function HomeDashboardSkeleton() {
 	return (
-		<div className="space-y-6">
-			<div className="space-y-2">
-				<Skeleton className="h-8 w-48" />
-				<Skeleton className="h-4 w-64" />
-			</div>
-			{/* Checklist */}
-			<div className="rounded-xl border border-border p-6 space-y-3">
-				{Array.from({ length: 4 }).map((_, i) => (
-					<div key={i} className="flex items-center gap-3">
-						<Skeleton className="h-5 w-5 rounded" />
-						<Skeleton className="h-4 w-48" />
-					</div>
-				))}
-			</div>
-			{/* Quick actions grid */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+		<div className="space-y-4">
+			{/* KPI Cards — 6 cards */}
+			<div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
 				{Array.from({ length: 6 }).map((_, i) => (
-					<div key={i} className="rounded-xl border border-border p-5 space-y-3">
-						<Skeleton className="h-10 w-10 rounded-lg" />
-						<Skeleton className="h-5 w-28" />
-						<Skeleton className="h-4 w-full" />
-					</div>
+					<Skeleton key={i} className="h-24 rounded-2xl" />
 				))}
+			</div>
+
+			{/* Active Projects */}
+			<Skeleton className="h-[120px] rounded-xl" />
+
+			{/* Quick Actions — 8 cards */}
+			<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">
+				{Array.from({ length: 8 }).map((_, i) => (
+					<Skeleton key={i} className="h-28 rounded-2xl" />
+				))}
+			</div>
+
+			{/* Alerts */}
+			<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+				{Array.from({ length: 4 }).map((_, i) => (
+					<Skeleton key={i} className="h-24 rounded-2xl" />
+				))}
+			</div>
+
+			{/* Financial + Operational */}
+			<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+				<Skeleton className="h-80 rounded-2xl" />
+				<Skeleton className="h-80 rounded-2xl" />
+			</div>
+
+			{/* Cash Flow + Expenses + Activity */}
+			<div className="grid grid-cols-1 gap-4 lg:grid-cols-11">
+				<Skeleton className="h-72 rounded-2xl lg:col-span-5" />
+				<Skeleton className="h-72 rounded-2xl lg:col-span-3" />
+				<Skeleton className="h-72 rounded-2xl lg:col-span-3" />
 			</div>
 		</div>
 	);

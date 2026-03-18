@@ -1415,12 +1415,16 @@
       "bankBalance": "Bank Balance",
       "cashBalance": "Cash Balance",
       "netProfit": "Net Profit",
+      "netProfitLabel": "Net Profit",
       "contracts": "Contract Value",
       "collection": "Collection Rate",
       "totalIncome": "Income",
       "totalExpenses": "Expenses",
       "thisMonth": "This month",
-      "vsLastMonth": "vs last month"
+      "vsLastMonth": "vs last month",
+      "outstanding": "Outstanding",
+      "outstandingSubtitle": "Unpaid invoices",
+      "profitMarginLabel": "Profit margin"
     },
     "project": {
       "contractValue": "Contract Value",
@@ -1456,6 +1460,41 @@
       "record": "Record",
       "view": "View",
       "openIssues": "{count} open issues in your projects"
+    },
+    "alerts": {
+      "needsAttention": "Needs Attention",
+      "overdueInvoices": "Overdue Invoices",
+      "overdueMilestones": "Overdue Milestones",
+      "pendingClaims": "Pending Claims",
+      "upcomingPayments": "Upcoming Payments",
+      "daysOverdue": "days overdue",
+      "daysRemaining": "days remaining"
+    },
+    "financial": {
+      "title": "Financial Overview",
+      "totalContractValue": "Total Contract Value",
+      "totalInvoiced": "Total Invoiced",
+      "totalCollected": "Total Collected",
+      "profitMarginLabel": "Profit Margin",
+      "revenueLabel": "Revenue",
+      "expensesLabel": "Expenses",
+      "noDataForTrend": "Not enough data to show financial trend"
+    },
+    "operational": {
+      "title": "Operational Overview",
+      "activeProjects": "Active Projects",
+      "completedProjects": "Completed Projects",
+      "onHoldProjects": "On Hold Projects",
+      "openIssues": "Open Issues",
+      "leadsPipeline": "Leads Pipeline",
+      "projectsByType": "Projects by Type",
+      "types": {
+        "RESIDENTIAL": "Residential",
+        "COMMERCIAL": "Commercial",
+        "INDUSTRIAL": "Industrial",
+        "INFRASTRUCTURE": "Infrastructure",
+        "MIXED": "Mixed"
+      }
     },
     "cashFlow": {
       "title": "Cash Flow — Last 7 Days",

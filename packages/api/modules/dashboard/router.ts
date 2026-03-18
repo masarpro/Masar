@@ -10,6 +10,10 @@ import {
 	getOverdueMilestones,
 	getRecentActivities,
 	getMonthlyFinancialTrend,
+	getDashboardOverdueInvoices,
+	getLeadsPipeline,
+	getPendingSubcontractClaimsCount,
+	getInvoiceTotals,
 } from "@repo/database";
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -187,13 +191,52 @@ const getAll = protectedProcedure
 			throw new Error("Unauthorized");
 		}
 
-		const [stats, activities, upcoming] = await Promise.all([
+		const [
+			stats,
+			activities,
+			upcoming,
+			overdueMilestones,
+			overdueInvoices,
+			financialTrend,
+			typeDistribution,
+			leadsPipeline,
+			pendingSubcontractClaims,
+			invoiceTotals,
+		] = await Promise.all([
 			getDashboardStats(input.organizationId),
 			getRecentActivities(input.organizationId, input.activitiesLimit),
 			getUpcomingMilestones(input.organizationId, input.upcomingLimit),
+			getOverdueMilestones(input.organizationId, 10),
+			getDashboardOverdueInvoices(input.organizationId),
+			getMonthlyFinancialTrend(input.organizationId),
+			getProjectTypeDistribution(input.organizationId),
+			getLeadsPipeline(input.organizationId),
+			getPendingSubcontractClaimsCount(input.organizationId),
+			getInvoiceTotals(input.organizationId),
 		]);
 
-		return { stats, activities, upcoming };
+		// Computed fields
+		const netProfit = invoiceTotals.totalCollected - stats.financials.totalExpenses;
+		const profitMargin = invoiceTotals.totalCollected > 0
+			? Number(((netProfit / invoiceTotals.totalCollected) * 100).toFixed(1))
+			: 0;
+
+		return {
+			stats,
+			activities,
+			upcoming,
+			overdue: {
+				milestones: overdueMilestones,
+				invoices: overdueInvoices,
+			},
+			financialTrend,
+			typeDistribution,
+			leadsPipeline,
+			pendingSubcontractClaims,
+			invoiceTotals,
+			netProfit,
+			profitMargin,
+		};
 	});
 
 export const dashboardRouter = {
