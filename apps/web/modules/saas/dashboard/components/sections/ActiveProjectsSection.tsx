@@ -95,9 +95,9 @@ export function ActiveProjectsSection({
 	const hasMore = projects.length > MAX_VISIBLE;
 
 	return (
-		<div className={`${glassCard} flex flex-col p-3 overflow-hidden`}>
+		<div className={`${glassCard} flex flex-col p-4 overflow-hidden`}>
 			{/* Header */}
-			<div className="flex items-center justify-between mb-2 shrink-0 -mx-3 -mt-3 px-3 py-2 rounded-t-2xl bg-gradient-to-l from-blue-50/70 via-blue-50/40 to-sky-50/60 dark:from-blue-950/30 dark:via-blue-950/20 dark:to-sky-950/25 border-b border-blue-200/30 dark:border-blue-500/15">
+			<div className="flex items-center justify-between mb-3 shrink-0 -mx-4 -mt-4 px-4 py-2.5 rounded-t-2xl bg-gradient-to-l from-blue-50/70 via-blue-50/40 to-sky-50/60 dark:from-blue-950/30 dark:via-blue-950/20 dark:to-sky-950/25 border-b border-blue-200/30 dark:border-blue-500/15">
 				<div className="flex items-center gap-2">
 					<div className="p-1.5 rounded-lg bg-blue-500/10">
 						<FolderOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -144,7 +144,7 @@ export function ActiveProjectsSection({
 						<Link
 							key={project.id}
 							href={`/app/${organizationSlug}/projects/${project.id}`}
-							className="group relative flex items-center gap-3 p-2.5 rounded-xl border border-border/30 bg-card/50 hover:bg-card hover:border-border/60 hover:shadow-md transition-all duration-300"
+							className="group relative flex items-center gap-3 p-3 rounded-xl border border-border/30 bg-card/50 hover:bg-card hover:border-border/60 hover:shadow-md transition-all duration-300"
 							style={{ animationDelay: `${80 + i * 50}ms` }}
 						>
 							{/* Health side bar */}
@@ -153,10 +153,10 @@ export function ActiveProjectsSection({
 							/>
 
 							{/* Progress ring */}
-							<div className="relative h-9 w-9 shrink-0 ms-1.5">
+							<div className="relative h-10 w-10 shrink-0 ms-2">
 								<svg
 									viewBox="0 0 36 36"
-									className="h-9 w-9 -rotate-90"
+									className="h-10 w-10 -rotate-90"
 								>
 									<circle
 										cx="18"

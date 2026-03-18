@@ -55,9 +55,9 @@ export function FinancePanel({
 	}, [financialTrend, locale]);
 
 	return (
-		<div className={`${glassCard} flex flex-col p-3 overflow-hidden`}>
+		<div className={`${glassCard} flex flex-col p-4 overflow-hidden`}>
 			{/* 2 balance cards */}
-			<div className="grid grid-cols-2 gap-3 mb-2 shrink-0">
+			<div className="grid grid-cols-2 gap-3 mb-3 shrink-0">
 				{/* Bank Balance */}
 				<Link
 					href={`/app/${organizationSlug}/finance/banks`}
@@ -110,7 +110,7 @@ export function FinancePanel({
 					</Link>
 				</div>
 
-				<ChartContainer config={chartConfig} className="w-full flex-1 min-h-[80px] aspect-auto">
+				<ChartContainer config={chartConfig} className="w-full flex-1 min-h-[100px] aspect-auto">
 					<AreaChart
 						data={chartData}
 						margin={{ top: 4, right: 4, left: 4, bottom: 0 }}
