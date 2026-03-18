@@ -6,22 +6,19 @@ import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 
-import { KpiCardsRow } from "./sections/KpiCardsRow";
 import { ActiveProjectsSection } from "./sections/ActiveProjectsSection";
+import { FinancePanel } from "./sections/FinancePanel";
 import { QuickActionsGrid } from "./sections/QuickActionsGrid";
 import { AlertsSection } from "./sections/AlertsSection";
-import { FinancialOverviewSection } from "./sections/FinancialOverviewSection";
 import { OperationalSection } from "./sections/OperationalSection";
-import { CashFlowSection } from "./sections/CashFlowSection";
-import { CompanyExpensesSection } from "./sections/CompanyExpensesSection";
-import { RecentActivitySection } from "./sections/RecentActivitySection";
+import { DidYouKnowCard } from "./sections/DidYouKnowCard";
 
 export function Dashboard() {
 	const { activeOrganization } = useActiveOrganization();
 	const organizationSlug = activeOrganization?.slug ?? "";
 	const organizationId = activeOrganization?.id ?? "";
 
-	// Combined dashboard data — single API call for stats + activities + upcoming + overdue + trends
+	// Combined dashboard data
 	const { data: dashboardData, isLoading: statsLoading } = useQuery({
 		...orpc.dashboard.getAll.queryOptions({
 			input: { organizationId, activitiesLimit: 5, upcomingLimit: 5 },
@@ -30,7 +27,7 @@ export function Dashboard() {
 		staleTime: STALE_TIMES.DASHBOARD_STATS,
 	});
 
-	// Org financial data (bank, cash, profit)
+	// Org financial data (bank, cash)
 	const { data: orgFinance } = useQuery(
 		orpc.finance.orgDashboard.queryOptions({
 			input: { organizationId },
@@ -44,65 +41,41 @@ export function Dashboard() {
 		}),
 	);
 
-	// Company expense dashboard data
-	const { data: companyExpenseData } = useQuery({
-		...orpc.company.expenses.getDashboardData.queryOptions({
-			input: { organizationId },
-		}),
-		enabled: !!organizationId,
-	});
-
 	if (statsLoading) {
 		return <HomeDashboardSkeleton />;
 	}
 
 	const stats = dashboardData?.stats ?? null;
-	const bankBalance = orgFinance?.balances?.totalBankBalance ?? 0;
-	const cashBalance = orgFinance?.balances?.totalCashBalance ?? 0;
-	const totalIncome = orgFinance?.payments?.total ?? 0;
-	const totalExpenses = orgFinance?.totalMoneyOut ?? stats?.financials?.totalExpenses ?? 0;
 	const projects = projectsData?.projects ?? [];
 
 	return (
-		<div className="space-y-4" dir="rtl">
-			{/* Row 1: KPI Cards */}
-			<KpiCardsRow
-				bankBalance={bankBalance}
-				cashBalance={cashBalance}
-				totalIncome={totalIncome}
-				totalExpenses={totalExpenses}
-				totalOutstanding={dashboardData?.invoiceTotals?.totalOutstanding ?? 0}
-				netProfit={dashboardData?.netProfit ?? 0}
-				profitMargin={dashboardData?.profitMargin ?? 0}
-				organizationSlug={organizationSlug}
-			/>
+		<div className="flex flex-col gap-3 p-3 md:p-4 lg:p-5" dir="rtl">
+			{/* Row 1: Projects (left) + Finance (right) */}
+			<div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+				<ActiveProjectsSection
+					projects={projects}
+					organizationSlug={organizationSlug}
+				/>
+				<FinancePanel
+					bankBalance={orgFinance?.balances?.totalBankBalance ?? 0}
+					cashBalance={orgFinance?.balances?.totalCashBalance ?? 0}
+					upcomingPayments={dashboardData?.upcoming ?? []}
+					financialTrend={dashboardData?.financialTrend ?? []}
+					organizationSlug={organizationSlug}
+				/>
+			</div>
 
-			{/* Row 2: Active Projects */}
-			<ActiveProjectsSection
-				projects={projects}
-				organizationSlug={organizationSlug}
-			/>
-
-			{/* Row 3: Quick Actions */}
+			{/* Row 2: 6 Quick Action cards */}
 			<QuickActionsGrid organizationSlug={organizationSlug} />
 
-			{/* Row 4: Alerts (only renders if there are alerts) */}
-			<AlertsSection
-				overdueInvoices={dashboardData?.overdue?.invoices ?? []}
-				overdueMilestones={dashboardData?.overdue?.milestones ?? []}
-				pendingSubcontractClaims={dashboardData?.pendingSubcontractClaims ?? 0}
-				upcomingPayments={dashboardData?.upcoming ?? []}
-				organizationSlug={organizationSlug}
-			/>
-
-			{/* Row 5: Financial + Operational */}
-			<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-				<FinancialOverviewSection
-					totalContractValue={stats?.financials?.totalContractValue ?? 0}
-					totalInvoiced={dashboardData?.invoiceTotals?.totalInvoiced ?? 0}
-					totalCollected={dashboardData?.invoiceTotals?.totalCollected ?? 0}
-					profitMargin={dashboardData?.profitMargin ?? 0}
-					financialTrend={dashboardData?.financialTrend ?? []}
+			{/* Row 3: Alerts + Operational + Did You Know */}
+			<div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+				<AlertsSection
+					overdueInvoices={dashboardData?.overdue?.invoices ?? []}
+					overdueMilestones={dashboardData?.overdue?.milestones ?? []}
+					pendingSubcontractClaims={dashboardData?.pendingSubcontractClaims ?? 0}
+					upcomingPayments={dashboardData?.upcoming ?? []}
+					organizationSlug={organizationSlug}
 				/>
 				<OperationalSection
 					activeProjects={stats?.projects?.active ?? 0}
@@ -112,27 +85,7 @@ export function Dashboard() {
 					leadsPipeline={dashboardData?.leadsPipeline ?? {}}
 					typeDistribution={dashboardData?.typeDistribution ?? []}
 				/>
-			</div>
-
-			{/* Row 6: Cash Flow + Company Expenses + Recent Activity */}
-			<div className="grid grid-cols-1 gap-4 lg:grid-cols-11 lg:items-stretch">
-				<div className="lg:col-span-5">
-					<CashFlowSection organizationSlug={organizationSlug} />
-				</div>
-				<div className="lg:col-span-3">
-					<CompanyExpensesSection
-						byCategory={companyExpenseData?.byCategory ?? {}}
-						monthlyExpenses={companyExpenseData?.monthlyExpenses ?? []}
-						organizationSlug={organizationSlug}
-					/>
-				</div>
-				<div className="lg:col-span-3">
-					<RecentActivitySection
-						activities={dashboardData?.activities ?? []}
-						upcomingMilestones={dashboardData?.upcoming ?? []}
-						organizationSlug={organizationSlug}
-					/>
-				</div>
+				<DidYouKnowCard organizationSlug={organizationSlug} />
 			</div>
 		</div>
 	);

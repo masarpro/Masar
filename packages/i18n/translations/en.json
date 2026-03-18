@@ -1565,6 +1565,54 @@
     "upcomingPayments": {
       "title": "Upcoming Payments"
     },
+    "addFirstProject": "Add Your First Project",
+    "addFirstProjectDesc": "Start by adding your first project and enjoy full project management from one place",
+    "createFirstProject": "Create Project",
+    "feature": {
+      "tracking": "Progress & execution tracking",
+      "invoicing": "Invoices & claims",
+      "team": "Team management",
+      "documents": "Documents & approvals"
+    },
+    "financePanel": {
+      "cashFlowTitle": "Cash Flow"
+    },
+    "didYouKnow": {
+      "title": "Did you know?",
+      "tryIt": "Try it now",
+      "tips": {
+        "quantitySmart": "You can calculate structural quantities automatically — foundations, columns, slabs, walls — and price them smartly from one place",
+        "aiAssistant": "Masar's AI assistant can answer any question about your projects or finances instantly — try asking it!",
+        "ownerPortal": "Create a private portal for the project owner to track progress, payments, and timeline without needing a Masar account",
+        "invoiceTemplates": "Design your invoice and quotation templates with drag-and-drop — add your logo, colors, and ZATCA QR code",
+        "zatcaQr": "Masar auto-generates ZATCA QR codes on every tax invoice — Phase 1 compliant",
+        "ganttChart": "Track your timeline with an interactive Gantt chart with drag-and-drop — and analyze your project's critical path",
+        "subcontractors": "Manage subcontracts fully — items, claims, payments, retention — all within each project",
+        "dailyReports": "Document daily site reports with photos and notes — weather, labor, obstacles, and progress percentage",
+        "criticalPath": "Masar calculates your project's critical path automatically and shows activities that affect the delivery date",
+        "leadsTracking": "Track potential clients from first contact to winning the project — with a visual pipeline",
+        "payrollSystem": "Create monthly payroll runs and add allowances and deductions per employee — then approve with one click",
+        "documentVersions": "Upload project documents with version tracking — and revert to any previous version anytime",
+        "approvalWorkflow": "Create approval requests for project documents and assign approvers — with automatic notifications",
+        "cashFlow": "Monitor your cash flow with detailed reports — daily, weekly, or monthly — with cumulative balance",
+        "changeOrders": "Record change orders on projects with their impact on value and schedule — and approve electronically",
+        "buildingConfig": "The building config wizard auto-calculates column and wall heights from floor elevations — no manual calculation needed",
+        "mepEngine": "The MEP engine calculates electrical, plumbing, and HVAC needs automatically based on areas and building type",
+        "finishingCalc": "Smart finishing calculator — tiles, paint, plaster, marble — calculates quantities and costs with waste percentages",
+        "profitability": "Per-project profitability report compares revenue to direct costs and subcontractor expenses — know your real profits",
+        "quotationGen": "Convert quantity study and pricing directly into a professional quotation ready to send — with one click",
+        "employeeLeaves": "Complete leave system — 8 Saudi default leave types with balances, requests, and approval",
+        "assetTracking": "Track your assets — equipment, vehicles, tools — with depreciation and insurance expiry dates",
+        "bankTransfers": "Transfer between your bank accounts and cash boxes directly — balances update automatically",
+        "multiLanguage": "Masar supports Arabic and English fully — switch languages anytime without reloading",
+        "darkMode": "Enable dark mode for eye comfort — Masar supports light, dark, and system modes",
+        "rolePermissions": "Create custom roles for your team — control who sees finance, who edits projects, who approves documents",
+        "claimsWorkflow": "Create interim and final claims for your projects — with detailed items and full approval workflow",
+        "boqSummary": "BOQ summary table shows all project materials — concrete, rebar, blocks — filtered by floor and element",
+        "heightDerivation": "Just enter floor elevations — Masar auto-calculates column heights, block wall heights, and neck columns",
+        "teamChat": "Real-time chat within each project — communicate with your team and the project owner from one place"
+      }
+    },
     "emptyProjects": {
       "title": "Create Your First Project",
       "description": "Start managing your projects efficiently — add your first project now",

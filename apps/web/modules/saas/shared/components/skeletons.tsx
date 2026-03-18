@@ -6,42 +6,23 @@ import { Skeleton } from "@ui/components/skeleton";
  */
 export function HomeDashboardSkeleton() {
 	return (
-		<div className="space-y-4">
-			{/* KPI Cards — 6 cards */}
-			<div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+		<div className="flex flex-col gap-3 p-3 md:p-4 lg:p-5">
+			{/* Top row: Projects + Finance */}
+			<div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+				<Skeleton className="h-[340px] rounded-2xl" />
+				<Skeleton className="h-[340px] rounded-2xl" />
+			</div>
+			{/* 6 Quick Action cards */}
+			<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
 				{Array.from({ length: 6 }).map((_, i) => (
-					<Skeleton key={i} className="h-24 rounded-2xl" />
+					<Skeleton key={i} className="h-[80px] rounded-xl" />
 				))}
 			</div>
-
-			{/* Active Projects */}
-			<Skeleton className="h-[120px] rounded-xl" />
-
-			{/* Quick Actions — 8 cards */}
-			<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">
-				{Array.from({ length: 8 }).map((_, i) => (
-					<Skeleton key={i} className="h-28 rounded-2xl" />
-				))}
-			</div>
-
-			{/* Alerts */}
-			<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-				{Array.from({ length: 4 }).map((_, i) => (
-					<Skeleton key={i} className="h-24 rounded-2xl" />
-				))}
-			</div>
-
-			{/* Financial + Operational */}
-			<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-				<Skeleton className="h-80 rounded-2xl" />
-				<Skeleton className="h-80 rounded-2xl" />
-			</div>
-
-			{/* Cash Flow + Expenses + Activity */}
-			<div className="grid grid-cols-1 gap-4 lg:grid-cols-11">
-				<Skeleton className="h-72 rounded-2xl lg:col-span-5" />
-				<Skeleton className="h-72 rounded-2xl lg:col-span-3" />
-				<Skeleton className="h-72 rounded-2xl lg:col-span-3" />
+			{/* Bottom row: 3 cards */}
+			<div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+				<Skeleton className="h-[200px] rounded-2xl" />
+				<Skeleton className="h-[200px] rounded-2xl" />
+				<Skeleton className="h-[200px] rounded-2xl" />
 			</div>
 		</div>
 	);
