@@ -55,9 +55,9 @@ export function Dashboard() {
 	return (
 		<div className="flex flex-col gap-5 p-4 pt-2 md:p-6 md:pt-3 lg:p-8 lg:pt-4" dir="rtl">
 			{/* Header card */}
-			<div className="relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-l from-primary/[0.04] via-card to-primary/[0.06] dark:from-primary/[0.08] dark:via-card dark:to-primary/[0.03] px-8 py-5 flex items-center justify-between shrink-0">
+			<div className="relative overflow-hidden rounded-2xl border border-blue-200/40 dark:border-blue-500/20 backdrop-blur-xl bg-gradient-to-l from-blue-50/70 via-blue-50/40 to-sky-50/60 dark:from-blue-950/30 dark:via-blue-950/20 dark:to-sky-950/25 shadow-lg shadow-blue-500/5 px-8 py-5 flex items-center justify-between shrink-0">
 				{/* Decorative accent */}
-				<div className="absolute inset-y-0 start-0 w-1 bg-gradient-to-b from-primary/60 via-primary/30 to-transparent rounded-full" />
+				<div className="absolute inset-y-0 start-0 w-1 bg-gradient-to-b from-blue-500/60 via-blue-400/30 to-transparent rounded-full" />
 				<div>
 					<h1 className="text-xl font-bold text-foreground">
 						{t("dashboard.welcome.greeting", { name: firstName })}

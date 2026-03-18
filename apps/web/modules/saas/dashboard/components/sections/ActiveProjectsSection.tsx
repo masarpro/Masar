@@ -97,21 +97,21 @@ export function ActiveProjectsSection({
 	return (
 		<div className={`${glassCard} flex flex-col p-3.5 overflow-hidden`}>
 			{/* Header */}
-			<div className="flex items-center justify-between mb-2.5 shrink-0">
+			<div className="flex items-center justify-between mb-2.5 shrink-0 -mx-3.5 -mt-3.5 px-3.5 py-2.5 rounded-t-2xl bg-gradient-to-l from-blue-50/70 via-blue-50/40 to-sky-50/60 dark:from-blue-950/30 dark:via-blue-950/20 dark:to-sky-950/25 border-b border-blue-200/30 dark:border-blue-500/15">
 				<div className="flex items-center gap-2">
-					<div className="p-1.5 rounded-lg bg-primary/10">
-						<FolderOpen className="h-4 w-4 text-primary" />
+					<div className="p-1.5 rounded-lg bg-blue-500/10">
+						<FolderOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
 					</div>
 					<h2 className="text-base font-bold text-foreground">
 						{t("dashboard.activeProjects")}
 					</h2>
-					<span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+					<span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full">
 						{projects.length}
 					</span>
 				</div>
 				<Link
 					href={`/app/${organizationSlug}/projects`}
-					className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+					className="flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
 				>
 					{t("dashboard.viewAll")}
 					<ChevronLeft className="h-3 w-3" />
