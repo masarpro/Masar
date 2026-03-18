@@ -47,6 +47,14 @@ export function Dashboard() {
 		enabled: !!organizationId,
 	});
 
+	const [currentTime, setCurrentTime] = useState<Date | null>(null);
+
+	useEffect(() => {
+		setCurrentTime(new Date());
+		const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+		return () => clearInterval(timer);
+	}, []);
+
 	if (!organizationId || statsLoading || finLoading || projLoading) {
 		return <HomeDashboardSkeleton />;
 	}
@@ -55,13 +63,6 @@ export function Dashboard() {
 	const projects = projectsData?.projects ?? [];
 	const firstName = user?.name?.split(" ")[0] || "";
 	const now = new Date();
-	const [currentTime, setCurrentTime] = useState<Date | null>(null);
-
-	useEffect(() => {
-		setCurrentTime(new Date());
-		const timer = setInterval(() => setCurrentTime(new Date()), 60000);
-		return () => clearInterval(timer);
-	}, []);
 
 	return (
 		<div className="flex flex-col gap-6 p-4 md:p-6 lg:p-8" dir="rtl">
