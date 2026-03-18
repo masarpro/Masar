@@ -60,7 +60,7 @@ export function AlertsSection({
 	if (!hasAlerts) {
 		return (
 			<div
-				className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/30 dark:border-emerald-800/20 shadow-lg shadow-black/5 flex flex-col items-center justify-center p-5 text-center"
+				className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/30 dark:border-emerald-800/20 shadow-lg shadow-black/5 flex flex-col items-center justify-center p-3.5 text-center"
 			>
 				<CheckCircle2 className="h-10 w-10 text-emerald-500 mb-2" />
 				<p className="text-base font-semibold text-foreground">
@@ -125,8 +125,8 @@ export function AlertsSection({
 	const visibleAlerts = alerts.slice(0, 3);
 
 	return (
-		<div className="rounded-2xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-200/30 dark:border-amber-800/20 shadow-lg shadow-black/5 flex flex-col p-5">
-			<h3 className="text-base font-bold text-foreground mb-3">
+		<div className="rounded-2xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-200/30 dark:border-amber-800/20 shadow-lg shadow-black/5 flex flex-col p-3.5">
+			<h3 className="text-sm font-bold text-foreground mb-2">
 				{t("dashboard.alerts.needsAttention")}
 			</h3>
 			<div className="flex-1 space-y-2">

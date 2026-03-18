@@ -65,8 +65,8 @@ export function Dashboard() {
 	const now = new Date();
 
 	return (
-		<div className="flex flex-col gap-6 p-4 md:p-6 lg:p-8" dir="rtl">
-			{/* Header card — matches finance header pattern */}
+		<div className="flex flex-col gap-5 p-4 pt-2 md:p-6 md:pt-3 lg:p-8 lg:pt-4" dir="rtl">
+			{/* Header card */}
 			<div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50">
 				<div className="flex items-center gap-3">
 					<div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -81,27 +81,19 @@ export function Dashboard() {
 						</p>
 					</div>
 				</div>
-				<div className="flex items-center gap-4">
-					<div className="text-start hidden sm:block">
-						<p className="text-sm font-medium text-foreground">
-							{new Intl.DateTimeFormat(locale, { weekday: "long" }).format(now)}
-						</p>
-						<p className="text-xs text-muted-foreground">
-							{new Intl.DateTimeFormat(locale, {
-								day: "numeric",
-								month: "long",
-								year: "numeric",
-							}).format(now)}
-						</p>
-					</div>
+				<div className="hidden sm:flex items-center gap-2 text-sm">
 					{currentTime && (
-						<div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
-							<Clock className="h-4 w-4" />
-							<span className="tabular-nums">
+						<>
+							<Clock className="h-4 w-4 text-muted-foreground" />
+							<span className="font-medium text-foreground tabular-nums">
 								{new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(currentTime)}
 							</span>
-						</div>
+							<span className="text-muted-foreground/40">|</span>
+						</>
 					)}
+					<span className="text-muted-foreground">
+						{new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" }).format(now)}
+					</span>
 				</div>
 			</div>
 
@@ -110,7 +102,6 @@ export function Dashboard() {
 				<FinancePanel
 					bankBalance={orgFinance?.balances?.totalBankBalance ?? 0}
 					cashBalance={orgFinance?.balances?.totalCashBalance ?? 0}
-					upcomingPayments={dashboardData?.upcoming ?? []}
 					financialTrend={dashboardData?.financialTrend ?? []}
 					organizationSlug={organizationSlug}
 				/>
@@ -140,7 +131,6 @@ export function Dashboard() {
 					onHoldProjects={stats?.projects?.onHold ?? 0}
 					openIssues={stats?.milestones?.overdue ?? 0}
 					leadsPipeline={dashboardData?.leadsPipeline ?? {}}
-					typeDistribution={dashboardData?.typeDistribution ?? []}
 				/>
 				<DidYouKnowCard organizationSlug={organizationSlug} />
 			</div>

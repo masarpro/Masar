@@ -23,21 +23,12 @@ const LEAD_STATUS_COLORS: Record<string, string> = {
 
 const LEAD_STATUS_ORDER = ["NEW", "STUDYING", "QUOTED", "NEGOTIATING", "WON", "LOST"];
 
-const TYPE_COLORS: Record<string, string> = {
-	RESIDENTIAL: "#3b82f6",
-	COMMERCIAL: "#10b981",
-	INDUSTRIAL: "#f97316",
-	INFRASTRUCTURE: "#6b7280",
-	MIXED: "#8b5cf6",
-};
-
 interface OperationalSectionProps {
 	activeProjects: number;
 	completedProjects: number;
 	onHoldProjects: number;
 	openIssues: number;
 	leadsPipeline: Record<string, number>;
-	typeDistribution: Array<{ type: string | null; count: number }>;
 }
 
 export function OperationalSection({
@@ -46,7 +37,6 @@ export function OperationalSection({
 	onHoldProjects,
 	openIssues,
 	leadsPipeline,
-	typeDistribution,
 }: OperationalSectionProps) {
 	const t = useTranslations();
 
@@ -61,16 +51,16 @@ export function OperationalSection({
 	const hasPipeline = pipelineTotal > 0;
 
 	return (
-		<div className={`${glassCard} flex flex-col p-5`}>
-			<div className="flex items-center gap-2 mb-3">
-				<Gauge className="h-5 w-5 text-muted-foreground" />
-				<span className="text-base font-bold text-foreground">
+		<div className={`${glassCard} flex flex-col p-3.5`}>
+			<div className="flex items-center gap-2 mb-2">
+				<Gauge className="h-4 w-4 text-muted-foreground" />
+				<span className="text-sm font-bold text-foreground">
 					{t("dashboard.operational.title")}
 				</span>
 			</div>
 
 			{/* Mini stats */}
-			<div className="grid grid-cols-2 gap-2 mb-3">
+			<div className="grid grid-cols-2 gap-2 mb-2">
 				{miniStats.map((stat, i) => {
 					const Icon = stat.icon;
 					return (
@@ -114,36 +104,6 @@ export function OperationalSection({
 				</div>
 			)}
 
-			{/* Type distribution */}
-			{typeDistribution.length > 0 && (
-				<div>
-					<p className="text-xs font-medium text-muted-foreground mb-1.5">
-						{t("dashboard.operational.projectsByType")}
-					</p>
-					<div className="space-y-1.5">
-						{typeDistribution
-							.filter((item) => item.type != null)
-							.map((item) => {
-								const typeKey = item.type as string;
-								const total = typeDistribution.reduce((s, d) => s + d.count, 0);
-								const pct = total > 0 ? Math.round((item.count / total) * 100) : 0;
-								return (
-									<div key={typeKey} className="flex items-center gap-2">
-										<div
-											className="h-2 w-2 rounded-full shrink-0"
-											style={{ backgroundColor: TYPE_COLORS[typeKey] ?? "#6b7280" }}
-										/>
-										<span className="text-xs text-foreground/80 flex-1">
-											{t(`dashboard.operational.types.${typeKey}`)}
-										</span>
-										<span className="text-xs font-bold tabular-nums text-foreground">{item.count}</span>
-										<span className="text-[10px] text-muted-foreground w-8 text-end">{pct}%</span>
-									</div>
-								);
-							})}
-					</div>
-				</div>
-			)}
 		</div>
 	);
 }

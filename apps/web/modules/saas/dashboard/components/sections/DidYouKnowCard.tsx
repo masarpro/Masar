@@ -63,14 +63,14 @@ export function DidYouKnowCard({ organizationSlug }: DidYouKnowCardProps) {
 
 	return (
 		<div
-			className="relative overflow-hidden rounded-2xl border border-blue-200/40 dark:border-blue-500/20 backdrop-blur-xl bg-gradient-to-br from-blue-50/70 via-blue-50/40 to-sky-50/60 dark:from-blue-950/30 dark:via-blue-950/20 dark:to-sky-950/25 shadow-lg shadow-blue-500/5 p-5 flex flex-col"
+			className="relative overflow-hidden rounded-2xl border border-blue-200/40 dark:border-blue-500/20 backdrop-blur-xl bg-gradient-to-br from-blue-50/70 via-blue-50/40 to-sky-50/60 dark:from-blue-950/30 dark:via-blue-950/20 dark:to-sky-950/25 shadow-lg shadow-blue-500/5 p-3.5 flex flex-col"
 		>
 			{/* Decorative background */}
 			<div className="absolute top-0 end-0 w-32 h-32 bg-blue-400/5 rounded-full -translate-y-1/2 translate-x-1/2" />
 			<div className="absolute bottom-0 start-0 w-20 h-20 bg-blue-400/5 rounded-full translate-y-1/2 -translate-x-1/2" />
 
 			{/* Header */}
-			<div className="flex items-center gap-2 mb-3 relative z-10">
+			<div className="flex items-center gap-2 mb-2 relative z-10">
 				<div className="p-1.5 rounded-lg bg-blue-500/10">
 					<Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
 				</div>
@@ -84,7 +84,7 @@ export function DidYouKnowCard({ organizationSlug }: DidYouKnowCardProps) {
 
 			{/* Content */}
 			<div className="flex-1 relative z-10">
-				<p className="text-base font-medium text-foreground/90 leading-relaxed mb-3">
+				<p className="text-sm font-medium text-foreground/90 leading-relaxed mb-2">
 					{t(`didYouKnow.tips.${tip.key}`)}
 				</p>
 			</div>
