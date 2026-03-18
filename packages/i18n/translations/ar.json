@@ -1441,6 +1441,7 @@
       "createInvoice": "إنشاء فاتورة",
       "invoices": "الفواتير",
       "newQuotation": "عرض سعر جديد",
+      "quotations": "عروض الأسعار",
       "pricing": "التسعير",
       "calculateQuantities": "حساب الكميات",
       "quantityStudies": "دراسات الكميات",
@@ -1565,6 +1566,8 @@
     "upcomingPayments": {
       "title": "الدفعات القادمة"
     },
+    "noClient": "بدون عميل",
+    "projectEnded": "انتهى",
     "addFirstProject": "أضف مشروعك الأول",
     "addFirstProjectDesc": "ابدأ بإضافة مشروعك الأول واستمتع بإدارة كاملة لمشاريعك من مكان واحد",
     "createFirstProject": "إنشاء مشروع",
@@ -1634,7 +1637,8 @@
       "nextStep": "الخطوة التالية",
       "skip": "تخطي",
       "hide": "إخفاء",
-      "greeting": "مرحبًا {name}!",
+      "greeting": "أهلاً {name}",
+      "subtitle": "إليك ملخص اليوم",
       "pendingActions": "لديك {count} إجراءات تحتاج انتباهك",
       "allGood": "كل شيء على ما يرام",
       "steps": {

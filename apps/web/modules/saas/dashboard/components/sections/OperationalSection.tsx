@@ -61,13 +61,10 @@ export function OperationalSection({
 	const hasPipeline = pipelineTotal > 0;
 
 	return (
-		<div
-			className={`${glassCard} flex flex-col p-4 animate-in fade-in slide-in-from-bottom-3 duration-500`}
-			style={{ animationDelay: "270ms" }}
-		>
+		<div className={`${glassCard} flex flex-col p-4`}>
 			<div className="flex items-center gap-2 mb-3">
-				<Gauge className="h-3.5 w-3.5 text-muted-foreground" />
-				<span className="text-xs font-semibold text-foreground">
+				<Gauge className="h-4 w-4 text-muted-foreground" />
+				<span className="text-sm font-bold text-foreground">
 					{t("dashboard.operational.title")}
 				</span>
 			</div>
@@ -77,11 +74,11 @@ export function OperationalSection({
 				{miniStats.map((stat, i) => {
 					const Icon = stat.icon;
 					return (
-						<div key={i} className={`rounded-lg ${stat.bgColor} p-2 flex items-center gap-1.5`}>
-							<Icon className={`h-3.5 w-3.5 ${stat.color}`} />
+						<div key={i} className={`rounded-lg ${stat.bgColor} p-2.5 flex items-center gap-2`}>
+							<Icon className={`h-4 w-4 ${stat.color}`} />
 							<div>
-								<p className="text-[9px] text-muted-foreground">{stat.label}</p>
-								<p className={`text-xs font-bold ${stat.color}`}>{stat.value}</p>
+								<p className="text-xs text-muted-foreground">{stat.label}</p>
+								<p className={`text-base font-bold ${stat.color}`}>{stat.value}</p>
 							</div>
 						</div>
 					);
@@ -91,21 +88,21 @@ export function OperationalSection({
 			{/* Leads Pipeline */}
 			{hasPipeline && (
 				<div className="mb-3">
-					<p className="text-[10px] font-medium text-muted-foreground mb-1.5">
+					<p className="text-xs font-medium text-muted-foreground mb-1.5">
 						{t("dashboard.operational.leadsPipeline")}
 					</p>
-					<div className="flex h-5 rounded-md overflow-hidden">
+					<div className="flex h-6 rounded-md overflow-hidden">
 						{LEAD_STATUS_ORDER.filter((s) => (leadsPipeline[s] ?? 0) > 0).map((status) => {
 							const count = leadsPipeline[status] ?? 0;
 							const pct = (count / pipelineTotal) * 100;
 							return (
 								<div
 									key={status}
-									className="flex items-center justify-center text-[8px] font-bold text-white"
+									className="flex items-center justify-center text-[10px] font-bold text-white"
 									style={{
 										width: `${pct}%`,
 										backgroundColor: LEAD_STATUS_COLORS[status] ?? "#6b7280",
-										minWidth: count > 0 ? "20px" : 0,
+										minWidth: count > 0 ? "22px" : 0,
 									}}
 									title={`${t(`leads.status.${status}`)} (${count})`}
 								>
@@ -120,10 +117,10 @@ export function OperationalSection({
 			{/* Type distribution */}
 			{typeDistribution.length > 0 && (
 				<div>
-					<p className="text-[10px] font-medium text-muted-foreground mb-1.5">
+					<p className="text-xs font-medium text-muted-foreground mb-1.5">
 						{t("dashboard.operational.projectsByType")}
 					</p>
-					<div className="space-y-1">
+					<div className="space-y-1.5">
 						{typeDistribution
 							.filter((item) => item.type != null)
 							.map((item) => {
@@ -131,16 +128,16 @@ export function OperationalSection({
 								const total = typeDistribution.reduce((s, d) => s + d.count, 0);
 								const pct = total > 0 ? Math.round((item.count / total) * 100) : 0;
 								return (
-									<div key={typeKey} className="flex items-center gap-1.5">
+									<div key={typeKey} className="flex items-center gap-2">
 										<div
-											className="h-1.5 w-1.5 rounded-full shrink-0"
+											className="h-2 w-2 rounded-full shrink-0"
 											style={{ backgroundColor: TYPE_COLORS[typeKey] ?? "#6b7280" }}
 										/>
-										<span className="text-[9px] text-foreground/80 flex-1">
+										<span className="text-xs text-foreground/80 flex-1">
 											{t(`dashboard.operational.types.${typeKey}`)}
 										</span>
-										<span className="text-[9px] font-bold tabular-nums text-foreground">{item.count}</span>
-										<span className="text-[8px] text-muted-foreground w-7 text-end">{pct}%</span>
+										<span className="text-xs font-bold tabular-nums text-foreground">{item.count}</span>
+										<span className="text-[10px] text-muted-foreground w-8 text-end">{pct}%</span>
 									</div>
 								);
 							})}

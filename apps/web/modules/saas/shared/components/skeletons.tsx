@@ -6,20 +6,29 @@ import { Skeleton } from "@ui/components/skeleton";
  */
 export function HomeDashboardSkeleton() {
 	return (
-		<div className="flex flex-col gap-3 p-3 md:p-4 lg:p-5">
+		<div className="flex min-h-[calc(100vh-64px)] flex-col gap-3 p-3 md:p-4">
+			{/* Header */}
+			<div className="flex items-center justify-between shrink-0">
+				<div className="space-y-1">
+					<Skeleton className="h-7 w-40" />
+					<Skeleton className="h-4 w-28" />
+				</div>
+				<Skeleton className="h-8 w-32 hidden md:block" />
+				<Skeleton className="h-8 w-24 hidden sm:block" />
+			</div>
 			{/* Top row: Projects + Finance */}
-			<div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-				<Skeleton className="h-[340px] rounded-2xl" />
-				<Skeleton className="h-[340px] rounded-2xl" />
+			<div className="grid grid-cols-1 gap-3 lg:grid-cols-2 flex-1 min-h-0">
+				<Skeleton className="rounded-2xl" />
+				<Skeleton className="rounded-2xl" />
 			</div>
 			{/* 6 Quick Action cards */}
-			<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+			<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 shrink-0">
 				{Array.from({ length: 6 }).map((_, i) => (
-					<Skeleton key={i} className="h-[80px] rounded-xl" />
+					<Skeleton key={i} className="h-[90px] rounded-xl" />
 				))}
 			</div>
 			{/* Bottom row: 3 cards */}
-			<div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+			<div className="grid grid-cols-1 gap-3 lg:grid-cols-3 shrink-0">
 				<Skeleton className="h-[200px] rounded-2xl" />
 				<Skeleton className="h-[200px] rounded-2xl" />
 				<Skeleton className="h-[200px] rounded-2xl" />

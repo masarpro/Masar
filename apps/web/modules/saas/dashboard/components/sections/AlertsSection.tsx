@@ -41,12 +41,6 @@ interface AlertsSectionProps {
 	organizationSlug: string;
 }
 
-function daysSince(date: Date | string): number {
-	const now = new Date();
-	const d = new Date(date);
-	return Math.max(0, Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24)));
-}
-
 export function AlertsSection({
 	overdueInvoices,
 	overdueMilestones,
@@ -66,14 +60,13 @@ export function AlertsSection({
 	if (!hasAlerts) {
 		return (
 			<div
-				className={`${glassCard} flex flex-col items-center justify-center p-4 text-center animate-in fade-in slide-in-from-bottom-3 duration-500`}
-				style={{ animationDelay: "240ms" }}
+				className={`${glassCard} flex flex-col items-center justify-center p-4 text-center`}
 			>
-				<CheckCircle2 className="h-8 w-8 text-emerald-500 mb-2" />
-				<p className="text-sm font-semibold text-foreground">
+				<CheckCircle2 className="h-10 w-10 text-emerald-500 mb-2" />
+				<p className="text-base font-semibold text-foreground">
 					{t("dashboard.welcome.allGood")}
 				</p>
-				<p className="text-[10px] text-muted-foreground mt-1">
+				<p className="text-xs text-muted-foreground mt-1">
 					{t("dashboard.alerts.needsAttention")}
 				</p>
 			</div>
@@ -129,15 +122,11 @@ export function AlertsSection({
 		href: string;
 	}>;
 
-	// Max 3 alerts displayed
 	const visibleAlerts = alerts.slice(0, 3);
 
 	return (
-		<div
-			className={`${glassCard} flex flex-col p-4 animate-in fade-in slide-in-from-bottom-3 duration-500`}
-			style={{ animationDelay: "240ms" }}
-		>
-			<h3 className="text-xs font-semibold text-foreground mb-3">
+		<div className={`${glassCard} flex flex-col p-4`}>
+			<h3 className="text-sm font-bold text-foreground mb-3">
 				{t("dashboard.alerts.needsAttention")}
 			</h3>
 			<div className="flex-1 space-y-2">
@@ -147,22 +136,22 @@ export function AlertsSection({
 						<Link
 							key={i}
 							href={alert.href}
-							className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-muted/50 transition-colors"
+							className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/50 transition-colors"
 						>
 							<div className={`p-1.5 rounded-lg ${alert.bgColor} shrink-0`}>
-								<Icon className={`h-3.5 w-3.5 ${alert.color}`} />
+								<Icon className={`h-4 w-4 ${alert.color}`} />
 							</div>
 							<div className="flex-1 min-w-0">
-								<p className="text-[11px] font-medium text-foreground truncate">
+								<p className="text-sm font-medium text-foreground truncate">
 									{alert.title}
 								</p>
 								{alert.amount != null && alert.amount > 0 && (
-									<p className={`text-[10px] font-bold ${alert.color}`}>
+									<p className={`text-xs font-bold ${alert.color}`}>
 										<Currency amount={alert.amount} />
 									</p>
 								)}
 							</div>
-							<span className={`text-sm font-bold ${alert.color} shrink-0`}>
+							<span className={`text-lg font-bold ${alert.color} shrink-0`}>
 								{alert.count}
 							</span>
 						</Link>

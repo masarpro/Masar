@@ -1441,6 +1441,7 @@
       "createInvoice": "Create Invoice",
       "invoices": "Invoices",
       "newQuotation": "New Quotation",
+      "quotations": "Quotations",
       "pricing": "Pricing",
       "calculateQuantities": "Quantities",
       "quantityStudies": "Quantity Studies",
@@ -1565,6 +1566,8 @@
     "upcomingPayments": {
       "title": "Upcoming Payments"
     },
+    "noClient": "No client",
+    "projectEnded": "Ended",
     "addFirstProject": "Add Your First Project",
     "addFirstProjectDesc": "Start by adding your first project and enjoy full project management from one place",
     "createFirstProject": "Create Project",
@@ -1634,9 +1637,10 @@
       "nextStep": "Next step",
       "skip": "Skip",
       "hide": "Hide",
-      "greeting": "Hello {name}!",
+      "greeting": "Hello {name}",
+      "subtitle": "Here's your daily summary",
       "pendingActions": "You have {count} actions that need attention",
-      "allGood": "Everything is on track",
+      "allGood": "Everything looks good",
       "steps": {
         "companyInfo": "Set up company info",
         "firstProject": "Create first project",

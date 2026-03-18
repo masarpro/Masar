@@ -63,8 +63,7 @@ export function DidYouKnowCard({ organizationSlug }: DidYouKnowCardProps) {
 
 	return (
 		<div
-			className={`relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br ${tip.gradient} p-4 flex flex-col animate-in fade-in slide-in-from-bottom-3 duration-500`}
-			style={{ animationDelay: "300ms" }}
+			className={`relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br ${tip.gradient} p-4 flex flex-col`}
 		>
 			{/* Decorative background */}
 			<div className="absolute top-0 end-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -75,17 +74,17 @@ export function DidYouKnowCard({ organizationSlug }: DidYouKnowCardProps) {
 				<div className="p-1.5 rounded-lg bg-primary/10">
 					<Sparkles className="h-4 w-4 text-primary" />
 				</div>
-				<span className="text-xs font-bold text-primary">
+				<span className="text-sm font-bold text-primary">
 					{t("didYouKnow.title")}
 				</span>
-				<span className="text-[9px] text-muted-foreground ms-auto">
+				<span className="text-xs text-muted-foreground ms-auto">
 					{tipIndex + 1}/{TIPS.length}
 				</span>
 			</div>
 
 			{/* Content */}
 			<div className="flex-1 relative z-10">
-				<p className="text-sm font-medium text-foreground/90 leading-relaxed mb-3">
+				<p className="text-base font-medium text-foreground/90 leading-relaxed mb-3">
 					{t(`didYouKnow.tips.${tip.key}`)}
 				</p>
 			</div>
@@ -93,10 +92,10 @@ export function DidYouKnowCard({ organizationSlug }: DidYouKnowCardProps) {
 			{/* Link */}
 			<Link
 				href={fullHref}
-				className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline relative z-10 mt-auto"
+				className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline relative z-10 mt-auto"
 			>
 				<span>{t("didYouKnow.tryIt")}</span>
-				<ArrowLeft className="h-3 w-3" />
+				<ArrowLeft className="h-3.5 w-3.5" />
 			</Link>
 		</div>
 	);
