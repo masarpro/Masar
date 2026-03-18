@@ -53,7 +53,7 @@ export function Dashboard() {
 	const now = new Date();
 
 	return (
-		<div className="flex flex-col gap-5 p-4 md:p-6 lg:p-8" dir="rtl">
+		<div className="flex flex-col gap-5 p-4 pt-2 md:p-6 md:pt-3 lg:p-8 lg:pt-4" dir="rtl">
 			{/* Header card */}
 			<div className="relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-l from-primary/[0.04] via-card to-primary/[0.06] dark:from-primary/[0.08] dark:via-card dark:to-primary/[0.03] px-8 py-5 flex items-center justify-between shrink-0">
 				{/* Decorative accent */}
