@@ -61,10 +61,10 @@ export function OperationalSection({
 	const hasPipeline = pipelineTotal > 0;
 
 	return (
-		<div className={`${glassCard} flex flex-col p-4`}>
+		<div className={`${glassCard} flex flex-col p-5`}>
 			<div className="flex items-center gap-2 mb-3">
-				<Gauge className="h-4 w-4 text-muted-foreground" />
-				<span className="text-sm font-bold text-foreground">
+				<Gauge className="h-5 w-5 text-muted-foreground" />
+				<span className="text-base font-bold text-foreground">
 					{t("dashboard.operational.title")}
 				</span>
 			</div>
@@ -78,7 +78,7 @@ export function OperationalSection({
 							<Icon className={`h-4 w-4 ${stat.color}`} />
 							<div>
 								<p className="text-xs text-muted-foreground">{stat.label}</p>
-								<p className={`text-base font-bold ${stat.color}`}>{stat.value}</p>
+								<p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
 							</div>
 						</div>
 					);

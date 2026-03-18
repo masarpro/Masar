@@ -95,14 +95,14 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 				return (
 					<div
 						key={i}
-						className="overflow-hidden rounded-xl border border-border/50 bg-card/80 shadow-sm backdrop-blur-xl transition-all duration-300 hover:shadow-lg animate-in fade-in slide-in-from-bottom-3"
+						className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:shadow-xl animate-in fade-in slide-in-from-bottom-3"
 						style={{ animationDelay: `${200 + i * 30}ms` }}
 					>
 						<Link
 							href={action.browsePath}
-							className={`flex flex-col items-center gap-2 border-b p-3 transition-colors ${action.bgColor} ${action.hoverBg} ${action.borderColor}`}
+							className={`flex flex-col items-center gap-2 p-4 ${action.bgColor} ${action.hoverBg} transition-colors border-b ${action.borderColor}`}
 						>
-							<div className={`rounded-lg bg-card/60 p-2.5 ${action.iconColor}`}>
+							<div className={`p-3 rounded-xl bg-card/60 ${action.iconColor}`}>
 								<Icon className="h-6 w-6" />
 							</div>
 							<span className="text-center text-sm font-medium text-foreground/80">
@@ -111,7 +111,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 						</Link>
 						<Link
 							href={action.createPath}
-							className="flex items-center justify-center gap-2 bg-card/50 p-2.5 transition-colors hover:bg-card/80"
+							className="flex items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
 						>
 							<Plus className={`h-4 w-4 ${action.iconColor}`} />
 							<span className={`text-xs font-medium ${action.iconColor}`}>

@@ -67,21 +67,23 @@ export function FinancePanel({
 	}, [financialTrend, locale]);
 
 	return (
-		<div className={`${glassCard} flex flex-col p-3.5 overflow-hidden`}>
+		<div className={`${glassCard} flex flex-col p-5 overflow-hidden`}>
 			{/* 3 mini-cards */}
-			<div className="grid grid-cols-3 gap-2 mb-2.5 shrink-0">
+			<div className="grid grid-cols-3 gap-4 mb-4 shrink-0">
 				{/* Bank Balance */}
 				<Link
 					href={`/app/${organizationSlug}/finance/banks`}
-					className="p-2.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/20 hover:bg-blue-100 dark:hover:bg-blue-950/30 transition-colors"
+					className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4 hover:shadow-xl transition-all"
 				>
-					<div className="flex items-center gap-1.5 mb-0.5">
-						<Building2 className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-						<span className="text-xs font-medium text-blue-600/80 dark:text-blue-400/80">
-							{t("dashboard.kpi.bankBalance")}
-						</span>
+					<div className="flex items-center justify-between mb-3">
+						<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+							<Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+						</div>
 					</div>
-					<p className="text-lg font-bold text-blue-700 dark:text-blue-300">
+					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+						{t("dashboard.kpi.bankBalance")}
+					</p>
+					<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
 						<Currency amount={Number(bankBalance ?? 0)} />
 					</p>
 				</Link>
@@ -89,42 +91,41 @@ export function FinancePanel({
 				{/* Cash Balance */}
 				<Link
 					href={`/app/${organizationSlug}/finance/banks`}
-					className="p-2.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/20 hover:bg-emerald-100 dark:hover:bg-emerald-950/30 transition-colors"
+					className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4 hover:shadow-xl transition-all"
 				>
-					<div className="flex items-center gap-1.5 mb-0.5">
-						<Banknote className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-						<span className="text-xs font-medium text-emerald-600/80 dark:text-emerald-400/80">
-							{t("dashboard.kpi.cashBalance")}
-						</span>
+					<div className="flex items-center justify-between mb-3">
+						<div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+							<Banknote className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+						</div>
 					</div>
-					<p className="text-lg font-bold text-emerald-700 dark:text-emerald-300">
+					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+						{t("dashboard.kpi.cashBalance")}
+					</p>
+					<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
 						<Currency amount={Number(cashBalance ?? 0)} />
 					</p>
 				</Link>
 
 				{/* Upcoming Payments */}
-				<div className="p-2.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/20">
-					<div className="flex items-center gap-1.5 mb-0.5">
-						<Clock className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
-						<span className="text-xs font-medium text-amber-600/80 dark:text-amber-400/80">
-							{t("dashboard.alerts.upcomingPayments")}
-						</span>
+				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+					<div className="flex items-center justify-between mb-3">
+						<div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30">
+							<Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+						</div>
 					</div>
-					<p className="text-lg font-bold text-amber-700 dark:text-amber-300">
+					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+						{t("dashboard.alerts.upcomingPayments")}
+					</p>
+					<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
 						{upcomingPayments.length}
 					</p>
-					{upcomingPayments.length > 0 && (
-						<p className="text-[11px] text-amber-600/60 dark:text-amber-400/60 truncate">
-							{upcomingPayments[0]?.project?.name}
-						</p>
-					)}
 				</div>
 			</div>
 
 			{/* Cash Flow Chart — always visible */}
 			<div className="flex flex-col">
-				<div className="flex items-center justify-between mb-1.5 shrink-0">
-					<span className="text-sm font-semibold text-muted-foreground">
+				<div className="flex items-center justify-between mb-3 shrink-0">
+					<span className="text-sm font-medium text-slate-700 dark:text-slate-300">
 						{t("dashboard.financePanel.cashFlowTitle")}
 					</span>
 					<Link
@@ -136,7 +137,7 @@ export function FinancePanel({
 					</Link>
 				</div>
 
-				<ChartContainer config={chartConfig} className="w-full h-[130px] aspect-auto">
+				<ChartContainer config={chartConfig} className="w-full h-32 aspect-auto">
 					<AreaChart
 						data={chartData}
 						margin={{ top: 4, right: 4, left: 4, bottom: 0 }}

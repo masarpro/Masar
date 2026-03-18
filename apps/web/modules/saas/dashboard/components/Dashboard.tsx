@@ -6,6 +6,8 @@ import { HomeDashboardSkeleton } from "@saas/shared/components/skeletons";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { Clock, LayoutDashboard } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { ActiveProjectsSection } from "./sections/ActiveProjectsSection";
@@ -53,42 +55,57 @@ export function Dashboard() {
 	const projects = projectsData?.projects ?? [];
 	const firstName = user?.name?.split(" ")[0] || "";
 	const now = new Date();
+	const [currentTime, setCurrentTime] = useState<Date | null>(null);
+
+	useEffect(() => {
+		setCurrentTime(new Date());
+		const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+		return () => clearInterval(timer);
+	}, []);
 
 	return (
-		<div className="flex flex-col gap-5 p-4 pt-2 md:p-6 md:pt-3 lg:p-8 lg:pt-4" dir="rtl">
-			{/* Header card */}
-			<div className="relative overflow-hidden rounded-2xl border border-blue-200/40 dark:border-blue-500/20 backdrop-blur-xl bg-gradient-to-l from-blue-50/70 via-blue-50/40 to-sky-50/60 dark:from-blue-950/30 dark:via-blue-950/20 dark:to-sky-950/25 shadow-lg shadow-blue-500/5 px-8 py-5 flex items-center justify-between shrink-0">
-				{/* Decorative accent */}
-				<div className="absolute inset-y-0 start-0 w-1 bg-gradient-to-b from-blue-500/60 via-blue-400/30 to-transparent rounded-full" />
-				<div>
-					<h1 className="text-xl font-bold text-foreground">
-						{t("dashboard.welcome.greeting", { name: firstName })}
-					</h1>
-					<p className="text-sm text-muted-foreground mt-0.5">
-						{t("dashboard.welcome.subtitle")}
-					</p>
+		<div className="flex flex-col gap-6 p-4 md:p-6 lg:p-8" dir="rtl">
+			{/* Header card — matches finance header pattern */}
+			<div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50">
+				<div className="flex items-center gap-3">
+					<div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+						<LayoutDashboard className="h-5 w-5 text-primary" />
+					</div>
+					<div>
+						<h1 className="text-xl font-bold text-foreground">
+							{t("dashboard.welcome.greeting", { name: firstName })}
+						</h1>
+						<p className="text-sm text-muted-foreground">
+							{activeOrganization?.name}
+						</p>
+					</div>
 				</div>
-				<div className="hidden md:block">
-					<p className="text-xl font-bold text-foreground">
-						{activeOrganization?.name}
-					</p>
-				</div>
-				<div className="text-start hidden sm:block">
-					<p className="text-sm font-medium text-foreground">
-						{new Intl.DateTimeFormat(locale, { weekday: "long" }).format(now)}
-					</p>
-					<p className="text-xs text-muted-foreground">
-						{new Intl.DateTimeFormat(locale, {
-							day: "numeric",
-							month: "long",
-							year: "numeric",
-						}).format(now)}
-					</p>
+				<div className="flex items-center gap-4">
+					<div className="text-start hidden sm:block">
+						<p className="text-sm font-medium text-foreground">
+							{new Intl.DateTimeFormat(locale, { weekday: "long" }).format(now)}
+						</p>
+						<p className="text-xs text-muted-foreground">
+							{new Intl.DateTimeFormat(locale, {
+								day: "numeric",
+								month: "long",
+								year: "numeric",
+							}).format(now)}
+						</p>
+					</div>
+					{currentTime && (
+						<div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
+							<Clock className="h-4 w-4" />
+							<span className="tabular-nums">
+								{new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(currentTime)}
+							</span>
+						</div>
+					)}
 				</div>
 			</div>
 
 			{/* Row 1: Finance (right/start) + Projects (left/end) — swapped for RTL */}
-			<div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+			<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 				<FinancePanel
 					bankBalance={orgFinance?.balances?.totalBankBalance ?? 0}
 					cashBalance={orgFinance?.balances?.totalCashBalance ?? 0}
@@ -106,7 +123,7 @@ export function Dashboard() {
 			<QuickActionsGrid organizationSlug={organizationSlug} />
 
 			{/* Row 3: Alerts + Operational + Did You Know */}
-			<div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+			<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 				<AlertsSection
 					overdueInvoices={dashboardData?.overdue?.invoices ?? []}
 					overdueMilestones={dashboardData?.overdue?.milestones ?? []}

@@ -63,7 +63,7 @@ export function DidYouKnowCard({ organizationSlug }: DidYouKnowCardProps) {
 
 	return (
 		<div
-			className="relative overflow-hidden rounded-2xl border border-blue-200/40 dark:border-blue-500/20 backdrop-blur-xl bg-gradient-to-br from-blue-50/70 via-blue-50/40 to-sky-50/60 dark:from-blue-950/30 dark:via-blue-950/20 dark:to-sky-950/25 shadow-lg shadow-blue-500/5 p-4 flex flex-col"
+			className="relative overflow-hidden rounded-2xl border border-blue-200/40 dark:border-blue-500/20 backdrop-blur-xl bg-gradient-to-br from-blue-50/70 via-blue-50/40 to-sky-50/60 dark:from-blue-950/30 dark:via-blue-950/20 dark:to-sky-950/25 shadow-lg shadow-blue-500/5 p-5 flex flex-col"
 		>
 			{/* Decorative background */}
 			<div className="absolute top-0 end-0 w-32 h-32 bg-blue-400/5 rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -74,7 +74,7 @@ export function DidYouKnowCard({ organizationSlug }: DidYouKnowCardProps) {
 				<div className="p-1.5 rounded-lg bg-blue-500/10">
 					<Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
 				</div>
-				<span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+				<span className="text-base font-bold text-blue-600 dark:text-blue-400">
 					{t("didYouKnow.title")}
 				</span>
 				<span className="text-xs text-muted-foreground ms-auto">
