@@ -6,7 +6,6 @@ import { HomeDashboardSkeleton } from "@saas/shared/components/skeletons";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
-import { Building2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { ActiveProjectsSection } from "./sections/ActiveProjectsSection";
@@ -54,12 +53,9 @@ export function Dashboard() {
 	const now = new Date();
 
 	return (
-		<div
-			className="flex min-h-[calc(100vh-64px)] flex-col gap-3 p-3 md:p-4"
-			dir="rtl"
-		>
-			{/* Header */}
-			<div className="flex items-center justify-between shrink-0">
+		<div className="flex flex-col gap-5 p-4 md:p-6 lg:p-8" dir="rtl">
+			{/* Header card */}
+			<div className="rounded-2xl border border-border/50 bg-card/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between shrink-0">
 				<div>
 					<h1 className="text-xl font-bold text-foreground">
 						{t("dashboard.welcome.greeting", { name: firstName })}
@@ -68,15 +64,10 @@ export function Dashboard() {
 						{t("dashboard.welcome.subtitle")}
 					</p>
 				</div>
-				<div className="hidden md:flex items-center gap-2">
-					<div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-						<Building2 className="h-4 w-4 text-primary" />
-					</div>
-					<div>
-						<p className="text-sm font-semibold text-foreground">
-							{activeOrganization?.name}
-						</p>
-					</div>
+				<div className="hidden md:block">
+					<p className="text-sm font-semibold text-foreground">
+						{activeOrganization?.name}
+					</p>
 				</div>
 				<div className="text-start hidden sm:block">
 					<p className="text-sm font-medium text-foreground">
@@ -92,12 +83,8 @@ export function Dashboard() {
 				</div>
 			</div>
 
-			{/* Row 1: Projects + Finance — fills available space */}
-			<div className="grid grid-cols-1 gap-3 lg:grid-cols-2 flex-1 min-h-0">
-				<ActiveProjectsSection
-					projects={projects}
-					organizationSlug={organizationSlug}
-				/>
+			{/* Row 1: Finance (right/start) + Projects (left/end) — swapped for RTL */}
+			<div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
 				<FinancePanel
 					bankBalance={orgFinance?.balances?.totalBankBalance ?? 0}
 					cashBalance={orgFinance?.balances?.totalCashBalance ?? 0}
@@ -105,15 +92,17 @@ export function Dashboard() {
 					financialTrend={dashboardData?.financialTrend ?? []}
 					organizationSlug={organizationSlug}
 				/>
+				<ActiveProjectsSection
+					projects={projects}
+					organizationSlug={organizationSlug}
+				/>
 			</div>
 
 			{/* Row 2: Quick Actions */}
-			<div className="shrink-0">
-				<QuickActionsGrid organizationSlug={organizationSlug} />
-			</div>
+			<QuickActionsGrid organizationSlug={organizationSlug} />
 
 			{/* Row 3: Alerts + Operational + Did You Know */}
-			<div className="grid grid-cols-1 gap-3 lg:grid-cols-3 shrink-0">
+			<div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
 				<AlertsSection
 					overdueInvoices={dashboardData?.overdue?.invoices ?? []}
 					overdueMilestones={dashboardData?.overdue?.milestones ?? []}

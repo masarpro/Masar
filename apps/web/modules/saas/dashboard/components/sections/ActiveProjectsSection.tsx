@@ -53,7 +53,7 @@ export function ActiveProjectsSection({
 	if (projects.length === 0) {
 		return (
 			<div
-				className={`${glassCard} flex flex-col items-center justify-center p-6 text-center h-full`}
+				className={`${glassCard} flex flex-col items-center justify-center p-6 text-center`}
 			>
 				<div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
 					<FolderPlus className="h-8 w-8 text-primary" />
@@ -95,7 +95,7 @@ export function ActiveProjectsSection({
 	const hasMore = projects.length > MAX_VISIBLE;
 
 	return (
-		<div className={`${glassCard} flex flex-col p-4 h-full overflow-hidden`}>
+		<div className={`${glassCard} flex flex-col p-4 overflow-hidden`}>
 			{/* Header */}
 			<div className="flex items-center justify-between mb-3 shrink-0">
 				<div className="flex items-center gap-2">

@@ -67,7 +67,7 @@ export function FinancePanel({
 	}, [financialTrend, locale]);
 
 	return (
-		<div className={`${glassCard} flex flex-col p-4 h-full overflow-hidden`}>
+		<div className={`${glassCard} flex flex-col p-4 overflow-hidden`}>
 			{/* 3 mini-cards */}
 			<div className="grid grid-cols-3 gap-2 mb-3 shrink-0">
 				{/* Bank Balance */}
