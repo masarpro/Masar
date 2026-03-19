@@ -36,7 +36,7 @@ export function SidebarInset({ children, className }: SidebarInsetProps) {
 					"px-3 py-4 xl:px-8 xl:py-8",
 				)}
 			>
-				<div className="w-full">{children}</div>
+				<div className="w-full max-w-[1400px] mx-auto">{children}</div>
 			</main>
 		</div>
 	);
