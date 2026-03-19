@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@ui/lib";
-import { Menu } from "lucide-react";
 import { useEffect } from "react";
 import { SidebarFooter } from "./SidebarFooter";
 import { SidebarHeader } from "./SidebarHeader";
@@ -19,7 +18,7 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ headerExtra }: AppSidebarProps) {
-	const { collapsed, mobileOpen, setMobileOpen, toggleMobile, ready } = useSidebar();
+	const { collapsed, mobileOpen, setMobileOpen, ready } = useSidebar();
 	const { items, activeId } = useSidebarMenu();
 	const isMobile = useIsMobile();
 
@@ -98,22 +97,6 @@ export function AppSidebar({ headerExtra }: AppSidebarProps) {
 				/>
 				<SidebarFooter />
 			</aside>
-
-			{/* Mobile toggle button (hamburger) */}
-			{isMobile && (
-				<button
-					type="button"
-					onClick={toggleMobile}
-					className={cn(
-						"fixed start-4 top-4 z-[45] rounded-xl border border-border bg-background p-2.5 shadow-md",
-						"transition-opacity duration-200 ease-out",
-						mobileOpen && "pointer-events-none opacity-0",
-					)}
-					aria-label="Open menu"
-				>
-					<Menu className="size-6" />
-				</button>
-			)}
 		</>
 	);
 }

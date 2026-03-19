@@ -8,6 +8,7 @@ import { useActiveOrganization } from "@saas/organizations/hooks/use-active-orga
 import { NotificationBell } from "@saas/shared/components/NotificationBell";
 import { UserAvatar } from "@shared/components/UserAvatar";
 import { ColorModeToggle } from "@shared/components/ColorModeToggle";
+import { Button } from "@ui/components/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -23,6 +24,7 @@ import {
 	Home,
 	LanguagesIcon,
 	LogOutIcon,
+	Menu,
 	Settings,
 	Wallet,
 } from "lucide-react";
@@ -30,6 +32,8 @@ import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+import { useSidebar } from "../sidebar/sidebar-context";
+import { useIsMobile } from "../sidebar/use-is-mobile";
 
 export function GlobalHeader() {
 	const t = useTranslations();
@@ -40,6 +44,8 @@ export function GlobalHeader() {
 	const localePathname = useLocalePathname();
 	const { user } = useSession();
 	const { activeOrganization } = useActiveOrganization();
+	const { setMobileOpen } = useSidebar();
+	const isMobile = useIsMobile();
 
 	// Determine current section from pathname
 	let SectionIcon: LucideIcon = Home;
@@ -84,39 +90,40 @@ export function GlobalHeader() {
 	};
 
 	return (
-		<div
-			className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50 mb-5"
-			dir="rtl"
-		>
-			{/* Section icon + title + org name */}
-			<div className="flex items-center gap-3">
-				<div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-					<SectionIcon className="h-5 w-5 text-primary" />
-				</div>
-				<div>
-					<h1 className="text-xl font-bold text-foreground">
-						{sectionLabel}
-					</h1>
-					<p className="text-sm text-muted-foreground">
-						{activeOrganization?.name}
-					</p>
-				</div>
+		<header className="sticky top-0 z-30 flex h-[52px] shrink-0 items-center justify-between border-b border-border/30 bg-background px-4">
+			{/* Start side: mobile hamburger + section icon + section name */}
+			<div className="flex items-center gap-2.5">
+				{isMobile && (
+					<Button
+						variant="ghost"
+						size="icon"
+						className="h-9 w-9 rounded-lg"
+						onClick={() => setMobileOpen(true)}
+						aria-label="Open menu"
+					>
+						<Menu className="h-5 w-5" />
+					</Button>
+				)}
+				<SectionIcon className="h-5 w-5 text-primary/70" />
+				<span className="text-base font-medium text-foreground">
+					{sectionLabel}
+				</span>
 			</div>
 
-			{/* Tools: notifications + color mode + user avatar */}
-			<div className="hidden sm:flex items-center gap-2">
+			{/* End side: color mode + notifications + user avatar */}
+			<div className="flex items-center gap-1">
+				<ColorModeToggle />
+
 				{activeOrganization?.id && (
 					<NotificationBell organizationId={activeOrganization.id} />
 				)}
-
-				<ColorModeToggle />
 
 				{/* User avatar + dropdown */}
 				<DropdownMenu modal={false}>
 					<DropdownMenuTrigger asChild>
 						<button
 							type="button"
-							className="rounded-full outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
+							className="ms-1 rounded-full outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
 							aria-label="User menu"
 						>
 							<UserAvatar
@@ -160,6 +167,6 @@ export function GlobalHeader() {
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>
-		</div>
+		</header>
 	);
 }
