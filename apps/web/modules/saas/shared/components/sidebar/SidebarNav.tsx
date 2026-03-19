@@ -8,7 +8,7 @@ import {
 import { cn } from "@ui/lib";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
-import { memo, useEffect, useState } from "react";
+import { memo, useState } from "react";
 import { useSidebar } from "./sidebar-context";
 import type { SidebarMenuChild, SidebarMenuItem } from "./use-sidebar-menu";
 
@@ -67,23 +67,8 @@ const navItemClasses = (isActive: boolean, isSubItem: boolean, collapsed: boolea
 export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 	const { setMobileOpen } = useSidebar();
 
-	// Track which parent menus are open (for items with children)
+	// Track which parent menus are open (accordion: only one at a time, all closed by default)
 	const [openMenus, setOpenMenus] = useState<string[]>([]);
-
-	// Auto-expand parent when a child is active
-	useEffect(() => {
-		if (!activeId) {
-			return;
-		}
-		for (const item of items) {
-			if (item.children?.some((c) => c.id === activeId)) {
-				setOpenMenus((prev) =>
-					prev.includes(item.id) ? prev : [...prev, item.id],
-				);
-				break;
-			}
-		}
-	}, [activeId, items]);
 
 	const closeMobile = () => setMobileOpen(false);
 
