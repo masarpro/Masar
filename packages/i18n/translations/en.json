@@ -4120,6 +4120,10 @@
     "noRecentQuotations": "No recent quotations",
     "noRecentInvoices": "No recent invoices"
   },
+  "globalHeader": {
+    "switchToEnglish": "English",
+    "switchToArabic": "العربية"
+  },
   "hero": {
     "badge": "🇸🇦 Built for the Saudi Market",
     "titleBrand": "Masar",

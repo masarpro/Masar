@@ -4,7 +4,6 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import dynamic from "next/dynamic";
-import { FinanceHeader } from "./FinanceHeader";
 import { BalanceCards } from "./BalanceCards";
 import { ActionCards } from "./ActionCards";
 import { StatsCards } from "./StatsCards";
@@ -55,10 +54,7 @@ export function FinanceDashboard({
 
 	return (
 		<div className="space-y-6" dir="rtl">
-			{/* 1. Header - Modern design with date and greeting */}
-			<FinanceHeader userName={userName} />
-
-			{/* 2. Balance Cards (Cash, Bank, Net Profit) */}
+			{/* 1. Balance Cards (Cash, Bank, Net Profit) */}
 			<BalanceCards
 				cashBalance={cashBalance}
 				bankBalance={bankBalance}

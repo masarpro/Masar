@@ -33,8 +33,6 @@ import { useTranslations } from "next-intl";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
 import { CardGridSkeleton } from "@saas/shared/components/skeletons";
-import { ProjectsHeader } from "./ProjectsHeader";
-
 interface ProjectsListProps {
 	organizationId: string;
 	userName?: string;
@@ -124,9 +122,6 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 
 	return (
 		<div className="space-y-6" dir="rtl">
-			{/* Header */}
-			<ProjectsHeader userName={userName} />
-
 			{/* Statistics Cards - Glass Morphism */}
 			<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
 				{/* Total Projects */}

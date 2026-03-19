@@ -4120,6 +4120,10 @@
       "clients": "العملاء"
     }
   },
+  "globalHeader": {
+    "switchToEnglish": "English",
+    "switchToArabic": "العربية"
+  },
   "hero": {
     "badge": "🇸🇦 مصمّم للسوق السعودي",
     "titleBrand": "مسار",

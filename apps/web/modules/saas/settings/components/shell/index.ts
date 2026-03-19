@@ -1,4 +1,3 @@
-export { SettingsHeader } from "./SettingsHeader";
 export { SettingsNavigation } from "./SettingsNavigation";
 export {
 	SETTINGS_NAV_SECTIONS,

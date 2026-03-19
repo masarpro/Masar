@@ -19,7 +19,7 @@ export function AppWrapper({ children }: PropsWithChildren) {
 
 	return (
 		<SidebarProvider>
-			<div className="flex min-h-screen">
+			<div className="flex h-screen">
 				<AppSidebar headerExtra={headerExtra} />
 				<SidebarInset>
 					<SkipNavTarget />

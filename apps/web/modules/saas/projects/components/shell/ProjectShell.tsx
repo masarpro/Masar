@@ -33,7 +33,6 @@ export function ProjectShell({
 						project={project}
 						organizationSlug={organizationSlug}
 						organizationId={organizationId}
-						userName={userName}
 					/>
 				</div>
 
