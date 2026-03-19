@@ -15,7 +15,7 @@ interface SidebarInsetProps {
  * Below xl: full width (sidebar is overlay). Above xl: margin for sidebar.
  */
 export function SidebarInset({ children, className }: SidebarInsetProps) {
-	const { collapsed } = useSidebar();
+	const { collapsed, ready } = useSidebar();
 
 	return (
 		<div
@@ -25,6 +25,7 @@ export function SidebarInset({ children, className }: SidebarInsetProps) {
 				config.ui.saas.useSidebarLayout && [
 					"xl:pe-4",
 					collapsed ? "xl:ms-20" : "xl:ms-[280px]",
+					ready && "transition-[margin] duration-300 ease-out",
 				],
 				className,
 			)}
@@ -35,7 +36,7 @@ export function SidebarInset({ children, className }: SidebarInsetProps) {
 					"px-3 py-4 xl:px-8 xl:py-8",
 				)}
 			>
-				<div className="container px-0">{children}</div>
+				<div className="w-full">{children}</div>
 			</main>
 		</div>
 	);

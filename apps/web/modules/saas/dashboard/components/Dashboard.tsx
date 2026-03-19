@@ -116,12 +116,8 @@ export function Dashboard() {
 
 			<hr className="border-border/50" />
 
-			{/* Row 3: Recent Docs + Operational + (Alerts + DidYouKnow stacked) */}
+			{/* Row 3: Operational + Recent Docs + (Alerts + DidYouKnow stacked) */}
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-				<RecentDocumentsCard
-					organizationId={organizationId}
-					organizationSlug={organizationSlug}
-				/>
 				<OperationalSection
 					activeProjects={stats?.projects?.active ?? 0}
 					completedProjects={stats?.projects?.completed ?? 0}
@@ -129,7 +125,11 @@ export function Dashboard() {
 					openIssues={stats?.milestones?.overdue ?? 0}
 					leadsPipeline={dashboardData?.leadsPipeline ?? {}}
 				/>
-				<div className="flex flex-col gap-3">
+				<RecentDocumentsCard
+					organizationId={organizationId}
+					organizationSlug={organizationSlug}
+				/>
+				<div className="flex flex-col gap-3 lg:h-full">
 					<AlertsSection
 						overdueInvoices={dashboardData?.overdue?.invoices ?? []}
 						overdueMilestones={dashboardData?.overdue?.milestones ?? []}

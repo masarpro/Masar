@@ -76,7 +76,7 @@ export function AppSidebar({ headerExtra }: AppSidebarProps) {
 					!ready && "opacity-0",
 					"flex flex-col",
 					"bg-background border-e border-border shadow-xl",
-					"transition-all duration-300 ease-out",
+					ready && "transition-[width,opacity,transform] duration-300 ease-out",
 					// Width: full overlay on mobile, collapsible on desktop
 					isMobile
 						? "w-[280px] max-w-[85vw]"
