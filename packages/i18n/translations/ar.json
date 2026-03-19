@@ -4790,6 +4790,55 @@
         "leads": "العملاء المحتملون"
       }
     },
+    "dashboard": {
+      "hello": "مرحباً",
+      "overview": {
+        "studiesValue": "إجمالي قيمة الدراسات",
+        "activeQuotations": "عروض الأسعار النشطة",
+        "leadsPipeline": "قيمة الفرص المتاحة"
+      },
+      "pipeline": {
+        "title": "مسار التسعير",
+        "studies": "الدراسات",
+        "quotationsSent": "عروض مُرسلة",
+        "leadsWon": "فرص رابحة",
+        "contracted": "تعاقدات"
+      },
+      "nav": {
+        "studies": "دراسات الكميات",
+        "studiesNew": "دراسة جديدة",
+        "quotations": "عروض الأسعار",
+        "quotationsNew": "عرض سعر جديد",
+        "leads": "العملاء المحتملون",
+        "leadsNew": "عميل محتمل جديد"
+      },
+      "stats": {
+        "activeClients": "العملاء النشطون",
+        "activeClientsSubtitle": "عملاء لديهم دراسات أو عروض",
+        "expiringQuotations": "عروض تنتهي قريباً",
+        "expiringQuotationsSubtitle": "خلال 7 أيام",
+        "conversionRate": "معدل التحويل",
+        "conversionRateSubtitle": "من عرض سعر إلى عقد"
+      },
+      "recentDocuments": "آخر المستندات",
+      "noRecentDocuments": "لا توجد مستندات حديثة",
+      "table": {
+        "type": "النوع",
+        "title": "العنوان",
+        "client": "العميل",
+        "amount": "المبلغ",
+        "status": "الحالة",
+        "date": "التاريخ",
+        "actions": "إجراءات"
+      },
+      "types": {
+        "study": "دراسة",
+        "quotation": "عرض سعر"
+      },
+      "alerts": {
+        "upcomingDeadlines": "عروض تنتهي قريباً"
+      }
+    },
     "pipeline": {
       "quantities": "الكميات",
       "specifications": "المواصفات",

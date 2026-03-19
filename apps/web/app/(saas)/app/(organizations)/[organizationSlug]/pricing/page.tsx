@@ -1,7 +1,7 @@
-import { getActiveOrganization } from "@saas/auth/lib/server";
+import { getActiveOrganization, getSession } from "@saas/auth/lib/server";
 import { PricingDashboard } from "@saas/pricing/components/dashboard/PricingDashboard";
 import { PricingShell } from "@saas/pricing/components/shell";
-import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
@@ -26,7 +26,7 @@ export default async function PricingPage({
 	const { organizationSlug } = await params;
 
 	return (
-		<Suspense fallback={<ListTableSkeleton />}>
+		<Suspense fallback={<DashboardSkeleton />}>
 			<PricingPageContent organizationSlug={organizationSlug} />
 		</Suspense>
 	);
@@ -35,17 +35,22 @@ export default async function PricingPage({
 async function PricingPageContent({
 	organizationSlug,
 }: { organizationSlug: string }) {
-	const activeOrganization = await getActiveOrganization(organizationSlug);
+	const [activeOrganization, session] = await Promise.all([
+		getActiveOrganization(organizationSlug),
+		getSession(),
+	]);
 
 	if (!activeOrganization) {
 		return notFound();
 	}
 
+	const userName = session?.user?.name ?? "";
+
 	return (
 		<PricingShell organizationSlug={organizationSlug}>
 			<PricingDashboard
 				organizationId={activeOrganization.id}
-				organizationSlug={organizationSlug}
+				userName={userName}
 			/>
 		</PricingShell>
 	);

@@ -69,3 +69,5 @@ export * from "./sequences";
 export * from "./super-admin";
 // Plan Config
 export * from "./plan-config";
+// Pricing Dashboard
+export * from "./pricing-dashboard";

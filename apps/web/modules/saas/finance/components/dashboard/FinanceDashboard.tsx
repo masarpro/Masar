@@ -11,6 +11,7 @@ import { RecentDocumentsTable } from "./RecentDocumentsTable";
 import { DeadlinesCard } from "./DeadlinesCard";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { Skeleton } from "@ui/components/skeleton";
+import { FinanceHeader } from "./FinanceHeader";
 
 const CashFlowCard = dynamic(
 	() => import("./CashFlowCard").then((m) => ({ default: m.CashFlowCard })),
@@ -54,6 +55,9 @@ export function FinanceDashboard({
 
 	return (
 		<div className="space-y-6" dir="rtl">
+			{/* 0. Blue Header */}
+			<FinanceHeader userName={userName} />
+
 			{/* 1. Balance Cards (Cash, Bank, Net Profit) */}
 			<BalanceCards
 				cashBalance={cashBalance}

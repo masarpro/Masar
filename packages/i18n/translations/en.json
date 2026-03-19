@@ -4790,6 +4790,55 @@
         "leads": "Leads"
       }
     },
+    "dashboard": {
+      "hello": "Hello",
+      "overview": {
+        "studiesValue": "Total Studies Value",
+        "activeQuotations": "Active Quotations",
+        "leadsPipeline": "Open Leads Value"
+      },
+      "pipeline": {
+        "title": "Pricing Pipeline",
+        "studies": "Studies",
+        "quotationsSent": "Quotations Sent",
+        "leadsWon": "Leads Won",
+        "contracted": "Contracted"
+      },
+      "nav": {
+        "studies": "Cost Studies",
+        "studiesNew": "New Study",
+        "quotations": "Quotations",
+        "quotationsNew": "New Quotation",
+        "leads": "Leads",
+        "leadsNew": "New Lead"
+      },
+      "stats": {
+        "activeClients": "Active Clients",
+        "activeClientsSubtitle": "Clients with studies or quotations",
+        "expiringQuotations": "Expiring Quotations",
+        "expiringQuotationsSubtitle": "Within 7 days",
+        "conversionRate": "Conversion Rate",
+        "conversionRateSubtitle": "Quotation to contract"
+      },
+      "recentDocuments": "Recent Documents",
+      "noRecentDocuments": "No recent documents",
+      "table": {
+        "type": "Type",
+        "title": "Title",
+        "client": "Client",
+        "amount": "Amount",
+        "status": "Status",
+        "date": "Date",
+        "actions": "Actions"
+      },
+      "types": {
+        "study": "Study",
+        "quotation": "Quotation"
+      },
+      "alerts": {
+        "upcomingDeadlines": "Expiring Quotations"
+      }
+    },
     "pipeline": {
       "quantities": "Quantities",
       "specifications": "Specifications",
