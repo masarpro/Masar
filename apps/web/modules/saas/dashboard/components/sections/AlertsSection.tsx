@@ -60,13 +60,13 @@ export function AlertsSection({
 	if (!hasAlerts) {
 		return (
 			<div
-				className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/30 dark:border-emerald-800/20 shadow-lg shadow-black/5 flex flex-col items-center justify-center p-3.5 text-center"
+				className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/30 dark:border-emerald-800/20 shadow-lg shadow-black/5 flex flex-col items-center justify-center p-2.5 text-center"
 			>
-				<CheckCircle2 className="h-10 w-10 text-emerald-500 mb-2" />
-				<p className="text-base font-semibold text-foreground">
+				<CheckCircle2 className="h-7 w-7 text-emerald-500 mb-1" />
+				<p className="text-sm font-semibold text-foreground">
 					{t("dashboard.welcome.allGood")}
 				</p>
-				<p className="text-xs text-muted-foreground mt-1">
+				<p className="text-[11px] text-muted-foreground mt-0.5">
 					{t("dashboard.alerts.needsAttention")}
 				</p>
 			</div>
@@ -122,36 +122,29 @@ export function AlertsSection({
 		href: string;
 	}>;
 
-	const visibleAlerts = alerts.slice(0, 3);
+	const visibleAlerts = alerts.slice(0, 2);
 
 	return (
-		<div className="rounded-2xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-200/30 dark:border-amber-800/20 shadow-lg shadow-black/5 flex flex-col p-3.5">
-			<h3 className="text-sm font-bold text-foreground mb-2">
+		<div className="rounded-2xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-200/30 dark:border-amber-800/20 shadow-lg shadow-black/5 flex flex-col p-2.5">
+			<h3 className="text-xs font-bold text-foreground mb-1.5">
 				{t("dashboard.alerts.needsAttention")}
 			</h3>
-			<div className="flex-1 space-y-2">
+			<div className="flex-1 space-y-1">
 				{visibleAlerts.map((alert, i) => {
 					const Icon = alert.icon;
 					return (
 						<Link
 							key={i}
 							href={alert.href}
-							className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/50 transition-colors"
+							className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-muted/50 transition-colors"
 						>
-							<div className={`p-1.5 rounded-lg ${alert.bgColor} shrink-0`}>
-								<Icon className={`h-4 w-4 ${alert.color}`} />
+							<div className={`p-1 rounded-md ${alert.bgColor} shrink-0`}>
+								<Icon className={`h-3.5 w-3.5 ${alert.color}`} />
 							</div>
-							<div className="flex-1 min-w-0">
-								<p className="text-sm font-medium text-foreground truncate">
-									{alert.title}
-								</p>
-								{alert.amount != null && alert.amount > 0 && (
-									<p className={`text-xs font-bold ${alert.color}`}>
-										<Currency amount={alert.amount} />
-									</p>
-								)}
-							</div>
-							<span className={`text-2xl font-bold ${alert.color} shrink-0`}>
+							<p className="flex-1 min-w-0 text-xs font-medium text-foreground truncate">
+								{alert.title}
+							</p>
+							<span className={`text-lg font-bold ${alert.color} shrink-0`}>
 								{alert.count}
 							</span>
 						</Link>

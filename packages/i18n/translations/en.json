@@ -1616,6 +1616,13 @@
         "teamChat": "Real-time chat within each project — communicate with your team and the project owner from one place"
       }
     },
+    "recentDocs": {
+      "title": "Recent Documents",
+      "invoice": "Invoice",
+      "quotation": "Quotation",
+      "study": "Cost Study",
+      "empty": "No recent documents"
+    },
     "emptyProjects": {
       "title": "Create Your First Project",
       "description": "Start managing your projects efficiently — add your first project now",

@@ -14,6 +14,7 @@ import {
 	Receipt,
 	Users,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
@@ -125,14 +126,6 @@ export function ActiveProjectsSection({
 					const contractValue = Number(project.contractValue ?? 0);
 					const days = daysRemaining(project.endDate);
 
-					const circumference = 2 * Math.PI * 15.5;
-					const strokeDash = (progress / 100) * circumference;
-					const healthColor =
-						progress >= 70
-							? "stroke-emerald-500"
-							: progress >= 40
-								? "stroke-amber-500"
-								: "stroke-red-500";
 					const healthBarColor =
 						progress >= 70
 							? "bg-emerald-500"
@@ -152,46 +145,46 @@ export function ActiveProjectsSection({
 								className={`absolute top-2 bottom-2 start-0 w-1 rounded-full ${healthBarColor}`}
 							/>
 
-							{/* Progress ring */}
-							<div className="relative h-10 w-10 shrink-0 ms-2">
-								<svg
-									viewBox="0 0 36 36"
-									className="h-10 w-10 -rotate-90"
-								>
-									<circle
-										cx="18"
-										cy="18"
-										r="15.5"
-										fill="none"
-										strokeWidth="2.5"
-										className="stroke-muted/20"
+							{/* Project photo */}
+							<div className="relative h-10 w-10 shrink-0 ms-2 rounded-lg overflow-hidden bg-muted/30">
+								{project.photos?.[0]?.url ? (
+									<Image
+										src={project.photos[0].url}
+										alt={project.name || ""}
+										fill
+										className="object-cover"
+										sizes="40px"
+										unoptimized
 									/>
-									<circle
-										cx="18"
-										cy="18"
-										r="15.5"
-										fill="none"
-										strokeWidth="2.5"
-										className={healthColor}
-										strokeDasharray={`${strokeDash} ${circumference}`}
-										strokeLinecap="round"
-									/>
-								</svg>
-								<span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-foreground">
-									{progress}%
-								</span>
+								) : (
+									<div className="h-full w-full bg-gradient-to-br from-blue-500/20 to-sky-500/20 flex items-center justify-center">
+										<FolderOpen className="h-4 w-4 text-blue-400/60" />
+									</div>
+								)}
 							</div>
 
 							{/* Info */}
 							<div className="flex-1 min-w-0">
-								<p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">
-									{project.name || t("projects.unnamed")}
-								</p>
-								<p className="text-xs text-muted-foreground truncate">
-									{project.clientName || t("dashboard.noClient")}
-								</p>
+								<div className="flex items-center gap-2">
+									<p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">
+										{project.name || t("projects.unnamed")}
+									</p>
+									<span className={`text-[10px] font-bold shrink-0 ${progress >= 70 ? "text-emerald-600" : progress >= 40 ? "text-amber-600" : "text-red-600"}`}>
+										{progress}%
+									</span>
+								</div>
+								{/* Progress bar */}
+								<div className="h-1.5 w-full bg-muted/30 rounded-full mt-1 overflow-hidden">
+									<div
+										className={`h-full rounded-full transition-all ${progress >= 70 ? "bg-emerald-500" : progress >= 40 ? "bg-amber-500" : "bg-red-500"}`}
+										style={{ width: `${progress}%` }}
+									/>
+								</div>
 
 								<div className="flex items-center gap-3 mt-1">
+									<span className="text-xs text-muted-foreground truncate">
+										{project.clientName || t("dashboard.noClient")}
+									</span>
 									<div className="flex items-center gap-1">
 										<Banknote className="h-3 w-3 text-emerald-500" />
 										<span className="text-xs font-bold text-foreground">

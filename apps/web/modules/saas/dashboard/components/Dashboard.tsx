@@ -16,6 +16,7 @@ import { QuickActionsGrid } from "./sections/QuickActionsGrid";
 import { AlertsSection } from "./sections/AlertsSection";
 import { OperationalSection } from "./sections/OperationalSection";
 import { DidYouKnowCard } from "./sections/DidYouKnowCard";
+import { RecentDocumentsCard } from "./sections/RecentDocumentsCard";
 
 export function Dashboard() {
 	const t = useTranslations();
@@ -81,19 +82,18 @@ export function Dashboard() {
 						</p>
 					</div>
 				</div>
-				<div className="hidden sm:flex items-center gap-2 text-sm">
-					{currentTime && (
-						<>
-							<Clock className="h-4 w-4 text-muted-foreground" />
-							<span className="font-medium text-foreground tabular-nums">
-								{new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(currentTime)}
-							</span>
-							<span className="text-muted-foreground/40">|</span>
-						</>
-					)}
-					<span className="text-muted-foreground">
+				<div className="hidden sm:flex flex-col items-end gap-0.5">
+					<span className="text-sm font-medium text-muted-foreground">
 						{new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" }).format(now)}
 					</span>
+					{currentTime && (
+						<div className="flex items-center gap-1.5">
+							<Clock className="h-3.5 w-3.5 text-muted-foreground" />
+							<span className="text-sm font-medium text-muted-foreground tabular-nums">
+								{new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(currentTime)}
+							</span>
+						</div>
+					)}
 				</div>
 			</div>
 
@@ -116,15 +116,10 @@ export function Dashboard() {
 
 			<hr className="border-border/50" />
 
-			{/* Row 3: Alerts + Operational + Did You Know */}
+			{/* Row 3: Recent Docs + Operational + (Alerts + DidYouKnow stacked) */}
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-				<AlertsSection
-					overdueInvoices={dashboardData?.overdue?.invoices ?? []}
-					overdueMilestones={dashboardData?.overdue?.milestones ?? []}
-					pendingSubcontractClaims={
-						dashboardData?.pendingSubcontractClaims ?? 0
-					}
-					upcomingPayments={dashboardData?.upcoming ?? []}
+				<RecentDocumentsCard
+					organizationId={organizationId}
 					organizationSlug={organizationSlug}
 				/>
 				<OperationalSection
@@ -134,7 +129,18 @@ export function Dashboard() {
 					openIssues={stats?.milestones?.overdue ?? 0}
 					leadsPipeline={dashboardData?.leadsPipeline ?? {}}
 				/>
-				<DidYouKnowCard organizationSlug={organizationSlug} />
+				<div className="flex flex-col gap-3">
+					<AlertsSection
+						overdueInvoices={dashboardData?.overdue?.invoices ?? []}
+						overdueMilestones={dashboardData?.overdue?.milestones ?? []}
+						pendingSubcontractClaims={
+							dashboardData?.pendingSubcontractClaims ?? 0
+						}
+						upcomingPayments={dashboardData?.upcoming ?? []}
+						organizationSlug={organizationSlug}
+					/>
+					<DidYouKnowCard organizationSlug={organizationSlug} />
+				</div>
 			</div>
 		</div>
 	);
