@@ -66,7 +66,7 @@ export function Dashboard() {
 	const now = new Date();
 
 	return (
-		<div className="flex flex-col gap-5 p-4 pt-2 md:p-6 md:pt-3 lg:p-8 lg:pt-4">
+		<div className="flex flex-col gap-5 p-4 pt-2 md:p-6 md:pt-3 lg:p-8 lg:pt-4 overflow-hidden">
 			{/* Header card */}
 			<div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50">
 				<div className="flex items-center gap-3">
