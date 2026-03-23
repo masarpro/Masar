@@ -268,10 +268,6 @@ function makeCuttingRow(overrides: Partial<CuttingDetailRow> & {
 	return {
 		element: "test",
 		description: "test",
-		diameter,
-		barLength,
-		barCount,
-		stockLength,
 		stocksNeeded,
 		wastePerStock: stockLength - cutsPerStock * barLength,
 		totalWaste: stocksNeeded * (stockLength - cutsPerStock * barLength),

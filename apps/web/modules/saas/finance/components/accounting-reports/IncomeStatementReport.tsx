@@ -156,7 +156,7 @@ export function IncomeStatementReport({
 					).map((p) => (
 						<Button
 							key={p.key}
-							variant={periodType === p.key ? "default" : "ghost"}
+							variant={periodType === p.key ? "primary" : "ghost"}
 							size="sm"
 							className="rounded-lg"
 							onClick={() => setPeriodType(p.key)}

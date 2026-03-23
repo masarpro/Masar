@@ -65,7 +65,7 @@ export function AccountingPeriodsPage({ organizationId, organizationSlug }: Prop
 			<div className="flex items-center justify-between">
 				<div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
 					{[currentYear - 1, currentYear, currentYear + 1].map((y) => (
-						<Button key={y} variant={year === y ? "default" : "ghost"} size="sm" className="rounded-lg" onClick={() => setYear(y)}>
+						<Button key={y} variant={year === y ? "primary" : "ghost"} size="sm" className="rounded-lg" onClick={() => setYear(y)}>
 							{y}
 						</Button>
 					))}
@@ -137,7 +137,7 @@ export function AccountingPeriodsPage({ organizationId, organizationSlug }: Prop
 												{canClose && (
 													<Button
 														size="sm"
-														variant="destructive"
+														variant="error"
 														className="rounded-xl"
 														disabled={closeMutation.isPending}
 														onClick={() => {

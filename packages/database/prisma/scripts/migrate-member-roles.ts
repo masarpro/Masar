@@ -54,7 +54,7 @@ async function migrate() {
 
 			// Map Member.role to RoleType
 			const memberRole = member.role.toUpperCase();
-			let targetRoleType: string;
+			let targetRoleType: "OWNER" | "ENGINEER";
 
 			if (memberRole === "OWNER" || memberRole === "ADMIN") {
 				targetRoleType = "OWNER";

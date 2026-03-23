@@ -9,11 +9,7 @@ export default defineConfig({
 		hookTimeout: 30_000,
 		setupFiles: ["./__tests__/helpers/setup.ts"],
 		pool: "threads",
-		poolOptions: {
-			threads: {
-				singleThread: true,
-			},
-		},
+		sequence: { concurrent: false },
 		coverage: {
 			provider: "v8",
 			include: [

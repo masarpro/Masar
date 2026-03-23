@@ -121,7 +121,7 @@ export function JournalEntryDetails({
 									</Button>
 									<Button
 										size="sm"
-										variant="destructive"
+										variant="error"
 										onClick={() => {
 											if (confirm(t("finance.accounting.confirmDelete"))) {
 												deleteMutation.mutate({ organizationId, id: entryId });

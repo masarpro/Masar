@@ -64,7 +64,7 @@ export function JournalIncomeStatementReport({ organizationId }: Props) {
 						{ key: "quarter" as const, label: t("finance.accounting.income.quarter") },
 						{ key: "year" as const, label: t("finance.accounting.income.year") },
 					]).map((p) => (
-						<Button key={p.key} variant={periodType === p.key ? "default" : "ghost"} size="sm" className="rounded-lg" onClick={() => setPeriodType(p.key)}>
+						<Button key={p.key} variant={periodType === p.key ? "primary" : "ghost"} size="sm" className="rounded-lg" onClick={() => setPeriodType(p.key)}>
 							{p.label}
 						</Button>
 					))}

@@ -69,7 +69,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 					{[1, 2, 3, 4].map((q) => (
 						<Button
 							key={q}
-							variant={selectedQuarter === q ? "default" : "ghost"}
+							variant={selectedQuarter === q ? "primary" : "ghost"}
 							size="sm"
 							className="rounded-lg"
 							onClick={() => setSelectedQuarter(q)}
@@ -82,7 +82,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 					{years.map((y) => (
 						<Button
 							key={y}
-							variant={selectedYear === y ? "default" : "ghost"}
+							variant={selectedYear === y ? "primary" : "ghost"}
 							size="sm"
 							className="rounded-lg"
 							onClick={() => setSelectedYear(y)}
