@@ -7,9 +7,11 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
-import { CheckCircle, XCircle } from "lucide-react";
+import { Button } from "@ui/components/button";
+import { CheckCircle, XCircle, Printer } from "lucide-react";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { formatAccounting } from "./formatters";
+import { ReportPrintHeader } from "../shared/ReportPrintHeader";
 
 interface Props {
 	organizationId: string;
@@ -30,12 +32,17 @@ export function BalanceSheetReport({ organizationId }: Props) {
 
 	return (
 		<div className="space-y-4">
+			<ReportPrintHeader reportTitle={t("finance.accounting.balanceSheet.title")} dateRange={asOfDate} />
 			{/* Date Filter */}
-			<div className="flex items-end gap-3">
+			<div className="flex items-end gap-3 print:hidden">
 				<div>
 					<Label className="text-xs">{t("finance.accounting.trialBalance.asOfDate")}</Label>
 					<Input type="date" value={asOfDate} onChange={(e) => setAsOfDate(e.target.value)} className="rounded-xl h-9 w-40" />
 				</div>
+				<Button variant="outline" size="sm" className="rounded-xl ms-auto" onClick={() => window.print()}>
+					<Printer className="h-4 w-4 me-1" />
+					{t("common.print")}
+				</Button>
 			</div>
 
 			{data && (

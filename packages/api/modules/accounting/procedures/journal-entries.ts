@@ -116,11 +116,22 @@ export const getJournalEntryByIdProcedure = protectedProcedure
 						account: { select: { code: true, nameAr: true, nameEn: true, type: true } },
 					},
 				},
+				createdByUser: { select: { name: true } },
+				postedByUser: { select: { name: true } },
 			},
 		});
 
 		if (!entry || entry.organizationId !== input.organizationId) {
 			throw new Error("Journal entry not found");
+		}
+
+		// Fetch reversal entry info if reversed
+		let reversalEntry: { id: string; entryNo: string } | null = null;
+		if (entry.reversalId) {
+			reversalEntry = await db.journalEntry.findUnique({
+				where: { id: entry.reversalId },
+				select: { id: true, entryNo: true },
+			});
 		}
 
 		return {
@@ -131,6 +142,7 @@ export const getJournalEntryByIdProcedure = protectedProcedure
 				debit: Number(l.debit),
 				credit: Number(l.credit),
 			})),
+			reversalEntry,
 		};
 	});
 

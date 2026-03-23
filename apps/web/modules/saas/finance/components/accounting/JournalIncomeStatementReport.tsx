@@ -6,10 +6,11 @@ import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
 import { Button } from "@ui/components/button";
-import { DollarSign, TrendingDown, TrendingUp, BarChart3 } from "lucide-react";
+import { DollarSign, TrendingDown, TrendingUp, BarChart3, Printer } from "lucide-react";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { formatAccounting, formatPercent } from "./formatters";
 import { Currency } from "../shared/Currency";
+import { ReportPrintHeader } from "../shared/ReportPrintHeader";
 
 interface Props {
 	organizationId: string;
@@ -56,8 +57,9 @@ export function JournalIncomeStatementReport({ organizationId }: Props) {
 
 	return (
 		<div className="space-y-6">
+			<ReportPrintHeader reportTitle={t("finance.accounting.incomeStatement.title")} dateRange={`${dateFrom.toLocaleDateString("en-SA")} — ${dateTo.toLocaleDateString("en-SA")}`} />
 			{/* Period Selector */}
-			<div className="flex flex-wrap items-center gap-3">
+			<div className="flex flex-wrap items-center gap-3 print:hidden">
 				<div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
 					{([
 						{ key: "month" as const, label: t("finance.accounting.income.month") },
@@ -73,6 +75,10 @@ export function JournalIncomeStatementReport({ organizationId }: Props) {
 					<input type="checkbox" checked={includeComparison} onChange={(e) => setIncludeComparison(e.target.checked)} className="rounded" />
 					{t("finance.accounting.incomeStatement.compareWithPrevious") || "مقارنة بالفترة السابقة"}
 				</label>
+				<Button variant="outline" size="sm" className="rounded-xl ms-auto" onClick={() => window.print()}>
+					<Printer className="h-4 w-4 me-1" />
+					{t("common.print")}
+				</Button>
 			</div>
 
 			{data && (

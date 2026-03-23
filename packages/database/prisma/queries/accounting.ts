@@ -313,9 +313,24 @@ export async function createJournalEntry(db: PrismaClient, data: {
 		if (!acc.isActive) throw new Error(`Account ${acc.id} is not active`);
 	}
 
-	// Generate entry number
-	const seqValue = await nextSequenceValue(data.organizationId, `JE-${new Date().getFullYear()}`);
-	const entryNo = formatSequenceNo("JE", new Date().getFullYear(), seqValue);
+	// Generate entry number with type-specific prefix
+	const REFERENCE_TYPE_PREFIX: Record<string, string> = {
+		INVOICE: "INV-JE",
+		INVOICE_PAYMENT: "RCV-JE",
+		EXPENSE: "EXP-JE",
+		TRANSFER: "TRF-JE",
+		SUBCONTRACT_PAYMENT: "SUB-JE",
+		PAYROLL: "PAY-JE",
+		ORG_PAYMENT: "RCV-JE",
+		CREDIT_NOTE: "CN-JE",
+		REVERSAL: "REV-JE",
+		ADJUSTMENT: "ADJ-JE",
+		OPENING_BALANCE: "OPN-JE",
+	};
+	const prefix = REFERENCE_TYPE_PREFIX[data.referenceType ?? ""] ?? "MAN-JE";
+	const year = new Date().getFullYear();
+	const seqValue = await nextSequenceValue(data.organizationId, `${prefix}-${year}`);
+	const entryNo = formatSequenceNo(prefix, year, seqValue);
 
 	// Auto-generated entries are posted immediately (they reflect real operations)
 	// Manual entries start as DRAFT and need explicit posting

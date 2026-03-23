@@ -16,9 +16,10 @@ import {
 	TableHeader,
 	TableRow,
 } from "@ui/components/table";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Printer } from "lucide-react";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { formatAccounting, ACCOUNT_TYPE_COLORS } from "./formatters";
+import { ReportPrintHeader } from "../shared/ReportPrintHeader";
 
 interface TrialBalanceReportProps {
 	organizationId: string;
@@ -46,8 +47,9 @@ export function TrialBalanceReport({ organizationId }: TrialBalanceReportProps) 
 
 	return (
 		<div className="space-y-4">
+			<ReportPrintHeader reportTitle={t("finance.accounting.trialBalance.title")} dateRange={asOfDate} />
 			{/* Filters */}
-			<div className="flex flex-wrap items-end gap-3">
+			<div className="flex flex-wrap items-end gap-3 print:hidden">
 				<div>
 					<Label className="text-xs">{t("finance.accounting.trialBalance.asOfDate")}</Label>
 					<Input type="date" value={asOfDate} onChange={(e) => setAsOfDate(e.target.value)} className="rounded-xl h-9 w-40" />
@@ -60,6 +62,10 @@ export function TrialBalanceReport({ organizationId }: TrialBalanceReportProps) 
 					<input type="checkbox" checked={includeZero} onChange={(e) => setIncludeZero(e.target.checked)} className="rounded" />
 					{t("finance.accounting.trialBalance.includeZero")}
 				</label>
+				<Button variant="outline" size="sm" className="rounded-xl ms-auto" onClick={() => window.print()}>
+					<Printer className="h-4 w-4 me-1" />
+					{t("common.print")}
+				</Button>
 			</div>
 
 			{data && (
