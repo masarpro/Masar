@@ -33,6 +33,7 @@ import {
 	Banknote,
 	Building2,
 	UserPlus,
+	BookOpen,
 } from "lucide-react";
 
 export interface SidebarMenuChild {
@@ -250,6 +251,24 @@ export function useSidebarMenu(): {
 									label: t("finance.shell.sections.reports"),
 									href: `${orgPrefix}/finance/reports`,
 									icon: BarChart3,
+								},
+								{
+									id: "finance-chart-of-accounts",
+									label: t("finance.shell.sections.chartOfAccounts"),
+									href: `${orgPrefix}/finance/chart-of-accounts`,
+									icon: BookOpen,
+								},
+								{
+									id: "finance-journal-entries",
+									label: t("finance.shell.sections.journalEntries"),
+									href: `${orgPrefix}/finance/journal-entries`,
+									icon: ClipboardList,
+								},
+								{
+									id: "finance-accounting-reports",
+									label: t("finance.shell.sections.accountingReports"),
+									href: `${orgPrefix}/finance/accounting-reports`,
+									icon: ClipboardList,
 								},
 							],
 						},

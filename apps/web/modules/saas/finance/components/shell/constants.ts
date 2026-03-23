@@ -8,6 +8,7 @@ import {
 	Building,
 	FolderOpen,
 	BarChart3,
+	ClipboardList,
 } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════════
@@ -73,6 +74,30 @@ export const FINANCE_NAV_SECTIONS: FinanceNavSection[] = [
 		path: "reports",
 		labelKey: "finance.shell.sections.reports",
 		icon: BarChart3,
+	},
+	{
+		id: "chart-of-accounts",
+		path: "chart-of-accounts",
+		labelKey: "finance.shell.sections.chartOfAccounts",
+		icon: ClipboardList,
+	},
+	{
+		id: "journal-entries",
+		path: "journal-entries",
+		labelKey: "finance.shell.sections.journalEntries",
+		icon: ClipboardList,
+	},
+	{
+		id: "accounting-periods",
+		path: "accounting-periods",
+		labelKey: "finance.accounting.periods.title",
+		icon: ClipboardList,
+	},
+	{
+		id: "accounting-reports",
+		path: "accounting-reports",
+		labelKey: "finance.shell.sections.accountingReports",
+		icon: ClipboardList,
 	},
 ];
 

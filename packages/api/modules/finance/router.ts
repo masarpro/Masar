@@ -56,6 +56,13 @@ import {
 import { getProjectProfitabilityProcedure } from "./procedures/profitability";
 import { getCashFlowReportProcedure } from "./procedures/cash-flow";
 
+import {
+	getAgedReceivablesProcedure,
+	getAgedPayablesProcedure,
+	getVATReportProcedure,
+	getIncomeStatementProcedure,
+} from "./procedures/accounting-reports";
+
 // Organization Finance (Banks, Expenses, Payments, Transfers)
 import {
 	listBankAccounts,
@@ -164,6 +171,14 @@ export const financeRouter = {
 		invoiceStats: getFinanceInvoiceStats,
 		profitability: getProjectProfitabilityProcedure,
 		cashFlow: getCashFlowReportProcedure,
+	},
+
+	// Accounting Reports (التقارير المحاسبية)
+	accountingReports: {
+		agedReceivables: getAgedReceivablesProcedure,
+		agedPayables: getAgedPayablesProcedure,
+		vatReport: getVATReportProcedure,
+		incomeStatement: getIncomeStatementProcedure,
 	},
 
 	// Project Finance (integration)
