@@ -3456,6 +3456,20 @@
         "cannotModifyClosed": "Cannot modify entries in a closed period",
         "noPeriods": "No accounting periods found. Click 'Generate Periods' to create periods for this year."
       },
+      "recurring": {
+        "title": "Recurring Entries",
+        "frequency": "Frequency",
+        "nextDue": "Next Due",
+        "generate": "Generate Due Entries",
+        "noTemplates": "No recurring entry templates",
+        "noTemplatesDue": "No entries due for generation",
+        "generatedSuccess": "Generated {count} draft entries",
+        "active": "Active",
+        "inactive": "Paused",
+        "monthly": "Monthly",
+        "quarterly": "Quarterly",
+        "annual": "Annual"
+      },
       "adjustments": {
         "title": "Adjusting Entries",
         "newAdjustment": "New Adjusting Entry",

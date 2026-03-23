@@ -3478,6 +3478,20 @@
         "cannotModifyClosed": "لا يمكن تعديل قيود في فترة مغلقة",
         "noPeriods": "لا توجد فترات محاسبية. اضغط «توليد الفترات» لإنشاء فترات لهذه السنة."
       },
+      "recurring": {
+        "title": "القيود المتكررة",
+        "frequency": "التكرار",
+        "nextDue": "الاستحقاق التالي",
+        "generate": "توليد القيود المستحقة",
+        "noTemplates": "لا توجد قوالب قيود متكررة",
+        "noTemplatesDue": "لا توجد قيود مستحقة للتوليد",
+        "generatedSuccess": "تم توليد {count} قيد مسودة",
+        "active": "نشط",
+        "inactive": "متوقف",
+        "monthly": "شهري",
+        "quarterly": "ربع سنوي",
+        "annual": "سنوي"
+      },
       "adjustments": {
         "title": "قيود التسوية",
         "newAdjustment": "قيد تسوية جديد",

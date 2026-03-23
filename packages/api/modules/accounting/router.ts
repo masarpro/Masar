@@ -41,6 +41,14 @@ import {
 	getVendorStatementProcedure,
 } from "./procedures/statements";
 
+import {
+	listRecurringTemplatesProcedure,
+	createRecurringTemplateProcedure,
+	updateRecurringTemplateProcedure,
+	deleteRecurringTemplateProcedure,
+	generateDueEntriesProcedure,
+} from "./procedures/recurring-entries";
+
 export const accountingRouter = {
 	// Chart of Accounts
 	accounts: {
@@ -89,6 +97,15 @@ export const accountingRouter = {
 	statements: {
 		client: getClientStatementProcedure,
 		vendor: getVendorStatementProcedure,
+	},
+
+	// Recurring Journal Entries
+	recurring: {
+		list: listRecurringTemplatesProcedure,
+		create: createRecurringTemplateProcedure,
+		update: updateRecurringTemplateProcedure,
+		delete: deleteRecurringTemplateProcedure,
+		generate: generateDueEntriesProcedure,
 	},
 
 	// Accounting Periods
