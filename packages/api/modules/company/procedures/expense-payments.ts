@@ -5,6 +5,7 @@ import {
 	updateExpensePayment,
 	deleteExpensePayment,
 	generateMonthlyPayments,
+	db,
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
@@ -102,13 +103,40 @@ export const markPaymentPaidProcedure = subscriptionProcedure
 			action: "expenses",
 		});
 
-		return markExpensePaymentPaid(input.id, {
+		const result = await markExpensePaymentPaid(input.id, {
 			paidAt: input.paidAt,
 			bankAccountId: input.bankAccountId,
 			referenceNo: input.referenceNo,
 			organizationId: input.organizationId,
 			createdById: context.user.id,
 		});
+
+		// Auto-Journal: generate accounting entry for the FinanceExpense created by marking payment as paid
+		try {
+			const { onExpenseCompleted } = await import("../../../lib/accounting/auto-journal");
+			if (result.financeExpenseId) {
+				const expense = await db.financeExpense.findUnique({
+					where: { id: result.financeExpenseId },
+					select: { id: true, category: true, amount: true, date: true, description: true, sourceAccountId: true, projectId: true },
+				});
+				if (expense) {
+					await onExpenseCompleted(db, {
+						id: expense.id,
+						organizationId: input.organizationId,
+						category: expense.category,
+						amount: expense.amount,
+						date: expense.date,
+						description: expense.description ?? expense.category,
+						sourceAccountId: expense.sourceAccountId,
+						projectId: expense.projectId,
+					});
+				}
+			}
+		} catch (e) {
+			console.error("[AutoJournal] Failed to generate entry for company expense payment:", e);
+		}
+
+		return result;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════

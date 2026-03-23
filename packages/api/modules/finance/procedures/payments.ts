@@ -257,5 +257,18 @@ export const deleteOrgPaymentProcedure = subscriptionProcedure
 			entityId: input.id,
 		});
 
+		// Auto-Journal: reverse accounting entry for deleted payment
+		try {
+			const { reverseAutoJournalEntry } = await import("../../../lib/accounting/auto-journal");
+			await reverseAutoJournalEntry(db, {
+				organizationId: input.organizationId,
+				referenceType: "ORG_PAYMENT",
+				referenceId: input.id,
+				userId: context.user.id,
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to reverse entry for deleted payment:", e);
+		}
+
 		return result;
 	});

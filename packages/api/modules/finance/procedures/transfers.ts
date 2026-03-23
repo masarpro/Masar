@@ -189,5 +189,18 @@ export const cancelTransferProcedure = subscriptionProcedure
 			entityId: input.id,
 		});
 
+		// Auto-Journal: reverse accounting entry for cancelled transfer
+		try {
+			const { reverseAutoJournalEntry } = await import("../../../lib/accounting/auto-journal");
+			await reverseAutoJournalEntry(db, {
+				organizationId: input.organizationId,
+				referenceType: "TRANSFER",
+				referenceId: input.id,
+				userId: context.user.id,
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to reverse entry for cancelled transfer:", e);
+		}
+
 		return transfer;
 	});

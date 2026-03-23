@@ -457,6 +457,7 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 			const inv = await db.financeInvoice.findUnique({ where: { id: input.id }, select: { invoiceNo: true, clientName: true, projectId: true } });
 			if (inv) {
 				await onInvoicePaymentReceived(db, {
+					paymentId: payment.id,
 					organizationId: input.organizationId,
 					invoiceId: input.id,
 					invoiceNumber: inv.invoiceNo,
@@ -512,6 +513,19 @@ export const deleteInvoicePaymentProcedure = subscriptionProcedure
 			metadata: { paymentId: input.paymentId },
 		});
 
+		// Auto-Journal: reverse accounting entry for deleted invoice payment
+		try {
+			const { reverseAutoJournalEntry } = await import("../../../lib/accounting/auto-journal");
+			await reverseAutoJournalEntry(db, {
+				organizationId: input.organizationId,
+				referenceType: "INVOICE_PAYMENT",
+				referenceId: input.paymentId,
+				userId: context.user.id,
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to reverse entry for deleted invoice payment:", e);
+		}
+
 		return { success: true };
 	});
 
@@ -543,6 +557,19 @@ export const deleteInvoiceProcedure = subscriptionProcedure
 			entityType: "invoice",
 			entityId: input.id,
 		});
+
+		// Auto-Journal: reverse accounting entry for deleted invoice
+		try {
+			const { reverseAutoJournalEntry } = await import("../../../lib/accounting/auto-journal");
+			await reverseAutoJournalEntry(db, {
+				organizationId: input.organizationId,
+				referenceType: "INVOICE",
+				referenceId: input.id,
+				userId: context.user.id,
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to reverse entry for deleted invoice:", e);
+		}
 
 		return { success: true };
 	});

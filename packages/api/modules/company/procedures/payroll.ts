@@ -180,13 +180,18 @@ export const approvePayrollRunProcedure = subscriptionProcedure
 		try {
 			const { onPayrollApproved } = await import("../../../lib/accounting/auto-journal");
 			const { Prisma } = await import("@repo/database/prisma/generated/client");
+			// Calculate actual GOSI from payroll items
+			const gosiAgg = await db.payrollRunItem.aggregate({
+				where: { payrollRunId: input.id },
+				_sum: { gosiDeduction: true },
+			});
 			await onPayrollApproved(db, {
 				id: input.id,
 				organizationId: input.organizationId,
 				month: (payrollRun as any).month ?? new Date().getMonth() + 1,
 				year: (payrollRun as any).year ?? new Date().getFullYear(),
 				totalNet: new Prisma.Decimal(Number((payrollRun as any).totalNetSalary ?? 0)),
-				totalGosi: new Prisma.Decimal(0),
+				totalGosi: new Prisma.Decimal(Number(gosiAgg._sum?.gosiDeduction ?? 0)),
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for payroll:", e);
@@ -217,7 +222,22 @@ export const cancelPayrollRunProcedure = subscriptionProcedure
 			action: "expenses",
 		});
 
-		return cancelPayrollRun(input.id, input.organizationId);
+		const result = await cancelPayrollRun(input.id, input.organizationId);
+
+		// Auto-Journal: reverse accounting entry for cancelled payroll
+		try {
+			const { reverseAutoJournalEntry } = await import("../../../lib/accounting/auto-journal");
+			await reverseAutoJournalEntry(db, {
+				organizationId: input.organizationId,
+				referenceType: "PAYROLL",
+				referenceId: input.id,
+				userId: context.user.id,
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to reverse entry for cancelled payroll:", e);
+		}
+
+		return result;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════

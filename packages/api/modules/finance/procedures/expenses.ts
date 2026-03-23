@@ -360,6 +360,19 @@ export const deleteExpenseProcedure = subscriptionProcedure
 			entityId: input.id,
 		});
 
+		// Auto-Journal: reverse accounting entry for deleted expense
+		try {
+			const { reverseAutoJournalEntry } = await import("../../../lib/accounting/auto-journal");
+			await reverseAutoJournalEntry(db, {
+				organizationId: input.organizationId,
+				referenceType: "EXPENSE",
+				referenceId: input.id,
+				userId: context.user.id,
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to reverse entry for deleted expense:", e);
+		}
+
 		return result;
 	});
 
@@ -458,6 +471,19 @@ export const cancelExpenseProcedure = subscriptionProcedure
 			entityType: "expense",
 			entityId: input.id,
 		});
+
+		// Auto-Journal: reverse accounting entry for cancelled expense
+		try {
+			const { reverseAutoJournalEntry } = await import("../../../lib/accounting/auto-journal");
+			await reverseAutoJournalEntry(db, {
+				organizationId: input.organizationId,
+				referenceType: "EXPENSE",
+				referenceId: input.id,
+				userId: context.user.id,
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to reverse entry for cancelled expense:", e);
+		}
 
 		return expense;
 	});
