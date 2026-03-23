@@ -11,6 +11,7 @@ import {
 	bulkPostJournalEntries,
 	bulkPostAllDrafts,
 	findJournalEntryByReference,
+	getCostCenterByProject,
 } from "@repo/database";
 import { db } from "@repo/database";
 import { z } from "zod";
@@ -34,6 +35,9 @@ export const listJournalEntriesProcedure = protectedProcedure
 			status: z.enum(["DRAFT", "POSTED", "REVERSED"]).optional(),
 			referenceType: z.string().optional(),
 			search: z.string().optional(),
+			amountFrom: z.number().nonnegative().optional(),
+			amountTo: z.number().nonnegative().optional(),
+			accountId: z.string().optional(),
 			limit: z.number().optional().default(50),
 			offset: z.number().optional().default(0),
 		}),
@@ -52,6 +56,14 @@ export const listJournalEntriesProcedure = protectedProcedure
 			where.date = {};
 			if (input.dateFrom) where.date.gte = new Date(input.dateFrom);
 			if (input.dateTo) where.date.lte = new Date(input.dateTo);
+		}
+		if (input.amountFrom !== undefined || input.amountTo !== undefined) {
+			where.totalAmount = {};
+			if (input.amountFrom !== undefined) where.totalAmount.gte = input.amountFrom;
+			if (input.amountTo !== undefined) where.totalAmount.lte = input.amountTo;
+		}
+		if (input.accountId) {
+			where.lines = { some: { accountId: input.accountId } };
 		}
 		if (input.search) {
 			where.OR = [
@@ -667,4 +679,34 @@ export const findJournalEntryByReferenceProcedure = protectedProcedure
 		});
 
 		return findJournalEntryByReference(db, input.organizationId, input.referenceType, input.referenceId);
+	});
+
+// ========== Cost Center Report ==========
+
+export const getCostCenterReportProcedure = protectedProcedure
+	.route({
+		method: "GET",
+		path: "/accounting/reports/cost-center",
+		tags: ["Accounting", "Reports"],
+		summary: "Get project cost center report",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			dateFrom: z.string().datetime().optional(),
+			dateTo: z.string().datetime().optional(),
+			projectId: z.string().optional(),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "view",
+		});
+
+		return getCostCenterByProject(db, input.organizationId, {
+			dateFrom: input.dateFrom ? new Date(input.dateFrom) : undefined,
+			dateTo: input.dateTo ? new Date(input.dateTo) : undefined,
+			projectId: input.projectId,
+		});
 	});

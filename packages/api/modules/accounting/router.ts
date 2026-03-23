@@ -32,6 +32,7 @@ import {
 	bulkPostJournalEntriesProcedure,
 	postAllDraftsProcedure,
 	findJournalEntryByReferenceProcedure,
+	getCostCenterReportProcedure,
 } from "./procedures/journal-entries";
 
 import {
@@ -77,6 +78,7 @@ export const accountingRouter = {
 		trialBalance: getTrialBalanceProcedure,
 		balanceSheet: getBalanceSheetProcedure,
 		incomeStatement: getJournalIncomeStatementProcedure,
+		costCenter: getCostCenterReportProcedure,
 	},
 
 	// Statements

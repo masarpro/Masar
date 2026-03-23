@@ -16,11 +16,12 @@ import {
 	TableHeader,
 	TableRow,
 } from "@ui/components/table";
-import { Plus, Search, Zap, FileEdit, CheckSquare, Send } from "lucide-react";
+import { Plus, Search, Zap, FileEdit, CheckSquare, Send, Filter, X, Download } from "lucide-react";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { formatAccounting } from "./formatters";
 import Link from "next/link";
 import { toast } from "sonner";
+import { exportJournalEntriesToExcel } from "../../lib/accounting-excel-export";
 
 interface JournalEntriesPageProps {
 	organizationId: string;
@@ -56,7 +57,20 @@ export function JournalEntriesPage({
 	const [search, setSearch] = useState("");
 	const [status, setStatus] = useState<string>("");
 	const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+	const [showFilters, setShowFilters] = useState(false);
+	const [dateFrom, setDateFrom] = useState("");
+	const [dateTo, setDateTo] = useState("");
+	const [amountFrom, setAmountFrom] = useState("");
+	const [amountTo, setAmountTo] = useState("");
+	const [accountId, setAccountId] = useState("");
+	const [referenceType, setReferenceType] = useState("");
 	const basePath = `/app/${organizationSlug}/finance/journal-entries`;
+
+	const { data: accountsList } = useQuery(
+		orpc.accounting.accounts.list.queryOptions({
+			input: { organizationId },
+		}),
+	);
 
 	const { data, isLoading } = useQuery(
 		orpc.accounting.journal.list.queryOptions({
@@ -64,6 +78,12 @@ export function JournalEntriesPage({
 				organizationId,
 				status: status as any || undefined,
 				search: search || undefined,
+				dateFrom: dateFrom ? new Date(dateFrom).toISOString() : undefined,
+				dateTo: dateTo ? new Date(dateTo).toISOString() : undefined,
+				amountFrom: amountFrom ? Number(amountFrom) : undefined,
+				amountTo: amountTo ? Number(amountTo) : undefined,
+				accountId: accountId || undefined,
+				referenceType: referenceType || undefined,
 				limit: 50,
 			},
 		}),
@@ -148,8 +168,23 @@ export function JournalEntriesPage({
 						<option value="POSTED">{t("finance.accounting.posted")}</option>
 						<option value="REVERSED">{t("finance.accounting.reversed")}</option>
 					</select>
+					<Button
+						variant={showFilters ? "secondary" : "outline"}
+						size="sm"
+						className="rounded-xl"
+						onClick={() => setShowFilters((v) => !v)}
+					>
+						<Filter className="h-4 w-4 me-1" />
+						{t("finance.accounting.advancedFilters")}
+					</Button>
 				</div>
 				<div className="flex gap-2">
+					{entries.length > 0 && (
+						<Button variant="outline" size="sm" className="rounded-xl" onClick={() => exportJournalEntriesToExcel(entries)}>
+							<Download className="h-4 w-4 me-1" />
+							Excel
+						</Button>
+					)}
 					{draftEntries.length > 0 && (
 						<Button
 							variant="outline"
@@ -176,6 +211,74 @@ export function JournalEntriesPage({
 					</Link>
 				</div>
 			</div>
+
+			{/* Advanced Filters */}
+			{showFilters && (
+				<Card className="rounded-2xl">
+					<CardContent className="p-4">
+						<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+							<div>
+								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.ledger.dateFrom")}</label>
+								<Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="rounded-xl h-8 text-sm" />
+							</div>
+							<div>
+								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.ledger.dateTo")}</label>
+								<Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="rounded-xl h-8 text-sm" />
+							</div>
+							<div>
+								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.amountFrom")}</label>
+								<Input type="number" min={0} step={0.01} value={amountFrom} onChange={(e) => setAmountFrom(e.target.value)} className="rounded-xl h-8 text-sm" placeholder="0" />
+							</div>
+							<div>
+								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.amountTo")}</label>
+								<Input type="number" min={0} step={0.01} value={amountTo} onChange={(e) => setAmountTo(e.target.value)} className="rounded-xl h-8 text-sm" placeholder="0" />
+							</div>
+							<div>
+								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.selectAccount")}</label>
+								<select
+									value={accountId}
+									onChange={(e) => setAccountId(e.target.value)}
+									className="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent px-2 text-sm"
+								>
+									<option value="">{t("finance.accounting.selectAccount")}</option>
+									{(accountsList ?? [])
+										.filter((a: any) => a.isPostable)
+										.map((a: any) => (
+											<option key={a.id} value={a.id}>{a.code} — {a.nameAr}</option>
+										))}
+								</select>
+							</div>
+							<div>
+								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.reference")}</label>
+								<select
+									value={referenceType}
+									onChange={(e) => setReferenceType(e.target.value)}
+									className="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent px-2 text-sm"
+								>
+									<option value="">الكل</option>
+									{Object.entries(REF_TYPE_BADGE).map(([key, label]) => (
+										<option key={key} value={key}>{label}</option>
+									))}
+								</select>
+							</div>
+							<div className="flex items-end">
+								<Button
+									variant="ghost"
+									size="sm"
+									className="rounded-xl text-slate-500"
+									onClick={() => {
+										setDateFrom(""); setDateTo(""); setAmountFrom(""); setAmountTo("");
+										setAccountId(""); setReferenceType(""); setSearch(""); setStatus("");
+									}}
+								>
+									<X className="h-3 w-3 me-1" />
+									{t("common.clear")}
+								</Button>
+							</div>
+						</div>
+					</CardContent>
+				</Card>
+			)}
 
 			{/* Bulk action bar */}
 			{selectedIds.size > 0 && (

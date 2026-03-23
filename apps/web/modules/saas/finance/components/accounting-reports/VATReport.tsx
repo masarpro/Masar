@@ -19,9 +19,11 @@ import {
 	ArrowUpCircle,
 	FileText,
 	Minus,
+	Printer,
 } from "lucide-react";
 import { Currency } from "../shared/Currency";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { ReportPrintHeader } from "../shared/ReportPrintHeader";
 
 interface VATReportProps {
 	organizationId: string;
@@ -36,6 +38,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 
 	const [selectedQuarter, setSelectedQuarter] = useState(currentQuarter);
 	const [selectedYear, setSelectedYear] = useState(currentYear);
+	const [activeTab, setActiveTab] = useState<"summary" | "invoices" | "expenses">("summary");
 
 	const { dateFrom, dateTo } = useMemo(() => {
 		const startMonth = (selectedQuarter - 1) * 3;
@@ -63,8 +66,9 @@ export function VATReport({ organizationId }: VATReportProps) {
 
 	return (
 		<div className="space-y-6">
+			<ReportPrintHeader reportTitle={t("finance.accountingReports.vatReport")} dateRange={`Q${selectedQuarter} ${selectedYear}`} />
 			{/* Period Selector */}
-			<div className="flex flex-wrap items-center gap-3">
+			<div className="flex flex-wrap items-center gap-3 print:hidden">
 				<div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
 					{[1, 2, 3, 4].map((q) => (
 						<Button
@@ -91,6 +95,23 @@ export function VATReport({ organizationId }: VATReportProps) {
 						</Button>
 					))}
 				</div>
+				<Button variant="outline" size="sm" className="rounded-xl ms-auto" onClick={() => window.print()}>
+					<Printer className="h-4 w-4 me-1" />
+					{t("common.print")}
+				</Button>
+			</div>
+
+			{/* Tabs */}
+			<div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 w-fit print:hidden">
+				{([
+					{ key: "summary" as const, label: t("finance.accountingReports.vat.statement") },
+					{ key: "invoices" as const, label: t("finance.accountingReports.vat.invoiceDetails") },
+					{ key: "expenses" as const, label: t("finance.accountingReports.vat.expenseDetails") },
+				]).map((tab) => (
+					<Button key={tab.key} variant={activeTab === tab.key ? "primary" : "ghost"} size="sm" className="rounded-lg" onClick={() => setActiveTab(tab.key)}>
+						{tab.label}
+					</Button>
+				))}
 			</div>
 
 			{/* KPI Cards */}
@@ -363,6 +384,74 @@ export function VATReport({ organizationId }: VATReportProps) {
 							</div>
 						</CardContent>
 					</Card>
+
+					{/* Invoice Details Tab */}
+					{activeTab === "invoices" && data.invoiceDetails && (
+						<Card className="rounded-2xl">
+							<CardHeader>
+								<CardTitle className="text-sm">{t("finance.accountingReports.vat.invoiceDetails")}</CardTitle>
+							</CardHeader>
+							<CardContent className="p-0">
+								<Table>
+									<TableHeader>
+										<TableRow>
+											<TableHead>{t("finance.accountingReports.vat.invoiceNo")}</TableHead>
+											<TableHead>{t("finance.accounting.entryDate")}</TableHead>
+											<TableHead>{t("finance.accountingReports.client")}</TableHead>
+											<TableHead>{t("finance.accountingReports.vat.type")}</TableHead>
+											<TableHead className="text-end">{t("finance.accountingReports.vat.taxableAmount")}</TableHead>
+											<TableHead className="text-end">{t("finance.accountingReports.vat.vatAmount")}</TableHead>
+										</TableRow>
+									</TableHeader>
+									<TableBody>
+										{data.invoiceDetails.map((inv: any, idx: number) => (
+											<TableRow key={idx}>
+												<TableCell className="font-mono text-sm">{inv.invoiceNo}</TableCell>
+												<TableCell className="text-sm">{new Date(inv.issueDate).toLocaleDateString("en-SA")}</TableCell>
+												<TableCell className="text-sm">{inv.clientName ?? "—"}</TableCell>
+												<TableCell className="text-sm">{inv.invoiceType}</TableCell>
+												<TableCell className="text-end"><Currency amount={inv.taxableAmount} /></TableCell>
+												<TableCell className="text-end"><Currency amount={inv.vatAmount} /></TableCell>
+											</TableRow>
+										))}
+									</TableBody>
+								</Table>
+							</CardContent>
+						</Card>
+					)}
+
+					{/* Expense Details Tab */}
+					{activeTab === "expenses" && data.expenseDetails && (
+						<Card className="rounded-2xl">
+							<CardHeader>
+								<CardTitle className="text-sm">{t("finance.accountingReports.vat.expenseDetails")}</CardTitle>
+							</CardHeader>
+							<CardContent className="p-0">
+								<Table>
+									<TableHeader>
+										<TableRow>
+											<TableHead>{t("finance.accounting.description")}</TableHead>
+											<TableHead>{t("finance.accounting.entryDate")}</TableHead>
+											<TableHead>{t("finance.accountingReports.vat.type")}</TableHead>
+											<TableHead className="text-end">{t("finance.accountingReports.vat.taxableAmount")}</TableHead>
+											<TableHead className="text-end">{t("finance.accountingReports.vat.vatAmount")}</TableHead>
+										</TableRow>
+									</TableHeader>
+									<TableBody>
+										{data.expenseDetails.map((exp: any, idx: number) => (
+											<TableRow key={idx}>
+												<TableCell className="text-sm">{exp.description ?? exp.category}</TableCell>
+												<TableCell className="text-sm">{new Date(exp.date).toLocaleDateString("en-SA")}</TableCell>
+												<TableCell className="text-sm">{exp.category}</TableCell>
+												<TableCell className="text-end"><Currency amount={exp.taxableAmount ?? exp.amount} /></TableCell>
+												<TableCell className="text-end"><Currency amount={exp.vatAmount ?? 0} /></TableCell>
+											</TableRow>
+										))}
+									</TableBody>
+								</Table>
+							</CardContent>
+						</Card>
+					)}
 				</>
 			)}
 		</div>

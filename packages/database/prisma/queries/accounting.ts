@@ -1430,3 +1430,122 @@ export async function findJournalEntryByReference(
 	});
 	return entry;
 }
+
+// ========================================
+// Project Cost Center Report (Feature 6)
+// ========================================
+
+export interface CostCenterProject {
+	projectId: string | null;
+	projectName: string;
+	accounts: Array<{ code: string; nameAr: string; type: string; amount: number }>;
+	totalRevenue: number;
+	totalExpenses: number;
+	netProfit: number;
+	profitMargin: number;
+}
+
+export interface CostCenterResult {
+	projects: CostCenterProject[];
+	totals: { totalRevenue: number; totalExpenses: number; netProfit: number };
+}
+
+export async function getCostCenterByProject(
+	db: PrismaClient,
+	organizationId: string,
+	options: { dateFrom?: Date; dateTo?: Date; projectId?: string },
+): Promise<CostCenterResult> {
+	const dateFilter: Record<string, Date> = {};
+	if (options.dateFrom) dateFilter.gte = options.dateFrom;
+	if (options.dateTo) dateFilter.lte = options.dateTo;
+
+	const lineWhere: any = {
+		journalEntry: {
+			organizationId,
+			status: "POSTED",
+			...(Object.keys(dateFilter).length > 0 ? { date: dateFilter } : {}),
+		},
+	};
+	if (options.projectId) {
+		lineWhere.projectId = options.projectId;
+	}
+
+	// Fetch all lines with project + account info
+	const lines = await db.journalEntryLine.findMany({
+		where: lineWhere,
+		select: {
+			projectId: true,
+			debit: true,
+			credit: true,
+			account: {
+				select: { code: true, nameAr: true, type: true },
+			},
+		},
+	});
+
+	// Fetch project names
+	const projectIds = [...new Set(lines.map((l) => l.projectId).filter(Boolean))] as string[];
+	const projects = await db.project.findMany({
+		where: { id: { in: projectIds } },
+		select: { id: true, name: true },
+	});
+	const projectMap = new Map(projects.map((p) => [p.id, p.name]));
+
+	// Group by project → account
+	const projectGroups = new Map<string | null, Map<string, { code: string; nameAr: string; type: string; debit: number; credit: number }>>();
+
+	for (const line of lines) {
+		const pId = line.projectId;
+		if (!projectGroups.has(pId)) projectGroups.set(pId, new Map());
+		const accountMap = projectGroups.get(pId)!;
+		const key = line.account.code;
+		if (!accountMap.has(key)) {
+			accountMap.set(key, { code: line.account.code, nameAr: line.account.nameAr, type: line.account.type, debit: 0, credit: 0 });
+		}
+		const acc = accountMap.get(key)!;
+		acc.debit += Number(line.debit);
+		acc.credit += Number(line.credit);
+	}
+
+	// Build result
+	let grandRevenue = 0;
+	let grandExpenses = 0;
+
+	const result: CostCenterProject[] = [];
+
+	for (const [pId, accountMap] of projectGroups) {
+		let totalRevenue = 0;
+		let totalExpenses = 0;
+		const accounts: CostCenterProject["accounts"] = [];
+
+		for (const [, acc] of accountMap) {
+			const amount = acc.type === "REVENUE" ? acc.credit - acc.debit : acc.debit - acc.credit;
+			if (acc.type === "REVENUE") totalRevenue += amount;
+			else if (acc.type === "EXPENSE") totalExpenses += amount;
+			accounts.push({ code: acc.code, nameAr: acc.nameAr, type: acc.type, amount });
+		}
+
+		accounts.sort((a, b) => a.code.localeCompare(b.code));
+
+		const netProfit = totalRevenue - totalExpenses;
+		result.push({
+			projectId: pId,
+			projectName: pId ? (projectMap.get(pId) ?? "غير معروف") : "عام / غير مخصص",
+			accounts,
+			totalRevenue,
+			totalExpenses,
+			netProfit,
+			profitMargin: totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0,
+		});
+
+		grandRevenue += totalRevenue;
+		grandExpenses += totalExpenses;
+	}
+
+	result.sort((a, b) => b.netProfit - a.netProfit);
+
+	return {
+		projects: result,
+		totals: { totalRevenue: grandRevenue, totalExpenses: grandExpenses, netProfit: grandRevenue - grandExpenses },
+	};
+}

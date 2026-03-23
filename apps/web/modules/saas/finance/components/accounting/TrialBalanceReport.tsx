@@ -16,10 +16,11 @@ import {
 	TableHeader,
 	TableRow,
 } from "@ui/components/table";
-import { CheckCircle, XCircle, Printer } from "lucide-react";
+import { CheckCircle, XCircle, Printer, Download } from "lucide-react";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { formatAccounting, ACCOUNT_TYPE_COLORS } from "./formatters";
 import { ReportPrintHeader } from "../shared/ReportPrintHeader";
+import { exportTrialBalanceToExcel } from "../../lib/accounting-excel-export";
 
 interface TrialBalanceReportProps {
 	organizationId: string;
@@ -62,10 +63,18 @@ export function TrialBalanceReport({ organizationId }: TrialBalanceReportProps) 
 					<input type="checkbox" checked={includeZero} onChange={(e) => setIncludeZero(e.target.checked)} className="rounded" />
 					{t("finance.accounting.trialBalance.includeZero")}
 				</label>
-				<Button variant="outline" size="sm" className="rounded-xl ms-auto" onClick={() => window.print()}>
-					<Printer className="h-4 w-4 me-1" />
-					{t("common.print")}
-				</Button>
+				<div className="flex gap-2 ms-auto">
+					<Button variant="outline" size="sm" className="rounded-xl" onClick={() => window.print()}>
+						<Printer className="h-4 w-4 me-1" />
+						{t("common.print")}
+					</Button>
+					{data && (
+						<Button variant="outline" size="sm" className="rounded-xl" onClick={() => exportTrialBalanceToExcel(data)}>
+							<Download className="h-4 w-4 me-1" />
+							Excel
+						</Button>
+					)}
+				</div>
 			</div>
 
 			{data && (

@@ -3478,6 +3478,9 @@
       "chartCreated": "Chart of Accounts created",
       "createChartOfAccounts": "Create Chart of Accounts",
       "noChartOfAccounts": "Chart of Accounts has not been created yet",
+      "advancedFilters": "Advanced Filters",
+      "amountFrom": "Amount From",
+      "amountTo": "Amount To",
       "bulkPost": "Post Selected",
       "postAllDrafts": "Post All Drafts",
       "selected": "selected",
@@ -3534,6 +3537,8 @@
       "vatReportDesc": "Quarterly output and input VAT summary — ready for ZATCA filing",
       "incomeStatement": "Simplified Income Statement",
       "incomeStatementDesc": "Period revenue minus expenses equals net profit",
+      "costCenter": "Cost Centers by Project",
+      "costCenterDesc": "Per-project profitability — revenue, expenses, and net profit",
       "viewReport": "View Report",
       "totalOutstanding": "Total Outstanding",
       "totalPayable": "Total Payable",
@@ -3581,7 +3586,10 @@
         "payable": "Payable",
         "refundable": "Refundable",
         "payableNote": "This amount must be paid to ZATCA",
-        "refundableNote": "You can claim this refund from ZATCA"
+        "refundableNote": "You can claim this refund from ZATCA",
+        "invoiceDetails": "Invoice Details",
+        "expenseDetails": "Expense Details",
+        "invoiceNo": "Invoice No"
       },
       "income": {
         "revenue": "Revenue",

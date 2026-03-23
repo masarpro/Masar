@@ -15,11 +15,12 @@ import {
 	TableHeader,
 	TableRow,
 } from "@ui/components/table";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft, Printer, Download } from "lucide-react";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { formatAccounting } from "./formatters";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { exportAccountLedgerToExcel } from "../../lib/accounting-excel-export";
 
 interface AccountLedgerPageProps {
 	organizationId: string;
@@ -100,6 +101,17 @@ export function AccountLedgerPage({
 						<Printer className="h-4 w-4 me-1" />
 						{t("finance.accounting.ledger.print")}
 					</Button>
+					{data && account && (
+						<Button variant="outline" size="sm" className="rounded-xl" onClick={() => exportAccountLedgerToExcel(
+							`${account.code} — ${account.nameAr}`,
+							data.openingBalance,
+							data.entries,
+							{ totalDebit: data.totalDebit, totalCredit: data.totalCredit, closingBalance: data.closingBalance },
+						)}>
+							<Download className="h-4 w-4 me-1" />
+							Excel
+						</Button>
+					)}
 				</div>
 			</div>
 

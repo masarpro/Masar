@@ -12,6 +12,7 @@ import {
 	Scale,
 	BarChart3,
 	BookOpen,
+	Target,
 } from "lucide-react";
 
 interface AccountingReportsLandingProps {
@@ -23,6 +24,7 @@ const ACCOUNTING_MODE_REPORT_IDS = new Set([
 	"trial-balance",
 	"journal-income-statement",
 	"balance-sheet",
+	"cost-center",
 ]);
 
 const REPORTS = [
@@ -81,6 +83,14 @@ const REPORTS = [
 		bgColor: "bg-violet-100 dark:bg-violet-900/30",
 		labelKey: "finance.accounting.balanceSheet.title",
 		descKey: "finance.accounting.balanceSheet.balanced",
+	},
+	{
+		id: "cost-center",
+		icon: Target,
+		color: "text-orange-600 dark:text-orange-400",
+		bgColor: "bg-orange-100 dark:bg-orange-900/30",
+		labelKey: "finance.accountingReports.costCenter",
+		descKey: "finance.accountingReports.costCenterDesc",
 	},
 ] as const;
 
