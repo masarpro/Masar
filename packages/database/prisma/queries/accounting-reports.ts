@@ -919,10 +919,17 @@ export async function getIncomeStatement(
 		Number(companyExpAgg._sum?.amount ?? 0),
 	);
 
+	// Merge SALARY category expenses into payroll to avoid duplication
+	const salaryExpense = expenseByCategory.get("SALARY") ?? ZERO;
+	if (!salaryExpense.isZero()) {
+		expenseByCategory.delete("SALARY");
+	}
+	const mergedPayroll = payrollTotal.add(salaryExpense);
+
 	const totalExpenses = [...expenseByCategory.values()]
 		.reduce((sum, v) => sum.add(v), ZERO)
 		.add(subPayments)
-		.add(payrollTotal)
+		.add(mergedPayroll)
 		.add(companyExpTotal);
 
 	const netProfit = totalRevenue.sub(totalExpenses);
@@ -1000,7 +1007,7 @@ export async function getIncomeStatement(
 				amount,
 			})),
 			subcontractorPayments: subPayments,
-			payroll: payrollTotal,
+			payroll: mergedPayroll,
 			companyExpenses: companyExpTotal,
 			totalExpenses,
 			byProject: [...expenseByProject.entries()].map(([id, v]) => ({

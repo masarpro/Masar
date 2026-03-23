@@ -97,6 +97,12 @@ export function JournalEntriesPage({
 				</div>
 				<div className="flex gap-2">
 					<Link href={`${basePath}/new-adjustment`}>
+						<Button size="sm" className="rounded-xl">
+							<Plus className="h-4 w-4 me-1" />
+							{t("finance.accounting.newEntry")}
+						</Button>
+					</Link>
+					<Link href={`${basePath}/new-adjustment`}>
 						<Button variant="outline" size="sm" className="rounded-xl">
 							<FileEdit className="h-4 w-4 me-1" />
 							{t("finance.accounting.adjustments.newAdjustment")}

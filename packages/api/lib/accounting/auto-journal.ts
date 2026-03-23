@@ -29,11 +29,13 @@ async function getAccountByCode(db: PrismaClient, organizationId: string, code: 
 // Helper: Get bank's chart account
 // ========================================
 async function getBankChartAccountId(db: PrismaClient, organizationId: string, bankId: string): Promise<string | null> {
-	const bank = await db.organizationBank.findUnique({
-		where: { id: bankId },
-		select: { chartAccountId: true },
-	});
-	if (bank?.chartAccountId) return bank.chartAccountId;
+	if (bankId) {
+		const bank = await db.organizationBank.findUnique({
+			where: { id: bankId },
+			select: { chartAccountId: true },
+		});
+		if (bank?.chartAccountId) return bank.chartAccountId;
+	}
 	// Fallback to generic Cash & Banks account
 	return getAccountByCode(db, organizationId, "1110");
 }

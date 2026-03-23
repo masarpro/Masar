@@ -228,7 +228,7 @@ export function IncomeStatementReport({
 							</CardTitle>
 						</CardHeader>
 						<CardContent>
-							<div className="font-mono text-sm space-y-1">
+							<div className="text-sm space-y-1">
 								{/* Revenue Section */}
 								<div className="font-bold text-slate-700 dark:text-slate-300 pb-2 border-b">
 									{t("finance.accountingReports.income.revenue")}

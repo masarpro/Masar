@@ -184,7 +184,7 @@ export function JournalEntryDetails({
 							))}
 							{/* Totals */}
 							<TableRow className="border-t-2 font-bold bg-slate-50 dark:bg-slate-800">
-								<TableCell colSpan={3}>{t("finance.accounting.trialBalance.title") || "الإجمالي"}</TableCell>
+								<TableCell colSpan={3}>{t("finance.accounting.aging.total")}</TableCell>
 								<TableCell className="text-end">{formatAccounting(totalDebit)}</TableCell>
 								<TableCell className="text-end">{formatAccounting(totalCredit)}</TableCell>
 							</TableRow>
