@@ -8,6 +8,7 @@ import {
 	getPayrollSummary,
 	updatePayrollRunItem,
 	deletePayrollRunItem,
+	db,
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
@@ -170,10 +171,28 @@ export const approvePayrollRunProcedure = subscriptionProcedure
 			action: "expenses",
 		});
 
-		return approvePayrollRun(input.id, {
+		const payrollRun = await approvePayrollRun(input.id, {
 			organizationId: input.organizationId,
 			approvedById: context.user.id,
 		});
+
+		// Auto-Journal: generate accounting entry for payroll approval
+		try {
+			const { onPayrollApproved } = await import("../../../lib/accounting/auto-journal");
+			const { Prisma } = await import("@repo/database/prisma/generated/client");
+			await onPayrollApproved(db, {
+				id: input.id,
+				organizationId: input.organizationId,
+				month: (payrollRun as any).month ?? new Date().getMonth() + 1,
+				year: (payrollRun as any).year ?? new Date().getFullYear(),
+				totalNet: new Prisma.Decimal(Number((payrollRun as any).totalNetSalary ?? 0)),
+				totalGosi: new Prisma.Decimal(0),
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to generate entry for payroll:", e);
+		}
+
+		return payrollRun;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════

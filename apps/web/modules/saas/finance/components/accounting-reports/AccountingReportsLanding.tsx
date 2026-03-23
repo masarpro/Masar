@@ -8,6 +8,9 @@ import {
 	Clock,
 	FileText,
 	TrendingUp,
+	Scale,
+	BarChart3,
+	BookOpen,
 } from "lucide-react";
 
 interface AccountingReportsLandingProps {
@@ -47,6 +50,30 @@ const REPORTS = [
 		bgColor: "bg-blue-100 dark:bg-blue-900/30",
 		labelKey: "finance.accountingReports.incomeStatement",
 		descKey: "finance.accountingReports.incomeStatementDesc",
+	},
+	{
+		id: "trial-balance",
+		icon: Scale,
+		color: "text-indigo-600 dark:text-indigo-400",
+		bgColor: "bg-indigo-100 dark:bg-indigo-900/30",
+		labelKey: "finance.accounting.trialBalance.title",
+		descKey: "finance.accounting.trialBalance.noEntries",
+	},
+	{
+		id: "journal-income-statement",
+		icon: BarChart3,
+		color: "text-teal-600 dark:text-teal-400",
+		bgColor: "bg-teal-100 dark:bg-teal-900/30",
+		labelKey: "finance.accounting.incomeStatement.title",
+		descKey: "finance.accounting.incomeStatement.revenue",
+	},
+	{
+		id: "balance-sheet",
+		icon: BookOpen,
+		color: "text-violet-600 dark:text-violet-400",
+		bgColor: "bg-violet-100 dark:bg-violet-900/30",
+		labelKey: "finance.accounting.balanceSheet.title",
+		descKey: "finance.accounting.balanceSheet.balanced",
 	},
 ] as const;
 

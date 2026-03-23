@@ -270,6 +270,12 @@ export function useSidebarMenu(): {
 									href: `${orgPrefix}/finance/accounting-reports`,
 									icon: ClipboardList,
 								},
+								{
+									id: "finance-accounting-periods",
+									label: t("finance.accounting.periods.title"),
+									href: `${orgPrefix}/finance/accounting-periods`,
+									icon: ClipboardList,
+								},
 							],
 						},
 						{

@@ -5,6 +5,7 @@ import {
 	updatePayment,
 	deletePayment,
 	orgAuditLog,
+	db,
 } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
@@ -157,6 +158,22 @@ export const createOrgPaymentProcedure = subscriptionProcedure
 			entityId: payment.id,
 			metadata: { amount: input.amount, destinationAccountId: input.destinationAccountId },
 		});
+
+		// Auto-Journal: generate accounting entry for payment received
+		try {
+			const { onOrganizationPaymentReceived } = await import("../../../lib/accounting/auto-journal");
+			await onOrganizationPaymentReceived(db, {
+				id: payment.id,
+				organizationId: input.organizationId,
+				amount: payment.amount,
+				date: payment.date,
+				description: input.description ?? "مقبوضات",
+				destinationAccountId: input.destinationAccountId,
+				projectId: input.projectId,
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to generate entry for payment:", e);
+		}
 
 		return payment;
 	});

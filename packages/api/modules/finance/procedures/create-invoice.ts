@@ -451,6 +451,26 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 			metadata: { amount: input.amount, paymentId: payment.id },
 		});
 
+		// Auto-Journal: generate accounting entry for invoice payment
+		try {
+			const { onInvoicePaymentReceived } = await import("../../../lib/accounting/auto-journal");
+			const inv = await db.financeInvoice.findUnique({ where: { id: input.id }, select: { invoiceNo: true, clientName: true, projectId: true } });
+			if (inv) {
+				await onInvoicePaymentReceived(db, {
+					organizationId: input.organizationId,
+					invoiceId: input.id,
+					invoiceNumber: inv.invoiceNo,
+					clientName: inv.clientName,
+					amount: payment.amount,
+					date: new Date(input.paymentDate),
+					sourceAccountId: "",
+					projectId: inv.projectId,
+				});
+			}
+		} catch (e) {
+			console.error("[AutoJournal] Failed to generate entry for invoice payment:", e);
+		}
+
 		return {
 			...payment,
 			amount: Number(payment.amount),
@@ -664,6 +684,23 @@ export const issueInvoiceProcedure = subscriptionProcedure
 			metadata: { invoiceType: invoice.invoiceType, totalAmount: Number(issuedInvoice.totalAmount) },
 		});
 
+		// Auto-Journal: generate accounting entry for invoice issuance
+		try {
+			const { onInvoiceIssued } = await import("../../../lib/accounting/auto-journal");
+			await onInvoiceIssued(db, {
+				id: issuedInvoice.id,
+				organizationId: input.organizationId,
+				number: issuedInvoice.invoiceNo,
+				issueDate: issuedInvoice.issueDate,
+				clientName: issuedInvoice.clientName,
+				totalAmount: issuedInvoice.totalAmount,
+				vatAmount: issuedInvoice.vatAmount,
+				projectId: issuedInvoice.projectId,
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to generate entry for invoice issue:", e);
+		}
+
 		return {
 			...issuedInvoice,
 			subtotal: Number(issuedInvoice.subtotal),
@@ -837,6 +874,23 @@ export const createCreditNoteProcedure = subscriptionProcedure
 			entityId: input.id,
 			metadata: { creditNoteId: creditNote.id, creditNoteNo: creditNote.invoiceNo },
 		});
+
+		// Auto-Journal: generate accounting entry for credit note
+		try {
+			const { onCreditNoteIssued } = await import("../../../lib/accounting/auto-journal");
+			await onCreditNoteIssued(db, {
+				id: creditNote.id,
+				organizationId: input.organizationId,
+				number: creditNote.invoiceNo,
+				issueDate: creditNote.issueDate,
+				clientName: creditNote.clientName,
+				totalAmount: creditNote.totalAmount,
+				vatAmount: creditNote.vatAmount,
+				projectId: creditNote.projectId,
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to generate entry for credit note:", e);
+		}
 
 		return {
 			...creditNote,

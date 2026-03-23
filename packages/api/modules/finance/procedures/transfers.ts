@@ -4,6 +4,7 @@ import {
 	createTransfer,
 	cancelTransfer,
 	orgAuditLog,
+	db,
 } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
@@ -136,6 +137,22 @@ export const createTransferProcedure = subscriptionProcedure
 			entityId: transfer.id,
 			metadata: { amount: input.amount, fromAccountId: input.fromAccountId, toAccountId: input.toAccountId },
 		});
+
+		// Auto-Journal: generate accounting entry for transfer
+		try {
+			const { onTransferCompleted } = await import("../../../lib/accounting/auto-journal");
+			await onTransferCompleted(db, {
+				id: transfer.id,
+				organizationId: input.organizationId,
+				amount: transfer.amount,
+				date: transfer.date,
+				fromAccountId: input.fromAccountId,
+				toAccountId: input.toAccountId,
+				description: input.description,
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to generate entry for transfer:", e);
+		}
 
 		return transfer;
 	});

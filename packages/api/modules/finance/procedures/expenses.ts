@@ -257,6 +257,25 @@ export const createExpenseProcedure = subscriptionProcedure
 			data: { firstExpenseRecorded: true },
 		}).catch(() => {});
 
+		// Auto-Journal: generate accounting entry for completed expense
+		if ((input.status ?? "COMPLETED") === "COMPLETED") {
+			try {
+				const { onExpenseCompleted } = await import("../../../lib/accounting/auto-journal");
+				await onExpenseCompleted(db, {
+					id: expense.id,
+					organizationId: input.organizationId,
+					category: input.category,
+					amount: expense.amount,
+					date: expense.date,
+					description: input.description ?? input.category,
+					sourceAccountId: input.sourceAccountId,
+					projectId: input.projectId,
+				});
+			} catch (e) {
+				console.error("[AutoJournal] Failed to generate entry for expense:", e);
+			}
+		}
+
 		return expense;
 	});
 
@@ -387,6 +406,23 @@ export const payExpenseProcedure = subscriptionProcedure
 			entityId: input.id,
 			metadata: { amount: input.amount, sourceAccountId: input.sourceAccountId, newStatus: expense.status },
 		});
+
+		// Auto-Journal: generate accounting entry for expense payment
+		try {
+			const { onExpenseCompleted } = await import("../../../lib/accounting/auto-journal");
+			await onExpenseCompleted(db, {
+				id: expense.id,
+				organizationId: input.organizationId,
+				category: expense.category,
+				amount: expense.amount,
+				date: expense.date,
+				description: expense.description ?? expense.category,
+				sourceAccountId: input.sourceAccountId,
+				projectId: expense.projectId,
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to generate entry for expense payment:", e);
+		}
 
 		return expense;
 	});

@@ -1,4 +1,4 @@
-import { createSubcontractPayment, getSubcontractById, logAuditEvent } from "@repo/database";
+import { createSubcontractPayment, getSubcontractById, logAuditEvent, db } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -73,6 +73,23 @@ export const createSubcontractPaymentProcedure = subscriptionProcedure
 				termId: input.termId,
 			},
 		}).catch(() => {});
+
+		// Auto-Journal: generate accounting entry for subcontract payment
+		try {
+			const { onSubcontractPayment } = await import("../../../lib/accounting/auto-journal");
+			const contract = await db.subcontractContract.findUnique({ where: { id: input.contractId }, select: { name: true } });
+			await onSubcontractPayment(db, {
+				id: payment.id,
+				organizationId: input.organizationId,
+				contractorName: contract?.name ?? "",
+				amount: payment.amount,
+				date: new Date(input.date),
+				sourceAccountId: input.sourceAccountId ?? "",
+				projectId: input.projectId,
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to generate entry for subcontract payment:", e);
+		}
 
 		return { ...payment, amount: Number(payment.amount) };
 	});

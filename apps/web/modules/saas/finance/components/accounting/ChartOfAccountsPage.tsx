@@ -1,0 +1,259 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { orpc } from "@shared/lib/orpc-query-utils";
+import { Card, CardContent } from "@ui/components/card";
+import { Button } from "@ui/components/button";
+import { Input } from "@ui/components/input";
+import { Badge } from "@ui/components/badge";
+import {
+	BookOpen,
+	ChevronDown,
+	ChevronLeft,
+	FileText,
+	Folder,
+	Plus,
+	Search,
+	Sparkles,
+} from "lucide-react";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { ACCOUNT_TYPE_COLORS } from "./formatters";
+
+interface ChartOfAccountsPageProps {
+	organizationId: string;
+	organizationSlug: string;
+}
+
+interface TreeNode {
+	id: string;
+	code: string;
+	nameAr: string;
+	nameEn: string;
+	type: string;
+	level: number;
+	parentId: string | null;
+	isSystem: boolean;
+	isActive: boolean;
+	isPostable: boolean;
+	children: TreeNode[];
+}
+
+export function ChartOfAccountsPage({ organizationId }: ChartOfAccountsPageProps) {
+	const t = useTranslations();
+	const queryClient = useQueryClient();
+	const [search, setSearch] = useState("");
+	const [expanded, setExpanded] = useState<Set<string>>(new Set(["1000", "2000", "3000", "4000", "5000", "6000"]));
+
+	const { data: accounts, isLoading } = useQuery(
+		orpc.accounting.accounts.list.queryOptions({
+			input: { organizationId },
+		}),
+	);
+
+	const seedMutation = useMutation({
+		...orpc.accounting.accounts.seed.mutationOptions(),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["accounting"] });
+		},
+	});
+
+	// Build tree from flat list
+	const tree = useMemo(() => {
+		if (!accounts || accounts.length === 0) return [];
+		const map = new Map<string, TreeNode>();
+		const roots: TreeNode[] = [];
+
+		for (const acc of accounts) {
+			map.set(acc.id, { ...acc, children: [] });
+		}
+
+		for (const acc of accounts) {
+			const node = map.get(acc.id)!;
+			if (acc.parentId && map.has(acc.parentId)) {
+				map.get(acc.parentId)!.children.push(node);
+			} else {
+				roots.push(node);
+			}
+		}
+
+		return roots;
+	}, [accounts]);
+
+	// Filter tree by search
+	const filteredTree = useMemo(() => {
+		if (!search.trim()) return tree;
+		const q = search.toLowerCase();
+
+		function matches(node: TreeNode): boolean {
+			return (
+				node.code.includes(q) ||
+				node.nameAr.includes(q) ||
+				node.nameEn.toLowerCase().includes(q) ||
+				node.children.some(matches)
+			);
+		}
+
+		function filter(nodes: TreeNode[]): TreeNode[] {
+			return nodes
+				.filter(matches)
+				.map((n) => ({ ...n, children: filter(n.children) }));
+		}
+
+		return filter(tree);
+	}, [tree, search]);
+
+	const toggleExpand = (code: string) => {
+		setExpanded((prev) => {
+			const next = new Set(prev);
+			if (next.has(code)) next.delete(code);
+			else next.add(code);
+			return next;
+		});
+	};
+
+	if (isLoading) return <DashboardSkeleton />;
+
+	// No accounts — show activation
+	if (!accounts || accounts.length === 0) {
+		return (
+			<div className="flex items-center justify-center min-h-[400px]">
+				<Card className="rounded-2xl max-w-md w-full">
+					<CardContent className="p-8 text-center">
+						<div className="p-4 bg-primary/10 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+							<BookOpen className="h-8 w-8 text-primary" />
+						</div>
+						<h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+							{t("finance.accounting.activateAccounting")}
+						</h2>
+						<p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+							{t("finance.accounting.activateDescription")}
+						</p>
+						<Button
+							onClick={() => seedMutation.mutate({ organizationId })}
+							disabled={seedMutation.isPending}
+							className="w-full"
+						>
+							<Sparkles className="h-4 w-4 me-2" />
+							{seedMutation.isPending ? "..." : t("finance.accounting.activateAccounting")}
+						</Button>
+					</CardContent>
+				</Card>
+			</div>
+		);
+	}
+
+	return (
+		<div className="space-y-4">
+			{/* Search */}
+			<div className="flex items-center gap-3">
+				<div className="relative flex-1 max-w-sm">
+					<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+					<Input
+						placeholder={t("finance.accounting.search")}
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+						className="ps-9 rounded-xl"
+					/>
+				</div>
+			</div>
+
+			{/* Tree */}
+			<Card className="rounded-2xl">
+				<CardContent className="p-0">
+					<div className="divide-y divide-slate-100 dark:divide-slate-800">
+						{filteredTree.map((node) => (
+							<AccountTreeNode
+								key={node.id}
+								node={node}
+								expanded={expanded}
+								onToggle={toggleExpand}
+								t={t}
+							/>
+						))}
+					</div>
+				</CardContent>
+			</Card>
+		</div>
+	);
+}
+
+function AccountTreeNode({
+	node,
+	expanded,
+	onToggle,
+	t,
+	depth = 0,
+}: {
+	node: TreeNode;
+	expanded: Set<string>;
+	onToggle: (code: string) => void;
+	t: ReturnType<typeof useTranslations>;
+	depth?: number;
+}) {
+	const isExpanded = expanded.has(node.code);
+	const hasChildren = node.children.length > 0;
+	const colors = ACCOUNT_TYPE_COLORS[node.type] ?? ACCOUNT_TYPE_COLORS.ASSET;
+	const isLevel1 = node.level === 1;
+
+	return (
+		<>
+			<div
+				className={`flex items-center gap-2 py-2.5 px-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors ${
+					isLevel1 ? `${colors.bg} font-semibold` : ""
+				} ${!node.isActive ? "opacity-50" : ""}`}
+				style={{ paddingInlineStart: `${depth * 1.5 + 1}rem` }}
+				onClick={() => hasChildren && onToggle(node.code)}
+			>
+				{/* Expand icon */}
+				<span className="w-5 flex-shrink-0">
+					{hasChildren ? (
+						isExpanded ? (
+							<ChevronDown className="h-4 w-4 text-slate-400" />
+						) : (
+							<ChevronLeft className="h-4 w-4 text-slate-400" />
+						)
+					) : null}
+				</span>
+
+				{/* Icon */}
+				{node.isPostable ? (
+					<FileText className={`h-4 w-4 flex-shrink-0 ${colors.text}`} />
+				) : (
+					<Folder className={`h-4 w-4 flex-shrink-0 ${colors.text}`} />
+				)}
+
+				{/* Code */}
+				<span className="text-xs font-mono text-slate-400 w-12 flex-shrink-0">
+					{node.code}
+				</span>
+
+				{/* Name */}
+				<span className={`flex-1 text-sm ${isLevel1 ? "text-slate-900 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}>
+					{node.nameAr}
+				</span>
+
+				{/* Badges */}
+				{node.isSystem && (
+					<Badge variant="outline" className="text-[10px] px-1.5 py-0">
+						{t("finance.accounting.systemAccount")}
+					</Badge>
+				)}
+			</div>
+
+			{/* Children */}
+			{isExpanded &&
+				node.children.map((child) => (
+					<AccountTreeNode
+						key={child.id}
+						node={child}
+						expanded={expanded}
+						onToggle={onToggle}
+						t={t}
+						depth={depth + 1}
+					/>
+				))}
+		</>
+	);
+}
