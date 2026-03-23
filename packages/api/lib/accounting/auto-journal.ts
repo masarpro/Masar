@@ -2,16 +2,23 @@
 // RULE: Silent failure — never break the original operation due to accounting errors
 
 import { type PrismaClient, Prisma } from "@repo/database/prisma/generated/client";
-import { createJournalEntry, reverseJournalEntry, EXPENSE_CATEGORY_TO_ACCOUNT_CODE } from "@repo/database";
+import { createJournalEntry, reverseJournalEntry, seedChartOfAccounts, EXPENSE_CATEGORY_TO_ACCOUNT_CODE } from "@repo/database";
 
 const ZERO = new Prisma.Decimal(0);
 
 // ========================================
-// Helper: Is accounting enabled for this org?
+// Helper: Ensure accounting is enabled — auto-seed chart of accounts if missing
 // ========================================
-async function isAccountingEnabled(db: PrismaClient, organizationId: string): Promise<boolean> {
+async function ensureAccountingEnabled(db: PrismaClient, organizationId: string): Promise<boolean> {
 	const count = await db.chartAccount.count({ where: { organizationId }, take: 1 });
-	return count > 0;
+	if (count > 0) return true;
+	// Auto-seed chart of accounts on first financial operation
+	try {
+		await seedChartOfAccounts(db, organizationId);
+		return true;
+	} catch {
+		return false;
+	}
 }
 
 // ========================================
@@ -53,7 +60,7 @@ export async function onInvoiceIssued(db: PrismaClient, invoice: {
 	vatAmount: Prisma.Decimal;
 	projectId?: string | null;
 }) {
-	if (!(await isAccountingEnabled(db, invoice.organizationId))) return;
+	if (!(await ensureAccountingEnabled(db,invoice.organizationId))) return;
 
 	const receivableId = await getAccountByCode(db, invoice.organizationId, "1120");
 	const revenueId = await getAccountByCode(db, invoice.organizationId, "4100");
@@ -97,7 +104,7 @@ export async function onInvoicePaymentReceived(db: PrismaClient, payment: {
 	sourceAccountId: string;
 	projectId?: string | null;
 }) {
-	if (!(await isAccountingEnabled(db, payment.organizationId))) return;
+	if (!(await ensureAccountingEnabled(db,payment.organizationId))) return;
 
 	const bankAccId = await getBankChartAccountId(db, payment.organizationId, payment.sourceAccountId);
 	const receivableId = await getAccountByCode(db, payment.organizationId, "1120");
@@ -131,7 +138,7 @@ export async function onExpenseCompleted(db: PrismaClient, expense: {
 	sourceAccountId?: string | null;
 	projectId?: string | null;
 }) {
-	if (!(await isAccountingEnabled(db, expense.organizationId))) return;
+	if (!(await ensureAccountingEnabled(db,expense.organizationId))) return;
 
 	const expenseCode = EXPENSE_CATEGORY_TO_ACCOUNT_CODE[expense.category] || "6900";
 	const expenseAccId = await getAccountByCode(db, expense.organizationId, expenseCode);
@@ -171,7 +178,7 @@ export async function onTransferCompleted(db: PrismaClient, transfer: {
 	toAccountId: string;
 	description?: string;
 }) {
-	if (!(await isAccountingEnabled(db, transfer.organizationId))) return;
+	if (!(await ensureAccountingEnabled(db,transfer.organizationId))) return;
 
 	const fromAccId = await getBankChartAccountId(db, transfer.organizationId, transfer.fromAccountId);
 	const toAccId = await getBankChartAccountId(db, transfer.organizationId, transfer.toAccountId);
@@ -203,7 +210,7 @@ export async function onSubcontractPayment(db: PrismaClient, payment: {
 	sourceAccountId: string;
 	projectId?: string | null;
 }) {
-	if (!(await isAccountingEnabled(db, payment.organizationId))) return;
+	if (!(await ensureAccountingEnabled(db,payment.organizationId))) return;
 
 	const subAccId = await getAccountByCode(db, payment.organizationId, "5200");
 	const bankAccId = await getBankChartAccountId(db, payment.organizationId, payment.sourceAccountId);
@@ -235,7 +242,7 @@ export async function onPayrollApproved(db: PrismaClient, payroll: {
 	totalGosi: Prisma.Decimal;
 	sourceAccountId?: string | null;
 }) {
-	if (!(await isAccountingEnabled(db, payroll.organizationId))) return;
+	if (!(await ensureAccountingEnabled(db,payroll.organizationId))) return;
 
 	const salaryAccId = await getAccountByCode(db, payroll.organizationId, "6100");
 	const gosiAccId = await getAccountByCode(db, payroll.organizationId, "2170");
@@ -280,7 +287,7 @@ export async function onOrganizationPaymentReceived(db: PrismaClient, payment: {
 	destinationAccountId: string;
 	projectId?: string | null;
 }) {
-	if (!(await isAccountingEnabled(db, payment.organizationId))) return;
+	if (!(await ensureAccountingEnabled(db,payment.organizationId))) return;
 
 	const bankAccId = await getBankChartAccountId(db, payment.organizationId, payment.destinationAccountId);
 	const revenueAccId = await getAccountByCode(db, payment.organizationId, "4300");
@@ -313,7 +320,7 @@ export async function onCreditNoteIssued(db: PrismaClient, creditNote: {
 	vatAmount: Prisma.Decimal;
 	projectId?: string | null;
 }) {
-	if (!(await isAccountingEnabled(db, creditNote.organizationId))) return;
+	if (!(await ensureAccountingEnabled(db,creditNote.organizationId))) return;
 
 	const receivableId = await getAccountByCode(db, creditNote.organizationId, "1120");
 	const revenueId = await getAccountByCode(db, creditNote.organizationId, "4100");
@@ -351,7 +358,7 @@ export async function reverseAutoJournalEntry(db: PrismaClient, data: {
 	referenceId: string;
 	userId: string;
 }) {
-	if (!(await isAccountingEnabled(db, data.organizationId))) return;
+	if (!(await ensureAccountingEnabled(db,data.organizationId))) return;
 
 	const entry = await db.journalEntry.findFirst({
 		where: {
