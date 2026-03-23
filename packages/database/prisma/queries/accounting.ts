@@ -1764,6 +1764,103 @@ export async function generateDueRecurringEntries(
 	return { generated };
 }
 
+// ========================================
+// Bank Reconciliation (Feature 7)
+// ========================================
+
+export async function getBankJournalLines(
+	db: PrismaClient,
+	organizationId: string,
+	chartAccountId: string,
+	dateFrom?: Date,
+	dateTo?: Date,
+) {
+	const dateFilter: Record<string, Date> = {};
+	if (dateFrom) dateFilter.gte = dateFrom;
+	if (dateTo) dateFilter.lte = dateTo;
+
+	const lines = await db.journalEntryLine.findMany({
+		where: {
+			accountId: chartAccountId,
+			journalEntry: {
+				organizationId,
+				status: "POSTED",
+				...(Object.keys(dateFilter).length > 0 ? { date: dateFilter } : {}),
+			},
+		},
+		include: {
+			journalEntry: {
+				select: { id: true, entryNo: true, date: true, description: true, referenceType: true, referenceNo: true },
+			},
+		},
+		orderBy: { journalEntry: { date: "asc" } },
+	});
+
+	return lines.map((l) => ({
+		id: l.id,
+		date: l.journalEntry.date,
+		entryNo: l.journalEntry.entryNo,
+		entryId: l.journalEntry.id,
+		description: l.journalEntry.description,
+		referenceType: l.journalEntry.referenceType,
+		referenceNo: l.journalEntry.referenceNo,
+		debit: Number(l.debit),
+		credit: Number(l.credit),
+		net: Number(l.debit) - Number(l.credit),
+	}));
+}
+
+export async function createBankReconciliation(
+	db: PrismaClient,
+	organizationId: string,
+	data: {
+		bankAccountId: string;
+		reconciliationDate: Date;
+		statementBalance: number;
+		bookBalance: number;
+		matchedLineIds: string[];
+		notes?: string;
+		createdById: string;
+	},
+) {
+	const difference = data.statementBalance - data.bookBalance;
+
+	return db.bankReconciliation.create({
+		data: {
+			organizationId,
+			bankAccountId: data.bankAccountId,
+			reconciliationDate: data.reconciliationDate,
+			statementBalance: data.statementBalance,
+			bookBalance: data.bookBalance,
+			difference,
+			status: Math.abs(difference) < 0.01 ? "COMPLETED" : "DRAFT",
+			notes: data.notes,
+			createdById: data.createdById,
+			completedAt: Math.abs(difference) < 0.01 ? new Date() : null,
+			completedById: Math.abs(difference) < 0.01 ? data.createdById : null,
+			items: {
+				create: data.matchedLineIds.map((lineId) => ({
+					journalEntryLineId: lineId,
+					isMatched: true,
+				})),
+			},
+		},
+		include: { items: true },
+	});
+}
+
+export async function listBankReconciliations(
+	db: PrismaClient,
+	organizationId: string,
+	bankAccountId: string,
+) {
+	return db.bankReconciliation.findMany({
+		where: { organizationId, bankAccountId },
+		orderBy: { reconciliationDate: "desc" },
+		take: 20,
+	});
+}
+
 function computeNextDueDate(fromDate: Date, frequency: string, dayOfMonth: number): Date {
 	const d = new Date(fromDate);
 	switch (frequency) {

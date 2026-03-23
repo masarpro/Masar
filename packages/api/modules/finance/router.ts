@@ -88,6 +88,12 @@ import {
 } from "./procedures/expenses";
 
 import {
+	getBankLinesForReconciliationProcedure,
+	createReconciliationProcedure,
+	listReconciliationsProcedure,
+} from "./procedures/bank-reconciliation";
+
+import {
 	listOrgPayments,
 	getOrgPayment,
 	createOrgPaymentProcedure,
@@ -198,6 +204,11 @@ export const financeRouter = {
 		update: updateBankAccountProcedure,
 		setDefault: setDefaultBankAccountProcedure,
 		delete: deleteBankAccountProcedure,
+		reconciliation: {
+			getLines: getBankLinesForReconciliationProcedure,
+			create: createReconciliationProcedure,
+			history: listReconciliationsProcedure,
+		},
 	},
 
 	// Expenses (المصروفات)

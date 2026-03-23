@@ -3456,6 +3456,16 @@
         "cannotModifyClosed": "Cannot modify entries in a closed period",
         "noPeriods": "No accounting periods found. Click 'Generate Periods' to create periods for this year."
       },
+      "reconciliation": {
+        "title": "Bank Reconciliation",
+        "statementBalance": "Statement Balance",
+        "bookBalance": "Book Balance",
+        "matched": "Matched Items",
+        "bankMovements": "Bank Movements",
+        "save": "Save Reconciliation",
+        "saved": "Reconciliation saved successfully",
+        "history": "Reconciliation History"
+      },
       "recurring": {
         "title": "Recurring Entries",
         "frequency": "Frequency",
