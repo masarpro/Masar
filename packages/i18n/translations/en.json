@@ -3411,7 +3411,16 @@
         "netProfitMargin": "Net Profit Margin",
         "totalRevenue": "Total Revenue",
         "totalCost": "Total Cost of Projects",
-        "totalOpex": "Total Operating Expenses"
+        "totalOpex": "Total Operating Expenses",
+        "compareWithPrevious": "Compare with previous period"
+      },
+      "income": {
+        "month": "Month",
+        "quarter": "Quarter",
+        "year": "Year"
+      },
+      "aging": {
+        "total": "Total"
       },
       "balanceSheet": {
         "title": "Balance Sheet",
@@ -3444,7 +3453,8 @@
         "closingConfirm": "Are you sure you want to close this period?",
         "draftEntriesExist": "There are draft entries in this period",
         "entriesCount": "Entries",
-        "cannotModifyClosed": "Cannot modify entries in a closed period"
+        "cannotModifyClosed": "Cannot modify entries in a closed period",
+        "noPeriods": "No accounting periods found. Click 'Generate Periods' to create periods for this year."
       },
       "adjustments": {
         "title": "Adjusting Entries",
@@ -3457,8 +3467,17 @@
         "correction": "Correction",
         "template": "Select Template",
         "freeEntry": "Free Entry",
-        "autoPost": "Auto-post"
-      }
+        "autoPost": "Auto-post",
+        "selectTemplate": "Select adjustment template"
+      },
+      "accountingMode": "Accounting Mode",
+      "accountingModeDesc": "Show advanced accounting tools (Chart of Accounts, Journal Entries, Financial Statements)",
+      "enableAccountingMode": "Enable Accounting Mode",
+      "disableAccountingMode": "Disable Accounting Mode",
+      "accountingModeActivated": "Accounting mode activated",
+      "chartCreated": "Chart of Accounts created",
+      "createChartOfAccounts": "Create Chart of Accounts",
+      "noChartOfAccounts": "Chart of Accounts has not been created yet"
     },
     "accountingReports": {
       "title": "Accounting Reports",

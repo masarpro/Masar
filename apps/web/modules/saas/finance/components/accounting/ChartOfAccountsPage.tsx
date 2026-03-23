@@ -115,7 +115,7 @@ export function ChartOfAccountsPage({ organizationId }: ChartOfAccountsPageProps
 
 	if (isLoading) return <DashboardSkeleton />;
 
-	// No accounts — show activation
+	// No accounts — show empty state with seed button
 	if (!accounts || accounts.length === 0) {
 		return (
 			<div className="flex items-center justify-center min-h-[400px]">
@@ -125,7 +125,7 @@ export function ChartOfAccountsPage({ organizationId }: ChartOfAccountsPageProps
 							<BookOpen className="h-8 w-8 text-primary" />
 						</div>
 						<h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-							{t("finance.accounting.activateAccounting")}
+							{t("finance.accounting.noChartOfAccounts")}
 						</h2>
 						<p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
 							{t("finance.accounting.activateDescription")}
@@ -136,7 +136,7 @@ export function ChartOfAccountsPage({ organizationId }: ChartOfAccountsPageProps
 							className="w-full"
 						>
 							<Sparkles className="h-4 w-4 me-2" />
-							{seedMutation.isPending ? "..." : t("finance.accounting.activateAccounting")}
+							{seedMutation.isPending ? "..." : t("finance.accounting.createChartOfAccounts")}
 						</Button>
 					</CardContent>
 				</Card>

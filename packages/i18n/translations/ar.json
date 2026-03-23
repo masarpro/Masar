@@ -3433,7 +3433,16 @@
         "netProfitMargin": "هامش صافي الربح",
         "totalRevenue": "إجمالي الإيرادات",
         "totalCost": "إجمالي تكاليف المشاريع",
-        "totalOpex": "إجمالي المصروفات التشغيلية"
+        "totalOpex": "إجمالي المصروفات التشغيلية",
+        "compareWithPrevious": "مقارنة بالفترة السابقة"
+      },
+      "income": {
+        "month": "شهر",
+        "quarter": "ربع سنوي",
+        "year": "سنة"
+      },
+      "aging": {
+        "total": "الإجمالي"
       },
       "balanceSheet": {
         "title": "الميزانية العمومية",
@@ -3466,7 +3475,8 @@
         "closingConfirm": "هل أنت متأكد من إقفال هذه الفترة؟",
         "draftEntriesExist": "يوجد قيود مسودة في هذه الفترة",
         "entriesCount": "عدد القيود",
-        "cannotModifyClosed": "لا يمكن تعديل قيود في فترة مغلقة"
+        "cannotModifyClosed": "لا يمكن تعديل قيود في فترة مغلقة",
+        "noPeriods": "لا توجد فترات محاسبية. اضغط «توليد الفترات» لإنشاء فترات لهذه السنة."
       },
       "adjustments": {
         "title": "قيود التسوية",
@@ -3479,8 +3489,17 @@
         "correction": "تصحيح",
         "template": "اختر قالب",
         "freeEntry": "قيد حر",
-        "autoPost": "ترحيل فوري"
-      }
+        "autoPost": "ترحيل فوري",
+        "selectTemplate": "اختر قالب التسوية"
+      },
+      "accountingMode": "وضع المحاسبة",
+      "accountingModeDesc": "عرض أدوات المحاسبة المتقدمة (دليل الحسابات، القيود، القوائم المالية)",
+      "enableAccountingMode": "تفعيل وضع المحاسبة",
+      "disableAccountingMode": "إلغاء وضع المحاسبة",
+      "accountingModeActivated": "تم تفعيل وضع المحاسبة",
+      "chartCreated": "تم إنشاء دليل الحسابات",
+      "createChartOfAccounts": "إنشاء دليل الحسابات",
+      "noChartOfAccounts": "لم يتم إنشاء دليل الحسابات بعد"
     },
     "accountingReports": {
       "title": "التقارير المحاسبية",
