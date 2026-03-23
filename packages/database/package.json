@@ -11,15 +11,15 @@
 		"zod": "^4.1.12"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.3.5",
+		"@biomejs/biome": "2.4.8",
 		"@faker-js/faker": "^10.3.0",
 		"@repo/tsconfig": "workspace:*",
-		"@types/node": "24.10.1",
-		"@vitest/coverage-v8": "^4.0.18",
+		"@types/node": "25.5.0",
+		"@vitest/coverage-v8": "^4.1.0",
 		"dotenv-cli": "^11.0.0",
-		"prisma": "7.1.0",
-		"prisma-zod-generator": "2.1.2",
-		"vitest": "^4.0.18"
+		"prisma": "7.5.0",
+		"prisma-zod-generator": "2.1.4",
+		"vitest": "^4.1.0"
 	},
 	"main": "./index.ts",
 	"name": "@repo/database",
