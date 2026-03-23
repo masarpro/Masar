@@ -15,6 +15,7 @@ import {
 const ACCOUNTING_ONLY_SECTIONS = new Set([
 	"chart-of-accounts",
 	"journal-entries",
+	"opening-balances",
 	"accounting-periods",
 ]);
 

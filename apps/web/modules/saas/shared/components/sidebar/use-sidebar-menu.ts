@@ -291,6 +291,12 @@ export function useSidebarMenu(): {
 												icon: ClipboardList,
 											},
 											{
+												id: "finance-opening-balances",
+												label: t("finance.accounting.openingBalances.title"),
+												href: `${orgPrefix}/finance/opening-balances`,
+												icon: ClipboardList,
+											},
+											{
 												id: "finance-accounting-periods",
 												label: t("finance.accounting.periods.title"),
 												href: `${orgPrefix}/finance/accounting-periods`,

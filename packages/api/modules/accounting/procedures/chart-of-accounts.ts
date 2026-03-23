@@ -3,6 +3,9 @@ import {
 	getChartOfAccounts,
 	getChartAccountById,
 	getAccountBalance,
+	getAccountLedger,
+	getOpeningBalances,
+	saveOpeningBalances,
 } from "@repo/database";
 import { db } from "@repo/database";
 import { z } from "zod";
@@ -250,4 +253,95 @@ export const getAccountBalanceProcedure = protectedProcedure
 		);
 
 		return { balance: Number(balance) };
+	});
+
+// ========== Get Account Ledger ==========
+
+export const getAccountLedgerProcedure = protectedProcedure
+	.route({
+		method: "GET",
+		path: "/accounting/accounts/{id}/ledger",
+		tags: ["Accounting", "Chart of Accounts"],
+		summary: "Get account ledger with running balance",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			id: z.string(),
+			dateFrom: z.string().datetime().optional(),
+			dateTo: z.string().datetime().optional(),
+			page: z.number().min(1).optional().default(1),
+			pageSize: z.number().min(10).max(200).optional().default(50),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "view",
+		});
+
+		return getAccountLedger(db, input.id, input.organizationId, {
+			dateFrom: input.dateFrom ? new Date(input.dateFrom) : undefined,
+			dateTo: input.dateTo ? new Date(input.dateTo) : undefined,
+			page: input.page,
+			pageSize: input.pageSize,
+		});
+	});
+
+// ========== Get Opening Balances ==========
+
+export const getOpeningBalancesProcedure = protectedProcedure
+	.route({
+		method: "GET",
+		path: "/accounting/opening-balances",
+		tags: ["Accounting", "Opening Balances"],
+		summary: "Get opening balances for all postable accounts",
+	})
+	.input(z.object({ organizationId: z.string() }))
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "view",
+		});
+
+		return getOpeningBalances(db, input.organizationId);
+	});
+
+// ========== Save Opening Balances ==========
+
+export const saveOpeningBalancesProcedure = subscriptionProcedure
+	.route({
+		method: "POST",
+		path: "/accounting/opening-balances",
+		tags: ["Accounting", "Opening Balances"],
+		summary: "Save or update opening balances",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			entryDate: z.string().datetime().optional(),
+			lines: z
+				.array(
+					z.object({
+						accountId: z.string(),
+						debit: z.number().nonnegative(),
+						credit: z.number().nonnegative(),
+					}),
+				)
+				.min(1),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "edit",
+		});
+
+		return saveOpeningBalances(
+			db,
+			input.organizationId,
+			input.lines,
+			context.user.id,
+			input.entryDate ? new Date(input.entryDate) : undefined,
+		);
 	});

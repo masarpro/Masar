@@ -88,6 +88,12 @@ export const FINANCE_NAV_SECTIONS: FinanceNavSection[] = [
 		icon: ClipboardList,
 	},
 	{
+		id: "opening-balances",
+		path: "opening-balances",
+		labelKey: "finance.accounting.openingBalances.title",
+		icon: ClipboardList,
+	},
+	{
 		id: "accounting-periods",
 		path: "accounting-periods",
 		labelKey: "finance.accounting.periods.title",

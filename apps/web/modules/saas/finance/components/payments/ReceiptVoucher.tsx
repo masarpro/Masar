@@ -9,6 +9,7 @@ import { Button } from "@ui/components/button";
 import { Card, CardContent } from "@ui/components/card";
 import { Printer, ArrowLeft, Download } from "lucide-react";
 import { formatDate } from "@shared/lib/formatters";
+import { numberToArabicWords } from "@repo/utils";
 import { Currency } from "../shared/Currency";
 import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
 
@@ -42,61 +43,6 @@ export function ReceiptVoucher({
 
 	const getPaymentMethodLabel = (method: string) => {
 		return t(`finance.payments.methods.${method.toLowerCase()}`);
-	};
-
-	// Convert number to Arabic words
-	const numberToArabicWords = (num: number): string => {
-		const ones = ["", "واحد", "اثنان", "ثلاثة", "أربعة", "خمسة", "ستة", "سبعة", "ثمانية", "تسعة"];
-		const tens = ["", "عشرة", "عشرون", "ثلاثون", "أربعون", "خمسون", "ستون", "سبعون", "ثمانون", "تسعون"];
-		const hundreds = ["", "مائة", "مائتان", "ثلاثمائة", "أربعمائة", "خمسمائة", "ستمائة", "سبعمائة", "ثمانمائة", "تسعمائة"];
-		const thousands = ["", "ألف", "ألفان", "ثلاثة آلاف", "أربعة آلاف", "خمسة آلاف", "ستة آلاف", "سبعة آلاف", "ثمانية آلاف", "تسعة آلاف"];
-
-		if (num === 0) return "صفر";
-
-		const intPart = Math.floor(num);
-		const decPart = Math.round((num - intPart) * 100);
-
-		let result = "";
-
-		// Thousands
-		const thousandsPart = Math.floor(intPart / 1000);
-		if (thousandsPart > 0 && thousandsPart < 10) {
-			result += thousands[thousandsPart] + " ";
-		} else if (thousandsPart >= 10) {
-			result += thousandsPart.toString() + " ألف ";
-		}
-
-		// Hundreds
-		const hundredsPart = Math.floor((intPart % 1000) / 100);
-		if (hundredsPart > 0) {
-			result += hundreds[hundredsPart] + " ";
-		}
-
-		// Tens and ones
-		const tensPart = Math.floor((intPart % 100) / 10);
-		const onesPart = intPart % 10;
-
-		if (tensPart === 1 && onesPart > 0) {
-			// Special case for 11-19
-			result += ones[onesPart] + " عشر ";
-		} else {
-			if (onesPart > 0) {
-				result += ones[onesPart] + " ";
-			}
-			if (tensPart > 1) {
-				result += (onesPart > 0 ? "و" : "") + tens[tensPart] + " ";
-			} else if (tensPart === 1) {
-				result += "عشرة ";
-			}
-		}
-
-		result += "ريال";
-
-		if (decPart > 0) {
-			result += " و" + decPart + " هللة";
-		}
-
-		return result.trim();
 	};
 
 	if (isLoading) {

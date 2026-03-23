@@ -820,6 +820,10 @@ model User {
   stageAssignments        StudyStage[]            @relation("StageAssignee")
   stageApprovals          StudyStage[]            @relation("StageApprover")
 
+  // Accounting — القيود اليومية
+  journalEntriesCreated   JournalEntry[]          @relation("JournalEntryCreator")
+  journalEntriesPosted    JournalEntry[]          @relation("JournalEntryPoster")
+
   // ═══ نهاية حقول مسار ═══
 
   @@unique([email])
@@ -1006,6 +1010,8 @@ model Organization {
   chartAccounts        ChartAccount[]
   journalEntries       JournalEntry[]
   accountingPeriods    AccountingPeriod[]
+  recurringJournalTemplates RecurringJournalTemplate[]
+  bankReconciliations  BankReconciliation[]
 
   // ═══ Subscription & Billing - الاشتراكات والفوترة ═══
   status               OrgStatus          @default(TRIALING)
@@ -2207,6 +2213,9 @@ model SubcontractPayment {
   description     String?
   notes           String?             @db.Text
   status          FinanceTransactionStatus @default(COMPLETED)
+
+  // رقم سند الصرف (اختياري — يُولّد عند الطباعة)
+  voucherNo       String?             @unique @map("voucher_no")
 
   // حساب المصدر (الحساب البنكي الذي تم الصرف منه)
   sourceAccountId String?             @map("source_account_id")
@@ -4094,6 +4103,9 @@ model OrganizationBank {
   chartAccountId  String?             @unique @map("chart_account_id")
   chartAccount    ChartAccount?       @relation(fields: [chartAccountId], references: [id])
 
+  // Bank Reconciliations - التسويات البنكية
+  reconciliations BankReconciliation[]
+
   @@index([organizationId])
   @@index([organizationId, accountType])
   @@index([organizationId, isActive])
@@ -4152,6 +4164,9 @@ model FinanceExpense {
 
   // ملاحظات
   notes           String?                   @db.Text
+
+  // رقم سند الصرف (اختياري — يُولّد عند الطباعة)
+  voucherNo       String?                   @unique @map("voucher_no")
 
   // من أنشأ
   createdById     String                    @map("created_by")
@@ -5242,6 +5257,8 @@ model JournalEntry {
   // العلاقات
   organization    Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   lines           JournalEntryLine[]
+  createdByUser   User?               @relation("JournalEntryCreator", fields: [createdById], references: [id])
+  postedByUser    User?               @relation("JournalEntryPoster", fields: [postedById], references: [id])
 
   createdAt       DateTime            @default(now()) @map("created_at")
   updatedAt       DateTime            @updatedAt @map("updated_at")
@@ -5302,4 +5319,84 @@ model AccountingPeriod {
   @@index([organizationId, isClosed])
   @@index([organizationId, endDate])
   @@map("accounting_periods")
+}
+
+// قوالب القيود المتكررة (Recurring Journal Templates)
+model RecurringJournalTemplate {
+  id                String    @id @default(cuid())
+  organizationId    String    @map("organization_id")
+
+  description       String
+  lines             Json      // Array<{accountId, debit, credit, description?, projectId?}>
+  totalAmount       Decimal   @db.Decimal(15, 2) @map("total_amount")
+
+  frequency         String    // MONTHLY, QUARTERLY, ANNUAL
+  dayOfMonth        Int       @default(1) @map("day_of_month")
+
+  isActive          Boolean   @default(true) @map("is_active")
+
+  startDate         DateTime  @map("start_date") @db.Date
+  endDate           DateTime? @map("end_date") @db.Date
+
+  lastGeneratedDate DateTime? @map("last_generated_date") @db.Date
+  nextDueDate       DateTime? @map("next_due_date") @db.Date
+
+  createdById       String    @map("created_by")
+
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([organizationId, isActive, nextDueDate])
+  @@map("recurring_journal_templates")
+}
+
+// التسوية البنكية (Bank Reconciliation)
+model BankReconciliation {
+  id                  String    @id @default(cuid())
+  organizationId      String    @map("organization_id")
+  bankAccountId       String    @map("bank_account_id")
+
+  reconciliationDate  DateTime  @map("reconciliation_date") @db.Date
+  statementBalance    Decimal   @db.Decimal(15, 2) @map("statement_balance")
+  bookBalance         Decimal   @db.Decimal(15, 2) @map("book_balance")
+  difference          Decimal   @db.Decimal(15, 2) @default(0)
+
+  status              String    @default("DRAFT") // DRAFT, COMPLETED
+  notes               String?   @db.Text
+
+  completedAt         DateTime? @map("completed_at")
+  completedById       String?   @map("completed_by")
+  createdById         String    @map("created_by")
+
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  organization        Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  bankAccount         OrganizationBank @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+  items               BankReconciliationItem[]
+
+  @@index([organizationId])
+  @@index([bankAccountId])
+  @@map("bank_reconciliations")
+}
+
+// بنود التسوية البنكية (Bank Reconciliation Items)
+model BankReconciliationItem {
+  id                  String   @id @default(cuid())
+  reconciliationId    String   @map("reconciliation_id")
+  journalEntryLineId  String   @map("journal_entry_line_id")
+
+  isMatched           Boolean  @default(false) @map("is_matched")
+  notes               String?
+
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  reconciliation      BankReconciliation @relation(fields: [reconciliationId], references: [id], onDelete: Cascade)
+
+  @@unique([reconciliationId, journalEntryLineId])
+  @@index([reconciliationId])
+  @@map("bank_reconciliation_items")
 }

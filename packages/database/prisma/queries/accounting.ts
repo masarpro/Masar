@@ -1009,3 +1009,409 @@ export async function reopenPeriod(
 		data: { isClosed: false, closedAt: null, closedById: null },
 	});
 }
+
+// ========================================
+// Bulk Post Journal Entries (Feature 5)
+// ========================================
+
+export async function bulkPostJournalEntries(
+	db: PrismaClient,
+	organizationId: string,
+	entryIds: string[],
+	postedById: string,
+): Promise<{ posted: number; errors: Array<{ entryId: string; entryNo: string; error: string }> }> {
+	// Fetch all entries
+	const entries = await db.journalEntry.findMany({
+		where: { id: { in: entryIds }, organizationId },
+	});
+
+	// Fetch all closed periods for the org at once to avoid N+1
+	const closedPeriods = await db.accountingPeriod.findMany({
+		where: { organizationId, isClosed: true },
+	});
+
+	const errors: Array<{ entryId: string; entryNo: string; error: string }> = [];
+	const validEntryIds: string[] = [];
+
+	for (const entry of entries) {
+		if (entry.status !== "DRAFT") {
+			errors.push({ entryId: entry.id, entryNo: entry.entryNo, error: "القيد ليس مسودة" });
+			continue;
+		}
+		// Check if entry date is in a closed period
+		const inClosedPeriod = closedPeriods.some(
+			(p) => entry.date >= p.startDate && entry.date <= p.endDate,
+		);
+		if (inClosedPeriod) {
+			errors.push({ entryId: entry.id, entryNo: entry.entryNo, error: "القيد في فترة محاسبية مغلقة" });
+			continue;
+		}
+		validEntryIds.push(entry.id);
+	}
+
+	// Batch update valid entries in a single transaction
+	if (validEntryIds.length > 0) {
+		await db.journalEntry.updateMany({
+			where: { id: { in: validEntryIds } },
+			data: {
+				status: "POSTED",
+				postedById,
+				postedAt: new Date(),
+			},
+		});
+	}
+
+	return { posted: validEntryIds.length, errors };
+}
+
+export async function bulkPostAllDrafts(
+	db: PrismaClient,
+	organizationId: string,
+	postedById: string,
+): Promise<{ posted: number; errors: Array<{ entryId: string; entryNo: string; error: string }> }> {
+	const draftEntries = await db.journalEntry.findMany({
+		where: { organizationId, status: "DRAFT" },
+		select: { id: true },
+	});
+	const ids = draftEntries.map((e) => e.id);
+	if (ids.length === 0) return { posted: 0, errors: [] };
+	return bulkPostJournalEntries(db, organizationId, ids, postedById);
+}
+
+// ========================================
+// Account Ledger (Feature 1)
+// ========================================
+
+export interface LedgerEntry {
+	date: Date;
+	entryNo: string;
+	entryId: string;
+	description: string;
+	referenceType: string | null;
+	referenceNo: string | null;
+	debit: number;
+	credit: number;
+	runningBalance: number;
+}
+
+export interface AccountLedgerResult {
+	account: {
+		id: string;
+		code: string;
+		nameAr: string;
+		nameEn: string;
+		type: ChartAccountType;
+		normalBalance: NormalBalance;
+	};
+	openingBalance: number;
+	entries: LedgerEntry[];
+	closingBalance: number;
+	totalDebit: number;
+	totalCredit: number;
+	total: number;
+}
+
+export async function getAccountLedger(
+	db: PrismaClient,
+	accountId: string,
+	organizationId: string,
+	options: {
+		dateFrom?: Date;
+		dateTo?: Date;
+		page?: number;
+		pageSize?: number;
+	} = {},
+): Promise<AccountLedgerResult> {
+	const { dateFrom, dateTo, page = 1, pageSize = 50 } = options;
+
+	// 1. Fetch account
+	const account = await db.chartAccount.findFirst({
+		where: { id: accountId, organizationId },
+		select: { id: true, code: true, nameAr: true, nameEn: true, type: true, normalBalance: true },
+	});
+	if (!account) throw new Error("الحساب غير موجود");
+
+	const isDebitNormal = account.normalBalance === "DEBIT";
+
+	// 2. Calculate opening balance (all POSTED entries before dateFrom)
+	let openingBalance = 0;
+	if (dateFrom) {
+		const openingAgg = await db.journalEntryLine.aggregate({
+			where: {
+				accountId,
+				journalEntry: { organizationId, status: "POSTED", date: { lt: dateFrom } },
+			},
+			_sum: { debit: true, credit: true },
+		});
+		const totalDebit = Number(openingAgg._sum.debit ?? 0);
+		const totalCredit = Number(openingAgg._sum.credit ?? 0);
+		openingBalance = isDebitNormal ? totalDebit - totalCredit : totalCredit - totalDebit;
+	}
+
+	// 3. Build date filter
+	const dateFilter: Record<string, Date> = {};
+	if (dateFrom) dateFilter.gte = dateFrom;
+	if (dateTo) dateFilter.lte = dateTo;
+
+	const whereClause = {
+		accountId,
+		journalEntry: {
+			organizationId,
+			status: "POSTED" as const,
+			...(Object.keys(dateFilter).length > 0 ? { date: dateFilter } : {}),
+		},
+	};
+
+	// 4. Count total for pagination
+	const total = await db.journalEntryLine.count({ where: whereClause });
+
+	// 5. Fetch entries
+	const lines = await db.journalEntryLine.findMany({
+		where: whereClause,
+		include: {
+			journalEntry: {
+				select: {
+					id: true,
+					entryNo: true,
+					date: true,
+					description: true,
+					referenceType: true,
+					referenceNo: true,
+				},
+			},
+		},
+		orderBy: [
+			{ journalEntry: { date: "asc" } },
+			{ journalEntry: { entryNo: "asc" } },
+		],
+		skip: (page - 1) * pageSize,
+		take: pageSize,
+	});
+
+	// 6. Calculate running balance
+	// For page > 1, we need the balance at the start of this page
+	let pageOpeningBalance = openingBalance;
+	if (page > 1) {
+		const priorLines = await db.journalEntryLine.aggregate({
+			where: whereClause,
+			_sum: { debit: true, credit: true },
+			// We need to sum only the first (page-1)*pageSize lines
+			// Since aggregate doesn't support skip/take, we use a workaround
+		});
+		// Actually, we need to recalculate: sum all lines from dateFrom up to the offset
+		const priorPageLines = await db.journalEntryLine.findMany({
+			where: whereClause,
+			select: { debit: true, credit: true },
+			orderBy: [
+				{ journalEntry: { date: "asc" } },
+				{ journalEntry: { entryNo: "asc" } },
+			],
+			take: (page - 1) * pageSize,
+		});
+		let priorSum = 0;
+		for (const l of priorPageLines) {
+			const d = Number(l.debit);
+			const c = Number(l.credit);
+			priorSum += isDebitNormal ? d - c : c - d;
+		}
+		pageOpeningBalance = openingBalance + priorSum;
+	}
+
+	let runningBalance = pageOpeningBalance;
+	let totalDebit = 0;
+	let totalCredit = 0;
+
+	const entries: LedgerEntry[] = lines.map((line) => {
+		const d = Number(line.debit);
+		const c = Number(line.credit);
+		totalDebit += d;
+		totalCredit += c;
+		runningBalance += isDebitNormal ? d - c : c - d;
+
+		return {
+			date: line.journalEntry.date,
+			entryNo: line.journalEntry.entryNo,
+			entryId: line.journalEntry.id,
+			description: line.journalEntry.description,
+			referenceType: line.journalEntry.referenceType,
+			referenceNo: line.journalEntry.referenceNo,
+			debit: d,
+			credit: c,
+			runningBalance,
+		};
+	});
+
+	return {
+		account,
+		openingBalance: page === 1 ? openingBalance : pageOpeningBalance,
+		entries,
+		closingBalance: runningBalance,
+		totalDebit,
+		totalCredit,
+		total,
+	};
+}
+
+// ========================================
+// Opening Balances (Feature 2)
+// ========================================
+
+export async function getOpeningBalances(
+	db: PrismaClient,
+	organizationId: string,
+): Promise<{
+	entryId: string | null;
+	entryDate: Date | null;
+	accounts: Array<{
+		accountId: string;
+		code: string;
+		nameAr: string;
+		nameEn: string;
+		type: ChartAccountType;
+		normalBalance: NormalBalance;
+		debit: number;
+		credit: number;
+	}>;
+}> {
+	// Find existing opening balance entry
+	const existingEntry = await db.journalEntry.findFirst({
+		where: { organizationId, referenceType: "OPENING_BALANCE" },
+		include: {
+			lines: {
+				include: { account: { select: { id: true, code: true, nameAr: true, nameEn: true, type: true, normalBalance: true } } },
+			},
+		},
+	});
+
+	// Get all postable accounts
+	const allAccounts = await db.chartAccount.findMany({
+		where: { organizationId, isPostable: true, isActive: true },
+		select: { id: true, code: true, nameAr: true, nameEn: true, type: true, normalBalance: true },
+		orderBy: { code: "asc" },
+	});
+
+	if (existingEntry) {
+		// Map existing lines to accounts, excluding the balancing entry (3200)
+		const lineMap = new Map(
+			existingEntry.lines.map((l) => [l.accountId, { debit: Number(l.debit), credit: Number(l.credit) }]),
+		);
+
+		return {
+			entryId: existingEntry.id,
+			entryDate: existingEntry.date,
+			accounts: allAccounts.map((a) => ({
+				accountId: a.id,
+				code: a.code,
+				nameAr: a.nameAr,
+				nameEn: a.nameEn,
+				type: a.type,
+				normalBalance: a.normalBalance,
+				debit: lineMap.get(a.id)?.debit ?? 0,
+				credit: lineMap.get(a.id)?.credit ?? 0,
+			})),
+		};
+	}
+
+	return {
+		entryId: null,
+		entryDate: null,
+		accounts: allAccounts.map((a) => ({
+			accountId: a.id,
+			code: a.code,
+			nameAr: a.nameAr,
+			nameEn: a.nameEn,
+			type: a.type,
+			normalBalance: a.normalBalance,
+			debit: 0,
+			credit: 0,
+		})),
+	};
+}
+
+export async function saveOpeningBalances(
+	db: PrismaClient,
+	organizationId: string,
+	lines: Array<{ accountId: string; debit: number; credit: number }>,
+	createdById: string,
+	entryDate?: Date,
+): Promise<{ entryId: string }> {
+	// Filter out zero lines
+	const nonZeroLines = lines.filter((l) => l.debit > 0 || l.credit > 0);
+	if (nonZeroLines.length === 0) throw new Error("يجب إدخال رصيد واحد على الأقل");
+
+	const totalDebit = nonZeroLines.reduce((sum, l) => sum + l.debit, 0);
+	const totalCredit = nonZeroLines.reduce((sum, l) => sum + l.credit, 0);
+
+	// Calculate the balancing amount for Retained Earnings (3200)
+	const difference = totalDebit - totalCredit;
+	const retainedEarningsAccount = await db.chartAccount.findFirst({
+		where: { organizationId, code: "3200" },
+	});
+	if (!retainedEarningsAccount) throw new Error("حساب الأرباح المبقاة (3200) غير موجود");
+
+	// Build final lines including balancing entry
+	const finalLines: Array<{ accountId: string; debit: number; credit: number; description?: string }> = nonZeroLines.map((l) => ({
+		accountId: l.accountId,
+		debit: l.debit,
+		credit: l.credit,
+	}));
+
+	if (Math.abs(difference) > 0.001) {
+		finalLines.push({
+			accountId: retainedEarningsAccount.id,
+			debit: difference < 0 ? Math.abs(difference) : 0,
+			credit: difference > 0 ? difference : 0,
+			description: "رصيد موازنة — أرباح مبقاة",
+		});
+	}
+
+	// Delete existing opening balance entry if any
+	const existing = await db.journalEntry.findFirst({
+		where: { organizationId, referenceType: "OPENING_BALANCE" },
+	});
+	if (existing) {
+		await db.journalEntry.delete({ where: { id: existing.id } });
+	}
+
+	// Create new entry
+	const date = entryDate ?? new Date(new Date().getFullYear(), 0, 1); // Jan 1 of current year
+	const entry = await createJournalEntry(db, {
+		organizationId,
+		date,
+		description: "أرصدة افتتاحية",
+		referenceType: "OPENING_BALANCE",
+		isAutoGenerated: true, // auto-POSTED
+		lines: finalLines.map((l) => ({
+			accountId: l.accountId,
+			debit: new Prisma.Decimal(l.debit),
+			credit: new Prisma.Decimal(l.credit),
+			description: l.description,
+		})),
+		createdById,
+	});
+
+	return { entryId: entry.id };
+}
+
+// ========================================
+// Find Journal Entry by Reference (Feature 10)
+// ========================================
+
+export async function findJournalEntryByReference(
+	db: PrismaClient,
+	organizationId: string,
+	referenceType: string,
+	referenceId: string,
+): Promise<{ id: string; entryNo: string } | null> {
+	const entry = await db.journalEntry.findFirst({
+		where: {
+			organizationId,
+			referenceType,
+			referenceId,
+			status: { not: "REVERSED" },
+		},
+		select: { id: true, entryNo: true },
+		orderBy: { createdAt: "desc" },
+	});
+	return entry;
+}

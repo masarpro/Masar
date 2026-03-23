@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { ACCOUNT_TYPE_COLORS } from "./formatters";
+import Link from "next/link";
 
 interface ChartOfAccountsPageProps {
 	organizationId: string;
@@ -40,7 +41,7 @@ interface TreeNode {
 	children: TreeNode[];
 }
 
-export function ChartOfAccountsPage({ organizationId }: ChartOfAccountsPageProps) {
+export function ChartOfAccountsPage({ organizationId, organizationSlug }: ChartOfAccountsPageProps) {
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 	const [search, setSearch] = useState("");
@@ -169,6 +170,7 @@ export function ChartOfAccountsPage({ organizationId }: ChartOfAccountsPageProps
 								node={node}
 								expanded={expanded}
 								onToggle={toggleExpand}
+								organizationSlug={organizationSlug}
 								t={t}
 							/>
 						))}
@@ -183,12 +185,14 @@ function AccountTreeNode({
 	node,
 	expanded,
 	onToggle,
+	organizationSlug,
 	t,
 	depth = 0,
 }: {
 	node: TreeNode;
 	expanded: Set<string>;
 	onToggle: (code: string) => void;
+	organizationSlug: string;
 	t: ReturnType<typeof useTranslations>;
 	depth?: number;
 }) {
@@ -196,6 +200,7 @@ function AccountTreeNode({
 	const hasChildren = node.children.length > 0;
 	const colors = ACCOUNT_TYPE_COLORS[node.type] ?? ACCOUNT_TYPE_COLORS.ASSET;
 	const isLevel1 = node.level === 1;
+	const ledgerHref = `/app/${organizationSlug}/finance/chart-of-accounts/${node.id}/ledger`;
 
 	return (
 		<>
@@ -229,16 +234,38 @@ function AccountTreeNode({
 					{node.code}
 				</span>
 
-				{/* Name */}
-				<span className={`flex-1 text-sm ${isLevel1 ? "text-slate-900 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}>
-					{node.nameAr}
-				</span>
+				{/* Name — clickable to ledger if postable */}
+				{node.isPostable ? (
+					<Link
+						href={ledgerHref}
+						className="flex-1 text-sm text-primary hover:underline"
+						onClick={(e) => e.stopPropagation()}
+					>
+						{node.nameAr}
+					</Link>
+				) : (
+					<span className={`flex-1 text-sm ${isLevel1 ? "text-slate-900 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}>
+						{node.nameAr}
+					</span>
+				)}
 
 				{/* Badges */}
 				{node.isSystem && (
 					<Badge variant="outline" className="text-[10px] px-1.5 py-0">
 						{t("finance.accounting.systemAccount")}
 					</Badge>
+				)}
+
+				{/* Ledger icon for postable accounts */}
+				{node.isPostable && (
+					<Link
+						href={ledgerHref}
+						className="text-slate-400 hover:text-primary"
+						onClick={(e) => e.stopPropagation()}
+						title={t("finance.accounting.viewLedger")}
+					>
+						<BookOpen className="h-3.5 w-3.5" />
+					</Link>
 				)}
 			</div>
 
@@ -250,6 +277,7 @@ function AccountTreeNode({
 						node={child}
 						expanded={expanded}
 						onToggle={onToggle}
+						organizationSlug={organizationSlug}
 						t={t}
 						depth={depth + 1}
 					/>

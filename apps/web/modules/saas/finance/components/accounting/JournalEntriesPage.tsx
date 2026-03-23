@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
+import { Card, CardContent } from "@ui/components/card";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Badge } from "@ui/components/badge";
@@ -16,10 +16,11 @@ import {
 	TableHeader,
 	TableRow,
 } from "@ui/components/table";
-import { Plus, Search, Zap, FileEdit } from "lucide-react";
+import { Plus, Search, Zap, FileEdit, CheckSquare, Send } from "lucide-react";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { formatAccounting } from "./formatters";
 import Link from "next/link";
+import { toast } from "sonner";
 
 interface JournalEntriesPageProps {
 	organizationId: string;
@@ -51,8 +52,10 @@ export function JournalEntriesPage({
 	organizationSlug,
 }: JournalEntriesPageProps) {
 	const t = useTranslations();
+	const queryClient = useQueryClient();
 	const [search, setSearch] = useState("");
 	const [status, setStatus] = useState<string>("");
+	const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 	const basePath = `/app/${organizationSlug}/finance/journal-entries`;
 
 	const { data, isLoading } = useQuery(
@@ -66,9 +69,60 @@ export function JournalEntriesPage({
 		}),
 	);
 
-	if (isLoading) return <DashboardSkeleton />;
+	const bulkPostMutation = useMutation(
+		orpc.accounting.journal.bulkPost.mutationOptions({
+			onSuccess: (result) => {
+				queryClient.invalidateQueries({ queryKey: ["orpc", "accounting"] });
+				setSelectedIds(new Set());
+				if (result.errors.length === 0) {
+					toast.success(`تم ترحيل ${result.posted} قيد بنجاح`);
+				} else {
+					toast.warning(`تم ترحيل ${result.posted} قيد، فشل ${result.errors.length}`);
+				}
+			},
+			onError: () => toast.error("حدث خطأ أثناء الترحيل"),
+		}),
+	);
+
+	const postAllMutation = useMutation(
+		orpc.accounting.journal.postAllDrafts.mutationOptions({
+			onSuccess: (result) => {
+				queryClient.invalidateQueries({ queryKey: ["orpc", "accounting"] });
+				setSelectedIds(new Set());
+				if (result.posted === 0) {
+					toast.info("لا توجد قيود مسودة للترحيل");
+				} else if (result.errors.length === 0) {
+					toast.success(`تم ترحيل ${result.posted} قيد بنجاح`);
+				} else {
+					toast.warning(`تم ترحيل ${result.posted} قيد، فشل ${result.errors.length}`);
+				}
+			},
+			onError: () => toast.error("حدث خطأ أثناء الترحيل"),
+		}),
+	);
 
 	const entries = data?.entries ?? [];
+	const draftEntries = entries.filter((e) => e.status === "DRAFT");
+
+	const toggleSelect = useCallback((id: string) => {
+		setSelectedIds((prev) => {
+			const next = new Set(prev);
+			if (next.has(id)) next.delete(id);
+			else next.add(id);
+			return next;
+		});
+	}, []);
+
+	const toggleSelectAll = useCallback(() => {
+		setSelectedIds((prev) => {
+			if (prev.size === draftEntries.length && draftEntries.length > 0) {
+				return new Set();
+			}
+			return new Set(draftEntries.map((e) => e.id));
+		});
+	}, [draftEntries]);
+
+	if (isLoading) return <DashboardSkeleton />;
 
 	return (
 		<div className="space-y-4">
@@ -96,6 +150,18 @@ export function JournalEntriesPage({
 					</select>
 				</div>
 				<div className="flex gap-2">
+					{draftEntries.length > 0 && (
+						<Button
+							variant="outline"
+							size="sm"
+							className="rounded-xl text-emerald-600 border-emerald-300 hover:bg-emerald-50"
+							onClick={() => postAllMutation.mutate({ input: { organizationId } })}
+							disabled={postAllMutation.isPending}
+						>
+							<Send className="h-4 w-4 me-1" />
+							{t("finance.accounting.postAllDrafts")}
+						</Button>
+					)}
 					<Link href={`${basePath}/new-adjustment`}>
 						<Button size="sm" className="rounded-xl">
 							<Plus className="h-4 w-4 me-1" />
@@ -111,6 +177,25 @@ export function JournalEntriesPage({
 				</div>
 			</div>
 
+			{/* Bulk action bar */}
+			{selectedIds.size > 0 && (
+				<div className="flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800">
+					<CheckSquare className="h-4 w-4 text-emerald-600" />
+					<span className="text-sm text-emerald-700 dark:text-emerald-300">
+						{selectedIds.size} {t("finance.accounting.selected")}
+					</span>
+					<Button
+						size="sm"
+						className="rounded-xl ms-auto"
+						onClick={() => bulkPostMutation.mutate({ input: { organizationId, entryIds: Array.from(selectedIds) } })}
+						disabled={bulkPostMutation.isPending}
+					>
+						<Send className="h-4 w-4 me-1" />
+						{t("finance.accounting.bulkPost")}
+					</Button>
+				</div>
+			)}
+
 			{/* Table */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-0">
@@ -122,6 +207,14 @@ export function JournalEntriesPage({
 						<Table>
 							<TableHeader>
 								<TableRow>
+									<TableHead className="w-10">
+										<input
+											type="checkbox"
+											checked={selectedIds.size === draftEntries.length && draftEntries.length > 0}
+											onChange={toggleSelectAll}
+											className="rounded"
+										/>
+									</TableHead>
 									<TableHead>{t("finance.accounting.entryNo")}</TableHead>
 									<TableHead>{t("finance.accounting.entryDate")}</TableHead>
 									<TableHead>{t("finance.accounting.description")}</TableHead>
@@ -133,8 +226,21 @@ export function JournalEntriesPage({
 							<TableBody>
 								{entries.map((entry) => {
 									const statusInfo = STATUS_BADGE[entry.status] ?? STATUS_BADGE.DRAFT;
+									const isDraft = entry.status === "DRAFT";
 									return (
 										<TableRow key={entry.id} className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50">
+											<TableCell>
+												{isDraft ? (
+													<input
+														type="checkbox"
+														checked={selectedIds.has(entry.id)}
+														onChange={() => toggleSelect(entry.id)}
+														className="rounded"
+													/>
+												) : (
+													<span className="block w-4" />
+												)}
+											</TableCell>
 											<TableCell>
 												<Link href={`${basePath}/${entry.id}`} className="font-mono text-sm text-primary hover:underline">
 													{entry.entryNo}

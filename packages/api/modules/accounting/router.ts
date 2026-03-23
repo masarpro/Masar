@@ -9,6 +9,9 @@ import {
 	updateAccountProcedure,
 	deactivateAccountProcedure,
 	getAccountBalanceProcedure,
+	getAccountLedgerProcedure,
+	getOpeningBalancesProcedure,
+	saveOpeningBalancesProcedure,
 } from "./procedures/chart-of-accounts";
 
 import {
@@ -26,7 +29,15 @@ import {
 	generatePeriodsProcedure,
 	closePeriodProcedure,
 	reopenPeriodProcedure,
+	bulkPostJournalEntriesProcedure,
+	postAllDraftsProcedure,
+	findJournalEntryByReferenceProcedure,
 } from "./procedures/journal-entries";
+
+import {
+	getClientStatementProcedure,
+	getVendorStatementProcedure,
+} from "./procedures/statements";
 
 export const accountingRouter = {
 	// Chart of Accounts
@@ -38,6 +49,13 @@ export const accountingRouter = {
 		update: updateAccountProcedure,
 		deactivate: deactivateAccountProcedure,
 		getBalance: getAccountBalanceProcedure,
+		getLedger: getAccountLedgerProcedure,
+	},
+
+	// Opening Balances
+	openingBalances: {
+		get: getOpeningBalancesProcedure,
+		save: saveOpeningBalancesProcedure,
 	},
 
 	// Journal Entries
@@ -49,6 +67,9 @@ export const accountingRouter = {
 		reverse: reverseJournalEntryProcedure,
 		delete: deleteJournalEntryProcedure,
 		createAdjustment: createAdjustmentEntryProcedure,
+		bulkPost: bulkPostJournalEntriesProcedure,
+		postAllDrafts: postAllDraftsProcedure,
+		findByReference: findJournalEntryByReferenceProcedure,
 	},
 
 	// Reports
@@ -56,6 +77,12 @@ export const accountingRouter = {
 		trialBalance: getTrialBalanceProcedure,
 		balanceSheet: getBalanceSheetProcedure,
 		incomeStatement: getJournalIncomeStatementProcedure,
+	},
+
+	// Statements
+	statements: {
+		client: getClientStatementProcedure,
+		vendor: getVendorStatementProcedure,
 	},
 
 	// Accounting Periods

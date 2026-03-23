@@ -235,7 +235,7 @@ export type SubcontractChangeOrderScalarFieldEnum = z.infer<typeof SubcontractCh
 
 // File: SubcontractPaymentScalarFieldEnum.schema.ts
 
-export const SubcontractPaymentScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'contractId', 'termId', 'claimId', 'paymentNo', 'amount', 'date', 'paymentMethod', 'referenceNo', 'description', 'notes', 'status', 'sourceAccountId', 'createdById', 'createdAt', 'updatedAt'])
+export const SubcontractPaymentScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'contractId', 'termId', 'claimId', 'paymentNo', 'amount', 'date', 'paymentMethod', 'referenceNo', 'description', 'notes', 'status', 'voucherNo', 'sourceAccountId', 'createdById', 'createdAt', 'updatedAt'])
 
 export type SubcontractPaymentScalarFieldEnum = z.infer<typeof SubcontractPaymentScalarFieldEnumSchema>;
 
@@ -511,7 +511,7 @@ export type OrganizationBankScalarFieldEnum = z.infer<typeof OrganizationBankSca
 
 // File: FinanceExpenseScalarFieldEnum.schema.ts
 
-export const FinanceExpenseScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'expenseNo', 'category', 'customCategory', 'description', 'amount', 'date', 'sourceAccountId', 'vendorName', 'vendorTaxNumber', 'projectId', 'invoiceRef', 'paymentMethod', 'referenceNo', 'status', 'sourceType', 'sourceId', 'paidAmount', 'dueDate', 'notes', 'createdById', 'createdAt', 'updatedAt'])
+export const FinanceExpenseScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'expenseNo', 'category', 'customCategory', 'description', 'amount', 'date', 'sourceAccountId', 'vendorName', 'vendorTaxNumber', 'projectId', 'invoiceRef', 'paymentMethod', 'referenceNo', 'status', 'sourceType', 'sourceId', 'paidAmount', 'dueDate', 'notes', 'voucherNo', 'createdById', 'createdAt', 'updatedAt'])
 
 export type FinanceExpenseScalarFieldEnum = z.infer<typeof FinanceExpenseScalarFieldEnumSchema>;
 
@@ -706,6 +706,24 @@ export type JournalEntryLineScalarFieldEnum = z.infer<typeof JournalEntryLineSca
 export const AccountingPeriodScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'name', 'periodType', 'startDate', 'endDate', 'isClosed', 'closedAt', 'closedById', 'closingEntryId', 'notes', 'createdAt', 'updatedAt'])
 
 export type AccountingPeriodScalarFieldEnum = z.infer<typeof AccountingPeriodScalarFieldEnumSchema>;
+
+// File: RecurringJournalTemplateScalarFieldEnum.schema.ts
+
+export const RecurringJournalTemplateScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'description', 'lines', 'totalAmount', 'frequency', 'dayOfMonth', 'isActive', 'startDate', 'endDate', 'lastGeneratedDate', 'nextDueDate', 'createdById', 'createdAt', 'updatedAt'])
+
+export type RecurringJournalTemplateScalarFieldEnum = z.infer<typeof RecurringJournalTemplateScalarFieldEnumSchema>;
+
+// File: BankReconciliationScalarFieldEnum.schema.ts
+
+export const BankReconciliationScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'bankAccountId', 'reconciliationDate', 'statementBalance', 'bookBalance', 'difference', 'status', 'notes', 'completedAt', 'completedById', 'createdById', 'createdAt', 'updatedAt'])
+
+export type BankReconciliationScalarFieldEnum = z.infer<typeof BankReconciliationScalarFieldEnumSchema>;
+
+// File: BankReconciliationItemScalarFieldEnum.schema.ts
+
+export const BankReconciliationItemScalarFieldEnumSchema = z.enum(['id', 'reconciliationId', 'journalEntryLineId', 'isMatched', 'notes', 'createdAt'])
+
+export type BankReconciliationItemScalarFieldEnum = z.infer<typeof BankReconciliationItemScalarFieldEnumSchema>;
 
 // File: SortOrder.schema.ts
 
@@ -2338,6 +2356,7 @@ export const SubcontractPaymentSchema = z.object({
   description: z.string().nullish(),
   notes: z.string().nullish(),
   status: FinanceTransactionStatusSchema.default("COMPLETED"),
+  voucherNo: z.string().nullish(),
   sourceAccountId: z.string().nullish(),
   createdById: z.string(),
   createdAt: z.date(),
@@ -3540,6 +3559,7 @@ export const FinanceExpenseSchema = z.object({
 }),
   dueDate: z.date().nullish(),
   notes: z.string().nullish(),
+  voucherNo: z.string().nullish(),
   createdById: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -4315,4 +4335,71 @@ export const AccountingPeriodSchema = z.object({
 });
 
 export type AccountingPeriodType = z.infer<typeof AccountingPeriodSchema>;
+
+
+// File: RecurringJournalTemplate.schema.ts
+
+export const RecurringJournalTemplateSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  description: z.string(),
+  lines: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10"),
+  totalAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalAmount' must be a Decimal. Location: ['Models', 'RecurringJournalTemplate']",
+}),
+  frequency: z.string(),
+  dayOfMonth: z.number().int().default(1),
+  isActive: z.boolean().default(true),
+  startDate: z.date(),
+  endDate: z.date().nullish(),
+  lastGeneratedDate: z.date().nullish(),
+  nextDueDate: z.date().nullish(),
+  createdById: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type RecurringJournalTemplateType = z.infer<typeof RecurringJournalTemplateSchema>;
+
+
+// File: BankReconciliation.schema.ts
+
+export const BankReconciliationSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  bankAccountId: z.string(),
+  reconciliationDate: z.date(),
+  statementBalance: z.instanceof(Prisma.Decimal, {
+  message: "Field 'statementBalance' must be a Decimal. Location: ['Models', 'BankReconciliation']",
+}),
+  bookBalance: z.instanceof(Prisma.Decimal, {
+  message: "Field 'bookBalance' must be a Decimal. Location: ['Models', 'BankReconciliation']",
+}),
+  difference: z.instanceof(Prisma.Decimal, {
+  message: "Field 'difference' must be a Decimal. Location: ['Models', 'BankReconciliation']",
+}),
+  status: z.string().default("DRAFT"),
+  notes: z.string().nullish(),
+  completedAt: z.date().nullish(),
+  completedById: z.string().nullish(),
+  createdById: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type BankReconciliationType = z.infer<typeof BankReconciliationSchema>;
+
+
+// File: BankReconciliationItem.schema.ts
+
+export const BankReconciliationItemSchema = z.object({
+  id: z.string(),
+  reconciliationId: z.string(),
+  journalEntryLineId: z.string(),
+  isMatched: z.boolean(),
+  notes: z.string().nullish(),
+  createdAt: z.date(),
+});
+
+export type BankReconciliationItemType = z.infer<typeof BankReconciliationItemSchema>;
 

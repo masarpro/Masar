@@ -75,3 +75,5 @@ export * from "./pricing-dashboard";
 export * from "./accounting-reports";
 // Accounting (Chart of Accounts + Journal Entries)
 export * from "./accounting";
+// Client & Vendor Statements
+export * from "./client-statements";

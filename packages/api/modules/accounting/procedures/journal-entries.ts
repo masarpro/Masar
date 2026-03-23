@@ -8,6 +8,9 @@ import {
 	generateMonthlyPeriods,
 	closePeriod,
 	reopenPeriod,
+	bulkPostJournalEntries,
+	bulkPostAllDrafts,
+	findJournalEntryByReference,
 } from "@repo/database";
 import { db } from "@repo/database";
 import { z } from "zod";
@@ -586,4 +589,70 @@ export const reopenPeriodProcedure = subscriptionProcedure
 
 		await reopenPeriod(db, input.id);
 		return { success: true };
+	});
+
+// ========== Bulk Post Journal Entries ==========
+
+export const bulkPostJournalEntriesProcedure = subscriptionProcedure
+	.route({
+		method: "POST",
+		path: "/accounting/journal/bulk-post",
+		tags: ["Accounting", "Journal Entries"],
+		summary: "Post multiple draft journal entries at once",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			entryIds: z.array(z.string()).min(1).max(500),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "edit",
+		});
+
+		return bulkPostJournalEntries(db, input.organizationId, input.entryIds, context.user.id);
+	});
+
+export const postAllDraftsProcedure = subscriptionProcedure
+	.route({
+		method: "POST",
+		path: "/accounting/journal/post-all-drafts",
+		tags: ["Accounting", "Journal Entries"],
+		summary: "Post all draft journal entries",
+	})
+	.input(z.object({ organizationId: z.string() }))
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "edit",
+		});
+
+		return bulkPostAllDrafts(db, input.organizationId, context.user.id);
+	});
+
+// ========== Find Journal Entry by Reference ==========
+
+export const findJournalEntryByReferenceProcedure = protectedProcedure
+	.route({
+		method: "GET",
+		path: "/accounting/journal/by-reference",
+		tags: ["Accounting", "Journal Entries"],
+		summary: "Find journal entry by reference type and ID",
+	})
+	.input(
+		z.object({
+			organizationId: z.string(),
+			referenceType: z.string(),
+			referenceId: z.string(),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "view",
+		});
+
+		return findJournalEntryByReference(db, input.organizationId, input.referenceType, input.referenceId);
 	});
