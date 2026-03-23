@@ -3518,6 +3518,12 @@
         "printStatement": "Print Statement",
         "balanceDue": "Balance Due"
       },
+      "dashboard": {
+        "title": "Accounting Dashboard",
+        "draftEntries": "Draft Entries",
+        "trialBalanceAlert": "Trial balance is unbalanced — please review",
+        "stalePeriodsAlert": "{count} accounting period(s) are open and expired"
+      },
       "audit": {
         "title": "Audit Trail",
         "createdBy": "Created by",

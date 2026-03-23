@@ -13,6 +13,7 @@ import {
 } from "./constants";
 
 const ACCOUNTING_ONLY_SECTIONS = new Set([
+	"accounting-dashboard",
 	"chart-of-accounts",
 	"journal-entries",
 	"opening-balances",

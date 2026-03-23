@@ -76,6 +76,12 @@ export const FINANCE_NAV_SECTIONS: FinanceNavSection[] = [
 		icon: BarChart3,
 	},
 	{
+		id: "accounting-dashboard",
+		path: "accounting-dashboard",
+		labelKey: "finance.accounting.dashboard.title",
+		icon: ClipboardList,
+	},
+	{
 		id: "chart-of-accounts",
 		path: "chart-of-accounts",
 		labelKey: "finance.shell.sections.chartOfAccounts",

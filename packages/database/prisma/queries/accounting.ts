@@ -1549,3 +1549,83 @@ export async function getCostCenterByProject(
 		totals: { totalRevenue: grandRevenue, totalExpenses: grandExpenses, netProfit: grandRevenue - grandExpenses },
 	};
 }
+
+// ========================================
+// Accounting Dashboard (Feature 12)
+// ========================================
+
+export interface AccountingDashboardResult {
+	totalAssets: number;
+	totalLiabilities: number;
+	netProfitThisMonth: number;
+	draftEntriesCount: number;
+	isTrialBalanceBalanced: boolean;
+	staleOpenPeriods: number;
+}
+
+export async function getAccountingDashboard(
+	db: PrismaClient,
+	organizationId: string,
+): Promise<AccountingDashboardResult> {
+	const now = new Date();
+	const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+	const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+	const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+
+	const [assetAgg, liabilityAgg, revenueAgg, expenseAgg, draftCount, stalePeriodsCount, trialBalance] = await Promise.all([
+		// Total Assets
+		db.journalEntryLine.aggregate({
+			where: {
+				journalEntry: { organizationId, status: "POSTED" },
+				account: { type: "ASSET", organizationId },
+			},
+			_sum: { debit: true, credit: true },
+		}),
+		// Total Liabilities
+		db.journalEntryLine.aggregate({
+			where: {
+				journalEntry: { organizationId, status: "POSTED" },
+				account: { type: "LIABILITY", organizationId },
+			},
+			_sum: { debit: true, credit: true },
+		}),
+		// Revenue this month
+		db.journalEntryLine.aggregate({
+			where: {
+				journalEntry: { organizationId, status: "POSTED", date: { gte: monthStart, lte: monthEnd } },
+				account: { type: "REVENUE", organizationId },
+			},
+			_sum: { debit: true, credit: true },
+		}),
+		// Expenses this month
+		db.journalEntryLine.aggregate({
+			where: {
+				journalEntry: { organizationId, status: "POSTED", date: { gte: monthStart, lte: monthEnd } },
+				account: { type: "EXPENSE", organizationId },
+			},
+			_sum: { debit: true, credit: true },
+		}),
+		// Draft entries count
+		db.journalEntry.count({ where: { organizationId, status: "DRAFT" } }),
+		// Stale open periods (endDate > 1 month ago, still open)
+		db.accountingPeriod.count({
+			where: { organizationId, isClosed: false, endDate: { lt: oneMonthAgo } },
+		}),
+		// Trial balance check
+		getTrialBalance(db, organizationId, {}),
+	]);
+
+	const totalAssets = Number(assetAgg._sum.debit ?? 0) - Number(assetAgg._sum.credit ?? 0);
+	const totalLiabilities = Number(liabilityAgg._sum.credit ?? 0) - Number(liabilityAgg._sum.debit ?? 0);
+	const monthRevenue = Number(revenueAgg._sum.credit ?? 0) - Number(revenueAgg._sum.debit ?? 0);
+	const monthExpenses = Number(expenseAgg._sum.debit ?? 0) - Number(expenseAgg._sum.credit ?? 0);
+
+	return {
+		totalAssets,
+		totalLiabilities,
+		netProfitThisMonth: monthRevenue - monthExpenses,
+		draftEntriesCount: draftCount,
+		isTrialBalanceBalanced: trialBalance.isBalanced,
+		staleOpenPeriods: stalePeriodsCount,
+	};
+}

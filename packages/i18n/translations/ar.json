@@ -3540,6 +3540,12 @@
         "printStatement": "طباعة كشف الحساب",
         "balanceDue": "الرصيد المستحق"
       },
+      "dashboard": {
+        "title": "لوحة المحاسبة",
+        "draftEntries": "قيود مسودة",
+        "trialBalanceAlert": "ميزان المراجعة غير متوازن — يرجى المراجعة",
+        "stalePeriodsAlert": "يوجد {count} فترة محاسبية مفتوحة ومنتهية"
+      },
       "audit": {
         "title": "سجل التدقيق",
         "createdBy": "أُنشئ بواسطة",

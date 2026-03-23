@@ -33,6 +33,7 @@ import {
 	postAllDraftsProcedure,
 	findJournalEntryByReferenceProcedure,
 	getCostCenterReportProcedure,
+	getAccountingDashboardProcedure,
 } from "./procedures/journal-entries";
 
 import {
@@ -80,6 +81,9 @@ export const accountingRouter = {
 		incomeStatement: getJournalIncomeStatementProcedure,
 		costCenter: getCostCenterReportProcedure,
 	},
+
+	// Dashboard
+	dashboard: getAccountingDashboardProcedure,
 
 	// Statements
 	statements: {

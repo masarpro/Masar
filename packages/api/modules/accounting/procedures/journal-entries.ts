@@ -12,6 +12,7 @@ import {
 	bulkPostAllDrafts,
 	findJournalEntryByReference,
 	getCostCenterByProject,
+	getAccountingDashboard,
 } from "@repo/database";
 import { db } from "@repo/database";
 import { z } from "zod";
@@ -709,4 +710,23 @@ export const getCostCenterReportProcedure = protectedProcedure
 			dateTo: input.dateTo ? new Date(input.dateTo) : undefined,
 			projectId: input.projectId,
 		});
+	});
+
+// ========== Accounting Dashboard ==========
+
+export const getAccountingDashboardProcedure = protectedProcedure
+	.route({
+		method: "GET",
+		path: "/accounting/dashboard",
+		tags: ["Accounting", "Dashboard"],
+		summary: "Get accounting dashboard KPIs",
+	})
+	.input(z.object({ organizationId: z.string() }))
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "view",
+		});
+
+		return getAccountingDashboard(db, input.organizationId);
 	});
