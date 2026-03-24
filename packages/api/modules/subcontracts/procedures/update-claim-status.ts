@@ -50,6 +50,28 @@ export const updateSubcontractClaimStatusProcedure = subscriptionProcedure
 				metadata: { newStatus: input.status },
 			}).catch(() => {});
 
+			// Auto-Journal: create accrual entry when claim is approved
+			if (input.status === "APPROVED") {
+				try {
+					const { onSubcontractClaimApproved } = await import("../../../lib/accounting/auto-journal");
+					const contract = await db.subcontractContract.findUnique({
+						where: { id: claim.contractId },
+						select: { name: true, projectId: true },
+					});
+					await onSubcontractClaimApproved(db, {
+						id: claim.id,
+						organizationId: input.organizationId,
+						claimNo: claim.claimNo,
+						contractorName: contract?.name ?? "",
+						netAmount: claim.netAmount,
+						date: new Date(),
+						projectId: contract?.projectId ?? input.projectId,
+					});
+				} catch (e) {
+					console.error("[AutoJournal] Failed for SubcontractClaim approval:", e);
+				}
+			}
+
 			return {
 				...claim,
 				grossAmount: Number(claim.grossAmount),

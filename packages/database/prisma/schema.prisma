@@ -3543,6 +3543,9 @@ enum OrgAuditAction {
   PAYROLL_RUN_APPROVED      // اعتماد مسير رواتب
   PAYROLL_RUN_CANCELLED     // إلغاء مسير رواتب
 
+  // ── المحاسبة (Accounting) ──
+  JOURNAL_ENTRY_SKIPPED     // تخطّي قيد تلقائي (فترة مغلقة)
+
   // ── المشاريع (Projects) ──
   PROJECT_ARCHIVED          // أرشفة مشروع
   PROJECT_RESTORED          // استعادة مشروع من الأرشيف

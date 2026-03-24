@@ -28,7 +28,11 @@ export const seedChartOfAccountsProcedure = subscriptionProcedure
 			action: "settings",
 		});
 
-		return seedChartOfAccounts(db, input.organizationId);
+		const result = await seedChartOfAccounts(db, input.organizationId);
+		// Invalidate cache so next operation picks up the new accounts
+		const { invalidateAccountingCache } = await import("../../../lib/accounting/auto-journal");
+		invalidateAccountingCache(input.organizationId);
+		return result;
 	});
 
 // ========== List Accounts ==========
