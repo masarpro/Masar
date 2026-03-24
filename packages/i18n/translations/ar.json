@@ -3521,6 +3521,18 @@
       "enableAccountingMode": "تفعيل وضع المحاسبة",
       "disableAccountingMode": "إلغاء وضع المحاسبة",
       "accountingModeActivated": "تم تفعيل وضع المحاسبة",
+      "enableTitle": "تفعيل وضع المحاسبة",
+      "enableDescription": "سيتم إنشاء دليل حسابات وتوليد قيود محاسبية تلقائية لكل عملية مالية جديدة.",
+      "enableWarning1": "العمليات المالية السابقة لن تظهر تلقائياً — يمكنك توليدها لاحقاً",
+      "enableWarning2": "يُنصح بإدخال أرصدة افتتاحية تعكس الوضع المالي الحالي",
+      "enableWarning3": "يمكنك إيقاف وضع المحاسبة في أي وقت",
+      "enableConfirm": "تفعيل",
+      "backfill": {
+        "title": "توليد القيود للعمليات السابقة",
+        "running": "جارٍ توليد القيود...",
+        "success": "تم توليد {total} قيد بنجاح",
+        "errors": "{count} أخطاء"
+      },
       "chartCreated": "تم إنشاء دليل الحسابات",
       "createChartOfAccounts": "إنشاء دليل الحسابات",
       "noChartOfAccounts": "لم يتم إنشاء دليل الحسابات بعد",

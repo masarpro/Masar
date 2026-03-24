@@ -3499,6 +3499,18 @@
       "enableAccountingMode": "Enable Accounting Mode",
       "disableAccountingMode": "Disable Accounting Mode",
       "accountingModeActivated": "Accounting mode activated",
+      "enableTitle": "Enable Accounting Mode",
+      "enableDescription": "This will create a chart of accounts and auto-generate journal entries for every new financial operation.",
+      "enableWarning1": "Previous financial operations won't appear automatically — you can generate them later",
+      "enableWarning2": "It's recommended to enter opening balances reflecting the current financial position",
+      "enableWarning3": "You can disable accounting mode at any time",
+      "enableConfirm": "Enable",
+      "backfill": {
+        "title": "Generate entries for past operations",
+        "running": "Generating entries...",
+        "success": "Successfully generated {total} entries",
+        "errors": "{count} errors"
+      },
       "chartCreated": "Chart of Accounts created",
       "createChartOfAccounts": "Create Chart of Accounts",
       "noChartOfAccounts": "Chart of Accounts has not been created yet",

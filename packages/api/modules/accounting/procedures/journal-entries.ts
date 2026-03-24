@@ -586,7 +586,11 @@ export const closePeriodProcedure = subscriptionProcedure
 		tags: ["Accounting", "Periods"],
 		summary: "Close an accounting period",
 	})
-	.input(z.object({ organizationId: z.string(), id: z.string() }))
+	.input(z.object({
+		organizationId: z.string(),
+		id: z.string(),
+		generateClosingEntry: z.boolean().optional().default(false),
+	}))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
@@ -598,7 +602,9 @@ export const closePeriodProcedure = subscriptionProcedure
 			throw new Error("Period not found");
 		}
 
-		return closePeriod(db, input.id, context.user.id);
+		return closePeriod(db, input.id, context.user.id, {
+			generateClosingEntry: input.generateClosingEntry,
+		});
 	});
 
 export const reopenPeriodProcedure = subscriptionProcedure

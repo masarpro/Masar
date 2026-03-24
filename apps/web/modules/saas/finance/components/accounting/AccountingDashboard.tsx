@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Card, CardContent } from "@ui/components/card";
 import { Button } from "@ui/components/button";
@@ -14,6 +14,8 @@ import {
 	DollarSign,
 	CreditCard,
 	ClipboardList,
+	RefreshCw,
+	CheckCircle,
 } from "lucide-react";
 import { formatAccounting } from "./formatters";
 import Link from "next/link";
@@ -29,12 +31,20 @@ export function AccountingDashboard({
 }: AccountingDashboardProps) {
 	const t = useTranslations();
 	const basePath = `/app/${organizationSlug}/finance`;
+	const queryClient = useQueryClient();
 
 	const { data, isLoading } = useQuery(
 		orpc.accounting.dashboard.queryOptions({
 			input: { organizationId },
 		}),
 	);
+
+	const backfillMutation = useMutation({
+		...orpc.accounting.backfill.mutationOptions(),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["accounting"] });
+		},
+	});
 
 	if (isLoading || !data) return null;
 
@@ -132,6 +142,21 @@ export function AccountingDashboard({
 				</div>
 			)}
 
+			{/* Backfill Result */}
+			{backfillMutation.data && backfillMutation.data.total > 0 && (
+				<div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
+					<CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+					<span className="text-sm text-green-700 dark:text-green-300">
+						{t("finance.accounting.backfill.success", { total: backfillMutation.data.total })}
+					</span>
+					{backfillMutation.data.errors.length > 0 && (
+						<span className="text-sm text-amber-600 ms-2">
+							({backfillMutation.data.errors.length} {t("finance.accounting.backfill.errors", { count: backfillMutation.data.errors.length })})
+						</span>
+					)}
+				</div>
+			)}
+
 			{/* Quick Actions */}
 			<div className="flex flex-wrap gap-2">
 				<Link href={`${basePath}/journal-entries/new-adjustment`}>
@@ -152,6 +177,18 @@ export function AccountingDashboard({
 						{t("finance.accounting.periods.close")}
 					</Button>
 				</Link>
+				<Button
+					variant="outline"
+					size="sm"
+					className="rounded-xl"
+					onClick={() => backfillMutation.mutate({ organizationId })}
+					disabled={backfillMutation.isPending}
+				>
+					<RefreshCw className={`h-4 w-4 me-1 ${backfillMutation.isPending ? "animate-spin" : ""}`} />
+					{backfillMutation.isPending
+						? t("finance.accounting.backfill.running")
+						: t("finance.accounting.backfill.title")}
+				</Button>
 			</div>
 		</div>
 	);

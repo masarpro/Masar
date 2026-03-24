@@ -41,6 +41,8 @@ import {
 	getVendorStatementProcedure,
 } from "./procedures/statements";
 
+import { backfillJournalEntriesProcedure } from "./procedures/backfill";
+
 import {
 	listRecurringTemplatesProcedure,
 	createRecurringTemplateProcedure,
@@ -92,6 +94,9 @@ export const accountingRouter = {
 
 	// Dashboard
 	dashboard: getAccountingDashboardProcedure,
+
+	// Backfill historical entries
+	backfill: backfillJournalEntriesProcedure,
 
 	// Statements
 	statements: {
