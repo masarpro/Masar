@@ -190,7 +190,7 @@ export function JournalEntriesPage({
 							variant="outline"
 							size="sm"
 							className="rounded-xl text-emerald-600 border-emerald-300 hover:bg-emerald-50"
-							onClick={() => postAllMutation.mutate({ input: { organizationId } })}
+							onClick={() => postAllMutation.mutate({ organizationId })}
 							disabled={postAllMutation.isPending}
 						>
 							<Send className="h-4 w-4 me-1" />
@@ -290,7 +290,7 @@ export function JournalEntriesPage({
 					<Button
 						size="sm"
 						className="rounded-xl ms-auto"
-						onClick={() => bulkPostMutation.mutate({ input: { organizationId, entryIds: Array.from(selectedIds) } })}
+						onClick={() => bulkPostMutation.mutate({ organizationId, entryIds: Array.from(selectedIds) })}
 						disabled={bulkPostMutation.isPending}
 					>
 						<Send className="h-4 w-4 me-1" />

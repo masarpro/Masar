@@ -66,8 +66,8 @@ function setRTL(ws: any) {
 
 export async function exportTrialBalanceToExcel(
 	data: {
-		rows: Array<{ accountCode: string; accountName: string; periodDebit: number; periodCredit: number; balanceDebit: number; balanceCredit: number }>;
-		totals: { periodDebit: number; periodCredit: number; balanceDebit: number; balanceCredit: number };
+		rows: Array<{ accountCode: string; accountNameAr: string; periodDebit: number; periodCredit: number; debitBalance: number; creditBalance: number }>;
+		totals: { totalPeriodDebit: number; totalPeriodCredit: number; totalDebitBalance: number; totalCreditBalance: number };
 	},
 	orgName?: string,
 ) {
@@ -88,21 +88,21 @@ export async function exportTrialBalanceToExcel(
 	// Data rows
 	for (const r of data.rows) {
 		setCell(ws, row, 0, r.accountCode, STYLES.cell);
-		setCell(ws, row, 1, r.accountName, STYLES.cell);
+		setCell(ws, row, 1, r.accountNameAr, STYLES.cell);
 		setCell(ws, row, 2, r.periodDebit, STYLES.number);
 		setCell(ws, row, 3, r.periodCredit, STYLES.number);
-		setCell(ws, row, 4, r.balanceDebit, STYLES.number);
-		setCell(ws, row, 5, r.balanceCredit, STYLES.number);
+		setCell(ws, row, 4, r.debitBalance, STYLES.number);
+		setCell(ws, row, 5, r.creditBalance, STYLES.number);
 		row++;
 	}
 
 	// Totals
 	setCell(ws, row, 0, "الإجمالي", STYLES.totalRow);
 	setCell(ws, row, 1, "", STYLES.totalRow);
-	setCell(ws, row, 2, data.totals.periodDebit, STYLES.totalRow);
-	setCell(ws, row, 3, data.totals.periodCredit, STYLES.totalRow);
-	setCell(ws, row, 4, data.totals.balanceDebit, STYLES.totalRow);
-	setCell(ws, row, 5, data.totals.balanceCredit, STYLES.totalRow);
+	setCell(ws, row, 2, data.totals.totalPeriodDebit, STYLES.totalRow);
+	setCell(ws, row, 3, data.totals.totalPeriodCredit, STYLES.totalRow);
+	setCell(ws, row, 4, data.totals.totalDebitBalance, STYLES.totalRow);
+	setCell(ws, row, 5, data.totals.totalCreditBalance, STYLES.totalRow);
 
 	ws["!ref"] = `A1:${cellAddr(row, 5)}`;
 	ws["!cols"] = [{ wch: 12 }, { wch: 30 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];

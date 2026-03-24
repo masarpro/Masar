@@ -386,7 +386,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 					</Card>
 
 					{/* Invoice Details Tab */}
-					{activeTab === "invoices" && data.invoiceDetails && (
+					{activeTab === "invoices" && (data as any).invoiceDetails && (
 						<Card className="rounded-2xl">
 							<CardHeader>
 								<CardTitle className="text-sm">{t("finance.accountingReports.vat.invoiceDetails")}</CardTitle>
@@ -404,7 +404,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 										</TableRow>
 									</TableHeader>
 									<TableBody>
-										{data.invoiceDetails.map((inv: any, idx: number) => (
+										{((data as any).invoiceDetails ?? []).map((inv: any, idx: number) => (
 											<TableRow key={idx}>
 												<TableCell className="font-mono text-sm">{inv.invoiceNo}</TableCell>
 												<TableCell className="text-sm">{new Date(inv.issueDate).toLocaleDateString("en-SA")}</TableCell>
@@ -421,7 +421,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 					)}
 
 					{/* Expense Details Tab */}
-					{activeTab === "expenses" && data.expenseDetails && (
+					{activeTab === "expenses" && (data as any).expenseDetails && (
 						<Card className="rounded-2xl">
 							<CardHeader>
 								<CardTitle className="text-sm">{t("finance.accountingReports.vat.expenseDetails")}</CardTitle>
@@ -438,7 +438,7 @@ export function VATReport({ organizationId }: VATReportProps) {
 										</TableRow>
 									</TableHeader>
 									<TableBody>
-										{data.expenseDetails.map((exp: any, idx: number) => (
+										{((data as any).expenseDetails ?? []).map((exp: any, idx: number) => (
 											<TableRow key={idx}>
 												<TableCell className="text-sm">{exp.description ?? exp.category}</TableCell>
 												<TableCell className="text-sm">{new Date(exp.date).toLocaleDateString("en-SA")}</TableCell>

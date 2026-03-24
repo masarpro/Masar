@@ -37,7 +37,7 @@ export function PaymentVoucher({
 	const printRef = useRef<HTMLDivElement>(null);
 
 	const { data: expense, isLoading } = useQuery(
-		orpc.finance.expenses.get.queryOptions({
+		orpc.finance.expenses.getById.queryOptions({
 			input: { organizationId, id: expenseId },
 		}),
 	);

@@ -110,14 +110,12 @@ export function BankReconciliation({
 
 	const handleSave = () => {
 		saveMutation.mutate({
-			input: {
-				organizationId,
-				bankAccountId,
-				reconciliationDate: new Date(dateTo).toISOString(),
-				statementBalance: Number(statementBalance) || 0,
-				bookBalance: calculations.bookBalance,
-				matchedLineIds: Array.from(matchedIds),
-			},
+			organizationId,
+			bankAccountId,
+			reconciliationDate: new Date(dateTo).toISOString(),
+			statementBalance: Number(statementBalance) || 0,
+			bookBalance: calculations.bookBalance,
+			matchedLineIds: Array.from(matchedIds),
 		});
 	};
 

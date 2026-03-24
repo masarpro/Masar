@@ -87,7 +87,7 @@ export function RecurringJournalTemplates({
 				<Button
 					size="sm"
 					className="rounded-xl"
-					onClick={() => generateMutation.mutate({ input: { organizationId } })}
+					onClick={() => generateMutation.mutate({ organizationId })}
 					disabled={generateMutation.isPending}
 				>
 					<RefreshCw className={`h-4 w-4 me-1 ${generateMutation.isPending ? "animate-spin" : ""}`} />
@@ -149,7 +149,7 @@ export function RecurringJournalTemplates({
 														size="sm"
 														className="h-7 w-7 p-0"
 														onClick={() => toggleMutation.mutate({
-															input: { organizationId, id: template.id, isActive: !template.isActive },
+															organizationId, id: template.id, isActive: !template.isActive,
 														})}
 													>
 														{template.isActive ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
@@ -160,7 +160,7 @@ export function RecurringJournalTemplates({
 														className="h-7 w-7 p-0 text-red-500 hover:text-red-700"
 														onClick={() => {
 															if (confirm(t("finance.accounting.confirmDelete"))) {
-																deleteMutation.mutate({ input: { organizationId, id: template.id } });
+																deleteMutation.mutate({ organizationId, id: template.id });
 															}
 														}}
 													>

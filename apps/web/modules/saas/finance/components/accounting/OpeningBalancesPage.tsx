@@ -121,7 +121,7 @@ export function OpeningBalancesPage({
 			debit,
 			credit,
 		}));
-		saveMutation.mutate({ input: { organizationId, lines } });
+		saveMutation.mutate({ organizationId, lines });
 	};
 
 	if (isLoading) return <DashboardSkeleton />;
