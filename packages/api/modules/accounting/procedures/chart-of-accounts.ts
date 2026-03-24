@@ -66,8 +66,8 @@ export const getAccountByIdProcedure = protectedProcedure
 			action: "view",
 		});
 
-		const account = await getChartAccountById(db, input.id);
-		if (!account || account.organizationId !== input.organizationId) {
+		const account = await getChartAccountById(db, input.id, input.organizationId);
+		if (!account) {
 			throw new Error("Account not found");
 		}
 

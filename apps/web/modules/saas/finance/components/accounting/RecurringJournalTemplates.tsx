@@ -24,12 +24,6 @@ interface RecurringJournalTemplatesProps {
 	organizationSlug: string;
 }
 
-const FREQUENCY_LABELS: Record<string, string> = {
-	MONTHLY: "شهري",
-	QUARTERLY: "ربع سنوي",
-	ANNUAL: "سنوي",
-};
-
 export function RecurringJournalTemplates({
 	organizationId,
 }: RecurringJournalTemplatesProps) {
@@ -126,7 +120,7 @@ export function RecurringJournalTemplates({
 											<TableCell className="text-end font-medium">{formatAccounting(template.totalAmount)}</TableCell>
 											<TableCell>
 												<Badge variant="outline" className="text-[10px]">
-													{FREQUENCY_LABELS[template.frequency] ?? template.frequency}
+													{t(`finance.accounting.frequency.${template.frequency}`)}
 												</Badge>
 											</TableCell>
 											<TableCell className="text-sm">

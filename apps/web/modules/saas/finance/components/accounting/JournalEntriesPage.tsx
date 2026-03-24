@@ -28,24 +28,10 @@ interface JournalEntriesPageProps {
 	organizationSlug: string;
 }
 
-const STATUS_BADGE: Record<string, { variant: "default" | "secondary" | "outline"; label: string }> = {
-	DRAFT: { variant: "secondary", label: "مسودة" },
-	POSTED: { variant: "default", label: "مرحّل" },
-	REVERSED: { variant: "outline", label: "معكوس" },
-};
-
-const REF_TYPE_BADGE: Record<string, string> = {
-	INVOICE: "فاتورة",
-	INVOICE_PAYMENT: "تحصيل",
-	EXPENSE: "مصروف",
-	TRANSFER: "تحويل",
-	SUBCONTRACT_PAYMENT: "مقاول باطن",
-	PAYROLL: "رواتب",
-	ORG_PAYMENT: "مقبوضات",
-	CREDIT_NOTE: "إشعار دائن",
-	ADJUSTMENT: "تسوية",
-	REVERSAL: "عكس",
-	MANUAL: "يدوي",
+const STATUS_VARIANTS: Record<string, "default" | "secondary" | "outline"> = {
+	DRAFT: "secondary",
+	POSTED: "default",
+	REVERSED: "outline",
 };
 
 export function JournalEntriesPage({
@@ -95,12 +81,12 @@ export function JournalEntriesPage({
 				queryClient.invalidateQueries({ queryKey: ["orpc", "accounting"] });
 				setSelectedIds(new Set());
 				if (result.errors.length === 0) {
-					toast.success(`تم ترحيل ${result.posted} قيد بنجاح`);
+					toast.success(t("finance.accounting.messages.bulkPostSuccess", { count: result.posted }));
 				} else {
-					toast.warning(`تم ترحيل ${result.posted} قيد، فشل ${result.errors.length}`);
+					toast.warning(t("finance.accounting.messages.bulkPostSuccess", { count: result.posted }));
 				}
 			},
-			onError: () => toast.error("حدث خطأ أثناء الترحيل"),
+			onError: () => toast.error(t("finance.accounting.messages.postError")),
 		}),
 	);
 
@@ -110,14 +96,14 @@ export function JournalEntriesPage({
 				queryClient.invalidateQueries({ queryKey: ["orpc", "accounting"] });
 				setSelectedIds(new Set());
 				if (result.posted === 0) {
-					toast.info("لا توجد قيود مسودة للترحيل");
+					toast.info(t("finance.accounting.messages.noDraftsToPost"));
 				} else if (result.errors.length === 0) {
-					toast.success(`تم ترحيل ${result.posted} قيد بنجاح`);
+					toast.success(t("finance.accounting.messages.bulkPostSuccess", { count: result.posted }));
 				} else {
-					toast.warning(`تم ترحيل ${result.posted} قيد، فشل ${result.errors.length}`);
+					toast.warning(t("finance.accounting.messages.bulkPostSuccess", { count: result.posted }));
 				}
 			},
-			onError: () => toast.error("حدث خطأ أثناء الترحيل"),
+			onError: () => toast.error(t("finance.accounting.messages.postError")),
 		}),
 	);
 
@@ -255,9 +241,9 @@ export function JournalEntriesPage({
 									onChange={(e) => setReferenceType(e.target.value)}
 									className="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent px-2 text-sm"
 								>
-									<option value="">الكل</option>
-									{Object.entries(REF_TYPE_BADGE).map(([key, label]) => (
-										<option key={key} value={key}>{label}</option>
+									<option value="">{t("common.all")}</option>
+									{["INVOICE", "INVOICE_PAYMENT", "EXPENSE", "TRANSFER", "SUBCONTRACT_PAYMENT", "PAYROLL", "ORG_PAYMENT", "CREDIT_NOTE", "REVERSAL", "ADJUSTMENT", "OPENING_BALANCE", "MANUAL"].map((key) => (
+										<option key={key} value={key}>{t(`finance.accounting.referenceTypes.${key}`)}</option>
 									))}
 								</select>
 							</div>
@@ -328,7 +314,8 @@ export function JournalEntriesPage({
 							</TableHeader>
 							<TableBody>
 								{entries.map((entry) => {
-									const statusInfo = STATUS_BADGE[entry.status] ?? STATUS_BADGE.DRAFT;
+									const statusVariant = STATUS_VARIANTS[entry.status] ?? STATUS_VARIANTS.DRAFT;
+									const statusLabel = t(`finance.accounting.status.${entry.status === "POSTED" ? "posted" : entry.status === "REVERSED" ? "reversed" : "draft"}`);
 									const isDraft = entry.status === "DRAFT";
 									return (
 										<TableRow key={entry.id} className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50">
@@ -361,7 +348,7 @@ export function JournalEntriesPage({
 											<TableCell>
 												{entry.referenceType && (
 													<Badge variant="outline" className="text-[10px]">
-														{REF_TYPE_BADGE[entry.referenceType] ?? entry.referenceType}
+														{t(`finance.accounting.referenceTypes.${entry.referenceType}`)}
 													</Badge>
 												)}
 											</TableCell>
@@ -369,8 +356,8 @@ export function JournalEntriesPage({
 												{formatAccounting(entry.totalAmount)}
 											</TableCell>
 											<TableCell className="text-center">
-												<Badge variant={statusInfo.variant} className="text-[10px]">
-													{statusInfo.label}
+												<Badge variant={statusVariant} className="text-[10px]">
+													{statusLabel}
 												</Badge>
 											</TableCell>
 										</TableRow>

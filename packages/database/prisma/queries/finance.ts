@@ -1202,6 +1202,7 @@ export async function addInvoicePayment(
 		paymentMethod?: string;
 		referenceNo?: string;
 		notes?: string;
+		sourceAccountId?: string;
 	},
 ) {
 	const invoice = await db.financeInvoice.findFirst({
@@ -1237,6 +1238,7 @@ export async function addInvoicePayment(
 				paymentMethod: data.paymentMethod,
 				referenceNo: data.referenceNo,
 				notes: data.notes,
+				sourceAccountId: data.sourceAccountId,
 			},
 		});
 

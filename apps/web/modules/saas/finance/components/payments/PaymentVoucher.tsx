@@ -85,9 +85,8 @@ export function PaymentVoucher({
 						{/* Header */}
 						<div className="text-center border-b-2 border-dashed border-slate-300 pb-6 mb-6">
 							<h1 className="text-2xl font-bold text-slate-900 mb-2">
-								سند صرف
+								{t("finance.accounting.voucher.paymentVoucher")}
 							</h1>
-							<p className="text-lg text-slate-600">Payment Voucher</p>
 						</div>
 
 						{/* Voucher Number and Date */}

@@ -823,6 +823,7 @@ model User {
   // Accounting — القيود اليومية
   journalEntriesCreated   JournalEntry[]          @relation("JournalEntryCreator")
   journalEntriesPosted    JournalEntry[]          @relation("JournalEntryPoster")
+  recurringJournalTemplates RecurringJournalTemplate[] @relation("RecurringTemplateCreator")
 
   // ═══ نهاية حقول مسار ═══
 
@@ -1825,6 +1826,9 @@ model Project {
 
   // جدول الكميات (BOQ)
   boqItems            ProjectBOQItem[]
+
+  // Accounting - المحاسبة (بنود القيود المرتبطة بالمشروع)
+  journalEntryLines JournalEntryLine[] @relation("ProjectJournalLines")
 
   // Company Management - إدارة المنشأة (ربط بالمشروع)
   companyExpenseAllocations CompanyExpenseAllocation[]
@@ -3953,6 +3957,10 @@ model FinanceInvoicePayment {
   referenceNo     String?        @map("reference_no")   // رقم التحويل أو الشيك
   notes           String?        @db.Text
 
+  // الحساب البنكي المستلم
+  sourceAccountId String?        @map("source_account_id")
+  sourceAccount   OrganizationBank? @relation("InvoicePaymentSource", fields: [sourceAccountId], references: [id])
+
   // من سجل الدفعة
   createdById     String         @map("created_by")
   createdBy       User           @relation("InvoicePaymentCreator", fields: [createdById], references: [id])
@@ -4098,6 +4106,9 @@ model OrganizationBank {
 
   // Company Management - دفعات مصروفات المنشأة
   companyExpensePayments CompanyExpensePayment[] @relation("CompanyExpensePaymentSource")
+
+  // Invoice Payments - دفعات الفواتير المستلمة
+  invoicePayments FinanceInvoicePayment[] @relation("InvoicePaymentSource")
 
   // Accounting - ربط بدليل الحسابات (اختياري)
   chartAccountId  String?             @unique @map("chart_account_id")
@@ -5241,13 +5252,21 @@ model JournalEntry {
   // عكس القيد
   isReversed      Boolean             @default(false) @map("is_reversed")
   reversedById    String?             @map("reversed_by_entry_id")
+  reversedBy      JournalEntry?       @relation("JournalEntryReversedBy", fields: [reversedById], references: [id], onDelete: SetNull)
+  reversedByOf    JournalEntry[]      @relation("JournalEntryReversedBy")
   reversalId      String?             @map("reversal_entry_id")
+  reversal        JournalEntry?       @relation("JournalEntryReversal", fields: [reversalId], references: [id], onDelete: SetNull)
+  reversalOf      JournalEntry[]      @relation("JournalEntryReversal")
 
   notes           String?             @db.Text
 
   // تسوية (Phase 3)
   adjustmentType  String?             @map("adjustment_type") // ACCRUAL, PREPAYMENT, DEPRECIATION, PROVISION, CORRECTION
   periodId        String?             @map("period_id") // ربط بفترة محاسبية
+  period          AccountingPeriod?   @relation("JournalEntryPeriod", fields: [periodId], references: [id], onDelete: SetNull)
+
+  // ربط بإقفال الفترة
+  closedPeriod    AccountingPeriod?   @relation("PeriodClosingEntry")
 
   // التدقيق
   createdById     String?             @map("created_by")
@@ -5282,10 +5301,16 @@ model JournalEntryLine {
 
   // مرجع إضافي
   projectId       String?       @map("project_id")
+  project         Project?      @relation("ProjectJournalLines", fields: [projectId], references: [id], onDelete: SetNull)
 
   // العلاقات
   journalEntry    JournalEntry  @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
   account         ChartAccount  @relation(fields: [accountId], references: [id])
+
+  // تسوية بنكية
+  bankReconciliationItems BankReconciliationItem[]
+
+  createdAt       DateTime      @default(now()) @map("created_at")
 
   @@index([journalEntryId])
   @@index([accountId])
@@ -5307,8 +5332,12 @@ model AccountingPeriod {
   closedAt        DateTime?    @map("closed_at")
   closedById      String?      @map("closed_by")
 
-  closingEntryId  String?      @map("closing_entry_id")
+  closingEntryId  String?      @unique @map("closing_entry_id")
+  closingEntry    JournalEntry? @relation("PeriodClosingEntry", fields: [closingEntryId], references: [id], onDelete: SetNull)
   notes           String?      @db.Text
+
+  // القيود المرتبطة بهذه الفترة
+  journalEntries  JournalEntry[] @relation("JournalEntryPeriod")
 
   organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
@@ -5342,6 +5371,7 @@ model RecurringJournalTemplate {
   nextDueDate       DateTime? @map("next_due_date") @db.Date
 
   createdById       String    @map("created_by")
+  createdByUser     User      @relation("RecurringTemplateCreator", fields: [createdById], references: [id])
 
   createdAt         DateTime  @default(now()) @map("created_at")
   updatedAt         DateTime  @updatedAt @map("updated_at")
@@ -5395,6 +5425,7 @@ model BankReconciliationItem {
   createdAt           DateTime @default(now()) @map("created_at")
 
   reconciliation      BankReconciliation @relation(fields: [reconciliationId], references: [id], onDelete: Cascade)
+  journalEntryLine    JournalEntryLine   @relation(fields: [journalEntryLineId], references: [id])
 
   @@unique([reconciliationId, journalEntryLineId])
   @@index([reconciliationId])

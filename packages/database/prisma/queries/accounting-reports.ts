@@ -408,6 +408,7 @@ export async function getAgedPayables(
 			contractNo: true,
 			value: true,
 			projectId: true,
+			createdAt: true,
 			project: { select: { name: true } },
 			claims: {
 				where: { status: "APPROVED" },
@@ -477,8 +478,8 @@ export async function getAgedPayables(
 			);
 
 			if (outstanding.gt(ZERO)) {
-				// Use contract start or creation as aging reference
-				const agingDays = 0; // Contract balance is considered "current"
+				// Age from contract creation date instead of treating as always "current"
+				const agingDays = Math.max(0, Math.floor((asOfDate.getTime() - (contract.createdAt?.getTime() ?? asOfDate.getTime())) / (1000 * 60 * 60 * 24)));
 				const bucket = assignToBucket(agingDays, outstanding);
 				contractBucket = addBuckets(contractBucket, bucket);
 
@@ -486,11 +487,11 @@ export async function getAgedPayables(
 					id: contract.id,
 					type: "contract_balance",
 					reference: contract.contractNo ?? contract.id,
-					date: asOfDate,
+					date: contract.createdAt ?? asOfDate,
 					totalAmount: contract.value,
 					paidAmount: new Prisma.Decimal(totalPaid),
 					outstanding,
-					agingDays: 0,
+					agingDays,
 				});
 			}
 		}
@@ -520,12 +521,16 @@ export async function getAgedPayables(
 
 // ========== Query: VAT Report ==========
 
-// Expense categories exempt from VAT
+// Expense categories exempt from VAT (no input VAT to reclaim)
 const VAT_EXEMPT_EXPENSE_CATEGORIES = [
+	"SALARIES",
 	"SALARY",
 	"GOVERNMENT_FEES",
 	"BANK_FEES",
 	"FINES",
+	"INSURANCE",
+	"ZAKAT",
+	"TAXES",
 ];
 
 function getQuarterLabel(dateFrom: Date, dateTo: Date): string {

@@ -421,6 +421,7 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 			paymentMethod: z.string().optional(),
 			referenceNo: z.string().optional(),
 			notes: z.string().optional(),
+			sourceAccountId: z.string().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -439,6 +440,7 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 				paymentMethod: input.paymentMethod,
 				referenceNo: input.referenceNo,
 				notes: input.notes,
+				sourceAccountId: input.sourceAccountId,
 			},
 		);
 
@@ -464,7 +466,7 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 					clientName: inv.clientName,
 					amount: payment.amount,
 					date: new Date(input.paymentDate),
-					sourceAccountId: "",
+					sourceAccountId: input.sourceAccountId || "",
 					projectId: inv.projectId,
 				});
 			}

@@ -27,13 +27,6 @@ interface OpeningBalancesPageProps {
 }
 
 const TYPE_ORDER = ["ASSET", "LIABILITY", "EQUITY", "REVENUE", "EXPENSE"];
-const TYPE_LABELS: Record<string, string> = {
-	ASSET: "أصول",
-	LIABILITY: "خصوم",
-	EQUITY: "حقوق ملكية",
-	REVENUE: "إيرادات",
-	EXPENSE: "مصروفات",
-};
 
 export function OpeningBalancesPage({
 	organizationId,
@@ -91,11 +84,11 @@ export function OpeningBalancesPage({
 		for (const type of TYPE_ORDER) {
 			const accs = data.accounts.filter((a) => a.type === type);
 			if (accs.length > 0) {
-				groups.push({ type, label: TYPE_LABELS[type] ?? type, accounts: accs });
+				groups.push({ type, label: t(`finance.accounting.accountTypes.${type}`), accounts: accs });
 			}
 		}
 		return groups;
-	}, [data]);
+	}, [data, t]);
 
 	const handleAmountChange = (accountId: string, field: "debit" | "credit", value: string) => {
 		const num = Number.parseFloat(value) || 0;

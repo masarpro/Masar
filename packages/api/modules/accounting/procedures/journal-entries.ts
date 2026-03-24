@@ -211,6 +211,10 @@ export const createJournalEntryProcedure = subscriptionProcedure
 			createdById: context.user.id,
 		});
 
+		if (!entry) {
+			throw new Error("لا يمكن إنشاء قيد في فترة محاسبية مغلقة");
+		}
+
 		if (input.notes) {
 			await db.journalEntry.update({
 				where: { id: entry.id },
@@ -473,6 +477,10 @@ export const createAdjustmentEntryProcedure = subscriptionProcedure
 			})),
 			createdById: context.user.id,
 		});
+
+		if (!entry) {
+			throw new Error("لا يمكن إنشاء قيد تسوية في فترة محاسبية مغلقة");
+		}
 
 		// Set adjustment type and notes
 		await db.journalEntry.update({

@@ -487,7 +487,7 @@ export type FinanceInvoiceItemScalarFieldEnum = z.infer<typeof FinanceInvoiceIte
 
 // File: FinanceInvoicePaymentScalarFieldEnum.schema.ts
 
-export const FinanceInvoicePaymentScalarFieldEnumSchema = z.enum(['id', 'invoiceId', 'amount', 'paymentDate', 'paymentMethod', 'referenceNo', 'notes', 'createdById', 'createdAt'])
+export const FinanceInvoicePaymentScalarFieldEnumSchema = z.enum(['id', 'invoiceId', 'amount', 'paymentDate', 'paymentMethod', 'referenceNo', 'notes', 'sourceAccountId', 'createdById', 'createdAt'])
 
 export type FinanceInvoicePaymentScalarFieldEnum = z.infer<typeof FinanceInvoicePaymentScalarFieldEnumSchema>;
 
@@ -697,7 +697,7 @@ export type JournalEntryScalarFieldEnum = z.infer<typeof JournalEntryScalarField
 
 // File: JournalEntryLineScalarFieldEnum.schema.ts
 
-export const JournalEntryLineScalarFieldEnumSchema = z.enum(['id', 'journalEntryId', 'accountId', 'description', 'debit', 'credit', 'projectId'])
+export const JournalEntryLineScalarFieldEnumSchema = z.enum(['id', 'journalEntryId', 'accountId', 'description', 'debit', 'credit', 'projectId', 'createdAt'])
 
 export type JournalEntryLineScalarFieldEnum = z.infer<typeof JournalEntryLineScalarFieldEnumSchema>;
 
@@ -3455,6 +3455,7 @@ export const FinanceInvoicePaymentSchema = z.object({
   paymentMethod: z.string().nullish(),
   referenceNo: z.string().nullish(),
   notes: z.string().nullish(),
+  sourceAccountId: z.string().nullish(),
   createdById: z.string(),
   createdAt: z.date(),
 });
@@ -4311,6 +4312,7 @@ export const JournalEntryLineSchema = z.object({
   message: "Field 'credit' must be a Decimal. Location: ['Models', 'JournalEntryLine']",
 }),
   projectId: z.string().nullish(),
+  createdAt: z.date(),
 });
 
 export type JournalEntryLineType = z.infer<typeof JournalEntryLineSchema>;

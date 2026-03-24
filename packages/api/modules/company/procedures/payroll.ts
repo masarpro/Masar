@@ -192,6 +192,8 @@ export const approvePayrollRunProcedure = subscriptionProcedure
 				year: (payrollRun as any).year ?? new Date().getFullYear(),
 				totalNet: new Prisma.Decimal(Number((payrollRun as any).totalNetSalary ?? 0)),
 				totalGosi: new Prisma.Decimal(Number(gosiAgg._sum?.gosiDeduction ?? 0)),
+				// TODO: Add bank account selection to payroll approval form
+				sourceAccountId: undefined,
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for payroll:", e);
