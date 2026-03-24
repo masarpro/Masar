@@ -1,4 +1,4 @@
-import { updateProjectPayment, logAuditEvent } from "@repo/database";
+import { updateProjectPayment, logAuditEvent, db } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -49,6 +49,28 @@ export const updateProjectPaymentProcedure = subscriptionProcedure
 					note: input.note,
 				},
 			);
+
+			// Auto-Journal: reverse old entry and create new one with updated data
+			try {
+				const { reverseAutoJournalEntry, onProjectPaymentReceived } = await import("../../../lib/accounting/auto-journal");
+				await reverseAutoJournalEntry(db, {
+					organizationId: input.organizationId,
+					referenceType: "PROJECT_PAYMENT",
+					referenceId: input.paymentId,
+					userId: context.user.id,
+				});
+				await onProjectPaymentReceived(db, {
+					id: payment.id,
+					organizationId: input.organizationId,
+					amount: payment.amount,
+					date: payment.date,
+					destinationAccountId: payment.destinationAccountId ?? "",
+					projectId: payment.projectId,
+					paymentNo: payment.paymentNo,
+				});
+			} catch (e) {
+				console.error("[AutoJournal] Failed to update ProjectPayment entry:", e);
+			}
 
 			logAuditEvent(input.organizationId, input.projectId, {
 				actorId: context.user.id,

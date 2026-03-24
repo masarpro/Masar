@@ -270,6 +270,7 @@ export const createExpenseProcedure = subscriptionProcedure
 					description: input.description ?? input.category,
 					sourceAccountId: input.sourceAccountId,
 					projectId: input.projectId,
+					sourceType: input.sourceType,
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to generate entry for expense:", e);
@@ -432,6 +433,7 @@ export const payExpenseProcedure = subscriptionProcedure
 				description: expense.description ?? expense.category,
 				sourceAccountId: input.sourceAccountId,
 				projectId: expense.projectId,
+				sourceType: expense.sourceType,
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for expense payment:", e);

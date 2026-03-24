@@ -1,4 +1,4 @@
-import { createProjectPayment, logAuditEvent } from "@repo/database";
+import { createProjectPayment, logAuditEvent, db } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -59,6 +59,22 @@ export const createProjectPaymentProcedure = subscriptionProcedure
 				paymentNo: payment.paymentNo,
 			},
 		}).catch(() => {});
+
+		// Auto-Journal: generate accounting entry for project payment
+		try {
+			const { onProjectPaymentReceived } = await import("../../../lib/accounting/auto-journal");
+			await onProjectPaymentReceived(db, {
+				id: payment.id,
+				organizationId: input.organizationId,
+				amount: payment.amount,
+				date: input.date,
+				destinationAccountId: input.destinationAccountId ?? "",
+				projectId: input.projectId,
+				paymentNo: payment.paymentNo,
+			});
+		} catch (e) {
+			console.error("[AutoJournal] Failed to create ProjectPayment entry:", e);
+		}
 
 		return { ...payment, amount: Number(payment.amount) };
 	});

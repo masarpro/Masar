@@ -1,4 +1,4 @@
-import { addSubcontractClaimPayment, logAuditEvent } from "@repo/database";
+import { addSubcontractClaimPayment, logAuditEvent, db } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -55,6 +55,27 @@ export const addSubcontractClaimPaymentProcedure = subscriptionProcedure
 					amount: input.amount,
 				},
 			}).catch(() => {});
+
+			// Auto-Journal: generate accounting entry for subcontract claim payment
+			try {
+				const { onSubcontractPayment } = await import("../../../lib/accounting/auto-journal");
+				const { Prisma } = await import("@repo/database/prisma/generated/client");
+				const claim = await db.subcontractClaim.findUnique({
+					where: { id: input.claimId },
+					select: { contractId: true, contract: { select: { name: true, projectId: true } } },
+				});
+				await onSubcontractPayment(db, {
+					id: payment.id,
+					organizationId: input.organizationId,
+					contractorName: claim?.contract?.name ?? "",
+					amount: new Prisma.Decimal(payment.amount),
+					date: input.date,
+					sourceAccountId: input.sourceAccountId ?? "",
+					projectId: claim?.contract?.projectId ?? input.projectId,
+				});
+			} catch (e) {
+				console.error("[AutoJournal] Failed to create SubcontractClaimPayment entry:", e);
+			}
 
 			return payment;
 		} catch (error) {

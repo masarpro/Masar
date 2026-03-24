@@ -1,5 +1,6 @@
 import {
 	createBankAccount,
+	createBankChartAccount,
 	deleteBankAccount,
 	getBankAccountById,
 	getOrganizationBalancesSummary,
@@ -8,6 +9,7 @@ import {
 	setDefaultBankAccount,
 	updateBankAccount,
 	orgAuditLog,
+	db,
 } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
@@ -150,6 +152,13 @@ export const createBankAccountProcedure = subscriptionProcedure
 			notes: input.notes,
 		});
 
+		// Auto-create chart account if accounting is enabled
+		try {
+			await createBankChartAccount(db, input.organizationId, account.id, input.name);
+		} catch (e) {
+			console.error("[Accounting] Failed to create chart account for bank:", e);
+		}
+
 		orgAuditLog({
 			organizationId: input.organizationId,
 			actorId: context.user.id,
@@ -264,6 +273,22 @@ export const deleteBankAccountProcedure = subscriptionProcedure
 			section: "finance",
 			action: "settings",
 		});
+
+		// Deactivate linked chart account before deletion (if exists)
+		try {
+			const bank = await db.organizationBank.findUnique({
+				where: { id: input.id },
+				select: { chartAccountId: true },
+			});
+			if (bank?.chartAccountId) {
+				await db.chartAccount.update({
+					where: { id: bank.chartAccountId },
+					data: { isActive: false },
+				});
+			}
+		} catch (e) {
+			console.error("[Accounting] Failed to deactivate chart account:", e);
+		}
 
 		const result = await deleteBankAccount(input.id, input.organizationId);
 

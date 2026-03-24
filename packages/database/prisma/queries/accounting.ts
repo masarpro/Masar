@@ -220,6 +220,60 @@ export async function seedChartOfAccounts(
 	return { created: DEFAULT_CHART_OF_ACCOUNTS.length + bankAccounts.length, skipped: 0 };
 }
 
+/**
+ * Create a chart account for a new bank account (if accounting enabled)
+ */
+export async function createBankChartAccount(
+	db: PrismaClient,
+	organizationId: string,
+	bankId: string,
+	bankName: string,
+): Promise<string | null> {
+	// Check if accounting is enabled (1110 parent exists)
+	const cashParent = await db.chartAccount.findUnique({
+		where: { organizationId_code: { organizationId, code: "1110" } },
+		select: { id: true },
+	});
+	if (!cashParent) return null;
+
+	// Find next available code under 1110
+	const lastChild = await db.chartAccount.findFirst({
+		where: { organizationId, parentId: cashParent.id },
+		orderBy: { code: "desc" },
+		select: { code: true },
+	});
+
+	let nextCode: string;
+	if (lastChild) {
+		const lastNum = parseInt(lastChild.code, 10);
+		nextCode = (lastNum + 1).toString();
+	} else {
+		nextCode = "1111";
+	}
+
+	const newAccount = await db.chartAccount.create({
+		data: {
+			organizationId,
+			code: nextCode,
+			nameAr: bankName,
+			nameEn: bankName,
+			type: "ASSET",
+			normalBalance: "DEBIT",
+			level: 4,
+			parentId: cashParent.id,
+			isSystem: false,
+			isPostable: true,
+		},
+	});
+
+	await db.organizationBank.update({
+		where: { id: bankId },
+		data: { chartAccountId: newAccount.id },
+	});
+
+	return newAccount.id;
+}
+
 // ========================================
 // Chart of Accounts Queries
 // ========================================
@@ -331,6 +385,7 @@ export async function createJournalEntry(db: PrismaClient, data: {
 		EXPENSE: "EXP-JE",
 		TRANSFER: "TRF-JE",
 		SUBCONTRACT_PAYMENT: "SUB-JE",
+		PROJECT_PAYMENT: "PRJ-JE",
 		PAYROLL: "PAY-JE",
 		ORG_PAYMENT: "RCV-JE",
 		CREDIT_NOTE: "CN-JE",

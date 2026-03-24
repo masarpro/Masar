@@ -117,7 +117,7 @@ export const markPaymentPaidProcedure = subscriptionProcedure
 			if (result.financeExpenseId) {
 				const expense = await db.financeExpense.findUnique({
 					where: { id: result.financeExpenseId },
-					select: { id: true, category: true, amount: true, date: true, description: true, sourceAccountId: true, projectId: true },
+					select: { id: true, category: true, amount: true, date: true, description: true, sourceAccountId: true, projectId: true, sourceType: true },
 				});
 				if (expense) {
 					await onExpenseCompleted(db, {
@@ -129,6 +129,7 @@ export const markPaymentPaidProcedure = subscriptionProcedure
 						description: expense.description ?? expense.category,
 						sourceAccountId: expense.sourceAccountId,
 						projectId: expense.projectId,
+						sourceType: expense.sourceType,
 					});
 				}
 			}

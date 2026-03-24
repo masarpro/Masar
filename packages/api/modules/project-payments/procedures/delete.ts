@@ -1,4 +1,4 @@
-import { deleteProjectPayment, logAuditEvent } from "@repo/database";
+import { deleteProjectPayment, logAuditEvent, db } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -28,6 +28,19 @@ export const deleteProjectPaymentProcedure = subscriptionProcedure
 
 		try {
 			await deleteProjectPayment(input.paymentId, input.organizationId);
+
+			// Auto-Journal: reverse accounting entry for deleted project payment
+			try {
+				const { reverseAutoJournalEntry } = await import("../../../lib/accounting/auto-journal");
+				await reverseAutoJournalEntry(db, {
+					organizationId: input.organizationId,
+					referenceType: "PROJECT_PAYMENT",
+					referenceId: input.paymentId,
+					userId: context.user.id,
+				});
+			} catch (e) {
+				console.error("[AutoJournal] Failed to reverse ProjectPayment entry:", e);
+			}
 
 			logAuditEvent(input.organizationId, input.projectId, {
 				actorId: context.user.id,
