@@ -1,5 +1,5 @@
 export { FinanceShell, type FinanceShellProps } from "./FinanceShell";
-export { AccountingModeToggle } from "./AccountingModeToggle";
+export { AccountingSeedCheck } from "./AccountingSeedCheck";
 export { FinanceSubPageHeader, type FinanceSubPageHeaderProps } from "./FinanceSubPageHeader";
 export { FinanceNavigation } from "./FinanceNavigation";
 export {

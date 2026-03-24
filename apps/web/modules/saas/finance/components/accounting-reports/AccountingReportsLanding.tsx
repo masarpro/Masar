@@ -3,7 +3,6 @@
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Card, CardContent } from "@ui/components/card";
-import { useAccountingMode } from "@saas/finance/hooks/use-accounting-mode";
 import {
 	AlertTriangle,
 	Clock,
@@ -19,13 +18,6 @@ interface AccountingReportsLandingProps {
 	organizationId: string;
 	organizationSlug: string;
 }
-
-const ACCOUNTING_MODE_REPORT_IDS = new Set([
-	"trial-balance",
-	"journal-income-statement",
-	"balance-sheet",
-	"cost-center",
-]);
 
 const REPORTS = [
 	{
@@ -99,12 +91,7 @@ export function AccountingReportsLanding({
 	organizationSlug,
 }: AccountingReportsLandingProps) {
 	const t = useTranslations();
-	const { isEnabled: accountingMode } = useAccountingMode(organizationId);
 	const basePath = `/app/${organizationSlug}/finance/accounting-reports`;
-
-	const visibleReports = accountingMode
-		? REPORTS
-		: REPORTS.filter((r) => !ACCOUNTING_MODE_REPORT_IDS.has(r.id));
 
 	return (
 		<div className="space-y-6">
@@ -118,7 +105,7 @@ export function AccountingReportsLanding({
 			</div>
 
 			<div className="grid gap-4 sm:grid-cols-2">
-				{visibleReports.map((report) => {
+				{REPORTS.map((report) => {
 					const Icon = report.icon;
 					return (
 						<Link key={report.id} href={`${basePath}/${report.id}`}>

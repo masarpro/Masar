@@ -6,7 +6,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useMemo, useSyncExternalStore, useCallback } from "react";
+import { useMemo } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
 	BarChart3,
@@ -92,23 +92,6 @@ export function useSidebarMenu(): {
 	});
 
 	const studyType = studyId ? ((studyData as any)?.studyType ?? "FULL_PROJECT") : "FULL_PROJECT";
-
-	// Accounting mode state (from localStorage)
-	const accountingModeEnabled = useSyncExternalStore(
-		useCallback((cb: () => void) => {
-			window.addEventListener("storage", cb);
-			window.addEventListener("accounting-mode-changed", cb);
-			return () => {
-				window.removeEventListener("storage", cb);
-				window.removeEventListener("accounting-mode-changed", cb);
-			};
-		}, []),
-		() => {
-			if (!activeOrganization?.id) return false;
-			return localStorage.getItem(`masar_accounting_mode_${activeOrganization.id}`) === "true";
-		},
-		() => false,
-	);
 
 	// Determine which sidebar items to show based on study type
 	const studyEnabledStages = useMemo(() => {
@@ -275,35 +258,30 @@ export function useSidebarMenu(): {
 									href: `${orgPrefix}/finance/accounting-reports`,
 									icon: ClipboardList,
 								},
-								// Accounting-mode-only items
-								...(accountingModeEnabled
-									? [
-											{
-												id: "finance-chart-of-accounts",
-												label: t("finance.shell.sections.chartOfAccounts"),
-												href: `${orgPrefix}/finance/chart-of-accounts`,
-												icon: BookOpen,
-											},
-											{
-												id: "finance-journal-entries",
-												label: t("finance.shell.sections.journalEntries"),
-												href: `${orgPrefix}/finance/journal-entries`,
-												icon: ClipboardList,
-											},
-											{
-												id: "finance-opening-balances",
-												label: t("finance.accounting.openingBalances.title"),
-												href: `${orgPrefix}/finance/opening-balances`,
-												icon: ClipboardList,
-											},
-											{
-												id: "finance-accounting-periods",
-												label: t("finance.accounting.periods.title"),
-												href: `${orgPrefix}/finance/accounting-periods`,
-												icon: ClipboardList,
-											},
-										]
-									: []),
+								{
+								id: "finance-chart-of-accounts",
+								label: t("finance.shell.sections.chartOfAccounts"),
+								href: `${orgPrefix}/finance/chart-of-accounts`,
+								icon: BookOpen,
+							},
+							{
+								id: "finance-journal-entries",
+								label: t("finance.shell.sections.journalEntries"),
+								href: `${orgPrefix}/finance/journal-entries`,
+								icon: ClipboardList,
+							},
+							{
+								id: "finance-opening-balances",
+								label: t("finance.accounting.openingBalances.title"),
+								href: `${orgPrefix}/finance/opening-balances`,
+								icon: ClipboardList,
+							},
+							{
+								id: "finance-accounting-periods",
+								label: t("finance.accounting.periods.title"),
+								href: `${orgPrefix}/finance/accounting-periods`,
+								icon: ClipboardList,
+							},
 							],
 						},
 						{
@@ -449,7 +427,6 @@ export function useSidebarMenu(): {
 		projectId,
 		studyId,
 		studyEnabledStages,
-		accountingModeEnabled,
 	]);
 
 	const activeId = useMemo(() => {
