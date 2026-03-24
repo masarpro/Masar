@@ -102,6 +102,17 @@ import {
 } from "./procedures/payments";
 
 import {
+	listReceiptVouchers,
+	getReceiptVoucher,
+	createReceiptVoucher,
+	updateReceiptVoucher,
+	issueReceiptVoucher,
+	cancelReceiptVoucher,
+	printReceiptVoucher,
+	getReceiptVoucherSummary,
+} from "./procedures/receipt-vouchers";
+
+import {
 	listTransfers,
 	getTransfer,
 	createTransferProcedure,
@@ -231,6 +242,18 @@ export const financeRouter = {
 		create: createOrgPaymentProcedure,
 		update: updateOrgPaymentProcedure,
 		delete: deleteOrgPaymentProcedure,
+	},
+
+	// Receipt Vouchers (سندات القبض)
+	receipts: {
+		list: listReceiptVouchers,
+		getById: getReceiptVoucher,
+		create: createReceiptVoucher,
+		update: updateReceiptVoucher,
+		issue: issueReceiptVoucher,
+		cancel: cancelReceiptVoucher,
+		print: printReceiptVoucher,
+		getSummary: getReceiptVoucherSummary,
 	},
 
 	// Transfers (التحويلات)

@@ -76,5 +76,30 @@ export const createProjectPaymentProcedure = subscriptionProcedure
 			console.error("[AutoJournal] Failed to create ProjectPayment entry:", e);
 		}
 
+		// Auto-create receipt voucher from project payment
+		try {
+			const { generateAtomicNo } = await import("@repo/database");
+			const { numberToArabicWords } = await import("@repo/utils");
+			const voucherNo = await generateAtomicNo(input.organizationId, "RCV");
+			await db.receiptVoucher.create({
+				data: {
+					organizationId: input.organizationId,
+					voucherNo,
+					projectPaymentId: payment.id,
+					date: input.date,
+					amount: payment.amount,
+					amountInWords: numberToArabicWords(Number(payment.amount)),
+					receivedFrom: input.description || `دفعة مشروع ${payment.paymentNo}`,
+					paymentMethod: input.paymentMethod || "BANK_TRANSFER",
+					destinationAccountId: input.destinationAccountId || null,
+					projectId: input.projectId,
+					status: "ISSUED",
+					createdById: context.user.id,
+				},
+			});
+		} catch (e) {
+			console.error("[ReceiptVoucher] Failed to create auto voucher from project payment:", e);
+		}
+
 		return { ...payment, amount: Number(payment.amount) };
 	});

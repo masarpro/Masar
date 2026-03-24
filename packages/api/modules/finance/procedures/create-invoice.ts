@@ -474,6 +474,33 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 			console.error("[AutoJournal] Failed to generate entry for invoice payment:", e);
 		}
 
+		// Auto-create receipt voucher from invoice payment
+		try {
+			const { generateAtomicNo } = await import("@repo/database");
+			const { numberToArabicWords } = await import("@repo/utils");
+			const invoiceData = await db.financeInvoice.findUnique({ where: { id: input.id }, select: { clientName: true, projectId: true } });
+			const voucherNo = await generateAtomicNo(input.organizationId, "RCV");
+			await db.receiptVoucher.create({
+				data: {
+					organizationId: input.organizationId,
+					voucherNo,
+					invoicePaymentId: payment.id,
+					date: new Date(input.paymentDate),
+					amount: payment.amount,
+					amountInWords: numberToArabicWords(Number(payment.amount)),
+					receivedFrom: invoiceData?.clientName || "عميل",
+					paymentMethod: (input.paymentMethod as any) || "BANK_TRANSFER",
+					destinationAccountId: input.sourceAccountId || null,
+					clientId: null,
+					projectId: invoiceData?.projectId || null,
+					status: "ISSUED",
+					createdById: context.user.id,
+				},
+			});
+		} catch (e) {
+			console.error("[ReceiptVoucher] Failed to create auto voucher from invoice payment:", e);
+		}
+
 		return {
 			...payment,
 			amount: Number(payment.amount),

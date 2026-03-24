@@ -425,6 +425,9 @@ export async function createJournalEntry(db: PrismaClient, data: {
 		ADJUSTMENT: "ADJ-JE",
 		PERIOD_CLOSING: "CLS-JE",
 		OPENING_BALANCE: "OPN-JE",
+		RECEIPT_VOUCHER: "RV-JE",
+		PAYMENT_VOUCHER: "PV-JE",
+		HANDOVER_RETENTION_RELEASE: "HR-JE",
 	};
 	const prefix = REFERENCE_TYPE_PREFIX[data.referenceType ?? ""] ?? "MAN-JE";
 	const year = new Date().getFullYear();

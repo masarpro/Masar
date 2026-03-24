@@ -725,6 +725,30 @@ export const BankReconciliationItemScalarFieldEnumSchema = z.enum(['id', 'reconc
 
 export type BankReconciliationItemScalarFieldEnum = z.infer<typeof BankReconciliationItemScalarFieldEnumSchema>;
 
+// File: ReceiptVoucherScalarFieldEnum.schema.ts
+
+export const ReceiptVoucherScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'voucherNo', 'paymentId', 'invoicePaymentId', 'projectPaymentId', 'projectId', 'clientId', 'date', 'amount', 'currency', 'amountInWords', 'receivedFrom', 'paymentMethod', 'checkNumber', 'checkDate', 'checkBank', 'bankName', 'transferRef', 'destinationAccountId', 'description', 'notes', 'status', 'printCount', 'lastPrintedAt', 'cancelledAt', 'cancelReason', 'createdById', 'createdAt', 'updatedAt'])
+
+export type ReceiptVoucherScalarFieldEnum = z.infer<typeof ReceiptVoucherScalarFieldEnumSchema>;
+
+// File: PaymentVoucherScalarFieldEnum.schema.ts
+
+export const PaymentVoucherScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'voucherNo', 'expenseId', 'subcontractPaymentId', 'projectId', 'subcontractContractId', 'date', 'amount', 'currency', 'amountInWords', 'payeeName', 'payeeType', 'paymentMethod', 'checkNumber', 'checkDate', 'checkBank', 'bankName', 'transferRef', 'sourceAccountId', 'description', 'notes', 'preparedById', 'approvedById', 'approvedAt', 'rejectionReason', 'status', 'printCount', 'lastPrintedAt', 'cancelledAt', 'cancelReason', 'createdAt', 'updatedAt'])
+
+export type PaymentVoucherScalarFieldEnum = z.infer<typeof PaymentVoucherScalarFieldEnumSchema>;
+
+// File: HandoverProtocolScalarFieldEnum.schema.ts
+
+export const HandoverProtocolScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'protocolNo', 'type', 'projectId', 'subcontractContractId', 'date', 'location', 'title', 'description', 'parties', 'observations', 'exceptions', 'conditions', 'warrantyStartDate', 'warrantyEndDate', 'warrantyMonths', 'retentionReleaseAmount', 'retentionReleaseDate', 'attachments', 'status', 'completedAt', 'createdById', 'createdAt', 'updatedAt'])
+
+export type HandoverProtocolScalarFieldEnum = z.infer<typeof HandoverProtocolScalarFieldEnumSchema>;
+
+// File: HandoverProtocolItemScalarFieldEnum.schema.ts
+
+export const HandoverProtocolItemScalarFieldEnumSchema = z.enum(['id', 'protocolId', 'subcontractItemId', 'boqItemId', 'description', 'unit', 'contractQty', 'executedQty', 'acceptedQty', 'qualityRating', 'remarks', 'defects', 'sortOrder'])
+
+export type HandoverProtocolItemScalarFieldEnum = z.infer<typeof HandoverProtocolItemScalarFieldEnumSchema>;
+
 // File: SortOrder.schema.ts
 
 export const SortOrderSchema = z.enum(['asc', 'desc'])
@@ -1243,7 +1267,7 @@ export type ExpenseRunStatus = z.infer<typeof ExpenseRunStatusSchema>;
 
 // File: OrgAuditAction.schema.ts
 
-export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED', 'EXPENSE_PAID', 'EXPENSE_CANCELLED', 'EXPENSE_DELETED', 'PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'TRANSFER_CREATED', 'TRANSFER_CANCELLED', 'BANK_ACCOUNT_CREATED', 'BANK_ACCOUNT_UPDATED', 'BANK_ACCOUNT_SET_DEFAULT', 'BANK_ACCOUNT_DELETED', 'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_ITEMS_UPDATED', 'INVOICE_STATUS_CHANGED', 'INVOICE_CONVERTED_TO_TAX', 'INVOICE_PAYMENT_ADDED', 'INVOICE_PAYMENT_DELETED', 'INVOICE_DELETED', 'INVOICE_ISSUED', 'INVOICE_DUPLICATED', 'INVOICE_CREDIT_NOTE_CREATED', 'QUOTATION_CREATED', 'QUOTATION_UPDATED', 'QUOTATION_ITEMS_UPDATED', 'QUOTATION_STATUS_CHANGED', 'QUOTATION_DELETED', 'QUOTATION_CONVERTED', 'CLIENT_CREATED', 'CLIENT_UPDATED', 'CLIENT_DELETED', 'PAYROLL_RUN_APPROVED', 'PAYROLL_RUN_CANCELLED', 'JOURNAL_ENTRY_SKIPPED', 'PROJECT_ARCHIVED', 'PROJECT_RESTORED', 'SETTINGS_UPDATED', 'ZATCA_INVOICE_SUBMITTED', 'ZATCA_INVOICE_CLEARED', 'ZATCA_INVOICE_REJECTED'])
+export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED', 'EXPENSE_PAID', 'EXPENSE_CANCELLED', 'EXPENSE_DELETED', 'PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'TRANSFER_CREATED', 'TRANSFER_CANCELLED', 'BANK_ACCOUNT_CREATED', 'BANK_ACCOUNT_UPDATED', 'BANK_ACCOUNT_SET_DEFAULT', 'BANK_ACCOUNT_DELETED', 'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_ITEMS_UPDATED', 'INVOICE_STATUS_CHANGED', 'INVOICE_CONVERTED_TO_TAX', 'INVOICE_PAYMENT_ADDED', 'INVOICE_PAYMENT_DELETED', 'INVOICE_DELETED', 'INVOICE_ISSUED', 'INVOICE_DUPLICATED', 'INVOICE_CREDIT_NOTE_CREATED', 'QUOTATION_CREATED', 'QUOTATION_UPDATED', 'QUOTATION_ITEMS_UPDATED', 'QUOTATION_STATUS_CHANGED', 'QUOTATION_DELETED', 'QUOTATION_CONVERTED', 'CLIENT_CREATED', 'CLIENT_UPDATED', 'CLIENT_DELETED', 'PAYROLL_RUN_APPROVED', 'PAYROLL_RUN_CANCELLED', 'JOURNAL_ENTRY_SKIPPED', 'PROJECT_ARCHIVED', 'PROJECT_RESTORED', 'SETTINGS_UPDATED', 'ZATCA_INVOICE_SUBMITTED', 'ZATCA_INVOICE_CLEARED', 'ZATCA_INVOICE_REJECTED', 'RECEIPT_VOUCHER_CREATED', 'RECEIPT_VOUCHER_UPDATED', 'RECEIPT_VOUCHER_ISSUED', 'RECEIPT_VOUCHER_CANCELLED'])
 
 export type OrgAuditAction = z.infer<typeof OrgAuditActionSchema>;
 
@@ -1300,6 +1324,36 @@ export type NormalBalance = z.infer<typeof NormalBalanceSchema>;
 export const JournalEntryStatusSchema = z.enum(['DRAFT', 'POSTED', 'REVERSED'])
 
 export type JournalEntryStatus = z.infer<typeof JournalEntryStatusSchema>;
+
+// File: VoucherStatus.schema.ts
+
+export const VoucherStatusSchema = z.enum(['DRAFT', 'PENDING_APPROVAL', 'ISSUED', 'CANCELLED'])
+
+export type VoucherStatus = z.infer<typeof VoucherStatusSchema>;
+
+// File: PayeeType.schema.ts
+
+export const PayeeTypeSchema = z.enum(['SUBCONTRACTOR', 'SUPPLIER', 'EMPLOYEE', 'OTHER'])
+
+export type PayeeType = z.infer<typeof PayeeTypeSchema>;
+
+// File: HandoverType.schema.ts
+
+export const HandoverTypeSchema = z.enum(['ITEM_ACCEPTANCE', 'PRELIMINARY', 'FINAL', 'DELIVERY'])
+
+export type HandoverType = z.infer<typeof HandoverTypeSchema>;
+
+// File: HandoverStatus.schema.ts
+
+export const HandoverStatusSchema = z.enum(['DRAFT', 'PENDING_SIGNATURES', 'PARTIALLY_SIGNED', 'COMPLETED', 'ARCHIVED'])
+
+export type HandoverStatus = z.infer<typeof HandoverStatusSchema>;
+
+// File: QualityRating.schema.ts
+
+export const QualityRatingSchema = z.enum(['EXCELLENT', 'GOOD', 'ACCEPTABLE', 'NEEDS_REWORK', 'REJECTED'])
+
+export type QualityRating = z.infer<typeof QualityRatingSchema>;
 
 // File: PlanConfig.schema.ts
 
@@ -4404,4 +4458,149 @@ export const BankReconciliationItemSchema = z.object({
 });
 
 export type BankReconciliationItemType = z.infer<typeof BankReconciliationItemSchema>;
+
+
+// File: ReceiptVoucher.schema.ts
+
+export const ReceiptVoucherSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  voucherNo: z.string(),
+  paymentId: z.string().nullish(),
+  invoicePaymentId: z.string().nullish(),
+  projectPaymentId: z.string().nullish(),
+  projectId: z.string().nullish(),
+  clientId: z.string().nullish(),
+  date: z.date(),
+  amount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'amount' must be a Decimal. Location: ['Models', 'ReceiptVoucher']",
+}),
+  currency: z.string().default("SAR"),
+  amountInWords: z.string().nullish(),
+  receivedFrom: z.string(),
+  paymentMethod: PaymentMethodSchema.default("BANK_TRANSFER"),
+  checkNumber: z.string().nullish(),
+  checkDate: z.date().nullish(),
+  checkBank: z.string().nullish(),
+  bankName: z.string().nullish(),
+  transferRef: z.string().nullish(),
+  destinationAccountId: z.string().nullish(),
+  description: z.string().nullish(),
+  notes: z.string().nullish(),
+  status: VoucherStatusSchema.default("DRAFT"),
+  printCount: z.number().int(),
+  lastPrintedAt: z.date().nullish(),
+  cancelledAt: z.date().nullish(),
+  cancelReason: z.string().nullish(),
+  createdById: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type ReceiptVoucherType = z.infer<typeof ReceiptVoucherSchema>;
+
+
+// File: PaymentVoucher.schema.ts
+
+export const PaymentVoucherSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  voucherNo: z.string(),
+  expenseId: z.string().nullish(),
+  subcontractPaymentId: z.string().nullish(),
+  projectId: z.string().nullish(),
+  subcontractContractId: z.string().nullish(),
+  date: z.date(),
+  amount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'amount' must be a Decimal. Location: ['Models', 'PaymentVoucher']",
+}),
+  currency: z.string().default("SAR"),
+  amountInWords: z.string().nullish(),
+  payeeName: z.string(),
+  payeeType: PayeeTypeSchema.default("OTHER"),
+  paymentMethod: PaymentMethodSchema.default("BANK_TRANSFER"),
+  checkNumber: z.string().nullish(),
+  checkDate: z.date().nullish(),
+  checkBank: z.string().nullish(),
+  bankName: z.string().nullish(),
+  transferRef: z.string().nullish(),
+  sourceAccountId: z.string().nullish(),
+  description: z.string().nullish(),
+  notes: z.string().nullish(),
+  preparedById: z.string(),
+  approvedById: z.string().nullish(),
+  approvedAt: z.date().nullish(),
+  rejectionReason: z.string().nullish(),
+  status: VoucherStatusSchema.default("DRAFT"),
+  printCount: z.number().int(),
+  lastPrintedAt: z.date().nullish(),
+  cancelledAt: z.date().nullish(),
+  cancelReason: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type PaymentVoucherType = z.infer<typeof PaymentVoucherSchema>;
+
+
+// File: HandoverProtocol.schema.ts
+
+export const HandoverProtocolSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  protocolNo: z.string(),
+  type: HandoverTypeSchema,
+  projectId: z.string(),
+  subcontractContractId: z.string().nullish(),
+  date: z.date(),
+  location: z.string().nullish(),
+  title: z.string(),
+  description: z.string().nullish(),
+  parties: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").default("[]"),
+  observations: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  exceptions: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  conditions: z.string().nullish(),
+  warrantyStartDate: z.date().nullish(),
+  warrantyEndDate: z.date().nullish(),
+  warrantyMonths: z.number().int().default(12).nullish(),
+  retentionReleaseAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'retentionReleaseAmount' must be a Decimal. Location: ['Models', 'HandoverProtocol']",
+}).nullish(),
+  retentionReleaseDate: z.date().nullish(),
+  attachments: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  status: HandoverStatusSchema.default("DRAFT"),
+  completedAt: z.date().nullish(),
+  createdById: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type HandoverProtocolType = z.infer<typeof HandoverProtocolSchema>;
+
+
+// File: HandoverProtocolItem.schema.ts
+
+export const HandoverProtocolItemSchema = z.object({
+  id: z.string(),
+  protocolId: z.string(),
+  subcontractItemId: z.string().nullish(),
+  boqItemId: z.string().nullish(),
+  description: z.string(),
+  unit: z.string().nullish(),
+  contractQty: z.instanceof(Prisma.Decimal, {
+  message: "Field 'contractQty' must be a Decimal. Location: ['Models', 'HandoverProtocolItem']",
+}).nullish(),
+  executedQty: z.instanceof(Prisma.Decimal, {
+  message: "Field 'executedQty' must be a Decimal. Location: ['Models', 'HandoverProtocolItem']",
+}).nullish(),
+  acceptedQty: z.instanceof(Prisma.Decimal, {
+  message: "Field 'acceptedQty' must be a Decimal. Location: ['Models', 'HandoverProtocolItem']",
+}).nullish(),
+  qualityRating: QualityRatingSchema.nullish(),
+  remarks: z.string().nullish(),
+  defects: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  sortOrder: z.number().int(),
+});
+
+export type HandoverProtocolItemType = z.infer<typeof HandoverProtocolItemSchema>;
 

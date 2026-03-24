@@ -472,6 +472,48 @@ enum PaymentMethod {
   OTHER          // أخرى
 }
 
+// حالة السند المالي (قبض/صرف)
+enum VoucherStatus {
+  DRAFT              // مسودة
+  PENDING_APPROVAL   // بانتظار الاعتماد (فقط لسندات الصرف)
+  ISSUED             // صادر
+  CANCELLED          // ملغي
+}
+
+// نوع المستفيد (سندات الصرف)
+enum PayeeType {
+  SUBCONTRACTOR   // مقاول باطن
+  SUPPLIER        // مورد
+  EMPLOYEE        // موظف
+  OTHER           // أخرى
+}
+
+// نوع محضر الاستلام/التسليم
+enum HandoverType {
+  ITEM_ACCEPTANCE  // استلام بنود
+  PRELIMINARY      // استلام ابتدائي
+  FINAL            // استلام نهائي
+  DELIVERY         // تسليم للعميل
+}
+
+// حالة محضر الاستلام
+enum HandoverStatus {
+  DRAFT               // مسودة
+  PENDING_SIGNATURES  // بانتظار التوقيعات
+  PARTIALLY_SIGNED    // موقّع جزئياً
+  COMPLETED           // مكتمل
+  ARCHIVED            // مؤرشف
+}
+
+// تقييم الجودة (محاضر الاستلام)
+enum QualityRating {
+  EXCELLENT      // ممتاز
+  GOOD           // جيد
+  ACCEPTABLE     // مقبول
+  NEEDS_REWORK   // يحتاج إعادة عمل
+  REJECTED       // مرفوض
+}
+
 // حالة أمر التغيير (Phase 11)
 enum ChangeOrderStatus {
   DRAFT         // مسودة
@@ -825,6 +867,12 @@ model User {
   journalEntriesPosted    JournalEntry[]          @relation("JournalEntryPoster")
   recurringJournalTemplates RecurringJournalTemplate[] @relation("RecurringTemplateCreator")
 
+  // Vouchers & Handover — السندات ومحاضر الاستلام
+  receiptVouchersCreated    ReceiptVoucher[]         @relation("ReceiptVoucherCreator")
+  paymentVouchersPrepared   PaymentVoucher[]         @relation("PaymentVoucherPreparer")
+  paymentVouchersApproved   PaymentVoucher[]         @relation("PaymentVoucherApprover")
+  handoverProtocolsCreated  HandoverProtocol[]       @relation("HandoverProtocolCreator")
+
   // ═══ نهاية حقول مسار ═══
 
   @@unique([email])
@@ -1061,6 +1109,11 @@ model Organization {
   costingItems            CostingItem[]
   manualItems             ManualItem[]
   sectionMarkups          SectionMarkup[]
+
+  // Vouchers & Handover - السندات ومحاضر الاستلام
+  receiptVouchers         ReceiptVoucher[]
+  paymentVouchers         PaymentVoucher[]
+  handoverProtocols       HandoverProtocol[]
 
   // ═══ نهاية حقول مسار ═══
 
@@ -1835,6 +1888,11 @@ model Project {
   employeeAssignments      EmployeeProjectAssignment[]
   assignedAssets           CompanyAsset[]              @relation("AssetCurrentProject")
 
+  // Vouchers & Handover - السندات ومحاضر الاستلام
+  receiptVouchers          ReceiptVoucher[]
+  paymentVouchers          PaymentVoucher[]
+  handoverProtocols        HandoverProtocol[]
+
   @@unique([organizationId, slug])
   @@index([organizationId])
   @@index([createdById])
@@ -2143,6 +2201,10 @@ model SubcontractContract {
   items           SubcontractItem[]
   claims          SubcontractClaim[]
 
+  // سندات الصرف ومحاضر الاستلام
+  paymentVouchers   PaymentVoucher[]
+  handoverProtocols HandoverProtocol[]
+
   @@index([organizationId, projectId])
   @@index([organizationId, projectId, status])
   @@map("subcontract_contracts")
@@ -2230,6 +2292,9 @@ model SubcontractPayment {
 
   createdAt       DateTime            @default(now()) @map("created_at")
   updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  // سند الصرف المرتبط
+  paymentVoucher  PaymentVoucher?
 
   @@index([organizationId, contractId])
   @@index([contractId, termId])
@@ -2481,6 +2546,9 @@ model ProjectPayment {
 
   createdAt            DateTime            @default(now()) @map("created_at")
   updatedAt            DateTime            @updatedAt @map("updated_at")
+
+  // سند القبض المرتبط
+  receiptVoucher       ReceiptVoucher?
 
   @@unique([projectId, paymentNo])
   @@index([organizationId])
@@ -3557,6 +3625,12 @@ enum OrgAuditAction {
   ZATCA_INVOICE_SUBMITTED   // إرسال فاتورة لهيئة الزكاة
   ZATCA_INVOICE_CLEARED     // اعتماد فاتورة من هيئة الزكاة
   ZATCA_INVOICE_REJECTED    // رفض فاتورة من هيئة الزكاة
+
+  // ── سندات القبض (Receipt Vouchers) ──
+  RECEIPT_VOUCHER_CREATED   // إنشاء سند قبض
+  RECEIPT_VOUCHER_UPDATED   // تعديل سند قبض
+  RECEIPT_VOUCHER_ISSUED    // إصدار سند قبض
+  RECEIPT_VOUCHER_CANCELLED // إلغاء سند قبض
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -3630,6 +3704,7 @@ model Client {
   contacts        ClientContact[]   // جهات الاتصال
   payments        FinancePayment[]  @relation("ClientPayments")  // المقبوضات
   projects        Project[]         @relation("ClientProjects")  // المشاريع
+  receiptVouchers ReceiptVoucher[]  @relation("ClientReceiptVouchers")  // سندات القبض
 
   @@index([organizationId])
   @@index([organizationId, name])
@@ -3970,6 +4045,9 @@ model FinanceInvoicePayment {
 
   createdAt       DateTime       @default(now()) @map("created_at")
 
+  // سند القبض المرتبط
+  receiptVoucher  ReceiptVoucher?
+
   @@index([invoiceId])
   @@map("finance_invoice_payments")
 }
@@ -4120,6 +4198,10 @@ model OrganizationBank {
   // Bank Reconciliations - التسويات البنكية
   reconciliations BankReconciliation[]
 
+  // Vouchers - السندات
+  receiptVouchersTo   ReceiptVoucher[]  @relation("ReceiptVoucherDestination")
+  paymentVouchersFrom PaymentVoucher[]  @relation("PaymentVoucherSource")
+
   @@index([organizationId])
   @@index([organizationId, accountType])
   @@index([organizationId, isActive])
@@ -4191,6 +4273,9 @@ model FinanceExpense {
   companyPayments CompanyExpensePayment[]    @relation("FinanceExpensePayments")
   expenseRunItems CompanyExpenseRunItem[]
 
+  // سند الصرف المرتبط
+  paymentVoucher  PaymentVoucher?
+
   createdAt       DateTime                  @default(now()) @map("created_at")
   updatedAt       DateTime                  @updatedAt @map("updated_at")
 
@@ -4255,6 +4340,9 @@ model FinancePayment {
 
   createdAt            DateTime                  @default(now()) @map("created_at")
   updatedAt            DateTime                  @updatedAt @map("updated_at")
+
+  // سند القبض المرتبط
+  receiptVoucher       ReceiptVoucher?
 
   @@index([organizationId, date])
   @@index([organizationId, clientId])
@@ -5433,4 +5521,244 @@ model BankReconciliationItem {
   @@unique([reconciliationId, journalEntryLineId])
   @@index([reconciliationId])
   @@map("bank_reconciliation_items")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RECEIPT VOUCHERS - سندات القبض
+// ═══════════════════════════════════════════════════════════════════════════
+
+model ReceiptVoucher {
+  id                   String            @id @default(cuid())
+  organizationId       String            @map("organization_id")
+  organization         Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // الرقم التسلسلي (RCV-2026-0001)
+  voucherNo            String            @map("voucher_no")
+
+  // الربط المالي (أحد هذه أو بدون ربط — سند يدوي)
+  paymentId            String?           @unique @map("payment_id")
+  payment              FinancePayment?   @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  invoicePaymentId     String?           @unique @map("invoice_payment_id")
+  invoicePayment       FinanceInvoicePayment? @relation(fields: [invoicePaymentId], references: [id], onDelete: SetNull)
+  projectPaymentId     String?           @unique @map("project_payment_id")
+  projectPayment       ProjectPayment?   @relation(fields: [projectPaymentId], references: [id], onDelete: SetNull)
+
+  // ربط بالمشروع والعميل
+  projectId            String?           @map("project_id")
+  project              Project?          @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  clientId             String?           @map("client_id")
+  client               Client?           @relation("ClientReceiptVouchers", fields: [clientId], references: [id], onDelete: SetNull)
+
+  // بيانات السند
+  date                 DateTime          @db.Date
+  amount               Decimal           @db.Decimal(15, 2)
+  currency             String            @default("SAR")
+  amountInWords        String?           @map("amount_in_words") @db.Text
+  receivedFrom         String            @map("received_from")
+
+  // طريقة الدفع
+  paymentMethod        PaymentMethod     @default(BANK_TRANSFER) @map("payment_method")
+  checkNumber          String?           @map("check_number")
+  checkDate            DateTime?         @map("check_date") @db.Date
+  checkBank            String?           @map("check_bank")
+  bankName             String?           @map("bank_name")
+  transferRef          String?           @map("transfer_ref")
+
+  // الحساب البنكي الوجهة
+  destinationAccountId String?           @map("destination_account_id")
+  destinationAccount   OrganizationBank? @relation("ReceiptVoucherDestination", fields: [destinationAccountId], references: [id], onDelete: SetNull)
+
+  // الوصف والملاحظات
+  description          String?           @db.Text
+  notes                String?           @db.Text
+
+  // الحالة
+  status               VoucherStatus     @default(DRAFT)
+  printCount           Int               @default(0) @map("print_count")
+  lastPrintedAt        DateTime?         @map("last_printed_at")
+  cancelledAt          DateTime?         @map("cancelled_at")
+  cancelReason         String?           @map("cancel_reason") @db.Text
+
+  // التدقيق
+  createdById          String            @map("created_by")
+  createdBy            User              @relation("ReceiptVoucherCreator", fields: [createdById], references: [id])
+
+  createdAt            DateTime          @default(now()) @map("created_at")
+  updatedAt            DateTime          @updatedAt @map("updated_at")
+
+  @@unique([organizationId, voucherNo])
+  @@index([organizationId, date])
+  @@index([organizationId, clientId])
+  @@index([organizationId, status])
+  @@map("receipt_vouchers")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PAYMENT VOUCHERS - سندات الصرف
+// ═══════════════════════════════════════════════════════════════════════════
+
+model PaymentVoucher {
+  id                   String              @id @default(cuid())
+  organizationId       String              @map("organization_id")
+  organization         Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // الرقم التسلسلي (PMT-2026-0001)
+  voucherNo            String              @map("voucher_no")
+
+  // الربط المالي (أحد هذه أو بدون ربط — سند يدوي)
+  expenseId            String?             @unique @map("expense_id")
+  expense              FinanceExpense?     @relation(fields: [expenseId], references: [id], onDelete: SetNull)
+  subcontractPaymentId String?             @unique @map("subcontract_payment_id")
+  subcontractPayment   SubcontractPayment? @relation(fields: [subcontractPaymentId], references: [id], onDelete: SetNull)
+
+  // ربط بالمشروع والعقد
+  projectId            String?             @map("project_id")
+  project              Project?            @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  subcontractContractId String?            @map("subcontract_contract_id")
+  subcontractContract  SubcontractContract? @relation(fields: [subcontractContractId], references: [id], onDelete: SetNull)
+
+  // بيانات السند
+  date                 DateTime            @db.Date
+  amount               Decimal             @db.Decimal(15, 2)
+  currency             String              @default("SAR")
+  amountInWords        String?             @map("amount_in_words") @db.Text
+
+  // المستفيد
+  payeeName            String              @map("payee_name")
+  payeeType            PayeeType           @default(OTHER) @map("payee_type")
+
+  // طريقة الدفع
+  paymentMethod        PaymentMethod       @default(BANK_TRANSFER) @map("payment_method")
+  checkNumber          String?             @map("check_number")
+  checkDate            DateTime?           @map("check_date") @db.Date
+  checkBank            String?             @map("check_bank")
+  bankName             String?             @map("bank_name")
+  transferRef          String?             @map("transfer_ref")
+
+  // الحساب البنكي المصدر
+  sourceAccountId      String?             @map("source_account_id")
+  sourceAccount        OrganizationBank?   @relation("PaymentVoucherSource", fields: [sourceAccountId], references: [id], onDelete: SetNull)
+
+  // الوصف والملاحظات
+  description          String?             @db.Text
+  notes                String?             @db.Text
+
+  // الاعتمادات
+  preparedById         String              @map("prepared_by")
+  preparedBy           User                @relation("PaymentVoucherPreparer", fields: [preparedById], references: [id])
+  approvedById         String?             @map("approved_by")
+  approvedBy           User?               @relation("PaymentVoucherApprover", fields: [approvedById], references: [id])
+  approvedAt           DateTime?           @map("approved_at")
+  rejectionReason      String?             @map("rejection_reason") @db.Text
+
+  // الحالة
+  status               VoucherStatus       @default(DRAFT)
+  printCount           Int                 @default(0) @map("print_count")
+  lastPrintedAt        DateTime?           @map("last_printed_at")
+  cancelledAt          DateTime?           @map("cancelled_at")
+  cancelReason         String?             @map("cancel_reason") @db.Text
+
+  createdAt            DateTime            @default(now()) @map("created_at")
+  updatedAt            DateTime            @updatedAt @map("updated_at")
+
+  @@unique([organizationId, voucherNo])
+  @@index([organizationId, date])
+  @@index([organizationId, payeeType])
+  @@index([organizationId, status])
+  @@map("payment_vouchers")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HANDOVER PROTOCOLS - محاضر الاستلام والتسليم
+// ═══════════════════════════════════════════════════════════════════════════
+
+model HandoverProtocol {
+  id                     String              @id @default(cuid())
+  organizationId         String              @map("organization_id")
+  organization           Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // الرقم التسلسلي (HND-2026-0001)
+  protocolNo             String              @map("protocol_no")
+  type                   HandoverType
+
+  // ربط بالمشروع والعقد
+  projectId              String              @map("project_id")
+  project                Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  subcontractContractId  String?             @map("subcontract_contract_id")
+  subcontractContract    SubcontractContract? @relation(fields: [subcontractContractId], references: [id], onDelete: SetNull)
+
+  // بيانات المحضر
+  date                   DateTime            @db.Date
+  location               String?
+  title                  String
+  description            String?             @db.Text
+
+  // الأطراف — JSON مرن [{name, role, organization, signed, signedAt}]
+  parties                Json                @default("[]")
+
+  // البنود
+  items                  HandoverProtocolItem[]
+
+  // الملاحظات والاستثناءات
+  observations           Json?               // ملاحظات
+  exceptions             Json?               // عيوب/استثناءات
+  conditions             String?             @db.Text
+
+  // فترة الضمان (للابتدائي)
+  warrantyStartDate      DateTime?           @map("warranty_start_date") @db.Date
+  warrantyEndDate        DateTime?           @map("warranty_end_date") @db.Date
+  warrantyMonths         Int?                @default(12) @map("warranty_months")
+
+  // المحتجزات (للنهائي)
+  retentionReleaseAmount Decimal?            @map("retention_release_amount") @db.Decimal(15, 2)
+  retentionReleaseDate   DateTime?           @map("retention_release_date") @db.Date
+
+  // المرفقات
+  attachments            Json?
+
+  // الحالة
+  status                 HandoverStatus      @default(DRAFT)
+  completedAt            DateTime?           @map("completed_at")
+
+  // من أنشأ
+  createdById            String              @map("created_by")
+  createdBy              User                @relation("HandoverProtocolCreator", fields: [createdById], references: [id])
+
+  createdAt              DateTime            @default(now()) @map("created_at")
+  updatedAt              DateTime            @updatedAt @map("updated_at")
+
+  @@unique([organizationId, protocolNo])
+  @@index([organizationId, projectId])
+  @@index([organizationId, type])
+  @@index([organizationId, status])
+  @@map("handover_protocols")
+}
+
+// بنود محضر الاستلام
+model HandoverProtocolItem {
+  id                String            @id @default(cuid())
+  protocolId        String            @map("protocol_id")
+  protocol          HandoverProtocol  @relation(fields: [protocolId], references: [id], onDelete: Cascade)
+
+  // ربط اختياري ببند عقد باطن أو BOQ
+  subcontractItemId String?           @map("subcontract_item_id")
+  boqItemId         String?           @map("boq_item_id")
+
+  // بيانات البند
+  description       String
+  unit              String?
+  contractQty       Decimal?          @map("contract_qty") @db.Decimal(15, 4)
+  executedQty       Decimal?          @map("executed_qty") @db.Decimal(15, 4)
+  acceptedQty       Decimal?          @map("accepted_qty") @db.Decimal(15, 4)
+
+  // تقييم الجودة
+  qualityRating     QualityRating?    @map("quality_rating")
+  remarks           String?           @db.Text
+  defects           Json?
+
+  // الترتيب
+  sortOrder         Int               @default(0) @map("sort_order")
+
+  @@index([protocolId])
+  @@map("handover_protocol_items")
 }

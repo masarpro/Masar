@@ -1,0 +1,783 @@
+# خطة بناء السندات المالية ومحاضر الاستلام وكشوفات الحساب
+# متوافقة مع نظام المحاسبة الجديد في مسار
+
+## ⛔ القائمة الحمراء — ملفات لا تلمسها أبداً
+- `structural-calculations.ts` / `derivation-engine.ts`
+- `packages/api/modules/quantities/**`
+- لا تعدّل أي hook موجود في `auto-journal.ts` — فقط أضف hooks جديدة
+- لا تعدّل `createJournalEntry` أو `ensureAccountingEnabled` — فقط استخدمها
+
+## السياق — ما هو موجود ويعمل الآن
+
+### النظام المحاسبي الجديد (مكتمل):
+- **دليل حسابات** — 45 حساب افتراضي يُنشأ تلقائياً عند أول عملية مالية (`ensureAccountingEnabled`)
+- **قيود تلقائية** — 26 عملية مالية تولّد قيود `POSTED` مباشرة عبر `auto-journal.ts`
+- **القيود اليومية** — CRUD + ترحيل + عكس + `reverseAutoJournalEntry`
+- **التقارير** — ميزان مراجعة + قائمة دخل + ميزانية عمومية + 4 تقارير سلبية
+- **إقفال الفترات** — توليد + إقفال + إعادة فتح + فحص الفترة المغلقة
+
+### القاعدة الذهبية:
+**كل سند/محضر يُنشأ → يولّد قيد محاسبي تلقائي عبر auto-journal.ts**
+**كل سند/محضر يُلغى → يُعكس القيد المحاسبي تلقائياً**
+
+---
+
+## المرحلة 1: سندات القبض والصرف
+
+### 1.1 سند القبض (Receipt Voucher — سق)
+
+**المفهوم:** مستند رسمي يُثبت استلام مبلغ مالي. يُولّد تلقائياً أو يُنشأ يدوياً.
+
+#### Schema:
+
+```prisma
+model ReceiptVoucher {
+  id               String   @id @default(cuid())
+  organizationId   String
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  voucherNo        String   // سق-001 (OrganizationSequence key: "receipt_voucher")
+  
+  // الربط المالي (أحد هذه أو بدون ربط)
+  paymentId        String?  @unique // ربط بـ FinancePayment
+  payment          FinancePayment? @relation(fields: [paymentId], references: [id])
+  invoicePaymentId String?  @unique // ربط بدفعة فاتورة
+  projectPaymentId String?  @unique // ربط بدفعة مشروع
+  projectPayment   ProjectPayment? @relation(fields: [projectPaymentId], references: [id])
+  
+  // ربط بالمشروع والعميل
+  projectId        String?
+  project          Project? @relation(fields: [projectId], references: [id])
+  clientId         String?
+  client           Client?  @relation(fields: [clientId], references: [id])
+  
+  // بيانات السند
+  date             DateTime
+  amount           Decimal  @db.Decimal(15, 2)
+  currency         String   @default("SAR")
+  amountInWords    String?  // التفقيط — يُحسب تلقائياً
+  receivedFrom     String   // اسم الدافع
+  
+  // طريقة الدفع
+  paymentMethod    PaymentMethod // CASH, BANK_TRANSFER, CHECK, CARD, OTHER
+  checkNumber      String?
+  checkDate        DateTime?
+  checkBank        String?
+  bankName         String?
+  transferRef      String?
+  
+  // الحساب البنكي الوجهة
+  destinationAccountId String?
+  destinationAccount   OrganizationBank? @relation(fields: [destinationAccountId], references: [id])
+  
+  description      String?
+  notes            String?
+  
+  // الحالة
+  status           VoucherStatus @default(DRAFT)
+  printCount       Int      @default(0)
+  lastPrintedAt    DateTime?
+  cancelledAt      DateTime?
+  cancelReason     String?
+  
+  // التدقيق
+  createdById      String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@unique([organizationId, voucherNo])
+  @@index([organizationId, date])
+  @@index([organizationId, clientId])
+  @@index([organizationId, status])
+}
+```
+
+#### API Endpoints (8):
+
+```
+finance.receipts.list          — قائمة مع فلاتر (تاريخ، عميل، مشروع، حالة)
+finance.receipts.getById       — تفاصيل سند
+finance.receipts.create        — إنشاء سند (مع توليد رقم تسلسلي + تفقيط)
+finance.receipts.update        — تعديل (DRAFT فقط)
+finance.receipts.issue         — إصدار (DRAFT → ISSUED)
+finance.receipts.cancel        — إلغاء (مع سبب)
+finance.receipts.print         — تسجيل طباعة
+finance.receipts.getSummary    — إجمالي بالفترة
+```
+
+#### ربط بنظام المحاسبة — القيود التلقائية:
+
+**عند إصدار سند قبض يدوي (بدون ربط بمقبوضة/فاتورة):**
+
+أضف hook جديد في `auto-journal.ts`:
+
+```typescript
+// في auto-journal.ts — أضف:
+export async function onReceiptVoucherIssued(db: PrismaClient, voucher: {
+  id: string;
+  organizationId: string;
+  voucherNo: string;
+  amount: Prisma.Decimal;
+  date: Date;
+  receivedFrom: string;
+  destinationAccountId?: string | null;
+  projectId?: string | null;
+}) {
+  if (!(await ensureAccountingEnabled(db, voucher.organizationId))) return;
+  
+  const bankAccId = voucher.destinationAccountId 
+    ? await getBankAccountId(db, voucher.organizationId, voucher.destinationAccountId)
+    : await getAccountByCode(db, voucher.organizationId, "1110");
+  const revenueId = await getAccountByCode(db, voucher.organizationId, "4300"); // إيرادات أخرى
+  if (!bankAccId || !revenueId) return;
+
+  await createJournalEntry(db, {
+    organizationId: voucher.organizationId,
+    date: voucher.date,
+    description: `سند قبض ${voucher.voucherNo} — ${voucher.receivedFrom}`,
+    referenceType: "RECEIPT_VOUCHER",
+    referenceId: voucher.id,
+    referenceNo: voucher.voucherNo,
+    isAutoGenerated: true,
+    lines: [
+      { accountId: bankAccId, debit: voucher.amount, credit: ZERO, projectId: voucher.projectId },
+      { accountId: revenueId, debit: ZERO, credit: voucher.amount, projectId: voucher.projectId },
+    ],
+  });
+}
+```
+
+**عند إلغاء سند قبض:**
+```typescript
+await reverseAutoJournalEntry(db, {
+  organizationId, referenceType: "RECEIPT_VOUCHER", referenceId: voucherId, userId
+});
+```
+
+**⚠️ مهم:** سندات القبض المرتبطة بمقبوضة (`paymentId`) أو دفعة فاتورة (`invoicePaymentId`) أو دفعة مشروع (`projectPaymentId`) **لا تولّد قيد مستقل** — لأن القيد مولّد مسبقاً من العملية الأصلية (`onOrganizationPaymentReceived` أو `onInvoicePaymentReceived` أو `onProjectPaymentReceived`). السند في هذه الحالة هو **طبقة مستندية فقط**.
+
+#### الإنشاء التلقائي من العمليات الحالية:
+
+في كل ملف من هذه الملفات، **بعد نجاح العملية وبعد الـ auto-journal hook الحالي**، أضف إنشاء سند قبض تلقائي:
+
+```
+| العملية | الملف | بعد أي سطر |
+|---------|-------|-----------|
+| مقبوضة مباشرة | finance/procedures/payments.ts | بعد onOrganizationPaymentReceived |
+| دفعة على فاتورة | finance/procedures/create-invoice.ts | بعد onInvoicePaymentReceived |
+| دفعة مشروع | project-payments/procedures/create.ts | بعد onProjectPaymentReceived |
+```
+
+النمط:
+```typescript
+// بعد الـ auto-journal hook:
+try {
+  await db.receiptVoucher.create({
+    data: {
+      organizationId: input.organizationId,
+      voucherNo: await getNextSequenceValue(db, input.organizationId, "receipt_voucher", "سق"),
+      paymentId: payment.id, // أو invoicePaymentId أو projectPaymentId
+      date: payment.date,
+      amount: payment.amount,
+      receivedFrom: clientName || "عميل",
+      paymentMethod: input.paymentMethod || "BANK_TRANSFER",
+      destinationAccountId: input.destinationAccountId,
+      clientId: input.clientId,
+      projectId: input.projectId,
+      status: "ISSUED", // سندات تلقائية تُصدر مباشرة
+      createdById: context.user.id,
+    },
+  });
+} catch (e) {
+  console.error("[ReceiptVoucher] Failed to create auto voucher:", e);
+}
+```
+
+---
+
+### 1.2 سند الصرف (Payment Voucher — سص)
+
+**المفهوم:** مستند رسمي يُثبت صرف مبلغ. يحتاج **اعتماد** قبل التنفيذ.
+
+#### Schema:
+
+```prisma
+model PaymentVoucher {
+  id               String   @id @default(cuid())
+  organizationId   String
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  voucherNo        String   // سص-001 (OrganizationSequence key: "payment_voucher")
+  
+  // الربط المالي (أحد هذه أو بدون ربط)
+  expenseId            String?  @unique
+  expense              FinanceExpense? @relation(fields: [expenseId], references: [id])
+  subcontractPaymentId String?  @unique
+  subcontractPayment   SubcontractPayment? @relation(fields: [subcontractPaymentId], references: [id])
+  
+  projectId            String?
+  project              Project? @relation(fields: [projectId], references: [id])
+  subcontractContractId String?
+  subcontractContract  SubcontractContract? @relation(fields: [subcontractContractId], references: [id])
+  
+  // بيانات السند
+  date             DateTime
+  amount           Decimal  @db.Decimal(15, 2)
+  currency         String   @default("SAR")
+  amountInWords    String?
+  
+  payeeName        String
+  payeeType        PayeeType // SUBCONTRACTOR, SUPPLIER, EMPLOYEE, OTHER
+  
+  paymentMethod    PaymentMethod
+  checkNumber      String?
+  checkDate        DateTime?
+  checkBank        String?
+  bankName         String?
+  transferRef      String?
+  
+  sourceAccountId  String?
+  sourceAccount    OrganizationBank? @relation(fields: [sourceAccountId], references: [id])
+  
+  description      String?
+  notes            String?
+  
+  // الاعتمادات
+  preparedById     String
+  approvedById     String?
+  approvedAt       DateTime?
+  
+  status           VoucherStatus @default(DRAFT)
+  printCount       Int      @default(0)
+  lastPrintedAt    DateTime?
+  cancelledAt      DateTime?
+  cancelReason     String?
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@unique([organizationId, voucherNo])
+  @@index([organizationId, date])
+  @@index([organizationId, payeeType])
+  @@index([organizationId, status])
+}
+```
+
+#### API Endpoints (10):
+
+```
+finance.disbursements.list          — قائمة مع فلاتر
+finance.disbursements.getById       — تفاصيل
+finance.disbursements.create        — إنشاء
+finance.disbursements.update        — تعديل (DRAFT فقط)
+finance.disbursements.submit        — تقديم للاعتماد (DRAFT → PENDING_APPROVAL)
+finance.disbursements.approve       — اعتماد (PENDING_APPROVAL → ISSUED)
+finance.disbursements.reject        — رفض (→ DRAFT مع سبب)
+finance.disbursements.cancel        — إلغاء
+finance.disbursements.print         — تسجيل طباعة
+finance.disbursements.getSummary    — إجمالي بالفترة
+```
+
+#### ربط بنظام المحاسبة:
+
+**سندات الصرف المرتبطة** بمصروف (`expenseId`) أو دفعة باطن (`subcontractPaymentId`) → **لا تولّد قيد مستقل** — القيد مولّد من العملية الأصلية.
+
+**سندات الصرف اليدوية (المستقلة):**
+
+```typescript
+// في auto-journal.ts:
+export async function onPaymentVoucherApproved(db: PrismaClient, voucher: {
+  id: string;
+  organizationId: string;
+  voucherNo: string;
+  amount: Prisma.Decimal;
+  date: Date;
+  payeeName: string;
+  payeeType: string; // SUBCONTRACTOR, SUPPLIER, EMPLOYEE, OTHER
+  sourceAccountId?: string | null;
+  projectId?: string | null;
+}) {
+  if (!(await ensureAccountingEnabled(db, voucher.organizationId))) return;
+
+  let bankAccId: string | null = null;
+  if (voucher.sourceAccountId) {
+    bankAccId = await getBankAccountId(db, voucher.organizationId, voucher.sourceAccountId);
+  } else {
+    bankAccId = await getAccountByCode(db, voucher.organizationId, "1110");
+  }
+  
+  // تحديد حساب المصروف حسب نوع المستفيد
+  let expenseCode = "6900"; // افتراضي: مصروفات أخرى
+  if (voucher.payeeType === "SUBCONTRACTOR") expenseCode = "5200";
+  else if (voucher.payeeType === "EMPLOYEE") expenseCode = "6100";
+  
+  const expenseAccId = await getAccountByCode(db, voucher.organizationId, expenseCode);
+  if (!bankAccId || !expenseAccId) return;
+
+  await createJournalEntry(db, {
+    organizationId: voucher.organizationId,
+    date: voucher.date,
+    description: `سند صرف ${voucher.voucherNo} — ${voucher.payeeName}`,
+    referenceType: "PAYMENT_VOUCHER",
+    referenceId: voucher.id,
+    referenceNo: voucher.voucherNo,
+    isAutoGenerated: true,
+    lines: [
+      { accountId: expenseAccId, debit: voucher.amount, credit: ZERO, projectId: voucher.projectId },
+      { accountId: bankAccId, debit: ZERO, credit: voucher.amount },
+    ],
+  });
+}
+```
+
+**عند إلغاء:**
+```typescript
+await reverseAutoJournalEntry(db, {
+  organizationId, referenceType: "PAYMENT_VOUCHER", referenceId: voucherId, userId
+});
+```
+
+#### الإنشاء التلقائي من العمليات الحالية:
+
+```
+| العملية | الملف | 
+|---------|-------|
+| دفع مصروف | expenses.ts — بعد onExpenseCompleted |
+| دفعة مقاول باطن | create-payment.ts — بعد onSubcontractPayment |
+| مصروف شركة متكرر | expense-payments.ts — بعد onExpenseCompleted |
+```
+
+---
+
+### 1.3 خدمة التفقيط
+
+```typescript
+// packages/utils/src/tafqit.ts
+export function amountToArabicWords(amount: number): string {
+  // المدخل: 15750.50
+  // المخرج: "خمسة عشر ألفاً وسبعمئة وخمسون ريالاً وخمسون هللة"
+}
+```
+
+- تُستدعى تلقائياً عند إنشاء أي سند
+- تُخزّن في `amountInWords`
+
+---
+
+### 1.4 Enums الجديدة
+
+```prisma
+enum VoucherStatus {
+  DRAFT
+  PENDING_APPROVAL  // فقط لسندات الصرف
+  ISSUED
+  CANCELLED
+}
+
+enum PayeeType {
+  SUBCONTRACTOR
+  SUPPLIER
+  EMPLOYEE
+  OTHER
+}
+```
+
+### 1.5 إضافة في REFERENCE_TYPE_PREFIX
+
+```typescript
+// في accounting.ts:
+RECEIPT_VOUCHER: "RV-JE",
+PAYMENT_VOUCHER: "PV-JE",
+```
+
+---
+
+## المرحلة 2: محاضر الاستلام والتسليم
+
+### 2.1 أنواع المحاضر
+
+```
+1. محضر استلام بنود (ITEM_ACCEPTANCE) — من مقاول الباطن
+2. محضر استلام ابتدائي (PRELIMINARY) — يبدأ فترة الضمان
+3. محضر استلام نهائي (FINAL) — يُحرر المحتجزات
+4. محضر تسليم للعميل (DELIVERY) — تسليم المشروع
+```
+
+### 2.2 Schema
+
+```prisma
+model HandoverProtocol {
+  id               String   @id @default(cuid())
+  organizationId   String
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  protocolNo       String   // مح-001 (OrganizationSequence key: "handover_protocol")
+  type             HandoverType
+  
+  projectId        String
+  project          Project  @relation(fields: [projectId], references: [id])
+  subcontractContractId String?
+  subcontractContract   SubcontractContract? @relation(fields: [subcontractContractId], references: [id])
+  
+  date             DateTime
+  location         String?
+  title            String
+  description      String?
+  
+  // الأطراف — JSON مرن
+  parties          Json     // [{name, role, organization, signed, signedAt}]
+  
+  items            HandoverProtocolItem[]
+  
+  observations     Json?    // ملاحظات
+  exceptions       Json?    // عيوب/استثناءات
+  conditions       String?
+  
+  // فترة الضمان (للابتدائي)
+  warrantyStartDate DateTime?
+  warrantyEndDate   DateTime?
+  warrantyMonths    Int?     @default(12)
+  
+  // المحتجزات (للنهائي)
+  retentionReleaseAmount Decimal? @db.Decimal(15, 2)
+  retentionReleaseDate   DateTime?
+  
+  attachments      Json?
+  
+  status           HandoverStatus @default(DRAFT)
+  completedAt      DateTime?
+  createdById      String
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@unique([organizationId, protocolNo])
+  @@index([organizationId, projectId])
+  @@index([organizationId, type])
+  @@index([organizationId, status])
+}
+
+model HandoverProtocolItem {
+  id               String   @id @default(cuid())
+  protocolId       String
+  protocol         HandoverProtocol @relation(fields: [protocolId], references: [id], onDelete: Cascade)
+  
+  subcontractItemId String?
+  boqItemId         String?
+  
+  description      String
+  unit             String?
+  contractQty      Decimal? @db.Decimal(15, 4)
+  executedQty      Decimal? @db.Decimal(15, 4)
+  acceptedQty      Decimal? @db.Decimal(15, 4)
+  
+  qualityRating    QualityRating?
+  remarks          String?
+  defects          Json?
+  
+  sortOrder        Int      @default(0)
+  
+  @@index([protocolId])
+}
+```
+
+### 2.3 ربط بنظام المحاسبة — الاستلام النهائي يُحرر المحتجزات:
+
+عند اكتمال محضر الاستلام النهائي (`status = COMPLETED` و `type = FINAL`):
+
+```typescript
+// في auto-journal.ts — أضف:
+export async function onFinalHandoverCompleted(db: PrismaClient, handover: {
+  id: string;
+  organizationId: string;
+  protocolNo: string;
+  retentionReleaseAmount: Prisma.Decimal;
+  projectId: string;
+  date: Date;
+}) {
+  if (!(await ensureAccountingEnabled(db, handover.organizationId))) return;
+  if (handover.retentionReleaseAmount.lessThanOrEqualTo(0)) return;
+
+  const retentionAccId = await getAccountByCode(db, handover.organizationId, "2150"); // احتفاظات
+  const receivableId = await getAccountByCode(db, handover.organizationId, "1120"); // عملاء
+  if (!retentionAccId || !receivableId) return;
+
+  // تحرير المحتجزات: نقل من حساب الاحتفاظات إلى حساب العملاء
+  await createJournalEntry(db, {
+    organizationId: handover.organizationId,
+    date: handover.date,
+    description: `تحرير محتجزات — محضر استلام نهائي ${handover.protocolNo}`,
+    referenceType: "HANDOVER_RETENTION_RELEASE",
+    referenceId: handover.id,
+    referenceNo: handover.protocolNo,
+    isAutoGenerated: true,
+    lines: [
+      { accountId: retentionAccId, debit: handover.retentionReleaseAmount, credit: ZERO, projectId: handover.projectId },
+      { accountId: receivableId, debit: ZERO, credit: handover.retentionReleaseAmount, projectId: handover.projectId },
+    ],
+  });
+}
+```
+
+### 2.4 API Endpoints (15):
+
+```
+handover.list / getById / create / update / delete
+handover.items.add / update / delete / importFromContract / importFromBOQ
+handover.submit / sign / complete / print
+handover.getWarrantyStatus
+```
+
+### 2.5 Enums:
+
+```prisma
+enum HandoverType {
+  ITEM_ACCEPTANCE
+  PRELIMINARY
+  FINAL
+  DELIVERY
+}
+
+enum HandoverStatus {
+  DRAFT
+  PENDING_SIGNATURES
+  PARTIALLY_SIGNED
+  COMPLETED
+  ARCHIVED
+}
+
+enum QualityRating {
+  EXCELLENT
+  GOOD
+  ACCEPTABLE
+  NEEDS_REWORK
+  REJECTED
+}
+```
+
+---
+
+## المرحلة 3: كشوفات الحساب
+
+### ⚠️ تحديث مهم — الاستفادة من نظام المحاسبة الجديد:
+
+**الآن عندنا خيارين لبناء كشوفات الحساب:**
+
+**الخيار أ (الأصلي):** تقرير محسوب من الجداول المالية مباشرة (FinanceInvoice + FinancePayment + ...) — كما في الخطة الأصلية.
+
+**الخيار ب (الجديد — المفضّل):** تقرير من **القيود المحاسبية** (`JournalEntryLine`) — أدق وأشمل لأن كل عملية مالية لها قيد.
+
+**التوصية:** استخدم **الخيار ب** لكشف حساب العميل ومقاول الباطن لأن:
+- يشمل كل العمليات بدون استثناء (حتى القيود اليدوية والتسويات)
+- متطابق مع ميزان المراجعة والتقارير المحاسبية
+- أسهل في البناء (query واحد على JournalEntryLine بدل 6+ queries)
+
+### 3.1 كشف حساب العميل (من القيود المحاسبية)
+
+```typescript
+// في accounting.ts — أضف:
+export async function getClientAccountStatement(
+  db: PrismaClient,
+  organizationId: string,
+  options: {
+    clientId?: string;      // فلتر بعميل محدد (اختياري)
+    accountCode?: string;   // الافتراضي: "1120" (العملاء)
+    dateFrom?: Date;
+    dateTo?: Date;
+    projectId?: string;     // فلتر بمشروع
+  }
+) {
+  // 1. جلب كل حركات حساب العملاء (1120) من القيود المرحّلة
+  // 2. فلتر بالتاريخ والمشروع
+  // 3. لكل حركة: جلب referenceType + referenceNo من JournalEntry
+  // 4. ترتيب زمني + حساب الرصيد التراكمي
+  // 5. حساب الرصيد الافتتاحي (قبل dateFrom)
+  
+  const lines = await db.$queryRaw`
+    SELECT 
+      je."date",
+      je."referenceType",
+      je."referenceNo", 
+      je."description",
+      jel."debit",
+      jel."credit",
+      jel."projectId",
+      p."name" as "projectName"
+    FROM "JournalEntryLine" jel
+    INNER JOIN "JournalEntry" je ON je."id" = jel."journalEntryId"
+    LEFT JOIN "Project" p ON p."id" = jel."projectId"
+    WHERE je."organizationId" = ${organizationId}
+      AND je."status" = 'POSTED'
+      AND jel."accountId" = ${accountId}  -- حساب العملاء 1120
+      ${options.dateFrom ? Prisma.sql`AND je."date" >= ${options.dateFrom}` : Prisma.empty}
+      ${options.dateTo ? Prisma.sql`AND je."date" <= ${options.dateTo}` : Prisma.empty}
+      ${options.projectId ? Prisma.sql`AND jel."projectId" = ${options.projectId}` : Prisma.empty}
+    ORDER BY je."date", je."createdAt"
+  `;
+  
+  // المخرجات:
+  return {
+    openingBalance,  // رصيد أول المدة
+    transactions,    // [{date, type, reference, description, debit, credit, balance, projectName}]
+    closingBalance,  // رصيد آخر المدة
+    summary: { totalDebit, totalCredit },
+  };
+}
+```
+
+**هذا هو "كشف الحساب" (Account Ledger)** — وهو نفسه النقص الحرج اللي ذكرناه في التقييم!
+
+#### API Endpoint:
+
+```
+accounting.reports.accountLedger
+  المدخلات: organizationId, accountCode (أو accountId), dateFrom?, dateTo?, projectId?
+  المخرجات: openingBalance, transactions[], closingBalance, summary
+```
+
+**كشف حساب العميل** = `accountLedger` مع `accountCode = "1120"` + فلتر بالمشروع
+**كشف حساب مقاول الباطن** = `accountLedger` مع `accountCode = "2120"` (ذمم مقاولي باطن) + فلتر بالمشروع
+
+### 3.2 كشف حساب مقاول الباطن
+
+نفس الـ endpoint `accountLedger` مع `accountCode = "2120"` أو `"5200"`.
+
+لكن بالإضافة — نحتاج تقرير مخصص يعرض تفاصيل العقد:
+
+```
+subcontracts.getStatement
+  المدخلات: contractId, dateFrom?, dateTo?
+  المخرجات:
+    contractInfo: { contractNo, name, value, retentionPercent }
+    transactions: من accountLedger مفلتر بـ projectId
+    summary: { totalContractValue, totalClaimed, totalPaid, remainingBalance, retentionHeld }
+```
+
+### 3.3 كشف حساب المشروع
+
+```
+projects.finance.getStatement
+  المدخلات: projectId, dateFrom?, dateTo?
+  المخرجات:
+    projectInfo: { name, contractValue, progress }
+    revenue: من accountLedger حساب 4100 مفلتر بـ projectId
+    costs: من accountLedger حسابات 5xxx + 6xxx مفلتر بـ projectId
+    profitability: { grossProfit, netProfit, margins }
+    cashFlow: { totalIn, totalOut, netCash }
+```
+
+### 3.4 واجهات كشوفات الحساب:
+
+```
+المالية > العملاء > [عميل] > كشف الحساب  (tab جديد)
+المشروع > مقاولو الباطن > [عقد] > كشف الحساب  (tab جديد)
+المشروع > المالية > كشف الحساب  (tab جديد بجوار الربحية)
+```
+
+**العرض موحّد:**
+- header: معلومات العميل/المقاول/المشروع
+- فلاتر: فترة زمنية
+- جدول: التاريخ | المرجع | البيان | مدين | دائن | الرصيد
+- ملخص + تقادم ذمم (للعملاء)
+- أزرار: طباعة PDF، تصدير Excel
+
+---
+
+## المرحلة 4: طباعة PDF
+
+### القوالب المطلوبة (8):
+
+```
+RECEIPT_VOUCHER          — سند قبض
+PAYMENT_VOUCHER          — سند صرف
+ITEM_ACCEPTANCE          — محضر استلام بنود
+PRELIMINARY_HANDOVER     — محضر استلام ابتدائي
+FINAL_HANDOVER           — محضر استلام نهائي
+CLIENT_STATEMENT         — كشف حساب عميل
+SUBCONTRACTOR_STATEMENT  — كشف حساب مقاول باطن
+PROJECT_STATEMENT        — كشف حساب مشروع
+```
+
+تُنشأ كقوالب افتراضية عند seed عبر نظام `FinanceTemplate` الموجود.
+
+### Endpoints التصدير (6):
+
+```
+exports.generateReceiptVoucherPDF
+exports.generatePaymentVoucherPDF
+exports.generateHandoverPDF
+exports.generateClientStatementPDF
+exports.generateSubStatementPDF
+exports.generateProjectStatementPDF
+```
+
+---
+
+## خطة التنفيذ — ترتيب البرومبتات
+
+```
+البرومبت 1 — البنية التحتية (Schema + Enums + Tafqit):
+  ✦ إضافة VoucherStatus, PayeeType, HandoverType, HandoverStatus, QualityRating
+  ✦ إنشاء ReceiptVoucher + PaymentVoucher + HandoverProtocol + HandoverProtocolItem
+  ✦ إضافة العلاقات في Organization + Project + SubcontractContract
+  ✦ db:generate + db:push
+  ✦ بناء tafqit.ts
+  ✦ إضافة REFERENCE_TYPE_PREFIX للأنواع الجديدة
+
+البرومبت 2 — سندات القبض (API + Hooks + UI):
+  ✦ 8 procedures + router
+  ✦ onReceiptVoucherIssued hook في auto-journal.ts
+  ✦ الإنشاء التلقائي في payments.ts + create-invoice.ts + project-payments/create.ts
+  ✦ صفحة القائمة + الإنشاء + العرض
+
+البرومبت 3 — سندات الصرف (API + Hooks + UI):
+  ✦ 10 procedures + router
+  ✦ onPaymentVoucherApproved hook في auto-journal.ts
+  ✦ الإنشاء التلقائي في expenses.ts + create-payment.ts + expense-payments.ts
+  ✦ صفحة القائمة + الإنشاء + workflow الاعتماد
+
+البرومبت 4 — محاضر الاستلام (API + UI):
+  ✦ 15 procedures + router
+  ✦ onFinalHandoverCompleted hook (تحرير محتجزات)
+  ✦ صفحات: قائمة + إنشاء (4 أنواع) + عرض + توقيع
+
+البرومبت 5 — كشوفات الحساب (API + UI):
+  ✦ accountLedger procedure (الـ query الأساسي)
+  ✦ finance.clients.getStatement
+  ✦ subcontracts.getStatement
+  ✦ projects.finance.getStatement
+  ✦ 3 صفحات عرض (tab في كل قسم)
+
+البرومبت 6 — طباعة PDF:
+  ✦ 8 قوالب افتراضية
+  ✦ 6 endpoints تصدير
+  ✦ تكامل مع TemplateCustomizer
+```
+
+---
+
+## ملاحظات تقنية
+
+### 1. كل سند/محضر يُنشأ → يولّد قيد:
+- سند قبض يدوي → `onReceiptVoucherIssued`
+- سند صرف يدوي → `onPaymentVoucherApproved`
+- استلام نهائي → `onFinalHandoverCompleted` (تحرير محتجزات)
+- سندات مرتبطة بعمليات → **لا قيد مستقل** (القيد من العملية الأصلية)
+
+### 2. الأنماط المعمارية (من مسار):
+- `organizationId` على كل query
+- `Decimal(15,2)` للمالية
+- `subscriptionProcedure` للـ mutations
+- RTL: `ms-`, `me-`, `ps-`, `pe-`
+- ترجمة: `ar.json` + `en.json`
+- `orgAuditLog` لكل عملية
+
+### 3. الترقيم:
+- `OrganizationSequence` الموجود
+- أنواع جديدة: `receipt_voucher`, `payment_voucher`, `handover_protocol`
+- التنسيق: سق-001، سص-001، مح-001
+
+### 4. الصلاحيات:
+- سندات: تحت `finance.payments` الموجودة
+- محاضر: صلاحية جديدة `projects.handover`
+- كشوفات: تحت `finance.reports`

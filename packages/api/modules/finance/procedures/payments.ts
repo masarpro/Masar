@@ -175,6 +175,32 @@ export const createOrgPaymentProcedure = subscriptionProcedure
 			console.error("[AutoJournal] Failed to generate entry for payment:", e);
 		}
 
+		// Auto-create receipt voucher
+		try {
+			const { generateAtomicNo } = await import("@repo/database");
+			const { numberToArabicWords } = await import("@repo/utils");
+			const voucherNo = await generateAtomicNo(input.organizationId, "RCV");
+			await db.receiptVoucher.create({
+				data: {
+					organizationId: input.organizationId,
+					voucherNo,
+					paymentId: payment.id,
+					date: payment.date,
+					amount: payment.amount,
+					amountInWords: numberToArabicWords(Number(payment.amount)),
+					receivedFrom: input.clientName || input.description || "مقبوضات",
+					paymentMethod: input.paymentMethod || "CASH",
+					destinationAccountId: input.destinationAccountId,
+					clientId: input.clientId || null,
+					projectId: input.projectId || null,
+					status: "ISSUED",
+					createdById: context.user.id,
+				},
+			});
+		} catch (e) {
+			console.error("[ReceiptVoucher] Failed to create auto voucher from payment:", e);
+		}
+
 		return payment;
 	});
 
