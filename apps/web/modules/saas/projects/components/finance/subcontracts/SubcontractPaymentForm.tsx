@@ -142,6 +142,10 @@ export function SubcontractPaymentForm({
 			toast.error(t("subcontracts.validation.amountRequired"));
 			return;
 		}
+		if (!sourceAccountId) {
+			toast.error(t("subcontracts.validation.sourceAccountRequired"));
+			return;
+		}
 
 		createMutation.mutate({
 			organizationId,
@@ -150,7 +154,7 @@ export function SubcontractPaymentForm({
 			termId: selectedTermId || null,
 			amount: numericAmount,
 			date: new Date(date),
-			sourceAccountId: sourceAccountId || null,
+			sourceAccountId,
 			paymentMethod:
 				(paymentMethod as (typeof PAYMENT_METHODS)[number]) || null,
 			referenceNo: referenceNo || null,
@@ -309,6 +313,7 @@ export function SubcontractPaymentForm({
 					</div>
 					<h2 className="font-semibold">
 						{t("subcontracts.payment.sourceAccount")}
+						<span className="text-red-500"> *</span>
 					</h2>
 				</div>
 				<div className="space-y-4 p-5">
@@ -460,7 +465,7 @@ export function SubcontractPaymentForm({
 				<Button
 					type="submit"
 					className="flex-1 rounded-xl"
-					disabled={createMutation.isPending}
+					disabled={createMutation.isPending || !sourceAccountId}
 				>
 					{createMutation.isPending ? (
 						<>

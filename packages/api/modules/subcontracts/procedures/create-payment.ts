@@ -19,7 +19,7 @@ export const createSubcontractPaymentProcedure = subscriptionProcedure
 			termId: z.string().nullish(),
 			amount: z.number().positive("مبلغ الدفعة يجب أن يكون أكبر من صفر"),
 			date: z.coerce.date(),
-			sourceAccountId: z.string().nullish(),
+			sourceAccountId: z.string().min(1, "يجب اختيار الحساب البنكي"),
 			paymentMethod: z
 				.enum(["CASH", "BANK_TRANSFER", "CHEQUE", "CREDIT_CARD", "OTHER"])
 				.nullish(),
@@ -84,7 +84,7 @@ export const createSubcontractPaymentProcedure = subscriptionProcedure
 				contractorName: contract?.name ?? "",
 				amount: payment.amount,
 				date: new Date(input.date),
-				sourceAccountId: input.sourceAccountId ?? "",
+				sourceAccountId: input.sourceAccountId,
 				projectId: input.projectId,
 			});
 		} catch (e) {

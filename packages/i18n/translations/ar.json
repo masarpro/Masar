@@ -8938,7 +8938,8 @@
     },
     "validation": {
       "requiredFields": "الرجاء تعبئة الحقول المطلوبة",
-      "amountRequired": "الرجاء إدخال مبلغ الدفعة"
+      "amountRequired": "الرجاء إدخال مبلغ الدفعة",
+      "sourceAccountRequired": "يجب اختيار الحساب البنكي"
     }
   },
   "subscription": {

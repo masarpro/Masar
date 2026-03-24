@@ -21,7 +21,7 @@ export const addSubcontractClaimPaymentProcedure = subscriptionProcedure
 			paymentMethod: z.enum([
 				"CASH", "BANK_TRANSFER", "CHEQUE", "CREDIT_CARD", "OTHER",
 			]),
-			sourceAccountId: z.string().nullish(),
+			sourceAccountId: z.string().min(1, "يجب اختيار الحساب البنكي"),
 			description: z.string().nullish(),
 		}),
 	)
@@ -70,7 +70,7 @@ export const addSubcontractClaimPaymentProcedure = subscriptionProcedure
 					contractorName: claim?.contract?.name ?? "",
 					amount: new Prisma.Decimal(payment.amount),
 					date: input.date,
-					sourceAccountId: input.sourceAccountId ?? "",
+					sourceAccountId: input.sourceAccountId,
 					projectId: claim?.contract?.projectId ?? input.projectId,
 					claimId: input.claimId,
 				});

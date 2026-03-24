@@ -8938,7 +8938,8 @@
     },
     "validation": {
       "requiredFields": "Please fill in the required fields",
-      "amountRequired": "Please enter the payment amount"
+      "amountRequired": "Please enter the payment amount",
+      "sourceAccountRequired": "Please select a bank account"
     }
   },
   "subscription": {

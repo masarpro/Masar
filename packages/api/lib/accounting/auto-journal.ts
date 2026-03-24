@@ -2,7 +2,7 @@
 // RULE: Silent failure — never break the original operation due to accounting errors
 
 import { type PrismaClient, Prisma } from "@repo/database/prisma/generated/client";
-import { createJournalEntry, reverseJournalEntry, seedChartOfAccounts, EXPENSE_CATEGORY_TO_ACCOUNT_CODE } from "@repo/database";
+import { createJournalEntry, reverseJournalEntry, seedChartOfAccounts, createBankChartAccount, EXPENSE_CATEGORY_TO_ACCOUNT_CODE } from "@repo/database";
 
 const ZERO = new Prisma.Decimal(0);
 
@@ -55,12 +55,31 @@ async function getBankChartAccountId(db: PrismaClient, organizationId: string, b
 	if (bankId) {
 		const bank = await db.organizationBank.findUnique({
 			where: { id: bankId },
-			select: { chartAccountId: true },
+			select: { id: true, name: true, chartAccountId: true },
 		});
 		if (bank?.chartAccountId) return bank.chartAccountId;
+
+		// Bank exists but has no chart account — auto-create one
+		if (bank) {
+			const newAccId = await createBankChartAccount(db, organizationId, bank.id, bank.name);
+			if (newAccId) return newAccId;
+		}
 	}
-	// Fallback to generic Cash & Banks account
-	return getAccountByCode(db, organizationId, "1110");
+
+	// Fallback: find first postable child of 1110 (1110 itself is not postable)
+	const cashParent = await db.chartAccount.findUnique({
+		where: { organizationId_code: { organizationId, code: "1110" } },
+		select: { id: true, isPostable: true },
+	});
+	if (!cashParent) return null;
+	if (cashParent.isPostable) return cashParent.id;
+
+	const firstChild = await db.chartAccount.findFirst({
+		where: { organizationId, parentId: cashParent.id, isPostable: true, isActive: true },
+		orderBy: { code: "asc" },
+		select: { id: true },
+	});
+	return firstChild?.id ?? null;
 }
 
 // ========================================
