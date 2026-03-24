@@ -41,6 +41,44 @@ export const updateClaimStatusProcedure = subscriptionProcedure
 			input.status,
 		);
 
+		// Auto-Journal: generate accrual entry when claim is approved
+		if (input.status === "APPROVED") {
+			try {
+				const { onProjectClaimApproved } = await import("../../../lib/accounting/auto-journal");
+				const { Prisma } = await import("@repo/database/prisma/generated/client");
+				const project = await db.project.findUnique({
+					where: { id: input.projectId },
+					select: { clientName: true },
+				});
+				await onProjectClaimApproved(db, {
+					id: input.claimId,
+					organizationId: input.organizationId,
+					claimNo: existingClaim?.claimNo ?? 0,
+					clientName: project?.clientName ?? "",
+					netAmount: new Prisma.Decimal(Number(claim.amount)),
+					date: new Date(),
+					projectId: input.projectId,
+				});
+			} catch (e) {
+				console.error("[AutoJournal] Failed to generate entry for project claim approval:", e);
+			}
+		}
+
+		// Auto-Journal: reverse accrual entry when claim is rejected
+		if (input.status === "REJECTED") {
+			try {
+				const { reverseAutoJournalEntry } = await import("../../../lib/accounting/auto-journal");
+				await reverseAutoJournalEntry(db, {
+					organizationId: input.organizationId,
+					referenceType: "PROJECT_CLAIM_APPROVED",
+					referenceId: input.claimId,
+					userId: context.user.id,
+				});
+			} catch (e) {
+				console.error("[AutoJournal] Failed to reverse entry for rejected project claim:", e);
+			}
+		}
+
 		// Notify claim creator about status change (fire and forget)
 		if (existingClaim && existingClaim.createdById !== context.user.id) {
 			getProjectById(input.projectId, input.organizationId)

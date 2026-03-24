@@ -188,9 +188,9 @@ export const approvePayrollRunProcedure = subscriptionProcedure
 			await onPayrollApproved(db, {
 				id: input.id,
 				organizationId: input.organizationId,
-				month: (payrollRun as any).month ?? new Date().getMonth() + 1,
-				year: (payrollRun as any).year ?? new Date().getFullYear(),
-				totalNet: new Prisma.Decimal(Number((payrollRun as any).totalNetSalary ?? 0)),
+				month: payrollRun.month,
+				year: payrollRun.year,
+				totalNet: payrollRun.totalNetSalary,
 				totalGosi: new Prisma.Decimal(Number(gosiAgg._sum?.gosiDeduction ?? 0)),
 				// TODO: Add bank account selection to payroll approval form
 				sourceAccountId: undefined,

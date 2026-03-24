@@ -13,6 +13,7 @@ import {
 	onCreditNoteIssued,
 	onProjectPaymentReceived,
 	onSubcontractClaimApproved,
+	onProjectClaimApproved,
 } from "./auto-journal";
 
 export interface BackfillResult {
@@ -26,6 +27,7 @@ export interface BackfillResult {
 	creditNotes: number;
 	projectPayments: number;
 	claimsApproved: number;
+	projectClaimsApproved: number;
 	total: number;
 	errors: { type: string; id: string; error: string }[];
 }
@@ -37,7 +39,7 @@ export async function backfillJournalEntries(
 	const r: BackfillResult = {
 		invoices: 0, invoicePayments: 0, expenses: 0, transfers: 0,
 		subcontractPayments: 0, payroll: 0, orgPayments: 0, creditNotes: 0,
-		projectPayments: 0, claimsApproved: 0, total: 0, errors: [],
+		projectPayments: 0, claimsApproved: 0, projectClaimsApproved: 0, total: 0, errors: [],
 	};
 
 	async function hasEntry(refType: string, refId: string): Promise<boolean> {
@@ -218,9 +220,26 @@ export async function backfillJournalEntries(
 		} catch (e: any) { r.errors.push({ type: "PROJECT_PAYMENT", id: pp.paymentNo, error: e.message }); }
 	}
 
+	// --- 11. Approved Project Claims (accrual — revenue recognition) ---
+	const projectClaims = await db.projectClaim.findMany({
+		where: { organizationId, status: { in: ["APPROVED", "PAID"] } },
+		include: { project: { select: { clientName: true } } },
+	});
+	for (const pc of projectClaims) {
+		if (await hasEntry("PROJECT_CLAIM_APPROVED", pc.id)) continue;
+		try {
+			await onProjectClaimApproved(db, {
+				id: pc.id, organizationId, claimNo: pc.claimNo,
+				clientName: pc.project.clientName || "",
+				netAmount: pc.amount, date: pc.approvedAt || pc.createdAt, projectId: pc.projectId,
+			});
+			r.projectClaimsApproved++;
+		} catch (e: any) { r.errors.push({ type: "PROJECT_CLAIM_APPROVED", id: `PCLM-${pc.claimNo}`, error: e.message }); }
+	}
+
 	r.total = r.invoices + r.invoicePayments + r.expenses + r.transfers +
 		r.subcontractPayments + r.payroll + r.orgPayments + r.creditNotes +
-		r.projectPayments + r.claimsApproved;
+		r.projectPayments + r.claimsApproved + r.projectClaimsApproved;
 
 	return r;
 }

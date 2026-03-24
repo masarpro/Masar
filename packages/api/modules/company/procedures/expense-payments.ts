@@ -169,8 +169,58 @@ export const updateExpensePaymentProcedure = subscriptionProcedure
 			action: "expenses",
 		});
 
+		// Check if payment was already paid (has linked FinanceExpense with journal entry)
+		const existingPayment = await db.companyExpensePayment.findUnique({
+			where: { id: input.id },
+			select: { isPaid: true, financeExpenseId: true, amount: true },
+		});
+
 		const { organizationId, id, ...data } = input;
-		return updateExpensePayment(id, data);
+		const result = await updateExpensePayment(id, data);
+
+		// If payment was paid and amount changed → reverse old journal + create new one
+		if (existingPayment?.isPaid && existingPayment.financeExpenseId && input.amount !== undefined) {
+			const amountChanged = Number(existingPayment.amount) !== input.amount;
+			if (amountChanged) {
+				try {
+					const { reverseAutoJournalEntry, onExpenseCompleted } = await import("../../../lib/accounting/auto-journal");
+					// Reverse old entry
+					await reverseAutoJournalEntry(db, {
+						organizationId: input.organizationId,
+						referenceType: "EXPENSE",
+						referenceId: existingPayment.financeExpenseId,
+						userId: context.user.id,
+					});
+					// Update linked FinanceExpense amount
+					await db.financeExpense.update({
+						where: { id: existingPayment.financeExpenseId },
+						data: { amount: input.amount },
+					});
+					// Re-create journal entry with new amount
+					const expense = await db.financeExpense.findUnique({
+						where: { id: existingPayment.financeExpenseId },
+						select: { id: true, category: true, amount: true, date: true, description: true, sourceAccountId: true, projectId: true, sourceType: true },
+					});
+					if (expense) {
+						await onExpenseCompleted(db, {
+							id: expense.id,
+							organizationId: input.organizationId,
+							category: expense.category,
+							amount: expense.amount,
+							date: expense.date,
+							description: expense.description ?? expense.category,
+							sourceAccountId: expense.sourceAccountId,
+							projectId: expense.projectId,
+							sourceType: expense.sourceType,
+						});
+					}
+				} catch (e) {
+					console.error("[AutoJournal] Failed to adjust entry for updated company expense payment:", e);
+				}
+			}
+		}
+
+		return result;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -195,7 +245,37 @@ export const deleteExpensePaymentProcedure = subscriptionProcedure
 			action: "expenses",
 		});
 
-		return deleteExpensePayment(input.id);
+		// Check if this payment has a linked FinanceExpense (created when marked as paid)
+		const payment = await db.companyExpensePayment.findUnique({
+			where: { id: input.id },
+			select: { financeExpenseId: true },
+		});
+
+		const result = await deleteExpensePayment(input.id);
+
+		// Auto-Journal: reverse accounting entry for the linked FinanceExpense
+		if (payment?.financeExpenseId) {
+			try {
+				const { reverseAutoJournalEntry } = await import("../../../lib/accounting/auto-journal");
+				await reverseAutoJournalEntry(db, {
+					organizationId: input.organizationId,
+					referenceType: "EXPENSE",
+					referenceId: payment.financeExpenseId,
+					userId: context.user.id,
+				});
+			} catch (e) {
+				console.error("[AutoJournal] Failed to reverse entry for deleted company expense payment:", e);
+			}
+
+			// Delete the orphaned FinanceExpense
+			try {
+				await db.financeExpense.delete({ where: { id: payment.financeExpenseId } });
+			} catch {
+				// Silently ignore — may already be deleted via cascade
+			}
+		}
+
+		return result;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
