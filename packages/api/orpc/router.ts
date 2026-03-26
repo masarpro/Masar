@@ -40,6 +40,7 @@ import { onboardingRouter } from "../modules/onboarding/router";
 import { activationCodesRouter } from "../modules/activation-codes/router";
 import { projectBoqRouter } from "../modules/project-boq/router";
 import { accountingRouter } from "../modules/accounting/router";
+import { handoverRouter } from "../modules/handover/router";
 import { publicProcedure } from "./procedures";
 
 export const router = publicProcedure.router({
@@ -103,6 +104,8 @@ export const router = publicProcedure.router({
 	activationCodes: activationCodesRouter,
 	// Accounting - المحاسبة
 	accounting: accountingRouter,
+	// Handover Protocols - محاضر الاستلام والتسليم
+	handover: handoverRouter,
 });
 
 export type ApiRouterClient = RouterClient<typeof router>;

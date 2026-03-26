@@ -41,7 +41,14 @@ import {
 	getVendorStatementProcedure,
 } from "./procedures/statements";
 
+import {
+	getAccountLedgerByCodeProcedure,
+	getSubcontractStatementProcedure,
+	getProjectStatementProcedure,
+} from "./procedures/account-statements";
+
 import { backfillJournalEntriesProcedure } from "./procedures/backfill";
+import { checkAccountingHealthProcedure } from "./procedures/health";
 
 import {
 	listRecurringTemplatesProcedure,
@@ -102,6 +109,9 @@ export const accountingRouter = {
 	statements: {
 		client: getClientStatementProcedure,
 		vendor: getVendorStatementProcedure,
+		accountLedger: getAccountLedgerByCodeProcedure,
+		subcontract: getSubcontractStatementProcedure,
+		project: getProjectStatementProcedure,
 	},
 
 	// Recurring Journal Entries
@@ -111,6 +121,11 @@ export const accountingRouter = {
 		update: updateRecurringTemplateProcedure,
 		delete: deleteRecurringTemplateProcedure,
 		generate: generateDueEntriesProcedure,
+	},
+
+	// Health Check
+	health: {
+		check: checkAccountingHealthProcedure,
 	},
 
 	// Accounting Periods

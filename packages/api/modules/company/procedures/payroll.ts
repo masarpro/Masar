@@ -163,6 +163,7 @@ export const approvePayrollRunProcedure = subscriptionProcedure
 		z.object({
 			organizationId: z.string(),
 			id: z.string(),
+			sourceAccountId: z.string().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -175,6 +176,24 @@ export const approvePayrollRunProcedure = subscriptionProcedure
 			organizationId: input.organizationId,
 			approvedById: context.user.id,
 		});
+
+		// Resolve bank account: explicit selection → default bank → fallback
+		let resolvedBankId = input.sourceAccountId;
+		if (!resolvedBankId) {
+			const defaultBank = await db.organizationBank.findFirst({
+				where: { organizationId: input.organizationId, isDefault: true, isActive: true },
+				select: { id: true },
+			});
+			resolvedBankId = defaultBank?.id;
+		}
+
+		// Store the bank account on the payroll run
+		if (resolvedBankId) {
+			await db.payrollRun.update({
+				where: { id: input.id },
+				data: { sourceAccountId: resolvedBankId },
+			}).catch(() => {});
+		}
 
 		// Auto-Journal: generate accounting entry for payroll approval
 		try {
@@ -192,8 +211,8 @@ export const approvePayrollRunProcedure = subscriptionProcedure
 				year: payrollRun.year,
 				totalNet: payrollRun.totalNetSalary,
 				totalGosi: new Prisma.Decimal(Number(gosiAgg._sum?.gosiDeduction ?? 0)),
-				// TODO: Add bank account selection to payroll approval form
-				sourceAccountId: undefined,
+				sourceAccountId: resolvedBankId,
+				userId: context.user.id,
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for payroll:", e);

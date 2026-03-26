@@ -170,6 +170,7 @@ export const createOrgPaymentProcedure = subscriptionProcedure
 				description: input.description ?? "مقبوضات",
 				destinationAccountId: input.destinationAccountId,
 				projectId: input.projectId,
+				userId: context.user.id,
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for payment:", e);

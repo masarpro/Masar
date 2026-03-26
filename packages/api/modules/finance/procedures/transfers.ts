@@ -149,6 +149,7 @@ export const createTransferProcedure = subscriptionProcedure
 				fromAccountId: input.fromAccountId,
 				toAccountId: input.toAccountId,
 				description: input.description,
+				userId: context.user.id,
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for transfer:", e);

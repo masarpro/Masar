@@ -11,11 +11,15 @@ import {
 	FileEdit,
 	Send,
 	TrendingUp,
+	TrendingDown,
 	DollarSign,
 	CreditCard,
 	ClipboardList,
 	RefreshCw,
 	CheckCircle,
+	Users,
+	Building2,
+	HeartPulse,
 } from "lucide-react";
 import { formatAccounting } from "./formatters";
 import Link from "next/link";
@@ -39,6 +43,12 @@ export function AccountingDashboard({
 		}),
 	);
 
+	const healthQuery = useQuery(
+		orpc.accounting.health.check.queryOptions({
+			input: { organizationId },
+		}),
+	);
+
 	const backfillMutation = useMutation({
 		...orpc.accounting.backfill.mutationOptions(),
 		onSuccess: () => {
@@ -50,7 +60,7 @@ export function AccountingDashboard({
 
 	return (
 		<div className="space-y-4">
-			{/* KPI Cards */}
+			{/* Primary KPI Cards — For the Contractor */}
 			<div className="grid gap-3 sm:grid-cols-4">
 				<Card className="rounded-2xl">
 					<CardContent className="p-4">
@@ -116,6 +126,101 @@ export function AccountingDashboard({
 					</CardContent>
 				</Card>
 			</div>
+
+			{/* Secondary KPI Cards — Revenue, Expenses, Receivable, Payable */}
+			<div className="grid gap-3 sm:grid-cols-4">
+				<Card className="rounded-2xl">
+					<CardContent className="p-4">
+						<div className="flex items-center justify-between">
+							<div>
+								<p className="text-xs text-slate-500">{t("finance.accounting.dashboard.totalRevenue")}</p>
+								<p className="text-lg font-bold text-green-600 mt-1">
+									{formatAccounting(data.totalRevenue)}
+								</p>
+							</div>
+							<div className="p-2.5 bg-green-100 dark:bg-green-900/30 rounded-xl">
+								<TrendingUp className="h-5 w-5 text-green-600" />
+							</div>
+						</div>
+					</CardContent>
+				</Card>
+
+				<Card className="rounded-2xl">
+					<CardContent className="p-4">
+						<div className="flex items-center justify-between">
+							<div>
+								<p className="text-xs text-slate-500">{t("finance.accounting.dashboard.totalExpenses")}</p>
+								<p className="text-lg font-bold text-red-600 mt-1">
+									{formatAccounting(data.totalExpenses)}
+								</p>
+							</div>
+							<div className="p-2.5 bg-red-100 dark:bg-red-900/30 rounded-xl">
+								<TrendingDown className="h-5 w-5 text-red-600" />
+							</div>
+						</div>
+					</CardContent>
+				</Card>
+
+				<Card className="rounded-2xl">
+					<CardContent className="p-4">
+						<div className="flex items-center justify-between">
+							<div>
+								<p className="text-xs text-slate-500">{t("finance.accounting.dashboard.accountsReceivable")}</p>
+								<p className="text-lg font-bold text-blue-600 mt-1">
+									{formatAccounting(data.accountsReceivable)}
+								</p>
+							</div>
+							<div className="p-2.5 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+								<Users className="h-5 w-5 text-blue-600" />
+							</div>
+						</div>
+					</CardContent>
+				</Card>
+
+				<Card className="rounded-2xl">
+					<CardContent className="p-4">
+						<div className="flex items-center justify-between">
+							<div>
+								<p className="text-xs text-slate-500">{t("finance.accounting.dashboard.accountsPayable")}</p>
+								<p className="text-lg font-bold text-amber-600 mt-1">
+									{formatAccounting(data.accountsPayable)}
+								</p>
+							</div>
+							<div className="p-2.5 bg-amber-100 dark:bg-amber-900/30 rounded-xl">
+								<Building2 className="h-5 w-5 text-amber-600" />
+							</div>
+						</div>
+					</CardContent>
+				</Card>
+			</div>
+
+			{/* Health Status */}
+			{healthQuery.data && (
+				<div className={`flex items-center gap-2 p-3 rounded-xl border ${
+					healthQuery.data.isHealthy
+						? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+						: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+				}`}>
+					{healthQuery.data.isHealthy ? (
+						<CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+					) : (
+						<HeartPulse className="h-4 w-4 text-red-600 flex-shrink-0" />
+					)}
+					<span className={`text-sm ${healthQuery.data.isHealthy ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"}`}>
+						{healthQuery.data.isHealthy
+							? t("finance.accounting.health.healthy")
+							: t("finance.accounting.health.issues", {
+								count: (healthQuery.data.unbalancedEntries?.length ?? 0) +
+									(healthQuery.data.invoicesWithoutEntries?.length ?? 0) +
+									(healthQuery.data.orphanedInvoiceEntries?.length ?? 0) +
+									(healthQuery.data.expensesWithoutEntries?.length ?? 0),
+							})}
+					</span>
+					<Link href={`${basePath}/accounting-reports/health`} className={`text-sm hover:underline ms-auto ${healthQuery.data.isHealthy ? "text-green-600" : "text-red-600"}`}>
+						{t("finance.accountingReports.viewReport")}
+					</Link>
+				</div>
+			)}
 
 			{/* Alerts */}
 			{!data.isTrialBalanceBalanced && (

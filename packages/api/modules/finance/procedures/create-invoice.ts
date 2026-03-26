@@ -468,6 +468,7 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 					date: new Date(input.paymentDate),
 					sourceAccountId: input.sourceAccountId || "",
 					projectId: inv.projectId,
+					userId: context.user.id,
 				});
 			}
 		} catch (e) {
@@ -752,6 +753,7 @@ export const issueInvoiceProcedure = subscriptionProcedure
 				totalAmount: issuedInvoice.totalAmount,
 				vatAmount: issuedInvoice.vatAmount,
 				projectId: issuedInvoice.projectId,
+				userId: context.user.id,
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for invoice issue:", e);
@@ -943,6 +945,7 @@ export const createCreditNoteProcedure = subscriptionProcedure
 				totalAmount: creditNote.totalAmount,
 				vatAmount: creditNote.vatAmount,
 				projectId: creditNote.projectId,
+				userId: context.user.id,
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for credit note:", e);

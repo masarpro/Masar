@@ -8,6 +8,7 @@ import {
 	getPurchasesByUserId,
 	getUserByEmail,
 	assignRoleToUser,
+	seedChartOfAccounts,
 } from "@repo/database";
 import type { Locale } from "@repo/i18n";
 import { logger } from "@repo/logs";
@@ -132,6 +133,13 @@ export const auth = betterAuth({
 							const ownerRole = roles.find((r) => r.type === "OWNER");
 							if (userId && ownerRole) {
 								await assignRoleToUser(userId, ownerRole.id);
+							}
+
+							// Seed default chart of accounts for the new organization
+							try {
+								await seedChartOfAccounts(db, org.id);
+							} catch (e) {
+								logger.error("Failed to seed chart of accounts", e);
 							}
 						}
 					} catch (e) {

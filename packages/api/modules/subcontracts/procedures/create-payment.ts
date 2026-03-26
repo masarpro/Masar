@@ -86,9 +86,39 @@ export const createSubcontractPaymentProcedure = subscriptionProcedure
 				date: new Date(input.date),
 				sourceAccountId: input.sourceAccountId,
 				projectId: input.projectId,
+				userId: context.user.id,
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for subcontract payment:", e);
+		}
+
+		// Auto-create payment voucher for subcontract payment
+		try {
+			const { generateAtomicNo } = await import("@repo/database");
+			const { numberToArabicWords } = await import("@repo/utils");
+			const voucherNo = await generateAtomicNo(input.organizationId, "PMT");
+			await db.paymentVoucher.create({
+				data: {
+					organizationId: input.organizationId,
+					voucherNo,
+					subcontractPaymentId: payment.id,
+					date: new Date(input.date),
+					amount: payment.amount,
+					amountInWords: numberToArabicWords(Number(payment.amount)),
+					payeeName: contract?.name ?? "مقاول باطن",
+					payeeType: "SUBCONTRACTOR",
+					paymentMethod: input.paymentMethod || "BANK_TRANSFER",
+					sourceAccountId: input.sourceAccountId || null,
+					projectId: input.projectId,
+					subcontractContractId: input.contractId,
+					status: "ISSUED",
+					preparedById: context.user.id,
+					approvedById: context.user.id,
+					approvedAt: new Date(),
+				},
+			});
+		} catch (e) {
+			console.error("[PaymentVoucher] Failed to create auto voucher from subcontract payment:", e);
 		}
 
 		return { ...payment, amount: Number(payment.amount) };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
@@ -16,7 +16,6 @@ import {
 	Folder,
 	Plus,
 	Search,
-	Sparkles,
 } from "lucide-react";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { ACCOUNT_TYPE_COLORS } from "./formatters";
@@ -59,6 +58,15 @@ export function ChartOfAccountsPage({ organizationId, organizationSlug }: ChartO
 			queryClient.invalidateQueries({ queryKey: ["accounting"] });
 		},
 	});
+
+	// Auto-seed chart of accounts if empty (rare edge case — normally seeded at org creation)
+	const autoSeeded = useRef(false);
+	useEffect(() => {
+		if (!isLoading && accounts && accounts.length === 0 && !seedMutation.isPending && !autoSeeded.current) {
+			autoSeeded.current = true;
+			seedMutation.mutate({ organizationId });
+		}
+	}, [isLoading, accounts, seedMutation.isPending, organizationId]);
 
 	// Build tree from flat list
 	const tree = useMemo(() => {
@@ -116,33 +124,9 @@ export function ChartOfAccountsPage({ organizationId, organizationSlug }: ChartO
 
 	if (isLoading) return <DashboardSkeleton />;
 
-	// No accounts — show empty state with seed button
+	// No accounts — auto-seeding in progress, show skeleton
 	if (!accounts || accounts.length === 0) {
-		return (
-			<div className="flex items-center justify-center min-h-[400px]">
-				<Card className="rounded-2xl max-w-md w-full">
-					<CardContent className="p-8 text-center">
-						<div className="p-4 bg-primary/10 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-							<BookOpen className="h-8 w-8 text-primary" />
-						</div>
-						<h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-							{t("finance.accounting.noChartOfAccounts")}
-						</h2>
-						<p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-							{t("finance.accounting.activateDescription")}
-						</p>
-						<Button
-							onClick={() => seedMutation.mutate({ organizationId })}
-							disabled={seedMutation.isPending}
-							className="w-full"
-						>
-							<Sparkles className="h-4 w-4 me-2" />
-							{seedMutation.isPending ? "..." : t("finance.accounting.createChartOfAccounts")}
-						</Button>
-					</CardContent>
-				</Card>
-			</div>
-		);
+		return <DashboardSkeleton />;
 	}
 
 	return (

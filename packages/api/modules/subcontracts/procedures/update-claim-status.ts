@@ -66,9 +66,25 @@ export const updateSubcontractClaimStatusProcedure = subscriptionProcedure
 						netAmount: claim.netAmount,
 						date: new Date(),
 						projectId: contract?.projectId ?? input.projectId,
+						userId: context.user.id,
 					});
 				} catch (e) {
 					console.error("[AutoJournal] Failed for SubcontractClaim approval:", e);
+				}
+			}
+
+			// Auto-Journal: reverse accrual entry when claim is rejected or cancelled
+			if (input.status === "REJECTED" || input.status === "CANCELLED") {
+				try {
+					const { reverseAutoJournalEntry } = await import("../../../lib/accounting/auto-journal");
+					await reverseAutoJournalEntry(db, {
+						organizationId: input.organizationId,
+						referenceType: "SUBCONTRACT_CLAIM_APPROVED",
+						referenceId: input.claimId,
+						userId: context.user.id,
+					});
+				} catch (e) {
+					console.error("[AutoJournal] Failed to reverse entry for rejected/cancelled subcontract claim:", e);
 				}
 			}
 

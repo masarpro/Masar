@@ -3613,6 +3613,7 @@ enum OrgAuditAction {
 
   // ── المحاسبة (Accounting) ──
   JOURNAL_ENTRY_SKIPPED     // تخطّي قيد تلقائي (فترة مغلقة)
+  JOURNAL_ENTRY_FAILED      // فشل إنشاء قيد تلقائي
 
   // ── المشاريع (Projects) ──
   PROJECT_ARCHIVED          // أرشفة مشروع
@@ -3631,6 +3632,26 @@ enum OrgAuditAction {
   RECEIPT_VOUCHER_UPDATED   // تعديل سند قبض
   RECEIPT_VOUCHER_ISSUED    // إصدار سند قبض
   RECEIPT_VOUCHER_CANCELLED // إلغاء سند قبض
+
+  // ── سندات الصرف (Payment Vouchers) ──
+  PAYMENT_VOUCHER_CREATED   // إنشاء سند صرف
+  PAYMENT_VOUCHER_UPDATED   // تعديل سند صرف
+  PAYMENT_VOUCHER_SUBMITTED // تقديم سند صرف للاعتماد
+  PAYMENT_VOUCHER_APPROVED  // اعتماد سند صرف
+  PAYMENT_VOUCHER_REJECTED  // رفض سند صرف
+  PAYMENT_VOUCHER_CANCELLED // إلغاء سند صرف
+
+  // ── محاضر الاستلام (Handover Protocols) ──
+  HANDOVER_CREATED          // إنشاء محضر
+  HANDOVER_UPDATED          // تعديل محضر
+  HANDOVER_DELETED          // حذف محضر
+  HANDOVER_SUBMITTED        // تقديم محضر للتوقيع
+  HANDOVER_SIGNED           // توقيع محضر
+  HANDOVER_COMPLETED        // إكمال محضر
+  HANDOVER_ITEM_ADDED       // إضافة بند
+  HANDOVER_ITEM_UPDATED     // تعديل بند
+  HANDOVER_ITEM_DELETED     // حذف بند
+  HANDOVER_ITEMS_IMPORTED   // استيراد بنود
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -4202,6 +4223,9 @@ model OrganizationBank {
   receiptVouchersTo   ReceiptVoucher[]  @relation("ReceiptVoucherDestination")
   paymentVouchersFrom PaymentVoucher[]  @relation("PaymentVoucherSource")
 
+  // Payroll - مسيرات الرواتب
+  payrollRuns         PayrollRun[]
+
   @@index([organizationId])
   @@index([organizationId, accountType])
   @@index([organizationId, isActive])
@@ -4754,6 +4778,10 @@ model PayrollRun {
   approvedById    String?             @map("approved_by")
   approvedBy      User?               @relation("PayrollRunApprover", fields: [approvedById], references: [id])
   approvedAt      DateTime?           @map("approved_at")
+
+  // حساب البنك المصدر
+  sourceAccountId String?             @map("source_account_id")
+  sourceAccount   OrganizationBank?   @relation(fields: [sourceAccountId], references: [id])
 
   // الإنشاء
   createdById     String              @map("created_by")

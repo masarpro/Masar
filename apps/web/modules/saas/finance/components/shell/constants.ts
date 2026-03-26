@@ -10,6 +10,7 @@ import {
 	BarChart3,
 	ClipboardList,
 	FileCheck,
+	FileMinus,
 } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════════
@@ -57,6 +58,12 @@ export const FINANCE_NAV_SECTIONS: FinanceNavSection[] = [
 		path: "receipt-vouchers",
 		labelKey: "finance.shell.sections.receiptVouchers",
 		icon: FileCheck,
+	},
+	{
+		id: "payment-vouchers",
+		path: "payment-vouchers",
+		labelKey: "finance.shell.sections.paymentVouchers",
+		icon: FileMinus,
 	},
 	{
 		id: "expenses",

@@ -71,6 +71,7 @@ export const createProjectPaymentProcedure = subscriptionProcedure
 				destinationAccountId: input.destinationAccountId ?? "",
 				projectId: input.projectId,
 				paymentNo: payment.paymentNo,
+				userId: context.user.id,
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to create ProjectPayment entry:", e);

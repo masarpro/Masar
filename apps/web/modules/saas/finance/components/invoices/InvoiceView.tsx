@@ -59,6 +59,7 @@ import {
 	StickyNote,
 } from "lucide-react";
 import { StatusBadge } from "../shared/StatusBadge";
+import { JournalEntryLink } from "../shared/JournalEntryLink";
 import { Currency } from "../shared/Currency";
 import { formatDate, formatDateTime } from "../../lib/utils";
 import { InvoiceDocument } from "./InvoiceDocument";
@@ -319,6 +320,14 @@ export function InvoiceView({
 								<div className="flex items-center gap-2 flex-wrap">
 									<h1 className="text-base font-bold leading-tight truncate">{invoice.invoiceNo}</h1>
 									<StatusBadge status={invoice.status} type="invoice" />
+									{invoice.status !== "DRAFT" && (
+										<JournalEntryLink
+											organizationId={organizationId}
+											organizationSlug={organizationSlug}
+											referenceType="INVOICE"
+											referenceId={invoiceId}
+										/>
+									)}
 									{invoice.clientName && (
 										<>
 											<span className="text-muted-foreground/50">·</span>

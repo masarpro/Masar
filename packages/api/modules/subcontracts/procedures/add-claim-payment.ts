@@ -73,6 +73,7 @@ export const addSubcontractClaimPaymentProcedure = subscriptionProcedure
 					sourceAccountId: input.sourceAccountId,
 					projectId: claim?.contract?.projectId ?? input.projectId,
 					claimId: input.claimId,
+					userId: context.user.id,
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to create SubcontractClaimPayment entry:", e);

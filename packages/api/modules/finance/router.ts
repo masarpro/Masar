@@ -113,6 +113,19 @@ import {
 } from "./procedures/receipt-vouchers";
 
 import {
+	listPaymentVouchers,
+	getPaymentVoucher,
+	createPaymentVoucher,
+	updatePaymentVoucher,
+	submitPaymentVoucher,
+	approvePaymentVoucher,
+	rejectPaymentVoucher,
+	cancelPaymentVoucher,
+	printPaymentVoucher,
+	getPaymentVoucherSummary,
+} from "./procedures/payment-vouchers";
+
+import {
 	listTransfers,
 	getTransfer,
 	createTransferProcedure,
@@ -254,6 +267,20 @@ export const financeRouter = {
 		cancel: cancelReceiptVoucher,
 		print: printReceiptVoucher,
 		getSummary: getReceiptVoucherSummary,
+	},
+
+	// Payment Vouchers / Disbursements (سندات الصرف)
+	disbursements: {
+		list: listPaymentVouchers,
+		getById: getPaymentVoucher,
+		create: createPaymentVoucher,
+		update: updatePaymentVoucher,
+		submit: submitPaymentVoucher,
+		approve: approvePaymentVoucher,
+		reject: rejectPaymentVoucher,
+		cancel: cancelPaymentVoucher,
+		print: printPaymentVoucher,
+		getSummary: getPaymentVoucherSummary,
 	},
 
 	// Transfers (التحويلات)

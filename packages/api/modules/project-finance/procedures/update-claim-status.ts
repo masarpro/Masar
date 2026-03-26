@@ -58,6 +58,7 @@ export const updateClaimStatusProcedure = subscriptionProcedure
 					netAmount: new Prisma.Decimal(Number(claim.amount)),
 					date: new Date(),
 					projectId: input.projectId,
+					userId: context.user.id,
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to generate entry for project claim approval:", e);

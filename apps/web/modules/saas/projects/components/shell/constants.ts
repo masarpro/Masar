@@ -18,6 +18,7 @@ import {
 	Receipt,
 	Hammer,
 	Calculator,
+	ClipboardCheck,
 } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════════
@@ -105,6 +106,13 @@ export const PROJECT_NAV_SECTIONS: ProjectNavSection[] = [
 		labelKey: "projects.shell.sections.subcontracts",
 		icon: Hammer,
 		section: "finance/subcontracts",
+	},
+	{
+		id: "handover",
+		path: "handover",
+		labelKey: "projects.shell.sections.handover",
+		icon: ClipboardCheck,
+		section: "handover",
 	},
 	{
 		id: "documents",

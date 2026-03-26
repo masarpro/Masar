@@ -375,6 +375,7 @@ export const issueReceiptVoucher = subscriptionProcedure
 					receivedFrom: voucher.receivedFrom,
 					destinationAccountId: voucher.destinationAccountId,
 					projectId: voucher.projectId,
+					userId: context.user.id,
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to generate entry for receipt voucher:", e);

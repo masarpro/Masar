@@ -130,11 +130,48 @@ export const markPaymentPaidProcedure = subscriptionProcedure
 						sourceAccountId: expense.sourceAccountId,
 						projectId: expense.projectId,
 						sourceType: expense.sourceType,
+						userId: context.user.id,
 					});
 				}
 			}
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for company expense payment:", e);
+		}
+
+		// Auto-create payment voucher for company expense payment
+		try {
+			if (result.financeExpenseId) {
+				const { generateAtomicNo } = await import("@repo/database");
+				const { numberToArabicWords } = await import("@repo/utils");
+				const expenseData = await db.financeExpense.findUnique({
+					where: { id: result.financeExpenseId },
+					select: { id: true, amount: true, date: true, vendorName: true, description: true, category: true, projectId: true },
+				});
+				if (expenseData) {
+					const voucherNo = await generateAtomicNo(input.organizationId, "PMT");
+					await db.paymentVoucher.create({
+						data: {
+							organizationId: input.organizationId,
+							voucherNo,
+							expenseId: expenseData.id,
+							date: expenseData.date,
+							amount: expenseData.amount,
+							amountInWords: numberToArabicWords(Number(expenseData.amount)),
+							payeeName: expenseData.vendorName || expenseData.description || expenseData.category,
+							payeeType: "SUPPLIER",
+							paymentMethod: "BANK_TRANSFER",
+							sourceAccountId: input.bankAccountId || null,
+							projectId: expenseData.projectId || null,
+							status: "ISSUED",
+							preparedById: context.user.id,
+							approvedById: context.user.id,
+							approvedAt: new Date(),
+						},
+					});
+				}
+			}
+		} catch (e) {
+			console.error("[PaymentVoucher] Failed to create auto voucher from company expense:", e);
 		}
 
 		return result;
@@ -212,6 +249,7 @@ export const updateExpensePaymentProcedure = subscriptionProcedure
 							sourceAccountId: expense.sourceAccountId,
 							projectId: expense.projectId,
 							sourceType: expense.sourceType,
+							userId: context.user.id,
 						});
 					}
 				} catch (e) {

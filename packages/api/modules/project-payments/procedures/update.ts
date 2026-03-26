@@ -67,6 +67,7 @@ export const updateProjectPaymentProcedure = subscriptionProcedure
 					destinationAccountId: payment.destinationAccountId ?? "",
 					projectId: payment.projectId,
 					paymentNo: payment.paymentNo,
+					userId: context.user.id,
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to update ProjectPayment entry:", e);

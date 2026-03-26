@@ -9,6 +9,13 @@ import { orpcClient } from "@shared/lib/orpc-client";
 import { Button } from "@ui/components/button";
 import { Badge } from "@ui/components/badge";
 import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@ui/components/select";
+import {
 	Table,
 	TableBody,
 	TableCell,
@@ -68,6 +75,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 	const queryClient = useQueryClient();
 	const [showApproveDialog, setShowApproveDialog] = useState(false);
 	const [showCancelDialog, setShowCancelDialog] = useState(false);
+	const [selectedBankId, setSelectedBankId] = useState<string>("");
 	const [editItem, setEditItem] = useState<{ id: string; [key: string]: unknown } | null>(null);
 	const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
 
@@ -78,6 +86,12 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 	const { data: run, isLoading } = useQuery(
 		orpc.company.payroll.getById.queryOptions({
 			input: { organizationId, id: runId },
+		}),
+	);
+
+	const { data: bankAccounts } = useQuery(
+		orpc.finance.banks.list.queryOptions({
+			input: { organizationId },
 		}),
 	);
 
@@ -130,6 +144,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 			return orpcClient.company.payroll.approve({
 				organizationId,
 				id: runId,
+				sourceAccountId: selectedBankId || undefined,
 			});
 		},
 		onSuccess: () => {
@@ -558,6 +573,25 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 							{t("company.payroll.approveConfirm")}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
+					{bankAccounts && bankAccounts.length > 0 && (
+						<div className="space-y-2 py-2">
+							<label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+								{t("company.payroll.sourceAccount")}
+							</label>
+							<Select value={selectedBankId} onValueChange={setSelectedBankId}>
+								<SelectTrigger className="rounded-xl">
+									<SelectValue placeholder={t("company.payroll.selectSourceAccount")} />
+								</SelectTrigger>
+								<SelectContent>
+									{bankAccounts.map((bank: any) => (
+										<SelectItem key={bank.id} value={bank.id}>
+											{bank.name} {bank.isDefault ? `(${t("company.payroll.default")})` : ""}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+					)}
 					<AlertDialogFooter>
 						<AlertDialogCancel className="rounded-xl">
 							{t("company.common.cancel")}

@@ -271,9 +271,38 @@ export const createExpenseProcedure = subscriptionProcedure
 					sourceAccountId: input.sourceAccountId,
 					projectId: input.projectId,
 					sourceType: input.sourceType,
+					userId: context.user.id,
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to generate entry for expense:", e);
+			}
+
+			// Auto-create payment voucher for completed expense
+			try {
+				const { generateAtomicNo } = await import("@repo/database");
+				const { numberToArabicWords } = await import("@repo/utils");
+				const voucherNo = await generateAtomicNo(input.organizationId, "PMT");
+				await db.paymentVoucher.create({
+					data: {
+						organizationId: input.organizationId,
+						voucherNo,
+						expenseId: expense.id,
+						date: expense.date,
+						amount: expense.amount,
+						amountInWords: numberToArabicWords(Number(expense.amount)),
+						payeeName: input.vendorName || input.description || input.category,
+						payeeType: "SUPPLIER",
+						paymentMethod: input.paymentMethod || "BANK_TRANSFER",
+						sourceAccountId: input.sourceAccountId || null,
+						projectId: input.projectId || null,
+						status: "ISSUED",
+						preparedById: context.user.id,
+						approvedById: context.user.id,
+						approvedAt: new Date(),
+					},
+				});
+			} catch (e) {
+				console.error("[PaymentVoucher] Failed to create auto voucher from expense:", e);
 			}
 		}
 
@@ -434,9 +463,38 @@ export const payExpenseProcedure = subscriptionProcedure
 				sourceAccountId: input.sourceAccountId,
 				projectId: expense.projectId,
 				sourceType: expense.sourceType,
+				userId: context.user.id,
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for expense payment:", e);
+		}
+
+		// Auto-create payment voucher for paid expense
+		try {
+			const { generateAtomicNo } = await import("@repo/database");
+			const { numberToArabicWords } = await import("@repo/utils");
+			const voucherNo = await generateAtomicNo(input.organizationId, "PMT");
+			await db.paymentVoucher.create({
+				data: {
+					organizationId: input.organizationId,
+					voucherNo,
+					expenseId: expense.id,
+					date: expense.date,
+					amount: expense.amount,
+					amountInWords: numberToArabicWords(Number(expense.amount)),
+					payeeName: expense.vendorName || expense.description || expense.category,
+					payeeType: "SUPPLIER",
+					paymentMethod: input.paymentMethod || "BANK_TRANSFER",
+					sourceAccountId: input.sourceAccountId || null,
+					projectId: expense.projectId || null,
+					status: "ISSUED",
+					preparedById: context.user.id,
+					approvedById: context.user.id,
+					approvedAt: new Date(),
+				},
+			});
+		} catch (e) {
+			console.error("[PaymentVoucher] Failed to create auto voucher from expense payment:", e);
 		}
 
 		return expense;
