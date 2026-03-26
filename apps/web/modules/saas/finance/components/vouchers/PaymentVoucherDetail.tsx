@@ -130,10 +130,10 @@ export function PaymentVoucherDetail({
 					)}
 					{voucher.status === "PENDING_APPROVAL" && (
 						<>
-							<Button variant="default" onClick={() => setShowApproveDialog(true)}>
+							<Button variant="primary" onClick={() => setShowApproveDialog(true)}>
 								<CheckCircle className="me-2 h-4 w-4" />{t("finance.paymentVouchers.actions.approve")}
 							</Button>
-							<Button variant="destructive" onClick={() => setShowRejectDialog(true)}>
+							<Button variant="error" onClick={() => setShowRejectDialog(true)}>
 								<XCircle className="me-2 h-4 w-4" />{t("finance.paymentVouchers.actions.reject")}
 							</Button>
 						</>
@@ -144,7 +144,7 @@ export function PaymentVoucherDetail({
 						</Button>
 					)}
 					{voucher.status !== "CANCELLED" && (
-						<Button variant="destructive" onClick={() => setShowCancelDialog(true)}>
+						<Button variant="error" onClick={() => setShowCancelDialog(true)}>
 							<Ban className="me-2 h-4 w-4" />{t("finance.paymentVouchers.actions.cancel")}
 						</Button>
 					)}

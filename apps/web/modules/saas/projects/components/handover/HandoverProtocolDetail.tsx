@@ -168,7 +168,7 @@ export function HandoverProtocolDetail({
 							<Button onClick={() => setShowSubmitDialog(true)}>
 								<Send className="me-2 h-4 w-4" />{t("handover.actions.submit")}
 							</Button>
-							<Button variant="destructive" size="icon" onClick={() => setShowDeleteDialog(true)}>
+							<Button variant="error" size="icon" onClick={() => setShowDeleteDialog(true)}>
 								<Trash2 className="h-4 w-4" />
 							</Button>
 						</>

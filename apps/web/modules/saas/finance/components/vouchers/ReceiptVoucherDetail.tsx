@@ -171,7 +171,7 @@ export function ReceiptVoucherDetail({
 					)}
 					{(voucher.status === "DRAFT" || voucher.status === "ISSUED") && (
 						<Button
-							variant="destructive"
+							variant="error"
 							onClick={() => setShowCancelDialog(true)}
 						>
 							<Ban className="me-2 h-4 w-4" />
