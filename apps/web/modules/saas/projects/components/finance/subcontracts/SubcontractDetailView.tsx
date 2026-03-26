@@ -268,7 +268,7 @@ export function SubcontractDetailView({
 			termId: data.termId || null,
 			amount: data.amount,
 			date: new Date(data.date),
-			sourceAccountId: data.sourceAccountId || null,
+			sourceAccountId: data.sourceAccountId || "",
 			paymentMethod: (data.paymentMethod as (typeof PAYMENT_METHODS)[number]) || null,
 			referenceNo: data.referenceNo || null,
 			description: data.description || null,

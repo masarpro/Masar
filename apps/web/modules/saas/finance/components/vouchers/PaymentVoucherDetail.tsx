@@ -98,8 +98,71 @@ export function PaymentVoucherDetail({
 
 	return (
 		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex items-center justify-between">
+			{/* ═══ Print-only formal payment voucher ═══ */}
+			<div className="hidden print:block print:space-y-4">
+				<div className="text-center border-b-2 border-black pb-3 mb-4">
+					<h1 className="text-2xl font-bold">{t("print.paymentVoucher")}</h1>
+					<p className="text-sm text-gray-500">PAYMENT VOUCHER</p>
+				</div>
+				<div className="flex justify-between text-sm mb-4">
+					<div><span className="font-medium">{t("finance.paymentVouchers.voucherNo")}:</span> <span className="font-mono">{voucher.voucherNo}</span></div>
+					<div><span className="font-medium">{t("finance.paymentVouchers.date")}:</span> {formatDate(voucher.date)}</div>
+				</div>
+				<table className="w-full border-collapse text-sm">
+					<tbody>
+						<tr className="border border-gray-400">
+							<td className="p-2 font-medium bg-gray-50 w-1/4 border-e border-gray-400">{t("finance.paymentVouchers.payeeName")}</td>
+							<td className="p-2">{voucher.payeeName}</td>
+						</tr>
+						<tr className="border border-gray-400">
+							<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.paymentVouchers.payeeType")}</td>
+							<td className="p-2">{t(`finance.paymentVouchers.payeeTypes.${voucher.payeeType}`)}</td>
+						</tr>
+						<tr className="border border-gray-400">
+							<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.paymentVouchers.amount")}</td>
+							<td className="p-2 font-bold text-lg">{new Intl.NumberFormat("en-SA", { style: "currency", currency: "SAR" }).format(Number(voucher.amount))}</td>
+						</tr>
+						{voucher.amountInWords && (
+							<tr className="border border-gray-400">
+								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.paymentVouchers.amountInWords")}</td>
+								<td className="p-2 font-medium">{voucher.amountInWords} {t("print.only")}</td>
+							</tr>
+						)}
+						<tr className="border border-gray-400">
+							<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.paymentVouchers.paymentMethod")}</td>
+							<td className="p-2">{t(`finance.payments.methods.${voucher.paymentMethod}`)}</td>
+						</tr>
+						{voucher.description && (
+							<tr className="border border-gray-400">
+								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.paymentVouchers.description")}</td>
+								<td className="p-2">{voucher.description}</td>
+							</tr>
+						)}
+					</tbody>
+				</table>
+				{/* Signature boxes */}
+				<div className="mt-16 grid grid-cols-3 gap-6 text-center text-sm">
+					<div>
+						<p className="mb-8">{voucher.preparedBy?.name ?? ""}</p>
+						<div className="border-b border-black mx-4 mb-1" />
+						<p>{t("print.preparedBy")}</p>
+					</div>
+					<div>
+						<p className="mb-8">{voucher.approvedBy?.name ?? ""}</p>
+						<div className="border-b border-black mx-4 mb-1" />
+						<p>{t("print.approvedBy")}</p>
+					</div>
+					<div>
+						<p className="mb-8" />
+						<div className="border-b border-black mx-4 mb-1" />
+						<p>{t("print.receiver")}</p>
+					</div>
+				</div>
+			</div>
+			{/* ═══ End print-only section ═══ */}
+
+			{/* Header — hidden on print */}
+			<div className="flex items-center justify-between print:hidden">
 				<div className="flex items-center gap-3">
 					<Button variant="ghost" size="icon" onClick={() => router.push(basePath)}>
 						<ArrowRight className="h-4 w-4" />

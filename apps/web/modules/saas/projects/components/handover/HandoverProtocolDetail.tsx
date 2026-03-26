@@ -147,8 +147,129 @@ export function HandoverProtocolDetail({
 
 	return (
 		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex items-center justify-between">
+			{/* ═══ Print-only formal handover protocol ═══ */}
+			<div className="hidden print:block print:space-y-4">
+				<div className="text-center border-b-2 border-black pb-3 mb-4">
+					<h1 className="text-2xl font-bold">{t("print.handoverProtocol")}</h1>
+					<p className="text-base font-medium">{t(`handover.types.${protocol.type}`)}</p>
+				</div>
+				<div className="flex justify-between text-sm mb-3">
+					<div><span className="font-medium">{t("handover.protocolNo")}:</span> <span className="font-mono">{protocol.protocolNo}</span></div>
+					<div><span className="font-medium">{t("handover.date")}:</span> {formatDate(protocol.date)}</div>
+				</div>
+				<table className="w-full border-collapse text-sm mb-4">
+					<tbody>
+						<tr className="border border-gray-400">
+							<td className="p-2 font-medium bg-gray-50 w-1/4 border-e border-gray-400">{t("handover.titleField")}</td>
+							<td className="p-2">{protocol.title}</td>
+						</tr>
+						{protocol.project && (
+							<tr className="border border-gray-400">
+								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("common.project")}</td>
+								<td className="p-2">{protocol.project.name}</td>
+							</tr>
+						)}
+						{protocol.subcontractContract && (
+							<tr className="border border-gray-400">
+								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("handover.subcontractRequired")}</td>
+								<td className="p-2">{protocol.subcontractContract.name}</td>
+							</tr>
+						)}
+						{protocol.location && (
+							<tr className="border border-gray-400">
+								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("handover.location")}</td>
+								<td className="p-2">{protocol.location}</td>
+							</tr>
+						)}
+						{protocol.description && (
+							<tr className="border border-gray-400">
+								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("handover.description")}</td>
+								<td className="p-2">{protocol.description}</td>
+							</tr>
+						)}
+					</tbody>
+				</table>
+
+				{/* Items table */}
+				{protocol.items?.length > 0 && (
+					<div className="mb-4">
+						<h3 className="font-bold text-sm mb-2">{t("handover.items.title")}</h3>
+						<table className="w-full border-collapse text-sm">
+							<thead>
+								<tr className="bg-gray-100">
+									<th className="border border-gray-400 p-1.5 text-start">#</th>
+									<th className="border border-gray-400 p-1.5 text-start">{t("handover.items.description")}</th>
+									<th className="border border-gray-400 p-1.5 text-center">{t("handover.items.unit")}</th>
+									<th className="border border-gray-400 p-1.5 text-center">{t("handover.items.contractQty")}</th>
+									<th className="border border-gray-400 p-1.5 text-center">{t("handover.items.executedQty")}</th>
+									<th className="border border-gray-400 p-1.5 text-center">{t("handover.items.acceptedQty")}</th>
+								</tr>
+							</thead>
+							<tbody>
+								{protocol.items.map((item: any, idx: number) => (
+									<tr key={item.id}>
+										<td className="border border-gray-400 p-1.5">{idx + 1}</td>
+										<td className="border border-gray-400 p-1.5">{item.description}</td>
+										<td className="border border-gray-400 p-1.5 text-center">{item.unit || "-"}</td>
+										<td className="border border-gray-400 p-1.5 text-center">{item.contractQty ? Number(item.contractQty) : "-"}</td>
+										<td className="border border-gray-400 p-1.5 text-center">{item.executedQty ? Number(item.executedQty) : "-"}</td>
+										<td className="border border-gray-400 p-1.5 text-center">{item.acceptedQty ? Number(item.acceptedQty) : "-"}</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+				)}
+
+				{/* Warranty (PRELIMINARY) */}
+				{protocol.type === "PRELIMINARY" && protocol.warrantyEndDate && (
+					<div className="mb-4 p-3 border border-gray-400">
+						<h3 className="font-bold text-sm mb-1">{t("handover.warranty.title")}</h3>
+						<p className="text-sm">{t("handover.warranty.months")}: {protocol.warrantyMonths ?? 12}</p>
+						{protocol.warrantyStartDate && <p className="text-sm">{t("handover.warranty.startDate")}: {formatDate(protocol.warrantyStartDate)}</p>}
+						<p className="text-sm">{t("handover.warranty.endDate")}: {formatDate(protocol.warrantyEndDate)}</p>
+					</div>
+				)}
+
+				{/* Retention (FINAL) */}
+				{protocol.type === "FINAL" && protocol.retentionReleaseAmount && (
+					<div className="mb-4 p-3 border border-gray-400">
+						<h3 className="font-bold text-sm mb-1">{t("handover.retention.title")}</h3>
+						<p className="text-sm">{t("handover.retention.amount")}: {new Intl.NumberFormat("en-SA", { style: "currency", currency: "SAR" }).format(Number(protocol.retentionReleaseAmount))}</p>
+					</div>
+				)}
+
+				{/* Parties & signatures */}
+				{((protocol.parties as any[]) ?? []).length > 0 && (
+					<div className="mt-8">
+						<h3 className="font-bold text-sm mb-2">{t("handover.parties.title")}</h3>
+						<table className="w-full border-collapse text-sm">
+							<thead>
+								<tr className="bg-gray-100">
+									<th className="border border-gray-400 p-1.5 text-start">{t("handover.parties.name")}</th>
+									<th className="border border-gray-400 p-1.5 text-start">{t("handover.parties.role")}</th>
+									<th className="border border-gray-400 p-1.5 text-start">{t("handover.parties.organization")}</th>
+									<th className="border border-gray-400 p-1.5 text-center w-1/4">{t("print.signature")}</th>
+								</tr>
+							</thead>
+							<tbody>
+								{((protocol.parties as any[]) ?? []).map((party: any, idx: number) => (
+									<tr key={idx}>
+										<td className="border border-gray-400 p-1.5">{party.name}</td>
+										<td className="border border-gray-400 p-1.5">{party.role}</td>
+										<td className="border border-gray-400 p-1.5">{party.organization || "-"}</td>
+										<td className="border border-gray-400 p-4" />
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+				)}
+			</div>
+			{/* ═══ End print-only section ═══ */}
+
+			{/* Header — hidden on print */}
+			<div className="flex items-center justify-between print:hidden">
 				<div className="flex items-center gap-3">
 					<Button variant="ghost" size="icon" onClick={() => router.push(basePath)}>
 						<ArrowRight className="h-4 w-4" />

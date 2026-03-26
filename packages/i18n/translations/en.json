@@ -8924,6 +8924,22 @@
     "pages": "Integrated Pages",
     "arabic": "Full Arabic Support"
   },
+  "print": {
+    "receiptVoucher": "Receipt Voucher",
+    "paymentVoucher": "Payment Voucher",
+    "handoverProtocol": "Handover Protocol",
+    "accountStatement": "Account Statement",
+    "documentNo": "No.",
+    "date": "Date",
+    "preparedBy": "Prepared By",
+    "approvedBy": "Approved By",
+    "receiver": "Receiver",
+    "financialManager": "Financial Manager",
+    "signature": "Signature",
+    "only": "only",
+    "stamp": "Stamp",
+    "printedOn": "Printed on"
+  },
   "accountStatement": {
     "title": "Account Statement",
     "clientStatement": "Client Statement",

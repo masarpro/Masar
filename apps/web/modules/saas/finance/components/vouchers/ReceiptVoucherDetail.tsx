@@ -117,8 +117,72 @@ export function ReceiptVoucherDetail({
 
 	return (
 		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex items-center justify-between">
+			{/* ═══ Print-only formal receipt voucher ═══ */}
+			<div className="hidden print:block print:space-y-4">
+				<div className="text-center border-b-2 border-black pb-3 mb-4">
+					<h1 className="text-2xl font-bold">{t("print.receiptVoucher")}</h1>
+					<p className="text-sm text-gray-500">RECEIPT VOUCHER</p>
+				</div>
+				<div className="flex justify-between text-sm mb-4">
+					<div><span className="font-medium">{t("finance.receiptVouchers.voucherNo")}:</span> <span className="font-mono">{voucher.voucherNo}</span></div>
+					<div><span className="font-medium">{t("finance.receiptVouchers.date")}:</span> {formatDate(voucher.date)}</div>
+				</div>
+				<table className="w-full border-collapse text-sm">
+					<tbody>
+						<tr className="border border-gray-400">
+							<td className="p-2 font-medium bg-gray-50 w-1/4 border-e border-gray-400">{t("finance.receiptVouchers.receivedFrom")}</td>
+							<td className="p-2">{voucher.receivedFrom}</td>
+						</tr>
+						<tr className="border border-gray-400">
+							<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.receiptVouchers.amount")}</td>
+							<td className="p-2 font-bold text-lg">{new Intl.NumberFormat("en-SA", { style: "currency", currency: "SAR" }).format(Number(voucher.amount))}</td>
+						</tr>
+						{voucher.amountInWords && (
+							<tr className="border border-gray-400">
+								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.receiptVouchers.amountInWords")}</td>
+								<td className="p-2 font-medium">{voucher.amountInWords} {t("print.only")}</td>
+							</tr>
+						)}
+						<tr className="border border-gray-400">
+							<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.receiptVouchers.paymentMethod")}</td>
+							<td className="p-2">{t(`finance.payments.methods.${voucher.paymentMethod}`)}</td>
+						</tr>
+						{voucher.checkNumber && (
+							<tr className="border border-gray-400">
+								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.receiptVouchers.checkNumber")}</td>
+								<td className="p-2">{voucher.checkNumber}</td>
+							</tr>
+						)}
+						{voucher.transferRef && (
+							<tr className="border border-gray-400">
+								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.receiptVouchers.transferRef")}</td>
+								<td className="p-2">{voucher.transferRef}</td>
+							</tr>
+						)}
+						{voucher.description && (
+							<tr className="border border-gray-400">
+								<td className="p-2 font-medium bg-gray-50 border-e border-gray-400">{t("finance.receiptVouchers.description")}</td>
+								<td className="p-2">{voucher.description}</td>
+							</tr>
+						)}
+					</tbody>
+				</table>
+				{/* Signature boxes */}
+				<div className="mt-16 grid grid-cols-2 gap-8 text-center text-sm">
+					<div>
+						<div className="border-b border-black mx-8 mb-1" />
+						<p>{t("print.receiver")}</p>
+					</div>
+					<div>
+						<div className="border-b border-black mx-8 mb-1" />
+						<p>{t("print.financialManager")}</p>
+					</div>
+				</div>
+			</div>
+			{/* ═══ End print-only section ═══ */}
+
+			{/* Header — hidden on print */}
+			<div className="flex items-center justify-between print:hidden">
 				<div className="flex items-center gap-3">
 					<Button
 						variant="ghost"

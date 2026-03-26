@@ -8924,6 +8924,22 @@
     "pages": "صفحة متكاملة",
     "arabic": "دعم عربي كامل"
   },
+  "print": {
+    "receiptVoucher": "سند قبض",
+    "paymentVoucher": "سند صرف",
+    "handoverProtocol": "محضر استلام",
+    "accountStatement": "كشف حساب",
+    "documentNo": "الرقم",
+    "date": "التاريخ",
+    "preparedBy": "أُعدّ بواسطة",
+    "approvedBy": "اعتُمد بواسطة",
+    "receiver": "المستلم",
+    "financialManager": "المدير المالي",
+    "signature": "التوقيع",
+    "only": "لا غير",
+    "stamp": "الختم",
+    "printedOn": "طُبع بتاريخ"
+  },
   "accountStatement": {
     "title": "كشف الحساب",
     "clientStatement": "كشف حساب العميل",

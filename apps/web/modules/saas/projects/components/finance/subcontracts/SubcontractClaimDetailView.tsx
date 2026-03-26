@@ -209,7 +209,7 @@ export function SubcontractClaimDetailView({
 			amount,
 			date: new Date(payDate),
 			paymentMethod: payMethod as any,
-			sourceAccountId: payAccountId || undefined,
+			sourceAccountId: payAccountId || "",
 			description: payNote || undefined,
 		});
 	}
