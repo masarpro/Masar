@@ -43,7 +43,7 @@ export function PaymentVouchersList({
 
 	const basePath = `/app/${organizationSlug}/finance/payment-vouchers`;
 
-	const { data, isLoading } = useQuery(
+	const { data: rawData, isLoading } = useQuery(
 		orpc.finance.disbursements.list.queryOptions({
 			input: {
 				organizationId,
@@ -52,12 +52,14 @@ export function PaymentVouchersList({
 			},
 		}),
 	);
+	const data = rawData as any;
 
-	const { data: summaryData } = useQuery(
+	const { data: rawSummaryData } = useQuery(
 		orpc.finance.disbursements.getSummary.queryOptions({
 			input: { organizationId },
 		}),
 	);
+	const summaryData = rawSummaryData as any;
 
 	const vouchers = data?.items ?? [];
 	const total = data?.total ?? 0;
@@ -84,7 +86,7 @@ export function PaymentVouchersList({
 								{t("finance.paymentVouchers.summary.totalIssued")}
 							</div>
 							<div className="mt-1 text-2xl font-bold">
-								<Currency value={summaryData.totalAmount} />
+								<Currency amount={summaryData.totalAmount} />
 							</div>
 						</CardContent>
 					</Card>
@@ -107,7 +109,7 @@ export function PaymentVouchersList({
 									{summaryData.pendingApproval.count}
 								</div>
 								<div className="text-xs text-amber-600">
-									<Currency value={summaryData.pendingApproval.total} />
+									<Currency amount={summaryData.pendingApproval.total} />
 								</div>
 							</CardContent>
 						</Card>
@@ -122,7 +124,7 @@ export function PaymentVouchersList({
 					<Input
 						placeholder={t("common.search")}
 						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
 						className="ps-9"
 					/>
 				</div>
@@ -170,7 +172,7 @@ export function PaymentVouchersList({
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{vouchers.map((v) => (
+							{vouchers.map((v: any) => (
 								<TableRow
 									key={v.id}
 									className="cursor-pointer"
@@ -180,7 +182,7 @@ export function PaymentVouchersList({
 									<TableCell>{formatDate(v.date)}</TableCell>
 									<TableCell>{v.payeeName}</TableCell>
 									<TableCell>{t(`finance.paymentVouchers.payeeTypes.${v.payeeType}`)}</TableCell>
-									<TableCell><Currency value={Number(v.amount)} /></TableCell>
+									<TableCell><Currency amount={Number(v.amount)} /></TableCell>
 									<TableCell>
 										<Badge className={STATUS_COLORS[v.status] ?? ""}>
 											{t(`finance.paymentVouchers.statuses.${v.status}`)}

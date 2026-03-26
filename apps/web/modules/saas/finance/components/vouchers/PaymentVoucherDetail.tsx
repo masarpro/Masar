@@ -54,11 +54,12 @@ export function PaymentVoucherDetail({
 
 	const basePath = `/app/${organizationSlug}/finance/payment-vouchers`;
 
-	const { data: voucher, isLoading } = useQuery(
+	const { data: rawVoucher, isLoading } = useQuery(
 		orpc.finance.disbursements.getById.queryOptions({
 			input: { organizationId, id: voucherId },
 		}),
 	);
+	const voucher = rawVoucher as any;
 
 	const invalidate = () => queryClient.invalidateQueries({ queryKey: ["finance", "disbursements"] });
 
@@ -160,7 +161,7 @@ export function PaymentVoucherDetail({
 					</CardHeader>
 					<CardContent className="space-y-3">
 						<InfoRow label={t("finance.paymentVouchers.date")} value={formatDate(voucher.date)} icon={<Calendar className="h-4 w-4" />} />
-						<InfoRow label={t("finance.paymentVouchers.amount")} value={<Currency value={Number(voucher.amount)} />} />
+						<InfoRow label={t("finance.paymentVouchers.amount")} value={<Currency amount={Number(voucher.amount)} />} />
 						{voucher.amountInWords && <InfoRow label={t("finance.paymentVouchers.amountInWords")} value={voucher.amountInWords} />}
 						<InfoRow label={t("finance.paymentVouchers.payeeName")} value={voucher.payeeName} icon={<User className="h-4 w-4" />} />
 						<InfoRow label={t("finance.paymentVouchers.payeeType")} value={t(`finance.paymentVouchers.payeeTypes.${voucher.payeeType}`)} />
@@ -269,7 +270,7 @@ export function PaymentVoucherDetail({
 						<Textarea
 							placeholder={t("finance.paymentVouchers.rejectDialog.reasonPlaceholder")}
 							value={rejectionReason}
-							onChange={(e) => setRejectionReason(e.target.value)}
+							onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setRejectionReason(e.target.value)}
 							rows={3}
 						/>
 					</div>
@@ -297,7 +298,7 @@ export function PaymentVoucherDetail({
 						<Textarea
 							placeholder={t("finance.paymentVouchers.cancelDialog.reasonPlaceholder")}
 							value={cancelReason}
-							onChange={(e) => setCancelReason(e.target.value)}
+							onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCancelReason(e.target.value)}
 							rows={3}
 						/>
 					</div>

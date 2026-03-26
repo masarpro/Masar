@@ -39,8 +39,8 @@ const formSchema = z.object({
 	location: z.string().optional(),
 	description: z.string().optional(),
 	conditions: z.string().optional(),
-	warrantyMonths: z.coerce.number().int().positive().optional(),
-	retentionReleaseAmount: z.coerce.number().nonnegative().optional(),
+	warrantyMonths: z.number().int().positive().optional(),
+	retentionReleaseAmount: z.number().nonnegative().optional(),
 	parties: z.array(z.object({
 		name: z.string().min(1),
 		role: z.string().min(1),
@@ -70,7 +70,7 @@ export function HandoverProtocolForm({
 	const basePath = `/app/${organizationSlug}/projects/${projectId}/handover`;
 
 	const form = useForm<FormValues>({
-		resolver: zodResolver(formSchema),
+		resolver: zodResolver(formSchema) as any,
 		defaultValues: {
 			type: "ITEM_ACCEPTANCE",
 			date: new Date().toISOString().split("T")[0],
@@ -143,7 +143,7 @@ export function HandoverProtocolForm({
 			</div>
 
 			<Form {...form}>
-				<form onSubmit={form.handleSubmit((d) => createMutation.mutate(d))} className="space-y-6">
+				<form onSubmit={form.handleSubmit(((d: any) => createMutation.mutate(d)) as any)} className="space-y-6">
 					{/* Type Selection */}
 					<Card>
 						<CardHeader><CardTitle>{t("handover.types.ITEM_ACCEPTANCE")}</CardTitle></CardHeader>
@@ -175,21 +175,21 @@ export function HandoverProtocolForm({
 					<Card>
 						<CardHeader><CardTitle>{t("handover.titleField")}</CardTitle></CardHeader>
 						<CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
-							<FormField control={form.control} name="title" render={({ field }) => (
+							<FormField control={form.control} name="title" render={({ field }: any) => (
 								<FormItem className="md:col-span-2">
 									<FormLabel>{t("handover.titleField")}</FormLabel>
 									<FormControl><Input {...field} /></FormControl>
 									<FormMessage />
 								</FormItem>
 							)} />
-							<FormField control={form.control} name="date" render={({ field }) => (
+							<FormField control={form.control} name="date" render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("handover.date")}</FormLabel>
 									<FormControl><Input type="date" {...field} /></FormControl>
 									<FormMessage />
 								</FormItem>
 							)} />
-							<FormField control={form.control} name="location" render={({ field }) => (
+							<FormField control={form.control} name="location" render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("handover.location")}</FormLabel>
 									<FormControl><Input {...field} /></FormControl>
@@ -199,7 +199,7 @@ export function HandoverProtocolForm({
 
 							{/* Subcontract (required for ITEM_ACCEPTANCE) */}
 							{selectedType === "ITEM_ACCEPTANCE" && (
-								<FormField control={form.control} name="subcontractContractId" render={({ field }) => (
+								<FormField control={form.control} name="subcontractContractId" render={({ field }: any) => (
 									<FormItem className="md:col-span-2">
 										<FormLabel>{t("handover.subcontractRequired")}</FormLabel>
 										<Select onValueChange={field.onChange} value={field.value ?? ""}>
@@ -217,7 +217,7 @@ export function HandoverProtocolForm({
 
 							{/* Warranty months for PRELIMINARY */}
 							{selectedType === "PRELIMINARY" && (
-								<FormField control={form.control} name="warrantyMonths" render={({ field }) => (
+								<FormField control={form.control} name="warrantyMonths" render={({ field }: any) => (
 									<FormItem>
 										<FormLabel>{t("handover.warranty.months")}</FormLabel>
 										<FormControl><Input type="number" min="1" {...field} /></FormControl>
@@ -228,7 +228,7 @@ export function HandoverProtocolForm({
 
 							{/* Retention for FINAL */}
 							{selectedType === "FINAL" && (
-								<FormField control={form.control} name="retentionReleaseAmount" render={({ field }) => (
+								<FormField control={form.control} name="retentionReleaseAmount" render={({ field }: any) => (
 									<FormItem>
 										<FormLabel>{t("handover.retention.amount")}</FormLabel>
 										<FormControl><Input type="number" step="0.01" min="0" {...field} /></FormControl>
@@ -237,14 +237,14 @@ export function HandoverProtocolForm({
 								)} />
 							)}
 
-							<FormField control={form.control} name="description" render={({ field }) => (
+							<FormField control={form.control} name="description" render={({ field }: any) => (
 								<FormItem className="md:col-span-2">
 									<FormLabel>{t("handover.description")}</FormLabel>
 									<FormControl><Textarea rows={2} {...field} /></FormControl>
 									<FormMessage />
 								</FormItem>
 							)} />
-							<FormField control={form.control} name="conditions" render={({ field }) => (
+							<FormField control={form.control} name="conditions" render={({ field }: any) => (
 								<FormItem className="md:col-span-2">
 									<FormLabel>{t("handover.conditions")}</FormLabel>
 									<FormControl><Textarea rows={2} {...field} /></FormControl>
@@ -272,17 +272,17 @@ export function HandoverProtocolForm({
 										<Input
 											placeholder={t("handover.parties.name")}
 											value={form.watch(`parties.${index}.name`)}
-											onChange={(e) => form.setValue(`parties.${index}.name`, e.target.value)}
+											onChange={(e: React.ChangeEvent<HTMLInputElement>) => form.setValue(`parties.${index}.name`, e.target.value)}
 										/>
 										<Input
 											placeholder={t("handover.parties.role")}
 											value={form.watch(`parties.${index}.role`)}
-											onChange={(e) => form.setValue(`parties.${index}.role`, e.target.value)}
+											onChange={(e: React.ChangeEvent<HTMLInputElement>) => form.setValue(`parties.${index}.role`, e.target.value)}
 										/>
 										<Input
 											placeholder={t("handover.parties.organization")}
 											value={form.watch(`parties.${index}.organization`)}
-											onChange={(e) => form.setValue(`parties.${index}.organization`, e.target.value)}
+											onChange={(e: React.ChangeEvent<HTMLInputElement>) => form.setValue(`parties.${index}.organization`, e.target.value)}
 										/>
 									</div>
 									<Button type="button" variant="ghost" size="icon" onClick={() => removeParty(index)}>

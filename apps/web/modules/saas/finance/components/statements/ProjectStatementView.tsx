@@ -35,7 +35,7 @@ export function ProjectStatementView({
 
 	const basePath = `/app/${organizationSlug}/projects/${projectId}/finance`;
 
-	const { data, isLoading } = useQuery(
+	const { data: rawData, isLoading } = useQuery(
 		orpc.accounting.statements.project.queryOptions({
 			input: {
 				organizationId,
@@ -45,6 +45,7 @@ export function ProjectStatementView({
 			},
 		}),
 	);
+	const data = rawData as any;
 
 	if (isLoading) return <ListTableSkeleton rows={10} cols={5} />;
 
@@ -79,7 +80,7 @@ export function ProjectStatementView({
 					<Input
 						type="date"
 						value={dateFrom}
-						onChange={(e) => setDateFrom(e.target.value)}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDateFrom(e.target.value)}
 					/>
 				</div>
 				<div>
@@ -87,7 +88,7 @@ export function ProjectStatementView({
 					<Input
 						type="date"
 						value={dateTo}
-						onChange={(e) => setDateTo(e.target.value)}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDateTo(e.target.value)}
 					/>
 				</div>
 			</div>
@@ -149,7 +150,7 @@ export function ProjectStatementView({
 										</TableRow>
 									</TableHeader>
 									<TableBody>
-										{data.revenue.breakdown.map((item) => (
+										{data.revenue.breakdown.map((item: any) => (
 											<TableRow key={item.accountCode}>
 												<TableCell>{item.accountName} ({item.accountCode})</TableCell>
 												<TableCell className="text-end"><Currency amount={item.amount} /></TableCell>
@@ -178,7 +179,7 @@ export function ProjectStatementView({
 										</TableRow>
 									</TableHeader>
 									<TableBody>
-										{data.costs.breakdown.map((item) => (
+										{data.costs.breakdown.map((item: any) => (
 											<TableRow key={item.accountCode}>
 												<TableCell>{item.accountName} ({item.accountCode})</TableCell>
 												<TableCell className="text-end"><Currency amount={item.amount} /></TableCell>

@@ -61,7 +61,7 @@ export function ReceiptVouchersList({
 	const basePath = `/app/${organizationSlug}/finance/receipt-vouchers`;
 
 	// Fetch vouchers
-	const { data, isLoading } = useQuery(
+	const { data: rawData, isLoading } = useQuery(
 		orpc.finance.receipts.list.queryOptions({
 			input: {
 				organizationId,
@@ -70,13 +70,15 @@ export function ReceiptVouchersList({
 			},
 		}),
 	);
+	const data = rawData as any;
 
 	// Fetch summary
-	const { data: summaryData } = useQuery(
+	const { data: rawSummaryData } = useQuery(
 		orpc.finance.receipts.getSummary.queryOptions({
 			input: { organizationId },
 		}),
 	);
+	const summaryData = rawSummaryData as any;
 
 	const vouchers = data?.items ?? [];
 	const total = data?.total ?? 0;
@@ -107,7 +109,7 @@ export function ReceiptVouchersList({
 								{t("finance.receiptVouchers.summary.totalIssued")}
 							</div>
 							<div className="mt-1 text-2xl font-bold">
-								<Currency value={summaryData.totalAmount} />
+								<Currency amount={summaryData.totalAmount} />
 							</div>
 						</CardContent>
 					</Card>
@@ -129,7 +131,7 @@ export function ReceiptVouchersList({
 					<Input
 						placeholder={t("common.search")}
 						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
 						className="ps-9"
 					/>
 				</div>
@@ -179,7 +181,7 @@ export function ReceiptVouchersList({
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{vouchers.map((voucher) => (
+							{vouchers.map((voucher: any) => (
 								<TableRow
 									key={voucher.id}
 									className="cursor-pointer"
@@ -191,7 +193,7 @@ export function ReceiptVouchersList({
 									<TableCell>{formatDate(voucher.date)}</TableCell>
 									<TableCell>{voucher.receivedFrom}</TableCell>
 									<TableCell>
-										<Currency value={Number(voucher.amount)} />
+										<Currency amount={Number(voucher.amount)} />
 									</TableCell>
 									<TableCell>
 										{t(PAYMENT_METHOD_KEYS[voucher.paymentMethod] ?? "finance.payments.methods.OTHER")}

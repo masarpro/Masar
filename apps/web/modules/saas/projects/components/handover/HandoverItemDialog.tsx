@@ -33,9 +33,9 @@ interface HandoverItemDialogProps {
 const formSchema = z.object({
 	description: z.string().min(1),
 	unit: z.string().optional(),
-	contractQty: z.coerce.number().optional(),
-	executedQty: z.coerce.number().optional(),
-	acceptedQty: z.coerce.number().optional(),
+	contractQty: z.number().optional(),
+	executedQty: z.number().optional(),
+	acceptedQty: z.number().optional(),
 	qualityRating: z.enum(["EXCELLENT", "GOOD", "ACCEPTABLE", "NEEDS_REWORK", "REJECTED"]).optional(),
 	remarks: z.string().optional(),
 });
@@ -129,8 +129,8 @@ export function HandoverItemDialog({
 				</DialogHeader>
 
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-						<FormField control={form.control} name="description" render={({ field }) => (
+					<form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-4">
+						<FormField control={form.control} name="description" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("handover.items.description")}</FormLabel>
 								<FormControl><Textarea rows={2} {...field} /></FormControl>
@@ -139,25 +139,25 @@ export function HandoverItemDialog({
 						)} />
 
 						<div className="grid grid-cols-2 gap-3">
-							<FormField control={form.control} name="unit" render={({ field }) => (
+							<FormField control={form.control} name="unit" render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("handover.items.unit")}</FormLabel>
 									<FormControl><Input {...field} /></FormControl>
 								</FormItem>
 							)} />
-							<FormField control={form.control} name="contractQty" render={({ field }) => (
+							<FormField control={form.control} name="contractQty" render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("handover.items.contractQty")}</FormLabel>
 									<FormControl><Input type="number" step="0.0001" {...field} /></FormControl>
 								</FormItem>
 							)} />
-							<FormField control={form.control} name="executedQty" render={({ field }) => (
+							<FormField control={form.control} name="executedQty" render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("handover.items.executedQty")}</FormLabel>
 									<FormControl><Input type="number" step="0.0001" {...field} /></FormControl>
 								</FormItem>
 							)} />
-							<FormField control={form.control} name="acceptedQty" render={({ field }) => (
+							<FormField control={form.control} name="acceptedQty" render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("handover.items.acceptedQty")}</FormLabel>
 									<FormControl><Input type="number" step="0.0001" {...field} /></FormControl>
@@ -165,7 +165,7 @@ export function HandoverItemDialog({
 							)} />
 						</div>
 
-						<FormField control={form.control} name="qualityRating" render={({ field }) => (
+						<FormField control={form.control} name="qualityRating" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("handover.items.qualityRating")}</FormLabel>
 								<Select onValueChange={field.onChange} value={field.value ?? ""}>
@@ -181,7 +181,7 @@ export function HandoverItemDialog({
 							</FormItem>
 						)} />
 
-						<FormField control={form.control} name="remarks" render={({ field }) => (
+						<FormField control={form.control} name="remarks" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("handover.items.remarks")}</FormLabel>
 								<FormControl><Textarea rows={2} {...field} /></FormControl>

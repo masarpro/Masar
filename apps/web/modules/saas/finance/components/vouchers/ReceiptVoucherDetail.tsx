@@ -66,11 +66,12 @@ export function ReceiptVoucherDetail({
 
 	const basePath = `/app/${organizationSlug}/finance/receipt-vouchers`;
 
-	const { data: voucher, isLoading } = useQuery(
+	const { data: rawVoucher, isLoading } = useQuery(
 		orpc.finance.receipts.getById.queryOptions({
 			input: { organizationId, id: voucherId },
 		}),
 	);
+	const voucher = rawVoucher as any;
 
 	const issueMutation = useMutation({
 		mutationFn: () =>
@@ -197,7 +198,7 @@ export function ReceiptVoucherDetail({
 						/>
 						<InfoRow
 							label={t("finance.receiptVouchers.amount")}
-							value={<Currency value={Number(voucher.amount)} />}
+							value={<Currency amount={Number(voucher.amount)} />}
 						/>
 						{voucher.amountInWords && (
 							<InfoRow
@@ -355,7 +356,7 @@ export function ReceiptVoucherDetail({
 						<Textarea
 							placeholder={t("finance.receiptVouchers.cancelDialog.reasonPlaceholder")}
 							value={cancelReason}
-							onChange={(e) => setCancelReason(e.target.value)}
+							onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCancelReason(e.target.value)}
 							rows={3}
 						/>
 					</div>

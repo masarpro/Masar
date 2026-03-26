@@ -36,7 +36,7 @@ export function SubcontractStatementView({
 	);
 	const [dateTo, setDateTo] = useState(now.toISOString());
 
-	const { data, isLoading } = useQuery(
+	const { data: rawData, isLoading } = useQuery(
 		orpc.accounting.statements.subcontract.queryOptions({
 			input: {
 				organizationId,
@@ -46,6 +46,7 @@ export function SubcontractStatementView({
 			},
 		}),
 	);
+	const data = rawData as any;
 
 	if (isLoading) return <ListTableSkeleton rows={10} cols={6} />;
 
@@ -68,7 +69,7 @@ export function SubcontractStatementView({
 					<Input
 						type="date"
 						value={dateFrom.split("T")[0]}
-						onChange={(e) => setDateFrom(new Date(e.target.value).toISOString())}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDateFrom(new Date(e.target.value).toISOString())}
 					/>
 				</div>
 				<div>
@@ -76,7 +77,7 @@ export function SubcontractStatementView({
 					<Input
 						type="date"
 						value={dateTo.split("T")[0]}
-						onChange={(e) => setDateTo(new Date(e.target.value).toISOString())}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDateTo(new Date(e.target.value).toISOString())}
 					/>
 				</div>
 			</div>
@@ -120,7 +121,7 @@ export function SubcontractStatementView({
 						</div>
 					}
 					openingBalance={data.vendorStatement.openingBalance}
-					entries={data.vendorStatement.lines.map((l, idx) => ({
+					entries={data.vendorStatement.lines.map((l: any, idx: number) => ({
 						date: l.date,
 						entryNo: l.referenceNo,
 						entryId: `line-${idx}`,

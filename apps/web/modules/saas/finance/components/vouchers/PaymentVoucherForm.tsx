@@ -29,7 +29,7 @@ interface PaymentVoucherFormProps {
 
 const formSchema = z.object({
 	date: z.string().min(1),
-	amount: z.coerce.number().positive(),
+	amount: z.number().positive(),
 	payeeName: z.string().min(1).max(200),
 	payeeType: z.enum(["SUBCONTRACTOR", "SUPPLIER", "EMPLOYEE", "OTHER"]),
 	paymentMethod: z.enum(["CASH", "BANK_TRANSFER", "CHEQUE", "CREDIT_CARD", "OTHER"]),
@@ -129,33 +129,33 @@ export function PaymentVoucherForm({
 			</div>
 
 			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+				<form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-6">
 					{/* Basic Info */}
 					<Card>
 						<CardHeader><CardTitle>{t("finance.payments.basicInfo")}</CardTitle></CardHeader>
 						<CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
-							<FormField control={form.control} name="date" render={({ field }) => (
+							<FormField control={form.control} name="date" render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("finance.paymentVouchers.date")}</FormLabel>
 									<FormControl><Input type="date" {...field} /></FormControl>
 									<FormMessage />
 								</FormItem>
 							)} />
-							<FormField control={form.control} name="amount" render={({ field }) => (
+							<FormField control={form.control} name="amount" render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("finance.paymentVouchers.amount")}</FormLabel>
 									<FormControl><Input type="number" step="0.01" min="0.01" {...field} /></FormControl>
 									<FormMessage />
 								</FormItem>
 							)} />
-							<FormField control={form.control} name="payeeName" render={({ field }) => (
+							<FormField control={form.control} name="payeeName" render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("finance.paymentVouchers.payeeName")}</FormLabel>
 									<FormControl><Input {...field} /></FormControl>
 									<FormMessage />
 								</FormItem>
 							)} />
-							<FormField control={form.control} name="payeeType" render={({ field }) => (
+							<FormField control={form.control} name="payeeType" render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("finance.paymentVouchers.payeeType")}</FormLabel>
 									<Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -177,7 +177,7 @@ export function PaymentVoucherForm({
 					<Card>
 						<CardHeader><CardTitle>{t("finance.paymentVouchers.paymentMethod")}</CardTitle></CardHeader>
 						<CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
-							<FormField control={form.control} name="paymentMethod" render={({ field }) => (
+							<FormField control={form.control} name="paymentMethod" render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("finance.paymentVouchers.paymentMethod")}</FormLabel>
 									<Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -193,7 +193,7 @@ export function PaymentVoucherForm({
 									<FormMessage />
 								</FormItem>
 							)} />
-							<FormField control={form.control} name="sourceAccountId" render={({ field }) => (
+							<FormField control={form.control} name="sourceAccountId" render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("finance.paymentVouchers.sourceAccount")}</FormLabel>
 									<Select onValueChange={field.onChange} value={field.value ?? ""}>
@@ -212,21 +212,21 @@ export function PaymentVoucherForm({
 
 							{paymentMethod === "CHEQUE" && (
 								<>
-									<FormField control={form.control} name="checkNumber" render={({ field }) => (
+									<FormField control={form.control} name="checkNumber" render={({ field }: any) => (
 										<FormItem>
 											<FormLabel>{t("finance.paymentVouchers.checkNumber")}</FormLabel>
 											<FormControl><Input {...field} /></FormControl>
 											<FormMessage />
 										</FormItem>
 									)} />
-									<FormField control={form.control} name="checkDate" render={({ field }) => (
+									<FormField control={form.control} name="checkDate" render={({ field }: any) => (
 										<FormItem>
 											<FormLabel>{t("finance.paymentVouchers.checkDate")}</FormLabel>
 											<FormControl><Input type="date" {...field} /></FormControl>
 											<FormMessage />
 										</FormItem>
 									)} />
-									<FormField control={form.control} name="checkBank" render={({ field }) => (
+									<FormField control={form.control} name="checkBank" render={({ field }: any) => (
 										<FormItem>
 											<FormLabel>{t("finance.paymentVouchers.checkBank")}</FormLabel>
 											<FormControl><Input {...field} /></FormControl>
@@ -238,14 +238,14 @@ export function PaymentVoucherForm({
 
 							{paymentMethod === "BANK_TRANSFER" && (
 								<>
-									<FormField control={form.control} name="transferRef" render={({ field }) => (
+									<FormField control={form.control} name="transferRef" render={({ field }: any) => (
 										<FormItem>
 											<FormLabel>{t("finance.paymentVouchers.transferRef")}</FormLabel>
 											<FormControl><Input {...field} /></FormControl>
 											<FormMessage />
 										</FormItem>
 									)} />
-									<FormField control={form.control} name="bankName" render={({ field }) => (
+									<FormField control={form.control} name="bankName" render={({ field }: any) => (
 										<FormItem>
 											<FormLabel>{t("finance.paymentVouchers.bankName")}</FormLabel>
 											<FormControl><Input {...field} /></FormControl>
@@ -260,14 +260,14 @@ export function PaymentVoucherForm({
 					{/* Description */}
 					<Card>
 						<CardContent className="grid grid-cols-1 gap-4 pt-6">
-							<FormField control={form.control} name="description" render={({ field }) => (
+							<FormField control={form.control} name="description" render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("finance.paymentVouchers.description")}</FormLabel>
 									<FormControl><Textarea rows={2} {...field} /></FormControl>
 									<FormMessage />
 								</FormItem>
 							)} />
-							<FormField control={form.control} name="notes" render={({ field }) => (
+							<FormField control={form.control} name="notes" render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("finance.paymentVouchers.notes")}</FormLabel>
 									<FormControl><Textarea rows={2} {...field} /></FormControl>

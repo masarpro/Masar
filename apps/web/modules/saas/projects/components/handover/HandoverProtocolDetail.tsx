@@ -75,11 +75,12 @@ export function HandoverProtocolDetail({
 
 	const basePath = `/app/${organizationSlug}/projects/${projectId}/handover`;
 
-	const { data: protocol, isLoading } = useQuery(
+	const { data: rawProtocol, isLoading } = useQuery(
 		orpc.handover.getById.queryOptions({
 			input: { organizationId, id: protocolId },
 		}),
 	);
+	const protocol = rawProtocol as any;
 
 	const invalidate = () => queryClient.invalidateQueries({ queryKey: ["handover"] });
 
@@ -224,7 +225,7 @@ export function HandoverProtocolDetail({
 					<Card>
 						<CardHeader><CardTitle>{t("handover.retention.title")}</CardTitle></CardHeader>
 						<CardContent className="space-y-3">
-							<InfoRow label={t("handover.retention.amount")} value={<Currency value={Number(protocol.retentionReleaseAmount)} />} />
+							<InfoRow label={t("handover.retention.amount")} value={<Currency amount={Number(protocol.retentionReleaseAmount)} />} />
 							{protocol.status === "COMPLETED" && (
 								<div className="rounded-lg bg-green-50 p-3 text-sm text-green-700">
 									{t("handover.retention.title")} — {t("handover.statuses.COMPLETED")}

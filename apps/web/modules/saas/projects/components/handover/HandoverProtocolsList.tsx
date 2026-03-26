@@ -53,7 +53,7 @@ export function HandoverProtocolsList({
 
 	const basePath = `/app/${organizationSlug}/projects/${projectId}/handover`;
 
-	const { data, isLoading } = useQuery(
+	const { data: rawData, isLoading } = useQuery(
 		orpc.handover.list.queryOptions({
 			input: {
 				organizationId,
@@ -64,6 +64,7 @@ export function HandoverProtocolsList({
 			},
 		}),
 	);
+	const data = rawData as any;
 
 	const protocols = data?.items ?? [];
 	const total = data?.total ?? 0;
@@ -87,7 +88,7 @@ export function HandoverProtocolsList({
 					<Input
 						placeholder={t("common.search")}
 						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
 						className="ps-9"
 					/>
 				</div>
@@ -144,7 +145,7 @@ export function HandoverProtocolsList({
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{protocols.map((p) => (
+							{protocols.map((p: any) => (
 								<TableRow
 									key={p.id}
 									className="cursor-pointer"

@@ -38,7 +38,7 @@ interface ReceiptVoucherFormProps {
 
 const formSchema = z.object({
 	date: z.string().min(1),
-	amount: z.coerce.number().positive(),
+	amount: z.number().positive(),
 	receivedFrom: z.string().min(1).max(200),
 	paymentMethod: z.enum(["CASH", "BANK_TRANSFER", "CHEQUE", "CREDIT_CARD", "OTHER"]),
 	clientId: z.string().optional(),
@@ -154,7 +154,7 @@ export function ReceiptVoucherForm({
 			</div>
 
 			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+				<form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-6">
 					{/* Basic Info */}
 					<Card>
 						<CardHeader>
@@ -164,7 +164,7 @@ export function ReceiptVoucherForm({
 							<FormField
 								control={form.control}
 								name="date"
-								render={({ field }) => (
+								render={({ field }: any) => (
 									<FormItem>
 										<FormLabel>{t("finance.receiptVouchers.date")}</FormLabel>
 										<FormControl>
@@ -177,7 +177,7 @@ export function ReceiptVoucherForm({
 							<FormField
 								control={form.control}
 								name="amount"
-								render={({ field }) => (
+								render={({ field }: any) => (
 									<FormItem>
 										<FormLabel>{t("finance.receiptVouchers.amount")}</FormLabel>
 										<FormControl>
@@ -195,7 +195,7 @@ export function ReceiptVoucherForm({
 							<FormField
 								control={form.control}
 								name="receivedFrom"
-								render={({ field }) => (
+								render={({ field }: any) => (
 									<FormItem className="md:col-span-2">
 										<FormLabel>{t("finance.receiptVouchers.receivedFrom")}</FormLabel>
 										<FormControl>
@@ -217,7 +217,7 @@ export function ReceiptVoucherForm({
 							<FormField
 								control={form.control}
 								name="paymentMethod"
-								render={({ field }) => (
+								render={({ field }: any) => (
 									<FormItem>
 										<FormLabel>{t("finance.receiptVouchers.paymentMethod")}</FormLabel>
 										<Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -241,7 +241,7 @@ export function ReceiptVoucherForm({
 							<FormField
 								control={form.control}
 								name="destinationAccountId"
-								render={({ field }) => (
+								render={({ field }: any) => (
 									<FormItem>
 										<FormLabel>{t("finance.receiptVouchers.destinationAccount")}</FormLabel>
 										<Select onValueChange={field.onChange} value={field.value ?? ""}>
@@ -269,7 +269,7 @@ export function ReceiptVoucherForm({
 									<FormField
 										control={form.control}
 										name="checkNumber"
-										render={({ field }) => (
+										render={({ field }: any) => (
 											<FormItem>
 												<FormLabel>{t("finance.receiptVouchers.checkNumber")}</FormLabel>
 												<FormControl>
@@ -282,7 +282,7 @@ export function ReceiptVoucherForm({
 									<FormField
 										control={form.control}
 										name="checkDate"
-										render={({ field }) => (
+										render={({ field }: any) => (
 											<FormItem>
 												<FormLabel>{t("finance.receiptVouchers.checkDate")}</FormLabel>
 												<FormControl>
@@ -295,7 +295,7 @@ export function ReceiptVoucherForm({
 									<FormField
 										control={form.control}
 										name="checkBank"
-										render={({ field }) => (
+										render={({ field }: any) => (
 											<FormItem>
 												<FormLabel>{t("finance.receiptVouchers.checkBank")}</FormLabel>
 												<FormControl>
@@ -314,7 +314,7 @@ export function ReceiptVoucherForm({
 									<FormField
 										control={form.control}
 										name="transferRef"
-										render={({ field }) => (
+										render={({ field }: any) => (
 											<FormItem>
 												<FormLabel>{t("finance.receiptVouchers.transferRef")}</FormLabel>
 												<FormControl>
@@ -327,7 +327,7 @@ export function ReceiptVoucherForm({
 									<FormField
 										control={form.control}
 										name="bankName"
-										render={({ field }) => (
+										render={({ field }: any) => (
 											<FormItem>
 												<FormLabel>{t("finance.receiptVouchers.bankName")}</FormLabel>
 												<FormControl>
@@ -351,7 +351,7 @@ export function ReceiptVoucherForm({
 							<FormField
 								control={form.control}
 								name="clientId"
-								render={({ field }) => (
+								render={({ field }: any) => (
 									<FormItem>
 										<FormLabel>{t("finance.payments.selectClient")}</FormLabel>
 										<Select onValueChange={field.onChange} value={field.value ?? ""}>
@@ -381,7 +381,7 @@ export function ReceiptVoucherForm({
 							<FormField
 								control={form.control}
 								name="description"
-								render={({ field }) => (
+								render={({ field }: any) => (
 									<FormItem>
 										<FormLabel>{t("finance.receiptVouchers.description")}</FormLabel>
 										<FormControl>
@@ -394,7 +394,7 @@ export function ReceiptVoucherForm({
 							<FormField
 								control={form.control}
 								name="notes"
-								render={({ field }) => (
+								render={({ field }: any) => (
 									<FormItem>
 										<FormLabel>{t("finance.receiptVouchers.notes")}</FormLabel>
 										<FormControl>
