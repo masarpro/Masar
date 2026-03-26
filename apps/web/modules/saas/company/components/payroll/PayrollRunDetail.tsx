@@ -573,7 +573,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 							{t("company.payroll.approveConfirm")}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
-					{bankAccounts && bankAccounts.length > 0 && (
+					{bankAccounts && (bankAccounts as any).accounts?.length > 0 && (
 						<div className="space-y-2 py-2">
 							<label className="text-sm font-medium text-slate-700 dark:text-slate-300">
 								{t("company.payroll.sourceAccount")}
@@ -583,7 +583,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 									<SelectValue placeholder={t("company.payroll.selectSourceAccount")} />
 								</SelectTrigger>
 								<SelectContent>
-									{bankAccounts.map((bank: any) => (
+									{(bankAccounts as any).accounts?.map((bank: any) => (
 										<SelectItem key={bank.id} value={bank.id}>
 											{bank.name} {bank.isDefault ? `(${t("company.payroll.default")})` : ""}
 										</SelectItem>
