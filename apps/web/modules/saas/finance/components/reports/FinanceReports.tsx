@@ -26,7 +26,9 @@ import {
 	Percent,
 	Calendar,
 	Building2,
+	ArrowUpDown,
 } from "lucide-react";
+import Link from "next/link";
 import { Currency } from "../shared/Currency";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 
@@ -212,6 +214,29 @@ export function FinanceReports({
 						</div>
 					</CardContent>
 				</Card>
+			</div>
+
+			{/* Detailed Reports */}
+			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				<Link href={`/app/${organizationSlug}/finance/reports/cash-flow`}>
+					<Card className="rounded-2xl hover:shadow-md transition-shadow cursor-pointer">
+						<CardContent className="p-4">
+							<div className="flex items-center gap-3">
+								<div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+									<ArrowUpDown className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+								</div>
+								<div>
+									<p className="font-medium text-slate-900 dark:text-slate-100">
+										{t("finance.reports.cashFlow.title")}
+									</p>
+									<p className="text-sm text-slate-500 dark:text-slate-400">
+										{t("finance.reports.cashFlow.subtitle")}
+									</p>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+				</Link>
 			</div>
 
 			{/* Reports Tabs */}

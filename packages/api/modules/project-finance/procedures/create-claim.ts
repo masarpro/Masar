@@ -1,4 +1,5 @@
-import { createProjectClaim, getProjectById } from "@repo/database";
+import { createProjectClaim, getProjectById, getContractSummary, db } from "@repo/database";
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -34,6 +35,25 @@ export const createClaim = subscriptionProcedure
 			context.user.id,
 			{ section: "finance", action: "payments" },
 		);
+
+		// Validate claim amount doesn't exceed contract value
+		const contractSummary = await getContractSummary(input.organizationId, input.projectId);
+		if (contractSummary.adjustedValue > 0) {
+			const existingClaims = await db.projectClaim.aggregate({
+				where: {
+					projectId: input.projectId,
+					organizationId: input.organizationId,
+					status: { not: "REJECTED" },
+				},
+				_sum: { amount: true },
+			});
+			const existingTotal = Number(existingClaims._sum.amount ?? 0);
+			if (existingTotal + input.amount > contractSummary.adjustedValue) {
+				throw new ORPCError("BAD_REQUEST", {
+					message: "إجمالي المستخلصات يتجاوز قيمة العقد المعدلة",
+				});
+			}
+		}
 
 		const claim = await createProjectClaim({
 			organizationId: input.organizationId,

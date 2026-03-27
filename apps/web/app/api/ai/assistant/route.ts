@@ -164,6 +164,9 @@ export async function POST(request: Request) {
       ...getAISDKTools(toolContext, "quantities"),
       ...getAISDKTools(toolContext, "finance"),
       ...getAISDKTools(toolContext, "leads"),
+      ...getAISDKTools(toolContext, "accounting"),
+      ...getAISDKTools(toolContext, "subcontracts"),
+      ...getAISDKTools(toolContext, "dashboard"),
     };
 
     // دمج الأدوات — القديمة لها الأولوية (لتجنب تكرار الأسماء)
@@ -177,8 +180,8 @@ export async function POST(request: Request) {
       system: systemPrompt,
       messages: modelMessages,
       tools,
-      stopWhen: stepCountIs(5),
-      maxOutputTokens: 2000,
+      stopWhen: stepCountIs(8),
+      maxOutputTokens: 4000,
       onError: ({ error }) => {
         console.error("[Assistant Stream Error]", error);
       },

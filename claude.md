@@ -1,7 +1,7 @@
 agents.md
 # CLAUDE.md — دليل Claude Code الشامل لمنصة مسار
 
-> **آخر تحديث:** 2026-03-24
+> **آخر تحديث:** 2026-03-27
 > **المطوّر:** جودت — مؤسس ومطوّر رئيسي (مطوّر فردي)
 > **المشروع:** منصة مسار (Masar) — SaaS لإدارة المشاريع الإنشائية
 > **المستودع:** github.com/masarpro/Masar
@@ -468,11 +468,11 @@ DIRECT_URL = postgresql://...                     # Direct (migrations only)
 | middleware.ts deprecated warning | Next.js 16 يستخدم proxy.ts بدل middleware.ts | إعادة تسمية proxy.disabled.ts → proxy.ts وحذف middleware.ts | 2026-03-16 |
 | الهالك السالب في اللبشة (-67.9%) | القطع الطويلة (>12m) تحتاج سيخين مع وصلة تراكب | إضافة `if (barLength > stockLength)` مع حساب lap splice | 2026-03-15 |
 | الحديد العلوي في القواعد (101 بدل 81 سيخ) | Top mesh يستخدم bottom mesh bars-per-meter بالخطأ | فصل حساب top mesh عن bottom mesh | 2026-03-14 |
-| تضاعف المواد في ملخص التسعير | 18,134 → 36,268 | ⚠️ مفتوحة — قيد التحقيق عبر console.log في bulkUpdate | 2026-03-13 |
 | أسماء العناصر تُمسح عند الكتابة | useEffect في ElementHeaderRow يعيد التشغيل بسبب inline function | إضافة `skipAutoName` prop + functional `setFormData` updaters | 2026-03-14 |
 | Prisma 6→7 breaking changes | Dependabot auto-upgraded major version | رفض PR + manual migration (driver adapters, ESM, prisma.config.ts) | 2026-03-10 |
 | Build failure (ECONNRESET) | Windows dev mode + Turbopack | غير مؤثر — يحدث فقط في dev mode، الحل: restart pnpm dev | متكرر |
 | .env.local duplicates | قيم وهمية تتجاوز القيم الحقيقية | تنظيف الملف يدوياً — حذف التكرارات | 2026-03-16 |
+| تدقيق محاسبي (14 خطأ) | تدقيق شامل للنظام المحاسبي والمالي | جميع الـ 14 خطأ تبيّن أنها مُصلحة مسبقاً: قيود تلقائية ذرية ($transaction)، تحديث رصيد البنك عند دفعة الفاتورة، state machine للفواتير والمستخلصات، حد مبلغ الإشعار الدائن، منع تعديل فاتورة ISSUED، ترقيم ذري للعقود، فحص الفترات المغلقة، VAT بـ Decimal، entryNo فريد، audit log لأخطاء القيود | 2026-03-27 |
 
 ### 10.2 مشاكل مفتوحة (تحتاج إصلاح)
 
@@ -769,9 +769,9 @@ export const createItem = subscriptionProcedure... // write
 
 ### 19.1 نظرة عامة
 
-نظام محاسبي متكامل يُفعّل عبر "وضع المحاسبة" (toggle في localStorage). يشمل: دليل حسابات هرمي، قيود يومية تلقائية ويدوية، فترات محاسبية، 10 تقارير، دفتر أستاذ، أرصدة افتتاحية، كشوف حساب، سندات قبض/صرف، تسوية بنكية، قيود متكررة، وتصدير Excel.
+نظام محاسبي متكامل يعمل دائماً. يشمل: دليل حسابات هرمي (يُنشأ تلقائياً عند أول عملية مالية)، قيود يومية تلقائية ويدوية، فترات محاسبية، 10 تقارير، دفتر أستاذ، أرصدة افتتاحية، كشوف حساب، سندات قبض/صرف، تسوية بنكية، قيود متكررة، وتصدير Excel.
 
-**القاعدة:** كل شيء محاسبي يظهر فقط عند تفعيل وضع المحاسبة. العمليات المالية الأساسية (فواتير، مصروفات، مقبوضات) تعمل بشكل مستقل عن المحاسبة.
+**القاعدة:** المحاسبة تعمل دائماً بلا toggle — دليل الحسابات يُنشأ تلقائياً عبر `ensureChartExists`. أخطاء القيود التلقائية لا تكسر العملية المالية الأصلية أبداً.
 
 ### 19.2 المعمارية
 
@@ -804,25 +804,39 @@ export const createItem = subscriptionProcedure... // write
 |-------|-------|--------|
 | إصدار فاتورة | DR: 1120 عملاء / CR: 4100 إيرادات + 2130 ضريبة | INVOICE |
 | تحصيل فاتورة | DR: البنك / CR: 1120 عملاء | INVOICE_PAYMENT |
-| مصروف | DR: حساب المصروف / CR: البنك | EXPENSE |
+| مصروف | DR: حساب المصروف + 1150 ضريبة مدخلات / CR: البنك | EXPENSE |
 | تحويل بنكي | DR: البنك المستلم / CR: البنك المرسل | TRANSFER |
 | دفعة مقاول باطن | DR: 5200 مقاولو باطن / CR: البنك | SUBCONTRACT_PAYMENT |
+| اعتماد مطالبة مقاول باطن | DR: 5200 مقاولو باطن / CR: 2120 مستحقات | SUBCONTRACT_CLAIM_APPROVED |
 | رواتب | DR: 6100 رواتب / CR: البنك + 2170 تأمينات | PAYROLL |
 | مقبوض مباشر | DR: البنك / CR: 4300 إيرادات أخرى | ORG_PAYMENT |
+| دفعة مشروع | DR: البنك / CR: 4100 إيرادات | PROJECT_PAYMENT |
+| اعتماد مستخلص مشروع | DR: 1120 عملاء / CR: 4100 إيرادات | PROJECT_CLAIM_APPROVED |
 | إشعار دائن | DR: 4100 + 2130 / CR: 1120 | CREDIT_NOTE |
+| سند قبض | DR: البنك / CR: حساب حسب النوع | RECEIPT_VOUCHER |
+| سند صرف | DR: حساب حسب النوع / CR: البنك | PAYMENT_VOUCHER |
+| تسليم نهائي (إفراج ضمان) | DR: 2120 / CR: البنك | HANDOVER_RETENTION_RELEASE |
+
+**14 حدث تلقائي** — كل واحد مع `JOURNAL_ENTRY_FAILED` audit log في حالة الفشل.
 
 **قاعدة صامتة:** أخطاء المحاسبة لا تكسر العملية المالية الأصلية أبداً.
 
 ### 19.5 ترقيم القيود حسب النوع
 
-كل نوع قيد له prefix مستقل مع sequence منفصل:
+كل نوع قيد له prefix مستقل مع sequence منفصل (18 نوع):
 ```
-INVOICE → INV-JE-2026-XXXX     EXPENSE → EXP-JE-2026-XXXX
-INVOICE_PAYMENT → RCV-JE-XXXX  TRANSFER → TRF-JE-2026-XXXX
-SUBCONTRACT_PAYMENT → SUB-JE   PAYROLL → PAY-JE-2026-XXXX
-MANUAL → MAN-JE-2026-XXXX      ADJUSTMENT → ADJ-JE-2026-XXXX
-OPENING_BALANCE → OPN-JE-XXXX  REVERSAL → REV-JE-2026-XXXX
+INVOICE → INV-JE              INVOICE_PAYMENT → RCV-JE
+EXPENSE → EXP-JE              TRANSFER → TRF-JE
+SUBCONTRACT_PAYMENT → SUB-JE  SUBCONTRACT_CLAIM_APPROVED → SCL-JE
+PROJECT_PAYMENT → PRJ-JE      PROJECT_CLAIM_APPROVED → PCL-JE
+PAYROLL → PAY-JE              ORG_PAYMENT → RCV-JE
+CREDIT_NOTE → CN-JE           REVERSAL → REV-JE
+ADJUSTMENT → ADJ-JE           PERIOD_CLOSING → CLS-JE
+OPENING_BALANCE → OPN-JE      RECEIPT_VOUCHER → RV-JE
+PAYMENT_VOUCHER → PV-JE       HANDOVER_RETENTION_RELEASE → HR-JE
+MANUAL (default) → MAN-JE
 ```
+Format: `{PREFIX}-{YEAR}-{XXXX}` (e.g. `INV-JE-2026-0001`)
 
 ### 19.6 الميزات الـ 17 المنفّذة
 
@@ -945,15 +959,13 @@ apps/web/modules/saas/finance/
 ├── components/shell/
 │   ├── constants.ts                 # FINANCE_NAV_SECTIONS (13 section)
 │   └── FinanceNavigation.tsx        # شريط التنقل المالي (15 قسم — المحاسبة مرئية دائماً)
-├── hooks/
-│   └── use-accounting-mode.ts       # useSyncExternalStore + localStorage
 └── lib/
     └── accounting-excel-export.ts   # xlsx-js-style: trial balance, journal, ledger
 ```
 
 ### 19.8 التنقل المحاسبي
 
-عند تفعيل وضع المحاسبة تظهر الأقسام التالية في شريط التنقل المالي والـ Sidebar:
+أقسام المحاسبة تظهر دائماً في شريط التنقل المالي والـ Sidebar:
 - لوحة المحاسبة
 - دليل الحسابات
 - القيود اليومية
@@ -1002,6 +1014,23 @@ mutation.mutate({ input: { organizationId } }); // هذا خطأ!
 | 6100 | رواتب إدارية | EXPENSE |
 | 6200-6950 | مصروفات تشغيلية (إيجار، مرافق، عمولات...) | EXPENSE |
 
+### 19.11 ضمانات سلامة البيانات المالية (مُتحقق منها 2026-03-27)
+
+| الضمانة | الموقع | التفاصيل |
+|---------|--------|----------|
+| القيود ذرية | `createJournalEntry` → `db.$transaction` | duplicate check + period check + account validation + create كلها في transaction واحد |
+| رصيد البنك يُحدّث مع دفعة الفاتورة | `addInvoicePayment` / `deleteInvoicePayment` | `increment` / `decrement` داخل نفس الـ transaction |
+| state machine للفواتير | `updateInvoiceStatusProcedure` | `ALLOWED_TRANSITIONS` + DRAFT محذوف من Zod enum |
+| منع تعديل فاتورة ISSUED | `updateInvoiceItems` | `status !== "DRAFT"` → throw |
+| حد مبلغ الإشعار الدائن | `createCreditNote` | مجموع الإشعارات السابقة + الجديد ≤ الفاتورة الأصلية |
+| الإشعار الدائن يُقلل رصيد الفاتورة | `createCreditNote` → `tx.financeInvoice.update` | `paidAmount: { increment: creditAmount }` + تحديث status |
+| فحص الفترات المغلقة عند الترحيل | `postJournalEntry` → `isPeriodClosed` | يمنع ترحيل قيد في فترة مغلقة |
+| entryNo فريد | Schema: `@@unique([organizationId, entryNo])` | مع ترقيم ذري عبر `nextSequenceValue` |
+| ترقيم ذري للعقود | `generateSubcontractNo` / `generateSubcontractPaymentNo` | عبر `generateAtomicNo` |
+| state machine للمستخلصات | `updateClaimStatus` → `ALLOWED_TRANSITIONS` | DRAFT→SUBMITTED→APPROVED→PAID |
+| VAT بـ Prisma Decimal | `onExpenseCompleted` | `amount.div(Decimal("1.15"))` بدل JS floating-point |
+| audit log لأخطاء القيود | كل catch block (33 موقع) | `JOURNAL_ENTRY_FAILED` + fire-and-forget |
+
 ---
 
 ## 20. ملاحظات بيئة العمل
@@ -1016,4 +1045,4 @@ mutation.mutate({ input: { organizationId } }); // هذا خطأ!
 
 ---
 
-*هذا الملف يُحدّث مع كل تطوير كبير. آخر مراجعة: 2026-03-24*
+*هذا الملف يُحدّث مع كل تطوير كبير. آخر مراجعة: 2026-03-27*

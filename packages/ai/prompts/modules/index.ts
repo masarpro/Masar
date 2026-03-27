@@ -7,3 +7,8 @@ export { getSubcontractsKnowledge } from "./subcontracts";
 export { getSettingsKnowledge } from "./settings";
 export { getOwnerPortalKnowledge } from "./owner-portal";
 export { getNavigationKnowledge } from "./navigation";
+export { getAccountingKnowledge } from "./accounting";
+export { getDashboardKnowledge } from "./dashboard";
+export { getDocumentsKnowledge } from "./documents";
+export { getChangeOrdersKnowledge } from "./change-orders";
+export { getFieldKnowledge } from "./field";

@@ -5,7 +5,7 @@ const financeModule: AIModuleDefinition = {
   nameAr: "المالية",
   nameEn: "Finance",
   description:
-    "إدارة الفواتير والمقبوضات والمصروفات والحسابات البنكية وعروض الأسعار",
+    "إدارة الفواتير والمقبوضات والمصروفات والحسابات البنكية وعروض الأسعار والمحاسبة وسندات القبض والصرف",
 
   routePatterns: [
     "^/[^/]+/finance",
@@ -54,6 +54,9 @@ const financeModule: AIModuleDefinition = {
     "queryQuotations",
     "getQuotationDetails",
     "getQuotationsSummary",
+    "queryAccounting",
+    "getAccountingReports",
+    "queryVouchers",
   ],
 
   entities: [
@@ -79,6 +82,11 @@ const financeModule: AIModuleDefinition = {
         "status",
         "validUntil",
       ],
+    },
+    {
+      name: "ChartAccount",
+      nameAr: "حساب",
+      fields: ["code", "nameAr", "type"],
     },
   ],
 };

@@ -518,12 +518,48 @@ export function getAssistantTools(ctx: ToolContext) {
           return { url: `${base}/projects/${projectId}${sub}`, label: destination };
         };
 
+        // Accounting & Reports (must be before general finance patterns)
+        if (/لوحة.*محاسب|accounting.*dashboard/.test(d))
+          return { url: `${base}/finance/accounting-dashboard`, label: "لوحة المحاسبة" };
+        if (/دليل.*حساب|chart.*account/.test(d))
+          return { url: `${base}/finance/chart-of-accounts`, label: "دليل الحسابات" };
+        if (/قيود.*متكرر|recurring.*journal/.test(d))
+          return { url: `${base}/finance/journal-entries/recurring`, label: "القيود المتكررة" };
+        if (/قيود.*يومي|قيد.*يومي|journal.*entr/.test(d))
+          return { url: `${base}/finance/journal-entries`, label: "القيود اليومية" };
+        if (/أرصدة.*افتتاح|opening.*balance/.test(d))
+          return { url: `${base}/finance/opening-balances`, label: "الأرصدة الافتتاحية" };
+        if (/فترات.*محاسب|accounting.*period/.test(d))
+          return { url: `${base}/finance/accounting-periods`, label: "الفترات المحاسبية" };
+        if (/ميزان.*مراجع|trial.*balance/.test(d))
+          return { url: `${base}/finance/accounting-reports/trial-balance`, label: "ميزان المراجعة" };
+        if (/ميزانية.*عمومي|balance.*sheet/.test(d))
+          return { url: `${base}/finance/accounting-reports/balance-sheet`, label: "الميزانية العمومية" };
+        if (/قائمة.*دخل|income.*statement/.test(d))
+          return { url: `${base}/finance/accounting-reports/income-statement`, label: "قائمة الدخل" };
+        if (/ضريبة.*قيمة|vat.*report/.test(d))
+          return { url: `${base}/finance/accounting-reports/vat-report`, label: "تقرير ضريبة القيمة المضافة" };
+        if (/ذمم.*مدين|aged.*receivable/.test(d))
+          return { url: `${base}/finance/accounting-reports/aged-receivables`, label: "أعمار الذمم المدينة" };
+        if (/ذمم.*دائن|aged.*payable/.test(d))
+          return { url: `${base}/finance/accounting-reports/aged-payables`, label: "أعمار الذمم الدائنة" };
+        if (/مراكز.*تكلفة|cost.*center/.test(d))
+          return { url: `${base}/finance/accounting-reports/cost-center`, label: "مراكز التكلفة" };
+        if (/تقرير.*محاسب|accounting.*report/.test(d))
+          return { url: `${base}/finance/accounting-reports`, label: "التقارير المحاسبية" };
+        if (/تسوية.*بنك|bank.*reconcil/.test(d))
+          return { url: `${base}/finance/banks`, label: "التسوية البنكية" };
+        if (/سند.*صرف|payment.*voucher/.test(d))
+          return { url: `${base}/finance/payment-vouchers`, label: "سندات الصرف" };
+        if (/سند.*قبض|receipt.*voucher/.test(d))
+          return { url: `${base}/finance/receipt-vouchers`, label: "سندات القبض" };
+
         // Finance
         if (/فاتورة.*جديد|new.*invoice|إنشاء.*فاتورة/.test(d))
           return { url: `${base}/finance/invoices/new`, label: "إنشاء فاتورة جديدة" };
         if (/فاتور|invoice/.test(d))
           return { url: `${base}/finance/invoices`, label: "الفواتير" };
-        if (/مقبوض|payment|سند.*قبض/.test(d))
+        if (/مقبوض|payment/.test(d))
           return { url: `${base}/finance/payments`, label: "المقبوضات" };
         if (/مصروف.*مالي|expense/.test(d) && !/منشأة|شركة/.test(d))
           return { url: `${base}/finance/expenses`, label: "المصروفات" };

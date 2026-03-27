@@ -70,6 +70,21 @@ const quickActionsMap: Record<string, QuickAction[]> = {
     { id: "unpaid-invoices", labelAr: "فواتير غير مدفوعة", labelEn: "Unpaid invoices", icon: "FileWarning", prompt: "كم فاتورة غير مدفوعة عندي؟" },
     { id: "how-invoice", labelAr: "كيف أنشئ فاتورة؟", labelEn: "How to create invoice?", icon: "Plus", prompt: "كيف أنشئ فاتورة جديدة؟" },
   ],
+  "chart-of-accounts": [
+    { id: "accounts-overview", labelAr: "نظرة على الحسابات", labelEn: "Accounts overview", icon: "BookOpen", prompt: "أعطني نظرة على دليل الحسابات" },
+    { id: "trial-balance", labelAr: "ميزان المراجعة", labelEn: "Trial balance", icon: "Scale", prompt: "هل ميزان المراجعة متوازن؟" },
+    { id: "accounting-guide", labelAr: "كيف أستخدم المحاسبة؟", labelEn: "Accounting guide", icon: "HelpCircle", prompt: "كيف أستخدم النظام المحاسبي؟" },
+  ],
+  "journal-entries": [
+    { id: "draft-entries", labelAr: "قيود غير مرحّلة", labelEn: "Draft entries", icon: "FileEdit", prompt: "كم قيد غير مرحّل عندي؟" },
+    { id: "recent-entries", labelAr: "آخر القيود", labelEn: "Recent entries", icon: "Clock", prompt: "أعرض لي آخر القيود اليومية" },
+    { id: "journal-guide", labelAr: "كيف أنشئ قيد؟", labelEn: "How to create entry?", icon: "Plus", prompt: "كيف أنشئ قيد يومي جديد؟" },
+  ],
+  "accounting-reports": [
+    { id: "trial-balance-report", labelAr: "ميزان المراجعة", labelEn: "Trial balance", icon: "Scale", prompt: "أعطني ميزان المراجعة" },
+    { id: "income-statement", labelAr: "قائمة الدخل", labelEn: "Income statement", icon: "TrendingUp", prompt: "أعطني قائمة الدخل لهذا الشهر" },
+    { id: "receivables-report", labelAr: "أعمار الذمم المدينة", labelEn: "Aged receivables", icon: "AlertTriangle", prompt: "أعطني تقرير أعمار الذمم المدينة" },
+  ],
   quantities: [
     { id: "quantities-overview", labelAr: "نظرة على الكميات", labelEn: "Quantities overview", icon: "Calculator", prompt: "أعطني نظرة عامة على حصر الكميات" },
     { id: "quantities-guide", labelAr: "كيف أحصر الكميات؟", labelEn: "How to survey?", icon: "HelpCircle", prompt: "كيف أستخدم نظام حصر الكميات؟" },

@@ -27,13 +27,23 @@ const subcontractsModule: AIModuleDefinition = {
     "كيف أضيف أمر تغيير على عقد باطن؟",
   ],
 
-  relatedTools: ["queryCompany"],
+  relatedTools: ["querySubcontracts", "getSubcontractDetails"],
 
   entities: [
     {
       name: "SubcontractContract",
       nameAr: "عقد باطن",
       fields: ["contractNo", "contractorName", "value", "status"],
+    },
+    {
+      name: "SubcontractPayment",
+      nameAr: "دفعة مقاول",
+      fields: ["paymentNo", "amount", "date", "paymentMethod"],
+    },
+    {
+      name: "SubcontractClaim",
+      nameAr: "مطالبة مقاول",
+      fields: ["claimNo", "amount", "status", "periodStart", "periodEnd"],
     },
   ],
 };

@@ -8,6 +8,11 @@ import {
   getQuantitiesKnowledge,
   getSettingsKnowledge,
   getSubcontractsKnowledge,
+  getAccountingKnowledge,
+  getDashboardKnowledge,
+  getDocumentsKnowledge,
+  getChangeOrdersKnowledge,
+  getFieldKnowledge,
 } from "./modules";
 
 export interface AssistantContext {
@@ -53,15 +58,15 @@ export function buildSystemPrompt(context: AssistantContext): string {
 
 export function getRelevantModules(section: string): string[] {
   const sectionModules: Record<string, string[]> = {
-    dashboard: ["projects", "finance"],
+    dashboard: ["projects", "finance", "dashboard"],
     projects: ["projects", "execution"],
     "project-overview": ["projects", "execution"],
     "project-execution": ["execution"],
-    "project-field": ["execution"],
-    "project-finance": ["finance", "subcontracts"],
+    "project-field": ["execution", "field"],
+    "project-finance": ["finance", "subcontracts", "projects"],
     "project-timeline": ["projects"],
-    "project-documents": ["projects"],
-    "project-changes": ["projects"],
+    "project-documents": ["projects", "documents"],
+    "project-changes": ["projects", "change-orders"],
     "project-chat": ["projects"],
     "project-team": ["projects"],
     "project-insights": ["projects"],
@@ -72,8 +77,16 @@ export function getRelevantModules(section: string): string[] {
     settings: ["settings"],
     notifications: ["projects", "finance"],
     chatbot: ["projects", "finance"],
-    leads: ["projects"],
+    leads: ["leads"],
     pricing: ["quantities", "finance"],
+    "chart-of-accounts": ["finance", "accounting"],
+    "journal-entries": ["finance", "accounting"],
+    "accounting-dashboard": ["finance", "accounting"],
+    "accounting-reports": ["finance", "accounting"],
+    "opening-balances": ["finance", "accounting"],
+    "accounting-periods": ["finance", "accounting"],
+    "receipt-vouchers": ["finance"],
+    "payment-vouchers": ["finance"],
   };
 
   return sectionModules[section] ?? ["projects", "finance"];
@@ -93,6 +106,11 @@ function getModuleKnowledge(
     subcontracts: getSubcontractsKnowledge,
     settings: getSettingsKnowledge,
     "owner-portal": getOwnerPortalKnowledge,
+    accounting: getAccountingKnowledge,
+    dashboard: getDashboardKnowledge,
+    documents: getDocumentsKnowledge,
+    "change-orders": getChangeOrdersKnowledge,
+    field: getFieldKnowledge,
   };
 
   const fn = moduleMap[moduleName];
@@ -135,6 +153,14 @@ function buildDynamicContext(context: AssistantContext): string {
     chatbot: "المحادثة الذكية",
     leads: "العملاء المحتملين",
     pricing: "التسعير",
+    "chart-of-accounts": "دليل الحسابات",
+    "journal-entries": "القيود اليومية",
+    "accounting-dashboard": "لوحة المحاسبة",
+    "accounting-reports": "التقارير المحاسبية",
+    "opening-balances": "الأرصدة الافتتاحية",
+    "accounting-periods": "الفترات المحاسبية",
+    "receipt-vouchers": "سندات القبض",
+    "payment-vouchers": "سندات الصرف",
   };
 
   let result = `## السياق الحالي
@@ -160,6 +186,12 @@ function buildDynamicContext(context: AssistantContext): string {
 
 function buildRules(context: AssistantContext): string {
   return `## قواعد مهمة — التزم بها دائماً:
+0. أنت مساعد مسار فقط — متخصص حصرياً في منصة مسار لإدارة مشاريع المقاولات.
+   - أجب على أسئلة بيانات المستخدم في مسار (مشاريع، مالية، محاسبة، تنفيذ، كميات، عروض أسعار، شركة)
+   - أجب على أسئلة كيفية استخدام المنصة ("كيف أنشئ فاتورة؟"، "وين ألاقي المصروفات؟")
+   - لا تجب على أسئلة هندسية أو مقاولاتية عامة (مثل: "كيف أحسب كمية الحديد؟"، "ما الفرق بين القواعد المنفصلة والمتصلة؟")
+   - لا تجب على أي موضوع خارج المنصة (برمجة، طبخ، رياضة، أخبار، إلخ)
+   - عند سؤال خارج النطاق، اعتذر بلطف: "أنا مساعد مسار الذكي، متخصص في مساعدتك مع بيانات منصة مسار. كيف أقدر أساعدك في مسار؟"
 1. أجب بالعربية إلا إذا سألك بالإنجليزية
 2. كن مختصراً ومباشراً — لا تكتب مقالات طويلة
 3. إذا سأل عن كيفية عمل شيء، أعطه الخطوات بوضوح مع رابط الصفحة

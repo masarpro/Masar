@@ -8,3 +8,8 @@ export { default as settingsModule } from "./settings";
 export { default as ownerPortalModule } from "./owner-portal";
 export { default as navigationModule } from "./navigation";
 export { default as leadsModule } from "./leads";
+export { default as accountingModule } from "./accounting";
+export { default as dashboardModule } from "./dashboard";
+export { default as documentsModule } from "./documents";
+export { default as changeOrdersModule } from "./change-orders";
+export { default as fieldModule } from "./field";
