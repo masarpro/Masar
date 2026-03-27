@@ -254,7 +254,7 @@ export function InvoiceEditor({
 
 	// Update status mutation
 	const statusMutation = useMutation({
-		mutationFn: async (status: "DRAFT" | "SENT" | "VIEWED" | "OVERDUE") => {
+		mutationFn: async (status: "CANCELLED" | "SENT" | "VIEWED" | "OVERDUE") => {
 			await orpcClient.finance.invoices.updateStatus({
 				organizationId,
 				id: invoiceId,
@@ -456,14 +456,7 @@ export function InvoiceEditor({
 									</DropdownMenuItem>
 								)}
 
-							{invoice.status !== "DRAFT" && invoice.status !== "CANCELLED" && (
-								<DropdownMenuItem
-									onClick={() => statusMutation.mutate("DRAFT")}
-									disabled={statusMutation.isPending}
-								>
-									{t("finance.invoices.actions.revertToDraft")}
-								</DropdownMenuItem>
-							)}
+							{/* Revert to draft is not supported by the API */}
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>

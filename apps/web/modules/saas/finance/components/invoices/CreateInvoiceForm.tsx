@@ -526,7 +526,7 @@ export function CreateInvoiceForm({
 	});
 
 	const statusMutation = useMutation({
-		mutationFn: async (status: "DRAFT" | "SENT" | "VIEWED" | "OVERDUE") => {
+		mutationFn: async (status: "CANCELLED" | "SENT" | "VIEWED" | "OVERDUE") => {
 			await orpcClient.finance.invoices.updateStatus({
 				organizationId,
 				id: invoiceId!,
