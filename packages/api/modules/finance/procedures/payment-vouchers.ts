@@ -444,6 +444,14 @@ export const approvePaymentVoucher = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to generate entry for payment voucher:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: input.id,
+					metadata: { error: String(e), referenceType: "PAYMENT_VOUCHER" },
+				});
 			}
 		}
 
@@ -577,6 +585,14 @@ export const cancelPaymentVoucher = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to reverse entry for cancelled payment voucher:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: input.id,
+					metadata: { error: String(e), referenceType: "PAYMENT_VOUCHER" },
+				});
 			}
 		}
 

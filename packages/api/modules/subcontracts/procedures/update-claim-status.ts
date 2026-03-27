@@ -1,4 +1,4 @@
-import { updateSubcontractClaimStatus, db, logAuditEvent } from "@repo/database";
+import { updateSubcontractClaimStatus, db, logAuditEvent, orgAuditLog } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -70,6 +70,14 @@ export const updateSubcontractClaimStatusProcedure = subscriptionProcedure
 					});
 				} catch (e) {
 					console.error("[AutoJournal] Failed for SubcontractClaim approval:", e);
+					orgAuditLog({
+						organizationId: input.organizationId,
+						actorId: context.user.id,
+						action: "JOURNAL_ENTRY_FAILED",
+						entityType: "journal_entry",
+						entityId: input.claimId,
+						metadata: { error: String(e), referenceType: "SUBCONTRACT_CLAIM_APPROVED" },
+					});
 				}
 			}
 
@@ -85,6 +93,14 @@ export const updateSubcontractClaimStatusProcedure = subscriptionProcedure
 					});
 				} catch (e) {
 					console.error("[AutoJournal] Failed to reverse entry for rejected/cancelled subcontract claim:", e);
+					orgAuditLog({
+						organizationId: input.organizationId,
+						actorId: context.user.id,
+						action: "JOURNAL_ENTRY_FAILED",
+						entityType: "journal_entry",
+						entityId: input.claimId,
+						metadata: { error: String(e), referenceType: "SUBCONTRACT_CLAIM_APPROVED" },
+					});
 				}
 			}
 

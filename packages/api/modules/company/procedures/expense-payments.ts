@@ -5,6 +5,7 @@ import {
 	updateExpensePayment,
 	deleteExpensePayment,
 	generateMonthlyPayments,
+	orgAuditLog,
 	db,
 } from "@repo/database";
 import { z } from "zod";
@@ -136,6 +137,14 @@ export const markPaymentPaidProcedure = subscriptionProcedure
 			}
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for company expense payment:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: result.financeExpenseId || input.id,
+				metadata: { error: String(e), referenceType: "EXPENSE" },
+			});
 		}
 
 		// Auto-create payment voucher for company expense payment
@@ -254,6 +263,14 @@ export const updateExpensePaymentProcedure = subscriptionProcedure
 					}
 				} catch (e) {
 					console.error("[AutoJournal] Failed to adjust entry for updated company expense payment:", e);
+					orgAuditLog({
+						organizationId: input.organizationId,
+						actorId: context.user.id,
+						action: "JOURNAL_ENTRY_FAILED",
+						entityType: "journal_entry",
+						entityId: existingPayment.financeExpenseId || input.id,
+						metadata: { error: String(e), referenceType: "EXPENSE" },
+					});
 				}
 			}
 		}
@@ -303,6 +320,14 @@ export const deleteExpensePaymentProcedure = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to reverse entry for deleted company expense payment:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: payment.financeExpenseId || input.id,
+					metadata: { error: String(e), referenceType: "EXPENSE" },
+				});
 			}
 
 			// Delete the orphaned FinanceExpense

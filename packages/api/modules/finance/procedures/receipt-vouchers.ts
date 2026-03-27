@@ -379,6 +379,14 @@ export const issueReceiptVoucher = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to generate entry for receipt voucher:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: input.id,
+					metadata: { error: String(e), referenceType: "RECEIPT_VOUCHER" },
+				});
 			}
 		}
 
@@ -453,6 +461,14 @@ export const cancelReceiptVoucher = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to reverse entry for cancelled receipt voucher:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: input.id,
+					metadata: { error: String(e), referenceType: "RECEIPT_VOUCHER" },
+				});
 			}
 		}
 

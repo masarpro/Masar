@@ -265,18 +265,15 @@ export async function onExpenseCompleted(db: PrismaClient, expense: {
 			{ accountId: bankAccId, debit: ZERO, credit: expense.amount, projectId: expense.projectId },
 		);
 	} else {
-		// Split: net expense + input VAT (Saudi 15%)
-		const amountNum = Number(expense.amount);
-		const netNum = Math.round((amountNum / 1.15) * 100) / 100;
-		const vatNum = Math.round((amountNum - netNum) * 100) / 100;
-		const netAmount = new Prisma.Decimal(netNum);
-		const vatAmount = new Prisma.Decimal(vatNum);
+		// Split: net expense + input VAT (Saudi 15%) — use Prisma.Decimal for consistency with reports
+		const netAmount = expense.amount.div(new Prisma.Decimal("1.15")).toDecimalPlaces(2);
+		const vatAmount = expense.amount.sub(netAmount);
 
 		lines.push(
 			{ accountId: expenseAccId, debit: netAmount, credit: ZERO, projectId: expense.projectId },
 		);
 
-		if (vatNum > 0) {
+		if (vatAmount.greaterThan(ZERO)) {
 			const inputVatAccId = await getAccountByCode(db, expense.organizationId, "1150");
 			if (inputVatAccId) {
 				lines.push(

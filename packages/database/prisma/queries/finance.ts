@@ -1227,7 +1227,7 @@ export async function addInvoicePayment(
 		newStatus = "ISSUED";
 	}
 
-	// Create payment and update invoice in transaction
+	// Create payment, update invoice, and increment bank balance in transaction
 	return db.$transaction(async (tx) => {
 		const payment = await tx.financeInvoicePayment.create({
 			data: {
@@ -1249,6 +1249,14 @@ export async function addInvoicePayment(
 				status: newStatus,
 			},
 		});
+
+		// Increment bank balance when payment is received into a bank account
+		if (data.sourceAccountId) {
+			await tx.organizationBank.update({
+				where: { id: data.sourceAccountId },
+				data: { balance: { increment: data.amount } },
+			});
+		}
 
 		return payment;
 	});
@@ -1273,7 +1281,7 @@ export async function deleteInvoicePayment(
 
 	const payment = await db.financeInvoicePayment.findFirst({
 		where: { id: paymentId, invoiceId },
-		select: { id: true, amount: true },
+		select: { id: true, amount: true, sourceAccountId: true },
 	});
 
 	if (!payment) {
@@ -1303,6 +1311,14 @@ export async function deleteInvoicePayment(
 				status: newStatus,
 			},
 		});
+
+		// Decrement bank balance when payment is reversed
+		if (payment.sourceAccountId) {
+			await tx.organizationBank.update({
+				where: { id: payment.sourceAccountId },
+				data: { balance: { decrement: Number(payment.amount) } },
+			});
+		}
 	});
 }
 
@@ -1554,7 +1570,7 @@ export async function createCreditNote(data: {
 			id: true, status: true, clientId: true, clientName: true,
 			clientCompany: true, clientPhone: true, clientEmail: true,
 			clientAddress: true, clientTaxNumber: true, projectId: true,
-			vatPercent: true, discountPercent: true,
+			vatPercent: true, discountPercent: true, totalAmount: true, paidAmount: true,
 		},
 	});
 
@@ -1564,6 +1580,22 @@ export async function createCreditNote(data: {
 
 	if (original.status === "DRAFT" || original.status === "CANCELLED") {
 		throw new Error("لا يمكن إنشاء إشعار دائن لفاتورة مسودة أو ملغية");
+	}
+
+	// Bug #9 fix: validate credit note amount doesn't exceed original invoice remaining
+	const itemTotals = data.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+	const existingCreditNotes = await db.financeInvoice.aggregate({
+		where: {
+			relatedInvoiceId: data.originalInvoiceId,
+			invoiceType: "CREDIT_NOTE",
+			status: { not: "CANCELLED" },
+		},
+		_sum: { totalAmount: true },
+	});
+	// Credit note totalAmounts are negative, so abs() to get the credited total
+	const totalAlreadyCredited = Math.abs(Number(existingCreditNotes._sum.totalAmount ?? 0));
+	if (totalAlreadyCredited + itemTotals > Number(original.totalAmount)) {
+		throw new Error("مبلغ الإشعار الدائن يتجاوز المبلغ المتبقي من الفاتورة الأصلية");
 	}
 
 	const invoiceNo = await generateInvoiceNumber(data.organizationId);
@@ -1584,45 +1616,64 @@ export async function createCreditNote(data: {
 		sortOrder: index,
 	}));
 
-	return db.financeInvoice.create({
-		data: {
-			organizationId: data.organizationId,
-			createdById: data.createdById,
-			invoiceNo,
-			invoiceType: "CREDIT_NOTE",
-			relatedInvoiceId: data.originalInvoiceId,
-			clientId: original.clientId,
-			clientName: original.clientName,
-			clientCompany: original.clientCompany,
-			clientPhone: original.clientPhone,
-			clientEmail: original.clientEmail,
-			clientAddress: original.clientAddress,
-			clientTaxNumber: original.clientTaxNumber,
-			projectId: original.projectId,
-			status: "ISSUED",
-			issuedAt: new Date(),
-			issueDate: new Date(),
-			dueDate: new Date(),
-			paymentTerms: null,
-			notes: data.reason,
-			subtotal: negSubtotal,
-			discountPercent: original.discountPercent,
-			discountAmount: negDiscountAmount,
-			vatPercent: original.vatPercent,
-			vatAmount: negVatAmount,
-			totalAmount: negTotalAmount,
-			paidAmount: 0,
-			sellerName: data.sellerName,
-			sellerTaxNumber: data.sellerTaxNumber,
-			sellerAddress: data.sellerAddress,
-			sellerPhone: data.sellerPhone,
-			qrCode: data.qrCode,
-			zatcaUuid: data.zatcaUuid,
-			items: {
-				create: itemsData,
+	// Create credit note and update original invoice in a transaction
+	return db.$transaction(async (tx) => {
+		const creditNote = await tx.financeInvoice.create({
+			data: {
+				organizationId: data.organizationId,
+				createdById: data.createdById,
+				invoiceNo,
+				invoiceType: "CREDIT_NOTE",
+				relatedInvoiceId: data.originalInvoiceId,
+				clientId: original.clientId,
+				clientName: original.clientName,
+				clientCompany: original.clientCompany,
+				clientPhone: original.clientPhone,
+				clientEmail: original.clientEmail,
+				clientAddress: original.clientAddress,
+				clientTaxNumber: original.clientTaxNumber,
+				projectId: original.projectId,
+				status: "ISSUED",
+				issuedAt: new Date(),
+				issueDate: new Date(),
+				dueDate: new Date(),
+				paymentTerms: null,
+				notes: data.reason,
+				subtotal: negSubtotal,
+				discountPercent: original.discountPercent,
+				discountAmount: negDiscountAmount,
+				vatPercent: original.vatPercent,
+				vatAmount: negVatAmount,
+				totalAmount: negTotalAmount,
+				paidAmount: 0,
+				sellerName: data.sellerName,
+				sellerTaxNumber: data.sellerTaxNumber,
+				sellerAddress: data.sellerAddress,
+				sellerPhone: data.sellerPhone,
+				qrCode: data.qrCode,
+				zatcaUuid: data.zatcaUuid,
+				items: {
+					create: itemsData,
+				},
 			},
-		},
-		include: { items: true },
+			include: { items: true },
+		});
+
+		// Bug #8 fix: update original invoice — credit note reduces outstanding amount
+		const creditAmount = Number(totals.totalAmount); // positive value
+		const newPaid = Number(original.paidAmount) + creditAmount;
+		const total = Number(original.totalAmount);
+		const newStatus = newPaid >= total ? "PAID" as const : newPaid > 0 ? "PARTIALLY_PAID" as const : undefined;
+
+		await tx.financeInvoice.update({
+			where: { id: data.originalInvoiceId },
+			data: {
+				paidAmount: { increment: creditAmount },
+				...(newStatus ? { status: newStatus } : {}),
+			},
+		});
+
+		return creditNote;
 	});
 }
 

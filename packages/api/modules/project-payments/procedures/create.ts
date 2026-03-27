@@ -1,4 +1,4 @@
-import { createProjectPayment, logAuditEvent, db } from "@repo/database";
+import { createProjectPayment, logAuditEvent, orgAuditLog, db } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -75,6 +75,14 @@ export const createProjectPaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to create ProjectPayment entry:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: payment.id,
+				metadata: { error: String(e), referenceType: "PROJECT_PAYMENT" },
+			});
 		}
 
 		// Auto-create receipt voucher from project payment

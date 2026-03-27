@@ -482,6 +482,20 @@ export async function updateClaimStatus(
 		throw new Error("المستخلص غير موجود");
 	}
 
+	// Enforce allowed status transitions
+	const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+		DRAFT: ["SUBMITTED"],
+		SUBMITTED: ["APPROVED", "REJECTED"],
+		APPROVED: ["PAID"],
+		PAID: [],
+		REJECTED: ["DRAFT"],
+	};
+
+	const allowed = ALLOWED_TRANSITIONS[existing.status] ?? [];
+	if (!allowed.includes(newStatus)) {
+		throw new Error(`لا يمكن تغيير حالة المستخلص من ${existing.status} إلى ${newStatus}`);
+	}
+
 	// Build update data with appropriate timestamps
 	const updateData: {
 		status: ClaimStatus;

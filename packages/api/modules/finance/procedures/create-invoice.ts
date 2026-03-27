@@ -275,10 +275,10 @@ export const updateInvoiceStatusProcedure = subscriptionProcedure
 			organizationId: z.string(),
 			id: z.string(),
 			status: z.enum([
-				"DRAFT",
 				"SENT",
 				"VIEWED",
 				"OVERDUE",
+				"CANCELLED",
 			]),
 		}),
 	)
@@ -287,6 +287,29 @@ export const updateInvoiceStatusProcedure = subscriptionProcedure
 			section: "finance",
 			action: "invoices",
 		});
+
+		// Validate allowed status transitions
+		const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+			DRAFT: [],
+			ISSUED: ["SENT", "OVERDUE", "CANCELLED"],
+			SENT: ["VIEWED", "OVERDUE", "CANCELLED"],
+			VIEWED: ["OVERDUE", "CANCELLED"],
+			PARTIALLY_PAID: ["OVERDUE", "CANCELLED"],
+			PAID: [],
+			OVERDUE: ["CANCELLED"],
+			CANCELLED: [],
+		};
+
+		const currentInvoice = await db.financeInvoice.findFirst({
+			where: { id: input.id, organizationId: input.organizationId },
+			select: { status: true },
+		});
+		if (!currentInvoice) throw new Error("الفاتورة غير موجودة");
+
+		const allowed = ALLOWED_TRANSITIONS[currentInvoice.status] ?? [];
+		if (!allowed.includes(input.status)) {
+			throw new Error(`لا يمكن تغيير حالة الفاتورة من ${currentInvoice.status} إلى ${input.status}`);
+		}
 
 		const invoice = await updateInvoiceStatus(
 			input.id,
@@ -473,6 +496,14 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 			}
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for invoice payment:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: payment.id,
+				metadata: { error: String(e), referenceType: "INVOICE_PAYMENT" },
+			});
 		}
 
 		// Auto-create receipt voucher from invoice payment
@@ -554,6 +585,14 @@ export const deleteInvoicePaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to reverse entry for deleted invoice payment:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: input.paymentId,
+				metadata: { error: String(e), referenceType: "INVOICE_PAYMENT" },
+			});
 		}
 
 		return { success: true };
@@ -599,6 +638,14 @@ export const deleteInvoiceProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to reverse entry for deleted invoice:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: input.id,
+				metadata: { error: String(e), referenceType: "INVOICE" },
+			});
 		}
 
 		return { success: true };
@@ -757,6 +804,14 @@ export const issueInvoiceProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for invoice issue:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: issuedInvoice.id,
+				metadata: { error: String(e), referenceType: "INVOICE" },
+			});
 		}
 
 		return {
@@ -949,6 +1004,14 @@ export const createCreditNoteProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for credit note:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: creditNote.id,
+				metadata: { error: String(e), referenceType: "CREDIT_NOTE" },
+			});
 		}
 
 		return {

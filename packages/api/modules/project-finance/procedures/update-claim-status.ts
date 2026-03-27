@@ -1,4 +1,4 @@
-import { updateClaimStatus, getProjectById, db } from "@repo/database";
+import { updateClaimStatus, getProjectById, orgAuditLog, db } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -62,6 +62,14 @@ export const updateClaimStatusProcedure = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to generate entry for project claim approval:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: input.claimId,
+					metadata: { error: String(e), referenceType: "PROJECT_CLAIM_APPROVED" },
+				});
 			}
 		}
 
@@ -77,6 +85,14 @@ export const updateClaimStatusProcedure = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to reverse entry for rejected project claim:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: input.claimId,
+					metadata: { error: String(e), referenceType: "PROJECT_CLAIM_APPROVED" },
+				});
 			}
 		}
 

@@ -1,5 +1,6 @@
 import type { PaymentMethod, PaymentTermType } from "../generated/client";
 import { db } from "../client";
+import { generateAtomicNo } from "./sequences";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Subcontract Contract Queries - إدارة مقاولي الباطن
@@ -7,15 +8,12 @@ import { db } from "../client";
 
 /**
  * Generate next subcontract number (SUB-YYYY-0001, SUB-YYYY-0002, ...)
+ * Uses atomic sequence to prevent race conditions.
  */
 export async function generateSubcontractNo(
 	organizationId: string,
 ): Promise<string> {
-	const year = new Date().getFullYear();
-	const count = await db.subcontractContract.count({
-		where: { organizationId },
-	});
-	return `SUB-${year}-${String(count + 1).padStart(4, "0")}`;
+	return generateAtomicNo(organizationId, "SUB");
 }
 
 /**
@@ -593,10 +591,7 @@ export async function deleteSubcontractChangeOrder(id: string) {
 async function generateSubcontractPaymentNo(
 	organizationId: string,
 ): Promise<string> {
-	const count = await db.subcontractPayment.count({
-		where: { organizationId },
-	});
-	return `SUBPAY-${String(count + 1).padStart(4, "0")}`;
+	return generateAtomicNo(organizationId, "SUBPAY");
 }
 
 /**

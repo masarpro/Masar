@@ -1,4 +1,4 @@
-import { addSubcontractClaimPayment, logAuditEvent, db } from "@repo/database";
+import { addSubcontractClaimPayment, logAuditEvent, orgAuditLog, db } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -77,6 +77,14 @@ export const addSubcontractClaimPaymentProcedure = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to create SubcontractClaimPayment entry:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: payment.id,
+					metadata: { error: String(e), referenceType: "SUBCONTRACT_PAYMENT" },
+				});
 			}
 
 			return payment;

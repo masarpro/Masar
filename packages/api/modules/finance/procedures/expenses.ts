@@ -275,6 +275,14 @@ export const createExpenseProcedure = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to generate entry for expense:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: expense.id,
+					metadata: { error: String(e), referenceType: "EXPENSE" },
+				});
 			}
 
 			// Auto-create payment voucher for completed expense
@@ -401,6 +409,14 @@ export const deleteExpenseProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to reverse entry for deleted expense:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: input.id,
+				metadata: { error: String(e), referenceType: "EXPENSE" },
+			});
 		}
 
 		return result;
@@ -467,6 +483,14 @@ export const payExpenseProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for expense payment:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: expense.id,
+				metadata: { error: String(e), referenceType: "EXPENSE" },
+			});
 		}
 
 		// Auto-create payment voucher for paid expense
@@ -543,6 +567,14 @@ export const cancelExpenseProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to reverse entry for cancelled expense:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: input.id,
+				metadata: { error: String(e), referenceType: "EXPENSE" },
+			});
 		}
 
 		return expense;

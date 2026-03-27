@@ -1,4 +1,4 @@
-import { deleteProjectPayment, logAuditEvent, db } from "@repo/database";
+import { deleteProjectPayment, logAuditEvent, orgAuditLog, db } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -40,6 +40,14 @@ export const deleteProjectPaymentProcedure = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to reverse ProjectPayment entry:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: input.paymentId,
+					metadata: { error: String(e), referenceType: "PROJECT_PAYMENT" },
+				});
 			}
 
 			logAuditEvent(input.organizationId, input.projectId, {

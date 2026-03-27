@@ -810,6 +810,14 @@ export const signHandoverProtocol = subscriptionProcedure
 					});
 				} catch (e) {
 					console.error("[AutoJournal] Failed to create retention release entry:", e);
+					orgAuditLog({
+						organizationId: input.organizationId,
+						actorId: context.user.id,
+						action: "JOURNAL_ENTRY_FAILED",
+						entityType: "journal_entry",
+						entityId: input.id,
+						metadata: { error: String(e), referenceType: "RETENTION_RELEASE" },
+					});
 				}
 			}
 		}
@@ -884,6 +892,14 @@ export const completeHandoverProtocol = subscriptionProcedure
 					});
 				} catch (e) {
 					console.error("[AutoJournal] Failed to create retention release entry:", e);
+					orgAuditLog({
+						organizationId: input.organizationId,
+						actorId: context.user.id,
+						action: "JOURNAL_ENTRY_FAILED",
+						entityType: "journal_entry",
+						entityId: input.id,
+						metadata: { error: String(e), referenceType: "RETENTION_RELEASE" },
+					});
 				}
 			}
 		}

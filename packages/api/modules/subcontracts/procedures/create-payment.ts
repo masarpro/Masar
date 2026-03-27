@@ -1,4 +1,4 @@
-import { createSubcontractPayment, getSubcontractById, logAuditEvent, db } from "@repo/database";
+import { createSubcontractPayment, getSubcontractById, logAuditEvent, orgAuditLog, db } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -90,6 +90,14 @@ export const createSubcontractPaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for subcontract payment:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: payment.id,
+				metadata: { error: String(e), referenceType: "SUBCONTRACT_PAYMENT" },
+			});
 		}
 
 		// Auto-create payment voucher for subcontract payment

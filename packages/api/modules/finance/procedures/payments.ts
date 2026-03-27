@@ -174,6 +174,14 @@ export const createOrgPaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for payment:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: payment.id,
+				metadata: { error: String(e), referenceType: "ORG_PAYMENT" },
+			});
 		}
 
 		// Auto-create receipt voucher
@@ -295,6 +303,14 @@ export const deleteOrgPaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to reverse entry for deleted payment:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: input.id,
+				metadata: { error: String(e), referenceType: "ORG_PAYMENT" },
+			});
 		}
 
 		return result;

@@ -153,6 +153,14 @@ export const createTransferProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for transfer:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: transfer.id,
+				metadata: { error: String(e), referenceType: "TRANSFER" },
+			});
 		}
 
 		return transfer;
@@ -201,6 +209,14 @@ export const cancelTransferProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to reverse entry for cancelled transfer:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: input.id,
+				metadata: { error: String(e), referenceType: "TRANSFER" },
+			});
 		}
 
 		return transfer;

@@ -776,9 +776,10 @@ export const createItem = subscriptionProcedure... // write
 ### 19.2 المعمارية
 
 ```
-Toggle "وضع المحاسبة" → localStorage → useAccountingMode hook
+المحاسبة تعمل **دائماً** — لا يوجد toggle
     ↓
-عند التفعيل أول مرة → seedChartOfAccounts() → 40+ حساب افتراضي
+عند أول عملية مالية أو أول زيارة لصفحات المالية → seedChartOfAccounts() → 48 حساب افتراضي
+    (auto-seed عبر ensureChartExists في auto-journal.ts + AccountingSeedCheck.tsx في frontend)
     ↓
 كل عملية مالية → auto-journal.ts → قيد تلقائي POSTED
     ↓
@@ -943,7 +944,7 @@ apps/web/modules/saas/finance/
 │   └── ReportPrintHeader.tsx        # هيدر طباعة مشترك (hidden print:block)
 ├── components/shell/
 │   ├── constants.ts                 # FINANCE_NAV_SECTIONS (13 section)
-│   └── FinanceNavigation.tsx        # ACCOUNTING_ONLY_SECTIONS gate
+│   └── FinanceNavigation.tsx        # شريط التنقل المالي (15 قسم — المحاسبة مرئية دائماً)
 ├── hooks/
 │   └── use-accounting-mode.ts       # useSyncExternalStore + localStorage
 └── lib/
@@ -960,7 +961,7 @@ apps/web/modules/saas/finance/
 - الفترات المحاسبية
 - التقارير المحاسبية (8 تقارير)
 
-**ACCOUNTING_ONLY_SECTIONS** = `["accounting-dashboard", "chart-of-accounts", "journal-entries", "opening-balances", "accounting-periods"]`
+**ملاحظة:** كل أقسام المحاسبة مرئية دائماً في شريط التنقل — لا يوجد `useAccountingMode` toggle أو `ACCOUNTING_ONLY_SECTIONS` gate.
 
 ### 19.9 نمط oRPC في المحاسبة
 

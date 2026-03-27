@@ -5404,7 +5404,7 @@ model JournalEntry {
   @@index([organizationId, date])
   @@index([organizationId, status])
   @@index([organizationId, referenceType, referenceId])
-  @@index([organizationId, entryNo])
+  @@unique([organizationId, entryNo])
   @@map("journal_entries")
 }
 

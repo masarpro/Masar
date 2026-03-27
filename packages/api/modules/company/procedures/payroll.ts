@@ -8,6 +8,7 @@ import {
 	getPayrollSummary,
 	updatePayrollRunItem,
 	deletePayrollRunItem,
+	orgAuditLog,
 	db,
 } from "@repo/database";
 import { z } from "zod";
@@ -216,6 +217,14 @@ export const approvePayrollRunProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to generate entry for payroll:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: input.id,
+				metadata: { error: String(e), referenceType: "PAYROLL" },
+			});
 		}
 
 		return payrollRun;
@@ -256,6 +265,14 @@ export const cancelPayrollRunProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[AutoJournal] Failed to reverse entry for cancelled payroll:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: input.id,
+				metadata: { error: String(e), referenceType: "PAYROLL" },
+			});
 		}
 
 		return result;
