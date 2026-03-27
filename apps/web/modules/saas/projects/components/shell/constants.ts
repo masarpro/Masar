@@ -231,6 +231,13 @@ export const NAVIGATION_GROUPS: NavGroup[] = [
 		isOverflow: true,
 		routes: [
 			{
+				id: "handover",
+				path: "handover",
+				label: "محاضر الاستلام",
+				labelEn: "Handover",
+				icon: ClipboardCheck,
+			},
+			{
 				id: "owner",
 				path: "owner",
 				label: "بوابة المالك",
@@ -347,7 +354,7 @@ export const NAV_GROUP_CONFIG: NavGroupConfig[] = [
 		labelKey: "projects.shell.navigation.more",
 		icon: MoreHorizontal,
 		type: "popover",
-		sectionIds: ["owner", "insights", "team"],
+		sectionIds: ["handover", "owner", "insights", "team"],
 		isOverflow: true,
 		showInMobileDock: true,
 		mobileSheet: true,
@@ -527,6 +534,17 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 	],
 	// Quantities page
 	quantities: [],
+	// Handover page
+	handover: [
+		{
+			id: "new-handover",
+			label: "محضر جديد",
+			labelEn: "New Protocol",
+			icon: ClipboardCheck,
+			href: "handover/new",
+			variant: "primary",
+		},
+	],
 	// Owner page
 	owner: [],
 	// Insights page
