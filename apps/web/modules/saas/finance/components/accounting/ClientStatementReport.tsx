@@ -93,7 +93,7 @@ export function ClientStatementReport({
 					<div className="mt-2">
 						<p className="text-lg font-semibold">{client.name}</p>
 						{client.businessName && <p className="text-sm">{client.businessName}</p>}
-						{client.taxNumber && <p className="text-sm">الرقم الضريبي: {client.taxNumber}</p>}
+						{client.taxNumber && <p className="text-sm">{t("finance.clients.taxNumber")}: {client.taxNumber}</p>}
 					</div>
 				)}
 				<p className="text-sm text-slate-500 mt-2">{dateFrom} — {dateTo}</p>
@@ -109,7 +109,7 @@ export function ClientStatementReport({
 								{client.businessName && <p className="text-sm text-slate-500">{client.businessName}</p>}
 							</div>
 							{client.taxNumber && (
-								<p className="text-sm text-slate-500">الرقم الضريبي: {client.taxNumber}</p>
+								<p className="text-sm text-slate-500">{t("finance.clients.taxNumber")}: {client.taxNumber}</p>
 							)}
 						</div>
 					</CardContent>

@@ -4,8 +4,12 @@ import { AccountingDashboard } from "@saas/finance/components/accounting/Account
 import { FinanceShell } from "@saas/finance/components/shell";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = { title: "لوحة المحاسبة" };
+export async function generateMetadata() {
+  const t = await getTranslations();
+  return { title: t("finance.pages.accountingDashboard") };
+}
 
 export default async function AccountingDashboardRoute({
   params,

@@ -3,6 +3,7 @@ import { config } from "@repo/config";
 import { logger } from "@repo/logs";
 import { sendEmail } from "@repo/mail";
 import { enforceRateLimit, createIpRateLimitKey, RATE_LIMITS } from "../../../lib/rate-limit";
+import { verifyTurnstileToken } from "../../../lib/turnstile";
 import { localeMiddleware } from "../../../orpc/middleware/locale-middleware";
 import { publicProcedure } from "../../../orpc/procedures";
 import { contactFormSchema } from "../types";
@@ -17,9 +18,10 @@ export const submitContactForm = publicProcedure
 	.input(contactFormSchema)
 	.use(localeMiddleware)
 	.handler(
-		async ({ input: { email, name, message }, context: { locale, headers } }) => {
+		async ({ input: { email, name, message, turnstileToken }, context: { locale, headers } }) => {
 			const ip = headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-			await enforceRateLimit(createIpRateLimitKey(ip, "submitContactForm"), RATE_LIMITS.STRICT);
+			await enforceRateLimit(createIpRateLimitKey(ip, "submitContactForm"), RATE_LIMITS.PUBLIC_FORM);
+			await verifyTurnstileToken(turnstileToken, ip);
 			try {
 				await sendEmail({
 					to: config.contactForm.to,

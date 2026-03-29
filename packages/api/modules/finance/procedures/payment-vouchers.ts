@@ -414,6 +414,13 @@ export const approvePaymentVoucher = subscriptionProcedure
 			});
 		}
 
+		// Separation of duties — المُعدّ لا يعتمد سنده
+		if (voucher.preparedById === context.user.id) {
+			throw new ORPCError("FORBIDDEN", {
+				message: "لا يمكنك اعتماد سند صرف أنشأته بنفسك",
+			});
+		}
+
 		const updated = await db.paymentVoucher.update({
 			where: { id: input.id },
 			data: {
@@ -461,7 +468,13 @@ export const approvePaymentVoucher = subscriptionProcedure
 			action: "PAYMENT_VOUCHER_APPROVED",
 			entityType: "payment_voucher",
 			entityId: input.id,
-			metadata: { voucherNo: voucher.voucherNo, isManual },
+			metadata: {
+				voucherNo: voucher.voucherNo,
+				isManual,
+				amount: Number(voucher.amount),
+				payeeName: voucher.payeeName,
+				preparedById: voucher.preparedById,
+			},
 		});
 
 		return updated;
@@ -557,8 +570,8 @@ export const cancelPaymentVoucher = subscriptionProcedure
 		if (!voucher) {
 			throw new ORPCError("NOT_FOUND", { message: "سند الصرف غير موجود" });
 		}
-		if (voucher.status === "CANCELLED") {
-			throw new ORPCError("BAD_REQUEST", { message: "السند ملغي بالفعل" });
+		if (!["DRAFT", "PENDING_APPROVAL", "ISSUED"].includes(voucher.status)) {
+			throw new ORPCError("BAD_REQUEST", { message: "لا يمكن إلغاء هذا السند" });
 		}
 
 		const updated = await db.paymentVoucher.update({

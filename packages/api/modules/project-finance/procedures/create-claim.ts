@@ -1,4 +1,4 @@
-import { createProjectClaim, getProjectById, getContractSummary, db } from "@repo/database";
+import { createProjectClaim, getProjectById } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -36,68 +36,60 @@ export const createClaim = subscriptionProcedure
 			{ section: "finance", action: "payments" },
 		);
 
-		// Validate claim amount doesn't exceed contract value
-		const contractSummary = await getContractSummary(input.organizationId, input.projectId);
-		if (contractSummary.adjustedValue > 0) {
-			const existingClaims = await db.projectClaim.aggregate({
-				where: {
-					projectId: input.projectId,
-					organizationId: input.organizationId,
-					status: { not: "REJECTED" },
-				},
-				_sum: { amount: true },
+		try {
+			const claim = await createProjectClaim({
+				organizationId: input.organizationId,
+				projectId: input.projectId,
+				createdById: context.user.id,
+				periodStart: input.periodStart,
+				periodEnd: input.periodEnd,
+				amount: input.amount,
+				dueDate: input.dueDate,
+				note: input.note,
 			});
-			const existingTotal = Number(existingClaims._sum.amount ?? 0);
-			if (existingTotal + input.amount > contractSummary.adjustedValue) {
-				throw new ORPCError("BAD_REQUEST", {
-					message: "إجمالي المستخلصات يتجاوز قيمة العقد المعدلة",
-				});
-			}
-		}
 
-		const claim = await createProjectClaim({
-			organizationId: input.organizationId,
-			projectId: input.projectId,
-			createdById: context.user.id,
-			periodStart: input.periodStart,
-			periodEnd: input.periodEnd,
-			amount: input.amount,
-			dueDate: input.dueDate,
-			note: input.note,
-		});
+			// Notify accountants and managers about new claim (fire and forget)
+			getProjectById(input.projectId, input.organizationId)
+				.then(async (project) => {
+					if (project) {
+						const [accountantIds, managerIds] = await Promise.all([
+							getProjectAccountants(input.projectId),
+							getProjectManagers(input.projectId),
+						]);
+						const recipientIds = [...new Set([...accountantIds, ...managerIds])];
 
-		// Notify accountants and managers about new claim (fire and forget)
-		getProjectById(input.projectId, input.organizationId)
-			.then(async (project) => {
-				if (project) {
-					const [accountantIds, managerIds] = await Promise.all([
-						getProjectAccountants(input.projectId),
-						getProjectManagers(input.projectId),
-					]);
-					const recipientIds = [...new Set([...accountantIds, ...managerIds])];
-
-					if (recipientIds.length > 0) {
-						notifyClaimCreated({
-							organizationId: input.organizationId,
-							projectId: input.projectId,
-							projectName: project.name,
-							claimId: claim.id,
-							claimNo: claim.claimNo,
-							amount: input.amount.toLocaleString("en-US"),
-							creatorId: context.user.id,
-							recipientIds,
-						}).catch(() => {
-							// Silently ignore notification errors
-						});
+						if (recipientIds.length > 0) {
+							notifyClaimCreated({
+								organizationId: input.organizationId,
+								projectId: input.projectId,
+								projectName: project.name,
+								claimId: claim.id,
+								claimNo: claim.claimNo,
+								amount: input.amount.toLocaleString("en-US"),
+								creatorId: context.user.id,
+								recipientIds,
+							}).catch(() => {
+								// Silently ignore notification errors
+							});
+						}
 					}
-				}
-			})
-			.catch(() => {
-				// Silently ignore errors
-			});
+				})
+				.catch(() => {
+					// Silently ignore errors
+				});
 
-		return {
-			...claim,
-			amount: Number(claim.amount),
-		};
+			return {
+				...claim,
+				amount: Number(claim.amount),
+			};
+		} catch (error) {
+			if (error instanceof Error) {
+				if (error.message === "CLAIMS_EXCEED_CONTRACT_VALUE") {
+					throw new ORPCError("BAD_REQUEST", {
+						message: "إجمالي المستخلصات يتجاوز قيمة العقد المعدلة",
+					});
+				}
+			}
+			throw error;
+		}
 	});

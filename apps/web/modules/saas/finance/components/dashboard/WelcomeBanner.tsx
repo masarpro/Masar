@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { CalendarDays } from "lucide-react";
 import { formatDateFull } from "../../lib/utils";
 
@@ -10,8 +10,9 @@ interface WelcomeBannerProps {
 
 export function WelcomeBanner({ userName }: WelcomeBannerProps) {
 	const t = useTranslations();
+	const locale = useLocale();
 
-	const today = formatDateFull(new Date());
+	const today = formatDateFull(new Date(), locale);
 
 	const getGreeting = () => {
 		const hour = new Date().getHours();

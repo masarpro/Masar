@@ -27,10 +27,10 @@ export function formatPercent(value: number): string {
 /**
  * Account type color classes
  */
-export const ACCOUNT_TYPE_COLORS: Record<string, { bg: string; text: string; label: string }> = {
-	ASSET: { bg: "bg-blue-50 dark:bg-blue-950/20", text: "text-blue-700 dark:text-blue-300", label: "أصول" },
-	LIABILITY: { bg: "bg-red-50 dark:bg-red-950/20", text: "text-red-700 dark:text-red-300", label: "خصوم" },
-	EQUITY: { bg: "bg-purple-50 dark:bg-purple-950/20", text: "text-purple-700 dark:text-purple-300", label: "حقوق ملكية" },
-	REVENUE: { bg: "bg-green-50 dark:bg-green-950/20", text: "text-green-700 dark:text-green-300", label: "إيرادات" },
-	EXPENSE: { bg: "bg-amber-50 dark:bg-amber-950/20", text: "text-amber-700 dark:text-amber-300", label: "مصروفات" },
+export const ACCOUNT_TYPE_COLORS: Record<string, { bg: string; text: string }> = {
+	ASSET: { bg: "bg-blue-50 dark:bg-blue-950/20", text: "text-blue-700 dark:text-blue-300" },
+	LIABILITY: { bg: "bg-red-50 dark:bg-red-950/20", text: "text-red-700 dark:text-red-300" },
+	EQUITY: { bg: "bg-purple-50 dark:bg-purple-950/20", text: "text-purple-700 dark:text-purple-300" },
+	REVENUE: { bg: "bg-green-50 dark:bg-green-950/20", text: "text-green-700 dark:text-green-300" },
+	EXPENSE: { bg: "bg-amber-50 dark:bg-amber-950/20", text: "text-amber-700 dark:text-amber-300" },
 };

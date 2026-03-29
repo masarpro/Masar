@@ -812,7 +812,16 @@
     "hidden": "Hidden",
     "dangerZone": "Danger Zone",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "weekdays": {
+      "saturday": "Saturday",
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday"
+    }
   },
   "company": {
     "title": "Company Management",
@@ -2288,6 +2297,53 @@
       "mada": "Mada",
       "other": "Other"
     },
+    "geography": {
+      "saudiRegions": {
+        "riyadh": "Riyadh",
+        "makkah": "Makkah",
+        "madinah": "Madinah",
+        "qassim": "Qassim",
+        "eastern": "Eastern Province",
+        "asir": "Asir",
+        "tabuk": "Tabuk",
+        "hail": "Hail",
+        "northernBorders": "Northern Borders",
+        "jazan": "Jazan",
+        "najran": "Najran",
+        "bahah": "Al Bahah",
+        "jouf": "Al Jouf"
+      },
+      "countries": {
+        "SA": "Saudi Arabia",
+        "AE": "UAE",
+        "KW": "Kuwait",
+        "QA": "Qatar",
+        "BH": "Bahrain",
+        "OM": "Oman",
+        "EG": "Egypt",
+        "JO": "Jordan"
+      }
+    },
+    "currencies": {
+      "SAR": "Saudi Riyal (SAR)",
+      "USD": "US Dollar (USD)",
+      "EUR": "Euro (EUR)",
+      "AED": "UAE Dirham (AED)",
+      "KWD": "Kuwaiti Dinar (KWD)"
+    },
+    "error": {
+      "title": "An Unexpected Error Occurred",
+      "description": "Sorry, an error occurred while loading the page. Please try again.",
+      "retry": "Try Again",
+      "backToFinance": "Back to Finance"
+    },
+    "pages": {
+      "accountingDashboard": "Accounting Dashboard",
+      "expenseVoucher": "Payment Voucher",
+      "bankReconciliation": "Bank Reconciliation",
+      "recurringEntries": "Recurring Entries",
+      "costCenterReport": "Cost Center Report"
+    },
     "units": {
       "m": "m (Meter)",
       "m2": "m² (Sq. Meter)",
@@ -3497,7 +3553,33 @@
         "template": "Select Template",
         "freeEntry": "Free Entry",
         "autoPost": "Auto-post",
-        "selectTemplate": "Select adjustment template"
+        "selectTemplate": "Select adjustment template",
+        "templates": {
+          "accrued_revenue": {
+            "label": "Accrued Revenue",
+            "description": "Record revenue earned but not yet invoiced"
+          },
+          "accrued_expense": {
+            "label": "Accrued Expense",
+            "description": "Record expenses incurred but not yet paid"
+          },
+          "depreciation": {
+            "label": "Fixed Asset Depreciation",
+            "description": "Record monthly/annual depreciation"
+          },
+          "prepaid_expense": {
+            "label": "Prepaid Expense",
+            "description": "Allocate portion of prepaid expense"
+          },
+          "provision": {
+            "label": "End of Service Provision",
+            "description": "Provision for end-of-service benefits"
+          },
+          "correction": {
+            "label": "Correction Entry",
+            "description": "Correct an error in a previous entry"
+          }
+        }
       },
       "accountingMode": "Accounting Mode",
       "accountingModeDesc": "Show advanced accounting tools (Chart of Accounts, Journal Entries, Financial Statements)",
@@ -3626,13 +3708,56 @@
       },
       "voucher": {
         "paymentVoucher": "Payment Voucher",
-        "receiptVoucher": "Receipt Voucher"
+        "receiptVoucher": "Receipt Voucher",
+        "voucherNo": "Voucher No.",
+        "date": "Date",
+        "amount": "Amount",
+        "paidTo": "Paid To",
+        "regarding": "Regarding",
+        "category": "Category",
+        "paymentMethod": "Payment Method",
+        "referenceNo": "Reference No.",
+        "sourceAccount": "Source Account",
+        "project": "Project",
+        "vendorTaxNumber": "Vendor Tax Number",
+        "accountant": "Accountant",
+        "financeManager": "Finance Manager",
+        "recipient": "Recipient",
+        "generatedAt": "Generated on {date}"
       },
       "messages": {
         "postSuccess": "Journal entry posted successfully",
         "postError": "Error while posting",
         "noDraftsToPost": "No draft entries to post",
         "bulkPostSuccess": "{count} entries posted successfully"
+      },
+      "excel": {
+        "total": "Total",
+        "openingBalance": "Opening Balance",
+        "closingBalance": "Closing Balance",
+        "sheetTrialBalance": "Trial Balance",
+        "sheetJournalEntries": "Journal Entries",
+        "sheetLedger": "Account Ledger",
+        "accountCode": "Account Code",
+        "accountName": "Account Name",
+        "periodDebit": "Period Debit",
+        "periodCredit": "Period Credit",
+        "debitBalance": "Debit Balance",
+        "creditBalance": "Credit Balance",
+        "entryNo": "Entry No.",
+        "date": "Date",
+        "description": "Description",
+        "type": "Type",
+        "amount": "Amount",
+        "status": "Status",
+        "statusPosted": "Posted",
+        "statusDraft": "Draft",
+        "statusReversed": "Reversed",
+        "typeManual": "Manual",
+        "debit": "Debit",
+        "credit": "Credit",
+        "balance": "Balance",
+        "ledgerPrefix": "Account Ledger"
       }
     },
     "accountingReports": {
@@ -4363,6 +4488,13 @@
       "codeHint": "Auto-generated if left empty",
       "currency": "Currency",
       "classification": "Classification",
+      "classifications": {
+        "VIP": "VIP",
+        "regular": "Regular",
+        "company": "Company",
+        "government": "Government Entity",
+        "contractor": "Contractor"
+      },
       "addClassification": "Add Classification",
       "displayLanguage": "Display Language",
       "displayLanguageHint": "Preferred language for documents",

@@ -157,6 +157,18 @@ export const createBankAccountProcedure = subscriptionProcedure
 			await createBankChartAccount(db, input.organizationId, account.id, input.name);
 		} catch (e) {
 			console.error("[Accounting] Failed to create chart account for bank:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "bank_chart_account",
+				entityId: account.id,
+				metadata: {
+					operation: "BANK_CHART_ACCOUNT_CREATION",
+					bankName: input.name,
+					error: e instanceof Error ? e.message : String(e),
+				},
+			});
 		}
 
 		orgAuditLog({
@@ -288,6 +300,17 @@ export const deleteBankAccountProcedure = subscriptionProcedure
 			}
 		} catch (e) {
 			console.error("[Accounting] Failed to deactivate chart account:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "bank_chart_account",
+				entityId: input.id,
+				metadata: {
+					operation: "BANK_CHART_ACCOUNT_DEACTIVATION",
+					error: e instanceof Error ? e.message : String(e),
+				},
+			});
 		}
 
 		const result = await deleteBankAccount(input.id, input.organizationId);

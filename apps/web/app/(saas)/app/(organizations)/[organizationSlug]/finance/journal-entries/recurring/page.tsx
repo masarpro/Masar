@@ -4,8 +4,12 @@ import { RecurringJournalTemplates } from "@saas/finance/components/accounting/R
 import { FinanceShell } from "@saas/finance/components/shell";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = { title: "القيود المتكررة" };
+export async function generateMetadata() {
+  const t = await getTranslations();
+  return { title: t("finance.pages.recurringEntries") };
+}
 
 export default async function RecurringEntriesRoute({
   params,

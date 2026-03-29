@@ -1,6 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { TurnstileInstance } from "@marsidev/react-turnstile";
+import { TurnstileWidget } from "@shared/components/TurnstileWidget";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation } from "@tanstack/react-query";
 import { Alert, AlertDescription, AlertTitle } from "@ui/components/alert";
@@ -9,6 +11,7 @@ import { Input } from "@ui/components/input";
 import { CheckCircleIcon, KeyIcon } from "lucide-react";
 
 import { useTranslations } from "next-intl";
+import { useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -19,6 +22,9 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function Newsletter() {
 	const t = useTranslations();
+	const [turnstileToken, setTurnstileToken] = useState("");
+	const turnstileRef = useRef<TurnstileInstance>(null);
+
 	const newsletterSignupMutation = useMutation(
 		orpc.newsletter.subscribe.mutationOptions(),
 	);
@@ -29,13 +35,26 @@ export function Newsletter() {
 
 	const onSubmit = form.handleSubmit(async ({ email }) => {
 		try {
-			await newsletterSignupMutation.mutateAsync({ email });
+			await newsletterSignupMutation.mutateAsync({
+				email,
+				turnstileToken,
+			});
 		} catch {
+			turnstileRef.current?.reset();
+			setTurnstileToken("");
 			form.setError("email", {
 				message: t("newsletter.hints.error.message"),
 			});
 		}
 	});
+
+	const handleTurnstileVerify = useCallback((token: string) => {
+		setTurnstileToken(token);
+	}, []);
+
+	const handleTurnstileError = useCallback(() => {
+		setTurnstileToken("");
+	}, []);
 
 	return (
 		<section className="pb-12 lg:pb-16 xl:pb-24">
@@ -75,6 +94,7 @@ export function Newsletter() {
 									<Button
 										type="submit"
 										loading={form.formState.isSubmitting}
+										disabled={!turnstileToken}
 									>
 										{t("newsletter.submit")}
 									</Button>
@@ -84,6 +104,14 @@ export function Newsletter() {
 										{form.formState.errors.email.message}
 									</p>
 								)}
+								<div className="mt-4 flex justify-center">
+									<TurnstileWidget
+										ref={turnstileRef}
+										onVerify={handleTurnstileVerify}
+										onError={handleTurnstileError}
+										onExpire={handleTurnstileError}
+									/>
+								</div>
 							</form>
 						)}
 					</div>

@@ -372,26 +372,27 @@ export function MaterialsCostingTab({
 				steelCost = itemSteelTons * mainPrice;
 			}
 
-			const storageCost = (concreteCost + steelCost) * (storagePct / 100);
 			const qty = Number(ci.quantity) || 1;
 
 			return {
 				id: ci.id,
-				materialUnitCost: qty > 0 ? (concreteCost + steelCost + storageCost) / qty : 0,
+				materialUnitCost: qty > 0 ? (concreteCost + steelCost) / qty : 0,
+				storageCostPercent: storagePct,
 			};
 		});
 
-		// Scale per-item costs so their sum matches the display grandTotal
+		// Scale per-item costs so their sum matches materialSubtotal (without storage)
 		let rawSum = 0;
 		for (const ui of updateItems) {
 			const ci = cItems.find((c: any) => c.id === ui.id);
 			const ciQty = Number(ci?.quantity) || 1;
 			rawSum += ui.materialUnitCost * ciQty;
 		}
-		const scaleFactor = rawSum > 0 ? grandTotal / rawSum : 0;
+		const scaleFactor = rawSum > 0 ? materialSubtotal / rawSum : 0;
 		const scaledItems = updateItems.map((ui: any) => ({
 			...ui,
 			materialUnitCost: ui.materialUnitCost * scaleFactor,
+			storageCostPercent: storagePct,
 		}));
 
 		(bulkUpdateMutation as any).mutate({

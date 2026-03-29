@@ -4,6 +4,7 @@ export const contactFormSchema = z.object({
 	email: z.string().email(),
 	name: z.string().min(3),
 	message: z.string().min(10),
+	turnstileToken: z.string().min(1),
 });
 
 export type ContactFormValues = z.infer<typeof contactFormSchema>;

@@ -20,7 +20,7 @@ import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { formatAccounting } from "./formatters";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { exportAccountLedgerToExcel } from "../../lib/accounting-excel-export";
+import { exportAccountLedgerToExcel, type LedgerLabels } from "../../lib/accounting-excel-export";
 
 interface AccountLedgerPageProps {
 	organizationId: string;
@@ -107,6 +107,13 @@ export function AccountLedgerPage({
 							data.openingBalance,
 							data.entries,
 							{ totalDebit: data.totalDebit, totalCredit: data.totalCredit, closingBalance: data.closingBalance },
+							{
+								sheetName: t("finance.accounting.excel.sheetLedger"),
+								ledgerPrefix: t("finance.accounting.excel.ledgerPrefix"),
+								headers: [t("finance.accounting.excel.date"), t("finance.accounting.excel.entryNo"), t("finance.accounting.excel.description"), t("finance.accounting.excel.debit"), t("finance.accounting.excel.credit"), t("finance.accounting.excel.balance")],
+								openingBalance: t("finance.accounting.excel.openingBalance"),
+								closingBalance: t("finance.accounting.excel.closingBalance"),
+							} as LedgerLabels,
 						)}>
 							<Download className="h-4 w-4 me-1" />
 							Excel

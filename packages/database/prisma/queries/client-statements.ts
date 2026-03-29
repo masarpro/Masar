@@ -119,7 +119,7 @@ export async function getClientStatement(
 			referenceNo: inv.invoiceNo,
 			description: isCreditNote ? "إشعار دائن" : "فاتورة",
 			debit: isCreditNote ? 0 : Number(inv.totalAmount),
-			credit: isCreditNote ? Number(inv.totalAmount) : 0,
+			credit: isCreditNote ? Math.abs(Number(inv.totalAmount)) : 0,
 		});
 	}
 

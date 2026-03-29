@@ -85,7 +85,7 @@ export function AccountingPeriodsPage({ organizationId, organizationSlug }: Prop
 			{periodsList.length === 0 ? (
 				<Card className="rounded-2xl">
 					<CardContent className="p-12 text-center text-slate-500">
-						{t("finance.accounting.periods.noPeriods") || "لا توجد فترات محاسبية"}
+						{t("finance.accounting.periods.noPeriods")}
 					</CardContent>
 				</Card>
 			) : (

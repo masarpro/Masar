@@ -285,7 +285,7 @@ export function BankReconciliation({
 										</TableCell>
 										<TableCell>
 											<Badge variant={rec.status === "COMPLETED" ? "default" : "secondary"} className="text-[10px]">
-												{rec.status === "COMPLETED" ? "مكتمل" : "مسودة"}
+												{rec.status === "COMPLETED" ? t("common.completed") : t("finance.accounting.draft")}
 											</Badge>
 										</TableCell>
 									</TableRow>

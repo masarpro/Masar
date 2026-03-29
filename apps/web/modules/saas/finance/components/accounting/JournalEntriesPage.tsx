@@ -21,7 +21,7 @@ import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { formatAccounting } from "./formatters";
 import Link from "next/link";
 import { toast } from "sonner";
-import { exportJournalEntriesToExcel } from "../../lib/accounting-excel-export";
+import { exportJournalEntriesToExcel, type JournalEntriesLabels } from "../../lib/accounting-excel-export";
 
 interface JournalEntriesPageProps {
 	organizationId: string;
@@ -166,7 +166,14 @@ export function JournalEntriesPage({
 				</div>
 				<div className="flex gap-2">
 					{entries.length > 0 && (
-						<Button variant="outline" size="sm" className="rounded-xl" onClick={() => exportJournalEntriesToExcel(entries)}>
+						<Button variant="outline" size="sm" className="rounded-xl" onClick={() => exportJournalEntriesToExcel(entries, {
+									sheetName: t("finance.accounting.excel.sheetJournalEntries"),
+									headers: [t("finance.accounting.excel.entryNo"), t("finance.accounting.excel.date"), t("finance.accounting.excel.description"), t("finance.accounting.excel.type"), t("finance.accounting.excel.amount"), t("finance.accounting.excel.status")],
+									statusPosted: t("finance.accounting.excel.statusPosted"),
+									statusDraft: t("finance.accounting.excel.statusDraft"),
+									statusReversed: t("finance.accounting.excel.statusReversed"),
+									typeManual: t("finance.accounting.excel.typeManual"),
+								} as JournalEntriesLabels)}>
 							<Download className="h-4 w-4 me-1" />
 							Excel
 						</Button>

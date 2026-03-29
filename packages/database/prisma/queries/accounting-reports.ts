@@ -875,7 +875,7 @@ export async function getIncomeStatement(
 	let creditNoteTotal = ZERO;
 	for (const cn of creditNotes) {
 		creditNoteTotal = creditNoteTotal.add(
-			new Prisma.Decimal(Number(cn.totalAmount) - Number(cn.vatAmount)),
+			new Prisma.Decimal(Math.abs(Number(cn.totalAmount) - Number(cn.vatAmount))),
 		);
 	}
 

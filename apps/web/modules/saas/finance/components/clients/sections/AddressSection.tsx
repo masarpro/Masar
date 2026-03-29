@@ -25,34 +25,7 @@ interface AddressSectionProps {
 	setFormData: React.Dispatch<React.SetStateAction<ClientFormData>>;
 }
 
-// قائمة الدول
-const countries = [
-	{ code: "SA", name: "السعودية" },
-	{ code: "AE", name: "الإمارات" },
-	{ code: "KW", name: "الكويت" },
-	{ code: "QA", name: "قطر" },
-	{ code: "BH", name: "البحرين" },
-	{ code: "OM", name: "عمان" },
-	{ code: "EG", name: "مصر" },
-	{ code: "JO", name: "الأردن" },
-];
-
-// قائمة المناطق السعودية
-const saudiRegions = [
-	"الرياض",
-	"مكة المكرمة",
-	"المدينة المنورة",
-	"القصيم",
-	"الشرقية",
-	"عسير",
-	"تبوك",
-	"حائل",
-	"الحدود الشمالية",
-	"جازان",
-	"نجران",
-	"الباحة",
-	"الجوف",
-];
+import { SAUDI_REGION_KEYS, COUNTRY_CODES } from "../../../lib/geography";
 
 export function AddressSection({
 	formData,
@@ -168,11 +141,14 @@ export function AddressSection({
 									/>
 								</SelectTrigger>
 								<SelectContent>
-									{saudiRegions.map((region) => (
-										<SelectItem key={region} value={region}>
-											{region}
-										</SelectItem>
-									))}
+									{SAUDI_REGION_KEYS.map((key) => {
+										const label = t(`finance.geography.saudiRegions.${key}`);
+										return (
+											<SelectItem key={key} value={label}>
+												{label}
+											</SelectItem>
+										);
+									})}
 								</SelectContent>
 							</Select>
 						</div>
@@ -206,9 +182,9 @@ export function AddressSection({
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
-									{countries.map((country) => (
-										<SelectItem key={country.code} value={country.code}>
-											{country.name}
+									{COUNTRY_CODES.map((code) => (
+										<SelectItem key={code} value={code}>
+											{t(`finance.geography.countries.${code}`)}
 										</SelectItem>
 									))}
 								</SelectContent>
@@ -301,11 +277,14 @@ export function AddressSection({
 										/>
 									</SelectTrigger>
 									<SelectContent>
-										{saudiRegions.map((region) => (
-											<SelectItem key={region} value={region}>
-												{region}
-											</SelectItem>
-										))}
+										{SAUDI_REGION_KEYS.map((key) => {
+											const label = t(`finance.geography.saudiRegions.${key}`);
+											return (
+												<SelectItem key={key} value={label}>
+													{label}
+												</SelectItem>
+											);
+										})}
 									</SelectContent>
 								</Select>
 							</div>
@@ -336,9 +315,9 @@ export function AddressSection({
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
-										{countries.map((country) => (
-											<SelectItem key={country.code} value={country.code}>
-												{country.name}
+										{COUNTRY_CODES.map((code) => (
+											<SelectItem key={code} value={code}>
+												{t(`finance.geography.countries.${code}`)}
 											</SelectItem>
 										))}
 									</SelectContent>

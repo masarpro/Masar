@@ -141,8 +141,8 @@ export const generateWeeklyReportProcedure = subscriptionProcedure
 
 		// Return as base64 for easy transport
 		return {
-			filename: `weekly-report-${weekStart.toISOString().split("T")[0]}.html`,
-			mimeType: "text/html",
+			filename: `weekly-report-${weekStart.toISOString().split("T")[0]}.pdf`,
+			mimeType: "application/pdf",
 			content: pdfBuffer.toString("base64"),
 			size: pdfBuffer.length,
 		};

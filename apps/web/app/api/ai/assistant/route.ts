@@ -13,8 +13,15 @@ import {
   getModuleById,
   getAISDKTools,
   type AIModuleDefinition,
+  // Permission filtering
+  filterToolsByPermission,
+  getPermissionSummaryForPrompt,
 } from "@repo/ai";
-import { db } from "@repo/database";
+import { db, ROLE_NAMES_AR } from "@repo/database";
+import {
+  getUserPermissions,
+  getUserRoleType,
+} from "@repo/api/lib/permissions";
 
 // تسجيل كل الأدوات الجديدة
 import "@repo/ai/tools/modules";
@@ -104,17 +111,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // If projectId provided, fetch project details from DB
-    let projectName = context.projectName;
-    if (context.projectId) {
-      const project = await db.project.findFirst({
-        where: { id: context.projectId, organizationId: organization.id },
-        select: { name: true },
-      });
-      if (project) {
-        projectName = project.name;
-      }
-    }
+    // جلب صلاحيات المستخدم ونوع الدور + بيانات المشروع بالتوازي
+    const [permissions, roleType, projectFromDb] = await Promise.all([
+      getUserPermissions(session.user.id, organization.id),
+      getUserRoleType(session.user.id, organization.id),
+      context.projectId
+        ? db.project.findFirst({
+            where: { id: context.projectId, organizationId: organization.id },
+            select: { name: true },
+          })
+        : null,
+    ]);
+
+    const projectName = projectFromDb?.name ?? context.projectName;
 
     // 1. تحديد الوحدة المعرفية من page context
     const activeModule = pageContext?.moduleId
@@ -122,9 +131,12 @@ export async function POST(request: Request) {
       : null;
 
     // 2. بناء system prompt — يدمج النظام القديم مع الجديد
+    const roleLabel = roleType
+      ? (ROLE_NAMES_AR[roleType] ?? roleType)
+      : "عضو";
     const assistantContext: AssistantContext = {
       userName: session.user.name || "المستخدم",
-      userRole: membership.role || "MANAGER",
+      userRole: roleLabel,
       locale: context.locale || "ar",
       organizationName: organization.name,
       organizationSlug: context.organizationSlug,
@@ -135,20 +147,23 @@ export async function POST(request: Request) {
       projectName,
     };
 
-    // بناء system prompt محسّن مع module registry + page context
+    // بناء system prompt محسّن مع module registry + page context + permissions
     const systemPrompt = buildEnhancedSystemPrompt(
       assistantContext,
       activeModule,
       pageContext,
+      permissions,
     );
 
-    // 3. جمع الأدوات — القديمة + الجديدة
+    // 3. جمع الأدوات — القديمة + الجديدة (مع صلاحيات)
     const toolContext = {
       organizationId: organization.id,
       userId: session.user.id,
       organizationSlug: context.organizationSlug,
       locale: context.locale || "ar",
       projectId: context.projectId,
+      permissions,
+      roleType: roleType ?? undefined,
     };
 
     // الأدوات القديمة (6 أدوات أساسية)
@@ -167,10 +182,15 @@ export async function POST(request: Request) {
       ...getAISDKTools(toolContext, "accounting"),
       ...getAISDKTools(toolContext, "subcontracts"),
       ...getAISDKTools(toolContext, "dashboard"),
+      // أداة صلاحياتي — متاحة دائماً
+      ...getAISDKTools(toolContext, "system"),
     };
 
     // دمج الأدوات — القديمة لها الأولوية (لتجنب تكرار الأسماء)
-    const tools = { ...newTools, ...legacyTools };
+    const allTools = { ...newTools, ...legacyTools };
+
+    // فلترة الأدوات حسب صلاحيات المستخدم
+    const tools = filterToolsByPermission(allTools, permissions);
 
     // Convert UIMessages from useChat to ModelMessages for streamText
     const modelMessages = convertToModelMessages(messages);
@@ -198,17 +218,29 @@ export async function POST(request: Request) {
 }
 
 /**
- * بناء system prompt محسّن يدمج Module Registry + Page Context
+ * بناء system prompt محسّن يدمج Module Registry + Page Context + Permissions
  */
 function buildEnhancedSystemPrompt(
   assistantContext: AssistantContext,
   activeModule: AIModuleDefinition | null | undefined,
   pageContext?: PageContextPayload,
+  permissions?: import("@repo/database").Permissions,
 ): string {
   // نبدأ من system prompt القديم كأساس
   const basePrompt = buildSystemPrompt(assistantContext);
 
   const parts: string[] = [basePrompt];
+
+  // إضافة سياق صلاحيات المستخدم
+  if (permissions) {
+    const permSummary = getPermissionSummaryForPrompt(permissions);
+    parts.push(`## صلاحيات المستخدم
+- **الدور:** ${assistantContext.userRole}
+- ${permSummary}
+- إذا طلب المستخدم بيانات ليس لديه صلاحية الوصول لها، أخبره بلطف: "ليس لديك صلاحية الوصول لهذه البيانات. يمكنك طلب الصلاحية من مالك المنظمة."
+- لا تذكر أسماء الصلاحيات التقنية — استخدم وصفاً بالعربي.
+- إذا سأل "وش صلاحياتي" أو "ما هي صلاحياتي" — استخدم أداة getMyPermissions.`);
+  }
 
   // إضافة قائمة كل أقسام المنصة من Module Registry
   const allModules = getAllModules();

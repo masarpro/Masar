@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
@@ -95,6 +95,7 @@ export function InvoiceView({
 	invoiceId,
 }: InvoiceViewProps) {
 	const t = useTranslations();
+	const locale = useLocale();
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const basePath = `/app/${organizationSlug}/finance/invoices`;
@@ -692,8 +693,8 @@ function DetailsTabContent({
 							</div>
 						</div>
 
-						<DetailRow icon={<CalendarDays className="h-4 w-4" />} label={t("finance.invoices.details.createdAt")} value={formatDateTime(invoice.createdAt)} />
-						{invoice.issuedAt && <DetailRow icon={<CalendarDays className="h-4 w-4" />} label={t("finance.invoices.details.issuedAt")} value={formatDateTime(invoice.issuedAt)} />}
+						<DetailRow icon={<CalendarDays className="h-4 w-4" />} label={t("finance.invoices.details.createdAt")} value={formatDateTime(invoice.createdAt, locale)} />
+						{invoice.issuedAt && <DetailRow icon={<CalendarDays className="h-4 w-4" />} label={t("finance.invoices.details.issuedAt")} value={formatDateTime(invoice.issuedAt, locale)} />}
 						<DetailRow icon={<CalendarDays className="h-4 w-4" />} label={t("finance.invoices.details.issueDate")} value={formatDate(invoice.issueDate)} />
 						<DetailRow icon={<CalendarDays className="h-4 w-4" />} label={t("finance.invoices.details.dueDate")} value={formatDate(invoice.dueDate)} />
 
@@ -911,7 +912,7 @@ function ActivityTabContent({
 											)}
 										</div>
 										<p className="text-xs text-muted-foreground/70 whitespace-nowrap">
-											{formatDateTime(log.createdAt)}
+											{formatDateTime(log.createdAt, locale)}
 										</p>
 									</div>
 

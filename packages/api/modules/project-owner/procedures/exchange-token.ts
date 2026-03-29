@@ -4,7 +4,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { publicProcedure } from "../../../orpc/procedures";
-import { rateLimitToken } from "../../../lib/rate-limit";
+import { rateLimitToken, enforceRateLimit, createIpRateLimitKey, RATE_LIMITS } from "../../../lib/rate-limit";
 import { throwOwnerTokenError } from "../helpers";
 
 export const exchangeTokenProcedure = publicProcedure
@@ -20,19 +20,24 @@ export const exchangeTokenProcedure = publicProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		// Rate limit to prevent brute-force
+		// IP-based rate limit (5/min) — prevents brute-force across different tokens
+		const ip = context.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+		await enforceRateLimit(createIpRateLimitKey(ip, "exchangeToken"), RATE_LIMITS.OWNER_EXCHANGE);
+
+		// Per-token rate limit (30/min) — defense in depth
 		await rateLimitToken(input.token, "exchangeToken");
 
 		// Validate token
 		const result = await getOwnerContextByToken(input.token);
 
 		if (!result.ok) {
+			// Delay failed attempts to slow brute-force
+			await new Promise((resolve) => setTimeout(resolve, 1000));
 			throwOwnerTokenError(result.reason);
 		}
 
 		// Create session
-		const ipAddress =
-			context.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? undefined;
+		const ipAddress = ip !== "unknown" ? ip : undefined;
 		const userAgent = context.headers.get("user-agent") ?? undefined;
 
 		const session = await createOwnerPortalSession(result.accessId, {

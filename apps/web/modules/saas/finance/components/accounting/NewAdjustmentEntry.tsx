@@ -34,14 +34,6 @@ const TEMPLATES = [
 	{ id: "correction", icon: Eraser, color: "text-slate-600", bg: "bg-slate-50 dark:bg-slate-800", type: "CORRECTION" },
 ] as const;
 
-const TEMPLATE_LABELS: Record<string, { ar: string; en: string; descAr: string }> = {
-	accrued_revenue: { ar: "إيرادات مستحقة", en: "Accrued Revenue", descAr: "تسجيل إيرادات تم تنفيذها ولم تُفوتر بعد" },
-	accrued_expense: { ar: "مصروفات مستحقة", en: "Accrued Expense", descAr: "تسجيل مصروفات تمت ولم تُسدد بعد" },
-	depreciation: { ar: "إهلاك أصول ثابتة", en: "Depreciation", descAr: "تسجيل قسط الإهلاك الشهري/السنوي" },
-	prepaid_expense: { ar: "مصروف مدفوع مقدماً", en: "Prepaid Expense", descAr: "تحميل جزء من المصروف المدفوع مقدماً" },
-	provision: { ar: "مخصص نهاية خدمة", en: "End of Service Provision", descAr: "تكوين مخصص مكافأة نهاية الخدمة" },
-	correction: { ar: "قيد تصحيحي", en: "Correction", descAr: "تصحيح خطأ في قيد سابق" },
-};
 
 export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) {
 	const t = useTranslations();
@@ -76,8 +68,9 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 		setSelectedTemplate(tplId);
 		const tpl = TEMPLATES.find((t) => t.id === tplId);
 		if (tpl) setAdjustmentType(tpl.type);
-		const label = TEMPLATE_LABELS[tplId];
-		if (label) setDescription(label.descAr);
+		if (tplId !== "free") {
+			setDescription(t(`finance.accounting.adjustments.templates.${tplId}.description`));
+		}
 	};
 
 	const addLine = () => setLines([...lines, { accountId: "", debit: 0, credit: 0, description: "" }]);
@@ -88,12 +81,11 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 		return (
 			<div className="space-y-4">
 				<h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-					{t("finance.accounting.adjustments.selectTemplate") || "اختر قالب أو ابدأ قيد حر"}
+					{t("finance.accounting.adjustments.selectTemplate")}
 				</h2>
 				<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
 					{TEMPLATES.map((tpl) => {
 						const Icon = tpl.icon;
-						const label = TEMPLATE_LABELS[tpl.id];
 						return (
 							<Card
 								key={tpl.id}
@@ -104,8 +96,8 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 									<div className={`p-3 rounded-xl ${tpl.bg} w-fit mb-3 group-hover:scale-110 transition-transform`}>
 										<Icon className={`h-6 w-6 ${tpl.color}`} />
 									</div>
-									<h3 className="font-semibold text-slate-900 dark:text-slate-100">{label.ar}</h3>
-									<p className="text-xs text-slate-500 mt-1">{label.descAr}</p>
+									<h3 className="font-semibold text-slate-900 dark:text-slate-100">{t(`finance.accounting.adjustments.templates.${tpl.id}.label`)}</h3>
+									<p className="text-xs text-slate-500 mt-1">{t(`finance.accounting.adjustments.templates.${tpl.id}.description`)}</p>
 								</CardContent>
 							</Card>
 						);
@@ -132,7 +124,7 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 	return (
 		<div className="space-y-4">
 			<Button variant="ghost" size="sm" onClick={() => setSelectedTemplate(null)} className="rounded-xl">
-				<ArrowRight className="h-4 w-4 me-1" /> {t("finance.accounting.adjustments.selectTemplate") || "رجوع"}
+				<ArrowRight className="h-4 w-4 me-1" /> {t("finance.accounting.adjustments.selectTemplate")}
 			</Button>
 
 			<Card className="rounded-2xl">
@@ -208,7 +200,7 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 						disabled={!isBalanced || !hasMinLines || mutation.isPending || !description}
 						className="w-full rounded-xl"
 					>
-						{mutation.isPending ? "..." : t("finance.accounting.saveDraft") || "حفظ"}
+						{mutation.isPending ? "..." : t("finance.accounting.saveDraft")}
 					</Button>
 				</CardContent>
 			</Card>

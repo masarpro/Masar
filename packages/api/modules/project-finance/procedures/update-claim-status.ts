@@ -1,4 +1,5 @@
 import { updateClaimStatus, getProjectById, orgAuditLog, db } from "@repo/database";
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -34,12 +35,30 @@ export const updateClaimStatusProcedure = subscriptionProcedure
 			select: { createdById: true, claimNo: true },
 		});
 
-		const claim = await updateClaimStatus(
-			input.claimId,
-			input.organizationId,
-			input.projectId,
-			input.status,
-		);
+		let claim;
+		try {
+			claim = await updateClaimStatus(
+				input.claimId,
+				input.organizationId,
+				input.projectId,
+				input.status,
+			);
+		} catch (error) {
+			if (error instanceof Error) {
+				if (error.message === "المستخلص غير موجود") {
+					throw new ORPCError("NOT_FOUND", { message: error.message });
+				}
+				if (error.message === "CLAIMS_EXCEED_CONTRACT_VALUE") {
+					throw new ORPCError("BAD_REQUEST", {
+						message: "إجمالي المستخلصات يتجاوز قيمة العقد المعدلة",
+					});
+				}
+				if (error.message.startsWith("لا يمكن تغيير حالة")) {
+					throw new ORPCError("BAD_REQUEST", { message: error.message });
+				}
+			}
+			throw error;
+		}
 
 		// Auto-Journal: generate accrual entry when claim is approved
 		if (input.status === "APPROVED") {

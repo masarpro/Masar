@@ -54,6 +54,27 @@ export async function getUserPermissions(
 		return createEmptyPermissions();
 	}
 
+	// Defense-in-depth: also verify the Role record itself belongs to this org.
+	// This catches data corruption or race conditions where organizationRoleId
+	// points to a role in a different organization.
+	if (
+		user.organizationRole &&
+		user.organizationRole.organizationId !== organizationId
+	) {
+		logBusinessEvent({
+			type: "permission.role_org_mismatch",
+			userId,
+			organizationId,
+			metadata: {
+				roleId: user.organizationRole.id,
+				roleOrgId: user.organizationRole.organizationId,
+				requestedOrgId: organizationId,
+			},
+			severity: "error",
+		});
+		return createEmptyPermissions();
+	}
+
 	// Priority 1: Check for custom permissions on user
 	if (user.customPermissions) {
 		try {

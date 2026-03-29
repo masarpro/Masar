@@ -183,6 +183,9 @@ export async function getOwnerContextByTokenLegacy(token: string) {
 // Owner Portal Session Management
 // ═══════════════════════════════════════════════════════════════════════════
 
+/** Maximum absolute session lifetime — 8 hours regardless of sliding refresh */
+const MAX_SESSION_LIFETIME_MS = 8 * 60 * 60 * 1000;
+
 /**
  * Create a session for an owner portal access token.
  * Session is valid for 1 hour and can be refreshed.
@@ -249,6 +252,11 @@ export async function getOwnerContextBySession(
 		return { ok: false, reason: "EXPIRED" };
 	}
 
+	// Check absolute session lifetime (8 hours max regardless of refresh)
+	if (Date.now() - session.createdAt.getTime() > MAX_SESSION_LIFETIME_MS) {
+		return { ok: false, reason: "EXPIRED" };
+	}
+
 	const access = session.portalAccess;
 
 	// Check if underlying access is revoked
@@ -261,12 +269,15 @@ export async function getOwnerContextBySession(
 		return { ok: false, reason: "EXPIRED" };
 	}
 
-	// Refresh session: extend expiry by 1 hour and update lastAccessedAt
+	// Refresh session: extend expiry by 1 hour, but never past 8h absolute max
+	const maxExpiresAt = new Date(session.createdAt.getTime() + MAX_SESSION_LIFETIME_MS);
+	const newExpiresAt = new Date(Math.min(Date.now() + 60 * 60 * 1000, maxExpiresAt.getTime()));
+
 	await db.ownerPortalSession.update({
 		where: { id: session.id },
 		data: {
 			lastAccessedAt: new Date(),
-			expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+			expiresAt: newExpiresAt,
 		},
 	});
 

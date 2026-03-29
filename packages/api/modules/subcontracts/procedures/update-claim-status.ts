@@ -123,6 +123,11 @@ export const updateSubcontractClaimStatusProcedure = subscriptionProcedure
 						message: "لا يمكن تغيير حالة المستخلص بهذا الشكل",
 					});
 				}
+				if (error.message.startsWith("QTY_EXCEEDS_REMAINING:")) {
+					throw new ORPCError("BAD_REQUEST", {
+						message: "اعتماد المستخلص سيتجاوز الكمية المتبقية من العقد",
+					});
+				}
 			}
 			throw error;
 		}

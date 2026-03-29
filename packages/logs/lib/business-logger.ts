@@ -14,6 +14,7 @@ type BusinessEventType =
 	// Permission events
 	| "permission.denied"
 	| "permission.cross_tenant"
+	| "permission.role_org_mismatch"
 	// Finance events
 	| "finance.invoice_overdue"
 	| "finance.large_transaction"

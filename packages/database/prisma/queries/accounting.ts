@@ -422,7 +422,7 @@ export async function createJournalEntry(db: PrismaClient, data: {
 								referenceId: data.referenceId,
 								date: data.date.toISOString(),
 								reason: "period_closed",
-							} as any,
+							} satisfies Prisma.InputJsonValue,
 						},
 					}).catch(() => {});
 				}
@@ -1101,6 +1101,22 @@ export async function closePeriod(
 	const period = await db.accountingPeriod.findUnique({ where: { id: periodId } });
 	if (!period) throw new Error("الفترة غير موجودة");
 	if (period.isClosed) throw new Error("الفترة مغلقة مسبقاً");
+
+	// Check sequential order — all previous periods must be closed first
+	const previousOpenPeriods = await db.accountingPeriod.findMany({
+		where: {
+			organizationId: period.organizationId,
+			endDate: { lt: period.startDate },
+			isClosed: false,
+		},
+		orderBy: { startDate: "asc" },
+		select: { name: true },
+		take: 5,
+	});
+	if (previousOpenPeriods.length > 0) {
+		const names = previousOpenPeriods.map((p) => p.name).join("، ");
+		throw new Error(`لا يمكن إقفال هذه الفترة قبل إقفال الفترات السابقة: ${names}`);
+	}
 
 	// Check no draft entries in this period
 	const draftEntries = await db.journalEntry.count({
@@ -1912,7 +1928,7 @@ export async function createRecurringTemplate(
 		data: {
 			organizationId,
 			description: data.description,
-			lines: data.lines as any,
+			lines: data.lines as Prisma.InputJsonValue,
 			totalAmount: totalDebit,
 			frequency: data.frequency,
 			dayOfMonth: data.dayOfMonth,

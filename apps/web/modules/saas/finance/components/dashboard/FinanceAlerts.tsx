@@ -2,7 +2,7 @@
 
 import { AlertTriangle, Clock, ArrowUpRight, Bell } from "lucide-react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { formatDateArabic } from "../../lib/utils";
 import { Currency } from "../shared/Currency";
 
@@ -35,6 +35,7 @@ export function FinanceAlerts({
 	organizationSlug,
 }: FinanceAlertsProps) {
 	const t = useTranslations();
+	const locale = useLocale();
 	const basePath = `/app/${organizationSlug}/finance`;
 
 	// Mock upcoming deadlines if none provided
@@ -107,7 +108,7 @@ export function FinanceAlerts({
 										<Currency amount={invoice.totalAmount - invoice.paidAmount} />
 									</p>
 									<p className="text-xs text-slate-500">
-										{formatDateArabic(invoice.dueDate)}
+										{formatDateArabic(invoice.dueDate, locale)}
 									</p>
 								</div>
 							</Link>

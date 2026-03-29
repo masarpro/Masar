@@ -12,7 +12,7 @@ const withAnalyzer = withBundleAnalyzer({
 const withNextIntl = nextIntlPlugin("./modules/i18n/request.ts");
 
 const nextConfig: NextConfig = {
-	serverExternalPackages: ["pg", "@prisma/client", "@prisma/adapter-pg"],
+	serverExternalPackages: ["pg", "@prisma/client", "@prisma/adapter-pg", "pdfkit"],
 	experimental: {
 		optimizePackageImports: [
 			"lucide-react",

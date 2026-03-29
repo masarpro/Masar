@@ -73,7 +73,7 @@ export function JournalIncomeStatementReport({ organizationId }: Props) {
 				</div>
 				<label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer">
 					<input type="checkbox" checked={includeComparison} onChange={(e) => setIncludeComparison(e.target.checked)} className="rounded" />
-					{t("finance.accounting.incomeStatement.compareWithPrevious") || "مقارنة بالفترة السابقة"}
+					{t("finance.accounting.incomeStatement.compareWithPrevious")}
 				</label>
 				<Button variant="outline" size="sm" className="rounded-xl ms-auto" onClick={() => window.print()}>
 					<Printer className="h-4 w-4 me-1" />

@@ -187,16 +187,15 @@ export function StructuralCostingTab({
 			const itemConcrete = Number(matchItem?.concreteVolume ?? 0);
 			const itemSteel = Number(matchItem?.steelWeight ?? 0) / 1000; // convert kg to tons
 
-			// Material cost for this item
+			// Material cost for this item (pure — without storage)
 			const matCost = (itemConcrete * cPrice) + (itemSteel * sPrice);
-			const storageCost = matCost * (storagePct / 100);
 			const qty = Number(ci.quantity) || 1;
 
 			return {
 				id: ci.id,
-				materialUnitCost: qty > 0 ? (matCost + storageCost) / qty : 0,
+				materialUnitCost: qty > 0 ? matCost / qty : 0,
+				storageCostPercent: storagePct,
 				// Don't send laborUnitCost — preserve existing labor data from labor tab
-				// Don't send storageCostPercent — storage is already included in materialUnitCost
 			};
 		});
 

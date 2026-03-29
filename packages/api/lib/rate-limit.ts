@@ -34,6 +34,8 @@ export const RATE_LIMITS = {
 	UPLOAD: { windowMs: 60 * 1000, maxRequests: 10 },
 	MESSAGE: { windowMs: 60 * 1000, maxRequests: 30 },
 	STRICT: { windowMs: 60 * 1000, maxRequests: 5 },
+	PUBLIC_FORM: { windowMs: 60 * 1000, maxRequests: 3 },
+	OWNER_EXCHANGE: { windowMs: 60 * 1000, maxRequests: 5 },
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -337,4 +339,192 @@ export async function rateLimitChecker(
 export async function rateLimitToken(token: string, procedureName: string): Promise<void> {
 	const key = `token:${token}:${procedureName}`;
 	await enforceRateLimit(key, RATE_LIMITS.TOKEN);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Auth-Specific: Email Rate Limiting + Account Lockout + Progressive Delay
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const AUTH_LOCKOUT = {
+	/** Number of failed login attempts before account lockout */
+	THRESHOLD: 10,
+	/** Lockout duration in seconds (15 minutes) */
+	DURATION_SEC: 15 * 60,
+	/** Window for tracking failed attempts in seconds (30 minutes) */
+	FAILURE_WINDOW_SEC: 30 * 60,
+} as const;
+
+/**
+ * Extract client IP from headers, preferring x-real-ip (set by Vercel, non-spoofable)
+ */
+export function getClientIp(headers: Headers): string {
+	return (
+		headers.get("x-real-ip") ||
+		headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+		"unknown"
+	);
+}
+
+/**
+ * Create a rate limit key for email-based limiting
+ */
+export function createEmailRateLimitKey(
+	email: string,
+	endpoint: string,
+): string {
+	return `email:${email.toLowerCase().trim()}:${endpoint}`;
+}
+
+/**
+ * Get the number of consecutive failed login attempts for an email
+ */
+export async function getFailedLoginCount(email: string): Promise<number> {
+	const key = `${REDIS_KEY_PREFIX}auth:failed:${email.toLowerCase().trim()}`;
+
+	const client = getRedisClient();
+	if (client && redisReady && !isCircuitOpen()) {
+		try {
+			const count = await client.get(key);
+			recordRedisSuccess();
+			return count ? Number.parseInt(count, 10) : 0;
+		} catch {
+			recordRedisFailure();
+		}
+	}
+
+	// Memory fallback
+	const entry = memoryStore.get(key);
+	if (entry) {
+		const elapsed = Date.now() - entry.windowStart;
+		if (elapsed < AUTH_LOCKOUT.FAILURE_WINDOW_SEC * 1000) {
+			return entry.count;
+		}
+		memoryStore.delete(key);
+	}
+	return 0;
+}
+
+/**
+ * Record a failed login attempt. Locks account after THRESHOLD failures.
+ */
+export async function recordFailedLogin(email: string): Promise<void> {
+	const normalized = email.toLowerCase().trim();
+	const failKey = `${REDIS_KEY_PREFIX}auth:failed:${normalized}`;
+	const lockKey = `${REDIS_KEY_PREFIX}auth:locked:${normalized}`;
+
+	const client = getRedisClient();
+	if (client && redisReady && !isCircuitOpen()) {
+		try {
+			const pipeline = client.pipeline();
+			pipeline.incr(failKey);
+			pipeline.expire(failKey, AUTH_LOCKOUT.FAILURE_WINDOW_SEC);
+			const results = await pipeline.exec();
+			recordRedisSuccess();
+
+			const count = results?.[0]?.[1] as number;
+			if (count >= AUTH_LOCKOUT.THRESHOLD) {
+				await client.setex(lockKey, AUTH_LOCKOUT.DURATION_SEC, "1");
+			}
+			return;
+		} catch {
+			recordRedisFailure();
+		}
+	}
+
+	// Memory fallback
+	const now = Date.now();
+	const entry = memoryStore.get(failKey);
+	const inWindow =
+		entry &&
+		now - entry.windowStart < AUTH_LOCKOUT.FAILURE_WINDOW_SEC * 1000;
+	const newCount = inWindow ? entry.count + 1 : 1;
+	memoryStore.set(failKey, {
+		count: newCount,
+		windowStart: inWindow ? entry.windowStart : now,
+	});
+	if (newCount >= AUTH_LOCKOUT.THRESHOLD) {
+		memoryStore.set(lockKey, { count: 1, windowStart: now });
+	}
+}
+
+/**
+ * Check if an account is temporarily locked due to too many failed login attempts
+ */
+export async function isAccountLocked(
+	email: string,
+): Promise<{ locked: boolean; remainingSec?: number }> {
+	const lockKey = `${REDIS_KEY_PREFIX}auth:locked:${email.toLowerCase().trim()}`;
+
+	const client = getRedisClient();
+	if (client && redisReady && !isCircuitOpen()) {
+		try {
+			const pipeline = client.pipeline();
+			pipeline.exists(lockKey);
+			pipeline.ttl(lockKey);
+			const results = await pipeline.exec();
+			recordRedisSuccess();
+
+			const exists = results?.[0]?.[1] as number;
+			const ttl = results?.[1]?.[1] as number;
+			if (exists) {
+				return {
+					locked: true,
+					remainingSec: ttl > 0 ? ttl : AUTH_LOCKOUT.DURATION_SEC,
+				};
+			}
+			return { locked: false };
+		} catch {
+			recordRedisFailure();
+		}
+	}
+
+	// Memory fallback
+	const entry = memoryStore.get(lockKey);
+	if (entry) {
+		const elapsed = (Date.now() - entry.windowStart) / 1000;
+		if (elapsed < AUTH_LOCKOUT.DURATION_SEC) {
+			return {
+				locked: true,
+				remainingSec: Math.ceil(AUTH_LOCKOUT.DURATION_SEC - elapsed),
+			};
+		}
+		memoryStore.delete(lockKey);
+	}
+	return { locked: false };
+}
+
+/**
+ * Clear failed login tracking (called on successful login)
+ */
+export async function clearFailedLogins(email: string): Promise<void> {
+	const normalized = email.toLowerCase().trim();
+	const failKey = `${REDIS_KEY_PREFIX}auth:failed:${normalized}`;
+	const lockKey = `${REDIS_KEY_PREFIX}auth:locked:${normalized}`;
+
+	const client = getRedisClient();
+	if (client && redisReady && !isCircuitOpen()) {
+		try {
+			await client.del(failKey, lockKey);
+			recordRedisSuccess();
+			return;
+		} catch {
+			recordRedisFailure();
+		}
+	}
+
+	// Memory fallback
+	memoryStore.delete(failKey);
+	memoryStore.delete(lockKey);
+}
+
+/**
+ * Calculate progressive delay based on failed attempt count.
+ * Returns milliseconds to sleep, or -1 if account should be locked.
+ */
+export function getProgressiveDelay(failedAttempts: number): number {
+	if (failedAttempts < 3) return 0;
+	if (failedAttempts < 5) return 2000;
+	if (failedAttempts < 8) return 5000;
+	if (failedAttempts < AUTH_LOCKOUT.THRESHOLD) return 10000;
+	return -1; // locked
 }

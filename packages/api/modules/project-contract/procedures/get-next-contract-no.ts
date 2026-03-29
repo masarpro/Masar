@@ -1,5 +1,6 @@
 import { generateContractNo } from "@repo/database";
 import { z } from "zod";
+import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
 
 export const getNextContractNo = protectedProcedure
@@ -14,7 +15,12 @@ export const getNextContractNo = protectedProcedure
 			organizationId: z.string(),
 		}),
 	)
-	.handler(async ({ input }) => {
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(
+			input.organizationId,
+			context.user.id,
+		);
+
 		try {
 			const contractNo = await generateContractNo(input.organizationId);
 			return { contractNo };

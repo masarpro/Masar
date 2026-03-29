@@ -1,5 +1,6 @@
 import { tool } from "ai";
 import type { z } from "zod";
+import type { Permissions } from "@repo/database";
 
 export interface AIToolRegistration {
   /** اسم الأداة */
@@ -20,6 +21,10 @@ export interface ToolContext {
   organizationSlug: string;
   locale: string;
   projectId?: string;
+  /** صلاحيات المستخدم — تُستخدم لفحص الصلاحيات وأداة getMyPermissions */
+  permissions?: Permissions;
+  /** نوع الدور (OWNER, ACCOUNTANT, etc.) */
+  roleType?: string;
 }
 
 // سجل الأدوات
@@ -53,7 +58,19 @@ export function getAISDKTools(
     tools[reg.name] = tool({
       description: reg.description,
       inputSchema: reg.parameters as z.ZodObject<any>,
-      execute: async (params: any) => reg.execute(params, context),
+      execute: async (params: any) => {
+        // Defense-in-depth: فحص الصلاحية داخل execute كطبقة حماية ثانية
+        if (context.permissions) {
+          const { isToolAllowed } = await import("../lib/tool-permissions");
+          if (!isToolAllowed(reg.name, context.permissions)) {
+            return {
+              error:
+                "ليس لديك صلاحية للوصول لهذه البيانات. تواصل مع مالك المنظمة لطلب الصلاحية المطلوبة.",
+            };
+          }
+        }
+        return reg.execute(params, context);
+      },
     });
   }
   return tools;

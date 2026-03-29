@@ -169,6 +169,7 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 												key={child.id}
 												href={childHref}
 												onClick={closeMobile}
+												prefetch
 												className={navItemClasses(childActive, true, false)}
 											>
 												<NavItemContent

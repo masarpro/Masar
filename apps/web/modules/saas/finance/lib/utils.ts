@@ -34,34 +34,29 @@ export function formatDate(date: Date | string | null | undefined): string {
 }
 
 /**
- * Format a date with Arabic month names but English numerals
+ * Format a date with localized month names but English numerals
  */
-export function formatDateArabic(date: Date | string | null | undefined): string {
+export function formatDateArabic(date: Date | string | null | undefined, locale = "ar"): string {
 	if (!date) return "";
 	const d = typeof date === "string" ? new Date(date) : date;
 
-	const months = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-
+	const month = new Intl.DateTimeFormat(locale, { month: "long" }).format(d);
 	const day = d.getDate();
-	const month = months[d.getMonth()];
 	const year = d.getFullYear();
 
 	return `${day} ${month} ${year}`;
 }
 
 /**
- * Format a date with weekday in Arabic text but English numerals
+ * Format a date with weekday and localized month names but English numerals
  */
-export function formatDateFull(date: Date | string | null | undefined): string {
+export function formatDateFull(date: Date | string | null | undefined, locale = "ar"): string {
 	if (!date) return "";
 	const d = typeof date === "string" ? new Date(date) : date;
 
-	const weekdays = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
-	const months = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-
-	const weekday = weekdays[d.getDay()];
+	const weekday = new Intl.DateTimeFormat(locale, { weekday: "long" }).format(d);
+	const month = new Intl.DateTimeFormat(locale, { month: "long" }).format(d);
 	const day = d.getDate();
-	const month = months[d.getMonth()];
 	const year = d.getFullYear();
 
 	return `${weekday} ${day} ${month} ${year}`;
@@ -107,14 +102,12 @@ export function formatTime(date: Date | null | undefined): string {
 /**
  * Format a date with time for display with English numerals
  */
-export function formatDateTime(date: Date | string | null | undefined): string {
+export function formatDateTime(date: Date | string | null | undefined, locale = "ar"): string {
 	if (!date) return "";
 	const d = typeof date === "string" ? new Date(date) : date;
 
-	const months = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-
+	const month = new Intl.DateTimeFormat(locale, { month: "long" }).format(d);
 	const day = d.getDate();
-	const month = months[d.getMonth()];
 	const year = d.getFullYear();
 	const time = d.toLocaleTimeString("en-SA", {
 		hour: "2-digit",

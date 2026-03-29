@@ -154,6 +154,12 @@ export async function createSubcontractClaim(data: {
 	}>;
 }) {
 	return db.$transaction(async (tx) => {
+		// Lock the contract row to prevent concurrent claims from racing
+		await tx.$queryRawUnsafe(
+			`SELECT id FROM subcontract_contracts WHERE id = $1 FOR UPDATE`,
+			data.contractId,
+		);
+
 		// 1. Get contract details
 		const contract = await tx.subcontractContract.findUnique({
 			where: { id: data.contractId, organizationId: data.organizationId },
@@ -390,6 +396,12 @@ export async function updateSubcontractClaim(
 		if (!claim) throw new Error("CLAIM_NOT_FOUND");
 		if (claim.status !== "DRAFT") throw new Error("CLAIM_NOT_DRAFT");
 
+		// Lock the contract row to prevent concurrent updates from racing
+		await tx.$queryRawUnsafe(
+			`SELECT id FROM subcontract_contracts WHERE id = $1 FOR UPDATE`,
+			claim.contractId,
+		);
+
 		const updateData: Record<string, unknown> = {};
 		if (data.title !== undefined) updateData.title = data.title;
 		if (data.periodStart !== undefined) updateData.periodStart = data.periodStart;
@@ -526,6 +538,7 @@ export async function updateSubcontractClaim(
 
 /**
  * Update subcontract claim status with workflow validation
+ * Uses $transaction + FOR UPDATE to prevent concurrent approval race conditions
  */
 export async function updateSubcontractClaimStatus(
 	id: string,
@@ -536,49 +549,91 @@ export async function updateSubcontractClaimStatus(
 		approvedById?: string;
 	},
 ) {
-	const claim = await db.subcontractClaim.findUnique({
-		where: { id, organizationId },
-		select: { status: true },
-	});
-	if (!claim) throw new Error("CLAIM_NOT_FOUND");
+	return db.$transaction(async (tx) => {
+		const claim = await tx.subcontractClaim.findUnique({
+			where: { id, organizationId },
+			select: {
+				id: true,
+				status: true,
+				contractId: true,
+				grossAmount: true,
+				items: {
+					select: {
+						contractItemId: true,
+						thisQty: true,
+						contractQty: true,
+					},
+				},
+			},
+		});
+		if (!claim) throw new Error("CLAIM_NOT_FOUND");
 
-	// Validate workflow transitions
-	const allowedTransitions: Record<string, string[]> = {
-		DRAFT: ["SUBMITTED"],
-		SUBMITTED: ["UNDER_REVIEW", "APPROVED", "REJECTED"],
-		UNDER_REVIEW: ["APPROVED", "REJECTED"],
-		APPROVED: ["PARTIALLY_PAID", "PAID"],
-		REJECTED: ["DRAFT"],
-		PARTIALLY_PAID: ["PAID"],
-		PAID: [],
-		CANCELLED: [],
-	};
+		// Validate workflow transitions
+		const allowedTransitions: Record<string, string[]> = {
+			DRAFT: ["SUBMITTED"],
+			SUBMITTED: ["UNDER_REVIEW", "APPROVED", "REJECTED"],
+			UNDER_REVIEW: ["APPROVED", "REJECTED"],
+			APPROVED: ["PARTIALLY_PAID", "PAID"],
+			REJECTED: ["DRAFT"],
+			PARTIALLY_PAID: ["PAID"],
+			PAID: [],
+			CANCELLED: [],
+		};
 
-	const allowed = allowedTransitions[claim.status] ?? [];
-	if (!allowed.includes(newStatus)) {
-		throw new Error(`INVALID_TRANSITION:${claim.status}:${newStatus}`);
-	}
+		const allowed = allowedTransitions[claim.status] ?? [];
+		if (!allowed.includes(newStatus)) {
+			throw new Error(`INVALID_TRANSITION:${claim.status}:${newStatus}`);
+		}
 
-	const updateData: Record<string, unknown> = { status: newStatus };
+		// If approving, lock the contract and re-validate ceiling
+		if (newStatus === "APPROVED") {
+			await tx.$queryRawUnsafe(
+				`SELECT id FROM subcontract_contracts WHERE id = $1 FOR UPDATE`,
+				claim.contractId,
+			);
 
-	if (newStatus === "SUBMITTED") {
-		updateData.submittedAt = new Date();
-	} else if (newStatus === "APPROVED") {
-		updateData.approvedAt = new Date();
-		if (options?.approvedById) updateData.approvedById = options.approvedById;
-	} else if (newStatus === "REJECTED") {
-		updateData.rejectionReason = options?.rejectionReason ?? null;
-	} else if (newStatus === "DRAFT") {
-		// Return to draft: clear submission/approval data
-		updateData.submittedAt = null;
-		updateData.approvedAt = null;
-		updateData.approvedById = null;
-		updateData.rejectionReason = null;
-	}
+			// Re-validate each item's cumulative qty against contract qty
+			for (const item of claim.items) {
+				const approvedQtyResult = await tx.subcontractClaimItem.aggregate({
+					where: {
+						contractItemId: item.contractItemId,
+						claim: {
+							contractId: claim.contractId,
+							status: { in: ["APPROVED", "PARTIALLY_PAID", "PAID"] },
+						},
+					},
+					_sum: { thisQty: true },
+				});
+				const approvedCumQty = approvedQtyResult._sum.thisQty ?? new Prisma.Decimal(0);
+				const newCumQty = approvedCumQty.add(item.thisQty);
 
-	return db.subcontractClaim.update({
-		where: { id },
-		data: updateData,
+				if (newCumQty.gt(item.contractQty)) {
+					throw new Error(`QTY_EXCEEDS_REMAINING:${item.contractItemId}`);
+				}
+			}
+		}
+
+		const updateData: Record<string, unknown> = { status: newStatus };
+
+		if (newStatus === "SUBMITTED") {
+			updateData.submittedAt = new Date();
+		} else if (newStatus === "APPROVED") {
+			updateData.approvedAt = new Date();
+			if (options?.approvedById) updateData.approvedById = options.approvedById;
+		} else if (newStatus === "REJECTED") {
+			updateData.rejectionReason = options?.rejectionReason ?? null;
+		} else if (newStatus === "DRAFT") {
+			// Return to draft: clear submission/approval data
+			updateData.submittedAt = null;
+			updateData.approvedAt = null;
+			updateData.approvedById = null;
+			updateData.rejectionReason = null;
+		}
+
+		return tx.subcontractClaim.update({
+			where: { id },
+			data: updateData,
+		});
 	});
 }
 

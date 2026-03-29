@@ -105,15 +105,22 @@ export const auth = betterAuth({
 								isSystem: true,
 							},
 						});
+						// Atomic update: set both role and organization in a single query
+						// to prevent race conditions where one is set without the other
 						if (role) {
-							await assignRoleToUser(userId, role.id);
+							await db.user.update({
+								where: { id: userId },
+								data: {
+									organizationRoleId: role.id,
+									organizationId: invitation.organizationId,
+								},
+							});
+						} else {
+							await db.user.update({
+								where: { id: userId },
+								data: { organizationId: invitation.organizationId },
+							});
 						}
-
-						// Also set organizationId on the user
-						await db.user.update({
-							where: { id: userId },
-							data: { organizationId: invitation.organizationId },
-						});
 					} catch (e) {
 						logger.error("Failed to assign role on invitation accept", e);
 					}

@@ -20,7 +20,7 @@ import { CheckCircle, XCircle, Printer, Download } from "lucide-react";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { formatAccounting, ACCOUNT_TYPE_COLORS } from "./formatters";
 import { ReportPrintHeader } from "../shared/ReportPrintHeader";
-import { exportTrialBalanceToExcel } from "../../lib/accounting-excel-export";
+import { exportTrialBalanceToExcel, type TrialBalanceLabels } from "../../lib/accounting-excel-export";
 
 interface TrialBalanceReportProps {
 	organizationId: string;
@@ -69,7 +69,11 @@ export function TrialBalanceReport({ organizationId }: TrialBalanceReportProps) 
 						{t("common.print")}
 					</Button>
 					{data && (
-						<Button variant="outline" size="sm" className="rounded-xl" onClick={() => exportTrialBalanceToExcel(data)}>
+						<Button variant="outline" size="sm" className="rounded-xl" onClick={() => exportTrialBalanceToExcel(data, {
+									sheetName: t("finance.accounting.excel.sheetTrialBalance"),
+									headers: [t("finance.accounting.excel.accountCode"), t("finance.accounting.excel.accountName"), t("finance.accounting.excel.periodDebit"), t("finance.accounting.excel.periodCredit"), t("finance.accounting.excel.debitBalance"), t("finance.accounting.excel.creditBalance")],
+									total: t("finance.accounting.excel.total"),
+								} as TrialBalanceLabels)}>
 							<Download className="h-4 w-4 me-1" />
 							Excel
 						</Button>
@@ -137,7 +141,7 @@ export function TrialBalanceReport({ organizationId }: TrialBalanceReportProps) 
 										})}
 										{/* Totals */}
 										<TableRow className="border-t-2 border-double border-slate-400 dark:border-slate-500 font-bold bg-slate-100 dark:bg-slate-800">
-											<TableCell colSpan={2}>{t("finance.accounting.aging.total") || "الإجمالي"}</TableCell>
+											<TableCell colSpan={2}>{t("finance.accounting.aging.total")}</TableCell>
 											<TableCell className="text-end">{formatAccounting(data.totals.totalPeriodDebit)}</TableCell>
 											<TableCell className="text-end">{formatAccounting(data.totals.totalPeriodCredit)}</TableCell>
 											<TableCell className="text-end">{formatAccounting(data.totals.totalDebitBalance)}</TableCell>

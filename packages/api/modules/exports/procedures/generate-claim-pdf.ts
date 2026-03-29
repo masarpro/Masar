@@ -77,8 +77,8 @@ export const generateClaimPDFProcedure = subscriptionProcedure
 
 		// Return as base64 for easy transport
 		return {
-			filename: `claim-${claim.claimNo}.html`,
-			mimeType: "text/html",
+			filename: `claim-${claim.claimNo}.pdf`,
+			mimeType: "application/pdf",
 			content: pdfBuffer.toString("base64"),
 			size: pdfBuffer.length,
 		};

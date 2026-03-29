@@ -34,6 +34,15 @@ export async function createOrgUser(data: {
 	isActive?: boolean;
 	emailVerified?: boolean;
 }) {
+	// Validate role belongs to the same organization
+	const role = await db.role.findUnique({
+		where: { id: data.organizationRoleId },
+		select: { organizationId: true },
+	});
+	if (!role || role.organizationId !== data.organizationId) {
+		throw new Error("الدور لا ينتمي لهذه المنظمة");
+	}
+
 	return await db.user.create({
 		data: {
 			name: data.name,
@@ -70,6 +79,17 @@ export async function updateOrgUser(
 	// لا يمكن تعديل المالك
 	if (user.accountType === "OWNER") {
 		throw new Error("لا يمكن تعديل حساب المالك");
+	}
+
+	// Validate new role belongs to the same organization
+	if (data.organizationRoleId) {
+		const role = await db.role.findUnique({
+			where: { id: data.organizationRoleId },
+			select: { organizationId: true },
+		});
+		if (!role || role.organizationId !== organizationId) {
+			throw new Error("الدور لا ينتمي لهذه المنظمة");
+		}
 	}
 
 	// When deactivating a user (isActive: true -> false), immediately invalidate

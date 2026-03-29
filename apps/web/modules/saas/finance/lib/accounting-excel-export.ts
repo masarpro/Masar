@@ -61,6 +61,33 @@ function setRTL(ws: any) {
 }
 
 // ════════════════════════════════════════════════════
+// Label types — callers construct these from t() calls
+// ════════════════════════════════════════════════════
+
+export interface TrialBalanceLabels {
+	sheetName: string;
+	headers: [string, string, string, string, string, string];
+	total: string;
+}
+
+export interface JournalEntriesLabels {
+	sheetName: string;
+	headers: [string, string, string, string, string, string];
+	statusPosted: string;
+	statusDraft: string;
+	statusReversed: string;
+	typeManual: string;
+}
+
+export interface LedgerLabels {
+	sheetName: string;
+	ledgerPrefix: string;
+	headers: [string, string, string, string, string, string];
+	openingBalance: string;
+	closingBalance: string;
+}
+
+// ════════════════════════════════════════════════════
 // Trial Balance Export
 // ════════════════════════════════════════════════════
 
@@ -69,6 +96,7 @@ export async function exportTrialBalanceToExcel(
 		rows: Array<{ accountCode: string; accountNameAr: string; periodDebit: number; periodCredit: number; debitBalance: number; creditBalance: number }>;
 		totals: { totalPeriodDebit: number; totalPeriodCredit: number; totalDebitBalance: number; totalCreditBalance: number };
 	},
+	labels: TrialBalanceLabels,
 	orgName?: string,
 ) {
 	const XLSX = await import("xlsx-js-style");
@@ -76,13 +104,12 @@ export async function exportTrialBalanceToExcel(
 	let row = 0;
 
 	// Title
-	setCell(ws, row, 0, orgName ?? "ميزان المراجعة", STYLES.title);
+	setCell(ws, row, 0, orgName ?? labels.sheetName, STYLES.title);
 	mergeRange(ws, 0, 0, 0, 5);
 	row += 2;
 
 	// Headers
-	const headers = ["رمز الحساب", "اسم الحساب", "مدين (حركة)", "دائن (حركة)", "رصيد مدين", "رصيد دائن"];
-	headers.forEach((h, c) => setCell(ws, row, c, h, STYLES.header));
+	labels.headers.forEach((h, c) => setCell(ws, row, c, h, STYLES.header));
 	row++;
 
 	// Data rows
@@ -97,7 +124,7 @@ export async function exportTrialBalanceToExcel(
 	}
 
 	// Totals
-	setCell(ws, row, 0, "الإجمالي", STYLES.totalRow);
+	setCell(ws, row, 0, labels.total, STYLES.totalRow);
 	setCell(ws, row, 1, "", STYLES.totalRow);
 	setCell(ws, row, 2, data.totals.totalPeriodDebit, STYLES.totalRow);
 	setCell(ws, row, 3, data.totals.totalPeriodCredit, STYLES.totalRow);
@@ -109,7 +136,7 @@ export async function exportTrialBalanceToExcel(
 	setRTL(ws);
 
 	const wb = XLSX.utils.book_new();
-	XLSX.utils.book_append_sheet(wb, ws, "ميزان المراجعة");
+	XLSX.utils.book_append_sheet(wb, ws, labels.sheetName);
 	XLSX.writeFile(wb, `trial-balance-${new Date().toISOString().split("T")[0]}.xlsx`);
 }
 
@@ -126,27 +153,27 @@ export async function exportJournalEntriesToExcel(
 		totalAmount: number;
 		status: string;
 	}>,
+	labels: JournalEntriesLabels,
 	orgName?: string,
 ) {
 	const XLSX = await import("xlsx-js-style");
 	const ws: any = {};
 	let row = 0;
 
-	setCell(ws, row, 0, orgName ?? "القيود اليومية", STYLES.title);
+	setCell(ws, row, 0, orgName ?? labels.sheetName, STYLES.title);
 	mergeRange(ws, 0, 0, 0, 5);
 	row += 2;
 
-	const headers = ["رقم القيد", "التاريخ", "الوصف", "النوع", "المبلغ", "الحالة"];
-	headers.forEach((h, c) => setCell(ws, row, c, h, STYLES.header));
+	labels.headers.forEach((h, c) => setCell(ws, row, c, h, STYLES.header));
 	row++;
 
 	for (const e of entries) {
 		setCell(ws, row, 0, e.entryNo, STYLES.cell);
 		setCell(ws, row, 1, new Date(e.date).toLocaleDateString("en-SA"), STYLES.cell);
 		setCell(ws, row, 2, e.description, STYLES.cell);
-		setCell(ws, row, 3, e.referenceType ?? "يدوي", STYLES.cell);
+		setCell(ws, row, 3, e.referenceType ?? labels.typeManual, STYLES.cell);
 		setCell(ws, row, 4, e.totalAmount, STYLES.number);
-		setCell(ws, row, 5, e.status === "POSTED" ? "مرحّل" : e.status === "DRAFT" ? "مسودة" : "معكوس", STYLES.cell);
+		setCell(ws, row, 5, e.status === "POSTED" ? labels.statusPosted : e.status === "DRAFT" ? labels.statusDraft : labels.statusReversed, STYLES.cell);
 		row++;
 	}
 
@@ -155,7 +182,7 @@ export async function exportJournalEntriesToExcel(
 	setRTL(ws);
 
 	const wb = XLSX.utils.book_new();
-	XLSX.utils.book_append_sheet(wb, ws, "القيود اليومية");
+	XLSX.utils.book_append_sheet(wb, ws, labels.sheetName);
 	XLSX.writeFile(wb, `journal-entries-${new Date().toISOString().split("T")[0]}.xlsx`);
 }
 
@@ -175,22 +202,22 @@ export async function exportAccountLedgerToExcel(
 		runningBalance: number;
 	}>,
 	totals: { totalDebit: number; totalCredit: number; closingBalance: number },
+	labels: LedgerLabels,
 	orgName?: string,
 ) {
 	const XLSX = await import("xlsx-js-style");
 	const ws: any = {};
 	let row = 0;
 
-	setCell(ws, row, 0, `${orgName ? orgName + " — " : ""}دفتر الأستاذ: ${accountName}`, STYLES.title);
+	setCell(ws, row, 0, `${orgName ? orgName + " — " : ""}${labels.ledgerPrefix}: ${accountName}`, STYLES.title);
 	mergeRange(ws, 0, 0, 0, 5);
 	row += 2;
 
-	const headers = ["التاريخ", "رقم القيد", "الوصف", "مدين", "دائن", "الرصيد"];
-	headers.forEach((h, c) => setCell(ws, row, c, h, STYLES.header));
+	labels.headers.forEach((h, c) => setCell(ws, row, c, h, STYLES.header));
 	row++;
 
 	// Opening balance
-	setCell(ws, row, 0, "الرصيد الافتتاحي", STYLES.totalRow);
+	setCell(ws, row, 0, labels.openingBalance, STYLES.totalRow);
 	setCell(ws, row, 1, "", STYLES.totalRow);
 	setCell(ws, row, 2, "", STYLES.totalRow);
 	setCell(ws, row, 3, 0, STYLES.totalRow);
@@ -209,7 +236,7 @@ export async function exportAccountLedgerToExcel(
 	}
 
 	// Closing balance
-	setCell(ws, row, 0, "الرصيد الختامي", STYLES.totalRow);
+	setCell(ws, row, 0, labels.closingBalance, STYLES.totalRow);
 	setCell(ws, row, 1, "", STYLES.totalRow);
 	setCell(ws, row, 2, "", STYLES.totalRow);
 	setCell(ws, row, 3, totals.totalDebit, STYLES.totalRow);
@@ -221,6 +248,6 @@ export async function exportAccountLedgerToExcel(
 	setRTL(ws);
 
 	const wb = XLSX.utils.book_new();
-	XLSX.utils.book_append_sheet(wb, ws, "دفتر الأستاذ");
+	XLSX.utils.book_append_sheet(wb, ws, labels.sheetName);
 	XLSX.writeFile(wb, `ledger-${accountName}-${new Date().toISOString().split("T")[0]}.xlsx`);
 }

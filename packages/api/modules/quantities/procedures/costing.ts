@@ -364,12 +364,6 @@ export const costingBulkUpdate = subscriptionProcedure
 
 		const existingMap = new Map(existingItems.map((i) => [i.id, i]));
 
-		// ──── DEBUG: log bulkUpdate processing ────
-		console.log("=== BULK_UPDATE DEBUG ===");
-		console.log("Input items count:", input.items.length);
-		console.log("Existing items found:", existingItems.length);
-		// ──── END DEBUG ────
-
 		await db.$transaction(
 			input.items.map((update) => {
 				const existing = existingMap.get(update.id);
@@ -390,10 +384,6 @@ export const costingBulkUpdate = subscriptionProcedure
 				};
 
 				const totals = calculateItemTotals(merged);
-
-				// ──── DEBUG: log per-item calculation ────
-				console.log(`  BULK id=${update.id} | qty=${merged.quantity} | inputMUC=${update.materialUnitCost} | mergedMUC=${merged.materialUnitCost} | storagePct=${merged.storageCostPercent} | → materialTotal=${totals.materialTotal} | storageTotal=${totals.storageTotal} | totalCost=${totals.totalCost}`);
-				// ──── END DEBUG ────
 
 				return db.costingItem.update({
 					where: { id: update.id },
@@ -545,21 +535,6 @@ export const costingGetSummary = protectedProcedure
 			section,
 			...data,
 		}));
-
-		// ──── DEBUG: log STRUCTURAL section details ────
-		const structItems_debug = items.filter(i => i.section === "STRUCTURAL");
-		console.log("=== GET_SUMMARY DEBUG: STRUCTURAL ===");
-		console.log("STRUCTURAL items count:", structItems_debug.length);
-		let debugMatSum = 0;
-		for (const it of structItems_debug) {
-			const mt = toNum(it.materialTotal);
-			const muc = toNum(it.materialUnitCost);
-			const qty = toNum(it.quantity);
-			debugMatSum += mt;
-			console.log(`  id=${it.id} | desc="${it.description}" | qty=${qty} | materialUnitCost=${muc} | materialTotal=${mt} | storagePct=${toNum(it.storageCostPercent)} | storageTotal=${toNum(it.storageTotal)} | totalCost=${toNum(it.totalCost)}`);
-		}
-		console.log("SUM(materialTotal) =", debugMatSum);
-		// ──── END DEBUG ────
 
 		const grandMaterial = sections.reduce((s, sec) => s + sec.materialTotal, 0);
 		const grandLabor = sections.reduce((s, sec) => s + sec.laborTotal, 0);

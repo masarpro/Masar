@@ -33,23 +33,7 @@ import {
 	FileText,
 } from "lucide-react";
 import { cn } from "@ui/lib";
-
-// قائمة المناطق السعودية
-const saudiRegions = [
-	"الرياض",
-	"مكة المكرمة",
-	"المدينة المنورة",
-	"القصيم",
-	"الشرقية",
-	"عسير",
-	"تبوك",
-	"حائل",
-	"الحدود الشمالية",
-	"جازان",
-	"نجران",
-	"الباحة",
-	"الجوف",
-];
+import { SAUDI_REGION_KEYS } from "../../lib/geography";
 
 interface InlineClientFormProps {
 	organizationId: string;
@@ -246,11 +230,14 @@ export function InlineClientForm({
 									<SelectValue placeholder={t("finance.clients.regionPlaceholder")} />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
-									{saudiRegions.map((r) => (
-										<SelectItem key={r} value={r} className="text-sm">
-											{r}
-										</SelectItem>
-									))}
+									{SAUDI_REGION_KEYS.map((key) => {
+										const label = t(`finance.geography.saudiRegions.${key}`);
+										return (
+											<SelectItem key={key} value={label} className="text-sm">
+												{label}
+											</SelectItem>
+										);
+									})}
 								</SelectContent>
 							</Select>
 							<Input

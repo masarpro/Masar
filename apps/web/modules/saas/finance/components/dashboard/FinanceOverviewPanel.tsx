@@ -36,24 +36,6 @@ interface FinanceOverviewPanelProps {
 	stats?: FinanceStats;
 }
 
-// Mock data for sparkline chart
-// TODO: Connect to real cash flow API
-const mockCashFlowData = [
-	{ day: "السبت", amount: 45000 },
-	{ day: "الأحد", amount: 52000 },
-	{ day: "الإثنين", amount: 48000 },
-	{ day: "الثلاثاء", amount: 61000 },
-	{ day: "الأربعاء", amount: 55000 },
-	{ day: "الخميس", amount: 67000 },
-	{ day: "الجمعة", amount: 72000 },
-];
-
-const chartConfig: ChartConfig = {
-	amount: {
-		label: "التدفق النقدي",
-		color: "hsl(var(--primary))",
-	},
-};
 
 // Mock balance data
 // TODO: Connect to real API
@@ -68,6 +50,25 @@ const mockBalances = {
 
 export function FinanceOverviewPanel({ stats }: FinanceOverviewPanelProps) {
 	const t = useTranslations();
+
+	// Mock data for sparkline chart
+	// TODO: Connect to real cash flow API
+	const mockCashFlowData = [
+		{ day: t("common.weekdays.saturday"), amount: 45000 },
+		{ day: t("common.weekdays.sunday"), amount: 52000 },
+		{ day: t("common.weekdays.monday"), amount: 48000 },
+		{ day: t("common.weekdays.tuesday"), amount: 61000 },
+		{ day: t("common.weekdays.wednesday"), amount: 55000 },
+		{ day: t("common.weekdays.thursday"), amount: 67000 },
+		{ day: t("common.weekdays.friday"), amount: 72000 },
+	];
+
+	const chartConfig: ChartConfig = {
+		amount: {
+			label: t("finance.dashboard.overview.cashFlow"),
+			color: "hsl(var(--primary))",
+		},
+	};
 
 	return (
 		<div className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 p-6 space-y-6">

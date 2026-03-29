@@ -11,4 +11,4 @@ import "./documents-tools";
 import "./field-tools";
 import "./dashboard-tools";
 import "./vouchers-tools";
-// ← أضف أي tools جديدة هنا
+import "./permissions-tool";

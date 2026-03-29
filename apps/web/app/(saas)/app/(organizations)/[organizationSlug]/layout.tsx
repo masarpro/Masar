@@ -35,23 +35,9 @@ export default async function OrganizationLayout({
 		return notFound();
 	}
 
-	const [orgSubscription, memberRole] = await Promise.all([
-		cachedGetOrganizationSubscription(organization.id),
-		session && !session.user.onboardingComplete
-			? cachedGetMemberRole(organization.id, session.user.id)
-			: Promise.resolve(null),
-	]);
-
-	const shouldShowOnboarding = memberRole?.role === "owner";
-
-	// Redirect cancelled orgs to choose-plan
-	if (orgSubscription?.status === "CANCELLED") {
-		redirect("/choose-plan");
-	}
-
 	const queryClient = getServerQueryClient();
 
-	// Prefetch queries in parallel
+	// Build prefetch promises (only depends on organization from Stage 1)
 	const prefetchPromises: Promise<void>[] = [
 		queryClient.prefetchQuery({
 			queryKey: activeOrganizationQueryKey(organizationSlug),
@@ -71,7 +57,21 @@ export default async function OrganizationLayout({
 		);
 	}
 
-	await Promise.all(prefetchPromises);
+	// Stage 2+3 merged: subscription + role + prefetch ALL in parallel
+	const [orgSubscription, memberRole] = await Promise.all([
+		cachedGetOrganizationSubscription(organization.id),
+		session && !session.user.onboardingComplete
+			? cachedGetMemberRole(organization.id, session.user.id)
+			: Promise.resolve(null),
+		...prefetchPromises,
+	]);
+
+	const shouldShowOnboarding = memberRole?.role === "owner";
+
+	// Redirect cancelled orgs to choose-plan
+	if (orgSubscription?.status === "CANCELLED") {
+		redirect("/choose-plan");
+	}
 
 	console.log(`[PERF] [organizationSlug]/layout.tsx: ${Math.round(performance.now() - layoutStart)}ms`);
 

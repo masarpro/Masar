@@ -33,8 +33,12 @@ export function ExportButtons({ projectId }: ExportButtonsProps) {
 		filename: string,
 		mimeType: string,
 	) => {
-		const decoded = atob(content);
-		const blob = new Blob([decoded], { type: mimeType });
+		const binaryString = atob(content);
+		const bytes = new Uint8Array(binaryString.length);
+		for (let i = 0; i < binaryString.length; i++) {
+			bytes[i] = binaryString.charCodeAt(i);
+		}
+		const blob = new Blob([bytes], { type: mimeType });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement("a");
 		a.href = url;
@@ -154,31 +158,31 @@ export function ExportButtons({ projectId }: ExportButtonsProps) {
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button variant="outline" disabled={isLoading}>
-					<DownloadIcon className="h-4 w-4 mr-2" />
+					<DownloadIcon className="h-4 w-4 me-2" />
 					{t("exports.title")}
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-56">
 				<DropdownMenuItem onClick={() => exportWeeklyReport.mutate()}>
-					<FileTextIcon className="h-4 w-4 mr-2" />
+					<FileTextIcon className="h-4 w-4 me-2" />
 					{t("exports.weeklyReport")}
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem onClick={() => exportExpensesCsv.mutate()}>
-					<TableIcon className="h-4 w-4 mr-2" />
+					<TableIcon className="h-4 w-4 me-2" />
 					{t("exports.expensesCsv")}
 				</DropdownMenuItem>
 				<DropdownMenuItem onClick={() => exportClaimsCsv.mutate()}>
-					<TableIcon className="h-4 w-4 mr-2" />
+					<TableIcon className="h-4 w-4 me-2" />
 					{t("exports.claimsCsv")}
 				</DropdownMenuItem>
 				<DropdownMenuItem onClick={() => exportIssuesCsv.mutate()}>
-					<TableIcon className="h-4 w-4 mr-2" />
+					<TableIcon className="h-4 w-4 me-2" />
 					{t("exports.issuesCsv")}
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem onClick={() => exportCalendarIcs.mutate()}>
-					<CalendarIcon className="h-4 w-4 mr-2" />
+					<CalendarIcon className="h-4 w-4 me-2" />
 					{t("exports.calendarIcs")}
 				</DropdownMenuItem>
 			</DropdownMenuContent>

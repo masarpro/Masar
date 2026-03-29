@@ -4,8 +4,12 @@ import { BankReconciliation } from "@saas/finance/components/banks/BankReconcili
 import { FinanceShell } from "@saas/finance/components/shell";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = { title: "التسوية البنكية" };
+export async function generateMetadata() {
+  const t = await getTranslations();
+  return { title: t("finance.pages.bankReconciliation") };
+}
 
 export default async function BankReconciliationRoute({
   params,

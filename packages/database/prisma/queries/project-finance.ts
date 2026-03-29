@@ -411,6 +411,7 @@ export async function getProjectClaims(
 
 /**
  * Create a new project claim with transaction-safe claimNo generation
+ * and atomic ceiling validation via FOR UPDATE lock
  */
 export async function createProjectClaim(data: {
 	organizationId: string;
@@ -422,19 +423,54 @@ export async function createProjectClaim(data: {
 	dueDate?: Date;
 	note?: string;
 }) {
-	// Verify project belongs to organization
-	const project = await db.project.findFirst({
-		where: { id: data.projectId, organizationId: data.organizationId },
-		select: { id: true },
-	});
-
-	if (!project) {
-		throw new Error("المشروع غير موجود");
-	}
-
-	// Use transaction to safely generate claimNo
 	return db.$transaction(async (tx) => {
-		// Get the maximum claimNo for this project
+		// Lock the project contract row to prevent concurrent claims from racing
+		await tx.$queryRawUnsafe(
+			`SELECT id FROM project_contracts WHERE project_id = $1 FOR UPDATE`,
+			data.projectId,
+		);
+
+		// Validate ceiling inside the transaction
+		const [contract, approvedCOImpact] = await Promise.all([
+			tx.projectContract.findFirst({
+				where: { organizationId: data.organizationId, projectId: data.projectId },
+				select: { value: true },
+			}),
+			tx.projectChangeOrder.aggregate({
+				where: {
+					organizationId: data.organizationId,
+					projectId: data.projectId,
+					status: { in: ["APPROVED", "IMPLEMENTED"] },
+					costImpact: { not: null },
+				},
+				_sum: { costImpact: true },
+			}),
+		]);
+
+		if (contract) {
+			const originalValue = Number(contract.value);
+			const coImpact = approvedCOImpact._sum.costImpact
+				? Number(approvedCOImpact._sum.costImpact)
+				: 0;
+			const adjustedValue = originalValue + coImpact;
+
+			if (adjustedValue > 0) {
+				const existingClaims = await tx.projectClaim.aggregate({
+					where: {
+						projectId: data.projectId,
+						organizationId: data.organizationId,
+						status: { not: "REJECTED" },
+					},
+					_sum: { amount: true },
+				});
+				const existingTotal = Number(existingClaims._sum.amount ?? 0);
+				if (existingTotal + data.amount > adjustedValue) {
+					throw new Error("CLAIMS_EXCEED_CONTRACT_VALUE");
+				}
+			}
+		}
+
+		// Generate claimNo
 		const lastClaim = await tx.projectClaim.findFirst({
 			where: { projectId: data.projectId },
 			orderBy: { claimNo: "desc" },
@@ -465,6 +501,7 @@ export async function createProjectClaim(data: {
 
 /**
  * Update claim status with appropriate timestamps
+ * Uses $transaction + FOR UPDATE to prevent concurrent approval race conditions
  */
 export async function updateClaimStatus(
 	id: string,
@@ -472,58 +509,106 @@ export async function updateClaimStatus(
 	projectId: string,
 	newStatus: ClaimStatus,
 ) {
-	// Verify claim belongs to organization/project
-	const existing = await db.projectClaim.findFirst({
-		where: { id, organizationId, projectId },
-		select: { id: true, status: true },
-	});
+	return db.$transaction(async (tx) => {
+		// Verify claim belongs to organization/project
+		const existing = await tx.projectClaim.findFirst({
+			where: { id, organizationId, projectId },
+			select: { id: true, status: true, amount: true },
+		});
 
-	if (!existing) {
-		throw new Error("المستخلص غير موجود");
-	}
-
-	// Enforce allowed status transitions
-	const ALLOWED_TRANSITIONS: Record<string, string[]> = {
-		DRAFT: ["SUBMITTED"],
-		SUBMITTED: ["APPROVED", "REJECTED"],
-		APPROVED: ["PAID"],
-		PAID: [],
-		REJECTED: ["DRAFT"],
-	};
-
-	const allowed = ALLOWED_TRANSITIONS[existing.status] ?? [];
-	if (!allowed.includes(newStatus)) {
-		throw new Error(`لا يمكن تغيير حالة المستخلص من ${existing.status} إلى ${newStatus}`);
-	}
-
-	// Build update data with appropriate timestamps
-	const updateData: {
-		status: ClaimStatus;
-		approvedAt?: Date | null;
-		paidAt?: Date | null;
-	} = { status: newStatus };
-
-	// Set timestamps based on new status
-	if (newStatus === "APPROVED" && existing.status !== "APPROVED") {
-		updateData.approvedAt = new Date();
-	} else if (newStatus === "PAID" && existing.status !== "PAID") {
-		updateData.paidAt = new Date();
-		// Also set approvedAt if not already set
-		if (existing.status !== "APPROVED") {
-			updateData.approvedAt = new Date();
+		if (!existing) {
+			throw new Error("المستخلص غير موجود");
 		}
-	} else if (newStatus === "DRAFT" || newStatus === "SUBMITTED") {
-		// Reset timestamps when going back to draft/submitted
-		updateData.approvedAt = null;
-		updateData.paidAt = null;
-	}
 
-	return db.projectClaim.update({
-		where: { id },
-		data: updateData,
-		include: {
-			createdBy: { select: { id: true, name: true } },
-		},
+		// Enforce allowed status transitions
+		const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+			DRAFT: ["SUBMITTED"],
+			SUBMITTED: ["APPROVED", "REJECTED"],
+			APPROVED: ["PAID"],
+			PAID: [],
+			REJECTED: ["DRAFT"],
+		};
+
+		const allowed = ALLOWED_TRANSITIONS[existing.status] ?? [];
+		if (!allowed.includes(newStatus)) {
+			throw new Error(`لا يمكن تغيير حالة المستخلص من ${existing.status} إلى ${newStatus}`);
+		}
+
+		// If approving, lock the contract and re-validate ceiling
+		if (newStatus === "APPROVED") {
+			await tx.$queryRawUnsafe(
+				`SELECT id FROM project_contracts WHERE project_id = $1 FOR UPDATE`,
+				projectId,
+			);
+
+			const [contract, approvedCOImpact] = await Promise.all([
+				tx.projectContract.findFirst({
+					where: { organizationId, projectId },
+					select: { value: true },
+				}),
+				tx.projectChangeOrder.aggregate({
+					where: {
+						organizationId,
+						projectId,
+						status: { in: ["APPROVED", "IMPLEMENTED"] },
+						costImpact: { not: null },
+					},
+					_sum: { costImpact: true },
+				}),
+			]);
+
+			if (contract) {
+				const adjustedValue = Number(contract.value) +
+					(approvedCOImpact._sum.costImpact ? Number(approvedCOImpact._sum.costImpact) : 0);
+
+				if (adjustedValue > 0) {
+					const otherClaims = await tx.projectClaim.aggregate({
+						where: {
+							projectId,
+							organizationId,
+							status: { not: "REJECTED" },
+							id: { not: id },
+						},
+						_sum: { amount: true },
+					});
+					const othersTotal = Number(otherClaims._sum.amount ?? 0);
+					const thisAmount = Number(existing.amount);
+					if (othersTotal + thisAmount > adjustedValue) {
+						throw new Error("CLAIMS_EXCEED_CONTRACT_VALUE");
+					}
+				}
+			}
+		}
+
+		// Build update data with appropriate timestamps
+		const updateData: {
+			status: ClaimStatus;
+			approvedAt?: Date | null;
+			paidAt?: Date | null;
+		} = { status: newStatus };
+
+		// Set timestamps based on new status
+		if (newStatus === "APPROVED" && existing.status !== "APPROVED") {
+			updateData.approvedAt = new Date();
+		} else if (newStatus === "PAID" && existing.status !== "PAID") {
+			updateData.paidAt = new Date();
+			// Also set approvedAt if not already set
+			if (existing.status !== "APPROVED") {
+				updateData.approvedAt = new Date();
+			}
+		} else if (newStatus === "DRAFT" || newStatus === "SUBMITTED") {
+			// Reset timestamps when going back to draft/submitted
+			updateData.approvedAt = null;
+			updateData.paidAt = null;
+		}
+
+		return tx.projectClaim.update({
+			where: { id },
+			data: updateData,
+			include: {
+				createdBy: { select: { id: true, name: true } },
+			},
+		});
 	});
 }
 
@@ -648,6 +733,7 @@ export async function deleteProjectClaim(
 
 /**
  * Update a project claim (full update, not just status)
+ * Uses $transaction + FOR UPDATE to prevent concurrent ceiling violations
  */
 export async function updateProjectClaim(
 	id: string,
@@ -661,32 +747,82 @@ export async function updateProjectClaim(
 		note?: string | null;
 	},
 ) {
-	const existing = await db.projectClaim.findFirst({
-		where: { id, organizationId, projectId },
-		select: { id: true, status: true },
-	});
+	return db.$transaction(async (tx) => {
+		// Lock the project contract row if amount is being changed
+		if (data.amount !== undefined) {
+			await tx.$queryRawUnsafe(
+				`SELECT id FROM project_contracts WHERE project_id = $1 FOR UPDATE`,
+				projectId,
+			);
+		}
 
-	if (!existing) {
-		throw new Error("المستخلص غير موجود");
-	}
+		const existing = await tx.projectClaim.findFirst({
+			where: { id, organizationId, projectId },
+			select: { id: true, status: true },
+		});
 
-	// Only allow editing if claim is in DRAFT status
-	if (existing.status !== "DRAFT") {
-		throw new Error("لا يمكن تعديل المستخلص إلا في حالة المسودة");
-	}
+		if (!existing) {
+			throw new Error("المستخلص غير موجود");
+		}
 
-	return db.projectClaim.update({
-		where: { id },
-		data: {
-			periodStart: data.periodStart,
-			periodEnd: data.periodEnd,
-			amount: data.amount,
-			dueDate: data.dueDate,
-			note: data.note,
-		},
-		include: {
-			createdBy: { select: { id: true, name: true } },
-		},
+		// Only allow editing if claim is in DRAFT status
+		if (existing.status !== "DRAFT") {
+			throw new Error("لا يمكن تعديل المستخلص إلا في حالة المسودة");
+		}
+
+		// Validate ceiling if amount changed
+		if (data.amount !== undefined) {
+			const [contract, approvedCOImpact] = await Promise.all([
+				tx.projectContract.findFirst({
+					where: { organizationId, projectId },
+					select: { value: true },
+				}),
+				tx.projectChangeOrder.aggregate({
+					where: {
+						organizationId,
+						projectId,
+						status: { in: ["APPROVED", "IMPLEMENTED"] },
+						costImpact: { not: null },
+					},
+					_sum: { costImpact: true },
+				}),
+			]);
+
+			if (contract) {
+				const adjustedValue = Number(contract.value) +
+					(approvedCOImpact._sum.costImpact ? Number(approvedCOImpact._sum.costImpact) : 0);
+
+				if (adjustedValue > 0) {
+					const existingClaims = await tx.projectClaim.aggregate({
+						where: {
+							projectId,
+							organizationId,
+							status: { not: "REJECTED" },
+							id: { not: id },
+						},
+						_sum: { amount: true },
+					});
+					const existingTotal = Number(existingClaims._sum.amount ?? 0);
+					if (existingTotal + data.amount > adjustedValue) {
+						throw new Error("CLAIMS_EXCEED_CONTRACT_VALUE");
+					}
+				}
+			}
+		}
+
+		return tx.projectClaim.update({
+			where: { id },
+			data: {
+				periodStart: data.periodStart,
+				periodEnd: data.periodEnd,
+				amount: data.amount,
+				dueDate: data.dueDate,
+				note: data.note,
+			},
+			include: {
+				createdBy: { select: { id: true, name: true } },
+			},
+		});
 	});
 }
 

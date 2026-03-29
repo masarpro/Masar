@@ -2,6 +2,7 @@
 
 import { Button } from "@ui/components/button";
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 export default function FinanceError({
 	error,
@@ -10,24 +11,26 @@ export default function FinanceError({
 	error: Error & { digest?: string };
 	reset: () => void;
 }) {
+	const t = useTranslations();
+
 	useEffect(() => {
 		console.error("[Finance Error]", error);
 	}, [error]);
 
 	return (
-		<div className="flex min-h-[50vh] flex-col items-center justify-center gap-6 px-4 text-center" dir="rtl">
+		<div className="flex min-h-[50vh] flex-col items-center justify-center gap-6 px-4 text-center">
 			<div className="space-y-2">
-				<h2 className="text-2xl font-bold">حدث خطأ غير متوقع</h2>
+				<h2 className="text-2xl font-bold">{t("finance.error.title")}</h2>
 				<p className="text-muted-foreground">
-					نعتذر، حدث خطأ أثناء تحميل الصفحة. يرجى المحاولة مرة أخرى.
+					{t("finance.error.description")}
 				</p>
 			</div>
 			<div className="flex gap-3">
 				<Button onClick={() => reset()}>
-					حاول مرة أخرى
+					{t("finance.error.retry")}
 				</Button>
 				<Button variant="outline" onClick={() => window.history.back()}>
-					العودة للمالية
+					{t("finance.error.backToFinance")}
 				</Button>
 			</div>
 			{process.env.NODE_ENV === "development" && error.message && (

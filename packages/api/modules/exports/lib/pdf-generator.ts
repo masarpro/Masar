@@ -1,6 +1,24 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// PDF Generator (Phase 8)
-// ═══════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════��════════════════════════════════════════
+// PDF Generator (pdfkit)
+// ═════════════════════���═════════════════════════════════════════════════════
+
+import { numberToArabicWords } from "@repo/utils";
+import {
+	createPDFDocument,
+	renderHeader,
+	registerFooter,
+	renderSectionTitle,
+	renderKeyValuePairs,
+	renderTable,
+	renderSummaryBoxes,
+	renderProgressBar,
+	docToBuffer,
+	formatDate,
+	formatDateShort,
+	formatCurrency,
+	formatNumber,
+	getStatusLabel,
+} from "./pdf-shared";
 
 /**
  * PDF generation configuration
@@ -69,272 +87,362 @@ export interface WeeklyReportPDFData {
 
 /**
  * Generate Update PDF
- * TODO: Implement with actual PDF library (puppeteer, jspdf, etc.)
  */
 export async function generateUpdatePDF(
 	data: UpdatePDFData,
 	config: PDFConfig,
 ): Promise<Buffer> {
-	// Stub implementation - returns HTML as buffer for now
-	const html = `
-<!DOCTYPE html>
-<html dir="${config.language === "ar" ? "rtl" : "ltr"}" lang="${config.language}">
-<head>
-	<meta charset="UTF-8">
-	<title>${config.title}</title>
-	<style>
-		body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 40px; direction: ${config.language === "ar" ? "rtl" : "ltr"}; }
-		.header { text-align: center; margin-bottom: 30px; }
-		.logo { max-height: 60px; margin-bottom: 10px; }
-		h1 { color: #333; margin: 0; }
-		h2 { color: #666; margin: 10px 0 30px; }
-		.content { line-height: 1.8; }
-		.meta { color: #888; font-size: 0.9em; margin-bottom: 20px; }
-		.photos { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
-		.photo { max-width: 200px; }
-		.footer { margin-top: 40px; text-align: center; color: #888; font-size: 0.8em; }
-	</style>
-</head>
-<body>
-	<div class="header">
-		${data.companyLogo ? `<img src="${data.companyLogo}" class="logo" alt="${data.companyName}">` : ""}
-		<h1>${data.projectName}</h1>
-		<h2>${data.title}</h2>
-	</div>
-	<div class="meta">
-		<p>${config.language === "ar" ? "التاريخ" : "Date"}: ${data.updateDate.toLocaleDateString(config.language === "ar" ? "ar-SA" : "en-US")}</p>
-		<p>${config.language === "ar" ? "النوع" : "Type"}: ${data.type}</p>
-	</div>
-	<div class="content">
-		${data.body}
-	</div>
-	${
-		data.photos?.length
-			? `
-	<div class="photos">
-		${data.photos.map((p) => `<img src="${p.url}" class="photo" alt="${p.caption || ""}">`).join("")}
-	</div>
-	`
-			: ""
-	}
-	<div class="footer">
-		<p>${data.companyName}</p>
-	</div>
-</body>
-</html>
-	`;
+	const doc = createPDFDocument(config);
+	const isAr = config.language === "ar";
 
-	return Buffer.from(html, "utf-8");
+	registerFooter(doc, { companyName: data.companyName, language: config.language });
+
+	// Header
+	renderHeader(doc, {
+		title: data.projectName,
+		subtitle: data.title,
+		companyName: data.companyName,
+		language: config.language,
+	});
+
+	// Metadata
+	renderKeyValuePairs(
+		doc,
+		[
+			[isAr ? "التاريخ:" : "Date:", formatDate(data.updateDate, config.language)],
+			[isAr ? "النوع:" : "Type:", getStatusLabel(data.type, config.language)],
+		],
+		config.language,
+	);
+
+	doc.moveDown(0.5);
+
+	// Body content
+	renderSectionTitle(doc, isAr ? "المحتوى" : "Content", config.language);
+
+	const pageWidth = doc.page.width - 80; // 40 margin each side
+	doc
+		.font("Arabic")
+		.fontSize(10)
+		.fillColor("#111827")
+		.text(data.body, 40, doc.y, {
+			width: pageWidth,
+			align: isAr ? "right" : "left",
+			lineGap: 4,
+		});
+
+	// Photos
+	if (data.photos?.length) {
+		doc.moveDown(1);
+		renderSectionTitle(doc, isAr ? "الصور" : "Photos", config.language);
+
+		const photoWidth = (pageWidth - 10) / 2; // 2 columns with gap
+		const photoHeight = 150;
+
+		for (let i = 0; i < data.photos.length; i++) {
+			const photo = data.photos[i];
+
+			// Check page break
+			if (doc.y + photoHeight + 20 > doc.page.height - 80) {
+				doc.addPage();
+			}
+
+			try {
+				const response = await fetch(photo.url);
+				if (response.ok) {
+					const arrayBuffer = await response.arrayBuffer();
+					const imageBuffer = Buffer.from(arrayBuffer);
+
+					const col = i % 2;
+					const x = 40 + col * (photoWidth + 10);
+					const y = col === 0 ? doc.y : doc.y - photoHeight - 20;
+
+					doc.image(imageBuffer, x, y, {
+						width: photoWidth,
+						height: photoHeight,
+						fit: [photoWidth, photoHeight],
+					});
+
+					// Caption
+					if (photo.caption) {
+						doc
+							.font("Arabic")
+							.fontSize(8)
+							.fillColor("#6B7280")
+							.text(photo.caption, x, y + photoHeight + 2, {
+								width: photoWidth,
+								align: "center",
+							});
+					}
+
+					// Move Y after every 2 photos
+					if (col === 1 || i === data.photos.length - 1) {
+						doc.y = y + photoHeight + 20;
+					}
+				}
+			} catch {
+				// Skip failed photo fetches silently
+			}
+		}
+	}
+
+	return docToBuffer(doc);
 }
 
 /**
  * Generate Claim PDF
- * TODO: Implement with actual PDF library
  */
 export async function generateClaimPDF(
 	data: ClaimPDFData,
 	config: PDFConfig,
 ): Promise<Buffer> {
-	const formatCurrency = (amount: number) => {
-		return new Intl.NumberFormat(config.language === "ar" ? "ar-SA" : "en-US", {
-			style: "currency",
-			currency: data.currency,
-		}).format(amount);
-	};
+	const doc = createPDFDocument(config);
+	const isAr = config.language === "ar";
 
-	const html = `
-<!DOCTYPE html>
-<html dir="${config.language === "ar" ? "rtl" : "ltr"}" lang="${config.language}">
-<head>
-	<meta charset="UTF-8">
-	<title>${config.title}</title>
-	<style>
-		body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 40px; direction: ${config.language === "ar" ? "rtl" : "ltr"}; }
-		.header { text-align: center; margin-bottom: 30px; }
-		.logo { max-height: 60px; margin-bottom: 10px; }
-		h1 { color: #333; margin: 0; }
-		h2 { color: #666; margin: 10px 0 30px; }
-		table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-		th, td { border: 1px solid #ddd; padding: 12px; text-align: ${config.language === "ar" ? "right" : "left"}; }
-		th { background: #f5f5f5; }
-		.total { font-weight: bold; background: #f0f0f0; }
-		.status { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 0.9em; }
-		.footer { margin-top: 40px; text-align: center; color: #888; font-size: 0.8em; }
-	</style>
-</head>
-<body>
-	<div class="header">
-		${data.companyLogo ? `<img src="${data.companyLogo}" class="logo" alt="${data.companyName}">` : ""}
-		<h1>${data.projectName}</h1>
-		<h2>${config.language === "ar" ? "مستخلص رقم" : "Claim #"}${data.claimNumber}</h2>
-	</div>
-	<table>
-		<tr>
-			<th>${config.language === "ar" ? "فترة المستخلص" : "Claim Period"}</th>
-			<td>${data.periodStart.toLocaleDateString()} - ${data.periodEnd.toLocaleDateString()}</td>
-		</tr>
-		<tr>
-			<th>${config.language === "ar" ? "الحالة" : "Status"}</th>
-			<td><span class="status">${data.status}</span></td>
-		</tr>
-	</table>
-	${
-		data.items?.length
-			? `
-	<table>
-		<thead>
-			<tr>
-				<th>${config.language === "ar" ? "البند" : "Item"}</th>
-				<th>${config.language === "ar" ? "المبلغ" : "Amount"}</th>
-			</tr>
-		</thead>
-		<tbody>
-			${data.items.map((item) => `<tr><td>${item.description}</td><td>${formatCurrency(item.amount)}</td></tr>`).join("")}
-		</tbody>
-	</table>
-	`
-			: ""
+	registerFooter(doc, { companyName: data.companyName, language: config.language });
+
+	// Header
+	renderHeader(doc, {
+		title: data.projectName,
+		subtitle: isAr
+			? `مستخلص رقم ${data.claimNumber}`
+			: `Claim #${data.claimNumber}`,
+		companyName: data.companyName,
+		language: config.language,
+	});
+
+	// Claim metadata
+	renderSectionTitle(
+		doc,
+		isAr ? "بيانات المستخل��" : "Claim Details",
+		config.language,
+	);
+
+	renderKeyValuePairs(
+		doc,
+		[
+			[
+				isAr ? "رقم المستخلص:" : "Claim No:",
+				String(data.claimNumber),
+			],
+			[
+				isAr ? "فترة المستخلص:" : "Claim Period:",
+				`${formatDateShort(data.periodStart, config.language)} - ${formatDateShort(data.periodEnd, config.language)}`,
+			],
+			[
+				isAr ? "الحالة:" : "Status:",
+				getStatusLabel(data.status, config.language),
+			],
+		],
+		config.language,
+	);
+
+	doc.moveDown(0.5);
+
+	// Items table (if any)
+	if (data.items?.length) {
+		renderSectionTitle(
+			doc,
+			isAr ? "البنود" : "Items",
+			config.language,
+		);
+
+		const rows = data.items.map((item) => [
+			item.description,
+			formatCurrency(item.amount, data.currency, config.language),
+		]);
+
+		// Add total row
+		rows.push([
+			isAr ? "الإجمالي" : "Total",
+			formatCurrency(data.amount, data.currency, config.language),
+		]);
+
+		renderTable(doc, {
+			headers: isAr
+				? ["البند", "المبلغ"]
+				: ["Item", "Amount"],
+			rows,
+			columnWidths: [3, 1],
+			language: config.language,
+			highlightLastRow: true,
+		});
 	}
-	<table>
-		<tr class="total">
-			<th>${config.language === "ar" ? "الإجمالي" : "Total"}</th>
-			<td>${formatCurrency(data.amount)}</td>
-		</tr>
-	</table>
-	<div class="footer">
-		<p>${data.companyName}</p>
-	</div>
-</body>
-</html>
-	`;
 
-	return Buffer.from(html, "utf-8");
+	// Financial summary
+	renderSectionTitle(
+		doc,
+		isAr ? "الملخص المالي" : "Financial Summary",
+		config.language,
+	);
+
+	renderTable(doc, {
+		headers: isAr
+			? ["البيان", "المبلغ"]
+			: ["Description", "Amount"],
+		rows: [
+			[
+				isAr ? "مبلغ المستخلص" : "Claim Amount",
+				formatCurrency(data.amount, data.currency, config.language),
+			],
+		],
+		columnWidths: [3, 1],
+		language: config.language,
+		highlightLastRow: true,
+	});
+
+	// Amount in words
+	doc.moveDown(0.5);
+	const amountInWords = numberToArabicWords(data.amount);
+	doc
+		.font("Arabic-Bold")
+		.fontSize(10)
+		.fillColor("#111827")
+		.text(
+			isAr ? `المبلغ بالحروف: ${amountInWords}` : `Amount in words: ${amountInWords}`,
+			40,
+			doc.y,
+			{
+				width: doc.page.width - 80,
+				align: isAr ? "right" : "left",
+			},
+		);
+
+	return docToBuffer(doc);
 }
 
 /**
  * Generate Weekly Report PDF
- * TODO: Implement with actual PDF library
  */
 export async function generateWeeklyReportPDF(
 	data: WeeklyReportPDFData,
 	config: PDFConfig,
 ): Promise<Buffer> {
-	const html = `
-<!DOCTYPE html>
-<html dir="${config.language === "ar" ? "rtl" : "ltr"}" lang="${config.language}">
-<head>
-	<meta charset="UTF-8">
-	<title>${config.title}</title>
-	<style>
-		body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 40px; direction: ${config.language === "ar" ? "rtl" : "ltr"}; }
-		.header { text-align: center; margin-bottom: 30px; }
-		.logo { max-height: 60px; margin-bottom: 10px; }
-		h1 { color: #333; margin: 0; }
-		h2 { color: #666; margin: 10px 0 30px; }
-		h3 { color: #444; margin: 20px 0 10px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
-		table { width: 100%; border-collapse: collapse; margin: 10px 0 20px; }
-		th, td { border: 1px solid #ddd; padding: 10px; text-align: ${config.language === "ar" ? "right" : "left"}; }
-		th { background: #f5f5f5; }
-		.progress-bar { background: #e0e0e0; border-radius: 10px; height: 20px; overflow: hidden; }
-		.progress-fill { background: #4caf50; height: 100%; transition: width 0.3s; }
-		.summary { display: flex; gap: 20px; margin: 20px 0; }
-		.summary-item { flex: 1; text-align: center; padding: 20px; background: #f9f9f9; border-radius: 8px; }
-		.summary-value { font-size: 2em; font-weight: bold; color: #333; }
-		.summary-label { color: #666; }
-		.footer { margin-top: 40px; text-align: center; color: #888; font-size: 0.8em; }
-	</style>
-</head>
-<body>
-	<div class="header">
-		${data.companyLogo ? `<img src="${data.companyLogo}" class="logo" alt="${data.companyName}">` : ""}
-		<h1>${data.projectName}</h1>
-		<h2>${config.language === "ar" ? "التقرير الأسبوعي" : "Weekly Report"}</h2>
-		<p>${data.weekStart.toLocaleDateString()} - ${data.weekEnd.toLocaleDateString()}</p>
-	</div>
+	const doc = createPDFDocument(config);
+	const isAr = config.language === "ar";
 
-	<div class="summary">
-		<div class="summary-item">
-			<div class="summary-value">${data.progress}%</div>
-			<div class="summary-label">${config.language === "ar" ? "نسبة الإنجاز" : "Progress"}</div>
-		</div>
-		<div class="summary-item">
-			<div class="summary-value">${data.updates.length}</div>
-			<div class="summary-label">${config.language === "ar" ? "التحديثات" : "Updates"}</div>
-		</div>
-		<div class="summary-item">
-			<div class="summary-value">${data.issues.length}</div>
-			<div class="summary-label">${config.language === "ar" ? "المشاكل" : "Issues"}</div>
-		</div>
-	</div>
+	registerFooter(doc, { companyName: data.companyName, language: config.language });
 
-	<div class="progress-bar">
-		<div class="progress-fill" style="width: ${data.progress}%"></div>
-	</div>
+	// Header
+	renderHeader(doc, {
+		title: data.projectName,
+		subtitle: isAr ? "التقرير الأسبوعي" : "Weekly Report",
+		companyName: data.companyName,
+		language: config.language,
+	});
 
-	${
-		data.updates.length
-			? `
-	<h3>${config.language === "ar" ? "التحديثات" : "Updates"}</h3>
-	<table>
-		<thead>
-			<tr>
-				<th>${config.language === "ar" ? "التاريخ" : "Date"}</th>
-				<th>${config.language === "ar" ? "النوع" : "Type"}</th>
-				<th>${config.language === "ar" ? "العنوان" : "Title"}</th>
-			</tr>
-		</thead>
-		<tbody>
-			${data.updates.map((u) => `<tr><td>${u.date.toLocaleDateString()}</td><td>${u.type}</td><td>${u.title}</td></tr>`).join("")}
-		</tbody>
-	</table>
-	`
-			: ""
+	// Date range
+	const pageWidth = doc.page.width - 80;
+	doc
+		.font("Arabic")
+		.fontSize(10)
+		.fillColor("#6B7280")
+		.text(
+			`${formatDateShort(data.weekStart, config.language)} - ${formatDateShort(data.weekEnd, config.language)}`,
+			40,
+			doc.y,
+			{ width: pageWidth, align: "center" },
+		);
+
+	doc.moveDown(0.8);
+
+	// Summary boxes
+	renderSummaryBoxes(
+		doc,
+		[
+			{
+				label: isAr ? "نسبة الإنجاز" : "Progress",
+				value: `${data.progress}%`,
+				color: "#ECFDF5",
+			},
+			{
+				label: isAr ? "التحديثات" : "Updates",
+				value: String(data.updates.length),
+				color: "#EFF6FF",
+			},
+			{
+				label: isAr ? "المشاكل" : "Issues",
+				value: String(data.issues.length),
+				color: data.issues.length > 0 ? "#FEF2F2" : "#F9FAFB",
+			},
+		],
+		config.language,
+	);
+
+	// Progress bar
+	renderProgressBar(doc, data.progress);
+
+	// Updates section
+	if (data.updates.length > 0) {
+		renderSectionTitle(
+			doc,
+			isAr ? "التحديثات" : "Updates",
+			config.language,
+		);
+
+		renderTable(doc, {
+			headers: isAr
+				? ["التاريخ", "النوع", "الع��وان"]
+				: ["Date", "Type", "Title"],
+			rows: data.updates.map((u) => [
+				formatDateShort(u.date, config.language),
+				u.type,
+				u.title,
+			]),
+			columnWidths: [1, 1, 3],
+			language: config.language,
+		});
 	}
 
-	${
-		data.expenses.length
-			? `
-	<h3>${config.language === "ar" ? "المصاريف" : "Expenses"}</h3>
-	<table>
-		<thead>
-			<tr>
-				<th>${config.language === "ar" ? "الفئة" : "Category"}</th>
-				<th>${config.language === "ar" ? "المبلغ" : "Amount"}</th>
-			</tr>
-		</thead>
-		<tbody>
-			${data.expenses.map((e) => `<tr><td>${e.category}</td><td>${e.amount}</td></tr>`).join("")}
-		</tbody>
-	</table>
-	`
-			: ""
+	// Expenses section
+	if (data.expenses.length > 0) {
+		renderSectionTitle(
+			doc,
+			isAr ? "المصاريف" : "Expenses",
+			config.language,
+		);
+
+		const totalExpenses = data.expenses.reduce((sum, e) => sum + e.amount, 0);
+		const rows = data.expenses.map((e) => [
+			e.category,
+			formatNumber(e.amount),
+		]);
+		rows.push([
+			isAr ? "الإجمالي" : "Total",
+			formatNumber(totalExpenses),
+		]);
+
+		renderTable(doc, {
+			headers: isAr
+				? ["الفئة", "المبلغ"]
+				: ["Category", "Amount"],
+			rows,
+			columnWidths: [3, 1],
+			language: config.language,
+			highlightLastRow: true,
+		});
 	}
 
-	${
-		data.issues.length
-			? `
-	<h3>${config.language === "ar" ? "المشاكل" : "Issues"}</h3>
-	<table>
-		<thead>
-			<tr>
-				<th>${config.language === "ar" ? "العنوان" : "Title"}</th>
-				<th>${config.language === "ar" ? "الحالة" : "Status"}</th>
-			</tr>
-		</thead>
-		<tbody>
-			${data.issues.map((i) => `<tr><td>${i.title}</td><td>${i.status}</td></tr>`).join("")}
-		</tbody>
-	</table>
-	`
-			: ""
+	// Issues section
+	if (data.issues.length > 0) {
+		renderSectionTitle(
+			doc,
+			isAr ? "المشاكل" : "Issues",
+			config.language,
+		);
+
+		renderTable(doc, {
+			headers: isAr
+				? ["العنوا��", "الحالة"]
+				: ["Title", "Status"],
+			rows: data.issues.map((i) => [
+				i.title,
+				getStatusLabel(i.status, config.language),
+			]),
+			columnWidths: [3, 1],
+			language: config.language,
+		});
 	}
 
-	<div class="footer">
-		<p>${data.companyName}</p>
-	</div>
-</body>
-</html>
-	`;
-
-	return Buffer.from(html, "utf-8");
+	return docToBuffer(doc);
 }

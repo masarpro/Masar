@@ -4,8 +4,12 @@ import { CostCenterReport } from "@saas/finance/components/accounting/CostCenter
 import { FinanceShell } from "@saas/finance/components/shell";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = { title: "تقرير مراكز التكلفة" };
+export async function generateMetadata() {
+  const t = await getTranslations();
+  return { title: t("finance.pages.costCenterReport") };
+}
 
 export default async function CostCenterRoute({
   params,

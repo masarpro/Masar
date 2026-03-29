@@ -812,7 +812,16 @@
     "viewAll": "عرض الكل",
     "completed": "مكتمل",
     "hidden": "مخفي",
-    "dangerZone": "منطقة الخطر"
+    "dangerZone": "منطقة الخطر",
+    "weekdays": {
+      "saturday": "السبت",
+      "sunday": "الأحد",
+      "monday": "الإثنين",
+      "tuesday": "الثلاثاء",
+      "wednesday": "الأربعاء",
+      "thursday": "الخميس",
+      "friday": "الجمعة"
+    }
   },
   "company": {
     "title": "إدارة المنشأة",
@@ -2288,6 +2297,53 @@
       "mada": "مدى",
       "other": "أخرى"
     },
+    "geography": {
+      "saudiRegions": {
+        "riyadh": "الرياض",
+        "makkah": "مكة المكرمة",
+        "madinah": "المدينة المنورة",
+        "qassim": "القصيم",
+        "eastern": "الشرقية",
+        "asir": "عسير",
+        "tabuk": "تبوك",
+        "hail": "حائل",
+        "northernBorders": "الحدود الشمالية",
+        "jazan": "جازان",
+        "najran": "نجران",
+        "bahah": "الباحة",
+        "jouf": "الجوف"
+      },
+      "countries": {
+        "SA": "السعودية",
+        "AE": "الإمارات",
+        "KW": "الكويت",
+        "QA": "قطر",
+        "BH": "البحرين",
+        "OM": "عمان",
+        "EG": "مصر",
+        "JO": "الأردن"
+      }
+    },
+    "currencies": {
+      "SAR": "ريال سعودي (SAR)",
+      "USD": "دولار أمريكي (USD)",
+      "EUR": "يورو (EUR)",
+      "AED": "درهم إماراتي (AED)",
+      "KWD": "دينار كويتي (KWD)"
+    },
+    "error": {
+      "title": "حدث خطأ غير متوقع",
+      "description": "نعتذر، حدث خطأ أثناء تحميل الصفحة. يرجى المحاولة مرة أخرى.",
+      "retry": "حاول مرة أخرى",
+      "backToFinance": "العودة للمالية"
+    },
+    "pages": {
+      "accountingDashboard": "لوحة المحاسبة",
+      "expenseVoucher": "سند صرف",
+      "bankReconciliation": "التسوية البنكية",
+      "recurringEntries": "القيود المتكررة",
+      "costCenterReport": "تقرير مراكز التكلفة"
+    },
     "units": {
       "m": "م (متر)",
       "m2": "م² (متر مربع)",
@@ -3519,7 +3575,33 @@
         "template": "اختر قالب",
         "freeEntry": "قيد حر",
         "autoPost": "ترحيل فوري",
-        "selectTemplate": "اختر قالب التسوية"
+        "selectTemplate": "اختر قالب التسوية",
+        "templates": {
+          "accrued_revenue": {
+            "label": "إيرادات مستحقة",
+            "description": "تسجيل إيرادات تم تنفيذها ولم تُفوتر بعد"
+          },
+          "accrued_expense": {
+            "label": "مصروفات مستحقة",
+            "description": "تسجيل مصروفات تمت ولم تُسدد بعد"
+          },
+          "depreciation": {
+            "label": "إهلاك أصول ثابتة",
+            "description": "تسجيل قسط الإهلاك الشهري/السنوي"
+          },
+          "prepaid_expense": {
+            "label": "مصروف مدفوع مقدماً",
+            "description": "تحميل جزء من المصروف المدفوع مقدماً"
+          },
+          "provision": {
+            "label": "مخصص نهاية خدمة",
+            "description": "تكوين مخصص مكافأة نهاية الخدمة"
+          },
+          "correction": {
+            "label": "قيد تصحيحي",
+            "description": "تصحيح خطأ في قيد سابق"
+          }
+        }
       },
       "accountingMode": "وضع المحاسبة",
       "accountingModeDesc": "عرض أدوات المحاسبة المتقدمة (دليل الحسابات، القيود، القوائم المالية)",
@@ -3648,13 +3730,56 @@
       },
       "voucher": {
         "paymentVoucher": "سند صرف",
-        "receiptVoucher": "سند قبض"
+        "receiptVoucher": "سند قبض",
+        "voucherNo": "رقم السند",
+        "date": "التاريخ",
+        "amount": "المبلغ",
+        "paidTo": "صُرف إلى",
+        "regarding": "وذلك عن",
+        "category": "التصنيف",
+        "paymentMethod": "طريقة الدفع",
+        "referenceNo": "رقم المرجع",
+        "sourceAccount": "الحساب المصدر",
+        "project": "المشروع",
+        "vendorTaxNumber": "الرقم الضريبي للمورد",
+        "accountant": "المحاسب",
+        "financeManager": "المدير المالي",
+        "recipient": "المستلم",
+        "generatedAt": "تم التوليد في {date}"
       },
       "messages": {
         "postSuccess": "تم ترحيل القيد بنجاح",
         "postError": "حدث خطأ أثناء الترحيل",
         "noDraftsToPost": "لا توجد قيود مسودة للترحيل",
         "bulkPostSuccess": "تم ترحيل {count} قيد بنجاح"
+      },
+      "excel": {
+        "total": "الإجمالي",
+        "openingBalance": "الرصيد الافتتاحي",
+        "closingBalance": "الرصيد الختامي",
+        "sheetTrialBalance": "ميزان المراجعة",
+        "sheetJournalEntries": "القيود اليومية",
+        "sheetLedger": "دفتر الأستاذ",
+        "accountCode": "رمز الحساب",
+        "accountName": "اسم الحساب",
+        "periodDebit": "مدين (حركة)",
+        "periodCredit": "دائن (حركة)",
+        "debitBalance": "رصيد مدين",
+        "creditBalance": "رصيد دائن",
+        "entryNo": "رقم القيد",
+        "date": "التاريخ",
+        "description": "الوصف",
+        "type": "النوع",
+        "amount": "المبلغ",
+        "status": "الحالة",
+        "statusPosted": "مرحّل",
+        "statusDraft": "مسودة",
+        "statusReversed": "معكوس",
+        "typeManual": "يدوي",
+        "debit": "مدين",
+        "credit": "دائن",
+        "balance": "الرصيد",
+        "ledgerPrefix": "دفتر الأستاذ"
       }
     },
     "accountingReports": {
@@ -4383,6 +4508,13 @@
       "codeHint": "يُنشأ تلقائياً إذا تُرك فارغاً",
       "currency": "العملة",
       "classification": "التصنيف",
+      "classifications": {
+        "VIP": "VIP",
+        "regular": "عادي",
+        "company": "شركة",
+        "government": "جهة حكومية",
+        "contractor": "مقاول"
+      },
       "addClassification": "إضافة تصنيف",
       "displayLanguage": "لغة العرض",
       "displayLanguageHint": "اللغة المفضلة للمستندات",

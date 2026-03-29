@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
@@ -49,26 +49,7 @@ interface ClientDetailProps {
 	clientId: string;
 }
 
-// قائمة التصنيفات
-const classificationLabels: Record<string, string> = {
-	VIP: "VIP",
-	regular: "عادي",
-	company: "شركة",
-	government: "جهة حكومية",
-	contractor: "مقاول",
-};
-
-// قائمة الدول
-const countryNames: Record<string, string> = {
-	SA: "السعودية",
-	AE: "الإمارات",
-	KW: "الكويت",
-	QA: "قطر",
-	BH: "البحرين",
-	OM: "عمان",
-	EG: "مصر",
-	JO: "الأردن",
-};
+import { COUNTRY_CODES } from "../../lib/geography";
 
 export function ClientDetail({
 	organizationId,
@@ -76,6 +57,7 @@ export function ClientDetail({
 	clientId,
 }: ClientDetailProps) {
 	const t = useTranslations();
+	const locale = useLocale();
 	const router = useRouter();
 	const queryClient = useQueryClient();
 
@@ -195,7 +177,7 @@ export function ClientDetail({
 									<div className="flex flex-wrap gap-1 mt-2">
 										{client.classification.map((c: string) => (
 											<Badge key={c} variant="secondary" className="rounded-lg">
-												{classificationLabels[c] || c}
+												{t(`finance.clients.classifications.${c}`) || c}
 											</Badge>
 										))}
 									</div>
@@ -337,7 +319,7 @@ export function ClientDetail({
 									</p>
 								)}
 								{client.country && (
-									<p>{countryNames[client.country] || client.country}</p>
+									<p>{COUNTRY_CODES.includes(client.country as any) ? t(`finance.geography.countries.${client.country}`) : client.country}</p>
 								)}
 							</>
 						) : (
@@ -374,8 +356,7 @@ export function ClientDetail({
 									)}
 									{secondaryAddress.country && (
 										<p>
-											{countryNames[secondaryAddress.country] ||
-												secondaryAddress.country}
+											{COUNTRY_CODES.includes(secondaryAddress.country as any) ? t(`finance.geography.countries.${secondaryAddress.country}`) : secondaryAddress.country}
 										</p>
 									)}
 								</div>
@@ -562,7 +543,7 @@ export function ClientDetail({
 						<div className="flex items-center gap-2">
 							<Calendar className="h-4 w-4" />
 							{t("finance.clients.createdAt")}:{" "}
-							{formatDateArabic(client.createdAt)}
+							{formatDateArabic(client.createdAt, locale)}
 						</div>
 						{client.createdBy && (
 							<div className="flex items-center gap-2">

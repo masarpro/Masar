@@ -114,22 +114,7 @@ const defaultFormData: ClientFormData = {
 	displayLanguage: "ar",
 };
 
-// قائمة المناطق السعودية
-const saudiRegions = [
-	"الرياض",
-	"مكة المكرمة",
-	"المدينة المنورة",
-	"القصيم",
-	"الشرقية",
-	"عسير",
-	"تبوك",
-	"حائل",
-	"الحدود الشمالية",
-	"جازان",
-	"نجران",
-	"الباحة",
-	"الجوف",
-];
+import { SAUDI_REGION_KEYS } from "../../lib/geography";
 
 interface ClientFormProps {
 	organizationId: string;
@@ -473,11 +458,14 @@ export function ClientForm({
 										<SelectValue placeholder={t("finance.clients.regionPlaceholder")} />
 									</SelectTrigger>
 									<SelectContent className="rounded-xl">
-										{saudiRegions.map((region) => (
-											<SelectItem key={region} value={region}>
-												{region}
-											</SelectItem>
-										))}
+										{SAUDI_REGION_KEYS.map((key) => {
+											const label = t(`finance.geography.saudiRegions.${key}`);
+											return (
+												<SelectItem key={key} value={label}>
+													{label}
+												</SelectItem>
+											);
+										})}
 									</SelectContent>
 								</Select>
 							</div>
@@ -615,10 +603,10 @@ export function ClientForm({
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent className="rounded-xl">
-										<SelectItem value="SAR">ريال سعودي (SAR)</SelectItem>
-										<SelectItem value="USD">دولار أمريكي (USD)</SelectItem>
-										<SelectItem value="EUR">يورو (EUR)</SelectItem>
-										<SelectItem value="AED">درهم إماراتي (AED)</SelectItem>
+										<SelectItem value="SAR">{t("finance.currencies.SAR")}</SelectItem>
+										<SelectItem value="USD">{t("finance.currencies.USD")}</SelectItem>
+										<SelectItem value="EUR">{t("finance.currencies.EUR")}</SelectItem>
+										<SelectItem value="AED">{t("finance.currencies.AED")}</SelectItem>
 									</SelectContent>
 								</Select>
 							</div>

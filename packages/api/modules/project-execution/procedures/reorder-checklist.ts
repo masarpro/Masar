@@ -1,5 +1,7 @@
-import { reorderChecklist } from "@repo/database";
+import { ORPCError } from "@orpc/server";
+import { db, reorderChecklist } from "@repo/database";
 import { z } from "zod";
+import { verifyProjectAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 
 export const reorderChecklistProcedure = subscriptionProcedure
@@ -16,7 +18,22 @@ export const reorderChecklistProcedure = subscriptionProcedure
 			checklistIds: z.array(z.string()),
 		}),
 	)
-	.handler(async ({ input }) => {
+	.handler(async ({ input, context }) => {
+		const activity = await db.projectActivity.findFirst({
+			where: { id: input.activityId, organizationId: input.organizationId },
+			select: { projectId: true },
+		});
+		if (!activity) {
+			throw new ORPCError("NOT_FOUND", { message: "Activity not found" });
+		}
+
+		await verifyProjectAccess(
+			activity.projectId,
+			input.organizationId,
+			context.user.id,
+			{ section: "projects", action: "edit" },
+		);
+
 		const checklists = await reorderChecklist(
 			input.organizationId,
 			input.activityId,

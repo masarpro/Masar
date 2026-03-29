@@ -5,6 +5,8 @@ import {
 	type ContactFormValues,
 	contactFormSchema,
 } from "@repo/api/modules/contact/types";
+import type { TurnstileInstance } from "@marsidev/react-turnstile";
+import { TurnstileWidget } from "@shared/components/TurnstileWidget";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation } from "@tanstack/react-query";
 import { Alert, AlertTitle } from "@ui/components/alert";
@@ -21,16 +23,22 @@ import { Input } from "@ui/components/input";
 import { Textarea } from "@ui/components/textarea";
 import { MailCheckIcon, MailIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 export function ContactForm() {
 	const t = useTranslations();
+	const [turnstileToken, setTurnstileToken] = useState("");
+	const turnstileRef = useRef<TurnstileInstance>(null);
+
 	const contactFormMutation = useMutation(
 		orpc.contact.submit.mutationOptions(),
 	);
 
-	const form = useForm<ContactFormValues>({
-		resolver: zodResolver(contactFormSchema),
+	const form = useForm<Omit<ContactFormValues, "turnstileToken">>({
+		resolver: zodResolver(
+			contactFormSchema.omit({ turnstileToken: true }),
+		),
 		defaultValues: {
 			name: "",
 			email: "",
@@ -40,13 +48,26 @@ export function ContactForm() {
 
 	const onSubmit = form.handleSubmit(async (values) => {
 		try {
-			await contactFormMutation.mutateAsync(values);
+			await contactFormMutation.mutateAsync({
+				...values,
+				turnstileToken,
+			});
 		} catch {
+			turnstileRef.current?.reset();
+			setTurnstileToken("");
 			form.setError("root", {
 				message: t("contact.form.notifications.error"),
 			});
 		}
 	});
+
+	const handleTurnstileVerify = useCallback((token: string) => {
+		setTurnstileToken(token);
+	}, []);
+
+	const handleTurnstileError = useCallback(() => {
+		setTurnstileToken("");
+	}, []);
 
 	return (
 		<div>
@@ -120,10 +141,20 @@ export function ContactForm() {
 							)}
 						/>
 
+						<div className="flex justify-center">
+							<TurnstileWidget
+								ref={turnstileRef}
+								onVerify={handleTurnstileVerify}
+								onError={handleTurnstileError}
+								onExpire={handleTurnstileError}
+							/>
+						</div>
+
 						<Button
 							type="submit"
 							className="w-full"
 							loading={form.formState.isSubmitting}
+							disabled={!turnstileToken}
 						>
 							{t("contact.form.submit")}
 						</Button>

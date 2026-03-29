@@ -88,8 +88,8 @@ export const generateUpdatePDFProcedure = subscriptionProcedure
 
 		// Return as base64 for easy transport
 		return {
-			filename: `update-${update.id}.html`,
-			mimeType: "text/html",
+			filename: `update-${update.id}.pdf`,
+			mimeType: "application/pdf",
 			content: pdfBuffer.toString("base64"),
 			size: pdfBuffer.length,
 		};
