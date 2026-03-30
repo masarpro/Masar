@@ -3659,6 +3659,10 @@ enum OrgAuditAction {
   HANDOVER_ITEM_UPDATED     // تعديل بند
   HANDOVER_ITEM_DELETED     // حذف بند
   HANDOVER_ITEMS_IMPORTED   // استيراد بنود
+
+  // ── المساعد الذكي (AI Assistant) ──
+  AI_CHAT_CREATED           // إنشاء محادثة ذكاء اصطناعي
+  AI_MESSAGE_SENT           // إرسال رسالة للمساعد الذكي
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

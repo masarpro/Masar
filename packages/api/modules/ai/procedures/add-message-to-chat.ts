@@ -26,9 +26,9 @@ export const addMessageToChat = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		// Strict rate limit for AI messages (5/min)
-		const { rateLimitChecker, RATE_LIMITS } = await import("../../../lib/rate-limit");
-		await rateLimitChecker(context.user.id, "ai.chats.messages.add", RATE_LIMITS.STRICT);
+		// Rate limit for AI messages (10/min — more generous than STRICT for active conversations)
+		const { rateLimitChecker } = await import("../../../lib/rate-limit");
+		await rateLimitChecker(context.user.id, "ai.chats.messages.add", { windowMs: 60_000, maxRequests: 10 });
 
 		const { chatId, messages } = input;
 		const user = context.user;

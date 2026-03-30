@@ -16,8 +16,10 @@ import {
   // Permission filtering
   filterToolsByPermission,
   getPermissionSummaryForPrompt,
+  // Sanitization
+  sanitizeUserContext,
 } from "@repo/ai";
-import { db, ROLE_NAMES_AR } from "@repo/database";
+import { db, ROLE_NAMES_AR, orgAuditLog } from "@repo/database";
 import {
   getUserPermissions,
   getUserRoleType,
@@ -195,6 +197,22 @@ export async function POST(request: Request) {
     // Convert UIMessages from useChat to ModelMessages for streamText
     const modelMessages = convertToModelMessages(messages);
 
+    // Audit log — fire-and-forget
+    orgAuditLog({
+      organizationId: organization.id,
+      actorId: session.user.id,
+      action: "AI_MESSAGE_SENT",
+      entityType: "ai_assistant",
+      entityId: context.organizationSlug,
+      metadata: {
+        messageCount: messages.length,
+        activeModule: activeModule?.id ?? null,
+        toolCount: Object.keys(tools).length,
+      },
+    });
+
+    // TODO: Add dedicated AI analytics dashboard
+
     const result = streamText({
       model: assistantModel,
       system: systemPrompt,
@@ -270,14 +288,14 @@ ${activeModule.exampleQuestions.map((q) => `- ${q}`).join("\n")}`);
       pageContext.visibleStats &&
       Object.keys(pageContext.visibleStats).length > 0
     ) {
-      contextSection += `\n- **إحصائيات معروضة:** ${JSON.stringify(pageContext.visibleStats)}`;
+      contextSection += `\n- **إحصائيات معروضة:** ${sanitizeUserContext(JSON.stringify(pageContext.visibleStats))}`;
     }
 
     if (
       pageContext.activeFilters &&
       Object.keys(pageContext.activeFilters).length > 0
     ) {
-      contextSection += `\n- **فلاتر مطبقة:** ${JSON.stringify(pageContext.activeFilters)}`;
+      contextSection += `\n- **فلاتر مطبقة:** ${sanitizeUserContext(JSON.stringify(pageContext.activeFilters))}`;
     }
 
     if (pageContext.itemCount !== undefined) {
@@ -285,11 +303,11 @@ ${activeModule.exampleQuestions.map((q) => `- ${q}`).join("\n")}`);
     }
 
     if (pageContext.dataSummary) {
-      contextSection += `\n- **ملخص البيانات:** ${pageContext.dataSummary}`;
+      contextSection += `\n- **ملخص البيانات:** ${sanitizeUserContext(pageContext.dataSummary)}`;
     }
 
     if (pageContext.formState?.isOpen) {
-      contextSection += `\n- **نموذج مفتوح:** ${pageContext.formState.entityName} (${pageContext.formState.formType})`;
+      contextSection += `\n- **نموذج مفتوح:** ${sanitizeUserContext(pageContext.formState.entityName)} (${sanitizeUserContext(pageContext.formState.formType)})`;
     }
 
     contextSection += `\nاستخدم هذا السياق لتقديم إجابات دقيقة ومرتبطة بما يراه المستخدم. إذا سأل "كم عندي" أو "وش هالأرقام" — ارجع للإحصائيات المعروضة.`;
