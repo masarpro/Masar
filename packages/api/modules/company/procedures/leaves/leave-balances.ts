@@ -5,6 +5,7 @@ import {
 	protectedProcedure,
 	subscriptionProcedure,
 } from "../../../../orpc/procedures";
+import { idString, dayCount } from "../../../../lib/validation-constants";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LIST LEAVE BALANCES
@@ -18,9 +19,9 @@ export const listLeaveBalancesProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			employeeId: z.string().optional(),
-			year: z.number().int().optional(),
+			organizationId: idString(),
+			employeeId: idString().optional(),
+			year: z.number().int().min(2020).max(2100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -64,11 +65,11 @@ export const adjustLeaveBalanceProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			employeeId: z.string(),
-			leaveTypeId: z.string(),
-			year: z.number().int().optional(),
-			totalDays: z.number().int().min(0),
+			organizationId: idString(),
+			employeeId: idString(),
+			leaveTypeId: idString(),
+			year: z.number().int().min(2020).max(2100).optional(),
+			totalDays: dayCount(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

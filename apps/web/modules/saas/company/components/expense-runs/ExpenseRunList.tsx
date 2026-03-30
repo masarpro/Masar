@@ -112,7 +112,7 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 		`FEXP-${run.year}-${String(run.month).padStart(2, "0")}`;
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Back to Expenses */}
 			<Button
 				variant="ghost"
@@ -197,7 +197,7 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 					onClick={() => setShowCreateDialog(true)}
 					className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
 				>
-					<Plus className="ml-2 h-4 w-4" />
+					<Plus className="ms-2 h-4 w-4" />
 					{t("company.expenseRuns.createRun")}
 				</Button>
 			</div>
@@ -207,12 +207,12 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 				<Table className="table-fixed w-full">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[20%]">{t("company.expenseRuns.runNo")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[20%]">{t("company.expenseRuns.month")} / {t("company.expenseRuns.year")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[15%]">{t("company.expenseRuns.itemCount")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[20%]">{t("company.expenseRuns.totalAmount")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[15%]">{t("company.expenseRuns.status")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[10%]">{t("company.common.actions")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[20%]">{t("company.expenseRuns.runNo")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[20%]">{t("company.expenseRuns.month")} / {t("company.expenseRuns.year")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[15%]">{t("company.expenseRuns.itemCount")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[20%]">{t("company.expenseRuns.totalAmount")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[15%]">{t("company.expenseRuns.status")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[10%]">{t("company.common.actions")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -234,24 +234,24 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 									style={{ animationDelay: `${index * 30}ms` }}
 									onClick={() => router.push(`/app/${organizationSlug}/company/expense-runs/${run.id}`)}
 								>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<p className="font-medium text-slate-900 dark:text-slate-100">
 											{getRunNo(run)}
 										</p>
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300">
 										{run.month} / {run.year}
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300">
 										{run.itemCount ?? 0}
 									</TableCell>
-									<TableCell className="text-right font-semibold text-slate-700 dark:text-slate-300">
+									<TableCell className="text-end font-semibold text-slate-700 dark:text-slate-300">
 										<Currency amount={Number(run.totalAmount)} />
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										{getStatusBadge(run.status)}
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<Button
 											variant="ghost"
 											size="icon"
@@ -287,9 +287,9 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 			{/* Create Expense Run Dialog */}
 			{showCreateDialog && (
 				<Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-					<DialogContent dir="rtl" className="sm:max-w-md p-0 gap-0 rounded-2xl overflow-hidden">
+					<DialogContent className="sm:max-w-md p-0 gap-0 rounded-2xl overflow-hidden">
 						<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
-							<DialogTitle className="text-base font-semibold text-right">
+							<DialogTitle className="text-base font-semibold text-end">
 								{t("company.expenseRuns.createRun")}
 							</DialogTitle>
 						</DialogHeader>

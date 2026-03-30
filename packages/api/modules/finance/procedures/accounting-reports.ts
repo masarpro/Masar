@@ -8,14 +8,15 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { idString, percentage } from "../../../lib/validation-constants";
 
 // ========== Shared Input Schema ==========
 
 const accountingReportInput = z.object({
-	organizationId: z.string(),
-	dateFrom: z.string().datetime().optional(),
-	dateTo: z.string().datetime().optional(),
-	projectId: z.string().optional(),
+	organizationId: idString(),
+	dateFrom: z.string().trim().datetime().optional(),
+	dateTo: z.string().trim().datetime().optional(),
+	projectId: z.string().trim().max(100).optional(),
 });
 
 // ========== Aged Receivables ==========
@@ -29,9 +30,9 @@ export const getAgedReceivablesProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			asOfDate: z.string().datetime().optional(),
-			projectId: z.string().optional(),
+			organizationId: idString(),
+			asOfDate: z.string().trim().datetime().optional(),
+			projectId: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -85,9 +86,9 @@ export const getAgedPayablesProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			asOfDate: z.string().datetime().optional(),
-			projectId: z.string().optional(),
+			organizationId: idString(),
+			asOfDate: z.string().trim().datetime().optional(),
+			projectId: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -140,11 +141,11 @@ export const getVATReportProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			dateFrom: z.string().datetime(),
-			dateTo: z.string().datetime(),
-			quarter: z.number().min(1).max(4).optional(),
-			year: z.number().optional(),
+			organizationId: idString(),
+			dateFrom: z.string().trim().datetime(),
+			dateTo: z.string().trim().datetime(),
+			quarter: z.number().int().min(1).max(4).optional(),
+			year: z.number().int().min(2000).max(2100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -216,10 +217,10 @@ export const getIncomeStatementProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			dateFrom: z.string().datetime(),
-			dateTo: z.string().datetime(),
-			projectId: z.string().optional(),
+			organizationId: idString(),
+			dateFrom: z.string().trim().datetime(),
+			dateTo: z.string().trim().datetime(),
+			projectId: z.string().trim().max(100).optional(),
 			includeComparison: z.boolean().optional().default(true),
 		}),
 	)

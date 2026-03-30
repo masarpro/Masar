@@ -13,9 +13,9 @@ export const convertToProject = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			leadId: z.string(),
-			projectName: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			leadId: z.string().trim().max(100),
+			projectName: z.string().trim().max(200).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

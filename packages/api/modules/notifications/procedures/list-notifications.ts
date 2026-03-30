@@ -12,9 +12,9 @@ export const listNotificationsProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: z.string().trim().max(100),
 			unreadOnly: z.boolean().optional().default(false),
-			page: z.number().int().positive().optional().default(1),
+			page: z.number().int().positive().max(1000).optional().default(1),
 			pageSize: z.number().int().positive().max(100).optional().default(20),
 		}),
 	)

@@ -17,10 +17,10 @@ export const getUploadUrl = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			leadId: z.string(),
-			fileName: z.string().min(1),
-			mimeType: z.string().min(1),
+			organizationId: z.string().trim().max(100),
+			leadId: z.string().trim().max(100),
+			fileName: z.string().trim().min(1).max(255),
+			mimeType: z.string().trim().min(1).max(200),
 			fileSize: z.number().int().positive().max(MAX_FILE_SIZE),
 		}),
 	)

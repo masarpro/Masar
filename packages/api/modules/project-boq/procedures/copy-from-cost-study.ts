@@ -13,9 +13,9 @@ export const copyFromCostStudy = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 			includeUnpriced: z.boolean().default(true),
 		}),
 	)

@@ -15,8 +15,8 @@ export const createChat = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			title: z.string().optional(),
-			organizationId: z.string().optional(),
+			title: z.string().trim().max(200).optional(),
+			organizationId: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

@@ -12,6 +12,10 @@ import { z } from "zod";
 import { ORPCError } from "@orpc/server";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_DESC, MAX_CODE, MAX_PHONE, MAX_ADDRESS,
+	idString, optionalTrimmed,
+} from "../../../lib/validation-constants";
 
 // نوع العميل
 const clientTypeEnum = z.enum(["INDIVIDUAL", "COMMERCIAL"]);
@@ -19,12 +23,12 @@ const clientTypeEnum = z.enum(["INDIVIDUAL", "COMMERCIAL"]);
 // العنوان الثانوي
 const secondaryAddressSchema = z
 	.object({
-		streetAddress1: z.string().optional(),
-		streetAddress2: z.string().optional(),
-		city: z.string().optional(),
-		region: z.string().optional(),
-		postalCode: z.string().optional(),
-		country: z.string().optional(),
+		streetAddress1: z.string().trim().max(MAX_ADDRESS).optional(),
+		streetAddress2: z.string().trim().max(MAX_ADDRESS).optional(),
+		city: z.string().trim().max(MAX_NAME).optional(),
+		region: z.string().trim().max(MAX_NAME).optional(),
+		postalCode: z.string().trim().max(20).optional(),
+		country: z.string().trim().max(3).optional(),
 	})
 	.nullable()
 	.optional();
@@ -38,39 +42,39 @@ export const updateClientProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 			// نوع العميل
 			clientType: clientTypeEnum.optional(),
 			// الأسماء
-			firstName: z.string().optional(),
-			lastName: z.string().optional(),
-			businessName: z.string().optional(),
-			name: z.string().min(1).optional(),
-			company: z.string().optional(),
+			firstName: optionalTrimmed(MAX_NAME),
+			lastName: optionalTrimmed(MAX_NAME),
+			businessName: optionalTrimmed(MAX_NAME),
+			name: z.string().trim().min(1).max(MAX_NAME).optional(),
+			company: optionalTrimmed(MAX_NAME),
 			// الاتصال
-			phone: z.string().optional(),
-			mobile: z.string().optional(),
-			email: z.string().email().optional().or(z.literal("")),
+			phone: z.string().trim().max(MAX_PHONE).optional(),
+			mobile: z.string().trim().max(MAX_PHONE).optional(),
+			email: z.string().trim().email().max(254).optional().or(z.literal("")),
 			// العنوان
-			address: z.string().optional(),
-			streetAddress1: z.string().optional(),
-			streetAddress2: z.string().optional(),
-			city: z.string().optional(),
-			region: z.string().optional(),
-			postalCode: z.string().optional(),
-			country: z.string().optional(),
+			address: optionalTrimmed(MAX_ADDRESS),
+			streetAddress1: optionalTrimmed(MAX_ADDRESS),
+			streetAddress2: optionalTrimmed(MAX_ADDRESS),
+			city: optionalTrimmed(MAX_NAME),
+			region: optionalTrimmed(MAX_NAME),
+			postalCode: z.string().trim().max(20).optional(),
+			country: z.string().trim().max(3).optional(),
 			secondaryAddress: secondaryAddressSchema,
 			// الحساب
-			code: z.string().optional(),
-			currency: z.string().optional(),
-			displayLanguage: z.string().optional(),
-			classification: z.array(z.string()).optional(),
+			code: z.string().trim().max(MAX_CODE).optional(),
+			currency: z.string().trim().max(3).optional(),
+			displayLanguage: z.string().trim().max(10).optional(),
+			classification: z.array(z.string().trim().max(MAX_NAME)).optional(),
 			// الضريبة
-			taxNumber: z.string().optional(),
-			crNumber: z.string().optional(),
+			taxNumber: z.string().trim().max(MAX_CODE).optional(),
+			crNumber: z.string().trim().max(MAX_CODE).optional(),
 			// أخرى
-			notes: z.string().optional(),
+			notes: optionalTrimmed(MAX_DESC),
 			isActive: z.boolean().optional(),
 		}),
 	)
@@ -99,8 +103,8 @@ export const deleteClientProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -123,8 +127,8 @@ export const getClient = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -155,8 +159,8 @@ export const listClientContacts = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			clientId: z.string(),
+			organizationId: idString(),
+			clientId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -184,15 +188,15 @@ export const createClientContactProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			clientId: z.string(),
-			name: z.string().min(1, "اسم جهة الاتصال مطلوب"),
-			position: z.string().optional(),
-			phone: z.string().optional(),
-			mobile: z.string().optional(),
-			email: z.string().email().optional().or(z.literal("")),
+			organizationId: idString(),
+			clientId: idString(),
+			name: z.string().trim().min(1, "اسم جهة الاتصال مطلوب").max(MAX_NAME),
+			position: optionalTrimmed(MAX_NAME),
+			phone: z.string().trim().max(MAX_PHONE).optional(),
+			mobile: z.string().trim().max(MAX_PHONE).optional(),
+			email: z.string().trim().email().max(254).optional().or(z.literal("")),
 			isPrimary: z.boolean().optional().default(false),
-			notes: z.string().optional(),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -230,16 +234,16 @@ export const updateClientContactProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			clientId: z.string(),
-			contactId: z.string(),
-			name: z.string().min(1).optional(),
-			position: z.string().optional(),
-			phone: z.string().optional(),
-			mobile: z.string().optional(),
-			email: z.string().email().optional().or(z.literal("")),
+			organizationId: idString(),
+			clientId: idString(),
+			contactId: idString(),
+			name: z.string().trim().min(1).max(MAX_NAME).optional(),
+			position: optionalTrimmed(MAX_NAME),
+			phone: z.string().trim().max(MAX_PHONE).optional(),
+			mobile: z.string().trim().max(MAX_PHONE).optional(),
+			email: z.string().trim().email().max(254).optional().or(z.literal("")),
 			isPrimary: z.boolean().optional(),
-			notes: z.string().optional(),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -273,9 +277,9 @@ export const deleteClientContactProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			clientId: z.string(),
-			contactId: z.string(),
+			organizationId: idString(),
+			clientId: idString(),
+			contactId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -304,9 +308,9 @@ export const setClientContactAsPrimaryProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			clientId: z.string(),
-			contactId: z.string(),
+			organizationId: idString(),
+			clientId: idString(),
+			contactId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

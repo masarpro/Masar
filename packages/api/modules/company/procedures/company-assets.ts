@@ -12,6 +12,20 @@ import {
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import {
+	idString,
+	trimmedString,
+	optionalTrimmed,
+	nullishTrimmed,
+	searchQuery,
+	financialAmount,
+	paginationLimit,
+	paginationOffset,
+	dayCount,
+	MAX_NAME,
+	MAX_DESC,
+	MAX_CODE,
+} from "../../../lib/validation-constants";
 
 const assetCategoryEnum = z.enum([
 	"HEAVY_EQUIPMENT", "LIGHT_EQUIPMENT", "VEHICLES", "TOOLS",
@@ -32,13 +46,13 @@ export const listAssets = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			category: assetCategoryEnum.optional(),
 			type: assetTypeEnum.optional(),
 			status: assetStatusEnum.optional(),
-			query: z.string().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			query: searchQuery(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -69,8 +83,8 @@ export const getAssetByIdProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -96,23 +110,23 @@ export const createAssetProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			name: z.string().min(1, "اسم الأصل مطلوب"),
-			assetNo: z.string().optional(),
+			organizationId: idString(),
+			name: trimmedString(MAX_NAME),
+			assetNo: optionalTrimmed(MAX_CODE),
 			category: assetCategoryEnum,
 			type: assetTypeEnum.optional(),
-			brand: z.string().optional(),
-			model: z.string().optional(),
-			serialNumber: z.string().optional(),
-			year: z.number().int().optional(),
-			description: z.string().optional(),
-			purchasePrice: z.number().min(0).optional(),
-			monthlyRent: z.number().min(0).optional(),
-			currentValue: z.number().min(0).optional(),
+			brand: optionalTrimmed(MAX_NAME),
+			model: optionalTrimmed(MAX_NAME),
+			serialNumber: optionalTrimmed(MAX_CODE),
+			year: z.number().int().min(1900).max(2100).optional(),
+			description: optionalTrimmed(MAX_DESC),
+			purchasePrice: financialAmount().optional(),
+			monthlyRent: financialAmount().optional(),
+			currentValue: financialAmount().optional(),
 			purchaseDate: z.coerce.date().optional(),
 			warrantyExpiry: z.coerce.date().optional(),
 			insuranceExpiry: z.coerce.date().optional(),
-			notes: z.string().optional(),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -136,25 +150,25 @@ export const updateAssetProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			name: z.string().min(1).optional(),
-			assetNo: z.string().optional(),
+			organizationId: idString(),
+			id: idString(),
+			name: trimmedString(MAX_NAME).optional(),
+			assetNo: optionalTrimmed(MAX_CODE),
 			category: assetCategoryEnum.optional(),
 			type: assetTypeEnum.optional(),
 			status: assetStatusEnum.optional(),
-			brand: z.string().nullable().optional(),
-			model: z.string().nullable().optional(),
-			serialNumber: z.string().nullable().optional(),
-			year: z.number().int().nullable().optional(),
-			description: z.string().nullable().optional(),
-			purchasePrice: z.number().min(0).nullable().optional(),
-			monthlyRent: z.number().min(0).nullable().optional(),
-			currentValue: z.number().min(0).nullable().optional(),
+			brand: nullishTrimmed(MAX_NAME),
+			model: nullishTrimmed(MAX_NAME),
+			serialNumber: nullishTrimmed(MAX_CODE),
+			year: z.number().int().min(1900).max(2100).nullable().optional(),
+			description: nullishTrimmed(MAX_DESC),
+			purchasePrice: financialAmount().nullable().optional(),
+			monthlyRent: financialAmount().nullable().optional(),
+			currentValue: financialAmount().nullable().optional(),
 			purchaseDate: z.coerce.date().nullable().optional(),
 			warrantyExpiry: z.coerce.date().nullable().optional(),
 			insuranceExpiry: z.coerce.date().nullable().optional(),
-			notes: z.string().nullable().optional(),
+			notes: nullishTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -179,8 +193,8 @@ export const deactivateAssetProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -204,9 +218,9 @@ export const assignAssetToProjectProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			projectId: z.string(),
+			organizationId: idString(),
+			id: idString(),
+			projectId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -230,8 +244,8 @@ export const returnAssetProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -253,7 +267,7 @@ export const getAssetSummaryProcedure = protectedProcedure
 		tags: ["Company", "Assets"],
 		summary: "Get asset summary statistics",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "company",
@@ -275,8 +289,8 @@ export const getExpiringInsuranceProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			daysAhead: z.number().optional().default(30),
+			organizationId: idString(),
+			daysAhead: dayCount().optional().default(30),
 		}),
 	)
 	.handler(async ({ input, context }) => {

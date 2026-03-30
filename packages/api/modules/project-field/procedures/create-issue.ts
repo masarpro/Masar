@@ -13,16 +13,16 @@ export const createIssueProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			title: z.string().min(1, "عنوان المشكلة مطلوب"),
-			description: z.string().min(1, "وصف المشكلة مطلوب"),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			title: z.string().trim().min(1, "عنوان المشكلة مطلوب").max(200),
+			description: z.string().trim().min(1, "وصف المشكلة مطلوب").max(2000),
 			severity: z
 				.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"])
 				.optional()
 				.default("MEDIUM"),
 			dueDate: z.coerce.date().optional(),
-			assigneeId: z.string().optional(),
+			assigneeId: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

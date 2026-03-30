@@ -12,10 +12,10 @@ export const createMilestoneProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			title: z.string().min(1).max(200),
-			description: z.string().max(2000).optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			title: z.string().trim().min(1).max(200),
+			description: z.string().trim().max(2000).optional(),
 			orderIndex: z.number().int().min(0).optional(),
 			plannedStart: z.string().datetime().optional(),
 			plannedEnd: z.string().datetime().optional(),

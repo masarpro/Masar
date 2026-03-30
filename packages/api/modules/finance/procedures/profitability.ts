@@ -3,6 +3,7 @@ import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
+import { idString } from "../../../lib/validation-constants";
 
 export const getProjectProfitabilityProcedure = protectedProcedure
 	.route({
@@ -13,10 +14,10 @@ export const getProjectProfitabilityProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			dateFrom: z.string().datetime().optional(),
-			dateTo: z.string().datetime().optional(),
+			organizationId: idString(),
+			projectId: idString(),
+			dateFrom: z.string().trim().datetime().optional(),
+			dateTo: z.string().trim().datetime().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

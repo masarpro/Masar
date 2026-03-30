@@ -13,12 +13,12 @@ export const updateOrgUser = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			id: z.string(),
-			organizationId: z.string(),
-			name: z.string().min(1).optional(),
-			organizationRoleId: z.string().optional(),
+			id: z.string().trim().max(100),
+			organizationId: z.string().trim().max(100),
+			name: z.string().trim().min(1).max(200).optional(),
+			organizationRoleId: z.string().trim().max(100).optional(),
 			isActive: z.boolean().optional(),
-			customPermissions: z.record(z.string(), z.any()).optional(),
+			customPermissions: z.record(z.string().max(50), z.record(z.string().max(50), z.boolean())).refine(obj => Object.keys(obj).length <= 20, "Too many permission sections").optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

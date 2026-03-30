@@ -1,6 +1,7 @@
 import { generateSubcontractNo } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { idString } from "../../../lib/validation-constants";
 
 export const generateSubcontractNoProcedure = protectedProcedure
 	.route({
@@ -11,7 +12,7 @@ export const generateSubcontractNoProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 		}),
 	)
 	.handler(async ({ input }) => {

@@ -6,6 +6,15 @@ import {
 	protectedProcedure,
 	subscriptionProcedure,
 } from "../../../../orpc/procedures";
+import {
+	idString,
+	trimmedString,
+	optionalTrimmed,
+	nullishTrimmed,
+	dayCount,
+	MAX_NAME,
+	MAX_CODE,
+} from "../../../../lib/validation-constants";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LIST LEAVE TYPES
@@ -17,7 +26,7 @@ export const listLeaveTypesProcedure = protectedProcedure
 		tags: ["Company", "Leaves"],
 		summary: "List leave types",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "employees",
@@ -42,13 +51,13 @@ export const createLeaveTypeProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			name: z.string().min(1),
-			nameEn: z.string().optional(),
-			daysPerYear: z.number().int().min(0),
+			organizationId: idString(),
+			name: trimmedString(MAX_NAME),
+			nameEn: optionalTrimmed(MAX_NAME),
+			daysPerYear: dayCount(),
 			isPaid: z.boolean().optional().default(true),
 			requiresApproval: z.boolean().optional().default(true),
-			color: z.string().optional(),
+			color: optionalTrimmed(MAX_CODE),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -95,14 +104,14 @@ export const updateLeaveTypeProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			name: z.string().min(1).optional(),
-			nameEn: z.string().optional(),
-			daysPerYear: z.number().int().min(0).optional(),
+			organizationId: idString(),
+			id: idString(),
+			name: trimmedString(MAX_NAME).optional(),
+			nameEn: optionalTrimmed(MAX_NAME),
+			daysPerYear: dayCount().optional(),
 			isPaid: z.boolean().optional(),
 			requiresApproval: z.boolean().optional(),
-			color: z.string().nullable().optional(),
+			color: nullishTrimmed(MAX_CODE),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -130,8 +139,8 @@ export const deleteLeaveTypeProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -165,7 +174,7 @@ export const seedDefaultLeaveTypesProcedure = subscriptionProcedure
 		tags: ["Company", "Leaves"],
 		summary: "Seed default Saudi leave types",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "employees",

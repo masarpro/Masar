@@ -21,7 +21,7 @@ export function PasswordInput({
 		<div className={`relative ${className}`}>
 			<Input
 				type={showPassword ? "text" : "password"}
-				className="pr-10"
+				className="pe-10"
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
 				autoComplete={autoComplete}
@@ -29,7 +29,7 @@ export function PasswordInput({
 			<button
 				type="button"
 				onClick={() => setShowPassword(!showPassword)}
-				className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary text-xl"
+				className="absolute inset-y-0 end-0 flex items-center pe-4 text-primary text-xl"
 			>
 				{showPassword ? (
 					<EyeOffIcon className="size-4" />

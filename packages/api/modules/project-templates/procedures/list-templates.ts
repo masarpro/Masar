@@ -12,10 +12,10 @@ export const listTemplates = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			query: z.string().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			organizationId: z.string().trim().max(100),
+			query: z.string().trim().max(100).optional(),
+			limit: z.number().int().min(1).max(500).optional().default(50),
+			offset: z.number().int().nonnegative().optional().default(0),
 		}),
 	)
 	.handler(async ({ input, context }) => {

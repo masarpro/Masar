@@ -13,7 +13,7 @@ export const getUnreadCountProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

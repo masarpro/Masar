@@ -10,6 +10,11 @@ import {
 import { z } from "zod";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_DESC, MAX_CODE, MAX_SEARCH,
+	idString, optionalTrimmed, searchQuery,
+	positiveAmount, paginationLimit, paginationOffset,
+} from "../../../lib/validation-constants";
 
 // Enums
 const paymentMethodEnum = z.enum([
@@ -38,16 +43,16 @@ export const listOrgPayments = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			destinationAccountId: z.string().optional(),
-			clientId: z.string().optional(),
-			projectId: z.string().optional(),
+			organizationId: idString(),
+			destinationAccountId: z.string().trim().max(100).optional(),
+			clientId: z.string().trim().max(100).optional(),
+			projectId: z.string().trim().max(100).optional(),
 			status: financeTransactionStatusEnum.optional(),
 			dateFrom: z.coerce.date().optional(),
 			dateTo: z.coerce.date().optional(),
-			query: z.string().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			query: searchQuery(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -81,8 +86,8 @@ export const getOrgPayment = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -112,19 +117,19 @@ export const createOrgPaymentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			amount: z.number().positive(),
+			organizationId: idString(),
+			amount: positiveAmount(),
 			date: z.coerce.date(),
-			destinationAccountId: z.string(),
-			clientId: z.string().optional(),
-			clientName: z.string().optional(),
-			projectId: z.string().optional(),
-			invoiceId: z.string().optional(),
-			contractTermId: z.string().optional(),
+			destinationAccountId: idString(),
+			clientId: z.string().trim().max(100).optional(),
+			clientName: optionalTrimmed(MAX_NAME),
+			projectId: z.string().trim().max(100).optional(),
+			invoiceId: z.string().trim().max(100).optional(),
+			contractTermId: z.string().trim().max(100).optional(),
 			paymentMethod: paymentMethodEnum.optional().default("CASH"),
-			referenceNo: z.string().optional(),
-			description: z.string().optional(),
-			notes: z.string().optional(),
+			referenceNo: z.string().trim().max(MAX_CODE).optional(),
+			description: optionalTrimmed(MAX_DESC),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -225,17 +230,17 @@ export const updateOrgPaymentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 			date: z.coerce.date().optional(),
-			clientId: z.string().nullable().optional(),
-			clientName: z.string().optional(),
-			projectId: z.string().nullable().optional(),
-			invoiceId: z.string().nullable().optional(),
+			clientId: z.string().trim().max(100).nullable().optional(),
+			clientName: optionalTrimmed(MAX_NAME),
+			projectId: z.string().trim().max(100).nullable().optional(),
+			invoiceId: z.string().trim().max(100).nullable().optional(),
 			paymentMethod: paymentMethodEnum.optional(),
-			referenceNo: z.string().optional(),
-			description: z.string().optional(),
-			notes: z.string().optional(),
+			referenceNo: z.string().trim().max(MAX_CODE).optional(),
+			description: optionalTrimmed(MAX_DESC),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -272,8 +277,8 @@ export const deleteOrgPaymentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

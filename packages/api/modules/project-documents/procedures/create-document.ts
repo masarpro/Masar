@@ -21,18 +21,18 @@ export const createDocumentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			folder: DocumentFolderEnum,
-			title: z.string().min(1, "العنوان مطلوب"),
-			description: z.string().optional(),
+			title: z.string().trim().min(1, "العنوان مطلوب").max(200),
+			description: z.string().trim().max(2000).optional(),
 			uploadType: z.enum(["FILE", "URL"]).default("FILE"),
 			fileUrl: z.string().url().optional(),
-			fileName: z.string().optional(),
+			fileName: z.string().trim().max(100).optional(),
 			fileSize: z.number().int().optional(),
-			mimeType: z.string().optional(),
-			storagePath: z.string().optional(),
-			thumbnailPath: z.string().optional(),
+			mimeType: z.string().trim().max(100).optional(),
+			storagePath: z.string().trim().max(100).optional(),
+			thumbnailPath: z.string().trim().max(100).optional(),
 		}).refine(
 			(data) => {
 				if (data.uploadType === "URL") return !!data.fileUrl;

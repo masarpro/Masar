@@ -12,8 +12,8 @@ export const getWeeklyDigest = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100).optional(),
 			weekStart: z.coerce.date().optional(),
 		}),
 	)

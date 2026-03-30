@@ -30,10 +30,10 @@ export const getUploadUrlProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string().min(1),
-			projectId: z.string().min(1),
-			fileName: z.string().min(1).max(255),
-			mimeType: z.string().min(1),
+			organizationId: z.string().trim().max(100).min(1),
+			projectId: z.string().trim().max(100).min(1),
+			fileName: z.string().trim().min(1).max(255),
+			mimeType: z.string().trim().min(1).max(2000),
 			fileSize: z.number().int().positive(),
 		}),
 	)

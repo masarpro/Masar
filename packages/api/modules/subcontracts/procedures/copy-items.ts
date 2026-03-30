@@ -2,6 +2,7 @@ import { copySubcontractItems, logAuditEvent } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { idString } from "../../../lib/validation-constants";
 
 export const copySubcontractItemsProcedure = subscriptionProcedure
 	.route({
@@ -12,10 +13,10 @@ export const copySubcontractItemsProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			sourceContractId: z.string(),
-			targetContractId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
+			sourceContractId: idString(),
+			targetContractId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

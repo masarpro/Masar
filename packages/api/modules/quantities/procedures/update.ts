@@ -16,23 +16,23 @@ export const update = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			id: z.string(),
-			organizationId: z.string(),
-			name: z.string().optional(),
-			customerName: z.string().optional(),
-			customerId: z.string().optional(),
-			projectType: z.string().optional(),
+			id: z.string().trim().max(100),
+			organizationId: z.string().trim().max(100),
+			name: z.string().trim().max(100).optional(),
+			customerName: z.string().trim().max(100).optional(),
+			customerId: z.string().trim().max(100).optional(),
+			projectType: z.string().trim().max(100).optional(),
 			landArea: z.number().positive().optional(),
 			buildingArea: z.number().positive().optional(),
 			numberOfFloors: z.number().int().positive().optional(),
 			hasBasement: z.boolean().optional(),
-			finishingLevel: z.string().optional(),
+			finishingLevel: z.string().trim().max(100).optional(),
 			overheadPercent: z.number().min(0).max(100).optional(),
 			profitPercent: z.number().min(0).max(100).optional(),
 			contingencyPercent: z.number().min(0).max(100).optional(),
 			vatIncluded: z.boolean().optional(),
-			status: z.string().optional(),
-			notes: z.string().optional(),
+			status: z.string().trim().max(100).optional(),
+			notes: z.string().trim().max(2000).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

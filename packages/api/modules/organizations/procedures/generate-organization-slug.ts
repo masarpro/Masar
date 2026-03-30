@@ -16,7 +16,7 @@ export const generateOrganizationSlug = publicProcedure
 	})
 	.input(
 		z.object({
-			name: z.string(),
+			name: z.string().trim().max(200),
 		}),
 	)
 	.handler(async ({ input: { name }, context: { headers } }) => {

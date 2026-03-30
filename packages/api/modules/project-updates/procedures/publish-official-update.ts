@@ -13,23 +13,23 @@ export const publishOfficialUpdate = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			headline: z.string().min(1, "العنوان مطلوب"),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			headline: z.string().trim().min(1, "العنوان مطلوب").max(200),
 			progress: z.number().min(0).max(100),
-			phaseLabel: z.string().optional(),
-			workDoneSummary: z.string().optional(),
-			blockers: z.string().optional(),
-			nextSteps: z.string().optional(),
+			phaseLabel: z.string().trim().max(100).optional(),
+			workDoneSummary: z.string().trim().max(100).optional(),
+			blockers: z.string().trim().max(100).optional(),
+			nextSteps: z.string().trim().max(100).optional(),
 			nextPayment: z
 				.object({
-					claimNo: z.number(),
-					amount: z.number(),
+					claimNo: z.number().int().nonnegative().max(999999),
+					amount: z.number().nonnegative().max(999999999.99),
 					dueDate: z.coerce.date().nullable(),
 				})
 				.nullable()
 				.optional(),
-			photoIds: z.array(z.string()).optional(),
+			photoIds: z.array(z.string().trim().max(100)).max(1000).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

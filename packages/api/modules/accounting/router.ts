@@ -48,7 +48,7 @@ import {
 } from "./procedures/account-statements";
 
 import { backfillJournalEntriesProcedure } from "./procedures/backfill";
-import { checkAccountingHealthProcedure } from "./procedures/health";
+import { checkAccountingHealthProcedure, reconcileInvoiceJournalsProcedure } from "./procedures/health";
 
 import {
 	listRecurringTemplatesProcedure,
@@ -126,6 +126,7 @@ export const accountingRouter = {
 	// Health Check
 	health: {
 		check: checkAccountingHealthProcedure,
+		reconcileInvoices: reconcileInvoiceJournalsProcedure,
 	},
 
 	// Accounting Periods

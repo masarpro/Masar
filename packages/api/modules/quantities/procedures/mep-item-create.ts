@@ -7,27 +7,27 @@ import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 
 const mepItemSchema = z.object({
-	category: z.string(),
-	subCategory: z.string().default("general"),
-	itemType: z.string().nullable().optional(),
-	name: z.string(),
-	floorId: z.string().nullable().optional(),
-	floorName: z.string().nullable().optional(),
-	roomId: z.string().nullable().optional(),
-	roomName: z.string().nullable().optional(),
-	scope: z.string().default("per_room"),
+	category: z.string().trim().max(200),
+	subCategory: z.string().trim().max(200).default("general"),
+	itemType: z.string().trim().max(100).nullable().optional(),
+	name: z.string().trim().max(200),
+	floorId: z.string().trim().max(100).nullable().optional(),
+	floorName: z.string().trim().max(100).nullable().optional(),
+	roomId: z.string().trim().max(100).nullable().optional(),
+	roomName: z.string().trim().max(100).nullable().optional(),
+	scope: z.string().trim().max(100).default("per_room"),
 	quantity: z.number().nonnegative().default(0),
-	unit: z.string().default("عدد"),
+	unit: z.string().trim().max(50).default("عدد"),
 	length: z.number().nonnegative().nullable().optional(),
 	area: z.number().nonnegative().nullable().optional(),
-	calculationMethod: z.string().default("manual"),
-	calculationData: z.any().optional(),
-	dataSource: z.string().default("manual"),
-	sourceFormula: z.string().nullable().optional(),
-	groupKey: z.string().nullable().optional(),
-	specifications: z.string().nullable().optional(),
-	specData: z.any().optional(),
-	qualityLevel: z.string().nullable().optional(),
+	calculationMethod: z.string().trim().max(100).default("manual"),
+	calculationData: z.record(z.string(), z.unknown()).optional(),
+	dataSource: z.string().trim().max(100).default("manual"),
+	sourceFormula: z.string().trim().max(100).nullable().optional(),
+	groupKey: z.string().trim().max(100).nullable().optional(),
+	specifications: z.string().trim().max(100).nullable().optional(),
+	specData: z.record(z.string(), z.unknown()).optional(),
+	qualityLevel: z.string().trim().max(100).nullable().optional(),
 	materialPrice: z.number().nonnegative().default(0),
 	laborPrice: z.number().nonnegative().default(0),
 	wastagePercent: z.number().min(0).max(100).default(10),
@@ -44,8 +44,8 @@ export const mepItemCreate = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			costStudyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			costStudyId: z.string().trim().max(100),
 		}).merge(mepItemSchema),
 	)
 	.handler(async ({ input, context }) => {
@@ -79,8 +79,8 @@ export const mepItemCreateBatch = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			costStudyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			costStudyId: z.string().trim().max(100),
 			items: z.array(mepItemSchema),
 		}),
 	)

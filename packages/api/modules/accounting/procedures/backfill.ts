@@ -2,6 +2,7 @@ import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { db } from "@repo/database";
+import { idString } from "../../../lib/validation-constants";
 
 export const backfillJournalEntriesProcedure = subscriptionProcedure
 	.route({
@@ -10,7 +11,7 @@ export const backfillJournalEntriesProcedure = subscriptionProcedure
 		tags: ["Accounting"],
 		summary: "Generate journal entries for historical financial operations",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",

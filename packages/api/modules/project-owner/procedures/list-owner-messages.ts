@@ -13,8 +13,8 @@ export const listOwnerMessagesProcedure = publicProcedure
 	})
 	.input(
 		z.object({
-			token: z.string().min(1).optional(),
-			sessionToken: z.string().min(1).optional(),
+			token: z.string().trim().min(1).max(200).optional(),
+			sessionToken: z.string().trim().min(1).max(200).optional(),
 			page: z.number().int().positive().optional().default(1),
 			pageSize: z.number().int().positive().max(100).optional().default(50),
 		}).refine((d) => d.token || d.sessionToken, {

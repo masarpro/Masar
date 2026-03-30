@@ -54,7 +54,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 
 	if (isLoading) {
 		return (
-			<div className="space-y-6" dir="rtl">
+			<div className="space-y-6">
 				<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
 					{[...Array(4)].map((_, i) => (
 						<div
@@ -90,7 +90,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 	};
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Statistics Cards - Glass Morphism */}
 			<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
 				<GlassStatCard

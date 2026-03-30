@@ -14,8 +14,8 @@ export const updateChat = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			id: z.string(),
-			title: z.string().optional(),
+			id: z.string().trim().max(100),
+			title: z.string().trim().max(200).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

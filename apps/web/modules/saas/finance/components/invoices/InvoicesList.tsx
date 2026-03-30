@@ -254,7 +254,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 				<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] px-5 py-3.5">
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
 						<div className="relative flex-1 min-w-[200px]">
-							<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+							<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 							<Input
 								placeholder={t("finance.invoices.searchPlaceholder")}
 								value={searchTerm}
@@ -262,7 +262,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 									setSearchTerm(e.target.value);
 									setCurrentPage(1);
 								}}
-								className="pr-10 rounded-xl h-9 border-slate-200/80 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background"
+								className="pe-10 rounded-xl h-9 border-slate-200/80 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background"
 							/>
 						</div>
 						<Select value={statusFilter} onValueChange={handleStatusChange}>
@@ -576,7 +576,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 					>
 						<Button asChild className="rounded-[10px] h-9 px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.45)] transition-all">
 							<Link href={`${basePath}/new`}>
-								<Plus className="ml-2 h-4 w-4" />
+								<Plus className="ms-2 h-4 w-4" />
 								{t("finance.invoices.create")}
 							</Link>
 						</Button>

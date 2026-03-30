@@ -13,8 +13,8 @@ export const getOwnerPaymentsProcedure = publicProcedure
 	})
 	.input(
 		z.object({
-			token: z.string().min(1).optional(),
-			sessionToken: z.string().min(1).optional(),
+			token: z.string().trim().min(1).max(200).optional(),
+			sessionToken: z.string().trim().min(1).max(200).optional(),
 		}).refine((d) => d.token || d.sessionToken, {
 			message: "token or sessionToken is required",
 		}),

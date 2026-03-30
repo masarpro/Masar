@@ -12,8 +12,8 @@ export const unsubscribeDigest = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

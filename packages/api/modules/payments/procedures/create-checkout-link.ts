@@ -23,9 +23,9 @@ export const createCheckoutLink = protectedProcedure
 	.input(
 		z.object({
 			type: z.enum(["one-time", "subscription"]),
-			productId: z.string(),
-			redirectUrl: z.string().optional(),
-			organizationId: z.string().nullish(),
+			productId: z.string().trim().max(200),
+			redirectUrl: z.string().trim().max(2048).optional(),
+			organizationId: z.string().trim().max(100).nullish(),
 		}),
 	)
 	.handler(

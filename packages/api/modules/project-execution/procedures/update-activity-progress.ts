@@ -13,9 +13,9 @@ export const updateActivityProgressProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			activityId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			activityId: z.string().trim().max(100),
 			progress: z.number().min(0).max(100),
 			status: z.enum(["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "DELAYED", "ON_HOLD", "CANCELLED"]).optional(),
 		}),

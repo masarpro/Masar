@@ -28,15 +28,15 @@ export const list = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			limit: z.number().min(1).max(100).default(50),
 			offset: z.number().min(0).default(0),
 			section: boqSectionEnum.optional(),
 			sourceType: boqSourceTypeEnum.optional(),
-			phaseId: z.string().optional(),
+			phaseId: z.string().trim().max(100).optional(),
 			isPriced: z.boolean().optional(),
-			search: z.string().max(200).optional(),
+			search: z.string().trim().max(200).optional(),
 			sortBy: z
 				.enum(["sortOrder", "code", "section", "totalPrice", "createdAt"])
 				.default("sortOrder"),

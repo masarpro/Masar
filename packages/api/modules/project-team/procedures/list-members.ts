@@ -12,8 +12,8 @@ export const listMembers = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

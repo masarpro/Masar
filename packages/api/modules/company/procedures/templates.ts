@@ -13,6 +13,15 @@ import { z } from "zod";
 import { ORPCError } from "@orpc/server";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	idString,
+	trimmedString,
+	optionalTrimmed,
+	paginationLimit,
+	paginationOffset,
+	MAX_NAME,
+	MAX_DESC,
+} from "../../../lib/validation-constants";
 
 export const listFinanceTemplates = protectedProcedure
 	.route({
@@ -23,10 +32,10 @@ export const listFinanceTemplates = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			templateType: z.enum(["QUOTATION", "INVOICE", "LETTER"]).optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -53,8 +62,8 @@ export const getFinanceTemplate = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -81,7 +90,7 @@ export const getDefaultTemplate = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			templateType: z.enum(["QUOTATION", "INVOICE", "LETTER"]),
 		}),
 	)
@@ -108,12 +117,12 @@ export const createFinanceTemplateProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			name: z.string().min(1, "اسم القالب مطلوب"),
-			description: z.string().optional(),
+			organizationId: idString(),
+			name: trimmedString(MAX_NAME),
+			description: optionalTrimmed(MAX_DESC),
 			templateType: z.enum(["QUOTATION", "INVOICE", "LETTER"]),
-			content: z.record(z.string(), z.any()).optional(),
-			settings: z.record(z.string(), z.any()).optional(),
+			content: z.record(z.string().max(100), z.union([z.string().max(5000), z.number(), z.boolean(), z.null()])).optional(),
+			settings: z.record(z.string().max(100), z.union([z.string().max(5000), z.number(), z.boolean(), z.null()])).optional(),
 			isDefault: z.boolean().optional().default(false),
 		}),
 	)
@@ -146,12 +155,12 @@ export const updateFinanceTemplateProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			name: z.string().min(1).optional(),
-			description: z.string().optional(),
-			content: z.record(z.string(), z.any()).optional(),
-			settings: z.record(z.string(), z.any()).optional(),
+			organizationId: idString(),
+			id: idString(),
+			name: trimmedString(MAX_NAME).optional(),
+			description: optionalTrimmed(MAX_DESC),
+			content: z.record(z.string().max(100), z.union([z.string().max(5000), z.number(), z.boolean(), z.null()])).optional(),
+			settings: z.record(z.string().max(100), z.union([z.string().max(5000), z.number(), z.boolean(), z.null()])).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -182,8 +191,8 @@ export const setDefaultTemplateProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -209,8 +218,8 @@ export const deleteFinanceTemplateProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -233,7 +242,7 @@ export const seedDefaultTemplates = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

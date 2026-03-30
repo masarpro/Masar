@@ -16,6 +16,10 @@
 		{
 			"path": "/api/cron/update-overdue-invoices",
 			"schedule": "0 0 * * *"
+		},
+		{
+			"path": "/api/cron/cleanup-expired-tokens",
+			"schedule": "0 2 * * *"
 		}
 	]
 }

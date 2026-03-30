@@ -76,7 +76,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 
 	return (
 		<style
-			// biome-ignore lint/security/noDangerouslySetInnerHtml: _
+			// biome-ignore lint/security/noDangerouslySetInnerHtml: SECURITY: Safe — only hardcoded theme constants and color configs are interpolated, no user input
 			dangerouslySetInnerHTML={{
 				__html: Object.entries(THEMES)
 					.map(

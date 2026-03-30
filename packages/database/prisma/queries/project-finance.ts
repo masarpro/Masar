@@ -1,8 +1,9 @@
 import { db } from "../client";
-import type {
-	ClaimStatus,
-	ExpenseCategory,
-	OrgExpenseCategory,
+import {
+	Prisma,
+	type ClaimStatus,
+	type ExpenseCategory,
+	type OrgExpenseCategory,
 } from "../generated/client";
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -172,7 +173,7 @@ export async function getProjectExpenses(
 	};
 
 	// Build FinanceExpense where clause
-	const expenseWhere: Record<string, unknown> = {
+	const expenseWhere: Prisma.FinanceExpenseWhereInput = {
 		organizationId,
 		projectId,
 	};
@@ -193,7 +194,7 @@ export async function getProjectExpenses(
 	}
 
 	// Build SubcontractPayment where clause
-	const subWhere: Record<string, unknown> = {
+	const subWhere: Prisma.SubcontractPaymentWhereInput = {
 		organizationId,
 		contract: { projectId },
 	};
@@ -217,7 +218,7 @@ export async function getProjectExpenses(
 			: (async () => {
 					const [expenses, total] = await Promise.all([
 						db.financeExpense.findMany({
-							where: expenseWhere as any,
+							where: expenseWhere,
 							include: {
 								sourceAccount: {
 									select: { id: true, name: true },
@@ -228,7 +229,7 @@ export async function getProjectExpenses(
 							take: 200,
 							skip: 0,
 						}),
-						db.financeExpense.count({ where: expenseWhere as any }),
+						db.financeExpense.count({ where: expenseWhere }),
 					]);
 					return { expenses, total };
 				})(),
@@ -237,7 +238,7 @@ export async function getProjectExpenses(
 			: (async () => {
 					const [payments, total] = await Promise.all([
 						db.subcontractPayment.findMany({
-							where: subWhere as any,
+							where: subWhere,
 							include: {
 								contract: {
 									select: { id: true, name: true, contractNo: true },
@@ -251,7 +252,7 @@ export async function getProjectExpenses(
 							take: 200,
 							skip: 0,
 						}),
-						db.subcontractPayment.count({ where: subWhere as any }),
+						db.subcontractPayment.count({ where: subWhere }),
 					]);
 					return { payments, total };
 				})(),

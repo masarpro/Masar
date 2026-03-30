@@ -3622,6 +3622,7 @@ enum OrgAuditAction {
   JOURNAL_ENTRY_FAILED      // فشل إنشاء قيد تلقائي
 
   // ── المشاريع (Projects) ──
+  PROJECT_CREATED           // إنشاء مشروع
   PROJECT_ARCHIVED          // أرشفة مشروع
   PROJECT_RESTORED          // استعادة مشروع من الأرشيف
 

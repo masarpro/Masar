@@ -13,9 +13,9 @@ export const deleteFile = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			leadId: z.string(),
-			fileId: z.string(),
+			organizationId: z.string().trim().max(100),
+			leadId: z.string().trim().max(100),
+			fileId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

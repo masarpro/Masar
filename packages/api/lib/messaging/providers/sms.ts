@@ -47,8 +47,8 @@ export class SMSProvider implements MessagingProvider {
 			};
 		}
 
-		console.log(`[SMS STUB] Sending to ${params.to}:`);
-		console.log(`  Message: ${params.text}`);
+		console.debug(`[SMS STUB] Sending to ${params.to}:`);
+		console.debug(`  Message: ${params.text}`);
 
 		// Simulate success for now
 		return {

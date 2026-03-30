@@ -13,8 +13,8 @@ export const markReadProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			notificationIds: z.array(z.string()).optional(),
+			organizationId: z.string().trim().max(100),
+			notificationIds: z.array(z.string().trim().max(100)).max(1000).optional(),
 			markAll: z.boolean().optional().default(false),
 		}),
 	)

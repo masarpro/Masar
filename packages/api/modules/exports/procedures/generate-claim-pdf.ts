@@ -15,9 +15,9 @@ export const generateClaimPDFProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			claimId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			claimId: z.string().trim().max(100),
 			language: z.enum(["ar", "en"]).optional().default("ar"),
 		}),
 	)

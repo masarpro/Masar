@@ -12,9 +12,9 @@ export const getPhaseBreakdown = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			studyId: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

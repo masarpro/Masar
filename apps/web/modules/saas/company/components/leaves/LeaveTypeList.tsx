@@ -155,7 +155,7 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 	const types = (leaveTypes as Array<{ id: string; name: string; nameEn: string | null; daysPerYear: number; isPaid: boolean; requiresApproval: boolean; color: string | null }>) ?? [];
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Header */}
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex items-center gap-3">
@@ -185,12 +185,12 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 				<Table className="table-fixed w-full">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.types.name")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.types.nameEn")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.types.daysPerYear")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.types.isPaid")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.types.requiresApproval")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.common.actions")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.types.name")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.types.nameEn")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.types.daysPerYear")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.types.isPaid")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.types.requiresApproval")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.common.actions")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -211,7 +211,7 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 									className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
 									style={{ animationDelay: `${index * 30}ms` }}
 								>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<div className="flex items-center gap-2">
 											{lt.color && (
 												<div className="w-3 h-3 rounded-full" style={{ backgroundColor: lt.color }} />
@@ -219,23 +219,23 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 											<span className="font-medium text-slate-900 dark:text-slate-100">{lt.name}</span>
 										</div>
 									</TableCell>
-									<TableCell className="text-right text-sm text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-sm text-slate-600 dark:text-slate-300">
 										{lt.nameEn || "-"}
 									</TableCell>
-									<TableCell className="text-right text-sm font-semibold text-slate-700 dark:text-slate-300">
+									<TableCell className="text-end text-sm font-semibold text-slate-700 dark:text-slate-300">
 										{lt.daysPerYear}
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<Badge className={`border-0 text-[10px] px-2 py-0.5 ${lt.isPaid ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400"}`}>
 											{lt.isPaid ? t("company.leaves.types.paid") : t("company.leaves.types.unpaid")}
 										</Badge>
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<Badge className={`border-0 text-[10px] px-2 py-0.5 ${lt.requiresApproval ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" : "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400"}`}>
 											{lt.requiresApproval ? t("company.leaves.types.yes") : t("company.leaves.types.no")}
 										</Badge>
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<div className="flex items-center gap-1 justify-end">
 											<Button
 												variant="ghost"
@@ -290,7 +290,7 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 
 			{/* Create/Edit Dialog */}
 			<Dialog open={showDialog} onOpenChange={setShowDialog}>
-				<DialogContent className="rounded-2xl" dir="rtl">
+				<DialogContent className="rounded-2xl">
 					<DialogHeader>
 						<DialogTitle>
 							{editingId ? t("company.leaves.types.edit") : t("company.leaves.types.create")}

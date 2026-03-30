@@ -10,12 +10,12 @@ import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedu
 // ═══════════════════════════════════════════════════════════════
 
 const elementSpecSchema = z.object({
-	concreteType: z.string().optional(),
-	steelGrade: z.string().optional(),
+	concreteType: z.string().trim().max(100).optional(),
+	steelGrade: z.string().trim().max(100).optional(),
 });
 
 const blockSpecSchema = z.object({
-	blockType: z.string(),
+	blockType: z.string().trim().max(100),
 	thickness: z.number().optional(),
 });
 
@@ -23,7 +23,7 @@ const heightPropertiesSchema = z.object({
 	heightInputMode: z.enum(["manual", "levels"]),
 	includeFinishInLevels: z.boolean(),
 	finishThickness: z.number().nonnegative(),
-	streetLevel: z.number(),
+	streetLevel: z.number().max(999999),
 	excavationDepth: z.number().nonnegative(),
 	plainConcreteThickness: z.number().nonnegative(),
 	foundationDepth: z.number().nonnegative(),
@@ -48,13 +48,13 @@ const derivedFloorHeightsSchema = z.object({
 
 const buildingConfigSchema = z.object({
 	floors: z.array(z.object({
-		id: z.string(),
-		type: z.string(),
-		label: z.string(),
-		icon: z.string(),
+		id: z.string().trim().max(100),
+		type: z.string().trim().max(100),
+		label: z.string().trim().max(200),
+		icon: z.string().trim().max(100),
 		height: z.number().nonnegative(),
 		slabArea: z.number().nonnegative(),
-		sortOrder: z.number(),
+		sortOrder: z.number().int().min(0).max(999999),
 		isRepeated: z.boolean(),
 		repeatCount: z.number().nonnegative(),
 		enabled: z.boolean(),
@@ -63,25 +63,25 @@ const buildingConfigSchema = z.object({
 	})),
 	isComplete: z.boolean(),
 	heightProperties: heightPropertiesSchema,
-	heightOverrides: z.record(z.string(), derivedFloorHeightsSchema).optional(),
+	heightOverrides: z.record(z.string().trim().max(100), derivedFloorHeightsSchema).optional(),
 });
 
 const structuralSpecsSchema = z.object({
 	// Per-element specs
-	elements: z.record(z.string(), elementSpecSchema).optional(),
+	elements: z.record(z.string().trim().max(100), elementSpecSchema).optional(),
 	// Steel brand (project-wide)
-	steelBrand: z.string().optional(),
+	steelBrand: z.string().trim().max(100).optional(),
 	hasIsolatedSteel: z.boolean().optional(),
 	// Block specs per wall category
-	blockSpecs: z.record(z.string(), blockSpecSchema).optional(),
+	blockSpecs: z.record(z.string().trim().max(100), blockSpecSchema).optional(),
 	// General specs
-	externalBlockType: z.string().optional(),
-	internalBlockType: z.string().optional(),
-	waterproofType: z.string().optional(),
-	thermalInsulationType: z.string().optional(),
+	externalBlockType: z.string().trim().max(100).optional(),
+	internalBlockType: z.string().trim().max(100).optional(),
+	waterproofType: z.string().trim().max(100).optional(),
+	thermalInsulationType: z.string().trim().max(100).optional(),
 	// Legacy fields (kept for backward compatibility)
-	concreteGrade: z.string().optional(),
-	steelGrade: z.string().optional(),
+	concreteGrade: z.string().trim().max(100).optional(),
+	steelGrade: z.string().trim().max(100).optional(),
 	// Building config (structural wizard)
 	buildingConfig: buildingConfigSchema.optional(),
 });
@@ -99,8 +99,8 @@ export const getStructuralSpecs = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -142,8 +142,8 @@ export const setStructuralSpecs = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 			specs: structuralSpecsSchema,
 		}),
 	)

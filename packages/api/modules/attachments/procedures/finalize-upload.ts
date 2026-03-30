@@ -28,15 +28,15 @@ export const finalizeUploadProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string().min(1),
-			projectId: z.string().optional(),
-			uploadId: z.string().min(1),
+			organizationId: z.string().trim().min(1).max(100),
+			projectId: z.string().trim().max(100).optional(),
+			uploadId: z.string().trim().min(1).max(200),
 			ownerType: AttachmentOwnerTypeEnum,
-			ownerId: z.string().min(1),
-			fileName: z.string().min(1).max(255),
-			fileSize: z.number().int().positive(),
-			mimeType: z.string().min(1),
-			storagePath: z.string().min(1),
+			ownerId: z.string().trim().min(1).max(100),
+			fileName: z.string().trim().min(1).max(255),
+			fileSize: z.number().int().positive().max(100 * 1024 * 1024),
+			mimeType: z.string().trim().min(1).max(200),
+			storagePath: z.string().trim().min(1).max(500),
 			// Optional: base64-encoded first 16 bytes for magic-byte validation
 			fileHeaderBase64: z.string().max(64).optional(),
 		}),

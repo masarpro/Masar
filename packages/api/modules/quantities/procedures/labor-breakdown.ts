@@ -13,37 +13,37 @@ const laborBreakdownSchema = z.object({
 	laborMode: z.enum(["per_sqm", "per_cbm_ton", "lump_sum", "salary"]).optional(),
 	// Per-SQM
 	floorRows: z.array(z.object({
-		id: z.string(),
-		label: z.string(),
-		area: z.string(),
-		pricePerSqm: z.string(),
+		id: z.string().trim().max(100),
+		label: z.string().trim().max(200),
+		area: z.string().trim().max(200),
+		pricePerSqm: z.string().trim().max(200),
 		isAuto: z.boolean().optional(),
-		floorKey: z.string().optional(),
+		floorKey: z.string().trim().max(100).optional(),
 	})).optional(),
 	extraRows: z.array(z.object({
-		id: z.string(),
-		label: z.string(),
-		quantity: z.string(),
-		unit: z.string(),
-		pricePerUnit: z.string(),
+		id: z.string().trim().max(100),
+		label: z.string().trim().max(200),
+		quantity: z.string().trim().max(200),
+		unit: z.string().trim().max(200),
+		pricePerUnit: z.string().trim().max(200),
 	})).optional(),
 	// Per-CBM+Ton
 	cbmRows: z.array(z.object({
-		id: z.string(),
-		label: z.string(),
-		quantity: z.string(),
-		unit: z.string(),
-		pricePerUnit: z.string(),
+		id: z.string().trim().max(100),
+		label: z.string().trim().max(200),
+		quantity: z.string().trim().max(200),
+		unit: z.string().trim().max(200),
+		pricePerUnit: z.string().trim().max(200),
 	})).optional(),
 	// Lump sum
 	lumpSumAmount: z.number().optional(),
 	// Salary
 	salaryWorkers: z.array(z.object({
-		id: z.string(),
-		craft: z.string(),
-		count: z.string(),
-		salary: z.string(),
-		months: z.string(),
+		id: z.string().trim().max(100),
+		craft: z.string().trim().max(200),
+		count: z.string().trim().max(200),
+		salary: z.string().trim().max(200),
+		months: z.string().trim().max(200),
 	})).optional(),
 	salaryInsurance: z.number().optional(),
 	salaryHousing: z.number().optional(),
@@ -52,7 +52,7 @@ const laborBreakdownSchema = z.object({
 	steelPrice: z.number().optional(),
 	storagePercent: z.number().optional(),
 	// Per-grade concrete prices: { "C15": 250, "C30": 350, "C35": 400 }
-	concretePrices: z.record(z.string(), z.number()).optional(),
+	concretePrices: z.record(z.string().trim().max(100), z.number().nonnegative().max(999999999.99)).optional(),
 	steelPriceD6: z.number().optional(),
 	steelPriceD8: z.number().optional(),
 	steelPriceMain: z.number().optional(),
@@ -71,8 +71,8 @@ export const getLaborBreakdown = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -114,8 +114,8 @@ export const setLaborBreakdown = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 			breakdown: laborBreakdownSchema,
 		}),
 	)

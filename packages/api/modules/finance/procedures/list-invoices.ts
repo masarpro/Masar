@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ORPCError } from "@orpc/server";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { idString, searchQuery, paginationLimit, paginationOffset } from "../../../lib/validation-constants";
 
 export const listInvoices = protectedProcedure
 	.route({
@@ -13,7 +14,7 @@ export const listInvoices = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			status: z
 				.enum([
 					"DRAFT",
@@ -27,12 +28,12 @@ export const listInvoices = protectedProcedure
 				])
 				.optional(),
 			invoiceType: z.enum(["STANDARD", "TAX", "SIMPLIFIED", "CREDIT_NOTE", "DEBIT_NOTE"]).optional(),
-			clientId: z.string().optional(),
-			projectId: z.string().optional(),
-			query: z.string().optional(),
+			clientId: z.string().trim().max(100).optional(),
+			projectId: z.string().trim().max(100).optional(),
+			query: searchQuery(),
 			overdue: z.boolean().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -80,8 +81,8 @@ export const getInvoice = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

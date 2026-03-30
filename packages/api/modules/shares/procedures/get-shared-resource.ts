@@ -2,6 +2,7 @@ import { ORPCError } from "@orpc/server";
 import { getShareLinkByToken, getSharedResourceData, db } from "@repo/database";
 import { z } from "zod";
 import { publicProcedure } from "../../../orpc/procedures";
+import { enforceRateLimit, createIpRateLimitKey, RATE_LIMITS } from "../../../lib/rate-limit";
 
 export const getSharedResourceProcedure = publicProcedure
 	.route({
@@ -12,10 +13,14 @@ export const getSharedResourceProcedure = publicProcedure
 	})
 	.input(
 		z.object({
-			token: z.string(),
+			token: z.string().trim().max(200),
 		}),
 	)
-	.handler(async ({ input }) => {
+	.handler(async ({ input, context }) => {
+		// IP-based rate limiting to prevent token brute-force
+		const ip = context.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+		await enforceRateLimit(createIpRateLimitKey(ip, "getSharedResource"), RATE_LIMITS.READ);
+
 		// Get and validate share link
 		const shareLink = await getShareLinkByToken(input.token);
 

@@ -112,7 +112,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 		`PAY-${run.year}-${String(run.month).padStart(2, "0")}`;
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Summary Cards - Glass Morphism */}
 			<div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
@@ -187,7 +187,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 					onClick={() => setShowCreateDialog(true)}
 					className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
 				>
-					<Plus className="ml-2 h-4 w-4" />
+					<Plus className="ms-2 h-4 w-4" />
 					{t("company.payroll.createRun")}
 				</Button>
 			</div>
@@ -197,12 +197,12 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 				<Table className="table-fixed w-full">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[20%]">{t("company.payroll.runNo")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[20%]">{t("company.payroll.month")} / {t("company.payroll.year")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[15%]">{t("company.payroll.employeeCount")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[20%]">{t("company.payroll.totalSalaries")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[15%]">{t("company.payroll.status")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[10%]">{t("company.common.actions")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[20%]">{t("company.payroll.runNo")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[20%]">{t("company.payroll.month")} / {t("company.payroll.year")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[15%]">{t("company.payroll.employeeCount")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[20%]">{t("company.payroll.totalSalaries")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[15%]">{t("company.payroll.status")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[10%]">{t("company.common.actions")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -224,24 +224,24 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 									style={{ animationDelay: `${index * 30}ms` }}
 									onClick={() => router.push(`/app/${organizationSlug}/company/payroll/${run.id}`)}
 								>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<p className="font-medium text-slate-900 dark:text-slate-100">
 											{getRunNo(run)}
 										</p>
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300">
 										{run.month} / {run.year}
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300">
 										{run.employeeCount ?? 0}
 									</TableCell>
-									<TableCell className="text-right font-semibold text-slate-700 dark:text-slate-300">
+									<TableCell className="text-end font-semibold text-slate-700 dark:text-slate-300">
 										<Currency amount={Number(run.totalNetSalary)} />
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										{getStatusBadge(run.status)}
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<Button
 											variant="ghost"
 											size="icon"
@@ -278,9 +278,9 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 			{/* Create Payroll Run Dialog */}
 			{showCreateDialog && (
 				<Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-					<DialogContent dir="rtl" className="sm:max-w-md p-0 gap-0 rounded-2xl overflow-hidden">
+					<DialogContent className="sm:max-w-md p-0 gap-0 rounded-2xl overflow-hidden">
 						<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
-							<DialogTitle className="text-base font-semibold text-right">
+							<DialogTitle className="text-base font-semibold text-end">
 								{t("company.payroll.createRun")}
 							</DialogTitle>
 						</DialogHeader>

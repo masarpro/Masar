@@ -26,10 +26,10 @@ const displayConfigSchema = z.object({
 	showVAT: z.boolean(),
 	showGrandTotal: z.boolean(),
 	showPricePerSqm: z.boolean(),
-	totalArea: z.number().optional(),
-	pricePerSqm: z.number().optional(),
+	totalArea: z.number().nonnegative().max(999999).optional(),
+	pricePerSqm: z.number().nonnegative().max(99999999.99).optional(),
 	lumpSumAmount: z.number().optional(),
-	lumpSumDescription: z.string().optional(),
+	lumpSumDescription: z.string().trim().max(100).optional(),
 });
 
 export const createStudyQuotation = subscriptionProcedure
@@ -41,24 +41,24 @@ export const createStudyQuotation = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 			format: z.enum(["DETAILED_BOQ", "PER_SQM", "LUMP_SUM", "CUSTOM"]),
 			displayConfig: displayConfigSchema,
 			clientData: z.object({
-				name: z.string().min(1),
-				company: z.string().optional(),
-				phone: z.string().optional(),
-				email: z.string().optional(),
-				taxNumber: z.string().optional(),
+				name: z.string().trim().min(1).max(200),
+				company: z.string().trim().max(100).optional(),
+				phone: z.string().trim().max(100).optional(),
+				email: z.string().trim().max(100).optional(),
+				taxNumber: z.string().trim().max(100).optional(),
 			}),
 			validDays: z.number().int().positive().default(30),
 			discountType: z.enum(["none", "percent", "amount"]).default("none"),
 			discountValue: z.number().optional(),
-			paymentTerms: z.string().optional(),
-			deliveryTerms: z.string().optional(),
-			warrantyTerms: z.string().optional(),
-			notes: z.string().optional(),
+			paymentTerms: z.string().trim().max(100).optional(),
+			deliveryTerms: z.string().trim().max(100).optional(),
+			warrantyTerms: z.string().trim().max(100).optional(),
+			notes: z.string().trim().max(2000).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

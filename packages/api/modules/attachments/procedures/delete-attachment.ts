@@ -19,8 +19,8 @@ export const deleteAttachmentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string().min(1),
-			attachmentId: z.string().min(1),
+			organizationId: z.string().trim().min(1).max(100),
+			attachmentId: z.string().trim().min(1).max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

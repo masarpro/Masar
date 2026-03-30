@@ -14,15 +14,15 @@ export const finishingItemBatchSpecUpdate = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			costStudyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			costStudyId: z.string().trim().max(100),
 			items: z.array(
 				z.object({
-					id: z.string(),
-					specData: z.any(),
-					qualityLevel: z.string().optional(),
-					brand: z.string().optional(),
-					specifications: z.string().optional(),
+					id: z.string().trim().max(100),
+					specData: z.record(z.string(), z.unknown()),
+					qualityLevel: z.string().trim().max(100).optional(),
+					brand: z.string().trim().max(100).optional(),
+					specifications: z.string().trim().max(100).optional(),
 				}),
 			),
 		}),

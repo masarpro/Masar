@@ -116,6 +116,15 @@ export async function getUserPermissions(
  * Fill in missing permission sections from defaults.
  * Only adds sections that don't exist in stored — never overrides existing values.
  * This handles schema evolution where new sections are added after role creation.
+ *
+ * Backward compatibility (lines 139-158): The `pricing` section was added after
+ * initial launch. Roles created before this section existed have no `pricing` key
+ * in their stored permissions JSON. When `pricing` is missing, we synthesize it
+ * from the legacy `quantities` and `finance` sections so existing roles continue
+ * to work without manual migration. This is SAFE because:
+ *   1. It only activates when `stored.pricing` is undefined (never overwrites).
+ *   2. The mapping is read-only and one-directional (legacy → pricing).
+ *   3. Can be removed once all orgs have been migrated or all roles re-saved.
  */
 function fillMissingSections(
 	stored: Partial<Permissions>,

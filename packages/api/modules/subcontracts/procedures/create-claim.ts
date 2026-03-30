@@ -3,6 +3,10 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_DESC, MAX_ID, MAX_FINANCIAL, MAX_QUANTITY, MAX_UNIT_PRICE, MAX_ARRAY,
+	idString, nullishTrimmed, coerceFinancialAmount, quantity, unitPrice,
+} from "../../../lib/validation-constants";
 
 export const createSubcontractClaimProcedure = subscriptionProcedure
 	.route({
@@ -13,25 +17,33 @@ export const createSubcontractClaimProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractId: z.string(),
-			title: z.string().min(1, "عنوان المستخلص مطلوب"),
+			organizationId: idString(),
+			projectId: idString(),
+			contractId: idString(),
+			title: z.string().trim().min(1, "عنوان المستخلص مطلوب").max(MAX_NAME),
 			periodStart: z.coerce.date(),
 			periodEnd: z.coerce.date(),
 			claimType: z
 				.enum(["INTERIM", "FINAL", "RETENTION"])
 				.default("INTERIM"),
-			notes: z.string().nullish(),
-			penaltyAmount: z.union([z.string(), z.number()]).optional().default(0),
-			otherDeductions: z.union([z.string(), z.number()]).optional().default(0),
-			otherDeductionsNote: z.string().nullish(),
+			notes: nullishTrimmed(MAX_DESC),
+			penaltyAmount: z.coerce.number().nonnegative().max(MAX_FINANCIAL).optional().default(0),
+			otherDeductions: z.coerce.number().nonnegative().max(MAX_FINANCIAL).optional().default(0),
+			otherDeductionsNote: nullishTrimmed(MAX_DESC),
 			items: z.array(
 				z.object({
-					contractItemId: z.string(),
-					thisQty: z.number().min(0),
+					contractItemId: idString(),
+					thisQty: quantity(),
 				}),
-			).min(1, "يجب إضافة بند واحد على الأقل"),
+			).max(MAX_ARRAY).default([]),
+			manualItems: z.array(
+				z.object({
+					description: z.string().trim().min(1).max(MAX_NAME),
+					unit: z.string().trim().max(MAX_ID).default("ls"),
+					qty: quantity(),
+					unitPrice: unitPrice(),
+				}),
+			).max(MAX_ARRAY).default([]),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -68,6 +80,7 @@ export const createSubcontractClaimProcedure = subscriptionProcedure
 				otherDeductions: Number(input.otherDeductions),
 				otherDeductionsNote: input.otherDeductionsNote,
 				items: input.items,
+				manualItems: input.manualItems,
 			});
 
 			logAuditEvent(input.organizationId, input.projectId, {

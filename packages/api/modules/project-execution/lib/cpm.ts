@@ -195,7 +195,7 @@ export function calculateCPM(
 		const ef = EF.get(nodeId) ?? 0;
 		const ls = LS.get(nodeId) ?? 0;
 		const lf = LF.get(nodeId) ?? 0;
-		const tf = ls - es;
+		const tf = Math.max(0, ls - es);
 
 		return {
 			id: nodeId,

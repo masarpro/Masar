@@ -1,7 +1,12 @@
 import { createSubcontractContract, logAuditEvent } from "@repo/database";
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_DESC, MAX_CODE, MAX_LONG_TEXT, MAX_ID, MAX_PHONE, MAX_EMAIL, MAX_URL,
+	idString, nullishTrimmed, positiveAmount, percentage,
+} from "../../../lib/validation-constants";
 
 export const createSubcontractProcedure = subscriptionProcedure
 	.route({
@@ -12,32 +17,32 @@ export const createSubcontractProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractNo: z.string().nullish(),
-			name: z.string().min(1, "اسم المقاول مطلوب"),
+			organizationId: idString(),
+			projectId: idString(),
+			contractNo: z.string().trim().max(MAX_CODE).nullish(),
+			name: z.string().trim().min(1, "اسم المقاول مطلوب").max(MAX_NAME),
 			contractorType: z.enum(["COMPANY", "INDIVIDUAL"]).optional(),
-			companyName: z.string().nullish(),
-			phone: z.string().nullish(),
-			email: z.string().email().nullish().or(z.literal("")),
-			taxNumber: z.string().nullish(),
-			crNumber: z.string().nullish(),
+			companyName: nullishTrimmed(MAX_NAME),
+			phone: nullishTrimmed(MAX_PHONE),
+			email: z.string().trim().max(MAX_EMAIL).email().nullish().or(z.literal("")),
+			taxNumber: nullishTrimmed(MAX_CODE),
+			crNumber: nullishTrimmed(MAX_CODE),
 			status: z
 				.enum(["DRAFT", "ACTIVE", "SUSPENDED", "COMPLETED", "TERMINATED"])
 				.optional(),
-			value: z.number().positive("قيمة العقد يجب أن تكون أكبر من صفر"),
+			value: positiveAmount(),
 			startDate: z.coerce.date().nullish(),
 			endDate: z.coerce.date().nullish(),
 			signedDate: z.coerce.date().nullish(),
-			scopeOfWork: z.string().nullish(),
-			notes: z.string().nullish(),
+			scopeOfWork: nullishTrimmed(MAX_LONG_TEXT),
+			notes: nullishTrimmed(MAX_DESC),
 			includesVat: z.boolean().optional(),
-			vatPercent: z.number().min(0).max(100).nullish(),
-			retentionPercent: z.number().min(0).max(100).nullish(),
+			vatPercent: percentage().nullish(),
+			retentionPercent: percentage().nullish(),
 			paymentMethod: z
 				.enum(["CASH", "BANK_TRANSFER", "CHEQUE", "CREDIT_CARD", "OTHER"])
 				.nullish(),
-			attachmentUrl: z.string().nullish(),
+			attachmentUrl: nullishTrimmed(MAX_URL),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -47,6 +52,13 @@ export const createSubcontractProcedure = subscriptionProcedure
 			context.user.id,
 			{ section: "finance", action: "payments" },
 		);
+
+		// Validate startDate <= endDate
+		if (input.startDate && input.endDate && input.startDate > input.endDate) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "تاريخ البداية يجب أن يكون قبل تاريخ النهاية",
+			});
+		}
 
 		const contract = await createSubcontractContract({
 			organizationId: input.organizationId,

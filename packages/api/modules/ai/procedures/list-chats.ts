@@ -16,7 +16,7 @@ export const listChats = protectedProcedure
 	.input(
 		z
 			.object({
-				organizationId: z.string().optional(),
+				organizationId: z.string().trim().max(100).optional(),
 			})
 			.optional(),
 	)

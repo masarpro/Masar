@@ -13,10 +13,10 @@ export const updateTemplateProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			name: z.string().min(1, "اسم القالب مطلوب").optional(),
-			description: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			id: z.string().trim().max(100),
+			name: z.string().trim().min(1, "اسم القالب مطلوب").max(200).optional(),
+			description: z.string().trim().max(2000).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

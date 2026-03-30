@@ -3,6 +3,7 @@ import { getProjectById } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { idString } from "../../../lib/validation-constants";
 
 export const getProject = protectedProcedure
 	.route({
@@ -13,8 +14,8 @@ export const getProject = protectedProcedure
 	})
 	.input(
 		z.object({
-			id: z.string(),
-			organizationId: z.string(),
+			id: idString(),
+			organizationId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

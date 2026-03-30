@@ -17,7 +17,7 @@ export const createLogoUploadUrl = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ context: { user }, input: { organizationId } }) => {

@@ -1,5 +1,5 @@
 import { db } from "../client";
-import type { RoleType } from "../generated/client";
+import { type RoleType, Prisma } from "../generated/client";
 import {
 	DEFAULT_ROLE_PERMISSIONS,
 	ROLE_NAMES_AR,
@@ -41,7 +41,7 @@ export async function createRole(data: {
 			nameEn: data.nameEn,
 			description: data.description,
 			type: data.type,
-			permissions: data.permissions as any,
+			permissions: data.permissions as unknown as Prisma.InputJsonValue,
 			organizationId: data.organizationId,
 			isSystem: data.isSystem ?? false,
 		},
@@ -85,7 +85,7 @@ export async function createDefaultRolesInTx(
 				nameEn: role.type.replace(/_/g, " ").toLowerCase(),
 				type: role.type,
 				isSystem: role.isSystem,
-				permissions: DEFAULT_ROLE_PERMISSIONS[role.type] as any,
+				permissions: DEFAULT_ROLE_PERMISSIONS[role.type] as unknown as Prisma.InputJsonValue,
 				organizationId,
 			},
 		});
@@ -110,7 +110,7 @@ export async function updateRole(
 		data: {
 			...data,
 			permissions: data.permissions
-				? (data.permissions as any)
+				? (data.permissions as unknown as Prisma.InputJsonValue)
 				: undefined,
 		},
 	});

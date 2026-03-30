@@ -13,9 +13,9 @@ export const removeTemplateItemProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			templateId: z.string(),
-			itemId: z.string(),
+			organizationId: z.string().trim().max(100),
+			templateId: z.string().trim().max(100),
+			itemId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

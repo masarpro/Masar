@@ -70,8 +70,8 @@ export const getStudyStages = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -146,8 +146,8 @@ export const approveStudyStage = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 			stage: stageTypeEnum,
 		}),
 	)
@@ -268,8 +268,8 @@ export const reopenStudyStage = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 			stage: stageTypeEnum,
 		}),
 	)
@@ -381,10 +381,10 @@ export const assignStudyStage = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 			stage: stageTypeEnum,
-			userId: z.string().nullable(),
+			userId: z.string().trim().max(100).nullable(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -429,8 +429,8 @@ export const getActiveStudyStage = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

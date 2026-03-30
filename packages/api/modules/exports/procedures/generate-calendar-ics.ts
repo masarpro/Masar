@@ -14,8 +14,8 @@ export const generateCalendarICSProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			includeMilestones: z.boolean().optional().default(true),
 			includeClaims: z.boolean().optional().default(true),
 			language: z.enum(["ar", "en"]).optional().default("ar"),

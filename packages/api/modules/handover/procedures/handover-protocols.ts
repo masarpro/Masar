@@ -10,6 +10,22 @@ import {
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { ORPCError } from "@orpc/server";
 import { Prisma } from "@repo/database/prisma/generated/client";
+import {
+	idString,
+	trimmedString,
+	optionalTrimmed,
+	nullishTrimmed,
+	searchQuery,
+	financialAmount,
+	quantity,
+	paginationLimit,
+	paginationOffset,
+	MAX_NAME,
+	MAX_DESC,
+	MAX_CODE,
+	MAX_LONG_TEXT,
+	MAX_ARRAY,
+} from "../../../lib/validation-constants";
 
 // ═══ Shared enums ═══
 const handoverTypeEnum = z.enum([
@@ -36,12 +52,21 @@ const qualityRatingEnum = z.enum([
 ]);
 
 const partySchema = z.object({
-	name: z.string().min(1),
-	role: z.string().min(1),
-	organization: z.string().optional(),
+	name: trimmedString(MAX_NAME),
+	role: trimmedString(MAX_NAME),
+	organization: optionalTrimmed(MAX_NAME),
 	signed: z.boolean().default(false),
-	signedAt: z.string().nullable().optional(),
+	signedAt: z.string().trim().max(MAX_CODE).nullable().optional(),
 });
+
+/** Runtime shape of a party stored as JSON in the protocol */
+type HandoverParty = {
+	name: string;
+	role: string;
+	organization?: string;
+	signed: boolean;
+	signedAt: string | null;
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 1. LIST HANDOVER PROTOCOLS
@@ -55,16 +80,16 @@ export const listHandoverProtocols = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string().optional(),
+			organizationId: idString(),
+			projectId: idString().optional(),
 			type: handoverTypeEnum.optional(),
 			status: handoverStatusEnum.optional(),
-			subcontractContractId: z.string().optional(),
+			subcontractContractId: idString().optional(),
 			dateFrom: z.coerce.date().optional(),
 			dateTo: z.coerce.date().optional(),
-			search: z.string().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			search: searchQuery(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -73,7 +98,7 @@ export const listHandoverProtocols = protectedProcedure
 			action: "view",
 		});
 
-		const where: any = { organizationId: input.organizationId };
+		const where: Prisma.HandoverProtocolWhereInput = { organizationId: input.organizationId };
 		if (input.projectId) where.projectId = input.projectId;
 		if (input.type) where.type = input.type;
 		if (input.status) where.status = input.status;
@@ -120,7 +145,7 @@ export const getHandoverProtocol = protectedProcedure
 		tags: ["Handover"],
 		summary: "Get a single handover protocol",
 	})
-	.input(z.object({ organizationId: z.string(), id: z.string() }))
+	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "projects",
@@ -156,18 +181,18 @@ export const createHandoverProtocol = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
 			type: handoverTypeEnum,
 			date: z.coerce.date(),
-			title: z.string().min(1).max(300),
-			subcontractContractId: z.string().optional(),
-			location: z.string().optional(),
-			description: z.string().optional(),
-			conditions: z.string().optional(),
-			parties: z.array(partySchema).default([]),
-			warrantyMonths: z.number().int().positive().optional().default(12),
-			retentionReleaseAmount: z.number().nonnegative().optional(),
+			title: trimmedString(MAX_NAME),
+			subcontractContractId: idString().optional(),
+			location: optionalTrimmed(MAX_NAME),
+			description: optionalTrimmed(MAX_DESC),
+			conditions: optionalTrimmed(MAX_LONG_TEXT),
+			parties: z.array(partySchema).max(MAX_ARRAY).default([]),
+			warrantyMonths: z.number().int().min(1).max(120).optional().default(12),
+			retentionReleaseAmount: financialAmount().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -227,7 +252,7 @@ export const createHandoverProtocol = subscriptionProcedure
 				title: input.title,
 				description: input.description,
 				conditions: input.conditions,
-				parties: parties as any,
+				parties: parties as unknown as Prisma.InputJsonValue,
 				warrantyMonths: input.type === "PRELIMINARY" ? (input.warrantyMonths ?? 12) : undefined,
 				warrantyStartDate,
 				warrantyEndDate,
@@ -261,18 +286,18 @@ export const updateHandoverProtocol = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			title: z.string().min(1).max(300).optional(),
+			organizationId: idString(),
+			id: idString(),
+			title: trimmedString(MAX_NAME).optional(),
 			date: z.coerce.date().optional(),
-			location: z.string().nullable().optional(),
-			description: z.string().nullable().optional(),
-			conditions: z.string().nullable().optional(),
-			parties: z.array(partySchema).optional(),
-			observations: z.any().optional(),
-			exceptions: z.any().optional(),
-			warrantyMonths: z.number().int().positive().optional(),
-			retentionReleaseAmount: z.number().nonnegative().optional(),
+			location: nullishTrimmed(MAX_NAME),
+			description: nullishTrimmed(MAX_DESC),
+			conditions: nullishTrimmed(MAX_LONG_TEXT),
+			parties: z.array(partySchema).max(MAX_ARRAY).optional(),
+			observations: z.array(z.object({ text: z.string().trim().max(2000), category: z.string().trim().max(100).optional() })).max(100).optional(),
+			exceptions: z.array(z.object({ text: z.string().trim().max(2000), category: z.string().trim().max(100).optional() })).max(100).optional(),
+			warrantyMonths: z.number().int().min(1).max(120).optional(),
+			retentionReleaseAmount: financialAmount().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -291,7 +316,7 @@ export const updateHandoverProtocol = subscriptionProcedure
 		}
 
 		const { organizationId, id, ...data } = input;
-		const updateData: any = { ...data };
+		const updateData: Prisma.HandoverProtocolUpdateInput = { ...data };
 
 		// Recalculate warranty if months or date changed for PRELIMINARY
 		if (existing.type === "PRELIMINARY" && (data.warrantyMonths || data.date)) {
@@ -304,7 +329,7 @@ export const updateHandoverProtocol = subscriptionProcedure
 		}
 
 		if (data.parties) {
-			updateData.parties = data.parties.map((p: any) => ({
+			updateData.parties = data.parties.map((p) => ({
 				...p,
 				signed: false,
 				signedAt: null,
@@ -337,7 +362,7 @@ export const deleteHandoverProtocol = subscriptionProcedure
 		tags: ["Handover"],
 		summary: "Delete a handover protocol (DRAFT only)",
 	})
-	.input(z.object({ organizationId: z.string(), id: z.string() }))
+	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "projects",
@@ -379,17 +404,17 @@ export const addHandoverItem = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			protocolId: z.string(),
-			description: z.string().min(1),
-			unit: z.string().optional(),
-			contractQty: z.number().optional(),
-			executedQty: z.number().optional(),
-			acceptedQty: z.number().optional(),
+			organizationId: idString(),
+			protocolId: idString(),
+			description: trimmedString(MAX_DESC),
+			unit: optionalTrimmed(MAX_CODE),
+			contractQty: quantity().optional(),
+			executedQty: quantity().optional(),
+			acceptedQty: quantity().optional(),
 			qualityRating: qualityRatingEnum.optional(),
-			remarks: z.string().optional(),
-			subcontractItemId: z.string().optional(),
-			boqItemId: z.string().optional(),
+			remarks: optionalTrimmed(MAX_DESC),
+			subcontractItemId: idString().optional(),
+			boqItemId: idString().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -454,16 +479,16 @@ export const updateHandoverItem = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			protocolId: z.string(),
-			itemId: z.string(),
-			description: z.string().min(1).optional(),
-			unit: z.string().nullable().optional(),
-			contractQty: z.number().nullable().optional(),
-			executedQty: z.number().nullable().optional(),
-			acceptedQty: z.number().nullable().optional(),
+			organizationId: idString(),
+			protocolId: idString(),
+			itemId: idString(),
+			description: trimmedString(MAX_DESC).optional(),
+			unit: z.string().trim().max(MAX_CODE).nullable().optional(),
+			contractQty: quantity().nullable().optional(),
+			executedQty: quantity().nullable().optional(),
+			acceptedQty: quantity().nullable().optional(),
 			qualityRating: qualityRatingEnum.nullable().optional(),
-			remarks: z.string().nullable().optional(),
+			remarks: nullishTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -510,7 +535,7 @@ export const deleteHandoverItem = subscriptionProcedure
 		tags: ["Handover"],
 		summary: "Delete a handover protocol item",
 	})
-	.input(z.object({ organizationId: z.string(), protocolId: z.string(), itemId: z.string() }))
+	.input(z.object({ organizationId: idString(), protocolId: idString(), itemId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "projects",
@@ -550,7 +575,7 @@ export const importItemsFromContract = subscriptionProcedure
 		tags: ["Handover"],
 		summary: "Import items from a subcontract",
 	})
-	.input(z.object({ organizationId: z.string(), protocolId: z.string() }))
+	.input(z.object({ organizationId: idString(), protocolId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "projects",
@@ -620,7 +645,7 @@ export const importItemsFromBOQ = subscriptionProcedure
 		tags: ["Handover"],
 		summary: "Import items from project BOQ",
 	})
-	.input(z.object({ organizationId: z.string(), protocolId: z.string() }))
+	.input(z.object({ organizationId: idString(), protocolId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "projects",
@@ -685,7 +710,7 @@ export const submitHandoverProtocol = subscriptionProcedure
 		tags: ["Handover"],
 		summary: "Submit protocol for signatures",
 	})
-	.input(z.object({ organizationId: z.string(), id: z.string() }))
+	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "projects",
@@ -705,7 +730,7 @@ export const submitHandoverProtocol = subscriptionProcedure
 		if (protocol._count.items === 0) {
 			throw new ORPCError("BAD_REQUEST", { message: "المحضر يجب أن يحتوي على بند واحد على الأقل" });
 		}
-		const parties = (protocol.parties as any[]) ?? [];
+		const parties = (protocol.parties as unknown as HandoverParty[] | null) ?? [];
 		if (parties.length === 0) {
 			throw new ORPCError("BAD_REQUEST", { message: "المحضر يجب أن يحتوي على طرف واحد على الأقل" });
 		}
@@ -739,9 +764,9 @@ export const signHandoverProtocol = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			partyIndex: z.number().int().nonnegative(),
+			organizationId: idString(),
+			id: idString(),
+			partyIndex: z.number().int().nonnegative().max(MAX_ARRAY),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -758,7 +783,7 @@ export const signHandoverProtocol = subscriptionProcedure
 			throw new ORPCError("BAD_REQUEST", { message: "المحضر ليس بحالة انتظار التوقيعات" });
 		}
 
-		const parties = (protocol.parties as any[]) ?? [];
+		const parties = (protocol.parties as unknown as HandoverParty[] | null) ?? [];
 		if (input.partyIndex >= parties.length) {
 			throw new ORPCError("BAD_REQUEST", { message: "فهرس الطرف غير صحيح" });
 		}
@@ -771,11 +796,11 @@ export const signHandoverProtocol = subscriptionProcedure
 		parties[input.partyIndex].signedAt = new Date().toISOString();
 
 		// Check if all parties signed
-		const allSigned = parties.every((p: any) => p.signed);
+		const allSigned = parties.every((p) => p.signed);
 		const newStatus = allSigned ? "COMPLETED" : "PARTIALLY_SIGNED";
 
-		const updateData: any = {
-			parties: parties as any,
+		const updateData: Prisma.HandoverProtocolUpdateInput = {
+			parties: parties as unknown as Prisma.InputJsonValue,
 			status: newStatus,
 		};
 
@@ -844,7 +869,7 @@ export const completeHandoverProtocol = subscriptionProcedure
 		tags: ["Handover"],
 		summary: "Complete a handover protocol manually",
 	})
-	.input(z.object({ organizationId: z.string(), id: z.string() }))
+	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "projects",
@@ -859,7 +884,7 @@ export const completeHandoverProtocol = subscriptionProcedure
 			throw new ORPCError("BAD_REQUEST", { message: "لا يمكن إكمال هذا المحضر" });
 		}
 
-		const updateData: any = {
+		const updateData: Prisma.HandoverProtocolUpdateInput = {
 			status: "COMPLETED",
 			completedAt: new Date(),
 		};
@@ -926,7 +951,7 @@ export const printHandoverProtocol = subscriptionProcedure
 		tags: ["Handover"],
 		summary: "Record a print event",
 	})
-	.input(z.object({ organizationId: z.string(), id: z.string() }))
+	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "projects",
@@ -957,8 +982,8 @@ export const getWarrantyStatus = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string().optional(),
+			organizationId: idString(),
+			projectId: idString().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

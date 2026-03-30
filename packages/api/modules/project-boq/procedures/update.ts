@@ -13,21 +13,21 @@ export const update = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			itemId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			itemId: z.string().trim().max(100),
 			section: z
 				.enum(["STRUCTURAL", "FINISHING", "MEP", "LABOR", "GENERAL"])
 				.optional(),
-			category: z.string().max(200).optional().nullable(),
-			code: z.string().max(50).optional().nullable(),
-			description: z.string().min(1).max(1000).optional(),
-			specifications: z.string().max(2000).optional().nullable(),
-			unit: z.string().min(1).max(50).optional(),
+			category: z.string().trim().max(200).optional().nullable(),
+			code: z.string().trim().max(50).optional().nullable(),
+			description: z.string().trim().min(1).max(1000).optional(),
+			specifications: z.string().trim().max(2000).optional().nullable(),
+			unit: z.string().trim().min(1).max(50).optional(),
 			quantity: z.number().min(0).optional(),
 			unitPrice: z.number().min(0).optional().nullable(),
-			projectPhaseId: z.string().optional().nullable(),
-			notes: z.string().max(1000).optional().nullable(),
+			projectPhaseId: z.string().trim().max(100).optional().nullable(),
+			notes: z.string().trim().max(1000).optional().nullable(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

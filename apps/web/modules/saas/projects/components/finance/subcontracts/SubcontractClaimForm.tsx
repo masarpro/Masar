@@ -31,7 +31,9 @@ import {
 	ArrowLeft,
 	ArrowRight,
 	Loader2,
+	Plus,
 	Save,
+	Trash2,
 } from "lucide-react";
 import { FormPageSkeleton } from "@saas/shared/components/skeletons";
 import { SubcontractTabs } from "./SubcontractTabs";
@@ -84,6 +86,33 @@ export function SubcontractClaimForm({
 	const [itemQtys, setItemQtys] = useState<Record<string, number>>({});
 	const [itemErrors, setItemErrors] = useState<Record<string, string>>({});
 
+	// Manual items (not linked to contract items)
+	interface ManualItem {
+		id: string;
+		description: string;
+		unit: string;
+		qty: number;
+		unitPrice: number;
+	}
+	const [manualItems, setManualItems] = useState<ManualItem[]>([]);
+
+	function addManualItem() {
+		setManualItems((prev) => [
+			...prev,
+			{ id: crypto.randomUUID(), description: "", unit: "ls", qty: 1, unitPrice: 0 },
+		]);
+	}
+
+	function updateManualItem(id: string, field: keyof ManualItem, value: string | number) {
+		setManualItems((prev) =>
+			prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
+		);
+	}
+
+	function removeManualItem(id: string) {
+		setManualItems((prev) => prev.filter((item) => item.id !== id));
+	}
+
 	// Penalty / deductions
 	const [penaltyAmount, setPenaltyAmount] = useState(0);
 	const [otherDeductions, setOtherDeductions] = useState(0);
@@ -118,16 +147,22 @@ export function SubcontractClaimForm({
 
 	// Compute financial summary in real-time
 	const financialSummary = useMemo(() => {
-		if (!items || !contract) return null;
+		if (!contract) return null;
 
 		const retentionPercent = Number(contract.retentionPercent ?? 10);
 		const vatPercent = Number(contract.vatPercent ?? 15);
 		const advancePercent = Number(contract.advancePaymentPercent ?? 0);
 
 		let grossAmount = 0;
-		for (const item of items) {
-			const qty = itemQtys[item.id] ?? 0;
-			grossAmount += qty * item.unitPrice;
+		if (items) {
+			for (const item of items) {
+				const qty = itemQtys[item.id] ?? 0;
+				grossAmount += qty * item.unitPrice;
+			}
+		}
+		// Add manual items
+		for (const mi of manualItems) {
+			grossAmount += (mi.qty || 0) * (mi.unitPrice || 0);
 		}
 
 		const retentionDeduction = grossAmount * (retentionPercent / 100);
@@ -150,7 +185,7 @@ export function SubcontractClaimForm({
 			vatAmount,
 			netAmount,
 		};
-	}, [items, contract, itemQtys, penaltyAmount, otherDeductions]);
+	}, [items, contract, itemQtys, manualItems, penaltyAmount, otherDeductions]);
 
 	function handleQtyChange(itemId: string, contractQty: number, prevCumQty: number, value: string) {
 		const qty = Number.parseFloat(value) || 0;
@@ -180,7 +215,9 @@ export function SubcontractClaimForm({
 	}
 
 	function hasAnyQty(): boolean {
-		return Object.values(itemQtys).some((q) => q > 0);
+		const hasContractItems = Object.values(itemQtys).some((q) => q > 0);
+		const hasManualItems = manualItems.some((mi) => mi.description.trim() && mi.qty > 0 && mi.unitPrice > 0);
+		return hasContractItems || hasManualItems;
 	}
 
 	function hasErrors(): boolean {
@@ -204,6 +241,15 @@ export function SubcontractClaimForm({
 				thisQty,
 			}));
 
+		const validManualItems = manualItems
+			.filter((mi) => mi.description.trim() && mi.qty > 0 && mi.unitPrice > 0)
+			.map((mi) => ({
+				description: mi.description.trim(),
+				unit: mi.unit,
+				qty: mi.qty,
+				unitPrice: mi.unitPrice,
+			}));
+
 		createMutation.mutate({
 			organizationId,
 			projectId,
@@ -217,6 +263,7 @@ export function SubcontractClaimForm({
 			otherDeductions,
 			otherDeductionsNote: otherDeductionsNote || undefined,
 			items: claimItems,
+			manualItems: validManualItems,
 		});
 	}
 
@@ -252,7 +299,7 @@ export function SubcontractClaimForm({
 					<span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs font-bold">
 						1
 					</span>
-					معلومات المستخلص
+					{t("steps.claimInfo")}
 				</div>
 				<div className="h-px flex-1 bg-border" />
 				<div
@@ -265,7 +312,7 @@ export function SubcontractClaimForm({
 					<span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs font-bold">
 						2
 					</span>
-					جدول البنود
+					{t("steps.itemsTable")}
 				</div>
 			</div>
 
@@ -336,7 +383,7 @@ export function SubcontractClaimForm({
 								onClick={() => setStep(2)}
 								disabled={!canProceedToStep2()}
 							>
-								التالي
+								{t("next")}
 								<ArrowLeft className="h-4 w-4 ms-2" />
 							</Button>
 						</div>
@@ -348,16 +395,17 @@ export function SubcontractClaimForm({
 			{step === 2 && (
 				<>
 					{itemsLoading ? <FormPageSkeleton /> : !items?.length ? (
-						<div className="rounded-xl border border-dashed p-12 text-center">
-							<p className="text-muted-foreground">
-								لا توجد بنود في هذا العقد. أضف بنود أولاً من صفحة البنود.
+						<div className="rounded-xl border border-dashed p-8 text-center">
+							<p className="text-muted-foreground text-sm">
+								{t("noContractItems")}
 							</p>
 							<Button
 								variant="outline"
-								className="mt-4"
+								size="sm"
+								className="mt-3"
 								onClick={() => router.push(`${basePath}/items`)}
 							>
-								الذهاب لصفحة البنود
+								{t("goToItems")}
 							</Button>
 						</div>
 					) : (
@@ -365,7 +413,7 @@ export function SubcontractClaimForm({
 							<Table>
 								<TableHeader>
 									<TableRow className="bg-muted/50">
-										<TableHead className="w-48">البند</TableHead>
+										<TableHead className="w-48">{t("itemColumn")}</TableHead>
 										<TableHead className="w-16 text-center">
 											{t("items.contractQty")}
 										</TableHead>
@@ -481,6 +529,86 @@ export function SubcontractClaimForm({
 						</div>
 					)}
 
+					{/* Manual Items Section */}
+					<div className="rounded-xl border p-4 space-y-3">
+						<div className="flex items-center justify-between">
+							<div>
+								<h3 className="text-sm font-semibold">{t("manualItems")}</h3>
+								<p className="text-xs text-muted-foreground">{t("manualItemsNote")}</p>
+							</div>
+							<Button variant="outline" size="sm" onClick={addManualItem}>
+								<Plus className="h-4 w-4 me-1" />
+								{t("addManualItem")}
+							</Button>
+						</div>
+						{manualItems.length > 0 && (
+							<div className="space-y-2">
+								{manualItems.map((mi) => (
+									<div key={mi.id} className="grid grid-cols-12 gap-2 items-end rounded-lg bg-muted/30 p-2">
+										<div className="col-span-4">
+											<Label className="text-xs">{t("manualItemDescription")}</Label>
+											<Input
+												value={mi.description}
+												onChange={(e) => updateManualItem(mi.id, "description", e.target.value)}
+												placeholder={t("manualItemDescription")}
+												className="h-8 text-sm"
+											/>
+										</div>
+										<div className="col-span-2">
+											<Label className="text-xs">{t("manualItemUnit")}</Label>
+											<Input
+												value={mi.unit}
+												onChange={(e) => updateManualItem(mi.id, "unit", e.target.value)}
+												className="h-8 text-sm"
+												dir="ltr"
+											/>
+										</div>
+										<div className="col-span-2">
+											<Label className="text-xs">{t("manualItemQty")}</Label>
+											<Input
+												type="number"
+												step="any"
+												min={0}
+												value={mi.qty || ""}
+												onChange={(e) => updateManualItem(mi.id, "qty", Number(e.target.value) || 0)}
+												className="h-8 text-sm"
+												dir="ltr"
+											/>
+										</div>
+										<div className="col-span-2">
+											<Label className="text-xs">{t("manualItemPrice")}</Label>
+											<Input
+												type="number"
+												step="0.01"
+												min={0}
+												value={mi.unitPrice || ""}
+												onChange={(e) => updateManualItem(mi.id, "unitPrice", Number(e.target.value) || 0)}
+												className="h-8 text-sm"
+												dir="ltr"
+											/>
+										</div>
+										<div className="col-span-1 text-center">
+											<Label className="text-xs">{t("manualItemAmount")}</Label>
+											<p className="text-sm font-medium tabular-nums h-8 leading-8" dir="ltr">
+												{formatNumber((mi.qty || 0) * (mi.unitPrice || 0))}
+											</p>
+										</div>
+										<div className="col-span-1 flex justify-center">
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-8 w-8 text-destructive"
+												onClick={() => removeManualItem(mi.id)}
+											>
+												<Trash2 className="h-3.5 w-3.5" />
+											</Button>
+										</div>
+									</div>
+								))}
+							</div>
+						)}
+					</div>
+
 					{/* Financial Summary */}
 					{financialSummary && financialSummary.grossAmount > 0 && (
 						<Card>
@@ -591,7 +719,7 @@ export function SubcontractClaimForm({
 					<div className="flex items-center justify-between">
 						<Button variant="outline" onClick={() => setStep(1)}>
 							<ArrowRight className="h-4 w-4 me-2" />
-							رجوع
+							{t("back")}
 						</Button>
 						<div className="flex gap-2">
 							<Button

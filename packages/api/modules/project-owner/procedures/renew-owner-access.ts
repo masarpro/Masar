@@ -13,9 +13,9 @@ export const renewOwnerAccessProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			accessId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			accessId: z.string().trim().max(100),
 			expiresInDays: z.number().int().min(1).max(90).optional().default(30),
 		}),
 	)

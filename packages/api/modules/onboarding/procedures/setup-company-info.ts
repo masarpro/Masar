@@ -12,15 +12,15 @@ export const setupCompanyInfo = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			name: z.string().min(2),
-			commercialRegister: z.string().optional(),
-			taxNumber: z.string().optional(),
-			contractorClass: z.string().optional(),
-			address: z.string().optional(),
-			city: z.string().optional(),
-			phone: z.string().optional(),
-			logo: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			name: z.string().trim().min(2).max(200),
+			commercialRegister: z.string().trim().max(50).optional(),
+			taxNumber: z.string().trim().max(50).optional(),
+			contractorClass: z.string().trim().max(50).optional(),
+			address: z.string().trim().max(500).optional(),
+			city: z.string().trim().max(200).optional(),
+			phone: z.string().trim().max(20).optional(),
+			logo: z.string().trim().max(2048).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

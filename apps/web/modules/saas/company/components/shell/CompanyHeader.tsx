@@ -35,7 +35,6 @@ export function CompanyHeader({ userName }: CompanyHeaderProps) {
 	return (
 		<div
 			className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50"
-			dir="rtl"
 		>
 			<div className="flex items-center gap-3">
 				<div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">

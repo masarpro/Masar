@@ -1,9 +1,18 @@
 import { z } from "zod";
+import {
+	idString,
+	searchQuery,
+	paginationLimit,
+	paginationOffset,
+	trimmedString,
+	optionalTrimmed,
+	MAX_QUANTITY,
+} from "../../lib/validation-constants";
 
 export const listOrganizationsInput = z.object({
-	query: z.string().optional(),
-	limit: z.number().min(1).max(100).default(10),
-	offset: z.number().min(0).default(0),
+	query: searchQuery(),
+	limit: paginationLimit(),
+	offset: paginationOffset(),
 	status: z
 		.enum(["ACTIVE", "TRIALING", "SUSPENDED", "CANCELLED", "PAST_DUE"])
 		.optional(),
@@ -15,46 +24,46 @@ export const listOrganizationsInput = z.object({
 });
 
 export const changePlanInput = z.object({
-	organizationId: z.string(),
+	organizationId: idString(),
 	plan: z.enum(["FREE", "PRO"]),
-	reason: z.string().optional(),
+	reason: optionalTrimmed(2000),
 });
 
 export const suspendOrgInput = z.object({
-	organizationId: z.string(),
-	reason: z.string().min(1),
+	organizationId: idString(),
+	reason: trimmedString(2000),
 });
 
 export const activateOrgInput = z.object({
-	organizationId: z.string(),
-	reason: z.string().optional(),
+	organizationId: idString(),
+	reason: optionalTrimmed(2000),
 });
 
 export const setFreeOverrideInput = z.object({
-	organizationId: z.string(),
+	organizationId: idString(),
 	isFreeOverride: z.boolean(),
-	reason: z.string().min(1),
+	reason: trimmedString(2000),
 });
 
 export const updateLimitsInput = z.object({
-	organizationId: z.string(),
-	maxUsers: z.number().min(1).optional(),
-	maxProjects: z.number().min(1).optional(),
-	maxStorage: z.number().min(1).optional(),
+	organizationId: idString(),
+	maxUsers: z.number().int().min(1).max(MAX_QUANTITY).optional(),
+	maxProjects: z.number().int().min(1).max(MAX_QUANTITY).optional(),
+	maxStorage: z.number().int().min(1).max(MAX_QUANTITY).optional(),
 });
 
 export const orgIdInput = z.object({
-	organizationId: z.string(),
+	organizationId: idString(),
 });
 
 export const trendInput = z.object({
-	months: z.number().min(1).max(24).default(6),
+	months: z.number().int().min(1).max(24).default(6),
 });
 
 export const listLogsInput = z.object({
-	limit: z.number().min(1).max(100).default(20),
-	offset: z.number().min(0).default(0),
-	adminId: z.string().optional(),
-	action: z.string().optional(),
-	targetOrgId: z.string().optional(),
+	limit: paginationLimit(),
+	offset: paginationOffset(),
+	adminId: z.string().trim().max(100).optional(),
+	action: z.string().trim().max(100).optional(),
+	targetOrgId: z.string().trim().max(100).optional(),
 });

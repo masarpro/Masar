@@ -3,6 +3,7 @@ import { getSubcontractById } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { idString } from "../../../lib/validation-constants";
 
 export const getSubcontract = protectedProcedure
 	.route({
@@ -13,9 +14,9 @@ export const getSubcontract = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
+			contractId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

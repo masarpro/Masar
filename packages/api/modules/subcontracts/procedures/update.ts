@@ -1,7 +1,12 @@
-import { updateSubcontractContract, logAuditEvent } from "@repo/database";
+import { updateSubcontractContract, logAuditEvent, db } from "@repo/database";
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_DESC, MAX_CODE, MAX_LONG_TEXT, MAX_ID, MAX_PHONE, MAX_EMAIL, MAX_URL,
+	idString, nullishTrimmed, positiveAmount, percentage,
+} from "../../../lib/validation-constants";
 
 export const updateSubcontractProcedure = subscriptionProcedure
 	.route({
@@ -12,33 +17,33 @@ export const updateSubcontractProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractId: z.string(),
-			contractNo: z.string().nullish(),
-			name: z.string().min(1).optional(),
+			organizationId: idString(),
+			projectId: idString(),
+			contractId: idString(),
+			contractNo: z.string().trim().max(MAX_CODE).nullish(),
+			name: z.string().trim().min(1).max(MAX_NAME).optional(),
 			contractorType: z.enum(["COMPANY", "INDIVIDUAL"]).optional(),
-			companyName: z.string().nullish(),
-			phone: z.string().nullish(),
-			email: z.string().email().nullish().or(z.literal("")),
-			taxNumber: z.string().nullish(),
-			crNumber: z.string().nullish(),
+			companyName: nullishTrimmed(MAX_NAME),
+			phone: nullishTrimmed(MAX_PHONE),
+			email: z.string().trim().max(MAX_EMAIL).email().nullish().or(z.literal("")),
+			taxNumber: nullishTrimmed(MAX_CODE),
+			crNumber: nullishTrimmed(MAX_CODE),
 			status: z
 				.enum(["DRAFT", "ACTIVE", "SUSPENDED", "COMPLETED", "TERMINATED"])
 				.optional(),
-			value: z.number().positive().optional(),
+			value: positiveAmount().optional(),
 			startDate: z.coerce.date().nullish(),
 			endDate: z.coerce.date().nullish(),
 			signedDate: z.coerce.date().nullish(),
-			scopeOfWork: z.string().nullish(),
-			notes: z.string().nullish(),
+			scopeOfWork: nullishTrimmed(MAX_LONG_TEXT),
+			notes: nullishTrimmed(MAX_DESC),
 			includesVat: z.boolean().optional(),
-			vatPercent: z.number().min(0).max(100).nullish(),
-			retentionPercent: z.number().min(0).max(100).nullish(),
+			vatPercent: percentage().nullish(),
+			retentionPercent: percentage().nullish(),
 			paymentMethod: z
 				.enum(["CASH", "BANK_TRANSFER", "CHEQUE", "CREDIT_CARD", "OTHER"])
 				.nullish(),
-			attachmentUrl: z.string().nullish(),
+			attachmentUrl: nullishTrimmed(MAX_URL),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -48,6 +53,27 @@ export const updateSubcontractProcedure = subscriptionProcedure
 			context.user.id,
 			{ section: "finance", action: "payments" },
 		);
+
+		// Validate startDate <= endDate
+		if (input.startDate && input.endDate && input.startDate > input.endDate) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "تاريخ البداية يجب أن يكون قبل تاريخ النهاية",
+			});
+		} else if (input.startDate || input.endDate) {
+			const existing = await db.subcontractContract.findFirst({
+				where: { id: input.contractId, organizationId: input.organizationId, projectId: input.projectId },
+				select: { startDate: true, endDate: true },
+			});
+			if (existing) {
+				const startDate = input.startDate ?? existing.startDate;
+				const endDate = input.endDate ?? existing.endDate;
+				if (startDate && endDate && startDate > endDate) {
+					throw new ORPCError("BAD_REQUEST", {
+						message: "تاريخ البداية يجب أن يكون قبل تاريخ النهاية",
+					});
+				}
+			}
+		}
 
 		const { organizationId, projectId, contractId, ...data } = input;
 

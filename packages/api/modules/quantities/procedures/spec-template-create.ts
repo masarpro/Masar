@@ -12,11 +12,11 @@ export const specTemplateCreate = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			name: z.string(),
-			nameEn: z.string().optional(),
-			description: z.string().optional(),
-			specs: z.any(),
+			organizationId: z.string().trim().max(100),
+			name: z.string().trim().max(200),
+			nameEn: z.string().trim().max(100).optional(),
+			description: z.string().trim().max(2000).optional(),
+			specs: z.record(z.string(), z.unknown()),
 		}),
 	)
 	.handler(async ({ input, context }) => {

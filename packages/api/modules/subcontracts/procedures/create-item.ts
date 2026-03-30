@@ -3,6 +3,10 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_CODE, MAX_ID,
+	idString, nullishTrimmed, quantity, unitPrice,
+} from "../../../lib/validation-constants";
 
 export const createSubcontractItemProcedure = subscriptionProcedure
 	.route({
@@ -13,17 +17,17 @@ export const createSubcontractItemProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractId: z.string(),
-			itemCode: z.string().nullish(),
-			description: z.string().min(1, "وصف البند مطلوب"),
-			descriptionEn: z.string().nullish(),
-			unit: z.string().min(1, "وحدة القياس مطلوبة"),
-			contractQty: z.number().positive("الكمية يجب أن تكون أكبر من صفر"),
-			unitPrice: z.number().positive("سعر الوحدة يجب أن يكون أكبر من صفر"),
-			sortOrder: z.number().optional(),
-			category: z.string().nullish(),
+			organizationId: idString(),
+			projectId: idString(),
+			contractId: idString(),
+			itemCode: z.string().trim().max(MAX_CODE).nullish(),
+			description: z.string().trim().min(1, "وصف البند مطلوب").max(MAX_NAME),
+			descriptionEn: nullishTrimmed(MAX_NAME),
+			unit: z.string().trim().min(1, "وحدة القياس مطلوبة").max(MAX_CODE),
+			contractQty: z.number().positive("الكمية يجب أن تكون أكبر من صفر").max(999_999),
+			unitPrice: z.number().positive("سعر الوحدة يجب أن يكون أكبر من صفر").max(99_999_999.99),
+			sortOrder: z.number().int().min(0).max(10_000).optional(),
+			category: nullishTrimmed(MAX_ID),
 			isLumpSum: z.boolean().default(false),
 		}),
 	)

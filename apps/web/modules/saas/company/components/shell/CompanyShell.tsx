@@ -16,7 +16,7 @@ export function CompanyShell({
 		<div className="flex min-h-0 flex-1 flex-col">
 			<div className="flex-1 px-4 pt-2 pb-6 sm:px-6">
 				{(pageTitle || headerActions) && (
-					<div className="mb-6 flex items-center justify-between" dir="rtl">
+					<div className="mb-6 flex items-center justify-between">
 						{pageTitle && (
 							<h1 className="text-xl font-bold">{pageTitle}</h1>
 						)}

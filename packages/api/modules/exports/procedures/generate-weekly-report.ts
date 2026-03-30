@@ -15,8 +15,8 @@ export const generateWeeklyReportProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			weekStart: z.string().datetime(),
 			weekEnd: z.string().datetime(),
 			language: z.enum(["ar", "en"]).optional().default("ar"),

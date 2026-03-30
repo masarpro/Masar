@@ -3,6 +3,7 @@ import { deleteProjectExpense } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { idString } from "../../../lib/validation-constants";
 
 export const deleteExpense = subscriptionProcedure
 	.route({
@@ -13,9 +14,9 @@ export const deleteExpense = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			expenseId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
+			expenseId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

@@ -12,8 +12,8 @@ export const createShareLinkProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			resourceType: z.enum([
 				"UPDATE_PDF",
 				"CLAIM_PDF",
@@ -22,8 +22,8 @@ export const createShareLinkProcedure = subscriptionProcedure
 				"ICS",
 				"WEEKLY_REPORT",
 			]),
-			resourceId: z.string().optional(),
-			expiresInDays: z.number().min(1).max(365).optional(),
+			resourceId: z.string().trim().max(100).optional(),
+			expiresInDays: z.number().int().min(1).max(365).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

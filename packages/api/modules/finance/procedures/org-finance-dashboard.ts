@@ -2,6 +2,7 @@ import { getOrgFinanceDashboard } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { idString } from "../../../lib/validation-constants";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // GET ORGANIZATION FINANCE DASHBOARD
@@ -15,7 +16,7 @@ export const getOrgFinanceDashboardProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			dateFrom: z.coerce.date().optional(),
 			dateTo: z.coerce.date().optional(),
 		}),

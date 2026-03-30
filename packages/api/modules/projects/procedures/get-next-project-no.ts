@@ -1,6 +1,7 @@
 import { db } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { idString } from "../../../lib/validation-constants";
 
 export const getNextProjectNoProcedure = protectedProcedure
 	.route({
@@ -11,7 +12,7 @@ export const getNextProjectNoProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 		}),
 	)
 	.handler(async ({ input }) => {

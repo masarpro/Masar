@@ -8,6 +8,7 @@ import {
 	getProjectAccountants,
 	getProjectManagers,
 } from "../../notifications/lib/notification-service";
+import { idString, positiveAmount, MAX_DESC } from "../../../lib/validation-constants";
 
 export const createClaim = subscriptionProcedure
 	.route({
@@ -18,13 +19,13 @@ export const createClaim = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
 			periodStart: z.coerce.date().optional(),
 			periodEnd: z.coerce.date().optional(),
-			amount: z.number().positive("المبلغ يجب أن يكون أكبر من صفر"),
+			amount: positiveAmount(),
 			dueDate: z.coerce.date().optional(),
-			note: z.string().optional(),
+			note: z.string().trim().max(MAX_DESC).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

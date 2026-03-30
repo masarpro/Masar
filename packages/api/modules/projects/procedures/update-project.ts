@@ -1,8 +1,16 @@
 import { ORPCError } from "@orpc/server";
-import { updateProject } from "@repo/database";
+import { updateProject, db } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import {
+	idString,
+	optionalTrimmed,
+	positiveAmount,
+	percentage,
+	MAX_NAME,
+	MAX_DESC,
+} from "../../../lib/validation-constants";
 
 export const updateProjectProcedure = subscriptionProcedure
 	.route({
@@ -13,10 +21,10 @@ export const updateProjectProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			name: z.string().min(1).optional(),
-			description: z.string().optional(),
+			organizationId: idString(),
+			id: idString(),
+			name: z.string().trim().min(1).max(MAX_NAME).optional(),
+			description: optionalTrimmed(MAX_DESC),
 			status: z.enum(["ACTIVE", "ON_HOLD", "COMPLETED", "ARCHIVED"]).optional(),
 			type: z
 				.enum([
@@ -27,11 +35,11 @@ export const updateProjectProcedure = subscriptionProcedure
 					"MIXED",
 				])
 				.optional(),
-			clientName: z.string().optional(),
-			clientId: z.string().nullable().optional(),
-			location: z.string().optional(),
-			contractValue: z.number().positive().optional(),
-			progress: z.number().min(0).max(100).optional(),
+			clientName: optionalTrimmed(MAX_NAME),
+			clientId: z.string().trim().max(100).nullable().optional(),
+			location: optionalTrimmed(MAX_DESC),
+			contractValue: positiveAmount().optional(),
+			progress: percentage().optional(),
 			startDate: z.coerce.date().nullable().optional(),
 			endDate: z.coerce.date().nullable().optional(),
 		}),
@@ -44,6 +52,27 @@ export const updateProjectProcedure = subscriptionProcedure
 			context.user.id,
 			{ section: "projects", action: "edit" },
 		);
+
+		// Validate startDate <= endDate
+		if (input.startDate && input.endDate && input.startDate > input.endDate) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "تاريخ البداية يجب أن يكون قبل تاريخ النهاية",
+			});
+		} else if (input.startDate || input.endDate) {
+			const existing = await db.project.findFirst({
+				where: { id: input.id, organizationId: input.organizationId },
+				select: { startDate: true, endDate: true },
+			});
+			if (existing) {
+				const startDate = input.startDate ?? existing.startDate;
+				const endDate = input.endDate ?? existing.endDate;
+				if (startDate && endDate && startDate > endDate) {
+					throw new ORPCError("BAD_REQUEST", {
+						message: "تاريخ البداية يجب أن يكون قبل تاريخ النهاية",
+					});
+				}
+			}
+		}
 
 		try {
 			const project = await updateProject(input.id, input.organizationId, {

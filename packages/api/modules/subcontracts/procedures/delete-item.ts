@@ -3,6 +3,7 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { idString } from "../../../lib/validation-constants";
 
 export const deleteSubcontractItemProcedure = subscriptionProcedure
 	.route({
@@ -13,10 +14,10 @@ export const deleteSubcontractItemProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractId: z.string(),
-			itemId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
+			contractId: idString(),
+			itemId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

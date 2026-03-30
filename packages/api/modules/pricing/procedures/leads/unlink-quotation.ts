@@ -13,8 +13,8 @@ export const unlinkQuotation = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			leadId: z.string(),
+			organizationId: z.string().trim().max(100),
+			leadId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

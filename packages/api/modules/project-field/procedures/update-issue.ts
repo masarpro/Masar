@@ -12,17 +12,17 @@ export const updateIssueProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			id: z.string(),
-			title: z.string().optional(),
-			description: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			id: z.string().trim().max(100),
+			title: z.string().trim().max(100).optional(),
+			description: z.string().trim().max(2000).optional(),
 			severity: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]).optional(),
 			status: z
 				.enum(["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"])
 				.optional(),
 			dueDate: z.coerce.date().nullable().optional(),
-			assigneeId: z.string().nullable().optional(),
+			assigneeId: z.string().trim().max(100).nullable().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

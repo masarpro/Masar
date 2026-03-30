@@ -21,8 +21,8 @@ export const addMessageToChat = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			chatId: z.string(),
-			messages: z.array(z.any() as z.ZodType<UIMessage>),
+			chatId: z.string().trim().max(100),
+			messages: z.array(z.any() as z.ZodType<UIMessage>).max(200),
 		}),
 	)
 	.handler(async ({ input, context }) => {

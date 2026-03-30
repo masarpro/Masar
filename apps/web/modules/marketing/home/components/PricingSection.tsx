@@ -66,8 +66,6 @@ export function PricingSection() {
 						<div
 							className="text-[44px] font-black mb-7"
 							style={{
-								fontFamily:
-									"'Space Grotesk', sans-serif",
 								color: "var(--lp-text)",
 							}}
 						>
@@ -127,7 +125,7 @@ export function PricingSection() {
 						</div>
 
 						<h3
-							className="text-[22px] font-bold mb-1.5"
+							className="text-[22px] font-bold mb-1.5 mt-4"
 							style={{ color: "var(--lp-text)" }}
 						>
 							{t("landingPricing.pro.name")}
@@ -138,13 +136,9 @@ export function PricingSection() {
 						>
 							{t("landingPricing.pro.description")}
 						</p>
-						<div className="mb-7 flex items-baseline gap-1 overflow-hidden">
+						<div className="mb-7 flex items-baseline gap-1">
 							<span
 								className="text-[clamp(28px,5vw,36px)] font-black shimmer-blue"
-								style={{
-									fontFamily:
-										"'Space Grotesk', sans-serif",
-								}}
 							>
 								{t("landingPricing.pro.price")}
 							</span>

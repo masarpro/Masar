@@ -13,13 +13,13 @@ export const addTemplateItemProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			templateId: z.string(),
+			organizationId: z.string().trim().max(100),
+			templateId: z.string().trim().max(100),
 			type: z.enum(["MILESTONE", "CHECKLIST"]),
-			title: z.string().min(1, "عنوان العنصر مطلوب"),
-			description: z.string().optional(),
-			sortOrder: z.number().optional(),
-			metadata: z.record(z.string(), z.any()).optional(),
+			title: z.string().trim().min(1, "عنوان العنصر مطلوب").max(200),
+			description: z.string().trim().max(2000).optional(),
+			sortOrder: z.number().int().min(0).max(999999).optional(),
+			metadata: z.record(z.string().max(100), z.union([z.string().max(1000), z.number(), z.boolean(), z.null()])).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

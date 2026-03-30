@@ -13,10 +13,10 @@ export const updateStatus = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			leadId: z.string(),
+			organizationId: z.string().trim().max(100),
+			leadId: z.string().trim().max(100),
 			status: z.enum(["NEW", "STUDYING", "QUOTED", "NEGOTIATING", "WON", "LOST"]),
-			lostReason: z.string().optional(),
+			lostReason: z.string().trim().max(2000).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

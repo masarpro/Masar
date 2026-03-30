@@ -1583,7 +1583,10 @@ export async function createCreditNote(data: {
 	}
 
 	// Bug #9 fix: validate credit note amount doesn't exceed original invoice remaining
-	const itemTotals = data.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+	const itemTotals = data.items.reduce(
+		(sum, item) => sum.add(D(item.quantity).times(D(item.unitPrice))),
+		ZERO,
+	);
 	const existingCreditNotes = await db.financeInvoice.aggregate({
 		where: {
 			relatedInvoiceId: data.originalInvoiceId,
@@ -1593,8 +1596,8 @@ export async function createCreditNote(data: {
 		_sum: { totalAmount: true },
 	});
 	// Credit note totalAmounts are negative, so abs() to get the credited total
-	const totalAlreadyCredited = Math.abs(Number(existingCreditNotes._sum.totalAmount ?? 0));
-	if (totalAlreadyCredited + itemTotals > Number(original.totalAmount)) {
+	const totalAlreadyCredited = D(existingCreditNotes._sum.totalAmount ?? 0).abs();
+	if (totalAlreadyCredited.add(itemTotals).greaterThan(D(original.totalAmount))) {
 		throw new Error("مبلغ الإشعار الدائن يتجاوز المبلغ المتبقي من الفاتورة الأصلية");
 	}
 

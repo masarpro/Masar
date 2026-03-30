@@ -269,8 +269,18 @@ export async function deleteSubcontractContract(
 ) {
 	const existing = await db.subcontractContract.findFirst({
 		where: { id, organizationId, projectId },
+		select: {
+			id: true,
+			_count: {
+				select: { payments: true, claims: true },
+			},
+		},
 	});
 	if (!existing) throw new Error("Subcontract not found");
+
+	if (existing._count.payments > 0 || existing._count.claims > 0) {
+		throw new Error("لا يمكن حذف عقد له مطالبات أو مدفوعات");
+	}
 
 	await db.subcontractContract.delete({ where: { id } });
 	return { success: true };

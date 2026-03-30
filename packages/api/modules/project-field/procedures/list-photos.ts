@@ -12,13 +12,13 @@ export const listPhotosProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			category: z
 				.enum(["PROGRESS", "ISSUE", "EQUIPMENT", "MATERIAL", "SAFETY", "OTHER"])
 				.optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			limit: z.number().int().min(1).max(500).optional().default(50),
+			offset: z.number().int().nonnegative().optional().default(0),
 		}),
 	)
 	.handler(async ({ input, context }) => {

@@ -13,9 +13,9 @@ export const createChecklistItemProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			activityId: z.string(),
-			title: z.string().min(1).max(500),
+			organizationId: z.string().trim().max(100),
+			activityId: z.string().trim().max(100),
+			title: z.string().trim().min(1).max(500),
 		}),
 	)
 	.handler(async ({ input, context }) => {

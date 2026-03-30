@@ -13,9 +13,9 @@ export const acceptInvitation = publicProcedure
 	})
 	.input(
 		z.object({
-			token: z.string(),
-			password: z.string().min(8),
-			name: z.string().min(1).optional(),
+			token: z.string().trim().max(200),
+			password: z.string().min(8).max(200),
+			name: z.string().trim().min(1).max(200).optional(),
 		}),
 	)
 	.handler(async ({ input }) => {

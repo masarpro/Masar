@@ -18,11 +18,11 @@ export const actOnApprovalProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			approvalId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			approvalId: z.string().trim().max(100),
 			decision: z.enum(["APPROVED", "REJECTED"]),
-			note: z.string().optional(),
+			note: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

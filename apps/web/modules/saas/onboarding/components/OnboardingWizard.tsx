@@ -65,6 +65,8 @@ export function OnboardingWizard({
 
 	const handleSkip = useCallback(
 		(stepId: string) => {
+			const step = WIZARD_STEPS.find((s) => s.id === stepId);
+			if (step?.required) return; // Don't allow skipping required steps
 			setSkippedSteps((prev) => [...prev, stepId]);
 			handleNext();
 		},

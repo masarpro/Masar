@@ -408,9 +408,13 @@
         "password": "Password"
       },
       "submit": "Sign in",
-      "subtitle": "Please enter your credentials to sign in.",
+      "subtitle": "Sign in to continue",
       "title": "Welcome back",
-      "sendMagicLink": "Send magic link"
+      "sendMagicLink": "Send magic link",
+      "emailLogin": "Sign in with email",
+      "emailLoginDescription": "We'll send you a login link to your email",
+      "orContinueWith": "Or continue with",
+      "backToPassword": "Sign in with password instead"
     },
     "resetPassword": {
       "backToSignin": "Back to signin",
@@ -430,12 +434,21 @@
         "signupFailed": "We are sorry, but we were unable to create your account. Please try again later.",
         "verifyEmail": "We have sent you a link to verify your email. Please check your inbox."
       },
-      "message": "We are happy that you want to join us. Please fill in the form below to create your account.",
+      "message": "Start managing your projects in minutes",
       "name": "Name",
       "password": "Password",
       "signIn": "Sign in",
       "submit": "Create account",
-      "title": "Create an account"
+      "title": "Create a new account",
+      "orContinueWith": "Or continue with"
+    },
+    "brand": {
+      "headline": "All-in-one Construction Management System",
+      "subheadline": "From quantity takeoff to project handover — in one system"
+    },
+    "footer": {
+      "privacyPolicy": "Privacy Policy",
+      "terms": "Terms & Conditions"
     },
     "verify": {
       "title": "Verify your account",
@@ -1694,13 +1707,13 @@
     "learn": {
       "title": "Learn About Masar",
       "pricing": "How to price your project",
-      "pricing.desc": "Step-by-step guide",
+      "pricingDesc": "Step-by-step guide",
       "invoices": "Invoice & collection management",
-      "invoices.desc": "Complete financial system",
+      "invoicesDesc": "Complete financial system",
       "ai": "Try the AI assistant",
-      "ai.desc": "6 smart tools",
+      "aiDesc": "6 smart tools",
       "support": "Contact us",
-      "support.desc": "Support team"
+      "supportDesc": "Support team"
     },
     "finance": {
       "title": "Finance",
@@ -9855,6 +9868,74 @@
     "directPayment": "Direct Payment (no claim)",
     "linkedToClaim": "Linked to Claim #{claimNo}",
     "selectClaim": "Select claim...",
-    "claimRemaining": "Remaining: {amount}"
+    "claimRemaining": "Remaining: {amount}",
+    "steps": {
+      "claimInfo": "Claim Info",
+      "itemsTable": "Items Table"
+    },
+    "next": "Next",
+    "back": "Back",
+    "noContractItems": "No items in this contract. Add items first from the items page.",
+    "goToItems": "Go to Items Page",
+    "itemColumn": "Item",
+    "manualItems": "Manual Items",
+    "addManualItem": "Add Manual Item",
+    "manualItemDescription": "Description",
+    "manualItemUnit": "Unit",
+    "manualItemQty": "Quantity",
+    "manualItemPrice": "Unit Price",
+    "manualItemAmount": "Amount",
+    "removeItem": "Remove",
+    "manualItemsNote": "Additional items not linked to contract items"
+  },
+  "subcontractItems": {
+    "title": "Contract Items",
+    "addItem": "Add Item",
+    "editItem": "Edit Item",
+    "noItems": "No items yet. Add contract items to create claims.",
+    "contractTotal": "Contract Total",
+    "itemCode": "Item Code",
+    "description": "Description",
+    "descriptionEn": "Description (English)",
+    "unit": "Unit",
+    "contractQty": "Contract Qty",
+    "unitPrice": "Unit Price",
+    "totalAmount": "Total Amount",
+    "claimedQty": "Claimed Qty",
+    "progress": "Progress",
+    "isLumpSum": "Lump Sum Item",
+    "category": "Category",
+    "selectCategory": "Select category...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "deleteItem": "Delete Item",
+    "deleteConfirm": "Are you sure you want to delete this item? Related data will also be deleted.",
+    "units": {
+      "m3": "m³ (Cubic Meter)",
+      "m2": "m² (Square Meter)",
+      "m": "m (Linear Meter)",
+      "ton": "Ton",
+      "piece": "Piece",
+      "ls": "Lump Sum",
+      "day": "Day"
+    },
+    "categories": {
+      "earthworks": "Earthworks",
+      "concrete": "Concrete",
+      "masonry": "Masonry",
+      "finishing": "Finishing",
+      "electrical": "Electrical",
+      "plumbing": "Plumbing",
+      "hvac": "HVAC",
+      "other": "Other"
+    },
+    "notifications": {
+      "created": "Item added successfully",
+      "createError": "Failed to add item",
+      "updated": "Item updated successfully",
+      "updateError": "Failed to update item",
+      "deleted": "Item deleted successfully",
+      "deleteError": "Failed to delete item"
+    }
   }
 }

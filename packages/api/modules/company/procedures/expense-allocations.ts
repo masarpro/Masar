@@ -6,6 +6,13 @@ import {
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import {
+	idString,
+	optionalTrimmed,
+	percentage,
+	MAX_DESC,
+	MAX_ARRAY,
+} from "../../../lib/validation-constants";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LIST EXPENSE ALLOCATIONS
@@ -19,8 +26,8 @@ export const listExpenseAllocations = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			expenseId: z.string(),
+			organizationId: idString(),
+			expenseId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -44,15 +51,15 @@ export const setExpenseAllocationsProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			expenseId: z.string(),
+			organizationId: idString(),
+			expenseId: idString(),
 			allocations: z.array(
 				z.object({
-					projectId: z.string(),
-					percentage: z.number().min(0).max(100),
-					notes: z.string().optional(),
+					projectId: idString(),
+					percentage: percentage(),
+					notes: optionalTrimmed(MAX_DESC),
 				}),
-			),
+			).max(MAX_ARRAY),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -76,8 +83,8 @@ export const getProjectAllocatedExpensesProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

@@ -11,6 +11,10 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_DESC, MAX_CODE, MAX_ARRAY,
+	idString, financialAmount, optionalTrimmed,
+} from "../../../lib/validation-constants";
 
 // ========== Seed (Activate Accounting) ==========
 
@@ -21,7 +25,7 @@ export const seedChartOfAccountsProcedure = subscriptionProcedure
 		tags: ["Accounting", "Chart of Accounts"],
 		summary: "Activate accounting by seeding default chart of accounts",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
@@ -44,7 +48,7 @@ export const listAccountsProcedure = protectedProcedure
 		tags: ["Accounting", "Chart of Accounts"],
 		summary: "List all accounts in chart of accounts",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
@@ -63,7 +67,7 @@ export const getAccountByIdProcedure = protectedProcedure
 		tags: ["Accounting", "Chart of Accounts"],
 		summary: "Get account details with balance",
 	})
-	.input(z.object({ organizationId: z.string(), id: z.string() }))
+	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
@@ -94,15 +98,15 @@ export const createAccountProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			code: z.string().min(1).max(20),
-			nameAr: z.string().min(1).max(200),
-			nameEn: z.string().min(1).max(200),
-			description: z.string().optional(),
+			organizationId: idString(),
+			code: z.string().trim().min(1).max(MAX_CODE),
+			nameAr: z.string().trim().min(1).max(MAX_NAME),
+			nameEn: z.string().trim().min(1).max(MAX_NAME),
+			description: optionalTrimmed(MAX_DESC),
 			type: z.enum(["ASSET", "LIABILITY", "EQUITY", "REVENUE", "EXPENSE"]),
 			normalBalance: z.enum(["DEBIT", "CREDIT"]),
-			level: z.number().min(1).max(5),
-			parentId: z.string().optional(),
+			level: z.number().int().min(1).max(5),
+			parentId: idString().optional(),
 			isPostable: z.boolean().optional().default(true),
 		}),
 	)
@@ -159,11 +163,11 @@ export const updateAccountProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			nameAr: z.string().min(1).max(200).optional(),
-			nameEn: z.string().min(1).max(200).optional(),
-			description: z.string().optional(),
+			organizationId: idString(),
+			id: idString(),
+			nameAr: z.string().trim().min(1).max(MAX_NAME).optional(),
+			nameEn: z.string().trim().min(1).max(MAX_NAME).optional(),
+			description: optionalTrimmed(MAX_DESC),
 			isActive: z.boolean().optional(),
 		}),
 	)
@@ -198,7 +202,7 @@ export const deactivateAccountProcedure = subscriptionProcedure
 		tags: ["Accounting", "Chart of Accounts"],
 		summary: "Deactivate account (no delete — may be linked to entries)",
 	})
-	.input(z.object({ organizationId: z.string(), id: z.string() }))
+	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
@@ -239,8 +243,8 @@ export const getAccountBalanceProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 			asOfDate: z.string().datetime().optional(),
 		}),
 	)
@@ -270,12 +274,12 @@ export const getAccountLedgerProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 			dateFrom: z.string().datetime().optional(),
 			dateTo: z.string().datetime().optional(),
-			page: z.number().min(1).optional().default(1),
-			pageSize: z.number().min(10).max(200).optional().default(50),
+			page: z.number().int().min(1).max(10000).optional().default(1),
+			pageSize: z.number().int().min(10).max(200).optional().default(50),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -301,7 +305,7 @@ export const getOpeningBalancesProcedure = protectedProcedure
 		tags: ["Accounting", "Opening Balances"],
 		summary: "Get opening balances for all postable accounts",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
@@ -322,17 +326,18 @@ export const saveOpeningBalancesProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			entryDate: z.string().datetime().optional(),
 			lines: z
 				.array(
 					z.object({
-						accountId: z.string(),
-						debit: z.number().nonnegative(),
-						credit: z.number().nonnegative(),
+						accountId: idString(),
+						debit: financialAmount(),
+						credit: financialAmount(),
 					}),
 				)
-				.min(1),
+				.min(1)
+				.max(MAX_ARRAY),
 		}),
 	)
 	.handler(async ({ input, context }) => {

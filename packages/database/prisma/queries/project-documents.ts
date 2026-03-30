@@ -223,46 +223,54 @@ export async function actOnApproval(
 		note?: string;
 	},
 ) {
-	// Update the approver's status
-	await db.projectApprovalApprover.updateMany({
-		where: {
+	await db.$transaction(async (tx) => {
+		// Lock the approval row to prevent concurrent decisions from racing
+		await tx.$queryRawUnsafe(
+			`SELECT id FROM "project_approvals" WHERE id = $1 FOR UPDATE`,
 			approvalId,
-			userId: data.actorId,
-		},
-		data: {
-			status: data.decision,
-			decidedAt: new Date(),
-			note: data.note,
-		},
-	});
+		);
 
-	// Get all approvers to check if approval should be finalized
-	const approvers = await db.projectApprovalApprover.findMany({
-		where: { approvalId },
-	});
-
-	// Determine overall approval status
-	let overallStatus: ApprovalStatus = "PENDING";
-	const hasRejection = approvers.some((a) => a.status === "REJECTED");
-	const allApproved = approvers.every((a) => a.status === "APPROVED");
-
-	if (hasRejection) {
-		overallStatus = "REJECTED";
-	} else if (allApproved) {
-		overallStatus = "APPROVED";
-	}
-
-	// Update approval if finalized
-	if (overallStatus !== "PENDING") {
-		await db.projectApproval.update({
-			where: { id: approvalId },
+		// Update the approver's status
+		await tx.projectApprovalApprover.updateMany({
+			where: {
+				approvalId,
+				userId: data.actorId,
+			},
 			data: {
-				status: overallStatus,
+				status: data.decision,
 				decidedAt: new Date(),
-				decisionNote: data.note,
+				note: data.note,
 			},
 		});
-	}
+
+		// Get all approvers to check if approval should be finalized
+		const approvers = await tx.projectApprovalApprover.findMany({
+			where: { approvalId },
+		});
+
+		// Determine overall approval status
+		let overallStatus: ApprovalStatus = "PENDING";
+		const hasRejection = approvers.some((a) => a.status === "REJECTED");
+		const allApproved = approvers.every((a) => a.status === "APPROVED");
+
+		if (hasRejection) {
+			overallStatus = "REJECTED";
+		} else if (allApproved) {
+			overallStatus = "APPROVED";
+		}
+
+		// Update approval if finalized
+		if (overallStatus !== "PENDING") {
+			await tx.projectApproval.update({
+				where: { id: approvalId },
+				data: {
+					status: overallStatus,
+					decidedAt: new Date(),
+					decisionNote: data.note,
+				},
+			});
+		}
+	});
 
 	return getApproval(organizationId, projectId, approvalId);
 }

@@ -111,7 +111,7 @@ const nextConfig: NextConfig = {
 		const supabaseStorage = "https://mbivfenbnvkquxajwbju.storage.supabase.co";
 		const appCsp = [
 			"default-src 'self'",
-			`script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+			`script-src 'self' 'unsafe-inline' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
 			"style-src 'self' 'unsafe-inline' https://unpkg.com",
 			`img-src 'self' https: data: blob: https://*.supabase.co ${supabaseStorage}`,
 			`connect-src 'self' blob: https://*.supabase.co ${supabaseStorage}`,
@@ -176,6 +176,10 @@ const nextConfig: NextConfig = {
 				source: "/owner/:path*",
 				headers: [
 					...securityHeaders,
+					{
+						key: "Referrer-Policy",
+						value: "no-referrer",
+					},
 					{
 						key: "Cache-Control",
 						value: "private, no-cache",

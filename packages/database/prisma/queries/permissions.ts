@@ -78,7 +78,7 @@ export async function updateUserCustomPermissions(
 	return db.user.update({
 		where: { id: userId },
 		data: {
-			customPermissions: permissions as any,
+			customPermissions: permissions as unknown as Prisma.InputJsonValue,
 		},
 	});
 }
@@ -180,10 +180,10 @@ function mergePermissions(
 
 	for (const section of Object.keys(override) as (keyof Permissions)[]) {
 		if (override[section]) {
-			merged[section] = {
-				...base[section],
-				...override[section],
-			} as any;
+			(merged as unknown as Record<string, Record<string, boolean>>)[section] = {
+				...(base[section] as unknown as Record<string, boolean>),
+				...(override[section] as unknown as Record<string, boolean>),
+			};
 		}
 	}
 

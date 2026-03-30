@@ -14,9 +14,9 @@ export const mepItemDelete = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			costStudyId: z.string(),
-			id: z.string(),
+			organizationId: z.string().trim().max(100),
+			costStudyId: z.string().trim().max(100),
+			id: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

@@ -15,9 +15,9 @@ export const generateUpdatePDFProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			updateId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			updateId: z.string().trim().max(100),
 			language: z.enum(["ar", "en"]).optional().default("ar"),
 		}),
 	)

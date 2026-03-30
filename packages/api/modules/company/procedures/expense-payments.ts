@@ -11,6 +11,16 @@ import {
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import {
+	idString,
+	optionalTrimmed,
+	nullishTrimmed,
+	positiveAmount,
+	paginationLimit,
+	paginationOffset,
+	MAX_CODE,
+	MAX_DESC,
+} from "../../../lib/validation-constants";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LIST EXPENSE PAYMENTS
@@ -24,11 +34,11 @@ export const listExpensePayments = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			expenseId: z.string(),
+			organizationId: idString(),
+			expenseId: idString(),
 			isPaid: z.boolean().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -56,17 +66,17 @@ export const createExpensePaymentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			expenseId: z.string(),
+			organizationId: idString(),
+			expenseId: idString(),
 			periodStart: z.coerce.date(),
 			periodEnd: z.coerce.date(),
-			amount: z.number().positive(),
+			amount: positiveAmount(),
 			dueDate: z.coerce.date(),
 			isPaid: z.boolean().optional(),
 			paidAt: z.coerce.date().optional(),
-			bankAccountId: z.string().optional(),
-			referenceNo: z.string().optional(),
-			notes: z.string().optional(),
+			bankAccountId: optionalTrimmed(MAX_CODE),
+			referenceNo: optionalTrimmed(MAX_CODE),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -91,11 +101,11 @@ export const markPaymentPaidProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 			paidAt: z.coerce.date().optional(),
-			bankAccountId: z.string(),
-			referenceNo: z.string().optional(),
+			bankAccountId: idString(),
+			referenceNo: optionalTrimmed(MAX_CODE),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -198,15 +208,15 @@ export const updateExpensePaymentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			amount: z.number().positive().optional(),
+			organizationId: idString(),
+			id: idString(),
+			amount: positiveAmount().optional(),
 			dueDate: z.coerce.date().optional(),
 			isPaid: z.boolean().optional(),
 			paidAt: z.coerce.date().nullable().optional(),
-			bankAccountId: z.string().nullable().optional(),
-			referenceNo: z.string().nullable().optional(),
-			notes: z.string().nullable().optional(),
+			bankAccountId: z.string().trim().max(MAX_CODE).nullable().optional(),
+			referenceNo: nullishTrimmed(MAX_CODE),
+			notes: nullishTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -290,8 +300,8 @@ export const deleteExpensePaymentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -353,9 +363,9 @@ export const generateMonthlyPaymentsProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			expenseId: z.string(),
-			monthsAhead: z.number().min(1).max(12).optional().default(3),
+			organizationId: idString(),
+			expenseId: idString(),
+			monthsAhead: z.number().int().min(1).max(12).optional().default(3),
 		}),
 	)
 	.handler(async ({ input, context }) => {

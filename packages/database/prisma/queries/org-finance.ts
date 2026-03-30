@@ -851,7 +851,7 @@ export async function getOrganizationSubcontractPayments(
 		offset?: number;
 	},
 ) {
-	const where: Record<string, unknown> = { organizationId };
+	const where: Prisma.SubcontractPaymentWhereInput = { organizationId };
 
 	if (options?.projectId) {
 		where.contract = { projectId: options.projectId };
@@ -882,7 +882,7 @@ export async function getOrganizationSubcontractPayments(
 
 	const [payments, total] = await Promise.all([
 		db.subcontractPayment.findMany({
-			where: where as any,
+			where,
 			include: {
 				contract: {
 					select: {
@@ -901,7 +901,7 @@ export async function getOrganizationSubcontractPayments(
 			take: options?.limit ?? 50,
 			skip: options?.offset ?? 0,
 		}),
-		db.subcontractPayment.count({ where: where as any }),
+		db.subcontractPayment.count({ where }),
 	]);
 
 	return { payments, total };

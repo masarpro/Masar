@@ -13,11 +13,11 @@ export const inviteTeamMembers = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: z.string().trim().max(100),
 			invitations: z
 				.array(
 					z.object({
-						email: z.string().email(),
+						email: z.string().trim().email().max(254),
 						role: z.enum(["admin", "member"]).default("member"),
 					}),
 				)

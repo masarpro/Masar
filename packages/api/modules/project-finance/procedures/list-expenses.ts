@@ -2,6 +2,7 @@ import { getProjectExpenses } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { idString, paginationLimit, paginationOffset } from "../../../lib/validation-constants";
 
 export const listExpenses = protectedProcedure
 	.route({
@@ -12,8 +13,8 @@ export const listExpenses = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
 			category: z
 				.enum([
 					"MATERIALS",
@@ -26,8 +27,8 @@ export const listExpenses = protectedProcedure
 				.optional(),
 			dateFrom: z.coerce.date().optional(),
 			dateTo: z.coerce.date().optional(),
-			limit: z.number().min(1).max(100).optional(),
-			offset: z.number().min(0).optional(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

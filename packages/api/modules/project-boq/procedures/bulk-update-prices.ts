@@ -13,12 +13,12 @@ export const bulkUpdatePrices = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			prices: z
 				.array(
 					z.object({
-						itemId: z.string(),
+						itemId: z.string().trim().max(100),
 						unitPrice: z.number().min(0),
 					}),
 				)

@@ -7,6 +7,11 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	MAX_DESC, MAX_ARRAY,
+	idString, optionalTrimmed,
+	signedAmount,
+} from "../../../lib/validation-constants";
 
 export const getBankLinesForReconciliationProcedure = protectedProcedure
 	.route({
@@ -17,10 +22,10 @@ export const getBankLinesForReconciliationProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			bankAccountId: z.string(),
-			dateFrom: z.string().datetime().optional(),
-			dateTo: z.string().datetime().optional(),
+			organizationId: idString(),
+			bankAccountId: idString(),
+			dateFrom: z.string().trim().datetime().optional(),
+			dateTo: z.string().trim().datetime().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -56,13 +61,13 @@ export const createReconciliationProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			bankAccountId: z.string(),
-			reconciliationDate: z.string().datetime(),
-			statementBalance: z.number(),
-			bookBalance: z.number(),
-			matchedLineIds: z.array(z.string()),
-			notes: z.string().optional(),
+			organizationId: idString(),
+			bankAccountId: idString(),
+			reconciliationDate: z.string().trim().datetime(),
+			statementBalance: signedAmount(),
+			bookBalance: signedAmount(),
+			matchedLineIds: z.array(z.string().trim().max(100)).max(MAX_ARRAY),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -91,8 +96,8 @@ export const listReconciliationsProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			bankAccountId: z.string(),
+			organizationId: idString(),
+			bankAccountId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

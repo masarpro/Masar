@@ -12,6 +12,14 @@ import {
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import {
+	idString,
+	optionalTrimmed,
+	financialAmount,
+	paginationLimit,
+	paginationOffset,
+	MAX_DESC,
+} from "../../../lib/validation-constants";
 
 const expenseRunStatusEnum = z.enum([
 	"DRAFT",
@@ -31,11 +39,11 @@ export const listExpenseRuns = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			status: expenseRunStatusEnum.optional(),
-			year: z.number().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			year: z.number().int().min(2020).max(2100).optional(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -64,8 +72,8 @@ export const getExpenseRunByIdProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -93,10 +101,10 @@ export const createExpenseRunProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			month: z.number().min(1).max(12),
-			year: z.number().min(2020).max(2100),
-			notes: z.string().optional(),
+			organizationId: idString(),
+			month: z.number().int().min(1).max(12),
+			year: z.number().int().min(2020).max(2100),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -133,8 +141,8 @@ export const populateExpenseRunProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -158,8 +166,8 @@ export const postExpenseRunProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -186,8 +194,8 @@ export const cancelExpenseRunProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -211,10 +219,10 @@ export const updateExpenseRunItemProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			itemId: z.string(),
-			amount: z.number().min(0).optional(),
-			notes: z.string().optional(),
+			organizationId: idString(),
+			itemId: idString(),
+			amount: financialAmount().optional(),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -241,8 +249,8 @@ export const deleteExpenseRunItemProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			itemId: z.string(),
+			organizationId: idString(),
+			itemId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -266,7 +274,7 @@ export const expenseRunSummaryProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

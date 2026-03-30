@@ -12,11 +12,11 @@ export const addProgressUpdateProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			progress: z.number().min(0).max(100),
-			phaseLabel: z.string().optional(),
-			note: z.string().optional(),
+			phaseLabel: z.string().trim().max(100).optional(),
+			note: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

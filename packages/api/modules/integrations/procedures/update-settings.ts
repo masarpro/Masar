@@ -14,7 +14,7 @@ export const updateSettings = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: z.string().trim().max(100),
 			emailEnabled: z.boolean().optional(),
 			whatsappEnabled: z.boolean().optional(),
 			smsEnabled: z.boolean().optional(),

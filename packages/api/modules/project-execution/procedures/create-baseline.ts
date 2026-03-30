@@ -12,10 +12,10 @@ export const createBaselineProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			name: z.string().min(1).max(200),
-			description: z.string().max(2000).optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			name: z.string().trim().min(1).max(200),
+			description: z.string().trim().max(2000).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

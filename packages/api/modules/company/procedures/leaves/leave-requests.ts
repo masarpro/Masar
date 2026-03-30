@@ -6,6 +6,15 @@ import {
 	protectedProcedure,
 	subscriptionProcedure,
 } from "../../../../orpc/procedures";
+import {
+	idString,
+	trimmedString,
+	optionalTrimmed,
+	paginationLimit,
+	paginationOffset,
+	MAX_DESC,
+	MAX_CODE,
+} from "../../../../lib/validation-constants";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LIST LEAVE REQUESTS
@@ -19,13 +28,13 @@ export const listLeaveRequestsProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			status: z.enum(["PENDING", "APPROVED", "REJECTED", "CANCELLED"]).optional(),
-			employeeId: z.string().optional(),
-			startDate: z.string().optional(),
-			endDate: z.string().optional(),
-			limit: z.number().int().min(1).max(100).optional().default(20),
-			offset: z.number().int().min(0).optional().default(0),
+			employeeId: idString().optional(),
+			startDate: z.string().trim().max(MAX_CODE).optional(),
+			endDate: z.string().trim().max(MAX_CODE).optional(),
+			limit: paginationLimit().default(20),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -77,12 +86,12 @@ export const createLeaveRequestProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			employeeId: z.string(),
-			leaveTypeId: z.string(),
-			startDate: z.string(),
-			endDate: z.string(),
-			reason: z.string().optional(),
+			organizationId: idString(),
+			employeeId: idString(),
+			leaveTypeId: idString(),
+			startDate: z.string().trim().max(MAX_CODE),
+			endDate: z.string().trim().max(MAX_CODE),
+			reason: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -185,8 +194,8 @@ export const approveLeaveRequestProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -264,9 +273,9 @@ export const rejectLeaveRequestProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			rejectionReason: z.string().min(1),
+			organizationId: idString(),
+			id: idString(),
+			rejectionReason: trimmedString(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -316,8 +325,8 @@ export const cancelLeaveRequestProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

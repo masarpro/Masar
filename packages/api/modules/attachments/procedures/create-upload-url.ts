@@ -4,7 +4,7 @@
  */
 
 import { ORPCError } from "@orpc/server";
-import { validateAttachment, validateFileName } from "@repo/database";
+import { validateAttachment, validateFileName, db } from "@repo/database";
 import { getSignedUploadUrl } from "@repo/storage";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -32,12 +32,12 @@ export const createUploadUrlProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string().min(1),
-			projectId: z.string().optional(),
+			organizationId: z.string().trim().min(1).max(100),
+			projectId: z.string().trim().max(100).optional(),
 			ownerType: AttachmentOwnerTypeEnum,
-			fileName: z.string().min(1).max(255),
+			fileName: z.string().trim().min(1).max(255),
 			fileSize: z.number().int().positive().max(100 * 1024 * 1024), // Max 100MB
-			mimeType: z.string().min(1),
+			mimeType: z.string().trim().min(1).max(200),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -49,6 +49,25 @@ export const createUploadUrlProcedure = subscriptionProcedure
 			user.id,
 			{ section: "projects", action: "edit" },
 		);
+
+		// Check organization storage limit
+		const org = await db.organization.findUnique({
+			where: { id: input.organizationId },
+			select: { maxStorage: true },
+		});
+		if (org && org.maxStorage > 0) {
+			const storageUsed = await db.attachment.aggregate({
+				where: { organizationId: input.organizationId },
+				_sum: { fileSize: true },
+			});
+			const usedBytes = Number(storageUsed._sum.fileSize ?? 0);
+			const limitBytes = org.maxStorage * 1024 * 1024 * 1024;
+			if (usedBytes + input.fileSize > limitBytes) {
+				throw new ORPCError("FORBIDDEN", {
+					message: "تم تجاوز حد التخزين المسموح",
+				});
+			}
+		}
 
 		// Rate limit check
 		await rateLimitChecker(user.id, "createUploadUrl", RATE_LIMITS.UPLOAD);

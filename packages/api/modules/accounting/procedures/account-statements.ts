@@ -10,6 +10,7 @@ import {
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { MAX_CODE, idString } from "../../../lib/validation-constants";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Account Ledger by Code
@@ -23,13 +24,13 @@ export const getAccountLedgerByCodeProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			accountCode: z.string(),
+			organizationId: idString(),
+			accountCode: z.string().trim().max(MAX_CODE),
 			dateFrom: z.string().datetime().optional(),
 			dateTo: z.string().datetime().optional(),
-			projectId: z.string().optional(),
-			page: z.number().min(1).optional().default(1),
-			pageSize: z.number().min(10).max(200).optional().default(100),
+			projectId: idString().optional(),
+			page: z.number().int().min(1).max(10000).optional().default(1),
+			pageSize: z.number().int().min(10).max(200).optional().default(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -59,8 +60,8 @@ export const getSubcontractStatementProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			contractId: z.string(),
+			organizationId: idString(),
+			contractId: idString(),
 			dateFrom: z.string().datetime(),
 			dateTo: z.string().datetime(),
 		}),
@@ -92,8 +93,8 @@ export const getProjectStatementProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
 			dateFrom: z.string().datetime().optional(),
 			dateTo: z.string().datetime().optional(),
 		}),

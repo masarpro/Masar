@@ -12,12 +12,17 @@ import { ORPCError } from "@orpc/server";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
+import {
+	MAX_NAME, MAX_DESC, MAX_CODE, MAX_PHONE, MAX_ADDRESS, MAX_ARRAY,
+	idString, optionalTrimmed,
+	percentage, quantity, unitPrice,
+} from "../../../lib/validation-constants";
 
 const quotationItemSchema = z.object({
-	description: z.string().min(1, "وصف البند مطلوب"),
-	quantity: z.number().positive("الكمية يجب أن تكون موجبة"),
-	unit: z.string().optional(),
-	unitPrice: z.number().min(0, "السعر يجب أن يكون صفر أو أكبر"),
+	description: z.string().trim().min(1, "وصف البند مطلوب").max(MAX_NAME),
+	quantity: quantity().positive("الكمية يجب أن تكون موجبة"),
+	unit: z.string().trim().max(50).optional(),
+	unitPrice: unitPrice().min(0, "السعر يجب أن يكون صفر أو أكبر"),
 });
 
 export const createQuotationProcedure = subscriptionProcedure
@@ -29,24 +34,24 @@ export const createQuotationProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			clientId: z.string().optional(),
-			clientName: z.string().min(1, "اسم العميل مطلوب"),
-			clientCompany: z.string().optional(),
-			clientPhone: z.string().optional(),
-			clientEmail: z.string().email().optional().or(z.literal("")),
-			clientAddress: z.string().optional(),
-			clientTaxNumber: z.string().optional(),
-			projectId: z.string().optional(),
-			validUntil: z.string().datetime(),
-			paymentTerms: z.string().optional(),
-			deliveryTerms: z.string().optional(),
-			warrantyTerms: z.string().optional(),
-			notes: z.string().optional(),
-			templateId: z.string().optional(),
-			vatPercent: z.number().min(0).max(100).optional().default(15),
-			discountPercent: z.number().min(0).max(100).optional().default(0),
-			items: z.array(quotationItemSchema).min(1, "يجب إضافة بند واحد على الأقل"),
+			organizationId: idString(),
+			clientId: z.string().trim().max(100).optional(),
+			clientName: z.string().trim().min(1, "اسم العميل مطلوب").max(MAX_NAME),
+			clientCompany: optionalTrimmed(MAX_NAME),
+			clientPhone: z.string().trim().max(MAX_PHONE).optional(),
+			clientEmail: z.string().trim().email().max(254).optional().or(z.literal("")),
+			clientAddress: optionalTrimmed(MAX_ADDRESS),
+			clientTaxNumber: z.string().trim().max(MAX_CODE).optional(),
+			projectId: z.string().trim().max(100).optional(),
+			validUntil: z.string().trim().datetime(),
+			paymentTerms: optionalTrimmed(MAX_DESC),
+			deliveryTerms: optionalTrimmed(MAX_DESC),
+			warrantyTerms: optionalTrimmed(MAX_DESC),
+			notes: optionalTrimmed(MAX_DESC),
+			templateId: z.string().trim().max(100).optional(),
+			vatPercent: percentage().optional().default(15),
+			discountPercent: percentage().optional().default(0),
+			items: z.array(quotationItemSchema).min(1, "يجب إضافة بند واحد على الأقل").max(MAX_ARRAY),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -112,24 +117,24 @@ export const updateQuotationProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			clientId: z.string().nullish(),
-			clientName: z.string().min(1).optional(),
-			clientCompany: z.string().optional(),
-			clientPhone: z.string().optional(),
-			clientEmail: z.string().email().optional().or(z.literal("")),
-			clientAddress: z.string().optional(),
-			clientTaxNumber: z.string().optional(),
-			projectId: z.string().nullish(),
-			validUntil: z.string().datetime().optional(),
-			paymentTerms: z.string().optional(),
-			deliveryTerms: z.string().optional(),
-			warrantyTerms: z.string().optional(),
-			notes: z.string().optional(),
-			templateId: z.string().nullish(),
-			vatPercent: z.number().min(0).max(100).optional(),
-			discountPercent: z.number().min(0).max(100).optional(),
+			organizationId: idString(),
+			id: idString(),
+			clientId: z.string().trim().max(100).nullish(),
+			clientName: z.string().trim().min(1).max(MAX_NAME).optional(),
+			clientCompany: optionalTrimmed(MAX_NAME),
+			clientPhone: z.string().trim().max(MAX_PHONE).optional(),
+			clientEmail: z.string().trim().email().max(254).optional().or(z.literal("")),
+			clientAddress: optionalTrimmed(MAX_ADDRESS),
+			clientTaxNumber: z.string().trim().max(MAX_CODE).optional(),
+			projectId: z.string().trim().max(100).nullish(),
+			validUntil: z.string().trim().datetime().optional(),
+			paymentTerms: optionalTrimmed(MAX_DESC),
+			deliveryTerms: optionalTrimmed(MAX_DESC),
+			warrantyTerms: optionalTrimmed(MAX_DESC),
+			notes: optionalTrimmed(MAX_DESC),
+			templateId: z.string().trim().max(100).nullish(),
+			vatPercent: percentage().optional(),
+			discountPercent: percentage().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -169,9 +174,9 @@ export const updateQuotationItemsProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			items: z.array(quotationItemSchema.extend({ id: z.string().optional() })),
+			organizationId: idString(),
+			id: idString(),
+			items: z.array(quotationItemSchema.extend({ id: z.string().trim().max(100).optional() })).max(MAX_ARRAY),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -221,8 +226,8 @@ export const updateQuotationStatusProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 			status: z.enum([
 				"DRAFT",
 				"SENT",
@@ -266,8 +271,8 @@ export const deleteQuotationProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -298,10 +303,10 @@ export const convertQuotationToInvoiceProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			issueDate: z.string().datetime().optional(),
-			dueDate: z.string().datetime().optional(),
+			organizationId: idString(),
+			id: idString(),
+			issueDate: z.string().trim().datetime().optional(),
+			dueDate: z.string().trim().datetime().optional(),
 			invoiceType: z.enum(["STANDARD", "TAX", "SIMPLIFIED"]).optional(),
 		}),
 	)

@@ -12,8 +12,8 @@ export const getLookaheadProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			weeks: z.number().int().min(1).max(12).default(2),
 		}),
 	)

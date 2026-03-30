@@ -25,9 +25,9 @@ export const submitChangeOrderProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			changeOrderId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			changeOrderId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -102,10 +102,10 @@ export const approveChangeOrderProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			changeOrderId: z.string(),
-			decisionNote: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			changeOrderId: z.string().trim().max(100),
+			decisionNote: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -186,10 +186,10 @@ export const rejectChangeOrderProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			changeOrderId: z.string(),
-			decisionNote: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			changeOrderId: z.string().trim().max(100),
+			decisionNote: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -270,9 +270,9 @@ export const markImplementedProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			changeOrderId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			changeOrderId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

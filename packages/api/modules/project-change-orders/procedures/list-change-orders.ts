@@ -12,12 +12,12 @@ export const listChangeOrdersProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			status: z
 				.enum(["DRAFT", "SUBMITTED", "APPROVED", "REJECTED", "IMPLEMENTED"])
 				.optional(),
-			search: z.string().optional(),
+			search: z.string().trim().max(100).optional(),
 			page: z.number().int().positive().optional(),
 			pageSize: z.number().int().positive().max(100).optional(),
 		}),
@@ -53,8 +53,8 @@ export const getChangeOrderStatsProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

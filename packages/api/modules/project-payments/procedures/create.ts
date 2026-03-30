@@ -12,18 +12,18 @@ export const createProjectPaymentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractTermId: z.string().nullish(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			contractTermId: z.string().trim().max(100).nullish(),
 			amount: z.number().positive("مبلغ الدفعة يجب أن يكون أكبر من صفر"),
 			date: z.coerce.date(),
 			paymentMethod: z
 				.enum(["CASH", "BANK_TRANSFER", "CHEQUE", "CREDIT_CARD", "OTHER"])
 				.default("BANK_TRANSFER"),
-			referenceNo: z.string().nullish(),
-			description: z.string().nullish(),
-			destinationAccountId: z.string().nullish(),
-			note: z.string().nullish(),
+			referenceNo: z.string().trim().max(100).nullish(),
+			description: z.string().trim().max(2000).nullish(),
+			destinationAccountId: z.string().trim().max(100).nullish(),
+			note: z.string().trim().max(100).nullish(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

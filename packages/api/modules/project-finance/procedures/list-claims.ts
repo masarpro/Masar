@@ -2,6 +2,7 @@ import { getProjectClaims } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { idString, paginationLimit, paginationOffset } from "../../../lib/validation-constants";
 
 export const listClaims = protectedProcedure
 	.route({
@@ -12,13 +13,13 @@ export const listClaims = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
 			status: z
 				.enum(["DRAFT", "SUBMITTED", "APPROVED", "PAID", "REJECTED"])
 				.optional(),
-			limit: z.number().min(1).max(100).optional(),
-			offset: z.number().min(0).optional(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

@@ -14,6 +14,14 @@ import {
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import {
+	idString,
+	optionalTrimmed,
+	financialAmount,
+	paginationLimit,
+	paginationOffset,
+	MAX_DESC,
+} from "../../../lib/validation-constants";
 
 const payrollRunStatusEnum = z.enum([
 	"DRAFT",
@@ -34,11 +42,11 @@ export const listPayrollRuns = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			status: payrollRunStatusEnum.optional(),
-			year: z.number().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			year: z.number().int().min(2020).max(2100).optional(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -67,8 +75,8 @@ export const getPayrollRun = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -96,10 +104,10 @@ export const createPayrollRunProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			month: z.number().min(1).max(12),
-			year: z.number().min(2020).max(2100),
-			notes: z.string().optional(),
+			organizationId: idString(),
+			month: z.number().int().min(1).max(12),
+			year: z.number().int().min(2020).max(2100),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -137,8 +145,8 @@ export const populatePayrollRunProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -162,9 +170,9 @@ export const approvePayrollRunProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			sourceAccountId: z.string().optional(),
+			organizationId: idString(),
+			id: idString(),
+			sourceAccountId: idString().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -242,8 +250,8 @@ export const cancelPayrollRunProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -290,14 +298,14 @@ export const updatePayrollRunItemProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			itemId: z.string(),
-			baseSalary: z.number().min(0).optional(),
-			housingAllowance: z.number().min(0).optional(),
-			transportAllowance: z.number().min(0).optional(),
-			otherAllowances: z.number().min(0).optional(),
-			gosiDeduction: z.number().min(0).optional(),
-			otherDeductions: z.number().min(0).optional(),
+			organizationId: idString(),
+			itemId: idString(),
+			baseSalary: financialAmount().optional(),
+			housingAllowance: financialAmount().optional(),
+			transportAllowance: financialAmount().optional(),
+			otherAllowances: financialAmount().optional(),
+			gosiDeduction: financialAmount().optional(),
+			otherDeductions: financialAmount().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -328,8 +336,8 @@ export const deletePayrollRunItemProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			itemId: z.string(),
+			organizationId: idString(),
+			itemId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -353,7 +361,7 @@ export const payrollSummaryProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

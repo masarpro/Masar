@@ -21,7 +21,7 @@ export const listChangeOrdersForOwnerProcedure = publicProcedure
 	})
 	.input(
 		z.object({
-			token: z.string(),
+			token: z.string().trim().max(200),
 			page: z.number().int().positive().optional(),
 			pageSize: z.number().int().positive().max(100).optional(),
 		}),
@@ -59,8 +59,8 @@ export const getChangeOrderForOwnerProcedure = publicProcedure
 	})
 	.input(
 		z.object({
-			token: z.string(),
-			changeOrderId: z.string(),
+			token: z.string().trim().max(200),
+			changeOrderId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input }) => {

@@ -13,9 +13,9 @@ export const revokeShareLinkProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			token: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			token: z.string().trim().max(200),
 		}),
 	)
 	.handler(async ({ input, context }) => {

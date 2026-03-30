@@ -12,18 +12,18 @@ export const createTemplateProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			name: z.string().min(1, "اسم القالب مطلوب"),
-			description: z.string().optional(),
-			sourceProjectId: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			name: z.string().trim().min(1, "اسم القالب مطلوب").max(200),
+			description: z.string().trim().max(2000).optional(),
+			sourceProjectId: z.string().trim().max(100).optional(),
 			items: z
 				.array(
 					z.object({
 						type: z.enum(["MILESTONE", "CHECKLIST"]),
-						title: z.string(),
-						description: z.string().optional(),
-						sortOrder: z.number().optional(),
-						metadata: z.record(z.string(), z.any()).optional(),
+						title: z.string().trim().max(200),
+						description: z.string().trim().max(2000).optional(),
+						sortOrder: z.number().int().min(0).max(999999).optional(),
+						metadata: z.record(z.string().max(100), z.union([z.string().max(1000), z.number(), z.boolean(), z.null()])).optional(),
 					}),
 				)
 				.optional(),

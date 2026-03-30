@@ -13,8 +13,8 @@ export const getTemplateProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: z.string().trim().max(100),
+			id: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

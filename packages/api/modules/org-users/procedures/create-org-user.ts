@@ -21,11 +21,11 @@ export const createOrgUser = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			name: z.string().min(1),
-			email: z.string().email(),
-			organizationRoleId: z.string(),
-			password: z.string().min(8).optional(),
+			organizationId: z.string().trim().max(100),
+			name: z.string().trim().min(1).max(200),
+			email: z.string().trim().email().max(254),
+			organizationRoleId: z.string().trim().max(100),
+			password: z.string().min(8).max(200).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

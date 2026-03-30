@@ -13,16 +13,16 @@ export const saveFile = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			leadId: z.string(),
-			name: z.string().min(1),
-			storagePath: z.string().min(1),
-			fileSize: z.number().int().positive().optional(),
-			mimeType: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			leadId: z.string().trim().max(100),
+			name: z.string().trim().min(1).max(255),
+			storagePath: z.string().trim().min(1).max(500),
+			fileSize: z.number().int().positive().max(100 * 1024 * 1024).optional(),
+			mimeType: z.string().trim().max(200).optional(),
 			category: z
 				.enum(["BLUEPRINT", "STRUCTURE", "SITE_PHOTO", "SCOPE", "OTHER"])
 				.optional(),
-			description: z.string().optional(),
+			description: z.string().trim().max(2000).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

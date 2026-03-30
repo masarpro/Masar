@@ -233,7 +233,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 
 	if (isLoading) {
 		return (
-			<div className="space-y-6" dir="rtl">
+			<div className="space-y-6">
 				{[...Array(4)].map((_, i) => (
 					<div
 						key={i}
@@ -262,7 +262,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 	const netTotal = Number(run.totalNetSalary ?? 0);
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Back Button */}
 			<Button
 				variant="ghost"
@@ -325,9 +325,9 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 										disabled={populateMutation.isPending}
 									>
 										{populateMutation.isPending ? (
-											<Loader2 className="ml-2 h-4 w-4 animate-spin" />
+											<Loader2 className="ms-2 h-4 w-4 animate-spin" />
 										) : (
-											<RefreshCw className="ml-2 h-4 w-4" />
+											<RefreshCw className="ms-2 h-4 w-4" />
 										)}
 										{t("company.payroll.populate")}
 									</Button>
@@ -336,7 +336,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 										onClick={() => setShowApproveDialog(true)}
 										disabled={approveMutation.isPending}
 									>
-										<CheckCircle className="ml-2 h-4 w-4" />
+										<CheckCircle className="ms-2 h-4 w-4" />
 										{t("company.payroll.approve")}
 									</Button>
 									<Button
@@ -345,7 +345,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 										onClick={() => setShowCancelDialog(true)}
 										disabled={cancelMutation.isPending}
 									>
-										<XCircle className="ml-2 h-4 w-4" />
+										<XCircle className="ms-2 h-4 w-4" />
 										{t("company.payroll.cancel")}
 									</Button>
 								</>
@@ -357,7 +357,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 									onClick={() => setShowCancelDialog(true)}
 									disabled={cancelMutation.isPending}
 								>
-									<XCircle className="ml-2 h-4 w-4" />
+									<XCircle className="ms-2 h-4 w-4" />
 									{t("company.payroll.cancel")}
 								</Button>
 							)}
@@ -441,35 +441,35 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 				<Table className="table-fixed w-full">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[16%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[16%]">
 								{t("company.payroll.employeeName")}
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[10%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[10%]">
 								{t("company.payroll.employeeNo")}
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[11%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[11%]">
 								{t("company.payroll.baseSalary")}
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[11%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[11%]">
 								{t("company.payroll.housingAllowance")}
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[11%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[11%]">
 								{t("company.payroll.transportAllowance")}
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[11%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[11%]">
 								{t("company.payroll.otherAllowances")}
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[10%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[10%]">
 								{t("company.payroll.gosiDeduction")}
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[11%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[11%]">
 								{t("company.payroll.netSalary")}
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[9%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[9%]">
 								{t("company.payroll.financeStatus")}
 							</TableHead>
 							{run.status === "DRAFT" && items.length > 0 && (
-								<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[8%]">
+								<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[8%]">
 									{t("company.common.actions")}
 								</TableHead>
 							)}
@@ -483,33 +483,33 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 									className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
 									style={{ animationDelay: `${index * 30}ms` }}
 								>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<p className="font-medium text-slate-900 dark:text-slate-100 truncate">
 											{item.employee?.name ?? "-"}
 										</p>
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300">
 										{item.employee?.employeeNo ?? "-"}
 									</TableCell>
-									<TableCell className="text-right text-slate-700 dark:text-slate-300 font-medium">
+									<TableCell className="text-end text-slate-700 dark:text-slate-300 font-medium">
 										{formatCurrency(Number(item.baseSalary ?? 0))}
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300">
 										{formatCurrency(Number(item.housingAllowance ?? 0))}
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300">
 										{formatCurrency(Number(item.transportAllowance ?? 0))}
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300">
 										{formatCurrency(Number(item.otherAllowances ?? 0))}
 									</TableCell>
-									<TableCell className="text-right text-red-600 dark:text-red-400">
+									<TableCell className="text-end text-red-600 dark:text-red-400">
 										{formatCurrency(Number(item.gosiDeduction ?? 0))}
 									</TableCell>
-									<TableCell className="text-right font-semibold text-slate-900 dark:text-slate-100">
+									<TableCell className="text-end font-semibold text-slate-900 dark:text-slate-100">
 										{formatCurrency(Number(item.netSalary ?? 0))}
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										{item.financeExpense?.status ? (
 											getFinanceStatusBadge(item.financeExpense.status)
 										) : (
@@ -517,7 +517,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 										)}
 									</TableCell>
 									{run.status === "DRAFT" && (
-										<TableCell className="text-right">
+										<TableCell className="text-end">
 											<div className="flex items-center justify-end gap-1">
 												<Button
 													variant="ghost"
@@ -564,7 +564,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 
 			{/* Approve Confirmation Dialog */}
 			<AlertDialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
-				<AlertDialogContent dir="rtl" className="rounded-2xl">
+				<AlertDialogContent className="rounded-2xl">
 					<AlertDialogHeader>
 						<AlertDialogTitle>
 							{t("company.payroll.approve")}
@@ -616,7 +616,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 
 			{/* Cancel Confirmation Dialog */}
 			<AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-				<AlertDialogContent dir="rtl" className="rounded-2xl">
+				<AlertDialogContent className="rounded-2xl">
 					<AlertDialogHeader>
 						<AlertDialogTitle>
 							{t("company.payroll.cancel")}
@@ -668,7 +668,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 				open={!!deleteItemId}
 				onOpenChange={(open) => !open && setDeleteItemId(null)}
 			>
-				<AlertDialogContent dir="rtl" className="rounded-2xl">
+				<AlertDialogContent className="rounded-2xl">
 					<AlertDialogHeader>
 						<AlertDialogTitle>
 							{t("company.payroll.deleteItem")}

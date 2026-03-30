@@ -12,7 +12,7 @@ export const listRoles = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input: { organizationId }, context }) => {

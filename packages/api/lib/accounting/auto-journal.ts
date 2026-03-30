@@ -242,6 +242,9 @@ export async function onExpenseCompleted(db: PrismaClient, expense: {
 	if (expense.sourceType === "FACILITY_PAYROLL") return;
 
 	const expenseCode = EXPENSE_CATEGORY_TO_ACCOUNT_CODE[expense.category] || "6900";
+	if (!EXPENSE_CATEGORY_TO_ACCOUNT_CODE[expense.category]) {
+		console.warn(`[Accounting] Expense ${expense.id} used fallback account 6900 for unknown category: ${expense.category}`);
+	}
 	const expenseAccId = await getAccountByCode(db, expense.organizationId, expenseCode);
 
 	let bankAccId: string | null = null;
@@ -373,8 +376,11 @@ export async function onSubcontractPayment(db: PrismaClient, payment: {
 		],
 	});
 }
-// TODO: No delete procedure exists for SubcontractPayment (immutable by design).
-// If delete is added later: call reverseAutoJournalEntry({ referenceType: "SUBCONTRACT_PAYMENT", referenceId })
+/**
+ * SubcontractPayment is immutable by design — no delete procedure exists.
+ * If a delete procedure is added in the future, it must call:
+ *   reverseAutoJournalEntry(db, { organizationId, referenceType: "SUBCONTRACT_PAYMENT", referenceId })
+ */
 
 // ========================================
 // 5b. Subcontract Claim Approved → DR: Subcontractor Cost / CR: Subcontractor Payable

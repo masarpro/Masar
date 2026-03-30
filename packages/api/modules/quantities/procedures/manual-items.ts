@@ -19,8 +19,8 @@ export const manualItemsList = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -54,13 +54,13 @@ export const manualItemCreate = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
-			description: z.string().min(1),
-			unit: z.string().min(1),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
+			description: z.string().trim().min(1).max(2000),
+			unit: z.string().trim().min(1).max(50),
 			quantity: z.number().min(0),
-			section: z.string().optional(),
-			notes: z.string().optional(),
+			section: z.string().trim().max(100).optional(),
+			notes: z.string().trim().max(2000).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -127,13 +127,13 @@ export const manualItemUpdate = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			itemId: z.string(),
-			description: z.string().min(1).optional(),
-			unit: z.string().min(1).optional(),
+			organizationId: z.string().trim().max(100),
+			itemId: z.string().trim().max(100),
+			description: z.string().trim().min(1).max(2000).optional(),
+			unit: z.string().trim().min(1).max(50).optional(),
 			quantity: z.number().min(0).optional(),
-			section: z.string().nullable().optional(),
-			notes: z.string().nullable().optional(),
+			section: z.string().trim().max(100).nullable().optional(),
+			notes: z.string().trim().max(2000).nullable().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -179,8 +179,8 @@ export const manualItemDelete = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			itemId: z.string(),
+			organizationId: z.string().trim().max(100),
+			itemId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -223,9 +223,9 @@ export const manualItemReorder = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
-			itemIds: z.array(z.string()),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
+			itemIds: z.array(z.string().trim().max(100)).max(1000),
 		}),
 	)
 	.handler(async ({ input, context }) => {

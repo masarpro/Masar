@@ -12,14 +12,14 @@ export const createStudy = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			name: z.string().optional(),
-			projectType: z.string().default("villa"),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			name: z.string().trim().max(100).optional(),
+			projectType: z.string().trim().max(100).default("villa"),
 			landArea: z.number().default(0),
 			buildingArea: z.number().default(0),
 			numberOfFloors: z.number().int().default(1),
-			finishingLevel: z.string().default("standard"),
+			finishingLevel: z.string().trim().max(100).default("standard"),
 			overheadPercent: z.number().min(0).max(100).optional(),
 			profitPercent: z.number().min(0).max(100).optional(),
 			contingencyPercent: z.number().min(0).max(100).optional(),

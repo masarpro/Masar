@@ -14,7 +14,7 @@ export const updateNotificationPreferencesProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: z.string().trim().max(100),
 			approvalRequested: z.array(notificationChannelEnum).optional(),
 			approvalDecided: z.array(notificationChannelEnum).optional(),
 			documentCreated: z.array(notificationChannelEnum).optional(),

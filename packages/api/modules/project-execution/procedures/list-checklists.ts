@@ -13,8 +13,8 @@ export const listChecklistsProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			activityId: z.string(),
+			organizationId: z.string().trim().max(100),
+			activityId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

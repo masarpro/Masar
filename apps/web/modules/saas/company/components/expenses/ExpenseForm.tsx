@@ -155,7 +155,7 @@ export function ExpenseForm({ organizationId, organizationSlug, expenseId }: Exp
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" dir="rtl">
+			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 				{/* Basic Info */}
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
 					<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">

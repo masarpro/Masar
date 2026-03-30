@@ -12,8 +12,8 @@ export const subscribeDigest = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100).optional(),
 			frequency: z.enum(["WEEKLY"]).optional().default("WEEKLY"),
 			channel: z.enum(["IN_APP", "EMAIL"]).optional().default("IN_APP"),
 		}),
@@ -47,7 +47,7 @@ export const listSubscriptions = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

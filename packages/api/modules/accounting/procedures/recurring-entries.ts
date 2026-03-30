@@ -9,6 +9,10 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	MAX_DESC, MAX_ARRAY,
+	idString, financialAmount, optionalTrimmed,
+} from "../../../lib/validation-constants";
 
 export const listRecurringTemplatesProcedure = protectedProcedure
 	.route({
@@ -17,7 +21,7 @@ export const listRecurringTemplatesProcedure = protectedProcedure
 		tags: ["Accounting", "Recurring"],
 		summary: "List recurring journal entry templates",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
@@ -35,17 +39,17 @@ export const createRecurringTemplateProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			description: z.string().min(1),
+			organizationId: idString(),
+			description: z.string().trim().min(1).max(MAX_DESC),
 			lines: z.array(z.object({
-				accountId: z.string(),
-				debit: z.number().nonnegative(),
-				credit: z.number().nonnegative(),
-				description: z.string().optional(),
-				projectId: z.string().optional(),
-			})).min(2),
+				accountId: idString(),
+				debit: financialAmount(),
+				credit: financialAmount(),
+				description: optionalTrimmed(MAX_DESC),
+				projectId: idString().optional(),
+			})).min(2).max(MAX_ARRAY),
 			frequency: z.enum(["MONTHLY", "QUARTERLY", "ANNUAL"]),
-			dayOfMonth: z.number().min(1).max(28).default(1),
+			dayOfMonth: z.number().int().min(1).max(28).default(1),
 			startDate: z.string().datetime(),
 			endDate: z.string().datetime().optional(),
 		}),
@@ -76,9 +80,9 @@ export const updateRecurringTemplateProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			description: z.string().optional(),
+			organizationId: idString(),
+			id: idString(),
+			description: optionalTrimmed(MAX_DESC),
 			isActive: z.boolean().optional(),
 		}),
 	)
@@ -106,7 +110,7 @@ export const deleteRecurringTemplateProcedure = subscriptionProcedure
 		tags: ["Accounting", "Recurring"],
 		summary: "Delete recurring template",
 	})
-	.input(z.object({ organizationId: z.string(), id: z.string() }))
+	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
@@ -129,7 +133,7 @@ export const generateDueEntriesProcedure = subscriptionProcedure
 		tags: ["Accounting", "Recurring"],
 		summary: "Generate due recurring journal entries",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",

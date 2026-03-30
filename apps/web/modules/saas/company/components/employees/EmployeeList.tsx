@@ -140,7 +140,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 	};
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Summary Cards - Glass Morphism */}
 			{summary && (
 				<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -211,7 +211,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 							placeholder={t("company.employees.searchPlaceholder")}
 							value={search}
 							onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pr-10 focus:ring-1 focus:ring-primary/30"
+							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pe-10 focus:ring-1 focus:ring-primary/30"
 						/>
 					</div>
 					<Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setCurrentPage(1); }}>
@@ -260,12 +260,12 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 									aria-label={t("common.selectAll")}
 								/>
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.employees.name")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 hidden sm:table-cell">{t("company.employees.type")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.employees.salary")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 hidden md:table-cell">{t("company.employees.status")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 hidden lg:table-cell">{t("company.employees.projects")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.common.actions")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.employees.name")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 hidden sm:table-cell">{t("company.employees.type")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.employees.salary")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 hidden md:table-cell">{t("company.employees.status")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 hidden lg:table-cell">{t("company.employees.projects")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.common.actions")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -294,7 +294,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 											aria-label={`${t("common.select")} ${employee.name}`}
 										/>
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<div>
 											<p className="font-medium text-slate-900 dark:text-slate-100">{employee.name}</p>
 											{employee.employeeNo && (
@@ -302,10 +302,10 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 											)}
 										</div>
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300 hidden sm:table-cell">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300 hidden sm:table-cell">
 										{t(`company.employees.types.${employee.type}`)}
 									</TableCell>
-									<TableCell className="text-right font-semibold text-slate-700 dark:text-slate-300">
+									<TableCell className="text-end font-semibold text-slate-700 dark:text-slate-300">
 										{formatCurrency(
 											Number(employee.baseSalary) +
 											Number(employee.housingAllowance) +
@@ -313,8 +313,8 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 											Number(employee.otherAllowances)
 										)}
 									</TableCell>
-									<TableCell className="text-right hidden md:table-cell">{getStatusBadge(employee.status)}</TableCell>
-									<TableCell className="text-right hidden lg:table-cell">
+									<TableCell className="text-end hidden md:table-cell">{getStatusBadge(employee.status)}</TableCell>
+									<TableCell className="text-end hidden lg:table-cell">
 										{employee.assignments?.length ? (
 											<div className="flex flex-wrap gap-1">
 												{employee.assignments.map((a) => (
@@ -329,7 +329,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 											</Badge>
 										)}
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										{employee.status === "ACTIVE" && (
 											<Button
 												variant="ghost"

@@ -18,7 +18,7 @@ export class NoopProvider implements MessagingProvider {
 	name = "noop";
 
 	async sendEmail(params: SendEmailParams): Promise<SendResult> {
-		console.log(`[NOOP] Email to ${params.to}: ${params.subject}`);
+		console.debug(`[NOOP] Email to ${params.to}: ${params.subject}`);
 		return {
 			success: true,
 			provider: this.name,
@@ -27,7 +27,7 @@ export class NoopProvider implements MessagingProvider {
 	}
 
 	async sendWhatsApp(params: SendWhatsAppParams): Promise<SendResult> {
-		console.log(
+		console.debug(
 			`[NOOP] WhatsApp to ${params.to}: ${params.templateKey} - ${params.fallbackText}`,
 		);
 		return {
@@ -38,7 +38,7 @@ export class NoopProvider implements MessagingProvider {
 	}
 
 	async sendSMS(params: SendSMSParams): Promise<SendResult> {
-		console.log(`[NOOP] SMS to ${params.to}: ${params.text}`);
+		console.debug(`[NOOP] SMS to ${params.to}: ${params.text}`);
 		return {
 			success: true,
 			provider: this.name,

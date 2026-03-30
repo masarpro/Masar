@@ -12,8 +12,8 @@ export const completeWizard = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			skippedSteps: z.array(z.string()).optional(),
+			organizationId: z.string().trim().max(100),
+			skippedSteps: z.array(z.enum(["inviteTeam"])).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

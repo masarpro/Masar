@@ -23,7 +23,7 @@ import {
 	ArrowRightIcon,
 	EyeIcon,
 	EyeOffIcon,
-	KeyIcon,
+	MailIcon,
 	MailboxIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -39,7 +39,6 @@ import {
 	oAuthProviders,
 } from "../constants/oauth-providers";
 import { useSession } from "../hooks/use-session";
-import { LoginModeSwitch } from "./LoginModeSwitch";
 import { SocialSigninButton } from "./SocialSigninButton";
 
 const formSchema = z.union([
@@ -135,30 +134,14 @@ export function LoginForm() {
 		}
 	};
 
-	const signInWithPasskey = async () => {
-		try {
-			await authClient.signIn.passkey();
-
-			router.replace(redirectPath);
-		} catch (e) {
-			form.setError("root", {
-				message: getAuthErrorMessage(
-					e && typeof e === "object" && "code" in e
-						? (e.code as string)
-						: undefined,
-				),
-			});
-		}
-	};
-
 	const signinMode = form.watch("mode");
 
 	return (
 		<div>
-			<h1 className="font-bold text-xl md:text-2xl">
+			<h1 className="font-bold text-2xl md:text-3xl">
 				{t("auth.login.title")}
 			</h1>
-			<p className="mt-1 mb-6 text-foreground/60">
+			<p className="mt-2 mb-8 text-muted-foreground">
 				{t("auth.login.subtitle")}
 			</p>
 
@@ -181,22 +164,9 @@ export function LoginForm() {
 
 					<Form {...form}>
 						<form
-							className="space-y-4"
+							className="space-y-5"
 							onSubmit={form.handleSubmit(onSubmit)}
 						>
-							{config.auth.enableMagicLink &&
-								config.auth.enablePasswordLogin && (
-									<LoginModeSwitch
-										activeMode={signinMode}
-										onChange={(mode) =>
-											form.setValue(
-												"mode",
-												mode as typeof signinMode,
-											)
-										}
-									/>
-								)}
-
 							{form.formState.isSubmitted &&
 								form.formState.errors.root?.message && (
 									<Alert variant="error">
@@ -206,6 +176,12 @@ export function LoginForm() {
 										</AlertTitle>
 									</Alert>
 								)}
+
+							{signinMode === "magic-link" && (
+								<p className="text-sm text-muted-foreground">
+									{t("auth.login.emailLoginDescription")}
+								</p>
+							)}
 
 							<FormField
 								control={form.control}
@@ -219,6 +195,7 @@ export function LoginForm() {
 											<Input
 												{...field}
 												autoComplete="email"
+												className="h-11"
 											/>
 										</FormControl>
 									</FormItem>
@@ -241,7 +218,7 @@ export function LoginForm() {
 
 													<Link
 														href="/auth/forgot-password"
-														className="text-foreground/60 text-xs"
+														className="text-muted-foreground text-xs hover:text-foreground transition-colors"
 													>
 														{t(
 															"auth.login.forgotPassword",
@@ -256,7 +233,7 @@ export function LoginForm() {
 																	? "text"
 																	: "password"
 															}
-															className="pr-10"
+															className="h-11 pe-10"
 															{...field}
 															autoComplete="current-password"
 														/>
@@ -267,7 +244,7 @@ export function LoginForm() {
 																	!showPassword,
 																)
 															}
-															className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary text-xl"
+															className="absolute inset-y-0 end-0 flex items-center pe-3 text-muted-foreground hover:text-foreground transition-colors"
 														>
 															{showPassword ? (
 																<EyeOffIcon className="size-4" />
@@ -283,9 +260,8 @@ export function LoginForm() {
 								)}
 
 							<Button
-								className="w-full"
+								className="w-full h-11"
 								type="submit"
-								variant="secondary"
 								loading={form.formState.isSubmitting}
 							>
 								{signinMode === "magic-link"
@@ -295,58 +271,80 @@ export function LoginForm() {
 						</form>
 					</Form>
 
-					{(config.auth.enablePasskeys ||
-						(config.auth.enableSignup &&
-							config.auth.enableSocialLogin)) && (
-						<>
-							<div className="relative my-6 h-4">
-								<hr className="relative top-2" />
-								<p className="-translate-x-1/2 absolute top-0 left-1/2 mx-auto inline-block h-4 bg-card px-2 text-center font-medium text-foreground/60 text-sm leading-tight">
-									{t("auth.login.continueWith")}
-								</p>
-							</div>
+					{/* Magic Link toggle button */}
+					{config.auth.enableMagicLink &&
+						signinMode === "password" && (
+							<Button
+								type="button"
+								variant="outline"
+								className="w-full h-11 mt-3"
+								onClick={() =>
+									form.setValue(
+										"mode",
+										"magic-link" as const,
+									)
+								}
+							>
+								<MailIcon className="me-2 size-4" />
+								{t("auth.login.emailLogin")}
+							</Button>
+						)}
 
-							<div className="grid grid-cols-1 items-stretch gap-2 sm:grid-cols-2">
-								{config.auth.enableSignup &&
-									config.auth.enableSocialLogin &&
-									Object.keys(oAuthProviders).map(
-										(providerId) => (
-											<SocialSigninButton
-												key={providerId}
-												provider={
-													providerId as OAuthProvider
-												}
-											/>
-										),
-									)}
+					{/* Back to password mode */}
+					{config.auth.enableMagicLink &&
+						config.auth.enablePasswordLogin &&
+						signinMode === "magic-link" &&
+						!form.formState.isSubmitSuccessful && (
+							<button
+								type="button"
+								className="w-full mt-3 text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+								onClick={() =>
+									form.setValue(
+										"mode",
+										"password" as const,
+									)
+								}
+							>
+								{t("auth.login.backToPassword")}
+							</button>
+						)}
 
-								{config.auth.enablePasskeys && (
-									<Button
-										variant="secondary"
-										className="w-full sm:col-span-2"
-										onClick={() => signInWithPasskey()}
-									>
-										<KeyIcon className="mr-1.5 size-4 text-primary" />
-										{t("auth.login.loginWithPasskey")}
-									</Button>
-								)}
-							</div>
-						</>
-					)}
+					{/* Social login (Google only) */}
+					{config.auth.enableSignup &&
+						config.auth.enableSocialLogin && (
+							<>
+								<div className="relative my-6 h-4">
+									<hr className="relative top-2" />
+									<p className="-translate-x-1/2 absolute top-0 left-1/2 mx-auto inline-block h-4 bg-background px-2 text-center font-medium text-muted-foreground text-sm leading-tight">
+										{t("auth.login.orContinueWith")}
+									</p>
+								</div>
+
+								<div className="grid grid-cols-1 gap-2">
+									<SocialSigninButton
+										provider="google"
+										className="h-11"
+									/>
+								</div>
+							</>
+						)}
 
 					{config.auth.enableSignup && (
-						<div className="mt-6 text-center text-sm">
-							<span className="text-foreground/60">
+						<div className="mt-8 text-center text-sm">
+							<span className="text-muted-foreground">
 								{t("auth.login.dontHaveAnAccount")}{" "}
 							</span>
 							<Link
 								href={withQuery(
 									"/auth/signup",
-									Object.fromEntries(searchParams.entries()),
+									Object.fromEntries(
+										searchParams.entries(),
+									),
 								)}
+								className="font-medium text-primary hover:underline"
 							>
 								{t("auth.login.createAnAccount")}
-								<ArrowRightIcon className="ml-1 inline size-4 align-middle" />
+								<ArrowRightIcon className="ms-1 inline size-4 align-middle rtl-flip" />
 							</Link>
 						</div>
 					)}

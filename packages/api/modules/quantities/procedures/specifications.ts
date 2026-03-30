@@ -18,8 +18,8 @@ export const getSpecifications = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -85,11 +85,11 @@ export const updateItemSpec = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
-			itemId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
+			itemId: z.string().trim().max(100),
 			itemType: itemTypeEnum,
-			specData: z.any(),
+			specData: z.record(z.string(), z.unknown()),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -107,7 +107,7 @@ export const updateItemSpec = subscriptionProcedure
 				if (!item) throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.ITEM_NOT_FOUND });
 				await db.finishingItem.update({
 					where: { id: input.itemId },
-					data: { specData: input.specData },
+					data: { specData: input.specData as Record<string, unknown> as any },
 				});
 				break;
 			}
@@ -118,7 +118,7 @@ export const updateItemSpec = subscriptionProcedure
 				if (!item) throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.ITEM_NOT_FOUND });
 				await db.mEPItem.update({
 					where: { id: input.itemId },
-					data: { specData: input.specData },
+					data: { specData: input.specData as Record<string, unknown> as any },
 				});
 				break;
 			}
@@ -129,7 +129,7 @@ export const updateItemSpec = subscriptionProcedure
 				if (!item) throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.ITEM_NOT_FOUND });
 				await db.structuralItem.update({
 					where: { id: input.itemId },
-					data: { dimensions: input.specData },
+					data: { dimensions: input.specData as Record<string, unknown> as any },
 				});
 				break;
 			}
@@ -246,12 +246,12 @@ export const applyTemplateToAll = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 			templateLevel: templateLevelEnum,
 			scope: z.enum(["all", "floor", "category"]).default("all"),
-			floorId: z.string().optional(),
-			categoryKey: z.string().optional(),
+			floorId: z.string().trim().max(100).optional(),
+			categoryKey: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -339,10 +339,10 @@ export const applySpecToAllFloors = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
-			category: z.string(),
-			specData: z.any(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
+			category: z.string().trim().max(200),
+			specData: z.record(z.string(), z.unknown()),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -367,7 +367,7 @@ export const applySpecToAllFloors = subscriptionProcedure
 				category: input.category,
 				isEnabled: true,
 			},
-			data: { specData: input.specData },
+			data: { specData: input.specData as Record<string, unknown> as any },
 		});
 
 		return { success: true, updated: result.count };
@@ -504,8 +504,8 @@ export const generateBOM = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -643,8 +643,8 @@ export const getBOM = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

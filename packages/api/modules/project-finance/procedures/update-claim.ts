@@ -3,6 +3,7 @@ import { updateProjectClaim } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { idString, positiveAmount, MAX_DESC } from "../../../lib/validation-constants";
 
 export const updateClaim = subscriptionProcedure
 	.route({
@@ -13,14 +14,14 @@ export const updateClaim = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			claimId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
+			claimId: idString(),
 			periodStart: z.coerce.date().nullable().optional(),
 			periodEnd: z.coerce.date().nullable().optional(),
-			amount: z.number().positive("المبلغ يجب أن يكون أكبر من صفر").optional(),
+			amount: positiveAmount().optional(),
 			dueDate: z.coerce.date().nullable().optional(),
-			note: z.string().nullable().optional(),
+			note: z.string().trim().max(MAX_DESC).nullable().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

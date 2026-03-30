@@ -3,6 +3,10 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import {
+	MAX_DESC,
+	idString, nullishTrimmed, positiveAmount,
+} from "../../../lib/validation-constants";
 
 export const addSubcontractClaimPaymentProcedure = subscriptionProcedure
 	.route({
@@ -13,16 +17,16 @@ export const addSubcontractClaimPaymentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			claimId: z.string(),
-			amount: z.number().positive("مبلغ الدفعة يجب أن يكون أكبر من صفر"),
+			organizationId: idString(),
+			projectId: idString(),
+			claimId: idString(),
+			amount: positiveAmount(),
 			date: z.coerce.date(),
 			paymentMethod: z.enum([
 				"CASH", "BANK_TRANSFER", "CHEQUE", "CREDIT_CARD", "OTHER",
 			]),
-			sourceAccountId: z.string().min(1, "يجب اختيار الحساب البنكي"),
-			description: z.string().nullish(),
+			sourceAccountId: z.string().trim().min(1, "يجب اختيار الحساب البنكي").max(100),
+			description: nullishTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {

@@ -15,15 +15,15 @@ export const bulkAssignToPhase = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			items: z.array(
 				z.object({
-					itemId: z.string(),
+					itemId: z.string().trim().max(100),
 					itemType: itemTypeEnum,
 				}),
 			),
-			phaseId: z.string().nullable(),
+			phaseId: z.string().trim().max(100).nullable(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

@@ -13,9 +13,9 @@ export const deleteChecklistItemProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			activityId: z.string(),
-			checklistId: z.string(),
+			organizationId: z.string().trim().max(100),
+			activityId: z.string().trim().max(100),
+			checklistId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

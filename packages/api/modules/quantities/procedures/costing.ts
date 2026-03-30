@@ -59,8 +59,8 @@ export const costingGenerateItems = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -211,9 +211,9 @@ export const costingGetItems = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
-			section: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
+			section: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -253,8 +253,8 @@ export const costingUpdateItem = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			itemId: z.string(),
+			organizationId: z.string().trim().max(100),
+			itemId: z.string().trim().max(100),
 			materialUnitCost: z.number().nonnegative().nullable().optional(),
 			laborType: z.enum(["PER_SQM", "PER_CBM", "PER_UNIT", "PER_LM", "LUMP_SUM", "SALARY"]).nullable().optional(),
 			laborUnitCost: z.number().nonnegative().nullable().optional(),
@@ -332,11 +332,11 @@ export const costingBulkUpdate = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 			items: z.array(
 				z.object({
-					id: z.string(),
+					id: z.string().trim().max(100),
 					materialUnitCost: z.number().nonnegative().nullable().optional(),
 					laborType: z.enum(["PER_SQM", "PER_CBM", "PER_UNIT", "PER_LM", "LUMP_SUM", "SALARY"]).nullable().optional(),
 					laborUnitCost: z.number().nonnegative().nullable().optional(),
@@ -418,9 +418,9 @@ export const costingSetSectionLabor = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
-			section: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
+			section: z.string().trim().max(200),
 			laborType: z.enum(["PER_SQM", "PER_CBM", "PER_UNIT", "PER_LM", "LUMP_SUM", "SALARY"]),
 			laborUnitCost: z.number().nonnegative(),
 		}),
@@ -493,8 +493,8 @@ export const costingGetSummary = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

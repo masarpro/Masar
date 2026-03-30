@@ -95,7 +95,7 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 
 	if (isLoading) {
 		return (
-			<div className="space-y-6" dir="rtl">
+			<div className="space-y-6">
 				{[...Array(3)].map((_, i) => (
 					<div key={i} className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-6">
 						<div className="h-24 animate-pulse rounded bg-muted" />
@@ -127,7 +127,7 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 	};
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>
@@ -141,7 +141,7 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 					className="rounded-xl border-white/20 dark:border-slate-700/30"
 					onClick={() => router.push(`/app/${organizationSlug}/company/employees/${employeeId}/edit`)}
 				>
-					<Pencil className="ml-2 h-4 w-4" />
+					<Pencil className="ms-2 h-4 w-4" />
 					{t("company.common.edit")}
 				</Button>
 			</div>
@@ -252,7 +252,7 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 							className="rounded-xl border-white/20 dark:border-slate-700/30"
 							onClick={() => setShowAssignForm(!showAssignForm)}
 						>
-							<Plus className="ml-1 h-4 w-4" />
+							<Plus className="ms-1 h-4 w-4" />
 							{t("company.employees.addAssignment")}
 						</Button>
 					)}
@@ -353,11 +353,11 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 								<table className="w-full text-sm">
 									<thead>
 										<tr className="border-b border-slate-200 dark:border-slate-700">
-											<th className="pb-2 text-right text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.date")}</th>
-											<th className="pb-2 text-right text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.changeType")}</th>
-											<th className="pb-2 text-right text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.field")}</th>
-											<th className="pb-2 text-right text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.oldValue")}</th>
-											<th className="pb-2 text-right text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.newValue")}</th>
+											<th className="pb-2 text-end text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.date")}</th>
+											<th className="pb-2 text-end text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.changeType")}</th>
+											<th className="pb-2 text-end text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.field")}</th>
+											<th className="pb-2 text-end text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.oldValue")}</th>
+											<th className="pb-2 text-end text-xs font-medium text-slate-500 dark:text-slate-400">{t("company.employees.changeHistory.newValue")}</th>
 										</tr>
 									</thead>
 									<tbody>

@@ -19,11 +19,11 @@ export const createApprovalRequestProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			documentId: z.string(),
-			approverUserIds: z.array(z.string()).min(1, "يجب تحديد معتمد واحد على الأقل"),
-			note: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			documentId: z.string().trim().max(100),
+			approverUserIds: z.array(z.string().trim().max(100)).min(1, "يجب تحديد معتمد واحد على الأقل"),
+			note: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

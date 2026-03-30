@@ -11,6 +11,21 @@ import {
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import {
+	idString,
+	trimmedString,
+	optionalTrimmed,
+	nullishTrimmed,
+	searchQuery,
+	positiveAmount,
+	financialAmount,
+	paginationLimit,
+	paginationOffset,
+	dayCount,
+	MAX_NAME,
+	MAX_DESC,
+	MAX_CODE,
+} from "../../../lib/validation-constants";
 
 const expenseCategoryEnum = z.enum([
 	"RENT", "UTILITIES", "COMMUNICATIONS", "INSURANCE", "LICENSES",
@@ -31,13 +46,13 @@ export const listCompanyExpenses = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			category: expenseCategoryEnum.optional(),
 			recurrence: recurrenceTypeEnum.optional(),
 			isActive: z.boolean().optional(),
-			query: z.string().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			query: searchQuery(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -68,8 +83,8 @@ export const getCompanyExpenseByIdProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -95,18 +110,18 @@ export const createCompanyExpenseProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			name: z.string().min(1, "اسم المصروف مطلوب"),
+			organizationId: idString(),
+			name: trimmedString(MAX_NAME),
 			category: expenseCategoryEnum,
-			description: z.string().optional(),
-			amount: z.number().positive("المبلغ يجب أن يكون أكبر من صفر"),
+			description: optionalTrimmed(MAX_DESC),
+			amount: positiveAmount(),
 			recurrence: recurrenceTypeEnum.optional(),
-			vendor: z.string().optional(),
-			contractNumber: z.string().optional(),
+			vendor: optionalTrimmed(MAX_NAME),
+			contractNumber: optionalTrimmed(MAX_CODE),
 			startDate: z.coerce.date(),
 			endDate: z.coerce.date().optional(),
-			reminderDays: z.number().min(0).optional(),
-			notes: z.string().optional(),
+			reminderDays: dayCount().optional(),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -130,20 +145,20 @@ export const updateCompanyExpenseProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			name: z.string().min(1).optional(),
+			organizationId: idString(),
+			id: idString(),
+			name: trimmedString(MAX_NAME).optional(),
 			category: expenseCategoryEnum.optional(),
-			description: z.string().nullable().optional(),
-			amount: z.number().positive().optional(),
+			description: nullishTrimmed(MAX_DESC),
+			amount: positiveAmount().optional(),
 			recurrence: recurrenceTypeEnum.optional(),
-			vendor: z.string().nullable().optional(),
-			contractNumber: z.string().nullable().optional(),
+			vendor: nullishTrimmed(MAX_NAME),
+			contractNumber: nullishTrimmed(MAX_CODE),
 			startDate: z.coerce.date().optional(),
 			endDate: z.coerce.date().nullable().optional(),
-			reminderDays: z.number().min(0).optional(),
+			reminderDays: dayCount().optional(),
 			isActive: z.boolean().optional(),
-			notes: z.string().nullable().optional(),
+			notes: nullishTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -168,8 +183,8 @@ export const deactivateCompanyExpenseProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -191,7 +206,7 @@ export const getCompanyExpenseSummaryProcedure = protectedProcedure
 		tags: ["Company", "Expenses"],
 		summary: "Get company expense summary",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "company",
@@ -211,7 +226,7 @@ export const getCompanyExpenseDashboardDataProcedure = protectedProcedure
 		tags: ["Company", "Expenses"],
 		summary: "Get company expense data for dashboard (byCategory + monthly)",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "company",
@@ -233,8 +248,8 @@ export const getUpcomingPaymentsProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			daysAhead: z.number().optional().default(30),
+			organizationId: idString(),
+			daysAhead: dayCount().optional().default(30),
 		}),
 	)
 	.handler(async ({ input, context }) => {

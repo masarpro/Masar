@@ -2,6 +2,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../../lib/permissions";
 import { protectedProcedure } from "../../../../orpc/procedures";
+import { idString } from "../../../../lib/validation-constants";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LEAVE DASHBOARD
@@ -13,7 +14,7 @@ export const leaveDashboardProcedure = protectedProcedure
 		tags: ["Company", "Leaves"],
 		summary: "Leave management dashboard summary",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "employees",

@@ -12,10 +12,10 @@ export const createPhotoProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			url: z.string().url("رابط الصورة غير صالح"),
-			caption: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			url: z.string().trim().url("رابط الصورة غير صالح").max(2048),
+			caption: z.string().trim().max(100).optional(),
 			category: z
 				.enum(["PROGRESS", "ISSUE", "EQUIPMENT", "MATERIAL", "SAFETY", "OTHER"])
 				.optional()

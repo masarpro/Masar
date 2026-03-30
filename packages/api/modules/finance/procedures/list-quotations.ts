@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ORPCError } from "@orpc/server";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { idString, searchQuery, paginationLimit, paginationOffset } from "../../../lib/validation-constants";
 
 export const listQuotations = protectedProcedure
 	.route({
@@ -13,7 +14,7 @@ export const listQuotations = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			status: z
 				.enum([
 					"DRAFT",
@@ -25,11 +26,11 @@ export const listQuotations = protectedProcedure
 					"CONVERTED",
 				])
 				.optional(),
-			clientId: z.string().optional(),
-			projectId: z.string().optional(),
-			query: z.string().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			clientId: z.string().trim().max(100).optional(),
+			projectId: z.string().trim().max(100).optional(),
+			query: searchQuery(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -72,8 +73,8 @@ export const getQuotation = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

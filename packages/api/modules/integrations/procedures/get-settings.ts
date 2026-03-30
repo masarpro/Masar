@@ -13,7 +13,7 @@ export const getSettings = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -41,8 +41,8 @@ export const getDeliveryLogs = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100).optional(),
 			channel: z.enum(["EMAIL", "WHATSAPP", "SMS"]).optional(),
 			status: z.enum(["PENDING", "SENT", "FAILED", "SKIPPED"]).optional(),
 			limit: z.number().min(1).max(100).optional().default(50),

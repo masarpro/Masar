@@ -89,7 +89,7 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 	};
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Summary Cards - Glass Morphism */}
 			{summary && (
 				<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -160,7 +160,7 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 							placeholder={t("company.assets.searchPlaceholder")}
 							value={search}
 							onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pr-10 focus:ring-1 focus:ring-primary/30"
+							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pe-10 focus:ring-1 focus:ring-primary/30"
 						/>
 					</div>
 					<Select value={categoryFilter} onValueChange={(v) => { setCategoryFilter(v); setCurrentPage(1); }}>
@@ -194,7 +194,7 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 					onClick={() => setShowAddDialog(true)}
 					className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
 				>
-					<Plus className="ml-2 h-4 w-4" />
+					<Plus className="ms-2 h-4 w-4" />
 					{t("company.assets.addAsset")}
 				</Button>
 			</div>
@@ -204,12 +204,12 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 				<Table className="table-fixed w-full">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[22%]">{t("company.assets.name")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[18%]">{t("company.assets.category")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[14%]">{t("company.assets.type")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[18%]">{t("company.assets.value")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[12%]">{t("company.assets.status")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[16%]">{t("company.assets.currentProject")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[22%]">{t("company.assets.name")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[18%]">{t("company.assets.category")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[14%]">{t("company.assets.type")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[18%]">{t("company.assets.value")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[12%]">{t("company.assets.status")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[16%]">{t("company.assets.currentProject")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -231,23 +231,23 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 									style={{ animationDelay: `${index * 30}ms` }}
 									onClick={() => router.push(`/app/${organizationSlug}/company/assets/${asset.id}`)}
 								>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<div>
 											<p className="font-medium text-slate-900 dark:text-slate-100 truncate">{asset.name}</p>
 											{asset.assetNo && <p className="text-xs text-slate-400">{asset.assetNo}</p>}
 										</div>
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300">
 										{t(`company.assets.categories.${asset.category}`)}
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300">
 										{t(`company.assets.types.${asset.type}`)}
 									</TableCell>
-									<TableCell className="text-right font-semibold text-slate-700 dark:text-slate-300">
+									<TableCell className="text-end font-semibold text-slate-700 dark:text-slate-300">
 										{formatCurrency(Number(asset.currentValue ?? asset.purchasePrice))}
 									</TableCell>
-									<TableCell className="text-right">{getStatusBadge(asset.status)}</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">{getStatusBadge(asset.status)}</TableCell>
+									<TableCell className="text-end">
 										{asset.currentProject ? (
 											<Badge variant="outline" className="text-[10px] rounded-lg border-slate-200/50 dark:border-slate-700/50 px-2 py-0.5">
 												{asset.currentProject.name}

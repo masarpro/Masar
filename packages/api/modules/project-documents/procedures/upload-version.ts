@@ -13,14 +13,14 @@ export const uploadVersionProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			documentId: z.string(),
-			fileName: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			documentId: z.string().trim().max(100),
+			fileName: z.string().trim().max(255),
 			fileSize: z.number().int(),
-			fileType: z.string(),
-			storagePath: z.string(),
-			changeNotes: z.string().optional(),
+			fileType: z.string().trim().max(200),
+			storagePath: z.string().trim().max(500),
+			changeNotes: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

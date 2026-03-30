@@ -12,9 +12,9 @@ export const reorder = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			orderedIds: z.array(z.string()).min(1).max(500),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			orderedIds: z.array(z.string().trim().max(100)).min(1).max(500),
 		}),
 	)
 	.handler(async ({ input, context }) => {

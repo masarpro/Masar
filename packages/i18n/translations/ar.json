@@ -408,9 +408,13 @@
         "password": "كلمة المرور"
       },
       "submit": "تسجيل الدخول",
-      "subtitle": "يرجى إدخال بيانات الاعتماد الخاصة بك لتسجيل الدخول.",
+      "subtitle": "سجّل دخولك للمتابعة",
       "title": "مرحباً بعودتك",
-      "sendMagicLink": "إرسال الرابط السحري"
+      "sendMagicLink": "إرسال الرابط السحري",
+      "emailLogin": "الدخول بالبريد الإلكتروني",
+      "emailLoginDescription": "سنرسل لك رابط دخول على بريدك الإلكتروني",
+      "orContinueWith": "أو تابع بـ",
+      "backToPassword": "الدخول بكلمة المرور بدلاً من ذلك"
     },
     "resetPassword": {
       "backToSignin": "العودة لتسجيل الدخول",
@@ -430,12 +434,21 @@
         "signupFailed": "نأسف، لم نتمكن من إنشاء حسابك. يرجى المحاولة لاحقاً.",
         "verifyEmail": "لقد أرسلنا لك رابطاً للتحقق من بريدك الإلكتروني. يرجى التحقق من صندوق الوارد."
       },
-      "message": "نحن سعداء بانضمامك إلينا. يرجى ملء النموذج أدناه لإنشاء حسابك.",
+      "message": "ابدأ بإدارة مشاريعك في دقائق",
       "name": "الاسم",
       "password": "كلمة المرور",
       "signIn": "تسجيل الدخول",
       "submit": "إنشاء حساب",
-      "title": "إنشاء حساب"
+      "title": "إنشاء حساب جديد",
+      "orContinueWith": "أو تابع بـ"
+    },
+    "brand": {
+      "headline": "نظام إدارة المقاولات المتكامل",
+      "subheadline": "من حساب الكميات إلى تسليم المشروع — في نظام واحد"
+    },
+    "footer": {
+      "privacyPolicy": "سياسة الخصوصية",
+      "terms": "الشروط والأحكام"
     },
     "verify": {
       "title": "تحقق من حسابك",
@@ -1694,13 +1707,13 @@
     "learn": {
       "title": "تعرّف على مسار",
       "pricing": "كيف تسعّر مشروعك",
-      "pricing.desc": "دليل خطوة بخطوة",
+      "pricingDesc": "دليل خطوة بخطوة",
       "invoices": "إدارة الفواتير والتحصيل",
-      "invoices.desc": "نظام مالي متكامل",
+      "invoicesDesc": "نظام مالي متكامل",
       "ai": "جرّب المساعد الذكي",
-      "ai.desc": "6 أدوات ذكية",
+      "aiDesc": "6 أدوات ذكية",
       "support": "تواصل معنا",
-      "support.desc": "فريق الدعم"
+      "supportDesc": "فريق الدعم"
     },
     "finance": {
       "title": "المالية",
@@ -9855,6 +9868,74 @@
     "directPayment": "دفعة مباشرة (بدون مستخلص)",
     "linkedToClaim": "مرتبطة بمستخلص #{claimNo}",
     "selectClaim": "اختر مستخلص...",
-    "claimRemaining": "المتبقي: {amount}"
+    "claimRemaining": "المتبقي: {amount}",
+    "steps": {
+      "claimInfo": "معلومات المستخلص",
+      "itemsTable": "جدول البنود"
+    },
+    "next": "التالي",
+    "back": "رجوع",
+    "noContractItems": "لا توجد بنود في هذا العقد. أضف بنود أولاً من صفحة البنود.",
+    "goToItems": "الذهاب لصفحة البنود",
+    "itemColumn": "البند",
+    "manualItems": "بنود يدوية",
+    "addManualItem": "إضافة بند يدوي",
+    "manualItemDescription": "وصف البند",
+    "manualItemUnit": "الوحدة",
+    "manualItemQty": "الكمية",
+    "manualItemPrice": "سعر الوحدة",
+    "manualItemAmount": "المبلغ",
+    "removeItem": "حذف",
+    "manualItemsNote": "بنود إضافية غير مرتبطة ببنود العقد"
+  },
+  "subcontractItems": {
+    "title": "بنود العقد",
+    "addItem": "إضافة بند",
+    "editItem": "تعديل البند",
+    "noItems": "لا توجد بنود بعد. أضف بنود العقد لتتمكن من إنشاء المستخلصات.",
+    "contractTotal": "إجمالي العقد",
+    "itemCode": "رمز البند",
+    "description": "الوصف",
+    "descriptionEn": "الوصف بالإنجليزية",
+    "unit": "الوحدة",
+    "contractQty": "كمية العقد",
+    "unitPrice": "سعر الوحدة",
+    "totalAmount": "الإجمالي",
+    "claimedQty": "الكمية المنصرفة",
+    "progress": "نسبة الإنجاز",
+    "isLumpSum": "بند مقطوع (مبلغ إجمالي)",
+    "category": "التصنيف",
+    "selectCategory": "اختر التصنيف...",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "deleteItem": "حذف البند",
+    "deleteConfirm": "هل أنت متأكد من حذف هذا البند؟ سيتم حذف البيانات المرتبطة به.",
+    "units": {
+      "m3": "م³ (متر مكعب)",
+      "m2": "م² (متر مربع)",
+      "m": "م.ط (متر طولي)",
+      "ton": "طن",
+      "piece": "عدد",
+      "ls": "مقطوعية",
+      "day": "يوم"
+    },
+    "categories": {
+      "earthworks": "أعمال ترابية",
+      "concrete": "خرسانة",
+      "masonry": "بناء بلوك",
+      "finishing": "تشطيبات",
+      "electrical": "كهرباء",
+      "plumbing": "سباكة",
+      "hvac": "تكييف",
+      "other": "أخرى"
+    },
+    "notifications": {
+      "created": "تم إضافة البند بنجاح",
+      "createError": "فشل إضافة البند",
+      "updated": "تم تحديث البند بنجاح",
+      "updateError": "فشل تحديث البند",
+      "deleted": "تم حذف البند بنجاح",
+      "deleteError": "فشل حذف البند"
+    }
   }
 }

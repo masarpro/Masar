@@ -14,6 +14,11 @@ import {
 import { z } from "zod";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_DESC, MAX_CODE,
+	idString, optionalTrimmed, searchQuery,
+	positiveAmount, paginationLimit, paginationOffset,
+} from "../../../lib/validation-constants";
 
 // Enums
 const orgExpenseCategoryEnum = z.enum([
@@ -79,17 +84,17 @@ export const listExpenses = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			category: orgExpenseCategoryEnum.optional(),
-			sourceAccountId: z.string().optional(),
-			projectId: z.string().optional(),
+			sourceAccountId: z.string().trim().max(100).optional(),
+			projectId: z.string().trim().max(100).optional(),
 			status: financeTransactionStatusEnum.optional(),
 			sourceType: expenseSourceTypeEnum.optional(),
 			dateFrom: z.coerce.date().optional(),
 			dateTo: z.coerce.date().optional(),
-			query: z.string().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			query: searchQuery(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -124,8 +129,8 @@ export const getExpense = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -155,10 +160,10 @@ export const getExpensesSummary = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			dateFrom: z.coerce.date().optional(),
 			dateTo: z.coerce.date().optional(),
-			projectId: z.string().optional(),
+			projectId: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -187,23 +192,23 @@ export const createExpenseProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			category: orgExpenseCategoryEnum,
-			customCategory: z.string().optional(),
-			description: z.string().optional(),
-			amount: z.number().positive(),
+			customCategory: z.string().trim().max(MAX_NAME).optional(),
+			description: optionalTrimmed(MAX_DESC),
+			amount: positiveAmount(),
 			date: z.coerce.date(),
-			sourceAccountId: z.string().optional(),
-			vendorName: z.string().optional(),
-			vendorTaxNumber: z.string().optional(),
-			projectId: z.string().optional(),
-			invoiceRef: z.string().optional(),
+			sourceAccountId: z.string().trim().max(100).optional(),
+			vendorName: optionalTrimmed(MAX_NAME),
+			vendorTaxNumber: z.string().trim().max(MAX_CODE).optional(),
+			projectId: z.string().trim().max(100).optional(),
+			invoiceRef: z.string().trim().max(MAX_CODE).optional(),
 			paymentMethod: paymentMethodEnum.optional().default("BANK_TRANSFER"),
-			referenceNo: z.string().optional(),
+			referenceNo: z.string().trim().max(MAX_CODE).optional(),
 			status: financeTransactionStatusEnum.optional(),
 			sourceType: expenseSourceTypeEnum.optional(),
 			dueDate: z.coerce.date().optional(),
-			notes: z.string().optional(),
+			notes: optionalTrimmed(MAX_DESC),
 		}).refine(
 			(data) => {
 				// sourceAccountId is required when status is not PENDING
@@ -329,19 +334,19 @@ export const updateExpenseProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 			category: orgExpenseCategoryEnum.optional(),
-			customCategory: z.string().optional(),
-			description: z.string().optional(),
+			customCategory: z.string().trim().max(MAX_NAME).optional(),
+			description: optionalTrimmed(MAX_DESC),
 			date: z.coerce.date().optional(),
-			vendorName: z.string().optional(),
-			vendorTaxNumber: z.string().optional(),
-			projectId: z.string().nullable().optional(),
-			invoiceRef: z.string().optional(),
+			vendorName: optionalTrimmed(MAX_NAME),
+			vendorTaxNumber: z.string().trim().max(MAX_CODE).optional(),
+			projectId: z.string().trim().max(100).nullable().optional(),
+			invoiceRef: z.string().trim().max(MAX_CODE).optional(),
 			paymentMethod: paymentMethodEnum.optional(),
-			referenceNo: z.string().optional(),
-			notes: z.string().optional(),
+			referenceNo: z.string().trim().max(MAX_CODE).optional(),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -378,8 +383,8 @@ export const deleteExpenseProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -434,12 +439,12 @@ export const payExpenseProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			sourceAccountId: z.string(),
+			organizationId: idString(),
+			id: idString(),
+			sourceAccountId: idString(),
 			paymentMethod: paymentMethodEnum.optional(),
-			referenceNo: z.string().optional(),
-			amount: z.number().positive().optional(),
+			referenceNo: z.string().trim().max(MAX_CODE).optional(),
+			amount: positiveAmount().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -536,8 +541,8 @@ export const cancelExpenseProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -592,16 +597,16 @@ export const listExpensesWithSubcontracts = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			category: orgExpenseCategoryEnum.optional(),
-			sourceAccountId: z.string().optional(),
-			projectId: z.string().optional(),
+			sourceAccountId: z.string().trim().max(100).optional(),
+			projectId: z.string().trim().max(100).optional(),
 			status: financeTransactionStatusEnum.optional(),
 			dateFrom: z.coerce.date().optional(),
 			dateTo: z.coerce.date().optional(),
-			query: z.string().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			query: searchQuery(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

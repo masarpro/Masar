@@ -4,6 +4,7 @@ import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { notifyClaimStatusChanged } from "../../notifications/lib/notification-service";
+import { idString } from "../../../lib/validation-constants";
 
 export const updateClaimStatusProcedure = subscriptionProcedure
 	.route({
@@ -14,9 +15,9 @@ export const updateClaimStatusProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			claimId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
+			claimId: idString(),
 			status: z.enum(["DRAFT", "SUBMITTED", "APPROVED", "PAID", "REJECTED"]),
 		}),
 	)

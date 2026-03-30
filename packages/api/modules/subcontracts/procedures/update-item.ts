@@ -2,6 +2,10 @@ import { updateSubcontractItem, logAuditEvent } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_CODE, MAX_ID,
+	idString, nullishTrimmed,
+} from "../../../lib/validation-constants";
 
 export const updateSubcontractItemProcedure = subscriptionProcedure
 	.route({
@@ -12,18 +16,18 @@ export const updateSubcontractItemProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractId: z.string(),
-			itemId: z.string(),
-			itemCode: z.string().nullish(),
-			description: z.string().min(1).optional(),
-			descriptionEn: z.string().nullish(),
-			unit: z.string().min(1).optional(),
-			contractQty: z.number().positive().optional(),
-			unitPrice: z.number().positive().optional(),
-			sortOrder: z.number().optional(),
-			category: z.string().nullish(),
+			organizationId: idString(),
+			projectId: idString(),
+			contractId: idString(),
+			itemId: idString(),
+			itemCode: z.string().trim().max(MAX_CODE).nullish(),
+			description: z.string().trim().min(1).max(MAX_NAME).optional(),
+			descriptionEn: nullishTrimmed(MAX_NAME),
+			unit: z.string().trim().min(1).max(MAX_CODE).optional(),
+			contractQty: z.number().positive().max(999_999).optional(),
+			unitPrice: z.number().positive().max(99_999_999.99).optional(),
+			sortOrder: z.number().int().min(0).max(10_000).optional(),
+			category: nullishTrimmed(MAX_ID),
 			isLumpSum: z.boolean().optional(),
 		}),
 	)

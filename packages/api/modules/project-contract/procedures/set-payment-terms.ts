@@ -13,11 +13,11 @@ export const setPaymentTerms = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			terms: z.array(
 				z.object({
-					id: z.string().nullish(),
+					id: z.string().trim().max(100).nullish(),
 					type: z.enum([
 						"ADVANCE",
 						"MILESTONE",
@@ -25,11 +25,11 @@ export const setPaymentTerms = subscriptionProcedure
 						"COMPLETION",
 						"CUSTOM",
 					]),
-					label: z.string().nullish(),
+					label: z.string().trim().max(100).nullish(),
 					percent: z.number().min(0).max(100).nullish(),
 					amount: z.number().min(0).nullish(),
 					dueDate: z.coerce.date().nullish(),
-					milestoneId: z.string().nullish(),
+					milestoneId: z.string().trim().max(100).nullish(),
 					sortOrder: z.number().int().optional(),
 				}),
 			),

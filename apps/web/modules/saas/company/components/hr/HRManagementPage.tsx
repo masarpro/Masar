@@ -31,8 +31,8 @@ export function HRManagementPage({ organizationId, organizationSlug }: HRManagem
 	);
 
 	return (
-		<div className="space-y-6" dir="rtl">
-			<Tabs value={currentTab} onValueChange={handleTabChange} dir="rtl">
+		<div className="space-y-6">
+			<Tabs value={currentTab} onValueChange={handleTabChange}>
 				<TabsList className="w-full justify-start">
 					<TabsTrigger value="employees" className="gap-1.5">
 						<Users className="h-3.5 w-3.5" />

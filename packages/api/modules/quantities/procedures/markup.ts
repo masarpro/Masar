@@ -19,8 +19,8 @@ export const markupGetSettings = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -93,8 +93,8 @@ export const markupSetUniform = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 			overheadPercent: z.number().min(0).max(100),
 			profitPercent: z.number().min(0).max(100),
 			contingencyPercent: z.number().min(0).max(100),
@@ -153,11 +153,11 @@ export const markupSetSectionMarkups = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 			markups: z.array(
 				z.object({
-					section: z.string(),
+					section: z.string().trim().max(200),
 					markupPercent: z.number().min(0).max(200),
 				}),
 			),
@@ -220,8 +220,8 @@ export const markupGetProfitAnalysis = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

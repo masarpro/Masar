@@ -13,28 +13,28 @@ export const update = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			leadId: z.string(),
-			name: z.string().min(1).optional(),
-			phone: z.string().optional().nullable(),
-			email: z.string().email().optional().nullable().or(z.literal("")),
-			company: z.string().optional().nullable(),
+			organizationId: z.string().trim().max(100),
+			leadId: z.string().trim().max(100),
+			name: z.string().trim().min(1).max(200).optional(),
+			phone: z.string().trim().max(20).optional().nullable(),
+			email: z.string().trim().email().max(254).optional().nullable().or(z.literal("")),
+			company: z.string().trim().max(200).optional().nullable(),
 			clientType: z.enum(["INDIVIDUAL", "COMMERCIAL"]).optional(),
 			projectType: z
 				.enum(["RESIDENTIAL", "COMMERCIAL", "INDUSTRIAL", "INFRASTRUCTURE", "MIXED"])
 				.optional()
 				.nullable(),
-			projectLocation: z.string().optional().nullable(),
-			estimatedArea: z.number().positive().optional().nullable(),
-			estimatedValue: z.number().positive().optional().nullable(),
+			projectLocation: z.string().trim().max(500).optional().nullable(),
+			estimatedArea: z.number().positive().max(999_999).optional().nullable(),
+			estimatedValue: z.number().positive().max(999_999_999.99).optional().nullable(),
 			source: z
 				.enum(["REFERRAL", "SOCIAL_MEDIA", "WEBSITE", "DIRECT", "EXHIBITION", "OTHER"])
 				.optional(),
 			priority: z.enum(["NORMAL", "HIGH", "URGENT"]).optional(),
-			assignedToId: z.string().optional().nullable(),
-			expectedCloseDate: z.string().optional().nullable(),
-			lostReason: z.string().optional().nullable(),
-			notes: z.string().optional().nullable(),
+			assignedToId: z.string().trim().max(100).optional().nullable(),
+			expectedCloseDate: z.string().trim().max(50).optional().nullable(),
+			lostReason: z.string().trim().max(2000).optional().nullable(),
+			notes: z.string().trim().max(2000).optional().nullable(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

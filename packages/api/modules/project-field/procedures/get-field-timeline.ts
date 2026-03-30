@@ -12,10 +12,10 @@ export const getFieldTimelineProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			limit: z.number().optional().default(20),
-			offset: z.number().optional().default(0),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			limit: z.number().int().min(1).max(500).optional().default(20),
+			offset: z.number().int().nonnegative().optional().default(0),
 		}),
 	)
 	.handler(async ({ input, context }) => {

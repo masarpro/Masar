@@ -12,9 +12,9 @@ export const sendOfficialUpdateProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			content: z.string().min(1, "محتوى التحديث مطلوب"),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			content: z.string().trim().min(1, "محتوى التحديث مطلوب").max(5000),
 		}),
 	)
 	.handler(async ({ input, context }) => {

@@ -3,6 +3,7 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { idString } from "../../../lib/validation-constants";
 
 export const getSubcontractClaimPrintDataProcedure = protectedProcedure
 	.route({
@@ -13,9 +14,9 @@ export const getSubcontractClaimPrintDataProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			claimId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
+			claimId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -45,9 +46,9 @@ export const markSubcontractClaimAsPrintedProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			claimId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
+			claimId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

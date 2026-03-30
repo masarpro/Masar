@@ -12,18 +12,18 @@ export const createActivityProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			milestoneId: z.string(),
-			title: z.string().min(1).max(200),
-			description: z.string().max(2000).optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			milestoneId: z.string().trim().max(100),
+			title: z.string().trim().min(1).max(200),
+			description: z.string().trim().max(2000).optional(),
 			plannedStart: z.string().datetime().optional(),
 			plannedEnd: z.string().datetime().optional(),
 			duration: z.number().int().min(0).optional(),
 			weight: z.number().min(0).optional(),
-			assigneeId: z.string().optional(),
-			calendarId: z.string().optional(),
-			notes: z.string().max(5000).optional(),
+			assigneeId: z.string().trim().max(100).optional(),
+			calendarId: z.string().trim().max(100).optional(),
+			notes: z.string().trim().max(5000).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

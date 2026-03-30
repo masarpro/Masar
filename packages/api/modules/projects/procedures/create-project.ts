@@ -1,8 +1,24 @@
-import { createProject } from "@repo/database";
+import { createProject, orgAuditLog } from "@repo/database";
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
+import {
+	idString,
+	trimmedString,
+	optionalTrimmed,
+	nullishTrimmed,
+	positiveAmount,
+	financialAmount,
+	percentage,
+	dayCount,
+	MAX_NAME,
+	MAX_DESC,
+	MAX_LONG_TEXT,
+	MAX_CODE,
+	MAX_ARRAY,
+} from "../../../lib/validation-constants";
 
 export const createProjectProcedure = subscriptionProcedure
 	.route({
@@ -13,9 +29,9 @@ export const createProjectProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			name: z.string().min(1, "اسم المشروع مطلوب"),
-			description: z.string().optional(),
+			organizationId: idString(),
+			name: trimmedString(MAX_NAME),
+			description: optionalTrimmed(MAX_DESC),
 			type: z
 				.enum([
 					"RESIDENTIAL",
@@ -25,35 +41,35 @@ export const createProjectProcedure = subscriptionProcedure
 					"MIXED",
 				])
 				.optional(),
-			clientName: z.string().optional(),
-			clientId: z.string().optional(),
-			location: z.string().optional(),
-			contractValue: z.number().min(0).optional(),
+			clientName: optionalTrimmed(MAX_NAME),
+			clientId: z.string().trim().max(100).optional(),
+			location: optionalTrimmed(MAX_DESC),
+			contractValue: financialAmount().optional(),
 			startDate: z.coerce.date().optional(),
 			endDate: z.coerce.date().optional(),
 			// Contract fields
-			contractNo: z.string().nullish(),
+			contractNo: nullishTrimmed(MAX_CODE),
 			contractStatus: z
 				.enum(["DRAFT", "ACTIVE", "SUSPENDED", "CLOSED"])
 				.optional(),
 			signedDate: z.coerce.date().nullish(),
-			retentionPercent: z.number().nullish(),
-			retentionCap: z.number().nullish(),
-			retentionReleaseDays: z.number().int().nullish(),
-			contractNotes: z.string().nullish(),
+			retentionPercent: percentage().nullish(),
+			retentionCap: financialAmount().nullish(),
+			retentionReleaseDays: dayCount().nullish(),
+			contractNotes: nullishTrimmed(MAX_LONG_TEXT),
 			// New contract fields
 			includesVat: z.boolean().optional(),
-			vatPercent: z.number().min(0).max(100).nullish(),
+			vatPercent: percentage().nullish(),
 			paymentMethod: z
 				.enum(["CASH", "BANK_TRANSFER", "CHEQUE", "CREDIT_CARD", "OTHER"])
 				.nullish(),
-			performanceBondPercent: z.number().min(0).max(100).nullish(),
-			performanceBondAmount: z.number().min(0).nullish(),
+			performanceBondPercent: percentage().nullish(),
+			performanceBondAmount: financialAmount().nullish(),
 			insuranceRequired: z.boolean().optional(),
-			insuranceDetails: z.string().nullish(),
-			scopeOfWork: z.string().nullish(),
-			penaltyPercent: z.number().min(0).max(100).nullish(),
-			penaltyCapPercent: z.number().min(0).max(100).nullish(),
+			insuranceDetails: nullishTrimmed(MAX_LONG_TEXT),
+			scopeOfWork: nullishTrimmed(MAX_LONG_TEXT),
+			penaltyPercent: percentage().nullish(),
+			penaltyCapPercent: percentage().nullish(),
 			// Payment terms
 			paymentTerms: z
 				.array(
@@ -65,12 +81,13 @@ export const createProjectProcedure = subscriptionProcedure
 							"COMPLETION",
 							"CUSTOM",
 						]),
-						label: z.string().nullish(),
-						percent: z.number().min(0).max(100).nullish(),
-						amount: z.number().min(0).nullish(),
-						sortOrder: z.number().int().optional(),
+						label: nullishTrimmed(MAX_NAME),
+						percent: percentage().nullish(),
+						amount: financialAmount().nullish(),
+						sortOrder: z.number().int().min(0).max(999).optional(),
 					}),
 				)
+				.max(MAX_ARRAY)
 				.optional(),
 		}),
 	)
@@ -84,6 +101,13 @@ export const createProjectProcedure = subscriptionProcedure
 
 		// Feature gate: check project creation limit
 		await enforceFeatureAccess(input.organizationId, "projects.create", context.user);
+
+		// Validate startDate <= endDate
+		if (input.startDate && input.endDate && input.startDate > input.endDate) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "تاريخ البداية يجب أن يكون قبل تاريخ النهاية",
+			});
+		}
 
 		const project = await createProject({
 			organizationId: input.organizationId,
@@ -117,6 +141,15 @@ export const createProjectProcedure = subscriptionProcedure
 			penaltyPercent: input.penaltyPercent,
 			penaltyCapPercent: input.penaltyCapPercent,
 			paymentTerms: input.paymentTerms,
+		});
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "PROJECT_CREATED",
+			entityType: "project",
+			entityId: project.id,
+			metadata: { name: input.name },
 		});
 
 		return {

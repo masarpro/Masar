@@ -16,8 +16,8 @@ export const subscribeToNewsletter = publicProcedure
 	})
 	.input(
 		z.object({
-			email: z.string().email(),
-			turnstileToken: z.string().min(1),
+			email: z.string().trim().email().max(254),
+			turnstileToken: z.string().min(1).max(5000),
 		}),
 	)
 	.use(localeMiddleware)

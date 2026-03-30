@@ -40,15 +40,15 @@ export const updatePlan = adminProcedure
 	.input(
 		z.object({
 			plan: z.enum(["FREE", "PRO"]),
-			name: z.object({ en: z.string(), ar: z.string() }),
-			maxUsers: z.number().min(0),
-			maxProjects: z.number().min(0),
-			maxStorageGB: z.number().min(0),
-			monthlyPrice: z.number().min(0),
-			yearlyPrice: z.number().min(0),
+			name: z.object({ en: z.string().trim().max(200), ar: z.string().trim().max(200) }),
+			maxUsers: z.number().int().min(0).max(999_999),
+			maxProjects: z.number().int().min(0).max(999_999),
+			maxStorageGB: z.number().int().min(0).max(999_999),
+			monthlyPrice: z.number().min(0).max(999_999_999.99),
+			yearlyPrice: z.number().min(0).max(999_999_999.99),
 			features: z.object({
-				en: z.array(z.string()),
-				ar: z.array(z.string()),
+				en: z.array(z.string().trim().max(500)).max(100),
+				ar: z.array(z.string().trim().max(500)).max(100),
 			}),
 			isActive: z.boolean().optional(),
 		}),

@@ -2,6 +2,7 @@ import { getProjectFinanceSummary } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { idString } from "../../../lib/validation-constants";
 
 export const getFinanceSummary = protectedProcedure
 	.route({
@@ -12,8 +13,8 @@ export const getFinanceSummary = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

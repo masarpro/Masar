@@ -3,6 +3,10 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_FINANCIAL, MAX_ARRAY,
+	idString, nullishTrimmed, percentage, financialAmount,
+} from "../../../lib/validation-constants";
 
 export const setSubcontractPaymentTermsProcedure = subscriptionProcedure
 	.route({
@@ -13,12 +17,12 @@ export const setSubcontractPaymentTermsProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
+			contractId: idString(),
 			terms: z.array(
 				z.object({
-					id: z.string().nullish(),
+					id: z.string().trim().max(100).nullish(),
 					type: z.enum([
 						"ADVANCE",
 						"MILESTONE",
@@ -26,13 +30,13 @@ export const setSubcontractPaymentTermsProcedure = subscriptionProcedure
 						"COMPLETION",
 						"CUSTOM",
 					]),
-					label: z.string().nullish(),
-					percent: z.number().min(0).max(100).nullish(),
-					amount: z.number().min(0).nullish(),
+					label: nullishTrimmed(MAX_NAME),
+					percent: percentage().nullish(),
+					amount: financialAmount().nullish(),
 					dueDate: z.coerce.date().nullish(),
-					sortOrder: z.number().int().optional(),
+					sortOrder: z.number().int().min(0).max(10_000).optional(),
 				}),
-			),
+			).max(MAX_ARRAY),
 		}),
 	)
 	.handler(async ({ input, context }) => {

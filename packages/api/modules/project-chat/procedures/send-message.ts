@@ -20,12 +20,12 @@ export const sendMessageProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			channel: MessageChannelEnum,
-			content: z.string().min(1, "الرسالة مطلوبة"),
+			content: z.string().trim().min(1, "الرسالة مطلوبة").max(5000),
 			isUpdate: z.boolean().optional().default(false),
-			attachmentIds: z.array(z.string()).optional(),
+			attachmentIds: z.array(z.string().trim().max(100)).max(1000).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

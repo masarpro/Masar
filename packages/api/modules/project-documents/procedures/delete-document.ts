@@ -16,9 +16,9 @@ export const deleteDocumentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string().min(1),
-			projectId: z.string().min(1),
-			documentId: z.string().min(1),
+			organizationId: z.string().trim().max(100).min(1),
+			projectId: z.string().trim().max(100).min(1),
+			documentId: z.string().trim().max(100).min(1),
 		}),
 	)
 	.handler(async ({ input, context }) => {

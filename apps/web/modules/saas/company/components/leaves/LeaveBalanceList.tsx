@@ -90,7 +90,7 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 	const yearOptions = [currentYear - 1, currentYear, currentYear + 1];
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Header */}
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex items-center gap-3">
@@ -119,11 +119,11 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 				<Table className="table-fixed w-full">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.balances.employee")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.balances.leaveType")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.balances.total")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.balances.used")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.balances.remaining")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.balances.employee")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.balances.leaveType")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.balances.total")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.balances.used")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.balances.remaining")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -144,13 +144,13 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 									className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
 									style={{ animationDelay: `${index * 30}ms` }}
 								>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<div>
 											<p className="font-medium text-slate-900 dark:text-slate-100">{bal.employee.name}</p>
 											{bal.employee.employeeNo && <p className="text-xs text-slate-400">{bal.employee.employeeNo}</p>}
 										</div>
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<div className="flex items-center gap-2">
 											{bal.leaveType.color && (
 												<div className="w-3 h-3 rounded-full" style={{ backgroundColor: bal.leaveType.color }} />
@@ -158,13 +158,13 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 											<span className="text-sm text-slate-700 dark:text-slate-300">{bal.leaveType.name}</span>
 										</div>
 									</TableCell>
-									<TableCell className="text-right text-sm font-semibold text-slate-700 dark:text-slate-300">
+									<TableCell className="text-end text-sm font-semibold text-slate-700 dark:text-slate-300">
 										{bal.totalDays} {t("company.leaves.days")}
 									</TableCell>
-									<TableCell className="text-right text-sm text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-sm text-slate-600 dark:text-slate-300">
 										{bal.usedDays} {t("company.leaves.days")}
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<Badge className={`border-0 text-[10px] px-2 py-0.5 ${
 											bal.remainingDays <= 3
 												? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
@@ -195,7 +195,7 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 
 			{/* Adjust Dialog */}
 			<Dialog open={showAdjustDialog} onOpenChange={setShowAdjustDialog}>
-				<DialogContent className="rounded-2xl" dir="rtl">
+				<DialogContent className="rounded-2xl">
 					<DialogHeader>
 						<DialogTitle>{t("company.leaves.balances.adjustTitle")}</DialogTitle>
 					</DialogHeader>

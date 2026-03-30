@@ -8,6 +8,13 @@ import {
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import {
+	idString,
+	nullishTrimmed,
+	optionalTrimmed,
+	percentage,
+	MAX_DESC,
+} from "../../../lib/validation-constants";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LIST EMPLOYEE ASSIGNMENTS
@@ -21,8 +28,8 @@ export const listEmployeeAssignments = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			employeeId: z.string(),
+			organizationId: idString(),
+			employeeId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -46,8 +53,8 @@ export const listProjectAssignments = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -71,12 +78,12 @@ export const createAssignmentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			employeeId: z.string(),
-			projectId: z.string(),
-			percentage: z.number().min(1).max(100),
+			organizationId: idString(),
+			employeeId: idString(),
+			projectId: idString(),
+			percentage: percentage().min(1),
 			startDate: z.coerce.date(),
-			notes: z.string().optional(),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -106,13 +113,13 @@ export const updateAssignmentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			percentage: z.number().min(1).max(100).optional(),
+			organizationId: idString(),
+			id: idString(),
+			percentage: percentage().min(1).optional(),
 			startDate: z.coerce.date().optional(),
 			endDate: z.coerce.date().nullable().optional(),
 			isActive: z.boolean().optional(),
-			notes: z.string().nullable().optional(),
+			notes: nullishTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -137,8 +144,8 @@ export const removeAssignmentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

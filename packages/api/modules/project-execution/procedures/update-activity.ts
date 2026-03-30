@@ -13,11 +13,11 @@ export const updateActivityProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			activityId: z.string(),
-			title: z.string().min(1).max(200).optional(),
-			description: z.string().max(2000).optional().nullable(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			activityId: z.string().trim().max(100),
+			title: z.string().trim().min(1).max(200).optional(),
+			description: z.string().trim().max(2000).optional().nullable(),
 			plannedStart: z.string().datetime().optional().nullable(),
 			plannedEnd: z.string().datetime().optional().nullable(),
 			duration: z.number().int().min(0).optional().nullable(),
@@ -27,9 +27,9 @@ export const updateActivityProcedure = subscriptionProcedure
 			progress: z.number().min(0).max(100).optional(),
 			isCritical: z.boolean().optional(),
 			weight: z.number().min(0).optional().nullable(),
-			assigneeId: z.string().optional().nullable(),
-			calendarId: z.string().optional().nullable(),
-			notes: z.string().max(5000).optional().nullable(),
+			assigneeId: z.string().trim().max(100).optional().nullable(),
+			calendarId: z.string().trim().max(100).optional().nullable(),
+			notes: z.string().trim().max(5000).optional().nullable(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

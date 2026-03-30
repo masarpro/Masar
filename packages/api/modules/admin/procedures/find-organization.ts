@@ -2,6 +2,7 @@ import { ORPCError } from "@orpc/client";
 import { getOrganizationById as getOrganizationByIdFn } from "@repo/database";
 import { z } from "zod";
 import { adminProcedure } from "../../../orpc/procedures";
+import { idString } from "../../../lib/validation-constants";
 
 export const findOrganization = adminProcedure
 	.route({
@@ -12,7 +13,7 @@ export const findOrganization = adminProcedure
 	})
 	.input(
 		z.object({
-			id: z.string(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input: { id } }) => {

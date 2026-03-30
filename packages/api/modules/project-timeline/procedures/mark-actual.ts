@@ -13,9 +13,9 @@ export const markActualProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			milestoneId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			milestoneId: z.string().trim().max(100),
 			actualStart: z.string().datetime().optional(),
 			actualEnd: z.string().datetime().optional(),
 			progress: z.number().min(0).max(100).optional(),
@@ -58,9 +58,9 @@ export const startMilestoneProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			milestoneId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			milestoneId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -96,9 +96,9 @@ export const completeMilestoneProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			milestoneId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			milestoneId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

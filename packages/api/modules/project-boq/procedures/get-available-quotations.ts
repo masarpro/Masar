@@ -12,9 +12,9 @@ export const getAvailableQuotations = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			search: z.string().max(200).optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			search: z.string().trim().max(200).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

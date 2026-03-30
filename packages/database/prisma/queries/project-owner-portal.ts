@@ -660,3 +660,38 @@ export async function ownerDeleteMilestone(
 		},
 	});
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Token Cleanup
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Delete expired portal sessions and expired/revoked access tokens.
+ * Called by a daily cron job to prevent stale data accumulation.
+ */
+export async function cleanupExpiredTokens(): Promise<{
+	deletedSessions: number;
+	deletedTokens: number;
+}> {
+	const now = new Date();
+
+	// 1. Delete expired sessions first
+	const sessionResult = await db.ownerPortalSession.deleteMany({
+		where: { expiresAt: { lt: now } },
+	});
+
+	// 2. Delete expired or revoked access tokens (cascade deletes remaining sessions)
+	const tokenResult = await db.projectOwnerAccess.deleteMany({
+		where: {
+			OR: [
+				{ expiresAt: { lt: now } },
+				{ isRevoked: true },
+			],
+		},
+	});
+
+	return {
+		deletedSessions: sessionResult.count,
+		deletedTokens: tokenResult.count,
+	};
+}

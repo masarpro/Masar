@@ -13,13 +13,13 @@ export const createDailyReportProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			reportDate: z.coerce.date(),
 			manpower: z.number().int().min(0).default(0),
-			equipment: z.string().optional(),
-			workDone: z.string().min(1, "الأعمال المنجزة مطلوبة"),
-			blockers: z.string().optional(),
+			equipment: z.string().trim().max(100).optional(),
+			workDone: z.string().trim().min(1, "الأعمال المنجزة مطلوبة").max(5000),
+			blockers: z.string().trim().max(100).optional(),
 			weather: z
 				.enum(["SUNNY", "CLOUDY", "RAINY", "WINDY", "DUSTY", "HOT", "COLD"])
 				.optional()

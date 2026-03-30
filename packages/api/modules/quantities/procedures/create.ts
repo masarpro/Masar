@@ -80,16 +80,16 @@ export const create = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			name: z.string().optional(),
-			customerName: z.string().optional(),
-			customerId: z.string().optional(),
-			projectType: z.string(),
+			organizationId: z.string().trim().max(100),
+			name: z.string().trim().max(100).optional(),
+			customerName: z.string().trim().max(100).optional(),
+			customerId: z.string().trim().max(100).optional(),
+			projectType: z.string().trim().max(100),
 			landArea: z.number().positive().default(1),
 			buildingArea: z.number().positive().default(1),
 			numberOfFloors: z.number().int().positive().default(1),
 			hasBasement: z.boolean().default(false),
-			finishingLevel: z.string().default("medium"),
+			finishingLevel: z.string().trim().max(100).default("medium"),
 			studyType: z.enum(["FULL_PROJECT", "CUSTOM_ITEMS", "LUMP_SUM_ANALYSIS", "FULL_STUDY", "COST_PRICING", "QUICK_PRICING"]).default("FULL_PROJECT"),
 			contractValue: z.number().positive().optional(),
 			entryPoint: z.enum([

@@ -13,9 +13,9 @@ export const reorderChecklistProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			activityId: z.string(),
-			checklistIds: z.array(z.string()),
+			organizationId: z.string().trim().max(100),
+			activityId: z.string().trim().max(100),
+			checklistIds: z.array(z.string().trim().max(100)).max(1000),
 		}),
 	)
 	.handler(async ({ input, context }) => {

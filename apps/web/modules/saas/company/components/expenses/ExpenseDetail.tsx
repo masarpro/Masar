@@ -130,7 +130,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 
 	if (isLoading) {
 		return (
-			<div className="space-y-6" dir="rtl">
+			<div className="space-y-6">
 				{[...Array(3)].map((_, i) => (
 					<div key={i} className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-6">
 						<div className="h-24 animate-pulse rounded bg-muted" />
@@ -146,7 +146,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 		new Intl.NumberFormat("en-US").format(Number(amount)) + " ر.س";
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>
@@ -165,7 +165,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 					className="rounded-xl border-white/20 dark:border-slate-700/30"
 					onClick={() => router.push(`/app/${organizationSlug}/company/expenses/${expenseId}/edit`)}
 				>
-					<Pencil className="ml-2 h-4 w-4" />
+					<Pencil className="ms-2 h-4 w-4" />
 					{t("company.common.edit")}
 				</Button>
 			</div>
@@ -234,7 +234,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 						onClick={() => generatePaymentsMutation.mutate()}
 						disabled={generatePaymentsMutation.isPending}
 					>
-						<RefreshCw className="ml-1 h-4 w-4" />
+						<RefreshCw className="ms-1 h-4 w-4" />
 						{t("company.expenses.generatePayments")}
 					</Button>
 				</div>
@@ -277,7 +277,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 												className="rounded-xl hover:bg-sky-50 dark:hover:bg-sky-900/20"
 												onClick={() => setMarkPaidPaymentId(payment.id)}
 											>
-												<CheckCircle className="ml-1 h-4 w-4 text-sky-600" />
+												<CheckCircle className="ms-1 h-4 w-4 text-sky-600" />
 												{t("company.expenses.markPaid")}
 											</Button>
 										) : payment.financeExpenseId ? (
@@ -287,7 +287,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 												className="rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/20"
 												onClick={() => router.push(`/app/${organizationSlug}/finance/expenses/${payment.financeExpenseId}`)}
 											>
-												<ExternalLink className="ml-1 h-4 w-4 text-blue-600" />
+												<ExternalLink className="ms-1 h-4 w-4 text-blue-600" />
 												{t("company.expenses.viewInFinance")}
 											</Button>
 										) : null}
@@ -322,7 +322,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 						className="rounded-xl border-white/20 dark:border-slate-700/30"
 						onClick={() => setShowAllocationForm(!showAllocationForm)}
 					>
-						<Plus className="ml-1 h-4 w-4" />
+						<Plus className="ms-1 h-4 w-4" />
 						{t("company.expenses.manageAllocations")}
 					</Button>
 				</div>
@@ -360,9 +360,9 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 
 			{/* Mark Paid Dialog - select bank account */}
 			<Dialog open={!!markPaidPaymentId} onOpenChange={(open) => { if (!open) { setMarkPaidPaymentId(null); setSelectedBankAccountId(""); } }}>
-				<DialogContent className="rounded-2xl" dir="rtl">
+				<DialogContent className="rounded-2xl">
 					<DialogHeader>
-						<DialogTitle className="text-right">{t("company.expenses.selectBankAccount")}</DialogTitle>
+						<DialogTitle className="text-end">{t("company.expenses.selectBankAccount")}</DialogTitle>
 					</DialogHeader>
 					<div className="space-y-4 py-4">
 						<div>
@@ -468,7 +468,7 @@ function AllocationForm({
 			<div className="flex items-center justify-between pt-2">
 				<div className="flex gap-2">
 					<Button size="sm" variant="outline" className="rounded-xl" onClick={addRow}>
-						<Plus className="ml-1 h-4 w-4" /> {t("company.common.add")}
+						<Plus className="ms-1 h-4 w-4" /> {t("company.common.add")}
 					</Button>
 					<Button
 						size="sm"

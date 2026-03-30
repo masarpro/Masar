@@ -12,6 +12,21 @@ import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { logEmployeeChanges } from "../lib/log-employee-change";
+import {
+	idString,
+	trimmedString,
+	optionalTrimmed,
+	nullishTrimmed,
+	searchQuery,
+	financialAmount,
+	paginationLimit,
+	paginationOffset,
+	MAX_NAME,
+	MAX_DESC,
+	MAX_CODE,
+	MAX_PHONE,
+	MAX_EMAIL,
+} from "../../../lib/validation-constants";
 
 const employeeTypeEnum = z.enum([
 	"PROJECT_MANAGER", "SITE_ENGINEER", "SUPERVISOR", "ACCOUNTANT",
@@ -32,12 +47,12 @@ export const listEmployees = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			status: employeeStatusEnum.optional(),
 			type: employeeTypeEnum.optional(),
-			query: z.string().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			query: searchQuery(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -67,8 +82,8 @@ export const getEmployeeByIdProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -94,22 +109,22 @@ export const createEmployeeProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			name: z.string().min(1, "اسم الموظف مطلوب"),
-			employeeNo: z.string().optional(),
+			organizationId: idString(),
+			name: trimmedString(MAX_NAME),
+			employeeNo: optionalTrimmed(MAX_CODE),
 			type: employeeTypeEnum,
-			phone: z.string().optional(),
-			email: z.string().email().optional().or(z.literal("")),
-			nationalId: z.string().optional(),
+			phone: optionalTrimmed(MAX_PHONE),
+			email: z.string().trim().max(MAX_EMAIL).email().optional().or(z.literal("")),
+			nationalId: optionalTrimmed(MAX_CODE),
 			salaryType: salaryTypeEnum.optional(),
-			baseSalary: z.number().min(0).optional(),
-			housingAllowance: z.number().min(0).optional(),
-			transportAllowance: z.number().min(0).optional(),
-			otherAllowances: z.number().min(0).optional(),
-			gosiSubscription: z.number().min(0).optional(),
+			baseSalary: financialAmount().optional(),
+			housingAllowance: financialAmount().optional(),
+			transportAllowance: financialAmount().optional(),
+			otherAllowances: financialAmount().optional(),
+			gosiSubscription: financialAmount().optional(),
 			joinDate: z.coerce.date(),
-			linkedUserId: z.string().optional(),
-			notes: z.string().optional(),
+			linkedUserId: optionalTrimmed(MAX_CODE),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -139,25 +154,25 @@ export const updateEmployeeProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			name: z.string().min(1).optional(),
-			employeeNo: z.string().optional(),
+			organizationId: idString(),
+			id: idString(),
+			name: trimmedString(MAX_NAME).optional(),
+			employeeNo: optionalTrimmed(MAX_CODE),
 			type: employeeTypeEnum.optional(),
-			phone: z.string().optional(),
-			email: z.string().email().optional().or(z.literal("")),
-			nationalId: z.string().optional(),
+			phone: optionalTrimmed(MAX_PHONE),
+			email: z.string().trim().max(MAX_EMAIL).email().optional().or(z.literal("")),
+			nationalId: optionalTrimmed(MAX_CODE),
 			salaryType: salaryTypeEnum.optional(),
-			baseSalary: z.number().min(0).optional(),
-			housingAllowance: z.number().min(0).optional(),
-			transportAllowance: z.number().min(0).optional(),
-			otherAllowances: z.number().min(0).optional(),
-			gosiSubscription: z.number().min(0).optional(),
+			baseSalary: financialAmount().optional(),
+			housingAllowance: financialAmount().optional(),
+			transportAllowance: financialAmount().optional(),
+			otherAllowances: financialAmount().optional(),
+			gosiSubscription: financialAmount().optional(),
 			joinDate: z.coerce.date().optional(),
 			endDate: z.coerce.date().nullable().optional(),
 			status: employeeStatusEnum.optional(),
-			linkedUserId: z.string().nullable().optional(),
-			notes: z.string().nullable().optional(),
+			linkedUserId: z.string().trim().max(MAX_CODE).nullable().optional(),
+			notes: nullishTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -201,8 +216,8 @@ export const terminateEmployeeProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 			endDate: z.coerce.date(),
 		}),
 	)
@@ -225,7 +240,7 @@ export const getEmployeeSummaryProcedure = protectedProcedure
 		tags: ["Company", "Employees"],
 		summary: "Get employee summary statistics",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "employees",

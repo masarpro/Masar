@@ -14,11 +14,11 @@ export const finishingItemReorder = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			costStudyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			costStudyId: z.string().trim().max(100),
 			items: z.array(
 				z.object({
-					id: z.string(),
+					id: z.string().trim().max(100),
 					sortOrder: z.number().nonnegative(),
 				}),
 			),

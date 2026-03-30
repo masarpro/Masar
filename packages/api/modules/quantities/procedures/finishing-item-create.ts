@@ -7,37 +7,37 @@ import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 
 export const finishingItemSchema = z.object({
-	category: z.string(),
-	subCategory: z.string().optional(),
-	name: z.string(),
-	description: z.string().optional(),
-	floorId: z.string().optional(),
-	floorName: z.string().optional(),
+	category: z.string().trim().max(200),
+	subCategory: z.string().trim().max(100).optional(),
+	name: z.string().trim().max(200),
+	description: z.string().trim().max(2000).optional(),
+	floorId: z.string().trim().max(100).optional(),
+	floorName: z.string().trim().max(100).optional(),
 	area: z.number().nonnegative().optional(),
 	length: z.number().nonnegative().optional(),
 	height: z.number().nonnegative().optional(),
 	width: z.number().nonnegative().optional(),
 	perimeter: z.number().nonnegative().optional(),
 	quantity: z.number().nonnegative().optional(),
-	unit: z.string().default("m2"),
-	calculationMethod: z.string().optional(),
-	calculationData: z.any().optional(),
-	qualityLevel: z.string().optional(),
-	brand: z.string().optional(),
-	specifications: z.string().optional(),
+	unit: z.string().trim().max(50).default("m2"),
+	calculationMethod: z.string().trim().max(100).optional(),
+	calculationData: z.record(z.string(), z.unknown()).optional(),
+	qualityLevel: z.string().trim().max(100).optional(),
+	brand: z.string().trim().max(100).optional(),
+	specifications: z.string().trim().max(100).optional(),
 	wastagePercent: z.number().min(0).max(100).default(0),
 	materialPrice: z.number().nonnegative().default(0),
 	laborPrice: z.number().nonnegative().default(0),
 	materialCost: z.number().nonnegative().default(0),
 	laborCost: z.number().nonnegative().default(0),
 	totalCost: z.number().nonnegative().default(0),
-	dataSource: z.string().optional(),
-	sourceItemId: z.string().optional(),
-	sourceFormula: z.string().optional(),
+	dataSource: z.string().trim().max(100).optional(),
+	sourceItemId: z.string().trim().max(100).optional(),
+	sourceFormula: z.string().trim().max(100).optional(),
 	isEnabled: z.boolean().default(true),
 	sortOrder: z.number().nonnegative().default(0),
-	groupKey: z.string().optional(),
-	scope: z.string().optional(),
+	groupKey: z.string().trim().max(100).optional(),
+	scope: z.string().trim().max(100).optional(),
 });
 
 export const finishingItemCreate = subscriptionProcedure
@@ -49,8 +49,8 @@ export const finishingItemCreate = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			costStudyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			costStudyId: z.string().trim().max(100),
 		}).merge(finishingItemSchema),
 	)
 	.handler(async ({ input, context }) => {
@@ -83,8 +83,8 @@ export const finishingItemCreateBatch = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			costStudyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			costStudyId: z.string().trim().max(100),
 			items: z.array(finishingItemSchema),
 		}),
 	)

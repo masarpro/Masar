@@ -3,6 +3,7 @@ import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { notifyExpenseCreated, getProjectAccountants } from "../../notifications/lib/notification-service";
+import { idString, positiveAmount, optionalTrimmed, MAX_NAME, MAX_DESC, MAX_URL } from "../../../lib/validation-constants";
 
 export const createExpense = subscriptionProcedure
 	.route({
@@ -13,8 +14,8 @@ export const createExpense = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
 			date: z.coerce.date(),
 			category: z.enum([
 				"MATERIALS",
@@ -24,11 +25,11 @@ export const createExpense = subscriptionProcedure
 				"TRANSPORT",
 				"MISC",
 			]),
-			amount: z.number().positive("المبلغ يجب أن يكون أكبر من صفر"),
-			vendorName: z.string().optional(),
-			note: z.string().optional(),
-			attachmentUrl: z.string().url().optional(),
-			subcontractContractId: z.string().optional(),
+			amount: positiveAmount(),
+			vendorName: optionalTrimmed(MAX_NAME),
+			note: optionalTrimmed(MAX_DESC),
+			attachmentUrl: z.string().trim().url().max(MAX_URL).optional(),
+			subcontractContractId: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

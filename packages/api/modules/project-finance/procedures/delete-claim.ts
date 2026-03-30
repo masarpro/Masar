@@ -3,6 +3,7 @@ import { deleteProjectClaim, db } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { idString } from "../../../lib/validation-constants";
 
 export const deleteClaim = subscriptionProcedure
 	.route({
@@ -13,9 +14,9 @@ export const deleteClaim = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			claimId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
+			claimId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

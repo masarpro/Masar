@@ -13,9 +13,9 @@ export const addActivity = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			leadId: z.string(),
-			content: z.string().min(1).max(2000),
+			organizationId: z.string().trim().max(100),
+			leadId: z.string().trim().max(100),
+			content: z.string().trim().min(1).max(2000),
 		}),
 	)
 	.handler(async ({ input, context }) => {

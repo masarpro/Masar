@@ -54,7 +54,7 @@ export function FinanceDashboard({
 	const netProfit = (orgData?.payments.total ?? 0) - (orgData?.totalMoneyOut ?? 0);
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* 0. Blue Header */}
 			<FinanceHeader userName={userName} />
 

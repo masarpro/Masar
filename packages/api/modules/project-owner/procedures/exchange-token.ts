@@ -16,7 +16,7 @@ export const exchangeTokenProcedure = publicProcedure
 	})
 	.input(
 		z.object({
-			token: z.string().min(1, "رمز الوصول مطلوب"),
+			token: z.string().trim().min(1, "رمز الوصول مطلوب").max(200),
 		}),
 	)
 	.handler(async ({ input, context }) => {

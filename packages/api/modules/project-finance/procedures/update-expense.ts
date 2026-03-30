@@ -3,6 +3,7 @@ import { updateProjectExpense } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { idString, positiveAmount, MAX_NAME, MAX_DESC, MAX_URL } from "../../../lib/validation-constants";
 
 export const updateExpense = subscriptionProcedure
 	.route({
@@ -13,9 +14,9 @@ export const updateExpense = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			expenseId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
+			expenseId: idString(),
 			date: z.coerce.date().optional(),
 			category: z
 				.enum([
@@ -27,11 +28,11 @@ export const updateExpense = subscriptionProcedure
 					"MISC",
 				])
 				.optional(),
-			amount: z.number().positive("المبلغ يجب أن يكون أكبر من صفر").optional(),
-			vendorName: z.string().nullable().optional(),
-			note: z.string().nullable().optional(),
-			attachmentUrl: z.string().url().nullable().optional(),
-			subcontractContractId: z.string().nullable().optional(),
+			amount: positiveAmount().optional(),
+			vendorName: z.string().trim().max(MAX_NAME).nullable().optional(),
+			note: z.string().trim().max(MAX_DESC).nullable().optional(),
+			attachmentUrl: z.string().trim().url().max(MAX_URL).nullable().optional(),
+			subcontractContractId: z.string().trim().max(100).nullable().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

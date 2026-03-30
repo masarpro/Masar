@@ -209,7 +209,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 
 	if (isLoading) {
 		return (
-			<div className="space-y-6" dir="rtl">
+			<div className="space-y-6" >
 				{[...Array(4)].map((_, i) => (
 					<div
 						key={i}
@@ -228,7 +228,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 	const totalAmount = items.reduce((sum, item) => sum + Number(item.amount ?? 0), 0);
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6" >
 			{/* Back Button */}
 			<Button
 				variant="ghost"
@@ -291,9 +291,9 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 										disabled={populateMutation.isPending}
 									>
 										{populateMutation.isPending ? (
-											<Loader2 className="ml-2 h-4 w-4 animate-spin" />
+											<Loader2 className="ms-2 h-4 w-4 animate-spin" />
 										) : (
-											<RefreshCw className="ml-2 h-4 w-4" />
+											<RefreshCw className="ms-2 h-4 w-4" />
 										)}
 										{t("company.expenseRuns.populate")}
 									</Button>
@@ -302,7 +302,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 										onClick={() => setShowPostDialog(true)}
 										disabled={postMutation.isPending}
 									>
-										<Send className="ml-2 h-4 w-4" />
+										<Send className="ms-2 h-4 w-4" />
 										{t("company.expenseRuns.postToFinance")}
 									</Button>
 									<Button
@@ -311,7 +311,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 										onClick={() => setShowCancelDialog(true)}
 										disabled={cancelMutation.isPending}
 									>
-										<XCircle className="ml-2 h-4 w-4" />
+										<XCircle className="ms-2 h-4 w-4" />
 										{t("company.expenseRuns.cancel")}
 									</Button>
 								</>
@@ -323,7 +323,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 									onClick={() => setShowCancelDialog(true)}
 									disabled={cancelMutation.isPending}
 								>
-									<XCircle className="ml-2 h-4 w-4" />
+									<XCircle className="ms-2 h-4 w-4" />
 									{t("company.expenseRuns.cancel")}
 								</Button>
 							)}
@@ -379,26 +379,26 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 				<Table className="table-fixed w-full">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[22%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[22%]">
 								{t("company.expenseRuns.expenseName")}
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[15%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[15%]">
 								{t("company.expenseRuns.category")}
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[15%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[15%]">
 								{t("company.expenseRuns.vendor")}
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[14%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[14%]">
 								{t("company.expenseRuns.originalAmount")}
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[14%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[14%]">
 								{t("company.expenseRuns.amount")}
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[12%]">
+							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[12%]">
 								{t("company.expenseRuns.financeStatus")}
 							</TableHead>
 							{run.status === "DRAFT" && items.length > 0 && (
-								<TableHead className="text-right text-slate-500 dark:text-slate-400 w-[8%]">
+								<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[8%]">
 									{t("company.common.actions")}
 								</TableHead>
 							)}
@@ -412,24 +412,24 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 									className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
 									style={{ animationDelay: `${index * 30}ms` }}
 								>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<p className="font-medium text-slate-900 dark:text-slate-100 truncate">
 											{item.name ?? "-"}
 										</p>
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300">
 										{item.category ? t(`company.expenses.categories.${item.category}`) : "-"}
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300">
 										{item.vendor ?? "-"}
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300">
 										{formatCurrency(Number(item.originalAmount ?? 0))}
 									</TableCell>
-									<TableCell className="text-right font-semibold text-slate-900 dark:text-slate-100">
+									<TableCell className="text-end font-semibold text-slate-900 dark:text-slate-100">
 										{formatCurrency(Number(item.amount ?? 0))}
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										{item.financeExpense?.status ? (
 											getFinanceStatusBadge(item.financeExpense.status)
 										) : (
@@ -437,7 +437,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 										)}
 									</TableCell>
 									{run.status === "DRAFT" && (
-										<TableCell className="text-right">
+										<TableCell className="text-end">
 											<div className="flex items-center justify-end gap-1">
 												<Button
 													variant="ghost"
@@ -482,7 +482,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 
 			{/* Post to Finance Confirmation Dialog */}
 			<AlertDialog open={showPostDialog} onOpenChange={setShowPostDialog}>
-				<AlertDialogContent dir="rtl" className="rounded-2xl">
+				<AlertDialogContent  className="rounded-2xl">
 					<AlertDialogHeader>
 						<AlertDialogTitle>
 							{t("company.expenseRuns.postToFinance")}
@@ -515,7 +515,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 
 			{/* Cancel Confirmation Dialog */}
 			<AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-				<AlertDialogContent dir="rtl" className="rounded-2xl">
+				<AlertDialogContent  className="rounded-2xl">
 					<AlertDialogHeader>
 						<AlertDialogTitle>
 							{t("company.expenseRuns.cancel")}
@@ -567,7 +567,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 				open={!!deleteItemId}
 				onOpenChange={(open) => !open && setDeleteItemId(null)}
 			>
-				<AlertDialogContent dir="rtl" className="rounded-2xl">
+				<AlertDialogContent  className="rounded-2xl">
 					<AlertDialogHeader>
 						<AlertDialogTitle>
 							{t("company.expenseRuns.deleteItem")}

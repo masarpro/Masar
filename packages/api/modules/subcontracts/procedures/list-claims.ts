@@ -2,6 +2,7 @@ import { getSubcontractClaims } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { idString } from "../../../lib/validation-constants";
 
 export const listSubcontractClaimsProcedure = protectedProcedure
 	.route({
@@ -12,9 +13,9 @@ export const listSubcontractClaimsProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractId: z.string().optional(),
+			organizationId: idString(),
+			projectId: idString(),
+			contractId: z.string().trim().max(100).optional(),
 			status: z
 				.enum([
 					"DRAFT", "SUBMITTED", "UNDER_REVIEW", "APPROVED",

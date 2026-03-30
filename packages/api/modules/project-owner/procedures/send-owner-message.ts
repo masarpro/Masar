@@ -14,10 +14,10 @@ export const sendOwnerMessageProcedure = publicProcedure
 	})
 	.input(
 		z.object({
-			token: z.string().min(1).optional(),
-			sessionToken: z.string().min(1).optional(),
-			content: z.string().min(1, "الرسالة مطلوبة"),
-			senderName: z.string().optional().default("مالك المشروع"),
+			token: z.string().trim().min(1).max(200).optional(),
+			sessionToken: z.string().trim().min(1).max(200).optional(),
+			content: z.string().trim().min(1, "الرسالة مطلوبة").max(5000),
+			senderName: z.string().trim().max(100).optional().default("مالك المشروع"),
 		}).refine((d) => d.token || d.sessionToken, {
 			message: "token or sessionToken is required",
 		}),

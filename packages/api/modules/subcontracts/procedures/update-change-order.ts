@@ -2,6 +2,10 @@ import { updateSubcontractChangeOrder, logAuditEvent } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import {
+	MAX_DESC, MAX_URL,
+	idString, nullishTrimmed, signedAmount,
+} from "../../../lib/validation-constants";
 
 export const updateSubcontractChangeOrderProcedure = subscriptionProcedure
 	.route({
@@ -12,15 +16,15 @@ export const updateSubcontractChangeOrderProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractId: z.string(),
-			changeOrderId: z.string(),
-			description: z.string().min(1).optional(),
-			amount: z.number().optional(),
+			organizationId: idString(),
+			projectId: idString(),
+			contractId: idString(),
+			changeOrderId: idString(),
+			description: z.string().trim().min(1).max(MAX_DESC).optional(),
+			amount: signedAmount().optional(),
 			status: z.enum(["DRAFT", "SUBMITTED", "APPROVED", "REJECTED"]).optional(),
 			approvedDate: z.coerce.date().nullish(),
-			attachmentUrl: z.string().nullish(),
+			attachmentUrl: nullishTrimmed(MAX_URL),
 		}),
 	)
 	.handler(async ({ input, context }) => {

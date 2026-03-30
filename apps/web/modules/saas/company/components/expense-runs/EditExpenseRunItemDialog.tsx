@@ -87,7 +87,7 @@ export function EditExpenseRunItemDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent dir="rtl" className="sm:max-w-md rounded-2xl">
+			<DialogContent className="sm:max-w-md rounded-2xl">
 				<DialogHeader>
 					<DialogTitle>
 						{t("company.expenseRuns.editItem")} - {item.name ?? "-"}

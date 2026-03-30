@@ -13,9 +13,9 @@ export const applyTemplateProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			templateId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			templateId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			options: z
 				.object({
 					/**

@@ -13,9 +13,9 @@ export const linkQuotation = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			leadId: z.string(),
-			quotationId: z.string(),
+			organizationId: z.string().trim().max(100),
+			leadId: z.string().trim().max(100),
+			quotationId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

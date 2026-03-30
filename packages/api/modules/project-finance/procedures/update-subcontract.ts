@@ -2,6 +2,7 @@ import { updateSubcontractContract, logAuditEvent } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { idString, positiveAmount, MAX_NAME, MAX_DESC } from "../../../lib/validation-constants";
 
 export const updateSubcontract = subscriptionProcedure
 	.route({
@@ -12,14 +13,14 @@ export const updateSubcontract = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractId: z.string(),
-			name: z.string().min(1).optional(),
+			organizationId: idString(),
+			projectId: idString(),
+			contractId: idString(),
+			name: z.string().trim().min(1).max(MAX_NAME).optional(),
 			startDate: z.coerce.date().nullable().optional(),
 			endDate: z.coerce.date().nullable().optional(),
-			value: z.number().positive("قيمة العقد يجب أن تكون أكبر من صفر").optional(),
-			notes: z.string().nullable().optional(),
+			value: positiveAmount().optional(),
+			notes: z.string().trim().max(MAX_DESC).nullable().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

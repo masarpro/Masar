@@ -12,14 +12,14 @@ export const listIssuesProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			status: z
 				.enum(["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"])
 				.optional(),
 			severity: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]).optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			limit: z.number().int().min(1).max(500).optional().default(50),
+			offset: z.number().int().nonnegative().optional().default(0),
 		}),
 	)
 	.handler(async ({ input, context }) => {

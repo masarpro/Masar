@@ -9,6 +9,11 @@ import {
 import { z } from "zod";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	MAX_DESC, MAX_CODE,
+	idString, optionalTrimmed, searchQuery,
+	positiveAmount, paginationLimit, paginationOffset,
+} from "../../../lib/validation-constants";
 
 // Enums
 const financeTransactionStatusEnum = z.enum([
@@ -29,15 +34,15 @@ export const listTransfers = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			fromAccountId: z.string().optional(),
-			toAccountId: z.string().optional(),
+			organizationId: idString(),
+			fromAccountId: z.string().trim().max(100).optional(),
+			toAccountId: z.string().trim().max(100).optional(),
 			status: financeTransactionStatusEnum.optional(),
 			dateFrom: z.coerce.date().optional(),
 			dateTo: z.coerce.date().optional(),
-			query: z.string().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			query: searchQuery(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -70,8 +75,8 @@ export const getTransfer = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -101,14 +106,14 @@ export const createTransferProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			amount: z.number().positive(),
+			organizationId: idString(),
+			amount: positiveAmount(),
 			date: z.coerce.date(),
-			fromAccountId: z.string(),
-			toAccountId: z.string(),
-			description: z.string().optional(),
-			notes: z.string().optional(),
-			referenceNo: z.string().optional(),
+			fromAccountId: idString(),
+			toAccountId: idString(),
+			description: optionalTrimmed(MAX_DESC),
+			notes: optionalTrimmed(MAX_DESC),
+			referenceNo: z.string().trim().max(MAX_CODE).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -178,8 +183,8 @@ export const cancelTransferProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

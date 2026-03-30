@@ -329,7 +329,7 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 
 	return (
 		<Form {...form}>
-			<div className="space-y-6" dir="rtl">
+			<div className="space-y-6">
 				<FormWizard
 					steps={wizardSteps}
 					onComplete={() => form.handleSubmit(onSubmit)()}

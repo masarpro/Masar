@@ -164,7 +164,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 	};
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Header */}
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
@@ -195,13 +195,13 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 				<Table className="table-fixed w-full">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.requests.employee")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.requests.leaveType")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.requests.startDate")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.requests.endDate")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.requests.totalDays")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.leaves.requests.status")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-400">{t("company.common.actions")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.requests.employee")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.requests.leaveType")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.requests.startDate")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.requests.endDate")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.requests.totalDays")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.requests.status")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.common.actions")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -222,13 +222,13 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 									className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
 									style={{ animationDelay: `${index * 30}ms` }}
 								>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<div>
 											<p className="font-medium text-slate-900 dark:text-slate-100">{req.employee.name}</p>
 											{req.employee.employeeNo && <p className="text-xs text-slate-400">{req.employee.employeeNo}</p>}
 										</div>
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<div className="flex items-center gap-2">
 											{req.leaveType.color && (
 												<div className="w-3 h-3 rounded-full" style={{ backgroundColor: req.leaveType.color }} />
@@ -236,17 +236,17 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 											<span className="text-sm text-slate-700 dark:text-slate-300">{req.leaveType.name}</span>
 										</div>
 									</TableCell>
-									<TableCell className="text-right text-sm text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-sm text-slate-600 dark:text-slate-300">
 										{new Date(req.startDate).toLocaleDateString("ar-SA")}
 									</TableCell>
-									<TableCell className="text-right text-sm text-slate-600 dark:text-slate-300">
+									<TableCell className="text-end text-sm text-slate-600 dark:text-slate-300">
 										{new Date(req.endDate).toLocaleDateString("ar-SA")}
 									</TableCell>
-									<TableCell className="text-right text-sm font-semibold text-slate-700 dark:text-slate-300">
+									<TableCell className="text-end text-sm font-semibold text-slate-700 dark:text-slate-300">
 										{req.totalDays}
 									</TableCell>
-									<TableCell className="text-right">{getStatusBadge(req.status)}</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">{getStatusBadge(req.status)}</TableCell>
+									<TableCell className="text-end">
 										<div className="flex items-center gap-1 justify-end">
 											{req.status === "PENDING" && (
 												<>
@@ -318,7 +318,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 
 			{/* Create Dialog */}
 			<Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-				<DialogContent className="rounded-2xl" dir="rtl">
+				<DialogContent className="rounded-2xl">
 					<DialogHeader>
 						<DialogTitle>{t("company.leaves.requests.create")}</DialogTitle>
 					</DialogHeader>
@@ -396,7 +396,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 
 			{/* Reject Dialog */}
 			<Dialog open={!!showRejectDialog} onOpenChange={(open) => { if (!open) setShowRejectDialog(null); }}>
-				<DialogContent className="rounded-2xl" dir="rtl">
+				<DialogContent className="rounded-2xl">
 					<DialogHeader>
 						<DialogTitle>{t("company.leaves.requests.rejectTitle")}</DialogTitle>
 					</DialogHeader>

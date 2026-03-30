@@ -16,6 +16,7 @@ import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess, verifyProjectAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
+import { idString, paginationLimit } from "../../../lib/validation-constants";
 
 export const getFinanceDashboard = protectedProcedure
 	.route({
@@ -26,7 +27,7 @@ export const getFinanceDashboard = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -71,8 +72,8 @@ export const getFinanceOutstanding = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			limit: z.number().optional().default(20),
+			organizationId: idString(),
+			limit: paginationLimit(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -102,9 +103,9 @@ export const getFinanceRevenueByPeriod = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			startDate: z.string().datetime(),
-			endDate: z.string().datetime(),
+			organizationId: idString(),
+			startDate: z.string().trim().datetime(),
+			endDate: z.string().trim().datetime(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -133,7 +134,7 @@ export const getFinanceRevenueByProject = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -158,8 +159,8 @@ export const getFinanceRevenueByClient = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			limit: z.number().optional().default(10),
+			organizationId: idString(),
+			limit: paginationLimit(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -184,9 +185,9 @@ export const getFinanceConversionRate = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			startDate: z.string().datetime().optional(),
-			endDate: z.string().datetime().optional(),
+			organizationId: idString(),
+			startDate: z.string().trim().datetime().optional(),
+			endDate: z.string().trim().datetime().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -215,7 +216,7 @@ export const getFinanceQuotationStats = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -238,7 +239,7 @@ export const getFinanceInvoiceStats = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -261,8 +262,8 @@ export const getProjectFinance = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: idString(),
+			projectId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

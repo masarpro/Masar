@@ -12,11 +12,11 @@ export const setupFirstProject = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectName: z.string().min(2),
-			ownerName: z.string().optional(),
-			estimatedBudget: z.number().optional(),
-			city: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectName: z.string().trim().min(2).max(200),
+			ownerName: z.string().trim().max(200).optional(),
+			estimatedBudget: z.number().nonnegative().max(999_999_999.99).optional(),
+			city: z.string().trim().max(200).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

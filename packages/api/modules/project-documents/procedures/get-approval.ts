@@ -13,9 +13,9 @@ export const getApprovalProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			approvalId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			approvalId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

@@ -13,9 +13,9 @@ export const copyFromQuotation = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			quotationId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			quotationId: z.string().trim().max(100),
 			includePrices: z.boolean().default(true),
 		}),
 	)

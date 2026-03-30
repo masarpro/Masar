@@ -62,8 +62,8 @@ export const getStages = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -137,8 +137,8 @@ export const approveStage = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 			stage: stageEnum,
 		}),
 	)
@@ -258,8 +258,8 @@ export const reopenStage = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 			stage: stageEnum,
 		}),
 	)
@@ -370,10 +370,10 @@ export const assignStage = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			studyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			studyId: z.string().trim().max(100),
 			stage: z.enum(["quantities", "specs", "costing", "pricing"]),
-			userId: z.string().nullable(),
+			userId: z.string().trim().max(100).nullable(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

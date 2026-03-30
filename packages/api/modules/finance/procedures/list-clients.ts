@@ -2,6 +2,7 @@ import { getOrganizationClients } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { idString, searchQuery, paginationLimit, paginationOffset } from "../../../lib/validation-constants";
 
 // نوع العميل
 const clientTypeEnum = z.enum(["INDIVIDUAL", "COMMERCIAL"]);
@@ -15,13 +16,13 @@ export const listClients = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			query: z.string().optional(),
+			organizationId: idString(),
+			query: searchQuery(),
 			isActive: z.boolean().optional(),
 			clientType: clientTypeEnum.optional(),
-			classification: z.string().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			classification: z.string().trim().max(200).optional(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

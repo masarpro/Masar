@@ -103,10 +103,10 @@ export function AddAssetDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent dir="rtl" className="sm:max-w-4xl p-0 gap-0 rounded-2xl overflow-hidden">
+			<DialogContent className="sm:max-w-4xl p-0 gap-0 rounded-2xl overflow-hidden">
 				{/* Header */}
 				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
-					<DialogTitle className="text-base font-semibold text-right">
+					<DialogTitle className="text-base font-semibold text-end">
 						{t("company.assets.addAsset")}
 					</DialogTitle>
 				</DialogHeader>

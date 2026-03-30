@@ -95,15 +95,15 @@ export const buildingConfigUpdate = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			costStudyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			costStudyId: z.string().trim().max(100),
 			buildingConfig: z.object({
 				totalLandArea: z.number().nonnegative(),
 				buildingPerimeter: z.number().nonnegative(),
 				floors: z.array(
 					z.object({
-						id: z.string(),
-						name: z.string(),
+						id: z.string().trim().max(100),
+						name: z.string().trim().max(200),
 						area: z.number().nonnegative(),
 						height: z.number().nonnegative(),
 						sortOrder: z.number().nonnegative(),
@@ -119,24 +119,24 @@ export const buildingConfigUpdate = subscriptionProcedure
 						]),
 						rooms: z.array(
 							z.object({
-								id: z.string(),
-								name: z.string(),
+								id: z.string().trim().max(100),
+								name: z.string().trim().max(200),
 								length: z.number().nonnegative(),
 								width: z.number().nonnegative(),
-								type: z.string(),
+								type: z.string().trim().max(100),
 								hasFalseCeiling: z.boolean().optional(),
 							}),
 						).optional(),
 						openings: z.array(
 							z.object({
-								id: z.string(),
+								id: z.string().trim().max(100),
 								type: z.enum(["door", "window"]),
-								subType: z.string(),
+								subType: z.string().trim().max(100),
 								width: z.number().nonnegative(),
 								height: z.number().nonnegative(),
 								count: z.number().nonnegative(),
 								isExternal: z.boolean(),
-								roomId: z.string().optional(),
+								roomId: z.string().trim().max(100).optional(),
 							}),
 						).optional(),
 					}),

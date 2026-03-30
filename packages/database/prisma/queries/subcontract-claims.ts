@@ -159,6 +159,12 @@ export async function createSubcontractClaim(data: {
 		contractItemId: string;
 		thisQty: number;
 	}>;
+	manualItems?: Array<{
+		description: string;
+		unit?: string;
+		qty: number;
+		unitPrice: number;
+	}>;
 }) {
 	return db.$transaction(async (tx) => {
 		// Lock the contract row to prevent concurrent claims from racing
@@ -265,6 +271,50 @@ export async function createSubcontractClaim(data: {
 				thisQty,
 				thisAmount,
 			});
+		}
+
+		// 6b. Handle manual items — auto-create SubcontractItems, then add to claim
+		if (data.manualItems?.length) {
+			// Get next sortOrder
+			const lastItem = await tx.subcontractItem.findFirst({
+				where: { contractId: data.contractId },
+				orderBy: { sortOrder: "desc" },
+				select: { sortOrder: true },
+			});
+			let nextSort = (lastItem?.sortOrder ?? 0) + 1;
+
+			for (const manual of data.manualItems) {
+				if (manual.qty <= 0 || manual.unitPrice <= 0) continue;
+
+				const newItem = await tx.subcontractItem.create({
+					data: {
+						organizationId: data.organizationId,
+						contractId: data.contractId,
+						description: manual.description,
+						unit: manual.unit ?? "ls",
+						contractQty: manual.qty,
+						unitPrice: manual.unitPrice,
+						totalAmount: manual.qty * manual.unitPrice,
+						category: "other",
+						isLumpSum: false,
+						sortOrder: nextSort++,
+					},
+				});
+
+				const thisQty = new Prisma.Decimal(manual.qty);
+				const thisAmount = thisQty.mul(new Prisma.Decimal(manual.unitPrice));
+				grossAmount = grossAmount.add(thisAmount);
+
+				claimItemsData.push({
+					organizationId: data.organizationId,
+					contractItemId: newItem.id,
+					contractQty: new Prisma.Decimal(manual.qty),
+					unitPrice: new Prisma.Decimal(manual.unitPrice),
+					prevCumulativeQty: new Prisma.Decimal(0),
+					thisQty,
+					thisAmount,
+				});
+			}
 		}
 
 		if (claimItemsData.length === 0) {

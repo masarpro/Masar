@@ -12,13 +12,13 @@ export const list = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			status: z.string().optional(),
-			source: z.string().optional(),
-			priority: z.string().optional(),
-			assignedToId: z.string().optional(),
-			search: z.string().optional(),
-			page: z.number().optional().default(1),
+			organizationId: z.string().trim().max(100),
+			status: z.string().trim().max(50).optional(),
+			source: z.string().trim().max(50).optional(),
+			priority: z.string().trim().max(50).optional(),
+			assignedToId: z.string().trim().max(100).optional(),
+			search: z.string().trim().max(200).optional(),
+			page: z.number().int().positive().max(1000).optional().default(1),
 			limit: z.number().optional().default(20).pipe(z.number().max(100)),
 		}),
 	)

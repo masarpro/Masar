@@ -13,11 +13,11 @@ export const updateChangeOrderProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			changeOrderId: z.string(),
-			title: z.string().min(1).max(200).optional(),
-			description: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			changeOrderId: z.string().trim().max(100),
+			title: z.string().trim().min(1).max(200).optional(),
+			description: z.string().trim().max(2000).optional(),
 			category: z
 				.enum([
 					"SCOPE_CHANGE",
@@ -29,11 +29,11 @@ export const updateChangeOrderProcedure = subscriptionProcedure
 					"OTHER",
 				])
 				.optional(),
-			costImpact: z.number().optional(),
-			currency: z.string().optional(),
+			costImpact: z.number().max(999999999.99).optional(),
+			currency: z.string().trim().max(100).optional(),
 			timeImpactDays: z.number().int().min(-365).max(365).optional(),
-			milestoneId: z.string().nullable().optional(),
-			claimId: z.string().nullable().optional(),
+			milestoneId: z.string().trim().max(100).nullable().optional(),
+			claimId: z.string().trim().max(100).nullable().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -86,9 +86,9 @@ export const deleteChangeOrderProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			changeOrderId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			changeOrderId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

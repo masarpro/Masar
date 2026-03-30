@@ -19,15 +19,15 @@ export const sendMessageProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100).optional(),
 			channel: z.enum(["EMAIL", "WHATSAPP", "SMS"]),
-			recipient: z.string(),
-			subject: z.string().optional(),
-			text: z.string(),
-			html: z.string().optional(),
-			templateKey: z.string().optional(),
-			variables: z.record(z.string(), z.string()).optional(),
+			recipient: z.string().trim().max(254),
+			subject: z.string().trim().max(500).optional(),
+			text: z.string().trim().max(5000),
+			html: z.string().max(50000).optional(),
+			templateKey: z.string().trim().max(200).optional(),
+			variables: z.record(z.string().max(100), z.string().max(2000)).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -111,15 +111,15 @@ export const sendBulkMessages = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100).optional(),
 			channel: z.enum(["EMAIL", "WHATSAPP", "SMS"]),
-			recipients: z.array(z.string()).min(1).max(50),
-			subject: z.string().optional(),
-			text: z.string(),
-			html: z.string().optional(),
-			templateKey: z.string().optional(),
-			variables: z.record(z.string(), z.string()).optional(),
+			recipients: z.array(z.string().trim().max(254)).min(1).max(50),
+			subject: z.string().trim().max(500).optional(),
+			text: z.string().trim().max(5000),
+			html: z.string().max(50000).optional(),
+			templateKey: z.string().trim().max(200).optional(),
+			variables: z.record(z.string().max(100), z.string().max(2000)).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

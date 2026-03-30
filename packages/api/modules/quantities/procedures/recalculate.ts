@@ -14,8 +14,8 @@ export const recalculate = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			id: z.string(),
-			organizationId: z.string(),
+			id: z.string().trim().max(100),
+			organizationId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

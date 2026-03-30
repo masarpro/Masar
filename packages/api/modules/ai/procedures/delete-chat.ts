@@ -14,7 +14,7 @@ export const deleteChat = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			id: z.string(),
+			id: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

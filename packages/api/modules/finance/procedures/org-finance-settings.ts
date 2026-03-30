@@ -9,6 +9,10 @@ import {
 import { z } from "zod";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_DESC, MAX_CODE, MAX_PHONE, MAX_ADDRESS, MAX_URL,
+	idString, optionalTrimmed, percentage, dayCount,
+} from "../../../lib/validation-constants";
 
 /**
  * Get organization finance settings
@@ -22,7 +26,7 @@ export const getOrgFinanceSettingsProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -54,43 +58,43 @@ export const updateOrgFinanceSettingsProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			// Company info
-			companyNameAr: z.string().optional(),
-			companyNameEn: z.string().optional(),
-			logo: z.string().optional(),
-			address: z.string().optional(),
-			addressEn: z.string().optional(),
+			companyNameAr: optionalTrimmed(MAX_NAME),
+			companyNameEn: optionalTrimmed(MAX_NAME),
+			logo: z.string().trim().max(MAX_URL).optional(),
+			address: optionalTrimmed(MAX_ADDRESS),
+			addressEn: optionalTrimmed(MAX_ADDRESS),
 			// National address fields
-			buildingNumber: z.string().optional(),
-			street: z.string().optional(),
-			secondaryNumber: z.string().optional(),
-			postalCode: z.string().optional(),
-			city: z.string().optional(),
-			phone: z.string().optional(),
-			email: z.string().email().optional().or(z.literal("")),
-			website: z.string().optional(),
-			taxNumber: z.string().optional(),
-			commercialReg: z.string().optional(),
+			buildingNumber: z.string().trim().max(20).optional(),
+			street: optionalTrimmed(MAX_ADDRESS),
+			secondaryNumber: z.string().trim().max(20).optional(),
+			postalCode: z.string().trim().max(20).optional(),
+			city: optionalTrimmed(MAX_NAME),
+			phone: z.string().trim().max(MAX_PHONE).optional(),
+			email: z.string().trim().email().max(254).optional().or(z.literal("")),
+			website: z.string().trim().max(MAX_URL).optional(),
+			taxNumber: z.string().trim().max(MAX_CODE).optional(),
+			commercialReg: z.string().trim().max(MAX_CODE).optional(),
 			// Bank details
-			bankName: z.string().optional(),
-			bankNameEn: z.string().optional(),
-			accountName: z.string().optional(),
-			iban: z.string().optional(),
-			accountNumber: z.string().optional(),
-			swiftCode: z.string().optional(),
+			bankName: optionalTrimmed(MAX_NAME),
+			bankNameEn: optionalTrimmed(MAX_NAME),
+			accountName: optionalTrimmed(MAX_NAME),
+			iban: z.string().trim().max(34).optional(),
+			accountNumber: z.string().trim().max(50).optional(),
+			swiftCode: z.string().trim().max(11).optional(),
 			// Print settings
-			headerText: z.string().optional(),
-			footerText: z.string().optional(),
-			thankYouMessage: z.string().optional(),
+			headerText: optionalTrimmed(MAX_DESC),
+			footerText: optionalTrimmed(MAX_DESC),
+			thankYouMessage: optionalTrimmed(MAX_DESC),
 			// Tax & currency
-			defaultVatPercent: z.number().min(0).max(100).optional(),
-			defaultCurrency: z.string().optional(),
+			defaultVatPercent: percentage().optional(),
+			defaultCurrency: z.string().trim().max(3).optional(),
 			// Default terms
-			defaultPaymentTerms: z.string().optional(),
-			defaultDeliveryTerms: z.string().optional(),
-			defaultWarrantyTerms: z.string().optional(),
-			quotationValidityDays: z.number().min(1).max(365).optional(),
+			defaultPaymentTerms: optionalTrimmed(MAX_DESC),
+			defaultDeliveryTerms: optionalTrimmed(MAX_DESC),
+			defaultWarrantyTerms: optionalTrimmed(MAX_DESC),
+			quotationValidityDays: dayCount().min(1).max(365).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

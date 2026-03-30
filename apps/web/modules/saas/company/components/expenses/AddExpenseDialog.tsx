@@ -96,7 +96,7 @@ export function AddExpenseDialog({
 
 	return (
 		<ResponsiveDialog open={open} onOpenChange={onOpenChange} title={t("company.expenses.addExpense")}>
-				<form onSubmit={handleSubmit} dir="rtl">
+				<form onSubmit={handleSubmit}>
 					<div className="p-5 space-y-4">
 						{/* Row 1: Name, Category, Amount */}
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

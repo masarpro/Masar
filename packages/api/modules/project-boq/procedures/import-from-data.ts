@@ -28,22 +28,22 @@ export const importFromData = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			defaultSection: boqSectionEnum.default("GENERAL"),
 			defaultSourceType: boqSourceTypeEnum.default("IMPORTED"),
 			items: z
 				.array(
 					z.object({
-						code: z.string().max(50).optional(),
-						description: z.string().min(1).max(1000),
-						specifications: z.string().max(2000).optional(),
-						unit: z.string().min(1).max(50),
+						code: z.string().trim().max(50).optional(),
+						description: z.string().trim().min(1).max(1000),
+						specifications: z.string().trim().max(2000).optional(),
+						unit: z.string().trim().min(1).max(50),
 						quantity: z.number().min(0),
 						unitPrice: z.number().min(0).optional().nullable(),
 						section: boqSectionEnum.optional(),
-						category: z.string().max(200).optional(),
-						notes: z.string().max(1000).optional(),
+						category: z.string().trim().max(200).optional(),
+						notes: z.string().trim().max(1000).optional(),
 					}),
 				)
 				.min(1)

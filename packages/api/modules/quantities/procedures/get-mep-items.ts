@@ -13,8 +13,8 @@ export const getMEPItems = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			costStudyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			costStudyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

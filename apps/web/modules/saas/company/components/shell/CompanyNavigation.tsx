@@ -15,7 +15,7 @@ export function CompanyNavigation({ organizationSlug }: CompanyNavigationProps) 
 	const pathname = usePathname();
 
 	return (
-		<div className="px-4 md:px-6 lg:px-8 pt-4" dir="rtl">
+		<div className="px-4 md:px-6 lg:px-8 pt-4">
 			<nav className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-2">
 				{COMPANY_NAV_SECTIONS.map((section) => {
 					const isActive = isSectionActive(pathname, section.path);

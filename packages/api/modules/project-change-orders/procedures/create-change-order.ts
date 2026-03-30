@@ -16,10 +16,10 @@ export const createChangeOrderProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			title: z.string().min(1).max(200),
-			description: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			title: z.string().trim().min(1).max(200),
+			description: z.string().trim().max(2000).optional(),
 			category: z
 				.enum([
 					"SCOPE_CHANGE",
@@ -31,11 +31,11 @@ export const createChangeOrderProcedure = subscriptionProcedure
 					"OTHER",
 				])
 				.optional(),
-			costImpact: z.number().optional(),
-			currency: z.string().optional(),
+			costImpact: z.number().max(999999999.99).optional(),
+			currency: z.string().trim().max(100).optional(),
 			timeImpactDays: z.number().int().min(-365).max(365).optional(),
-			milestoneId: z.string().optional(),
-			claimId: z.string().optional(),
+			milestoneId: z.string().trim().max(100).optional(),
+			claimId: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

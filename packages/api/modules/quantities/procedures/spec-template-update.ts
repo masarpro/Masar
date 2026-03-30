@@ -12,12 +12,12 @@ export const specTemplateUpdate = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			name: z.string().optional(),
-			nameEn: z.string().optional(),
-			description: z.string().optional(),
-			specs: z.any().optional(),
+			organizationId: z.string().trim().max(100),
+			id: z.string().trim().max(100),
+			name: z.string().trim().max(100).optional(),
+			nameEn: z.string().trim().max(100).optional(),
+			description: z.string().trim().max(2000).optional(),
+			specs: z.record(z.string(), z.unknown()).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

@@ -36,7 +36,7 @@ export function SocialSigninButton({
 			className={className}
 		>
 			{providerData.icon && (
-				<i className="mr-2 text-primary">
+				<i className="me-2 text-primary">
 					<providerData.icon className="size-4" />
 				</i>
 			)}

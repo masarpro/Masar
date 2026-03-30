@@ -12,9 +12,9 @@ export const listProjectPaymentsProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractTermId: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			contractTermId: z.string().trim().max(100).optional(),
 			type: z.enum(["term", "free"]).optional(),
 		}),
 	)

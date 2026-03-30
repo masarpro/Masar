@@ -14,18 +14,18 @@ export const create = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			name: z.string().min(1),
-			phone: z.string().optional(),
-			email: z.string().email().optional().or(z.literal("")),
-			company: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			name: z.string().trim().min(1).max(200),
+			phone: z.string().trim().max(20).optional(),
+			email: z.string().trim().email().max(254).optional().or(z.literal("")),
+			company: z.string().trim().max(200).optional(),
 			clientType: z.enum(["INDIVIDUAL", "COMMERCIAL"]).optional(),
 			projectType: z
 				.enum(["RESIDENTIAL", "COMMERCIAL", "INDUSTRIAL", "INFRASTRUCTURE", "MIXED"])
 				.optional(),
-			projectLocation: z.string().optional(),
-			estimatedArea: z.number().positive().optional(),
-			estimatedValue: z.number().positive().optional(),
+			projectLocation: z.string().trim().max(500).optional(),
+			estimatedArea: z.number().positive().max(999_999).optional(),
+			estimatedValue: z.number().positive().max(999_999_999.99).optional(),
 			status: z
 				.enum(["NEW", "STUDYING", "QUOTED", "NEGOTIATING", "WON", "LOST"])
 				.optional(),
@@ -33,9 +33,9 @@ export const create = subscriptionProcedure
 				.enum(["REFERRAL", "SOCIAL_MEDIA", "WEBSITE", "DIRECT", "EXHIBITION", "OTHER"])
 				.optional(),
 			priority: z.enum(["NORMAL", "HIGH", "URGENT"]).optional(),
-			assignedToId: z.string().optional(),
-			expectedCloseDate: z.string().optional(),
-			notes: z.string().optional(),
+			assignedToId: z.string().trim().max(100).optional(),
+			expectedCloseDate: z.string().trim().max(50).optional(),
+			notes: z.string().trim().max(2000).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

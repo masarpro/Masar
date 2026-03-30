@@ -15,10 +15,10 @@ export const exportIssuesCsvProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			status: z.string().optional(),
-			severity: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			status: z.string().trim().max(100).optional(),
+			severity: z.string().trim().max(100).optional(),
 			language: z.enum(["ar", "en"]).optional().default("ar"),
 		}),
 	)

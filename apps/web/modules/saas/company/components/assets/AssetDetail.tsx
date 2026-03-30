@@ -93,7 +93,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 
 	if (isLoading) {
 		return (
-			<div className="space-y-6" dir="rtl">
+			<div className="space-y-6">
 				{[...Array(2)].map((_, i) => (
 					<div key={i} className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-6">
 						<div className="h-24 animate-pulse rounded bg-muted" />
@@ -121,7 +121,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 	};
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>
@@ -146,7 +146,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 						className="rounded-xl border-white/20 dark:border-slate-700/30"
 						onClick={() => router.push(`/app/${organizationSlug}/company/assets/${assetId}/edit`)}
 					>
-						<Pencil className="ml-2 h-4 w-4" />
+						<Pencil className="ms-2 h-4 w-4" />
 						{t("company.common.edit")}
 					</Button>
 					{asset.status !== "RETIRED" && (
@@ -157,7 +157,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 								if (confirm(t("company.assets.confirmRetire"))) retireMutation.mutate();
 							}}
 						>
-							<Trash2 className="ml-2 h-4 w-4" />
+							<Trash2 className="ms-2 h-4 w-4" />
 							{t("company.assets.retire")}
 						</Button>
 					)}
@@ -281,7 +281,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 								onClick={() => returnMutation.mutate()}
 								disabled={returnMutation.isPending}
 							>
-								<RotateCcw className="ml-2 h-4 w-4" />
+								<RotateCcw className="ms-2 h-4 w-4" />
 								{t("company.assets.returnToWarehouse")}
 							</Button>
 						</div>
@@ -315,7 +315,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 									className="rounded-xl border-white/20 dark:border-slate-700/30"
 									onClick={() => setShowAssignForm(true)}
 								>
-									<MapPin className="ml-2 h-4 w-4" />
+									<MapPin className="ms-2 h-4 w-4" />
 									{t("company.assets.assignToProject")}
 								</Button>
 							)}

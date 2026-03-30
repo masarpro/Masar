@@ -18,6 +18,23 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_DESC, MAX_ID, MAX_ARRAY,
+	idString, searchQuery, financialAmount,
+	paginationLimit, paginationOffset,
+} from "../../../lib/validation-constants";
+import type { Prisma } from "@repo/database/prisma/generated/client";
+
+/** Shape of a journal entry line as returned by createJournalEntry / reverseJournalEntry (include: { lines: true }) */
+type JournalEntryLine = {
+	id: string;
+	journalEntryId: string;
+	accountId: string;
+	debit: { toNumber(): number } | number;
+	credit: { toNumber(): number } | number;
+	description: string | null;
+	projectId: string | null;
+};
 
 // ========== List Journal Entries ==========
 
@@ -30,17 +47,17 @@ export const listJournalEntriesProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			dateFrom: z.string().datetime().optional(),
 			dateTo: z.string().datetime().optional(),
 			status: z.enum(["DRAFT", "POSTED", "REVERSED"]).optional(),
-			referenceType: z.string().optional(),
-			search: z.string().optional(),
-			amountFrom: z.number().nonnegative().optional(),
-			amountTo: z.number().nonnegative().optional(),
-			accountId: z.string().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			referenceType: z.string().trim().max(MAX_ID).optional(),
+			search: searchQuery(),
+			amountFrom: financialAmount().optional(),
+			amountTo: financialAmount().optional(),
+			accountId: idString().optional(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -49,7 +66,7 @@ export const listJournalEntriesProcedure = protectedProcedure
 			action: "view",
 		});
 
-		const where: any = { organizationId: input.organizationId };
+		const where: Prisma.JournalEntryWhereInput = { organizationId: input.organizationId };
 
 		if (input.status) where.status = input.status;
 		if (input.referenceType) where.referenceType = input.referenceType;
@@ -114,7 +131,7 @@ export const getJournalEntryByIdProcedure = protectedProcedure
 		tags: ["Accounting", "Journal Entries"],
 		summary: "Get journal entry details",
 	})
-	.input(z.object({ organizationId: z.string(), id: z.string() }))
+	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
@@ -170,21 +187,22 @@ export const createJournalEntryProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			date: z.string().datetime(),
-			description: z.string().min(1),
-			notes: z.string().optional(),
+			description: z.string().trim().min(1).max(MAX_DESC),
+			notes: z.string().trim().max(MAX_DESC).optional(),
 			lines: z
 				.array(
 					z.object({
-						accountId: z.string(),
-						description: z.string().optional(),
-						debit: z.number().nonnegative(),
-						credit: z.number().nonnegative(),
-						projectId: z.string().optional(),
+						accountId: idString(),
+						description: z.string().trim().max(MAX_DESC).optional(),
+						debit: financialAmount(),
+						credit: financialAmount(),
+						projectId: idString().optional(),
 					}),
 				)
-				.min(2),
+				.min(2)
+				.max(MAX_ARRAY),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -222,11 +240,12 @@ export const createJournalEntryProcedure = subscriptionProcedure
 			});
 		}
 
-		const entryLines = (entry as any).lines ?? [];
+		const entryWithLines = entry as typeof entry & { lines?: JournalEntryLine[] };
+		const entryLines = entryWithLines.lines ?? [];
 		return {
 			...entry,
 			totalAmount: Number(entry.totalAmount),
-			lines: entryLines.map((l: any) => ({
+			lines: entryLines.map((l) => ({
 				...l,
 				debit: Number(l.debit),
 				credit: Number(l.credit),
@@ -243,7 +262,7 @@ export const postJournalEntryProcedure = subscriptionProcedure
 		tags: ["Accounting", "Journal Entries"],
 		summary: "Post a draft journal entry",
 	})
-	.input(z.object({ organizationId: z.string(), id: z.string() }))
+	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
@@ -269,8 +288,8 @@ export const reverseJournalEntryProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 			date: z.string().datetime().optional(),
 		}),
 	)
@@ -292,11 +311,12 @@ export const reverseJournalEntryProcedure = subscriptionProcedure
 			input.date ? new Date(input.date) : new Date(),
 		);
 
-		const reversalLines = (reversal as any).lines ?? [];
+		const reversalWithLines = reversal as typeof reversal & { lines?: JournalEntryLine[] };
+		const reversalLines = reversalWithLines.lines ?? [];
 		return {
 			...reversal,
 			totalAmount: Number(reversal.totalAmount),
-			lines: reversalLines.map((l: any) => ({
+			lines: reversalLines.map((l) => ({
 				...l,
 				debit: Number(l.debit),
 				credit: Number(l.credit),
@@ -313,7 +333,7 @@ export const deleteJournalEntryProcedure = subscriptionProcedure
 		tags: ["Accounting", "Journal Entries"],
 		summary: "Delete a draft journal entry",
 	})
-	.input(z.object({ organizationId: z.string(), id: z.string() }))
+	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
@@ -343,11 +363,11 @@ export const getTrialBalanceProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			asOfDate: z.string().datetime().optional(),
 			dateFrom: z.string().datetime().optional(),
 			includeZeroBalance: z.boolean().optional(),
-			level: z.number().min(1).max(4).optional(),
+			level: z.number().int().min(1).max(4).optional(),
 			accountType: z.enum(["ASSET", "LIABILITY", "EQUITY", "REVENUE", "EXPENSE"]).optional(),
 		}),
 	)
@@ -377,7 +397,7 @@ export const getBalanceSheetProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			asOfDate: z.string().datetime().optional(),
 		}),
 	)
@@ -405,7 +425,7 @@ export const getJournalIncomeStatementProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			dateFrom: z.string().datetime(),
 			dateTo: z.string().datetime(),
 			includeComparison: z.boolean().optional().default(false),
@@ -435,23 +455,24 @@ export const createAdjustmentEntryProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			adjustmentType: z.enum(["ACCRUAL", "PREPAYMENT", "DEPRECIATION", "PROVISION", "CORRECTION"]),
 			date: z.string().datetime(),
-			description: z.string().min(1),
-			notes: z.string().optional(),
+			description: z.string().trim().min(1).max(MAX_DESC),
+			notes: z.string().trim().max(MAX_DESC).optional(),
 			autoPost: z.boolean().optional().default(false),
 			lines: z
 				.array(
 					z.object({
-						accountId: z.string(),
-						description: z.string().optional(),
-						debit: z.number().nonnegative(),
-						credit: z.number().nonnegative(),
-						projectId: z.string().optional(),
+						accountId: idString(),
+						description: z.string().trim().max(MAX_DESC).optional(),
+						debit: financialAmount(),
+						credit: financialAmount(),
+						projectId: idString().optional(),
 					}),
 				)
-				.min(2),
+				.min(2)
+				.max(MAX_ARRAY),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -496,11 +517,12 @@ export const createAdjustmentEntryProcedure = subscriptionProcedure
 			await postJournalEntry(db, entry.id, context.user.id);
 		}
 
-		const adjLines = (entry as any).lines ?? [];
+		const adjEntryWithLines = entry as typeof entry & { lines?: JournalEntryLine[] };
+		const adjLines = adjEntryWithLines.lines ?? [];
 		return {
 			...entry,
 			totalAmount: Number(entry.totalAmount),
-			lines: adjLines.map((l: any) => ({
+			lines: adjLines.map((l) => ({
 				...l,
 				debit: Number(l.debit),
 				credit: Number(l.credit),
@@ -519,8 +541,8 @@ export const listPeriodsProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			year: z.number().optional(),
+			organizationId: idString(),
+			year: z.number().int().min(2000).max(2100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -529,7 +551,7 @@ export const listPeriodsProcedure = protectedProcedure
 			action: "view",
 		});
 
-		const where: any = { organizationId: input.organizationId };
+		const where: Prisma.AccountingPeriodWhereInput = { organizationId: input.organizationId };
 		if (input.year) {
 			where.startDate = { gte: new Date(input.year, 0, 1) };
 			where.endDate = { lte: new Date(input.year, 11, 31) };
@@ -566,8 +588,8 @@ export const generatePeriodsProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			year: z.number(),
+			organizationId: idString(),
+			year: z.number().int().min(2000).max(2100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -587,8 +609,8 @@ export const closePeriodProcedure = subscriptionProcedure
 		summary: "Close an accounting period",
 	})
 	.input(z.object({
-		organizationId: z.string(),
-		id: z.string(),
+		organizationId: idString(),
+		id: idString(),
 		generateClosingEntry: z.boolean().optional().default(false),
 	}))
 	.handler(async ({ input, context }) => {
@@ -614,7 +636,7 @@ export const reopenPeriodProcedure = subscriptionProcedure
 		tags: ["Accounting", "Periods"],
 		summary: "Reopen the last closed accounting period",
 	})
-	.input(z.object({ organizationId: z.string(), id: z.string() }))
+	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
@@ -641,8 +663,8 @@ export const bulkPostJournalEntriesProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			entryIds: z.array(z.string()).min(1).max(500),
+			organizationId: idString(),
+			entryIds: z.array(idString()).min(1).max(500),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -661,7 +683,7 @@ export const postAllDraftsProcedure = subscriptionProcedure
 		tags: ["Accounting", "Journal Entries"],
 		summary: "Post all draft journal entries",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
@@ -682,9 +704,9 @@ export const findJournalEntryByReferenceProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			referenceType: z.string(),
-			referenceId: z.string(),
+			organizationId: idString(),
+			referenceType: z.string().trim().max(MAX_ID),
+			referenceId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -707,10 +729,10 @@ export const getCostCenterReportProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			dateFrom: z.string().datetime().optional(),
 			dateTo: z.string().datetime().optional(),
-			projectId: z.string().optional(),
+			projectId: idString().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -735,7 +757,7 @@ export const getAccountingDashboardProcedure = protectedProcedure
 		tags: ["Accounting", "Dashboard"],
 		summary: "Get accounting dashboard KPIs",
 	})
-	.input(z.object({ organizationId: z.string() }))
+	.input(z.object({ organizationId: idString() }))
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",

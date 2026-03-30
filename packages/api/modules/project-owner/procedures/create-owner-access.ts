@@ -13,9 +13,9 @@ export const createOwnerAccessProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			label: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			label: z.string().trim().max(100).optional(),
 			expiresInDays: z.number().int().min(1).max(90).optional().default(30),
 		}),
 	)

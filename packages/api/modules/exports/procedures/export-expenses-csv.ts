@@ -15,11 +15,11 @@ export const exportExpensesCsvProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
 			dateFrom: z.string().datetime().optional(),
 			dateTo: z.string().datetime().optional(),
-			category: z.string().optional(),
+			category: z.string().trim().max(100).optional(),
 			language: z.enum(["ar", "en"]).optional().default("ar"),
 		}),
 	)

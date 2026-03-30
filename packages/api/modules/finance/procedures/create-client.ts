@@ -2,6 +2,10 @@ import { createClient } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_DESC, MAX_CODE, MAX_PHONE, MAX_ADDRESS,
+	idString, optionalTrimmed,
+} from "../../../lib/validation-constants";
 
 // نوع العميل
 const clientTypeEnum = z.enum(["INDIVIDUAL", "COMMERCIAL"]);
@@ -9,12 +13,12 @@ const clientTypeEnum = z.enum(["INDIVIDUAL", "COMMERCIAL"]);
 // العنوان الثانوي
 const secondaryAddressSchema = z
 	.object({
-		streetAddress1: z.string().optional(),
-		streetAddress2: z.string().optional(),
-		city: z.string().optional(),
-		region: z.string().optional(),
-		postalCode: z.string().optional(),
-		country: z.string().optional(),
+		streetAddress1: z.string().trim().max(MAX_ADDRESS).optional(),
+		streetAddress2: z.string().trim().max(MAX_ADDRESS).optional(),
+		city: z.string().trim().max(MAX_NAME).optional(),
+		region: z.string().trim().max(MAX_NAME).optional(),
+		postalCode: z.string().trim().max(20).optional(),
+		country: z.string().trim().max(3).optional(),
 	})
 	.optional();
 
@@ -27,38 +31,38 @@ export const createClientProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			// نوع العميل
 			clientType: clientTypeEnum.optional().default("INDIVIDUAL"),
 			// الأسماء
-			firstName: z.string().optional(),
-			lastName: z.string().optional(),
-			businessName: z.string().optional(),
-			name: z.string().min(1, "اسم العميل مطلوب"),
-			company: z.string().optional(),
+			firstName: optionalTrimmed(MAX_NAME),
+			lastName: optionalTrimmed(MAX_NAME),
+			businessName: optionalTrimmed(MAX_NAME),
+			name: z.string().trim().min(1, "اسم العميل مطلوب").max(MAX_NAME),
+			company: optionalTrimmed(MAX_NAME),
 			// الاتصال
-			phone: z.string().optional(),
-			mobile: z.string().optional(),
-			email: z.string().email().optional().or(z.literal("")),
+			phone: z.string().trim().max(MAX_PHONE).optional(),
+			mobile: z.string().trim().max(MAX_PHONE).optional(),
+			email: z.string().trim().email().max(254).optional().or(z.literal("")),
 			// العنوان
-			address: z.string().optional(),
-			streetAddress1: z.string().optional(),
-			streetAddress2: z.string().optional(),
-			city: z.string().optional(),
-			region: z.string().optional(),
-			postalCode: z.string().optional(),
-			country: z.string().optional().default("SA"),
+			address: optionalTrimmed(MAX_ADDRESS),
+			streetAddress1: optionalTrimmed(MAX_ADDRESS),
+			streetAddress2: optionalTrimmed(MAX_ADDRESS),
+			city: optionalTrimmed(MAX_NAME),
+			region: optionalTrimmed(MAX_NAME),
+			postalCode: z.string().trim().max(20).optional(),
+			country: z.string().trim().max(3).optional().default("SA"),
 			secondaryAddress: secondaryAddressSchema,
 			// الحساب
-			code: z.string().optional(),
-			currency: z.string().optional().default("SAR"),
-			displayLanguage: z.string().optional().default("ar"),
-			classification: z.array(z.string()).optional().default([]),
+			code: z.string().trim().max(MAX_CODE).optional(),
+			currency: z.string().trim().max(3).optional().default("SAR"),
+			displayLanguage: z.string().trim().max(10).optional().default("ar"),
+			classification: z.array(z.string().trim().max(MAX_NAME)).optional().default([]),
 			// الضريبة
-			taxNumber: z.string().optional(),
-			crNumber: z.string().optional(),
+			taxNumber: z.string().trim().max(MAX_CODE).optional(),
+			crNumber: z.string().trim().max(MAX_CODE).optional(),
 			// أخرى
-			notes: z.string().optional(),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {

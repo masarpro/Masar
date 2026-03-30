@@ -147,7 +147,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 	};
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Summary Cards - Glass Morphism */}
 			{summary && (
 				<div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
@@ -204,7 +204,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 							placeholder={t("company.expenses.searchPlaceholder")}
 							value={search}
 							onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pr-10 focus:ring-1 focus:ring-primary/30"
+							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pe-10 focus:ring-1 focus:ring-primary/30"
 						/>
 					</div>
 					<Select value={categoryFilter} onValueChange={(v) => { setCategoryFilter(v); setCurrentPage(1); }}>
@@ -262,13 +262,13 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 									aria-label={t("common.selectAll")}
 								/>
 							</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-500">{t("company.expenses.name")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-500 hidden sm:table-cell">{t("company.expenses.category")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-500">{t("company.expenses.amount")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-500 hidden md:table-cell">{t("company.expenses.recurrenceLabel")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-500 hidden lg:table-cell">{t("company.expenses.vendor")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-500 hidden sm:table-cell">{t("company.expenses.status")}</TableHead>
-							<TableHead className="text-right text-slate-500 dark:text-slate-500">{t("company.common.actions")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-500">{t("company.expenses.name")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-500 hidden sm:table-cell">{t("company.expenses.category")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-500">{t("company.expenses.amount")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-500 hidden md:table-cell">{t("company.expenses.recurrenceLabel")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-500 hidden lg:table-cell">{t("company.expenses.vendor")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-500 hidden sm:table-cell">{t("company.expenses.status")}</TableHead>
+							<TableHead className="text-end text-slate-500 dark:text-slate-500">{t("company.common.actions")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -297,25 +297,25 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 											aria-label={`${t("common.select")} ${expense.name}`}
 										/>
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end">
 										<p className="font-medium text-slate-900 dark:text-slate-100 truncate">{expense.name}</p>
 									</TableCell>
-									<TableCell className="text-right text-slate-600 dark:text-slate-300 hidden sm:table-cell">
+									<TableCell className="text-end text-slate-600 dark:text-slate-300 hidden sm:table-cell">
 										{t(`company.expenses.categories.${expense.category}`)}
 									</TableCell>
-									<TableCell className="text-right font-semibold text-slate-700 dark:text-slate-300">
+									<TableCell className="text-end font-semibold text-slate-700 dark:text-slate-300">
 										{formatCurrency(Number(expense.amount))}
 									</TableCell>
-									<TableCell className="text-right hidden md:table-cell">{getRecurrenceBadge(expense.recurrence)}</TableCell>
-									<TableCell className="text-right hidden lg:table-cell">
+									<TableCell className="text-end hidden md:table-cell">{getRecurrenceBadge(expense.recurrence)}</TableCell>
+									<TableCell className="text-end hidden lg:table-cell">
 										{expense.vendor ? (
 											<span className="text-slate-600 dark:text-slate-300 truncate block">{expense.vendor}</span>
 										) : (
 											<span className="text-xs text-slate-500">-</span>
 										)}
 									</TableCell>
-									<TableCell className="text-right hidden sm:table-cell">{getStatusBadge(expense.isActive)}</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="text-end hidden sm:table-cell">{getStatusBadge(expense.isActive)}</TableCell>
+									<TableCell className="text-end">
 										{expense.isActive && (
 											<Button
 												variant="ghost"

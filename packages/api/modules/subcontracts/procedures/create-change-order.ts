@@ -3,6 +3,10 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import {
+	MAX_DESC, MAX_ID, MAX_URL,
+	idString, nullishTrimmed, signedAmount,
+} from "../../../lib/validation-constants";
 
 export const createSubcontractChangeOrderProcedure = subscriptionProcedure
 	.route({
@@ -13,14 +17,14 @@ export const createSubcontractChangeOrderProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractId: z.string(),
-			description: z.string().min(1, "وصف أمر التغيير مطلوب"),
-			amount: z.number(),
+			organizationId: idString(),
+			projectId: idString(),
+			contractId: idString(),
+			description: z.string().trim().min(1, "وصف أمر التغيير مطلوب").max(MAX_DESC),
+			amount: signedAmount(),
 			status: z.enum(["DRAFT", "SUBMITTED", "APPROVED", "REJECTED"]).optional(),
 			approvedDate: z.coerce.date().nullish(),
-			attachmentUrl: z.string().nullish(),
+			attachmentUrl: nullishTrimmed(MAX_URL),
 		}),
 	)
 	.handler(async ({ input, context }) => {

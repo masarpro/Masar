@@ -13,10 +13,10 @@ export const createDependencyProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			predecessorId: z.string(),
-			successorId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			predecessorId: z.string().trim().max(100),
+			successorId: z.string().trim().max(100),
 			dependencyType: z.enum(["FINISH_TO_START", "START_TO_START", "FINISH_TO_FINISH", "START_TO_FINISH"]).optional(),
 			lagDays: z.number().int().optional(),
 		}),

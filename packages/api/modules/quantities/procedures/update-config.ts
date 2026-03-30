@@ -13,8 +13,8 @@ export const updateConfig = protectedProcedure
 	})
 	.input(
 		z.object({
-			studyId: z.string(),
-			organizationId: z.string(),
+			studyId: z.string().trim().max(100),
+			organizationId: z.string().trim().max(100),
 			studyType: z
 				.enum([
 					"FULL_PROJECT",

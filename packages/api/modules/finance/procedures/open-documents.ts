@@ -9,6 +9,11 @@ import { z } from "zod";
 import { ORPCError } from "@orpc/server";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_LONG_TEXT, MAX_ADDRESS,
+	idString, optionalTrimmed, searchQuery,
+	paginationLimit, paginationOffset,
+} from "../../../lib/validation-constants";
 
 export const listOpenDocuments = protectedProcedure
 	.route({
@@ -19,14 +24,14 @@ export const listOpenDocuments = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			documentType: z
 				.enum(["LETTER", "AGREEMENT", "CERTIFICATE", "MEMO", "OTHER"])
 				.optional(),
-			projectId: z.string().optional(),
-			query: z.string().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			projectId: z.string().trim().max(100).optional(),
+			query: searchQuery(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -55,8 +60,8 @@ export const getOpenDocument = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -83,16 +88,16 @@ export const createOpenDocumentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			documentType: z.enum(["LETTER", "AGREEMENT", "CERTIFICATE", "MEMO", "OTHER"]),
-			title: z.string().min(1, "عنوان المستند مطلوب"),
-			content: z.string().min(1, "محتوى المستند مطلوب"),
-			clientId: z.string().optional(),
-			projectId: z.string().optional(),
-			recipientName: z.string().optional(),
-			recipientCompany: z.string().optional(),
-			recipientAddress: z.string().optional(),
-			templateId: z.string().optional(),
+			title: z.string().trim().min(1, "عنوان المستند مطلوب").max(MAX_NAME),
+			content: z.string().trim().min(1, "محتوى المستند مطلوب").max(MAX_LONG_TEXT),
+			clientId: z.string().trim().max(100).optional(),
+			projectId: z.string().trim().max(100).optional(),
+			recipientName: optionalTrimmed(MAX_NAME),
+			recipientCompany: optionalTrimmed(MAX_NAME),
+			recipientAddress: optionalTrimmed(MAX_ADDRESS),
+			templateId: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -127,17 +132,17 @@ export const updateOpenDocumentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 			documentType: z.enum(["LETTER", "AGREEMENT", "CERTIFICATE", "MEMO", "OTHER"]).optional(),
-			title: z.string().min(1).optional(),
-			content: z.string().min(1).optional(),
-			clientId: z.string().nullish(),
-			projectId: z.string().nullish(),
-			recipientName: z.string().optional(),
-			recipientCompany: z.string().optional(),
-			recipientAddress: z.string().optional(),
-			templateId: z.string().nullish(),
+			title: z.string().trim().min(1).max(MAX_NAME).optional(),
+			content: z.string().trim().min(1).max(MAX_LONG_TEXT).optional(),
+			clientId: z.string().trim().max(100).nullish(),
+			projectId: z.string().trim().max(100).nullish(),
+			recipientName: optionalTrimmed(MAX_NAME),
+			recipientCompany: optionalTrimmed(MAX_NAME),
+			recipientAddress: optionalTrimmed(MAX_ADDRESS),
+			templateId: z.string().trim().max(100).nullish(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -167,8 +172,8 @@ export const deleteOpenDocumentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

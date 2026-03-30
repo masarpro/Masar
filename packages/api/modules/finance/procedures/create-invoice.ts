@@ -24,12 +24,17 @@ import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { generateZatcaQR, generateZatcaQRImage } from "../../../lib/zatca";
 import { db } from "@repo/database/prisma/client";
 import crypto from "crypto";
+import {
+	MAX_NAME, MAX_DESC, MAX_CODE, MAX_PHONE, MAX_ADDRESS, MAX_ARRAY,
+	idString, optionalTrimmed, nullishTrimmed,
+	financialAmount, percentage, quantity, unitPrice,
+} from "../../../lib/validation-constants";
 
 const invoiceItemSchema = z.object({
-	description: z.string().min(1, "وصف البند مطلوب"),
-	quantity: z.number().positive("الكمية يجب أن تكون موجبة"),
-	unit: z.string().optional(),
-	unitPrice: z.number().min(0, "السعر يجب أن يكون صفر أو أكبر"),
+	description: z.string().trim().min(1, "وصف البند مطلوب").max(MAX_NAME),
+	quantity: quantity().positive("الكمية يجب أن تكون موجبة"),
+	unit: z.string().trim().max(50).optional(),
+	unitPrice: unitPrice().min(0, "السعر يجب أن يكون صفر أو أكبر"),
 });
 
 export const createInvoiceProcedure = subscriptionProcedure
@@ -41,25 +46,25 @@ export const createInvoiceProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			invoiceType: z.enum(["STANDARD", "TAX", "SIMPLIFIED"]).optional().default("STANDARD"),
-			clientId: z.string().optional(),
-			clientName: z.string().min(1, "اسم العميل مطلوب"),
-			clientCompany: z.string().optional(),
-			clientPhone: z.string().optional(),
-			clientEmail: z.string().email().optional().or(z.literal("")),
-			clientAddress: z.string().optional(),
-			clientTaxNumber: z.string().optional(),
-			projectId: z.string().optional(),
-			quotationId: z.string().optional(),
-			issueDate: z.string().datetime(),
-			dueDate: z.string().datetime(),
-			paymentTerms: z.string().optional(),
-			notes: z.string().optional(),
-			templateId: z.string().optional(),
-			vatPercent: z.number().min(0).max(100).optional().default(15),
-			discountPercent: z.number().min(0).max(100).optional().default(0),
-			items: z.array(invoiceItemSchema).min(1, "يجب إضافة بند واحد على الأقل"),
+			clientId: z.string().trim().max(100).optional(),
+			clientName: z.string().trim().min(1, "اسم العميل مطلوب").max(MAX_NAME),
+			clientCompany: optionalTrimmed(MAX_NAME),
+			clientPhone: z.string().trim().max(MAX_PHONE).optional(),
+			clientEmail: z.string().trim().email().max(254).optional().or(z.literal("")),
+			clientAddress: optionalTrimmed(MAX_ADDRESS),
+			clientTaxNumber: z.string().trim().max(MAX_CODE).optional(),
+			projectId: z.string().trim().max(100).optional(),
+			quotationId: z.string().trim().max(100).optional(),
+			issueDate: z.string().trim().datetime(),
+			dueDate: z.string().trim().datetime(),
+			paymentTerms: optionalTrimmed(MAX_DESC),
+			notes: optionalTrimmed(MAX_DESC),
+			templateId: z.string().trim().max(100).optional(),
+			vatPercent: percentage().optional().default(15),
+			discountPercent: percentage().optional().default(0),
+			items: z.array(invoiceItemSchema).min(1, "يجب إضافة بند واحد على الأقل").max(MAX_ARRAY),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -67,6 +72,13 @@ export const createInvoiceProcedure = subscriptionProcedure
 			section: "finance",
 			action: "invoices",
 		});
+
+		// Validate issueDate <= dueDate
+		if (new Date(input.issueDate) > new Date(input.dueDate)) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "تاريخ الإصدار يجب أن يكون قبل أو يساوي تاريخ الاستحقاق",
+			});
+		}
 
 		// Get organization for seller tax number if invoice is TAX type
 		let sellerTaxNumber: string | undefined;
@@ -152,24 +164,24 @@ export const updateInvoiceProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 			invoiceType: z.enum(["STANDARD", "TAX", "SIMPLIFIED"]).optional(),
-			clientId: z.string().nullish(),
-			clientName: z.string().min(1).optional(),
-			clientCompany: z.string().optional(),
-			clientPhone: z.string().optional(),
-			clientEmail: z.string().email().optional().or(z.literal("")),
-			clientAddress: z.string().optional(),
-			clientTaxNumber: z.string().optional(),
-			projectId: z.string().nullish(),
-			issueDate: z.string().datetime().optional(),
-			dueDate: z.string().datetime().optional(),
-			paymentTerms: z.string().optional(),
-			notes: z.string().optional(),
-			templateId: z.string().nullish(),
-			vatPercent: z.number().min(0).max(100).optional(),
-			discountPercent: z.number().min(0).max(100).optional(),
+			clientId: z.string().trim().max(100).nullish(),
+			clientName: z.string().trim().min(1).max(MAX_NAME).optional(),
+			clientCompany: optionalTrimmed(MAX_NAME),
+			clientPhone: z.string().trim().max(MAX_PHONE).optional(),
+			clientEmail: z.string().trim().email().max(254).optional().or(z.literal("")),
+			clientAddress: optionalTrimmed(MAX_ADDRESS),
+			clientTaxNumber: z.string().trim().max(MAX_CODE).optional(),
+			projectId: z.string().trim().max(100).nullish(),
+			issueDate: z.string().trim().datetime().optional(),
+			dueDate: z.string().trim().datetime().optional(),
+			paymentTerms: optionalTrimmed(MAX_DESC),
+			notes: optionalTrimmed(MAX_DESC),
+			templateId: z.string().trim().max(100).nullish(),
+			vatPercent: percentage().optional(),
+			discountPercent: percentage().optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -179,6 +191,26 @@ export const updateInvoiceProcedure = subscriptionProcedure
 		});
 
 		const { organizationId, id, ...data } = input;
+
+		// Validate issueDate <= dueDate
+		if (input.issueDate && input.dueDate) {
+			if (new Date(input.issueDate) > new Date(input.dueDate)) {
+				throw new ORPCError("BAD_REQUEST", {
+					message: "تاريخ الإصدار يجب أن يكون قبل أو يساوي تاريخ الاستحقاق",
+				});
+			}
+		} else if (input.issueDate || input.dueDate) {
+			const existing = await getInvoiceById(id, organizationId);
+			if (existing) {
+				const issueDate = input.issueDate ? new Date(input.issueDate) : existing.issueDate;
+				const dueDate = input.dueDate ? new Date(input.dueDate) : existing.dueDate;
+				if (issueDate && dueDate && issueDate > dueDate) {
+					throw new ORPCError("BAD_REQUEST", {
+						message: "تاريخ الإصدار يجب أن يكون قبل أو يساوي تاريخ الاستحقاق",
+					});
+				}
+			}
+		}
 
 		const invoice = await updateInvoice(id, organizationId, {
 			...data,
@@ -219,9 +251,9 @@ export const updateInvoiceItemsProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			items: z.array(invoiceItemSchema.extend({ id: z.string().optional() })),
+			organizationId: idString(),
+			id: idString(),
+			items: z.array(invoiceItemSchema.extend({ id: z.string().trim().max(100).optional() })).max(MAX_ARRAY),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -272,8 +304,8 @@ export const updateInvoiceStatusProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 			status: z.enum([
 				"SENT",
 				"VIEWED",
@@ -347,8 +379,8 @@ export const convertToTaxInvoiceProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -437,14 +469,14 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			amount: z.number().positive("المبلغ يجب أن يكون موجب"),
-			paymentDate: z.string().datetime(),
-			paymentMethod: z.string().optional(),
-			referenceNo: z.string().optional(),
-			notes: z.string().optional(),
-			sourceAccountId: z.string().optional(),
+			organizationId: idString(),
+			id: idString(),
+			amount: financialAmount().positive("المبلغ يجب أن يكون موجب"),
+			paymentDate: z.string().trim().datetime(),
+			paymentMethod: z.string().trim().max(MAX_CODE).optional(),
+			referenceNo: z.string().trim().max(MAX_CODE).optional(),
+			notes: optionalTrimmed(MAX_DESC),
+			sourceAccountId: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -548,9 +580,9 @@ export const deleteInvoicePaymentProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			invoiceId: z.string(),
-			paymentId: z.string(),
+			organizationId: idString(),
+			invoiceId: idString(),
+			paymentId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -607,8 +639,8 @@ export const deleteInvoiceProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -664,8 +696,8 @@ export const issueInvoiceProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -845,8 +877,8 @@ export const duplicateInvoiceProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -901,17 +933,17 @@ export const createCreditNoteProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			reason: z.string().min(1, "سبب الإشعار الدائن مطلوب"),
+			organizationId: idString(),
+			id: idString(),
+			reason: z.string().trim().min(1, "سبب الإشعار الدائن مطلوب").max(MAX_DESC),
 			items: z.array(
 				z.object({
-					description: z.string().min(1),
-					quantity: z.number().positive(),
-					unit: z.string().optional(),
-					unitPrice: z.number().min(0),
+					description: z.string().trim().min(1).max(MAX_NAME),
+					quantity: quantity().positive(),
+					unit: z.string().trim().max(50).optional(),
+					unitPrice: unitPrice().min(0),
 				}),
-			).min(1, "يجب إضافة بند واحد على الأقل"),
+			).min(1, "يجب إضافة بند واحد على الأقل").max(MAX_ARRAY),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -1045,9 +1077,9 @@ export const updateInvoiceNotesProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			notes: z.string(),
+			organizationId: idString(),
+			id: idString(),
+			notes: z.string().trim().max(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -1095,8 +1127,8 @@ export const getInvoiceActivityProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

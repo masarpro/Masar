@@ -3,6 +3,10 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import {
+	MAX_NAME, MAX_DESC, MAX_ID, MAX_FINANCIAL, MAX_QUANTITY, MAX_ARRAY,
+	idString, nullishTrimmed, quantity,
+} from "../../../lib/validation-constants";
 
 export const updateSubcontractClaimProcedure = subscriptionProcedure
 	.route({
@@ -13,24 +17,25 @@ export const updateSubcontractClaimProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			claimId: z.string(),
-			title: z.string().min(1).optional(),
+			organizationId: idString(),
+			projectId: idString(),
+			claimId: idString(),
+			title: z.string().trim().min(1).max(MAX_NAME).optional(),
 			periodStart: z.coerce.date().optional(),
 			periodEnd: z.coerce.date().optional(),
 			claimType: z.enum(["INTERIM", "FINAL", "RETENTION"]).optional(),
-			notes: z.string().nullish(),
-			penaltyAmount: z.union([z.string(), z.number()]).optional(),
-			otherDeductions: z.union([z.string(), z.number()]).optional(),
-			otherDeductionsNote: z.string().nullish(),
+			notes: nullishTrimmed(MAX_DESC),
+			penaltyAmount: z.coerce.number().nonnegative().max(MAX_FINANCIAL).optional(),
+			otherDeductions: z.coerce.number().nonnegative().max(MAX_FINANCIAL).optional(),
+			otherDeductionsNote: nullishTrimmed(MAX_DESC),
 			items: z
 				.array(
 					z.object({
-						contractItemId: z.string(),
-						thisQty: z.number().min(0),
+						contractItemId: idString(),
+						thisQty: quantity(),
 					}),
 				)
+				.max(MAX_ARRAY)
 				.optional(),
 		}),
 	)

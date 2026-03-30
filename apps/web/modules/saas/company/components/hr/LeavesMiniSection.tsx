@@ -41,7 +41,7 @@ export function LeavesMiniSection({ organizationId, organizationSlug }: LeavesMi
 	);
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Summary Cards */}
 			<div className="grid grid-cols-3 gap-4">
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">

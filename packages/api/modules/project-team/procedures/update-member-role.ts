@@ -13,9 +13,9 @@ export const updateMemberRole = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			userId: z.string(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			userId: z.string().trim().max(100),
 			role: z.enum(["MANAGER", "ENGINEER", "SUPERVISOR", "ACCOUNTANT", "VIEWER"]),
 		}),
 	)

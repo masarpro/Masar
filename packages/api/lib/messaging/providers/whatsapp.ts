@@ -39,10 +39,10 @@ export class WhatsAppProvider implements MessagingProvider {
 			};
 		}
 
-		console.log(`[WhatsApp STUB] Sending to ${params.to}:`);
-		console.log(`  Template: ${params.templateKey}`);
-		console.log(`  Variables: ${JSON.stringify(params.variables)}`);
-		console.log(`  Fallback: ${params.fallbackText}`);
+		console.debug(`[WhatsApp STUB] Sending to ${params.to}:`);
+		console.debug(`  Template: ${params.templateKey}`);
+		console.debug(`  Variables: ${JSON.stringify(params.variables)}`);
+		console.debug(`  Fallback: ${params.fallbackText}`);
 
 		// Simulate success for now
 		return {

@@ -30,10 +30,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { withQuery } from "ufo";
 import { z } from "zod";
-import {
-	type OAuthProvider,
-	oAuthProviders,
-} from "../constants/oauth-providers";
 import { SocialSigninButton } from "./SocialSigninButton";
 
 const formSchema = z.object({
@@ -112,10 +108,10 @@ export function SignupForm({ prefillEmail }: { prefillEmail?: string }) {
 
 	return (
 		<div>
-			<h1 className="font-bold text-xl md:text-2xl">
+			<h1 className="font-bold text-2xl md:text-3xl">
 				{t("auth.signup.title")}
 			</h1>
-			<p className="mt-1 mb-6 text-foreground/60">
+			<p className="mt-2 mb-8 text-muted-foreground">
 				{t("auth.signup.message")}
 			</p>
 
@@ -134,7 +130,7 @@ export function SignupForm({ prefillEmail }: { prefillEmail?: string }) {
 
 					<Form {...form}>
 						<form
-							className="flex flex-col items-stretch gap-4"
+							className="flex flex-col items-stretch gap-5"
 							onSubmit={onSubmit}
 						>
 							{form.formState.isSubmitted &&
@@ -156,7 +152,10 @@ export function SignupForm({ prefillEmail }: { prefillEmail?: string }) {
 											{t("auth.signup.name")}
 										</FormLabel>
 										<FormControl>
-											<Input {...field} />
+											<Input
+												{...field}
+												className="h-11"
+											/>
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -176,6 +175,7 @@ export function SignupForm({ prefillEmail }: { prefillEmail?: string }) {
 												{...field}
 												autoComplete="email"
 												readOnly={!!prefillEmail}
+												className="h-11"
 											/>
 										</FormControl>
 										<FormMessage />
@@ -200,7 +200,7 @@ export function SignupForm({ prefillEmail }: { prefillEmail?: string }) {
 																? "text"
 																: "password"
 														}
-														className="pr-10"
+														className="h-11 pe-10"
 														{...field}
 														autoComplete="new-password"
 													/>
@@ -211,7 +211,7 @@ export function SignupForm({ prefillEmail }: { prefillEmail?: string }) {
 																!showPassword,
 															)
 														}
-														className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary text-xl"
+														className="absolute inset-y-0 end-0 flex items-center pe-3 text-muted-foreground hover:text-foreground transition-colors"
 													>
 														{showPassword ? (
 															<EyeOffIcon className="size-4" />
@@ -227,41 +227,39 @@ export function SignupForm({ prefillEmail }: { prefillEmail?: string }) {
 								/>
 							)}
 
-							<Button loading={form.formState.isSubmitting}>
+							<Button
+								className="h-11"
+								loading={form.formState.isSubmitting}
+							>
 								{t("auth.signup.submit")}
 							</Button>
 						</form>
 					</Form>
 
+					{/* Social login (Google only) */}
 					{config.auth.enableSignup &&
 						config.auth.enableSocialLogin && (
 							<>
 								<div className="relative my-6 h-4">
 									<hr className="relative top-2" />
-									<p className="-translate-x-1/2 absolute top-0 left-1/2 mx-auto inline-block h-4 bg-card px-2 text-center font-medium text-foreground/60 text-sm leading-tight">
-										{t("auth.login.continueWith")}
+									<p className="-translate-x-1/2 absolute top-0 left-1/2 mx-auto inline-block h-4 bg-background px-2 text-center font-medium text-muted-foreground text-sm leading-tight">
+										{t("auth.signup.orContinueWith")}
 									</p>
 								</div>
 
-								<div className="grid grid-cols-1 items-stretch gap-2 sm:grid-cols-2">
-									{Object.keys(oAuthProviders).map(
-										(providerId) => (
-											<SocialSigninButton
-												key={providerId}
-												provider={
-													providerId as OAuthProvider
-												}
-											/>
-										),
-									)}
+								<div className="grid grid-cols-1 gap-2">
+									<SocialSigninButton
+										provider="google"
+										className="h-11"
+									/>
 								</div>
 							</>
 						)}
 				</>
 			)}
 
-			<div className="mt-6 text-center text-sm">
-				<span className="text-foreground/60">
+			<div className="mt-8 text-center text-sm">
+				<span className="text-muted-foreground">
 					{t("auth.signup.alreadyHaveAccount")}{" "}
 				</span>
 				<Link
@@ -269,9 +267,10 @@ export function SignupForm({ prefillEmail }: { prefillEmail?: string }) {
 						"/auth/login",
 						Object.fromEntries(searchParams.entries()),
 					)}
+					className="font-medium text-primary hover:underline"
 				>
 					{t("auth.signup.signIn")}
-					<ArrowRightIcon className="ml-1 inline size-4 align-middle" />
+					<ArrowRightIcon className="ms-1 inline size-4 align-middle rtl-flip" />
 				</Link>
 			</div>
 		</div>

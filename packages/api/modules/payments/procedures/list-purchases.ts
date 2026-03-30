@@ -17,7 +17,7 @@ export const listPurchases = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string().nullish(),
+			organizationId: z.string().trim().max(100).nullish(),
 		}),
 	)
 	.handler(async ({ input: { organizationId }, context: { user } }) => {

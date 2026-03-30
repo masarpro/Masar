@@ -13,24 +13,24 @@ export const upsertContract = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			contractNo: z.string().nullish(),
-			title: z.string().nullish(),
-			clientName: z.string().nullish(),
-			description: z.string().nullish(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			contractNo: z.string().trim().max(100).nullish(),
+			title: z.string().trim().max(100).nullish(),
+			clientName: z.string().trim().max(100).nullish(),
+			description: z.string().trim().max(2000).nullish(),
 			status: z
 				.enum(["DRAFT", "ACTIVE", "SUSPENDED", "CLOSED"])
 				.optional(),
 			value: z.number().min(0, "قيمة العقد يجب أن تكون صفر أو أكبر"),
-			currency: z.string().optional(),
+			currency: z.string().trim().max(100).optional(),
 			signedDate: z.coerce.date().nullish(),
 			startDate: z.coerce.date().nullish(),
 			endDate: z.coerce.date().nullish(),
 			retentionPercent: z.number().min(0).max(100).nullish(),
 			retentionCap: z.number().min(0).nullish(),
 			retentionReleaseDays: z.number().int().min(0).nullish(),
-			notes: z.string().nullish(),
+			notes: z.string().trim().max(2000).nullish(),
 			includesVat: z.boolean().optional(),
 			vatPercent: z.number().min(0).max(100).nullish(),
 			paymentMethod: z
@@ -39,8 +39,8 @@ export const upsertContract = subscriptionProcedure
 			performanceBondPercent: z.number().min(0).max(100).nullish(),
 			performanceBondAmount: z.number().min(0).nullish(),
 			insuranceRequired: z.boolean().optional(),
-			insuranceDetails: z.string().nullish(),
-			scopeOfWork: z.string().nullish(),
+			insuranceDetails: z.string().trim().max(100).nullish(),
+			scopeOfWork: z.string().trim().max(100).nullish(),
 			penaltyPercent: z.number().min(0).max(100).nullish(),
 			penaltyCapPercent: z.number().min(0).max(100).nullish(),
 		}),

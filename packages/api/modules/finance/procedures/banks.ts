@@ -14,6 +14,11 @@ import {
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import {
+	MAX_NAME, MAX_DESC,
+	idString, optionalTrimmed, searchQuery,
+	signedAmount, paginationLimit, paginationOffset,
+} from "../../../lib/validation-constants";
 
 // Enums
 const financeAccountTypeEnum = z.enum(["BANK", "CASH_BOX"]);
@@ -30,12 +35,12 @@ export const listBankAccounts = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 			accountType: financeAccountTypeEnum.optional(),
 			isActive: z.boolean().optional(),
-			query: z.string().optional(),
-			limit: z.number().optional().default(50),
-			offset: z.number().optional().default(0),
+			query: searchQuery(),
+			limit: paginationLimit(),
+			offset: paginationOffset(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -65,8 +70,8 @@ export const getBankAccount = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -96,7 +101,7 @@ export const getBalancesSummary = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
+			organizationId: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -120,16 +125,16 @@ export const createBankAccountProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			name: z.string().min(1),
-			accountNumber: z.string().optional(),
-			bankName: z.string().optional(),
-			iban: z.string().optional(),
+			organizationId: idString(),
+			name: z.string().trim().min(1).max(MAX_NAME),
+			accountNumber: z.string().trim().max(50).optional(),
+			bankName: optionalTrimmed(MAX_NAME),
+			iban: z.string().trim().max(34).optional(),
 			accountType: financeAccountTypeEnum.optional().default("BANK"),
-			balance: z.number().optional().default(0),
-			currency: z.string().optional().default("SAR"),
+			balance: signedAmount().optional().default(0),
+			currency: z.string().trim().max(3).optional().default("SAR"),
 			isDefault: z.boolean().optional().default(false),
-			notes: z.string().optional(),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -138,38 +143,38 @@ export const createBankAccountProcedure = subscriptionProcedure
 			action: "settings",
 		});
 
-		const account = await createBankAccount({
-			organizationId: input.organizationId,
-			createdById: context.user.id,
-			name: input.name,
-			accountNumber: input.accountNumber,
-			bankName: input.bankName,
-			iban: input.iban,
-			accountType: input.accountType,
-			balance: input.balance,
-			currency: input.currency,
-			isDefault: input.isDefault,
-			notes: input.notes,
-		});
+		// Atomic: create bank account + chart account in one transaction
+		const account = await db.$transaction(async (tx: any) => {
+			// If this is marked as default, unset other defaults
+			if (input.isDefault) {
+				await tx.organizationBank.updateMany({
+					where: { organizationId: input.organizationId, isDefault: true },
+					data: { isDefault: false },
+				});
+			}
 
-		// Auto-create chart account if accounting is enabled
-		try {
-			await createBankChartAccount(db, input.organizationId, account.id, input.name);
-		} catch (e) {
-			console.error("[Accounting] Failed to create chart account for bank:", e);
-			orgAuditLog({
-				organizationId: input.organizationId,
-				actorId: context.user.id,
-				action: "JOURNAL_ENTRY_FAILED",
-				entityType: "bank_chart_account",
-				entityId: account.id,
-				metadata: {
-					operation: "BANK_CHART_ACCOUNT_CREATION",
-					bankName: input.name,
-					error: e instanceof Error ? e.message : String(e),
+			const bank = await tx.organizationBank.create({
+				data: {
+					organizationId: input.organizationId,
+					createdById: context.user.id,
+					name: input.name,
+					accountNumber: input.accountNumber,
+					bankName: input.bankName,
+					iban: input.iban,
+					accountType: input.accountType ?? "BANK",
+					balance: input.balance ?? 0,
+					currency: input.currency ?? "SAR",
+					isDefault: input.isDefault ?? false,
+					isActive: true,
+					notes: input.notes,
 				},
 			});
-		}
+
+			// Auto-create chart account if accounting is enabled
+			await createBankChartAccount(tx, input.organizationId, bank.id, input.name);
+
+			return bank;
+		});
 
 		orgAuditLog({
 			organizationId: input.organizationId,
@@ -195,16 +200,16 @@ export const updateBankAccountProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
-			name: z.string().min(1).optional(),
-			accountNumber: z.string().optional(),
-			bankName: z.string().optional(),
-			iban: z.string().optional(),
+			organizationId: idString(),
+			id: idString(),
+			name: z.string().trim().min(1).max(MAX_NAME).optional(),
+			accountNumber: z.string().trim().max(50).optional(),
+			bankName: optionalTrimmed(MAX_NAME),
+			iban: z.string().trim().max(34).optional(),
 			accountType: financeAccountTypeEnum.optional(),
-			currency: z.string().optional(),
+			currency: z.string().trim().max(3).optional(),
 			isActive: z.boolean().optional(),
-			notes: z.string().optional(),
+			notes: optionalTrimmed(MAX_DESC),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -241,8 +246,8 @@ export const setDefaultBankAccountProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -276,8 +281,8 @@ export const deleteBankAccountProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -338,8 +343,8 @@ export const reconcileBankAccountProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			id: z.string(),
+			organizationId: idString(),
+			id: idString(),
 		}),
 	)
 	.handler(async ({ input, context }) => {

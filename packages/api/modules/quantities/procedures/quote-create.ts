@@ -15,30 +15,30 @@ export const quoteCreate = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			costStudyId: z.string(),
-			quoteType: z.string(),
-			clientName: z.string(),
-			clientCompany: z.string().optional(),
-			clientPhone: z.string().optional(),
-			clientEmail: z.string().optional(),
-			clientAddress: z.string().optional(),
+			organizationId: z.string().trim().max(100),
+			costStudyId: z.string().trim().max(100),
+			quoteType: z.string().trim().max(100),
+			clientName: z.string().trim().max(200),
+			clientCompany: z.string().trim().max(100).optional(),
+			clientPhone: z.string().trim().max(100).optional(),
+			clientEmail: z.string().trim().max(100).optional(),
+			clientAddress: z.string().trim().max(100).optional(),
 			subtotal: z.number().nonnegative(),
 			overheadAmount: z.number().nonnegative().default(0),
 			profitAmount: z.number().nonnegative().default(0),
 			vatAmount: z.number().nonnegative().default(0),
 			totalAmount: z.number().nonnegative(),
 			validUntil: z.string().transform((str) => new Date(str)),
-			paymentTerms: z.string().optional(),
-			deliveryTerms: z.string().optional(),
+			paymentTerms: z.string().trim().max(100).optional(),
+			deliveryTerms: z.string().trim().max(100).optional(),
 			showUnitPrices: z.boolean().default(true),
 			showQuantities: z.boolean().default(true),
 			showItemDescriptions: z.boolean().default(true),
 			includeTerms: z.boolean().default(true),
 			includeCoverPage: z.boolean().default(true),
-			selectedCategories: z.any().optional(),
-			termsAndConditions: z.string().optional(),
-			notes: z.string().optional(),
+			selectedCategories: z.record(z.string(), z.unknown()).optional(),
+			termsAndConditions: z.string().trim().max(100).optional(),
+			notes: z.string().trim().max(2000).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -72,8 +72,8 @@ export const quoteGetById = protectedProcedure
 	})
 	.input(
 		z.object({
-			id: z.string(),
-			organizationId: z.string(),
+			id: z.string().trim().max(100),
+			organizationId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -103,32 +103,32 @@ export const quoteUpdate = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			id: z.string(),
-			organizationId: z.string(),
-			quoteType: z.string().optional(),
-			clientName: z.string().optional(),
-			clientCompany: z.string().optional(),
-			clientPhone: z.string().optional(),
-			clientEmail: z.string().optional(),
-			clientAddress: z.string().optional(),
+			id: z.string().trim().max(100),
+			organizationId: z.string().trim().max(100),
+			quoteType: z.string().trim().max(100).optional(),
+			clientName: z.string().trim().max(100).optional(),
+			clientCompany: z.string().trim().max(100).optional(),
+			clientPhone: z.string().trim().max(100).optional(),
+			clientEmail: z.string().trim().max(100).optional(),
+			clientAddress: z.string().trim().max(100).optional(),
 			subtotal: z.number().nonnegative().optional(),
 			overheadAmount: z.number().nonnegative().optional(),
 			profitAmount: z.number().nonnegative().optional(),
 			vatAmount: z.number().nonnegative().optional(),
 			totalAmount: z.number().nonnegative().optional(),
 			validUntil: z.string().transform((str) => new Date(str)).optional(),
-			paymentTerms: z.string().optional(),
-			deliveryTerms: z.string().optional(),
+			paymentTerms: z.string().trim().max(100).optional(),
+			deliveryTerms: z.string().trim().max(100).optional(),
 			showUnitPrices: z.boolean().optional(),
 			showQuantities: z.boolean().optional(),
 			showItemDescriptions: z.boolean().optional(),
 			includeTerms: z.boolean().optional(),
 			includeCoverPage: z.boolean().optional(),
-			selectedCategories: z.any().optional(),
-			termsAndConditions: z.string().optional(),
-			notes: z.string().optional(),
-			pdfUrl: z.string().optional(),
-			status: z.string().optional(),
+			selectedCategories: z.record(z.string(), z.unknown()).optional(),
+			termsAndConditions: z.string().trim().max(100).optional(),
+			notes: z.string().trim().max(2000).optional(),
+			pdfUrl: z.string().trim().max(100).optional(),
+			status: z.string().trim().max(100).optional(),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -162,8 +162,8 @@ export const quoteDelete = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			id: z.string(),
-			organizationId: z.string(),
+			id: z.string().trim().max(100),
+			organizationId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -195,8 +195,8 @@ export const quoteList = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			costStudyId: z.string(),
+			organizationId: z.string().trim().max(100),
+			costStudyId: z.string().trim().max(100),
 		}),
 	)
 	.handler(async ({ input, context }) => {

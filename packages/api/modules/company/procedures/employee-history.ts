@@ -2,6 +2,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { idString, paginationLimit } from "../../../lib/validation-constants";
 
 export const getEmployeeHistoryProcedure = protectedProcedure
 	.route({
@@ -12,10 +13,10 @@ export const getEmployeeHistoryProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			employeeId: z.string(),
-			page: z.number().optional().default(1),
-			pageSize: z.number().optional().default(20),
+			organizationId: idString(),
+			employeeId: idString(),
+			page: z.number().int().min(1).max(1000).optional().default(1),
+			pageSize: paginationLimit().default(20),
 		}),
 	)
 	.handler(async ({ input, context }) => {

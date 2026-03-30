@@ -3,6 +3,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { idString } from "../../../lib/validation-constants";
 
 // ========== Client Statement ==========
 
@@ -15,8 +16,8 @@ export const getClientStatementProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			clientId: z.string(),
+			organizationId: idString(),
+			clientId: idString(),
 			dateFrom: z.string().datetime(),
 			dateTo: z.string().datetime(),
 		}),
@@ -47,8 +48,8 @@ export const getVendorStatementProcedure = protectedProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			contractId: z.string(),
+			organizationId: idString(),
+			contractId: idString(),
 			dateFrom: z.string().datetime(),
 			dateTo: z.string().datetime(),
 		}),

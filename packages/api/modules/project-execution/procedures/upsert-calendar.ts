@@ -12,15 +12,15 @@ export const upsertCalendarProcedure = subscriptionProcedure
 	})
 	.input(
 		z.object({
-			organizationId: z.string(),
-			projectId: z.string(),
-			name: z.string().min(1).max(200).optional(),
+			organizationId: z.string().trim().max(100),
+			projectId: z.string().trim().max(100),
+			name: z.string().trim().min(1).max(200).optional(),
 			workDays: z.array(z.number().int().min(0).max(6)).optional(),
 			holidays: z
 				.array(
 					z.object({
-						date: z.string(),
-						name: z.string(),
+						date: z.string().trim().max(50),
+						name: z.string().trim().max(200),
 					}),
 				)
 				.optional(),

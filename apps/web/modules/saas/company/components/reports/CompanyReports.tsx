@@ -46,7 +46,7 @@ export function CompanyReports({ organizationId }: CompanyReportsProps) {
 
 	if (isLoading) {
 		return (
-			<div className="space-y-6" dir="rtl">
+			<div className="space-y-6">
 				{[...Array(3)].map((_, i) => (
 					<div
 						key={i}
@@ -62,7 +62,7 @@ export function CompanyReports({ organizationId }: CompanyReportsProps) {
 	if (!dashboard) return null;
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-6">
 			{/* Monthly Summary */}
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
 				<div className="flex items-center gap-3 p-5 border-b border-white/10 dark:border-slate-700/30">
