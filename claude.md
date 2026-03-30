@@ -1,7 +1,7 @@
 agents.md
 # CLAUDE.md — دليل Claude Code الشامل لمنصة مسار
 
-> **آخر تحديث:** 2026-03-28
+> **آخر تحديث:** 2026-03-30
 > **المطوّر:** جودت — مؤسس ومطوّر رئيسي (مطوّر فردي)
 > **المشروع:** منصة مسار (Masar) — SaaS لإدارة المشاريع الإنشائية
 > **المستودع:** github.com/masarpro/Masar
@@ -29,10 +29,14 @@ agents.md
 - **React 19.2.3** + **Next.js 16.1.0** (App Router)
 - **TypeScript** + **Zod 4** (validation)
 - **Tailwind CSS 4** + **shadcn/ui** (Radix-based, 35+ components)
-- **TanStack React Query 5** (server state) + **TanStack React Table 8** (tables)
+- **TanStack React Query 5** (server state) + **TanStack React Table 8** (tables) + **TanStack Virtual** (virtualization)
 - **Recharts** (charts) + **Lucide React 0.553** (icons)
 - **next-intl** (i18n — Arabic-first مع دعم إنجليزي)
 - **React Hook Form** + Zod schemas (forms)
+
+### Testing
+- **Vitest** (unit/integration tests — monorepo workspace)
+- **Playwright** (E2E tests — Chromium, Arabic locale, Asia/Riyadh timezone)
 
 ### Backend
 - **Hono** (HTTP framework) + **oRPC 1.13.2** (type-safe RPC مع OpenAPI)
@@ -68,8 +72,8 @@ agents.md
 
 ```
 D:\Masar\Masar/
-├── apps/web/                          # Next.js 16 App (1,135+ files)
-│   ├── app/                           # App Router
+├── apps/web/                          # Next.js 16 App (1,200+ files)
+│   ├── app/                           # App Router (221 pages, 220 loading states, 16 error boundaries)
 │   │   ├── (marketing)/[locale]/      # Marketing (8 pages, SSG)
 │   │   ├── (saas)/app/                # SaaS App (145+ pages)
 │   │   │   └── [organizationSlug]/    # Multi-tenant routes
@@ -78,14 +82,16 @@ D:\Masar\Masar/
 │   │   │       ├── finance/           # النظام المالي (55+ pages — يشمل المحاسبة)
 │   │   │       ├── settings/          # الإعدادات (8 pages)
 │   │   │       └── pricing/           # دراسات التسعير والكميات
-│   │   ├── auth/                      # المصادقة (6 pages)
+│   │   ├── auth/                      # المصادقة (6 pages + AuthParticleField تأثير بصري)
 │   │   ├── owner/[token]/             # بوابة المالك (5 pages)
 │   │   └── share/[token]/             # مستندات مشاركة
-│   ├── modules/                       # Feature modules (753 files)
+│   ├── modules/                       # Feature modules (875 files)
 │   │   └── saas/                      # 19 sub-modules
 │   │       ├── pricing/               # ⭐ أكبر وأعقد module (257 file, ~82,620 lines)
 │   │       │   ├── components/studies/ # مكونات دراسات الكميات
 │   │       │   │   ├── sections/      # أقسام إنشائية (7 sections)
+│   │       │   │   │   ├── blocks/    # 🆕 قسم البلوك (مُعاد هيكلته — 7 ملفات)
+│   │       │   │   │   └── columns/   # 🆕 قسم الأعمدة (مُعاد هيكلته — 6 ملفات)
 │   │       │   │   └── shared/        # مكونات مشتركة
 │   │       │   ├── lib/               # محركات الحساب
 │   │       │   │   ├── structural-calculations.ts  # ⭐ 2,357 lines — القلب
@@ -97,27 +103,50 @@ D:\Masar\Masar/
 │   │       │   ├── constants/         # ثوابت (أسعار، بلوك، بلاطات)
 │   │       │   └── hooks/             # React hooks
 │   │       ├── projects/              # إدارة المشاريع
+│   │       │   └── components/
+│   │       │       ├── boq/           # 🆕 جدول كميات المشروع (12 ملف — CRUD + Excel import)
+│   │       │       ├── chat/          # 🆕 محادثات المشروع (7 ملفات — فريق + مالك)
+│   │       │       └── finance/
+│   │       │           └── subcontracts/  # مقاولو الباطن (مُحسّن)
 │   │       ├── finance/               # النظام المالي
+│   │       │   └── components/
+│   │       │       └── invoices/
+│   │       │           └── invoice-form/  # 🆕 نموذج الفاتورة (مُعاد هيكلته — 11 ملف)
 │   │       ├── company/               # إدارة الشركة/HR
+│   │       │   └── components/
+│   │       │       └── templates/
+│   │       │           └── renderer/  # 🆕 محرك عرض القوالب (TemplateRenderer — 693 سطر)
 │   │       └── shared/                # مكونات مشتركة
+│   │           └── hooks/
+│   │               └── use-virtual-rows.ts  # 🆕 hook افتراضية الصفوف (TanStack Virtual)
+│   ├── tests/                         # 🆕 E2E Tests (Playwright)
+│   │   └── e2e/                       # 4 test files + fixtures
 │   └── proxy.ts                       # Next.js 16 proxy (replaced middleware.ts)
 │
 ├── packages/
-│   ├── api/                           # Backend (420+ files, 41 modules, 690+ endpoints)
-│   │   └── modules/
-│   │       ├── quantities/            # API الكميات والدراسات
-│   │       │   ├── engines/           # محركات الحساب الخلفية
-│   │       │   │   ├── structural-calculations.ts  # ⭐ لا تلمس
-│   │       │   │   └── derivation-engine.ts        # ⭐ لا تلمس (2,493 lines)
-│   │       │   └── procedures/        # CRUD + business logic
-│   │       ├── finance/               # 116+ endpoints (+ payment vouchers)
-│   │       ├── company/               # 87 endpoints
-│   │       ├── handover/              # 15 endpoints (محاضر الاستلام — جديد)
-│   │       └── ...                    # 37 more modules
+│   ├── api/                           # Backend (420+ files, 43 modules, 690+ endpoints)
+│   │   ├── modules/
+│   │   │   ├── quantities/            # API الكميات والدراسات
+│   │   │   │   ├── engines/           # محركات الحساب الخلفية
+│   │   │   │   │   ├── structural-calculations.ts  # ⭐ لا تلمس
+│   │   │   │   │   └── derivation-engine.ts        # ⭐ لا تلمس (2,493 lines)
+│   │   │   │   └── procedures/        # CRUD + business logic
+│   │   │   ├── finance/               # 116+ endpoints (+ payment vouchers)
+│   │   │   ├── company/               # 87 endpoints
+│   │   │   ├── handover/              # 15 endpoints (محاضر الاستلام — مُعاد هيكلته إلى 8 ملفات)
+│   │   │   ├── project-boq/           # 🆕 جدول كميات المشروع
+│   │   │   ├── project-chat/          # 🆕 محادثات المشروع
+│   │   │   └── ...                    # 37 more modules
+│   │   ├── lib/
+│   │   │   ├── accounting/auto-journal.ts  # قيود تلقائية (766 سطر)
+│   │   │   ├── messaging/providers/   # 🆕 مزودو الرسائل (SMS, WhatsApp, NoOp)
+│   │   │   └── validation-constants.ts # 🆕 ثوابت التحقق المركزية (حدود أرقام/نصوص)
+│   │   └── __tests__/                 # 🆕 اختبارات API (21 ملف — permissions, finance, security)
 │   ├── database/                      # Prisma (175+ files)
-│   │   └── prisma/
-│   │       ├── schema/                # Schema files (119 models, 77 enums)
-│   │       └── zod/index.ts           # ⚠️ auto-generated, breaks after prisma generate
+│   │   ├── prisma/
+│   │   │   ├── schema.prisma          # Schema (123 models, 95 enums)
+│   │   │   └── zod/index.ts           # ⚠️ auto-generated, breaks after prisma generate
+│   │   └── __tests__/                 # 🆕 اختبارات DB (7 ملفات — invoices, sequences, smoke)
 │   ├── ai/                            # AI assistant (40+ files, 32 tools)
 │   ├── auth/                          # Better Auth config
 │   ├── mail/                          # Email (7 templates via Resend)
@@ -142,7 +171,7 @@ D:\Masar\Masar/
 | `packages/api/modules/quantities/engines/derivation-engine.ts` | محرك اشتقاق كميات التشطيبات — 2,493 سطر |
 | `apps/web/modules/saas/pricing/lib/structural-calculations.ts` | نسخة المحرك الإنشائي في الواجهة — synchronized مع الخلفية |
 | `packages/database/prisma/zod/index.ts` | ملف مولّد تلقائياً — لا تعدّله يدوياً (يُصلح بـ `fix-zod-decimal.mjs`) |
-| `packages/database/prisma/schema/*.prisma` | لا تعدّل Schema بدون تأكيد صريح من جودت |
+| `packages/database/prisma/schema.prisma` | لا تعدّل Schema بدون تأكيد صريح من جودت |
 
 **استثناء وحيد:** إذا طُلب منك صراحةً إصلاح bug محدد في المحرك مع تقديم الحساب اليدوي كدليل.
 
@@ -324,9 +353,9 @@ export default function Loading() {
 | صبة النظافة | `PlainConcreteSection.tsx` | 511 lines | خرسانة عادية تحت القواعد |
 | القواعد | `FoundationsSection.tsx` | 2,383 lines | معزولة، مشتركة، شريطية، لبشة |
 | الميدة | `BeamsSection.tsx` | 549 lines | كمرات ربط |
-| الأعمدة | `ColumnsSection.tsx` | 1,643 lines | أعمدة + رقاب أعمدة |
+| الأعمدة | `columns/` (6 ملفات) | 1,643 lines | أعمدة + رقاب أعمدة (مُعاد هيكلته) |
 | الأسقف | `SlabsSection.tsx` | 3,438 lines | صلب، مسطح، هوردي، كمرات عريضة |
-| البلوك | `BlocksSection.tsx` | 1,287 lines | 6 تصنيفات جدران |
+| البلوك | `blocks/` (7 ملفات) | 1,287 lines | 6 تصنيفات جدران (مُعاد هيكلته) |
 | السلالم | `StairsSection.tsx` | 1,095 lines | 4 طبقات تسليح |
 | عناصر إنشائية أخرى | `OtherStructuralSection.tsx` | ~600 lines | 11 عنصر (بيارة، خزان، مصعد، إلخ) |
 
@@ -392,7 +421,7 @@ model StructuralItem {
 
 ### 8.1 إحصائيات
 
-- **119 model** + **77 enum** في Prisma Schema (~4,900+ سطر)
+- **123 model** + **95 enum** في Prisma Schema (~5,000+ سطر)
 - **275+ indexes** + **42+ unique constraints**
 - **Decimal(15,2)** لكل الحقول المالية
 - **Cascade Delete** شامل — حذف المنظمة يحذف كل شيء
@@ -481,6 +510,8 @@ DIRECT_URL = postgresql://...                     # Direct (migrations only)
 | Build failure (ECONNRESET) | Windows dev mode + Turbopack | غير مؤثر — يحدث فقط في dev mode، الحل: restart pnpm dev | متكرر |
 | .env.local duplicates | قيم وهمية تتجاوز القيم الحقيقية | تنظيف الملف يدوياً — حذف التكرارات | 2026-03-16 |
 | تدقيق محاسبي (14 خطأ) | تدقيق شامل للنظام المحاسبي والمالي | جميع الـ 14 خطأ تبيّن أنها مُصلحة مسبقاً: قيود تلقائية ذرية ($transaction)، تحديث رصيد البنك عند دفعة الفاتورة، state machine للفواتير والمستخلصات، حد مبلغ الإشعار الدائن، منع تعديل فاتورة ISSUED، ترقيم ذري للعقود، فحص الفترات المغلقة، VAT بـ Decimal، entryNo فريد، audit log لأخطاء القيود | 2026-03-27 |
+| غياب Error Boundaries | 2 فقط من ~17 route group | إضافة 16 error boundary يغطي كل route groups الرئيسية (root, marketing, saas, org, projects, finance, company, pricing, settings, handover, execution, subcontracts, admin, account, owner) | 2026-03-29 |
+| غياب اختبارات | صفر tests | إضافة بنية اختبارات كاملة: Vitest workspace (API + DB) + Playwright E2E — 33 ملف اختبار يغطي: RBAC permissions, feature gates, financial calculations, invoice lifecycle, auto-journal, security, auth flows, public pages | 2026-03-29 |
 
 ### 10.2 مشاكل مفتوحة (تحتاج إصلاح)
 
@@ -491,9 +522,9 @@ DIRECT_URL = postgresql://...                     # Direct (migrations only)
 | تضاعف تكلفة المواد في ملخص التسعير | 🟠 عالي | 18,134.49 يظهر 36,268.98 — المصنعيات صحيحة |
 | Region mismatch | 🟠 عالي | Vercel Dubai ↔ Supabase Mumbai = ~20-30ms per query |
 | مكونات >1000 سطر (10+) | 🟡 متوسط | تحتاج تقسيم لتحسين bundle size |
-| غياب Error Boundaries | 🟡 متوسط | 2 فقط من ~17 route group |
+| ~~غياب Error Boundaries~~ | ✅ مُصلح | 16 error boundary (كانت 2 — تغطي كل route groups الرئيسية) |
 | CSP unsafe-inline | 🟡 متوسط | يضعف الحماية ضد XSS |
-| غياب اختبارات | 🟡 متوسط | صفر unit/integration/E2E tests |
+| ~~غياب اختبارات~~ | ✅ مُصلح | Vitest (unit/integration) + Playwright (E2E) — 33 ملف اختبار |
 | PDF export يعرض صفحة فارغة ثانية + URL المتصفح | 🟡 متوسط | مشكلة iframe في window.print |
 
 ---
@@ -523,6 +554,14 @@ pnpm lint
 
 # تنسيق الكود
 pnpm format
+
+# اختبارات (Vitest)
+pnpm test                              # كل الاختبارات
+pnpm --filter @repo/api test           # API فقط
+pnpm --filter @repo/database test      # Database فقط
+
+# E2E (Playwright — يتطلب build أولاً)
+cd apps/web && npx playwright test
 ```
 
 ### أوامر Windows-specific
@@ -602,7 +641,7 @@ export const createItem = subscriptionProcedure... // write
 
 ---
 
-## 13. بنية وحدة API (41 module)
+## 13. بنية وحدة API (43 module)
 
 | الوحدة | Endpoints | الملاحظات |
 |--------|-----------|---------|
@@ -619,6 +658,8 @@ export const createItem = subscriptionProcedure... // write
 | project-change-orders | 12 | أوامر التغيير |
 | project-owner | 12 | بوابة المالك |
 | project-field | 11 | تقارير يومية، صور، مشاكل |
+| project-boq | ~10 | 🆕 جدول كميات المشروع (BOQ) — CRUD + import |
+| project-chat | ~8 | 🆕 محادثات المشروع — قنوات فريق/مالك |
 | dashboard | 9 | لوحة التحكم الرئيسية |
 | ai | 6 | المساعد الذكي (32 tools) |
 | + 26 more modules | ~250 | باقي الوحدات |
@@ -741,19 +782,21 @@ export const createItem = subscriptionProcedure... // write
 
 | المقياس | القيمة |
 |---------|--------|
-| أسطر الكود | 620,000+ |
-| ملفات TypeScript/TSX | 1,950+ |
-| صفحات | 210+ |
+| أسطر الكود | 650,000+ |
+| ملفات TypeScript/TSX | 2,286+ |
+| صفحات | 221+ |
 | API Endpoints | 690+ |
-| API Modules | 41 |
-| Database Models | 119 |
-| Database Enums | 77 |
+| API Modules | 43 |
+| API Procedure Files | 365 |
+| Database Models | 123 |
+| Database Enums | 95 |
 | Database Indexes | 280+ |
-| Loading States | 200+ files |
-| Translation Keys (AR) | ~6,900 |
-| Translation Keys (EN) | ~7,100 |
+| Loading States | 220 files |
+| Error Boundaries | 16 files |
+| Translation Keys (AR) | ~9,100 |
+| Translation Keys (EN) | ~9,100 |
 | Permissions | 42 |
-| Custom Hooks | 21 |
+| Custom Hooks | 22 |
 | UI Components (shadcn) | 35+ |
 | Environment Variables | 43 |
 | Rate Limit Tiers | 6 |
@@ -762,6 +805,7 @@ export const createItem = subscriptionProcedure... // write
 | AI Module Prompts | 14 |
 | AI navigateTo Patterns | 37 |
 | Auto-Journal Events | 15 (+ generic reverse) |
+| Test Files | 33 (21 API + 7 DB + 5 E2E) |
 
 ---
 
@@ -1188,14 +1232,18 @@ model HandoverProtocolItem {
 }
 ```
 
-### 20.5 API Endpoints (15 endpoint)
+### 20.5 API Endpoints (15 endpoint — مُعاد هيكلته إلى 8 ملفات)
 
-| المجموعة | الإجراءات |
-|----------|-----------|
-| CRUD | list, getById, create, update, delete |
-| بنود | add, update, delete, importFromContract, importFromBOQ |
-| سير العمل | submit, sign, complete, print |
-| تقارير | getWarrantyStatus (حالة الضمان لكل المحاضر الابتدائية) |
+| الملف | الإجراءات |
+|-------|-----------|
+| `shared.ts` | Enums + schemas مشتركة (handoverType, handoverStatus, qualityRating, partySchema) |
+| `list-protocols.ts` | list, getById |
+| `crud-protocols.ts` | create, update, delete |
+| `protocol-items.ts` | addItem, updateItem, deleteItem, importFromContract, importFromBOQ |
+| `protocol-workflow.ts` | submit, sign, complete (+ auto-accounting for FINAL) |
+| `protocol-reports.ts` | print, getWarrantyStatus |
+| `handover-protocols.ts` | backward-compatibility shim → re-exports from index |
+| `index.ts` | central export hub |
 
 **Router path:** `orpc.handover.*`
 
@@ -1258,7 +1306,220 @@ finance.disbursements.list / getById / create / update / submit / approve / reje
 
 ---
 
-## 22. ملاحظات بيئة العمل
+## 22. بنية الاختبارات (أُضيف 2026-03-29)
+
+### 22.1 نظرة عامة
+
+بنية اختبارات متكاملة تغطي unit tests, integration tests, و E2E tests.
+
+### 22.2 المكدس
+
+| الأداة | الاستخدام |
+|--------|-----------|
+| **Vitest** | Unit + Integration (monorepo workspace: `packages/api` + `packages/database`) |
+| **Playwright** | E2E (Chromium, Arabic locale, Asia/Riyadh timezone, `http://localhost:3000`) |
+
+### 22.3 اختبارات API (`packages/api/__tests__/` — 21 ملف)
+
+| الملف/المجلد | الوصف | النوع |
+|-------------|-------|-------|
+| `permissions.test.ts` | 60+ assertion — RBAC لـ 6 أدوار و 7 أقسام صلاحيات | Unit + Integration |
+| `feature-gate.test.ts` | Feature gating — FREE/PRO/TRIAL مع حدود count | Unit (mocked) |
+| `financial-calculations.test.ts` | معادلات مالية (رواتب، محتجزات، أقساط) | Unit (pure) |
+| `zatca-tlv.test.ts` | ترميز QR الفاتورة الإلكترونية | Unit |
+| `rate-limit.test.ts` | Rate limiting enforcement | Unit |
+| `permissions/` | Permission matrix, cross-tenant, project access | Integration |
+| `security/` | File upload validation, input sanitization | Unit |
+| `modules/accounting/` | Auto-journal entry creation | Integration |
+| `modules/finance/` | Invoice lifecycle, payment voucher workflow | Integration |
+| `modules/ai/` | AI tool permissions | Unit |
+| `helpers/` | setup.ts (DB redirect), factories.ts, mock-context.ts, assertions.ts | Utilities |
+
+### 22.4 اختبارات Database (`packages/database/__tests__/` — 7 ملفات)
+
+| الملف | الوصف |
+|-------|-------|
+| `smoke.test.ts` | اتصال DB + CRUD + rollback |
+| `invoice-calculations.test.ts` | 60+ test — `calculateInvoiceTotals()` (خصومات، VAT، تقريب، Decimal) |
+| `sequences.test.ts` | 15 test — `formatSequenceNo()` (INV, EXP, QT prefixes) |
+| `attachments-validation.test.ts` | قواعد التحقق من الملفات |
+| `org-finance.test.ts` | بيانات مالية المنظمة |
+| `helpers/setup.ts` | `withTestTx()` — transaction-per-test مع auto-rollback |
+| `helpers/factories.ts` | مصانع بيانات اختبار (org, user, bank) |
+
+### 22.5 اختبارات E2E (`apps/web/tests/e2e/` — 5 ملفات)
+
+| الملف | الاختبارات |
+|-------|-----------|
+| `smoke.spec.ts` | 6 tests — server responds, login loads, CSS, API health, RTL/LTR |
+| `auth.spec.ts` | 5 tests — login form, wrong credentials, register, forgot password, protected routes |
+| `public-pages.spec.ts` | 6 tests — marketing pages, invalid tokens, 404, console errors |
+| `fixtures/auth.ts` | Pre-authenticated page fixture (TEST_USER_EMAIL/PASSWORD env vars) |
+
+### 22.6 أوامر الاختبار
+
+```bash
+# تشغيل كل الاختبارات (Vitest workspace)
+pnpm test
+
+# اختبارات API فقط
+pnpm --filter @repo/api test
+
+# اختبارات Database فقط
+pnpm --filter @repo/database test
+
+# E2E tests (يتطلب build + start أولاً)
+cd apps/web && npx playwright test
+```
+
+---
+
+## 23. الوحدات الجديدة (أُضيف 2026-03-29)
+
+### 23.1 جدول كميات المشروع (Project BOQ)
+
+وحدة كاملة لإدارة جدول الكميات على مستوى المشروع (مختلف عن دراسات التسعير).
+
+**Frontend:** `apps/web/modules/saas/projects/components/boq/` (12 ملف)
+- `BOQOverview.tsx` — صفحة رئيسية مع فلترة وترتيب وعمليات جماعية
+- `boq-items-table.tsx` — جدول بيانات مع pagination
+- `boq-summary-cards.tsx` — بطاقات ملخص
+- `boq-filters.tsx` — فلاتر (قسم، نوع مصدر، حالة تسعير)
+- `boq-bulk-actions.tsx` — عمليات جماعية
+- `create-item-dialog.tsx` — إضافة بند
+- `bulk-entry-dialog.tsx` — إدخال بنود بالجملة
+- `pricing-mode-dialog.tsx` — تسعير جماعي
+- `copy-from-study-dialog.tsx` — نسخ من دراسات
+- `copy-from-quotation-dialog.tsx` — نسخ من عروض أسعار
+- `import-excel-dialog.tsx` — استيراد Excel
+- `boq-dashboard-card.tsx` — بطاقة لوحة التحكم
+
+**Backend:** `packages/api/modules/project-boq/`
+
+### 23.2 محادثات المشروع (Project Chat)
+
+نظام محادثات فورية داخل المشروع مع قناتين: فريق العمل والمالك.
+
+**Frontend:** `apps/web/modules/saas/projects/components/chat/` (7 ملفات)
+- `ChatPanel.tsx` — واجهة المحادثة (قناتين: TEAM + OWNER)
+- `ChatMessageList.tsx` — عرض الرسائل
+- `ChatInput.tsx` — إدخال الرسائل
+- `ChatBubble.tsx` — فقاعة الرسالة
+- `ChatAttachmentPreview.tsx` — معاينة المرفقات
+- `FloatingChatButton.tsx` — زر عائم لفتح المحادثة
+
+**Polling:** كل 15 ثانية + mark-as-read
+**Backend:** `packages/api/modules/project-chat/`
+
+### 23.3 محرك عرض القوالب (Template Renderer)
+
+محرك عرض شامل للفواتير وعروض الأسعار قابل للتخصيص بالكامل.
+
+**الملف:** `apps/web/modules/saas/company/components/templates/renderer/TemplateRenderer.tsx` (693 سطر)
+
+**يدعم:**
+- فواتير + عروض أسعار مع بيانات مختلفة
+- عناصر قابلة للسحب: هيدر، بيانات العميل، جدول البنود، المجاميع، الشروط، التوقيع، بيانات البنك، QR كود (ZATCA)، فوتر
+- ثنائي اللغة (AR/EN + RTL)
+- وضع تفاعلي لتحديد العناصر وتخصيصها
+- ألوان وخطوط وخلفيات قابلة للتخصيص
+- Watermark overlay
+
+### 23.4 مزودو الرسائل (Messaging Providers — مرحلة مبكرة)
+
+**المجلد:** `packages/api/lib/messaging/providers/`
+
+| المزود | الحالة | الملاحظات |
+|--------|--------|---------|
+| `noop.ts` | ✅ يعمل | Fallback افتراضي — يسجّل في console فقط |
+| `sms.ts` | 🔲 Stub | جاهز لـ Twilio/Vonage/MessageBird/Yamamah |
+| `whatsapp.ts` | 🔲 Stub | جاهز لـ WhatsApp Business API |
+
+### 23.5 ثوابت التحقق المركزية (Validation Constants)
+
+**الملف:** `packages/api/lib/validation-constants.ts` (50 سطر)
+
+ثوابت ودوال Zod مركزية لكل الـ API:
+- حدود نصوص: `MAX_NAME(200)`, `MAX_DESC(2000)`, `MAX_LONG_TEXT(5000)`
+- حدود مالية: `MAX_FINANCIAL(999,999,999.99)`, `MAX_QUANTITY(999,999)`
+- دوال Zod جاهزة: `trimmedString()`, `financialAmount()`, `percentage()`, `quantity()`
+
+### 23.6 Hook افتراضية الصفوف (Virtual Rows)
+
+**الملف:** `apps/web/modules/saas/shared/hooks/use-virtual-rows.ts` (81 سطر)
+
+Hook أداء يستخدم `@tanstack/react-virtual` لافتراضية صفوف الجداول الكبيرة:
+- يتفعل تلقائياً فوق 50 عنصر (configurable threshold)
+- ارتفاع صف افتراضي 48px مع 10 صفوف إضافية (overscan)
+- يدعم ارتفاعات ديناميكية عبر `measureElement`
+
+---
+
+## 24. إعادة الهيكلة الأخيرة (2026-03-29)
+
+### 24.1 نموذج الفاتورة (Invoice Form)
+
+**المسار:** `apps/web/modules/saas/finance/components/invoices/invoice-form/`
+
+مكون `CreateInvoiceForm.tsx` الضخم قُسّم إلى 11 ملف:
+
+| الملف | الوظيفة |
+|-------|---------|
+| `CreateInvoiceForm.tsx` | المنسّق الرئيسي — يدير الحالة ويجمع المكونات |
+| `InvoiceFormHeader.tsx` | شريط الإجراءات (حفظ، إصدار، معاينة، طباعة) |
+| `InvoiceClientCard.tsx` | اختيار/تعديل العميل |
+| `InvoiceDetailsCard.tsx` | التاريخ، المشروع، الضريبة، العملة |
+| `InvoiceItemsTable.tsx` | جدول البنود مع إعادة ترتيب وأعمدة قابلة للإخفاء |
+| `InvoiceNotesPanel.tsx` | ملاحظات + شروط دفع + مرفقات (tabs) |
+| `InvoiceSummaryPanel.tsx` | ملخص مالي (إجمالي، خصم، ضريبة، المتبقي) |
+| `InvoicePaymentsSection.tsx` | المدفوعات المسجّلة |
+| `InvoiceMobileBar.tsx` | شريط سفلي للجوال (المجموع + أزرار سريعة) |
+| `InvoiceDialogs.tsx` | Modals (معاينة، تأكيد إصدار، عميل جديد، دفعة) |
+| `types.ts` | أنواع TypeScript + ColumnKey |
+| `index.ts` | exports: CreateInvoiceForm, CreateInvoiceFormProps, InvoiceItem, ColumnKey |
+
+### 24.2 قسم البلوك (Blocks Section)
+
+**المسار:** `apps/web/modules/saas/pricing/components/studies/sections/blocks/`
+
+| الملف | الوظيفة |
+|-------|---------|
+| `BlocksSection.tsx` | المنسّق — أدوار + عناصر عامة + حذف |
+| `BlockForm.tsx` | نموذج إضافة/تعديل + حسابات |
+| `BlockItemsTable.tsx` | جدول العناصر (اسم، مساحة، سمك، كمية) |
+| `CopyFromFloorButton.tsx` | نسخ من دور آخر |
+| `BlocksSummary.tsx` | ملخص الإحصائيات |
+| `types.ts` | أنواع + ثوابت (أسعار بلوك/ملاط، أسماء أدوار) |
+| `index.ts` | exports: BlocksSection |
+
+### 24.3 قسم الأعمدة (Columns Section)
+
+**المسار:** `apps/web/modules/saas/pricing/components/studies/sections/columns/`
+
+| الملف | الوظيفة |
+|-------|---------|
+| `ColumnsSection.tsx` | المنسّق — أدوار متكررة + مجاميع |
+| `FloorColumnsPanel.tsx` | لوحة أعمدة الدور + حسابات حديد/خرسانة |
+| `NeckColumnsSection.tsx` | رقاب الأعمدة + ارتفاعات مسبقة + تفاصيل تقطيع |
+| `CopyFromFloorButton.tsx` | نسخ من دور آخر |
+| `types.ts` | أنواع + ثوابت (ارتفاعات رقاب مسبقة) |
+| `index.ts` | exports: ColumnsSection |
+
+### 24.4 وحدة محاضر الاستلام (Handover Backend)
+
+**المسار:** `packages/api/modules/handover/procedures/`
+
+الملف الواحد `handover-protocols.ts` قُسّم إلى 8 ملفات متخصصة (تفاصيل في القسم 20.5).
+
+### 24.5 صفحة المصادقة (Auth Redesign)
+
+**الملفات:**
+- `apps/web/app/auth/layout.tsx` — تصميم جديد: شاشة مقسومة (55% لوحة علامة تجارية + 45% نموذج)
+- `apps/web/app/auth/AuthParticleField.tsx` — 🆕 خلفية جزيئات متحركة (Canvas-based, 70 جزيء + روابط ديناميكية)
+
+---
+
+## 25. ملاحظات بيئة العمل
 
 - **نظام التشغيل:** Windows (primary)
 - **المحرر:** VS Code / Cursor
@@ -1267,7 +1528,8 @@ finance.disbursements.list / getById / create / update / submit / approve / reje
 - **النص العربي معكوس في Windows Terminal** — استخدم ملفات `.md` للبرومبتات
 - **الجهاز الثاني:** GitHub Codespaces (Linux — syntax مختلف)
 - **Git identity** يحتاج إعداد على كل جهاز جديد
+- **Vitest + Playwright** — مُثبتان (انظر القسم 22 لأوامر الاختبار)
 
 ---
 
-*هذا الملف يُحدّث مع كل تطوير كبير. آخر مراجعة: 2026-03-28*
+*هذا الملف يُحدّث مع كل تطوير كبير. آخر مراجعة: 2026-03-30*
