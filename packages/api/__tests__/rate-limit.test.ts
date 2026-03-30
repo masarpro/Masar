@@ -2,21 +2,31 @@
  * Rate Limiting Tests — Sprint 4.2 Verification
  * Tests in-memory fallback (no REDIS_URL), presets, error class
  */
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 
 // Ensure no REDIS_URL so tests exercise the in-memory fallback path
 delete process.env.REDIS_URL;
 
-const {
-	checkRateLimit,
-	enforceRateLimit,
-	rateLimitChecker,
-	rateLimitToken,
-	createRateLimitKey,
-	createIpRateLimitKey,
-	RATE_LIMITS,
-	RateLimitError,
-} = await import("../lib/rate-limit");
+let checkRateLimit: typeof import("../lib/rate-limit")["checkRateLimit"];
+let enforceRateLimit: typeof import("../lib/rate-limit")["enforceRateLimit"];
+let rateLimitChecker: typeof import("../lib/rate-limit")["rateLimitChecker"];
+let rateLimitToken: typeof import("../lib/rate-limit")["rateLimitToken"];
+let createRateLimitKey: typeof import("../lib/rate-limit")["createRateLimitKey"];
+let createIpRateLimitKey: typeof import("../lib/rate-limit")["createIpRateLimitKey"];
+let RATE_LIMITS: typeof import("../lib/rate-limit")["RATE_LIMITS"];
+let RateLimitError: typeof import("../lib/rate-limit")["RateLimitError"];
+
+beforeAll(async () => {
+	const mod = await import("../lib/rate-limit");
+	checkRateLimit = mod.checkRateLimit;
+	enforceRateLimit = mod.enforceRateLimit;
+	rateLimitChecker = mod.rateLimitChecker;
+	rateLimitToken = mod.rateLimitToken;
+	createRateLimitKey = mod.createRateLimitKey;
+	createIpRateLimitKey = mod.createIpRateLimitKey;
+	RATE_LIMITS = mod.RATE_LIMITS;
+	RateLimitError = mod.RateLimitError;
+});
 
 describe("RATE_LIMITS presets", () => {
 	it("exports all 6 presets", () => {
@@ -111,7 +121,7 @@ describe("enforceRateLimit", () => {
 			expect.unreachable("Should have thrown");
 		} catch (err) {
 			expect(err).toBeInstanceOf(RateLimitError);
-			expect((err as RateLimitError).retryAfterMs).toBeGreaterThan(0);
+			expect((err as InstanceType<typeof RateLimitError>).retryAfterMs).toBeGreaterThan(0);
 		}
 	});
 });

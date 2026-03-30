@@ -41,12 +41,6 @@ if (testUrl) {
 	// Override DATABASE_URL so the db singleton from ../client also uses the test DB.
 	// This must happen BEFORE any module imports ../client.
 	process.env.DATABASE_URL = testUrl;
-
-	// Dynamic import to avoid crashing when no DB is available
-	const { PrismaPg } = await import("@prisma/adapter-pg");
-	const { PrismaClient } = await import("../../prisma/generated/client");
-	const adapter = new PrismaPg({ connectionString: testUrl });
-	testDb = new PrismaClient({ adapter });
 }
 
 export { testDb };
@@ -95,7 +89,12 @@ export async function withTestTx<T>(
 // ─── Global lifecycle ───────────────────────────────────────────────────────
 
 beforeAll(async () => {
-	if (testDb) {
+	if (testUrl) {
+		// Dynamic import to avoid crashing when no DB is available
+		const { PrismaPg } = await import("@prisma/adapter-pg");
+		const { PrismaClient } = await import("../../prisma/generated/client");
+		const adapter = new PrismaPg({ connectionString: testUrl });
+		testDb = new PrismaClient({ adapter });
 		await testDb.$queryRawUnsafe("SELECT 1");
 	}
 });

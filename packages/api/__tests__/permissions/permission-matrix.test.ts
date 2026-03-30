@@ -159,7 +159,7 @@ describe("Permission Matrix — full coverage", () => {
 
 						it(`${action} → ${expected ? "GRANTED" : "DENIED"}`, () => {
 							const sectionPerms = perms[section as keyof Permissions];
-							const actual = (sectionPerms as Record<string, boolean>)[action];
+							const actual = (sectionPerms as unknown as Record<string, boolean>)[action];
 							expect(actual).toBe(expected);
 						});
 					}
@@ -192,7 +192,7 @@ describe("OWNER completeness", () => {
 			for (const action of actions) {
 				const sectionPerms = ownerPerms[section as keyof Permissions];
 				expect(
-					(sectionPerms as Record<string, boolean>)[action],
+					(sectionPerms as unknown as Record<string, boolean>)[action],
 					`OWNER.${section}.${action}`,
 				).toBe(true);
 			}
@@ -210,7 +210,7 @@ describe("CUSTOM completeness", () => {
 			for (const action of actions) {
 				const sectionPerms = customPerms[section as keyof Permissions];
 				expect(
-					(sectionPerms as Record<string, boolean>)[action],
+					(sectionPerms as unknown as Record<string, boolean>)[action],
 					`CUSTOM.${section}.${action}`,
 				).toBe(false);
 			}
@@ -263,7 +263,7 @@ describe("Section isolation — finance", () => {
 		const perms = DEFAULT_ROLE_PERMISSIONS.ENGINEER;
 		for (const action of SECTIONS.finance) {
 			expect(
-				(perms.finance as Record<string, boolean>)[action],
+				(perms.finance as unknown as Record<string, boolean>)[action],
 				`ENGINEER.finance.${action}`,
 			).toBe(false);
 		}
@@ -273,7 +273,7 @@ describe("Section isolation — finance", () => {
 		const perms = DEFAULT_ROLE_PERMISSIONS.SUPERVISOR;
 		for (const action of SECTIONS.finance) {
 			expect(
-				(perms.finance as Record<string, boolean>)[action],
+				(perms.finance as unknown as Record<string, boolean>)[action],
 				`SUPERVISOR.finance.${action}`,
 			).toBe(false);
 		}
@@ -287,7 +287,7 @@ describe("Section isolation — settings", () => {
 			const perms = DEFAULT_ROLE_PERMISSIONS[role];
 			for (const action of SECTIONS.settings) {
 				expect(
-					(perms.settings as Record<string, boolean>)[action],
+					(perms.settings as unknown as Record<string, boolean>)[action],
 					`${role}.settings.${action}`,
 				).toBe(false);
 			}
@@ -301,7 +301,7 @@ describe("Section isolation — employees", () => {
 			const perms = DEFAULT_ROLE_PERMISSIONS[role];
 			for (const action of SECTIONS.employees) {
 				expect(
-					(perms.employees as Record<string, boolean>)[action],
+					(perms.employees as unknown as Record<string, boolean>)[action],
 					`${role}.employees.${action}`,
 				).toBe(false);
 			}

@@ -126,7 +126,7 @@ describe("FREE plan", () => {
 			expect.unreachable("Should have thrown");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError).code).toBe("FORBIDDEN");
+			expect((err as ORPCError<string, unknown>).code).toBe("FORBIDDEN");
 		}
 	});
 
@@ -138,7 +138,7 @@ describe("FREE plan", () => {
 			await checkSubscription(ctx);
 			expect.unreachable("Should have thrown");
 		} catch (err) {
-			const orpcErr = err as ORPCError;
+			const orpcErr = err as ORPCError<string, unknown>;
 			expect(orpcErr.data).toEqual({ code: "UPGRADE_REQUIRED" });
 		}
 	});
@@ -158,8 +158,8 @@ describe("organization status: SUSPENDED", () => {
 			expect.unreachable("Should have thrown");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError).code).toBe("FORBIDDEN");
-			expect((err as ORPCError).message).toContain("subscription_required");
+			expect((err as ORPCError<string, unknown>).code).toBe("FORBIDDEN");
+			expect((err as ORPCError<string, unknown>).message).toContain("subscription_required");
 		}
 	});
 
@@ -180,7 +180,7 @@ describe("organization status: CANCELLED", () => {
 			expect.unreachable("Should have thrown");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError).code).toBe("FORBIDDEN");
+			expect((err as ORPCError<string, unknown>).code).toBe("FORBIDDEN");
 		}
 	});
 
@@ -209,7 +209,7 @@ describe("trial expiration", () => {
 			expect.unreachable("Should have thrown");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError).code).toBe("FORBIDDEN");
+			expect((err as ORPCError<string, unknown>).code).toBe("FORBIDDEN");
 		}
 
 		// Should have updated org to FREE
@@ -234,7 +234,7 @@ describe("trial expiration", () => {
 			expect.unreachable("Should have thrown");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError).code).toBe("FORBIDDEN");
+			expect((err as ORPCError<string, unknown>).code).toBe("FORBIDDEN");
 		}
 	});
 
@@ -256,7 +256,7 @@ describe("trial expiration", () => {
 			expect.unreachable("Should have thrown");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError).code).toBe("FORBIDDEN");
+			expect((err as ORPCError<string, unknown>).code).toBe("FORBIDDEN");
 		}
 	});
 });

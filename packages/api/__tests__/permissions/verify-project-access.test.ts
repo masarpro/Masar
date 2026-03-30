@@ -54,7 +54,7 @@ describe("requirePermission (pure unit)", () => {
 			expect.unreachable("Should have thrown");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError).code).toBe("FORBIDDEN");
+			expect((err as ORPCError<string, unknown>).code).toBe("FORBIDDEN");
 		}
 	});
 
@@ -64,7 +64,7 @@ describe("requirePermission (pure unit)", () => {
 			expect.unreachable("Should have thrown");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError).code).toBe("FORBIDDEN");
+			expect((err as ORPCError<string, unknown>).code).toBe("FORBIDDEN");
 		}
 	});
 
@@ -74,7 +74,7 @@ describe("requirePermission (pure unit)", () => {
 			expect.unreachable("Should have thrown");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError).code).toBe("FORBIDDEN");
+			expect((err as ORPCError<string, unknown>).code).toBe("FORBIDDEN");
 		}
 	});
 
@@ -83,7 +83,7 @@ describe("requirePermission (pure unit)", () => {
 			requirePermission(emptyPerms, "projects", "create");
 			expect.unreachable("Should have thrown");
 		} catch (err) {
-			const orpcErr = err as ORPCError;
+			const orpcErr = err as ORPCError<string, unknown>;
 			expect(orpcErr.message).toContain("صلاحية");
 		}
 	});
@@ -107,7 +107,7 @@ describe("requirePermission (pure unit)", () => {
 				requirePermission(emptyPerms, section, action);
 				expect.unreachable("Should have thrown");
 			} catch (err) {
-				const orpcErr = err as ORPCError;
+				const orpcErr = err as ORPCError<string, unknown>;
 				expect(orpcErr.code).toBe("FORBIDDEN");
 				// All error messages should contain "صلاحية" (permission)
 				expect(orpcErr.message).toContain("صلاحية");
@@ -292,7 +292,7 @@ describe.skipIf(!HAS_TEST_DB)("verifyProjectAccess (integration)", () => {
 			expect.unreachable("Should have thrown FORBIDDEN");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError).code).toBe("FORBIDDEN");
+			expect((err as ORPCError<string, unknown>).code).toBe("FORBIDDEN");
 		}
 	});
 
@@ -302,7 +302,7 @@ describe.skipIf(!HAS_TEST_DB)("verifyProjectAccess (integration)", () => {
 			expect.unreachable("Should have thrown NOT_FOUND");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError).code).toBe("NOT_FOUND");
+			expect((err as ORPCError<string, unknown>).code).toBe("NOT_FOUND");
 		}
 	});
 
@@ -326,7 +326,7 @@ describe.skipIf(!HAS_TEST_DB)("verifyProjectAccess (integration)", () => {
 			expect.unreachable("Should have thrown FORBIDDEN");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError).code).toBe("FORBIDDEN");
+			expect((err as ORPCError<string, unknown>).code).toBe("FORBIDDEN");
 		} finally {
 			await db.user.delete({ where: { id: outsideUser.id } });
 		}
@@ -357,7 +357,7 @@ describe.skipIf(!HAS_TEST_DB)("verifyProjectAccess (integration)", () => {
 			expect.unreachable("Should have thrown FORBIDDEN");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError).code).toBe("FORBIDDEN");
+			expect((err as ORPCError<string, unknown>).code).toBe("FORBIDDEN");
 		}
 	});
 
@@ -379,7 +379,7 @@ describe.skipIf(!HAS_TEST_DB)("verifyProjectAccess (integration)", () => {
 			expect.unreachable("Should have thrown FORBIDDEN");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ORPCError);
-			expect((err as ORPCError).code).toBe("FORBIDDEN");
+			expect((err as ORPCError<string, unknown>).code).toBe("FORBIDDEN");
 		} finally {
 			await db.user.delete({ where: { id: outsideUser.id } });
 		}
