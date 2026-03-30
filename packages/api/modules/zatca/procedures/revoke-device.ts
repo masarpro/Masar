@@ -74,11 +74,11 @@ export const revokeDevice = subscriptionProcedure
 
 		orgAuditLog({
 			organizationId: input.organizationId,
-			userId: context.user.id,
+			actorId: context.user.id,
 			action: "SETTINGS_UPDATED",
-			entity: "ZatcaDevice",
+			entityType: "ZatcaDevice",
 			entityId: device.id,
-			details: {
+			metadata: {
 				action: "zatca_revoke",
 				invoiceType: device.invoiceType,
 				reason: input.reason,

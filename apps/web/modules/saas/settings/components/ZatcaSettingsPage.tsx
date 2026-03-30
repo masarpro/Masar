@@ -175,7 +175,7 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 							<p className="text-sm text-muted-foreground mt-1">{t("phase2.description")}</p>
 							{phase === "1" && (
 								<Button
-									variant="default"
+									variant="primary"
 									size="sm"
 									className="mt-3"
 									onClick={() => setOnboardingOpen(true)}
@@ -366,7 +366,7 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 							{t("onboarding.error") /* Cancel — reuse */}
 						</Button>
 						<Button
-							variant="destructive"
+							variant="error"
 							disabled={revokeMutation.isPending}
 							onClick={() => revokeDeviceId && revokeMutation.mutate(revokeDeviceId)}
 						>

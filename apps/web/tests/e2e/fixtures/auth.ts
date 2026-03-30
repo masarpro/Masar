@@ -1,4 +1,4 @@
-import { test as base, expect } from "@playwright/test";
+import { test as base, expect, type Page } from "@playwright/test";
 
 /**
  * Test user credentials.
@@ -12,7 +12,7 @@ const TEST_USER = {
 /**
  * Fixture that provides a pre-authenticated page.
  */
-export const test = base.extend<{ authenticatedPage: ReturnType<typeof base["page"]> }>({
+export const test = base.extend<{ authenticatedPage: Page }>({
 	authenticatedPage: async ({ page }, use) => {
 		await page.goto("/auth/login");
 		await page.fill('input[name="email"]', TEST_USER.email);

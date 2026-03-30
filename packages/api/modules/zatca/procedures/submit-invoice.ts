@@ -280,11 +280,11 @@ export const submitInvoice = subscriptionProcedure
 		// 15. Audit log
 		orgAuditLog({
 			organizationId: input.organizationId,
-			userId: context.user.id,
+			actorId: context.user.id,
 			action: "INVOICE_UPDATED",
-			entity: "FinanceInvoice",
+			entityType: "FinanceInvoice",
 			entityId: invoice.id,
-			details: {
+			metadata: {
 				action: "zatca_submit",
 				submissionType,
 				status: submissionStatus,

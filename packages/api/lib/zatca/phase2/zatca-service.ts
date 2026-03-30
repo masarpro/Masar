@@ -129,7 +129,7 @@ export async function processInvoiceForZatca(
 	}
 
 	try {
-		return await processPhase2(db, invoice, organizationId, seller, device, zatcaUuid, isSimplified, zatcaInvoiceType, cleanTaxNumber);
+		return await processPhase2(db, invoice, organizationId, seller, device as typeof device & { csidCertificate: string; csidSecret: string; privateKey: string; publicKey: string }, zatcaUuid, isSimplified, zatcaInvoiceType, cleanTaxNumber);
 	} catch (error) {
 		// ═══ Silent Failure — don't block invoice issuance ═══
 		console.error("[ZATCA] Phase 2 processing failed, falling back to Phase 1:", error);

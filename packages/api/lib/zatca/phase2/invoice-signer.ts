@@ -62,8 +62,9 @@ export function signInvoice(
 	// 7. Sign the SignedInfo with ECDSA-SHA256
 	const signedInfoHash = sha256(new TextEncoder().encode(signedInfoXml));
 	const privKeyHex = pemToPrivateKeyHex(privateKeyPem);
-	const sig = secp256k1.sign(signedInfoHash, privKeyHex);
-	const signatureValue = Buffer.from(sig.toDERRawBytes()).toString("base64");
+	const privKeyBytes = Buffer.from(privKeyHex, "hex");
+	const derSig = secp256k1.sign(signedInfoHash, privKeyBytes, { prehash: false, format: "der" });
+	const signatureValue = Buffer.from(derSig).toString("base64");
 
 	// 8. Build the complete Signature element
 	const signatureXml = buildSignatureElement(
