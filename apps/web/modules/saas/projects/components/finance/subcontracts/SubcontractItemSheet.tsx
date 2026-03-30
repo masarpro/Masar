@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";

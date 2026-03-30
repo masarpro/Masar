@@ -27,16 +27,18 @@ const S_CURVE_DATA = [
 	{ period: "M12", planned: 100, actual: 100 },
 ];
 
-const chartConfig: ChartConfig = {
-	planned: {
-		label: "المخطط",
-		color: "#3b82f6",
-	},
-	actual: {
-		label: "الفعلي",
-		color: "#0ea5e9",
-	},
-};
+function useChartConfig(t: ReturnType<typeof useTranslations>): ChartConfig {
+	return {
+		planned: {
+			label: t("projects.commandCenter.plannedProgress"),
+			color: "#3b82f6",
+		},
+		actual: {
+			label: t("projects.commandCenter.actualProgress"),
+			color: "#0ea5e9",
+		},
+	};
+}
 
 type ProjectStatus = "on_track" | "at_risk" | "delayed";
 
@@ -53,6 +55,7 @@ interface ProjectStatusChartProps {
 
 export function ProjectStatusChart({ projectProgress }: ProjectStatusChartProps) {
 	const t = useTranslations();
+	const chartConfig = useChartConfig(t);
 
 	// آخر نقطة بيانات لتحديد الحالة
 	const lastData = S_CURVE_DATA[S_CURVE_DATA.length - 1];

@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useTranslations } from "next-intl";
 import { Badge } from "@ui/components/badge";
@@ -50,30 +49,16 @@ function formatCurrency(value: number): string {
 	}).format(value);
 }
 
-const TERM_TYPE_LABELS: Record<string, string> = {
-	ADVANCE: "دفعة مقدمة",
-	MILESTONE: "مرحلة",
-	MONTHLY: "شهري",
-	COMPLETION: "عند الإنهاء",
-	CUSTOM: "مخصص",
+const STATUS_ICON_MAP: Record<string, typeof CheckCircle2> = {
+	PENDING: Clock,
+	PARTIALLY_PAID: AlertCircle,
+	FULLY_PAID: CheckCircle2,
 };
 
-const STATUS_CONFIG: Record<string, { icon: typeof CheckCircle2; label: string; color: string }> = {
-	PENDING: {
-		icon: Clock,
-		label: "لم يتم الدفع",
-		color: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-	},
-	PARTIALLY_PAID: {
-		icon: AlertCircle,
-		label: "مدفوع جزئياً",
-		color: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-	},
-	FULLY_PAID: {
-		icon: CheckCircle2,
-		label: "مدفوع بالكامل",
-		color: "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
-	},
+const STATUS_COLOR_MAP: Record<string, string> = {
+	PENDING: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+	PARTIALLY_PAID: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+	FULLY_PAID: "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
 };
 
 export function PaymentTermsSection({
@@ -93,8 +78,9 @@ export function PaymentTermsSection({
 				const paidPercent = termAmount > 0
 					? Math.min(100, Math.round((term.paidAmount / termAmount) * 100))
 					: 0;
-				const statusConfig = STATUS_CONFIG[term.status] ?? STATUS_CONFIG.PENDING;
-				const StatusIcon = statusConfig.icon;
+				const statusKey = term.status in STATUS_ICON_MAP ? term.status : "PENDING";
+				const StatusIcon = STATUS_ICON_MAP[statusKey] ?? Clock;
+				const statusColor = STATUS_COLOR_MAP[statusKey] ?? STATUS_COLOR_MAP.PENDING;
 
 				return (
 					<Collapsible key={term.id}>
@@ -103,14 +89,14 @@ export function PaymentTermsSection({
 								<ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition-transform [[data-state=open]>&]:rotate-180" />
 								<div className="flex flex-1 flex-wrap items-center gap-2">
 									<span className="font-medium text-slate-900 dark:text-slate-100">
-										{term.label ?? TERM_TYPE_LABELS[term.type] ?? term.type}
+										{term.label ?? t(`projectPayments.termTypes.${term.type}`)}
 									</span>
 									<Badge variant="secondary" className="text-xs">
-										{TERM_TYPE_LABELS[term.type] ?? term.type}
+										{t(`projectPayments.termTypes.${term.type}`)}
 									</Badge>
-									<Badge variant="secondary" className={statusConfig.color}>
-										<StatusIcon className="ml-1 h-3 w-3" />
-										{statusConfig.label}
+									<Badge variant="secondary" className={statusColor}>
+										<StatusIcon className="ms-1 h-3 w-3" />
+										{t(`projectPayments.statuses.${statusKey}`)}
 									</Badge>
 								</div>
 								<div className="flex shrink-0 items-center gap-4 text-sm">

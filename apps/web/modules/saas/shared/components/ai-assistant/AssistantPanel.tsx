@@ -356,7 +356,7 @@ export function AssistantPanel() {
                 refreshChats();
               }}
               className="relative flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              title={locale === "ar" ? "المحادثات السابقة" : "Chat History"}
+              title={t("history.title")}
             >
               <History size={16} />
               {savedChats.length > 0 && (
@@ -451,18 +451,18 @@ export function AssistantPanel() {
               {saveStatus === "saving" && (
                 <span className="text-[10px] text-muted-foreground/60 flex items-center gap-1">
                   <span className="inline-block w-2.5 h-2.5 border border-current border-t-transparent rounded-full animate-spin" />
-                  {locale === "ar" ? "يحفظ..." : "Saving..."}
+                  {t("history.saving")}
                 </span>
               )}
               {saveStatus === "saved" && (
                 <span className="text-[10px] text-green-600/60 flex items-center gap-1">
                   <svg className="w-2.5 h-2.5" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  {locale === "ar" ? "تم الحفظ" : "Saved"}
+                  {t("history.saved")}
                 </span>
               )}
               {saveStatus === "error" && (
                 <span className="text-[10px] text-red-500/60">
-                  {locale === "ar" ? "فشل الحفظ" : "Save failed"}
+                  {t("history.saveFailed")}
                 </span>
               )}
             </div>

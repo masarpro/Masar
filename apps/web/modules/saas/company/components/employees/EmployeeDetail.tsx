@@ -108,7 +108,7 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 	if (!employee) return null;
 
 	const formatCurrency = (amount: number | string) =>
-		new Intl.NumberFormat("en-US").format(Number(amount)) + " ر.س";
+		new Intl.NumberFormat("en-US").format(Number(amount)) + " " + t("common.sar");
 
 	const totalSalary = Number(employee.baseSalary) + Number(employee.housingAllowance) +
 		Number(employee.transportAllowance) + Number(employee.otherAllowances);

@@ -333,7 +333,7 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 						label={t("projects.createProject.contractValue")}
 						value={
 							Number(contract.value) > 0
-								? `${formatCurrency(Number(contract.value))} ر.س`
+								? `${formatCurrency(Number(contract.value))} ${t("common.sar")}`
 								: "—"
 						}
 					/>
@@ -350,7 +350,7 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 					{contract.includesVat && (
 						<ReadOnlyField
 							label={t("projects.createProject.vatToggle")}
-							value={`${formatCurrency(Number(contract.value) * 1.15)} ر.س`}
+							value={`${formatCurrency(Number(contract.value) * 1.15)} ${t("common.sar")}`}
 						/>
 					)}
 					{contract.paymentMethod && (
@@ -441,7 +441,7 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 										{term.amount != null && (
 											<span className="font-mono text-sm text-slate-600 dark:text-slate-400">
 												{formatCurrency(Number(term.amount))}{" "}
-												ر.س
+												{t("common.sar")}
 											</span>
 										)}
 									</div>

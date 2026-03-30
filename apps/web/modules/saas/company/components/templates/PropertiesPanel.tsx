@@ -45,27 +45,27 @@ interface PropertiesPanelProps {
 	onToggleElement: (id: string) => void;
 }
 
-const fontFamilies = [
-	{ value: "inherit", label: "افتراضي" },
+const fontFamilyKeys = [
+	{ value: "inherit", labelKey: "finance.templates.editor.fontDefault" },
 	{ value: "Cairo", label: "Cairo" },
 	{ value: "Tajawal", label: "Tajawal" },
 	{ value: "IBM Plex Sans Arabic", label: "IBM Plex Sans Arabic" },
 	{ value: "Noto Sans Arabic", label: "Noto Sans Arabic" },
-];
+] as const;
 
-const fontSizes = [
-	{ value: "12px", label: "صغير" },
-	{ value: "14px", label: "متوسط" },
-	{ value: "16px", label: "كبير" },
-	{ value: "18px", label: "كبير جداً" },
-];
+const fontSizeKeys = [
+	{ value: "12px", labelKey: "common.small" },
+	{ value: "14px", labelKey: "common.medium" },
+	{ value: "16px", labelKey: "common.large" },
+	{ value: "18px", labelKey: "common.xlarge" },
+] as const;
 
-const currencies = [
-	{ value: "SAR", label: "ريال سعودي (SAR)" },
-	{ value: "AED", label: "درهم إماراتي (AED)" },
-	{ value: "USD", label: "دولار أمريكي (USD)" },
-	{ value: "EUR", label: "يورو (EUR)" },
-];
+const currencyKeys = [
+	{ value: "SAR", labelKey: "finance.templates.editor.currencies.sar" },
+	{ value: "AED", labelKey: "finance.templates.editor.currencies.aed" },
+	{ value: "USD", labelKey: "finance.templates.editor.currencies.usd" },
+	{ value: "EUR", labelKey: "finance.templates.editor.currencies.eur" },
+] as const;
 
 export function PropertiesPanel({
 	selectedElement,
@@ -605,9 +605,9 @@ export function PropertiesPanel({
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
-										{fontFamilies.map((font) => (
+										{fontFamilyKeys.map((font) => (
 											<SelectItem key={font.value} value={font.value}>
-												{font.label}
+												{"labelKey" in font ? t(font.labelKey) : font.label}
 											</SelectItem>
 										))}
 									</SelectContent>
@@ -623,9 +623,9 @@ export function PropertiesPanel({
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
-										{fontSizes.map((size) => (
+										{fontSizeKeys.map((size) => (
 											<SelectItem key={size.value} value={size.value}>
-												{size.label}
+												{t(size.labelKey)}
 											</SelectItem>
 										))}
 									</SelectContent>
@@ -713,9 +713,9 @@ export function PropertiesPanel({
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
-										{currencies.map((currency) => (
+										{currencyKeys.map((currency) => (
 											<SelectItem key={currency.value} value={currency.value}>
-												{currency.label}
+												{t(currency.labelKey)}
 											</SelectItem>
 										))}
 									</SelectContent>

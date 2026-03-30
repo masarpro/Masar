@@ -114,7 +114,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 	const selectedExpenses = expenses.filter((e) => selectedIds.has(e.id));
 
 	const formatCurrency = (amount: number | string) =>
-		new Intl.NumberFormat("en-US").format(Number(amount)) + " ر.س";
+		new Intl.NumberFormat("en-US").format(Number(amount)) + " " + t("common.sar");
 
 	const getStatusBadge = (active: boolean) => {
 		if (active) {

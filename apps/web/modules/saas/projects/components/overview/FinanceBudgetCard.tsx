@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { CreditCard, Wallet } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -164,7 +163,7 @@ export function FinanceBudgetCard({
 							dir="ltr"
 						>
 							{formatCompact(actualExpenses)} /{" "}
-							{formatCompact(contractValue)} ر.س
+							{formatCompact(contractValue)} {t("common.sar")}
 						</strong>
 					</div>
 					<div className="flex h-6 w-full overflow-hidden rounded-md bg-slate-100 dark:bg-slate-800">
@@ -255,7 +254,7 @@ export function FinanceBudgetCard({
 						dir="ltr"
 						style={{ textAlign: "right" }}
 					>
-						{formatNumber(nextPaymentAmount)} ر.س
+						{formatNumber(nextPaymentAmount)} {t("common.sar")}
 					</div>
 				</div>
 			</div>

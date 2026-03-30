@@ -125,7 +125,7 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pl-12 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
 								/>
 								<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
-									ر.س
+									{t("common.sar")}
 								</span>
 							</div>
 						</div>

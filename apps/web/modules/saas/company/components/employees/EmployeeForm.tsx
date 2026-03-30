@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -36,24 +35,26 @@ const EMPLOYEE_TYPES = [
 	"ADMIN", "DRIVER", "TECHNICIAN", "LABORER", "SECURITY", "OTHER",
 ] as const;
 
-const formSchema = z.object({
-	name: z.string().min(1, "اسم الموظف مطلوب"),
-	employeeNo: z.string().optional(),
-	type: z.enum(EMPLOYEE_TYPES),
-	phone: z.string().optional(),
-	email: z.string().email("بريد إلكتروني غير صحيح").optional().or(z.literal("")),
-	nationalId: z.string().optional(),
-	salaryType: z.enum(["MONTHLY", "DAILY"]),
-	baseSalary: z.coerce.number().min(0),
-	housingAllowance: z.coerce.number().min(0),
-	transportAllowance: z.coerce.number().min(0),
-	otherAllowances: z.coerce.number().min(0),
-	gosiSubscription: z.coerce.number().min(0),
-	joinDate: z.string().min(1, "تاريخ الالتحاق مطلوب"),
-	notes: z.string().optional(),
-});
+function createFormSchema(t: (key: string) => string) {
+	return z.object({
+		name: z.string().min(1, t("company.employees.validation.nameRequired")),
+		employeeNo: z.string().optional(),
+		type: z.enum(EMPLOYEE_TYPES),
+		phone: z.string().optional(),
+		email: z.string().email(t("company.employees.validation.invalidEmail")).optional().or(z.literal("")),
+		nationalId: z.string().optional(),
+		salaryType: z.enum(["MONTHLY", "DAILY"]),
+		baseSalary: z.coerce.number().min(0),
+		housingAllowance: z.coerce.number().min(0),
+		transportAllowance: z.coerce.number().min(0),
+		otherAllowances: z.coerce.number().min(0),
+		gosiSubscription: z.coerce.number().min(0),
+		joinDate: z.string().min(1, t("company.employees.validation.joinDateRequired")),
+		notes: z.string().optional(),
+	});
+}
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<ReturnType<typeof createFormSchema>>;
 
 interface EmployeeFormProps {
 	organizationId: string;
@@ -66,6 +67,7 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const isEditing = !!employeeId;
+	const formSchema = createFormSchema(t);
 
 	const { data: existingEmployee } = useQuery({
 		...orpc.company.employees.getById.queryOptions({

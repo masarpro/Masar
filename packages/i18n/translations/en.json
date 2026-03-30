@@ -335,14 +335,48 @@
       "navigateTo": "Preparing link...",
       "queryCompany": "Reviewing company data..."
     },
+    "welcomeGreeting": "Hi {name}!",
+    "welcomeDescription": "I'm Masar's smart assistant. I can help you navigate, query your data, and understand anything.",
+    "tip": "Tip: Press {shortcut} to open quickly",
+    "conversationLog": "Conversation log",
+    "suggestions": {
+      "overdueInvoices": "Overdue invoices",
+      "monthlySummary": "Monthly summary",
+      "bankBalances": "Bank balances",
+      "moreDetails": "More details",
+      "openIssues": "Open issues",
+      "budget": "Budget",
+      "dailyReports": "Daily reports",
+      "criticalIssues": "Critical issues",
+      "progress": "Progress",
+      "employeeCount": "Employee count",
+      "assets": "Assets",
+      "payroll": "Payroll",
+      "projectSummary": "Project summary",
+      "financialSummary": "Financial summary",
+      "expenseSummary": "Expense summary",
+      "projectList": "Project list",
+      "anyIssues": "Any issues?",
+      "companyExpenses": "Company expenses",
+      "howToUse": "How do I use the platform?"
+    },
     "history": {
       "title": "Chat History",
       "empty": "No previous chats",
       "delete": "Delete",
       "confirmDelete": "Sure?",
+      "defaultTitle": "Chat",
       "loadError": "Failed to load chat",
       "saving": "Saving...",
-      "saved": "Saved"
+      "saved": "Saved",
+      "saveFailed": "Save failed",
+      "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{count}m ago",
+        "hoursAgo": "{count}h ago",
+        "yesterday": "Yesterday",
+        "daysAgo": "{count}d ago"
+      }
     }
   },
   "auth": {
@@ -3083,7 +3117,9 @@
         "sampleBankName": "Al Rajhi Bank",
         "sampleAccountName": "Company Name",
         "page": "Page",
-        "of": "of"
+        "of": "of",
+        "crNumberShort": "CR",
+        "taxNumberShort": "Tax"
       },
       "systemTemplate": "System Template",
       "cannotModifyDefault": "Cannot modify default template. Create a custom template instead.",
@@ -3323,7 +3359,19 @@
           "decreaseHeight": "Decrease Height",
           "hide": "Hide Element",
           "show": "Show Element",
-          "delete": "Delete Element"
+          "delete": "Delete Element",
+          "undo": "Undo",
+          "redo": "Redo",
+          "zoomIn": "Zoom In",
+          "zoomOut": "Zoom Out",
+          "resetZoom": "Reset Zoom"
+        },
+        "fontDefault": "Default",
+        "currencies": {
+          "sar": "Saudi Riyal (SAR)",
+          "aed": "UAE Dirham (AED)",
+          "usd": "US Dollar (USD)",
+          "eur": "Euro (EUR)"
         }
       },
       "universalTemplate": {
@@ -5003,10 +5051,15 @@
     "showAll": "Show All",
     "showUnread": "Unread Only",
     "markAllRead": "Mark All Read",
+    "markAllReadSuccess": "All notifications marked as read",
     "markAsRead": "Mark as Read",
     "markReadError": "Failed to update notification",
     "empty": "No new notifications",
     "viewAll": "View all notifications"
+  },
+  "pagination": {
+    "navigation": "Page navigation",
+    "rangeOf": "{start} - {end} of {total}"
   },
   "onboarding": {
     "account": {
@@ -7450,7 +7503,10 @@
       "skippedRows": "{count} rows skipped — incomplete data",
       "importItems": "Import {count} items",
       "maxFileSize": "Max file size: 5MB",
-      "maxItems": "Maximum: 500 items"
+      "maxItems": "Maximum: 500 items",
+      "readError": "Failed to read file",
+      "rowCount": "{count} rows",
+      "moreItems": "... +{count} more items"
     },
     "copyStudy": {
       "title": "Copy Items from Cost Study",
@@ -7558,7 +7614,26 @@
     "updateError": "Failed to update payment",
     "invalidAmount": "Invalid amount",
     "deleteConfirmTitle": "Delete Payment",
-    "deleteConfirmDescription": "Are you sure you want to delete this payment? Balances will be adjusted automatically."
+    "deleteConfirmDescription": "Are you sure you want to delete this payment? Balances will be adjusted automatically.",
+    "paymentMethods": {
+      "BANK_TRANSFER": "Bank Transfer",
+      "CASH": "Cash",
+      "CHEQUE": "Cheque",
+      "CREDIT_CARD": "Credit Card",
+      "OTHER": "Other"
+    },
+    "termTypes": {
+      "ADVANCE": "Advance Payment",
+      "MILESTONE": "Milestone",
+      "MONTHLY": "Monthly",
+      "COMPLETION": "On Completion",
+      "CUSTOM": "Custom"
+    },
+    "statuses": {
+      "PENDING": "Unpaid",
+      "PARTIALLY_PAID": "Partially Paid",
+      "FULLY_PAID": "Fully Paid"
+    }
   },
   "projectQuantities": {
     "title": "Quantities & Specifications",
@@ -8023,6 +8098,16 @@
         "revertConfirm": "Are you sure you want to revert to this version? A new version will be created as a copy.",
         "revertSuccess": "Successfully reverted",
         "noVersions": "No versions recorded"
+      },
+      "requestedBy": "Requested by",
+      "approvers": "Approvers",
+      "approve": "Approve",
+      "reject": "Reject",
+      "auditActions": {
+        "docCreated": "Document created",
+        "docDeleted": "Document deleted",
+        "approvalRequested": "Approval requested",
+        "approvalDecided": "Approval decided"
       }
     },
     "chat": {
@@ -8044,7 +8129,8 @@
       "uploadError": "Failed to upload file",
       "attachFile": "Attach file",
       "fullScreen": "Full screen",
-      "exitFullScreen": "Exit full screen"
+      "exitFullScreen": "Exit full screen",
+      "yesterday": "Yesterday"
     },
     "contract": {
       "title": "Contract",
@@ -8070,7 +8156,8 @@
         "startDate": "Start Date",
         "endDate": "End Date",
         "description": "Description",
-        "notes": "Notes"
+        "notes": "Notes",
+        "status": "Status"
       },
       "status": {
         "DRAFT": "Draft",
@@ -8182,7 +8269,16 @@
       "createdBy": "Created by",
       "fromProject": "From project",
       "whatIsTemplate": "What are project templates?",
-      "templateExplanation": "Templates help you start new projects quickly by copying the structure (phases, checklists) from a previous project or creating a standard structure."
+      "templateExplanation": "Templates help you start new projects quickly by copying the structure (phases, checklists) from a previous project or creating a standard structure.",
+      "descriptionFull": "Create and manage project templates to start new projects quickly",
+      "createSuccess": "Template created successfully",
+      "createError": "An error occurred while creating the template",
+      "nameRequired": "Template name is required",
+      "namePlaceholder": "Example: Standard residential project",
+      "descriptionOptional": "Description (optional)",
+      "descriptionPlaceholder": "Brief template description...",
+      "creating": "Creating...",
+      "createFirstDescription": "Create a template to start new projects quickly"
     },
     "shell": {
       "backToProjects": "Back to Projects",
@@ -9620,10 +9716,15 @@
     "uploading": "Uploading...",
     "uploadSuccess": "File uploaded successfully",
     "uploadError": "Failed to upload file",
+    "downloadError": "Failed to download file",
     "deleteSuccess": "Attachment deleted",
     "deleteError": "Failed to delete attachment",
+    "confirmDelete": "Are you sure you want to delete this attachment?",
     "fileTooLarge": "File size exceeds the maximum allowed",
-    "invalidType": "File type not allowed"
+    "fileTooLargeWithSize": "File size exceeds the maximum allowed ({size} MB)",
+    "invalidType": "File type not allowed",
+    "dragOrClick": "Drag file or click to select",
+    "acceptedFormats": "PDF, JPG, PNG (max 10 MB)"
   },
   "zatca": {
     "title": "ZATCA Compliant",
@@ -9839,7 +9940,8 @@
       "method": "Payment Method",
       "sourceAccount": "Source Account",
       "note": "Notes",
-      "maxAllowed": "Maximum allowed: {amount}"
+      "maxAllowed": "Maximum allowed: {amount}",
+      "selectBankAccount": "Select bank account"
     },
     "validation": {
       "noItemsAdded": "At least one item must have a quantity",
@@ -9886,7 +9988,12 @@
     "manualItemPrice": "Unit Price",
     "manualItemAmount": "Amount",
     "removeItem": "Remove",
-    "manualItemsNote": "Additional items not linked to contract items"
+    "manualItemsNote": "Additional items not linked to contract items",
+    "deleteConfirmDescription": "Are you sure you want to delete this claim? This action cannot be undone.",
+    "notFound": "Claim not found",
+    "claimHeader": "Claim #{claimNo}",
+    "createdBy": "Created by",
+    "claimTitlePlaceholder": "Third floor concrete claim"
   },
   "subcontractItems": {
     "title": "Contract Items",

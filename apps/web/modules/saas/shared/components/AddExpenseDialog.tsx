@@ -186,7 +186,7 @@ export function AddExpenseDialog({
 		});
 
 		if (!uploadResponse.ok) {
-			throw new Error("فشل رفع الملف");
+			throw new Error(t("upload.uploadError"));
 		}
 
 		await finalizeUploadMutation.mutateAsync({
@@ -295,13 +295,13 @@ export function AddExpenseDialog({
 	// File handling
 	const handleFileSelect = useCallback((file: File) => {
 		if (file.size > MAX_FILE_SIZE) {
-			toast.error("حجم الملف يتجاوز الحد المسموح (10 ميجابايت)");
+			toast.error(t("upload.fileTooLargeWithSize", { size: 10 }));
 			return;
 		}
 
 		const allowedTypes = ACCEPTED_FILE_TYPES.split(",");
 		if (!allowedTypes.includes(file.type)) {
-			toast.error("نوع الملف غير مسموح. يُقبل: صور أو PDF");
+			toast.error(t("upload.invalidType"));
 			return;
 		}
 
@@ -762,10 +762,10 @@ export function AddExpenseDialog({
 											<FileText className="h-4 w-4" />
 										</div>
 										<p className="text-xs text-slate-500 dark:text-slate-400">
-											اسحب الملف أو اضغط للاختيار
+											{t("upload.dragOrClick")}
 										</p>
 										<p className="text-[10px] text-slate-400">
-											PDF, JPG, PNG (حد أقصى 10 MB)
+											{t("upload.acceptedFormats")}
 										</p>
 									</div>
 								)}

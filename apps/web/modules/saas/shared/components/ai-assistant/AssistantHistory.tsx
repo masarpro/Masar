@@ -2,10 +2,11 @@
 
 import { cn } from "@ui/lib";
 import { History, MessageSquare, Trash2, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import type { SavedChat } from "./types";
 
-function formatRelativeTime(dateStr: string, locale: string): string {
+function formatRelativeTime(dateStr: string, locale: string, t: (key: string, values?: Record<string, string | number>) => string): string {
   const date = new Date(dateStr);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
@@ -13,20 +14,12 @@ function formatRelativeTime(dateStr: string, locale: string): string {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (locale === "ar") {
-    if (diffMins < 1) return "الآن";
-    if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
-    if (diffHours < 24) return `منذ ${diffHours} ساعة`;
-    if (diffDays === 1) return "أمس";
-    if (diffDays < 7) return `منذ ${diffDays} أيام`;
-    return date.toLocaleDateString("ar-SA");
-  }
-  if (diffMins < 1) return "Just now";
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString("en-US");
+  if (diffMins < 1) return t("history.time.justNow");
+  if (diffMins < 60) return t("history.time.minutesAgo", { count: diffMins });
+  if (diffHours < 24) return t("history.time.hoursAgo", { count: diffHours });
+  if (diffDays === 1) return t("history.time.yesterday");
+  if (diffDays < 7) return t("history.time.daysAgo", { count: diffDays });
+  return date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US");
 }
 
 function ChatListItem({
@@ -43,6 +36,7 @@ function ChatListItem({
   locale: string;
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const t = useTranslations("assistant");
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -68,10 +62,10 @@ function ChatListItem({
     >
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">
-          {chat.title || (locale === "ar" ? "محادثة" : "Chat")}
+          {chat.title || t("history.defaultTitle")}
         </p>
         <p className="text-[11px] text-muted-foreground mt-0.5">
-          {formatRelativeTime(chat.updatedAt, locale)}
+          {formatRelativeTime(chat.updatedAt, locale, t)}
         </p>
       </div>
       <button
@@ -86,11 +80,11 @@ function ChatListItem({
             ? "bg-red-50 dark:bg-red-950/30 text-red-500"
             : "hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-500",
         )}
-        title={locale === "ar" ? "حذف" : "Delete"}
+        title={t("history.delete")}
       >
         {confirmDelete ? (
           <span className="text-[10px] text-red-500 font-medium px-1">
-            {locale === "ar" ? "تأكيد؟" : "Sure?"}
+            {t("history.confirmDelete")}
           </span>
         ) : (
           <Trash2 className="w-3.5 h-3.5" />
@@ -119,6 +113,8 @@ export function AssistantHistory({
   locale: string;
   isOpen: boolean;
 }) {
+  const t = useTranslations("assistant");
+
   return (
     <div
       className={cn(
@@ -134,7 +130,7 @@ export function AssistantHistory({
         <div className="flex items-center gap-2">
           <History className="w-4 h-4" />
           <span className="text-sm font-medium">
-            {locale === "ar" ? "المحادثات السابقة" : "Chat History"}
+            {t("history.title")}
           </span>
         </div>
         <button
@@ -161,9 +157,7 @@ export function AssistantHistory({
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-sm py-8">
             <MessageSquare className="w-8 h-8 mb-2 opacity-30" />
             <span>
-              {locale === "ar"
-                ? "لا توجد محادثات سابقة"
-                : "No previous chats"}
+              {t("history.empty")}
             </span>
           </div>
         ) : (

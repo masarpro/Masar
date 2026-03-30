@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -356,7 +355,7 @@ export function SubcontractForm({
 									required
 								/>
 								<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500">
-									ر.س
+									{t("common.sar")}
 								</span>
 							</div>
 						</div>

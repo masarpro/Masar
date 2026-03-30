@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -38,21 +37,23 @@ const EXPENSE_CATEGORIES = [
 
 const RECURRENCE_TYPES = ["MONTHLY", "QUARTERLY", "SEMI_ANNUAL", "ANNUAL", "ONE_TIME"] as const;
 
-const formSchema = z.object({
-	name: z.string().min(1, "اسم المصروف مطلوب"),
-	category: z.enum(EXPENSE_CATEGORIES),
-	description: z.string().optional(),
-	amount: z.coerce.number().positive("المبلغ يجب أن يكون أكبر من صفر"),
-	recurrence: z.enum(RECURRENCE_TYPES),
-	vendor: z.string().optional(),
-	contractNumber: z.string().optional(),
-	startDate: z.string().min(1, "تاريخ البداية مطلوب"),
-	endDate: z.string().optional(),
-	reminderDays: z.coerce.number().min(0).optional(),
-	notes: z.string().optional(),
-});
+function createFormSchema(t: (key: string) => string) {
+	return z.object({
+		name: z.string().min(1, t("company.expenses.validation.nameRequired")),
+		category: z.enum(EXPENSE_CATEGORIES),
+		description: z.string().optional(),
+		amount: z.coerce.number().positive(t("company.expenses.validation.amountPositive")),
+		recurrence: z.enum(RECURRENCE_TYPES),
+		vendor: z.string().optional(),
+		contractNumber: z.string().optional(),
+		startDate: z.string().min(1, t("company.expenses.validation.startDateRequired")),
+		endDate: z.string().optional(),
+		reminderDays: z.coerce.number().min(0).optional(),
+		notes: z.string().optional(),
+	});
+}
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<ReturnType<typeof createFormSchema>>;
 
 interface ExpenseFormProps {
 	organizationId: string;
@@ -65,6 +66,7 @@ export function ExpenseForm({ organizationId, organizationSlug, expenseId }: Exp
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const isEditing = !!expenseId;
+	const formSchema = createFormSchema(t);
 
 	const { data: existingExpense } = useQuery({
 		...orpc.company.expenses.getById.queryOptions({

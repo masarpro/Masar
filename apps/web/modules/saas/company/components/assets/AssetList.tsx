@@ -71,7 +71,7 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 
 	const formatCurrency = (amount: number | string | null | undefined) => {
 		if (!amount) return "-";
-		return new Intl.NumberFormat("en-US").format(Number(amount)) + " ر.س";
+		return new Intl.NumberFormat("en-US").format(Number(amount)) + ` ${t("common.sar")}`;
 	};
 
 	const getStatusBadge = (status: string) => {

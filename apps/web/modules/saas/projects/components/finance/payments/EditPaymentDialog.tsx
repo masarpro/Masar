@@ -44,12 +44,12 @@ interface EditPaymentDialogProps {
 	payment: Payment;
 }
 
-const PAYMENT_METHODS = [
-	{ value: "BANK_TRANSFER", label: "تحويل بنكي" },
-	{ value: "CASH", label: "نقدي" },
-	{ value: "CHEQUE", label: "شيك" },
-	{ value: "CREDIT_CARD", label: "بطاقة ائتمان" },
-	{ value: "OTHER", label: "أخرى" },
+const PAYMENT_METHOD_VALUES = [
+	"BANK_TRANSFER",
+	"CASH",
+	"CHEQUE",
+	"CREDIT_CARD",
+	"OTHER",
 ] as const;
 
 export function EditPaymentDialog({
@@ -160,9 +160,9 @@ export function EditPaymentDialog({
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
-								{PAYMENT_METHODS.map((m) => (
-									<SelectItem key={m.value} value={m.value}>
-										{m.label}
+								{PAYMENT_METHOD_VALUES.map((value) => (
+									<SelectItem key={value} value={value}>
+										{t(`projectPayments.paymentMethods.${value}`)}
 									</SelectItem>
 								))}
 							</SelectContent>

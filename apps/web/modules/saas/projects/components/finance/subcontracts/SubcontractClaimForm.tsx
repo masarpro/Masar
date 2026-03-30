@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -326,7 +325,7 @@ export function SubcontractClaimForm({
 							<Input
 								value={title}
 								onChange={(e) => setTitle(e.target.value)}
-								placeholder="مستخلص خرسانة الدور الثالث"
+								placeholder={t("claimTitlePlaceholder")}
 							/>
 						</div>
 

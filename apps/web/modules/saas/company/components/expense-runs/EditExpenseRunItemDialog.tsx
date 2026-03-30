@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
@@ -83,7 +82,7 @@ export function EditExpenseRunItemDialog({
 	if (!item) return null;
 
 	const formatCurrency = (amount: number | string) => {
-		return new Intl.NumberFormat("en-SA", { minimumFractionDigits: 2 }).format(Number(amount)) + " ر.س";
+		return new Intl.NumberFormat("en-SA", { minimumFractionDigits: 2 }).format(Number(amount)) + ` ${t("common.sar")}`;
 	};
 
 	return (

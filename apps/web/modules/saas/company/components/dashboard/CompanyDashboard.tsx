@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
@@ -87,7 +86,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 			style: "decimal",
 			minimumFractionDigits: 0,
 			maximumFractionDigits: 0,
-		}).format(amount) + " ر.س";
+		}).format(amount) + ` ${t("common.sar")}`;
 	};
 
 	return (

@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import React, { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
@@ -139,7 +138,7 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 								required
 							/>
 							<span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-500">
-								ر.س
+								{t("common.sar")}
 							</span>
 						</div>
 					</div>

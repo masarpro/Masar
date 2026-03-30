@@ -335,14 +335,48 @@
       "navigateTo": "يجهز الرابط...",
       "queryCompany": "يراجع بيانات المنشأة..."
     },
+    "welcomeGreeting": "مرحباً {name}!",
+    "welcomeDescription": "أنا مساعد مسار الذكي. أقدر أساعدك تتنقل في المنصة وتستعلم عن بياناتك.",
+    "tip": "نصيحة: اضغط {shortcut} للفتح السريع",
+    "conversationLog": "سجل المحادثة",
+    "suggestions": {
+      "overdueInvoices": "فواتير متأخرة",
+      "monthlySummary": "ملخص الشهر",
+      "bankBalances": "أرصدة البنوك",
+      "moreDetails": "تفاصيل أكثر",
+      "openIssues": "المشاكل المفتوحة",
+      "budget": "الميزانية",
+      "dailyReports": "التقارير اليومية",
+      "criticalIssues": "المشاكل الحرجة",
+      "progress": "نسبة الإنجاز",
+      "employeeCount": "عدد الموظفين",
+      "assets": "الأصول",
+      "payroll": "الرواتب",
+      "projectSummary": "ملخص مشاريعي",
+      "financialSummary": "ملخص مالي",
+      "expenseSummary": "ملخص المصروفات",
+      "projectList": "قائمة المشاريع",
+      "anyIssues": "أي مشاكل؟",
+      "companyExpenses": "مصروفات المنشأة",
+      "howToUse": "كيف أستخدم المنصة؟"
+    },
     "history": {
       "title": "المحادثات السابقة",
       "empty": "لا توجد محادثات سابقة",
       "delete": "حذف",
       "confirmDelete": "تأكيد؟",
+      "defaultTitle": "محادثة",
       "loadError": "فشل تحميل المحادثة",
       "saving": "يحفظ...",
-      "saved": "تم الحفظ"
+      "saved": "تم الحفظ",
+      "saveFailed": "فشل الحفظ",
+      "time": {
+        "justNow": "الآن",
+        "minutesAgo": "منذ {count} دقيقة",
+        "hoursAgo": "منذ {count} ساعة",
+        "yesterday": "أمس",
+        "daysAgo": "منذ {count} أيام"
+      }
     }
   },
   "auth": {
@@ -3103,7 +3137,9 @@
         "sampleBankName": "بنك الراجحي",
         "sampleAccountName": "اسم الشركة",
         "page": "صفحة",
-        "of": "من"
+        "of": "من",
+        "crNumberShort": "س.ت",
+        "taxNumberShort": "ض"
       },
       "systemTemplate": "قالب النظام",
       "cannotModifyDefault": "لا يمكن تعديل القالب الافتراضي. يمكنك إنشاء قالب مخصص بدلاً من ذلك.",
@@ -3339,7 +3375,19 @@
           "decreaseHeight": "تقليل الارتفاع",
           "hide": "إخفاء العنصر",
           "show": "إظهار العنصر",
-          "delete": "حذف العنصر"
+          "delete": "حذف العنصر",
+          "undo": "تراجع",
+          "redo": "إعادة",
+          "zoomIn": "تكبير",
+          "zoomOut": "تصغير",
+          "resetZoom": "إعادة تعيين الحجم"
+        },
+        "fontDefault": "افتراضي",
+        "currencies": {
+          "sar": "ريال سعودي (SAR)",
+          "aed": "درهم إماراتي (AED)",
+          "usd": "دولار أمريكي (USD)",
+          "eur": "يورو (EUR)"
         }
       },
       "universalTemplate": {
@@ -5003,10 +5051,15 @@
     "showAll": "عرض الكل",
     "showUnread": "غير المقروءة فقط",
     "markAllRead": "قراءة الكل",
+    "markAllReadSuccess": "تم تحديد جميع الإشعارات كمقروءة",
     "markAsRead": "قراءة",
     "markReadError": "فشل تحديث الإشعار",
     "empty": "لا توجد إشعارات جديدة",
     "viewAll": "عرض جميع الإشعارات"
+  },
+  "pagination": {
+    "navigation": "التنقل بين الصفحات",
+    "rangeOf": "{start} - {end} من {total}"
   },
   "onboarding": {
     "account": {
@@ -7450,7 +7503,10 @@
       "skippedRows": "{count} صف تم تجاهله — بيانات غير مكتملة",
       "importItems": "استيراد {count} بند",
       "maxFileSize": "الحد الأقصى لحجم الملف: 5MB",
-      "maxItems": "الحد الأقصى: 500 بند"
+      "maxItems": "الحد الأقصى: 500 بند",
+      "readError": "فشل قراءة الملف",
+      "rowCount": "{count} صف",
+      "moreItems": "... +{count} بند إضافي"
     },
     "copyStudy": {
       "title": "نسخ بنود من دراسة كميات",
@@ -7558,7 +7614,26 @@
     "updateError": "فشل تحديث الدفعة",
     "invalidAmount": "المبلغ غير صالح",
     "deleteConfirmTitle": "حذف الدفعة",
-    "deleteConfirmDescription": "هل أنت متأكد من حذف هذه الدفعة؟ سيتم تعديل الأرصدة تلقائياً."
+    "deleteConfirmDescription": "هل أنت متأكد من حذف هذه الدفعة؟ سيتم تعديل الأرصدة تلقائياً.",
+    "paymentMethods": {
+      "BANK_TRANSFER": "تحويل بنكي",
+      "CASH": "نقدي",
+      "CHEQUE": "شيك",
+      "CREDIT_CARD": "بطاقة ائتمان",
+      "OTHER": "أخرى"
+    },
+    "termTypes": {
+      "ADVANCE": "دفعة مقدمة",
+      "MILESTONE": "مرحلة",
+      "MONTHLY": "شهري",
+      "COMPLETION": "عند الإنهاء",
+      "CUSTOM": "مخصص"
+    },
+    "statuses": {
+      "PENDING": "لم يتم الدفع",
+      "PARTIALLY_PAID": "مدفوع جزئياً",
+      "FULLY_PAID": "مدفوع بالكامل"
+    }
   },
   "projectQuantities": {
     "title": "الكميات والمواصفات",
@@ -8023,6 +8098,16 @@
         "revertConfirm": "هل أنت متأكد من الاستعادة لهذا الإصدار؟ سيتم إنشاء إصدار جديد كنسخة.",
         "revertSuccess": "تمت الاستعادة بنجاح",
         "noVersions": "لا توجد إصدارات مسجلة"
+      },
+      "requestedBy": "طالب الاعتماد",
+      "approvers": "المعتمدون",
+      "approve": "اعتماد",
+      "reject": "رفض",
+      "auditActions": {
+        "docCreated": "إنشاء الوثيقة",
+        "docDeleted": "حذف الوثيقة",
+        "approvalRequested": "طلب اعتماد",
+        "approvalDecided": "قرار اعتماد"
       }
     },
     "chat": {
@@ -8044,7 +8129,8 @@
       "uploadError": "فشل رفع الملف",
       "attachFile": "إرفاق ملف",
       "fullScreen": "ملء الشاشة",
-      "exitFullScreen": "الخروج من ملء الشاشة"
+      "exitFullScreen": "الخروج من ملء الشاشة",
+      "yesterday": "أمس"
     },
     "contract": {
       "title": "العقد",
@@ -8070,7 +8156,8 @@
         "startDate": "تاريخ البداية",
         "endDate": "تاريخ النهاية",
         "description": "الوصف",
-        "notes": "ملاحظات"
+        "notes": "ملاحظات",
+        "status": "الحالة"
       },
       "status": {
         "DRAFT": "مسودة",
@@ -8182,7 +8269,16 @@
       "createdBy": "أنشأه",
       "fromProject": "مأخوذ من مشروع",
       "whatIsTemplate": "ما هي قوالب المشاريع؟",
-      "templateExplanation": "القوالب تساعدك على بدء مشاريع جديدة بسرعة عن طريق نسخ الهيكل (المراحل، قوائم المهام) من مشروع سابق أو إنشاء هيكل معياري."
+      "templateExplanation": "القوالب تساعدك على بدء مشاريع جديدة بسرعة عن طريق نسخ الهيكل (المراحل، قوائم المهام) من مشروع سابق أو إنشاء هيكل معياري.",
+      "descriptionFull": "إنشاء وإدارة قوالب المشاريع لبدء مشاريع جديدة بسرعة",
+      "createSuccess": "تم إنشاء القالب بنجاح",
+      "createError": "حدث خطأ أثناء إنشاء القالب",
+      "nameRequired": "اسم القالب مطلوب",
+      "namePlaceholder": "مثال: مشروع سكني نموذجي",
+      "descriptionOptional": "الوصف (اختياري)",
+      "descriptionPlaceholder": "وصف مختصر للقالب...",
+      "creating": "جاري الإنشاء...",
+      "createFirstDescription": "أنشئ قالبًا لبدء مشاريع جديدة بسرعة"
     },
     "shell": {
       "backToProjects": "العودة للمشاريع",
@@ -9620,10 +9716,15 @@
     "uploading": "جارٍ الرفع...",
     "uploadSuccess": "تم رفع الملف بنجاح",
     "uploadError": "فشل رفع الملف",
+    "downloadError": "فشل تحميل الملف",
     "deleteSuccess": "تم حذف المرفق",
     "deleteError": "فشل حذف المرفق",
+    "confirmDelete": "هل أنت متأكد من حذف هذا المرفق؟",
     "fileTooLarge": "حجم الملف يتجاوز الحد المسموح",
-    "invalidType": "نوع الملف غير مسموح"
+    "fileTooLargeWithSize": "حجم الملف يتجاوز الحد المسموح ({size} ميجابايت)",
+    "invalidType": "نوع الملف غير مسموح",
+    "dragOrClick": "اسحب الملف أو اضغط للاختيار",
+    "acceptedFormats": "PDF, JPG, PNG (حد أقصى 10 MB)"
   },
   "zatca": {
     "title": "متوافق مع هيئة الزكاة والضريبة",
@@ -9839,7 +9940,8 @@
       "method": "طريقة الدفع",
       "sourceAccount": "حساب الصرف",
       "note": "ملاحظات",
-      "maxAllowed": "الحد الأقصى المسموح: {amount}"
+      "maxAllowed": "الحد الأقصى المسموح: {amount}",
+      "selectBankAccount": "اختر الحساب البنكي"
     },
     "validation": {
       "noItemsAdded": "يجب إضافة كميات لبند واحد على الأقل",
@@ -9886,7 +9988,12 @@
     "manualItemPrice": "سعر الوحدة",
     "manualItemAmount": "المبلغ",
     "removeItem": "حذف",
-    "manualItemsNote": "بنود إضافية غير مرتبطة ببنود العقد"
+    "manualItemsNote": "بنود إضافية غير مرتبطة ببنود العقد",
+    "deleteConfirmDescription": "هل أنت متأكد من حذف هذا المستخلص؟ لا يمكن التراجع عن هذا الإجراء.",
+    "notFound": "المستخلص غير موجود",
+    "claimHeader": "مستخلص #{claimNo}",
+    "createdBy": "المنشئ",
+    "claimTitlePlaceholder": "مستخلص خرسانة الدور الثالث"
   },
   "subcontractItems": {
     "title": "بنود العقد",

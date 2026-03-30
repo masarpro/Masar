@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -326,11 +325,11 @@ export function SubcontractClaimsListView({
 					<AlertDialogHeader>
 						<AlertDialogTitle>{t("actions.delete")}</AlertDialogTitle>
 						<AlertDialogDescription>
-							هل أنت متأكد من حذف هذا المستخلص؟
+							{t("deleteConfirmDescription")}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>إلغاء</AlertDialogCancel>
+						<AlertDialogCancel>{t("actions.cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
 							onClick={() => {

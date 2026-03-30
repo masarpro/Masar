@@ -80,6 +80,7 @@ export function BOQItemsTable({
 	onSortChange,
 }: BOQItemsTableProps) {
 	const t = useTranslations("projectBoq");
+	const tCommon = useTranslations("common");
 
 	const allSelected = items.length > 0 && items.every((item) => selectedIds.has(item.id));
 	const someSelected = items.some((item) => selectedIds.has(item.id)) && !allSelected;
@@ -227,14 +228,14 @@ export function BOQItemsTable({
 												<DropdownMenuContent align="end">
 													<DropdownMenuItem onClick={() => onEdit(item)}>
 														<Pencil className="h-4 w-4 me-2" />
-														{t("table.actions")}
+														{tCommon("edit")}
 													</DropdownMenuItem>
 													<DropdownMenuItem
 														onClick={() => onDelete(item)}
 														className="text-red-600 dark:text-red-400"
 													>
 														<Trash2 className="h-4 w-4 me-2" />
-														{t("actions.deleteSelected")}
+														{tCommon("delete")}
 													</DropdownMenuItem>
 												</DropdownMenuContent>
 											</DropdownMenu>
@@ -250,7 +251,7 @@ export function BOQItemsTable({
 				{items.length > 0 && (
 					<div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/50">
 						<div className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-							{t("table.total")}: {formatCurrency(visibleTotal)} ر.س
+							{t("table.total")}: {formatCurrency(visibleTotal)} {tCommon("sar")}
 						</div>
 						<div className="flex items-center gap-2 text-sm text-slate-500">
 							<span>{currentPage} / {totalPages}</span>

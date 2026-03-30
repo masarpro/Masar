@@ -112,7 +112,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 	const selectedEmployees = employees.filter((e) => selectedIds.has(e.id));
 
 	const formatCurrency = (amount: number | string) =>
-		new Intl.NumberFormat("en-US").format(Number(amount)) + " ر.س";
+		new Intl.NumberFormat("en-US").format(Number(amount)) + " " + t("common.sar");
 
 	const getStatusBadge = (status: string) => {
 		switch (status) {

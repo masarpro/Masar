@@ -37,7 +37,7 @@ const ASSET_CATEGORIES = [
 const ASSET_TYPES = ["OWNED", "RENTED", "LEASED"] as const;
 
 const formSchema = z.object({
-	name: z.string().min(1, "اسم الأصل مطلوب"),
+	name: z.string().min(1),
 	assetNo: z.string().optional(),
 	category: z.enum(ASSET_CATEGORIES),
 	type: z.enum(ASSET_TYPES),

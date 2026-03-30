@@ -65,7 +65,7 @@ export function AddAssetDialog({
 	const createMutation = useMutation({
 		mutationFn: async () => {
 			if (!formData.name.trim()) {
-				throw new Error("اسم الأصل مطلوب");
+				throw new Error(t("company.assets.nameRequired"));
 			}
 			return orpcClient.company.assets.create({
 				organizationId,

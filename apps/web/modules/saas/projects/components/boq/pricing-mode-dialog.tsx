@@ -46,6 +46,7 @@ export function PricingModeDialog({
 	projectId,
 }: PricingModeDialogProps) {
 	const t = useTranslations("projectBoq");
+	const tCommon = useTranslations("common");
 	const { data: items, isLoading } = useProjectBOQUnpriced(
 		organizationId,
 		projectId,
@@ -174,7 +175,7 @@ export function PricingModeDialog({
 					<div className="text-sm">
 						<span className="text-slate-500">{t("pricing.totalAfterPricing")}:</span>{" "}
 						<span className="font-semibold text-slate-900 dark:text-slate-100">
-							{formatCurrency(totalAfterPricing)} ر.س
+							{formatCurrency(totalAfterPricing)} {tCommon("sar")}
 						</span>
 					</div>
 					<div className="flex gap-3">

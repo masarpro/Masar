@@ -62,7 +62,7 @@ export function AddEmployeeDialog({
 	const createMutation = useMutation({
 		mutationFn: async () => {
 			if (!formData.name.trim()) {
-				throw new Error("اسم الموظف مطلوب");
+				throw new Error(t("company.employees.validation.nameRequired"));
 			}
 			return orpcClient.company.employees.create({
 				organizationId,

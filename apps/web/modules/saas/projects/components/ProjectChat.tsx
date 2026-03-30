@@ -177,7 +177,7 @@ export function ProjectChat({
 										</span>
 										{message.isUpdate && (
 											<Badge className="border-0 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 text-xs">
-												تحديث رسمي
+												{t("projects.chat.officialUpdate")}
 											</Badge>
 										)}
 										<span className="text-xs text-slate-400">

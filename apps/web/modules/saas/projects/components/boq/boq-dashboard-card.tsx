@@ -27,6 +27,7 @@ export function BOQDashboardCard({
 	basePath,
 }: BOQDashboardCardProps) {
 	const t = useTranslations("projectBoq");
+	const tCommon = useTranslations("common");
 
 	const { data: summary, isLoading } = useQuery(
 		orpc.projectBoq.getSummary.queryOptions({
@@ -91,7 +92,7 @@ export function BOQDashboardCard({
 								dir="ltr"
 								style={{ textAlign: "right" }}
 							>
-								{formatNumber(summary.grandTotal)} ر.س
+								{formatNumber(summary.grandTotal)} {tCommon("sar")}
 							</div>
 						</div>
 
@@ -123,7 +124,7 @@ export function BOQDashboardCard({
 									className="font-semibold text-emerald-600 dark:text-emerald-400"
 									dir="ltr"
 								>
-									{formatNumber(summary.grandTotal)} ر.س
+									{formatNumber(summary.grandTotal)} {tCommon("sar")}
 								</span>
 							</div>
 						)}

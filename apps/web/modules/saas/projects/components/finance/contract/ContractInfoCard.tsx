@@ -292,7 +292,7 @@ export function ContractInfoCard({
 						) : null}
 					</div>
 					<div className="space-y-2">
-						<Label>{t("projects.contract.status.DRAFT").replace("مسودة", "الحالة")}</Label>
+						<Label>{t("projects.contract.info.status")}</Label>
 						<Select value={status} onValueChange={setStatus}>
 							<SelectTrigger>
 								<SelectValue />

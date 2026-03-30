@@ -47,21 +47,21 @@ export function ProjectTemplates({
 	const createMutation = useMutation(
 		orpc.projectTemplates.create.mutationOptions({
 			onSuccess: () => {
-				toast.success("تم إنشاء القالب بنجاح");
+				toast.success(t("projects.templates.createSuccess"));
 				setShowCreateForm(false);
 				setNewTemplateName("");
 				setNewTemplateDescription("");
 				queryClient.invalidateQueries({ queryKey: ["projectTemplates"] });
 			},
 			onError: () => {
-				toast.error("حدث خطأ أثناء إنشاء القالب");
+				toast.error(t("projects.templates.createError"));
 			},
 		}),
 	);
 
 	const handleCreateTemplate = () => {
 		if (!newTemplateName.trim()) {
-			toast.error("اسم القالب مطلوب");
+			toast.error(t("projects.templates.nameRequired"));
 			return;
 		}
 
@@ -93,10 +93,10 @@ export function ProjectTemplates({
 					</Button>
 					<div>
 						<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-							قوالب المشاريع
+							{t("projects.templates.title")}
 						</h1>
 						<p className="text-sm text-slate-500">
-							إنشاء وإدارة قوالب المشاريع لبدء مشاريع جديدة بسرعة
+							{t("projects.templates.descriptionFull")}
 						</p>
 					</div>
 				</div>
@@ -118,7 +118,7 @@ export function ProjectTemplates({
 						size="sm"
 					>
 						<Plus className="h-4 w-4" />
-						قالب جديد
+						{t("projects.templates.newTemplate")}
 					</Button>
 				</div>
 			</div>
@@ -127,27 +127,27 @@ export function ProjectTemplates({
 			{showCreateForm && (
 				<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
 					<h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
-						إنشاء قالب جديد
+						{t("projects.templates.createTemplate")}
 					</h2>
 					<div className="space-y-4">
 						<div>
 							<label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-								اسم القالب
+								{t("projects.templates.templateName")}
 							</label>
 							<Input
 								value={newTemplateName}
 								onChange={(e) => setNewTemplateName(e.target.value)}
-								placeholder="مثال: مشروع سكني نموذجي"
+								placeholder={t("projects.templates.namePlaceholder")}
 							/>
 						</div>
 						<div>
 							<label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-								الوصف (اختياري)
+								{t("projects.templates.descriptionOptional")}
 							</label>
 							<Input
 								value={newTemplateDescription}
 								onChange={(e) => setNewTemplateDescription(e.target.value)}
-								placeholder="وصف مختصر للقالب..."
+								placeholder={t("projects.templates.descriptionPlaceholder")}
 							/>
 						</div>
 						<div className="flex justify-end gap-3">
@@ -155,13 +155,13 @@ export function ProjectTemplates({
 								variant="outline"
 								onClick={() => setShowCreateForm(false)}
 							>
-								إلغاء
+								{t("common.cancel")}
 							</Button>
 							<Button
 								onClick={handleCreateTemplate}
 								disabled={createMutation.isPending}
 							>
-								{createMutation.isPending ? "جاري الإنشاء..." : "إنشاء القالب"}
+								{createMutation.isPending ? t("projects.templates.creating") : t("projects.templates.createTemplate")}
 							</Button>
 						</div>
 					</div>
@@ -182,7 +182,7 @@ export function ProjectTemplates({
 										<Layout className="h-5 w-5 text-primary" />
 									</div>
 									<Badge variant="outline" className="text-xs">
-										{template.itemsCount} عنصر
+										{template.itemsCount} {t("projects.templates.items")}
 									</Badge>
 								</div>
 								<h3 className="mb-1 font-medium text-slate-900 dark:text-slate-100">
@@ -195,11 +195,11 @@ export function ProjectTemplates({
 								)}
 								{template.sourceProject && (
 									<p className="text-xs text-slate-400">
-										مأخوذ من: {template.sourceProject.name}
+										{t("projects.templates.fromProject")}: {template.sourceProject.name}
 									</p>
 								)}
 								<p className="mt-2 text-xs text-slate-400">
-									أنشأه: {template.createdBy.name}
+									{t("projects.templates.createdBy")}: {template.createdBy.name}
 								</p>
 							</div>
 						))}
@@ -210,10 +210,10 @@ export function ProjectTemplates({
 							<FileStack className="h-10 w-10 text-slate-400" />
 						</div>
 						<h3 className="mb-1 font-medium text-slate-900 dark:text-slate-100">
-							لا توجد قوالب
+							{t("projects.templates.noTemplates")}
 						</h3>
 						<p className="mb-4 text-sm text-slate-500">
-							أنشئ قالبًا لبدء مشاريع جديدة بسرعة
+							{t("projects.templates.createFirstDescription")}
 						</p>
 						<Button
 							onClick={() => setShowCreateForm(true)}
@@ -221,7 +221,7 @@ export function ProjectTemplates({
 							className="gap-2"
 						>
 							<FolderPlus className="h-4 w-4" />
-							إنشاء أول قالب
+							{t("projects.templates.createFirst")}
 						</Button>
 					</div>
 				)}
@@ -233,11 +233,10 @@ export function ProjectTemplates({
 					<Layout className="mt-0.5 h-5 w-5 text-indigo-600 dark:text-indigo-400" />
 					<div>
 						<p className="font-medium text-indigo-800 dark:text-indigo-200">
-							ما هي قوالب المشاريع؟
+							{t("projects.templates.whatIsTemplate")}
 						</p>
 						<p className="text-sm text-indigo-700 dark:text-indigo-300">
-							القوالب تساعدك على بدء مشاريع جديدة بسرعة عن طريق نسخ الهيكل
-							(المراحل، قوائم المهام) من مشروع سابق أو إنشاء هيكل معياري.
+							{t("projects.templates.templateExplanation")}
 						</p>
 					</div>
 				</div>

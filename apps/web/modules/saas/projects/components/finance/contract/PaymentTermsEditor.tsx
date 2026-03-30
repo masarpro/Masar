@@ -180,7 +180,7 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 									className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 pl-12 font-mono text-xs dark:border-violet-800/40 dark:bg-slate-800/50"
 								/>
 								<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
-									ر.س
+									{t("common.sar")}
 								</span>
 							</div>
 						</div>
@@ -223,7 +223,7 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 								{termsTotalPercent.toFixed(1)}%
 							</span>
 							<span className="font-mono text-sm text-slate-600 dark:text-slate-400">
-								{formatNumber(termsTotalAmount)} ر.س
+								{formatNumber(termsTotalAmount)} {t("common.sar")}
 							</span>
 						</div>
 					</div>

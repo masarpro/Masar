@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { AssistantSection } from "./types";
 
 interface AssistantSuggestionsProps {
@@ -12,54 +13,35 @@ interface AssistantSuggestionsProps {
 function getSuggestions(
   section: AssistantSection,
   lastMessage: string,
-  locale: string,
+  t: (key: string) => string,
 ): string[] {
-  const isAr = locale === "ar";
   const msg = lastMessage.toLowerCase();
 
   // Keyword-based contextual suggestions
   if (msg.includes("فاتور") || msg.includes("invoice")) {
-    return isAr
-      ? ["فواتير متأخرة", "ملخص الشهر", "أرصدة البنوك"]
-      : ["Overdue invoices", "Monthly summary", "Bank balances"];
+    return [t("suggestions.overdueInvoices"), t("suggestions.monthlySummary"), t("suggestions.bankBalances")];
   }
   if (msg.includes("مشروع") || msg.includes("project")) {
-    return isAr
-      ? ["تفاصيل أكثر", "المشاكل المفتوحة", "الميزانية"]
-      : ["More details", "Open issues", "Budget"];
+    return [t("suggestions.moreDetails"), t("suggestions.openIssues"), t("suggestions.budget")];
   }
   if (msg.includes("تنفيذ") || msg.includes("execution") || msg.includes("تقرير")) {
-    return isAr
-      ? ["التقارير اليومية", "المشاكل الحرجة", "نسبة الإنجاز"]
-      : ["Daily reports", "Critical issues", "Progress"];
+    return [t("suggestions.dailyReports"), t("suggestions.criticalIssues"), t("suggestions.progress")];
   }
   if (msg.includes("موظف") || msg.includes("employee") || msg.includes("منشأة")) {
-    return isAr
-      ? ["عدد الموظفين", "الأصول", "الرواتب"]
-      : ["Employee count", "Assets", "Payroll"];
+    return [t("suggestions.employeeCount"), t("suggestions.assets"), t("suggestions.payroll")];
   }
 
   // Section-based fallback
   const sectionSuggestions: Partial<Record<AssistantSection, string[]>> = {
-    dashboard: isAr
-      ? ["ملخص مشاريعي", "ملخص مالي", "مشاكل مفتوحة"]
-      : ["Project summary", "Financial summary", "Open issues"],
-    finance: isAr
-      ? ["فواتير متأخرة", "أرصدة البنوك", "ملخص المصروفات"]
-      : ["Overdue invoices", "Bank balances", "Expense summary"],
-    projects: isAr
-      ? ["قائمة المشاريع", "ملخص مالي", "أي مشاكل؟"]
-      : ["Project list", "Financial summary", "Any issues?"],
-    company: isAr
-      ? ["عدد الموظفين", "الأصول", "مصروفات المنشأة"]
-      : ["Employee count", "Assets", "Company expenses"],
+    dashboard: [t("suggestions.projectSummary"), t("suggestions.financialSummary"), t("suggestions.openIssues")],
+    finance: [t("suggestions.overdueInvoices"), t("suggestions.bankBalances"), t("suggestions.expenseSummary")],
+    projects: [t("suggestions.projectList"), t("suggestions.financialSummary"), t("suggestions.anyIssues")],
+    company: [t("suggestions.employeeCount"), t("suggestions.assets"), t("suggestions.companyExpenses")],
   };
 
   return (
     sectionSuggestions[section] ??
-    (isAr
-      ? ["ملخص مشاريعي", "ملخص مالي", "كيف أستخدم المنصة؟"]
-      : ["Project summary", "Financial summary", "How do I use the platform?"])
+    [t("suggestions.projectSummary"), t("suggestions.financialSummary"), t("suggestions.howToUse")]
   );
 }
 
@@ -69,7 +51,8 @@ export function AssistantSuggestions({
   locale,
   onSuggestion,
 }: AssistantSuggestionsProps) {
-  const suggestions = getSuggestions(section, lastMessage, locale);
+  const t = useTranslations("assistant");
+  const suggestions = getSuggestions(section, lastMessage, t);
 
   return (
     <div className="flex flex-wrap gap-1.5 border-t border-border/50 px-3 py-2">

@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
@@ -59,10 +58,10 @@ export function AddExpenseDialog({
 	const createMutation = useMutation({
 		mutationFn: async () => {
 			if (!formData.name.trim()) {
-				throw new Error("اسم المصروف مطلوب");
+				throw new Error(t("company.expenses.validation.nameRequired"));
 			}
 			if (!formData.amount || parseFloat(formData.amount) <= 0) {
-				throw new Error("المبلغ يجب أن يكون أكبر من صفر");
+				throw new Error(t("company.expenses.validation.amountPositive"));
 			}
 			return orpcClient.company.expenses.create({
 				organizationId,

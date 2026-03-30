@@ -41,6 +41,7 @@ interface BOQSummaryCardsProps {
 
 export function BOQSummaryCards({ summary, onStartPricing }: BOQSummaryCardsProps) {
 	const t = useTranslations("projectBoq");
+	const tCommon = useTranslations("common");
 
 	const sectionKeys = ["STRUCTURAL", "FINISHING", "MEP", "LABOR", "GENERAL"] as const;
 
@@ -70,7 +71,7 @@ export function BOQSummaryCards({ summary, onStartPricing }: BOQSummaryCardsProp
 						<div>
 							<p className="text-sm text-emerald-600 dark:text-emerald-400">{t("summary.grandTotal")}</p>
 							<p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">
-								{formatCurrency(summary.grandTotal)} <span className="text-sm font-normal">ر.س</span>
+								{formatCurrency(summary.grandTotal)} <span className="text-sm font-normal">{tCommon("sar")}</span>
 							</p>
 						</div>
 					</CardContent>
@@ -94,7 +95,7 @@ export function BOQSummaryCards({ summary, onStartPricing }: BOQSummaryCardsProp
 									</span>
 								</div>
 								<p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-									{formatCurrency(data.total)} <span className="text-xs font-normal text-slate-400">ر.س</span>
+									{formatCurrency(data.total)} <span className="text-xs font-normal text-slate-400">{tCommon("sar")}</span>
 								</p>
 								<p className="text-xs text-slate-400">{data.count} {t("summary.totalItems").toLowerCase()}</p>
 							</CardContent>

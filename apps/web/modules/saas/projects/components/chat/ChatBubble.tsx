@@ -31,7 +31,7 @@ interface ChatBubbleProps {
 	organizationId: string;
 }
 
-function formatMessageTime(date: string | Date): string {
+function formatMessageTime(date: string | Date, t: ReturnType<typeof useTranslations>): string {
 	const d = new Date(date);
 	const now = new Date();
 	const isToday = d.toDateString() === now.toDateString();
@@ -46,7 +46,7 @@ function formatMessageTime(date: string | Date): string {
 	});
 
 	if (isToday) return time;
-	if (isYesterday) return `أمس ${time}`;
+	if (isYesterday) return `${t("projects.chat.yesterday")} ${time}`;
 
 	return d.toLocaleString("ar-SA", {
 		day: "numeric",
@@ -134,7 +134,7 @@ export function ChatBubble({ message, isMine, organizationId }: ChatBubbleProps)
 
 				{/* Timestamp */}
 				<span className="mt-0.5 px-2 text-[10px] text-muted-foreground">
-					{formatMessageTime(message.createdAt)}
+					{formatMessageTime(message.createdAt, t)}
 				</span>
 			</div>
 		</div>

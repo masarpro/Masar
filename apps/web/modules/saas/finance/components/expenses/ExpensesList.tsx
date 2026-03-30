@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useVirtualRows } from "@saas/shared/hooks/use-virtual-rows";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
@@ -13,7 +14,6 @@ import { Input } from "@ui/components/input";
 import { Badge } from "@ui/components/badge";
 import { Card, CardContent } from "@ui/components/card";
 import {
-	Table,
 	TableBody,
 	TableCell,
 	TableHead,
@@ -161,6 +161,9 @@ export function ExpensesList({
 	const expensesTotal = data?.expensesTotal ?? 0;
 	const subcontractTotal = data?.subcontractTotal ?? 0;
 	const projects = projectsData?.projects ?? [];
+
+	const { containerRef, virtualItems, paddingTop, paddingBottom, isVirtualized } =
+		useVirtualRows({ count: items.length, rowHeight: 56, threshold: 50 });
 
 	// Delete mutation
 	const deleteMutation = useMutation({
@@ -407,8 +410,13 @@ export function ExpensesList({
 							)}
 						</EmptyState>
 					) : (
-						<Table>
-							<TableHeader>
+						<div
+							ref={containerRef}
+							className="w-full overflow-auto"
+							style={isVirtualized ? { maxHeight: 600 } : undefined}
+						>
+						<table className="w-full caption-bottom text-sm">
+							<TableHeader className={isVirtualized ? "sticky top-0 z-10 bg-background" : ""}>
 								<TableRow>
 									<TableHead>{t("finance.expenses.expenseNo")}</TableHead>
 									<TableHead>{t("finance.expenses.date")}</TableHead>
@@ -426,7 +434,13 @@ export function ExpensesList({
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{items.map((item) => (
+								{isVirtualized && paddingTop > 0 && (
+									<tr style={{ height: paddingTop }} />
+								)}
+								{(isVirtualized
+									? virtualItems.map((vi: { index: number }) => items[vi.index])
+									: items
+								).map((item: (typeof items)[number]) => (
 									<TableRow
 										key={`${item._type}-${item.id}`}
 										className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
@@ -562,8 +576,12 @@ export function ExpensesList({
 										</TableCell>
 									</TableRow>
 								))}
+								{isVirtualized && paddingBottom > 0 && (
+									<tr style={{ height: paddingBottom }} />
+								)}
 							</TableBody>
-						</Table>
+						</table>
+						</div>
 					)}
 				</CardContent>
 			</Card>

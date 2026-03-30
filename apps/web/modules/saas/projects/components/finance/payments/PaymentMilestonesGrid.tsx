@@ -223,7 +223,7 @@ function MilestoneCard({
 						{formatCurrency(Number(term.paidAmount))}
 					</span>
 					<span className="font-mono text-slate-500">
-						/ {formatCurrency(Number(term.amount))} ر.س
+						/ {formatCurrency(Number(term.amount))} {t("common.sar")}
 					</span>
 				</div>
 
@@ -263,7 +263,7 @@ function MilestoneCard({
 												{formatCurrency(
 													Number(payment.amount),
 												)}{" "}
-												ر.س
+												{t("common.sar")}
 											</span>
 										</div>
 									))}

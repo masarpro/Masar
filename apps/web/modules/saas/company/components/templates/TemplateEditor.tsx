@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useState, useCallback, useEffect } from "react";
 import { useTranslations } from "next-intl";
@@ -480,7 +479,7 @@ export function TemplateEditor({
 			<div className="border-b bg-background px-4 py-3 flex items-center justify-between">
 				<div className="flex items-center gap-4">
 					<Link href={`${basePath}/templates`}>
-						<Button variant="ghost" size="icon" aria-label="رجوع">
+						<Button variant="ghost" size="icon" aria-label={t("common.back")}>
 							<ArrowLeftIcon className="h-5 w-5 rtl:rotate-180" />
 						</Button>
 					</Link>
@@ -520,7 +519,7 @@ export function TemplateEditor({
 							size="icon"
 							onClick={undo}
 							disabled={historyIndex === 0}
-							aria-label="تراجع"
+							aria-label={t("finance.templates.editor.actions.undo")}
 						>
 							<Undo2Icon className="h-4 w-4" />
 						</Button>
@@ -529,7 +528,7 @@ export function TemplateEditor({
 							size="icon"
 							onClick={redo}
 							disabled={historyIndex === history.length - 1}
-							aria-label="إعادة"
+							aria-label={t("finance.templates.editor.actions.redo")}
 						>
 							<Redo2Icon className="h-4 w-4" />
 						</Button>

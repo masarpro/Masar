@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
@@ -73,12 +72,12 @@ function formatDate(date: string | Date): string {
 	}).format(new Date(date));
 }
 
-const PAYMENT_METHOD_LABELS: Record<string, { ar: string; color: string }> = {
-	CASH: { ar: "نقدي", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" },
-	BANK_TRANSFER: { ar: "تحويل بنكي", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" },
-	CHEQUE: { ar: "شيك", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" },
-	CREDIT_CARD: { ar: "بطاقة ائتمان", color: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300" },
-	OTHER: { ar: "أخرى", color: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300" },
+const PAYMENT_METHOD_COLORS: Record<string, string> = {
+	CASH: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+	BANK_TRANSFER: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+	CHEQUE: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+	CREDIT_CARD: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+	OTHER: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
 };
 
 export function PaymentsTable({
@@ -131,7 +130,7 @@ export function PaymentsTable({
 					</TableHeader>
 					<TableBody>
 						{payments.map((payment) => {
-							const method = PAYMENT_METHOD_LABELS[payment.paymentMethod] ?? PAYMENT_METHOD_LABELS.OTHER;
+							const methodColor = PAYMENT_METHOD_COLORS[payment.paymentMethod] ?? PAYMENT_METHOD_COLORS.OTHER;
 							return (
 								<TableRow key={payment.id}>
 									<TableCell className="font-mono text-sm">
@@ -144,8 +143,8 @@ export function PaymentsTable({
 										{formatCurrency(payment.amount)}
 									</TableCell>
 									<TableCell>
-										<Badge variant="secondary" className={method.color}>
-											{method.ar}
+										<Badge variant="secondary" className={methodColor}>
+											{t(`projectPayments.paymentMethods.${payment.paymentMethod}`)}
 										</Badge>
 									</TableCell>
 									{showTermColumn && (

@@ -123,7 +123,7 @@ export function ProjectPaymentsView({
 								{t("projectPayments.totalRequired")}
 							</p>
 							<p className="font-mono text-sm font-semibold text-slate-800 dark:text-slate-200">
-								{formatCurrency(Number(data.totalRequired))} ر.س
+								{formatCurrency(Number(data.totalRequired))} {t("common.sar")}
 							</p>
 						</div>
 						<div className="rounded-xl bg-white/60 p-3 dark:bg-slate-900/30">
@@ -131,7 +131,7 @@ export function ProjectPaymentsView({
 								{t("projectPayments.totalPaid")}
 							</p>
 							<p className="font-mono text-sm font-semibold text-sky-700 dark:text-sky-300">
-								{formatCurrency(Number(data.totalPaid))} ر.س
+								{formatCurrency(Number(data.totalPaid))} {t("common.sar")}
 							</p>
 						</div>
 						<div className="rounded-xl bg-white/60 p-3 dark:bg-slate-900/30">
@@ -142,7 +142,7 @@ export function ProjectPaymentsView({
 								{formatCurrency(
 									Number(data.totalRequired) - Number(data.totalPaid),
 								)}{" "}
-								ر.س
+								{t("common.sar")}
 							</p>
 						</div>
 					</div>
@@ -279,11 +279,11 @@ function TermCard({
 					<div className="mb-1 flex justify-between text-xs text-slate-500">
 						<span>
 							{t("projectPayments.paid")}:{" "}
-							{formatCurrency(Number(term.paidAmount))} ر.س
+							{formatCurrency(Number(term.paidAmount))} {t("common.sar")}
 						</span>
 						<span>
 							{t("projectPayments.required")}:{" "}
-							{formatCurrency(Number(term.amount))} ر.س
+							{formatCurrency(Number(term.amount))} {t("common.sar")}
 							{term.percent != null && ` (${term.percent}%)`}
 						</span>
 					</div>
@@ -294,7 +294,7 @@ function TermCard({
 					{Number(term.remainingAmount) > 0 && (
 						<p className="mt-1 text-xs text-slate-400">
 							{t("projectPayments.remaining")}:{" "}
-							{formatCurrency(Number(term.remainingAmount))} ر.س
+							{formatCurrency(Number(term.remainingAmount))} {t("common.sar")}
 						</p>
 					)}
 				</div>
@@ -345,7 +345,7 @@ function TermCard({
 												{formatCurrency(
 													Number(payment.amount),
 												)}{" "}
-												ر.س
+												{t("common.sar")}
 											</span>
 										</div>
 									))}

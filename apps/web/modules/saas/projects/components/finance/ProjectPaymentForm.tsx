@@ -257,7 +257,7 @@ export function ProjectPaymentForm({
 													</span>
 												)}
 												<span className="font-mono text-xs text-slate-400">
-													({formatCurrency(Number(term.remainingAmount))} ر.س {t("projectPayments.remaining")})
+													({formatCurrency(Number(term.remainingAmount))} {t("common.sar")} {t("projectPayments.remaining")})
 												</span>
 											</div>
 										</SelectItem>
@@ -304,7 +304,7 @@ export function ProjectPaymentForm({
 								</p>
 								<p className="font-mono text-sm font-semibold text-slate-800 dark:text-slate-200">
 									{formatCurrency(Number(selectedTerm.amount))}{" "}
-									ر.س
+									{t("common.sar")}
 								</p>
 							</div>
 							<div className="rounded-xl bg-white/60 p-3 dark:bg-slate-900/30">
@@ -315,7 +315,7 @@ export function ProjectPaymentForm({
 									{formatCurrency(
 										Number(selectedTerm.paidAmount),
 									)}{" "}
-									ر.س
+									{t("common.sar")}
 								</p>
 							</div>
 							<div className="rounded-xl bg-blue-100/60 p-3 dark:bg-blue-900/30">
@@ -326,7 +326,7 @@ export function ProjectPaymentForm({
 									{formatCurrency(
 										Number(selectedTerm.remainingAmount),
 									)}{" "}
-									ر.س
+									{t("common.sar")}
 								</p>
 							</div>
 						</div>
@@ -370,7 +370,7 @@ export function ProjectPaymentForm({
 									required
 								/>
 								<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500">
-									ر.س
+									{t("common.sar")}
 								</span>
 							</div>
 						</div>
@@ -523,7 +523,7 @@ export function ProjectPaymentForm({
 												selectedAccount.balance,
 											),
 										)}{" "}
-										ر.س
+										{t("common.sar")}
 									</p>
 									{formData.amount && (
 										<p className="flex items-center gap-1 text-xs text-slate-500">
@@ -537,7 +537,7 @@ export function ProjectPaymentForm({
 															"0",
 													),
 											)}{" "}
-											ر.س
+											{t("common.sar")}
 										</p>
 									)}
 								</div>

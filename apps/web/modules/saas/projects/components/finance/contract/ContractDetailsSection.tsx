@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import React from "react";
 import { useTranslations } from "next-intl";
@@ -107,7 +106,7 @@ export const ContractDetailsSection = React.memo(
 									className="rounded-xl border-sky-200/60 bg-white pl-12 dark:border-sky-800/40 dark:bg-slate-900/50"
 								/>
 								<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500">
-									ر.س
+									{t("common.sar")}
 								</span>
 							</div>
 						</div>

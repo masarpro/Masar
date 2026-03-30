@@ -64,7 +64,7 @@ export function NotificationBell({ organizationId }: NotificationBellProps) {
 			queryClient.invalidateQueries({
 				queryKey: ["notifications", "list", organizationId],
 			});
-			toast.success("تم تحديد جميع الإشعارات كمقروءة");
+			toast.success(t("notifications.markAllReadSuccess"));
 		},
 	});
 

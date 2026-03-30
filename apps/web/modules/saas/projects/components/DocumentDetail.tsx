@@ -66,27 +66,27 @@ const FOLDER_COLORS: Record<string, string> = {
 	OTHER: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
 };
 
-function getApprovalStatusBadge(status: string) {
+function getApprovalStatusBadge(status: string, t: ReturnType<typeof useTranslations>) {
 	switch (status) {
 		case "PENDING":
 			return (
 				<Badge className="border-0 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
 					<Clock className="h-3 w-3 me-1" />
-					قيد الاعتماد
+					{t("approvalPending")}
 				</Badge>
 			);
 		case "APPROVED":
 			return (
 				<Badge className="border-0 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
 					<CheckCircle className="h-3 w-3 me-1" />
-					معتمد
+					{t("approvalApproved")}
 				</Badge>
 			);
 		case "REJECTED":
 			return (
 				<Badge className="border-0 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
 					<XCircle className="h-3 w-3 me-1" />
-					مرفوض
+					{t("approvalRejected")}
 				</Badge>
 			);
 		default:
@@ -94,16 +94,16 @@ function getApprovalStatusBadge(status: string) {
 	}
 }
 
-function getActionLabel(action: string) {
+function getActionLabel(action: string, t: ReturnType<typeof useTranslations>) {
 	switch (action) {
 		case "DOC_CREATED":
-			return "إنشاء الوثيقة";
+			return t("auditActions.docCreated");
 		case "DOC_DELETED":
-			return "حذف الوثيقة";
+			return t("auditActions.docDeleted");
 		case "APPROVAL_REQUESTED":
-			return "طلب اعتماد";
+			return t("auditActions.approvalRequested");
 		case "APPROVAL_DECIDED":
-			return "قرار اعتماد";
+			return t("auditActions.approvalDecided");
 		default:
 			return action;
 	}
@@ -501,18 +501,18 @@ export function DocumentDetail({
 										className="rounded-xl border border-slate-200 p-4 dark:border-slate-700"
 									>
 										<div className="flex items-center justify-between mb-3">
-											{getApprovalStatusBadge(approval.status)}
+											{getApprovalStatusBadge(approval.status, t)}
 											<span className="text-xs text-slate-500">
 												{new Date(approval.requestedAt).toLocaleDateString("ar-SA")}
 											</span>
 										</div>
 										<div className="mb-3">
-											<p className="text-xs text-slate-500 mb-1">طالب الاعتماد</p>
+											<p className="text-xs text-slate-500 mb-1">{t("requestedBy")}</p>
 											<p className="text-sm font-medium">{approval.requestedBy.name}</p>
 										</div>
 										{approval.approvers && approval.approvers.length > 0 && (
 											<div>
-												<p className="text-xs text-slate-500 mb-2">المعتمدون</p>
+												<p className="text-xs text-slate-500 mb-2">{t("approvers")}</p>
 												<div className="flex flex-wrap gap-2">
 													{approval.approvers.map((approver) => (
 														<div
@@ -543,7 +543,7 @@ export function DocumentDetail({
 													disabled={actOnApprovalMutation.isPending}
 												>
 													<CheckCircle className="h-4 w-4 me-1" />
-													اعتماد
+													{t("approve")}
 												</Button>
 												<Button
 													size="sm"
@@ -553,7 +553,7 @@ export function DocumentDetail({
 													disabled={actOnApprovalMutation.isPending}
 												>
 													<XCircle className="h-4 w-4 me-1" />
-													رفض
+													{t("reject")}
 												</Button>
 											</div>
 										)}
@@ -701,7 +701,7 @@ export function DocumentDetail({
 									className="border-s-2 border-slate-200 ps-3 dark:border-slate-700"
 								>
 									<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-										{getActionLabel(log.action)}
+										{getActionLabel(log.action, t)}
 									</p>
 									<p className="text-xs text-slate-500">
 										{log.actor.name} •{" "}

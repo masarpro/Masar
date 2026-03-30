@@ -1,7 +1,7 @@
-// TODO: Consider @tanstack/react-virtual for large BOQ tables (>100 rows)
 "use client";
 
 import { Fragment, useMemo, useState } from "react";
+import { useVirtualRows } from "@saas/shared/hooks/use-virtual-rows";
 import { Card, CardContent } from "@ui/components/card";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
@@ -1154,75 +1154,81 @@ function CuttingWorkshopTab({
 								</span>
 							</div>
 						</div>
-						<div className="overflow-x-auto">
-							<Table>
-								<TableHeader>
-									<TableRow>
-										<TableHead className="text-right text-xs">
-											العنصر
-										</TableHead>
-										<TableHead className="text-right text-xs">
-											الوصف
-										</TableHead>
-										<TableHead className="text-right text-xs">
-											طول القطعة (م)
-										</TableHead>
-										<TableHead className="text-right text-xs">
-											العدد
-										</TableHead>
-										<TableHead className="text-right text-xs">
-											أسياخ المصنع
-										</TableHead>
-										<TableHead className="text-right text-xs">
-											الهالك %
-										</TableHead>
-										<TableHead className="text-right text-xs">
-											الوزن (كجم)
-										</TableHead>
-									</TableRow>
-								</TableHeader>
-								<TableBody>
-									{group.map((d, i) => (
-										<TableRow key={i}>
-											<TableCell className="text-sm">
-												{d.element}
-											</TableCell>
-											<TableCell className="text-sm text-muted-foreground">
-												{d.description}
-											</TableCell>
-											<TableCell className="text-sm font-medium">
-												{d.barLength}
-											</TableCell>
-											<TableCell className="text-sm">
-												{d.barCount}
-											</TableCell>
-											<TableCell className="text-sm">
-												{d.stocksNeeded}
-											</TableCell>
-											<TableCell className="text-sm">
-												<span
-													className={
-														d.wastePercentage > 15
-															? "text-red-600 font-medium"
-															: d.wastePercentage > 8
-																? "text-amber-600"
-																: "text-green-600"
-													}
-												>
-													{d.wastePercentage}%
-												</span>
-											</TableCell>
-											<TableCell className="text-sm font-medium">
-												{formatNumber(d.grossWeight)}
-											</TableCell>
-										</TableRow>
-									))}
-								</TableBody>
-							</Table>
-						</div>
+						<CuttingDiameterTable group={group} />
 					</Card>
 				);
 			})}
+		</div>
+	);
+}
+
+// ─────────────────────────────────────────────────────────────
+// Cutting Diameter Table (virtualized for large groups)
+// ─────────────────────────────────────────────────────────────
+
+function CuttingDiameterTable({ group }: { group: CuttingDetailRow[] }) {
+	const { containerRef, virtualItems, paddingTop, paddingBottom, isVirtualized } =
+		useVirtualRows({ count: group.length, rowHeight: 40, threshold: 50 });
+
+	return (
+		<div
+			ref={containerRef}
+			className="overflow-x-auto"
+			style={isVirtualized ? { maxHeight: 400 } : undefined}
+		>
+			<table className="w-full caption-bottom text-sm">
+				<TableHeader className={isVirtualized ? "sticky top-0 z-10 bg-background" : ""}>
+					<TableRow>
+						<TableHead className="text-right text-xs">العنصر</TableHead>
+						<TableHead className="text-right text-xs">الوصف</TableHead>
+						<TableHead className="text-right text-xs">طول القطعة (م)</TableHead>
+						<TableHead className="text-right text-xs">العدد</TableHead>
+						<TableHead className="text-right text-xs">أسياخ المصنع</TableHead>
+						<TableHead className="text-right text-xs">الهالك %</TableHead>
+						<TableHead className="text-right text-xs">الوزن (كجم)</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{isVirtualized && paddingTop > 0 && (
+						<tr style={{ height: paddingTop }} />
+					)}
+					{(isVirtualized
+						? virtualItems.map((vi: { index: number }) => group[vi.index])
+						: group
+					).map((d: CuttingDetailRow, i: number) => (
+						<TableRow key={isVirtualized ? virtualItems[i].index : i}>
+							<TableCell className="text-sm">{d.element}</TableCell>
+							<TableCell className="text-sm text-muted-foreground">
+								{d.description}
+							</TableCell>
+							<TableCell className="text-sm font-medium">
+								{d.barLength}
+							</TableCell>
+							<TableCell className="text-sm">{d.barCount}</TableCell>
+							<TableCell className="text-sm">{d.stocksNeeded}</TableCell>
+							<TableCell className="text-sm">
+								<span
+									className={
+										d.wastePercentage > 15
+											? "text-red-600 font-medium"
+											: d.wastePercentage > 8
+												? "text-amber-600"
+												: "text-green-600"
+									}
+								>
+									{d.wastePercentage}%
+								</span>
+							</TableCell>
+							<TableCell className="text-sm font-medium">
+								{formatNumber(d.grossWeight)}
+							</TableCell>
+						</TableRow>
+					))}
+					{isVirtualized && paddingBottom > 0 && (
+						<tr style={{ height: paddingBottom }} />
+					)}
+				</TableBody>
+			</table>
 		</div>
 	);
 }

@@ -73,7 +73,7 @@ export function UploadButton({
 		// Validate file size
 		if (file.size > maxSize) {
 			const maxSizeMB = Math.round(maxSize / (1024 * 1024));
-			toast.error(`حجم الملف يتجاوز الحد المسموح (${maxSizeMB} ميجابايت)`);
+			toast.error(t("upload.fileTooLargeWithSize", { size: maxSizeMB }));
 			return;
 		}
 
@@ -104,7 +104,7 @@ export function UploadButton({
 			});
 
 			if (!uploadResponse.ok) {
-				throw new Error("فشل رفع الملف");
+				throw new Error(t("upload.uploadError"));
 			}
 
 			setProgress(70);
@@ -124,11 +124,11 @@ export function UploadButton({
 
 			setProgress(100);
 
-			toast.success("تم رفع الملف بنجاح");
+			toast.success(t("upload.uploadSuccess"));
 			onUploadComplete?.(attachment);
 		} catch (error) {
 			console.error("Upload error:", error);
-			toast.error("فشل رفع الملف");
+			toast.error(t("upload.uploadError"));
 		} finally {
 			setUploading(false);
 			setProgress(0);

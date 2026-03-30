@@ -14,13 +14,17 @@ export default defineConfig({
 	retries: process.env.CI ? 1 : 0,
 	workers: process.env.CI ? 1 : undefined,
 	reporter: [["html"]],
+	timeout: 30_000,
 	use: {
 		baseURL: "http://localhost:3000",
 		trace: "on-first-retry",
+		screenshot: "only-on-failure",
 		video: {
 			mode: "retain-on-failure",
 			size: { width: 640, height: 480 },
 		},
+		locale: "ar",
+		timezoneId: "Asia/Riyadh",
 	},
 	projects: [
 		{ name: "setup", testMatch: /.*\.setup\.ts/ },

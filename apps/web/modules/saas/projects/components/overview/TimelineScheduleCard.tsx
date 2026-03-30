@@ -26,10 +26,12 @@ const S_CURVE_DATA = [
 	{ period: "M12", planned: 100, actual: null },
 ];
 
-const chartConfig: ChartConfig = {
-	planned: { label: "المخطط", color: "#3b82f6" },
-	actual: { label: "الفعلي", color: "#0ea5e9" },
-};
+function useChartConfig(t: ReturnType<typeof useTranslations>): ChartConfig {
+	return {
+		planned: { label: t("projects.commandCenter.plannedProgress"), color: "#3b82f6" },
+		actual: { label: t("projects.commandCenter.actualProgress"), color: "#0ea5e9" },
+	};
+}
 
 interface TimelineScheduleCardProps {
 	projectProgress?: number;
@@ -43,6 +45,7 @@ export function TimelineScheduleCard({
 	endDate,
 }: TimelineScheduleCardProps) {
 	const t = useTranslations();
+	const chartConfig = useChartConfig(t);
 
 	// Calculate days remaining
 	const end = endDate ? new Date(endDate) : null;

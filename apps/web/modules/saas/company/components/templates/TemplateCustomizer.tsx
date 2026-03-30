@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useTranslations } from "next-intl";
@@ -76,12 +75,12 @@ const fontFamilies = [
 	{ value: "Noto Sans Arabic", label: "Noto Sans Arabic" },
 ];
 
-const fontSizes = [
-	{ value: "12px", label: "صغير" },
-	{ value: "14px", label: "متوسط" },
-	{ value: "16px", label: "كبير" },
-	{ value: "18px", label: "كبير جداً" },
-];
+const fontSizeKeys = [
+	{ value: "12px", labelKey: "common.small" },
+	{ value: "14px", labelKey: "common.medium" },
+	{ value: "16px", labelKey: "common.large" },
+	{ value: "18px", labelKey: "common.xlarge" },
+] as const;
 
 const defaultSettings: TemplateSettings = {
 	backgroundColor: "#ffffff",
@@ -417,7 +416,7 @@ export function TemplateCustomizer({
 			<div className="border-b bg-background px-4 py-3 flex items-center justify-between shrink-0">
 				<div className="flex items-center gap-3">
 					<Link href={`${basePath}/templates`}>
-						<Button variant="ghost" size="icon" className="rounded-xl" aria-label="رجوع">
+						<Button variant="ghost" size="icon" className="rounded-xl" aria-label={t("common.back")}>
 							<ArrowRightIcon className="h-5 w-5 rtl:rotate-180" />
 						</Button>
 					</Link>
@@ -691,7 +690,7 @@ export function TemplateCustomizer({
 											size="icon"
 											className="absolute top-1 end-1 h-6 w-6 rounded-full bg-background/80"
 											onClick={() => handleUpdateSettings({ headerImage: undefined })}
-											aria-label="إزالة صورة الترويسة"
+											aria-label={t("finance.templates.customizer.removeHeaderImage")}
 										>
 											<XIcon className="h-3 w-3" />
 										</Button>
@@ -718,7 +717,7 @@ export function TemplateCustomizer({
 											size="icon"
 											className="absolute top-1 end-1 h-6 w-6 rounded-full bg-background/80"
 											onClick={() => handleUpdateSettings({ footerImage: undefined })}
-											aria-label="إزالة صورة التذييل"
+											aria-label={t("finance.templates.customizer.removeFooterImage")}
 										>
 											<XIcon className="h-3 w-3" />
 										</Button>
@@ -815,9 +814,9 @@ export function TemplateCustomizer({
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent className="rounded-xl">
-										{fontSizes.map((s) => (
+										{fontSizeKeys.map((s) => (
 											<SelectItem key={s.value} value={s.value}>
-												{s.label}
+												{t(s.labelKey)}
 											</SelectItem>
 										))}
 									</SelectContent>
@@ -872,7 +871,7 @@ export function TemplateCustomizer({
 								onClick={() =>
 									setZoom((z) => Math.max(30, z - 10))
 								}
-								aria-label="تصغير"
+								aria-label={t("finance.templates.editor.actions.zoomOut")}
 							>
 								<ZoomOutIcon className="h-4 w-4" />
 							</Button>
@@ -886,7 +885,7 @@ export function TemplateCustomizer({
 								onClick={() =>
 									setZoom((z) => Math.min(150, z + 10))
 								}
-								aria-label="تكبير"
+								aria-label={t("finance.templates.editor.actions.zoomIn")}
 							>
 								<ZoomInIcon className="h-4 w-4" />
 							</Button>

@@ -9,6 +9,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   memo,
   useCallback,
@@ -37,24 +38,6 @@ interface AssistantMessagesProps {
   error?: boolean;
 }
 
-const toolLabelsAr: Record<string, string> = {
-  queryProjects: "يبحث في المشاريع...",
-  queryFinance: "يراجع البيانات المالية...",
-  queryExecution: "يتحقق من التنفيذ...",
-  queryTimeline: "يراجع الجدول الزمني...",
-  queryCompany: "يراجع بيانات المنشأة...",
-  navigateTo: "يجهز الرابط...",
-};
-
-const toolLabelsEn: Record<string, string> = {
-  queryProjects: "Searching projects...",
-  queryFinance: "Reviewing financials...",
-  queryExecution: "Checking execution...",
-  queryTimeline: "Checking timeline...",
-  queryCompany: "Reviewing company data...",
-  navigateTo: "Preparing link...",
-};
-
 const MessageBubble = memo(function MessageBubble({
   msg,
   locale,
@@ -65,7 +48,7 @@ const MessageBubble = memo(function MessageBubble({
   router: ReturnType<typeof useRouter>;
 }) {
   const [copied, setCopied] = useState(false);
-  const isAr = locale === "ar";
+  const t = useTranslations("assistant");
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(msg.content);
@@ -74,9 +57,8 @@ const MessageBubble = memo(function MessageBubble({
   }, [msg.content]);
 
   const pendingTools = msg.toolInvocations?.filter(
-    (t) => t.state === "call" || t.state === "partial-call",
+    (ti) => ti.state === "call" || ti.state === "partial-call",
   );
-  const toolLabels = isAr ? toolLabelsAr : toolLabelsEn;
 
   if (msg.role === "user") {
     return (
@@ -94,7 +76,10 @@ const MessageBubble = memo(function MessageBubble({
           <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-500" />
           <span>
             {pendingTools
-              .map((t) => toolLabels[t.toolName] || t.toolName)
+              .map((ti) => {
+                const key = `tools.${ti.toolName}` as const;
+                return t.has(key) ? t(key) : ti.toolName;
+              })
               .join("، ")}
           </span>
         </div>
@@ -141,7 +126,7 @@ const MessageBubble = memo(function MessageBubble({
           type="button"
           onClick={handleCopy}
           className="absolute end-1 top-1 rounded-md bg-background/80 p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-muted group-hover:opacity-100"
-          title={isAr ? "نسخ" : "Copy"}
+          title={t("copy")}
         >
           {copied ? (
             <Check className="h-3 w-3 text-green-600" />
@@ -164,7 +149,7 @@ export function AssistantMessages({
   const bottomRef = useRef<HTMLDivElement>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const router = useRouter();
-  const isAr = locale === "ar";
+  const t = useTranslations("assistant");
 
   const scrollToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -196,7 +181,7 @@ export function AssistantMessages({
         className="assistant-messages flex flex-1 flex-col gap-3 overflow-y-auto p-4"
         role="log"
         aria-live="polite"
-        aria-label={isAr ? "سجل المحادثة" : "Conversation log"}
+        aria-label={t("conversationLog")}
       >
         {messages.map((msg) => (
           <MessageBubble
@@ -222,12 +207,10 @@ export function AssistantMessages({
             <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
             <div className="text-xs">
               <p className="font-medium text-red-700 dark:text-red-400">
-                {isAr ? "حدث خطأ" : "An error occurred"}
+                {t("error")}
               </p>
               <p className="mt-0.5 text-red-600/70 dark:text-red-400/70">
-                {isAr
-                  ? "حاول مرة أخرى أو ابدأ محادثة جديدة"
-                  : "Try again or start a new chat"}
+                {t("errorRetry")}
               </p>
             </div>
           </div>
@@ -244,7 +227,7 @@ export function AssistantMessages({
           className="absolute bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full border bg-background px-3 py-1 text-xs shadow-sm transition-colors hover:bg-muted"
         >
           <ArrowDown className="h-3 w-3" />
-          <span>{isAr ? "رسائل جديدة" : "New messages"}</span>
+          <span>{t("newMessages")}</span>
         </button>
       )}
     </div>

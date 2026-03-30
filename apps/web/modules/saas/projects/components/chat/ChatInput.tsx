@@ -101,7 +101,7 @@ export function ChatInput({
 				});
 
 				if (!uploadResponse.ok) {
-					throw new Error("فشل رفع الملف");
+					throw new Error(t("projects.chat.uploadError"));
 				}
 
 				// Step 3: Finalize upload

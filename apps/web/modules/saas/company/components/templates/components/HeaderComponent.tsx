@@ -376,8 +376,8 @@ export function HeaderComponent({
 		const logoBg = `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)`;
 
 		const infoRowAr = [
-			showCrNumber && companyInfo?.commercialReg && `س.ت: ${companyInfo.commercialReg}`,
-			companyInfo?.taxNumber && `الرقم الضريبي: ${companyInfo.taxNumber}`,
+			showCrNumber && companyInfo?.commercialReg && `${t("finance.templates.preview.crNumberShort")}: ${companyInfo.commercialReg}`,
+			companyInfo?.taxNumber && `${t("finance.templates.preview.taxNumber")}: ${companyInfo.taxNumber}`,
 		].filter(Boolean);
 
 		const infoRowEn = [
@@ -432,7 +432,7 @@ export function HeaderComponent({
 							className={`${companyNameSizeClass} font-extrabold`}
 							style={{ color: primaryColor }}
 						>
-							{companyInfo?.nameEn || companyInfo?.name || "Company Name"}
+							{companyInfo?.nameEn || companyInfo?.name || t("finance.templates.preview.companyName")}
 						</h1>
 						{showAddress && companyInfo?.addressEn && (
 							<p className="text-[10px] text-slate-400 mt-0.5">
@@ -489,10 +489,10 @@ export function HeaderComponent({
 						{[
 							showCrNumber &&
 								companyInfo?.commercialReg &&
-								`س.ت: ${companyInfo.commercialReg}`,
+								`${t("finance.templates.preview.crNumberShort")}: ${companyInfo.commercialReg}`,
 							showTaxNumber &&
 								companyInfo?.taxNumber &&
-								`ض: ${companyInfo.taxNumber}`,
+								`${t("finance.templates.preview.taxNumberShort")}: ${companyInfo.taxNumber}`,
 						]
 							.filter(Boolean)
 							.join(" | ")}

@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
@@ -43,21 +42,13 @@ interface CreatePaymentDialogProps {
 	hasContract: boolean;
 }
 
-const PAYMENT_METHODS = [
-	{ value: "BANK_TRANSFER", label: "تحويل بنكي" },
-	{ value: "CASH", label: "نقدي" },
-	{ value: "CHEQUE", label: "شيك" },
-	{ value: "CREDIT_CARD", label: "بطاقة ائتمان" },
-	{ value: "OTHER", label: "أخرى" },
+const PAYMENT_METHOD_VALUES = [
+	"BANK_TRANSFER",
+	"CASH",
+	"CHEQUE",
+	"CREDIT_CARD",
+	"OTHER",
 ] as const;
-
-const TERM_TYPE_LABELS: Record<string, string> = {
-	ADVANCE: "دفعة مقدمة",
-	MILESTONE: "مرحلة",
-	MONTHLY: "شهري",
-	COMPLETION: "عند الإنهاء",
-	CUSTOM: "مخصص",
-};
 
 function formatCurrency(value: number): string {
 	return new Intl.NumberFormat("en-US", {
@@ -164,7 +155,7 @@ export function CreatePaymentDialog({
 										.filter((term) => term.status !== "FULLY_PAID")
 										.map((term) => (
 											<SelectItem key={term.id} value={term.id}>
-												{term.label ?? TERM_TYPE_LABELS[term.type] ?? term.type}
+												{term.label ?? t(`projectPayments.termTypes.${term.type}`)}
 												{term.amount != null && (
 													<span className="text-xs text-slate-500">
 														{" "}
@@ -211,9 +202,9 @@ export function CreatePaymentDialog({
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
-								{PAYMENT_METHODS.map((m) => (
-									<SelectItem key={m.value} value={m.value}>
-										{m.label}
+								{PAYMENT_METHOD_VALUES.map((value) => (
+									<SelectItem key={value} value={value}>
+										{t(`projectPayments.paymentMethods.${value}`)}
 									</SelectItem>
 								))}
 							</SelectContent>

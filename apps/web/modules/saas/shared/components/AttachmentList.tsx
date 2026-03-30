@@ -69,14 +69,14 @@ export function AttachmentList({
 			window.open(result.downloadUrl, "_blank");
 		},
 		onError: () => {
-			toast.error("فشل تحميل الملف");
+			toast.error(t("upload.downloadError"));
 		},
 	});
 
 	const deleteMutation = useMutation({
 		...orpc.attachments.delete.mutationOptions(),
 		onSuccess: () => {
-			toast.success("تم حذف المرفق");
+			toast.success(t("upload.deleteSuccess"));
 			queryClient.invalidateQueries({
 				queryKey: orpc.attachments.list.queryOptions({
 					input: { organizationId, ownerType, ownerId },
@@ -84,7 +84,7 @@ export function AttachmentList({
 			});
 		},
 		onError: () => {
-			toast.error("فشل حذف المرفق");
+			toast.error(t("upload.deleteError"));
 		},
 	});
 
@@ -93,7 +93,7 @@ export function AttachmentList({
 	};
 
 	const handleDelete = (attachmentId: string) => {
-		if (confirm("هل أنت متأكد من حذف هذا المرفق؟")) {
+		if (confirm(t("upload.confirmDelete"))) {
 			deleteMutation.mutate({ organizationId, attachmentId });
 		}
 	};

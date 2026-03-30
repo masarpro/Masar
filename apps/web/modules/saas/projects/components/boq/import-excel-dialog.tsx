@@ -239,7 +239,7 @@ export function ImportExcelDialog({
 				setMappings(autoMappings);
 				setStep(2);
 			} catch {
-				toast.error("Failed to read file");
+				toast.error(t("importExcel.readError"));
 			}
 			setIsProcessing(false);
 		},
@@ -480,7 +480,7 @@ export function ImportExcelDialog({
 								<FileSpreadsheet className="h-4 w-4" />
 								<span>{fileName}</span>
 								<span className="text-slate-400">
-									— {rawData.length} rows
+									— {t("importExcel.rowCount", { count: rawData.length })}
 								</span>
 							</div>
 
@@ -718,7 +718,7 @@ export function ImportExcelDialog({
 
 							{parsedItems.length > 10 && (
 								<p className="text-xs text-slate-400 text-center">
-									... +{parsedItems.length - 10} more
+									{t("importExcel.moreItems", { count: parsedItems.length - 10 })}
 								</p>
 							)}
 

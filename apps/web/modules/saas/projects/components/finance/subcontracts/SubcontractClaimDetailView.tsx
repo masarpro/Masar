@@ -1,5 +1,4 @@
 "use client";
-// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -115,6 +114,7 @@ export function SubcontractClaimDetailView({
 	claimId,
 }: SubcontractClaimDetailViewProps) {
 	const t = useTranslations("claims");
+	const tSub = useTranslations("subcontracts");
 	const router = useRouter();
 	const queryClient = useQueryClient();
 
@@ -226,7 +226,7 @@ export function SubcontractClaimDetailView({
 	if (!claim) {
 		return (
 			<div className="text-center py-16">
-				<p className="text-muted-foreground">المستخلص غير موجود</p>
+				<p className="text-muted-foreground">{t("notFound")}</p>
 			</div>
 		);
 	}
@@ -380,7 +380,7 @@ export function SubcontractClaimDetailView({
 				<div className="space-y-1">
 					<div className="flex items-center gap-3">
 						<h1 className="text-2xl font-bold">
-							مستخلص #{claim.claimNo}
+							{t("claimHeader", { claimNo: claim.claimNo })}
 						</h1>
 						<Badge
 							variant="outline"
@@ -396,7 +396,7 @@ export function SubcontractClaimDetailView({
 						</span>
 						{claim.contract && (
 							<span>
-								{claim.contract.name} | قيمة العقد:{" "}
+								{claim.contract.name} | {t("contractValue")}:{" "}
 								<span className="tabular-nums" dir="ltr">
 									{formatCurrency(claim.contract.value)}
 								</span>
@@ -405,7 +405,7 @@ export function SubcontractClaimDetailView({
 					</div>
 					{claim.createdBy && (
 						<p className="text-sm text-muted-foreground">
-							المنشئ: {claim.createdBy.name}
+							{t("createdBy")}: {claim.createdBy.name}
 						</p>
 					)}
 				</div>
@@ -501,8 +501,8 @@ export function SubcontractClaimDetailView({
 					<Table>
 						<TableHeader>
 							<TableRow className="bg-muted/50">
-								<TableHead className="w-48">البند</TableHead>
-								<TableHead className="w-20 text-center">الوحدة</TableHead>
+								<TableHead className="w-48">{t("itemColumn")}</TableHead>
+								<TableHead className="w-20 text-center">{t("items.unit")}</TableHead>
 								<TableHead className="w-24 text-center">
 									{t("items.contractQty")}
 								</TableHead>
@@ -584,7 +584,7 @@ export function SubcontractClaimDetailView({
 			{/* Section 3 — Financial Summary */}
 			<Card>
 				<CardHeader>
-					<CardTitle className="text-base">الملخص المالي</CardTitle>
+					<CardTitle className="text-base">{t("financialSummary")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3 text-sm">
 					<div className="flex justify-between">
@@ -769,11 +769,11 @@ export function SubcontractClaimDetailView({
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
-									<SelectItem value="BANK_TRANSFER">تحويل بنكي</SelectItem>
-									<SelectItem value="CASH">نقدي</SelectItem>
-									<SelectItem value="CHEQUE">شيك</SelectItem>
-									<SelectItem value="CREDIT_CARD">بطاقة ائتمان</SelectItem>
-									<SelectItem value="OTHER">أخرى</SelectItem>
+									<SelectItem value="BANK_TRANSFER">{tSub("paymentMethods.BANK_TRANSFER")}</SelectItem>
+									<SelectItem value="CASH">{tSub("paymentMethods.CASH")}</SelectItem>
+									<SelectItem value="CHEQUE">{tSub("paymentMethods.CHEQUE")}</SelectItem>
+									<SelectItem value="CREDIT_CARD">{tSub("paymentMethods.CREDIT_CARD")}</SelectItem>
+									<SelectItem value="OTHER">{tSub("paymentMethods.OTHER")}</SelectItem>
 								</SelectContent>
 							</Select>
 						</div>
@@ -782,7 +782,7 @@ export function SubcontractClaimDetailView({
 								<Label>{t("payment.sourceAccount")}</Label>
 								<Select value={payAccountId} onValueChange={setPayAccountId}>
 									<SelectTrigger>
-										<SelectValue placeholder="اختر الحساب البنكي" />
+										<SelectValue placeholder={t("payment.selectBankAccount")} />
 									</SelectTrigger>
 									<SelectContent>
 										{bankAccounts.accounts.map((account) => (
@@ -827,11 +827,11 @@ export function SubcontractClaimDetailView({
 					<AlertDialogHeader>
 						<AlertDialogTitle>{t("actions.delete")}</AlertDialogTitle>
 						<AlertDialogDescription>
-							هل أنت متأكد من حذف هذا المستخلص؟ لا يمكن التراجع عن هذا الإجراء.
+							{t("deleteConfirmDescription")}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>إلغاء</AlertDialogCancel>
+						<AlertDialogCancel>{t("actions.cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
 							onClick={() => {
