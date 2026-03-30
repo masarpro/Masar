@@ -21,24 +21,24 @@ interface ProjectInsightsProps {
 	projectId: string;
 }
 
-function getSeverityBadge(severity: string) {
+function getSeverityBadge(severity: string, t: (key: string) => string) {
 	switch (severity) {
 		case "CRITICAL":
 			return (
 				<Badge className="border-0 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
-					حرج
+					{t("projects.insights.critical")}
 				</Badge>
 			);
 		case "WARN":
 			return (
 				<Badge className="border-0 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-					تحذير
+					{t("projects.insights.warnings")}
 				</Badge>
 			);
 		case "INFO":
 			return (
 				<Badge className="border-0 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-					معلومة
+					{t("projects.insights.info")}
 				</Badge>
 			);
 		default:
@@ -59,21 +59,10 @@ function getSeverityIcon(severity: string) {
 	}
 }
 
-function getAlertTypeLabel(type: string) {
-	switch (type) {
-		case "MISSING_DAILY_REPORT":
-			return "تقرير يومي مفقود";
-		case "STALE_PROGRESS":
-			return "تقدم قديم";
-		case "OVERDUE_PAYMENT":
-			return "دفعة متأخرة";
-		case "COST_OVERRUN_RISK":
-			return "خطر تجاوز التكلفة";
-		case "TOO_MANY_OPEN_ISSUES":
-			return "مشاكل مفتوحة كثيرة";
-		default:
-			return type;
-	}
+function getAlertTypeLabel(type: string, t: (key: string) => string) {
+	const key = `projects.insights.alertTypes.${type}`;
+	const translated = t(key);
+	return translated !== key ? translated : type;
 }
 
 export function ProjectInsights({
@@ -100,10 +89,10 @@ export function ProjectInsights({
 				queryClient.invalidateQueries({
 					queryKey: ["projectInsights", "get"],
 				});
-				toast.success("تم الاطلاع على التنبيه");
+				toast.success(t("projects.insights.toastAcknowledged"));
 			},
 			onError: () => {
-				toast.error("حدث خطأ");
+				toast.error(t("projects.insights.toastError"));
 			},
 		}),
 	);
@@ -130,7 +119,7 @@ export function ProjectInsights({
 							<AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
 						</div>
 						<div>
-							<p className="text-xs text-red-600 dark:text-red-400">حرج</p>
+							<p className="text-xs text-red-600 dark:text-red-400">{t("projects.insights.critical")}</p>
 							<p className="text-2xl font-semibold text-red-700 dark:text-red-300">
 								{data?.stats.critical || 0}
 							</p>
@@ -145,7 +134,7 @@ export function ProjectInsights({
 						</div>
 						<div>
 							<p className="text-xs text-amber-600 dark:text-amber-400">
-								تحذيرات
+								{t("projects.insights.warnings")}
 							</p>
 							<p className="text-2xl font-semibold text-amber-700 dark:text-amber-300">
 								{data?.stats.warnings || 0}
@@ -161,7 +150,7 @@ export function ProjectInsights({
 						</div>
 						<div>
 							<p className="text-xs text-blue-600 dark:text-blue-400">
-								معلومات
+								{t("projects.insights.info")}
 							</p>
 							<p className="text-2xl font-semibold text-blue-700 dark:text-blue-300">
 								{data?.stats.info || 0}
@@ -174,7 +163,7 @@ export function ProjectInsights({
 			{/* Active Alerts */}
 			<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
 				<h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
-					التنبيهات النشطة
+					{t("projects.insights.activeAlerts")}
 				</h2>
 
 				{data?.activeAlerts && data.activeAlerts.length > 0 ? (
@@ -190,13 +179,13 @@ export function ProjectInsights({
 										<span className="font-medium text-slate-900 dark:text-slate-100">
 											{alert.title}
 										</span>
-										{getSeverityBadge(alert.severity)}
+										{getSeverityBadge(alert.severity, t)}
 									</div>
 									<p className="text-sm text-slate-600 dark:text-slate-400">
 										{alert.description}
 									</p>
 									<p className="mt-1 text-xs text-slate-400">
-										{getAlertTypeLabel(alert.type)}
+										{getAlertTypeLabel(alert.type, t)}
 									</p>
 								</div>
 								<Button
@@ -207,7 +196,7 @@ export function ProjectInsights({
 									className="shrink-0 gap-1"
 								>
 									<Check className="h-3 w-3" />
-									تم الاطلاع
+									{t("projects.insights.acknowledge")}
 								</Button>
 							</div>
 						))}
@@ -218,9 +207,9 @@ export function ProjectInsights({
 							<Check className="h-8 w-8 text-sky-600 dark:text-sky-400" />
 						</div>
 						<p className="text-slate-600 dark:text-slate-400">
-							لا توجد تنبيهات نشطة
+							{t("projects.insights.noAlerts")}
 						</p>
-						<p className="text-sm text-slate-400">المشروع في حالة جيدة</p>
+						<p className="text-sm text-slate-400">{t("projects.insights.projectHealthy")}</p>
 					</div>
 				)}
 			</div>
@@ -229,7 +218,7 @@ export function ProjectInsights({
 			{data?.acknowledgedAlerts && data.acknowledgedAlerts.length > 0 && (
 				<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
 					<h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
-						تنبيهات تم الاطلاع عليها
+						{t("projects.insights.acknowledged")}
 					</h2>
 					<div className="space-y-2">
 						{data.acknowledgedAlerts.map((alert) => (

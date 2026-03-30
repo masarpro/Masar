@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -41,6 +41,7 @@ import { formatCurrency, PAYMENT_METHODS } from "./subcontract-shared";
 import { SubcontractHeader } from "./SubcontractHeader";
 import { SubcontractFinanceSummary } from "./SubcontractFinanceSummary";
 import { SubcontractClaimsSection } from "./SubcontractClaimsSection";
+import { SubcontractChangeOrdersSection } from "./SubcontractChangeOrdersSection";
 import { SubcontractPaymentSection } from "./SubcontractPaymentSection";
 
 interface SubcontractDetailViewProps {
@@ -107,6 +108,37 @@ export function SubcontractDetailView({
 			input: { organizationId },
 		}),
 	);
+
+	const { data: claimsData } = useQuery({
+		...orpc.subcontracts.listClaims.queryOptions({
+			input: { organizationId, projectId, contractId: subcontractId },
+		}),
+		enabled: !!contract,
+	});
+
+	const payableClaims = useMemo(
+		() =>
+			claimsData
+				?.filter((c) => ["APPROVED", "PARTIALLY_PAID"].includes(c.status))
+				.map((c) => ({
+					id: c.id,
+					claimNo: c.claimNo,
+					netAmount: c.netAmount,
+					paidAmount: c.paidAmount,
+				})) ?? [],
+		[claimsData],
+	);
+
+	// All claims lookup for badge display (includes PAID claims for historical payments)
+	const claimsLookup = useMemo(() => {
+		const map = new Map<string, number>();
+		if (claimsData) {
+			for (const c of claimsData) {
+				map.set(c.id, c.claimNo);
+			}
+		}
+		return map;
+	}, [claimsData]);
 
 	function startEditing() {
 		if (!contract) return;
@@ -198,6 +230,19 @@ export function SubcontractDetailView({
 		},
 	});
 
+	const addClaimPaymentMutation = useMutation({
+		...orpc.subcontracts.addClaimPayment.mutationOptions(),
+		onSuccess: () => {
+			toast.success(t("subcontracts.notifications.paymentCreated"));
+			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: ["finance"] });
+			queryClient.invalidateQueries({ queryKey: ["projectFinance"] });
+		},
+		onError: (error) => {
+			toast.error(error.message || t("subcontracts.notifications.paymentCreateError"));
+		},
+	});
+
 	function resetCOForm() {
 		setCODescription("");
 		setCOAmount("");
@@ -256,24 +301,41 @@ export function SubcontractDetailView({
 		referenceNo: string;
 		description: string;
 		termId: string;
+		claimId?: string;
 	}) => {
 		if (data.amount <= 0) {
 			toast.error(t("subcontracts.validation.amountRequired"));
 			return;
 		}
-		createPaymentMutation.mutate({
-			organizationId,
-			projectId,
-			contractId: subcontractId,
-			termId: data.termId || null,
-			amount: data.amount,
-			date: new Date(data.date),
-			sourceAccountId: data.sourceAccountId || "",
-			paymentMethod: (data.paymentMethod as (typeof PAYMENT_METHODS)[number]) || null,
-			referenceNo: data.referenceNo || null,
-			description: data.description || null,
-		});
-	}, [organizationId, projectId, subcontractId, createPaymentMutation, t]);
+
+		if (data.claimId) {
+			// Route to claim payment endpoint
+			addClaimPaymentMutation.mutate({
+				organizationId,
+				projectId,
+				claimId: data.claimId,
+				amount: data.amount,
+				date: new Date(data.date),
+				sourceAccountId: data.sourceAccountId || "",
+				paymentMethod: (data.paymentMethod as (typeof PAYMENT_METHODS)[number]) || "BANK_TRANSFER",
+				description: data.description || null,
+			});
+		} else {
+			// Existing direct payment flow
+			createPaymentMutation.mutate({
+				organizationId,
+				projectId,
+				contractId: subcontractId,
+				termId: data.termId || null,
+				amount: data.amount,
+				date: new Date(data.date),
+				sourceAccountId: data.sourceAccountId || "",
+				paymentMethod: (data.paymentMethod as (typeof PAYMENT_METHODS)[number]) || null,
+				referenceNo: data.referenceNo || null,
+				description: data.description || null,
+			});
+		}
+	}, [organizationId, projectId, subcontractId, createPaymentMutation, addClaimPaymentMutation, t]);
 
 	const handleOpenEditCO = useCallback((co: { id: string; description: string; amount: number; status: string }) => {
 		setEditCO(co.id);
@@ -350,17 +412,28 @@ export function SubcontractDetailView({
 				payments={contract.payments}
 				termsProgress={termsProgress}
 				accounts={accounts}
+				approvedClaims={payableClaims}
+				claimsLookup={claimsLookup}
 				totalPaid={totalPaid}
 				remaining={remaining}
 				adjustedValue={adjustedValue}
 				progress={progress}
 				isOverBudget={isOverBudget}
 				onSubmitPayment={handleSubmitPayment}
-				isSubmittingPayment={createPaymentMutation.isPending}
+				isSubmittingPayment={createPaymentMutation.isPending || addClaimPaymentMutation.isPending}
+			/>
+
+			{/* Claims */}
+			<SubcontractClaimsSection
+				organizationId={contract.organizationId}
+				organizationSlug={organizationSlug}
+				projectId={contract.projectId}
+				subcontractId={contract.id}
+				contractStatus={contract.status}
 			/>
 
 			{/* Change Orders */}
-			<SubcontractClaimsSection
+			<SubcontractChangeOrdersSection
 				changeOrders={contract.changeOrders}
 				onAdd={handleAddCO}
 				onEdit={handleOpenEditCO}

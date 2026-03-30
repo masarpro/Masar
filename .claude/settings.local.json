@@ -118,7 +118,8 @@
       "Bash(test:*)",
       "Bash(npx tsx:*)",
       "Bash(mv:*)",
-      "Bash(mv calculators:*)"
+      "Bash(mv calculators:*)",
+      "Bash(python -c \":*)"
     ]
   }
 }

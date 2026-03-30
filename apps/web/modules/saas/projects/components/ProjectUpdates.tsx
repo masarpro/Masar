@@ -55,7 +55,7 @@ export function ProjectUpdates({
 	const publishMutation = useMutation(
 		orpc.projectUpdates.publish.mutationOptions({
 			onSuccess: () => {
-				toast.success("تم نشر التحديث الرسمي بنجاح");
+				toast.success(t("projects.updates.toastPublished"));
 				setIsEditing(false);
 				// Reset form
 				setHeadline("");
@@ -66,7 +66,7 @@ export function ProjectUpdates({
 				queryClient.invalidateQueries({ queryKey: ["projectUpdates"] });
 			},
 			onError: () => {
-				toast.error("حدث خطأ أثناء نشر التحديث");
+				toast.error(t("projects.updates.toastError"));
 			},
 		}),
 	);
@@ -83,7 +83,7 @@ export function ProjectUpdates({
 
 	const handlePublish = () => {
 		if (!headline.trim()) {
-			toast.error("العنوان مطلوب");
+			toast.error(t("projects.updates.headlineRequired"));
 			return;
 		}
 
@@ -113,11 +113,11 @@ export function ProjectUpdates({
 					<>
 						<div className="mb-6 flex items-center justify-between">
 							<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-								إنشاء تحديث تلقائي
+								{t("projects.updates.createAutoUpdate")}
 							</h2>
 							<Button onClick={handleGenerateDraft} className="gap-2">
 								<Sparkles className="h-4 w-4" />
-								إنشاء مسودة
+								{t("projects.updates.generateDraft")}
 							</Button>
 						</div>
 
@@ -127,13 +127,13 @@ export function ProjectUpdates({
 								<div className="flex items-center gap-2">
 									<Megaphone className="h-5 w-5 text-sky-500" />
 									<span className="font-medium text-slate-900 dark:text-slate-100">
-										معاينة التحديث التلقائي
+										{t("projects.updates.preview")}
 									</span>
 								</div>
 
 								<div className="space-y-3">
 									<div>
-										<span className="text-sm text-slate-500">العنوان:</span>
+										<span className="text-sm text-slate-500">{t("projects.updates.headline")}:</span>
 										<p className="font-medium text-slate-900 dark:text-slate-100">
 											{draftData.draft.headline}
 										</p>
@@ -141,7 +141,7 @@ export function ProjectUpdates({
 
 									<div className="flex items-center gap-4">
 										<div>
-											<span className="text-sm text-slate-500">التقدم:</span>
+											<span className="text-sm text-slate-500">{t("projects.updates.progress")}:</span>
 											<div className="flex items-center gap-2">
 												<Progress
 													value={Number(draftData.draft.progress)}
@@ -154,7 +154,7 @@ export function ProjectUpdates({
 										</div>
 										{draftData.draft.phaseLabel && (
 											<div>
-												<span className="text-sm text-slate-500">المرحلة:</span>
+												<span className="text-sm text-slate-500">{t("projects.updates.phase")}:</span>
 												<Badge variant="outline" className="ms-1">
 													{draftData.draft.phaseLabel}
 												</Badge>
@@ -165,7 +165,7 @@ export function ProjectUpdates({
 									{draftData.draft.workDoneSummary && (
 										<div>
 											<span className="text-sm text-slate-500">
-												ما تم إنجازه:
+												{t("projects.updates.workDone")}:
 											</span>
 											<p className="text-slate-700 dark:text-slate-300">
 												{draftData.draft.workDoneSummary}
@@ -176,12 +176,12 @@ export function ProjectUpdates({
 									{draftData.draft.nextPayment && (
 										<div className="rounded-lg bg-indigo-50 p-3 dark:bg-indigo-950/30">
 											<span className="text-sm text-indigo-600 dark:text-indigo-400">
-												الدفعة القادمة:
+												{t("projects.updates.nextPayment")}:
 											</span>
 											<p className="font-medium text-indigo-700 dark:text-indigo-300">
-												المستخلص رقم {draftData.draft.nextPayment.claimNo} -{" "}
+												{t("projects.updates.claimNo", { no: draftData.draft.nextPayment.claimNo })} -{" "}
 												{draftData.draft.nextPayment.amount.toLocaleString("en-US")}{" "}
-												ر.س
+												{t("common.sar")}
 											</p>
 										</div>
 									)}
@@ -190,8 +190,7 @@ export function ProjectUpdates({
 										draftData.draft.photos.length > 0 && (
 											<div>
 												<span className="text-sm text-slate-500">
-													<ImageIcon className="mb-0.5 inline h-4 w-4" /> صور
-													مرفقة ({draftData.draft.photos.length})
+													<ImageIcon className="mb-0.5 inline h-4 w-4" /> {t("projects.updates.attachedPhotos")} ({draftData.draft.photos.length})
 												</span>
 												<div className="mt-2 flex gap-2">
 													{draftData.draft.photos.slice(0, 4).map((photo) => (
@@ -206,12 +205,12 @@ export function ProjectUpdates({
 								</div>
 
 								<p className="mt-4 text-xs text-slate-400">
-									آخر تقرير:{" "}
+									{t("projects.updates.lastReport")}:{" "}
 									{draftData.lastReportDate
 										? new Date(draftData.lastReportDate).toLocaleDateString(
 												"ar-SA",
 											)
-										: "لا يوجد"}
+										: "-"}
 								</p>
 							</div>
 						)}
@@ -220,64 +219,64 @@ export function ProjectUpdates({
 					<>
 						<div className="mb-6 flex items-center justify-between">
 							<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-								تحرير التحديث
+								{t("projects.updates.editUpdate")}
 							</h2>
 							<Button
 								variant="ghost"
 								size="sm"
 								onClick={() => setIsEditing(false)}
 							>
-								إلغاء
+								{t("common.cancel")}
 							</Button>
 						</div>
 
 						<div className="space-y-4">
 							<div>
 								<label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-									العنوان
+									{t("projects.updates.headline")}
 								</label>
 								<input
 									type="text"
 									value={headline}
 									onChange={(e) => setHeadline(e.target.value)}
 									className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-900 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-									placeholder="عنوان التحديث..."
+									placeholder={t("projects.updates.headlinePlaceholder")}
 								/>
 							</div>
 
 							<div>
 								<label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-									ما تم إنجازه
+									{t("projects.updates.workDone")}
 								</label>
 								<Textarea
 									value={workDoneSummary}
 									onChange={(e) => setWorkDoneSummary(e.target.value)}
 									className="min-h-[100px]"
-									placeholder="وصف الأعمال المنجزة..."
+									placeholder={t("projects.updates.workDonePlaceholder")}
 								/>
 							</div>
 
 							<div>
 								<label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-									العوائق (اختياري)
+									{t("projects.updates.blockersOptional")}
 								</label>
 								<Textarea
 									value={blockers}
 									onChange={(e) => setBlockers(e.target.value)}
 									className="min-h-[80px]"
-									placeholder="أي عوائق أو مشاكل..."
+									placeholder={t("projects.updates.blockersPlaceholder")}
 								/>
 							</div>
 
 							<div>
 								<label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-									الخطوات القادمة
+									{t("projects.updates.nextSteps")}
 								</label>
 								<Textarea
 									value={nextSteps}
 									onChange={(e) => setNextSteps(e.target.value)}
 									className="min-h-[80px]"
-									placeholder="الخطوات المقبلة..."
+									placeholder={t("projects.updates.nextStepsPlaceholder")}
 								/>
 							</div>
 
@@ -286,7 +285,7 @@ export function ProjectUpdates({
 								<div className="flex items-center gap-4">
 									<div className="flex-1">
 										<span className="text-sm text-slate-500">
-											نسبة الإنجاز:
+											{t("projects.updates.progressLabel")}:
 										</span>
 										<div className="mt-1 flex items-center gap-3">
 											<Progress
@@ -306,7 +305,7 @@ export function ProjectUpdates({
 									variant="outline"
 									onClick={() => setIsEditing(false)}
 								>
-									إلغاء
+									{t("common.cancel")}
 								</Button>
 								<Button
 									onClick={handlePublish}
@@ -314,7 +313,7 @@ export function ProjectUpdates({
 									className="gap-2"
 								>
 									<Send className="h-4 w-4" />
-									{publishMutation.isPending ? "جاري النشر..." : "نشر للمالك"}
+									{publishMutation.isPending ? t("projects.updates.publishing") : t("projects.updates.publishToOwner")}
 								</Button>
 							</div>
 						</div>
@@ -328,12 +327,10 @@ export function ProjectUpdates({
 					<Megaphone className="mt-0.5 h-5 w-5 text-sky-600 dark:text-sky-400" />
 					<div>
 						<p className="font-medium text-sky-800 dark:text-sky-200">
-							ما هو التحديث الرسمي؟
+							{t("projects.updates.whatIsUpdate")}
 						</p>
 						<p className="text-sm text-sky-700 dark:text-sky-300">
-							التحديث الرسمي هو رسالة مُهيكلة تُرسل لمالك المشروع عبر بوابته
-							الخاصة. تتضمن نسبة الإنجاز، الأعمال المنجزة، الدفعات القادمة،
-							وأي ملاحظات مهمة.
+							{t("projects.updates.updateExplanation")}
 						</p>
 					</div>
 				</div>

@@ -34,6 +34,8 @@ import {
 	Building2,
 	UserPlus,
 	BookOpen,
+	ClipboardCheck,
+	Megaphone,
 } from "lucide-react";
 
 export interface SidebarMenuChild {
@@ -181,6 +183,18 @@ export function useSidebarMenu(): {
 												label: t("projects.shell.sections.owner"),
 												href: `${projectBase}/owner`,
 												icon: Key,
+											},
+											{
+												id: "project-handover",
+												label: t("projects.shell.sections.handover"),
+												href: `${projectBase}/handover`,
+												icon: ClipboardCheck,
+											},
+											{
+												id: "project-updates",
+												label: t("projects.shell.sections.updates"),
+												href: `${projectBase}/updates`,
+												icon: Megaphone,
 											},
 											{
 												id: "project-insights",

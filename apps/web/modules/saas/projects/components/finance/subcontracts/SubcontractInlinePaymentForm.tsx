@@ -40,6 +40,7 @@ export interface SubcontractInlinePaymentFormProps {
 	termsProgress: TermsProgressData | null | undefined;
 	accounts: BankAccount[];
 	remaining: number;
+	approvedClaims?: Array<{ id: string; claimNo: number; netAmount: number; paidAmount: number }>;
 	onSubmit: (data: {
 		amount: number;
 		date: string;
@@ -48,6 +49,7 @@ export interface SubcontractInlinePaymentFormProps {
 		referenceNo: string;
 		description: string;
 		termId: string;
+		claimId?: string;
 	}) => void;
 	onCancel: () => void;
 	isSubmitting: boolean;
@@ -57,6 +59,7 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 	termsProgress,
 	accounts,
 	remaining,
+	approvedClaims,
 	onSubmit,
 	onCancel,
 	isSubmitting,
@@ -70,6 +73,7 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 	const [payReferenceNo, setPayReferenceNo] = useState("");
 	const [payDescription, setPayDescription] = useState("");
 	const [payTermId, setPayTermId] = useState("");
+	const [payClaimId, setPayClaimId] = useState("");
 
 	const selectedPayAccount = useMemo(
 		() => accounts.find((a) => a.id === paySourceAccountId),
@@ -84,6 +88,7 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 		setPayReferenceNo("");
 		setPayDescription("");
 		setPayTermId("");
+		setPayClaimId("");
 	}
 
 	function handleSubmit(e: React.FormEvent) {
@@ -96,6 +101,7 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 			referenceNo: payReferenceNo,
 			description: payDescription,
 			termId: payTermId,
+			claimId: payClaimId || undefined,
 		});
 		resetForm();
 	}
@@ -217,6 +223,42 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 												{tt.label || tt.type} - {t("subcontracts.payment.remaining")}: {formatCurrency(tt.remainingAmount)}
 											</SelectItem>
 										))}
+								</SelectContent>
+							</Select>
+						</div>
+					)}
+
+					{/* Link to Claim */}
+					{approvedClaims && approvedClaims.length > 0 && (
+						<div className="space-y-1.5">
+							<Label className="text-xs">{t("claims.linkToClaim")}</Label>
+							<Select
+								value={payClaimId || "_none"}
+								onValueChange={(v) => {
+									const actualValue = v === "_none" ? "" : v;
+									setPayClaimId(actualValue);
+									if (actualValue) {
+										const claim = approvedClaims.find((c) => c.id === actualValue);
+										if (claim) {
+											const claimRemaining = Math.max(0, claim.netAmount - claim.paidAmount);
+											setPayAmount(String(claimRemaining));
+										}
+									}
+								}}
+							>
+								<SelectTrigger className="rounded-lg text-xs">
+									<SelectValue placeholder={t("claims.selectClaim")} />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="_none">{t("claims.directPayment")}</SelectItem>
+									{approvedClaims.map((claim) => {
+										const claimRemaining = Math.max(0, claim.netAmount - claim.paidAmount);
+										return (
+											<SelectItem key={claim.id} value={claim.id}>
+												#{claim.claimNo} — {t("claims.claimRemaining", { amount: formatCurrency(claimRemaining) })}
+											</SelectItem>
+										);
+									})}
 								</SelectContent>
 							</Select>
 						</div>

@@ -24,6 +24,7 @@ import { createSubcontractItemProcedure } from "./procedures/create-item";
 import { updateSubcontractItemProcedure } from "./procedures/update-item";
 import { deleteSubcontractItemProcedure } from "./procedures/delete-item";
 import { copySubcontractItemsProcedure } from "./procedures/copy-items";
+import { getSubcontractClaimPrintDataProcedure, markSubcontractClaimAsPrintedProcedure } from "./procedures/get-claim-print-data";
 
 export const subcontractsRouter = {
 	list: listSubcontracts,
@@ -48,6 +49,8 @@ export const subcontractsRouter = {
 	updateClaimStatus: updateSubcontractClaimStatusProcedure,
 	addClaimPayment: addSubcontractClaimPaymentProcedure,
 	getClaimSummary: getSubcontractClaimSummaryProcedure,
+	getClaimPrintData: getSubcontractClaimPrintDataProcedure,
+	markClaimAsPrinted: markSubcontractClaimAsPrintedProcedure,
 	// Items
 	listItems: listSubcontractItemsProcedure,
 	createItem: createSubcontractItemProcedure,

@@ -36,8 +36,16 @@ interface Payment {
 	paymentMethod?: string | null;
 	referenceNo?: string | null;
 	description?: string | null;
+	claimId?: string | null;
 	term?: { label?: string | null; type?: string | null } | null;
 	sourceAccount?: { name?: string | null } | null;
+}
+
+interface ApprovedClaim {
+	id: string;
+	claimNo: number;
+	netAmount: number;
+	paidAmount: number;
 }
 
 interface TermProgress {
@@ -69,6 +77,8 @@ export interface SubcontractPaymentSectionProps {
 	payments: Payment[] | null | undefined;
 	termsProgress: TermsProgressData | null | undefined;
 	accounts: BankAccount[];
+	approvedClaims?: ApprovedClaim[];
+	claimsLookup?: Map<string, number>;
 	totalPaid: number;
 	remaining: number;
 	adjustedValue: number;
@@ -82,6 +92,7 @@ export interface SubcontractPaymentSectionProps {
 		referenceNo: string;
 		description: string;
 		termId: string;
+		claimId?: string;
 	}) => void;
 	isSubmittingPayment: boolean;
 }
@@ -90,6 +101,8 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 	payments,
 	termsProgress,
 	accounts,
+	approvedClaims,
+	claimsLookup,
 	totalPaid,
 	remaining,
 	progress,
@@ -103,6 +116,19 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 	const [paymentSortBy, setPaymentSortBy] = useState<"date" | "amount" | "term">("date");
 	const [paymentSortOrder, setPaymentSortOrder] = useState<"asc" | "desc">("desc");
 	const [showPaymentForm, setShowPaymentForm] = useState(false);
+
+	// Build a claimId → claimNo lookup for badge display
+	// Uses claimsLookup (all claims) if provided, otherwise falls back to approvedClaims
+	const claimMap = useMemo(() => {
+		if (claimsLookup) return claimsLookup;
+		const map = new Map<string, number>();
+		if (approvedClaims) {
+			for (const c of approvedClaims) {
+				map.set(c.id, c.claimNo);
+			}
+		}
+		return map;
+	}, [claimsLookup, approvedClaims]);
 
 	// Filter & sort payments
 	const filteredPayments = useMemo(() => {
@@ -222,6 +248,7 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 									<TableHead className="text-start">{t("subcontracts.payment.amount")}</TableHead>
 									<TableHead className="text-start">{t("subcontracts.payment.paymentMethod")}</TableHead>
 									<TableHead className="text-start">{t("subcontracts.payment.selectTerm")}</TableHead>
+									<TableHead className="text-start">{t("claims.linkToClaim")}</TableHead>
 									<TableHead className="text-start">{t("subcontracts.payment.sourceAccount")}</TableHead>
 									<TableHead className="text-start">{t("subcontracts.payment.referenceNo")}</TableHead>
 								</TableRow>
@@ -247,6 +274,15 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 											{payment.term ? (
 												<Badge variant="outline" className="rounded-lg text-[10px]">
 													{payment.term.label || t(`subcontracts.termTypes.${payment.term.type}`)}
+												</Badge>
+											) : (
+												<span className="text-xs text-slate-400">-</span>
+											)}
+										</TableCell>
+										<TableCell>
+											{payment.claimId && claimMap.has(payment.claimId) ? (
+												<Badge variant="secondary" className="rounded-lg text-[10px]">
+													{t("claims.linkedToClaim", { claimNo: String(claimMap.get(payment.claimId) ?? 0) })}
 												</Badge>
 											) : (
 												<span className="text-xs text-slate-400">-</span>
@@ -303,6 +339,7 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 						termsProgress={termsProgress}
 						accounts={accounts}
 						remaining={remaining}
+						approvedClaims={approvedClaims}
 						onSubmit={onSubmitPayment}
 						onCancel={() => setShowPaymentForm(false)}
 						isSubmitting={isSubmittingPayment}

@@ -23,6 +23,9 @@ export const createSubcontractClaimProcedure = subscriptionProcedure
 				.enum(["INTERIM", "FINAL", "RETENTION"])
 				.default("INTERIM"),
 			notes: z.string().nullish(),
+			penaltyAmount: z.union([z.string(), z.number()]).optional().default(0),
+			otherDeductions: z.union([z.string(), z.number()]).optional().default(0),
+			otherDeductionsNote: z.string().nullish(),
 			items: z.array(
 				z.object({
 					contractItemId: z.string(),
@@ -61,6 +64,9 @@ export const createSubcontractClaimProcedure = subscriptionProcedure
 				periodEnd: input.periodEnd,
 				claimType: input.claimType,
 				notes: input.notes,
+				penaltyAmount: Number(input.penaltyAmount),
+				otherDeductions: Number(input.otherDeductions),
+				otherDeductionsNote: input.otherDeductionsNote,
 				items: input.items,
 			});
 
@@ -100,6 +106,11 @@ export const createSubcontractClaimProcedure = subscriptionProcedure
 				if (error.message.startsWith("QTY_EXCEEDS_REMAINING:")) {
 					throw new ORPCError("BAD_REQUEST", {
 						message: "الكمية المدخلة تتجاوز المتبقي من كمية العقد",
+					});
+				}
+				if (error.message === "NET_AMOUNT_NEGATIVE") {
+					throw new ORPCError("BAD_REQUEST", {
+						message: "صافي المستحق لا يمكن أن يكون سالباً",
 					});
 				}
 			}

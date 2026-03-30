@@ -84,6 +84,11 @@ export function SubcontractClaimForm({
 	const [itemQtys, setItemQtys] = useState<Record<string, number>>({});
 	const [itemErrors, setItemErrors] = useState<Record<string, string>>({});
 
+	// Penalty / deductions
+	const [penaltyAmount, setPenaltyAmount] = useState(0);
+	const [otherDeductions, setOtherDeductions] = useState(0);
+	const [otherDeductionsNote, setOtherDeductionsNote] = useState("");
+
 	// Fetch contract details
 	const { data: contract } = useQuery(
 		orpc.subcontracts.get.queryOptions({
@@ -127,9 +132,11 @@ export function SubcontractClaimForm({
 
 		const retentionDeduction = grossAmount * (retentionPercent / 100);
 		const advanceDeduction = grossAmount * (advancePercent / 100);
-		const taxableAmount = grossAmount - retentionDeduction - advanceDeduction;
+		const penaltyDed = penaltyAmount;
+		const otherDed = otherDeductions;
+		const taxableAmount = grossAmount - retentionDeduction - advanceDeduction - penaltyDed - otherDed;
 		const vatAmount = taxableAmount > 0 ? taxableAmount * (vatPercent / 100) : 0;
-		const netAmount = grossAmount - retentionDeduction - advanceDeduction + vatAmount;
+		const netAmount = grossAmount - retentionDeduction - advanceDeduction - penaltyDed - otherDed + vatAmount;
 
 		return {
 			grossAmount,
@@ -137,11 +144,13 @@ export function SubcontractClaimForm({
 			retentionDeduction,
 			advancePercent,
 			advanceDeduction,
+			penaltyDed,
+			otherDed,
 			vatPercent,
 			vatAmount,
 			netAmount,
 		};
-	}, [items, contract, itemQtys]);
+	}, [items, contract, itemQtys, penaltyAmount, otherDeductions]);
 
 	function handleQtyChange(itemId: string, contractQty: number, prevCumQty: number, value: string) {
 		const qty = Number.parseFloat(value) || 0;
@@ -204,6 +213,9 @@ export function SubcontractClaimForm({
 			periodEnd: new Date(periodEnd),
 			claimType,
 			notes: notes || undefined,
+			penaltyAmount,
+			otherDeductions,
+			otherDeductionsNote: otherDeductionsNote || undefined,
 			items: claimItems,
 		});
 	}
@@ -498,6 +510,18 @@ export function SubcontractClaimForm({
 											</span>
 										</div>
 									)}
+									{financialSummary.penaltyDed > 0 && (
+										<div className="flex justify-between text-sm">
+											<span>(-) {t("penaltyAmount")}:</span>
+											<span className="font-medium text-red-600">{formatCurrency(financialSummary.penaltyDed)}</span>
+										</div>
+									)}
+									{financialSummary.otherDed > 0 && (
+										<div className="flex justify-between text-sm">
+											<span>(-) {t("otherDeductions")}:</span>
+											<span className="font-medium text-red-600">{formatCurrency(financialSummary.otherDed)}</span>
+										</div>
+									)}
 									<div className="flex justify-between text-muted-foreground">
 										<span>
 											(+) {t("vatAmount")} ({financialSummary.vatPercent}%):
@@ -516,6 +540,52 @@ export function SubcontractClaimForm({
 							</CardContent>
 						</Card>
 					)}
+
+					{/* Additional Deductions (collapsible) */}
+					<details className="rounded-lg border p-3">
+						<summary className="cursor-pointer text-sm font-medium text-slate-700 dark:text-slate-300">
+							{t("additionalDeductions")} ▾
+						</summary>
+						<div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+							<div className="space-y-1.5">
+								<Label className="text-xs">{t("penaltyAmount")}</Label>
+								<Input
+									type="number"
+									step="0.01"
+									min="0"
+									value={penaltyAmount || ""}
+									onChange={(e) => setPenaltyAmount(Number.parseFloat(e.target.value) || 0)}
+									placeholder="0.00"
+									className="rounded-lg"
+									dir="ltr"
+								/>
+							</div>
+							<div className="space-y-1.5">
+								<Label className="text-xs">{t("otherDeductions")}</Label>
+								<Input
+									type="number"
+									step="0.01"
+									min="0"
+									value={otherDeductions || ""}
+									onChange={(e) => setOtherDeductions(Number.parseFloat(e.target.value) || 0)}
+									placeholder="0.00"
+									className="rounded-lg"
+									dir="ltr"
+								/>
+							</div>
+							{otherDeductions > 0 && (
+								<div className="space-y-1.5 sm:col-span-2">
+									<Label className="text-xs">{t("otherDeductionsNote")}</Label>
+									<Input
+										value={otherDeductionsNote}
+										onChange={(e) => setOtherDeductionsNote(e.target.value)}
+										placeholder={t("notesPlaceholder")}
+										className="rounded-lg"
+									/>
+								</div>
+							)}
+						</div>
+					</details>
 
 					{/* Action buttons */}
 					<div className="flex items-center justify-between">

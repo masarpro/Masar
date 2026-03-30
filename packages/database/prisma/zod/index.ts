@@ -247,7 +247,7 @@ export type SubcontractItemScalarFieldEnum = z.infer<typeof SubcontractItemScala
 
 // File: SubcontractClaimScalarFieldEnum.schema.ts
 
-export const SubcontractClaimScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'contractId', 'claimNo', 'title', 'claimType', 'status', 'periodStart', 'periodEnd', 'grossAmount', 'retentionAmount', 'advanceDeduction', 'vatAmount', 'netAmount', 'paidAmount', 'notes', 'rejectionReason', 'submittedAt', 'approvedAt', 'approvedById', 'createdById', 'createdAt', 'updatedAt'])
+export const SubcontractClaimScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'contractId', 'claimNo', 'title', 'claimType', 'status', 'periodStart', 'periodEnd', 'grossAmount', 'retentionAmount', 'advanceDeduction', 'vatAmount', 'netAmount', 'paidAmount', 'penaltyAmount', 'otherDeductions', 'otherDeductionsNote', 'notes', 'rejectionReason', 'printedAt', 'submittedAt', 'approvedAt', 'approvedById', 'createdById', 'createdAt', 'updatedAt'])
 
 export type SubcontractClaimScalarFieldEnum = z.infer<typeof SubcontractClaimScalarFieldEnumSchema>;
 
@@ -2480,8 +2480,16 @@ export const SubcontractClaimSchema = z.object({
   paidAmount: z.instanceof(Prisma.Decimal, {
   message: "Field 'paidAmount' must be a Decimal. Location: ['Models', 'SubcontractClaim']",
 }),
+  penaltyAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'penaltyAmount' must be a Decimal. Location: ['Models', 'SubcontractClaim']",
+}),
+  otherDeductions: z.instanceof(Prisma.Decimal, {
+  message: "Field 'otherDeductions' must be a Decimal. Location: ['Models', 'SubcontractClaim']",
+}),
+  otherDeductionsNote: z.string().nullish(),
   notes: z.string().nullish(),
   rejectionReason: z.string().nullish(),
+  printedAt: z.date().nullish(),
   submittedAt: z.date().nullish(),
   approvedAt: z.date().nullish(),
   approvedById: z.string().nullish(),

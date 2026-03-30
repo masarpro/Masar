@@ -179,6 +179,30 @@ export function NotificationPreferencesForm({
 				</div>
 			)}
 
+			{/* Email Digest Toggle */}
+			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-6">
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-3">
+						<Mail className="h-5 w-5 text-slate-500" />
+						<div>
+							<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+								{t("settings.notifications.emailDigest")}
+							</p>
+							<p className="text-xs text-slate-500 dark:text-slate-400">
+								{t("settings.notifications.emailDigestDescription")}
+							</p>
+						</div>
+					</div>
+					<Switch
+						checked={prefs.emailDigest ?? false}
+						onCheckedChange={() => {
+							updateMutation.mutate({ emailDigest: !prefs.emailDigest });
+						}}
+						disabled={updateMutation.isPending || isMuted}
+					/>
+				</div>
+			</div>
+
 			{/* Preferences Table */}
 			<div
 				className={`backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden ${isMuted ? "opacity-50 pointer-events-none" : ""}`}

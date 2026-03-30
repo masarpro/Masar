@@ -776,6 +776,7 @@
     "export": "Export CSV",
     "enable": "Enable",
     "disable": "Disable",
+    "sar": "SAR",
     "days": "days",
     "clear": "Clear",
     "previous": "Previous",
@@ -3432,19 +3433,6 @@
       "confirmPost": "Post this entry? This cannot be undone.",
       "confirmReverse": "Reverse this entry? A reversal entry will be created.",
       "confirmDelete": "Delete this entry permanently?",
-      "trialBalance": "Trial Balance",
-      "balanceSheet": "Balance Sheet",
-      "totalDebit": "Total Debit",
-      "totalCredit": "Total Credit",
-      "totalAssets": "Total Assets",
-      "totalLiabilities": "Total Liabilities",
-      "totalEquity": "Total Equity",
-      "currentAssets": "Current Assets",
-      "fixedAssets": "Fixed Assets",
-      "currentLiabilities": "Current Liabilities",
-      "currentYearPL": "Current Year P&L",
-      "isBalanced": "Balanced",
-      "notBalanced": "Not Balanced",
       "trialBalance": {
         "title": "Trial Balance",
         "asOfDate": "As of Date",
@@ -3460,6 +3448,33 @@
         "noEntries": "No posted entries yet",
         "accountCount": "Account count"
       },
+      "balanceSheet": {
+        "title": "Balance Sheet",
+        "assets": "Assets",
+        "liabilities": "Liabilities",
+        "equity": "Equity",
+        "currentAssets": "Current Assets",
+        "fixedAssets": "Fixed Assets",
+        "currentLiabilities": "Current Liabilities",
+        "totalAssets": "Total Assets",
+        "totalLiabilities": "Total Liabilities",
+        "totalEquity": "Total Equity",
+        "currentYearPL": "Current Year P&L",
+        "liabilitiesAndEquity": "Liabilities & Equity",
+        "balanced": "Assets = Liabilities + Equity",
+        "notBalanced": "Balance sheet is not balanced"
+      },
+      "totalDebit": "Total Debit",
+      "totalCredit": "Total Credit",
+      "totalAssets": "Total Assets",
+      "totalLiabilities": "Total Liabilities",
+      "totalEquity": "Total Equity",
+      "currentAssets": "Current Assets",
+      "fixedAssets": "Fixed Assets",
+      "currentLiabilities": "Current Liabilities",
+      "currentYearPL": "Current Year P&L",
+      "isBalanced": "Balanced",
+      "notBalanced": "Not Balanced",
       "incomeStatement": {
         "title": "Income Statement",
         "revenue": "Revenue",
@@ -3482,22 +3497,6 @@
       },
       "aging": {
         "total": "Total"
-      },
-      "balanceSheet": {
-        "title": "Balance Sheet",
-        "assets": "Assets",
-        "liabilities": "Liabilities",
-        "equity": "Equity",
-        "currentAssets": "Current Assets",
-        "fixedAssets": "Fixed Assets",
-        "currentLiabilities": "Current Liabilities",
-        "totalAssets": "Total Assets",
-        "totalLiabilities": "Total Liabilities",
-        "totalEquity": "Total Equity",
-        "currentYearPL": "Current Year P&L",
-        "liabilitiesAndEquity": "Liabilities & Equity",
-        "balanced": "Assets = Liabilities + Equity",
-        "notBalanced": "Balance sheet is not balanced"
       },
       "periods": {
         "title": "Accounting Periods",
@@ -8115,7 +8114,16 @@
       "info": "Information",
       "acknowledge": "Acknowledged",
       "acknowledged": "Acknowledged alerts",
-      "activeAlerts": "Active Alerts"
+      "activeAlerts": "Active Alerts",
+      "toastAcknowledged": "Alert acknowledged",
+      "toastError": "An error occurred",
+      "alertTypes": {
+        "MISSING_DAILY_REPORT": "Missing Daily Report",
+        "STALE_PROGRESS": "Stale Progress",
+        "OVERDUE_PAYMENT": "Overdue Payment",
+        "COST_OVERRUN_RISK": "Cost Overrun Risk",
+        "TOO_MANY_OPEN_ISSUES": "Too Many Open Issues"
+      }
     },
     "updates": {
       "title": "Official Updates",
@@ -8134,7 +8142,19 @@
       "attachedPhotos": "Attached Photos",
       "lastReport": "Last Report",
       "whatIsUpdate": "What is an official update?",
-      "updateExplanation": "An official update is a structured message sent to the project owner via their portal. It includes progress percentage, completed work, upcoming payments, and important notes."
+      "updateExplanation": "An official update is a structured message sent to the project owner via their portal. It includes progress percentage, completed work, upcoming payments, and important notes.",
+      "createAutoUpdate": "Create Auto Update",
+      "publishing": "Publishing...",
+      "toastPublished": "Update published successfully",
+      "toastError": "Error publishing update",
+      "headlinePlaceholder": "Update headline...",
+      "workDonePlaceholder": "Describe completed work...",
+      "blockersPlaceholder": "Any blockers or issues...",
+      "nextStepsPlaceholder": "Upcoming steps...",
+      "progressLabel": "Completion",
+      "headlineRequired": "Headline is required",
+      "claimNo": "Claim #{no}",
+      "blockersOptional": "Blockers (optional)"
     },
     "templates": {
       "title": "Project Templates",
@@ -8954,6 +8974,8 @@
       "mutedWarning": "All notifications are currently muted. You will not receive any notifications.",
       "resetDefaults": "Reset to Defaults",
       "updateSuccess": "Notification preferences updated",
+      "emailDigest": "Email Digest",
+      "emailDigestDescription": "Receive a weekly email summary of activity",
       "types": {
         "approvalRequested": {
           "title": "Approval Requests",
@@ -9004,6 +9026,19 @@
           "description": "When you are added or removed from a project team"
         }
       }
+    },
+    "digests": {
+      "title": "Email Digests",
+      "description": "Receive weekly project summaries via email",
+      "weeklyDigest": "Weekly Digest",
+      "allProjects": "All Projects",
+      "noSubscriptions": "No digest subscriptions",
+      "noSubscriptionsDescription": "Subscribe to receive weekly summaries for your projects",
+      "subscribed": "Subscribed",
+      "unsubscribed": "Unsubscribed",
+      "toastSubscribed": "Subscribed to digest",
+      "toastUnsubscribed": "Unsubscribed from digest",
+      "toastError": "Error updating subscription"
     }
   },
   "share": {
@@ -9696,5 +9731,130 @@
       "url": "url",
       "uuid": "uuid"
     }
+  },
+  "claims": {
+    "title": "Claims",
+    "subcontractClaims": "Claims",
+    "new": "New Claim",
+    "newClaim": "Create New Claim",
+    "claimTitle": "Claim Title",
+    "claimType": "Claim Type",
+    "interim": "Interim",
+    "final": "Final",
+    "retentionRelease": "Retention Release",
+    "periodFrom": "Period From",
+    "periodTo": "Period To",
+    "period": "Period",
+    "notes": "Notes",
+    "notesPlaceholder": "Add optional notes...",
+    "empty": "No claims yet",
+    "grossAmount": "Gross Amount",
+    "retentionDeduction": "Retention Deduction",
+    "advanceDeduction": "Advance Deduction",
+    "penaltyAmount": "Penalties",
+    "otherDeductions": "Other Deductions",
+    "otherDeductionsNote": "Deductions Description",
+    "vatAmount": "VAT",
+    "netAmount": "Net Payable",
+    "paidAmount": "Paid Amount",
+    "outstandingAmount": "Outstanding",
+    "amountInWords": "Amount in Words",
+    "totalClaimed": "Total Claimed",
+    "totalPaid": "Total Paid",
+    "totalOutstanding": "Outstanding",
+    "totalDeductions": "Total Deductions",
+    "additionalDeductions": "Additional Deductions",
+    "financialSummary": "Financial Summary",
+    "contractValue": "Contract Value",
+    "changeOrdersValue": "Change Orders Value",
+    "totalContractValue": "Total",
+    "previousWorks": "Previous Works Value",
+    "currentWorks": "Current Works Value",
+    "cumulativeWorks": "Cumulative Works Value",
+    "completionPercent": "Completion %",
+    "claimNumber": "Claim #{current} of {total}",
+    "types": {
+      "INTERIM": "Interim",
+      "FINAL": "Final",
+      "RETENTION": "Retention Release"
+    },
+    "statuses": {
+      "DRAFT": "Draft",
+      "SUBMITTED": "Submitted",
+      "UNDER_REVIEW": "Under Review",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "PARTIALLY_PAID": "Partially Paid",
+      "PAID": "Fully Paid",
+      "CANCELLED": "Cancelled"
+    },
+    "actions": {
+      "submit": "Submit for Review",
+      "review": "Start Review",
+      "approve": "Approve Claim",
+      "reject": "Reject Claim",
+      "cancel": "Cancel",
+      "print": "Print Claim",
+      "createPayment": "Create Payment Voucher",
+      "addPayment": "Add Payment",
+      "delete": "Delete Claim",
+      "saveDraft": "Save as Draft",
+      "backToDraft": "Back to Draft",
+      "edit": "Edit"
+    },
+    "items": {
+      "title": "Claim Items",
+      "description": "Description",
+      "unit": "Unit",
+      "contractQty": "Contract Qty",
+      "unitPrice": "Unit Price",
+      "prevCumulative": "Previous Cumulative",
+      "thisQty": "This Claim Qty",
+      "cumulative": "Total Cumulative",
+      "remaining": "Remaining",
+      "completionPct": "Completion %",
+      "prevAmount": "Previous Amount",
+      "currentAmount": "Current Amount",
+      "cumulativeAmount": "Cumulative Amount"
+    },
+    "payment": {
+      "fullyPaid": "Fully Paid",
+      "paymentHistory": "Payment History",
+      "addPayment": "Add Payment",
+      "paymentAmount": "Payment Amount",
+      "date": "Date",
+      "method": "Payment Method",
+      "sourceAccount": "Source Account",
+      "note": "Notes",
+      "maxAllowed": "Maximum allowed: {amount}"
+    },
+    "validation": {
+      "noItemsAdded": "At least one item must have a quantity",
+      "qtyExceedsRemaining": "Quantity ({qty}) exceeds remaining ({remaining})",
+      "negativeNet": "Net payable cannot be negative"
+    },
+    "print": {
+      "title": "Subcontractor Claim",
+      "projectInfo": "Project Information",
+      "contractorInfo": "Contractor Information",
+      "financialStatement": "Financial Statement",
+      "itemsTable": "Quantities Table",
+      "deductions": "Deductions",
+      "signatures": "Signatures",
+      "retentionNote": "Released upon project completion",
+      "previousPayments": "Previously paid from prior claims",
+      "projectEngineer": "Project Engineer",
+      "technicalOffice": "Technical Office",
+      "projectApprover": "Project Approver",
+      "projectsManager": "Projects Manager",
+      "executiveDirector": "Executive Director",
+      "financialManager": "Financial Manager",
+      "generalManager": "General Manager"
+    },
+    "linkToClaim": "Link to Claim",
+    "directPayment": "Direct Payment (no claim)",
+    "linkedToClaim": "Linked to Claim #{claimNo}",
+    "selectClaim": "Select claim...",
+    "claimRemaining": "Remaining: {amount}"
   }
 }

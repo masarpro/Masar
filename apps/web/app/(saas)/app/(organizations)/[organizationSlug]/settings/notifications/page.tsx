@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { getTranslations } from "next-intl/server";
 import { NotificationPreferencesForm } from "@saas/settings/components/NotificationPreferencesForm";
+import { DigestSubscriptionsSection } from "@saas/settings/components/DigestSubscriptionsSection";
 
 export async function generateMetadata() {
 	const t = await getTranslations();
@@ -32,8 +33,13 @@ async function NotificationSettingsPageContent({
 	if (!organization) return null;
 
 	return (
-		<NotificationPreferencesForm
-			organizationId={organization.id}
-		/>
+		<div className="space-y-8">
+			<NotificationPreferencesForm
+				organizationId={organization.id}
+			/>
+			<DigestSubscriptionsSection
+				organizationId={organization.id}
+			/>
+		</div>
 	);
 }

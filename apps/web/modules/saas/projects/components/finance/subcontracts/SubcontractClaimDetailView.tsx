@@ -50,12 +50,16 @@ import {
 	Banknote,
 	Check,
 	CheckCircle,
+	FileText,
 	Loader2,
+	Printer,
 	RotateCcw,
 	Send,
 	Trash2,
 	X,
 } from "lucide-react";
+import Link from "next/link";
+import { numberToArabicWords } from "@repo/utils";
 import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 import { SubcontractTabs } from "./SubcontractTabs";
 
@@ -229,7 +233,139 @@ export function SubcontractClaimDetailView({
 	const outstanding = claim.outstanding ?? 0;
 
 	return (
-		<div className="space-y-6">
+		<>
+		{/* Print-only layout */}
+		<div className="hidden print:block print:space-y-4 p-8" dir="rtl">
+			{/* Header - Organization */}
+			<div className="text-center border-b-2 border-black pb-3 mb-4">
+				<h1 className="text-xl font-bold">{t("print.title")}</h1>
+				<p className="text-sm text-gray-600 mt-1">
+					{t("claimNumber", { current: claim.claimNo, total: "" })} — {t(`types.${claim.claimType}`)}
+				</p>
+			</div>
+
+			{/* Contract & Claim Info */}
+			<table className="w-full text-sm border border-black">
+				<tbody>
+					<tr>
+						<td className="border border-black p-2 font-semibold bg-gray-100 w-1/4">{t("print.contractorInfo")}</td>
+						<td className="border border-black p-2 w-1/4">{claim.contract?.companyName || claim.contract?.name}</td>
+						<td className="border border-black p-2 font-semibold bg-gray-100 w-1/4">{t("period")}</td>
+						<td className="border border-black p-2 w-1/4">{formatDate(claim.periodStart)} — {formatDate(claim.periodEnd)}</td>
+					</tr>
+				</tbody>
+			</table>
+
+			{/* Items Table */}
+			<table className="w-full text-xs border-collapse border border-black mt-4">
+				<thead>
+					<tr className="bg-gray-100">
+						<th className="border border-black p-1.5">#</th>
+						<th className="border border-black p-1.5">{t("items.description")}</th>
+						<th className="border border-black p-1.5">{t("items.unit")}</th>
+						<th className="border border-black p-1.5">{t("items.contractQty")}</th>
+						<th className="border border-black p-1.5">{t("items.unitPrice")}</th>
+						<th className="border border-black p-1.5">{t("items.prevCumulative")}</th>
+						<th className="border border-black p-1.5">{t("items.thisQty")}</th>
+						<th className="border border-black p-1.5">{t("items.cumulative")}</th>
+						<th className="border border-black p-1.5">{t("items.completionPct")}</th>
+						<th className="border border-black p-1.5">{t("items.currentAmount")}</th>
+					</tr>
+				</thead>
+				<tbody>
+					{claim.items?.map((item: any, idx: number) => (
+						<tr key={item.id}>
+							<td className="border border-black p-1 text-center">{idx + 1}</td>
+							<td className="border border-black p-1">{item.contractItem?.description}</td>
+							<td className="border border-black p-1 text-center">{item.contractItem?.unit}</td>
+							<td className="border border-black p-1 text-center">{formatNumber(item.contractQty)}</td>
+							<td className="border border-black p-1 text-center">{formatNumber(item.unitPrice)}</td>
+							<td className="border border-black p-1 text-center">{formatNumber(item.prevCumulativeQty)}</td>
+							<td className="border border-black p-1 text-center font-semibold">{formatNumber(item.thisQty)}</td>
+							<td className="border border-black p-1 text-center">{formatNumber(item.cumulativeQty)}</td>
+							<td className="border border-black p-1 text-center">{item.completionPercent?.toFixed(1)}%</td>
+							<td className="border border-black p-1 text-center">{formatCurrency(item.thisAmount)}</td>
+						</tr>
+					))}
+					<tr className="bg-gray-100 font-bold">
+						<td colSpan={9} className="border border-black p-1.5 text-start">{t("grossAmount")}</td>
+						<td className="border border-black p-1.5 text-center">{formatCurrency(claim.grossAmount)}</td>
+					</tr>
+				</tbody>
+			</table>
+
+			{/* Deductions */}
+			<table className="w-full text-sm border border-black mt-4">
+				<tbody>
+					<tr>
+						<td className="border border-black p-2">{t("retentionDeduction")}</td>
+						<td className="border border-black p-2 text-center w-40">{formatCurrency(claim.retentionAmount)}</td>
+					</tr>
+					{claim.advanceDeduction > 0 && (
+						<tr>
+							<td className="border border-black p-2">{t("advanceDeduction")}</td>
+							<td className="border border-black p-2 text-center">{formatCurrency(claim.advanceDeduction)}</td>
+						</tr>
+					)}
+					{(claim.penaltyAmount ?? 0) > 0 && (
+						<tr>
+							<td className="border border-black p-2">{t("penaltyAmount")}</td>
+							<td className="border border-black p-2 text-center">{formatCurrency(claim.penaltyAmount)}</td>
+						</tr>
+					)}
+					{(claim.otherDeductions ?? 0) > 0 && (
+						<tr>
+							<td className="border border-black p-2">{t("otherDeductions")}{claim.otherDeductionsNote ? ` (${claim.otherDeductionsNote})` : ""}</td>
+							<td className="border border-black p-2 text-center">{formatCurrency(claim.otherDeductions)}</td>
+						</tr>
+					)}
+					{claim.vatAmount > 0 && (
+						<tr>
+							<td className="border border-black p-2">{t("vatAmount")}</td>
+							<td className="border border-black p-2 text-center">{formatCurrency(claim.vatAmount)}</td>
+						</tr>
+					)}
+					<tr className="bg-gray-100 font-bold text-base">
+						<td className="border border-black p-2">{t("netAmount")}</td>
+						<td className="border border-black p-2 text-center">{formatCurrency(claim.netAmount)}</td>
+					</tr>
+				</tbody>
+			</table>
+
+			{/* Amount in Words */}
+			<div className="mt-2 text-sm">
+				<strong>{t("amountInWords")}:</strong> {numberToArabicWords(claim.netAmount)}
+			</div>
+
+			{/* Signatures */}
+			<div className="mt-12 grid grid-cols-4 gap-4 text-center text-xs">
+				{[
+					t("print.projectEngineer"),
+					t("print.technicalOffice"),
+					t("print.projectApprover"),
+					t("print.projectsManager"),
+				].map((role) => (
+					<div key={role} className="space-y-8">
+						<p className="font-semibold">{role}</p>
+						<div className="border-b border-black" />
+					</div>
+				))}
+			</div>
+			<div className="mt-8 grid grid-cols-3 gap-4 text-center text-xs">
+				{[
+					t("print.executiveDirector"),
+					t("print.financialManager"),
+					t("print.generalManager"),
+				].map((role) => (
+					<div key={role} className="space-y-8">
+						<p className="font-semibold">{role}</p>
+						<div className="border-b border-black" />
+					</div>
+				))}
+			</div>
+		</div>
+
+		<div className="space-y-6 print:hidden">
 			{/* Navigation Tabs */}
 			<SubcontractTabs
 				organizationId={organizationId}
@@ -322,9 +458,25 @@ export function SubcontractClaimDetailView({
 					</>
 				)}
 				{(claim.status === "APPROVED" || claim.status === "PARTIALLY_PAID") && (
-					<Button onClick={() => setPaymentSheetOpen(true)}>
-						<Banknote className="h-4 w-4 me-2" />
-						{t("payment.addPayment")}
+					<>
+						<Button onClick={() => setPaymentSheetOpen(true)}>
+							<Banknote className="h-4 w-4 me-2" />
+							{t("payment.addPayment")}
+						</Button>
+						<Link
+							href={`/app/${organizationSlug}/finance/payment-vouchers/new?payeeType=SUBCONTRACTOR&subcontractContractId=${claim.contract?.id ?? ""}&amount=${claim.netAmount - claim.paidAmount}&projectId=${projectId}`}
+						>
+							<Button variant="outline" size="sm">
+								<FileText className="me-1 h-4 w-4" />
+								{t("actions.createPayment")}
+							</Button>
+						</Link>
+					</>
+				)}
+				{(claim.status === "APPROVED" || claim.status === "PARTIALLY_PAID" || claim.status === "PAID") && (
+					<Button variant="outline" size="sm" onClick={() => window.print()}>
+						<Printer className="me-1 h-4 w-4" />
+						{t("actions.print")}
 					</Button>
 				)}
 				{claim.status === "REJECTED" && (
@@ -454,6 +606,22 @@ export function SubcontractClaimDetailView({
 							</span>
 						</div>
 					)}
+					{(claim.penaltyAmount ?? 0) > 0 && (
+						<div className="flex justify-between text-muted-foreground">
+							<span>(-) {t("penaltyAmount")}:</span>
+							<span className="tabular-nums" dir="ltr">
+								{formatCurrency(claim.penaltyAmount)}
+							</span>
+						</div>
+					)}
+					{(claim.otherDeductions ?? 0) > 0 && (
+						<div className="flex justify-between text-muted-foreground">
+							<span>(-) {t("otherDeductions")}{claim.otherDeductionsNote ? ` (${claim.otherDeductionsNote})` : ""}:</span>
+							<span className="tabular-nums" dir="ltr">
+								{formatCurrency(claim.otherDeductions)}
+							</span>
+						</div>
+					)}
 					<div className="flex justify-between text-muted-foreground">
 						<span>(+) {t("vatAmount")}:</span>
 						<span className="tabular-nums" dir="ltr">
@@ -466,6 +634,10 @@ export function SubcontractClaimDetailView({
 						<span className="tabular-nums" dir="ltr">
 							{formatCurrency(claim.netAmount)}
 						</span>
+					</div>
+					<div className="pt-2 text-sm text-slate-600 dark:text-slate-400">
+						<span className="font-medium">{t("amountInWords")}: </span>
+						{numberToArabicWords(claim.netAmount)}
 					</div>
 					<div className="flex justify-between">
 						<span>{t("paidAmount")}:</span>
@@ -678,5 +850,6 @@ export function SubcontractClaimDetailView({
 				</AlertDialogContent>
 			</AlertDialog>
 		</div>
+		</>
 	);
 }

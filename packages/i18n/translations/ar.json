@@ -778,6 +778,7 @@
     "export": "تصدير CSV",
     "enable": "تفعيل",
     "disable": "تعطيل",
+    "sar": "ر.س",
     "days": "يوم",
     "clear": "مسح",
     "previous": "السابق",
@@ -3454,19 +3455,6 @@
       "confirmPost": "هل تريد ترحيل هذا القيد؟ لا يمكن التراجع.",
       "confirmReverse": "هل تريد عكس هذا القيد؟ سيُنشأ قيد عكسي.",
       "confirmDelete": "هل تريد حذف هذا القيد نهائياً؟",
-      "trialBalance": "ميزان المراجعة",
-      "balanceSheet": "الميزانية العمومية",
-      "totalDebit": "إجمالي المدين",
-      "totalCredit": "إجمالي الدائن",
-      "totalAssets": "إجمالي الأصول",
-      "totalLiabilities": "إجمالي الخصوم",
-      "totalEquity": "إجمالي حقوق الملكية",
-      "currentAssets": "أصول متداولة",
-      "fixedAssets": "أصول ثابتة",
-      "currentLiabilities": "خصوم متداولة",
-      "currentYearPL": "أرباح/خسائر العام الحالي",
-      "isBalanced": "متوازن",
-      "notBalanced": "غير متوازن",
       "trialBalance": {
         "title": "ميزان المراجعة",
         "asOfDate": "كما في تاريخ",
@@ -3482,6 +3470,33 @@
         "noEntries": "لا توجد قيود مرحّلة بعد",
         "accountCount": "عدد الحسابات"
       },
+      "balanceSheet": {
+        "title": "الميزانية العمومية",
+        "assets": "الأصول",
+        "liabilities": "الخصوم",
+        "equity": "حقوق الملكية",
+        "currentAssets": "الأصول المتداولة",
+        "fixedAssets": "الأصول الثابتة",
+        "currentLiabilities": "الخصوم المتداولة",
+        "totalAssets": "إجمالي الأصول",
+        "totalLiabilities": "إجمالي الخصوم",
+        "totalEquity": "إجمالي حقوق الملكية",
+        "currentYearPL": "أرباح/خسائر العام الحالي",
+        "liabilitiesAndEquity": "الخصوم وحقوق الملكية",
+        "balanced": "الأصول = الخصوم + حقوق الملكية",
+        "notBalanced": "الميزانية غير متوازنة"
+      },
+      "totalDebit": "إجمالي المدين",
+      "totalCredit": "إجمالي الدائن",
+      "totalAssets": "إجمالي الأصول",
+      "totalLiabilities": "إجمالي الخصوم",
+      "totalEquity": "إجمالي حقوق الملكية",
+      "currentAssets": "أصول متداولة",
+      "fixedAssets": "أصول ثابتة",
+      "currentLiabilities": "خصوم متداولة",
+      "currentYearPL": "أرباح/خسائر العام الحالي",
+      "isBalanced": "متوازن",
+      "notBalanced": "غير متوازن",
       "incomeStatement": {
         "title": "قائمة الدخل",
         "revenue": "الإيرادات",
@@ -3504,22 +3519,6 @@
       },
       "aging": {
         "total": "الإجمالي"
-      },
-      "balanceSheet": {
-        "title": "الميزانية العمومية",
-        "assets": "الأصول",
-        "liabilities": "الخصوم",
-        "equity": "حقوق الملكية",
-        "currentAssets": "الأصول المتداولة",
-        "fixedAssets": "الأصول الثابتة",
-        "currentLiabilities": "الخصوم المتداولة",
-        "totalAssets": "إجمالي الأصول",
-        "totalLiabilities": "إجمالي الخصوم",
-        "totalEquity": "إجمالي حقوق الملكية",
-        "currentYearPL": "أرباح/خسائر العام الحالي",
-        "liabilitiesAndEquity": "الخصوم وحقوق الملكية",
-        "balanced": "الأصول = الخصوم + حقوق الملكية",
-        "notBalanced": "الميزانية غير متوازنة"
       },
       "periods": {
         "title": "الفترات المحاسبية",
@@ -8115,7 +8114,16 @@
       "info": "معلومات",
       "acknowledge": "تم الاطلاع",
       "acknowledged": "تنبيهات تم الاطلاع عليها",
-      "activeAlerts": "التنبيهات النشطة"
+      "activeAlerts": "التنبيهات النشطة",
+      "toastAcknowledged": "تم الاطلاع على التنبيه",
+      "toastError": "حدث خطأ",
+      "alertTypes": {
+        "MISSING_DAILY_REPORT": "تقرير يومي مفقود",
+        "STALE_PROGRESS": "تقدم قديم",
+        "OVERDUE_PAYMENT": "دفعة متأخرة",
+        "COST_OVERRUN_RISK": "خطر تجاوز التكلفة",
+        "TOO_MANY_OPEN_ISSUES": "مشاكل مفتوحة كثيرة"
+      }
     },
     "updates": {
       "title": "التحديثات الرسمية",
@@ -8134,7 +8142,19 @@
       "attachedPhotos": "صور مرفقة",
       "lastReport": "آخر تقرير",
       "whatIsUpdate": "ما هو التحديث الرسمي؟",
-      "updateExplanation": "التحديث الرسمي هو رسالة مُهيكلة تُرسل لمالك المشروع عبر بوابته الخاصة. تتضمن نسبة الإنجاز، الأعمال المنجزة، الدفعات القادمة، وأي ملاحظات مهمة."
+      "updateExplanation": "التحديث الرسمي هو رسالة مُهيكلة تُرسل لمالك المشروع عبر بوابته الخاصة. تتضمن نسبة الإنجاز، الأعمال المنجزة، الدفعات القادمة، وأي ملاحظات مهمة.",
+      "createAutoUpdate": "إنشاء تحديث تلقائي",
+      "publishing": "جاري النشر...",
+      "toastPublished": "تم نشر التحديث الرسمي بنجاح",
+      "toastError": "حدث خطأ أثناء نشر التحديث",
+      "headlinePlaceholder": "عنوان التحديث...",
+      "workDonePlaceholder": "وصف الأعمال المنجزة...",
+      "blockersPlaceholder": "أي عوائق أو مشاكل...",
+      "nextStepsPlaceholder": "الخطوات المقبلة...",
+      "progressLabel": "نسبة الإنجاز",
+      "headlineRequired": "العنوان مطلوب",
+      "claimNo": "المستخلص رقم {no}",
+      "blockersOptional": "العوائق (اختياري)"
     },
     "templates": {
       "title": "قوالب المشاريع",
@@ -8954,6 +8974,8 @@
       "mutedWarning": "جميع الإشعارات مكتومة حالياً. لن تتلقى أي إشعارات.",
       "resetDefaults": "إعادة للافتراضي",
       "updateSuccess": "تم تحديث تفضيلات الإشعارات",
+      "emailDigest": "ملخص بريدي",
+      "emailDigestDescription": "استقبل ملخصاً أسبوعياً بالبريد الإلكتروني",
       "types": {
         "approvalRequested": {
           "title": "طلبات الاعتماد",
@@ -9004,6 +9026,19 @@
           "description": "عند إضافتك أو إزالتك من فريق مشروع"
         }
       }
+    },
+    "digests": {
+      "title": "الملخصات البريدية",
+      "description": "استقبل ملخصات أسبوعية عن مشاريعك عبر البريد الإلكتروني",
+      "weeklyDigest": "ملخص أسبوعي",
+      "allProjects": "جميع المشاريع",
+      "noSubscriptions": "لا توجد اشتراكات",
+      "noSubscriptionsDescription": "اشترك لاستقبال ملخصات أسبوعية عن مشاريعك",
+      "subscribed": "مشترك",
+      "unsubscribed": "غير مشترك",
+      "toastSubscribed": "تم الاشتراك في الملخص",
+      "toastUnsubscribed": "تم إلغاء الاشتراك من الملخص",
+      "toastError": "حدث خطأ في تحديث الاشتراك"
     }
   },
   "share": {
@@ -9696,5 +9731,130 @@
       "url": "رابط",
       "uuid": "معرف فريد عالمي"
     }
+  },
+  "claims": {
+    "title": "المستخلصات",
+    "subcontractClaims": "المستخلصات",
+    "new": "مستخلص جديد",
+    "newClaim": "إنشاء مستخلص جديد",
+    "claimTitle": "عنوان المستخلص",
+    "claimType": "نوع المستخلص",
+    "interim": "جاري",
+    "final": "ختامي",
+    "retentionRelease": "استرداد محتجزات",
+    "periodFrom": "من تاريخ",
+    "periodTo": "إلى تاريخ",
+    "period": "الفترة",
+    "notes": "ملاحظات",
+    "notesPlaceholder": "أضف ملاحظات اختيارية...",
+    "empty": "لا توجد مستخلصات بعد",
+    "grossAmount": "إجمالي البنود",
+    "retentionDeduction": "حسم الاحتفاظ",
+    "advanceDeduction": "خصم الدفعة المقدمة",
+    "penaltyAmount": "الغرامات",
+    "otherDeductions": "حسميات أخرى",
+    "otherDeductionsNote": "وصف الحسميات",
+    "vatAmount": "ضريبة القيمة المضافة",
+    "netAmount": "صافي المستحق",
+    "paidAmount": "المبلغ المدفوع",
+    "outstandingAmount": "المبلغ المتبقي",
+    "amountInWords": "المبلغ بالحروف",
+    "totalClaimed": "إجمالي المطالبات",
+    "totalPaid": "إجمالي المدفوع",
+    "totalOutstanding": "المتبقي",
+    "totalDeductions": "إجمالي الحسميات",
+    "additionalDeductions": "حسميات إضافية",
+    "financialSummary": "الملخص المالي",
+    "contractValue": "قيمة العقد",
+    "changeOrdersValue": "قيمة الأوامر التغييرية",
+    "totalContractValue": "الإجمالي",
+    "previousWorks": "قيمة الأعمال المنفذة السابقة",
+    "currentWorks": "قيمة الأعمال الحالية",
+    "cumulativeWorks": "قيمة الأعمال المنفذة حتى تاريخه",
+    "completionPercent": "نسبة الإنجاز",
+    "claimNumber": "المستخلص رقم {current} من {total}",
+    "types": {
+      "INTERIM": "جاري",
+      "FINAL": "ختامي",
+      "RETENTION": "استرداد محتجزات"
+    },
+    "statuses": {
+      "DRAFT": "مسودة",
+      "SUBMITTED": "مقدّم",
+      "UNDER_REVIEW": "قيد المراجعة",
+      "APPROVED": "معتمد",
+      "REJECTED": "مرفوض",
+      "PARTIALLY_PAID": "مدفوع جزئياً",
+      "PAID": "مدفوع بالكامل",
+      "CANCELLED": "ملغي"
+    },
+    "actions": {
+      "submit": "تقديم للمراجعة",
+      "review": "بدء المراجعة",
+      "approve": "اعتماد المستخلص",
+      "reject": "رفض المستخلص",
+      "cancel": "إلغاء",
+      "print": "طباعة المستخلص",
+      "createPayment": "إنشاء سند صرف",
+      "addPayment": "تسجيل دفعة",
+      "delete": "حذف المستخلص",
+      "saveDraft": "حفظ كمسودة",
+      "backToDraft": "إعادة للمسودة",
+      "edit": "تعديل"
+    },
+    "items": {
+      "title": "بنود المستخلص",
+      "description": "الوصف",
+      "unit": "الوحدة",
+      "contractQty": "كمية العقد",
+      "unitPrice": "سعر الوحدة",
+      "prevCumulative": "تراكمي سابق",
+      "thisQty": "كمية هذا المستخلص",
+      "cumulative": "تراكمي كلي",
+      "remaining": "المتبقي",
+      "completionPct": "نسبة الإنجاز %",
+      "prevAmount": "قيمة سابقة",
+      "currentAmount": "قيمة حالية",
+      "cumulativeAmount": "قيمة تراكمية"
+    },
+    "payment": {
+      "fullyPaid": "مدفوع بالكامل",
+      "paymentHistory": "سجل الدفعات",
+      "addPayment": "تسجيل دفعة",
+      "paymentAmount": "مبلغ الدفعة",
+      "date": "التاريخ",
+      "method": "طريقة الدفع",
+      "sourceAccount": "حساب الصرف",
+      "note": "ملاحظات",
+      "maxAllowed": "الحد الأقصى المسموح: {amount}"
+    },
+    "validation": {
+      "noItemsAdded": "يجب إضافة كميات لبند واحد على الأقل",
+      "qtyExceedsRemaining": "الكمية المدخلة ({qty}) تتجاوز المتبقي ({remaining})",
+      "negativeNet": "صافي المستحق لا يمكن أن يكون سالباً"
+    },
+    "print": {
+      "title": "مستخلص مقاول باطن",
+      "projectInfo": "بيانات المشروع",
+      "contractorInfo": "بيانات المقاول",
+      "financialStatement": "البيان المالي",
+      "itemsTable": "جدول الكميات",
+      "deductions": "الحسميات",
+      "signatures": "التوقيعات",
+      "retentionNote": "تصرف عند انتهاء الأعمال",
+      "previousPayments": "ما سبق صرفه من مستخلصات سابقة",
+      "projectEngineer": "مهندس المشروع",
+      "technicalOffice": "المكتب الفني",
+      "projectApprover": "معتمد المشروع",
+      "projectsManager": "مدير المشاريع",
+      "executiveDirector": "المدير التنفيذي",
+      "financialManager": "المدير المالي",
+      "generalManager": "المدير العام"
+    },
+    "linkToClaim": "ربط بمستخلص",
+    "directPayment": "دفعة مباشرة (بدون مستخلص)",
+    "linkedToClaim": "مرتبطة بمستخلص #{claimNo}",
+    "selectClaim": "اختر مستخلص...",
+    "claimRemaining": "المتبقي: {amount}"
   }
 }

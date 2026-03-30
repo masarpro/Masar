@@ -1,4 +1,5 @@
 import { IntegrationsSettingsForm } from "@saas/integrations/components/IntegrationsSettingsForm";
+import { MessageDeliveryLogs } from "@saas/integrations/components/MessageDeliveryLogs";
 import { SettingsList } from "@saas/shared/components/SettingsList";
 import { getTranslations } from "next-intl/server";
 
@@ -14,6 +15,7 @@ export default function IntegrationsSettingsPage() {
 	return (
 		<SettingsList>
 			<IntegrationsSettingsForm />
+			<MessageDeliveryLogs />
 		</SettingsList>
 	);
 }

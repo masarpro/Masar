@@ -669,6 +669,7 @@ function DetailsTabContent({
 	onDeletePayment: (id: string) => void;
 }) {
 	const t = useTranslations();
+	const locale = useLocale();
 
 	return (
 		<div className="space-y-5">
@@ -854,6 +855,7 @@ function ActivityTabContent({
 	invoiceId: string;
 }) {
 	const t = useTranslations();
+	const locale = useLocale();
 
 	const { data, isLoading } = useQuery(
 		orpc.finance.invoices.getActivity.queryOptions({

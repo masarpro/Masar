@@ -2356,8 +2356,14 @@ model SubcontractClaim {
   netAmount         Decimal                 @default(0) @map("net_amount") @db.Decimal(15, 2)
   paidAmount        Decimal                 @default(0) @map("paid_amount") @db.Decimal(15, 2)
 
+  // حسميات إضافية
+  penaltyAmount     Decimal                 @default(0) @map("penalty_amount") @db.Decimal(15, 2)
+  otherDeductions   Decimal                 @default(0) @map("other_deductions") @db.Decimal(15, 2)
+  otherDeductionsNote String?               @map("other_deductions_note")
+
   notes             String?                 @db.Text
   rejectionReason   String?                 @map("rejection_reason") @db.Text
+  printedAt         DateTime?               @map("printed_at")
 
   submittedAt       DateTime?               @map("submitted_at")
   approvedAt        DateTime?               @map("approved_at")
