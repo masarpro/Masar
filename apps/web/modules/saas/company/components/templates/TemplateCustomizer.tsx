@@ -1,4 +1,5 @@
 "use client";
+// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useTranslations } from "next-intl";
@@ -267,8 +268,8 @@ export function TemplateCustomizer({
 				organizationId,
 				name: templateName,
 				templateType,
-				content: { elements } as any,
-				settings: cleanObject(settings as any) as any,
+				content: { elements },
+				settings: cleanObject(settings as any),
 			});
 		},
 		onSuccess: (data) => {
@@ -287,8 +288,8 @@ export function TemplateCustomizer({
 				organizationId,
 				id: templateId!,
 				name: templateName,
-				content: { elements } as any,
-				settings: cleanObject(settings as any) as any,
+				content: { elements },
+				settings: cleanObject(settings as any),
 			});
 		},
 		onSuccess: () => {
@@ -683,6 +684,7 @@ export function TemplateCustomizer({
 								<Label className="text-xs">{t("finance.templates.customizer.headerImage")}</Label>
 								{settings.headerImage ? (
 									<div className="relative rounded-lg border overflow-hidden">
+										{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
 										<img src={settings.headerImage} alt="" className="w-full" />
 										<Button
 											variant="outline"
@@ -709,6 +711,7 @@ export function TemplateCustomizer({
 								<Label className="text-xs">{t("finance.templates.customizer.footerImage")}</Label>
 								{settings.footerImage ? (
 									<div className="relative rounded-lg border overflow-hidden">
+										{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
 										<img src={settings.footerImage} alt="" className="w-full" />
 										<Button
 											variant="outline"

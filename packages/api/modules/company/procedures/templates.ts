@@ -23,6 +23,12 @@ import {
 	MAX_DESC,
 } from "../../../lib/validation-constants";
 
+// Recursive JSON schema — accepts nested objects and arrays (for template content/settings)
+const jsonValue: z.ZodType = z.lazy(() =>
+	z.union([z.string(), z.number(), z.boolean(), z.null(), z.array(jsonValue), z.record(z.string(), jsonValue)]),
+);
+const jsonRecord = z.record(z.string(), jsonValue).optional();
+
 export const listFinanceTemplates = protectedProcedure
 	.route({
 		method: "GET",
@@ -121,8 +127,8 @@ export const createFinanceTemplateProcedure = subscriptionProcedure
 			name: trimmedString(MAX_NAME),
 			description: optionalTrimmed(MAX_DESC),
 			templateType: z.enum(["QUOTATION", "INVOICE", "LETTER"]),
-			content: z.record(z.string().max(100), z.union([z.string().max(5000), z.number(), z.boolean(), z.null()])).optional(),
-			settings: z.record(z.string().max(100), z.union([z.string().max(5000), z.number(), z.boolean(), z.null()])).optional(),
+			content: jsonRecord,
+			settings: jsonRecord,
 			isDefault: z.boolean().optional().default(false),
 		}),
 	)
@@ -159,8 +165,8 @@ export const updateFinanceTemplateProcedure = subscriptionProcedure
 			id: idString(),
 			name: trimmedString(MAX_NAME).optional(),
 			description: optionalTrimmed(MAX_DESC),
-			content: z.record(z.string().max(100), z.union([z.string().max(5000), z.number(), z.boolean(), z.null()])).optional(),
-			settings: z.record(z.string().max(100), z.union([z.string().max(5000), z.number(), z.boolean(), z.null()])).optional(),
+			content: jsonRecord,
+			settings: jsonRecord,
 		}),
 	)
 	.handler(async ({ input, context }) => {
