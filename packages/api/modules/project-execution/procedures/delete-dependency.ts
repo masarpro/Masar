@@ -3,6 +3,7 @@ import { deleteDependency } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
+import { invalidateCPMCache } from "../lib/cpm-cache";
 
 export const deleteDependencyProcedure = subscriptionProcedure
 	.route({
@@ -32,6 +33,8 @@ export const deleteDependencyProcedure = subscriptionProcedure
 				input.projectId,
 				input.dependencyId,
 			);
+
+			invalidateCPMCache(input.projectId);
 
 			return { success: true };
 		} catch (error) {

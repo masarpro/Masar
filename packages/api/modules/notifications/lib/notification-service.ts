@@ -12,6 +12,7 @@ import {
 	type CreateNotificationInput,
 } from "@repo/database";
 import type { NotificationType, NotificationChannel, ProjectRole } from "@repo/database/prisma/generated/client";
+import { sendNotificationEmails } from "./notification-email";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Notification Type → Preference Field Mapping
@@ -57,7 +58,10 @@ async function getUserAllowedChannels(
 	if (prefs.muteAll) return [];
 
 	const fieldName = notificationTypeToPreferenceField[notificationType];
-	if (!fieldName) return ["IN_APP"]; // Unknown type, default to IN_APP
+	if (!fieldName) {
+		console.warn(`[Notification] Unknown type: ${notificationType}, defaulting to IN_APP`);
+		return ["IN_APP"];
+	}
 
 	const channels = (prefs as Record<string, unknown>)[fieldName] as NotificationChannel[] | undefined;
 	return channels ?? ["IN_APP"];
@@ -213,6 +217,15 @@ export async function sendNotification(
 		notificationData,
 	);
 
+	// Dispatch email notifications (fire-and-forget)
+	dispatchEmailNotifications(
+		payload.organizationId,
+		recipients,
+		payload.type,
+		payload.title,
+		payload.body,
+	).catch(() => {});
+
 	return result;
 }
 
@@ -254,6 +267,66 @@ export async function sendNotificationToUser(
 	}
 
 	await createNotification(organizationId, userId, notificationData);
+
+	// Dispatch email if user has EMAIL channel enabled (fire-and-forget)
+	if (allowedChannels.includes("EMAIL")) {
+		db.user.findUnique({ where: { id: userId }, select: { email: true } })
+			.then((user) => {
+				if (user?.email) {
+					sendNotificationEmails(
+						[{ email: user.email }],
+						data.title,
+						data.body,
+					);
+				}
+			})
+			.catch(() => {});
+	}
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Email Dispatch Helper
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Check which recipients have EMAIL channel enabled and dispatch emails.
+ * Fire-and-forget — does not block or throw.
+ */
+async function dispatchEmailNotifications(
+	organizationId: string,
+	recipientIds: string[],
+	notificationType: NotificationType,
+	title: string,
+	body?: string,
+): Promise<void> {
+	// Check each recipient's preferences for EMAIL channel
+	const prefs = await db.notificationPreference.findMany({
+		where: { organizationId, userId: { in: recipientIds } },
+	});
+	const prefsMap = new Map(prefs.map((p) => [p.userId, p]));
+
+	const emailRecipientIds = recipientIds.filter((userId) => {
+		const pref = prefsMap.get(userId);
+		if (!pref) return false; // Default is IN_APP only
+		if (pref.muteAll) return false;
+		const fieldName = notificationTypeToPreferenceField[notificationType];
+		if (!fieldName) return false;
+		const channels = (pref as Record<string, unknown>)[fieldName] as NotificationChannel[] | undefined;
+		return channels?.includes("EMAIL") ?? false;
+	});
+
+	if (emailRecipientIds.length === 0) return;
+
+	// Look up emails
+	const users = await db.user.findMany({
+		where: { id: { in: emailRecipientIds } },
+		select: { email: true },
+	});
+
+	const recipients = users.filter((u) => u.email).map((u) => ({ email: u.email }));
+	if (recipients.length > 0) {
+		sendNotificationEmails(recipients, title, body);
+	}
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

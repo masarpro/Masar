@@ -267,7 +267,7 @@ export function TemplateCustomizer({
 				organizationId,
 				name: templateName,
 				templateType,
-				content: { elements },
+				content: { elements } as any,
 				settings: cleanObject(settings as any) as any,
 			});
 		},
@@ -287,7 +287,7 @@ export function TemplateCustomizer({
 				organizationId,
 				id: templateId!,
 				name: templateName,
-				content: { elements },
+				content: { elements } as any,
 				settings: cleanObject(settings as any) as any,
 			});
 		},

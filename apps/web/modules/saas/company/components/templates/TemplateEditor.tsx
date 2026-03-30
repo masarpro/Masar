@@ -277,8 +277,8 @@ export function TemplateEditor({
 				organizationId,
 				name: templateName,
 				templateType: templateType.toUpperCase() as "QUOTATION" | "INVOICE" | "LETTER",
-				content: { elements },
-				settings,
+				content: { elements } as any,
+				settings: settings as any,
 			});
 		},
 		onSuccess: (data) => {
@@ -298,8 +298,8 @@ export function TemplateEditor({
 				organizationId,
 				id: templateId!,
 				name: templateName,
-				content: { elements },
-				settings,
+				content: { elements } as any,
+				settings: settings as any,
 			});
 		},
 		onSuccess: () => {

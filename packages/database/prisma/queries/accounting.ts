@@ -612,6 +612,7 @@ export interface TrialBalanceResult {
 	generatedAt: Date;
 }
 
+// TODO: Consider materialized view for large organizations to avoid raw SQL aggregation on every request
 export async function getTrialBalance(
 	db: PrismaClient,
 	organizationId: string,

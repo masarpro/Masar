@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@ui/lib";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { SidebarFooter } from "./SidebarFooter";
 import { SidebarHeader } from "./SidebarHeader";
 import { SidebarNav } from "./SidebarNav";
@@ -17,7 +17,7 @@ interface AppSidebarProps {
 	headerExtra?: React.ReactNode;
 }
 
-export function AppSidebar({ headerExtra }: AppSidebarProps) {
+export const AppSidebar = React.memo(function AppSidebar({ headerExtra }: AppSidebarProps) {
 	const { collapsed, mobileOpen, setMobileOpen, ready } = useSidebar();
 	const { items, activeId } = useSidebarMenu();
 	const isMobile = useIsMobile();
@@ -99,4 +99,4 @@ export function AppSidebar({ headerExtra }: AppSidebarProps) {
 			</aside>
 		</>
 	);
-}
+});

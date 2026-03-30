@@ -3,6 +3,7 @@ import { createDependency } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
+import { invalidateCPMCache } from "../lib/cpm-cache";
 
 export const createDependencyProcedure = subscriptionProcedure
 	.route({
@@ -40,6 +41,8 @@ export const createDependencyProcedure = subscriptionProcedure
 					lagDays: input.lagDays,
 				},
 			);
+
+			invalidateCPMCache(input.projectId);
 
 			return { dependency };
 		} catch (error: any) {

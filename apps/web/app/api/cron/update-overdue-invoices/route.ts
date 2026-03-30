@@ -1,6 +1,8 @@
 import { db } from "@repo/database";
 import { NextResponse } from "next/server";
 
+export const maxDuration = 120;
+
 export async function GET(request: Request) {
 	// Verify cron secret to prevent unauthorized access
 	const authHeader = request.headers.get("authorization");

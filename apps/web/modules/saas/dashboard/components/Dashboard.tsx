@@ -6,14 +6,27 @@ import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
+import dynamic from "next/dynamic";
 
 import { ActiveProjectsSection } from "./sections/ActiveProjectsSection";
-import { FinancePanel } from "./sections/FinancePanel";
 import { QuickActionsGrid } from "./sections/QuickActionsGrid";
 import { AlertsSection } from "./sections/AlertsSection";
 import { OperationalSection } from "./sections/OperationalSection";
 import { DidYouKnowCard } from "./sections/DidYouKnowCard";
 import { RecentDocumentsCard } from "./sections/RecentDocumentsCard";
+
+const FinancePanel = dynamic(
+	() =>
+		import("./sections/FinancePanel").then((m) => ({
+			default: m.FinancePanel,
+		})),
+	{
+		loading: () => (
+			<div className="h-[300px] animate-pulse rounded-lg bg-muted" />
+		),
+		ssr: false,
+	},
+);
 
 export function Dashboard() {
 	const t = useTranslations();

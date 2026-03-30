@@ -2,6 +2,7 @@ import { createActivity } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
+import { invalidateCPMCache } from "../lib/cpm-cache";
 
 export const createActivityProcedure = subscriptionProcedure
 	.route({
@@ -50,6 +51,8 @@ export const createActivityProcedure = subscriptionProcedure
 				notes: input.notes,
 			},
 		);
+
+		invalidateCPMCache(input.projectId);
 
 		return { activity };
 	});

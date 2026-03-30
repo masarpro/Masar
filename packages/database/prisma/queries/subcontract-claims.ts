@@ -297,6 +297,7 @@ export async function createSubcontractClaim(data: {
 						totalAmount: manual.qty * manual.unitPrice,
 						category: "other",
 						isLumpSum: false,
+						createdById: data.createdById,
 						sortOrder: nextSort++,
 					},
 				});

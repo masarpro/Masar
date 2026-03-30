@@ -3,6 +3,7 @@ import { updateActivity } from "@repo/database";
 import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
+import { invalidateCPMCache } from "../lib/cpm-cache";
 
 export const updateActivityProcedure = subscriptionProcedure
 	.route({
@@ -72,6 +73,8 @@ export const updateActivityProcedure = subscriptionProcedure
 					actualEnd: actualEnd ? new Date(actualEnd) : actualEnd === null ? null : undefined,
 				},
 			);
+
+			invalidateCPMCache(input.projectId);
 
 			return { activity };
 		} catch (error) {

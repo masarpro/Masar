@@ -9,6 +9,7 @@ import { NotificationBell } from "@saas/shared/components/NotificationBell";
 import { UserAvatar } from "@shared/components/UserAvatar";
 import { ColorModeToggle } from "@shared/components/ColorModeToggle";
 import { Button } from "@ui/components/button";
+import React from "react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -35,7 +36,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useSidebar } from "../sidebar/sidebar-context";
 import { useIsMobile } from "../sidebar/use-is-mobile";
 
-export function GlobalHeader() {
+export const GlobalHeader = React.memo(function GlobalHeader() {
 	const t = useTranslations();
 	const pathname = usePathname();
 	const locale = useLocale();
@@ -169,4 +170,4 @@ export function GlobalHeader() {
 			</div>
 		</header>
 	);
-}
+});

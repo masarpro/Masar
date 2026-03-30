@@ -3,6 +3,7 @@ import { z } from "zod";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { calculateCPM } from "../lib/cpm";
+import { getCachedCPM, setCPMCache } from "../lib/cpm-cache";
 
 export const getCriticalPathProcedure = protectedProcedure
 	.route({
@@ -25,6 +26,10 @@ export const getCriticalPathProcedure = protectedProcedure
 			{ section: "projects", action: "view" },
 		);
 
+		// Check cache first
+		const cached = getCachedCPM(input.projectId);
+		if (cached) return cached;
+
 		const graph = await getActivityGraphForCPM(
 			input.organizationId,
 			input.projectId,
@@ -35,7 +40,7 @@ export const getCriticalPathProcedure = protectedProcedure
 			graph.edges,
 		);
 
-		return {
+		const result = {
 			nodes: graph.nodes.map((n) => {
 				const cpm = cpmResults.find((r) => r.id === n.id);
 				return {
@@ -48,4 +53,8 @@ export const getCriticalPathProcedure = protectedProcedure
 				.filter((r) => r.isCritical)
 				.map((r) => r.id),
 		};
+
+		setCPMCache(input.projectId, result);
+
+		return result;
 	});

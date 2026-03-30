@@ -1,3 +1,4 @@
+// TODO: Consider @tanstack/react-virtual for large BOQ tables (>100 rows)
 "use client";
 
 import { Fragment, useMemo, useState } from "react";

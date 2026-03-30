@@ -77,7 +77,7 @@ export function OnboardingWizard({
 		try {
 			await completeWizardMutation.mutateAsync({
 				organizationId,
-				skippedSteps,
+				skippedSteps: skippedSteps as ("inviteTeam")[],
 			});
 			await authClient.updateUser({ onboardingComplete: true });
 			await clearCache();

@@ -5,6 +5,7 @@
 
 import { ORPCError } from "@orpc/server";
 import { getAttachment, deleteAttachment } from "@repo/database";
+import { deleteFile } from "@repo/storage";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { rateLimitChecker, RATE_LIMITS } from "../../../lib/rate-limit";
@@ -47,8 +48,16 @@ export const deleteAttachmentProcedure = subscriptionProcedure
 		}
 
 		// Delete from database
-		// Note: Storage cleanup should be handled by a separate job/cron
 		await deleteAttachment(input.organizationId, input.attachmentId);
+
+		// Clean up S3 file (fire-and-forget)
+		if (attachment.storagePath) {
+			deleteFile(attachment.storagePath, {
+				bucket: process.env.S3_ATTACHMENTS_BUCKET ?? "attachments",
+			}).catch((err) => {
+				console.error("[Storage] Failed to delete file:", attachment.storagePath, err);
+			});
+		}
 
 		return { success: true };
 	});

@@ -2,10 +2,10 @@
 	"$schema": "https://openapi.vercel.sh/vercel.json",
 	"framework": "nextjs",
 	"installCommand": "pnpm install",
-	"regions": ["fra1"],
+	"regions": ["dxb1"],
 	"functions": {
 		"apps/web/app/api/**/*.ts": {
-			"maxDuration": 30
+			"maxDuration": 60
 		}
 	},
 	"crons": [
@@ -20,6 +20,10 @@
 		{
 			"path": "/api/cron/cleanup-expired-tokens",
 			"schedule": "0 2 * * *"
+		},
+		{
+			"path": "/api/cron/daily",
+			"schedule": "0 3 * * *"
 		}
 	]
 }
