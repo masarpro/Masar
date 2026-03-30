@@ -41,6 +41,7 @@ import { activationCodesRouter } from "../modules/activation-codes/router";
 import { projectBoqRouter } from "../modules/project-boq/router";
 import { accountingRouter } from "../modules/accounting/router";
 import { handoverRouter } from "../modules/handover/router";
+import { zatcaRouter } from "../modules/zatca/router";
 import { publicProcedure } from "./procedures";
 
 export const router = publicProcedure.router({
@@ -106,6 +107,8 @@ export const router = publicProcedure.router({
 	accounting: accountingRouter,
 	// Handover Protocols - محاضر الاستلام والتسليم
 	handover: handoverRouter,
+	// ZATCA E-Invoicing Phase 2 - الفوترة الإلكترونية
+	zatca: zatcaRouter,
 });
 
 export type ApiRouterClient = RouterClient<typeof router>;

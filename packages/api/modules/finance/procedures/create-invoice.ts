@@ -22,6 +22,7 @@ import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { generateZatcaQR, generateZatcaQRImage } from "../../../lib/zatca";
+import { processInvoiceForZatca } from "../../../lib/zatca/phase2/zatca-service";
 import { db } from "@repo/database/prisma/client";
 import crypto from "crypto";
 import {
@@ -722,7 +723,7 @@ export const issueInvoiceProcedure = subscriptionProcedure
 		const [org, financeSettings] = await Promise.all([
 			db.organization.findUnique({
 				where: { id: input.organizationId },
-				select: { name: true, taxNumber: true },
+				select: { name: true, taxNumber: true, commercialRegister: true, address: true, city: true },
 			}),
 			getOrganizationFinanceSettings(input.organizationId),
 		]);
@@ -767,32 +768,15 @@ export const issueInvoiceProcedure = subscriptionProcedure
 			});
 		}
 
-		// ─── Generate QR for all invoices when tax number is available ───
-		let qrCode: string | undefined;
+		// ─── Validate tax number for TAX/SIMPLIFIED invoices ────────────
 		if (sellerTaxNumber) {
 			const cleanTaxNumber = sellerTaxNumber.replace(/[\s\-]/g, "");
 			if (!/^\d{15}$/.test(cleanTaxNumber)) {
-				// Only throw for TAX/SIMPLIFIED — for STANDARD just skip QR
 				if (invoice.invoiceType === "TAX" || invoice.invoiceType === "SIMPLIFIED") {
 					throw new ORPCError("BAD_REQUEST", {
 						message: `الرقم الضريبي يجب أن يكون 15 رقماً بالضبط (بدون رموز أو مسافات). الرقم الحالي: "${sellerTaxNumber}". يرجى تصحيحه في إعدادات المالية`,
 					});
 				}
-			} else {
-				const totals = calculateInvoiceTotals(
-					invoice.items.map((i) => ({ quantity: i.quantity, unitPrice: i.unitPrice })),
-					invoice.discountPercent,
-					invoice.vatPercent,
-				);
-
-				const tlvBase64 = generateZatcaQR({
-					sellerName,
-					vatNumber: cleanTaxNumber,
-					timestamp: invoice.issueDate,
-					totalWithVat: Number(totals.totalAmount),
-					vatAmount: Number(totals.vatAmount),
-				});
-				qrCode = await generateZatcaQRImage(tlvBase64);
 			}
 		} else if (invoice.invoiceType === "TAX" || invoice.invoiceType === "SIMPLIFIED") {
 			throw new ORPCError("BAD_REQUEST", {
@@ -802,14 +786,52 @@ export const issueInvoiceProcedure = subscriptionProcedure
 
 		const zatcaUuid = crypto.randomUUID();
 
+		// ─── Issue the invoice first (DRAFT → ISSUED) ───────────────────
 		const issuedInvoice = await issueInvoice(input.id, input.organizationId, {
 			sellerName,
 			sellerTaxNumber: sellerTaxNumber ? sellerTaxNumber.replace(/[\s\-]/g, "") : undefined,
 			sellerAddress: sellerAddress || undefined,
 			sellerPhone: sellerPhone || undefined,
-			qrCode,
 			zatcaUuid,
 		});
+
+		// ─── ZATCA Processing (Phase 1 QR or Phase 2 XML+Sign+Submit) ──
+		// Silent failure: ZATCA errors don't block invoice issuance
+		try {
+			const zatcaResult = await processInvoiceForZatca(
+				db,
+				{ ...issuedInvoice, zatcaUuid, items: issuedInvoice.items },
+				input.organizationId,
+				{
+					name: sellerName,
+					taxNumber: sellerTaxNumber,
+					crNumber: org?.commercialRegister ?? undefined,
+					address: sellerAddress || org?.address || undefined,
+					city: org?.city ?? undefined,
+				},
+			);
+
+			// Update invoice with ZATCA results
+			await db.financeInvoice.update({
+				where: { id: issuedInvoice.id },
+				data: {
+					qrCode: zatcaResult.qrCode || undefined,
+					zatcaInvoiceType: zatcaResult.zatcaInvoiceType || undefined,
+					zatcaSubmissionStatus: zatcaResult.zatcaSubmissionStatus,
+					zatcaHash: zatcaResult.zatcaHash || undefined,
+					zatcaSignature: zatcaResult.zatcaSignature || undefined,
+					zatcaXml: zatcaResult.zatcaXml || undefined,
+					zatcaClearedXml: zatcaResult.zatcaClearedXml || undefined,
+					zatcaCounterValue: zatcaResult.zatcaCounterValue ?? undefined,
+					zatcaPreviousHash: zatcaResult.zatcaPreviousHash || undefined,
+					zatcaSubmittedAt: zatcaResult.zatcaSubmittedAt || undefined,
+					zatcaClearedAt: zatcaResult.zatcaClearedAt || undefined,
+				},
+			});
+		} catch (error) {
+			console.error("[ZATCA] Failed to process invoice:", error);
+			// Invoice is already ISSUED — ZATCA status stays NOT_APPLICABLE
+		}
 
 		orgAuditLog({
 			organizationId: input.organizationId,
@@ -956,7 +978,7 @@ export const createCreditNoteProcedure = subscriptionProcedure
 		const [orgCN, financeSettingsCN] = await Promise.all([
 			db.organization.findUnique({
 				where: { id: input.organizationId },
-				select: { name: true, taxNumber: true },
+				select: { name: true, taxNumber: true, commercialRegister: true, address: true, city: true },
 			}),
 			getOrganizationFinanceSettings(input.organizationId),
 		]);
@@ -973,29 +995,7 @@ export const createCreditNoteProcedure = subscriptionProcedure
 			throw new ORPCError("NOT_FOUND", { message: "الفاتورة الأصلية غير موجودة" });
 		}
 
-		// Generate QR for credit note if original was TAX/SIMPLIFIED
-		let qrCode: string | undefined;
-		const cleanCnTaxNumber = cnSellerTaxNumber ? cnSellerTaxNumber.replace(/[\s\-]/g, "") : "";
-		if (
-			(original.invoiceType === "TAX" || original.invoiceType === "SIMPLIFIED") &&
-			cleanCnTaxNumber &&
-			/^\d{15}$/.test(cleanCnTaxNumber)
-		) {
-			const totals = calculateInvoiceTotals(
-				input.items,
-				original.discountPercent,
-				original.vatPercent,
-			);
-
-			const tlvBase64 = generateZatcaQR({
-				sellerName: cnSellerName,
-				vatNumber: cleanCnTaxNumber,
-				timestamp: new Date(),
-				totalWithVat: Number(totals.totalAmount),
-				vatAmount: Number(totals.vatAmount),
-			});
-			qrCode = await generateZatcaQRImage(tlvBase64);
-		}
+		const cnZatcaUuid = crypto.randomUUID();
 
 		const creditNote = await createCreditNote({
 			organizationId: input.organizationId,
@@ -1003,13 +1003,47 @@ export const createCreditNoteProcedure = subscriptionProcedure
 			originalInvoiceId: input.id,
 			reason: input.reason,
 			items: input.items,
-			qrCode,
-			zatcaUuid: crypto.randomUUID(),
+			zatcaUuid: cnZatcaUuid,
 			sellerName: cnSellerName || undefined,
 			sellerTaxNumber: cnSellerTaxNumber || undefined,
 			sellerAddress: cnSellerAddress || undefined,
 			sellerPhone: cnSellerPhone || undefined,
 		});
+
+		// ─── ZATCA Processing for Credit Note ──────────────────────────
+		try {
+			const zatcaResult = await processInvoiceForZatca(
+				db,
+				{ ...creditNote, zatcaUuid: cnZatcaUuid, items: creditNote.items },
+				input.organizationId,
+				{
+					name: cnSellerName,
+					taxNumber: cnSellerTaxNumber,
+					crNumber: orgCN?.commercialRegister ?? undefined,
+					address: cnSellerAddress || orgCN?.address || undefined,
+					city: orgCN?.city ?? undefined,
+				},
+			);
+
+			await db.financeInvoice.update({
+				where: { id: creditNote.id },
+				data: {
+					qrCode: zatcaResult.qrCode || undefined,
+					zatcaInvoiceType: zatcaResult.zatcaInvoiceType || undefined,
+					zatcaSubmissionStatus: zatcaResult.zatcaSubmissionStatus,
+					zatcaHash: zatcaResult.zatcaHash || undefined,
+					zatcaSignature: zatcaResult.zatcaSignature || undefined,
+					zatcaXml: zatcaResult.zatcaXml || undefined,
+					zatcaClearedXml: zatcaResult.zatcaClearedXml || undefined,
+					zatcaCounterValue: zatcaResult.zatcaCounterValue ?? undefined,
+					zatcaPreviousHash: zatcaResult.zatcaPreviousHash || undefined,
+					zatcaSubmittedAt: zatcaResult.zatcaSubmittedAt || undefined,
+					zatcaClearedAt: zatcaResult.zatcaClearedAt || undefined,
+				},
+			});
+		} catch (error) {
+			console.error("[ZATCA] Failed to process credit note:", error);
+		}
 
 		orgAuditLog({
 			organizationId: input.organizationId,

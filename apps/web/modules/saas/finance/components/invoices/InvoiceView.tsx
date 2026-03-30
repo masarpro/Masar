@@ -738,6 +738,33 @@ function DetailsTabContent({
 								</div>
 							</div>
 						)}
+
+						{/* ZATCA Phase 2 Status */}
+						{invoice.zatcaSubmissionStatus && invoice.zatcaSubmissionStatus !== "NOT_APPLICABLE" && (
+							<div className="sm:col-span-2 lg:col-span-3 flex items-start gap-3">
+								<div className="mt-1 text-slate-400"><FileCheck className="h-4 w-4" /></div>
+								<div className="space-y-1.5">
+									<p className="text-sm text-muted-foreground">{t("zatca.submission.title")}</p>
+									<span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
+										invoice.zatcaSubmissionStatus === "CLEARED" || invoice.zatcaSubmissionStatus === "REPORTED"
+											? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+											: invoice.zatcaSubmissionStatus === "REJECTED"
+												? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+												: invoice.zatcaSubmissionStatus === "FAILED"
+													? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+													: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+									}`}>
+										{t(`zatca.submission.${invoice.zatcaSubmissionStatus}`)}
+									</span>
+									{invoice.zatcaSubmittedAt && (
+										<p className="text-xs text-muted-foreground">{t("zatca.submission.sentAt")}: {new Date(invoice.zatcaSubmittedAt).toLocaleString("ar-SA")}</p>
+									)}
+									{invoice.zatcaClearedAt && (
+										<p className="text-xs text-muted-foreground">{t("zatca.submission.clearedAt")}: {new Date(invoice.zatcaClearedAt).toLocaleString("ar-SA")}</p>
+									)}
+								</div>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

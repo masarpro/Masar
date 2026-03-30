@@ -6,6 +6,7 @@ import {
 	TriangleAlert,
 	Bell,
 	Layout,
+	FileCheck,
 	type LucideIcon,
 } from "lucide-react";
 
@@ -57,6 +58,13 @@ export const SETTINGS_NAV_SECTIONS: SettingsNavSection[] = [
 		path: "templates",
 		labelKey: "settings.menu.organization.templates",
 		icon: Layout,
+	},
+	{
+		id: "zatca",
+		path: "zatca",
+		labelKey: "settings.menu.organization.zatca",
+		icon: FileCheck,
+		adminOnly: true,
 	},
 	{
 		id: "danger-zone",

@@ -9069,7 +9069,8 @@
         "dangerZone": "Danger zone",
         "integrations": "Integrations",
         "notifications": "Notifications",
-        "templates": "Templates"
+        "templates": "Templates",
+        "zatca": "E-Invoicing"
       }
     },
     "save": "Save",
@@ -10043,6 +10044,83 @@
       "updateError": "Failed to update item",
       "deleted": "Item deleted successfully",
       "deleteError": "Failed to delete item"
+    }
+  },
+  "zatca": {
+    "title": "E-Invoicing",
+    "subtitle": "Manage integration with ZATCA (Zakat, Tax and Customs Authority)",
+    "phase1": {
+      "title": "Phase 1 — QR Code Only",
+      "description": "Your invoices include a standard QR code without direct ZATCA integration",
+      "active": "Active"
+    },
+    "phase2": {
+      "title": "Phase 2 — Direct ZATCA Integration",
+      "description": "Your invoices are automatically sent to ZATCA for clearance or reporting",
+      "active": "Active",
+      "activate": "Activate Direct Integration"
+    },
+    "onboarding": {
+      "title": "Activate ZATCA Integration",
+      "step1Title": "Log into Fatoora Portal",
+      "step1Description": "Sign in to the Fatoora portal with your tax account using the link below",
+      "step2Title": "Register a New Device",
+      "step2Description": "Click \"Register new device\" and copy the OTP code",
+      "step3Title": "Enter OTP Code",
+      "step3Description": "Paste the OTP code here and we'll handle the rest",
+      "otpLabel": "OTP Code",
+      "otpPlaceholder": "Enter OTP from Fatoora portal",
+      "otpHelp": "The code is valid for one hour only",
+      "invoiceTypeLabel": "Invoice Type",
+      "invoiceTypeStandard": "Tax Invoices (B2B)",
+      "invoiceTypeSimplified": "Simplified Invoices (B2C)",
+      "activateButton": "Activate Integration",
+      "activating": "Activating...",
+      "success": "ZATCA integration activated successfully",
+      "error": "Activation failed",
+      "fatooraLink": "Open Fatoora Portal",
+      "noTaxNumber": "Please add your tax number in company settings first"
+    },
+    "status": {
+      "DISABLED": "Disabled",
+      "ONBOARDING": "Onboarding",
+      "COMPLIANCE": "Testing",
+      "ACTIVE": "Active",
+      "EXPIRED": "Expired",
+      "REVOKED": "Revoked"
+    },
+    "submission": {
+      "NOT_APPLICABLE": "—",
+      "PENDING": "Pending",
+      "SUBMITTED": "Submitted",
+      "CLEARED": "Cleared by ZATCA",
+      "REPORTED": "Reported to ZATCA",
+      "REJECTED": "Rejected",
+      "FAILED": "Failed",
+      "retry": "Retry",
+      "title": "E-Invoicing",
+      "sentAt": "Sent at",
+      "clearedAt": "Cleared at"
+    },
+    "device": {
+      "title": "Registered Devices",
+      "name": "Device Name",
+      "type": "Invoice Type",
+      "standard": "Standard",
+      "simplified": "Simplified",
+      "counter": "Invoice Count",
+      "expiresAt": "Certificate Expires",
+      "revoke": "Revoke",
+      "revokeConfirm": "Are you sure you want to revoke this device? Invoices will no longer be sent to ZATCA.",
+      "noDevices": "No registered devices"
+    },
+    "stats": {
+      "title": "E-Invoicing Statistics",
+      "total": "Total Sent",
+      "cleared": "Cleared",
+      "reported": "Reported",
+      "rejected": "Rejected",
+      "pending": "Pending"
     }
   }
 }

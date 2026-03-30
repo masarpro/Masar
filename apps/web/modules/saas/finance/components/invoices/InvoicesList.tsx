@@ -312,6 +312,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.amount")}</th>
 											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide hidden md:table-cell">{t("finance.invoices.columns.paid")}</th>
 											<th className="p-3 text-start text-[11.5px] font-semibold text-muted-foreground tracking-wide">{t("finance.invoices.columns.status")}</th>
+											<th className="p-3 text-center text-[11.5px] font-semibold text-muted-foreground tracking-wide hidden lg:table-cell">{t("zatca.title")}</th>
 											<th className="p-3 w-10" />
 										</tr>
 									</thead>
@@ -377,6 +378,9 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 															status={overdue && invoice.status !== "PAID" ? "OVERDUE" : invoice.status}
 															type="invoice"
 														/>
+													</td>
+													<td className="p-3 text-center hidden lg:table-cell">
+														<ZatcaStatusIcon status={(invoice as any).zatcaSubmissionStatus} />
 													</td>
 													<td className="p-3">
 														<DropdownMenu>
@@ -645,5 +649,40 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 				</AlertDialogContent>
 			</AlertDialog>
 		</div>
+	);
+}
+
+// ─── ZATCA Status Icon (inline helper) ──────────────────────────────────
+
+function ZatcaStatusIcon({ status }: { status?: string | null }) {
+	if (!status || status === "NOT_APPLICABLE") {
+		return <span className="text-slate-300 dark:text-slate-600">—</span>;
+	}
+	if (status === "CLEARED" || status === "REPORTED") {
+		return (
+			<span title={status === "CLEARED" ? "Cleared" : "Reported"} className="text-green-500">
+				<FileCheck className="h-4 w-4 inline-block" />
+			</span>
+		);
+	}
+	if (status === "REJECTED") {
+		return (
+			<span title="Rejected" className="text-red-500">
+				<XCircle className="h-4 w-4 inline-block" />
+			</span>
+		);
+	}
+	if (status === "FAILED") {
+		return (
+			<span title="Failed" className="text-amber-500">
+				<XCircle className="h-4 w-4 inline-block" />
+			</span>
+		);
+	}
+	// PENDING, SUBMITTED
+	return (
+		<span title="Pending" className="text-blue-500 animate-pulse">
+			<FileCheck className="h-4 w-4 inline-block" />
+		</span>
 	);
 }

@@ -1115,6 +1115,9 @@ model Organization {
   paymentVouchers         PaymentVoucher[]
   handoverProtocols       HandoverProtocol[]
 
+  // ZATCA Phase 2 - الفوترة الإلكترونية
+  zatcaDevices            ZatcaDevice[]
+
   // ═══ نهاية حقول مسار ═══
 
   @@unique([slug])
@@ -3535,6 +3538,35 @@ enum FinanceInvoiceStatus {
   CANCELLED     // ملغية
 }
 
+// ═══ ZATCA Phase 2 Enums ═══
+
+// حالة ربط المنظمة مع زاتكا
+enum ZatcaIntegrationStatus {
+  DISABLED          // المرحلة 1 فقط (QR بسيط) — الوضع الافتراضي
+  ONBOARDING        // بدأ التسجيل، ينتظر OTP أو compliance
+  COMPLIANCE        // حصل على Compliance CSID، يختبر
+  ACTIVE            // Production CSID نشط — فواتير تُرسل لزاتكا
+  EXPIRED           // الشهادة انتهت، تحتاج تجديد
+  REVOKED           // ملغاة
+}
+
+// نوع الفاتورة حسب زاتكا
+enum ZatcaInvoiceType {
+  STANDARD          // فاتورة ضريبية B2B — تحتاج Clearance
+  SIMPLIFIED        // فاتورة مبسّطة B2C — تحتاج Reporting فقط
+}
+
+// حالة إرسال الفاتورة لزاتكا
+enum ZatcaSubmissionStatus {
+  NOT_APPLICABLE    // المنظمة على Phase 1 فقط
+  PENDING           // لم تُرسل بعد
+  SUBMITTED         // أُرسلت، تنتظر الرد
+  CLEARED           // زاتكا وافقت (B2B clearance)
+  REPORTED          // زاتكا استلمت (B2C reporting)
+  REJECTED          // زاتكا رفضت — تحتاج تصحيح
+  FAILED            // خطأ تقني في الإرسال
+}
+
 // نوع الفاتورة
 enum InvoiceType {
   STANDARD      // عادية
@@ -3997,6 +4029,16 @@ model FinanceInvoice {
   zatcaHash       String?              @map("zatca_hash")          // Hash للفاتورة
   zatcaSignature  String?              @map("zatca_signature") @db.Text // التوقيع الرقمي
 
+  // --- ZATCA Phase 2 ---
+  zatcaInvoiceType      ZatcaInvoiceType?    @map("zatca_invoice_type")
+  zatcaSubmissionStatus ZatcaSubmissionStatus @default(NOT_APPLICABLE) @map("zatca_submission_status")
+  zatcaCounterValue     Int?                 @map("zatca_counter_value")
+  zatcaPreviousHash     String?              @map("zatca_previous_hash")
+  zatcaXml              String?              @map("zatca_xml") @db.Text
+  zatcaClearedXml       String?              @map("zatca_cleared_xml") @db.Text
+  zatcaSubmittedAt      DateTime?            @map("zatca_submitted_at")
+  zatcaClearedAt        DateTime?            @map("zatca_cleared_at")
+
   // الشروط والملاحظات
   paymentTerms    String?              @map("payment_terms") @db.Text
   notes           String?              @db.Text
@@ -4020,6 +4062,7 @@ model FinanceInvoice {
   items           FinanceInvoiceItem[]
   payments        FinanceInvoicePayment[]
   directPayments  FinancePayment[]         @relation("InvoiceDirectPayments")  // المقبوضات المباشرة
+  zatcaSubmissions ZatcaSubmission[]
 
   @@index([organizationId])
   @@index([organizationId, status])
@@ -4028,6 +4071,7 @@ model FinanceInvoice {
   @@index([organizationId, invoiceType])
   @@index([organizationId, dueDate])
   @@index([relatedInvoiceId])
+  @@index([organizationId, zatcaSubmissionStatus])
   @@map("finance_invoices")
 }
 
@@ -5800,4 +5844,93 @@ model HandoverProtocolItem {
 
   @@index([protocolId])
   @@map("handover_protocol_items")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ZATCA Phase 2 — الفوترة الإلكترونية (E-Invoicing)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// جهاز الفوترة الإلكترونية (EGS Unit) — لكل منظمة قد يكون عندها أكثر من device
+model ZatcaDevice {
+  id                    String   @id @default(cuid())
+  organizationId        String   @map("organization_id")
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // --- بيانات التسجيل ---
+  deviceName            String   @default("MASAR-EGS-001") @map("device_name")
+  invoiceType           ZatcaInvoiceType @map("invoice_type")
+
+  // --- الشهادة والمفاتيح (مشفّرة) ---
+  csidCertificate       String?  @map("csid_certificate") @db.Text
+  csidSecret            String?  @map("csid_secret") @db.Text
+  csidRequestId         String?  @map("csid_request_id")
+  csidExpiresAt         DateTime? @map("csid_expires_at")
+  privateKey            String?  @map("private_key") @db.Text
+  publicKey             String?  @map("public_key") @db.Text
+
+  // --- Compliance (مرحلة الاختبار) ---
+  complianceCsid        String?  @map("compliance_csid") @db.Text
+  complianceSecret      String?  @map("compliance_secret") @db.Text
+
+  // --- عدّاد الفواتير وسلسلة Hash ---
+  invoiceCounter        Int      @default(0) @map("invoice_counter")
+  previousInvoiceHash   String   @default("NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYmUxYjE3ZTExNzA5") @map("previous_invoice_hash")
+
+  // --- الحالة ---
+  status                ZatcaIntegrationStatus @default(DISABLED)
+  lastError             String?  @map("last_error") @db.Text
+  onboardedAt           DateTime? @map("onboarded_at")
+
+  // --- Timestamps ---
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  // --- العلاقات ---
+  invoiceSubmissions    ZatcaSubmission[]
+
+  @@unique([organizationId, invoiceType])
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@map("zatca_devices")
+}
+
+// سجل إرسال الفواتير لزاتكا
+model ZatcaSubmission {
+  id                    String   @id @default(cuid())
+  organizationId        String   @map("organization_id")
+
+  // --- ربط بالفاتورة ---
+  invoiceId             String   @map("invoice_id")
+  invoice               FinanceInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  // --- ربط بالجهاز ---
+  deviceId              String   @map("device_id")
+  device                ZatcaDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  // --- بيانات الإرسال ---
+  submissionType        String   @map("submission_type")
+  invoiceHash           String   @map("invoice_hash")
+  xmlContent            String?  @map("xml_content") @db.Text
+  signedXmlContent      String?  @map("signed_xml_content") @db.Text
+
+  // --- استجابة زاتكا ---
+  status                ZatcaSubmissionStatus @default(PENDING)
+  zatcaResponse         Json?    @map("zatca_response")
+  clearedXml            String?  @map("cleared_xml") @db.Text
+  zatcaWarnings         Json?    @map("zatca_warnings")
+  zatcaErrors           Json?    @map("zatca_errors")
+
+  // --- محاولات ---
+  attempts              Int      @default(1)
+  lastAttemptAt         DateTime @default(now()) @map("last_attempt_at")
+
+  // --- Timestamps ---
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@index([organizationId])
+  @@index([invoiceId])
+  @@index([status])
+  @@index([organizationId, status])
+  @@map("zatca_submissions")
 }

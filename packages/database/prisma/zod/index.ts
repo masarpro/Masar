@@ -475,7 +475,7 @@ export type QuotationDisplayConfigScalarFieldEnum = z.infer<typeof QuotationDisp
 
 // File: FinanceInvoiceScalarFieldEnum.schema.ts
 
-export const FinanceInvoiceScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'invoiceNo', 'invoiceType', 'clientId', 'clientName', 'clientCompany', 'clientPhone', 'clientEmail', 'clientAddress', 'clientTaxNumber', 'projectId', 'quotationId', 'status', 'issueDate', 'dueDate', 'subtotal', 'discountPercent', 'discountAmount', 'vatPercent', 'vatAmount', 'totalAmount', 'paidAmount', 'sellerName', 'sellerAddress', 'sellerPhone', 'relatedInvoiceId', 'issuedAt', 'sellerTaxNumber', 'qrCode', 'zatcaUuid', 'zatcaHash', 'zatcaSignature', 'paymentTerms', 'notes', 'templateId', 'viewedAt', 'sentAt', 'createdById', 'createdAt', 'updatedAt'])
+export const FinanceInvoiceScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'invoiceNo', 'invoiceType', 'clientId', 'clientName', 'clientCompany', 'clientPhone', 'clientEmail', 'clientAddress', 'clientTaxNumber', 'projectId', 'quotationId', 'status', 'issueDate', 'dueDate', 'subtotal', 'discountPercent', 'discountAmount', 'vatPercent', 'vatAmount', 'totalAmount', 'paidAmount', 'sellerName', 'sellerAddress', 'sellerPhone', 'relatedInvoiceId', 'issuedAt', 'sellerTaxNumber', 'qrCode', 'zatcaUuid', 'zatcaHash', 'zatcaSignature', 'zatcaInvoiceType', 'zatcaSubmissionStatus', 'zatcaCounterValue', 'zatcaPreviousHash', 'zatcaXml', 'zatcaClearedXml', 'zatcaSubmittedAt', 'zatcaClearedAt', 'paymentTerms', 'notes', 'templateId', 'viewedAt', 'sentAt', 'createdById', 'createdAt', 'updatedAt'])
 
 export type FinanceInvoiceScalarFieldEnum = z.infer<typeof FinanceInvoiceScalarFieldEnumSchema>;
 
@@ -748,6 +748,18 @@ export type HandoverProtocolScalarFieldEnum = z.infer<typeof HandoverProtocolSca
 export const HandoverProtocolItemScalarFieldEnumSchema = z.enum(['id', 'protocolId', 'subcontractItemId', 'boqItemId', 'description', 'unit', 'contractQty', 'executedQty', 'acceptedQty', 'qualityRating', 'remarks', 'defects', 'sortOrder'])
 
 export type HandoverProtocolItemScalarFieldEnum = z.infer<typeof HandoverProtocolItemScalarFieldEnumSchema>;
+
+// File: ZatcaDeviceScalarFieldEnum.schema.ts
+
+export const ZatcaDeviceScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'deviceName', 'invoiceType', 'csidCertificate', 'csidSecret', 'csidRequestId', 'csidExpiresAt', 'privateKey', 'publicKey', 'complianceCsid', 'complianceSecret', 'invoiceCounter', 'previousInvoiceHash', 'status', 'lastError', 'onboardedAt', 'createdAt', 'updatedAt'])
+
+export type ZatcaDeviceScalarFieldEnum = z.infer<typeof ZatcaDeviceScalarFieldEnumSchema>;
+
+// File: ZatcaSubmissionScalarFieldEnum.schema.ts
+
+export const ZatcaSubmissionScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'invoiceId', 'deviceId', 'submissionType', 'invoiceHash', 'xmlContent', 'signedXmlContent', 'status', 'zatcaResponse', 'clearedXml', 'zatcaWarnings', 'zatcaErrors', 'attempts', 'lastAttemptAt', 'createdAt', 'updatedAt'])
+
+export type ZatcaSubmissionScalarFieldEnum = z.infer<typeof ZatcaSubmissionScalarFieldEnumSchema>;
 
 // File: SortOrder.schema.ts
 
@@ -1163,6 +1175,18 @@ export const FinanceInvoiceStatusSchema = z.enum(['DRAFT', 'ISSUED', 'SENT', 'VI
 
 export type FinanceInvoiceStatus = z.infer<typeof FinanceInvoiceStatusSchema>;
 
+// File: ZatcaInvoiceType.schema.ts
+
+export const ZatcaInvoiceTypeSchema = z.enum(['STANDARD', 'SIMPLIFIED'])
+
+export type ZatcaInvoiceType = z.infer<typeof ZatcaInvoiceTypeSchema>;
+
+// File: ZatcaSubmissionStatus.schema.ts
+
+export const ZatcaSubmissionStatusSchema = z.enum(['NOT_APPLICABLE', 'PENDING', 'SUBMITTED', 'CLEARED', 'REPORTED', 'REJECTED', 'FAILED'])
+
+export type ZatcaSubmissionStatus = z.infer<typeof ZatcaSubmissionStatusSchema>;
+
 // File: OpenDocumentType.schema.ts
 
 export const OpenDocumentTypeSchema = z.enum(['LETTER', 'AGREEMENT', 'CERTIFICATE', 'MEMO', 'OTHER'])
@@ -1354,6 +1378,12 @@ export type HandoverStatus = z.infer<typeof HandoverStatusSchema>;
 export const QualityRatingSchema = z.enum(['EXCELLENT', 'GOOD', 'ACCEPTABLE', 'NEEDS_REWORK', 'REJECTED'])
 
 export type QualityRating = z.infer<typeof QualityRatingSchema>;
+
+// File: ZatcaIntegrationStatus.schema.ts
+
+export const ZatcaIntegrationStatusSchema = z.enum(['DISABLED', 'ONBOARDING', 'COMPLIANCE', 'ACTIVE', 'EXPIRED', 'REVOKED'])
+
+export type ZatcaIntegrationStatus = z.infer<typeof ZatcaIntegrationStatusSchema>;
 
 // File: PlanConfig.schema.ts
 
@@ -3468,6 +3498,14 @@ export const FinanceInvoiceSchema = z.object({
   zatcaUuid: z.string().nullish(),
   zatcaHash: z.string().nullish(),
   zatcaSignature: z.string().nullish(),
+  zatcaInvoiceType: ZatcaInvoiceTypeSchema.nullish(),
+  zatcaSubmissionStatus: ZatcaSubmissionStatusSchema.default("NOT_APPLICABLE"),
+  zatcaCounterValue: z.number().int().nullish(),
+  zatcaPreviousHash: z.string().nullish(),
+  zatcaXml: z.string().nullish(),
+  zatcaClearedXml: z.string().nullish(),
+  zatcaSubmittedAt: z.date().nullish(),
+  zatcaClearedAt: z.date().nullish(),
   paymentTerms: z.string().nullish(),
   notes: z.string().nullish(),
   templateId: z.string().nullish(),
@@ -4612,4 +4650,56 @@ export const HandoverProtocolItemSchema = z.object({
 });
 
 export type HandoverProtocolItemType = z.infer<typeof HandoverProtocolItemSchema>;
+
+
+// File: ZatcaDevice.schema.ts
+
+export const ZatcaDeviceSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  deviceName: z.string().default("MASAR-EGS-001"),
+  invoiceType: ZatcaInvoiceTypeSchema,
+  csidCertificate: z.string().nullish(),
+  csidSecret: z.string().nullish(),
+  csidRequestId: z.string().nullish(),
+  csidExpiresAt: z.date().nullish(),
+  privateKey: z.string().nullish(),
+  publicKey: z.string().nullish(),
+  complianceCsid: z.string().nullish(),
+  complianceSecret: z.string().nullish(),
+  invoiceCounter: z.number().int(),
+  previousInvoiceHash: z.string().default("NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYmUxYjE3ZTExNzA5"),
+  status: ZatcaIntegrationStatusSchema.default("DISABLED"),
+  lastError: z.string().nullish(),
+  onboardedAt: z.date().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type ZatcaDeviceType = z.infer<typeof ZatcaDeviceSchema>;
+
+
+// File: ZatcaSubmission.schema.ts
+
+export const ZatcaSubmissionSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  invoiceId: z.string(),
+  deviceId: z.string(),
+  submissionType: z.string(),
+  invoiceHash: z.string(),
+  xmlContent: z.string().nullish(),
+  signedXmlContent: z.string().nullish(),
+  status: ZatcaSubmissionStatusSchema.default("PENDING"),
+  zatcaResponse: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  clearedXml: z.string().nullish(),
+  zatcaWarnings: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  zatcaErrors: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  attempts: z.number().int().default(1),
+  lastAttemptAt: z.date(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type ZatcaSubmissionType = z.infer<typeof ZatcaSubmissionSchema>;
 
