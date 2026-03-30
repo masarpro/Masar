@@ -6,13 +6,7 @@ import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Badge } from "@ui/components/badge";
-import {
-	FileText,
-	List,
-	ClipboardCheck,
-	Banknote,
-	BarChart3,
-} from "lucide-react";
+import { FileText, List, ClipboardCheck } from "lucide-react";
 
 interface SubcontractTabsProps {
 	organizationId: string;
@@ -46,6 +40,9 @@ export function SubcontractTabs({
 		}),
 	);
 
+	const itemCount = Array.isArray(items) ? items.length : undefined;
+	const claimCount = Array.isArray(claims) ? claims.length : undefined;
+
 	const tabs = [
 		{
 			key: "details",
@@ -59,14 +56,14 @@ export function SubcontractTabs({
 			label: t("subcontractItems.title"),
 			href: `${basePath}/items`,
 			icon: List,
-			count: items?.length,
+			count: itemCount,
 		},
 		{
 			key: "claims",
 			label: t("claims.subcontractClaims"),
 			href: `${basePath}/claims`,
 			icon: ClipboardCheck,
-			count: claims?.length,
+			count: claimCount,
 		},
 	];
 

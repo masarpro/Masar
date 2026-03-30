@@ -21,6 +21,7 @@ export const ROLE_SECTION_VISIBILITY: Record<ProjectRole, string[]> = {
 		"owner",
 		"insights",
 		"team",
+		"handover",
 	],
 	ENGINEER: [
 		"overview",
@@ -32,6 +33,7 @@ export const ROLE_SECTION_VISIBILITY: Record<ProjectRole, string[]> = {
 		"documents",
 		"chat",
 		"updates",
+		"handover",
 	],
 	SUPERVISOR: [
 		"overview",
@@ -40,6 +42,7 @@ export const ROLE_SECTION_VISIBILITY: Record<ProjectRole, string[]> = {
 		"documents",
 		"chat",
 		"updates",
+		"handover",
 	],
 	ACCOUNTANT: [
 		"overview",

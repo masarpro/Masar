@@ -40,6 +40,7 @@ import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 import { formatCurrency, PAYMENT_METHODS } from "./subcontract-shared";
 import { SubcontractHeader } from "./SubcontractHeader";
 import { SubcontractFinanceSummary } from "./SubcontractFinanceSummary";
+import { SubcontractTabs } from "./SubcontractTabs";
 import { SubcontractClaimsSection } from "./SubcontractClaimsSection";
 import { SubcontractChangeOrdersSection } from "./SubcontractChangeOrdersSection";
 import { SubcontractPaymentSection } from "./SubcontractPaymentSection";
@@ -406,6 +407,14 @@ export function SubcontractDetailView({
 					scopeOfWork={contract.scopeOfWork}
 				/>
 			</SubcontractHeader>
+
+			{/* Navigation Tabs */}
+			<SubcontractTabs
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+				projectId={projectId}
+				subcontractId={subcontractId}
+			/>
 
 			{/* Payments + Payment Terms */}
 			<SubcontractPaymentSection
