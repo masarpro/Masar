@@ -1,4 +1,5 @@
 "use client";
+// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { CreditCard, Wallet } from "lucide-react";
 import { useTranslations } from "next-intl";

@@ -56,6 +56,12 @@ agents.md
 - **Stripe** (subscription billing)
 - **Google OAuth** (Project ID: masar-489017)
 
+### Compatibility Notes
+- **React 19.2.3:** Production release — `use()` hook, Server Components, Actions all stable
+- **Next.js 16.1.0:** Production release — App Router, proxy.ts (replaces middleware.ts), Turbopack default
+- **Zod v4.1.12:** Breaking changes from v3 — `z.coerce` behavior changed, some `.transform()` patterns differ
+- **Node.js:** Requires 20+ (ESM-first Prisma 7)
+
 ---
 
 ## 3. هيكل المشروع

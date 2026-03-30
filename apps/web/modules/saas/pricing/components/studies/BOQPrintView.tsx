@@ -211,6 +211,7 @@ function buildPrintHTML(props: BOQPrintViewProps): string {
   <!-- Header -->
   <div class="header">
     <div class="header-right">
+      ${/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */ ""}
       ${organizationLogo ? `<img class="header-logo" src="${esc(organizationLogo)}" alt="" />` : ""}
       <div>
         <div class="header-company">${esc(organizationName)}</div>

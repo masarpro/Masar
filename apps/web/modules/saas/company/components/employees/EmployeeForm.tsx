@@ -1,4 +1,5 @@
 "use client";
+// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";

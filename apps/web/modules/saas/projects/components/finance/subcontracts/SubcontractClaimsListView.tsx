@@ -1,4 +1,5 @@
 "use client";
+// TODO(i18n): Extract hardcoded Arabic strings to translation keys
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";

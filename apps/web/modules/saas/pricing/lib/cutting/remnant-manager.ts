@@ -6,6 +6,14 @@ import type { StoredRemnant, WasteInventory, Remnant } from './types';
 import { REBAR_SPECIFICATIONS } from './saudi-rebar-specs';
 
 /**
+ * Remnant Manager — tracks reusable steel bar remnants across cutting sessions.
+ * Remnant lifecycle: available → reserved → used
+ * Remnants < 0.3m (minimumUsableLength) are automatically discarded as scrap.
+ * This is a design decision matching Saudi construction practice.
+ * Ref: Audit v5 #57
+ */
+
+/**
  * البحث عن فضلات قابلة للاستخدام
  */
 export function findMatchingRemnants(

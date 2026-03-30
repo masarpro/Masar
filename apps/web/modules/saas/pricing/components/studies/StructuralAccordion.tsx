@@ -53,7 +53,7 @@ const SlabsSection = dynamic(
 );
 
 const BlocksSection = dynamic(
-	() => import("./sections/BlocksSection").then(mod => ({ default: mod.BlocksSection })),
+	() => import("./sections/blocks/BlocksSection").then(mod => ({ default: mod.BlocksSection })),
 	{ loading: () => <SectionSkeleton /> },
 );
 

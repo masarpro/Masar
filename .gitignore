@@ -44,3 +44,4 @@ dist/
 .content-collections/
 .prisma-zod-generator-manifest.json
 nul
+.vercel

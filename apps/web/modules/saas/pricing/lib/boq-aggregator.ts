@@ -150,6 +150,17 @@ interface EnabledFloor {
 /**
  * Determines which floor group a structural item belongs to.
  * Returns "foundations", a floor id, or "shared".
+ *
+ * Floor label matching strategy:
+ * Uses bidirectional includes() to handle Arabic label variations.
+ * Example: "الدور الأرضي" matches "الأرضي" and vice versa.
+ * This is intentional — Saudi building naming conventions vary between
+ * contractors, so fuzzy matching is required.
+ * Priority: exact match > label.includes(floorLabel) > floorLabel.includes(label)
+ *
+ * CAUTION: includes() may cause false positives in edge cases.
+ * Post-beta: replace with normalized matching or exact IDs.
+ * Ref: Audit v5 #56
  */
 export function getItemFloorGroup(
 	item: StructuralItem,

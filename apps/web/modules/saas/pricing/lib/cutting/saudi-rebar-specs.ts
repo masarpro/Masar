@@ -34,7 +34,12 @@ export const REBAR_SPECIFICATIONS = {
 		32: 6.313,
 	} as Record<number, number>,
 
-	// أقل طول قطعة يمكن استخدامها
+	/**
+	 * Minimum usable remnant length (meters).
+	 * Remnants below this threshold are treated as scrap (not reusable).
+	 * This matches standard construction practice in Saudi Arabia.
+	 * Ref: Audit v5 #57
+	 */
 	minimumUsableLength: 0.3, // 30 سم
 
 	// طول الوصلة (overlap) حسب القطر

@@ -107,8 +107,8 @@ export function deriveHeights(
 			const beamDepth = actualSlab?.beamDepth ?? hp.defaultBeamDepth;
 			const visibleBeam = Math.max(0, beamDepth - slabThickness);
 
-			columnHeight = floorToFloor * 100 - slabThickness - visibleBeam;
-			blockHeight = floorToFloor * 100 - visibleBeam;
+			columnHeight = Math.max(0, floorToFloor * 100 - slabThickness - visibleBeam);
+			blockHeight = Math.max(0, floorToFloor * 100 - visibleBeam);
 
 			totalAboveGround += floorToFloor;
 		}

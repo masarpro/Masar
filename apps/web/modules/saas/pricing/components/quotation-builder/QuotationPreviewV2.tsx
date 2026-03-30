@@ -170,6 +170,7 @@ export function QuotationPreviewV2({
 						<div className="flex justify-between items-start border-b border-border pb-6">
 							<div>
 								{org?.logo && (
+									// NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply
 									<img src={org.logo} alt="" className="h-16 mb-3 object-contain" />
 								)}
 								<p className="font-bold text-lg leading-relaxed">{org?.companyNameAr ?? ""}</p>

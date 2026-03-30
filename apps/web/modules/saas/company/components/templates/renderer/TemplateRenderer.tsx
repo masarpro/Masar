@@ -535,6 +535,7 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 				}
 				return (
 					<div key={element.id} className="py-4 flex justify-center">
+						{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
 						<img src={imageUrl} alt="" className="max-w-full h-auto rounded-lg" />
 					</div>
 				);
@@ -640,6 +641,7 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 			onClick={() => interactive && onElementClick?.(null)}
 		>
 			{/* Header Image (full-bleed) */}
+			{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
 			{headerImage && (
 				<img src={headerImage} alt="" className="w-full block" />
 			)}
@@ -682,6 +684,7 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 			</div>
 
 			{/* Footer Image (full-bleed) */}
+			{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
 			{footerImage && (
 				<img src={footerImage} alt="" className="w-full block" />
 			)}
