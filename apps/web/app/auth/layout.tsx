@@ -8,6 +8,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import type { PropsWithChildren } from "react";
 import { Suspense } from "react";
+import { AuthParticleField } from "./AuthParticleField";
 
 export default async function AuthLayout({ children }: PropsWithChildren) {
 	const [locale, messages, t] = await Promise.all([
@@ -39,6 +40,7 @@ export default async function AuthLayout({ children }: PropsWithChildren) {
 								<div className="landing-grid" />
 								<div className="landing-glow-line" />
 							</div>
+							<AuthParticleField />
 							<div
 								className="absolute inset-0 pointer-events-none"
 								style={{
