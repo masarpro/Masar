@@ -1,25 +1,26 @@
 /**
- * ZATCA Phase 2 — CSR Generator (Pure JavaScript)
+ * ZATCA Phase 2 — CSR Generator
  *
  * Generates ECDSA secp256k1 key pair + CSR with all ZATCA-required fields.
- * Uses @noble/curves — no OpenSSL CLI dependency, works on Vercel Serverless.
+ * Uses Node.js crypto for key generation and signing — works on Vercel Serverless.
  *
- * Required fields per ZATCA spec (Developer Portal Manual v3, Appendix 5.3):
- * - Subject DN: C, OU, O, CN
- * - Extension: certificateTemplateName = ZATCA-Code-Signing (OID 1.3.6.1.4.1.311.20.2)
- * - SubjectAltName (dirName): SN, UID, title, registeredAddress, businessCategory
- * - Key: ECDSA secp256k1, SHA-256
+ * Matches the working OpenSSL config (ZATCA Developer Portal Manual v3, Appendix 5.3):
+ * - Subject DN: C=SA, OU=orgName, O=orgName, CN=TST-886431145-{taxNumber}
+ * - Extensions: basicConstraints, keyUsage, certificateTemplateName, subjectAltName
+ * - Key: ECDSA secp256k1, ecdsaWithSHA256
  */
 
-import { randomUUID } from "node:crypto";
-import { secp256k1 } from "@noble/curves/secp256k1.js";
-import { sha256 } from "@noble/hashes/sha2.js";
+import {
+	generateKeyPairSync,
+	createSign,
+	randomUUID,
+} from "node:crypto";
 import { CSR_CONFIG } from "./constants";
 import type { CSRInput, CSRResult } from "./types";
 import type { ZatcaEnvironment } from "./constants";
 
 // ═══════════════════════════════════════════════════════════
-// ASN.1 DER Encoding
+// ASN.1 DER Encoding Helpers
 // ═══════════════════════════════════════════════════════════
 
 function derLength(len: number): Buffer {
@@ -40,12 +41,19 @@ const derSequence = (...items: Buffer[]) =>
 	derWrap(0x30, Buffer.concat(items));
 const derSet = (...items: Buffer[]) => derWrap(0x31, Buffer.concat(items));
 const derOctetString = (data: Buffer) => derWrap(0x04, data);
-const derBitString = (data: Buffer) =>
-	derWrap(0x03, Buffer.concat([Buffer.from([0x00]), data]));
 const derUTF8String = (str: string) =>
 	derWrap(0x0c, Buffer.from(str, "utf8"));
 const derPrintableString = (str: string) =>
 	derWrap(0x13, Buffer.from(str, "ascii"));
+const derBoolean = (val: boolean) =>
+	derWrap(0x01, Buffer.from([val ? 0xff : 0x00]));
+
+function derBitString(data: Buffer, unusedBits = 0): Buffer {
+	return derWrap(
+		0x03,
+		Buffer.concat([Buffer.from([unusedBits]), data]),
+	);
+}
 
 function derInteger(value: number): Buffer {
 	if (value === 0) return derWrap(0x02, Buffer.from([0]));
@@ -100,12 +108,12 @@ function derRDN(oid: string, value: Buffer): Buffer {
 // ═══════════════════════════════════════════════════════════
 
 const OID = {
-	// Subject DN attributes
+	// Subject DN
 	countryName: "2.5.4.6",
 	organizationUnit: "2.5.4.11",
 	organization: "2.5.4.10",
 	commonName: "2.5.4.3",
-	// SubjectAltName dirName attributes
+	// SubjectAltName dirName
 	serialNumber: "2.5.4.5",
 	userId: "0.9.2342.19200300.100.1.1",
 	title: "2.5.4.12",
@@ -117,45 +125,11 @@ const OID = {
 	ecdsaWithSHA256: "1.2.840.10045.4.3.2",
 	// Extensions
 	extensionRequest: "1.2.840.113549.1.9.14",
+	basicConstraints: "2.5.29.19",
+	keyUsage: "2.5.29.15",
 	subjectAltName: "2.5.29.17",
 	certificateTemplateName: "1.3.6.1.4.1.311.20.2",
 } as const;
-
-// ═══════════════════════════════════════════════════════════
-// PEM Helpers
-// ═══════════════════════════════════════════════════════════
-
-function toPem(der: Buffer, label: string): string {
-	const b64 = der.toString("base64");
-	const lines: string[] = [];
-	for (let i = 0; i < b64.length; i += 64) {
-		lines.push(b64.substring(i, i + 64));
-	}
-	return `-----BEGIN ${label}-----\n${lines.join("\n")}\n-----END ${label}-----\n`;
-}
-
-/** SEC1 EC PRIVATE KEY PEM (compatible with invoice-signer's pemToPrivateKeyHex) */
-function buildPrivateKeyPem(
-	privBytes: Uint8Array,
-	pubUncompressed: Uint8Array,
-): string {
-	const der = derSequence(
-		derInteger(1), // ecPrivkeyVer1
-		derOctetString(Buffer.from(privBytes)),
-		derContextTag(0, derOID(OID.secp256k1)),
-		derContextTag(1, derBitString(Buffer.from(pubUncompressed))),
-	);
-	return toPem(der, "EC PRIVATE KEY");
-}
-
-/** SubjectPublicKeyInfo PEM (compressed point) */
-function buildPublicKeyPem(pubCompressed: Uint8Array): string {
-	const der = derSequence(
-		derSequence(derOID(OID.ecPublicKey), derOID(OID.secp256k1)),
-		derBitString(Buffer.from(pubCompressed)),
-	);
-	return toPem(der, "PUBLIC KEY");
-}
 
 // ═══════════════════════════════════════════════════════════
 // CSR Generator
@@ -163,44 +137,72 @@ function buildPublicKeyPem(pubCompressed: Uint8Array): string {
 
 /**
  * Generate an ECDSA secp256k1 key pair + ZATCA-compliant CSR.
- * Pure JavaScript — no OpenSSL CLI, no temp files, works on Vercel.
+ * Uses Node.js crypto — no OpenSSL CLI, no temp files, works on Vercel.
  */
 export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 	const serialNumber = input.serialNumber || randomUUID();
 	const invoiceType = input.invoiceType ?? "1100";
 	const location = input.location || CSR_CONFIG.registeredAddress;
 	const industry = input.industry || CSR_CONFIG.businessCategory;
+	const env = (process.env.ZATCA_ENVIRONMENT || "sandbox") as ZatcaEnvironment;
 
-	// 1. Generate ECDSA secp256k1 key pair
-	const privateKeyBytes = secp256k1.utils.randomSecretKey();
-	const publicKeyUncompressed = secp256k1.getPublicKey(privateKeyBytes, false); // 65 bytes
-	const publicKeyCompressed = secp256k1.getPublicKey(privateKeyBytes, true); // 33 bytes
+	// 1. Generate ECDSA secp256k1 key pair via Node.js crypto
+	const keyPair = generateKeyPairSync("ec", { namedCurve: "secp256k1" });
 
-	// 2. Subject DN: C=SA, OU=orgName, O=orgName, CN=MASAR-EGS
+	const privateKeyPem = keyPair.privateKey.export({
+		type: "sec1",
+		format: "pem",
+	}) as string;
+
+	const publicKeyPem = keyPair.publicKey.export({
+		type: "spki",
+		format: "pem",
+	}) as string;
+
+	// SPKI DER — used directly as SubjectPublicKeyInfo in the CSR
+	const publicKeySpkiDer = keyPair.publicKey.export({
+		type: "spki",
+		format: "der",
+	});
+
+	// 2. Subject DN
+	//    CN = TST-886431145-{taxNumber} for sandbox, MASAR-EGS for production
+	const cn =
+		env === "production"
+			? CSR_CONFIG.commonName
+			: `TST-886431145-${input.vatNumber}`;
+
 	const subject = derSequence(
 		derRDN(OID.countryName, derPrintableString(CSR_CONFIG.country)),
 		derRDN(OID.organizationUnit, derUTF8String(input.organizationName)),
 		derRDN(OID.organization, derUTF8String(input.organizationName)),
-		derRDN(OID.commonName, derUTF8String(CSR_CONFIG.commonName)),
+		derRDN(OID.commonName, derUTF8String(cn)),
 	);
 
-	// 3. SubjectPublicKeyInfo (uncompressed point in CSR per X.509 standard)
-	const subjectPublicKeyInfo = derSequence(
-		derSequence(derOID(OID.ecPublicKey), derOID(OID.secp256k1)),
-		derBitString(Buffer.from(publicKeyUncompressed)),
+	// 3. Extensions
+	// 3a. basicConstraints: CA:FALSE (empty SEQUENCE = default FALSE)
+	const basicConstraintsExt = derSequence(
+		derOID(OID.basicConstraints),
+		derOctetString(derSequence()),
 	);
 
-	// 4. Extensions
-	// 4a. certificateTemplateName — sandbox uses "TSTZATCA-Code-Signing", production uses "ZATCA-Code-Signing"
-	const env = (process.env.ZATCA_ENVIRONMENT || "sandbox") as ZatcaEnvironment;
+	// 3b. keyUsage: digitalSignature + nonRepudiation + keyEncipherment (critical)
+	//     Bits 0,1,2 set → 0xE0, unused bits = 5
+	const keyUsageExt = derSequence(
+		derOID(OID.keyUsage),
+		derBoolean(true), // critical
+		derOctetString(derBitString(Buffer.from([0xe0]), 5)),
+	);
+
+	// 3c. certificateTemplateName — UTF8String per ZATCA spec
 	const templateName =
 		env === "production" ? "ZATCA-Code-Signing" : "TSTZATCA-Code-Signing";
 	const certTemplateExt = derSequence(
 		derOID(OID.certificateTemplateName),
-		derOctetString(derPrintableString(templateName)),
+		derOctetString(derUTF8String(templateName)),
 	);
 
-	// 4b. subjectAltName dirName (SN, UID, title, registeredAddress, businessCategory)
+	// 3d. subjectAltName dirName (SN, UID, title, registeredAddress, businessCategory)
 	const altNameDirName = derSequence(
 		derRDN(
 			OID.serialNumber,
@@ -219,45 +221,53 @@ export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 		),
 	);
 
-	// 5. Attributes: [0] IMPLICIT SET OF Attribute → extensionRequest
+	// 4. Attributes: [0] IMPLICIT SET OF Attribute → extensionRequest
 	const attributes = derContextTag(
 		0,
 		derSequence(
 			derOID(OID.extensionRequest),
-			derSet(derSequence(certTemplateExt, subjectAltNameExt)),
+			derSet(
+				derSequence(
+					basicConstraintsExt,
+					keyUsageExt,
+					certTemplateExt,
+					subjectAltNameExt,
+				),
+			),
 		),
 	);
 
-	// 6. CertificationRequestInfo
+	// 5. CertificationRequestInfo
 	const certRequestInfo = derSequence(
 		derInteger(0), // version 0
 		subject,
-		subjectPublicKeyInfo,
+		publicKeySpkiDer, // SPKI DER from Node.js crypto
 		attributes,
 	);
 
-	// 7. Sign CertificationRequestInfo with ECDSA-SHA256
-	const hash = sha256(certRequestInfo);
-	const signatureDer = Buffer.from(
-		secp256k1.sign(hash, privateKeyBytes, { prehash: false, format: "der" }),
-	);
+	// 6. Sign with ECDSA-SHA256 via Node.js crypto
+	const signer = createSign("SHA256");
+	signer.update(certRequestInfo);
+	const signatureDer = signer.sign(keyPair.privateKey);
 
-	// 8. Complete CertificationRequest
+	// 7. Complete CertificationRequest
 	const csrDer = derSequence(
 		certRequestInfo,
 		derSequence(derOID(OID.ecdsaWithSHA256)),
 		derBitString(signatureDer),
 	);
 
-	// 9. ZATCA expects Base64(PEM), not Base64(DER)
+	// 8. ZATCA expects Base64(PEM), not Base64(DER)
 	const derBase64 = csrDer.toString("base64");
 	const pemLines = derBase64.match(/.{1,64}/g)?.join("\n") || derBase64;
 	const pem = `-----BEGIN CERTIFICATE REQUEST-----\n${pemLines}\n-----END CERTIFICATE REQUEST-----`;
 	const csrForZatca = Buffer.from(pem).toString("base64");
 
+	console.log("[ZATCA DEBUG] CSR PEM:\n" + pem);
+
 	return {
 		csr: csrForZatca,
-		privateKey: buildPrivateKeyPem(privateKeyBytes, publicKeyUncompressed),
-		publicKey: buildPublicKeyPem(publicKeyCompressed),
+		privateKey: privateKeyPem,
+		publicKey: publicKeyPem,
 	};
 }
