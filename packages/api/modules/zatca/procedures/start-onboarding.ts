@@ -86,7 +86,9 @@ export const startOnboarding = subscriptionProcedure
 			});
 		}
 
-		// 3. Generate CSR + key pair
+		// 3. Generate CSR + key pair (wrap in try-catch for clear error messages)
+		try {
+
 		const csrResult = await generateCSR({
 			organizationName: org.name,
 			vatNumber: cleanTaxNumber,
@@ -289,4 +291,14 @@ export const startOnboarding = subscriptionProcedure
 					? "تم التسجيل بنجاح مع زاتكا"
 					: "تم الحصول على شهادة الاختبار. اطلب شهادة الإنتاج لإكمال التسجيل.",
 		};
+
+		} catch (error) {
+			// Re-throw ORPCError as-is (already has proper messages)
+			if (error instanceof ORPCError) throw error;
+
+			console.error("[ZATCA Onboarding] Error:", error);
+			throw new ORPCError("INTERNAL_SERVER_ERROR", {
+				message: `خطأ في التسجيل مع زاتكا: ${error instanceof Error ? error.message : "خطأ غير معروف"}`,
+			});
+		}
 	});
