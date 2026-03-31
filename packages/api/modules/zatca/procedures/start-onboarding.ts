@@ -16,6 +16,7 @@ import {
 	buildInvoiceXml,
 	signInvoice,
 	getInitialPIH,
+	SANDBOX_DEFAULTS,
 } from "../../../lib/zatca/phase2";
 import type { ZatcaInvoiceData } from "../../../lib/zatca/phase2";
 import { v4 as uuidv4 } from "uuid";
@@ -98,7 +99,10 @@ export const startOnboarding = subscriptionProcedure
 		});
 
 		// 4. Request Compliance CSID from ZATCA
-		const complianceResult = await requestComplianceCSID(csrResult.csr, input.otp);
+		//    Sandbox always requires the fixed OTP "123345" regardless of user input
+		const env = process.env.ZATCA_ENVIRONMENT || "sandbox";
+		const effectiveOtp = env === "sandbox" ? SANDBOX_DEFAULTS.otp : input.otp;
+		const complianceResult = await requestComplianceCSID(csrResult.csr, effectiveOtp);
 
 		if (!complianceResult.success || !complianceResult.csid || !complianceResult.secret) {
 			throw new ORPCError("BAD_REQUEST", {
