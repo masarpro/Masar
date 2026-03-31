@@ -40,7 +40,7 @@ export const startOnboarding = subscriptionProcedure
 			action: "integrations",
 		});
 
-		// 1. Get organization details
+		// 1. Get organization details (tax number may be in financeSettings or Organization)
 		const org = await db.organization.findUnique({
 			where: { id: input.organizationId },
 			select: {
@@ -50,6 +50,9 @@ export const startOnboarding = subscriptionProcedure
 				commercialRegister: true,
 				address: true,
 				city: true,
+				financeSettings: {
+					select: { taxNumber: true, commercialRegister: true },
+				},
 			},
 		});
 
@@ -57,13 +60,16 @@ export const startOnboarding = subscriptionProcedure
 			throw new ORPCError("NOT_FOUND", { message: "المنظمة غير موجودة" });
 		}
 
-		if (!org.taxNumber || !/^\d{15}$/.test(org.taxNumber.replace(/[\s-]/g, ""))) {
+		// Prefer financeSettings (where /settings/general saves), fallback to Organization
+		const resolvedTaxNumber = org.financeSettings?.taxNumber || org.taxNumber;
+
+		if (!resolvedTaxNumber || !/^\d{15}$/.test(resolvedTaxNumber.replace(/[\s-]/g, ""))) {
 			throw new ORPCError("BAD_REQUEST", {
 				message: "أضف الرقم الضريبي (15 رقم) في إعدادات المنظمة أولاً",
 			});
 		}
 
-		const cleanTaxNumber = org.taxNumber.replace(/[\s-]/g, "");
+		const cleanTaxNumber = resolvedTaxNumber.replace(/[\s-]/g, "");
 
 		// 2. Check for existing active device
 		const existingDevice = await db.zatcaDevice.findFirst({
