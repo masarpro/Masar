@@ -51,10 +51,17 @@ async function zatcaFetch(path: string, options: ZatcaFetchOptions): Promise<Zat
 		headers.OTP = options.otp;
 	}
 
+	const bodyJson = options.body ? JSON.stringify(options.body) : undefined;
+
+	// DEBUG — log full request for ZATCA troubleshooting
+	console.log("[ZATCA API] Request:", options.method, url);
+	console.log("[ZATCA API] Headers:", JSON.stringify(headers));
+	if (bodyJson) console.log("[ZATCA API] Body:", bodyJson.substring(0, 200));
+
 	const response = await fetch(url, {
 		method: options.method,
 		headers,
-		body: options.body ? JSON.stringify(options.body) : undefined,
+		body: bodyJson,
 	});
 
 	const responseText = await response.text();

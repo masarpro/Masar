@@ -170,17 +170,20 @@ export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 		format: "der",
 	});
 
-	// 2. Subject DN
-	//    CN = TST-886431145-{taxNumber} for sandbox, MASAR-EGS for production
+	// 2. Subject DN — ASCII only (no Arabic), ZATCA rejects non-ASCII in Subject
 	const cn =
 		env === "production"
 			? CSR_CONFIG.commonName
 			: `TST-886431145-${input.vatNumber}`;
 
+	// Use ASCII-safe org name: strip non-ASCII chars, fallback to defaults
+	const asciiOrg = input.organizationName.replace(/[^\x20-\x7E]/g, "").trim() || "Masar Platform";
+	const asciiOU = "Main Branch";
+
 	const subject = derSequence(
 		derRDN(OID.countryName, derPrintableString(CSR_CONFIG.country)),
-		derRDN(OID.organizationUnit, derUTF8String(input.organizationName)),
-		derRDN(OID.organization, derUTF8String(input.organizationName)),
+		derRDN(OID.organizationUnit, derUTF8String(asciiOU)),
+		derRDN(OID.organization, derUTF8String(asciiOrg)),
 		derRDN(OID.commonName, derUTF8String(cn)),
 	);
 
