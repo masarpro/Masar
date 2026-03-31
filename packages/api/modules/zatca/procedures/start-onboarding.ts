@@ -51,7 +51,7 @@ export const startOnboarding = subscriptionProcedure
 				address: true,
 				city: true,
 				financeSettings: {
-					select: { taxNumber: true, commercialRegister: true },
+					select: { taxNumber: true, commercialReg: true },
 				},
 			},
 		});
