@@ -249,8 +249,14 @@ export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 		derBitString(signatureDer),
 	);
 
+	// 9. ZATCA expects Base64(PEM), not Base64(DER)
+	const derBase64 = csrDer.toString("base64");
+	const pemLines = derBase64.match(/.{1,64}/g)?.join("\n") || derBase64;
+	const pem = `-----BEGIN CERTIFICATE REQUEST-----\n${pemLines}\n-----END CERTIFICATE REQUEST-----`;
+	const csrForZatca = Buffer.from(pem).toString("base64");
+
 	return {
-		csr: csrDer.toString("base64"),
+		csr: csrForZatca,
 		privateKey: buildPrivateKeyPem(privateKeyBytes, publicKeyUncompressed),
 		publicKey: buildPublicKeyPem(publicKeyCompressed),
 	};
