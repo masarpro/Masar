@@ -121,7 +121,7 @@ const OID = {
 	businessCategory: "2.5.4.15",
 	// Algorithms
 	ecPublicKey: "1.2.840.10045.2.1",
-	secp256k1: "1.3.132.0.10",
+	prime256v1: "1.2.840.10045.3.1.7", // P-256 — required by ZATCA
 	ecdsaWithSHA256: "1.2.840.10045.4.3.2",
 	// Extensions
 	extensionRequest: "1.2.840.113549.1.9.14",
@@ -136,8 +136,12 @@ const OID = {
 // ═══════════════════════════════════════════════════════════
 
 /**
- * Generate an ECDSA secp256k1 key pair + ZATCA-compliant CSR.
+ * Generate an ECDSA P-256 key pair + ZATCA-compliant CSR.
  * Uses Node.js crypto — no OpenSSL CLI, no temp files, works on Vercel.
+ *
+ * ZATCA Security Features v1.2, Section 2.2.2:
+ *   SubjectPublicKeyInfo: Public Key, Key length: P-256
+ *   → prime256v1 (secp256r1) — OID 1.2.840.10045.3.1.7
  */
 export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 	const serialNumber = input.serialNumber || randomUUID();
@@ -146,8 +150,9 @@ export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 	const industry = input.industry || CSR_CONFIG.businessCategory;
 	const env = (process.env.ZATCA_ENVIRONMENT || "sandbox") as ZatcaEnvironment;
 
-	// 1. Generate ECDSA secp256k1 key pair via Node.js crypto
-	const keyPair = generateKeyPairSync("ec", { namedCurve: "secp256k1" });
+	// 1. Generate ECDSA P-256 key pair via Node.js crypto
+	//    ZATCA requires prime256v1 (P-256), NOT secp256k1
+	const keyPair = generateKeyPairSync("ec", { namedCurve: "prime256v1" });
 
 	const privateKeyPem = keyPair.privateKey.export({
 		type: "sec1",
@@ -263,6 +268,11 @@ export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 	const pem = `-----BEGIN CERTIFICATE REQUEST-----\n${pemLines}\n-----END CERTIFICATE REQUEST-----`;
 	const csrForZatca = Buffer.from(pem).toString("base64");
 
+	// DEBUG — verify correct EC curve OID in CSR
+	const p256OID = Buffer.from([0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07]);
+	const k1OID = Buffer.from([0x06, 0x05, 0x2b, 0x81, 0x04, 0x00, 0x0a]);
+	console.log("[ZATCA DEBUG] CSR uses P-256 (prime256v1):", csrDer.includes(p256OID));
+	console.log("[ZATCA DEBUG] CSR uses secp256k1 (WRONG):", csrDer.includes(k1OID));
 	console.log("[ZATCA DEBUG] CSR PEM:\n" + pem);
 
 	return {
