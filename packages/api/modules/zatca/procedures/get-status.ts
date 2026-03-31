@@ -21,7 +21,7 @@ export const getZatcaStatus = protectedProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "settings",
-			action: "view",
+			action: "integrations",
 		});
 
 		// Get all ZATCA devices for this org

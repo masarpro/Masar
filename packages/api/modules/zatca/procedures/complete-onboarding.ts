@@ -29,7 +29,7 @@ export const completeOnboarding = subscriptionProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "settings",
-			action: "edit",
+			action: "integrations",
 		});
 
 		const device = await db.zatcaDevice.findFirst({
