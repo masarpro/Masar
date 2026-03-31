@@ -11,10 +11,12 @@
  * - Key: ECDSA secp256k1, SHA-256
  */
 
+import { randomUUID } from "node:crypto";
 import { secp256k1 } from "@noble/curves/secp256k1.js";
 import { sha256 } from "@noble/hashes/sha2.js";
 import { CSR_CONFIG } from "./constants";
 import type { CSRInput, CSRResult } from "./types";
+import type { ZatcaEnvironment } from "./constants";
 
 // ═══════════════════════════════════════════════════════════
 // ASN.1 DER Encoding
@@ -164,7 +166,7 @@ function buildPublicKeyPem(pubCompressed: Uint8Array): string {
  * Pure JavaScript — no OpenSSL CLI, no temp files, works on Vercel.
  */
 export async function generateCSR(input: CSRInput): Promise<CSRResult> {
-	const serialNumber = input.serialNumber || `${Date.now()}`;
+	const serialNumber = input.serialNumber || randomUUID();
 	const invoiceType = input.invoiceType ?? "1100";
 	const location = input.location || CSR_CONFIG.registeredAddress;
 	const industry = input.industry || CSR_CONFIG.businessCategory;
@@ -189,10 +191,13 @@ export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 	);
 
 	// 4. Extensions
-	// 4a. certificateTemplateName = ZATCA-Code-Signing
+	// 4a. certificateTemplateName — sandbox uses "TSTZATCA-Code-Signing", production uses "ZATCA-Code-Signing"
+	const env = (process.env.ZATCA_ENVIRONMENT || "sandbox") as ZatcaEnvironment;
+	const templateName =
+		env === "production" ? "ZATCA-Code-Signing" : "TSTZATCA-Code-Signing";
 	const certTemplateExt = derSequence(
 		derOID(OID.certificateTemplateName),
-		derOctetString(derPrintableString("ZATCA-Code-Signing")),
+		derOctetString(derPrintableString(templateName)),
 	);
 
 	// 4b. subjectAltName dirName (SN, UID, title, registeredAddress, businessCategory)
