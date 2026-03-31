@@ -112,6 +112,10 @@ export interface CSRInput {
 	/** "1100" = both, "1000" = standard only, "0100" = simplified only */
 	invoiceType?: "1100" | "1000" | "0100";
 	serialNumber?: string;
+	/** Branch address or location (registeredAddress in CSR alt_names) */
+	location?: string;
+	/** Business sector (businessCategory in CSR alt_names) */
+	industry?: string;
 }
 
 /** Input for enhanced QR code (9 tags) */

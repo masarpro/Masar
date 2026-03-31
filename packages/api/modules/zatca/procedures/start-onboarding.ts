@@ -85,6 +85,8 @@ export const startOnboarding = subscriptionProcedure
 			organizationName: org.name,
 			vatNumber: cleanTaxNumber,
 			invoiceType: input.invoiceType === "STANDARD" ? "1000" : "0100",
+			location: org.city || "Jeddah",
+			industry: "Construction",
 		});
 
 		// 4. Request Compliance CSID from ZATCA

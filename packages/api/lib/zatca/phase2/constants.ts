@@ -88,3 +88,9 @@ export const INVOICE_SUBTYPE = {
 
 // ZATCA environment type
 export type ZatcaEnvironment = keyof typeof ZATCA_URLS;
+
+// Sandbox testing — OTP can be any 6-digit number in sandbox mode.
+// The sandbox Swagger page provides dummy credentials for initial testing.
+export const SANDBOX_DEFAULTS = {
+	otp: "123345",
+} as const;
