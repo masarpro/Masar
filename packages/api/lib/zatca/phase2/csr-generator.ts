@@ -262,21 +262,19 @@ export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 		derBitString(signatureDer),
 	);
 
-	// 8. ZATCA expects Base64(PEM), not Base64(DER)
-	const derBase64 = csrDer.toString("base64");
-	const pemLines = derBase64.match(/.{1,64}/g)?.join("\n") || derBase64;
-	const pem = `-----BEGIN CERTIFICATE REQUEST-----\n${pemLines}\n-----END CERTIFICATE REQUEST-----`;
-	const csrForZatca = Buffer.from(pem).toString("base64");
+	// 8. CSR as raw Base64 of DER — no PEM headers, no newlines
+	const csrBase64 = csrDer.toString("base64");
 
 	// DEBUG — verify correct EC curve OID in CSR
 	const p256OID = Buffer.from([0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07]);
 	const k1OID = Buffer.from([0x06, 0x05, 0x2b, 0x81, 0x04, 0x00, 0x0a]);
 	console.log("[ZATCA DEBUG] CSR uses P-256 (prime256v1):", csrDer.includes(p256OID));
 	console.log("[ZATCA DEBUG] CSR uses secp256k1 (WRONG):", csrDer.includes(k1OID));
-	console.log("[ZATCA DEBUG] CSR PEM:\n" + pem);
+	console.log("[ZATCA DEBUG] CSR Base64 length:", csrBase64.length);
+	console.log("[ZATCA DEBUG] CSR first 60:", csrBase64.substring(0, 60));
 
 	return {
-		csr: csrForZatca,
+		csr: csrBase64,
 		privateKey: privateKeyPem,
 		publicKey: publicKeyPem,
 	};
