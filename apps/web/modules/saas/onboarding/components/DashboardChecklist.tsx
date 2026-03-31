@@ -32,7 +32,19 @@ export function DashboardChecklist() {
 			input: { organizationId },
 		}),
 		enabled: !!organizationId,
-	});
+	}) as {
+		data: {
+			wizardCompleted: boolean;
+			checklistDismissed: boolean;
+			companyInfoDone: boolean;
+			firstProjectDone: boolean;
+			firstQuantityAdded: boolean;
+			firstInvoiceCreated: boolean;
+			firstExpenseRecorded: boolean;
+			zatcaInfoComplete: boolean;
+		} | undefined;
+		isLoading: boolean;
+	};
 
 	const dismissMutation = useMutation(
 		orpc.onboarding.dismissChecklist.mutationOptions(),

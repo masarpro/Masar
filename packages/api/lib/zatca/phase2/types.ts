@@ -29,6 +29,12 @@ export interface ZatcaInvoiceData {
 	// --- Totals ---
 	totals: ZatcaTotals;
 
+	// --- Delivery (required for B2B standard invoices) ---
+	deliveryDate?: string; // YYYY-MM-DD — defaults to issueDate if not set
+
+	// --- Payment Means (optional) ---
+	paymentMeansCode?: string; // "10"=cash, "30"=credit transfer, "42"=bank account, "48"=bank card
+
 	// --- Billing Reference (for credit/debit notes only) ---
 	billingReference?: {
 		invoiceNumber: string;
@@ -50,15 +56,20 @@ export interface ZatcaParty {
 export interface ZatcaBuyer {
 	name: string;
 	taxNumber?: string;
+	/** Buyer identification for non-VAT registered buyers (BR-KSA-14) */
+	identificationId?: string;
+	/** Scheme ID: TIN, CRN, MOM, MLS, 700, SAG, NAT, GCC, IQA, PAS, OTH */
+	identificationScheme?: string;
 	address?: Partial<ZatcaAddress>;
 }
 
 export interface ZatcaAddress {
 	street?: string;
-	buildingNumber?: string;
+	buildingNumber?: string; // Must be exactly 4 digits (BR-KSA-37)
+	additionalNumber?: string; // Secondary/additional number
 	city: string;
 	postalCode?: string;
-	district?: string;
+	district?: string; // Neighborhood (CitySubdivisionName)
 	countryCode: string; // "SA"
 }
 

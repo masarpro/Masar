@@ -4,6 +4,9 @@
  */
 
 // ZATCA API endpoints per environment
+// sandbox (developer-portal): accepts OTP 123345 — currently blocked by WAF (2026-03)
+// simulation: requires real OTP from Fatoora portal — CSR accepted ✅
+// production: live environment
 export const ZATCA_URLS = {
 	sandbox: "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal",
 	simulation: "https://gw-fatoora.zatca.gov.sa/e-invoicing/simulation",
@@ -51,7 +54,7 @@ export const CSR_CONFIG = {
 	country: "SA",
 	organizationUnit: "Masar Platform",
 	commonName: "MASAR-EGS",
-	serialNumber: "1-MASAR|2-001|3-",
+	serialNumber: "1-Masar|2-EGS1|3-",
 	registeredAddress: "Jeddah",
 	businessCategory: "Construction",
 } as const;

@@ -80,6 +80,11 @@ export function buildInvoiceXml(data: ZatcaInvoiceData): string {
 	// 10. QR code reference — placeholder, added after signing
 	// (The signer will inject this)
 
+	// 10b. Signature reference (per ZATCA UBL spec — separate from UBLExtensions signature)
+	const sigRef = inv.ele(UBL_NAMESPACES.cac, "cac:Signature");
+	sigRef.ele(UBL_NAMESPACES.cbc, "cbc:ID").txt("urn:oasis:names:specification:ubl:signature:Invoice");
+	sigRef.ele(UBL_NAMESPACES.cbc, "cbc:SignatureMethod").txt("urn:oasis:names:specification:ubl:dsig:enveloped:xades");
+
 	// 11. AccountingSupplierParty
 	addSupplierParty(inv, data.seller);
 
@@ -89,6 +94,20 @@ export function buildInvoiceXml(data: ZatcaInvoiceData): string {
 	} else if (!data.isSimplified) {
 		// B2B requires buyer — should not happen if validation is correct
 		throw new Error("Buyer is required for standard (B2B) invoices");
+	}
+
+	// 12b. Delivery (required for B2B standard invoices, optional for B2C)
+	if (!data.isSimplified || data.deliveryDate) {
+		const delivery = inv.ele(UBL_NAMESPACES.cac, "cac:Delivery");
+		delivery
+			.ele(UBL_NAMESPACES.cbc, "cbc:ActualDeliveryDate")
+			.txt(data.deliveryDate || data.issueDate);
+	}
+
+	// 12c. PaymentMeans (optional but recommended)
+	if (data.paymentMeansCode) {
+		const pm = inv.ele(UBL_NAMESPACES.cac, "cac:PaymentMeans");
+		pm.ele(UBL_NAMESPACES.cbc, "cbc:PaymentMeansCode").txt(data.paymentMeansCode);
 	}
 
 	// 13. AllowanceCharge (invoice-level discount)
@@ -188,12 +207,23 @@ function addCustomerParty(
 	const cp = parent.ele(UBL_NAMESPACES.cac, "cac:AccountingCustomerParty");
 	const party = cp.ele(UBL_NAMESPACES.cac, "cac:Party");
 
+	// PartyIdentification — for non-VAT buyers (BR-KSA-14)
+	if (buyer.identificationId && buyer.identificationScheme) {
+		const pid = party.ele(UBL_NAMESPACES.cac, "cac:PartyIdentification");
+		pid
+			.ele(UBL_NAMESPACES.cbc, "cbc:ID")
+			.att("schemeID", buyer.identificationScheme)
+			.txt(buyer.identificationId);
+	}
+
 	// PostalAddress
 	if (buyer.address) {
 		addAddress(party, {
 			city: buyer.address.city ?? "",
 			countryCode: buyer.address.countryCode ?? "SA",
 			street: buyer.address.street,
+			buildingNumber: buyer.address.buildingNumber,
+			district: buyer.address.district,
 			postalCode: buyer.address.postalCode,
 		});
 	}
@@ -220,6 +250,9 @@ function addAddress(parent: ReturnType<typeof create>, addr: ZatcaAddress): void
 	}
 	if (addr.buildingNumber) {
 		pa.ele(UBL_NAMESPACES.cbc, "cbc:BuildingNumber").txt(addr.buildingNumber);
+	}
+	if (addr.additionalNumber) {
+		pa.ele(UBL_NAMESPACES.cbc, "cbc:PlotIdentification").txt(addr.additionalNumber);
 	}
 	if (addr.district) {
 		pa.ele(UBL_NAMESPACES.cbc, "cbc:CitySubdivisionName").txt(addr.district);

@@ -117,6 +117,7 @@ export const retrySubmission = subscriptionProcedure
 				"00:00:00",
 			invoiceTypeCode,
 			isSimplified,
+			deliveryDate: !isSimplified ? invoice.issueDate.toISOString().split("T")[0]! : undefined,
 			seller: {
 				name: invoice.sellerName || org.name,
 				taxNumber: invoice.sellerTaxNumber || cleanTaxNumber,

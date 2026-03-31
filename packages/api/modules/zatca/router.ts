@@ -7,6 +7,7 @@ import { submitInvoice } from "./procedures/submit-invoice";
 import { retrySubmission } from "./procedures/retry-submission";
 import { getSubmissions, getSubmissionById } from "./procedures/get-submissions";
 import { revokeDevice } from "./procedures/revoke-device";
+import { renewCsid } from "./procedures/renew-csid";
 
 export const zatcaRouter = {
 	// Status
@@ -15,6 +16,9 @@ export const zatcaRouter = {
 	// Onboarding
 	startOnboarding: startOnboarding,
 	completeOnboarding: completeOnboarding,
+
+	// Certificate Renewal
+	renewCsid: renewCsid,
 
 	// Invoice Submission
 	submitInvoice: submitInvoice,

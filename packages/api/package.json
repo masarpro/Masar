@@ -52,7 +52,8 @@
 		"type-check": "tsc --noEmit",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"test:coverage": "vitest run --coverage"
+		"test:coverage": "vitest run --coverage",
+		"zatca:test-sandbox": "tsx lib/zatca/phase2/sandbox-test.ts"
 	},
 	"version": "0.0.0"
 }

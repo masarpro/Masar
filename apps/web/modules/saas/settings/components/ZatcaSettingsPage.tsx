@@ -42,6 +42,31 @@ interface ZatcaSettingsPageProps {
 	organizationSlug: string;
 }
 
+/** Local type — matches getStatus return shape (Prisma client may be stale) */
+interface ZatcaStatusData {
+	phase: "1" | "2";
+	devices: Array<{
+		id: string;
+		deviceName: string;
+		invoiceType: string;
+		status: string;
+		onboardedAt: string | null;
+		csidExpiresAt: string | null;
+		lastError: string | null;
+		invoiceCounter: number;
+		createdAt: string;
+		updatedAt: string;
+	}>;
+	stats: {
+		total: number;
+		cleared: number;
+		reported: number;
+		rejected: number;
+		pending: number;
+		failed: number;
+	};
+}
+
 const STATUS_COLORS: Record<string, string> = {
 	DISABLED: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
 	ONBOARDING: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
@@ -60,11 +85,12 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 	const [revokeDeviceId, setRevokeDeviceId] = useState<string | null>(null);
 
 	// ─── Query ──────────────────────────────────────────────────────
-	const { data, isLoading } = useQuery(
+	const { data: rawData, isLoading } = useQuery(
 		orpc.zatca.getStatus.queryOptions({
 			input: { organizationId },
 		}),
 	);
+	const data = rawData as ZatcaStatusData | undefined;
 
 	// ─── Mutations ──────────────────────────────────────────────────
 	const onboardMutation = useMutation({
@@ -303,7 +329,7 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 									<Input
 										id="otp"
 										value={otp}
-										onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+										onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
 										placeholder={t("onboarding.otpPlaceholder")}
 										maxLength={6}
 										className="mt-1 font-mono tracking-widest text-center text-lg"
@@ -316,7 +342,7 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 									<Label>{t("onboarding.invoiceTypeLabel")}</Label>
 									<Select
 										value={invoiceType}
-										onValueChange={(v) => setInvoiceType(v as "STANDARD" | "SIMPLIFIED")}
+										onValueChange={(v: string) => setInvoiceType(v as "STANDARD" | "SIMPLIFIED")}
 									>
 										<SelectTrigger className="mt-1">
 											<SelectValue />

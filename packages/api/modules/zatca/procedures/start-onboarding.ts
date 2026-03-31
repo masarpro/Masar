@@ -110,111 +110,149 @@ export const startOnboarding = subscriptionProcedure
 			});
 		}
 
-		// 5. Build and send a test invoice for compliance check
-		const testUuid = uuidv4();
-		const testInvoiceData: ZatcaInvoiceData = {
-			uuid: testUuid,
-			invoiceNumber: "TEST-0001",
-			issueDate: new Date().toISOString().split("T")[0]!,
-			issueTime: new Date().toISOString().split("T")[1]!.replace(/\.\d+Z/, ""),
-			invoiceTypeCode: "388",
-			isSimplified: input.invoiceType === "SIMPLIFIED",
-			seller: {
-				name: org.name,
-				taxNumber: cleanTaxNumber,
-				crNumber: org.commercialRegister ?? undefined,
-				address: {
-					street: org.address ?? undefined,
-					city: org.city ?? "Jeddah",
-					countryCode: "SA",
+		// 5. Build and send 6 test invoices for compliance check
+		//    Per ZATCA spec: standard invoice, standard debit, standard credit,
+		//    simplified invoice, simplified credit, simplified debit
+		const complianceTestTypes: Array<{
+			typeCode: "388" | "381" | "383";
+			simplified: boolean;
+			label: string;
+			billingRef?: { invoiceNumber: string };
+		}> = input.invoiceType === "STANDARD"
+			? [
+				{ typeCode: "388", simplified: false, label: "Standard Invoice" },
+				{ typeCode: "383", simplified: false, label: "Standard Debit Note", billingRef: { invoiceNumber: "TEST-0001" } },
+				{ typeCode: "381", simplified: false, label: "Standard Credit Note", billingRef: { invoiceNumber: "TEST-0001" } },
+			]
+			: [
+				{ typeCode: "388", simplified: true, label: "Simplified Invoice" },
+				{ typeCode: "381", simplified: true, label: "Simplified Credit Note", billingRef: { invoiceNumber: "TEST-0001" } },
+				{ typeCode: "383", simplified: true, label: "Simplified Debit Note", billingRef: { invoiceNumber: "TEST-0001" } },
+			];
+
+		let previousHash = getInitialPIH();
+		let counter = 0;
+		const allComplianceWarnings: Array<{ code?: string; message?: string }> = [];
+
+		for (const testType of complianceTestTypes) {
+			const testUuid = uuidv4();
+			counter++;
+
+			const testInvoiceData: ZatcaInvoiceData = {
+				uuid: testUuid,
+				invoiceNumber: `TEST-${String(counter).padStart(4, "0")}`,
+				issueDate: new Date().toISOString().split("T")[0]!,
+				issueTime: new Date().toISOString().split("T")[1]!.replace(/\.\d+Z/, ""),
+				invoiceTypeCode: testType.typeCode,
+				isSimplified: testType.simplified,
+				deliveryDate: testType.simplified ? undefined : new Date().toISOString().split("T")[0]!,
+				seller: {
+					name: org.name,
+					taxNumber: cleanTaxNumber,
+					crNumber: org.commercialRegister ?? undefined,
+					address: {
+						street: org.address ?? undefined,
+						city: org.city ?? "Jeddah",
+						countryCode: "SA",
+					},
 				},
-			},
-			buyer:
-				input.invoiceType === "STANDARD"
+				buyer: !testType.simplified
 					? {
 							name: "ZATCA Compliance Test Buyer",
 							taxNumber: "300000000000003",
 							address: { city: "Riyadh", countryCode: "SA" },
 						}
 					: undefined,
-			lineItems: [
-				{
-					id: "1",
-					name: "بند اختبار",
-					quantity: 1,
-					unitPrice: 100,
-					taxCategory: "S",
-					taxPercent: 15,
-					lineTotal: 100,
+				lineItems: [
+					{
+						id: "1",
+						name: "بند اختبار",
+						quantity: 1,
+						unitPrice: 100,
+						taxCategory: "S",
+						taxPercent: 15,
+						lineTotal: 100,
+					},
+				],
+				totals: {
+					subtotal: 100,
+					totalDiscount: 0,
+					taxableAmount: 100,
+					taxAmount: 15,
+					totalWithVat: 115,
+					payableAmount: 115,
 				},
-			],
-			totals: {
-				subtotal: 100,
-				totalDiscount: 0,
-				taxableAmount: 100,
-				taxAmount: 15,
-				totalWithVat: 115,
-				payableAmount: 115,
-			},
-			previousInvoiceHash: getInitialPIH(),
-			invoiceCounter: 0,
-		};
+				billingReference: testType.billingRef,
+				previousInvoiceHash: previousHash,
+				invoiceCounter: counter,
+			};
 
-		const testXml = buildInvoiceXml(testInvoiceData);
-		const testSigned = signInvoice(
-			testXml,
-			csrResult.privateKey,
-			complianceResult.csid,
-			csrResult.publicKey,
-		);
+			const testXml = buildInvoiceXml(testInvoiceData);
+			const testSigned = signInvoice(
+				testXml,
+				csrResult.privateKey,
+				complianceResult.csid,
+				csrResult.publicKey,
+			);
 
-		const complianceInvoiceResult = await submitComplianceInvoice(
-			Buffer.from(testSigned.signedXml).toString("base64"),
-			testSigned.invoiceHash,
-			testUuid,
-			complianceResult.csid,
-			complianceResult.secret,
-		);
+			previousHash = testSigned.invoiceHash;
 
-		if (!complianceInvoiceResult.success) {
-			// Store compliance CSID so user can retry
-			await db.zatcaDevice.upsert({
-				where: {
-					organizationId_invoiceType: {
+			const complianceInvoiceResult = await submitComplianceInvoice(
+				Buffer.from(testSigned.signedXml).toString("base64"),
+				testSigned.invoiceHash,
+				testUuid,
+				complianceResult.csid,
+				complianceResult.secret,
+			);
+
+			if (complianceInvoiceResult.warnings?.length) {
+				allComplianceWarnings.push(...complianceInvoiceResult.warnings);
+			}
+
+			if (!complianceInvoiceResult.success) {
+				console.error(`[ZATCA] Compliance test failed for ${testType.label}:`, complianceInvoiceResult.errors);
+
+				// Store compliance CSID so user can retry
+				await db.zatcaDevice.upsert({
+					where: {
+						organizationId_invoiceType: {
+							organizationId: input.organizationId,
+							invoiceType: input.invoiceType,
+						},
+					},
+					create: {
 						organizationId: input.organizationId,
 						invoiceType: input.invoiceType,
+						status: "COMPLIANCE",
+						complianceCsid: complianceResult.csid,
+						complianceSecret: encryptSecret(complianceResult.secret),
+						csidRequestId: complianceResult.requestId,
+						privateKey: encryptSecret(csrResult.privateKey),
+						publicKey: csrResult.publicKey,
+						lastError: `${testType.label}: ${complianceInvoiceResult.errors?.map((e) => e.message).join("; ")}`,
 					},
-				},
-				create: {
-					organizationId: input.organizationId,
-					invoiceType: input.invoiceType,
-					status: "COMPLIANCE",
-					complianceCsid: complianceResult.csid,
-					complianceSecret: encryptSecret(complianceResult.secret),
-					csidRequestId: complianceResult.requestId,
-					privateKey: encryptSecret(csrResult.privateKey),
-					publicKey: csrResult.publicKey,
-					lastError: complianceInvoiceResult.errors
-						?.map((e) => e.message)
-						.join("; "),
-				},
-				update: {
-					status: "COMPLIANCE",
-					complianceCsid: complianceResult.csid,
-					complianceSecret: encryptSecret(complianceResult.secret),
-					csidRequestId: complianceResult.requestId,
-					privateKey: encryptSecret(csrResult.privateKey),
-					publicKey: csrResult.publicKey,
-					lastError: complianceInvoiceResult.errors
-						?.map((e) => e.message)
-						.join("; "),
-				},
-			});
+					update: {
+						status: "COMPLIANCE",
+						complianceCsid: complianceResult.csid,
+						complianceSecret: encryptSecret(complianceResult.secret),
+						csidRequestId: complianceResult.requestId,
+						privateKey: encryptSecret(csrResult.privateKey),
+						publicKey: csrResult.publicKey,
+						lastError: `${testType.label}: ${complianceInvoiceResult.errors?.map((e) => e.message).join("; ")}`,
+					},
+				});
 
-			throw new ORPCError("BAD_REQUEST", {
-				message: `فاتورة الاختبار رُفضت: ${complianceInvoiceResult.errors?.map((e) => e.message).join(", ") || "خطأ غير معروف"}`,
-			});
+				throw new ORPCError("BAD_REQUEST", {
+					message: `فاتورة اختبار ${testType.label} رُفضت: ${complianceInvoiceResult.errors?.map((e) => e.message).join(", ") || "خطأ غير معروف"}`,
+				});
+			}
 		}
+
+		// All compliance tests passed
+		const complianceInvoiceResult = {
+			success: true,
+			warnings: allComplianceWarnings.length > 0 ? allComplianceWarnings : undefined,
+		};
 
 		// 6. Request Production CSID
 		const productionResult = await requestProductionCSID(

@@ -44,8 +44,11 @@ export function cleanXmlForHashing(xml: string): string {
 		"",
 	);
 
-	// Remove Signature element if present outside UBLExtensions
+	// Remove ds:Signature element if present outside UBLExtensions
 	cleaned = cleaned.replace(/<ds:Signature[\s\S]*?<\/ds:Signature>\s*/g, "");
+
+	// Remove cac:Signature reference element (per XPath transform: not(//ancestor-or-self::cac:Signature))
+	cleaned = cleaned.replace(/<cac:Signature[\s\S]*?<\/cac:Signature>\s*/g, "");
 
 	// Remove QR code AdditionalDocumentReference
 	// Match the one with <cbc:ID>QR</cbc:ID>

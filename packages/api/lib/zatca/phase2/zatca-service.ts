@@ -80,6 +80,11 @@ interface SellerInfo {
 	crNumber?: string;
 	address?: string;
 	city?: string;
+	/** Structured address fields from OrganizationFinanceSettings */
+	buildingNumber?: string;
+	additionalNumber?: string;
+	postalCode?: string;
+	district?: string;
 }
 
 /**
@@ -242,13 +247,18 @@ async function processPhase2(
 			invoice.issuedAt?.toISOString().split("T")[1]?.replace(/\.\d+Z/, "") || "00:00:00",
 		invoiceTypeCode,
 		isSimplified,
+		deliveryDate: !isSimplified ? invoice.issueDate.toISOString().split("T")[0]! : undefined,
 		seller: {
 			name: seller.name,
 			taxNumber: cleanTaxNumber,
 			crNumber: seller.crNumber,
 			address: {
 				street: seller.address || undefined,
+				buildingNumber: seller.buildingNumber,
+				additionalNumber: seller.additionalNumber,
 				city: seller.city || "Jeddah",
+				postalCode: seller.postalCode,
+				district: seller.district,
 				countryCode: "SA",
 			},
 		},

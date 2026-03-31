@@ -16,7 +16,16 @@ export {
 } from "./hash-chain";
 export { generateEnhancedQR } from "./qr-enhanced";
 export { encryptSecret, decryptSecret } from "./encryption";
-export * from "./api-client";
+export {
+	requestComplianceCSID,
+	submitComplianceInvoice,
+	requestProductionCSID,
+	renewProductionCSID,
+	clearInvoice,
+	reportInvoice,
+	type ZatcaCSIDResult,
+	type ZatcaInvoiceResult,
+} from "./api-client";
 export { processInvoiceForZatca, type ZatcaProcessResult } from "./zatca-service";
 export { retryFailedSubmissions } from "./retry-failed";
 export * from "./types";

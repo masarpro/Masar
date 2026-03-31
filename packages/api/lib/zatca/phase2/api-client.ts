@@ -17,10 +17,12 @@ function getBaseUrl(): string {
 // ─── Shared fetch helper ────────────────────────────────────────────────
 
 interface ZatcaFetchOptions {
-	method: "POST" | "GET";
+	method: "POST" | "GET" | "PATCH";
 	body?: unknown;
 	auth?: { username: string; password: string };
 	otp?: string;
+	/** ClearanceStatus header: "0" for reporting, "1" for clearance */
+	clearanceStatus?: "0" | "1";
 }
 
 interface ZatcaFetchResult {
@@ -51,6 +53,10 @@ async function zatcaFetch(path: string, options: ZatcaFetchOptions): Promise<Zat
 		headers.OTP = options.otp;
 	}
 
+	if (options.clearanceStatus) {
+		headers["Clearance-Status"] = options.clearanceStatus;
+	}
+
 	const bodyJson = options.body ? JSON.stringify(options.body) : undefined;
 
 	// DEBUG — log full request for ZATCA troubleshooting
@@ -72,7 +78,10 @@ async function zatcaFetch(path: string, options: ZatcaFetchOptions): Promise<Zat
 		// Non-JSON response — keep responseText for error messages
 	}
 
-	if (!response.ok) {
+	// 2xx = success. Also treat 208 (Already Reported) and 409 (Already Reported) as success (idempotency).
+	const isSuccess = response.ok || response.status === 208 || response.status === 409;
+
+	if (!isSuccess) {
 		console.error(`[ZATCA API] ${options.method} ${path} → ${response.status}`);
 		console.error("[ZATCA API] Response body:", responseText.substring(0, 1000));
 		console.error("[ZATCA API] Response headers:", JSON.stringify(
@@ -80,7 +89,17 @@ async function zatcaFetch(path: string, options: ZatcaFetchOptions): Promise<Zat
 		));
 	}
 
-	return { ok: response.ok, status: response.status, data, responseText };
+	if (response.status === 202) {
+		console.warn(`[ZATCA API] ${path} → 202 (accepted with warnings)`);
+	}
+	if (response.status === 208 || response.status === 409) {
+		console.warn(`[ZATCA API] ${path} → ${response.status} (already reported — treating as success)`);
+	}
+	if (response.status === 303) {
+		console.warn(`[ZATCA API] ${path} → 303 (See Other — wrong endpoint for this invoice type)`);
+	}
+
+	return { ok: isSuccess, status: response.status, data, responseText };
 }
 
 // ─── Result types ───────────────────────────────────────────────────────
@@ -215,6 +234,7 @@ export async function clearInvoice(
 		method: "POST",
 		body: { invoiceHash, uuid, invoice: signedXmlBase64 },
 		auth: { username: csid, password: secret },
+		clearanceStatus: "1",
 	});
 
 	return {
@@ -223,6 +243,57 @@ export async function clearInvoice(
 		status: result.data?.clearanceStatus,
 		warnings: result.data?.validationResults?.warningMessages,
 		errors: result.data?.validationResults?.errorMessages,
+	};
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 5. Reporting — B2C simplified invoice
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 3b. Production CSID Renewal — PATCH (when certificate expires)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export async function renewProductionCSID(
+	csrBase64: string,
+	otp: string,
+	currentCsid: string,
+	currentSecret: string,
+): Promise<ZatcaCSIDResult> {
+	const result = await zatcaFetch(ZATCA_PATHS.productionCSID, {
+		method: "PATCH",
+		body: { csr: csrBase64 },
+		auth: { username: currentCsid, password: currentSecret },
+		otp,
+	});
+
+	if (result.ok && result.data) {
+		return {
+			success: true,
+			csid: result.data.binarySecurityToken,
+			secret: result.data.secret,
+			requestId: result.data.requestID,
+		};
+	}
+
+	// 428 NOT_COMPLIANT — returns temporary compliance certificate
+	if (result.status === 428 && result.data?.binarySecurityToken) {
+		console.warn("[ZATCA API] Renewal returned 428 NOT_COMPLIANT — temporary certificate issued");
+		return {
+			success: false,
+			csid: result.data.binarySecurityToken,
+			secret: result.data.secret,
+			requestId: result.data.requestID,
+			errors: result.data?.errors || [{ message: "NOT_COMPLIANT — compliance required before renewal" }],
+		};
+	}
+
+	return {
+		success: false,
+		errors:
+			result.data?.errors ||
+			result.data?.validationResults?.errorMessages ||
+			[{ message: result.data?.message || result.responseText?.substring(0, 300) || `HTTP ${result.status}` }],
 	};
 }
 
@@ -241,6 +312,7 @@ export async function reportInvoice(
 		method: "POST",
 		body: { invoiceHash, uuid, invoice: signedXmlBase64 },
 		auth: { username: csid, password: secret },
+		clearanceStatus: "0",
 	});
 
 	return {

@@ -41,7 +41,7 @@ export const submitInvoice = subscriptionProcedure
 			where: { id: input.invoiceId, organizationId: input.organizationId },
 			include: {
 				items: { orderBy: { sortOrder: "asc" } },
-				client: { select: { taxNumber: true } },
+				client: { select: { taxNumber: true, crNumber: true, city: true, streetAddress1: true, postalCode: true } },
 			},
 		});
 
@@ -64,7 +64,7 @@ export const submitInvoice = subscriptionProcedure
 			});
 		}
 
-		// 2. Load organization
+		// 2. Load organization with finance settings (structured address)
 		const org = await db.organization.findUnique({
 			where: { id: input.organizationId },
 			select: {
@@ -73,6 +73,18 @@ export const submitInvoice = subscriptionProcedure
 				commercialRegister: true,
 				address: true,
 				city: true,
+				financeSettings: {
+					select: {
+						companyNameAr: true,
+						taxNumber: true,
+						commercialReg: true,
+						street: true,
+						buildingNumber: true,
+						secondaryNumber: true,
+						postalCode: true,
+						city: true,
+					},
+				},
 			},
 		});
 
@@ -126,6 +138,31 @@ export const submitInvoice = subscriptionProcedure
 		else if (invoice.invoiceType === "DEBIT_NOTE") invoiceTypeCode = "383";
 
 		// 7. Build ZatcaInvoiceData
+		//    Prefer OrganizationFinanceSettings (structured) over Organization (basic)
+		const fs = org.financeSettings;
+		const sellerStreet = invoice.sellerAddress || fs?.street || org.address || undefined;
+		const sellerBuildingNo = fs?.buildingNumber || undefined;
+		const sellerAdditionalNo = fs?.secondaryNumber || undefined;
+		const sellerPostalCode = fs?.postalCode || undefined;
+		const sellerCity = fs?.city || org.city || "Jeddah";
+		const sellerCR = fs?.commercialReg || org.commercialRegister || undefined;
+
+		// Warn about missing required address fields (BR-KSA-09)
+		if (!sellerStreet) console.warn("[ZATCA] BR-KSA-09: Seller StreetName missing");
+		if (!sellerBuildingNo) console.warn("[ZATCA] BR-KSA-37: Seller BuildingNumber missing");
+		else if (!/^\d{4}$/.test(sellerBuildingNo)) console.warn(`[ZATCA] BR-KSA-37: BuildingNumber "${sellerBuildingNo}" is not exactly 4 digits`);
+		if (!sellerPostalCode) console.warn("[ZATCA] BR-KSA-09: Seller PostalZone missing");
+
+		// Buyer identification for standard invoices without VAT number (BR-KSA-14)
+		const buyerCrNumber = invoice.client?.crNumber;
+		const buyerIdentification = (!clientTaxNumber && buyerCrNumber)
+			? { identificationId: buyerCrNumber, identificationScheme: "CRN" as const }
+			: undefined;
+
+		if (!isSimplified && !clientTaxNumber && !buyerCrNumber) {
+			console.warn("[ZATCA] BR-KSA-14: Standard invoice buyer has no VAT number and no CR number — ZATCA may reject");
+		}
+
 		const invoiceData: ZatcaInvoiceData = {
 			uuid: invoice.zatcaUuid || crypto.randomUUID(),
 			invoiceNumber: invoice.invoiceNo,
@@ -135,13 +172,17 @@ export const submitInvoice = subscriptionProcedure
 				"00:00:00",
 			invoiceTypeCode,
 			isSimplified,
+			deliveryDate: !isSimplified ? invoice.issueDate.toISOString().split("T")[0]! : undefined,
 			seller: {
 				name: invoice.sellerName || org.name,
 				taxNumber: invoice.sellerTaxNumber || cleanTaxNumber,
-				crNumber: org.commercialRegister ?? undefined,
+				crNumber: sellerCR,
 				address: {
-					street: invoice.sellerAddress || org.address || undefined,
-					city: org.city || "Jeddah",
+					street: sellerStreet,
+					buildingNumber: sellerBuildingNo,
+					additionalNumber: sellerAdditionalNo,
+					city: sellerCity,
+					postalCode: sellerPostalCode,
 					countryCode: "SA",
 				},
 			},
@@ -150,12 +191,20 @@ export const submitInvoice = subscriptionProcedure
 						name: invoice.clientName,
 						taxNumber: clientTaxNumber,
 						address: invoice.clientAddress
-							? { street: invoice.clientAddress, countryCode: "SA" }
+							? {
+								street: invoice.clientAddress,
+								city: invoice.client?.city || undefined,
+								postalCode: invoice.client?.postalCode || undefined,
+								countryCode: "SA",
+							}
 							: undefined,
 					}
 				: isSimplified
 					? undefined
-					: { name: invoice.clientName },
+					: {
+						name: invoice.clientName,
+						...buyerIdentification,
+					},
 			lineItems: invoice.items.map((item, idx) => ({
 				id: String(idx + 1),
 				name: item.description,

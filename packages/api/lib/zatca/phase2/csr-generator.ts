@@ -1,15 +1,15 @@
 /**
  * ZATCA Phase 2 — CSR Generator
  *
- * Generates ECDSA secp256k1 key pair + CSR with all ZATCA-required fields.
- * Uses Node.js crypto for key generation and signing — works on Vercel Serverless.
+ * Generates ECDSA secp256k1 key pair + ZATCA-compliant CSR.
+ * Uses Node.js crypto for key generation and manual DER/ASN.1 for CSR building.
+ * Works on Vercel Serverless — no OpenSSL CLI needed.
  *
- * Per ZATCA Developer Portal Manual v3, Appendix 5.3.2.1 (page 93):
- *   openssl ecparam -name secp256k1 -genkey -noout -out PrivateKey.pem
- *
- * - Subject DN: C=SA, OU=orgName, O=orgName, CN=TST-886431145-{taxNumber}
- * - Extensions: basicConstraints, keyUsage, certificateTemplateName, subjectAltName
- * - Key: ECDSA secp256k1, ecdsaWithSHA256
+ * Based on analysis of the official ZATCA SDK certificate (cert.pem):
+ *   Subject DN order: C, O, OU, CN
+ *   SAN dirName: SN, UID, title, registeredAddress, businessCategory
+ *   Extension: ZATCA-Code-Signing (OID 1.3.6.1.4.1.311.20.2)
+ *   Key: ECDSA secp256k1 (OID 1.3.132.0.10)
  */
 
 import {
@@ -90,7 +90,6 @@ function derOID(oid: string): Buffer {
 	return derWrap(0x06, Buffer.from(bytes));
 }
 
-/** Context-specific constructed tag: [tag] IMPLICIT */
 function derContextTag(tag: number, content: Buffer): Buffer {
 	const tagByte = 0xa0 | tag;
 	return Buffer.concat([
@@ -100,7 +99,6 @@ function derContextTag(tag: number, content: Buffer): Buffer {
 	]);
 }
 
-/** One RDN: SET { SEQUENCE { OID, value } } */
 function derRDN(oid: string, value: Buffer): Buffer {
 	return derSet(derSequence(derOID(oid), value));
 }
@@ -110,22 +108,16 @@ function derRDN(oid: string, value: Buffer): Buffer {
 // ═══════════════════════════════════════════════════════════
 
 const OID = {
-	// Subject DN
 	countryName: "2.5.4.6",
-	organizationUnit: "2.5.4.11",
 	organization: "2.5.4.10",
+	organizationUnit: "2.5.4.11",
 	commonName: "2.5.4.3",
-	// SubjectAltName dirName
 	serialNumber: "2.5.4.5",
 	userId: "0.9.2342.19200300.100.1.1",
 	title: "2.5.4.12",
 	registeredAddress: "2.5.4.26",
 	businessCategory: "2.5.4.15",
-	// Algorithms
-	ecPublicKey: "1.2.840.10045.2.1",
-	secp256k1: "1.3.132.0.10", // secp256k1 — per ZATCA Developer Portal Manual v3
 	ecdsaWithSHA256: "1.2.840.10045.4.3.2",
-	// Extensions
 	extensionRequest: "1.2.840.113549.1.9.14",
 	basicConstraints: "2.5.29.19",
 	keyUsage: "2.5.29.15",
@@ -137,13 +129,6 @@ const OID = {
 // CSR Generator
 // ═══════════════════════════════════════════════════════════
 
-/**
- * Generate an ECDSA secp256k1 key pair + ZATCA-compliant CSR.
- * Uses Node.js crypto — no OpenSSL CLI, no temp files, works on Vercel.
- *
- * ZATCA Developer Portal Manual v3, Appendix 5.3.2.1 (page 93):
- *   openssl ecparam -name secp256k1
- */
 export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 	const serialNumber = input.serialNumber || randomUUID();
 	const invoiceType = input.invoiceType ?? "1100";
@@ -151,8 +136,7 @@ export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 	const industry = input.industry || CSR_CONFIG.businessCategory;
 	const env = (process.env.ZATCA_ENVIRONMENT || "sandbox") as ZatcaEnvironment;
 
-	// 1. Generate ECDSA secp256k1 key pair via Node.js crypto
-	//    Per ZATCA Developer Portal Manual v3, Appendix 5.3.2.1
+	// 1. Generate ECDSA secp256k1 key pair
 	const keyPair = generateKeyPairSync("ec", { namedCurve: "secp256k1" });
 
 	const privateKeyPem = keyPair.privateKey.export({
@@ -165,58 +149,41 @@ export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 		format: "pem",
 	}) as string;
 
-	// SPKI DER — used directly as SubjectPublicKeyInfo in the CSR
 	const publicKeySpkiDer = keyPair.publicKey.export({
 		type: "spki",
 		format: "der",
 	});
 
-	// 2. Subject DN — ASCII only (no Arabic), ZATCA rejects non-ASCII in Subject
+	// 2. Subject DN — order: C, O, OU, CN (per ZATCA SDK cert.pem)
 	const cn =
 		env === "production"
 			? CSR_CONFIG.commonName
 			: `TST-886431145-${input.vatNumber}`;
-
-	// Use ASCII-safe org name: strip non-ASCII chars, fallback to defaults
-	const asciiOrg = input.organizationName.replace(/[^\x20-\x7E]/g, "").trim() || "Masar Platform";
-	const asciiOU = "Main Branch";
+	const asciiOrg =
+		input.organizationName.replace(/[^\x20-\x7E]/g, "").trim() ||
+		"Masar Platform";
+	const ou = input.location || "Main Branch";
 
 	const subject = derSequence(
-		derRDN(OID.countryName, derPrintableString(CSR_CONFIG.country)),
-		derRDN(OID.organizationUnit, derUTF8String(asciiOU)),
+		derRDN(OID.countryName, derPrintableString("SA")),
 		derRDN(OID.organization, derUTF8String(asciiOrg)),
+		derRDN(OID.organizationUnit, derUTF8String(ou)),
 		derRDN(OID.commonName, derUTF8String(cn)),
 	);
 
 	// 3. Extensions
-	// 3a. basicConstraints: CA:FALSE (empty SEQUENCE = default FALSE)
-	const basicConstraintsExt = derSequence(
-		derOID(OID.basicConstraints),
-		derOctetString(derSequence()),
-	);
 
-	// 3b. keyUsage: digitalSignature + nonRepudiation + keyEncipherment (critical)
-	//     Bits 0,1,2 set → 0xE0, unused bits = 5
-	const keyUsageExt = derSequence(
-		derOID(OID.keyUsage),
-		derBoolean(true), // critical
-		derOctetString(derBitString(Buffer.from([0xe0]), 5)),
-	);
-
-	// 3c. certificateTemplateName — UTF8String per ZATCA spec
-	const templateName =
-		env === "production" ? "ZATCA-Code-Signing" : "TSTZATCA-Code-Signing";
+	// 3a. ZATCA-Code-Signing (OID 1.3.6.1.4.1.311.20.2)
 	const certTemplateExt = derSequence(
 		derOID(OID.certificateTemplateName),
-		derOctetString(derUTF8String(templateName)),
+		derOctetString(derUTF8String("ZATCA-Code-Signing")),
 	);
 
-	// 3d. subjectAltName dirName (SN, UID, title, registeredAddress, businessCategory)
+	// 3b. subjectAltName with directoryName
+	//     SN: "1-<solution>|2-<model>|3-<UUID>"
+	const snPrefix = env === "production" ? "1-Masar|2-EGS1|3-" : "1-TST|2-TST|3-";
 	const altNameDirName = derSequence(
-		derRDN(
-			OID.serialNumber,
-			derUTF8String(`1-Masar|2-001|3-${serialNumber}`),
-		),
+		derRDN(OID.serialNumber, derUTF8String(`${snPrefix}${serialNumber}`)),
 		derRDN(OID.userId, derUTF8String(input.vatNumber)),
 		derRDN(OID.title, derUTF8String(invoiceType)),
 		derRDN(OID.registeredAddress, derUTF8String(location)),
@@ -226,19 +193,18 @@ export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 	const subjectAltNameExt = derSequence(
 		derOID(OID.subjectAltName),
 		derOctetString(
-			derSequence(derContextTag(4, altNameDirName)), // GeneralNames → directoryName [4]
+			derSequence(derContextTag(4, altNameDirName)),
 		),
 	);
 
-	// 4. Attributes: [0] IMPLICIT SET OF Attribute → extensionRequest
+	// 4. Attributes — extensionRequest containing only the two ZATCA-specific extensions
+	//    (basicConstraints + keyUsage are implicit per ZATCA SDK behavior)
 	const attributes = derContextTag(
 		0,
 		derSequence(
 			derOID(OID.extensionRequest),
 			derSet(
 				derSequence(
-					basicConstraintsExt,
-					keyUsageExt,
 					certTemplateExt,
 					subjectAltNameExt,
 				),
@@ -248,13 +214,13 @@ export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 
 	// 5. CertificationRequestInfo
 	const certRequestInfo = derSequence(
-		derInteger(0), // version 0
+		derInteger(0),
 		subject,
-		publicKeySpkiDer, // SPKI DER from Node.js crypto
+		publicKeySpkiDer,
 		attributes,
 	);
 
-	// 6. Sign with ECDSA-SHA256 via Node.js crypto
+	// 6. Sign with ECDSA-SHA256
 	const signer = createSign("SHA256");
 	signer.update(certRequestInfo);
 	const signatureDer = signer.sign(keyPair.privateKey);
@@ -266,16 +232,14 @@ export async function generateCSR(input: CSRInput): Promise<CSRResult> {
 		derBitString(signatureDer),
 	);
 
-	// 8. CSR as raw Base64 of DER — no PEM headers, no newlines
-	const csrBase64 = csrDer.toString("base64");
+	// 8. PEM-wrap with 64-char lines, then base64-encode the whole PEM
+	const derBase64 = csrDer.toString("base64");
+	const wrappedDer = derBase64.replace(/(.{64})/g, "$1\n");
+	const pemBody = wrappedDer.endsWith("\n") ? wrappedDer : wrappedDer + "\n";
+	const pemString = `-----BEGIN CERTIFICATE REQUEST-----\n${pemBody}-----END CERTIFICATE REQUEST-----\n`;
+	const csrBase64 = Buffer.from(pemString).toString("base64");
 
-	// DEBUG — verify correct EC curve OID in CSR
-	const p256OID = Buffer.from([0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07]);
-	const k1OID = Buffer.from([0x06, 0x05, 0x2b, 0x81, 0x04, 0x00, 0x0a]);
-	console.log("[ZATCA DEBUG] CSR uses secp256k1 (correct):", csrDer.includes(k1OID));
-	console.log("[ZATCA DEBUG] CSR uses P-256 (WRONG):", csrDer.includes(p256OID));
-	console.log("[ZATCA DEBUG] CSR Base64 length:", csrBase64.length);
-	console.log("[ZATCA DEBUG] CSR first 60:", csrBase64.substring(0, 60));
+	console.log("[ZATCA] CSR generated — length:", csrBase64.length, "| CN:", cn);
 
 	return {
 		csr: csrBase64,

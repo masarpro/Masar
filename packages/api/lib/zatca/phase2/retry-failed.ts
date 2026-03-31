@@ -100,6 +100,7 @@ export async function retryFailedSubmissions(db: PrismaClient): Promise<RetryRes
 				issueTime: invoice.issuedAt?.toISOString().split("T")[1]?.replace(/\.\d+Z/, "") || "00:00:00",
 				invoiceTypeCode,
 				isSimplified,
+				deliveryDate: !isSimplified ? invoice.issueDate.toISOString().split("T")[0]! : undefined,
 				seller: {
 					name: invoice.sellerName || org.name,
 					taxNumber: invoice.sellerTaxNumber || cleanTaxNumber,
