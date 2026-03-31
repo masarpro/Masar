@@ -35,6 +35,7 @@ async function zatcaFetch(path: string, options: ZatcaFetchOptions): Promise<Zat
 
 	const headers: Record<string, string> = {
 		"Content-Type": "application/json",
+		Accept: "application/json",
 		"Accept-Language": "en",
 		"Accept-Version": "V2",
 	};
@@ -65,10 +66,11 @@ async function zatcaFetch(path: string, options: ZatcaFetchOptions): Promise<Zat
 	}
 
 	if (!response.ok) {
-		console.error(
-			`[ZATCA API] ${options.method} ${path} → ${response.status}:`,
-			data ? JSON.stringify(data, null, 2) : responseText.substring(0, 500),
-		);
+		console.error(`[ZATCA API] ${options.method} ${path} → ${response.status}`);
+		console.error("[ZATCA API] Response body:", responseText.substring(0, 1000));
+		console.error("[ZATCA API] Response headers:", JSON.stringify(
+			Object.fromEntries(response.headers.entries()),
+		));
 	}
 
 	return { ok: response.ok, status: response.status, data, responseText };
@@ -100,6 +102,15 @@ export async function requestComplianceCSID(
 	csrBase64: string,
 	otp: string,
 ): Promise<ZatcaCSIDResult> {
+	// Diagnostic logging (helps debug sandbox rejections)
+	console.log("[ZATCA] === Compliance CSID Request ===");
+	console.log("[ZATCA] URL:", `${getBaseUrl()}${ZATCA_PATHS.complianceCSID}`);
+	console.log("[ZATCA] CSR length:", csrBase64.length);
+	console.log("[ZATCA] CSR first 80:", csrBase64.substring(0, 80));
+	console.log("[ZATCA] Has PEM header:", csrBase64.includes("-----BEGIN"));
+	console.log("[ZATCA] Has newlines:", csrBase64.includes("\n"));
+	console.log("[ZATCA] OTP:", otp);
+
 	const result = await zatcaFetch(ZATCA_PATHS.complianceCSID, {
 		method: "POST",
 		body: { csr: csrBase64 },
