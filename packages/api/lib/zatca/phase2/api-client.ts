@@ -27,6 +27,7 @@ interface ZatcaFetchResult {
 	ok: boolean;
 	status: number;
 	data: any;
+	responseText: string;
 }
 
 async function zatcaFetch(path: string, options: ZatcaFetchOptions): Promise<ZatcaFetchResult> {
@@ -55,9 +56,22 @@ async function zatcaFetch(path: string, options: ZatcaFetchOptions): Promise<Zat
 		body: options.body ? JSON.stringify(options.body) : undefined,
 	});
 
-	const data = await response.json().catch(() => null);
+	const responseText = await response.text();
+	let data: any = null;
+	try {
+		data = JSON.parse(responseText);
+	} catch {
+		// Non-JSON response — keep responseText for error messages
+	}
 
-	return { ok: response.ok, status: response.status, data };
+	if (!response.ok) {
+		console.error(
+			`[ZATCA API] ${options.method} ${path} → ${response.status}:`,
+			data ? JSON.stringify(data, null, 2) : responseText.substring(0, 500),
+		);
+	}
+
+	return { ok: response.ok, status: response.status, data, responseText };
 }
 
 // ─── Result types ───────────────────────────────────────────────────────
@@ -103,7 +117,10 @@ export async function requestComplianceCSID(
 
 	return {
 		success: false,
-		errors: result.data?.errors || [{ message: `HTTP ${result.status}` }],
+		errors:
+			result.data?.errors ||
+			result.data?.validationResults?.errorMessages ||
+			[{ message: result.data?.message || result.responseText?.substring(0, 300) || `HTTP ${result.status}` }],
 	};
 }
 
@@ -158,7 +175,10 @@ export async function requestProductionCSID(
 
 	return {
 		success: false,
-		errors: result.data?.errors || [{ message: `HTTP ${result.status}` }],
+		errors:
+			result.data?.errors ||
+			result.data?.validationResults?.errorMessages ||
+			[{ message: result.data?.message || result.responseText?.substring(0, 300) || `HTTP ${result.status}` }],
 	};
 }
 
