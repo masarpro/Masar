@@ -429,19 +429,23 @@ export async function runSandboxE2ETest(): Promise<StepResult[]> {
 	return results;
 }
 
-// ─── CLI entry point ───────────────────────────────────────────────────
+// ─── CLI entry point (only when run directly, not when imported) ──────
 
-// Auto-detect: default to simulation if ZATCA_ENVIRONMENT not set
-if (!process.env.ZATCA_ENVIRONMENT) {
-	process.env.ZATCA_ENVIRONMENT = "simulation";
+const isDirectRun =
+	typeof require !== "undefined" &&
+	require.main === module;
+
+if (isDirectRun) {
+	if (!process.env.ZATCA_ENVIRONMENT) {
+		process.env.ZATCA_ENVIRONMENT = "simulation";
+	}
+	runSandboxE2ETest()
+		.then((results) => {
+			const allPassed = results.every((r) => r.ok);
+			process.exit(allPassed ? 0 : 1);
+		})
+		.catch((err) => {
+			console.error("Fatal error:", err);
+			process.exit(1);
+		});
 }
-
-runSandboxE2ETest()
-	.then((results) => {
-		const allPassed = results.every((r) => r.ok);
-		process.exit(allPassed ? 0 : 1);
-	})
-	.catch((err) => {
-		console.error("Fatal error:", err);
-		process.exit(1);
-	});
