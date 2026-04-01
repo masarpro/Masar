@@ -197,7 +197,7 @@ export async function requestProductionCSID(
 ): Promise<ZatcaCSIDResult> {
 	const result = await zatcaFetch(ZATCA_PATHS.productionCSID, {
 		method: "POST",
-		body: { compliance_request_id: complianceRequestId },
+		body: { compliance_request_id: String(complianceRequestId) },
 		auth: { username: complianceCsid, password: complianceSecret },
 	});
 

@@ -16,7 +16,7 @@ export const ZATCA_URLS = {
 // ZATCA API paths
 export const ZATCA_PATHS = {
 	complianceCSID: "/compliance",
-	productionCSID: "/production/CSIDs",
+	productionCSID: "/production/csids",
 	complianceInvoice: "/compliance/invoices",
 	clearance: "/invoices/clearance/single",
 	reporting: "/invoices/reporting/single",
