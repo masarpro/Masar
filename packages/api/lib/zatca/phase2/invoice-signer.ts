@@ -54,19 +54,20 @@ export function signInvoice(
 	const signingTime = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
 	const signedPropertiesXml = buildSignedProperties(certHash, signingTime, issuerDN, serialNumberDec);
 
-	// 6. Hash the SignedProperties
+	// 6. Hash the SignedProperties (C14N form: inherited namespaces added alphabetically)
+	const spForHashing = signedPropertiesXml.replace(
+		'<xades:SignedProperties Id="xadesSignedProperties">',
+		`<xades:SignedProperties xmlns:ds="${UBL_NAMESPACES.ds}" xmlns:xades="${UBL_NAMESPACES.xades}" Id="xadesSignedProperties">`,
+	);
 	const signedPropsHash = createHash("sha256")
-		.update(signedPropertiesXml)
+		.update(spForHashing)
 		.digest("base64");
 
 	// DEBUG — hash diagnostics
-	console.log("[ZATCA Sign] pemBody (first 50):", pemBody.substring(0, 50));
-	console.log("[ZATCA Sign] certDER length:", certDerBytes.length, "bytes");
-	console.log("[ZATCA Sign] certHash:", certHash);
-	console.log("[ZATCA Sign] issuer:", issuerDN);
-	console.log("[ZATCA Sign] serial:", serialNumberDec);
-	console.log("[ZATCA Sign] signedProps (first 200):", signedPropertiesXml.substring(0, 200));
-	console.log("[ZATCA Sign] signedPropsHash:", signedPropsHash);
+	console.log("[ZATCA Sign] X509Cert in XML (first 50):", pemBody.substring(0, 50));
+	console.log("[ZATCA Sign] certDER length:", certDerBytes.length, "bytes | certHash:", certHash);
+	console.log("[ZATCA Sign] issuer:", issuerDN, "| serial:", serialNumberDec);
+	console.log("[ZATCA Sign] SP hash input length:", signedPropertiesXml.length, "| SP hash:", signedPropsHash);
 	console.log("[ZATCA Sign] invoiceHash:", invoiceHash);
 
 	// 7. Build SignedInfo
@@ -123,19 +124,21 @@ function buildSignedProperties(
 	issuerDN: string,
 	serialNumber: string,
 ): string {
+	// For embedding in XML: no xmlns declarations (inherited from ancestors
+	// ds:Signature and xades:QualifyingProperties)
 	return [
-		`<xades:SignedProperties xmlns:xades="${UBL_NAMESPACES.xades}" Id="xadesSignedProperties">`,
+		`<xades:SignedProperties Id="xadesSignedProperties">`,
 		`<xades:SignedSignatureProperties>`,
 		`<xades:SigningTime>${signingTime}</xades:SigningTime>`,
 		`<xades:SigningCertificate>`,
 		`<xades:Cert>`,
 		`<xades:CertDigest>`,
-		`<ds:DigestMethod xmlns:ds="${UBL_NAMESPACES.ds}" Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>`,
-		`<ds:DigestValue xmlns:ds="${UBL_NAMESPACES.ds}">${certHash}</ds:DigestValue>`,
+		`<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>`,
+		`<ds:DigestValue>${certHash}</ds:DigestValue>`,
 		`</xades:CertDigest>`,
 		`<xades:IssuerSerial>`,
-		`<ds:X509IssuerName xmlns:ds="${UBL_NAMESPACES.ds}">${escapeXml(issuerDN)}</ds:X509IssuerName>`,
-		`<ds:X509SerialNumber xmlns:ds="${UBL_NAMESPACES.ds}">${serialNumber}</ds:X509SerialNumber>`,
+		`<ds:X509IssuerName>${escapeXml(issuerDN)}</ds:X509IssuerName>`,
+		`<ds:X509SerialNumber>${serialNumber}</ds:X509SerialNumber>`,
 		`</xades:IssuerSerial>`,
 		`</xades:Cert>`,
 		`</xades:SigningCertificate>`,

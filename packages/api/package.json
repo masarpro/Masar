@@ -31,6 +31,7 @@
 		"use-intl": "^4.5.3",
 		"uuid": "^13.0.0",
 		"xmlbuilder2": "^4.0.3",
+		"zatca-xml-js": "^0.1.9",
 		"zod": "^4.1.12"
 	},
 	"devDependencies": {

@@ -1,23 +1,14 @@
 /**
- * ZATCA Phase 2 — Full Sandbox E2E Test
+ * ZATCA Phase 2 — Sandbox E2E Test
  *
- * Tests the complete onboarding + submission flow against the ZATCA sandbox:
- *   1. CSR Generation
- *   2. POST /compliance → CCSID
- *   3. POST /compliance/invoices × 3 types (invoice + credit + debit)
- *   4. POST /production/csids → PCSID
- *   5. POST /invoices/reporting/single (simplified)
- *   6. POST /invoices/clearance/single (standard)
+ * Uses zatca-xml-js library for invoice building and signing (proven to work with ZATCA).
+ * Uses our CSR generator (OpenSSL-based) for key/CSR generation.
+ * Uses our API client for ZATCA API communication.
  *
  * Usage: npx tsx packages/api/lib/zatca/phase2/sandbox-test.ts
- *
- * Required env: ZATCA_ENVIRONMENT=sandbox (or unset, defaults to sandbox)
  */
 
 import { generateCSRviaOpenSSL } from "./csr-generator";
-import { buildInvoiceXml } from "./xml-builder";
-import { signInvoice } from "./invoice-signer";
-import { getInitialPIH } from "./hash-chain";
 import {
 	requestComplianceCSID,
 	submitComplianceInvoice,
@@ -25,8 +16,15 @@ import {
 	reportInvoice,
 	clearInvoice,
 } from "./api-client";
-import { SANDBOX_DEFAULTS } from "./constants";
-import type { ZatcaInvoiceData } from "./types";
+import {
+	ZATCASimplifiedTaxInvoice,
+	ZATCAInvoiceTypes,
+	ZATCAPaymentMethods,
+} from "zatca-xml-js";
+import { generateSignedXMLString } from "zatca-xml-js/lib/zatca/signing";
+import { XMLDocument } from "zatca-xml-js/lib/parser";
+import type { EGSUnitInfo } from "zatca-xml-js/lib/zatca/egs";
+import type { ZATCASimplifiedInvoiceLineItem } from "zatca-xml-js";
 
 // ─── Test Configuration ────────────────────────────────────────────────
 
@@ -37,6 +35,8 @@ const TEST_BRANCH = "Riyadh Branch";
 const TEST_INDUSTRY = "Supply";
 const TEST_ADDRESS = "RRRD2929";
 
+const INITIAL_PIH = "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==";
+
 interface StepResult {
 	step: number;
 	name: string;
@@ -46,18 +46,39 @@ interface StepResult {
 	warnings?: unknown[];
 }
 
+// ─── EGS Unit Info (used by zatca-xml-js) ──────────────────────────────
+
+function makeEGSInfo(): EGSUnitInfo {
+	return {
+		uuid: crypto.randomUUID(),
+		custom_id: "EGS1-886431145",
+		model: "IOS",
+		CRN_number: "454634645645654",
+		VAT_name: TEST_ORG,
+		VAT_number: TEST_VAT,
+		branch_name: TEST_BRANCH,
+		branch_industry: TEST_INDUSTRY,
+		location: {
+			city: "Riyadh",
+			city_subdivision: "West",
+			street: "Prince Sultan St",
+			plot_identification: "0000",
+			building: "2322",
+			postal_zone: "23333",
+		},
+	};
+}
+
 // ─── Main test runner ──────────────────────────────────────────────────
 
 export async function runSandboxE2ETest(): Promise<StepResult[]> {
 	const results: StepResult[] = [];
 
 	console.log("╔══════════════════════════════════════════════════════════╗");
-	console.log("║        ZATCA Phase 2 — Sandbox E2E Test                ║");
+	console.log("║  ZATCA Phase 2 — Sandbox E2E Test (zatca-xml-js)       ║");
 	console.log("╚══════════════════════════════════════════════════════════╝\n");
 
-	// ════════════════════════════════════════════════════════════════════
-	// Step 1: CSR Generation
-	// ════════════════════════════════════════════════════════════════════
+	// ═══ Step 1: CSR Generation ═══
 	console.log("─── Step 1: CSR Generation ───");
 	let csrResult: Awaited<ReturnType<typeof generateCSRviaOpenSSL>>;
 	try {
@@ -68,376 +89,243 @@ export async function runSandboxE2ETest(): Promise<StepResult[]> {
 			location: TEST_ADDRESS,
 			industry: TEST_INDUSTRY,
 		});
-		results.push({
-			step: 1,
-			name: "CSR Generation",
-			ok: true,
-			details: `CSR length: ${csrResult.csr.length}`,
-		});
+		results.push({ step: 1, name: "CSR Generation", ok: true, details: `len: ${csrResult.csr.length}` });
 		console.log(`✅ Step 1: CSR generated (${csrResult.csr.length} chars)\n`);
-
-} catch (error) {
+	} catch (error) {
 		results.push({ step: 1, name: "CSR Generation", ok: false, errors: [error] });
-		console.error(`❌ Step 1: CSR generation failed:`, error);
-		return results; // Can't proceed
-	}
-
-	// ════════════════════════════════════════════════════════════════════
-	// Step 2: Compliance CSID
-	// ════════════════════════════════════════════════════════════════════
-	console.log("─── Step 2: POST /compliance → CCSID ───");
-	const complianceResult = await requestComplianceCSID(csrResult.csr, TEST_OTP);
-	results.push({
-		step: 2,
-		name: "Compliance CSID",
-		ok: complianceResult.success,
-		details: complianceResult.success
-			? `requestId: ${complianceResult.requestId}`
-			: undefined,
-		errors: complianceResult.errors,
-	});
-	if (complianceResult.success) {
-		console.log(`✅ Step 2: CCSID obtained (requestId: ${complianceResult.requestId})\n`);
-	} else {
-		console.error(`❌ Step 2: Compliance CSID failed:`, complianceResult.errors);
+		console.error(`❌ Step 1 failed:`, error);
 		return results;
 	}
 
-	// ════════════════════════════════════════════════════════════════════
-	// Step 3: Compliance Invoices (3 types)
-	// ════════════════════════════════════════════════════════════════════
-	const complianceTypes: Array<{
-		typeCode: "388" | "381" | "383";
+	// ═══ Step 2: Compliance CSID ═══
+	console.log("─── Step 2: POST /compliance → CCSID ───");
+	const complianceResult = await requestComplianceCSID(csrResult.csr, TEST_OTP);
+	results.push({
+		step: 2, name: "Compliance CSID", ok: complianceResult.success,
+		details: complianceResult.success ? `requestId: ${complianceResult.requestId}` : undefined,
+		errors: complianceResult.errors,
+	});
+	if (!complianceResult.success) {
+		console.error(`❌ Step 2 failed:`, complianceResult.errors);
+		return results;
+	}
+	console.log(`✅ Step 2: CCSID obtained (requestId: ${complianceResult.requestId})\n`);
+
+	// Decode binarySecurityToken → PEM body (certificate base64)
+	const certPemBody = Buffer.from(complianceResult.csid!, "base64").toString("utf-8");
+	console.log("[DEBUG] cert PEM body first 50:", certPemBody.substring(0, 50));
+
+	// Private key — our OpenSSL generator returns SEC1 or PKCS8 PEM
+	const privateKeyBody = csrResult.privateKey
+		.replace(/-----BEGIN[^-]+-----/g, "")
+		.replace(/-----END[^-]+-----/g, "")
+		.replace(/\s/g, "");
+
+	// ═══ Steps 3-8: Compliance Invoices (3 simplified + 3 standard) ═══
+	const egsInfo = makeEGSInfo();
+	const lineItem: ZATCASimplifiedInvoiceLineItem = {
+		id: "1",
+		name: "Test Item",
+		quantity: 5,
+		tax_exclusive_price: 10,
+		VAT_percent: 0.15,
+	};
+
+	const complianceTests: Array<{
 		label: string;
-		billingRef?: { invoiceNumber: string };
-		noteReason?: string;
+		standard: boolean;
+		cancelation?: { canceled_invoice_number: number; payment_method: ZATCAPaymentMethods; cancelation_type: ZATCAInvoiceTypes; reason: string };
 	}> = [
-		{ typeCode: "388", label: "Invoice" },
-		{ typeCode: "383", label: "Debit Note", billingRef: { invoiceNumber: "TEST-0001" }, noteReason: "Service upgrade" },
-		{ typeCode: "381", label: "Credit Note", billingRef: { invoiceNumber: "TEST-0001" }, noteReason: "Return" },
+		// Simplified (B2C)
+		{ label: "Simplified Invoice", standard: false },
+		{ label: "Simplified Debit", standard: false, cancelation: { canceled_invoice_number: 1, payment_method: ZATCAPaymentMethods.CASH, cancelation_type: ZATCAInvoiceTypes.DEBIT_NOTE, reason: "Service upgrade" } },
+		{ label: "Simplified Credit", standard: false, cancelation: { canceled_invoice_number: 1, payment_method: ZATCAPaymentMethods.CASH, cancelation_type: ZATCAInvoiceTypes.CREDIT_NOTE, reason: "Return" } },
+		// Standard (B2B)
+		{ label: "Standard Invoice", standard: true },
+		{ label: "Standard Debit", standard: true, cancelation: { canceled_invoice_number: 4, payment_method: ZATCAPaymentMethods.CASH, cancelation_type: ZATCAInvoiceTypes.DEBIT_NOTE, reason: "Service upgrade" } },
+		{ label: "Standard Credit", standard: true, cancelation: { canceled_invoice_number: 4, payment_method: ZATCAPaymentMethods.CASH, cancelation_type: ZATCAInvoiceTypes.CREDIT_NOTE, reason: "Return" } },
 	];
 
-	let previousHash = getInitialPIH();
+	let previousHash = INITIAL_PIH;
 	let counter = 0;
+	const issueDate = new Date().toISOString().split("T")[0]!;
+	const issueTime = new Date().toISOString().split("T")[1]!.replace(/\.\d+Z/, "");
 
-	for (const testType of complianceTypes) {
+	for (const test of complianceTests) {
 		counter++;
-		const stepNum = 2 + counter; // 3, 4, 5
-		const uuid = crypto.randomUUID();
-		console.log(`─── Step ${stepNum}: Compliance ${testType.label} ───`);
+		const stepNum = 2 + counter;
+		console.log(`─── Step ${stepNum}: Compliance ${test.label} ───`);
 
-		const invoiceData: ZatcaInvoiceData = {
-			uuid,
-			invoiceNumber: `TEST-${String(counter).padStart(4, "0")}`,
-			issueDate: new Date().toISOString().split("T")[0]!,
-			issueTime: new Date().toISOString().split("T")[1]!.replace(/\.\d+Z/, ""),
-			invoiceTypeCode: testType.typeCode,
-			isSimplified: true, // Simplified for compliance test
-			seller: {
-				name: TEST_ORG,
-				taxNumber: TEST_VAT,
-				address: {
-					street: "Test Street",
-					buildingNumber: "1234",
-					city: "Riyadh",
-					postalCode: "12345",
-					district: "Test District",
-					countryCode: "SA",
-				},
+		// Build simplified invoice first (zatca-xml-js only builds simplified)
+		const invoice = new ZATCASimplifiedTaxInvoice({
+			props: {
+				egs_info: egsInfo,
+				invoice_counter_number: counter,
+				invoice_serial_number: `EGS1-886431145-${counter}`,
+				issue_date: issueDate,
+				issue_time: issueTime,
+				previous_invoice_hash: previousHash,
+				line_items: [lineItem],
+				cancelation: test.cancelation,
 			},
-			lineItems: [
-				{
-					id: "1",
-					name: "Test Item",
-					quantity: 1,
-					unitPrice: 100,
-					taxCategory: "S",
-					taxPercent: 15,
-					lineTotal: 100,
-				},
-			],
-			totals: {
-				subtotal: 100,
-				totalDiscount: 0,
-				taxableAmount: 100,
-				taxAmount: 15,
-				totalWithVat: 115,
-				payableAmount: 115,
-			},
-			billingReference: testType.billingRef,
-			previousInvoiceHash: previousHash,
-			invoiceCounter: counter,
-			...(testType.noteReason ? { noteReason: testType.noteReason } : {}),
-		} as ZatcaInvoiceData;
+		});
 
-		const xml = buildInvoiceXml(invoiceData);
-		const signed = signInvoice(
-			xml,
-			csrResult.privateKey,
-			complianceResult.csid!,
-			csrResult.publicKey,
-		);
-		previousHash = signed.invoiceHash;
+		let signedResult: { signed_invoice_string: string; invoice_hash: string; qr: string };
+
+		if (test.standard) {
+			// Convert simplified → standard:
+			// 1. Change InvoiceTypeCode name 02→01
+			// 2. Replace empty AccountingCustomerParty with full buyer
+			// 3. Add Delivery with ActualDeliveryDate
+			const xmlDoc = invoice.getXML();
+			let xmlStr = xmlDoc.toString({ no_header: false });
+
+			xmlStr = xmlStr.replace(/name="02/g, 'name="01');
+
+			// Replace the empty AccountingCustomerParty with full buyer info
+			const buyerBlock = [
+				`<cac:AccountingCustomerParty>`,
+				`<cac:Party>`,
+				`<cac:PartyIdentification><cbc:ID schemeID="CRN">454634645645654</cbc:ID></cac:PartyIdentification>`,
+				`<cac:PostalAddress>`,
+				`<cbc:StreetName>King Fahd St</cbc:StreetName>`,
+				`<cbc:BuildingNumber>1234</cbc:BuildingNumber>`,
+				`<cbc:CitySubdivisionName>West</cbc:CitySubdivisionName>`,
+				`<cbc:CityName>Jeddah</cbc:CityName>`,
+				`<cbc:PostalZone>23456</cbc:PostalZone>`,
+				`<cac:Country><cbc:IdentificationCode>SA</cbc:IdentificationCode></cac:Country>`,
+				`</cac:PostalAddress>`,
+				`<cac:PartyTaxScheme>`,
+				`<cbc:CompanyID>300000000000003</cbc:CompanyID>`,
+				`<cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>`,
+				`</cac:PartyTaxScheme>`,
+				`<cac:PartyLegalEntity><cbc:RegistrationName>Test Buyer Corp</cbc:RegistrationName></cac:PartyLegalEntity>`,
+				`</cac:Party>`,
+				`</cac:AccountingCustomerParty>`,
+			].join("");
+
+			// Replace empty tag (may be self-closing or open+close)
+			xmlStr = xmlStr
+				.replace(/<cac:AccountingCustomerParty\s*\/>/, buyerBlock)
+				.replace(/<cac:AccountingCustomerParty><\/cac:AccountingCustomerParty>/, buyerBlock);
+
+			// Add Delivery — must come before PaymentMeans (if present) or TaxTotal
+			const deliveryBlock = `<cac:Delivery><cbc:ActualDeliveryDate>${issueDate}</cbc:ActualDeliveryDate></cac:Delivery>`;
+			if (xmlStr.includes("<cac:PaymentMeans>")) {
+				xmlStr = xmlStr.replace("<cac:PaymentMeans>", `${deliveryBlock}<cac:PaymentMeans>`);
+			} else {
+				xmlStr = xmlStr.replace("<cac:TaxTotal>", `${deliveryBlock}<cac:TaxTotal>`);
+			}
+
+			const modifiedDoc = new XMLDocument(xmlStr);
+			signedResult = generateSignedXMLString({
+				invoice_xml: modifiedDoc,
+				certificate_string: certPemBody,
+				private_key_string: privateKeyBody,
+			});
+		} else {
+			signedResult = invoice.sign(certPemBody, privateKeyBody);
+		}
+
+		previousHash = signedResult.invoice_hash;
+		const signedB64 = Buffer.from(signedResult.signed_invoice_string).toString("base64");
 
 		const result = await submitComplianceInvoice(
-			Buffer.from(signed.signedXml).toString("base64"),
-			signed.invoiceHash,
-			uuid,
-			complianceResult.csid!,
-			complianceResult.secret!,
+			signedB64, signedResult.invoice_hash, egsInfo.uuid,
+			complianceResult.csid!, complianceResult.secret!,
 		);
 
 		results.push({
-			step: stepNum,
-			name: `Compliance ${testType.label}`,
-			ok: result.success,
-			errors: result.errors,
-			warnings: result.warnings,
+			step: stepNum, name: `Compliance ${test.label}`, ok: result.success,
+			errors: result.errors, warnings: result.warnings,
 		});
 
 		if (result.success) {
-			console.log(`✅ Step ${stepNum}: ${testType.label} passed`);
-			if (result.warnings?.length) {
-				console.log(`   ⚠️ Warnings:`, result.warnings);
-			}
+			console.log(`✅ Step ${stepNum}: ${test.label} passed`);
+			if (result.warnings?.length) console.log(`   ⚠️`, result.warnings);
 		} else {
-			console.error(`❌ Step ${stepNum}: ${testType.label} failed:`, result.errors);
+			console.error(`❌ Step ${stepNum}: ${test.label} failed:`, result.errors);
 		}
 		console.log();
 	}
 
-	// Check if all compliance tests passed
-	const complianceFailed = results.some((r) => r.step >= 3 && r.step <= 5 && !r.ok);
+	const complianceFailed = results.some(r => r.step >= 3 && r.step <= 8 && !r.ok);
 	if (complianceFailed) {
-		console.error("⛔ Compliance tests failed — cannot proceed to production CSID\n");
+		console.error("⛔ Compliance failed — cannot proceed\n");
 		return results;
 	}
 
-	// ════════════════════════════════════════════════════════════════════
-	// Step 6: Production CSID
-	// ════════════════════════════════════════════════════════════════════
-	console.log("─── Step 6: POST /production/csids → PCSID ───");
-	const productionResult = await requestProductionCSID(
-		complianceResult.requestId!,
-		complianceResult.csid!,
-		complianceResult.secret!,
+	// ═══ Step 9: Production CSID ═══
+	console.log("─── Step 9: POST /production/csids → PCSID ───");
+	const prodResult = await requestProductionCSID(
+		complianceResult.requestId!, complianceResult.csid!, complianceResult.secret!,
 	);
 	results.push({
-		step: 6,
-		name: "Production CSID",
-		ok: productionResult.success,
-		details: productionResult.success
-			? `requestId: ${productionResult.requestId}`
-			: undefined,
-		errors: productionResult.errors,
+		step: 9, name: "Production CSID", ok: prodResult.success,
+		details: prodResult.success ? `requestId: ${prodResult.requestId}` : undefined,
+		errors: prodResult.errors,
 	});
-
-	if (productionResult.success) {
-		console.log(`✅ Step 6: PCSID obtained (requestId: ${productionResult.requestId})\n`);
-	} else {
-		console.error(`❌ Step 6: Production CSID failed:`, productionResult.errors);
+	if (!prodResult.success) {
+		console.error(`❌ Step 9 failed:`, prodResult.errors);
 		return results;
 	}
+	console.log(`✅ Step 9: PCSID obtained\n`);
 
-	// ════════════════════════════════════════════════════════════════════
-	// Step 7: Reporting (simplified invoice)
-	// ════════════════════════════════════════════════════════════════════
-	console.log("─── Step 7: POST /invoices/reporting/single ───");
+	const prodCertBody = Buffer.from(prodResult.csid!, "base64").toString("utf-8");
+
+	// ═══ Step 10: Reporting (simplified B2C) ═══
+	console.log("─── Step 10: POST /invoices/reporting/single ───");
 	counter++;
-	const reportUuid = crypto.randomUUID();
-	const reportInvoiceData: ZatcaInvoiceData = {
-		uuid: reportUuid,
-		invoiceNumber: `INV-${String(counter).padStart(4, "0")}`,
-		issueDate: new Date().toISOString().split("T")[0]!,
-		issueTime: new Date().toISOString().split("T")[1]!.replace(/\.\d+Z/, ""),
-		invoiceTypeCode: "388",
-		isSimplified: true,
-		seller: {
-			name: TEST_ORG,
-			taxNumber: TEST_VAT,
-			address: {
-				street: "Prince Sultan St",
-				buildingNumber: "2322",
-				city: "Riyadh",
-				postalCode: "23333",
-				district: "Al-Murabba",
-				countryCode: "SA",
-			},
+	const reportInv = new ZATCASimplifiedTaxInvoice({
+		props: {
+			egs_info: egsInfo,
+			invoice_counter_number: counter,
+			invoice_serial_number: `EGS1-886431145-${counter}`,
+			issue_date: new Date().toISOString().split("T")[0]!,
+			issue_time: new Date().toISOString().split("T")[1]!.replace(/\.\d+Z/, ""),
+			previous_invoice_hash: previousHash,
+			line_items: [lineItem],
 		},
-		lineItems: [
-			{
-				id: "1",
-				name: "Construction Service",
-				quantity: 2,
-				unitPrice: 500,
-				taxCategory: "S",
-				taxPercent: 15,
-				lineTotal: 1000,
-			},
-		],
-		totals: {
-			subtotal: 1000,
-			totalDiscount: 0,
-			taxableAmount: 1000,
-			taxAmount: 150,
-			totalWithVat: 1150,
-			payableAmount: 1150,
-		},
-		previousInvoiceHash: previousHash,
-		invoiceCounter: counter,
-	};
-
-	const reportXml = buildInvoiceXml(reportInvoiceData);
-	const reportSigned = signInvoice(
-		reportXml,
-		csrResult.privateKey,
-		productionResult.csid!,
-		csrResult.publicKey,
-	);
-	previousHash = reportSigned.invoiceHash;
-
-	const reportResult = await reportInvoice(
-		Buffer.from(reportSigned.signedXml).toString("base64"),
-		reportSigned.invoiceHash,
-		reportUuid,
-		productionResult.csid!,
-		productionResult.secret!,
-	);
-
-	results.push({
-		step: 7,
-		name: "Reporting (B2C)",
-		ok: reportResult.success,
-		details: `status: ${reportResult.status}`,
-		errors: reportResult.errors,
-		warnings: reportResult.warnings,
 	});
+	const reportSigned = reportInv.sign(prodCertBody, privateKeyBody);
+	previousHash = reportSigned.invoice_hash;
 
-	if (reportResult.success) {
-		console.log(`✅ Step 7: Reporting success (status: ${reportResult.status})`);
-		if (reportResult.warnings?.length) {
-			console.log(`   ⚠️ Warnings:`, reportResult.warnings);
-		}
+	const reportRes = await reportInvoice(
+		Buffer.from(reportSigned.signed_invoice_string).toString("base64"),
+		reportSigned.invoice_hash, egsInfo.uuid,
+		prodResult.csid!, prodResult.secret!,
+	);
+	results.push({
+		step: 10, name: "Reporting (B2C)", ok: reportRes.success,
+		details: `status: ${reportRes.status}`,
+		errors: reportRes.errors, warnings: reportRes.warnings,
+	});
+	if (reportRes.success) {
+		console.log(`✅ Step 10: Reported (${reportRes.status})`);
 	} else {
-		console.error(`❌ Step 7: Reporting failed:`, reportResult.errors);
+		console.error(`❌ Step 10 failed:`, reportRes.errors);
 	}
 	console.log();
 
-	// ════════════════════════════════════════════════════════════════════
-	// Step 8: Clearance (standard invoice)
-	// ════════════════════════════════════════════════════════════════════
-	console.log("─── Step 8: POST /invoices/clearance/single ───");
-	counter++;
-	const clearUuid = crypto.randomUUID();
-	const clearInvoiceData: ZatcaInvoiceData = {
-		uuid: clearUuid,
-		invoiceNumber: `INV-${String(counter).padStart(4, "0")}`,
-		issueDate: new Date().toISOString().split("T")[0]!,
-		issueTime: new Date().toISOString().split("T")[1]!.replace(/\.\d+Z/, ""),
-		invoiceTypeCode: "388",
-		isSimplified: false,
-		deliveryDate: new Date().toISOString().split("T")[0]!,
-		seller: {
-			name: TEST_ORG,
-			taxNumber: TEST_VAT,
-			address: {
-				street: "Prince Sultan St",
-				buildingNumber: "2322",
-				city: "Riyadh",
-				postalCode: "23333",
-				district: "Al-Murabba",
-				countryCode: "SA",
-			},
-		},
-		buyer: {
-			name: "Test Buyer Co",
-			taxNumber: "300000000000003",
-			address: { city: "Jeddah", countryCode: "SA" },
-		},
-		lineItems: [
-			{
-				id: "1",
-				name: "Construction Materials",
-				quantity: 5,
-				unitPrice: 200,
-				taxCategory: "S",
-				taxPercent: 15,
-				lineTotal: 1000,
-			},
-		],
-		totals: {
-			subtotal: 1000,
-			totalDiscount: 0,
-			taxableAmount: 1000,
-			taxAmount: 150,
-			totalWithVat: 1150,
-			payableAmount: 1150,
-		},
-		previousInvoiceHash: previousHash,
-		invoiceCounter: counter,
-	};
-
-	const clearXml = buildInvoiceXml(clearInvoiceData);
-	const clearSigned = signInvoice(
-		clearXml,
-		csrResult.privateKey,
-		productionResult.csid!,
-		csrResult.publicKey,
-	);
-
-	const clearResult = await clearInvoice(
-		Buffer.from(clearSigned.signedXml).toString("base64"),
-		clearSigned.invoiceHash,
-		clearUuid,
-		productionResult.csid!,
-		productionResult.secret!,
-	);
-
-	results.push({
-		step: 8,
-		name: "Clearance (B2B)",
-		ok: clearResult.success,
-		details: `status: ${clearResult.status}, hasClearedXml: ${!!clearResult.clearedInvoice}`,
-		errors: clearResult.errors,
-		warnings: clearResult.warnings,
-	});
-
-	if (clearResult.success) {
-		console.log(`✅ Step 8: Clearance success (status: ${clearResult.status})`);
-		console.log(`   📄 Cleared XML received: ${!!clearResult.clearedInvoice}`);
-		if (clearResult.warnings?.length) {
-			console.log(`   ⚠️ Warnings:`, clearResult.warnings);
-		}
-	} else {
-		console.error(`❌ Step 8: Clearance failed:`, clearResult.errors);
-	}
-	console.log();
-
-	// ════════════════════════════════════════════════════════════════════
-	// Summary
-	// ════════════════════════════════════════════════════════════════════
+	// ═══ Summary ═══
 	console.log("╔══════════════════════════════════════════════════════════╗");
 	console.log("║                    Test Summary                         ║");
 	console.log("╠══════════════════════════════════════════════════════════╣");
 	for (const r of results) {
 		const icon = r.ok ? "✅" : "❌";
-		const line = `║ ${icon} Step ${r.step}: ${r.name.padEnd(30)} ${r.details || ""}`;
-		console.log(line.padEnd(58) + "║");
+		console.log(`║ ${icon} Step ${r.step}: ${r.name.padEnd(30)} ${(r.details || "").padEnd(20)}║`);
 	}
-	const passed = results.filter((r) => r.ok).length;
-	const total = results.length;
+	const passed = results.filter(r => r.ok).length;
 	console.log("╠══════════════════════════════════════════════════════════╣");
-	console.log(`║ Result: ${passed}/${total} steps passed`.padEnd(58) + "║");
+	console.log(`║ Result: ${passed}/${results.length} passed`.padEnd(58) + "║");
 	console.log("╚══════════════════════════════════════════════════════════╝");
 
 	return results;
 }
 
-// ─── CLI entry point (only when run directly, not when imported) ──────
+// ─── CLI entry point ───────────────────────────────────────────────────
 
-const isDirectRun =
-	typeof require !== "undefined" &&
-	require.main === module;
+const isDirectRun = typeof require !== "undefined" && require.main === module;
 
 if (isDirectRun) {
 	if (!process.env.ZATCA_ENVIRONMENT) {
@@ -445,11 +333,10 @@ if (isDirectRun) {
 	}
 	runSandboxE2ETest()
 		.then((results) => {
-			const allPassed = results.every((r) => r.ok);
-			process.exit(allPassed ? 0 : 1);
+			process.exit(results.every(r => r.ok) ? 0 : 1);
 		})
 		.catch((err) => {
-			console.error("Fatal error:", err);
+			console.error("Fatal:", err);
 			process.exit(1);
 		});
 }
