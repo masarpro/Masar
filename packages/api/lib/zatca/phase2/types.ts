@@ -123,9 +123,11 @@ export interface CSRInput {
 	/** "1100" = both, "1000" = standard only, "0100" = simplified only */
 	invoiceType?: "1100" | "1000" | "0100";
 	serialNumber?: string;
-	/** Branch address or location (registeredAddress in CSR alt_names) */
+	/** Branch name for OU in Subject DN (e.g. "Riyadh Branch") */
+	branch?: string;
+	/** Branch address code (registeredAddress in SAN, e.g. "RRRD2929") */
 	location?: string;
-	/** Business sector (businessCategory in CSR alt_names) */
+	/** Business activity (businessCategory in SAN, e.g. "Supply activities") */
 	industry?: string;
 }
 

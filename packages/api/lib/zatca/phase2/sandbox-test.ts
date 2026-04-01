@@ -14,7 +14,7 @@
  * Required env: ZATCA_ENVIRONMENT=sandbox (or unset, defaults to sandbox)
  */
 
-import { generateCSR } from "./csr-generator";
+import { generateCSRviaOpenSSL } from "./csr-generator";
 import { buildInvoiceXml } from "./xml-builder";
 import { signInvoice } from "./invoice-signer";
 import { getInitialPIH } from "./hash-chain";
@@ -30,10 +30,11 @@ import type { ZatcaInvoiceData } from "./types";
 
 // ─── Test Configuration ────────────────────────────────────────────────
 
-const TEST_VAT = "399999999900003"; // ZATCA sandbox test VAT number
+const TEST_VAT = process.env.ZATCA_VAT || "399999999900003";
+const TEST_OTP = process.env.ZATCA_OTP || "123345";
 const TEST_ORG = "Maximum Speed Tech Supply LTD";
 const TEST_BRANCH = "Riyadh Branch";
-const TEST_INDUSTRY = "Supply activities";
+const TEST_INDUSTRY = "Supply";
 const TEST_ADDRESS = "RRRD2929";
 
 interface StepResult {
@@ -58,9 +59,9 @@ export async function runSandboxE2ETest(): Promise<StepResult[]> {
 	// Step 1: CSR Generation
 	// ════════════════════════════════════════════════════════════════════
 	console.log("─── Step 1: CSR Generation ───");
-	let csrResult: Awaited<ReturnType<typeof generateCSR>>;
+	let csrResult: Awaited<ReturnType<typeof generateCSRviaOpenSSL>>;
 	try {
-		csrResult = await generateCSR({
+		csrResult = await generateCSRviaOpenSSL({
 			organizationName: TEST_ORG,
 			vatNumber: TEST_VAT,
 			invoiceType: "1100",
@@ -74,7 +75,8 @@ export async function runSandboxE2ETest(): Promise<StepResult[]> {
 			details: `CSR length: ${csrResult.csr.length}`,
 		});
 		console.log(`✅ Step 1: CSR generated (${csrResult.csr.length} chars)\n`);
-	} catch (error) {
+
+} catch (error) {
 		results.push({ step: 1, name: "CSR Generation", ok: false, errors: [error] });
 		console.error(`❌ Step 1: CSR generation failed:`, error);
 		return results; // Can't proceed
@@ -84,7 +86,7 @@ export async function runSandboxE2ETest(): Promise<StepResult[]> {
 	// Step 2: Compliance CSID
 	// ════════════════════════════════════════════════════════════════════
 	console.log("─── Step 2: POST /compliance → CCSID ───");
-	const complianceResult = await requestComplianceCSID(csrResult.csr, SANDBOX_DEFAULTS.otp);
+	const complianceResult = await requestComplianceCSID(csrResult.csr, TEST_OTP);
 	results.push({
 		step: 2,
 		name: "Compliance CSID",
@@ -108,10 +110,11 @@ export async function runSandboxE2ETest(): Promise<StepResult[]> {
 		typeCode: "388" | "381" | "383";
 		label: string;
 		billingRef?: { invoiceNumber: string };
+		noteReason?: string;
 	}> = [
 		{ typeCode: "388", label: "Invoice" },
-		{ typeCode: "383", label: "Debit Note", billingRef: { invoiceNumber: "TEST-0001" } },
-		{ typeCode: "381", label: "Credit Note", billingRef: { invoiceNumber: "TEST-0001" } },
+		{ typeCode: "383", label: "Debit Note", billingRef: { invoiceNumber: "TEST-0001" }, noteReason: "Service upgrade" },
+		{ typeCode: "381", label: "Credit Note", billingRef: { invoiceNumber: "TEST-0001" }, noteReason: "Return" },
 	];
 
 	let previousHash = getInitialPIH();
@@ -164,7 +167,8 @@ export async function runSandboxE2ETest(): Promise<StepResult[]> {
 			billingReference: testType.billingRef,
 			previousInvoiceHash: previousHash,
 			invoiceCounter: counter,
-		};
+			...(testType.noteReason ? { noteReason: testType.noteReason } : {}),
+		} as ZatcaInvoiceData;
 
 		const xml = buildInvoiceXml(invoiceData);
 		const signed = signInvoice(
