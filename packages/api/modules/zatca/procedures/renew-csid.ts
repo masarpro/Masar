@@ -88,7 +88,7 @@ export const renewCsid = subscriptionProcedure
 
 		// 4. Call PATCH /production/csids
 		const currentSecret = decryptSecret(device.csidSecret);
-		const env = process.env.ZATCA_ENVIRONMENT || "sandbox";
+		const env = process.env.ZATCA_ENVIRONMENT || "simulation";
 		const effectiveOtp = env === "sandbox" ? SANDBOX_DEFAULTS.otp : input.otp;
 
 		const result = await renewProductionCSID(

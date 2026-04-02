@@ -10,7 +10,7 @@
 import { ZATCA_URLS, ZATCA_PATHS, type ZatcaEnvironment } from "./constants";
 
 function getBaseUrl(): string {
-	const env = (process.env.ZATCA_ENVIRONMENT || "sandbox") as ZatcaEnvironment;
+	const env = (process.env.ZATCA_ENVIRONMENT || "simulation") as ZatcaEnvironment;
 	return ZATCA_URLS[env] || ZATCA_URLS.sandbox;
 }
 

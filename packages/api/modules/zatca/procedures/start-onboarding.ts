@@ -100,7 +100,7 @@ export const startOnboarding = subscriptionProcedure
 
 		// 4. Request Compliance CSID from ZATCA
 		//    Sandbox always requires the fixed OTP "123345" regardless of user input
-		const env = process.env.ZATCA_ENVIRONMENT || "sandbox";
+		const env = process.env.ZATCA_ENVIRONMENT || "simulation";
 		const effectiveOtp = env === "sandbox" ? SANDBOX_DEFAULTS.otp : input.otp;
 		const complianceResult = await requestComplianceCSID(csrResult.csr, effectiveOtp);
 

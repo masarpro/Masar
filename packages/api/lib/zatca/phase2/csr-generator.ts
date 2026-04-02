@@ -39,7 +39,7 @@ export async function generateCSRviaOpenSSL(input: CSRInput): Promise<CSRResult>
 	const invoiceType = input.invoiceType ?? "1100";
 	const location = input.location || CSR_CONFIG.registeredAddress;
 	const industry = input.industry || CSR_CONFIG.businessCategory;
-	const env = (process.env.ZATCA_ENVIRONMENT || "sandbox") as ZatcaEnvironment;
+	const env = (process.env.ZATCA_ENVIRONMENT || "simulation") as ZatcaEnvironment;
 
 	const cn =
 		env === "production"
@@ -213,32 +213,35 @@ async function generateCSRviaCrypto(input: CSRInput): Promise<CSRResult> {
 	const invoiceType = input.invoiceType ?? "1100";
 	const location = input.location || CSR_CONFIG.registeredAddress;
 	const industry = input.industry || CSR_CONFIG.businessCategory;
-	const env = (process.env.ZATCA_ENVIRONMENT || "sandbox") as ZatcaEnvironment;
+	const env = (process.env.ZATCA_ENVIRONMENT || "simulation") as ZatcaEnvironment;
 	const curve = process.env.ZATCA_EC_CURVE || "secp256k1";
 
 	const keyPair = generateKeyPairSync("ec", { namedCurve: curve });
-	const privateKeyPem = keyPair.privateKey.export({ type: "sec1", format: "pem" }) as string;
+	// PKCS8 format — matches OpenSSL version and what invoice-signer expects
+	const privateKeyPem = keyPair.privateKey.export({ type: "pkcs8", format: "pem" }) as string;
 	const publicKeyPem = keyPair.publicKey.export({ type: "spki", format: "pem" }) as string;
 	const publicKeySpkiDer = keyPair.publicKey.export({ type: "spki", format: "der" });
 
 	const cn = env === "production" ? CSR_CONFIG.commonName : `TST-886431145-${input.vatNumber}`;
 	const asciiOrg = input.organizationName.replace(/[^\x20-\x7E]/g, "").trim() || "Masar Platform";
-	const ou = input.location || "Main Branch";
 	const templateName = env === "simulation" ? "PREZATCACode-Signing" : "ZATCA-Code-Signing";
 	const snPrefix = env === "production" ? "1-Masar|2-EGS1|3-" : "1-TST|2-TST|3-";
 
+	// Subject DN — matches OpenSSL conf order (C, O, OU, CN)
 	const subject = derSequence(
 		derRDN(OID.countryName, derPrintableString("SA")),
 		derRDN(OID.organization, derUTF8String(asciiOrg)),
-		derRDN(OID.organizationUnit, derUTF8String(ou)),
+		derRDN(OID.organizationUnit, derUTF8String(location)),
 		derRDN(OID.commonName, derUTF8String(cn)),
 	);
 
-	const certTemplateExt = derSequence(
-		derOID(OID.certificateTemplateName),
-		derOctetString(derUTF8String(templateName)),
+	// Extension 1: basicConstraints = CA:FALSE (empty SEQUENCE = default FALSE)
+	const basicConstraintsExt = derSequence(
+		derOID("2.5.29.19"),
+		derOctetString(derSequence()),
 	);
 
+	// Extension 2: subjectAltName = dirName (SAN with ZATCA-specific fields)
 	const altNameDirName = derSequence(
 		derRDN(OID.serialNumber, derUTF8String(`${snPrefix}${serialNumber}`)),
 		derRDN(OID.userId, derUTF8String(input.vatNumber)),
@@ -252,9 +255,16 @@ async function generateCSRviaCrypto(input: CSRInput): Promise<CSRResult> {
 		derOctetString(derSequence(derContextTag(4, altNameDirName))),
 	);
 
+	// Extension 3: certificateTemplateName — PrintableString (matches OpenSSL ASN1:PRINTABLESTRING)
+	const certTemplateExt = derSequence(
+		derOID(OID.certificateTemplateName),
+		derOctetString(derPrintableString(templateName)),
+	);
+
+	// Attributes: extensionRequest with all 3 extensions (order matches OpenSSL conf)
 	const attributes = derContextTag(0, derSequence(
 		derOID(OID.extensionRequest),
-		derSet(derSequence(certTemplateExt, subjectAltNameExt)),
+		derSet(derSequence(basicConstraintsExt, subjectAltNameExt, certTemplateExt)),
 	));
 
 	const certRequestInfo = derSequence(derInteger(0), subject, publicKeySpkiDer, attributes);
