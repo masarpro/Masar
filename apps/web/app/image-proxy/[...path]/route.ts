@@ -15,7 +15,10 @@ export const GET = async (
 		return new Response("Invalid path", { status: 400 });
 	}
 
-	if (bucket === config.storage.bucketNames.avatars) {
+	const ATTACHMENTS_BUCKET = process.env.S3_ATTACHMENTS_BUCKET || "attachments";
+	const allowedBuckets = [config.storage.bucketNames.avatars, ATTACHMENTS_BUCKET];
+
+	if (allowedBuckets.includes(bucket)) {
 		const signedUrl = await getSignedUrl(filePath, {
 			bucket,
 			expiresIn: 60 * 60,

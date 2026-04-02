@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
 	Calculator,
 	FileText,
@@ -11,6 +12,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import { AddExpenseDialog } from "@saas/shared/components/AddExpenseDialog";
 
 interface QuickActionsGridProps {
 	organizationSlug: string;
@@ -18,6 +21,9 @@ interface QuickActionsGridProps {
 
 export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 	const t = useTranslations();
+	const { activeOrganization } = useActiveOrganization();
+	const organizationId = activeOrganization?.id ?? "";
+	const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
 
 	const quickActions = [
 		{
@@ -30,6 +36,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			bgColor: "bg-rose-50/80 dark:bg-rose-950/30",
 			hoverBg: "hover:bg-rose-100 dark:hover:bg-rose-900/50",
 			borderColor: "border-rose-200/50 dark:border-rose-800/50",
+			onCreateClick: () => setExpenseDialogOpen(true),
 		},
 		{
 			icon: TrendingUp,
@@ -89,38 +96,60 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 	];
 
 	return (
-		<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-			{quickActions.map((action, i) => {
-				const Icon = action.icon;
-				return (
-					<div
-						key={i}
-						className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:shadow-xl animate-in fade-in slide-in-from-bottom-3"
-						style={{ animationDelay: `${200 + i * 30}ms` }}
-					>
-						<Link
-							href={action.browsePath}
-							className={`flex flex-col items-center gap-2 p-4 ${action.bgColor} ${action.hoverBg} transition-colors border-b ${action.borderColor}`}
+		<>
+			<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+				{quickActions.map((action, i) => {
+					const Icon = action.icon;
+					return (
+						<div
+							key={i}
+							className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:shadow-xl animate-in fade-in slide-in-from-bottom-3"
+							style={{ animationDelay: `${200 + i * 30}ms` }}
 						>
-							<div className={`p-3 rounded-xl bg-card/60 ${action.iconColor}`}>
-								<Icon className="h-6 w-6" />
-							</div>
-							<span className="text-center text-sm font-medium text-foreground/80">
-								{action.sectionLabel}
-							</span>
-						</Link>
-						<Link
-							href={action.createPath}
-							className="flex items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
-						>
-							<Plus className={`h-4 w-4 ${action.iconColor}`} />
-							<span className={`text-xs font-medium ${action.iconColor}`}>
-								{action.actionLabel}
-							</span>
-						</Link>
-					</div>
-				);
-			})}
-		</div>
+							<Link
+								href={action.browsePath}
+								className={`flex flex-col items-center gap-2 p-4 ${action.bgColor} ${action.hoverBg} transition-colors border-b ${action.borderColor}`}
+							>
+								<div className={`p-3 rounded-xl bg-card/60 ${action.iconColor}`}>
+									<Icon className="h-6 w-6" />
+								</div>
+								<span className="text-center text-sm font-medium text-foreground/80">
+									{action.sectionLabel}
+								</span>
+							</Link>
+							{"onCreateClick" in action && action.onCreateClick ? (
+								<button
+									type="button"
+									onClick={action.onCreateClick}
+									className="flex w-full items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
+								>
+									<Plus className={`h-4 w-4 ${action.iconColor}`} />
+									<span className={`text-xs font-medium ${action.iconColor}`}>
+										{action.actionLabel}
+									</span>
+								</button>
+							) : (
+								<Link
+									href={action.createPath}
+									className="flex items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
+								>
+									<Plus className={`h-4 w-4 ${action.iconColor}`} />
+									<span className={`text-xs font-medium ${action.iconColor}`}>
+										{action.actionLabel}
+									</span>
+								</Link>
+							)}
+						</div>
+					);
+				})}
+			</div>
+
+			<AddExpenseDialog
+				open={expenseDialogOpen}
+				onOpenChange={setExpenseDialogOpen}
+				organizationId={organizationId}
+				showProjectSelector
+			/>
+		</>
 	);
 }

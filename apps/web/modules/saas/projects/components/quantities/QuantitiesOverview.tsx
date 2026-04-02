@@ -33,6 +33,7 @@ import {
 	Link2,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -60,6 +61,10 @@ export function QuantitiesOverview({
 }: QuantitiesOverviewProps) {
 	const t = useTranslations("projectQuantities");
 	const queryClient = useQueryClient();
+	const router = useRouter();
+
+	const studyPath = (studyId: string) =>
+		`/app/${organizationSlug}/pricing/studies/${studyId}`;
 
 	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 	const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
@@ -272,7 +277,11 @@ export function QuantitiesOverview({
 					</TableHeader>
 					<TableBody>
 						{studies.map((study) => (
-							<TableRow key={study.id}>
+							<TableRow
+								key={study.id}
+								className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
+								onClick={() => router.push(studyPath(study.id))}
+							>
 								<TableCell>
 									<div className="flex items-center gap-2">
 										<span className="font-medium text-slate-900 dark:text-slate-100">
@@ -306,6 +315,7 @@ export function QuantitiesOverview({
 												variant="ghost"
 												size="icon"
 												className="h-8 w-8 rounded-lg"
+												onClick={(e) => e.stopPropagation()}
 											>
 												<MoreVertical className="h-4 w-4" />
 											</Button>
@@ -313,7 +323,7 @@ export function QuantitiesOverview({
 										<DropdownMenuContent align="end">
 											<DropdownMenuItem asChild>
 												<Link
-													href={`/${organizationSlug}/pricing/studies/${study.id}`}
+													href={studyPath(study.id)}
 												>
 													<ExternalLink className="h-4 w-4 me-2" />
 													{t("studies.actions.open")}
@@ -321,7 +331,10 @@ export function QuantitiesOverview({
 											</DropdownMenuItem>
 											<DropdownMenuItem
 												className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
-												onClick={() => unlinkMutation.mutate(study.id)}
+												onClick={(e) => {
+														e.stopPropagation();
+														unlinkMutation.mutate(study.id);
+													}}
 												disabled={unlinkMutation.isPending}
 											>
 												<Unlink className="h-4 w-4 me-2" />
