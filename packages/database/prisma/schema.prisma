@@ -3738,7 +3738,7 @@ model Client {
   secondaryAddress Json?        @map("secondary_address")
 
   // رقم الكود (تلقائي: C-001, C-002, ...)
-  code            String?       @unique     // رقم العميل
+  code            String?                   // رقم العميل
 
   // العملة ولغة العرض
   currency        String        @default("SAR")          // العملة
@@ -3772,7 +3772,7 @@ model Client {
 
   @@index([organizationId])
   @@index([organizationId, name])
-  @@index([organizationId, code])
+  @@unique([organizationId, code])
   @@index([organizationId, clientType])
   @@map("clients")
 }
