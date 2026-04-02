@@ -554,6 +554,7 @@ export function TemplateEditor({
 				<ComponentsPanel
 					onDragStart={handleDragStart}
 					onAddElement={handleAddElement}
+					templateType={templateType}
 				/>
 
 				{/* Interactive Preview (Center) */}

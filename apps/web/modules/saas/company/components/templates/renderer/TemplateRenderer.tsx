@@ -417,6 +417,9 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 				);
 
 			case "qrCode":
+				if (docType === "quotation") {
+					return null;
+				}
 				return (
 					<QRCodeElement
 						key={element.id}

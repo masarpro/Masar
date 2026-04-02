@@ -138,7 +138,7 @@ export const getQuotationElements = (): TemplateElement[] => [
 	{
 		id: generateId(),
 		type: "qrCode",
-		enabled: true,
+		enabled: false,
 		order: 6,
 		settings: {
 			size: "medium",

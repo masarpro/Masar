@@ -128,7 +128,12 @@ export function InlineClientForm({
 			});
 		},
 		onError: (error: any) => {
-			toast.error(error.message || t("finance.clients.createError"));
+			const message = error?.message;
+			if (message && message !== "Internal server error") {
+				toast.error(message);
+			} else {
+				toast.error(t("finance.clients.createError"));
+			}
 		},
 	});
 

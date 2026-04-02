@@ -159,8 +159,9 @@ export function PhotoUploadForm({
 
 				setUploadProgress(95);
 
-				// Step 3: Construct the photo URL using image-proxy
-				const photoUrl = `/image-proxy/${ATTACHMENTS_BUCKET}/${storagePath}`;
+				// Step 3: Construct the photo URL using image-proxy (absolute URL for backend validation)
+				const origin = typeof window !== "undefined" ? window.location.origin : "";
+				const photoUrl = `${origin}/image-proxy/${ATTACHMENTS_BUCKET}/${storagePath}`;
 				setUploadedPhotoUrl(photoUrl);
 				setUploadProgress(100);
 				setUploadState("uploaded");

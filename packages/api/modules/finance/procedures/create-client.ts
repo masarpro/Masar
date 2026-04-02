@@ -1,5 +1,7 @@
 import { createClient } from "@repo/database";
 import { z } from "zod";
+import { ORPCError } from "@orpc/server";
+import { hasPermission } from "@repo/database/prisma/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import {
@@ -66,10 +68,13 @@ export const createClientProcedure = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "finance",
-			action: "quotations",
-		});
+		// العميل كيان مشترك — يُنشأ من المالية (finance.quotations) أو التسعير (pricing.quotations)
+		const { permissions } = await verifyOrganizationAccess(input.organizationId, context.user.id);
+		if (!hasPermission(permissions, "finance", "quotations") && !hasPermission(permissions, "pricing", "quotations")) {
+			throw new ORPCError("FORBIDDEN", {
+				message: "ليس لديك صلاحية إضافة عملاء",
+			});
+		}
 
 		const client = await createClient({
 			organizationId: input.organizationId,

@@ -70,6 +70,7 @@ import { StatusBadge } from "@saas/finance/components/shared/StatusBadge";
 import { AmountSummary } from "@saas/finance/components/shared/AmountSummary";
 import { calculateTotals } from "@saas/finance/lib/utils";
 import { TemplateRenderer } from "@saas/company/components/templates/renderer";
+import { useEnsureDefaultTemplate } from "@saas/shared/hooks/use-ensure-default-template";
 import { EditorPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface QuotationFormProps {
@@ -300,6 +301,9 @@ export function QuotationForm({
 		}),
 	);
 	const defaultTemplate = defaultTemplateRaw as any;
+
+	// Auto-seed templates if none exist (null = no template found, undefined = still loading)
+	useEnsureDefaultTemplate(organizationId, defaultTemplateRaw, false);
 
 	// Fetch projects for dropdown
 	const { data: projectsDataRaw } = useQuery(
@@ -592,7 +596,13 @@ export function QuotationForm({
 							>
 								<Eye className="h-4 w-4" />
 							</Button>
-							<Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => toast.info(t("finance.actions.printComingSoon"))}>
+							<Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => {
+								if (mode === "edit" && quotationId) {
+									router.push(`${basePath}/${quotationId}/preview`);
+								} else {
+									toast.info(t("common.saveFirst"));
+								}
+							}}>
 								<Printer className="h-4 w-4" />
 							</Button>
 							<div className="w-px h-5 bg-border/50" />

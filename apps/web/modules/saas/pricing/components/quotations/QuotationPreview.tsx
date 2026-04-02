@@ -9,6 +9,7 @@ import { Card, CardContent } from "@ui/components/card";
 import { Printer, Download, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { TemplateRenderer } from "@saas/company/components/templates/renderer";
+import { useEnsureDefaultTemplate } from "@saas/shared/hooks/use-ensure-default-template";
 import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
 
 interface QuotationPreviewProps {
@@ -55,6 +56,13 @@ export function QuotationPreview({
 
 	// Use linked template or default
 	const template = linkedTemplate || defaultTemplate;
+
+	// Auto-seed templates if none exist
+	useEnsureDefaultTemplate(
+		organizationId,
+		linkedTemplate || defaultTemplate,
+		isLoadingDefaultTemplate,
+	);
 
 	const isLoading = isLoadingQuotation || isLoadingSettings ||
 		(!linkedTemplate && isLoadingDefaultTemplate);

@@ -67,16 +67,23 @@ const components: ComponentDefinition[] = [
 interface ComponentsPanelProps {
 	onDragStart: (elementType: ElementType) => void;
 	onAddElement: (elementType: ElementType) => void;
+	templateType?: "quotation" | "invoice" | "letter";
 }
 
 export function ComponentsPanel({
 	onDragStart,
 	onAddElement,
+	templateType,
 }: ComponentsPanelProps) {
 	const t = useTranslations();
 
-	const basicComponents = components.filter((c) => c.category === "basic");
-	const advancedComponents = components.filter((c) => c.category === "advanced");
+	// QR code is ZATCA-specific — hide for quotation templates
+	const filteredComponents = templateType === "quotation"
+		? components.filter((c) => c.id !== "qrCode")
+		: components;
+
+	const basicComponents = filteredComponents.filter((c) => c.category === "basic");
+	const advancedComponents = filteredComponents.filter((c) => c.category === "advanced");
 
 	const handleDragStart = (
 		e: React.DragEvent<HTMLDivElement>,
