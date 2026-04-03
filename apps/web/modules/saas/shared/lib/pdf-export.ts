@@ -1,207 +1,143 @@
 "use client";
 
-const A4_W = 210; // mm
-const A4_H = 297; // mm
-const GAP = 2; // mm safety gap between header↔body and body↔footer
-
 /**
- * Capture an HTML element as a high-resolution canvas.
- * Forces RTL direction on the cloned element to fix Arabic text rendering.
+ * Open a clean print window with the document content.
+ * Uses the browser's native rendering — guarantees perfect Arabic/RTL support.
+ *
+ * If the container has [data-pdf-header], [data-pdf-body], [data-pdf-footer],
+ * uses the HTML <table> trick so the browser repeats header/footer on every page.
+ *
+ * The user can choose "Save as PDF" in the print dialog to download a PDF.
  */
-async function capture(
-	el: HTMLElement,
-	scale = 2,
-): Promise<HTMLCanvasElement> {
-	const html2canvas = (await import("html2canvas-pro")).default;
-	return html2canvas(el, {
-		scale,
-		useCORS: true,
-		logging: false,
-		backgroundColor: "#ffffff",
-		ignoreElements: (e) => e.classList?.contains("no-print") || false,
-		onclone: (_doc, clonedEl) => {
-			// Ensure RTL is preserved in the cloned subtree.
-			// html2canvas clones only the target element, so the parent's
-			// dir="rtl" is lost. We force it on the clone and all children.
-			clonedEl.setAttribute("dir", "rtl");
-			clonedEl.style.direction = "rtl";
-			clonedEl.querySelectorAll("*").forEach((child) => {
-				if (child instanceof HTMLElement && !child.getAttribute("dir")) {
-					child.style.direction = "rtl";
+export function exportToPDF(containerId: string): void {
+	const container = document.getElementById(containerId);
+	if (!container) {
+		console.error(`Element #${containerId} not found`);
+		return;
+	}
+
+	// Collect all stylesheets from the current page
+	const stylesheets = Array.from(
+		document.querySelectorAll('link[rel="stylesheet"], style'),
+	)
+		.map((el) => el.outerHTML)
+		.join("\n");
+
+	// Detect direction
+	const dir =
+		container.closest("[dir]")?.getAttribute("dir") ||
+		document.documentElement.dir ||
+		"rtl";
+
+	// Build document HTML
+	const headerEl = container.querySelector("[data-pdf-header]");
+	const bodyEl = container.querySelector("[data-pdf-body]");
+	const footerEl = container.querySelector("[data-pdf-footer]");
+
+	let documentHTML: string;
+
+	if (headerEl && bodyEl && footerEl) {
+		// Table trick: browser auto-repeats <thead>/<tfoot> on every printed page
+		documentHTML = `
+			<table class="print-table">
+				<thead><tr><td class="print-cell">${headerEl.innerHTML}</td></tr></thead>
+				<tfoot><tr><td class="print-cell">${footerEl.innerHTML}</td></tr></tfoot>
+				<tbody><tr><td class="print-cell">${bodyEl.innerHTML}</td></tr></tbody>
+			</table>
+		`;
+	} else {
+		documentHTML = container.innerHTML;
+	}
+
+	// Open a clean window
+	const printWindow = window.open("", "_blank");
+	if (!printWindow) {
+		// Popup blocked — fallback to printing the current page
+		window.print();
+		return;
+	}
+
+	printWindow.document.write(`<!DOCTYPE html>
+<html dir="${dir}" lang="ar">
+<head>
+<meta charset="utf-8" />
+<title>طباعة</title>
+${stylesheets}
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    direction: ${dir};
+    background: white;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /* Table trick for repeating header/footer */
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: auto;
+  }
+  .print-table thead { display: table-header-group; }
+  .print-table tfoot { display: table-footer-group; }
+  .print-table tbody { display: table-row-group; }
+  .print-cell {
+    padding: 0;
+    border: none;
+    vertical-align: top;
+  }
+
+  /* Prevent awkward breaks */
+  tr { page-break-inside: avoid; }
+  h3, h4, h5, h6 { page-break-after: avoid; }
+
+  /* Hide non-printable elements */
+  .no-print, .print\\:hidden, [data-print-hidden="true"] {
+    display: none !important;
+  }
+
+  img { max-width: 100%; }
+</style>
+</head>
+<body>
+${documentHTML}
+</body>
+</html>`);
+
+	printWindow.document.close();
+
+	// Wait for images to load, then trigger print
+	const images = printWindow.document.querySelectorAll("img");
+	const imagePromises = Array.from(images).map(
+		(img) =>
+			new Promise<void>((resolve) => {
+				if (img.complete) resolve();
+				else {
+					img.onload = () => resolve();
+					img.onerror = () => resolve();
 				}
-			});
-		},
+			}),
+	);
+
+	Promise.all(imagePromises).then(() => {
+		setTimeout(() => {
+			printWindow.focus();
+			printWindow.print();
+		}, 800);
 	});
 }
 
 /**
- * Convert canvas height to mm based on A4 width using aspect ratio.
- * This is mathematically exact — no dependency on container.offsetWidth.
+ * Alias — same behavior. Both print and PDF use the browser's print dialog.
  */
-function canvasHeightToMm(
-	canvas: HTMLCanvasElement,
-	targetWidthMm: number,
-): number {
-	if (canvas.width === 0) return 0;
-	return (canvas.height / canvas.width) * targetWidthMm;
-}
-
-/**
- * Create a canvas slice from a larger source canvas.
- */
-function sliceCanvas(
-	source: HTMLCanvasElement,
-	sourceY: number,
-	sliceHeight: number,
-): HTMLCanvasElement {
-	const c = document.createElement("canvas");
-	c.width = source.width;
-	c.height = Math.max(1, Math.round(sliceHeight));
-	const ctx = c.getContext("2d");
-	if (ctx) {
-		ctx.fillStyle = "#ffffff";
-		ctx.fillRect(0, 0, c.width, c.height);
-		const actualHeight = Math.min(sliceHeight, source.height - sourceY);
-		if (actualHeight > 0) {
-			ctx.drawImage(
-				source,
-				0,
-				Math.round(sourceY),
-				source.width,
-				Math.round(actualHeight),
-				0,
-				0,
-				c.width,
-				Math.round(actualHeight),
-			);
-		}
-	}
-	return c;
-}
-
-/**
- * Export an HTML document to a multi-page A4 PDF.
- * If the container has [data-pdf-header], [data-pdf-body], [data-pdf-footer]
- * children, header and footer are repeated on every page with a safety gap.
- * Otherwise falls back to single-canvas slicing.
- *
- * Uses html2canvas-pro which supports oklch colors (Tailwind CSS 4).
- */
-export async function exportToPDF(
-	container: HTMLElement,
-	filename: string,
-): Promise<void> {
-	const headerEl = container.querySelector(
-		"[data-pdf-header]",
-	) as HTMLElement | null;
-	const bodyEl = container.querySelector(
-		"[data-pdf-body]",
-	) as HTMLElement | null;
-	const footerEl = container.querySelector(
-		"[data-pdf-footer]",
-	) as HTMLElement | null;
-
-	if (headerEl && bodyEl && footerEl) {
-		return exportWithSections(headerEl, bodyEl, footerEl, filename);
-	}
-
-	return fallbackExport(container, filename);
-}
-
-/**
- * Sectioned export: header + body slices + footer on every page.
- */
-async function exportWithSections(
-	headerEl: HTMLElement,
-	bodyEl: HTMLElement,
-	footerEl: HTMLElement,
-	filename: string,
-): Promise<void> {
-	const { jsPDF } = await import("jspdf");
-	const scale = 2;
-
-	const [headerCv, bodyCv, footerCv] = await Promise.all([
-		capture(headerEl, scale),
-		capture(bodyEl, scale),
-		capture(footerEl, scale),
-	]);
-
-	// Heights in mm via pure aspect ratio
-	const hH = canvasHeightToMm(headerCv, A4_W);
-	const fH = canvasHeightToMm(footerCv, A4_W);
-	const totalBodyH = canvasHeightToMm(bodyCv, A4_W);
-
-	// Available content area per page (with safety gaps)
-	const contentArea = A4_H - hH - fH - GAP * 2;
-
-	if (contentArea <= 10) {
-		// Header + footer too tall — fall back
-		const fullEl = headerEl.parentElement || headerEl;
-		return fallbackExport(fullEl, filename);
-	}
-
-	const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-
-	const headerImg = headerCv.toDataURL("image/jpeg", 0.95);
-	const footerImg = footerCv.toDataURL("image/jpeg", 0.95);
-
-	const totalPages = Math.max(1, Math.ceil(totalBodyH / contentArea));
-	const bodySlicePx = bodyCv.height / totalPages;
-
-	for (let p = 0; p < totalPages; p++) {
-		if (p > 0) pdf.addPage();
-
-		// 1. Header at the top
-		if (hH > 0) {
-			pdf.addImage(headerImg, "JPEG", 0, 0, A4_W, hH);
-		}
-
-		// 2. Body slice after header + gap
-		const srcY = p * bodySlicePx;
-		const slice = sliceCanvas(bodyCv, srcY, bodySlicePx);
-		const sliceImg = slice.toDataURL("image/jpeg", 0.95);
-		const sliceH = Math.min(canvasHeightToMm(slice, A4_W), contentArea);
-		const contentTop = hH + GAP;
-		pdf.addImage(sliceImg, "JPEG", 0, contentTop, A4_W, sliceH);
-
-		// 3. Footer at the bottom
-		if (fH > 0) {
-			pdf.addImage(footerImg, "JPEG", 0, A4_H - fH, A4_W, fH);
-		}
-	}
-
-	const name = filename.endsWith(".pdf") ? filename : `${filename}.pdf`;
-	pdf.save(name);
-}
-
-/**
- * Fallback: capture entire element as one canvas, slice into pages.
- */
-async function fallbackExport(
-	el: HTMLElement,
-	filename: string,
-): Promise<void> {
-	const { jsPDF } = await import("jspdf");
-	const cv = await capture(el);
-	const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-
-	const totalH = canvasHeightToMm(cv, A4_W);
-	const totalPages = Math.max(1, Math.ceil(totalH / A4_H));
-	const slicePx = cv.height / totalPages;
-
-	for (let p = 0; p < totalPages; p++) {
-		if (p > 0) pdf.addPage();
-		const slice = sliceCanvas(cv, p * slicePx, slicePx);
-		const sliceH = canvasHeightToMm(slice, A4_W);
-		pdf.addImage(
-			slice.toDataURL("image/jpeg", 0.95),
-			"JPEG",
-			0,
-			0,
-			A4_W,
-			sliceH,
-		);
-	}
-
-	pdf.save(filename.endsWith(".pdf") ? filename : `${filename}.pdf`);
+export function printDocument(containerId: string): void {
+	exportToPDF(containerId);
 }
