@@ -20,6 +20,7 @@ import Link from "next/link";
 import { useState, type ReactNode, useMemo } from "react";
 import { toast } from "sonner";
 import { exportToPDF } from "@saas/shared/lib/pdf-export";
+import { printWithRepeatingHeaderFooter } from "@saas/shared/lib/print-with-header-footer";
 
 interface QuotationPreviewV2Props {
 	organizationId: string;
@@ -114,7 +115,7 @@ export function QuotationPreviewV2({
 	const status: string = (quotation as any).status ?? "DRAFT";
 	const isDraft = status === "DRAFT";
 
-	const handlePrint = () => window.print();
+	const handlePrint = () => printWithRepeatingHeaderFooter("quotation-print-area");
 
 	// PDF download state
 	const [showFilenameDialog, setShowFilenameDialog] = useState(false);
@@ -210,74 +211,80 @@ export function QuotationPreviewV2({
 					</div>
 				)}
 
-				<CardContent className="p-8 print:p-6 space-y-6 relative z-20">
-					{/* Header with subtle gradient */}
-					<div className="rounded-xl bg-gradient-to-l from-primary/5 via-transparent to-transparent -mx-2 px-2 py-1">
-						<div className="flex justify-between items-start border-b border-border pb-6">
-							<div>
-								{org?.logo && (
-									// NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply
-									<img src={org.logo} alt="" className="h-16 mb-3 object-contain" />
-								)}
-								<p className="font-bold text-lg leading-relaxed">{org?.companyNameAr ?? ""}</p>
-								{org?.address && (
-									<p className="text-sm text-muted-foreground mt-0.5">{org.address}</p>
-								)}
-								{org?.phone && (
-									<p className="text-sm text-muted-foreground">{org.phone}</p>
-								)}
-							</div>
-							<div className="text-left space-y-1.5">
-								<h2 className="text-2xl font-bold text-primary tracking-tight">عرض سعر</h2>
-								<p className="text-xs text-muted-foreground uppercase tracking-wide">QUOTATION</p>
-								<div className="space-y-1 mt-3">
-									<p className="text-sm">
-										<span className="text-muted-foreground">رقم:</span>{" "}
-										<span className="font-semibold">{q.quotationNo}</span>
-									</p>
-									<p className="text-sm">
-										<span className="text-muted-foreground">التاريخ:</span>{" "}
-										<span className="font-medium">
-											{new Date(q.createdAt).toLocaleDateString("ar-SA")}
-										</span>
-									</p>
-									<p className="text-sm">
-										<span className="text-muted-foreground">صالح حتى:</span>{" "}
-										<span className="font-medium">
-											{new Date(q.validUntil).toLocaleDateString("ar-SA")}
-										</span>
-									</p>
+				<CardContent className="p-0 print:p-0 relative z-20">
+					{/* PDF Header Section */}
+					<div data-pdf-header className="p-8 pb-4 print:p-6 print:pb-3 space-y-6">
+						{/* Header with subtle gradient */}
+						<div className="rounded-xl bg-gradient-to-l from-primary/5 via-transparent to-transparent -mx-2 px-2 py-1">
+							<div className="flex justify-between items-start border-b border-border pb-6">
+								<div>
+									{org?.logo && (
+										// NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply
+										<img src={org.logo} alt="" className="h-16 mb-3 object-contain" />
+									)}
+									<p className="font-bold text-lg leading-relaxed">{org?.companyNameAr ?? ""}</p>
+									{org?.address && (
+										<p className="text-sm text-muted-foreground mt-0.5">{org.address}</p>
+									)}
+									{org?.phone && (
+										<p className="text-sm text-muted-foreground">{org.phone}</p>
+									)}
+								</div>
+								<div className="text-left space-y-1.5">
+									<h2 className="text-2xl font-bold text-primary tracking-tight">عرض سعر</h2>
+									<p className="text-xs text-muted-foreground uppercase tracking-wide">QUOTATION</p>
+									<div className="space-y-1 mt-3">
+										<p className="text-sm">
+											<span className="text-muted-foreground">رقم:</span>{" "}
+											<span className="font-semibold">{q.quotationNo}</span>
+										</p>
+										<p className="text-sm">
+											<span className="text-muted-foreground">التاريخ:</span>{" "}
+											<span className="font-medium">
+												{new Date(q.createdAt).toLocaleDateString("ar-SA")}
+											</span>
+										</p>
+										<p className="text-sm">
+											<span className="text-muted-foreground">صالح حتى:</span>{" "}
+											<span className="font-medium">
+												{new Date(q.validUntil).toLocaleDateString("ar-SA")}
+											</span>
+										</p>
+									</div>
 								</div>
 							</div>
 						</div>
+
+						{/* Client info */}
+						<div className="rounded-lg bg-muted/30 border border-border/50 p-4 space-y-1.5">
+							<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">بيانات العميل</p>
+							<p className="text-sm">
+								<span className="text-muted-foreground">العميل:</span>{" "}
+								<span className="font-semibold">{q.clientName}</span>
+							</p>
+							{q.clientCompany && (
+								<p className="text-sm">
+									<span className="text-muted-foreground">الشركة:</span>{" "}
+									{q.clientCompany}
+								</p>
+							)}
+							{q.clientPhone && (
+								<p className="text-sm">
+									<span className="text-muted-foreground">الهاتف:</span>{" "}
+									<span dir="ltr">{q.clientPhone}</span>
+								</p>
+							)}
+							{q.clientTaxNumber && (
+								<p className="text-sm">
+									<span className="text-muted-foreground">الرقم الضريبي:</span>{" "}
+									<span dir="ltr">{q.clientTaxNumber}</span>
+								</p>
+							)}
+						</div>
 					</div>
 
-					{/* Client info */}
-					<div className="rounded-lg bg-muted/30 border border-border/50 p-4 space-y-1.5">
-						<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">بيانات العميل</p>
-						<p className="text-sm">
-							<span className="text-muted-foreground">العميل:</span>{" "}
-							<span className="font-semibold">{q.clientName}</span>
-						</p>
-						{q.clientCompany && (
-							<p className="text-sm">
-								<span className="text-muted-foreground">الشركة:</span>{" "}
-								{q.clientCompany}
-							</p>
-						)}
-						{q.clientPhone && (
-							<p className="text-sm">
-								<span className="text-muted-foreground">الهاتف:</span>{" "}
-								<span dir="ltr">{q.clientPhone}</span>
-							</p>
-						)}
-						{q.clientTaxNumber && (
-							<p className="text-sm">
-								<span className="text-muted-foreground">الرقم الضريبي:</span>{" "}
-								<span dir="ltr">{q.clientTaxNumber}</span>
-							</p>
-						)}
-					</div>
+					{/* PDF Body Section */}
+					<div data-pdf-body className="px-8 print:px-6 space-y-6">
 
 					{/* ─── Introduction ─── */}
 					{q.introduction && (
@@ -433,12 +440,16 @@ export function QuotationPreviewV2({
 						</div>
 					)}
 
-					{/* Footer */}
-					{org?.thankYouMessage && (
-						<div className="text-center text-sm text-muted-foreground border-t border-border pt-4">
-							{org.thankYouMessage}
-						</div>
-					)}
+					</div>
+
+					{/* PDF Footer Section */}
+					<div data-pdf-footer className="px-8 pb-8 print:px-6 print:pb-6">
+						{org?.thankYouMessage && (
+							<div className="text-center text-sm text-muted-foreground border-t border-border pt-4">
+								{org.thankYouMessage}
+							</div>
+						)}
+					</div>
 				</CardContent>
 			</Card>
 
@@ -490,7 +501,7 @@ export function QuotationPreviewV2({
 					}
 					@page {
 						size: A4;
-						margin: 15mm;
+						margin: 0;
 					}
 				}
 			`}</style>

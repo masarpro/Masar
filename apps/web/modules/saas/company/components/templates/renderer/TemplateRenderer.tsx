@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, memo } from "react";
+import { Fragment, memo, useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { HeaderComponent } from "../components/HeaderComponent";
 import { DocumentMetaComponent } from "../components/DocumentMetaComponent";
@@ -658,13 +658,40 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 		);
 	};
 
-	// Group totals + qrCode side by side when adjacent
-	const renderGroupedElements = () => {
+	// Classify elements into header / body / footer groups
+	const PDF_HEADER_TYPES = new Set(["header", "documentMeta"]);
+	const PDF_FOOTER_TYPES = new Set(["footer"]);
+
+	const { headerEls, bodyEls, footerEls } = useMemo(() => {
+		const h: TemplateElement[] = [];
+		const b: TemplateElement[] = [];
+		const f: TemplateElement[] = [];
+		for (const el of defaultElements) {
+			if (PDF_HEADER_TYPES.has(el.type)) h.push(el);
+			else if (PDF_FOOTER_TYPES.has(el.type)) f.push(el);
+			else b.push(el);
+		}
+		return { headerEls: h, bodyEls: b, footerEls: f };
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [defaultElements]);
+
+	// Render header elements (simple — no grouping logic needed)
+	const renderHeaderElements = () => {
+		return headerEls.map((el) => renderInteractiveElement(el));
+	};
+
+	// Render footer elements (simple)
+	const renderFooterElements = () => {
+		return footerEls.map((el) => renderInteractiveElement(el));
+	};
+
+	// Render body elements with grouping logic (totals + qrCode side by side, quotation injections)
+	const renderBodyGroupedElements = () => {
 		const result: React.ReactNode[] = [];
 		let i = 0;
-		while (i < defaultElements.length) {
-			const el = defaultElements[i];
-			const nextEl = i + 1 < defaultElements.length ? defaultElements[i + 1] : null;
+		while (i < bodyEls.length) {
+			const el = bodyEls[i];
+			const nextEl = i + 1 < bodyEls.length ? bodyEls[i + 1] : null;
 
 			// Inject quotation introduction + before-table blocks before itemsTable
 			if (el.type === "itemsTable") {
@@ -713,11 +740,17 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 			dir={locale === "ar" ? "rtl" : "ltr"}
 			onClick={() => interactive && onElementClick?.(null)}
 		>
-			{/* Header Image (full-bleed) */}
-			{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
-			{headerImage && (
-				<img src={headerImage} alt="" className="w-full block" />
-			)}
+			{/* PDF Header Section */}
+			<div data-pdf-header>
+				{/* Header Image (full-bleed) */}
+				{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
+				{headerImage && (
+					<img src={headerImage} alt="" className="w-full block" />
+				)}
+				<div className={`px-14 ${headerImage ? "pt-4" : "pt-10"}`}>
+					{renderHeaderElements()}
+				</div>
+			</div>
 
 			{/* Watermark overlay */}
 			{showWatermark && organization?.logo && (
@@ -734,33 +767,41 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 				</div>
 			)}
 
-			{/* Content */}
-			<div className={`px-14 ${headerImage ? "pt-4" : "pt-10"} ${footerImage ? "pb-4" : "pb-10"}`}>
-				{renderGroupedElements()}
+			{/* PDF Body Section */}
+			<div data-pdf-body>
+				<div className="px-14">
+					{renderBodyGroupedElements()}
 
-				{/* Notes section (if present) */}
-				{data.notes && (
-					<div className="mt-4 pt-4 border-t border-slate-200">
-						<h4 className="text-sm font-medium text-slate-700 mb-2">
-							{t("finance.quotations.notes")}:
-						</h4>
-						<p className="text-sm text-slate-600 whitespace-pre-line">{data.notes}</p>
-					</div>
-				)}
+					{/* Notes section (if present) */}
+					{data.notes && (
+						<div className="mt-4 pt-4 border-t border-slate-200">
+							<h4 className="text-sm font-medium text-slate-700 mb-2">
+								{t("finance.quotations.notes")}:
+							</h4>
+							<p className="text-sm text-slate-600 whitespace-pre-line">{data.notes}</p>
+						</div>
+					)}
 
-				{/* Thank you message */}
-				{organization?.thankYouMessage && (
-					<div className="mt-6 text-center">
-						<p className="text-sm text-slate-600">{organization.thankYouMessage}</p>
-					</div>
-				)}
+					{/* Thank you message */}
+					{organization?.thankYouMessage && (
+						<div className="mt-6 text-center">
+							<p className="text-sm text-slate-600">{organization.thankYouMessage}</p>
+						</div>
+					)}
+				</div>
 			</div>
 
-			{/* Footer Image (full-bleed) */}
-			{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
-			{footerImage && (
-				<img src={footerImage} alt="" className="w-full block" />
-			)}
+			{/* PDF Footer Section */}
+			<div data-pdf-footer>
+				<div className={`px-14 ${footerImage ? "pb-4" : "pb-10"}`}>
+					{renderFooterElements()}
+				</div>
+				{/* Footer Image (full-bleed) */}
+				{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
+				{footerImage && (
+					<img src={footerImage} alt="" className="w-full block" />
+				)}
+			</div>
 		</div>
 	);
 });

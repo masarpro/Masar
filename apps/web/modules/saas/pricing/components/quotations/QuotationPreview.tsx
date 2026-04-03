@@ -24,6 +24,7 @@ import { TemplateRenderer } from "@saas/company/components/templates/renderer";
 import { useEnsureDefaultTemplate } from "@saas/shared/hooks/use-ensure-default-template";
 import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
 import { exportToPDF } from "@saas/shared/lib/pdf-export";
+import { printWithRepeatingHeaderFooter } from "@saas/shared/lib/print-with-header-footer";
 
 interface QuotationPreviewProps {
 	organizationId: string;
@@ -104,7 +105,7 @@ export function QuotationPreview({
 	}
 
 	const handlePrint = () => {
-		window.print();
+		printWithRepeatingHeaderFooter("quotation-print-area");
 	};
 
 	const defaultFilename = `${quotation.quotationNo}-${quotation.clientName || "quotation"}`;
@@ -270,7 +271,7 @@ export function QuotationPreview({
 					}
 					@page {
 						size: A4;
-						margin: 15mm;
+						margin: 0;
 					}
 				}
 			`}</style>
