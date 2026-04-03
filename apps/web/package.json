@@ -40,6 +40,7 @@
 		"@repo/utils": "workspace:*",
 		"@sentry/nextjs": "^10.42.0",
 		"@sindresorhus/slugify": "^3.0.0",
+		"@sparticuz/chromium": "^143.0.4",
 		"@tanstack/react-query": "^5.90.9",
 		"@tanstack/react-table": "^8.21.3",
 		"@tanstack/react-virtual": "^3.13.23",
@@ -68,6 +69,7 @@
 		"nuqs": "^2.7.3",
 		"oslo": "^1.2.1",
 		"pg": "^8.16.3",
+		"puppeteer-core": "^24.40.0",
 		"react": "19.2.3",
 		"react-cropper": "^2.3.3",
 		"react-dom": "19.2.3",
@@ -116,6 +118,7 @@
 		"mdx-bundler": "^10.1.1",
 		"postcss": "8.5.6",
 		"prettier": "3.6.2",
+		"puppeteer": "^24.40.0",
 		"start-server-and-test": "^2.1.2",
 		"tailwindcss": "4.1.17",
 		"typescript": "5.9.3"

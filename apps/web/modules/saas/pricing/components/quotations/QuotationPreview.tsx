@@ -7,6 +7,8 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Button } from "@ui/components/button";
 import { Card, CardContent } from "@ui/components/card";
+import { Input } from "@ui/components/input";
+import { Label } from "@ui/components/label";
 import {
 	Dialog,
 	DialogContent,
@@ -15,8 +17,9 @@ import {
 	DialogTitle,
 	DialogFooter,
 } from "@ui/components/dialog";
-import { Printer, Download, ArrowLeft } from "lucide-react";
+import { Printer, Download, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { TemplateRenderer } from "@saas/company/components/templates/renderer";
 import { useEnsureDefaultTemplate } from "@saas/shared/hooks/use-ensure-default-template";
 import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
@@ -36,8 +39,10 @@ export function QuotationPreview({
 	const t = useTranslations();
 	const basePath = `/app/${organizationSlug}/pricing/quotations`;
 
-	// PDF dialog state
+	// PDF download state
 	const [showFilenameDialog, setShowFilenameDialog] = useState(false);
+	const [pdfFilename, setPdfFilename] = useState("");
+	const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
 	// Fetch quotation data
 	const { data: quotationRaw, isLoading: isLoadingQuotation } = useQuery(
@@ -102,9 +107,19 @@ export function QuotationPreview({
 		printDocument("quotation-print-area");
 	};
 
-	const handleDownloadPdf = () => {
-		exportToPDF("quotation-print-area");
-		setShowFilenameDialog(false);
+	const defaultFilename = `${quotation.quotationNo}-${quotation.clientName || "quotation"}`;
+
+	const handleDownloadPdf = async (filename: string) => {
+		setIsGeneratingPdf(true);
+		try {
+			await exportToPDF("quotation-print-area", filename || defaultFilename);
+		} catch (error) {
+			console.error("PDF generation failed:", error);
+			toast.error(t("common.error"));
+		} finally {
+			setIsGeneratingPdf(false);
+			setShowFilenameDialog(false);
+		}
 	};
 
 	// Prepare data for TemplateRenderer
@@ -191,9 +206,17 @@ export function QuotationPreview({
 					</Button>
 					<Button
 						className="rounded-xl"
-						onClick={() => setShowFilenameDialog(true)}
+						onClick={() => {
+							setPdfFilename(defaultFilename);
+							setShowFilenameDialog(true);
+						}}
+						disabled={isGeneratingPdf}
 					>
-						<Download className="h-4 w-4 me-2" />
+						{isGeneratingPdf ? (
+							<Loader2 className="h-4 w-4 animate-spin me-2" />
+						) : (
+							<Download className="h-4 w-4 me-2" />
+						)}
 						{t("finance.actions.downloadPdf")}
 					</Button>
 				</div>
@@ -254,17 +277,40 @@ export function QuotationPreview({
 				<DialogContent className="sm:max-w-md rounded-2xl">
 					<DialogHeader>
 						<DialogTitle>{t("finance.actions.downloadPdf")}</DialogTitle>
-						<DialogDescription>
-							سيُفتح مربع الطباعة — اختر &quot;حفظ كملف PDF&quot; أو &quot;Save as PDF&quot; من خيارات الطابعة
+						<DialogDescription className="sr-only">
+							{t("finance.actions.downloadPdf")}
 						</DialogDescription>
 					</DialogHeader>
+					<div className="space-y-3">
+						<div>
+							<Label>{t("common.fileName")}</Label>
+							<div className="flex items-center gap-2 mt-1.5">
+								<Input
+									value={pdfFilename}
+									onChange={(e: any) => setPdfFilename(e.target.value)}
+									placeholder={defaultFilename}
+									dir="auto"
+									className="rounded-xl"
+								/>
+								<span className="text-sm text-muted-foreground shrink-0">.pdf</span>
+							</div>
+						</div>
+					</div>
 					<DialogFooter>
 						<Button variant="ghost" onClick={() => setShowFilenameDialog(false)} className="rounded-xl">
 							{t("common.cancel")}
 						</Button>
-						<Button onClick={handleDownloadPdf} className="rounded-xl">
-							<Download className="h-4 w-4 me-2" />
-							{t("common.continue")}
+						<Button
+							onClick={() => handleDownloadPdf(pdfFilename)}
+							disabled={isGeneratingPdf}
+							className="rounded-xl"
+						>
+							{isGeneratingPdf ? (
+								<Loader2 className="h-4 w-4 animate-spin me-2" />
+							) : (
+								<Download className="h-4 w-4 me-2" />
+							)}
+							{t("common.download")}
 						</Button>
 					</DialogFooter>
 				</DialogContent>

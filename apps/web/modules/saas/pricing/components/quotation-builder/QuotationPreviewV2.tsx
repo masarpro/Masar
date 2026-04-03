@@ -5,6 +5,8 @@ import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Card, CardContent } from "@ui/components/card";
+import { Input } from "@ui/components/input";
+import { Label } from "@ui/components/label";
 import {
 	Dialog,
 	DialogContent,
@@ -16,6 +18,7 @@ import {
 import { ArrowLeft, Download, Loader2, Printer } from "lucide-react";
 import Link from "next/link";
 import { useState, type ReactNode, useMemo } from "react";
+import { toast } from "sonner";
 import { exportToPDF, printDocument } from "@saas/shared/lib/pdf-export";
 
 interface QuotationPreviewV2Props {
@@ -113,12 +116,24 @@ export function QuotationPreviewV2({
 
 	const handlePrint = () => printDocument("quotation-print-area");
 
-	// PDF dialog state
+	// PDF download state
 	const [showFilenameDialog, setShowFilenameDialog] = useState(false);
+	const [pdfFilename, setPdfFilename] = useState("");
+	const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-	const handleDownloadPdf = () => {
-		exportToPDF("quotation-print-area");
-		setShowFilenameDialog(false);
+	const defaultFilename = `${q.quotationNo}-${q.clientName || "quotation"}`;
+
+	const handleDownloadPdf = async (filename: string) => {
+		setIsGeneratingPdf(true);
+		try {
+			await exportToPDF("quotation-print-area", filename || defaultFilename);
+		} catch (error) {
+			console.error("PDF generation failed:", error);
+			toast.error("حدث خطأ أثناء إنشاء PDF");
+		} finally {
+			setIsGeneratingPdf(false);
+			setShowFilenameDialog(false);
+		}
 	};
 
 	// Determine visible columns from display config
@@ -165,9 +180,17 @@ export function QuotationPreviewV2({
 					</Button>
 					<Button
 						className="rounded-xl"
-						onClick={() => setShowFilenameDialog(true)}
+						onClick={() => {
+							setPdfFilename(defaultFilename);
+							setShowFilenameDialog(true);
+						}}
+						disabled={isGeneratingPdf}
 					>
-						<Download className="h-4 w-4 me-2" />
+						{isGeneratingPdf ? (
+							<Loader2 className="h-4 w-4 animate-spin me-2" />
+						) : (
+							<Download className="h-4 w-4 me-2" />
+						)}
 						تصدير PDF
 					</Button>
 				</div>
@@ -479,22 +502,45 @@ export function QuotationPreviewV2({
 				}
 			`}</style>
 
-			{/* PDF Dialog */}
+			{/* PDF Filename Dialog */}
 			<Dialog open={showFilenameDialog} onOpenChange={setShowFilenameDialog}>
 				<DialogContent className="sm:max-w-md rounded-2xl">
 					<DialogHeader>
 						<DialogTitle>تصدير PDF</DialogTitle>
-						<DialogDescription>
-							سيُفتح مربع الطباعة — اختر &quot;حفظ كملف PDF&quot; أو &quot;Save as PDF&quot; من خيارات الطابعة
+						<DialogDescription className="sr-only">
+							تصدير PDF
 						</DialogDescription>
 					</DialogHeader>
+					<div className="space-y-3">
+						<div>
+							<Label>اسم الملف</Label>
+							<div className="flex items-center gap-2 mt-1.5">
+								<Input
+									value={pdfFilename}
+									onChange={(e: any) => setPdfFilename(e.target.value)}
+									placeholder={defaultFilename}
+									dir="auto"
+									className="rounded-xl"
+								/>
+								<span className="text-sm text-muted-foreground shrink-0">.pdf</span>
+							</div>
+						</div>
+					</div>
 					<DialogFooter>
 						<Button variant="ghost" onClick={() => setShowFilenameDialog(false)} className="rounded-xl">
 							إلغاء
 						</Button>
-						<Button onClick={handleDownloadPdf} className="rounded-xl">
-							<Download className="h-4 w-4 me-2" />
-							متابعة
+						<Button
+							onClick={() => handleDownloadPdf(pdfFilename)}
+							disabled={isGeneratingPdf}
+							className="rounded-xl"
+						>
+							{isGeneratingPdf ? (
+								<Loader2 className="h-4 w-4 animate-spin me-2" />
+							) : (
+								<Download className="h-4 w-4 me-2" />
+							)}
+							تحميل
 						</Button>
 					</DialogFooter>
 				</DialogContent>
