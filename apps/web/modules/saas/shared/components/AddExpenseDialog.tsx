@@ -36,37 +36,16 @@ import {
 	ImageIcon,
 	Clock,
 	FolderOpen,
+	ChevronDown,
 } from "lucide-react";
 import { Currency } from "@saas/finance/components/shared/Currency";
-
-const ALL_EXPENSE_CATEGORIES = [
-	"MATERIALS",
-	"LABOR",
-	"EQUIPMENT_RENTAL",
-	"EQUIPMENT_PURCHASE",
-	"SUBCONTRACTOR",
-	"TRANSPORT",
-	"SALARIES",
-	"RENT",
-	"UTILITIES",
-	"COMMUNICATIONS",
-	"INSURANCE",
-	"LICENSES",
-	"BANK_FEES",
-	"FUEL",
-	"MAINTENANCE",
-	"SUPPLIES",
-	"MARKETING",
-	"TRAINING",
-	"TRAVEL",
-	"HOSPITALITY",
-	"LOAN_PAYMENT",
-	"TAXES",
-	"ZAKAT",
-	"REFUND",
-	"MISC",
-	"CUSTOM",
-] as const;
+import { ExpenseCategoryCombobox } from "./ExpenseCategoryCombobox";
+import { ExpenseSubcategoryCombobox } from "./ExpenseSubcategoryCombobox";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@ui/components/collapsible";
 
 const PAYMENT_METHODS = [
 	"CASH",
@@ -87,8 +66,6 @@ interface AddExpenseDialogProps {
 	projectId?: string;
 	/** Show a project selector dropdown (used from Finance module) */
 	showProjectSelector?: boolean;
-	/** Override the list of categories (defaults to all) */
-	categories?: readonly string[];
 	/** Called after successful creation */
 	onSuccess?: () => void;
 }
@@ -99,22 +76,21 @@ export function AddExpenseDialog({
 	organizationId,
 	projectId,
 	showProjectSelector = false,
-	categories,
 	onSuccess,
 }: AddExpenseDialogProps) {
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const expenseCategories = categories ?? ALL_EXPENSE_CATEGORIES;
-
 	// Obligation toggle only available when not in fixed-project mode
 	const supportsObligation = !projectId;
 	const [isObligation, setIsObligation] = useState(false);
 
+	const [advancedOpen, setAdvancedOpen] = useState(false);
+
 	const [formData, setFormData] = useState({
-		category: "MISC" as (typeof ALL_EXPENSE_CATEGORIES)[number],
-		customCategory: "",
+		categoryId: "",
+		subcategoryId: null as string | null,
 		description: "",
 		amount: "",
 		date: new Date().toISOString().split("T")[0],
@@ -211,14 +187,14 @@ export function AddExpenseDialog({
 			if (!formData.amount || parseFloat(formData.amount) <= 0) {
 				throw new Error(t("finance.expenses.errors.amountRequired"));
 			}
+			if (!formData.categoryId) {
+				throw new Error(t("finance.expenses.categoryRequired"));
+			}
 
 			const expense = await orpcClient.finance.expenses.create({
 				organizationId,
-				category: formData.category,
-				customCategory:
-					formData.category === "CUSTOM"
-						? formData.customCategory
-						: undefined,
+				categoryId: formData.categoryId,
+				subcategoryId: formData.subcategoryId || undefined,
 				description: formData.description || undefined,
 				amount: parseFloat(formData.amount),
 				date: new Date(formData.date),
@@ -260,8 +236,8 @@ export function AddExpenseDialog({
 
 	const resetForm = () => {
 		setFormData({
-			category: "MISC",
-			customCategory: "",
+			categoryId: "",
+			subcategoryId: null,
 			description: "",
 			amount: "",
 			date: new Date().toISOString().split("T")[0],
@@ -276,16 +252,13 @@ export function AddExpenseDialog({
 			projectId: "",
 		});
 		setIsObligation(false);
+		setAdvancedOpen(false);
 		removeFile();
 	};
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		createMutation.mutate();
-	};
-
-	const getCategoryLabel = (category: string) => {
-		return t(`finance.expenses.categories.${category.toLowerCase()}`);
 	};
 
 	const getPaymentMethodLabel = (method: string) => {
@@ -366,8 +339,8 @@ export function AddExpenseDialog({
 
 				<form onSubmit={handleSubmit} className="flex flex-col overflow-hidden flex-1">
 					<div className="p-5 space-y-4 overflow-y-auto flex-1">
-						{/* Row 1: Amount, Date, Category */}
-						<div className="grid grid-cols-3 gap-3">
+						{/* Row 1: Amount, Date */}
+						<div className="grid grid-cols-2 gap-3">
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("finance.expenses.amount")} *
@@ -400,44 +373,65 @@ export function AddExpenseDialog({
 									required
 								/>
 							</div>
+						</div>
+
+						{/* Row 2: Category, Subcategory */}
+						<div className="grid grid-cols-2 gap-3">
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("finance.expenses.category")} *
 								</Label>
+								<ExpenseCategoryCombobox
+									value={formData.categoryId}
+									onValueChange={(id) =>
+										setFormData({
+											...formData,
+											categoryId: id,
+											subcategoryId: null,
+										})
+									}
+								/>
+							</div>
+							<div className="space-y-1">
+								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+									{t("finance.expenses.subcategory")}
+								</Label>
+								<ExpenseSubcategoryCombobox
+									categoryId={formData.categoryId}
+									value={formData.subcategoryId}
+									onValueChange={(id) =>
+										setFormData({ ...formData, subcategoryId: id })
+									}
+									disabled={!formData.categoryId}
+								/>
+							</div>
+						</div>
+
+						{/* Project Link (Finance mode only) */}
+						{showProjectSelector && (
+							<div className="space-y-1">
+								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+									<FolderOpen className="h-3 w-3 inline me-1" />
+									{t("finance.expenses.projectLink")}
+								</Label>
 								<Select
-									value={formData.category}
+									value={formData.projectId || "none"}
 									onValueChange={(value) =>
-										setFormData({ ...formData, category: value as any })
+										setFormData({ ...formData, projectId: value === "none" ? "" : value })
 									}
 								>
 									<SelectTrigger className="rounded-xl h-10">
-										<SelectValue />
+										<SelectValue placeholder={t("finance.expenses.selectProjectPlaceholder")} />
 									</SelectTrigger>
-									<SelectContent className="rounded-xl max-h-[250px]">
-										{expenseCategories.map((cat) => (
-											<SelectItem key={cat} value={cat}>
-												{getCategoryLabel(cat)}
+									<SelectContent className="rounded-xl">
+										<SelectItem value="none">{t("finance.expenses.noProject")}</SelectItem>
+										{projects.map((project) => (
+											<SelectItem key={project.id} value={project.id}>
+												{project.name}
 											</SelectItem>
 										))}
 									</SelectContent>
 								</Select>
-							</div>
-						</div>
-
-						{formData.category === "CUSTOM" && (
-							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
-									{t("finance.expenses.customCategory")} *
-								</Label>
-								<Input
-									value={formData.customCategory}
-									onChange={(e) =>
-										setFormData({ ...formData, customCategory: e.target.value })
-									}
-									placeholder={t("finance.expenses.customCategoryPlaceholder")}
-									className="rounded-xl h-10"
-									required
-								/>
 							</div>
 						)}
 
@@ -491,6 +485,19 @@ export function AddExpenseDialog({
 								/>
 							</div>
 						)}
+
+						{/* Advanced Section */}
+						<Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+							<CollapsibleTrigger asChild>
+								<button
+									type="button"
+									className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors w-full"
+								>
+									<ChevronDown className={`h-4 w-4 transition-transform ${advancedOpen ? "rotate-180" : ""}`} />
+									{t("finance.expenses.advanced")}
+								</button>
+							</CollapsibleTrigger>
+							<CollapsibleContent className="space-y-4 pt-3">
 
 						{/* Account, Payment Method, Reference */}
 						<div className={`grid grid-cols-3 gap-3 ${isObligation ? "opacity-60" : ""}`}>
@@ -654,34 +661,6 @@ export function AddExpenseDialog({
 							</div>
 						</div>
 
-						{/* Project Link (Finance mode only) */}
-						{showProjectSelector && (
-							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
-									<FolderOpen className="h-3 w-3 inline me-1" />
-									{t("finance.expenses.projectLink")}
-								</Label>
-								<Select
-									value={formData.projectId || "none"}
-									onValueChange={(value) =>
-										setFormData({ ...formData, projectId: value === "none" ? "" : value })
-									}
-								>
-									<SelectTrigger className="rounded-xl h-10">
-										<SelectValue placeholder={t("finance.expenses.selectProjectPlaceholder")} />
-									</SelectTrigger>
-									<SelectContent className="rounded-xl">
-										<SelectItem value="none">{t("finance.expenses.noProject")}</SelectItem>
-										{projects.map((project) => (
-											<SelectItem key={project.id} value={project.id}>
-												{project.name}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-						)}
-
 						{/* Notes + Invoice Attachment */}
 						<div className="grid grid-cols-2 gap-3">
 							<div className="space-y-1">
@@ -771,6 +750,9 @@ export function AddExpenseDialog({
 								)}
 							</div>
 						</div>
+
+							</CollapsibleContent>
+						</Collapsible>
 					</div>
 
 					{/* Footer Actions */}

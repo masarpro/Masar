@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useVirtualRows } from "@saas/shared/hooks/use-virtual-rows";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
@@ -69,6 +69,7 @@ import { Currency } from "../shared/Currency";
 import { PayExpenseDialog } from "./PayExpenseDialog";
 import { AddExpenseDialog } from "./AddExpenseDialog";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { findCategoryById, EXPENSE_CATEGORIES as ALL_CATEGORIES } from "@repo/utils";
 
 interface ExpensesListProps {
 	organizationId: string;
@@ -78,36 +79,6 @@ interface ExpensesListProps {
 	hideAddButton?: boolean;
 }
 
-// فئات المصروفات
-const EXPENSE_CATEGORIES = [
-	"MATERIALS",
-	"LABOR",
-	"EQUIPMENT_RENTAL",
-	"EQUIPMENT_PURCHASE",
-	"SUBCONTRACTOR",
-	"TRANSPORT",
-	"SALARIES",
-	"RENT",
-	"UTILITIES",
-	"COMMUNICATIONS",
-	"INSURANCE",
-	"LICENSES",
-	"BANK_FEES",
-	"FUEL",
-	"MAINTENANCE",
-	"SUPPLIES",
-	"MARKETING",
-	"TRAINING",
-	"TRAVEL",
-	"HOSPITALITY",
-	"LOAN_PAYMENT",
-	"TAXES",
-	"ZAKAT",
-	"REFUND",
-	"MISC",
-	"CUSTOM",
-] as const;
-
 export function ExpensesList({
 	organizationId,
 	organizationSlug,
@@ -116,6 +87,7 @@ export function ExpensesList({
 	hideAddButton,
 }: ExpensesListProps) {
 	const t = useTranslations();
+	const locale = useLocale();
 	const router = useRouter();
 	const queryClient = useQueryClient();
 
@@ -142,7 +114,7 @@ export function ExpensesList({
 			input: {
 				organizationId,
 				query: searchQuery || undefined,
-				category: categoryFilter as any,
+				categoryId: categoryFilter,
 				projectId: projectFilter,
 			},
 		}),
@@ -185,6 +157,10 @@ export function ExpensesList({
 	});
 
 	const getCategoryLabel = (category: string) => {
+		// Try new hierarchical category first
+		const cat = findCategoryById(category);
+		if (cat) return locale === "ar" ? cat.nameAr : cat.nameEn;
+		// Fallback to old translation key for legacy records
 		return t(`finance.expenses.categories.${category.toLowerCase()}`);
 	};
 
@@ -331,9 +307,9 @@ export function ExpensesList({
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
 							<SelectItem value="all">{t("common.all")}</SelectItem>
-							{EXPENSE_CATEGORIES.map((category) => (
-								<SelectItem key={category} value={category}>
-									{getCategoryLabel(category)}
+							{ALL_CATEGORIES.map((cat) => (
+								<SelectItem key={cat.id} value={cat.id}>
+									{locale === "ar" ? cat.nameAr : cat.nameEn}
 								</SelectItem>
 							))}
 						</SelectContent>

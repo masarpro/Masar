@@ -4328,6 +4328,10 @@ model FinanceExpense {
   category        OrgExpenseCategory
   customCategory  String?                   @map("custom_category")  // إذا كانت CUSTOM
 
+  // فئات المصروفات الهرمية الجديدة
+  categoryId      String?                   @map("category_id")
+  subcategoryId   String?                   @map("subcategory_id")
+
   // الوصف والمبلغ
   description     String?                   @db.Text
   amount          Decimal                   @db.Decimal(15, 2)
@@ -4388,6 +4392,7 @@ model FinanceExpense {
 
   @@index([organizationId, date])
   @@index([organizationId, category])
+  @@index([organizationId, categoryId])
   @@index([organizationId, projectId])
   @@index([organizationId, sourceAccountId])
   @@index([organizationId, sourceType])
@@ -4514,6 +4519,10 @@ model CompanyExpense {
   name            String                  // اسم المصروف (مثل: إيجار المكتب الرئيسي)
   category        CompanyExpenseCategory   // فئة المصروف
   description     String?                 @db.Text
+
+  // فئات المصروفات الهرمية الجديدة
+  categoryId      String?                 @map("category_id")
+  subcategoryId   String?                 @map("subcategory_id")
 
   // المبلغ والتكرار
   amount          Decimal                 @db.Decimal(15, 2)  // المبلغ لكل فترة

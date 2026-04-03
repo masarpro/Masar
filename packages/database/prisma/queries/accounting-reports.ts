@@ -576,6 +576,7 @@ export async function getVATReport(
 				id: true,
 				amount: true,
 				category: true,
+				categoryId: true,
 			},
 		}),
 		// Subcontract payments with VAT-inclusive contracts
@@ -654,7 +655,9 @@ export async function getVATReport(
 	let expenseCount = 0;
 
 	for (const exp of expenses) {
-		const isExempt = VAT_EXEMPT_EXPENSE_CATEGORIES.includes(exp.category);
+		// New hierarchical categories that are VAT-exempt
+		const NEW_VAT_EXEMPT_CATEGORIES = ["ADMIN_SALARIES", "GOVERNMENT_LICENSES", "INSURANCE_GUARANTEES", "FINANCIAL_EXPENSES"];
+		const isExempt = (exp.categoryId ? NEW_VAT_EXEMPT_CATEGORIES.includes(exp.categoryId) : false) || VAT_EXEMPT_EXPENSE_CATEGORIES.includes(exp.category);
 		if (isExempt) continue;
 
 		const amount = new Prisma.Decimal(Number(exp.amount));

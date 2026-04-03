@@ -421,6 +421,7 @@ export async function getOrganizationExpenses(
 	organizationId: string,
 	options?: {
 		category?: OrgExpenseCategory;
+		categoryId?: string;
 		sourceAccountId?: string;
 		projectId?: string;
 		status?: FinanceTransactionStatus;
@@ -434,7 +435,8 @@ export async function getOrganizationExpenses(
 ) {
 	const where: Record<string, unknown> = { organizationId };
 
-	if (options?.category) where.category = options.category;
+	if (options?.categoryId) where.categoryId = options.categoryId;
+	else if (options?.category) where.category = options.category;
 	if (options?.sourceAccountId) where.sourceAccountId = options.sourceAccountId;
 	if (options?.projectId) where.projectId = options.projectId;
 	if (options?.status) where.status = options.status;
@@ -496,6 +498,8 @@ export async function createExpense(data: {
 	createdById: string;
 	category: OrgExpenseCategory;
 	customCategory?: string;
+	categoryId?: string;
+	subcategoryId?: string;
 	description?: string;
 	amount: number;
 	date: Date;
@@ -536,6 +540,8 @@ export async function createExpense(data: {
 				expenseNo,
 				category: data.category,
 				customCategory: data.customCategory,
+				categoryId: data.categoryId,
+				subcategoryId: data.subcategoryId,
 				description: data.description,
 				amount: data.amount,
 				date: data.date,
@@ -727,6 +733,8 @@ export async function updateExpense(
 	data: Partial<{
 		category: OrgExpenseCategory;
 		customCategory: string;
+		categoryId: string;
+		subcategoryId: string;
 		description: string;
 		date: Date;
 		vendorName: string;
@@ -818,18 +826,43 @@ export async function getExpensesSummaryByCategory(
 		if (dateTo) where.date.lte = dateTo;
 	}
 
-	const expenses = await db.financeExpense.groupBy({
-		by: ["category"],
-		where,
-		_sum: { amount: true },
-		_count: true,
-	});
+	// Group by new categoryId if available, fallback to legacy category
+	const [byNewCategory, byLegacyCategory] = await Promise.all([
+		db.financeExpense.groupBy({
+			by: ["categoryId"],
+			where: { ...where, categoryId: { not: null } },
+			_sum: { amount: true },
+			_count: true,
+		}),
+		db.financeExpense.groupBy({
+			by: ["category"],
+			where: { ...where, categoryId: null },
+			_sum: { amount: true },
+			_count: true,
+		}),
+	]);
 
-	return expenses.map((e) => ({
-		category: e.category,
-		total: Number(e._sum.amount) || 0,
-		count: e._count,
-	}));
+	const results: { category: string; categoryId: string | null; total: number; count: number }[] = [];
+
+	for (const e of byNewCategory) {
+		results.push({
+			category: e.categoryId ?? "",
+			categoryId: e.categoryId,
+			total: Number(e._sum.amount) || 0,
+			count: e._count,
+		});
+	}
+
+	for (const e of byLegacyCategory) {
+		results.push({
+			category: e.category,
+			categoryId: null,
+			total: Number(e._sum.amount) || 0,
+			count: e._count,
+		});
+	}
+
+	return results;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

@@ -5,9 +5,19 @@ import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Card, CardContent } from "@ui/components/card";
+import { Input } from "@ui/components/input";
+import { Label } from "@ui/components/label";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogFooter,
+} from "@ui/components/dialog";
 import { ArrowLeft, Download, Printer, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { type ReactNode, useMemo } from "react";
+import { useState, type ReactNode, useMemo } from "react";
+import { toast } from "sonner";
 
 interface QuotationPreviewV2Props {
 	organizationId: string;
@@ -104,6 +114,48 @@ export function QuotationPreviewV2({
 
 	const handlePrint = () => window.print();
 
+	// PDF download state
+	const [showFilenameDialog, setShowFilenameDialog] = useState(false);
+	const [pdfFilename, setPdfFilename] = useState("");
+	const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+	const defaultFilename = `${q.quotationNo}-${q.clientName || "quotation"}`;
+
+	const handleDownloadPdf = async (filename: string) => {
+		const element = document.getElementById("quotation-print-area");
+		if (!element) return;
+
+		setIsGeneratingPdf(true);
+		try {
+			const html2pdf = (await import("html2pdf.js")).default;
+
+			await html2pdf()
+				.set({
+					margin: [10, 12, 10, 12],
+					filename: `${filename || defaultFilename}.pdf`,
+					image: { type: "jpeg", quality: 0.98 },
+					html2canvas: {
+						scale: 2,
+						useCORS: true,
+						logging: false,
+					},
+					jsPDF: {
+						unit: "mm",
+						format: "a4",
+						orientation: "portrait",
+					},
+				} as any)
+				.from(element)
+				.save();
+		} catch (error) {
+			console.error("PDF generation failed:", error);
+			toast.error("حدث خطأ أثناء إنشاء PDF");
+		} finally {
+			setIsGeneratingPdf(false);
+			setShowFilenameDialog(false);
+		}
+	};
+
 	// Determine visible columns from display config
 	const showItemNumber = displayConfig?.showItemNumber ?? true;
 	const showDescription = displayConfig?.showDescription ?? true;
@@ -146,15 +198,26 @@ export function QuotationPreviewV2({
 						<Printer className="h-4 w-4 me-2" />
 						طباعة
 					</Button>
-					<Button className="rounded-xl">
-						<Download className="h-4 w-4 me-2" />
+					<Button
+						className="rounded-xl"
+						onClick={() => {
+							setPdfFilename(defaultFilename);
+							setShowFilenameDialog(true);
+						}}
+						disabled={isGeneratingPdf}
+					>
+						{isGeneratingPdf ? (
+							<Loader2 className="h-4 w-4 animate-spin me-2" />
+						) : (
+							<Download className="h-4 w-4 me-2" />
+						)}
 						تصدير PDF
 					</Button>
 				</div>
 			</div>
 
 			{/* Preview Card */}
-			<Card className="quotation-preview rounded-2xl max-w-[210mm] min-h-[297mm] mx-auto print:shadow-none print:rounded-none print:border-none relative overflow-hidden">
+			<Card id="quotation-print-area" className="quotation-preview rounded-2xl max-w-[210mm] min-h-[297mm] mx-auto print:shadow-none print:rounded-none print:border-none relative overflow-hidden">
 				{/* DRAFT watermark */}
 				{isDraft && (
 					<div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center overflow-hidden print:flex">
@@ -402,11 +465,11 @@ export function QuotationPreviewV2({
 					body * {
 						visibility: hidden;
 					}
-					.quotation-preview,
-					.quotation-preview * {
+					#quotation-print-area,
+					#quotation-print-area * {
 						visibility: visible;
 					}
-					.quotation-preview {
+					#quotation-print-area {
 						position: absolute;
 						left: 0;
 						top: 0;
@@ -448,6 +511,47 @@ export function QuotationPreviewV2({
 					}
 				}
 			`}</style>
+
+			{/* PDF Filename Dialog */}
+			<Dialog open={showFilenameDialog} onOpenChange={setShowFilenameDialog}>
+				<DialogContent className="sm:max-w-md rounded-2xl">
+					<DialogHeader>
+						<DialogTitle>تصدير PDF</DialogTitle>
+					</DialogHeader>
+					<div className="space-y-3">
+						<div>
+							<Label>اسم الملف</Label>
+							<div className="flex items-center gap-2 mt-1.5">
+								<Input
+									value={pdfFilename}
+									onChange={(e: any) => setPdfFilename(e.target.value)}
+									placeholder={defaultFilename}
+									dir="auto"
+									className="rounded-xl"
+								/>
+								<span className="text-sm text-muted-foreground shrink-0">.pdf</span>
+							</div>
+						</div>
+					</div>
+					<DialogFooter>
+						<Button variant="ghost" onClick={() => setShowFilenameDialog(false)} className="rounded-xl">
+							إلغاء
+						</Button>
+						<Button
+							onClick={() => handleDownloadPdf(pdfFilename)}
+							disabled={isGeneratingPdf}
+							className="rounded-xl"
+						>
+							{isGeneratingPdf ? (
+								<Loader2 className="h-4 w-4 animate-spin me-2" />
+							) : (
+								<Download className="h-4 w-4 me-2" />
+							)}
+							تحميل
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

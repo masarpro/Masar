@@ -517,7 +517,7 @@ export type OrganizationBankScalarFieldEnum = z.infer<typeof OrganizationBankSca
 
 // File: FinanceExpenseScalarFieldEnum.schema.ts
 
-export const FinanceExpenseScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'expenseNo', 'category', 'customCategory', 'description', 'amount', 'date', 'sourceAccountId', 'vendorName', 'vendorTaxNumber', 'projectId', 'invoiceRef', 'paymentMethod', 'referenceNo', 'status', 'sourceType', 'sourceId', 'paidAmount', 'dueDate', 'notes', 'voucherNo', 'createdById', 'createdAt', 'updatedAt'])
+export const FinanceExpenseScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'expenseNo', 'category', 'customCategory', 'categoryId', 'subcategoryId', 'description', 'amount', 'date', 'sourceAccountId', 'vendorName', 'vendorTaxNumber', 'projectId', 'invoiceRef', 'paymentMethod', 'referenceNo', 'status', 'sourceType', 'sourceId', 'paidAmount', 'dueDate', 'notes', 'voucherNo', 'createdById', 'createdAt', 'updatedAt'])
 
 export type FinanceExpenseScalarFieldEnum = z.infer<typeof FinanceExpenseScalarFieldEnumSchema>;
 
@@ -535,7 +535,7 @@ export type FinanceTransferScalarFieldEnum = z.infer<typeof FinanceTransferScala
 
 // File: CompanyExpenseScalarFieldEnum.schema.ts
 
-export const CompanyExpenseScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'name', 'category', 'description', 'amount', 'recurrence', 'vendor', 'contractNumber', 'startDate', 'endDate', 'reminderDays', 'isActive', 'notes', 'createdAt', 'updatedAt'])
+export const CompanyExpenseScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'name', 'category', 'description', 'categoryId', 'subcategoryId', 'amount', 'recurrence', 'vendor', 'contractNumber', 'startDate', 'endDate', 'reminderDays', 'isActive', 'notes', 'createdAt', 'updatedAt'])
 
 export type CompanyExpenseScalarFieldEnum = z.infer<typeof CompanyExpenseScalarFieldEnumSchema>;
 
@@ -3670,6 +3670,8 @@ export const FinanceExpenseSchema = z.object({
   expenseNo: z.string(),
   category: OrgExpenseCategorySchema,
   customCategory: z.string().nullish(),
+  categoryId: z.string().nullish(),
+  subcategoryId: z.string().nullish(),
   description: z.string().nullish(),
   amount: z.instanceof(Prisma.Decimal, {
   message: "Field 'amount' must be a Decimal. Location: ['Models', 'FinanceExpense']",
@@ -3760,6 +3762,8 @@ export const CompanyExpenseSchema = z.object({
   name: z.string(),
   category: CompanyExpenseCategorySchema,
   description: z.string().nullish(),
+  categoryId: z.string().nullish(),
+  subcategoryId: z.string().nullish(),
   amount: z.instanceof(Prisma.Decimal, {
   message: "Field 'amount' must be a Decimal. Location: ['Models', 'CompanyExpense']",
 }),

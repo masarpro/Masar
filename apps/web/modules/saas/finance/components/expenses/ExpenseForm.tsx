@@ -22,6 +22,8 @@ import { toast } from "sonner";
 import { Save, Building, Wallet, TrendingDown, Clock } from "lucide-react";
 import { Currency } from "../shared/Currency";
 import { Switch } from "@ui/components/switch";
+import { ExpenseCategoryCombobox } from "@saas/shared/components/ExpenseCategoryCombobox";
+import { ExpenseSubcategoryCombobox } from "@saas/shared/components/ExpenseSubcategoryCombobox";
 
 interface ExpenseFormProps {
 	organizationId: string;
@@ -30,36 +32,6 @@ interface ExpenseFormProps {
 	defaultProjectId?: string;
 	redirectPath?: string;
 }
-
-// فئات المصروفات
-const EXPENSE_CATEGORIES = [
-	"MATERIALS",
-	"LABOR",
-	"EQUIPMENT_RENTAL",
-	"EQUIPMENT_PURCHASE",
-	"SUBCONTRACTOR",
-	"TRANSPORT",
-	"SALARIES",
-	"RENT",
-	"UTILITIES",
-	"COMMUNICATIONS",
-	"INSURANCE",
-	"LICENSES",
-	"BANK_FEES",
-	"FUEL",
-	"MAINTENANCE",
-	"SUPPLIES",
-	"MARKETING",
-	"TRAINING",
-	"TRAVEL",
-	"HOSPITALITY",
-	"LOAN_PAYMENT",
-	"TAXES",
-	"ZAKAT",
-	"REFUND",
-	"MISC",
-	"CUSTOM",
-] as const;
 
 const PAYMENT_METHODS = [
 	"CASH",
@@ -83,8 +55,8 @@ export function ExpenseForm({
 	// Form state
 	const [isObligation, setIsObligation] = useState(false);
 	const [formData, setFormData] = useState({
-		category: "MISC" as typeof EXPENSE_CATEGORIES[number],
-		customCategory: "",
+		categoryId: "",
+		subcategoryId: null as string | null,
 		description: "",
 		amount: "",
 		date: new Date().toISOString().split("T")[0],
@@ -129,10 +101,14 @@ export function ExpenseForm({
 				throw new Error(t("finance.expenses.errors.amountRequired"));
 			}
 
+			if (!formData.categoryId) {
+				throw new Error(t("finance.expenses.categoryRequired"));
+			}
+
 			return orpcClient.finance.expenses.create({
 				organizationId,
-				category: formData.category,
-				customCategory: formData.category === "CUSTOM" ? formData.customCategory : undefined,
+				categoryId: formData.categoryId,
+				subcategoryId: formData.subcategoryId || undefined,
 				description: formData.description || undefined,
 				amount: parseFloat(formData.amount),
 				date: new Date(formData.date),
@@ -165,10 +141,6 @@ export function ExpenseForm({
 		createMutation.mutate();
 	};
 
-	const getCategoryLabel = (category: string) => {
-		return t(`finance.expenses.categories.${category.toLowerCase()}`);
-	};
-
 	const getPaymentMethodLabel = (method: string) => {
 		return t(`finance.payments.methods.${method.toLowerCase()}`);
 	};
@@ -181,61 +153,55 @@ export function ExpenseForm({
 					<CardTitle>{t("finance.expenses.basicInfo")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-6">
-					{/* Category & Amount */}
+					{/* Amount */}
+					<div>
+						<Label>{t("finance.expenses.amount")} *</Label>
+						<Input
+							type="number"
+							step="0.01"
+							min="0"
+							value={formData.amount}
+							onChange={(e) =>
+								setFormData({ ...formData, amount: e.target.value })
+							}
+							placeholder="0.00"
+							className="rounded-xl mt-1 max-w-xs"
+							dir="ltr"
+							required
+						/>
+					</div>
+
+					{/* Category & Subcategory */}
 					<div className="grid gap-6 sm:grid-cols-2">
 						<div>
 							<Label>{t("finance.expenses.category")} *</Label>
-							<Select
-								value={formData.category}
-								onValueChange={(value) =>
-									setFormData({ ...formData, category: value as any })
-								}
-							>
-								<SelectTrigger className="rounded-xl mt-1">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent className="rounded-xl max-h-[300px]">
-									{EXPENSE_CATEGORIES.map((category) => (
-										<SelectItem key={category} value={category}>
-											{getCategoryLabel(category)}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
+							<div className="mt-1">
+								<ExpenseCategoryCombobox
+									value={formData.categoryId}
+									onValueChange={(id) =>
+										setFormData({
+											...formData,
+											categoryId: id,
+											subcategoryId: null,
+										})
+									}
+								/>
+							</div>
 						</div>
 						<div>
-							<Label>{t("finance.expenses.amount")} *</Label>
-							<Input
-								type="number"
-								step="0.01"
-								min="0"
-								value={formData.amount}
-								onChange={(e) =>
-									setFormData({ ...formData, amount: e.target.value })
-								}
-								placeholder="0.00"
-								className="rounded-xl mt-1"
-								dir="ltr"
-								required
-							/>
+							<Label>{t("finance.expenses.subcategory")}</Label>
+							<div className="mt-1">
+								<ExpenseSubcategoryCombobox
+									categoryId={formData.categoryId}
+									value={formData.subcategoryId}
+									onValueChange={(id) =>
+										setFormData({ ...formData, subcategoryId: id })
+									}
+									disabled={!formData.categoryId}
+								/>
+							</div>
 						</div>
 					</div>
-
-					{/* Custom Category (if CUSTOM selected) */}
-					{formData.category === "CUSTOM" && (
-						<div>
-							<Label>{t("finance.expenses.customCategory")} *</Label>
-							<Input
-								value={formData.customCategory}
-								onChange={(e) =>
-									setFormData({ ...formData, customCategory: e.target.value })
-								}
-								placeholder={t("finance.expenses.customCategoryPlaceholder")}
-								className="rounded-xl mt-1"
-								required
-							/>
-						</div>
-					)}
 
 					{/* Date */}
 					<div>

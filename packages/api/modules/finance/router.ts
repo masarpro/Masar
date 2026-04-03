@@ -87,6 +87,8 @@ import {
 	listExpensesWithSubcontracts,
 } from "./procedures/expenses";
 
+import { listExpenseCategories } from "./procedures/expense-categories";
+
 import {
 	getBankLinesForReconciliationProcedure,
 	createReconciliationProcedure,
@@ -241,6 +243,7 @@ export const financeRouter = {
 		listUnified: listExpensesWithSubcontracts,
 		getById: getExpense,
 		getSummary: getExpensesSummary,
+		categories: listExpenseCategories,
 		create: createExpenseProcedure,
 		update: updateExpenseProcedure,
 		delete: deleteExpenseProcedure,

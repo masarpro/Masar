@@ -1,13 +1,24 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Button } from "@ui/components/button";
 import { Card, CardContent } from "@ui/components/card";
+import { Input } from "@ui/components/input";
+import { Label } from "@ui/components/label";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogFooter,
+} from "@ui/components/dialog";
 import { Printer, Download, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { TemplateRenderer } from "@saas/company/components/templates/renderer";
 import { useEnsureDefaultTemplate } from "@saas/shared/hooks/use-ensure-default-template";
 import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
@@ -25,6 +36,11 @@ export function QuotationPreview({
 }: QuotationPreviewProps) {
 	const t = useTranslations();
 	const basePath = `/app/${organizationSlug}/pricing/quotations`;
+
+	// PDF download state
+	const [showFilenameDialog, setShowFilenameDialog] = useState(false);
+	const [pdfFilename, setPdfFilename] = useState("");
+	const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
 	// Fetch quotation data
 	const { data: quotationRaw, isLoading: isLoadingQuotation } = useQuery(
@@ -87,6 +103,43 @@ export function QuotationPreview({
 
 	const handlePrint = () => {
 		window.print();
+	};
+
+	const defaultFilename = `${quotation.quotationNo}-${quotation.clientName || "quotation"}`;
+
+	const handleDownloadPdf = async (filename: string) => {
+		const element = document.getElementById("quotation-print-area");
+		if (!element) return;
+
+		setIsGeneratingPdf(true);
+		try {
+			const html2pdf = (await import("html2pdf.js")).default;
+
+			await html2pdf()
+				.set({
+					margin: [10, 12, 10, 12],
+					filename: `${filename || defaultFilename}.pdf`,
+					image: { type: "jpeg", quality: 0.98 },
+					html2canvas: {
+						scale: 2,
+						useCORS: true,
+						logging: false,
+					},
+					jsPDF: {
+						unit: "mm",
+						format: "a4",
+						orientation: "portrait",
+					},
+				} as any)
+				.from(element)
+				.save();
+		} catch (error) {
+			console.error("PDF generation failed:", error);
+			toast.error(t("common.error"));
+		} finally {
+			setIsGeneratingPdf(false);
+			setShowFilenameDialog(false);
+		}
 	};
 
 	// Prepare data for TemplateRenderer
@@ -171,8 +224,19 @@ export function QuotationPreview({
 						<Printer className="h-4 w-4 me-2" />
 						{t("finance.actions.print")}
 					</Button>
-					<Button className="rounded-xl">
-						<Download className="h-4 w-4 me-2" />
+					<Button
+						className="rounded-xl"
+						onClick={() => {
+							setPdfFilename(defaultFilename);
+							setShowFilenameDialog(true);
+						}}
+						disabled={isGeneratingPdf}
+					>
+						{isGeneratingPdf ? (
+							<Loader2 className="h-4 w-4 animate-spin me-2" />
+						) : (
+							<Download className="h-4 w-4 me-2" />
+						)}
 						{t("finance.actions.downloadPdf")}
 					</Button>
 				</div>
@@ -188,7 +252,7 @@ export function QuotationPreview({
 			)}
 
 			{/* Preview Content using TemplateRenderer */}
-			<Card className="rounded-2xl max-w-[210mm] min-h-[297mm] mx-auto print:shadow-none print:rounded-none print:border-none print:min-h-0 print:max-w-none">
+			<Card id="quotation-print-area" className="rounded-2xl max-w-[210mm] min-h-[297mm] mx-auto print:shadow-none print:rounded-none print:border-none print:min-h-0 print:max-w-none">
 				<CardContent className="p-0 print:p-0">
 					<TemplateRenderer
 						data={quotationData}
@@ -206,21 +270,68 @@ export function QuotationPreview({
 					body * {
 						visibility: hidden;
 					}
-					.print-container,
-					.print-container * {
+					#quotation-print-area,
+					#quotation-print-area * {
 						visibility: visible;
 					}
-					.print-container {
+					#quotation-print-area {
 						position: absolute;
 						left: 0;
 						top: 0;
-						width: 100%;
+						width: 210mm;
+						margin: 0;
+						padding: 0;
+						box-shadow: none !important;
+						border: none !important;
+						border-radius: 0 !important;
 					}
-					.print\\:hidden {
-						display: none !important;
+					@page {
+						size: A4;
+						margin: 15mm;
 					}
 				}
 			`}</style>
+
+			{/* PDF Filename Dialog */}
+			<Dialog open={showFilenameDialog} onOpenChange={setShowFilenameDialog}>
+				<DialogContent className="sm:max-w-md rounded-2xl">
+					<DialogHeader>
+						<DialogTitle>{t("finance.actions.downloadPdf")}</DialogTitle>
+					</DialogHeader>
+					<div className="space-y-3">
+						<div>
+							<Label>{t("common.fileName")}</Label>
+							<div className="flex items-center gap-2 mt-1.5">
+								<Input
+									value={pdfFilename}
+									onChange={(e: any) => setPdfFilename(e.target.value)}
+									placeholder={defaultFilename}
+									dir="auto"
+									className="rounded-xl"
+								/>
+								<span className="text-sm text-muted-foreground shrink-0">.pdf</span>
+							</div>
+						</div>
+					</div>
+					<DialogFooter>
+						<Button variant="ghost" onClick={() => setShowFilenameDialog(false)} className="rounded-xl">
+							{t("common.cancel")}
+						</Button>
+						<Button
+							onClick={() => handleDownloadPdf(pdfFilename)}
+							disabled={isGeneratingPdf}
+							className="rounded-xl"
+						>
+							{isGeneratingPdf ? (
+								<Loader2 className="h-4 w-4 animate-spin me-2" />
+							) : (
+								<Download className="h-4 w-4 me-2" />
+							)}
+							{t("common.download")}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

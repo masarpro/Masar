@@ -14,3 +14,4 @@ declare global {
 declare global {
 	interface IntlMessages extends Messages {}
 }
+

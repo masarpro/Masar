@@ -737,4 +737,22 @@ input[cmdk-input] {
 		-webkit-print-color-adjust: exact !important;
 		print-color-adjust: exact !important;
 	}
+
+	/* ── Hide app shell on print ── */
+	aside {
+		display: none !important;
+	}
+	header {
+		display: none !important;
+	}
+	/* Reset sidebar margin so content fills page */
+	[class*="ms-[280px]"],
+	[class*="ms-20"] {
+		margin-inline-start: 0 !important;
+	}
+	/* Reset content area padding/rounding for print */
+	main {
+		padding: 0 !important;
+		border-radius: 0 !important;
+	}
 }

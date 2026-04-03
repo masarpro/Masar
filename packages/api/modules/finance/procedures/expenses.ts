@@ -19,6 +19,7 @@ import {
 	idString, optionalTrimmed, searchQuery,
 	positiveAmount, paginationLimit, paginationOffset,
 } from "../../../lib/validation-constants";
+import { findCategoryById, findSubcategoryById } from "@repo/utils";
 
 // Enums
 const orgExpenseCategoryEnum = z.enum([
@@ -86,6 +87,7 @@ export const listExpenses = protectedProcedure
 		z.object({
 			organizationId: idString(),
 			category: orgExpenseCategoryEnum.optional(),
+			categoryId: z.string().trim().max(100).optional(),
 			sourceAccountId: z.string().trim().max(100).optional(),
 			projectId: z.string().trim().max(100).optional(),
 			status: financeTransactionStatusEnum.optional(),
@@ -105,6 +107,7 @@ export const listExpenses = protectedProcedure
 
 		return getOrganizationExpenses(input.organizationId, {
 			category: input.category,
+			categoryId: input.categoryId,
 			sourceAccountId: input.sourceAccountId,
 			projectId: input.projectId,
 			status: input.status,
@@ -193,8 +196,10 @@ export const createExpenseProcedure = subscriptionProcedure
 	.input(
 		z.object({
 			organizationId: idString(),
-			category: orgExpenseCategoryEnum,
+			category: orgExpenseCategoryEnum.optional(),
 			customCategory: z.string().trim().max(MAX_NAME).optional(),
+			categoryId: z.string().trim().min(1).max(100),
+			subcategoryId: z.string().trim().max(100).optional(),
 			description: optionalTrimmed(MAX_DESC),
 			amount: positiveAmount(),
 			date: z.coerce.date(),
@@ -226,11 +231,25 @@ export const createExpenseProcedure = subscriptionProcedure
 			action: "payments",
 		});
 
+		// Validate new hierarchical category
+		const cat = findCategoryById(input.categoryId);
+		if (!cat) {
+			throw new Error("فئة المصروف غير صالحة");
+		}
+		if (input.subcategoryId) {
+			const sub = findSubcategoryById(input.categoryId, input.subcategoryId);
+			if (!sub) {
+				throw new Error("الفئة الفرعية غير صالحة");
+			}
+		}
+
 		const expense = await createExpense({
 			organizationId: input.organizationId,
 			createdById: context.user.id,
-			category: input.category,
+			category: input.category ?? "MISC",
 			customCategory: input.customCategory,
+			categoryId: input.categoryId,
+			subcategoryId: input.subcategoryId,
 			description: input.description,
 			amount: input.amount,
 			date: input.date,
@@ -253,7 +272,7 @@ export const createExpenseProcedure = subscriptionProcedure
 			action: "EXPENSE_CREATED",
 			entityType: "expense",
 			entityId: expense.id,
-			metadata: { amount: input.amount, category: input.category, status: input.status ?? "COMPLETED" },
+			metadata: { amount: input.amount, categoryId: input.categoryId, category: input.category, status: input.status ?? "COMPLETED" },
 		});
 
 		// Update onboarding checklist
@@ -269,10 +288,10 @@ export const createExpenseProcedure = subscriptionProcedure
 				await onExpenseCompleted(db, {
 					id: expense.id,
 					organizationId: input.organizationId,
-					category: input.category,
+					category: input.categoryId ?? input.category ?? "MISC",
 					amount: expense.amount,
 					date: expense.date,
-					description: input.description ?? input.category,
+					description: input.description ?? input.categoryId,
 					sourceAccountId: input.sourceAccountId,
 					projectId: input.projectId,
 					sourceType: input.sourceType,
@@ -303,7 +322,7 @@ export const createExpenseProcedure = subscriptionProcedure
 						date: expense.date,
 						amount: expense.amount,
 						amountInWords: numberToArabicWords(Number(expense.amount)),
-						payeeName: input.vendorName || input.description || input.category,
+						payeeName: input.vendorName || input.description || input.categoryId,
 						payeeType: "SUPPLIER",
 						paymentMethod: input.paymentMethod || "BANK_TRANSFER",
 						sourceAccountId: input.sourceAccountId || null,
@@ -338,6 +357,8 @@ export const updateExpenseProcedure = subscriptionProcedure
 			id: idString(),
 			category: orgExpenseCategoryEnum.optional(),
 			customCategory: z.string().trim().max(MAX_NAME).optional(),
+			categoryId: z.string().trim().max(100).optional(),
+			subcategoryId: z.string().trim().max(100).optional(),
 			description: optionalTrimmed(MAX_DESC),
 			date: z.coerce.date().optional(),
 			vendorName: optionalTrimmed(MAX_NAME),
@@ -599,6 +620,7 @@ export const listExpensesWithSubcontracts = protectedProcedure
 		z.object({
 			organizationId: idString(),
 			category: orgExpenseCategoryEnum.optional(),
+			categoryId: z.string().trim().max(100).optional(),
 			sourceAccountId: z.string().trim().max(100).optional(),
 			projectId: z.string().trim().max(100).optional(),
 			status: financeTransactionStatusEnum.optional(),
@@ -619,6 +641,7 @@ export const listExpensesWithSubcontracts = protectedProcedure
 		const [expensesResult, subPaymentsResult] = await Promise.all([
 			getOrganizationExpenses(input.organizationId, {
 				category: input.category,
+				categoryId: input.categoryId,
 				sourceAccountId: input.sourceAccountId,
 				projectId: input.projectId,
 				status: input.status,
@@ -629,7 +652,7 @@ export const listExpensesWithSubcontracts = protectedProcedure
 				offset: 0,
 			}),
 			// Only fetch subcontract payments if no category filter (or if category is SUBCONTRACTOR)
-			!input.category || input.category === "SUBCONTRACTOR"
+			(!input.category && !input.categoryId) || input.category === "SUBCONTRACTOR"
 				? getOrganizationSubcontractPayments(input.organizationId, {
 						projectId: input.projectId,
 						status: input.status,
@@ -648,7 +671,7 @@ export const listExpensesWithSubcontracts = protectedProcedure
 			id: e.id,
 			refNo: e.expenseNo,
 			date: e.date,
-			category: e.category,
+			category: e.categoryId ?? e.category,
 			description: e.description,
 			amount: Number(e.amount),
 			vendorName: e.vendorName,
