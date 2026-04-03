@@ -756,3 +756,27 @@ input[cmdk-input] {
 		border-radius: 0 !important;
 	}
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   Capacitor / Mobile Safe Areas
+   Activated when `viewport-fit=cover` is set in the meta tag.
+   Uses CSS env() values provided by the native OS for notch,
+   home-indicator, and status-bar insets.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Apply safe-area padding to the root body when inside Capacitor */
+body.capacitor-app {
+	padding-top: env(safe-area-inset-top, 0px);
+	padding-bottom: env(safe-area-inset-bottom, 0px);
+	padding-left: env(safe-area-inset-left, 0px);
+	padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Sticky headers/footers need their own safe-area offsets */
+body.capacitor-app .sticky-header {
+	padding-top: env(safe-area-inset-top, 0px);
+}
+
+body.capacitor-app .sticky-footer {
+	padding-bottom: env(safe-area-inset-bottom, 0px);
+}

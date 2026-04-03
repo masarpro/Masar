@@ -51,6 +51,8 @@ export async function Document({
 			)}
 		>
 			<head>
+				{/* viewport-fit=cover enables safe-area-inset-* env() values for Capacitor */}
+				<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 				{/* Saudi Riyal Currency Symbol Font - pinned version for performance */}
 				<link rel="dns-prefetch" href="https://unpkg.com" />
 				<link rel="preconnect" href="https://unpkg.com" crossOrigin="anonymous" />
@@ -58,6 +60,12 @@ export async function Document({
 					rel="stylesheet"
 					href="https://unpkg.com/saudi-riyal-symbol@1.0.1/dist/saudi-riyal-symbol.min.css"
 					crossOrigin="anonymous"
+				/>
+				{/* Inline script to detect Capacitor and add body class before first paint */}
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `if(window.Capacitor&&window.Capacitor.isNativePlatform()){document.addEventListener("DOMContentLoaded",function(){document.body.classList.add("capacitor-app")})}`,
+					}}
 				/>
 			</head>
 			<body

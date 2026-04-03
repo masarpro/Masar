@@ -46,6 +46,9 @@ export const auth = betterAuth({
 		process.env.NEXT_PUBLIC_SITE_URL,
 		process.env.BETTER_AUTH_URL,
 		"https://app-masar.com",
+		// Capacitor WebView origins — required for cookie-based auth in native apps
+		"capacitor://localhost", // iOS
+		"http://localhost",      // Android
 	].filter(Boolean) as string[],
 	appName: config.appName,
 	database: prismaAdapter(db, {

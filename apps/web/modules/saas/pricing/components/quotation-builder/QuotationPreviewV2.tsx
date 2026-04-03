@@ -114,7 +114,7 @@ export function QuotationPreviewV2({
 	const status: string = (quotation as any).status ?? "DRAFT";
 	const isDraft = status === "DRAFT";
 
-	const handlePrint = () => printDocument("quotation-print-area");
+	const handlePrint = () => printDocument();
 
 	// PDF download state
 	const [showFilenameDialog, setShowFilenameDialog] = useState(false);
@@ -126,7 +126,7 @@ export function QuotationPreviewV2({
 	const handleDownloadPdf = async (filename: string) => {
 		setIsGeneratingPdf(true);
 		try {
-			await exportToPDF("quotation-print-area", filename || defaultFilename);
+			await exportToPDF(filename || defaultFilename);
 		} catch (error) {
 			console.error("PDF generation failed:", error);
 			toast.error("حدث خطأ أثناء إنشاء PDF");

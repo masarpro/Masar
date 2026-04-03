@@ -104,7 +104,7 @@ export function QuotationPreview({
 	}
 
 	const handlePrint = () => {
-		printDocument("quotation-print-area");
+		printDocument();
 	};
 
 	const defaultFilename = `${quotation.quotationNo}-${quotation.clientName || "quotation"}`;
@@ -112,7 +112,7 @@ export function QuotationPreview({
 	const handleDownloadPdf = async (filename: string) => {
 		setIsGeneratingPdf(true);
 		try {
-			await exportToPDF("quotation-print-area", filename || defaultFilename);
+			await exportToPDF(filename || defaultFilename);
 		} catch (error) {
 			console.error("PDF generation failed:", error);
 			toast.error(t("common.error"));

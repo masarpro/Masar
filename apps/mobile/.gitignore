@@ -1,0 +1,9 @@
+# Capacitor native projects — generated, not checked in
+ios/
+android/
+
+# Dependencies
+node_modules/
+
+# Build artifacts
+*.log
