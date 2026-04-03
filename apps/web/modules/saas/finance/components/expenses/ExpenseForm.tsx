@@ -19,9 +19,10 @@ import {
 	SelectValue,
 } from "@ui/components/select";
 import { toast } from "sonner";
-import { Save, Building, Wallet, TrendingDown, Clock } from "lucide-react";
+import { Save, Building, Wallet, TrendingDown, Clock, ChevronDown, Settings2 } from "lucide-react";
 import { Currency } from "../shared/Currency";
 import { Switch } from "@ui/components/switch";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@ui/components/collapsible";
 import { ExpenseCategoryCombobox } from "@saas/shared/components/ExpenseCategoryCombobox";
 import { ExpenseSubcategoryCombobox } from "@saas/shared/components/ExpenseSubcategoryCombobox";
 
@@ -217,38 +218,6 @@ export function ExpenseForm({
 						/>
 					</div>
 
-					{/* Obligation Toggle */}
-					<div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-						<div className="flex items-center gap-3">
-							<div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-lg">
-								<Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-							</div>
-							<div>
-								<p className="text-sm font-medium">{t("finance.expenses.recordObligation")}</p>
-								<p className="text-xs text-slate-500">{t("finance.expenses.recordObligationHint")}</p>
-							</div>
-						</div>
-						<Switch
-							checked={isObligation}
-							onCheckedChange={setIsObligation}
-						/>
-					</div>
-
-					{/* Due Date (only for obligations) */}
-					{isObligation && (
-						<div>
-							<Label>{t("finance.expenses.dueDate")}</Label>
-							<Input
-								type="date"
-								value={formData.dueDate}
-								onChange={(e) =>
-									setFormData({ ...formData, dueDate: e.target.value })
-								}
-								className="rounded-xl mt-1 max-w-xs"
-							/>
-						</div>
-					)}
-
 					{/* Description */}
 					<div>
 						<Label>{t("finance.expenses.description")}</Label>
@@ -265,8 +234,8 @@ export function ExpenseForm({
 				</CardContent>
 			</Card>
 
-			{/* Source Account - optional for obligations */}
-			<Card className={`rounded-2xl ${isObligation ? "opacity-60" : ""}`}>
+			{/* Source Account & Payment Method */}
+			<Card className="rounded-2xl">
 				<CardHeader>
 					<CardTitle>{t("finance.expenses.sourceAccount")} {!isObligation && "*"}</CardTitle>
 					{isObligation && (
@@ -366,6 +335,56 @@ export function ExpenseForm({
 					</div>
 				</CardContent>
 			</Card>
+
+			{/* Advanced Options */}
+			<Collapsible defaultOpen={isObligation}>
+				<Card className="rounded-2xl">
+					<CollapsibleTrigger asChild>
+						<button type="button" className="flex w-full items-center justify-between px-6 py-4 text-sm font-semibold text-foreground hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors rounded-t-2xl">
+							<span className="flex items-center gap-2.5">
+								<Settings2 className="h-4 w-4 text-muted-foreground" />
+								{t("finance.expenses.advancedOptions")}
+							</span>
+							<ChevronDown className="h-4 w-4 text-muted-foreground transition-transform [[data-state=open]>&]:rotate-180" />
+						</button>
+					</CollapsibleTrigger>
+					<CollapsibleContent>
+						<div className="px-6 pb-6 space-y-6">
+							{/* Obligation Toggle */}
+							<div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+								<div className="flex items-center gap-3">
+									<div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-lg">
+										<Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+									</div>
+									<div>
+										<p className="text-sm font-medium">{t("finance.expenses.recordObligation")}</p>
+										<p className="text-xs text-slate-500">{t("finance.expenses.recordObligationHint")}</p>
+									</div>
+								</div>
+								<Switch
+									checked={isObligation}
+									onCheckedChange={setIsObligation}
+								/>
+							</div>
+
+							{/* Due Date (only for obligations) */}
+							{isObligation && (
+								<div>
+									<Label>{t("finance.expenses.dueDate")}</Label>
+									<Input
+										type="date"
+										value={formData.dueDate}
+										onChange={(e) =>
+											setFormData({ ...formData, dueDate: e.target.value })
+										}
+										className="rounded-xl mt-1 max-w-xs"
+									/>
+								</div>
+							)}
+						</div>
+					</CollapsibleContent>
+				</Card>
+			</Collapsible>
 
 			{/* Vendor Info */}
 			<Card className="rounded-2xl">

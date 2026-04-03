@@ -10,6 +10,7 @@ import { Label } from "@ui/components/label";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogFooter,
@@ -18,6 +19,7 @@ import { ArrowLeft, Download, Printer, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState, type ReactNode, useMemo } from "react";
 import { toast } from "sonner";
+import { exportToPDF } from "@saas/shared/lib/pdf-export";
 
 interface QuotationPreviewV2Props {
 	organizationId: string;
@@ -127,26 +129,7 @@ export function QuotationPreviewV2({
 
 		setIsGeneratingPdf(true);
 		try {
-			const html2pdf = (await import("html2pdf.js")).default;
-
-			await html2pdf()
-				.set({
-					margin: [10, 12, 10, 12],
-					filename: `${filename || defaultFilename}.pdf`,
-					image: { type: "jpeg", quality: 0.98 },
-					html2canvas: {
-						scale: 2,
-						useCORS: true,
-						logging: false,
-					},
-					jsPDF: {
-						unit: "mm",
-						format: "a4",
-						orientation: "portrait",
-					},
-				} as any)
-				.from(element)
-				.save();
+			await exportToPDF(element, filename || defaultFilename);
 		} catch (error) {
 			console.error("PDF generation failed:", error);
 			toast.error("حدث خطأ أثناء إنشاء PDF");
@@ -517,6 +500,9 @@ export function QuotationPreviewV2({
 				<DialogContent className="sm:max-w-md rounded-2xl">
 					<DialogHeader>
 						<DialogTitle>تصدير PDF</DialogTitle>
+						<DialogDescription className="sr-only">
+							تصدير PDF
+						</DialogDescription>
 					</DialogHeader>
 					<div className="space-y-3">
 						<div>

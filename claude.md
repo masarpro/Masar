@@ -1,7 +1,7 @@
 agents.md
 # CLAUDE.md — دليل Claude Code الشامل لمنصة مسار
 
-> **آخر تحديث:** 2026-03-30
+> **آخر تحديث:** 2026-04-03
 > **المطوّر:** جودت — مؤسس ومطوّر رئيسي (مطوّر فردي)
 > **المشروع:** منصة مسار (Masar) — SaaS لإدارة المشاريع الإنشائية
 > **المستودع:** github.com/masarpro/Masar
@@ -11,7 +11,7 @@ agents.md
 
 ## القاعدة الذهبية
 
-**اقرأ أولاً، لا تخمّن.** — قبل تعديل أي ملف، اقرأه بالكامل أولاً. لا تفترض أسماء الحقول أو المسارات أو الـ imports. هذا المشروع كبير (600K+ سطر كود) والافتراضات تؤدي لأخطاء صامتة وتكرار عمل.
+**اقرأ أولاً، لا تخمّن.** — قبل تعديل أي ملف، اقرأه بالكامل أولاً. لا تفترض أسماء الحقول أو المسارات أو الـ imports. هذا المشروع كبير (650K+ سطر كود) والافتراضات تؤدي لأخطاء صامتة وتكرار عمل.
 
 ---
 
@@ -73,7 +73,7 @@ agents.md
 ```
 D:\Masar\Masar/
 ├── apps/web/                          # Next.js 16 App (1,200+ files)
-│   ├── app/                           # App Router (221 pages, 220 loading states, 16 error boundaries)
+│   ├── app/                           # App Router (222 pages, 221 loading states, 16 error boundaries)
 │   │   ├── (marketing)/[locale]/      # Marketing (8 pages, SSG)
 │   │   ├── (saas)/app/                # SaaS App (145+ pages)
 │   │   │   └── [organizationSlug]/    # Multi-tenant routes
@@ -85,7 +85,7 @@ D:\Masar\Masar/
 │   │   ├── auth/                      # المصادقة (6 pages + AuthParticleField تأثير بصري)
 │   │   ├── owner/[token]/             # بوابة المالك (5 pages)
 │   │   └── share/[token]/             # مستندات مشاركة
-│   ├── modules/                       # Feature modules (875 files)
+│   ├── modules/                       # Feature modules (985 files)
 │   │   └── saas/                      # 19 sub-modules
 │   │       ├── pricing/               # ⭐ أكبر وأعقد module (257 file, ~82,620 lines)
 │   │       │   ├── components/studies/ # مكونات دراسات الكميات
@@ -117,6 +117,9 @@ D:\Masar\Masar/
 │   │       │       └── templates/
 │   │       │           └── renderer/  # 🆕 محرك عرض القوالب (TemplateRenderer — 693 سطر)
 │   │       └── shared/                # مكونات مشتركة
+│   │           ├── components/
+│   │           │   ├── ExpenseCategoryCombobox.tsx    # 🆕 تصنيفات المصروفات (combobox هرمي)
+│   │           │   └── ExpenseSubcategoryCombobox.tsx # 🆕 تصنيفات فرعية (combobox مرتبط)
 │   │           └── hooks/
 │   │               └── use-virtual-rows.ts  # 🆕 hook افتراضية الصفوف (TanStack Virtual)
 │   ├── tests/                         # 🆕 E2E Tests (Playwright)
@@ -124,14 +127,14 @@ D:\Masar\Masar/
 │   └── proxy.ts                       # Next.js 16 proxy (replaced middleware.ts)
 │
 ├── packages/
-│   ├── api/                           # Backend (420+ files, 43 modules, 690+ endpoints)
+│   ├── api/                           # Backend (437+ files, 45 modules, 700+ endpoints)
 │   │   ├── modules/
 │   │   │   ├── quantities/            # API الكميات والدراسات
 │   │   │   │   ├── engines/           # محركات الحساب الخلفية
 │   │   │   │   │   ├── structural-calculations.ts  # ⭐ لا تلمس
 │   │   │   │   │   └── derivation-engine.ts        # ⭐ لا تلمس (2,493 lines)
 │   │   │   │   └── procedures/        # CRUD + business logic
-│   │   │   ├── finance/               # 116+ endpoints (+ payment vouchers)
+│   │   │   ├── finance/               # 120+ endpoints (+ payment vouchers + expense categories)
 │   │   │   ├── company/               # 87 endpoints
 │   │   │   ├── handover/              # 15 endpoints (محاضر الاستلام — مُعاد هيكلته إلى 8 ملفات)
 │   │   │   ├── project-boq/           # 🆕 جدول كميات المشروع
@@ -144,7 +147,7 @@ D:\Masar\Masar/
 │   │   └── __tests__/                 # 🆕 اختبارات API (21 ملف — permissions, finance, security)
 │   ├── database/                      # Prisma (175+ files)
 │   │   ├── prisma/
-│   │   │   ├── schema.prisma          # Schema (123 models, 95 enums)
+│   │   │   ├── schema.prisma          # Schema (126 models, 99 enums, ~5,973 سطر)
 │   │   │   └── zod/index.ts           # ⚠️ auto-generated, breaks after prisma generate
 │   │   └── __tests__/                 # 🆕 اختبارات DB (7 ملفات — invoices, sequences, smoke)
 │   ├── ai/                            # AI assistant (40+ files, 32 tools)
@@ -153,7 +156,7 @@ D:\Masar\Masar/
 │   ├── payments/                      # Stripe integration
 │   ├── storage/                       # S3/Supabase storage
 │   ├── i18n/                          # Internationalization
-│   └── utils/                         # Shared utilities
+│   └── utils/                         # Shared utilities (+ expense-categories.ts — 39 تصنيف هرمي)
 │
 ├── tooling/                           # Scripts, configs
 └── config/                            # App configuration
@@ -200,8 +203,8 @@ D:\Masar\Masar/
 ### 5.4 قاعدة الترجمة
 
 كل نص يظهر للمستخدم يجب أن يستخدم مفاتيح الترجمة عبر `useTranslations()` — لا hardcoded strings. أضف المفاتيح في كلا الملفين:
-- `apps/web/i18n/messages/ar.json` (~6,567 مفتاح)
-- `apps/web/i18n/messages/en.json` (~6,781 مفتاح)
+- `packages/i18n/translations/ar.json` (~10,161 سطر)
+- `packages/i18n/translations/en.json` (~10,161 سطر)
 
 ### 5.5 قاعدة RTL
 
@@ -421,8 +424,8 @@ model StructuralItem {
 
 ### 8.1 إحصائيات
 
-- **123 model** + **95 enum** في Prisma Schema (~5,000+ سطر)
-- **275+ indexes** + **42+ unique constraints**
+- **126 model** + **99 enum** في Prisma Schema (~5,973 سطر)
+- **259+ indexes** + **40+ unique constraints**
 - **Decimal(15,2)** لكل الحقول المالية
 - **Cascade Delete** شامل — حذف المنظمة يحذف كل شيء
 - **organizationId** كـ index على كل model
@@ -525,7 +528,7 @@ DIRECT_URL = postgresql://...                     # Direct (migrations only)
 | ~~غياب Error Boundaries~~ | ✅ مُصلح | 16 error boundary (كانت 2 — تغطي كل route groups الرئيسية) |
 | CSP unsafe-inline | 🟡 متوسط | يضعف الحماية ضد XSS |
 | ~~غياب اختبارات~~ | ✅ مُصلح | Vitest (unit/integration) + Playwright (E2E) — 33 ملف اختبار |
-| PDF export يعرض صفحة فارغة ثانية + URL المتصفح | 🟡 متوسط | مشكلة iframe في window.print |
+| ~~PDF export يعرض صفحة فارغة ثانية + URL المتصفح~~ | ✅ مُصلح | أنماط طباعة A4 شاملة + page-break control + @page rules في globals.css |
 
 ---
 
@@ -641,11 +644,11 @@ export const createItem = subscriptionProcedure... // write
 
 ---
 
-## 13. بنية وحدة API (43 module)
+## 13. بنية وحدة API (45 module)
 
 | الوحدة | Endpoints | الملاحظات |
 |--------|-----------|---------|
-| finance | 116+ | أكبر وحدة — فواتير، مصروفات، مدفوعات، تحويلات، بنوك، سندات قبض/صرف، تقارير |
+| finance | 120+ | أكبر وحدة — فواتير، مصروفات، مدفوعات، تحويلات، بنوك، سندات قبض/صرف، تقارير، تصنيفات مصروفات |
 | company | 87 | HR — موظفين، أصول، رواتب، إجازات، مصروفات متكررة |
 | pricing (+ quantities + leads) | 57 | دراسات، كميات، عروض أسعار، عملاء محتملون |
 | accounting | 36+ | دليل حسابات، قيود، تقارير، فترات، أرصدة افتتاحية، كشوف حساب، تسوية بنكية، قيود متكررة، صحة محاسبية |
@@ -662,8 +665,8 @@ export const createItem = subscriptionProcedure... // write
 | project-chat | ~8 | 🆕 محادثات المشروع — قنوات فريق/مالك |
 | dashboard | 9 | لوحة التحكم الرئيسية |
 | ai | 6 | المساعد الذكي (32 tools) |
-| + 26 more modules | ~250 | باقي الوحدات |
-| **المجموع** | **690+** | |
+| + 28 more modules | ~260 | باقي الوحدات |
+| **المجموع** | **700+** | |
 
 ---
 
@@ -782,19 +785,19 @@ export const createItem = subscriptionProcedure... // write
 
 | المقياس | القيمة |
 |---------|--------|
-| أسطر الكود | 650,000+ |
-| ملفات TypeScript/TSX | 2,286+ |
-| صفحات | 221+ |
-| API Endpoints | 690+ |
-| API Modules | 43 |
-| API Procedure Files | 365 |
-| Database Models | 123 |
-| Database Enums | 95 |
-| Database Indexes | 280+ |
-| Loading States | 220 files |
+| أسطر الكود | 660,000+ |
+| ملفات TypeScript/TSX | 2,324+ |
+| صفحات | 222+ |
+| API Endpoints | 700+ |
+| API Modules | 45 |
+| API Procedure Files | 374 |
+| Database Models | 126 |
+| Database Enums | 99 |
+| Database Indexes | 259+ |
+| Loading States | 221 files |
 | Error Boundaries | 16 files |
-| Translation Keys (AR) | ~9,100 |
-| Translation Keys (EN) | ~9,100 |
+| Translation Lines (AR) | ~10,161 |
+| Translation Lines (EN) | ~10,161 |
 | Permissions | 42 |
 | Custom Hooks | 22 |
 | UI Components (shadcn) | 35+ |
@@ -806,6 +809,7 @@ export const createItem = subscriptionProcedure... // write
 | AI navigateTo Patterns | 37 |
 | Auto-Journal Events | 15 (+ generic reverse) |
 | Test Files | 33 (21 API + 7 DB + 5 E2E) |
+| Expense Categories | 39 main + ~200 subcategories |
 
 ---
 
@@ -1001,13 +1005,15 @@ packages/api/modules/accounting/
 
 packages/api/modules/finance/procedures/
 ├── bank-reconciliation.ts     # getLines, create, history
-└── payment-vouchers.ts        # list, getById, create, update, submit, approve, reject, cancel, print, summary (10 endpoints)
+├── payment-vouchers.ts        # list, getById, create, update, submit, approve, reject, cancel, print, summary (10 endpoints)
+└── expense-categories.ts      # 🆕 listExpenseCategories (بحث + هرمي)
 
 packages/api/lib/accounting/
 └── auto-journal.ts            # 12 event handlers + reverseAutoJournalEntry (766 lines)
 
 packages/utils/lib/
-└── number-to-arabic-words.ts  # numberToArabicWords(13800.50) → "ثلاثة عشر ألفاً وثمانمائة ريال سعودي وخمسون هللة"
+├── number-to-arabic-words.ts  # numberToArabicWords(13800.50) → "ثلاثة عشر ألفاً وثمانمائة ريال سعودي وخمسون هللة"
+└── expense-categories.ts      # 🆕 39 تصنيف هرمي + بحث + خرائط legacy (887 سطر)
 ```
 
 **Frontend (pages + components):**
@@ -1519,7 +1525,119 @@ Hook أداء يستخدم `@tanstack/react-virtual` لافتراضية صفوف
 
 ---
 
-## 25. ملاحظات بيئة العمل
+## 25. نظام تصنيفات المصروفات الهرمي (أُضيف 2026-04-03)
+
+### 25.1 نظرة عامة
+
+نظام تصنيفات مصروفات هرمي يحل محل الـ enum القديم (`OrgExpenseCategory` / `CompanyExpenseCategory`). يوفر 39 تصنيف رئيسي مع ~200+ تصنيف فرعي، مصمم خصيصاً للمقاولات الإنشائية السعودية. متوافق مع النظام المحاسبي (كل تصنيف مربوط بحساب في دليل الحسابات).
+
+### 25.2 البنية
+
+```
+packages/utils/lib/expense-categories.ts     # 🆕 المصدر الوحيد (887 سطر)
+├── EXPENSE_CATEGORIES[]                     # 39 تصنيف رئيسي
+├── findCategoryById()                       # بحث بالمعرّف
+├── findSubcategoryById()                    # بحث تصنيف فرعي
+├── searchCategories()                       # بحث نصي (AR/EN)
+├── searchSubcategories()                    # بحث داخل تصنيف
+├── LEGACY_CATEGORY_MAP                      # خريطة OrgExpenseCategory → id (25 mapping)
+└── LEGACY_COMPANY_CATEGORY_MAP              # خريطة CompanyExpenseCategory → id (12 mapping)
+
+packages/api/modules/finance/procedures/expense-categories.ts  # 🆕 API endpoint
+apps/web/modules/saas/shared/components/
+├── ExpenseCategoryCombobox.tsx              # 🆕 combobox التصنيف الرئيسي
+└── ExpenseSubcategoryCombobox.tsx           # 🆕 combobox التصنيف الفرعي
+packages/database/scripts/migrate-expense-categories.ts  # 🆕 سكربت ترحيل البيانات
+```
+
+### 25.3 التصنيفات الرئيسية (39 تصنيف)
+
+| الفئة | التصنيفات | أكواد الحسابات |
+|-------|-----------|---------------|
+| تكاليف مباشرة (مشاريع) | CONCRETE_STRUCTURAL, REBAR, BLOCKS_BRICKS, TIMBER_FORMWORK, EXCAVATION_EARTHWORK, WATERPROOFING_INSULATION | 5100 |
+| تشطيبات | PLASTERING, GYPSUM_CEILINGS, PAINTING, TILING_FLOORING, FINISHING_DECOR, DOORS_WINDOWS_HARDWARE | 5100 |
+| كهروميكانيك | ELECTRICAL_ROUGH/FINISH/SYSTEMS, PLUMBING_ROUGH/FINISH/SYSTEMS, HVAC, FIRE_PROTECTION | 5100 |
+| مقاولو باطن | SUBCONTRACTOR_GENERAL | 5200 |
+| عمالة | INDIRECT_LABOR | 5300 |
+| تشغيلية | SAFETY_HSE, EQUIPMENT_MACHINERY, TRANSPORT_LOGISTICS, ADMIN_SALARIES, INSURANCE_GUARANTEES | 6xxx |
+| إدارية | FINANCIAL_EXPENSES, MARKETING_BUSINESS, PROFESSIONAL_CONSULTANCY, GOVERNMENT_LICENSES, MISCELLANEOUS | 6xxx |
+
+### 25.4 هيكل التصنيف
+
+```typescript
+interface ExpenseMainCategory {
+  id: string;              // "CONCRETE_STRUCTURAL"
+  nameAr: string;          // "خرسانة وهيكل إنشائي"
+  nameEn: string;          // "Concrete & Structural"
+  accountCode: string;     // "5100" — ربط بدليل الحسابات
+  isVatExempt: boolean;    // هل معفى من الضريبة
+  subcategories: ExpenseSubcategory[];
+}
+
+interface ExpenseSubcategory {
+  id: string;              // "READY_MIX"
+  nameAr: string;          // "خرسانة جاهزة"
+  nameEn: string;          // "Ready Mix Concrete"
+  isLabor: boolean;        // هل هو عنصر عمالة
+}
+```
+
+### 25.5 التكامل مع Schema
+
+```prisma
+// حقول جديدة في FinanceExpense و CompanyExpense
+categoryId      String?    // معرّف التصنيف الجديد (e.g. "CONCRETE_STRUCTURAL")
+subcategoryId   String?    // معرّف التصنيف الفرعي (e.g. "READY_MIX")
+// الحقل القديم category (enum) محفوظ للتوافق العكسي
+```
+
+### 25.6 التكامل المحاسبي
+
+- `auto-journal.ts` يستخدم `getAccountCodeForCategory()` لتحديد حساب المصروف الصحيح
+- VAT exemption يُفحص عبر `isCategoryVatExempt()` بناءً على `categoryId`
+- `accounting-reports.ts` يدعم التصنيفات الجديدة والقديمة في تقرير VAT
+- `org-finance.ts` يدعم الفلترة والتجميع بالتصنيف الجديد
+
+### 25.7 التوافق العكسي
+
+- الحقول القديمة (`category` enum) محفوظة — النظام يعمل مع كلا النظامين
+- `LEGACY_CATEGORY_MAP` يحوّل 25 قيمة enum قديمة للتصنيفات الجديدة
+- سكربت `migrate-expense-categories.ts` يُحدّث السجلات القائمة batch-wise
+
+---
+
+## 26. أنماط الطباعة وتصدير PDF (أُضيف 2026-04-03)
+
+### 26.1 نظرة عامة
+
+بنية تحتية شاملة لطباعة المستندات بصيغة A4 مع تحكم كامل في فواصل الصفحات.
+
+### 26.2 أنماط CSS للطباعة
+
+**الملف:** `apps/web/app/globals.css` — أنماط `@media print` جديدة:
+
+```css
+@page { size: A4 portrait; margin: 15mm 10mm 10mm 10mm; }
+```
+
+**القواعد الرئيسية:**
+- إخفاء عناصر التطبيق (`aside`, `header`) عند الطباعة
+- الحفاظ على الألوان: `print-color-adjust: exact`
+- تحكم بفواصل الصفحات: `.print-page-break-before/after`, `.print-avoid-break`
+- أقسام تبقى معاً: `.signature-section`, `.totals-section`, `.client-info-card`
+- رؤوس الجداول تتكرر: `thead { display: table-header-group }`
+- دعم Watermark: `[data-watermark]::before`
+
+### 26.3 تصدير PDF في عروض الأسعار
+
+- `QuotationPreview.tsx` و `QuotationPreviewV2.tsx` — حوار تخصيص اسم ملف PDF
+- إدارة حالة التحميل (`isGeneratingPdf`, `showFilenameDialog`)
+- تكامل مع `window.print()` و `html2pdf.js`
+- TypeScript declaration لـ `html2pdf.js` في `global.d.ts`
+
+---
+
+## 27. ملاحظات بيئة العمل
 
 - **نظام التشغيل:** Windows (primary)
 - **المحرر:** VS Code / Cursor
@@ -1532,4 +1650,4 @@ Hook أداء يستخدم `@tanstack/react-virtual` لافتراضية صفوف
 
 ---
 
-*هذا الملف يُحدّث مع كل تطوير كبير. آخر مراجعة: 2026-03-30*
+*هذا الملف يُحدّث مع كل تطوير كبير. آخر مراجعة: 2026-04-03*

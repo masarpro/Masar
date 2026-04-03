@@ -4239,6 +4239,7 @@
       "remaining": "المتبقي",
       "paymentAmount": "مبلغ الدفع",
       "partialPaymentNote": "دفعة جزئية - سيبقى المصروف معلقاً",
+      "advancedOptions": "خيارات متقدمة",
       "recordObligation": "تسجيل التزام",
       "recordObligationHint": "تسجيل كالتزام مستحق بدون خصم فوري من الرصيد",
       "accountOptionalForObligation": "الحساب اختياري للالتزامات المعلقة - يتم اختياره عند الدفع",

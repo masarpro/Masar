@@ -4217,6 +4217,7 @@
       "remaining": "Remaining",
       "paymentAmount": "Payment Amount",
       "partialPaymentNote": "Partial payment - expense will remain pending",
+      "advancedOptions": "Advanced Options",
       "recordObligation": "Record Obligation",
       "recordObligationHint": "Record as a pending obligation without immediate balance deduction",
       "accountOptionalForObligation": "Account is optional for pending obligations - selected at payment time",

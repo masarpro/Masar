@@ -12,6 +12,7 @@ import { Label } from "@ui/components/label";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogFooter,
@@ -22,6 +23,7 @@ import { toast } from "sonner";
 import { TemplateRenderer } from "@saas/company/components/templates/renderer";
 import { useEnsureDefaultTemplate } from "@saas/shared/hooks/use-ensure-default-template";
 import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
+import { exportToPDF } from "@saas/shared/lib/pdf-export";
 
 interface QuotationPreviewProps {
 	organizationId: string;
@@ -113,26 +115,7 @@ export function QuotationPreview({
 
 		setIsGeneratingPdf(true);
 		try {
-			const html2pdf = (await import("html2pdf.js")).default;
-
-			await html2pdf()
-				.set({
-					margin: [10, 12, 10, 12],
-					filename: `${filename || defaultFilename}.pdf`,
-					image: { type: "jpeg", quality: 0.98 },
-					html2canvas: {
-						scale: 2,
-						useCORS: true,
-						logging: false,
-					},
-					jsPDF: {
-						unit: "mm",
-						format: "a4",
-						orientation: "portrait",
-					},
-				} as any)
-				.from(element)
-				.save();
+			await exportToPDF(element, filename || defaultFilename);
 		} catch (error) {
 			console.error("PDF generation failed:", error);
 			toast.error(t("common.error"));
@@ -297,6 +280,9 @@ export function QuotationPreview({
 				<DialogContent className="sm:max-w-md rounded-2xl">
 					<DialogHeader>
 						<DialogTitle>{t("finance.actions.downloadPdf")}</DialogTitle>
+						<DialogDescription className="sr-only">
+							{t("finance.actions.downloadPdf")}
+						</DialogDescription>
 					</DialogHeader>
 					<div className="space-y-3">
 						<div>
