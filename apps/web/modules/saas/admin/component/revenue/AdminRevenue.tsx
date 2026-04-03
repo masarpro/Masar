@@ -101,7 +101,7 @@ export function AdminRevenue() {
 						{t("admin.revenue.byPlan")}
 					</h3>
 					<div className="space-y-3">
-						{byPlan.map((item) => (
+						{byPlan.map((item: any) => (
 							<div
 								key={item.plan}
 								className="flex items-center justify-between rounded-lg border p-3"

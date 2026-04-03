@@ -620,7 +620,7 @@ export function TemplateCustomizer({
 								</div>
 								<Slider
 									value={[settings.logoSize ?? 64]}
-									onValueChange={([v]) =>
+									onValueChange={([v]: any) =>
 										handleUpdateSettings({ logoSize: v })
 									}
 									min={32}
@@ -760,7 +760,7 @@ export function TemplateCustomizer({
 									</div>
 									<Slider
 										value={[settings.watermarkOpacity ?? 5]}
-										onValueChange={([v]) =>
+										onValueChange={([v]: any) =>
 											handleUpdateSettings({ watermarkOpacity: v })
 										}
 										min={1}

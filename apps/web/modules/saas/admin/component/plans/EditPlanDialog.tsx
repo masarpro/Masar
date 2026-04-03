@@ -116,14 +116,14 @@ export function EditPlanDialog({
 							<Label>{t("admin.plans.nameEn")}</Label>
 							<Input
 								value={nameEn}
-								onChange={(e) => setNameEn(e.target.value)}
+								onChange={(e: any) => setNameEn(e.target.value)}
 							/>
 						</div>
 						<div className="space-y-2">
 							<Label>{t("admin.plans.nameAr")}</Label>
 							<Input
 								value={nameAr}
-								onChange={(e) => setNameAr(e.target.value)}
+								onChange={(e: any) => setNameAr(e.target.value)}
 								dir="rtl"
 							/>
 						</div>
@@ -136,7 +136,7 @@ export function EditPlanDialog({
 								type="number"
 								min={0}
 								value={maxUsers}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setMaxUsers(Number(e.target.value))
 								}
 							/>
@@ -147,7 +147,7 @@ export function EditPlanDialog({
 								type="number"
 								min={0}
 								value={maxProjects}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setMaxProjects(Number(e.target.value))
 								}
 							/>
@@ -158,7 +158,7 @@ export function EditPlanDialog({
 								type="number"
 								min={0}
 								value={maxStorageGB}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setMaxStorageGB(Number(e.target.value))
 								}
 							/>
@@ -172,7 +172,7 @@ export function EditPlanDialog({
 								type="number"
 								min={0}
 								value={monthlyPrice}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setMonthlyPrice(Number(e.target.value))
 								}
 							/>
@@ -183,7 +183,7 @@ export function EditPlanDialog({
 								type="number"
 								min={0}
 								value={yearlyPrice}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setYearlyPrice(Number(e.target.value))
 								}
 							/>
@@ -214,7 +214,7 @@ export function EditPlanDialog({
 											"admin.plans.featureEn",
 										)}
 										value={featuresEn[index]}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											updateFeatureEn(
 												index,
 												e.target.value,
@@ -227,7 +227,7 @@ export function EditPlanDialog({
 											"admin.plans.featureAr",
 										)}
 										value={featuresAr[index] ?? ""}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											updateFeatureAr(
 												index,
 												e.target.value,

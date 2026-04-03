@@ -46,7 +46,7 @@ export function AdminPlans() {
 			<div className="space-y-6">
 				<h2 className="font-semibold text-2xl">{t("admin.plans.title")}</h2>
 				<div className="grid gap-6 md:grid-cols-2">
-					{plans?.map((plan) => {
+					{plans?.map((plan: any) => {
 						const name = plan.name as { en: string; ar: string };
 						const features = plan.features as {
 							en: string[];

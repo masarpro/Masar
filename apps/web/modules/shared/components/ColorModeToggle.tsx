@@ -60,7 +60,7 @@ export function ColorModeToggle() {
 			<DropdownMenuContent>
 				<DropdownMenuRadioGroup
 					value={value}
-					onValueChange={(value) => {
+					onValueChange={(value: any) => {
 						setTheme(value);
 						setValue(value);
 					}}

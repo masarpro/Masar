@@ -100,7 +100,7 @@ export function ForgotPasswordForm() {
 						<FormField
 							control={form.control}
 							name="email"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>
 										{t("auth.forgotPassword.email")}

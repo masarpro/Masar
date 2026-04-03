@@ -72,7 +72,7 @@ export function UpdateLimitsDialog({
 							type="number"
 							min={1}
 							value={maxUsers}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setMaxUsers(Number(e.target.value))
 							}
 						/>
@@ -83,7 +83,7 @@ export function UpdateLimitsDialog({
 							type="number"
 							min={1}
 							value={maxProjects}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setMaxProjects(Number(e.target.value))
 							}
 						/>
@@ -96,7 +96,7 @@ export function UpdateLimitsDialog({
 							type="number"
 							min={1}
 							value={maxStorage}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setMaxStorage(Number(e.target.value))
 							}
 						/>

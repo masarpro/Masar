@@ -56,7 +56,7 @@ export function AdminSubscriptions() {
 			</h2>
 
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-				{stats?.planDistribution.map((item) => (
+				{stats?.planDistribution.map((item: any) => (
 					<Card key={item.plan} className="p-4">
 						<p className="text-muted-foreground text-sm">
 							{item.plan}
@@ -75,7 +75,7 @@ export function AdminSubscriptions() {
 						</Badge>
 					</div>
 					<div className="space-y-2">
-						{statusOrgs.map((org) => (
+						{statusOrgs.map((org: any) => (
 							<div
 								key={org.id}
 								className="flex items-center justify-between rounded-lg border p-3"

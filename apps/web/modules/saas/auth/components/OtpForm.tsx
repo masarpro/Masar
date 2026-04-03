@@ -102,7 +102,7 @@ export function OtpForm() {
 					<FormField
 						control={form.control}
 						name="code"
-						render={({ field }) => (
+						render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("auth.verify.code")}</FormLabel>
 								<FormControl>
@@ -110,7 +110,7 @@ export function OtpForm() {
 										maxLength={6}
 										{...field}
 										autoComplete="one-time-code"
-										onChange={(value) => {
+										onChange={(value: any) => {
 											field.onChange(value);
 											onSubmit();
 										}}

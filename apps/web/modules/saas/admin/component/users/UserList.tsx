@@ -321,7 +321,7 @@ export function UserList() {
 				type="search"
 				placeholder={t("admin.users.search")}
 				value={searchTerm}
-				onChange={(e) => setSearchTerm(e.target.value)}
+				onChange={(e: any) => setSearchTerm(e.target.value)}
 				className="mb-4"
 			/>
 

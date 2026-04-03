@@ -186,7 +186,7 @@ export function LoginForm() {
 							<FormField
 								control={form.control}
 								name="email"
-								render={({ field }) => (
+								render={({ field }: any) => (
 									<FormItem>
 										<FormLabel>
 											{t("auth.signup.email")}
@@ -207,7 +207,7 @@ export function LoginForm() {
 									<FormField
 										control={form.control}
 										name="password"
-										render={({ field }) => (
+										render={({ field }: any) => (
 											<FormItem>
 												<div className="flex justify-between gap-4">
 													<FormLabel>

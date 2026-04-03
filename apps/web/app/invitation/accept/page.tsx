@@ -42,7 +42,7 @@ export default function AcceptInvitationPage() {
 		});
 
 	const form = useForm({
-		resolver: zodResolver(formSchema),
+		resolver: zodResolver(formSchema as any),
 		defaultValues: {
 			name: "",
 			password: "",

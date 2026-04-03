@@ -42,7 +42,7 @@ export function LocaleSwitch({
 			<DropdownMenuContent>
 				<DropdownMenuRadioGroup
 					value={value}
-					onValueChange={(value) => {
+					onValueChange={(value: any) => {
 						setValue(value);
 
 						if (withLocaleInUrl) {
