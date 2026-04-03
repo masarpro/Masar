@@ -88,6 +88,10 @@ ${styleSheets}
     border: none;
     vertical-align: top;
   }
+  /* Ensure RTL on all pdf sections */
+  [data-pdf-header], [data-pdf-body], [data-pdf-footer] {
+    direction: rtl;
+  }
   /* Hide any no-print elements */
   .no-print, .print\\:hidden, [data-print-hidden="true"] {
     display: none !important;
