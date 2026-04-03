@@ -118,6 +118,13 @@ export function QuotationPreview({
 		deliveryTerms: quotation.deliveryTerms ?? undefined,
 		warrantyTerms: quotation.warrantyTerms ?? undefined,
 		notes: quotation.notes ?? undefined,
+		introduction: quotation.introduction ?? undefined,
+		termsAndConditions: quotation.termsAndConditions ?? undefined,
+		contentBlocks: (quotation.contentBlocks ?? []).map((b: any) => ({
+			title: b.title,
+			content: b.content,
+			position: b.position,
+		})),
 	};
 
 	const templateConfig = {

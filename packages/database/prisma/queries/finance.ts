@@ -579,6 +579,7 @@ export async function getQuotationById(id: string, organizationId: string) {
 			items: { orderBy: { sortOrder: "asc" } },
 			costStudy: { select: { id: true, name: true } },
 			displayConfig: true,
+			contentBlocks: { orderBy: { sortOrder: "asc" } },
 		},
 	});
 }
@@ -602,6 +603,13 @@ export async function createQuotation(data: {
 	deliveryTerms?: string;
 	warrantyTerms?: string;
 	notes?: string;
+	introduction?: string;
+	termsAndConditions?: string;
+	contentBlocks?: Array<{
+		title: string;
+		content: string;
+		position: "BEFORE_TABLE" | "AFTER_TABLE";
+	}>;
 	templateId?: string;
 	vatPercent?: number;
 	discountPercent?: number;
@@ -655,6 +663,8 @@ export async function createQuotation(data: {
 			deliveryTerms: data.deliveryTerms,
 			warrantyTerms: data.warrantyTerms,
 			notes: data.notes,
+			introduction: data.introduction,
+			termsAndConditions: data.termsAndConditions,
 			templateId: data.templateId,
 			subtotal,
 			discountPercent,
@@ -665,9 +675,20 @@ export async function createQuotation(data: {
 			items: {
 				create: itemsData,
 			},
+			contentBlocks: data.contentBlocks?.length
+				? {
+						create: data.contentBlocks.map((block, index) => ({
+							title: block.title,
+							content: block.content,
+							position: block.position,
+							sortOrder: index,
+						})),
+					}
+				: undefined,
 		},
 		include: {
 			items: true,
+			contentBlocks: { orderBy: { sortOrder: "asc" } },
 		},
 	});
 }
@@ -693,6 +714,8 @@ export async function updateQuotation(
 		deliveryTerms: string;
 		warrantyTerms: string;
 		notes: string;
+		introduction: string;
+		termsAndConditions: string;
 		templateId: string | null;
 		vatPercent: number;
 		discountPercent: number;
@@ -773,6 +796,47 @@ export async function updateQuotationItems(
 			totalAmount,
 		},
 		include: { items: { orderBy: { sortOrder: "asc" } } },
+	});
+}
+
+/**
+ * Update quotation content blocks (delete-and-recreate)
+ */
+export async function updateQuotationContentBlocks(
+	id: string,
+	organizationId: string,
+	blocks: Array<{
+		title: string;
+		content: string;
+		position: "BEFORE_TABLE" | "AFTER_TABLE";
+	}>,
+) {
+	const existing = await db.quotation.findFirst({
+		where: { id, organizationId },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("Quotation not found");
+	}
+
+	await db.quotationContentBlock.deleteMany({ where: { quotationId: id } });
+
+	if (blocks.length > 0) {
+		await db.quotationContentBlock.createMany({
+			data: blocks.map((block, index) => ({
+				quotationId: id,
+				title: block.title,
+				content: block.content,
+				position: block.position as any,
+				sortOrder: index,
+			})),
+		});
+	}
+
+	return db.quotation.findFirst({
+		where: { id },
+		include: { contentBlocks: { orderBy: { sortOrder: "asc" } } },
 	});
 }
 

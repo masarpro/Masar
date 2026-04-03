@@ -46,6 +46,13 @@ export interface QuotationData {
 	deliveryTerms?: string;
 	warrantyTerms?: string;
 	notes?: string;
+	introduction?: string;
+	termsAndConditions?: string;
+	contentBlocks?: Array<{
+		title: string;
+		content: string;
+		position: "BEFORE_TABLE" | "AFTER_TABLE";
+	}>;
 }
 
 export interface InvoiceData {
@@ -601,6 +608,56 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 		);
 	};
 
+	// Render quotation-only content sections (introduction, content blocks, T&C)
+	const renderQuotationBeforeTable = () => {
+		if (docType !== "quotation") return null;
+		const qData = data as QuotationData;
+		const beforeBlocks = qData.contentBlocks?.filter((b) => b.position === "BEFORE_TABLE") || [];
+		if (!qData.introduction && beforeBlocks.length === 0) return null;
+
+		return (
+			<Fragment key="quotation-before-table">
+				{qData.introduction && (
+					<div className="px-6 py-3">
+						<p className="text-sm whitespace-pre-line leading-relaxed">{qData.introduction}</p>
+					</div>
+				)}
+				{beforeBlocks.map((block, idx) => (
+					<div key={`before-block-${idx}`} className="px-6 py-3">
+						<h4 className="text-sm font-semibold mb-1.5">{block.title}</h4>
+						<p className="text-sm whitespace-pre-line leading-relaxed text-muted-foreground">{block.content}</p>
+					</div>
+				))}
+			</Fragment>
+		);
+	};
+
+	const renderQuotationAfterTotals = () => {
+		if (docType !== "quotation") return null;
+		const qData = data as QuotationData;
+		const afterBlocks = qData.contentBlocks?.filter((b) => b.position === "AFTER_TABLE") || [];
+		if (!qData.termsAndConditions && afterBlocks.length === 0) return null;
+
+		return (
+			<Fragment key="quotation-after-totals">
+				{afterBlocks.map((block, idx) => (
+					<div key={`after-block-${idx}`} className="px-6 py-3">
+						<h4 className="text-sm font-semibold mb-1.5">{block.title}</h4>
+						<p className="text-sm whitespace-pre-line leading-relaxed text-muted-foreground">{block.content}</p>
+					</div>
+				))}
+				{qData.termsAndConditions && (
+					<div className="px-6 py-3 border-t border-slate-200">
+						<h4 className="text-sm font-semibold mb-1.5" style={{ color: primaryColor }}>
+							{t("pricing.quotations.termsAndConditions")}
+						</h4>
+						<p className="text-sm whitespace-pre-line leading-relaxed text-muted-foreground">{qData.termsAndConditions}</p>
+					</div>
+				)}
+			</Fragment>
+		);
+	};
+
 	// Group totals + qrCode side by side when adjacent
 	const renderGroupedElements = () => {
 		const result: React.ReactNode[] = [];
@@ -608,6 +665,11 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 		while (i < defaultElements.length) {
 			const el = defaultElements[i];
 			const nextEl = i + 1 < defaultElements.length ? defaultElements[i + 1] : null;
+
+			// Inject quotation introduction + before-table blocks before itemsTable
+			if (el.type === "itemsTable") {
+				result.push(renderQuotationBeforeTable());
+			}
 
 			// If totals followed by qrCode, render them side by side
 			// In RTL: first child goes to the right, so totals (flex-1) goes right, qrCode goes left
@@ -623,11 +685,19 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 						</div>
 					</div>
 				);
+				// Inject quotation after-totals content
+				result.push(renderQuotationAfterTotals());
 				i += 2;
 				continue;
 			}
 
 			result.push(renderInteractiveElement(el));
+
+			// Inject quotation after-totals content (standalone totals case)
+			if (el.type === "totals" && !(nextEl?.type === "qrCode" && nextEl.enabled)) {
+				result.push(renderQuotationAfterTotals());
+			}
+
 			i++;
 		}
 		return result;

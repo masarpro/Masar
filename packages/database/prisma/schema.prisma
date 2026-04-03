@@ -3477,6 +3477,11 @@ enum QuotationGrouping {
   FLAT          // بدون تجميع
 }
 
+enum QuotationBlockPosition {
+  BEFORE_TABLE  // قبل جدول البنود
+  AFTER_TABLE   // بعد جدول البنود
+}
+
 // ═══════════════════════════════════════════════════════════
 // Leads Enums — العملاء المحتملون
 // ═══════════════════════════════════════════════════════════
@@ -3852,6 +3857,10 @@ model Quotation {
   warrantyTerms   String?         @map("warranty_terms") @db.Text
   notes           String?         @db.Text
 
+  // أقسام المحتوى الإضافية (عرض السعر فقط)
+  introduction       String?  @db.Text
+  termsAndConditions String?  @map("terms_and_conditions") @db.Text
+
   // القالب المستخدم
   templateId      String?         @map("template_id")
   template        FinanceTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
@@ -3878,6 +3887,7 @@ model Quotation {
   invoices        FinanceInvoice[] // الفواتير المحولة من هذا العرض
   lead            Lead?
   displayConfig   QuotationDisplayConfig?
+  contentBlocks   QuotationContentBlock[]
 
   @@index([organizationId])
   @@index([organizationId, status])
@@ -3958,6 +3968,24 @@ model QuotationDisplayConfig {
   updatedAt           DateTime            @updatedAt @map("updated_at")
 
   @@map("quotation_display_configs")
+}
+
+// أقسام محتوى عرض السعر (مقدمة، أقسام شرحية، ملاحظات)
+model QuotationContentBlock {
+  id          String                  @id @default(cuid())
+  quotationId String                  @map("quotation_id")
+  quotation   Quotation               @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+
+  title       String                  @db.VarChar(200)
+  content     String                  @db.Text
+  position    QuotationBlockPosition  @default(BEFORE_TABLE)
+  sortOrder   Int                     @default(0) @map("sort_order")
+
+  createdAt   DateTime                @default(now()) @map("created_at")
+  updatedAt   DateTime                @updatedAt @map("updated_at")
+
+  @@index([quotationId, position, sortOrder])
+  @@map("quotation_content_blocks")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

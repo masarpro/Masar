@@ -457,7 +457,7 @@ export type ClientContactScalarFieldEnum = z.infer<typeof ClientContactScalarFie
 
 // File: QuotationScalarFieldEnum.schema.ts
 
-export const QuotationScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'quotationNo', 'clientId', 'clientName', 'clientCompany', 'clientPhone', 'clientEmail', 'clientAddress', 'clientTaxNumber', 'projectId', 'status', 'subtotal', 'discountPercent', 'discountAmount', 'vatPercent', 'vatAmount', 'totalAmount', 'validUntil', 'paymentTerms', 'deliveryTerms', 'warrantyTerms', 'notes', 'templateId', 'viewedAt', 'sentAt', 'acceptedAt', 'rejectedAt', 'createdById', 'createdAt', 'updatedAt', 'costStudyId'])
+export const QuotationScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'quotationNo', 'clientId', 'clientName', 'clientCompany', 'clientPhone', 'clientEmail', 'clientAddress', 'clientTaxNumber', 'projectId', 'status', 'subtotal', 'discountPercent', 'discountAmount', 'vatPercent', 'vatAmount', 'totalAmount', 'validUntil', 'paymentTerms', 'deliveryTerms', 'warrantyTerms', 'notes', 'introduction', 'termsAndConditions', 'templateId', 'viewedAt', 'sentAt', 'acceptedAt', 'rejectedAt', 'createdById', 'createdAt', 'updatedAt', 'costStudyId'])
 
 export type QuotationScalarFieldEnum = z.infer<typeof QuotationScalarFieldEnumSchema>;
 
@@ -472,6 +472,12 @@ export type QuotationItemScalarFieldEnum = z.infer<typeof QuotationItemScalarFie
 export const QuotationDisplayConfigScalarFieldEnumSchema = z.enum(['id', 'quotationId', 'quoteId', 'format', 'grouping', 'showItemNumber', 'showDescription', 'showSpecifications', 'showQuantity', 'showUnit', 'showUnitPrice', 'showItemTotal', 'showStructural', 'showFinishing', 'showMEP', 'showManualItems', 'showMaterialDetails', 'showSectionSubtotal', 'showSubtotal', 'showDiscount', 'showVAT', 'showGrandTotal', 'showPricePerSqm', 'totalArea', 'pricePerSqm', 'lumpSumAmount', 'lumpSumDescription', 'createdAt', 'updatedAt'])
 
 export type QuotationDisplayConfigScalarFieldEnum = z.infer<typeof QuotationDisplayConfigScalarFieldEnumSchema>;
+
+// File: QuotationContentBlockScalarFieldEnum.schema.ts
+
+export const QuotationContentBlockScalarFieldEnumSchema = z.enum(['id', 'quotationId', 'title', 'content', 'position', 'sortOrder', 'createdAt', 'updatedAt'])
+
+export type QuotationContentBlockScalarFieldEnum = z.infer<typeof QuotationContentBlockScalarFieldEnumSchema>;
 
 // File: FinanceInvoiceScalarFieldEnum.schema.ts
 
@@ -1162,6 +1168,12 @@ export type QuotationFormat = z.infer<typeof QuotationFormatSchema>;
 export const QuotationGroupingSchema = z.enum(['BY_SECTION', 'BY_FLOOR', 'BY_ITEM', 'FLAT'])
 
 export type QuotationGrouping = z.infer<typeof QuotationGroupingSchema>;
+
+// File: QuotationBlockPosition.schema.ts
+
+export const QuotationBlockPositionSchema = z.enum(['BEFORE_TABLE', 'AFTER_TABLE'])
+
+export type QuotationBlockPosition = z.infer<typeof QuotationBlockPositionSchema>;
 
 // File: InvoiceType.schema.ts
 
@@ -3367,6 +3379,8 @@ export const QuotationSchema = z.object({
   deliveryTerms: z.string().nullish(),
   warrantyTerms: z.string().nullish(),
   notes: z.string().nullish(),
+  introduction: z.string().nullish(),
+  termsAndConditions: z.string().nullish(),
   templateId: z.string().nullish(),
   viewedAt: z.date().nullish(),
   sentAt: z.date().nullish(),
@@ -3446,6 +3460,22 @@ export const QuotationDisplayConfigSchema = z.object({
 });
 
 export type QuotationDisplayConfigType = z.infer<typeof QuotationDisplayConfigSchema>;
+
+
+// File: QuotationContentBlock.schema.ts
+
+export const QuotationContentBlockSchema = z.object({
+  id: z.string(),
+  quotationId: z.string(),
+  title: z.string(),
+  content: z.string(),
+  position: QuotationBlockPositionSchema.default("BEFORE_TABLE"),
+  sortOrder: z.number().int(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type QuotationContentBlockType = z.infer<typeof QuotationContentBlockSchema>;
 
 
 // File: FinanceInvoice.schema.ts

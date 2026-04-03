@@ -233,6 +233,22 @@ export function QuotationPreviewV2({
 						)}
 					</div>
 
+					{/* ─── Introduction ─── */}
+					{q.introduction && (
+						<div className="text-sm leading-relaxed whitespace-pre-line">{q.introduction}</div>
+					)}
+
+					{/* ─── Content Blocks: BEFORE_TABLE ─── */}
+					{q.contentBlocks
+						?.filter((b: any) => b.position === "BEFORE_TABLE")
+						.sort((a: any, b: any) => a.sortOrder - b.sortOrder)
+						.map((block: any, idx: number) => (
+							<div key={block.id || idx} className="space-y-1">
+								<h4 className="font-semibold text-sm">{block.title}</h4>
+								<p className="text-sm text-muted-foreground whitespace-pre-line">{block.content}</p>
+							</div>
+						))}
+
 					{/* ─── LUMP_SUM Format ─── */}
 					{format === "LUMP_SUM" && (
 						<LumpSumView
@@ -332,6 +348,25 @@ export function QuotationPreviewV2({
 							</div>
 						)}
 					</div>
+
+					{/* ─── Content Blocks: AFTER_TABLE ─── */}
+					{q.contentBlocks
+						?.filter((b: any) => b.position === "AFTER_TABLE")
+						.sort((a: any, b: any) => a.sortOrder - b.sortOrder)
+						.map((block: any, idx: number) => (
+							<div key={block.id || idx} className="space-y-1">
+								<h4 className="font-semibold text-sm">{block.title}</h4>
+								<p className="text-sm text-muted-foreground whitespace-pre-line">{block.content}</p>
+							</div>
+						))}
+
+					{/* ─── Terms & Conditions ─── */}
+					{q.termsAndConditions && (
+						<div className="border-t border-border pt-4 space-y-2.5 text-sm page-break-inside-avoid">
+							<h4 className="font-semibold text-sm">الشروط والأحكام العامة</h4>
+							<p className="text-muted-foreground whitespace-pre-line">{q.termsAndConditions}</p>
+						</div>
+					)}
 
 					{/* Terms */}
 					{(q.paymentTerms || q.deliveryTerms || q.warrantyTerms || q.notes) && (

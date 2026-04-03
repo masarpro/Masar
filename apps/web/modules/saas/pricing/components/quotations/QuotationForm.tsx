@@ -62,6 +62,9 @@ import {
 	StickyNote,
 	Paperclip,
 	Receipt,
+	ScrollText,
+	BookOpen,
+	ListChecks,
 } from "lucide-react";
 import { cn } from "@ui/lib";
 import { ClientSelector, type Client } from "@saas/finance/components/shared/ClientSelector";
@@ -72,6 +75,8 @@ import { calculateTotals } from "@saas/finance/lib/utils";
 import { TemplateRenderer } from "@saas/company/components/templates/renderer";
 import { useEnsureDefaultTemplate } from "@saas/shared/hooks/use-ensure-default-template";
 import { EditorPageSkeleton } from "@saas/shared/components/skeletons";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@ui/components/collapsible";
+import { QuotationContentBlockEditor, type ContentBlock } from "./QuotationContentBlockEditor";
 
 interface QuotationFormProps {
 	organizationId: string;
@@ -136,6 +141,11 @@ export function QuotationForm({
 	const [deliveryTerms, setDeliveryTerms] = useState("");
 	const [warrantyTerms, setWarrantyTerms] = useState("");
 	const [notes, setNotes] = useState("");
+
+	// Content sections
+	const [introduction, setIntroduction] = useState("");
+	const [termsAndConditions, setTermsAndConditions] = useState("");
+	const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>([]);
 
 	// Tax & Discount (simplified: always show, percent only)
 	const [vatPercent, setVatPercent] = useState(15);
@@ -234,6 +244,16 @@ export function QuotationForm({
 			setDeliveryTerms(existingQuotation.deliveryTerms ?? "");
 			setWarrantyTerms(existingQuotation.warrantyTerms ?? "");
 			setNotes(existingQuotation.notes ?? "");
+			setIntroduction((existingQuotation as any).introduction ?? "");
+			setTermsAndConditions((existingQuotation as any).termsAndConditions ?? "");
+			setContentBlocks(
+				((existingQuotation as any).contentBlocks ?? []).map((b: any) => ({
+					id: b.id,
+					title: b.title,
+					content: b.content,
+					position: b.position,
+				})),
+			);
 			setVatPercent(existingQuotation.vatPercent);
 			setDiscountPercent(existingQuotation.discountPercent);
 			if (existingQuotation.projectId) {
@@ -403,6 +423,11 @@ export function QuotationForm({
 				deliveryTerms,
 				warrantyTerms,
 				notes,
+				introduction: introduction || undefined,
+				termsAndConditions: termsAndConditions || undefined,
+				contentBlocks: contentBlocks
+					.filter((b) => b.title.trim() && b.content.trim())
+					.map((b) => ({ title: b.title, content: b.content, position: b.position })),
 				templateId: defaultTemplate?.id,
 				vatPercent,
 				discountPercent,
@@ -443,6 +468,8 @@ export function QuotationForm({
 				deliveryTerms: deliveryTerms || undefined,
 				warrantyTerms: warrantyTerms || undefined,
 				notes: notes || undefined,
+				introduction: introduction || undefined,
+				termsAndConditions: termsAndConditions || undefined,
 				templateId: existingQuotation?.templateId,
 				vatPercent,
 				discountPercent,
@@ -473,6 +500,27 @@ export function QuotationForm({
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("pricing.quotations.itemsUpdateError"));
+		},
+	});
+
+	// Update content blocks mutation
+	const updateContentBlocksMutation = useMutation({
+		mutationFn: async () => {
+			return orpcClient.pricing.quotations.updateContentBlocks({
+				organizationId,
+				id: quotationId!,
+				contentBlocks: contentBlocks
+					.filter((b) => b.title.trim() && b.content.trim())
+					.map((b) => ({
+						id: b.id.startsWith("new-") ? undefined : b.id,
+						title: b.title,
+						content: b.content,
+						position: b.position,
+					})),
+			});
+		},
+		onError: (error: any) => {
+			toast.error(error.message || t("pricing.quotations.updateError"));
 		},
 	});
 
@@ -521,6 +569,7 @@ export function QuotationForm({
 			try {
 				await updateMutation.mutateAsync();
 				await updateItemsMutation.mutateAsync();
+				await updateContentBlocksMutation.mutateAsync();
 				toast.success(t("pricing.quotations.updateSuccess"));
 				queryClient.invalidateQueries({
 					queryKey: ["finance", "quotations"],
@@ -531,7 +580,7 @@ export function QuotationForm({
 		}
 	};
 
-	const isBusy = createMutation.isPending || updateMutation.isPending || updateItemsMutation.isPending;
+	const isBusy = createMutation.isPending || updateMutation.isPending || updateItemsMutation.isPending || updateContentBlocksMutation.isPending;
 
 	// Loading state for edit mode
 	if (mode === "edit" && isLoadingQuotation) {
@@ -857,6 +906,63 @@ export function QuotationForm({
 					</div>
 				</div>
 
+				{/* ─── Introduction (Collapsible) ─────────────────────── */}
+				<Collapsible defaultOpen={!!introduction}>
+					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
+						<CollapsibleTrigger asChild>
+							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+								<span className="flex items-center gap-2.5">
+									<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-sky-100 to-sky-50 dark:from-sky-900/40 dark:to-sky-800/20 flex items-center justify-center">
+										<BookOpen className="h-[15px] w-[15px] text-sky-500" />
+									</div>
+									{t("pricing.quotations.introduction")}
+								</span>
+								<ChevronDown className="h-4 w-4 text-muted-foreground transition-transform [[data-state=open]>&]:rotate-180" />
+							</button>
+						</CollapsibleTrigger>
+						<CollapsibleContent>
+							<div className="px-5 pb-5">
+								<Textarea
+									value={introduction}
+									onChange={(e: any) => setIntroduction(e.target.value)}
+									placeholder={t("pricing.quotations.introductionPlaceholder")}
+									rows={4}
+									disabled={!isEditable}
+									className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background resize-none"
+									maxLength={5000}
+								/>
+							</div>
+						</CollapsibleContent>
+					</div>
+				</Collapsible>
+
+				{/* ─── Content Blocks: BEFORE_TABLE ───────────────��───── */}
+				<Collapsible defaultOpen={contentBlocks.some((b) => b.position === "BEFORE_TABLE")}>
+					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
+						<CollapsibleTrigger asChild>
+							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+								<span className="flex items-center gap-2.5">
+									<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-violet-100 to-violet-50 dark:from-violet-900/40 dark:to-violet-800/20 flex items-center justify-center">
+										<ListChecks className="h-[15px] w-[15px] text-violet-500" />
+									</div>
+									{t("pricing.quotations.contentBlocksBeforeTable")}
+								</span>
+								<ChevronDown className="h-4 w-4 text-muted-foreground transition-transform [[data-state=open]>&]:rotate-180" />
+							</button>
+						</CollapsibleTrigger>
+						<CollapsibleContent>
+							<div className="px-5 pb-5">
+								<QuotationContentBlockEditor
+									blocks={contentBlocks}
+									position="BEFORE_TABLE"
+									onChange={setContentBlocks}
+									disabled={!isEditable}
+								/>
+							</div>
+						</CollapsibleContent>
+					</div>
+				</Collapsible>
+
 				{/* ─── Items Table ─────────────────────────────────────── */}
 				<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
 					<div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800/60">
@@ -985,6 +1091,63 @@ export function QuotationForm({
 						</div>
 					)}
 				</div>
+
+				{/* ─── Content Blocks: AFTER_TABLE ────────────────────── */}
+				<Collapsible defaultOpen={contentBlocks.some((b) => b.position === "AFTER_TABLE")}>
+					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
+						<CollapsibleTrigger asChild>
+							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+								<span className="flex items-center gap-2.5">
+									<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-violet-100 to-violet-50 dark:from-violet-900/40 dark:to-violet-800/20 flex items-center justify-center">
+										<ListChecks className="h-[15px] w-[15px] text-violet-500" />
+									</div>
+									{t("pricing.quotations.contentBlocksAfterTable")}
+								</span>
+								<ChevronDown className="h-4 w-4 text-muted-foreground transition-transform [[data-state=open]>&]:rotate-180" />
+							</button>
+						</CollapsibleTrigger>
+						<CollapsibleContent>
+							<div className="px-5 pb-5">
+								<QuotationContentBlockEditor
+									blocks={contentBlocks}
+									position="AFTER_TABLE"
+									onChange={setContentBlocks}
+									disabled={!isEditable}
+								/>
+							</div>
+						</CollapsibleContent>
+					</div>
+				</Collapsible>
+
+				{/* ─── Terms & Conditions (Collapsible) ───────────────── */}
+				<Collapsible defaultOpen={!!termsAndConditions}>
+					<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
+						<CollapsibleTrigger asChild>
+							<button type="button" className="flex w-full items-center justify-between px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+								<span className="flex items-center gap-2.5">
+									<div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/40 dark:to-emerald-800/20 flex items-center justify-center">
+										<ScrollText className="h-[15px] w-[15px] text-emerald-500" />
+									</div>
+									{t("pricing.quotations.termsAndConditions")}
+								</span>
+								<ChevronDown className="h-4 w-4 text-muted-foreground transition-transform [[data-state=open]>&]:rotate-180" />
+							</button>
+						</CollapsibleTrigger>
+						<CollapsibleContent>
+							<div className="px-5 pb-5">
+								<Textarea
+									value={termsAndConditions}
+									onChange={(e: any) => setTermsAndConditions(e.target.value)}
+									placeholder={t("pricing.quotations.termsAndConditionsPlaceholder")}
+									rows={4}
+									disabled={!isEditable}
+									className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background resize-none"
+									maxLength={5000}
+								/>
+							</div>
+						</CollapsibleContent>
+					</div>
+				</Collapsible>
 
 				{/* ─── Notes + Summary Grid ────────────────────────────── */}
 				<div className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
@@ -1132,6 +1295,11 @@ export function QuotationForm({
 									deliveryTerms: deliveryTerms || orgSettings?.defaultDeliveryTerms || undefined,
 									warrantyTerms: warrantyTerms || orgSettings?.defaultWarrantyTerms || undefined,
 									notes,
+									introduction: introduction || undefined,
+									termsAndConditions: termsAndConditions || undefined,
+									contentBlocks: contentBlocks
+										.filter((b) => b.title.trim() && b.content.trim())
+										.map((b) => ({ title: b.title, content: b.content, position: b.position })),
 								}}
 								template={{
 									elements: (defaultTemplate?.content as { elements?: any[] })?.elements || [],

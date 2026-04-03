@@ -2,6 +2,7 @@ import {
 	createQuotation,
 	updateQuotation,
 	updateQuotationItems,
+	updateQuotationContentBlocks,
 	updateQuotationStatus,
 	deleteQuotation,
 	convertQuotationToInvoice,
@@ -48,6 +49,13 @@ export const createQuotationProcedure = subscriptionProcedure
 			deliveryTerms: optionalTrimmed(MAX_DESC),
 			warrantyTerms: optionalTrimmed(MAX_DESC),
 			notes: optionalTrimmed(MAX_DESC),
+			introduction: z.string().trim().max(5000).optional(),
+			termsAndConditions: z.string().trim().max(5000).optional(),
+			contentBlocks: z.array(z.object({
+				title: z.string().trim().min(1).max(200),
+				content: z.string().trim().min(1).max(5000),
+				position: z.enum(["BEFORE_TABLE", "AFTER_TABLE"]),
+			})).max(20).optional().default([]),
 			templateId: z.string().trim().max(100).optional(),
 			vatPercent: percentage().optional().default(15),
 			discountPercent: percentage().optional().default(0),
@@ -76,6 +84,9 @@ export const createQuotationProcedure = subscriptionProcedure
 			deliveryTerms: input.deliveryTerms,
 			warrantyTerms: input.warrantyTerms,
 			notes: input.notes,
+			introduction: input.introduction,
+			termsAndConditions: input.termsAndConditions,
+			contentBlocks: input.contentBlocks,
 			templateId: input.templateId,
 			vatPercent: input.vatPercent,
 			discountPercent: input.discountPercent,
@@ -132,6 +143,8 @@ export const updateQuotationProcedure = subscriptionProcedure
 			deliveryTerms: optionalTrimmed(MAX_DESC),
 			warrantyTerms: optionalTrimmed(MAX_DESC),
 			notes: optionalTrimmed(MAX_DESC),
+			introduction: z.string().trim().max(5000).optional(),
+			termsAndConditions: z.string().trim().max(5000).optional(),
 			templateId: z.string().trim().max(100).nullish(),
 			vatPercent: percentage().optional(),
 			discountPercent: percentage().optional(),
@@ -215,6 +228,48 @@ export const updateQuotationItemsProcedure = subscriptionProcedure
 				totalPrice: Number(item.totalPrice),
 			})),
 		};
+	});
+
+export const updateQuotationContentBlocksProcedure = subscriptionProcedure
+	.route({
+		method: "PUT",
+		path: "/finance/quotations/{id}/content-blocks",
+		tags: ["Finance", "Quotations"],
+		summary: "Update quotation content blocks",
+	})
+	.input(
+		z.object({
+			organizationId: idString(),
+			id: idString(),
+			contentBlocks: z.array(z.object({
+				title: z.string().trim().min(1).max(200),
+				content: z.string().trim().min(1).max(5000),
+				position: z.enum(["BEFORE_TABLE", "AFTER_TABLE"]),
+			})).max(20),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "pricing",
+			action: "quotations",
+		});
+
+		const result = await updateQuotationContentBlocks(
+			input.id,
+			input.organizationId,
+			input.contentBlocks,
+		);
+
+		orgAuditLog({
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			action: "QUOTATION_CONTENT_UPDATED",
+			entityType: "quotation",
+			entityId: input.id,
+			metadata: { blockCount: input.contentBlocks.length },
+		});
+
+		return result;
 	});
 
 export const updateQuotationStatusProcedure = subscriptionProcedure
