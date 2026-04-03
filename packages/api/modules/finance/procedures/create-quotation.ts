@@ -263,7 +263,7 @@ export const updateQuotationContentBlocksProcedure = subscriptionProcedure
 		orgAuditLog({
 			organizationId: input.organizationId,
 			actorId: context.user.id,
-			action: "QUOTATION_CONTENT_UPDATED",
+			action: "QUOTATION_UPDATED",
 			entityType: "quotation",
 			entityId: input.id,
 			metadata: { blockCount: input.contentBlocks.length },
