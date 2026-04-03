@@ -113,5 +113,6 @@ const docsMeta = defineCollection({
 });
 
 export default defineConfig({
+	// @ts-expect-error fumadocs collections return non-serializable types (zod v4 compat)
 	collections: [posts, legalPages, docs, docsMeta],
 });

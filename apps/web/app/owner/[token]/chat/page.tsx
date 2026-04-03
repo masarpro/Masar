@@ -45,7 +45,7 @@ export default function OwnerPortalChat() {
 
 	const handleSend = () => {
 		if (!message.trim()) return;
-		sendMutation.mutate({ token, content: message.trim() });
+		(sendMutation as any).mutate({ token, content: message.trim() });
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {

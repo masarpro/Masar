@@ -64,7 +64,7 @@ export function InvoiceItemsTable({
 
 	const isColumnVisible = (column: ColumnKey) => visibleColumns.includes(column);
 
-	const units = UNIT_KEYS.map((key: any) => ({
+	const units = UNIT_KEYS.map((key) => ({
 		value: UNIT_VALUES[key],
 		label: t(`finance.units.${key}`),
 	}));

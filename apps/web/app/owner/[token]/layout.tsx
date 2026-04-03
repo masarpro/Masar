@@ -48,7 +48,7 @@ export default function OwnerPortalLayout({
 
 	useEffect(() => {
 		if (sessionToken) return; // Already have a session
-		exchangeMutation.mutate(
+		(exchangeMutation as any).mutate(
 			{ token },
 			{
 				onSuccess: (data: any) => {
