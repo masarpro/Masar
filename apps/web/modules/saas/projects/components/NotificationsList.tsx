@@ -81,7 +81,7 @@ export function NotificationsList({
 					queryKey: [["notifications", "list"]],
 				});
 			},
-			onError: (error) => {
+			onError: (error: any) => {
 				toast.error(error.message || t("notifications.markReadError"));
 			},
 		}),
@@ -167,7 +167,7 @@ export function NotificationsList({
 				</div>
 			) : (
 				<div className="space-y-3">
-					{data.items.map((notification) => {
+					{data.items.map((notification: any) => {
 						const link = getNotificationLink(notification, organizationSlug);
 						const isUnread = !notification.readAt;
 
@@ -200,7 +200,7 @@ export function NotificationsList({
 										<Button
 											variant="ghost"
 											size="sm"
-											onClick={(e) => {
+											onClick={(e: any) => {
 												e.preventDefault();
 												handleMarkRead(notification.id);
 											}}

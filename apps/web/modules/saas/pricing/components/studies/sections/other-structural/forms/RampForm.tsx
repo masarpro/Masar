@@ -23,7 +23,7 @@ export function RampForm({ data, onChange }: ElementFormProps<RampInput>) {
 			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 				<div>
 					<Label>{t("fields.rampType")}</Label>
-					<Select value={data.rampType} onValueChange={(v) => set("rampType", v)}>
+					<Select value={data.rampType} onValueChange={(v: any) => set("rampType", v)}>
 						<SelectTrigger><SelectValue /></SelectTrigger>
 						<SelectContent>
 							<SelectItem value="CAR_RAMP">{t("rampTypes.CAR_RAMP")}</SelectItem>
@@ -34,20 +34,20 @@ export function RampForm({ data, onChange }: ElementFormProps<RampInput>) {
 				</div>
 				<div>
 					<Label>{t("fields.length")} (م)</Label>
-					<Input type="number" min={0} step={0.5} value={data.length || ""} onChange={(e) => set("length", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0} step={0.5} value={data.length || ""} onChange={(e: any) => set("length", parseFloat(e.target.value) || 0)} />
 				</div>
 				<div>
 					<Label>{t("fields.width")} (م)</Label>
-					<Input type="number" min={0} step={0.1} value={data.width || ""} onChange={(e) => set("width", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0} step={0.1} value={data.width || ""} onChange={(e: any) => set("width", parseFloat(e.target.value) || 0)} />
 				</div>
 				<div>
 					<Label>{t("fields.quantity")}</Label>
-					<Input type="number" min={1} step={1} value={data.quantity || 1} onChange={(e) => set("quantity", parseInt(e.target.value) || 1)} />
+					<Input type="number" min={1} step={1} value={data.quantity || 1} onChange={(e: any) => set("quantity", parseInt(e.target.value) || 1)} />
 				</div>
 			</div>
 
 			<div className="flex items-center gap-2">
-				<Checkbox id="hasWalls" checked={data.hasWalls} onCheckedChange={(v) => set("hasWalls", !!v)} />
+				<Checkbox id="hasWalls" checked={data.hasWalls} onCheckedChange={(v: any) => set("hasWalls", !!v)} />
 				<Label htmlFor="hasWalls">{t("fields.hasWalls")}</Label>
 			</div>
 
@@ -59,17 +59,17 @@ export function RampForm({ data, onChange }: ElementFormProps<RampInput>) {
 				<div className="grid grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.slabThickness")} (سم)</Label>
-						<Input type="number" value={data.thickness} onChange={(e) => set("thickness", parseFloat(e.target.value) || 20)} />
+						<Input type="number" value={data.thickness} onChange={(e: any) => set("thickness", parseFloat(e.target.value) || 20)} />
 					</div>
 					{data.hasWalls && (
 						<>
 							<div>
 								<Label>{t("fields.wallHeight")} (سم)</Label>
-								<Input type="number" value={data.wallHeight} onChange={(e) => set("wallHeight", parseFloat(e.target.value) || 100)} />
+								<Input type="number" value={data.wallHeight} onChange={(e: any) => set("wallHeight", parseFloat(e.target.value) || 100)} />
 							</div>
 							<div>
 								<Label>{t("fields.wallThickness")} (سم)</Label>
-								<Input type="number" value={data.wallThickness} onChange={(e) => set("wallThickness", parseFloat(e.target.value) || 20)} />
+								<Input type="number" value={data.wallThickness} onChange={(e: any) => set("wallThickness", parseFloat(e.target.value) || 20)} />
 							</div>
 						</>
 					)}

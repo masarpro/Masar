@@ -496,7 +496,7 @@ export function StructuralBuildingWizard({
 					<div className="flex items-center gap-3 bg-amber-50/30 dark:bg-amber-950/10 border border-amber-200/50 rounded-lg p-3">
 						<Switch
 							checked={heightProps.hasParapet}
-							onCheckedChange={(checked) =>
+							onCheckedChange={(checked: any) =>
 								updateHeightProperties({ hasParapet: checked })
 							}
 						/>
@@ -657,7 +657,7 @@ export function StructuralBuildingWizard({
 										<div className="flex items-center gap-2 col-span-2">
 											<Switch
 												checked={heightProps.includeFinishInLevels}
-												onCheckedChange={(checked) =>
+												onCheckedChange={(checked: any) =>
 													updateHeightProperties({ includeFinishInLevels: checked })
 												}
 											/>

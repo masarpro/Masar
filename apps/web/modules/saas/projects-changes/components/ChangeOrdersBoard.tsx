@@ -295,7 +295,7 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 						<Input
 							placeholder={t("changeOrders.search")}
 							value={searchQuery}
-							onChange={(e) => {
+							onChange={(e: any) => {
 								setSearchQuery(e.target.value);
 								setPage(1);
 							}}
@@ -304,7 +304,7 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 					</div>
 					<Select
 						value={statusFilter}
-						onValueChange={(value) => {
+						onValueChange={(value: any) => {
 							setStatusFilter(value);
 							setPage(1);
 						}}

@@ -114,7 +114,7 @@ export function ActivationCodesManager() {
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{codes.map((code) => (
+							{codes.map((code: any) => (
 								<CodeRow
 									key={code.id}
 									code={code}
@@ -322,7 +322,7 @@ function CreateCodeDialog({
 						</Label>
 						<Input
 							value={description}
-							onChange={(e) => setDescription(e.target.value)}
+							onChange={(e: any) => setDescription(e.target.value)}
 							placeholder={t(
 								"admin.activationCodes.descriptionPlaceholder",
 							)}
@@ -366,7 +366,7 @@ function CreateCodeDialog({
 								type="number"
 								min={1}
 								value={maxUses}
-								onChange={(e) => setMaxUses(e.target.value)}
+								onChange={(e: any) => setMaxUses(e.target.value)}
 							/>
 						</div>
 						<div className="space-y-2">
@@ -377,7 +377,7 @@ function CreateCodeDialog({
 								type="number"
 								min={1}
 								value={maxUsers}
-								onChange={(e) => setMaxUsers(e.target.value)}
+								onChange={(e: any) => setMaxUsers(e.target.value)}
 							/>
 						</div>
 					</div>
@@ -390,7 +390,7 @@ function CreateCodeDialog({
 							type="number"
 							min={1}
 							value={maxProjects}
-							onChange={(e) => setMaxProjects(e.target.value)}
+							onChange={(e: any) => setMaxProjects(e.target.value)}
 						/>
 					</div>
 
@@ -401,7 +401,7 @@ function CreateCodeDialog({
 						<Input
 							type="date"
 							value={expiresAt}
-							onChange={(e) => setExpiresAt(e.target.value)}
+							onChange={(e: any) => setExpiresAt(e.target.value)}
 							dir="ltr"
 						/>
 					</div>

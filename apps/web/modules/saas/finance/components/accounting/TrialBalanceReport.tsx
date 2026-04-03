@@ -53,11 +53,11 @@ export function TrialBalanceReport({ organizationId }: TrialBalanceReportProps) 
 			<div className="flex flex-wrap items-end gap-3 print:hidden">
 				<div>
 					<Label className="text-xs">{t("finance.accounting.trialBalance.asOfDate")}</Label>
-					<Input type="date" value={asOfDate} onChange={(e) => setAsOfDate(e.target.value)} className="rounded-xl h-9 w-40" />
+					<Input type="date" value={asOfDate} onChange={(e: any) => setAsOfDate(e.target.value)} className="rounded-xl h-9 w-40" />
 				</div>
 				<div>
 					<Label className="text-xs">{t("finance.accounting.trialBalance.periodFrom")}</Label>
-					<Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="rounded-xl h-9 w-40" />
+					<Input type="date" value={dateFrom} onChange={(e: any) => setDateFrom(e.target.value)} className="rounded-xl h-9 w-40" />
 				</div>
 				<label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer">
 					<input type="checkbox" checked={includeZero} onChange={(e) => setIncludeZero(e.target.checked)} className="rounded" />
@@ -123,7 +123,7 @@ export function TrialBalanceReport({ organizationId }: TrialBalanceReportProps) 
 										</TableRow>
 									</TableHeader>
 									<TableBody>
-										{data.rows.map((row) => {
+										{data.rows.map((row: any) => {
 											const colors = ACCOUNT_TYPE_COLORS[row.accountType];
 											const isLevel1 = row.level === 1;
 											return (

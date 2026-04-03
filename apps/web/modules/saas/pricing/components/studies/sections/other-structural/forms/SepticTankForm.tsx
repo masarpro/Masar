@@ -23,7 +23,7 @@ export function SepticTankForm({ data, onChange }: ElementFormProps<SepticTankIn
 			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 				<div>
 					<Label>{t("fields.tankType")}</Label>
-					<Select value={data.tankType} onValueChange={(v) => set("tankType", v)}>
+					<Select value={data.tankType} onValueChange={(v: any) => set("tankType", v)}>
 						<SelectTrigger><SelectValue /></SelectTrigger>
 						<SelectContent>
 							<SelectItem value="SEALED">{t("tankTypes.SEALED")}</SelectItem>
@@ -35,7 +35,7 @@ export function SepticTankForm({ data, onChange }: ElementFormProps<SepticTankIn
 				</div>
 				<div>
 					<Label>{t("fields.wallType")}</Label>
-					<Select value={data.wallType} onValueChange={(v) => set("wallType", v)}>
+					<Select value={data.wallType} onValueChange={(v: any) => set("wallType", v)}>
 						<SelectTrigger><SelectValue /></SelectTrigger>
 						<SelectContent>
 							<SelectItem value="RC">{t("wallTypes.RC")}</SelectItem>
@@ -50,19 +50,19 @@ export function SepticTankForm({ data, onChange }: ElementFormProps<SepticTankIn
 			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 				<div>
 					<Label>{t("fields.length")} (م)</Label>
-					<Input type="number" min={0} step={0.1} value={data.length || ""} onChange={(e) => set("length", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0} step={0.1} value={data.length || ""} onChange={(e: any) => set("length", parseFloat(e.target.value) || 0)} />
 				</div>
 				<div>
 					<Label>{t("fields.width")} (م)</Label>
-					<Input type="number" min={0} step={0.1} value={data.width || ""} onChange={(e) => set("width", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0} step={0.1} value={data.width || ""} onChange={(e: any) => set("width", parseFloat(e.target.value) || 0)} />
 				</div>
 				<div>
 					<Label>{t("fields.depth")} (م)</Label>
-					<Input type="number" min={0} step={0.1} value={data.depth || ""} onChange={(e) => set("depth", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0} step={0.1} value={data.depth || ""} onChange={(e: any) => set("depth", parseFloat(e.target.value) || 0)} />
 				</div>
 				<div>
 					<Label>{t("fields.quantity")}</Label>
-					<Input type="number" min={1} step={1} value={data.quantity || 1} onChange={(e) => set("quantity", parseInt(e.target.value) || 1)} />
+					<Input type="number" min={1} step={1} value={data.quantity || 1} onChange={(e: any) => set("quantity", parseInt(e.target.value) || 1)} />
 				</div>
 			</div>
 
@@ -75,15 +75,15 @@ export function SepticTankForm({ data, onChange }: ElementFormProps<SepticTankIn
 				<div className="grid grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.wallThickness")} (سم)</Label>
-						<Input type="number" min={10} step={5} value={data.wallThickness} onChange={(e) => set("wallThickness", parseFloat(e.target.value) || 20)} />
+						<Input type="number" min={10} step={5} value={data.wallThickness} onChange={(e: any) => set("wallThickness", parseFloat(e.target.value) || 20)} />
 					</div>
 					<div>
 						<Label>{t("fields.baseThickness")} (سم)</Label>
-						<Input type="number" min={15} step={5} value={data.baseThickness} onChange={(e) => set("baseThickness", parseFloat(e.target.value) || 25)} />
+						<Input type="number" min={15} step={5} value={data.baseThickness} onChange={(e: any) => set("baseThickness", parseFloat(e.target.value) || 25)} />
 					</div>
 					<div>
 						<Label>{t("fields.slabThickness")} (سم)</Label>
-						<Input type="number" min={10} step={5} value={data.slabThickness} onChange={(e) => set("slabThickness", parseFloat(e.target.value) || 15)} />
+						<Input type="number" min={10} step={5} value={data.slabThickness} onChange={(e: any) => set("slabThickness", parseFloat(e.target.value) || 15)} />
 					</div>
 				</div>
 			)}

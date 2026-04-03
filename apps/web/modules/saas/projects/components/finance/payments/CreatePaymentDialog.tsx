@@ -177,7 +177,7 @@ export function CreatePaymentDialog({
 							step="0.01"
 							min="0.01"
 							value={amount}
-							onChange={(e) => setAmount(e.target.value)}
+							onChange={(e: any) => setAmount(e.target.value)}
 							placeholder="0.00"
 							required
 						/>
@@ -189,7 +189,7 @@ export function CreatePaymentDialog({
 						<Input
 							type="date"
 							value={date}
-							onChange={(e) => setDate(e.target.value)}
+							onChange={(e: any) => setDate(e.target.value)}
 							required
 						/>
 					</div>
@@ -216,7 +216,7 @@ export function CreatePaymentDialog({
 						<Label>{t("projectPayments.referenceNo")}</Label>
 						<Input
 							value={referenceNo}
-							onChange={(e) => setReferenceNo(e.target.value)}
+							onChange={(e: any) => setReferenceNo(e.target.value)}
 							placeholder={t("projectPayments.referenceNoPlaceholder")}
 						/>
 					</div>
@@ -230,7 +230,7 @@ export function CreatePaymentDialog({
 									<SelectValue placeholder={t("projectPayments.selectAccount")} />
 								</SelectTrigger>
 								<SelectContent>
-									{accounts.map((account) => (
+									{accounts.map((account: any) => (
 										<SelectItem key={account.id} value={account.id}>
 											{account.name}
 										</SelectItem>
@@ -245,7 +245,7 @@ export function CreatePaymentDialog({
 						<Label>{t("projectPayments.description")}</Label>
 						<Input
 							value={description}
-							onChange={(e) => setDescription(e.target.value)}
+							onChange={(e: any) => setDescription(e.target.value)}
 							placeholder={t("projectPayments.descriptionPlaceholder")}
 						/>
 					</div>
@@ -255,7 +255,7 @@ export function CreatePaymentDialog({
 						<Label>{t("projectPayments.note")}</Label>
 						<Textarea
 							value={note}
-							onChange={(e) => setNote(e.target.value)}
+							onChange={(e: any) => setNote(e.target.value)}
 							placeholder={t("projectPayments.notePlaceholder")}
 							rows={2}
 						/>

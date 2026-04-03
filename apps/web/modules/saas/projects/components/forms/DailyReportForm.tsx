@@ -128,7 +128,7 @@ export function DailyReportForm({
 								id="reportDate"
 								type="date"
 								value={reportDate}
-								onChange={(e) => setReportDate(e.target.value)}
+								onChange={(e: any) => setReportDate(e.target.value)}
 								required
 								className="rounded-xl"
 							/>
@@ -139,7 +139,7 @@ export function DailyReportForm({
 							<Label>{t("projects.field.weatherLabel")}</Label>
 							<Select
 								value={weather}
-								onValueChange={(v) => setWeather(v as WeatherCondition)}
+								onValueChange={(v: any) => setWeather(v as WeatherCondition)}
 							>
 								<SelectTrigger className="rounded-xl">
 									<SelectValue />
@@ -162,7 +162,7 @@ export function DailyReportForm({
 								type="number"
 								min="0"
 								value={manpower}
-								onChange={(e) => setManpower(e.target.value)}
+								onChange={(e: any) => setManpower(e.target.value)}
 								placeholder="0"
 								className="rounded-xl"
 							/>
@@ -176,7 +176,7 @@ export function DailyReportForm({
 							<Input
 								id="equipment"
 								value={equipment}
-								onChange={(e) => setEquipment(e.target.value)}
+								onChange={(e: any) => setEquipment(e.target.value)}
 								placeholder={t("projects.field.equipmentPlaceholder")}
 								className="rounded-xl"
 							/>
@@ -189,7 +189,7 @@ export function DailyReportForm({
 						<Textarea
 							id="workDone"
 							value={workDone}
-							onChange={(e) => setWorkDone(e.target.value)}
+							onChange={(e: any) => setWorkDone(e.target.value)}
 							placeholder={t("projects.field.workDonePlaceholder")}
 							rows={4}
 							required
@@ -203,7 +203,7 @@ export function DailyReportForm({
 						<Textarea
 							id="blockers"
 							value={blockers}
-							onChange={(e) => setBlockers(e.target.value)}
+							onChange={(e: any) => setBlockers(e.target.value)}
 							placeholder={t("projects.field.blockersPlaceholder")}
 							rows={3}
 							className="rounded-xl"

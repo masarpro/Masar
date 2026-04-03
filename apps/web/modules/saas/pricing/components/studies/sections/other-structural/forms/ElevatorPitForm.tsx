@@ -23,7 +23,7 @@ export function ElevatorPitForm({ data, onChange }: ElementFormProps<ElevatorPit
 			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 				<div>
 					<Label>{t("fields.elevatorType")}</Label>
-					<Select value={data.elevatorType} onValueChange={(v) => set("elevatorType", v)}>
+					<Select value={data.elevatorType} onValueChange={(v: any) => set("elevatorType", v)}>
 						<SelectTrigger><SelectValue /></SelectTrigger>
 						<SelectContent>
 							<SelectItem value="ELECTRIC_MRL">{t("elevatorTypes.ELECTRIC_MRL")}</SelectItem>
@@ -34,35 +34,35 @@ export function ElevatorPitForm({ data, onChange }: ElementFormProps<ElevatorPit
 				</div>
 				<div>
 					<Label>{t("fields.numberOfStops")}</Label>
-					<Input type="number" min={2} step={1} value={data.numberOfStops} onChange={(e) => set("numberOfStops", parseInt(e.target.value) || 3)} />
+					<Input type="number" min={2} step={1} value={data.numberOfStops} onChange={(e: any) => set("numberOfStops", parseInt(e.target.value) || 3)} />
 				</div>
 				<div>
 					<Label>{t("fields.floorHeight")} (م)</Label>
-					<Input type="number" min={2} step={0.1} value={data.floorHeight} onChange={(e) => set("floorHeight", parseFloat(e.target.value) || 3.2)} />
+					<Input type="number" min={2} step={0.1} value={data.floorHeight} onChange={(e: any) => set("floorHeight", parseFloat(e.target.value) || 3.2)} />
 				</div>
 				<div>
 					<Label>{t("fields.quantity")}</Label>
-					<Input type="number" min={1} step={1} value={data.quantity || 1} onChange={(e) => set("quantity", parseInt(e.target.value) || 1)} />
+					<Input type="number" min={1} step={1} value={data.quantity || 1} onChange={(e: any) => set("quantity", parseInt(e.target.value) || 1)} />
 				</div>
 			</div>
 
 			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 				<div>
 					<Label>{t("fields.pitWidth")} (م)</Label>
-					<Input type="number" min={0} step={0.1} value={data.pitWidth} onChange={(e) => set("pitWidth", parseFloat(e.target.value) || 1.6)} />
+					<Input type="number" min={0} step={0.1} value={data.pitWidth} onChange={(e: any) => set("pitWidth", parseFloat(e.target.value) || 1.6)} />
 				</div>
 				<div>
 					<Label>{t("fields.pitLength")} (م)</Label>
-					<Input type="number" min={0} step={0.1} value={data.pitLength} onChange={(e) => set("pitLength", parseFloat(e.target.value) || 1.6)} />
+					<Input type="number" min={0} step={0.1} value={data.pitLength} onChange={(e: any) => set("pitLength", parseFloat(e.target.value) || 1.6)} />
 				</div>
 				<div>
 					<Label>{t("fields.pitHoleDepth")} (م)</Label>
-					<Input type="number" min={0} step={0.1} value={data.pitHoleDepth} onChange={(e) => set("pitHoleDepth", parseFloat(e.target.value) || 1.2)} />
+					<Input type="number" min={0} step={0.1} value={data.pitHoleDepth} onChange={(e: any) => set("pitHoleDepth", parseFloat(e.target.value) || 1.2)} />
 				</div>
 			</div>
 
 			<div className="flex items-center gap-2">
-				<Checkbox id="hasMachineRoom" checked={data.hasMachineRoom} onCheckedChange={(v) => set("hasMachineRoom", !!v)} />
+				<Checkbox id="hasMachineRoom" checked={data.hasMachineRoom} onCheckedChange={(v: any) => set("hasMachineRoom", !!v)} />
 				<Label htmlFor="hasMachineRoom">{t("fields.hasMachineRoom")}</Label>
 			</div>
 
@@ -70,7 +70,7 @@ export function ElevatorPitForm({ data, onChange }: ElementFormProps<ElevatorPit
 				<div className="grid grid-cols-2 gap-3">
 					<div>
 						<Label>{t("fields.machineRoomHeight")} (م)</Label>
-						<Input type="number" min={2} step={0.1} value={data.machineRoomHeight ?? 2.5} onChange={(e) => set("machineRoomHeight", parseFloat(e.target.value) || 2.5)} />
+						<Input type="number" min={2} step={0.1} value={data.machineRoomHeight ?? 2.5} onChange={(e: any) => set("machineRoomHeight", parseFloat(e.target.value) || 2.5)} />
 					</div>
 				</div>
 			)}
@@ -83,15 +83,15 @@ export function ElevatorPitForm({ data, onChange }: ElementFormProps<ElevatorPit
 				<div className="grid grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.wallThickness")} (سم)</Label>
-						<Input type="number" value={data.wallThickness} onChange={(e) => set("wallThickness", parseFloat(e.target.value) || 25)} />
+						<Input type="number" value={data.wallThickness} onChange={(e: any) => set("wallThickness", parseFloat(e.target.value) || 25)} />
 					</div>
 					<div>
 						<Label>{t("fields.pitSlabThickness")} (سم)</Label>
-						<Input type="number" value={data.pitSlabThickness} onChange={(e) => set("pitSlabThickness", parseFloat(e.target.value) || 25)} />
+						<Input type="number" value={data.pitSlabThickness} onChange={(e: any) => set("pitSlabThickness", parseFloat(e.target.value) || 25)} />
 					</div>
 					<div>
 						<Label>{t("fields.overTravel")} (م)</Label>
-						<Input type="number" value={data.overTravel} onChange={(e) => set("overTravel", parseFloat(e.target.value) || 3.5)} />
+						<Input type="number" value={data.overTravel} onChange={(e: any) => set("overTravel", parseFloat(e.target.value) || 3.5)} />
 					</div>
 				</div>
 			)}

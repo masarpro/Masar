@@ -260,7 +260,7 @@ export function OrganizationDetail({
 							</TableHeader>
 							<TableBody>
 								{members?.length ? (
-									members.map((member) => (
+									members.map((member: any) => (
 										<TableRow key={member.id}>
 											<TableCell>
 												<div>
@@ -302,7 +302,7 @@ export function OrganizationDetail({
 							</TableHeader>
 							<TableBody>
 								{projects?.length ? (
-									projects.map((project) => (
+									projects.map((project: any) => (
 										<TableRow key={project.id}>
 											<TableCell className="font-medium">
 												{project.name}
@@ -344,7 +344,7 @@ export function OrganizationDetail({
 							</TableHeader>
 							<TableBody>
 								{paymentHistory?.length ? (
-									paymentHistory.map((event) => (
+									paymentHistory.map((event: any) => (
 										<TableRow key={event.id}>
 											<TableCell>
 												{new Date(
@@ -394,7 +394,7 @@ export function OrganizationDetail({
 							</TableHeader>
 							<TableBody>
 								{org.superAdminLogs?.length ? (
-									org.superAdminLogs.map((log) => (
+									org.superAdminLogs.map((log: any) => (
 										<TableRow key={log.id}>
 											<TableCell>
 												{new Date(

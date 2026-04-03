@@ -211,7 +211,7 @@ export function MEPItemsView({
 									<TableCell>
 										<Select
 											value={item.projectPhaseId ?? "__none__"}
-											onValueChange={(value) => {
+											onValueChange={(value: any) => {
 												assignMutation.mutate({
 													itemId: item.id,
 													phaseId: value === "__none__" ? null : value,
@@ -226,7 +226,7 @@ export function MEPItemsView({
 												<SelectItem value="__none__">
 													\u0628\u062F\u0648\u0646 \u0645\u0631\u062D\u0644\u0629
 												</SelectItem>
-												{milestones.map((milestone) => (
+												{milestones.map((milestone: any) => (
 													<SelectItem key={milestone.id} value={milestone.id}>
 														{milestone.title}
 													</SelectItem>

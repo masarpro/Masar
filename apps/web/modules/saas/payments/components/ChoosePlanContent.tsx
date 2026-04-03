@@ -846,7 +846,7 @@ function ActivationCodeSection() {
 						<Input
 							placeholder={t("choosePlan.codePlaceholder")}
 							value={code}
-							onChange={(e) => {
+							onChange={(e: any) => {
 								setCode(e.target.value.toUpperCase());
 								setValidatedData(null);
 								setValidationError(false);
@@ -857,7 +857,7 @@ function ActivationCodeSection() {
 									: ""
 							}`}
 							dir="ltr"
-							onKeyDown={(e) => {
+							onKeyDown={(e: any) => {
 								if (e.key === "Enter") handleVerify();
 							}}
 						/>

@@ -105,7 +105,7 @@ export function CopyFromQuotationDialog({
 						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
 						<Input
 							value={search}
-							onChange={(e) => setSearch(e.target.value)}
+							onChange={(e: any) => setSearch(e.target.value)}
 							placeholder={t("copyQuotation.search")}
 							className="ps-9 rounded-xl h-10"
 						/>
@@ -116,7 +116,7 @@ export function CopyFromQuotationDialog({
 						<Checkbox
 							id="includePrices"
 							checked={includePrices}
-							onCheckedChange={(checked) =>
+							onCheckedChange={(checked: any) =>
 								setIncludePrices(checked === true)
 							}
 						/>

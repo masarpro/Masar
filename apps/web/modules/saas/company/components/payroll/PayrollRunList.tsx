@@ -70,7 +70,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 	const runs = data?.runs ?? [];
 	const latestRun = runs.length > 0 ? runs[0] : null;
 
-	const currentMonthRun = runs.find((r) => {
+	const currentMonthRun = runs.find((r: any) => {
 		const now = new Date();
 		return r.month === now.getMonth() + 1 && r.year === now.getFullYear();
 	});
@@ -217,7 +217,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 								</TableRow>
 							))
 						) : runs.length ? (
-							runs.map((run, index) => (
+							runs.map((run: any, index: any) => (
 								<TableRow
 									key={run.id}
 									className="cursor-pointer border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
@@ -247,7 +247,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 											size="icon"
 											className="rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/50"
 											aria-label={t("company.payroll.viewDetails")}
-											onClick={(e) => {
+											onClick={(e: any) => {
 												e.stopPropagation();
 												router.push(`/app/${organizationSlug}/company/payroll/${run.id}`);
 											}}
@@ -299,7 +299,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 										</Label>
 										<Select
 											value={String(createMonth)}
-											onValueChange={(value) => setCreateMonth(Number(value))}
+											onValueChange={(value: any) => setCreateMonth(Number(value))}
 										>
 											<SelectTrigger className="rounded-xl h-10">
 												<SelectValue />
@@ -322,7 +322,7 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 											min={2020}
 											max={2100}
 											value={createYear}
-											onChange={(e) => setCreateYear(Number(e.target.value))}
+											onChange={(e: any) => setCreateYear(Number(e.target.value))}
 											className="rounded-xl h-10"
 											required
 										/>

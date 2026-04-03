@@ -84,7 +84,7 @@ export function PasskeysBlock() {
 						<Skeleton className="size-9 shrink-0" />
 					</div>
 				) : (
-					passkeys?.map((passkey) => (
+					passkeys?.map((passkey: any) => (
 						<div key={passkey.id} className="flex gap-2">
 							<KeyIcon className="size-6 shrink-0 text-primary/50" />
 							<div className="flex-1">

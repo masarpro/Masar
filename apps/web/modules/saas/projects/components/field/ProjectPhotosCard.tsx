@@ -146,7 +146,7 @@ export function ProjectPhotosCard({
 	// Filter by active category
 	const filteredPhotos = useMemo(() => {
 		if (activeCategory === "ALL") return allPhotos;
-		return allPhotos.filter((p) => p.category === activeCategory);
+		return allPhotos.filter((p: any) => p.category === activeCategory);
 	}, [allPhotos, activeCategory]);
 
 	// Group photos by date
@@ -184,7 +184,7 @@ export function ProjectPhotosCard({
 	// Lightbox slides
 	const lightboxSlides = useMemo(
 		() =>
-			filteredPhotos.map((photo) => ({
+			filteredPhotos.map((photo: any) => ({
 				src: photo.url,
 				title: photo.caption || undefined,
 				description: `${t(`projects.field.photoCategory.${photo.category}`)} — ${formatPhotoDate(photo.createdAt)}`,
@@ -218,7 +218,7 @@ export function ProjectPhotosCard({
 
 	// Find the index in filteredPhotos for opening lightbox
 	const openLightbox = (photoId: string) => {
-		const idx = filteredPhotos.findIndex((p) => p.id === photoId);
+		const idx = filteredPhotos.findIndex((p: any) => p.id === photoId);
 		if (idx >= 0) setLightboxIndex(idx);
 	};
 
@@ -364,7 +364,7 @@ export function ProjectPhotosCard({
 									<div className="h-px flex-1 bg-slate-100 dark:bg-slate-800" />
 								</div>
 								<div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
-									{photos.map((photo) => (
+									{photos.map((photo: any) => (
 										<PhotoThumbnail
 											key={photo.id}
 											photo={photo}
@@ -408,7 +408,7 @@ export function ProjectPhotosCard({
 									<div className="h-px flex-1 bg-slate-100 dark:bg-slate-800" />
 								</div>
 								<div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
-									{photos.map((photo) => (
+									{photos.map((photo: any) => (
 										<PhotoThumbnail
 											key={photo.id}
 											photo={photo}
@@ -437,7 +437,7 @@ export function ProjectPhotosCard({
 			{/* Delete confirmation */}
 			<AlertDialog
 				open={!!photoToDelete}
-				onOpenChange={(open) => !open && setPhotoToDelete(null)}
+				onOpenChange={(open: any) => !open && setPhotoToDelete(null)}
 			>
 				<AlertDialogContent>
 					<AlertDialogHeader>

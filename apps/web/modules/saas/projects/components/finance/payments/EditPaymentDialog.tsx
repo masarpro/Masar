@@ -136,7 +136,7 @@ export function EditPaymentDialog({
 							step="0.01"
 							min="0.01"
 							value={amount}
-							onChange={(e) => setAmount(e.target.value)}
+							onChange={(e: any) => setAmount(e.target.value)}
 							required
 						/>
 					</div>
@@ -147,7 +147,7 @@ export function EditPaymentDialog({
 						<Input
 							type="date"
 							value={date}
-							onChange={(e) => setDate(e.target.value)}
+							onChange={(e: any) => setDate(e.target.value)}
 							required
 						/>
 					</div>
@@ -174,7 +174,7 @@ export function EditPaymentDialog({
 						<Label>{t("projectPayments.referenceNo")}</Label>
 						<Input
 							value={referenceNo}
-							onChange={(e) => setReferenceNo(e.target.value)}
+							onChange={(e: any) => setReferenceNo(e.target.value)}
 						/>
 					</div>
 
@@ -187,7 +187,7 @@ export function EditPaymentDialog({
 									<SelectValue placeholder={t("projectPayments.selectAccount")} />
 								</SelectTrigger>
 								<SelectContent>
-									{accounts.map((account) => (
+									{accounts.map((account: any) => (
 										<SelectItem key={account.id} value={account.id}>
 											{account.name}
 										</SelectItem>
@@ -202,7 +202,7 @@ export function EditPaymentDialog({
 						<Label>{t("projectPayments.description")}</Label>
 						<Input
 							value={description}
-							onChange={(e) => setDescription(e.target.value)}
+							onChange={(e: any) => setDescription(e.target.value)}
 						/>
 					</div>
 
@@ -211,7 +211,7 @@ export function EditPaymentDialog({
 						<Label>{t("projectPayments.note")}</Label>
 						<Textarea
 							value={note}
-							onChange={(e) => setNote(e.target.value)}
+							onChange={(e: any) => setNote(e.target.value)}
 							rows={2}
 						/>
 					</div>

@@ -115,7 +115,7 @@ export function AttachmentList({
 	return (
 		<div className={className}>
 			<div className="space-y-2">
-				{attachments.map((attachment) => {
+				{attachments.map((attachment: any) => {
 					const Icon = getFileIcon(attachment.mimeType);
 					return (
 						<div

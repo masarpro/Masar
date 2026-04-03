@@ -204,7 +204,7 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 								<Input
 									placeholder={t("subcontracts.detail.searchPayments")}
 									value={paymentSearch}
-									onChange={(e) => setPaymentSearch(e.target.value)}
+									onChange={(e: any) => setPaymentSearch(e.target.value)}
 									className="h-8 rounded-lg ps-9 text-xs"
 								/>
 							</div>

@@ -208,7 +208,7 @@ export function CompanyInfoStep({
 					<FormField
 						control={form.control}
 						name="name"
-						render={({ field }) => (
+						render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>
 									{t("onboarding.wizard.companyInfo.name")} *
@@ -231,7 +231,7 @@ export function CompanyInfoStep({
 						<FormField
 							control={form.control}
 							name="commercialRegister"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>
 										{t("onboarding.wizard.companyInfo.commercialRegister")}
@@ -248,7 +248,7 @@ export function CompanyInfoStep({
 						<FormField
 							control={form.control}
 							name="taxNumber"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>
 										{t("onboarding.wizard.companyInfo.taxNumber")}
@@ -272,7 +272,7 @@ export function CompanyInfoStep({
 						<FormField
 							control={form.control}
 							name="contractorClass"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>
 										{t("onboarding.wizard.companyInfo.contractorClass")}
@@ -303,7 +303,7 @@ export function CompanyInfoStep({
 						<FormField
 							control={form.control}
 							name="city"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>
 										{t("onboarding.wizard.companyInfo.city")}
@@ -335,7 +335,7 @@ export function CompanyInfoStep({
 					<FormField
 						control={form.control}
 						name="address"
-						render={({ field }) => (
+						render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>
 									{t("onboarding.wizard.companyInfo.address")}
@@ -352,7 +352,7 @@ export function CompanyInfoStep({
 					<FormField
 						control={form.control}
 						name="phone"
-						render={({ field }) => (
+						render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>
 									{t("onboarding.wizard.companyInfo.phone")}

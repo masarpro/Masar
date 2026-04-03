@@ -76,7 +76,7 @@ export function ExpenseCategoryChart({
 			<ChartContainer config={chartConfig} className="mx-auto aspect-square h-48">
 				<PieChart>
 					<ChartTooltip
-						content={({ active, payload }) => {
+						content={({ active, payload }: any) => {
 							if (!active || !payload?.length) return null;
 							const item = payload[0];
 							const percentage = totalAmount > 0

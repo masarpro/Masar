@@ -122,7 +122,7 @@ export function RolesListPage() {
 										<Button
 											variant="ghost"
 											size="sm"
-											onClick={(e) => {
+											onClick={(e: any) => {
 												e.stopPropagation();
 											}}
 										>
@@ -133,7 +133,7 @@ export function RolesListPage() {
 											<Button
 												variant="ghost"
 												size="sm"
-												onClick={(e) => {
+												onClick={(e: any) => {
 													e.stopPropagation();
 													handleDeleteRole(role.id);
 												}}

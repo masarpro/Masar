@@ -302,7 +302,7 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 							<Input
 								className="rounded-xl mt-1"
 								value={form.name}
-								onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+								onChange={(e: any) => setForm((p) => ({ ...p, name: e.target.value }))}
 								placeholder={t("company.leaves.types.namePlaceholder")}
 							/>
 						</div>
@@ -311,7 +311,7 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 							<Input
 								className="rounded-xl mt-1"
 								value={form.nameEn}
-								onChange={(e) => setForm((p) => ({ ...p, nameEn: e.target.value }))}
+								onChange={(e: any) => setForm((p) => ({ ...p, nameEn: e.target.value }))}
 								placeholder={t("company.leaves.types.nameEnPlaceholder")}
 								dir="ltr"
 							/>
@@ -324,7 +324,7 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 									className="rounded-xl mt-1"
 									min={0}
 									value={form.daysPerYear}
-									onChange={(e) => setForm((p) => ({ ...p, daysPerYear: Number(e.target.value) }))}
+									onChange={(e: any) => setForm((p) => ({ ...p, daysPerYear: Number(e.target.value) }))}
 								/>
 							</div>
 							<div>
@@ -333,7 +333,7 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 									type="color"
 									className="rounded-xl mt-1 h-10"
 									value={form.color}
-									onChange={(e) => setForm((p) => ({ ...p, color: e.target.value }))}
+									onChange={(e: any) => setForm((p) => ({ ...p, color: e.target.value }))}
 								/>
 							</div>
 						</div>
@@ -342,7 +342,7 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 								<Checkbox
 									id="isPaid"
 									checked={form.isPaid}
-									onCheckedChange={(checked) => setForm((p) => ({ ...p, isPaid: !!checked }))}
+									onCheckedChange={(checked: any) => setForm((p) => ({ ...p, isPaid: !!checked }))}
 								/>
 								<Label htmlFor="isPaid">{t("company.leaves.types.isPaid")}</Label>
 							</div>
@@ -350,7 +350,7 @@ export function LeaveTypeList({ organizationId, organizationSlug }: LeaveTypeLis
 								<Checkbox
 									id="requiresApproval"
 									checked={form.requiresApproval}
-									onCheckedChange={(checked) => setForm((p) => ({ ...p, requiresApproval: !!checked }))}
+									onCheckedChange={(checked: any) => setForm((p) => ({ ...p, requiresApproval: !!checked }))}
 								/>
 								<Label htmlFor="requiresApproval">{t("company.leaves.types.requiresApproval")}</Label>
 							</div>

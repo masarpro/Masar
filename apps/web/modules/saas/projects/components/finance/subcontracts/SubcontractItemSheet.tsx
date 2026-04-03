@@ -138,7 +138,7 @@ export function SubcontractItemSheet({
 						<Input
 							id="itemCode"
 							value={itemCode}
-							onChange={(e) => setItemCode(e.target.value)}
+							onChange={(e: any) => setItemCode(e.target.value)}
 							placeholder="2-1-1"
 							dir="ltr"
 						/>
@@ -152,7 +152,7 @@ export function SubcontractItemSheet({
 						<Input
 							id="description"
 							value={description}
-							onChange={(e) => setDescription(e.target.value)}
+							onChange={(e: any) => setDescription(e.target.value)}
 							required
 						/>
 					</div>
@@ -165,7 +165,7 @@ export function SubcontractItemSheet({
 						<Input
 							id="descriptionEn"
 							value={descriptionEn}
-							onChange={(e) => setDescriptionEn(e.target.value)}
+							onChange={(e: any) => setDescriptionEn(e.target.value)}
 							dir="ltr"
 						/>
 					</div>
@@ -192,7 +192,7 @@ export function SubcontractItemSheet({
 						<Checkbox
 							id="isLumpSum"
 							checked={isLumpSum}
-							onCheckedChange={(checked) =>
+							onCheckedChange={(checked: any) =>
 								setIsLumpSum(checked === true)
 							}
 						/>
@@ -213,7 +213,7 @@ export function SubcontractItemSheet({
 								step="0.001"
 								min="0"
 								value={contractQty}
-								onChange={(e) => setContractQty(e.target.value)}
+								onChange={(e: any) => setContractQty(e.target.value)}
 								dir="ltr"
 								required={!isLumpSum}
 							/>
@@ -231,7 +231,7 @@ export function SubcontractItemSheet({
 							step="0.01"
 							min="0"
 							value={unitPrice}
-							onChange={(e) => setUnitPrice(e.target.value)}
+							onChange={(e: any) => setUnitPrice(e.target.value)}
 							dir="ltr"
 							required
 						/>

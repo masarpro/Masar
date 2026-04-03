@@ -132,7 +132,7 @@ export const SubcontractClaimsSection = React.memo(function SubcontractClaimsSec
 					</p>
 				) : (
 					<div className="space-y-2">
-						{claims.map((claim) => {
+						{claims.map((claim: any) => {
 							const statusStyle = CLAIM_STATUS_STYLES[claim.status] ?? CLAIM_STATUS_STYLES.DRAFT;
 							const typeStyle = CLAIM_TYPE_STYLES[claim.claimType] ?? CLAIM_TYPE_STYLES.INTERIM;
 							return (

@@ -59,7 +59,7 @@ export function UserLanguageForm() {
 		>
 			<Select
 				value={locale}
-				onValueChange={(value) => {
+				onValueChange={(value: any) => {
 					setLocale(value as Locale);
 					saveLocale();
 				}}

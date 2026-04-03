@@ -96,7 +96,7 @@ export function PricingTable({
 				<div className="mb-6 flex justify-start">
 					<Tabs
 						value={interval}
-						onValueChange={(value) =>
+						onValueChange={(value: any) =>
 							setInterval(value as typeof interval)
 						}
 						data-test="price-table-interval-tabs"
@@ -190,7 +190,7 @@ export function PricingTable({
 										{!!features?.length && (
 											<ul className="mt-4 grid list-none gap-2 text-sm">
 												{features.map(
-													(feature, key) => (
+													(feature: any, key: any) => (
 														<li
 															key={key}
 															className="flex items-center justify-start"

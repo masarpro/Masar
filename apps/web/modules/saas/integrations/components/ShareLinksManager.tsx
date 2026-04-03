@@ -183,7 +183,7 @@ export function ShareLinksManager({ projectId }: ShareLinksManagerProps) {
 								<Label>{t("shares.resourceType")}</Label>
 								<Select
 									value={newLink.resourceType}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										setNewLink({ ...newLink, resourceType: value as ResourceType })
 									}
 								>
@@ -208,7 +208,7 @@ export function ShareLinksManager({ projectId }: ShareLinksManagerProps) {
 								<Label>{t("shares.expiresIn")}</Label>
 								<Select
 									value={newLink.expiresInDays?.toString() || "none"}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										setNewLink({
 											...newLink,
 											expiresInDays:
@@ -259,7 +259,7 @@ export function ShareLinksManager({ projectId }: ShareLinksManagerProps) {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{links.map((link) => (
+						{links.map((link: any) => (
 							<TableRow key={link.token}>
 								<TableCell>
 									<div className="flex items-center gap-2">

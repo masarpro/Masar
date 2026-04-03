@@ -227,7 +227,7 @@ export function TemplateCanvas({
 													variant="ghost"
 													size="icon"
 													className="h-8 w-8"
-													onClick={(e) => {
+													onClick={(e: any) => {
 														e.stopPropagation();
 														onMoveElement(element.id, "up");
 													}}
@@ -239,7 +239,7 @@ export function TemplateCanvas({
 													variant="ghost"
 													size="icon"
 													className="h-8 w-8"
-													onClick={(e) => {
+													onClick={(e: any) => {
 														e.stopPropagation();
 														onMoveElement(element.id, "down");
 													}}
@@ -251,7 +251,7 @@ export function TemplateCanvas({
 													variant="ghost"
 													size="icon"
 													className="h-8 w-8"
-													onClick={(e) => {
+													onClick={(e: any) => {
 														e.stopPropagation();
 														onToggleElement(element.id);
 													}}
@@ -266,7 +266,7 @@ export function TemplateCanvas({
 													variant="ghost"
 													size="icon"
 													className="h-8 w-8 text-destructive hover:text-destructive"
-													onClick={(e) => {
+													onClick={(e: any) => {
 														e.stopPropagation();
 														onRemoveElement(element.id);
 													}}

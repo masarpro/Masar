@@ -105,12 +105,12 @@ export function FinanceReports({
 
 	// Calculate totals from revenue by period
 	const totalRevenue =
-		revenueByPeriod?.reduce((sum, item) => sum + Number(item.revenue), 0) ?? 0;
+		revenueByPeriod?.reduce((sum: any, item: any) => sum + Number(item.revenue), 0) ?? 0;
 
 	// Calculate max revenue for chart scaling
 	const maxRevenue =
 		revenueByPeriod?.reduce(
-			(max, item) => Math.max(max, Number(item.revenue)),
+			(max: any, item: any) => Math.max(max, Number(item.revenue)),
 			0,
 		) ?? 1;
 
@@ -123,7 +123,7 @@ export function FinanceReports({
 					<Input
 						type="date"
 						value={startDate}
-						onChange={(e) => setStartDate(e.target.value)}
+						onChange={(e: any) => setStartDate(e.target.value)}
 						className="rounded-xl h-9 w-36"
 					/>
 				</div>
@@ -132,7 +132,7 @@ export function FinanceReports({
 					<Input
 						type="date"
 						value={endDate}
-						onChange={(e) => setEndDate(e.target.value)}
+						onChange={(e: any) => setEndDate(e.target.value)}
 						className="rounded-xl h-9 w-36"
 					/>
 				</div>
@@ -187,7 +187,7 @@ export function FinanceReports({
 									{t("finance.reports.totalQuotations")}
 								</p>
 								<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
-									{quotationStats?.reduce((sum, s) => sum + s.count, 0) ?? 0}
+									{quotationStats?.reduce((sum: any, s: any) => sum + s.count, 0) ?? 0}
 								</p>
 							</div>
 							<div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
@@ -205,7 +205,7 @@ export function FinanceReports({
 									{t("finance.reports.totalInvoices")}
 								</p>
 								<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
-									{invoiceStats?.reduce((sum, s) => sum + s.count, 0) ?? 0}
+									{invoiceStats?.reduce((sum: any, s: any) => sum + s.count, 0) ?? 0}
 								</p>
 							</div>
 							<div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-xl">
@@ -280,7 +280,7 @@ export function FinanceReports({
 								<div className="space-y-4">
 									{/* Simple Bar Chart */}
 									<div className="space-y-3">
-										{revenueByPeriod.map((item) => (
+										{revenueByPeriod.map((item: any) => (
 											<div key={item.month} className="flex items-center gap-4">
 												<div className="w-20 text-sm text-slate-500 dark:text-slate-400">
 													{item.month}
@@ -336,7 +336,7 @@ export function FinanceReports({
 										</TableRow>
 									</TableHeader>
 									<TableBody>
-										{revenueByProject.map((item) => (
+										{revenueByProject.map((item: any) => (
 											<TableRow key={item.project?.id || "no-project"}>
 												<TableCell className="font-medium">
 													{item.project?.name || t("finance.reports.noProject")}
@@ -387,7 +387,7 @@ export function FinanceReports({
 										</TableRow>
 									</TableHeader>
 									<TableBody>
-										{revenueByClient.map((item, index) => (
+										{revenueByClient.map((item: any, index: any) => (
 											<TableRow key={item.client?.id || index}>
 												<TableCell className="text-slate-400">
 													{index + 1}
@@ -430,7 +430,7 @@ export function FinanceReports({
 									</div>
 								) : (
 									<div className="space-y-3">
-										{quotationStats.map((stat) => (
+										{quotationStats.map((stat: any) => (
 											<div
 												key={stat.status}
 												className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl"
@@ -473,7 +473,7 @@ export function FinanceReports({
 									</div>
 								) : (
 									<div className="space-y-3">
-										{invoiceStats.map((stat) => (
+										{invoiceStats.map((stat: any) => (
 											<div
 												key={stat.status}
 												className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl"

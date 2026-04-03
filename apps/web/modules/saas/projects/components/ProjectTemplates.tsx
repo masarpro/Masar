@@ -136,7 +136,7 @@ export function ProjectTemplates({
 							</label>
 							<Input
 								value={newTemplateName}
-								onChange={(e) => setNewTemplateName(e.target.value)}
+								onChange={(e: any) => setNewTemplateName(e.target.value)}
 								placeholder={t("projects.templates.namePlaceholder")}
 							/>
 						</div>
@@ -146,7 +146,7 @@ export function ProjectTemplates({
 							</label>
 							<Input
 								value={newTemplateDescription}
-								onChange={(e) => setNewTemplateDescription(e.target.value)}
+								onChange={(e: any) => setNewTemplateDescription(e.target.value)}
 								placeholder={t("projects.templates.descriptionPlaceholder")}
 							/>
 						</div>
@@ -172,7 +172,7 @@ export function ProjectTemplates({
 			<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
 				{data?.templates && data.templates.length > 0 ? (
 					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-						{data.templates.map((template) => (
+						{data.templates.map((template: any) => (
 							<div
 								key={template.id}
 								className="group rounded-xl border border-slate-200 bg-slate-50 p-4 transition-all hover:border-primary/30 hover:shadow-md dark:border-slate-700 dark:bg-slate-800/50"

@@ -267,7 +267,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 							<Input
 								placeholder={t("finance.banks.searchPlaceholder")}
 								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
+								onChange={(e: any) => setSearchQuery(e.target.value)}
 								className="ps-10 rounded-xl"
 							/>
 						</div>
@@ -328,7 +328,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{accounts.map((account) => (
+								{accounts.map((account: any) => (
 									<TableRow
 										key={account.id}
 										className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
@@ -390,7 +390,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 												<Currency amount={Number(account.balance)} />
 											</span>
 										</TableCell>
-										<TableCell onClick={(e) => e.stopPropagation()}>
+										<TableCell onClick={(e: any) => e.stopPropagation()}>
 											<DropdownMenu>
 												<DropdownMenuTrigger asChild>
 													<Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -457,7 +457,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 							<Label className="mb-2 block">{t("finance.banks.accountType")}</Label>
 							<Tabs
 								value={quickFormData.accountType}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									setQuickFormData({
 										...quickFormData,
 										accountType: value as "BANK" | "CASH_BOX",
@@ -483,7 +483,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 							<Label>{t("finance.banks.accountName")} *</Label>
 							<Input
 								value={quickFormData.name}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setQuickFormData({
 										...quickFormData,
 										name: e.target.value,
@@ -506,7 +506,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 									<Label>{t("finance.banks.bankName")}</Label>
 									<Input
 										value={quickFormData.bankName}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											setQuickFormData({
 												...quickFormData,
 												bankName: e.target.value,
@@ -520,7 +520,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 									<Label>{t("finance.banks.accountNumber")}</Label>
 									<Input
 										value={quickFormData.accountNumber}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											setQuickFormData({
 												...quickFormData,
 												accountNumber: e.target.value,
@@ -541,7 +541,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 								type="number"
 								step="0.01"
 								value={quickFormData.balance}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setQuickFormData({
 										...quickFormData,
 										balance: parseFloat(e.target.value) || 0,

@@ -749,7 +749,7 @@ export function SubcontractClaimDetailView({
 								min={0}
 								max={outstanding}
 								value={payAmount}
-								onChange={(e) => setPayAmount(e.target.value)}
+								onChange={(e: any) => setPayAmount(e.target.value)}
 								dir="ltr"
 								className="text-start"
 							/>
@@ -759,7 +759,7 @@ export function SubcontractClaimDetailView({
 							<Input
 								type="date"
 								value={payDate}
-								onChange={(e) => setPayDate(e.target.value)}
+								onChange={(e: any) => setPayDate(e.target.value)}
 							/>
 						</div>
 						<div className="space-y-2">
@@ -785,7 +785,7 @@ export function SubcontractClaimDetailView({
 										<SelectValue placeholder={t("payment.selectBankAccount")} />
 									</SelectTrigger>
 									<SelectContent>
-										{bankAccounts.accounts.map((account) => (
+										{bankAccounts.accounts.map((account: any) => (
 											<SelectItem key={account.id} value={account.id}>
 												{account.bankName} - {account.accountNumber}
 											</SelectItem>
@@ -798,7 +798,7 @@ export function SubcontractClaimDetailView({
 							<Label>{t("payment.note")}</Label>
 							<Textarea
 								value={payNote}
-								onChange={(e) => setPayNote(e.target.value)}
+								onChange={(e: any) => setPayNote(e.target.value)}
 								rows={2}
 							/>
 						</div>

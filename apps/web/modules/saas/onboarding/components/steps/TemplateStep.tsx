@@ -62,7 +62,7 @@ export function TemplateStep({
 	useEffect(() => {
 		if (templates.length > 0 && !selectedTemplateId) {
 			const defaultTemplate = templates.find(
-				(tmpl) => tmpl.isDefault,
+				(tmpl: any) => tmpl.isDefault,
 			);
 			if (defaultTemplate) {
 				setSelectedTemplateId(defaultTemplate.id);
@@ -84,7 +84,7 @@ export function TemplateStep({
 			});
 
 			const selected = templates.find(
-				(tmpl) => tmpl.id === selectedTemplateId,
+				(tmpl: any) => tmpl.id === selectedTemplateId,
 			);
 			if (selected) {
 				onTemplateSelected(selected.name);
@@ -124,7 +124,7 @@ export function TemplateStep({
 			) : (
 				<>
 					<div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-						{templates.map((template) => {
+						{templates.map((template: any) => {
 							const isSelected = selectedTemplateId === template.id;
 							const color = getTemplateColor(template);
 

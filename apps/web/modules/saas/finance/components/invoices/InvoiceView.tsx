@@ -525,11 +525,11 @@ export function InvoiceView({
 					<div className="space-y-4">
 						<div>
 							<Label>{t("finance.invoices.paymentAmount")} *</Label>
-							<Input type="number" step="0.01" min="0" max={remainingAmount} value={newPaymentAmount} onChange={(e) => setNewPaymentAmount(e.target.value)} placeholder={t("finance.invoices.maxAmount")} className="rounded-xl mt-1" />
+							<Input type="number" step="0.01" min="0" max={remainingAmount} value={newPaymentAmount} onChange={(e: any) => setNewPaymentAmount(e.target.value)} placeholder={t("finance.invoices.maxAmount")} className="rounded-xl mt-1" />
 						</div>
 						<div>
 							<Label>{t("finance.invoices.paymentDate")} *</Label>
-							<Input type="date" value={newPaymentDate} onChange={(e) => setNewPaymentDate(e.target.value)} className="rounded-xl mt-1" />
+							<Input type="date" value={newPaymentDate} onChange={(e: any) => setNewPaymentDate(e.target.value)} className="rounded-xl mt-1" />
 						</div>
 						<div>
 							<Label>{t("finance.invoices.paymentMethod")}</Label>
@@ -548,11 +548,11 @@ export function InvoiceView({
 						</div>
 						<div>
 							<Label>{t("finance.invoices.referenceNo")}</Label>
-							<Input value={newPaymentReference} onChange={(e) => setNewPaymentReference(e.target.value)} placeholder={t("finance.invoices.referenceNoPlaceholder")} className="rounded-xl mt-1" />
+							<Input value={newPaymentReference} onChange={(e: any) => setNewPaymentReference(e.target.value)} placeholder={t("finance.invoices.referenceNoPlaceholder")} className="rounded-xl mt-1" />
 						</div>
 						<div>
 							<Label>{t("finance.invoices.paymentNotes")}</Label>
-							<Textarea value={newPaymentNotes} onChange={(e) => setNewPaymentNotes(e.target.value)} rows={2} className="rounded-xl mt-1" />
+							<Textarea value={newPaymentNotes} onChange={(e: any) => setNewPaymentNotes(e.target.value)} rows={2} className="rounded-xl mt-1" />
 						</div>
 					</div>
 					<DialogFooter>
@@ -606,7 +606,7 @@ export function InvoiceView({
 					<div>
 						<Textarea
 							value={noteText}
-							onChange={(e) => setNoteText(e.target.value)}
+							onChange={(e: any) => setNoteText(e.target.value)}
 							rows={4}
 							className="rounded-xl"
 							placeholder={t("finance.invoices.notes")}

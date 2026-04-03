@@ -102,8 +102,8 @@ export function PaymentForm({
 	const invoices = invoicesData?.invoices ?? [];
 
 	// Selected account
-	const selectedAccount = accounts.find((a) => a.id === formData.destinationAccountId);
-	const selectedClient = clients.find((c) => c.id === formData.clientId);
+	const selectedAccount = accounts.find((a: any) => a.id === formData.destinationAccountId);
+	const selectedClient = clients.find((c: any) => c.id === formData.clientId);
 
 	// Create mutation
 	const createMutation = useMutation({
@@ -173,7 +173,7 @@ export function PaymentForm({
 								step="0.01"
 								min="0"
 								value={formData.amount}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({ ...formData, amount: e.target.value })
 								}
 								placeholder="0.00"
@@ -187,7 +187,7 @@ export function PaymentForm({
 							<Input
 								type="date"
 								value={formData.date}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({ ...formData, date: e.target.value })
 								}
 								className="rounded-xl mt-1"
@@ -201,7 +201,7 @@ export function PaymentForm({
 						<Label>{t("finance.payments.description")}</Label>
 						<Textarea
 							value={formData.description}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData({ ...formData, description: e.target.value })
 							}
 							placeholder={t("finance.payments.descriptionPlaceholder")}
@@ -225,7 +225,7 @@ export function PaymentForm({
 						<Label>{t("finance.payments.selectClient")}</Label>
 						<Select
 							value={formData.clientId || "manual"}
-							onValueChange={(value) =>
+							onValueChange={(value: any) =>
 								setFormData({
 									...formData,
 									clientId: value === "manual" ? "" : value,
@@ -238,7 +238,7 @@ export function PaymentForm({
 							</SelectTrigger>
 							<SelectContent className="rounded-xl">
 								<SelectItem value="manual">{t("finance.payments.manualEntry")}</SelectItem>
-								{clients.map((client) => (
+								{clients.map((client: any) => (
 									<SelectItem key={client.id} value={client.id}>
 										{client.name}
 									</SelectItem>
@@ -252,7 +252,7 @@ export function PaymentForm({
 							<Label>{t("finance.payments.clientName")} *</Label>
 							<Input
 								value={formData.clientName}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({ ...formData, clientName: e.target.value })
 								}
 								placeholder={t("finance.payments.clientNamePlaceholder")}
@@ -290,7 +290,7 @@ export function PaymentForm({
 						<Label>{t("finance.payments.selectAccount")} *</Label>
 						<Select
 							value={formData.destinationAccountId}
-							onValueChange={(value) =>
+							onValueChange={(value: any) =>
 								setFormData({ ...formData, destinationAccountId: value })
 							}
 						>
@@ -298,7 +298,7 @@ export function PaymentForm({
 								<SelectValue placeholder={t("finance.payments.selectAccountPlaceholder")} />
 							</SelectTrigger>
 							<SelectContent className="rounded-xl">
-								{accounts.map((account) => (
+								{accounts.map((account: any) => (
 									<SelectItem key={account.id} value={account.id}>
 										<div className="flex items-center gap-2">
 											{account.accountType === "BANK" ? (
@@ -355,7 +355,7 @@ export function PaymentForm({
 							<Label>{t("finance.payments.paymentMethod")}</Label>
 							<Select
 								value={formData.paymentMethod}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									setFormData({ ...formData, paymentMethod: value as any })
 								}
 							>
@@ -375,7 +375,7 @@ export function PaymentForm({
 							<Label>{t("finance.payments.referenceNo")}</Label>
 							<Input
 								value={formData.referenceNo}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({ ...formData, referenceNo: e.target.value })
 								}
 								placeholder={t("finance.payments.referenceNoPlaceholder")}
@@ -402,7 +402,7 @@ export function PaymentForm({
 								<Label>{t("finance.payments.selectProject")}</Label>
 								<Select
 									value={formData.projectId || "none"}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										setFormData({ ...formData, projectId: value === "none" ? "" : value })
 									}
 								>
@@ -411,7 +411,7 @@ export function PaymentForm({
 									</SelectTrigger>
 									<SelectContent className="rounded-xl">
 										<SelectItem value="none">{t("finance.payments.noProject")}</SelectItem>
-										{projects.map((project) => (
+										{projects.map((project: any) => (
 											<SelectItem key={project.id} value={project.id}>
 												{project.name}
 											</SelectItem>
@@ -423,7 +423,7 @@ export function PaymentForm({
 								<Label>{t("finance.payments.selectInvoice")}</Label>
 								<Select
 									value={formData.invoiceId || "none"}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										setFormData({ ...formData, invoiceId: value === "none" ? "" : value })
 									}
 								>
@@ -432,7 +432,7 @@ export function PaymentForm({
 									</SelectTrigger>
 									<SelectContent className="rounded-xl">
 										<SelectItem value="none">{t("finance.payments.noInvoice")}</SelectItem>
-										{invoices.map((invoice) => (
+										{invoices.map((invoice: any) => (
 											<SelectItem key={invoice.id} value={invoice.id}>
 												<span className="inline-flex items-center gap-1">
 													{invoice.invoiceNo} - <Currency amount={Number(invoice.totalAmount)} />
@@ -461,7 +461,7 @@ export function PaymentForm({
 							<Label>{t("finance.payments.selectInvoice")}</Label>
 							<Select
 								value={formData.invoiceId || "none"}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									setFormData({ ...formData, invoiceId: value === "none" ? "" : value })
 								}
 							>
@@ -470,7 +470,7 @@ export function PaymentForm({
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
 									<SelectItem value="none">{t("finance.payments.noInvoice")}</SelectItem>
-									{invoices.map((invoice) => (
+									{invoices.map((invoice: any) => (
 										<SelectItem key={invoice.id} value={invoice.id}>
 											<span className="inline-flex items-center gap-1">
 												{invoice.invoiceNo} - <Currency amount={Number(invoice.totalAmount)} />
@@ -492,7 +492,7 @@ export function PaymentForm({
 				<CardContent>
 					<Textarea
 						value={formData.notes}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							setFormData({ ...formData, notes: e.target.value })
 						}
 						placeholder={t("finance.payments.notesPlaceholder")}

@@ -110,7 +110,7 @@ export function BeamInputRow({
 							<Label className="text-xs">العرض (سم)</Label>
 							<Select
 								value={beam.width.toString()}
-								onValueChange={(v) =>
+								onValueChange={(v: any) =>
 									onChange({ ...beam, width: +v })
 								}
 							>
@@ -130,7 +130,7 @@ export function BeamInputRow({
 							<Label className="text-xs">الارتفاع (سم)</Label>
 							<Select
 								value={beam.height.toString()}
-								onValueChange={(v) =>
+								onValueChange={(v: any) =>
 									onChange({ ...beam, height: +v })
 								}
 							>

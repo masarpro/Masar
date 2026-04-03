@@ -131,7 +131,7 @@ export function CreateProjectForm({
 	// ─── Mutation ───────────────────────────────────────────
 	const createMutation = useMutation(
 		orpc.projects.create.mutationOptions({
-			onSuccess: (data) => {
+			onSuccess: (data: any) => {
 				toast.success(t("projects.createProject.success"));
 				router.push(`/app/${organizationSlug}/projects/${data.id}`);
 			},
@@ -291,7 +291,7 @@ export function CreateProjectForm({
 							</Label>
 							<Input
 								value={projectData.name}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									updateProjectField("name", e.target.value)
 								}
 								placeholder={t(
@@ -307,7 +307,7 @@ export function CreateProjectForm({
 							</Label>
 							<Select
 								value={projectData.type}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									updateProjectField("type", value)
 								}
 							>
@@ -371,7 +371,7 @@ export function CreateProjectForm({
 						{showInlineClientForm ? (
 							<InlineClientForm
 								organizationId={organizationId}
-								onSuccess={(client) => {
+								onSuccess={(client: any) => {
 									setClientId(client.id);
 									setClientName(client.name);
 									setClientCompany(client.company ?? "");
@@ -448,7 +448,7 @@ export function CreateProjectForm({
 						</Label>
 						<Input
 							value={projectData.location}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								updateProjectField(
 									"location",
 									e.target.value,
@@ -467,7 +467,7 @@ export function CreateProjectForm({
 						</Label>
 						<Textarea
 							value={projectData.description}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								updateProjectField(
 									"description",
 									e.target.value,

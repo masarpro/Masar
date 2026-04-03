@@ -107,11 +107,11 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 		if (expenses.length > 0 && selectedIds.size === expenses.length) {
 			setSelectedIds(new Set());
 		} else {
-			setSelectedIds(new Set(expenses.map((e) => e.id)));
+			setSelectedIds(new Set(expenses.map((e: any) => e.id)));
 		}
 	};
 	const clearSelection = () => setSelectedIds(new Set());
-	const selectedExpenses = expenses.filter((e) => selectedIds.has(e.id));
+	const selectedExpenses = expenses.filter((e: any) => selectedIds.has(e.id));
 
 	const formatCurrency = (amount: number | string) =>
 		new Intl.NumberFormat("en-US").format(Number(amount)) + " " + t("common.sar");
@@ -203,11 +203,11 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 						<Input
 							placeholder={t("company.expenses.searchPlaceholder")}
 							value={search}
-							onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+							onChange={(e: any) => { setSearch(e.target.value); setCurrentPage(1); }}
 							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pe-10 focus:ring-1 focus:ring-primary/30"
 						/>
 					</div>
-					<Select value={categoryFilter} onValueChange={(v) => { setCategoryFilter(v); setCurrentPage(1); }}>
+					<Select value={categoryFilter} onValueChange={(v: any) => { setCategoryFilter(v); setCurrentPage(1); }}>
 						<SelectTrigger className="w-[160px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.expenses.filterCategory")} />
 						</SelectTrigger>
@@ -220,7 +220,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 							))}
 						</SelectContent>
 					</Select>
-					<Select value={activeFilter} onValueChange={(v) => { setActiveFilter(v); setCurrentPage(1); }}>
+					<Select value={activeFilter} onValueChange={(v: any) => { setActiveFilter(v); setCurrentPage(1); }}>
 						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.expenses.filterStatus")} />
 						</SelectTrigger>
@@ -283,14 +283,14 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 								</TableRow>
 							))
 						) : data?.expenses?.length ? (
-							data.expenses.map((expense, index) => (
+							data.expenses.map((expense: any, index: any) => (
 								<TableRow
 									key={expense.id}
 									className="cursor-pointer border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
 									style={{ animationDelay: `${index * 30}ms` }}
 									onClick={() => router.push(`/app/${organizationSlug}/company/expenses/${expense.id}`)}
 								>
-									<TableCell onClick={(e) => e.stopPropagation()}>
+									<TableCell onClick={(e: any) => e.stopPropagation()}>
 										<Checkbox
 											checked={selectedIds.has(expense.id)}
 											onCheckedChange={() => toggleRow(expense.id)}
@@ -322,7 +322,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 												size="icon"
 												className="rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
 												aria-label={t("company.expenses.deactivate")}
-												onClick={(e) => {
+												onClick={(e: any) => {
 													e.stopPropagation();
 													if (confirm(t("company.expenses.confirmDeactivate"))) {
 														deactivateMutation.mutate(expense.id);
@@ -383,14 +383,14 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 						icon: <XCircle className="h-4 w-4 me-1.5" />,
 						variant: "destructive",
 						onClick: () => {
-							const eligible = selectedExpenses.filter((e) => e.isActive);
+							const eligible = selectedExpenses.filter((e: any) => e.isActive);
 							if (eligible.length === 0) {
 								toast.error(t("company.expenses.noActiveSelected"));
 								return;
 							}
 							if (confirm(t("company.expenses.bulkDeactivateConfirm", { count: eligible.length }))) {
 								Promise.allSettled(
-									eligible.map((e) =>
+									eligible.map((e: any) =>
 										orpcClient.company.expenses.deactivate({ organizationId, id: e.id }),
 									),
 								).then(() => {

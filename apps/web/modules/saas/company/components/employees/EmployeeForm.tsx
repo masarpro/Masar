@@ -176,21 +176,21 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 						</h3>
 					</div>
 					<div className="p-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-						<FormField control={form.control} name="name" render={({ field }) => (
+						<FormField control={form.control} name="name" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.employees.name")}</FormLabel>
 								<FormControl><Input className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="employeeNo" render={({ field }) => (
+						<FormField control={form.control} name="employeeNo" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.employees.employeeNo")}</FormLabel>
 								<FormControl><Input className="rounded-xl bg-slate-50 dark:bg-slate-800/50" readOnly disabled {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="type" render={({ field }) => (
+						<FormField control={form.control} name="type" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.employees.type")}</FormLabel>
 								<Select onValueChange={field.onChange} value={field.value}>
@@ -204,28 +204,28 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="joinDate" render={({ field }) => (
+						<FormField control={form.control} name="joinDate" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.employees.joinDate")}</FormLabel>
 								<FormControl><Input type="date" className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="phone" render={({ field }) => (
+						<FormField control={form.control} name="phone" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.employees.phone")}</FormLabel>
 								<FormControl><Input className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="email" render={({ field }) => (
+						<FormField control={form.control} name="email" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.employees.email")}</FormLabel>
 								<FormControl><Input type="email" className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="nationalId" render={({ field }) => (
+						<FormField control={form.control} name="nationalId" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.employees.nationalId")}</FormLabel>
 								<FormControl><Input className="rounded-xl" {...field} /></FormControl>
@@ -251,7 +251,7 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 						</h3>
 					</div>
 					<div className="p-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-						<FormField control={form.control} name="salaryType" render={({ field }) => (
+						<FormField control={form.control} name="salaryType" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.employees.salaryType")}</FormLabel>
 								<Select onValueChange={field.onChange} value={field.value}>
@@ -264,35 +264,35 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="baseSalary" render={({ field }) => (
+						<FormField control={form.control} name="baseSalary" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.employees.baseSalary")}</FormLabel>
 								<FormControl><Input type="number" step="0.01" className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="housingAllowance" render={({ field }) => (
+						<FormField control={form.control} name="housingAllowance" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.employees.housingAllowance")}</FormLabel>
 								<FormControl><Input type="number" step="0.01" className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="transportAllowance" render={({ field }) => (
+						<FormField control={form.control} name="transportAllowance" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.employees.transportAllowance")}</FormLabel>
 								<FormControl><Input type="number" step="0.01" className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="otherAllowances" render={({ field }) => (
+						<FormField control={form.control} name="otherAllowances" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.employees.otherAllowances")}</FormLabel>
 								<FormControl><Input type="number" step="0.01" className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="gosiSubscription" render={({ field }) => (
+						<FormField control={form.control} name="gosiSubscription" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.employees.gosiSubscription")}</FormLabel>
 								<FormControl><Input type="number" step="0.01" className="rounded-xl" {...field} /></FormControl>
@@ -318,7 +318,7 @@ export function EmployeeForm({ organizationId, organizationSlug, employeeId }: E
 						</h3>
 					</div>
 					<div className="p-5">
-						<FormField control={form.control} name="notes" render={({ field }) => (
+						<FormField control={form.control} name="notes" render={({ field }: any) => (
 							<FormItem>
 								<FormControl><Textarea rows={3} className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />

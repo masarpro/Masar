@@ -43,7 +43,7 @@ export default function OwnerPortalLayout({
 
 	// Exchange URL token for a session token on first visit
 	const exchangeMutation = useMutation(
-		orpc.projectOwner.portal.exchangeToken.mutationOptions(),
+		orpc.projectOwner.portal.exchangeToken.mutationOptions() as any,
 	);
 
 	useEffect(() => {
@@ -51,7 +51,7 @@ export default function OwnerPortalLayout({
 		exchangeMutation.mutate(
 			{ token },
 			{
-				onSuccess: (data) => {
+				onSuccess: (data: any) => {
 					setSessionCookie(data.sessionToken, data.expiresAt);
 					setSessionToken(data.sessionToken);
 				},
@@ -70,7 +70,7 @@ export default function OwnerPortalLayout({
 		orpc.projectOwner.portal.getSummary.queryOptions({
 			input: authInput,
 		}),
-	);
+	) as { data: any; isLoading: boolean; error: any };
 
 	const navItems = [
 		{

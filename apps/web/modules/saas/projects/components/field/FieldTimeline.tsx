@@ -112,7 +112,7 @@ export function FieldTimeline({
 		ISSUE: "issue",
 		PROGRESS_UPDATE: "progress",
 	} as const;
-	const timeline = rawTimeline.map((item) => ({
+	const timeline = rawTimeline.map((item: any) => ({
 		...item,
 		type: (TYPE_MAP[item.type as keyof typeof TYPE_MAP] ??
 			item.type.toLowerCase()) as "report" | "photo" | "issue" | "progress",
@@ -214,7 +214,7 @@ export function FieldTimeline({
 				) : (
 					<>
 						<div className="space-y-4">
-							{timeline.map((item) => (
+							{timeline.map((item: any) => (
 								<TimelineItem
 									key={`${item.type}-${item.data.id}`}
 									item={item}
@@ -233,7 +233,7 @@ export function FieldTimeline({
 						{/* Delete photo confirmation */}
 						<AlertDialog
 							open={!!photoToDelete}
-							onOpenChange={(open) => !open && setPhotoToDelete(null)}
+							onOpenChange={(open: any) => !open && setPhotoToDelete(null)}
 						>
 							<AlertDialogContent>
 								<AlertDialogHeader>

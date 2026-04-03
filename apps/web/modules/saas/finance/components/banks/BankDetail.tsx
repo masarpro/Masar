@@ -304,7 +304,7 @@ export function BankDetail({
 								<Label className="mb-2 block">{t("finance.banks.accountType")}</Label>
 								<Tabs
 									value={formData.accountType}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										setFormData({
 											...formData,
 											accountType: value as "BANK" | "CASH_BOX",
@@ -330,7 +330,7 @@ export function BankDetail({
 								<Label>{t("finance.banks.accountName")} *</Label>
 								<Input
 									value={formData.name}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({ ...formData, name: e.target.value })
 									}
 									required
@@ -346,7 +346,7 @@ export function BankDetail({
 											<Label>{t("finance.banks.bankName")}</Label>
 											<Input
 												value={formData.bankName}
-												onChange={(e) =>
+												onChange={(e: any) =>
 													setFormData({ ...formData, bankName: e.target.value })
 												}
 												className="rounded-xl mt-1"
@@ -356,7 +356,7 @@ export function BankDetail({
 											<Label>{t("finance.banks.accountNumber")}</Label>
 											<Input
 												value={formData.accountNumber}
-												onChange={(e) =>
+												onChange={(e: any) =>
 													setFormData({ ...formData, accountNumber: e.target.value })
 												}
 												className="rounded-xl mt-1"
@@ -368,7 +368,7 @@ export function BankDetail({
 										<Label>{t("finance.banks.iban")}</Label>
 										<Input
 											value={formData.iban}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												setFormData({ ...formData, iban: e.target.value })
 											}
 											className="rounded-xl mt-1 max-w-md font-mono"
@@ -383,7 +383,7 @@ export function BankDetail({
 								<Label>{t("finance.banks.notes")}</Label>
 								<Textarea
 									value={formData.notes}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({ ...formData, notes: e.target.value })
 									}
 									className="rounded-xl mt-1"

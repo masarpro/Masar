@@ -56,8 +56,8 @@ export function AccountingPeriodsPage({ organizationId, organizationSlug }: Prop
 	const periodsList = periods ?? [];
 
 	// Find the oldest open period and the last closed period
-	const firstOpenIdx = periodsList.findIndex((p) => !p.isClosed);
-	const lastClosedIdx = periodsList.reduce((last, p, i) => (p.isClosed ? i : last), -1);
+	const firstOpenIdx = periodsList.findIndex((p: any) => !p.isClosed);
+	const lastClosedIdx = periodsList.reduce((last: any, p: any, i: any) => (p.isClosed ? i : last), -1);
 
 	return (
 		<div className="space-y-4">
@@ -102,7 +102,7 @@ export function AccountingPeriodsPage({ organizationId, organizationSlug }: Prop
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{periodsList.map((period, idx) => {
+								{periodsList.map((period: any, idx: any) => {
 									const canClose = !period.isClosed && idx === firstOpenIdx;
 									const canReopen = period.isClosed && idx === lastClosedIdx;
 

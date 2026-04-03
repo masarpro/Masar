@@ -71,7 +71,7 @@ export function ProgressUpdateForm({
 				</div>
 				<Slider
 					value={[progress]}
-					onValueChange={(v) => setProgress(v[0])}
+					onValueChange={(v: any) => setProgress(v[0])}
 					max={100}
 					min={0}
 					step={1}
@@ -92,7 +92,7 @@ export function ProgressUpdateForm({
 				<Input
 					id="phaseLabel"
 					value={phaseLabel}
-					onChange={(e) => setPhaseLabel(e.target.value)}
+					onChange={(e: any) => setPhaseLabel(e.target.value)}
 					placeholder={t("projects.field.phaseLabelPlaceholder")}
 					className="rounded-xl"
 				/>
@@ -104,7 +104,7 @@ export function ProgressUpdateForm({
 				<Textarea
 					id="note"
 					value={note}
-					onChange={(e) => setNote(e.target.value)}
+					onChange={(e: any) => setNote(e.target.value)}
 					placeholder={t("projects.field.notePlaceholder")}
 					rows={3}
 					className="rounded-xl"

@@ -95,7 +95,7 @@ export function PaymentMilestonesGrid({
 
 			{/* Horizontal scrollable on desktop, stack on mobile */}
 			<div className="flex flex-col gap-3 sm:flex-row sm:overflow-x-auto sm:pb-2">
-				{data.terms.map((term) => (
+				{data.terms.map((term: any) => (
 					<MilestoneCard
 						key={term.id}
 						term={term}

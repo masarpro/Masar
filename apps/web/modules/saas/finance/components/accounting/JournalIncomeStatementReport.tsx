@@ -100,7 +100,7 @@ export function JournalIncomeStatementReport({ organizationId }: Props) {
 							<div className="font-mono text-sm space-y-0.5">
 								{/* Revenue */}
 								<SectionHeader label={t("finance.accounting.incomeStatement.revenue")} color="green" />
-								{data.revenue.accounts.map((a) => (
+								{data.revenue.accounts.map((a: any) => (
 									<StatementLine key={a.code} label={a.nameAr} amount={a.amount} indent={1} />
 								))}
 								<SubtotalLine label={t("finance.accounting.incomeStatement.totalRevenue")} amount={data.revenue.total} />
@@ -108,7 +108,7 @@ export function JournalIncomeStatementReport({ organizationId }: Props) {
 								{/* Cost of Projects */}
 								<div className="pt-3" />
 								<SectionHeader label={t("finance.accounting.incomeStatement.costOfProjects")} color="amber" />
-								{data.costOfProjects.accounts.map((a) => (
+								{data.costOfProjects.accounts.map((a: any) => (
 									<StatementLine key={a.code} label={a.nameAr} amount={a.amount} indent={1} />
 								))}
 								<SubtotalLine label={`${t("finance.accounting.incomeStatement.totalCost")}`} amount={-data.costOfProjects.total} />
@@ -120,7 +120,7 @@ export function JournalIncomeStatementReport({ organizationId }: Props) {
 								{/* Operating Expenses */}
 								<div className="pt-3" />
 								<SectionHeader label={t("finance.accounting.incomeStatement.operatingExpenses")} color="red" />
-								{data.operatingExpenses.accounts.map((a) => (
+								{data.operatingExpenses.accounts.map((a: any) => (
 									<StatementLine key={a.code} label={a.nameAr} amount={a.amount} indent={1} />
 								))}
 								<SubtotalLine label={`${t("finance.accounting.incomeStatement.totalOpex")}`} amount={-data.operatingExpenses.total} />

@@ -205,7 +205,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 						<Input
 							placeholder={t("projects.searchPlaceholder")}
 							value={searchTerm}
-							onChange={(e) => setSearchTerm(e.target.value)}
+							onChange={(e: any) => setSearchTerm(e.target.value)}
 							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pr-10 focus:ring-1 focus:ring-primary/30"
 						/>
 					</div>
@@ -246,7 +246,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 			{/* Grid of Projects - Glass Morphism Cards */}
 			{projects.length > 0 ? (
 				<div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{projects.map((project, index) => {
+					{projects.map((project: any, index: any) => {
 						const coverPhoto = (project as any).photos?.[0]?.url;
 						const gradientIndex = index % coverGradients.length;
 

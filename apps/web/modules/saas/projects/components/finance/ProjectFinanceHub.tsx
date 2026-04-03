@@ -61,7 +61,7 @@ export function ProjectFinanceHub({
 
 	// Client-side search filter
 	const allExpenses =
-		expensesData?.expenses?.map((e) => ({
+		expensesData?.expenses?.map((e: any) => ({
 			...e,
 			date: new Date(e.date),
 			createdAt: new Date(e.createdAt),
@@ -69,7 +69,7 @@ export function ProjectFinanceHub({
 		})) ?? [];
 
 	const filteredExpenses = searchQuery
-		? allExpenses.filter((e) => {
+		? allExpenses.filter((e: any) => {
 				const q = searchQuery.toLowerCase();
 				return (
 					(e.vendorName && e.vendorName.toLowerCase().includes(q)) ||

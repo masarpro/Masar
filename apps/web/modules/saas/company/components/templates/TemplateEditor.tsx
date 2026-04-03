@@ -486,13 +486,13 @@ export function TemplateEditor({
 					<div className="flex items-center gap-3">
 						<Input
 							value={templateName}
-							onChange={(e) => setTemplateName(e.target.value)}
+							onChange={(e: any) => setTemplateName(e.target.value)}
 							placeholder={t("finance.templates.editor.templateNamePlaceholder")}
 							className="w-64"
 						/>
 						<Select
 							value={templateType}
-							onValueChange={(v) => setTemplateType(v as typeof templateType)}
+							onValueChange={(v: any) => setTemplateType(v as typeof templateType)}
 						>
 							<SelectTrigger className="w-40">
 								<SelectValue />

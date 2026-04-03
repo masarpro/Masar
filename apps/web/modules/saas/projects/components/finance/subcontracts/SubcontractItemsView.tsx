@@ -181,7 +181,7 @@ export function SubcontractItemsView({
 	}
 
 	const totalContractAmount =
-		items?.reduce((sum, item) => sum + item.totalAmount, 0) ?? 0;
+		items?.reduce((sum: any, item: any) => sum + item.totalAmount, 0) ?? 0;
 
 	if (isLoading) {
 		return <ListTableSkeleton />;
@@ -240,7 +240,7 @@ export function SubcontractItemsView({
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{items.map((item) => (
+							{items.map((item: any) => (
 								<TableRow key={item.id} className="group">
 									<TableCell className="font-mono text-sm text-muted-foreground">
 										{item.itemCode || "—"}
@@ -339,7 +339,7 @@ export function SubcontractItemsView({
 			{/* Delete Confirmation */}
 			<AlertDialog
 				open={!!deleteItemId}
-				onOpenChange={(open) => !open && setDeleteItemId(null)}
+				onOpenChange={(open: any) => !open && setDeleteItemId(null)}
 			>
 				<AlertDialogContent>
 					<AlertDialogHeader>

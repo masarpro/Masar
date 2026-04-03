@@ -295,7 +295,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 												<SelectValue placeholder={t("company.employees.selectProject")} />
 											</SelectTrigger>
 											<SelectContent className="rounded-xl">
-												{projectsList?.map((p) => (
+												{projectsList?.map((p: any) => (
 													<SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
 												))}
 											</SelectContent>

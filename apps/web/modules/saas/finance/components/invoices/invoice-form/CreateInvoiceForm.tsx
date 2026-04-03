@@ -188,7 +188,7 @@ export function CreateInvoiceForm({
 			setVatPercent(invoice.vatPercent);
 			setDiscountPercent(invoice.discountPercent);
 			setItems(
-				invoice.items.map((item) => ({
+				invoice.items.map((item: any) => ({
 					id: item.id,
 					description: item.description,
 					quantity: item.quantity,
@@ -233,7 +233,7 @@ export function CreateInvoiceForm({
 			setPaymentTerms(quotation.paymentTerms ?? "");
 			setNotes(quotation.notes ?? "");
 			setItems(
-				quotation.items.map((item, index) => ({
+				quotation.items.map((item: any, index: any) => ({
 					id: String(index + 1),
 					description: item.description,
 					quantity: item.quantity,

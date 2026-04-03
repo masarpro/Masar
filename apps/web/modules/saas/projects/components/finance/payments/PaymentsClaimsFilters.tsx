@@ -81,7 +81,7 @@ export function PaymentsClaimsFilters({
 					<Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 					<Input
 						value={searchInput}
-						onChange={(e) => setSearchInput(e.target.value)}
+						onChange={(e: any) => setSearchInput(e.target.value)}
 						placeholder={t("paymentsHub.searchPlaceholder")}
 						className="rounded-xl pr-10"
 					/>
@@ -123,7 +123,7 @@ export function PaymentsClaimsFilters({
 				{/* Status */}
 				<Select
 					value={filters.status || "_all"}
-					onValueChange={(v) =>
+					onValueChange={(v: any) =>
 						updateFilter("status", v === "_all" ? "" : v)
 					}
 				>
@@ -171,7 +171,7 @@ export function PaymentsClaimsFilters({
 					<Input
 						type="date"
 						value={filters.dateFrom}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							updateFilter("dateFrom", e.target.value)
 						}
 						className="h-8 w-32 rounded-lg text-xs"
@@ -182,7 +182,7 @@ export function PaymentsClaimsFilters({
 					<Input
 						type="date"
 						value={filters.dateTo}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							updateFilter("dateTo", e.target.value)
 						}
 						className="h-8 w-32 rounded-lg text-xs"
@@ -192,7 +192,7 @@ export function PaymentsClaimsFilters({
 				{/* Sort */}
 				<Select
 					value={filters.sortBy}
-					onValueChange={(v) =>
+					onValueChange={(v: any) =>
 						updateFilter("sortBy", v as "date" | "amount")
 					}
 				>

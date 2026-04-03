@@ -68,11 +68,11 @@ export function BaselineManagementDialog({
 					<div className="flex gap-2">
 						<Input
 							value={newName}
-							onChange={(e) => setNewName(e.target.value)}
+							onChange={(e: any) => setNewName(e.target.value)}
 							placeholder={t(
 								"execution.advanced.baseline.namePlaceholder",
 							)}
-							onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+							onKeyDown={(e: any) => e.key === "Enter" && handleCreate()}
 						/>
 						<Button
 							size="sm"

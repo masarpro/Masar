@@ -43,7 +43,7 @@ async function AccountSecurityPageContent() {
 	const userAccounts = await getUserAccounts();
 
 	const userHasPassword = userAccounts?.some(
-		(account) => account.providerId === "credential",
+		(account: any) => account.providerId === "credential",
 	);
 
 	const queryClient = getServerQueryClient();

@@ -153,7 +153,7 @@ export function CompanyInfoSettings() {
 				<FinanceLogoUpload
 					organizationId={organizationId}
 					currentLogoUrl={getFieldValue("logo")}
-					onLogoChange={(url) => handleFieldChange("logo", url)}
+					onLogoChange={(url: any) => handleFieldChange("logo", url)}
 					onLogoRemove={() => handleFieldChange("logo", "")}
 				/>
 			</SettingsItem>
@@ -173,7 +173,7 @@ export function CompanyInfoSettings() {
 							<Label>{t("finance.settings.companyNameAr")}</Label>
 							<Input
 								value={getFieldValue("companyNameAr")}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleFieldChange("companyNameAr", e.target.value)
 								}
 								placeholder={t("finance.settings.companyNameArPlaceholder")}
@@ -184,7 +184,7 @@ export function CompanyInfoSettings() {
 							<Label>{t("finance.settings.companyNameEn")}</Label>
 							<Input
 								value={getFieldValue("companyNameEn")}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleFieldChange("companyNameEn", e.target.value)
 								}
 								placeholder={t("finance.settings.companyNameEnPlaceholder")}
@@ -198,7 +198,7 @@ export function CompanyInfoSettings() {
 							<Label>{t("finance.settings.taxNumber")}</Label>
 							<Input
 								value={getFieldValue("taxNumber")}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleFieldChange("taxNumber", e.target.value)
 								}
 								placeholder={t("finance.settings.taxNumberPlaceholder")}
@@ -210,7 +210,7 @@ export function CompanyInfoSettings() {
 							<Label>{t("finance.settings.commercialReg")}</Label>
 							<Input
 								value={getFieldValue("commercialReg")}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleFieldChange("commercialReg", e.target.value)
 								}
 								placeholder={t("finance.settings.commercialRegPlaceholder")}
@@ -237,7 +237,7 @@ export function CompanyInfoSettings() {
 							<Label>{t("finance.settings.buildingNumber")}</Label>
 							<Input
 								value={getFieldValue("buildingNumber")}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleFieldChange("buildingNumber", e.target.value)
 								}
 								placeholder={t("finance.settings.buildingNumberPlaceholder")}
@@ -249,7 +249,7 @@ export function CompanyInfoSettings() {
 							<Label>{t("finance.settings.street")}</Label>
 							<Input
 								value={getFieldValue("street")}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleFieldChange("street", e.target.value)
 								}
 								placeholder={t("finance.settings.streetPlaceholder")}
@@ -262,7 +262,7 @@ export function CompanyInfoSettings() {
 							<Label>{t("finance.settings.secondaryNumber")}</Label>
 							<Input
 								value={getFieldValue("secondaryNumber")}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleFieldChange("secondaryNumber", e.target.value)
 								}
 								placeholder={t("finance.settings.secondaryNumberPlaceholder")}
@@ -274,7 +274,7 @@ export function CompanyInfoSettings() {
 							<Label>{t("finance.settings.postalCode")}</Label>
 							<Input
 								value={getFieldValue("postalCode")}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleFieldChange("postalCode", e.target.value)
 								}
 								placeholder={t("finance.settings.postalCodePlaceholder")}
@@ -288,7 +288,7 @@ export function CompanyInfoSettings() {
 							<Label>{t("finance.settings.city")}</Label>
 							<Input
 								value={getFieldValue("city")}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleFieldChange("city", e.target.value)
 								}
 								placeholder={t("finance.settings.cityPlaceholder")}
@@ -324,7 +324,7 @@ export function CompanyInfoSettings() {
 							<Label>{t("finance.settings.phone")}</Label>
 							<Input
 								value={getFieldValue("phone")}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleFieldChange("phone", e.target.value)
 								}
 								placeholder={t("finance.settings.phonePlaceholder")}
@@ -337,7 +337,7 @@ export function CompanyInfoSettings() {
 							<Input
 								type="email"
 								value={getFieldValue("email")}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleFieldChange("email", e.target.value)
 								}
 								placeholder={t("finance.settings.emailPlaceholder")}
@@ -350,7 +350,7 @@ export function CompanyInfoSettings() {
 						<Label>{t("finance.settings.website")}</Label>
 						<Input
 							value={getFieldValue("website")}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								handleFieldChange("website", e.target.value)
 							}
 							placeholder={t("finance.settings.websitePlaceholder")}
@@ -381,7 +381,7 @@ export function CompanyInfoSettings() {
 									max="100"
 									step="0.5"
 									value={getFieldValue("defaultVatPercent") || 15}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										handleFieldChange(
 											"defaultVatPercent",
 											parseFloat(e.target.value),
@@ -399,7 +399,7 @@ export function CompanyInfoSettings() {
 							<Label>{t("finance.settings.defaultCurrency")}</Label>
 							<Select
 								value={getFieldValue("defaultCurrency") || "SAR"}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									handleFieldChange("defaultCurrency", value)
 								}
 							>
@@ -427,7 +427,7 @@ export function CompanyInfoSettings() {
 								min="1"
 								max="365"
 								value={getFieldValue("quotationValidityDays") || 30}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									handleFieldChange(
 										"quotationValidityDays",
 										parseInt(e.target.value),

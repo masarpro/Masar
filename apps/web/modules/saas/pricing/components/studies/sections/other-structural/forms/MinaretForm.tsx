@@ -59,7 +59,7 @@ export function MinaretForm({ data, onChange }: ElementFormProps<MinaretInput>) 
 			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 				<div>
 					<Label>{t("fields.minaretShape")}</Label>
-					<Select value={data.shape} onValueChange={(v) => set("shape", v)}>
+					<Select value={data.shape} onValueChange={(v: any) => set("shape", v)}>
 						<SelectTrigger><SelectValue /></SelectTrigger>
 						<SelectContent>
 							<SelectItem value="CYLINDRICAL">{t("minaretShapes.CYLINDRICAL")}</SelectItem>
@@ -70,14 +70,14 @@ export function MinaretForm({ data, onChange }: ElementFormProps<MinaretInput>) 
 				</div>
 				<div>
 					<Label>{t("fields.totalHeight")} (م)</Label>
-					<Input type="number" min={0} step={1} value={data.totalHeight || ""} onChange={(e) => set("totalHeight", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0} step={1} value={data.totalHeight || ""} onChange={(e: any) => set("totalHeight", parseFloat(e.target.value) || 0)} />
 				</div>
 				<div>
 					<Label>{data.shape === "SQUARE" ? t("fields.sideLength") : t("fields.outerDiameter")} (م)</Label>
 					<Input
 						type="number" min={0} step={0.1}
 						value={data.shape === "SQUARE" ? (data.sideLength || data.outerDiameter || "") : (data.outerDiameter || "")}
-						onChange={(e) => {
+						onChange={(e: any) => {
 							const v = parseFloat(e.target.value) || 0;
 							if (data.shape === "SQUARE") set("sideLength", v);
 							else set("outerDiameter", v);
@@ -86,26 +86,26 @@ export function MinaretForm({ data, onChange }: ElementFormProps<MinaretInput>) 
 				</div>
 				<div>
 					<Label>{t("fields.quantity")}</Label>
-					<Input type="number" min={1} step={1} value={data.quantity || 1} onChange={(e) => set("quantity", parseInt(e.target.value) || 1)} />
+					<Input type="number" min={1} step={1} value={data.quantity || 1} onChange={(e: any) => set("quantity", parseInt(e.target.value) || 1)} />
 				</div>
 			</div>
 
 			<div className="flex flex-wrap gap-4">
 				<div className="flex items-center gap-2">
-					<Checkbox id="hasBalcony" checked={data.hasBalcony} onCheckedChange={(v) => set("hasBalcony", !!v)} />
+					<Checkbox id="hasBalcony" checked={data.hasBalcony} onCheckedChange={(v: any) => set("hasBalcony", !!v)} />
 					<Label htmlFor="hasBalcony">{t("fields.hasBalcony")}</Label>
 				</div>
 				{data.hasBalcony && (
 					<div className="flex items-center gap-2">
 						<Label>{t("fields.balconyCount")}</Label>
-						<Input type="number" min={1} step={1} className="w-16" value={data.balconyCount} onChange={(e) => set("balconyCount", parseInt(e.target.value) || 1)} />
+						<Input type="number" min={1} step={1} className="w-16" value={data.balconyCount} onChange={(e: any) => set("balconyCount", parseInt(e.target.value) || 1)} />
 					</div>
 				)}
 			</div>
 
 			<div>
 				<Label>{t("fields.topType")}</Label>
-				<Select value={data.topType} onValueChange={(v) => set("topType", v)}>
+				<Select value={data.topType} onValueChange={(v: any) => set("topType", v)}>
 					<SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
 					<SelectContent>
 						<SelectItem value="CONE">{t("topTypes.CONE")}</SelectItem>
@@ -123,12 +123,12 @@ export function MinaretForm({ data, onChange }: ElementFormProps<MinaretInput>) 
 				<div className="grid grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.wallThickness")} (سم)</Label>
-						<Input type="number" value={data.wallThickness} onChange={(e) => set("wallThickness", parseFloat(e.target.value) || 25)} />
+						<Input type="number" value={data.wallThickness} onChange={(e: any) => set("wallThickness", parseFloat(e.target.value) || 25)} />
 					</div>
 					{data.hasBalcony && (
 						<div>
 							<Label>{t("fields.balconyProjection")} (سم)</Label>
-							<Input type="number" value={data.balconyProjection} onChange={(e) => set("balconyProjection", parseFloat(e.target.value) || 80)} />
+							<Input type="number" value={data.balconyProjection} onChange={(e: any) => set("balconyProjection", parseFloat(e.target.value) || 80)} />
 						</div>
 					)}
 				</div>

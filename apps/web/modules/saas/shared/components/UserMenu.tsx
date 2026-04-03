@@ -122,7 +122,7 @@ export function UserMenu({ showUserName }: { showUserName?: boolean }) {
 						<DropdownMenuSubContent>
 							<DropdownMenuRadioGroup
 								value={theme}
-								onValueChange={(value) => {
+								onValueChange={(value: any) => {
 									setTheme(value);
 									setCurrentTheme(value);
 								}}

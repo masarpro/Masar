@@ -64,14 +64,14 @@ export function CreateDocumentForm({
 
 	const createMutation = useMutation(
 		orpc.projectDocuments.create.mutationOptions({
-			onSuccess: (data) => {
+			onSuccess: (data: any) => {
 				toast.success(t("createSuccess"));
 				queryClient.invalidateQueries({
 					queryKey: [["projectDocuments", "list"]],
 				});
 				router.push(`${basePath}/documents/${data.id}`);
 			},
-			onError: (error) => {
+			onError: (error: any) => {
 				toast.error(error.message || t("createError"));
 			},
 		}),
@@ -137,7 +137,7 @@ export function CreateDocumentForm({
 							<Label htmlFor="folder">{t("folder")} *</Label>
 							<Select
 								value={formData.folder}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									setFormData((prev) => ({ ...prev, folder: value }))
 								}
 							>
@@ -159,7 +159,7 @@ export function CreateDocumentForm({
 							<Input
 								id="title"
 								value={formData.title}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData((prev) => ({ ...prev, title: e.target.value }))
 								}
 								placeholder={t("titlePlaceholder")}
@@ -183,7 +183,7 @@ export function CreateDocumentForm({
 							<Textarea
 								id="description"
 								value={formData.description}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData((prev) => ({ ...prev, description: e.target.value }))
 								}
 								placeholder={t("descriptionPlaceholder")}

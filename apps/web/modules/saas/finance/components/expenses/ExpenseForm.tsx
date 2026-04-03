@@ -90,7 +90,7 @@ export function ExpenseForm({
 	const projects = projectsData?.projects ?? [];
 
 	// Selected account
-	const selectedAccount = accounts.find((a) => a.id === formData.sourceAccountId);
+	const selectedAccount = accounts.find((a: any) => a.id === formData.sourceAccountId);
 
 	// Create mutation
 	const createMutation = useMutation({
@@ -162,7 +162,7 @@ export function ExpenseForm({
 							step="0.01"
 							min="0"
 							value={formData.amount}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData({ ...formData, amount: e.target.value })
 							}
 							placeholder="0.00"
@@ -179,7 +179,7 @@ export function ExpenseForm({
 							<div className="mt-1">
 								<ExpenseCategoryCombobox
 									value={formData.categoryId}
-									onValueChange={(id) =>
+									onValueChange={(id: any) =>
 										setFormData({
 											...formData,
 											categoryId: id,
@@ -195,7 +195,7 @@ export function ExpenseForm({
 								<ExpenseSubcategoryCombobox
 									categoryId={formData.categoryId}
 									value={formData.subcategoryId}
-									onValueChange={(id) =>
+									onValueChange={(id: any) =>
 										setFormData({ ...formData, subcategoryId: id })
 									}
 									disabled={!formData.categoryId}
@@ -210,7 +210,7 @@ export function ExpenseForm({
 						<Input
 							type="date"
 							value={formData.date}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData({ ...formData, date: e.target.value })
 							}
 							className="rounded-xl mt-1 max-w-xs"
@@ -223,7 +223,7 @@ export function ExpenseForm({
 						<Label>{t("finance.expenses.description")}</Label>
 						<Textarea
 							value={formData.description}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData({ ...formData, description: e.target.value })
 							}
 							placeholder={t("finance.expenses.descriptionPlaceholder")}
@@ -247,7 +247,7 @@ export function ExpenseForm({
 						<Label>{t("finance.expenses.selectAccount")} {!isObligation && "*"}</Label>
 						<Select
 							value={formData.sourceAccountId}
-							onValueChange={(value) =>
+							onValueChange={(value: any) =>
 								setFormData({ ...formData, sourceAccountId: value })
 							}
 						>
@@ -255,7 +255,7 @@ export function ExpenseForm({
 								<SelectValue placeholder={t("finance.expenses.selectAccountPlaceholder")} />
 							</SelectTrigger>
 							<SelectContent className="rounded-xl">
-								{accounts.map((account) => (
+								{accounts.map((account: any) => (
 									<SelectItem key={account.id} value={account.id}>
 										<div className="flex items-center gap-2">
 											{account.accountType === "BANK" ? (
@@ -304,7 +304,7 @@ export function ExpenseForm({
 							<Label>{t("finance.expenses.paymentMethod")}</Label>
 							<Select
 								value={formData.paymentMethod}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									setFormData({ ...formData, paymentMethod: value as any })
 								}
 							>
@@ -324,7 +324,7 @@ export function ExpenseForm({
 							<Label>{t("finance.expenses.referenceNo")}</Label>
 							<Input
 								value={formData.referenceNo}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({ ...formData, referenceNo: e.target.value })
 								}
 								placeholder={t("finance.expenses.referenceNoPlaceholder")}
@@ -374,7 +374,7 @@ export function ExpenseForm({
 									<Input
 										type="date"
 										value={formData.dueDate}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											setFormData({ ...formData, dueDate: e.target.value })
 										}
 										className="rounded-xl mt-1 max-w-xs"
@@ -397,7 +397,7 @@ export function ExpenseForm({
 							<Label>{t("finance.expenses.vendorName")}</Label>
 							<Input
 								value={formData.vendorName}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({ ...formData, vendorName: e.target.value })
 								}
 								placeholder={t("finance.expenses.vendorNamePlaceholder")}
@@ -408,7 +408,7 @@ export function ExpenseForm({
 							<Label>{t("finance.expenses.vendorTaxNumber")}</Label>
 							<Input
 								value={formData.vendorTaxNumber}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({ ...formData, vendorTaxNumber: e.target.value })
 								}
 								placeholder={t("finance.expenses.vendorTaxNumberPlaceholder")}
@@ -421,7 +421,7 @@ export function ExpenseForm({
 						<Label>{t("finance.expenses.invoiceRef")}</Label>
 						<Input
 							value={formData.invoiceRef}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData({ ...formData, invoiceRef: e.target.value })
 							}
 							placeholder={t("finance.expenses.invoiceRefPlaceholder")}
@@ -443,7 +443,7 @@ export function ExpenseForm({
 							<Label>{t("finance.expenses.selectProject")}</Label>
 							<Select
 								value={formData.projectId || "none"}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									setFormData({ ...formData, projectId: value === "none" ? "" : value })
 								}
 							>
@@ -452,7 +452,7 @@ export function ExpenseForm({
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
 									<SelectItem value="none">{t("finance.expenses.noProject")}</SelectItem>
-									{projects.map((project) => (
+									{projects.map((project: any) => (
 										<SelectItem key={project.id} value={project.id}>
 											{project.name}
 										</SelectItem>
@@ -475,7 +475,7 @@ export function ExpenseForm({
 				<CardContent>
 					<Textarea
 						value={formData.notes}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							setFormData({ ...formData, notes: e.target.value })
 						}
 						placeholder={t("finance.expenses.notesPlaceholder")}

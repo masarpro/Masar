@@ -153,7 +153,7 @@ export function CreateMilestoneForm({
 						<Switch
 							id="isCritical"
 							checked={form.watch("isCritical")}
-							onCheckedChange={(checked) =>
+							onCheckedChange={(checked: any) =>
 								form.setValue("isCritical", checked)
 							}
 						/>

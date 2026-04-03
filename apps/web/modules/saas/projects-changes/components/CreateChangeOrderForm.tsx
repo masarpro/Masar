@@ -154,7 +154,7 @@ export function CreateChangeOrderForm({
 						<Input
 							id="title"
 							value={title}
-							onChange={(e) => setTitle(e.target.value)}
+							onChange={(e: any) => setTitle(e.target.value)}
 							placeholder={t("changeOrders.form.titlePlaceholder")}
 							maxLength={200}
 							required
@@ -165,7 +165,7 @@ export function CreateChangeOrderForm({
 						<Label htmlFor="category">{t("changeOrders.fields.category")}</Label>
 						<Select
 							value={category}
-							onValueChange={(value) => setCategory(value as ChangeOrderCategory)}
+							onValueChange={(value: any) => setCategory(value as ChangeOrderCategory)}
 						>
 							<SelectTrigger>
 								<SelectValue />
@@ -201,7 +201,7 @@ export function CreateChangeOrderForm({
 						<Textarea
 							id="description"
 							value={description}
-							onChange={(e) => setDescription(e.target.value)}
+							onChange={(e: any) => setDescription(e.target.value)}
 							placeholder={t("changeOrders.form.descriptionPlaceholder")}
 							rows={3}
 						/>
@@ -216,7 +216,7 @@ export function CreateChangeOrderForm({
 								id="costImpact"
 								type="number"
 								value={costImpact}
-								onChange={(e) => setCostImpact(e.target.value)}
+								onChange={(e: any) => setCostImpact(e.target.value)}
 								placeholder="0"
 								step="any"
 							/>
@@ -233,7 +233,7 @@ export function CreateChangeOrderForm({
 								id="timeImpactDays"
 								type="number"
 								value={timeImpactDays}
-								onChange={(e) => setTimeImpactDays(e.target.value)}
+								onChange={(e: any) => setTimeImpactDays(e.target.value)}
 								placeholder="0"
 								min={-365}
 								max={365}

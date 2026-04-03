@@ -69,7 +69,7 @@ export default function OwnerPortalPayments() {
 		orpc.projectOwner.portal.getPayments.queryOptions({
 			input: { token },
 		}),
-	);
+	) as { data: any; isLoading: boolean };
 
 	if (isLoading) {
 		return (
@@ -198,7 +198,7 @@ export default function OwnerPortalPayments() {
 								</tr>
 							</thead>
 							<tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-								{claims.map((claim) => (
+								{claims.map((claim: any) => (
 									<tr key={claim.id}>
 										<td className="py-4">
 											<span className="font-medium text-slate-900 dark:text-slate-100">

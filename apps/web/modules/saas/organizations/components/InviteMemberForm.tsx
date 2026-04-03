@@ -92,7 +92,7 @@ export function InviteMemberForm({
 							<FormField
 								control={form.control}
 								name="email"
-								render={({ field }) => (
+								render={({ field }: any) => (
 									<FormItem>
 										<FormLabel>
 											{t(
@@ -111,7 +111,7 @@ export function InviteMemberForm({
 							<FormField
 								control={form.control}
 								name="role"
-								render={({ field }) => (
+								render={({ field }: any) => (
 									<FormItem>
 										<FormLabel>
 											{t(

@@ -20,7 +20,7 @@ export function OrganizationsGrid() {
 				{t("organizations.organizationsGrid.title")}
 			</h2>
 			<div className="grid @2xl:grid-cols-3 @lg:grid-cols-2 grid-cols-1 gap-4">
-				{allOrganizations?.map((organization) => (
+				{allOrganizations?.map((organization: any) => (
 					<Card
 						key={organization.id}
 						className="flex cursor-pointer items-center gap-4 overflow-hidden p-4"

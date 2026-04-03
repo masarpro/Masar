@@ -151,7 +151,7 @@ export function ProjectPaymentsView({
 
 			{/* Term Cards */}
 			<div className="space-y-4">
-				{data.terms.map((term) => (
+				{data.terms.map((term: any) => (
 					<TermCard
 						key={term.id}
 						term={term}

@@ -292,13 +292,13 @@ export function ExpensesList({
 						<Input
 							placeholder={t("finance.expenses.searchPlaceholder")}
 							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
+							onChange={(e: any) => setSearchQuery(e.target.value)}
 							className="ps-10 rounded-xl"
 						/>
 					</div>
 					<Select
 						value={categoryFilter || "all"}
-						onValueChange={(value) =>
+						onValueChange={(value: any) =>
 							setCategoryFilter(value === "all" ? undefined : value)
 						}
 					>
@@ -316,7 +316,7 @@ export function ExpensesList({
 					</Select>
 					<Select
 						value={sourceTypeFilter || "all"}
-						onValueChange={(value) =>
+						onValueChange={(value: any) =>
 							setSourceTypeFilter(value === "all" ? undefined : value)
 						}
 					>
@@ -335,7 +335,7 @@ export function ExpensesList({
 					{!projectId && (
 						<Select
 							value={projectFilter || "all"}
-							onValueChange={(value) =>
+							onValueChange={(value: any) =>
 								setProjectFilter(value === "all" ? undefined : value)
 							}
 						>
@@ -344,7 +344,7 @@ export function ExpensesList({
 							</SelectTrigger>
 							<SelectContent className="rounded-xl">
 								<SelectItem value="all">{t("finance.expenses.allProjects")}</SelectItem>
-								{projects.map((project) => (
+								{projects.map((project: any) => (
 									<SelectItem key={project.id} value={project.id}>
 										{project.name}
 									</SelectItem>
@@ -491,7 +491,7 @@ export function ExpensesList({
 										<TableCell>
 											{getPaymentStatusBadge(item)}
 										</TableCell>
-										<TableCell onClick={(e) => e.stopPropagation()}>
+										<TableCell onClick={(e: any) => e.stopPropagation()}>
 											{item._type === "expense" ? (
 												<DropdownMenu>
 													<DropdownMenuTrigger asChild>

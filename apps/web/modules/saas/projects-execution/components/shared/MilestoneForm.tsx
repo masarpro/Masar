@@ -110,7 +110,7 @@ export function MilestoneForm({
 						<Label>{t("timeline.form.title")}</Label>
 						<Input
 							value={title}
-							onChange={(e) => setTitle(e.target.value)}
+							onChange={(e: any) => setTitle(e.target.value)}
 							placeholder={t("timeline.form.titlePlaceholder")}
 							required
 						/>
@@ -119,7 +119,7 @@ export function MilestoneForm({
 						<Label>{t("timeline.form.description")}</Label>
 						<Textarea
 							value={description}
-							onChange={(e) => setDescription(e.target.value)}
+							onChange={(e: any) => setDescription(e.target.value)}
 							placeholder={t("timeline.form.descriptionPlaceholder")}
 							rows={3}
 						/>
@@ -130,7 +130,7 @@ export function MilestoneForm({
 							<Input
 								type="date"
 								value={plannedStart}
-								onChange={(e) => setPlannedStart(e.target.value)}
+								onChange={(e: any) => setPlannedStart(e.target.value)}
 							/>
 						</div>
 						<div className="space-y-2">
@@ -138,7 +138,7 @@ export function MilestoneForm({
 							<Input
 								type="date"
 								value={plannedEnd}
-								onChange={(e) => setPlannedEnd(e.target.value)}
+								onChange={(e: any) => setPlannedEnd(e.target.value)}
 							/>
 						</div>
 					</div>

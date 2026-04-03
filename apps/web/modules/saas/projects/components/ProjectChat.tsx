@@ -60,7 +60,7 @@ export function ProjectChat({
 					queryKey: [["projectChat", "listMessages"]],
 				});
 			},
-			onError: (error) => {
+			onError: (error: any) => {
 				toast.error(error.message || t("projects.chat.sendError"));
 			},
 		}),
@@ -151,7 +151,7 @@ export function ProjectChat({
 					</div>
 				) : (
 					<div className="space-y-4">
-						{messages.items.map((message) => (
+						{messages.items.map((message: any) => (
 							<div
 								key={message.id}
 								className="group flex gap-3"
@@ -218,10 +218,10 @@ export function ProjectChat({
 				<div className="flex gap-3">
 					<Textarea
 						value={newMessage}
-						onChange={(e) => setNewMessage(e.target.value)}
+						onChange={(e: any) => setNewMessage(e.target.value)}
 						placeholder={t("projects.chat.messagePlaceholder")}
 						className="min-h-12 flex-1 resize-none rounded-xl"
-						onKeyDown={(e) => {
+						onKeyDown={(e: any) => {
 							if (e.key === "Enter" && !e.shiftKey) {
 								e.preventDefault();
 								handleSendMessage(e);

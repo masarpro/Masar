@@ -361,7 +361,7 @@ export function ContactsSection({
 								<Label>{t("finance.clients.contacts.name")} *</Label>
 								<Input
 									value={contactForm.name}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setContactForm((prev) => ({
 											...prev,
 											name: e.target.value,
@@ -375,7 +375,7 @@ export function ContactsSection({
 								<Label>{t("finance.clients.contacts.position")}</Label>
 								<Input
 									value={contactForm.position}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setContactForm((prev) => ({
 											...prev,
 											position: e.target.value,
@@ -389,7 +389,7 @@ export function ContactsSection({
 								<Label>{t("finance.clients.phone")}</Label>
 								<Input
 									value={contactForm.phone}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setContactForm((prev) => ({
 											...prev,
 											phone: e.target.value,
@@ -404,7 +404,7 @@ export function ContactsSection({
 								<Label>{t("finance.clients.mobile")}</Label>
 								<Input
 									value={contactForm.mobile}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setContactForm((prev) => ({
 											...prev,
 											mobile: e.target.value,
@@ -421,7 +421,7 @@ export function ContactsSection({
 							<Input
 								type="email"
 								value={contactForm.email}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setContactForm((prev) => ({
 										...prev,
 										email: e.target.value,
@@ -436,7 +436,7 @@ export function ContactsSection({
 							<Checkbox
 								id="isPrimary"
 								checked={contactForm.isPrimary}
-								onCheckedChange={(checked) =>
+								onCheckedChange={(checked: any) =>
 									setContactForm((prev) => ({
 										...prev,
 										isPrimary: checked as boolean,
@@ -451,7 +451,7 @@ export function ContactsSection({
 							<Label>{t("finance.clients.notes")}</Label>
 							<Textarea
 								value={contactForm.notes}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setContactForm((prev) => ({
 										...prev,
 										notes: e.target.value,

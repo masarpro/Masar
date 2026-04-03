@@ -278,7 +278,7 @@ export function ProfitabilityReport({
 							</TableRow>
 
 							{/* Category Breakdown */}
-							{costs.directExpenses.byCategory.map((cat) => (
+							{costs.directExpenses.byCategory.map((cat: any) => (
 								<TableRow key={cat.category} className="text-slate-500 dark:text-slate-400">
 									<TableCell className="ps-8 text-sm">
 										{t(`finance.category.${cat.category}` as any) ?? cat.category} ({cat.count})
@@ -300,7 +300,7 @@ export function ProfitabilityReport({
 							</TableRow>
 
 							{/* Subcontract Details */}
-							{costs.subcontracts.contracts.map((sc) => (
+							{costs.subcontracts.contracts.map((sc: any) => (
 								<TableRow key={sc.id} className="text-slate-500 dark:text-slate-400">
 									<TableCell className="ps-8 text-sm">
 										{sc.name} ({sc.contractNo})

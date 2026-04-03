@@ -155,13 +155,13 @@ export function NavBar() {
 											}
 										: undefined
 								}
-								onMouseEnter={(e) => {
+								onMouseEnter={(e: any) => {
 									if (isHomePage) {
 										e.currentTarget.style.color = "var(--lp-nav-link-hover)";
 										e.currentTarget.style.backgroundColor = "var(--lp-nav-link-hover-bg)";
 									}
 								}}
-								onMouseLeave={(e) => {
+								onMouseLeave={(e: any) => {
 									if (isHomePage) {
 										e.currentTarget.style.color = isMenuItemActive(menuItem.href)
 											? "var(--lp-nav-link-active)"
@@ -191,7 +191,7 @@ export function NavBar() {
 
 						<Sheet
 							open={mobileMenuOpen}
-							onOpenChange={(open) => setMobileMenuOpen(open)}
+							onOpenChange={(open: any) => setMobileMenuOpen(open)}
 						>
 							<SheetTrigger asChild>
 								<Button
@@ -259,10 +259,10 @@ export function NavBar() {
 										style={{
 											color: "var(--lp-nav-login)",
 										}}
-										onMouseEnter={(e) => {
+										onMouseEnter={(e: any) => {
 											e.currentTarget.style.color = "var(--lp-nav-login-hover)";
 										}}
-										onMouseLeave={(e) => {
+										onMouseLeave={(e: any) => {
 											e.currentTarget.style.color = "var(--lp-nav-login)";
 										}}
 										prefetch

@@ -75,7 +75,7 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 									min="0"
 									max="100"
 									value={retentionPercent}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										onFieldChange(
 											"retentionPercent",
 											e.target.value,
@@ -115,7 +115,7 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 									step="0.01"
 									min="0"
 									value={retentionCap}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										onFieldChange(
 											"retentionCap",
 											e.target.value,
@@ -140,7 +140,7 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 								type="number"
 								min="0"
 								value={retentionReleaseDays}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									onFieldChange(
 										"retentionReleaseDays",
 										e.target.value,
@@ -172,7 +172,7 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 									min="0"
 									max="100"
 									value={performanceBondPercent}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										onFieldChange(
 											"performanceBondPercent",
 											e.target.value,
@@ -212,7 +212,7 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 						</Label>
 						<Switch
 							checked={insuranceRequired}
-							onCheckedChange={(checked) =>
+							onCheckedChange={(checked: any) =>
 								onFieldChange("insuranceRequired", checked)
 							}
 						/>
@@ -221,7 +221,7 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 						<div className="mt-3">
 							<Textarea
 								value={insuranceDetails}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									onFieldChange(
 										"insuranceDetails",
 										e.target.value,
@@ -256,7 +256,7 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 									min="0"
 									max="100"
 									value={penaltyPercent}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										onFieldChange(
 											"penaltyPercent",
 											e.target.value,
@@ -284,7 +284,7 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 									min="0"
 									max="100"
 									value={penaltyCapPercent}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										onFieldChange(
 											"penaltyCapPercent",
 											e.target.value,

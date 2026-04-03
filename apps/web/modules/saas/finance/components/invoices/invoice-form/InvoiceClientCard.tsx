@@ -89,27 +89,27 @@ export function InvoiceClientCard({
 					<div className="grid gap-3 sm:grid-cols-2 pt-1">
 						<div>
 							<Label className="text-xs">{t("finance.invoices.clientName")} *</Label>
-							<Input value={clientName} onChange={(e) => onClientNameChange(e.target.value)} placeholder={t("finance.invoices.clientNamePlaceholder")} required className="rounded-xl mt-1 h-9" />
+							<Input value={clientName} onChange={(e: any) => onClientNameChange(e.target.value)} placeholder={t("finance.invoices.clientNamePlaceholder")} required className="rounded-xl mt-1 h-9" />
 						</div>
 						<div>
 							<Label className="text-xs">{t("finance.invoices.clientCompany")}</Label>
-							<Input value={clientCompany} onChange={(e) => onClientCompanyChange(e.target.value)} placeholder={t("finance.invoices.clientCompanyPlaceholder")} className="rounded-xl mt-1 h-9" />
+							<Input value={clientCompany} onChange={(e: any) => onClientCompanyChange(e.target.value)} placeholder={t("finance.invoices.clientCompanyPlaceholder")} className="rounded-xl mt-1 h-9" />
 						</div>
 						<div>
 							<Label className="text-xs">{t("finance.invoices.clientPhone")}</Label>
-							<Input value={clientPhone} onChange={(e) => onClientPhoneChange(e.target.value)} placeholder="05xxxxxxxx" className="rounded-xl mt-1 h-9" />
+							<Input value={clientPhone} onChange={(e: any) => onClientPhoneChange(e.target.value)} placeholder="05xxxxxxxx" className="rounded-xl mt-1 h-9" />
 						</div>
 						<div>
 							<Label className="text-xs">{t("finance.invoices.clientEmail")}</Label>
-							<Input type="email" value={clientEmail} onChange={(e) => onClientEmailChange(e.target.value)} placeholder="email@example.com" className="rounded-xl mt-1 h-9" />
+							<Input type="email" value={clientEmail} onChange={(e: any) => onClientEmailChange(e.target.value)} placeholder="email@example.com" className="rounded-xl mt-1 h-9" />
 						</div>
 						<div>
 							<Label className="text-xs">{t("finance.invoices.clientTaxNumber")} *</Label>
-							<Input value={clientTaxNumber} onChange={(e) => onClientTaxNumberChange(e.target.value)} placeholder={t("finance.invoices.taxNumberPlaceholder")} required className="rounded-xl mt-1 h-9" />
+							<Input value={clientTaxNumber} onChange={(e: any) => onClientTaxNumberChange(e.target.value)} placeholder={t("finance.invoices.taxNumberPlaceholder")} required className="rounded-xl mt-1 h-9" />
 						</div>
 						<div>
 							<Label className="text-xs">{t("finance.invoices.clientAddress")}</Label>
-							<Input value={clientAddress} onChange={(e) => onClientAddressChange(e.target.value)} placeholder={t("finance.invoices.addressPlaceholder")} className="rounded-xl mt-1 h-9" />
+							<Input value={clientAddress} onChange={(e: any) => onClientAddressChange(e.target.value)} placeholder={t("finance.invoices.addressPlaceholder")} className="rounded-xl mt-1 h-9" />
 						</div>
 					</div>
 				)}

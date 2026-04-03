@@ -94,7 +94,7 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 			{/* Header */}
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex items-center gap-3">
-					<Select value={String(year)} onValueChange={(v) => setYear(Number(v))}>
+					<Select value={String(year)} onValueChange={(v: any) => setYear(Number(v))}>
 						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue />
 						</SelectTrigger>
@@ -138,7 +138,7 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 								</TableRow>
 							))
 						) : balances?.balances?.length ? (
-							balances.balances.map((bal, index) => (
+							balances.balances.map((bal: any, index: any) => (
 								<TableRow
 									key={bal.id}
 									className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
@@ -202,12 +202,12 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 					<div className="space-y-4">
 						<div>
 							<Label>{t("company.leaves.balances.employee")}</Label>
-							<Select value={adjustData.employeeId} onValueChange={(v) => setAdjustData((p) => ({ ...p, employeeId: v }))}>
+							<Select value={adjustData.employeeId} onValueChange={(v: any) => setAdjustData((p) => ({ ...p, employeeId: v }))}>
 								<SelectTrigger className="rounded-xl mt-1">
 									<SelectValue placeholder={t("company.leaves.requests.selectEmployee")} />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
-									{employees?.employees?.map((emp) => (
+									{employees?.employees?.map((emp: any) => (
 										<SelectItem key={emp.id} value={emp.id}>{emp.name}</SelectItem>
 									))}
 								</SelectContent>
@@ -215,7 +215,7 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 						</div>
 						<div>
 							<Label>{t("company.leaves.balances.leaveType")}</Label>
-							<Select value={adjustData.leaveTypeId} onValueChange={(v) => setAdjustData((p) => ({ ...p, leaveTypeId: v }))}>
+							<Select value={adjustData.leaveTypeId} onValueChange={(v: any) => setAdjustData((p) => ({ ...p, leaveTypeId: v }))}>
 								<SelectTrigger className="rounded-xl mt-1">
 									<SelectValue placeholder={t("company.leaves.requests.selectLeaveType")} />
 								</SelectTrigger>
@@ -233,7 +233,7 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 								className="rounded-xl mt-1"
 								min={0}
 								value={adjustData.totalDays}
-								onChange={(e) => setAdjustData((p) => ({ ...p, totalDays: Number(e.target.value) }))}
+								onChange={(e: any) => setAdjustData((p) => ({ ...p, totalDays: Number(e.target.value) }))}
 							/>
 						</div>
 					</div>

@@ -110,7 +110,7 @@ export default function AcceptInvitationPage() {
 					<FormField
 						control={form.control}
 						name="name"
-						render={({ field }) => (
+						render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("invitation.name")}</FormLabel>
 								<FormControl>
@@ -124,7 +124,7 @@ export default function AcceptInvitationPage() {
 					<FormField
 						control={form.control}
 						name="password"
-						render={({ field }) => (
+						render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("invitation.setPassword")}</FormLabel>
 								<FormControl>
@@ -138,7 +138,7 @@ export default function AcceptInvitationPage() {
 					<FormField
 						control={form.control}
 						name="confirmPassword"
-						render={({ field }) => (
+						render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("invitation.confirmPassword")}</FormLabel>
 								<FormControl>

@@ -170,7 +170,7 @@ export function IntegrationsSettingsForm() {
 							<Switch
 								id="emailEnabled"
 								checked={form.watch("emailEnabled")}
-								onCheckedChange={(checked) =>
+								onCheckedChange={(checked: any) =>
 									form.setValue("emailEnabled", checked, { shouldDirty: true })
 								}
 								disabled={!providersStatus.email}
@@ -188,7 +188,7 @@ export function IntegrationsSettingsForm() {
 							<Switch
 								id="whatsappEnabled"
 								checked={form.watch("whatsappEnabled")}
-								onCheckedChange={(checked) =>
+								onCheckedChange={(checked: any) =>
 									form.setValue("whatsappEnabled", checked, {
 										shouldDirty: true,
 									})
@@ -205,7 +205,7 @@ export function IntegrationsSettingsForm() {
 							<Switch
 								id="smsEnabled"
 								checked={form.watch("smsEnabled")}
-								onCheckedChange={(checked) =>
+								onCheckedChange={(checked: any) =>
 									form.setValue("smsEnabled", checked, { shouldDirty: true })
 								}
 								disabled={!providersStatus.sms}
@@ -218,7 +218,7 @@ export function IntegrationsSettingsForm() {
 							</Label>
 							<Select
 								value={form.watch("defaultChannel")}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									form.setValue(
 										"defaultChannel",
 										value as "EMAIL" | "WHATSAPP" | "SMS",
@@ -280,7 +280,7 @@ export function IntegrationsSettingsForm() {
 							<Switch
 								id="ownerNotifyOnOfficialUpdate"
 								checked={form.watch("ownerNotifyOnOfficialUpdate")}
-								onCheckedChange={(checked) =>
+								onCheckedChange={(checked: any) =>
 									form.setValue("ownerNotifyOnOfficialUpdate", checked, {
 										shouldDirty: true,
 									})
@@ -305,7 +305,7 @@ export function IntegrationsSettingsForm() {
 							<Switch
 								id="ownerNotifyOnPaymentDue"
 								checked={form.watch("ownerNotifyOnPaymentDue")}
-								onCheckedChange={(checked) =>
+								onCheckedChange={(checked: any) =>
 									form.setValue("ownerNotifyOnPaymentDue", checked, {
 										shouldDirty: true,
 									})

@@ -426,7 +426,7 @@ export function TimelineBoard({ projectId }: TimelineBoardProps) {
 						</Card>
 					) : (
 						<div className="space-y-4">
-							{milestones.map((milestone) => (
+							{milestones.map((milestone: any) => (
 								<MilestoneCard
 									key={milestone.id}
 									milestone={milestone}

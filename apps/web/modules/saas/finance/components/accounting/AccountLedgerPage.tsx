@@ -87,14 +87,14 @@ export function AccountLedgerPage({
 					<Input
 						type="date"
 						value={dateFrom}
-						onChange={(e) => { setDateFrom(e.target.value); setPage(1); }}
+						onChange={(e: any) => { setDateFrom(e.target.value); setPage(1); }}
 						className="rounded-xl w-40"
 					/>
 					<span className="text-slate-400">—</span>
 					<Input
 						type="date"
 						value={dateTo}
-						onChange={(e) => { setDateTo(e.target.value); setPage(1); }}
+						onChange={(e: any) => { setDateTo(e.target.value); setPage(1); }}
 						className="rounded-xl w-40"
 					/>
 					<Button variant="outline" size="sm" className="rounded-xl" onClick={() => window.print()}>
@@ -162,7 +162,7 @@ export function AccountLedgerPage({
 									</TableRow>
 								)}
 
-								{entries.map((entry) => (
+								{entries.map((entry: any) => (
 									<TableRow key={`${entry.entryId}-${entry.debit}-${entry.credit}`}>
 										<TableCell className="text-sm text-slate-500">
 											{new Date(entry.date).toLocaleDateString("en-SA")}

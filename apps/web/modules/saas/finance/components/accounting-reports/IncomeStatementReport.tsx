@@ -110,7 +110,7 @@ export function IncomeStatementReport({
 	// Expense pie chart data
 	const expensePieData = data
 		? [
-				...data.expenses.byCategory.map((c) => ({
+				...data.expenses.byCategory.map((c: any) => ({
 					name: c.categoryLabel,
 					value: c.amount,
 				})),
@@ -175,7 +175,7 @@ export function IncomeStatementReport({
 							<Input
 								type="date"
 								value={customFrom}
-								onChange={(e) => setCustomFrom(e.target.value)}
+								onChange={(e: any) => setCustomFrom(e.target.value)}
 								className="rounded-xl h-9 w-36"
 							/>
 						</div>
@@ -186,7 +186,7 @@ export function IncomeStatementReport({
 							<Input
 								type="date"
 								value={customTo}
-								onChange={(e) => setCustomTo(e.target.value)}
+								onChange={(e: any) => setCustomTo(e.target.value)}
 								className="rounded-xl h-9 w-36"
 							/>
 						</div>
@@ -262,7 +262,7 @@ export function IncomeStatementReport({
 								<div className="font-bold text-slate-700 dark:text-slate-300 pb-2 pt-4 border-b">
 									{t("finance.accountingReports.income.expenses")}
 								</div>
-								{data.expenses.byCategory.map((cat) => (
+								{data.expenses.byCategory.map((cat: any) => (
 									<StatementLine
 										key={cat.category}
 										label={cat.categoryLabel}
@@ -386,11 +386,11 @@ export function IncomeStatementReport({
 										<div className="space-y-3">
 											{data.revenue.byProject
 												.sort(
-													(a, b) =>
+													(a: any, b: any) =>
 														b.amount - a.amount,
 												)
 												.slice(0, 8)
-												.map((proj) => {
+												.map((proj: any) => {
 													const pct =
 														data.revenue
 															.totalRevenue > 0

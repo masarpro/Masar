@@ -322,7 +322,7 @@ export function PaymentDetail({
 						{isEditing ? (
 							<Input
 								value={formData.referenceNo}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({ ...formData, referenceNo: e.target.value })
 								}
 								className="rounded-xl mt-1"
@@ -340,7 +340,7 @@ export function PaymentDetail({
 						{isEditing ? (
 							<Textarea
 								value={formData.description}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({ ...formData, description: e.target.value })
 								}
 								className="rounded-xl mt-1"
@@ -358,7 +358,7 @@ export function PaymentDetail({
 						{isEditing ? (
 							<Textarea
 								value={formData.notes}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({ ...formData, notes: e.target.value })
 								}
 								className="rounded-xl mt-1"

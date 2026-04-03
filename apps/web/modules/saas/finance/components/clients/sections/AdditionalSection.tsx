@@ -48,7 +48,7 @@ export function AdditionalSection({
 					</Label>
 					<Textarea
 						value={formData.notes}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							setFormData((prev) => ({
 								...prev,
 								notes: e.target.value,
@@ -68,7 +68,7 @@ export function AdditionalSection({
 					</Label>
 					<Select
 						value={formData.displayLanguage}
-						onValueChange={(value) =>
+						onValueChange={(value: any) =>
 							setFormData((prev) => ({ ...prev, displayLanguage: value }))
 						}
 					>

@@ -46,13 +46,13 @@ export function ExecutionPhasesCard({
 	// Single source of truth: all values derived from milestones for consistency
 	const totalMilestones = milestones.length;
 	const completedCount = milestones.filter(
-		(m) => m.status === "COMPLETED",
+		(m: any) => m.status === "COMPLETED",
 	).length;
 	const inProgressCount = milestones.filter(
-		(m) => m.status === "IN_PROGRESS" || m.status === "DELAYED",
+		(m: any) => m.status === "IN_PROGRESS" || m.status === "DELAYED",
 	).length;
 	const notStartedCount = milestones.filter(
-		(m) => m.status === "PLANNED",
+		(m: any) => m.status === "PLANNED",
 	).length;
 
 	// Status breakdown percentages (must sum to 100)
@@ -73,7 +73,7 @@ export function ExecutionPhasesCard({
 	const overallProgress =
 		totalMilestones > 0
 			? Math.round(
-					milestones.reduce((sum, m) => sum + Number(m.progress ?? 0), 0) /
+					milestones.reduce((sum: any, m: any) => sum + Number(m.progress ?? 0), 0) /
 						totalMilestones,
 				)
 			: health?.overallProgress ?? projectProgress ?? 0;
@@ -88,15 +88,15 @@ export function ExecutionPhasesCard({
 	// Health stats: derive from milestones when available for consistency
 	const onTrackCount =
 		totalMilestones > 0
-			? milestones.filter((m) => m.healthStatus === "ON_TRACK").length
+			? milestones.filter((m: any) => m.healthStatus === "ON_TRACK").length
 			: health?.onTrack ?? 0;
 	const atRiskCount =
 		totalMilestones > 0
-			? milestones.filter((m) => m.healthStatus === "AT_RISK").length
+			? milestones.filter((m: any) => m.healthStatus === "AT_RISK").length
 			: health?.atRisk ?? 0;
 	const delayedCount =
 		totalMilestones > 0
-			? milestones.filter((m) => m.healthStatus === "DELAYED").length
+			? milestones.filter((m: any) => m.healthStatus === "DELAYED").length
 			: health?.delayed ?? 0;
 
 	// Milestone status → dot color
@@ -305,7 +305,7 @@ export function ExecutionPhasesCard({
 							{t("projects.commandCenter.executionPhases")}
 						</div>
 						<div className="flex flex-col gap-1.5">
-							{milestones.map((milestone) => (
+							{milestones.map((milestone: any) => (
 								<div
 									key={milestone.id}
 									className="flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50/80 px-2.5 py-[7px] dark:border-slate-800 dark:bg-slate-800/50"

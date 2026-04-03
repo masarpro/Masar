@@ -171,7 +171,7 @@ export function AddPaymentDialog({
 							min="0"
 							max={remainingAmount}
 							value={paymentAmount}
-							onChange={(e) => onPaymentAmountChange(e.target.value)}
+							onChange={(e: any) => onPaymentAmountChange(e.target.value)}
 							placeholder={t("finance.invoices.maxAmount")}
 							className="rounded-xl mt-1"
 						/>
@@ -181,7 +181,7 @@ export function AddPaymentDialog({
 						<Input
 							type="date"
 							value={paymentDate}
-							onChange={(e) => onPaymentDateChange(e.target.value)}
+							onChange={(e: any) => onPaymentDateChange(e.target.value)}
 							className="rounded-xl mt-1"
 						/>
 					</div>
@@ -204,7 +204,7 @@ export function AddPaymentDialog({
 						<Label>{t("finance.invoices.referenceNo")}</Label>
 						<Input
 							value={paymentReference}
-							onChange={(e) => onPaymentReferenceChange(e.target.value)}
+							onChange={(e: any) => onPaymentReferenceChange(e.target.value)}
 							placeholder={t("finance.invoices.referenceNoPlaceholder")}
 							className="rounded-xl mt-1"
 						/>
@@ -213,7 +213,7 @@ export function AddPaymentDialog({
 						<Label>{t("finance.invoices.paymentNotes")}</Label>
 						<Textarea
 							value={paymentNotes}
-							onChange={(e) => onPaymentNotesChange(e.target.value)}
+							onChange={(e: any) => onPaymentNotesChange(e.target.value)}
 							rows={2}
 							className="rounded-xl mt-1"
 						/>

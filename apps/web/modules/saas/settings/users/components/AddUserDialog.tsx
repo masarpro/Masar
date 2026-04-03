@@ -135,7 +135,7 @@ export function AddUserDialog({
 								<FormField
 									control={form.control}
 									name="name"
-									render={({ field }) => (
+									render={({ field }: any) => (
 										<FormItem>
 											<FormLabel>الاسم</FormLabel>
 											<FormControl>
@@ -151,7 +151,7 @@ export function AddUserDialog({
 								<FormField
 									control={form.control}
 									name="email"
-									render={({ field }) => (
+									render={({ field }: any) => (
 										<FormItem>
 											<FormLabel>
 												البريد الإلكتروني
@@ -171,7 +171,7 @@ export function AddUserDialog({
 								<FormField
 									control={form.control}
 									name="password"
-									render={({ field }) => (
+									render={({ field }: any) => (
 										<FormItem>
 											<FormLabel>
 												كلمة المرور المؤقتة
@@ -190,7 +190,7 @@ export function AddUserDialog({
 								<FormField
 									control={form.control}
 									name="organizationRoleId"
-									render={({ field }) => (
+									render={({ field }: any) => (
 										<FormItem>
 											<FormLabel>الدور</FormLabel>
 											<Select

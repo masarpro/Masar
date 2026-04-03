@@ -101,7 +101,7 @@ export function SubcontractPaymentForm({
 	// Auto-fill amount from selected term
 	const selectedTerm = useMemo(() => {
 		if (!selectedTermId || !termsProgress) return null;
-		return termsProgress.terms.find((t) => t.id === selectedTermId);
+		return termsProgress.terms.find((t: any) => t.id === selectedTermId);
 	}, [selectedTermId, termsProgress]);
 
 	// Auto-fill remaining when term changes
@@ -114,7 +114,7 @@ export function SubcontractPaymentForm({
 	const accounts = bankAccounts?.accounts ?? [];
 
 	const selectedAccount = useMemo(
-		() => accounts.find((a) => a.id === sourceAccountId),
+		() => accounts.find((a: any) => a.id === sourceAccountId),
 		[accounts, sourceAccountId],
 	);
 
@@ -179,12 +179,12 @@ export function SubcontractPaymentForm({
 					<div className="p-5">
 						<Select
 							value={selectedTermId || "_none"}
-							onValueChange={(v) => {
+							onValueChange={(v: any) => {
 								const actualValue = v === "_none" ? "" : v;
 								setSelectedTermId(actualValue);
 								if (actualValue) {
 									const term = termsProgress.terms.find(
-										(tt) => tt.id === actualValue,
+										(tt: any) => tt.id === actualValue,
 									);
 									if (term) {
 										setAmount(
@@ -208,8 +208,8 @@ export function SubcontractPaymentForm({
 									{t("subcontracts.payment.noTerm")}
 								</SelectItem>
 								{termsProgress.terms
-									.filter((tt) => !tt.isComplete)
-									.map((tt) => (
+									.filter((tt: any) => !tt.isComplete)
+									.map((tt: any) => (
 										<SelectItem key={tt.id} value={tt.id}>
 											{tt.label || tt.type} -{" "}
 											{t("subcontracts.payment.remaining")}:{" "}
@@ -280,7 +280,7 @@ export function SubcontractPaymentForm({
 									step="0.01"
 									min="0"
 									value={amount}
-									onChange={(e) => setAmount(e.target.value)}
+									onChange={(e: any) => setAmount(e.target.value)}
 									placeholder="0.00"
 									className="rounded-xl pl-12"
 									dir="ltr"
@@ -296,7 +296,7 @@ export function SubcontractPaymentForm({
 							<Input
 								type="date"
 								value={date}
-								onChange={(e) => setDate(e.target.value)}
+								onChange={(e: any) => setDate(e.target.value)}
 								className="rounded-xl"
 								required
 							/>
@@ -330,8 +330,8 @@ export function SubcontractPaymentForm({
 						</SelectTrigger>
 						<SelectContent>
 							{accounts
-								.filter((a) => a.isActive)
-								.map((account) => (
+								.filter((a: any) => a.isActive)
+								.map((account: any) => (
 									<SelectItem
 										key={account.id}
 										value={account.id}
@@ -423,7 +423,7 @@ export function SubcontractPaymentForm({
 							</Label>
 							<Input
 								value={referenceNo}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setReferenceNo(e.target.value)
 								}
 								className="rounded-xl"
@@ -437,7 +437,7 @@ export function SubcontractPaymentForm({
 						</Label>
 						<Input
 							value={description}
-							onChange={(e) => setDescription(e.target.value)}
+							onChange={(e: any) => setDescription(e.target.value)}
 							className="rounded-xl"
 						/>
 					</div>
@@ -445,7 +445,7 @@ export function SubcontractPaymentForm({
 						<Label>{t("subcontracts.payment.notes")}</Label>
 						<Textarea
 							value={notes}
-							onChange={(e) => setNotes(e.target.value)}
+							onChange={(e: any) => setNotes(e.target.value)}
 							className="min-h-16 rounded-xl"
 						/>
 					</div>

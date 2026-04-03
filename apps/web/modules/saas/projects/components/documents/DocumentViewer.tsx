@@ -140,7 +140,7 @@ export function DocumentViewer({
 			: null;
 
 		return (
-			<Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+			<Dialog open={open} onOpenChange={(v: any) => !v && onClose()}>
 				<DialogContent className="max-w-5xl h-[90vh] flex flex-col p-0 gap-0">
 					{/* Header */}
 					<div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
@@ -204,7 +204,7 @@ export function DocumentViewer({
 
 	// --- Other file types → Download-only Dialog ---
 	return (
-		<Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+		<Dialog open={open} onOpenChange={(v: any) => !v && onClose()}>
 			<DialogContent className="max-w-md">
 				<div className="flex flex-col items-center gap-4 py-6 text-center">
 					<p className="text-sm font-medium text-slate-900 dark:text-slate-100">

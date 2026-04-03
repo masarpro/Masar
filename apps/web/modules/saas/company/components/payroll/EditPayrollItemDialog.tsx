@@ -104,7 +104,7 @@ export function EditPayrollItemDialog({
 						<FormField
 							control={form.control}
 							name="baseSalary"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("company.payroll.baseSalary")}</FormLabel>
 									<FormControl>
@@ -123,7 +123,7 @@ export function EditPayrollItemDialog({
 						<FormField
 							control={form.control}
 							name="housingAllowance"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("company.payroll.housingAllowance")}</FormLabel>
 									<FormControl>
@@ -142,7 +142,7 @@ export function EditPayrollItemDialog({
 						<FormField
 							control={form.control}
 							name="transportAllowance"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("company.payroll.transportAllowance")}</FormLabel>
 									<FormControl>
@@ -161,7 +161,7 @@ export function EditPayrollItemDialog({
 						<FormField
 							control={form.control}
 							name="otherAllowances"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("company.payroll.otherAllowances")}</FormLabel>
 									<FormControl>
@@ -180,7 +180,7 @@ export function EditPayrollItemDialog({
 						<FormField
 							control={form.control}
 							name="gosiDeduction"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("company.payroll.gosiDeduction")}</FormLabel>
 									<FormControl>

@@ -85,7 +85,7 @@ export function PayExpenseDialog({
 	);
 
 	const accounts = accountsData?.accounts ?? [];
-	const selectedAccount = accounts.find((a) => a.id === sourceAccountId);
+	const selectedAccount = accounts.find((a: any) => a.id === sourceAccountId);
 	const numericAmount = Number.parseFloat(amount) || 0;
 
 	// Pay mutation
@@ -206,7 +206,7 @@ export function PayExpenseDialog({
 									/>
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
-									{accounts.map((account) => (
+									{accounts.map((account: any) => (
 										<SelectItem key={account.id} value={account.id}>
 											<div className="flex items-center gap-2">
 												{account.accountType === "BANK" ? (
@@ -276,7 +276,7 @@ export function PayExpenseDialog({
 								min="0.01"
 								max={remaining}
 								value={amount}
-								onChange={(e) => setAmount(e.target.value)}
+								onChange={(e: any) => setAmount(e.target.value)}
 								placeholder="0.00"
 								className="rounded-xl h-10 text-base font-semibold"
 								dir="ltr"
@@ -297,7 +297,7 @@ export function PayExpenseDialog({
 								</Label>
 								<Select
 									value={paymentMethod}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										setPaymentMethod(value as (typeof PAYMENT_METHODS)[number])
 									}
 								>
@@ -319,7 +319,7 @@ export function PayExpenseDialog({
 								</Label>
 								<Input
 									value={referenceNo}
-									onChange={(e) => setReferenceNo(e.target.value)}
+									onChange={(e: any) => setReferenceNo(e.target.value)}
 									placeholder={t("finance.expenses.referenceNoPlaceholder")}
 									className="rounded-xl h-10"
 									dir="ltr"

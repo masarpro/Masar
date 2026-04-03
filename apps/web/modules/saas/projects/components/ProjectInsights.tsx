@@ -168,7 +168,7 @@ export function ProjectInsights({
 
 				{data?.activeAlerts && data.activeAlerts.length > 0 ? (
 					<div className="space-y-3">
-						{data.activeAlerts.map((alert) => (
+						{data.activeAlerts.map((alert: any) => (
 							<div
 								key={alert.id}
 								className="flex items-start gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50"
@@ -221,7 +221,7 @@ export function ProjectInsights({
 						{t("projects.insights.acknowledged")}
 					</h2>
 					<div className="space-y-2">
-						{data.acknowledgedAlerts.map((alert) => (
+						{data.acknowledgedAlerts.map((alert: any) => (
 							<div
 								key={alert.id}
 								className="flex items-center gap-3 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-500 dark:bg-slate-800/30"

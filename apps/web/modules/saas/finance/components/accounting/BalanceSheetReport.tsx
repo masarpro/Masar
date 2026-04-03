@@ -37,7 +37,7 @@ export function BalanceSheetReport({ organizationId }: Props) {
 			<div className="flex items-end gap-3 print:hidden">
 				<div>
 					<Label className="text-xs">{t("finance.accounting.trialBalance.asOfDate")}</Label>
-					<Input type="date" value={asOfDate} onChange={(e) => setAsOfDate(e.target.value)} className="rounded-xl h-9 w-40" />
+					<Input type="date" value={asOfDate} onChange={(e: any) => setAsOfDate(e.target.value)} className="rounded-xl h-9 w-40" />
 				</div>
 				<Button variant="outline" size="sm" className="rounded-xl ms-auto" onClick={() => window.print()}>
 					<Printer className="h-4 w-4 me-1" />
@@ -109,7 +109,7 @@ export function BalanceSheetReport({ organizationId }: Props) {
 									<h4 className="font-semibold text-sm text-purple-700 dark:text-purple-300 mb-2 py-1 px-2 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
 										{t("finance.accounting.balanceSheet.equity")}
 									</h4>
-									{data.equity.accounts.map((acc) => (
+									{data.equity.accounts.map((acc: any) => (
 										<div key={acc.accountId} className="flex justify-between py-1 text-sm">
 											<span className="text-slate-600 dark:text-slate-400">{acc.nameAr}</span>
 											<span>{formatAccounting(acc.balance)}</span>

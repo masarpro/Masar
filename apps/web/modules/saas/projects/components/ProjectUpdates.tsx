@@ -193,7 +193,7 @@ export function ProjectUpdates({
 													<ImageIcon className="mb-0.5 inline h-4 w-4" /> {t("projects.updates.attachedPhotos")} ({draftData.draft.photos.length})
 												</span>
 												<div className="mt-2 flex gap-2">
-													{draftData.draft.photos.slice(0, 4).map((photo) => (
+													{draftData.draft.photos.slice(0, 4).map((photo: any) => (
 														<div
 															key={photo.id}
 															className="h-16 w-16 rounded-lg bg-slate-200 dark:bg-slate-700"
@@ -250,7 +250,7 @@ export function ProjectUpdates({
 								</label>
 								<Textarea
 									value={workDoneSummary}
-									onChange={(e) => setWorkDoneSummary(e.target.value)}
+									onChange={(e: any) => setWorkDoneSummary(e.target.value)}
 									className="min-h-[100px]"
 									placeholder={t("projects.updates.workDonePlaceholder")}
 								/>
@@ -262,7 +262,7 @@ export function ProjectUpdates({
 								</label>
 								<Textarea
 									value={blockers}
-									onChange={(e) => setBlockers(e.target.value)}
+									onChange={(e: any) => setBlockers(e.target.value)}
 									className="min-h-[80px]"
 									placeholder={t("projects.updates.blockersPlaceholder")}
 								/>
@@ -274,7 +274,7 @@ export function ProjectUpdates({
 								</label>
 								<Textarea
 									value={nextSteps}
-									onChange={(e) => setNextSteps(e.target.value)}
+									onChange={(e: any) => setNextSteps(e.target.value)}
 									className="min-h-[80px]"
 									placeholder={t("projects.updates.nextStepsPlaceholder")}
 								/>

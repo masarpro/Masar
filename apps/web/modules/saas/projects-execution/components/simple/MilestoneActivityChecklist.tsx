@@ -133,14 +133,14 @@ export function MilestoneActivityChecklist({
 				</p>
 			) : (
 				<div className="space-y-1.5 ps-2">
-					{activities.map((activity) => (
+					{activities.map((activity: any) => (
 						<div
 							key={activity.id}
 							className="flex items-center gap-2 group"
 						>
 							<Checkbox
 								checked={activity.status === "COMPLETED"}
-								onCheckedChange={(checked) => {
+								onCheckedChange={(checked: any) => {
 									updateProgressMutation.mutate({
 										activityId: activity.id,
 										progress: checked ? 100 : 0,
@@ -181,7 +181,7 @@ export function MilestoneActivityChecklist({
 			>
 				<Input
 					value={newActivityTitle}
-					onChange={(e) => setNewActivityTitle(e.target.value)}
+					onChange={(e: any) => setNewActivityTitle(e.target.value)}
 					placeholder={t("execution.milestone.addActivity")}
 					className="h-7 text-sm"
 					disabled={createMutation.isPending}

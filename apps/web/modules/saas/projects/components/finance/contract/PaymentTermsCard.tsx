@@ -202,7 +202,7 @@ export function PaymentTermsCard({
 							>
 								<Select
 									value={term.type}
-									onValueChange={(v) =>
+									onValueChange={(v: any) =>
 										updateTerm(index, "type", v)
 									}
 								>
@@ -222,7 +222,7 @@ export function PaymentTermsCard({
 
 								<Input
 									value={term.label}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										updateTerm(index, "label", e.target.value)
 									}
 									placeholder={t(
@@ -234,7 +234,7 @@ export function PaymentTermsCard({
 								<Input
 									type="number"
 									value={term.percent}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										updateTerm(index, "percent", e.target.value)
 									}
 									placeholder="%"
@@ -246,7 +246,7 @@ export function PaymentTermsCard({
 								<Input
 									type="number"
 									value={term.amount}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										updateTerm(index, "amount", e.target.value)
 									}
 									placeholder="0"
@@ -257,7 +257,7 @@ export function PaymentTermsCard({
 								<Input
 									type="date"
 									value={term.dueDate}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										updateTerm(index, "dueDate", e.target.value)
 									}
 									className="h-9 text-sm"

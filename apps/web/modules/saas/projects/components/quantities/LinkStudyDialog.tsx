@@ -112,7 +112,7 @@ export function LinkStudyDialog({
 						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
 						<Input
 							value={search}
-							onChange={(e) => setSearch(e.target.value)}
+							onChange={(e: any) => setSearch(e.target.value)}
 							placeholder={t(
 								"projectQuantities.linkDialog.searchPlaceholder",
 							)}

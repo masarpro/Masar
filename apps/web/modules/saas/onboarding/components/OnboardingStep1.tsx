@@ -70,7 +70,7 @@ export function OnboardingStep1({ onCompleted }: { onCompleted: () => void }) {
 					<FormField
 						control={form.control}
 						name="name"
-						render={({ field }) => (
+						render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>
 									{t("onboarding.account.name")}

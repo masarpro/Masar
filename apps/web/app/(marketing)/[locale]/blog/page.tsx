@@ -24,13 +24,13 @@ export default async function BlogListPage() {
 
 			<div className="grid gap-8 md:grid-cols-2">
 				{posts
-					.filter((post) => post.published && locale === post.locale)
+					.filter((post: any) => post.published && locale === post.locale)
 					.sort(
-						(a, b) =>
+						(a: any, b: any) =>
 							new Date(b.date).getTime() -
 							new Date(a.date).getTime(),
 					)
-					.map((post) => (
+					.map((post: any) => (
 						<PostListItem post={post} key={post.path} />
 					))}
 			</div>

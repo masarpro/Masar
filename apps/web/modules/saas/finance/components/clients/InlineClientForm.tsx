@@ -173,7 +173,7 @@ export function InlineClientForm({
 						<Label className="text-xs text-muted-foreground">{t("finance.clients.businessName")} *</Label>
 						<Input
 							value={businessName}
-							onChange={(e) => setBusinessName(e.target.value)}
+							onChange={(e: any) => setBusinessName(e.target.value)}
 							placeholder={t("finance.clients.businessNamePlaceholder")}
 							className="rounded-lg mt-1 h-9 text-sm"
 							required
@@ -185,7 +185,7 @@ export function InlineClientForm({
 						<Label className="text-xs text-muted-foreground">{t("finance.clients.taxNumber")}</Label>
 						<Input
 							value={taxNumber}
-							onChange={(e) => setTaxNumber(e.target.value)}
+							onChange={(e: any) => setTaxNumber(e.target.value)}
 							placeholder="3XXXXXXXXXX0003"
 							className="rounded-lg mt-1 h-9 text-sm font-mono"
 							dir="ltr"
@@ -197,7 +197,7 @@ export function InlineClientForm({
 						<Label className="text-xs text-muted-foreground">{t("finance.clients.crNumber")}</Label>
 						<Input
 							value={crNumber}
-							onChange={(e) => setCrNumber(e.target.value)}
+							onChange={(e: any) => setCrNumber(e.target.value)}
 							placeholder="XXXXXXXXXX"
 							className="rounded-lg mt-1 h-9 text-sm font-mono"
 							dir="ltr"
@@ -216,7 +216,7 @@ export function InlineClientForm({
 						<div className="sm:col-span-2">
 							<Input
 								value={streetAddress1}
-								onChange={(e) => setStreetAddress1(e.target.value)}
+								onChange={(e: any) => setStreetAddress1(e.target.value)}
 								placeholder={t("finance.clients.streetAddress1Placeholder")}
 								className="rounded-lg h-9 text-sm"
 							/>
@@ -224,7 +224,7 @@ export function InlineClientForm({
 						<div>
 							<Input
 								value={city}
-								onChange={(e) => setCity(e.target.value)}
+								onChange={(e: any) => setCity(e.target.value)}
 								placeholder={t("finance.clients.cityPlaceholder")}
 								className="rounded-lg h-9 text-sm"
 							/>
@@ -247,7 +247,7 @@ export function InlineClientForm({
 							</Select>
 							<Input
 								value={postalCode}
-								onChange={(e) => setPostalCode(e.target.value)}
+								onChange={(e: any) => setPostalCode(e.target.value)}
 								placeholder="12345"
 								className="rounded-lg h-9 text-sm font-mono"
 								dir="ltr"
@@ -276,7 +276,7 @@ export function InlineClientForm({
 								<Label className="text-xs text-muted-foreground">{t("finance.clients.mobile")}</Label>
 								<Input
 									value={mobile}
-									onChange={(e) => setMobile(e.target.value)}
+									onChange={(e: any) => setMobile(e.target.value)}
 									placeholder="05XXXXXXXX"
 									className="rounded-lg mt-1 h-9 text-sm font-mono"
 									dir="ltr"
@@ -286,7 +286,7 @@ export function InlineClientForm({
 								<Label className="text-xs text-muted-foreground">{t("finance.clients.phone")}</Label>
 								<Input
 									value={phone}
-									onChange={(e) => setPhone(e.target.value)}
+									onChange={(e: any) => setPhone(e.target.value)}
 									placeholder="011XXXXXXX"
 									className="rounded-lg mt-1 h-9 text-sm font-mono"
 									dir="ltr"
@@ -297,7 +297,7 @@ export function InlineClientForm({
 								<Input
 									type="email"
 									value={email}
-									onChange={(e) => setEmail(e.target.value)}
+									onChange={(e: any) => setEmail(e.target.value)}
 									placeholder="email@example.com"
 									className="rounded-lg mt-1 h-9 text-sm"
 									dir="ltr"
@@ -308,7 +308,7 @@ export function InlineClientForm({
 							<Label className="text-xs text-muted-foreground">{t("finance.clients.notes")}</Label>
 							<Textarea
 								value={notes}
-								onChange={(e) => setNotes(e.target.value)}
+								onChange={(e: any) => setNotes(e.target.value)}
 								placeholder={t("finance.clients.notesPlaceholder")}
 								rows={2}
 								className="rounded-lg mt-1 text-sm"

@@ -31,7 +31,7 @@ export default function OwnerPortalSchedule() {
 		orpc.projectOwner.portal.getSchedule.queryOptions({
 			input: { token },
 		}),
-	);
+	) as { data: any; isLoading: boolean };
 
 	if (isLoading) {
 		return (
@@ -101,7 +101,7 @@ export default function OwnerPortalSchedule() {
 						<div className="absolute start-5 top-0 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700" />
 
 						<div className="space-y-6">
-							{milestones.map((milestone, index) => {
+							{milestones.map((milestone: any, index: number) => {
 								const daysDelay = getDaysDelay(milestone.plannedDate, milestone.actualDate);
 								const isDelayed = daysDelay !== null && daysDelay > 0 && !milestone.isCompleted;
 

@@ -68,7 +68,7 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 
 	const runs = data?.runs ?? [];
 
-	const currentMonthRun = runs.find((r) => {
+	const currentMonthRun = runs.find((r: any) => {
 		const now = new Date();
 		return r.month === now.getMonth() + 1 && r.year === now.getFullYear();
 	});
@@ -227,7 +227,7 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 								</TableRow>
 							))
 						) : runs.length ? (
-							runs.map((run, index) => (
+							runs.map((run: any, index: any) => (
 								<TableRow
 									key={run.id}
 									className="cursor-pointer border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
@@ -256,7 +256,7 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 											variant="ghost"
 											size="icon"
 											className="rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/50"
-											onClick={(e) => {
+											onClick={(e: any) => {
 												e.stopPropagation();
 												router.push(`/app/${organizationSlug}/company/expense-runs/${run.id}`);
 											}}
@@ -308,7 +308,7 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 										</Label>
 										<Select
 											value={String(createMonth)}
-											onValueChange={(value) => setCreateMonth(Number(value))}
+											onValueChange={(value: any) => setCreateMonth(Number(value))}
 										>
 											<SelectTrigger className="rounded-xl h-10">
 												<SelectValue />
@@ -331,7 +331,7 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 											min={2020}
 											max={2100}
 											value={createYear}
-											onChange={(e) => setCreateYear(Number(e.target.value))}
+											onChange={(e: any) => setCreateYear(Number(e.target.value))}
 											className="rounded-xl h-10"
 											required
 										/>

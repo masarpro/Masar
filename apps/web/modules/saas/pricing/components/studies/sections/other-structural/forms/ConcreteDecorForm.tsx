@@ -50,7 +50,7 @@ export function ConcreteDecorForm({ data, onChange }: ElementFormProps<ConcreteD
 					<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 						<div>
 							<Label>{t("fields.decorType")}</Label>
-							<Select value={item.type} onValueChange={(v) => updateItem(idx, "type", v as DecorItemType)}>
+							<Select value={item.type} onValueChange={(v: any) => updateItem(idx, "type", v as DecorItemType)}>
 								<SelectTrigger><SelectValue /></SelectTrigger>
 								<SelectContent>
 									{(['CORNICE', 'COLUMN_DECORATIVE', 'CAPITAL', 'WINDOW_FRAME', 'FRONTON', 'CORBEL', 'PANEL', 'BALUSTRADE', 'BALUSTER', 'MASHRABIYA', 'CLADDING', 'BELT', 'OTHER_DECOR'] as DecorItemType[]).map((dt) => (
@@ -61,7 +61,7 @@ export function ConcreteDecorForm({ data, onChange }: ElementFormProps<ConcreteD
 						</div>
 						<div>
 							<Label>{t("fields.decorMaterial")}</Label>
-							<Select value={item.material} onValueChange={(v) => updateItem(idx, "material", v as DecorMaterial)}>
+							<Select value={item.material} onValueChange={(v: any) => updateItem(idx, "material", v as DecorMaterial)}>
 								<SelectTrigger><SelectValue /></SelectTrigger>
 								<SelectContent>
 									<SelectItem value="GRC">{t("decorMaterials.GRC")}</SelectItem>
@@ -73,7 +73,7 @@ export function ConcreteDecorForm({ data, onChange }: ElementFormProps<ConcreteD
 						</div>
 						<div>
 							<Label>{t("fields.decorUnit")}</Label>
-							<Select value={item.unit} onValueChange={(v) => updateItem(idx, "unit", v as DecorUnit)}>
+							<Select value={item.unit} onValueChange={(v: any) => updateItem(idx, "unit", v as DecorUnit)}>
 								<SelectTrigger><SelectValue /></SelectTrigger>
 								<SelectContent>
 									<SelectItem value="LINEAR_METER">{t("decorUnits.LINEAR_METER")}</SelectItem>
@@ -84,39 +84,39 @@ export function ConcreteDecorForm({ data, onChange }: ElementFormProps<ConcreteD
 						</div>
 						<div>
 							<Label>{t("fields.quantity")}</Label>
-							<Input type="number" min={1} step={1} value={item.quantity || 1} onChange={(e) => updateItem(idx, "quantity", parseInt(e.target.value) || 1)} />
+							<Input type="number" min={1} step={1} value={item.quantity || 1} onChange={(e: any) => updateItem(idx, "quantity", parseInt(e.target.value) || 1)} />
 						</div>
 					</div>
 					<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 						{item.unit === 'LINEAR_METER' && (
 							<div>
 								<Label>{t("fields.length")} (م.ط)</Label>
-								<Input type="number" min={0} step={0.5} value={item.length || ""} onChange={(e) => updateItem(idx, "length", parseFloat(e.target.value) || 0)} />
+								<Input type="number" min={0} step={0.5} value={item.length || ""} onChange={(e: any) => updateItem(idx, "length", parseFloat(e.target.value) || 0)} />
 							</div>
 						)}
 						{item.unit === 'SQM' && (
 							<div>
 								<Label>{t("fields.area")} (م²)</Label>
-								<Input type="number" min={0} step={0.5} value={item.area || ""} onChange={(e) => updateItem(idx, "area", parseFloat(e.target.value) || 0)} />
+								<Input type="number" min={0} step={0.5} value={item.area || ""} onChange={(e: any) => updateItem(idx, "area", parseFloat(e.target.value) || 0)} />
 							</div>
 						)}
 						{(item.unit === 'PIECE' || item.unit === 'LINEAR_METER') && (
 							<>
 								<div>
 									<Label>{t("fields.height")} (سم)</Label>
-									<Input type="number" value={item.height ?? ""} onChange={(e) => updateItem(idx, "height", parseFloat(e.target.value) || 0)} />
+									<Input type="number" value={item.height ?? ""} onChange={(e: any) => updateItem(idx, "height", parseFloat(e.target.value) || 0)} />
 								</div>
 								{item.unit === 'PIECE' && (
 									<div>
 										<Label>{t("fields.width")} (سم)</Label>
-										<Input type="number" value={item.width ?? ""} onChange={(e) => updateItem(idx, "width", parseFloat(e.target.value) || 0)} />
+										<Input type="number" value={item.width ?? ""} onChange={(e: any) => updateItem(idx, "width", parseFloat(e.target.value) || 0)} />
 									</div>
 								)}
 							</>
 						)}
 						<div className="col-span-2">
 							<Label>{t("fields.description")}</Label>
-							<Input value={item.description ?? ""} onChange={(e) => updateItem(idx, "description", e.target.value)} />
+							<Input value={item.description ?? ""} onChange={(e: any) => updateItem(idx, "description", e.target.value)} />
 						</div>
 					</div>
 				</div>

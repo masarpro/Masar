@@ -100,7 +100,7 @@ export function ProjectTeamManagement({
 
 	// Filter out users who are already team members
 	const availableUsers = orgUsersData?.users.filter(
-		(user) => !teamData?.members.some((member) => member.user.id === user.id)
+		(user: any) => !teamData?.members.some((member: any) => member.user.id === user.id)
 	) ?? [];
 
 	const addMutation = useMutation({
@@ -211,7 +211,7 @@ export function ProjectTeamManagement({
 					</div>
 				) : (
 					<div className="divide-y divide-slate-100 dark:divide-slate-800">
-						{teamData.members.map((member) => {
+						{teamData.members.map((member: any) => {
 							const RoleIcon = roleIcons[member.role as ProjectRole];
 							return (
 								<div
@@ -299,7 +299,7 @@ export function ProjectTeamManagement({
 									<SelectValue placeholder={t("projects.team.selectUser")} />
 								</SelectTrigger>
 								<SelectContent>
-									{availableUsers.map((user) => (
+									{availableUsers.map((user: any) => (
 										<SelectItem key={user.id} value={user.id}>
 											{user.name} ({user.email})
 										</SelectItem>
@@ -310,7 +310,7 @@ export function ProjectTeamManagement({
 
 						<div className="space-y-2">
 							<Label>{t("projects.team.selectRole")}</Label>
-							<Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as ProjectRole)}>
+							<Select value={selectedRole} onValueChange={(v: any) => setSelectedRole(v as ProjectRole)}>
 								<SelectTrigger>
 									<SelectValue />
 								</SelectTrigger>
@@ -357,7 +357,7 @@ export function ProjectTeamManagement({
 					<div className="space-y-4 py-4">
 						<div className="space-y-2">
 							<Label>{t("projects.team.selectRole")}</Label>
-							<Select value={newRole} onValueChange={(v) => setNewRole(v as ProjectRole)}>
+							<Select value={newRole} onValueChange={(v: any) => setNewRole(v as ProjectRole)}>
 								<SelectTrigger>
 									<SelectValue />
 								</SelectTrigger>

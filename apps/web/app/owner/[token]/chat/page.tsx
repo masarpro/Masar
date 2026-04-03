@@ -28,10 +28,10 @@ export default function OwnerPortalChat() {
 		orpc.projectOwner.portal.listMessages.queryOptions({
 			input: { token },
 		}),
-	);
+	) as { data: any; isLoading: boolean; refetch: () => void; isFetching: boolean };
 
 	const sendMutation = useMutation({
-		...orpc.projectOwner.portal.sendMessage.mutationOptions(),
+		...(orpc.projectOwner.portal.sendMessage.mutationOptions() as any),
 		onSuccess: () => {
 			setMessage("");
 			refetch();
@@ -111,7 +111,7 @@ export default function OwnerPortalChat() {
 					</div>
 				) : (
 					<>
-						{messages.map((msg) => {
+						{messages.map((msg: any) => {
 							const isFromOwner = msg.content.startsWith("[من المالك]");
 							return (
 								<div
@@ -174,7 +174,7 @@ export default function OwnerPortalChat() {
 				<div className="flex gap-3">
 					<Textarea
 						value={message}
-						onChange={(e) => setMessage(e.target.value)}
+						onChange={(e: any) => setMessage(e.target.value)}
 						onKeyDown={handleKeyDown}
 						placeholder={t("ownerPortal.chat.placeholder")}
 						className="min-h-[60px] resize-none rounded-xl"

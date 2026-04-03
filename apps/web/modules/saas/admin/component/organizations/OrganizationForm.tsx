@@ -112,7 +112,7 @@ export function OrganizationForm({
 							<FormField
 								control={form.control}
 								name="name"
-								render={({ field }) => (
+								render={({ field }: any) => (
 									<FormItem>
 										<FormLabel>
 											{t("admin.organizations.form.name")}

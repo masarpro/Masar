@@ -141,7 +141,7 @@ export function ClientsHeaderActions({
 							<Label className="mb-2 block">{t("finance.clients.clientType")}</Label>
 							<Tabs
 								value={quickFormData.clientType}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									setQuickFormData({
 										...quickFormData,
 										clientType: value as "INDIVIDUAL" | "COMMERCIAL",
@@ -169,7 +169,7 @@ export function ClientsHeaderActions({
 									<Label>{t("finance.clients.firstName")} *</Label>
 									<Input
 										value={quickFormData.firstName}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											setQuickFormData({
 												...quickFormData,
 												firstName: e.target.value,
@@ -184,7 +184,7 @@ export function ClientsHeaderActions({
 									<Label>{t("finance.clients.lastName")} *</Label>
 									<Input
 										value={quickFormData.lastName}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											setQuickFormData({
 												...quickFormData,
 												lastName: e.target.value,
@@ -201,7 +201,7 @@ export function ClientsHeaderActions({
 								<Label>{t("finance.clients.businessName")} *</Label>
 								<Input
 									value={quickFormData.businessName}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setQuickFormData({
 											...quickFormData,
 											businessName: e.target.value,
@@ -220,7 +220,7 @@ export function ClientsHeaderActions({
 								<Label>{t("finance.clients.mobile")}</Label>
 								<Input
 									value={quickFormData.mobile}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setQuickFormData({
 											...quickFormData,
 											mobile: e.target.value,
@@ -236,7 +236,7 @@ export function ClientsHeaderActions({
 								<Input
 									type="email"
 									value={quickFormData.email}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setQuickFormData({
 											...quickFormData,
 											email: e.target.value,

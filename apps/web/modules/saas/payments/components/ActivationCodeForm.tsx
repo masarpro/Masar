@@ -66,7 +66,7 @@ export function ActivationCodeForm() {
 				<Input
 					placeholder={t("choosePlan.codePlaceholder")}
 					value={code}
-					onChange={(e) => {
+					onChange={(e: any) => {
 						setCode(e.target.value.toUpperCase());
 						setValidatedData(null);
 					}}

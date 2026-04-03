@@ -37,7 +37,7 @@ export function ElementDetailSettings({
 			</Label>
 			<Switch
 				checked={(s[key] as boolean) ?? defaultVal}
-				onCheckedChange={(checked) => onUpdate({ [key]: checked })}
+				onCheckedChange={(checked: any) => onUpdate({ [key]: checked })}
 				className="scale-75"
 			/>
 		</div>
@@ -59,7 +59,7 @@ export function ElementDetailSettings({
 						</Label>
 						<Select
 							value={(s.companyNameSize as string) ?? "large"}
-							onValueChange={(v) => onUpdate({ companyNameSize: v })}
+							onValueChange={(v: any) => onUpdate({ companyNameSize: v })}
 						>
 							<SelectTrigger className="h-8 text-xs rounded-lg">
 								<SelectValue />
@@ -86,7 +86,7 @@ export function ElementDetailSettings({
 						</Label>
 						<Select
 							value={(s.layout as string) ?? "modern"}
-							onValueChange={(v) => onUpdate({ layout: v })}
+							onValueChange={(v: any) => onUpdate({ layout: v })}
 						>
 							<SelectTrigger className="h-8 text-xs rounded-lg">
 								<SelectValue />
@@ -123,7 +123,7 @@ export function ElementDetailSettings({
 						</Label>
 						<Select
 							value={(s.layout as string) ?? "centered"}
-							onValueChange={(v) => onUpdate({ layout: v })}
+							onValueChange={(v: any) => onUpdate({ layout: v })}
 						>
 							<SelectTrigger className="h-8 text-xs rounded-lg">
 								<SelectValue />
@@ -157,7 +157,7 @@ export function ElementDetailSettings({
 						</Label>
 						<Select
 							value={(s.layout as string) ?? "default"}
-							onValueChange={(v) => onUpdate({ layout: v })}
+							onValueChange={(v: any) => onUpdate({ layout: v })}
 						>
 							<SelectTrigger className="h-8 text-xs rounded-lg">
 								<SelectValue />
@@ -213,7 +213,7 @@ export function ElementDetailSettings({
 						</Label>
 						<Input
 							value={(s.title as string) ?? ""}
-							onChange={(e) => onUpdate({ title: e.target.value })}
+							onChange={(e: any) => onUpdate({ title: e.target.value })}
 							placeholder={t("finance.templates.preview.termsAndConditions")}
 							className="h-8 text-xs rounded-lg"
 						/>
@@ -224,7 +224,7 @@ export function ElementDetailSettings({
 						</Label>
 						<Textarea
 							value={(s.content as string) ?? ""}
-							onChange={(e) => onUpdate({ content: e.target.value })}
+							onChange={(e: any) => onUpdate({ content: e.target.value })}
 							placeholder={t("finance.templates.editor.settings.termsContentPlaceholder")}
 							rows={4}
 							className="text-xs rounded-lg"
@@ -261,7 +261,7 @@ export function ElementDetailSettings({
 								type="file"
 								accept="image/*"
 								className="h-8 text-xs rounded-lg"
-								onChange={(e) => {
+								onChange={(e: any) => {
 									const file = e.target.files?.[0];
 									if (file) {
 										const reader = new FileReader();
@@ -280,7 +280,7 @@ export function ElementDetailSettings({
 						</Label>
 						<Select
 							value={(s.signaturePosition as string) ?? "bottom-right"}
-							onValueChange={(v) => onUpdate({ signaturePosition: v })}
+							onValueChange={(v: any) => onUpdate({ signaturePosition: v })}
 						>
 							<SelectTrigger className="h-8 text-xs rounded-lg">
 								<SelectValue />
@@ -317,7 +317,7 @@ export function ElementDetailSettings({
 						</Label>
 						<Select
 							value={(s.size as string) ?? "medium"}
-							onValueChange={(v) => onUpdate({ size: v })}
+							onValueChange={(v: any) => onUpdate({ size: v })}
 						>
 							<SelectTrigger className="h-8 text-xs rounded-lg">
 								<SelectValue />
@@ -351,7 +351,7 @@ export function ElementDetailSettings({
 						</Label>
 						<Select
 							value={(s.textAlign as string) ?? "center"}
-							onValueChange={(v) => onUpdate({ textAlign: v })}
+							onValueChange={(v: any) => onUpdate({ textAlign: v })}
 						>
 							<SelectTrigger className="h-8 text-xs rounded-lg">
 								<SelectValue />
@@ -381,7 +381,7 @@ export function ElementDetailSettings({
 						</Label>
 						<Input
 							value={(s.label as string) ?? ""}
-							onChange={(e) => onUpdate({ label: e.target.value })}
+							onChange={(e: any) => onUpdate({ label: e.target.value })}
 							placeholder={t(
 								"finance.templates.editor.settings.textLabelPlaceholder",
 							)}
@@ -394,7 +394,7 @@ export function ElementDetailSettings({
 						</Label>
 						<Input
 							value={(s.placeholder as string) ?? ""}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								onUpdate({ placeholder: e.target.value })
 							}
 							placeholder={t(
@@ -409,7 +409,7 @@ export function ElementDetailSettings({
 						</Label>
 						<Textarea
 							value={(s.content as string) ?? ""}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								onUpdate({ content: e.target.value })
 							}
 							placeholder={t(

@@ -225,7 +225,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 	if (!run) return null;
 
 	const items = run.items ?? [];
-	const totalAmount = items.reduce((sum, item) => sum + Number(item.amount ?? 0), 0);
+	const totalAmount = items.reduce((sum: any, item: any) => sum + Number(item.amount ?? 0), 0);
 
 	return (
 		<div className="space-y-6" >
@@ -406,7 +406,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 					</TableHeader>
 					<TableBody>
 						{items.length ? (
-							items.map((item, index) => (
+							items.map((item: any, index: any) => (
 								<TableRow
 									key={item.id}
 									className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
@@ -565,7 +565,7 @@ export function ExpenseRunDetail({ organizationId, organizationSlug, runId }: Ex
 			{/* Delete Item Confirmation Dialog */}
 			<AlertDialog
 				open={!!deleteItemId}
-				onOpenChange={(open) => !open && setDeleteItemId(null)}
+				onOpenChange={(open: any) => !open && setDeleteItemId(null)}
 			>
 				<AlertDialogContent  className="rounded-2xl">
 					<AlertDialogHeader>

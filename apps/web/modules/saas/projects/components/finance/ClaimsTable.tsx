@@ -236,7 +236,7 @@ export function ClaimsTable({
 							<TableCell>
 								<Select
 									value={claim.status}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										handleStatusChange(
 											claim.id,
 											value as "DRAFT" | "SUBMITTED" | "APPROVED" | "PAID" | "REJECTED",

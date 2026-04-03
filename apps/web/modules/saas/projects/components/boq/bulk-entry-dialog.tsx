@@ -151,22 +151,22 @@ export function BulkEntryDialog({
 							<div key={idx} className="grid grid-cols-[60px_1fr_80px_90px_100px_32px] gap-2">
 								<Input
 									value={row.code}
-									onChange={(e) => updateRow(idx, "code", e.target.value)}
+									onChange={(e: any) => updateRow(idx, "code", e.target.value)}
 									className="rounded-lg h-8 text-sm"
-									onKeyDown={(e) => handleKeyDown(e, idx)}
+									onKeyDown={(e: any) => handleKeyDown(e, idx)}
 								/>
 								<Input
 									value={row.description}
-									onChange={(e) => updateRow(idx, "description", e.target.value)}
+									onChange={(e: any) => updateRow(idx, "description", e.target.value)}
 									className="rounded-lg h-8 text-sm"
-									onKeyDown={(e) => handleKeyDown(e, idx)}
+									onKeyDown={(e: any) => handleKeyDown(e, idx)}
 									required
 								/>
 								<Input
 									value={row.unit}
-									onChange={(e) => updateRow(idx, "unit", e.target.value)}
+									onChange={(e: any) => updateRow(idx, "unit", e.target.value)}
 									className="rounded-lg h-8 text-sm"
-									onKeyDown={(e) => handleKeyDown(e, idx)}
+									onKeyDown={(e: any) => handleKeyDown(e, idx)}
 									required
 								/>
 								<Input
@@ -174,18 +174,18 @@ export function BulkEntryDialog({
 									min="0"
 									step="any"
 									value={row.quantity}
-									onChange={(e) => updateRow(idx, "quantity", e.target.value)}
+									onChange={(e: any) => updateRow(idx, "quantity", e.target.value)}
 									className="rounded-lg h-8 text-sm"
-									onKeyDown={(e) => handleKeyDown(e, idx)}
+									onKeyDown={(e: any) => handleKeyDown(e, idx)}
 								/>
 								<Input
 									type="number"
 									min="0"
 									step="any"
 									value={row.unitPrice}
-									onChange={(e) => updateRow(idx, "unitPrice", e.target.value)}
+									onChange={(e: any) => updateRow(idx, "unitPrice", e.target.value)}
 									className="rounded-lg h-8 text-sm"
-									onKeyDown={(e) => handleKeyDown(e, idx)}
+									onKeyDown={(e: any) => handleKeyDown(e, idx)}
 								/>
 								<Button
 									variant="ghost"

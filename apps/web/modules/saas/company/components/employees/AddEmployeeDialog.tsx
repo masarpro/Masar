@@ -117,7 +117,7 @@ export function AddEmployeeDialog({
 								</Label>
 								<Input
 									value={formData.name}
-									onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, name: e.target.value })}
 									className="rounded-xl h-10"
 									required
 								/>
@@ -128,7 +128,7 @@ export function AddEmployeeDialog({
 								</Label>
 								<Select
 									value={formData.type}
-									onValueChange={(value) => setFormData({ ...formData, type: value as any })}
+									onValueChange={(value: any) => setFormData({ ...formData, type: value as any })}
 								>
 									<SelectTrigger className="rounded-xl h-10">
 										<SelectValue />
@@ -149,7 +149,7 @@ export function AddEmployeeDialog({
 								<Input
 									type="date"
 									value={formData.joinDate}
-									onChange={(e) => setFormData({ ...formData, joinDate: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, joinDate: e.target.value })}
 									className="rounded-xl h-10"
 									required
 								/>
@@ -164,7 +164,7 @@ export function AddEmployeeDialog({
 								</Label>
 								<Input
 									value={formData.phone}
-									onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, phone: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -175,7 +175,7 @@ export function AddEmployeeDialog({
 								<Input
 									type="email"
 									value={formData.email}
-									onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, email: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -185,7 +185,7 @@ export function AddEmployeeDialog({
 								</Label>
 								<Input
 									value={formData.nationalId}
-									onChange={(e) => setFormData({ ...formData, nationalId: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, nationalId: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -199,7 +199,7 @@ export function AddEmployeeDialog({
 								</Label>
 								<Select
 									value={formData.salaryType}
-									onValueChange={(value) => setFormData({ ...formData, salaryType: value as any })}
+									onValueChange={(value: any) => setFormData({ ...formData, salaryType: value as any })}
 								>
 									<SelectTrigger className="rounded-xl h-10">
 										<SelectValue />
@@ -219,7 +219,7 @@ export function AddEmployeeDialog({
 									step="0.01"
 									min="0"
 									value={formData.baseSalary}
-									onChange={(e) => setFormData({ ...formData, baseSalary: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, baseSalary: e.target.value })}
 									placeholder="0.00"
 									className="rounded-xl h-10"
 								/>
@@ -233,7 +233,7 @@ export function AddEmployeeDialog({
 									step="0.01"
 									min="0"
 									value={formData.housingAllowance}
-									onChange={(e) => setFormData({ ...formData, housingAllowance: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, housingAllowance: e.target.value })}
 									placeholder="0.00"
 									className="rounded-xl h-10"
 								/>
@@ -251,7 +251,7 @@ export function AddEmployeeDialog({
 									step="0.01"
 									min="0"
 									value={formData.transportAllowance}
-									onChange={(e) => setFormData({ ...formData, transportAllowance: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, transportAllowance: e.target.value })}
 									placeholder="0.00"
 									className="rounded-xl h-10"
 								/>
@@ -265,7 +265,7 @@ export function AddEmployeeDialog({
 									step="0.01"
 									min="0"
 									value={formData.otherAllowances}
-									onChange={(e) => setFormData({ ...formData, otherAllowances: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, otherAllowances: e.target.value })}
 									placeholder="0.00"
 									className="rounded-xl h-10"
 								/>
@@ -279,7 +279,7 @@ export function AddEmployeeDialog({
 									step="0.01"
 									min="0"
 									value={formData.gosiSubscription}
-									onChange={(e) => setFormData({ ...formData, gosiSubscription: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, gosiSubscription: e.target.value })}
 									placeholder="0.00"
 									className="rounded-xl h-10"
 								/>
@@ -293,7 +293,7 @@ export function AddEmployeeDialog({
 							</Label>
 							<Input
 								value={formData.notes}
-								onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+								onChange={(e: any) => setFormData({ ...formData, notes: e.target.value })}
 								className="rounded-xl h-10"
 							/>
 						</div>

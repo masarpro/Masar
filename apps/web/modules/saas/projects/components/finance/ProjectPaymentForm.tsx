@@ -86,7 +86,7 @@ export function ProjectPaymentForm({
 	// Find the selected term
 	const selectedTerm = useMemo(() => {
 		if (!termsData || !selectedTermId) return null;
-		return termsData.terms.find((t) => t.id === selectedTermId) ?? null;
+		return termsData.terms.find((t: any) => t.id === selectedTermId) ?? null;
 	}, [termsData, selectedTermId]);
 
 	// Form state - pre-fill amount from remaining
@@ -115,7 +115,7 @@ export function ProjectPaymentForm({
 	// Handle term change from selector
 	const handleTermChange = (newTermId: string) => {
 		setSelectedTermId(newTermId);
-		const newTerm = termsData?.terms.find((t) => t.id === newTermId);
+		const newTerm = termsData?.terms.find((t: any) => t.id === newTermId);
 		if (newTerm) {
 			setFormData((prev) => ({
 				...prev,
@@ -133,7 +133,7 @@ export function ProjectPaymentForm({
 
 	const accounts = accountsData?.accounts ?? [];
 	const selectedAccount = accounts.find(
-		(a) => a.id === formData.destinationAccountId,
+		(a: any) => a.id === formData.destinationAccountId,
 	);
 
 	// Create mutation
@@ -200,7 +200,7 @@ export function ProjectPaymentForm({
 				<div className="overflow-hidden rounded-2xl border border-slate-200/50 bg-white dark:border-slate-700/30 dark:bg-slate-900/50">
 					{/* Compact terms overview strip */}
 					<div className="flex gap-1.5 overflow-x-auto border-b border-slate-200/50 p-3 dark:border-slate-700/30">
-						{termsData.terms.map((term) => {
+						{termsData.terms.map((term: any) => {
 							const isActive = term.id === selectedTermId;
 							const progressColor = term.isComplete
 								? "bg-sky-500"
@@ -244,8 +244,8 @@ export function ProjectPaymentForm({
 							</SelectTrigger>
 							<SelectContent className="rounded-xl">
 								{termsData.terms
-									.filter((term) => !term.isComplete)
-									.map((term) => (
+									.filter((term: any) => !term.isComplete)
+									.map((term: any) => (
 										<SelectItem key={term.id} value={term.id}>
 											<div className="flex items-center gap-2">
 												<span>
@@ -358,7 +358,7 @@ export function ProjectPaymentForm({
 									step="0.01"
 									min="0"
 									value={formData.amount}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({
 											...formData,
 											amount: e.target.value,
@@ -381,7 +381,7 @@ export function ProjectPaymentForm({
 							<Input
 								type="date"
 								value={formData.date}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({
 										...formData,
 										date: e.target.value,
@@ -400,7 +400,7 @@ export function ProjectPaymentForm({
 						</Label>
 						<Input
 							value={formData.clientName}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData({
 									...formData,
 									clientName: e.target.value,
@@ -420,7 +420,7 @@ export function ProjectPaymentForm({
 						</Label>
 						<Textarea
 							value={formData.description}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData({
 									...formData,
 									description: e.target.value,
@@ -455,7 +455,7 @@ export function ProjectPaymentForm({
 						</Label>
 						<Select
 							value={formData.destinationAccountId}
-							onValueChange={(value) =>
+							onValueChange={(value: any) =>
 								setFormData({
 									...formData,
 									destinationAccountId: value,
@@ -470,7 +470,7 @@ export function ProjectPaymentForm({
 								/>
 							</SelectTrigger>
 							<SelectContent className="rounded-xl">
-								{accounts.map((account) => (
+								{accounts.map((account: any) => (
 									<SelectItem
 										key={account.id}
 										value={account.id}
@@ -553,7 +553,7 @@ export function ProjectPaymentForm({
 							</Label>
 							<Select
 								value={formData.paymentMethod}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									setFormData({
 										...formData,
 										paymentMethod: value as any,
@@ -583,7 +583,7 @@ export function ProjectPaymentForm({
 							</Label>
 							<Input
 								value={formData.referenceNo}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({
 										...formData,
 										referenceNo: e.target.value,
@@ -609,7 +609,7 @@ export function ProjectPaymentForm({
 						</Label>
 						<Textarea
 							value={formData.notes}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData({
 									...formData,
 									notes: e.target.value,

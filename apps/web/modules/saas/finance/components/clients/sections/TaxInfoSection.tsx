@@ -32,7 +32,7 @@ export function TaxInfoSection({
 						<Label>{t("finance.clients.taxNumber")}</Label>
 						<Input
 							value={formData.taxNumber}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData((prev) => ({
 									...prev,
 									taxNumber: e.target.value,
@@ -50,7 +50,7 @@ export function TaxInfoSection({
 						<Label>{t("finance.clients.crNumber")}</Label>
 						<Input
 							value={formData.crNumber}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData((prev) => ({
 									...prev,
 									crNumber: e.target.value,

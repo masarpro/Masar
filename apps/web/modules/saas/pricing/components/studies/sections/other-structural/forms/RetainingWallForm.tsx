@@ -22,7 +22,7 @@ export function RetainingWallForm({ data, onChange }: ElementFormProps<Retaining
 			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 				<div>
 					<Label>{t("fields.retainingWallType")}</Label>
-					<Select value={data.wallType} onValueChange={(v) => set("wallType", v)}>
+					<Select value={data.wallType} onValueChange={(v: any) => set("wallType", v)}>
 						<SelectTrigger><SelectValue /></SelectTrigger>
 						<SelectContent>
 							<SelectItem value="CANTILEVER">{t("retainingWallTypes.CANTILEVER")}</SelectItem>
@@ -33,15 +33,15 @@ export function RetainingWallForm({ data, onChange }: ElementFormProps<Retaining
 				</div>
 				<div>
 					<Label>{t("fields.length")} (م)</Label>
-					<Input type="number" min={0} step={0.5} value={data.length || ""} onChange={(e) => set("length", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0} step={0.5} value={data.length || ""} onChange={(e: any) => set("length", parseFloat(e.target.value) || 0)} />
 				</div>
 				<div>
 					<Label>{t("fields.height")} (م)</Label>
-					<Input type="number" min={0} step={0.5} value={data.height || ""} onChange={(e) => set("height", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0} step={0.5} value={data.height || ""} onChange={(e: any) => set("height", parseFloat(e.target.value) || 0)} />
 				</div>
 				<div>
 					<Label>{t("fields.quantity")}</Label>
-					<Input type="number" min={1} step={1} value={data.quantity || 1} onChange={(e) => set("quantity", parseInt(e.target.value) || 1)} />
+					<Input type="number" min={1} step={1} value={data.quantity || 1} onChange={(e: any) => set("quantity", parseInt(e.target.value) || 1)} />
 				</div>
 			</div>
 
@@ -53,15 +53,15 @@ export function RetainingWallForm({ data, onChange }: ElementFormProps<Retaining
 				<div className="grid grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.stemThickness")} (سم)</Label>
-						<Input type="number" value={data.stemThickness} onChange={(e) => set("stemThickness", parseFloat(e.target.value) || 25)} />
+						<Input type="number" value={data.stemThickness} onChange={(e: any) => set("stemThickness", parseFloat(e.target.value) || 25)} />
 					</div>
 					<div>
 						<Label>{t("fields.baseWidth")} (م)</Label>
-						<Input type="number" step={0.1} value={data.baseWidth || ""} onChange={(e) => set("baseWidth", parseFloat(e.target.value) || 0)} />
+						<Input type="number" step={0.1} value={data.baseWidth || ""} onChange={(e: any) => set("baseWidth", parseFloat(e.target.value) || 0)} />
 					</div>
 					<div>
 						<Label>{t("fields.baseThickness")} (سم)</Label>
-						<Input type="number" value={data.baseThickness} onChange={(e) => set("baseThickness", parseFloat(e.target.value) || 30)} />
+						<Input type="number" value={data.baseThickness} onChange={(e: any) => set("baseThickness", parseFloat(e.target.value) || 30)} />
 					</div>
 				</div>
 			)}

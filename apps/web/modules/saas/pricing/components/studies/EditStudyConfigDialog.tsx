@@ -180,7 +180,7 @@ export function EditStudyConfigDialog({
 								>
 									<Checkbox
 										checked={scopes[item.key]}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											setScopes({ ...scopes, [item.key]: !!checked })
 										}
 									/>

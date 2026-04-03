@@ -41,7 +41,7 @@ export default async function ChoosePlanPage() {
 	);
 
 	if (!error && purchases) {
-		const { activePlan } = createPurchasesHelper(purchases);
+		const { activePlan } = createPurchasesHelper(purchases as any);
 
 		if (activePlan) {
 			redirect("/app");

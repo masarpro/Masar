@@ -624,7 +624,7 @@ export function ChangeOrderDetail({
 						<Textarea
 							placeholder={t("changeOrders.dialog.notePlaceholder")}
 							value={decisionNote}
-							onChange={(e) => setDecisionNote(e.target.value)}
+							onChange={(e: any) => setDecisionNote(e.target.value)}
 							rows={3}
 						/>
 					</div>

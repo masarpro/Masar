@@ -51,7 +51,7 @@ export function AdminLogs() {
 				type="search"
 				placeholder={t("admin.logs.filterByAction")}
 				value={actionFilter}
-				onChange={(e) => setActionFilter(e.target.value)}
+				onChange={(e: any) => setActionFilter(e.target.value)}
 			/>
 
 			<Card>
@@ -77,7 +77,7 @@ export function AdminLogs() {
 								</TableRow>
 							))
 						) : data?.logs.length ? (
-							data.logs.map((log) => (
+							data.logs.map((log: any) => (
 								<TableRow key={log.id}>
 									<TableCell className="text-sm">
 										{new Date(

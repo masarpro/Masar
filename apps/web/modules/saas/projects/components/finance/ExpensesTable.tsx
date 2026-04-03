@@ -153,13 +153,13 @@ export function ExpensesTable({
 							<Input
 								placeholder={t("finance.expenses.searchPlaceholder")}
 								value={searchQuery}
-								onChange={(e) => onSearchChange(e.target.value)}
+								onChange={(e: any) => onSearchChange(e.target.value)}
 								className="ps-10 rounded-xl"
 							/>
 						</div>
 						<Select
 							value={selectedCategory || "all"}
-							onValueChange={(value) =>
+							onValueChange={(value: any) =>
 								onCategoryChange(value === "all" ? undefined : value)
 							}
 						>

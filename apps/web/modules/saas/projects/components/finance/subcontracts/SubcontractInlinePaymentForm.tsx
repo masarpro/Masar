@@ -131,7 +131,7 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 								step="0.01"
 								min="0"
 								value={payAmount}
-								onChange={(e) => setPayAmount(e.target.value)}
+								onChange={(e: any) => setPayAmount(e.target.value)}
 								placeholder="0.00"
 								className="rounded-lg pl-12"
 								dir="ltr"
@@ -149,7 +149,7 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 						<Input
 							type="date"
 							value={payDate}
-							onChange={(e) => setPayDate(e.target.value)}
+							onChange={(e: any) => setPayDate(e.target.value)}
 							className="rounded-lg"
 							required
 						/>
@@ -200,7 +200,7 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 							<Label className="text-xs">{t("subcontracts.payment.selectTerm")}</Label>
 							<Select
 								value={payTermId || "_none"}
-								onValueChange={(v) => {
+								onValueChange={(v: any) => {
 									const actualValue = v === "_none" ? "" : v;
 									setPayTermId(actualValue);
 									if (actualValue) {
@@ -234,7 +234,7 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 							<Label className="text-xs">{t("claims.linkToClaim")}</Label>
 							<Select
 								value={payClaimId || "_none"}
-								onValueChange={(v) => {
+								onValueChange={(v: any) => {
 									const actualValue = v === "_none" ? "" : v;
 									setPayClaimId(actualValue);
 									if (actualValue) {
@@ -269,7 +269,7 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 						<Label className="text-xs">{t("subcontracts.payment.referenceNo")}</Label>
 						<Input
 							value={payReferenceNo}
-							onChange={(e) => setPayReferenceNo(e.target.value)}
+							onChange={(e: any) => setPayReferenceNo(e.target.value)}
 							className="rounded-lg"
 							dir="ltr"
 						/>
@@ -280,7 +280,7 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 						<Label className="text-xs">{t("subcontracts.payment.description")}</Label>
 						<Input
 							value={payDescription}
-							onChange={(e) => setPayDescription(e.target.value)}
+							onChange={(e: any) => setPayDescription(e.target.value)}
 							className="rounded-lg"
 						/>
 					</div>

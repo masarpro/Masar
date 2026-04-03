@@ -138,7 +138,7 @@ export function BandedBeamSlabFields({
 									variant="ghost"
 									size="sm"
 									className="text-red-500 hover:text-red-700"
-									onClick={(e) => {
+									onClick={(e: any) => {
 										e.stopPropagation();
 										setBandedBeamTemplates(prev => prev.filter(t => t.id !== tmpl.id));
 										setExpandedBandedIds(prev => prev.filter(x => x !== tmpl.id));
@@ -155,23 +155,23 @@ export function BandedBeamSlabFields({
 									<div className="grid grid-cols-2 md:grid-cols-5 gap-3">
 										<div className="space-y-1">
 											<Label className="text-xs">اسم النموذج</Label>
-											<Input value={tmpl.name} onChange={e => updateTmpl({ name: e.target.value })} />
+											<Input value={tmpl.name} onChange={(e: any) => updateTmpl({ name: e.target.value })} />
 										</div>
 										<div className="space-y-1">
 											<Label className="text-xs">عدد التكرار</Label>
-											<Input type="number" min={1} value={tmpl.quantity} onChange={e => updateTmpl({ quantity: +e.target.value })} />
+											<Input type="number" min={1} value={tmpl.quantity} onChange={(e: any) => updateTmpl({ quantity: +e.target.value })} />
 										</div>
 										<div className="space-y-1">
 											<Label className="text-xs">طول الكمرة (م)</Label>
-											<Input type="number" step="0.1" value={tmpl.length} onChange={e => updateTmpl({ length: +e.target.value })} />
+											<Input type="number" step="0.1" value={tmpl.length} onChange={(e: any) => updateTmpl({ length: +e.target.value })} />
 										</div>
 										<div className="space-y-1">
 											<Label className="text-xs">عرض الكمرة (م)</Label>
-											<Input type="number" step="0.1" value={tmpl.width} onChange={e => updateTmpl({ width: +e.target.value })} />
+											<Input type="number" step="0.1" value={tmpl.width} onChange={(e: any) => updateTmpl({ width: +e.target.value })} />
 										</div>
 										<div className="space-y-1">
 											<Label className="text-xs">عمق الكمرة (م)</Label>
-											<Input type="number" step="0.05" value={tmpl.depth} onChange={e => updateTmpl({ depth: +e.target.value })} />
+											<Input type="number" step="0.05" value={tmpl.depth} onChange={(e: any) => updateTmpl({ depth: +e.target.value })} />
 										</div>
 									</div>
 
@@ -179,11 +179,11 @@ export function BandedBeamSlabFields({
 									<div className="grid grid-cols-2 md:grid-cols-5 gap-3">
 										<div className="space-y-1">
 											<Label className="text-xs">سفلي مستمر - عدد</Label>
-											<Input type="number" min={1} value={tmpl.bottomContCount} onChange={e => updateTmpl({ bottomContCount: +e.target.value })} />
+											<Input type="number" min={1} value={tmpl.bottomContCount} onChange={(e: any) => updateTmpl({ bottomContCount: +e.target.value })} />
 										</div>
 										<div className="space-y-1">
 											<Label className="text-xs">سفلي مستمر - قطر</Label>
-											<Select value={String(tmpl.bottomContDiameter)} onValueChange={v => updateTmpl({ bottomContDiameter: +v })}>
+											<Select value={String(tmpl.bottomContDiameter)} onValueChange={(v: any) => updateTmpl({ bottomContDiameter: +v })}>
 												<SelectTrigger><SelectValue /></SelectTrigger>
 												<SelectContent>
 													{REBAR_DIAMETERS.map(d => <SelectItem key={d} value={String(d)}>{d} مم</SelectItem>)}
@@ -205,11 +205,11 @@ export function BandedBeamSlabFields({
 											<>
 												<div className="space-y-1">
 													<Label className="text-xs">إضافي - عدد</Label>
-													<Input type="number" min={1} value={tmpl.bottomAddCount} onChange={e => updateTmpl({ bottomAddCount: +e.target.value })} />
+													<Input type="number" min={1} value={tmpl.bottomAddCount} onChange={(e: any) => updateTmpl({ bottomAddCount: +e.target.value })} />
 												</div>
 												<div className="space-y-1">
 													<Label className="text-xs">إضافي - قطر</Label>
-													<Select value={String(tmpl.bottomAddDiameter)} onValueChange={v => updateTmpl({ bottomAddDiameter: +v })}>
+													<Select value={String(tmpl.bottomAddDiameter)} onValueChange={(v: any) => updateTmpl({ bottomAddDiameter: +v })}>
 														<SelectTrigger><SelectValue /></SelectTrigger>
 														<SelectContent>
 															{REBAR_DIAMETERS.map(d => <SelectItem key={d} value={String(d)}>{d} مم</SelectItem>)}
@@ -224,11 +224,11 @@ export function BandedBeamSlabFields({
 									<div className="grid grid-cols-2 md:grid-cols-5 gap-3">
 										<div className="space-y-1">
 											<Label className="text-xs">علوي مستمر - عدد</Label>
-											<Input type="number" min={1} value={tmpl.topContCount} onChange={e => updateTmpl({ topContCount: +e.target.value })} />
+											<Input type="number" min={1} value={tmpl.topContCount} onChange={(e: any) => updateTmpl({ topContCount: +e.target.value })} />
 										</div>
 										<div className="space-y-1">
 											<Label className="text-xs">علوي مستمر - قطر</Label>
-											<Select value={String(tmpl.topContDiameter)} onValueChange={v => updateTmpl({ topContDiameter: +v })}>
+											<Select value={String(tmpl.topContDiameter)} onValueChange={(v: any) => updateTmpl({ topContDiameter: +v })}>
 												<SelectTrigger><SelectValue /></SelectTrigger>
 												<SelectContent>
 													{REBAR_DIAMETERS.map(d => <SelectItem key={d} value={String(d)}>{d} مم</SelectItem>)}
@@ -241,7 +241,7 @@ export function BandedBeamSlabFields({
 									<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 										<div className="space-y-1">
 											<Label className="text-xs">كانات - قطر</Label>
-											<Select value={String(tmpl.stirrupDiameter)} onValueChange={v => updateTmpl({ stirrupDiameter: +v })}>
+											<Select value={String(tmpl.stirrupDiameter)} onValueChange={(v: any) => updateTmpl({ stirrupDiameter: +v })}>
 												<SelectTrigger><SelectValue /></SelectTrigger>
 												<SelectContent>
 													{REBAR_DIAMETERS.filter(d => d <= 12).map(d => <SelectItem key={d} value={String(d)}>{d} مم</SelectItem>)}
@@ -250,15 +250,15 @@ export function BandedBeamSlabFields({
 										</div>
 										<div className="space-y-1">
 											<Label className="text-xs">تباعد ربع البحر (سم)</Label>
-											<Input type="number" step="1" min={1} value={tmpl.stirrupSpacingQuarter} onChange={e => updateTmpl({ stirrupSpacingQuarter: +e.target.value })} />
+											<Input type="number" step="1" min={1} value={tmpl.stirrupSpacingQuarter} onChange={(e: any) => updateTmpl({ stirrupSpacingQuarter: +e.target.value })} />
 										</div>
 										<div className="space-y-1">
 											<Label className="text-xs">تباعد المنتصف (سم)</Label>
-											<Input type="number" step="1" min={1} value={tmpl.stirrupSpacingMid} onChange={e => updateTmpl({ stirrupSpacingMid: +e.target.value })} />
+											<Input type="number" step="1" min={1} value={tmpl.stirrupSpacingMid} onChange={(e: any) => updateTmpl({ stirrupSpacingMid: +e.target.value })} />
 										</div>
 										<div className="space-y-1">
 											<Label className="text-xs">عدد الفروع</Label>
-											<Select value={String(tmpl.stirrupLegs)} onValueChange={v => updateTmpl({ stirrupLegs: +v })}>
+											<Select value={String(tmpl.stirrupLegs)} onValueChange={(v: any) => updateTmpl({ stirrupLegs: +v })}>
 												<SelectTrigger><SelectValue /></SelectTrigger>
 												<SelectContent>
 													<SelectItem value="2">2 فرع</SelectItem>

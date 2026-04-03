@@ -98,7 +98,7 @@ export function PaymentsList({
 
 	const payments = data?.payments ?? [];
 	const totalPayments = payments.reduce(
-		(acc, p) => acc + Number(p.amount),
+		(acc: any, p: any) => acc + Number(p.amount),
 		0,
 	);
 
@@ -174,7 +174,7 @@ export function PaymentsList({
 							<Input
 								placeholder={t("finance.payments.searchPlaceholder")}
 								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
+								onChange={(e: any) => setSearchQuery(e.target.value)}
 								className="ps-10 rounded-xl"
 							/>
 						</div>
@@ -210,7 +210,7 @@ export function PaymentsList({
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{payments.map((payment) => (
+								{payments.map((payment: any) => (
 									<TableRow
 										key={payment.id}
 										className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
@@ -262,7 +262,7 @@ export function PaymentsList({
 												+<Currency amount={Number(payment.amount)} />
 											</span>
 										</TableCell>
-										<TableCell onClick={(e) => e.stopPropagation()}>
+										<TableCell onClick={(e: any) => e.stopPropagation()}>
 											<DropdownMenu>
 												<DropdownMenuTrigger asChild>
 													<Button variant="ghost" size="sm" className="h-8 w-8 p-0">

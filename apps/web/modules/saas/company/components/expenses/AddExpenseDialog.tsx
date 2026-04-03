@@ -106,7 +106,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Input
 									value={formData.name}
-									onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, name: e.target.value })}
 									className="rounded-xl h-10"
 									required
 								/>
@@ -117,7 +117,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Select
 									value={formData.category}
-									onValueChange={(value) => setFormData({ ...formData, category: value as any })}
+									onValueChange={(value: any) => setFormData({ ...formData, category: value as any })}
 								>
 									<SelectTrigger className="rounded-xl h-10">
 										<SelectValue />
@@ -140,7 +140,7 @@ export function AddExpenseDialog({
 									step="0.01"
 									min="0"
 									value={formData.amount}
-									onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, amount: e.target.value })}
 									placeholder="0.00"
 									className="rounded-xl h-10"
 									required
@@ -156,7 +156,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Select
 									value={formData.recurrence}
-									onValueChange={(value) => setFormData({ ...formData, recurrence: value as any })}
+									onValueChange={(value: any) => setFormData({ ...formData, recurrence: value as any })}
 								>
 									<SelectTrigger className="rounded-xl h-10">
 										<SelectValue />
@@ -176,7 +176,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Input
 									value={formData.vendor}
-									onChange={(e) => setFormData({ ...formData, vendor: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, vendor: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -186,7 +186,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Input
 									value={formData.contractNumber}
-									onChange={(e) => setFormData({ ...formData, contractNumber: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, contractNumber: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -201,7 +201,7 @@ export function AddExpenseDialog({
 								<Input
 									type="date"
 									value={formData.startDate}
-									onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, startDate: e.target.value })}
 									className="rounded-xl h-10"
 									required
 								/>
@@ -213,7 +213,7 @@ export function AddExpenseDialog({
 								<Input
 									type="date"
 									value={formData.endDate}
-									onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, endDate: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -225,7 +225,7 @@ export function AddExpenseDialog({
 									type="number"
 									min="0"
 									value={formData.reminderDays}
-									onChange={(e) => setFormData({ ...formData, reminderDays: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, reminderDays: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -239,7 +239,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Input
 									value={formData.description}
-									onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, description: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -249,7 +249,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Input
 									value={formData.notes}
-									onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, notes: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>

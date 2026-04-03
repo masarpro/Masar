@@ -250,7 +250,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 					</TableHeader>
 					<TableBody>
 						{expense.payments?.length ? (
-							expense.payments.map((payment) => (
+							expense.payments.map((payment: any) => (
 								<TableRow key={payment.id} className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
 									<TableCell className="text-slate-700 dark:text-slate-300">
 										{new Date(payment.periodStart).toLocaleDateString("ar-SA")} -{" "}
@@ -339,7 +339,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 
 					{expense.allocations?.length ? (
 						<div className="space-y-2">
-							{expense.allocations.map((allocation) => (
+							{expense.allocations.map((allocation: any) => (
 								<div key={allocation.id} className="flex items-center justify-between rounded-xl border border-white/20 dark:border-slate-700/30 bg-slate-50/50 dark:bg-slate-800/20 p-3">
 									<div>
 										<p className="font-medium text-slate-900 dark:text-slate-100">{allocation.project.name}</p>
@@ -359,7 +359,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 			</div>
 
 			{/* Mark Paid Dialog - select bank account */}
-			<Dialog open={!!markPaidPaymentId} onOpenChange={(open) => { if (!open) { setMarkPaidPaymentId(null); setSelectedBankAccountId(""); } }}>
+			<Dialog open={!!markPaidPaymentId} onOpenChange={(open: any) => { if (!open) { setMarkPaidPaymentId(null); setSelectedBankAccountId(""); } }}>
 				<DialogContent className="rounded-2xl">
 					<DialogHeader>
 						<DialogTitle className="text-end">{t("company.expenses.selectBankAccount")}</DialogTitle>
@@ -372,7 +372,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 									<SelectValue placeholder={t("company.expenses.selectBankAccountPlaceholder")} />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
-									{bankAccounts.map((account) => (
+									{bankAccounts.map((account: any) => (
 										<SelectItem key={account.id} value={account.id}>
 											<div className="flex items-center gap-2">
 												<Building className="h-4 w-4 text-blue-500" />
@@ -438,7 +438,7 @@ function AllocationForm({
 			{allocations.map((a, i) => (
 				<div key={i} className="flex items-end gap-3">
 					<div className="flex-1">
-						<Select value={a.projectId} onValueChange={(v) => updateRow(i, "projectId", v)}>
+						<Select value={a.projectId} onValueChange={(v: any) => updateRow(i, "projectId", v)}>
 							<SelectTrigger className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70">
 								<SelectValue placeholder={t("company.employees.selectProject")} />
 							</SelectTrigger>
@@ -455,7 +455,7 @@ function AllocationForm({
 							min={0}
 							max={100}
 							value={a.percentage}
-							onChange={(e) => updateRow(i, "percentage", e.target.value)}
+							onChange={(e: any) => updateRow(i, "percentage", e.target.value)}
 							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70"
 						/>
 					</div>

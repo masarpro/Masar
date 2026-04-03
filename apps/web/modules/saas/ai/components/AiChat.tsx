@@ -142,7 +142,7 @@ export function AiChat({ organizationId }: { organizationId?: string }) {
 	const sortedChats = useMemo(() => {
 		return (
 			chats?.sort(
-				(a, b) =>
+				(a: any, b: any) =>
 					new Date(b.createdAt).getTime() -
 					new Date(a.createdAt).getTime(),
 			) ?? []
@@ -198,7 +198,7 @@ export function AiChat({ organizationId }: { organizationId?: string }) {
 						</p>
 					)}
 
-					{sortedChats.map((chat) => (
+					{sortedChats.map((chat: any) => (
 						<div className="relative" key={chat.id}>
 							<Button
 								variant="link"
@@ -279,11 +279,11 @@ export function AiChat({ organizationId }: { organizationId?: string }) {
 				>
 					<Textarea
 						value={input}
-						onChange={(e) => setInput(e.target.value)}
+						onChange={(e: any) => setInput(e.target.value)}
 						disabled={!hasChat}
 						placeholder="Chat with your AI..."
 						className="min-h-8 rounded-none border-none bg-transparent focus:outline-hidden focus-visible:ring-0 shadow-none p-6 pr-14"
-						onKeyDown={(e) => {
+						onKeyDown={(e: any) => {
 							if (e.key === "Enter" && !e.shiftKey) {
 								e.preventDefault();
 								handleSubmit(e);

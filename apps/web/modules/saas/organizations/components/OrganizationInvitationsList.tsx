@@ -54,9 +54,9 @@ export function OrganizationInvitationsList({
 	const invitations = useMemo(
 		() =>
 			organization?.invitations
-				?.filter((invitation) => invitation.status === "pending")
+				?.filter((invitation: any) => invitation.status === "pending")
 				.sort(
-					(a, b) =>
+					(a: any, b: any) =>
 						new Date(a.expiresAt).getTime() -
 						new Date(b.expiresAt).getTime(),
 				),

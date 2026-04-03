@@ -100,7 +100,7 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 						<Collapsible
 							key={item.id}
 							open={isOpen}
-							onOpenChange={(open) =>
+							onOpenChange={(open: any) =>
 								setOpenMenus(
 									open ? [item.id] : [],
 								)

@@ -282,7 +282,7 @@ export function EmptySectionTable({
 		value: string | undefined,
 		onChange: (v: string) => void,
 	) => (
-		<Select value={value || "none"} onValueChange={(v) => onChange(v === "none" ? "" : v)}>
+		<Select value={value || "none"} onValueChange={(v: any) => onChange(v === "none" ? "" : v)}>
 			<SelectTrigger className="h-8">
 				<SelectValue />
 			</SelectTrigger>
@@ -722,7 +722,7 @@ function renderEditCells(
 					<td className="px-3 py-1.5">
 						<Select
 							value={row.extras.scope || "none"}
-							onValueChange={(v) => updateExtras({ scope: v === "none" ? "" : v })}
+							onValueChange={(v: any) => updateExtras({ scope: v === "none" ? "" : v })}
 						>
 							<SelectTrigger className="h-8">
 								<SelectValue />

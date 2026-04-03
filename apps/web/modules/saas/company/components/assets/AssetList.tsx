@@ -159,11 +159,11 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 						<Input
 							placeholder={t("company.assets.searchPlaceholder")}
 							value={search}
-							onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+							onChange={(e: any) => { setSearch(e.target.value); setCurrentPage(1); }}
 							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pe-10 focus:ring-1 focus:ring-primary/30"
 						/>
 					</div>
-					<Select value={categoryFilter} onValueChange={(v) => { setCategoryFilter(v); setCurrentPage(1); }}>
+					<Select value={categoryFilter} onValueChange={(v: any) => { setCategoryFilter(v); setCurrentPage(1); }}>
 						<SelectTrigger className="w-[160px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.assets.filterCategory")} />
 						</SelectTrigger>
@@ -176,7 +176,7 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 							))}
 						</SelectContent>
 					</Select>
-					<Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setCurrentPage(1); }}>
+					<Select value={statusFilter} onValueChange={(v: any) => { setStatusFilter(v); setCurrentPage(1); }}>
 						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.assets.filterStatus")} />
 						</SelectTrigger>
@@ -224,7 +224,7 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 								</TableRow>
 							))
 						) : data?.assets?.length ? (
-							data.assets.map((asset, index) => (
+							data.assets.map((asset: any, index: any) => (
 								<TableRow
 									key={asset.id}
 									className="cursor-pointer border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"

@@ -63,7 +63,7 @@ export function ClientInfoSection({
 									<Label>{t("finance.clients.firstName")} *</Label>
 									<Input
 										value={formData.firstName}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											setFormData((prev) => ({
 												...prev,
 												firstName: e.target.value,
@@ -78,7 +78,7 @@ export function ClientInfoSection({
 									<Label>{t("finance.clients.lastName")} *</Label>
 									<Input
 										value={formData.lastName}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											setFormData((prev) => ({
 												...prev,
 												lastName: e.target.value,
@@ -98,7 +98,7 @@ export function ClientInfoSection({
 								<Label>{t("finance.clients.businessName")} *</Label>
 								<Input
 									value={formData.businessName}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData((prev) => ({
 											...prev,
 											businessName: e.target.value,
@@ -122,7 +122,7 @@ export function ClientInfoSection({
 						</Label>
 						<Input
 							value={formData.phone}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData((prev) => ({
 									...prev,
 									phone: e.target.value,
@@ -140,7 +140,7 @@ export function ClientInfoSection({
 						</Label>
 						<Input
 							value={formData.mobile}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData((prev) => ({
 									...prev,
 									mobile: e.target.value,
@@ -162,7 +162,7 @@ export function ClientInfoSection({
 					<Input
 						type="email"
 						value={formData.email}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							setFormData((prev) => ({
 								...prev,
 								email: e.target.value,

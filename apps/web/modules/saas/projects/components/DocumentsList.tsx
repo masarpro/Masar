@@ -144,7 +144,7 @@ export function DocumentsList({
 					queryKey: [["projectDocuments", "list"]],
 				});
 			},
-			onError: (error) => {
+			onError: (error: any) => {
 				toast.error(error.message || t("deleteError"));
 			},
 		}),
@@ -269,7 +269,7 @@ export function DocumentsList({
 			) : (
 				/* ─── Compact Grid ─── */
 				<div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-					{data.items.map((doc) => {
+					{data.items.map((doc: any) => {
 						const { icon: FileIcon, bg, color } = getFileTypeIcon(doc.mimeType);
 						return (
 							<div

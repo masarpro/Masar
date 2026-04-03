@@ -56,8 +56,8 @@ export function TransferForm({
 	const accounts = accountsData?.accounts ?? [];
 
 	// Selected accounts
-	const fromAccount = accounts.find((a) => a.id === formData.fromAccountId);
-	const toAccount = accounts.find((a) => a.id === formData.toAccountId);
+	const fromAccount = accounts.find((a: any) => a.id === formData.fromAccountId);
+	const toAccount = accounts.find((a: any) => a.id === formData.toAccountId);
 
 	// Create mutation
 	const createMutation = useMutation({
@@ -122,7 +122,7 @@ export function TransferForm({
 								step="0.01"
 								min="0"
 								value={formData.amount}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({ ...formData, amount: e.target.value })
 								}
 								placeholder="0.00"
@@ -136,7 +136,7 @@ export function TransferForm({
 							<Input
 								type="date"
 								value={formData.date}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({ ...formData, date: e.target.value })
 								}
 								className="rounded-xl mt-1"
@@ -150,7 +150,7 @@ export function TransferForm({
 						<Label>{t("finance.transfers.description")}</Label>
 						<Input
 							value={formData.description}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData({ ...formData, description: e.target.value })
 							}
 							placeholder={t("finance.transfers.descriptionPlaceholder")}
@@ -163,7 +163,7 @@ export function TransferForm({
 						<Label>{t("finance.transfers.referenceNo")}</Label>
 						<Input
 							value={formData.referenceNo}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData({ ...formData, referenceNo: e.target.value })
 							}
 							placeholder={t("finance.transfers.referenceNoPlaceholder")}
@@ -182,7 +182,7 @@ export function TransferForm({
 				<CardContent className="space-y-4">
 					<Select
 						value={formData.fromAccountId}
-						onValueChange={(value) =>
+						onValueChange={(value: any) =>
 							setFormData({ ...formData, fromAccountId: value })
 						}
 					>
@@ -191,8 +191,8 @@ export function TransferForm({
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
 							{accounts
-								.filter((a) => a.id !== formData.toAccountId)
-								.map((account) => (
+								.filter((a: any) => a.id !== formData.toAccountId)
+								.map((account: any) => (
 									<SelectItem key={account.id} value={account.id}>
 										<div className="flex items-center gap-2">
 											{account.accountType === "BANK" ? (
@@ -259,7 +259,7 @@ export function TransferForm({
 				<CardContent className="space-y-4">
 					<Select
 						value={formData.toAccountId}
-						onValueChange={(value) =>
+						onValueChange={(value: any) =>
 							setFormData({ ...formData, toAccountId: value })
 						}
 					>
@@ -268,8 +268,8 @@ export function TransferForm({
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
 							{accounts
-								.filter((a) => a.id !== formData.fromAccountId)
-								.map((account) => (
+								.filter((a: any) => a.id !== formData.fromAccountId)
+								.map((account: any) => (
 									<SelectItem key={account.id} value={account.id}>
 										<div className="flex items-center gap-2">
 											{account.accountType === "BANK" ? (
@@ -329,7 +329,7 @@ export function TransferForm({
 				<CardContent>
 					<Textarea
 						value={formData.notes}
-						onChange={(e) =>
+						onChange={(e: any) =>
 							setFormData({ ...formData, notes: e.target.value })
 						}
 						placeholder={t("finance.transfers.notesPlaceholder")}

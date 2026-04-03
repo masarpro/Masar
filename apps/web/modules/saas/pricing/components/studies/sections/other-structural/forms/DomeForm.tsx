@@ -23,7 +23,7 @@ export function DomeForm({ data, onChange }: ElementFormProps<DomeInput>) {
 			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 				<div>
 					<Label>{t("fields.domeType")}</Label>
-					<Select value={data.domeType} onValueChange={(v) => set("domeType", v)}>
+					<Select value={data.domeType} onValueChange={(v: any) => set("domeType", v)}>
 						<SelectTrigger><SelectValue /></SelectTrigger>
 						<SelectContent>
 							<SelectItem value="HALF_SPHERE">{t("domeTypes.HALF_SPHERE")}</SelectItem>
@@ -35,29 +35,29 @@ export function DomeForm({ data, onChange }: ElementFormProps<DomeInput>) {
 				</div>
 				<div>
 					<Label>{t("fields.diameter")} (م)</Label>
-					<Input type="number" min={0} step={0.5} value={data.diameter || ""} onChange={(e) => set("diameter", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0} step={0.5} value={data.diameter || ""} onChange={(e: any) => set("diameter", parseFloat(e.target.value) || 0)} />
 				</div>
 				<div>
 					<Label>{t("fields.riseHeight")} (م)</Label>
-					<Input type="number" min={0} step={0.5} value={data.riseHeight || ""} onChange={(e) => set("riseHeight", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0} step={0.5} value={data.riseHeight || ""} onChange={(e: any) => set("riseHeight", parseFloat(e.target.value) || 0)} />
 				</div>
 				<div>
 					<Label>{t("fields.quantity")}</Label>
-					<Input type="number" min={1} step={1} value={data.quantity || 1} onChange={(e) => set("quantity", parseInt(e.target.value) || 1)} />
+					<Input type="number" min={1} step={1} value={data.quantity || 1} onChange={(e: any) => set("quantity", parseInt(e.target.value) || 1)} />
 				</div>
 			</div>
 
 			<div className="flex flex-wrap gap-4">
 				<div className="flex items-center gap-2">
-					<Checkbox id="hasRingBeam" checked={data.hasRingBeam} onCheckedChange={(v) => set("hasRingBeam", !!v)} />
+					<Checkbox id="hasRingBeam" checked={data.hasRingBeam} onCheckedChange={(v: any) => set("hasRingBeam", !!v)} />
 					<Label htmlFor="hasRingBeam">{t("fields.hasRingBeam")}</Label>
 				</div>
 				<div className="flex items-center gap-2">
-					<Checkbox id="hasDrum" checked={data.hasDrum} onCheckedChange={(v) => set("hasDrum", !!v)} />
+					<Checkbox id="hasDrum" checked={data.hasDrum} onCheckedChange={(v: any) => set("hasDrum", !!v)} />
 					<Label htmlFor="hasDrum">{t("fields.hasDrum")}</Label>
 				</div>
 				<div className="flex items-center gap-2">
-					<Checkbox id="hasSupportColumns" checked={data.hasSupportColumns} onCheckedChange={(v) => set("hasSupportColumns", !!v)} />
+					<Checkbox id="hasSupportColumns" checked={data.hasSupportColumns} onCheckedChange={(v: any) => set("hasSupportColumns", !!v)} />
 					<Label htmlFor="hasSupportColumns">{t("fields.hasSupportColumns")}</Label>
 				</div>
 			</div>
@@ -66,11 +66,11 @@ export function DomeForm({ data, onChange }: ElementFormProps<DomeInput>) {
 				<div className="grid grid-cols-2 gap-3">
 					<div>
 						<Label>{t("fields.drumHeight")} (م)</Label>
-						<Input type="number" min={0} step={0.5} value={data.drumHeight ?? ""} onChange={(e) => set("drumHeight", parseFloat(e.target.value) || 0)} />
+						<Input type="number" min={0} step={0.5} value={data.drumHeight ?? ""} onChange={(e: any) => set("drumHeight", parseFloat(e.target.value) || 0)} />
 					</div>
 					<div>
 						<Label>{t("fields.drumThickness")} (سم)</Label>
-						<Input type="number" value={data.drumThickness ?? 20} onChange={(e) => set("drumThickness", parseFloat(e.target.value) || 20)} />
+						<Input type="number" value={data.drumThickness ?? 20} onChange={(e: any) => set("drumThickness", parseFloat(e.target.value) || 20)} />
 					</div>
 				</div>
 			)}
@@ -79,15 +79,15 @@ export function DomeForm({ data, onChange }: ElementFormProps<DomeInput>) {
 				<div className="grid grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.supportColumnCount")}</Label>
-						<Input type="number" min={1} value={data.supportColumnCount ?? 4} onChange={(e) => set("supportColumnCount", parseInt(e.target.value) || 4)} />
+						<Input type="number" min={1} value={data.supportColumnCount ?? 4} onChange={(e: any) => set("supportColumnCount", parseInt(e.target.value) || 4)} />
 					</div>
 					<div>
 						<Label>{t("fields.supportColumnHeight")} (م)</Label>
-						<Input type="number" min={0} step={0.5} value={data.supportColumnHeight ?? ""} onChange={(e) => set("supportColumnHeight", parseFloat(e.target.value) || 0)} />
+						<Input type="number" min={0} step={0.5} value={data.supportColumnHeight ?? ""} onChange={(e: any) => set("supportColumnHeight", parseFloat(e.target.value) || 0)} />
 					</div>
 					<div>
 						<Label>{t("fields.supportColumnSize")} (سم)</Label>
-						<Input type="number" value={data.supportColumnSize ?? 40} onChange={(e) => set("supportColumnSize", parseFloat(e.target.value) || 40)} />
+						<Input type="number" value={data.supportColumnSize ?? 40} onChange={(e: any) => set("supportColumnSize", parseFloat(e.target.value) || 40)} />
 					</div>
 				</div>
 			)}
@@ -100,21 +100,21 @@ export function DomeForm({ data, onChange }: ElementFormProps<DomeInput>) {
 				<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 					<div>
 						<Label>{t("fields.shellThicknessTop")} (سم)</Label>
-						<Input type="number" value={data.shellThicknessTop} onChange={(e) => set("shellThicknessTop", parseFloat(e.target.value) || 10)} />
+						<Input type="number" value={data.shellThicknessTop} onChange={(e: any) => set("shellThicknessTop", parseFloat(e.target.value) || 10)} />
 					</div>
 					<div>
 						<Label>{t("fields.shellThicknessBottom")} (سم)</Label>
-						<Input type="number" value={data.shellThicknessBottom} onChange={(e) => set("shellThicknessBottom", parseFloat(e.target.value) || 15)} />
+						<Input type="number" value={data.shellThicknessBottom} onChange={(e: any) => set("shellThicknessBottom", parseFloat(e.target.value) || 15)} />
 					</div>
 					{data.hasRingBeam && (
 						<>
 							<div>
 								<Label>{t("fields.ringBeamWidth")} (سم)</Label>
-								<Input type="number" value={data.ringBeamWidth} onChange={(e) => set("ringBeamWidth", parseFloat(e.target.value) || 30)} />
+								<Input type="number" value={data.ringBeamWidth} onChange={(e: any) => set("ringBeamWidth", parseFloat(e.target.value) || 30)} />
 							</div>
 							<div>
 								<Label>{t("fields.ringBeamDepth")} (سم)</Label>
-								<Input type="number" value={data.ringBeamDepth} onChange={(e) => set("ringBeamDepth", parseFloat(e.target.value) || 60)} />
+								<Input type="number" value={data.ringBeamDepth} onChange={(e: any) => set("ringBeamDepth", parseFloat(e.target.value) || 60)} />
 							</div>
 						</>
 					)}

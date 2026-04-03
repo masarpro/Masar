@@ -143,7 +143,7 @@ export function DocumentDetail({
 					queryKey: [["projectDocuments", "get"]],
 				});
 			},
-			onError: (error) => {
+			onError: (error: any) => {
 				toast.error(error.message || t("approvalActionError"));
 			},
 		}),
@@ -155,7 +155,7 @@ export function DocumentDetail({
 				toast.success(t("deleteSuccess"));
 				router.push(`${basePath}/documents`);
 			},
-			onError: (error) => {
+			onError: (error: any) => {
 				toast.error(error.message || t("deleteError"));
 			},
 		}),
@@ -495,7 +495,7 @@ export function DocumentDetail({
 
 						{document.approvals && document.approvals.length > 0 ? (
 							<div className="space-y-4">
-								{document.approvals.map((approval) => (
+								{document.approvals.map((approval: any) => (
 									<div
 										key={approval.id}
 										className="rounded-xl border border-slate-200 p-4 dark:border-slate-700"
@@ -514,7 +514,7 @@ export function DocumentDetail({
 											<div>
 												<p className="text-xs text-slate-500 mb-2">{t("approvers")}</p>
 												<div className="flex flex-wrap gap-2">
-													{approval.approvers.map((approver) => (
+													{approval.approvers.map((approver: any) => (
 														<div
 															key={approver.id}
 															className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-1.5 dark:bg-slate-800"
@@ -596,7 +596,7 @@ export function DocumentDetail({
 												<Label>{t("versions.changeNotes")}</Label>
 												<Textarea
 													value={versionChangeNotes}
-													onChange={(e) => setVersionChangeNotes(e.target.value)}
+													onChange={(e: any) => setVersionChangeNotes(e.target.value)}
 													placeholder={t("versions.changeNotesPlaceholder")}
 													className="mt-1.5"
 												/>
@@ -606,7 +606,7 @@ export function DocumentDetail({
 												<Input
 													type="file"
 													className="mt-1.5"
-													onChange={(e) => {
+													onChange={(e: any) => {
 														const file = e.target.files?.[0];
 														if (file) handleUploadVersion(file);
 													}}
@@ -621,7 +621,7 @@ export function DocumentDetail({
 
 						{versionsData && versionsData.versions.length > 0 ? (
 							<div className="space-y-2">
-								{versionsData.versions.map((version) => (
+								{versionsData.versions.map((version: any) => (
 									<div
 										key={version.id}
 										className={`flex items-center justify-between rounded-xl border p-3 transition-colors ${
@@ -695,7 +695,7 @@ export function DocumentDetail({
 					</h2>
 					{document.auditLogs && document.auditLogs.length > 0 ? (
 						<div className="space-y-3">
-							{document.auditLogs.map((log) => (
+							{document.auditLogs.map((log: any) => (
 								<div
 									key={log.id}
 									className="border-s-2 border-slate-200 ps-3 dark:border-slate-700"

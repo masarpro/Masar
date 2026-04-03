@@ -117,7 +117,7 @@ export function NotificationBell({ organizationId }: NotificationBellProps) {
 					</div>
 				) : (
 					<>
-						{notifications.map((notification) => (
+						{notifications.map((notification: any) => (
 							<DropdownMenuItem
 								key={notification.id}
 								className={cn(

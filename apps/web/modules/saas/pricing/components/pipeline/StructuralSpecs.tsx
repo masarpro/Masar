@@ -439,7 +439,7 @@ export function StructuralSpecs({
 											<div className="flex justify-center">
 												<Select
 													value={specs.elements[row.id]?.concreteType || row.defaultConcrete}
-													onValueChange={(val) => handleElementChange(row.id, "concreteType", val)}
+													onValueChange={(val: any) => handleElementChange(row.id, "concreteType", val)}
 												>
 													<SelectTrigger className="w-28 h-8 text-center text-sm">
 														<SelectValue />
@@ -590,7 +590,7 @@ export function StructuralSpecs({
 												<div className="flex justify-center">
 													<Select
 														value={block.blockType}
-														onValueChange={(val) => handleBlockSpecChange(block.category, val)}
+														onValueChange={(val: any) => handleBlockSpecChange(block.category, val)}
 													>
 														<SelectTrigger className="w-48 h-8 text-sm">
 															<SelectValue />

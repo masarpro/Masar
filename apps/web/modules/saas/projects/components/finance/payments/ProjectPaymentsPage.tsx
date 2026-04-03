@@ -155,7 +155,7 @@ export function ProjectPaymentsPage({
 							projectId={projectId}
 							payments={data?.freePayments ?? []}
 							totalCollected={data?.freePayments?.reduce(
-								(s, p) => s + p.amount,
+								(s: any, p: any) => s + p.amount,
 								0,
 							) ?? 0}
 						/>

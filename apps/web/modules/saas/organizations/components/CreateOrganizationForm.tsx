@@ -83,7 +83,7 @@ export function CreateOrganizationForm({
 					<FormField
 						control={form.control}
 						name="name"
-						render={({ field }) => (
+						render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>
 									{t("organizations.createForm.name")}

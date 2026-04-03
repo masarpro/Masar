@@ -59,7 +59,7 @@ export function GanttToolbar({
 				{/* Status filter */}
 				<Select
 					value={filters.status}
-					onValueChange={(value) =>
+					onValueChange={(value: any) =>
 						onFiltersChange({ ...filters, status: value as StatusFilter })
 					}
 				>
@@ -79,7 +79,7 @@ export function GanttToolbar({
 				{/* Health filter */}
 				<Select
 					value={filters.health}
-					onValueChange={(value) =>
+					onValueChange={(value: any) =>
 						onFiltersChange({ ...filters, health: value as HealthFilter })
 					}
 				>

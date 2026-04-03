@@ -68,7 +68,7 @@ export default function OwnerPortalSummary() {
 		orpc.projectOwner.portal.getSummary.queryOptions({
 			input: { token },
 		}),
-	);
+	) as { data: any; isLoading: boolean };
 
 	if (isLoading || !data?.project) {
 		return (

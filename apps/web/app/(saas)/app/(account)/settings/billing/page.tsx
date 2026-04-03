@@ -36,7 +36,7 @@ async function BillingSettingsPageContent() {
 		throw new Error("Failed to fetch purchases");
 	}
 
-	const purchases = data?.purchases ?? [];
+	const purchases = (data as any)?.purchases ?? [];
 
 	const queryClient = getServerQueryClient();
 

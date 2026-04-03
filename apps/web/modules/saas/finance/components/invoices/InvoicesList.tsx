@@ -134,11 +134,11 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 		if (selectedIds.size === invoices.length) {
 			setSelectedIds(new Set());
 		} else {
-			setSelectedIds(new Set(invoices.map((inv) => inv.id)));
+			setSelectedIds(new Set(invoices.map((inv: any) => inv.id)));
 		}
 	};
 	const clearSelection = () => setSelectedIds(new Set());
-	const selectedInvoices = invoices.filter((inv) => selectedIds.has(inv.id));
+	const selectedInvoices = invoices.filter((inv: any) => selectedIds.has(inv.id));
 
 	// Reset page on filter change
 	const handleStatusChange = (value: string) => {
@@ -258,7 +258,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 							<Input
 								placeholder={t("finance.invoices.searchPlaceholder")}
 								value={searchTerm}
-								onChange={(e) => {
+								onChange={(e: any) => {
 									setSearchTerm(e.target.value);
 									setCurrentPage(1);
 								}}
@@ -317,7 +317,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 										</tr>
 									</thead>
 									<tbody>
-										{invoices.map((invoice) => {
+										{invoices.map((invoice: any) => {
 											const overdue = isOverdue(invoice.dueDate) &&
 												invoice.status !== "PAID" &&
 												invoice.status !== "CANCELLED";
@@ -511,7 +511,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 									label: t("finance.invoices.bulkMarkAsSent"),
 									icon: <Send className="h-4 w-4 me-1.5" />,
 									onClick: () => {
-										const eligible = selectedInvoices.filter((inv) => inv.status === "ISSUED");
+										const eligible = selectedInvoices.filter((inv: any) => inv.status === "ISSUED");
 										if (eligible.length === 0) {
 											toast.error(t("finance.invoices.noEligibleForSent"));
 											return;
@@ -520,7 +520,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 											title: t("finance.invoices.bulkMarkAsSentConfirm", { count: eligible.length }),
 											onConfirm: async () => {
 												await Promise.allSettled(
-													eligible.map((inv) =>
+													eligible.map((inv: any) =>
 														orpcClient.finance.invoices.issue({ organizationId, id: inv.id }),
 													),
 												);
@@ -537,7 +537,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 									icon: <XCircle className="h-4 w-4 me-1.5" />,
 									variant: "destructive",
 									onClick: () => {
-										const eligible = selectedInvoices.filter((inv) => inv.status === "DRAFT");
+										const eligible = selectedInvoices.filter((inv: any) => inv.status === "DRAFT");
 										if (eligible.length === 0) {
 											toast.error(t("finance.invoices.noEligibleForCancel"));
 											return;
@@ -547,7 +547,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 											description: t("finance.invoices.bulkCancelWarning"),
 											onConfirm: async () => {
 												await Promise.allSettled(
-													eligible.map((inv) =>
+													eligible.map((inv: any) =>
 														orpcClient.finance.invoices.delete({ organizationId, id: inv.id }),
 													),
 												);

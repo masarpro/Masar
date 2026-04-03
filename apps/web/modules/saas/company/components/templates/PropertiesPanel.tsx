@@ -111,7 +111,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showLogo")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showLogo as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showLogo: checked })
 										}
 									/>
@@ -120,7 +120,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showCompanyName")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showCompanyName as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showCompanyName: checked })
 										}
 									/>
@@ -129,7 +129,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showAddress")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showAddress as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showAddress: checked })
 										}
 									/>
@@ -138,7 +138,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showBilingualName")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showBilingualName as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showBilingualName: checked })
 										}
 									/>
@@ -147,7 +147,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.layout")}</Label>
 									<Select
 										value={(selectedElement.settings.layout as string) ?? "modern"}
-										onValueChange={(value) =>
+										onValueChange={(value: any) =>
 											onUpdateElement(selectedElement.id, { layout: value })
 										}
 									>
@@ -170,7 +170,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showTaxNumber")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showTaxNumber as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showTaxNumber: checked })
 										}
 									/>
@@ -179,7 +179,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showEmail")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showEmail as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showEmail: checked })
 										}
 									/>
@@ -188,7 +188,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showPhone")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showPhone as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showPhone: checked })
 										}
 									/>
@@ -202,7 +202,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showQuantity")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showQuantity as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showQuantity: checked })
 										}
 									/>
@@ -211,7 +211,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showUnit")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showUnit as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showUnit: checked })
 										}
 									/>
@@ -220,7 +220,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showUnitPrice")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showUnitPrice as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showUnitPrice: checked })
 										}
 									/>
@@ -229,7 +229,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showRowNumbers")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showRowNumbers as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showRowNumbers: checked })
 										}
 									/>
@@ -238,7 +238,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.alternatingColors")}</Label>
 									<Switch
 										checked={(selectedElement.settings.alternatingColors as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { alternatingColors: checked })
 										}
 									/>
@@ -252,7 +252,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showDiscount")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showDiscount as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showDiscount: checked })
 										}
 									/>
@@ -261,7 +261,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showVat")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showVat as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showVat: checked })
 										}
 									/>
@@ -270,7 +270,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showAmountInWords")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showAmountInWords as boolean) ?? false}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showAmountInWords: checked })
 										}
 									/>
@@ -279,7 +279,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.highlightTotal")}</Label>
 									<Switch
 										checked={(selectedElement.settings.highlightTotal as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { highlightTotal: checked })
 										}
 									/>
@@ -293,7 +293,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showPaymentTerms")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showPaymentTerms as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showPaymentTerms: checked })
 										}
 									/>
@@ -302,7 +302,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showDeliveryTerms")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showDeliveryTerms as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showDeliveryTerms: checked })
 										}
 									/>
@@ -311,7 +311,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showWarrantyTerms")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showWarrantyTerms as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showWarrantyTerms: checked })
 										}
 									/>
@@ -320,7 +320,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showValidityNote")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showValidityNote as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showValidityNote: checked })
 										}
 									/>
@@ -332,7 +332,7 @@ export function PropertiesPanel({
 										min={1}
 										max={365}
 										value={(selectedElement.settings.validityDays as number) ?? 30}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											onUpdateElement(selectedElement.id, { validityDays: parseInt(e.target.value) || 30 })
 										}
 									/>
@@ -346,7 +346,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.qrSize")}</Label>
 									<Select
 										value={(selectedElement.settings.size as string) ?? "medium"}
-										onValueChange={(value) =>
+										onValueChange={(value: any) =>
 											onUpdateElement(selectedElement.id, { size: value })
 										}
 									>
@@ -364,7 +364,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showZatcaCompliance")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showZatcaCompliance as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showZatcaCompliance: checked })
 										}
 									/>
@@ -378,7 +378,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showDate")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showDate as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showDate: checked })
 										}
 									/>
@@ -387,7 +387,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showStampArea")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showStampArea as boolean) ?? false}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showStampArea: checked })
 										}
 									/>
@@ -396,7 +396,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.twoColumns")}</Label>
 									<Switch
 										checked={(selectedElement.settings.twoColumns as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { twoColumns: checked })
 										}
 									/>
@@ -410,7 +410,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showBankName")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showBankName as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showBankName: checked })
 										}
 									/>
@@ -419,7 +419,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showIban")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showIban as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showIban: checked })
 										}
 									/>
@@ -428,7 +428,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showAccountName")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showAccountName as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showAccountName: checked })
 										}
 									/>
@@ -437,7 +437,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showSwiftCode")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showSwiftCode as boolean) ?? false}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showSwiftCode: checked })
 										}
 									/>
@@ -451,7 +451,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showThankYouMessage")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showThankYouMessage as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showThankYouMessage: checked })
 										}
 									/>
@@ -460,7 +460,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.showYear")}</Label>
 									<Switch
 										checked={(selectedElement.settings.showYear as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { showYear: checked })
 										}
 									/>
@@ -474,7 +474,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.textLabel")}</Label>
 									<Input
 										value={(selectedElement.settings.label as string) ?? ""}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											onUpdateElement(selectedElement.id, { label: e.target.value })
 										}
 										placeholder={t("finance.templates.editor.settings.textLabelPlaceholder")}
@@ -484,7 +484,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.textPlaceholder")}</Label>
 									<Input
 										value={(selectedElement.settings.placeholder as string) ?? ""}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											onUpdateElement(selectedElement.id, { placeholder: e.target.value })
 										}
 										placeholder={t("finance.templates.editor.settings.textPlaceholderHint")}
@@ -494,7 +494,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.defaultContent")}</Label>
 									<Textarea
 										value={(selectedElement.settings.content as string) ?? ""}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											onUpdateElement(selectedElement.id, { content: e.target.value })
 										}
 										placeholder={t("finance.templates.editor.settings.defaultContentPlaceholder")}
@@ -505,7 +505,7 @@ export function PropertiesPanel({
 									<Label>{t("finance.templates.editor.settings.isEditable")}</Label>
 									<Switch
 										checked={(selectedElement.settings.isEditable as boolean) ?? true}
-										onCheckedChange={(checked) =>
+										onCheckedChange={(checked: any) =>
 											onUpdateElement(selectedElement.id, { isEditable: checked })
 										}
 									/>
@@ -551,14 +551,14 @@ export function PropertiesPanel({
 									<Input
 										type="color"
 										value={templateSettings.backgroundColor}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											onUpdateSettings({ backgroundColor: e.target.value })
 										}
 										className="w-10 h-10 p-1 rounded-lg cursor-pointer"
 									/>
 									<Input
 										value={templateSettings.backgroundColor}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											onUpdateSettings({ backgroundColor: e.target.value })
 										}
 										className="flex-1 text-xs"
@@ -571,14 +571,14 @@ export function PropertiesPanel({
 									<Input
 										type="color"
 										value={templateSettings.primaryColor}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											onUpdateSettings({ primaryColor: e.target.value })
 										}
 										className="w-10 h-10 p-1 rounded-lg cursor-pointer"
 									/>
 									<Input
 										value={templateSettings.primaryColor}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											onUpdateSettings({ primaryColor: e.target.value })
 										}
 										className="flex-1 text-xs"
@@ -599,7 +599,7 @@ export function PropertiesPanel({
 								<Label className="text-xs">{t("finance.templates.editor.fontFamily")}</Label>
 								<Select
 									value={templateSettings.fontFamily}
-									onValueChange={(value) => onUpdateSettings({ fontFamily: value })}
+									onValueChange={(value: any) => onUpdateSettings({ fontFamily: value })}
 								>
 									<SelectTrigger>
 										<SelectValue />
@@ -617,7 +617,7 @@ export function PropertiesPanel({
 								<Label className="text-xs">{t("finance.templates.editor.fontSize")}</Label>
 								<Select
 									value={templateSettings.fontSize}
-									onValueChange={(value) => onUpdateSettings({ fontSize: value })}
+									onValueChange={(value: any) => onUpdateSettings({ fontSize: value })}
 								>
 									<SelectTrigger>
 										<SelectValue />
@@ -645,7 +645,7 @@ export function PropertiesPanel({
 								<Label className="text-xs">{t("finance.templates.editor.pageSize")}</Label>
 								<Select
 									value={templateSettings.pageSize}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										onUpdateSettings({ pageSize: value as "A4" | "Letter" })
 									}
 								>
@@ -662,7 +662,7 @@ export function PropertiesPanel({
 								<Label className="text-xs">{t("finance.templates.editor.orientation")}</Label>
 								<Select
 									value={templateSettings.orientation}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										onUpdateSettings({ orientation: value as "portrait" | "landscape" })
 									}
 								>
@@ -698,7 +698,7 @@ export function PropertiesPanel({
 								</div>
 								<Slider
 									value={[templateSettings.vatPercent]}
-									onValueChange={([value]) => onUpdateSettings({ vatPercent: value })}
+									onValueChange={([value]: any) => onUpdateSettings({ vatPercent: value })}
 									max={25}
 									step={0.5}
 								/>
@@ -707,7 +707,7 @@ export function PropertiesPanel({
 								<Label className="text-xs">{t("finance.templates.editor.currency")}</Label>
 								<Select
 									value={templateSettings.currency}
-									onValueChange={(value) => onUpdateSettings({ currency: value })}
+									onValueChange={(value: any) => onUpdateSettings({ currency: value })}
 								>
 									<SelectTrigger>
 										<SelectValue />

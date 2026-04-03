@@ -49,7 +49,7 @@ export function ActivePlan({
 
 					{!!activePlanData.features?.length && (
 						<ul className="mt-2 grid list-none gap-2 text-sm">
-							{activePlanData.features.map((feature, key) => (
+							{activePlanData.features.map((feature: any, key: any) => (
 								<li
 									key={key}
 									className="flex items-center justify-start"

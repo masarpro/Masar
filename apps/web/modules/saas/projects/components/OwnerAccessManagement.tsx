@@ -187,7 +187,7 @@ export function OwnerAccessManagement({
 					</div>
 				) : (
 					<div className="divide-y divide-slate-100 dark:divide-slate-800">
-						{accessList.map((access) => {
+						{accessList.map((access: any) => {
 							const expiryStatus = getExpiryStatus(access.expiresAt);
 							return (
 								<div
@@ -320,7 +320,7 @@ export function OwnerAccessManagement({
 							<Input
 								id="label"
 								value={newLinkLabel}
-								onChange={(e) => setNewLinkLabel(e.target.value)}
+								onChange={(e: any) => setNewLinkLabel(e.target.value)}
 								placeholder={t("ownerAccess.labelPlaceholder")}
 							/>
 						</div>

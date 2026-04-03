@@ -19,7 +19,7 @@ export function OrganizationMembersBlock({
 			title={t("organizations.settings.members.title")}
 			description={t("organizations.settings.members.description")}
 		>
-			<Tabs value={activeTab} onValueChange={(tab) => setActiveTab(tab)}>
+			<Tabs value={activeTab} onValueChange={(tab: any) => setActiveTab(tab)}>
 				<TabsList className="mb-4">
 					<TabsTrigger value="members">
 						{t("organizations.settings.members.activeMembers")}

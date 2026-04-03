@@ -135,7 +135,7 @@ export function ClientsList({
 							<Input
 								placeholder={t("finance.clients.searchPlaceholder")}
 								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
+								onChange={(e: any) => setSearchQuery(e.target.value)}
 								className="ps-10 rounded-xl"
 							/>
 						</div>
@@ -196,7 +196,7 @@ export function ClientsList({
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{clients.map((client) => (
+								{clients.map((client: any) => (
 									<TableRow
 										key={client.id}
 										className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
@@ -206,7 +206,7 @@ export function ClientsList({
 											)
 										}
 									>
-										<TableCell onClick={(e) => e.stopPropagation()}>
+										<TableCell onClick={(e: any) => e.stopPropagation()}>
 											{client.code ? (
 												<Badge variant="outline" className="rounded-lg font-mono">
 													{client.code}
@@ -288,7 +288,7 @@ export function ClientsList({
 												</span>
 											)}
 										</TableCell>
-										<TableCell onClick={(e) => e.stopPropagation()}>
+										<TableCell onClick={(e: any) => e.stopPropagation()}>
 											<DropdownMenu>
 												<DropdownMenuTrigger asChild>
 													<Button variant="ghost" size="sm" className="h-8 w-8 p-0">

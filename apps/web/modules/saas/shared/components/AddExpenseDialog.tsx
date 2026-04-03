@@ -127,7 +127,7 @@ export function AddExpenseDialog({
 	const accounts = accountsData?.accounts ?? [];
 	const projects = projectsData?.projects ?? [];
 	const selectedAccount = accounts.find(
-		(a) => a.id === formData.sourceAccountId,
+		(a: any) => a.id === formData.sourceAccountId,
 	);
 	const numericAmount = Number.parseFloat(formData.amount) || 0;
 
@@ -324,7 +324,7 @@ export function AddExpenseDialog({
 	return (
 		<Dialog
 			open={open}
-			onOpenChange={(val) => {
+			onOpenChange={(val: any) => {
 				if (!val) resetForm();
 				onOpenChange(val);
 			}}
@@ -350,7 +350,7 @@ export function AddExpenseDialog({
 									step="0.01"
 									min="0"
 									value={formData.amount}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({ ...formData, amount: e.target.value })
 									}
 									placeholder="0.00"
@@ -366,7 +366,7 @@ export function AddExpenseDialog({
 								<Input
 									type="date"
 									value={formData.date}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({ ...formData, date: e.target.value })
 									}
 									className="rounded-xl h-10"
@@ -416,7 +416,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Select
 									value={formData.projectId || "none"}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										setFormData({ ...formData, projectId: value === "none" ? "" : value })
 									}
 								>
@@ -425,7 +425,7 @@ export function AddExpenseDialog({
 									</SelectTrigger>
 									<SelectContent className="rounded-xl">
 										<SelectItem value="none">{t("finance.expenses.noProject")}</SelectItem>
-										{projects.map((project) => (
+										{projects.map((project: any) => (
 											<SelectItem key={project.id} value={project.id}>
 												{project.name}
 											</SelectItem>
@@ -442,7 +442,7 @@ export function AddExpenseDialog({
 							</Label>
 							<Input
 								value={formData.description}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData({ ...formData, description: e.target.value })
 								}
 								placeholder={t("finance.expenses.descriptionPlaceholder")}
@@ -478,7 +478,7 @@ export function AddExpenseDialog({
 								<Input
 									type="date"
 									value={formData.dueDate}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({ ...formData, dueDate: e.target.value })
 									}
 									className="rounded-xl h-10 max-w-xs"
@@ -507,7 +507,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Select
 									value={formData.sourceAccountId}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										setFormData({ ...formData, sourceAccountId: value })
 									}
 									disabled={isObligation}
@@ -518,7 +518,7 @@ export function AddExpenseDialog({
 										/>
 									</SelectTrigger>
 									<SelectContent className="rounded-xl">
-										{accounts.map((account) => (
+										{accounts.map((account: any) => (
 											<SelectItem key={account.id} value={account.id}>
 												<div className="flex items-center gap-2">
 													{account.accountType === "BANK" ? (
@@ -542,7 +542,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Select
 									value={formData.paymentMethod}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										setFormData({ ...formData, paymentMethod: value as any })
 									}
 									disabled={isObligation}
@@ -565,7 +565,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Input
 									value={formData.referenceNo}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({ ...formData, referenceNo: e.target.value })
 									}
 									placeholder={t("finance.expenses.referenceNoPlaceholder")}
@@ -624,7 +624,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Input
 									value={formData.vendorName}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({ ...formData, vendorName: e.target.value })
 									}
 									placeholder={t("finance.expenses.vendorNamePlaceholder")}
@@ -637,7 +637,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Input
 									value={formData.vendorTaxNumber}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({ ...formData, vendorTaxNumber: e.target.value })
 									}
 									placeholder={t("finance.expenses.vendorTaxNumberPlaceholder")}
@@ -651,7 +651,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Input
 									value={formData.invoiceRef}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({ ...formData, invoiceRef: e.target.value })
 									}
 									placeholder={t("finance.expenses.invoiceRefPlaceholder")}
@@ -669,7 +669,7 @@ export function AddExpenseDialog({
 								</Label>
 								<Textarea
 									value={formData.notes}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										setFormData({ ...formData, notes: e.target.value })
 									}
 									placeholder={t("finance.expenses.notesPlaceholder")}

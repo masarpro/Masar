@@ -57,8 +57,8 @@ export function MilestoneProgressRow({
 			) : (
 				<Slider
 					value={[localProgress]}
-					onValueChange={([value]) => setLocalProgress(value)}
-					onValueCommit={([value]) => onUpdateProgress(value)}
+					onValueChange={([value]: any) => setLocalProgress(value)}
+					onValueCommit={([value]: any) => onUpdateProgress(value)}
 					min={0}
 					max={100}
 					step={5}

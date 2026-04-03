@@ -386,7 +386,7 @@ export function ImportExcelDialog({
 	return (
 		<Dialog
 			open={open}
-			onOpenChange={(o) => {
+			onOpenChange={(o: any) => {
 				if (!o) resetState();
 				onOpenChange(o);
 			}}
@@ -544,7 +544,7 @@ export function ImportExcelDialog({
 												<td className="px-3 py-2">
 													<Select
 														value={mapping.masarField}
-														onValueChange={(v) =>
+														onValueChange={(v: any) =>
 															updateMapping(
 																idx,
 																v as MasarField,

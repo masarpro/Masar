@@ -258,7 +258,7 @@ export function PaymentsClaimsTable({
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{items.map((item) => (
+								{items.map((item: any) => (
 									<TableRow key={`${item.type}-${item.id}`}>
 										{/* Date */}
 										<TableCell className="text-sm text-slate-600 dark:text-slate-400">
@@ -314,7 +314,7 @@ export function PaymentsClaimsTable({
 												<Select
 													value={item.status}
 													onValueChange={(
-														value,
+														value: any,
 													) =>
 														handleClaimStatusChange(
 															item.id,

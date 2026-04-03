@@ -103,7 +103,7 @@ export function CreateItemDialog({
 						{/* Section */}
 						<div className="space-y-1.5">
 							<Label>{t("createDialog.section")}</Label>
-							<Select value={form.section} onValueChange={(v) => updateField("section", v)}>
+							<Select value={form.section} onValueChange={(v: any) => updateField("section", v)}>
 								<SelectTrigger className="rounded-xl h-10">
 									<SelectValue />
 								</SelectTrigger>
@@ -124,7 +124,7 @@ export function CreateItemDialog({
 								<Input
 									placeholder={t("createDialog.codePlaceholder")}
 									value={form.code}
-									onChange={(e) => updateField("code", e.target.value)}
+									onChange={(e: any) => updateField("code", e.target.value)}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -132,7 +132,7 @@ export function CreateItemDialog({
 								<Label>{t("createDialog.category")}</Label>
 								<Input
 									value={form.category}
-									onChange={(e) => updateField("category", e.target.value)}
+									onChange={(e: any) => updateField("category", e.target.value)}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -144,7 +144,7 @@ export function CreateItemDialog({
 							<Textarea
 								placeholder={t("createDialog.descriptionPlaceholder")}
 								value={form.description}
-								onChange={(e) => updateField("description", e.target.value)}
+								onChange={(e: any) => updateField("description", e.target.value)}
 								className="rounded-xl min-h-[80px]"
 								required
 							/>
@@ -156,7 +156,7 @@ export function CreateItemDialog({
 							<Textarea
 								placeholder={t("createDialog.specificationsPlaceholder")}
 								value={form.specifications}
-								onChange={(e) => updateField("specifications", e.target.value)}
+								onChange={(e: any) => updateField("specifications", e.target.value)}
 								className="rounded-xl min-h-[60px]"
 							/>
 						</div>
@@ -168,7 +168,7 @@ export function CreateItemDialog({
 								<Input
 									placeholder={t("createDialog.unitPlaceholder")}
 									value={form.unit}
-									onChange={(e) => updateField("unit", e.target.value)}
+									onChange={(e: any) => updateField("unit", e.target.value)}
 									className="rounded-xl h-10"
 									required
 								/>
@@ -180,7 +180,7 @@ export function CreateItemDialog({
 									min="0"
 									step="any"
 									value={form.quantity}
-									onChange={(e) => updateField("quantity", e.target.value)}
+									onChange={(e: any) => updateField("quantity", e.target.value)}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -192,7 +192,7 @@ export function CreateItemDialog({
 									step="any"
 									placeholder={t("createDialog.unitPricePlaceholder")}
 									value={form.unitPrice}
-									onChange={(e) => updateField("unitPrice", e.target.value)}
+									onChange={(e: any) => updateField("unitPrice", e.target.value)}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -203,7 +203,7 @@ export function CreateItemDialog({
 							<Label>{t("createDialog.notes")}</Label>
 							<Textarea
 								value={form.notes}
-								onChange={(e) => updateField("notes", e.target.value)}
+								onChange={(e: any) => updateField("notes", e.target.value)}
 								className="rounded-xl min-h-[60px]"
 							/>
 						</div>

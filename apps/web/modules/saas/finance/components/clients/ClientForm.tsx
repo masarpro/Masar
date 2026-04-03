@@ -333,7 +333,7 @@ export function ClientForm({
 						{/* نوع العميل */}
 						<Tabs
 							value={formData.clientType}
-							onValueChange={(value) => setFormData((prev) => ({ ...prev, clientType: value as ClientType }))}
+							onValueChange={(value: any) => setFormData((prev) => ({ ...prev, clientType: value as ClientType }))}
 							className="w-full"
 						>
 							<TabsList className="grid w-full grid-cols-2 rounded-xl h-11">
@@ -353,7 +353,7 @@ export function ClientForm({
 									<Label className="text-xs text-muted-foreground">{t("finance.clients.businessName")} *</Label>
 									<Input
 										value={formData.businessName}
-										onChange={(e) => setFormData((prev) => ({ ...prev, businessName: e.target.value }))}
+										onChange={(e: any) => setFormData((prev) => ({ ...prev, businessName: e.target.value }))}
 										placeholder={t("finance.clients.businessNamePlaceholder")}
 										className="rounded-lg mt-1 h-10"
 										required={formData.clientType === "COMMERCIAL"}
@@ -368,7 +368,7 @@ export function ClientForm({
 										<Label className="text-xs text-muted-foreground">{t("finance.clients.firstName")} *</Label>
 										<Input
 											value={formData.firstName}
-											onChange={(e) => setFormData((prev) => ({ ...prev, firstName: e.target.value }))}
+											onChange={(e: any) => setFormData((prev) => ({ ...prev, firstName: e.target.value }))}
 											placeholder={t("finance.clients.firstNamePlaceholder")}
 											className="rounded-lg mt-1 h-10"
 											required={formData.clientType === "INDIVIDUAL"}
@@ -378,7 +378,7 @@ export function ClientForm({
 										<Label className="text-xs text-muted-foreground">{t("finance.clients.lastName")} *</Label>
 										<Input
 											value={formData.lastName}
-											onChange={(e) => setFormData((prev) => ({ ...prev, lastName: e.target.value }))}
+											onChange={(e: any) => setFormData((prev) => ({ ...prev, lastName: e.target.value }))}
 											placeholder={t("finance.clients.lastNamePlaceholder")}
 											className="rounded-lg mt-1 h-10"
 											required={formData.clientType === "INDIVIDUAL"}
@@ -401,7 +401,7 @@ export function ClientForm({
 								<Label className="text-xs text-muted-foreground">{t("finance.clients.taxNumber")}</Label>
 								<Input
 									value={formData.taxNumber}
-									onChange={(e) => setFormData((prev) => ({ ...prev, taxNumber: e.target.value }))}
+									onChange={(e: any) => setFormData((prev) => ({ ...prev, taxNumber: e.target.value }))}
 									placeholder="3XXXXXXXXXX0003"
 									className="rounded-lg mt-1 h-10 font-mono text-sm"
 									dir="ltr"
@@ -412,7 +412,7 @@ export function ClientForm({
 								<Label className="text-xs text-muted-foreground">{t("finance.clients.crNumber")}</Label>
 								<Input
 									value={formData.crNumber}
-									onChange={(e) => setFormData((prev) => ({ ...prev, crNumber: e.target.value }))}
+									onChange={(e: any) => setFormData((prev) => ({ ...prev, crNumber: e.target.value }))}
 									placeholder="XXXXXXXXXX"
 									className="rounded-lg mt-1 h-10 font-mono text-sm"
 									dir="ltr"
@@ -434,7 +434,7 @@ export function ClientForm({
 								<Label className="text-xs text-muted-foreground">{t("finance.clients.streetAddress1")}</Label>
 								<Input
 									value={formData.streetAddress1}
-									onChange={(e) => setFormData((prev) => ({ ...prev, streetAddress1: e.target.value }))}
+									onChange={(e: any) => setFormData((prev) => ({ ...prev, streetAddress1: e.target.value }))}
 									placeholder={t("finance.clients.streetAddress1Placeholder")}
 									className="rounded-lg mt-1 h-10"
 								/>
@@ -443,7 +443,7 @@ export function ClientForm({
 								<Label className="text-xs text-muted-foreground">{t("finance.clients.city")}</Label>
 								<Input
 									value={formData.city}
-									onChange={(e) => setFormData((prev) => ({ ...prev, city: e.target.value }))}
+									onChange={(e: any) => setFormData((prev) => ({ ...prev, city: e.target.value }))}
 									placeholder={t("finance.clients.cityPlaceholder")}
 									className="rounded-lg mt-1 h-10"
 								/>
@@ -452,7 +452,7 @@ export function ClientForm({
 								<Label className="text-xs text-muted-foreground">{t("finance.clients.region")}</Label>
 								<Select
 									value={formData.region}
-									onValueChange={(value) => setFormData((prev) => ({ ...prev, region: value }))}
+									onValueChange={(value: any) => setFormData((prev) => ({ ...prev, region: value }))}
 								>
 									<SelectTrigger className="rounded-lg mt-1 h-10">
 										<SelectValue placeholder={t("finance.clients.regionPlaceholder")} />
@@ -473,7 +473,7 @@ export function ClientForm({
 								<Label className="text-xs text-muted-foreground">{t("finance.clients.postalCode")}</Label>
 								<Input
 									value={formData.postalCode}
-									onChange={(e) => setFormData((prev) => ({ ...prev, postalCode: e.target.value }))}
+									onChange={(e: any) => setFormData((prev) => ({ ...prev, postalCode: e.target.value }))}
 									placeholder="12345"
 									className="rounded-lg mt-1 h-10 font-mono"
 									dir="ltr"
@@ -483,7 +483,7 @@ export function ClientForm({
 								<Label className="text-xs text-muted-foreground">{t("finance.clients.streetAddress2")}</Label>
 								<Input
 									value={formData.streetAddress2}
-									onChange={(e) => setFormData((prev) => ({ ...prev, streetAddress2: e.target.value }))}
+									onChange={(e: any) => setFormData((prev) => ({ ...prev, streetAddress2: e.target.value }))}
 									placeholder={t("finance.clients.streetAddress2Placeholder")}
 									className="rounded-lg mt-1 h-10"
 								/>
@@ -506,7 +506,7 @@ export function ClientForm({
 								<Label className="text-xs text-muted-foreground">{t("finance.clients.mobile")}</Label>
 								<Input
 									value={formData.mobile}
-									onChange={(e) => setFormData((prev) => ({ ...prev, mobile: e.target.value }))}
+									onChange={(e: any) => setFormData((prev) => ({ ...prev, mobile: e.target.value }))}
 									placeholder="05XXXXXXXX"
 									className="rounded-lg mt-1 h-10 font-mono"
 									dir="ltr"
@@ -516,7 +516,7 @@ export function ClientForm({
 								<Label className="text-xs text-muted-foreground">{t("finance.clients.phone")}</Label>
 								<Input
 									value={formData.phone}
-									onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
+									onChange={(e: any) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
 									placeholder="011XXXXXXX"
 									className="rounded-lg mt-1 h-10 font-mono"
 									dir="ltr"
@@ -527,7 +527,7 @@ export function ClientForm({
 								<Input
 									type="email"
 									value={formData.email}
-									onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+									onChange={(e: any) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
 									placeholder="email@example.com"
 									className="rounded-lg mt-1 h-10 text-sm"
 									dir="ltr"
@@ -587,7 +587,7 @@ export function ClientForm({
 								<Label className="text-xs text-muted-foreground">{t("finance.clients.code")}</Label>
 								<Input
 									value={formData.code}
-									onChange={(e) => setFormData((prev) => ({ ...prev, code: e.target.value }))}
+									onChange={(e: any) => setFormData((prev) => ({ ...prev, code: e.target.value }))}
 									placeholder={t("finance.clients.codePlaceholder")}
 									className="rounded-lg mt-1 h-10 font-mono"
 									dir="ltr"
@@ -597,7 +597,7 @@ export function ClientForm({
 								<Label className="text-xs text-muted-foreground">{t("finance.clients.currency")}</Label>
 								<Select
 									value={formData.currency}
-									onValueChange={(value) => setFormData((prev) => ({ ...prev, currency: value }))}
+									onValueChange={(value: any) => setFormData((prev) => ({ ...prev, currency: value }))}
 								>
 									<SelectTrigger className="rounded-lg mt-1 h-10">
 										<SelectValue />
@@ -615,7 +615,7 @@ export function ClientForm({
 							<Label className="text-xs text-muted-foreground">{t("finance.clients.notes")}</Label>
 							<Textarea
 								value={formData.notes}
-								onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
+								onChange={(e: any) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
 								placeholder={t("finance.clients.notesPlaceholder")}
 								rows={3}
 								className="rounded-lg mt-1"

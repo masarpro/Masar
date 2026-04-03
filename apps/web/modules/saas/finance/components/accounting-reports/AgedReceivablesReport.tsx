@@ -76,16 +76,16 @@ export function AgedReceivablesReport({
 	const { rows, totals } = data;
 
 	// KPI calculations
-	const overdueClients = rows.filter((r) => r.over90 > 0).length;
-	const maxDebt = rows.length > 0 ? Math.max(...rows.map((r) => r.total)) : 0;
-	const totalInvoices = rows.reduce((sum, r) => sum + r.invoices.length, 0);
+	const overdueClients = rows.filter((r: any) => r.over90 > 0).length;
+	const maxDebt = rows.length > 0 ? Math.max(...rows.map((r: any) => r.total)) : 0;
+	const totalInvoices = rows.reduce((sum: any, r: any) => sum + r.invoices.length, 0);
 	const avgAgingDays =
 		totalInvoices > 0
 			? Math.round(
 					rows.reduce(
-						(sum, r) =>
+						(sum: any, r: any) =>
 							sum +
-							r.invoices.reduce((s, inv) => s + inv.agingDays, 0),
+							r.invoices.reduce((s: any, inv: any) => s + inv.agingDays, 0),
 						0,
 					) / totalInvoices,
 				)
@@ -242,7 +242,7 @@ export function AgedReceivablesReport({
 										</TableRow>
 									</TableHeader>
 									<TableBody>
-										{rows.map((row) => {
+										{rows.map((row: any) => {
 											const key =
 												row.clientId ?? row.clientName;
 											const isExpanded =
@@ -311,7 +311,7 @@ export function AgedReceivablesReport({
 													</TableRow>
 													{isExpanded &&
 														row.invoices.map(
-															(inv) => (
+															(inv: any) => (
 																<TableRow
 																	key={inv.id}
 																	className="bg-slate-50/50 dark:bg-slate-800/50"

@@ -185,7 +185,7 @@ export function QuotationForm({
 	const isColumnVisible = (column: ColumnKey) => visibleColumns.includes(column);
 
 	// Unit options for select
-	const units = UNIT_KEYS.map((key) => ({
+	const units = UNIT_KEYS.map((key: any) => ({
 		value: UNIT_VALUES[key],
 		label: t(`finance.units.${key}`),
 	}));
@@ -1043,7 +1043,7 @@ export function QuotationForm({
 													<SelectTrigger className="rounded-[10px] h-9 text-xs px-1 border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30"><SelectValue placeholder={t("finance.items.unitPlaceholder")} /></SelectTrigger>
 													<SelectContent className="rounded-xl">
 														<SelectItem value="_empty">-</SelectItem>
-														{units.map((u) => (<SelectItem key={u.value} value={u.value}>{u.label}</SelectItem>))}
+														{units.map((u: any) => (<SelectItem key={u.value} value={u.value}>{u.label}</SelectItem>))}
 													</SelectContent>
 												</Select>
 											</td>

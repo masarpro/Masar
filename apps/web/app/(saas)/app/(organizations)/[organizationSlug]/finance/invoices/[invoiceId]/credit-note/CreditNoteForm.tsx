@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -33,6 +33,32 @@ interface CreditNoteFormProps {
 	invoiceId: string;
 }
 
+interface InvoiceItem {
+	id: string;
+	description: string;
+	quantity: number;
+	unit: string | null;
+	unitPrice: number;
+	totalPrice: number;
+}
+
+interface InvoiceData {
+	id: string;
+	invoiceNo: string;
+	clientName: string | null;
+	status: string;
+	subtotal: number;
+	discountPercent: number;
+	discountAmount: number;
+	vatPercent: number;
+	vatAmount: number;
+	totalAmount: number;
+	paidAmount: number;
+	items: InvoiceItem[];
+	payments: { id: string; amount: number }[];
+	creditNotes: { id: string; totalAmount: number }[];
+}
+
 interface ReturnItem {
 	originalItemId: string;
 	description: string;
@@ -60,7 +86,7 @@ export function CreditNoteForm({
 		orpc.finance.invoices.getById.queryOptions({
 			input: { organizationId, id: invoiceId },
 		}),
-	);
+	) as { data: InvoiceData | undefined; isLoading: boolean };
 
 	// Initialize return items from invoice data
 	if (invoice && !initialized) {
@@ -103,7 +129,7 @@ export function CreditNoteForm({
 				})),
 			});
 		},
-		onSuccess: (creditNote) => {
+		onSuccess: (creditNote: { id: string }) => {
 			toast.success(t("finance.invoices.creditNoteSuccess"));
 			router.push(`${basePath}/${creditNote.id}`);
 		},
@@ -276,7 +302,7 @@ export function CreditNoteForm({
 					</div>
 					<Textarea
 						value={reason}
-						onChange={(e) => setReason(e.target.value)}
+						onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setReason(e.target.value)}
 						placeholder={t("finance.invoices.creditNote.reasonPlaceholder")}
 						rows={3}
 						required
@@ -350,7 +376,7 @@ export function CreditNoteForm({
 													max={item.maxQuantity}
 													step={1}
 													value={item.returnQuantity}
-													onChange={(e) =>
+													onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 														handleQuantityChange(
 															index,
 															Number(e.target.value),

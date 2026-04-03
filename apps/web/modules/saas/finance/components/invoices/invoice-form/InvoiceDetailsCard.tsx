@@ -66,11 +66,11 @@ export function InvoiceDetailsCard({
 				<div className="grid grid-cols-2 gap-3">
 					<div>
 						<Label className="text-xs text-muted-foreground">{t("finance.invoices.issueDate")}</Label>
-						<Input type="date" value={issueDate} onChange={(e) => onIssueDateChange(e.target.value)} required className="rounded-xl mt-1 h-9" />
+						<Input type="date" value={issueDate} onChange={(e: any) => onIssueDateChange(e.target.value)} required className="rounded-xl mt-1 h-9" />
 					</div>
 					<div>
 						<Label className="text-xs text-muted-foreground">{t("finance.invoices.dueDate")}</Label>
-						<Input type="date" value={dueDate} onChange={(e) => onDueDateChange(e.target.value)} required className="rounded-xl mt-1 h-9" />
+						<Input type="date" value={dueDate} onChange={(e: any) => onDueDateChange(e.target.value)} required className="rounded-xl mt-1 h-9" />
 					</div>
 				</div>
 

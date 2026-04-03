@@ -142,7 +142,7 @@ export function CreateExpenseForm({
 							id="date"
 							type="date"
 							value={date}
-							onChange={(e) => setDate(e.target.value)}
+							onChange={(e: any) => setDate(e.target.value)}
 							className="rounded-xl"
 							required
 						/>
@@ -152,7 +152,7 @@ export function CreateExpenseForm({
 						<Label htmlFor="category">{t("finance.expenses.category")}</Label>
 						<Select
 							value={category}
-							onValueChange={(val) => {
+							onValueChange={(val: any) => {
 								setCategory(val);
 								if (val !== "SUBCONTRACTOR") {
 									setSubcontractContractId("");
@@ -183,7 +183,7 @@ export function CreateExpenseForm({
 							</Label>
 							<Select
 								value={subcontractContractId || "none"}
-								onValueChange={(val) =>
+								onValueChange={(val: any) =>
 									setSubcontractContractId(val === "none" ? "" : val)
 								}
 							>
@@ -192,7 +192,7 @@ export function CreateExpenseForm({
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value="none">-</SelectItem>
-									{contracts.map((c) => (
+									{contracts.map((c: any) => (
 										<SelectItem key={c.id} value={c.id}>
 											{c.name}
 										</SelectItem>
@@ -210,7 +210,7 @@ export function CreateExpenseForm({
 							min="0"
 							step="0.01"
 							value={amount}
-							onChange={(e) => setAmount(e.target.value)}
+							onChange={(e: any) => setAmount(e.target.value)}
 							placeholder="0.00"
 							className="rounded-xl"
 							required
@@ -223,7 +223,7 @@ export function CreateExpenseForm({
 							id="vendorName"
 							type="text"
 							value={vendorName}
-							onChange={(e) => setVendorName(e.target.value)}
+							onChange={(e: any) => setVendorName(e.target.value)}
 							placeholder={t("finance.expenses.vendorPlaceholder")}
 							className="rounded-xl"
 						/>
@@ -234,7 +234,7 @@ export function CreateExpenseForm({
 						<Textarea
 							id="note"
 							value={note}
-							onChange={(e) => setNote(e.target.value)}
+							onChange={(e: any) => setNote(e.target.value)}
 							placeholder={t("finance.expenses.notePlaceholder")}
 							className="min-h-24 rounded-xl"
 						/>

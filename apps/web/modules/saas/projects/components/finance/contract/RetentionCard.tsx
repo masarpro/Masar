@@ -112,7 +112,7 @@ export function RetentionCard({
 					<Input
 						type="number"
 						value={retentionPercent}
-						onChange={(e) => setRetentionPercent(e.target.value)}
+						onChange={(e: any) => setRetentionPercent(e.target.value)}
 						min={0}
 						max={100}
 						step={0.5}
@@ -125,7 +125,7 @@ export function RetentionCard({
 					<Input
 						type="number"
 						value={retentionCap}
-						onChange={(e) => setRetentionCap(e.target.value)}
+						onChange={(e: any) => setRetentionCap(e.target.value)}
 						min={0}
 						step={0.01}
 					/>
@@ -136,7 +136,7 @@ export function RetentionCard({
 					<Input
 						type="number"
 						value={retentionReleaseDays}
-						onChange={(e) => setRetentionReleaseDays(e.target.value)}
+						onChange={(e: any) => setRetentionReleaseDays(e.target.value)}
 						min={0}
 						step={1}
 						placeholder="365"

@@ -132,7 +132,7 @@ export function BOQItemsTable({
 								<TableHead className="w-10">
 									<Checkbox
 										checked={allSelected}
-										ref={(el) => {
+										ref={(el: any) => {
 											if (el) (el as any).indeterminate = someSelected;
 										}}
 										onCheckedChange={toggleAll}

@@ -138,7 +138,7 @@ export function ChartOfAccountsPage({ organizationId, organizationSlug }: ChartO
 					<Input
 						placeholder={t("finance.accounting.search")}
 						value={search}
-						onChange={(e) => setSearch(e.target.value)}
+						onChange={(e: any) => setSearch(e.target.value)}
 						className="ps-9 rounded-xl"
 					/>
 				</div>

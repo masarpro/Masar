@@ -26,7 +26,7 @@ function ContentMenuItem({
 
 			{children && (
 				<div className="-mr-4 pl-4">
-					{children.map((subItem) => (
+					{children.map((subItem: any) => (
 						<ContentMenuItem
 							key={subItem.path}
 							{...subItem}

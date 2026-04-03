@@ -48,7 +48,7 @@ export function ConfirmationAlertProvider({ children }: PropsWithChildren) {
 
 			<AlertDialog
 				open={!!confirmOptions}
-				onOpenChange={(open) =>
+				onOpenChange={(open: any) =>
 					setConfirmOptions(open ? confirmOptions : null)
 				}
 			>

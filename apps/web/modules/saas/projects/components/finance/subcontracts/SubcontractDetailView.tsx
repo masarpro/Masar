@@ -120,8 +120,8 @@ export function SubcontractDetailView({
 	const payableClaims = useMemo(
 		() =>
 			claimsData
-				?.filter((c) => ["APPROVED", "PARTIALLY_PAID"].includes(c.status))
-				.map((c) => ({
+				?.filter((c: any) => ["APPROVED", "PARTIALLY_PAID"].includes(c.status))
+				.map((c: any) => ({
 					id: c.id,
 					claimNo: c.claimNo,
 					netAmount: c.netAmount,
@@ -367,12 +367,12 @@ export function SubcontractDetailView({
 	}
 
 	const coImpact = contract.changeOrders
-		?.filter((co) => co.status === "APPROVED")
-		.reduce((sum, co) => sum + co.amount, 0) ?? 0;
+		?.filter((co: any) => co.status === "APPROVED")
+		.reduce((sum: any, co: any) => sum + co.amount, 0) ?? 0;
 	const adjustedValue = contract.value + coImpact;
 	const totalPaid = contract.payments
-		?.filter((p) => p.status === "COMPLETED")
-		.reduce((sum, p) => sum + p.amount, 0) ?? 0;
+		?.filter((p: any) => p.status === "COMPLETED")
+		.reduce((sum: any, p: any) => sum + p.amount, 0) ?? 0;
 	const remaining = adjustedValue - totalPaid;
 	const progress = adjustedValue > 0 ? Math.min((totalPaid / adjustedValue) * 100, 100) : 0;
 
@@ -469,7 +469,7 @@ export function SubcontractDetailView({
 						<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 							<div className="space-y-2">
 								<Label>{t("subcontracts.form.name")}</Label>
-								<Input value={editName} onChange={(e) => setEditName(e.target.value)} className="rounded-xl" />
+								<Input value={editName} onChange={(e: any) => setEditName(e.target.value)} className="rounded-xl" />
 							</div>
 							<div className="space-y-2">
 								<Label>{t("subcontracts.form.status")}</Label>
@@ -486,7 +486,7 @@ export function SubcontractDetailView({
 						<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 							<div className="space-y-2">
 								<Label>{t("subcontracts.form.value")}</Label>
-								<Input type="number" value={editValue} onChange={(e) => setEditValue(e.target.value)} className="rounded-xl" dir="ltr" />
+								<Input type="number" value={editValue} onChange={(e: any) => setEditValue(e.target.value)} className="rounded-xl" dir="ltr" />
 							</div>
 							<div className="space-y-2">
 								<Label>{t("subcontracts.form.contractorType")}</Label>
@@ -500,37 +500,37 @@ export function SubcontractDetailView({
 							</div>
 							<div className="space-y-2">
 								<Label>{t("subcontracts.form.companyName")}</Label>
-								<Input value={editCompanyName} onChange={(e) => setEditCompanyName(e.target.value)} className="rounded-xl" />
+								<Input value={editCompanyName} onChange={(e: any) => setEditCompanyName(e.target.value)} className="rounded-xl" />
 							</div>
 						</div>
 						<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 							<div className="space-y-2">
 								<Label>{t("subcontracts.form.phone")}</Label>
-								<Input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} className="rounded-xl" dir="ltr" />
+								<Input value={editPhone} onChange={(e: any) => setEditPhone(e.target.value)} className="rounded-xl" dir="ltr" />
 							</div>
 							<div className="space-y-2">
 								<Label>{t("subcontracts.form.email")}</Label>
-								<Input value={editEmail} onChange={(e) => setEditEmail(e.target.value)} className="rounded-xl" dir="ltr" />
+								<Input value={editEmail} onChange={(e: any) => setEditEmail(e.target.value)} className="rounded-xl" dir="ltr" />
 							</div>
 						</div>
 						<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 							<div className="space-y-2">
 								<Label>{t("subcontracts.form.taxNumber")}</Label>
-								<Input value={editTaxNumber} onChange={(e) => setEditTaxNumber(e.target.value)} className="rounded-xl" dir="ltr" />
+								<Input value={editTaxNumber} onChange={(e: any) => setEditTaxNumber(e.target.value)} className="rounded-xl" dir="ltr" />
 							</div>
 							<div className="space-y-2">
 								<Label>{t("subcontracts.form.crNumber")}</Label>
-								<Input value={editCrNumber} onChange={(e) => setEditCrNumber(e.target.value)} className="rounded-xl" dir="ltr" />
+								<Input value={editCrNumber} onChange={(e: any) => setEditCrNumber(e.target.value)} className="rounded-xl" dir="ltr" />
 							</div>
 						</div>
 						<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 							<div className="space-y-2">
 								<Label>{t("subcontracts.form.startDate")}</Label>
-								<Input type="date" value={editStartDate} onChange={(e) => setEditStartDate(e.target.value)} className="rounded-xl" />
+								<Input type="date" value={editStartDate} onChange={(e: any) => setEditStartDate(e.target.value)} className="rounded-xl" />
 							</div>
 							<div className="space-y-2">
 								<Label>{t("subcontracts.form.endDate")}</Label>
-								<Input type="date" value={editEndDate} onChange={(e) => setEditEndDate(e.target.value)} className="rounded-xl" />
+								<Input type="date" value={editEndDate} onChange={(e: any) => setEditEndDate(e.target.value)} className="rounded-xl" />
 							</div>
 						</div>
 						<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -541,21 +541,21 @@ export function SubcontractDetailView({
 							{editIncludesVat && (
 								<div className="space-y-2">
 									<Label>{t("subcontracts.form.vatPercent")}</Label>
-									<Input type="number" value={editVatPercent} onChange={(e) => setEditVatPercent(e.target.value)} className="rounded-xl" dir="ltr" />
+									<Input type="number" value={editVatPercent} onChange={(e: any) => setEditVatPercent(e.target.value)} className="rounded-xl" dir="ltr" />
 								</div>
 							)}
 							<div className="space-y-2">
 								<Label>{t("subcontracts.form.retentionPercent")}</Label>
-								<Input type="number" value={editRetentionPercent} onChange={(e) => setEditRetentionPercent(e.target.value)} className="rounded-xl" dir="ltr" />
+								<Input type="number" value={editRetentionPercent} onChange={(e: any) => setEditRetentionPercent(e.target.value)} className="rounded-xl" dir="ltr" />
 							</div>
 						</div>
 						<div className="space-y-2">
 							<Label>{t("subcontracts.form.scopeOfWork")}</Label>
-							<Textarea value={editScopeOfWork} onChange={(e) => setEditScopeOfWork(e.target.value)} className="min-h-20 rounded-xl" />
+							<Textarea value={editScopeOfWork} onChange={(e: any) => setEditScopeOfWork(e.target.value)} className="min-h-20 rounded-xl" />
 						</div>
 						<div className="space-y-2">
 							<Label>{t("subcontracts.form.notes")}</Label>
-							<Textarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)} className="min-h-16 rounded-xl" />
+							<Textarea value={editNotes} onChange={(e: any) => setEditNotes(e.target.value)} className="min-h-16 rounded-xl" />
 						</div>
 						<div className="flex gap-3 pt-2">
 							<Button
@@ -617,7 +617,7 @@ export function SubcontractDetailView({
 							<Label>{t("subcontracts.co.description")}</Label>
 							<Textarea
 								value={coDescription}
-								onChange={(e) => setCODescription(e.target.value)}
+								onChange={(e: any) => setCODescription(e.target.value)}
 								placeholder={t("subcontracts.co.descriptionPlaceholder")}
 								className="min-h-20 rounded-xl"
 								required
@@ -630,7 +630,7 @@ export function SubcontractDetailView({
 									type="number"
 									step="0.01"
 									value={coAmount}
-									onChange={(e) => setCOAmount(e.target.value)}
+									onChange={(e: any) => setCOAmount(e.target.value)}
 									placeholder="0.00"
 									className="rounded-xl"
 									dir="ltr"

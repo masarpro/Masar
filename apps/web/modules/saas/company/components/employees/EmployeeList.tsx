@@ -105,11 +105,11 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 		if (employees.length > 0 && selectedIds.size === employees.length) {
 			setSelectedIds(new Set());
 		} else {
-			setSelectedIds(new Set(employees.map((e) => e.id)));
+			setSelectedIds(new Set(employees.map((e: any) => e.id)));
 		}
 	};
 	const clearSelection = () => setSelectedIds(new Set());
-	const selectedEmployees = employees.filter((e) => selectedIds.has(e.id));
+	const selectedEmployees = employees.filter((e: any) => selectedIds.has(e.id));
 
 	const formatCurrency = (amount: number | string) =>
 		new Intl.NumberFormat("en-US").format(Number(amount)) + " " + t("common.sar");
@@ -210,11 +210,11 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 						<Input
 							placeholder={t("company.employees.searchPlaceholder")}
 							value={search}
-							onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+							onChange={(e: any) => { setSearch(e.target.value); setCurrentPage(1); }}
 							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pe-10 focus:ring-1 focus:ring-primary/30"
 						/>
 					</div>
-					<Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setCurrentPage(1); }}>
+					<Select value={statusFilter} onValueChange={(v: any) => { setStatusFilter(v); setCurrentPage(1); }}>
 						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.employees.filterStatus")} />
 						</SelectTrigger>
@@ -225,7 +225,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 							<SelectItem value="TERMINATED">{t("company.employees.statusTerminated")}</SelectItem>
 						</SelectContent>
 					</Select>
-					<Select value={typeFilter} onValueChange={(v) => { setTypeFilter(v); setCurrentPage(1); }}>
+					<Select value={typeFilter} onValueChange={(v: any) => { setTypeFilter(v); setCurrentPage(1); }}>
 						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.employees.filterType")} />
 						</SelectTrigger>
@@ -280,14 +280,14 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 								</TableRow>
 							))
 						) : data?.employees?.length ? (
-							data.employees.map((employee, index) => (
+							data.employees.map((employee: any, index: any) => (
 								<TableRow
 									key={employee.id}
 									className="cursor-pointer border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
 									style={{ animationDelay: `${index * 30}ms` }}
 									onClick={() => router.push(`/app/${organizationSlug}/company/employees/${employee.id}`)}
 								>
-									<TableCell onClick={(e) => e.stopPropagation()}>
+									<TableCell onClick={(e: any) => e.stopPropagation()}>
 										<Checkbox
 											checked={selectedIds.has(employee.id)}
 											onCheckedChange={() => toggleRow(employee.id)}
@@ -317,7 +317,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 									<TableCell className="text-end hidden lg:table-cell">
 										{employee.assignments?.length ? (
 											<div className="flex flex-wrap gap-1">
-												{employee.assignments.map((a) => (
+												{employee.assignments.map((a: any) => (
 													<Badge key={a.project.id} variant="outline" className="text-[10px] rounded-lg border-slate-200/50 dark:border-slate-700/50 px-2 py-0.5">
 														{a.project.name}
 													</Badge>
@@ -336,7 +336,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 												size="icon"
 												className="rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
 												aria-label={t("company.employees.terminate")}
-												onClick={(e) => {
+												onClick={(e: any) => {
 													e.stopPropagation();
 													if (confirm(t("company.employees.confirmTerminate"))) {
 														terminateMutation.mutate(employee.id);

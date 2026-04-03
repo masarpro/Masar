@@ -249,10 +249,10 @@ export function OtherStructuralSection({
 								<div className="flex items-center gap-1">
 									{!isEditing && (
 										<>
-											<Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setEditingIndex(index); }}>
+											<Button variant="ghost" size="sm" onClick={(e: any) => { e.stopPropagation(); setEditingIndex(index); }}>
 												<Pencil className="h-4 w-4" />
 											</Button>
-											<Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleDeleteElement(index); }}>
+											<Button variant="ghost" size="sm" onClick={(e: any) => { e.stopPropagation(); handleDeleteElement(index); }}>
 												<Trash2 className="h-4 w-4 text-destructive" />
 											</Button>
 										</>
@@ -271,7 +271,7 @@ export function OtherStructuralSection({
 											<Label>{tS("itemName")}</Label>
 											<Input
 												value={el.input.name}
-												onChange={(e) => handleUpdateInput(index, { ...el.input, name: e.target.value })}
+												onChange={(e: any) => handleUpdateInput(index, { ...el.input, name: e.target.value })}
 											/>
 										</div>
 

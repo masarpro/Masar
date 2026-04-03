@@ -77,7 +77,7 @@ export function JournalEntriesPage({
 
 	const bulkPostMutation = useMutation(
 		orpc.accounting.journal.bulkPost.mutationOptions({
-			onSuccess: (result) => {
+			onSuccess: (result: any) => {
 				queryClient.invalidateQueries({ queryKey: ["orpc", "accounting"] });
 				setSelectedIds(new Set());
 				if (result.errors.length === 0) {
@@ -92,7 +92,7 @@ export function JournalEntriesPage({
 
 	const postAllMutation = useMutation(
 		orpc.accounting.journal.postAllDrafts.mutationOptions({
-			onSuccess: (result) => {
+			onSuccess: (result: any) => {
 				queryClient.invalidateQueries({ queryKey: ["orpc", "accounting"] });
 				setSelectedIds(new Set());
 				if (result.posted === 0) {
@@ -108,7 +108,7 @@ export function JournalEntriesPage({
 	);
 
 	const entries = data?.entries ?? [];
-	const draftEntries = entries.filter((e) => e.status === "DRAFT");
+	const draftEntries = entries.filter((e: any) => e.status === "DRAFT");
 
 	const toggleSelect = useCallback((id: string) => {
 		setSelectedIds((prev) => {
@@ -124,7 +124,7 @@ export function JournalEntriesPage({
 			if (prev.size === draftEntries.length && draftEntries.length > 0) {
 				return new Set();
 			}
-			return new Set(draftEntries.map((e) => e.id));
+			return new Set(draftEntries.map((e: any) => e.id));
 		});
 	}, [draftEntries]);
 
@@ -140,7 +140,7 @@ export function JournalEntriesPage({
 						<Input
 							placeholder={t("finance.accounting.search")}
 							value={search}
-							onChange={(e) => setSearch(e.target.value)}
+							onChange={(e: any) => setSearch(e.target.value)}
 							className="ps-9 rounded-xl w-64"
 						/>
 					</div>
@@ -212,19 +212,19 @@ export function JournalEntriesPage({
 						<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 							<div>
 								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.ledger.dateFrom")}</label>
-								<Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="rounded-xl h-8 text-sm" />
+								<Input type="date" value={dateFrom} onChange={(e: any) => setDateFrom(e.target.value)} className="rounded-xl h-8 text-sm" />
 							</div>
 							<div>
 								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.ledger.dateTo")}</label>
-								<Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="rounded-xl h-8 text-sm" />
+								<Input type="date" value={dateTo} onChange={(e: any) => setDateTo(e.target.value)} className="rounded-xl h-8 text-sm" />
 							</div>
 							<div>
 								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.amountFrom")}</label>
-								<Input type="number" min={0} step={0.01} value={amountFrom} onChange={(e) => setAmountFrom(e.target.value)} className="rounded-xl h-8 text-sm" placeholder="0" />
+								<Input type="number" min={0} step={0.01} value={amountFrom} onChange={(e: any) => setAmountFrom(e.target.value)} className="rounded-xl h-8 text-sm" placeholder="0" />
 							</div>
 							<div>
 								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.amountTo")}</label>
-								<Input type="number" min={0} step={0.01} value={amountTo} onChange={(e) => setAmountTo(e.target.value)} className="rounded-xl h-8 text-sm" placeholder="0" />
+								<Input type="number" min={0} step={0.01} value={amountTo} onChange={(e: any) => setAmountTo(e.target.value)} className="rounded-xl h-8 text-sm" placeholder="0" />
 							</div>
 							<div>
 								<label className="text-xs text-slate-500 mb-1 block">{t("finance.accounting.selectAccount")}</label>
@@ -320,7 +320,7 @@ export function JournalEntriesPage({
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{entries.map((entry) => {
+								{entries.map((entry: any) => {
 									const statusVariant = STATUS_VARIANTS[entry.status] ?? STATUS_VARIANTS.DRAFT;
 									const statusLabel = t(`finance.accounting.status.${entry.status === "POSTED" ? "posted" : entry.status === "REVERSED" ? "reversed" : "draft"}`);
 									const isDraft = entry.status === "DRAFT";

@@ -142,7 +142,7 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 						</div>
 						<div>
 							<Label>{t("finance.accounting.entryDate")}</Label>
-							<Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="rounded-xl" />
+							<Input type="date" value={date} onChange={(e: any) => setDate(e.target.value)} className="rounded-xl" />
 						</div>
 						<div className="flex items-end">
 							<label className="flex items-center gap-2 text-sm cursor-pointer">
@@ -154,7 +154,7 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 
 					<div>
 						<Label>{t("finance.accounting.description")}</Label>
-						<Input value={description} onChange={(e) => setDescription(e.target.value)} className="rounded-xl" />
+						<Input value={description} onChange={(e: any) => setDescription(e.target.value)} className="rounded-xl" />
 					</div>
 
 					{/* Lines */}
@@ -162,9 +162,9 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 						<Label>{t("finance.accounting.journalEntries")}</Label>
 						{lines.map((line, idx) => (
 							<div key={idx} className="flex gap-2 items-center">
-								<Input placeholder={t("finance.accounting.selectAccount")} value={line.accountId} onChange={(e) => { const n = [...lines]; n[idx].accountId = e.target.value; setLines(n); }} className="flex-1 rounded-xl text-sm" />
-								<Input type="number" placeholder={t("finance.accounting.debit")} value={line.debit || ""} onChange={(e) => { const n = [...lines]; n[idx].debit = Number(e.target.value); setLines(n); }} className="w-28 rounded-xl text-sm" />
-								<Input type="number" placeholder={t("finance.accounting.credit")} value={line.credit || ""} onChange={(e) => { const n = [...lines]; n[idx].credit = Number(e.target.value); setLines(n); }} className="w-28 rounded-xl text-sm" />
+								<Input placeholder={t("finance.accounting.selectAccount")} value={line.accountId} onChange={(e: any) => { const n = [...lines]; n[idx].accountId = e.target.value; setLines(n); }} className="flex-1 rounded-xl text-sm" />
+								<Input type="number" placeholder={t("finance.accounting.debit")} value={line.debit || ""} onChange={(e: any) => { const n = [...lines]; n[idx].debit = Number(e.target.value); setLines(n); }} className="w-28 rounded-xl text-sm" />
+								<Input type="number" placeholder={t("finance.accounting.credit")} value={line.credit || ""} onChange={(e: any) => { const n = [...lines]; n[idx].credit = Number(e.target.value); setLines(n); }} className="w-28 rounded-xl text-sm" />
 								{lines.length > 2 && (
 									<Button variant="ghost" size="sm" onClick={() => removeLine(idx)} className="text-red-500 px-2">×</Button>
 								)}

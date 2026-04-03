@@ -41,10 +41,10 @@ export function InvoiceNotesPanel({
 				</div>
 				<div className="p-5">
 					<TabsContent value="notes" className="mt-0">
-						<Textarea value={notes} onChange={(e) => onNotesChange(e.target.value)} placeholder={t("finance.invoices.notesPlaceholder")} rows={4} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
+						<Textarea value={notes} onChange={(e: any) => onNotesChange(e.target.value)} placeholder={t("finance.invoices.notesPlaceholder")} rows={4} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
 					</TabsContent>
 					<TabsContent value="terms" className="mt-0">
-						<Textarea value={paymentTerms} onChange={(e) => onPaymentTermsChange(e.target.value)} placeholder={t("finance.invoices.paymentTermsPlaceholder")} rows={4} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
+						<Textarea value={paymentTerms} onChange={(e: any) => onPaymentTermsChange(e.target.value)} placeholder={t("finance.invoices.paymentTermsPlaceholder")} rows={4} className="rounded-xl border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background" />
 					</TabsContent>
 					<TabsContent value="attachments" className="mt-0">
 						<div className="flex flex-col items-center justify-center py-8 text-sm text-muted-foreground border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-800/20 cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all">

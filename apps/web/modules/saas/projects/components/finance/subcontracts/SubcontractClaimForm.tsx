@@ -324,7 +324,7 @@ export function SubcontractClaimForm({
 							<Label>{t("claimTitle")}</Label>
 							<Input
 								value={title}
-								onChange={(e) => setTitle(e.target.value)}
+								onChange={(e: any) => setTitle(e.target.value)}
 								placeholder={t("claimTitlePlaceholder")}
 							/>
 						</div>
@@ -333,7 +333,7 @@ export function SubcontractClaimForm({
 							<Label>{t("claimType")}</Label>
 							<Select
 								value={claimType}
-								onValueChange={(v) =>
+								onValueChange={(v: any) =>
 									setClaimType(v as "INTERIM" | "FINAL" | "RETENTION")
 								}
 							>
@@ -356,7 +356,7 @@ export function SubcontractClaimForm({
 								<Input
 									type="date"
 									value={periodStart}
-									onChange={(e) => setPeriodStart(e.target.value)}
+									onChange={(e: any) => setPeriodStart(e.target.value)}
 								/>
 							</div>
 							<div className="space-y-2">
@@ -364,7 +364,7 @@ export function SubcontractClaimForm({
 								<Input
 									type="date"
 									value={periodEnd}
-									onChange={(e) => setPeriodEnd(e.target.value)}
+									onChange={(e: any) => setPeriodEnd(e.target.value)}
 								/>
 							</div>
 						</div>
@@ -373,7 +373,7 @@ export function SubcontractClaimForm({
 							<Label>{t("notes")}</Label>
 							<Textarea
 								value={notes}
-								onChange={(e) => setNotes(e.target.value)}
+								onChange={(e: any) => setNotes(e.target.value)}
 								rows={3}
 							/>
 						</div>
@@ -432,7 +432,7 @@ export function SubcontractClaimForm({
 									</TableRow>
 								</TableHeader>
 								<TableBody>
-									{items.map((item) => {
+									{items.map((item: any) => {
 										const thisQty = itemQtys[item.id] ?? 0;
 										const prevCum = item.totalCumulativeQty ?? 0;
 										const contractQty = item.contractQty;
@@ -485,7 +485,7 @@ export function SubcontractClaimForm({
 														}`}
 														dir="ltr"
 														value={itemQtys[item.id] ?? ""}
-														onChange={(e) =>
+														onChange={(e: any) =>
 															handleQtyChange(
 																item.id,
 																contractQty,
@@ -549,7 +549,7 @@ export function SubcontractClaimForm({
 											<Label className="text-xs">{t("manualItemDescription")}</Label>
 											<Input
 												value={mi.description}
-												onChange={(e) => updateManualItem(mi.id, "description", e.target.value)}
+												onChange={(e: any) => updateManualItem(mi.id, "description", e.target.value)}
 												placeholder={t("manualItemDescription")}
 												className="h-8 text-sm"
 											/>
@@ -558,7 +558,7 @@ export function SubcontractClaimForm({
 											<Label className="text-xs">{t("manualItemUnit")}</Label>
 											<Input
 												value={mi.unit}
-												onChange={(e) => updateManualItem(mi.id, "unit", e.target.value)}
+												onChange={(e: any) => updateManualItem(mi.id, "unit", e.target.value)}
 												className="h-8 text-sm"
 												dir="ltr"
 											/>
@@ -570,7 +570,7 @@ export function SubcontractClaimForm({
 												step="any"
 												min={0}
 												value={mi.qty || ""}
-												onChange={(e) => updateManualItem(mi.id, "qty", Number(e.target.value) || 0)}
+												onChange={(e: any) => updateManualItem(mi.id, "qty", Number(e.target.value) || 0)}
 												className="h-8 text-sm"
 												dir="ltr"
 											/>
@@ -582,7 +582,7 @@ export function SubcontractClaimForm({
 												step="0.01"
 												min={0}
 												value={mi.unitPrice || ""}
-												onChange={(e) => updateManualItem(mi.id, "unitPrice", Number(e.target.value) || 0)}
+												onChange={(e: any) => updateManualItem(mi.id, "unitPrice", Number(e.target.value) || 0)}
 												className="h-8 text-sm"
 												dir="ltr"
 											/>
@@ -682,7 +682,7 @@ export function SubcontractClaimForm({
 									step="0.01"
 									min="0"
 									value={penaltyAmount || ""}
-									onChange={(e) => setPenaltyAmount(Number.parseFloat(e.target.value) || 0)}
+									onChange={(e: any) => setPenaltyAmount(Number.parseFloat(e.target.value) || 0)}
 									placeholder="0.00"
 									className="rounded-lg"
 									dir="ltr"
@@ -695,7 +695,7 @@ export function SubcontractClaimForm({
 									step="0.01"
 									min="0"
 									value={otherDeductions || ""}
-									onChange={(e) => setOtherDeductions(Number.parseFloat(e.target.value) || 0)}
+									onChange={(e: any) => setOtherDeductions(Number.parseFloat(e.target.value) || 0)}
 									placeholder="0.00"
 									className="rounded-lg"
 									dir="ltr"
@@ -706,7 +706,7 @@ export function SubcontractClaimForm({
 									<Label className="text-xs">{t("otherDeductionsNote")}</Label>
 									<Input
 										value={otherDeductionsNote}
-										onChange={(e) => setOtherDeductionsNote(e.target.value)}
+										onChange={(e: any) => setOtherDeductionsNote(e.target.value)}
 										placeholder={t("notesPlaceholder")}
 										className="rounded-lg"
 									/>

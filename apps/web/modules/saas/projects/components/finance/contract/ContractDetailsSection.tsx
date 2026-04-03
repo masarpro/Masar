@@ -96,7 +96,7 @@ export const ContractDetailsSection = React.memo(
 									step="0.01"
 									min="0"
 									value={contractValue}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										onFieldChange(
 											"contractValue",
 											e.target.value,
@@ -117,7 +117,7 @@ export const ContractDetailsSection = React.memo(
 							</Label>
 							<Select
 								value={contractStatus}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									onFieldChange("contractStatus", value)
 								}
 							>
@@ -149,7 +149,7 @@ export const ContractDetailsSection = React.memo(
 							</Label>
 							<Switch
 								checked={includesVat}
-								onCheckedChange={(checked) =>
+								onCheckedChange={(checked: any) =>
 									onFieldChange("includesVat", checked)
 								}
 							/>
@@ -198,7 +198,7 @@ export const ContractDetailsSection = React.memo(
 							<Input
 								type="date"
 								value={signedDate}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									onFieldChange("signedDate", e.target.value)
 								}
 								className="rounded-xl border-sky-200/60 bg-white dark:border-sky-800/40 dark:bg-slate-900/50"
@@ -211,7 +211,7 @@ export const ContractDetailsSection = React.memo(
 							<Input
 								type="date"
 								value={startDate}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									onFieldChange("startDate", e.target.value)
 								}
 								className="rounded-xl border-sky-200/60 bg-white dark:border-sky-800/40 dark:bg-slate-900/50"
@@ -224,7 +224,7 @@ export const ContractDetailsSection = React.memo(
 							<Input
 								type="date"
 								value={endDate}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									onFieldChange("endDate", e.target.value)
 								}
 								className="rounded-xl border-sky-200/60 bg-white dark:border-sky-800/40 dark:bg-slate-900/50"
@@ -240,7 +240,7 @@ export const ContractDetailsSection = React.memo(
 							</Label>
 							<Select
 								value={paymentMethod}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									onFieldChange("paymentMethod", value)
 								}
 							>
@@ -275,7 +275,7 @@ export const ContractDetailsSection = React.memo(
 						</Label>
 						<Textarea
 							value={scopeOfWork}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								onFieldChange("scopeOfWork", e.target.value)
 							}
 							placeholder={t(
@@ -293,7 +293,7 @@ export const ContractDetailsSection = React.memo(
 						</Label>
 						<Textarea
 							value={contractNotes}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								onFieldChange("contractNotes", e.target.value)
 							}
 							rows={2}

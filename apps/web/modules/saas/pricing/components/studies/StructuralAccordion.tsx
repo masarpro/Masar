@@ -195,7 +195,7 @@ export function StructuralAccordion({
 			type="single"
 			collapsible
 			value={openItem}
-			onValueChange={(val) => setOpenItem(val)}
+			onValueChange={(val: any) => setOpenItem(val)}
 			className="space-y-3"
 		>
 			{sections.map((section) => {

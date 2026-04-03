@@ -29,7 +29,7 @@ async function AppStartPageContent() {
 	) {
 		const organization =
 			organizations.find(
-				(org) => org.id === session?.session.activeOrganizationId,
+				(org: any) => org.id === session?.session.activeOrganizationId,
 			) || organizations[0];
 
 		if (!organization) {

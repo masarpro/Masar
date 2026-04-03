@@ -45,7 +45,7 @@ export function AssistantPanel() {
   const prevSaveLenRef = useRef(0);
 
   // Page context from Zustand store (set by PageContextProvider on individual pages)
-  const enhancedPageContext = usePageContextStore((s) => s.context);
+  const enhancedPageContext = usePageContextStore((s: any) => s.context);
 
   const contextBody = {
     organizationSlug,

@@ -103,7 +103,7 @@ export function IssueForm({
 						<Input
 							id="title"
 							value={title}
-							onChange={(e) => setTitle(e.target.value)}
+							onChange={(e: any) => setTitle(e.target.value)}
 							placeholder={t("projects.field.issueTitlePlaceholder")}
 							required
 							className="rounded-xl"
@@ -116,7 +116,7 @@ export function IssueForm({
 							<Label>{t("projects.field.severityLabel")}</Label>
 							<Select
 								value={severity}
-								onValueChange={(v) => setSeverity(v as IssueSeverity)}
+								onValueChange={(v: any) => setSeverity(v as IssueSeverity)}
 							>
 								<SelectTrigger className="rounded-xl">
 									<SelectValue />
@@ -137,7 +137,7 @@ export function IssueForm({
 								id="dueDate"
 								type="date"
 								value={dueDate}
-								onChange={(e) => setDueDate(e.target.value)}
+								onChange={(e: any) => setDueDate(e.target.value)}
 								className="rounded-xl"
 							/>
 						</div>
@@ -151,7 +151,7 @@ export function IssueForm({
 						<Textarea
 							id="description"
 							value={description}
-							onChange={(e) => setDescription(e.target.value)}
+							onChange={(e: any) => setDescription(e.target.value)}
 							placeholder={t("projects.field.issueDescriptionPlaceholder")}
 							rows={4}
 							required

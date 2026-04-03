@@ -129,7 +129,7 @@ export function ContractInfoCard({
 
 	const { mutate: updateProject } = useMutation(
 		orpc.projects.update.mutationOptions({
-			onError: (error) => {
+			onError: (error: any) => {
 				console.error("[ContractInfoCard] Failed to update project client:", error);
 			},
 		}),
@@ -178,7 +178,7 @@ export function ContractInfoCard({
 						<Label>{t("projects.contract.info.contractNo")}</Label>
 						<Input
 							value={contractNo}
-							onChange={(e) => setContractNo(e.target.value)}
+							onChange={(e: any) => setContractNo(e.target.value)}
 							placeholder="CON-001"
 						/>
 					</div>
@@ -186,7 +186,7 @@ export function ContractInfoCard({
 						<Label>{t("projects.contract.info.contractTitle")}</Label>
 						<Input
 							value={title}
-							onChange={(e) => setTitle(e.target.value)}
+							onChange={(e: any) => setTitle(e.target.value)}
 						/>
 					</div>
 				</div>
@@ -222,7 +222,7 @@ export function ContractInfoCard({
 						{showInlineClientForm ? (
 							<InlineClientForm
 								organizationId={organizationId}
-								onSuccess={(client) => {
+								onSuccess={(client: any) => {
 									setClientId(client.id);
 									setClientName(client.name);
 									setClientCompany(client.company ?? "");
@@ -315,7 +315,7 @@ export function ContractInfoCard({
 						<Input
 							type="number"
 							value={value}
-							onChange={(e) => setValue(e.target.value)}
+							onChange={(e: any) => setValue(e.target.value)}
 							min={0}
 							step={0.01}
 						/>
@@ -329,7 +329,7 @@ export function ContractInfoCard({
 						<Input
 							type="date"
 							value={signedDate}
-							onChange={(e) => setSignedDate(e.target.value)}
+							onChange={(e: any) => setSignedDate(e.target.value)}
 						/>
 					</div>
 					<div className="space-y-2">
@@ -337,7 +337,7 @@ export function ContractInfoCard({
 						<Input
 							type="date"
 							value={startDate}
-							onChange={(e) => setStartDate(e.target.value)}
+							onChange={(e: any) => setStartDate(e.target.value)}
 						/>
 					</div>
 					<div className="space-y-2">
@@ -345,7 +345,7 @@ export function ContractInfoCard({
 						<Input
 							type="date"
 							value={endDate}
-							onChange={(e) => setEndDate(e.target.value)}
+							onChange={(e: any) => setEndDate(e.target.value)}
 						/>
 					</div>
 				</div>
@@ -355,7 +355,7 @@ export function ContractInfoCard({
 					<Label>{t("projects.contract.info.description")}</Label>
 					<Textarea
 						value={description}
-						onChange={(e) => setDescription(e.target.value)}
+						onChange={(e: any) => setDescription(e.target.value)}
 						rows={2}
 					/>
 				</div>
@@ -365,7 +365,7 @@ export function ContractInfoCard({
 					<Label>{t("projects.contract.info.notes")}</Label>
 					<Textarea
 						value={notes}
-						onChange={(e) => setNotes(e.target.value)}
+						onChange={(e: any) => setNotes(e.target.value)}
 						rows={2}
 					/>
 				</div>

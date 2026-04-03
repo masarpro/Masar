@@ -198,7 +198,7 @@ export function PaymentsTable({
 			{/* Delete Confirmation */}
 			<AlertDialog
 				open={!!deletePaymentId}
-				onOpenChange={(open) => !open && setDeletePaymentId(null)}
+				onOpenChange={(open: any) => !open && setDeletePaymentId(null)}
 			>
 				<AlertDialogContent>
 					<AlertDialogHeader>

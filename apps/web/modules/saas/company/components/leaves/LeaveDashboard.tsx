@@ -144,7 +144,7 @@ export function LeaveDashboard({ organizationId, organizationSlug }: LeaveDashbo
 					</div>
 				) : data?.onLeaveToday?.length ? (
 					<div className="space-y-3">
-						{data.onLeaveToday.map((req) => (
+						{data.onLeaveToday.map((req: any) => (
 							<div key={req.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50/50 dark:bg-slate-800/30">
 								<div className="flex items-center gap-3">
 									<div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: req.leaveType.color || "#6b7280" }}>
@@ -188,7 +188,7 @@ export function LeaveDashboard({ organizationId, organizationSlug }: LeaveDashbo
 						</div>
 					) : data?.recentRequests?.length ? (
 						<div className="space-y-3">
-							{data.recentRequests.map((req) => (
+							{data.recentRequests.map((req: any) => (
 								<div key={req.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50/50 dark:bg-slate-800/30">
 									<div>
 										<p className="font-medium text-sm text-slate-900 dark:text-slate-100">{req.employee.name}</p>
@@ -223,7 +223,7 @@ export function LeaveDashboard({ organizationId, organizationSlug }: LeaveDashbo
 						</div>
 					) : data?.lowBalances?.length ? (
 						<div className="space-y-3">
-							{data.lowBalances.map((bal) => (
+							{data.lowBalances.map((bal: any) => (
 								<div key={bal.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50/50 dark:bg-slate-800/30">
 									<div>
 										<p className="font-medium text-sm text-slate-900 dark:text-slate-100">{bal.employee.name}</p>

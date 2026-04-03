@@ -85,7 +85,7 @@ export default function OwnerChangeOrdersPage() {
 		orpc.projectChangeOrders.ownerList.queryOptions({
 			input: { token },
 		}),
-	);
+	) as { data: any; isLoading: boolean };
 
 	const changeOrders = (data?.changeOrders ?? []) as OwnerChangeOrder[];
 

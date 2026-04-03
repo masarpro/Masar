@@ -59,7 +59,7 @@ export function ClientSelector({
 	);
 
 	const clients = data?.clients ?? [];
-	const selectedClient = clients.find((c) => c.id === selectedClientId);
+	const selectedClient = clients.find((c: any) => c.id === selectedClientId);
 
 	return (
 		<div className="space-y-2">
@@ -117,7 +117,7 @@ export function ClientSelector({
 								</div>
 							</CommandEmpty>
 							<CommandGroup>
-								{clients.map((client) => (
+								{clients.map((client: any) => (
 									<CommandItem
 										key={client.id}
 										value={client.id}

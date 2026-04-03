@@ -153,7 +153,7 @@ export function TwoFactorBlock() {
 		verifyTwoFactorMutation.mutate();
 	};
 
-	if (!accounts?.some((account) => account.providerId === "credential")) {
+	if (!accounts?.some((account: any) => account.providerId === "credential")) {
 		return null;
 	}
 
@@ -215,7 +215,7 @@ export function TwoFactorBlock() {
 									</Label>
 									<PasswordInput
 										value={password}
-										onChange={(value) => setPassword(value)}
+										onChange={(value: any) => setPassword(value)}
 									/>
 								</FormItem>
 							</div>
@@ -263,7 +263,7 @@ export function TwoFactorBlock() {
 										</Label>
 										<Input
 											value={totpCode}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												setTotpCode(e.target.value)
 											}
 										/>

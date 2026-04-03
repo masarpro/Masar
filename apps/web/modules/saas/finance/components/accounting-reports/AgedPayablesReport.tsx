@@ -74,16 +74,16 @@ export function AgedPayablesReport({
 	const { rows, totals } = data;
 
 	const maxPayable =
-		rows.length > 0 ? Math.max(...rows.map((r) => r.total)) : 0;
+		rows.length > 0 ? Math.max(...rows.map((r: any) => r.total)) : 0;
 	const totalContractors = rows.length;
-	const totalDetails = rows.reduce((sum, r) => sum + r.details.length, 0);
+	const totalDetails = rows.reduce((sum: any, r: any) => sum + r.details.length, 0);
 	const avgAgingDays =
 		totalDetails > 0
 			? Math.round(
 					rows.reduce(
-						(sum, r) =>
+						(sum: any, r: any) =>
 							sum +
-							r.details.reduce((s, d) => s + d.agingDays, 0),
+							r.details.reduce((s: any, d: any) => s + d.agingDays, 0),
 						0,
 					) / totalDetails,
 				)
@@ -242,7 +242,7 @@ export function AgedPayablesReport({
 										</TableRow>
 									</TableHeader>
 									<TableBody>
-										{rows.map((row) => {
+										{rows.map((row: any) => {
 											const isExpanded =
 												expandedContracts.has(
 													row.contractId,
@@ -309,7 +309,7 @@ export function AgedPayablesReport({
 													</TableRow>
 													{isExpanded &&
 														row.details.map(
-															(detail) => (
+															(detail: any) => (
 																<TableRow
 																	key={
 																		detail.id

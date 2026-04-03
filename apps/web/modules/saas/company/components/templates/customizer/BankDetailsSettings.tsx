@@ -45,7 +45,7 @@ export function BankDetailsSettings({
 			</Label>
 			<Select
 				value={selectedBankId || "default"}
-				onValueChange={(v) => onUpdate({ selectedBankId: v === "default" ? "" : v })}
+				onValueChange={(v: any) => onUpdate({ selectedBankId: v === "default" ? "" : v })}
 			>
 				<SelectTrigger className="h-8 text-xs rounded-lg">
 					<SelectValue placeholder={t("finance.templates.editor.settings.selectBankPlaceholder")} />

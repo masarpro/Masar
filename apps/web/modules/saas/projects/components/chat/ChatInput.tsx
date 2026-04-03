@@ -69,7 +69,7 @@ export function ChatInput({
 					queryKey: [["projectChat", "getUnreadCount"]],
 				});
 			},
-			onError: (error) => {
+			onError: (error: any) => {
 				toast.error(error.message || t("projects.chat.sendError"));
 			},
 		}),
@@ -227,10 +227,10 @@ export function ChatInput({
 				{/* Message textarea */}
 				<Textarea
 					value={message}
-					onChange={(e) => setMessage(e.target.value)}
+					onChange={(e: any) => setMessage(e.target.value)}
 					placeholder={t("projects.chat.messagePlaceholder")}
 					className="min-h-10 max-h-24 flex-1 resize-none rounded-xl text-sm"
-					onKeyDown={(e) => {
+					onKeyDown={(e: any) => {
 						if (e.key === "Enter" && !e.shiftKey) {
 							e.preventDefault();
 							handleSend();

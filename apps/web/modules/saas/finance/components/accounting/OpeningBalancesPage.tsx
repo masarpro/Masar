@@ -62,7 +62,7 @@ export function OpeningBalancesPage({
 				queryClient.invalidateQueries({ queryKey: ["orpc", "accounting"] });
 				toast.success(t("finance.accounting.openingBalances.saveSuccess"));
 			},
-			onError: (err) => toast.error(err.message),
+			onError: (err: any) => toast.error(err.message),
 		}),
 	);
 
@@ -82,7 +82,7 @@ export function OpeningBalancesPage({
 		if (!data) return [];
 		const groups: Array<{ type: string; label: string; accounts: typeof data.accounts }> = [];
 		for (const type of TYPE_ORDER) {
-			const accs = data.accounts.filter((a) => a.type === type);
+			const accs = data.accounts.filter((a: any) => a.type === type);
 			if (accs.length > 0) {
 				groups.push({ type, label: t(`finance.accounting.accountTypes.${type}`), accounts: accs });
 			}
@@ -190,7 +190,7 @@ export function OpeningBalancesPage({
 									</TableRow>
 								</TableHeader>
 								<TableBody>
-									{group.accounts.map((acc) => {
+									{group.accounts.map((acc: any) => {
 										const current = amounts.get(acc.accountId) ?? { debit: 0, credit: 0 };
 										return (
 											<TableRow key={acc.accountId}>
@@ -202,7 +202,7 @@ export function OpeningBalancesPage({
 														min={0}
 														step={0.01}
 														value={current.debit || ""}
-														onChange={(e) => handleAmountChange(acc.accountId, "debit", e.target.value)}
+														onChange={(e: any) => handleAmountChange(acc.accountId, "debit", e.target.value)}
 														className="rounded-lg text-end h-8 text-sm"
 														placeholder="0.00"
 													/>
@@ -213,7 +213,7 @@ export function OpeningBalancesPage({
 														min={0}
 														step={0.01}
 														value={current.credit || ""}
-														onChange={(e) => handleAmountChange(acc.accountId, "credit", e.target.value)}
+														onChange={(e: any) => handleAmountChange(acc.accountId, "credit", e.target.value)}
 														className="rounded-lg text-end h-8 text-sm"
 														placeholder="0.00"
 													/>

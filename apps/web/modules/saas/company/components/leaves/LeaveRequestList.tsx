@@ -168,7 +168,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 			{/* Header */}
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
-					<Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setCurrentPage(1); }}>
+					<Select value={statusFilter} onValueChange={(v: any) => { setStatusFilter(v); setCurrentPage(1); }}>
 						<SelectTrigger className="w-[160px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.leaves.filterStatus")} />
 						</SelectTrigger>
@@ -216,7 +216,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 								</TableRow>
 							))
 						) : data?.requests?.length ? (
-							data.requests.map((req, index) => (
+							data.requests.map((req: any, index: any) => (
 								<TableRow
 									key={req.id}
 									className="border-white/10 dark:border-slate-700/30 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
@@ -325,12 +325,12 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 					<div className="space-y-4">
 						<div>
 							<Label>{t("company.leaves.requests.employee")}</Label>
-							<Select value={newRequest.employeeId} onValueChange={(v) => setNewRequest((p) => ({ ...p, employeeId: v }))}>
+							<Select value={newRequest.employeeId} onValueChange={(v: any) => setNewRequest((p) => ({ ...p, employeeId: v }))}>
 								<SelectTrigger className="rounded-xl mt-1">
 									<SelectValue placeholder={t("company.leaves.requests.selectEmployee")} />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
-									{employees?.employees?.map((emp) => (
+									{employees?.employees?.map((emp: any) => (
 										<SelectItem key={emp.id} value={emp.id}>{emp.name}</SelectItem>
 									))}
 								</SelectContent>
@@ -338,7 +338,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 						</div>
 						<div>
 							<Label>{t("company.leaves.requests.leaveType")}</Label>
-							<Select value={newRequest.leaveTypeId} onValueChange={(v) => setNewRequest((p) => ({ ...p, leaveTypeId: v }))}>
+							<Select value={newRequest.leaveTypeId} onValueChange={(v: any) => setNewRequest((p) => ({ ...p, leaveTypeId: v }))}>
 								<SelectTrigger className="rounded-xl mt-1">
 									<SelectValue placeholder={t("company.leaves.requests.selectLeaveType")} />
 								</SelectTrigger>
@@ -356,7 +356,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 									type="date"
 									className="rounded-xl mt-1"
 									value={newRequest.startDate}
-									onChange={(e) => setNewRequest((p) => ({ ...p, startDate: e.target.value }))}
+									onChange={(e: any) => setNewRequest((p) => ({ ...p, startDate: e.target.value }))}
 								/>
 							</div>
 							<div>
@@ -365,7 +365,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 									type="date"
 									className="rounded-xl mt-1"
 									value={newRequest.endDate}
-									onChange={(e) => setNewRequest((p) => ({ ...p, endDate: e.target.value }))}
+									onChange={(e: any) => setNewRequest((p) => ({ ...p, endDate: e.target.value }))}
 								/>
 							</div>
 						</div>
@@ -374,7 +374,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 							<Textarea
 								className="rounded-xl mt-1"
 								value={newRequest.reason}
-								onChange={(e) => setNewRequest((p) => ({ ...p, reason: e.target.value }))}
+								onChange={(e: any) => setNewRequest((p) => ({ ...p, reason: e.target.value }))}
 								placeholder={t("company.leaves.requests.reasonPlaceholder")}
 							/>
 						</div>
@@ -395,7 +395,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 			</Dialog>
 
 			{/* Reject Dialog */}
-			<Dialog open={!!showRejectDialog} onOpenChange={(open) => { if (!open) setShowRejectDialog(null); }}>
+			<Dialog open={!!showRejectDialog} onOpenChange={(open: any) => { if (!open) setShowRejectDialog(null); }}>
 				<DialogContent className="rounded-2xl">
 					<DialogHeader>
 						<DialogTitle>{t("company.leaves.requests.rejectTitle")}</DialogTitle>
@@ -405,7 +405,7 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 						<Textarea
 							className="rounded-xl mt-1"
 							value={rejectionReason}
-							onChange={(e) => setRejectionReason(e.target.value)}
+							onChange={(e: any) => setRejectionReason(e.target.value)}
 							placeholder={t("company.leaves.requests.rejectionReasonPlaceholder")}
 						/>
 					</div>

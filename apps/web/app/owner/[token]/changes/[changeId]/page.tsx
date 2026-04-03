@@ -67,7 +67,7 @@ export default function OwnerChangeOrderDetailPage() {
 		orpc.projectChangeOrders.ownerGet.queryOptions({
 			input: { token, changeOrderId: changeId },
 		}),
-	);
+	) as { data: any; isLoading: boolean };
 
 	if (isLoading) {
 		return (

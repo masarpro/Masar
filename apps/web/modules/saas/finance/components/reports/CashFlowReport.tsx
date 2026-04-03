@@ -99,7 +99,7 @@ export function CashFlowReport({
 					<Input
 						type="date"
 						value={dateFrom}
-						onChange={(e) => setDateFrom(e.target.value)}
+						onChange={(e: any) => setDateFrom(e.target.value)}
 						className="rounded-xl h-9 w-36"
 					/>
 				</div>
@@ -110,7 +110,7 @@ export function CashFlowReport({
 					<Input
 						type="date"
 						value={dateTo}
-						onChange={(e) => setDateTo(e.target.value)}
+						onChange={(e: any) => setDateTo(e.target.value)}
 						className="rounded-xl h-9 w-36"
 					/>
 				</div>
@@ -254,7 +254,7 @@ export function CashFlowReport({
 										</TableCell>
 									</TableRow>
 
-									{data.periods.map((period) => (
+									{data.periods.map((period: any) => (
 										<TableRow key={period.periodStart}>
 											<TableCell className="font-medium whitespace-nowrap">
 												{period.periodStart} → {period.periodEnd}

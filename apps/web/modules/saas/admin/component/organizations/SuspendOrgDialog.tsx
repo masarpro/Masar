@@ -57,7 +57,7 @@ export function SuspendOrgDialog({
 						<Label>{t("admin.organizations.reason")}</Label>
 						<Textarea
 							value={reason}
-							onChange={(e) => setReason(e.target.value)}
+							onChange={(e: any) => setReason(e.target.value)}
 							placeholder={t(
 								"admin.organizations.suspendReasonPlaceholder",
 							)}

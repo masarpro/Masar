@@ -74,7 +74,7 @@ export function BankReconciliation({
 				queryClient.invalidateQueries({ queryKey: ["orpc", "finance"] });
 				toast.success(t("finance.accounting.reconciliation.saved"));
 			},
-			onError: (err) => toast.error(err.message),
+			onError: (err: any) => toast.error(err.message),
 		}),
 	);
 
@@ -156,11 +156,11 @@ export function BankReconciliation({
 						<div className="grid grid-cols-2 gap-3">
 							<div>
 								<Label className="text-xs">{t("finance.accounting.ledger.dateFrom")}</Label>
-								<Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="rounded-xl h-8 text-sm" />
+								<Input type="date" value={dateFrom} onChange={(e: any) => setDateFrom(e.target.value)} className="rounded-xl h-8 text-sm" />
 							</div>
 							<div>
 								<Label className="text-xs">{t("finance.accounting.ledger.dateTo")}</Label>
-								<Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="rounded-xl h-8 text-sm" />
+								<Input type="date" value={dateTo} onChange={(e: any) => setDateTo(e.target.value)} className="rounded-xl h-8 text-sm" />
 							</div>
 						</div>
 						<div>
@@ -169,7 +169,7 @@ export function BankReconciliation({
 								type="number"
 								step="0.01"
 								value={statementBalance}
-								onChange={(e) => setStatementBalance(e.target.value)}
+								onChange={(e: any) => setStatementBalance(e.target.value)}
 								className="rounded-xl h-8 text-sm"
 								placeholder="0.00"
 							/>

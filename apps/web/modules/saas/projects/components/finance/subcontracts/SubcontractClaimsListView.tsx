@@ -245,7 +245,7 @@ export function SubcontractClaimsListView({
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{claims.map((claim) => (
+							{claims.map((claim: any) => (
 								<TableRow
 									key={claim.id}
 									className="group cursor-pointer hover:bg-muted/30"
@@ -287,7 +287,7 @@ export function SubcontractClaimsListView({
 												variant="ghost"
 												size="icon"
 												className="h-7 w-7"
-												onClick={(e) => {
+												onClick={(e: any) => {
 													e.stopPropagation();
 													router.push(`${basePath}/claims/${claim.id}`);
 												}}
@@ -299,7 +299,7 @@ export function SubcontractClaimsListView({
 													variant="ghost"
 													size="icon"
 													className="h-7 w-7 text-destructive"
-													onClick={(e) => {
+													onClick={(e: any) => {
 														e.stopPropagation();
 														setDeleteClaimId(claim.id);
 													}}
@@ -319,7 +319,7 @@ export function SubcontractClaimsListView({
 			{/* Delete Confirmation */}
 			<AlertDialog
 				open={!!deleteClaimId}
-				onOpenChange={(open) => !open && setDeleteClaimId(null)}
+				onOpenChange={(open: any) => !open && setDeleteClaimId(null)}
 			>
 				<AlertDialogContent>
 					<AlertDialogHeader>

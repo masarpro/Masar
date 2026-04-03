@@ -123,7 +123,7 @@ export function OrganzationSelect({ className }: { className?: string }) {
 								"organizations.organizationSelect.organizations",
 							)}
 						</DropdownMenuLabel>
-						{allOrganizations?.map((organization) => (
+						{allOrganizations?.map((organization: any) => (
 							<DropdownMenuRadioItem
 								key={organization.slug}
 								value={organization.slug}

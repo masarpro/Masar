@@ -23,7 +23,7 @@ export function BoundaryWallForm({ data, onChange }: ElementFormProps<BoundaryWa
 			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 				<div>
 					<Label>{t("fields.boundaryWallType")}</Label>
-					<Select value={data.wallType} onValueChange={(v) => set("wallType", v)}>
+					<Select value={data.wallType} onValueChange={(v: any) => set("wallType", v)}>
 						<SelectTrigger><SelectValue /></SelectTrigger>
 						<SelectContent>
 							<SelectItem value="BLOCK_WALL">{t("boundaryWallTypes.BLOCK_WALL")}</SelectItem>
@@ -34,25 +34,25 @@ export function BoundaryWallForm({ data, onChange }: ElementFormProps<BoundaryWa
 				</div>
 				<div>
 					<Label>{t("fields.length")} (م)</Label>
-					<Input type="number" min={0} step={1} value={data.length || ""} onChange={(e) => set("length", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0} step={1} value={data.length || ""} onChange={(e: any) => set("length", parseFloat(e.target.value) || 0)} />
 				</div>
 				<div>
 					<Label>{t("fields.height")} (م)</Label>
-					<Input type="number" min={0} step={0.1} value={data.height || ""} onChange={(e) => set("height", parseFloat(e.target.value) || 0)} />
+					<Input type="number" min={0} step={0.1} value={data.height || ""} onChange={(e: any) => set("height", parseFloat(e.target.value) || 0)} />
 				</div>
 				<div>
 					<Label>{t("fields.quantity")}</Label>
-					<Input type="number" min={1} step={1} value={data.quantity || 1} onChange={(e) => set("quantity", parseInt(e.target.value) || 1)} />
+					<Input type="number" min={1} step={1} value={data.quantity || 1} onChange={(e: any) => set("quantity", parseInt(e.target.value) || 1)} />
 				</div>
 			</div>
 
 			<div className="flex flex-wrap gap-4">
 				<div className="flex items-center gap-2">
-					<Checkbox id="hasRCColumns" checked={data.hasRCColumns} onCheckedChange={(v) => set("hasRCColumns", !!v)} />
+					<Checkbox id="hasRCColumns" checked={data.hasRCColumns} onCheckedChange={(v: any) => set("hasRCColumns", !!v)} />
 					<Label htmlFor="hasRCColumns">{t("fields.hasRCColumns")}</Label>
 				</div>
 				<div className="flex items-center gap-2">
-					<Checkbox id="hasFoundation" checked={data.hasFoundation} onCheckedChange={(v) => set("hasFoundation", !!v)} />
+					<Checkbox id="hasFoundation" checked={data.hasFoundation} onCheckedChange={(v: any) => set("hasFoundation", !!v)} />
 					<Label htmlFor="hasFoundation">{t("fields.hasFoundation")}</Label>
 				</div>
 			</div>
@@ -65,23 +65,23 @@ export function BoundaryWallForm({ data, onChange }: ElementFormProps<BoundaryWa
 				<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 					<div>
 						<Label>{t("fields.thickness")} (سم)</Label>
-						<Input type="number" value={data.thickness} onChange={(e) => set("thickness", parseFloat(e.target.value) || 20)} />
+						<Input type="number" value={data.thickness} onChange={(e: any) => set("thickness", parseFloat(e.target.value) || 20)} />
 					</div>
 					{data.hasRCColumns && (
 						<div>
 							<Label>{t("fields.columnSpacing")} (م)</Label>
-							<Input type="number" step={0.5} value={data.columnSpacing} onChange={(e) => set("columnSpacing", parseFloat(e.target.value) || 3.5)} />
+							<Input type="number" step={0.5} value={data.columnSpacing} onChange={(e: any) => set("columnSpacing", parseFloat(e.target.value) || 3.5)} />
 						</div>
 					)}
 					{data.hasFoundation && (
 						<>
 							<div>
 								<Label>{t("fields.foundationWidth")} (سم)</Label>
-								<Input type="number" value={data.foundationWidth} onChange={(e) => set("foundationWidth", parseFloat(e.target.value) || 50)} />
+								<Input type="number" value={data.foundationWidth} onChange={(e: any) => set("foundationWidth", parseFloat(e.target.value) || 50)} />
 							</div>
 							<div>
 								<Label>{t("fields.foundationDepth")} (سم)</Label>
-								<Input type="number" value={data.foundationDepth} onChange={(e) => set("foundationDepth", parseFloat(e.target.value) || 50)} />
+								<Input type="number" value={data.foundationDepth} onChange={(e: any) => set("foundationDepth", parseFloat(e.target.value) || 50)} />
 							</div>
 						</>
 					)}

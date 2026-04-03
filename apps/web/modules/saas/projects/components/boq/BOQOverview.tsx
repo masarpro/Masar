@@ -346,7 +346,7 @@ export function BOQOverview({
 			{/* Delete Confirmation */}
 			<AlertDialog
 				open={deleteConfirm !== null}
-				onOpenChange={(open) => !open && setDeleteConfirm(null)}
+				onOpenChange={(open: any) => !open && setDeleteConfirm(null)}
 			>
 				<AlertDialogContent className="rounded-2xl">
 					<AlertDialogHeader>

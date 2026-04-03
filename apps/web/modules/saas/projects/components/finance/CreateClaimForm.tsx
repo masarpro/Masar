@@ -105,7 +105,7 @@ export function CreateClaimForm({
 								id="periodStart"
 								type="date"
 								value={periodStart}
-								onChange={(e) => setPeriodStart(e.target.value)}
+								onChange={(e: any) => setPeriodStart(e.target.value)}
 								className="rounded-xl"
 							/>
 						</div>
@@ -115,7 +115,7 @@ export function CreateClaimForm({
 								id="periodEnd"
 								type="date"
 								value={periodEnd}
-								onChange={(e) => setPeriodEnd(e.target.value)}
+								onChange={(e: any) => setPeriodEnd(e.target.value)}
 								className="rounded-xl"
 							/>
 						</div>
@@ -129,7 +129,7 @@ export function CreateClaimForm({
 							min="0"
 							step="0.01"
 							value={amount}
-							onChange={(e) => setAmount(e.target.value)}
+							onChange={(e: any) => setAmount(e.target.value)}
 							placeholder="0.00"
 							className="rounded-xl"
 							required
@@ -142,7 +142,7 @@ export function CreateClaimForm({
 							id="dueDate"
 							type="date"
 							value={dueDate}
-							onChange={(e) => setDueDate(e.target.value)}
+							onChange={(e: any) => setDueDate(e.target.value)}
 							className="rounded-xl"
 						/>
 					</div>
@@ -152,7 +152,7 @@ export function CreateClaimForm({
 						<Textarea
 							id="note"
 							value={note}
-							onChange={(e) => setNote(e.target.value)}
+							onChange={(e: any) => setNote(e.target.value)}
 							placeholder={t("finance.claims.notePlaceholder")}
 							className="min-h-24 rounded-xl"
 						/>

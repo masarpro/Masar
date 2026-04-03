@@ -423,7 +423,7 @@ export function TemplateCustomizer({
 					<div>
 						<Input
 							value={templateName}
-							onChange={(e) => setTemplateName(e.target.value)}
+							onChange={(e: any) => setTemplateName(e.target.value)}
 							placeholder={t(
 								"finance.templates.customizer.templateNamePlaceholder",
 							)}
@@ -441,7 +441,7 @@ export function TemplateCustomizer({
 					{!templateId && (
 						<Select
 							value={templateType}
-							onValueChange={(v) => setTemplateType(v as "QUOTATION" | "INVOICE")}
+							onValueChange={(v: any) => setTemplateType(v as "QUOTATION" | "INVOICE")}
 						>
 							<SelectTrigger className="w-auto gap-1.5 rounded-xl h-9 text-xs px-3">
 								{templateType === "INVOICE" ? (
@@ -507,14 +507,14 @@ export function TemplateCustomizer({
 									<Input
 										type="color"
 										value={settings.primaryColor}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											handleUpdateSettings({ primaryColor: e.target.value })
 										}
 										className="w-10 h-10 p-1 rounded-lg cursor-pointer"
 									/>
 									<Input
 										value={settings.primaryColor}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											handleUpdateSettings({ primaryColor: e.target.value })
 										}
 										className="flex-1 text-xs rounded-xl"
@@ -552,7 +552,7 @@ export function TemplateCustomizer({
 									<Input
 										type="color"
 										value={settings.backgroundColor}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											handleUpdateSettings({
 												backgroundColor: e.target.value,
 											})
@@ -561,7 +561,7 @@ export function TemplateCustomizer({
 									/>
 									<Input
 										value={settings.backgroundColor}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											handleUpdateSettings({
 												backgroundColor: e.target.value,
 											})
@@ -580,7 +580,7 @@ export function TemplateCustomizer({
 									<Input
 										type="color"
 										value={settings.secondaryColor ?? "#1e293b"}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											handleUpdateSettings({
 												secondaryColor: e.target.value,
 											})
@@ -589,7 +589,7 @@ export function TemplateCustomizer({
 									/>
 									<Input
 										value={settings.secondaryColor ?? "#1e293b"}
-										onChange={(e) =>
+										onChange={(e: any) =>
 											handleUpdateSettings({
 												secondaryColor: e.target.value,
 											})
@@ -643,7 +643,7 @@ export function TemplateCustomizer({
 										const headerEl = elements.find((el) => el.type === "header");
 										return (headerEl?.settings?.logoPosition as string) ?? "top";
 									})()}
-									onValueChange={(v) => {
+									onValueChange={(v: any) => {
 										const headerEl = elements.find((el) => el.type === "header");
 										if (headerEl) {
 											handleUpdateElement(headerEl.id, { logoPosition: v });
@@ -740,7 +740,7 @@ export function TemplateCustomizer({
 								</Label>
 								<Switch
 									checked={settings.showWatermark ?? false}
-									onCheckedChange={(checked) =>
+									onCheckedChange={(checked: any) =>
 										handleUpdateSettings({ showWatermark: checked })
 									}
 									className="scale-75"
@@ -784,7 +784,7 @@ export function TemplateCustomizer({
 								</Label>
 								<Select
 									value={settings.fontFamily}
-									onValueChange={(v) =>
+									onValueChange={(v: any) =>
 										handleUpdateSettings({ fontFamily: v })
 									}
 								>
@@ -806,7 +806,7 @@ export function TemplateCustomizer({
 								</Label>
 								<Select
 									value={settings.fontSize}
-									onValueChange={(v) =>
+									onValueChange={(v: any) =>
 										handleUpdateSettings({ fontSize: v })
 									}
 								>
@@ -936,7 +936,7 @@ export function TemplateCustomizer({
 			<CropImageDialog
 				image={headerFile}
 				open={showHeaderCrop}
-				onOpenChange={(open) => {
+				onOpenChange={(open: any) => {
 					if (!open) {
 						setShowHeaderCrop(false);
 						setHeaderFile(null);
@@ -954,7 +954,7 @@ export function TemplateCustomizer({
 			<CropImageDialog
 				image={footerFile}
 				open={showFooterCrop}
-				onOpenChange={(open) => {
+				onOpenChange={(open: any) => {
 					if (!open) {
 						setShowFooterCrop(false);
 						setFooterFile(null);

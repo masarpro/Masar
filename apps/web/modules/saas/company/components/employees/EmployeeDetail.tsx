@@ -267,7 +267,7 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 										<SelectValue placeholder={t("company.employees.selectProject")} />
 									</SelectTrigger>
 									<SelectContent className="rounded-xl">
-										{projectsList?.map((p) => (
+										{projectsList?.map((p: any) => (
 											<SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
 										))}
 									</SelectContent>
@@ -280,7 +280,7 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 									min={1}
 									max={100}
 									value={assignPercentage}
-									onChange={(e) => setAssignPercentage(e.target.value)}
+									onChange={(e: any) => setAssignPercentage(e.target.value)}
 									className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70"
 								/>
 							</div>
@@ -297,7 +297,7 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 
 					{employee.assignments?.length ? (
 						<div className="space-y-2">
-							{employee.assignments.map((assignment) => (
+							{employee.assignments.map((assignment: any) => (
 								<div
 									key={assignment.id}
 									className="flex items-center justify-between rounded-xl border border-white/20 dark:border-slate-700/30 bg-slate-50/50 dark:bg-slate-800/20 p-3 transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-800/40"
@@ -361,7 +361,7 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 										</tr>
 									</thead>
 									<tbody>
-										{historyData.changes.map((change) => (
+										{historyData.changes.map((change: any) => (
 											<tr key={change.id} className="border-b border-slate-100 dark:border-slate-800 last:border-0">
 												<td className="py-2.5 text-slate-700 dark:text-slate-300 whitespace-nowrap">
 													{new Date(change.createdAt).toLocaleDateString("ar-SA")}

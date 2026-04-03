@@ -38,7 +38,7 @@ export function RecurringJournalTemplates({
 
 	const generateMutation = useMutation(
 		orpc.accounting.recurring.generate.mutationOptions({
-			onSuccess: (result) => {
+			onSuccess: (result: any) => {
 				queryClient.invalidateQueries({ queryKey: ["orpc", "accounting"] });
 				if (result.generated === 0) {
 					toast.info(t("finance.accounting.recurring.noTemplatesDue"));

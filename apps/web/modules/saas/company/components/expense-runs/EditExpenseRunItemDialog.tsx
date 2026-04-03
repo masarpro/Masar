@@ -108,7 +108,7 @@ export function EditExpenseRunItemDialog({
 						<FormField
 							control={form.control}
 							name="amount"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("company.expenseRuns.amount")}</FormLabel>
 									<FormControl>
@@ -127,7 +127,7 @@ export function EditExpenseRunItemDialog({
 						<FormField
 							control={form.control}
 							name="notes"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>{t("company.expenseRuns.notes")}</FormLabel>
 									<FormControl>

@@ -68,7 +68,7 @@ export function ChangePasswordForm() {
 						<FormField
 							control={form.control}
 							name="currentPassword"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>
 										{t(
@@ -90,7 +90,7 @@ export function ChangePasswordForm() {
 						<FormField
 							control={form.control}
 							name="newPassword"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>
 										{t(

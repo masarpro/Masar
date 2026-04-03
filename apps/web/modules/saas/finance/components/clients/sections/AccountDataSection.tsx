@@ -75,7 +75,7 @@ export function AccountDataSection({
 						<Label>{t("finance.clients.code")}</Label>
 						<Input
 							value={formData.code}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData((prev) => ({
 									...prev,
 									code: e.target.value,
@@ -95,7 +95,7 @@ export function AccountDataSection({
 						<Label>{t("finance.clients.currency")}</Label>
 						<Select
 							value={formData.currency}
-							onValueChange={(value) =>
+							onValueChange={(value: any) =>
 								setFormData((prev) => ({ ...prev, currency: value }))
 							}
 						>
@@ -141,7 +141,7 @@ export function AccountDataSection({
 					</div>
 					<Select
 						value=""
-						onValueChange={(value) => {
+						onValueChange={(value: any) => {
 							if (value) addClassification(value);
 						}}
 					>

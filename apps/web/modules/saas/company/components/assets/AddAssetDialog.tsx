@@ -121,7 +121,7 @@ export function AddAssetDialog({
 								</Label>
 								<Input
 									value={formData.name}
-									onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, name: e.target.value })}
 									className="rounded-xl h-10"
 									required
 								/>
@@ -132,7 +132,7 @@ export function AddAssetDialog({
 								</Label>
 								<Select
 									value={formData.category}
-									onValueChange={(value) => setFormData({ ...formData, category: value as any })}
+									onValueChange={(value: any) => setFormData({ ...formData, category: value as any })}
 								>
 									<SelectTrigger className="rounded-xl h-10">
 										<SelectValue />
@@ -152,7 +152,7 @@ export function AddAssetDialog({
 								</Label>
 								<Select
 									value={formData.type}
-									onValueChange={(value) => setFormData({ ...formData, type: value as any })}
+									onValueChange={(value: any) => setFormData({ ...formData, type: value as any })}
 								>
 									<SelectTrigger className="rounded-xl h-10">
 										<SelectValue />
@@ -176,7 +176,7 @@ export function AddAssetDialog({
 								</Label>
 								<Input
 									value={formData.brand}
-									onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, brand: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -186,7 +186,7 @@ export function AddAssetDialog({
 								</Label>
 								<Input
 									value={formData.model}
-									onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, model: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -196,7 +196,7 @@ export function AddAssetDialog({
 								</Label>
 								<Input
 									value={formData.serialNumber}
-									onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, serialNumber: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -211,7 +211,7 @@ export function AddAssetDialog({
 								<Input
 									type="number"
 									value={formData.year}
-									onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, year: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -224,7 +224,7 @@ export function AddAssetDialog({
 									step="0.01"
 									min="0"
 									value={formData.purchasePrice}
-									onChange={(e) => setFormData({ ...formData, purchasePrice: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, purchasePrice: e.target.value })}
 									placeholder="0.00"
 									className="rounded-xl h-10"
 								/>
@@ -238,7 +238,7 @@ export function AddAssetDialog({
 									step="0.01"
 									min="0"
 									value={formData.monthlyRent}
-									onChange={(e) => setFormData({ ...formData, monthlyRent: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, monthlyRent: e.target.value })}
 									placeholder="0.00"
 									className="rounded-xl h-10"
 								/>
@@ -256,7 +256,7 @@ export function AddAssetDialog({
 									step="0.01"
 									min="0"
 									value={formData.currentValue}
-									onChange={(e) => setFormData({ ...formData, currentValue: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, currentValue: e.target.value })}
 									placeholder="0.00"
 									className="rounded-xl h-10"
 								/>
@@ -268,7 +268,7 @@ export function AddAssetDialog({
 								<Input
 									type="date"
 									value={formData.purchaseDate}
-									onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, purchaseDate: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -279,7 +279,7 @@ export function AddAssetDialog({
 								<Input
 									type="date"
 									value={formData.warrantyExpiry}
-									onChange={(e) => setFormData({ ...formData, warrantyExpiry: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, warrantyExpiry: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -294,7 +294,7 @@ export function AddAssetDialog({
 								<Input
 									type="date"
 									value={formData.insuranceExpiry}
-									onChange={(e) => setFormData({ ...formData, insuranceExpiry: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, insuranceExpiry: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>
@@ -304,7 +304,7 @@ export function AddAssetDialog({
 								</Label>
 								<Input
 									value={formData.notes}
-									onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+									onChange={(e: any) => setFormData({ ...formData, notes: e.target.value })}
 									className="rounded-xl h-10"
 								/>
 							</div>

@@ -64,7 +64,7 @@ export function InvoiceItemsTable({
 
 	const isColumnVisible = (column: ColumnKey) => visibleColumns.includes(column);
 
-	const units = UNIT_KEYS.map((key) => ({
+	const units = UNIT_KEYS.map((key: any) => ({
 		value: UNIT_VALUES[key],
 		label: t(`finance.units.${key}`),
 	}));
@@ -142,23 +142,23 @@ export function InvoiceItemsTable({
 								)}
 								{isColumnVisible("unit") && (
 									<td className="p-2">
-										<Select value={item.unit || "_empty"} onValueChange={(v) => onUpdateItem(item.id, { unit: v === "_empty" ? "" : v })}>
+										<Select value={item.unit || "_empty"} onValueChange={(v: any) => onUpdateItem(item.id, { unit: v === "_empty" ? "" : v })}>
 											<SelectTrigger className="rounded-[10px] h-9 text-xs px-1 border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30"><SelectValue placeholder={t("finance.items.unitPlaceholder")} /></SelectTrigger>
 											<SelectContent className="rounded-xl">
 												<SelectItem value="_empty">-</SelectItem>
-												{units.map((u) => (<SelectItem key={u.value} value={u.value}>{u.label}</SelectItem>))}
+												{units.map((u: any) => (<SelectItem key={u.value} value={u.value}>{u.label}</SelectItem>))}
 											</SelectContent>
 										</Select>
 									</td>
 								)}
 								{isColumnVisible("unitPrice") && (
 									<td className="p-2">
-										<Input type="number" min="0" step="0.01" value={item.unitPrice || ""} onChange={(e) => onUpdateItem(item.id, { unitPrice: Number(e.target.value) || 0 })} placeholder="0.00" className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
+										<Input type="number" min="0" step="0.01" value={item.unitPrice || ""} onChange={(e: any) => onUpdateItem(item.id, { unitPrice: Number(e.target.value) || 0 })} placeholder="0.00" className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
 									</td>
 								)}
 								{isColumnVisible("quantity") && (
 									<td className="p-2">
-										<Input type="number" min="0" step="0.01" value={item.quantity || ""} onChange={(e) => onUpdateItem(item.id, { quantity: Number(e.target.value) || 0 })} placeholder="1" className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
+										<Input type="number" min="0" step="0.01" value={item.quantity || ""} onChange={(e: any) => onUpdateItem(item.id, { quantity: Number(e.target.value) || 0 })} placeholder="1" className="rounded-[10px] h-9 text-sm text-center border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08]" />
 									</td>
 								)}
 								{isColumnVisible("total") && (

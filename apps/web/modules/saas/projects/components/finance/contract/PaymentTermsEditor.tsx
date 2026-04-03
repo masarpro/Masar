@@ -94,7 +94,7 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 							</Label>
 							<Select
 								value={term.type}
-								onValueChange={(val) =>
+								onValueChange={(val: any) =>
 									onUpdateTerm(term.id, "type", val)
 								}
 							>
@@ -123,7 +123,7 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 							</Label>
 							<Input
 								value={term.label}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									onUpdateTerm(
 										term.id,
 										"label",
@@ -145,7 +145,7 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 									min="0"
 									max="100"
 									value={term.percent}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										onUpdateTerm(
 											term.id,
 											"percent",
@@ -170,7 +170,7 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 									step="0.01"
 									min="0"
 									value={term.amount}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										onUpdateTerm(
 											term.id,
 											"amount",

@@ -115,7 +115,7 @@ export function StructuralSpecsSection({ specs, onSpecsChange }: StructuralSpecs
 										<div className="flex justify-center">
 											<Select
 												value={specs[row.id]?.concreteType || row.defaultConcrete}
-												onValueChange={(val) => updateSpec(row.id, "concreteType", val)}
+												onValueChange={(val: any) => updateSpec(row.id, "concreteType", val)}
 											>
 												<SelectTrigger className="w-28 h-8 text-center text-sm">
 													<SelectValue />
@@ -136,7 +136,7 @@ export function StructuralSpecsSection({ specs, onSpecsChange }: StructuralSpecs
 										<div className="flex justify-center">
 											<Select
 												value={specs[row.id]?.steelGrade || row.defaultSteel}
-												onValueChange={(val) => updateSpec(row.id, "steelGrade", val)}
+												onValueChange={(val: any) => updateSpec(row.id, "steelGrade", val)}
 											>
 												<SelectTrigger className="w-44 h-8 text-center text-sm">
 													<SelectValue />

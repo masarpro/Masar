@@ -71,7 +71,7 @@ export function DependencyEditDialog({
 						<Label>{t("execution.dependency.type")}</Label>
 						<Select
 							value={type}
-							onValueChange={(v) => setType(v as DependencyType)}
+							onValueChange={(v: any) => setType(v as DependencyType)}
 						>
 							<SelectTrigger>
 								<SelectValue />
@@ -91,7 +91,7 @@ export function DependencyEditDialog({
 						<Input
 							type="number"
 							value={lag}
-							onChange={(e) => setLag(Number(e.target.value))}
+							onChange={(e: any) => setLag(Number(e.target.value))}
 						/>
 					</div>
 				</div>

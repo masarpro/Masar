@@ -139,7 +139,7 @@ export function CreateStudyDialog({
 	return (
 		<Dialog
 			open={open}
-			onOpenChange={(val) => {
+			onOpenChange={(val: any) => {
 				if (!val) form.reset();
 				onOpenChange(val);
 			}}
@@ -159,7 +159,7 @@ export function CreateStudyDialog({
 							<FormField
 								control={form.control}
 								name="name"
-								render={({ field }) => (
+								render={({ field }: any) => (
 									<FormItem>
 										<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
 											{t("projectQuantities.createDialog.name")} *
@@ -181,7 +181,7 @@ export function CreateStudyDialog({
 								<FormField
 									control={form.control}
 									name="projectType"
-									render={({ field }) => (
+									render={({ field }: any) => (
 										<FormItem>
 											<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
 												{t("projectQuantities.createDialog.projectType")} *
@@ -217,7 +217,7 @@ export function CreateStudyDialog({
 								<FormField
 									control={form.control}
 									name="finishingLevel"
-									render={({ field }) => (
+									render={({ field }: any) => (
 										<FormItem>
 											<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
 												{t("projectQuantities.createDialog.finishingLevel")}
@@ -256,7 +256,7 @@ export function CreateStudyDialog({
 								<FormField
 									control={form.control}
 									name="landArea"
-									render={({ field }) => (
+									render={({ field }: any) => (
 										<FormItem>
 											<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
 												{t("projectQuantities.createDialog.landArea")}
@@ -280,7 +280,7 @@ export function CreateStudyDialog({
 								<FormField
 									control={form.control}
 									name="buildingArea"
-									render={({ field }) => (
+									render={({ field }: any) => (
 										<FormItem>
 											<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
 												{t("projectQuantities.createDialog.buildingArea")}
@@ -304,7 +304,7 @@ export function CreateStudyDialog({
 								<FormField
 									control={form.control}
 									name="numberOfFloors"
-									render={({ field }) => (
+									render={({ field }: any) => (
 										<FormItem>
 											<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
 												{t("projectQuantities.createDialog.numberOfFloors")}
@@ -331,7 +331,7 @@ export function CreateStudyDialog({
 								<FormField
 									control={form.control}
 									name="overheadPercent"
-									render={({ field }) => (
+									render={({ field }: any) => (
 										<FormItem>
 											<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
 												{t("projectQuantities.createDialog.overheadPercent")}
@@ -356,7 +356,7 @@ export function CreateStudyDialog({
 								<FormField
 									control={form.control}
 									name="profitPercent"
-									render={({ field }) => (
+									render={({ field }: any) => (
 										<FormItem>
 											<FormLabel className="text-xs font-medium text-slate-500 dark:text-slate-400">
 												{t("projectQuantities.createDialog.profitPercent")}
@@ -383,7 +383,7 @@ export function CreateStudyDialog({
 							<FormField
 								control={form.control}
 								name="vatIncluded"
-								render={({ field }) => (
+								render={({ field }: any) => (
 									<FormItem className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-4 py-3">
 										<FormControl>
 											<Checkbox

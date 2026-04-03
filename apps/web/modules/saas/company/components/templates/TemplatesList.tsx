@@ -239,7 +239,7 @@ export function TemplatesList({
 					</Card>
 				) : (
 					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-						{customTemplates.map((template) => (
+						{customTemplates.map((template: any) => (
 							<Card
 								key={template.id}
 								className={cn(

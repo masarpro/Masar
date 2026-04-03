@@ -239,7 +239,7 @@ export function SubcontractForm({
 							<Label>{t("subcontracts.form.name")}</Label>
 							<Input
 								value={name}
-								onChange={(e) => setName(e.target.value)}
+								onChange={(e: any) => setName(e.target.value)}
 								placeholder={t("subcontracts.form.namePlaceholder")}
 								className="rounded-xl"
 								required
@@ -249,7 +249,7 @@ export function SubcontractForm({
 							<Label>{t("subcontracts.form.contractorType")}</Label>
 							<Select
 								value={contractorType}
-								onValueChange={(v) =>
+								onValueChange={(v: any) =>
 									setContractorType(v as "COMPANY" | "INDIVIDUAL")
 								}
 							>
@@ -273,7 +273,7 @@ export function SubcontractForm({
 							<Label>{t("subcontracts.form.companyName")}</Label>
 							<Input
 								value={companyName}
-								onChange={(e) => setCompanyName(e.target.value)}
+								onChange={(e: any) => setCompanyName(e.target.value)}
 								placeholder={t("subcontracts.form.companyNamePlaceholder")}
 								className="rounded-xl"
 							/>
@@ -285,7 +285,7 @@ export function SubcontractForm({
 							<Label>{t("subcontracts.form.phone")}</Label>
 							<Input
 								value={phone}
-								onChange={(e) => setPhone(e.target.value)}
+								onChange={(e: any) => setPhone(e.target.value)}
 								placeholder="05xxxxxxxx"
 								className="rounded-xl"
 								dir="ltr"
@@ -296,7 +296,7 @@ export function SubcontractForm({
 							<Input
 								type="email"
 								value={email}
-								onChange={(e) => setEmail(e.target.value)}
+								onChange={(e: any) => setEmail(e.target.value)}
 								placeholder="email@example.com"
 								className="rounded-xl"
 								dir="ltr"
@@ -309,7 +309,7 @@ export function SubcontractForm({
 							<Label>{t("subcontracts.form.taxNumber")}</Label>
 							<Input
 								value={taxNumber}
-								onChange={(e) => setTaxNumber(e.target.value)}
+								onChange={(e: any) => setTaxNumber(e.target.value)}
 								className="rounded-xl"
 								dir="ltr"
 							/>
@@ -318,7 +318,7 @@ export function SubcontractForm({
 							<Label>{t("subcontracts.form.crNumber")}</Label>
 							<Input
 								value={crNumber}
-								onChange={(e) => setCrNumber(e.target.value)}
+								onChange={(e: any) => setCrNumber(e.target.value)}
 								className="rounded-xl"
 								dir="ltr"
 							/>
@@ -348,7 +348,7 @@ export function SubcontractForm({
 									step="0.01"
 									min="0"
 									value={value}
-									onChange={(e) => setValue(e.target.value)}
+									onChange={(e: any) => setValue(e.target.value)}
 									placeholder="0.00"
 									className="rounded-xl pl-12"
 									dir="ltr"
@@ -396,7 +396,7 @@ export function SubcontractForm({
 							<Input
 								type="date"
 								value={startDate}
-								onChange={(e) => setStartDate(e.target.value)}
+								onChange={(e: any) => setStartDate(e.target.value)}
 								className="rounded-xl"
 							/>
 						</div>
@@ -405,7 +405,7 @@ export function SubcontractForm({
 							<Input
 								type="date"
 								value={endDate}
-								onChange={(e) => setEndDate(e.target.value)}
+								onChange={(e: any) => setEndDate(e.target.value)}
 								className="rounded-xl"
 							/>
 						</div>
@@ -414,7 +414,7 @@ export function SubcontractForm({
 							<Input
 								type="date"
 								value={signedDate}
-								onChange={(e) => setSignedDate(e.target.value)}
+								onChange={(e: any) => setSignedDate(e.target.value)}
 								className="rounded-xl"
 							/>
 						</div>
@@ -440,7 +440,7 @@ export function SubcontractForm({
 									max="100"
 									step="0.01"
 									value={vatPercent}
-									onChange={(e) => setVatPercent(e.target.value)}
+									onChange={(e: any) => setVatPercent(e.target.value)}
 									className="rounded-xl"
 									dir="ltr"
 								/>
@@ -454,7 +454,7 @@ export function SubcontractForm({
 								max="100"
 								step="0.01"
 								value={retentionPercent}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setRetentionPercent(e.target.value)
 								}
 								placeholder="10"
@@ -530,7 +530,7 @@ export function SubcontractForm({
 										</Label>
 										<Select
 											value={term.type}
-											onValueChange={(v) =>
+											onValueChange={(v: any) =>
 												updateTerm(index, "type", v)
 											}
 										>
@@ -552,7 +552,7 @@ export function SubcontractForm({
 										</Label>
 										<Input
 											value={term.label}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												updateTerm(
 													index,
 													"label",
@@ -573,7 +573,7 @@ export function SubcontractForm({
 											max="100"
 											step="0.01"
 											value={term.percent}
-											onChange={(e) =>
+											onChange={(e: any) =>
 												updateTerm(
 													index,
 													"percent",
@@ -623,7 +623,7 @@ export function SubcontractForm({
 						<Label>{t("subcontracts.form.scopeOfWork")}</Label>
 						<Textarea
 							value={scopeOfWork}
-							onChange={(e) => setScopeOfWork(e.target.value)}
+							onChange={(e: any) => setScopeOfWork(e.target.value)}
 							placeholder={t(
 								"subcontracts.form.scopeOfWorkPlaceholder",
 							)}
@@ -634,7 +634,7 @@ export function SubcontractForm({
 						<Label>{t("subcontracts.form.notes")}</Label>
 						<Textarea
 							value={notes}
-							onChange={(e) => setNotes(e.target.value)}
+							onChange={(e: any) => setNotes(e.target.value)}
 							placeholder={t("subcontracts.form.notesPlaceholder")}
 							className="min-h-20 rounded-xl"
 						/>

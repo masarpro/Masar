@@ -272,7 +272,7 @@ export function CreateCostStudyDialog({
 											>
 												<Checkbox
 													checked={scope[item.stateKey]}
-													onCheckedChange={(checked) =>
+													onCheckedChange={(checked: any) =>
 														setScope({ ...scope, [item.stateKey]: !!checked })
 													}
 												/>

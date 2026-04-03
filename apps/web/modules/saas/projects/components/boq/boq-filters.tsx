@@ -84,7 +84,7 @@ export function BOQFilters({
 				<Input
 					placeholder={t("filters.search")}
 					value={search}
-					onChange={(e) => onSearchChange(e.target.value)}
+					onChange={(e: any) => onSearchChange(e.target.value)}
 					className="ps-9 rounded-xl h-9 text-sm"
 				/>
 			</div>

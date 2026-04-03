@@ -150,7 +150,7 @@ export function InviteTeamStep({
 						<Input
 							type="email"
 							value={invite.email}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								updateRow(invite.id, "email", e.target.value)
 							}
 							placeholder={t(
@@ -161,7 +161,7 @@ export function InviteTeamStep({
 						/>
 						<Select
 							value={invite.role}
-							onValueChange={(value) =>
+							onValueChange={(value: any) =>
 								updateRow(invite.id, "role", value)
 							}
 						>

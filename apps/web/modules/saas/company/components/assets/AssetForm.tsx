@@ -209,21 +209,21 @@ export function AssetForm({ organizationId, organizationSlug, assetId }: AssetFo
 						</h3>
 					</div>
 					<div className="p-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-						<FormField control={form.control} name="name" render={({ field }) => (
+						<FormField control={form.control} name="name" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.name")}</FormLabel>
 								<FormControl><Input className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="assetNo" render={({ field }) => (
+						<FormField control={form.control} name="assetNo" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.assetNo")}</FormLabel>
 								<FormControl><Input className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="category" render={({ field }) => (
+						<FormField control={form.control} name="category" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.category")}</FormLabel>
 								<Select onValueChange={field.onChange} value={field.value}>
@@ -237,7 +237,7 @@ export function AssetForm({ organizationId, organizationSlug, assetId }: AssetFo
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="type" render={({ field }) => (
+						<FormField control={form.control} name="type" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.type")}</FormLabel>
 								<Select onValueChange={field.onChange} value={field.value}>
@@ -251,28 +251,28 @@ export function AssetForm({ organizationId, organizationSlug, assetId }: AssetFo
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="brand" render={({ field }) => (
+						<FormField control={form.control} name="brand" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.brand")}</FormLabel>
 								<FormControl><Input className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="model" render={({ field }) => (
+						<FormField control={form.control} name="model" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.model")}</FormLabel>
 								<FormControl><Input className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="serialNumber" render={({ field }) => (
+						<FormField control={form.control} name="serialNumber" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.serialNumber")}</FormLabel>
 								<FormControl><Input className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="year" render={({ field }) => (
+						<FormField control={form.control} name="year" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.year")}</FormLabel>
 								<FormControl><Input type="number" className="rounded-xl" {...field} /></FormControl>
@@ -293,42 +293,42 @@ export function AssetForm({ organizationId, organizationSlug, assetId }: AssetFo
 						</h3>
 					</div>
 					<div className="p-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-						<FormField control={form.control} name="purchasePrice" render={({ field }) => (
+						<FormField control={form.control} name="purchasePrice" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.purchasePrice")}</FormLabel>
 								<FormControl><Input type="number" step="0.01" className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="monthlyRent" render={({ field }) => (
+						<FormField control={form.control} name="monthlyRent" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.monthlyRent")}</FormLabel>
 								<FormControl><Input type="number" step="0.01" className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="currentValue" render={({ field }) => (
+						<FormField control={form.control} name="currentValue" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.currentValue")}</FormLabel>
 								<FormControl><Input type="number" step="0.01" className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="purchaseDate" render={({ field }) => (
+						<FormField control={form.control} name="purchaseDate" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.purchaseDate")}</FormLabel>
 								<FormControl><Input type="date" className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="warrantyExpiry" render={({ field }) => (
+						<FormField control={form.control} name="warrantyExpiry" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.warrantyExpiry")}</FormLabel>
 								<FormControl><Input type="date" className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="insuranceExpiry" render={({ field }) => (
+						<FormField control={form.control} name="insuranceExpiry" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.insuranceExpiry")}</FormLabel>
 								<FormControl><Input type="date" className="rounded-xl" {...field} /></FormControl>
@@ -349,14 +349,14 @@ export function AssetForm({ organizationId, organizationSlug, assetId }: AssetFo
 						</h3>
 					</div>
 					<div className="p-5 space-y-4">
-						<FormField control={form.control} name="description" render={({ field }) => (
+						<FormField control={form.control} name="description" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.assets.description")}</FormLabel>
 								<FormControl><Textarea rows={2} className="rounded-xl" {...field} /></FormControl>
 								<FormMessage />
 							</FormItem>
 						)} />
-						<FormField control={form.control} name="notes" render={({ field }) => (
+						<FormField control={form.control} name="notes" render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>{t("company.common.notes")}</FormLabel>
 								<FormControl><Textarea rows={2} className="rounded-xl" {...field} /></FormControl>

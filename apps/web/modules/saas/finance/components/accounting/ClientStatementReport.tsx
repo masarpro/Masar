@@ -69,14 +69,14 @@ export function ClientStatementReport({
 					<Input
 						type="date"
 						value={dateFrom}
-						onChange={(e) => setDateFrom(e.target.value)}
+						onChange={(e: any) => setDateFrom(e.target.value)}
 						className="rounded-xl w-40"
 					/>
 					<span className="text-slate-400">—</span>
 					<Input
 						type="date"
 						value={dateTo}
-						onChange={(e) => setDateTo(e.target.value)}
+						onChange={(e: any) => setDateTo(e.target.value)}
 						className="rounded-xl w-40"
 					/>
 					<Button variant="outline" size="sm" className="rounded-xl" onClick={() => window.print()}>
@@ -146,7 +146,7 @@ export function ClientStatementReport({
 									</TableCell>
 								</TableRow>
 
-								{data?.lines.map((line, idx) => (
+								{data?.lines.map((line: any, idx: any) => (
 									<TableRow key={idx}>
 										<TableCell className="text-sm text-slate-500">
 											{new Date(line.date).toLocaleDateString("en-SA")}

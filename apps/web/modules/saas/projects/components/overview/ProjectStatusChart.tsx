@@ -162,7 +162,7 @@ export function ProjectStatusChart({ projectProgress }: ProjectStatusChartProps)
 						content={
 							<ChartTooltipContent
 								formatter={(value: number | string) => `${value}%`}
-								labelFormatter={(label) =>
+								labelFormatter={(label: any) =>
 									`${t("projects.commandCenter.scheduleSnapshot")} - ${label}`
 								}
 							/>

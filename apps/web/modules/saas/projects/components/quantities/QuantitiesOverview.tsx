@@ -276,7 +276,7 @@ export function QuantitiesOverview({
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{studies.map((study) => (
+						{studies.map((study: any) => (
 							<TableRow
 								key={study.id}
 								className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
@@ -315,7 +315,7 @@ export function QuantitiesOverview({
 												variant="ghost"
 												size="icon"
 												className="h-8 w-8 rounded-lg"
-												onClick={(e) => e.stopPropagation()}
+												onClick={(e: any) => e.stopPropagation()}
 											>
 												<MoreVertical className="h-4 w-4" />
 											</Button>
@@ -331,7 +331,7 @@ export function QuantitiesOverview({
 											</DropdownMenuItem>
 											<DropdownMenuItem
 												className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
-												onClick={(e) => {
+												onClick={(e: any) => {
 														e.stopPropagation();
 														unlinkMutation.mutate(study.id);
 													}}

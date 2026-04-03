@@ -105,7 +105,7 @@ export function FirstProjectStep({
 					<FormField
 						control={form.control}
 						name="projectName"
-						render={({ field }) => (
+						render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>
 									{t("onboarding.wizard.firstProject.projectName")} *
@@ -127,7 +127,7 @@ export function FirstProjectStep({
 					<FormField
 						control={form.control}
 						name="ownerName"
-						render={({ field }) => (
+						render={({ field }: any) => (
 							<FormItem>
 								<FormLabel>
 									{t("onboarding.wizard.firstProject.ownerName")}
@@ -145,7 +145,7 @@ export function FirstProjectStep({
 						<FormField
 							control={form.control}
 							name="estimatedBudget"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>
 										{t("onboarding.wizard.firstProject.estimatedBudget")}
@@ -167,7 +167,7 @@ export function FirstProjectStep({
 						<FormField
 							control={form.control}
 							name="city"
-							render={({ field }) => (
+							render={({ field }: any) => (
 								<FormItem>
 									<FormLabel>
 										{t("onboarding.wizard.firstProject.city")}

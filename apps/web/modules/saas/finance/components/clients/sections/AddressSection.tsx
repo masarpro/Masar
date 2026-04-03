@@ -86,7 +86,7 @@ export function AddressSection({
 						<Label>{t("finance.clients.streetAddress1")}</Label>
 						<Input
 							value={formData.streetAddress1}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData((prev) => ({
 									...prev,
 									streetAddress1: e.target.value,
@@ -101,7 +101,7 @@ export function AddressSection({
 						<Label>{t("finance.clients.streetAddress2")}</Label>
 						<Input
 							value={formData.streetAddress2}
-							onChange={(e) =>
+							onChange={(e: any) =>
 								setFormData((prev) => ({
 									...prev,
 									streetAddress2: e.target.value,
@@ -117,7 +117,7 @@ export function AddressSection({
 							<Label>{t("finance.clients.city")}</Label>
 							<Input
 								value={formData.city}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData((prev) => ({
 										...prev,
 										city: e.target.value,
@@ -131,7 +131,7 @@ export function AddressSection({
 							<Label>{t("finance.clients.region")}</Label>
 							<Select
 								value={formData.region}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									setFormData((prev) => ({ ...prev, region: value }))
 								}
 							>
@@ -159,7 +159,7 @@ export function AddressSection({
 							<Label>{t("finance.clients.postalCode")}</Label>
 							<Input
 								value={formData.postalCode}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									setFormData((prev) => ({
 										...prev,
 										postalCode: e.target.value,
@@ -174,7 +174,7 @@ export function AddressSection({
 							<Label>{t("finance.clients.country")}</Label>
 							<Select
 								value={formData.country}
-								onValueChange={(value) =>
+								onValueChange={(value: any) =>
 									setFormData((prev) => ({ ...prev, country: value }))
 								}
 							>
@@ -231,7 +231,7 @@ export function AddressSection({
 							<Label>{t("finance.clients.streetAddress1")}</Label>
 							<Input
 								value={formData.secondaryAddress?.streetAddress1 || ""}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									updateSecondaryAddress("streetAddress1", e.target.value)
 								}
 								placeholder={t("finance.clients.streetAddress1Placeholder")}
@@ -243,7 +243,7 @@ export function AddressSection({
 							<Label>{t("finance.clients.streetAddress2")}</Label>
 							<Input
 								value={formData.secondaryAddress?.streetAddress2 || ""}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									updateSecondaryAddress("streetAddress2", e.target.value)
 								}
 								placeholder={t("finance.clients.streetAddress2Placeholder")}
@@ -256,7 +256,7 @@ export function AddressSection({
 								<Label>{t("finance.clients.city")}</Label>
 								<Input
 									value={formData.secondaryAddress?.city || ""}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										updateSecondaryAddress("city", e.target.value)
 									}
 									placeholder={t("finance.clients.cityPlaceholder")}
@@ -267,7 +267,7 @@ export function AddressSection({
 								<Label>{t("finance.clients.region")}</Label>
 								<Select
 									value={formData.secondaryAddress?.region || ""}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										updateSecondaryAddress("region", value)
 									}
 								>
@@ -295,7 +295,7 @@ export function AddressSection({
 								<Label>{t("finance.clients.postalCode")}</Label>
 								<Input
 									value={formData.secondaryAddress?.postalCode || ""}
-									onChange={(e) =>
+									onChange={(e: any) =>
 										updateSecondaryAddress("postalCode", e.target.value)
 									}
 									placeholder="12345"
@@ -307,7 +307,7 @@ export function AddressSection({
 								<Label>{t("finance.clients.country")}</Label>
 								<Select
 									value={formData.secondaryAddress?.country || "SA"}
-									onValueChange={(value) =>
+									onValueChange={(value: any) =>
 										updateSecondaryAddress("country", value)
 									}
 								>

@@ -106,7 +106,7 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 							<span className="text-xs text-slate-500 sm:hidden mb-1 block">{t("finance.items.description")}</span>
 							<Input
 								value={item.description}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									updateItem(item.id, { description: e.target.value })
 								}
 								placeholder={t("finance.items.descriptionPlaceholder")}
@@ -123,7 +123,7 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 								min="0"
 								step="0.01"
 								value={item.quantity}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									updateItem(item.id, { quantity: Number(e.target.value) })
 								}
 								disabled={readOnly}
@@ -143,7 +143,7 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 							) : (
 								<Select
 									value={item.unit || "_empty"}
-									onValueChange={(v) => updateItem(item.id, { unit: v === "_empty" ? "" : v })}
+									onValueChange={(v: any) => updateItem(item.id, { unit: v === "_empty" ? "" : v })}
 								>
 									<SelectTrigger className="rounded-lg h-10 text-xs px-1">
 										<SelectValue placeholder={t("finance.items.unitPlaceholder")} />
@@ -168,7 +168,7 @@ export function ItemsEditor({ items, onChange, readOnly = false }: ItemsEditorPr
 								min="0"
 								step="0.01"
 								value={item.unitPrice}
-								onChange={(e) =>
+								onChange={(e: any) =>
 									updateItem(item.id, { unitPrice: Number(e.target.value) })
 								}
 								disabled={readOnly}

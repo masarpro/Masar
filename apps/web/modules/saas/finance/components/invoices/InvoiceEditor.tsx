@@ -158,7 +158,7 @@ export function InvoiceEditor({
 			setVatPercent(invoice.vatPercent);
 			setDiscountPercent(invoice.discountPercent);
 			setItems(
-				invoice.items.map((item) => ({
+				invoice.items.map((item: any) => ({
 					id: item.id,
 					description: item.description,
 					quantity: item.quantity,
@@ -517,7 +517,7 @@ export function InvoiceEditor({
 								<Label>{t("finance.invoices.clientName")} *</Label>
 								<Input
 									value={clientName}
-									onChange={(e) => setClientName(e.target.value)}
+									onChange={(e: any) => setClientName(e.target.value)}
 									readOnly={!isEditable}
 									required
 									className="rounded-xl mt-1"
@@ -527,7 +527,7 @@ export function InvoiceEditor({
 								<Label>{t("finance.invoices.clientCompany")}</Label>
 								<Input
 									value={clientCompany}
-									onChange={(e) => setClientCompany(e.target.value)}
+									onChange={(e: any) => setClientCompany(e.target.value)}
 									readOnly={!isEditable}
 									className="rounded-xl mt-1"
 								/>
@@ -536,7 +536,7 @@ export function InvoiceEditor({
 								<Label>{t("finance.invoices.clientPhone")}</Label>
 								<Input
 									value={clientPhone}
-									onChange={(e) => setClientPhone(e.target.value)}
+									onChange={(e: any) => setClientPhone(e.target.value)}
 									readOnly={!isEditable}
 									className="rounded-xl mt-1"
 								/>
@@ -546,7 +546,7 @@ export function InvoiceEditor({
 								<Input
 									type="email"
 									value={clientEmail}
-									onChange={(e) => setClientEmail(e.target.value)}
+									onChange={(e: any) => setClientEmail(e.target.value)}
 									readOnly={!isEditable}
 									className="rounded-xl mt-1"
 								/>
@@ -555,7 +555,7 @@ export function InvoiceEditor({
 								<Label>{t("finance.invoices.clientTaxNumber")}</Label>
 								<Input
 									value={clientTaxNumber}
-									onChange={(e) => setClientTaxNumber(e.target.value)}
+									onChange={(e: any) => setClientTaxNumber(e.target.value)}
 									readOnly={!isEditable}
 									className="rounded-xl mt-1"
 								/>
@@ -565,7 +565,7 @@ export function InvoiceEditor({
 							<Label>{t("finance.invoices.clientAddress")}</Label>
 							<Textarea
 								value={clientAddress}
-								onChange={(e) => setClientAddress(e.target.value)}
+								onChange={(e: any) => setClientAddress(e.target.value)}
 								readOnly={!isEditable}
 								rows={2}
 								className="rounded-xl mt-1"
@@ -587,7 +587,7 @@ export function InvoiceEditor({
 							<Label>{t("finance.invoices.invoiceType")}</Label>
 							<Select
 								value={invoiceType}
-								onValueChange={(v) => setInvoiceType(v as typeof invoiceType)}
+								onValueChange={(v: any) => setInvoiceType(v as typeof invoiceType)}
 								disabled={!isEditable || invoice.invoiceType === "TAX"}
 							>
 								<SelectTrigger className="rounded-xl mt-1">
@@ -620,7 +620,7 @@ export function InvoiceEditor({
 									<SelectItem value="none">
 										{t("finance.invoices.noProject")}
 									</SelectItem>
-									{projects.map((project) => (
+									{projects.map((project: any) => (
 										<SelectItem key={project.id} value={project.id}>
 											{project.name}
 										</SelectItem>
@@ -633,7 +633,7 @@ export function InvoiceEditor({
 							<Input
 								type="date"
 								value={issueDate}
-								onChange={(e) => setIssueDate(e.target.value)}
+								onChange={(e: any) => setIssueDate(e.target.value)}
 								readOnly={!isEditable}
 								className="rounded-xl mt-1"
 							/>
@@ -646,7 +646,7 @@ export function InvoiceEditor({
 									min="1"
 									max="365"
 									value={paymentTermsDays}
-									onChange={(e) => {
+									onChange={(e: any) => {
 										const val = e.target.value;
 										setPaymentTermsDays(val === "" ? "" : Number(val));
 									}}
@@ -660,7 +660,7 @@ export function InvoiceEditor({
 							<Input
 								type="date"
 								value={dueDate}
-								onChange={(e) => {
+								onChange={(e: any) => {
 									setDueDate(e.target.value);
 									setPaymentTermsDays("");
 								}}
@@ -675,7 +675,7 @@ export function InvoiceEditor({
 								min="0"
 								max="100"
 								value={vatPercent}
-								onChange={(e) => setVatPercent(Number(e.target.value))}
+								onChange={(e: any) => setVatPercent(Number(e.target.value))}
 								readOnly={!isEditable}
 								className="rounded-xl mt-1"
 							/>
@@ -687,7 +687,7 @@ export function InvoiceEditor({
 								min="0"
 								max="100"
 								value={discountPercent}
-								onChange={(e) => setDiscountPercent(Number(e.target.value))}
+								onChange={(e: any) => setDiscountPercent(Number(e.target.value))}
 								readOnly={!isEditable}
 								className="rounded-xl mt-1"
 							/>
@@ -763,7 +763,7 @@ export function InvoiceEditor({
 					</CardHeader>
 					<CardContent>
 						<div className="space-y-3">
-							{invoice.payments.map((payment) => (
+							{invoice.payments.map((payment: any) => (
 								<div
 									key={payment.id}
 									className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl"
@@ -810,7 +810,7 @@ export function InvoiceEditor({
 						<Label>{t("finance.invoices.paymentTerms")}</Label>
 						<Textarea
 							value={paymentTerms}
-							onChange={(e) => setPaymentTerms(e.target.value)}
+							onChange={(e: any) => setPaymentTerms(e.target.value)}
 							readOnly={!isEditable}
 							rows={2}
 							className="rounded-xl mt-1"
@@ -820,7 +820,7 @@ export function InvoiceEditor({
 						<Label>{t("finance.invoices.notes")}</Label>
 						<Textarea
 							value={notes}
-							onChange={(e) => setNotes(e.target.value)}
+							onChange={(e: any) => setNotes(e.target.value)}
 							readOnly={!isEditable}
 							rows={2}
 							className="rounded-xl mt-1"
@@ -868,7 +868,7 @@ export function InvoiceEditor({
 								min="0"
 								max={remainingAmount}
 								value={newPaymentAmount}
-								onChange={(e) => setNewPaymentAmount(e.target.value)}
+								onChange={(e: any) => setNewPaymentAmount(e.target.value)}
 								placeholder={t("finance.invoices.maxAmount")}
 								className="rounded-xl mt-1"
 							/>
@@ -878,7 +878,7 @@ export function InvoiceEditor({
 							<Input
 								type="date"
 								value={newPaymentDate}
-								onChange={(e) => setNewPaymentDate(e.target.value)}
+								onChange={(e: any) => setNewPaymentDate(e.target.value)}
 								className="rounded-xl mt-1"
 							/>
 						</div>
@@ -901,7 +901,7 @@ export function InvoiceEditor({
 							<Label>{t("finance.invoices.referenceNo")}</Label>
 							<Input
 								value={newPaymentReference}
-								onChange={(e) => setNewPaymentReference(e.target.value)}
+								onChange={(e: any) => setNewPaymentReference(e.target.value)}
 								placeholder={t("finance.invoices.referenceNoPlaceholder")}
 								className="rounded-xl mt-1"
 							/>
@@ -910,7 +910,7 @@ export function InvoiceEditor({
 							<Label>{t("finance.invoices.paymentNotes")}</Label>
 							<Textarea
 								value={newPaymentNotes}
-								onChange={(e) => setNewPaymentNotes(e.target.value)}
+								onChange={(e: any) => setNewPaymentNotes(e.target.value)}
 								rows={2}
 								className="rounded-xl mt-1"
 							/>

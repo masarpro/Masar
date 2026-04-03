@@ -66,11 +66,11 @@ export function CostCenterReport({ organizationId }: Props) {
 			<div className="flex flex-wrap items-end gap-3 print:hidden">
 				<div>
 					<Label className="text-xs">{t("finance.accounting.ledger.dateFrom")}</Label>
-					<Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="rounded-xl h-9 w-40" />
+					<Input type="date" value={dateFrom} onChange={(e: any) => setDateFrom(e.target.value)} className="rounded-xl h-9 w-40" />
 				</div>
 				<div>
 					<Label className="text-xs">{t("finance.accounting.ledger.dateTo")}</Label>
-					<Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="rounded-xl h-9 w-40" />
+					<Input type="date" value={dateTo} onChange={(e: any) => setDateTo(e.target.value)} className="rounded-xl h-9 w-40" />
 				</div>
 				<Button variant="outline" size="sm" className="rounded-xl ms-auto" onClick={() => window.print()}>
 					<Printer className="h-4 w-4 me-1" />
@@ -120,7 +120,7 @@ export function CostCenterReport({ organizationId }: Props) {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{projects.map((project) => {
+								{projects.map((project: any) => {
 									const isExpanded = expandedProjects.has(project.projectId);
 									const marginColor = project.profitMargin >= 20 ? "text-green-600" : project.profitMargin >= 0 ? "text-amber-600" : "text-red-600";
 									return (
@@ -145,7 +145,7 @@ export function CostCenterReport({ organizationId }: Props) {
 													{project.profitMargin.toFixed(1)}%
 												</TableCell>
 											</TableRow>
-											{isExpanded && project.accounts.map((acc) => (
+											{isExpanded && project.accounts.map((acc: any) => (
 												<TableRow key={`${project.projectId}-${acc.code}`} className="bg-slate-50/50 dark:bg-slate-800/30">
 													<TableCell />
 													<TableCell className="ps-8 text-sm">

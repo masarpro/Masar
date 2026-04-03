@@ -476,12 +476,12 @@ export function OrganizationList() {
 						type="search"
 						placeholder={t("admin.organizations.search")}
 						value={searchTerm}
-						onChange={(e) => setSearchTerm(e.target.value)}
+						onChange={(e: any) => setSearchTerm(e.target.value)}
 						className="max-w-xs"
 					/>
 					<Select
 						value={statusFilter || "all"}
-						onValueChange={(v) =>
+						onValueChange={(v: any) =>
 							setStatusFilter(v === "all" ? "" : v)
 						}
 					>
@@ -509,7 +509,7 @@ export function OrganizationList() {
 					</Select>
 					<Select
 						value={planFilter || "all"}
-						onValueChange={(v) =>
+						onValueChange={(v: any) =>
 							setPlanFilter(v === "all" ? "" : v)
 						}
 					>
