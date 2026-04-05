@@ -51,6 +51,35 @@ import { backfillJournalEntriesProcedure } from "./procedures/backfill";
 import { checkAccountingHealthProcedure, reconcileInvoiceJournalsProcedure } from "./procedures/health";
 
 import {
+	listOwnersProcedure,
+	getOwnerByIdProcedure,
+	createOwnerProcedure,
+	updateOwnerProcedure,
+	deactivateOwnerProcedure,
+	getTotalOwnershipProcedure,
+	ensureOwnerDrawingsSystemProcedure,
+} from "./procedures/organization-owners";
+
+import {
+	listDrawingsProcedure,
+	getDrawingByIdProcedure,
+	createDrawingProcedure,
+	approveDrawingProcedure,
+	cancelDrawingProcedure,
+	checkOverdrawProcedure,
+	getCompanySummaryProcedure,
+	getProjectSummaryProcedure,
+	getOwnerSummaryProcedure,
+} from "./procedures/owner-drawings";
+
+import {
+	previewYearEndProcedure,
+	executeYearEndProcedure,
+	yearEndHistoryProcedure,
+	reverseYearEndProcedure,
+} from "./procedures/year-end-closing";
+
+import {
 	listRecurringTemplatesProcedure,
 	createRecurringTemplateProcedure,
 	updateRecurringTemplateProcedure,
@@ -69,6 +98,7 @@ export const accountingRouter = {
 		deactivate: deactivateAccountProcedure,
 		getBalance: getAccountBalanceProcedure,
 		getLedger: getAccountLedgerProcedure,
+		ensureOwnerDrawingsSystem: ensureOwnerDrawingsSystemProcedure,
 	},
 
 	// Opening Balances
@@ -135,5 +165,36 @@ export const accountingRouter = {
 		generate: generatePeriodsProcedure,
 		close: closePeriodProcedure,
 		reopen: reopenPeriodProcedure,
+	},
+
+	// Organization Owners (Partners)
+	owners: {
+		list: listOwnersProcedure,
+		getById: getOwnerByIdProcedure,
+		create: createOwnerProcedure,
+		update: updateOwnerProcedure,
+		deactivate: deactivateOwnerProcedure,
+		getTotalOwnership: getTotalOwnershipProcedure,
+	},
+
+	// Owner Drawings (Withdrawals)
+	ownerDrawings: {
+		list: listDrawingsProcedure,
+		getById: getDrawingByIdProcedure,
+		create: createDrawingProcedure,
+		approve: approveDrawingProcedure,
+		cancel: cancelDrawingProcedure,
+		checkOverdraw: checkOverdrawProcedure,
+		companySummary: getCompanySummaryProcedure,
+		projectSummary: getProjectSummaryProcedure,
+		ownerSummary: getOwnerSummaryProcedure,
+	},
+
+	// Year-End Closing
+	yearEnd: {
+		preview: previewYearEndProcedure,
+		execute: executeYearEndProcedure,
+		history: yearEndHistoryProcedure,
+		reverse: reverseYearEndProcedure,
 	},
 };

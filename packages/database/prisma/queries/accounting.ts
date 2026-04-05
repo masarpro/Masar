@@ -56,6 +56,8 @@ export const DEFAULT_CHART_OF_ACCOUNTS: DefaultAccount[] = [
 	{ code: "3100", nameAr: "رأس المال", nameEn: "Capital", type: "EQUITY", normalBalance: "CREDIT", level: 2, parentCode: "3000", isSystem: true, isPostable: true },
 	{ code: "3200", nameAr: "أرباح مبقاة", nameEn: "Retained Earnings", type: "EQUITY", normalBalance: "CREDIT", level: 2, parentCode: "3000", isSystem: true, isPostable: true },
 	{ code: "3300", nameAr: "أرباح / خسائر العام الحالي", nameEn: "Current Year P&L", type: "EQUITY", normalBalance: "CREDIT", level: 2, parentCode: "3000", isSystem: true, isPostable: false },
+	{ code: "3400", nameAr: "سحوبات الشركاء", nameEn: "Owner Drawings", type: "EQUITY", normalBalance: "DEBIT", level: 2, parentCode: "3000", isSystem: true, isPostable: false },
+	{ code: "3500", nameAr: "توزيعات الأرباح", nameEn: "Profit Distributions", type: "EQUITY", normalBalance: "DEBIT", level: 2, parentCode: "3000", isSystem: true, isPostable: true },
 
 	// 4000 — Revenue
 	{ code: "4000", nameAr: "الإيرادات", nameEn: "Revenue", type: "REVENUE", normalBalance: "CREDIT", level: 1, parentCode: null, isSystem: true, isPostable: false },
@@ -289,6 +291,151 @@ export async function createBankChartAccount(
 }
 
 // ========================================
+// Owner Drawings Account Creation
+// ========================================
+
+/**
+ * Creates a sub-account under 3400 for a new owner/partner.
+ * Account codes: 3410, 3420, 3430, ... (jumps of 10)
+ */
+export async function createOwnerDrawingAccount(
+	db: PrismaClient,
+	organizationId: string,
+	ownerName: string,
+	ownerNameEn?: string,
+): Promise<string | null> {
+	// Find 3400 parent account
+	const drawingsParent = await db.chartAccount.findUnique({
+		where: { organizationId_code: { organizationId, code: "3400" } },
+		select: { id: true },
+	});
+	if (!drawingsParent) return null;
+
+	// Find the highest existing child code under 3400
+	const lastChild = await db.chartAccount.findFirst({
+		where: { organizationId, parentId: drawingsParent.id },
+		orderBy: { code: "desc" },
+		select: { code: true },
+	});
+
+	let nextCode: string;
+	if (lastChild) {
+		const lastNum = parseInt(lastChild.code, 10);
+		// Jump by 10: 3410, 3420, 3430, ...
+		nextCode = (lastNum + 10).toString();
+	} else {
+		nextCode = "3410";
+	}
+
+	const newAccount = await db.chartAccount.create({
+		data: {
+			organizationId,
+			code: nextCode,
+			nameAr: `سحوبات ${ownerName}`,
+			nameEn: `${ownerNameEn ?? ownerName} Drawings`,
+			type: "EQUITY",
+			normalBalance: "DEBIT",
+			level: 3,
+			parentId: drawingsParent.id,
+			isSystem: false,
+			isPostable: true,
+		},
+	});
+
+	return newAccount.id;
+}
+
+/**
+ * Ensures the Owner Drawings system is set up for an organization.
+ * Idempotent: creates 3400 parent if missing, creates default owner if none exist.
+ * Called from AccountingSeedCheck.tsx after initial seed.
+ */
+export async function ensureOwnerDrawingsSystem(
+	db: PrismaClient,
+	organizationId: string,
+): Promise<{ created: boolean; ownerId?: string }> {
+	// 1. Ensure 3400 parent exists (idempotent — may already be seeded)
+	let drawingsParent = await db.chartAccount.findUnique({
+		where: { organizationId_code: { organizationId, code: "3400" } },
+	});
+
+	if (!drawingsParent) {
+		// Find 3000 parent
+		const equityParent = await db.chartAccount.findUnique({
+			where: { organizationId_code: { organizationId, code: "3000" } },
+			select: { id: true },
+		});
+		if (!equityParent) return { created: false };
+
+		drawingsParent = await db.chartAccount.create({
+			data: {
+				organizationId,
+				code: "3400",
+				nameAr: "سحوبات الشركاء",
+				nameEn: "Owner Drawings",
+				type: "EQUITY",
+				normalBalance: "DEBIT",
+				level: 2,
+				parentId: equityParent.id,
+				isSystem: true,
+				isPostable: false,
+			},
+		});
+	}
+
+	// 2. Also ensure 3500 exists
+	const distribAccount = await db.chartAccount.findUnique({
+		where: { organizationId_code: { organizationId, code: "3500" } },
+	});
+	if (!distribAccount) {
+		const equityParent = await db.chartAccount.findUnique({
+			where: { organizationId_code: { organizationId, code: "3000" } },
+			select: { id: true },
+		});
+		if (equityParent) {
+			await db.chartAccount.create({
+				data: {
+					organizationId,
+					code: "3500",
+					nameAr: "توزيعات الأرباح",
+					nameEn: "Profit Distributions",
+					type: "EQUITY",
+					normalBalance: "DEBIT",
+					level: 2,
+					parentId: equityParent.id,
+					isSystem: true,
+					isPostable: true,
+				},
+			});
+		}
+	}
+
+	// 3. Check if any owner exists
+	const existingOwner = await db.organizationOwner.findFirst({
+		where: { organizationId },
+		select: { id: true },
+	});
+
+	if (existingOwner) return { created: false };
+
+	// 4. Create default owner with 100% ownership
+	const accountId = await createOwnerDrawingAccount(db, organizationId, "المالك", "Owner");
+
+	const newOwner = await db.organizationOwner.create({
+		data: {
+			organizationId,
+			name: "المالك",
+			nameEn: "Owner",
+			ownershipPercent: new Prisma.Decimal(100),
+			isActive: true,
+			drawingsAccountId: accountId,
+		},
+	});
+
+	return { created: true, ownerId: newOwner.id };
+}
+
+// ========================================
 // Chart of Accounts Queries
 // ========================================
 
@@ -372,6 +519,9 @@ export async function createJournalEntry(db: PrismaClient, data: {
 		RECEIPT_VOUCHER: "RV-JE",
 		PAYMENT_VOUCHER: "PV-JE",
 		HANDOVER_RETENTION_RELEASE: "HR-JE",
+		OWNER_DRAWING: "OWD-JE",
+		YEAR_END_CLOSING: "YEC-JE",
+		YEAR_END_RETAINED: "YER-JE",
 	};
 	const prefix = REFERENCE_TYPE_PREFIX[data.referenceType ?? ""] ?? "MAN-JE";
 	const year = new Date().getFullYear();

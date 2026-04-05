@@ -11,6 +11,8 @@ import {
 	ClipboardList,
 	FileCheck,
 	FileMinus,
+	UserMinus,
+	CalendarCheck,
 } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════════
@@ -124,6 +126,18 @@ export const FINANCE_NAV_SECTIONS: FinanceNavSection[] = [
 		path: "accounting-reports",
 		labelKey: "finance.shell.sections.accountingReports",
 		icon: ClipboardList,
+	},
+	{
+		id: "owner-drawings",
+		path: "owner-drawings",
+		labelKey: "finance.ownerDrawings.title",
+		icon: UserMinus,
+	},
+	{
+		id: "year-end-closing",
+		path: "year-end-closing",
+		labelKey: "finance.yearEnd.title",
+		icon: CalendarCheck,
 	},
 ];
 

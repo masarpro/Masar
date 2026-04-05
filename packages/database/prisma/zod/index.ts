@@ -707,6 +707,24 @@ export const JournalEntryLineScalarFieldEnumSchema = z.enum(['id', 'journalEntry
 
 export type JournalEntryLineScalarFieldEnum = z.infer<typeof JournalEntryLineScalarFieldEnumSchema>;
 
+// File: OrganizationOwnerScalarFieldEnum.schema.ts
+
+export const OrganizationOwnerScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'name', 'nameEn', 'ownershipPercent', 'nationalId', 'phone', 'email', 'drawingsAccountId', 'isActive', 'notes', 'createdById', 'createdAt', 'updatedAt'])
+
+export type OrganizationOwnerScalarFieldEnum = z.infer<typeof OrganizationOwnerScalarFieldEnumSchema>;
+
+// File: OwnerDrawingScalarFieldEnum.schema.ts
+
+export const OwnerDrawingScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'drawingNo', 'date', 'amount', 'currency', 'ownerId', 'bankAccountId', 'projectId', 'type', 'description', 'notes', 'status', 'journalEntryId', 'hasOverdrawWarning', 'overdrawAmount', 'overdrawAcknowledgedBy', 'overdrawAcknowledgedAt', 'approvedById', 'approvedAt', 'cancelledAt', 'cancelReason', 'createdById', 'createdAt', 'updatedAt'])
+
+export type OwnerDrawingScalarFieldEnum = z.infer<typeof OwnerDrawingScalarFieldEnumSchema>;
+
+// File: YearEndClosingScalarFieldEnum.schema.ts
+
+export const YearEndClosingScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'fiscalYear', 'closingDate', 'totalRevenue', 'totalExpenses', 'netProfit', 'totalDrawings', 'retainedEarningsTransfer', 'closingJournalEntryId', 'drawingsClosingEntryId', 'distributionDetails', 'status', 'reversedAt', 'reversedById', 'createdById', 'createdAt', 'updatedAt'])
+
+export type YearEndClosingScalarFieldEnum = z.infer<typeof YearEndClosingScalarFieldEnumSchema>;
+
 // File: AccountingPeriodScalarFieldEnum.schema.ts
 
 export const AccountingPeriodScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'name', 'periodType', 'startDate', 'endDate', 'isClosed', 'closedAt', 'closedById', 'closingEntryId', 'notes', 'createdAt', 'updatedAt'])
@@ -1303,7 +1321,7 @@ export type ExpenseRunStatus = z.infer<typeof ExpenseRunStatusSchema>;
 
 // File: OrgAuditAction.schema.ts
 
-export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED', 'EXPENSE_PAID', 'EXPENSE_CANCELLED', 'EXPENSE_DELETED', 'PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'TRANSFER_CREATED', 'TRANSFER_CANCELLED', 'BANK_ACCOUNT_CREATED', 'BANK_ACCOUNT_UPDATED', 'BANK_ACCOUNT_SET_DEFAULT', 'BANK_ACCOUNT_DELETED', 'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_ITEMS_UPDATED', 'INVOICE_STATUS_CHANGED', 'INVOICE_CONVERTED_TO_TAX', 'INVOICE_PAYMENT_ADDED', 'INVOICE_PAYMENT_DELETED', 'INVOICE_DELETED', 'INVOICE_ISSUED', 'INVOICE_DUPLICATED', 'INVOICE_CREDIT_NOTE_CREATED', 'QUOTATION_CREATED', 'QUOTATION_UPDATED', 'QUOTATION_ITEMS_UPDATED', 'QUOTATION_STATUS_CHANGED', 'QUOTATION_DELETED', 'QUOTATION_CONVERTED', 'CLIENT_CREATED', 'CLIENT_UPDATED', 'CLIENT_DELETED', 'PAYROLL_RUN_APPROVED', 'PAYROLL_RUN_CANCELLED', 'JOURNAL_ENTRY_SKIPPED', 'JOURNAL_ENTRY_FAILED', 'PROJECT_CREATED', 'PROJECT_ARCHIVED', 'PROJECT_RESTORED', 'SETTINGS_UPDATED', 'ZATCA_INVOICE_SUBMITTED', 'ZATCA_INVOICE_CLEARED', 'ZATCA_INVOICE_REJECTED', 'RECEIPT_VOUCHER_CREATED', 'RECEIPT_VOUCHER_UPDATED', 'RECEIPT_VOUCHER_ISSUED', 'RECEIPT_VOUCHER_CANCELLED', 'PAYMENT_VOUCHER_CREATED', 'PAYMENT_VOUCHER_UPDATED', 'PAYMENT_VOUCHER_SUBMITTED', 'PAYMENT_VOUCHER_APPROVED', 'PAYMENT_VOUCHER_REJECTED', 'PAYMENT_VOUCHER_CANCELLED', 'HANDOVER_CREATED', 'HANDOVER_UPDATED', 'HANDOVER_DELETED', 'HANDOVER_SUBMITTED', 'HANDOVER_SIGNED', 'HANDOVER_COMPLETED', 'HANDOVER_ITEM_ADDED', 'HANDOVER_ITEM_UPDATED', 'HANDOVER_ITEM_DELETED', 'HANDOVER_ITEMS_IMPORTED', 'AI_CHAT_CREATED', 'AI_MESSAGE_SENT'])
+export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED', 'EXPENSE_PAID', 'EXPENSE_CANCELLED', 'EXPENSE_DELETED', 'PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'TRANSFER_CREATED', 'TRANSFER_CANCELLED', 'BANK_ACCOUNT_CREATED', 'BANK_ACCOUNT_UPDATED', 'BANK_ACCOUNT_SET_DEFAULT', 'BANK_ACCOUNT_DELETED', 'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_ITEMS_UPDATED', 'INVOICE_STATUS_CHANGED', 'INVOICE_CONVERTED_TO_TAX', 'INVOICE_PAYMENT_ADDED', 'INVOICE_PAYMENT_DELETED', 'INVOICE_DELETED', 'INVOICE_ISSUED', 'INVOICE_DUPLICATED', 'INVOICE_CREDIT_NOTE_CREATED', 'QUOTATION_CREATED', 'QUOTATION_UPDATED', 'QUOTATION_ITEMS_UPDATED', 'QUOTATION_STATUS_CHANGED', 'QUOTATION_DELETED', 'QUOTATION_CONVERTED', 'CLIENT_CREATED', 'CLIENT_UPDATED', 'CLIENT_DELETED', 'PAYROLL_RUN_APPROVED', 'PAYROLL_RUN_CANCELLED', 'JOURNAL_ENTRY_SKIPPED', 'JOURNAL_ENTRY_FAILED', 'PROJECT_CREATED', 'PROJECT_ARCHIVED', 'PROJECT_RESTORED', 'SETTINGS_UPDATED', 'ZATCA_INVOICE_SUBMITTED', 'ZATCA_INVOICE_CLEARED', 'ZATCA_INVOICE_REJECTED', 'RECEIPT_VOUCHER_CREATED', 'RECEIPT_VOUCHER_UPDATED', 'RECEIPT_VOUCHER_ISSUED', 'RECEIPT_VOUCHER_CANCELLED', 'PAYMENT_VOUCHER_CREATED', 'PAYMENT_VOUCHER_UPDATED', 'PAYMENT_VOUCHER_SUBMITTED', 'PAYMENT_VOUCHER_APPROVED', 'PAYMENT_VOUCHER_REJECTED', 'PAYMENT_VOUCHER_CANCELLED', 'HANDOVER_CREATED', 'HANDOVER_UPDATED', 'HANDOVER_DELETED', 'HANDOVER_SUBMITTED', 'HANDOVER_SIGNED', 'HANDOVER_COMPLETED', 'HANDOVER_ITEM_ADDED', 'HANDOVER_ITEM_UPDATED', 'HANDOVER_ITEM_DELETED', 'HANDOVER_ITEMS_IMPORTED', 'AI_CHAT_CREATED', 'AI_MESSAGE_SENT', 'OWNER_CREATED', 'OWNER_UPDATED', 'OWNER_DEACTIVATED', 'OWNER_DRAWING_CREATED', 'OWNER_DRAWING_APPROVED', 'OWNER_DRAWING_CANCELLED', 'OWNER_DRAWING_OVERDRAW_ACKNOWLEDGED', 'YEAR_END_CLOSING_EXECUTED', 'YEAR_END_CLOSING_REVERSED'])
 
 export type OrgAuditAction = z.infer<typeof OrgAuditActionSchema>;
 
@@ -1360,6 +1378,18 @@ export type NormalBalance = z.infer<typeof NormalBalanceSchema>;
 export const JournalEntryStatusSchema = z.enum(['DRAFT', 'POSTED', 'REVERSED'])
 
 export type JournalEntryStatus = z.infer<typeof JournalEntryStatusSchema>;
+
+// File: OwnerDrawingType.schema.ts
+
+export const OwnerDrawingTypeSchema = z.enum(['COMPANY_LEVEL', 'PROJECT_SPECIFIC'])
+
+export type OwnerDrawingType = z.infer<typeof OwnerDrawingTypeSchema>;
+
+// File: OwnerDrawingStatus.schema.ts
+
+export const OwnerDrawingStatusSchema = z.enum(['DRAFT', 'APPROVED', 'CANCELLED'])
+
+export type OwnerDrawingStatus = z.infer<typeof OwnerDrawingStatusSchema>;
 
 // File: VoucherStatus.schema.ts
 
@@ -4451,6 +4481,102 @@ export const JournalEntryLineSchema = z.object({
 });
 
 export type JournalEntryLineType = z.infer<typeof JournalEntryLineSchema>;
+
+
+// File: OrganizationOwner.schema.ts
+
+export const OrganizationOwnerSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  name: z.string(),
+  nameEn: z.string().nullish(),
+  ownershipPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'ownershipPercent' must be a Decimal. Location: ['Models', 'OrganizationOwner']",
+}),
+  nationalId: z.string().nullish(),
+  phone: z.string().nullish(),
+  email: z.string().nullish(),
+  drawingsAccountId: z.string().nullish(),
+  isActive: z.boolean().default(true),
+  notes: z.string().nullish(),
+  createdById: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type OrganizationOwnerType = z.infer<typeof OrganizationOwnerSchema>;
+
+
+// File: OwnerDrawing.schema.ts
+
+export const OwnerDrawingSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  drawingNo: z.string(),
+  date: z.date(),
+  amount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'amount' must be a Decimal. Location: ['Models', 'OwnerDrawing']",
+}),
+  currency: z.string().default("SAR"),
+  ownerId: z.string(),
+  bankAccountId: z.string().nullish(),
+  projectId: z.string().nullish(),
+  type: OwnerDrawingTypeSchema.default("COMPANY_LEVEL"),
+  description: z.string().nullish(),
+  notes: z.string().nullish(),
+  status: OwnerDrawingStatusSchema.default("DRAFT"),
+  journalEntryId: z.string().nullish(),
+  hasOverdrawWarning: z.boolean(),
+  overdrawAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'overdrawAmount' must be a Decimal. Location: ['Models', 'OwnerDrawing']",
+}).nullish(),
+  overdrawAcknowledgedBy: z.string().nullish(),
+  overdrawAcknowledgedAt: z.date().nullish(),
+  approvedById: z.string().nullish(),
+  approvedAt: z.date().nullish(),
+  cancelledAt: z.date().nullish(),
+  cancelReason: z.string().nullish(),
+  createdById: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type OwnerDrawingModel = z.infer<typeof OwnerDrawingSchema>;
+
+// File: YearEndClosing.schema.ts
+
+export const YearEndClosingSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  fiscalYear: z.number().int(),
+  closingDate: z.date(),
+  totalRevenue: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalRevenue' must be a Decimal. Location: ['Models', 'YearEndClosing']",
+}),
+  totalExpenses: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalExpenses' must be a Decimal. Location: ['Models', 'YearEndClosing']",
+}),
+  netProfit: z.instanceof(Prisma.Decimal, {
+  message: "Field 'netProfit' must be a Decimal. Location: ['Models', 'YearEndClosing']",
+}),
+  totalDrawings: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalDrawings' must be a Decimal. Location: ['Models', 'YearEndClosing']",
+}),
+  retainedEarningsTransfer: z.instanceof(Prisma.Decimal, {
+  message: "Field 'retainedEarningsTransfer' must be a Decimal. Location: ['Models', 'YearEndClosing']",
+}),
+  closingJournalEntryId: z.string().nullish(),
+  drawingsClosingEntryId: z.string().nullish(),
+  distributionDetails: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  status: z.string().default("COMPLETED"),
+  reversedAt: z.date().nullish(),
+  reversedById: z.string().nullish(),
+  createdById: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type YearEndClosingType = z.infer<typeof YearEndClosingSchema>;
 
 
 // File: AccountingPeriod.schema.ts

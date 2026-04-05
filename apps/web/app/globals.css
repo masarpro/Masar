@@ -124,32 +124,7 @@ input[cmdk-input] {
 	--lp-effects-opacity: 1;
 }
 
-.auth-form-panel {
-	--border: #d4d9e0;
-	--input: #d4d9e0;
-	--ring: #0284c7;
-	--background: #f4f7fa;
-	--foreground: #0c1823;
-	--primary: #0284c7;
-	--primary-foreground: #ffffff;
-	--secondary: #e8edf0;
-	--secondary-foreground: #0c1823;
-	--destructive: #ef4444;
-	--destructive-foreground: #ffffff;
-	--success: #39a561;
-	--success-foreground: #ffffff;
-	--muted: #edf0f2;
-	--muted-foreground: #5a6d7a;
-	--accent: #e0e5ec;
-	--accent-foreground: #0c1823;
-	--popover: #ffffff;
-	--popover-foreground: #0c1823;
-	--card: #ffffff;
-	--card-foreground: #0c1823;
-	background-color: #f4f7fa;
-	color: #0c1823;
-	color-scheme: light;
-}
+/* .auth-form-panel inherits theme from :root / .dark — no overrides needed */
 
 /* ═══════════════════════════════════════════════
    Landing Page — Theme-Aware Variables

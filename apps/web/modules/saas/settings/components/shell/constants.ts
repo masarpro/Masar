@@ -7,6 +7,7 @@ import {
 	Bell,
 	Layout,
 	FileCheck,
+	UsersRound,
 	type LucideIcon,
 } from "lucide-react";
 
@@ -64,6 +65,13 @@ export const SETTINGS_NAV_SECTIONS: SettingsNavSection[] = [
 		path: "zatca",
 		labelKey: "settings.menu.organization.zatca",
 		icon: FileCheck,
+		adminOnly: true,
+	},
+	{
+		id: "owners",
+		path: "owners",
+		labelKey: "settings.menu.organization.owners",
+		icon: UsersRound,
 		adminOnly: true,
 	},
 	{

@@ -1,5 +1,6 @@
 import { config } from "@repo/config";
 import { SessionProvider } from "@saas/auth/components/SessionProvider";
+import { ColorModeToggle } from "@shared/components/ColorModeToggle";
 import { LocaleSwitch } from "@shared/components/LocaleSwitch";
 import { Logo, MasarLogoSvg } from "@shared/components/Logo";
 import { Document } from "@shared/components/Document";
@@ -74,10 +75,10 @@ export default async function AuthLayout({ children }: PropsWithChildren) {
 						</div>
 
 						{/* Divider */}
-						<div className="hidden lg:block w-px bg-[#d4d9e0]" />
+						<div className="hidden lg:block w-px bg-border" />
 
-						{/* Form Area — always light */}
-						<div className="auth-form-panel flex-1 flex flex-col">
+						{/* Form Area — theme-aware */}
+						<div className="flex-1 flex flex-col bg-background text-foreground">
 							<div className="flex items-center justify-between p-4">
 								<div className="lg:hidden">
 									<Link href="/" className="block">
@@ -93,6 +94,7 @@ export default async function AuthLayout({ children }: PropsWithChildren) {
 											/>
 										</Suspense>
 									)}
+									<ColorModeToggle />
 								</div>
 							</div>
 

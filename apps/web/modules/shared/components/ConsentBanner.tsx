@@ -3,9 +3,11 @@
 import { useCookieConsent } from "@shared/hooks/cookie-consent";
 import { Button } from "@ui/components/button";
 import { CookieIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 export function ConsentBanner() {
+	const t = useTranslations();
 	const { userHasConsented, allowCookies, declineCookies } =
 		useCookieConsent();
 	const [mounted, setMounted] = useState(false);
@@ -22,13 +24,12 @@ export function ConsentBanner() {
 	}
 
 	return (
-		<div className="fixed left-4 bottom-4 max-w-md z-50">
+		<div className="fixed start-4 bottom-4 max-w-md z-50">
 			<div className="flex gap-4 rounded-2xl border bg-card p-4 text-card-foreground shadow-xl">
-				<CookieIcon className="block size-6 shrink-0 text-5xl text-primary/60 mt-1" />
+				<CookieIcon className="block size-6 shrink-0 text-primary/60 mt-1" />
 				<div>
 					<p className="text-sm leading-normal">
-						This site doesn't use cookies yet, but we added this
-						banner to demo it to you.
+						{t("common.consent.message")}
 					</p>
 					<div className="mt-4 flex gap-2">
 						<Button
@@ -36,13 +37,13 @@ export function ConsentBanner() {
 							className="flex-1"
 							onClick={() => declineCookies()}
 						>
-							Decline
+							{t("common.consent.decline")}
 						</Button>
 						<Button
 							className="flex-1"
 							onClick={() => allowCookies()}
 						>
-							Allow
+							{t("common.consent.allow")}
 						</Button>
 					</div>
 				</div>

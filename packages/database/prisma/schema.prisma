@@ -480,6 +480,19 @@ enum VoucherStatus {
   CANCELLED          // ملغي
 }
 
+// نوع سحب المالك/الشريك
+enum OwnerDrawingType {
+  COMPANY_LEVEL      // سحب عام من الشركة (من الربح الكلي)
+  PROJECT_SPECIFIC   // سحب مخصص من مشروع معين
+}
+
+// حالة سحب المالك
+enum OwnerDrawingStatus {
+  DRAFT              // مسودة
+  APPROVED           // معتمد
+  CANCELLED          // ملغي
+}
+
 // نوع المستفيد (سندات الصرف)
 enum PayeeType {
   SUBCONTRACTOR   // مقاول باطن
@@ -873,6 +886,13 @@ model User {
   paymentVouchersApproved   PaymentVoucher[]         @relation("PaymentVoucherApprover")
   handoverProtocolsCreated  HandoverProtocol[]       @relation("HandoverProtocolCreator")
 
+  // Owner Drawings — سحوبات الشركاء والإقفال السنوي
+  ownersCreated             OrganizationOwner[]      @relation("OwnerCreator")
+  ownerDrawingsCreated      OwnerDrawing[]           @relation("OwnerDrawingCreator")
+  ownerDrawingsApproved     OwnerDrawing[]           @relation("OwnerDrawingApprover")
+  yearEndClosingsCreated    YearEndClosing[]         @relation("YearEndClosingCreator")
+  yearEndClosingsReversed   YearEndClosing[]         @relation("YearEndClosingReverser")
+
   // ═══ نهاية حقول مسار ═══
 
   @@unique([email])
@@ -1117,6 +1137,11 @@ model Organization {
 
   // ZATCA Phase 2 - الفوترة الإلكترونية
   zatcaDevices            ZatcaDevice[]
+
+  // Owner Drawings - سحوبات الشركاء والإقفال السنوي
+  organizationOwners      OrganizationOwner[]
+  ownerDrawings           OwnerDrawing[]
+  yearEndClosings         YearEndClosing[]
 
   // ═══ نهاية حقول مسار ═══
 
@@ -1895,6 +1920,9 @@ model Project {
   receiptVouchers          ReceiptVoucher[]
   paymentVouchers          PaymentVoucher[]
   handoverProtocols        HandoverProtocol[]
+
+  // Owner Drawings - سحوبات الشركاء المخصصة لهذا المشروع
+  ownerDrawings            OwnerDrawing[]     @relation("ProjectOwnerDrawings")
 
   @@unique([organizationId, slug])
   @@index([organizationId])
@@ -3700,6 +3728,21 @@ enum OrgAuditAction {
   // ── المساعد الذكي (AI Assistant) ──
   AI_CHAT_CREATED           // إنشاء محادثة ذكاء اصطناعي
   AI_MESSAGE_SENT           // إرسال رسالة للمساعد الذكي
+
+  // ── الشركاء / الملاك (Partners / Owners) ──
+  OWNER_CREATED                       // إنشاء شريك
+  OWNER_UPDATED                       // تعديل شريك
+  OWNER_DEACTIVATED                   // تعطيل شريك
+
+  // ── سحوبات الشركاء (Owner Drawings) ──
+  OWNER_DRAWING_CREATED               // إنشاء سحب شريك
+  OWNER_DRAWING_APPROVED              // اعتماد سحب شريك
+  OWNER_DRAWING_CANCELLED             // إلغاء سحب شريك
+  OWNER_DRAWING_OVERDRAW_ACKNOWLEDGED // تأكيد سحب رغم تجاوز الربح
+
+  // ── الإقفال السنوي (Year-End Closing) ──
+  YEAR_END_CLOSING_EXECUTED           // تنفيذ إقفال نهاية العام
+  YEAR_END_CLOSING_REVERSED           // عكس إقفال نهاية العام
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -4308,6 +4351,9 @@ model OrganizationBank {
 
   // Payroll - مسيرات الرواتب
   payrollRuns         PayrollRun[]
+
+  // Owner Drawings - سحوبات الشركاء
+  ownerDrawings       OwnerDrawing[] @relation("OwnerDrawingSource")
 
   @@index([organizationId])
   @@index([organizationId, accountType])
@@ -5428,6 +5474,9 @@ model ChartAccount {
   // ربط 1-1 مع حساب بنكي (اختياري)
   bankAccount     OrganizationBank?
 
+  // ربط 1-1 مع شريك (حساب سحوبات — اختياري)
+  ownerAccount    OrganizationOwner? @relation("OwnerDrawingsAccount")
+
   // العلاقات
   organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   journalLines    JournalEntryLine[]
@@ -5490,6 +5539,11 @@ model JournalEntry {
   createdByUser   User?               @relation("JournalEntryCreator", fields: [createdById], references: [id])
   postedByUser    User?               @relation("JournalEntryPoster", fields: [postedById], references: [id])
 
+  // Owner Drawings & Year-End Closing
+  ownerDrawing              OwnerDrawing?     @relation("OwnerDrawingJournalEntry")
+  yearEndClosing            YearEndClosing?   @relation("YearEndClosingEntry")
+  yearEndDrawingsClosing    YearEndClosing?   @relation("YearEndDrawingsClosingEntry")
+
   createdAt       DateTime            @default(now()) @map("created_at")
   updatedAt       DateTime            @updatedAt @map("updated_at")
 
@@ -5527,6 +5581,164 @@ model JournalEntryLine {
   @@index([accountId])
   @@index([projectId])
   @@map("journal_entry_lines")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ORGANIZATION OWNERS — الشركاء / الملاك
+// ═══════════════════════════════════════════════════════════════════════════
+
+model OrganizationOwner {
+  id               String       @id @default(cuid())
+  organizationId   String       @map("organization_id")
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name             String       // اسم المالك/الشريك
+  nameEn           String?      @map("name_en") // English name
+
+  ownershipPercent Decimal      @map("ownership_percent") @db.Decimal(5, 2) // نسبة الملكية (0.00 - 100.00)
+
+  nationalId       String?      @map("national_id") // رقم الهوية
+  phone            String?
+  email            String?
+
+  // ربط بحساب السحوبات الخاص بهذا الشريك في دليل الحسابات
+  drawingsAccountId String?     @unique @map("drawings_account_id")
+  drawingsAccount   ChartAccount? @relation("OwnerDrawingsAccount", fields: [drawingsAccountId], references: [id])
+
+  isActive         Boolean      @default(true) @map("is_active")
+  notes            String?      @db.Text
+
+  // من أنشأ
+  createdById      String?      @map("created_by")
+  createdBy        User?        @relation("OwnerCreator", fields: [createdById], references: [id])
+
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+
+  // العلاقات
+  drawings         OwnerDrawing[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId, isActive])
+  @@map("organization_owners")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// OWNER DRAWING — سحوبات المالك / الشريك
+// ═══════════════════════════════════════════════════════════════════════════
+
+model OwnerDrawing {
+  id               String              @id @default(cuid())
+  organizationId   String              @map("organization_id")
+  organization     Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  drawingNo        String              @map("drawing_no") // OD-YYYY-XXXX (ترقيم ذري)
+  date             DateTime            @db.Date
+  amount           Decimal             @db.Decimal(15, 2)
+  currency         String              @default("SAR")
+
+  // المالك/الشريك الذي سحب
+  ownerId          String              @map("owner_id")
+  owner            OrganizationOwner   @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+
+  // البنك المصدر
+  bankAccountId    String?             @map("bank_account_id")
+  bankAccount      OrganizationBank?   @relation("OwnerDrawingSource", fields: [bankAccountId], references: [id])
+
+  // ربط اختياري بمشروع — إذا كان السحب مخصص من ربح مشروع معين
+  projectId        String?             @map("project_id")
+  project          Project?            @relation("ProjectOwnerDrawings", fields: [projectId], references: [id], onDelete: SetNull)
+
+  // نوع السحب (مشتق من projectId — COMPANY_LEVEL إذا بدون مشروع)
+  type             OwnerDrawingType    @default(COMPANY_LEVEL) @map("drawing_type")
+
+  description      String?             @db.Text
+  notes            String?             @db.Text
+
+  // حالة السحب
+  status           OwnerDrawingStatus  @default(DRAFT)
+
+  // ربط بالقيد المحاسبي
+  journalEntryId   String?             @unique @map("journal_entry_id")
+  journalEntry     JournalEntry?       @relation("OwnerDrawingJournalEntry", fields: [journalEntryId], references: [id])
+
+  // حقول تحذير التجاوز
+  hasOverdrawWarning       Boolean     @default(false) @map("has_overdraw_warning")
+  overdrawAmount           Decimal?    @map("overdraw_amount") @db.Decimal(15, 2)
+  overdrawAcknowledgedBy   String?     @map("overdraw_acknowledged_by")
+  overdrawAcknowledgedAt   DateTime?   @map("overdraw_acknowledged_at")
+
+  // الاعتماد
+  approvedById     String?             @map("approved_by")
+  approvedBy       User?               @relation("OwnerDrawingApprover", fields: [approvedById], references: [id])
+  approvedAt       DateTime?           @map("approved_at")
+
+  // الإلغاء
+  cancelledAt      DateTime?           @map("cancelled_at")
+  cancelReason     String?             @map("cancel_reason") @db.Text
+
+  // من أنشأ
+  createdById      String              @map("created_by")
+  createdBy        User                @relation("OwnerDrawingCreator", fields: [createdById], references: [id])
+
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
+
+  @@unique([organizationId, drawingNo])
+  @@index([organizationId, status])
+  @@index([organizationId, date])
+  @@index([organizationId, ownerId])
+  @@index([organizationId, projectId])
+  @@map("owner_drawings")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// YEAR-END CLOSING — الإقفال السنوي
+// ═══════════════════════════════════════════════════════════════════════════
+
+model YearEndClosing {
+  id                        String       @id @default(cuid())
+  organizationId            String       @map("organization_id")
+  organization              Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  fiscalYear                Int          @map("fiscal_year") // السنة المالية (مثل 2025)
+  closingDate               DateTime     @map("closing_date") @db.Date
+
+  // ملخص مالي
+  totalRevenue              Decimal      @map("total_revenue") @db.Decimal(15, 2)
+  totalExpenses             Decimal      @map("total_expenses") @db.Decimal(15, 2)
+  netProfit                 Decimal      @map("net_profit") @db.Decimal(15, 2)
+  totalDrawings             Decimal      @map("total_drawings") @db.Decimal(15, 2)
+  retainedEarningsTransfer  Decimal      @map("retained_earnings_transfer") @db.Decimal(15, 2)
+
+  // قيد إقفال الإيرادات والمصروفات
+  closingJournalEntryId     String?      @unique @map("closing_journal_entry_id")
+  closingJournalEntry       JournalEntry? @relation("YearEndClosingEntry", fields: [closingJournalEntryId], references: [id])
+
+  // قيد إقفال سحوبات الشركاء
+  drawingsClosingEntryId    String?      @unique @map("drawings_closing_entry_id")
+  drawingsClosingEntry      JournalEntry? @relation("YearEndDrawingsClosingEntry", fields: [drawingsClosingEntryId], references: [id])
+
+  // تفاصيل التوزيع على الشركاء (JSON)
+  distributionDetails       Json?        @map("distribution_details")
+
+  // الحالة
+  status                    String       @default("COMPLETED") // COMPLETED | REVERSED
+
+  // عكس الإقفال
+  reversedAt                DateTime?    @map("reversed_at")
+  reversedById              String?      @map("reversed_by")
+  reversedBy                User?        @relation("YearEndClosingReverser", fields: [reversedById], references: [id])
+
+  // من أنشأ
+  createdById               String       @map("created_by")
+  createdBy                 User         @relation("YearEndClosingCreator", fields: [createdById], references: [id])
+
+  createdAt                 DateTime     @default(now()) @map("created_at")
+  updatedAt                 DateTime     @updatedAt @map("updated_at")
+
+  @@unique([organizationId, fiscalYear])
+  @@map("year_end_closings")
 }
 
 // الفترات المحاسبية (Accounting Periods)

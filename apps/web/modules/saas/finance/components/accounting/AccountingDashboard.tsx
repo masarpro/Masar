@@ -20,6 +20,8 @@ import {
 	Users,
 	Building2,
 	HeartPulse,
+	UserMinus,
+	CalendarCheck,
 } from "lucide-react";
 import { formatAccounting } from "./formatters";
 import Link from "next/link";
@@ -45,6 +47,12 @@ export function AccountingDashboard({
 
 	const healthQuery = useQuery(
 		orpc.accounting.health.check.queryOptions({
+			input: { organizationId },
+		}),
+	);
+
+	const drawingsSummaryQuery = useQuery(
+		orpc.accounting.ownerDrawings.companySummary.queryOptions({
 			input: { organizationId },
 		}),
 	);
@@ -194,6 +202,27 @@ export function AccountingDashboard({
 				</Card>
 			</div>
 
+			{/* Owner Drawings YTD */}
+			{drawingsSummaryQuery.data && (
+				<div className="grid gap-3 sm:grid-cols-3">
+					<Card className="rounded-2xl">
+						<CardContent className="p-4">
+							<div className="flex items-center justify-between">
+								<div>
+									<p className="text-xs text-slate-500">{t("finance.accounting.dashboard.ownerDrawingsYtd")}</p>
+									<p className="text-lg font-bold text-red-600 mt-1">
+										{formatAccounting(drawingsSummaryQuery.data.totalDrawingsThisYear)}
+									</p>
+								</div>
+								<div className="p-2.5 bg-red-100 dark:bg-red-900/30 rounded-xl">
+									<UserMinus className="h-5 w-5 text-red-600" />
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+				</div>
+			)}
+
 			{/* Health Status */}
 			{healthQuery.data && (
 				<div className={`flex items-center gap-2 p-3 rounded-xl border ${
@@ -294,6 +323,24 @@ export function AccountingDashboard({
 						? t("finance.accounting.backfill.running")
 						: t("finance.accounting.backfill.title")}
 				</Button>
+				<Link href={`${basePath}/owner-drawings/new`}>
+					<Button variant="outline" size="sm" className="rounded-xl">
+						<UserMinus className="h-4 w-4 me-1" />
+						{t("finance.accounting.dashboard.newOwnerDrawing")}
+					</Button>
+				</Link>
+				<Link href={`${basePath}/year-end-closing`}>
+					<Button variant="outline" size="sm" className="rounded-xl">
+						<CalendarCheck className="h-4 w-4 me-1" />
+						{t("finance.accounting.dashboard.yearEndClosing")}
+					</Button>
+				</Link>
+				<Link href={`/app/${organizationSlug}/settings/owners`}>
+					<Button variant="outline" size="sm" className="rounded-xl">
+						<Users className="h-4 w-4 me-1" />
+						{t("finance.accounting.dashboard.manageOwners")}
+					</Button>
+				</Link>
 			</div>
 		</div>
 	);
