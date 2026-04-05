@@ -1,6 +1,7 @@
 import { config } from "@repo/config";
 import { SessionProvider } from "@saas/auth/components/SessionProvider";
 import { ColorModeToggle } from "@shared/components/ColorModeToggle";
+import { ConsentBanner } from "@shared/components/ConsentBanner";
 import { LocaleSwitch } from "@shared/components/LocaleSwitch";
 import { Logo, MasarLogoSvg } from "@shared/components/Logo";
 import { Document } from "@shared/components/Document";
@@ -122,6 +123,7 @@ export default async function AuthLayout({ children }: PropsWithChildren) {
 						</div>
 					</div>
 				</SessionProvider>
+				<ConsentBanner />
 			</NextIntlClientProvider>
 		</Document>
 	);

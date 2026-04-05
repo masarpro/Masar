@@ -5,6 +5,7 @@ import { getOrganizationList, getSession } from "@saas/auth/lib/server";
 import { ActiveOrganizationProvider } from "@saas/organizations/components/ActiveOrganizationProvider";
 import { organizationListQueryKey } from "@saas/organizations/lib/api";
 import { ConfirmationAlertProvider } from "@saas/shared/components/ConfirmationAlertProvider";
+import { ConsentBanner } from "@shared/components/ConsentBanner";
 import { Document } from "@shared/components/Document";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { getServerQueryClient } from "@shared/lib/server";
@@ -70,6 +71,7 @@ export default async function SaaSLayout({ children }: PropsWithChildren) {
 						</ActiveOrganizationProvider>
 					</SessionProvider>
 				</HydrationBoundary>
+				<ConsentBanner />
 			</NextIntlClientProvider>
 		</Document>
 	);
