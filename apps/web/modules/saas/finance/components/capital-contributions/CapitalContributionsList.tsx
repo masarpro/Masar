@@ -1,0 +1,201 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
+import { orpc } from "@shared/lib/orpc-query-utils";
+import { Button } from "@ui/components/button";
+import { Input } from "@ui/components/input";
+import { Badge } from "@ui/components/badge";
+import { Card, CardContent } from "@ui/components/card";
+import {
+	Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from "@ui/components/table";
+import {
+	Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@ui/components/select";
+import { Search, Plus, Landmark, Eye, TrendingUp } from "lucide-react";
+import { formatDate } from "@shared/lib/formatters";
+import { Currency } from "../shared/Currency";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+
+interface CapitalContributionsListProps {
+	organizationId: string;
+	organizationSlug: string;
+}
+
+const STATUS_COLORS: Record<string, string> = {
+	ACTIVE: "bg-green-100 text-green-700",
+	CANCELLED: "bg-red-100 text-red-700",
+};
+
+const TYPE_COLORS: Record<string, string> = {
+	INITIAL: "border-blue-300 text-blue-700 bg-blue-50",
+	ADDITIONAL: "border-green-300 text-green-700 bg-green-50",
+	IN_KIND: "border-purple-300 text-purple-700 bg-purple-50",
+};
+
+export function CapitalContributionsList({
+	organizationId,
+	organizationSlug,
+}: CapitalContributionsListProps) {
+	const t = useTranslations();
+	const router = useRouter();
+	const [searchQuery, setSearchQuery] = useState("");
+	const [ownerFilter, setOwnerFilter] = useState<string>("all");
+
+	const basePath = `/app/${organizationSlug}/finance/capital-contributions`;
+
+	const { data: rawData, isLoading } = useQuery(
+		orpc.accounting.capitalContributions.list.queryOptions({
+			input: {
+				organizationId,
+				search: searchQuery || undefined,
+				ownerId: ownerFilter !== "all" ? ownerFilter : undefined,
+			},
+		}),
+	);
+	const data = rawData as any;
+
+	// Fetch owners for the filter dropdown
+	const { data: rawOwners } = useQuery(
+		orpc.accounting.owners.list.queryOptions({
+			input: { organizationId },
+		}),
+	);
+	const owners = (rawOwners as any)?.owners ?? rawOwners ?? [];
+
+	const contributions = data?.items ?? [];
+	const total = data?.total ?? 0;
+	const totalAmount = data?.totalAmount ?? 0;
+
+	if (isLoading) return <ListTableSkeleton rows={8} cols={5} />;
+
+	return (
+		<div className="space-y-4">
+			{/* Header */}
+			<div className="flex items-center justify-between">
+				<h1 className="text-2xl font-bold">{t("finance.capitalContributions.title")}</h1>
+				<Button onClick={() => router.push(`${basePath}/new`)}>
+					<Plus className="me-2 h-4 w-4" />
+					{t("finance.capitalContributions.new")}
+				</Button>
+			</div>
+
+			{/* Summary Card */}
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+				<Card className="border-green-200">
+					<CardContent className="pt-4">
+						<div className="flex items-center gap-2 text-sm text-muted-foreground">
+							<TrendingUp className="h-4 w-4 text-green-500" />
+							{t("finance.capitalContributions.summary.totalContributions")}
+						</div>
+						<div className="mt-1 text-2xl font-bold text-green-600">
+							<Currency amount={totalAmount} />
+						</div>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardContent className="pt-4">
+						<div className="flex items-center gap-2 text-sm text-muted-foreground">
+							<Landmark className="h-4 w-4" />
+							{t("finance.capitalContributions.summary.totalCount")}
+						</div>
+						<div className="mt-1 text-2xl font-bold">
+							{total}
+						</div>
+					</CardContent>
+				</Card>
+			</div>
+
+			{/* Filters */}
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+				<div className="relative flex-1">
+					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+					<Input
+						placeholder={t("common.search")}
+						value={searchQuery}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+						className="ps-9"
+					/>
+				</div>
+				<Select value={ownerFilter} onValueChange={setOwnerFilter}>
+					<SelectTrigger className="w-[200px]">
+						<SelectValue placeholder={t("finance.capitalContributions.allOwners")} />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">{t("finance.capitalContributions.allOwners")}</SelectItem>
+						{Array.isArray(owners) && owners.map((owner: any) => (
+							<SelectItem key={owner.id} value={owner.id}>{owner.name}</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			</div>
+
+			{/* Table */}
+			{contributions.length === 0 ? (
+				<Card>
+					<CardContent className="flex flex-col items-center justify-center py-12">
+						<Landmark className="mb-4 h-12 w-12 text-muted-foreground" />
+						<p className="text-lg font-medium">{t("finance.capitalContributions.noContributions")}</p>
+						<p className="mt-1 text-sm text-muted-foreground">
+							{t("finance.capitalContributions.noContributionsDescription")}
+						</p>
+						<Button className="mt-4" onClick={() => router.push(`${basePath}/new`)}>
+							<Plus className="me-2 h-4 w-4" />
+							{t("finance.capitalContributions.new")}
+						</Button>
+					</CardContent>
+				</Card>
+			) : (
+				<Card>
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead>{t("finance.capitalContributions.contributionNo")}</TableHead>
+								<TableHead>{t("finance.capitalContributions.date")}</TableHead>
+								<TableHead>{t("finance.capitalContributions.ownerName")}</TableHead>
+								<TableHead>{t("finance.capitalContributions.amount")}</TableHead>
+								<TableHead>{t("finance.capitalContributions.type")}</TableHead>
+								<TableHead>{t("finance.capitalContributions.status")}</TableHead>
+								<TableHead className="w-10" />
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{contributions.map((c: any) => (
+								<TableRow
+									key={c.id}
+									className="cursor-pointer"
+									onClick={() => router.push(`${basePath}/${c.id}`)}
+								>
+									<TableCell className="font-mono font-medium">{c.contributionNo}</TableCell>
+									<TableCell>{formatDate(c.date)}</TableCell>
+									<TableCell>{c.owner?.name ?? "-"}</TableCell>
+									<TableCell><Currency amount={Number(c.amount)} /></TableCell>
+									<TableCell>
+										<Badge variant="outline" className={TYPE_COLORS[c.type] ?? ""}>
+											{t(`finance.capitalContributions.types.${c.type}`)}
+										</Badge>
+									</TableCell>
+									<TableCell>
+										<Badge className={STATUS_COLORS[c.status] ?? ""}>
+											{t(`finance.capitalContributions.statuses.${c.status}`)}
+										</Badge>
+									</TableCell>
+									<TableCell>
+										<Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</Card>
+			)}
+
+			<div className="text-sm text-muted-foreground">
+				{t("common.totalResults", { count: total })}
+			</div>
+		</div>
+	);
+}

@@ -16,7 +16,7 @@ import {
 } from "@ui/components/alert-dialog";
 import { toast } from "sonner";
 import {
-	ArrowRight, Printer, Ban, CheckCircle, UserMinus,
+	ArrowRight, Printer, Ban, UserMinus,
 	Calendar, User, Building, Banknote, Link2, AlertTriangle,
 } from "lucide-react";
 import { formatDate } from "@shared/lib/formatters";
@@ -30,7 +30,6 @@ interface OwnerDrawingDetailProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-	DRAFT: "bg-gray-100 text-gray-700",
 	APPROVED: "bg-green-100 text-green-700",
 	CANCELLED: "bg-red-100 text-red-700",
 };
@@ -49,7 +48,6 @@ export function OwnerDrawingDetail({
 	const router = useRouter();
 	const queryClient = useQueryClient();
 
-	const [showApproveDialog, setShowApproveDialog] = useState(false);
 	const [showCancelDialog, setShowCancelDialog] = useState(false);
 	const [cancelReason, setCancelReason] = useState("");
 
@@ -65,28 +63,6 @@ export function OwnerDrawingDetail({
 	const invalidate = () => {
 		queryClient.invalidateQueries({ queryKey: ["accounting", "ownerDrawings"] });
 	};
-
-	const approveMutation = useMutation({
-		mutationFn: () =>
-			orpcClient.accounting.ownerDrawings.approve({
-				organizationId,
-				id: drawingId,
-			}),
-		onSuccess: () => {
-			invalidate();
-			toast.success(t("finance.ownerDrawings.approved"));
-			setShowApproveDialog(false);
-		},
-		onError: (error: any) => {
-			const message = error?.message ?? "";
-			if (message.includes("INSUFFICIENT_BANK_BALANCE")) {
-				toast.error(t("finance.ownerDrawings.insufficientBankBalance"));
-			} else {
-				toast.error(t("common.error"));
-			}
-			setShowApproveDialog(false);
-		},
-	});
 
 	const cancelMutation = useMutation({
 		mutationFn: () =>
@@ -226,23 +202,17 @@ export function OwnerDrawingDetail({
 				</div>
 
 				<div className="flex gap-2">
-					{drawing.status === "DRAFT" && (
-						<Button onClick={() => setShowApproveDialog(true)}>
-							<CheckCircle className="me-2 h-4 w-4" />
-							{t("finance.ownerDrawings.actions.approve")}
-						</Button>
-					)}
 					{drawing.status === "APPROVED" && (
-						<Button variant="outline" onClick={() => window.print()}>
-							<Printer className="me-2 h-4 w-4" />
-							{t("finance.ownerDrawings.actions.print")}
-						</Button>
-					)}
-					{drawing.status !== "CANCELLED" && (
-						<Button variant="error" onClick={() => setShowCancelDialog(true)}>
-							<Ban className="me-2 h-4 w-4" />
-							{t("finance.ownerDrawings.actions.cancel")}
-						</Button>
+						<>
+							<Button variant="outline" onClick={() => window.print()}>
+								<Printer className="me-2 h-4 w-4" />
+								{t("finance.ownerDrawings.actions.print")}
+							</Button>
+							<Button variant="error" onClick={() => setShowCancelDialog(true)}>
+								<Ban className="me-2 h-4 w-4" />
+								{t("finance.ownerDrawings.actions.cancel")}
+							</Button>
+						</>
 					)}
 				</div>
 			</div>
@@ -394,30 +364,6 @@ export function OwnerDrawingDetail({
 					)}
 				</CardContent>
 			</Card>
-
-			{/* Approve Dialog */}
-			<AlertDialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>{t("finance.ownerDrawings.approveDialog.title")}</AlertDialogTitle>
-						<AlertDialogDescription>
-							{t("finance.ownerDrawings.approveDialog.description", {
-								amount: new Intl.NumberFormat("en-US").format(Number(drawing.amount)),
-								owner: drawing.owner?.name ?? "",
-							})}
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-						<AlertDialogAction
-							onClick={() => approveMutation.mutate()}
-							disabled={approveMutation.isPending}
-						>
-							{t("finance.ownerDrawings.actions.approve")}
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
 
 			{/* Cancel Dialog */}
 			<AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>

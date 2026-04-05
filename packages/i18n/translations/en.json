@@ -2324,7 +2324,8 @@
         "accountingReports": "Accounting Reports",
         "settings": "Settings",
         "ownerDrawings": "Owner Drawings",
-        "yearEndClosing": "Year-End Closing"
+        "yearEndClosing": "Year-End Closing",
+        "capitalContributions": "Capital Contributions"
       }
     },
     "actions": {
@@ -3881,7 +3882,17 @@
       "reverseDialogDescription": "Are you sure you want to reverse the year-end closing for {year}? The associated journal entries will be reversed.",
       "reverseSuccess": "Year-end closing reversed successfully",
       "reverseFailed": "Failed to reverse year-end closing",
-      "confirmReverse": "Confirm Reversal"
+      "confirmReverse": "Confirm Reversal",
+      "tabs": {
+        "summary": "Summary",
+        "distribution": "Profit Distribution",
+        "entries": "Proposed Entries",
+        "warnings": "Warnings"
+      },
+      "capitalContributions": "Capital Contributions",
+      "newCapitalBalance": "New Capital Balance",
+      "proposedEntries": "Proposed Entries",
+      "confirmTypeText": "Close Year"
     },
     "ownerDrawings": {
       "title": "Owner Drawings",
@@ -3903,10 +3914,16 @@
       "selectProject": "Select Project (Optional)",
       "status": "Status",
       "statuses": {
-        "DRAFT": "Draft",
         "APPROVED": "Approved",
         "CANCELLED": "Cancelled"
       },
+      "createDrawing": "Record Drawing",
+      "contextProfit": "Profit",
+      "ownerShare": "Owner Share",
+      "availableForOwner": "Available for Owner",
+      "otherPartnersRights": "Other Partners' Rights",
+      "capitalContributions": "Capital Contributions",
+      "totalCount": "Total Drawings",
       "approve": "Approve Drawing",
       "cancel": "Cancel Drawing",
       "print": "Print",
@@ -3942,14 +3959,14 @@
       "ownerBalance": "Partner Account Balance",
       "totalDrawnThisYear": "Total Drawn This Year",
       "yearProfit": "Company Year Profit",
-      "draftsCount": "Pending Approval",
       "allStatuses": "All Statuses",
       "allOwners": "All Partners",
       "summary": {
         "drawingsByOwner": "Drawings by Partner",
         "drawingsByProject": "Drawings by Project",
         "drawingsByMonth": "Drawings by Month",
-        "difference": "Difference"
+        "difference": "Difference",
+        "totalCount": "Total Drawings"
       },
       "detail": {
         "drawingInfo": "Drawing Information",
@@ -3962,6 +3979,38 @@
         "createdBy": "Created By",
         "createdAt": "Creation Date"
       }
+    },
+    "capitalContributions": {
+      "title": "Capital Contributions",
+      "new": "New Contribution",
+      "create": "Record Contribution",
+      "contributionNo": "Contribution No.",
+      "date": "Contribution Date",
+      "amount": "Contribution Amount",
+      "type": "Contribution Type",
+      "types": {
+        "INITIAL": "Initial Capital",
+        "ADDITIONAL": "Additional Injection",
+        "IN_KIND": "In-Kind Contribution"
+      },
+      "owner": "Partner",
+      "bank": "Bank Account",
+      "description": "Description",
+      "notes": "Notes",
+      "selectOwner": "Select Partner",
+      "selectBank": "Select Bank Account",
+      "status": "Status",
+      "statuses": {
+        "ACTIVE": "Active",
+        "CANCELLED": "Cancelled"
+      },
+      "cancel": "Cancel Contribution",
+      "cancelReason": "Cancellation Reason",
+      "noContributions": "No contributions",
+      "noContributionsDescription": "No capital contributions have been recorded yet",
+      "totalContributions": "Total Contributions",
+      "created": "Contribution recorded successfully",
+      "cancelled": "Contribution cancelled"
     },
     "accountingReports": {
       "title": "Accounting Reports",

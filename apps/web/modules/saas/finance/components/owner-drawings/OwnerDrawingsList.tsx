@@ -26,7 +26,6 @@ interface OwnerDrawingsListProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-	DRAFT: "bg-gray-100 text-gray-700",
 	APPROVED: "bg-green-100 text-green-700",
 	CANCELLED: "bg-red-100 text-red-700",
 };
@@ -131,7 +130,7 @@ export function OwnerDrawingsList({
 						<CardContent className="pt-4">
 							<div className="flex items-center gap-2 text-sm text-muted-foreground">
 								<FileText className="h-4 w-4" />
-								{t("finance.ownerDrawings.summary.draftsCount")}
+								{t("finance.ownerDrawings.summary.totalCount")}
 							</div>
 							<div className="mt-1 text-2xl font-bold">
 								{summary.drawingsByOwner?.reduce((sum: number, o: any) => sum + o.count, 0) ?? 0}
@@ -158,7 +157,6 @@ export function OwnerDrawingsList({
 					</SelectTrigger>
 					<SelectContent>
 						<SelectItem value="all">{t("common.all")}</SelectItem>
-						<SelectItem value="DRAFT">{t("finance.ownerDrawings.statuses.DRAFT")}</SelectItem>
 						<SelectItem value="APPROVED">{t("finance.ownerDrawings.statuses.APPROVED")}</SelectItem>
 						<SelectItem value="CANCELLED">{t("finance.ownerDrawings.statuses.CANCELLED")}</SelectItem>
 					</SelectContent>

@@ -24,7 +24,7 @@ import {
 	AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@ui/components/alert-dialog";
 import { toast } from "sonner";
-import { ArrowRight, Save, User, Building, Banknote, AlertTriangle } from "lucide-react";
+import { ArrowRight, Save, User, Building, Banknote, AlertTriangle, Users } from "lucide-react";
 import { Currency } from "../shared/Currency";
 
 interface OwnerDrawingFormProps {
@@ -182,6 +182,7 @@ export function OwnerDrawingForm({
 	};
 
 	const bankInsufficient = checkResult && checkResult.bankBalance !== null && !checkResult.bankSufficient;
+	const cr = checkResult; // shorthand for context cards
 
 	return (
 		<div className="space-y-6">
@@ -317,7 +318,7 @@ export function OwnerDrawingForm({
 									disabled={createMutation.isPending || !!bankInsufficient}
 								>
 									<Save className="me-2 h-4 w-4" />
-									{t("finance.ownerDrawings.createDraft")}
+									{t("finance.ownerDrawings.createDrawing")}
 								</Button>
 							</div>
 						</form>
@@ -327,7 +328,7 @@ export function OwnerDrawingForm({
 				{/* Sidebar — Context Cards */}
 				<div className="space-y-4">
 					{/* Owner Context Card */}
-					{checkResult && (
+					{cr && (
 						<Card>
 							<CardHeader className="pb-2">
 								<CardTitle className="flex items-center gap-2 text-base">
@@ -337,37 +338,41 @@ export function OwnerDrawingForm({
 							</CardHeader>
 							<CardContent className="space-y-2 text-sm">
 								<InfoRow
-									label={t("finance.ownerDrawings.ownerName")}
-									value={checkResult.ownerName}
+									label={cr.contextType === "PROJECT" && cr.projectName
+										? t("finance.ownerDrawings.projectProfit")
+										: t("finance.ownerDrawings.currentYearProfit")}
+									value={<Currency amount={cr.contextProfit} />}
 								/>
 								<InfoRow
-									label={t("finance.ownerDrawings.ownershipPercent")}
-									value={`${checkResult.ownershipPercent}%`}
+									label={`× ${cr.ownerName} (${cr.ownershipPercent}%)`}
+									value={<Currency amount={cr.ownerShareOfContext} />}
 								/>
+								{cr.capitalContributions > 0 && (
+									<InfoRow
+										label={t("finance.ownerDrawings.capitalContributions")}
+										value={<Currency amount={cr.capitalContributions} />}
+									/>
+								)}
 								<InfoRow
-									label={t("finance.ownerDrawings.expectedShare")}
-									value={<Currency amount={checkResult.expectedShare} />}
-								/>
-								<InfoRow
-									label={t("finance.ownerDrawings.previousDrawings")}
-									value={<Currency amount={checkResult.previousDrawings} />}
+									label={`- ${t("finance.ownerDrawings.previousDrawings")}`}
+									value={<Currency amount={cr.totalPreviousDrawings} />}
 								/>
 								<div className="border-t pt-2">
 									<InfoRow
-										label={t("finance.ownerDrawings.availableBalance")}
+										label={t("finance.ownerDrawings.availableForOwner")}
 										value={
-											<span className={checkResult.available < 0 ? "text-red-600 font-bold" : "text-green-600 font-bold"}>
-												<Currency amount={checkResult.available} />
+											<span className={cr.availableForOwner < 0 ? "text-red-600 font-bold" : "text-green-600 font-bold"}>
+												<Currency amount={cr.availableForOwner} />
 											</span>
 										}
 									/>
 								</div>
-								{checkResult.isOverdraw && (
+								{cr.willExceed && (
 									<div className="mt-2 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-2">
 										<AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
 										<span className="text-xs text-amber-700">
 											{t("finance.ownerDrawings.overdrawWarning", {
-												amount: new Intl.NumberFormat("en-US").format(checkResult.overdrawAmount),
+												amount: new Intl.NumberFormat("en-US").format(cr.overdrawAmount),
 											})}
 										</span>
 									</div>
@@ -376,40 +381,29 @@ export function OwnerDrawingForm({
 						</Card>
 					)}
 
-					{/* Project Context Card */}
-					{checkResult && checkResult.projectName && (
-						<Card>
+					{/* Other Partners Card */}
+					{cr && cr.otherPartners && cr.otherPartners.length > 0 && (
+						<Card className="border-blue-100">
 							<CardHeader className="pb-2">
 								<CardTitle className="flex items-center gap-2 text-base">
-									<Building className="h-4 w-4" />
-									{t("finance.ownerDrawings.projectContext")}
+									<Users className="h-4 w-4" />
+									{t("finance.ownerDrawings.otherPartnersRights")}
 								</CardTitle>
 							</CardHeader>
 							<CardContent className="space-y-2 text-sm">
-								<InfoRow
-									label={t("finance.ownerDrawings.projectProfit")}
-									value={<Currency amount={checkResult.totalProfit} />}
-								/>
-								<InfoRow
-									label={t("finance.ownerDrawings.previousDrawings")}
-									value={<Currency amount={checkResult.previousDrawings} />}
-								/>
-								<div className="border-t pt-2">
+								{cr.otherPartners.map((p: any) => (
 									<InfoRow
-										label={t("finance.ownerDrawings.availableBalance")}
-										value={
-											<span className={checkResult.available < 0 ? "text-red-600 font-bold" : "text-green-600 font-bold"}>
-												<Currency amount={checkResult.available} />
-											</span>
-										}
+										key={p.ownerId}
+										label={`${p.ownerName} (${p.ownershipPercent}%)`}
+										value={<Currency amount={p.theirShareOfContext} />}
 									/>
-								</div>
+								))}
 							</CardContent>
 						</Card>
 					)}
 
 					{/* Bank Balance Card */}
-					{checkResult && checkResult.bankBalance !== null && (
+					{cr && cr.bankBalance !== null && (
 						<Card className={bankInsufficient ? "border-red-200" : ""}>
 							<CardHeader className="pb-2">
 								<CardTitle className="flex items-center gap-2 text-base">
@@ -420,13 +414,13 @@ export function OwnerDrawingForm({
 							<CardContent className="space-y-2 text-sm">
 								<InfoRow
 									label={t("finance.ownerDrawings.currentBalance")}
-									value={<Currency amount={checkResult.bankBalance} />}
+									value={<Currency amount={cr.bankBalance} />}
 								/>
 								<InfoRow
 									label={t("finance.ownerDrawings.afterDrawing")}
 									value={
 										<span className={bankInsufficient ? "text-red-600 font-bold" : "font-medium"}>
-											<Currency amount={checkResult.bankBalance - (checkResult.requestedAmount ?? 0)} />
+											<Currency amount={cr.balanceAfterDrawing ?? 0} />
 										</span>
 									}
 								/>
@@ -466,20 +460,20 @@ export function OwnerDrawingForm({
 					{overdrawData && (
 						<div className="my-2 space-y-1 rounded-md border bg-muted/50 p-3 text-sm">
 							<div className="flex justify-between">
-								<span className="text-muted-foreground">{t("finance.ownerDrawings.totalProfit")}</span>
-								<span><Currency amount={overdrawData.totalProfit ?? 0} /></span>
+								<span className="text-muted-foreground">{t("finance.ownerDrawings.contextProfit")}</span>
+								<span><Currency amount={overdrawData.contextProfit ?? 0} /></span>
 							</div>
 							<div className="flex justify-between">
-								<span className="text-muted-foreground">{t("finance.ownerDrawings.expectedShare")}</span>
-								<span><Currency amount={overdrawData.expectedShare ?? 0} /></span>
+								<span className="text-muted-foreground">{t("finance.ownerDrawings.ownerShare")}</span>
+								<span><Currency amount={overdrawData.ownerShareOfContext ?? 0} /></span>
 							</div>
 							<div className="flex justify-between">
 								<span className="text-muted-foreground">{t("finance.ownerDrawings.previousDrawings")}</span>
-								<span><Currency amount={overdrawData.previousDrawings ?? 0} /></span>
+								<span><Currency amount={overdrawData.totalPreviousDrawings ?? 0} /></span>
 							</div>
 							<div className="flex justify-between border-t pt-1">
-								<span className="text-muted-foreground">{t("finance.ownerDrawings.availableBalance")}</span>
-								<span className="font-bold text-red-600"><Currency amount={overdrawData.available ?? 0} /></span>
+								<span className="text-muted-foreground">{t("finance.ownerDrawings.availableForOwner")}</span>
+								<span className="font-bold text-red-600"><Currency amount={overdrawData.availableForOwner ?? 0} /></span>
 							</div>
 							<div className="flex justify-between">
 								<span className="text-muted-foreground">{t("finance.ownerDrawings.requestedAmount")}</span>

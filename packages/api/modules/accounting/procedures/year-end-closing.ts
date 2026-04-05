@@ -191,23 +191,43 @@ export const previewYearEndProcedure = protectedProcedure
 
 		const totalDrawings = drawingsAccountBalances.reduce((s, a) => s + a.balance, 0);
 
-		// Step 6: Compute per-owner distribution
+		// Step 6: Get capital contributions per owner
+		const contributionsGrouped = await db.capitalContribution.groupBy({
+			by: ["ownerId"],
+			where: {
+				organizationId,
+				status: "ACTIVE",
+			},
+			_sum: { amount: true },
+		}).catch(() => [] as Array<{ ownerId: string; _sum: { amount: any } }>);
+
+		const contributionsPerOwner: Record<string, number> = {};
+		for (const g of contributionsGrouped) {
+			contributionsPerOwner[g.ownerId] = Number(g._sum.amount ?? 0);
+		}
+
+		// Step 7: Compute per-owner distribution
 		const profitDistribution = owners.map((owner) => {
 			const ownershipPercent = Number(owner.ownershipPercent);
 			const shareOfProfit = netProfit * (ownershipPercent / 100);
 			const drawings = drawingsPerOwner[owner.id] ?? 0;
+			const capitalContributions = contributionsPerOwner[owner.id] ?? 0;
+			const difference = shareOfProfit - drawings;
 			return {
 				ownerId: owner.id,
 				ownerName: owner.name,
 				ownershipPercent,
 				shareOfProfit: Math.round(shareOfProfit * 100) / 100,
 				drawings,
-				netToRetained: Math.round((shareOfProfit - drawings) * 100) / 100,
+				difference: Math.round(difference * 100) / 100,
+				capitalContributions,
+				newCapitalBalance: Math.round((capitalContributions + difference) * 100) / 100,
+				netToRetained: Math.round(difference * 100) / 100,
 			};
 		});
 
-		// Step 7: Check warnings
-		const warnings: string[] = [];
+		// Step 8: Check warnings
+		const warnings: Array<{ severity: "INFO" | "WARNING" | "ERROR"; message: string }> = [];
 
 		// Count DRAFT journal entries for the year
 		const draftCount = await db.journalEntry.count({
@@ -218,7 +238,10 @@ export const previewYearEndProcedure = protectedProcedure
 			},
 		});
 		if (draftCount > 0) {
-			warnings.push(`يوجد ${draftCount} قيد مسودة لم يُرحّل بعد في السنة المالية`);
+			warnings.push({
+				severity: "WARNING",
+				message: `يوجد ${draftCount} قيد مسودة لم يُرحّل بعد في السنة المالية`,
+			});
 		}
 
 		// Count open (not closed) accounting periods for the year
@@ -231,7 +254,10 @@ export const previewYearEndProcedure = protectedProcedure
 			},
 		});
 		if (openPeriodsCount > 0) {
-			warnings.push(`يوجد ${openPeriodsCount} فترة محاسبية مفتوحة لم تُغلق بعد`);
+			warnings.push({
+				severity: "WARNING",
+				message: `يوجد ${openPeriodsCount} فترة محاسبية مفتوحة لم تُغلق بعد`,
+			});
 		}
 
 		// Check if YearEndClosing already exists for this year
@@ -243,7 +269,10 @@ export const previewYearEndProcedure = protectedProcedure
 		const isAlreadyClosed =
 			existingClosing !== null && existingClosing.status !== "REVERSED";
 		if (isAlreadyClosed) {
-			warnings.push("تم إقفال هذه السنة المالية مسبقاً");
+			warnings.push({
+				severity: "ERROR",
+				message: "تم إقفال هذه السنة المالية مسبقاً",
+			});
 		}
 
 		// Check if total ownership % = 100
@@ -252,9 +281,18 @@ export const previewYearEndProcedure = protectedProcedure
 			0,
 		);
 		if (owners.length > 0 && Math.abs(totalOwnership - 100) > 0.01) {
-			warnings.push(
-				`مجموع نسب الملكية ${totalOwnership}% — يجب أن يكون 100%`,
-			);
+			warnings.push({
+				severity: "ERROR",
+				message: `مجموع نسب الملكية ${totalOwnership}% — يجب أن يكون 100%`,
+			});
+		}
+
+		// No owners defined
+		if (owners.length === 0) {
+			warnings.push({
+				severity: "INFO",
+				message: "لم يتم تعريف شركاء — سيُحوّل كامل الربح للأرباح المبقاة",
+			});
 		}
 
 		return {
@@ -687,7 +725,7 @@ export const reverseYearEndProcedure = subscriptionProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "edit",
+			action: "settings",
 		});
 
 		const { organizationId, fiscalYear } = input;

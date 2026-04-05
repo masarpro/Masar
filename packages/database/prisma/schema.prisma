@@ -488,8 +488,7 @@ enum OwnerDrawingType {
 
 // حالة سحب المالك
 enum OwnerDrawingStatus {
-  DRAFT              // مسودة
-  APPROVED           // معتمد
+  APPROVED           // معتمد — الحالة الافتراضية عند الإنشاء
   CANCELLED          // ملغي
 }
 
@@ -892,6 +891,7 @@ model User {
   ownerDrawingsApproved     OwnerDrawing[]           @relation("OwnerDrawingApprover")
   yearEndClosingsCreated    YearEndClosing[]         @relation("YearEndClosingCreator")
   yearEndClosingsReversed   YearEndClosing[]         @relation("YearEndClosingReverser")
+  capitalContributionsCreated CapitalContribution[]  @relation("CapitalContributionCreator")
 
   // ═══ نهاية حقول مسار ═══
 
@@ -1142,6 +1142,7 @@ model Organization {
   organizationOwners      OrganizationOwner[]
   ownerDrawings           OwnerDrawing[]
   yearEndClosings         YearEndClosing[]
+  capitalContributions    CapitalContribution[]
 
   // ═══ نهاية حقول مسار ═══
 
@@ -3740,6 +3741,10 @@ enum OrgAuditAction {
   OWNER_DRAWING_CANCELLED             // إلغاء سحب شريك
   OWNER_DRAWING_OVERDRAW_ACKNOWLEDGED // تأكيد سحب رغم تجاوز الربح
 
+  // ── مساهمات رأس المال (Capital Contributions) ──
+  CAPITAL_CONTRIBUTION_CREATED         // تسجيل مساهمة رأس مال
+  CAPITAL_CONTRIBUTION_CANCELLED       // إلغاء مساهمة رأس مال
+
   // ── الإقفال السنوي (Year-End Closing) ──
   YEAR_END_CLOSING_EXECUTED           // تنفيذ إقفال نهاية العام
   YEAR_END_CLOSING_REVERSED           // عكس إقفال نهاية العام
@@ -4354,6 +4359,7 @@ model OrganizationBank {
 
   // Owner Drawings - سحوبات الشركاء
   ownerDrawings       OwnerDrawing[] @relation("OwnerDrawingSource")
+  capitalContributionsReceived CapitalContribution[] @relation("CapitalContributionBank")
 
   @@index([organizationId])
   @@index([organizationId, accountType])
@@ -5543,6 +5549,7 @@ model JournalEntry {
   ownerDrawing              OwnerDrawing?     @relation("OwnerDrawingJournalEntry")
   yearEndClosing            YearEndClosing?   @relation("YearEndClosingEntry")
   yearEndDrawingsClosing    YearEndClosing?   @relation("YearEndDrawingsClosingEntry")
+  capitalContribution       CapitalContribution? @relation("CapitalContributionJournal")
 
   createdAt       DateTime            @default(now()) @map("created_at")
   updatedAt       DateTime            @updatedAt @map("updated_at")
@@ -5617,10 +5624,59 @@ model OrganizationOwner {
 
   // العلاقات
   drawings         OwnerDrawing[]
+  capitalContributions CapitalContribution[]
 
   @@unique([organizationId, name])
   @@index([organizationId, isActive])
   @@map("organization_owners")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CAPITAL CONTRIBUTION — مساهمات رأس المال
+// ═══════════════════════════════════════════════════════════════════════════
+
+enum CapitalContributionType {
+  INITIAL     // رأس مال ابتدائي
+  ADDITIONAL  // ضخ إضافي
+  IN_KIND     // مساهمة عينية
+}
+
+model CapitalContribution {
+  id               String       @id @default(cuid())
+  organizationId   String       @map("organization_id")
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  ownerId          String       @map("owner_id")
+  owner            OrganizationOwner @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+
+  contributionNo   String       @map("contribution_no")
+  date             DateTime     @db.Date
+  amount           Decimal      @db.Decimal(15, 2)
+  type             CapitalContributionType @default(INITIAL)
+
+  bankAccountId    String?      @map("bank_account_id")
+  bankAccount      OrganizationBank? @relation("CapitalContributionBank", fields: [bankAccountId], references: [id])
+
+  description      String?      @db.Text
+  notes            String?      @db.Text
+
+  journalEntryId   String?      @unique @map("journal_entry_id")
+  journalEntry     JournalEntry? @relation("CapitalContributionJournal", fields: [journalEntryId], references: [id])
+
+  status           String       @default("ACTIVE") // ACTIVE or CANCELLED
+  cancelledAt      DateTime?    @map("cancelled_at")
+  cancelReason     String?      @map("cancel_reason") @db.Text
+
+  createdById      String       @map("created_by")
+  createdBy        User         @relation("CapitalContributionCreator", fields: [createdById], references: [id])
+
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+
+  @@unique([organizationId, contributionNo])
+  @@index([organizationId, ownerId])
+  @@index([organizationId, date])
+  @@map("capital_contributions")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -5656,7 +5712,7 @@ model OwnerDrawing {
   notes            String?             @db.Text
 
   // حالة السحب
-  status           OwnerDrawingStatus  @default(DRAFT)
+  status           OwnerDrawingStatus  @default(APPROVED)
 
   // ربط بالقيد المحاسبي
   journalEntryId   String?             @unique @map("journal_entry_id")

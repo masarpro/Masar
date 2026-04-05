@@ -520,6 +520,7 @@ export async function createJournalEntry(db: PrismaClient, data: {
 		PAYMENT_VOUCHER: "PV-JE",
 		HANDOVER_RETENTION_RELEASE: "HR-JE",
 		OWNER_DRAWING: "OWD-JE",
+		CAPITAL_CONTRIBUTION: "CNT-JE",
 		YEAR_END_CLOSING: "YEC-JE",
 		YEAR_END_RETAINED: "YER-JE",
 	};

@@ -64,13 +64,20 @@ import {
 	listDrawingsProcedure,
 	getDrawingByIdProcedure,
 	createDrawingProcedure,
-	approveDrawingProcedure,
 	cancelDrawingProcedure,
 	checkOverdrawProcedure,
 	getCompanySummaryProcedure,
 	getProjectSummaryProcedure,
 	getOwnerSummaryProcedure,
 } from "./procedures/owner-drawings";
+
+import {
+	listContributionsProcedure,
+	getContributionByIdProcedure,
+	createContributionProcedure,
+	cancelContributionProcedure,
+	getByOwnerProcedure,
+} from "./procedures/capital-contributions";
 
 import {
 	previewYearEndProcedure,
@@ -182,12 +189,20 @@ export const accountingRouter = {
 		list: listDrawingsProcedure,
 		getById: getDrawingByIdProcedure,
 		create: createDrawingProcedure,
-		approve: approveDrawingProcedure,
 		cancel: cancelDrawingProcedure,
 		checkOverdraw: checkOverdrawProcedure,
 		companySummary: getCompanySummaryProcedure,
 		projectSummary: getProjectSummaryProcedure,
 		ownerSummary: getOwnerSummaryProcedure,
+	},
+
+	// Capital Contributions
+	capitalContributions: {
+		list: listContributionsProcedure,
+		getById: getContributionByIdProcedure,
+		create: createContributionProcedure,
+		cancel: cancelContributionProcedure,
+		getByOwner: getByOwnerProcedure,
 	},
 
 	// Year-End Closing

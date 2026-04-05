@@ -326,17 +326,24 @@ export function YearEndClosingPage({
 					{/* Warnings */}
 					{preview.warnings.length > 0 && (
 						<div className="space-y-2">
-							{preview.warnings.map((warning, idx) => (
-								<div
-									key={idx}
-									className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800"
-								>
-									<AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
-									<span className="text-sm text-amber-700 dark:text-amber-300">
-										{warning}
-									</span>
-								</div>
-							))}
+							{preview.warnings.map((warning: any, idx: number) => {
+								const severity = typeof warning === "string" ? "WARNING" : warning.severity;
+								const message = typeof warning === "string" ? warning : warning.message;
+								const colors = {
+									INFO: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300",
+									WARNING: "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300",
+									ERROR: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300",
+								}[severity] ?? "bg-amber-50 border-amber-200 text-amber-700";
+								return (
+									<div
+										key={idx}
+										className={`flex items-center gap-2 p-3 rounded-xl border ${colors}`}
+									>
+										<AlertTriangle className="h-4 w-4 flex-shrink-0" />
+										<span className="text-sm">{message}</span>
+									</div>
+								);
+							})}
 						</div>
 					)}
 

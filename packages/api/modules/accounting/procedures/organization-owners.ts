@@ -41,7 +41,7 @@ export const listOwnersProcedure = protectedProcedure
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "settings",
+			section: "finance",
 			action: "view",
 		});
 
@@ -99,7 +99,7 @@ export const getOwnerByIdProcedure = protectedProcedure
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "settings",
+			section: "finance",
 			action: "view",
 		});
 
@@ -168,8 +168,8 @@ export const createOwnerProcedure = subscriptionProcedure
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "settings",
-			action: "edit",
+			section: "finance",
+			action: "settings",
 		});
 
 		// Validate total ownership does not exceed 100%
@@ -267,8 +267,8 @@ export const updateOwnerProcedure = subscriptionProcedure
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "settings",
-			action: "edit",
+			section: "finance",
+			action: "settings",
 		});
 
 		// Verify owner exists
@@ -376,8 +376,8 @@ export const deactivateOwnerProcedure = subscriptionProcedure
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "settings",
-			action: "edit",
+			section: "finance",
+			action: "settings",
 		});
 
 		// Verify owner exists and is active
@@ -393,17 +393,17 @@ export const deactivateOwnerProcedure = subscriptionProcedure
 			throw new Error("Owner not found or already deactivated");
 		}
 
-		// Check no DRAFT drawings exist for this owner
-		const draftDrawings = await db.ownerDrawing.count({
+		// Check no active (APPROVED) drawings exist for this owner
+		const activeDrawings = await db.ownerDrawing.count({
 			where: {
 				ownerId: input.id,
 				organizationId: input.organizationId,
-				status: "DRAFT",
+				status: "APPROVED",
 			},
 		});
-		if (draftDrawings > 0) {
+		if (activeDrawings > 0) {
 			throw new Error(
-				`لا يمكن تعطيل الشريك — يوجد ${draftDrawings} سحوبات بحالة مسودة يجب اعتمادها أو إلغاؤها أولاً`,
+				`لا يمكن تعطيل الشريك — يوجد ${activeDrawings} سحوبات معتمدة يجب إلغاؤها أولاً`,
 			);
 		}
 
@@ -444,7 +444,7 @@ export const getTotalOwnershipProcedure = protectedProcedure
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "settings",
+			section: "finance",
 			action: "view",
 		});
 

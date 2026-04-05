@@ -12,6 +12,7 @@ import {
 	FileCheck,
 	FileMinus,
 	UserMinus,
+	TrendingUp,
 	CalendarCheck,
 } from "lucide-react";
 
@@ -126,6 +127,12 @@ export const FINANCE_NAV_SECTIONS: FinanceNavSection[] = [
 		path: "accounting-reports",
 		labelKey: "finance.shell.sections.accountingReports",
 		icon: ClipboardList,
+	},
+	{
+		id: "capital-contributions",
+		path: "capital-contributions",
+		labelKey: "finance.capitalContributions.title",
+		icon: TrendingUp,
 	},
 	{
 		id: "owner-drawings",

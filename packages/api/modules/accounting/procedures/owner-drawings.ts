@@ -1,5 +1,5 @@
 // Owner Drawings — سحوبات الشركاء/المالكين
-// List + GetById + Create (with overdraw logic) + Approve + Cancel + CheckOverdraw
+// List + GetById + Create (APPROVED مباشرة مع overdraw logic) + Cancel + CheckOverdraw
 // + CompanySummary + ProjectSummary + OwnerSummary
 
 import {
@@ -9,7 +9,6 @@ import {
 	getJournalIncomeStatement,
 	getCostCenterByProject,
 } from "@repo/database";
-import { Prisma } from "@repo/database/prisma/generated/client";
 import { z } from "zod";
 import {
 	protectedProcedure,
@@ -32,7 +31,7 @@ import {
 } from "../../../lib/accounting/auto-journal";
 
 // ═══ Shared enums ═══
-const drawingStatusEnum = z.enum(["DRAFT", "APPROVED", "CANCELLED"]);
+const drawingStatusEnum = z.enum(["APPROVED", "CANCELLED"]);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 1. LIST DRAWINGS
@@ -189,14 +188,157 @@ export const getDrawingByIdProcedure = protectedProcedure
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 3. CREATE DRAWING (with overdraw logic)
+// Helper: compute overdraw context for an owner
+// ═══════════════════════════════════════════════════════════════════════════
+async function computeOverdrawContext(
+	organizationId: string,
+	ownerId: string,
+	amount: number,
+	bankAccountId: string | undefined,
+	projectId: string | undefined,
+) {
+	// Fetch owner
+	const owner = await db.organizationOwner.findFirst({
+		where: { id: ownerId, organizationId },
+		select: { id: true, name: true, ownershipPercent: true, isActive: true },
+	});
+
+	if (!owner) {
+		throw new ORPCError("NOT_FOUND", { message: "المالك/الشريك غير موجود" });
+	}
+
+	const ownershipPercent = Number(owner.ownershipPercent);
+
+	// Bank balance
+	let bankBalance: number | null = null;
+	let bankSufficient = true;
+	if (bankAccountId) {
+		const bank = await db.organizationBank.findFirst({
+			where: { id: bankAccountId, organizationId },
+			select: { balance: true },
+		});
+		bankBalance = bank ? Number(bank.balance) : null;
+		bankSufficient = bankBalance !== null && bankBalance >= amount;
+	}
+
+	let contextProfit = 0;
+	let totalPreviousDrawings = 0;
+	let contextType: "PROJECT" | "COMPANY" = "COMPANY";
+	let projectName: string | null = null;
+
+	if (projectId) {
+		contextType = "PROJECT";
+
+		const costCenter = await getCostCenterByProject(db, organizationId, {
+			projectId,
+		});
+		const projectData = costCenter.projects.find(
+			(p) => p.projectId === projectId,
+		);
+		contextProfit = projectData?.netProfit ?? 0;
+		projectName = projectData?.projectName ?? null;
+
+		// Sum APPROVED drawings for this project by this owner
+		const existingDrawings = await db.ownerDrawing.aggregate({
+			where: {
+				organizationId,
+				projectId,
+				ownerId,
+				status: "APPROVED",
+			},
+			_sum: { amount: true },
+		});
+		totalPreviousDrawings = Number(existingDrawings._sum?.amount ?? 0);
+	} else {
+		const now = new Date();
+		const yearStart = new Date(now.getFullYear(), 0, 1);
+		const yearEnd = new Date(now.getFullYear(), 11, 31);
+
+		const incomeStatement = await getJournalIncomeStatement(
+			db,
+			organizationId,
+			{ dateFrom: yearStart, dateTo: yearEnd },
+		);
+		contextProfit = incomeStatement.netProfit;
+
+		// Sum APPROVED company-level drawings (projectId = null) for this owner this year
+		const existingDrawings = await db.ownerDrawing.aggregate({
+			where: {
+				organizationId,
+				ownerId,
+				projectId: null,
+				status: "APPROVED",
+				date: { gte: yearStart, lte: yearEnd },
+			},
+			_sum: { amount: true },
+		});
+		totalPreviousDrawings = Number(existingDrawings._sum?.amount ?? 0);
+	}
+
+	const ownerShareOfContext = contextProfit * (ownershipPercent / 100);
+
+	// Capital contributions total for this owner
+	let capitalContributionsTotal = 0;
+	try {
+		const contributions = await db.capitalContribution.aggregate({
+			where: { organizationId, ownerId },
+			_sum: { amount: true },
+		});
+		capitalContributionsTotal = Number(contributions._sum?.amount ?? 0);
+	} catch {
+		// Table may not exist yet — ignore
+	}
+
+	const availableForOwner =
+		ownerShareOfContext + capitalContributionsTotal - totalPreviousDrawings;
+	const willExceed = amount > availableForOwner;
+	const overdrawAmount = willExceed ? amount - availableForOwner : 0;
+
+	// Other partners (informational)
+	const allOwners = await db.organizationOwner.findMany({
+		where: { organizationId, isActive: true, id: { not: ownerId } },
+		select: { id: true, name: true, ownershipPercent: true },
+		orderBy: { name: "asc" },
+	});
+
+	const otherPartners = allOwners.map((o) => ({
+		ownerId: o.id,
+		ownerName: o.name,
+		ownershipPercent: Number(o.ownershipPercent),
+		theirShareOfContext: contextProfit * (Number(o.ownershipPercent) / 100),
+	}));
+
+	return {
+		owner,
+		ownershipPercent,
+		contextType,
+		contextProfit,
+		projectName,
+		ownerName: owner.name,
+		ownerShareOfContext,
+		totalPreviousDrawings,
+		capitalContributions: capitalContributionsTotal,
+		availableForOwner,
+		willExceed,
+		overdrawAmount,
+		bankBalance,
+		bankSufficient,
+		balanceAfterDrawing:
+			bankBalance !== null ? bankBalance - amount : null,
+		otherPartners,
+	};
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 3. CREATE DRAWING (APPROVED مباشرة — no draft/approval flow)
 // ═══════════════════════════════════════════════════════════════════════════
 export const createDrawingProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/accounting/owner-drawings",
 		tags: ["Accounting", "Owner Drawings"],
-		summary: "Create a new owner drawing with overdraw detection",
+		summary:
+			"Create a new owner drawing — APPROVED immediately with overdraw detection",
 	})
 	.input(
 		z.object({
@@ -214,7 +356,7 @@ export const createDrawingProcedure = subscriptionProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "create",
+			action: "payments",
 		});
 
 		// Step 1: Verify owner exists and is active
@@ -254,7 +396,7 @@ export const createDrawingProcedure = subscriptionProcedure
 			? "PROJECT_SPECIFIC"
 			: "COMPANY_LEVEL";
 
-		// Step 3: Check bank balance if bankAccountId provided
+		// Step 3: Check bank balance (hard block)
 		if (input.bankAccountId) {
 			const bank = await db.organizationBank.findFirst({
 				where: {
@@ -298,84 +440,33 @@ export const createDrawingProcedure = subscriptionProcedure
 			}
 		}
 
-		// Step 5: Overdraw check
-		const ownershipPercent = Number(owner.ownershipPercent);
-		let available = 0;
-		let totalProfit = 0;
-		let previousDrawings = 0;
-		let expectedShare = 0;
-
-		if (input.projectId) {
-			// Project-specific: get profit from cost center
-			const costCenter = await getCostCenterByProject(
-				db,
-				input.organizationId,
-				{ projectId: input.projectId },
-			);
-			const projectData = costCenter.projects.find(
-				(p) => p.projectId === input.projectId,
-			);
-			totalProfit = projectData?.netProfit ?? 0;
-
-			// Sum existing APPROVED drawings for this project
-			const existingDrawings = await db.ownerDrawing.aggregate({
-				where: {
-					organizationId: input.organizationId,
-					projectId: input.projectId,
-					ownerId: input.ownerId,
-					status: "APPROVED",
-				},
-				_sum: { amount: true },
-			});
-			previousDrawings = Number(existingDrawings._sum?.amount ?? 0);
-
-			expectedShare = totalProfit * (ownershipPercent / 100);
-			available = expectedShare - previousDrawings;
-		} else {
-			// Company-level: get income statement for current year
-			const now = new Date();
-			const yearStart = new Date(now.getFullYear(), 0, 1);
-			const yearEnd = new Date(now.getFullYear(), 11, 31);
-
-			const incomeStatement = await getJournalIncomeStatement(
-				db,
-				input.organizationId,
-				{ dateFrom: yearStart, dateTo: yearEnd },
-			);
-			totalProfit = incomeStatement.netProfit;
-
-			// Sum all APPROVED drawings for this owner for current year
-			const existingDrawings = await db.ownerDrawing.aggregate({
-				where: {
-					organizationId: input.organizationId,
-					ownerId: input.ownerId,
-					status: "APPROVED",
-					date: { gte: yearStart, lte: yearEnd },
-				},
-				_sum: { amount: true },
-			});
-			previousDrawings = Number(existingDrawings._sum?.amount ?? 0);
-
-			expectedShare = totalProfit * (ownershipPercent / 100);
-			available = expectedShare - previousDrawings;
-		}
-
-		const isOverdraw = input.amount > available;
+		// Step 5: Overdraw check (same logic as checkOverdraw)
+		const overdrawCtx = await computeOverdrawContext(
+			input.organizationId,
+			input.ownerId,
+			input.amount,
+			input.bankAccountId,
+			input.projectId,
+		);
 
 		// Step 6: If overdraw detected and not acknowledged → throw for confirmation
-		if (isOverdraw && !input.acknowledgeOverdraw) {
+		if (overdrawCtx.willExceed && !input.acknowledgeOverdraw) {
 			throw new ORPCError("CONFLICT", {
 				message: "OVERDRAW_REQUIRES_CONFIRMATION",
 				data: {
 					code: "OVERDRAW_REQUIRES_CONFIRMATION",
-					overdrawAmount: input.amount - available,
-					available,
-					totalProfit,
-					previousDrawings,
-					ownershipPercent,
-					expectedShare,
+					overdrawAmount: overdrawCtx.overdrawAmount,
+					availableForOwner: overdrawCtx.availableForOwner,
+					contextProfit: overdrawCtx.contextProfit,
+					totalPreviousDrawings: overdrawCtx.totalPreviousDrawings,
+					ownershipPercent: overdrawCtx.ownershipPercent,
+					ownerShareOfContext: overdrawCtx.ownerShareOfContext,
+					capitalContributions: overdrawCtx.capitalContributions,
 					requestedAmount: input.amount,
 					drawingType,
+					contextType: overdrawCtx.contextType,
+					ownerName: overdrawCtx.ownerName,
+					otherPartners: overdrawCtx.otherPartners,
 				},
 			});
 		}
@@ -388,10 +479,10 @@ export const createDrawingProcedure = subscriptionProcedure
 			overdrawAcknowledgedAt?: Date;
 		} = { hasOverdrawWarning: false };
 
-		if (isOverdraw && input.acknowledgeOverdraw) {
+		if (overdrawCtx.willExceed && input.acknowledgeOverdraw) {
 			overdrawData = {
 				hasOverdrawWarning: true,
-				overdrawAmount: input.amount - available,
+				overdrawAmount: overdrawCtx.overdrawAmount,
 				overdrawAcknowledgedBy: context.user.id,
 				overdrawAcknowledgedAt: new Date(),
 			};
@@ -400,32 +491,93 @@ export const createDrawingProcedure = subscriptionProcedure
 		// Step 8: Generate drawing number
 		const drawingNo = await generateAtomicNo(input.organizationId, "OD");
 
-		// Step 9: Create OwnerDrawing record
-		const drawing = await db.ownerDrawing.create({
-			data: {
-				organizationId: input.organizationId,
-				drawingNo,
-				date: input.date,
-				amount: input.amount,
-				ownerId: input.ownerId,
-				bankAccountId: input.bankAccountId ?? null,
-				projectId: input.projectId ?? null,
-				type: drawingType,
-				description: input.description ?? null,
-				notes: input.notes ?? null,
-				status: "DRAFT",
-				createdById: context.user.id,
-				hasOverdrawWarning: overdrawData.hasOverdrawWarning,
-				overdrawAmount: overdrawData.overdrawAmount ?? null,
-				overdrawAcknowledgedBy: overdrawData.overdrawAcknowledgedBy ?? null,
-				overdrawAcknowledgedAt: overdrawData.overdrawAcknowledgedAt ?? null,
-			},
-			include: {
-				owner: { select: { id: true, name: true } },
-				project: { select: { id: true, name: true } },
-			},
+		// Step 9: Transaction — create APPROVED + decrement bank atomically
+		const drawing = await db.$transaction(async (tx) => {
+			const created = await tx.ownerDrawing.create({
+				data: {
+					organizationId: input.organizationId,
+					drawingNo,
+					date: input.date,
+					amount: input.amount,
+					ownerId: input.ownerId,
+					bankAccountId: input.bankAccountId ?? null,
+					projectId: input.projectId ?? null,
+					type: drawingType,
+					description: input.description ?? null,
+					notes: input.notes ?? null,
+					status: "APPROVED",
+					approvedById: context.user.id,
+					approvedAt: new Date(),
+					createdById: context.user.id,
+					hasOverdrawWarning: overdrawData.hasOverdrawWarning,
+					overdrawAmount: overdrawData.overdrawAmount ?? null,
+					overdrawAcknowledgedBy:
+						overdrawData.overdrawAcknowledgedBy ?? null,
+					overdrawAcknowledgedAt:
+						overdrawData.overdrawAcknowledgedAt ?? null,
+				},
+				include: {
+					owner: { select: { id: true, name: true } },
+					project: { select: { id: true, name: true } },
+				},
+			});
+
+			// Decrement bank balance atomically
+			if (input.bankAccountId) {
+				await tx.organizationBank.update({
+					where: { id: input.bankAccountId },
+					data: {
+						balance: { decrement: input.amount },
+					},
+				});
+			}
+
+			return created;
 		});
 
+		// Step 10: Create journal entry (outside transaction — silent failure)
+		let journalEntryId: string | null = null;
+		try {
+			journalEntryId = await onOwnerDrawing(db, {
+				id: drawing.id,
+				organizationId: input.organizationId,
+				drawingNo,
+				amount: drawing.amount,
+				date: input.date,
+				ownerName: owner.name,
+				drawingsAccountId: owner.drawingsAccountId,
+				bankAccountId: input.bankAccountId ?? null,
+				projectId: input.projectId ?? null,
+				projectName: drawing.project?.name ?? null,
+				userId: context.user.id,
+			});
+		} catch (e) {
+			console.error(
+				"[AutoJournal] Failed to generate entry for owner drawing:",
+				e,
+			);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: drawing.id,
+				metadata: {
+					error: String(e),
+					referenceType: "OWNER_DRAWING",
+				},
+			});
+		}
+
+		// Link journal entry to drawing
+		if (journalEntryId) {
+			await db.ownerDrawing.update({
+				where: { id: drawing.id },
+				data: { journalEntryId },
+			});
+		}
+
+		// Audit log
 		orgAuditLog({
 			organizationId: input.organizationId,
 			actorId: context.user.id,
@@ -438,10 +590,11 @@ export const createDrawingProcedure = subscriptionProcedure
 				ownerId: input.ownerId,
 				ownerName: owner.name,
 				drawingType,
+				hasJournalEntry: !!journalEntryId,
 			},
 		});
 
-		if (isOverdraw && input.acknowledgeOverdraw) {
+		if (overdrawCtx.willExceed && input.acknowledgeOverdraw) {
 			orgAuditLog({
 				organizationId: input.organizationId,
 				actorId: context.user.id,
@@ -450,10 +603,10 @@ export const createDrawingProcedure = subscriptionProcedure
 				entityId: drawing.id,
 				metadata: {
 					drawingNo,
-					overdrawAmount: input.amount - available,
-					available,
-					totalProfit,
-					expectedShare,
+					overdrawAmount: overdrawCtx.overdrawAmount,
+					availableForOwner: overdrawCtx.availableForOwner,
+					contextProfit: overdrawCtx.contextProfit,
+					ownerShareOfContext: overdrawCtx.ownerShareOfContext,
 				},
 			});
 		}
@@ -468,188 +621,14 @@ export const createDrawingProcedure = subscriptionProcedure
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 4. APPROVE DRAWING (DRAFT → APPROVED)
-// ═══════════════════════════════════════════════════════════════════════════
-export const approveDrawingProcedure = subscriptionProcedure
-	.route({
-		method: "POST",
-		path: "/accounting/owner-drawings/{id}/approve",
-		tags: ["Accounting", "Owner Drawings"],
-		summary: "Approve an owner drawing (DRAFT → APPROVED)",
-	})
-	.input(
-		z.object({
-			organizationId: idString(),
-			id: idString(),
-		}),
-	)
-	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "finance",
-			action: "edit",
-		});
-
-		const drawing = await db.ownerDrawing.findFirst({
-			where: {
-				id: input.id,
-				organizationId: input.organizationId,
-			},
-			include: {
-				owner: {
-					select: {
-						id: true,
-						name: true,
-						drawingsAccountId: true,
-					},
-				},
-				project: { select: { id: true, name: true } },
-			},
-		});
-
-		if (!drawing) {
-			throw new ORPCError("NOT_FOUND", {
-				message: "سحب المالك غير موجود",
-			});
-		}
-		if (drawing.status !== "DRAFT") {
-			throw new ORPCError("BAD_REQUEST", {
-				message: "يمكن اعتماد السحوبات بحالة مسودة فقط",
-			});
-		}
-		if (!drawing.owner.drawingsAccountId) {
-			throw new ORPCError("BAD_REQUEST", {
-				message:
-					"لا يوجد حساب سحوبات مخصص لهذا الشريك. يرجى إعداد حساب السحوبات أولاً",
-			});
-		}
-
-		// Re-check bank balance (may have changed since creation)
-		if (drawing.bankAccountId) {
-			const bank = await db.organizationBank.findFirst({
-				where: {
-					id: drawing.bankAccountId,
-					organizationId: input.organizationId,
-				},
-				select: { id: true, balance: true, name: true },
-			});
-
-			if (!bank) {
-				throw new ORPCError("BAD_REQUEST", {
-					message: "الحساب البنكي غير موجود",
-				});
-			}
-
-			if (Number(bank.balance) < Number(drawing.amount)) {
-				throw new ORPCError("BAD_REQUEST", {
-					message: `رصيد البنك غير كافٍ. الرصيد الحالي: ${Number(bank.balance).toLocaleString("en-US")} ر.س`,
-					data: {
-						code: "INSUFFICIENT_BANK_BALANCE",
-						currentBalance: Number(bank.balance),
-						requestedAmount: Number(drawing.amount),
-					},
-				});
-			}
-		}
-
-		// Transaction: update status + decrement bank + create journal entry
-		const updated = await db.$transaction(async (tx) => {
-			// Update drawing status
-			const updatedDrawing = await tx.ownerDrawing.update({
-				where: { id: input.id },
-				data: {
-					status: "APPROVED",
-					approvedById: context.user.id,
-					approvedAt: new Date(),
-				},
-			});
-
-			// Decrement bank balance if bankAccountId present
-			if (drawing.bankAccountId) {
-				await tx.organizationBank.update({
-					where: { id: drawing.bankAccountId },
-					data: {
-						balance: { decrement: Number(drawing.amount) },
-					},
-				});
-			}
-
-			return updatedDrawing;
-		});
-
-		// Create journal entry (outside transaction — silent failure)
-		let journalEntryId: string | null = null;
-		try {
-			journalEntryId = await onOwnerDrawing(db, {
-				id: drawing.id,
-				organizationId: input.organizationId,
-				drawingNo: drawing.drawingNo,
-				amount: drawing.amount,
-				date: drawing.date,
-				ownerName: drawing.owner.name,
-				drawingsAccountId: drawing.owner.drawingsAccountId,
-				bankAccountId: drawing.bankAccountId,
-				projectId: drawing.projectId,
-				projectName: drawing.project?.name ?? null,
-				userId: context.user.id,
-			});
-		} catch (e) {
-			console.error(
-				"[AutoJournal] Failed to generate entry for owner drawing:",
-				e,
-			);
-			orgAuditLog({
-				organizationId: input.organizationId,
-				actorId: context.user.id,
-				action: "JOURNAL_ENTRY_FAILED",
-				entityType: "journal_entry",
-				entityId: input.id,
-				metadata: {
-					error: String(e),
-					referenceType: "OWNER_DRAWING",
-				},
-			});
-		}
-
-		// Link journal entry to drawing
-		if (journalEntryId) {
-			await db.ownerDrawing.update({
-				where: { id: input.id },
-				data: { journalEntryId },
-			});
-		}
-
-		orgAuditLog({
-			organizationId: input.organizationId,
-			actorId: context.user.id,
-			action: "OWNER_DRAWING_APPROVED",
-			entityType: "owner_drawing",
-			entityId: input.id,
-			metadata: {
-				drawingNo: drawing.drawingNo,
-				amount: Number(drawing.amount),
-				ownerName: drawing.owner.name,
-				hasJournalEntry: !!journalEntryId,
-			},
-		});
-
-		return {
-			...updated,
-			amount: Number(updated.amount),
-			overdrawAmount: updated.overdrawAmount
-				? Number(updated.overdrawAmount)
-				: null,
-		};
-	});
-
-// ═══════════════════════════════════════════════════════════════════════════
-// 5. CANCEL DRAWING
+// 4. CANCEL DRAWING (APPROVED → CANCELLED)
 // ═══════════════════════════════════════════════════════════════════════════
 export const cancelDrawingProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/accounting/owner-drawings/{id}/cancel",
 		tags: ["Accounting", "Owner Drawings"],
-		summary: "Cancel an owner drawing",
+		summary: "Cancel an approved owner drawing",
 	})
 	.input(
 		z.object({
@@ -661,7 +640,7 @@ export const cancelDrawingProcedure = subscriptionProcedure
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
-			action: "edit",
+			action: "payments",
 		});
 
 		const drawing = await db.ownerDrawing.findFirst({
@@ -684,18 +663,15 @@ export const cancelDrawingProcedure = subscriptionProcedure
 				message: "سحب المالك غير موجود",
 			});
 		}
-		if (!["DRAFT", "APPROVED"].includes(drawing.status)) {
+		if (drawing.status !== "APPROVED") {
 			throw new ORPCError("BAD_REQUEST", {
-				message: "لا يمكن إلغاء هذا السحب",
+				message: "يمكن إلغاء السحوبات المعتمدة فقط",
 			});
 		}
 
-		const wasApproved = drawing.status === "APPROVED";
-
-		// Transaction: update status + restore bank balance if was approved
+		// Transaction: restore bank balance + update status
 		await db.$transaction(async (tx) => {
-			// Restore bank balance if was APPROVED and had a bank account
-			if (wasApproved && drawing.bankAccountId) {
+			if (drawing.bankAccountId) {
 				await tx.organizationBank.update({
 					where: { id: drawing.bankAccountId },
 					data: {
@@ -714,31 +690,29 @@ export const cancelDrawingProcedure = subscriptionProcedure
 			});
 		});
 
-		// Reverse journal entry if was approved
-		if (wasApproved) {
-			try {
-				await onOwnerDrawingCancelled(db, {
-					organizationId: input.organizationId,
-					drawingId: input.id,
-					userId: context.user.id,
-				});
-			} catch (e) {
-				console.error(
-					"[AutoJournal] Failed to reverse entry for cancelled owner drawing:",
-					e,
-				);
-				orgAuditLog({
-					organizationId: input.organizationId,
-					actorId: context.user.id,
-					action: "JOURNAL_ENTRY_FAILED",
-					entityType: "journal_entry",
-					entityId: input.id,
-					metadata: {
-						error: String(e),
-						referenceType: "OWNER_DRAWING",
-					},
-				});
-			}
+		// Reverse journal entry (silent failure)
+		try {
+			await onOwnerDrawingCancelled(db, {
+				organizationId: input.organizationId,
+				drawingId: input.id,
+				userId: context.user.id,
+			});
+		} catch (e) {
+			console.error(
+				"[AutoJournal] Failed to reverse entry for cancelled owner drawing:",
+				e,
+			);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "journal_entry",
+				entityId: input.id,
+				metadata: {
+					error: String(e),
+					referenceType: "OWNER_DRAWING",
+				},
+			});
 		}
 
 		orgAuditLog({
@@ -749,7 +723,6 @@ export const cancelDrawingProcedure = subscriptionProcedure
 			entityId: input.id,
 			metadata: {
 				drawingNo: drawing.drawingNo,
-				wasApproved,
 				cancelReason: input.cancelReason,
 				amount: Number(drawing.amount),
 			},
@@ -759,7 +732,7 @@ export const cancelDrawingProcedure = subscriptionProcedure
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 6. CHECK OVERDRAW (pre-check before creation)
+// 5. CHECK OVERDRAW (pre-check — real-time in form)
 // ═══════════════════════════════════════════════════════════════════════════
 export const checkOverdrawProcedure = protectedProcedure
 	.route({
@@ -783,122 +756,36 @@ export const checkOverdrawProcedure = protectedProcedure
 			action: "view",
 		});
 
-		// Fetch owner
-		const owner = await db.organizationOwner.findFirst({
-			where: {
-				id: input.ownerId,
-				organizationId: input.organizationId,
-			},
-			select: {
-				id: true,
-				name: true,
-				ownershipPercent: true,
-				isActive: true,
-			},
-		});
-
-		if (!owner) {
-			throw new ORPCError("NOT_FOUND", {
-				message: "المالك/الشريك غير موجود",
-			});
-		}
-
-		const ownershipPercent = Number(owner.ownershipPercent);
-
-		// Check bank balance
-		let bankBalance: number | null = null;
-		let bankSufficient = true;
-		if (input.bankAccountId) {
-			const bank = await db.organizationBank.findFirst({
-				where: {
-					id: input.bankAccountId,
-					organizationId: input.organizationId,
-				},
-				select: { balance: true },
-			});
-			bankBalance = bank ? Number(bank.balance) : null;
-			bankSufficient = bankBalance !== null && bankBalance >= input.amount;
-		}
-
-		let totalProfit = 0;
-		let previousDrawings = 0;
-		let expectedShare = 0;
-		let available = 0;
-		let drawingType: "COMPANY_LEVEL" | "PROJECT_SPECIFIC" = "COMPANY_LEVEL";
-		let projectName: string | null = null;
-
-		if (input.projectId) {
-			drawingType = "PROJECT_SPECIFIC";
-
-			const costCenter = await getCostCenterByProject(
-				db,
-				input.organizationId,
-				{ projectId: input.projectId },
-			);
-			const projectData = costCenter.projects.find(
-				(p) => p.projectId === input.projectId,
-			);
-			totalProfit = projectData?.netProfit ?? 0;
-			projectName = projectData?.projectName ?? null;
-
-			// Sum existing APPROVED drawings for this project by this owner
-			const existingDrawings = await db.ownerDrawing.aggregate({
-				where: {
-					organizationId: input.organizationId,
-					projectId: input.projectId,
-					ownerId: input.ownerId,
-					status: "APPROVED",
-				},
-				_sum: { amount: true },
-			});
-			previousDrawings = Number(existingDrawings._sum?.amount ?? 0);
-		} else {
-			const now = new Date();
-			const yearStart = new Date(now.getFullYear(), 0, 1);
-			const yearEnd = new Date(now.getFullYear(), 11, 31);
-
-			const incomeStatement = await getJournalIncomeStatement(
-				db,
-				input.organizationId,
-				{ dateFrom: yearStart, dateTo: yearEnd },
-			);
-			totalProfit = incomeStatement.netProfit;
-
-			const existingDrawings = await db.ownerDrawing.aggregate({
-				where: {
-					organizationId: input.organizationId,
-					ownerId: input.ownerId,
-					status: "APPROVED",
-					date: { gte: yearStart, lte: yearEnd },
-				},
-				_sum: { amount: true },
-			});
-			previousDrawings = Number(existingDrawings._sum?.amount ?? 0);
-		}
-
-		expectedShare = totalProfit * (ownershipPercent / 100);
-		available = expectedShare - previousDrawings;
-		const isOverdraw = input.amount > available;
+		const result = await computeOverdrawContext(
+			input.organizationId,
+			input.ownerId,
+			input.amount,
+			input.bankAccountId,
+			input.projectId,
+		);
 
 		return {
-			drawingType,
-			ownerName: owner.name,
-			ownershipPercent,
-			totalProfit,
-			expectedShare,
-			previousDrawings,
-			available,
+			contextType: result.contextType,
+			projectName: result.projectName,
+			contextProfit: result.contextProfit,
+			ownerName: result.ownerName,
+			ownershipPercent: result.ownershipPercent,
+			ownerShareOfContext: result.ownerShareOfContext,
+			totalPreviousDrawings: result.totalPreviousDrawings,
+			capitalContributions: result.capitalContributions,
+			availableForOwner: result.availableForOwner,
+			willExceed: result.willExceed,
+			overdrawAmount: result.overdrawAmount,
+			bankBalance: result.bankBalance,
+			bankSufficient: result.bankSufficient,
+			balanceAfterDrawing: result.balanceAfterDrawing,
 			requestedAmount: input.amount,
-			isOverdraw,
-			overdrawAmount: isOverdraw ? input.amount - available : 0,
-			bankBalance,
-			bankSufficient,
-			projectName,
+			otherPartners: result.otherPartners,
 		};
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 7. GET COMPANY SUMMARY
+// 6. GET COMPANY SUMMARY
 // ═══════════════════════════════════════════════════════════════════════════
 export const getCompanySummaryProcedure = protectedProcedure
 	.route({
@@ -1087,7 +974,7 @@ export const getCompanySummaryProcedure = protectedProcedure
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 8. GET PROJECT SUMMARY
+// 7. GET PROJECT SUMMARY
 // ═══════════════════════════════════════════════════════════════════════════
 export const getProjectSummaryProcedure = protectedProcedure
 	.route({
@@ -1170,7 +1057,7 @@ export const getProjectSummaryProcedure = protectedProcedure
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 9. GET OWNER SUMMARY
+// 8. GET OWNER SUMMARY
 // ═══════════════════════════════════════════════════════════════════════════
 export const getOwnerSummaryProcedure = protectedProcedure
 	.route({

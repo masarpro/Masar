@@ -2324,7 +2324,8 @@
         "accountingReports": "التقارير المحاسبية",
         "settings": "الإعدادات",
         "ownerDrawings": "سحوبات المالك",
-        "yearEndClosing": "الإقفال السنوي"
+        "yearEndClosing": "الإقفال السنوي",
+        "capitalContributions": "مساهمات رأس المال"
       }
     },
     "actions": {
@@ -3903,7 +3904,17 @@
       "reverseDialogDescription": "هل أنت متأكد من عكس إقفال السنة المالية {year}؟ سيتم عكس القيود المحاسبية المرتبطة.",
       "reverseSuccess": "تم عكس الإقفال السنوي بنجاح",
       "reverseFailed": "فشل عكس الإقفال السنوي",
-      "confirmReverse": "تأكيد العكس"
+      "confirmReverse": "تأكيد العكس",
+      "tabs": {
+        "summary": "الملخص",
+        "distribution": "توزيع الأرباح",
+        "entries": "القيود المقترحة",
+        "warnings": "التحذيرات"
+      },
+      "capitalContributions": "مساهمات رأس المال",
+      "newCapitalBalance": "رصيد رأس المال الجديد",
+      "proposedEntries": "القيود المقترحة",
+      "confirmTypeText": "أقفل السنة"
     },
     "ownerDrawings": {
       "title": "سحوبات المالك",
@@ -3925,10 +3936,16 @@
       "selectProject": "اختر مشروعاً (اختياري)",
       "status": "الحالة",
       "statuses": {
-        "DRAFT": "مسودة",
         "APPROVED": "معتمد",
         "CANCELLED": "ملغي"
       },
+      "createDrawing": "تسجيل السحب",
+      "contextProfit": "الربح",
+      "ownerShare": "حصة الشريك",
+      "availableForOwner": "المتاح للشريك",
+      "otherPartnersRights": "حقوق الشركاء الآخرين",
+      "capitalContributions": "مساهمات رأس المال",
+      "totalCount": "إجمالي السحوبات",
       "approve": "اعتماد السحب",
       "cancel": "إلغاء السحب",
       "print": "طباعة",
@@ -3964,14 +3981,14 @@
       "ownerBalance": "رصيد حساب الشريك",
       "totalDrawnThisYear": "إجمالي السحوبات هذا العام",
       "yearProfit": "ربح الشركة للعام",
-      "draftsCount": "سحوبات بانتظار الاعتماد",
       "allStatuses": "كل الحالات",
       "allOwners": "كل الشركاء",
       "summary": {
         "drawingsByOwner": "السحوبات لكل شريك",
         "drawingsByProject": "السحوبات لكل مشروع",
         "drawingsByMonth": "السحوبات حسب الشهر",
-        "difference": "الفرق"
+        "difference": "الفرق",
+        "totalCount": "إجمالي السحوبات"
       },
       "detail": {
         "drawingInfo": "بيانات السحب",
@@ -3984,6 +4001,38 @@
         "createdBy": "أُنشئ بواسطة",
         "createdAt": "تاريخ الإنشاء"
       }
+    },
+    "capitalContributions": {
+      "title": "مساهمات رأس المال",
+      "new": "مساهمة جديدة",
+      "create": "تسجيل المساهمة",
+      "contributionNo": "رقم المساهمة",
+      "date": "تاريخ المساهمة",
+      "amount": "مبلغ المساهمة",
+      "type": "نوع المساهمة",
+      "types": {
+        "INITIAL": "رأس مال ابتدائي",
+        "ADDITIONAL": "ضخ إضافي",
+        "IN_KIND": "مساهمة عينية"
+      },
+      "owner": "الشريك",
+      "bank": "الحساب البنكي",
+      "description": "الوصف",
+      "notes": "ملاحظات",
+      "selectOwner": "اختر الشريك",
+      "selectBank": "اختر الحساب البنكي",
+      "status": "الحالة",
+      "statuses": {
+        "ACTIVE": "فعّالة",
+        "CANCELLED": "ملغاة"
+      },
+      "cancel": "إلغاء المساهمة",
+      "cancelReason": "سبب الإلغاء",
+      "noContributions": "لا توجد مساهمات",
+      "noContributionsDescription": "لم يتم تسجيل أي مساهمات رأس مال بعد",
+      "totalContributions": "إجمالي المساهمات",
+      "created": "تم تسجيل المساهمة بنجاح",
+      "cancelled": "تم إلغاء المساهمة"
     },
     "accountingReports": {
       "title": "التقارير المحاسبية",

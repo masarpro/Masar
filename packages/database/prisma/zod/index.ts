@@ -713,6 +713,12 @@ export const OrganizationOwnerScalarFieldEnumSchema = z.enum(['id', 'organizatio
 
 export type OrganizationOwnerScalarFieldEnum = z.infer<typeof OrganizationOwnerScalarFieldEnumSchema>;
 
+// File: CapitalContributionScalarFieldEnum.schema.ts
+
+export const CapitalContributionScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'ownerId', 'contributionNo', 'date', 'amount', 'type', 'bankAccountId', 'description', 'notes', 'journalEntryId', 'status', 'cancelledAt', 'cancelReason', 'createdById', 'createdAt', 'updatedAt'])
+
+export type CapitalContributionScalarFieldEnum = z.infer<typeof CapitalContributionScalarFieldEnumSchema>;
+
 // File: OwnerDrawingScalarFieldEnum.schema.ts
 
 export const OwnerDrawingScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'drawingNo', 'date', 'amount', 'currency', 'ownerId', 'bankAccountId', 'projectId', 'type', 'description', 'notes', 'status', 'journalEntryId', 'hasOverdrawWarning', 'overdrawAmount', 'overdrawAcknowledgedBy', 'overdrawAcknowledgedAt', 'approvedById', 'approvedAt', 'cancelledAt', 'cancelReason', 'createdById', 'createdAt', 'updatedAt'])
@@ -1321,7 +1327,7 @@ export type ExpenseRunStatus = z.infer<typeof ExpenseRunStatusSchema>;
 
 // File: OrgAuditAction.schema.ts
 
-export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED', 'EXPENSE_PAID', 'EXPENSE_CANCELLED', 'EXPENSE_DELETED', 'PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'TRANSFER_CREATED', 'TRANSFER_CANCELLED', 'BANK_ACCOUNT_CREATED', 'BANK_ACCOUNT_UPDATED', 'BANK_ACCOUNT_SET_DEFAULT', 'BANK_ACCOUNT_DELETED', 'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_ITEMS_UPDATED', 'INVOICE_STATUS_CHANGED', 'INVOICE_CONVERTED_TO_TAX', 'INVOICE_PAYMENT_ADDED', 'INVOICE_PAYMENT_DELETED', 'INVOICE_DELETED', 'INVOICE_ISSUED', 'INVOICE_DUPLICATED', 'INVOICE_CREDIT_NOTE_CREATED', 'QUOTATION_CREATED', 'QUOTATION_UPDATED', 'QUOTATION_ITEMS_UPDATED', 'QUOTATION_STATUS_CHANGED', 'QUOTATION_DELETED', 'QUOTATION_CONVERTED', 'CLIENT_CREATED', 'CLIENT_UPDATED', 'CLIENT_DELETED', 'PAYROLL_RUN_APPROVED', 'PAYROLL_RUN_CANCELLED', 'JOURNAL_ENTRY_SKIPPED', 'JOURNAL_ENTRY_FAILED', 'PROJECT_CREATED', 'PROJECT_ARCHIVED', 'PROJECT_RESTORED', 'SETTINGS_UPDATED', 'ZATCA_INVOICE_SUBMITTED', 'ZATCA_INVOICE_CLEARED', 'ZATCA_INVOICE_REJECTED', 'RECEIPT_VOUCHER_CREATED', 'RECEIPT_VOUCHER_UPDATED', 'RECEIPT_VOUCHER_ISSUED', 'RECEIPT_VOUCHER_CANCELLED', 'PAYMENT_VOUCHER_CREATED', 'PAYMENT_VOUCHER_UPDATED', 'PAYMENT_VOUCHER_SUBMITTED', 'PAYMENT_VOUCHER_APPROVED', 'PAYMENT_VOUCHER_REJECTED', 'PAYMENT_VOUCHER_CANCELLED', 'HANDOVER_CREATED', 'HANDOVER_UPDATED', 'HANDOVER_DELETED', 'HANDOVER_SUBMITTED', 'HANDOVER_SIGNED', 'HANDOVER_COMPLETED', 'HANDOVER_ITEM_ADDED', 'HANDOVER_ITEM_UPDATED', 'HANDOVER_ITEM_DELETED', 'HANDOVER_ITEMS_IMPORTED', 'AI_CHAT_CREATED', 'AI_MESSAGE_SENT', 'OWNER_CREATED', 'OWNER_UPDATED', 'OWNER_DEACTIVATED', 'OWNER_DRAWING_CREATED', 'OWNER_DRAWING_APPROVED', 'OWNER_DRAWING_CANCELLED', 'OWNER_DRAWING_OVERDRAW_ACKNOWLEDGED', 'YEAR_END_CLOSING_EXECUTED', 'YEAR_END_CLOSING_REVERSED'])
+export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED', 'EXPENSE_PAID', 'EXPENSE_CANCELLED', 'EXPENSE_DELETED', 'PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'TRANSFER_CREATED', 'TRANSFER_CANCELLED', 'BANK_ACCOUNT_CREATED', 'BANK_ACCOUNT_UPDATED', 'BANK_ACCOUNT_SET_DEFAULT', 'BANK_ACCOUNT_DELETED', 'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_ITEMS_UPDATED', 'INVOICE_STATUS_CHANGED', 'INVOICE_CONVERTED_TO_TAX', 'INVOICE_PAYMENT_ADDED', 'INVOICE_PAYMENT_DELETED', 'INVOICE_DELETED', 'INVOICE_ISSUED', 'INVOICE_DUPLICATED', 'INVOICE_CREDIT_NOTE_CREATED', 'QUOTATION_CREATED', 'QUOTATION_UPDATED', 'QUOTATION_ITEMS_UPDATED', 'QUOTATION_STATUS_CHANGED', 'QUOTATION_DELETED', 'QUOTATION_CONVERTED', 'CLIENT_CREATED', 'CLIENT_UPDATED', 'CLIENT_DELETED', 'PAYROLL_RUN_APPROVED', 'PAYROLL_RUN_CANCELLED', 'JOURNAL_ENTRY_SKIPPED', 'JOURNAL_ENTRY_FAILED', 'PROJECT_CREATED', 'PROJECT_ARCHIVED', 'PROJECT_RESTORED', 'SETTINGS_UPDATED', 'ZATCA_INVOICE_SUBMITTED', 'ZATCA_INVOICE_CLEARED', 'ZATCA_INVOICE_REJECTED', 'RECEIPT_VOUCHER_CREATED', 'RECEIPT_VOUCHER_UPDATED', 'RECEIPT_VOUCHER_ISSUED', 'RECEIPT_VOUCHER_CANCELLED', 'PAYMENT_VOUCHER_CREATED', 'PAYMENT_VOUCHER_UPDATED', 'PAYMENT_VOUCHER_SUBMITTED', 'PAYMENT_VOUCHER_APPROVED', 'PAYMENT_VOUCHER_REJECTED', 'PAYMENT_VOUCHER_CANCELLED', 'HANDOVER_CREATED', 'HANDOVER_UPDATED', 'HANDOVER_DELETED', 'HANDOVER_SUBMITTED', 'HANDOVER_SIGNED', 'HANDOVER_COMPLETED', 'HANDOVER_ITEM_ADDED', 'HANDOVER_ITEM_UPDATED', 'HANDOVER_ITEM_DELETED', 'HANDOVER_ITEMS_IMPORTED', 'AI_CHAT_CREATED', 'AI_MESSAGE_SENT', 'OWNER_CREATED', 'OWNER_UPDATED', 'OWNER_DEACTIVATED', 'OWNER_DRAWING_CREATED', 'OWNER_DRAWING_APPROVED', 'OWNER_DRAWING_CANCELLED', 'OWNER_DRAWING_OVERDRAW_ACKNOWLEDGED', 'CAPITAL_CONTRIBUTION_CREATED', 'CAPITAL_CONTRIBUTION_CANCELLED', 'YEAR_END_CLOSING_EXECUTED', 'YEAR_END_CLOSING_REVERSED'])
 
 export type OrgAuditAction = z.infer<typeof OrgAuditActionSchema>;
 
@@ -1379,6 +1385,12 @@ export const JournalEntryStatusSchema = z.enum(['DRAFT', 'POSTED', 'REVERSED'])
 
 export type JournalEntryStatus = z.infer<typeof JournalEntryStatusSchema>;
 
+// File: CapitalContributionType.schema.ts
+
+export const CapitalContributionTypeSchema = z.enum(['INITIAL', 'ADDITIONAL', 'IN_KIND'])
+
+export type CapitalContributionType = z.infer<typeof CapitalContributionTypeSchema>;
+
 // File: OwnerDrawingType.schema.ts
 
 export const OwnerDrawingTypeSchema = z.enum(['COMPANY_LEVEL', 'PROJECT_SPECIFIC'])
@@ -1387,7 +1399,7 @@ export type OwnerDrawingType = z.infer<typeof OwnerDrawingTypeSchema>;
 
 // File: OwnerDrawingStatus.schema.ts
 
-export const OwnerDrawingStatusSchema = z.enum(['DRAFT', 'APPROVED', 'CANCELLED'])
+export const OwnerDrawingStatusSchema = z.enum(['APPROVED', 'CANCELLED'])
 
 export type OwnerDrawingStatus = z.infer<typeof OwnerDrawingStatusSchema>;
 
@@ -4507,6 +4519,32 @@ export const OrganizationOwnerSchema = z.object({
 export type OrganizationOwnerType = z.infer<typeof OrganizationOwnerSchema>;
 
 
+// File: CapitalContribution.schema.ts
+
+export const CapitalContributionSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  ownerId: z.string(),
+  contributionNo: z.string(),
+  date: z.date(),
+  amount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'amount' must be a Decimal. Location: ['Models', 'CapitalContribution']",
+}),
+  type: CapitalContributionTypeSchema.default("INITIAL"),
+  bankAccountId: z.string().nullish(),
+  description: z.string().nullish(),
+  notes: z.string().nullish(),
+  journalEntryId: z.string().nullish(),
+  status: z.string().default("ACTIVE"),
+  cancelledAt: z.date().nullish(),
+  cancelReason: z.string().nullish(),
+  createdById: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type CapitalContributionModel = z.infer<typeof CapitalContributionSchema>;
+
 // File: OwnerDrawing.schema.ts
 
 export const OwnerDrawingSchema = z.object({
@@ -4524,7 +4562,7 @@ export const OwnerDrawingSchema = z.object({
   type: OwnerDrawingTypeSchema.default("COMPANY_LEVEL"),
   description: z.string().nullish(),
   notes: z.string().nullish(),
-  status: OwnerDrawingStatusSchema.default("DRAFT"),
+  status: OwnerDrawingStatusSchema.default("APPROVED"),
   journalEntryId: z.string().nullish(),
   hasOverdrawWarning: z.boolean(),
   overdrawAmount: z.instanceof(Prisma.Decimal, {
