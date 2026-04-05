@@ -37,8 +37,7 @@ interface OwnerFormProps {
 const ownerFormSchema = z.object({
 	name: z.string().min(1, "required").max(200),
 	nameEn: z.string().max(200).optional().or(z.literal("")),
-	ownershipPercent: z.coerce
-		.number()
+	ownershipPercent: z.number()
 		.min(0.01, "min 0.01")
 		.max(100, "max 100"),
 	nationalId: z.string().max(200).optional().or(z.literal("")),
@@ -212,6 +211,7 @@ export function OwnerForm({
 													min="0.01"
 													max="100"
 													{...field}
+													onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
 													className="pe-8"
 												/>
 												<span className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">

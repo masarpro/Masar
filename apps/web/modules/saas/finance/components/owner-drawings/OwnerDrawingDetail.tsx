@@ -239,7 +239,7 @@ export function OwnerDrawingDetail({
 						</Button>
 					)}
 					{drawing.status !== "CANCELLED" && (
-						<Button variant="destructive" onClick={() => setShowCancelDialog(true)}>
+						<Button variant="error" onClick={() => setShowCancelDialog(true)}>
 							<Ban className="me-2 h-4 w-4" />
 							{t("finance.ownerDrawings.actions.cancel")}
 						</Button>

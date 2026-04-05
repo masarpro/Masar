@@ -189,7 +189,7 @@ export function OwnerDetailPage({
 				</div>
 				{owner.isActive && (
 					<Button
-						variant="destructive"
+						variant="error"
 						size="sm"
 						onClick={() => setDeactivateOpen(true)}
 					>

@@ -344,7 +344,7 @@ export function YearEndClosingPage({
 					{!preview.isAlreadyClosed && (
 						<div className="flex justify-end">
 							<Button
-								variant="destructive"
+								variant="error"
 								className="rounded-xl"
 								onClick={() => setShowExecuteDialog(true)}
 								disabled={executeMutation.isPending}
@@ -524,7 +524,7 @@ export function YearEndClosingPage({
 					<AlertDialogHeader>
 						<AlertDialogTitle>{t("reverseDialogTitle")}</AlertDialogTitle>
 						<AlertDialogDescription>
-							{t("reverseDialogDescription", { year: reverseYear })}
+							{t("reverseDialogDescription", { year: reverseYear ?? 0 })}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter className="flex gap-2">

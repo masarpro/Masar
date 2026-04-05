@@ -36,7 +36,7 @@ const formSchema = z.object({
 	ownerId: z.string().min(1),
 	bankAccountId: z.string().optional(),
 	date: z.string().min(1),
-	amount: z.coerce.number().positive(),
+	amount: z.number().positive(),
 	projectId: z.string().optional(),
 	description: z.string().max(2000).optional(),
 	notes: z.string().max(5000).optional(),
