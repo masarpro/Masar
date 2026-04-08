@@ -72,6 +72,19 @@ export const createInvoiceProcedure = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
+		// === DEBUG: log validated input (only fires if Zod passed) ===
+		console.log("[INVOICE_BACKEND_DEBUG] === Zod validation PASSED ===");
+		console.log("[INVOICE_BACKEND_DEBUG] items count:", input.items.length);
+		input.items.forEach((item, idx) => {
+			console.log(`[INVOICE_BACKEND_DEBUG] Item ${idx}:`, {
+				description: JSON.stringify(item.description),
+				descriptionLength: item.description.length,
+				quantity: item.quantity,
+				unitPrice: item.unitPrice,
+			});
+		});
+		console.log("[INVOICE_BACKEND_DEBUG] === end validated input ===");
+
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
 			action: "invoices",

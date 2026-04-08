@@ -270,6 +270,24 @@ export function CreateInvoiceForm({
 
 	// Build the invoice payload (shared between save draft and issue flows)
 	const buildPayload = () => {
+		// === DEBUG: trace items through every transformation step ===
+		console.log("[INVOICE_DEBUG] === buildPayload() called ===");
+		console.log("[INVOICE_DEBUG] Raw items state:", JSON.stringify(items, null, 2));
+		console.log("[INVOICE_DEBUG] Items count:", items.length);
+		items.forEach((item, idx) => {
+			console.log(`[INVOICE_DEBUG] Item ${idx}:`, {
+				hasDescription: !!item.description,
+				descriptionType: typeof item.description,
+				descriptionValue: JSON.stringify(item.description),
+				descriptionLength: item.description?.length,
+				trimmedLength: (item.description ?? "").trim().length,
+				isOnlyWhitespace: item.description ? item.description.trim().length === 0 : "N/A (nullish)",
+				filterWillKeep: !!(item.description ?? "").trim(),
+				quantity: item.quantity,
+				unitPrice: item.unitPrice,
+			});
+		});
+
 		const filteredItems = items
 			.filter((item) => (item.description ?? "").trim())
 			.map((item) => ({
@@ -279,7 +297,10 @@ export function CreateInvoiceForm({
 				unitPrice: Number(item.unitPrice) || 0,
 			}));
 
-		return {
+		console.log("[INVOICE_DEBUG] Filtered items count:", filteredItems.length);
+		console.log("[INVOICE_DEBUG] Filtered items:", JSON.stringify(filteredItems, null, 2));
+
+		const payload = {
 			organizationId,
 			invoiceType,
 			clientId: clientId || undefined,
@@ -300,6 +321,10 @@ export function CreateInvoiceForm({
 			templateId: defaultTemplate?.id || undefined,
 			items: filteredItems,
 		};
+
+		console.log("[INVOICE_DEBUG] Final payload:", JSON.stringify(payload, null, 2));
+		console.log("[INVOICE_DEBUG] === end buildPayload() ===");
+		return payload;
 	};
 
 	// Map backend Zod error paths to human-readable Arabic messages
@@ -332,6 +357,15 @@ export function CreateInvoiceForm({
 			router.push(`${basePath}/${data.id}`);
 		},
 		onError: (error: any) => {
+			// === DEBUG: full error response ===
+			console.log("[INVOICE_DEBUG] === createMutation onError ===");
+			console.log("[INVOICE_DEBUG] Full error object:", JSON.stringify(error, null, 2));
+			console.log("[INVOICE_DEBUG] error.data:", JSON.stringify(error?.data, null, 2));
+			console.log("[INVOICE_DEBUG] error.issues:", JSON.stringify(error?.issues, null, 2));
+			console.log("[INVOICE_DEBUG] error.data?.issues:", JSON.stringify(error?.data?.issues, null, 2));
+			console.log("[INVOICE_DEBUG] error.message:", error?.message);
+			console.log("[INVOICE_DEBUG] === end error ===");
+
 			const issues = error?.data?.issues ?? error?.issues;
 			if (issues?.length) {
 				toast.error(`${t("finance.invoices.createError")}: ${formatValidationErrors(issues)}`);
@@ -372,6 +406,11 @@ export function CreateInvoiceForm({
 			router.push(`${basePath}/${data.id}`);
 		},
 		onError: (error: any) => {
+			// === DEBUG: full error response ===
+			console.log("[INVOICE_DEBUG] === createAndIssueMutation onError ===");
+			console.log("[INVOICE_DEBUG] Full error:", JSON.stringify(error, null, 2));
+			console.log("[INVOICE_DEBUG] === end error ===");
+
 			const issues = error?.data?.issues ?? error?.issues;
 			if (issues?.length) {
 				toast.error(`${t("finance.invoices.issueError")}: ${formatValidationErrors(issues)}`);
