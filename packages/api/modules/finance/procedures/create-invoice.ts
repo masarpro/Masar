@@ -132,10 +132,11 @@ export const createInvoiceProcedure = subscriptionProcedure
 				sellerTaxNumber,
 				items: input.items,
 			});
-		} catch (e) {
+		} catch (e: any) {
 			console.error("[createInvoice] Failed:", e);
+			const detail = e?.message || String(e);
 			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "فشل في إنشاء الفاتورة. يرجى المحاولة مرة أخرى.",
+				message: `فشل في إنشاء الفاتورة: ${detail}`,
 			});
 		}
 
