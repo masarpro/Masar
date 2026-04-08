@@ -22,8 +22,14 @@ const EXPECTED_ERROR_CODES = new Set([
 export const rpcHandler = new RPCHandler(router, {
 	clientInterceptors: [
 		onError(async (error) => {
+			// Log Zod validation details for debugging
+			const err = error as any;
+			const issues = err?.cause?.issues ?? err?.issues ?? err?.data?.issues;
+			if (issues) {
+				console.error("[Validation Issues]", JSON.stringify(issues));
+			}
 			logger.error(error);
-			const code = (error as any)?.code;
+			const code = err?.code;
 			if (!EXPECTED_ERROR_CODES.has(code)) {
 				console.error("[API Error]", error);
 			}

@@ -31,11 +31,23 @@ import {
 	financialAmount, percentage, quantity, unitPrice,
 } from "../../../lib/validation-constants";
 
+/** Recursively convert null → undefined so Zod .optional() / .nullish() both accept the value */
+function cleanNulls(obj: unknown): unknown {
+	if (obj === null) return undefined;
+	if (Array.isArray(obj)) return obj.map(cleanNulls);
+	if (obj && typeof obj === "object") {
+		const out: Record<string, unknown> = {};
+		for (const [k, v] of Object.entries(obj)) out[k] = cleanNulls(v);
+		return out;
+	}
+	return obj;
+}
+
 const invoiceItemSchema = z.object({
 	description: z.string().trim().min(1, "وصف البند مطلوب").max(MAX_NAME),
-	quantity: quantity().positive("الكمية يجب أن تكون موجبة"),
+	quantity: z.coerce.number().positive("الكمية يجب أن تكون موجبة").max(999_999),
 	unit: z.string().trim().max(50).optional(),
-	unitPrice: unitPrice().min(0, "السعر يجب أن يكون صفر أو أكبر"),
+	unitPrice: z.coerce.number().nonnegative("السعر يجب أن يكون صفر أو أكبر").max(99_999_999.99),
 });
 
 export const createInvoiceProcedure = subscriptionProcedure
@@ -46,27 +58,27 @@ export const createInvoiceProcedure = subscriptionProcedure
 		summary: "Create a new invoice",
 	})
 	.input(
-		z.object({
-			organizationId: idString(),
+		z.preprocess(cleanNulls, z.object({
+			organizationId: z.string().trim().min(1).max(100),
 			invoiceType: z.enum(["STANDARD", "TAX", "SIMPLIFIED"]).optional().default("STANDARD"),
 			clientId: z.string().trim().max(100).optional(),
 			clientName: z.string().trim().min(1, "اسم العميل مطلوب").max(MAX_NAME),
-			clientCompany: optionalTrimmed(MAX_NAME),
+			clientCompany: z.string().trim().max(MAX_NAME).optional(),
 			clientPhone: z.string().trim().max(MAX_PHONE).optional(),
-			clientEmail: z.string().trim().email().max(254).optional().or(z.literal("")),
-			clientAddress: optionalTrimmed(MAX_ADDRESS),
+			clientEmail: z.string().trim().max(254).optional(),
+			clientAddress: z.string().trim().max(MAX_ADDRESS).optional(),
 			clientTaxNumber: z.string().trim().max(MAX_CODE).optional(),
 			projectId: z.string().trim().max(100).optional(),
 			quotationId: z.string().trim().max(100).optional(),
 			issueDate: z.string().min(1),
 			dueDate: z.string().min(1),
-			paymentTerms: optionalTrimmed(MAX_DESC),
-			notes: optionalTrimmed(MAX_DESC),
+			paymentTerms: z.string().trim().max(MAX_DESC).optional(),
+			notes: z.string().trim().max(MAX_DESC).optional(),
 			templateId: z.string().trim().max(100).optional(),
-			vatPercent: percentage().optional().default(15),
-			discountPercent: percentage().optional().default(0),
+			vatPercent: z.coerce.number().min(0).max(100).optional().default(15),
+			discountPercent: z.coerce.number().min(0).max(100).optional().default(0),
 			items: z.array(invoiceItemSchema).min(1, "يجب إضافة بند واحد على الأقل").max(MAX_ARRAY),
-		}),
+		})),
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
@@ -164,26 +176,26 @@ export const updateInvoiceProcedure = subscriptionProcedure
 		summary: "Update an invoice",
 	})
 	.input(
-		z.object({
-			organizationId: idString(),
-			id: idString(),
+		z.preprocess(cleanNulls, z.object({
+			organizationId: z.string().trim().min(1).max(100),
+			id: z.string().trim().min(1).max(100),
 			invoiceType: z.enum(["STANDARD", "TAX", "SIMPLIFIED"]).optional(),
-			clientId: z.string().trim().max(100).nullish(),
+			clientId: z.string().trim().max(100).optional(),
 			clientName: z.string().trim().min(1).max(MAX_NAME).optional(),
-			clientCompany: optionalTrimmed(MAX_NAME),
+			clientCompany: z.string().trim().max(MAX_NAME).optional(),
 			clientPhone: z.string().trim().max(MAX_PHONE).optional(),
-			clientEmail: z.string().trim().email().max(254).optional().or(z.literal("")),
-			clientAddress: optionalTrimmed(MAX_ADDRESS),
+			clientEmail: z.string().trim().max(254).optional(),
+			clientAddress: z.string().trim().max(MAX_ADDRESS).optional(),
 			clientTaxNumber: z.string().trim().max(MAX_CODE).optional(),
-			projectId: z.string().trim().max(100).nullish(),
+			projectId: z.string().trim().max(100).optional(),
 			issueDate: z.string().min(1).optional(),
 			dueDate: z.string().min(1).optional(),
-			paymentTerms: optionalTrimmed(MAX_DESC),
-			notes: optionalTrimmed(MAX_DESC),
-			templateId: z.string().trim().max(100).nullish(),
-			vatPercent: percentage().optional(),
-			discountPercent: percentage().optional(),
-		}),
+			paymentTerms: z.string().trim().max(MAX_DESC).optional(),
+			notes: z.string().trim().max(MAX_DESC).optional(),
+			templateId: z.string().trim().max(100).optional(),
+			vatPercent: z.coerce.number().min(0).max(100).optional(),
+			discountPercent: z.coerce.number().min(0).max(100).optional(),
+		})),
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
@@ -251,11 +263,11 @@ export const updateInvoiceItemsProcedure = subscriptionProcedure
 		summary: "Update invoice items",
 	})
 	.input(
-		z.object({
-			organizationId: idString(),
-			id: idString(),
+		z.preprocess(cleanNulls, z.object({
+			organizationId: z.string().trim().min(1).max(100),
+			id: z.string().trim().min(1).max(100),
 			items: z.array(invoiceItemSchema.extend({ id: z.string().trim().max(100).optional() })).max(MAX_ARRAY),
-		}),
+		})),
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
