@@ -955,7 +955,7 @@ export async function generatePaymentNumber(
 }
 
 /**
- * Get all payments for an organization
+ * Get all payments for an organization (FinancePayment + ProjectPayment merged)
  */
 export async function getOrganizationPayments(
 	organizationId: string,
@@ -971,7 +971,12 @@ export async function getOrganizationPayments(
 		offset?: number;
 	},
 ) {
-	const where: {
+	const limit = options?.limit ?? 50;
+	const offset = options?.offset ?? 0;
+	const maxFetch = offset + limit;
+
+	// ── FinancePayment where clause ──
+	const financeWhere: {
 		organizationId: string;
 		destinationAccountId?: string;
 		clientId?: string;
@@ -985,52 +990,158 @@ export async function getOrganizationPayments(
 		}>;
 	} = { organizationId };
 
+	// ── ProjectPayment where clause ──
+	const projectWhere: {
+		organizationId: string;
+		destinationAccountId?: string;
+		projectId?: string;
+		date?: { gte?: Date; lte?: Date };
+		OR?: Array<{
+			paymentNo?: { contains: string; mode: "insensitive" };
+			description?: { contains: string; mode: "insensitive" };
+		}>;
+	} = { organizationId };
+
+	// Skip ProjectPayment when filtering by client (ProjectPayment has no client)
+	let includeProjectPayments = true;
+
 	if (options?.destinationAccountId) {
-		where.destinationAccountId = options.destinationAccountId;
+		financeWhere.destinationAccountId = options.destinationAccountId;
+		projectWhere.destinationAccountId = options.destinationAccountId;
 	}
 
 	if (options?.clientId) {
-		where.clientId = options.clientId;
+		financeWhere.clientId = options.clientId;
+		includeProjectPayments = false; // ProjectPayment has no clientId
 	}
 
 	if (options?.projectId) {
-		where.projectId = options.projectId;
+		financeWhere.projectId = options.projectId;
+		projectWhere.projectId = options.projectId;
 	}
 
 	if (options?.status) {
-		where.status = options.status;
+		financeWhere.status = options.status;
+		// ProjectPayment has no status field — skip them unless filtering for COMPLETED
+		if (options.status !== "COMPLETED") {
+			includeProjectPayments = false;
+		}
 	}
 
 	if (options?.dateFrom || options?.dateTo) {
-		where.date = {};
-		if (options.dateFrom) where.date.gte = options.dateFrom;
-		if (options.dateTo) where.date.lte = options.dateTo;
+		const dateFilter: { gte?: Date; lte?: Date } = {};
+		if (options?.dateFrom) dateFilter.gte = options.dateFrom;
+		if (options?.dateTo) dateFilter.lte = options.dateTo;
+		financeWhere.date = dateFilter;
+		projectWhere.date = { ...dateFilter };
 	}
 
 	if (options?.query) {
-		where.OR = [
+		financeWhere.OR = [
 			{ paymentNo: { contains: options.query, mode: "insensitive" } },
 			{ description: { contains: options.query, mode: "insensitive" } },
 			{ clientName: { contains: options.query, mode: "insensitive" } },
 		];
+		projectWhere.OR = [
+			{ paymentNo: { contains: options.query, mode: "insensitive" } },
+			{ description: { contains: options.query, mode: "insensitive" } },
+		];
 	}
 
-	const [payments, total] = await Promise.all([
-		db.financePayment.findMany({
-			where,
-			include: {
-				destinationAccount: { select: { id: true, name: true, accountType: true } },
-				client: { select: { id: true, name: true, company: true } },
-				project: { select: { id: true, name: true, slug: true } },
-				invoice: { select: { id: true, invoiceNo: true, totalAmount: true } },
-				createdBy: { select: { id: true, name: true } },
-			},
-			orderBy: { date: "desc" },
-			take: options?.limit ?? 50,
-			skip: options?.offset ?? 0,
-		}),
-		db.financePayment.count({ where }),
-	]);
+	// ── Query both tables in parallel ──
+	const [financePayments, projectPayments, financeTotal, projectTotal] =
+		await Promise.all([
+			db.financePayment.findMany({
+				where: financeWhere,
+				include: {
+					destinationAccount: {
+						select: { id: true, name: true, accountType: true },
+					},
+					client: { select: { id: true, name: true, company: true } },
+					project: { select: { id: true, name: true, slug: true } },
+					invoice: {
+						select: { id: true, invoiceNo: true, totalAmount: true },
+					},
+					createdBy: { select: { id: true, name: true } },
+				},
+				orderBy: { date: "desc" },
+				take: maxFetch,
+			}),
+			includeProjectPayments
+				? db.projectPayment.findMany({
+						where: projectWhere,
+						include: {
+							destinationAccount: {
+								select: { id: true, name: true },
+							},
+							project: {
+								select: { id: true, name: true, slug: true },
+							},
+							createdBy: { select: { id: true, name: true } },
+						},
+						orderBy: { date: "desc" },
+						take: maxFetch,
+					})
+				: Promise.resolve([]),
+			db.financePayment.count({ where: financeWhere }),
+			includeProjectPayments
+				? db.projectPayment.count({ where: projectWhere })
+				: Promise.resolve(0),
+		]);
+
+	// ── Normalize FinancePayment records ──
+	const normalizedFinance = financePayments.map((p) => ({
+		id: p.id,
+		paymentNo: p.paymentNo,
+		amount: p.amount,
+		date: p.date,
+		status: p.status,
+		paymentMethod: p.paymentMethod,
+		referenceNo: p.referenceNo,
+		description: p.description,
+		notes: p.notes,
+		destinationAccount: p.destinationAccount,
+		client: p.client,
+		project: p.project,
+		invoice: p.invoice,
+		createdBy: p.createdBy,
+		createdAt: p.createdAt,
+		_source: "org" as const,
+	}));
+
+	// ── Normalize ProjectPayment records ──
+	const normalizedProject = projectPayments.map((p) => ({
+		id: p.id,
+		paymentNo: p.paymentNo,
+		amount: p.amount,
+		date: p.date,
+		status: "COMPLETED" as const,
+		paymentMethod: p.paymentMethod,
+		referenceNo: p.referenceNo,
+		description: p.description,
+		notes: p.note,
+		destinationAccount: p.destinationAccount
+			? { ...p.destinationAccount, accountType: null }
+			: null,
+		client: null as { id: string; name: string; company: string | null } | null,
+		project: p.project,
+		invoice: null as {
+			id: string;
+			invoiceNo: string;
+			totalAmount: unknown;
+		} | null,
+		createdBy: p.createdBy,
+		createdAt: p.createdAt,
+		_source: "project" as const,
+	}));
+
+	// ── Merge, sort by date DESC, paginate ──
+	const merged = [...normalizedFinance, ...normalizedProject].sort(
+		(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+	);
+
+	const payments = merged.slice(offset, offset + limit);
+	const total = financeTotal + projectTotal;
 
 	return { payments, total };
 }

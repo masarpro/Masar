@@ -3009,6 +3009,7 @@
         "clientRequired": "Client name is required",
         "itemsRequired": "At least one item is required",
         "taxNumberRequired": "Tax number is required for tax invoices",
+        "quantityMustBePositive": "Quantity must be greater than zero for all items",
         "dueDateMustBeAfterIssueDate": "Due date must be after issue date",
         "orgNameRequired": "Organization name is required",
         "orgTaxNumberRequired": "Tax number is required for tax/simplified invoices",
@@ -4469,6 +4470,8 @@
       "noSearchResults": "No search results",
       "searchPlaceholder": "Search payments...",
       "printReceipt": "Print Receipt",
+      "projectPayment": "Project Payment",
+      "viewInProject": "View in Project",
       "afterPayment": "After Payment",
       "linkedItems": "Linked Items",
       "methods": {

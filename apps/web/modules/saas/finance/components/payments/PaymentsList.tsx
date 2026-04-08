@@ -49,6 +49,7 @@ import {
 	User,
 	FileText,
 	Printer,
+	FolderKanban,
 } from "lucide-react";
 import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
@@ -210,15 +211,30 @@ export function PaymentsList({
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{payments.map((payment: any) => (
+								{payments.map((payment: any) => {
+								const isProjectPayment = payment._source === "project";
+								const projectSlug = payment.project?.slug;
+								const projectPaymentPath = projectSlug
+									? `/app/${organizationSlug}/projects/${payment.project?.id}/finance/claims`
+									: null;
+
+								return (
 									<TableRow
-										key={payment.id}
+										key={`${payment._source ?? "org"}-${payment.id}`}
 										className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
 									>
 										<TableCell>
-											<Badge variant="outline" className="rounded-lg font-mono">
-												{payment.paymentNo}
-											</Badge>
+											<div className="flex items-center gap-2">
+												<Badge variant="outline" className="rounded-lg font-mono">
+													{payment.paymentNo}
+												</Badge>
+												{isProjectPayment && (
+													<Badge className="rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400 text-[10px] px-1.5 py-0">
+														<FolderKanban className="h-3 w-3 me-1" />
+														{t("finance.payments.projectPayment")}
+													</Badge>
+												)}
+											</div>
 										</TableCell>
 										<TableCell>
 											<div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
@@ -249,7 +265,11 @@ export function PaymentsList({
 										<TableCell>
 											<div className="flex items-center gap-2">
 												<Building className="h-4 w-4 text-slate-400" />
-												<span className="text-sm">{payment.destinationAccount?.name}</span>
+												<span className="text-sm">
+													{payment.destinationAccount?.name || (
+														<span className="text-slate-400">-</span>
+													)}
+												</span>
 											</div>
 										</TableCell>
 										<TableCell>
@@ -270,49 +290,65 @@ export function PaymentsList({
 													</Button>
 												</DropdownMenuTrigger>
 												<DropdownMenuContent align="end" className="rounded-xl">
-													<DropdownMenuItem
-														onClick={() =>
-															router.push(
-																`${effectiveBasePath}/${payment.id}`,
-															)
-														}
-													>
-														<Eye className="h-4 w-4 me-2" />
-														{t("common.view")}
-													</DropdownMenuItem>
-													<DropdownMenuItem
-														onClick={() =>
-															router.push(
-																`${effectiveBasePath}/${payment.id}/receipt`,
-															)
-														}
-													>
-														<Printer className="h-4 w-4 me-2" />
-														{t("finance.payments.printReceipt")}
-													</DropdownMenuItem>
-													<DropdownMenuItem
-														onClick={() =>
-															router.push(
-																`${effectiveBasePath}/${payment.id}`,
-															)
-														}
-													>
-														<Pencil className="h-4 w-4 me-2" />
-														{t("common.edit")}
-													</DropdownMenuItem>
-													<DropdownMenuSeparator />
-													<DropdownMenuItem
-														onClick={() => setDeletePaymentId(payment.id)}
-														className="text-red-600"
-													>
-														<Trash2 className="h-4 w-4 me-2" />
-														{t("common.delete")}
-													</DropdownMenuItem>
+													{isProjectPayment ? (
+														<>
+															{projectPaymentPath && (
+																<DropdownMenuItem
+																	onClick={() => router.push(projectPaymentPath)}
+																>
+																	<FolderKanban className="h-4 w-4 me-2" />
+																	{t("finance.payments.viewInProject")}
+																</DropdownMenuItem>
+															)}
+														</>
+													) : (
+														<>
+															<DropdownMenuItem
+																onClick={() =>
+																	router.push(
+																		`${effectiveBasePath}/${payment.id}`,
+																	)
+																}
+															>
+																<Eye className="h-4 w-4 me-2" />
+																{t("common.view")}
+															</DropdownMenuItem>
+															<DropdownMenuItem
+																onClick={() =>
+																	router.push(
+																		`${effectiveBasePath}/${payment.id}/receipt`,
+																	)
+																}
+															>
+																<Printer className="h-4 w-4 me-2" />
+																{t("finance.payments.printReceipt")}
+															</DropdownMenuItem>
+															<DropdownMenuItem
+																onClick={() =>
+																	router.push(
+																		`${effectiveBasePath}/${payment.id}`,
+																	)
+																}
+															>
+																<Pencil className="h-4 w-4 me-2" />
+																{t("common.edit")}
+															</DropdownMenuItem>
+															<DropdownMenuSeparator />
+															<DropdownMenuItem
+																onClick={() => setDeletePaymentId(payment.id)}
+																className="text-red-600"
+															>
+																<Trash2 className="h-4 w-4 me-2" />
+																{t("common.delete")}
+															</DropdownMenuItem>
+														</>
+													)}
 												</DropdownMenuContent>
 											</DropdownMenu>
 										</TableCell>
 									</TableRow>
-								))}
+								);
+							})}
 							</TableBody>
 						</Table>
 					)}

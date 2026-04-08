@@ -12,6 +12,7 @@ import {
 	db,
 } from "@repo/database";
 import { z } from "zod";
+import { ORPCError } from "@orpc/server";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import {
@@ -234,37 +235,48 @@ export const createExpenseProcedure = subscriptionProcedure
 		// Validate new hierarchical category
 		const cat = findCategoryById(input.categoryId);
 		if (!cat) {
-			throw new Error("فئة المصروف غير صالحة");
+			throw new ORPCError("BAD_REQUEST", {
+				message: "فئة المصروف غير صالحة",
+			});
 		}
 		if (input.subcategoryId) {
 			const sub = findSubcategoryById(input.categoryId, input.subcategoryId);
 			if (!sub) {
-				throw new Error("الفئة الفرعية غير صالحة");
+				throw new ORPCError("BAD_REQUEST", {
+					message: "الفئة الفرعية غير صالحة",
+				});
 			}
 		}
 
-		const expense = await createExpense({
-			organizationId: input.organizationId,
-			createdById: context.user.id,
-			category: input.category ?? "MISC",
-			customCategory: input.customCategory,
-			categoryId: input.categoryId,
-			subcategoryId: input.subcategoryId,
-			description: input.description,
-			amount: input.amount,
-			date: input.date,
-			sourceAccountId: input.sourceAccountId,
-			vendorName: input.vendorName,
-			vendorTaxNumber: input.vendorTaxNumber,
-			projectId: input.projectId,
-			invoiceRef: input.invoiceRef,
-			paymentMethod: input.paymentMethod,
-			referenceNo: input.referenceNo,
-			status: input.status,
-			sourceType: input.sourceType,
-			dueDate: input.dueDate,
-			notes: input.notes,
-		});
+		let expense: Awaited<ReturnType<typeof createExpense>>;
+		try {
+			expense = await createExpense({
+				organizationId: input.organizationId,
+				createdById: context.user.id,
+				category: input.category ?? "MISC",
+				customCategory: input.customCategory,
+				categoryId: input.categoryId,
+				subcategoryId: input.subcategoryId,
+				description: input.description,
+				amount: input.amount,
+				date: input.date,
+				sourceAccountId: input.sourceAccountId,
+				vendorName: input.vendorName,
+				vendorTaxNumber: input.vendorTaxNumber,
+				projectId: input.projectId,
+				invoiceRef: input.invoiceRef,
+				paymentMethod: input.paymentMethod,
+				referenceNo: input.referenceNo,
+				status: input.status,
+				sourceType: input.sourceType,
+				dueDate: input.dueDate,
+				notes: input.notes,
+			});
+		} catch (e) {
+			console.error("[CreateExpense] Failed:", e);
+			const msg = e instanceof Error ? e.message : "فشل إنشاء المصروف";
+			throw new ORPCError("BAD_REQUEST", { message: msg });
+		}
 
 		orgAuditLog({
 			organizationId: input.organizationId,

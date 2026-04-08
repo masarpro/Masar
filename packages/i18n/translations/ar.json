@@ -2976,6 +2976,7 @@
         "clientRequired": "اسم العميل مطلوب",
         "itemsRequired": "يجب إضافة بند واحد على الأقل",
         "taxNumberRequired": "الرقم الضريبي مطلوب للفاتورة الضريبية",
+        "quantityMustBePositive": "الكمية يجب أن تكون أكبر من صفر لجميع البنود",
         "dueDateMustBeAfterIssueDate": "تاريخ الاستحقاق يجب أن يكون بعد تاريخ الإصدار",
         "orgNameRequired": "اسم المنشأة مطلوب. يرجى إضافته في إعدادات المنظمة",
         "orgTaxNumberRequired": "الرقم الضريبي مطلوب للفاتورة الضريبية/المبسطة",
@@ -4491,6 +4492,8 @@
       "noSearchResults": "لا توجد نتائج للبحث",
       "searchPlaceholder": "البحث في المقبوضات...",
       "printReceipt": "طباعة سند القبض",
+      "projectPayment": "دفعة مشروع",
+      "viewInProject": "عرض في المشروع",
       "afterPayment": "بعد الاستلام",
       "linkedItems": "العناصر المرتبطة",
       "methods": {

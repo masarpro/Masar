@@ -185,15 +185,15 @@ export function CreateInvoiceForm({
 			setDueDate(new Date(invoice.dueDate).toISOString().split("T")[0]);
 			setPaymentTerms(invoice.paymentTerms ?? "");
 			setNotes(invoice.notes ?? "");
-			setVatPercent(invoice.vatPercent);
-			setDiscountPercent(invoice.discountPercent);
+			setVatPercent(Number(invoice.vatPercent) || 15);
+			setDiscountPercent(Number(invoice.discountPercent) || 0);
 			setItems(
 				invoice.items.map((item: any) => ({
 					id: item.id,
 					description: item.description,
-					quantity: item.quantity,
+					quantity: Number(item.quantity) || 1,
 					unit: item.unit ?? "",
-					unitPrice: item.unitPrice,
+					unitPrice: Number(item.unitPrice) || 0,
 				})),
 			);
 		}
@@ -228,17 +228,17 @@ export function CreateInvoiceForm({
 				setProjectId(quotation.projectId);
 				setShowProjectLink(true);
 			}
-			setVatPercent(quotation.vatPercent);
-			setDiscountPercent(quotation.discountPercent);
+			setVatPercent(Number(quotation.vatPercent) || 15);
+			setDiscountPercent(Number(quotation.discountPercent) || 0);
 			setPaymentTerms(quotation.paymentTerms ?? "");
 			setNotes(quotation.notes ?? "");
 			setItems(
 				quotation.items.map((item: any, index: any) => ({
 					id: String(index + 1),
 					description: item.description,
-					quantity: item.quantity,
+					quantity: Number(item.quantity) || 1,
 					unit: item.unit ?? "",
-					unitPrice: item.unitPrice,
+					unitPrice: Number(item.unitPrice) || 0,
 				})),
 			);
 			setClientDetailsOpen(true);
@@ -260,29 +260,29 @@ export function CreateInvoiceForm({
 	const buildPayload = () => ({
 		organizationId,
 		invoiceType,
-		clientId,
-		clientName,
-		clientCompany,
-		clientPhone,
-		clientEmail,
-		clientAddress,
-		clientTaxNumber,
+		clientId: clientId || undefined,
+		clientName: clientName.trim(),
+		clientCompany: clientCompany.trim() || undefined,
+		clientPhone: clientPhone.trim() || undefined,
+		clientEmail: clientEmail.trim() || undefined,
+		clientAddress: clientAddress.trim() || undefined,
+		clientTaxNumber: clientTaxNumber.trim() || undefined,
 		projectId: !showProjectLink || projectId === "none" ? undefined : projectId,
 		quotationId: quotationId ?? undefined,
 		issueDate: new Date(issueDate).toISOString(),
 		dueDate: new Date(dueDate).toISOString(),
-		paymentTerms,
-		notes,
-		vatPercent,
-		discountPercent,
+		paymentTerms: paymentTerms.trim() || undefined,
+		notes: notes.trim() || undefined,
+		vatPercent: Number(vatPercent) || 0,
+		discountPercent: Number(discountPercent) || 0,
 		templateId: defaultTemplate?.id,
 		items: items
 			.filter((item) => item.description.trim())
 			.map((item) => ({
-				description: item.description,
-				quantity: item.quantity,
-				unit: item.unit || undefined,
-				unitPrice: item.unitPrice,
+				description: item.description.trim(),
+				quantity: Math.max(Number(item.quantity) || 1, 0.01),
+				unit: item.unit?.trim() || undefined,
+				unitPrice: Number(item.unitPrice) || 0,
 			})),
 	});
 
@@ -296,7 +296,13 @@ export function CreateInvoiceForm({
 			router.push(`${basePath}/${data.id}`);
 		},
 		onError: (error: any) => {
-			toast.error(error.message || t("finance.invoices.createError"));
+			const issues = error?.data?.issues ?? error?.issues;
+			if (issues?.length) {
+				const fields = issues.map((i: any) => i.path?.join(".") || i.message).join(", ");
+				toast.error(`${t("finance.invoices.createError")}: ${fields}`);
+			} else {
+				toast.error(error.message || t("finance.invoices.createError"));
+			}
 		},
 	});
 
@@ -331,7 +337,13 @@ export function CreateInvoiceForm({
 			router.push(`${basePath}/${data.id}`);
 		},
 		onError: (error: any) => {
-			toast.error(error.message || t("finance.invoices.issueError"));
+			const issues = error?.data?.issues ?? error?.issues;
+			if (issues?.length) {
+				const fields = issues.map((i: any) => i.path?.join(".") || i.message).join(", ");
+				toast.error(`${t("finance.invoices.issueError")}: ${fields}`);
+			} else {
+				toast.error(error.message || t("finance.invoices.issueError"));
+			}
 		},
 	});
 
@@ -342,20 +354,20 @@ export function CreateInvoiceForm({
 				organizationId,
 				id: invoiceId!,
 				invoiceType,
-				clientId,
-				clientName,
-				clientCompany,
-				clientPhone,
-				clientEmail,
-				clientAddress,
-				clientTaxNumber,
+				clientId: clientId || undefined,
+				clientName: clientName.trim(),
+				clientCompany: clientCompany.trim() || undefined,
+				clientPhone: clientPhone.trim() || undefined,
+				clientEmail: clientEmail.trim() || undefined,
+				clientAddress: clientAddress.trim() || undefined,
+				clientTaxNumber: clientTaxNumber.trim() || undefined,
 				projectId: !showProjectLink || projectId === "none" ? null : projectId,
 				issueDate: new Date(issueDate).toISOString(),
 				dueDate: new Date(dueDate).toISOString(),
-				paymentTerms,
-				notes,
-				vatPercent,
-				discountPercent,
+				paymentTerms: paymentTerms.trim() || undefined,
+				notes: notes.trim() || undefined,
+				vatPercent: Number(vatPercent) || 0,
+				discountPercent: Number(discountPercent) || 0,
 				templateId: invoice?.templateId || null,
 			});
 		},
@@ -376,10 +388,10 @@ export function CreateInvoiceForm({
 					.filter((item) => item.description.trim())
 					.map((item) => ({
 						id: item.id.startsWith("new-") ? undefined : item.id,
-						description: item.description,
-						quantity: item.quantity,
-						unit: item.unit || undefined,
-						unitPrice: item.unitPrice,
+						description: item.description.trim(),
+						quantity: Math.max(Number(item.quantity) || 1, 0.01),
+						unit: item.unit?.trim() || undefined,
+						unitPrice: Number(item.unitPrice) || 0,
 					})),
 			});
 		},
@@ -504,6 +516,13 @@ export function CreateInvoiceForm({
 		if (validItems.length === 0) {
 			toast.error(t("finance.invoices.errors.itemsRequired"));
 			return false;
+		}
+
+		for (const item of validItems) {
+			if (!item.quantity || Number(item.quantity) <= 0) {
+				toast.error(t("finance.invoices.errors.quantityMustBePositive"));
+				return false;
+			}
 		}
 
 		if (!clientTaxNumber.trim()) {
