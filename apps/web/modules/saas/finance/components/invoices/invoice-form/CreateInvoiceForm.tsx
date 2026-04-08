@@ -85,6 +85,10 @@ export function CreateInvoiceForm({
 	const [newPaymentNotes, setNewPaymentNotes] = useState("");
 	const [deletePaymentId, setDeletePaymentId] = useState<string | null>(null);
 
+	// Validation state
+	const [itemErrors, setItemErrors] = useState<Record<string, string>>({});
+	const [isValidating, setIsValidating] = useState(false);
+
 	// Column visibility helpers
 	const toggleColumn = (column: ColumnKey) => {
 		setVisibleColumns((prev) =>
@@ -101,6 +105,14 @@ export function CreateInvoiceForm({
 				item.id === itemId ? { ...item, ...updates } : item,
 			),
 		);
+		// Clear validation error when user edits description
+		if (updates.description !== undefined) {
+			setItemErrors((prev) => {
+				const next = { ...prev };
+				delete next[itemId];
+				return next;
+			});
+		}
 	};
 
 	const addItem = () => {
@@ -277,14 +289,34 @@ export function CreateInvoiceForm({
 		discountPercent: Number(discountPercent) || 0,
 		templateId: defaultTemplate?.id,
 		items: items
-			.filter((item) => item.description.trim())
+			.filter((item) => (item.description ?? "").trim())
 			.map((item) => ({
-				description: item.description.trim(),
+				description: (item.description ?? "").trim(),
 				quantity: Math.max(Number(item.quantity) || 1, 0.01),
 				unit: item.unit?.trim() || undefined,
 				unitPrice: Number(item.unitPrice) || 0,
 			})),
 	});
+
+	// Map backend Zod error paths to human-readable Arabic messages
+	const formatValidationErrors = (issues: any[]): string => {
+		const msgs: string[] = [];
+		for (const issue of issues) {
+			const path = issue.path?.join(".") || "";
+			if (path.includes("description")) {
+				msgs.push(t("finance.invoices.errors.descriptionRequired"));
+			} else if (path.includes("quantity")) {
+				msgs.push(t("finance.invoices.errors.quantityMustBePositive"));
+			} else if (path === "items") {
+				msgs.push(t("finance.invoices.errors.itemsRequired"));
+			} else if (path.includes("clientName")) {
+				msgs.push(t("finance.invoices.errors.clientRequired"));
+			} else {
+				msgs.push(issue.message || path);
+			}
+		}
+		return [...new Set(msgs)].join("، ");
+	};
 
 	// Create mutation (save as draft)
 	const createMutation = useMutation({
@@ -298,8 +330,7 @@ export function CreateInvoiceForm({
 		onError: (error: any) => {
 			const issues = error?.data?.issues ?? error?.issues;
 			if (issues?.length) {
-				const fields = issues.map((i: any) => i.path?.join(".") || i.message).join(", ");
-				toast.error(`${t("finance.invoices.createError")}: ${fields}`);
+				toast.error(`${t("finance.invoices.createError")}: ${formatValidationErrors(issues)}`);
 			} else {
 				toast.error(error.message || t("finance.invoices.createError"));
 			}
@@ -339,8 +370,7 @@ export function CreateInvoiceForm({
 		onError: (error: any) => {
 			const issues = error?.data?.issues ?? error?.issues;
 			if (issues?.length) {
-				const fields = issues.map((i: any) => i.path?.join(".") || i.message).join(", ");
-				toast.error(`${t("finance.invoices.issueError")}: ${fields}`);
+				toast.error(`${t("finance.invoices.issueError")}: ${formatValidationErrors(issues)}`);
 			} else {
 				toast.error(error.message || t("finance.invoices.issueError"));
 			}
@@ -385,10 +415,10 @@ export function CreateInvoiceForm({
 				organizationId,
 				id: invoiceId!,
 				items: items
-					.filter((item) => item.description.trim())
+					.filter((item) => (item.description ?? "").trim())
 					.map((item) => ({
 						id: item.id.startsWith("new-") ? undefined : item.id,
-						description: item.description.trim(),
+						description: (item.description ?? "").trim(),
 						quantity: Math.max(Number(item.quantity) || 1, 0.01),
 						unit: item.unit?.trim() || undefined,
 						unitPrice: Number(item.unitPrice) || 0,
@@ -507,43 +537,78 @@ export function CreateInvoiceForm({
 	};
 
 	const validateForm = (): boolean => {
+		setIsValidating(true);
+
+		// 1. Client name check (first priority)
 		if (!clientName.trim()) {
 			toast.error(t("finance.invoices.errors.clientRequired"));
+			setIsValidating(false);
 			return false;
 		}
 
-		const validItems = items.filter((item) => item.description.trim());
+		// 2. Per-item validation — check items with data but missing description
+		const newItemErrors: Record<string, string> = {};
+		for (const item of items) {
+			const hasPrice = Number(item.unitPrice) > 0;
+			const hasQty = Number(item.quantity) > 0 && Number(item.quantity) !== 1; // exclude default qty=1
+			const hasDesc = (item.description ?? "").trim().length > 0;
+			if ((hasPrice || hasQty) && !hasDesc) {
+				newItemErrors[item.id] = t("finance.invoices.errors.descriptionRequired");
+			}
+		}
+		setItemErrors(newItemErrors);
+
+		if (Object.keys(newItemErrors).length > 0) {
+			toast.error(t("finance.invoices.errors.descriptionRequired"));
+			// Scroll to first error item
+			const firstErrorId = Object.keys(newItemErrors)[0];
+			const el = document.querySelector(`[data-item-id="${firstErrorId}"]`);
+			if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+			setIsValidating(false);
+			return false;
+		}
+
+		// 3. Must have at least one valid item
+		const validItems = items.filter((item) => (item.description ?? "").trim());
 		if (validItems.length === 0) {
 			toast.error(t("finance.invoices.errors.itemsRequired"));
+			setIsValidating(false);
 			return false;
 		}
 
+		// 4. Quantity check on valid items
 		for (const item of validItems) {
 			if (!item.quantity || Number(item.quantity) <= 0) {
 				toast.error(t("finance.invoices.errors.quantityMustBePositive"));
+				setIsValidating(false);
 				return false;
 			}
 		}
 
-		// Tax number required for TAX invoices
+		// 5. Tax number required for TAX invoices
 		if (invoiceType === "TAX" && !clientTaxNumber.trim()) {
 			toast.error(t("finance.invoices.errors.taxNumberRequired"));
+			setIsValidating(false);
 			return false;
 		}
 
-		// Validate email format if provided
+		// 6. Email format validation
 		if (clientEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clientEmail.trim())) {
-			toast.error(t("finance.invoices.errors.invalidEmail") || "البريد الإلكتروني غير صالح");
+			toast.error(t("finance.invoices.errors.invalidEmail"));
+			setIsValidating(false);
 			return false;
 		}
 
+		// 7. Date validation
 		const issueDateObj = new Date(issueDate);
 		const dueDateObj = new Date(dueDate);
 		if (dueDateObj <= issueDateObj) {
 			toast.error(t("finance.invoices.errors.dueDateMustBeAfterIssueDate"));
+			setIsValidating(false);
 			return false;
 		}
 
+		setIsValidating(false);
 		return true;
 	};
 
@@ -584,7 +649,7 @@ export function CreateInvoiceForm({
 		}
 	};
 
-	const isBusy = createMutation.isPending || createAndIssueMutation.isPending ||
+	const isBusy = isValidating || createMutation.isPending || createAndIssueMutation.isPending ||
 		(isEditMode && (updateMutation.isPending || updateItemsMutation.isPending));
 
 	const canAddPayment = isEditMode && invoice &&
@@ -668,6 +733,7 @@ export function CreateInvoiceForm({
 				<InvoiceItemsTable
 					items={items}
 					visibleColumns={visibleColumns}
+					itemErrors={itemErrors}
 					onUpdateItem={updateItem}
 					onAddItem={addItem}
 					onRemoveItem={removeItem}

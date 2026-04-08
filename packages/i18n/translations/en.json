@@ -3015,7 +3015,9 @@
         "orgTaxNumberRequired": "Tax number is required for tax/simplified invoices",
         "clientTaxNumberRequired": "Client tax number is required for tax invoices (B2B)",
         "validItemsRequired": "Invoice must have at least one item with quantity and price > 0",
-        "issueDateRequired": "Issue date is required"
+        "issueDateRequired": "Issue date is required",
+        "descriptionRequired": "Item description is required",
+        "invalidEmail": "Email address is invalid"
       },
       "paid": "Paid",
       "remaining": "Remaining",

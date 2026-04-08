@@ -2982,7 +2982,9 @@
         "orgTaxNumberRequired": "الرقم الضريبي مطلوب للفاتورة الضريبية/المبسطة",
         "clientTaxNumberRequired": "الرقم الضريبي للعميل مطلوب للفاتورة الضريبية",
         "validItemsRequired": "يجب أن تحتوي الفاتورة على بند واحد على الأقل بكمية وسعر أكبر من صفر",
-        "issueDateRequired": "تاريخ الإصدار مطلوب"
+        "issueDateRequired": "تاريخ الإصدار مطلوب",
+        "descriptionRequired": "وصف البند مطلوب",
+        "invalidEmail": "البريد الإلكتروني غير صالح"
       },
       "paid": "المدفوع",
       "remaining": "المتبقي",
