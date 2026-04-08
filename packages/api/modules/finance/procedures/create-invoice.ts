@@ -35,7 +35,7 @@ import {
 const optStr = (max: number) => z.union([z.string().max(max), z.null()]).optional().transform(v => v ?? undefined);
 
 const invoiceItemSchema = z.object({
-	description: z.string().min(1, "وصف البند مطلوب").max(MAX_NAME),
+	description: z.string().min(1, "وصف البند مطلوب").max(MAX_DESC),
 	quantity: z.coerce.number().positive("الكمية يجب أن تكون موجبة").max(999_999),
 	unit: optStr(50),
 	unitPrice: z.coerce.number().nonnegative("السعر يجب أن يكون صفر أو أكبر").max(99_999_999.99),

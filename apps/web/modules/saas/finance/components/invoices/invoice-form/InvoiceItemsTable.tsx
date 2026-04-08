@@ -139,6 +139,7 @@ export function InvoiceItemsTable({
 												value={item.description}
 												onChange={(e) => { onUpdateItem(item.id, { description: e.target.value }); e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }}
 												placeholder={t("finance.items.descriptionPlaceholder")}
+												maxLength={2000}
 												rows={1}
 												className={`w-full min-h-[36px] px-3 py-2 rounded-[10px] text-sm border focus:ring-[3px] focus:outline-none resize-none overflow-hidden transition-all ${
 													hasError

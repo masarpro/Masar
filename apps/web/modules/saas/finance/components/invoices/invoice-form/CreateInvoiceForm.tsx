@@ -333,7 +333,11 @@ export function CreateInvoiceForm({
 		for (const issue of issues) {
 			const path = issue.path?.join(".") || "";
 			if (path.includes("description")) {
-				msgs.push(t("finance.invoices.errors.descriptionRequired"));
+				if (issue.code === "too_big") {
+					msgs.push(t("finance.invoices.errors.descriptionTooLong"));
+				} else {
+					msgs.push(t("finance.invoices.errors.descriptionRequired"));
+				}
 			} else if (path.includes("quantity")) {
 				msgs.push(t("finance.invoices.errors.quantityMustBePositive"));
 			} else if (path === "items") {

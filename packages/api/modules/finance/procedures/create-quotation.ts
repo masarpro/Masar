@@ -20,7 +20,7 @@ import {
 } from "../../../lib/validation-constants";
 
 const quotationItemSchema = z.object({
-	description: z.string().trim().min(1, "وصف البند مطلوب").max(MAX_NAME),
+	description: z.string().trim().min(1, "وصف البند مطلوب").max(MAX_DESC),
 	quantity: quantity().positive("الكمية يجب أن تكون موجبة"),
 	unit: z.string().trim().max(50).optional(),
 	unitPrice: unitPrice().min(0, "السعر يجب أن يكون صفر أو أكبر"),

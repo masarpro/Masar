@@ -3017,6 +3017,7 @@
         "validItemsRequired": "Invoice must have at least one item with quantity and price > 0",
         "issueDateRequired": "Issue date is required",
         "descriptionRequired": "Item description is required",
+        "descriptionTooLong": "Item description is too long (max 2000 characters)",
         "invalidEmail": "Email address is invalid"
       },
       "paid": "Paid",
