@@ -194,7 +194,7 @@ export function getAssistantTools(ctx: ToolContext) {
                 paymentNo: p.paymentNo,
                 amount: toNum(p.amount),
                 date: p.date,
-                clientName: p.clientName,
+                clientName: p.client?.name ?? null,
                 paymentMethod: p.paymentMethod,
               })),
               total: result.total,
