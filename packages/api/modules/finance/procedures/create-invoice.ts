@@ -31,10 +31,13 @@ import {
 	financialAmount, quantity, unitPrice,
 } from "../../../lib/validation-constants";
 
+// Helper: accept both undefined and null for optional string fields (Zod v4 .optional() rejects null)
+const optStr = (max: number) => z.union([z.string().max(max), z.null()]).optional().transform(v => v ?? undefined);
+
 const invoiceItemSchema = z.object({
 	description: z.string().min(1, "وصف البند مطلوب").max(MAX_NAME),
 	quantity: z.coerce.number().positive("الكمية يجب أن تكون موجبة").max(999_999),
-	unit: z.string().max(50).optional(),
+	unit: optStr(50),
 	unitPrice: z.coerce.number().nonnegative("السعر يجب أن يكون صفر أو أكبر").max(99_999_999.99),
 });
 
@@ -49,20 +52,20 @@ export const createInvoiceProcedure = subscriptionProcedure
 		z.object({
 			organizationId: z.string().min(1).max(100),
 			invoiceType: z.enum(["STANDARD", "TAX", "SIMPLIFIED"]).optional().default("STANDARD"),
-			clientId: z.string().max(100).optional(),
+			clientId: optStr(100),
 			clientName: z.string().min(1, "اسم العميل مطلوب").max(MAX_NAME),
-			clientCompany: z.string().max(MAX_NAME).optional(),
-			clientPhone: z.string().max(MAX_PHONE).optional(),
-			clientEmail: z.string().max(254).optional(),
-			clientAddress: z.string().max(MAX_ADDRESS).optional(),
-			clientTaxNumber: z.string().max(MAX_CODE).optional(),
-			projectId: z.string().max(100).optional(),
-			quotationId: z.string().max(100).optional(),
+			clientCompany: optStr(MAX_NAME),
+			clientPhone: optStr(MAX_PHONE),
+			clientEmail: optStr(254),
+			clientAddress: optStr(MAX_ADDRESS),
+			clientTaxNumber: optStr(MAX_CODE),
+			projectId: optStr(100),
+			quotationId: optStr(100),
 			issueDate: z.string().min(1),
 			dueDate: z.string().min(1),
-			paymentTerms: z.string().max(MAX_DESC).optional(),
-			notes: z.string().max(MAX_DESC).optional(),
-			templateId: z.string().max(100).optional(),
+			paymentTerms: optStr(MAX_DESC),
+			notes: optStr(MAX_DESC),
+			templateId: optStr(100),
 			vatPercent: z.coerce.number().min(0).max(100).optional().default(15),
 			discountPercent: z.coerce.number().min(0).max(100).optional().default(0),
 			items: z.array(invoiceItemSchema).min(1, "يجب إضافة بند واحد على الأقل").max(MAX_ARRAY),
@@ -91,35 +94,45 @@ export const createInvoiceProcedure = subscriptionProcedure
 			sellerTaxNumber = org?.taxNumber ?? undefined;
 		}
 
-		const invoice = await createInvoice({
-			organizationId: input.organizationId,
-			createdById: context.user.id,
-			invoiceType: input.invoiceType,
-			clientId: input.clientId,
-			clientName: input.clientName,
-			clientCompany: input.clientCompany,
-			clientPhone: input.clientPhone,
-			clientEmail: input.clientEmail || undefined,
-			clientAddress: input.clientAddress,
-			clientTaxNumber: input.clientTaxNumber,
-			projectId: input.projectId,
-			quotationId: input.quotationId,
-			issueDate: new Date(input.issueDate),
-			dueDate: new Date(input.dueDate),
-			paymentTerms: input.paymentTerms,
-			notes: input.notes,
-			templateId: input.templateId,
-			vatPercent: input.vatPercent,
-			discountPercent: input.discountPercent,
-			sellerTaxNumber,
-			items: input.items,
-		});
+		let invoice;
+		try {
+			invoice = await createInvoice({
+				organizationId: input.organizationId,
+				createdById: context.user.id,
+				invoiceType: input.invoiceType,
+				clientId: input.clientId || undefined,
+				clientName: input.clientName,
+				clientCompany: input.clientCompany || undefined,
+				clientPhone: input.clientPhone || undefined,
+				clientEmail: input.clientEmail || undefined,
+				clientAddress: input.clientAddress || undefined,
+				clientTaxNumber: input.clientTaxNumber || undefined,
+				projectId: input.projectId || undefined,
+				quotationId: input.quotationId || undefined,
+				issueDate: new Date(input.issueDate),
+				dueDate: new Date(input.dueDate),
+				paymentTerms: input.paymentTerms || undefined,
+				notes: input.notes || undefined,
+				templateId: input.templateId || undefined,
+				vatPercent: input.vatPercent,
+				discountPercent: input.discountPercent,
+				sellerTaxNumber,
+				items: input.items,
+			});
+		} catch (e) {
+			console.error("[createInvoice] Failed:", e);
+			throw new ORPCError("INTERNAL_SERVER_ERROR", {
+				message: "فشل في إنشاء الفاتورة. يرجى المحاولة مرة أخرى.",
+			});
+		}
 
 		// If created from a quotation, update its status to CONVERTED
 		if (input.quotationId) {
 			await db.quotation.update({
 				where: { id: input.quotationId },
 				data: { status: "CONVERTED" },
+			}).catch((e) => {
+				console.error("[createInvoice] Failed to update quotation status:", e);
 			});
 		}
 
@@ -168,19 +181,19 @@ export const updateInvoiceProcedure = subscriptionProcedure
 			organizationId: z.string().min(1).max(100),
 			id: z.string().min(1).max(100),
 			invoiceType: z.enum(["STANDARD", "TAX", "SIMPLIFIED"]).optional(),
-			clientId: z.string().max(100).optional(),
+			clientId: optStr(100),
 			clientName: z.string().min(1).max(MAX_NAME).optional(),
-			clientCompany: z.string().max(MAX_NAME).optional(),
-			clientPhone: z.string().max(MAX_PHONE).optional(),
-			clientEmail: z.string().max(254).optional(),
-			clientAddress: z.string().max(MAX_ADDRESS).optional(),
-			clientTaxNumber: z.string().max(MAX_CODE).optional(),
-			projectId: z.string().max(100).optional(),
+			clientCompany: optStr(MAX_NAME),
+			clientPhone: optStr(MAX_PHONE),
+			clientEmail: optStr(254),
+			clientAddress: optStr(MAX_ADDRESS),
+			clientTaxNumber: optStr(MAX_CODE),
+			projectId: optStr(100),
 			issueDate: z.string().min(1).optional(),
 			dueDate: z.string().min(1).optional(),
-			paymentTerms: z.string().max(MAX_DESC).optional(),
-			notes: z.string().max(MAX_DESC).optional(),
-			templateId: z.string().max(100).optional(),
+			paymentTerms: optStr(MAX_DESC),
+			notes: optStr(MAX_DESC),
+			templateId: optStr(100),
 			vatPercent: z.coerce.number().min(0).max(100).optional(),
 			discountPercent: z.coerce.number().min(0).max(100).optional(),
 		}),
@@ -254,7 +267,7 @@ export const updateInvoiceItemsProcedure = subscriptionProcedure
 		z.object({
 			organizationId: z.string().min(1).max(100),
 			id: z.string().min(1).max(100),
-			items: z.array(invoiceItemSchema.extend({ id: z.string().max(100).optional() })).max(MAX_ARRAY),
+			items: z.array(invoiceItemSchema.extend({ id: optStr(100) })).max(MAX_ARRAY),
 		}),
 	)
 	.handler(async ({ input, context }) => {

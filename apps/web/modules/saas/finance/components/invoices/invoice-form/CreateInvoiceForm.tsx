@@ -269,34 +269,38 @@ export function CreateInvoiceForm({
 	const totals = calculateTotals(items, discountPercent, vatPercent);
 
 	// Build the invoice payload (shared between save draft and issue flows)
-	const buildPayload = () => ({
-		organizationId,
-		invoiceType,
-		clientId: clientId || undefined,
-		clientName: clientName.trim(),
-		clientCompany: clientCompany.trim() || undefined,
-		clientPhone: clientPhone.trim() || undefined,
-		clientEmail: clientEmail.trim() || undefined,
-		clientAddress: clientAddress.trim() || undefined,
-		clientTaxNumber: clientTaxNumber.trim() || undefined,
-		projectId: !showProjectLink || projectId === "none" ? undefined : projectId,
-		quotationId: quotationId ?? undefined,
-		issueDate: new Date(issueDate).toISOString(),
-		dueDate: new Date(dueDate).toISOString(),
-		paymentTerms: paymentTerms.trim() || undefined,
-		notes: notes.trim() || undefined,
-		vatPercent: Number(vatPercent) || 0,
-		discountPercent: Number(discountPercent) || 0,
-		templateId: defaultTemplate?.id,
-		items: items
+	const buildPayload = () => {
+		const filteredItems = items
 			.filter((item) => (item.description ?? "").trim())
 			.map((item) => ({
 				description: (item.description ?? "").trim(),
 				quantity: Math.max(Number(item.quantity) || 1, 0.01),
 				unit: item.unit?.trim() || undefined,
 				unitPrice: Number(item.unitPrice) || 0,
-			})),
-	});
+			}));
+
+		return {
+			organizationId,
+			invoiceType,
+			clientId: clientId || undefined,
+			clientName: clientName.trim(),
+			clientCompany: clientCompany.trim() || undefined,
+			clientPhone: clientPhone.trim() || undefined,
+			clientEmail: clientEmail.trim() || undefined,
+			clientAddress: clientAddress.trim() || undefined,
+			clientTaxNumber: clientTaxNumber.trim() || undefined,
+			projectId: !showProjectLink || projectId === "none" ? undefined : (projectId || undefined),
+			quotationId: quotationId || undefined,
+			issueDate: new Date(issueDate).toISOString(),
+			dueDate: new Date(dueDate).toISOString(),
+			paymentTerms: paymentTerms.trim() || undefined,
+			notes: notes.trim() || undefined,
+			vatPercent: Number(vatPercent) || 0,
+			discountPercent: Number(discountPercent) || 0,
+			templateId: defaultTemplate?.id || undefined,
+			items: filteredItems,
+		};
+	};
 
 	// Map backend Zod error paths to human-readable Arabic messages
 	const formatValidationErrors = (issues: any[]): string => {
