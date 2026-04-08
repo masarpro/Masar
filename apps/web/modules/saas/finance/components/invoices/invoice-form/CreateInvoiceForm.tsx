@@ -361,14 +361,14 @@ export function CreateInvoiceForm({
 				clientEmail: clientEmail.trim() || undefined,
 				clientAddress: clientAddress.trim() || undefined,
 				clientTaxNumber: clientTaxNumber.trim() || undefined,
-				projectId: !showProjectLink || projectId === "none" ? null : projectId,
+				projectId: !showProjectLink || projectId === "none" ? undefined : projectId,
 				issueDate: new Date(issueDate).toISOString(),
 				dueDate: new Date(dueDate).toISOString(),
 				paymentTerms: paymentTerms.trim() || undefined,
 				notes: notes.trim() || undefined,
 				vatPercent: Number(vatPercent) || 0,
 				discountPercent: Number(discountPercent) || 0,
-				templateId: invoice?.templateId || null,
+				templateId: invoice?.templateId || undefined,
 			});
 		},
 		onSuccess: () => {

@@ -27,26 +27,14 @@ import { db } from "@repo/database/prisma/client";
 import crypto from "crypto";
 import {
 	MAX_NAME, MAX_DESC, MAX_CODE, MAX_PHONE, MAX_ADDRESS, MAX_ARRAY,
-	idString, optionalTrimmed, nullishTrimmed,
-	financialAmount, percentage, quantity, unitPrice,
+	idString, optionalTrimmed,
+	financialAmount, quantity, unitPrice,
 } from "../../../lib/validation-constants";
 
-/** Recursively convert null → undefined so Zod .optional() / .nullish() both accept the value */
-function cleanNulls(obj: unknown): unknown {
-	if (obj === null) return undefined;
-	if (Array.isArray(obj)) return obj.map(cleanNulls);
-	if (obj && typeof obj === "object") {
-		const out: Record<string, unknown> = {};
-		for (const [k, v] of Object.entries(obj)) out[k] = cleanNulls(v);
-		return out;
-	}
-	return obj;
-}
-
 const invoiceItemSchema = z.object({
-	description: z.string().trim().min(1, "وصف البند مطلوب").max(MAX_NAME),
+	description: z.string().min(1, "وصف البند مطلوب").max(MAX_NAME),
 	quantity: z.coerce.number().positive("الكمية يجب أن تكون موجبة").max(999_999),
-	unit: z.string().trim().max(50).optional(),
+	unit: z.string().max(50).optional(),
 	unitPrice: z.coerce.number().nonnegative("السعر يجب أن يكون صفر أو أكبر").max(99_999_999.99),
 });
 
@@ -58,27 +46,27 @@ export const createInvoiceProcedure = subscriptionProcedure
 		summary: "Create a new invoice",
 	})
 	.input(
-		z.preprocess(cleanNulls, z.object({
-			organizationId: z.string().trim().min(1).max(100),
+		z.object({
+			organizationId: z.string().min(1).max(100),
 			invoiceType: z.enum(["STANDARD", "TAX", "SIMPLIFIED"]).optional().default("STANDARD"),
-			clientId: z.string().trim().max(100).optional(),
-			clientName: z.string().trim().min(1, "اسم العميل مطلوب").max(MAX_NAME),
-			clientCompany: z.string().trim().max(MAX_NAME).optional(),
-			clientPhone: z.string().trim().max(MAX_PHONE).optional(),
-			clientEmail: z.string().trim().max(254).optional(),
-			clientAddress: z.string().trim().max(MAX_ADDRESS).optional(),
-			clientTaxNumber: z.string().trim().max(MAX_CODE).optional(),
-			projectId: z.string().trim().max(100).optional(),
-			quotationId: z.string().trim().max(100).optional(),
+			clientId: z.string().max(100).optional(),
+			clientName: z.string().min(1, "اسم العميل مطلوب").max(MAX_NAME),
+			clientCompany: z.string().max(MAX_NAME).optional(),
+			clientPhone: z.string().max(MAX_PHONE).optional(),
+			clientEmail: z.string().max(254).optional(),
+			clientAddress: z.string().max(MAX_ADDRESS).optional(),
+			clientTaxNumber: z.string().max(MAX_CODE).optional(),
+			projectId: z.string().max(100).optional(),
+			quotationId: z.string().max(100).optional(),
 			issueDate: z.string().min(1),
 			dueDate: z.string().min(1),
-			paymentTerms: z.string().trim().max(MAX_DESC).optional(),
-			notes: z.string().trim().max(MAX_DESC).optional(),
-			templateId: z.string().trim().max(100).optional(),
+			paymentTerms: z.string().max(MAX_DESC).optional(),
+			notes: z.string().max(MAX_DESC).optional(),
+			templateId: z.string().max(100).optional(),
 			vatPercent: z.coerce.number().min(0).max(100).optional().default(15),
 			discountPercent: z.coerce.number().min(0).max(100).optional().default(0),
 			items: z.array(invoiceItemSchema).min(1, "يجب إضافة بند واحد على الأقل").max(MAX_ARRAY),
-		})),
+		}),
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
@@ -176,26 +164,26 @@ export const updateInvoiceProcedure = subscriptionProcedure
 		summary: "Update an invoice",
 	})
 	.input(
-		z.preprocess(cleanNulls, z.object({
-			organizationId: z.string().trim().min(1).max(100),
-			id: z.string().trim().min(1).max(100),
+		z.object({
+			organizationId: z.string().min(1).max(100),
+			id: z.string().min(1).max(100),
 			invoiceType: z.enum(["STANDARD", "TAX", "SIMPLIFIED"]).optional(),
-			clientId: z.string().trim().max(100).optional(),
-			clientName: z.string().trim().min(1).max(MAX_NAME).optional(),
-			clientCompany: z.string().trim().max(MAX_NAME).optional(),
-			clientPhone: z.string().trim().max(MAX_PHONE).optional(),
-			clientEmail: z.string().trim().max(254).optional(),
-			clientAddress: z.string().trim().max(MAX_ADDRESS).optional(),
-			clientTaxNumber: z.string().trim().max(MAX_CODE).optional(),
-			projectId: z.string().trim().max(100).optional(),
+			clientId: z.string().max(100).optional(),
+			clientName: z.string().min(1).max(MAX_NAME).optional(),
+			clientCompany: z.string().max(MAX_NAME).optional(),
+			clientPhone: z.string().max(MAX_PHONE).optional(),
+			clientEmail: z.string().max(254).optional(),
+			clientAddress: z.string().max(MAX_ADDRESS).optional(),
+			clientTaxNumber: z.string().max(MAX_CODE).optional(),
+			projectId: z.string().max(100).optional(),
 			issueDate: z.string().min(1).optional(),
 			dueDate: z.string().min(1).optional(),
-			paymentTerms: z.string().trim().max(MAX_DESC).optional(),
-			notes: z.string().trim().max(MAX_DESC).optional(),
-			templateId: z.string().trim().max(100).optional(),
+			paymentTerms: z.string().max(MAX_DESC).optional(),
+			notes: z.string().max(MAX_DESC).optional(),
+			templateId: z.string().max(100).optional(),
 			vatPercent: z.coerce.number().min(0).max(100).optional(),
 			discountPercent: z.coerce.number().min(0).max(100).optional(),
-		})),
+		}),
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
@@ -263,11 +251,11 @@ export const updateInvoiceItemsProcedure = subscriptionProcedure
 		summary: "Update invoice items",
 	})
 	.input(
-		z.preprocess(cleanNulls, z.object({
-			organizationId: z.string().trim().min(1).max(100),
-			id: z.string().trim().min(1).max(100),
-			items: z.array(invoiceItemSchema.extend({ id: z.string().trim().max(100).optional() })).max(MAX_ARRAY),
-		})),
+		z.object({
+			organizationId: z.string().min(1).max(100),
+			id: z.string().min(1).max(100),
+			items: z.array(invoiceItemSchema.extend({ id: z.string().max(100).optional() })).max(MAX_ARRAY),
+		}),
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {

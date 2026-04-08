@@ -203,14 +203,14 @@ export function InvoiceEditor({
 				clientEmail,
 				clientAddress,
 				clientTaxNumber,
-				projectId: projectId === "none" ? null : projectId,
+				projectId: projectId === "none" ? undefined : projectId,
 				issueDate: new Date(issueDate).toISOString(),
 				dueDate: new Date(dueDate).toISOString(),
 				paymentTerms,
 				notes,
 				vatPercent,
 				discountPercent,
-				templateId: invoice?.templateId || null,
+				templateId: invoice?.templateId || undefined,
 			});
 		},
 		onSuccess: () => {
