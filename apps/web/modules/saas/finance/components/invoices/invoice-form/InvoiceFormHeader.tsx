@@ -22,7 +22,6 @@ import {
 	QrCode,
 } from "lucide-react";
 import { StatusBadge } from "../../shared/StatusBadge";
-import { toast } from "sonner";
 
 interface InvoiceFormHeaderProps {
 	organizationSlug: string;
@@ -117,7 +116,7 @@ export function InvoiceFormHeader({
 					>
 						<Eye className="h-4 w-4" />
 					</Button>
-					<Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => toast.info(t("finance.actions.printComingSoon"))}><Printer className="h-4 w-4" /></Button>
+					<Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={onPreview}><Printer className="h-4 w-4" /></Button>
 					{isEditMode && canAddPayment && (
 						<>
 							<div className="w-px h-5 bg-border/50" />

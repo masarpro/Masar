@@ -525,8 +525,15 @@ export function CreateInvoiceForm({
 			}
 		}
 
-		if (!clientTaxNumber.trim()) {
+		// Tax number required for TAX invoices
+		if (invoiceType === "TAX" && !clientTaxNumber.trim()) {
 			toast.error(t("finance.invoices.errors.taxNumberRequired"));
+			return false;
+		}
+
+		// Validate email format if provided
+		if (clientEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clientEmail.trim())) {
+			toast.error(t("finance.invoices.errors.invalidEmail") || "البريد الإلكتروني غير صالح");
 			return false;
 		}
 

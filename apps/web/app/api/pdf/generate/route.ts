@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
 
 		// Wait for the content to render (React Query data loaded)
 		await page
-			.waitForSelector("#quotation-print-area, [data-pdf-body]", {
+			.waitForSelector("#quotation-print-area, #invoice-print-area, [data-pdf-body]", {
 				timeout: 10000,
 			})
 			.catch(() => {

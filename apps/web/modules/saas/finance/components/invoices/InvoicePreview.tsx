@@ -1,13 +1,28 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Button } from "@ui/components/button";
-import { Printer, ArrowRight, ChevronLeft } from "lucide-react";
+import { Card, CardContent } from "@ui/components/card";
+import { Input } from "@ui/components/input";
+import { Label } from "@ui/components/label";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogFooter,
+} from "@ui/components/dialog";
+import { Printer, Download, ArrowRight, ChevronLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { InvoiceDocument } from "./InvoiceDocument";
 import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
+import { exportToPDF, printDocument } from "@saas/shared/lib/pdf-export";
 
 interface InvoicePreviewProps {
 	organizationId: string;
@@ -22,6 +37,11 @@ export function InvoicePreview({
 }: InvoicePreviewProps) {
 	const t = useTranslations();
 	const basePath = `/app/${organizationSlug}/finance/invoices`;
+
+	// PDF download state
+	const [showFilenameDialog, setShowFilenameDialog] = useState(false);
+	const [pdfFilename, setPdfFilename] = useState("");
+	const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
 	const { data: invoice, isLoading } = useQuery(
 		orpc.finance.invoices.getById.queryOptions({
@@ -46,7 +66,22 @@ export function InvoicePreview({
 	}
 
 	const handlePrint = () => {
-		window.print();
+		printDocument();
+	};
+
+	const defaultFilename = `${invoice.invoiceNo}-${invoice.clientName || "invoice"}`;
+
+	const handleDownloadPdf = async (filename: string) => {
+		setIsGeneratingPdf(true);
+		try {
+			await exportToPDF(filename || defaultFilename);
+		} catch (error) {
+			console.error("PDF generation failed:", error);
+			toast.error(t("common.error"));
+		} finally {
+			setIsGeneratingPdf(false);
+			setShowFilenameDialog(false);
+		}
 	};
 
 	return (
@@ -78,26 +113,115 @@ export function InvoicePreview({
 							</span>
 						</div>
 					</div>
-					<Button variant="outline" onClick={handlePrint} className="rounded-xl gap-2">
-						<Printer className="h-4 w-4" />
-						{t("finance.actions.print")}
-					</Button>
+					<div className="flex gap-2">
+						<Button variant="outline" onClick={handlePrint} className="rounded-xl gap-2">
+							<Printer className="h-4 w-4" />
+							{t("finance.actions.print")}
+						</Button>
+						<Button
+							className="rounded-xl gap-2"
+							onClick={() => {
+								setPdfFilename(defaultFilename);
+								setShowFilenameDialog(true);
+							}}
+							disabled={isGeneratingPdf}
+						>
+							{isGeneratingPdf ? (
+								<Loader2 className="h-4 w-4 animate-spin" />
+							) : (
+								<Download className="h-4 w-4" />
+							)}
+							{t("finance.actions.downloadPdf")}
+						</Button>
+					</div>
 				</div>
 			</div>
 
 			{/* ─── A4 Invoice Document ─────────────────────────── */}
-			<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] max-w-[210mm] mx-auto print:shadow-none print:rounded-none print:border-none print:max-w-none print:bg-white">
-				<div className="min-h-[297mm] print:min-h-0 print:text-black">
+			<Card id="invoice-print-area" className="rounded-2xl max-w-[210mm] min-h-[297mm] mx-auto print:shadow-none print:rounded-none print:border-none print:min-h-0 print:max-w-none">
+				<CardContent className="p-0 print:p-0">
 					<InvoiceDocument
 						invoice={invoice}
 						options={{
-							showWatermark: false,
+							showWatermark: true,
 							printMode: true,
 							showPayments: true,
 						}}
 					/>
-				</div>
-			</div>
+				</CardContent>
+			</Card>
+
+			{/* Print styles */}
+			<style jsx global>{`
+				@media print {
+					body * {
+						visibility: hidden;
+					}
+					#invoice-print-area,
+					#invoice-print-area * {
+						visibility: visible;
+					}
+					#invoice-print-area {
+						position: absolute;
+						left: 0;
+						top: 0;
+						width: 210mm;
+						margin: 0;
+						padding: 0;
+						box-shadow: none !important;
+						border: none !important;
+						border-radius: 0 !important;
+					}
+					@page {
+						size: A4;
+						margin: 0;
+					}
+				}
+			`}</style>
+
+			{/* PDF Filename Dialog */}
+			<Dialog open={showFilenameDialog} onOpenChange={setShowFilenameDialog}>
+				<DialogContent className="sm:max-w-md rounded-2xl">
+					<DialogHeader>
+						<DialogTitle>{t("finance.actions.downloadPdf")}</DialogTitle>
+						<DialogDescription className="sr-only">
+							{t("finance.actions.downloadPdf")}
+						</DialogDescription>
+					</DialogHeader>
+					<div className="space-y-3">
+						<div>
+							<Label>{t("common.fileName")}</Label>
+							<div className="flex items-center gap-2 mt-1.5">
+								<Input
+									value={pdfFilename}
+									onChange={(e: any) => setPdfFilename(e.target.value)}
+									placeholder={defaultFilename}
+									dir="auto"
+									className="rounded-xl"
+								/>
+								<span className="text-sm text-muted-foreground shrink-0">.pdf</span>
+							</div>
+						</div>
+					</div>
+					<DialogFooter>
+						<Button variant="ghost" onClick={() => setShowFilenameDialog(false)} className="rounded-xl">
+							{t("common.cancel")}
+						</Button>
+						<Button
+							onClick={() => handleDownloadPdf(pdfFilename)}
+							disabled={isGeneratingPdf}
+							className="rounded-xl"
+						>
+							{isGeneratingPdf ? (
+								<Loader2 className="h-4 w-4 animate-spin me-2" />
+							) : (
+								<Download className="h-4 w-4 me-2" />
+							)}
+							{t("common.download")}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }
