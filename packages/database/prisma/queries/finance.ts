@@ -1054,8 +1054,6 @@ export async function createInvoice(data: {
 		unitPrice: number;
 	}>;
 }) {
-	const invoiceNo = await generateInvoiceNumber(data.organizationId);
-
 	// Calculate totals using Decimal
 	const discountPercent = data.discountPercent ?? 0;
 	const vatPercent = data.vatPercent ?? 15;
@@ -1070,43 +1068,71 @@ export async function createInvoice(data: {
 		sortOrder: index,
 	}));
 
-	return db.financeInvoice.create({
-		data: {
-			organizationId: data.organizationId,
-			createdById: data.createdById,
-			invoiceNo,
-			invoiceType: data.invoiceType ?? "STANDARD",
-			clientId: data.clientId,
-			clientName: data.clientName,
-			clientCompany: data.clientCompany,
-			clientPhone: data.clientPhone,
-			clientEmail: data.clientEmail,
-			clientAddress: data.clientAddress,
-			clientTaxNumber: data.clientTaxNumber,
-			projectId: data.projectId,
-			quotationId: data.quotationId,
-			status: "DRAFT",
-			issueDate: data.issueDate,
-			dueDate: data.dueDate,
-			paymentTerms: data.paymentTerms,
-			notes: data.notes,
-			templateId: data.templateId,
-			subtotal: totals.subtotal,
-			discountPercent,
-			discountAmount: totals.discountAmount,
-			vatPercent,
-			vatAmount: totals.vatAmount,
-			totalAmount: totals.totalAmount,
-			paidAmount: 0,
-			sellerTaxNumber: data.sellerTaxNumber,
-			items: {
-				create: itemsData,
-			},
-		},
-		include: {
-			items: true,
-		},
-	});
+	// Retry up to 3 times in case sequence is out of sync with existing invoice numbers
+	const MAX_RETRIES = 3;
+	for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+		const invoiceNo = await generateInvoiceNumber(data.organizationId);
+		try {
+			return await db.financeInvoice.create({
+				data: {
+					organizationId: data.organizationId,
+					createdById: data.createdById,
+					invoiceNo,
+					invoiceType: data.invoiceType ?? "STANDARD",
+					clientId: data.clientId,
+					clientName: data.clientName,
+					clientCompany: data.clientCompany,
+					clientPhone: data.clientPhone,
+					clientEmail: data.clientEmail,
+					clientAddress: data.clientAddress,
+					clientTaxNumber: data.clientTaxNumber,
+					projectId: data.projectId,
+					quotationId: data.quotationId,
+					status: "DRAFT",
+					issueDate: data.issueDate,
+					dueDate: data.dueDate,
+					paymentTerms: data.paymentTerms,
+					notes: data.notes,
+					templateId: data.templateId,
+					subtotal: totals.subtotal,
+					discountPercent,
+					discountAmount: totals.discountAmount,
+					vatPercent,
+					vatAmount: totals.vatAmount,
+					totalAmount: totals.totalAmount,
+					paidAmount: 0,
+					sellerTaxNumber: data.sellerTaxNumber,
+					items: {
+						create: itemsData,
+					},
+				},
+				include: {
+					items: true,
+				},
+			});
+		} catch (e: any) {
+			const isUniqueViolation =
+				e?.code === "P2002" ||
+				(e?.message && e.message.includes("Unique constraint failed"));
+			if (isUniqueViolation && attempt < MAX_RETRIES - 1) {
+				// Sequence is out of sync — resync from actual max invoice number and retry
+				console.warn(`[createInvoice] invoice_no "${invoiceNo}" already exists, resyncing sequence (attempt ${attempt + 1}/${MAX_RETRIES})`);
+				const { resyncSequence } = await import("./sequences");
+				const year = new Date().getFullYear();
+				await resyncSequence(
+					data.organizationId,
+					`INV-${year}`,
+					"finance_invoices",
+					"invoice_no",
+					`INV-${year}`,
+				);
+				continue;
+			}
+			throw e;
+		}
+	}
+	// Should never reach here, but TypeScript needs it
+	throw new Error("Failed to create invoice after retries");
 }
 
 /**

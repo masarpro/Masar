@@ -40,6 +40,58 @@ export async function nextSequenceValue(
 }
 
 /**
+ * Resync a sequence counter to match the actual max value in a table.
+ *
+ * Reads the highest existing number from the target column, then sets
+ * the sequence counter to that value so the next call to
+ * `nextSequenceValue` returns max + 1.
+ *
+ * @param organizationId - Organization ID
+ * @param sequenceKey    - e.g. "INV-2026"
+ * @param table          - DB table name, e.g. "finance_invoices"
+ * @param column         - Column that stores the formatted number, e.g. "invoice_no"
+ * @param prefix         - Number prefix, e.g. "INV-2026"
+ */
+export async function resyncSequence(
+	organizationId: string,
+	sequenceKey: string,
+	table: string,
+	column: string,
+	prefix: string,
+): Promise<number> {
+	// Extract the max numeric suffix from existing records
+	// e.g. "INV-2026-0042" → 42
+	const maxResult: Array<{ max_val: number | null }> =
+		await db.$queryRawUnsafe(
+			`SELECT MAX(
+				CAST(NULLIF(SPLIT_PART(${column}, '-', array_length(string_to_array(${column}, '-'), 1)), '') AS INTEGER)
+			) as max_val
+			FROM ${table}
+			WHERE organization_id = $1
+			  AND ${column} LIKE $2`,
+			organizationId,
+			`${prefix}-%`,
+		);
+
+	const maxVal = maxResult[0]?.max_val ?? 0;
+
+	if (maxVal > 0) {
+		// Set the sequence to the max value so next increment returns max + 1
+		await db.$queryRawUnsafe(
+			`INSERT INTO organization_sequences (id, organization_id, sequence_key, current_value, updated_at)
+			 VALUES (gen_random_uuid(), $1, $2, $3, NOW())
+			 ON CONFLICT (organization_id, sequence_key)
+			 DO UPDATE SET current_value = $3, updated_at = NOW()`,
+			organizationId,
+			sequenceKey,
+			maxVal,
+		);
+	}
+
+	return maxVal;
+}
+
+/**
  * Format a sequence number with prefix and zero-padding.
  *
  * @example formatSequenceNo("INV", 2026, 42) => "INV-2026-0042"
