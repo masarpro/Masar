@@ -791,6 +791,18 @@ export const ZatcaSubmissionScalarFieldEnumSchema = z.enum(['id', 'organizationI
 
 export type ZatcaSubmissionScalarFieldEnum = z.infer<typeof ZatcaSubmissionScalarFieldEnumSchema>;
 
+// File: OrgCategoryScalarFieldEnum.schema.ts
+
+export const OrgCategoryScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'group', 'systemId', 'nameAr', 'nameEn', 'accountCode', 'isVatExempt', 'isSystem', 'isActive', 'sortOrder', 'createdAt', 'updatedAt', 'createdById'])
+
+export type OrgCategoryScalarFieldEnum = z.infer<typeof OrgCategoryScalarFieldEnumSchema>;
+
+// File: OrgSubcategoryScalarFieldEnum.schema.ts
+
+export const OrgSubcategoryScalarFieldEnumSchema = z.enum(['id', 'categoryId', 'organizationId', 'systemId', 'nameAr', 'nameEn', 'isLabor', 'isSystem', 'isActive', 'sortOrder', 'createdAt', 'updatedAt'])
+
+export type OrgSubcategoryScalarFieldEnum = z.infer<typeof OrgSubcategoryScalarFieldEnumSchema>;
+
 // File: SortOrder.schema.ts
 
 export const SortOrderSchema = z.enum(['asc', 'desc'])
@@ -1438,6 +1450,12 @@ export type QualityRating = z.infer<typeof QualityRatingSchema>;
 export const ZatcaIntegrationStatusSchema = z.enum(['DISABLED', 'ONBOARDING', 'COMPLIANCE', 'ACTIVE', 'EXPIRED', 'REVOKED'])
 
 export type ZatcaIntegrationStatus = z.infer<typeof ZatcaIntegrationStatusSchema>;
+
+// File: CategoryGroup.schema.ts
+
+export const CategoryGroupSchema = z.enum(['EXPENSE'])
+
+export type CategoryGroup = z.infer<typeof CategoryGroupSchema>;
 
 // File: PlanConfig.schema.ts
 
@@ -4900,4 +4918,46 @@ export const ZatcaSubmissionSchema = z.object({
 });
 
 export type ZatcaSubmissionType = z.infer<typeof ZatcaSubmissionSchema>;
+
+
+// File: OrgCategory.schema.ts
+
+export const OrgCategorySchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  group: CategoryGroupSchema,
+  systemId: z.string().nullish(),
+  nameAr: z.string(),
+  nameEn: z.string(),
+  accountCode: z.string().nullish(),
+  isVatExempt: z.boolean(),
+  isSystem: z.boolean(),
+  isActive: z.boolean().default(true),
+  sortOrder: z.number().int(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  createdById: z.string().nullish(),
+});
+
+export type OrgCategoryType = z.infer<typeof OrgCategorySchema>;
+
+
+// File: OrgSubcategory.schema.ts
+
+export const OrgSubcategorySchema = z.object({
+  id: z.string(),
+  categoryId: z.string(),
+  organizationId: z.string(),
+  systemId: z.string().nullish(),
+  nameAr: z.string(),
+  nameEn: z.string(),
+  isLabor: z.boolean(),
+  isSystem: z.boolean(),
+  isActive: z.boolean().default(true),
+  sortOrder: z.number().int(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type OrgSubcategoryType = z.infer<typeof OrgSubcategorySchema>;
 

@@ -90,6 +90,29 @@ export async function POST(req: NextRequest) {
 		await page.evaluate(() => document.fonts?.ready);
 		await new Promise((r) => setTimeout(r, 1000));
 
+		// Move print area to body root and mark for CSS targeting.
+		// This mimics what the beforeprint event does for browser printing.
+		// Without this, the print area stays buried deep in the DOM and the
+		// body[data-printing] > *:not(#print-area) selector cannot isolate it.
+		await page.evaluate(() => {
+			const printArea =
+				document.getElementById("invoice-print-area") ||
+				document.getElementById("quotation-print-area");
+
+			if (
+				printArea &&
+				printArea.parentNode &&
+				printArea.parentNode !== document.body
+			) {
+				document.body.appendChild(printArea);
+			}
+
+			document.body.setAttribute("data-printing", "true");
+		});
+
+		// Small wait for CSS to apply after DOM mutation
+		await new Promise((r) => setTimeout(r, 100));
+
 		// Generate PDF — @media print CSS handles hiding sidebar/toolbar
 		const pdfBuffer = await page.pdf({
 			format: "A4",

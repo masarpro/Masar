@@ -585,8 +585,11 @@ input[cmdk-input] {
 		background-color: white !important;
 	}
 
-	/* Repeating header/footer via position: fixed within @page margin space */
-	[data-pdf-header] {
+	/* Repeating header/footer via position: fixed within @page margin space.
+	   Gated by body[data-printing="true"] — set by beforeprint event (browser)
+	   or page.evaluate() (Puppeteer) — so it only activates after the print
+	   area has been moved to be a direct child of body. */
+	body[data-printing="true"] [data-pdf-header] {
 		position: fixed !important;
 		top: 0 !important;
 		left: 0 !important;
@@ -595,7 +598,7 @@ input[cmdk-input] {
 		background: white !important;
 		z-index: 9999 !important;
 	}
-	[data-pdf-footer] {
+	body[data-printing="true"] [data-pdf-footer] {
 		position: fixed !important;
 		bottom: 0 !important;
 		left: 0 !important;
@@ -604,7 +607,7 @@ input[cmdk-input] {
 		background: white !important;
 		z-index: 9999 !important;
 	}
-	[data-pdf-body] {
+	body[data-printing="true"] [data-pdf-body] {
 		padding-top: 0 !important;
 		padding-bottom: 0 !important;
 	}

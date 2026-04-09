@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
@@ -43,6 +43,48 @@ export function QuotationPreview({
 	const [showFilenameDialog, setShowFilenameDialog] = useState(false);
 	const [pdfFilename, setPdfFilename] = useState("");
 	const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+	// Browser print handler: physically move #quotation-print-area to be a direct
+	// child of body before printing, so CSS selectors can isolate it cleanly.
+	// Restores original DOM position after printing.
+	useEffect(() => {
+		const PRINT_ID = "quotation-print-area";
+
+		const handleBeforePrint = () => {
+			const printArea = document.getElementById(PRINT_ID);
+			if (
+				printArea &&
+				printArea.parentNode &&
+				printArea.parentNode !== document.body
+			) {
+				(printArea as any).__originalParent = printArea.parentNode;
+				(printArea as any).__originalNextSibling = printArea.nextSibling;
+				document.body.appendChild(printArea);
+				document.body.setAttribute("data-printing", "true");
+			}
+		};
+
+		const handleAfterPrint = () => {
+			const printArea = document.getElementById(PRINT_ID) as any;
+			if (printArea?.__originalParent) {
+				printArea.__originalParent.insertBefore(
+					printArea,
+					printArea.__originalNextSibling,
+				);
+				delete printArea.__originalParent;
+				delete printArea.__originalNextSibling;
+			}
+			document.body.removeAttribute("data-printing");
+		};
+
+		window.addEventListener("beforeprint", handleBeforePrint);
+		window.addEventListener("afterprint", handleAfterPrint);
+
+		return () => {
+			window.removeEventListener("beforeprint", handleBeforePrint);
+			window.removeEventListener("afterprint", handleAfterPrint);
+		};
+	}, []);
 
 	// Fetch quotation data
 	const { data: quotationRaw, isLoading: isLoadingQuotation } = useQuery(
@@ -247,12 +289,23 @@ export function QuotationPreview({
 			{/* Print styles */}
 			<style jsx global>{`
 				@media print {
-					/* Hide everything except the print area — using display, NOT visibility */
-					body > *:not(#quotation-print-area):not(script):not(style) {
+					@page {
+						size: A4 portrait;
+						margin: 50mm 0 35mm 0;
+					}
+
+					/* When body has data-printing (set by beforeprint event or Puppeteer),
+					   hide all direct children except the print area that was moved to body root */
+					body[data-printing="true"] > *:not(#quotation-print-area):not(script):not(style) {
 						display: none !important;
 					}
 
-					/* Keep print area in normal flow — DO NOT use position: absolute */
+					body[data-printing="true"] {
+						margin: 0 !important;
+						padding: 0 !important;
+						background: white !important;
+					}
+
 					#quotation-print-area {
 						display: block !important;
 						width: 210mm !important;
@@ -265,15 +318,8 @@ export function QuotationPreview({
 						background: white !important;
 					}
 
-					/* Reset wrapper Card styles that interfere with print */
-					#quotation-print-area .rounded-2xl,
 					#quotation-print-area [class*="rounded"] {
 						border-radius: 0 !important;
-					}
-
-					@page {
-						size: A4 portrait;
-						margin: 15mm 0;
 					}
 				}
 			`}</style>

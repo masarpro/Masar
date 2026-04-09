@@ -1144,6 +1144,10 @@ model Organization {
   yearEndClosings         YearEndClosing[]
   capitalContributions    CapitalContribution[]
 
+  // Category Management - إدارة الفئات (DB-backed، seed-on-access)
+  orgCategories           OrgCategory[]
+  orgSubcategories        OrgSubcategory[]
+
   // ═══ نهاية حقول مسار ═══
 
   @@unique([slug])
@@ -4380,9 +4384,11 @@ model FinanceExpense {
   category        OrgExpenseCategory
   customCategory  String?                   @map("custom_category")  // إذا كانت CUSTOM
 
-  // فئات المصروفات الهرمية الجديدة
+  // فئات المصروفات الهرمية الجديدة (DB-backed)
   categoryId      String?                   @map("category_id")
   subcategoryId   String?                   @map("subcategory_id")
+  categoryRef     OrgCategory?              @relation("FinanceExpenseCategory", fields: [categoryId], references: [id], onDelete: SetNull)
+  subcategoryRef  OrgSubcategory?           @relation("FinanceExpenseSubcategory", fields: [subcategoryId], references: [id], onDelete: SetNull)
 
   // الوصف والمبلغ
   description     String?                   @db.Text
@@ -4572,9 +4578,11 @@ model CompanyExpense {
   category        CompanyExpenseCategory   // فئة المصروف
   description     String?                 @db.Text
 
-  // فئات المصروفات الهرمية الجديدة
+  // فئات المصروفات الهرمية الجديدة (DB-backed)
   categoryId      String?                 @map("category_id")
   subcategoryId   String?                 @map("subcategory_id")
+  categoryRef     OrgCategory?            @relation("CompanyExpenseCategory", fields: [categoryId], references: [id], onDelete: SetNull)
+  subcategoryRef  OrgSubcategory?         @relation("CompanyExpenseSubcategory", fields: [subcategoryId], references: [id], onDelete: SetNull)
 
   // المبلغ والتكرار
   amount          Decimal                 @db.Decimal(15, 2)  // المبلغ لكل فترة
@@ -6238,4 +6246,75 @@ model ZatcaSubmission {
   @@index([status])
   @@index([organizationId, status])
   @@map("zatca_submissions")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CATEGORY MANAGEMENT — Extensible Multi-Group Category System
+// إدارة الفئات — نظام فئات قابل للتوسعة عبر مجموعات متعددة
+// ═══════════════════════════════════════════════════════════════════════════
+
+enum CategoryGroup {
+  EXPENSE // فئات المصروفات (المجموعة الوحيدة الفعّالة الآن)
+  // مستقبلاً: LEAD_SOURCE, PROJECT_TYPE, ASSET_CATEGORY, INCOME_CATEGORY ...
+}
+
+// فئات قابلة للتعديل من المستخدم — مزروعة افتراضياً عند أول استعلام
+model OrgCategory {
+  id              String        @id @default(cuid())
+  organizationId  String        @map("organization_id")
+  group           CategoryGroup
+  // الـ stable ID من ملف الـ defaults (e.g., "CONCRETE_STRUCTURAL"). null لو فئة مخصصة.
+  systemId        String?       @map("system_id")
+  nameAr          String        @map("name_ar")
+  nameEn          String        @map("name_en")
+
+  // حقول خاصة بمجموعة EXPENSE (nullable لأن المجموعات الأخرى قد لا تحتاجها)
+  accountCode     String?       @map("account_code") // كود الحساب المحاسبي (5100, 5200, ...)
+  isVatExempt     Boolean       @default(false) @map("is_vat_exempt")
+
+  isSystem        Boolean       @default(false) @map("is_system") // true للفئات الافتراضية
+  isActive        Boolean       @default(true) @map("is_active")
+  sortOrder       Int           @default(0) @map("sort_order")
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  createdById     String?       @map("created_by")
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  subcategories   OrgSubcategory[]
+  financeExpenses FinanceExpense[] @relation("FinanceExpenseCategory")
+  companyExpenses CompanyExpense[] @relation("CompanyExpenseCategory")
+
+  @@unique([organizationId, group, systemId])
+  @@index([organizationId, group, isActive])
+  @@map("org_categories")
+}
+
+// فئات فرعية تنتمي لفئة رئيسية
+model OrgSubcategory {
+  id             String  @id @default(cuid())
+  categoryId     String  @map("category_id")
+  // multi-tenancy isolation على مستوى الـ subcategory مباشرة
+  organizationId String  @map("organization_id")
+  // الـ stable ID من ملف الـ defaults (e.g., "READY_MIX"). null لو فئة فرعية مخصصة.
+  systemId       String? @map("system_id")
+  nameAr         String  @map("name_ar")
+  nameEn         String  @map("name_en")
+  isLabor        Boolean @default(false) @map("is_labor")
+  isSystem       Boolean @default(false) @map("is_system")
+  isActive       Boolean @default(true) @map("is_active")
+  sortOrder      Int     @default(0) @map("sort_order")
+
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  category        OrgCategory      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  financeExpenses FinanceExpense[] @relation("FinanceExpenseSubcategory")
+  companyExpenses CompanyExpense[] @relation("CompanyExpenseSubcategory")
+
+  @@unique([categoryId, systemId])
+  @@index([categoryId, isActive])
+  @@index([organizationId])
+  @@map("org_subcategories")
 }
