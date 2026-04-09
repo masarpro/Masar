@@ -42,6 +42,7 @@ import { projectBoqRouter } from "../modules/project-boq/router";
 import { accountingRouter } from "../modules/accounting/router";
 import { handoverRouter } from "../modules/handover/router";
 import { zatcaRouter } from "../modules/zatca/router";
+import { categoriesRouter } from "../modules/categories/router";
 import { publicProcedure } from "./procedures";
 
 export const router = publicProcedure.router({
@@ -109,6 +110,8 @@ export const router = publicProcedure.router({
 	handover: handoverRouter,
 	// ZATCA E-Invoicing Phase 2 - الفوترة الإلكترونية
 	zatca: zatcaRouter,
+	// Category Management - إدارة الفئات (DB-backed، seed-on-access، extensible groups)
+	categories: categoriesRouter,
 });
 
 export type ApiRouterClient = RouterClient<typeof router>;
