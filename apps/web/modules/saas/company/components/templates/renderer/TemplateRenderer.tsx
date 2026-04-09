@@ -760,21 +760,6 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 						</div>
 					</td></tr>
 				</thead>
-				<tfoot>
-					<tr><td>
-						{/* PDF Footer Section — repeats on every printed page */}
-						<div data-pdf-footer>
-							<div className={`px-14 ${footerImage ? "pb-4" : "pb-10"}`}>
-								{renderFooterElements()}
-							</div>
-							{/* Footer Image (full-bleed) */}
-							{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
-							{footerImage && (
-								<img src={footerImage} alt="" className="w-full block" />
-							)}
-						</div>
-					</td></tr>
-				</tfoot>
 				<tbody>
 					<tr><td>
 						{/* Watermark overlay */}
@@ -820,6 +805,23 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 						{afterBody}
 					</td></tr>
 				</tbody>
+				{/* tfoot AFTER tbody: valid HTML5, renders in DOM order on screen (footer at bottom),
+				    but browsers still repeat it at bottom of every printed page */}
+				<tfoot>
+					<tr><td>
+						{/* PDF Footer Section — repeats on every printed page */}
+						<div data-pdf-footer>
+							<div className={`px-14 ${footerImage ? "pb-4" : "pb-10"}`}>
+								{renderFooterElements()}
+							</div>
+							{/* Footer Image (full-bleed) */}
+							{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
+							{footerImage && (
+								<img src={footerImage} alt="" className="w-full block" />
+							)}
+						</div>
+					</td></tr>
+				</tfoot>
 			</table>
 		</div>
 	);
