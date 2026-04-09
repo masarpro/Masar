@@ -625,6 +625,16 @@ input[cmdk-input] {
 		margin: 0;
 	}
 
+	/* Force full height + white background — fixes footer-at-bottom and dark background bleed */
+	html,
+	body {
+		height: 100% !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		background: white !important;
+		background-color: white !important;
+	}
+
 	/* Hide non-printable elements */
 	.print\:hidden,
 	[data-print-hidden="true"] {
@@ -784,9 +794,11 @@ input[cmdk-input] {
 	.print-layout-table {
 		display: table !important;
 		width: 100% !important;
-		min-height: auto !important;
+		height: 100% !important;
+		min-height: 100vh !important;
 		flex-direction: unset !important;
-		border-collapse: collapse;
+		border-collapse: collapse !important;
+		background: white !important;
 	}
 	.print-layout-table > thead {
 		display: table-header-group !important;
@@ -808,11 +820,19 @@ input[cmdk-input] {
 		display: table-row !important;
 		flex: unset !important;
 	}
+	/* Body cell takes all remaining vertical space → pushes tfoot to page bottom */
+	.print-layout-table > tbody > tr > td {
+		display: table-cell !important;
+		flex: unset !important;
+		height: 100% !important;
+		vertical-align: top !important;
+	}
+	/* Header and footer cells: natural height */
 	.print-layout-table > thead > tr > td,
-	.print-layout-table > tbody > tr > td,
 	.print-layout-table > tfoot > tr > td {
 		display: table-cell !important;
 		flex: unset !important;
+		height: auto !important;
 	}
 }
 
