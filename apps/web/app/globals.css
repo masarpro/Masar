@@ -572,18 +572,23 @@ input[cmdk-input] {
 
 /* ══════════════════════════════════════════════════════════════════
    Print Layout Table — on screen: behaves like normal divs
+   Child combinator (>) ensures nested tables (e.g. items table) are NOT affected
    ══════════════════════════════════════════════════════════════════ */
 .print-layout-table,
-.print-layout-table thead,
-.print-layout-table tfoot,
-.print-layout-table tbody,
-.print-layout-table tr,
-.print-layout-table td {
+.print-layout-table > thead,
+.print-layout-table > tbody,
+.print-layout-table > tfoot,
+.print-layout-table > thead > tr,
+.print-layout-table > tbody > tr,
+.print-layout-table > tfoot > tr,
+.print-layout-table > thead > tr > td,
+.print-layout-table > tbody > tr > td,
+.print-layout-table > tfoot > tr > td {
 	display: block;
 	border: none;
 	padding: 0;
 	margin: 0;
-	width: 100%;
+	background: transparent;
 }
 
 /* Print Styles for Financial Templates */
@@ -753,21 +758,24 @@ input[cmdk-input] {
 		width: 100% !important;
 		border-collapse: collapse;
 	}
-	.print-layout-table thead {
+	.print-layout-table > thead {
 		display: table-header-group !important;
 	}
-	.print-layout-table tfoot {
-		display: table-footer-group !important;
-	}
-	.print-layout-table tbody {
+	.print-layout-table > tbody {
 		display: table-row-group !important;
 	}
-	.print-layout-table tr {
+	.print-layout-table > tfoot {
+		display: table-footer-group !important;
+	}
+	.print-layout-table > thead > tr,
+	.print-layout-table > tbody > tr,
+	.print-layout-table > tfoot > tr {
 		display: table-row !important;
 	}
-	.print-layout-table td {
+	.print-layout-table > thead > tr > td,
+	.print-layout-table > tbody > tr > td,
+	.print-layout-table > tfoot > tr > td {
 		display: table-cell !important;
-		width: 100%;
 	}
 }
 
