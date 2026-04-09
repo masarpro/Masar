@@ -7,12 +7,14 @@ interface AddExpenseDialogProps {
 	onOpenChange: (open: boolean) => void;
 	organizationId: string;
 	organizationSlug: string;
+	expenseId?: string | null;
 }
 
 export function AddExpenseDialog({
 	open,
 	onOpenChange,
 	organizationId,
+	expenseId,
 }: AddExpenseDialogProps) {
 	return (
 		<SharedAddExpenseDialog
@@ -20,6 +22,7 @@ export function AddExpenseDialog({
 			onOpenChange={onOpenChange}
 			organizationId={organizationId}
 			showProjectSelector
+			expenseId={expenseId}
 		/>
 	);
 }

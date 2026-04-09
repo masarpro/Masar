@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
@@ -68,6 +68,8 @@ interface AddExpenseDialogProps {
 	showProjectSelector?: boolean;
 	/** Called after successful creation */
 	onSuccess?: () => void;
+	/** When set, dialog opens in edit mode and loads this expense */
+	expenseId?: string | null;
 }
 
 export function AddExpenseDialog({
@@ -77,7 +79,9 @@ export function AddExpenseDialog({
 	projectId,
 	showProjectSelector = false,
 	onSuccess,
+	expenseId,
 }: AddExpenseDialogProps) {
+	const isEditMode = !!expenseId;
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -123,6 +127,42 @@ export function AddExpenseDialog({
 		}),
 		enabled: showProjectSelector,
 	});
+
+	// Fetch existing expense data in edit mode
+	const { data: existingExpense, isLoading: isLoadingExpense } = useQuery({
+		...orpc.finance.expenses.getById.queryOptions({
+			input: { organizationId, id: expenseId ?? "" },
+		}),
+		enabled: isEditMode && open && !!expenseId,
+	});
+
+	// Populate form when existing expense data arrives
+	useEffect(() => {
+		if (!isEditMode || !existingExpense || !open) return;
+		setFormData({
+			categoryId: (existingExpense as any).categoryId ?? "",
+			subcategoryId: (existingExpense as any).subcategoryId ?? null,
+			description: (existingExpense as any).description ?? "",
+			amount: String((existingExpense as any).amount ?? ""),
+			date: new Date((existingExpense as any).date)
+				.toISOString()
+				.split("T")[0],
+			dueDate: (existingExpense as any).dueDate
+				? new Date((existingExpense as any).dueDate)
+						.toISOString()
+						.split("T")[0]
+				: "",
+			sourceAccountId: (existingExpense as any).sourceAccountId ?? "",
+			vendorName: (existingExpense as any).vendorName ?? "",
+			vendorTaxNumber: (existingExpense as any).vendorTaxNumber ?? "",
+			invoiceRef: (existingExpense as any).invoiceRef ?? "",
+			paymentMethod: ((existingExpense as any).paymentMethod ??
+				"BANK_TRANSFER") as (typeof PAYMENT_METHODS)[number],
+			referenceNo: (existingExpense as any).referenceNo ?? "",
+			notes: (existingExpense as any).notes ?? "",
+			projectId: (existingExpense as any).projectId ?? "",
+		});
+	}, [existingExpense, isEditMode, open]);
 
 	const accounts = accountsData?.accounts ?? [];
 	const projects = projectsData?.projects ?? [];
@@ -222,9 +262,9 @@ export function AddExpenseDialog({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.expenses.createSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "expenses"] });
-			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
-			queryClient.invalidateQueries({ queryKey: ["projectFinance"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.expenses.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.projectFinance.key() });
 			onSuccess?.();
 			resetForm();
 			onOpenChange(false);
@@ -233,6 +273,48 @@ export function AddExpenseDialog({
 			toast.error(error.message || t("finance.expenses.createError"));
 		},
 	});
+
+	// Update mutation (edit mode)
+	const updateMutation = useMutation({
+		mutationFn: async () => {
+			if (!expenseId) {
+				throw new Error("Missing expense id");
+			}
+			if (!formData.categoryId) {
+				throw new Error(t("finance.expenses.categoryRequired"));
+			}
+
+			return orpcClient.finance.expenses.update({
+				organizationId,
+				id: expenseId,
+				categoryId: formData.categoryId,
+				subcategoryId: formData.subcategoryId || undefined,
+				description: formData.description || undefined,
+				date: new Date(formData.date),
+				vendorName: formData.vendorName || undefined,
+				vendorTaxNumber: formData.vendorTaxNumber || undefined,
+				projectId: formData.projectId || null,
+				invoiceRef: formData.invoiceRef || undefined,
+				paymentMethod: formData.paymentMethod,
+				referenceNo: formData.referenceNo || undefined,
+				notes: formData.notes || undefined,
+			});
+		},
+		onSuccess: () => {
+			toast.success(t("finance.expenses.updateSuccess"));
+			queryClient.invalidateQueries({ queryKey: orpc.finance.expenses.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.projectFinance.key() });
+			onSuccess?.();
+			resetForm();
+			onOpenChange(false);
+		},
+		onError: (error: any) => {
+			toast.error(error.message || t("finance.expenses.updateError"));
+		},
+	});
+
+	const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
 	const resetForm = () => {
 		setFormData({
@@ -258,7 +340,11 @@ export function AddExpenseDialog({
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		createMutation.mutate();
+		if (isEditMode) {
+			updateMutation.mutate();
+		} else {
+			createMutation.mutate();
+		}
 	};
 
 	const getPaymentMethodLabel = (method: string) => {
@@ -329,11 +415,17 @@ export function AddExpenseDialog({
 				onOpenChange(val);
 			}}
 		>
-			<DialogContent className="sm:max-w-4xl p-0 gap-0 rounded-2xl overflow-hidden max-h-[90vh] flex flex-col">
+			<DialogContent
+				className="sm:max-w-4xl p-0 gap-0 rounded-2xl overflow-hidden max-h-[90vh] flex flex-col"
+				onPointerDownOutside={(e) => e.preventDefault()}
+				onInteractOutside={(e) => e.preventDefault()}
+			>
 				{/* Header */}
 				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4 shrink-0">
 					<DialogTitle className="text-base font-semibold">
-						{t("finance.expenses.new")}
+						{isEditMode
+							? t("finance.expenses.edit")
+							: t("finance.expenses.new")}
 					</DialogTitle>
 				</DialogHeader>
 
@@ -357,6 +449,7 @@ export function AddExpenseDialog({
 									className="rounded-xl text-base font-semibold h-10"
 									dir="ltr"
 									required
+									disabled={isEditMode}
 								/>
 							</div>
 							<div className="space-y-1">
@@ -407,6 +500,83 @@ export function AddExpenseDialog({
 							</div>
 						</div>
 
+						{/* Row 3: Account (moved out of Advanced) */}
+						<div className={`space-y-1 ${isObligation ? "opacity-60" : ""}`}>
+							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								{t("finance.expenses.selectAccount")} {!isObligation && "*"}
+							</Label>
+							<Select
+								value={formData.sourceAccountId}
+								onValueChange={(value: any) =>
+									setFormData({ ...formData, sourceAccountId: value })
+								}
+								disabled={isObligation || isEditMode}
+							>
+								<SelectTrigger className="rounded-xl h-10">
+									<SelectValue
+										placeholder={t("finance.expenses.selectAccountPlaceholder")}
+									/>
+								</SelectTrigger>
+								<SelectContent className="rounded-xl">
+									{accounts.map((account: any) => (
+										<SelectItem key={account.id} value={account.id}>
+											<div className="flex items-center gap-2">
+												{account.accountType === "BANK" ? (
+													<Building className="h-3.5 w-3.5 text-blue-500" />
+												) : (
+													<Wallet className="h-3.5 w-3.5 text-green-500" />
+												)}
+												<span>{account.name}</span>
+												<span className="text-slate-400 text-xs">
+													(<Currency amount={Number(account.balance)} />)
+												</span>
+											</div>
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+
+						{/* Selected account info (compact) — shown outside Advanced */}
+						{selectedAccount && !isObligation && (
+							<div className="rounded-xl border border-blue-200/60 bg-blue-50/40 dark:border-blue-800/30 dark:bg-blue-950/20 px-4 py-2.5 flex items-center justify-between">
+								<div className="flex items-center gap-2.5">
+									<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
+										{selectedAccount.accountType === "BANK" ? (
+											<Building className="h-3.5 w-3.5 text-blue-600" />
+										) : (
+											<Wallet className="h-3.5 w-3.5 text-green-600" />
+										)}
+									</div>
+									<div>
+										<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+											{selectedAccount.name}
+										</p>
+										{selectedAccount.bankName && (
+											<p className="text-[11px] text-slate-500">
+												{selectedAccount.bankName}
+											</p>
+										)}
+									</div>
+								</div>
+								<div className="flex items-center gap-3 text-sm">
+									<span className="font-semibold">
+										<Currency amount={Number(selectedAccount.balance)} />
+									</span>
+									{numericAmount > 0 && (
+										<>
+											<ArrowRight className="h-3.5 w-3.5 text-slate-400" />
+											<span className="text-red-500 font-semibold">
+												<Currency
+													amount={Number(selectedAccount.balance) - numericAmount}
+												/>
+											</span>
+										</>
+									)}
+								</div>
+							</div>
+						)}
+
 						{/* Project Link (Finance mode only) */}
 						{showProjectSelector && (
 							<div className="space-y-1">
@@ -451,7 +621,7 @@ export function AddExpenseDialog({
 						</div>
 
 						{/* Obligation Toggle (Finance only) */}
-						{supportsObligation && (
+						{supportsObligation && !isEditMode && (
 							<div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
 								<div className="flex items-center gap-2.5">
 									<div className="p-1.5 bg-amber-100 dark:bg-amber-900/50 rounded-lg">
@@ -470,7 +640,7 @@ export function AddExpenseDialog({
 						)}
 
 						{/* Due Date (only for obligations) */}
-						{supportsObligation && isObligation && (
+						{supportsObligation && !isEditMode && isObligation && (
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("finance.expenses.dueDate")}
@@ -499,43 +669,8 @@ export function AddExpenseDialog({
 							</CollapsibleTrigger>
 							<CollapsibleContent className="space-y-4 pt-3">
 
-						{/* Account, Payment Method, Reference */}
-						<div className={`grid grid-cols-3 gap-3 ${isObligation ? "opacity-60" : ""}`}>
-							<div className="space-y-1">
-								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
-									{t("finance.expenses.selectAccount")} {!isObligation && "*"}
-								</Label>
-								<Select
-									value={formData.sourceAccountId}
-									onValueChange={(value: any) =>
-										setFormData({ ...formData, sourceAccountId: value })
-									}
-									disabled={isObligation}
-								>
-									<SelectTrigger className="rounded-xl h-10">
-										<SelectValue
-											placeholder={t("finance.expenses.selectAccountPlaceholder")}
-										/>
-									</SelectTrigger>
-									<SelectContent className="rounded-xl">
-										{accounts.map((account: any) => (
-											<SelectItem key={account.id} value={account.id}>
-												<div className="flex items-center gap-2">
-													{account.accountType === "BANK" ? (
-														<Building className="h-3.5 w-3.5 text-blue-500" />
-													) : (
-														<Wallet className="h-3.5 w-3.5 text-green-500" />
-													)}
-													<span>{account.name}</span>
-													<span className="text-slate-400 text-xs">
-														(<Currency amount={Number(account.balance)} />)
-													</span>
-												</div>
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
+						{/* Payment Method, Reference */}
+						<div className={`grid grid-cols-2 gap-3 ${isObligation ? "opacity-60" : ""}`}>
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("finance.expenses.paymentMethod")}
@@ -575,46 +710,6 @@ export function AddExpenseDialog({
 								/>
 							</div>
 						</div>
-
-						{/* Selected account info (compact) */}
-						{selectedAccount && !isObligation && (
-							<div className="rounded-xl border border-blue-200/60 bg-blue-50/40 dark:border-blue-800/30 dark:bg-blue-950/20 px-4 py-2.5 flex items-center justify-between">
-								<div className="flex items-center gap-2.5">
-									<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
-										{selectedAccount.accountType === "BANK" ? (
-											<Building className="h-3.5 w-3.5 text-blue-600" />
-										) : (
-											<Wallet className="h-3.5 w-3.5 text-green-600" />
-										)}
-									</div>
-									<div>
-										<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-											{selectedAccount.name}
-										</p>
-										{selectedAccount.bankName && (
-											<p className="text-[11px] text-slate-500">
-												{selectedAccount.bankName}
-											</p>
-										)}
-									</div>
-								</div>
-								<div className="flex items-center gap-3 text-sm">
-									<span className="font-semibold">
-										<Currency amount={Number(selectedAccount.balance)} />
-									</span>
-									{numericAmount > 0 && (
-										<>
-											<ArrowRight className="h-3.5 w-3.5 text-slate-400" />
-											<span className="text-red-500 font-semibold">
-												<Currency
-													amount={Number(selectedAccount.balance) - numericAmount}
-												/>
-											</span>
-										</>
-									)}
-								</div>
-							</div>
-						)}
 
 						{/* Vendor Name, Tax Number, Invoice Ref */}
 						<div className="grid grid-cols-3 gap-3">
@@ -662,7 +757,7 @@ export function AddExpenseDialog({
 						</div>
 
 						{/* Notes + Invoice Attachment */}
-						<div className="grid grid-cols-2 gap-3">
+						<div className={`grid gap-3 ${isEditMode ? "grid-cols-1" : "grid-cols-2"}`}>
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("finance.expenses.additionalNotes")}
@@ -679,6 +774,7 @@ export function AddExpenseDialog({
 							</div>
 
 							{/* Invoice Attachment Zone */}
+							{!isEditMode && (
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("finance.expenses.attachInvoice")}
@@ -749,6 +845,7 @@ export function AddExpenseDialog({
 									</div>
 								)}
 							</div>
+							)}
 						</div>
 
 							</CollapsibleContent>
@@ -762,16 +859,16 @@ export function AddExpenseDialog({
 							variant="outline"
 							className="flex-1 rounded-xl h-10"
 							onClick={() => onOpenChange(false)}
-							disabled={createMutation.isPending}
+							disabled={isSubmitting}
 						>
 							{t("common.cancel")}
 						</Button>
 						<Button
 							type="submit"
 							className="flex-1 rounded-xl h-10"
-							disabled={createMutation.isPending}
+							disabled={isSubmitting || (isEditMode && isLoadingExpense)}
 						>
-							{createMutation.isPending ? (
+							{isSubmitting ? (
 								<>
 									<Loader2 className="h-4 w-4 me-2 animate-spin" />
 									{t("common.saving")}
@@ -779,7 +876,9 @@ export function AddExpenseDialog({
 							) : (
 								<>
 									<Save className="h-4 w-4 me-2" />
-									{t("finance.expenses.create")}
+									{isEditMode
+										? t("common.save")
+										: t("finance.expenses.create")}
 								</>
 							)}
 						</Button>

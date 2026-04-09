@@ -571,8 +571,9 @@ input[cmdk-input] {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   Print Layout Table — on screen: behaves like normal divs
-   Child combinator (>) ensures nested tables (e.g. items table) are NOT affected
+   Print Layout Table — on screen: behaves like a flex column
+   that fills A4 height and pins footer to bottom.
+   Child combinator (>) ensures nested tables (e.g. items table) are NOT affected.
    ══════════════════════════════════════════════════════════════════ */
 .print-layout-table,
 .print-layout-table > thead,
@@ -584,11 +585,36 @@ input[cmdk-input] {
 .print-layout-table > thead > tr > td,
 .print-layout-table > tbody > tr > td,
 .print-layout-table > tfoot > tr > td {
-	display: block;
 	border: none;
 	padding: 0;
 	margin: 0;
 	background: transparent;
+}
+
+/* Screen: pin footer to bottom of A4 page card */
+.print-layout-table {
+	min-height: 297mm;
+	display: flex !important;
+	flex-direction: column !important;
+}
+.print-layout-table > thead {
+	display: block !important;
+	flex-shrink: 0;
+}
+.print-layout-table > tbody {
+	display: flex !important;
+	flex-direction: column !important;
+	flex: 1 1 auto;
+}
+.print-layout-table > tbody > tr,
+.print-layout-table > tbody > tr > td {
+	display: block !important;
+	flex: 1 1 auto;
+}
+.print-layout-table > tfoot {
+	display: block !important;
+	flex-shrink: 0;
+	margin-top: auto;
 }
 
 /* Print Styles for Financial Templates */
@@ -752,30 +778,41 @@ input[cmdk-input] {
 		border-radius: 0 !important;
 	}
 
-	/* ── Repeating Header/Footer via Table Layout ── */
+	/* ── Repeating Header/Footer via Table Layout ──
+	   Override screen flex-layout back to real table so
+	   thead/tfoot repeat on every printed page. ── */
 	.print-layout-table {
 		display: table !important;
 		width: 100% !important;
+		min-height: auto !important;
+		flex-direction: unset !important;
 		border-collapse: collapse;
 	}
 	.print-layout-table > thead {
 		display: table-header-group !important;
+		flex-shrink: unset !important;
 	}
 	.print-layout-table > tbody {
 		display: table-row-group !important;
+		flex: unset !important;
+		flex-direction: unset !important;
 	}
 	.print-layout-table > tfoot {
 		display: table-footer-group !important;
+		flex-shrink: unset !important;
+		margin-top: unset !important;
 	}
 	.print-layout-table > thead > tr,
 	.print-layout-table > tbody > tr,
 	.print-layout-table > tfoot > tr {
 		display: table-row !important;
+		flex: unset !important;
 	}
 	.print-layout-table > thead > tr > td,
 	.print-layout-table > tbody > tr > td,
 	.print-layout-table > tfoot > tr > td {
 		display: table-cell !important;
+		flex: unset !important;
 	}
 }
 

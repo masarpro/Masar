@@ -98,6 +98,7 @@ export function ExpensesList({
 	const [projectFilter, setProjectFilter] = useState<string | undefined>(projectId);
 	const [deleteExpenseId, setDeleteExpenseId] = useState<string | null>(null);
 	const [showAddDialog, setShowAddDialog] = useState(false);
+	const [editExpenseId, setEditExpenseId] = useState<string | null>(null);
 	const [payExpense, setPayExpense] = useState<{
 		id: string;
 		expenseNo: string;
@@ -511,11 +512,7 @@ export function ExpensesList({
 															{t("common.view")}
 														</DropdownMenuItem>
 														<DropdownMenuItem
-															onClick={() =>
-																router.push(
-																	`${effectiveBasePath}/${item.id}`,
-																)
-															}
+															onClick={() => setEditExpenseId(item.id)}
 														>
 															<Pencil className="h-4 w-4 me-2" />
 															{t("common.edit")}
@@ -607,6 +604,15 @@ export function ExpensesList({
 				onOpenChange={setShowAddDialog}
 				organizationId={organizationId}
 				organizationSlug={organizationSlug}
+			/>
+
+			{/* Edit Expense Dialog (reuses the same form, populated with existing data) */}
+			<AddExpenseDialog
+				open={!!editExpenseId}
+				onOpenChange={(open) => !open && setEditExpenseId(null)}
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+				expenseId={editExpenseId}
 			/>
 		</div>
 	);

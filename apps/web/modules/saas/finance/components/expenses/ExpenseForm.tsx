@@ -127,9 +127,9 @@ export function ExpenseForm({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.expenses.createSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "expenses"] });
-			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
-			queryClient.invalidateQueries({ queryKey: ["projectFinance"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.expenses.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.projectFinance.key() });
 			router.push(redirectPath || `/app/${organizationSlug}/finance/expenses`);
 		},
 		onError: (error: any) => {

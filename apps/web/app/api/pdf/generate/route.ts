@@ -52,20 +52,23 @@ export async function POST(req: NextRequest) {
 
 		const page = await browser.newPage();
 
-		// Forward cookies from the original request so Puppeteer can access protected pages
-		const cookieHeader = req.headers.get("cookie");
-		if (cookieHeader) {
-			const parsedUrl = new URL(fullUrl);
-			const cookies = cookieHeader.split(";").map((c) => {
-				const [name, ...rest] = c.trim().split("=");
-				return {
-					name: name!.trim(),
-					value: rest.join("=").trim(),
-					domain: parsedUrl.hostname,
-					path: "/",
-				};
-			});
-			await page.setCookie(...cookies);
+		// Forward cookies from the original request (sanitized for Puppeteer)
+		const parsedUrl = new URL(fullUrl);
+		const sanitizedCookies = req.cookies
+			.getAll()
+			.filter((c) => c.name && c.value)
+			.map((c) => ({
+				name: c.name,
+				value: c.value,
+				domain: parsedUrl.hostname,
+				path: "/",
+				httpOnly: false,
+				secure: parsedUrl.protocol === "https:",
+				sameSite: "Lax" as const,
+			}));
+
+		if (sanitizedCookies.length > 0) {
+			await page.setCookie(...sanitizedCookies);
 		}
 
 		await page.goto(fullUrl, {
