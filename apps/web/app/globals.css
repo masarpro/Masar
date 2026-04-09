@@ -570,69 +570,43 @@ input[cmdk-input] {
 	background: hsl(var(--muted-foreground) / 0.3);
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   Print Layout Table — on screen: behaves like a flex column
-   that fills A4 height and pins footer to bottom.
-   Child combinator (>) ensures nested tables (e.g. items table) are NOT affected.
-   ══════════════════════════════════════════════════════════════════ */
-.print-layout-table,
-.print-layout-table > thead,
-.print-layout-table > tbody,
-.print-layout-table > tfoot,
-.print-layout-table > thead > tr,
-.print-layout-table > tbody > tr,
-.print-layout-table > tfoot > tr,
-.print-layout-table > thead > tr > td,
-.print-layout-table > tbody > tr > td,
-.print-layout-table > tfoot > tr > td {
-	border: none;
-	padding: 0;
-	margin: 0;
-	background: transparent;
-}
-
-/* Screen: pin footer to bottom of A4 page card */
-.print-layout-table {
-	min-height: 297mm;
-	display: flex !important;
-	flex-direction: column !important;
-}
-.print-layout-table > thead {
-	display: block !important;
-	flex-shrink: 0;
-}
-.print-layout-table > tbody {
-	display: flex !important;
-	flex-direction: column !important;
-	flex: 1 1 auto;
-}
-.print-layout-table > tbody > tr,
-.print-layout-table > tbody > tr > td {
-	display: block !important;
-	flex: 1 1 auto;
-}
-.print-layout-table > tfoot {
-	display: block !important;
-	flex-shrink: 0;
-	margin-top: auto;
-}
-
 /* Print Styles for Financial Templates */
 @media print {
-	/* Page setup */
+	/* Page setup — 15mm top/bottom margin reserves space for fixed header/footer repetition */
 	@page {
 		size: A4 portrait;
-		margin: 0;
+		margin: 15mm 0;
 	}
 
-	/* Force full height + white background — fixes footer-at-bottom and dark background bleed */
+	/* White background to prevent dark mode bleed */
 	html,
 	body {
-		height: 100% !important;
-		margin: 0 !important;
-		padding: 0 !important;
 		background: white !important;
 		background-color: white !important;
+	}
+
+	/* Repeating header/footer via position: fixed within @page margin space */
+	[data-pdf-header] {
+		position: fixed !important;
+		top: 0 !important;
+		left: 0 !important;
+		right: 0 !important;
+		width: 210mm !important;
+		background: white !important;
+		z-index: 9999 !important;
+	}
+	[data-pdf-footer] {
+		position: fixed !important;
+		bottom: 0 !important;
+		left: 0 !important;
+		right: 0 !important;
+		width: 210mm !important;
+		background: white !important;
+		z-index: 9999 !important;
+	}
+	[data-pdf-body] {
+		padding-top: 0 !important;
+		padding-bottom: 0 !important;
 	}
 
 	/* Hide non-printable elements */
@@ -786,53 +760,6 @@ input[cmdk-input] {
 	main {
 		padding: 0 !important;
 		border-radius: 0 !important;
-	}
-
-	/* ── Repeating Header/Footer via Table Layout ──
-	   Override screen flex-layout back to real table so
-	   thead/tfoot repeat on every printed page. ── */
-	.print-layout-table {
-		display: table !important;
-		width: 100% !important;
-		height: 100% !important;
-		min-height: 100vh !important;
-		flex-direction: unset !important;
-		border-collapse: collapse !important;
-		background: white !important;
-	}
-	.print-layout-table > thead {
-		display: table-header-group !important;
-		flex-shrink: unset !important;
-	}
-	.print-layout-table > tbody {
-		display: table-row-group !important;
-		flex: unset !important;
-		flex-direction: unset !important;
-	}
-	.print-layout-table > tfoot {
-		display: table-footer-group !important;
-		flex-shrink: unset !important;
-		margin-top: unset !important;
-	}
-	.print-layout-table > thead > tr,
-	.print-layout-table > tbody > tr,
-	.print-layout-table > tfoot > tr {
-		display: table-row !important;
-		flex: unset !important;
-	}
-	/* Body cell takes all remaining vertical space → pushes tfoot to page bottom */
-	.print-layout-table > tbody > tr > td {
-		display: table-cell !important;
-		flex: unset !important;
-		height: 100% !important;
-		vertical-align: top !important;
-	}
-	/* Header and footer cells: natural height */
-	.print-layout-table > thead > tr > td,
-	.print-layout-table > tfoot > tr > td {
-		display: table-cell !important;
-		flex: unset !important;
-		height: auto !important;
 	}
 }
 

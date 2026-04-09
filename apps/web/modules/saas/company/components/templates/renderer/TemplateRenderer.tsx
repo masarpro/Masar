@@ -743,86 +743,71 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 			dir={locale === "ar" ? "rtl" : "ltr"}
 			onClick={() => interactive && onElementClick?.(null)}
 		>
-			{/* Table layout: on screen display:block (invisible), in print thead/tfoot repeat on every page */}
-			<table className="print-layout-table">
-				<thead>
-					<tr><td>
-						{/* PDF Header Section — repeats on every printed page */}
-						<div data-pdf-header>
-							{/* Header Image (full-bleed) */}
-							{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
-							{headerImage && (
-								<img src={headerImage} alt="" className="w-full block" />
-							)}
-							<div className={`px-14 ${headerImage ? "pt-4" : "pt-10"}`}>
-								{renderHeaderElements()}
-							</div>
+			{/* PDF Header Section */}
+			<div data-pdf-header>
+				{/* Header Image (full-bleed) */}
+				{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
+				{headerImage && (
+					<img src={headerImage} alt="" className="w-full block" />
+				)}
+				<div className={`px-14 ${headerImage ? "pt-4" : "pt-10"}`}>
+					{renderHeaderElements()}
+				</div>
+			</div>
+
+			{/* Watermark overlay */}
+			{showWatermark && organization?.logo && (
+				<div
+					className="absolute inset-0 flex items-center justify-center pointer-events-none"
+					data-watermark
+				>
+					<img
+						src={organization.logo}
+						alt=""
+						className="w-64 h-64 object-contain"
+						style={{ opacity: watermarkOpacity / 100 }}
+					/>
+				</div>
+			)}
+
+			{/* PDF Body Section */}
+			<div data-pdf-body>
+				<div className="px-14">
+					{renderBodyGroupedElements()}
+
+					{/* Notes section (if present) */}
+					{data.notes && (
+						<div className="mt-4 pt-4 border-t border-slate-200">
+							<h4 className="text-sm font-medium text-slate-700 mb-2">
+								{t("finance.quotations.notes")}:
+							</h4>
+							<p className="text-sm text-slate-600 whitespace-pre-line">{data.notes}</p>
 						</div>
-					</td></tr>
-				</thead>
-				<tbody>
-					<tr><td>
-						{/* Watermark overlay */}
-						{showWatermark && organization?.logo && (
-							<div
-								className="absolute inset-0 flex items-center justify-center pointer-events-none"
-								data-watermark
-							>
-								<img
-									src={organization.logo}
-									alt=""
-									className="w-64 h-64 object-contain"
-									style={{ opacity: watermarkOpacity / 100 }}
-								/>
-							</div>
-						)}
+					)}
 
-						{/* PDF Body Section */}
-						<div data-pdf-body>
-							<div className="px-14">
-								{renderBodyGroupedElements()}
-
-								{/* Notes section (if present) */}
-								{data.notes && (
-									<div className="mt-4 pt-4 border-t border-slate-200">
-										<h4 className="text-sm font-medium text-slate-700 mb-2">
-											{t("finance.quotations.notes")}:
-										</h4>
-										<p className="text-sm text-slate-600 whitespace-pre-line">{data.notes}</p>
-									</div>
-								)}
-
-								{/* Thank you message */}
-								{organization?.thankYouMessage && (
-									<div className="mt-6 text-center">
-										<p className="text-sm text-slate-600">{organization.thankYouMessage}</p>
-									</div>
-								)}
-							</div>
+					{/* Thank you message */}
+					{organization?.thankYouMessage && (
+						<div className="mt-6 text-center">
+							<p className="text-sm text-slate-600">{organization.thankYouMessage}</p>
 						</div>
+					)}
+				</div>
+			</div>
 
-						{/* Additional content after body (e.g., PaymentsTable) */}
-						{afterBody}
-					</td></tr>
-				</tbody>
-				{/* tfoot AFTER tbody: valid HTML5, renders in DOM order on screen (footer at bottom),
-				    but browsers still repeat it at bottom of every printed page */}
-				<tfoot>
-					<tr><td>
-						{/* PDF Footer Section — repeats on every printed page */}
-						<div data-pdf-footer>
-							<div className={`px-14 ${footerImage ? "pb-4" : "pb-10"}`}>
-								{renderFooterElements()}
-							</div>
-							{/* Footer Image (full-bleed) */}
-							{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
-							{footerImage && (
-								<img src={footerImage} alt="" className="w-full block" />
-							)}
-						</div>
-					</td></tr>
-				</tfoot>
-			</table>
+			{/* Additional content after body (e.g., PaymentsTable) */}
+			{afterBody}
+
+			{/* PDF Footer Section */}
+			<div data-pdf-footer>
+				<div className={`px-14 ${footerImage ? "pb-4" : "pb-10"}`}>
+					{renderFooterElements()}
+				</div>
+				{/* Footer Image (full-bleed) */}
+				{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
+				{footerImage && (
+					<img src={footerImage} alt="" className="w-full block" />
+				)}
+			</div>
 		</div>
 	);
 });

@@ -247,27 +247,33 @@ export function QuotationPreview({
 			{/* Print styles */}
 			<style jsx global>{`
 				@media print {
-					body * {
-						visibility: hidden;
+					/* Hide everything except the print area — using display, NOT visibility */
+					body > *:not(#quotation-print-area):not(script):not(style) {
+						display: none !important;
 					}
-					#quotation-print-area,
-					#quotation-print-area * {
-						visibility: visible;
-					}
+
+					/* Keep print area in normal flow — DO NOT use position: absolute */
 					#quotation-print-area {
-						position: absolute;
-						left: 0;
-						top: 0;
-						width: 210mm;
-						margin: 0;
-						padding: 0;
+						display: block !important;
+						width: 210mm !important;
+						max-width: 210mm !important;
+						margin: 0 auto !important;
+						padding: 0 !important;
 						box-shadow: none !important;
 						border: none !important;
 						border-radius: 0 !important;
+						background: white !important;
 					}
+
+					/* Reset wrapper Card styles that interfere with print */
+					#quotation-print-area .rounded-2xl,
+					#quotation-print-area [class*="rounded"] {
+						border-radius: 0 !important;
+					}
+
 					@page {
-						size: A4;
-						margin: 0;
+						size: A4 portrait;
+						margin: 15mm 0;
 					}
 				}
 			`}</style>

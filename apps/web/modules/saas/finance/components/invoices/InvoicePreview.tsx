@@ -154,27 +154,33 @@ export function InvoicePreview({
 			{/* Print styles */}
 			<style jsx global>{`
 				@media print {
-					body * {
-						visibility: hidden;
+					/* Hide everything except the print area — using display, NOT visibility */
+					body > *:not(#invoice-print-area):not(script):not(style) {
+						display: none !important;
 					}
-					#invoice-print-area,
-					#invoice-print-area * {
-						visibility: visible;
-					}
+
+					/* Keep print area in normal flow — DO NOT use position: absolute */
 					#invoice-print-area {
-						position: absolute;
-						left: 0;
-						top: 0;
-						width: 210mm;
-						margin: 0;
-						padding: 0;
+						display: block !important;
+						width: 210mm !important;
+						max-width: 210mm !important;
+						margin: 0 auto !important;
+						padding: 0 !important;
 						box-shadow: none !important;
 						border: none !important;
 						border-radius: 0 !important;
+						background: white !important;
 					}
+
+					/* Reset wrapper Card styles that interfere with print */
+					#invoice-print-area .rounded-2xl,
+					#invoice-print-area [class*="rounded"] {
+						border-radius: 0 !important;
+					}
+
 					@page {
-						size: A4;
-						margin: 0;
+						size: A4 portrait;
+						margin: 15mm 0;
 					}
 				}
 			`}</style>
