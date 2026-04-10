@@ -128,7 +128,7 @@ export function TemplatesList({
 		onSuccess: () => {
 			toast.success(t("finance.templates.setDefaultSuccess"));
 			queryClient.invalidateQueries({
-				queryKey: ["company", "templates"],
+				queryKey: ["orpc", "company", "templates"],
 			});
 		},
 		onError: (error: any) => {
@@ -148,7 +148,7 @@ export function TemplatesList({
 			toast.success(t("finance.templates.deleteSuccess"));
 			setDeleteTemplateId(null);
 			queryClient.invalidateQueries({
-				queryKey: ["company", "templates"],
+				queryKey: ["orpc", "company", "templates"],
 			});
 		},
 		onError: (error: any) => {

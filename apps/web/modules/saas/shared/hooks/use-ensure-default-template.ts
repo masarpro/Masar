@@ -21,7 +21,7 @@ export function useEnsureDefaultTemplate(
 			orpcClient.company.templates.seed({ organizationId }),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: ["company", "templates"],
+				queryKey: ["orpc", "company", "templates"],
 			});
 		},
 	});
