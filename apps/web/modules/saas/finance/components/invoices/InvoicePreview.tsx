@@ -85,7 +85,7 @@ export function InvoicePreview({
 	};
 
 	return (
-		<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-slate-100/40 to-slate-50 dark:from-slate-950 dark:via-slate-900/40 dark:to-slate-950">
+		<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-slate-100/40 to-slate-50 dark:from-slate-950 dark:via-slate-900/40 dark:to-slate-950 print:!p-0 print:!m-0 print:!min-h-0 print:!bg-white print:!bg-none">
 			{/* ─── Sticky Header ────────────────────────────────── */}
 			<div className="sticky top-0 z-20 py-3 px-4 mb-6 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50 print:hidden">
 				<div className="flex items-center justify-between">
