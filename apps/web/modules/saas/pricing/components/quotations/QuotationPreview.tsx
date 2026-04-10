@@ -190,7 +190,7 @@ export function QuotationPreview({
 	};
 
 	return (
-		<div className="space-y-4 print:!space-y-0 print:!p-0 print:!m-0">
+		<div className="space-y-4">
 			{/* Actions Bar - Hide on print */}
 			<div className="flex items-center justify-between print:hidden">
 				<Link href={`${basePath}/${quotationId}`}>

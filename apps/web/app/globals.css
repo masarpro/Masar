@@ -577,42 +577,35 @@ input[cmdk-input] {
 		margin: 0;
 	}
 
+	/* Hide everything visually, then selectively reveal print areas */
+	body * {
+		visibility: hidden;
+	}
+
+	#invoice-print-area,
+	#invoice-print-area *,
+	#quotation-print-area,
+	#quotation-print-area * {
+		visibility: visible;
+	}
+
+	#invoice-print-area,
+	#quotation-print-area {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 210mm;
+	}
+
 	html,
 	body {
 		margin: 0 !important;
 		padding: 0 !important;
 		background: white !important;
 		width: 210mm !important;
-		height: auto !important;
-		min-height: 0 !important;
-		overflow: visible !important;
 	}
 
-	/* Hide app shell */
-	aside,
-	nav {
-		display: none !important;
-	}
-
-	.print\:hidden,
-	[data-print-hidden="true"] {
-		display: none !important;
-	}
-
-	/* Reset layout wrappers so they don't add height */
-	main {
-		padding: 0 !important;
-		margin: 0 !important;
-		border-radius: 0 !important;
-		min-height: 0 !important;
-	}
-
-	[class*="ms-[280px]"],
-	[class*="ms-20"] {
-		margin-inline-start: 0 !important;
-	}
-
-	/* Table header/footer repetition */
+	/* Table-based header/footer repetition */
 	thead {
 		display: table-header-group;
 	}
@@ -621,10 +614,9 @@ input[cmdk-input] {
 		display: table-footer-group;
 	}
 
-	/* Reset table height for print — let content flow naturally */
+	/* Pin footer to bottom of every printed page */
 	table[data-layout-table] {
-		min-height: 0 !important;
-		height: auto !important;
+		height: 100vh;
 	}
 
 	/* Preserve colors and backgrounds */
@@ -632,6 +624,12 @@ input[cmdk-input] {
 		-webkit-print-color-adjust: exact !important;
 		print-color-adjust: exact !important;
 		color-adjust: exact !important;
+	}
+
+	/* Hide non-printable elements */
+	.print\:hidden,
+	[data-print-hidden="true"] {
+		display: none !important;
 	}
 
 	/* Template card styling */
@@ -647,8 +645,12 @@ input[cmdk-input] {
 		border: none !important;
 	}
 
-	/* Page break control */
-	.print-avoid-break,
+	/* Selective page-break control — only on marked elements */
+	.print-avoid-break {
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
 	.signature-section,
 	.totals-section,
 	.qr-code-container,
@@ -661,6 +663,22 @@ input[cmdk-input] {
 
 	a {
 		text-decoration: none !important;
+	}
+
+	/* ── Hide app shell on print ── */
+	aside,
+	header {
+		display: none !important;
+	}
+
+	[class*="ms-[280px]"],
+	[class*="ms-20"] {
+		margin-inline-start: 0 !important;
+	}
+
+	main {
+		padding: 0 !important;
+		border-radius: 0 !important;
 	}
 }
 
