@@ -572,10 +572,9 @@ input[cmdk-input] {
 
 /* Print Styles for Financial Templates */
 @media print {
-	/* Page setup — 15mm top/bottom margin reserves space for fixed header/footer repetition */
 	@page {
 		size: A4 portrait;
-		margin: 15mm 0;
+		margin: 10mm;
 	}
 
 	/* White background to prevent dark mode bleed */
@@ -585,47 +584,19 @@ input[cmdk-input] {
 		background-color: white !important;
 	}
 
-	/* Repeating header/footer via position: fixed within @page margin space.
-	   Gated by body[data-printing="true"] — set by beforeprint event (browser)
-	   or page.evaluate() (Puppeteer) — so it only activates after the print
-	   area has been moved to be a direct child of body. */
-	body[data-printing="true"] [data-pdf-header] {
-		position: fixed !important;
-		top: 0 !important;
-		left: 0 !important;
-		right: 0 !important;
-		width: 210mm !important;
-		background: white !important;
-		z-index: 9999 !important;
-	}
-	body[data-printing="true"] [data-pdf-footer] {
-		position: fixed !important;
-		bottom: 0 !important;
-		left: 0 !important;
-		right: 0 !important;
-		width: 210mm !important;
-		background: white !important;
-		z-index: 9999 !important;
-	}
-	body[data-printing="true"] [data-pdf-body] {
-		padding-top: 0 !important;
-		padding-bottom: 0 !important;
-	}
-
 	/* Hide non-printable elements */
 	.print\:hidden,
 	[data-print-hidden="true"] {
 		display: none !important;
 	}
 
-	/* Reset print-specific styles */
+	/* Preserve colors and backgrounds */
 	body {
 		-webkit-print-color-adjust: exact !important;
 		print-color-adjust: exact !important;
 		color-adjust: exact !important;
 	}
 
-	/* Preserve colors and backgrounds */
 	* {
 		-webkit-print-color-adjust: exact !important;
 		print-color-adjust: exact !important;
@@ -661,7 +632,6 @@ input[cmdk-input] {
 		break-inside: avoid;
 	}
 
-	/* Keep table headers with content */
 	thead {
 		display: table-header-group;
 	}
@@ -671,95 +641,32 @@ input[cmdk-input] {
 		break-inside: avoid;
 	}
 
-	/* Ensure signature section stays together */
-	.signature-section {
-		page-break-inside: avoid;
-		break-inside: avoid;
-	}
-
-	/* Keep totals section together */
-	.totals-section {
-		page-break-inside: avoid;
-		break-inside: avoid;
-	}
-
-	/* Preserve background colors in print */
-	[style*="background-color"] {
-		-webkit-print-color-adjust: exact !important;
-		print-color-adjust: exact !important;
-	}
-
-	/* Ensure table header colors are preserved */
-	table thead tr {
-		-webkit-print-color-adjust: exact !important;
-		print-color-adjust: exact !important;
-	}
-
-	/* Fix for alternating row colors */
-	table tbody tr:nth-child(even) {
-		-webkit-print-color-adjust: exact !important;
-		print-color-adjust: exact !important;
-	}
-
-	/* Links should not show underlines in print */
-	a {
-		text-decoration: none !important;
-	}
-
-	/* QR Code visibility */
-	.qr-code-container {
-		page-break-inside: avoid;
-		break-inside: avoid;
-	}
-
-	/* Bank details section */
-	.bank-details-section {
-		page-break-inside: avoid;
-		break-inside: avoid;
-	}
-
-	/* Client info card — keep together */
-	.client-info-card {
-		page-break-inside: avoid;
-		break-inside: avoid;
-	}
-
-	/* Individual item rows — keep together */
-	.invoice-item-row {
-		page-break-inside: avoid;
-		break-inside: avoid;
-	}
-
-	/* QR + Signature — keep together */
+	.signature-section,
+	.totals-section,
+	.qr-code-container,
+	.bank-details-section,
+	.client-info-card,
+	.invoice-item-row,
 	.qr-signature-section {
 		page-break-inside: avoid;
 		break-inside: avoid;
 	}
 
-	/* Allow page break after items table */
-	.items-table-wrapper {
-		break-after: auto;
-	}
-
-	/* Preserve watermark colors in print */
-	[data-watermark] {
-		-webkit-print-color-adjust: exact !important;
-		print-color-adjust: exact !important;
+	a {
+		text-decoration: none !important;
 	}
 
 	/* ── Hide app shell on print ── */
-	aside {
-		display: none !important;
-	}
+	aside,
 	header {
 		display: none !important;
 	}
-	/* Reset sidebar margin so content fills page */
+
 	[class*="ms-[280px]"],
 	[class*="ms-20"] {
 		margin-inline-start: 0 !important;
 	}
-	/* Reset content area padding/rounding for print */
+
 	main {
 		padding: 0 !important;
 		border-radius: 0 !important;

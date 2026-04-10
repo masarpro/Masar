@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
@@ -42,48 +42,6 @@ export function InvoicePreview({
 	const [showFilenameDialog, setShowFilenameDialog] = useState(false);
 	const [pdfFilename, setPdfFilename] = useState("");
 	const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-
-	// Browser print handler: physically move #invoice-print-area to be a direct
-	// child of body before printing, so CSS selectors can isolate it cleanly.
-	// Restores original DOM position after printing.
-	useEffect(() => {
-		const PRINT_ID = "invoice-print-area";
-
-		const handleBeforePrint = () => {
-			const printArea = document.getElementById(PRINT_ID);
-			if (
-				printArea &&
-				printArea.parentNode &&
-				printArea.parentNode !== document.body
-			) {
-				(printArea as any).__originalParent = printArea.parentNode;
-				(printArea as any).__originalNextSibling = printArea.nextSibling;
-				document.body.appendChild(printArea);
-				document.body.setAttribute("data-printing", "true");
-			}
-		};
-
-		const handleAfterPrint = () => {
-			const printArea = document.getElementById(PRINT_ID) as any;
-			if (printArea?.__originalParent) {
-				printArea.__originalParent.insertBefore(
-					printArea,
-					printArea.__originalNextSibling,
-				);
-				delete printArea.__originalParent;
-				delete printArea.__originalNextSibling;
-			}
-			document.body.removeAttribute("data-printing");
-		};
-
-		window.addEventListener("beforeprint", handleBeforePrint);
-		window.addEventListener("afterprint", handleAfterPrint);
-
-		return () => {
-			window.removeEventListener("beforeprint", handleBeforePrint);
-			window.removeEventListener("afterprint", handleAfterPrint);
-		};
-	}, []);
 
 	const { data: invoice, isLoading } = useQuery(
 		orpc.finance.invoices.getById.queryOptions({
@@ -192,44 +150,6 @@ export function InvoicePreview({
 					/>
 				</CardContent>
 			</Card>
-
-			{/* Print styles */}
-			<style jsx global>{`
-				@media print {
-					@page {
-						size: A4 portrait;
-						margin: 50mm 0 35mm 0;
-					}
-
-					/* When body has data-printing (set by beforeprint event or Puppeteer),
-					   hide all direct children except the print area that was moved to body root */
-					body[data-printing="true"] > *:not(#invoice-print-area):not(script):not(style) {
-						display: none !important;
-					}
-
-					body[data-printing="true"] {
-						margin: 0 !important;
-						padding: 0 !important;
-						background: white !important;
-					}
-
-					#invoice-print-area {
-						display: block !important;
-						width: 210mm !important;
-						max-width: 210mm !important;
-						margin: 0 auto !important;
-						padding: 0 !important;
-						box-shadow: none !important;
-						border: none !important;
-						border-radius: 0 !important;
-						background: white !important;
-					}
-
-					#invoice-print-area [class*="rounded"] {
-						border-radius: 0 !important;
-					}
-				}
-			`}</style>
 
 			{/* PDF Filename Dialog */}
 			<Dialog open={showFilenameDialog} onOpenChange={setShowFilenameDialog}>
