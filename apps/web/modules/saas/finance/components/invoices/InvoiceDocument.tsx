@@ -235,19 +235,19 @@ export function InvoiceDocument({
 				organization={rendererOrg}
 				documentType="invoice"
 				interactive={false}
+				afterBody={
+					showPayments &&
+					invoice.payments &&
+					invoice.payments.length > 0 ? (
+						<div className="px-8 pb-4">
+							<PaymentsTable
+								payments={invoice.payments}
+								primaryColor={primaryColor}
+							/>
+						</div>
+					) : undefined
+				}
 			/>
-
-			{/* Payments table (outside template — not a template element) */}
-			{showPayments &&
-				invoice.payments &&
-				invoice.payments.length > 0 && (
-					<div className="px-8 pb-4">
-						<PaymentsTable
-							payments={invoice.payments}
-							primaryColor={primaryColor}
-						/>
-					</div>
-				)}
 		</div>
 	);
 }

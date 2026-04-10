@@ -614,6 +614,11 @@ input[cmdk-input] {
 		display: table-footer-group;
 	}
 
+	/* Pin footer to bottom of every printed page */
+	table[data-layout-table] {
+		height: 100vh;
+	}
+
 	/* Preserve colors and backgrounds */
 	* {
 		-webkit-print-color-adjust: exact !important;
