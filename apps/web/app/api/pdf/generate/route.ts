@@ -90,11 +90,12 @@ export async function POST(req: NextRequest) {
 		await page.evaluate(() => document.fonts?.ready);
 		await new Promise((r) => setTimeout(r, 1000));
 
-		// Generate PDF
+		// Generate PDF — @page { margin: 0 } + table thead/tfoot handle repetition
 		const pdfBuffer = await page.pdf({
 			format: "A4",
+			margin: { top: "0", right: "0", bottom: "0", left: "0" },
 			printBackground: true,
-			preferCSSPageSize: false,
+			preferCSSPageSize: true,
 		});
 
 		await browser.close();

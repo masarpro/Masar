@@ -574,33 +574,57 @@ input[cmdk-input] {
 @media print {
 	@page {
 		size: A4 portrait;
-		margin: 10mm;
+		margin: 0;
 	}
 
-	/* White background to prevent dark mode bleed */
+	/* Hide everything visually, then selectively reveal print areas */
+	body * {
+		visibility: hidden;
+	}
+
+	#invoice-print-area,
+	#invoice-print-area *,
+	#quotation-print-area,
+	#quotation-print-area * {
+		visibility: visible;
+	}
+
+	#invoice-print-area,
+	#quotation-print-area {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 210mm;
+	}
+
 	html,
 	body {
+		margin: 0 !important;
+		padding: 0 !important;
 		background: white !important;
-		background-color: white !important;
+		width: 210mm !important;
+	}
+
+	/* Table-based header/footer repetition */
+	thead {
+		display: table-header-group;
+	}
+
+	tfoot {
+		display: table-footer-group;
+	}
+
+	/* Preserve colors and backgrounds */
+	* {
+		-webkit-print-color-adjust: exact !important;
+		print-color-adjust: exact !important;
+		color-adjust: exact !important;
 	}
 
 	/* Hide non-printable elements */
 	.print\:hidden,
 	[data-print-hidden="true"] {
 		display: none !important;
-	}
-
-	/* Preserve colors and backgrounds */
-	body {
-		-webkit-print-color-adjust: exact !important;
-		print-color-adjust: exact !important;
-		color-adjust: exact !important;
-	}
-
-	* {
-		-webkit-print-color-adjust: exact !important;
-		print-color-adjust: exact !important;
-		color-adjust: exact !important;
 	}
 
 	/* Template card styling */
@@ -616,27 +640,8 @@ input[cmdk-input] {
 		border: none !important;
 	}
 
-	/* Page break handling */
-	.print-page-break-before {
-		page-break-before: always;
-		break-before: page;
-	}
-
-	.print-page-break-after {
-		page-break-after: always;
-		break-after: page;
-	}
-
+	/* Selective page-break control — only on marked elements */
 	.print-avoid-break {
-		page-break-inside: avoid;
-		break-inside: avoid;
-	}
-
-	thead {
-		display: table-header-group;
-	}
-
-	tr {
 		page-break-inside: avoid;
 		break-inside: avoid;
 	}
@@ -646,7 +651,6 @@ input[cmdk-input] {
 	.qr-code-container,
 	.bank-details-section,
 	.client-info-card,
-	.invoice-item-row,
 	.qr-signature-section {
 		page-break-inside: avoid;
 		break-inside: avoid;

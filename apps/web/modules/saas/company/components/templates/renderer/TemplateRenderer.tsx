@@ -743,18 +743,6 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 			dir={locale === "ar" ? "rtl" : "ltr"}
 			onClick={() => interactive && onElementClick?.(null)}
 		>
-			{/* PDF Header Section */}
-			<div data-pdf-header>
-				{/* Header Image (full-bleed) */}
-				{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
-				{headerImage && (
-					<img src={headerImage} alt="" className="w-full block" />
-				)}
-				<div className={`px-14 ${headerImage ? "pt-4" : "pt-10"}`}>
-					{renderHeaderElements()}
-				</div>
-			</div>
-
 			{/* Watermark overlay */}
 			{showWatermark && organization?.logo && (
 				<div
@@ -770,44 +758,65 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 				</div>
 			)}
 
-			{/* PDF Body Section */}
-			<div data-pdf-body>
-				<div className="px-14">
-					{renderBodyGroupedElements()}
+			{/* Table layout: thead/tfoot repeat on every printed page */}
+			<table style={{ width: "100%", borderCollapse: "collapse" }}>
+				<thead>
+					<tr>
+						<td style={{ padding: 0, border: "none" }}>
+							<div data-pdf-header>
+								{headerImage && (
+									<img src={headerImage} alt="" className="w-full block" />
+								)}
+								<div className={`px-14 ${headerImage ? "pt-4" : "pt-10"}`}>
+									{renderHeaderElements()}
+								</div>
+							</div>
+						</td>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<td style={{ padding: 0, border: "none" }}>
+							<div data-pdf-footer>
+								<div className={`px-14 ${footerImage ? "pb-4" : "pb-10"}`}>
+									{renderFooterElements()}
+								</div>
+								{footerImage && (
+									<img src={footerImage} alt="" className="w-full block" />
+								)}
+							</div>
+						</td>
+					</tr>
+				</tfoot>
+				<tbody>
+					<tr>
+						<td style={{ padding: 0, border: "none", verticalAlign: "top" }}>
+							<div data-pdf-body>
+								<div className="px-14">
+									{renderBodyGroupedElements()}
 
-					{/* Notes section (if present) */}
-					{data.notes && (
-						<div className="mt-4 pt-4 border-t border-slate-200">
-							<h4 className="text-sm font-medium text-slate-700 mb-2">
-								{t("finance.quotations.notes")}:
-							</h4>
-							<p className="text-sm text-slate-600 whitespace-pre-line">{data.notes}</p>
-						</div>
-					)}
+									{data.notes && (
+										<div className="mt-4 pt-4 border-t border-slate-200">
+											<h4 className="text-sm font-medium text-slate-700 mb-2">
+												{t("finance.quotations.notes")}:
+											</h4>
+											<p className="text-sm text-slate-600 whitespace-pre-line">{data.notes}</p>
+										</div>
+									)}
 
-					{/* Thank you message */}
-					{organization?.thankYouMessage && (
-						<div className="mt-6 text-center">
-							<p className="text-sm text-slate-600">{organization.thankYouMessage}</p>
-						</div>
-					)}
-				</div>
-			</div>
+									{organization?.thankYouMessage && (
+										<div className="mt-6 text-center">
+											<p className="text-sm text-slate-600">{organization.thankYouMessage}</p>
+										</div>
+									)}
+								</div>
+							</div>
 
-			{/* Additional content after body (e.g., PaymentsTable) */}
-			{afterBody}
-
-			{/* PDF Footer Section */}
-			<div data-pdf-footer>
-				<div className={`px-14 ${footerImage ? "pb-4" : "pb-10"}`}>
-					{renderFooterElements()}
-				</div>
-				{/* Footer Image (full-bleed) */}
-				{/* NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply */}
-				{footerImage && (
-					<img src={footerImage} alt="" className="w-full block" />
-				)}
-			</div>
+							{afterBody}
+						</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	);
 });
