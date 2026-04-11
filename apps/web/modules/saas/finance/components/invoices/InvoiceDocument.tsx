@@ -19,6 +19,7 @@ import { formatDate } from "../../lib/utils";
 
 interface InvoiceDocumentProps {
 	invoice: any;
+	defaultTemplate?: any;
 	options?: {
 		showWatermark?: boolean;
 		printMode?: boolean;
@@ -166,6 +167,7 @@ function PaymentsTable({
 
 export function InvoiceDocument({
 	invoice,
+	defaultTemplate,
 	options = {},
 }: InvoiceDocumentProps) {
 	const t = useTranslations();
@@ -175,12 +177,13 @@ export function InvoiceDocument({
 		showPayments = true,
 	} = options;
 
-	// 1. Determine template elements and settings
-	const templateContent = invoice.template?.content as
+	// 1. Determine template — default template takes precedence (reflects current settings)
+	const activeTemplate = defaultTemplate || invoice.template;
+	const templateContent = activeTemplate?.content as
 		| { elements?: TemplateElement[] }
 		| null;
 	const templateElements = templateContent?.elements || getInvoiceElements();
-	const templateSettings = (invoice.template?.settings ||
+	const templateSettings = (activeTemplate?.settings ||
 		DEFAULT_TEMPLATE_SETTINGS) as TemplateSettings;
 
 	// 2. Transform data

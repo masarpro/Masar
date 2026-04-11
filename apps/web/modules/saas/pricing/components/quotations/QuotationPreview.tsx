@@ -52,15 +52,11 @@ export function QuotationPreview({
 	);
 	const quotation = quotationRaw as any;
 
-	// القالب يأتي مع بيانات عرض السعر مباشرة
-	const linkedTemplate = quotation?.template;
-
-	// Fetch default template only if quotation has no template
+	// Always fetch the current default template (reflects user's choice in settings)
 	const { data: defaultTemplate, isLoading: isLoadingDefaultTemplate } = useQuery({
 		...orpc.company.templates.getDefault.queryOptions({
 			input: { organizationId, templateType: "QUOTATION" },
 		}),
-		enabled: !linkedTemplate,
 	});
 
 	// Fetch organization finance settings
@@ -72,18 +68,17 @@ export function QuotationPreview({
 	});
 	const orgSettings = orgSettingsRaw as any;
 
-	// Use linked template or default
-	const template = linkedTemplate || defaultTemplate;
+	// Default template takes precedence — linked template is fallback
+	const template = defaultTemplate || quotation?.template;
 
 	// Auto-seed templates if none exist
 	useEnsureDefaultTemplate(
 		organizationId,
-		linkedTemplate || defaultTemplate,
+		defaultTemplate,
 		isLoadingDefaultTemplate,
 	);
 
-	const isLoading = isLoadingQuotation || isLoadingSettings ||
-		(!linkedTemplate && isLoadingDefaultTemplate);
+	const isLoading = isLoadingQuotation || isLoadingSettings || isLoadingDefaultTemplate;
 
 	if (isLoading) {
 		return <PreviewPageSkeleton />;

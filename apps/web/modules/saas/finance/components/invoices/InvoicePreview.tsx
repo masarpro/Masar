@@ -43,11 +43,20 @@ export function InvoicePreview({
 	const [pdfFilename, setPdfFilename] = useState("");
 	const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-	const { data: invoice, isLoading } = useQuery(
+	const { data: invoice, isLoading: isLoadingInvoice } = useQuery(
 		orpc.finance.invoices.getById.queryOptions({
 			input: { organizationId, id: invoiceId },
 		}),
 	);
+
+	// Always fetch the current default template (reflects user's choice in settings)
+	const { data: defaultTemplate, isLoading: isLoadingTemplate } = useQuery({
+		...orpc.company.templates.getDefault.queryOptions({
+			input: { organizationId, templateType: "INVOICE" },
+		}),
+	});
+
+	const isLoading = isLoadingInvoice || isLoadingTemplate;
 
 	if (isLoading) {
 		return <PreviewPageSkeleton />;
@@ -142,6 +151,7 @@ export function InvoicePreview({
 				<CardContent className="p-0 print:p-0">
 					<InvoiceDocument
 						invoice={invoice}
+						defaultTemplate={defaultTemplate}
 						options={{
 							showWatermark: true,
 							printMode: true,
