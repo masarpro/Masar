@@ -1,0 +1,17 @@
+@'
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pnpm --filter @repo/web type-check 1>&2"
+          }
+        ]
+      }
+    ]
+  }
+}
+'@ | Set-Content -Path "H:\Masar\supastarter-nextjs-3\.claude\settings.json"

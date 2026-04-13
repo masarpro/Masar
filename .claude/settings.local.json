@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(pnpm generate:*)",
+      "Bash(pnpm --filter @repo/web type-check:*)",
       "Bash(npx dotenv:*)",
       "Bash(npx tsc:*)",
       "Bash(pnpm build:*)",
@@ -119,7 +120,8 @@
       "Bash(npx tsx:*)",
       "Bash(mv:*)",
       "Bash(mv calculators:*)",
-      "Bash(python -c \":*)"
+      "Bash(python -c \":*)",
+      "Bash(npx husky:*)"
     ]
   }
 }

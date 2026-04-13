@@ -1,7 +1,6 @@
-agents.md
 # CLAUDE.md — دليل Claude Code الشامل لمنصة مسار
 
-> **آخر تحديث:** 2026-04-03
+> **آخر تحديث:** 2026-04-13
 > **المطوّر:** جودت — مؤسس ومطوّر رئيسي (مطوّر فردي)
 > **المشروع:** منصة مسار (Masar) — SaaS لإدارة المشاريع الإنشائية
 > **المستودع:** github.com/masarpro/Masar
@@ -185,9 +184,9 @@ D:\Masar\Masar/
 ### 5.1 نمط تنفيذ المهام
 
 ```
-1. اقرأ الملفات المعنية أولاً (grep + cat/view)
+1. اقرأ الملفات المعنية أولاً (grep + view)
 2. نفّذ التعديلات
-3. تحقق بـ: npx tsc --noEmit (أو pnpm type-check)
+3. تحقق بـ: pnpm --filter @repo/web type-check (من جذر المشروع)
 4. إذا نجح → pnpm build للتحقق النهائي
 5. git add -A && git commit && git push
 ```
@@ -200,9 +199,12 @@ D:\Masar\Masar/
 
 **165+ write endpoint** يستخدم `subscriptionProcedure` لمنع مستخدمي الخطة المجانية. لا تستخدم `publicProcedure` أبداً لـ endpoints تتعامل مع بيانات المنظمة. القراءة تستخدم `protectedProcedure`، الكتابة تستخدم `subscriptionProcedure`.
 
-### 5.4 قاعدة الترجمة
+### 5.4 قاعدة الترجمة (Internationalization)
 
-كل نص يظهر للمستخدم يجب أن يستخدم مفاتيح الترجمة عبر `useTranslations()` — لا hardcoded strings. أضف المفاتيح في كلا الملفين:
+كل نص يظهر للمستخدم يجب أن يستخدم مفاتيح الترجمة عبر `useTranslations()` — لا hardcoded strings.
+
+**قاعدة الإضافة:** عند إضافة أي نص UI جديد، **أضف الترجمة في كلا الملفين معاً** في نفس الـ commit. لا تترك مفاتيح ترجمة ناقصة أبداً — هذا يكسر الـ fallback ويظهر المفتاح الخام للمستخدم.
+
 - `packages/i18n/translations/ar.json` (~10,161 سطر)
 - `packages/i18n/translations/en.json` (~10,161 سطر)
 
@@ -241,6 +243,67 @@ new Intl.NumberFormat("en-US").format(value);
 // عملات: en-SA format (1,234.56 ر.س)
 new Intl.NumberFormat("en-SA", { style: "currency", currency: "SAR" }).format(value);
 ```
+
+### 5.9 قاعدة فحص الأنواع (Build & Type Checking) ⚠️ حرجة
+
+**الأمر الصحيح الوحيد** للـ type-check هو من جذر المشروع:
+
+```bash
+# ✅ صحيح — من جذر المشروع
+pnpm --filter @repo/web type-check
+pnpm --filter @repo/database type-check
+
+# ❌ ممنوع — ينتج ~5600 خطأ module resolution وهمي
+cd apps/web && npx tsc --noEmit
+```
+
+**السبب:** تشغيل `tsc` داخل `apps/web` يفقد path mappings من الـ monorepo ويُسبب أخطاء import وهمية على كل ملف تقريباً. هذه المشكلة استهلكت 6+ جلسات Claude Code سابقاً.
+
+**بعد أي تغيير Prisma schema:** شغّل `pnpm --filter @repo/database generate` قبل type-check.
+
+### 5.10 قاعدة التعديل (Editing Conventions)
+
+**اقرأ قبل التعديل، دائماً.** قبل أي Edit:
+1. استخدم `view` لقراءة الملف كاملاً أولاً
+2. لاحظ بدقة: tabs أم spaces، 2 أم 4 spaces، CRLF أم LF
+3. إذا فشل Edit مرتين بسبب whitespace mismatch → انتقل فوراً إلى `Write` كامل أو `sed` عبر Bash. **لا تُحاول مرة ثالثة** — أنت تُضيع وقتاً.
+
+هذه القاعدة تمنع دورات تصحيح متكررة (كانت 61 فشل Edit في آخر 6 أسابيع).
+
+### 5.11 قاعدة Zod v4 + oRPC (حرجة)
+
+المشروع يستخدم Zod v4 مع oRPC. مخالفة هذه القواعد = runtime errors صامتة:
+
+```typescript
+// ❌ ممنوع — .nullish() يُدخل null ويكسر oRPC serialization
+z.string().nullish()
+
+// ✅ البديل — .transform() للحقول الاختيارية
+z.string().optional().transform(v => v ?? "")
+
+// ❌ ممنوع — رمي Error عادي لا يظهر للـ client
+throw new Error("فشل")
+
+// ✅ صحيح — ORPCError مع code مناسب
+throw new ORPCError("BAD_REQUEST", { message: "فشل" })
+
+// ❌ ممنوع — .trim() مع .optional()
+z.string().trim().optional()  // يكسر في Zod v4
+
+// ✅ البديل
+z.string().optional().transform(v => v?.trim() ?? "")
+```
+
+### 5.12 قاعدة التصحيح (Debugging Workflow)
+
+بعد إصلاح أي bug، **لا تعتبره منتهياً قبل smoke test للمسار الكامل**:
+- إصلاح validation قد يكشف unique constraint bug مختبئ
+- إصلاح API قد يكشف cache invalidation مفقود في الـ frontend
+- إصلاح UI قد يكشف hydration mismatch
+
+**الطريقة:** نفّذ الـ full user flow من البداية للنهاية — ليس فقط الكود المُعدَّل.
+
+**أسلوب التحقيق قبل الإصلاح (مهم):** للأخطاء الغامضة، اقرأ الملفات المعنية، تتبّع تدفّق البيانات، واشرح السبب الجذري قبل أي تعديل. لا تجرّب حلولاً عشوائية — 19 جلسة سابقة ضاعت في "wrong approach" بسبب القفز للإصلاح قبل التشخيص.
 
 ---
 
@@ -323,7 +386,7 @@ import { ListTableSkeleton } from "@/modules/saas/shared/components/skeletons";
 export default function Loading() {
   return <ListTableSkeleton rows={10} cols={5} />;
 }
-// 189 loading.tsx files exist — maintain this pattern for any new pages
+// 221 loading.tsx files exist — maintain this pattern for any new pages
 ```
 
 ---
@@ -497,38 +560,18 @@ DIRECT_URL = postgresql://...                     # Direct (migrations only)
 
 ---
 
-## 10. مشاكل معروفة ومحلولة
-
-### 10.1 مشاكل محلولة (للرجوع إليها)
-
-| المشكلة | السبب | الحل | التاريخ |
-|---------|-------|------|---------|
-| Redirect loop (ERR_TOO_MANY_REDIRECTS) | middleware.ts يعيد توجيه المستخدم بجلسة منتهية بين /auth و /app | حذف شرط إعادة التوجيه من /auth/ عند وجود session cookie | 2026-03-16 |
-| pg Pool #state error (500 errors كل الصفحات) | webpack يُضمّن مكتبة pg فتتعارض مع النسخة الأصلية | إضافة `"pg"` لـ `serverExternalPackages` في next.config.ts | 2026-03-17 |
-| middleware.ts deprecated warning | Next.js 16 يستخدم proxy.ts بدل middleware.ts | إعادة تسمية proxy.disabled.ts → proxy.ts وحذف middleware.ts | 2026-03-16 |
-| الهالك السالب في اللبشة (-67.9%) | القطع الطويلة (>12m) تحتاج سيخين مع وصلة تراكب | إضافة `if (barLength > stockLength)` مع حساب lap splice | 2026-03-15 |
-| الحديد العلوي في القواعد (101 بدل 81 سيخ) | Top mesh يستخدم bottom mesh bars-per-meter بالخطأ | فصل حساب top mesh عن bottom mesh | 2026-03-14 |
-| أسماء العناصر تُمسح عند الكتابة | useEffect في ElementHeaderRow يعيد التشغيل بسبب inline function | إضافة `skipAutoName` prop + functional `setFormData` updaters | 2026-03-14 |
-| Prisma 6→7 breaking changes | Dependabot auto-upgraded major version | رفض PR + manual migration (driver adapters, ESM, prisma.config.ts) | 2026-03-10 |
-| Build failure (ECONNRESET) | Windows dev mode + Turbopack | غير مؤثر — يحدث فقط في dev mode، الحل: restart pnpm dev | متكرر |
-| .env.local duplicates | قيم وهمية تتجاوز القيم الحقيقية | تنظيف الملف يدوياً — حذف التكرارات | 2026-03-16 |
-| تدقيق محاسبي (14 خطأ) | تدقيق شامل للنظام المحاسبي والمالي | جميع الـ 14 خطأ تبيّن أنها مُصلحة مسبقاً: قيود تلقائية ذرية ($transaction)، تحديث رصيد البنك عند دفعة الفاتورة، state machine للفواتير والمستخلصات، حد مبلغ الإشعار الدائن، منع تعديل فاتورة ISSUED، ترقيم ذري للعقود، فحص الفترات المغلقة، VAT بـ Decimal، entryNo فريد، audit log لأخطاء القيود | 2026-03-27 |
-| غياب Error Boundaries | 2 فقط من ~17 route group | إضافة 16 error boundary يغطي كل route groups الرئيسية (root, marketing, saas, org, projects, finance, company, pricing, settings, handover, execution, subcontracts, admin, account, owner) | 2026-03-29 |
-| غياب اختبارات | صفر tests | إضافة بنية اختبارات كاملة: Vitest workspace (API + DB) + Playwright E2E — 33 ملف اختبار يغطي: RBAC permissions, feature gates, financial calculations, invoice lifecycle, auto-journal, security, auth flows, public pages | 2026-03-29 |
-
-### 10.2 مشاكل مفتوحة (تحتاج إصلاح)
+## 10. مشاكل مفتوحة (تحتاج إصلاح)
 
 | المشكلة | الأولوية | التفاصيل |
 |---------|---------|---------|
 | بطء التنقل بين الصفحات | 🔴 حرج | Cache-Control: no-store على كل /app/* routes + waterfall layouts + 11 Suspense فقط من 171 صفحة |
-| صفحات "ترفرف" عند الفتح | 🔴 حرج | 4-5 layouts متداخلة كل واحد يعمل await لاستعلام DB — المحتوى يظهر ويختفي |
+| صفحات "ترفرف" عند الفتح | 🔴 حرج | 4-5 layouts متداخلة كل واحد يعمل await لاستعلام DB |
 | تضاعف تكلفة المواد في ملخص التسعير | 🟠 عالي | 18,134.49 يظهر 36,268.98 — المصنعيات صحيحة |
 | Region mismatch | 🟠 عالي | Vercel Dubai ↔ Supabase Mumbai = ~20-30ms per query |
 | مكونات >1000 سطر (10+) | 🟡 متوسط | تحتاج تقسيم لتحسين bundle size |
-| ~~غياب Error Boundaries~~ | ✅ مُصلح | 16 error boundary (كانت 2 — تغطي كل route groups الرئيسية) |
 | CSP unsafe-inline | 🟡 متوسط | يضعف الحماية ضد XSS |
-| ~~غياب اختبارات~~ | ✅ مُصلح | Vitest (unit/integration) + Playwright (E2E) — 33 ملف اختبار |
-| ~~PDF export يعرض صفحة فارغة ثانية + URL المتصفح~~ | ✅ مُصلح | أنماط طباعة A4 شاملة + page-break control + @page rules في globals.css |
+
+**مشاكل محلولة سابقاً:** Redirect loop، pg Pool state، middleware→proxy، الهالك السالب في اللبشة، الحديد العلوي في القواعد، أسماء العناصر تُمسح، Prisma 6→7، Error Boundaries (16)، غياب اختبارات (33 ملف)، PDF export. *(للتفاصيل التاريخية، راجع git log)*
 
 ---
 
@@ -541,10 +584,9 @@ pnpm dev
 # بناء الإنتاج
 pnpm build
 
-# فحص الأنواع (أسرع من build)
-pnpm type-check
-# أو بشكل مستهدف:
-npx tsc --noEmit
+# فحص الأنواع — دائماً من جذر المشروع
+pnpm --filter @repo/web type-check
+pnpm --filter @repo/database type-check
 
 # توليد Prisma client (مع إصلاح Zod تلقائي)
 pnpm --filter @repo/database db:generate
@@ -587,7 +629,7 @@ git config --global user.email "your@email.com"
 
 ### 12.1 قبل أي مهمة
 
-1. **اقرأ الملفات قبل التعديل** — استخدم `cat` أو `grep` لفهم البنية الحالية
+1. **اقرأ الملفات قبل التعديل** — استخدم `view` أو `grep` لفهم البنية الحالية
 2. **تحقق من وجود الحقول في Schema** — قبل استخدام أي model أو field تأكد إنه موجود فعلاً في Prisma schema
 3. **تحقق من المسارات** — `grep -r "ImportName" --include="*.ts" --include="*.tsx" -l` قبل افتراض import paths
 4. **لا تفترض أسماء الإجراءات** — اقرأ ملف router.ts للـ module المعني
@@ -610,7 +652,7 @@ git config --global user.email "your@email.com"
 
 - **pnpm بطيء جداً** — تجنب `pnpm install` الكامل، استخدم `pnpm --filter @repo/web add package`
 - **النص العربي معكوس في Terminal** — استخدم ملفات `.md` لتمرير البرومبتات الطويلة
-- **`tsc --noEmit` قد يأخذ وقتاً طويلاً** — استخدم `grep` المستهدف + scoped builds بدل full project checks
+- **`tsc` يأخذ وقتاً طويلاً** — استخدم `grep` المستهدف + scoped builds
 - **ECONNRESET في dev mode** — طبيعي على Windows مع Turbopack، أعد تشغيل `pnpm dev`
 
 ### 12.5 أنماط حرجة لتجنب الأخطاء
@@ -656,13 +698,13 @@ export const createItem = subscriptionProcedure... // write
 | project-execution | 28 | أنشطة، مراحل، تقدم، Gantt |
 | subcontracts | 26 | عقود باطن، مدفوعات، مطالبات |
 | project-finance | 17 | مالية المشروع — عقد، مصروفات، مطالبات |
-| handover | 15 | **جديد** — محاضر استلام (ابتدائي، نهائي، بنود، تسليم) |
+| handover | 15 | محاضر استلام (ابتدائي، نهائي، بنود، تسليم) |
 | project-documents | 13 | مستندات — تصنيف، إصدارات، موافقات |
 | project-change-orders | 12 | أوامر التغيير |
 | project-owner | 12 | بوابة المالك |
 | project-field | 11 | تقارير يومية، صور، مشاكل |
-| project-boq | ~10 | 🆕 جدول كميات المشروع (BOQ) — CRUD + import |
-| project-chat | ~8 | 🆕 محادثات المشروع — قنوات فريق/مالك |
+| project-boq | ~10 | جدول كميات المشروع (BOQ) — CRUD + import |
+| project-chat | ~8 | محادثات المشروع — قنوات فريق/مالك |
 | dashboard | 9 | لوحة التحكم الرئيسية |
 | ai | 6 | المساعد الذكي (32 tools) |
 | + 28 more modules | ~260 | باقي الوحدات |
@@ -714,39 +756,20 @@ export const createItem = subscriptionProcedure... // write
 
 - **Model:** Claude Sonnet 4 (via Vercel AI SDK)
 - **Streaming:** `POST /api/ai/assistant` مع `stepCountIs(8)` و `maxOutputTokens: 4000`
-- **32 أداة** (6 legacy + 26 registry) مقسمة على ملفات:
+- **32 أداة** (6 legacy + 26 registry)
 
-### الأدوات القديمة (Legacy — 6 أدوات في `packages/ai/tools/assistant-tools.ts`)
-  - `queryProjects` — قائمة/تفاصيل/إحصائيات المشاريع
-  - `queryFinance` — فواتير، مدفوعات، مصروفات، أرصدة بنكية، ملخص مالي
-  - `queryExecution` — مراحل، تقارير يومية، مشاكل، تقدم
-  - `queryTimeline` — معالم المشروع الزمنية
-  - `navigateTo` — توليد روابط تنقل (37 regex pattern عربي/إنجليزي)
-  - `queryCompany` — موظفين، أصول، مصروفات منشأة، رواتب
+### الأدوات (ملخص)
 
-### الأدوات الجديدة (Registry — 26 أداة في `packages/ai/tools/modules/`)
-  - **projects-tools** (2): `getProjectDetails`, `getProjectFinanceSummary`
-  - **execution-tools** (3): `getProjectActivities`, `getProjectMilestones`, `getDelayAnalysis`
-  - **quantities-tools** (3): `queryCostStudies`, `getCostStudyDetails`, `searchMaterials`
-  - **quotations-tools** (3): `queryQuotations`, `getQuotationDetails`, `getQuotationsSummary`
-  - **leads-tools** (3): `queryLeads`, `getLeadsSummary`, `getLeadsPipeline`
-  - **accounting-tools** (3): `queryAccounting`, `getAccountLedger`, `getAccountingReports`
-  - **subcontracts-tools** (2): `querySubcontracts`, `getSubcontractDetails`
-  - **project-finance-tools** (2): `queryClaims`, `queryChangeOrders`
-  - **dashboard-tools** (2): `getDashboardSummary`, `getFinanceDashboard`
-  - **documents-tools** (1): `queryDocuments`
-  - **field-tools** (1): `queryFieldExecution`
-  - **vouchers-tools** (1): `queryVouchers`
-
-### 15 وحدة معرفية (Module Definitions — `packages/ai/modules/definitions/`)
-  projects, execution, finance, quantities, company, leads, subcontracts, owner-portal, settings, navigation, **accounting**, **dashboard**, **documents**, **change-orders**, **field**
+- **Legacy (6):** `queryProjects`, `queryFinance`, `queryExecution`, `queryTimeline`, `navigateTo`, `queryCompany`
+- **Registry (26):** projects-tools (2), execution-tools (3), quantities-tools (3), quotations-tools (3), leads-tools (3), accounting-tools (3), subcontracts-tools (2), project-finance-tools (2), dashboard-tools (2), documents-tools (1), field-tools (1), vouchers-tools (1)
 
 ### بنية المساعد
+
 - **Page Context:** Zustand store يرسل snapshot الصفحة الحالية مع كل رسالة AI
 - **Module/Tool Registry:** extensible — إضافة module أو tool جديد = ملف واحد فقط
-- **تقييد النطاق:** المساعد يجيب فقط على أسئلة متعلقة ببيانات مسار واستخدام المنصة — يرفض الأسئلة الهندسية/المقاولاتية العامة
-- **Always Available Tools:** projects, execution, quantities, finance, leads, accounting, subcontracts, dashboard — متاحة من أي صفحة
-- **Context-Aware:** أدوات documents, field, change-orders تتفعل تلقائياً حسب الصفحة الحالية عبر `activeModule`
+- **تقييد النطاق:** المساعد يجيب فقط على أسئلة متعلقة ببيانات مسار — يرفض الأسئلة الهندسية العامة
+- **Always Available Tools:** projects, execution, quantities, finance, leads, accounting, subcontracts, dashboard
+- **Context-Aware:** documents, field, change-orders تتفعل تلقائياً حسب الصفحة الحالية
 
 ### إضافة أداة AI جديدة
 
@@ -755,7 +778,7 @@ export const createItem = subscriptionProcedure... // write
 2. استخدم registerTool({ name, description, moduleId, parameters: z.object({}), execute })
 3. أضف import في packages/ai/tools/modules/index.ts
 4. أضف اسم الأداة في relatedTools بتعريف الوحدة المناسبة
-5. (اختياري) أضف الوحدة في القائمة الثابتة في route.ts إذا كانت مطلوبة من أي صفحة
+5. (اختياري) أضف الوحدة في route.ts إذا مطلوبة من أي صفحة
 ```
 
 ---
@@ -766,54 +789,22 @@ export const createItem = subscriptionProcedure... // write
 - إصلاح بطء التنقل (Cache-Control + Suspense + parallel layouts)
 - إصلاح تضاعف تكلفة المواد في ملخص التسعير
 - Beta مغلق مع مستخدمين محدودين
+- ZATCA Phase 2 production go-live
 
 ### متوسط (أشهر)
-- وحدة الأعمال الترابية (حفر، ردم، تدعيم، تجفيف) — قسم منفصل قبل الإنشائي
-- توسيع الأقسام الإنشائية: دمج عناصر متشابهة هيكلياً + كتالوج "بنود إضافية"
-- ZATCA Phase 2 (secp256k1, UBL 2.1, XAdES-BES, CSID)
+- وحدة الأعمال الترابية (حفر، ردم، تدعيم، تجفيف)
+- توسيع الأقسام الإنشائية
 - تطبيق React Native / Expo (MVP: مشرف ميداني)
 
 ### بعيد (6+ أشهر)
 - مكتبة أسعار مجتمعية (13 موقع مورد سعودي)
-- 7 أركان AI: استخراج مستندات، تسعير ذكي، تحليلات تنبؤية، أتمتة، رؤية حاسوبية، تقارير آلية
+- 7 أركان AI
 - ربط BOQ بالتنفيذ (Earned Value: CPI/SPI)
 - Offline mode + GPS tagging
 
 ---
 
-## 17. ملخص الإحصائيات
-
-| المقياس | القيمة |
-|---------|--------|
-| أسطر الكود | 660,000+ |
-| ملفات TypeScript/TSX | 2,324+ |
-| صفحات | 222+ |
-| API Endpoints | 700+ |
-| API Modules | 45 |
-| API Procedure Files | 374 |
-| Database Models | 126 |
-| Database Enums | 99 |
-| Database Indexes | 259+ |
-| Loading States | 221 files |
-| Error Boundaries | 16 files |
-| Translation Lines (AR) | ~10,161 |
-| Translation Lines (EN) | ~10,161 |
-| Permissions | 42 |
-| Custom Hooks | 22 |
-| UI Components (shadcn) | 35+ |
-| Environment Variables | 43 |
-| Rate Limit Tiers | 6 |
-| AI Tools | 32 (6 legacy + 26 registry) |
-| AI Module Definitions | 15 |
-| AI Module Prompts | 14 |
-| AI navigateTo Patterns | 37 |
-| Auto-Journal Events | 15 (+ generic reverse) |
-| Test Files | 33 (21 API + 7 DB + 5 E2E) |
-| Expense Categories | 39 main + ~200 subcategories |
-
----
-
-## 18. دليل سريع: كيف أنفذ مهمة شائعة
+## 17. دليل سريع: كيف أنفذ مهمة شائعة
 
 ### إضافة صفحة جديدة
 
@@ -821,7 +812,7 @@ export const createItem = subscriptionProcedure... // write
 1. أنشئ app/(saas)/app/[organizationSlug]/module/page.tsx
 2. أنشئ app/.../module/loading.tsx (skeleton)
 3. أضف المكون في modules/saas/module/components/
-4. أضف مفاتيح الترجمة في ar.json + en.json
+4. أضف مفاتيح الترجمة في ar.json + en.json (كلاهما!)
 5. أضف رابط في SidebarNav.tsx (مع prefetch)
 6. أضف الصلاحية في navigation guard
 ```
@@ -834,7 +825,7 @@ export const createItem = subscriptionProcedure... // write
 3. أضف Zod schema مع .min(), .max(), .nonnegative()
 4. أضف verifyOrganizationAccess() + orgAuditLog()
 5. سجّل في packages/api/modules/[module]/router.ts
-6. تحقق بـ npx tsc --noEmit
+6. تحقق بـ pnpm --filter @repo/web type-check (من الجذر!)
 ```
 
 ### إصلاح مشكلة UI لا تظهر
@@ -843,7 +834,7 @@ export const createItem = subscriptionProcedure... // write
 1. احذف .next: Remove-Item -Recurse -Force apps/web/.next
 2. أعد تشغيل: pnpm dev
 3. Hard refresh في المتصفح: Ctrl+Shift+R
-4. إذا لا يزال الأمر — تحقق من console errors في المتصفح
+4. إذا لا يزال — تحقق من console errors في المتصفح
 ```
 
 ### إضافة قسم إنشائي جديد
@@ -856,798 +847,181 @@ export const createItem = subscriptionProcedure... // write
 5. أضف في StructuralAccordion.tsx كقسم جديد
 6. أضف في boq-aggregator.ts (SECTION_ORDER + SECTION_LABELS + SECTION_ICONS)
 7. أضف الترجمات (~20-30 مفتاح في ar.json + en.json)
-8. تحقق: npx tsc --noEmit → pnpm build
+8. تحقق: pnpm --filter @repo/web type-check → pnpm build
 ```
 
 ---
 
-## 19. النظام المحاسبي المتكامل (أُضيف 2026-03-24)
+## 18. النظام المحاسبي المتكامل
 
-### 19.1 نظرة عامة
+### 18.1 نظرة عامة
 
-نظام محاسبي متكامل يعمل دائماً. يشمل: دليل حسابات هرمي (يُنشأ تلقائياً عند أول عملية مالية)، قيود يومية تلقائية ويدوية، فترات محاسبية، 10 تقارير، دفتر أستاذ، أرصدة افتتاحية، كشوف حساب (عميل/مقاول/مشروع/حساب)، سندات قبض/صرف (مع workflow اعتماد)، تسوية بنكية، قيود متكررة، فحص صحة محاسبية، وتصدير Excel.
+نظام محاسبي يعمل **دائماً بلا toggle**. يشمل: دليل حسابات هرمي (يُنشأ تلقائياً)، قيود يومية تلقائية ويدوية، فترات محاسبية، 10 تقارير، دفتر أستاذ، أرصدة افتتاحية، كشوف حساب، سندات قبض/صرف، تسوية بنكية، قيود متكررة، فحص صحة محاسبية، تصدير Excel.
 
-**القاعدة:** المحاسبة تعمل دائماً بلا toggle — دليل الحسابات يُنشأ تلقائياً عبر `ensureChartExists`. أخطاء القيود التلقائية لا تكسر العملية المالية الأصلية أبداً.
+**قاعدة صامتة:** أخطاء القيود التلقائية **لا تكسر العملية المالية الأصلية أبداً** — تُسجّل في `JOURNAL_ENTRY_FAILED` audit log.
 
-### 19.2 المعمارية
+### 18.2 المعمارية
 
 ```
-المحاسبة تعمل **دائماً** — لا يوجد toggle
+المحاسبة دائماً — لا toggle
     ↓
-عند أول عملية مالية أو أول زيارة لصفحات المالية → seedChartOfAccounts() → 48 حساب افتراضي
-    (auto-seed عبر ensureChartExists في auto-journal.ts + AccountingSeedCheck.tsx في frontend)
+أول عملية مالية → seedChartOfAccounts() → 48 حساب افتراضي
     ↓
-كل عملية مالية → auto-journal.ts → قيد تلقائي POSTED
+كل عملية → auto-journal.ts → قيد POSTED
     ↓
-القيود → تغذي التقارير (ميزان مراجعة، ميزانية، قائمة دخل، مراكز تكلفة)
+القيود → التقارير (ميزان مراجعة، ميزانية، قائمة دخل، مراكز تكلفة)
 ```
 
-### 19.3 Models المحاسبية (7 models)
+### 18.3 Models المحاسبية (7)
 
-| Model | الوصف | الحقول الرئيسية |
-|-------|-------|-----------------|
-| `ChartAccount` | دليل الحسابات | code, nameAr, nameEn, type(ASSET/LIABILITY/EQUITY/REVENUE/EXPENSE), normalBalance(DEBIT/CREDIT), level(1-4), parentId, isSystem, isPostable, bankAccount(1-1) |
-| `JournalEntry` | القيد اليومي | entryNo, date, description, referenceType, referenceId, referenceNo, isAutoGenerated, status(DRAFT/POSTED/REVERSED), totalAmount, createdByUser, postedByUser |
-| `JournalEntryLine` | بند القيد | accountId, debit(Decimal 15,2), credit(Decimal 15,2), projectId, description |
-| `AccountingPeriod` | الفترة المحاسبية | name, periodType(MONTHLY/QUARTERLY/ANNUAL), startDate, endDate, isClosed |
-| `RecurringJournalTemplate` | قالب قيد متكرر | description, lines(Json), frequency(MONTHLY/QUARTERLY/ANNUAL), dayOfMonth, nextDueDate, isActive |
-| `BankReconciliation` | التسوية البنكية | bankAccountId, reconciliationDate, statementBalance, bookBalance, difference, status(DRAFT/COMPLETED) |
-| `BankReconciliationItem` | بند التسوية | reconciliationId, journalEntryLineId, isMatched |
+`ChartAccount`, `JournalEntry`, `JournalEntryLine`, `AccountingPeriod`, `RecurringJournalTemplate`, `BankReconciliation`, `BankReconciliationItem`
 
-### 19.4 القيود التلقائية (auto-journal.ts)
+### 18.4 القيود التلقائية (15 حدث في `auto-journal.ts`)
 
-| الحدث | القيد | المرجع |
+| الحدث | القيد | Prefix |
 |-------|-------|--------|
-| إصدار فاتورة | DR: 1120 عملاء / CR: 4100 إيرادات + 2130 ضريبة | INVOICE |
-| تحصيل فاتورة | DR: البنك / CR: 1120 عملاء | INVOICE_PAYMENT |
-| مصروف | DR: حساب المصروف + 1150 ضريبة مدخلات / CR: البنك | EXPENSE |
-| تحويل بنكي | DR: البنك المستلم / CR: البنك المرسل | TRANSFER |
-| دفعة مقاول باطن | DR: 5200 مقاولو باطن / CR: البنك | SUBCONTRACT_PAYMENT |
-| اعتماد مطالبة مقاول باطن | DR: 5200 مقاولو باطن / CR: 2120 مستحقات | SUBCONTRACT_CLAIM_APPROVED |
-| رواتب | DR: 6100 رواتب / CR: البنك + 2170 تأمينات | PAYROLL |
-| مقبوض مباشر | DR: البنك / CR: 4300 إيرادات أخرى | ORG_PAYMENT |
-| دفعة مشروع | DR: البنك / CR: 4100 إيرادات | PROJECT_PAYMENT |
-| اعتماد مستخلص مشروع | DR: 1120 عملاء / CR: 4100 إيرادات | PROJECT_CLAIM_APPROVED |
-| إشعار دائن | DR: 4100 + 2130 / CR: 1120 | CREDIT_NOTE |
-| سند قبض | DR: البنك / CR: حساب حسب النوع | RECEIPT_VOUCHER |
-| سند صرف | DR: حساب حسب النوع / CR: البنك | PAYMENT_VOUCHER |
-| تسليم نهائي (إفراج ضمان) | DR: 2120 / CR: البنك | HANDOVER_RETENTION_RELEASE |
+| إصدار فاتورة | DR: 1120 / CR: 4100 + 2130 | INV-JE |
+| تحصيل فاتورة | DR: بنك / CR: 1120 | RCV-JE |
+| مصروف | DR: مصروف + 1150 / CR: بنك | EXP-JE |
+| تحويل بنكي | DR: بنك مستلم / CR: بنك مرسل | TRF-JE |
+| دفعة مقاول باطن | DR: 5200 / CR: بنك | SUB-JE |
+| اعتماد مطالبة باطن | DR: 5200 / CR: 2120 | SCL-JE |
+| رواتب | DR: 6100 / CR: بنك + 2170 | PAY-JE |
+| مقبوض مباشر | DR: بنك / CR: 4300 | RCV-JE |
+| دفعة مشروع | DR: بنك / CR: 4100 | PRJ-JE |
+| اعتماد مستخلص مشروع | DR: 1120 / CR: 4100 | PCL-JE |
+| إشعار دائن | DR: 4100 + 2130 / CR: 1120 | CN-JE |
+| سند قبض | DR: بنك / CR: حسب النوع | RV-JE |
+| سند صرف | DR: حسب النوع / CR: بنك | PV-JE |
+| إفراج ضمان | DR: 2150 / CR: 1120 | HR-JE |
 
-**15 حدث تلقائي** — كل واحد مع `JOURNAL_ENTRY_FAILED` audit log في حالة الفشل + `reverseAutoJournalEntry` دالة عكس عامة.
+**Format ترقيم:** `{PREFIX}-{YEAR}-{XXXX}` (ذري عبر `nextSequenceValue`)
 
-**قاعدة صامتة:** أخطاء المحاسبة لا تكسر العملية المالية الأصلية أبداً.
+### 18.5 الميزات المنفّذة (21)
 
-### 19.5 ترقيم القيود حسب النوع
+دفتر الأستاذ، أرصدة افتتاحية، كشوف حساب، سند صرف، ترحيل جماعي، مراكز التكلفة، تسوية بنكية، قيود متكررة، طباعة التقارير، ربط ثنائي الاتجاه، ترقيم حسب النوع، لوحة محاسبة، بحث متقدم، سجل تدقيق بصري، تصدير Excel، المبلغ بالحروف العربية، VAT تفصيلي، سندات صرف كاملة، كشوف حساب متقدمة، فحص صحة محاسبية، تكامل محاسبي شامل.
 
-كل نوع قيد له prefix مستقل مع sequence منفصل (18 نوع):
-```
-INVOICE → INV-JE              INVOICE_PAYMENT → RCV-JE
-EXPENSE → EXP-JE              TRANSFER → TRF-JE
-SUBCONTRACT_PAYMENT → SUB-JE  SUBCONTRACT_CLAIM_APPROVED → SCL-JE
-PROJECT_PAYMENT → PRJ-JE      PROJECT_CLAIM_APPROVED → PCL-JE
-PAYROLL → PAY-JE              ORG_PAYMENT → RCV-JE
-CREDIT_NOTE → CN-JE           REVERSAL → REV-JE
-ADJUSTMENT → ADJ-JE           PERIOD_CLOSING → CLS-JE
-OPENING_BALANCE → OPN-JE      RECEIPT_VOUCHER → RV-JE
-PAYMENT_VOUCHER → PV-JE       HANDOVER_RETENTION_RELEASE → HR-JE
-MANUAL (default) → MAN-JE
-```
-Format: `{PREFIX}-{YEAR}-{XXXX}` (e.g. `INV-JE-2026-0001`)
-
-### 19.6 الميزات الـ 21 المنفّذة
-
-| # | الميزة | الملفات الرئيسية |
-|---|--------|-----------------|
-| 1 | **دفتر الأستاذ** — حركات الحساب بالرصيد التراكمي | `AccountLedgerPage.tsx` + `/chart-of-accounts/[accountId]/ledger` |
-| 2 | **أرصدة افتتاحية** — إدخال أرصدة عند بدء استخدام النظام | `OpeningBalancesPage.tsx` + `/opening-balances` |
-| 3 | **كشف حساب عميل/مقاول** — من الفواتير والمدفوعات مباشرة | `ClientStatementReport.tsx` + `client-statements.ts` |
-| 4 | **سند صرف** — مستند مطبوع للمصروفات | `PaymentVoucher.tsx` + `/expenses/[id]/voucher` |
-| 5 | **ترحيل جماعي** — checkboxes + bulk post + post all drafts | `JournalEntriesPage.tsx` (معدّل) |
-| 6 | **مراكز التكلفة** — ربحية كل مشروع | `CostCenterReport.tsx` + `/accounting-reports/cost-center` |
-| 7 | **تسوية بنكية** — مطابقة يدوية مع كشف البنك | `BankReconciliation.tsx` + `/banks/[id]/reconciliation` |
-| 8 | **قيود متكررة** — قوالب شهرية/ربعية/سنوية تولّد DRAFT | `RecurringJournalTemplates.tsx` + `recurring-entries.ts` |
-| 9 | **طباعة التقارير** — `ReportPrintHeader` + `window.print()` | `ReportPrintHeader.tsx` + 4 تقارير معدّلة |
-| 10 | **ربط ثنائي الاتجاه** — من القيد للمصدر والعكس | `JournalEntryDetails.tsx` (referenceNo clickable) |
-| 11 | **ترقيم حسب النوع** — INV-JE, EXP-JE, etc. | `accounting.ts` → `createJournalEntry()` |
-| 12 | **لوحة محاسبة** — KPIs + تنبيهات + اختصارات | `AccountingDashboard.tsx` + `/accounting-dashboard` |
-| 13 | **بحث متقدم** — فلاتر المبلغ والحساب والنوع والتاريخ | `JournalEntriesPage.tsx` (فلاتر متقدمة) |
-| 14 | **سجل تدقيق بصري** — من أنشأ/رحّل/عكس القيد | `JournalEntryDetails.tsx` (audit trail card) |
-| 15 | **تصدير Excel** — ميزان مراجعة + قيود + دفتر أستاذ | `accounting-excel-export.ts` (xlsx-js-style) |
-| 16 | **المبلغ بالحروف العربية** — utility مشتركة | `packages/utils/lib/number-to-arabic-words.ts` |
-| 17 | **VAT تفصيلي** — tabs لتفاصيل الفواتير والمصروفات | `VATReport.tsx` (معدّل بـ 3 tabs) |
-| 18 | **سندات صرف كاملة** — CRUD + workflow اعتماد (DRAFT→PENDING→ISSUED) | `PaymentVouchersList/Form/Detail.tsx` + `payment-vouchers.ts` (10 endpoints) |
-| 19 | **كشوف حساب متقدمة** — حساب بالكود + مشروع + مقاول باطن | `AccountStatementView.tsx` + `ProjectStatementView.tsx` + `SubcontractStatementView.tsx` |
-| 20 | **فحص صحة محاسبية** — 4 فحوصات + backfill تلقائي | `AccountingHealthPage.tsx` + `accounting-health.ts` |
-| 21 | **تكامل محاسبي شامل** — 15+ procedure مع auto-journal hooks | `auto-journal.ts` (12 handler + reverse) — يشمل كل العمليات المالية |
-
-### 19.7 ملفات النظام المحاسبي — خريطة كاملة
-
-**Backend (queries + procedures):**
-```
-packages/database/prisma/queries/
-├── accounting.ts              # ⭐ ~1,600 سطر — كل الاستعلامات المحاسبية
-│   ├── seedChartOfAccounts()  # إنشاء 40+ حساب افتراضي
-│   ├── createJournalEntry()   # إنشاء قيد مع ترقيم حسب النوع
-│   ├── postJournalEntry()     # ترحيل قيد DRAFT→POSTED
-│   ├── reverseJournalEntry()  # عكس قيد مع إنشاء قيد عكسي
-│   ├── getTrialBalance()      # Raw SQL — ميزان المراجعة
-│   ├── getBalanceSheet()      # الميزانية العمومية
-│   ├── getJournalIncomeStatement() # قائمة الدخل
-│   ├── getAccountLedger()     # دفتر الأستاذ بالرصيد التراكمي
-│   ├── getOpeningBalances() / saveOpeningBalances() # أرصدة افتتاحية
-│   ├── bulkPostJournalEntries() / bulkPostAllDrafts() # ترحيل جماعي
-│   ├── getCostCenterByProject() # مراكز التكلفة
-│   ├── getAccountingDashboard() # لوحة المحاسبة KPIs
-│   ├── listRecurringTemplates() / createRecurringTemplate() / generateDueRecurringEntries()
-│   ├── getBankJournalLines() / createBankReconciliation() / listBankReconciliations()
-│   └── findJournalEntryByReference() # ربط ثنائي الاتجاه
-├── client-statements.ts       # كشوف حساب العملاء والمقاولين
-│   ├── getClientStatement()   # من FinanceInvoice + FinancePayment
-│   └── getVendorStatement()   # من SubcontractClaim + SubcontractPayment
-├── account-statements.ts      # كشوف حساب متقدمة (جديد — 428 سطر)
-│   ├── getAccountLedgerByCode()  # دفتر أستاذ بكود الحساب + فلتر مشروع
-│   ├── getSubcontractStatement() # كشف مقاول باطن + ملخص عقد
-│   └── getProjectStatement()     # ربحية مشروع (إيرادات/تكاليف/تدفق نقدي)
-├── accounting-health.ts       # فحص صحة محاسبية (جديد — 87 سطر)
-│   └── checkAccountingHealth()   # 4 فحوصات: unbalanced, missing entries, orphaned, expenses
-└── accounting-reports.ts      # تقارير: aged receivables/payables, VAT, income statement
-
-packages/api/modules/accounting/
-├── router.ts                  # accounts.*, journal.*, reports.*, openingBalances.*, statements.*, recurring.*, periods.*, dashboard, health
-├── procedures/
-│   ├── chart-of-accounts.ts   # seed, list, getById, create, update, deactivate, getBalance, getLedger, openingBalances
-│   ├── journal-entries.ts     # list, getById, create, post, reverse, delete, bulkPost, postAllDrafts, findByReference, costCenter, dashboard
-│   ├── statements.ts          # getClientStatement, getVendorStatement
-│   ├── account-statements.ts  # accountLedgerByCode, subcontractStatement, projectStatement
-│   ├── health.ts              # checkAccountingHealth (4 validations)
-│   ├── backfill.ts            # backfillJournalEntries
-│   └── recurring-entries.ts   # list, create, update, delete, generate
-
-packages/api/modules/finance/procedures/
-├── bank-reconciliation.ts     # getLines, create, history
-├── payment-vouchers.ts        # list, getById, create, update, submit, approve, reject, cancel, print, summary (10 endpoints)
-└── expense-categories.ts      # 🆕 listExpenseCategories (بحث + هرمي)
-
-packages/api/lib/accounting/
-└── auto-journal.ts            # 12 event handlers + reverseAutoJournalEntry (766 lines)
-
-packages/utils/lib/
-├── number-to-arabic-words.ts  # numberToArabicWords(13800.50) → "ثلاثة عشر ألفاً وثمانمائة ريال سعودي وخمسون هللة"
-└── expense-categories.ts      # 🆕 39 تصنيف هرمي + بحث + خرائط legacy (887 سطر)
-```
-
-**Frontend (pages + components):**
-```
-apps/web/app/(saas)/app/(organizations)/[organizationSlug]/finance/
-├── chart-of-accounts/
-│   ├── page.tsx + loading.tsx
-│   └── [accountId]/ledger/page.tsx + loading.tsx     # Feature 1: دفتر الأستاذ
-├── journal-entries/
-│   ├── page.tsx + loading.tsx
-│   ├── [id]/page.tsx                                  # تفاصيل القيد + audit trail
-│   └── recurring/page.tsx                             # Feature 8: قيود متكررة
-├── opening-balances/page.tsx + loading.tsx             # Feature 2: أرصدة افتتاحية
-├── accounting-dashboard/page.tsx + loading.tsx         # Feature 12: لوحة المحاسبة
-├── accounting-periods/page.tsx + loading.tsx
-├── accounting-reports/
-│   ├── page.tsx (landing — 9 بطاقات تقارير)
-│   ├── trial-balance/        # + طباعة + Excel
-│   ├── balance-sheet/        # + طباعة
-│   ├── income-statement/     # + طباعة
-│   ├── journal-income-statement/ # + طباعة
-│   ├── cost-center/          # Feature 6: مراكز التكلفة
-│   ├── vat-report/           # Feature 17: tabs تفصيلية
-│   ├── health/               # Feature 20: فحص صحة محاسبية
-│   ├── aged-receivables/
-│   └── aged-payables/
-├── payment-vouchers/                                   # Feature 18: سندات صرف
-│   ├── page.tsx + loading.tsx                          # قائمة السندات
-│   ├── new/page.tsx + loading.tsx                      # إنشاء سند جديد
-│   └── [voucherId]/page.tsx + loading.tsx              # تفاصيل السند
-├── clients/[clientId]/statement/page.tsx               # Feature 3: كشف حساب عميل
-├── expenses/[expenseId]/voucher/page.tsx               # Feature 4: سند صرف مصروف
-└── banks/[bankId]/reconciliation/page.tsx              # Feature 7: تسوية بنكية
-
-apps/web/app/(saas)/app/(organizations)/[organizationSlug]/projects/[projectId]/
-├── finance/
-│   ├── statement/page.tsx + loading.tsx                # Feature 19: كشف حساب مشروع
-│   └── subcontracts/[subcontractId]/
-│       └── statement/page.tsx + loading.tsx            # Feature 19: كشف حساب مقاول باطن
-└── handover/                                           # وحدة الاستلام (Section 21)
-    ├── page.tsx + loading.tsx                          # قائمة المحاضر
-    ├── new/page.tsx + loading.tsx                      # إنشاء محضر
-    └── [protocolId]/page.tsx + loading.tsx             # تفاصيل المحضر
-
-apps/web/modules/saas/finance/
-├── components/accounting/
-│   ├── ChartOfAccountsPage.tsx      # شجرة حسابات + حسابات قابلة للنقر → ledger
-│   ├── JournalEntriesPage.tsx       # بحث متقدم + checkboxes + bulk post + Excel
-│   ├── JournalEntryDetails.tsx      # referenceNo clickable + audit trail
-│   ├── AccountLedgerPage.tsx        # رصيد تراكمي + طباعة + Excel
-│   ├── OpeningBalancesPage.tsx      # إدخال أرصدة مجمّعة حسب النوع
-│   ├── ClientStatementReport.tsx    # كشف حساب مع طباعة
-│   ├── CostCenterReport.tsx         # صفوف قابلة للتوسيع + بطاقات KPI
-│   ├── AccountingDashboard.tsx      # 4 KPIs + تنبيهات + اختصارات
-│   ├── AccountingHealthPage.tsx     # 4 فحوصات صحة + backfill (جديد)
-│   ├── RecurringJournalTemplates.tsx # قائمة قوالب + توليد + toggle
-│   ├── TrialBalanceReport.tsx       # + طباعة + Excel export
-│   ├── BalanceSheetReport.tsx       # + طباعة
-│   ├── JournalIncomeStatementReport.tsx # + طباعة
-│   └── formatters.ts               # formatAccounting, ACCOUNT_TYPE_COLORS
-├── components/accounting-reports/
-│   ├── AccountingReportsLanding.tsx  # 9 بطاقات (+ cost center + health)
-│   └── VATReport.tsx                # 3 tabs: ملخص/فواتير/مصروفات
-├── components/banks/
-│   └── BankReconciliation.tsx       # مطابقة يدوية + checkboxes + تاريخ تسويات
-├── components/vouchers/
-│   ├── ReceiptVouchersList.tsx      # قائمة سندات القبض
-│   ├── ReceiptVoucherForm.tsx       # إنشاء/تعديل سند قبض
-│   ├── ReceiptVoucherDetail.tsx     # تفاصيل سند قبض + طباعة
-│   ├── PaymentVouchersList.tsx      # قائمة سندات الصرف (جديد)
-│   ├── PaymentVoucherForm.tsx       # إنشاء سند صرف + workflow (جديد)
-│   └── PaymentVoucherDetail.tsx     # تفاصيل + اعتماد/رفض + طباعة (جديد)
-├── components/statements/
-│   ├── AccountStatementView.tsx     # كشف حساب عام بالكود (reusable)
-│   ├── ProjectStatementView.tsx     # ربحية مشروع + تدفق نقدي
-│   └── SubcontractStatementView.tsx # كشف حساب مقاول باطن
-├── components/shared/
-│   ├── ReportPrintHeader.tsx        # هيدر طباعة مشترك (hidden print:block)
-│   └── JournalEntryLink.tsx         # رابط للقيد المحاسبي من أي مكان
-├── components/shell/
-│   ├── constants.ts                 # FINANCE_NAV_SECTIONS (15 section)
-│   └── FinanceNavigation.tsx        # شريط التنقل المالي (المحاسبة مرئية دائماً)
-└── lib/
-    └── accounting-excel-export.ts   # xlsx-js-style: trial balance, journal, ledger
-
-apps/web/modules/saas/projects/components/handover/     # وحدة الاستلام (جديدة)
-├── HandoverProtocolsList.tsx        # قائمة المحاضر + فلاتر + بحث
-├── HandoverProtocolForm.tsx         # إنشاء محضر + أطراف + شروط
-├── HandoverProtocolDetail.tsx       # تفاصيل + توقيعات + بنود + ضمان
-└── HandoverItemDialog.tsx           # إضافة/تعديل بند استلام
-
-apps/web/modules/saas/shared/components/
-└── DocumentPrintHeader.tsx          # هيدر طباعة مستندات مشترك (جديد)
-```
-
-### 19.8 التنقل المحاسبي
-
-أقسام المحاسبة تظهر دائماً في شريط التنقل المالي والـ Sidebar:
-- لوحة المحاسبة
-- دليل الحسابات
-- القيود اليومية
-- الأرصدة الافتتاحية
-- الفترات المحاسبية
-- التقارير المحاسبية (8 تقارير)
-
-**ملاحظة:** كل أقسام المحاسبة مرئية دائماً في شريط التنقل — لا يوجد `useAccountingMode` toggle أو `ACCOUNTING_ONLY_SECTIONS` gate.
-
-### 19.9 نمط oRPC في المحاسبة
+### 18.6 نمط oRPC في المحاسبة
 
 ```typescript
-// ✅ Query (استعلام — protectedProcedure)
+// ✅ Query (protectedProcedure)
 const { data } = useQuery(
   orpc.accounting.accounts.getLedger.queryOptions({
     input: { organizationId, id: accountId, dateFrom, dateTo },
   }),
 );
 
-// ✅ Mutation (كتابة — subscriptionProcedure) — بدون { input: }
+// ✅ Mutation (subscriptionProcedure) — بدون { input: }
 bulkPostMutation.mutate({ organizationId, entryIds: [...] });
 
 // ❌ خطأ شائع — لا تلف المعاملات في { input: }
 mutation.mutate({ input: { organizationId } }); // هذا خطأ!
 ```
 
-### 19.10 حسابات النظام الافتراضية (Saudi Construction)
+### 18.7 حسابات النظام الافتراضية (Saudi Construction)
 
 | الكود | الحساب | النوع |
 |-------|--------|-------|
 | 1110 | النقدية والبنوك | ASSET |
-| 1120 | العملاء (ذمم مدينة) | ASSET |
-| 1150 | ضريبة مدخلات قابلة للاسترداد | ASSET |
-| 2110 | الموردون (ذمم دائنة) | LIABILITY |
+| 1120 | العملاء | ASSET |
+| 1150 | ضريبة مدخلات | ASSET |
+| 2110 | الموردون | LIABILITY |
 | 2120 | مستحقات مقاولي الباطن | LIABILITY |
-| 2130 | ضريبة القيمة المضافة المستحقة | LIABILITY |
+| 2130 | VAT المستحقة | LIABILITY |
 | 2150 | محتجزات (ضمان) | LIABILITY |
-| 2140 | رواتب مستحقة | LIABILITY |
-| 2170 | تأمينات اجتماعية مستحقة | LIABILITY |
+| 2170 | تأمينات اجتماعية | LIABILITY |
 | 3100 | رأس المال | EQUITY |
-| 3200 | أرباح مبقاة (حساب موازنة الأرصدة الافتتاحية) | EQUITY |
+| 3200 | أرباح مبقاة | EQUITY |
 | 4100 | إيرادات المشاريع | REVENUE |
 | 4300 | إيرادات أخرى | REVENUE |
 | 5100 | مواد ومشتريات | EXPENSE |
 | 5200 | مقاولو باطن | EXPENSE |
 | 5300 | عمالة مباشرة | EXPENSE |
-| 6100 | رواتب إدارية | EXPENSE |
-| 6200-6950 | مصروفات تشغيلية (إيجار، مرافق، عمولات...) | EXPENSE |
+| 6100-6950 | مصروفات إدارية وتشغيلية | EXPENSE |
 
-### 19.11 ضمانات سلامة البيانات المالية (مُتحقق منها 2026-03-27)
+### 18.8 ضمانات سلامة البيانات المالية
 
-| الضمانة | الموقع | التفاصيل |
-|---------|--------|----------|
-| القيود ذرية | `createJournalEntry` → `db.$transaction` | duplicate check + period check + account validation + create كلها في transaction واحد |
-| رصيد البنك يُحدّث مع دفعة الفاتورة | `addInvoicePayment` / `deleteInvoicePayment` | `increment` / `decrement` داخل نفس الـ transaction |
-| state machine للفواتير | `updateInvoiceStatusProcedure` | `ALLOWED_TRANSITIONS` + DRAFT محذوف من Zod enum |
-| منع تعديل فاتورة ISSUED | `updateInvoiceItems` | `status !== "DRAFT"` → throw |
-| حد مبلغ الإشعار الدائن | `createCreditNote` | مجموع الإشعارات السابقة + الجديد ≤ الفاتورة الأصلية |
-| الإشعار الدائن يُقلل رصيد الفاتورة | `createCreditNote` → `tx.financeInvoice.update` | `paidAmount: { increment: creditAmount }` + تحديث status |
-| فحص الفترات المغلقة عند الترحيل | `postJournalEntry` → `isPeriodClosed` | يمنع ترحيل قيد في فترة مغلقة |
-| entryNo فريد | Schema: `@@unique([organizationId, entryNo])` | مع ترقيم ذري عبر `nextSequenceValue` |
-| ترقيم ذري للعقود | `generateSubcontractNo` / `generateSubcontractPaymentNo` | عبر `generateAtomicNo` |
-| state machine للمستخلصات | `updateClaimStatus` → `ALLOWED_TRANSITIONS` | DRAFT→SUBMITTED→APPROVED→PAID |
-| VAT بـ Prisma Decimal | `onExpenseCompleted` | `amount.div(Decimal("1.15"))` بدل JS floating-point |
-| audit log لأخطاء القيود | كل catch block (33+ موقع) | `JOURNAL_ENTRY_FAILED` enum + fire-and-forget |
-| سندات صرف state machine | `payment-vouchers.ts` | DRAFT→PENDING_APPROVAL→ISSUED + reject/cancel |
-| محاضر استلام state machine | `handover-protocols.ts` | DRAFT→PENDING_SIGNATURES→COMPLETED + sign tracking |
+القيود ذرية ($transaction)، رصيد البنك يُحدّث مع دفعة الفاتورة، state machines (فواتير/مستخلصات/سندات)، منع تعديل فاتورة ISSUED، حد مبلغ الإشعار الدائن، فحص الفترات المغلقة، entryNo فريد، ترقيم ذري للعقود، VAT بـ Decimal، audit log لأخطاء القيود (33+ موقع).
+
+### 18.9 ملفات النظام المحاسبي
+
+**Backend:** `packages/database/prisma/queries/accounting.ts` (~1,600 سطر — القلب)، `packages/api/modules/accounting/` (router + 7 procedure files)، `packages/api/lib/accounting/auto-journal.ts` (766 سطر)، `packages/utils/lib/number-to-arabic-words.ts`
+
+**Frontend:** `apps/web/app/(saas)/app/(organizations)/[organizationSlug]/finance/` (chart-of-accounts, journal-entries, accounting-reports, opening-balances, accounting-dashboard, payment-vouchers, clients/[id]/statement, banks/[id]/reconciliation)، `apps/web/modules/saas/finance/components/accounting/` (13 مكون رئيسي)
 
 ---
 
-## 20. وحدة محاضر الاستلام (Handover Protocols — أُضيف 2026-03-28)
+## 19. وحدات إضافية
 
-### 20.1 نظرة عامة
+### 19.1 محاضر الاستلام (Handover Protocols)
 
-وحدة كاملة لإدارة محاضر الاستلام في المشاريع الإنشائية. تدعم 4 أنواع استلام مع workflow توقيعات وتتبع ضمان وربط محاسبي تلقائي لإفراج المحتجزات.
+4 أنواع (`ITEM_ACCEPTANCE`, `PRELIMINARY`, `FINAL`, `DELIVERY`) مع state machine (DRAFT → PENDING_SIGNATURES → PARTIALLY_SIGNED → COMPLETED → ARCHIVED). تتبع ضمان + ربط محاسبي لإفراج المحتجزات عند `FINAL` (DR: 2150 / CR: 1120 → HR-JE).
 
-### 20.2 أنواع المحاضر (4 أنواع)
+**Backend:** `packages/api/modules/handover/procedures/` (8 ملفات — shared, list, crud, items, workflow, reports)
+**Frontend:** `apps/web/modules/saas/projects/components/handover/` (4 مكونات)
+**Router:** `orpc.handover.*`
 
-| النوع | الوصف | ملاحظات |
-|-------|-------|---------|
-| `ITEM_ACCEPTANCE` | استلام بنود | يتطلب ربط بعقد مقاول باطن |
-| `PRELIMINARY` | استلام ابتدائي | يحسب تلقائياً فترة الضمان (warrantyMonths) |
-| `FINAL` | استلام نهائي | يفرج المحتجزات (retentionReleaseAmount) + قيد تلقائي |
-| `DELIVERY` | تسليم للعميل | تسليم المشروع النهائي |
+### 19.2 سندات الصرف (Payment Vouchers)
 
-### 20.3 حالات المحضر (State Machine)
+State machine: `DRAFT → PENDING_APPROVAL → ISSUED` (مع reject/cancel). ترقيم PMT-YYYY-XXXX. 10 endpoints: `finance.disbursements.*`. ربط محاسبي تلقائي للسندات اليدوية (PV-JE). عند الإلغاء من ISSUED → عكس القيد.
 
-```
-DRAFT → PENDING_SIGNATURES → PARTIALLY_SIGNED → COMPLETED
-  │                                                  ↑
-  └──────────────────────────────────────────────────┘ (complete manually)
-                                                    → ARCHIVED
-```
+### 19.3 جدول كميات المشروع (Project BOQ)
 
-**شروط التقديم:** يتطلب ≥1 بند و ≥1 طرف موقّع.
-**إكمال تلقائي:** عند توقيع جميع الأطراف → COMPLETED تلقائياً.
+وحدة منفصلة عن دراسات التسعير. 12 ملف frontend في `apps/web/modules/saas/projects/components/boq/`: فلترة، ترتيب، عمليات جماعية، إضافة/إدخال بنود بالجملة، نسخ من دراسات/عروض أسعار، استيراد Excel.
 
-### 20.4 Prisma Models
+### 19.4 محادثات المشروع (Project Chat)
 
-```prisma
-model HandoverProtocol {
-  protocolNo              String         // HND-YYYY-XXXX (ترقيم ذري)
-  type                    HandoverType   // ITEM_ACCEPTANCE | PRELIMINARY | FINAL | DELIVERY
-  status                  HandoverStatus // DRAFT → PENDING_SIGNATURES → COMPLETED
-  projectId               String         // FK → Project
-  subcontractContractId   String?        // FK → SubcontractContract (مطلوب لـ ITEM_ACCEPTANCE)
-  title                   String
-  parties                 Json           // [{name, role, organization, signed, signedAt}]
-  items                   HandoverProtocolItem[]
-  warrantyMonths          Int?           // افتراضي 12 (لـ PRELIMINARY)
-  warrantyStartDate       DateTime?      // يُحسب تلقائياً
-  warrantyEndDate         DateTime?
-  retentionReleaseAmount  Decimal?       // (لـ FINAL) → قيد محاسبي تلقائي
-  // ...
-}
+قناتان (TEAM + OWNER) مع polling كل 15 ثانية + mark-as-read. 7 ملفات frontend في `apps/web/modules/saas/projects/components/chat/`.
 
-model HandoverProtocolItem {
-  description    String
-  contractQty    Decimal?       // الكمية التعاقدية
-  executedQty    Decimal?       // الكمية المنفّذة
-  acceptedQty    Decimal?       // الكمية المقبولة
-  qualityRating  QualityRating? // EXCELLENT | GOOD | ACCEPTABLE | NEEDS_REWORK | REJECTED
-  defects        Json?          // تفاصيل العيوب
-}
-```
+### 19.5 محرك عرض القوالب (Template Renderer)
 
-### 20.5 API Endpoints (15 endpoint — مُعاد هيكلته إلى 8 ملفات)
+`TemplateRenderer.tsx` (693 سطر) — فواتير + عروض أسعار، عناصر قابلة للسحب (هيدر، بيانات، جدول، مجاميع، شروط، توقيع، QR ZATCA، فوتر)، AR/EN + RTL، ألوان/خطوط/خلفيات قابلة للتخصيص، Watermark.
 
-| الملف | الإجراءات |
-|-------|-----------|
-| `shared.ts` | Enums + schemas مشتركة (handoverType, handoverStatus, qualityRating, partySchema) |
-| `list-protocols.ts` | list, getById |
-| `crud-protocols.ts` | create, update, delete |
-| `protocol-items.ts` | addItem, updateItem, deleteItem, importFromContract, importFromBOQ |
-| `protocol-workflow.ts` | submit, sign, complete (+ auto-accounting for FINAL) |
-| `protocol-reports.ts` | print, getWarrantyStatus |
-| `handover-protocols.ts` | backward-compatibility shim → re-exports from index |
-| `index.ts` | central export hub |
+### 19.6 تصنيفات المصروفات الهرمية
 
-**Router path:** `orpc.handover.*`
+39 تصنيف رئيسي + ~200 فرعي مربوطة بدليل الحسابات. `packages/utils/lib/expense-categories.ts` (887 سطر). `auto-journal.ts` يستخدم `getAccountCodeForCategory()`. تدعم الفئات القديمة عبر `LEGACY_CATEGORY_MAP` (25 mapping).
 
-### 20.6 التكامل المحاسبي
+### 19.7 بنية الاختبارات
 
-عند إكمال محضر استلام نهائي (`FINAL`) مع مبلغ محتجزات > 0:
-- **القيد التلقائي:** DR: 2150 (محتجزات) / CR: 1120 (عملاء)
-- **المرجع:** `HANDOVER_RETENTION_RELEASE` → `HR-JE-YYYY-XXXX`
-- **الفشل آمن:** أخطاء القيد تُسجّل في audit trail بدون كسر العملية
+**Vitest** (workspace: api + database) + **Playwright** (E2E). 33 ملف اختبار: 21 API (`permissions`, `feature-gate`, `financial-calculations`, `zatca-tlv`, `rate-limit`, `security/`, `modules/`) + 7 DB (`smoke`, `invoice-calculations`, `sequences`, `attachments-validation`, `org-finance`) + 5 E2E (`smoke`, `auth`, `public-pages`).
 
-### 20.7 Frontend
+### 19.8 ثوابت التحقق المركزية
 
-| المكون | الموقع | الوصف |
-|--------|--------|-------|
-| `HandoverProtocolsList.tsx` | projects/handover | قائمة + بحث + فلاتر (نوع، حالة) |
-| `HandoverProtocolForm.tsx` | projects/handover/new | إنشاء محضر + أطراف + شروط |
-| `HandoverProtocolDetail.tsx` | projects/handover/[id] | تفاصيل + توقيعات + بنود + ضمان + طباعة |
-| `HandoverItemDialog.tsx` | (dialog) | إضافة/تعديل بند مع تقييم جودة |
+`packages/api/lib/validation-constants.ts`: حدود نصوص (`MAX_NAME=200`, `MAX_DESC=2000`, `MAX_LONG_TEXT=5000`)، حدود مالية (`MAX_FINANCIAL=999,999,999.99`)، دوال Zod جاهزة (`trimmedString`, `financialAmount`, `percentage`, `quantity`).
 
-**التنقل:** أيقونة ClipboardCheck في sidebar المشروع → `/projects/[id]/handover`
+### 19.9 أنماط الطباعة
+
+`@page { size: A4 portrait; margin: 15mm 10mm 10mm 10mm; }` في globals.css. `.print-page-break-before/after`, `.print-avoid-break`, `.signature-section`, `.totals-section`. `thead` يتكرر. Watermark عبر `[data-watermark]::before`. PDF export عبر `html2pdf.js` + `window.print()`.
 
 ---
 
-## 21. نظام سندات الصرف (Payment Vouchers — أُضيف 2026-03-28)
+## 20. ملاحظات بيئة العمل
 
-### 21.1 نظرة عامة
-
-نظام سندات صرف كامل مع workflow اعتماد ثنائي (إعداد → اعتماد)، ربط اختياري بالمصروفات/عقود الباطن، وتكامل محاسبي تلقائي.
-
-### 21.2 State Machine
-
-```
-DRAFT ──submit──→ PENDING_APPROVAL ──approve──→ ISSUED
-  │                      │                         │
-  │                    reject                   cancel
-  │                      ↓                         ↓
-  └──cancel──→      CANCELLED                CANCELLED
-```
-
-### 21.3 حقول السند الرئيسية
-
-- `voucherNo`: PMT-YYYY-XXXX (ترقيم ذري)
-- `payeeType`: SUBCONTRACTOR | SUPPLIER | EMPLOYEE | OTHER
-- `paymentMethod`: CASH | BANK_TRANSFER | CHEQUE | CREDIT_CARD | OTHER
-- حقول شرطية: `checkNumber/checkDate/checkBank` (شيك) أو `transferRef/bankName` (تحويل)
-- ربط اختياري: `projectId`, `subcontractContractId`, `expenseId`
-- `amountInWords`: توليد تلقائي بالعربية عبر `numberToArabicWords()`
-
-### 21.4 API Endpoints (10 endpoints)
-
-```
-finance.disbursements.list / getById / create / update / submit / approve / reject / cancel / print / getSummary
-```
-
-### 21.5 التكامل المحاسبي
-
-- **سندات يدوية فقط** (بدون ربط بمصروف أو دفعة مقاول): عند الاعتماد → `onPaymentVoucherApproved()`
-- **المرجع:** `PAYMENT_VOUCHER` → `PV-JE-YYYY-XXXX`
-- **عند الإلغاء من ISSUED:** يعكس القيد تلقائياً عبر `reverseAutoJournalEntry()`
-
----
-
-## 22. بنية الاختبارات (أُضيف 2026-03-29)
-
-### 22.1 نظرة عامة
-
-بنية اختبارات متكاملة تغطي unit tests, integration tests, و E2E tests.
-
-### 22.2 المكدس
-
-| الأداة | الاستخدام |
-|--------|-----------|
-| **Vitest** | Unit + Integration (monorepo workspace: `packages/api` + `packages/database`) |
-| **Playwright** | E2E (Chromium, Arabic locale, Asia/Riyadh timezone, `http://localhost:3000`) |
-
-### 22.3 اختبارات API (`packages/api/__tests__/` — 21 ملف)
-
-| الملف/المجلد | الوصف | النوع |
-|-------------|-------|-------|
-| `permissions.test.ts` | 60+ assertion — RBAC لـ 6 أدوار و 7 أقسام صلاحيات | Unit + Integration |
-| `feature-gate.test.ts` | Feature gating — FREE/PRO/TRIAL مع حدود count | Unit (mocked) |
-| `financial-calculations.test.ts` | معادلات مالية (رواتب، محتجزات، أقساط) | Unit (pure) |
-| `zatca-tlv.test.ts` | ترميز QR الفاتورة الإلكترونية | Unit |
-| `rate-limit.test.ts` | Rate limiting enforcement | Unit |
-| `permissions/` | Permission matrix, cross-tenant, project access | Integration |
-| `security/` | File upload validation, input sanitization | Unit |
-| `modules/accounting/` | Auto-journal entry creation | Integration |
-| `modules/finance/` | Invoice lifecycle, payment voucher workflow | Integration |
-| `modules/ai/` | AI tool permissions | Unit |
-| `helpers/` | setup.ts (DB redirect), factories.ts, mock-context.ts, assertions.ts | Utilities |
-
-### 22.4 اختبارات Database (`packages/database/__tests__/` — 7 ملفات)
-
-| الملف | الوصف |
-|-------|-------|
-| `smoke.test.ts` | اتصال DB + CRUD + rollback |
-| `invoice-calculations.test.ts` | 60+ test — `calculateInvoiceTotals()` (خصومات، VAT، تقريب، Decimal) |
-| `sequences.test.ts` | 15 test — `formatSequenceNo()` (INV, EXP, QT prefixes) |
-| `attachments-validation.test.ts` | قواعد التحقق من الملفات |
-| `org-finance.test.ts` | بيانات مالية المنظمة |
-| `helpers/setup.ts` | `withTestTx()` — transaction-per-test مع auto-rollback |
-| `helpers/factories.ts` | مصانع بيانات اختبار (org, user, bank) |
-
-### 22.5 اختبارات E2E (`apps/web/tests/e2e/` — 5 ملفات)
-
-| الملف | الاختبارات |
-|-------|-----------|
-| `smoke.spec.ts` | 6 tests — server responds, login loads, CSS, API health, RTL/LTR |
-| `auth.spec.ts` | 5 tests — login form, wrong credentials, register, forgot password, protected routes |
-| `public-pages.spec.ts` | 6 tests — marketing pages, invalid tokens, 404, console errors |
-| `fixtures/auth.ts` | Pre-authenticated page fixture (TEST_USER_EMAIL/PASSWORD env vars) |
-
-### 22.6 أوامر الاختبار
-
-```bash
-# تشغيل كل الاختبارات (Vitest workspace)
-pnpm test
-
-# اختبارات API فقط
-pnpm --filter @repo/api test
-
-# اختبارات Database فقط
-pnpm --filter @repo/database test
-
-# E2E tests (يتطلب build + start أولاً)
-cd apps/web && npx playwright test
-```
-
----
-
-## 23. الوحدات الجديدة (أُضيف 2026-03-29)
-
-### 23.1 جدول كميات المشروع (Project BOQ)
-
-وحدة كاملة لإدارة جدول الكميات على مستوى المشروع (مختلف عن دراسات التسعير).
-
-**Frontend:** `apps/web/modules/saas/projects/components/boq/` (12 ملف)
-- `BOQOverview.tsx` — صفحة رئيسية مع فلترة وترتيب وعمليات جماعية
-- `boq-items-table.tsx` — جدول بيانات مع pagination
-- `boq-summary-cards.tsx` — بطاقات ملخص
-- `boq-filters.tsx` — فلاتر (قسم، نوع مصدر، حالة تسعير)
-- `boq-bulk-actions.tsx` — عمليات جماعية
-- `create-item-dialog.tsx` — إضافة بند
-- `bulk-entry-dialog.tsx` — إدخال بنود بالجملة
-- `pricing-mode-dialog.tsx` — تسعير جماعي
-- `copy-from-study-dialog.tsx` — نسخ من دراسات
-- `copy-from-quotation-dialog.tsx` — نسخ من عروض أسعار
-- `import-excel-dialog.tsx` — استيراد Excel
-- `boq-dashboard-card.tsx` — بطاقة لوحة التحكم
-
-**Backend:** `packages/api/modules/project-boq/`
-
-### 23.2 محادثات المشروع (Project Chat)
-
-نظام محادثات فورية داخل المشروع مع قناتين: فريق العمل والمالك.
-
-**Frontend:** `apps/web/modules/saas/projects/components/chat/` (7 ملفات)
-- `ChatPanel.tsx` — واجهة المحادثة (قناتين: TEAM + OWNER)
-- `ChatMessageList.tsx` — عرض الرسائل
-- `ChatInput.tsx` — إدخال الرسائل
-- `ChatBubble.tsx` — فقاعة الرسالة
-- `ChatAttachmentPreview.tsx` — معاينة المرفقات
-- `FloatingChatButton.tsx` — زر عائم لفتح المحادثة
-
-**Polling:** كل 15 ثانية + mark-as-read
-**Backend:** `packages/api/modules/project-chat/`
-
-### 23.3 محرك عرض القوالب (Template Renderer)
-
-محرك عرض شامل للفواتير وعروض الأسعار قابل للتخصيص بالكامل.
-
-**الملف:** `apps/web/modules/saas/company/components/templates/renderer/TemplateRenderer.tsx` (693 سطر)
-
-**يدعم:**
-- فواتير + عروض أسعار مع بيانات مختلفة
-- عناصر قابلة للسحب: هيدر، بيانات العميل، جدول البنود، المجاميع، الشروط، التوقيع، بيانات البنك، QR كود (ZATCA)، فوتر
-- ثنائي اللغة (AR/EN + RTL)
-- وضع تفاعلي لتحديد العناصر وتخصيصها
-- ألوان وخطوط وخلفيات قابلة للتخصيص
-- Watermark overlay
-
-### 23.4 مزودو الرسائل (Messaging Providers — مرحلة مبكرة)
-
-**المجلد:** `packages/api/lib/messaging/providers/`
-
-| المزود | الحالة | الملاحظات |
-|--------|--------|---------|
-| `noop.ts` | ✅ يعمل | Fallback افتراضي — يسجّل في console فقط |
-| `sms.ts` | 🔲 Stub | جاهز لـ Twilio/Vonage/MessageBird/Yamamah |
-| `whatsapp.ts` | 🔲 Stub | جاهز لـ WhatsApp Business API |
-
-### 23.5 ثوابت التحقق المركزية (Validation Constants)
-
-**الملف:** `packages/api/lib/validation-constants.ts` (50 سطر)
-
-ثوابت ودوال Zod مركزية لكل الـ API:
-- حدود نصوص: `MAX_NAME(200)`, `MAX_DESC(2000)`, `MAX_LONG_TEXT(5000)`
-- حدود مالية: `MAX_FINANCIAL(999,999,999.99)`, `MAX_QUANTITY(999,999)`
-- دوال Zod جاهزة: `trimmedString()`, `financialAmount()`, `percentage()`, `quantity()`
-
-### 23.6 Hook افتراضية الصفوف (Virtual Rows)
-
-**الملف:** `apps/web/modules/saas/shared/hooks/use-virtual-rows.ts` (81 سطر)
-
-Hook أداء يستخدم `@tanstack/react-virtual` لافتراضية صفوف الجداول الكبيرة:
-- يتفعل تلقائياً فوق 50 عنصر (configurable threshold)
-- ارتفاع صف افتراضي 48px مع 10 صفوف إضافية (overscan)
-- يدعم ارتفاعات ديناميكية عبر `measureElement`
-
----
-
-## 24. إعادة الهيكلة الأخيرة (2026-03-29)
-
-### 24.1 نموذج الفاتورة (Invoice Form)
-
-**المسار:** `apps/web/modules/saas/finance/components/invoices/invoice-form/`
-
-مكون `CreateInvoiceForm.tsx` الضخم قُسّم إلى 11 ملف:
-
-| الملف | الوظيفة |
-|-------|---------|
-| `CreateInvoiceForm.tsx` | المنسّق الرئيسي — يدير الحالة ويجمع المكونات |
-| `InvoiceFormHeader.tsx` | شريط الإجراءات (حفظ، إصدار، معاينة، طباعة) |
-| `InvoiceClientCard.tsx` | اختيار/تعديل العميل |
-| `InvoiceDetailsCard.tsx` | التاريخ، المشروع، الضريبة، العملة |
-| `InvoiceItemsTable.tsx` | جدول البنود مع إعادة ترتيب وأعمدة قابلة للإخفاء |
-| `InvoiceNotesPanel.tsx` | ملاحظات + شروط دفع + مرفقات (tabs) |
-| `InvoiceSummaryPanel.tsx` | ملخص مالي (إجمالي، خصم، ضريبة، المتبقي) |
-| `InvoicePaymentsSection.tsx` | المدفوعات المسجّلة |
-| `InvoiceMobileBar.tsx` | شريط سفلي للجوال (المجموع + أزرار سريعة) |
-| `InvoiceDialogs.tsx` | Modals (معاينة، تأكيد إصدار، عميل جديد، دفعة) |
-| `types.ts` | أنواع TypeScript + ColumnKey |
-| `index.ts` | exports: CreateInvoiceForm, CreateInvoiceFormProps, InvoiceItem, ColumnKey |
-
-### 24.2 قسم البلوك (Blocks Section)
-
-**المسار:** `apps/web/modules/saas/pricing/components/studies/sections/blocks/`
-
-| الملف | الوظيفة |
-|-------|---------|
-| `BlocksSection.tsx` | المنسّق — أدوار + عناصر عامة + حذف |
-| `BlockForm.tsx` | نموذج إضافة/تعديل + حسابات |
-| `BlockItemsTable.tsx` | جدول العناصر (اسم، مساحة، سمك، كمية) |
-| `CopyFromFloorButton.tsx` | نسخ من دور آخر |
-| `BlocksSummary.tsx` | ملخص الإحصائيات |
-| `types.ts` | أنواع + ثوابت (أسعار بلوك/ملاط، أسماء أدوار) |
-| `index.ts` | exports: BlocksSection |
-
-### 24.3 قسم الأعمدة (Columns Section)
-
-**المسار:** `apps/web/modules/saas/pricing/components/studies/sections/columns/`
-
-| الملف | الوظيفة |
-|-------|---------|
-| `ColumnsSection.tsx` | المنسّق — أدوار متكررة + مجاميع |
-| `FloorColumnsPanel.tsx` | لوحة أعمدة الدور + حسابات حديد/خرسانة |
-| `NeckColumnsSection.tsx` | رقاب الأعمدة + ارتفاعات مسبقة + تفاصيل تقطيع |
-| `CopyFromFloorButton.tsx` | نسخ من دور آخر |
-| `types.ts` | أنواع + ثوابت (ارتفاعات رقاب مسبقة) |
-| `index.ts` | exports: ColumnsSection |
-
-### 24.4 وحدة محاضر الاستلام (Handover Backend)
-
-**المسار:** `packages/api/modules/handover/procedures/`
-
-الملف الواحد `handover-protocols.ts` قُسّم إلى 8 ملفات متخصصة (تفاصيل في القسم 20.5).
-
-### 24.5 صفحة المصادقة (Auth Redesign)
-
-**الملفات:**
-- `apps/web/app/auth/layout.tsx` — تصميم جديد: شاشة مقسومة (55% لوحة علامة تجارية + 45% نموذج)
-- `apps/web/app/auth/AuthParticleField.tsx` — 🆕 خلفية جزيئات متحركة (Canvas-based, 70 جزيء + روابط ديناميكية)
-
----
-
-## 25. نظام تصنيفات المصروفات الهرمي (أُضيف 2026-04-03)
-
-### 25.1 نظرة عامة
-
-نظام تصنيفات مصروفات هرمي يحل محل الـ enum القديم (`OrgExpenseCategory` / `CompanyExpenseCategory`). يوفر 39 تصنيف رئيسي مع ~200+ تصنيف فرعي، مصمم خصيصاً للمقاولات الإنشائية السعودية. متوافق مع النظام المحاسبي (كل تصنيف مربوط بحساب في دليل الحسابات).
-
-### 25.2 البنية
-
-```
-packages/utils/lib/expense-categories.ts     # 🆕 المصدر الوحيد (887 سطر)
-├── EXPENSE_CATEGORIES[]                     # 39 تصنيف رئيسي
-├── findCategoryById()                       # بحث بالمعرّف
-├── findSubcategoryById()                    # بحث تصنيف فرعي
-├── searchCategories()                       # بحث نصي (AR/EN)
-├── searchSubcategories()                    # بحث داخل تصنيف
-├── LEGACY_CATEGORY_MAP                      # خريطة OrgExpenseCategory → id (25 mapping)
-└── LEGACY_COMPANY_CATEGORY_MAP              # خريطة CompanyExpenseCategory → id (12 mapping)
-
-packages/api/modules/finance/procedures/expense-categories.ts  # 🆕 API endpoint
-apps/web/modules/saas/shared/components/
-├── ExpenseCategoryCombobox.tsx              # 🆕 combobox التصنيف الرئيسي
-└── ExpenseSubcategoryCombobox.tsx           # 🆕 combobox التصنيف الفرعي
-packages/database/scripts/migrate-expense-categories.ts  # 🆕 سكربت ترحيل البيانات
-```
-
-### 25.3 التصنيفات الرئيسية (39 تصنيف)
-
-| الفئة | التصنيفات | أكواد الحسابات |
-|-------|-----------|---------------|
-| تكاليف مباشرة (مشاريع) | CONCRETE_STRUCTURAL, REBAR, BLOCKS_BRICKS, TIMBER_FORMWORK, EXCAVATION_EARTHWORK, WATERPROOFING_INSULATION | 5100 |
-| تشطيبات | PLASTERING, GYPSUM_CEILINGS, PAINTING, TILING_FLOORING, FINISHING_DECOR, DOORS_WINDOWS_HARDWARE | 5100 |
-| كهروميكانيك | ELECTRICAL_ROUGH/FINISH/SYSTEMS, PLUMBING_ROUGH/FINISH/SYSTEMS, HVAC, FIRE_PROTECTION | 5100 |
-| مقاولو باطن | SUBCONTRACTOR_GENERAL | 5200 |
-| عمالة | INDIRECT_LABOR | 5300 |
-| تشغيلية | SAFETY_HSE, EQUIPMENT_MACHINERY, TRANSPORT_LOGISTICS, ADMIN_SALARIES, INSURANCE_GUARANTEES | 6xxx |
-| إدارية | FINANCIAL_EXPENSES, MARKETING_BUSINESS, PROFESSIONAL_CONSULTANCY, GOVERNMENT_LICENSES, MISCELLANEOUS | 6xxx |
-
-### 25.4 هيكل التصنيف
-
-```typescript
-interface ExpenseMainCategory {
-  id: string;              // "CONCRETE_STRUCTURAL"
-  nameAr: string;          // "خرسانة وهيكل إنشائي"
-  nameEn: string;          // "Concrete & Structural"
-  accountCode: string;     // "5100" — ربط بدليل الحسابات
-  isVatExempt: boolean;    // هل معفى من الضريبة
-  subcategories: ExpenseSubcategory[];
-}
-
-interface ExpenseSubcategory {
-  id: string;              // "READY_MIX"
-  nameAr: string;          // "خرسانة جاهزة"
-  nameEn: string;          // "Ready Mix Concrete"
-  isLabor: boolean;        // هل هو عنصر عمالة
-}
-```
-
-### 25.5 التكامل مع Schema
-
-```prisma
-// حقول جديدة في FinanceExpense و CompanyExpense
-categoryId      String?    // معرّف التصنيف الجديد (e.g. "CONCRETE_STRUCTURAL")
-subcategoryId   String?    // معرّف التصنيف الفرعي (e.g. "READY_MIX")
-// الحقل القديم category (enum) محفوظ للتوافق العكسي
-```
-
-### 25.6 التكامل المحاسبي
-
-- `auto-journal.ts` يستخدم `getAccountCodeForCategory()` لتحديد حساب المصروف الصحيح
-- VAT exemption يُفحص عبر `isCategoryVatExempt()` بناءً على `categoryId`
-- `accounting-reports.ts` يدعم التصنيفات الجديدة والقديمة في تقرير VAT
-- `org-finance.ts` يدعم الفلترة والتجميع بالتصنيف الجديد
-
-### 25.7 التوافق العكسي
-
-- الحقول القديمة (`category` enum) محفوظة — النظام يعمل مع كلا النظامين
-- `LEGACY_CATEGORY_MAP` يحوّل 25 قيمة enum قديمة للتصنيفات الجديدة
-- سكربت `migrate-expense-categories.ts` يُحدّث السجلات القائمة batch-wise
-
----
-
-## 26. أنماط الطباعة وتصدير PDF (أُضيف 2026-04-03)
-
-### 26.1 نظرة عامة
-
-بنية تحتية شاملة لطباعة المستندات بصيغة A4 مع تحكم كامل في فواصل الصفحات.
-
-### 26.2 أنماط CSS للطباعة
-
-**الملف:** `apps/web/app/globals.css` — أنماط `@media print` جديدة:
-
-```css
-@page { size: A4 portrait; margin: 15mm 10mm 10mm 10mm; }
-```
-
-**القواعد الرئيسية:**
-- إخفاء عناصر التطبيق (`aside`, `header`) عند الطباعة
-- الحفاظ على الألوان: `print-color-adjust: exact`
-- تحكم بفواصل الصفحات: `.print-page-break-before/after`, `.print-avoid-break`
-- أقسام تبقى معاً: `.signature-section`, `.totals-section`, `.client-info-card`
-- رؤوس الجداول تتكرر: `thead { display: table-header-group }`
-- دعم Watermark: `[data-watermark]::before`
-
-### 26.3 تصدير PDF في عروض الأسعار
-
-- `QuotationPreview.tsx` و `QuotationPreviewV2.tsx` — حوار تخصيص اسم ملف PDF
-- إدارة حالة التحميل (`isGeneratingPdf`, `showFilenameDialog`)
-- تكامل مع `window.print()` و `html2pdf.js`
-- TypeScript declaration لـ `html2pdf.js` في `global.d.ts`
-
----
-
-## 27. ملاحظات بيئة العمل
-
-- **نظام التشغيل:** Windows (primary)
+- **نظام التشغيل:** Windows (primary) + GitHub Codespaces (secondary — Linux)
 - **المحرر:** VS Code / Cursor
-- **Claude Code:** مع `--dangerously-skip-permissions` flag
-- **pnpm على Windows بطيء جداً** — تجنب `pnpm install` الكامل
-- **النص العربي معكوس في Windows Terminal** — استخدم ملفات `.md` للبرومبتات
-- **الجهاز الثاني:** GitHub Codespaces (Linux — syntax مختلف)
+- **Claude Code:** مع `--dangerously-skip-permissions` flag للمهام الكبيرة
+- **pnpm بطيء على Windows** — تجنب `pnpm install` الكامل
+- **النص العربي معكوس في Windows Terminal** — استخدم ملفات `.md` للبرومبتات الطويلة
 - **Git identity** يحتاج إعداد على كل جهاز جديد
-- **Vitest + Playwright** — مُثبتان (انظر القسم 22 لأوامر الاختبار)
+- **Vitest + Playwright** مُثبتان (القسم 19.7)
 
 ---
 
-*هذا الملف يُحدّث مع كل تطوير كبير. آخر مراجعة: 2026-04-03*
+## 21. Claude Code — ملخص قواعد حرجة
+
+هذه الخلاصة الذهبية (من واقع 142 جلسة سابقة):
+
+1. **Type-check من الجذر فقط:** `pnpm --filter @repo/web type-check` — أبداً `cd apps/web && tsc`
+2. **اقرأ قبل Edit:** view الملف أولاً لمطابقة indentation. فشل مرتين → انتقل لـ Write/sed
+3. **Zod v4 + oRPC:** لا `.nullish()`، استخدم `.transform()`. رمي `ORPCError` وليس `Error`
+4. **بعد الإصلاح:** smoke test للمسار الكامل — قد تظهر bugs متعلقة
+5. **الترجمات:** ar.json + en.json معاً في نفس commit — أبداً لا تترك مفاتيح ناقصة
+6. **المحركات مقدّسة:** `structural-calculations.ts` و `derivation-engine.ts` لا تُمس بدون طلب صريح
+7. **Multi-tenancy:** `organizationId` على كل query، `verifyOrganizationAccess()` على كل handler
+8. **RTL:** `ms-/me-/ps-/pe-` فقط — أبداً `ml-/mr-/pl-/pr-`
+9. **Decimal → Number():** قبل أي عملية حسابية على حقل Prisma Decimal
+10. **لا تفترض — تحقّق:** grep قبل افتراض import path، اقرأ router.ts قبل استخدام procedure
+
+---
+
+*هذا الملف يُحدّث مع كل تطوير كبير. آخر مراجعة: 2026-04-13*
