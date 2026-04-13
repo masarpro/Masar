@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import {
 	Dialog,
@@ -47,6 +47,13 @@ export function AddExpenseDialog({
 	const generalRef = useRef<GeneralExpenseTabHandle>(null);
 	const subcontractRef = useRef<SubcontractPaymentTabHandle>(null);
 	const ownerDrawingRef = useRef<OwnerDrawingTabHandle>(null);
+
+	// Reset to general tab when dialog opens in edit mode
+	useEffect(() => {
+		if (open && isEditMode) {
+			setActiveTab("general");
+		}
+	}, [open, isEditMode]);
 
 	const getActiveRef = useCallback(() => {
 		switch (activeTab) {
@@ -118,122 +125,106 @@ export function AddExpenseDialog({
 				onPointerDownOutside={(e) => e.preventDefault()}
 				onInteractOutside={(e) => e.preventDefault()}
 			>
-				{/* Header */}
-				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4 shrink-0">
-					<DialogTitle className="text-base font-semibold">
-						{getDialogTitle()}
-					</DialogTitle>
+				<Tabs
+					value={activeTab}
+					onValueChange={(v) => setActiveTab(v as TabValue)}
+					className="flex flex-col overflow-hidden flex-1"
+				>
+					{/* Header */}
+					<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4 shrink-0">
+						<DialogTitle className="text-base font-semibold">
+							{getDialogTitle()}
+						</DialogTitle>
 
-					{/* Tab triggers — hidden in edit mode */}
-					{!isEditMode && (
-						<TabsList className="rounded-xl bg-slate-100 dark:bg-slate-800 p-1 mt-3 grid grid-cols-3 w-full">
-							<TabsTrigger
-								value="general"
-								className="rounded-lg text-xs"
-								onClick={() => setActiveTab("general")}
-								data-state={
-									activeTab === "general"
-										? "active"
-										: "inactive"
-								}
-							>
-								<Receipt className="h-3.5 w-3.5 me-1.5" />
-								{t("finance.expenses.tabs.general")}
-							</TabsTrigger>
-							<TabsTrigger
-								value="subcontract"
-								className="rounded-lg text-xs"
-								onClick={() => setActiveTab("subcontract")}
-								data-state={
-									activeTab === "subcontract"
-										? "active"
-										: "inactive"
-								}
-							>
-								<FileSignature className="h-3.5 w-3.5 me-1.5" />
-								{t("finance.expenses.tabs.subcontract")}
-							</TabsTrigger>
-							<TabsTrigger
-								value="owner-drawing"
-								className="rounded-lg text-xs"
-								onClick={() => setActiveTab("owner-drawing")}
-								data-state={
-									activeTab === "owner-drawing"
-										? "active"
-										: "inactive"
-								}
-							>
-								<User className="h-3.5 w-3.5 me-1.5" />
-								{t("finance.expenses.tabs.ownerDrawing")}
-							</TabsTrigger>
-						</TabsList>
-					)}
-				</DialogHeader>
+						{/* Tab triggers — hidden in edit mode */}
+						{!isEditMode && (
+							<TabsList className="rounded-xl bg-slate-100 dark:bg-slate-800 p-1 mt-3 grid grid-cols-3 w-full">
+								<TabsTrigger
+									value="general"
+									className="rounded-lg text-xs"
+								>
+									<Receipt className="h-3.5 w-3.5 me-1.5" />
+									{t("finance.expenses.tabs.general")}
+								</TabsTrigger>
+								<TabsTrigger
+									value="subcontract"
+									className="rounded-lg text-xs"
+								>
+									<FileSignature className="h-3.5 w-3.5 me-1.5" />
+									{t("finance.expenses.tabs.subcontract")}
+								</TabsTrigger>
+								<TabsTrigger
+									value="owner-drawing"
+									className="rounded-lg text-xs"
+								>
+									<User className="h-3.5 w-3.5 me-1.5" />
+									{t("finance.expenses.tabs.ownerDrawing")}
+								</TabsTrigger>
+							</TabsList>
+						)}
+					</DialogHeader>
 
-				{/* Body — scrollable */}
-				<div className="p-5 space-y-4 overflow-y-auto flex-1">
-					{(activeTab === "general" || isEditMode) && (
-						<div
-							className={
-								activeTab !== "general" && !isEditMode
-									? "hidden"
-									: undefined
-							}
-						>
+					{/* Body — scrollable */}
+					<div className="p-5 space-y-4 overflow-y-auto flex-1">
+						<TabsContent value="general" className="mt-0">
 							<GeneralExpenseTab
 								ref={generalRef}
 								organizationId={organizationId}
 								expenseId={expenseId}
 								onSuccess={handleSuccess}
 							/>
-						</div>
-					)}
-					{activeTab === "subcontract" && !isEditMode && (
-						<SubcontractPaymentTab
-							ref={subcontractRef}
-							organizationId={organizationId}
-							onSuccess={handleSuccess}
-						/>
-					)}
-					{activeTab === "owner-drawing" && !isEditMode && (
-						<OwnerDrawingTab
-							ref={ownerDrawingRef}
-							organizationId={organizationId}
-							onSuccess={handleSuccess}
-						/>
-					)}
-				</div>
-
-				{/* Footer */}
-				<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-5 py-3 flex gap-3 shrink-0">
-					<Button
-						type="button"
-						variant="outline"
-						className="flex-1 rounded-xl h-10"
-						onClick={handleClose}
-						disabled={isSubmitting}
-					>
-						{t("common.cancel")}
-					</Button>
-					<Button
-						type="button"
-						className="flex-1 rounded-xl h-10"
-						onClick={handleSubmit}
-						disabled={isSubmitting}
-					>
-						{isSubmitting ? (
+						</TabsContent>
+						{!isEditMode && (
 							<>
-								<Loader2 className="h-4 w-4 me-2 animate-spin" />
-								{t("common.saving")}
-							</>
-						) : (
-							<>
-								<Save className="h-4 w-4 me-2" />
-								{getSubmitLabel()}
+								<TabsContent value="subcontract" className="mt-0">
+									<SubcontractPaymentTab
+										ref={subcontractRef}
+										organizationId={organizationId}
+										onSuccess={handleSuccess}
+									/>
+								</TabsContent>
+								<TabsContent value="owner-drawing" className="mt-0">
+									<OwnerDrawingTab
+										ref={ownerDrawingRef}
+										organizationId={organizationId}
+										onSuccess={handleSuccess}
+									/>
+								</TabsContent>
 							</>
 						)}
-					</Button>
-				</div>
+					</div>
+
+					{/* Footer */}
+					<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-5 py-3 flex gap-3 shrink-0">
+						<Button
+							type="button"
+							variant="outline"
+							className="flex-1 rounded-xl h-10"
+							onClick={handleClose}
+							disabled={isSubmitting}
+						>
+							{t("common.cancel")}
+						</Button>
+						<Button
+							type="button"
+							className="flex-1 rounded-xl h-10"
+							onClick={handleSubmit}
+							disabled={isSubmitting}
+						>
+							{isSubmitting ? (
+								<>
+									<Loader2 className="h-4 w-4 me-2 animate-spin" />
+									{t("common.saving")}
+								</>
+							) : (
+								<>
+									<Save className="h-4 w-4 me-2" />
+									{getSubmitLabel()}
+								</>
+							)}
+						</Button>
+					</div>
+				</Tabs>
 			</DialogContent>
 		</Dialog>
 	);
