@@ -90,9 +90,6 @@ export async function POST(req: NextRequest) {
 		await page.evaluate(() => document.fonts?.ready);
 		await new Promise((r) => setTimeout(r, 1000));
 
-<<<<<<< HEAD
-		// Generate PDF — @page { margin: 0 } + table thead/tfoot handle repetition
-=======
 		// Move print area to body root and mark for CSS targeting.
 		// This mimics what the beforeprint event does for browser printing.
 		// Without this, the print area stays buried deep in the DOM and the
@@ -121,7 +118,6 @@ export async function POST(req: NextRequest) {
 		// so fixed header/footer have reserved space and body content
 		// doesn't get clipped behind them.
 		// preferCSSPageSize: false is critical — true would ignore margin param.
->>>>>>> f0787a50 (kjio)
 		const pdfBuffer = await page.pdf({
 			format: "A4",
 			margin: {
