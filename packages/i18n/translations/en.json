@@ -826,6 +826,7 @@
     "sar": "SAR",
     "days": "days",
     "clear": "Clear",
+    "optional": "Optional",
     "previous": "Previous",
     "next": "Next",
     "pageOf": "Page {current} of {total}",
@@ -3947,6 +3948,12 @@
       "overdrawCompanyMessage": "Company current profit is {profit} SAR, with total previous drawings of {previous} SAR. This drawing ({amount} SAR) will exceed available profit by {overdraw} SAR.",
       "convertToGeneral": "Convert to General Drawing",
       "confirmDespiteOverdraw": "Confirm Despite Overdraw",
+      "overdrawDialog": {
+        "title": "Warning: Drawing Exceeds Available Profit",
+        "description": "The requested amount exceeds available profit by {amount} SAR (Available: {available} SAR). Do you want to proceed?",
+        "convertToGeneral": "Convert to General Drawing",
+        "confirmDespite": "Confirm Despite Overdraw"
+      },
       "insufficientBank": "Insufficient Bank Balance",
       "journalEntry": "Journal Entry",
       "ownerContext": "Partner Context",
@@ -4426,7 +4433,7 @@
       "tabs": {
         "general": "General Expense",
         "subcontract": "Subcontract Payment",
-        "ownerDrawing": "Owner Drawing"
+        "ownerDrawing": "Profit Withdrawal"
       },
       "subcontractPayment": {
         "selectProject": "Select Project",

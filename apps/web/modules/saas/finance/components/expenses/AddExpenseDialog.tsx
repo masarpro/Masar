@@ -127,7 +127,7 @@ export function AddExpenseDialog({
 			}}
 		>
 			<DialogContent
-				className="sm:max-w-4xl p-0 gap-0 rounded-2xl overflow-hidden max-h-[90vh] flex flex-col"
+				className="sm:max-w-4xl p-0 gap-0 rounded-none sm:rounded-2xl overflow-hidden h-[100dvh] sm:h-auto sm:max-h-[90vh] flex flex-col w-full"
 				onPointerDownOutside={(e) => e.preventDefault()}
 				onInteractOutside={(e) => e.preventDefault()}
 			>
@@ -137,41 +137,41 @@ export function AddExpenseDialog({
 					className="flex flex-col overflow-hidden flex-1"
 				>
 					{/* Header */}
-					<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4 shrink-0">
-						<DialogTitle className="text-base font-semibold">
+					<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-3 sm:px-5 py-3 sm:py-4 shrink-0">
+						<DialogTitle className="text-sm sm:text-base font-semibold">
 							{getDialogTitle()}
 						</DialogTitle>
 
 						{/* Tab triggers — hidden in edit mode */}
 						{!isEditMode && (
-							<TabsList className="rounded-xl bg-slate-100 dark:bg-slate-800 p-1 mt-3 grid grid-cols-3 w-full">
+							<TabsList className="rounded-xl bg-slate-100 dark:bg-slate-800 p-1 mt-2 sm:mt-3 grid grid-cols-3 w-full">
 								<TabsTrigger
 									value="general"
-									className="rounded-lg text-xs"
+									className="rounded-lg text-[11px] sm:text-xs px-1 sm:px-3"
 								>
-									<Receipt className="h-3.5 w-3.5 me-1.5" />
-									{t("finance.expenses.tabs.general")}
+									<Receipt className="h-3 w-3 sm:h-3.5 sm:w-3.5 me-1 sm:me-1.5 shrink-0" />
+									<span className="truncate">{t("finance.expenses.tabs.general")}</span>
 								</TabsTrigger>
 								<TabsTrigger
 									value="subcontract"
-									className="rounded-lg text-xs"
+									className="rounded-lg text-[11px] sm:text-xs px-1 sm:px-3"
 								>
-									<FileSignature className="h-3.5 w-3.5 me-1.5" />
-									{t("finance.expenses.tabs.subcontract")}
+									<FileSignature className="h-3 w-3 sm:h-3.5 sm:w-3.5 me-1 sm:me-1.5 shrink-0" />
+									<span className="truncate">{t("finance.expenses.tabs.subcontract")}</span>
 								</TabsTrigger>
 								<TabsTrigger
 									value="owner-drawing"
-									className="rounded-lg text-xs"
+									className="rounded-lg text-[11px] sm:text-xs px-1 sm:px-3"
 								>
-									<User className="h-3.5 w-3.5 me-1.5" />
-									{t("finance.expenses.tabs.ownerDrawing")}
+									<User className="h-3 w-3 sm:h-3.5 sm:w-3.5 me-1 sm:me-1.5 shrink-0" />
+									<span className="truncate">{t("finance.expenses.tabs.ownerDrawing")}</span>
 								</TabsTrigger>
 							</TabsList>
 						)}
 					</DialogHeader>
 
 					{/* Body — scrollable */}
-					<div className="p-5 space-y-4 overflow-y-auto flex-1">
+					<div className="p-3 sm:p-5 space-y-4 overflow-y-auto flex-1">
 						<TabsContent value="general" className="mt-0">
 							<GeneralExpenseTab
 								ref={generalRef}
@@ -204,7 +204,7 @@ export function AddExpenseDialog({
 					</div>
 
 					{/* Footer */}
-					<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-5 py-3 flex gap-3 shrink-0">
+					<div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 px-3 sm:px-5 py-3 flex gap-2 sm:gap-3 shrink-0">
 						<Button
 							type="button"
 							variant="outline"

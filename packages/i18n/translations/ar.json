@@ -828,6 +828,7 @@
     "sar": "ر.س",
     "days": "يوم",
     "clear": "مسح",
+    "optional": "اختياري",
     "previous": "السابق",
     "next": "التالي",
     "pageOf": "صفحة {current} من {total}",
@@ -3969,6 +3970,12 @@
       "overdrawCompanyMessage": "ربح الشركة الحالي {profit} ر.س، وإجمالي السحوبات السابقة {previous} ر.س. هذا السحب ({amount} ر.س) سيتجاوز الربح المتاح بـ {overdraw} ر.س.",
       "convertToGeneral": "تحويل لسحب عام",
       "confirmDespiteOverdraw": "تأكيد رغم التجاوز",
+      "overdrawDialog": {
+        "title": "تحذير: السحب يتجاوز الربح المتاح",
+        "description": "المبلغ المطلوب سحبه يتجاوز الربح المتاح بمقدار {amount} ر.س (المتاح: {available} ر.س). هل تريد المتابعة؟",
+        "convertToGeneral": "تحويل لسحب عام",
+        "confirmDespite": "تأكيد رغم التجاوز"
+      },
       "insufficientBank": "رصيد البنك غير كافٍ",
       "journalEntry": "القيد المحاسبي",
       "ownerContext": "سياق الشريك",
@@ -4448,7 +4455,7 @@
       "tabs": {
         "general": "مصروف عام",
         "subcontract": "دفعة عقد باطن",
-        "ownerDrawing": "سحب مالك"
+        "ownerDrawing": "سحب أرباح"
       },
       "subcontractPayment": {
         "selectProject": "اختر المشروع",

@@ -413,9 +413,9 @@ export const GeneralExpenseTab = forwardRef<
 	}
 
 	return (
-		<div className="space-y-4">
+		<div className="space-y-3 sm:space-y-4">
 			{/* Row 1: Amount, Date */}
-			<div className="grid grid-cols-2 gap-3">
+			<div className="grid grid-cols-2 gap-2 sm:gap-3">
 				<div className="space-y-1">
 					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 						{t("finance.expenses.amount")} *
@@ -452,7 +452,7 @@ export const GeneralExpenseTab = forwardRef<
 			</div>
 
 			{/* Row 2: Category, Subcategory */}
-			<div className="grid grid-cols-2 gap-3">
+			<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
 				<div className="space-y-1">
 					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 						{t("finance.expenses.category")} *
@@ -528,27 +528,27 @@ export const GeneralExpenseTab = forwardRef<
 
 			{/* Selected account info */}
 			{selectedAccount && !isObligation && (
-				<div className="rounded-xl border border-blue-200/60 bg-blue-50/40 dark:border-blue-800/30 dark:bg-blue-950/20 px-4 py-2.5 flex items-center justify-between">
-					<div className="flex items-center gap-2.5">
-						<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
+				<div className="rounded-xl border border-blue-200/60 bg-blue-50/40 dark:border-blue-800/30 dark:bg-blue-950/20 px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+					<div className="flex items-center gap-2.5 min-w-0">
+						<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50 shrink-0">
 							{selectedAccount.accountType === "BANK" ? (
 								<Building className="h-3.5 w-3.5 text-blue-600" />
 							) : (
 								<Wallet className="h-3.5 w-3.5 text-green-600" />
 							)}
 						</div>
-						<div>
-							<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+						<div className="min-w-0">
+							<p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
 								{selectedAccount.name}
 							</p>
 							{selectedAccount.bankName && (
-								<p className="text-[11px] text-slate-500">
+								<p className="text-[11px] text-slate-500 truncate">
 									{selectedAccount.bankName}
 								</p>
 							)}
 						</div>
 					</div>
-					<div className="flex items-center gap-3 text-sm">
+					<div className="flex items-center gap-2 sm:gap-3 text-sm ps-9 sm:ps-0">
 						<span className="font-semibold">
 							<Currency
 								amount={Number(selectedAccount.balance)}
@@ -556,7 +556,7 @@ export const GeneralExpenseTab = forwardRef<
 						</span>
 						{numericAmount > 0 && (
 							<>
-								<ArrowRight className="h-3.5 w-3.5 text-slate-400" />
+								<ArrowRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
 								<span className="text-red-500 font-semibold">
 									<Currency
 										amount={
@@ -683,7 +683,7 @@ export const GeneralExpenseTab = forwardRef<
 				<CollapsibleContent className="space-y-4 pt-3">
 					{/* Payment Method, Reference */}
 					<div
-						className={`grid grid-cols-2 gap-3 ${isObligation ? "opacity-60" : ""}`}
+						className={`grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 ${isObligation ? "opacity-60" : ""}`}
 					>
 						<div className="space-y-1">
 							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
@@ -734,7 +734,7 @@ export const GeneralExpenseTab = forwardRef<
 					</div>
 
 					{/* Vendor Name, Tax Number, Invoice Ref */}
-					<div className="grid grid-cols-3 gap-3">
+					<div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
 						<div className="space-y-1">
 							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 								{t("finance.expenses.vendorName")}
@@ -795,7 +795,7 @@ export const GeneralExpenseTab = forwardRef<
 
 					{/* Notes + Invoice Attachment */}
 					<div
-						className={`grid gap-3 ${isEditMode ? "grid-cols-1" : "grid-cols-2"}`}
+						className={`grid gap-2 sm:gap-3 ${isEditMode ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}`}
 					>
 						<div className="space-y-1">
 							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">

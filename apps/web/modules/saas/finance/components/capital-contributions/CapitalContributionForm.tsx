@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -45,13 +45,15 @@ export function CapitalContributionForm({
 	const t = useTranslations();
 	const router = useRouter();
 	const queryClient = useQueryClient();
+	const searchParams = useSearchParams();
+	const preSelectedOwnerId = searchParams.get("ownerId") ?? "";
 
 	const basePath = `/app/${organizationSlug}/finance/capital-contributions`;
 
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			ownerId: "",
+			ownerId: preSelectedOwnerId,
 			date: new Date().toISOString().split("T")[0],
 			amount: 0,
 			type: "INITIAL",

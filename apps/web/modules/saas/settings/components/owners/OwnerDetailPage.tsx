@@ -414,7 +414,7 @@ export function OwnerDetailPage({
 						className="rounded-xl"
 						onClick={() =>
 							router.push(
-								`/app/${organizationSlug}/finance/capital-contributions/new`,
+								`/app/${organizationSlug}/finance/capital-contributions/new?ownerId=${ownerId}`,
 							)
 						}
 					>
@@ -427,7 +427,7 @@ export function OwnerDetailPage({
 						className="rounded-xl"
 						onClick={() =>
 							router.push(
-								`/app/${organizationSlug}/finance/owner-drawings/new`,
+								`/app/${organizationSlug}/finance/owner-drawings/new?ownerId=${ownerId}`,
 							)
 						}
 					>
@@ -858,7 +858,7 @@ export function OwnerDetailPage({
 									className="mt-4 rounded-xl"
 									onClick={() =>
 										router.push(
-											`/app/${organizationSlug}/finance/capital-contributions/new`,
+											`/app/${organizationSlug}/finance/capital-contributions/new?ownerId=${ownerId}`,
 										)
 									}
 								>
@@ -1001,7 +1001,7 @@ export function OwnerDetailPage({
 									className="mt-4 rounded-xl"
 									onClick={() =>
 										router.push(
-											`/app/${organizationSlug}/finance/owner-drawings/new`,
+											`/app/${organizationSlug}/finance/owner-drawings/new?ownerId=${ownerId}`,
 										)
 									}
 								>
