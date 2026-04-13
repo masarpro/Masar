@@ -33,8 +33,13 @@ export function isOrganizationAccountant(
 ) {
 	const userOrganizationRole = organization?.members.find(
 		(member) => member.userId === user?.id,
-	)?.role;
+	)?.role as string | undefined;
 
+	// Better Auth's built-in roles are owner/admin/member, but Masar extends
+	// with custom role types (e.g. "accountant") via the Role model. When a
+	// user's Better Auth member role is the custom "accountant" string, treat
+	// them as an accountant for UI purposes. Server-side authorization still
+	// uses user.organizationRole.type (OWNER/ACCOUNTANT/...) as source of truth.
 	return userOrganizationRole === "accountant";
 }
 
