@@ -8,6 +8,8 @@ import {
 	generateAtomicNo,
 	getJournalIncomeStatement,
 	getCostCenterByProject,
+	createOwnerDrawingAccount,
+	ensureOwnerDrawingsSystem,
 } from "@repo/database";
 import { z } from "zod";
 import {
@@ -384,10 +386,24 @@ export const createDrawingProcedure = subscriptionProcedure
 				message: "المالك/الشريك غير نشط",
 			});
 		}
-		if (!owner.drawingsAccountId) {
-			throw new ORPCError("BAD_REQUEST", {
-				message:
-					"لا يوجد حساب سحوبات مخصص لهذا الشريك. يرجى إعداد حساب السحوبات أولاً",
+		// Auto-create drawings account for legacy owners created before the feature existed
+		let drawingsAccountId = owner.drawingsAccountId;
+		if (!drawingsAccountId) {
+			await ensureOwnerDrawingsSystem(db, input.organizationId);
+			drawingsAccountId = await createOwnerDrawingAccount(
+				db,
+				input.organizationId,
+				owner.name,
+			);
+			if (!drawingsAccountId) {
+				throw new ORPCError("BAD_REQUEST", {
+					message:
+						"تعذّر إنشاء حساب سحوبات للشريك. يرجى التأكد من إعداد دليل الحسابات (حساب 3400) أولاً",
+				});
+			}
+			await db.organizationOwner.update({
+				where: { id: owner.id },
+				data: { drawingsAccountId },
 			});
 		}
 
@@ -545,7 +561,7 @@ export const createDrawingProcedure = subscriptionProcedure
 				amount: drawing.amount,
 				date: input.date,
 				ownerName: owner.name,
-				drawingsAccountId: owner.drawingsAccountId,
+				drawingsAccountId,
 				bankAccountId: input.bankAccountId ?? null,
 				projectId: input.projectId ?? null,
 				projectName: drawing.project?.name ?? null,
