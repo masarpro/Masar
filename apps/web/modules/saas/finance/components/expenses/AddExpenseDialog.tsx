@@ -30,8 +30,16 @@ interface AddExpenseDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	organizationId: string;
-	organizationSlug: string;
+	organizationSlug?: string;
 	expenseId?: string | null;
+	/**
+	 * Fixed project context.
+	 * - General tab: hides project selector, always uses this projectId.
+	 * - Subcontract / Owner-drawing tabs: pre-selects this project (user can still change).
+	 */
+	projectId?: string;
+	/** Pre-fills source account in General tab (user can still change) */
+	initialSourceAccountId?: string;
 }
 
 export function AddExpenseDialog({
@@ -39,6 +47,8 @@ export function AddExpenseDialog({
 	onOpenChange,
 	organizationId,
 	expenseId,
+	projectId,
+	initialSourceAccountId,
 }: AddExpenseDialogProps) {
 	const isEditMode = !!expenseId;
 	const t = useTranslations();
@@ -177,6 +187,8 @@ export function AddExpenseDialog({
 								ref={generalRef}
 								organizationId={organizationId}
 								expenseId={expenseId}
+								projectId={projectId}
+								initialSourceAccountId={initialSourceAccountId}
 								onSuccess={handleSuccess}
 								onError={handleError}
 							/>
@@ -187,6 +199,7 @@ export function AddExpenseDialog({
 									<SubcontractPaymentTab
 										ref={subcontractRef}
 										organizationId={organizationId}
+										projectId={projectId}
 										onSuccess={handleSuccess}
 										onError={handleError}
 									/>
@@ -195,6 +208,7 @@ export function AddExpenseDialog({
 									<OwnerDrawingTab
 										ref={ownerDrawingRef}
 										organizationId={organizationId}
+										projectId={projectId}
 										onSuccess={handleSuccess}
 										onError={handleError}
 									/>

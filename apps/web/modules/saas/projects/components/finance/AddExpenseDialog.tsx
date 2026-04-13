@@ -1,6 +1,6 @@
 "use client";
 
-import { AddExpenseDialog as SharedAddExpenseDialog } from "@saas/shared/components/AddExpenseDialog";
+import { AddExpenseDialog as FinanceAddExpenseDialog } from "@saas/finance/components/expenses/AddExpenseDialog";
 
 interface AddExpenseDialogProps {
 	open: boolean;
@@ -16,7 +16,7 @@ export function AddExpenseDialog({
 	projectId,
 }: AddExpenseDialogProps) {
 	return (
-		<SharedAddExpenseDialog
+		<FinanceAddExpenseDialog
 			open={open}
 			onOpenChange={onOpenChange}
 			organizationId={organizationId}

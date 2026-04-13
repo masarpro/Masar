@@ -65,6 +65,10 @@ export interface GeneralExpenseTabHandle {
 interface GeneralExpenseTabProps {
 	organizationId: string;
 	expenseId?: string | null;
+	/** Fixed project context — hides project selector, always sends this projectId */
+	projectId?: string;
+	/** Pre-fills source account (user can still change) */
+	initialSourceAccountId?: string;
 	onSuccess: () => void;
 	onError?: () => void;
 }
@@ -72,7 +76,17 @@ interface GeneralExpenseTabProps {
 export const GeneralExpenseTab = forwardRef<
 	GeneralExpenseTabHandle,
 	GeneralExpenseTabProps
->(function GeneralExpenseTab({ organizationId, expenseId, onSuccess, onError }, ref) {
+>(function GeneralExpenseTab(
+	{
+		organizationId,
+		expenseId,
+		projectId: fixedProjectId,
+		initialSourceAccountId,
+		onSuccess,
+		onError,
+	},
+	ref,
+) {
 	const isEditMode = !!expenseId;
 	const t = useTranslations();
 	const queryClient = useQueryClient();
@@ -88,7 +102,7 @@ export const GeneralExpenseTab = forwardRef<
 		amount: "",
 		date: new Date().toISOString().split("T")[0],
 		dueDate: "",
-		sourceAccountId: "",
+		sourceAccountId: initialSourceAccountId ?? "",
 		vendorName: "",
 		vendorTaxNumber: "",
 		invoiceRef: "",
@@ -97,6 +111,17 @@ export const GeneralExpenseTab = forwardRef<
 		notes: "",
 		projectId: "",
 	});
+
+	// Pre-fill source account from parent context (still user-changeable)
+	useEffect(() => {
+		if (initialSourceAccountId && !isEditMode) {
+			setFormData((prev) =>
+				prev.sourceAccountId
+					? prev
+					: { ...prev, sourceAccountId: initialSourceAccountId },
+			);
+		}
+	}, [initialSourceAccountId, isEditMode]);
 
 	const [attachedFile, setAttachedFile] = useState<File | null>(null);
 	const [filePreview, setFilePreview] = useState<string | null>(null);
@@ -158,7 +183,8 @@ export const GeneralExpenseTab = forwardRef<
 		(a: any) => a.id === formData.sourceAccountId,
 	);
 	const numericAmount = Number.parseFloat(formData.amount) || 0;
-	const effectiveProjectId = formData.projectId || undefined;
+	const effectiveProjectId =
+		fixedProjectId || formData.projectId || undefined;
 
 	// Upload mutations
 	const getUploadUrlMutation = useMutation({
@@ -320,7 +346,7 @@ export const GeneralExpenseTab = forwardRef<
 			amount: "",
 			date: new Date().toISOString().split("T")[0],
 			dueDate: "",
-			sourceAccountId: "",
+			sourceAccountId: initialSourceAccountId ?? "",
 			vendorName: "",
 			vendorTaxNumber: "",
 			invoiceRef: "",
@@ -571,40 +597,42 @@ export const GeneralExpenseTab = forwardRef<
 				</div>
 			)}
 
-			{/* Project Link */}
-			<div className="space-y-1">
-				<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
-					<FolderOpen className="h-3 w-3 inline me-1" />
-					{t("finance.expenses.projectLink")}
-				</Label>
-				<Select
-					value={formData.projectId || "none"}
-					onValueChange={(value: any) =>
-						setFormData({
-							...formData,
-							projectId: value === "none" ? "" : value,
-						})
-					}
-				>
-					<SelectTrigger className="rounded-xl h-10">
-						<SelectValue
-							placeholder={t(
-								"finance.expenses.selectProjectPlaceholder",
-							)}
-						/>
-					</SelectTrigger>
-					<SelectContent className="rounded-xl">
-						<SelectItem value="none">
-							{t("finance.expenses.noProject")}
-						</SelectItem>
-						{projects.map((project: any) => (
-							<SelectItem key={project.id} value={project.id}>
-								{project.name}
+			{/* Project Link — hidden when project is fixed by parent context */}
+			{!fixedProjectId && (
+				<div className="space-y-1">
+					<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+						<FolderOpen className="h-3 w-3 inline me-1" />
+						{t("finance.expenses.projectLink")}
+					</Label>
+					<Select
+						value={formData.projectId || "none"}
+						onValueChange={(value: any) =>
+							setFormData({
+								...formData,
+								projectId: value === "none" ? "" : value,
+							})
+						}
+					>
+						<SelectTrigger className="rounded-xl h-10">
+							<SelectValue
+								placeholder={t(
+									"finance.expenses.selectProjectPlaceholder",
+								)}
+							/>
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="none">
+								{t("finance.expenses.noProject")}
 							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
-			</div>
+							{projects.map((project: any) => (
+								<SelectItem key={project.id} value={project.id}>
+									{project.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</div>
+			)}
 
 			{/* Description */}
 			<div className="space-y-1">

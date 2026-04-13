@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { Currency } from "../shared/Currency";
 import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
+import { AddExpenseDialog } from "@saas/finance/components/expenses/AddExpenseDialog";
 
 interface BankDetailProps {
 	organizationId: string;
@@ -55,6 +56,7 @@ export function BankDetail({
 
 	const [isEditing, setIsEditing] = useState(false);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+	const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
 
 	// Fetch account details
 	const { data: account, isLoading } = useQuery(
@@ -245,7 +247,7 @@ export function BankDetail({
 				<Button
 					variant="outline"
 					className="h-auto py-4 rounded-xl justify-start"
-					onClick={() => router.push(`/app/${organizationSlug}/finance/expenses/new?sourceAccountId=${bankId}`)}
+					onClick={() => setExpenseDialogOpen(true)}
 				>
 					<TrendingDown className="h-5 w-5 me-3 text-red-500" />
 					<div className="text-start">
@@ -531,6 +533,14 @@ export function BankDetail({
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
+
+			<AddExpenseDialog
+				open={expenseDialogOpen}
+				onOpenChange={setExpenseDialogOpen}
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+				initialSourceAccountId={bankId}
+			/>
 		</div>
 	);
 }

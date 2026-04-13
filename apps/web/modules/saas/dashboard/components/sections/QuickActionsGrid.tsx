@@ -13,7 +13,7 @@ import {
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
-import { AddExpenseDialog } from "@saas/shared/components/AddExpenseDialog";
+import { AddExpenseDialog } from "@saas/finance/components/expenses/AddExpenseDialog";
 
 interface QuickActionsGridProps {
 	organizationSlug: string;
@@ -31,7 +31,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			sectionLabel: t("dashboard.actions.expenses"),
 			actionLabel: t("dashboard.actions.addExpense"),
 			browsePath: `/app/${organizationSlug}/finance/expenses`,
-			createPath: `/app/${organizationSlug}/finance/expenses/new`,
+			createPath: "",
 			iconColor: "text-rose-500 dark:text-rose-400",
 			bgColor: "bg-rose-50/80 dark:bg-rose-950/30",
 			hoverBg: "hover:bg-rose-100 dark:hover:bg-rose-900/50",
@@ -148,7 +148,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 				open={expenseDialogOpen}
 				onOpenChange={setExpenseDialogOpen}
 				organizationId={organizationId}
-				showProjectSelector
+				organizationSlug={organizationSlug}
 			/>
 		</>
 	);

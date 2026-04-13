@@ -52,6 +52,8 @@ export interface OwnerDrawingTabHandle {
 
 interface OwnerDrawingTabProps {
 	organizationId: string;
+	/** Pre-selects this project (still changeable by user) */
+	projectId?: string;
 	onSuccess: () => void;
 	onError?: () => void;
 }
@@ -59,7 +61,10 @@ interface OwnerDrawingTabProps {
 export const OwnerDrawingTab = forwardRef<
 	OwnerDrawingTabHandle,
 	OwnerDrawingTabProps
->(function OwnerDrawingTab({ organizationId, onSuccess, onError }, ref) {
+>(function OwnerDrawingTab(
+	{ organizationId, projectId: initialProjectId, onSuccess, onError },
+	ref,
+) {
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 
@@ -67,8 +72,15 @@ export const OwnerDrawingTab = forwardRef<
 	const [amount, setAmount] = useState("");
 	const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
 	const [bankAccountId, setBankAccountId] = useState("");
-	const [projectId, setProjectId] = useState("");
+	const [projectId, setProjectId] = useState(initialProjectId ?? "");
 	const [description, setDescription] = useState("");
+
+	// Pre-select project from parent context (still user-changeable)
+	useEffect(() => {
+		if (initialProjectId) {
+			setProjectId(initialProjectId);
+		}
+	}, [initialProjectId]);
 
 	const [overdrawDialog, setOverdrawDialog] = useState(false);
 	const [overdrawData, setOverdrawData] = useState<any>(null);
@@ -146,7 +158,7 @@ export const OwnerDrawingTab = forwardRef<
 		setAmount("");
 		setDate(new Date().toISOString().split("T")[0]);
 		setBankAccountId("");
-		setProjectId("");
+		setProjectId(initialProjectId ?? "");
 		setDescription("");
 		setCheckResult(null);
 		setOverdrawData(null);

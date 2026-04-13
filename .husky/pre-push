@@ -1,1 +1,25 @@
-cd apps/web && npx tsc --noEmit
+#!/usr/bin/env sh
+
+echo "🔍 Running type-check before push..."
+pnpm --filter @repo/web type-check
+if [ $? -ne 0 ]; then
+	echo ""
+	echo "❌ Type-check failed — فشل فحص الأنواع"
+	echo "   Fix TypeScript errors before pushing."
+	echo "   أصلح أخطاء TypeScript قبل الـ push."
+	exit 1
+fi
+
+echo "✅ Type-check passed — نجح فحص الأنواع"
+echo ""
+echo "🏗️  Running full build (catches Next.js-specific errors Vercel will hit)..."
+pnpm --filter @repo/web build
+if [ $? -ne 0 ]; then
+	echo ""
+	echo "❌ Build failed — فشل البناء"
+	echo "   This is the same build Vercel runs. Fix errors before pushing."
+	echo "   هذا نفس البناء الذي يُشغّل على Vercel. أصلح الأخطاء قبل الـ push."
+	exit 1
+fi
+
+echo "✅ Build passed — نجح البناء. Pushing..."

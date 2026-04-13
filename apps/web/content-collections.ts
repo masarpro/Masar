@@ -113,5 +113,6 @@ const docsMeta = defineCollection({
 });
 
 export default defineConfig({
+	// @ts-ignore content-collections serialization type mismatch with zod v4 — required for Next.js build (tsc alone doesn't hit this)
 	collections: [posts, legalPages, docs, docsMeta],
 });

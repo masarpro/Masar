@@ -428,7 +428,7 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 			label: "إضافة مصروف",
 			labelEn: "Add Expense",
 			icon: Banknote,
-			href: "finance/expenses/new",
+			href: "finance/expenses",
 			variant: "primary",
 		},
 		{
@@ -445,7 +445,7 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 			label: "إضافة مصروف",
 			labelEn: "Add Expense",
 			icon: Banknote,
-			href: "finance/expenses/new",
+			href: "finance/expenses",
 			variant: "primary",
 		},
 	],

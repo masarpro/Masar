@@ -3,15 +3,26 @@
 import { FileText, Camera, Receipt, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { useProjectRole } from "../../hooks/use-project-role";
+import { AddExpenseDialog } from "@saas/finance/components/expenses/AddExpenseDialog";
 
 interface QuickActionsProps {
 	basePath: string;
+	organizationId: string;
+	organizationSlug: string;
+	projectId: string;
 }
 
-export function QuickActions({ basePath }: QuickActionsProps) {
+export function QuickActions({
+	basePath,
+	organizationId,
+	organizationSlug,
+	projectId,
+}: QuickActionsProps) {
 	const t = useTranslations();
 	const { canViewSection } = useProjectRole();
+	const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
 
 	const actions = [
 		{
@@ -40,7 +51,8 @@ export function QuickActions({ basePath }: QuickActionsProps) {
 			id: "add-expense",
 			icon: Receipt,
 			label: t("projects.commandCenter.addExpense"),
-			href: `${basePath}/finance/expenses/new`,
+			href: null,
+			onClick: () => setExpenseDialogOpen(true),
 			section: "finance",
 			bgColor: "bg-sky-50 dark:bg-sky-950/30",
 			iconBg: "bg-sky-100 dark:bg-sky-900/50",
@@ -63,15 +75,12 @@ export function QuickActions({ basePath }: QuickActionsProps) {
 	if (actions.length === 0) return null;
 
 	return (
-		<div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
-			{actions.map((action) => {
-				const Icon = action.icon;
-				return (
-					<Link
-						key={action.id}
-						href={action.href}
-						className={`flex min-w-0 flex-1 rounded-2xl border border-slate-200/60 shadow-lg shadow-black/5 transition-all hover:shadow-xl dark:border-slate-700/50 ${action.bgColor} p-4`}
-					>
+		<>
+			<div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
+				{actions.map((action) => {
+					const Icon = action.icon;
+					const className = `flex min-w-0 flex-1 rounded-2xl border border-slate-200/60 shadow-lg shadow-black/5 transition-all hover:shadow-xl dark:border-slate-700/50 ${action.bgColor} p-4`;
+					const content = (
 						<div className="flex min-w-0 items-center gap-3">
 							<div className={`shrink-0 rounded-xl ${action.iconBg} p-2.5`}>
 								<Icon className={`h-5 w-5 shrink-0 ${action.iconColor}`} />
@@ -82,9 +91,34 @@ export function QuickActions({ basePath }: QuickActionsProps) {
 								{action.label}
 							</span>
 						</div>
-					</Link>
-				);
-			})}
-		</div>
+					);
+					if (action.onClick) {
+						return (
+							<button
+								key={action.id}
+								type="button"
+								onClick={action.onClick}
+								className={`${className} text-start`}
+							>
+								{content}
+							</button>
+						);
+					}
+					return (
+						<Link key={action.id} href={action.href as string} className={className}>
+							{content}
+						</Link>
+					);
+				})}
+			</div>
+
+			<AddExpenseDialog
+				open={expenseDialogOpen}
+				onOpenChange={setExpenseDialogOpen}
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+				projectId={projectId}
+			/>
+		</>
 	);
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
@@ -8,6 +9,8 @@ import {
 	TrendingUp,
 	Plus,
 } from "lucide-react";
+import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import { AddExpenseDialog } from "@saas/finance/components/expenses/AddExpenseDialog";
 
 interface ActionCardsProps {
 	organizationSlug: string;
@@ -27,6 +30,9 @@ interface MainSection {
 export function ActionCards({ organizationSlug }: ActionCardsProps) {
 	const t = useTranslations();
 	const basePath = `/app/${organizationSlug}/finance`;
+	const { activeOrganization } = useActiveOrganization();
+	const organizationId = activeOrganization?.id ?? "";
+	const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
 
 	// Main 3 sections with cards
 	const mainSections: MainSection[] = [
@@ -63,42 +69,65 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 	];
 
 	return (
-		<div className="grid grid-cols-3 gap-4">
-			{mainSections.map((section) => {
-				const Icon = section.icon;
-				return (
-					<div
-						key={section.id}
-						className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:shadow-xl"
-					>
-						{/* Browse Section (Top) */}
-						<Link
-							href={section.browsePath}
-							className={`flex flex-col items-center gap-2 p-4 ${section.bgColor} ${section.hoverBg} transition-colors border-b ${section.borderColor}`}
+		<>
+			<div className="grid grid-cols-3 gap-4">
+				{mainSections.map((section) => {
+					const Icon = section.icon;
+					const isExpense = section.id === "expenses";
+					return (
+						<div
+							key={section.id}
+							className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:shadow-xl"
 						>
-							<div
-								className={`p-3 rounded-xl bg-card/60 ${section.iconColor}`}
+							{/* Browse Section (Top) */}
+							<Link
+								href={section.browsePath}
+								className={`flex flex-col items-center gap-2 p-4 ${section.bgColor} ${section.hoverBg} transition-colors border-b ${section.borderColor}`}
 							>
-								<Icon className="h-6 w-6" />
-							</div>
-							<span className="text-sm font-medium text-foreground/80 text-center">
-								{t(`finance.dashboard.nav.${section.id}`)}
-							</span>
-						</Link>
+								<div
+									className={`p-3 rounded-xl bg-card/60 ${section.iconColor}`}
+								>
+									<Icon className="h-6 w-6" />
+								</div>
+								<span className="text-sm font-medium text-foreground/80 text-center">
+									{t(`finance.dashboard.nav.${section.id}`)}
+								</span>
+							</Link>
 
-						{/* Create Section (Bottom) */}
-						<Link
-							href={section.createPath}
-							className="flex items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
-						>
-							<Plus className={`h-4 w-4 ${section.iconColor}`} />
-							<span className={`text-xs font-medium ${section.iconColor}`}>
-								{t(`finance.dashboard.nav.${section.id}New`)}
-							</span>
-						</Link>
-					</div>
-				);
-			})}
-		</div>
+							{/* Create Section (Bottom) — expense opens dialog, others navigate */}
+							{isExpense ? (
+								<button
+									type="button"
+									onClick={() => setExpenseDialogOpen(true)}
+									className="flex w-full items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
+								>
+									<Plus className={`h-4 w-4 ${section.iconColor}`} />
+									<span className={`text-xs font-medium ${section.iconColor}`}>
+										{t(`finance.dashboard.nav.${section.id}New`)}
+									</span>
+								</button>
+							) : (
+								<Link
+									href={section.createPath}
+									className="flex items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
+								>
+									<Plus className={`h-4 w-4 ${section.iconColor}`} />
+									<span className={`text-xs font-medium ${section.iconColor}`}>
+										{t(`finance.dashboard.nav.${section.id}New`)}
+									</span>
+								</Link>
+							)}
+						</div>
+					);
+				})}
+			</div>
+
+			<AddExpenseDialog
+				open={expenseDialogOpen}
+				onOpenChange={setExpenseDialogOpen}
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+			/>
+		</>
 	);
 }

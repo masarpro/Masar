@@ -3,6 +3,7 @@
 import {
 	useState,
 	useMemo,
+	useEffect,
 	forwardRef,
 	useImperativeHandle,
 } from "react";
@@ -46,6 +47,8 @@ export interface SubcontractPaymentTabHandle {
 
 interface SubcontractPaymentTabProps {
 	organizationId: string;
+	/** Pre-selects this project (still changeable by user) */
+	projectId?: string;
 	onSuccess: () => void;
 	onError?: () => void;
 }
@@ -53,11 +56,21 @@ interface SubcontractPaymentTabProps {
 export const SubcontractPaymentTab = forwardRef<
 	SubcontractPaymentTabHandle,
 	SubcontractPaymentTabProps
->(function SubcontractPaymentTab({ organizationId, onSuccess, onError }, ref) {
+>(function SubcontractPaymentTab(
+	{ organizationId, projectId: initialProjectId, onSuccess, onError },
+	ref,
+) {
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 
-	const [projectId, setProjectId] = useState("");
+	const [projectId, setProjectId] = useState(initialProjectId ?? "");
+
+	// Pre-select project from parent context (still user-changeable)
+	useEffect(() => {
+		if (initialProjectId) {
+			setProjectId(initialProjectId);
+		}
+	}, [initialProjectId]);
 	const [contractId, setContractId] = useState("");
 	const [amount, setAmount] = useState("");
 	const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
@@ -108,7 +121,7 @@ export const SubcontractPaymentTab = forwardRef<
 	const numericAmount = Number.parseFloat(amount) || 0;
 
 	const resetForm = () => {
-		setProjectId("");
+		setProjectId(initialProjectId ?? "");
 		setContractId("");
 		setAmount("");
 		setDate(new Date().toISOString().split("T")[0]);

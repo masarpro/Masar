@@ -93,7 +93,12 @@ export function ProjectOverview({
 			)}
 
 			{/* Quick Actions */}
-			<QuickActions basePath={basePath} />
+			<QuickActions
+				basePath={basePath}
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+				projectId={projectId}
+			/>
 
 			{/* BOQ Dashboard Card */}
 			{canViewSection("finance") && (
