@@ -21,6 +21,7 @@ import {
 	positiveAmount, paginationLimit, paginationOffset,
 } from "../../../lib/validation-constants";
 import { findCategoryById, findSubcategoryById } from "@repo/utils";
+import { ensureCategoriesSeeded } from "../../../lib/categories/ensure-categories-seeded";
 
 // Enums
 const orgExpenseCategoryEnum = z.enum([
@@ -232,7 +233,7 @@ export const createExpenseProcedure = subscriptionProcedure
 			action: "payments",
 		});
 
-		// Validate new hierarchical category
+		// Validate new hierarchical category against the static list
 		const cat = findCategoryById(input.categoryId);
 		if (!cat) {
 			throw new ORPCError("BAD_REQUEST", {
@@ -248,6 +249,21 @@ export const createExpenseProcedure = subscriptionProcedure
 			}
 		}
 
+		// Ensure DB-backed categories are seeded, then resolve actual OrgCategory IDs
+		await ensureCategoriesSeeded(input.organizationId, "EXPENSE");
+		const dbCategory = await db.orgCategory.findFirst({
+			where: { organizationId: input.organizationId, systemId: input.categoryId, group: "EXPENSE" },
+			select: { id: true },
+		});
+		let dbSubcategoryId: string | undefined;
+		if (input.subcategoryId && dbCategory) {
+			const dbSub = await db.orgSubcategory.findFirst({
+				where: { categoryId: dbCategory.id, organizationId: input.organizationId, systemId: input.subcategoryId },
+				select: { id: true },
+			});
+			dbSubcategoryId = dbSub?.id ?? undefined;
+		}
+
 		let expense: Awaited<ReturnType<typeof createExpense>>;
 		try {
 			expense = await createExpense({
@@ -255,8 +271,8 @@ export const createExpenseProcedure = subscriptionProcedure
 				createdById: context.user.id,
 				category: input.category ?? "MISC",
 				customCategory: input.customCategory,
-				categoryId: input.categoryId,
-				subcategoryId: input.subcategoryId,
+				categoryId: dbCategory?.id ?? undefined,
+				subcategoryId: dbSubcategoryId ?? undefined,
 				description: input.description,
 				amount: input.amount,
 				date: input.date,
@@ -388,7 +404,34 @@ export const updateExpenseProcedure = subscriptionProcedure
 			action: "payments",
 		});
 
-		const { organizationId, id, ...data } = input;
+		const { organizationId, id, categoryId: inputCategoryId, subcategoryId: inputSubcategoryId, ...rest } = input;
+
+		// Resolve DB-backed category IDs if provided
+		let resolvedCategoryId: string | undefined;
+		let resolvedSubcategoryId: string | undefined;
+		if (inputCategoryId) {
+			await ensureCategoriesSeeded(organizationId, "EXPENSE");
+			const dbCat = await db.orgCategory.findFirst({
+				where: { organizationId, systemId: inputCategoryId, group: "EXPENSE" },
+				select: { id: true },
+			});
+			if (dbCat) {
+				resolvedCategoryId = dbCat.id;
+				if (inputSubcategoryId) {
+					const dbSub = await db.orgSubcategory.findFirst({
+						where: { categoryId: dbCat.id, organizationId, systemId: inputSubcategoryId },
+						select: { id: true },
+					});
+					resolvedSubcategoryId = dbSub?.id;
+				}
+			}
+		}
+
+		const data = {
+			...rest,
+			...(resolvedCategoryId !== undefined ? { categoryId: resolvedCategoryId } : {}),
+			...(resolvedSubcategoryId !== undefined ? { subcategoryId: resolvedSubcategoryId } : {}),
+		};
 
 		const expense = await updateExpense(id, organizationId, data);
 

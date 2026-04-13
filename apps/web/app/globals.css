@@ -597,11 +597,34 @@ input[cmdk-input] {
 		width: 210mm;
 	}
 
+<<<<<<< HEAD
+=======
+	/* White background to prevent dark mode bleed + force light color-scheme
+	   so browser doesn't paint a dark default before CSS applies (flash of dark) */
+>>>>>>> f0787a50 (kjio)
 	html,
 	body {
 		margin: 0 !important;
 		padding: 0 !important;
 		background: white !important;
+<<<<<<< HEAD
+=======
+		background-color: white !important;
+		color-scheme: light !important;
+		-webkit-print-color-adjust: exact !important;
+		print-color-adjust: exact !important;
+	}
+
+	/* Repeating header/footer via position: fixed within @page margin space.
+	   Gated by body[data-printing="true"] — set by beforeprint event (browser)
+	   or page.evaluate() (Puppeteer) — so it only activates after the print
+	   area has been moved to be a direct child of body. */
+	body[data-printing="true"] [data-pdf-header] {
+		position: fixed !important;
+		top: 0 !important;
+		left: 0 !important;
+		right: 0 !important;
+>>>>>>> f0787a50 (kjio)
 		width: 210mm !important;
 	}
 

@@ -161,6 +161,56 @@ export function InvoicePreview({
 				</CardContent>
 			</Card>
 
+<<<<<<< HEAD
+=======
+			{/* Print styles */}
+			<style jsx global>{`
+				@media print {
+					/* Force white background + light color-scheme to eliminate dark mode bleed */
+					html,
+					body,
+					body[data-printing="true"] {
+						background: white !important;
+						background-color: white !important;
+						color-scheme: light !important;
+					}
+
+					@page {
+						size: A4 portrait;
+						margin: 50mm 0 35mm 0;
+					}
+
+					/* When body has data-printing (set by beforeprint event or Puppeteer),
+					   hide all direct children except the print area that was moved to body root */
+					body[data-printing="true"] > *:not(#invoice-print-area):not(script):not(style) {
+						display: none !important;
+					}
+
+					body[data-printing="true"] {
+						margin: 0 !important;
+						padding: 0 !important;
+						background: white !important;
+					}
+
+					#invoice-print-area {
+						display: block !important;
+						width: 210mm !important;
+						max-width: 210mm !important;
+						margin: 0 auto !important;
+						padding: 0 !important;
+						box-shadow: none !important;
+						border: none !important;
+						border-radius: 0 !important;
+						background: white !important;
+					}
+
+					#invoice-print-area [class*="rounded"] {
+						border-radius: 0 !important;
+					}
+				}
+			`}</style>
+
+>>>>>>> f0787a50 (kjio)
 			{/* PDF Filename Dialog */}
 			<Dialog open={showFilenameDialog} onOpenChange={setShowFilenameDialog}>
 				<DialogContent className="sm:max-w-md rounded-2xl">
