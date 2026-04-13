@@ -55,7 +55,11 @@ export default async function SaaSLayout({ children }: PropsWithChildren) {
 		);
 	}
 
-	await Promise.all(prefetchPromises);
+	try {
+		await Promise.all(prefetchPromises);
+	} catch (error) {
+		console.error("[LAYOUT] Error prefetching data:", error);
+	}
 
 	console.log(`[PERF] (saas)/layout.tsx: ${Math.round(performance.now() - layoutStart)}ms`);
 

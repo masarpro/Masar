@@ -58,13 +58,19 @@ export default async function OrganizationLayout({
 	}
 
 	// Stage 2+3 merged: subscription + role + prefetch ALL in parallel
-	const [orgSubscription, memberRole] = await Promise.all([
-		cachedGetOrganizationSubscription(organization.id),
-		session && !session.user.onboardingComplete
-			? cachedGetMemberRole(organization.id, session.user.id)
-			: Promise.resolve(null),
-		...prefetchPromises,
-	]);
+	let orgSubscription: Awaited<ReturnType<typeof cachedGetOrganizationSubscription>> | null = null;
+	let memberRole: Awaited<ReturnType<typeof cachedGetMemberRole>> | null = null;
+	try {
+		[orgSubscription, memberRole] = await Promise.all([
+			cachedGetOrganizationSubscription(organization.id),
+			session && !session.user.onboardingComplete
+				? cachedGetMemberRole(organization.id, session.user.id)
+				: Promise.resolve(null),
+			...prefetchPromises,
+		]);
+	} catch (error) {
+		console.error("[LAYOUT] Error fetching org data:", error);
+	}
 
 	const shouldShowOnboarding = memberRole?.role === "owner";
 

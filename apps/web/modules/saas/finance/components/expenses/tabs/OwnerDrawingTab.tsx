@@ -53,12 +53,13 @@ export interface OwnerDrawingTabHandle {
 interface OwnerDrawingTabProps {
 	organizationId: string;
 	onSuccess: () => void;
+	onError?: () => void;
 }
 
 export const OwnerDrawingTab = forwardRef<
 	OwnerDrawingTabHandle,
 	OwnerDrawingTabProps
->(function OwnerDrawingTab({ organizationId, onSuccess }, ref) {
+>(function OwnerDrawingTab({ organizationId, onSuccess, onError }, ref) {
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 
@@ -191,13 +192,16 @@ export const OwnerDrawingTab = forwardRef<
 			if (message.includes("OVERDRAW_REQUIRES_CONFIRMATION")) {
 				setOverdrawData(error?.data?.data ?? error?.data ?? null);
 				setOverdrawDialog(true);
+				onError?.();
 			} else if (message.includes("INSUFFICIENT_BANK_BALANCE")) {
 				toast.error(t("finance.expenses.ownerDrawingPayment.insufficientBank"));
+				onError?.();
 			} else {
 				toast.error(
 					error.message ||
 						t("finance.expenses.ownerDrawingPayment.createError"),
 				);
+				onError?.();
 			}
 		},
 	});

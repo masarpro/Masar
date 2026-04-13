@@ -47,12 +47,13 @@ export interface SubcontractPaymentTabHandle {
 interface SubcontractPaymentTabProps {
 	organizationId: string;
 	onSuccess: () => void;
+	onError?: () => void;
 }
 
 export const SubcontractPaymentTab = forwardRef<
 	SubcontractPaymentTabHandle,
 	SubcontractPaymentTabProps
->(function SubcontractPaymentTab({ organizationId, onSuccess }, ref) {
+>(function SubcontractPaymentTab({ organizationId, onSuccess, onError }, ref) {
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 
@@ -167,6 +168,7 @@ export const SubcontractPaymentTab = forwardRef<
 				error.message ||
 					t("finance.expenses.subcontractPayment.createError"),
 			);
+			onError?.();
 		},
 	});
 
@@ -243,7 +245,9 @@ export const SubcontractPaymentTab = forwardRef<
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
 							<SelectItem value="none">
-								{t("finance.expenses.subcontractPayment.selectContract")}
+								{contracts.length === 0 && projectId
+									? t("finance.expenses.subcontractPayment.noContracts")
+									: t("finance.expenses.subcontractPayment.selectContract")}
 							</SelectItem>
 							{contracts.map((contract: any) => (
 								<SelectItem
@@ -253,11 +257,6 @@ export const SubcontractPaymentTab = forwardRef<
 									{contract.name || contract.contractNo}
 								</SelectItem>
 							))}
-							{contracts.length === 0 && projectId && (
-								<SelectItem value="none" disabled>
-									{t("finance.expenses.subcontractPayment.noContracts")}
-								</SelectItem>
-							)}
 						</SelectContent>
 					</Select>
 				</div>

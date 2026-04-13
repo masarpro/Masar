@@ -43,15 +43,19 @@ export function AddExpenseDialog({
 	const isEditMode = !!expenseId;
 	const t = useTranslations();
 	const [activeTab, setActiveTab] = useState<TabValue>("general");
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const generalRef = useRef<GeneralExpenseTabHandle>(null);
 	const subcontractRef = useRef<SubcontractPaymentTabHandle>(null);
 	const ownerDrawingRef = useRef<OwnerDrawingTabHandle>(null);
 
-	// Reset to general tab when dialog opens in edit mode
+	// Reset state when dialog opens
 	useEffect(() => {
-		if (open && isEditMode) {
-			setActiveTab("general");
+		if (open) {
+			setIsSubmitting(false);
+			if (isEditMode) {
+				setActiveTab("general");
+			}
 		}
 	}, [open, isEditMode]);
 
@@ -67,10 +71,12 @@ export function AddExpenseDialog({
 	}, [activeTab]);
 
 	const handleSubmit = () => {
+		setIsSubmitting(true);
 		getActiveRef()?.submit();
 	};
 
 	const handleClose = () => {
+		setIsSubmitting(false);
 		generalRef.current?.resetForm();
 		subcontractRef.current?.resetForm();
 		ownerDrawingRef.current?.resetForm();
@@ -79,13 +85,13 @@ export function AddExpenseDialog({
 	};
 
 	const handleSuccess = () => {
+		setIsSubmitting(false);
 		handleClose();
 	};
 
-	const isSubmitting = (() => {
-		const ref = getActiveRef();
-		return ref?.isSubmitting ?? false;
-	})();
+	const handleError = () => {
+		setIsSubmitting(false);
+	};
 
 	const getSubmitLabel = () => {
 		switch (activeTab) {
@@ -172,6 +178,7 @@ export function AddExpenseDialog({
 								organizationId={organizationId}
 								expenseId={expenseId}
 								onSuccess={handleSuccess}
+								onError={handleError}
 							/>
 						</TabsContent>
 						{!isEditMode && (
@@ -181,6 +188,7 @@ export function AddExpenseDialog({
 										ref={subcontractRef}
 										organizationId={organizationId}
 										onSuccess={handleSuccess}
+										onError={handleError}
 									/>
 								</TabsContent>
 								<TabsContent value="owner-drawing" className="mt-0">
@@ -188,6 +196,7 @@ export function AddExpenseDialog({
 										ref={ownerDrawingRef}
 										organizationId={organizationId}
 										onSuccess={handleSuccess}
+										onError={handleError}
 									/>
 								</TabsContent>
 							</>

@@ -9364,7 +9364,32 @@
       "backToList": "العودة للقائمة",
       "ownerDetails": "بيانات الشريك",
       "ownerInfo": "معلومات الشريك",
-      "drawingsSummary": "ملخص السحوبات"
+      "drawingsSummary": "ملخص السحوبات",
+      "dashboard": {
+        "capitalContributed": "رأس المال المساهم",
+        "profitShareYTD": "حصته من الأرباح (هذه السنة)",
+        "totalDrawingsYTD": "السحوبات (هذه السنة)",
+        "availableBalance": "الرصيد المتاح للسحب",
+        "exceedsShare": "تجاوز حصته المتوقعة من الأرباح",
+        "availableForDrawing": "متاح للسحب",
+        "fromContributions": "من {count} مساهمات",
+        "fromNetProfit": "من صافي ربح {amount}",
+        "fromDrawings": "من {count} عمليات سحب",
+        "noContributions": "لا توجد مساهمات رأسمالية بعد",
+        "noDrawings": "لا توجد سحوبات مسجلة بعد",
+        "monthlyDrawings": "السحوبات الشهرية",
+        "drawingsByProject": "السحوبات حسب المشروع",
+        "equityContext": "سياق حقوق الملكية",
+        "currentYearProfit": "ربح السنة الحالية",
+        "addContribution": "تسجيل مساهمة",
+        "addDrawing": "تسجيل سحب",
+        "editOwner": "تعديل البيانات",
+        "tabs": {
+          "summary": "ملخص",
+          "contributions": "المساهمات",
+          "drawings": "السحوبات"
+        }
+      }
     },
     "notifications": {
       "title": "تفضيلات الإشعارات",

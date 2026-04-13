@@ -66,12 +66,13 @@ interface GeneralExpenseTabProps {
 	organizationId: string;
 	expenseId?: string | null;
 	onSuccess: () => void;
+	onError?: () => void;
 }
 
 export const GeneralExpenseTab = forwardRef<
 	GeneralExpenseTabHandle,
 	GeneralExpenseTabProps
->(function GeneralExpenseTab({ organizationId, expenseId, onSuccess }, ref) {
+>(function GeneralExpenseTab({ organizationId, expenseId, onSuccess, onError }, ref) {
 	const isEditMode = !!expenseId;
 	const t = useTranslations();
 	const queryClient = useQueryClient();
@@ -261,6 +262,7 @@ export const GeneralExpenseTab = forwardRef<
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.expenses.createError"));
+			onError?.();
 		},
 	});
 
@@ -304,6 +306,7 @@ export const GeneralExpenseTab = forwardRef<
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.expenses.updateError"));
+			onError?.();
 		},
 	});
 
@@ -366,7 +369,7 @@ export const GeneralExpenseTab = forwardRef<
 		} else {
 			setFilePreview(null);
 		}
-	}, []);
+	}, [t]);
 
 	const removeFile = useCallback(() => {
 		if (filePreview) URL.revokeObjectURL(filePreview);

@@ -9364,7 +9364,32 @@
       "backToList": "Back to List",
       "ownerDetails": "Owner Details",
       "ownerInfo": "Owner Information",
-      "drawingsSummary": "Drawings Summary"
+      "drawingsSummary": "Drawings Summary",
+      "dashboard": {
+        "capitalContributed": "Capital Contributed",
+        "profitShareYTD": "Profit Share (YTD)",
+        "totalDrawingsYTD": "Drawings (YTD)",
+        "availableBalance": "Available Balance",
+        "exceedsShare": "Exceeds expected profit share",
+        "availableForDrawing": "Available for drawing",
+        "fromContributions": "from {count} contributions",
+        "fromNetProfit": "from net profit {amount}",
+        "fromDrawings": "from {count} drawings",
+        "noContributions": "No capital contributions yet",
+        "noDrawings": "No drawings recorded yet",
+        "monthlyDrawings": "Monthly Drawings",
+        "drawingsByProject": "Drawings by Project",
+        "equityContext": "Equity Context",
+        "currentYearProfit": "Current Year Profit",
+        "addContribution": "Add Contribution",
+        "addDrawing": "Add Drawing",
+        "editOwner": "Edit Owner",
+        "tabs": {
+          "summary": "Summary",
+          "contributions": "Contributions",
+          "drawings": "Drawings"
+        }
+      }
     },
     "notifications": {
       "title": "Notification Preferences",
