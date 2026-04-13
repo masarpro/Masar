@@ -15,6 +15,7 @@ import { z } from "zod";
 import { ORPCError } from "@orpc/server";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { resolvePartnerAccessLevel } from "../../accounting/lib/partner-access";
 import {
 	MAX_NAME, MAX_DESC, MAX_CODE,
 	idString, optionalTrimmed, searchQuery,
@@ -692,8 +693,17 @@ export const listExpensesWithSubcontracts = protectedProcedure
 			action: "view",
 		});
 
-		// Fetch both in parallel
-		const [expensesResult, subPaymentsResult] = await Promise.all([
+		const partnerAccessLevel = await resolvePartnerAccessLevel(
+			input.organizationId,
+			context.user.id,
+		);
+		const canSeeOwnerDrawings = partnerAccessLevel !== "none";
+		const categoryFilterBlocksDrawings =
+			(!!input.category && input.category !== "SUBCONTRACTOR") ||
+			!!input.categoryId;
+
+		// Fetch all three streams in parallel
+		const [expensesResult, subPaymentsResult, ownerDrawings] = await Promise.all([
 			getOrganizationExpenses(input.organizationId, {
 				category: input.category,
 				categoryId: input.categoryId,
@@ -718,6 +728,61 @@ export const listExpensesWithSubcontracts = protectedProcedure
 						offset: 0,
 					})
 				: { payments: [], total: 0 },
+			// Owner drawings — only for OWNER / ACCOUNTANT, and only when category filter doesn't exclude them
+			canSeeOwnerDrawings && !categoryFilterBlocksDrawings
+				? db.ownerDrawing.findMany({
+						where: {
+							organizationId: input.organizationId,
+							status: "APPROVED",
+							...(input.projectId ? { projectId: input.projectId } : {}),
+							...(input.sourceAccountId
+								? { bankAccountId: input.sourceAccountId }
+								: {}),
+							...(input.dateFrom || input.dateTo
+								? {
+										date: {
+											...(input.dateFrom ? { gte: input.dateFrom } : {}),
+											...(input.dateTo ? { lte: input.dateTo } : {}),
+										},
+									}
+								: {}),
+							...(input.query
+								? {
+										OR: [
+											{
+												drawingNo: {
+													contains: input.query,
+													mode: "insensitive" as const,
+												},
+											},
+											{
+												description: {
+													contains: input.query,
+													mode: "insensitive" as const,
+												},
+											},
+											{
+												owner: {
+													name: {
+														contains: input.query,
+														mode: "insensitive" as const,
+													},
+												},
+											},
+										],
+									}
+								: {}),
+						},
+						include: {
+							owner: { select: { id: true, name: true } },
+							bankAccount: { select: { id: true, name: true } },
+							project: { select: { id: true, name: true } },
+							createdBy: { select: { id: true, name: true } },
+						},
+						orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+						take: 200,
+					})
+				: [],
 		]);
 
 		// Normalize expenses
@@ -737,6 +802,8 @@ export const listExpensesWithSubcontracts = protectedProcedure
 			// Subcontract-specific fields
 			contractName: null as string | null,
 			contractNo: null as string | null,
+			ownerId: null as string | null,
+			hasOverdrawWarning: false,
 		}));
 
 		// Normalize subcontract payments
@@ -755,16 +822,45 @@ export const listExpensesWithSubcontracts = protectedProcedure
 			createdBy: p.createdBy,
 			contractName: p.contract.name,
 			contractNo: p.contract.contractNo,
+			ownerId: null as string | null,
+			hasOverdrawWarning: false,
+		}));
+
+		// Normalize owner drawings
+		const normalizedOwnerDrawings = ownerDrawings.map((d) => ({
+			_type: "owner_drawing" as const,
+			id: d.id,
+			refNo: d.drawingNo,
+			date: d.date,
+			category: "OWNER_DRAWING" as const,
+			description: d.description ?? "",
+			amount: Number(d.amount),
+			vendorName: d.owner.name,
+			status: d.status,
+			sourceAccount: d.bankAccount ?? null,
+			project: d.project ?? null,
+			createdBy: d.createdBy,
+			contractName: null as string | null,
+			contractNo: null as string | null,
+			ownerId: d.ownerId,
+			hasOverdrawWarning: d.hasOverdrawWarning,
 		}));
 
 		// Merge and sort by date descending
-		const unified = [...normalizedExpenses, ...normalizedSubPayments].sort(
+		const unified = [
+			...normalizedExpenses,
+			...normalizedSubPayments,
+			...normalizedOwnerDrawings,
+		].sort(
 			(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
 		);
 
 		// Apply pagination
 		const paged = unified.slice(input.offset, input.offset + input.limit);
-		const total = expensesResult.total + subPaymentsResult.total;
+		const total =
+			expensesResult.total +
+			subPaymentsResult.total +
+			normalizedOwnerDrawings.length;
 
 		// Compute combined summary
 		const expensesTotal = normalizedExpenses.reduce(
@@ -775,12 +871,18 @@ export const listExpensesWithSubcontracts = protectedProcedure
 			(sum, p) => sum + p.amount,
 			0,
 		);
+		const ownerDrawingsTotal = normalizedOwnerDrawings.reduce(
+			(sum, d) => sum + d.amount,
+			0,
+		);
 
 		return {
 			items: paged,
 			total,
 			expensesTotal,
 			subcontractTotal,
-			grandTotal: expensesTotal + subcontractTotal,
+			ownerDrawingsTotal,
+			grandTotal: expensesTotal + subcontractTotal + ownerDrawingsTotal,
+			partnerAccessLevel,
 		};
 	});

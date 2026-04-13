@@ -80,6 +80,12 @@ import {
 } from "./procedures/capital-contributions";
 
 import {
+	partnerListWithSummaryProcedure,
+	partnerDetailProcedure,
+	partnersComparisonReportProcedure,
+} from "./procedures/partners-finance";
+
+import {
 	previewYearEndProcedure,
 	executeYearEndProcedure,
 	yearEndHistoryProcedure,
@@ -203,6 +209,13 @@ export const accountingRouter = {
 		create: createContributionProcedure,
 		cancel: cancelContributionProcedure,
 		getByOwner: getByOwnerProcedure,
+	},
+
+	// Partners Finance (unified view)
+	partners: {
+		listWithSummary: partnerListWithSummaryProcedure,
+		detail: partnerDetailProcedure,
+		comparisonReport: partnersComparisonReportProcedure,
 	},
 
 	// Year-End Closing

@@ -860,6 +860,10 @@
     "completed": "Completed",
     "hidden": "Hidden",
     "error": "An error occurred",
+    "errorOccurred": "An error occurred while loading data",
+    "inactive": "Inactive",
+    "status": "Status",
+    "project": "Project",
     "fileName": "File name",
     "download": "Download",
     "dangerZone": "Danger Zone",
@@ -2326,7 +2330,8 @@
         "settings": "Settings",
         "ownerDrawings": "Owner Drawings",
         "yearEndClosing": "Year-End Closing",
-        "capitalContributions": "Capital Contributions"
+        "capitalContributions": "Capital Contributions",
+        "partners": "Partners"
       }
     },
     "actions": {
@@ -4023,6 +4028,68 @@
       "created": "Contribution recorded successfully",
       "cancelled": "Contribution cancelled"
     },
+    "partners": {
+      "title": "Partners",
+      "subtitle": "Detailed financial summary for each partner",
+      "partner": "Partner",
+      "ownershipPercent": "Ownership %",
+      "totalDrawings": "Total Drawings",
+      "totalContributions": "Total Contributions",
+      "shareOfProfit": "Share of Profit",
+      "netBalance": "Net Partner Balance",
+      "noPartners": "No partners registered",
+      "noPartnersDescription": "Add partners from organization settings to view their financial data here",
+      "goToSettings": "Go to Partner Settings",
+      "actions": {
+        "viewDetail": "View Detail",
+        "newDrawing": "New Drawing",
+        "newContribution": "New Contribution",
+        "viewReports": "Full Reports"
+      },
+      "tabs": {
+        "drawings": "Drawings",
+        "contributions": "Contributions",
+        "profitShare": "Profit Share",
+        "netAccount": "Net Account"
+      },
+      "summary": {
+        "companyLevelProfit": "Company Profit",
+        "projectProfit": "Project Profit",
+        "totalProfit": "Total Profit",
+        "availableForDrawing": "Available for Drawing",
+        "drawnSoFar": "Drawn So Far",
+        "remainingShare": "Remaining Share"
+      },
+      "detail": {
+        "title": "Partner Card",
+        "info": "Basic Info",
+        "financialOverview": "Financial Overview",
+        "drawingsHistory": "Drawings History",
+        "contributionsHistory": "Contributions History",
+        "projectBreakdown": "Project Breakdown",
+        "noDrawings": "No drawings",
+        "noContributions": "No contributions",
+        "drawingsCount": "Drawings Count",
+        "contributionsCount": "Contributions Count"
+      },
+      "reports": {
+        "title": "Partner Reports",
+        "subtitle": "Comprehensive comparison between partners",
+        "distributionTitle": "Current Profit Distribution",
+        "comparisonTitle": "Partner Comparison",
+        "drawingsTrend": "Drawings Trend",
+        "byProject": "By Project",
+        "netPosition": "Net Financial Position",
+        "owner": "Partner",
+        "percentage": "Percentage",
+        "amount": "Amount"
+      },
+      "access": {
+        "ownerOnly": "This section is available to organization owners only",
+        "accessDenied": "You do not have access to partner data",
+        "limitedAccountant": "Accountant view — drawings and contributions only"
+      }
+    },
     "accountingReports": {
       "title": "Accounting Reports",
       "subtitle": "Smart accounting reports built on your existing data",
@@ -4344,8 +4411,12 @@
       "totalExpenses": "Total Expenses",
       "directExpenses": "Direct Expenses",
       "subcontractPayments": "Subcontract Payments",
+      "ownerDrawingsTotal": "Partner Drawings",
       "subcontractBadge": "Subcontract",
       "expenseBadge": "Expense",
+      "ownerDrawingBadge": "Owner Drawing",
+      "overdrawBadge": "Overdraw",
+      "filterOwnerDrawingsOnly": "Partner Drawings Only",
       "type": "Type",
       "project": "Project",
       "filterByProject": "Filter by Project",

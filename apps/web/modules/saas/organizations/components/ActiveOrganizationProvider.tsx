@@ -1,7 +1,11 @@
 "use client";
 
 import { authClient } from "@repo/auth/client";
-import { isOrganizationAdmin } from "@repo/auth/lib/helper";
+import {
+	getPartnerAccessLevel,
+	isOrganizationAccountant,
+	isOrganizationAdmin,
+} from "@repo/auth/lib/helper";
 import { config } from "@repo/config";
 import { useSession } from "@saas/auth/hooks/use-session";
 import { sessionQueryKey } from "@saas/auth/lib/api";
@@ -109,6 +113,14 @@ export function ActiveOrganizationProvider({
 					!!activeOrganization &&
 					!!user &&
 					isOrganizationAdmin(activeOrganization, user),
+				isOrganizationAccountant:
+					!!activeOrganization &&
+					!!user &&
+					isOrganizationAccountant(activeOrganization, user),
+				partnerAccessLevel: getPartnerAccessLevel(
+					activeOrganization,
+					user,
+				),
 				setActiveOrganization,
 				refetchActiveOrganization,
 			}}

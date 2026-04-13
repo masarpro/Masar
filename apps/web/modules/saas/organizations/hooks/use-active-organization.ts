@@ -15,6 +15,8 @@ export const useActiveOrganization = () => {
 			refetchActiveOrganization: () => Promise.resolve(),
 			activeOrganizationUserRole: null,
 			isOrganizationAdmin: false,
+			isOrganizationAccountant: false,
+			partnerAccessLevel: "none",
 			loaded: true,
 		} satisfies ActiveOrganizationContextType;
 	}

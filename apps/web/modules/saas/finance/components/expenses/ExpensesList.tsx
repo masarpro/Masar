@@ -63,6 +63,8 @@ import {
 	FolderOpen,
 	Clock,
 	AlertCircle,
+	UserIcon,
+	TrendingUp,
 } from "lucide-react";
 import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
@@ -70,6 +72,7 @@ import { PayExpenseDialog } from "./PayExpenseDialog";
 import { AddExpenseDialog } from "./AddExpenseDialog";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { findCategoryById, EXPENSE_CATEGORIES as ALL_CATEGORIES } from "@repo/utils";
+import { usePartnerAccess } from "@saas/organizations/hooks/use-partner-access";
 
 interface ExpensesListProps {
 	organizationId: string;
@@ -90,6 +93,7 @@ export function ExpensesList({
 	const locale = useLocale();
 	const router = useRouter();
 	const queryClient = useQueryClient();
+	const { canAccessPartners } = usePartnerAccess();
 
 	// State
 	const [searchQuery, setSearchQuery] = useState("");
@@ -129,10 +133,15 @@ export function ExpensesList({
 		}),
 	);
 
-	const items = data?.items ?? [];
+	const rawItems = data?.items ?? [];
+	const items =
+		sourceTypeFilter === "OWNER_DRAWING"
+			? rawItems.filter((i: any) => i._type === "owner_drawing")
+			: rawItems;
 	const grandTotal = data?.grandTotal ?? 0;
 	const expensesTotal = data?.expensesTotal ?? 0;
 	const subcontractTotal = data?.subcontractTotal ?? 0;
+	const ownerDrawingsTotal = (data as any)?.ownerDrawingsTotal ?? 0;
 	const projects = projectsData?.projects ?? [];
 
 	const { containerRef, virtualItems, paddingTop, paddingBottom, isVirtualized } =
@@ -231,7 +240,11 @@ export function ExpensesList({
 	return (
 		<div className="space-y-6">
 			{/* Summary Cards */}
-			<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+			<div
+				className={`grid grid-cols-1 gap-4 ${
+					canAccessPartners ? "sm:grid-cols-4" : "sm:grid-cols-3"
+				}`}
+			>
 				<Card className="rounded-2xl">
 					<CardContent className="p-4">
 						<div className="flex items-center gap-3">
@@ -283,6 +296,25 @@ export function ExpensesList({
 						</div>
 					</CardContent>
 				</Card>
+				{canAccessPartners && (
+					<Card className="rounded-2xl">
+						<CardContent className="p-4">
+							<div className="flex items-center gap-3">
+								<div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-xl">
+									<UserIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+								</div>
+								<div>
+									<p className="text-sm text-slate-500 dark:text-slate-400">
+										{t("finance.expenses.ownerDrawingsTotal")}
+									</p>
+									<p className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+										<Currency amount={ownerDrawingsTotal} />
+									</p>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+				)}
 			</div>
 
 			{/* Filters & Actions */}
@@ -331,6 +363,11 @@ export function ExpensesList({
 							<SelectItem value="FACILITY_RECURRING">{t("finance.expenses.sourceTypes.facility_recurring")}</SelectItem>
 							<SelectItem value="FACILITY_ASSET">{t("finance.expenses.sourceTypes.facility_asset")}</SelectItem>
 							<SelectItem value="PROJECT">{t("finance.expenses.sourceTypes.project")}</SelectItem>
+							{canAccessPartners && (
+								<SelectItem value="OWNER_DRAWING">
+									{t("finance.expenses.filterOwnerDrawingsOnly")}
+								</SelectItem>
+							)}
 						</SelectContent>
 					</Select>
 					{!projectId && (
@@ -439,6 +476,19 @@ export function ExpensesList({
 													<Hammer className="h-3 w-3 me-1" />
 													{t("finance.expenses.subcontractBadge")}
 												</Badge>
+											) : item._type === "owner_drawing" ? (
+												<div className="flex items-center gap-1">
+													<Badge className="rounded-lg bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400 border-0">
+														<UserIcon className="h-3 w-3 me-1" />
+														{t("finance.expenses.ownerDrawingBadge")}
+													</Badge>
+													{(item as any).hasOverdrawWarning && (
+														<Badge className="rounded-lg bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400 border-0">
+															<AlertCircle className="h-3 w-3 me-1" />
+															{t("finance.expenses.overdrawBadge")}
+														</Badge>
+													)}
+												</div>
 											) : (
 												<Badge variant="outline" className="rounded-lg">
 													{t("finance.expenses.expenseBadge")}

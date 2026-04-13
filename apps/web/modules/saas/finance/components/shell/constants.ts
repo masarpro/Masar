@@ -14,6 +14,7 @@ import {
 	UserMinus,
 	TrendingUp,
 	CalendarCheck,
+	UsersRound,
 } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════════
@@ -127,6 +128,12 @@ export const FINANCE_NAV_SECTIONS: FinanceNavSection[] = [
 		path: "accounting-reports",
 		labelKey: "finance.shell.sections.accountingReports",
 		icon: ClipboardList,
+	},
+	{
+		id: "partners",
+		path: "partners",
+		labelKey: "finance.shell.sections.partners",
+		icon: UsersRound,
 	},
 	{
 		id: "capital-contributions",

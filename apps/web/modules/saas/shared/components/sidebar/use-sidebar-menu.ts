@@ -36,6 +36,8 @@ import {
 	BookOpen,
 	ClipboardCheck,
 	Megaphone,
+	UsersRound,
+	TrendingUp,
 } from "lucide-react";
 
 export interface SidebarMenuChild {
@@ -60,7 +62,8 @@ export function useSidebarMenu(): {
 	const t = useTranslations();
 	const pathname = usePathname();
 	const { user } = useSession();
-	const { activeOrganization, isOrganizationAdmin } = useActiveOrganization();
+	const { activeOrganization, isOrganizationAdmin, partnerAccessLevel } =
+		useActiveOrganization();
 
 	const basePath = activeOrganization
 		? `/app/${activeOrganization.slug}`
@@ -296,6 +299,28 @@ export function useSidebarMenu(): {
 								href: `${orgPrefix}/finance/accounting-periods`,
 								icon: ClipboardList,
 							},
+							...(partnerAccessLevel !== "none"
+								? [
+										{
+											id: "finance-partners",
+											label: t("finance.shell.sections.partners"),
+											href: `${orgPrefix}/finance/partners`,
+											icon: UsersRound,
+										},
+										{
+											id: "finance-owner-drawings",
+											label: t("finance.shell.sections.ownerDrawings"),
+											href: `${orgPrefix}/finance/owner-drawings`,
+											icon: Banknote,
+										},
+										{
+											id: "finance-capital-contributions",
+											label: t("finance.shell.sections.capitalContributions"),
+											href: `${orgPrefix}/finance/capital-contributions`,
+											icon: TrendingUp,
+										},
+									]
+								: []),
 							],
 						},
 						{
@@ -437,6 +462,7 @@ export function useSidebarMenu(): {
 		orgPrefix,
 		activeOrganization,
 		isOrganizationAdmin,
+		partnerAccessLevel,
 		user?.role,
 		projectId,
 		studyId,

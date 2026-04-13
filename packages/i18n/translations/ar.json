@@ -862,6 +862,10 @@
     "completed": "مكتمل",
     "hidden": "مخفي",
     "error": "حدث خطأ",
+    "errorOccurred": "حدث خطأ أثناء تحميل البيانات",
+    "inactive": "غير نشط",
+    "status": "الحالة",
+    "project": "المشروع",
     "fileName": "اسم الملف",
     "download": "تحميل",
     "dangerZone": "منطقة الخطر",
@@ -2326,7 +2330,8 @@
         "settings": "الإعدادات",
         "ownerDrawings": "سحوبات المالك",
         "yearEndClosing": "الإقفال السنوي",
-        "capitalContributions": "مساهمات رأس المال"
+        "capitalContributions": "مساهمات رأس المال",
+        "partners": "الشركاء"
       }
     },
     "actions": {
@@ -4045,6 +4050,68 @@
       "created": "تم تسجيل المساهمة بنجاح",
       "cancelled": "تم إلغاء المساهمة"
     },
+    "partners": {
+      "title": "الشركاء",
+      "subtitle": "ملخص مالي تفصيلي لكل شريك",
+      "partner": "الشريك",
+      "ownershipPercent": "نسبة الملكية",
+      "totalDrawings": "إجمالي السحوبات",
+      "totalContributions": "إجمالي المساهمات",
+      "shareOfProfit": "حصة من الأرباح",
+      "netBalance": "صافي حساب الشريك",
+      "noPartners": "لا يوجد شركاء مسجّلون",
+      "noPartnersDescription": "أضف الشركاء من إعدادات المنشأة لعرض بياناتهم المالية هنا",
+      "goToSettings": "الذهاب لإعدادات الشركاء",
+      "actions": {
+        "viewDetail": "عرض التفاصيل",
+        "newDrawing": "سحب أرباح جديد",
+        "newContribution": "مساهمة جديدة",
+        "viewReports": "التقارير الشاملة"
+      },
+      "tabs": {
+        "drawings": "السحوبات",
+        "contributions": "المساهمات",
+        "profitShare": "حصة الأرباح",
+        "netAccount": "صافي الحساب"
+      },
+      "summary": {
+        "companyLevelProfit": "ربح الشركة",
+        "projectProfit": "ربح المشاريع",
+        "totalProfit": "إجمالي الربح",
+        "availableForDrawing": "المتاح للسحب",
+        "drawnSoFar": "المسحوب حتى الآن",
+        "remainingShare": "المتبقي من الحصة"
+      },
+      "detail": {
+        "title": "بطاقة الشريك",
+        "info": "البيانات الأساسية",
+        "financialOverview": "نظرة عامة مالية",
+        "drawingsHistory": "سجل السحوبات",
+        "contributionsHistory": "سجل المساهمات",
+        "projectBreakdown": "توزيع حسب المشروع",
+        "noDrawings": "لا توجد سحوبات",
+        "noContributions": "لا توجد مساهمات",
+        "drawingsCount": "عدد السحوبات",
+        "contributionsCount": "عدد المساهمات"
+      },
+      "reports": {
+        "title": "تقارير الشركاء",
+        "subtitle": "مقارنة شاملة بين الشركاء",
+        "distributionTitle": "توزيع الأرباح الحالية",
+        "comparisonTitle": "مقارنة الشركاء",
+        "drawingsTrend": "تطوّر السحوبات",
+        "byProject": "حسب المشروع",
+        "netPosition": "المركز المالي الصافي",
+        "owner": "الشريك",
+        "percentage": "النسبة",
+        "amount": "المبلغ"
+      },
+      "access": {
+        "ownerOnly": "هذا القسم متاح لمالكي المنشأة فقط",
+        "accessDenied": "لا تملك صلاحية الوصول لبيانات الشركاء",
+        "limitedAccountant": "عرض المحاسب — السحوبات والمساهمات فقط"
+      }
+    },
     "accountingReports": {
       "title": "التقارير المحاسبية",
       "subtitle": "تقارير محاسبية ذكية فوق بياناتك الحالية",
@@ -4366,8 +4433,12 @@
       "totalExpenses": "إجمالي المصروفات",
       "directExpenses": "المصروفات المباشرة",
       "subcontractPayments": "دفعات مقاولي الباطن",
+      "ownerDrawingsTotal": "سحوبات الشركاء",
       "subcontractBadge": "دفعة باطن",
       "expenseBadge": "مصروف",
+      "ownerDrawingBadge": "سحب أرباح",
+      "overdrawBadge": "تجاوز متاح",
+      "filterOwnerDrawingsOnly": "سحوبات الشركاء فقط",
       "type": "النوع",
       "project": "المشروع",
       "filterByProject": "تصفية حسب المشروع",

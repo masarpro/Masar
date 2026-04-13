@@ -23,3 +23,35 @@ export function isOrganizationAdmin(
 		user?.role === "admin"
 	);
 }
+
+export function isOrganizationAccountant(
+	organization?: ActiveOrganization | null,
+	user?: {
+		id: string;
+		role?: string | null;
+	} | null,
+) {
+	const userOrganizationRole = organization?.members.find(
+		(member) => member.userId === user?.id,
+	)?.role;
+
+	return userOrganizationRole === "accountant";
+}
+
+export type PartnerAccessLevel = "full" | "limited" | "none";
+
+export function getPartnerAccessLevel(
+	organization?: ActiveOrganization | null,
+	user?: {
+		id: string;
+		role?: string | null;
+	} | null,
+): PartnerAccessLevel {
+	if (isOrganizationAdmin(organization, user)) {
+		return "full";
+	}
+	if (isOrganizationAccountant(organization, user)) {
+		return "limited";
+	}
+	return "none";
+}
