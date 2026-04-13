@@ -1,4 +1,4 @@
-import { defineCollection, defineConfig } from "@content-collections/core";
+﻿import { defineCollection, defineConfig } from "@content-collections/core";
 import { compileMDX } from "@content-collections/mdx";
 import {
 	createDocSchema,
@@ -113,6 +113,5 @@ const docsMeta = defineCollection({
 });
 
 export default defineConfig({
-	// @ts-expect-error fumadocs collections return non-serializable types (zod v4 compat)
 	collections: [posts, legalPages, docs, docsMeta],
 });
