@@ -4444,6 +4444,37 @@
       "errors": {
         "accountRequired": "الحساب المصدر مطلوب",
         "amountRequired": "المبلغ مطلوب"
+      },
+      "tabs": {
+        "general": "مصروف عام",
+        "subcontract": "دفعة عقد باطن",
+        "ownerDrawing": "سحب مالك"
+      },
+      "subcontractPayment": {
+        "selectProject": "اختر المشروع",
+        "selectProjectFirst": "اختر المشروع أولاً",
+        "selectContract": "اختر عقد الباطن",
+        "noContracts": "لا توجد عقود لهذا المشروع",
+        "projectRequired": "يجب اختيار المشروع",
+        "contractRequired": "يجب اختيار عقد الباطن",
+        "contractValue": "قيمة العقد",
+        "totalPaid": "إجمالي المدفوع",
+        "remaining": "المتبقي",
+        "createSuccess": "تم تسجيل الدفعة بنجاح",
+        "createError": "فشل تسجيل الدفعة",
+        "recordPayment": "تسجيل الدفعة"
+      },
+      "ownerDrawingPayment": {
+        "selectOwner": "اختر الشريك",
+        "ownerRequired": "يجب اختيار الشريك",
+        "overdrawWarning": "تحذير: السحب يتجاوز الربح المتاح",
+        "availableAmount": "المتاح",
+        "overdrawAmount": "مبلغ التجاوز",
+        "confirmOverdraw": "تأكيد رغم التجاوز",
+        "insufficientBank": "رصيد البنك غير كافٍ",
+        "createSuccess": "تم تسجيل السحب بنجاح",
+        "createError": "فشل تسجيل السحب",
+        "recordDrawing": "تسجيل السحب"
       }
     },
     "payments": {

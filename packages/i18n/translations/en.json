@@ -4422,6 +4422,37 @@
       "errors": {
         "accountRequired": "Source account is required",
         "amountRequired": "Amount is required"
+      },
+      "tabs": {
+        "general": "General Expense",
+        "subcontract": "Subcontract Payment",
+        "ownerDrawing": "Owner Drawing"
+      },
+      "subcontractPayment": {
+        "selectProject": "Select Project",
+        "selectProjectFirst": "Select a project first",
+        "selectContract": "Select Subcontract",
+        "noContracts": "No contracts for this project",
+        "projectRequired": "Project is required",
+        "contractRequired": "Subcontract is required",
+        "contractValue": "Contract Value",
+        "totalPaid": "Total Paid",
+        "remaining": "Remaining",
+        "createSuccess": "Payment recorded successfully",
+        "createError": "Failed to record payment",
+        "recordPayment": "Record Payment"
+      },
+      "ownerDrawingPayment": {
+        "selectOwner": "Select Owner",
+        "ownerRequired": "Owner is required",
+        "overdrawWarning": "Warning: Drawing exceeds available profit",
+        "availableAmount": "Available",
+        "overdrawAmount": "Overdraw",
+        "confirmOverdraw": "Confirm despite overdraw",
+        "insufficientBank": "Insufficient bank balance",
+        "createSuccess": "Drawing recorded successfully",
+        "createError": "Failed to record drawing",
+        "recordDrawing": "Record Drawing"
       }
     },
     "payments": {
