@@ -29,15 +29,19 @@ import { EmptyState } from "@ui/components/empty-state";
 import { usePartnerAccess } from "@saas/organizations/hooks/use-partner-access";
 import Link from "next/link";
 
-interface PartnersFinanceListProps {
+interface PartnersOverviewTabProps {
 	organizationId: string;
 	organizationSlug: string;
+	showSummaryCards?: boolean;
+	showReportsButton?: boolean;
 }
 
-export function PartnersFinanceList({
+export function PartnersOverviewTab({
 	organizationId,
 	organizationSlug,
-}: PartnersFinanceListProps) {
+	showSummaryCards = true,
+	showReportsButton = true,
+}: PartnersOverviewTabProps) {
 	const t = useTranslations();
 	const router = useRouter();
 	const { canViewProfits, canViewNetBalance, canViewReports, level } =
@@ -90,19 +94,19 @@ export function PartnersFinanceList({
 				</div>
 			)}
 
-			{canViewProfits && totals && (
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+			{showSummaryCards && canViewProfits && totals && (
+				<div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
-								<div className="p-2 bg-emerald-100 dark:bg-emerald-900/50 rounded-xl">
+								<div className="p-2 bg-emerald-100 dark:bg-emerald-900/50 rounded-xl shrink-0">
 									<TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
 								</div>
-								<div>
-									<p className="text-sm text-slate-500 dark:text-slate-400">
+								<div className="min-w-0">
+									<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
 										{t("finance.partners.summary.totalProfit")}
 									</p>
-									<p className="text-xl font-semibold">
+									<p className="text-xl font-semibold tabular-nums">
 										<Currency amount={totals.netProfit ?? 0} />
 									</p>
 								</div>
@@ -112,14 +116,14 @@ export function PartnersFinanceList({
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
-								<div className="p-2 bg-sky-100 dark:bg-sky-900/50 rounded-xl">
+								<div className="p-2 bg-sky-100 dark:bg-sky-900/50 rounded-xl shrink-0">
 									<Wallet className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 								</div>
-								<div>
-									<p className="text-sm text-slate-500 dark:text-slate-400">
+								<div className="min-w-0">
+									<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
 										{t("finance.partners.totalContributions")}
 									</p>
-									<p className="text-xl font-semibold">
+									<p className="text-xl font-semibold tabular-nums">
 										<Currency amount={totals.totalContributions ?? 0} />
 									</p>
 								</div>
@@ -129,14 +133,14 @@ export function PartnersFinanceList({
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
-								<div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-xl">
+								<div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-xl shrink-0">
 									<TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
 								</div>
-								<div>
-									<p className="text-sm text-slate-500 dark:text-slate-400">
+								<div className="min-w-0">
+									<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
 										{t("finance.partners.totalDrawings")}
 									</p>
-									<p className="text-xl font-semibold">
+									<p className="text-xl font-semibold tabular-nums">
 										<Currency amount={totals.totalDrawings ?? 0} />
 									</p>
 								</div>
@@ -146,14 +150,14 @@ export function PartnersFinanceList({
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
-								<div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl">
+								<div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl shrink-0">
 									<BarChart3 className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
 								</div>
-								<div>
-									<p className="text-sm text-slate-500 dark:text-slate-400">
+								<div className="min-w-0">
+									<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
 										{t("finance.partners.shareOfProfit")}
 									</p>
-									<p className="text-xl font-semibold">
+									<p className="text-xl font-semibold tabular-nums">
 										<Currency amount={totals.totalShareOfProfit ?? 0} />
 									</p>
 								</div>
@@ -167,7 +171,7 @@ export function PartnersFinanceList({
 				<h2 className="text-lg font-semibold">
 					{t("finance.partners.title")}
 				</h2>
-				{canViewReports && (
+				{showReportsButton && canViewReports && (
 					<Button asChild variant="outline" className="rounded-xl">
 						<Link href={`${basePath}/reports`}>
 							<BarChart3 className="me-2 h-4 w-4" />
@@ -186,14 +190,14 @@ export function PartnersFinanceList({
 								<TableHead>
 									{t("finance.partners.ownershipPercent")}
 								</TableHead>
-								<TableHead className="text-end">
+								<TableHead className="text-end hidden md:table-cell">
 									{t("finance.partners.totalContributions")}
 								</TableHead>
-								<TableHead className="text-end">
+								<TableHead className="text-end hidden md:table-cell">
 									{t("finance.partners.totalDrawings")}
 								</TableHead>
 								{canViewProfits && (
-									<TableHead className="text-end">
+									<TableHead className="text-end hidden md:table-cell">
 										{t("finance.partners.shareOfProfit")}
 									</TableHead>
 								)}
@@ -221,20 +225,20 @@ export function PartnersFinanceList({
 											%
 										</Badge>
 									</TableCell>
-									<TableCell className="text-end">
+									<TableCell className="text-end tabular-nums hidden md:table-cell">
 										<Currency amount={p.totalContributions} />
 									</TableCell>
-									<TableCell className="text-end text-red-600 dark:text-red-400">
+									<TableCell className="text-end tabular-nums text-red-600 dark:text-red-400 hidden md:table-cell">
 										<Currency amount={p.totalDrawings} />
 									</TableCell>
 									{canViewProfits && (
-										<TableCell className="text-end">
+										<TableCell className="text-end tabular-nums hidden md:table-cell">
 											<Currency amount={p.shareOfProfit ?? 0} />
 										</TableCell>
 									)}
 									{canViewNetBalance && (
 										<TableCell
-											className={`text-end font-semibold ${
+											className={`text-end tabular-nums font-semibold ${
 												(p.netBalance ?? 0) >= 0
 													? "text-emerald-600 dark:text-emerald-400"
 													: "text-red-600 dark:text-red-400"

@@ -75,23 +75,23 @@ export function CapitalContributionsList({
 	return (
 		<div className="space-y-4">
 			{/* Header */}
-			<div className="flex items-center justify-between">
+			<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 				<h1 className="text-2xl font-bold">{t("finance.capitalContributions.title")}</h1>
-				<Button onClick={() => router.push(`${basePath}/new`)}>
+				<Button onClick={() => router.push(`${basePath}/new`)} className="w-full sm:w-auto">
 					<Plus className="me-2 h-4 w-4" />
 					{t("finance.capitalContributions.new")}
 				</Button>
 			</div>
 
-			{/* Summary Card */}
-			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+			{/* Summary Cards */}
+			<div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
 				<Card className="border-green-200">
 					<CardContent className="pt-4">
 						<div className="flex items-center gap-2 text-sm text-muted-foreground">
-							<TrendingUp className="h-4 w-4 text-green-500" />
-							{t("finance.capitalContributions.summary.totalContributions")}
+							<TrendingUp className="h-4 w-4 text-green-500 shrink-0" />
+							<span className="truncate">{t("finance.capitalContributions.summary.totalContributions")}</span>
 						</div>
-						<div className="mt-1 text-2xl font-bold text-green-600">
+						<div className="mt-1 text-2xl font-bold text-green-600 tabular-nums">
 							<Currency amount={totalAmount} />
 						</div>
 					</CardContent>
@@ -99,10 +99,10 @@ export function CapitalContributionsList({
 				<Card>
 					<CardContent className="pt-4">
 						<div className="flex items-center gap-2 text-sm text-muted-foreground">
-							<Landmark className="h-4 w-4" />
-							{t("finance.capitalContributions.summary.totalCount")}
+							<Landmark className="h-4 w-4 shrink-0" />
+							<span className="truncate">{t("finance.capitalContributions.summary.totalCount")}</span>
 						</div>
-						<div className="mt-1 text-2xl font-bold">
+						<div className="mt-1 text-2xl font-bold tabular-nums">
 							{total}
 						</div>
 					</CardContent>
@@ -110,7 +110,7 @@ export function CapitalContributionsList({
 			</div>
 
 			{/* Filters */}
-			<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+			<div className="flex flex-col gap-2 md:flex-row md:items-center">
 				<div className="relative flex-1">
 					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
@@ -121,7 +121,7 @@ export function CapitalContributionsList({
 					/>
 				</div>
 				<Select value={ownerFilter} onValueChange={setOwnerFilter}>
-					<SelectTrigger className="w-[200px]">
+					<SelectTrigger className="w-full md:w-[200px]">
 						<SelectValue placeholder={t("finance.capitalContributions.allOwners")} />
 					</SelectTrigger>
 					<SelectContent>
@@ -154,11 +154,11 @@ export function CapitalContributionsList({
 						<TableHeader>
 							<TableRow>
 								<TableHead>{t("finance.capitalContributions.contributionNo")}</TableHead>
-								<TableHead>{t("finance.capitalContributions.date")}</TableHead>
-								<TableHead>{t("finance.capitalContributions.ownerName")}</TableHead>
+								<TableHead className="hidden md:table-cell">{t("finance.capitalContributions.date")}</TableHead>
+								<TableHead className="hidden md:table-cell">{t("finance.capitalContributions.ownerName")}</TableHead>
 								<TableHead>{t("finance.capitalContributions.amount")}</TableHead>
-								<TableHead>{t("finance.capitalContributions.type")}</TableHead>
-								<TableHead>{t("finance.capitalContributions.status")}</TableHead>
+								<TableHead className="hidden md:table-cell">{t("finance.capitalContributions.type")}</TableHead>
+								<TableHead className="hidden md:table-cell">{t("finance.capitalContributions.status")}</TableHead>
 								<TableHead className="w-10" />
 							</TableRow>
 						</TableHeader>
@@ -170,15 +170,15 @@ export function CapitalContributionsList({
 									onClick={() => router.push(`${basePath}/${c.id}`)}
 								>
 									<TableCell className="font-mono font-medium">{c.contributionNo}</TableCell>
-									<TableCell>{formatDate(c.date)}</TableCell>
-									<TableCell>{c.owner?.name ?? "-"}</TableCell>
-									<TableCell><Currency amount={Number(c.amount)} /></TableCell>
-									<TableCell>
+									<TableCell className="hidden md:table-cell">{formatDate(c.date)}</TableCell>
+									<TableCell className="hidden md:table-cell">{c.owner?.name ?? "-"}</TableCell>
+									<TableCell className="tabular-nums"><Currency amount={Number(c.amount)} /></TableCell>
+									<TableCell className="hidden md:table-cell">
 										<Badge variant="outline" className={TYPE_COLORS[c.type] ?? ""}>
 											{t(`finance.capitalContributions.types.${c.type}`)}
 										</Badge>
 									</TableCell>
-									<TableCell>
+									<TableCell className="hidden md:table-cell">
 										<Badge className={STATUS_COLORS[c.status] ?? ""}>
 											{t(`finance.capitalContributions.statuses.${c.status}`)}
 										</Badge>

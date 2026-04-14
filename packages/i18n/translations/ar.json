@@ -832,6 +832,8 @@
     "previous": "السابق",
     "next": "التالي",
     "pageOf": "صفحة {current} من {total}",
+    "search": "بحث",
+    "totalResults": "{count} نتيجة",
     "confirmation": {
       "cancel": "إلغاء",
       "confirm": "تأكيد"
@@ -3932,8 +3934,13 @@
       "drawingNo": "رقم السحب",
       "date": "تاريخ السحب",
       "owner": "الشريك",
+      "ownerName": "اسم الشريك",
       "amount": "المبلغ",
       "type": "النوع",
+      "types": {
+        "COMPANY_LEVEL": "على مستوى الشركة",
+        "PROJECT_SPECIFIC": "مخصص لمشروع"
+      },
       "companyLevel": "سحب عام من الشركة",
       "projectSpecific": "سحب مخصص من مشروع",
       "project": "المشروع",
@@ -3968,6 +3975,7 @@
       "created": "تم إنشاء السحب بنجاح",
       "noDrawings": "لا توجد سحوبات",
       "noDrawingsDesc": "لم يتم تسجيل أي سحوبات بعد",
+      "noDrawingsDescription": "لم يتم تسجيل أي سحوبات بعد",
       "overdrawWarning": "تحذير: تجاوز الربح المتاح",
       "overdrawTitle": "السحب يتجاوز الربح المتاح",
       "overdrawAmount": "مقدار التجاوز",
@@ -4004,7 +4012,10 @@
         "drawingsByProject": "السحوبات لكل مشروع",
         "drawingsByMonth": "السحوبات حسب الشهر",
         "difference": "الفرق",
-        "totalCount": "إجمالي السحوبات"
+        "totalCount": "إجمالي السحوبات",
+        "totalDrawn": "إجمالي السحوبات هذا العام",
+        "yearProfit": "ربح العام الحالي",
+        "available": "المتاح للسحب"
       },
       "detail": {
         "drawingInfo": "بيانات السحب",
@@ -4032,6 +4043,8 @@
         "IN_KIND": "مساهمة عينية"
       },
       "owner": "الشريك",
+      "ownerName": "اسم الشريك",
+      "allOwners": "كل الشركاء",
       "bank": "الحساب البنكي",
       "description": "الوصف",
       "notes": "ملاحظات",
@@ -4047,6 +4060,10 @@
       "noContributions": "لا توجد مساهمات",
       "noContributionsDescription": "لم يتم تسجيل أي مساهمات رأس مال بعد",
       "totalContributions": "إجمالي المساهمات",
+      "summary": {
+        "totalContributions": "إجمالي المساهمات",
+        "totalCount": "عدد المساهمات"
+      },
       "created": "تم تسجيل المساهمة بنجاح",
       "cancelled": "تم إلغاء المساهمة"
     },
@@ -4069,6 +4086,8 @@
         "viewReports": "التقارير الشاملة"
       },
       "tabs": {
+        "overview": "نظرة عامة",
+        "partnersList": "الشركاء",
         "drawings": "السحوبات",
         "contributions": "المساهمات",
         "profitShare": "حصة الأرباح",
@@ -4476,7 +4495,8 @@
         "zakat": "زكاة",
         "refund": "مرتجعات",
         "misc": "متنوعة",
-        "custom": "مخصص"
+        "custom": "مخصص",
+        "owner_drawing": "سحب أرباح"
       },
       "createSuccess": "تم إضافة المصروف بنجاح",
       "createError": "فشل إضافة المصروف",

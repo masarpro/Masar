@@ -830,6 +830,8 @@
     "previous": "Previous",
     "next": "Next",
     "pageOf": "Page {current} of {total}",
+    "search": "Search",
+    "totalResults": "{count} results",
     "confirmation": {
       "cancel": "Cancel",
       "confirm": "Confirm"
@@ -3910,8 +3912,13 @@
       "drawingNo": "Drawing No.",
       "date": "Date",
       "owner": "Partner",
+      "ownerName": "Partner Name",
       "amount": "Amount",
       "type": "Type",
+      "types": {
+        "COMPANY_LEVEL": "Company Level",
+        "PROJECT_SPECIFIC": "Project Specific"
+      },
       "companyLevel": "Company Level",
       "projectSpecific": "Project Specific",
       "project": "Project",
@@ -3946,6 +3953,7 @@
       "created": "Drawing created successfully",
       "noDrawings": "No Drawings",
       "noDrawingsDesc": "No drawings have been recorded yet",
+      "noDrawingsDescription": "No drawings have been recorded yet",
       "overdrawWarning": "Warning: Exceeds Available Profit",
       "overdrawTitle": "Drawing Exceeds Available Profit",
       "overdrawAmount": "Overdraw Amount",
@@ -3982,7 +3990,10 @@
         "drawingsByProject": "Drawings by Project",
         "drawingsByMonth": "Drawings by Month",
         "difference": "Difference",
-        "totalCount": "Total Drawings"
+        "totalCount": "Total Drawings",
+        "totalDrawn": "Total Drawings This Year",
+        "yearProfit": "Current Year Profit",
+        "available": "Available for Drawing"
       },
       "detail": {
         "drawingInfo": "Drawing Information",
@@ -4010,6 +4021,8 @@
         "IN_KIND": "In-Kind Contribution"
       },
       "owner": "Partner",
+      "ownerName": "Partner Name",
+      "allOwners": "All Partners",
       "bank": "Bank Account",
       "description": "Description",
       "notes": "Notes",
@@ -4025,6 +4038,10 @@
       "noContributions": "No contributions",
       "noContributionsDescription": "No capital contributions have been recorded yet",
       "totalContributions": "Total Contributions",
+      "summary": {
+        "totalContributions": "Total Contributions",
+        "totalCount": "Total Count"
+      },
       "created": "Contribution recorded successfully",
       "cancelled": "Contribution cancelled"
     },
@@ -4047,6 +4064,8 @@
         "viewReports": "Full Reports"
       },
       "tabs": {
+        "overview": "Overview",
+        "partnersList": "Partners",
         "drawings": "Drawings",
         "contributions": "Contributions",
         "profitShare": "Profit Share",
@@ -4454,7 +4473,8 @@
         "zakat": "Zakat",
         "refund": "Refund",
         "misc": "Miscellaneous",
-        "custom": "Custom"
+        "custom": "Custom",
+        "owner_drawing": "Owner Drawing"
       },
       "createSuccess": "Expense added successfully",
       "createError": "Failed to add expense",

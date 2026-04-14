@@ -37,7 +37,6 @@ import {
 	ClipboardCheck,
 	Megaphone,
 	UsersRound,
-	TrendingUp,
 } from "lucide-react";
 
 export interface SidebarMenuChild {
@@ -263,6 +262,16 @@ export function useSidebarMenu(): {
 									href: `${orgPrefix}/finance/documents`,
 									icon: FolderOpen,
 								},
+								...(partnerAccessLevel !== "none"
+									? [
+											{
+												id: "finance-partners",
+												label: t("finance.shell.sections.partners"),
+												href: `${orgPrefix}/finance/partners`,
+												icon: UsersRound,
+											},
+										]
+									: []),
 								{
 									id: "finance-reports",
 									label: t("finance.shell.sections.reports"),
@@ -299,28 +308,6 @@ export function useSidebarMenu(): {
 								href: `${orgPrefix}/finance/accounting-periods`,
 								icon: ClipboardList,
 							},
-							...(partnerAccessLevel !== "none"
-								? [
-										{
-											id: "finance-partners",
-											label: t("finance.shell.sections.partners"),
-											href: `${orgPrefix}/finance/partners`,
-											icon: UsersRound,
-										},
-										{
-											id: "finance-owner-drawings",
-											label: t("finance.shell.sections.ownerDrawings"),
-											href: `${orgPrefix}/finance/owner-drawings`,
-											icon: Banknote,
-										},
-										{
-											id: "finance-capital-contributions",
-											label: t("finance.shell.sections.capitalContributions"),
-											href: `${orgPrefix}/finance/capital-contributions`,
-											icon: TrendingUp,
-										},
-									]
-								: []),
 							],
 						},
 						{

@@ -464,6 +464,8 @@ export async function getOrganizationExpenses(
 				sourceAccount: { select: { id: true, name: true, accountType: true } },
 				project: { select: { id: true, name: true, slug: true } },
 				createdBy: { select: { id: true, name: true } },
+				categoryRef: { select: { id: true, nameAr: true, nameEn: true, systemId: true } },
+				subcategoryRef: { select: { id: true, nameAr: true, nameEn: true, systemId: true } },
 			},
 			orderBy: { date: "desc" },
 			take: options?.limit ?? 50,

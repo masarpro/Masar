@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { PartnersFinanceList } from "@saas/finance/components/partners/PartnersFinanceList";
+import { PartnersTabsClient } from "@saas/finance/components/partners/PartnersTabsClient";
 import { FinanceShell } from "@saas/finance/components/shell";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
@@ -34,10 +34,12 @@ async function PartnersPageContent({
 
 	return (
 		<FinanceShell organizationSlug={organizationSlug} sectionKey="partners">
-			<PartnersFinanceList
-				organizationId={activeOrganization.id}
-				organizationSlug={organizationSlug}
-			/>
+			<Suspense fallback={<ListTableSkeleton rows={6} cols={6} />}>
+				<PartnersTabsClient
+					organizationId={activeOrganization.id}
+					organizationSlug={organizationSlug}
+				/>
+			</Suspense>
 		</FinanceShell>
 	);
 }

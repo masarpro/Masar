@@ -166,12 +166,19 @@ export function ExpensesList({
 		},
 	});
 
-	const getCategoryLabel = (category: string) => {
-		// Try new hierarchical category first
+	const getCategoryLabel = (item: any) => {
+		const category = item?.category ?? "";
+		// 1) DB-backed hierarchical category (resolved server-side)
+		const dbNameAr = item?.categoryNameAr as string | null | undefined;
+		const dbNameEn = item?.categoryNameEn as string | null | undefined;
+		if (dbNameAr || dbNameEn) {
+			return locale === "ar" ? dbNameAr ?? dbNameEn ?? "" : dbNameEn ?? dbNameAr ?? "";
+		}
+		// 2) Static default hierarchical category by system ID
 		const cat = findCategoryById(category);
 		if (cat) return locale === "ar" ? cat.nameAr : cat.nameEn;
-		// Fallback to old translation key for legacy records
-		return t(`finance.expenses.categories.${category.toLowerCase()}`);
+		// 3) Fallback to old translation key for legacy records
+		return t(`finance.expenses.categories.${String(category).toLowerCase()}`);
 	};
 
 	const getCategoryColor = (category: string) => {
@@ -507,7 +514,7 @@ export function ExpensesList({
 										</TableCell>
 										<TableCell>
 											<Badge className={`rounded-lg ${getCategoryColor(item.category)}`}>
-												{getCategoryLabel(item.category)}
+												{getCategoryLabel(item)}
 											</Badge>
 										</TableCell>
 										<TableCell>
