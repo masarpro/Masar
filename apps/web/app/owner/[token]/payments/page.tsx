@@ -28,31 +28,31 @@ function getStatusBadge(status: string, t: (key: string) => string) {
 		case "DRAFT":
 			return (
 				<Badge className="border-0 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
-					{t("ownerPortal.payments.status.draft")}
+					{t("ownerPortal.payments.statuses.draft")}
 				</Badge>
 			);
 		case "SUBMITTED":
 			return (
 				<Badge className="border-0 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-					{t("ownerPortal.payments.status.submitted")}
+					{t("ownerPortal.payments.statuses.submitted")}
 				</Badge>
 			);
 		case "APPROVED":
 			return (
 				<Badge className="border-0 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-					{t("ownerPortal.payments.status.approved")}
+					{t("ownerPortal.payments.statuses.approved")}
 				</Badge>
 			);
 		case "PAID":
 			return (
 				<Badge className="border-0 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-					{t("ownerPortal.payments.status.paid")}
+					{t("ownerPortal.payments.statuses.paid")}
 				</Badge>
 			);
 		case "REJECTED":
 			return (
 				<Badge className="border-0 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
-					{t("ownerPortal.payments.status.rejected")}
+					{t("ownerPortal.payments.statuses.rejected")}
 				</Badge>
 			);
 		default:

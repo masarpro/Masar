@@ -386,7 +386,7 @@ export function SubcontractClaimDetailView({
 							variant="outline"
 							className={`text-sm ${statusColors[claim.status] ?? ""}`}
 						>
-							{t(`status.${claim.status}`)}
+							{t(`statuses.${claim.status}`)}
 						</Badge>
 					</div>
 					<p className="text-lg">{claim.title}</p>

@@ -278,7 +278,7 @@ export function SubcontractClaimsListView({
 											variant="outline"
 											className={`text-xs ${statusColors[claim.status] ?? ""}`}
 										>
-											{t(`status.${claim.status}`)}
+											{t(`statuses.${claim.status}`)}
 										</Badge>
 									</TableCell>
 									<TableCell>

@@ -94,7 +94,7 @@ export function OperationalSection({
 										backgroundColor: LEAD_STATUS_COLORS[status] ?? "#6b7280",
 										minWidth: count > 0 ? "22px" : 0,
 									}}
-									title={`${t(`leads.status.${status}`)} (${count})`}
+									title={`${t(`pricing.leads.status.${status}`)} (${count})`}
 								>
 									{count}
 								</div>

@@ -884,7 +884,14 @@
       "message": "We use cookies to improve your experience. You can accept or decline them.",
       "allow": "Allow",
       "decline": "Decline"
-    }
+    },
+    "createdBy": "Created by",
+    "deleted": "Deleted",
+    "none": "None",
+    "notFound": "Not found",
+    "print": "Print",
+    "saved": "Saved",
+    "total": "Total"
   },
   "company": {
     "title": "Company Management",
@@ -1054,6 +1061,12 @@
           "linkedUserId": "Linked User Account",
           "notes": "Notes"
         }
+      },
+      "terminate": "Terminate",
+      "validation": {
+        "invalidEmail": "Invalid email address",
+        "joinDateRequired": "Join date is required",
+        "nameRequired": "Employee name is required"
       }
     },
     "expenses": {
@@ -1136,6 +1149,13 @@
         "SEMI_ANNUAL": "Semi-Annual",
         "ANNUAL": "Annual",
         "ONE_TIME": "One-Time"
+      },
+      "deactivate": "Deactivate",
+      "deleteItem": "Delete expense",
+      "validation": {
+        "amountPositive": "Amount must be greater than zero",
+        "nameRequired": "Expense name is required",
+        "startDateRequired": "Start date is required"
       }
     },
     "assets": {
@@ -1206,7 +1226,8 @@
         "IN_USE": "In Use",
         "MAINTENANCE": "Maintenance",
         "RETIRED": "Retired"
-      }
+      },
+      "nameRequired": "Asset name is required"
     },
     "leaves": {
       "title": "Leave Management",
@@ -1371,7 +1392,8 @@
       "updateItemSuccess": "Payroll item updated successfully",
       "updateItemError": "Failed to update payroll item",
       "deleteItemSuccess": "Employee removed from payroll",
-      "deleteItemError": "Failed to remove employee"
+      "deleteItemError": "Failed to remove employee",
+      "viewDetails": "View details"
     },
     "expenseRuns": {
       "title": "Post Expenses to Finance",
@@ -3473,7 +3495,24 @@
         "expectedOutflows": "Expected Outflows",
         "projectedBalance": "Projected Balance",
         "noData": "No cash flow data for the selected period"
-      }
+      },
+      "client": "Client",
+      "conversionRate": "Conversion rate",
+      "invoiceCount": "Invoice count",
+      "invoiceStats": "Invoice statistics",
+      "monthlyRevenue": "Monthly revenue",
+      "noProject": "No project",
+      "paidAmount": "Paid amount",
+      "project": "Project",
+      "projectRevenue": "Project revenue",
+      "quotationStats": "Quotation statistics",
+      "statusStats": "Status statistics",
+      "topClients": "Top clients",
+      "totalInvoiced": "Total invoiced",
+      "totalInvoices": "Total invoices",
+      "totalQuotations": "Total quotations",
+      "totalRevenue": "Total revenue",
+      "unknown": "Unknown"
     },
     "accounting": {
       "chartOfAccounts": "Chart of Accounts",
@@ -4069,7 +4108,9 @@
         "totalCount": "Total Count"
       },
       "created": "Contribution recorded successfully",
-      "cancelled": "Contribution cancelled"
+      "cancelled": "Contribution cancelled",
+      "bankAccount": "Bank account",
+      "basicInfo": "Basic information"
     },
     "partners": {
       "title": "Partners",
@@ -4442,7 +4483,6 @@
       "subcategory": "Subcategory",
       "searchCategory": "Search category...",
       "searchSubcategory": "Search subcategory...",
-      "selectCategory": "Select category",
       "selectSubcategory": "Select subcategory (optional)",
       "noResults": "No results found",
       "categoryRequired": "Category is required",
@@ -4545,7 +4585,8 @@
       },
       "errors": {
         "accountRequired": "Source account is required",
-        "amountRequired": "Amount is required"
+        "amountRequired": "Amount is required",
+        "amountExceedsRemaining": "Amount exceeds the remaining balance"
       },
       "tabs": {
         "general": "General Expense",
@@ -4637,7 +4678,12 @@
         "bank_transfer": "Bank Transfer",
         "cheque": "Cheque",
         "credit_card": "Credit Card",
-        "other": "Other"
+        "other": "Other",
+        "BANK_TRANSFER": "Bank transfer",
+        "CASH": "Cash",
+        "CHEQUE": "Cheque",
+        "CREDIT_CARD": "Credit card",
+        "OTHER": "Other"
       },
       "createSuccess": "Payment added successfully",
       "createError": "Failed to add payment",
@@ -5014,7 +5060,8 @@
       "expenses": "Actual Expenses",
       "remaining": "Remaining",
       "claimsPaid": "Claims Paid",
-      "payments": "Payments"
+      "payments": "Payments",
+      "title": "Financial summary"
     },
     "nav": {
       "summary": "Summary",
@@ -5763,13 +5810,16 @@
       "amount": "Amount",
       "dueDate": "Due Date",
       "paidDate": "Paid Date",
-      "status": {
+      "statuses": {
         "draft": "Draft",
         "submitted": "Submitted",
         "approved": "Approved",
         "paid": "Paid",
         "rejected": "Rejected"
-      }
+      },
+      "paidAmount": "Paid amount",
+      "period": "Period",
+      "status": "Status"
     },
     "chat": {
       "title": "Chat",
@@ -7310,7 +7360,8 @@
           "colRate": "Rate",
           "colTotal": "Total",
           "colSellingUnit": "Selling Unit",
-          "colSellingQty": "Qty Needed"
+          "colSellingQty": "Qty Needed",
+          "noItems": "No items to specify"
         },
         "bulk": {
           "title": "Set Specifications",
@@ -7750,7 +7801,17 @@
         "convertDescription": "A new project will be created from this lead's data and the status will be updated to 'Won'.",
         "projectName": "Project Name"
       }
-    }
+    },
+    "choosePlan": "Choose plan",
+    "contactSales": "Contact sales",
+    "getStarted": "Get started",
+    "month": "{count, plural, one {per month} other {per # months}}",
+    "monthly": "Monthly",
+    "perSeat": "per seat",
+    "recommended": "Recommended",
+    "trialPeriod": "{count}-day free trial",
+    "year": "{count, plural, one {per year} other {per # years}}",
+    "yearly": "Yearly"
   },
   "projectBoq": {
     "title": "Bill of Quantities",
@@ -8014,8 +8075,35 @@
     "finishing": "Finishing",
     "mep": "MEP",
     "labor": "Labor",
-    "materials": "Materials",
-    "summary": "Quantities Summary",
+    "materials": {
+      "title": "Materials",
+      "empty": "No materials",
+      "groupBy": {
+        "category": "By category",
+        "phase": "By phase",
+        "study": "By study"
+      },
+      "summary": {
+        "grandTotal": "Grand total",
+        "itemCount": "Item count"
+      },
+      "table": {
+        "description": "Description",
+        "quantity": "Quantity",
+        "section": "Section",
+        "totalCost": "Total cost",
+        "unit": "Unit",
+        "unitPrice": "Unit price"
+      }
+    },
+    "summary": {
+      "title": "Quantities Summary",
+      "finishing": "Finishing",
+      "grandTotal": "Grand total",
+      "labor": "Labor",
+      "mep": "MEP",
+      "structural": "Structural"
+    },
     "totalStructural": "Total Structural",
     "totalFinishing": "Total Finishing",
     "totalMEP": "Total MEP",
@@ -8039,7 +8127,8 @@
       "openStudy": "Open Study",
       "assignToPhase": "Assign to Phase",
       "removeFromPhase": "Remove from Phase",
-      "recalculate": "Recalculate"
+      "recalculate": "Recalculate",
+      "linkExisting": "Link existing study"
     },
     "linkDialog": {
       "title": "Link Cost Study to Project",
@@ -8048,7 +8137,20 @@
       "noStudiesDesc": "All studies are linked to other projects. You can create a new one.",
       "link": "Link",
       "floors": "Floors",
-      "area": "Area"
+      "area": "Area",
+      "buildingArea": "Building area",
+      "emptyState": {
+        "description": "No studies available to link to this project",
+        "title": "No studies"
+      },
+      "items": "items",
+      "linkButton": "Link study",
+      "searchPlaceholder": "Search studies...",
+      "sqm": "m²",
+      "toast": {
+        "linkError": "Failed to link study",
+        "studyLinked": "Study linked successfully"
+      }
     },
     "createDialog": {
       "title": "Create New Cost Study",
@@ -8062,7 +8164,35 @@
       "vatPercent": "VAT (%)",
       "create": "Create Study",
       "projectType": "Project Type",
-      "finishingLevel": "Finishing Level"
+      "finishingLevel": "Finishing Level",
+      "areaSqm": "Area (m²)",
+      "buildingArea": "Building area",
+      "finishingLevelPlaceholder": "Select finishing level",
+      "landArea": "Land area",
+      "numberOfFloors": "Number of floors",
+      "projectTypePlaceholder": "Select project type",
+      "submit": "Create study",
+      "toast": {
+        "createError": "Failed to create study",
+        "studyCreated": "Study created successfully"
+      },
+      "vatIncluded": "VAT included",
+      "projectTypes": {
+        "residential": "Residential",
+        "commercial": "Commercial",
+        "industrial": "Industrial",
+        "educational": "Educational",
+        "medical": "Medical",
+        "governmental": "Governmental",
+        "infrastructure": "Infrastructure",
+        "other": "Other"
+      },
+      "finishingLevels": {
+        "standard": "Standard",
+        "premium": "Premium",
+        "luxury": "Luxury",
+        "shell_core": "Shell & Core"
+      }
     },
     "table": {
       "study": "Study",
@@ -8086,7 +8216,10 @@
       "section": "Section",
       "itemCount": "Items",
       "subtotal": "Subtotal",
-      "name": "Name"
+      "name": "Name",
+      "grandTotal": "Grand total",
+      "subCategory": "Sub-category",
+      "totalCost": "Total cost"
     },
     "studyCard": {
       "items": "items",
@@ -8099,11 +8232,30 @@
       "studyCreated": "Study created successfully",
       "phaseAssigned": "Item assigned to phase",
       "phaseRemoved": "Item removed from phase",
-      "bulkAssigned": "{count} items assigned to phase"
+      "bulkAssigned": "{count} items assigned to phase",
+      "phaseAssignError": "Failed to assign item to phase"
     },
     "noItems": "No items",
     "noItemsDescription": "No items in this section from the studies linked to the project",
-    "totalItems": "Total Items"
+    "totalItems": "Total Items",
+    "empty": {
+      "description": "No quantity items yet. Link an existing study or create a new one.",
+      "noFinishingItems": "No finishing items",
+      "noLaborItems": "No labor items",
+      "noMEPItems": "No MEP items",
+      "noStructuralItems": "No structural items",
+      "title": "No quantities yet"
+    },
+    "studies": {
+      "actions": {
+        "open": "Open",
+        "unlink": "Unlink"
+      },
+      "itemCount": "Item count",
+      "name": "Study name",
+      "title": "Linked studies",
+      "total": "Total"
+    }
   },
   "projects": {
     "title": "Projects",
@@ -10169,9 +10321,83 @@
     "acceptedFormats": "PDF, JPG, PNG (max 10 MB)"
   },
   "zatca": {
-    "title": "ZATCA Compliant",
-    "description": "E-invoicing compliant with ZATCA Phase 1.",
-    "badge": "✓ ZATCA Phase 1"
+    "title": "E-Invoicing",
+    "subtitle": "Manage integration with ZATCA (Zakat, Tax and Customs Authority)",
+    "phase1": {
+      "title": "Phase 1 — QR Code Only",
+      "description": "Your invoices include a standard QR code without direct ZATCA integration",
+      "active": "Active"
+    },
+    "phase2": {
+      "title": "Phase 2 — Direct ZATCA Integration",
+      "description": "Your invoices are automatically sent to ZATCA for clearance or reporting",
+      "active": "Active",
+      "activate": "Activate Direct Integration"
+    },
+    "onboarding": {
+      "title": "Activate ZATCA Integration",
+      "step1Title": "Log into Fatoora Portal",
+      "step1Description": "Sign in to the Fatoora portal with your tax account using the link below",
+      "step2Title": "Register a New Device",
+      "step2Description": "Click \"Register new device\" and copy the OTP code",
+      "step3Title": "Enter OTP Code",
+      "step3Description": "Paste the OTP code here and we'll handle the rest",
+      "otpLabel": "OTP Code",
+      "otpPlaceholder": "Enter OTP from Fatoora portal",
+      "otpHelp": "The code is valid for one hour only",
+      "invoiceTypeLabel": "Invoice Type",
+      "invoiceTypeStandard": "Tax Invoices (B2B)",
+      "invoiceTypeSimplified": "Simplified Invoices (B2C)",
+      "activateButton": "Activate Integration",
+      "activating": "Activating...",
+      "success": "ZATCA integration activated successfully",
+      "error": "Activation failed",
+      "fatooraLink": "Open Fatoora Portal",
+      "noTaxNumber": "Please add your tax number in company settings first"
+    },
+    "status": {
+      "DISABLED": "Disabled",
+      "ONBOARDING": "Onboarding",
+      "COMPLIANCE": "Testing",
+      "ACTIVE": "Active",
+      "EXPIRED": "Expired",
+      "REVOKED": "Revoked"
+    },
+    "submission": {
+      "NOT_APPLICABLE": "—",
+      "PENDING": "Pending",
+      "SUBMITTED": "Submitted",
+      "CLEARED": "Cleared by ZATCA",
+      "REPORTED": "Reported to ZATCA",
+      "REJECTED": "Rejected",
+      "FAILED": "Failed",
+      "retry": "Retry",
+      "title": "E-Invoicing",
+      "sentAt": "Sent at",
+      "clearedAt": "Cleared at"
+    },
+    "device": {
+      "title": "Registered Devices",
+      "name": "Device Name",
+      "type": "Invoice Type",
+      "standard": "Standard",
+      "simplified": "Simplified",
+      "counter": "Invoice Count",
+      "expiresAt": "Certificate Expires",
+      "revoke": "Revoke",
+      "revokeConfirm": "Are you sure you want to revoke this device? Invoices will no longer be sent to ZATCA.",
+      "noDevices": "No registered devices"
+    },
+    "stats": {
+      "title": "E-Invoicing Statistics",
+      "total": "Total Sent",
+      "cleared": "Cleared",
+      "reported": "Reported",
+      "rejected": "Rejected",
+      "pending": "Pending"
+    },
+    "badge": "E-invoicing",
+    "description": "Invoice compliant with ZATCA requirements"
   },
   "zod": {
     "errors": {
@@ -10303,7 +10529,10 @@
     "period": "Period",
     "notes": "Notes",
     "notesPlaceholder": "Add optional notes...",
-    "empty": "No claims yet",
+    "empty": {
+      "title": "No claims yet",
+      "description": "Create your first claim for this contract"
+    },
     "grossAmount": "Gross Amount",
     "retentionDeduction": "Retention Deduction",
     "advanceDeduction": "Advance Deduction",
@@ -10435,7 +10664,14 @@
     "notFound": "Claim not found",
     "claimHeader": "Claim #{claimNo}",
     "createdBy": "Created by",
-    "claimTitlePlaceholder": "Third floor concrete claim"
+    "claimTitlePlaceholder": "Third floor concrete claim",
+    "claimNo": "Claim No.",
+    "status": "Status",
+    "summary": {
+      "totalClaimed": "Total Claimed",
+      "totalOutstanding": "Outstanding",
+      "totalPaid": "Paid"
+    }
   },
   "subcontractItems": {
     "title": "Contract Items",
@@ -10487,81 +10723,13 @@
       "deleteError": "Failed to delete item"
     }
   },
-  "zatca": {
-    "title": "E-Invoicing",
-    "subtitle": "Manage integration with ZATCA (Zakat, Tax and Customs Authority)",
-    "phase1": {
-      "title": "Phase 1 — QR Code Only",
-      "description": "Your invoices include a standard QR code without direct ZATCA integration",
-      "active": "Active"
-    },
-    "phase2": {
-      "title": "Phase 2 — Direct ZATCA Integration",
-      "description": "Your invoices are automatically sent to ZATCA for clearance or reporting",
-      "active": "Active",
-      "activate": "Activate Direct Integration"
-    },
-    "onboarding": {
-      "title": "Activate ZATCA Integration",
-      "step1Title": "Log into Fatoora Portal",
-      "step1Description": "Sign in to the Fatoora portal with your tax account using the link below",
-      "step2Title": "Register a New Device",
-      "step2Description": "Click \"Register new device\" and copy the OTP code",
-      "step3Title": "Enter OTP Code",
-      "step3Description": "Paste the OTP code here and we'll handle the rest",
-      "otpLabel": "OTP Code",
-      "otpPlaceholder": "Enter OTP from Fatoora portal",
-      "otpHelp": "The code is valid for one hour only",
-      "invoiceTypeLabel": "Invoice Type",
-      "invoiceTypeStandard": "Tax Invoices (B2B)",
-      "invoiceTypeSimplified": "Simplified Invoices (B2C)",
-      "activateButton": "Activate Integration",
-      "activating": "Activating...",
-      "success": "ZATCA integration activated successfully",
-      "error": "Activation failed",
-      "fatooraLink": "Open Fatoora Portal",
-      "noTaxNumber": "Please add your tax number in company settings first"
-    },
-    "status": {
-      "DISABLED": "Disabled",
-      "ONBOARDING": "Onboarding",
-      "COMPLIANCE": "Testing",
-      "ACTIVE": "Active",
-      "EXPIRED": "Expired",
-      "REVOKED": "Revoked"
-    },
-    "submission": {
-      "NOT_APPLICABLE": "—",
-      "PENDING": "Pending",
-      "SUBMITTED": "Submitted",
-      "CLEARED": "Cleared by ZATCA",
-      "REPORTED": "Reported to ZATCA",
-      "REJECTED": "Rejected",
-      "FAILED": "Failed",
-      "retry": "Retry",
-      "title": "E-Invoicing",
-      "sentAt": "Sent at",
-      "clearedAt": "Cleared at"
-    },
-    "device": {
-      "title": "Registered Devices",
-      "name": "Device Name",
-      "type": "Invoice Type",
-      "standard": "Standard",
-      "simplified": "Simplified",
-      "counter": "Invoice Count",
-      "expiresAt": "Certificate Expires",
-      "revoke": "Revoke",
-      "revokeConfirm": "Are you sure you want to revoke this device? Invoices will no longer be sent to ZATCA.",
-      "noDevices": "No registered devices"
-    },
-    "stats": {
-      "title": "E-Invoicing Statistics",
-      "total": "Total Sent",
-      "cleared": "Cleared",
-      "reported": "Reported",
-      "rejected": "Rejected",
-      "pending": "Pending"
+  "structural": {
+    "flatSlab": {
+      "actualCalculation": "Actual calculation",
+      "dropPanelRecommendation": "Drop panels at columns are recommended to reduce stresses",
+      "estimatedCalculation": "Estimated calculation",
+      "minThicknessWarning": "Entered thickness ({entered} cm) is below SBC 304 recommended minimum ({recommended} cm)",
+      "noTopMeshWarning": "Top mesh recommended to resist negative moments at columns"
     }
   }
 }

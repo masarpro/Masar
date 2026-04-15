@@ -23,7 +23,7 @@ const MaterialsListView = dynamic(
 
 export async function generateMetadata() {
 	const t = await getTranslations();
-	return { title: t("projectQuantities.materials") };
+	return { title: t("projectQuantities.materials.title") };
 }
 
 export default async function MaterialsPage({

@@ -128,7 +128,7 @@ export const SubcontractClaimsSection = React.memo(function SubcontractClaimsSec
 					</div>
 				) : !claims || claims.length === 0 ? (
 					<p className="py-6 text-center text-sm text-slate-500">
-						{t("claims.empty")}
+						{t("claims.empty.title")}
 					</p>
 				) : (
 					<div className="space-y-2">

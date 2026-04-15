@@ -884,7 +884,14 @@
       "message": "نستخدم ملفات تعريف الارتباط لتحسين تجربتك. يمكنك قبولها أو رفضها.",
       "allow": "قبول",
       "decline": "رفض"
-    }
+    },
+    "createdBy": "بواسطة",
+    "deleted": "محذوف",
+    "none": "لا يوجد",
+    "notFound": "غير موجود",
+    "print": "طباعة",
+    "saved": "تم الحفظ",
+    "total": "الإجمالي"
   },
   "company": {
     "title": "إدارة المنشأة",
@@ -1069,6 +1076,12 @@
           "linkedUserId": "حساب المستخدم المرتبط",
           "notes": "الملاحظات"
         }
+      },
+      "terminate": "إنهاء الخدمة",
+      "validation": {
+        "invalidEmail": "البريد الإلكتروني غير صالح",
+        "joinDateRequired": "تاريخ الالتحاق مطلوب",
+        "nameRequired": "اسم الموظف مطلوب"
       }
     },
     "expenses": {
@@ -1151,6 +1164,13 @@
         "SEMI_ANNUAL": "نصف سنوي",
         "ANNUAL": "سنوي",
         "ONE_TIME": "مرة واحدة"
+      },
+      "deactivate": "إيقاف المصروف",
+      "deleteItem": "حذف المصروف",
+      "validation": {
+        "amountPositive": "المبلغ يجب أن يكون أكبر من صفر",
+        "nameRequired": "اسم المصروف مطلوب",
+        "startDateRequired": "تاريخ البداية مطلوب"
       }
     },
     "payroll": {
@@ -1216,7 +1236,8 @@
       "updateItemSuccess": "تم تحديث بيانات الراتب بنجاح",
       "updateItemError": "فشل تحديث بيانات الراتب",
       "deleteItemSuccess": "تم حذف الموظف من الدورة",
-      "deleteItemError": "فشل حذف الموظف"
+      "deleteItemError": "فشل حذف الموظف",
+      "viewDetails": "عرض التفاصيل"
     },
     "expenseRuns": {
       "title": "ترحيل المصروفات للمالية",
@@ -1338,7 +1359,8 @@
         "IN_USE": "قيد الاستخدام",
         "MAINTENANCE": "صيانة",
         "RETIRED": "مستبعد"
-      }
+      },
+      "nameRequired": "اسم الأصل مطلوب"
     },
     "leaves": {
       "title": "إدارة الإجازات",
@@ -3495,7 +3517,24 @@
       "export": "تصدير",
       "exportPdf": "تصدير PDF",
       "exportExcel": "تصدير Excel",
-      "noData": "لا توجد بيانات"
+      "noData": "لا توجد بيانات",
+      "client": "العميل",
+      "conversionRate": "نسبة التحويل",
+      "invoiceCount": "عدد الفواتير",
+      "invoiceStats": "إحصائيات الفواتير",
+      "monthlyRevenue": "الإيرادات الشهرية",
+      "noProject": "بدون مشروع",
+      "paidAmount": "المبلغ المدفوع",
+      "project": "المشروع",
+      "projectRevenue": "إيرادات المشاريع",
+      "quotationStats": "إحصائيات عروض الأسعار",
+      "statusStats": "إحصائيات الحالات",
+      "topClients": "أعلى العملاء",
+      "totalInvoiced": "إجمالي المفوتر",
+      "totalInvoices": "إجمالي الفواتير",
+      "totalQuotations": "إجمالي عروض الأسعار",
+      "totalRevenue": "إجمالي الإيرادات",
+      "unknown": "غير معروف"
     },
     "accounting": {
       "chartOfAccounts": "دليل الحسابات",
@@ -4091,7 +4130,9 @@
         "totalCount": "عدد المساهمات"
       },
       "created": "تم تسجيل المساهمة بنجاح",
-      "cancelled": "تم إلغاء المساهمة"
+      "cancelled": "تم إلغاء المساهمة",
+      "bankAccount": "الحساب البنكي",
+      "basicInfo": "المعلومات الأساسية"
     },
     "partners": {
       "title": "الشركاء",
@@ -4464,7 +4505,6 @@
       "subcategory": "الفئة الفرعية",
       "searchCategory": "ابحث عن فئة...",
       "searchSubcategory": "ابحث عن فئة فرعية...",
-      "selectCategory": "اختر الفئة",
       "selectSubcategory": "اختر الفئة الفرعية (اختياري)",
       "noResults": "لا توجد نتائج",
       "categoryRequired": "يجب اختيار الفئة",
@@ -4567,7 +4607,8 @@
       },
       "errors": {
         "accountRequired": "الحساب المصدر مطلوب",
-        "amountRequired": "المبلغ مطلوب"
+        "amountRequired": "المبلغ مطلوب",
+        "amountExceedsRemaining": "المبلغ يتجاوز المتبقي للسداد"
       },
       "tabs": {
         "general": "مصروف عام",
@@ -4659,7 +4700,12 @@
         "bank_transfer": "تحويل بنكي",
         "cheque": "شيك",
         "credit_card": "بطاقة ائتمان",
-        "other": "أخرى"
+        "other": "أخرى",
+        "BANK_TRANSFER": "تحويل بنكي",
+        "CASH": "نقدي",
+        "CHEQUE": "شيك",
+        "CREDIT_CARD": "بطاقة ائتمان",
+        "OTHER": "أخرى"
       },
       "createSuccess": "تم إضافة المقبوض بنجاح",
       "createError": "فشل إضافة المقبوض",
@@ -5036,7 +5082,8 @@
       "expenses": "المصروفات الفعلية",
       "remaining": "المتبقي",
       "claimsPaid": "المستخلصات المدفوعة",
-      "payments": "الدفعات"
+      "payments": "الدفعات",
+      "title": "الملخص المالي"
     },
     "nav": {
       "summary": "الملخص",
@@ -5763,13 +5810,16 @@
       "amount": "المبلغ",
       "dueDate": "تاريخ الاستحقاق",
       "paidDate": "تاريخ الدفع",
-      "status": {
+      "statuses": {
         "draft": "مسودة",
         "submitted": "مقدم",
         "approved": "معتمد",
         "paid": "مدفوع",
         "rejected": "مرفوض"
-      }
+      },
+      "paidAmount": "المبلغ المدفوع",
+      "period": "الفترة",
+      "status": "الحالة"
     },
     "chat": {
       "title": "المحادثة",
@@ -7310,7 +7360,8 @@
           "colRate": "المعدل",
           "colTotal": "الإجمالي",
           "colSellingUnit": "وحدة البيع",
-          "colSellingQty": "العدد المطلوب"
+          "colSellingQty": "العدد المطلوب",
+          "noItems": "لا توجد بنود لتحديد مواصفاتها"
         },
         "bulk": {
           "title": "تحديد المواصفات",
@@ -7750,7 +7801,17 @@
         "convertDescription": "سيتم إنشاء مشروع جديد من بيانات هذا العميل المحتمل وتحديث حالته إلى 'تم التعاقد'.",
         "projectName": "اسم المشروع"
       }
-    }
+    },
+    "choosePlan": "اختر الخطة",
+    "contactSales": "تواصل مع المبيعات",
+    "getStarted": "ابدأ الآن",
+    "month": "{count, plural, one {شهرياً} other {كل # أشهر}}",
+    "monthly": "شهري",
+    "perSeat": "لكل مستخدم",
+    "recommended": "موصى به",
+    "trialPeriod": "{count} يوم تجربة مجانية",
+    "year": "{count, plural, one {سنوياً} other {كل # سنوات}}",
+    "yearly": "سنوي"
   },
   "projectBoq": {
     "title": "جدول الكميات",
@@ -8014,8 +8075,35 @@
     "finishing": "تشطيبات",
     "mep": "ميكانيك وكهرباء وسباكة",
     "labor": "عمالة",
-    "materials": "المواد",
-    "summary": "ملخص الكميات",
+    "materials": {
+      "title": "المواد",
+      "empty": "لا توجد مواد",
+      "groupBy": {
+        "category": "حسب الفئة",
+        "phase": "حسب المرحلة",
+        "study": "حسب الدراسة"
+      },
+      "summary": {
+        "grandTotal": "الإجمالي الكلي",
+        "itemCount": "عدد البنود"
+      },
+      "table": {
+        "description": "الوصف",
+        "quantity": "الكمية",
+        "section": "القسم",
+        "totalCost": "إجمالي التكلفة",
+        "unit": "الوحدة",
+        "unitPrice": "سعر الوحدة"
+      }
+    },
+    "summary": {
+      "title": "ملخص الكميات",
+      "finishing": "التشطيبات",
+      "grandTotal": "الإجمالي الكلي",
+      "labor": "العمالة",
+      "mep": "الكهروميكانيكية",
+      "structural": "الإنشائية"
+    },
     "totalStructural": "إجمالي الإنشائي",
     "totalFinishing": "إجمالي التشطيبات",
     "totalMEP": "إجمالي MEP",
@@ -8039,7 +8127,8 @@
       "openStudy": "فتح الدراسة",
       "assignToPhase": "تعيين لمرحلة",
       "removeFromPhase": "إزالة من المرحلة",
-      "recalculate": "إعادة الحساب"
+      "recalculate": "إعادة الحساب",
+      "linkExisting": "ربط بدراسة موجودة"
     },
     "linkDialog": {
       "title": "ربط دراسة كميات بالمشروع",
@@ -8048,7 +8137,20 @@
       "noStudiesDesc": "جميع الدراسات مرتبطة بمشاريع أخرى. يمكنك إنشاء دراسة جديدة.",
       "link": "ربط",
       "floors": "أدوار",
-      "area": "المساحة"
+      "area": "المساحة",
+      "buildingArea": "مساحة البناء",
+      "emptyState": {
+        "description": "لا توجد دراسات متاحة للربط بهذا المشروع",
+        "title": "لا توجد دراسات"
+      },
+      "items": "بنود",
+      "linkButton": "ربط الدراسة",
+      "searchPlaceholder": "ابحث في الدراسات...",
+      "sqm": "م²",
+      "toast": {
+        "linkError": "تعذّر ربط الدراسة",
+        "studyLinked": "تم ربط الدراسة بنجاح"
+      }
     },
     "createDialog": {
       "title": "إنشاء دراسة كميات جديدة",
@@ -8062,7 +8164,35 @@
       "vatPercent": "نسبة ضريبة القيمة المضافة (%)",
       "create": "إنشاء الدراسة",
       "projectType": "نوع المشروع",
-      "finishingLevel": "مستوى التشطيب"
+      "finishingLevel": "مستوى التشطيب",
+      "areaSqm": "المساحة (م²)",
+      "buildingArea": "مساحة البناء",
+      "finishingLevelPlaceholder": "اختر مستوى التشطيب",
+      "landArea": "مساحة الأرض",
+      "numberOfFloors": "عدد الأدوار",
+      "projectTypePlaceholder": "اختر نوع المشروع",
+      "submit": "إنشاء الدراسة",
+      "toast": {
+        "createError": "تعذّر إنشاء الدراسة",
+        "studyCreated": "تم إنشاء الدراسة بنجاح"
+      },
+      "vatIncluded": "يشمل ضريبة القيمة المضافة",
+      "projectTypes": {
+        "residential": "سكني",
+        "commercial": "تجاري",
+        "industrial": "صناعي",
+        "educational": "تعليمي",
+        "medical": "طبي",
+        "governmental": "حكومي",
+        "infrastructure": "بنية تحتية",
+        "other": "أخرى"
+      },
+      "finishingLevels": {
+        "standard": "عادي",
+        "premium": "ممتاز",
+        "luxury": "فاخر",
+        "shell_core": "هيكل بدون تشطيب (Shell & Core)"
+      }
     },
     "table": {
       "study": "الدراسة",
@@ -8086,7 +8216,10 @@
       "section": "القسم",
       "itemCount": "عدد البنود",
       "subtotal": "المجموع الفرعي",
-      "name": "الاسم"
+      "name": "الاسم",
+      "grandTotal": "الإجمالي الكلي",
+      "subCategory": "الفئة الفرعية",
+      "totalCost": "إجمالي التكلفة"
     },
     "studyCard": {
       "items": "بند",
@@ -8099,11 +8232,30 @@
       "studyCreated": "تم إنشاء الدراسة بنجاح",
       "phaseAssigned": "تم تعيين البند للمرحلة",
       "phaseRemoved": "تم إزالة البند من المرحلة",
-      "bulkAssigned": "تم تعيين {count} بند للمرحلة"
+      "bulkAssigned": "تم تعيين {count} بند للمرحلة",
+      "phaseAssignError": "تعذّر تعيين البند للمرحلة"
     },
     "noItems": "لا توجد بنود",
     "noItemsDescription": "لا توجد بنود في هذا القسم من الدراسات المرتبطة بالمشروع",
-    "totalItems": "إجمالي البنود"
+    "totalItems": "إجمالي البنود",
+    "empty": {
+      "description": "لا توجد بنود كميات بعد. ابدأ بربط دراسة أو إنشاء واحدة جديدة.",
+      "noFinishingItems": "لا توجد بنود تشطيبات",
+      "noLaborItems": "لا توجد بنود عمالة",
+      "noMEPItems": "لا توجد بنود كهروميكانيكية",
+      "noStructuralItems": "لا توجد بنود إنشائية",
+      "title": "لا توجد كميات"
+    },
+    "studies": {
+      "actions": {
+        "open": "فتح",
+        "unlink": "فك الربط"
+      },
+      "itemCount": "عدد البنود",
+      "name": "اسم الدراسة",
+      "title": "الدراسات المرتبطة",
+      "total": "الإجمالي"
+    }
   },
   "projects": {
     "title": "المشاريع",
@@ -10169,9 +10321,83 @@
     "acceptedFormats": "PDF, JPG, PNG (حد أقصى 10 MB)"
   },
   "zatca": {
-    "title": "متوافق مع هيئة الزكاة والضريبة",
-    "description": "فوترة إلكترونية متوافقة مع ZATCA المرحلة الأولى.",
-    "badge": "✓ ZATCA Phase 1"
+    "title": "الفوترة الإلكترونية",
+    "subtitle": "إدارة الربط مع هيئة الزكاة والضريبة والجمارك (زاتكا)",
+    "phase1": {
+      "title": "المرحلة 1 — باركود فقط",
+      "description": "فواتيرك تحتوي رمز QR نظامي بدون ربط مباشر مع زاتكا",
+      "active": "مفعّل"
+    },
+    "phase2": {
+      "title": "المرحلة 2 — ربط مباشر مع زاتكا",
+      "description": "فواتيرك تُرسل لزاتكا تلقائياً للاعتماد أو الإبلاغ",
+      "active": "مفعّل",
+      "activate": "تفعيل الربط المباشر"
+    },
+    "onboarding": {
+      "title": "تفعيل الربط مع زاتكا",
+      "step1Title": "الدخول لبوابة فاتورة",
+      "step1Description": "سجّل دخول في بوابة فاتورة بحسابك الضريبي من الرابط أدناه",
+      "step2Title": "تسجيل جهاز جديد",
+      "step2Description": "اضغط على \"تسجيل جهاز جديد\" وانسخ رمز OTP",
+      "step3Title": "إدخال رمز OTP",
+      "step3Description": "ألصق رمز OTP هنا وسنتكفل بالباقي",
+      "otpLabel": "رمز OTP",
+      "otpPlaceholder": "أدخل رمز OTP من بوابة فاتورة",
+      "otpHelp": "الرمز صالح لمدة ساعة واحدة فقط",
+      "invoiceTypeLabel": "نوع الفواتير",
+      "invoiceTypeStandard": "فواتير ضريبية (شركة لشركة)",
+      "invoiceTypeSimplified": "فواتير مبسّطة (شركة لأفراد)",
+      "activateButton": "تفعيل الربط",
+      "activating": "جاري التفعيل...",
+      "success": "تم تفعيل الربط مع زاتكا بنجاح",
+      "error": "فشل التفعيل",
+      "fatooraLink": "فتح بوابة فاتورة",
+      "noTaxNumber": "يجب إضافة الرقم الضريبي في إعدادات الشركة أولاً"
+    },
+    "status": {
+      "DISABLED": "غير مفعّل",
+      "ONBOARDING": "قيد التسجيل",
+      "COMPLIANCE": "وضع الاختبار",
+      "ACTIVE": "مفعّل",
+      "EXPIRED": "منتهي الصلاحية",
+      "REVOKED": "ملغى"
+    },
+    "submission": {
+      "NOT_APPLICABLE": "—",
+      "PENDING": "قيد الانتظار",
+      "SUBMITTED": "مُرسل",
+      "CLEARED": "معتمد من زاتكا",
+      "REPORTED": "مُبلّغ لزاتكا",
+      "REJECTED": "مرفوض",
+      "FAILED": "فشل الإرسال",
+      "retry": "إعادة المحاولة",
+      "title": "الفوترة الإلكترونية",
+      "sentAt": "تاريخ الإرسال",
+      "clearedAt": "تاريخ الاعتماد"
+    },
+    "device": {
+      "title": "الأجهزة المسجّلة",
+      "name": "اسم الجهاز",
+      "type": "نوع الفواتير",
+      "standard": "ضريبية",
+      "simplified": "مبسّطة",
+      "counter": "عدد الفواتير",
+      "expiresAt": "تنتهي الشهادة",
+      "revoke": "إلغاء الربط",
+      "revokeConfirm": "هل أنت متأكد من إلغاء ربط هذا الجهاز؟ لن تُرسل الفواتير لزاتكا بعد ذلك.",
+      "noDevices": "لا توجد أجهزة مسجّلة"
+    },
+    "stats": {
+      "title": "إحصائيات الفوترة الإلكترونية",
+      "total": "إجمالي المُرسل",
+      "cleared": "معتمدة",
+      "reported": "مُبلّغة",
+      "rejected": "مرفوضة",
+      "pending": "قيد الانتظار"
+    },
+    "badge": "فوترة إلكترونية",
+    "description": "فاتورة متوافقة مع متطلبات هيئة الزكاة والضريبة والجمارك"
   },
   "zod": {
     "errors": {
@@ -10303,7 +10529,10 @@
     "period": "الفترة",
     "notes": "ملاحظات",
     "notesPlaceholder": "أضف ملاحظات اختيارية...",
-    "empty": "لا توجد مستخلصات بعد",
+    "empty": {
+      "title": "لا توجد مستخلصات بعد",
+      "description": "ابدأ بإنشاء أول مستخلص لهذا العقد"
+    },
     "grossAmount": "إجمالي البنود",
     "retentionDeduction": "حسم الاحتفاظ",
     "advanceDeduction": "خصم الدفعة المقدمة",
@@ -10435,7 +10664,14 @@
     "notFound": "المستخلص غير موجود",
     "claimHeader": "مستخلص #{claimNo}",
     "createdBy": "المنشئ",
-    "claimTitlePlaceholder": "مستخلص خرسانة الدور الثالث"
+    "claimTitlePlaceholder": "مستخلص خرسانة الدور الثالث",
+    "claimNo": "رقم المستخلص",
+    "status": "الحالة",
+    "summary": {
+      "totalClaimed": "إجمالي المطالبات",
+      "totalOutstanding": "المتبقي",
+      "totalPaid": "المدفوع"
+    }
   },
   "subcontractItems": {
     "title": "بنود العقد",
@@ -10487,81 +10723,13 @@
       "deleteError": "فشل حذف البند"
     }
   },
-  "zatca": {
-    "title": "الفوترة الإلكترونية",
-    "subtitle": "إدارة الربط مع هيئة الزكاة والضريبة والجمارك (زاتكا)",
-    "phase1": {
-      "title": "المرحلة 1 — باركود فقط",
-      "description": "فواتيرك تحتوي رمز QR نظامي بدون ربط مباشر مع زاتكا",
-      "active": "مفعّل"
-    },
-    "phase2": {
-      "title": "المرحلة 2 — ربط مباشر مع زاتكا",
-      "description": "فواتيرك تُرسل لزاتكا تلقائياً للاعتماد أو الإبلاغ",
-      "active": "مفعّل",
-      "activate": "تفعيل الربط المباشر"
-    },
-    "onboarding": {
-      "title": "تفعيل الربط مع زاتكا",
-      "step1Title": "الدخول لبوابة فاتورة",
-      "step1Description": "سجّل دخول في بوابة فاتورة بحسابك الضريبي من الرابط أدناه",
-      "step2Title": "تسجيل جهاز جديد",
-      "step2Description": "اضغط على \"تسجيل جهاز جديد\" وانسخ رمز OTP",
-      "step3Title": "إدخال رمز OTP",
-      "step3Description": "ألصق رمز OTP هنا وسنتكفل بالباقي",
-      "otpLabel": "رمز OTP",
-      "otpPlaceholder": "أدخل رمز OTP من بوابة فاتورة",
-      "otpHelp": "الرمز صالح لمدة ساعة واحدة فقط",
-      "invoiceTypeLabel": "نوع الفواتير",
-      "invoiceTypeStandard": "فواتير ضريبية (شركة لشركة)",
-      "invoiceTypeSimplified": "فواتير مبسّطة (شركة لأفراد)",
-      "activateButton": "تفعيل الربط",
-      "activating": "جاري التفعيل...",
-      "success": "تم تفعيل الربط مع زاتكا بنجاح",
-      "error": "فشل التفعيل",
-      "fatooraLink": "فتح بوابة فاتورة",
-      "noTaxNumber": "يجب إضافة الرقم الضريبي في إعدادات الشركة أولاً"
-    },
-    "status": {
-      "DISABLED": "غير مفعّل",
-      "ONBOARDING": "قيد التسجيل",
-      "COMPLIANCE": "وضع الاختبار",
-      "ACTIVE": "مفعّل",
-      "EXPIRED": "منتهي الصلاحية",
-      "REVOKED": "ملغى"
-    },
-    "submission": {
-      "NOT_APPLICABLE": "—",
-      "PENDING": "قيد الانتظار",
-      "SUBMITTED": "مُرسل",
-      "CLEARED": "معتمد من زاتكا",
-      "REPORTED": "مُبلّغ لزاتكا",
-      "REJECTED": "مرفوض",
-      "FAILED": "فشل الإرسال",
-      "retry": "إعادة المحاولة",
-      "title": "الفوترة الإلكترونية",
-      "sentAt": "تاريخ الإرسال",
-      "clearedAt": "تاريخ الاعتماد"
-    },
-    "device": {
-      "title": "الأجهزة المسجّلة",
-      "name": "اسم الجهاز",
-      "type": "نوع الفواتير",
-      "standard": "ضريبية",
-      "simplified": "مبسّطة",
-      "counter": "عدد الفواتير",
-      "expiresAt": "تنتهي الشهادة",
-      "revoke": "إلغاء الربط",
-      "revokeConfirm": "هل أنت متأكد من إلغاء ربط هذا الجهاز؟ لن تُرسل الفواتير لزاتكا بعد ذلك.",
-      "noDevices": "لا توجد أجهزة مسجّلة"
-    },
-    "stats": {
-      "title": "إحصائيات الفوترة الإلكترونية",
-      "total": "إجمالي المُرسل",
-      "cleared": "معتمدة",
-      "reported": "مُبلّغة",
-      "rejected": "مرفوضة",
-      "pending": "قيد الانتظار"
+  "structural": {
+    "flatSlab": {
+      "actualCalculation": "الحساب الفعلي",
+      "dropPanelRecommendation": "يُنصح بإضافة لوحات سقوط (Drop Panels) عند الأعمدة لتقليل الإجهادات",
+      "estimatedCalculation": "الحساب التقديري",
+      "minThicknessWarning": "السماكة المدخلة ({entered} سم) أقل من الحد الأدنى الموصى به ({recommended} سم) وفق SBC 304",
+      "noTopMeshWarning": "يُنصح بإضافة شبكة حديد علوية لمقاومة العزوم السالبة عند الأعمدة"
     }
   }
 }
