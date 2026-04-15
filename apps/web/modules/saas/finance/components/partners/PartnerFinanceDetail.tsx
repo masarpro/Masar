@@ -67,7 +67,7 @@ export function PartnerFinanceDetail({
 
 	return (
 		<div className="space-y-6">
-			<div className="flex items-center justify-between gap-3">
+			<div className="flex flex-wrap items-center justify-between gap-2">
 				<Button
 					variant="ghost"
 					className="rounded-xl"
@@ -76,8 +76,8 @@ export function PartnerFinanceDetail({
 					<ArrowLeft className="me-2 h-4 w-4" />
 					{t("common.back")}
 				</Button>
-				<div className="flex items-center gap-2">
-					<Button asChild variant="outline" className="rounded-xl">
+				<div className="flex flex-wrap items-center gap-2">
+					<Button asChild variant="outline" size="sm" className="rounded-xl">
 						<Link
 							href={`/app/${organizationSlug}/finance/owner-drawings/new?ownerId=${partnerId}`}
 						>
@@ -85,7 +85,7 @@ export function PartnerFinanceDetail({
 							{t("finance.partners.actions.newDrawing")}
 						</Link>
 					</Button>
-					<Button asChild variant="outline" className="rounded-xl">
+					<Button asChild variant="outline" size="sm" className="rounded-xl">
 						<Link
 							href={`/app/${organizationSlug}/finance/capital-contributions/new?ownerId=${partnerId}`}
 						>
@@ -98,10 +98,10 @@ export function PartnerFinanceDetail({
 
 			{/* Owner info */}
 			<Card className="rounded-2xl">
-				<CardContent className="p-6">
-					<div className="flex items-center justify-between gap-4">
-						<div>
-							<h1 className="text-2xl font-semibold">{owner.name}</h1>
+				<CardContent className="p-4 sm:p-6">
+					<div className="flex flex-wrap items-center justify-between gap-4">
+						<div className="min-w-0">
+							<h1 className="text-xl sm:text-2xl font-semibold break-words">{owner.name}</h1>
 							{owner.nameEn && (
 								<p className="text-sm text-slate-500">{owner.nameEn}</p>
 							)}
@@ -126,8 +126,8 @@ export function PartnerFinanceDetail({
 
 			{/* Summary cards */}
 			<div
-				className={`grid grid-cols-1 gap-4 ${
-					canViewProfits ? "sm:grid-cols-4" : "sm:grid-cols-2"
+				className={`grid grid-cols-2 gap-3 sm:gap-4 ${
+					canViewProfits ? "lg:grid-cols-4" : "sm:grid-cols-2"
 				}`}
 			>
 				<SummaryCard
@@ -165,7 +165,8 @@ export function PartnerFinanceDetail({
 
 			{/* Tabs */}
 			<Tabs value={tab} onValueChange={setTab} className="w-full">
-				<TabsList className="rounded-xl">
+				<div className="-mx-2 overflow-x-auto px-2 sm:mx-0 sm:px-0">
+				<TabsList className="rounded-xl w-max min-w-full sm:w-auto sm:min-w-0">
 					<TabsTrigger value="drawings" className="rounded-lg">
 						{t("finance.partners.tabs.drawings")}
 					</TabsTrigger>
@@ -178,28 +179,30 @@ export function PartnerFinanceDetail({
 						</TabsTrigger>
 					)}
 				</TabsList>
+				</div>
 
 				<TabsContent value="drawings">
-					<Card className="rounded-2xl">
+					<Card className="rounded-2xl overflow-hidden">
 						<CardContent className="p-0">
 							{drawings.length === 0 ? (
 								<div className="p-8 text-center text-slate-500">
 									{t("finance.partners.detail.noDrawings")}
 								</div>
 							) : (
-								<Table>
+								<div className="overflow-x-auto">
+								<Table className="min-w-[800px]">
 									<TableHeader>
 										<TableRow>
-											<TableHead>
+											<TableHead className="whitespace-nowrap">
 												{t("finance.ownerDrawings.drawingNo")}
 											</TableHead>
-											<TableHead>{t("finance.ownerDrawings.date")}</TableHead>
-											<TableHead>{t("finance.ownerDrawings.bank")}</TableHead>
-											<TableHead>
+											<TableHead className="whitespace-nowrap">{t("finance.ownerDrawings.date")}</TableHead>
+											<TableHead className="whitespace-nowrap">{t("finance.ownerDrawings.bank")}</TableHead>
+											<TableHead className="whitespace-nowrap">
 												{t("finance.ownerDrawings.project")}
 											</TableHead>
-											<TableHead>{t("common.status")}</TableHead>
-											<TableHead className="text-end">
+											<TableHead className="whitespace-nowrap">{t("common.status")}</TableHead>
+											<TableHead className="text-end whitespace-nowrap">
 												{t("finance.ownerDrawings.amount")}
 											</TableHead>
 										</TableRow>
@@ -207,7 +210,7 @@ export function PartnerFinanceDetail({
 									<TableBody>
 										{drawings.map((d) => (
 											<TableRow key={d.id}>
-												<TableCell>
+												<TableCell className="whitespace-nowrap">
 													<Link
 														href={`/app/${organizationSlug}/finance/owner-drawings/${d.id}`}
 														className="font-mono hover:underline"
@@ -215,17 +218,17 @@ export function PartnerFinanceDetail({
 														{d.drawingNo}
 													</Link>
 												</TableCell>
-												<TableCell>
+												<TableCell className="whitespace-nowrap">
 													<div className="flex items-center gap-2 text-slate-600">
 														<Calendar className="h-4 w-4" />
 														{formatDate(new Date(d.date))}
 													</div>
 												</TableCell>
-												<TableCell>
+												<TableCell className="whitespace-nowrap">
 													{d.bankAccount?.name ?? "-"}
 												</TableCell>
-												<TableCell>{d.project?.name ?? "-"}</TableCell>
-												<TableCell>
+												<TableCell className="whitespace-nowrap">{d.project?.name ?? "-"}</TableCell>
+												<TableCell className="whitespace-nowrap">
 													<Badge
 														className={
 															d.status === "APPROVED"
@@ -238,42 +241,44 @@ export function PartnerFinanceDetail({
 														)}
 													</Badge>
 												</TableCell>
-												<TableCell className="text-end font-semibold text-red-600">
+												<TableCell className="text-end font-semibold text-red-600 whitespace-nowrap">
 													<Currency amount={d.amount} />
 												</TableCell>
 											</TableRow>
 										))}
 									</TableBody>
 								</Table>
+								</div>
 							)}
 						</CardContent>
 					</Card>
 				</TabsContent>
 
 				<TabsContent value="contributions">
-					<Card className="rounded-2xl">
+					<Card className="rounded-2xl overflow-hidden">
 						<CardContent className="p-0">
 							{contributions.length === 0 ? (
 								<div className="p-8 text-center text-slate-500">
 									{t("finance.partners.detail.noContributions")}
 								</div>
 							) : (
-								<Table>
+								<div className="overflow-x-auto">
+								<Table className="min-w-[700px]">
 									<TableHeader>
 										<TableRow>
-											<TableHead>
+											<TableHead className="whitespace-nowrap">
 												{t("finance.capitalContributions.contributionNo")}
 											</TableHead>
-											<TableHead>
+											<TableHead className="whitespace-nowrap">
 												{t("finance.capitalContributions.date")}
 											</TableHead>
-											<TableHead>
+											<TableHead className="whitespace-nowrap">
 												{t("finance.capitalContributions.type")}
 											</TableHead>
-											<TableHead>
+											<TableHead className="whitespace-nowrap">
 												{t("finance.capitalContributions.bank")}
 											</TableHead>
-											<TableHead className="text-end">
+											<TableHead className="text-end whitespace-nowrap">
 												{t("finance.capitalContributions.amount")}
 											</TableHead>
 										</TableRow>
@@ -281,16 +286,16 @@ export function PartnerFinanceDetail({
 									<TableBody>
 										{contributions.map((c) => (
 											<TableRow key={c.id}>
-												<TableCell className="font-mono">
+												<TableCell className="font-mono whitespace-nowrap">
 													{c.contributionNo}
 												</TableCell>
-												<TableCell>
+												<TableCell className="whitespace-nowrap">
 													<div className="flex items-center gap-2 text-slate-600">
 														<Calendar className="h-4 w-4" />
 														{formatDate(new Date(c.date))}
 													</div>
 												</TableCell>
-												<TableCell>
+												<TableCell className="whitespace-nowrap">
 													<Badge
 														variant="outline"
 														className="rounded-lg"
@@ -300,16 +305,17 @@ export function PartnerFinanceDetail({
 														)}
 													</Badge>
 												</TableCell>
-												<TableCell>
+												<TableCell className="whitespace-nowrap">
 													{c.bankAccount?.name ?? "-"}
 												</TableCell>
-												<TableCell className="text-end font-semibold text-emerald-600">
+												<TableCell className="text-end font-semibold text-emerald-600 whitespace-nowrap">
 													<Currency amount={c.amount} />
 												</TableCell>
 											</TableRow>
 										))}
 									</TableBody>
 								</Table>
+								</div>
 							)}
 						</CardContent>
 					</Card>
@@ -317,16 +323,17 @@ export function PartnerFinanceDetail({
 
 				{canViewProfits && summary.drawingsByProject && (
 					<TabsContent value="projects">
-						<Card className="rounded-2xl">
+						<Card className="rounded-2xl overflow-hidden">
 							<CardContent className="p-0">
-								<Table>
+								<div className="overflow-x-auto">
+								<Table className="min-w-[500px]">
 									<TableHeader>
 										<TableRow>
-											<TableHead>{t("common.project")}</TableHead>
-											<TableHead className="text-end">
+											<TableHead className="whitespace-nowrap">{t("common.project")}</TableHead>
+											<TableHead className="text-end whitespace-nowrap">
 												{t("finance.partners.detail.drawingsCount")}
 											</TableHead>
-											<TableHead className="text-end">
+											<TableHead className="text-end whitespace-nowrap">
 												{t("finance.ownerDrawings.amount")}
 											</TableHead>
 										</TableRow>
@@ -334,19 +341,20 @@ export function PartnerFinanceDetail({
 									<TableBody>
 										{summary.drawingsByProject.map((row: any) => (
 											<TableRow key={row.projectId ?? "company"}>
-												<TableCell className="font-medium">
+												<TableCell className="font-medium whitespace-nowrap">
 													{row.projectName}
 												</TableCell>
-												<TableCell className="text-end">
+												<TableCell className="text-end whitespace-nowrap">
 													{row.count}
 												</TableCell>
-												<TableCell className="text-end font-semibold text-red-600">
+												<TableCell className="text-end font-semibold text-red-600 whitespace-nowrap">
 													<Currency amount={row.total} />
 												</TableCell>
 											</TableRow>
 										))}
 									</TableBody>
 								</Table>
+								</div>
 							</CardContent>
 						</Card>
 					</TabsContent>
@@ -375,13 +383,13 @@ function SummaryCard({
 		<Card className="rounded-2xl">
 			<CardContent className="p-4">
 				<div className="flex items-center gap-3">
-					<div className={`p-2 ${bg} rounded-xl`}>{icon}</div>
-					<div>
-						<p className="text-sm text-slate-500 dark:text-slate-400">
+					<div className={`p-2 ${bg} rounded-xl shrink-0`}>{icon}</div>
+					<div className="min-w-0">
+						<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
 							{label}
 						</p>
 						<p
-							className={`text-xl font-semibold ${
+							className={`text-base sm:text-xl font-semibold tabular-nums break-words ${
 								emphasizeSign
 									? value >= 0
 										? "text-emerald-600"
