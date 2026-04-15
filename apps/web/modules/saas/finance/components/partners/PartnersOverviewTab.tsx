@@ -106,7 +106,7 @@ export function PartnersOverviewTab({
 									<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
 										{t("finance.partners.summary.totalProfit")}
 									</p>
-									<p className="text-xl font-semibold tabular-nums">
+									<p className="text-base sm:text-xl font-semibold tabular-nums break-words">
 										<Currency amount={totals.netProfit ?? 0} />
 									</p>
 								</div>
@@ -123,7 +123,7 @@ export function PartnersOverviewTab({
 									<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
 										{t("finance.partners.totalContributions")}
 									</p>
-									<p className="text-xl font-semibold tabular-nums">
+									<p className="text-base sm:text-xl font-semibold tabular-nums break-words">
 										<Currency amount={totals.totalContributions ?? 0} />
 									</p>
 								</div>
@@ -140,7 +140,7 @@ export function PartnersOverviewTab({
 									<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
 										{t("finance.partners.totalDrawings")}
 									</p>
-									<p className="text-xl font-semibold tabular-nums">
+									<p className="text-base sm:text-xl font-semibold tabular-nums break-words">
 										<Currency amount={totals.totalDrawings ?? 0} />
 									</p>
 								</div>
@@ -157,7 +157,7 @@ export function PartnersOverviewTab({
 									<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
 										{t("finance.partners.shareOfProfit")}
 									</p>
-									<p className="text-xl font-semibold tabular-nums">
+									<p className="text-base sm:text-xl font-semibold tabular-nums break-words">
 										<Currency amount={totals.totalShareOfProfit ?? 0} />
 									</p>
 								</div>
@@ -167,12 +167,12 @@ export function PartnersOverviewTab({
 				</div>
 			)}
 
-			<div className="flex items-center justify-between">
+			<div className="flex flex-wrap items-center justify-between gap-2">
 				<h2 className="text-lg font-semibold">
 					{t("finance.partners.title")}
 				</h2>
 				{showReportsButton && canViewReports && (
-					<Button asChild variant="outline" className="rounded-xl">
+					<Button asChild variant="outline" size="sm" className="rounded-xl">
 						<Link href={`${basePath}/reports`}>
 							<BarChart3 className="me-2 h-4 w-4" />
 							{t("finance.partners.actions.viewReports")}
@@ -181,28 +181,29 @@ export function PartnersOverviewTab({
 				)}
 			</div>
 
-			<Card className="rounded-2xl">
+			<Card className="rounded-2xl overflow-hidden">
 				<CardContent className="p-0">
-					<Table>
+					<div className="overflow-x-auto">
+					<Table className="min-w-[700px]">
 						<TableHeader>
 							<TableRow>
-								<TableHead>{t("finance.partners.partner")}</TableHead>
-								<TableHead>
+								<TableHead className="whitespace-nowrap">{t("finance.partners.partner")}</TableHead>
+								<TableHead className="whitespace-nowrap">
 									{t("finance.partners.ownershipPercent")}
 								</TableHead>
-								<TableHead className="text-end hidden md:table-cell">
+								<TableHead className="text-end whitespace-nowrap">
 									{t("finance.partners.totalContributions")}
 								</TableHead>
-								<TableHead className="text-end hidden md:table-cell">
+								<TableHead className="text-end whitespace-nowrap">
 									{t("finance.partners.totalDrawings")}
 								</TableHead>
 								{canViewProfits && (
-									<TableHead className="text-end hidden md:table-cell">
+									<TableHead className="text-end whitespace-nowrap">
 										{t("finance.partners.shareOfProfit")}
 									</TableHead>
 								)}
 								{canViewNetBalance && (
-									<TableHead className="text-end">
+									<TableHead className="text-end whitespace-nowrap">
 										{t("finance.partners.netBalance")}
 									</TableHead>
 								)}
@@ -216,8 +217,8 @@ export function PartnersOverviewTab({
 									className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
 									onClick={() => router.push(`${basePath}/${p.id}`)}
 								>
-									<TableCell className="font-medium">{p.name}</TableCell>
-									<TableCell>
+									<TableCell className="font-medium whitespace-nowrap">{p.name}</TableCell>
+									<TableCell className="whitespace-nowrap">
 										<Badge variant="outline" className="rounded-lg">
 											{new Intl.NumberFormat("en-US", {
 												maximumFractionDigits: 2,
@@ -225,20 +226,20 @@ export function PartnersOverviewTab({
 											%
 										</Badge>
 									</TableCell>
-									<TableCell className="text-end tabular-nums hidden md:table-cell">
+									<TableCell className="text-end tabular-nums whitespace-nowrap">
 										<Currency amount={p.totalContributions} />
 									</TableCell>
-									<TableCell className="text-end tabular-nums text-red-600 dark:text-red-400 hidden md:table-cell">
+									<TableCell className="text-end tabular-nums text-red-600 dark:text-red-400 whitespace-nowrap">
 										<Currency amount={p.totalDrawings} />
 									</TableCell>
 									{canViewProfits && (
-										<TableCell className="text-end tabular-nums hidden md:table-cell">
+										<TableCell className="text-end tabular-nums whitespace-nowrap">
 											<Currency amount={p.shareOfProfit ?? 0} />
 										</TableCell>
 									)}
 									{canViewNetBalance && (
 										<TableCell
-											className={`text-end tabular-nums font-semibold ${
+											className={`text-end tabular-nums font-semibold whitespace-nowrap ${
 												(p.netBalance ?? 0) >= 0
 													? "text-emerald-600 dark:text-emerald-400"
 													: "text-red-600 dark:text-red-400"
@@ -264,6 +265,7 @@ export function PartnersOverviewTab({
 							))}
 						</TableBody>
 					</Table>
+					</div>
 				</CardContent>
 			</Card>
 		</div>
