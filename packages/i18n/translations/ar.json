@@ -4027,6 +4027,32 @@
         "cancelledReason": "سبب الإلغاء",
         "createdBy": "أُنشئ بواسطة",
         "createdAt": "تاريخ الإنشاء"
+      },
+      "drawingVoucher": "سند سحب المالك",
+      "basicInfo": "البيانات الأساسية",
+      "drawingDetails": "تفاصيل السحب",
+      "linkedInfo": "المعلومات المرتبطة",
+      "overdrawInfo": "معلومات التجاوز",
+      "overdrawAcknowledged": "تم الإقرار بتجاوز الرصيد المتاح",
+      "ownershipPercent": "نسبة الملكية",
+      "bankAccount": "الحساب البنكي",
+      "currentBalance": "الرصيد الحالي",
+      "afterDrawing": "الرصيد بعد السحب",
+      "insufficientBankBalance": "رصيد البنك غير كافٍ",
+      "requestedAmount": "المبلغ المطلوب",
+      "approvedAt": "تاريخ الاعتماد",
+      "approvedBy": "اعتُمد بواسطة",
+      "createdBy": "أُنشئ بواسطة",
+      "cancelledAt": "تاريخ الإلغاء",
+      "actions": {
+        "cancel": "إلغاء السحب",
+        "print": "طباعة"
+      },
+      "cancelDialog": {
+        "title": "إلغاء السحب",
+        "description": "هل أنت متأكد من إلغاء هذا السحب؟ سيتم عكس القيد المحاسبي وإعادة المبلغ إلى رصيد البنك.",
+        "reasonPlaceholder": "أدخل سبب الإلغاء (اختياري)...",
+        "confirm": "تأكيد الإلغاء"
       }
     },
     "capitalContributions": {

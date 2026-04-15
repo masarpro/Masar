@@ -4005,6 +4005,32 @@
         "cancelledReason": "Cancellation Reason",
         "createdBy": "Created By",
         "createdAt": "Creation Date"
+      },
+      "drawingVoucher": "Owner Drawing Voucher",
+      "basicInfo": "Basic Information",
+      "drawingDetails": "Drawing Details",
+      "linkedInfo": "Linked Information",
+      "overdrawInfo": "Overdraw Information",
+      "overdrawAcknowledged": "Overdraw acknowledged",
+      "ownershipPercent": "Ownership Percentage",
+      "bankAccount": "Bank Account",
+      "currentBalance": "Current Balance",
+      "afterDrawing": "Balance After Drawing",
+      "insufficientBankBalance": "Insufficient Bank Balance",
+      "requestedAmount": "Requested Amount",
+      "approvedAt": "Approval Date",
+      "approvedBy": "Approved By",
+      "createdBy": "Created By",
+      "cancelledAt": "Cancellation Date",
+      "actions": {
+        "cancel": "Cancel Drawing",
+        "print": "Print"
+      },
+      "cancelDialog": {
+        "title": "Cancel Drawing",
+        "description": "Are you sure you want to cancel this drawing? The journal entry will be reversed and the amount will be returned to the bank balance.",
+        "reasonPlaceholder": "Enter cancellation reason (optional)...",
+        "confirm": "Confirm Cancellation"
       }
     },
     "capitalContributions": {
