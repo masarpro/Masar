@@ -121,9 +121,9 @@ export async function POST(req: NextRequest) {
 		const pdfBuffer = await page.pdf({
 			format: "A4",
 			margin: {
-				top: "110mm",
+				top: "0",
 				right: "0",
-				bottom: "25mm",
+				bottom: "0",
 				left: "0",
 			},
 			printBackground: true,

@@ -574,7 +574,7 @@ input[cmdk-input] {
 @media print {
 	@page {
 		size: A4 portrait;
-		margin: 110mm 0 25mm 0;
+		margin: 0;
 	}
 
 	/* Hide everything visually, then selectively reveal print areas */
@@ -628,6 +628,32 @@ input[cmdk-input] {
 		left: 0 !important;
 		right: 0 !important;
 		width: 210mm !important;
+	}
+
+	/* Reserve space in body flow so content doesn't overlap fixed header/footer.
+	   Fixed header/footer paint at physical page edges (since @page margin: 0),
+	   and the padding here pushes body content into the visible middle area. */
+	body[data-printing="true"] [data-pdf-body] {
+		padding-top: 110mm !important;
+		padding-bottom: 25mm !important;
+	}
+
+	/* Prevent items/rows from being cut between pages */
+	body[data-printing="true"] tr,
+	body[data-printing="true"] [data-pdf-body] > * {
+		page-break-inside: avoid !important;
+		break-inside: avoid !important;
+	}
+
+	/* Override V2's Card constraints that break PDF pagination.
+	   Non-V2 paths use Tailwind print: modifiers — these overrides ensure
+	   V2 behaves the same way during printing. */
+	body[data-printing="true"] #quotation-print-area,
+	body[data-printing="true"] #invoice-print-area {
+		position: relative !important;
+		min-height: 0 !important;
+		max-height: none !important;
+		overflow: visible !important;
 	}
 
 	/* Table-based header/footer repetition */

@@ -42,3 +42,15 @@ export async function exportToPDF(
 export function printDocument(): void {
 	window.print();
 }
+
+// Mirror Puppeteer's data-printing="true" setup for browser Ctrl+P printing.
+// Without this, position: fixed rules for [data-pdf-header] and [data-pdf-footer]
+// don't activate during native browser print, causing overlap and empty pages.
+if (typeof window !== "undefined") {
+	window.addEventListener("beforeprint", () => {
+		document.body.setAttribute("data-printing", "true");
+	});
+	window.addEventListener("afterprint", () => {
+		document.body.removeAttribute("data-printing");
+	});
+}
