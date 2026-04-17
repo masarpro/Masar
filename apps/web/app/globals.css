@@ -610,46 +610,11 @@ input[cmdk-input] {
 		print-color-adjust: exact !important;
 	}
 
-	/* Repeating header/footer via position: fixed within @page margin space.
-	   Gated by body[data-printing="true"] — set by beforeprint event (browser)
-	   or page.evaluate() (Puppeteer) — so it only activates after the print
-	   area has been moved to be a direct child of body. */
-	body[data-printing="true"] [data-pdf-header] {
-		position: fixed !important;
-		top: 0 !important;
-		left: 0 !important;
-		right: 0 !important;
-		width: 210mm !important;
-	}
-
-	body[data-printing="true"] [data-pdf-footer] {
-		position: fixed !important;
-		bottom: 0 !important;
-		left: 0 !important;
-		right: 0 !important;
-		width: 210mm !important;
-	}
-
-	/* Reserve space in body flow so content doesn't overlap fixed header/footer.
-	   Fixed header/footer paint at physical page edges (since @page margin: 0),
-	   and the padding here pushes body content into the visible middle area. */
-	body[data-printing="true"] [data-pdf-body] {
-		padding-top: 110mm !important;
-		padding-bottom: 25mm !important;
-	}
-
-	/* Prevent items/rows from being cut between pages */
-	body[data-printing="true"] tr,
-	body[data-printing="true"] [data-pdf-body] > * {
-		page-break-inside: avoid !important;
-		break-inside: avoid !important;
-	}
-
-	/* Override V2's Card constraints that break PDF pagination.
-	   Non-V2 paths use Tailwind print: modifiers — these overrides ensure
-	   V2 behaves the same way during printing. */
-	body[data-printing="true"] #quotation-print-area,
-	body[data-printing="true"] #invoice-print-area {
+	/* Allow natural pagination of print-area (V2's Card has min-h + overflow-hidden
+	   that break PDF pagination; these overrides ensure consistent behavior).
+	   Step B/C will migrate data-printing to "puppeteer" / "browser" attribute values. */
+	body[data-printing] #quotation-print-area,
+	body[data-printing] #invoice-print-area {
 		position: relative !important;
 		min-height: 0 !important;
 		max-height: none !important;
