@@ -42,16 +42,3 @@ export async function exportToPDF(
 export function printDocument(): void {
 	window.print();
 }
-
-// Set data-printing="browser" for browser Ctrl+P printing so @media print
-// rules can distinguish it from Puppeteer PDF generation (which uses "puppeteer").
-// For Puppeteer, the inline header/footer are hidden (rendered via templates);
-// for browser print, they remain visible and flow naturally in the body.
-if (typeof window !== "undefined") {
-	window.addEventListener("beforeprint", () => {
-		document.body.setAttribute("data-printing", "browser");
-	});
-	window.addEventListener("afterprint", () => {
-		document.body.removeAttribute("data-printing");
-	});
-}

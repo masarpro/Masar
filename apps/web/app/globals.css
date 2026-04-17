@@ -610,19 +610,19 @@ input[cmdk-input] {
 		print-color-adjust: exact !important;
 	}
 
-	/* Allow natural pagination of print-area (V2's Card has min-h + overflow-hidden
-	   that break PDF pagination; these overrides ensure consistent behavior). */
-	body[data-printing] #quotation-print-area,
-	body[data-printing] #invoice-print-area {
-		position: relative !important;
-		min-height: 0 !important;
-		max-height: none !important;
-		overflow: visible !important;
+	/* Repeating header/footer via position: fixed within @page margin space.
+	   Gated by body[data-printing="true"] — set by beforeprint event (browser)
+	   or page.evaluate() (Puppeteer) — so it only activates after the print
+	   area has been moved to be a direct child of body. */
+	body[data-printing="true"] [data-pdf-header] {
+		position: fixed !important;
+		top: 0 !important;
+		left: 0 !important;
+		right: 0 !important;
+		width: 210mm !important;
 	}
 
-	/* Native Chromium paged-media: thead/tfoot repeat on every printed page.
-	   TemplateRenderer uses this structure — don't hide [data-pdf-header/footer]
-	   which lives inside thead/tfoot or the groups will repeat empty. */
+	/* Table-based header/footer repetition */
 	thead {
 		display: table-header-group;
 	}
@@ -631,16 +631,9 @@ input[cmdk-input] {
 		display: table-footer-group;
 	}
 
-	/* min-height (not height) so short docs push tfoot to page bottom
-	   AND long docs paginate naturally. `height: 100vh` forces a single page. */
+	/* Pin footer to bottom of every printed page */
 	table[data-layout-table] {
-		min-height: 100vh;
-	}
-
-	/* Keep item rows intact across page breaks */
-	tr {
-		page-break-inside: avoid;
-		break-inside: avoid;
+		height: 100vh;
 	}
 
 	/* Preserve colors and backgrounds */
