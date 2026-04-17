@@ -574,7 +574,7 @@ input[cmdk-input] {
 @media print {
 	@page {
 		size: A4 portrait;
-		margin: 0;
+		margin: 110mm 0 25mm 0;
 	}
 
 	/* Hide everything visually, then selectively reveal print areas */
