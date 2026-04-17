@@ -611,14 +611,21 @@ input[cmdk-input] {
 	}
 
 	/* Allow natural pagination of print-area (V2's Card has min-h + overflow-hidden
-	   that break PDF pagination; these overrides ensure consistent behavior).
-	   Step B/C will migrate data-printing to "puppeteer" / "browser" attribute values. */
+	   that break PDF pagination; these overrides ensure consistent behavior). */
 	body[data-printing] #quotation-print-area,
 	body[data-printing] #invoice-print-area {
 		position: relative !important;
 		min-height: 0 !important;
 		max-height: none !important;
 		overflow: visible !important;
+	}
+
+	/* Hide inline header/footer during Puppeteer PDF generation —
+	   they render via headerTemplate/footerTemplate as screenshot images.
+	   Browser Ctrl+P keeps them visible for natural body flow. */
+	body[data-printing="puppeteer"] [data-pdf-header],
+	body[data-printing="puppeteer"] [data-pdf-footer] {
+		display: none !important;
 	}
 
 	/* Table-based header/footer repetition */

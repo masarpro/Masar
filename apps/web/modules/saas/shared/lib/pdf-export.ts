@@ -43,12 +43,13 @@ export function printDocument(): void {
 	window.print();
 }
 
-// Mirror Puppeteer's data-printing="true" setup for browser Ctrl+P printing.
-// Without this, position: fixed rules for [data-pdf-header] and [data-pdf-footer]
-// don't activate during native browser print, causing overlap and empty pages.
+// Set data-printing="browser" for browser Ctrl+P printing so @media print
+// rules can distinguish it from Puppeteer PDF generation (which uses "puppeteer").
+// For Puppeteer, the inline header/footer are hidden (rendered via templates);
+// for browser print, they remain visible and flow naturally in the body.
 if (typeof window !== "undefined") {
 	window.addEventListener("beforeprint", () => {
-		document.body.setAttribute("data-printing", "true");
+		document.body.setAttribute("data-printing", "browser");
 	});
 	window.addEventListener("afterprint", () => {
 		document.body.removeAttribute("data-printing");
