@@ -90,9 +90,10 @@ export async function POST(req: NextRequest) {
 		await page.evaluate(() => document.fonts?.ready);
 		await new Promise((r) => setTimeout(r, 1000));
 
-		// Move print area to body root for isolation from layout wrappers.
-		// Note: data-printing attribute is NOT set here — it's set after screenshots
-		// so that CSS overrides don't distort layout during screenshot capture.
+		// Move print-area to body root + mark print context.
+		// TemplateRenderer's <table data-layout-table> uses <thead>/<tfoot> with
+		// display: table-header-group/footer-group so Chromium repeats them on
+		// every page natively — no headerTemplate/footerTemplate needed.
 		await page.evaluate(() => {
 			const printArea =
 				document.getElementById("invoice-print-area") ||
@@ -105,92 +106,18 @@ export async function POST(req: NextRequest) {
 			) {
 				document.body.appendChild(printArea);
 			}
-		});
 
-		// === Screenshot Strategy: capture header/footer before hiding them ===
-		// Puppeteer's displayHeaderFooter repeats headerTemplate/footerTemplate
-		// on every page automatically. By capturing the rendered DOM elements
-		// as images, we preserve the original design 100% (fonts, gradients, logo).
-		await page
-			.waitForSelector("[data-pdf-header]", { timeout: 5000 })
-			.catch(() => null);
-		await page
-			.waitForSelector("[data-pdf-footer]", { timeout: 5000 })
-			.catch(() => null);
-
-		// Extra wait for fonts and images to fully render
-		await page.evaluate(() => document.fonts?.ready);
-		await new Promise((r) => setTimeout(r, 500));
-
-		// Capture header
-		const headerElement = await page.$("[data-pdf-header]");
-		let headerBase64: string | null = null;
-		let headerHeightMm = 0;
-		if (headerElement) {
-			const box = await headerElement.boundingBox();
-			if (box && box.height > 0) {
-				const buf = await headerElement.screenshot({
-					type: "png",
-					omitBackground: false,
-				});
-				headerBase64 = `data:image/png;base64,${Buffer.from(buf).toString("base64")}`;
-				// px → mm (96 DPI: 1mm = 3.7795275591px)
-				headerHeightMm = box.height / 3.7795275591;
-			}
-		}
-
-		// Capture footer
-		const footerElement = await page.$("[data-pdf-footer]");
-		let footerBase64: string | null = null;
-		let footerHeightMm = 0;
-		if (footerElement) {
-			const box = await footerElement.boundingBox();
-			if (box && box.height > 0) {
-				const buf = await footerElement.screenshot({
-					type: "png",
-					omitBackground: false,
-				});
-				footerBase64 = `data:image/png;base64,${Buffer.from(buf).toString("base64")}`;
-				footerHeightMm = box.height / 3.7795275591;
-			}
-		}
-
-		// Now set data-printing="puppeteer" and hide inline header/footer
-		// (they render via headerTemplate/footerTemplate as images from screenshots).
-		await page.evaluate(() => {
 			document.body.setAttribute("data-printing", "puppeteer");
-		});
-		await page.addStyleTag({
-			content: `[data-pdf-header], [data-pdf-footer] { display: none !important; }`,
 		});
 
 		// Small wait for CSS to apply after DOM mutation
 		await new Promise((r) => setTimeout(r, 100));
 
-		// Build templates — font-size:0/line-height:0 eliminates ghost spacing
-		const headerTemplate = headerBase64
-			? `<div style="margin:0;padding:0;width:100%;font-size:0;line-height:0;"><img src="${headerBase64}" style="width:210mm;display:block;margin:0;padding:0;" /></div>`
-			: `<div></div>`;
-		const footerTemplate = footerBase64
-			? `<div style="margin:0;padding:0;width:100%;font-size:0;line-height:0;"><img src="${footerBase64}" style="width:210mm;display:block;margin:0;padding:0;" /></div>`
-			: `<div></div>`;
-
-		// Margins = measured heights + 3mm safety (fallback 10mm if no element)
-		const topMargin = headerHeightMm > 0 ? `${Math.ceil(headerHeightMm) + 3}mm` : "10mm";
-		const bottomMargin = footerHeightMm > 0 ? `${Math.ceil(footerHeightMm) + 3}mm` : "10mm";
-
-		// Generate PDF with repeating header/footer via Puppeteer templates
+		// Generate PDF — Chromium handles thead/tfoot repetition natively via
+		// table-header-group / table-footer-group. Margin 0 = full A4 usable.
 		const pdfBuffer = await page.pdf({
 			format: "A4",
-			displayHeaderFooter: true,
-			headerTemplate,
-			footerTemplate,
-			margin: {
-				top: topMargin,
-				right: "0",
-				bottom: bottomMargin,
-				left: "0",
-			},
+			margin: { top: "0", right: "0", bottom: "0", left: "0" },
 			printBackground: true,
 			preferCSSPageSize: false,
 		});
