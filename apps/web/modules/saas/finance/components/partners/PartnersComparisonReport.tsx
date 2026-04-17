@@ -80,7 +80,7 @@ export function PartnersComparisonReport({
 
 	return (
 		<div className="space-y-6">
-			<div className="flex flex-wrap items-center justify-between gap-2">
+			<div className="flex items-center justify-between gap-3">
 				<Button
 					variant="ghost"
 					className="rounded-xl"
@@ -89,13 +89,13 @@ export function PartnersComparisonReport({
 					<ArrowLeft className="me-2 h-4 w-4" />
 					{t("common.back")}
 				</Button>
-				<h2 className="text-base sm:text-lg font-semibold">
+				<h2 className="text-lg font-semibold">
 					{t("finance.partners.reports.title")} {data.year}
 				</h2>
 			</div>
 
 			{/* Company summary */}
-			<div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+			<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
 				<SummaryCard
 					icon={<TrendingUp className="h-5 w-5 text-emerald-600" />}
 					bg="bg-emerald-100 dark:bg-emerald-900/50"
@@ -116,26 +116,25 @@ export function PartnersComparisonReport({
 				/>
 			</div>
 
-			<Card className="rounded-2xl overflow-hidden">
+			<Card className="rounded-2xl">
 				<CardContent className="p-0">
-					<div className="overflow-x-auto">
-					<Table className="min-w-[800px]">
+					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead className="whitespace-nowrap">{t("finance.partners.reports.owner")}</TableHead>
-								<TableHead className="whitespace-nowrap">
+								<TableHead>{t("finance.partners.reports.owner")}</TableHead>
+								<TableHead>
 									{t("finance.partners.reports.percentage")}
 								</TableHead>
-								<TableHead className="text-end whitespace-nowrap">
+								<TableHead className="text-end">
 									{t("finance.partners.totalContributions")}
 								</TableHead>
-								<TableHead className="text-end whitespace-nowrap">
+								<TableHead className="text-end">
 									{t("finance.partners.shareOfProfit")}
 								</TableHead>
-								<TableHead className="text-end whitespace-nowrap">
+								<TableHead className="text-end">
 									{t("finance.partners.totalDrawings")}
 								</TableHead>
-								<TableHead className="text-end whitespace-nowrap">
+								<TableHead className="text-end">
 									{t("finance.partners.netBalance")}
 								</TableHead>
 							</TableRow>
@@ -147,8 +146,8 @@ export function PartnersComparisonReport({
 									className="cursor-pointer hover:bg-slate-50"
 									onClick={() => router.push(`${basePath}/${r.id}`)}
 								>
-									<TableCell className="font-medium whitespace-nowrap">{r.name}</TableCell>
-									<TableCell className="whitespace-nowrap">
+									<TableCell className="font-medium">{r.name}</TableCell>
+									<TableCell>
 										<Badge variant="outline" className="rounded-lg">
 											{new Intl.NumberFormat("en-US", {
 												maximumFractionDigits: 2,
@@ -156,17 +155,17 @@ export function PartnersComparisonReport({
 											%
 										</Badge>
 									</TableCell>
-									<TableCell className="text-end tabular-nums whitespace-nowrap">
+									<TableCell className="text-end">
 										<Currency amount={r.totalContributions} />
 									</TableCell>
-									<TableCell className="text-end tabular-nums whitespace-nowrap">
+									<TableCell className="text-end">
 										<Currency amount={r.shareOfProfit} />
 									</TableCell>
-									<TableCell className="text-end tabular-nums text-red-600 whitespace-nowrap">
+									<TableCell className="text-end text-red-600">
 										<Currency amount={r.totalDrawings} />
 									</TableCell>
 									<TableCell
-										className={`text-end tabular-nums font-semibold whitespace-nowrap ${
+										className={`text-end font-semibold ${
 											r.netBalance >= 0
 												? "text-emerald-600"
 												: "text-red-600"
@@ -178,7 +177,6 @@ export function PartnersComparisonReport({
 							))}
 						</TableBody>
 					</Table>
-					</div>
 				</CardContent>
 			</Card>
 		</div>
@@ -200,12 +198,12 @@ function SummaryCard({
 		<Card className="rounded-2xl">
 			<CardContent className="p-4">
 				<div className="flex items-center gap-3">
-					<div className={`p-2 ${bg} rounded-xl shrink-0`}>{icon}</div>
-					<div className="min-w-0">
-						<p className="text-sm text-slate-500 dark:text-slate-400 truncate">
+					<div className={`p-2 ${bg} rounded-xl`}>{icon}</div>
+					<div>
+						<p className="text-sm text-slate-500 dark:text-slate-400">
 							{label}
 						</p>
-						<p className="text-base sm:text-xl font-semibold tabular-nums break-words">
+						<p className="text-xl font-semibold">
 							<Currency amount={value} />
 						</p>
 					</div>

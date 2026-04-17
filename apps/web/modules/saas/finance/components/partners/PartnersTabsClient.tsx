@@ -62,8 +62,7 @@ export function PartnersTabsClient({
 
 	return (
 		<Tabs value={current} onValueChange={onChange} className="w-full space-y-4">
-			<div className="-mx-2 overflow-x-auto px-2 sm:mx-0 sm:px-0">
-			<TabsList className="rounded-xl w-max min-w-full sm:w-auto sm:min-w-0">
+			<TabsList className="rounded-xl">
 				<TabsTrigger value="overview" className="rounded-lg">
 					{t("finance.partners.tabs.overview")}
 				</TabsTrigger>
@@ -81,7 +80,6 @@ export function PartnersTabsClient({
 					</TabsTrigger>
 				)}
 			</TabsList>
-			</div>
 
 			<TabsContent value="overview" className="mt-0">
 				{current === "overview" && (

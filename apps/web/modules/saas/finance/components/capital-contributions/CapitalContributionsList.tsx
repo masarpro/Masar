@@ -91,7 +91,7 @@ export function CapitalContributionsList({
 							<TrendingUp className="h-4 w-4 text-green-500 shrink-0" />
 							<span className="truncate">{t("finance.capitalContributions.summary.totalContributions")}</span>
 						</div>
-						<div className="mt-1 text-lg sm:text-2xl font-bold text-green-600 tabular-nums break-words">
+						<div className="mt-1 text-2xl font-bold text-green-600 tabular-nums">
 							<Currency amount={totalAmount} />
 						</div>
 					</CardContent>
@@ -102,7 +102,7 @@ export function CapitalContributionsList({
 							<Landmark className="h-4 w-4 shrink-0" />
 							<span className="truncate">{t("finance.capitalContributions.summary.totalCount")}</span>
 						</div>
-						<div className="mt-1 text-lg sm:text-2xl font-bold tabular-nums break-words">
+						<div className="mt-1 text-2xl font-bold tabular-nums">
 							{total}
 						</div>
 					</CardContent>
@@ -149,17 +149,16 @@ export function CapitalContributionsList({
 					</CardContent>
 				</Card>
 			) : (
-				<Card className="overflow-hidden">
-					<div className="overflow-x-auto">
-					<Table className="min-w-[800px]">
+				<Card>
+					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead className="whitespace-nowrap">{t("finance.capitalContributions.contributionNo")}</TableHead>
-								<TableHead className="whitespace-nowrap">{t("finance.capitalContributions.date")}</TableHead>
-								<TableHead className="whitespace-nowrap">{t("finance.capitalContributions.ownerName")}</TableHead>
-								<TableHead className="whitespace-nowrap">{t("finance.capitalContributions.amount")}</TableHead>
-								<TableHead className="whitespace-nowrap">{t("finance.capitalContributions.type")}</TableHead>
-								<TableHead className="whitespace-nowrap">{t("finance.capitalContributions.status")}</TableHead>
+								<TableHead>{t("finance.capitalContributions.contributionNo")}</TableHead>
+								<TableHead className="hidden md:table-cell">{t("finance.capitalContributions.date")}</TableHead>
+								<TableHead className="hidden md:table-cell">{t("finance.capitalContributions.ownerName")}</TableHead>
+								<TableHead>{t("finance.capitalContributions.amount")}</TableHead>
+								<TableHead className="hidden md:table-cell">{t("finance.capitalContributions.type")}</TableHead>
+								<TableHead className="hidden md:table-cell">{t("finance.capitalContributions.status")}</TableHead>
 								<TableHead className="w-10" />
 							</TableRow>
 						</TableHeader>
@@ -170,16 +169,16 @@ export function CapitalContributionsList({
 									className="cursor-pointer"
 									onClick={() => router.push(`${basePath}/${c.id}`)}
 								>
-									<TableCell className="font-mono font-medium whitespace-nowrap">{c.contributionNo}</TableCell>
-									<TableCell className="whitespace-nowrap">{formatDate(c.date)}</TableCell>
-									<TableCell className="whitespace-nowrap">{c.owner?.name ?? "-"}</TableCell>
-									<TableCell className="tabular-nums whitespace-nowrap"><Currency amount={Number(c.amount)} /></TableCell>
-									<TableCell className="whitespace-nowrap">
+									<TableCell className="font-mono font-medium">{c.contributionNo}</TableCell>
+									<TableCell className="hidden md:table-cell">{formatDate(c.date)}</TableCell>
+									<TableCell className="hidden md:table-cell">{c.owner?.name ?? "-"}</TableCell>
+									<TableCell className="tabular-nums"><Currency amount={Number(c.amount)} /></TableCell>
+									<TableCell className="hidden md:table-cell">
 										<Badge variant="outline" className={TYPE_COLORS[c.type] ?? ""}>
 											{t(`finance.capitalContributions.types.${c.type}`)}
 										</Badge>
 									</TableCell>
-									<TableCell className="whitespace-nowrap">
+									<TableCell className="hidden md:table-cell">
 										<Badge className={STATUS_COLORS[c.status] ?? ""}>
 											{t(`finance.capitalContributions.statuses.${c.status}`)}
 										</Badge>
@@ -191,7 +190,6 @@ export function CapitalContributionsList({
 							))}
 						</TableBody>
 					</Table>
-					</div>
 				</Card>
 			)}
 

@@ -99,7 +99,7 @@ export function OwnerDrawingsList({
 								<TrendingDown className="h-4 w-4 text-red-500 shrink-0" />
 								<span className="truncate">{t("finance.ownerDrawings.summary.totalDrawn")}</span>
 							</div>
-							<div className="mt-1 text-lg sm:text-2xl font-bold text-red-600 tabular-nums break-words">
+							<div className="mt-1 text-2xl font-bold text-red-600 tabular-nums">
 								<Currency amount={summary.totalDrawingsThisYear} />
 							</div>
 						</CardContent>
@@ -110,7 +110,7 @@ export function OwnerDrawingsList({
 								<TrendingUp className="h-4 w-4 text-green-500 shrink-0" />
 								<span className="truncate">{t("finance.ownerDrawings.summary.yearProfit")}</span>
 							</div>
-							<div className="mt-1 text-lg sm:text-2xl font-bold text-green-600 tabular-nums break-words">
+							<div className="mt-1 text-2xl font-bold text-green-600 tabular-nums">
 								<Currency amount={summary.currentYearProfit} />
 							</div>
 						</CardContent>
@@ -121,7 +121,7 @@ export function OwnerDrawingsList({
 								<Wallet className="h-4 w-4 text-blue-500 shrink-0" />
 								<span className="truncate">{t("finance.ownerDrawings.summary.available")}</span>
 							</div>
-							<div className="mt-1 text-lg sm:text-2xl font-bold text-blue-600 tabular-nums break-words">
+							<div className="mt-1 text-2xl font-bold text-blue-600 tabular-nums">
 								<Currency amount={summary.availableForDrawing} />
 							</div>
 						</CardContent>
@@ -132,7 +132,7 @@ export function OwnerDrawingsList({
 								<FileText className="h-4 w-4 shrink-0" />
 								<span className="truncate">{t("finance.ownerDrawings.summary.totalCount")}</span>
 							</div>
-							<div className="mt-1 text-lg sm:text-2xl font-bold tabular-nums break-words">
+							<div className="mt-1 text-2xl font-bold tabular-nums">
 								{summary.drawingsByOwner?.reduce((sum: number, o: any) => sum + o.count, 0) ?? 0}
 							</div>
 						</CardContent>
@@ -190,18 +190,17 @@ export function OwnerDrawingsList({
 					</CardContent>
 				</Card>
 			) : (
-				<Card className="overflow-hidden">
-					<div className="overflow-x-auto">
-					<Table className="min-w-[900px]">
+				<Card>
+					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead className="whitespace-nowrap">{t("finance.ownerDrawings.drawingNo")}</TableHead>
-								<TableHead className="whitespace-nowrap">{t("finance.ownerDrawings.date")}</TableHead>
-								<TableHead className="whitespace-nowrap">{t("finance.ownerDrawings.ownerName")}</TableHead>
-								<TableHead className="whitespace-nowrap">{t("finance.ownerDrawings.amount")}</TableHead>
-								<TableHead className="whitespace-nowrap">{t("finance.ownerDrawings.type")}</TableHead>
-								<TableHead className="whitespace-nowrap">{t("finance.ownerDrawings.project")}</TableHead>
-								<TableHead className="whitespace-nowrap">{t("finance.ownerDrawings.status")}</TableHead>
+								<TableHead>{t("finance.ownerDrawings.drawingNo")}</TableHead>
+								<TableHead className="hidden md:table-cell">{t("finance.ownerDrawings.date")}</TableHead>
+								<TableHead className="hidden md:table-cell">{t("finance.ownerDrawings.ownerName")}</TableHead>
+								<TableHead>{t("finance.ownerDrawings.amount")}</TableHead>
+								<TableHead className="hidden md:table-cell">{t("finance.ownerDrawings.type")}</TableHead>
+								<TableHead className="hidden lg:table-cell">{t("finance.ownerDrawings.project")}</TableHead>
+								<TableHead className="hidden md:table-cell">{t("finance.ownerDrawings.status")}</TableHead>
 								<TableHead className="w-10" />
 							</TableRow>
 						</TableHeader>
@@ -212,17 +211,17 @@ export function OwnerDrawingsList({
 									className="cursor-pointer"
 									onClick={() => router.push(`${basePath}/${d.id}`)}
 								>
-									<TableCell className="font-mono font-medium whitespace-nowrap">{d.drawingNo}</TableCell>
-									<TableCell className="whitespace-nowrap">{formatDate(d.date)}</TableCell>
-									<TableCell className="whitespace-nowrap">{d.owner?.name ?? "-"}</TableCell>
-									<TableCell className="tabular-nums whitespace-nowrap"><Currency amount={Number(d.amount)} /></TableCell>
-									<TableCell className="whitespace-nowrap">
+									<TableCell className="font-mono font-medium">{d.drawingNo}</TableCell>
+									<TableCell className="hidden md:table-cell">{formatDate(d.date)}</TableCell>
+									<TableCell className="hidden md:table-cell">{d.owner?.name ?? "-"}</TableCell>
+									<TableCell className="tabular-nums"><Currency amount={Number(d.amount)} /></TableCell>
+									<TableCell className="hidden md:table-cell">
 										<Badge variant="outline" className={TYPE_COLORS[d.type] ?? ""}>
 											{t(`finance.ownerDrawings.types.${d.type}`)}
 										</Badge>
 									</TableCell>
-									<TableCell className="whitespace-nowrap">{d.project?.name ?? "-"}</TableCell>
-									<TableCell className="whitespace-nowrap">
+									<TableCell className="hidden lg:table-cell">{d.project?.name ?? "-"}</TableCell>
+									<TableCell className="hidden md:table-cell">
 										<Badge className={STATUS_COLORS[d.status] ?? ""}>
 											{t(`finance.ownerDrawings.statuses.${d.status}`)}
 										</Badge>
@@ -234,7 +233,6 @@ export function OwnerDrawingsList({
 							))}
 						</TableBody>
 					</Table>
-					</div>
 				</Card>
 			)}
 
