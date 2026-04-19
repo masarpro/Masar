@@ -620,6 +620,14 @@ input[cmdk-input] {
 		overflow: visible !important;
 	}
 
+	/* Puppeteer: after appendChild moves print-area to body root,
+	   hide all OTHER body children completely (not just visibility:hidden)
+	   so body height = print-area height, not print-area + hidden siblings.
+	   This eliminates the phantom blank first page in generated PDFs. */
+	body[data-printing] > *:not(#invoice-print-area):not(#quotation-print-area) {
+		display: none !important;
+	}
+
 	/* Native Chromium paged-media: thead/tfoot repeat on every printed page.
 	   TemplateRenderer uses this structure — don't hide [data-pdf-header/footer]
 	   which lives inside thead/tfoot or the groups will repeat empty. */

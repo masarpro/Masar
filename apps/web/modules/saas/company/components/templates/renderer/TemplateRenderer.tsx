@@ -760,7 +760,7 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 			)}
 
 			{/* Table layout: thead/tfoot repeat on every printed page */}
-			<table data-layout-table style={{ width: "100%", borderCollapse: "collapse", height: "297mm" }}>
+			<table data-layout-table style={{ width: "100%", borderCollapse: "collapse" }}>
 				<thead>
 					<tr>
 						<td style={{ padding: 0, border: "none" }}>
