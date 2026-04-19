@@ -90,10 +90,10 @@ export async function POST(req: NextRequest) {
 		await page.evaluate(() => document.fonts?.ready);
 		await new Promise((r) => setTimeout(r, 1000));
 
-		// Move print area to body root and mark for CSS targeting.
-		// This mimics what the beforeprint event does for browser printing.
-		// Without this, the print area stays buried deep in the DOM and the
-		// body[data-printing] > *:not(#print-area) selector cannot isolate it.
+		// Move print-area to body root + mark print context.
+		// TemplateRenderer's <table data-layout-table> uses <thead>/<tfoot> with
+		// display: table-header-group/footer-group so Chromium repeats them on
+		// every page natively — no headerTemplate/footerTemplate needed.
 		await page.evaluate(() => {
 			const printArea =
 				document.getElementById("invoice-print-area") ||
@@ -107,25 +107,17 @@ export async function POST(req: NextRequest) {
 				document.body.appendChild(printArea);
 			}
 
-			document.body.setAttribute("data-printing", "true");
+			document.body.setAttribute("data-printing", "puppeteer");
 		});
 
 		// Small wait for CSS to apply after DOM mutation
 		await new Promise((r) => setTimeout(r, 100));
 
-		// Generate PDF — @media print CSS handles hiding sidebar/toolbar.
-		// margin MUST match @page margin in CSS (50mm top, 35mm bottom)
-		// so fixed header/footer have reserved space and body content
-		// doesn't get clipped behind them.
-		// preferCSSPageSize: false is critical — true would ignore margin param.
+		// Generate PDF — Chromium handles thead/tfoot repetition natively via
+		// table-header-group / table-footer-group. Margin 0 = full A4 usable.
 		const pdfBuffer = await page.pdf({
 			format: "A4",
-			margin: {
-				top: "50mm",
-				right: "0",
-				bottom: "35mm",
-				left: "0",
-			},
+			margin: { top: "0", right: "0", bottom: "0", left: "0" },
 			printBackground: true,
 			preferCSSPageSize: false,
 		});
