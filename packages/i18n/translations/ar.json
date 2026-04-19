@@ -3152,6 +3152,7 @@
         "crNumber": "السجل التجاري",
         "taxNumber": "الرقم الضريبي",
         "billTo": "فاتورة إلى",
+        "quotationTo": "عرض سعر إلى",
         "clientName": "اسم العميل",
         "documentDetails": "تفاصيل المستند",
         "documentNumber": "رقم المستند",

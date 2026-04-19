@@ -372,6 +372,7 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 						primaryColor={primaryColor}
 						secondaryColor={secondaryColor}
 						qrCode={isInvoice(data) ? data.qrCode : null}
+						documentType={docType}
 					/>
 				);
 
@@ -622,12 +623,12 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 			<Fragment key="quotation-before-table">
 				{qData.introduction && (
 					<div className="px-6 py-3">
-						<p className="text-sm whitespace-pre-line leading-relaxed">{qData.introduction}</p>
+						<p className="text-sm whitespace-pre-line leading-relaxed text-slate-700">{qData.introduction}</p>
 					</div>
 				)}
 				{beforeBlocks.map((block, idx) => (
 					<div key={`before-block-${idx}`} className="px-6 py-3">
-						<h4 className="text-sm font-semibold mb-1.5">{block.title}</h4>
+						<h4 className="text-sm font-semibold mb-1.5 text-slate-700">{block.title}</h4>
 						<p className="text-sm whitespace-pre-line leading-relaxed text-muted-foreground">{block.content}</p>
 					</div>
 				))}
@@ -645,7 +646,7 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 			<Fragment key="quotation-after-totals">
 				{afterBlocks.map((block, idx) => (
 					<div key={`after-block-${idx}`} className="px-6 py-3">
-						<h4 className="text-sm font-semibold mb-1.5">{block.title}</h4>
+						<h4 className="text-sm font-semibold mb-1.5 text-slate-700">{block.title}</h4>
 						<p className="text-sm whitespace-pre-line leading-relaxed text-muted-foreground">{block.content}</p>
 					</div>
 				))}

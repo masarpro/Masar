@@ -142,7 +142,7 @@ export function TotalsComponent({
 						<span className="text-slate-600">
 							{t("finance.templates.preview.subtotal")}
 						</span>
-						<span className="font-medium text-slate-900" dir="ltr">
+						<span className="font-medium text-slate-900">
 							<Currency
 								amount={displayTotals.subtotal}
 															/>
@@ -158,7 +158,7 @@ export function TotalsComponent({
 									{t("finance.templates.preview.discount")} (
 									{formatPercent(displayTotals.discountPercent)})
 								</span>
-								<span className="font-medium text-red-600" dir="ltr">
+								<span className="font-medium text-red-600">
 									-
 									<Currency
 										amount={displayTotals.discountAmount || 0}
@@ -176,7 +176,7 @@ export function TotalsComponent({
 									{t("finance.templates.preview.vat")} (
 									{formatPercent(displayTotals.vatPercent)})
 								</span>
-								<span className="font-medium text-slate-900" dir="ltr">
+								<span className="font-medium text-slate-900">
 									<Currency
 										amount={displayTotals.vatAmount || 0}
 																			/>
@@ -210,7 +210,6 @@ export function TotalsComponent({
 							style={{
 								color: totalAmountColor || totalColor || undefined,
 							}}
-							dir="ltr"
 						>
 							<Currency
 								amount={displayTotals.total}
@@ -224,7 +223,7 @@ export function TotalsComponent({
 							<span className="text-slate-500">
 								{t("finance.invoices.paid")}
 							</span>
-							<span style={{ color: paidColor }} dir="ltr">
+							<span style={{ color: paidColor }}>
 								<Currency amount={paid} />
 							</span>
 						</div>
@@ -239,7 +238,6 @@ export function TotalsComponent({
 							<span
 								className="font-bold"
 								style={{ color: remainingColor }}
-								dir="ltr"
 							>
 								<Currency amount={remaining} />
 							</span>

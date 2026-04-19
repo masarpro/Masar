@@ -62,6 +62,7 @@ interface ClientInfoComponentProps {
 	primaryColor?: string;
 	secondaryColor?: string;
 	qrCode?: string | null;
+	documentType?: "quotation" | "invoice";
 }
 
 export function ClientInfoComponent({
@@ -72,6 +73,7 @@ export function ClientInfoComponent({
 	primaryColor = "#3b82f6",
 	secondaryColor,
 	qrCode,
+	documentType,
 }: ClientInfoComponentProps) {
 	const t = useTranslations();
 	const {
@@ -95,6 +97,11 @@ export function ClientInfoComponent({
 	} = settings;
 
 	const accent = secondaryColor || primaryColor;
+
+	const billToLabel =
+		documentType === "quotation"
+			? t("finance.templates.preview.quotationTo")
+			: t("finance.templates.preview.billTo");
 
 	// QR size mapping
 	const qrSizeMap = { small: 80, medium: 110, large: 140 };
@@ -138,7 +145,7 @@ export function ClientInfoComponent({
 				return (
 					<span
 						className="text-sm font-semibold uppercase tracking-wide"
-						style={{ color: primaryColor }}
+						style={{ color: labelColor || "#334155" }}
 					>
 						{text}
 					</span>
@@ -232,7 +239,7 @@ export function ClientInfoComponent({
 		const bColor = borderColor || accent;
 
 		return (
-			<div className="py-4 client-info-card">
+			<div className="py-2 client-info-card">
 				<div className="flex gap-4 items-start">
 					{/* Client info (right side in RTL) */}
 					<div
@@ -244,9 +251,9 @@ export function ClientInfoComponent({
 						}}
 					>
 						<div className="mb-2">
-							{renderLabel(t("finance.templates.preview.billTo"))}
+							{renderLabel(billToLabel)}
 						</div>
-						<div className="space-y-1">
+						<div className="space-y-0.5">
 							<p className="font-bold text-sm">
 								{clientInfo?.name || t("finance.templates.preview.clientName")}
 							</p>
@@ -287,7 +294,7 @@ export function ClientInfoComponent({
 		const bColor = borderColor || accent;
 
 		return (
-			<div className="py-4 client-info-card">
+			<div className="py-2 client-info-card">
 				<div className="flex gap-4">
 					{/* Client card with border */}
 					<div
@@ -299,7 +306,7 @@ export function ClientInfoComponent({
 						}}
 					>
 						<div className="mb-2">
-							{renderLabel(t("finance.templates.preview.billTo"))}
+							{renderLabel(billToLabel)}
 						</div>
 						<div className="flex justify-between">
 							<div className="text-end">
@@ -351,7 +358,7 @@ export function ClientInfoComponent({
 		const radius = borderRadius || "8px";
 
 		return (
-			<div className="py-4 client-info-card">
+			<div className="py-2 client-info-card">
 				<div className="flex gap-4">
 					{/* Company info card (replaces old invoice details card) */}
 					{showCompanyInfo && companyInfo ? (
@@ -387,14 +394,14 @@ export function ClientInfoComponent({
 						}}
 					>
 						<div className="mb-2">
-							{renderLabel(t("finance.templates.preview.billTo"))}
+							{renderLabel(billToLabel)}
 						</div>
 						<p className="font-bold text-sm">
 							{clientInfo?.name ||
 								t("finance.templates.preview.clientName")}
 						</p>
 						{clientInfo?.address && (
-							<p className="text-xs text-slate-500 mt-1">
+							<p className="text-xs text-slate-500 mt-0.5">
 								{clientInfo.address}
 							</p>
 						)}
@@ -420,7 +427,7 @@ export function ClientInfoComponent({
 		const radius = borderRadius || "8px";
 
 		return (
-			<div className="py-4 client-info-card">
+			<div className="py-2 client-info-card">
 				<div className="flex gap-4">
 					<div
 						className="flex-1 p-4"
@@ -433,7 +440,7 @@ export function ClientInfoComponent({
 						<div className="flex justify-between">
 							<div className="text-end">
 								<div className="mb-1">
-									{renderLabel(t("finance.templates.preview.billTo"))}
+									{renderLabel(billToLabel)}
 								</div>
 								<p className="font-bold text-sm mt-1">
 									{clientInfo?.name ||
@@ -480,16 +487,13 @@ export function ClientInfoComponent({
 
 	// ─── Default Layout ──────────────────────────────────────────────────
 	return (
-		<div className="grid grid-cols-2 gap-6 py-6 client-info-card">
+		<div className="grid grid-cols-2 gap-6 py-3 client-info-card">
 			{/* Client Info */}
-			<div className="space-y-3">
-				<h3
-					className="text-sm font-semibold uppercase tracking-wide"
-					style={{ color: primaryColor }}
-				>
-					{t("finance.templates.preview.billTo")}
+			<div className="space-y-1.5">
+				<h3 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
+					{billToLabel}
 				</h3>
-				<div className="space-y-1">
+				<div className="space-y-0.5">
 					<p className="font-medium text-slate-900">
 						{clientInfo?.name ||
 							t("finance.templates.preview.clientName")}
@@ -517,14 +521,11 @@ export function ClientInfoComponent({
 
 			{/* Company Info (replaces old Document Info) */}
 			{showCompanyInfo && companyInfo ? (
-				<div className="space-y-3">
-					<h3
-						className="text-sm font-semibold uppercase tracking-wide"
-						style={{ color: primaryColor }}
-					>
+				<div className="space-y-1.5">
+					<h3 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
 						{t("finance.templates.preview.companyInfo")}
 					</h3>
-					<div className="space-y-1">
+					<div className="space-y-0.5">
 						<p className="font-medium text-slate-900">
 							{companyInfo.name || t("finance.templates.preview.companyName")}
 						</p>
@@ -547,11 +548,8 @@ export function ClientInfoComponent({
 					</div>
 				</div>
 			) : (
-				<div className="space-y-3">
-					<h3
-						className="text-sm font-semibold uppercase tracking-wide"
-						style={{ color: primaryColor }}
-					>
+				<div className="space-y-1.5">
+					<h3 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
 						{t("finance.templates.preview.companyInfo")}
 					</h3>
 					<p className="text-sm text-slate-400">

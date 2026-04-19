@@ -3132,6 +3132,7 @@
         "crNumber": "Commercial Registration",
         "taxNumber": "Tax Number",
         "billTo": "Bill To",
+        "quotationTo": "Quotation To",
         "clientName": "Client Name",
         "documentDetails": "Document Details",
         "documentNumber": "Document Number",
