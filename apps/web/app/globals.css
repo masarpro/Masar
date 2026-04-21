@@ -651,11 +651,15 @@ input[cmdk-input] {
 	   Applies to BOTH TemplateRenderer (table-based) and QuotationPreviewV2
 	   (flow-based) — both emit [data-pdf-footer]. */
 
-	/* Hide the tfoot wrapper from TemplateRenderer's table to prevent a
-	   zero-height repeating empty row at the end of each page fragment.
-	   The actual footer content is rendered via position:fixed below. */
-	table[data-layout-table] tfoot {
-		display: none;
+	/* NOTE: do NOT set `display: none` on tfoot — that also collapses the
+	   position:fixed child (display:none on an ancestor removes the whole
+	   subtree from the render tree, overriding position:fixed).
+	   Instead, keep tfoot as table-footer-group. Since its only child is
+	   position:fixed (out of flow), the tfoot's own box is effectively
+	   zero-height and doesn't visually repeat. */
+	table[data-layout-table] tfoot > tr > td {
+		padding: 0 !important;
+		border: 0 !important;
 	}
 
 	[data-pdf-footer] {
@@ -675,15 +679,24 @@ input[cmdk-input] {
 		padding-bottom: var(--pdf-footer-reserve, 45mm);
 	}
 
-	/* Defensive: ancestor `transform` / `filter` / `will-change` traps
-	   position:fixed children inside that ancestor's box (so they'd only
-	   appear on page 1). Neutralize on the print containers. */
+	/* Defensive: ancestor `transform` / `filter` / `will-change` / `contain`
+	   traps position:fixed children inside that ancestor's box (so they'd
+	   only appear on page 1). `overflow: hidden` on ancestors can also
+	   clip fixed children in some browsers. Neutralize all of these on the
+	   print containers. */
 	#quotation-print-area,
 	#invoice-print-area,
 	#quotation-print-area *,
 	#invoice-print-area * {
 		transform: none !important;
 		filter: none !important;
+		contain: none !important;
+		will-change: auto !important;
+	}
+
+	#quotation-print-area,
+	#invoice-print-area {
+		overflow: visible !important;
 	}
 
 	/* Keep item rows intact across page breaks */
