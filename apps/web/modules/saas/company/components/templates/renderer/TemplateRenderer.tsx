@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, memo, useMemo } from "react";
+import { Fragment, memo, useEffect, useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { HeaderComponent } from "../components/HeaderComponent";
 import { DocumentMetaComponent } from "../components/DocumentMetaComponent";
@@ -221,6 +221,42 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 	const footerImage = settings.footerImage;
 	const showWatermark = settings.showWatermark;
 	const watermarkOpacity = settings.watermarkOpacity ?? 5;
+
+	// Measure footer height on mount + after images load + before print/PDF.
+	// Sets CSS var `--pdf-footer-reserve` used by globals.css @media print to
+	// reserve exact space above the pinned position:fixed footer. Handles
+	// letterhead images whose height isn't known ahead of time.
+	useEffect(() => {
+		if (typeof window === "undefined") return;
+
+		const measureFooter = () => {
+			const footer = document.querySelector<HTMLElement>("[data-pdf-footer]");
+			if (!footer) return;
+			const h = Math.ceil(footer.getBoundingClientRect().height);
+			if (h > 0) {
+				document.documentElement.style.setProperty(
+					"--pdf-footer-reserve",
+					`${h}px`,
+				);
+			}
+		};
+
+		measureFooter();
+
+		const imgs = document.querySelectorAll<HTMLImageElement>(
+			"[data-pdf-footer] img",
+		);
+		imgs.forEach((img) => {
+			if (!img.complete) {
+				img.addEventListener("load", measureFooter, { once: true });
+			}
+		});
+
+		window.addEventListener("beforeprint", measureFooter);
+		return () => {
+			window.removeEventListener("beforeprint", measureFooter);
+		};
+	}, [settings.footerImage]);
 
 	// Determine document type
 	const docType = documentType || (isInvoice(data) ? "invoice" : "quotation");

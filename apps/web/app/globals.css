@@ -639,10 +639,51 @@ input[cmdk-input] {
 		display: table-footer-group;
 	}
 
-	/* min-height (not height) so short docs push tfoot to page bottom
-	   AND long docs paginate naturally. `height: 100vh` forces a single page. */
-	table[data-layout-table] {
-		min-height: 100vh;
+	/* Pin document footer to the bottom of EVERY printed page (including short
+	   last pages and partial pages in multi-page documents).
+
+	   Chromium repeats position:fixed elements on every page in Paged Media
+	   (both window.print() and puppeteer page.pdf()). This replaces the
+	   previous table-footer-group approach, which only pinned the footer to
+	   "end of fragment on that page" — causing the footer to float at
+	   1/2-page or 3/4-page whenever tbody content didn't fill the page.
+
+	   Applies to BOTH TemplateRenderer (table-based) and QuotationPreviewV2
+	   (flow-based) — both emit [data-pdf-footer]. */
+
+	/* Hide the tfoot wrapper from TemplateRenderer's table to prevent a
+	   zero-height repeating empty row at the end of each page fragment.
+	   The actual footer content is rendered via position:fixed below. */
+	table[data-layout-table] tfoot {
+		display: none;
+	}
+
+	[data-pdf-footer] {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		width: 100%;
+		z-index: 10;
+	}
+
+	/* Reserve vertical space at the end of body content so flow content does
+	   NOT render under the pinned footer. CSS var is set dynamically by
+	   TemplateRenderer's useEffect (measures actual footer height including
+	   letterhead image). 45mm default covers typical letterhead. */
+	[data-pdf-body] {
+		padding-bottom: var(--pdf-footer-reserve, 45mm);
+	}
+
+	/* Defensive: ancestor `transform` / `filter` / `will-change` traps
+	   position:fixed children inside that ancestor's box (so they'd only
+	   appear on page 1). Neutralize on the print containers. */
+	#quotation-print-area,
+	#invoice-print-area,
+	#quotation-print-area *,
+	#invoice-print-area * {
+		transform: none !important;
+		filter: none !important;
 	}
 
 	/* Keep item rows intact across page breaks */
