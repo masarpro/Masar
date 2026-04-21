@@ -43,15 +43,51 @@ export function printDocument(): void {
 	window.print();
 }
 
-// Set data-printing="browser" for browser Ctrl+P printing so @media print
-// rules can distinguish it from Puppeteer PDF generation (which uses "puppeteer").
-// For Puppeteer, the inline header/footer are hidden (rendered via templates);
-// for browser print, they remain visible and flow naturally in the body.
+// Browser print parity with Puppeteer PDF:
+// 1. Set data-printing="browser" (matches body[data-printing] rules in globals.css).
+// 2. Move #quotation-print-area / #invoice-print-area to be a direct child of
+//    <body> before printing — this is what /api/pdf/generate does for Puppeteer.
+//    Without this, the print-area stays nested inside Next.js layout wrappers
+//    (main, aside containers) whose padding/margins leak into printed output and
+//    cause the browser Ctrl+P result to look different from the PDF.
+// 3. Restore the element to its original DOM position after printing so React
+//    reconciliation isn't confused.
 if (typeof window !== "undefined") {
+	let movedElement: HTMLElement | null = null;
+	let originalParent: Node | null = null;
+	let originalNextSibling: Node | null = null;
+
 	window.addEventListener("beforeprint", () => {
 		document.body.setAttribute("data-printing", "browser");
+
+		const printArea =
+			document.getElementById("invoice-print-area") ||
+			document.getElementById("quotation-print-area");
+
+		if (
+			printArea &&
+			printArea.parentNode &&
+			printArea.parentNode !== document.body
+		) {
+			originalParent = printArea.parentNode;
+			originalNextSibling = printArea.nextSibling;
+			movedElement = printArea;
+			document.body.appendChild(printArea);
+		}
 	});
+
 	window.addEventListener("afterprint", () => {
 		document.body.removeAttribute("data-printing");
+
+		if (movedElement && originalParent) {
+			if (originalNextSibling && originalNextSibling.parentNode === originalParent) {
+				originalParent.insertBefore(movedElement, originalNextSibling);
+			} else {
+				originalParent.appendChild(movedElement);
+			}
+			movedElement = null;
+			originalParent = null;
+			originalNextSibling = null;
+		}
 	});
 }
