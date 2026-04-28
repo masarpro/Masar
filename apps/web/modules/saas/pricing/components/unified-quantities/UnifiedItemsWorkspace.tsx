@@ -9,6 +9,7 @@ import { useCostStudy } from "./hooks/useCostStudy";
 import { useUnifiedQuantities } from "./hooks/useUnifiedQuantities";
 import { EmptyState } from "./items-list/EmptyState";
 import { ItemsList } from "./items-list/ItemsList";
+import { QuoteDrawer } from "./quote/QuoteDrawer";
 import { ErrorState } from "./shared/ErrorState";
 import { LoadingSkeleton } from "./shared/LoadingSkeleton";
 import type { CalculationMethod, Domain, ItemCatalogEntry } from "./types";
@@ -17,17 +18,16 @@ import { StudyHeader } from "./workspace-header/StudyHeader";
 interface Props {
 	costStudyId: string;
 	organizationId: string;
-	onGenerateQuote?: () => void;
 }
 
 export function UnifiedItemsWorkspace({
 	costStudyId,
 	organizationId,
-	onGenerateQuote,
 }: Props) {
 	const [pickerOpen, setPickerOpen] = useState(false);
 	const [pickerMode, setPickerMode] = useState<"items" | "presets">("items");
 	const [contextOpen, setContextOpen] = useState(false);
+	const [quoteOpen, setQuoteOpen] = useState(false);
 
 	const {
 		items,
@@ -78,7 +78,7 @@ export function UnifiedItemsWorkspace({
 				organizationId={organizationId}
 				items={items}
 				globalMarkupPercent={globalMarkupPercent}
-				onGenerateQuote={() => onGenerateQuote?.()}
+				onGenerateQuote={() => setQuoteOpen(true)}
 				onOpenContext={() => setContextOpen(true)}
 			/>
 
@@ -153,6 +153,13 @@ export function UnifiedItemsWorkspace({
 			<ContextDrawer
 				open={contextOpen}
 				onOpenChange={setContextOpen}
+				costStudyId={costStudyId}
+				organizationId={organizationId}
+			/>
+
+			<QuoteDrawer
+				open={quoteOpen}
+				onOpenChange={setQuoteOpen}
 				costStudyId={costStudyId}
 				organizationId={organizationId}
 			/>
