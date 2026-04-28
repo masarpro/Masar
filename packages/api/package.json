@@ -54,7 +54,8 @@
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage",
-		"zatca:test-sandbox": "tsx lib/zatca/phase2/sandbox-test.ts"
+		"zatca:test-sandbox": "tsx lib/zatca/phase2/sandbox-test.ts",
+		"seed:catalog": "dotenv -c -e ../../.env -- tsx modules/unified-quantities/scripts/seed-catalog.ts"
 	},
 	"version": "0.0.0"
 }
