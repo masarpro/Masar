@@ -4,6 +4,7 @@ import { Button } from "@ui/components/button";
 import { Package, Plus } from "lucide-react";
 import { useState } from "react";
 import { CatalogPickerDrawer } from "./catalog-picker/CatalogPickerDrawer";
+import { ContextDrawer } from "./context-drawer/ContextDrawer";
 import { useCostStudy } from "./hooks/useCostStudy";
 import { useUnifiedQuantities } from "./hooks/useUnifiedQuantities";
 import { EmptyState } from "./items-list/EmptyState";
@@ -11,15 +12,22 @@ import { ItemsList } from "./items-list/ItemsList";
 import { ErrorState } from "./shared/ErrorState";
 import { LoadingSkeleton } from "./shared/LoadingSkeleton";
 import type { CalculationMethod, Domain, ItemCatalogEntry } from "./types";
+import { StudyHeader } from "./workspace-header/StudyHeader";
 
 interface Props {
 	costStudyId: string;
 	organizationId: string;
+	onGenerateQuote?: () => void;
 }
 
-export function UnifiedItemsWorkspace({ costStudyId, organizationId }: Props) {
+export function UnifiedItemsWorkspace({
+	costStudyId,
+	organizationId,
+	onGenerateQuote,
+}: Props) {
 	const [pickerOpen, setPickerOpen] = useState(false);
 	const [pickerMode, setPickerMode] = useState<"items" | "presets">("items");
+	const [contextOpen, setContextOpen] = useState(false);
 
 	const {
 		items,
@@ -65,9 +73,17 @@ export function UnifiedItemsWorkspace({ costStudyId, organizationId }: Props) {
 
 	return (
 		<div className="flex flex-col gap-4 pb-20" dir="rtl">
-			{/* Header مؤقت — سيُستبدل بـ StudyHeader في Phase 8 */}
+			<StudyHeader
+				costStudyId={costStudyId}
+				organizationId={organizationId}
+				items={items}
+				globalMarkupPercent={globalMarkupPercent}
+				onGenerateQuote={() => onGenerateQuote?.()}
+				onOpenContext={() => setContextOpen(true)}
+			/>
+
 			<div className="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
-				<h2 className="text-xl font-semibold">التشطيبات والكهروميكانيكا</h2>
+				<h2 className="text-lg font-semibold">البنود</h2>
 				<div className="flex gap-2">
 					<Button
 						variant="outline"
@@ -132,6 +148,13 @@ export function UnifiedItemsWorkspace({ costStudyId, organizationId }: Props) {
 					} as never);
 					setPickerOpen(false);
 				}}
+			/>
+
+			<ContextDrawer
+				open={contextOpen}
+				onOpenChange={setContextOpen}
+				costStudyId={costStudyId}
+				organizationId={organizationId}
 			/>
 		</div>
 	);
