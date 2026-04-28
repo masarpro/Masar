@@ -4,12 +4,13 @@ import { Button } from "@ui/components/button";
 import { Package, Plus } from "lucide-react";
 import { useState } from "react";
 import { CatalogPickerDrawer } from "./catalog-picker/CatalogPickerDrawer";
+import { useCostStudy } from "./hooks/useCostStudy";
 import { useUnifiedQuantities } from "./hooks/useUnifiedQuantities";
 import { EmptyState } from "./items-list/EmptyState";
 import { ItemsList } from "./items-list/ItemsList";
 import { ErrorState } from "./shared/ErrorState";
 import { LoadingSkeleton } from "./shared/LoadingSkeleton";
-import type { Domain, CalculationMethod, ItemCatalogEntry } from "./types";
+import type { CalculationMethod, Domain, ItemCatalogEntry } from "./types";
 
 interface Props {
 	costStudyId: string;
@@ -30,6 +31,8 @@ export function UnifiedItemsWorkspace({ costStudyId, organizationId }: Props) {
 		reorderItems,
 		applyPreset,
 	} = useUnifiedQuantities({ costStudyId, organizationId });
+
+	const { globalMarkupPercent } = useCostStudy(costStudyId, organizationId);
 
 	if (isLoading) return <LoadingSkeleton />;
 	if (error) return <ErrorState error={error} />;
@@ -104,6 +107,7 @@ export function UnifiedItemsWorkspace({ costStudyId, organizationId }: Props) {
 					items={items}
 					costStudyId={costStudyId}
 					organizationId={organizationId}
+					globalMarkupPercent={globalMarkupPercent}
 					onUpsert={upsertItem}
 					onDelete={deleteItem}
 					onDuplicate={duplicateItem}
