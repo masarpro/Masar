@@ -237,7 +237,8 @@ describe("upsertOpeningSchema", () => {
 			height: 2.1,
 			count: 1,
 		});
-		expect(r.computedArea).toBeUndefined(); // schema doesn't compute — handler does
+		// schema doesn't include computedArea — handler computes width × height
+		expect((r as Record<string, unknown>).computedArea).toBeUndefined();
 		expect(r.deductFromInteriorFinishes).toBe(true);
 	});
 
