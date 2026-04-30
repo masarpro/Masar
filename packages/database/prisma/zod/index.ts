@@ -109,7 +109,7 @@ export type AiChatScalarFieldEnum = z.infer<typeof AiChatScalarFieldEnumSchema>;
 
 // File: CostStudyScalarFieldEnum.schema.ts
 
-export const CostStudyScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'createdById', 'name', 'customerName', 'customerId', 'projectType', 'landArea', 'buildingArea', 'numberOfFloors', 'hasBasement', 'finishingLevel', 'structuralCost', 'finishingCost', 'mepCost', 'laborCost', 'overheadPercent', 'profitPercent', 'contingencyPercent', 'vatIncluded', 'totalCost', 'buildingConfig', 'status', 'notes', 'projectId', 'studyType', 'entryPoint', 'workScopes', 'quantitiesStatus', 'specsStatus', 'costingStatus', 'pricingStatus', 'quotationStatus', 'quantitiesAssigneeId', 'specsAssigneeId', 'costingAssigneeId', 'pricingAssigneeId', 'contractValue', 'generatedQuotationId', 'convertedProjectId', 'structuralSpecs', 'laborBreakdown', 'costingMethod', 'overheadCost', 'adminCost', 'adminPercent', 'storageCostPercent', 'markupMethod', 'uniformMarkupPercent', 'createdAt', 'updatedAt'])
+export const CostStudyScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'createdById', 'name', 'customerName', 'customerId', 'projectType', 'landArea', 'buildingArea', 'numberOfFloors', 'hasBasement', 'finishingLevel', 'structuralCost', 'finishingCost', 'mepCost', 'laborCost', 'overheadPercent', 'profitPercent', 'contingencyPercent', 'vatIncluded', 'totalCost', 'buildingConfig', 'status', 'notes', 'projectId', 'studyType', 'entryPoint', 'workScopes', 'quantitiesStatus', 'specsStatus', 'costingStatus', 'pricingStatus', 'quotationStatus', 'quantitiesAssigneeId', 'specsAssigneeId', 'costingAssigneeId', 'pricingAssigneeId', 'contractValue', 'generatedQuotationId', 'convertedProjectId', 'structuralSpecs', 'laborBreakdown', 'costingMethod', 'overheadCost', 'adminCost', 'adminPercent', 'storageCostPercent', 'markupMethod', 'uniformMarkupPercent', 'globalMarkupPercent', 'globalMarkupMethod', 'vatPercent', 'vatIncludedInPrices', 'totalMaterialCost', 'totalLaborCost', 'totalGrossCost', 'totalSellAmount', 'totalProfitAmount', 'totalProfitPercent', 'createdAt', 'updatedAt'])
 
 export type CostStudyScalarFieldEnum = z.infer<typeof CostStudyScalarFieldEnumSchema>;
 
@@ -802,6 +802,36 @@ export type OrgCategoryScalarFieldEnum = z.infer<typeof OrgCategoryScalarFieldEn
 export const OrgSubcategoryScalarFieldEnumSchema = z.enum(['id', 'categoryId', 'organizationId', 'systemId', 'nameAr', 'nameEn', 'isLabor', 'isSystem', 'isActive', 'sortOrder', 'createdAt', 'updatedAt'])
 
 export type OrgSubcategoryScalarFieldEnum = z.infer<typeof OrgSubcategoryScalarFieldEnumSchema>;
+
+// File: QuantityItemScalarFieldEnum.schema.ts
+
+export const QuantityItemScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'organizationId', 'domain', 'categoryKey', 'catalogItemKey', 'displayName', 'sortOrder', 'isEnabled', 'primaryValue', 'secondaryValue', 'tertiaryValue', 'calculationMethod', 'unit', 'computedQuantity', 'wastagePercent', 'effectiveQuantity', 'contextSpaceId', 'contextScope', 'deductOpenings', 'openingsArea', 'polygonPoints', 'linkedFromItemId', 'linkQuantityFormula', 'linkPercentValue', 'specMaterialName', 'specMaterialBrand', 'specMaterialGrade', 'specColor', 'specSource', 'specNotes', 'materialUnitPrice', 'laborUnitPrice', 'materialCost', 'laborCost', 'totalCost', 'markupMethod', 'markupPercent', 'markupFixedAmount', 'manualUnitPrice', 'sellUnitPrice', 'sellTotalAmount', 'profitAmount', 'profitPercent', 'hasCustomMarkup', 'notes', 'createdAt', 'updatedAt', 'createdById', 'updatedById'])
+
+export type QuantityItemScalarFieldEnum = z.infer<typeof QuantityItemScalarFieldEnumSchema>;
+
+// File: QuantityItemContextScalarFieldEnum.schema.ts
+
+export const QuantityItemContextScalarFieldEnumSchema = z.enum(['id', 'costStudyId', 'organizationId', 'totalFloorArea', 'totalWallArea', 'totalExteriorWallArea', 'totalRoofArea', 'totalPerimeter', 'averageFloorHeight', 'hasBasement', 'hasRoof', 'hasYard', 'yardArea', 'fenceLength', 'generalNotes', 'createdAt', 'updatedAt'])
+
+export type QuantityItemContextScalarFieldEnum = z.infer<typeof QuantityItemContextScalarFieldEnumSchema>;
+
+// File: QuantityContextSpaceScalarFieldEnum.schema.ts
+
+export const QuantityContextSpaceScalarFieldEnumSchema = z.enum(['id', 'contextId', 'organizationId', 'name', 'spaceType', 'floorLabel', 'length', 'width', 'height', 'floorArea', 'wallPerimeter', 'polygonPoints', 'computedFloorArea', 'computedWallArea', 'isWetArea', 'isExterior', 'sortOrder', 'createdAt', 'updatedAt'])
+
+export type QuantityContextSpaceScalarFieldEnum = z.infer<typeof QuantityContextSpaceScalarFieldEnumSchema>;
+
+// File: QuantityContextOpeningScalarFieldEnum.schema.ts
+
+export const QuantityContextOpeningScalarFieldEnumSchema = z.enum(['id', 'contextId', 'organizationId', 'name', 'openingType', 'width', 'height', 'computedArea', 'count', 'isExterior', 'deductFromInteriorFinishes', 'spaceId', 'createdAt', 'updatedAt'])
+
+export type QuantityContextOpeningScalarFieldEnum = z.infer<typeof QuantityContextOpeningScalarFieldEnumSchema>;
+
+// File: ItemCatalogEntryScalarFieldEnum.schema.ts
+
+export const ItemCatalogEntryScalarFieldEnumSchema = z.enum(['id', 'itemKey', 'domain', 'categoryKey', 'subcategoryKey', 'nameAr', 'nameEn', 'descriptionAr', 'descriptionEn', 'icon', 'color', 'unit', 'defaultWastagePercent', 'defaultCalculationMethod', 'requiredFields', 'defaultMaterialUnitPrice', 'defaultLaborUnitPrice', 'commonMaterials', 'commonColors', 'linkableFrom', 'legacyDerivationType', 'legacyScope', 'displayOrder', 'isActive', 'createdAt', 'updatedAt'])
+
+export type ItemCatalogEntryScalarFieldEnum = z.infer<typeof ItemCatalogEntryScalarFieldEnumSchema>;
 
 // File: SortOrder.schema.ts
 
@@ -1855,6 +1885,32 @@ export const CostStudySchema = z.object({
   uniformMarkupPercent: z.instanceof(Prisma.Decimal, {
   message: "Field 'uniformMarkupPercent' must be a Decimal. Location: ['Models', 'CostStudy']",
 }).nullish(),
+  globalMarkupPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'globalMarkupPercent' must be a Decimal. Location: ['Models', 'CostStudy']",
+}).default(new Prisma.Decimal(30)),
+  globalMarkupMethod: z.string().default("percentage"),
+  vatPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'vatPercent' must be a Decimal. Location: ['Models', 'CostStudy']",
+}).default(new Prisma.Decimal(15)),
+  vatIncludedInPrices: z.boolean(),
+  totalMaterialCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalMaterialCost' must be a Decimal. Location: ['Models', 'CostStudy']",
+}),
+  totalLaborCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalLaborCost' must be a Decimal. Location: ['Models', 'CostStudy']",
+}),
+  totalGrossCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalGrossCost' must be a Decimal. Location: ['Models', 'CostStudy']",
+}),
+  totalSellAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalSellAmount' must be a Decimal. Location: ['Models', 'CostStudy']",
+}),
+  totalProfitAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalProfitAmount' must be a Decimal. Location: ['Models', 'CostStudy']",
+}),
+  totalProfitPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalProfitPercent' must be a Decimal. Location: ['Models', 'CostStudy']",
+}),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -4960,4 +5016,252 @@ export const OrgSubcategorySchema = z.object({
 });
 
 export type OrgSubcategoryType = z.infer<typeof OrgSubcategorySchema>;
+
+
+// File: QuantityItem.schema.ts
+
+export const QuantityItemSchema = z.object({
+  id: z.string(),
+  costStudyId: z.string(),
+  organizationId: z.string(),
+  domain: z.string(),
+  categoryKey: z.string(),
+  catalogItemKey: z.string(),
+  displayName: z.string(),
+  sortOrder: z.number().int(),
+  isEnabled: z.boolean().default(true),
+  primaryValue: z.instanceof(Prisma.Decimal, {
+  message: "Field 'primaryValue' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  secondaryValue: z.instanceof(Prisma.Decimal, {
+  message: "Field 'secondaryValue' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  tertiaryValue: z.instanceof(Prisma.Decimal, {
+  message: "Field 'tertiaryValue' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  calculationMethod: z.string(),
+  unit: z.string(),
+  computedQuantity: z.instanceof(Prisma.Decimal, {
+  message: "Field 'computedQuantity' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}),
+  wastagePercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'wastagePercent' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).default(new Prisma.Decimal(10)),
+  effectiveQuantity: z.instanceof(Prisma.Decimal, {
+  message: "Field 'effectiveQuantity' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}),
+  contextSpaceId: z.string().nullish(),
+  contextScope: z.string().nullish(),
+  deductOpenings: z.boolean(),
+  openingsArea: z.instanceof(Prisma.Decimal, {
+  message: "Field 'openingsArea' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  polygonPoints: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  linkedFromItemId: z.string().nullish(),
+  linkQuantityFormula: z.string().nullish(),
+  linkPercentValue: z.instanceof(Prisma.Decimal, {
+  message: "Field 'linkPercentValue' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  specMaterialName: z.string().nullish(),
+  specMaterialBrand: z.string().nullish(),
+  specMaterialGrade: z.string().nullish(),
+  specColor: z.string().nullish(),
+  specSource: z.string().nullish(),
+  specNotes: z.string().nullish(),
+  materialUnitPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'materialUnitPrice' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  laborUnitPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'laborUnitPrice' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  materialCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'materialCost' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  laborCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'laborCost' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  totalCost: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalCost' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  markupMethod: z.string().default("percentage"),
+  markupPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'markupPercent' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  markupFixedAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'markupFixedAmount' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  manualUnitPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'manualUnitPrice' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  sellUnitPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'sellUnitPrice' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  sellTotalAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'sellTotalAmount' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  profitAmount: z.instanceof(Prisma.Decimal, {
+  message: "Field 'profitAmount' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  profitPercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'profitPercent' must be a Decimal. Location: ['Models', 'QuantityItem']",
+}).nullish(),
+  hasCustomMarkup: z.boolean(),
+  notes: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  createdById: z.string().nullish(),
+  updatedById: z.string().nullish(),
+});
+
+export type QuantityItemType = z.infer<typeof QuantityItemSchema>;
+
+
+// File: QuantityItemContext.schema.ts
+
+export const QuantityItemContextSchema = z.object({
+  id: z.string(),
+  costStudyId: z.string(),
+  organizationId: z.string(),
+  totalFloorArea: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalFloorArea' must be a Decimal. Location: ['Models', 'QuantityItemContext']",
+}).nullish(),
+  totalWallArea: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalWallArea' must be a Decimal. Location: ['Models', 'QuantityItemContext']",
+}).nullish(),
+  totalExteriorWallArea: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalExteriorWallArea' must be a Decimal. Location: ['Models', 'QuantityItemContext']",
+}).nullish(),
+  totalRoofArea: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalRoofArea' must be a Decimal. Location: ['Models', 'QuantityItemContext']",
+}).nullish(),
+  totalPerimeter: z.instanceof(Prisma.Decimal, {
+  message: "Field 'totalPerimeter' must be a Decimal. Location: ['Models', 'QuantityItemContext']",
+}).nullish(),
+  averageFloorHeight: z.instanceof(Prisma.Decimal, {
+  message: "Field 'averageFloorHeight' must be a Decimal. Location: ['Models', 'QuantityItemContext']",
+}).nullish(),
+  hasBasement: z.boolean(),
+  hasRoof: z.boolean().default(true),
+  hasYard: z.boolean(),
+  yardArea: z.instanceof(Prisma.Decimal, {
+  message: "Field 'yardArea' must be a Decimal. Location: ['Models', 'QuantityItemContext']",
+}).nullish(),
+  fenceLength: z.instanceof(Prisma.Decimal, {
+  message: "Field 'fenceLength' must be a Decimal. Location: ['Models', 'QuantityItemContext']",
+}).nullish(),
+  generalNotes: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type QuantityItemContextType = z.infer<typeof QuantityItemContextSchema>;
+
+
+// File: QuantityContextSpace.schema.ts
+
+export const QuantityContextSpaceSchema = z.object({
+  id: z.string(),
+  contextId: z.string(),
+  organizationId: z.string(),
+  name: z.string(),
+  spaceType: z.string(),
+  floorLabel: z.string().nullish(),
+  length: z.instanceof(Prisma.Decimal, {
+  message: "Field 'length' must be a Decimal. Location: ['Models', 'QuantityContextSpace']",
+}).nullish(),
+  width: z.instanceof(Prisma.Decimal, {
+  message: "Field 'width' must be a Decimal. Location: ['Models', 'QuantityContextSpace']",
+}).nullish(),
+  height: z.instanceof(Prisma.Decimal, {
+  message: "Field 'height' must be a Decimal. Location: ['Models', 'QuantityContextSpace']",
+}).nullish(),
+  floorArea: z.instanceof(Prisma.Decimal, {
+  message: "Field 'floorArea' must be a Decimal. Location: ['Models', 'QuantityContextSpace']",
+}).nullish(),
+  wallPerimeter: z.instanceof(Prisma.Decimal, {
+  message: "Field 'wallPerimeter' must be a Decimal. Location: ['Models', 'QuantityContextSpace']",
+}).nullish(),
+  polygonPoints: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  computedFloorArea: z.instanceof(Prisma.Decimal, {
+  message: "Field 'computedFloorArea' must be a Decimal. Location: ['Models', 'QuantityContextSpace']",
+}).nullish(),
+  computedWallArea: z.instanceof(Prisma.Decimal, {
+  message: "Field 'computedWallArea' must be a Decimal. Location: ['Models', 'QuantityContextSpace']",
+}).nullish(),
+  isWetArea: z.boolean(),
+  isExterior: z.boolean(),
+  sortOrder: z.number().int(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type QuantityContextSpaceType = z.infer<typeof QuantityContextSpaceSchema>;
+
+
+// File: QuantityContextOpening.schema.ts
+
+export const QuantityContextOpeningSchema = z.object({
+  id: z.string(),
+  contextId: z.string(),
+  organizationId: z.string(),
+  name: z.string(),
+  openingType: z.string(),
+  width: z.instanceof(Prisma.Decimal, {
+  message: "Field 'width' must be a Decimal. Location: ['Models', 'QuantityContextOpening']",
+}),
+  height: z.instanceof(Prisma.Decimal, {
+  message: "Field 'height' must be a Decimal. Location: ['Models', 'QuantityContextOpening']",
+}),
+  computedArea: z.instanceof(Prisma.Decimal, {
+  message: "Field 'computedArea' must be a Decimal. Location: ['Models', 'QuantityContextOpening']",
+}),
+  count: z.number().int().default(1),
+  isExterior: z.boolean(),
+  deductFromInteriorFinishes: z.boolean().default(true),
+  spaceId: z.string().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type QuantityContextOpeningType = z.infer<typeof QuantityContextOpeningSchema>;
+
+
+// File: ItemCatalogEntry.schema.ts
+
+export const ItemCatalogEntrySchema = z.object({
+  id: z.string(),
+  itemKey: z.string(),
+  domain: z.string(),
+  categoryKey: z.string(),
+  subcategoryKey: z.string().nullish(),
+  nameAr: z.string(),
+  nameEn: z.string(),
+  descriptionAr: z.string().nullish(),
+  descriptionEn: z.string().nullish(),
+  icon: z.string(),
+  color: z.string().nullish(),
+  unit: z.string(),
+  defaultWastagePercent: z.instanceof(Prisma.Decimal, {
+  message: "Field 'defaultWastagePercent' must be a Decimal. Location: ['Models', 'ItemCatalogEntry']",
+}).default(new Prisma.Decimal(10)),
+  defaultCalculationMethod: z.string(),
+  requiredFields: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10"),
+  defaultMaterialUnitPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'defaultMaterialUnitPrice' must be a Decimal. Location: ['Models', 'ItemCatalogEntry']",
+}).nullish(),
+  defaultLaborUnitPrice: z.instanceof(Prisma.Decimal, {
+  message: "Field 'defaultLaborUnitPrice' must be a Decimal. Location: ['Models', 'ItemCatalogEntry']",
+}).nullish(),
+  commonMaterials: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  commonColors: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  linkableFrom: z.array(z.string()),
+  legacyDerivationType: z.string().nullish(),
+  legacyScope: z.string().nullish(),
+  displayOrder: z.number().int(),
+  isActive: z.boolean().default(true),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type ItemCatalogEntryType = z.infer<typeof ItemCatalogEntrySchema>;
 

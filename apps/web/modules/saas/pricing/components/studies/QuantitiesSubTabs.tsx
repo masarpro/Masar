@@ -16,6 +16,10 @@ import { ManualItemsTable } from "../pipeline/ManualItemsTable";
 import { ImportItemsDialog } from "./ImportItemsDialog";
 import { QuantitiesSummary } from "../pipeline/QuantitiesSummary";
 import { StageApprovalButton } from "../pipeline/StageApprovalButton";
+import { UnifiedItemsWorkspace } from "../unified-quantities";
+
+const isUnifiedEnabled =
+	process.env.NEXT_PUBLIC_FEATURE_UNIFIED_QUANTITIES === "1";
 
 interface QuantitiesSubTabsProps {
 	organizationId: string;
@@ -54,6 +58,16 @@ export function QuantitiesSubTabs({
 		if (workScopes.includes("FINISHING")) enabledTabs.push("finishing");
 		if (workScopes.includes("MEP")) enabledTabs.push("mep");
 		if (workScopes.includes("CUSTOM")) enabledTabs.push("manual");
+	}
+
+	// Unified tab: only when feature flag is on AND study has FINISHING or MEP
+	const showUnifiedTab =
+		isUnifiedEnabled &&
+		(workScopes.length === 0 ||
+			workScopes.includes("FINISHING") ||
+			workScopes.includes("MEP"));
+	if (showUnifiedTab) {
+		enabledTabs.push("unified");
 	}
 
 	const currentTab = searchParams.get("tab") || defaultTab || enabledTabs[0] || "structural";
@@ -139,6 +153,12 @@ export function QuantitiesSubTabs({
 								{t("pricing.pipeline.tabManual")}
 							</TabsTrigger>
 						)}
+						{enabledTabs.includes("unified") && (
+							<TabsTrigger value="unified" className="gap-1.5">
+								<PaintBucket className="h-3.5 w-3.5" />
+								تشطيبات + MEP (موحَّد) ✨
+							</TabsTrigger>
+						)}
 					</TabsList>
 				)}
 
@@ -183,6 +203,15 @@ export function QuantitiesSubTabs({
 						studyId={studyId}
 					/>
 				</TabsContent>
+
+				{showUnifiedTab && (
+					<TabsContent value="unified" className="mt-4">
+						<UnifiedItemsWorkspace
+							costStudyId={studyId}
+							organizationId={organizationId}
+						/>
+					</TabsContent>
+				)}
 			</Tabs>
 
 			{/* Summary - hide when only one scope is enabled */}
