@@ -3,6 +3,7 @@ import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PricingPageContentV2 } from "@saas/pricing/components/pricing-v2/PricingPageContentV2";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { StudyPageShell } from "@saas/pricing/components/studies/StudyPageShell";
+import { redirectIfUnified } from "@saas/pricing/lib/guards/redirect-if-unified";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -34,6 +35,8 @@ async function StudyPricingPageContent({ organizationSlug, studyId }: { organiza
 	if (!activeOrganization) {
 		return notFound();
 	}
+
+	await redirectIfUnified(organizationSlug, studyId, activeOrganization.id);
 
 	return (
 		<PricingShell

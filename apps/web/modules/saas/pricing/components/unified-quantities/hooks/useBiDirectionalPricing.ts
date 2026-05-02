@@ -2,7 +2,7 @@
 
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { toast } from "sonner";
 import type { MarkupMethod, PricingField, QuantityItem } from "../types";
@@ -93,6 +93,77 @@ export function useBiDirectionalPricing(item: QuantityItem) {
 		},
 		400,
 	);
+
+	// Separate path that bypasses the bi-directional solver (which always sets
+	// hasCustomMarkup=true on any pricing field change). When the user toggles
+	// the custom-markup switch OFF we use upsertItem to write
+	// hasCustomMarkup=false explicitly; the server then re-prices the item via
+	// the study's globalMarkupPercent.
+	const revertMutation = useMutation(
+		orpc.unifiedQuantities.upsertItem.mutationOptions({
+			onSuccess: (result: any) => {
+				if (result?.item) {
+					setLocal(toState(result.item as QuantityItem));
+				}
+				queryClient.invalidateQueries({
+					queryKey: orpc.unifiedQuantities.getItems.key(),
+				});
+				queryClient.invalidateQueries({
+					queryKey: orpc.unifiedQuantities.pricing.getStudyTotals.key(),
+				});
+				isEditingRef.current = false;
+			},
+			onError: (err: Error) => {
+				toast.error("فشل العودة للهامش العام: " + err.message);
+				setLocal(toState(item));
+				isEditingRef.current = false;
+			},
+		}),
+	);
+
+	const revertToGlobal = () => {
+		isEditingRef.current = true;
+		// Optimistic: mark local state as following global. The server response
+		// (which recomputes via globalMarkupPercent) will overwrite this.
+		setLocal((prev) => ({ ...prev, hasCustomMarkup: false }));
+		revertMutation.mutate({
+			id: item.id,
+			costStudyId: item.costStudyId,
+			organizationId: item.organizationId,
+			domain: item.domain,
+			categoryKey: item.categoryKey,
+			catalogItemKey: item.catalogItemKey,
+			displayName: item.displayName,
+			sortOrder: item.sortOrder,
+			isEnabled: item.isEnabled,
+			primaryValue: item.primaryValue,
+			secondaryValue: item.secondaryValue,
+			tertiaryValue: item.tertiaryValue,
+			calculationMethod: item.calculationMethod,
+			unit: item.unit,
+			wastagePercent: Number(item.wastagePercent ?? 0),
+			contextSpaceId: item.contextSpaceId,
+			contextScope: item.contextScope,
+			deductOpenings: item.deductOpenings,
+			linkedFromItemId: item.linkedFromItemId,
+			linkQuantityFormula: item.linkQuantityFormula,
+			linkPercentValue: item.linkPercentValue,
+			specMaterialName: item.specMaterialName,
+			specMaterialBrand: item.specMaterialBrand,
+			specMaterialGrade: item.specMaterialGrade,
+			specColor: item.specColor,
+			specSource: item.specSource,
+			specNotes: item.specNotes,
+			materialUnitPrice: item.materialUnitPrice,
+			laborUnitPrice: item.laborUnitPrice,
+			markupMethod: "percentage",
+			markupPercent: null,
+			markupFixedAmount: null,
+			manualUnitPrice: null,
+			hasCustomMarkup: false,
+			notes: item.notes,
+		} as never);
+	};
 
 	const updateField = (field: PricingField, value: number) => {
 		isEditingRef.current = true;
@@ -190,9 +261,20 @@ export function useBiDirectionalPricing(item: QuantityItem) {
 		debouncedUpdate(field, value);
 	};
 
+	// Implied markup % when the canonical method is manual_price — useful as a
+	// read-only display so the user still sees what their manual price means
+	// in terms of margin on cost.
+	const impliedMarkupPercent = useMemo(() => {
+		const cost = local.materialUnitPrice + local.laborUnitPrice;
+		if (cost <= 0 || local.sellUnitPrice <= 0) return null;
+		return ((local.sellUnitPrice - cost) / cost) * 100;
+	}, [local.materialUnitPrice, local.laborUnitPrice, local.sellUnitPrice]);
+
 	return {
 		...local,
 		updateField,
-		isLoading: mutation.isPending,
+		revertToGlobal,
+		impliedMarkupPercent,
+		isLoading: mutation.isPending || revertMutation.isPending,
 	};
 }

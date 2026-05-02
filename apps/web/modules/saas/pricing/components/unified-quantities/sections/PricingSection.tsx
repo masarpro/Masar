@@ -23,8 +23,8 @@ const fmt = (n: number) =>
 export function PricingSection({ item, globalMarkupPercent }: Props) {
 	const pricing = useBiDirectionalPricing(item);
 	const effectiveQty = Number(item.effectiveQuantity ?? 0);
-	const totalCost =
-		(pricing.materialUnitPrice + pricing.laborUnitPrice) * effectiveQty;
+	const unitCost = pricing.materialUnitPrice + pricing.laborUnitPrice;
+	const totalCost = unitCost * effectiveQty;
 	const isProfit = pricing.profitAmount >= 0;
 
 	const handleToggleCustomMarkup = (custom: boolean) => {
@@ -34,95 +34,127 @@ export function PricingSection({ item, globalMarkupPercent }: Props) {
 				pricing.markupPercent || globalMarkupPercent,
 			);
 		} else {
-			pricing.updateField("markup_percent", globalMarkupPercent);
+			// Use the dedicated revert path — bi-directional solver would
+			// otherwise re-set hasCustomMarkup=true.
+			pricing.revertToGlobal();
 		}
 	};
 
 	const handleMethodChange = (method: MarkupMethod) => {
 		if (method === "percentage") {
-			pricing.updateField("markup_percent", pricing.markupPercent || 30);
+			pricing.updateField(
+				"markup_percent",
+				pricing.markupPercent || globalMarkupPercent,
+			);
 		} else if (method === "fixed_amount") {
 			pricing.updateField(
 				"markup_fixed_amount",
-				pricing.markupFixedAmount || 5,
+				pricing.markupFixedAmount || Math.max(5, unitCost * 0.3),
 			);
 		} else if (method === "manual_price") {
 			pricing.updateField(
 				"manual_unit_price",
-				pricing.sellUnitPrice || pricing.materialUnitPrice + pricing.laborUnitPrice,
+				pricing.sellUnitPrice || unitCost,
 			);
 		}
 	};
 
+	// markup % — actual stored value for percentage; implied for manual_price.
+	const displayMarkupPercent =
+		pricing.markupMethod === "manual_price"
+			? pricing.impliedMarkupPercent
+			: pricing.markupPercent;
+
 	return (
 		<Card className="border-violet-200 bg-violet-50/40 p-4 dark:border-violet-900 dark:bg-violet-950/20">
 			<div className="space-y-4">
+				{/* Header row — title + custom-markup toggle */}
 				<div className="flex flex-wrap items-center justify-between gap-2">
-					<h4 className="text-sm font-semibold text-violet-700 dark:text-violet-300">
-						📊 الربح والسعر النهائي
-					</h4>
+					<div className="flex flex-col gap-0.5">
+						<h4 className="text-sm font-semibold text-violet-700 dark:text-violet-300">
+							📊 الربح والسعر النهائي
+						</h4>
+						{!pricing.hasCustomMarkup && (
+							<p className="text-[11px] text-muted-foreground">
+								يتبع الهامش العام للدراسة (
+								{globalMarkupPercent.toFixed(0)}%)
+							</p>
+						)}
+					</div>
 					<div className="flex items-center gap-2">
 						<Switch
 							id={`custom-markup-${item.id}`}
 							checked={pricing.hasCustomMarkup}
 							onCheckedChange={handleToggleCustomMarkup}
+							disabled={pricing.isLoading}
 						/>
 						<Label
 							htmlFor={`custom-markup-${item.id}`}
 							className="text-xs"
 						>
 							هامش خاص
-							{!pricing.hasCustomMarkup && (
-								<span className="ms-1 text-muted-foreground">
-									(يتبع العام {globalMarkupPercent.toFixed(0)}%)
-								</span>
-							)}
 						</Label>
 					</div>
 				</div>
 
+				{/* Method selector + the relevant markup input — only when custom */}
 				{pricing.hasCustomMarkup && (
-					<MarkupMethodSelector
-						value={pricing.markupMethod}
-						onChange={handleMethodChange}
-					/>
+					<div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+						<MarkupMethodSelector
+							value={pricing.markupMethod}
+							onChange={handleMethodChange}
+						/>
+
+						{pricing.markupMethod === "percentage" && (
+							<BiDirectionalPriceInput
+								id={`${item.id}-mp`}
+								label="نسبة الربح (markup)"
+								value={pricing.markupPercent}
+								unit="%"
+								onChange={(v) =>
+									pricing.updateField("markup_percent", v)
+								}
+								isLoading={pricing.isLoading}
+								precision={1}
+								min={-50}
+								max={1000}
+							/>
+						)}
+
+						{pricing.markupMethod === "fixed_amount" && (
+							<BiDirectionalPriceInput
+								id={`${item.id}-mf`}
+								label="ربح ثابت لكل وحدة"
+								value={pricing.markupFixedAmount}
+								unit="ر.س"
+								onChange={(v) =>
+									pricing.updateField("markup_fixed_amount", v)
+								}
+								isLoading={pricing.isLoading}
+							/>
+						)}
+
+						{pricing.markupMethod === "manual_price" && (
+							<div className="flex items-start gap-2 rounded-md border bg-background/60 px-3 py-2 text-xs text-muted-foreground">
+								<Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
+								<div>
+									<p>السعر اليدوي يتجاوز الحساب التلقائي.</p>
+									{displayMarkupPercent !== null &&
+										displayMarkupPercent !== undefined && (
+											<p className="mt-0.5 tabular-nums">
+												markup ضمني:{" "}
+												{displayMarkupPercent.toFixed(1)}%
+											</p>
+										)}
+								</div>
+							</div>
+						)}
+					</div>
 				)}
 
-				<div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-					{pricing.markupMethod === "percentage" && (
-						<BiDirectionalPriceInput
-							id={`${item.id}-mp`}
-							label="نسبة الربح"
-							value={pricing.markupPercent}
-							unit="%"
-							onChange={(v) => pricing.updateField("markup_percent", v)}
-							isLoading={pricing.isLoading}
-							precision={1}
-							min={-50}
-							max={1000}
-						/>
-					)}
-
-					{pricing.markupMethod === "fixed_amount" && (
-						<BiDirectionalPriceInput
-							id={`${item.id}-mf`}
-							label="ربح ثابت/وحدة"
-							value={pricing.markupFixedAmount}
-							unit="ر.س"
-							onChange={(v) =>
-								pricing.updateField("markup_fixed_amount", v)
-							}
-							isLoading={pricing.isLoading}
-						/>
-					)}
-
-					{pricing.markupMethod === "manual_price" && (
-						<div className="flex items-center text-xs text-muted-foreground md:col-span-1">
-							<Info className="me-2 h-4 w-4" />
-							<span>السعر اليدوي يتجاوز الحساب</span>
-						</div>
-					)}
-
+				{/* Sell unit price + total — always editable; canonical-source rule
+				    means editing either one switches method to manual_price. */}
+				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 					<BiDirectionalPriceInput
 						id={`${item.id}-su`}
 						label="سعر الوحدة"
@@ -130,27 +162,35 @@ export function PricingSection({ item, globalMarkupPercent }: Props) {
 						unit={`ر.س/${item.unit}`}
 						onChange={(v) => pricing.updateField("sell_unit_price", v)}
 						isLoading={pricing.isLoading}
-						precision={4}
+						precision={2}
 					/>
-
 					<BiDirectionalPriceInput
 						id={`${item.id}-st`}
 						label="إجمالي البيع"
 						value={pricing.sellTotalAmount}
 						unit="ر.س"
-						onChange={(v) => pricing.updateField("sell_total_amount", v)}
+						onChange={(v) =>
+							pricing.updateField("sell_total_amount", v)
+						}
 						isLoading={pricing.isLoading}
 					/>
 				</div>
 
+				{/* Profit recap */}
 				<div className="rounded-lg border border-violet-200 bg-background p-3 dark:border-violet-800">
 					<div className="grid grid-cols-2 gap-3 text-sm">
 						<div>
-							<p className="text-xs text-muted-foreground">إجمالي التكلفة</p>
-							<p className="font-medium tabular-nums">{fmt(totalCost)} ر.س</p>
+							<p className="text-xs text-muted-foreground">
+								إجمالي التكلفة
+							</p>
+							<p className="font-medium tabular-nums">
+								{fmt(totalCost)} ر.س
+							</p>
 						</div>
 						<div>
-							<p className="text-xs text-muted-foreground">إجمالي البيع</p>
+							<p className="text-xs text-muted-foreground">
+								إجمالي البيع
+							</p>
 							<p className="font-medium tabular-nums">
 								{fmt(pricing.sellTotalAmount)} ر.س
 							</p>
@@ -168,13 +208,29 @@ export function PricingSection({ item, globalMarkupPercent }: Props) {
 							</div>
 							<p
 								className={`mt-1 text-lg font-bold tabular-nums ${
-									isProfit ? "text-emerald-600" : "text-red-600"
+									isProfit
+										? "text-emerald-600 dark:text-emerald-400"
+										: "text-red-600 dark:text-red-400"
 								}`}
 							>
 								{fmt(pricing.profitAmount)} ر.س
-								<span className="ms-2 text-sm font-normal">
-									({pricing.profitPercent.toFixed(1)}% من البيع)
-								</span>
+							</p>
+							<p className="mt-0.5 text-[11px] text-muted-foreground">
+								<span className="tabular-nums">
+									{pricing.profitPercent.toFixed(1)}%
+								</span>{" "}
+								هامش من البيع
+								{displayMarkupPercent !== null &&
+									displayMarkupPercent !== undefined && (
+										<>
+											{" "}
+											·{" "}
+											<span className="tabular-nums">
+												{displayMarkupPercent.toFixed(1)}%
+											</span>{" "}
+											markup من التكلفة
+										</>
+									)}
 							</p>
 						</div>
 					</div>

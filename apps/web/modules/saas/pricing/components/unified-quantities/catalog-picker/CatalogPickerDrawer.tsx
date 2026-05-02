@@ -2,7 +2,7 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@ui/components/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCatalog } from "../hooks/useCatalog";
 import { usePresets } from "../hooks/usePresets";
 import type { ItemCatalogEntry } from "../types";
@@ -30,22 +30,33 @@ export function CatalogPickerDrawer({
 	const { groupedByCategory, isLoading } = useCatalog(organizationId);
 	const { presets, isLoading: presetsLoading } = usePresets(organizationId);
 	const [searchQuery, setSearchQuery] = useState("");
+	const [activeTab, setActiveTab] = useState<"items" | "presets">(mode);
+
+	// Sync the controlled tab with the requested mode whenever the drawer is
+	// opened from a different button (the previous version used defaultValue
+	// which silently ignored mode changes after the first mount).
+	useEffect(() => {
+		if (open) setActiveTab(mode);
+	}, [open, mode]);
 
 	return (
 		<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent
 				side="right"
-				className="flex w-full flex-col gap-4 sm:max-w-2xl"
+				className="flex w-full flex-col gap-0 p-0 sm:max-w-2xl"
 			>
-				<SheetHeader>
+				<SheetHeader className="px-4 pt-4">
 					<SheetTitle>
-						{mode === "items" ? "اختر بنداً من الكتالوج" : "اختر باقة جاهزة"}
+						{activeTab === "items"
+							? "اختر بنداً من الكتالوج"
+							: "اختر باقة جاهزة"}
 					</SheetTitle>
 				</SheetHeader>
 
 				<Tabs
-					defaultValue={mode}
-					className="flex flex-1 flex-col overflow-hidden px-4 pb-4"
+					value={activeTab}
+					onValueChange={(v) => setActiveTab(v as "items" | "presets")}
+					className="flex flex-1 flex-col overflow-hidden px-4 pb-4 pt-3"
 				>
 					<TabsList className="w-full">
 						<TabsTrigger value="items" className="flex-1">

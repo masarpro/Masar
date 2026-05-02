@@ -3,6 +3,7 @@ import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { StudyPageShell } from "@saas/pricing/components/studies/StudyPageShell";
 import { StudyQuotationPageContent } from "@saas/pricing/components/quotation-builder/StudyQuotationPageContent";
+import { redirectIfUnified } from "@saas/pricing/lib/guards/redirect-if-unified";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata() {
@@ -31,6 +32,8 @@ async function QuotationPageContent({ organizationSlug, studyId }: { organizatio
 	if (!activeOrganization) {
 		return notFound();
 	}
+
+	await redirectIfUnified(organizationSlug, studyId, activeOrganization.id);
 
 	return (
 		<PricingShell

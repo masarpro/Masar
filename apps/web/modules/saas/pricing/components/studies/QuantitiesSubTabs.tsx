@@ -4,22 +4,28 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@ui/components/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
-import { Building2, Calendar, FileEdit, Hash, PaintBucket, Wrench } from "lucide-react";
+import {
+	Building2,
+	Calendar,
+	FileEdit,
+	Hash,
+	Layers,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
-import { StructuralItemsEditor } from "./StructuralItemsEditor";
-import { FinishingItemsEditor } from "./FinishingItemsEditor";
-import { MEPItemsEditor } from "./MEPItemsEditor";
+import { isUnifiedStudy } from "../../lib/unified-flag";
 import { ManualItemsTable } from "../pipeline/ManualItemsTable";
-import { ImportItemsDialog } from "./ImportItemsDialog";
 import { QuantitiesSummary } from "../pipeline/QuantitiesSummary";
 import { StageApprovalButton } from "../pipeline/StageApprovalButton";
 import { UnifiedItemsWorkspace } from "../unified-quantities";
-
-const isUnifiedEnabled =
-	process.env.NEXT_PUBLIC_FEATURE_UNIFIED_QUANTITIES === "1";
+import { ImportItemsDialog } from "./ImportItemsDialog";
+import { StructuralItemsEditor } from "./StructuralItemsEditor";
+// Legacy editors — only mounted when the unified workspace is OFF for this study
+import { FinishingItemsEditor } from "./FinishingItemsEditor";
+import { MEPItemsEditor } from "./MEPItemsEditor";
+import { PaintBucket, Wrench } from "lucide-react";
 
 interface QuantitiesSubTabsProps {
 	organizationId: string;
@@ -39,7 +45,6 @@ export function QuantitiesSubTabs({
 	const searchParams = useSearchParams();
 	const queryClient = useQueryClient();
 
-	// Fetch study to determine work scopes
 	const { data: study } = useQuery(
 		orpc.pricing.studies.getById.queryOptions({
 			input: { id: studyId, organizationId },
@@ -47,39 +52,39 @@ export function QuantitiesSubTabs({
 	);
 
 	const workScopes: string[] = (study as any)?.workScopes ?? [];
+	const isUnified = isUnifiedStudy({ workScopes });
 
-	// Determine which tabs to show based on work scopes
-	const enabledTabs: string[] = [];
-	if (workScopes.length === 0) {
-		// fallback for old studies: show all
-		enabledTabs.push("structural", "finishing", "mep", "manual");
-	} else {
-		if (workScopes.includes("STRUCTURAL")) enabledTabs.push("structural");
-		if (workScopes.includes("FINISHING")) enabledTabs.push("finishing");
-		if (workScopes.includes("MEP")) enabledTabs.push("mep");
-		if (workScopes.includes("CUSTOM")) enabledTabs.push("manual");
-	}
+	// Tab list. When unified is in effect the legacy `finishing` and `mep`
+	// editors are hidden — the unified tab is the single entry point for both.
+	const enabledTabs = useMemo(() => {
+		const tabs: string[] = [];
+		const noScopes = workScopes.length === 0;
 
-	// Unified tab: only when feature flag is on AND study has FINISHING or MEP
-	const showUnifiedTab =
-		isUnifiedEnabled &&
-		(workScopes.length === 0 ||
-			workScopes.includes("FINISHING") ||
-			workScopes.includes("MEP"));
-	if (showUnifiedTab) {
-		enabledTabs.push("unified");
-	}
+		if (workScopes.includes("STRUCTURAL")) tabs.push("structural");
 
-	const currentTab = searchParams.get("tab") || defaultTab || enabledTabs[0] || "structural";
+		if (isUnified) {
+			tabs.push("unified");
+		} else {
+			if (noScopes || workScopes.includes("FINISHING")) tabs.push("finishing");
+			if (noScopes || workScopes.includes("MEP")) tabs.push("mep");
+		}
 
-	// Fetch stages for the approval button
+		if (workScopes.includes("CUSTOM")) tabs.push("manual");
+		return tabs;
+	}, [workScopes, isUnified]);
+
+	const currentTab =
+		searchParams.get("tab") ||
+		defaultTab ||
+		enabledTabs[0] ||
+		(isUnified ? "unified" : "structural");
+
 	const { data: stagesData } = useQuery(
 		orpc.pricing.studies.stages.get.queryOptions({
 			input: { organizationId, studyId },
 		}),
 	);
 
-	// Fetch quantities summary for the bottom bar
 	const { data: summaryData } = useQuery(
 		orpc.pricing.studies.quantitiesSummary.queryOptions({
 			input: { organizationId, studyId },
@@ -135,6 +140,12 @@ export function QuantitiesSubTabs({
 								{t("pricing.pipeline.tabStructural")}
 							</TabsTrigger>
 						)}
+						{enabledTabs.includes("unified") && (
+							<TabsTrigger value="unified" className="gap-1.5">
+								<Layers className="h-3.5 w-3.5" />
+								تشطيبات + كهروميكانيكا
+							</TabsTrigger>
+						)}
 						{enabledTabs.includes("finishing") && (
 							<TabsTrigger value="finishing" className="gap-1.5">
 								<PaintBucket className="h-3.5 w-3.5" />
@@ -153,12 +164,6 @@ export function QuantitiesSubTabs({
 								{t("pricing.pipeline.tabManual")}
 							</TabsTrigger>
 						)}
-						{enabledTabs.includes("unified") && (
-							<TabsTrigger value="unified" className="gap-1.5">
-								<PaintBucket className="h-3.5 w-3.5" />
-								تشطيبات + MEP (موحَّد) ✨
-							</TabsTrigger>
-						)}
 					</TabsList>
 				)}
 
@@ -170,21 +175,34 @@ export function QuantitiesSubTabs({
 					/>
 				</TabsContent>
 
-				<TabsContent value="finishing" className="mt-4">
-					<FinishingItemsEditor
-						organizationId={organizationId}
-						organizationSlug={organizationSlug}
-						studyId={studyId}
-					/>
-				</TabsContent>
+				{enabledTabs.includes("unified") && (
+					<TabsContent value="unified" className="mt-4">
+						<UnifiedItemsWorkspace
+							costStudyId={studyId}
+							organizationId={organizationId}
+						/>
+					</TabsContent>
+				)}
 
-				<TabsContent value="mep" className="mt-4">
-					<MEPItemsEditor
-						organizationId={organizationId}
-						organizationSlug={organizationSlug}
-						studyId={studyId}
-					/>
-				</TabsContent>
+				{enabledTabs.includes("finishing") && (
+					<TabsContent value="finishing" className="mt-4">
+						<FinishingItemsEditor
+							organizationId={organizationId}
+							organizationSlug={organizationSlug}
+							studyId={studyId}
+						/>
+					</TabsContent>
+				)}
+
+				{enabledTabs.includes("mep") && (
+					<TabsContent value="mep" className="mt-4">
+						<MEPItemsEditor
+							organizationId={organizationId}
+							organizationSlug={organizationSlug}
+							studyId={studyId}
+						/>
+					</TabsContent>
+				)}
 
 				<TabsContent value="manual" className="mt-4 space-y-4">
 					<div className="flex justify-end">
@@ -203,57 +221,53 @@ export function QuantitiesSubTabs({
 						studyId={studyId}
 					/>
 				</TabsContent>
-
-				{showUnifiedTab && (
-					<TabsContent value="unified" className="mt-4">
-						<UnifiedItemsWorkspace
-							costStudyId={studyId}
-							organizationId={organizationId}
-						/>
-					</TabsContent>
-				)}
 			</Tabs>
 
-			{/* Summary - hide when only one scope is enabled */}
-			{enabledTabs.length > 1 && (
+			{/* Legacy mid-page summary — only useful for the legacy multi-tab flow.
+			    The unified workspace renders its own MiniPnLCard so we suppress this. */}
+			{!isUnified && enabledTabs.length > 1 && (
 				<QuantitiesSummary organizationId={organizationId} studyId={studyId} />
 			)}
 
-			{/* Bottom Summary Bar */}
-			<Card className="sticky bottom-0 z-10 border-t-2 border-primary/20 bg-card/95 backdrop-blur-sm">
-				<CardContent className="p-4">
-					<div
-						className="flex items-center justify-between flex-wrap gap-3"
-						dir="rtl"
-					>
-						<div className="flex items-center gap-6 text-sm">
-							<span className="flex items-center gap-2 text-muted-foreground">
-								<Hash className="h-4 w-4" />
-								إجمالي البنود:{" "}
-								<span className="font-semibold text-foreground">
-									{totalItems}
+			{/* Bottom approval bar — hidden under unified mode because the workspace
+			    has its own header CTAs (quote / context) and per-item totals; the
+			    pipeline approval ladder no longer applies. */}
+			{!isUnified && (
+				<Card className="sticky bottom-0 z-10 border-t-2 border-primary/20 bg-card/95 backdrop-blur-sm">
+					<CardContent className="p-4">
+						<div
+							className="flex items-center justify-between flex-wrap gap-3"
+							dir="rtl"
+						>
+							<div className="flex items-center gap-6 text-sm">
+								<span className="flex items-center gap-2 text-muted-foreground">
+									<Hash className="h-4 w-4" />
+									إجمالي البنود:{" "}
+									<span className="font-semibold text-foreground">
+										{totalItems}
+									</span>
 								</span>
-							</span>
-							<span className="flex items-center gap-2 text-muted-foreground">
-								<Calendar className="h-4 w-4" />
-								آخر تحديث:{" "}
-								<span className="font-semibold text-foreground">
-									{formatDate(lastUpdated)}
+								<span className="flex items-center gap-2 text-muted-foreground">
+									<Calendar className="h-4 w-4" />
+									آخر تحديث:{" "}
+									<span className="font-semibold text-foreground">
+										{formatDate(lastUpdated)}
+									</span>
 								</span>
-							</span>
+							</div>
+							<StageApprovalButton
+								organizationId={organizationId}
+								organizationSlug={organizationSlug}
+								studyId={studyId}
+								stage="quantities"
+								status={stages.quantities}
+								canReopen
+								canApprove={canApprove.quantities}
+							/>
 						</div>
-						<StageApprovalButton
-							organizationId={organizationId}
-							organizationSlug={organizationSlug}
-							studyId={studyId}
-							stage="quantities"
-							status={stages.quantities}
-							canReopen
-							canApprove={canApprove.quantities}
-						/>
-					</div>
-				</CardContent>
-			</Card>
+					</CardContent>
+				</Card>
+			)}
 		</div>
 	);
 }

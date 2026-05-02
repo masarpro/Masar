@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { isUnifiedStudy } from "../lib/unified-flag";
 
 interface StudyConfigInput {
 	studyType: string;
@@ -27,7 +28,13 @@ const ALL_STAGE_TYPES = [
 ] as const;
 
 export function useStudyConfig(study: StudyConfigInput) {
+	// When the unified workspace is active for this study, the 4 downstream
+	// stages (specifications/costing/pricing/quotation) collapse into the
+	// single Quantities page.
+	const useUnifiedWorkspace = isUnifiedStudy({ workScopes: study.workScopes });
+
 	const enabledStages = useMemo(() => {
+		if (useUnifiedWorkspace) return ["quantities"] as const;
 		switch (study.studyType) {
 			case "FULL_STUDY":
 			case "FULL_PROJECT": // backward compat
@@ -57,10 +64,11 @@ export function useStudyConfig(study: StudyConfigInput) {
 					"pricing",
 				] as const;
 		}
-	}, [study.studyType]);
+	}, [study.studyType, useUnifiedWorkspace]);
 
 	/** Uppercase stage types for filtering PIPELINE_STAGES by key */
 	const enabledStageTypes = useMemo(() => {
+		if (useUnifiedWorkspace) return ["QUANTITIES"] as const;
 		switch (study.studyType) {
 			case "FULL_STUDY":
 			case "FULL_PROJECT":
@@ -90,21 +98,26 @@ export function useStudyConfig(study: StudyConfigInput) {
 					"PRICING",
 				] as const;
 		}
-	}, [study.studyType]);
+	}, [study.studyType, useUnifiedWorkspace]);
 
 	const enabledTabs = useMemo(() => {
 		const scopes = study.workScopes;
 		if (!scopes || scopes.length === 0) {
-			// fallback: all tabs (for old studies)
+			// fallback for old studies — unified replaces finishing+mep when active
+			if (useUnifiedWorkspace) return ["structural", "unified", "manual"];
 			return ["structural", "finishing", "mep", "manual"] as const;
 		}
 		const tabs: string[] = [];
 		if (scopes.includes("STRUCTURAL")) tabs.push("structural");
-		if (scopes.includes("FINISHING")) tabs.push("finishing");
-		if (scopes.includes("MEP")) tabs.push("mep");
+		if (useUnifiedWorkspace) {
+			tabs.push("unified");
+		} else {
+			if (scopes.includes("FINISHING")) tabs.push("finishing");
+			if (scopes.includes("MEP")) tabs.push("mep");
+		}
 		if (scopes.includes("CUSTOM")) tabs.push("manual");
 		return tabs;
-	}, [study.workScopes]);
+	}, [study.workScopes, useUnifiedWorkspace]);
 
 	const isEmptyTableMode = study.studyType === "COST_PRICING";
 	const isCostPricingMode = study.studyType === "COST_PRICING";
@@ -121,5 +134,6 @@ export function useStudyConfig(study: StudyConfigInput) {
 		isCostPricingMode,
 		skipCalculationEngines,
 		isQuickPricing,
+		useUnifiedWorkspace,
 	};
 }
