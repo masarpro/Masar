@@ -1,19 +1,25 @@
 "use client";
 
-import { Button } from "@ui/components/button";
-import { Package, Plus } from "lucide-react";
 import { useState } from "react";
 import { CatalogPickerDrawer } from "./catalog-picker/CatalogPickerDrawer";
 import { ContextDrawer } from "./context-drawer/ContextDrawer";
 import { useCostStudy } from "./hooks/useCostStudy";
+import { useDomainFilter } from "./hooks/useDomainFilter";
+import { useStudyTotals } from "./hooks/useStudyTotals";
 import { useUnifiedQuantities } from "./hooks/useUnifiedQuantities";
 import { EmptyState } from "./items-list/EmptyState";
 import { ItemsList } from "./items-list/ItemsList";
 import { QuoteDrawer } from "./quote/QuoteDrawer";
 import { ErrorState } from "./shared/ErrorState";
 import { LoadingSkeleton } from "./shared/LoadingSkeleton";
-import type { CalculationMethod, Domain, ItemCatalogEntry } from "./types";
-import { StudyHeader } from "./workspace-header/StudyHeader";
+import type {
+	CalculationMethod,
+	Domain,
+	ItemCatalogEntry,
+	QuantityItem,
+} from "./types";
+import { ProfitControlCard } from "./workspace-header/ProfitControlCard";
+import { WorkspaceBar } from "./workspace-bar/WorkspaceBar";
 
 interface Props {
 	costStudyId: string;
@@ -41,6 +47,15 @@ export function UnifiedItemsWorkspace({
 	} = useUnifiedQuantities({ costStudyId, organizationId });
 
 	const { globalMarkupPercent } = useCostStudy(costStudyId, organizationId);
+	const { totals } = useStudyTotals({ costStudyId, organizationId });
+
+	const {
+		selectedDomains,
+		toggleDomain,
+		clearDomains,
+		domainCounts,
+		filteredItems,
+	} = useDomainFilter(items);
 
 	if (isLoading) return <LoadingSkeleton />;
 	if (error) return <ErrorState error={error} />;
@@ -71,41 +86,47 @@ export function UnifiedItemsWorkspace({
 		} as never);
 	};
 
+	const totalGrossCost = Number(totals?.totalGrossCost ?? 0);
+	const totalSellAmount = Number(totals?.totalSellAmount ?? 0);
+	const totalProfitAmount = Number(totals?.totalProfitAmount ?? 0);
+	const totalProfitPercent = Number(totals?.totalProfitPercent ?? 0);
+	const customMarkupCount = (items as QuantityItem[]).filter(
+		(i) => i.hasCustomMarkup,
+	).length;
+
 	return (
 		<div className="flex flex-col gap-4 pb-20" dir="rtl">
-			<StudyHeader
-				costStudyId={costStudyId}
-				organizationId={organizationId}
-				items={items}
-				globalMarkupPercent={globalMarkupPercent}
+			<WorkspaceBar
+				totalGrossCost={totalGrossCost}
+				totalSellAmount={totalSellAmount}
+				totalProfitAmount={totalProfitAmount}
+				totalProfitPercent={totalProfitPercent}
+				itemCount={items.length}
+				domainCounts={domainCounts}
+				selectedDomains={selectedDomains}
+				onToggleDomain={toggleDomain}
+				onClearDomains={clearDomains}
+				onAddItem={() => {
+					setPickerMode("items");
+					setPickerOpen(true);
+				}}
+				onApplyPreset={() => {
+					setPickerMode("presets");
+					setPickerOpen(true);
+				}}
 				onGenerateQuote={() => setQuoteOpen(true)}
 				onOpenContext={() => setContextOpen(true)}
+				canGenerateQuote={items.length > 0}
 			/>
 
-			<div className="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
-				<h2 className="text-lg font-semibold">البنود</h2>
-				<div className="flex gap-2">
-					<Button
-						variant="outline"
-						onClick={() => {
-							setPickerMode("presets");
-							setPickerOpen(true);
-						}}
-					>
-						<Package className="me-2 h-4 w-4" />
-						باقات جاهزة
-					</Button>
-					<Button
-						onClick={() => {
-							setPickerMode("items");
-							setPickerOpen(true);
-						}}
-					>
-						<Plus className="me-2 h-4 w-4" />
-						بند جديد
-					</Button>
-				</div>
-			</div>
+			{items.length > 0 && (
+				<ProfitControlCard
+					costStudyId={costStudyId}
+					organizationId={organizationId}
+					currentValue={globalMarkupPercent}
+					customMarkupCount={customMarkupCount}
+				/>
+			)}
 
 			{items.length === 0 ? (
 				<EmptyState
@@ -120,7 +141,7 @@ export function UnifiedItemsWorkspace({
 				/>
 			) : (
 				<ItemsList
-					items={items}
+					items={filteredItems}
 					costStudyId={costStudyId}
 					organizationId={organizationId}
 					globalMarkupPercent={globalMarkupPercent}
