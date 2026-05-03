@@ -1,6 +1,11 @@
 "use client";
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@ui/components/sheet";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@ui/components/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 import { useEffect, useState } from "react";
 import { useCatalog } from "../hooks/useCatalog";
@@ -19,6 +24,12 @@ interface Props {
 	onPresetSelect: (presetKey: string) => Promise<void> | void;
 }
 
+/**
+ * Centered modal picker — replaces the previous side Sheet so the catalog
+ * appears on top of the page chrome rather than crammed against the edge.
+ * Sized to be roomy on desktop (max-w-3xl, max-h-[85vh]) and full-bleed on
+ * mobile.
+ */
 export function CatalogPickerDrawer({
 	open,
 	onOpenChange,
@@ -32,31 +43,28 @@ export function CatalogPickerDrawer({
 	const [searchQuery, setSearchQuery] = useState("");
 	const [activeTab, setActiveTab] = useState<"items" | "presets">(mode);
 
-	// Sync the controlled tab with the requested mode whenever the drawer is
-	// opened from a different button (the previous version used defaultValue
-	// which silently ignored mode changes after the first mount).
 	useEffect(() => {
 		if (open) setActiveTab(mode);
 	}, [open, mode]);
 
 	return (
-		<Sheet open={open} onOpenChange={onOpenChange}>
-			<SheetContent
-				side="right"
-				className="flex w-full flex-col gap-0 p-0 sm:max-w-2xl"
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogContent
+				className="flex h-[85vh] w-[95vw] max-w-3xl flex-col gap-0 p-0 sm:w-[90vw]"
+				dir="rtl"
 			>
-				<SheetHeader className="px-4 pt-4">
-					<SheetTitle>
+				<DialogHeader className="border-b px-5 py-4">
+					<DialogTitle className="text-start">
 						{activeTab === "items"
 							? "اختر بنداً من الكتالوج"
 							: "اختر باقة جاهزة"}
-					</SheetTitle>
-				</SheetHeader>
+					</DialogTitle>
+				</DialogHeader>
 
 				<Tabs
 					value={activeTab}
 					onValueChange={(v) => setActiveTab(v as "items" | "presets")}
-					className="flex flex-1 flex-col overflow-hidden px-4 pb-4 pt-3"
+					className="flex flex-1 flex-col overflow-hidden px-5 pb-5 pt-3"
 				>
 					<TabsList className="w-full">
 						<TabsTrigger value="items" className="flex-1">
@@ -72,7 +80,7 @@ export function CatalogPickerDrawer({
 						className="mt-3 flex flex-1 flex-col gap-3 overflow-hidden"
 					>
 						<CatalogSearch value={searchQuery} onChange={setSearchQuery} />
-						<div className="flex-1 overflow-y-auto pe-2">
+						<div className="flex-1 overflow-y-auto pe-1">
 							<CatalogCategoryTree
 								groupedByCategory={groupedByCategory}
 								isLoading={isLoading}
@@ -84,7 +92,7 @@ export function CatalogPickerDrawer({
 
 					<TabsContent
 						value="presets"
-						className="mt-3 flex-1 overflow-y-auto pe-2"
+						className="mt-3 flex-1 overflow-y-auto pe-1"
 					>
 						<PresetsCarousel
 							presets={presets}
@@ -93,7 +101,7 @@ export function CatalogPickerDrawer({
 						/>
 					</TabsContent>
 				</Tabs>
-			</SheetContent>
-		</Sheet>
+			</DialogContent>
+		</Dialog>
 	);
 }
