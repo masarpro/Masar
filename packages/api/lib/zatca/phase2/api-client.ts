@@ -157,7 +157,7 @@ export async function requestComplianceCSID(
 			success: true,
 			csid: result.data.binarySecurityToken,
 			secret: result.data.secret,
-			requestId: result.data.requestID,
+			requestId: coerceRequestId(result.data.requestID),
 			httpStatus: result.status,
 		};
 	}
@@ -170,6 +170,16 @@ export async function requestComplianceCSID(
 			result.data?.validationResults?.errorMessages ||
 			[{ message: result.data?.message || result.responseText?.substring(0, 300) || `HTTP ${result.status}` }],
 	};
+}
+
+/**
+ * ZATCA returns `requestID` as a JSON number (e.g. 1777912080975). The TS
+ * surface and Prisma column are both `string`, so coerce at the API boundary
+ * to keep every downstream caller (5 upsert sites) honest.
+ */
+function coerceRequestId(value: unknown): string | undefined {
+	if (value === null || value === undefined) return undefined;
+	return String(value);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -217,7 +227,7 @@ export async function requestProductionCSID(
 			success: true,
 			csid: result.data.binarySecurityToken,
 			secret: result.data.secret,
-			requestId: result.data.requestID,
+			requestId: coerceRequestId(result.data.requestID),
 			httpStatus: result.status,
 		};
 	}
@@ -285,7 +295,7 @@ export async function renewProductionCSID(
 			success: true,
 			csid: result.data.binarySecurityToken,
 			secret: result.data.secret,
-			requestId: result.data.requestID,
+			requestId: coerceRequestId(result.data.requestID),
 			httpStatus: result.status,
 		};
 	}
@@ -298,7 +308,7 @@ export async function renewProductionCSID(
 			httpStatus: result.status,
 			csid: result.data.binarySecurityToken,
 			secret: result.data.secret,
-			requestId: result.data.requestID,
+			requestId: coerceRequestId(result.data.requestID),
 			errors: result.data?.errors || [{ message: "NOT_COMPLIANT — compliance required before renewal" }],
 		};
 	}

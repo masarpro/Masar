@@ -161,22 +161,27 @@ export const startOnboarding = subscriptionProcedure
 
 		// 5. Build and send 6 test invoices for compliance check
 		//    Per ZATCA spec: standard invoice, standard debit, standard credit,
-		//    simplified invoice, simplified credit, simplified debit
+		//    simplified invoice, simplified credit, simplified debit.
+		//    Debit (383) and credit (381) notes MUST carry a reason (KSA-10)
+		//    per BR-KSA-17 — emitted as cbc:Note + cac:PaymentMeans/cbc:InstructionNote.
+		const DEBIT_REASON = "إشعار إضافة - اختبار توافق ZATCA Phase 2";
+		const CREDIT_REASON = "إشعار خصم - اختبار توافق ZATCA Phase 2";
 		const complianceTestTypes: Array<{
 			typeCode: "388" | "381" | "383";
 			simplified: boolean;
 			label: string;
 			billingRef?: { invoiceNumber: string };
+			noteReason?: string;
 		}> = input.invoiceType === "STANDARD"
 			? [
 				{ typeCode: "388", simplified: false, label: "Standard Invoice" },
-				{ typeCode: "383", simplified: false, label: "Standard Debit Note", billingRef: { invoiceNumber: "TEST-0001" } },
-				{ typeCode: "381", simplified: false, label: "Standard Credit Note", billingRef: { invoiceNumber: "TEST-0001" } },
+				{ typeCode: "383", simplified: false, label: "Standard Debit Note", billingRef: { invoiceNumber: "TEST-0001" }, noteReason: DEBIT_REASON },
+				{ typeCode: "381", simplified: false, label: "Standard Credit Note", billingRef: { invoiceNumber: "TEST-0001" }, noteReason: CREDIT_REASON },
 			]
 			: [
 				{ typeCode: "388", simplified: true, label: "Simplified Invoice" },
-				{ typeCode: "381", simplified: true, label: "Simplified Credit Note", billingRef: { invoiceNumber: "TEST-0001" } },
-				{ typeCode: "383", simplified: true, label: "Simplified Debit Note", billingRef: { invoiceNumber: "TEST-0001" } },
+				{ typeCode: "381", simplified: true, label: "Simplified Credit Note", billingRef: { invoiceNumber: "TEST-0001" }, noteReason: CREDIT_REASON },
+				{ typeCode: "383", simplified: true, label: "Simplified Debit Note", billingRef: { invoiceNumber: "TEST-0001" }, noteReason: DEBIT_REASON },
 			];
 
 		let previousHash = getInitialPIH();
@@ -232,6 +237,7 @@ export const startOnboarding = subscriptionProcedure
 					payableAmount: 115,
 				},
 				billingReference: testType.billingRef,
+				noteReason: testType.noteReason,
 				previousInvoiceHash: previousHash,
 				invoiceCounter: counter,
 			};

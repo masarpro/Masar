@@ -41,6 +41,14 @@ export interface ZatcaInvoiceData {
 		invoiceUuid?: string;
 	};
 
+	/**
+	 * Reason for the credit/debit note (KSA-10) — required by BR-KSA-17 when
+	 * `invoiceTypeCode` is "381" (credit) or "383" (debit). The XML builder
+	 * emits it as `cbc:Note` at invoice level and `cbc:InstructionNote` inside
+	 * `cac:PaymentMeans`. Ignored for type "388".
+	 */
+	noteReason?: string;
+
 	// --- Hash Chain ---
 	previousInvoiceHash: string; // PIH — Base64 SHA-256
 	invoiceCounter: number; // Cumulative counter
