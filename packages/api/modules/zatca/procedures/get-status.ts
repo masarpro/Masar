@@ -61,8 +61,14 @@ export const getZatcaStatus = protectedProcedure
 			statMap[s.status] = s._count.id;
 		}
 
+		const environment = (process.env.ZATCA_ENVIRONMENT || "simulation") as
+			| "sandbox"
+			| "simulation"
+			| "production";
+
 		return {
 			phase,
+			environment,
 			devices,
 			stats: {
 				total: Object.values(statMap).reduce((a, b) => a + b, 0),

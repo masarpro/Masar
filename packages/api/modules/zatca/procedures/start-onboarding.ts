@@ -16,7 +16,6 @@ import {
 	buildInvoiceXml,
 	signInvoice,
 	getInitialPIH,
-	SANDBOX_DEFAULTS,
 } from "../../../lib/zatca/phase2";
 import type { ZatcaInvoiceData } from "../../../lib/zatca/phase2";
 import { v4 as uuidv4 } from "uuid";
@@ -99,14 +98,64 @@ export const startOnboarding = subscriptionProcedure
 		});
 
 		// 4. Request Compliance CSID from ZATCA
-		//    Sandbox always requires the fixed OTP "123345" regardless of user input
+		//    Sandbox endpoint (developer-portal) is currently blocked by ZATCA WAF (2026-03)
+		//    so we fail fast and direct the user to switch to "simulation".
 		const env = process.env.ZATCA_ENVIRONMENT || "simulation";
-		const effectiveOtp = env === "sandbox" ? SANDBOX_DEFAULTS.otp : input.otp;
+
+		if (env === "sandbox") {
+			throw new ORPCError("BAD_REQUEST", {
+				message:
+					"بيئة sandbox محجوبة من ZATCA حالياً (WAF). غيّر متغيّر البيئة ZATCA_ENVIRONMENT إلى simulation أو production وأعد المحاولة. ملاحظة: في وضع sandbox يتم تجاهل رمز OTP المُدخَل واستبداله بـ 123345 — وهو ما يسبّب رفض الطلب.",
+			});
+		}
+
+		// In simulation/production the user-entered OTP is used as-is
+		const effectiveOtp = input.otp;
 		const complianceResult = await requestComplianceCSID(csrResult.csr, effectiveOtp);
 
 		if (!complianceResult.success || !complianceResult.csid || !complianceResult.secret) {
+			const zatcaMsg =
+				complianceResult.errors?.map((e) => e.message).filter(Boolean).join(", ") || "خطأ غير معروف";
+			const httpStatus = complianceResult.httpStatus;
+
+			// Persist a diagnostic record so the user can see what went wrong
+			// (lastError + DISABLED status keeps it inert until they retry).
+			try {
+				await db.zatcaDevice.upsert({
+					where: {
+						organizationId_invoiceType: {
+							organizationId: input.organizationId,
+							invoiceType: input.invoiceType,
+						},
+					},
+					create: {
+						organizationId: input.organizationId,
+						invoiceType: input.invoiceType,
+						status: "DISABLED",
+						privateKey: encryptSecret(csrResult.privateKey),
+						publicKey: csrResult.publicKey,
+						lastError: `[CSID:${httpStatus ?? "?"}/${env}] ${zatcaMsg}`,
+					},
+					update: {
+						lastError: `[CSID:${httpStatus ?? "?"}/${env}] ${zatcaMsg}`,
+					},
+				});
+			} catch (logErr) {
+				console.error("[ZATCA] Failed to persist diagnostic record:", logErr);
+			}
+
+			// Build a human-friendly hint for common failures
+			let hint = "";
+			if (httpStatus === 401 || httpStatus === 403) {
+				hint = " — تأكّد أن رمز OTP صحيح وغير منتهي (مدة الصلاحية ~ساعة، ولا يُستخدَم مرتين).";
+			} else if (httpStatus === 400) {
+				hint = ` — تأكّد أن الـ OTP من بوابة Fatoora ${env === "simulation" ? "Simulation" : "Production"} وأن الرقم الضريبي صحيح.`;
+			} else if (httpStatus && httpStatus >= 500) {
+				hint = " — خطأ من خوادم ZATCA، حاول بعد دقائق.";
+			}
+
 			throw new ORPCError("BAD_REQUEST", {
-				message: `فشل التسجيل مع زاتكا: ${complianceResult.errors?.map((e) => e.message).join(", ") || "خطأ غير معروف"}`,
+				message: `فشل التسجيل مع زاتكا (${env}, HTTP ${httpStatus ?? "?"}): ${zatcaMsg}${hint}`,
 			});
 		}
 

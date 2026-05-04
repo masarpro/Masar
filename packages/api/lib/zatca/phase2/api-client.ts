@@ -109,6 +109,7 @@ export interface ZatcaCSIDResult {
 	csid?: string;
 	secret?: string;
 	requestId?: string;
+	httpStatus?: number;
 	errors?: Array<{ code?: string; message: string }>;
 }
 
@@ -149,11 +150,13 @@ export async function requestComplianceCSID(
 			csid: result.data.binarySecurityToken,
 			secret: result.data.secret,
 			requestId: result.data.requestID,
+			httpStatus: result.status,
 		};
 	}
 
 	return {
 		success: false,
+		httpStatus: result.status,
 		errors:
 			result.data?.errors ||
 			result.data?.validationResults?.errorMessages ||
@@ -207,11 +210,13 @@ export async function requestProductionCSID(
 			csid: result.data.binarySecurityToken,
 			secret: result.data.secret,
 			requestId: result.data.requestID,
+			httpStatus: result.status,
 		};
 	}
 
 	return {
 		success: false,
+		httpStatus: result.status,
 		errors:
 			result.data?.errors ||
 			result.data?.validationResults?.errorMessages ||
@@ -273,6 +278,7 @@ export async function renewProductionCSID(
 			csid: result.data.binarySecurityToken,
 			secret: result.data.secret,
 			requestId: result.data.requestID,
+			httpStatus: result.status,
 		};
 	}
 
@@ -281,6 +287,7 @@ export async function renewProductionCSID(
 		console.warn("[ZATCA API] Renewal returned 428 NOT_COMPLIANT — temporary certificate issued");
 		return {
 			success: false,
+			httpStatus: result.status,
 			csid: result.data.binarySecurityToken,
 			secret: result.data.secret,
 			requestId: result.data.requestID,
@@ -290,6 +297,7 @@ export async function renewProductionCSID(
 
 	return {
 		success: false,
+		httpStatus: result.status,
 		errors:
 			result.data?.errors ||
 			result.data?.validationResults?.errorMessages ||

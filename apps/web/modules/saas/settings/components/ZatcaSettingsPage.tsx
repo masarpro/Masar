@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
@@ -45,6 +45,7 @@ interface ZatcaSettingsPageProps {
 /** Local type — matches getStatus return shape (Prisma client may be stale) */
 interface ZatcaStatusData {
 	phase: "1" | "2";
+	environment: "sandbox" | "simulation" | "production";
 	devices: Array<{
 		id: string;
 		deviceName: string;
@@ -142,6 +143,18 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 	const phase = data?.phase ?? "1";
 	const devices = data?.devices ?? [];
 	const stats = data?.stats;
+	const environment = data?.environment ?? "simulation";
+	const isSandbox = environment === "sandbox";
+	const envLabel =
+		environment === "production"
+			? "إنتاج (Production)"
+			: environment === "simulation"
+				? "محاكاة (Simulation)"
+				: "تجريبي (Sandbox)";
+	const fatooraPortalUrl =
+		environment === "production"
+			? "https://fatoora.zatca.gov.sa"
+			: "https://fatoora.zatca.gov.sa/Onboarding/PreProduction";
 
 	return (
 		<div className="flex flex-col gap-6">
@@ -235,30 +248,42 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 							</thead>
 							<tbody>
 								{devices.map((device) => (
-									<tr key={device.id} className="border-b border-slate-50 dark:border-slate-800/30 last:border-0">
-										<td className="p-3 font-medium text-sm">{device.deviceName}</td>
-										<td className="p-3 text-sm text-muted-foreground">
-											{device.invoiceType === "STANDARD" ? t("device.standard") : t("device.simplified")}
-										</td>
-										<td className="p-3 text-sm font-mono">{device.invoiceCounter}</td>
-										<td className="p-3">
-											<span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[device.status] ?? STATUS_COLORS.DISABLED}`}>
-												{t(`status.${device.status}`)}
-											</span>
-										</td>
-										<td className="p-3">
-											{device.status === "ACTIVE" && (
-												<Button
-													variant="ghost"
-													size="icon"
-													className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
-													onClick={() => setRevokeDeviceId(device.id)}
-												>
-													<Trash2 className="h-4 w-4" />
-												</Button>
-											)}
-										</td>
-									</tr>
+									<Fragment key={device.id}>
+										<tr className="border-b border-slate-50 dark:border-slate-800/30 last:border-0">
+											<td className="p-3 font-medium text-sm">{device.deviceName}</td>
+											<td className="p-3 text-sm text-muted-foreground">
+												{device.invoiceType === "STANDARD" ? t("device.standard") : t("device.simplified")}
+											</td>
+											<td className="p-3 text-sm font-mono">{device.invoiceCounter}</td>
+											<td className="p-3">
+												<span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[device.status] ?? STATUS_COLORS.DISABLED}`}>
+													{t(`status.${device.status}`)}
+												</span>
+											</td>
+											<td className="p-3">
+												{device.status === "ACTIVE" && (
+													<Button
+														variant="ghost"
+														size="icon"
+														className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+														onClick={() => setRevokeDeviceId(device.id)}
+													>
+														<Trash2 className="h-4 w-4" />
+													</Button>
+												)}
+											</td>
+										</tr>
+										{device.lastError && device.status !== "ACTIVE" && (
+											<tr className="border-b border-slate-50 dark:border-slate-800/30">
+												<td colSpan={5} className="px-3 pb-3">
+													<div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-2.5 text-xs text-red-800 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-200">
+														<AlertCircle className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
+														<span className="font-mono break-all">{device.lastError}</span>
+													</div>
+												</td>
+											</tr>
+										)}
+									</Fragment>
 								))}
 							</tbody>
 						</table>
@@ -291,6 +316,34 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 						<DialogDescription>{t("subtitle")}</DialogDescription>
 					</DialogHeader>
 
+					{/* Environment indicator */}
+					<div
+						className={`flex items-start gap-2 rounded-xl border p-3 text-sm ${
+							isSandbox
+								? "border-red-200 bg-red-50 text-red-900 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-200"
+								: environment === "production"
+									? "border-green-200 bg-green-50 text-green-900 dark:border-green-900/40 dark:bg-green-950/30 dark:text-green-200"
+									: "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-200"
+						}`}
+					>
+						<AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+						<div className="flex-1">
+							<p className="font-semibold">البيئة الحالية: {envLabel}</p>
+							{isSandbox ? (
+								<p className="mt-0.5">
+									بيئة sandbox محجوبة من ZATCA. غيّر متغيّر <code className="font-mono">ZATCA_ENVIRONMENT</code> إلى
+									<code className="font-mono"> simulation</code> أو
+									<code className="font-mono"> production</code> ثم أعد المحاولة.
+								</p>
+							) : (
+								<p className="mt-0.5">
+									تأكّد أن رمز OTP من بوابة Fatoora <strong>{environment === "production" ? "الإنتاج" : "Simulation"}</strong>{" "}
+									(صلاحية ~ساعة، يُستخدم مرة واحدة).
+								</p>
+							)}
+						</div>
+					</div>
+
 					<div className="space-y-6 py-4">
 						{/* Step 1 */}
 						<div className="flex gap-3">
@@ -299,7 +352,7 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 								<p className="font-medium text-sm">{t("onboarding.step1Title")}</p>
 								<p className="text-sm text-muted-foreground mt-0.5">{t("onboarding.step1Description")}</p>
 								<a
-									href="https://fatoora.zatca.gov.sa"
+									href={fatooraPortalUrl}
 									target="_blank"
 									rel="noopener noreferrer"
 									className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-1.5"
