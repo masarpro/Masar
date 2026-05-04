@@ -57,8 +57,15 @@ export async function generateCSRviaOpenSSL(input: CSRInput): Promise<CSRResult>
 		input.organizationName.replace(/[^\x20-\x7E]/g, "").trim() ||
 		"Masar Platform";
 
+	// Per ZATCA SDK / zatca-xml-js reference:
+	//   sandbox/simulation → "TSTZATCA-Code-Signing"
+	//   production         → "ZATCA-Code-Signing"
+	// (The earlier value "PREZATCACode-Signing" is unsupported by ZATCA.)
 	const templateName =
-		env === "simulation" ? "PREZATCACode-Signing" : "ZATCA-Code-Signing";
+		env === "production" ? "ZATCA-Code-Signing" : "TSTZATCA-Code-Signing";
+
+	const snPrefix =
+		env === "production" ? "1-Masar|2-EGS1|3-" : "1-TST|2-TST|3-";
 
 	// 1. Create temp directory for all files
 	const tmp = mkdtempSync(join(tmpdir(), "zatca-"));
@@ -71,12 +78,14 @@ export async function generateCSRviaOpenSSL(input: CSRInput): Promise<CSRResult>
 		const conf = generateOpenSSLConf({
 			organizationName: asciiOrg,
 			location,
+			branchName: location,
 			cn,
 			templateName,
 			uuid,
 			vatNumber: input.vatNumber,
 			invoiceType,
 			industry,
+			snPrefix,
 		});
 		writeFileSync(confFile, conf);
 
@@ -273,24 +282,24 @@ async function generateCSRviaCrypto(input: CSRInput): Promise<CSRResult> {
 		? `${CSR_CONFIG.commonName}-${input.vatNumber}`
 		: `TST-886431145-${input.vatNumber}`;
 	const asciiOrg = input.organizationName.replace(/[^\x20-\x7E]/g, "").trim() || "Masar Platform";
-	const templateName = env === "simulation" ? "PREZATCACode-Signing" : "ZATCA-Code-Signing";
+	// Match the ZATCA SDK template names exactly. "PREZATCACode-Signing"
+	// (which we used previously) is not recognized by ZATCA.
+	const templateName = env === "production" ? "ZATCA-Code-Signing" : "TSTZATCA-Code-Signing";
 	const snPrefix = env === "production" ? "1-Masar|2-EGS1|3-" : "1-TST|2-TST|3-";
 
-	// Subject DN — matches OpenSSL conf order (C, O, OU, CN)
+	// Subject DN — matches the ZATCA reference template order: CN, OU, O, C.
+	// Strings are PrintableString (utf8 = no in the official conf) when the
+	// content is pure ASCII — which it is, since asciiOrg/location/cn are
+	// pre-stripped to printable ASCII.
 	const subject = derSequence(
+		derRDN(OID.commonName, derPrintableString(cn)),
+		derRDN(OID.organizationUnit, derPrintableString(location)),
+		derRDN(OID.organization, derPrintableString(asciiOrg)),
 		derRDN(OID.countryName, derPrintableString("SA")),
-		derRDN(OID.organization, derUTF8String(asciiOrg)),
-		derRDN(OID.organizationUnit, derUTF8String(location)),
-		derRDN(OID.commonName, derUTF8String(cn)),
 	);
 
-	// Extension 1: basicConstraints = CA:FALSE (empty SEQUENCE = default FALSE)
-	const basicConstraintsExt = derSequence(
-		derOID("2.5.29.19"),
-		derOctetString(derSequence()),
-	);
-
-	// Extension 2: subjectAltName = dirName (SAN with ZATCA-specific fields)
+	// SAN dirName — values are UTF8String per ZATCA SDK output (these come
+	// from openssl SUBJ where attributes default to UTF8String).
 	const altNameDirName = derSequence(
 		derRDN(OID.serialNumber, derUTF8String(`${snPrefix}${serialNumber}`)),
 		derRDN(OID.userId, derUTF8String(input.vatNumber)),
@@ -304,16 +313,20 @@ async function generateCSRviaCrypto(input: CSRInput): Promise<CSRResult> {
 		derOctetString(derSequence(derContextTag(4, altNameDirName))),
 	);
 
-	// Extension 3: certificateTemplateName — PrintableString (matches OpenSSL ASN1:PRINTABLESTRING)
+	// Certificate template name — UTF8String per the ZATCA SDK conf
+	// (1.3.6.1.4.1.311.20.2 = ASN1:UTF8String:...). Was previously
+	// PrintableString which ZATCA rejects in production.
 	const certTemplateExt = derSequence(
 		derOID(OID.certificateTemplateName),
-		derOctetString(derPrintableString(templateName)),
+		derOctetString(derUTF8String(templateName)),
 	);
 
-	// Attributes: extensionRequest with all 3 extensions (order matches OpenSSL conf)
+	// Attributes: extensionRequest with subjectAltName + certTemplate only.
+	// The official ZATCA template intentionally omits basicConstraints —
+	// including it produced "Invalid-CSR" errors in production.
 	const attributes = derContextTag(0, derSequence(
 		derOID(OID.extensionRequest),
-		derSet(derSequence(basicConstraintsExt, subjectAltNameExt, certTemplateExt)),
+		derSet(derSequence(subjectAltNameExt, certTemplateExt)),
 	));
 
 	const certRequestInfo = derSequence(derInteger(0), subject, publicKeySpkiDer, attributes);
