@@ -298,14 +298,15 @@ async function generateCSRviaCrypto(input: CSRInput): Promise<CSRResult> {
 		derRDN(OID.countryName, derPrintableString("SA")),
 	);
 
-	// SAN dirName — values are UTF8String per ZATCA SDK output (these come
-	// from openssl SUBJ where attributes default to UTF8String).
+	// SAN dirName — PrintableString to match `utf8 = no` in the ZATCA conf.
+	// (OpenSSL with utf8=no encodes ASCII fields as PrintableString; using
+	// UTF8String here produced byte-level mismatches versus the conf path.)
 	const altNameDirName = derSequence(
-		derRDN(OID.serialNumber, derUTF8String(`${snPrefix}${serialNumber}`)),
-		derRDN(OID.userId, derUTF8String(input.vatNumber)),
-		derRDN(OID.title, derUTF8String(invoiceType)),
-		derRDN(OID.registeredAddress, derUTF8String(location)),
-		derRDN(OID.businessCategory, derUTF8String(industry)),
+		derRDN(OID.serialNumber, derPrintableString(`${snPrefix}${serialNumber}`)),
+		derRDN(OID.userId, derPrintableString(input.vatNumber)),
+		derRDN(OID.title, derPrintableString(invoiceType)),
+		derRDN(OID.registeredAddress, derPrintableString(location)),
+		derRDN(OID.businessCategory, derPrintableString(industry)),
 	);
 
 	const subjectAltNameExt = derSequence(
@@ -314,26 +315,30 @@ async function generateCSRviaCrypto(input: CSRInput): Promise<CSRResult> {
 	);
 
 	// Certificate template name — UTF8String per the ZATCA SDK conf
-	// (1.3.6.1.4.1.311.20.2 = ASN1:UTF8String:...). Was previously
-	// PrintableString which ZATCA rejects in production.
+	// (1.3.6.1.4.1.311.20.2 = ASN1:UTF8String:...).
 	const certTemplateExt = derSequence(
 		derOID(OID.certificateTemplateName),
 		derOctetString(derUTF8String(templateName)),
 	);
 
-	// Attributes: extensionRequest with subjectAltName + certTemplate only.
-	// The official ZATCA template intentionally omits basicConstraints —
-	// including it produced "Invalid-CSR" errors in production.
+	// Extensions ordered to match ZATCA conf: cert template FIRST, then SAN.
+	// (OpenSSL emits extensions in conf-section order; reversing this caused
+	// validator-level differences against the reference template.)
 	const attributes = derContextTag(0, derSequence(
 		derOID(OID.extensionRequest),
-		derSet(derSequence(subjectAltNameExt, certTemplateExt)),
+		derSet(derSequence(certTemplateExt, subjectAltNameExt)),
 	));
 
 	const certRequestInfo = derSequence(derInteger(0), subject, publicKeySpkiDer, attributes);
 
 	const signer = createSign("SHA256");
 	signer.update(certRequestInfo);
-	const signatureDer = signer.sign(keyPair.privateKey);
+	// Force DER-encoded ECDSA signature (SEQUENCE { r INTEGER, s INTEGER }).
+	// Node default is "der" since v17 but being explicit avoids regressions.
+	const signatureDer = signer.sign({
+		key: keyPair.privateKey,
+		dsaEncoding: "der",
+	});
 
 	const csrDer = derSequence(
 		certRequestInfo,
@@ -347,7 +352,20 @@ async function generateCSRviaCrypto(input: CSRInput): Promise<CSRResult> {
 	const pemString = `-----BEGIN CERTIFICATE REQUEST-----\n${pemBody}-----END CERTIFICATE REQUEST-----\n`;
 	const csrBase64 = Buffer.from(pemString).toString("base64");
 
-	console.log("[ZATCA] CSR generated (Node.js fallback) — length:", csrBase64.length, "| CN:", cn);
+	console.log(
+		"[ZATCA] CSR generated (Node.js fallback) — outer base64 len:",
+		csrBase64.length,
+		"| DER bytes:",
+		csrDer.length,
+		"| CN:",
+		cn,
+		"| template:",
+		templateName,
+	);
+	// Hex dump of the DER for offline byte-level diff against a known-good CSR
+	console.log("[ZATCA] CSR DER hex:", csrDer.toString("hex"));
+	// Also dump the SPKI bytes (ZATCA validates the secp256k1 algorithm OID)
+	console.log("[ZATCA] SPKI hex:", Buffer.from(publicKeySpkiDer).toString("hex"));
 
 	return { csr: csrBase64, privateKey: privateKeyPem, publicKey: publicKeyPem };
 }
