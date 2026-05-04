@@ -288,25 +288,30 @@ async function generateCSRviaCrypto(input: CSRInput): Promise<CSRResult> {
 	const snPrefix = env === "production" ? "1-Masar|2-EGS1|3-" : "1-TST|2-TST|3-";
 
 	// Subject DN — matches the ZATCA reference template order: CN, OU, O, C.
-	// Strings are PrintableString (utf8 = no in the official conf) when the
-	// content is pure ASCII — which it is, since asciiOrg/location/cn are
-	// pre-stripped to printable ASCII.
+	// Encoding is UTF8String for free-text RDNs because OpenSSL 3.x defaults to
+	// string_mask = utf8only and ZATCA's validator follows the OpenSSL output
+	// byte-for-byte. countryName stays PrintableString — it's schema-constrained
+	// (X520countryName) and OpenSSL emits it as PrintableString regardless.
+	// Verified via byte-level diff in scripts/zatca/csr-diff.log.
 	const subject = derSequence(
-		derRDN(OID.commonName, derPrintableString(cn)),
-		derRDN(OID.organizationUnit, derPrintableString(location)),
-		derRDN(OID.organization, derPrintableString(asciiOrg)),
+		derRDN(OID.commonName, derUTF8String(cn)),
+		derRDN(OID.organizationUnit, derUTF8String(location)),
+		derRDN(OID.organization, derUTF8String(asciiOrg)),
 		derRDN(OID.countryName, derPrintableString("SA")),
 	);
 
-	// SAN dirName — PrintableString to match `utf8 = no` in the ZATCA conf.
-	// (OpenSSL with utf8=no encodes ASCII fields as PrintableString; using
-	// UTF8String here produced byte-level mismatches versus the conf path.)
+	// SAN dirName — UTF8String for all values (same reason as Subject above).
+	// CRITICAL: OpenSSL's "SN" shortname maps to surname (OID 2.5.4.4), NOT
+	// serialNumber (2.5.4.5). The ZATCA SDK template uses "SN = …", so the
+	// reference CSR carries surname; ZATCA's validator expects the same OID.
+	// Using serialNumber (2.5.4.5) caused production Invalid-CSR rejections.
+	const SAN_SN_OID = "2.5.4.4"; // surname — matches OpenSSL SN shortname
 	const altNameDirName = derSequence(
-		derRDN(OID.serialNumber, derPrintableString(`${snPrefix}${serialNumber}`)),
-		derRDN(OID.userId, derPrintableString(input.vatNumber)),
-		derRDN(OID.title, derPrintableString(invoiceType)),
-		derRDN(OID.registeredAddress, derPrintableString(location)),
-		derRDN(OID.businessCategory, derPrintableString(industry)),
+		derRDN(SAN_SN_OID, derUTF8String(`${snPrefix}${serialNumber}`)),
+		derRDN(OID.userId, derUTF8String(input.vatNumber)),
+		derRDN(OID.title, derUTF8String(invoiceType)),
+		derRDN(OID.registeredAddress, derUTF8String(location)),
+		derRDN(OID.businessCategory, derUTF8String(industry)),
 	);
 
 	const subjectAltNameExt = derSequence(

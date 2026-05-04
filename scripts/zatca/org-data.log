@@ -1,0 +1,60 @@
+[dotenv@17.2.3] injecting env (20) from packages\database\.env.local -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (5) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+══════════════════════════════════════════════════════════════════════
+  ZATCA ONBOARDING — ORGANIZATION DATA INSPECTOR
+  Org slug: mnshat-omran-alkhaleej
+  Date    : 2026-05-04T16:06:16.162Z
+══════════════════════════════════════════════════════════════════════
+
+[1] ORGANIZATION RECORD
+──────────────────────────────────────────────────────────────────────
+    id                                 "cmnhonj6u000004l5mtf8rdq9"
+    slug                               "mnshat-omran-alkhaleej"
+    name (raw)                         "مؤسسة عمران الخليج للمقاولات العامة"
+    name byte-length (UTF8)            66
+  ✗ name has non-ASCII                 true
+  ✗ name PrintableString-illegal chars U+0645 ("م"), U+0624 ("ؤ"), U+0633 ("س"), U+0633 ("س"), U+0629 ("ة"), U+0639 ("ع"), U+0645 ("م"), U+0631 ("ر"), U+0627 ("ا"), U+0646 ("ن"), U+0627 ("ا"), U+0644 ("ل"), U+062e ("خ"), U+0644 ("ل"), U+064a ("ي"), U+062c ("ج"), U+0644 ("ل"), U+0644 ("ل"), U+0645 ("م"), U+0642 ("ق"), U+0627 ("ا"), U+0648 ("و"), U+0644 ("ل"), U+0627 ("ا"), U+062a ("ت"), U+0627 ("ا"), U+0644 ("ل"), U+0639 ("ع"), U+0627 ("ا"), U+0645 ("م"), U+0629 ("ة")
+    name → ASCII strip → fallback      (empty → "Masar Platform")
+    commercialRegister                 "5900121203"
+    taxNumber                          "311181325200003"
+    city                               (null)
+    address                            (null)
+    phone                              (null)
+
+[2] FINANCE SETTINGS
+──────────────────────────────────────────────────────────────────────
+    financeSettings                    (none)
+
+[3] RESOLVED VAT NUMBER (per start-onboarding.ts logic)
+──────────────────────────────────────────────────────────────────────
+    resolved (fs ?? org)               "311181325200003"
+    cleaned (no space/dash)            "311181325200003"
+  ✓ length == 15                       15
+  ✓ matches /^\d{15}$/                 true
+  ✓ matches ZATCA /^3\d{13}3$/         true
+  ✓ starts with 3                      true
+  ✓ ends with 3                        true
+
+[4] FIELDS ENTERING THE CSR (computed)
+──────────────────────────────────────────────────────────────────────
+    ZATCA_ENVIRONMENT                  sandbox
+    CN (commonName)                    "TST-886431145-311181325200003"
+      CN length                        29
+  ✓   CN PrintableString-clean         true
+    O (organizationName)               "Masar Platform"
+    OU (organizationalUnitName)        "Jeddah"
+    registeredAddress (SAN)            "Jeddah"
+    businessCategory (SAN)             "Construction"
+    SN prefix                          "1-TST|2-TST|3-"
+    templateName                       "TSTZATCA-Code-Signing"
+
+[5] EXISTING ZATCA DEVICES
+──────────────────────────────────────────────────────────────────────
+    count                              0 (no devices yet)
+
+[6] FINAL VERDICT
+──────────────────────────────────────────────────────────────────────
+  ✗ Issues that may cause Invalid-CSR / Invalid-OTP:
+    - Org name has non-ASCII (will be stripped to fallback)
+
+══════════════════════════════════════════════════════════════════════

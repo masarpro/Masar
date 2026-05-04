@@ -1,0 +1,115 @@
+════════════════════════════════════════════════════════════════════════
+  ZATCA CSR REFERENCE DIFF (READ-ONLY)
+  OpenSSL 3.5.4 30 Sep 2025 (Library: OpenSSL 3.5.4 30 Sep 2025)
+  Date: 2026-05-04T16:12:39.493Z
+════════════════════════════════════════════════════════════════════════
+
+[Setup] Generated secp256k1 key pair
+        SPKI bytes: 88
+
+[REF] CSR built via openssl CLI — DER bytes: 507
+
+[OURS] CSR built via Node.js DER builder — DER bytes: 508
+
+════════════════════════════════════════════════════════════════════════
+  CSR DIFF: Ours (Node.js crypto) vs Reference (OpenSSL CLI)
+  Same private key, same logical inputs
+════════════════════════════════════════════════════════════════════════
+
+[1] Total DER length
+────────────────────────────────────────────────────────────────────────
+  Ours:      508 bytes
+  Reference: 507 bytes
+  Match:     ✗
+
+[2] Subject DN
+────────────────────────────────────────────────────────────────────────
+  RDN count: Ours=4, Ref=4, Match=✓
+  RDN[0]:
+    OID:     Ours=2.5.4.3 (CN)  Ref=2.5.4.3 (CN)  ✓
+    Tag:     Ours=0x13 (PrintableString)  Ref=0x0c (UTF8String)  ✗
+    Value:   Ours="MASAR-EGS-311181325200003"  Ref="MASAR-EGS-311181325200003"  ✓
+  RDN[1]:
+    OID:     Ours=2.5.4.11 (OU)  Ref=2.5.4.11 (OU)  ✓
+    Tag:     Ours=0x13 (PrintableString)  Ref=0x0c (UTF8String)  ✗
+    Value:   Ours="Jeddah"  Ref="Jeddah"  ✓
+  RDN[2]:
+    OID:     Ours=2.5.4.10 (O)  Ref=2.5.4.10 (O)  ✓
+    Tag:     Ours=0x13 (PrintableString)  Ref=0x0c (UTF8String)  ✗
+    Value:   Ours="Masar Platform"  Ref="Masar Platform"  ✓
+  RDN[3]:
+    OID:     Ours=2.5.4.6 (C)  Ref=2.5.4.6 (C)  ✓
+    Tag:     Ours=0x13 (PrintableString)  Ref=0x13 (PrintableString)  ✓
+    Value:   Ours="SA"  Ref="SA"  ✓
+
+[3] subjectPublicKeyInfo
+────────────────────────────────────────────────────────────────────────
+  algorithm OID:    Ours=1.2.840.10045.2.1 (ecPublicKey)  Ref=1.2.840.10045.2.1 (ecPublicKey)  ✓
+  parameters:       Ours=06052b8104000a  Ref=06052b8104000a
+  parameters match: ✓
+  publicKey first 16 bytes: Ours=04b5c5a11d8a77d381e35f2bf653ca97  Ref=04b5c5a11d8a77d381e35f2bf653ca97
+  publicKey full match (must match — same key): ✓
+
+[4] Attributes (extensionRequest)
+────────────────────────────────────────────────────────────────────────
+  Attribute count: Ours=0, Ref=0, Match=✓
+  Raw [0] length:  Ours=230, Ref=230
+
+[5] signatureAlgorithm
+────────────────────────────────────────────────────────────────────────
+  Ours: 1.2.840.10045.4.3.2 (ecdsa-with-SHA256)
+  Ref:  1.2.840.10045.4.3.2 (ecdsa-with-SHA256)
+  Match: ✓
+  Parameters present: Ours=false Ref=false
+
+[6] First differing byte
+────────────────────────────────────────────────────────────────────────
+  Ours certRequestInfo bytes: 418
+  Ref  certRequestInfo bytes: 418
+  ✗ First diff at byte offset 0x12 (18 dec)
+    Ours: …03 55 04 03 [13] 19 4d 41 53 41 52 2d 45 47 53 2d
+    Ref:  …03 55 04 03 [0c] 19 4d 41 53 41 52 2d 45 47 53 2d
+
+════════════════════════════════════════════════════════════════════════
+  HEX DUMPS (full DER)
+════════════════════════════════════════════════════════════════════════
+OURS DER (508 bytes)
+  0000: 30 82 01 f8 30 82 01 9e 02 01 00 30 5b 31 22 30 20 06 03 55 04 03 13 19 4d 41 53 41 52 2d 45 47
+  0020: 53 2d 33 31 31 31 38 31 33 32 35 32 30 30 30 30 33 31 0f 30 0d 06 03 55 04 0b 13 06 4a 65 64 64
+  0040: 61 68 31 17 30 15 06 03 55 04 0a 13 0e 4d 61 73 61 72 20 50 6c 61 74 66 6f 72 6d 31 0b 30 09 06
+  0060: 03 55 04 06 13 02 53 41 30 56 30 10 06 07 2a 86 48 ce 3d 02 01 06 05 2b 81 04 00 0a 03 42 00 04
+  0080: b5 c5 a1 1d 8a 77 d3 81 e3 5f 2b f6 53 ca 97 df 0e be d4 a5 b0 c5 01 c4 67 7e 16 91 3e 01 6c 4a
+  00a0: 76 71 d4 fd 70 48 00 97 c9 42 27 4d 85 e0 1e a7 c1 28 78 67 64 3c 36 5b 77 26 ef 36 86 f2 99 7a
+  00c0: a0 81 e3 30 81 e0 06 09 2a 86 48 86 f7 0d 01 09 0e 31 81 d2 30 81 cf 30 21 06 09 2b 06 01 04 01
+  00e0: 82 37 14 02 04 14 0c 12 5a 41 54 43 41 2d 43 6f 64 65 2d 53 69 67 6e 69 6e 67 30 81 a9 06 03 55
+  0100: 1d 11 04 81 a1 30 81 9e a4 81 9b 30 81 98 31 3e 30 3c 06 03 55 04 05 13 35 31 2d 4d 61 73 61 72
+  0120: 7c 32 2d 45 47 53 31 7c 33 2d 30 30 30 30 30 30 30 30 2d 30 30 30 30 2d 30 30 30 30 2d 30 30 30
+  0140: 30 2d 30 30 30 30 30 30 30 30 30 30 30 31 31 1f 30 1d 06 0a 09 92 26 89 93 f2 2c 64 01 01 13 0f
+  0160: 33 31 31 31 38 31 33 32 35 32 30 30 30 30 33 31 0d 30 0b 06 03 55 04 0c 13 04 31 31 30 30 31 0f
+  0180: 30 0d 06 03 55 04 1a 13 06 4a 65 64 64 61 68 31 15 30 13 06 03 55 04 0f 13 0c 43 6f 6e 73 74 72
+  01a0: 75 63 74 69 6f 6e 30 0a 06 08 2a 86 48 ce 3d 04 03 02 03 48 00 30 45 02 20 77 0a 33 cc 54 83 2c
+  01c0: eb ad bd 2d 48 4a 4b 80 ab d2 67 01 01 28 e8 29 ca ce a2 eb 4a 17 37 a1 7d 02 21 00 fd 49 dd 90
+  01e0: a7 73 ba ce 33 98 83 1d 27 cc 95 9a aa c0 20 ea 80 5a 38 cb 0d 0e 1c 8b 6b e7 da c4
+
+REFERENCE DER (507 bytes)
+  0000: 30 82 01 f7 30 82 01 9e 02 01 00 30 5b 31 22 30 20 06 03 55 04 03 0c 19 4d 41 53 41 52 2d 45 47
+  0020: 53 2d 33 31 31 31 38 31 33 32 35 32 30 30 30 30 33 31 0f 30 0d 06 03 55 04 0b 0c 06 4a 65 64 64
+  0040: 61 68 31 17 30 15 06 03 55 04 0a 0c 0e 4d 61 73 61 72 20 50 6c 61 74 66 6f 72 6d 31 0b 30 09 06
+  0060: 03 55 04 06 13 02 53 41 30 56 30 10 06 07 2a 86 48 ce 3d 02 01 06 05 2b 81 04 00 0a 03 42 00 04
+  0080: b5 c5 a1 1d 8a 77 d3 81 e3 5f 2b f6 53 ca 97 df 0e be d4 a5 b0 c5 01 c4 67 7e 16 91 3e 01 6c 4a
+  00a0: 76 71 d4 fd 70 48 00 97 c9 42 27 4d 85 e0 1e a7 c1 28 78 67 64 3c 36 5b 77 26 ef 36 86 f2 99 7a
+  00c0: a0 81 e3 30 81 e0 06 09 2a 86 48 86 f7 0d 01 09 0e 31 81 d2 30 81 cf 30 21 06 09 2b 06 01 04 01
+  00e0: 82 37 14 02 04 14 0c 12 5a 41 54 43 41 2d 43 6f 64 65 2d 53 69 67 6e 69 6e 67 30 81 a9 06 03 55
+  0100: 1d 11 04 81 a1 30 81 9e a4 81 9b 30 81 98 31 3e 30 3c 06 03 55 04 04 0c 35 31 2d 4d 61 73 61 72
+  0120: 7c 32 2d 45 47 53 31 7c 33 2d 30 30 30 30 30 30 30 30 2d 30 30 30 30 2d 30 30 30 30 2d 30 30 30
+  0140: 30 2d 30 30 30 30 30 30 30 30 30 30 30 31 31 1f 30 1d 06 0a 09 92 26 89 93 f2 2c 64 01 01 0c 0f
+  0160: 33 31 31 31 38 31 33 32 35 32 30 30 30 30 33 31 0d 30 0b 06 03 55 04 0c 0c 04 31 31 30 30 31 0f
+  0180: 30 0d 06 03 55 04 1a 0c 06 4a 65 64 64 61 68 31 15 30 13 06 03 55 04 0f 0c 0c 43 6f 6e 73 74 72
+  01a0: 75 63 74 69 6f 6e 30 0a 06 08 2a 86 48 ce 3d 04 03 02 03 47 00 30 44 02 20 73 b1 7e 57 a5 60 72
+  01c0: 52 d6 df 58 6b 86 21 55 13 24 08 f3 53 45 91 aa fa 3d 01 ed 9a ef 49 7b 03 02 20 28 91 4f ea 41
+  01e0: 89 90 7e 5a 7a a4 0d 32 99 c6 a0 42 40 66 f9 cb bd a1 05 d1 50 9b 07 0a 03 c3 6a
+
+════════════════════════════════════════════════════════════════════════
+  Done. Temp dir kept for inspection: C:\Users\jawda\AppData\Local\Temp\zatca-diff-eJjd5j
+  (private key + CSRs there — DELETE after diagnosis)
+════════════════════════════════════════════════════════════════════════
