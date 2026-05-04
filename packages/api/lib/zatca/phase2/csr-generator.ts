@@ -18,10 +18,15 @@ import { execSync } from "node:child_process";
 import { writeFileSync, readFileSync, unlinkSync, mkdtempSync, rmdirSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import * as forge from "node-forge";
 import { CSR_CONFIG } from "./constants";
 import { generateOpenSSLConf } from "./csr-openssl.conf";
 import type { CSRInput, CSRResult } from "./types";
 import type { ZatcaEnvironment } from "./constants";
+
+// Module-level cache: once OpenSSL CLI fails on this runtime (e.g. Vercel's
+// broken binary with `SSL_get_srp_g` symbol mismatch), don't keep trying.
+let openSSLBroken = false;
 
 // ═══════════════════════════════════════════════════════════
 // OpenSSL-based CSR Generator (preferred)
@@ -41,9 +46,11 @@ export async function generateCSRviaOpenSSL(input: CSRInput): Promise<CSRResult>
 	const industry = input.industry || CSR_CONFIG.businessCategory;
 	const env = (process.env.ZATCA_ENVIRONMENT || "simulation") as ZatcaEnvironment;
 
+	// Production CN must be unique per EGS unit — ZATCA rejects collisions
+	// across merchants. Embed the VAT number so each merchant has a distinct CN.
 	const cn =
 		env === "production"
-			? CSR_CONFIG.commonName
+			? `${CSR_CONFIG.commonName}-${input.vatNumber}`
 			: `TST-886431145-${input.vatNumber}`;
 
 	const asciiOrg =
@@ -130,13 +137,52 @@ export async function generateCSRviaOpenSSL(input: CSRInput): Promise<CSRResult>
 
 /**
  * Generate CSR — tries OpenSSL first, falls back to Node.js crypto.
+ * Once OpenSSL fails on a runtime, we skip it for the rest of the process
+ * lifetime to avoid wasted ~50ms per request on broken Vercel binaries.
  */
 export async function generateCSR(input: CSRInput): Promise<CSRResult> {
+	if (openSSLBroken) {
+		const result = await generateCSRviaCrypto(input);
+		validateCSRStructure(result.csr);
+		return result;
+	}
+
 	try {
-		return await generateCSRviaOpenSSL(input);
+		const result = await generateCSRviaOpenSSL(input);
+		validateCSRStructure(result.csr);
+		return result;
 	} catch (err) {
-		console.warn("[ZATCA] OpenSSL not available, falling back to Node.js crypto CSR:", (err as Error).message);
-		return generateCSRviaCrypto(input);
+		const msg = (err as Error).message;
+		console.warn("[ZATCA] OpenSSL not available, falling back to Node.js crypto CSR:", msg);
+		// Lock the fallback for the remaining process lifetime when the binary
+		// is broken (symbol mismatch is non-recoverable on Vercel).
+		if (msg.includes("symbol lookup error") || msg.includes("ENOENT")) {
+			openSSLBroken = true;
+		}
+		const result = await generateCSRviaCrypto(input);
+		validateCSRStructure(result.csr);
+		return result;
+	}
+}
+
+/**
+ * Decode the produced CSR with node-forge to confirm the ASN.1 structure
+ * parses correctly. Logs subject + extensions so we can diagnose ZATCA
+ * "Invalid-CSR" responses from the Vercel logs alone.
+ */
+function validateCSRStructure(csrBase64: string): void {
+	try {
+		const pem = Buffer.from(csrBase64, "base64").toString("utf-8");
+		const csr = forge.pki.certificationRequestFromPem(pem);
+		const subjectStr = csr.subject.attributes
+			.map((a) => `${a.shortName ?? a.type}=${a.value}`)
+			.join(", ");
+		console.log("[ZATCA] CSR validated by node-forge — Subject:", subjectStr);
+	} catch (err) {
+		// node-forge may fail on secp256k1 (it lacks native support) — that's
+		// fine for the signature check, but it should still parse the ASN.1
+		// envelope. Surface the error so we can spot real structural issues.
+		console.warn("[ZATCA] node-forge CSR parse failed:", (err as Error).message);
 	}
 }
 
@@ -222,7 +268,10 @@ async function generateCSRviaCrypto(input: CSRInput): Promise<CSRResult> {
 	const publicKeyPem = keyPair.publicKey.export({ type: "spki", format: "pem" }) as string;
 	const publicKeySpkiDer = keyPair.publicKey.export({ type: "spki", format: "der" });
 
-	const cn = env === "production" ? CSR_CONFIG.commonName : `TST-886431145-${input.vatNumber}`;
+	// Production CN must be unique per EGS unit (see OpenSSL path comment).
+	const cn = env === "production"
+		? `${CSR_CONFIG.commonName}-${input.vatNumber}`
+		: `TST-886431145-${input.vatNumber}`;
 	const asciiOrg = input.organizationName.replace(/[^\x20-\x7E]/g, "").trim() || "Masar Platform";
 	const templateName = env === "simulation" ? "PREZATCACode-Signing" : "ZATCA-Code-Signing";
 	const snPrefix = env === "production" ? "1-Masar|2-EGS1|3-" : "1-TST|2-TST|3-";

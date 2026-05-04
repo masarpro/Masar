@@ -129,13 +129,21 @@ export async function requestComplianceCSID(
 	csrBase64: string,
 	otp: string,
 ): Promise<ZatcaCSIDResult> {
-	// Diagnostic logging (helps debug sandbox rejections)
+	// Diagnostic logging — decode the outer base64 so the checks reflect the
+	// actual PEM content, not the wrapper.
+	let decodedPem = "";
+	try {
+		decodedPem = Buffer.from(csrBase64, "base64").toString("utf-8");
+	} catch {
+		// keep empty — diagnostics will show that
+	}
 	console.log("[ZATCA] === Compliance CSID Request ===");
 	console.log("[ZATCA] URL:", `${getBaseUrl()}${ZATCA_PATHS.complianceCSID}`);
-	console.log("[ZATCA] CSR length:", csrBase64.length);
-	console.log("[ZATCA] CSR first 80:", csrBase64.substring(0, 80));
-	console.log("[ZATCA] Has PEM header:", csrBase64.includes("-----BEGIN"));
-	console.log("[ZATCA] Has newlines:", csrBase64.includes("\n"));
+	console.log("[ZATCA] Outer base64 length:", csrBase64.length);
+	console.log("[ZATCA] Inner PEM has BEGIN:", decodedPem.includes("-----BEGIN CERTIFICATE REQUEST-----"));
+	console.log("[ZATCA] Inner PEM has END:", decodedPem.includes("-----END CERTIFICATE REQUEST-----"));
+	console.log("[ZATCA] Inner PEM has newlines:", /\n|\r/.test(decodedPem));
+	console.log("[ZATCA] Inner PEM length:", decodedPem.length);
 	console.log("[ZATCA] OTP:", otp);
 
 	const result = await zatcaFetch(ZATCA_PATHS.complianceCSID, {
