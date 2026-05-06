@@ -1,5 +1,7 @@
 "use client";
 
+// TODO(cleanup): unused — remove after Phase 3 verification
+
 import {
 	AlertDialog,
 	AlertDialogAction,

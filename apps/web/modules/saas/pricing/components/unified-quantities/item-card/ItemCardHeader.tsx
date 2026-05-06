@@ -1,5 +1,7 @@
 "use client";
 
+// TODO(cleanup): unused — remove after Phase 3 verification
+
 import { Button } from "@ui/components/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { DomainBadge } from "../shared/DomainBadge";

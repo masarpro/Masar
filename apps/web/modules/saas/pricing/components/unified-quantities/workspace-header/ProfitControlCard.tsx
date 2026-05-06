@@ -28,7 +28,7 @@ interface Props {
 	customMarkupCount: number;
 }
 
-const QUICK_CHIPS = [15, 25, 30, 40, 50];
+const QUICK_CHIPS = [0, 15, 30, 50, 100];
 
 const fmt = (n: number) => n.toFixed(0);
 
@@ -142,9 +142,9 @@ export function ProfitControlCard({
 				/>
 				<div className="mt-1.5 flex justify-between text-[10px] tabular-nums text-muted-foreground">
 					<span>0%</span>
-					<span>25%</span>
+					<span>15%</span>
+					<span>30%</span>
 					<span>50%</span>
-					<span>75%</span>
 					<span>100%</span>
 				</div>
 			</div>

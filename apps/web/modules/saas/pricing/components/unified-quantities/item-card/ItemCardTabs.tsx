@@ -30,20 +30,29 @@ interface PersistedState {
 }
 
 const STORAGE_KEY = (id: string) => `unified-item-tab-${id}`;
-const DEFAULT_STATE: PersistedState = { expanded: false, tab: "pricing" };
 
-function readPersisted(id: string): PersistedState {
-	if (typeof window === "undefined") return DEFAULT_STATE;
+// Smart default: if the user hasn't entered any quantity yet, open on
+// "quantity" (the natural starting point). Once a quantity is present,
+// open on "pricing" (the typical review surface).
+function defaultTabForItem(item: QuantityItem): TabKey {
+	const qty = Number(item.effectiveQuantity ?? 0);
+	return qty > 0 ? "pricing" : "quantity";
+}
+
+function readPersisted(item: QuantityItem): PersistedState {
+	const fallbackTab = defaultTabForItem(item);
+	if (typeof window === "undefined")
+		return { expanded: false, tab: fallbackTab };
 	try {
-		const raw = window.localStorage.getItem(STORAGE_KEY(id));
-		if (!raw) return DEFAULT_STATE;
+		const raw = window.localStorage.getItem(STORAGE_KEY(item.id));
+		if (!raw) return { expanded: false, tab: fallbackTab };
 		const parsed = JSON.parse(raw) as Partial<PersistedState>;
 		return {
 			expanded: Boolean(parsed.expanded),
-			tab: (parsed.tab as TabKey) ?? DEFAULT_STATE.tab,
+			tab: (parsed.tab as TabKey) ?? fallbackTab,
 		};
 	} catch {
-		return DEFAULT_STATE;
+		return { expanded: false, tab: fallbackTab };
 	}
 }
 
@@ -68,7 +77,7 @@ export function ItemCardTabs({
 	onDuplicate,
 }: Props) {
 	const [state, setState] = useState<PersistedState>(() =>
-		readPersisted(item.id),
+		readPersisted(item),
 	);
 
 	const { entries } = useCatalog(item.organizationId);
@@ -102,36 +111,36 @@ export function ItemCardTabs({
 						onValueChange={(v) => setTab(v as TabKey)}
 					>
 						<TabsList className="w-full justify-start gap-1 bg-transparent p-0">
-							<TabTrigger value="pricing" icon={<ChartBar className="h-3.5 w-3.5" />}>
-								التسعير
-							</TabTrigger>
 							<TabTrigger value="quantity" icon={<Ruler className="h-3.5 w-3.5" />}>
 								الكمية
-							</TabTrigger>
-							<TabTrigger value="cost" icon={<Wallet className="h-3.5 w-3.5" />}>
-								التكلفة
 							</TabTrigger>
 							<TabTrigger value="specs" icon={<FileText className="h-3.5 w-3.5" />}>
 								المواصفات
 							</TabTrigger>
+							<TabTrigger value="cost" icon={<Wallet className="h-3.5 w-3.5" />}>
+								التكلفة
+							</TabTrigger>
+							<TabTrigger value="pricing" icon={<ChartBar className="h-3.5 w-3.5" />}>
+								التسعير
+							</TabTrigger>
 						</TabsList>
 
-						<TabsContent value="pricing" className="mt-3">
-							<PricingStrip
-								item={item}
-								globalMarkupPercent={globalMarkupPercent}
-							/>
-						</TabsContent>
 						<TabsContent value="quantity" className="mt-3">
 							<QuantitySection item={item} />
-						</TabsContent>
-						<TabsContent value="cost" className="mt-3">
-							<CostSection item={item} />
 						</TabsContent>
 						<TabsContent value="specs" className="mt-3">
 							<SpecificationsSection
 								item={item}
 								catalogEntry={catalogEntry}
+							/>
+						</TabsContent>
+						<TabsContent value="cost" className="mt-3">
+							<CostSection item={item} />
+						</TabsContent>
+						<TabsContent value="pricing" className="mt-3">
+							<PricingStrip
+								item={item}
+								globalMarkupPercent={globalMarkupPercent}
 							/>
 						</TabsContent>
 					</Tabs>

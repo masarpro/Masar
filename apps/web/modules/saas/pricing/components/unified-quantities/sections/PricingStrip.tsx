@@ -1,8 +1,9 @@
 "use client";
 
+import { Button } from "@ui/components/button";
 import { Label } from "@ui/components/label";
 import { Switch } from "@ui/components/switch";
-import { ArrowLeft, Info, TrendingDown, TrendingUp } from "lucide-react";
+import { ArrowLeft, Info, RotateCcw, TrendingDown, TrendingUp } from "lucide-react";
 import { useBiDirectionalPricing } from "../hooks/useBiDirectionalPricing";
 import { BiDirectionalPriceInput } from "../inputs/BiDirectionalPriceInput";
 import { MarkupMethodSelector } from "../inputs/MarkupMethodSelector";
@@ -25,14 +26,13 @@ const fmt0 = (n: number) =>
 		maximumFractionDigits: 0,
 	}).format(Math.round(n));
 
-const QUICK_CHIPS = [15, 25, 30, 40];
-
 export function PricingStrip({ item, globalMarkupPercent }: Props) {
 	const pricing = useBiDirectionalPricing(item);
 	const effectiveQty = Number(item.effectiveQuantity ?? 0);
 	const unitCost = pricing.materialUnitPrice + pricing.laborUnitPrice;
 	const totalCost = unitCost * effectiveQty;
 	const isProfit = pricing.profitAmount >= 0;
+	const unitLabel = item.unit?.trim() || "وحدة";
 
 	const handleToggleCustomMarkup = (custom: boolean) => {
 		if (custom) {
@@ -69,43 +69,32 @@ export function PricingStrip({ item, globalMarkupPercent }: Props) {
 			? pricing.impliedMarkupPercent
 			: pricing.markupPercent;
 
-	const isQuickActive = (chip: number) =>
-		pricing.hasCustomMarkup &&
-		pricing.markupMethod === "percentage" &&
-		Math.abs(pricing.markupPercent - chip) < 0.5;
-
 	return (
 		<div className="space-y-4">
-			{/* Quick chips — fastest path to a price */}
-			<div className="flex flex-wrap items-center gap-1.5">
-				<span className="me-1 text-xs text-muted-foreground">سريع:</span>
-				{QUICK_CHIPS.map((chip) => (
-					<button
-						key={chip}
-						type="button"
-						onClick={() =>
-							pricing.updateField("markup_percent", chip)
-						}
-						className={`rounded-full border px-3 py-1 text-xs tabular-nums transition ${
-							isQuickActive(chip)
-								? "border-violet-600 bg-violet-600 text-white"
-								: "border-border bg-background hover:bg-muted"
-						}`}
-					>
-						+{chip}%
-					</button>
-				))}
-				{pricing.hasCustomMarkup &&
-					pricing.markupMethod !== "percentage" && (
-						<span className="rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs text-violet-700 dark:border-violet-900 dark:bg-violet-950/30 dark:text-violet-300">
-							{pricing.markupMethod === "fixed_amount"
-								? `+${fmt2(pricing.markupFixedAmount)} ر.س ثابت`
-								: "سعر يدوي"}
+			{/* Markup-source indicator: either follows global, or shows a single
+			    "revert to global" action when this item has a custom markup. */}
+			<div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+				{pricing.hasCustomMarkup ? (
+					<>
+						<span className="text-muted-foreground">
+							هذا البند يستخدم هامشاً خاصاً
 						</span>
-					)}
-				{!pricing.hasCustomMarkup && (
-					<span className="ms-auto text-[10px] text-muted-foreground">
-						يتبع العام {globalMarkupPercent.toFixed(0)}%
+						<Button
+							size="sm"
+							variant="outline"
+							onClick={() => pricing.revertToGlobal()}
+							disabled={pricing.isLoading}
+						>
+							<RotateCcw className="me-1.5 h-3.5 w-3.5" />
+							العودة للهامش العام ({globalMarkupPercent.toFixed(0)}%)
+						</Button>
+					</>
+				) : (
+					<span className="text-muted-foreground">
+						يتبع الهامش العام{" "}
+						<span className="tabular-nums">
+							{globalMarkupPercent.toFixed(0)}%
+						</span>
 					</span>
 				)}
 			</div>
@@ -121,7 +110,7 @@ export function PricingStrip({ item, globalMarkupPercent }: Props) {
 					<p className="text-lg font-semibold tabular-nums">
 						{fmt2(unitCost)}
 						<span className="ms-1 text-xs font-normal text-muted-foreground">
-							ر.س/{item.unit}
+							ر.س/{unitLabel}
 						</span>
 					</p>
 					<p className="text-[10px] tabular-nums text-muted-foreground">
@@ -157,7 +146,7 @@ export function PricingStrip({ item, globalMarkupPercent }: Props) {
 						id={`${item.id}-su`}
 						label=""
 						value={pricing.sellUnitPrice}
-						unit={`ر.س/${item.unit}`}
+						unit={`ر.س/${unitLabel}`}
 						onChange={(v) => pricing.updateField("sell_unit_price", v)}
 						isLoading={pricing.isLoading}
 						precision={2}

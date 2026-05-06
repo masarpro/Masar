@@ -1,5 +1,7 @@
 "use client";
 
+// TODO(cleanup): unused — remove after Phase 3 verification
+
 import { Button } from "@ui/components/button";
 import { Card } from "@ui/components/card";
 import { FileText, Settings2 } from "lucide-react";

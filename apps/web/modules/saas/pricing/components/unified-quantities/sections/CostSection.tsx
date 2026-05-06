@@ -20,6 +20,7 @@ export function CostSection({ item }: Props) {
 	const effectiveQty = Number(item.effectiveQuantity ?? 0);
 	const totalCost =
 		(pricing.materialUnitPrice + pricing.laborUnitPrice) * effectiveQty;
+	const unitLabel = item.unit?.trim() || "وحدة";
 
 	return (
 		<Card className="border-emerald-200 bg-emerald-50/40 p-4 dark:border-emerald-900 dark:bg-emerald-950/20">
@@ -33,7 +34,7 @@ export function CostSection({ item }: Props) {
 						id={`${item.id}-mat`}
 						label="سعر المادة"
 						value={pricing.materialUnitPrice}
-						unit={`ر.س/${item.unit}`}
+						unit={`ر.س/${unitLabel}`}
 						onChange={(v) => pricing.updateField("material_unit_price", v)}
 						isLoading={pricing.isLoading}
 					/>
@@ -41,7 +42,7 @@ export function CostSection({ item }: Props) {
 						id={`${item.id}-lab`}
 						label="سعر العمالة"
 						value={pricing.laborUnitPrice}
-						unit={`ر.س/${item.unit}`}
+						unit={`ر.س/${unitLabel}`}
 						onChange={(v) => pricing.updateField("labor_unit_price", v)}
 						isLoading={pricing.isLoading}
 					/>
