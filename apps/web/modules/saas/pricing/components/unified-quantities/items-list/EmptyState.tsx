@@ -19,18 +19,18 @@ export function EmptyState({ onAddItem, onApplyPreset }: Props) {
 			<div>
 				<h3 className="text-lg font-semibold">لا توجد بنود بعد</h3>
 				<p className="mt-1 text-sm text-muted-foreground">
-					أضف بنداً واحداً أو طبّق باقة جاهزة للبدء
+					أضف بنوداً من الكتالوج للبدء
 				</p>
 			</div>
 
-			<div className="flex flex-wrap justify-center gap-2">
-				<Button onClick={onAddItem}>
-					<Plus className="me-2 h-4 w-4" />
-					أضف بنداً جديداً
-				</Button>
-				<Button variant="outline" onClick={onApplyPreset}>
+			<div className="flex flex-col items-center gap-2">
+				<Button size="lg" onClick={onApplyPreset}>
 					<Package className="me-2 h-4 w-4" />
-					استخدم باقة جاهزة
+					تطبيق باقة جاهزة
+				</Button>
+				<Button variant="ghost" size="sm" onClick={onAddItem}>
+					<Plus className="me-1.5 h-3.5 w-3.5" />
+					إضافة بند يدوي
 				</Button>
 			</div>
 		</Card>

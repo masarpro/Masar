@@ -1,10 +1,20 @@
 "use client";
 
 import { Button } from "@ui/components/button";
-import { FileText, Layers, Package, Plus, Settings2 } from "lucide-react";
+import {
+	FileText,
+	LayoutGrid,
+	Layers,
+	Package,
+	Plus,
+	Settings2,
+	Table as TableIcon,
+} from "lucide-react";
 import type { Domain } from "../types";
 import { DomainFilterChips } from "./DomainFilterChips";
 import { WorkspaceStatPills } from "./WorkspaceStatPills";
+
+export type ViewMode = "spreadsheet" | "cards";
 
 interface Props {
 	totalGrossCost: number;
@@ -24,6 +34,9 @@ interface Props {
 	onOpenContext: () => void;
 
 	canGenerateQuote: boolean;
+
+	viewMode: ViewMode;
+	onViewModeChange: (mode: ViewMode) => void;
 }
 
 /**
@@ -48,6 +61,8 @@ export function WorkspaceBar({
 	onGenerateQuote,
 	onOpenContext,
 	canGenerateQuote,
+	viewMode,
+	onViewModeChange,
 }: Props) {
 	return (
 		<div className="sticky top-0 z-30 -mx-4 mb-4 border-b bg-background/95 px-4 pb-3 pt-3 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:-mx-6 sm:px-6">
@@ -60,6 +75,41 @@ export function WorkspaceBar({
 				/>
 
 				<div className="flex flex-wrap items-center gap-2">
+					<div
+						className="inline-flex items-center rounded-md border bg-muted/30 p-0.5"
+						role="group"
+						aria-label="طريقة العرض"
+					>
+						<button
+							type="button"
+							onClick={() => onViewModeChange("spreadsheet")}
+							className={`inline-flex items-center gap-1 rounded-sm px-2 py-1 text-xs transition ${
+								viewMode === "spreadsheet"
+									? "bg-background text-foreground shadow-sm"
+									: "text-muted-foreground hover:text-foreground"
+							}`}
+							aria-pressed={viewMode === "spreadsheet"}
+							title="عرض جدولي — إدخال سريع"
+						>
+							<TableIcon className="h-3.5 w-3.5" />
+							جدول
+						</button>
+						<button
+							type="button"
+							onClick={() => onViewModeChange("cards")}
+							className={`inline-flex items-center gap-1 rounded-sm px-2 py-1 text-xs transition ${
+								viewMode === "cards"
+									? "bg-background text-foreground shadow-sm"
+									: "text-muted-foreground hover:text-foreground"
+							}`}
+							aria-pressed={viewMode === "cards"}
+							title="عرض بطاقات — تحكّم تفصيلي"
+						>
+							<LayoutGrid className="h-3.5 w-3.5" />
+							بطاقات
+						</button>
+					</div>
+
 					<Button
 						size="sm"
 						variant="outline"

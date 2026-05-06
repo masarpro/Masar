@@ -12,6 +12,7 @@ import { ItemsList } from "./items-list/ItemsList";
 import { QuoteDrawer } from "./quote/QuoteDrawer";
 import { ErrorState } from "./shared/ErrorState";
 import { LoadingSkeleton } from "./shared/LoadingSkeleton";
+import { ItemDetailDialog } from "./spreadsheet-view/ItemDetailDialog";
 import type {
 	CalculationMethod,
 	Domain,
@@ -19,7 +20,22 @@ import type {
 	QuantityItem,
 } from "./types";
 import { ProfitControlCard } from "./workspace-header/ProfitControlCard";
-import { WorkspaceBar } from "./workspace-bar/WorkspaceBar";
+import {
+	WorkspaceBar,
+	type ViewMode,
+} from "./workspace-bar/WorkspaceBar";
+
+const VIEW_MODE_KEY = "masar:unified-workspace:view-mode";
+
+function readSavedViewMode(): ViewMode | null {
+	if (typeof window === "undefined") return null;
+	try {
+		const v = window.localStorage.getItem(VIEW_MODE_KEY);
+		return v === "spreadsheet" || v === "cards" ? v : null;
+	} catch {
+		return null;
+	}
+}
 
 interface Props {
 	costStudyId: string;
@@ -34,6 +50,10 @@ export function UnifiedItemsWorkspace({
 	const [pickerMode, setPickerMode] = useState<"items" | "presets">("items");
 	const [contextOpen, setContextOpen] = useState(false);
 	const [quoteOpen, setQuoteOpen] = useState(false);
+	const [savedViewMode, setSavedViewMode] = useState<ViewMode | null>(() =>
+		readSavedViewMode(),
+	);
+	const [detailItemId, setDetailItemId] = useState<string | null>(null);
 
 	const {
 		items,
@@ -45,6 +65,20 @@ export function UnifiedItemsWorkspace({
 		reorderItems,
 		applyPreset,
 	} = useUnifiedQuantities({ costStudyId, organizationId });
+
+	// Auto-pick: spreadsheet for empty/large studies, cards for 1-4 items.
+	// Only applies before the user has made an explicit choice.
+	const resolvedViewMode: ViewMode =
+		savedViewMode ?? (items.length >= 1 && items.length < 5 ? "cards" : "spreadsheet");
+
+	const handleViewModeChange = (mode: ViewMode) => {
+		setSavedViewMode(mode);
+		try {
+			window.localStorage.setItem(VIEW_MODE_KEY, mode);
+		} catch {
+			// ignore quota / private mode
+		}
+	};
 
 	const { globalMarkupPercent } = useCostStudy(costStudyId, organizationId);
 	const { totals } = useStudyTotals({ costStudyId, organizationId });
@@ -117,6 +151,8 @@ export function UnifiedItemsWorkspace({
 				onGenerateQuote={() => setQuoteOpen(true)}
 				onOpenContext={() => setContextOpen(true)}
 				canGenerateQuote={items.length > 0}
+				viewMode={resolvedViewMode}
+				onViewModeChange={handleViewModeChange}
 			/>
 
 			{items.length > 0 && (
@@ -145,12 +181,29 @@ export function UnifiedItemsWorkspace({
 					costStudyId={costStudyId}
 					organizationId={organizationId}
 					globalMarkupPercent={globalMarkupPercent}
+					viewMode={resolvedViewMode}
+					onOpenDetail={setDetailItemId}
 					onUpsert={upsertItem}
 					onDelete={deleteItem}
 					onDuplicate={duplicateItem}
 					onReorder={reorderItems}
 				/>
 			)}
+
+			<ItemDetailDialog
+				item={
+					detailItemId
+						? (items as QuantityItem[]).find(
+								(i) => i.id === detailItemId,
+							) ?? null
+						: null
+				}
+				open={Boolean(detailItemId)}
+				onOpenChange={(open) => {
+					if (!open) setDetailItemId(null);
+				}}
+				globalMarkupPercent={globalMarkupPercent}
+			/>
 
 			<CatalogPickerDrawer
 				open={pickerOpen}

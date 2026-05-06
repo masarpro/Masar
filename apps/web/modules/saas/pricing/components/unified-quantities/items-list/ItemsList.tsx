@@ -1,13 +1,17 @@
 "use client";
 
 import { ItemCardTabs } from "../item-card/ItemCardTabs";
+import { UnifiedSpreadsheetView } from "../spreadsheet-view/UnifiedSpreadsheetView";
 import type { QuantityItem } from "../types";
+import type { ViewMode } from "../workspace-bar/WorkspaceBar";
 
 interface Props {
 	items: QuantityItem[];
 	costStudyId: string;
 	organizationId: string;
 	globalMarkupPercent: number;
+	viewMode: ViewMode;
+	onOpenDetail: (itemId: string) => void;
 	onUpsert: (data: any) => Promise<any>;
 	onDelete: (data: any) => Promise<any>;
 	onDuplicate: (data: any) => Promise<any>;
@@ -17,6 +21,8 @@ interface Props {
 export function ItemsList({
 	items,
 	globalMarkupPercent,
+	viewMode,
+	onOpenDetail,
 	onDelete,
 	onDuplicate,
 }: Props) {
@@ -25,6 +31,12 @@ export function ItemsList({
 			<div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
 				لا توجد بنود تطابق التصفية الحالية. أزل التصفية أو أضف بنداً جديداً.
 			</div>
+		);
+	}
+
+	if (viewMode === "spreadsheet") {
+		return (
+			<UnifiedSpreadsheetView items={items} onOpenDetail={onOpenDetail} />
 		);
 	}
 
