@@ -5363,33 +5363,71 @@
   "landingPricing": {
     "title": "Clear pricing, no surprises",
     "label": "Pricing",
+    "subtitle": "Choose the plan that fits your company size",
+    "badges": {
+      "popular": "Most Popular",
+      "enterprise": "Enterprise"
+    },
     "free": {
       "name": "Free",
-      "description": "Try the platform yourself",
+      "description": "Start managing your projects",
       "price": "0 SAR",
+      "period": "Free forever",
       "features": {
-        "1": "Full system overview",
-        "2": "Demo project",
-        "3": "All features (read-only)",
-        "4": "Basic project management"
+        "1": "1 project",
+        "2": "2 users",
+        "3": "10 AI chats"
       },
       "cta": "Start Free"
     },
-    "pro": {
-      "name": "Professional",
-      "description": "All features, no limits",
-      "price": "199 SAR / month",
-      "badge": "Most Popular",
+    "monthly": {
+      "name": "Monthly",
+      "description": "For contractors and small offices",
+      "price": "199 SAR",
+      "period": "per month",
       "features": {
-        "1": "Unlimited projects",
-        "2": "All advanced features",
-        "3": "Owner portal",
-        "4": "Invoices & claims",
-        "5": "Priority support",
-        "6": "Continuous updates",
-        "7": "Priority technical support"
+        "1": "Up to 9 users",
+        "2": "Unlimited projects",
+        "3": "Unlimited AI chat",
+        "4": "PDF & CSV export",
+        "5": "Owner portal",
+        "6": "ZATCA e-invoicing",
+        "7": "All reports & analytics"
       },
-      "cta": "Subscribe Now"
+      "cta": "Subscribe Monthly"
+    },
+    "yearly": {
+      "name": "Yearly",
+      "description": "For serious contractors — best value",
+      "price": "1,999 SAR",
+      "period": "per year",
+      "subtitle": "≈ 166 SAR / month — save 389 SAR",
+      "features": {
+        "1": "Up to 9 users",
+        "2": "Unlimited projects",
+        "3": "Unlimited AI chat",
+        "4": "PDF & CSV export",
+        "5": "Owner portal",
+        "6": "ZATCA e-invoicing",
+        "7": "All reports & analytics"
+      },
+      "cta": "Subscribe Yearly"
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "description": "For large companies and major contractors",
+      "price": "24,499 SAR",
+      "period": "one-time",
+      "subtitle": "+ monthly subscription based on user count",
+      "features": {
+        "1": "50+ users",
+        "2": "Full system customization",
+        "3": "Dedicated support",
+        "4": "Team training",
+        "5": "Guaranteed SLA",
+        "6": "System integrations"
+      },
+      "cta": "Contact Us"
     }
   },
   "mail": {
