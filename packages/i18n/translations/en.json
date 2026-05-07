@@ -10411,6 +10411,10 @@
       "REJECTED": "Rejected",
       "FAILED": "Failed",
       "retry": "Retry",
+      "retrying": "Retrying...",
+      "retrySuccess": "Successfully resubmitted",
+      "retryError": "Retry failed",
+      "errorDetails": "ZATCA error details",
       "title": "E-Invoicing",
       "sentAt": "Sent at",
       "clearedAt": "Cleared at"

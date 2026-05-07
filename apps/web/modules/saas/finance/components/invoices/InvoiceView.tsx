@@ -57,6 +57,8 @@ import {
 	Check,
 	FileDown,
 	StickyNote,
+	RefreshCw,
+	AlertTriangle,
 } from "lucide-react";
 import { StatusBadge } from "../shared/StatusBadge";
 import { JournalEntryLink } from "../shared/JournalEntryLink";
@@ -484,6 +486,8 @@ export function InvoiceView({
 				<div className="mt-5 print:hidden">
 					<DetailsTabContent
 						invoice={invoice}
+						organizationId={organizationId}
+						invoiceId={invoiceId}
 						organizationSlug={organizationSlug}
 						basePath={basePath}
 						canAddPayment={canAddPayment}
@@ -657,12 +661,16 @@ function InvoiceTabContent({
 
 function DetailsTabContent({
 	invoice,
+	organizationId,
+	invoiceId,
 	organizationSlug,
 	basePath,
 	canAddPayment,
 	onDeletePayment,
 }: {
 	invoice: any;
+	organizationId: string;
+	invoiceId: string;
 	organizationSlug: string;
 	basePath: string;
 	canAddPayment: boolean;
@@ -670,6 +678,45 @@ function DetailsTabContent({
 }) {
 	const t = useTranslations();
 	const locale = useLocale();
+	const queryClient = useQueryClient();
+
+	// ─── ZATCA retry: fetch latest submission only when status is recoverable ─
+	const zatcaCanRetry =
+		invoice?.zatcaSubmissionStatus === "FAILED" ||
+		invoice?.zatcaSubmissionStatus === "REJECTED";
+
+	const { data: zatcaSubmissionsData } = useQuery({
+		...orpc.zatca.submissions.list.queryOptions({
+			input: { organizationId, invoiceId, limit: 1, offset: 0 },
+		}),
+		enabled: !!invoice && zatcaCanRetry,
+	});
+	const latestZatcaSubmission = zatcaSubmissionsData?.submissions?.[0];
+
+	const retryZatcaMutation = useMutation({
+		mutationFn: async () => {
+			if (!latestZatcaSubmission) {
+				throw new Error(t("zatca.submission.retryError"));
+			}
+			return orpcClient.zatca.retrySubmission({
+				organizationId,
+				submissionId: latestZatcaSubmission.id,
+			});
+		},
+		onSuccess: (data) => {
+			if (data.success) {
+				toast.success(t("zatca.submission.retrySuccess"));
+			} else {
+				const firstErr = data.errors?.[0]?.message;
+				toast.error(firstErr || t("zatca.submission.retryError"));
+			}
+			queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+			queryClient.invalidateQueries({ queryKey: ["zatca"] });
+		},
+		onError: (error: any) => {
+			toast.error(error?.message || t("zatca.submission.retryError"));
+		},
+	});
 
 	return (
 		<div className="space-y-5">
@@ -743,24 +790,77 @@ function DetailsTabContent({
 						{invoice.zatcaSubmissionStatus && invoice.zatcaSubmissionStatus !== "NOT_APPLICABLE" && (
 							<div className="sm:col-span-2 lg:col-span-3 flex items-start gap-3">
 								<div className="mt-1 text-slate-400"><FileCheck className="h-4 w-4" /></div>
-								<div className="space-y-1.5">
+								<div className="space-y-1.5 flex-1 min-w-0">
 									<p className="text-sm text-muted-foreground">{t("zatca.submission.title")}</p>
-									<span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
-										invoice.zatcaSubmissionStatus === "CLEARED" || invoice.zatcaSubmissionStatus === "REPORTED"
-											? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-											: invoice.zatcaSubmissionStatus === "REJECTED"
-												? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-												: invoice.zatcaSubmissionStatus === "FAILED"
-													? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-													: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-									}`}>
-										{t(`zatca.submission.${invoice.zatcaSubmissionStatus}`)}
-									</span>
+									<div className="flex flex-wrap items-center gap-2">
+										<span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
+											invoice.zatcaSubmissionStatus === "CLEARED" || invoice.zatcaSubmissionStatus === "REPORTED"
+												? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+												: invoice.zatcaSubmissionStatus === "REJECTED"
+													? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+													: invoice.zatcaSubmissionStatus === "FAILED"
+														? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+														: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+										}`}>
+											{t(`zatca.submission.${invoice.zatcaSubmissionStatus}`)}
+										</span>
+										{zatcaCanRetry && latestZatcaSubmission && (
+											<Button
+												type="button"
+												size="sm"
+												variant="outline"
+												disabled={retryZatcaMutation.isPending}
+												onClick={() => retryZatcaMutation.mutate()}
+												className="h-7 px-2.5 gap-1.5 text-xs"
+											>
+												<RefreshCw className={`h-3.5 w-3.5 ${retryZatcaMutation.isPending ? "animate-spin" : ""}`} />
+												{retryZatcaMutation.isPending
+													? t("zatca.submission.retrying")
+													: t("zatca.submission.retry")}
+											</Button>
+										)}
+									</div>
 									{invoice.zatcaSubmittedAt && (
 										<p className="text-xs text-muted-foreground">{t("zatca.submission.sentAt")}: {new Date(invoice.zatcaSubmittedAt).toLocaleString("ar-SA")}</p>
 									)}
 									{invoice.zatcaClearedAt && (
 										<p className="text-xs text-muted-foreground">{t("zatca.submission.clearedAt")}: {new Date(invoice.zatcaClearedAt).toLocaleString("ar-SA")}</p>
+									)}
+									{zatcaCanRetry && latestZatcaSubmission && (
+										(() => {
+											const errs = (latestZatcaSubmission.zatcaErrors as Array<{ code?: string; message?: string }> | null) ?? [];
+											const resp = (latestZatcaSubmission.zatcaResponse as { errors?: Array<{ message?: string }>; message?: string } | null);
+											const hasErrors = errs.length > 0 || (resp?.errors && resp.errors.length > 0) || resp?.message;
+											if (!hasErrors) return null;
+											return (
+												<div className="mt-2 p-2.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40">
+													<div className="flex items-start gap-2">
+														<AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+														<div className="space-y-1 min-w-0">
+															<p className="text-xs font-semibold text-red-700 dark:text-red-300">
+																{t("zatca.submission.errorDetails")}
+															</p>
+															<ul className="text-xs text-red-700 dark:text-red-300 space-y-0.5 list-disc ms-4">
+																{errs.length > 0 ? (
+																	errs.map((e, i) => (
+																		<li key={i} className="break-words">
+																			{e.code ? <span className="font-mono">[{e.code}] </span> : null}
+																			{e.message}
+																		</li>
+																	))
+																) : resp?.errors && resp.errors.length > 0 ? (
+																	resp.errors.map((e, i) => (
+																		<li key={i} className="break-words">{e.message}</li>
+																	))
+																) : (
+																	<li className="break-words">{resp?.message}</li>
+																)}
+															</ul>
+														</div>
+													</div>
+												</div>
+											);
+										})()
 									)}
 								</div>
 							</div>
