@@ -106,6 +106,19 @@ export function signInvoice(
 		.replace(/-----END [^-]+-----/g, "")
 		.replace(/\s/g, "");
 
+	// QR-specific signature: ZATCA's verifier app does
+	//   ECDSA-verify(b64decode(tag7), b64decode(tag6), tag8) == true
+	// i.e. tag 7 must be a signature OVER THE RAW HASH BYTES (32 bytes), not
+	// over the SignedInfo XML. The XAdES `<ds:SignatureValue>` above stays as
+	// signature-over-SignedInfo (which ZATCA's clearance API accepts), but the
+	// QR's signature is computed separately. Reference: zatca-xml-js's
+	// createInvoiceDigitalSignature (signs invoice_hash bytes).
+	// Verified by scripts/zatca/verify-qr-against-zatca-spec.ts.
+	const hashBytes = Buffer.from(invoiceHash, "base64");
+	const qrSigner = createSign("SHA256");
+	qrSigner.update(hashBytes);
+	const qrSignature = qrSigner.sign(privKey, "base64");
+
 	const qrCode = generateEnhancedQR({
 		sellerName: extractXmlValue(xml, "cbc:RegistrationName") ?? "",
 		vatNumber: extractXmlValue(xml, "cbc:CompanyID") ?? "",
@@ -113,7 +126,7 @@ export function signInvoice(
 		totalWithVat: extractXmlValue(xml, "cbc:TaxInclusiveAmount") ?? "0.00",
 		vatAmount: extractTaxAmount(xml),
 		invoiceHash,
-		digitalSignature: signatureValue,
+		digitalSignature: qrSignature,
 		publicKey: publicKeyDerB64,
 		certificateSignature: certSignature,
 	});

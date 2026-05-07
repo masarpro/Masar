@@ -30,9 +30,17 @@ export function generateEnhancedQR(input: EnhancedQRInput): string {
 		encodeTLVText(3, input.timestamp),
 		encodeTLVText(4, input.totalWithVat),
 		encodeTLVText(5, input.vatAmount),
-		// Tags 6-9: binary values (Base64-decoded)
-		encodeTLVBinary(6, Buffer.from(input.invoiceHash, "base64")),
-		encodeTLVBinary(7, Buffer.from(input.digitalSignature, "base64")),
+		// Tags 6 & 7: per ZATCA spec (and zatca-xml-js reference impl), the hash
+		// and signature are carried as the base64 STRING itself — encoded as
+		// UTF-8 bytes — NOT base64-decoded to raw binary. The verifier app
+		// re-decodes them inside the QR before doing ECDSA-verify.
+		// Reference: node_modules/zatca-xml-js/lib/zatca/qr/index.js (TLV()
+		// calls Buffer.from(tag) on a base64 string → UTF-8 bytes).
+		// Verified by scripts/zatca/verify-qr-against-zatca-spec.ts.
+		encodeTLVBinary(6, Buffer.from(input.invoiceHash)),
+		encodeTLVBinary(7, Buffer.from(input.digitalSignature)),
+		// Tags 8 & 9: raw DER bytes (the inputs are base64 of DER, so we DO
+		// decode them here to get the binary form the spec expects).
 		encodeTLVBinary(8, Buffer.from(input.publicKey, "base64")),
 		encodeTLVBinary(9, Buffer.from(input.certificateSignature, "base64")),
 	];
