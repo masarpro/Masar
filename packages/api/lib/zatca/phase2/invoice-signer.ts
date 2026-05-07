@@ -93,6 +93,19 @@ export function signInvoice(
 	// 11. Generate enhanced QR code (9 tags)
 	const certSignature = extractCertificateSignature(certDerBytes);
 
+	// `publicKeyDer` arrives as a PEM string (with -----BEGIN/END----- headers
+	// and newlines) but the contract of EnhancedQRInput.publicKey is "Base64 of
+	// the DER SubjectPublicKeyInfo body" — qr-enhanced.ts does
+	// `Buffer.from(input.publicKey, "base64")` and embeds the raw DER as tag 8.
+	// Passing PEM headers through Node's lenient base64 decoder produces ~106
+	// bytes of garbage (the BEGIN/PUBLIC/KEY letters are valid base64 chars and
+	// get folded into the output). Strip headers + whitespace so the input is
+	// pure base64-of-DER. Verified by scripts/zatca/verify-fixed-qr.ts.
+	const publicKeyDerB64 = publicKeyDer
+		.replace(/-----BEGIN [^-]+-----/g, "")
+		.replace(/-----END [^-]+-----/g, "")
+		.replace(/\s/g, "");
+
 	const qrCode = generateEnhancedQR({
 		sellerName: extractXmlValue(xml, "cbc:RegistrationName") ?? "",
 		vatNumber: extractXmlValue(xml, "cbc:CompanyID") ?? "",
@@ -101,7 +114,7 @@ export function signInvoice(
 		vatAmount: extractTaxAmount(xml),
 		invoiceHash,
 		digitalSignature: signatureValue,
-		publicKey: publicKeyDer,
+		publicKey: publicKeyDerB64,
 		certificateSignature: certSignature,
 	});
 
@@ -242,36 +255,73 @@ function injectQRCode(xml: string, qrBase64: string): string {
 
 // ─── Certificate Helpers ────────────────────────────────────────────────
 
+/**
+ * Extract the signatureValue (BIT STRING) from an X.509 certificate's DER.
+ *
+ *   Certificate ::= SEQUENCE {
+ *     tbsCertificate     TBSCertificate,
+ *     signatureAlgorithm AlgorithmIdentifier,
+ *     signatureValue     BIT STRING        ← this is what we extract
+ *   }
+ *
+ * For ECDSA-SHA256/secp256k1 the signatureValue is ~70-72 bytes (DER ECDSA r,s).
+ *
+ * The previous implementation used `hex.indexOf("03", ...)` which matched any
+ * "03" pair — including byte-misaligned ones inside tbsCertificate data — and
+ * produced a 3-byte garbage signature (verified by scripts/zatca/decode-qr-deep.ts
+ * against INV-2026-0023). This DER walker positions exactly at the third
+ * top-level field of the outer SEQUENCE, so it cannot pick up an interior "03".
+ */
 function extractCertificateSignature(certDerBytes: Buffer): string {
-	const hex = certDerBytes.toString("hex");
-	// X.509: SEQUENCE { tbsCertificate, sigAlgorithm, signatureValue(BIT STRING) }
-	// Find the last BIT STRING (tag 03) in the second half of the cert
-	const halfPoint = Math.floor(hex.length / 2);
-	let searchFrom = halfPoint;
-	let lastIdx = -1;
-	while (true) {
-		const idx = hex.indexOf("03", searchFrom);
-		if (idx === -1) break;
-		lastIdx = idx;
-		searchFrom = idx + 2;
-	}
+	let off = 0;
 
-	if (lastIdx > 0) {
-		const remaining = hex.substring(lastIdx);
-		const lenByte = parseInt(remaining.substring(2, 4), 16);
-		let sigStart = 4;
-		let sigLength = lenByte;
-		if (lenByte === 0x81) { sigLength = parseInt(remaining.substring(4, 6), 16); sigStart = 6; }
-		else if (lenByte === 0x82) { sigLength = parseInt(remaining.substring(4, 8), 16); sigStart = 8; }
-		// Skip unused bits byte
-		const sigHex = remaining.substring(sigStart + 2, sigStart + 2 + (sigLength - 1) * 2);
-		if (sigHex.length > 0) {
-			return Buffer.from(sigHex, "hex").toString("base64");
-		}
+	// outer SEQUENCE wrapper
+	if (certDerBytes[off] !== 0x30) {
+		throw new Error("Certificate must start with SEQUENCE (0x30)");
 	}
+	off++;
+	off += derLengthSize(certDerBytes, off);
 
-	// Fallback
-	return createHash("sha256").update(certDerBytes).digest("base64");
+	// skip tbsCertificate (SEQUENCE)
+	off += derTotalSize(certDerBytes, off);
+
+	// skip signatureAlgorithm (SEQUENCE)
+	off += derTotalSize(certDerBytes, off);
+
+	// signatureValue (BIT STRING — tag 0x03)
+	if (certDerBytes[off] !== 0x03) {
+		throw new Error(
+			`Expected BIT STRING (0x03) at signatureValue, got 0x${certDerBytes[off]?.toString(16) ?? "??"}`,
+		);
+	}
+	off++;
+	const len = readDerLength(certDerBytes, off);
+	off += derLengthSize(certDerBytes, off);
+
+	// BIT STRING content: first byte = unused-bits count (always 0 for our use),
+	// remaining bytes = the actual signature.
+	return certDerBytes.subarray(off + 1, off + len).toString("base64");
+}
+
+/** Read a DER definite length starting at `off`. Supports short and long forms. */
+function readDerLength(buf: Buffer, off: number): number {
+	const b = buf[off]!;
+	if (b < 0x80) return b;
+	const n = b & 0x7f;
+	let v = 0;
+	for (let i = 1; i <= n; i++) v = (v << 8) | buf[off + i]!;
+	return v;
+}
+
+/** Number of bytes the length field at `off` occupies (1 for short form, 1+n for long form). */
+function derLengthSize(buf: Buffer, off: number): number {
+	const b = buf[off]!;
+	return b < 0x80 ? 1 : 1 + (b & 0x7f);
+}
+
+/** Total bytes of a DER TLV at `off` (tag + length-bytes + value). */
+function derTotalSize(buf: Buffer, off: number): number {
+	return 1 + derLengthSize(buf, off + 1) + readDerLength(buf, off + 1);
 }
 
 // ─── Utility ────────────────────────────────────────────────────────────
