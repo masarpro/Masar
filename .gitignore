@@ -39,9 +39,13 @@ dist/
 # typescript
 *.tsbuildinfo
 
-# other 
+# other
 .react-email/
 .content-collections/
 .prisma-zod-generator-manifest.json
 nul
 .vercel
+
+# ZATCA QR PNG artifacts (sensitive production data — local debugging only)
+scripts/zatca/_qr-*.png
+scripts/zatca/test-*.png
