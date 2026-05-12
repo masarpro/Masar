@@ -69,6 +69,20 @@ export const TOOL_PERMISSION_MAP: Record<
 	// === Registry: field ===
 	queryFieldExecution: ["projects", "view"],
 
+	// === Registry: finance (new) ===
+	queryInvoices: ["finance", "view"],
+	queryZatcaStatus: ["finance", "view"],
+
+	// === Registry: company (new) ===
+	queryEmployees: ["company", "view"],
+	queryPayroll: ["company", "view"],
+	queryAssets: ["company", "view"],
+
+	// === Registry: projects (new) ===
+	queryProjectBOQ: ["projects", "view"],
+	queryHandover: ["projects", "view"],
+	queryProjectChat: ["projects", "view"],
+
 	// === Meta tool ===
 	getMyPermissions: null,
 };

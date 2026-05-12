@@ -123,6 +123,7 @@ registerTool({
               totalCost: true,
             },
             orderBy: { createdAt: "asc" },
+            take: 100,
           },
           finishingItems: {
             select: {
@@ -136,6 +137,7 @@ registerTool({
               totalCost: true,
             },
             orderBy: { createdAt: "asc" },
+            take: 100,
           },
           mepItems: {
             select: {
@@ -149,6 +151,7 @@ registerTool({
               totalCost: true,
             },
             orderBy: { createdAt: "asc" },
+            take: 100,
           },
           laborItems: {
             select: {
@@ -161,6 +164,7 @@ registerTool({
               totalCost: true,
             },
             orderBy: { createdAt: "asc" },
+            take: 50,
           },
           quotes: {
             select: {
@@ -168,6 +172,15 @@ registerTool({
               quoteNumber: true,
               totalAmount: true,
               notes: true,
+            },
+            take: 20,
+          },
+          _count: {
+            select: {
+              structuralItems: true,
+              finishingItems: true,
+              mepItems: true,
+              laborItems: true,
             },
           },
         },
@@ -245,6 +258,7 @@ registerTool({
           ...q,
           totalAmount: q.totalAmount?.toString(),
         })),
+        counts: s._count ?? null,
         totals: {
           structural: structuralTotal.toFixed(2),
           finishing: finishingTotal.toFixed(2),
@@ -299,149 +313,165 @@ registerTool({
           }
         : orgFilter;
 
-      const results: any = {};
+      const wantsStructural =
+        params.section === "all" || params.section === "structural";
+      const wantsFinishing =
+        params.section === "all" || params.section === "finishing";
+      const wantsMep = params.section === "all" || params.section === "mep";
+      const wantsLabor = params.section === "all" || params.section === "labor";
 
-      if (params.section === "all" || params.section === "structural") {
-        results.structural = await db.structuralItem.findMany({
-          where: {
-            ...projectFilter,
-            OR: [
-              {
-                description: {
-                  contains: params.search,
-                  mode: "insensitive" as const,
+      // كل الاستعلامات بالتوازي لتقليص الـ latency
+      const [structuralRows, finishingRows, mepRows, laborRows] =
+        await Promise.all([
+          wantsStructural
+            ? db.structuralItem.findMany({
+                where: {
+                  ...projectFilter,
+                  OR: [
+                    {
+                      description: {
+                        contains: params.search,
+                        mode: "insensitive" as const,
+                      },
+                    },
+                    {
+                      category: {
+                        contains: params.search,
+                        mode: "insensitive" as const,
+                      },
+                    },
+                    {
+                      name: {
+                        contains: params.search,
+                        mode: "insensitive" as const,
+                      },
+                    },
+                  ],
                 },
-              },
-              {
-                category: {
-                  contains: params.search,
-                  mode: "insensitive" as const,
+                select: {
+                  id: true,
+                  category: true,
+                  name: true,
+                  description: true,
+                  unit: true,
+                  quantity: true,
+                  totalCost: true,
+                  costStudy: {
+                    select: {
+                      name: true,
+                      project: { select: { name: true } },
+                    },
+                  },
                 },
-              },
-              {
-                name: {
-                  contains: params.search,
-                  mode: "insensitive" as const,
+                take: 20,
+              })
+            : Promise.resolve(undefined),
+          wantsFinishing
+            ? db.finishingItem.findMany({
+                where: {
+                  ...projectFilter,
+                  OR: [
+                    {
+                      name: {
+                        contains: params.search,
+                        mode: "insensitive" as const,
+                      },
+                    },
+                    {
+                      category: {
+                        contains: params.search,
+                        mode: "insensitive" as const,
+                      },
+                    },
+                  ],
                 },
-              },
-            ],
-          },
-          select: {
-            id: true,
-            category: true,
-            name: true,
-            description: true,
-            unit: true,
-            quantity: true,
-            totalCost: true,
-            costStudy: {
-              select: {
-                name: true,
-                project: { select: { name: true } },
-              },
-            },
-          },
-          take: 20,
-        });
-      }
+                select: {
+                  id: true,
+                  category: true,
+                  name: true,
+                  floorName: true,
+                  area: true,
+                  totalCost: true,
+                  costStudy: {
+                    select: {
+                      name: true,
+                      project: { select: { name: true } },
+                    },
+                  },
+                },
+                take: 20,
+              })
+            : Promise.resolve(undefined),
+          wantsMep
+            ? db.mEPItem.findMany({
+                where: {
+                  ...projectFilter,
+                  OR: [
+                    {
+                      name: {
+                        contains: params.search,
+                        mode: "insensitive" as const,
+                      },
+                    },
+                    {
+                      category: {
+                        contains: params.search,
+                        mode: "insensitive" as const,
+                      },
+                    },
+                  ],
+                },
+                select: {
+                  id: true,
+                  category: true,
+                  name: true,
+                  quantity: true,
+                  totalCost: true,
+                  costStudy: {
+                    select: {
+                      name: true,
+                      project: { select: { name: true } },
+                    },
+                  },
+                },
+                take: 20,
+              })
+            : Promise.resolve(undefined),
+          wantsLabor
+            ? db.laborItem.findMany({
+                where: {
+                  ...projectFilter,
+                  name: {
+                    contains: params.search,
+                    mode: "insensitive" as const,
+                  },
+                },
+                select: {
+                  id: true,
+                  name: true,
+                  workerType: true,
+                  quantity: true,
+                  dailyRate: true,
+                  durationDays: true,
+                  totalCost: true,
+                  costStudy: {
+                    select: {
+                      name: true,
+                      project: { select: { name: true } },
+                    },
+                  },
+                },
+                take: 20,
+              })
+            : Promise.resolve(undefined),
+        ]);
 
-      if (params.section === "all" || params.section === "finishing") {
-        results.finishing = await db.finishingItem.findMany({
-          where: {
-            ...projectFilter,
-            OR: [
-              {
-                name: {
-                  contains: params.search,
-                  mode: "insensitive" as const,
-                },
-              },
-              {
-                category: {
-                  contains: params.search,
-                  mode: "insensitive" as const,
-                },
-              },
-            ],
-          },
-          select: {
-            id: true,
-            category: true,
-            name: true,
-            floorName: true,
-            area: true,
-            totalCost: true,
-            costStudy: {
-              select: {
-                name: true,
-                project: { select: { name: true } },
-              },
-            },
-          },
-          take: 20,
-        });
-      }
-
-      if (params.section === "all" || params.section === "mep") {
-        results.mep = await db.mEPItem.findMany({
-          where: {
-            ...projectFilter,
-            OR: [
-              {
-                name: {
-                  contains: params.search,
-                  mode: "insensitive" as const,
-                },
-              },
-              {
-                category: {
-                  contains: params.search,
-                  mode: "insensitive" as const,
-                },
-              },
-            ],
-          },
-          select: {
-            id: true,
-            category: true,
-            name: true,
-            quantity: true,
-            totalCost: true,
-            costStudy: {
-              select: {
-                name: true,
-                project: { select: { name: true } },
-              },
-            },
-          },
-          take: 20,
-        });
-      }
-
-      if (params.section === "all" || params.section === "labor") {
-        results.labor = await db.laborItem.findMany({
-          where: {
-            ...projectFilter,
-            name: { contains: params.search, mode: "insensitive" as const },
-          },
-          select: {
-            id: true,
-            name: true,
-            workerType: true,
-            quantity: true,
-            dailyRate: true,
-            durationDays: true,
-            totalCost: true,
-            costStudy: {
-              select: {
-                name: true,
-                project: { select: { name: true } },
-              },
-            },
-          },
-          take: 20,
-        });
-      }
+      const results: any = {
+        structural: structuralRows,
+        finishing: finishingRows,
+        mep: mepRows,
+        labor: laborRows,
+      };
 
       return {
         searchTerm: params.search,

@@ -101,6 +101,7 @@ registerTool({
               unitPrice: true,
               totalAmount: true,
             },
+            take: 50,
           },
           claims: {
             select: {
@@ -134,6 +135,7 @@ registerTool({
               amount: true,
             },
             orderBy: { createdAt: "desc" as const },
+            take: 20,
           },
         },
       });

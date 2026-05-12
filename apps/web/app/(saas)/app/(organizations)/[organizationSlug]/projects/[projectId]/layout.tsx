@@ -2,6 +2,7 @@ import { getProjectById, getProjectMemberRole, getEffectivePermissions } from "@
 import { hasPermission } from "@repo/database/prisma/permissions";
 import { getActiveOrganization, getSession } from "@saas/auth/lib/server";
 import { ProjectShell } from "@saas/projects/components/shell";
+import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { notFound, redirect } from "next/navigation";
 import type { PropsWithChildren } from "react";
 import type { ProjectRole } from "@saas/projects/lib/role-visibility";
@@ -60,14 +61,33 @@ export default async function ProjectLayout({
 	const userName = session?.user?.name ?? "";
 
 	return (
-		<ProjectShell
-			project={projectData}
-			organizationSlug={organizationSlug}
-			organizationId={organization.id}
-			userRole={userRole}
-			userName={userName}
+		<PageContextProvider
+			moduleId="projects"
+			pageName={`Project: ${project.name}`}
+			pageNameAr={`مشروع: ${project.name}`}
+			pageDescription={`صفحات المشروع: التنفيذ، المالية، المستندات، الكميات، أوامر التغيير، الاستلام، المحادثات، الفريق`}
+			visibleData={{
+				projectId,
+				projectName: project.name,
+				status: project.status,
+				progress: Number(project.progress),
+				clientName: project.clientName ?? undefined,
+			}}
+			visibleStats={
+				project.contractValue
+					? { contractValue: Number(project.contractValue) }
+					: undefined
+			}
 		>
-			{children}
-		</ProjectShell>
+			<ProjectShell
+				project={projectData}
+				organizationSlug={organizationSlug}
+				organizationId={organization.id}
+				userRole={userRole}
+				userName={userName}
+			>
+				{children}
+			</ProjectShell>
+		</PageContextProvider>
 	);
 }

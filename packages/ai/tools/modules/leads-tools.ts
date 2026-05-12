@@ -59,7 +59,7 @@ registerTool({
       return {
         leads: leads.map((l) => ({
           ...l,
-          estimatedValue: l.estimatedValue?.toString(),
+          estimatedValue: l.estimatedValue == null ? 0 : Number(l.estimatedValue),
         })),
         total: leads.length,
       };
@@ -107,8 +107,10 @@ registerTool({
           (acc, s) => ({ ...acc, [s.status]: s._count.id }),
           {},
         ),
-        totalEstectedValue:
-          totalValue._sum.estimatedValue?.toString() ?? "0",
+        totalExpectedValue:
+          totalValue._sum.estimatedValue == null
+            ? 0
+            : Number(totalValue._sum.estimatedValue),
         conversionRate:
           totalCount > 0
             ? ((wonCount / totalCount) * 100).toFixed(1) + "%"
@@ -150,7 +152,10 @@ registerTool({
           return {
             stage,
             count: found?._count.id ?? 0,
-            totalValue: found?._sum.estimatedValue?.toString() ?? "0",
+            totalValue:
+              found?._sum.estimatedValue == null
+                ? 0
+                : Number(found._sum.estimatedValue),
           };
         }),
       };

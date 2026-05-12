@@ -51,6 +51,8 @@ const financeModule: AIModuleDefinition = {
 
   relatedTools: [
     "queryFinance",
+    "queryInvoices",
+    "queryZatcaStatus",
     "queryQuotations",
     "getQuotationDetails",
     "getQuotationsSummary",

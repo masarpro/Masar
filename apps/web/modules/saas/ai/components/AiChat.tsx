@@ -2,6 +2,7 @@
 
 import { type UIMessage, useChat } from "@ai-sdk/react";
 import { eventIteratorToStream } from "@orpc/client";
+import { usePageContextStore } from "@saas/ai/hooks/use-page-context";
 import { SidebarContentLayout } from "@saas/shared/components/SidebarContentLayout";
 import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
 import { useOrganizationPlan } from "@saas/shared/hooks/use-organization-plan";
@@ -18,17 +19,25 @@ import { Button } from "@ui/components/button";
 import { Textarea } from "@ui/components/textarea";
 import { cn } from "@ui/lib";
 import { EllipsisIcon, PlusIcon, SendIcon } from "lucide-react";
-import { useFormatter } from "next-intl";
+import { useFormatter, useLocale } from "next-intl";
 import { useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export function AiChat({ organizationId }: { organizationId?: string }) {
 	const formatter = useFormatter();
+	const locale = useLocale();
 	const queryClient = useQueryClient();
 	const [input, setInput] = useState("");
 	const { isFree, limits } = useOrganizationPlan();
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+	// سياق الصفحة الحالية — يُلتقط من PageContextProvider
+	const pageContext = usePageContextStore((s) => s.context);
+	const pageContextRef = useRef(pageContext);
+	pageContextRef.current = pageContext;
+	const localeRef = useRef(locale);
+	localeRef.current = locale;
 	const { data, status: chatsStatus } = useQuery({
 		...orpc.ai.chats.list.queryOptions({
 			input: {
@@ -63,11 +72,38 @@ export function AiChat({ organizationId }: { organizationId?: string }) {
 					throw new Error("Chat ID is required");
 				}
 
+				const pc = pageContextRef.current;
+				const visibleData = pc?.visibleData;
+				const dataSummary = visibleData
+					? summarizeVisibleData(visibleData)
+					: undefined;
+
 				return eventIteratorToStream(
 					await orpcClient.ai.chats.messages.add(
 						{
 							chatId,
 							messages: options.messages,
+							locale: localeRef.current,
+							pageContext: pc
+								? {
+										moduleId: pc.moduleId,
+										pageName: pc.pageNameAr || pc.pageName,
+										currentRoute: pc.currentRoute,
+										pageDescription: pc.pageDescription,
+										visibleStats: pc.visibleStats,
+										activeFilters: pc.activeFilters,
+										itemCount: pc.itemCount,
+										tableColumns: pc.tableColumns,
+										formState: pc.formState
+											? {
+													isOpen: pc.formState.isOpen,
+													formType: pc.formState.formType,
+													entityName: pc.formState.entityName,
+												}
+											: undefined,
+										dataSummary,
+									}
+								: null,
 						},
 						{ signal: options.abortSignal },
 					),
@@ -304,4 +340,22 @@ export function AiChat({ organizationId }: { organizationId?: string }) {
 			</div>
 		</SidebarContentLayout>
 	);
+}
+
+/** تلخيص البيانات المرئية لإرسالها مع الرسالة */
+function summarizeVisibleData(data: Record<string, any>): string {
+	if (!data || Object.keys(data).length === 0) return "";
+	const parts: string[] = [];
+	for (const [key, value] of Object.entries(data)) {
+		if (value?._summary) {
+			parts.push(`${key}: ${value.totalCount} عنصر`);
+		} else if (Array.isArray(value)) {
+			parts.push(`${key}: ${value.length} عنصر`);
+		} else if (typeof value === "object" && value !== null) {
+			parts.push(`${key}: ${Object.keys(value).length} حقل`);
+		} else {
+			parts.push(`${key}: ${value}`);
+		}
+	}
+	return parts.join(" | ");
 }

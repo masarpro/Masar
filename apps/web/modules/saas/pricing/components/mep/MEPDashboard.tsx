@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Button } from "@ui/components/button";
 import { Card, CardContent } from "@ui/components/card";
 import { RefreshCw, Settings } from "lucide-react";
@@ -14,6 +14,7 @@ import { MEPSummaryBar } from "./MEPSummaryBar";
 import { MEPCategorySection } from "./MEPCategorySection";
 import { MEPManualAdder } from "./MEPManualAdder";
 import { useTranslations } from "next-intl";
+import { usePageContextStore } from "@saas/ai/hooks/use-page-context";
 
 interface MEPDashboardProps {
 	mergedItems: MEPMergedItem[];
@@ -62,6 +63,27 @@ export function MEPDashboard({
 			};
 		}).filter((c) => c.items.length > 0);
 	}, [mergedItems]);
+
+	// إثراء سياق المساعد بإحصائيات MEP
+	const updateAiContext = usePageContextStore((s) => s.updateContext);
+	useEffect(() => {
+		const totalItems = mergedItems.length;
+		const enabledCount = mergedItems.filter((i) => i.isEnabled).length;
+		const categoriesActive = categoryData.length;
+		updateAiContext({
+			pageName: "MEP Quantities Calculator",
+			pageNameAr: "حاسب أنظمة MEP (كهرباء وسباكة وتكييف)",
+			pageDescription:
+				"حاسب كميات الأنظمة الكهروميكانيكية: كهرباء، سباكة، تكييف، حريق، تأريض، اتصالات. يستخرج الكميات تلقائياً من تهيئة المبنى",
+			itemCount: totalItems,
+			visibleStats: {
+				totalItems,
+				enabledCount,
+				disabledCount: totalItems - enabledCount,
+				categoriesActive,
+			},
+		});
+	}, [mergedItems, categoryData, updateAiContext]);
 
 	return (
 		<div className="space-y-6">

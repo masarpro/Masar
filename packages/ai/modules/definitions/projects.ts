@@ -61,6 +61,9 @@ const projectsModule: AIModuleDefinition = {
     "queryProjects",
     "getProjectDetails",
     "getProjectFinanceSummary",
+    "queryProjectBOQ",
+    "queryHandover",
+    "queryProjectChat",
   ],
 
   entities: [

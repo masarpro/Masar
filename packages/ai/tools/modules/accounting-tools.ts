@@ -31,8 +31,10 @@ registerTool({
     try {
       if (params.action === "chart") {
         const accounts = await getChartOfAccounts(db, context.organizationId);
+        // حد 200 حساب لتقليل token usage — دليل الحسابات النموذجي ~50-150 حساب
+        const trimmed = accounts.slice(0, 200);
         return {
-          accounts: accounts.map((a) => ({
+          accounts: trimmed.map((a) => ({
             id: a.id,
             code: a.code,
             nameAr: a.nameAr,
@@ -43,6 +45,7 @@ registerTool({
             isPostable: a.isPostable,
           })),
           total: accounts.length,
+          truncated: accounts.length > 200,
         };
       }
 

@@ -35,30 +35,48 @@ registerTool({
       .boolean()
       .default(false)
       .describe("عرض أنشطة المسار الحرج فقط"),
+    limit: z
+      .number()
+      .min(1)
+      .max(100)
+      .optional()
+      .describe("الحد الأقصى لعدد الأنشطة المُرجَعة (افتراضي 50)"),
   }),
   execute: async (params, context) => {
     try {
-      const activities = await db.projectActivity.findMany({
-        where: {
-          projectId: params.projectId,
-          project: { organizationId: context.organizationId },
-          ...(params.status && { status: params.status }),
-          ...(params.onlyCritical && { isCritical: true }),
-        },
-        select: {
-          id: true,
-          title: true,
-          status: true,
-          progress: true,
-          plannedStart: true,
-          plannedEnd: true,
-          actualStart: true,
-          actualEnd: true,
-          duration: true,
-          isCritical: true,
-        },
-        orderBy: { plannedStart: "asc" },
-      });
+      const take = params.limit ?? 50;
+      const [activities, totalCount] = await Promise.all([
+        db.projectActivity.findMany({
+          where: {
+            projectId: params.projectId,
+            project: { organizationId: context.organizationId },
+            ...(params.status && { status: params.status }),
+            ...(params.onlyCritical && { isCritical: true }),
+          },
+          select: {
+            id: true,
+            title: true,
+            status: true,
+            progress: true,
+            plannedStart: true,
+            plannedEnd: true,
+            actualStart: true,
+            actualEnd: true,
+            duration: true,
+            isCritical: true,
+          },
+          orderBy: { plannedStart: "asc" },
+          take,
+        }),
+        db.projectActivity.count({
+          where: {
+            projectId: params.projectId,
+            project: { organizationId: context.organizationId },
+            ...(params.status && { status: params.status }),
+            ...(params.onlyCritical && { isCritical: true }),
+          },
+        }),
+      ]);
 
       const now = new Date();
       const delayed = activities.filter(
@@ -86,7 +104,8 @@ registerTool({
           isDelayed: delayed.some((d) => d.id === a.id),
         })),
         summary: {
-          total: activities.length,
+          total: totalCount,
+          returned: activities.length,
           completed: completed.length,
           inProgress: inProgress.length,
           delayed: delayed.length,

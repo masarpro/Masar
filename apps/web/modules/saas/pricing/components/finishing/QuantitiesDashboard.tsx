@@ -30,6 +30,7 @@ import {
 	type ExtractionResult,
 } from "../../lib/knowledge-extractor";
 import { formatNumber, getUnitLabel, mapToCatalogCategory } from "../../lib/utils";
+import { usePageContextStore } from "@saas/ai/hooks/use-page-context";
 import { BuildingSummaryBar } from "./BuildingSummaryBar";
 import { QuantitiesTable } from "./QuantitiesTable";
 import { ManualItemAdder } from "./ManualItemAdder";
@@ -122,6 +123,39 @@ export function QuantitiesDashboard({
 	const totalItems = localItems.length;
 	const enabledCount = localItems.filter((i) => i.isEnabled).length;
 	const disabledCount = totalItems - enabledCount;
+
+	// إثراء سياق المساعد الذكي بإحصائيات حاسب التشطيبات
+	const updateAiContext = usePageContextStore((s) => s.updateContext);
+	useEffect(() => {
+		updateAiContext({
+			pageName: "Finishing Quantities Calculator",
+			pageNameAr: "حاسب كميات التشطيبات",
+			pageDescription:
+				"حاسب كميات التشطيبات الذكي: دهانات، أرضيات، عوازل، حوائط، أسقف، أبواب، شبابيك. يستخرج الكميات تلقائياً من تهيئة المبنى",
+			itemCount: totalItems,
+			visibleStats: {
+				totalItems,
+				enabledCount,
+				disabledCount,
+				viewMode,
+			},
+			activeFilters: {
+				group: groupFilter ?? "all",
+				status: statusFilter,
+				search: searchQuery || undefined,
+			},
+		});
+	}, [
+		totalItems,
+		enabledCount,
+		disabledCount,
+		viewMode,
+		groupFilter,
+		statusFilter,
+		searchQuery,
+		updateAiContext,
+	]);
+
 	// Filtered items
 	const filteredItems = useMemo(() => {
 		let items = localItems;

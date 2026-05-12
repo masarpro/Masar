@@ -23,6 +23,7 @@ import { FinishingCostingTab } from "./FinishingCostingTab";
 import { MEPCostingTab } from "./MEPCostingTab";
 import { LaborOverviewTab } from "./LaborOverviewTab";
 import { CostingSummaryTab } from "./CostingSummaryTab";
+import { usePageContextStore } from "@saas/ai/hooks/use-page-context";
 
 interface CostingPageContentV2Props {
 	organizationId: string;
@@ -69,6 +70,26 @@ export function CostingPageContentV2({
 			(generateMutation as any).mutate({ organizationId, studyId });
 		}
 	}, [isSpecsApproved]);
+
+	// إثراء سياق المساعد بمعلومات صفحة تسعير التكلفة v2
+	const updateAiContext = usePageContextStore((s) => s.updateContext);
+	useEffect(() => {
+		const studyName = (study as any)?.name ?? "";
+		const buildingAreaVal = Number((study as any)?.buildingArea ?? 0);
+		updateAiContext({
+			pageName: "Cost Pricing v2",
+			pageNameAr: "تسعير التكلفة (الإصدار الجديد)",
+			pageDescription:
+				"صفحة تسعير التكلفة بنظام التبويبات: المواد، التشطيبات، MEP، العمالة، الملخص. يحسب تكلفة كل بند تلقائياً",
+			visibleStats: {
+				studyName,
+				buildingArea: buildingAreaVal,
+				studyType,
+				activeTab: activeTab || "default",
+				specsApproved: isSpecsApproved ? "نعم" : "لا",
+			},
+		});
+	}, [study, studyType, activeTab, isSpecsApproved, updateAiContext]);
 
 	if (stagesLoading) {
 		return (

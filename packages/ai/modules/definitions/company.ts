@@ -39,7 +39,7 @@ const companyModule: AIModuleDefinition = {
     "كم مصاريف المنشأة الشهرية؟",
   ],
 
-  relatedTools: ["queryCompany"],
+  relatedTools: ["queryCompany", "queryEmployees", "queryPayroll", "queryAssets"],
 
   entities: [
     {
