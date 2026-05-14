@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { Button } from "@ui/components/button";
 import { Card, CardContent } from "@ui/components/card";
+import { Label } from "@ui/components/label";
 import {
 	Table,
 	TableBody,
@@ -60,8 +61,10 @@ export function FloorColumnsPanel({
 	const [formData, setFormData] = useState({
 		name: "",
 		quantity: 1,
+		shape: "rectangular" as "rectangular" | "circular",
 		width: 30,
 		depth: 30,
+		diameter: 40,
 		height: defaultColumnHeight,
 		mainBarsCount: 8,
 		mainBarDiameter: 16,
@@ -70,8 +73,11 @@ export function FloorColumnsPanel({
 	});
 
 	const calculations = useMemo(() => {
-		if (formData.width <= 0 || formData.depth <= 0 || formData.height <= 0)
-			return null;
+		const isCircular = formData.shape === "circular";
+		if (formData.height <= 0) return null;
+		if (isCircular) {
+			if (!formData.diameter || formData.diameter <= 0) return null;
+		} else if (formData.width <= 0 || formData.depth <= 0) return null;
 		return calculateColumnRebar({
 			...formData,
 			concreteType: specs?.concreteType || "C35",
@@ -124,8 +130,10 @@ export function FloorColumnsPanel({
 		setFormData({
 			name: "",
 			quantity: 1,
+			shape: "rectangular",
 			width: 30,
 			depth: 30,
+			diameter: 40,
 			height: defaultColumnHeight,
 			mainBarsCount: 8,
 			mainBarDiameter: 16,
@@ -153,6 +161,8 @@ export function FloorColumnsPanel({
 				mainBarDiameter: formData.mainBarDiameter,
 				stirrupDiameter: formData.stirrupDiameter,
 				stirrupSpacing: formData.stirrupSpacing,
+				shape: formData.shape === "circular" ? 1 : 0,
+				diameter: formData.diameter,
 			},
 			concreteVolume: calculations.concreteVolume,
 			concreteType: specs?.concreteType || "C35",
@@ -199,8 +209,10 @@ export function FloorColumnsPanel({
 		setFormData({
 			name: item.name,
 			quantity: item.quantity,
+			shape: item.dimensions?.shape ? "circular" : "rectangular",
 			width: item.dimensions?.width || 30,
 			depth: item.dimensions?.depth || 30,
+			diameter: item.dimensions?.diameter || 40,
 			height: item.dimensions?.height || 3,
 			mainBarsCount: item.dimensions?.mainBarsCount || 8,
 			mainBarDiameter: item.dimensions?.mainBarDiameter || 16,
@@ -215,8 +227,10 @@ export function FloorColumnsPanel({
 		setFormData({
 			name: `${item.name} - نسخة`,
 			quantity: item.quantity,
+			shape: item.dimensions?.shape ? "circular" : "rectangular",
 			width: item.dimensions?.width || 30,
 			depth: item.dimensions?.depth || 30,
+			diameter: item.dimensions?.diameter || 40,
 			height: item.dimensions?.height || 3,
 			mainBarsCount: item.dimensions?.mainBarsCount || 8,
 			mainBarDiameter: item.dimensions?.mainBarDiameter || 16,
@@ -261,11 +275,22 @@ export function FloorColumnsPanel({
 									<TableCell className="font-medium">{item.name}</TableCell>
 									<TableCell>{item.quantity}</TableCell>
 									<TableCell>
-										{item.dimensions?.width || 0}×
-										{item.dimensions?.depth || 0}{" "}
-										{t("pricing.studies.units.cm")} ×{" "}
-										{item.dimensions?.height || 0}{" "}
-										{t("pricing.studies.units.m")}
+										{item.dimensions?.shape ? (
+											<>
+												Ø{item.dimensions?.diameter || 0}{" "}
+												{t("pricing.studies.units.cm")} ×{" "}
+												{item.dimensions?.height || 0}{" "}
+												{t("pricing.studies.units.m")}
+											</>
+										) : (
+											<>
+												{item.dimensions?.width || 0}×
+												{item.dimensions?.depth || 0}{" "}
+												{t("pricing.studies.units.cm")} ×{" "}
+												{item.dimensions?.height || 0}{" "}
+												{t("pricing.studies.units.m")}
+											</>
+										)}
 									</TableCell>
 									<TableCell className="text-xs text-muted-foreground">
 										{item.dimensions?.mainBarsCount || 8}∅
@@ -352,42 +377,94 @@ export function FloorColumnsPanel({
 							showSubType={false}
 						/>
 
+						<div className="flex items-center gap-2">
+							<Label className="text-sm text-muted-foreground">شكل العمود:</Label>
+							<div className="flex gap-1">
+								<Button
+									type="button"
+									variant={formData.shape === "rectangular" ? "primary" : "outline"}
+									size="sm"
+									onClick={() => setFormData({ ...formData, shape: "rectangular" })}
+								>
+									مستطيل
+								</Button>
+								<Button
+									type="button"
+									variant={formData.shape === "circular" ? "primary" : "outline"}
+									size="sm"
+									onClick={() =>
+										setFormData({
+											...formData,
+											shape: "circular",
+											mainBarsCount: Math.max(formData.mainBarsCount, 8),
+										})
+									}
+								>
+									عمود دائري
+								</Button>
+							</div>
+						</div>
+
 						<DimensionsCard
 							title={derivedColumnHeight != null ? "أبعاد العمود (الارتفاع محسوب من المناسيب)" : "أبعاد العمود"}
-							dimensions={[
-								{
-									key: "width",
-									label: "العرض",
-									value: formData.width,
-									unit: "سم",
-									step: 5,
-									min: 20,
-								},
-								{
-									key: "depth",
-									label: "العمق",
-									value: formData.depth,
-									unit: "سم",
-									step: 5,
-									min: 20,
-								},
-								{
-									key: "height",
-									label: derivedColumnHeight != null ? "الارتفاع (محسوب)" : "الارتفاع",
-									value: formData.height,
-									unit: "م",
-									step: 0.1,
-									min: 0.5,
-								},
-							]}
+							dimensions={
+								formData.shape === "circular"
+									? [
+										{
+											key: "diameter",
+											label: "القطر",
+											value: formData.diameter,
+											unit: "سم",
+											step: 1,
+											min: 20,
+											max: 200,
+										},
+										{
+											key: "height",
+											label: derivedColumnHeight != null ? "الارتفاع (محسوب)" : "الارتفاع",
+											value: formData.height,
+											unit: "م",
+											step: 0.1,
+											min: 0.5,
+										},
+									]
+									: [
+										{
+											key: "width",
+											label: "العرض",
+											value: formData.width,
+											unit: "سم",
+											step: 5,
+											min: 20,
+										},
+										{
+											key: "depth",
+											label: "العمق",
+											value: formData.depth,
+											unit: "سم",
+											step: 5,
+											min: 20,
+										},
+										{
+											key: "height",
+											label: derivedColumnHeight != null ? "الارتفاع (محسوب)" : "الارتفاع",
+											value: formData.height,
+											unit: "م",
+											step: 0.1,
+											min: 0.5,
+										},
+									]
+							}
 							onDimensionChange={(key, value) =>
 								setFormData({ ...formData, [key]: value })
 							}
 							calculatedVolume={
-								(formData.width / 100) *
-								(formData.depth / 100) *
-								formData.height *
-								formData.quantity
+								formData.shape === "circular"
+									? Math.PI * (formData.diameter / 200) ** 2 * formData.height * formData.quantity
+									: (formData.width / 100) *
+										(formData.depth / 100) *
+										formData.height *
+										formData.quantity
 							}
 						/>
 
@@ -409,7 +486,12 @@ export function FloorColumnsPanel({
 									}
 									colorScheme="indigo"
 									availableDiameters={REBAR_DIAMETERS.filter((d) => d >= 12)}
-									availableBarsCount={[4, 6, 8, 10, 12, 14, 16]}
+									availableBarsCount={
+										formData.shape === "circular"
+											? [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 40, 50]
+											: [4, 6, 8, 10, 12, 14, 16]
+									}
+									allowCustomCount
 								/>
 								<StirrupsInput
 									diameter={formData.stirrupDiameter}

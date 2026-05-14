@@ -145,6 +145,8 @@ export interface ColumnCalcInput {
 	stirrupDiameter: number; // مم
 	stirrupSpacing: number; // مم
 	concreteType?: string;
+	shape?: "rectangular" | "circular";
+	diameter?: number; // سم — للعمود الدائري
 }
 
 export interface ColumnResult {
@@ -172,14 +174,20 @@ export function calculateColumn(data: ColumnCalcInput): ColumnResult {
 		stirrupDiameter,
 		stirrupSpacing,
 		concreteType = "C35",
+		shape = "rectangular",
+		diameter,
 	} = data;
 
 	// تحويل الأبعاد من سم إلى متر
 	const widthM = width / 100;
 	const depthM = depth / 100;
+	const isCircular = shape === "circular" && diameter && diameter > 0;
+	const diameterM = isCircular ? (diameter as number) / 100 : 0;
 
 	// حجم الخرسانة
-	const volumePerUnit = widthM * depthM * height;
+	const volumePerUnit = isCircular
+		? Math.PI * (diameterM / 2) ** 2 * height
+		: widthM * depthM * height;
 	const concreteVolume = volumePerUnit * quantity;
 
 	// الحديد الرئيسي
@@ -188,8 +196,10 @@ export function calculateColumn(data: ColumnCalcInput): ColumnResult {
 	const mainRebarWeight =
 		mainBarsCount * mainBarLength * mainBarWeight * quantity;
 
-	// الكانات
-	const stirrupPerimeter = 2 * (widthM + depthM - STIRRUP_COVER_DEDUCTION) + STIRRUP_HOOK_LENGTH; // محيط الكانة + الرجوع
+	// الكانات (دائرية للعمود الدائري، مستطيلة للعمود المستطيل)
+	const stirrupPerimeter = isCircular
+		? Math.PI * (diameterM - 2 * STIRRUP_COVER_DEDUCTION) + STIRRUP_HOOK_LENGTH
+		: 2 * (widthM + depthM - STIRRUP_COVER_DEDUCTION) + STIRRUP_HOOK_LENGTH;
 	const stirrupsCount = Math.ceil((height * 1000) / stirrupSpacing) + 1;
 	const stirrupWeight = getRebarWeightPerMeter(stirrupDiameter);
 	const stirrupRebarWeight =
@@ -198,7 +208,9 @@ export function calculateColumn(data: ColumnCalcInput): ColumnResult {
 	const totalRebarWeight = mainRebarWeight + stirrupRebarWeight;
 
 	// مساحة الشدات
-	const formworkArea = 2 * (widthM + depthM) * height * quantity;
+	const formworkArea = isCircular
+		? Math.PI * diameterM * height * quantity
+		: 2 * (widthM + depthM) * height * quantity;
 
 	// التكلفة
 	const concretePrice = STRUCTURAL_PRICES.concrete[concreteType] || 350;

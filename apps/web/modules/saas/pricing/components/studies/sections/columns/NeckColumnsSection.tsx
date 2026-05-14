@@ -43,6 +43,8 @@ export function NeckColumnsSection({
 			const mainBarDiameter = col.dimensions?.mainBarDiameter || 16;
 			const stirrupDiameter = col.dimensions?.stirrupDiameter || 8;
 			const stirrupSpacing = col.dimensions?.stirrupSpacing || 150;
+			const isCircular = !!col.dimensions?.shape;
+			const diameter = col.dimensions?.diameter || 40;
 
 			const calc = calculateColumnRebar({
 				quantity: col.quantity,
@@ -54,6 +56,8 @@ export function NeckColumnsSection({
 				stirrupDiameter,
 				stirrupSpacing,
 				concreteType: specs?.concreteType || "C35",
+				shape: isCircular ? "circular" : "rectangular",
+				diameter,
 			});
 
 			return {
@@ -65,6 +69,8 @@ export function NeckColumnsSection({
 				mainBarDiameter,
 				stirrupDiameter,
 				stirrupSpacing,
+				isCircular,
+				diameter,
 				calc,
 			};
 		});

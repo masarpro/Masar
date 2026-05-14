@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
 	Select,
 	SelectContent,
@@ -7,6 +8,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@ui/components/select";
+import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
 import { REBAR_DIAMETERS } from "../../../constants/prices";
 
@@ -19,8 +21,11 @@ interface RebarBarsInputProps {
 	colorScheme?: "blue" | "green" | "indigo" | "gray";
 	availableDiameters?: number[];
 	availableBarsCount?: number[];
+	allowCustomCount?: boolean;
 	className?: string;
 }
+
+const CUSTOM_COUNT_SENTINEL = "__custom__";
 
 const COLOR_SCHEMES = {
 	blue: {
@@ -56,9 +61,21 @@ export function RebarBarsInput({
 	colorScheme = "gray",
 	availableDiameters = REBAR_DIAMETERS.filter((d) => d >= 12),
 	availableBarsCount = DEFAULT_BARS_COUNT,
+	allowCustomCount = false,
 	className,
 }: RebarBarsInputProps) {
 	const colors = COLOR_SCHEMES[colorScheme];
+	const isPredefined = availableBarsCount.includes(barsCount);
+	const [isCustom, setIsCustom] = useState<boolean>(
+		allowCustomCount && !isPredefined,
+	);
+
+	useEffect(() => {
+		if (!allowCustomCount) return;
+		if (!availableBarsCount.includes(barsCount)) setIsCustom(true);
+	}, [barsCount, availableBarsCount, allowCustomCount]);
+
+	const selectValue = isCustom ? CUSTOM_COUNT_SENTINEL : barsCount.toString();
 
 	return (
 		<div
@@ -93,8 +110,15 @@ export function RebarBarsInput({
 				<div className="space-y-1.5">
 					<Label className="text-xs text-muted-foreground">عدد الأسياخ</Label>
 					<Select
-						value={barsCount.toString()}
-						onValueChange={(v: any) => onBarsCountChange(parseInt(v))}
+						value={selectValue}
+						onValueChange={(v: any) => {
+							if (v === CUSTOM_COUNT_SENTINEL) {
+								setIsCustom(true);
+								return;
+							}
+							setIsCustom(false);
+							onBarsCountChange(parseInt(v));
+						}}
 					>
 						<SelectTrigger>
 							<SelectValue />
@@ -105,8 +129,26 @@ export function RebarBarsInput({
 									{n} أسياخ
 								</SelectItem>
 							))}
+							{allowCustomCount && (
+								<SelectItem value={CUSTOM_COUNT_SENTINEL}>أخرى — كتابة العدد</SelectItem>
+							)}
 						</SelectContent>
 					</Select>
+					{allowCustomCount && isCustom && (
+						<Input
+							type="number"
+							min={1}
+							max={200}
+							step={1}
+							value={barsCount}
+							onChange={(e: any) => {
+								const n = parseInt(e.target.value);
+								onBarsCountChange(Number.isFinite(n) && n > 0 ? n : 0);
+							}}
+							placeholder="عدد مخصّص"
+							className="h-9"
+						/>
+					)}
 				</div>
 			</div>
 		</div>

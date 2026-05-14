@@ -2568,6 +2568,8 @@ export interface ColumnRebarInput {
 	stirrupDiameter: number;
 	stirrupSpacing: number; // mm
 	concreteType: string;
+	shape?: "rectangular" | "circular";
+	diameter?: number; // cm
 }
 
 export interface ColumnRebarResult {
@@ -2593,7 +2595,11 @@ export function calculateColumnRebar(params: ColumnRebarInput): ColumnRebarResul
 	const mainBarLength = params.height + 0.8;
 	const widthM = params.width / 100;
 	const depthM = params.depth / 100;
-	const stirrupPerimeter = 2 * (widthM + depthM - 0.08) + 0.3;
+	const isCircular = params.shape === "circular" && params.diameter && params.diameter > 0;
+	const diameterM = isCircular ? (params.diameter as number) / 100 : 0;
+	const stirrupPerimeter = isCircular
+		? Math.PI * (diameterM - 0.08) + 0.3
+		: 2 * (widthM + depthM - 0.08) + 0.3;
 	const stirrupsCount =
 		Math.ceil((params.height * 1000) / params.stirrupSpacing) + 1;
 
