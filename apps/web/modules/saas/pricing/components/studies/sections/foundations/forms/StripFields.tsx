@@ -106,7 +106,7 @@ export function StripFields({
 									onBarsCountChange={(n) => setFormData({ ...formData, bottomSecondaryCount: n })}
 									colorScheme="blue"
 									availableDiameters={REBAR_DIAMETERS.filter(d => d >= 10)}
-									availableBarsCount={[2, 3, 4, 5, 6]}
+									availableBarsCount={[4, 5, 6, 7, 8, 9, 10, 11, 12]}
 								/>
 							</div>
 						)}
