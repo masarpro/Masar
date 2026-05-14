@@ -21,6 +21,7 @@ import {
 	Pencil,
 	Calculator,
 	X,
+	Copy,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMutation } from "@tanstack/react-query";
@@ -546,6 +547,19 @@ export function FoundationsSection({
 												title={t("common.edit")}
 											>
 												<Pencil className="h-4 w-4" />
+											</Button>
+											<Button
+												variant="ghost"
+												size="icon"
+												onClick={() => {
+													setEditingItemId(null);
+													setIsAdding(true);
+													const populated = populateFormFromItem(item);
+													setFormData({ ...populated, name: `${populated.name} - نسخة` });
+												}}
+												title="نسخ القاعدة"
+											>
+												<Copy className="h-4 w-4 text-blue-600" />
 											</Button>
 											<Button
 												variant="ghost"

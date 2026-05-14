@@ -201,7 +201,7 @@ export function StripFields({
 									onDiameterChange={(d) => setFormData({ ...formData, stripTopMeshYDiameter: d })}
 									barsPerMeter={formData.stripTopMeshYBarsPerMeter}
 									onBarsPerMeterChange={(n) => setFormData({ ...formData, stripTopMeshYBarsPerMeter: n })}
-									colorScheme="green" availableDiameters={REBAR_DIAMETERS.filter(d => d >= 12 && d <= 18)} availableBarsPerMeter={[3, 4, 5, 6]} />
+									colorScheme="green" availableDiameters={REBAR_DIAMETERS.filter(d => d >= 12 && d <= 18)} availableBarsPerMeter={[4, 5, 6, 7, 8]} />
 							</div>
 						)}
 					</div>
