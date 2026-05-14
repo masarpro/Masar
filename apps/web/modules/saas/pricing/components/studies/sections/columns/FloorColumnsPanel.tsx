@@ -18,6 +18,7 @@ import {
 	Pencil,
 	Calculator,
 	X,
+	Copy,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMutation } from "@tanstack/react-query";
@@ -208,6 +209,22 @@ export function FloorColumnsPanel({
 		});
 	};
 
+	const handleDuplicate = (item: ItemType) => {
+		setEditingItemId(null);
+		setIsAdding(true);
+		setFormData({
+			name: `${item.name} - نسخة`,
+			quantity: item.quantity,
+			width: item.dimensions?.width || 30,
+			depth: item.dimensions?.depth || 30,
+			height: item.dimensions?.height || 3,
+			mainBarsCount: item.dimensions?.mainBarsCount || 8,
+			mainBarDiameter: item.dimensions?.mainBarDiameter || 16,
+			stirrupDiameter: item.dimensions?.stirrupDiameter || 8,
+			stirrupSpacing: item.dimensions?.stirrupSpacing || 150,
+		});
+	};
+
 	const floorConcrete = items.reduce((s, i) => s + i.concreteVolume, 0);
 	const floorSteel = items.reduce((s, i) => s + i.steelWeight, 0);
 
@@ -273,6 +290,14 @@ export function FloorColumnsPanel({
 												title={t("common.edit")}
 											>
 												<Pencil className="h-4 w-4" />
+											</Button>
+											<Button
+												variant="ghost"
+												size="icon"
+												onClick={() => handleDuplicate(item)}
+												title="نسخ"
+											>
+												<Copy className="h-4 w-4 text-blue-600" />
 											</Button>
 											<Button
 												variant="ghost"

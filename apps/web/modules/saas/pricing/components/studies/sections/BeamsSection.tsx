@@ -28,6 +28,7 @@ import {
 	Pencil,
 	Calculator,
 	X,
+	Copy,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMutation } from "@tanstack/react-query";
@@ -272,6 +273,31 @@ export function BeamsSection({
 												title={t("common.edit")}
 											>
 												<Pencil className="h-4 w-4" />
+											</Button>
+											<Button
+												variant="ghost"
+												size="icon"
+												onClick={() => {
+													setEditingItemId(null);
+													setIsAdding(true);
+													setFormData({
+														name: `${item.name} - نسخة`,
+														beamType: (item.subCategory === "groundBeam" ? "groundBeam" : "beam") as "beam" | "groundBeam",
+														quantity: item.quantity,
+														width: item.dimensions?.width || 30,
+														height: item.dimensions?.height || 60,
+														length: item.dimensions?.length || 5,
+														topBarsCount: item.dimensions?.topBarsCount || 3,
+														topBarDiameter: item.dimensions?.topBarDiameter || 16,
+														bottomBarsCount: item.dimensions?.bottomBarsCount || 4,
+														bottomBarDiameter: item.dimensions?.bottomBarDiameter || 18,
+														stirrupDiameter: item.dimensions?.stirrupDiameter || 8,
+														stirrupSpacing: item.dimensions?.stirrupSpacing || 150,
+													});
+												}}
+												title="نسخ"
+											>
+												<Copy className="h-4 w-4 text-blue-600" />
 											</Button>
 											<Button
 												variant="ghost"
