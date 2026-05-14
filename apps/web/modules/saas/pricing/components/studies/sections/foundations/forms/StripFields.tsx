@@ -195,7 +195,7 @@ export function StripFields({
 									onDiameterChange={(d) => setFormData({ ...formData, stripTopMeshXDiameter: d })}
 									barsPerMeter={formData.stripTopMeshXBarsPerMeter}
 									onBarsPerMeterChange={(n) => setFormData({ ...formData, stripTopMeshXBarsPerMeter: n })}
-									colorScheme="green" availableDiameters={REBAR_DIAMETERS.filter(d => d >= 12 && d <= 18)} availableBarsPerMeter={[3, 4, 5, 6]} />
+									colorScheme="green" availableDiameters={REBAR_DIAMETERS.filter(d => d >= 14)} availableBarsPerMeter={[4, 5, 6, 7, 8]} />
 								<RebarMeshInput title={t("pricing.studies.structural.strip.topMesh")} direction="اتجاه Y"
 									diameter={formData.stripTopMeshYDiameter}
 									onDiameterChange={(d) => setFormData({ ...formData, stripTopMeshYDiameter: d })}
