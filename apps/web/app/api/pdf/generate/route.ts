@@ -113,50 +113,11 @@ export async function POST(req: NextRequest) {
 		// Small wait for CSS to apply after DOM mutation
 		await new Promise((r) => setTimeout(r, 100));
 
-		// Wait explicitly for every letterhead footer image to finish loading.
-		// Without this, getBoundingClientRect can return 0 height for a still-
-		// loading image and the reserved bottom margin would be too small,
-		// causing the items table to render underneath the footer on pages
-		// 1..N-1 of multi-page documents.
-		await page.evaluate(async () => {
-			const imgs = Array.from(
-				document.querySelectorAll<HTMLImageElement>("[data-pdf-footer] img"),
-			);
-			await Promise.all(
-				imgs
-					.filter((img) => !img.complete)
-					.map(
-						(img) =>
-							new Promise<void>((resolve) => {
-								img.onload = () => resolve();
-								img.onerror = () => resolve();
-							}),
-					),
-			);
-		});
-
-		// Measure the rendered footer height in millimeters. 1 CSS px = 0.2645833 mm
-		// at 96 DPI (Puppeteer's default viewport 794×1123 is A4 at 96 DPI).
-		const footerMm = await page.evaluate(() => {
-			const el = document.querySelector(
-				"[data-pdf-footer]",
-			) as HTMLElement | null;
-			if (!el) return 0;
-			return Math.ceil(el.getBoundingClientRect().height * 0.2645833);
-		});
-
 		// Generate PDF — Chromium handles thead/tfoot repetition natively via
-		// table-header-group / table-footer-group. The bottom margin reserves
-		// per-page space for the position:fixed [data-pdf-footer], so the body
-		// content stops above it on every page (not just the last one).
+		// table-header-group / table-footer-group. Margin 0 = full A4 usable.
 		const pdfBuffer = await page.pdf({
 			format: "A4",
-			margin: {
-				top: "0",
-				right: "0",
-				bottom: `${footerMm}mm`,
-				left: "0",
-			},
+			margin: { top: "0", right: "0", bottom: "0", left: "0" },
 			printBackground: true,
 			preferCSSPageSize: false,
 		});
