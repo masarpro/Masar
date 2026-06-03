@@ -643,10 +643,15 @@ input[cmdk-input] {
 	   last pages and partial pages in multi-page documents).
 
 	   Chromium repeats position:fixed elements on every page in Paged Media
-	   (both window.print() and puppeteer page.pdf()). This replaces the
-	   previous table-footer-group approach, which only pinned the footer to
-	   "end of fragment on that page" — causing the footer to float at
-	   1/2-page or 3/4-page whenever tbody content didn't fill the page.
+	   (both window.print() and puppeteer page.pdf()).
+
+	   Per-page space for the footer is reserved by `@page { margin-bottom }`
+	   injected dynamically from TemplateRenderer.tsx (browser print path) and
+	   passed explicitly to page.pdf({margin}) by /api/pdf/generate/route.ts
+	   (Puppeteer path). This replaces the previous `padding-bottom` hack on
+	   [data-pdf-body], which only reserved space at the END of body content
+	   (so only the last page was safe; pages 1..N-1 had content rendered
+	   underneath the fixed footer).
 
 	   Applies to BOTH TemplateRenderer (table-based) and QuotationPreviewV2
 	   (flow-based) — both emit [data-pdf-footer]. */
@@ -669,14 +674,6 @@ input[cmdk-input] {
 		right: 0;
 		width: 100%;
 		z-index: 10;
-	}
-
-	/* Reserve vertical space at the end of body content so flow content does
-	   NOT render under the pinned footer. CSS var is set dynamically by
-	   TemplateRenderer's useEffect (measures actual footer height including
-	   letterhead image). 45mm default covers typical letterhead. */
-	[data-pdf-body] {
-		padding-bottom: var(--pdf-footer-reserve, 45mm);
 	}
 
 	/* Defensive: ancestor `transform` / `filter` / `will-change` / `contain`

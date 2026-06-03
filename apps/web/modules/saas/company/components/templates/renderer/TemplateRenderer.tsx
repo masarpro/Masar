@@ -222,39 +222,61 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 	const showWatermark = settings.showWatermark;
 	const watermarkOpacity = settings.watermarkOpacity ?? 5;
 
-	// Measure footer height on mount + after images load + before print/PDF.
-	// Sets CSS var `--pdf-footer-reserve` used by globals.css @media print to
-	// reserve exact space above the pinned position:fixed footer. Handles
-	// letterhead images whose height isn't known ahead of time.
+	// Reserve space for the pinned footer on EVERY printed page by injecting
+	// `@page { margin-bottom: <H>mm }` dynamically. Browser print (window.print)
+	// reads this CSS @page rule directly. The Puppeteer PDF route reads the
+	// same DOM measurement via page.evaluate and passes it as page.pdf({margin})
+	// — Puppeteer's explicit margin overrides CSS @page, so the route handles
+	// its own measurement (defense in depth + bypasses React effect timing).
 	useEffect(() => {
 		if (typeof window === "undefined") return;
 
+		const STYLE_ID = "pdf-page-margins";
+
+		const upsertPageStyle = (footerMm: number) => {
+			let styleEl = document.getElementById(STYLE_ID) as HTMLStyleElement | null;
+			if (!styleEl) {
+				styleEl = document.createElement("style");
+				styleEl.id = STYLE_ID;
+				document.head.appendChild(styleEl);
+			}
+			styleEl.textContent = footerMm > 0
+				? `@media print { @page { size: A4 portrait; margin: 0 0 ${footerMm}mm 0; } }`
+				: "";
+		};
+
 		const measureFooter = () => {
 			const footer = document.querySelector<HTMLElement>("[data-pdf-footer]");
-			if (!footer) return;
-			const h = Math.ceil(footer.getBoundingClientRect().height);
-			if (h > 0) {
-				document.documentElement.style.setProperty(
-					"--pdf-footer-reserve",
-					`${h}px`,
-				);
+			if (!footer) {
+				upsertPageStyle(0);
+				return;
 			}
+			const px = footer.getBoundingClientRect().height;
+			// 1 CSS px = 0.2645833 mm at 96 DPI (Puppeteer's default viewport
+			// 794×1123 is A4 at 96 DPI, so the conversion is exact for PDF).
+			const mm = Math.ceil(px * 0.2645833);
+			upsertPageStyle(mm);
 		};
 
 		measureFooter();
 
-		const imgs = document.querySelectorAll<HTMLImageElement>(
-			"[data-pdf-footer] img",
-		);
-		imgs.forEach((img) => {
-			if (!img.complete) {
-				img.addEventListener("load", measureFooter, { once: true });
-			}
-		});
+		// ResizeObserver catches every height change: image load, font load,
+		// template element edits, paper-mode switches — without depending on
+		// a fragile React dep array.
+		let observer: ResizeObserver | null = null;
+		const footerEl = document.querySelector<HTMLElement>("[data-pdf-footer]");
+		if (footerEl && typeof ResizeObserver !== "undefined") {
+			observer = new ResizeObserver(measureFooter);
+			observer.observe(footerEl);
+		}
 
+		// Force a fresh measurement immediately before window.print() fires.
 		window.addEventListener("beforeprint", measureFooter);
+
 		return () => {
 			window.removeEventListener("beforeprint", measureFooter);
+			observer?.disconnect();
+			document.getElementById(STYLE_ID)?.remove();
 		};
 	}, [settings.footerImage]);
 
