@@ -174,7 +174,7 @@ export function ItemsTableComponent({
 					>
 						{showRowNumbers && (
 							<th
-								className="py-1.5 px-4 text-center font-medium text-sm"
+								className="py-1 px-4 text-center font-medium text-sm"
 								style={
 									isUnderline
 										? {
@@ -192,7 +192,7 @@ export function ItemsTableComponent({
 							</th>
 						)}
 						<th
-							className={`py-1.5 px-4 font-medium text-sm text-start`}
+							className={`py-1 px-4 font-medium text-sm text-start`}
 							style={
 								isUnderline
 									? {
@@ -211,7 +211,7 @@ export function ItemsTableComponent({
 						</th>
 						{showQuantity && (
 							<th
-								className="py-1.5 px-4 text-center font-medium text-sm"
+								className="py-1 px-4 text-center font-medium text-sm"
 								style={
 									isUnderline
 										? {
@@ -227,7 +227,7 @@ export function ItemsTableComponent({
 						)}
 						{showUnit && (
 							<th
-								className="py-1.5 px-4 text-center font-medium text-sm"
+								className="py-1 px-4 text-center font-medium text-sm"
 								style={
 									isUnderline
 										? {
@@ -243,7 +243,7 @@ export function ItemsTableComponent({
 						)}
 						{showUnitPrice && (
 							<th
-								className="py-1.5 px-4 text-end font-medium text-sm"
+								className="py-1 px-4 text-end font-medium text-sm"
 								style={
 									isUnderline
 										? {
@@ -258,7 +258,7 @@ export function ItemsTableComponent({
 							</th>
 						)}
 						<th
-							className="py-1.5 px-4 text-end font-medium text-sm"
+							className="py-1 px-4 text-end font-medium text-sm"
 							style={
 								isUnderline
 									? {
@@ -296,11 +296,11 @@ export function ItemsTableComponent({
 								}}
 							>
 								{showRowNumbers && (
-									<td className="py-1.5 px-4 text-center text-sm">
+									<td className="py-1 px-4 text-center text-sm">
 										{renderRowNumber(index + 1)}
 									</td>
 								)}
-								<td className="py-1.5 px-4 text-sm text-slate-900">
+								<td className="py-1 px-4 text-sm text-slate-900">
 									<span>{item.description}</span>
 									{item.descriptionEn &&
 										item.descriptionEn !== item.description && (
@@ -314,27 +314,27 @@ export function ItemsTableComponent({
 								</td>
 								{showQuantity && (
 									<td
-										className="py-1.5 px-4 text-center text-sm text-slate-600 font-medium"
+										className="py-1 px-4 text-center text-sm text-slate-600 font-medium"
 										dir="ltr"
 									>
 										{formatNumber(item.quantity)}
 									</td>
 								)}
 								{showUnit && (
-									<td className="py-1.5 px-4 text-center text-sm text-slate-600">
+									<td className="py-1 px-4 text-center text-sm text-slate-600">
 										{item.unit}
 									</td>
 								)}
 								{showUnitPrice && (
 									<td
-										className="py-1.5 px-4 text-end text-sm text-slate-600"
+										className="py-1 px-4 text-end text-sm text-slate-600"
 										dir="ltr"
 									>
 										<Currency amount={item.unitPrice} showSymbol={false} />
 									</td>
 								)}
 								<td
-									className="py-1.5 px-4 text-end text-sm font-semibold text-slate-900"
+									className="py-1 px-4 text-end text-sm font-semibold text-slate-900"
 									dir="ltr"
 								>
 									<Currency amount={item.totalPrice} showSymbol={false} />

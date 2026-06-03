@@ -135,10 +135,10 @@ export function TotalsComponent({
 						borderRadius: isCard ? borderRadius : undefined,
 						padding: isCard ? "12px 16px" : undefined,
 					}}
-					className="space-y-2"
+					className="space-y-1"
 				>
 					{/* Subtotal */}
-					<div className="flex justify-between py-2 border-b border-slate-200">
+					<div className="flex justify-between py-1 border-b border-slate-200">
 						<span className="text-slate-600">
 							{t("finance.templates.preview.subtotal")}
 						</span>
@@ -153,7 +153,7 @@ export function TotalsComponent({
 					{showDiscount &&
 						displayTotals.discountPercent &&
 						displayTotals.discountPercent > 0 && (
-							<div className="flex justify-between py-2 border-b border-slate-200">
+							<div className="flex justify-between py-1 border-b border-slate-200">
 								<span className="text-slate-600">
 									{t("finance.templates.preview.discount")} (
 									{formatPercent(displayTotals.discountPercent)})
@@ -171,7 +171,7 @@ export function TotalsComponent({
 					{showVat &&
 						displayTotals.vatPercent &&
 						displayTotals.vatPercent > 0 && (
-							<div className="flex justify-between py-2 border-b border-slate-200">
+							<div className="flex justify-between py-1 border-b border-slate-200">
 								<span className="text-slate-600">
 									{t("finance.templates.preview.vat")} (
 									{formatPercent(displayTotals.vatPercent)})
@@ -194,7 +194,7 @@ export function TotalsComponent({
 
 					{/* Total */}
 					<div
-						className={`flex justify-between py-3 px-4 ${highlightTotal && !totalBorderTop ? "text-white" : ""}`}
+						className={`flex justify-between py-2 px-4 ${highlightTotal && !totalBorderTop ? "text-white" : ""}`}
 						style={{
 							...totalRowStyle,
 							fontSize: totalFontSize || undefined,
