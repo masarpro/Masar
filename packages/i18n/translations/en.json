@@ -893,6 +893,21 @@
     "saved": "Saved",
     "total": "Total"
   },
+  "autosave": {
+    "saving": "Saving...",
+    "saved": "Saved",
+    "savedAgo": "Saved {time} ago",
+    "justNow": "just now",
+    "error": "Save failed",
+    "errorRetry": "Save failed — click to retry",
+    "offline": "Offline — will save when reconnected",
+    "waiting": "Add a client name and an item to start autosaving",
+    "conflictTitle": "Edit conflict",
+    "conflictMessage": "This document was modified in another session. Choose to reload (discards your current changes) or overwrite.",
+    "conflictReload": "Reload (discard my changes)",
+    "conflictOverwrite": "Overwrite anyway",
+    "unsavedChangesWarning": "You have unsaved changes. Leave anyway?"
+  },
   "company": {
     "title": "Company Management",
     "greeting": "Company & Resources Management",

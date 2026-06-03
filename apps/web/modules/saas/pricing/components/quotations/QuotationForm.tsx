@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
+import { useAutosave } from "@saas/shared/hooks/use-autosave";
+import { AutosaveIndicator } from "@saas/shared/components/AutosaveIndicator";
+import { AutosaveConflictDialog } from "@saas/shared/components/AutosaveConflictDialog";
 import { formatCurrency } from "@saas/shared/lib/invoice-constants";
 import { UnitField } from "@saas/shared/components/UnitField";
 import { Button } from "@ui/components/button";
@@ -41,7 +44,6 @@ import {
 import { toast } from "sonner";
 import Link from "next/link";
 import {
-	Save,
 	User,
 	FileText,
 	Plus,
@@ -112,6 +114,12 @@ export function QuotationForm({
 	const basePath = `/app/${organizationSlug}/pricing/quotations`;
 	const searchParams = useSearchParams();
 	const fromStudyId = searchParams.get("fromStudy");
+
+	// internalQuotationId يُحدّث بعد lazy create
+	const [internalQuotationId, setInternalQuotationId] = useState<string | undefined>(quotationId);
+	const effectiveQuotationId = quotationId ?? internalQuotationId;
+	const [isPublishing, setIsPublishing] = useState(false);
+	const [showConflictDialog, setShowConflictDialog] = useState(false);
 
 	// Client state
 	const [clientId, setClientId] = useState<string | undefined>();
@@ -401,130 +409,209 @@ export function QuotationForm({
 		}
 	};
 
-	// Create mutation
-	const createMutation = useMutation({
-		mutationFn: async () => {
-			return orpcClient.pricing.quotations.create({
+	// ─── Autosave snapshots ────────────────────────────────
+	const headerSnapshot = useMemo(
+		() => ({
+			clientId: clientId ?? null,
+			clientName: clientName.trim(),
+			clientCompany: clientCompany.trim() || undefined,
+			clientPhone: clientPhone.trim() || undefined,
+			clientEmail: clientEmail.trim(),
+			clientAddress: clientAddress.trim() || undefined,
+			clientTaxNumber: clientTaxNumber.trim() || undefined,
+			validUntil: validUntilDate,
+			paymentTerms: paymentTerms.trim() || undefined,
+			deliveryTerms: deliveryTerms.trim() || undefined,
+			warrantyTerms: warrantyTerms.trim() || undefined,
+			notes: notes.trim() || undefined,
+			introduction: introduction.trim() || undefined,
+			termsAndConditions: termsAndConditions.trim() || undefined,
+			vatPercent,
+			discountPercent,
+			projectId: !showProjectLink || projectId === "none" ? null : projectId,
+			templateId: existingQuotation?.templateId || defaultTemplate?.id || undefined,
+		}),
+		[clientId, clientName, clientCompany, clientPhone, clientEmail, clientAddress,
+		 clientTaxNumber, validUntilDate, paymentTerms, deliveryTerms, warrantyTerms,
+		 notes, introduction, termsAndConditions, vatPercent, discountPercent,
+		 showProjectLink, projectId, existingQuotation?.templateId, defaultTemplate?.id],
+	);
+
+	const itemsSnapshot = useMemo(
+		() => ({
+			items: items
+				.filter((item) => item.description.trim())
+				.map((item) => ({
+					id: item.id,
+					description: item.description.trim(),
+					quantity: Math.max(Number(item.quantity) || 1, 0.01),
+					unit: item.unit?.trim() || undefined,
+					unitPrice: Number(item.unitPrice) || 0,
+				})),
+			contentBlocks: contentBlocks
+				.filter((b) => b.title.trim() && b.content.trim())
+				.map((b) => ({
+					id: b.id,
+					title: b.title.trim(),
+					content: b.content.trim(),
+					position: b.position,
+				})),
+		}),
+		[items, contentBlocks],
+	);
+
+	const isReadyForCreate = useCallback(
+		(snap: typeof headerSnapshot, snapItems: typeof itemsSnapshot) =>
+			!!snap.clientName && snapItems.items.length > 0,
+		[],
+	);
+
+	const createDraft = useCallback(
+		async (snap: typeof headerSnapshot, snapItems: typeof itemsSnapshot) => {
+			const result = await orpcClient.pricing.quotations.create({
 				organizationId,
-				clientId,
-				clientName,
-				clientCompany,
-				clientPhone,
-				clientEmail: clientEmail || undefined,
-				clientAddress,
-				clientTaxNumber,
-				validUntil: new Date(validUntilDate).toISOString(),
-				paymentTerms,
-				deliveryTerms,
-				warrantyTerms,
-				notes,
-				introduction: introduction || undefined,
-				termsAndConditions: termsAndConditions || undefined,
-				contentBlocks: contentBlocks
-					.filter((b) => b.title.trim() && b.content.trim())
-					.map((b) => ({ title: b.title, content: b.content, position: b.position })),
-				templateId: defaultTemplate?.id,
-				vatPercent,
-				discountPercent,
-				projectId: !showProjectLink || projectId === "none" ? undefined : projectId,
-				items: items
-					.filter((item) => item.description.trim())
-					.map((item) => ({
+				clientId: snap.clientId ?? undefined,
+				clientName: snap.clientName,
+				clientCompany: snap.clientCompany,
+				clientPhone: snap.clientPhone,
+				clientEmail: snap.clientEmail || undefined,
+				clientAddress: snap.clientAddress,
+				clientTaxNumber: snap.clientTaxNumber,
+				validUntil: new Date(snap.validUntil).toISOString(),
+				paymentTerms: snap.paymentTerms,
+				deliveryTerms: snap.deliveryTerms,
+				warrantyTerms: snap.warrantyTerms,
+				notes: snap.notes,
+				introduction: snap.introduction,
+				termsAndConditions: snap.termsAndConditions,
+				templateId: snap.templateId,
+				vatPercent: snap.vatPercent,
+				discountPercent: snap.discountPercent,
+				projectId: snap.projectId ?? undefined,
+				contentBlocks: snapItems.contentBlocks.map(({ title, content, position }) => ({
+					title,
+					content,
+					position,
+				})),
+				items: snapItems.items.map(({ description, quantity, unit, unitPrice }) => ({
+					description,
+					quantity,
+					unit,
+					unitPrice,
+				})),
+			});
+			return { id: result.id };
+		},
+		[organizationId],
+	);
+
+	const updateHeader = useCallback(
+		async (id: string, snap: typeof headerSnapshot) => {
+			await orpcClient.pricing.quotations.update({
+				organizationId,
+				id,
+				clientId: snap.clientId,
+				clientName: snap.clientName,
+				clientCompany: snap.clientCompany,
+				clientPhone: snap.clientPhone,
+				clientEmail: snap.clientEmail || "",
+				clientAddress: snap.clientAddress,
+				clientTaxNumber: snap.clientTaxNumber,
+				validUntil: new Date(snap.validUntil).toISOString(),
+				paymentTerms: snap.paymentTerms,
+				deliveryTerms: snap.deliveryTerms,
+				warrantyTerms: snap.warrantyTerms,
+				notes: snap.notes,
+				introduction: snap.introduction,
+				termsAndConditions: snap.termsAndConditions,
+				templateId: snap.templateId,
+				vatPercent: snap.vatPercent,
+				discountPercent: snap.discountPercent,
+				projectId: snap.projectId,
+			});
+		},
+		[organizationId],
+	);
+
+	// نتعقّب آخر items/contentBlocks لتجنب استدعاءات لا داعي لها
+	const lastSavedItemsRef = useMemo(() => ({ current: null as null | typeof itemsSnapshot }), []);
+
+	const updateItemsRemote = useCallback(
+		async (id: string, snap: typeof itemsSnapshot) => {
+			const prev = lastSavedItemsRef.current;
+			const itemsChanged =
+				!prev || JSON.stringify(prev.items) !== JSON.stringify(snap.items);
+			const blocksChanged =
+				!prev || JSON.stringify(prev.contentBlocks) !== JSON.stringify(snap.contentBlocks);
+
+			if (itemsChanged) {
+				await orpcClient.pricing.quotations.updateItems({
+					organizationId,
+					id,
+					items: snap.items.map((item) => ({
+						id: item.id.startsWith("new-") || /^\d+$/.test(item.id) ? undefined : item.id,
 						description: item.description,
 						quantity: item.quantity,
-						unit: item.unit || undefined,
+						unit: item.unit,
 						unitPrice: item.unitPrice,
 					})),
-			});
-		},
-		onSuccess: (data) => {
-			toast.success(t("pricing.quotations.createSuccess"));
-			router.push(`${basePath}/${data.id}`);
-		},
-		onError: (error: any) => {
-			toast.error(error.message || t("pricing.quotations.createError"));
-		},
-	});
-
-	// Update mutation
-	const updateMutation = useMutation({
-		mutationFn: async () => {
-			return orpcClient.pricing.quotations.update({
-				organizationId,
-				id: quotationId!,
-				clientId: clientId ?? null,
-				clientName,
-				clientCompany: clientCompany || undefined,
-				clientPhone: clientPhone || undefined,
-				clientEmail: clientEmail || "",
-				clientAddress: clientAddress || undefined,
-				clientTaxNumber: clientTaxNumber || undefined,
-				paymentTerms: paymentTerms || undefined,
-				deliveryTerms: deliveryTerms || undefined,
-				warrantyTerms: warrantyTerms || undefined,
-				notes: notes || undefined,
-				introduction: introduction || undefined,
-				termsAndConditions: termsAndConditions || undefined,
-				templateId: existingQuotation?.templateId,
-				vatPercent,
-				discountPercent,
-				projectId: !showProjectLink || projectId === "none" ? null : projectId,
-			});
-		},
-		onError: (error: any) => {
-			toast.error(error.message || t("pricing.quotations.updateError"));
-		},
-	});
-
-	// Update items mutation
-	const updateItemsMutation = useMutation({
-		mutationFn: async () => {
-			return orpcClient.pricing.quotations.updateItems({
-				organizationId,
-				id: quotationId!,
-				items: items
-					.filter((item) => item.description.trim())
-					.map((item) => ({
-						id: item.id.startsWith("new-") ? undefined : item.id,
-						description: item.description,
-						quantity: item.quantity,
-						unit: item.unit || undefined,
-						unitPrice: item.unitPrice,
-					})),
-			});
-		},
-		onError: (error: any) => {
-			toast.error(error.message || t("pricing.quotations.itemsUpdateError"));
-		},
-	});
-
-	// Update content blocks mutation
-	const updateContentBlocksMutation = useMutation({
-		mutationFn: async () => {
-			return orpcClient.pricing.quotations.updateContentBlocks({
-				organizationId,
-				id: quotationId!,
-				contentBlocks: contentBlocks
-					.filter((b) => b.title.trim() && b.content.trim())
-					.map((b) => ({
+				});
+			}
+			if (blocksChanged) {
+				await orpcClient.pricing.quotations.updateContentBlocks({
+					organizationId,
+					id,
+					contentBlocks: snap.contentBlocks.map((b) => ({
 						id: b.id.startsWith("new-") ? undefined : b.id,
 						title: b.title,
 						content: b.content,
 						position: b.position,
 					})),
-			});
+				});
+			}
+			lastSavedItemsRef.current = snap;
 		},
-		onError: (error: any) => {
-			toast.error(error.message || t("pricing.quotations.updateError"));
+		[organizationId, lastSavedItemsRef],
+	);
+
+	const autosaveEnabled = !isPublishing && (mode === "create" || existingQuotation?.status === "DRAFT");
+
+	const autosave = useAutosave({
+		snapshot: headerSnapshot,
+		items: itemsSnapshot,
+		id: effectiveQuotationId,
+		enabled: autosaveEnabled,
+		isReadyForCreate,
+		createDraft,
+		updateHeader,
+		updateItems: updateItemsRemote,
+		onCreated: (newId) => {
+			setInternalQuotationId(newId);
+			if (typeof window !== "undefined") {
+				window.history.replaceState(null, "", `${basePath}/${newId}`);
+			}
 		},
+		onSaved: () => {
+			queryClient.invalidateQueries({ queryKey: ["finance", "quotations"] });
+		},
+		onConflict: () => setShowConflictDialog(true),
 	});
 
 	// Status mutation
 	const statusMutation = useMutation({
 		mutationFn: async (status: "DRAFT" | "SENT" | "ACCEPTED" | "REJECTED" | "EXPIRED") => {
+			setIsPublishing(status !== "DRAFT");
+			// أولاً: ضمان حفظ آخر التغييرات قبل تغيير الحالة
+			if (status !== "DRAFT") {
+				await autosave.forceSave();
+			}
+			const idToUse = effectiveQuotationId;
+			if (!idToUse) {
+				throw new Error(t("pricing.quotations.errors.itemsRequired"));
+			}
 			await orpcClient.pricing.quotations.updateStatus({
 				organizationId,
-				id: quotationId!,
+				id: idToUse,
 				status,
 			});
 		},
@@ -535,47 +622,41 @@ export function QuotationForm({
 			});
 		},
 		onError: (error: any) => {
+			setIsPublishing(false);
 			toast.error(error.message || t("pricing.quotations.statusUpdateError"));
 		},
 	});
 
-	// Validation
-	const validateForm = (): boolean => {
-		if (!clientName.trim()) {
-			toast.error(t("pricing.quotations.errors.clientRequired"));
-			return false;
-		}
-		const validItems = items.filter((item) => item.description.trim());
-		if (validItems.length === 0) {
-			toast.error(t("pricing.quotations.errors.itemsRequired"));
-			return false;
-		}
-		return true;
-	};
-
-	// Submit handler
+	// Form submit (Enter في الحقول) → force-save
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!validateForm()) return;
-
-		if (mode === "create") {
-			createMutation.mutate();
-		} else {
-			try {
-				await updateMutation.mutateAsync();
-				await updateItemsMutation.mutateAsync();
-				await updateContentBlocksMutation.mutateAsync();
-				toast.success(t("pricing.quotations.updateSuccess"));
-				queryClient.invalidateQueries({
-					queryKey: ["finance", "quotations"],
-				});
-			} catch {
-				// Error handled in mutations
-			}
-		}
+		await autosave.forceSave();
 	};
 
-	const isBusy = createMutation.isPending || updateMutation.isPending || updateItemsMutation.isPending || updateContentBlocksMutation.isPending;
+	// Ctrl+S / Cmd+S → force save
+	useEffect(() => {
+		if (!autosaveEnabled) return;
+		const handler = (e: KeyboardEvent) => {
+			if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+				e.preventDefault();
+				void autosave.forceSave();
+			}
+		};
+		window.addEventListener("keydown", handler);
+		return () => window.removeEventListener("keydown", handler);
+	}, [autosaveEnabled, autosave]);
+
+	const handleConflictReload = () => {
+		setShowConflictDialog(false);
+		window.location.reload();
+	};
+
+	const handleConflictOverwrite = () => {
+		setShowConflictDialog(false);
+		void autosave.forceSave();
+	};
+
+	const isBusy = autosave.state.status === "saving" || statusMutation.isPending;
 
 	// Loading state for edit mode
 	if (mode === "edit" && isLoadingQuotation) {
@@ -634,6 +715,7 @@ export function QuotationForm({
 
 						{/* End: actions */}
 						<div className="flex items-center gap-1.5 shrink-0">
+							<AutosaveIndicator state={autosave.state} onRetry={() => void autosave.forceSave()} className="hidden sm:inline-flex me-1" />
 							<Button
 								type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg"
 								onClick={() => setShowPreviewDialog(true)}
@@ -641,20 +723,17 @@ export function QuotationForm({
 								<Eye className="h-4 w-4" />
 							</Button>
 							<Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => {
-								if (mode === "edit" && quotationId) {
-									router.push(`${basePath}/${quotationId}/preview`);
+								if (effectiveQuotationId) {
+									router.push(`${basePath}/${effectiveQuotationId}/preview`);
 								} else {
 									toast.info(t("common.saveFirst"));
 								}
 							}}>
 								<Printer className="h-4 w-4" />
 							</Button>
-							<div className="w-px h-5 bg-border/50" />
-							{/* Save Draft Button */}
-							<Button type="submit" variant="outline" size="sm" disabled={isBusy || !isEditable} className="hidden sm:flex h-8 rounded-lg text-xs px-3 shadow-sm">
-								<Save className="h-3.5 w-3.5 me-1.5" />
-								{isBusy ? t("common.saving") : mode === "create" ? t("pricing.quotations.saveAsDraft") : t("pricing.quotations.saveChanges")}
-							</Button>
+							{(mode === "edit" && existingQuotation && existingQuotation.status !== "DRAFT" && existingQuotation.status !== "CONVERTED") && (
+								<div className="w-px h-5 bg-border/50" />
+							)}
 							{/* Convert to Invoice Button (prominent) */}
 							{mode === "edit" && existingQuotation && existingQuotation.status !== "DRAFT" && existingQuotation.status !== "CONVERTED" && (
 								<Button type="button" size="sm" className="hidden sm:flex h-8 rounded-lg text-xs px-3 shadow-sm bg-blue-600 hover:bg-blue-700 text-white" asChild>
@@ -1236,14 +1315,15 @@ export function QuotationForm({
 				{/* ─── Mobile Bottom Bar ───────────────────────────────── */}
 				<div className="fixed bottom-0 inset-x-0 z-50 sm:hidden backdrop-blur-xl bg-white/90 dark:bg-slate-900/90 border-t shadow-[0_-4px_20px_rgba(0,0,0,0.06)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
 					<div className="flex items-center justify-between gap-3">
-						<div>
+						<div className="min-w-0">
 							<p className="text-[11px] text-muted-foreground">{t("finance.summary.total")}</p>
-							<p className="text-lg font-bold text-primary">
+							<p className="text-lg font-bold text-primary leading-tight">
 								{formatCurrency(totals.totalAmount)}
 								<span className="text-xs font-normal text-muted-foreground ms-1">{currency}</span>
 							</p>
+							<AutosaveIndicator state={autosave.state} onRetry={() => void autosave.forceSave()} className="mt-0.5" />
 						</div>
-						<div className="flex items-center gap-2">
+						<div className="flex items-center gap-2 shrink-0">
 							{mode === "edit" && existingQuotation && existingQuotation.status !== "DRAFT" && existingQuotation.status !== "CONVERTED" && (
 								<Button type="button" size="sm" className="rounded-xl h-9 bg-blue-600 hover:bg-blue-700 text-white" asChild>
 									<Link href={`/app/${organizationSlug}/finance/invoices/new?quotationId=${quotationId}`}>
@@ -1252,16 +1332,16 @@ export function QuotationForm({
 									</Link>
 								</Button>
 							)}
-							{isEditable && (
-								<Button type="submit" size="sm" disabled={isBusy} className="rounded-xl h-9">
-									<Save className="h-4 w-4 me-1" />
-									{isBusy ? t("common.saving") : (mode === "create" ? t("pricing.quotations.saveAsDraft") : t("pricing.quotations.saveChanges"))}
-								</Button>
-							)}
 						</div>
 					</div>
 				</div>
 			</form>
+
+			<AutosaveConflictDialog
+				open={showConflictDialog}
+				onReload={handleConflictReload}
+				onOverwrite={handleConflictOverwrite}
+			/>
 
 			{/* Preview Dialog */}
 			<Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>

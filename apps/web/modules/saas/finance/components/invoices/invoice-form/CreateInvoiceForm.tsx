@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -10,6 +10,8 @@ import { orpcClient } from "@shared/lib/orpc-client";
 import { toast } from "sonner";
 import { calculateTotals } from "../../../lib/utils";
 import { FormPageSkeleton } from "@saas/shared/components/skeletons";
+import { useAutosave } from "@saas/shared/hooks/use-autosave";
+import { AutosaveConflictDialog } from "@saas/shared/components/AutosaveConflictDialog";
 import type { Client } from "../../shared/ClientSelector";
 import type { InvoiceItem, CreateInvoiceFormProps } from "./types";
 import { DEFAULT_VISIBLE_COLUMNS, type ColumnKey } from "./types";
@@ -40,7 +42,14 @@ export function CreateInvoiceForm({
 	const searchParams = useSearchParams();
 	const quotationId = searchParams.get("quotationId");
 	const basePath = `/app/${organizationSlug}/finance/invoices`;
-	const isEditMode = !!invoiceId;
+
+	// internalInvoiceId يُحدّث بعد lazy create لتتبع ID المسودة الجديدة
+	// effectiveInvoiceId = prop invoiceId (edit mode) أو internalInvoiceId (بعد lazy create)
+	const [internalInvoiceId, setInternalInvoiceId] = useState<string | undefined>(invoiceId);
+	const effectiveInvoiceId = invoiceId ?? internalInvoiceId;
+	const isEditMode = !!invoiceId; // الـ mode الأصلي للـ UI (لا يتغيّر بعد lazy create)
+	const [isIssuing, setIsIssuing] = useState(false);
+	const [showConflictDialog, setShowConflictDialog] = useState(false);
 
 	// Form state
 	const [invoiceType, setInvoiceType] = useState<"STANDARD" | "TAX" | "SIMPLIFIED">("TAX");
@@ -268,65 +277,6 @@ export function CreateInvoiceForm({
 	// Calculate totals
 	const totals = calculateTotals(items, discountPercent, vatPercent);
 
-	// Build the invoice payload (shared between save draft and issue flows)
-	const buildPayload = () => {
-		// === DEBUG: trace items through every transformation step ===
-		console.log("[INVOICE_DEBUG] === buildPayload() called ===");
-		console.log("[INVOICE_DEBUG] Raw items state:", JSON.stringify(items, null, 2));
-		console.log("[INVOICE_DEBUG] Items count:", items.length);
-		items.forEach((item, idx) => {
-			console.log(`[INVOICE_DEBUG] Item ${idx}:`, {
-				hasDescription: !!item.description,
-				descriptionType: typeof item.description,
-				descriptionValue: JSON.stringify(item.description),
-				descriptionLength: item.description?.length,
-				trimmedLength: (item.description ?? "").trim().length,
-				isOnlyWhitespace: item.description ? item.description.trim().length === 0 : "N/A (nullish)",
-				filterWillKeep: !!(item.description ?? "").trim(),
-				quantity: item.quantity,
-				unitPrice: item.unitPrice,
-			});
-		});
-
-		const filteredItems = items
-			.filter((item) => (item.description ?? "").trim())
-			.map((item) => ({
-				description: (item.description ?? "").trim(),
-				quantity: Math.max(Number(item.quantity) || 1, 0.01),
-				unit: item.unit?.trim() || undefined,
-				unitPrice: Number(item.unitPrice) || 0,
-			}));
-
-		console.log("[INVOICE_DEBUG] Filtered items count:", filteredItems.length);
-		console.log("[INVOICE_DEBUG] Filtered items:", JSON.stringify(filteredItems, null, 2));
-
-		const payload = {
-			organizationId,
-			invoiceType,
-			clientId: clientId || undefined,
-			clientName: clientName.trim(),
-			clientCompany: clientCompany.trim() || undefined,
-			clientPhone: clientPhone.trim() || undefined,
-			clientEmail: clientEmail.trim() || undefined,
-			clientAddress: clientAddress.trim() || undefined,
-			clientTaxNumber: clientTaxNumber.trim() || undefined,
-			projectId: !showProjectLink || projectId === "none" ? undefined : (projectId || undefined),
-			quotationId: quotationId || undefined,
-			issueDate: new Date(issueDate).toISOString(),
-			dueDate: new Date(dueDate).toISOString(),
-			paymentTerms: paymentTerms.trim() || undefined,
-			notes: notes.trim() || undefined,
-			vatPercent: Number(vatPercent) || 0,
-			discountPercent: Number(discountPercent) || 0,
-			templateId: defaultTemplate?.id || undefined,
-			items: filteredItems,
-		};
-
-		console.log("[INVOICE_DEBUG] Final payload:", JSON.stringify(payload, null, 2));
-		console.log("[INVOICE_DEBUG] === end buildPayload() ===");
-		return payload;
-	};
-
 	// Map backend Zod error paths to human-readable Arabic messages
 	const formatValidationErrors = (issues: any[]): string => {
 		const msgs: string[] = [];
@@ -351,40 +301,134 @@ export function CreateInvoiceForm({
 		return [...new Set(msgs)].join("، ");
 	};
 
-	// Create mutation (save as draft)
-	const createMutation = useMutation({
-		mutationFn: async () => {
-			return orpcClient.finance.invoices.create(buildPayload());
-		},
-		onSuccess: (data) => {
-			toast.success(t("finance.invoices.createSuccess"));
-			router.push(`${basePath}/${data.id}`);
-		},
-		onError: (error: any) => {
-			// === DEBUG: full error response ===
-			console.log("[INVOICE_DEBUG] === createMutation onError ===");
-			console.log("[INVOICE_DEBUG] Full error object:", JSON.stringify(error, null, 2));
-			console.log("[INVOICE_DEBUG] error.data:", JSON.stringify(error?.data, null, 2));
-			console.log("[INVOICE_DEBUG] error.issues:", JSON.stringify(error?.issues, null, 2));
-			console.log("[INVOICE_DEBUG] error.data?.issues:", JSON.stringify(error?.data?.issues, null, 2));
-			console.log("[INVOICE_DEBUG] error.message:", error?.message);
-			console.log("[INVOICE_DEBUG] === end error ===");
+	// ─── Autosave: snapshot للحقول والبنود ────────────────
+	const headerSnapshot = useMemo(
+		() => ({
+			invoiceType,
+			clientId: clientId || undefined,
+			clientName: clientName.trim(),
+			clientCompany: clientCompany.trim() || undefined,
+			clientPhone: clientPhone.trim() || undefined,
+			clientEmail: clientEmail.trim() || undefined,
+			clientAddress: clientAddress.trim() || undefined,
+			clientTaxNumber: clientTaxNumber.trim() || undefined,
+			projectId: !showProjectLink || projectId === "none" ? undefined : projectId || undefined,
+			issueDate,
+			dueDate,
+			paymentTerms: paymentTerms.trim() || undefined,
+			notes: notes.trim() || undefined,
+			vatPercent: Number(vatPercent) || 0,
+			discountPercent: Number(discountPercent) || 0,
+			templateId: invoice?.templateId || defaultTemplate?.id || undefined,
+		}),
+		[invoiceType, clientId, clientName, clientCompany, clientPhone, clientEmail,
+		 clientAddress, clientTaxNumber, showProjectLink, projectId, issueDate, dueDate,
+		 paymentTerms, notes, vatPercent, discountPercent, invoice?.templateId, defaultTemplate?.id],
+	);
 
-			const issues = error?.data?.issues ?? error?.issues;
-			if (issues?.length) {
-				toast.error(`${t("finance.invoices.createError")}: ${formatValidationErrors(issues)}`);
-			} else {
-				toast.error(error.message || t("finance.invoices.createError"));
+	const itemsSnapshot = useMemo(
+		() =>
+			items
+				.filter((item) => (item.description ?? "").trim())
+				.map((item) => ({
+					id: item.id,
+					description: (item.description ?? "").trim(),
+					quantity: Math.max(Number(item.quantity) || 1, 0.01),
+					unit: item.unit?.trim() || undefined,
+					unitPrice: Number(item.unitPrice) || 0,
+				})),
+		[items],
+	);
+
+	const isReadyForCreate = useCallback(
+		(snap: typeof headerSnapshot, snapItems: typeof itemsSnapshot) =>
+			!!snap.clientName && snapItems.length > 0,
+		[],
+	);
+
+	const createDraft = useCallback(
+		async (snap: typeof headerSnapshot, snapItems: typeof itemsSnapshot) => {
+			const result = await orpcClient.finance.invoices.create({
+				organizationId,
+				...snap,
+				quotationId: quotationId || undefined,
+				issueDate: new Date(snap.issueDate).toISOString(),
+				dueDate: new Date(snap.dueDate).toISOString(),
+				items: snapItems.map(({ description, quantity, unit, unitPrice }) => ({
+					description,
+					quantity,
+					unit,
+					unitPrice,
+				})),
+			});
+			return { id: result.id };
+		},
+		[organizationId, quotationId],
+	);
+
+	const updateHeader = useCallback(
+		async (id: string, snap: typeof headerSnapshot) => {
+			await orpcClient.finance.invoices.update({
+				organizationId,
+				id,
+				...snap,
+				issueDate: new Date(snap.issueDate).toISOString(),
+				dueDate: new Date(snap.dueDate).toISOString(),
+			});
+		},
+		[organizationId],
+	);
+
+	const updateItemsRemote = useCallback(
+		async (id: string, snapItems: typeof itemsSnapshot) => {
+			await orpcClient.finance.invoices.updateItems({
+				organizationId,
+				id,
+				items: snapItems.map((item) => ({
+					id: item.id.startsWith("new-") || /^\d+$/.test(item.id) ? undefined : item.id,
+					description: item.description,
+					quantity: item.quantity,
+					unit: item.unit,
+					unitPrice: item.unitPrice,
+				})),
+			});
+		},
+		[organizationId],
+	);
+
+	const autosaveEnabled =
+		!isIssuing && (isEditMode ? invoice?.status === "DRAFT" : true);
+
+	const autosave = useAutosave({
+		snapshot: headerSnapshot,
+		items: itemsSnapshot,
+		id: effectiveInvoiceId,
+		enabled: autosaveEnabled,
+		isReadyForCreate,
+		createDraft,
+		updateHeader,
+		updateItems: updateItemsRemote,
+		onCreated: (newId) => {
+			setInternalInvoiceId(newId);
+			// تغيير URL بدون re-render (لا router.push كي لا يفقد النموذج حالته)
+			if (typeof window !== "undefined") {
+				window.history.replaceState(null, "", `${basePath}/${newId}`);
 			}
 		},
+		onSaved: () => {
+			queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+		},
+		onConflict: () => {
+			setShowConflictDialog(true);
+		},
 	});
 
-	// Issue mutation
+	// Issue mutation (الإجراء الصريح الوحيد المتبقي)
 	const issueMutation = useMutation({
-		mutationFn: async (invoiceId: string) => {
+		mutationFn: async (id: string) => {
 			return orpcClient.finance.invoices.issue({
 				organizationId,
-				id: invoiceId,
+				id,
 			});
 		},
 		onSuccess: (data) => {
@@ -392,91 +436,12 @@ export function CreateInvoiceForm({
 			router.push(`${basePath}/${data.id}`);
 		},
 		onError: (error: any) => {
-			toast.error(error.message || t("finance.invoices.issueError"));
-		},
-	});
-
-	// Combined: create draft then issue
-	const createAndIssueMutation = useMutation({
-		mutationFn: async () => {
-			const newInvoice = await orpcClient.finance.invoices.create(buildPayload());
-			return orpcClient.finance.invoices.issue({
-				organizationId,
-				id: newInvoice.id,
-			});
-		},
-		onSuccess: (data) => {
-			toast.success(t("finance.invoices.issueSuccess"));
-			router.push(`${basePath}/${data.id}`);
-		},
-		onError: (error: any) => {
-			// === DEBUG: full error response ===
-			console.log("[INVOICE_DEBUG] === createAndIssueMutation onError ===");
-			console.log("[INVOICE_DEBUG] Full error:", JSON.stringify(error, null, 2));
-			console.log("[INVOICE_DEBUG] === end error ===");
-
 			const issues = error?.data?.issues ?? error?.issues;
 			if (issues?.length) {
 				toast.error(`${t("finance.invoices.issueError")}: ${formatValidationErrors(issues)}`);
 			} else {
 				toast.error(error.message || t("finance.invoices.issueError"));
 			}
-		},
-	});
-
-	// ─── Edit mode mutations ────────────────────────────
-	const updateMutation = useMutation({
-		mutationFn: async () => {
-			await orpcClient.finance.invoices.update({
-				organizationId,
-				id: invoiceId!,
-				invoiceType,
-				clientId: clientId || undefined,
-				clientName: clientName.trim(),
-				clientCompany: clientCompany.trim() || undefined,
-				clientPhone: clientPhone.trim() || undefined,
-				clientEmail: clientEmail.trim() || undefined,
-				clientAddress: clientAddress.trim() || undefined,
-				clientTaxNumber: clientTaxNumber.trim() || undefined,
-				projectId: !showProjectLink || projectId === "none" ? undefined : projectId,
-				issueDate: new Date(issueDate).toISOString(),
-				dueDate: new Date(dueDate).toISOString(),
-				paymentTerms: paymentTerms.trim() || undefined,
-				notes: notes.trim() || undefined,
-				vatPercent: Number(vatPercent) || 0,
-				discountPercent: Number(discountPercent) || 0,
-				templateId: invoice?.templateId || undefined,
-			});
-		},
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
-		},
-		onError: (error: any) => {
-			toast.error(error.message || t("finance.invoices.updateError"));
-		},
-	});
-
-	const updateItemsMutation = useMutation({
-		mutationFn: async () => {
-			await orpcClient.finance.invoices.updateItems({
-				organizationId,
-				id: invoiceId!,
-				items: items
-					.filter((item) => (item.description ?? "").trim())
-					.map((item) => ({
-						id: item.id.startsWith("new-") ? undefined : item.id,
-						description: (item.description ?? "").trim(),
-						quantity: Math.max(Number(item.quantity) || 1, 0.01),
-						unit: item.unit?.trim() || undefined,
-						unitPrice: Number(item.unitPrice) || 0,
-					})),
-			});
-		},
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
-		},
-		onError: (error: any) => {
-			toast.error(error.message || t("finance.invoices.itemsUpdateError"));
 		},
 	});
 
@@ -659,21 +624,10 @@ export function CreateInvoiceForm({
 		return true;
 	};
 
+	// Form submit (Enter في الحقول) → force-save تلقائي
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!validateForm()) return;
-		if (isEditMode) {
-			try {
-				await updateMutation.mutateAsync();
-				await updateItemsMutation.mutateAsync();
-				toast.success(t("finance.invoices.updateSuccess"));
-				router.push(`${basePath}/${invoiceId}`);
-			} catch {
-				// Error handled in mutations
-			}
-		} else {
-			createMutation.mutate();
-		}
+		await autosave.forceSave();
 	};
 
 	const handleIssueClick = () => {
@@ -683,21 +637,50 @@ export function CreateInvoiceForm({
 
 	const handleIssueConfirm = async () => {
 		setShowIssueConfirm(false);
-		if (isEditMode) {
-			try {
-				await updateMutation.mutateAsync();
-				await updateItemsMutation.mutateAsync();
-				await issueMutation.mutateAsync(invoiceId!);
-			} catch {
-				// Error handled in mutations
+		setIsIssuing(true);
+		try {
+			// أولاً: حفظ آخر التغييرات (الذي قد يُنشئ السجل إن لم يكن موجوداً)
+			await autosave.forceSave();
+			const idToIssue = effectiveInvoiceId ?? internalInvoiceId;
+			if (!idToIssue) {
+				toast.error(t("finance.invoices.errors.itemsRequired"));
+				setIsIssuing(false);
+				return;
 			}
-		} else {
-			createAndIssueMutation.mutate();
+			await issueMutation.mutateAsync(idToIssue);
+		} catch {
+			setIsIssuing(false);
 		}
 	};
 
-	const isBusy = isValidating || createMutation.isPending || createAndIssueMutation.isPending ||
-		(isEditMode && (updateMutation.isPending || updateItemsMutation.isPending));
+	// Ctrl+S / Cmd+S → force save
+	useEffect(() => {
+		if (!autosaveEnabled) return;
+		const handler = (e: KeyboardEvent) => {
+			if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+				e.preventDefault();
+				void autosave.forceSave();
+			}
+		};
+		window.addEventListener("keydown", handler);
+		return () => window.removeEventListener("keydown", handler);
+	}, [autosaveEnabled, autosave]);
+
+	const handleConflictReload = () => {
+		setShowConflictDialog(false);
+		window.location.reload();
+	};
+
+	const handleConflictOverwrite = () => {
+		setShowConflictDialog(false);
+		void autosave.forceSave();
+	};
+
+	const isBusy =
+		isValidating ||
+		isIssuing ||
+		issueMutation.isPending ||
+		autosave.state.status === "saving";
 
 	const canAddPayment = isEditMode && invoice &&
 		invoice.status !== "PAID" && invoice.status !== "CANCELLED";
@@ -726,10 +709,12 @@ export function CreateInvoiceForm({
 					quotation={quotation ? { quotationNo: quotation.quotationNo } : null}
 					isBusy={isBusy}
 					canAddPayment={!!canAddPayment}
-					isCreateAndIssuePending={createAndIssueMutation.isPending}
+					isCreateAndIssuePending={isIssuing || issueMutation.isPending}
 					isStatusMutationPending={statusMutation.isPending}
 					isConvertToTaxPending={convertToTaxMutation.isPending}
-					onPreview={() => isEditMode ? router.push(`${basePath}/${invoiceId}/preview`) : setShowPreviewDialog(true)}
+					autosaveState={autosave.state}
+					onAutosaveRetry={() => void autosave.forceSave()}
+					onPreview={() => effectiveInvoiceId ? router.push(`${basePath}/${effectiveInvoiceId}/preview`) : setShowPreviewDialog(true)}
 					onPaymentDialogOpen={() => setPaymentDialogOpen(true)}
 					onIssueClick={handleIssueClick}
 					onSendClick={() => statusMutation.mutate("SENT")}
@@ -829,9 +814,17 @@ export function CreateInvoiceForm({
 					isEditMode={isEditMode}
 					isBusy={isBusy}
 					invoiceStatus={invoice?.status}
+					autosaveState={autosave.state}
+					onAutosaveRetry={() => void autosave.forceSave()}
 					onIssueClick={handleIssueClick}
 				/>
 			</form>
+
+			<AutosaveConflictDialog
+				open={showConflictDialog}
+				onReload={handleConflictReload}
+				onOverwrite={handleConflictOverwrite}
+			/>
 
 			{/* Dialogs */}
 			<PreviewDialog

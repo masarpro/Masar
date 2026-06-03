@@ -10,7 +10,6 @@ import {
 } from "@ui/components/dropdown-menu";
 import Link from "next/link";
 import {
-	Save,
 	FileCheck,
 	ChevronLeft,
 	Eye,
@@ -22,6 +21,8 @@ import {
 	QrCode,
 } from "lucide-react";
 import { StatusBadge } from "../../shared/StatusBadge";
+import { AutosaveIndicator } from "@saas/shared/components/AutosaveIndicator";
+import type { AutosaveState } from "@saas/shared/hooks/use-autosave";
 
 interface InvoiceFormHeaderProps {
 	organizationSlug: string;
@@ -39,6 +40,8 @@ interface InvoiceFormHeaderProps {
 	isCreateAndIssuePending: boolean;
 	isStatusMutationPending: boolean;
 	isConvertToTaxPending: boolean;
+	autosaveState: AutosaveState;
+	onAutosaveRetry: () => void;
 	onPreview: () => void;
 	onPaymentDialogOpen: () => void;
 	onIssueClick: () => void;
@@ -58,6 +61,8 @@ export function InvoiceFormHeader({
 	isCreateAndIssuePending,
 	isStatusMutationPending,
 	isConvertToTaxPending,
+	autosaveState,
+	onAutosaveRetry,
 	onPreview,
 	onPaymentDialogOpen,
 	onIssueClick,
@@ -110,6 +115,7 @@ export function InvoiceFormHeader({
 
 				{/* End: actions */}
 				<div className="flex items-center gap-1.5 shrink-0">
+					<AutosaveIndicator state={autosaveState} onRetry={onAutosaveRetry} className="hidden sm:inline-flex me-1" />
 					<Button
 						type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg"
 						onClick={onPreview}
@@ -126,11 +132,9 @@ export function InvoiceFormHeader({
 							</Button>
 						</>
 					)}
-					<div className="w-px h-5 bg-border/50" />
-					<Button type="submit" variant="outline" size="sm" disabled={isBusy} className="hidden sm:flex h-8 rounded-lg text-xs px-3 shadow-sm">
-						<Save className="h-3.5 w-3.5 me-1.5" />
-						{isBusy ? t("common.saving") : isEditMode ? t("finance.invoices.saveChanges") : t("finance.invoices.saveAsDraft")}
-					</Button>
+					{(!isEditMode || invoice?.status === "DRAFT") && (
+						<div className="w-px h-5 bg-border/50" />
+					)}
 					{(!isEditMode || invoice?.status === "DRAFT") && (
 						<Button type="button" size="sm" disabled={isBusy} onClick={onIssueClick} className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.45)] transition-all">
 							<FileCheck className="h-3.5 w-3.5 me-1.5" />
