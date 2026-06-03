@@ -822,6 +822,16 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 									<img src={footerImage} alt="" className="w-full block" />
 								)}
 							</div>
+							{/* Print-only spacer: gives <tfoot> a real box height so
+							    Chromium's table-footer-group reserves the same
+							    vertical space at the bottom of EVERY printed page.
+							    The visible footer above is position:fixed (zero in
+							    flow), so without this spacer tfoot collapses to 0
+							    and the items table runs underneath the footer on
+							    pages 1..N-1 of multi-page documents.
+							    Empty div = 0 height on screen; height kicks in only
+							    inside @media print via globals.css. */}
+							<div data-pdf-footer-spacer aria-hidden />
 						</td>
 					</tr>
 				</tfoot>
