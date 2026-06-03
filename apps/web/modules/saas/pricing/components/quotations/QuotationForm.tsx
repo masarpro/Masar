@@ -1029,11 +1029,28 @@ export function QuotationForm({
 											<td className="p-2 align-top">
 												<textarea
 													value={item.description}
-													onChange={(e: any) => { updateItem(item.id, { description: e.target.value }); e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }}
+													ref={(el) => {
+														if (el && el.value) {
+															el.style.height = "auto";
+															setTimeout(() => {
+																el.style.height = Math.min(el.scrollHeight, 300) + "px";
+															}, 0);
+														}
+													}}
+													onChange={(e: any) => {
+														updateItem(item.id, { description: e.target.value });
+														const ta = e.target as HTMLTextAreaElement;
+														ta.style.height = "auto";
+														setTimeout(() => {
+															ta.style.height = Math.min(ta.scrollHeight, 300) + "px";
+														}, 0);
+													}}
 													placeholder={t("finance.items.descriptionPlaceholder")}
 													rows={1}
+													maxLength={2000}
+													enterKeyHint="enter"
 													disabled={!isEditable}
-													className="w-full min-h-[36px] px-3 py-2 rounded-[10px] text-sm border border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08] focus:outline-none resize-none overflow-hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+													className="w-full min-h-[36px] max-h-[300px] px-3 py-2 rounded-[10px] text-sm border border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30 focus:ring-[3px] focus:ring-primary/[0.08] focus:outline-none overflow-y-auto resize-y whitespace-pre-wrap break-words transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 												/>
 											</td>
 										)}
