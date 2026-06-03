@@ -2435,6 +2435,7 @@
     },
     "units": {
       "m": "m (Meter)",
+      "mr": "lm (Linear Meter)",
       "m2": "m² (Sq. Meter)",
       "m3": "m³ (Cu. Meter)",
       "ton": "Ton",
@@ -5035,6 +5036,8 @@
       "quantity": "Quantity",
       "unit": "Unit",
       "unitPlaceholder": "m",
+      "unitCustom": "Custom...",
+      "unitCustomPlaceholder": "Type unit",
       "unitPrice": "Unit Price",
       "total": "Total",
       "add": "Add Item",

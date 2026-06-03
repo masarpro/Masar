@@ -7,7 +7,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
-import { UNIT_KEYS, UNIT_VALUES, formatCurrency } from "@saas/shared/lib/invoice-constants";
+import { formatCurrency } from "@saas/shared/lib/invoice-constants";
+import { UnitField } from "@saas/shared/components/UnitField";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
@@ -183,12 +184,6 @@ export function QuotationForm({
 	};
 
 	const isColumnVisible = (column: ColumnKey) => visibleColumns.includes(column);
-
-	// Unit options for select
-	const units = UNIT_KEYS.map((key) => ({
-		value: UNIT_VALUES[key],
-		label: t(`finance.units.${key}`),
-	}));
 
 	// Fetch existing quotation for edit mode
 	const { data: existingQuotationRaw, isLoading: isLoadingQuotation } = useQuery({
@@ -1056,13 +1051,11 @@ export function QuotationForm({
 										)}
 										{isColumnVisible("unit") && (
 											<td className="p-2">
-												<Select value={item.unit || "_empty"} onValueChange={(v: any) => updateItem(item.id, { unit: v === "_empty" ? "" : v })} disabled={!isEditable}>
-													<SelectTrigger className="rounded-[10px] h-9 text-xs px-1 border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-background focus:border-primary/30"><SelectValue placeholder={t("finance.items.unitPlaceholder")} /></SelectTrigger>
-													<SelectContent className="rounded-xl">
-														<SelectItem value="_empty">-</SelectItem>
-														{units.map((u: any) => (<SelectItem key={u.value} value={u.value}>{u.label}</SelectItem>))}
-													</SelectContent>
-												</Select>
+												<UnitField
+													value={item.unit}
+													onChange={(v) => updateItem(item.id, { unit: v })}
+													disabled={!isEditable}
+												/>
 											</td>
 										)}
 										{isColumnVisible("unitPrice") && (
