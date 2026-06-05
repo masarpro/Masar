@@ -229,7 +229,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 						</div>
 						<div className="flex items-center gap-2 shrink-0">
 							<Button asChild size="sm" variant="outline" className="h-8 rounded-[10px] text-xs px-4">
-								<Link href={`/app/${organizationSlug}/finance/drafts`}>
+								<Link href={`/app/${organizationSlug}/finance/invoices/drafts`}>
 									<FileText className="h-3.5 w-3.5 me-1.5" />
 									{t("drafts.button")}
 									{draftCount > 0 && (

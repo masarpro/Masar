@@ -1,0 +1,43 @@
+import { Suspense } from "react";
+import { getActiveOrganization } from "@saas/auth/lib/server";
+import { PricingShell } from "@saas/pricing/components/shell";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { DraftsPage } from "@saas/shared/components/drafts/DraftsPage";
+import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata() {
+	const t = await getTranslations();
+	return { title: t("drafts.title") };
+}
+
+export default async function QuotationDraftsRoutePage({
+	params,
+}: {
+	params: Promise<{ organizationSlug: string }>;
+}) {
+	const { organizationSlug } = await params;
+
+	return (
+		<Suspense fallback={<ListTableSkeleton rows={8} cols={5} />}>
+			<Content organizationSlug={organizationSlug} />
+		</Suspense>
+	);
+}
+
+async function Content({ organizationSlug }: { organizationSlug: string }) {
+	const activeOrganization = await getActiveOrganization(organizationSlug);
+	if (!activeOrganization) {
+		return notFound();
+	}
+
+	return (
+		<PricingShell organizationSlug={organizationSlug}>
+			<DraftsPage
+				kind="quotation"
+				organizationId={activeOrganization.id}
+				organizationSlug={organizationSlug}
+			/>
+		</PricingShell>
+	);
+}

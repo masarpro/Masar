@@ -11,29 +11,22 @@ export async function generateMetadata() {
 	return { title: t("drafts.title") };
 }
 
-export default async function DraftsRoutePage({
+export default async function InvoiceDraftsRoutePage({
 	params,
-	searchParams,
 }: {
 	params: Promise<{ organizationSlug: string }>;
-	searchParams: Promise<{ tab?: string }>;
 }) {
 	const { organizationSlug } = await params;
-	const { tab } = await searchParams;
 
 	return (
 		<Suspense fallback={<ListTableSkeleton rows={8} cols={5} />}>
-			<DraftsContent organizationSlug={organizationSlug} tab={tab} />
+			<Content organizationSlug={organizationSlug} />
 		</Suspense>
 	);
 }
 
-async function DraftsContent({
-	organizationSlug,
-	tab,
-}: { organizationSlug: string; tab?: string }) {
+async function Content({ organizationSlug }: { organizationSlug: string }) {
 	const activeOrganization = await getActiveOrganization(organizationSlug);
-
 	if (!activeOrganization) {
 		return notFound();
 	}
@@ -41,9 +34,9 @@ async function DraftsContent({
 	return (
 		<FinanceShell organizationSlug={organizationSlug}>
 			<DraftsPage
+				kind="invoice"
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}
-				defaultTab={tab === "quotations" ? "quotations" : "invoices"}
 			/>
 		</FinanceShell>
 	);

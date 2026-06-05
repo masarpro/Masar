@@ -1,26 +1,25 @@
 "use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 import { Button } from "@ui/components/button";
-import { ArrowRight, FileText, Receipt } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { DraftsTable } from "./DraftsTable";
 
 interface DraftsPageProps {
+	kind: "invoice" | "quotation";
 	organizationId: string;
 	organizationSlug: string;
-	defaultTab?: "invoices" | "quotations";
 }
 
-export function DraftsPage({ organizationId, organizationSlug, defaultTab = "invoices" }: DraftsPageProps) {
+export function DraftsPage({ kind, organizationId, organizationSlug }: DraftsPageProps) {
 	const t = useTranslations();
-	const [tab, setTab] = useState<string>(defaultTab);
 	const backHref =
-		tab === "quotations"
+		kind === "quotation"
 			? `/app/${organizationSlug}/pricing/quotations`
 			: `/app/${organizationSlug}/finance/invoices`;
+	const sectionTitle =
+		kind === "quotation" ? t("drafts.tabs.quotations") : t("drafts.tabs.invoices");
 
 	return (
 		<div className="space-y-5 max-w-6xl mx-auto">
@@ -29,32 +28,17 @@ export function DraftsPage({ organizationId, organizationSlug, defaultTab = "inv
 				<div className="flex items-center gap-3">
 					<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border shadow-sm">
 						<Link href={backHref}>
-							<ArrowRight className="h-4 w-4" />
+							<ArrowRight className="h-4 w-4 rtl:rotate-180" />
 						</Link>
 					</Button>
-					<h1 className="text-base font-bold leading-tight">{t("drafts.title")}</h1>
+					<div className="min-w-0">
+						<p className="text-[11px] text-muted-foreground mb-0.5">{sectionTitle}</p>
+						<h1 className="text-base font-bold leading-tight">{t("drafts.title")}</h1>
+					</div>
 				</div>
 			</div>
 
-			<Tabs value={tab} onValueChange={setTab}>
-				<TabsList>
-					<TabsTrigger value="invoices" className="gap-1.5">
-						<Receipt className="h-4 w-4" />
-						{t("drafts.tabs.invoices")}
-					</TabsTrigger>
-					<TabsTrigger value="quotations" className="gap-1.5">
-						<FileText className="h-4 w-4" />
-						{t("drafts.tabs.quotations")}
-					</TabsTrigger>
-				</TabsList>
-
-				<TabsContent value="invoices" className="mt-4">
-					<DraftsTable kind="invoice" organizationId={organizationId} organizationSlug={organizationSlug} />
-				</TabsContent>
-				<TabsContent value="quotations" className="mt-4">
-					<DraftsTable kind="quotation" organizationId={organizationId} organizationSlug={organizationSlug} />
-				</TabsContent>
-			</Tabs>
+			<DraftsTable kind={kind} organizationId={organizationId} organizationSlug={organizationSlug} />
 		</div>
 	);
 }

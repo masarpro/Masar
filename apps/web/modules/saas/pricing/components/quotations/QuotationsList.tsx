@@ -117,7 +117,7 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 						</SelectContent>
 					</Select>
 					<Button asChild variant="outline" className="rounded-xl shrink-0">
-						<Link href={`/app/${organizationSlug}/finance/drafts?tab=quotations`}>
+						<Link href={`/app/${organizationSlug}/pricing/quotations/drafts`}>
 							<FileText className="h-4 w-4 me-1.5" />
 							{t("drafts.button")}
 							{draftCount > 0 && (
