@@ -67,28 +67,23 @@ function encodeTLVText(tag: number, value: string): Uint8Array {
 
 /**
  * Encode a TLV field with raw binary value.
- * Uses ASN.1-style length encoding:
- * - length <= 127: single byte
- * - length <= 255: 0x81 + 1 byte
- * - length <= 65535: 0x82 + 2 bytes
+ *
+ * ZATCA TLV uses a single length byte (0-255), exactly like the Phase 1
+ * encoder (tlv-encoder.ts) and the zatca-xml-js reference impl — NOT ASN.1
+ * DER length encoding. Using the ASN.1 0x81 prefix for 128-255 byte values
+ * (as a previous version did) corrupts the TLV for the verifier whenever a
+ * field exceeds 127 bytes (e.g. a long Arabic seller name in Tag 1 = 64+
+ * Arabic chars at 2 bytes each).
  */
 function encodeTLVBinary(tag: number, value: Uint8Array): Uint8Array {
-	const lengthBytes = encodeLength(value.length);
-	const result = new Uint8Array(1 + lengthBytes.length + value.length);
+	if (value.length > 255) {
+		throw new Error(
+			`ZATCA TLV value for tag ${tag} exceeds 255 bytes (${value.length})`,
+		);
+	}
+	const result = new Uint8Array(2 + value.length);
 	result[0] = tag;
-	result.set(lengthBytes, 1);
-	result.set(value, 1 + lengthBytes.length);
+	result[1] = value.length;
+	result.set(value, 2);
 	return result;
-}
-
-/** Encode length using ASN.1 DER-style variable-length encoding. */
-function encodeLength(length: number): Uint8Array {
-	if (length <= 127) {
-		return new Uint8Array([length]);
-	}
-	if (length <= 255) {
-		return new Uint8Array([0x81, length]);
-	}
-	// length <= 65535
-	return new Uint8Array([0x82, (length >> 8) & 0xff, length & 0xff]);
 }

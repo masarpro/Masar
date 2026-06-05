@@ -6,23 +6,25 @@ import QRCode from "qrcode";
  * The resulting string is a complete `data:image/png;base64,...` URL
  * that can be stored in the database and rendered directly in an `<img>` tag.
  *
- * Rendering parameters tuned for ZATCA Phase 2 (9 tags, ~570 base64 chars):
- *  - margin: 4 modules — the QR/ISO 18004 minimum quiet zone. With margin=1
- *    the finder patterns touch the image edge and most scanners (incl. the
- *    official ZATCA verifier) can't lock onto the matrix.
- *  - width: 400 px — gives ~7-8 px per module for Phase 2 (33-37 modules per
- *    side). At width=200 the modules were ~5 px and scanning failed.
- *  - errorCorrectionLevel "M" — 15% recovery, ZATCA-recommended.
+ * Rendering parameters tuned for ZATCA Phase 2 (9 tags, ~520 base64 chars):
+ *  - margin: 5 modules — above the QR/ISO 18004 4-module minimum quiet zone.
+ *    With too small a quiet zone the finder patterns touch the image edge and
+ *    most scanners (incl. the official ZATCA verifier) can't lock onto the
+ *    matrix.
+ *  - errorCorrectionLevel "L" — 7% recovery. EC level is NOT part of the TLV
+ *    content ZATCA verifies (verification runs on the decoded payload, not the
+ *    matrix), so lowering M→L is spec-safe. The Phase 2 payload (~520 base64
+ *    chars) renders as ~V12 (65 modules/side) at L versus ~V15 (77 modules) at
+ *    M — ~30% larger modules at the same physical size, which is what makes the
+ *    dense Phase 2 code scannable on screen and on paper.
+ *  - width: 600 px — a crisp source so the larger on-screen / print display
+ *    sizes (see QRCodeElement.tsx) don't upscale-blur the matrix.
  */
 export async function generateZatcaQRImage(tlvBase64: string): Promise<string> {
 	return QRCode.toDataURL(tlvBase64, {
-		errorCorrectionLevel: "M",
-		// margin 5 (one above the 4-module spec floor) gives a measurable
-		// safety buffer: with `qrcode`'s rounding behavior on a 400-px target,
-		// a literal margin=4 produced ~3.2 modules of measurable quiet zone in
-		// our pixel walker. Margin=5 cleanly clears the 4-module bar.
+		errorCorrectionLevel: "L",
 		margin: 5,
-		width: 400,
+		width: 600,
 		color: {
 			dark: "#000000",
 			light: "#FFFFFF",
