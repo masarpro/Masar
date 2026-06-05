@@ -2,12 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import { Button } from "@ui/components/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@ui/components/dropdown-menu";
 import Link from "next/link";
 import {
 	FileCheck,
@@ -15,59 +9,44 @@ import {
 	Eye,
 	Printer,
 	ArrowRight,
-	CreditCard,
-	Send,
-	MoreVertical,
-	QrCode,
+	Save,
 } from "lucide-react";
-import { StatusBadge } from "../../shared/StatusBadge";
 import { AutosaveIndicator } from "@saas/shared/components/AutosaveIndicator";
 import type { AutosaveState } from "@saas/shared/hooks/use-autosave";
 
 interface InvoiceFormHeaderProps {
 	organizationSlug: string;
 	basePath: string;
-	isEditMode: boolean;
-	invoiceId?: string;
-	invoice?: {
-		invoiceNo: string;
-		status: string;
-		invoiceType: string;
-	} | null;
+	/** نعدّل فاتورة معتمدة عبر مسودة تعديل */
+	isEditDraft: boolean;
+	sourceInvoiceId?: string;
+	sourceInvoiceNo?: string | null;
 	quotation?: { quotationNo: string } | null;
 	isBusy: boolean;
-	canAddPayment: boolean;
-	isCreateAndIssuePending: boolean;
-	isStatusMutationPending: boolean;
-	isConvertToTaxPending: boolean;
+	isSaving: boolean;
+	isIssuing: boolean;
 	autosaveState: AutosaveState;
 	onAutosaveRetry: () => void;
 	onPreview: () => void;
-	onPaymentDialogOpen: () => void;
+	onSaveClick: () => void;
 	onIssueClick: () => void;
-	onSendClick: () => void;
-	onConvertToTax: () => void;
 }
 
 export function InvoiceFormHeader({
 	organizationSlug,
 	basePath,
-	isEditMode,
-	invoiceId,
-	invoice,
+	isEditDraft,
+	sourceInvoiceId,
+	sourceInvoiceNo,
 	quotation,
 	isBusy,
-	canAddPayment,
-	isCreateAndIssuePending,
-	isStatusMutationPending,
-	isConvertToTaxPending,
+	isSaving,
+	isIssuing,
 	autosaveState,
 	onAutosaveRetry,
 	onPreview,
-	onPaymentDialogOpen,
+	onSaveClick,
 	onIssueClick,
-	onSendClick,
-	onConvertToTax,
 }: InvoiceFormHeaderProps) {
 	const t = useTranslations();
 
@@ -86,18 +65,20 @@ export function InvoiceFormHeader({
 							<Link href={`/app/${organizationSlug}/finance`} className="hover:text-foreground transition-colors">{t("finance.title")}</Link>
 							<ChevronLeft className="h-3 w-3 shrink-0" />
 							<Link href={`/app/${organizationSlug}/finance/invoices`} className="hover:text-foreground transition-colors">{t("finance.invoices.title")}</Link>
-							{isEditMode && invoice && (
+							{isEditDraft && sourceInvoiceId && (
 								<>
 									<ChevronLeft className="h-3 w-3 shrink-0" />
-									<Link href={`${basePath}/${invoiceId}`} className="hover:text-foreground transition-colors">{invoice.invoiceNo}</Link>
+									<Link href={`${basePath}/${sourceInvoiceId}`} className="hover:text-foreground transition-colors">{sourceInvoiceNo ?? ""}</Link>
 								</>
 							)}
 						</nav>
 						<h1 className="text-base font-bold leading-tight truncate flex items-center gap-2">
-							{isEditMode && invoice ? (
+							{isEditDraft ? (
 								<>
-									{invoice.invoiceNo}
-									<StatusBadge status={invoice.status} type="invoice" />
+									{sourceInvoiceNo ?? t("finance.invoices.title")}
+									<span className="text-[10px] font-medium rounded-md px-2 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+										{t("drafts.editDraftBadge")}
+									</span>
 								</>
 							) : (
 								<>
@@ -115,55 +96,20 @@ export function InvoiceFormHeader({
 
 				{/* End: actions */}
 				<div className="flex items-center gap-1.5 shrink-0">
-					<AutosaveIndicator state={autosaveState} onRetry={onAutosaveRetry} className="hidden sm:inline-flex me-1" />
-					<Button
-						type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg"
-						onClick={onPreview}
-					>
+					<AutosaveIndicator state={autosaveState} onRetry={onAutosaveRetry} mode="draft" className="hidden sm:inline-flex me-1" />
+					<Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={onPreview}>
 						<Eye className="h-4 w-4" />
 					</Button>
 					<Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={onPreview}><Printer className="h-4 w-4" /></Button>
-					{isEditMode && canAddPayment && (
-						<>
-							<div className="w-px h-5 bg-border/50" />
-							<Button type="button" variant="ghost" size="sm" className="h-8 rounded-lg text-xs px-2.5" onClick={onPaymentDialogOpen}>
-								<CreditCard className="h-3.5 w-3.5 me-1" />
-								{t("finance.invoices.addPayment")}
-							</Button>
-						</>
-					)}
-					{(!isEditMode || invoice?.status === "DRAFT") && (
-						<div className="w-px h-5 bg-border/50" />
-					)}
-					{(!isEditMode || invoice?.status === "DRAFT") && (
-						<Button type="button" size="sm" disabled={isBusy} onClick={onIssueClick} className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.45)] transition-all">
-							<FileCheck className="h-3.5 w-3.5 me-1.5" />
-							{isCreateAndIssuePending ? t("common.saving") : t("finance.invoices.issueInvoice")}
-						</Button>
-					)}
-					{isEditMode && (
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
-									<MoreVertical className="h-4 w-4" />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end" className="rounded-xl">
-								{invoice?.status === "DRAFT" && (
-									<DropdownMenuItem onClick={onSendClick} disabled={isStatusMutationPending}>
-										<Send className="h-4 w-4 me-2" />
-										{t("finance.invoices.actions.send")}
-									</DropdownMenuItem>
-								)}
-								{invoice?.invoiceType !== "TAX" && invoice?.status !== "CANCELLED" && (
-									<DropdownMenuItem onClick={onConvertToTax} disabled={isConvertToTaxPending}>
-										<QrCode className="h-4 w-4 me-2" />
-										{t("finance.invoices.actions.convertToTax")}
-									</DropdownMenuItem>
-								)}
-							</DropdownMenuContent>
-						</DropdownMenu>
-					)}
+					<div className="w-px h-5 bg-border/50" />
+					<Button type="button" variant="outline" size="sm" disabled={isBusy} onClick={onSaveClick} className="h-8 rounded-[10px] text-xs px-4">
+						<Save className="h-3.5 w-3.5 me-1.5" />
+						{isSaving ? t("common.saving") : t("common.save")}
+					</Button>
+					<Button type="button" size="sm" disabled={isBusy} onClick={onIssueClick} className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.45)] transition-all">
+						<FileCheck className="h-3.5 w-3.5 me-1.5" />
+						{isIssuing ? t("common.saving") : t("finance.invoices.issueInvoice")}
+					</Button>
 				</div>
 			</div>
 		</div>

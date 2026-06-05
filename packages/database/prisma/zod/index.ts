@@ -457,7 +457,7 @@ export type ClientContactScalarFieldEnum = z.infer<typeof ClientContactScalarFie
 
 // File: QuotationScalarFieldEnum.schema.ts
 
-export const QuotationScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'quotationNo', 'clientId', 'clientName', 'clientCompany', 'clientPhone', 'clientEmail', 'clientAddress', 'clientTaxNumber', 'projectId', 'status', 'subtotal', 'discountPercent', 'discountAmount', 'vatPercent', 'vatAmount', 'totalAmount', 'validUntil', 'paymentTerms', 'deliveryTerms', 'warrantyTerms', 'notes', 'introduction', 'termsAndConditions', 'templateId', 'viewedAt', 'sentAt', 'acceptedAt', 'rejectedAt', 'createdById', 'createdAt', 'updatedAt', 'costStudyId'])
+export const QuotationScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'quotationNo', 'clientId', 'clientName', 'clientCompany', 'clientPhone', 'clientEmail', 'clientAddress', 'clientTaxNumber', 'projectId', 'status', 'subtotal', 'discountPercent', 'discountAmount', 'vatPercent', 'vatAmount', 'totalAmount', 'validUntil', 'paymentTerms', 'deliveryTerms', 'warrantyTerms', 'notes', 'introduction', 'termsAndConditions', 'templateId', 'viewedAt', 'sentAt', 'acceptedAt', 'rejectedAt', 'createdById', 'createdAt', 'updatedAt', 'costStudyId', 'isDraft', 'sourceQuotationId'])
 
 export type QuotationScalarFieldEnum = z.infer<typeof QuotationScalarFieldEnumSchema>;
 
@@ -481,7 +481,7 @@ export type QuotationContentBlockScalarFieldEnum = z.infer<typeof QuotationConte
 
 // File: FinanceInvoiceScalarFieldEnum.schema.ts
 
-export const FinanceInvoiceScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'invoiceNo', 'invoiceType', 'clientId', 'clientName', 'clientCompany', 'clientPhone', 'clientEmail', 'clientAddress', 'clientTaxNumber', 'projectId', 'quotationId', 'status', 'issueDate', 'dueDate', 'subtotal', 'discountPercent', 'discountAmount', 'vatPercent', 'vatAmount', 'totalAmount', 'paidAmount', 'sellerName', 'sellerAddress', 'sellerPhone', 'relatedInvoiceId', 'issuedAt', 'sellerTaxNumber', 'qrCode', 'zatcaUuid', 'zatcaHash', 'zatcaSignature', 'zatcaInvoiceType', 'zatcaSubmissionStatus', 'zatcaCounterValue', 'zatcaPreviousHash', 'zatcaXml', 'zatcaClearedXml', 'zatcaSubmittedAt', 'zatcaClearedAt', 'paymentTerms', 'notes', 'templateId', 'viewedAt', 'sentAt', 'createdById', 'createdAt', 'updatedAt'])
+export const FinanceInvoiceScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'invoiceNo', 'invoiceType', 'clientId', 'clientName', 'clientCompany', 'clientPhone', 'clientEmail', 'clientAddress', 'clientTaxNumber', 'projectId', 'quotationId', 'status', 'issueDate', 'dueDate', 'subtotal', 'discountPercent', 'discountAmount', 'vatPercent', 'vatAmount', 'totalAmount', 'paidAmount', 'sellerName', 'sellerAddress', 'sellerPhone', 'relatedInvoiceId', 'issuedAt', 'sellerTaxNumber', 'qrCode', 'zatcaUuid', 'zatcaHash', 'zatcaSignature', 'zatcaInvoiceType', 'zatcaSubmissionStatus', 'zatcaCounterValue', 'zatcaPreviousHash', 'zatcaXml', 'zatcaClearedXml', 'zatcaSubmittedAt', 'zatcaClearedAt', 'paymentTerms', 'notes', 'templateId', 'viewedAt', 'sentAt', 'createdById', 'createdAt', 'updatedAt', 'isDraft', 'sourceInvoiceId'])
 
 export type FinanceInvoiceScalarFieldEnum = z.infer<typeof FinanceInvoiceScalarFieldEnumSchema>;
 
@@ -1369,7 +1369,7 @@ export type ExpenseRunStatus = z.infer<typeof ExpenseRunStatusSchema>;
 
 // File: OrgAuditAction.schema.ts
 
-export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED', 'EXPENSE_PAID', 'EXPENSE_CANCELLED', 'EXPENSE_DELETED', 'PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'TRANSFER_CREATED', 'TRANSFER_CANCELLED', 'BANK_ACCOUNT_CREATED', 'BANK_ACCOUNT_UPDATED', 'BANK_ACCOUNT_SET_DEFAULT', 'BANK_ACCOUNT_DELETED', 'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_ITEMS_UPDATED', 'INVOICE_STATUS_CHANGED', 'INVOICE_CONVERTED_TO_TAX', 'INVOICE_PAYMENT_ADDED', 'INVOICE_PAYMENT_DELETED', 'INVOICE_DELETED', 'INVOICE_ISSUED', 'INVOICE_DUPLICATED', 'INVOICE_CREDIT_NOTE_CREATED', 'QUOTATION_CREATED', 'QUOTATION_UPDATED', 'QUOTATION_ITEMS_UPDATED', 'QUOTATION_STATUS_CHANGED', 'QUOTATION_DELETED', 'QUOTATION_CONVERTED', 'CLIENT_CREATED', 'CLIENT_UPDATED', 'CLIENT_DELETED', 'PAYROLL_RUN_APPROVED', 'PAYROLL_RUN_CANCELLED', 'JOURNAL_ENTRY_SKIPPED', 'JOURNAL_ENTRY_FAILED', 'PROJECT_CREATED', 'PROJECT_ARCHIVED', 'PROJECT_RESTORED', 'SETTINGS_UPDATED', 'ZATCA_INVOICE_SUBMITTED', 'ZATCA_INVOICE_CLEARED', 'ZATCA_INVOICE_REJECTED', 'RECEIPT_VOUCHER_CREATED', 'RECEIPT_VOUCHER_UPDATED', 'RECEIPT_VOUCHER_ISSUED', 'RECEIPT_VOUCHER_CANCELLED', 'PAYMENT_VOUCHER_CREATED', 'PAYMENT_VOUCHER_UPDATED', 'PAYMENT_VOUCHER_SUBMITTED', 'PAYMENT_VOUCHER_APPROVED', 'PAYMENT_VOUCHER_REJECTED', 'PAYMENT_VOUCHER_CANCELLED', 'HANDOVER_CREATED', 'HANDOVER_UPDATED', 'HANDOVER_DELETED', 'HANDOVER_SUBMITTED', 'HANDOVER_SIGNED', 'HANDOVER_COMPLETED', 'HANDOVER_ITEM_ADDED', 'HANDOVER_ITEM_UPDATED', 'HANDOVER_ITEM_DELETED', 'HANDOVER_ITEMS_IMPORTED', 'AI_CHAT_CREATED', 'AI_MESSAGE_SENT', 'OWNER_CREATED', 'OWNER_UPDATED', 'OWNER_DEACTIVATED', 'OWNER_DRAWING_CREATED', 'OWNER_DRAWING_APPROVED', 'OWNER_DRAWING_CANCELLED', 'OWNER_DRAWING_OVERDRAW_ACKNOWLEDGED', 'CAPITAL_CONTRIBUTION_CREATED', 'CAPITAL_CONTRIBUTION_CANCELLED', 'YEAR_END_CLOSING_EXECUTED', 'YEAR_END_CLOSING_REVERSED'])
+export const OrgAuditActionSchema = z.enum(['EXPENSE_CREATED', 'EXPENSE_UPDATED', 'EXPENSE_PAID', 'EXPENSE_CANCELLED', 'EXPENSE_DELETED', 'PAYMENT_CREATED', 'PAYMENT_UPDATED', 'PAYMENT_DELETED', 'TRANSFER_CREATED', 'TRANSFER_CANCELLED', 'BANK_ACCOUNT_CREATED', 'BANK_ACCOUNT_UPDATED', 'BANK_ACCOUNT_SET_DEFAULT', 'BANK_ACCOUNT_DELETED', 'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_ITEMS_UPDATED', 'INVOICE_STATUS_CHANGED', 'INVOICE_CONVERTED_TO_TAX', 'INVOICE_PAYMENT_ADDED', 'INVOICE_PAYMENT_DELETED', 'INVOICE_DELETED', 'INVOICE_ISSUED', 'INVOICE_DUPLICATED', 'INVOICE_CREDIT_NOTE_CREATED', 'INVOICE_DRAFT_CREATED', 'INVOICE_DRAFT_COMMITTED', 'INVOICE_DRAFT_DISCARDED', 'QUOTATION_CREATED', 'QUOTATION_UPDATED', 'QUOTATION_ITEMS_UPDATED', 'QUOTATION_STATUS_CHANGED', 'QUOTATION_DELETED', 'QUOTATION_CONVERTED', 'QUOTATION_DRAFT_CREATED', 'QUOTATION_DRAFT_COMMITTED', 'QUOTATION_DRAFT_DISCARDED', 'CLIENT_CREATED', 'CLIENT_UPDATED', 'CLIENT_DELETED', 'PAYROLL_RUN_APPROVED', 'PAYROLL_RUN_CANCELLED', 'JOURNAL_ENTRY_SKIPPED', 'JOURNAL_ENTRY_FAILED', 'PROJECT_CREATED', 'PROJECT_ARCHIVED', 'PROJECT_RESTORED', 'SETTINGS_UPDATED', 'ZATCA_INVOICE_SUBMITTED', 'ZATCA_INVOICE_CLEARED', 'ZATCA_INVOICE_REJECTED', 'RECEIPT_VOUCHER_CREATED', 'RECEIPT_VOUCHER_UPDATED', 'RECEIPT_VOUCHER_ISSUED', 'RECEIPT_VOUCHER_CANCELLED', 'PAYMENT_VOUCHER_CREATED', 'PAYMENT_VOUCHER_UPDATED', 'PAYMENT_VOUCHER_SUBMITTED', 'PAYMENT_VOUCHER_APPROVED', 'PAYMENT_VOUCHER_REJECTED', 'PAYMENT_VOUCHER_CANCELLED', 'HANDOVER_CREATED', 'HANDOVER_UPDATED', 'HANDOVER_DELETED', 'HANDOVER_SUBMITTED', 'HANDOVER_SIGNED', 'HANDOVER_COMPLETED', 'HANDOVER_ITEM_ADDED', 'HANDOVER_ITEM_UPDATED', 'HANDOVER_ITEM_DELETED', 'HANDOVER_ITEMS_IMPORTED', 'AI_CHAT_CREATED', 'AI_MESSAGE_SENT', 'OWNER_CREATED', 'OWNER_UPDATED', 'OWNER_DEACTIVATED', 'OWNER_DRAWING_CREATED', 'OWNER_DRAWING_APPROVED', 'OWNER_DRAWING_CANCELLED', 'OWNER_DRAWING_OVERDRAW_ACKNOWLEDGED', 'CAPITAL_CONTRIBUTION_CREATED', 'CAPITAL_CONTRIBUTION_CANCELLED', 'YEAR_END_CLOSING_EXECUTED', 'YEAR_END_CLOSING_REVERSED'])
 
 export type OrgAuditAction = z.infer<typeof OrgAuditActionSchema>;
 
@@ -3506,6 +3506,8 @@ export const QuotationSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   costStudyId: z.string().nullish(),
+  isDraft: z.boolean(),
+  sourceQuotationId: z.string().nullish(),
 });
 
 export type QuotationType = z.infer<typeof QuotationSchema>;
@@ -3660,6 +3662,8 @@ export const FinanceInvoiceSchema = z.object({
   createdById: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
+  isDraft: z.boolean(),
+  sourceInvoiceId: z.string().nullish(),
 });
 
 export type FinanceInvoiceType = z.infer<typeof FinanceInvoiceSchema>;

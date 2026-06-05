@@ -897,6 +897,9 @@
     "saving": "جارٍ الحفظ...",
     "saved": "تم الحفظ",
     "savedAgo": "تم الحفظ منذ {time}",
+    "draftSaving": "جارٍ حفظ المسودة...",
+    "draftSaved": "مسودة محفوظة",
+    "draftSavedAgo": "حُفظت المسودة منذ {time}",
     "justNow": "الآن",
     "error": "فشل الحفظ",
     "errorRetry": "فشل الحفظ — إعادة المحاولة",
@@ -907,6 +910,35 @@
     "conflictReload": "إعادة التحميل (إلغاء تغييراتي)",
     "conflictOverwrite": "متابعة والكتابة فوق",
     "unsavedChangesWarning": "لديك تغييرات غير محفوظة. هل تريد المغادرة؟"
+  },
+  "drafts": {
+    "title": "المسودات",
+    "button": "المسودات",
+    "tabs": {
+      "invoices": "فواتير",
+      "quotations": "عروض الأسعار"
+    },
+    "empty": "لا توجد مسودات",
+    "emptyDescription": "ستظهر المسودات المحفوظة تلقائياً هنا",
+    "columns": {
+      "number": "الرقم",
+      "client": "العميل",
+      "lastSaved": "آخر حفظ",
+      "amount": "المبلغ"
+    },
+    "provisional": "مسودة بدون رقم",
+    "editDraftOf": "مسودة تعديل #{number}",
+    "editDraftBadge": "مسودة تعديل",
+    "continueEditing": "متابعة التحرير",
+    "discard": "تجاهل المسودة",
+    "discardConfirmTitle": "تجاهل هذه المسودة؟",
+    "discardConfirmDescription": "لن يتغيّر المستند الأصلي. لا يمكن التراجع عن هذا الإجراء.",
+    "saveSuccess": "تم الحفظ بنجاح",
+    "saveError": "تعذّر حفظ المسودة",
+    "discardSuccess": "تم تجاهل المسودة",
+    "discardError": "تعذّر تجاهل المسودة",
+    "editBanner": "تعمل على مسودة تعديل — لن يتغيّر الأصل (#{number}) حتى تضغط حفظ",
+    "viewOriginal": "عرض الأصل"
   },
   "company": {
     "title": "إدارة المنشأة",

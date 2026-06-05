@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -59,6 +59,7 @@ import {
 	Calendar,
 	FolderOpen,
 	Send,
+	Save,
 	MoreVertical,
 	CheckCircle,
 	XCircle,
@@ -79,13 +80,17 @@ import { TemplateRenderer } from "@saas/company/components/templates/renderer";
 import { useEnsureDefaultTemplate } from "@saas/shared/hooks/use-ensure-default-template";
 import { EditorPageSkeleton } from "@saas/shared/components/skeletons";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@ui/components/collapsible";
+import { EditDraftBanner } from "@saas/shared/components/drafts/EditDraftBanner";
 import { QuotationContentBlockEditor, type ContentBlock } from "./QuotationContentBlockEditor";
 
 interface QuotationFormProps {
 	organizationId: string;
 	organizationSlug: string;
 	mode: "create" | "edit";
+	/** عرض سعر معتمد نعدّله عبر مسودة تعديل */
 	quotationId?: string;
+	/** مسودة staging قائمة نستأنفها مباشرةً */
+	draftId?: string;
 }
 
 interface QuotationItem {
@@ -107,6 +112,7 @@ export function QuotationForm({
 	organizationSlug,
 	mode,
 	quotationId,
+	draftId,
 }: QuotationFormProps) {
 	const t = useTranslations();
 	const router = useRouter();
@@ -115,10 +121,21 @@ export function QuotationForm({
 	const searchParams = useSearchParams();
 	const fromStudyId = searchParams.get("fromStudy");
 
-	// internalQuotationId يُحدّث بعد lazy create
-	const [internalQuotationId, setInternalQuotationId] = useState<string | undefined>(quotationId);
-	const effectiveQuotationId = quotationId ?? internalQuotationId;
+	// نعمل دائماً على مسودة staging:
+	// - draftId: مسودة قائمة نستأنفها.
+	// - mode "edit" + quotationId: عرض سعر معتمد نعدّله عبر مسودة تعديل (startEdit).
+	// - بدونهما: مسودة جديدة (lazy create).
+	const [workingDraftId, setWorkingDraftId] = useState<string | undefined>(draftId);
+	const workingDraftIdRef = useRef<string | undefined>(draftId);
+	const setDraftIdBoth = useCallback((id: string | undefined) => {
+		workingDraftIdRef.current = id;
+		setWorkingDraftId(id);
+	}, []);
+	const effectiveDraftId = workingDraftId;
+	const isEditDraft = mode === "edit";
 	const [isPublishing, setIsPublishing] = useState(false);
+	const [isCommitting, setIsCommitting] = useState(false);
+	const [isStartingEdit, setIsStartingEdit] = useState(mode === "edit" && !draftId);
 	const [showConflictDialog, setShowConflictDialog] = useState(false);
 
 	// Client state
@@ -169,7 +186,7 @@ export function QuotationForm({
 	const [showNewClientDialog, setShowNewClientDialog] = useState(false);
 	const [clientDetailsOpen, setClientDetailsOpen] = useState(false);
 	const [visibleColumns, setVisibleColumns] = useState<ColumnKey[]>(DEFAULT_VISIBLE_COLUMNS);
-	const [isInitialized, setIsInitialized] = useState(mode === "create");
+	const [isInitialized, setIsInitialized] = useState(mode === "create" && !draftId);
 	const [showPreviewDialog, setShowPreviewDialog] = useState(false);
 
 	// Column visibility helpers
@@ -193,18 +210,56 @@ export function QuotationForm({
 
 	const isColumnVisible = (column: ColumnKey) => visibleColumns.includes(column);
 
-	// Fetch existing quotation for edit mode
-	const { data: existingQuotationRaw, isLoading: isLoadingQuotation } = useQuery({
-		...orpc.pricing.quotations.getById.queryOptions({
-			input: { organizationId, id: quotationId! },
+	// ─── بدء/استئناف مسودة تعديل عند تمرير quotationId (عرض سعر معتمد) ───
+	useEffect(() => {
+		if (mode !== "edit" || !quotationId || draftId || workingDraftIdRef.current) return;
+		let cancelled = false;
+		(async () => {
+			try {
+				const res = await orpcClient.pricing.quotations.startEdit({ organizationId, id: quotationId });
+				if (cancelled) return;
+				setDraftIdBoth(res.id);
+				if (typeof window !== "undefined") {
+					window.history.replaceState(null, "", `${basePath}/drafts/${res.id}`);
+				}
+			} catch (e: any) {
+				toast.error(e?.message || t("pricing.quotations.notEditable"));
+				router.replace(`${basePath}/${quotationId}`);
+			} finally {
+				if (!cancelled) setIsStartingEdit(false);
+			}
+		})();
+		return () => {
+			cancelled = true;
+		};
+	}, [mode, quotationId, draftId, organizationId, basePath, router, t, setDraftIdBoth]);
+
+	// تحميل بيانات المسودة
+	const { data: draftRaw, isLoading: isLoadingDraft } = useQuery({
+		...orpc.pricing.quotations.drafts.getById.queryOptions({
+			input: { organizationId, id: workingDraftId ?? "" },
 		}),
-		enabled: mode === "edit" && !!quotationId,
+		enabled: !!workingDraftId,
 	});
-	const existingQuotation = existingQuotationRaw as any;
+	const draft = draftRaw as any;
+
+	// عرض السعر الأصلي (لمسودة التعديل — للعرض في الشريط والمعاينة)
+	const sourceQuotationId = (draft?.sourceQuotationId as string | null | undefined) ?? undefined;
+	const { data: sourceQuotationRaw } = useQuery({
+		...orpc.pricing.quotations.getById.queryOptions({
+			input: { organizationId, id: sourceQuotationId ?? "" },
+		}),
+		enabled: !!sourceQuotationId,
+	});
+	const existingQuotation = (sourceQuotationRaw as any) ?? null;
+	const sourceQuotationNo = existingQuotation?.quotationNo ?? null;
+	const isLoadingQuotation = isLoadingDraft;
+	// نعرض شريط "مسودة تعديل" إذا دخلنا عبر عرض سعر معتمد أو إذا كانت المسودة مرتبطة بأصل
+	const showEditDraftUi = isEditDraft || !!sourceQuotationId;
 
 	// Prefill items from study conversion (via sessionStorage)
 	useEffect(() => {
-		if (mode === "create" && fromStudyId) {
+		if (mode === "create" && !draftId && fromStudyId) {
 			const storageKey = `quotation_prefill_${fromStudyId}`;
 			const raw = sessionStorage.getItem(storageKey);
 			if (raw) {
@@ -230,60 +285,55 @@ export function QuotationForm({
 		}
 	}, [fromStudyId, mode]);
 
-	// Initialize form with existing data in edit mode
+	// تعبئة النموذج من المسودة
 	useEffect(() => {
-		if (mode === "edit" && existingQuotation && !isInitialized) {
-			setClientId(existingQuotation.clientId ?? undefined);
-			setClientName(existingQuotation.clientName);
-			setClientCompany(existingQuotation.clientCompany ?? "");
-			setClientPhone(existingQuotation.clientPhone ?? "");
-			setClientEmail(existingQuotation.clientEmail ?? "");
-			setClientAddress(existingQuotation.clientAddress ?? "");
-			setClientTaxNumber(existingQuotation.clientTaxNumber ?? "");
-			setQuotationNumber(existingQuotation.quotationNo);
-			setQuotationDate(new Date(existingQuotation.createdAt).toISOString().split("T")[0]);
-			setValidUntilDate(new Date(existingQuotation.validUntil).toISOString().split("T")[0]);
-			setPaymentTerms(existingQuotation.paymentTerms ?? "");
-			setDeliveryTerms(existingQuotation.deliveryTerms ?? "");
-			setWarrantyTerms(existingQuotation.warrantyTerms ?? "");
-			setNotes(existingQuotation.notes ?? "");
-			setIntroduction((existingQuotation as any).introduction ?? "");
-			setTermsAndConditions((existingQuotation as any).termsAndConditions ?? "");
+		if (draft && !isInitialized) {
+			setClientId(draft.clientId ?? undefined);
+			setClientName(draft.clientName ?? "");
+			setClientCompany(draft.clientCompany ?? "");
+			setClientPhone(draft.clientPhone ?? "");
+			setClientEmail(draft.clientEmail ?? "");
+			setClientAddress(draft.clientAddress ?? "");
+			setClientTaxNumber(draft.clientTaxNumber ?? "");
+			setQuotationNumber(draft.quotationNo);
+			setQuotationDate(new Date(draft.createdAt).toISOString().split("T")[0]);
+			setValidUntilDate(new Date(draft.validUntil).toISOString().split("T")[0]);
+			setPaymentTerms(draft.paymentTerms ?? "");
+			setDeliveryTerms(draft.deliveryTerms ?? "");
+			setWarrantyTerms(draft.warrantyTerms ?? "");
+			setNotes(draft.notes ?? "");
+			setIntroduction(draft.introduction ?? "");
+			setTermsAndConditions(draft.termsAndConditions ?? "");
 			setContentBlocks(
-				((existingQuotation as any).contentBlocks ?? []).map((b: any) => ({
+				(draft.contentBlocks ?? []).map((b: any) => ({
 					id: b.id,
 					title: b.title,
 					content: b.content,
 					position: b.position,
 				})),
 			);
-			setVatPercent(existingQuotation.vatPercent);
-			setDiscountPercent(existingQuotation.discountPercent);
-			if (existingQuotation.projectId) {
-				setProjectId(existingQuotation.projectId);
+			setVatPercent(Number(draft.vatPercent) || 15);
+			setDiscountPercent(Number(draft.discountPercent) || 0);
+			if (draft.projectId) {
+				setProjectId(draft.projectId);
 				setShowProjectLink(true);
 			}
 
-			if (existingQuotation.items && existingQuotation.items.length > 0) {
+			if (draft.items && draft.items.length > 0) {
 				setItems(
-					existingQuotation.items.map((item: any) => ({
+					draft.items.map((item: any) => ({
 						id: item.id,
 						description: item.description,
-						quantity: item.quantity,
+						quantity: Number(item.quantity) || 1,
 						unit: item.unit ?? "",
-						unitPrice: item.unitPrice,
-					}))
+						unitPrice: Number(item.unitPrice) || 0,
+					})),
 				);
-			}
-
-			// Open client details if we have client data
-			if (existingQuotation.clientName) {
-				setClientDetailsOpen(false);
 			}
 
 			setIsInitialized(true);
 		}
-	}, [existingQuotation, mode, isInitialized]);
+	}, [draft, isInitialized]);
 
 	// Fetch organization members for sales rep
 	const { data: membersDataRaw } = useQuery(
@@ -303,9 +353,9 @@ export function QuotationForm({
 	});
 	const orgSettings = orgSettingsRaw as any;
 
-	// Apply finance settings defaults (create mode only)
+	// Apply finance settings defaults (مسودة جديدة فقط)
 	useEffect(() => {
-		if (orgSettings && mode === "create") {
+		if (orgSettings && mode === "create" && !draftId) {
 			if (orgSettings.defaultVatPercent !== undefined) {
 				setVatPercent(orgSettings.defaultVatPercent);
 			}
@@ -340,8 +390,8 @@ export function QuotationForm({
 	// Calculate totals using shared utility
 	const totals = calculateTotals(items, discountPercent, vatPercent);
 
-	// Check if editable (only DRAFT status can be edited)
-	const isEditable = mode === "create" || (existingQuotation?.status === "DRAFT");
+	// نعمل دائماً على مسودة — قابلة للتحرير دائماً
+	const isEditable = true;
 
 	const currency = orgSettings?.defaultCurrency || "SAR";
 
@@ -429,12 +479,12 @@ export function QuotationForm({
 			vatPercent,
 			discountPercent,
 			projectId: !showProjectLink || projectId === "none" ? null : projectId,
-			templateId: existingQuotation?.templateId || defaultTemplate?.id || undefined,
+			templateId: draft?.templateId || defaultTemplate?.id || undefined,
 		}),
 		[clientId, clientName, clientCompany, clientPhone, clientEmail, clientAddress,
 		 clientTaxNumber, validUntilDate, paymentTerms, deliveryTerms, warrantyTerms,
 		 notes, introduction, termsAndConditions, vatPercent, discountPercent,
-		 showProjectLink, projectId, existingQuotation?.templateId, defaultTemplate?.id],
+		 showProjectLink, projectId, draft?.templateId, defaultTemplate?.id],
 	);
 
 	const itemsSnapshot = useMemo(
@@ -468,7 +518,7 @@ export function QuotationForm({
 
 	const createDraft = useCallback(
 		async (snap: typeof headerSnapshot, snapItems: typeof itemsSnapshot) => {
-			const result = await orpcClient.pricing.quotations.create({
+			const result = await orpcClient.pricing.quotations.drafts.create({
 				organizationId,
 				clientId: snap.clientId ?? undefined,
 				clientName: snap.clientName,
@@ -507,7 +557,7 @@ export function QuotationForm({
 
 	const updateHeader = useCallback(
 		async (id: string, snap: typeof headerSnapshot) => {
-			await orpcClient.pricing.quotations.update({
+			await orpcClient.pricing.quotations.drafts.updateHeader({
 				organizationId,
 				id,
 				clientId: snap.clientId,
@@ -545,7 +595,7 @@ export function QuotationForm({
 				!prev || JSON.stringify(prev.contentBlocks) !== JSON.stringify(snap.contentBlocks);
 
 			if (itemsChanged) {
-				await orpcClient.pricing.quotations.updateItems({
+				await orpcClient.pricing.quotations.drafts.updateItems({
 					organizationId,
 					id,
 					items: snap.items.map((item) => ({
@@ -558,11 +608,10 @@ export function QuotationForm({
 				});
 			}
 			if (blocksChanged) {
-				await orpcClient.pricing.quotations.updateContentBlocks({
+				await orpcClient.pricing.quotations.drafts.updateContentBlocks({
 					organizationId,
 					id,
 					contentBlocks: snap.contentBlocks.map((b) => ({
-						id: b.id.startsWith("new-") ? undefined : b.id,
 						title: b.title,
 						content: b.content,
 						position: b.position,
@@ -574,58 +623,102 @@ export function QuotationForm({
 		[organizationId, lastSavedItemsRef],
 	);
 
-	const autosaveEnabled = !isPublishing && (mode === "create" || existingQuotation?.status === "DRAFT");
+	const autosaveEnabled = !isPublishing && !isCommitting && !isStartingEdit;
 
 	const autosave = useAutosave({
 		snapshot: headerSnapshot,
 		items: itemsSnapshot,
-		id: effectiveQuotationId,
+		id: effectiveDraftId,
 		enabled: autosaveEnabled,
 		isReadyForCreate,
 		createDraft,
 		updateHeader,
 		updateItems: updateItemsRemote,
 		onCreated: (newId) => {
-			setInternalQuotationId(newId);
+			setDraftIdBoth(newId);
 			if (typeof window !== "undefined") {
-				window.history.replaceState(null, "", `${basePath}/${newId}`);
+				window.history.replaceState(null, "", `${basePath}/drafts/${newId}`);
 			}
 		},
 		onSaved: () => {
-			queryClient.invalidateQueries({ queryKey: ["finance", "quotations"] });
+			queryClient.invalidateQueries({ queryKey: ["pricing", "quotationDrafts"] });
 		},
 		onConflict: () => setShowConflictDialog(true),
 	});
 
-	// Status mutation
-	const statusMutation = useMutation({
-		mutationFn: async (status: "DRAFT" | "SENT" | "ACCEPTED" | "REJECTED" | "EXPIRED") => {
-			setIsPublishing(status !== "DRAFT");
-			// أولاً: ضمان حفظ آخر التغييرات قبل تغيير الحالة
-			if (status !== "DRAFT") {
-				await autosave.forceSave();
+	// commit المسودة (حفظ): يُفرّغ آخر تغييرات ثم يثبّت المسودة. يُرجع id عرض السعر المعتمد.
+	const commitDraft = async (): Promise<string | null> => {
+		await autosave.forceSave();
+		const did = workingDraftIdRef.current;
+		if (!did) {
+			toast.error(t("pricing.quotations.errors.itemsRequired"));
+			return null;
+		}
+		const result = await orpcClient.pricing.quotations.drafts.commit({ organizationId, id: did });
+		queryClient.invalidateQueries({ queryKey: ["finance", "quotations"] });
+		queryClient.invalidateQueries({ queryKey: ["pricing", "quotationDrafts"] });
+		return result.id;
+	};
+
+	// زر "حفظ" → commit ثم الانتقال لعرض السعر المعتمد
+	const handleSaveClick = async () => {
+		if (!clientName.trim()) {
+			toast.error(t("pricing.quotations.errors.clientRequired"));
+			return;
+		}
+		setIsCommitting(true);
+		try {
+			const id = await commitDraft();
+			if (id) {
+				toast.success(t("drafts.saveSuccess"));
+				router.push(`${basePath}/${id}`);
 			}
-			const idToUse = effectiveQuotationId;
-			if (!idToUse) {
-				throw new Error(t("pricing.quotations.errors.itemsRequired"));
+		} catch (e: any) {
+			toast.error(e?.message || t("drafts.saveError"));
+		} finally {
+			setIsCommitting(false);
+		}
+	};
+
+	// زر "إرسال" → commit ثم تغيير الحالة إلى SENT
+	const handleSendClick = async () => {
+		if (!clientName.trim()) {
+			toast.error(t("pricing.quotations.errors.clientRequired"));
+			return;
+		}
+		setIsPublishing(true);
+		try {
+			const id = await commitDraft();
+			if (!id) {
+				setIsPublishing(false);
+				return;
 			}
-			await orpcClient.pricing.quotations.updateStatus({
-				organizationId,
-				id: idToUse,
-				status,
-			});
-		},
-		onSuccess: (_, status) => {
-			toast.success(t(`pricing.quotations.status.${status.toLowerCase()}Success`));
-			queryClient.invalidateQueries({
-				queryKey: ["finance", "quotations"],
-			});
-		},
-		onError: (error: any) => {
+			await orpcClient.pricing.quotations.updateStatus({ organizationId, id, status: "SENT" });
+			queryClient.invalidateQueries({ queryKey: ["finance", "quotations"] });
+			toast.success(t("pricing.quotations.status.sentSuccess"));
+			router.push(`${basePath}/${id}`);
+		} catch (e: any) {
+			toast.error(e?.message || t("pricing.quotations.statusUpdateError"));
 			setIsPublishing(false);
-			toast.error(error.message || t("pricing.quotations.statusUpdateError"));
-		},
-	});
+		}
+	};
+
+	// تجاهل مسودة التعديل
+	const handleDiscardDraft = async () => {
+		const did = workingDraftIdRef.current;
+		if (!did) {
+			router.push(basePath);
+			return;
+		}
+		try {
+			await orpcClient.pricing.quotations.drafts.delete({ organizationId, id: did });
+			queryClient.invalidateQueries({ queryKey: ["pricing", "quotationDrafts"] });
+			toast.success(t("drafts.discardSuccess"));
+			router.push(sourceQuotationId ? `${basePath}/${sourceQuotationId}` : basePath);
+		} catch (e: any) {
+			toast.error(e?.message || t("drafts.discardError"));
+		}
+	};
 
 	// Form submit (Enter في الحقول) → force-save
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -656,22 +749,11 @@ export function QuotationForm({
 		void autosave.forceSave();
 	};
 
-	const isBusy = autosave.state.status === "saving" || statusMutation.isPending;
+	const isBusy = autosave.state.status === "saving" || isCommitting || isPublishing;
 
-	// Loading state for edit mode
-	if (mode === "edit" && isLoadingQuotation) {
+	// Loading state
+	if ((isEditDraft && isStartingEdit) || (!!workingDraftId && isLoadingDraft && !draft)) {
 		return <EditorPageSkeleton />;
-	}
-
-	// Not found state for edit mode
-	if (mode === "edit" && !existingQuotation && !isLoadingQuotation) {
-		return (
-			<div className="text-center py-20">
-				<p className="text-muted-foreground">
-					{t("pricing.quotations.notFound")}
-				</p>
-			</div>
-		);
 	}
 
 	return (
@@ -715,99 +797,36 @@ export function QuotationForm({
 
 						{/* End: actions */}
 						<div className="flex items-center gap-1.5 shrink-0">
-							<AutosaveIndicator state={autosave.state} onRetry={() => void autosave.forceSave()} className="hidden sm:inline-flex me-1" />
+							<AutosaveIndicator state={autosave.state} onRetry={() => void autosave.forceSave()} mode="draft" className="hidden sm:inline-flex me-1" />
 							<Button
 								type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg"
 								onClick={() => setShowPreviewDialog(true)}
 							>
 								<Eye className="h-4 w-4" />
 							</Button>
-							<Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => {
-								if (effectiveQuotationId) {
-									router.push(`${basePath}/${effectiveQuotationId}/preview`);
-								} else {
-									toast.info(t("common.saveFirst"));
-								}
-							}}>
+							<Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setShowPreviewDialog(true)}>
 								<Printer className="h-4 w-4" />
 							</Button>
-							{(mode === "edit" && existingQuotation && existingQuotation.status !== "DRAFT" && existingQuotation.status !== "CONVERTED") && (
-								<div className="w-px h-5 bg-border/50" />
-							)}
-							{/* Convert to Invoice Button (prominent) */}
-							{mode === "edit" && existingQuotation && existingQuotation.status !== "DRAFT" && existingQuotation.status !== "CONVERTED" && (
-								<Button type="button" size="sm" className="hidden sm:flex h-8 rounded-lg text-xs px-3 shadow-sm bg-blue-600 hover:bg-blue-700 text-white" asChild>
-									<Link href={`/app/${organizationSlug}/finance/invoices/new?quotationId=${quotationId}`}>
-										<ArrowRightLeft className="h-3.5 w-3.5 me-1.5" />
-										{t("pricing.quotations.actions.convertToInvoice")}
-									</Link>
-								</Button>
-							)}
-							{/* Status Actions (edit mode) */}
-							{mode === "edit" && existingQuotation && (
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
-											<MoreVertical className="h-4 w-4" />
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent align="end" className="rounded-xl">
-										{existingQuotation.status === "DRAFT" && (
-											<DropdownMenuItem
-												onClick={() => statusMutation.mutate("SENT")}
-												disabled={statusMutation.isPending}
-											>
-												<Send className="h-4 w-4 me-2" />
-												{t("pricing.quotations.actions.send")}
-											</DropdownMenuItem>
-										)}
-										{(existingQuotation.status === "SENT" || existingQuotation.status === "VIEWED") && (
-											<>
-												<DropdownMenuItem
-													onClick={() => statusMutation.mutate("ACCEPTED")}
-													disabled={statusMutation.isPending}
-												>
-													<CheckCircle className="h-4 w-4 me-2 text-green-600" />
-													{t("pricing.quotations.actions.accept")}
-												</DropdownMenuItem>
-												<DropdownMenuItem
-													onClick={() => statusMutation.mutate("REJECTED")}
-													disabled={statusMutation.isPending}
-												>
-													<XCircle className="h-4 w-4 me-2 text-red-600" />
-													{t("pricing.quotations.actions.reject")}
-												</DropdownMenuItem>
-											</>
-										)}
-										{existingQuotation.status !== "DRAFT" && existingQuotation.status !== "CONVERTED" && (
-											<DropdownMenuItem asChild>
-												<Link href={`/app/${organizationSlug}/finance/invoices/new?quotationId=${quotationId}`}>
-													<ArrowRightLeft className="h-4 w-4 me-2" />
-													{t("pricing.quotations.actions.convertToInvoice")}
-												</Link>
-											</DropdownMenuItem>
-										)}
-										<DropdownMenuSeparator />
-										<DropdownMenuItem
-											onClick={() => statusMutation.mutate("DRAFT")}
-											disabled={statusMutation.isPending || existingQuotation.status === "DRAFT"}
-										>
-											{t("pricing.quotations.actions.revertToDraft")}
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							)}
+							<div className="w-px h-5 bg-border/50" />
+							<Button type="button" variant="outline" size="sm" disabled={isBusy} onClick={handleSaveClick} className="h-8 rounded-[10px] text-xs px-4">
+								<Save className="h-3.5 w-3.5 me-1.5" />
+								{isCommitting ? t("common.saving") : t("common.save")}
+							</Button>
+							<Button type="button" size="sm" disabled={isBusy} onClick={handleSendClick} className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] transition-all">
+								<Send className="h-3.5 w-3.5 me-1.5" />
+								{isPublishing ? t("common.saving") : t("pricing.quotations.actions.send")}
+							</Button>
 						</div>
 					</div>
 				</div>
 
-				{/* Non-editable warning */}
-				{mode === "edit" && !isEditable && (
-					<div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
-						<p className="text-amber-800 dark:text-amber-200 text-sm">
-							{t("pricing.quotations.notEditable")}
-						</p>
-					</div>
+				{/* Edit-draft banner */}
+				{showEditDraftUi && (
+					<EditDraftBanner
+						sourceNumber={sourceQuotationNo}
+						sourceHref={sourceQuotationId ? `${basePath}/${sourceQuotationId}` : undefined}
+						onDiscard={handleDiscardDraft}
+					/>
 				)}
 
 				{/* ─── Client + Details Grid ───────────────────────────── */}
@@ -1321,17 +1340,17 @@ export function QuotationForm({
 								{formatCurrency(totals.totalAmount)}
 								<span className="text-xs font-normal text-muted-foreground ms-1">{currency}</span>
 							</p>
-							<AutosaveIndicator state={autosave.state} onRetry={() => void autosave.forceSave()} className="mt-0.5" />
+							<AutosaveIndicator state={autosave.state} onRetry={() => void autosave.forceSave()} mode="draft" className="mt-0.5" />
 						</div>
 						<div className="flex items-center gap-2 shrink-0">
-							{mode === "edit" && existingQuotation && existingQuotation.status !== "DRAFT" && existingQuotation.status !== "CONVERTED" && (
-								<Button type="button" size="sm" className="rounded-xl h-9 bg-blue-600 hover:bg-blue-700 text-white" asChild>
-									<Link href={`/app/${organizationSlug}/finance/invoices/new?quotationId=${quotationId}`}>
-										<ArrowRightLeft className="h-4 w-4 me-1" />
-										{t("finance.actions.convertToInvoice")}
-									</Link>
-								</Button>
-							)}
+							<Button type="button" variant="outline" size="sm" disabled={isBusy} onClick={handleSaveClick} className="rounded-xl h-9">
+								<Save className="h-4 w-4 me-1" />
+								{t("common.save")}
+							</Button>
+							<Button type="button" size="sm" disabled={isBusy} onClick={handleSendClick} className="rounded-xl h-9">
+								<Send className="h-4 w-4 me-1" />
+								{t("pricing.quotations.actions.send")}
+							</Button>
 						</div>
 					</div>
 				</div>

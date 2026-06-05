@@ -897,6 +897,9 @@
     "saving": "Saving...",
     "saved": "Saved",
     "savedAgo": "Saved {time} ago",
+    "draftSaving": "Saving draft...",
+    "draftSaved": "Draft saved",
+    "draftSavedAgo": "Draft saved {time} ago",
     "justNow": "just now",
     "error": "Save failed",
     "errorRetry": "Save failed — click to retry",
@@ -907,6 +910,35 @@
     "conflictReload": "Reload (discard my changes)",
     "conflictOverwrite": "Overwrite anyway",
     "unsavedChangesWarning": "You have unsaved changes. Leave anyway?"
+  },
+  "drafts": {
+    "title": "Drafts",
+    "button": "Drafts",
+    "tabs": {
+      "invoices": "Invoices",
+      "quotations": "Quotations"
+    },
+    "empty": "No drafts",
+    "emptyDescription": "Auto-saved drafts will appear here",
+    "columns": {
+      "number": "Number",
+      "client": "Client",
+      "lastSaved": "Last saved",
+      "amount": "Amount"
+    },
+    "provisional": "Untitled draft",
+    "editDraftOf": "Edit draft of #{number}",
+    "editDraftBadge": "Edit draft",
+    "continueEditing": "Continue editing",
+    "discard": "Discard draft",
+    "discardConfirmTitle": "Discard this draft?",
+    "discardConfirmDescription": "The original document is unaffected. This action cannot be undone.",
+    "saveSuccess": "Saved successfully",
+    "saveError": "Could not save the draft",
+    "discardSuccess": "Draft discarded",
+    "discardError": "Could not discard the draft",
+    "editBanner": "You're editing a draft — the original (#{number}) won't change until you save",
+    "viewOriginal": "View original"
   },
   "company": {
     "title": "Company Management",

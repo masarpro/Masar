@@ -93,6 +93,12 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 	const [currentPage, setCurrentPage] = useState(1);
 	const basePath = `/app/${organizationSlug}/finance/invoices`;
 
+	// Drafts count (badge)
+	const { data: draftCountData } = useQuery(
+		orpc.finance.invoices.drafts.count.queryOptions({ input: { organizationId } }),
+	);
+	const draftCount = (draftCountData as any)?.count ?? 0;
+
 	// Row selection state
 	const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
@@ -221,12 +227,25 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 								<h1 className="text-base font-bold leading-tight truncate">{t("finance.invoices.title")}</h1>
 							</div>
 						</div>
-						<Button asChild size="sm" className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.45)] transition-all">
-							<Link href={`${basePath}/new`}>
-								<Plus className="h-3.5 w-3.5 me-1.5" />
-								{t("finance.invoices.create")}
-							</Link>
-						</Button>
+						<div className="flex items-center gap-2 shrink-0">
+							<Button asChild size="sm" variant="outline" className="h-8 rounded-[10px] text-xs px-4">
+								<Link href={`/app/${organizationSlug}/finance/drafts`}>
+									<FileText className="h-3.5 w-3.5 me-1.5" />
+									{t("drafts.button")}
+									{draftCount > 0 && (
+										<span className="ms-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white text-[10px] font-bold">
+											{draftCount}
+										</span>
+									)}
+								</Link>
+							</Button>
+							<Button asChild size="sm" className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.45)] transition-all">
+								<Link href={`${basePath}/new`}>
+									<Plus className="h-3.5 w-3.5 me-1.5" />
+									{t("finance.invoices.create")}
+								</Link>
+							</Button>
+						</div>
 					</div>
 				</div>
 

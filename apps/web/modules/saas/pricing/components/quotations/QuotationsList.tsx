@@ -78,6 +78,11 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 
 	const quotations = (data as any)?.quotations ?? [];
 
+	const { data: draftCountData } = useQuery(
+		orpc.pricing.quotations.drafts.count.queryOptions({ input: { organizationId } }),
+	);
+	const draftCount = (draftCountData as any)?.count ?? 0;
+
 	if (isLoading) {
 		return <ListTableSkeleton />;
 	}
@@ -111,6 +116,17 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 							<SelectItem value="CONVERTED">{t("pricing.quotations.status.converted")}</SelectItem>
 						</SelectContent>
 					</Select>
+					<Button asChild variant="outline" className="rounded-xl shrink-0">
+						<Link href={`/app/${organizationSlug}/finance/drafts?tab=quotations`}>
+							<FileText className="h-4 w-4 me-1.5" />
+							{t("drafts.button")}
+							{draftCount > 0 && (
+								<span className="ms-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white text-[10px] font-bold">
+									{draftCount}
+								</span>
+							)}
+						</Link>
+					</Button>
 				</div>
 			</div>
 

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { db } from "../client";
 import { Prisma } from "../generated/client";
 import type {
@@ -506,6 +507,7 @@ export async function getOrganizationQuotations(
 		clientId?: string;
 		projectId?: string;
 		query?: string;
+		isDraft?: boolean;
 		limit?: number;
 		offset?: number;
 	},
@@ -515,12 +517,16 @@ export async function getOrganizationQuotations(
 		status?: QuotationStatus;
 		clientId?: string;
 		projectId?: string;
+		isDraft?: boolean;
 		OR?: Array<{
 			quotationNo?: { contains: string; mode: "insensitive" };
 			clientName?: { contains: string; mode: "insensitive" };
 			clientCompany?: { contains: string; mode: "insensitive" };
 		}>;
 	} = { organizationId };
+
+	// استبعاد مسودات الـ staging من القائمة الرئيسية ما لم يُطلَب صراحةً
+	where.isDraft = options?.isDraft ?? false;
 
 	if (options?.status) {
 		where.status = options.status;
@@ -927,6 +933,7 @@ export async function getOrganizationInvoices(
 		projectId?: string;
 		query?: string;
 		overdue?: boolean;
+		isDraft?: boolean;
 		limit?: number;
 		offset?: number;
 	},
@@ -937,6 +944,7 @@ export async function getOrganizationInvoices(
 		invoiceType?: InvoiceType;
 		clientId?: string;
 		projectId?: string;
+		isDraft?: boolean;
 		dueDate?: { lt: Date };
 		OR?: Array<{
 			invoiceNo?: { contains: string; mode: "insensitive" };
@@ -944,6 +952,9 @@ export async function getOrganizationInvoices(
 			clientCompany?: { contains: string; mode: "insensitive" };
 		}>;
 	} = { organizationId };
+
+	// استبعاد مسودات الـ staging من القائمة الرئيسية ما لم يُطلَب صراحةً
+	where.isDraft = options?.isDraft ?? false;
 
 	if (options?.status) {
 		where.status = options.status;
@@ -1434,6 +1445,10 @@ export async function convertQuotationToInvoice(
 		throw new Error("Quotation not found");
 	}
 
+	if (quotation.isDraft) {
+		throw new Error("لا يمكن تحويل مسودة غير محفوظة إلى فاتورة. احفظ عرض السعر أولاً.");
+	}
+
 	if (quotation.status === "CONVERTED") {
 		throw new Error("Quotation already converted");
 	}
@@ -1527,6 +1542,10 @@ export async function issueInvoice(
 			throw new Error("الفاتورة غير موجودة");
 		}
 
+		if (invoice.isDraft) {
+			throw new Error("لا يمكن إصدار مسودة غير محفوظة. احفظ الفاتورة أولاً.");
+		}
+
 		if (invoice.status !== "DRAFT") {
 			throw new Error("لا يمكن إصدار فاتورة ليست في حالة مسودة");
 		}
@@ -1583,6 +1602,10 @@ export async function duplicateInvoice(
 
 	if (!original) {
 		throw new Error("الفاتورة غير موجودة");
+	}
+
+	if (original.isDraft) {
+		throw new Error("لا يمكن نسخ مسودة غير محفوظة. احفظ الفاتورة أولاً.");
 	}
 
 	const invoiceNo = await generateInvoiceNumber(organizationId);
@@ -2293,4 +2316,997 @@ export async function updateOrganizationFinanceSettings(
 		},
 		update: finalData,
 	});
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DRAFTS (مسودات staging) — INVOICES
+// المسودة سجل isDraft=true لا يستهلك رقماً رسمياً (invoiceNo = "DRAFT-{uuid}")
+// ولا تظهر في القائمة الرئيسية. الحفظ التلقائي يكتب عليها فقط؛ زر "حفظ" يستدعي commit.
+// sourceInvoiceId != null ⇒ مسودة تعديل لفاتورة معتمدة (الأصل لا يتغيّر حتى commit).
+// ═══════════════════════════════════════════════════════════════════════════
+
+const DRAFT_NO_PREFIX = "DRAFT-";
+
+type InvoiceDraftHeader = Partial<{
+	invoiceType: InvoiceType;
+	clientId: string | null;
+	clientName: string;
+	clientCompany: string | null;
+	clientPhone: string | null;
+	clientEmail: string | null;
+	clientAddress: string | null;
+	clientTaxNumber: string | null;
+	projectId: string | null;
+	issueDate: Date;
+	dueDate: Date;
+	paymentTerms: string | null;
+	notes: string | null;
+	templateId: string | null;
+	vatPercent: number;
+	discountPercent: number;
+}>;
+
+/**
+ * Create a new staging invoice draft (lazy autosave target). No official number consumed.
+ */
+export async function createInvoiceDraft(data: {
+	organizationId: string;
+	createdById: string;
+	sourceInvoiceId?: string;
+	quotationId?: string;
+	invoiceType?: InvoiceType;
+	clientId?: string;
+	clientName?: string;
+	clientCompany?: string;
+	clientPhone?: string;
+	clientEmail?: string;
+	clientAddress?: string;
+	clientTaxNumber?: string;
+	projectId?: string;
+	issueDate?: Date;
+	dueDate?: Date;
+	paymentTerms?: string;
+	notes?: string;
+	templateId?: string;
+	vatPercent?: number;
+	discountPercent?: number;
+	sellerTaxNumber?: string;
+	items?: Array<{
+		description: string;
+		quantity: number;
+		unit?: string;
+		unitPrice: number;
+	}>;
+}) {
+	const items = data.items ?? [];
+	const discountPercent = data.discountPercent ?? 0;
+	const vatPercent = data.vatPercent ?? 15;
+	const totals = calculateInvoiceTotals(items, discountPercent, vatPercent);
+	const today = new Date();
+
+	return db.financeInvoice.create({
+		data: {
+			organizationId: data.organizationId,
+			createdById: data.createdById,
+			invoiceNo: `${DRAFT_NO_PREFIX}${randomUUID()}`,
+			isDraft: true,
+			sourceInvoiceId: data.sourceInvoiceId,
+			quotationId: data.quotationId,
+			invoiceType: data.invoiceType ?? "STANDARD",
+			clientId: data.clientId,
+			clientName: data.clientName ?? "",
+			clientCompany: data.clientCompany,
+			clientPhone: data.clientPhone,
+			clientEmail: data.clientEmail,
+			clientAddress: data.clientAddress,
+			clientTaxNumber: data.clientTaxNumber,
+			projectId: data.projectId,
+			status: "DRAFT",
+			issueDate: data.issueDate ?? today,
+			dueDate: data.dueDate ?? today,
+			paymentTerms: data.paymentTerms,
+			notes: data.notes,
+			templateId: data.templateId,
+			subtotal: totals.subtotal,
+			discountPercent,
+			discountAmount: totals.discountAmount,
+			vatPercent,
+			vatAmount: totals.vatAmount,
+			totalAmount: totals.totalAmount,
+			paidAmount: 0,
+			sellerTaxNumber: data.sellerTaxNumber,
+			items: {
+				create: items.map((item, index) => ({
+					description: item.description,
+					quantity: item.quantity,
+					unit: item.unit,
+					unitPrice: item.unitPrice,
+					totalPrice: totals.itemTotals[index],
+					sortOrder: index,
+				})),
+			},
+		},
+		include: { items: { orderBy: { sortOrder: "asc" } } },
+	});
+}
+
+/**
+ * Update a staging invoice draft's header. Recomputes totals from current items.
+ */
+export async function updateInvoiceDraftHeader(
+	id: string,
+	organizationId: string,
+	data: InvoiceDraftHeader,
+) {
+	const existing = await db.financeInvoice.findFirst({
+		where: { id, organizationId, isDraft: true },
+		select: { id: true },
+	});
+	if (!existing) {
+		throw new Error("المسودة غير موجودة");
+	}
+
+	const updated = await db.financeInvoice.update({ where: { id }, data });
+
+	// Recompute totals (vat/discount may have changed)
+	const items = await db.financeInvoiceItem.findMany({
+		where: { invoiceId: id },
+		select: { quantity: true, unitPrice: true },
+	});
+	const totals = calculateInvoiceTotals(items, updated.discountPercent, updated.vatPercent);
+	return db.financeInvoice.update({
+		where: { id },
+		data: {
+			subtotal: totals.subtotal,
+			discountAmount: totals.discountAmount,
+			vatAmount: totals.vatAmount,
+			totalAmount: totals.totalAmount,
+		},
+	});
+}
+
+/**
+ * Replace a staging invoice draft's items and recompute totals.
+ */
+export async function updateInvoiceDraftItems(
+	id: string,
+	organizationId: string,
+	items: Array<{
+		id?: string;
+		description: string;
+		quantity: number;
+		unit?: string;
+		unitPrice: number;
+	}>,
+) {
+	const existing = await db.financeInvoice.findFirst({
+		where: { id, organizationId, isDraft: true },
+		select: { id: true, discountPercent: true, vatPercent: true },
+	});
+	if (!existing) {
+		throw new Error("المسودة غير موجودة");
+	}
+
+	await db.financeInvoiceItem.deleteMany({ where: { invoiceId: id } });
+	const totals = calculateInvoiceTotals(items, existing.discountPercent, existing.vatPercent);
+	await db.financeInvoiceItem.createMany({
+		data: items.map((item, index) => ({
+			invoiceId: id,
+			description: item.description,
+			quantity: item.quantity,
+			unit: item.unit,
+			unitPrice: item.unitPrice,
+			totalPrice: totals.itemTotals[index],
+			sortOrder: index,
+		})),
+	});
+
+	return db.financeInvoice.update({
+		where: { id },
+		data: {
+			subtotal: totals.subtotal,
+			discountAmount: totals.discountAmount,
+			vatAmount: totals.vatAmount,
+			totalAmount: totals.totalAmount,
+		},
+		include: { items: { orderBy: { sortOrder: "asc" } } },
+	});
+}
+
+/**
+ * Resume or create an edit-draft for a committed invoice.
+ * Guard: only DRAFT-status invoices are editable (issued/tax invoices use credit-note flow → ZATCA safe).
+ */
+export async function getOrCreateInvoiceEditDraft(
+	sourceInvoiceId: string,
+	organizationId: string,
+	createdById: string,
+) {
+	const existing = await db.financeInvoice.findFirst({
+		where: { organizationId, isDraft: true, sourceInvoiceId },
+		select: { id: true },
+	});
+	if (existing) {
+		return existing;
+	}
+
+	const source = await db.financeInvoice.findFirst({
+		where: { id: sourceInvoiceId, organizationId },
+		include: { items: { orderBy: { sortOrder: "asc" } } },
+	});
+	if (!source) {
+		throw new Error("الفاتورة غير موجودة");
+	}
+	if (source.isDraft) {
+		throw new Error("لا يمكن إنشاء مسودة تعديل لمسودة.");
+	}
+	if (source.status !== "DRAFT") {
+		throw new Error(
+			"لا يمكن تعديل فاتورة تم إصدارها. أنشئ إشعاراً دائناً بدلاً من ذلك.",
+		);
+	}
+
+	return db.financeInvoice.create({
+		data: {
+			organizationId,
+			createdById,
+			invoiceNo: `${DRAFT_NO_PREFIX}${randomUUID()}`,
+			isDraft: true,
+			sourceInvoiceId,
+			invoiceType: source.invoiceType,
+			clientId: source.clientId,
+			clientName: source.clientName,
+			clientCompany: source.clientCompany,
+			clientPhone: source.clientPhone,
+			clientEmail: source.clientEmail,
+			clientAddress: source.clientAddress,
+			clientTaxNumber: source.clientTaxNumber,
+			projectId: source.projectId,
+			status: "DRAFT",
+			issueDate: source.issueDate,
+			dueDate: source.dueDate,
+			paymentTerms: source.paymentTerms,
+			notes: source.notes,
+			templateId: source.templateId,
+			subtotal: source.subtotal,
+			discountPercent: source.discountPercent,
+			discountAmount: source.discountAmount,
+			vatPercent: source.vatPercent,
+			vatAmount: source.vatAmount,
+			totalAmount: source.totalAmount,
+			paidAmount: 0,
+			sellerTaxNumber: source.sellerTaxNumber,
+			items: {
+				create: source.items.map((item) => ({
+					description: item.description,
+					quantity: item.quantity,
+					unit: item.unit,
+					unitPrice: item.unitPrice,
+					totalPrice: item.totalPrice,
+					sortOrder: item.sortOrder,
+				})),
+			},
+		},
+		include: { items: { orderBy: { sortOrder: "asc" } } },
+	});
+}
+
+/**
+ * Commit a staging invoice draft.
+ * - New draft (no source): mint official number, flip isDraft=false. Stays DRAFT status.
+ * - Edit draft (has source): apply header+items onto the committed original, delete the draft.
+ */
+export async function commitInvoiceDraft(
+	draftId: string,
+	organizationId: string,
+) {
+	const draft = await db.financeInvoice.findFirst({
+		where: { id: draftId, organizationId, isDraft: true },
+		include: { items: { orderBy: { sortOrder: "asc" } } },
+	});
+	if (!draft) {
+		throw new Error("المسودة غير موجودة");
+	}
+
+	const totals = calculateInvoiceTotals(
+		draft.items.map((i) => ({ quantity: i.quantity, unitPrice: i.unitPrice })),
+		draft.discountPercent,
+		draft.vatPercent,
+	);
+
+	// ── New draft → real invoice ──
+	if (!draft.sourceInvoiceId) {
+		const MAX_RETRIES = 3;
+		for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+			const invoiceNo = await generateInvoiceNumber(organizationId);
+			try {
+				const committed = await db.financeInvoice.update({
+					where: { id: draftId },
+					data: {
+						isDraft: false,
+						invoiceNo,
+						subtotal: totals.subtotal,
+						discountAmount: totals.discountAmount,
+						vatAmount: totals.vatAmount,
+						totalAmount: totals.totalAmount,
+					},
+					include: { items: { orderBy: { sortOrder: "asc" } } },
+				});
+				// إذا أُنشئت من عرض سعر، علّمه CONVERTED
+				if (draft.quotationId) {
+					await db.quotation
+						.update({ where: { id: draft.quotationId }, data: { status: "CONVERTED" } })
+						.catch(() => {});
+				}
+				return committed;
+			} catch (e: any) {
+				const isUniqueViolation =
+					e?.code === "P2002" ||
+					(e?.message && e.message.includes("Unique constraint failed"));
+				if (isUniqueViolation && attempt < MAX_RETRIES - 1) {
+					const { resyncSequence } = await import("./sequences");
+					const year = new Date().getFullYear();
+					await resyncSequence(
+						organizationId,
+						`INV-${year}`,
+						"finance_invoices",
+						"invoice_no",
+						`INV-${year}`,
+					);
+					continue;
+				}
+				throw e;
+			}
+		}
+		throw new Error("Failed to commit invoice draft after retries");
+	}
+
+	// ── Edit draft → apply onto committed original ──
+	return db.$transaction(async (tx) => {
+		const original = await tx.financeInvoice.findFirst({
+			where: { id: draft.sourceInvoiceId!, organizationId },
+			select: { id: true, status: true },
+		});
+		if (!original) {
+			throw new Error("الفاتورة الأصلية غير موجودة");
+		}
+		if (original.status !== "DRAFT") {
+			throw new Error(
+				"لا يمكن تطبيق التعديلات على فاتورة تم إصدارها. أنشئ إشعاراً دائناً بدلاً من ذلك.",
+			);
+		}
+
+		await tx.financeInvoiceItem.deleteMany({ where: { invoiceId: original.id } });
+		await tx.financeInvoiceItem.createMany({
+			data: draft.items.map((item, index) => ({
+				invoiceId: original.id,
+				description: item.description,
+				quantity: item.quantity,
+				unit: item.unit,
+				unitPrice: item.unitPrice,
+				totalPrice: totals.itemTotals[index],
+				sortOrder: index,
+			})),
+		});
+
+		const updated = await tx.financeInvoice.update({
+			where: { id: original.id },
+			data: {
+				invoiceType: draft.invoiceType,
+				clientId: draft.clientId,
+				clientName: draft.clientName,
+				clientCompany: draft.clientCompany,
+				clientPhone: draft.clientPhone,
+				clientEmail: draft.clientEmail,
+				clientAddress: draft.clientAddress,
+				clientTaxNumber: draft.clientTaxNumber,
+				projectId: draft.projectId,
+				issueDate: draft.issueDate,
+				dueDate: draft.dueDate,
+				paymentTerms: draft.paymentTerms,
+				notes: draft.notes,
+				templateId: draft.templateId,
+				subtotal: totals.subtotal,
+				discountPercent: draft.discountPercent,
+				discountAmount: totals.discountAmount,
+				vatPercent: draft.vatPercent,
+				vatAmount: totals.vatAmount,
+				totalAmount: totals.totalAmount,
+			},
+			include: { items: { orderBy: { sortOrder: "asc" } } },
+		});
+
+		await tx.financeInvoice.delete({ where: { id: draftId } });
+		return updated;
+	});
+}
+
+/**
+ * Discard (hard-delete) a staging invoice draft. Original (if edit-draft) is untouched.
+ */
+export async function deleteInvoiceDraft(id: string, organizationId: string) {
+	const existing = await db.financeInvoice.findFirst({
+		where: { id, organizationId, isDraft: true },
+		select: { id: true },
+	});
+	if (!existing) {
+		throw new Error("المسودة غير موجودة");
+	}
+	return db.financeInvoice.delete({ where: { id } });
+}
+
+/**
+ * List staging invoice drafts for an organization.
+ */
+export async function getOrganizationInvoiceDrafts(
+	organizationId: string,
+	options?: { query?: string; limit?: number; offset?: number },
+) {
+	const where: {
+		organizationId: string;
+		isDraft: boolean;
+		OR?: Array<{
+			clientName?: { contains: string; mode: "insensitive" };
+			clientCompany?: { contains: string; mode: "insensitive" };
+		}>;
+	} = { organizationId, isDraft: true };
+
+	if (options?.query) {
+		where.OR = [
+			{ clientName: { contains: options.query, mode: "insensitive" } },
+			{ clientCompany: { contains: options.query, mode: "insensitive" } },
+		];
+	}
+
+	const [drafts, total] = await Promise.all([
+		db.financeInvoice.findMany({
+			where,
+			include: {
+				sourceInvoice: { select: { id: true, invoiceNo: true } },
+				_count: { select: { items: true } },
+			},
+			orderBy: { updatedAt: "desc" },
+			take: options?.limit ?? 50,
+			skip: options?.offset ?? 0,
+		}),
+		db.financeInvoice.count({ where }),
+	]);
+
+	return { drafts, total };
+}
+
+/** Count staging invoice drafts (for badge). */
+export async function countOrganizationInvoiceDrafts(organizationId: string) {
+	return db.financeInvoice.count({ where: { organizationId, isDraft: true } });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DRAFTS (مسودات staging) — QUOTATIONS
+// ═══════════════════════════════════════════════════════════════════════════
+
+type QuotationDraftHeader = Partial<{
+	clientId: string | null;
+	clientName: string;
+	clientCompany: string | null;
+	clientPhone: string | null;
+	clientEmail: string | null;
+	clientAddress: string | null;
+	clientTaxNumber: string | null;
+	projectId: string | null;
+	validUntil: Date;
+	paymentTerms: string | null;
+	deliveryTerms: string | null;
+	warrantyTerms: string | null;
+	notes: string | null;
+	introduction: string | null;
+	termsAndConditions: string | null;
+	templateId: string | null;
+	vatPercent: number;
+	discountPercent: number;
+}>;
+
+function quotationTotals(
+	items: Array<{ quantity: number; unitPrice: number }>,
+	discountPercent: number,
+	vatPercent: number,
+) {
+	let subtotal = 0;
+	const itemTotals = items.map((item) => {
+		const totalPrice = item.quantity * item.unitPrice;
+		subtotal += totalPrice;
+		return totalPrice;
+	});
+	const discountAmount = (subtotal * discountPercent) / 100;
+	const afterDiscount = subtotal - discountAmount;
+	const vatAmount = (afterDiscount * vatPercent) / 100;
+	const totalAmount = afterDiscount + vatAmount;
+	return { subtotal, discountAmount, vatAmount, totalAmount, itemTotals };
+}
+
+/** Create a new staging quotation draft (lazy autosave target). */
+export async function createQuotationDraft(data: {
+	organizationId: string;
+	createdById: string;
+	sourceQuotationId?: string;
+	clientId?: string;
+	clientName?: string;
+	clientCompany?: string;
+	clientPhone?: string;
+	clientEmail?: string;
+	clientAddress?: string;
+	clientTaxNumber?: string;
+	projectId?: string;
+	validUntil?: Date;
+	paymentTerms?: string;
+	deliveryTerms?: string;
+	warrantyTerms?: string;
+	notes?: string;
+	introduction?: string;
+	termsAndConditions?: string;
+	templateId?: string;
+	vatPercent?: number;
+	discountPercent?: number;
+	items?: Array<{ description: string; quantity: number; unit?: string; unitPrice: number }>;
+	contentBlocks?: Array<{ title: string; content: string; position: "BEFORE_TABLE" | "AFTER_TABLE" }>;
+}) {
+	const items = data.items ?? [];
+	const discountPercent = data.discountPercent ?? 0;
+	const vatPercent = data.vatPercent ?? 15;
+	const totals = quotationTotals(items, discountPercent, vatPercent);
+	const today = new Date();
+	const defaultValidUntil = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+	return db.quotation.create({
+		data: {
+			organizationId: data.organizationId,
+			createdById: data.createdById,
+			quotationNo: `${DRAFT_NO_PREFIX}${randomUUID()}`,
+			isDraft: true,
+			sourceQuotationId: data.sourceQuotationId,
+			clientId: data.clientId,
+			clientName: data.clientName ?? "",
+			clientCompany: data.clientCompany,
+			clientPhone: data.clientPhone,
+			clientEmail: data.clientEmail,
+			clientAddress: data.clientAddress,
+			clientTaxNumber: data.clientTaxNumber,
+			projectId: data.projectId,
+			status: "DRAFT",
+			validUntil: data.validUntil ?? defaultValidUntil,
+			paymentTerms: data.paymentTerms,
+			deliveryTerms: data.deliveryTerms,
+			warrantyTerms: data.warrantyTerms,
+			notes: data.notes,
+			introduction: data.introduction,
+			termsAndConditions: data.termsAndConditions,
+			templateId: data.templateId,
+			subtotal: totals.subtotal,
+			discountPercent,
+			discountAmount: totals.discountAmount,
+			vatPercent,
+			vatAmount: totals.vatAmount,
+			totalAmount: totals.totalAmount,
+			items: {
+				create: items.map((item, index) => ({
+					description: item.description,
+					quantity: item.quantity,
+					unit: item.unit,
+					unitPrice: item.unitPrice,
+					totalPrice: item.quantity * item.unitPrice,
+					sortOrder: index,
+				})),
+			},
+			contentBlocks: data.contentBlocks?.length
+				? {
+						create: data.contentBlocks.map((block, index) => ({
+							title: block.title,
+							content: block.content,
+							position: block.position,
+							sortOrder: index,
+						})),
+					}
+				: undefined,
+		},
+		include: {
+			items: { orderBy: { sortOrder: "asc" } },
+			contentBlocks: { orderBy: { sortOrder: "asc" } },
+		},
+	});
+}
+
+/** Update a staging quotation draft's header. Recomputes totals from current items. */
+export async function updateQuotationDraftHeader(
+	id: string,
+	organizationId: string,
+	data: QuotationDraftHeader,
+) {
+	const existing = await db.quotation.findFirst({
+		where: { id, organizationId, isDraft: true },
+		select: { id: true },
+	});
+	if (!existing) {
+		throw new Error("المسودة غير موجودة");
+	}
+
+	const updated = await db.quotation.update({ where: { id }, data });
+	const items = await db.quotationItem.findMany({
+		where: { quotationId: id },
+		select: { quantity: true, unitPrice: true },
+	});
+	const totals = quotationTotals(
+		items.map((i) => ({ quantity: Number(i.quantity), unitPrice: Number(i.unitPrice) })),
+		Number(updated.discountPercent),
+		Number(updated.vatPercent),
+	);
+	return db.quotation.update({
+		where: { id },
+		data: {
+			subtotal: totals.subtotal,
+			discountAmount: totals.discountAmount,
+			vatAmount: totals.vatAmount,
+			totalAmount: totals.totalAmount,
+		},
+	});
+}
+
+/** Replace a staging quotation draft's items and recompute totals. */
+export async function updateQuotationDraftItems(
+	id: string,
+	organizationId: string,
+	items: Array<{ id?: string; description: string; quantity: number; unit?: string; unitPrice: number }>,
+) {
+	const existing = await db.quotation.findFirst({
+		where: { id, organizationId, isDraft: true },
+		select: { id: true, discountPercent: true, vatPercent: true },
+	});
+	if (!existing) {
+		throw new Error("المسودة غير موجودة");
+	}
+
+	await db.quotationItem.deleteMany({ where: { quotationId: id } });
+	await db.quotationItem.createMany({
+		data: items.map((item, index) => ({
+			quotationId: id,
+			description: item.description,
+			quantity: item.quantity,
+			unit: item.unit,
+			unitPrice: item.unitPrice,
+			totalPrice: item.quantity * item.unitPrice,
+			sortOrder: index,
+		})),
+	});
+
+	const totals = quotationTotals(items, Number(existing.discountPercent), Number(existing.vatPercent));
+	return db.quotation.update({
+		where: { id },
+		data: {
+			subtotal: totals.subtotal,
+			discountAmount: totals.discountAmount,
+			vatAmount: totals.vatAmount,
+			totalAmount: totals.totalAmount,
+		},
+		include: { items: { orderBy: { sortOrder: "asc" } } },
+	});
+}
+
+/** Replace a staging quotation draft's content blocks. */
+export async function updateQuotationDraftContentBlocks(
+	id: string,
+	organizationId: string,
+	blocks: Array<{ title: string; content: string; position: "BEFORE_TABLE" | "AFTER_TABLE" }>,
+) {
+	const existing = await db.quotation.findFirst({
+		where: { id, organizationId, isDraft: true },
+		select: { id: true },
+	});
+	if (!existing) {
+		throw new Error("المسودة غير موجودة");
+	}
+
+	await db.quotationContentBlock.deleteMany({ where: { quotationId: id } });
+	if (blocks.length > 0) {
+		await db.quotationContentBlock.createMany({
+			data: blocks.map((block, index) => ({
+				quotationId: id,
+				title: block.title,
+				content: block.content,
+				position: block.position as any,
+				sortOrder: index,
+			})),
+		});
+	}
+
+	return db.quotation.findFirst({
+		where: { id },
+		include: { contentBlocks: { orderBy: { sortOrder: "asc" } } },
+	});
+}
+
+/**
+ * Resume or create an edit-draft for a committed quotation.
+ * Guard: cannot edit a CONVERTED quotation.
+ */
+export async function getOrCreateQuotationEditDraft(
+	sourceQuotationId: string,
+	organizationId: string,
+	createdById: string,
+) {
+	const existing = await db.quotation.findFirst({
+		where: { organizationId, isDraft: true, sourceQuotationId },
+		select: { id: true },
+	});
+	if (existing) {
+		return existing;
+	}
+
+	const source = await db.quotation.findFirst({
+		where: { id: sourceQuotationId, organizationId },
+		include: {
+			items: { orderBy: { sortOrder: "asc" } },
+			contentBlocks: { orderBy: { sortOrder: "asc" } },
+		},
+	});
+	if (!source) {
+		throw new Error("عرض السعر غير موجود");
+	}
+	if (source.isDraft) {
+		throw new Error("لا يمكن إنشاء مسودة تعديل لمسودة.");
+	}
+	if (source.status === "CONVERTED") {
+		throw new Error("لا يمكن تعديل عرض سعر تم تحويله إلى فاتورة.");
+	}
+
+	return db.quotation.create({
+		data: {
+			organizationId,
+			createdById,
+			quotationNo: `${DRAFT_NO_PREFIX}${randomUUID()}`,
+			isDraft: true,
+			sourceQuotationId,
+			clientId: source.clientId,
+			clientName: source.clientName,
+			clientCompany: source.clientCompany,
+			clientPhone: source.clientPhone,
+			clientEmail: source.clientEmail,
+			clientAddress: source.clientAddress,
+			clientTaxNumber: source.clientTaxNumber,
+			projectId: source.projectId,
+			status: "DRAFT",
+			validUntil: source.validUntil,
+			paymentTerms: source.paymentTerms,
+			deliveryTerms: source.deliveryTerms,
+			warrantyTerms: source.warrantyTerms,
+			notes: source.notes,
+			introduction: source.introduction,
+			termsAndConditions: source.termsAndConditions,
+			templateId: source.templateId,
+			subtotal: source.subtotal,
+			discountPercent: source.discountPercent,
+			discountAmount: source.discountAmount,
+			vatPercent: source.vatPercent,
+			vatAmount: source.vatAmount,
+			totalAmount: source.totalAmount,
+			items: {
+				create: source.items.map((item) => ({
+					description: item.description,
+					quantity: item.quantity,
+					unit: item.unit,
+					unitPrice: item.unitPrice,
+					totalPrice: item.totalPrice,
+					sortOrder: item.sortOrder,
+				})),
+			},
+			contentBlocks: source.contentBlocks.length
+				? {
+						create: source.contentBlocks.map((block) => ({
+							title: block.title,
+							content: block.content,
+							position: block.position,
+							sortOrder: block.sortOrder,
+						})),
+					}
+				: undefined,
+		},
+		include: {
+			items: { orderBy: { sortOrder: "asc" } },
+			contentBlocks: { orderBy: { sortOrder: "asc" } },
+		},
+	});
+}
+
+/**
+ * Commit a staging quotation draft.
+ * - New draft: mint official number, flip isDraft=false. Stays DRAFT status.
+ * - Edit draft: apply header+items+contentBlocks onto the committed original, delete the draft.
+ */
+export async function commitQuotationDraft(draftId: string, organizationId: string) {
+	const draft = await db.quotation.findFirst({
+		where: { id: draftId, organizationId, isDraft: true },
+		include: {
+			items: { orderBy: { sortOrder: "asc" } },
+			contentBlocks: { orderBy: { sortOrder: "asc" } },
+		},
+	});
+	if (!draft) {
+		throw new Error("المسودة غير موجودة");
+	}
+
+	const totals = quotationTotals(
+		draft.items.map((i) => ({ quantity: Number(i.quantity), unitPrice: Number(i.unitPrice) })),
+		Number(draft.discountPercent),
+		Number(draft.vatPercent),
+	);
+
+	// ── New draft → real quotation ──
+	if (!draft.sourceQuotationId) {
+		const MAX_RETRIES = 3;
+		for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+			const quotationNo = await generateQuotationNumber(organizationId);
+			try {
+				return await db.quotation.update({
+					where: { id: draftId },
+					data: {
+						isDraft: false,
+						quotationNo,
+						subtotal: totals.subtotal,
+						discountAmount: totals.discountAmount,
+						vatAmount: totals.vatAmount,
+						totalAmount: totals.totalAmount,
+					},
+					include: {
+						items: { orderBy: { sortOrder: "asc" } },
+						contentBlocks: { orderBy: { sortOrder: "asc" } },
+					},
+				});
+			} catch (e: any) {
+				const isUniqueViolation =
+					e?.code === "P2002" ||
+					(e?.message && e.message.includes("Unique constraint failed"));
+				if (isUniqueViolation && attempt < MAX_RETRIES - 1) {
+					const { resyncSequence } = await import("./sequences");
+					const year = new Date().getFullYear();
+					await resyncSequence(
+						organizationId,
+						`QT-${year}`,
+						"quotations",
+						"quotation_no",
+						`QT-${year}`,
+					);
+					continue;
+				}
+				throw e;
+			}
+		}
+		throw new Error("Failed to commit quotation draft after retries");
+	}
+
+	// ── Edit draft → apply onto committed original ──
+	return db.$transaction(async (tx) => {
+		const original = await tx.quotation.findFirst({
+			where: { id: draft.sourceQuotationId!, organizationId },
+			select: { id: true, status: true },
+		});
+		if (!original) {
+			throw new Error("عرض السعر الأصلي غير موجود");
+		}
+		if (original.status === "CONVERTED") {
+			throw new Error("لا يمكن تطبيق التعديلات على عرض سعر تم تحويله إلى فاتورة.");
+		}
+
+		await tx.quotationItem.deleteMany({ where: { quotationId: original.id } });
+		await tx.quotationItem.createMany({
+			data: draft.items.map((item, index) => ({
+				quotationId: original.id,
+				description: item.description,
+				quantity: item.quantity,
+				unit: item.unit,
+				unitPrice: item.unitPrice,
+				totalPrice: item.totalPrice,
+				sortOrder: index,
+			})),
+		});
+
+		await tx.quotationContentBlock.deleteMany({ where: { quotationId: original.id } });
+		if (draft.contentBlocks.length > 0) {
+			await tx.quotationContentBlock.createMany({
+				data: draft.contentBlocks.map((block, index) => ({
+					quotationId: original.id,
+					title: block.title,
+					content: block.content,
+					position: block.position,
+					sortOrder: index,
+				})),
+			});
+		}
+
+		const updated = await tx.quotation.update({
+			where: { id: original.id },
+			data: {
+				clientId: draft.clientId,
+				clientName: draft.clientName,
+				clientCompany: draft.clientCompany,
+				clientPhone: draft.clientPhone,
+				clientEmail: draft.clientEmail,
+				clientAddress: draft.clientAddress,
+				clientTaxNumber: draft.clientTaxNumber,
+				projectId: draft.projectId,
+				validUntil: draft.validUntil,
+				paymentTerms: draft.paymentTerms,
+				deliveryTerms: draft.deliveryTerms,
+				warrantyTerms: draft.warrantyTerms,
+				notes: draft.notes,
+				introduction: draft.introduction,
+				termsAndConditions: draft.termsAndConditions,
+				templateId: draft.templateId,
+				subtotal: totals.subtotal,
+				discountPercent: draft.discountPercent,
+				discountAmount: totals.discountAmount,
+				vatPercent: draft.vatPercent,
+				vatAmount: totals.vatAmount,
+				totalAmount: totals.totalAmount,
+			},
+			include: {
+				items: { orderBy: { sortOrder: "asc" } },
+				contentBlocks: { orderBy: { sortOrder: "asc" } },
+			},
+		});
+
+		await tx.quotation.delete({ where: { id: draftId } });
+		return updated;
+	});
+}
+
+/** Discard (hard-delete) a staging quotation draft. */
+export async function deleteQuotationDraft(id: string, organizationId: string) {
+	const existing = await db.quotation.findFirst({
+		where: { id, organizationId, isDraft: true },
+		select: { id: true },
+	});
+	if (!existing) {
+		throw new Error("المسودة غير موجودة");
+	}
+	return db.quotation.delete({ where: { id } });
+}
+
+/** List staging quotation drafts for an organization. */
+export async function getOrganizationQuotationDrafts(
+	organizationId: string,
+	options?: { query?: string; limit?: number; offset?: number },
+) {
+	const where: {
+		organizationId: string;
+		isDraft: boolean;
+		OR?: Array<{
+			clientName?: { contains: string; mode: "insensitive" };
+			clientCompany?: { contains: string; mode: "insensitive" };
+		}>;
+	} = { organizationId, isDraft: true };
+
+	if (options?.query) {
+		where.OR = [
+			{ clientName: { contains: options.query, mode: "insensitive" } },
+			{ clientCompany: { contains: options.query, mode: "insensitive" } },
+		];
+	}
+
+	const [drafts, total] = await Promise.all([
+		db.quotation.findMany({
+			where,
+			include: {
+				sourceQuotation: { select: { id: true, quotationNo: true } },
+				_count: { select: { items: true } },
+			},
+			orderBy: { updatedAt: "desc" },
+			take: options?.limit ?? 50,
+			skip: options?.offset ?? 0,
+		}),
+		db.quotation.count({ where }),
+	]);
+
+	return { drafts, total };
+}
+
+/** Count staging quotation drafts (for badge). */
+export async function countOrganizationQuotationDrafts(organizationId: string) {
+	return db.quotation.count({ where: { organizationId, isDraft: true } });
 }

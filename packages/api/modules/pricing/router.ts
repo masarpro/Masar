@@ -14,6 +14,18 @@ import {
 	deleteQuotationProcedure,
 	convertQuotationToInvoiceProcedure,
 } from "../finance/procedures/create-quotation";
+import {
+	createQuotationDraftProcedure,
+	updateQuotationDraftProcedure,
+	updateQuotationDraftItemsProcedure,
+	updateQuotationDraftContentBlocksProcedure,
+	editQuotationProcedure,
+	commitQuotationDraftProcedure,
+	deleteQuotationDraftProcedure,
+	listQuotationDraftsProcedure,
+	getQuotationDraftProcedure,
+	countQuotationDraftsProcedure,
+} from "../finance/procedures/quotation-drafts";
 
 import { leadsRouter } from "./procedures/leads/router";
 import { getPricingDashboard } from "./procedures/dashboard";
@@ -36,6 +48,19 @@ export const pricingRouter = {
 		updateStatus: updateQuotationStatusProcedure,
 		delete: deleteQuotationProcedure,
 		convertToInvoice: convertQuotationToInvoiceProcedure,
+		startEdit: editQuotationProcedure,
+		// Drafts (مسودات) staging
+		drafts: {
+			list: listQuotationDraftsProcedure,
+			getById: getQuotationDraftProcedure,
+			count: countQuotationDraftsProcedure,
+			create: createQuotationDraftProcedure,
+			updateHeader: updateQuotationDraftProcedure,
+			updateItems: updateQuotationDraftItemsProcedure,
+			updateContentBlocks: updateQuotationDraftContentBlocksProcedure,
+			commit: commitQuotationDraftProcedure,
+			delete: deleteQuotationDraftProcedure,
+		},
 	},
 
 	// Leads (العملاء المحتملون) — lead management procedures

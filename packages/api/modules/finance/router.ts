@@ -17,6 +17,17 @@ import {
 
 import { listInvoices, getInvoice } from "./procedures/list-invoices";
 import {
+	createInvoiceDraftProcedure,
+	updateInvoiceDraftProcedure,
+	updateInvoiceDraftItemsProcedure,
+	editInvoiceProcedure,
+	commitInvoiceDraftProcedure,
+	deleteInvoiceDraftProcedure,
+	listInvoiceDraftsProcedure,
+	getInvoiceDraftProcedure,
+	countInvoiceDraftsProcedure,
+} from "./procedures/invoice-drafts";
+import {
 	createInvoiceProcedure,
 	updateInvoiceProcedure,
 	updateInvoiceItemsProcedure,
@@ -182,6 +193,18 @@ export const financeRouter = {
 		createCreditNote: createCreditNoteProcedure,
 		updateNotes: updateInvoiceNotesProcedure,
 		getActivity: getInvoiceActivityProcedure,
+		startEdit: editInvoiceProcedure,
+		// Drafts (مسودات) staging
+		drafts: {
+			list: listInvoiceDraftsProcedure,
+			getById: getInvoiceDraftProcedure,
+			count: countInvoiceDraftsProcedure,
+			create: createInvoiceDraftProcedure,
+			updateHeader: updateInvoiceDraftProcedure,
+			updateItems: updateInvoiceDraftItemsProcedure,
+			commit: commitInvoiceDraftProcedure,
+			delete: deleteInvoiceDraftProcedure,
+		},
 	},
 
 	// Open Documents

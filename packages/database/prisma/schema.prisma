@@ -3702,6 +3702,9 @@ enum OrgAuditAction {
   INVOICE_ISSUED // إصدار فاتورة رسمياً
   INVOICE_DUPLICATED // نسخ فاتورة
   INVOICE_CREDIT_NOTE_CREATED // إنشاء إشعار دائن
+  INVOICE_DRAFT_CREATED // إنشاء مسودة فاتورة
+  INVOICE_DRAFT_COMMITTED // حفظ مسودة فاتورة
+  INVOICE_DRAFT_DISCARDED // تجاهل مسودة فاتورة
 
   // ── عروض الأسعار (Quotations) ──
   QUOTATION_CREATED // إنشاء عرض سعر
@@ -3710,6 +3713,9 @@ enum OrgAuditAction {
   QUOTATION_STATUS_CHANGED // تغيير حالة عرض سعر
   QUOTATION_DELETED // حذف عرض سعر
   QUOTATION_CONVERTED // تحويل عرض سعر لفاتورة
+  QUOTATION_DRAFT_CREATED // إنشاء مسودة عرض سعر
+  QUOTATION_DRAFT_COMMITTED // حفظ مسودة عرض سعر
+  QUOTATION_DRAFT_DISCARDED // تجاهل مسودة عرض سعر
 
   // ── العملاء (Clients) ──
   CLIENT_CREATED // إنشاء عميل
@@ -3967,6 +3973,14 @@ model Quotation {
   costStudyId String?    @map("cost_study_id")
   costStudy   CostStudy? @relation(fields: [costStudyId], references: [id], onDelete: SetNull)
 
+  // ── المسودات (Drafts staging) ──
+  // isDraft=true: مسودة غير معتمدة (staging) لا تظهر في القائمة الرئيسية كعرض سعر حقيقي
+  // sourceQuotationId: عند وجوده فهذه مسودة تعديل مرتبطة بعرض سعر معتمد لا يتغيّر حتى الحفظ
+  isDraft           Boolean    @default(false) @map("is_draft")
+  sourceQuotationId String?    @map("source_quotation_id")
+  sourceQuotation   Quotation? @relation("QuotationEditDraft", fields: [sourceQuotationId], references: [id], onDelete: Cascade)
+  editDrafts        Quotation[] @relation("QuotationEditDraft")
+
   // العلاقات
   items         QuotationItem[]
   invoices      FinanceInvoice[] // الفواتير المحولة من هذا العرض
@@ -3979,6 +3993,8 @@ model Quotation {
   @@index([organizationId, clientId])
   @@index([organizationId, projectId])
   @@index([costStudyId])
+  @@index([organizationId, isDraft])
+  @@index([sourceQuotationId])
   @@map("quotations")
 }
 
@@ -4171,6 +4187,14 @@ model FinanceInvoice {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  // ── المسودات (Drafts staging) ──
+  // isDraft=true: مسودة غير معتمدة (staging) لا تظهر في قائمة الفواتير الحقيقية ولا تستهلك رقماً رسمياً
+  // sourceInvoiceId: عند وجوده فهذه مسودة تعديل مرتبطة بفاتورة معتمدة لا تتغيّر حتى الحفظ
+  isDraft         Boolean          @default(false) @map("is_draft")
+  sourceInvoiceId String?          @map("source_invoice_id")
+  sourceInvoice   FinanceInvoice?  @relation("InvoiceEditDraft", fields: [sourceInvoiceId], references: [id], onDelete: Cascade)
+  editDrafts      FinanceInvoice[] @relation("InvoiceEditDraft")
+
   // العلاقات
   items            FinanceInvoiceItem[]
   payments         FinanceInvoicePayment[]
@@ -4185,6 +4209,8 @@ model FinanceInvoice {
   @@index([organizationId, dueDate])
   @@index([relatedInvoiceId])
   @@index([organizationId, zatcaSubmissionStatus])
+  @@index([organizationId, isDraft])
+  @@index([sourceInvoiceId])
   @@map("finance_invoices")
 }
 

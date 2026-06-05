@@ -3,29 +3,27 @@
 import { useTranslations } from "next-intl";
 import { formatCurrency } from "@saas/shared/lib/invoice-constants";
 import { Button } from "@ui/components/button";
-import { FileCheck } from "lucide-react";
+import { FileCheck, Save } from "lucide-react";
 import { AutosaveIndicator } from "@saas/shared/components/AutosaveIndicator";
 import type { AutosaveState } from "@saas/shared/hooks/use-autosave";
 
 interface InvoiceMobileBarProps {
 	totalAmount: number;
 	currency: string;
-	isEditMode: boolean;
 	isBusy: boolean;
-	invoiceStatus?: string;
 	autosaveState: AutosaveState;
 	onAutosaveRetry: () => void;
+	onSaveClick: () => void;
 	onIssueClick: () => void;
 }
 
 export function InvoiceMobileBar({
 	totalAmount,
 	currency,
-	isEditMode,
 	isBusy,
-	invoiceStatus,
 	autosaveState,
 	onAutosaveRetry,
+	onSaveClick,
 	onIssueClick,
 }: InvoiceMobileBarProps) {
 	const t = useTranslations();
@@ -39,15 +37,17 @@ export function InvoiceMobileBar({
 						{formatCurrency(totalAmount)}
 						<span className="text-xs font-normal text-muted-foreground ms-1">{currency}</span>
 					</p>
-					<AutosaveIndicator state={autosaveState} onRetry={onAutosaveRetry} className="mt-0.5" />
+					<AutosaveIndicator state={autosaveState} onRetry={onAutosaveRetry} mode="draft" className="mt-0.5" />
 				</div>
 				<div className="flex gap-2 shrink-0">
-					{(!isEditMode || invoiceStatus === "DRAFT") && (
-						<Button type="button" size="sm" disabled={isBusy} onClick={onIssueClick} className="rounded-xl h-9">
-							<FileCheck className="h-4 w-4 me-1" />
-							{t("finance.invoices.issueInvoice")}
-						</Button>
-					)}
+					<Button type="button" variant="outline" size="sm" disabled={isBusy} onClick={onSaveClick} className="rounded-xl h-9">
+						<Save className="h-4 w-4 me-1" />
+						{t("common.save")}
+					</Button>
+					<Button type="button" size="sm" disabled={isBusy} onClick={onIssueClick} className="rounded-xl h-9">
+						<FileCheck className="h-4 w-4 me-1" />
+						{t("finance.invoices.issueInvoice")}
+					</Button>
 				</div>
 			</div>
 		</div>

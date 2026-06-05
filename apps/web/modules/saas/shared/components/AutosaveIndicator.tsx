@@ -10,6 +10,8 @@ interface AutosaveIndicatorProps {
 	state: AutosaveState;
 	onRetry?: () => void;
 	className?: string;
+	/** "draft" يبدّل النصوص لتوضّح أن الحفظ التلقائي يكتب على مسودة (مختلف عن زر "حفظ") */
+	mode?: "default" | "draft";
 }
 
 function formatRelativeTime(date: Date, t: (key: string) => string): string {
@@ -22,9 +24,10 @@ function formatRelativeTime(date: Date, t: (key: string) => string): string {
 	return `${hours}h`;
 }
 
-export function AutosaveIndicator({ state, onRetry, className }: AutosaveIndicatorProps) {
+export function AutosaveIndicator({ state, onRetry, className, mode = "default" }: AutosaveIndicatorProps) {
 	const t = useTranslations();
 	const [, forceTick] = useState(0);
+	const isDraft = mode === "draft";
 
 	// تحديث "saved X ago" بصرياً كل 15 ثانية
 	useEffect(() => {
@@ -63,7 +66,7 @@ export function AutosaveIndicator({ state, onRetry, className }: AutosaveIndicat
 				)}
 			>
 				<Loader2 className="h-3 w-3 animate-spin" />
-				<span>{t("autosave.saving")}</span>
+				<span>{t(isDraft ? "autosave.draftSaving" : "autosave.saving")}</span>
 			</span>
 		);
 	}
@@ -78,7 +81,7 @@ export function AutosaveIndicator({ state, onRetry, className }: AutosaveIndicat
 				)}
 			>
 				<Check className="h-3 w-3" />
-				<span>{t("autosave.saved")}</span>
+				<span>{t(isDraft ? "autosave.draftSaved" : "autosave.saved")}</span>
 			</span>
 		);
 	}
@@ -121,8 +124,8 @@ export function AutosaveIndicator({ state, onRetry, className }: AutosaveIndicat
 		const relative = formatRelativeTime(state.lastSavedAt, t);
 		const label =
 			relative === t("autosave.justNow")
-				? t("autosave.saved")
-				: t("autosave.savedAgo").replace("{time}", relative);
+				? t(isDraft ? "autosave.draftSaved" : "autosave.saved")
+				: t(isDraft ? "autosave.draftSavedAgo" : "autosave.savedAgo").replace("{time}", relative);
 		return (
 			<span
 				className={cn(

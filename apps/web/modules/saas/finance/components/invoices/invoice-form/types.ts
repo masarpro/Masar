@@ -1,7 +1,10 @@
 export interface CreateInvoiceFormProps {
 	organizationId: string;
 	organizationSlug: string;
+	/** فاتورة معتمدة نريد تعديلها — تُنشئ/تستأنف مسودة تعديل مرتبطة بها */
 	invoiceId?: string;
+	/** مسودة staging قائمة نريد استئنافها مباشرةً */
+	draftId?: string;
 }
 
 export interface InvoiceItem {

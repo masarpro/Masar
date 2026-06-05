@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -23,6 +23,7 @@ import { InvoiceNotesPanel } from "./InvoiceNotesPanel";
 import { InvoiceSummaryPanel } from "./InvoiceSummaryPanel";
 import { InvoicePaymentsSection } from "./InvoicePaymentsSection";
 import { InvoiceMobileBar } from "./InvoiceMobileBar";
+import { EditDraftBanner } from "@saas/shared/components/drafts/EditDraftBanner";
 import {
 	PreviewDialog,
 	IssueConfirmDialog,
@@ -35,6 +36,7 @@ export function CreateInvoiceForm({
 	organizationId,
 	organizationSlug,
 	invoiceId,
+	draftId,
 }: CreateInvoiceFormProps) {
 	const t = useTranslations();
 	const router = useRouter();
@@ -43,12 +45,21 @@ export function CreateInvoiceForm({
 	const quotationId = searchParams.get("quotationId");
 	const basePath = `/app/${organizationSlug}/finance/invoices`;
 
-	// internalInvoiceId يُحدّث بعد lazy create لتتبع ID المسودة الجديدة
-	// effectiveInvoiceId = prop invoiceId (edit mode) أو internalInvoiceId (بعد lazy create)
-	const [internalInvoiceId, setInternalInvoiceId] = useState<string | undefined>(invoiceId);
-	const effectiveInvoiceId = invoiceId ?? internalInvoiceId;
-	const isEditMode = !!invoiceId; // الـ mode الأصلي للـ UI (لا يتغيّر بعد lazy create)
+	// نعمل دائماً على مسودة staging:
+	// - draftId: مسودة قائمة نستأنفها مباشرةً.
+	// - invoiceId: فاتورة معتمدة نعدّلها عبر مسودة تعديل (تُنشأ/تُستأنف عبر startEdit).
+	// - بدونهما: مسودة جديدة (lazy create عبر الحفظ التلقائي).
+	const [workingDraftId, setWorkingDraftId] = useState<string | undefined>(draftId);
+	const workingDraftIdRef = useRef<string | undefined>(draftId);
+	const setDraftIdBoth = useCallback((id: string | undefined) => {
+		workingDraftIdRef.current = id;
+		setWorkingDraftId(id);
+	}, []);
+	const effectiveDraftId = workingDraftId;
+	const isEditDraft = !!invoiceId; // نعدّل فاتورة معتمدة
 	const [isIssuing, setIsIssuing] = useState(false);
+	const [isCommitting, setIsCommitting] = useState(false);
+	const [isStartingEdit, setIsStartingEdit] = useState(!!invoiceId && !draftId);
 	const [showConflictDialog, setShowConflictDialog] = useState(false);
 
 	// Form state
@@ -164,52 +175,80 @@ export function CreateInvoiceForm({
 		staleTime: STALE_TIMES.FINANCE_SETTINGS,
 	});
 
-	// Apply finance settings defaults (create mode only)
+	// Apply finance settings defaults (مسودة جديدة فقط)
 	useEffect(() => {
-		if (orgSettings && !isEditMode) {
+		if (orgSettings && !invoiceId && !draftId) {
 			if (orgSettings.defaultVatPercent !== undefined) {
 				setVatPercent(orgSettings.defaultVatPercent);
 			}
 		}
-	}, [orgSettings, isEditMode]);
+	}, [orgSettings, invoiceId, draftId]);
 
-	// ─── Edit mode: Fetch invoice data ────────────────────
-	const { data: invoice, isLoading: isLoadingInvoice } = useQuery({
-		...orpc.finance.invoices.getById.queryOptions({
-			input: { organizationId, id: invoiceId ?? "" },
+	// ─── بدء/استئناف مسودة تعديل عند تمرير invoiceId (فاتورة معتمدة) ───
+	useEffect(() => {
+		if (!invoiceId || draftId || workingDraftIdRef.current) return;
+		let cancelled = false;
+		(async () => {
+			try {
+				const res = await orpcClient.finance.invoices.startEdit({ organizationId, id: invoiceId });
+				if (cancelled) return;
+				setDraftIdBoth(res.id);
+				if (typeof window !== "undefined") {
+					window.history.replaceState(null, "", `${basePath}/drafts/${res.id}`);
+				}
+			} catch (e: any) {
+				toast.error(e?.message || t("finance.invoices.notEditable"));
+				router.replace(`${basePath}/${invoiceId}`);
+			} finally {
+				if (!cancelled) setIsStartingEdit(false);
+			}
+		})();
+		return () => {
+			cancelled = true;
+		};
+	}, [invoiceId, draftId, organizationId, basePath, router, t, setDraftIdBoth]);
+
+	// ─── تحميل بيانات المسودة ────────────────────
+	const { data: draft, isLoading: isLoadingDraft } = useQuery({
+		...orpc.finance.invoices.drafts.getById.queryOptions({
+			input: { organizationId, id: workingDraftId ?? "" },
 		}),
-		enabled: !!invoiceId,
+		enabled: !!workingDraftId,
 	});
 
-	// Redirect if invoice is not DRAFT
-	useEffect(() => {
-		if (invoice && invoice.status !== "DRAFT") {
-			toast.error(t("finance.invoices.notEditable"));
-			router.replace(`${basePath}/${invoiceId}`);
-		}
-	}, [invoice, basePath, invoiceId, router, t]);
+	// رقم الفاتورة الأصلية (لشريط مسودة التعديل)
+	const sourceInvoiceId = (draft?.sourceInvoiceId as string | null | undefined) ?? undefined;
+	const { data: sourceInvoice } = useQuery({
+		...orpc.finance.invoices.getById.queryOptions({
+			input: { organizationId, id: sourceInvoiceId ?? "" },
+		}),
+		enabled: !!sourceInvoiceId,
+	});
+	const sourceInvoiceNo = sourceInvoice?.invoiceNo ?? null;
+	// نعرض واجهة "مسودة تعديل" إذا دخلنا عبر فاتورة معتمدة أو إذا كانت المسودة مرتبطة بأصل
+	const showEditDraftUi = isEditDraft || !!sourceInvoiceId;
 
-	// Populate form from invoice data
+	// تعبئة النموذج من المسودة
 	useEffect(() => {
-		if (invoice) {
-			setInvoiceType(invoice.invoiceType as "STANDARD" | "TAX" | "SIMPLIFIED");
-			setClientId(invoice.clientId ?? undefined);
-			setClientName(invoice.clientName);
-			setClientCompany(invoice.clientCompany ?? "");
-			setClientPhone(invoice.clientPhone ?? "");
-			setClientEmail(invoice.clientEmail ?? "");
-			setClientAddress(invoice.clientAddress ?? "");
-			setClientTaxNumber(invoice.clientTaxNumber ?? "");
-			setProjectId(invoice.projectId ?? undefined);
-			if (invoice.projectId) setShowProjectLink(true);
-			setIssueDate(new Date(invoice.issueDate).toISOString().split("T")[0]);
-			setDueDate(new Date(invoice.dueDate).toISOString().split("T")[0]);
-			setPaymentTerms(invoice.paymentTerms ?? "");
-			setNotes(invoice.notes ?? "");
-			setVatPercent(Number(invoice.vatPercent) || 15);
-			setDiscountPercent(Number(invoice.discountPercent) || 0);
+		if (draft) {
+			setInvoiceType(draft.invoiceType as "STANDARD" | "TAX" | "SIMPLIFIED");
+			setClientId(draft.clientId ?? undefined);
+			setClientName(draft.clientName);
+			setClientCompany(draft.clientCompany ?? "");
+			setClientPhone(draft.clientPhone ?? "");
+			setClientEmail(draft.clientEmail ?? "");
+			setClientAddress(draft.clientAddress ?? "");
+			setClientTaxNumber(draft.clientTaxNumber ?? "");
+			setProjectId(draft.projectId ?? undefined);
+			if (draft.projectId) setShowProjectLink(true);
+			setIssueDate(new Date(draft.issueDate).toISOString().split("T")[0]);
+			setDueDate(new Date(draft.dueDate).toISOString().split("T")[0]);
+			setPaymentTerms(draft.paymentTerms ?? "");
+			setNotes(draft.notes ?? "");
+			setVatPercent(Number(draft.vatPercent) || 15);
+			setDiscountPercent(Number(draft.discountPercent) || 0);
 			setItems(
-				invoice.items.map((item: any) => ({
+				draft.items.map((item: any) => ({
 					id: item.id,
 					description: item.description,
 					quantity: Number(item.quantity) || 1,
@@ -218,7 +257,7 @@ export function CreateInvoiceForm({
 				})),
 			);
 		}
-	}, [invoice]);
+	}, [draft]);
 
 	// Fetch default template
 	const { data: defaultTemplate } = useQuery(
@@ -235,9 +274,9 @@ export function CreateInvoiceForm({
 		enabled: !!quotationId,
 	});
 
-	// Pre-fill form with quotation data (create mode only)
+	// Pre-fill form with quotation data (مسودة جديدة فقط)
 	useEffect(() => {
-		if (quotation && !isEditMode) {
+		if (quotation && !invoiceId && !draftId) {
 			setClientId(quotation.clientId ?? undefined);
 			setClientName(quotation.clientName);
 			setClientCompany(quotation.clientCompany ?? "");
@@ -319,11 +358,11 @@ export function CreateInvoiceForm({
 			notes: notes.trim() || undefined,
 			vatPercent: Number(vatPercent) || 0,
 			discountPercent: Number(discountPercent) || 0,
-			templateId: invoice?.templateId || defaultTemplate?.id || undefined,
+			templateId: draft?.templateId || defaultTemplate?.id || undefined,
 		}),
 		[invoiceType, clientId, clientName, clientCompany, clientPhone, clientEmail,
 		 clientAddress, clientTaxNumber, showProjectLink, projectId, issueDate, dueDate,
-		 paymentTerms, notes, vatPercent, discountPercent, invoice?.templateId, defaultTemplate?.id],
+		 paymentTerms, notes, vatPercent, discountPercent, draft?.templateId, defaultTemplate?.id],
 	);
 
 	const itemsSnapshot = useMemo(
@@ -348,7 +387,7 @@ export function CreateInvoiceForm({
 
 	const createDraft = useCallback(
 		async (snap: typeof headerSnapshot, snapItems: typeof itemsSnapshot) => {
-			const result = await orpcClient.finance.invoices.create({
+			const result = await orpcClient.finance.invoices.drafts.create({
 				organizationId,
 				...snap,
 				quotationId: quotationId || undefined,
@@ -368,7 +407,7 @@ export function CreateInvoiceForm({
 
 	const updateHeader = useCallback(
 		async (id: string, snap: typeof headerSnapshot) => {
-			await orpcClient.finance.invoices.update({
+			await orpcClient.finance.invoices.drafts.updateHeader({
 				organizationId,
 				id,
 				...snap,
@@ -381,7 +420,7 @@ export function CreateInvoiceForm({
 
 	const updateItemsRemote = useCallback(
 		async (id: string, snapItems: typeof itemsSnapshot) => {
-			await orpcClient.finance.invoices.updateItems({
+			await orpcClient.finance.invoices.drafts.updateItems({
 				organizationId,
 				id,
 				items: snapItems.map((item) => ({
@@ -396,27 +435,26 @@ export function CreateInvoiceForm({
 		[organizationId],
 	);
 
-	const autosaveEnabled =
-		!isIssuing && (isEditMode ? invoice?.status === "DRAFT" : true);
+	const autosaveEnabled = !isIssuing && !isCommitting && !isStartingEdit;
 
 	const autosave = useAutosave({
 		snapshot: headerSnapshot,
 		items: itemsSnapshot,
-		id: effectiveInvoiceId,
+		id: effectiveDraftId,
 		enabled: autosaveEnabled,
 		isReadyForCreate,
 		createDraft,
 		updateHeader,
 		updateItems: updateItemsRemote,
 		onCreated: (newId) => {
-			setInternalInvoiceId(newId);
+			setDraftIdBoth(newId);
 			// تغيير URL بدون re-render (لا router.push كي لا يفقد النموذج حالته)
 			if (typeof window !== "undefined") {
-				window.history.replaceState(null, "", `${basePath}/${newId}`);
+				window.history.replaceState(null, "", `${basePath}/drafts/${newId}`);
 			}
 		},
 		onSaved: () => {
-			queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+			queryClient.invalidateQueries({ queryKey: ["finance", "invoiceDrafts"] });
 		},
 		onConflict: () => {
 			setShowConflictDialog(true);
@@ -630,6 +668,37 @@ export function CreateInvoiceForm({
 		await autosave.forceSave();
 	};
 
+	// commit المسودة (حفظ): يُفرّغ آخر تغييرات ثم يثبّت المسودة كمستند حقيقي. يُرجع id المستند المعتمد.
+	const commitDraft = async (): Promise<string | null> => {
+		await autosave.forceSave();
+		const did = workingDraftIdRef.current;
+		if (!did) {
+			toast.error(t("finance.invoices.errors.itemsRequired"));
+			return null;
+		}
+		const result = await orpcClient.finance.invoices.drafts.commit({ organizationId, id: did });
+		queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+		queryClient.invalidateQueries({ queryKey: ["finance", "invoiceDrafts"] });
+		return result.id;
+	};
+
+	// زر "حفظ" → commit ثم الانتقال للمستند المعتمد
+	const handleSaveClick = async () => {
+		if (!validateForm()) return;
+		setIsCommitting(true);
+		try {
+			const id = await commitDraft();
+			if (id) {
+				toast.success(t("drafts.saveSuccess"));
+				router.push(`${basePath}/${id}`);
+			}
+		} catch (e: any) {
+			toast.error(e?.message || t("drafts.saveError"));
+		} finally {
+			setIsCommitting(false);
+		}
+	};
+
 	const handleIssueClick = () => {
 		if (!validateForm()) return;
 		setShowIssueConfirm(true);
@@ -639,16 +708,15 @@ export function CreateInvoiceForm({
 		setShowIssueConfirm(false);
 		setIsIssuing(true);
 		try {
-			// أولاً: حفظ آخر التغييرات (الذي قد يُنشئ السجل إن لم يكن موجوداً)
-			await autosave.forceSave();
-			const idToIssue = effectiveInvoiceId ?? internalInvoiceId;
-			if (!idToIssue) {
-				toast.error(t("finance.invoices.errors.itemsRequired"));
+			// أولاً: تثبيت المسودة (commit) للحصول على فاتورة حقيقية ثم إصدارها
+			const committedId = await commitDraft();
+			if (!committedId) {
 				setIsIssuing(false);
 				return;
 			}
-			await issueMutation.mutateAsync(idToIssue);
-		} catch {
+			await issueMutation.mutateAsync(committedId);
+		} catch (e: any) {
+			toast.error(e?.message || t("finance.invoices.issueError"));
 			setIsIssuing(false);
 		}
 	};
@@ -676,22 +744,38 @@ export function CreateInvoiceForm({
 		void autosave.forceSave();
 	};
 
+	// تجاهل مسودة التعديل (الأصل لا يتأثّر)
+	const handleDiscardDraft = async () => {
+		const did = workingDraftIdRef.current;
+		if (!did) {
+			router.push(basePath);
+			return;
+		}
+		try {
+			await orpcClient.finance.invoices.drafts.delete({ organizationId, id: did });
+			queryClient.invalidateQueries({ queryKey: ["finance", "invoiceDrafts"] });
+			toast.success(t("drafts.discardSuccess"));
+			router.push(sourceInvoiceId ? `${basePath}/${sourceInvoiceId}` : basePath);
+		} catch (e: any) {
+			toast.error(e?.message || t("drafts.discardError"));
+		}
+	};
+
 	const isBusy =
 		isValidating ||
 		isIssuing ||
+		isCommitting ||
 		issueMutation.isPending ||
 		autosave.state.status === "saving";
 
-	const canAddPayment = isEditMode && invoice &&
-		invoice.status !== "PAID" && invoice.status !== "CANCELLED";
-	const remainingAmount = isEditMode && invoice
-		? invoice.totalAmount - invoice.paidAmount
-		: 0;
+	// المسودات لا تحتوي مدفوعات (التحرير مسموح فقط لمستندات قبل الإصدار)
+	const canAddPayment = false;
+	const remainingAmount = 0;
 
 	const currency = orgSettings?.defaultCurrency || "SAR";
 
-	// Loading state for edit mode
-	if (isEditMode && isLoadingInvoice) {
+	// Loading state
+	if ((isEditDraft && isStartingEdit) || (!!workingDraftId && isLoadingDraft && !draft)) {
 		return <FormPageSkeleton />;
 	}
 
@@ -703,23 +787,28 @@ export function CreateInvoiceForm({
 				<InvoiceFormHeader
 					organizationSlug={organizationSlug}
 					basePath={basePath}
-					isEditMode={isEditMode}
-					invoiceId={invoiceId}
-					invoice={invoice ? { invoiceNo: invoice.invoiceNo, status: invoice.status, invoiceType: invoice.invoiceType } : null}
+					isEditDraft={showEditDraftUi}
+					sourceInvoiceId={sourceInvoiceId}
+					sourceInvoiceNo={sourceInvoiceNo}
 					quotation={quotation ? { quotationNo: quotation.quotationNo } : null}
 					isBusy={isBusy}
-					canAddPayment={!!canAddPayment}
-					isCreateAndIssuePending={isIssuing || issueMutation.isPending}
-					isStatusMutationPending={statusMutation.isPending}
-					isConvertToTaxPending={convertToTaxMutation.isPending}
+					isSaving={isCommitting}
+					isIssuing={isIssuing || issueMutation.isPending}
 					autosaveState={autosave.state}
 					onAutosaveRetry={() => void autosave.forceSave()}
-					onPreview={() => effectiveInvoiceId ? router.push(`${basePath}/${effectiveInvoiceId}/preview`) : setShowPreviewDialog(true)}
-					onPaymentDialogOpen={() => setPaymentDialogOpen(true)}
+					onPreview={() => setShowPreviewDialog(true)}
+					onSaveClick={handleSaveClick}
 					onIssueClick={handleIssueClick}
-					onSendClick={() => statusMutation.mutate("SENT")}
-					onConvertToTax={() => convertToTaxMutation.mutate()}
 				/>
+
+				{/* ─── Edit-draft banner ──────────────────────────────── */}
+				{showEditDraftUi && (
+					<EditDraftBanner
+						sourceNumber={sourceInvoiceNo}
+						sourceHref={sourceInvoiceId ? `${basePath}/${sourceInvoiceId}` : undefined}
+						onDiscard={handleDiscardDraft}
+					/>
+				)}
 
 				{/* ─── Client + Details Grid ───────────────────────────── */}
 				<div className="grid gap-5 lg:grid-cols-[1.15fr_1fr]">
@@ -745,8 +834,8 @@ export function CreateInvoiceForm({
 					/>
 
 					<InvoiceDetailsCard
-						isEditMode={isEditMode}
-						invoice={invoice ? { invoiceNo: invoice.invoiceNo } : null}
+						isEditMode={false}
+						invoice={null}
 						issueDate={issueDate}
 						dueDate={dueDate}
 						showProjectLink={showProjectLink}
@@ -791,31 +880,20 @@ export function CreateInvoiceForm({
 						vatAmount={totals.vatAmount}
 						totalAmount={totals.totalAmount}
 						currency={currency}
-						isEditMode={isEditMode}
-						invoice={invoice ? { paidAmount: invoice.paidAmount } : null}
+						isEditMode={false}
+						invoice={null}
 						remainingAmount={remainingAmount}
 					/>
 				</div>
-
-				{/* ─── Payments Section (edit mode) ───────────────────── */}
-				{isEditMode && invoice && invoice.payments && invoice.payments.length > 0 && (
-					<InvoicePaymentsSection
-						payments={invoice.payments}
-						canAddPayment={!!canAddPayment}
-						onAddPayment={() => setPaymentDialogOpen(true)}
-						onDeletePayment={(paymentId) => setDeletePaymentId(paymentId)}
-					/>
-				)}
 
 				{/* ─── Mobile Bottom Bar ───────────────────────────────── */}
 				<InvoiceMobileBar
 					totalAmount={totals.totalAmount}
 					currency={currency}
-					isEditMode={isEditMode}
 					isBusy={isBusy}
-					invoiceStatus={invoice?.status}
 					autosaveState={autosave.state}
 					onAutosaveRetry={() => void autosave.forceSave()}
+					onSaveClick={handleSaveClick}
 					onIssueClick={handleIssueClick}
 				/>
 			</form>
