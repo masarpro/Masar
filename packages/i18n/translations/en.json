@@ -4413,6 +4413,45 @@
       "thankYouMessagePlaceholder": "Thank you for your business"
     },
     "banks": {
+      "ledger": {
+        "title": "Account Statement",
+        "print": "Print",
+        "allTypes": "All Types",
+        "searchPlaceholder": "Search description or reference…",
+        "noMovements": "No movements in this period",
+        "openingBalance": "Opening Balance",
+        "closingBalance": "Closing Balance",
+        "viewSource": "View document",
+        "truncatedNote": "Showing the latest 5000 movements only — use the date filter to narrow the range.",
+        "balanced": "Balance matches",
+        "unbalanced": "Balance difference: {amount}",
+        "totalIn": "Total In",
+        "totalOut": "Total Out",
+        "transfersIn": "Transfers In",
+        "transfersOut": "Transfers Out",
+        "netChange": "Net Change",
+        "columns": {
+          "date": "Date",
+          "type": "Type",
+          "description": "Description",
+          "counterparty": "Counterparty",
+          "reference": "Reference",
+          "in": "In",
+          "out": "Out",
+          "balance": "Balance"
+        },
+        "types": {
+          "PAYMENT": "Receipt",
+          "INVOICE_PAYMENT": "Invoice Collection",
+          "PROJECT_PAYMENT": "Project Payment",
+          "CAPITAL_CONTRIBUTION": "Capital Contribution",
+          "TRANSFER_IN": "Transfer In",
+          "EXPENSE": "Expense",
+          "SUBCONTRACT_PAYMENT": "Subcontractor Payment",
+          "OWNER_DRAWING": "Owner Drawing",
+          "TRANSFER_OUT": "Transfer Out"
+        }
+      },
       "title": "Bank Accounts",
       "subtitle": "Manage bank accounts and cash boxes",
       "addBank": "Add Bank",

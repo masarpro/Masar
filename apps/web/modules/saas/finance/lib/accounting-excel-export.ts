@@ -87,6 +87,16 @@ export interface LedgerLabels {
 	closingBalance: string;
 }
 
+export interface BankLedgerLabels {
+	sheetName: string;
+	ledgerPrefix: string;
+	// [date, type, description, counterparty, reference, in, out, balance]
+	headers: [string, string, string, string, string, string, string, string];
+	openingBalance: string;
+	closingBalance: string;
+	typeNames: Record<string, string>;
+}
+
 // ════════════════════════════════════════════════════
 // Trial Balance Export
 // ════════════════════════════════════════════════════
@@ -250,4 +260,71 @@ export async function exportAccountLedgerToExcel(
 	const wb = XLSX.utils.book_new();
 	XLSX.utils.book_append_sheet(wb, ws, labels.sheetName);
 	XLSX.writeFile(wb, `ledger-${accountName}-${new Date().toISOString().split("T")[0]}.xlsx`);
+}
+
+// ════════════════════════════════════════════════════
+// Bank/Cash Account Ledger Export
+// ════════════════════════════════════════════════════
+
+export async function exportBankLedgerToExcel(
+	accountName: string,
+	openingBalance: number,
+	entries: Array<{
+		date: string | Date;
+		type: string;
+		description: string;
+		counterparty: string | null;
+		referenceNo: string | null;
+		direction: "IN" | "OUT";
+		amount: number;
+		runningBalance: number;
+	}>,
+	totals: { totalIn: number; totalOut: number; closingBalance: number },
+	labels: BankLedgerLabels,
+	orgName?: string,
+) {
+	const XLSX = await import("xlsx-js-style");
+	const ws: any = {};
+	let row = 0;
+	const lastCol = 7;
+
+	setCell(ws, row, 0, `${orgName ? orgName + " — " : ""}${labels.ledgerPrefix}: ${accountName}`, STYLES.title);
+	mergeRange(ws, 0, 0, 0, lastCol);
+	row += 2;
+
+	labels.headers.forEach((h, c) => setCell(ws, row, c, h, STYLES.header));
+	row++;
+
+	// Opening balance
+	setCell(ws, row, 0, labels.openingBalance, STYLES.totalRow);
+	for (let c = 1; c <= 6; c++) setCell(ws, row, c, "", STYLES.totalRow);
+	setCell(ws, row, 7, openingBalance, STYLES.totalRow);
+	row++;
+
+	for (const e of entries) {
+		setCell(ws, row, 0, new Date(e.date).toLocaleDateString("en-SA"), STYLES.cell);
+		setCell(ws, row, 1, labels.typeNames[e.type] ?? e.type, STYLES.cell);
+		setCell(ws, row, 2, e.description, STYLES.cell);
+		setCell(ws, row, 3, e.counterparty ?? "", STYLES.cell);
+		setCell(ws, row, 4, e.referenceNo ?? "", STYLES.cell);
+		setCell(ws, row, 5, e.direction === "IN" ? e.amount : 0, STYLES.number);
+		setCell(ws, row, 6, e.direction === "OUT" ? e.amount : 0, STYLES.number);
+		setCell(ws, row, 7, e.runningBalance, STYLES.number);
+		row++;
+	}
+
+	// Closing balance
+	setCell(ws, row, 0, labels.closingBalance, STYLES.totalRow);
+	for (let c = 1; c <= 4; c++) setCell(ws, row, c, "", STYLES.totalRow);
+	setCell(ws, row, 5, totals.totalIn, STYLES.totalRow);
+	setCell(ws, row, 6, totals.totalOut, STYLES.totalRow);
+	setCell(ws, row, 7, totals.closingBalance, STYLES.totalRow);
+
+	ws["!ref"] = `A1:${cellAddr(row, lastCol)}`;
+	ws["!cols"] = [{ wch: 12 }, { wch: 18 }, { wch: 30 }, { wch: 22 }, { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 15 }];
+	setRTL(ws);
+
+	const wb = XLSX.utils.book_new();
+	XLSX.utils.book_append_sheet(wb, ws, labels.sheetName);
+	XLSX.writeFile(wb, `bank-ledger-${accountName}-${new Date().toISOString().split("T")[0]}.xlsx`);
 }

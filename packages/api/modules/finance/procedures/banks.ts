@@ -3,6 +3,7 @@ import {
 	createBankChartAccount,
 	deleteBankAccount,
 	getBankAccountById,
+	getBankAccountLedger,
 	getOrganizationBalancesSummary,
 	getOrganizationBankAccounts,
 	reconcileBankAccount,
@@ -371,4 +372,34 @@ export const reconcileBankAccountProcedure = protectedProcedure
 				transfersOut: Number(result.components.transfersOut),
 			},
 		};
+	});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GET BANK ACCOUNT LEDGER (full account statement)
+// ═══════════════════════════════════════════════════════════════════════════
+export const getBankLedgerProcedure = protectedProcedure
+	.route({
+		method: "GET",
+		path: "/finance/banks/{id}/ledger",
+		tags: ["Finance", "Banks"],
+		summary: "Get the full account statement (ledger) for a bank/cash account",
+	})
+	.input(
+		z.object({
+			organizationId: idString(),
+			id: idString(),
+			dateFrom: z.string().trim().datetime().optional(),
+			dateTo: z.string().trim().datetime().optional(),
+		}),
+	)
+	.handler(async ({ input, context }) => {
+		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+			section: "finance",
+			action: "view",
+		});
+
+		return getBankAccountLedger(input.id, input.organizationId, {
+			dateFrom: input.dateFrom ? new Date(input.dateFrom) : undefined,
+			dateTo: input.dateTo ? new Date(input.dateTo) : undefined,
+		});
 	});

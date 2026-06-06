@@ -12,7 +12,7 @@ import { Label } from "@ui/components/label";
 import { Textarea } from "@ui/components/textarea";
 import { Badge } from "@ui/components/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@ui/components/card";
-import { Tabs, TabsList, TabsTrigger } from "@ui/components/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@ui/components/tabs";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -34,10 +34,15 @@ import {
 	ArrowLeftRight,
 	TrendingDown,
 	TrendingUp,
+	ArrowDownLeft,
+	ArrowUpRight,
+	CheckCircle2,
+	AlertTriangle,
 } from "lucide-react";
 import { Currency } from "../shared/Currency";
 import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 import { AddExpenseDialog } from "@saas/finance/components/expenses/AddExpenseDialog";
+import { BankLedger, type BankLedgerData } from "./BankLedger";
 
 interface BankDetailProps {
 	organizationId: string;
@@ -57,6 +62,8 @@ export function BankDetail({
 	const [isEditing, setIsEditing] = useState(false);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 	const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
+	const [dateFrom, setDateFrom] = useState("");
+	const [dateTo, setDateTo] = useState("");
 
 	// Fetch account details
 	const { data: account, isLoading } = useQuery(
@@ -64,6 +71,19 @@ export function BankDetail({
 			input: { organizationId, id: bankId },
 		}),
 	);
+
+	// Fetch the full account statement (ledger)
+	const { data: ledger, isLoading: ledgerLoading } = useQuery(
+		orpc.finance.banks.getLedger.queryOptions({
+			input: {
+				organizationId,
+				id: bankId,
+				dateFrom: dateFrom ? new Date(dateFrom).toISOString() : undefined,
+				dateTo: dateTo ? new Date(`${dateTo}T23:59:59`).toISOString() : undefined,
+			},
+		}),
+	);
+	const summary = ledger?.summary;
 
 	// Form state
 	const [formData, setFormData] = useState({
@@ -237,10 +257,88 @@ export function BankDetail({
 							}`}>
 								<Currency amount={Number(account.balance)} />
 							</p>
+							{summary && (
+								summary.isBalanced ? (
+									<Badge className="mt-2 rounded-lg border-0 bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
+										<CheckCircle2 className="h-3.5 w-3.5 me-1" />
+										{t("finance.banks.ledger.balanced")}
+									</Badge>
+								) : (
+									<Badge className="mt-2 rounded-lg border-0 bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+										<AlertTriangle className="h-3.5 w-3.5 me-1" />
+										{t("finance.banks.ledger.unbalanced", { amount: summary.delta.toFixed(2) })}
+									</Badge>
+								)
+							)}
 						</div>
 					</div>
 				</CardContent>
 			</Card>
+
+			{/* Summary stat cards */}
+			{summary && (
+				<div className="grid gap-4 grid-cols-2 lg:grid-cols-5">
+					<Card className="rounded-2xl">
+						<CardContent className="p-4">
+							<div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+								<ArrowDownLeft className="h-4 w-4" />
+								<span className="text-xs text-slate-500">{t("finance.banks.ledger.totalIn")}</span>
+							</div>
+							<p className="text-lg font-bold mt-1 text-green-600 dark:text-green-400">
+								<Currency amount={summary.totalIn} />
+							</p>
+						</CardContent>
+					</Card>
+					<Card className="rounded-2xl">
+						<CardContent className="p-4">
+							<div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+								<ArrowUpRight className="h-4 w-4" />
+								<span className="text-xs text-slate-500">{t("finance.banks.ledger.totalOut")}</span>
+							</div>
+							<p className="text-lg font-bold mt-1 text-red-600 dark:text-red-400">
+								<Currency amount={summary.totalOut} />
+							</p>
+						</CardContent>
+					</Card>
+					<Card className="rounded-2xl">
+						<CardContent className="p-4">
+							<div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+								<ArrowDownLeft className="h-4 w-4" />
+								<span className="text-xs text-slate-500">{t("finance.banks.ledger.transfersIn")}</span>
+							</div>
+							<p className="text-lg font-bold mt-1">
+								<Currency amount={summary.totalTransfersIn} />
+							</p>
+						</CardContent>
+					</Card>
+					<Card className="rounded-2xl">
+						<CardContent className="p-4">
+							<div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+								<ArrowUpRight className="h-4 w-4" />
+								<span className="text-xs text-slate-500">{t("finance.banks.ledger.transfersOut")}</span>
+							</div>
+							<p className="text-lg font-bold mt-1">
+								<Currency amount={summary.totalTransfersOut} />
+							</p>
+						</CardContent>
+					</Card>
+					<Card className="rounded-2xl">
+						<CardContent className="p-4">
+							<div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+								<ArrowLeftRight className="h-4 w-4" />
+								<span className="text-xs text-slate-500">{t("finance.banks.ledger.netChange")}</span>
+							</div>
+							<p className={`text-lg font-bold mt-1 ${
+								summary.netChange >= 0
+									? "text-green-600 dark:text-green-400"
+									: "text-red-600 dark:text-red-400"
+							}`}>
+								<Currency amount={summary.netChange} />
+							</p>
+						</CardContent>
+					</Card>
+				</div>
+			)}
 
 			{/* Quick Actions */}
 			<div className="grid gap-4 md:grid-cols-3">
@@ -279,6 +377,30 @@ export function BankDetail({
 				</Button>
 			</div>
 
+			{/* Main Tabs: Ledger + Account Info */}
+			<Tabs defaultValue="ledger" className="w-full">
+				<TabsList className="rounded-xl">
+					<TabsTrigger value="ledger" className="rounded-xl">
+						{t("finance.banks.ledger.title")}
+					</TabsTrigger>
+					<TabsTrigger value="info" className="rounded-xl">
+						{t("finance.banks.accountInfo")}
+					</TabsTrigger>
+				</TabsList>
+
+				<TabsContent value="ledger" className="mt-4">
+					<BankLedger
+						data={ledger as BankLedgerData | undefined}
+						isLoading={ledgerLoading}
+						basePath={`/app/${organizationSlug}`}
+						dateFrom={dateFrom}
+						dateTo={dateTo}
+						onDateFromChange={setDateFrom}
+						onDateToChange={setDateTo}
+					/>
+				</TabsContent>
+
+				<TabsContent value="info" className="mt-4 space-y-6">
 			{/* Account Details */}
 			<Card className="rounded-2xl">
 				<CardHeader className="flex flex-row items-center justify-between">
@@ -509,6 +631,8 @@ export function BankDetail({
 					</div>
 				</CardContent>
 			</Card>
+				</TabsContent>
+			</Tabs>
 
 			{/* Delete Confirmation */}
 			<AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

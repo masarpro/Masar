@@ -84,6 +84,7 @@ import {
 	setDefaultBankAccountProcedure,
 	deleteBankAccountProcedure,
 	reconcileBankAccountProcedure,
+	getBankLedgerProcedure,
 } from "./procedures/banks";
 
 import {
@@ -249,6 +250,7 @@ export const financeRouter = {
 		getById: getBankAccount,
 		getSummary: getBalancesSummary,
 		reconcile: reconcileBankAccountProcedure,
+		getLedger: getBankLedgerProcedure,
 		create: createBankAccountProcedure,
 		update: updateBankAccountProcedure,
 		setDefault: setDefaultBankAccountProcedure,

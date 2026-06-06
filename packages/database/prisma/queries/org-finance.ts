@@ -266,6 +266,254 @@ export async function reconcileBankAccount(
 	};
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// BANK ACCOUNT LEDGER - كشف حساب الصندوق/البنك (كل الحركات + رصيد جارٍ)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Unified ledger entry types — every kind of movement that mutates the stored
+ * `OrganizationBank.balance`. Vouchers (Receipt/Payment) and PayrollRun are
+ * intentionally excluded: vouchers are print wrappers around existing rows and
+ * payroll/facility-recurring payments are recorded as FinanceExpense rows.
+ */
+export type BankLedgerType =
+	| "PAYMENT"
+	| "INVOICE_PAYMENT"
+	| "PROJECT_PAYMENT"
+	| "CAPITAL_CONTRIBUTION"
+	| "TRANSFER_IN"
+	| "EXPENSE"
+	| "SUBCONTRACT_PAYMENT"
+	| "OWNER_DRAWING"
+	| "TRANSFER_OUT";
+
+export interface BankLedgerEntry {
+	id: string;
+	type: BankLedgerType;
+	direction: "IN" | "OUT";
+	date: Date;
+	amount: number;
+	description: string;
+	counterparty: string | null;
+	referenceNo: string | null;
+	sourceId: string;
+	sourceLink: string | null;
+	runningBalance: number;
+}
+
+// Safety cap on returned rows (newest kept). SMB accounts are far below this.
+const BANK_LEDGER_MAX = 5000;
+
+/**
+ * Build a complete account statement (ledger) for a single bank/cash account.
+ * Running balances are computed over the FULL chronological history so each row
+ * reflects its true position; an optional date window then slices the view and
+ * carries the correct period-opening balance.
+ */
+export async function getBankAccountLedger(
+	accountId: string,
+	organizationId: string,
+	opts?: { dateFrom?: Date; dateTo?: Date },
+) {
+	const account = await db.organizationBank.findFirst({
+		where: { id: accountId, organizationId },
+		select: {
+			id: true,
+			name: true,
+			accountType: true,
+			balance: true,
+			openingBalance: true,
+			currency: true,
+		},
+	});
+	if (!account) {
+		throw new Error("Bank account not found");
+	}
+
+	const [
+		payments,
+		invoicePayments,
+		projectPayments,
+		capitalContributions,
+		transfersIn,
+		expenses,
+		subcontractPayments,
+		ownerDrawings,
+		transfersOut,
+	] = await Promise.all([
+		// IN: organization payments (receipts)
+		db.financePayment.findMany({
+			where: { organizationId, destinationAccountId: accountId, status: "COMPLETED" },
+			select: { id: true, date: true, createdAt: true, amount: true, description: true, referenceNo: true, paymentNo: true, clientName: true },
+		}),
+		// IN: invoice collections (linked to invoice for org isolation)
+		db.financeInvoicePayment.findMany({
+			where: { sourceAccountId: accountId, invoice: { organizationId } },
+			select: { id: true, paymentDate: true, createdAt: true, amount: true, referenceNo: true, notes: true, invoiceId: true, invoice: { select: { invoiceNo: true, clientName: true } } },
+		}),
+		// IN: project payments
+		db.projectPayment.findMany({
+			where: { organizationId, destinationAccountId: accountId },
+			select: { id: true, date: true, createdAt: true, amount: true, description: true, referenceNo: true, paymentNo: true, projectId: true, project: { select: { name: true } } },
+		}),
+		// IN: capital contributions
+		db.capitalContribution.findMany({
+			where: { organizationId, bankAccountId: accountId, status: "ACTIVE" },
+			select: { id: true, date: true, createdAt: true, amount: true, description: true, contributionNo: true, owner: { select: { name: true } } },
+		}),
+		// IN: transfers into this account
+		db.financeTransfer.findMany({
+			where: { organizationId, toAccountId: accountId, status: "COMPLETED" },
+			select: { id: true, date: true, createdAt: true, amount: true, description: true, referenceNo: true, transferNo: true, fromAccount: { select: { name: true } } },
+		}),
+		// OUT: expenses (by paidAmount — matches balance logic; includes facility payroll/recurring)
+		db.financeExpense.findMany({
+			where: { organizationId, sourceAccountId: accountId, status: { not: "CANCELLED" }, paidAmount: { gt: 0 } },
+			select: { id: true, date: true, createdAt: true, paidAmount: true, description: true, referenceNo: true, expenseNo: true, vendorName: true },
+		}),
+		// OUT: subcontract payments
+		db.subcontractPayment.findMany({
+			where: { organizationId, sourceAccountId: accountId, status: "COMPLETED" },
+			select: { id: true, date: true, createdAt: true, amount: true, description: true, referenceNo: true, paymentNo: true, contract: { select: { name: true, projectId: true } } },
+		}),
+		// OUT: owner drawings
+		db.ownerDrawing.findMany({
+			where: { organizationId, bankAccountId: accountId, status: "APPROVED" },
+			select: { id: true, date: true, createdAt: true, amount: true, description: true, drawingNo: true, owner: { select: { name: true } } },
+		}),
+		// OUT: transfers out of this account
+		db.financeTransfer.findMany({
+			where: { organizationId, fromAccountId: accountId, status: "COMPLETED" },
+			select: { id: true, date: true, createdAt: true, amount: true, description: true, referenceNo: true, transferNo: true, toAccount: { select: { name: true } } },
+		}),
+	]);
+
+	type RawEntry = Omit<BankLedgerEntry, "runningBalance"> & { createdAt: Date };
+	const raw: RawEntry[] = [];
+
+	for (const p of payments) {
+		raw.push({ id: `pay-${p.id}`, type: "PAYMENT", direction: "IN", date: p.date, createdAt: p.createdAt, amount: Number(p.amount), description: p.description ?? "", counterparty: p.clientName ?? null, referenceNo: p.referenceNo ?? p.paymentNo ?? null, sourceId: p.id, sourceLink: `/finance/payments/${p.id}` });
+	}
+	for (const ip of invoicePayments) {
+		raw.push({ id: `inv-${ip.id}`, type: "INVOICE_PAYMENT", direction: "IN", date: ip.paymentDate, createdAt: ip.createdAt, amount: Number(ip.amount), description: ip.notes ?? "", counterparty: ip.invoice?.clientName ?? null, referenceNo: ip.referenceNo ?? ip.invoice?.invoiceNo ?? null, sourceId: ip.invoiceId, sourceLink: `/finance/invoices/${ip.invoiceId}` });
+	}
+	for (const pp of projectPayments) {
+		raw.push({ id: `prj-${pp.id}`, type: "PROJECT_PAYMENT", direction: "IN", date: pp.date, createdAt: pp.createdAt, amount: Number(pp.amount), description: pp.description ?? "", counterparty: pp.project?.name ?? null, referenceNo: pp.referenceNo ?? pp.paymentNo ?? null, sourceId: pp.projectId, sourceLink: `/projects/${pp.projectId}/finance` });
+	}
+	for (const cc of capitalContributions) {
+		raw.push({ id: `cap-${cc.id}`, type: "CAPITAL_CONTRIBUTION", direction: "IN", date: cc.date, createdAt: cc.createdAt, amount: Number(cc.amount), description: cc.description ?? "", counterparty: cc.owner?.name ?? null, referenceNo: cc.contributionNo ?? null, sourceId: cc.id, sourceLink: `/finance/capital-contributions` });
+	}
+	for (const tr of transfersIn) {
+		raw.push({ id: `tin-${tr.id}`, type: "TRANSFER_IN", direction: "IN", date: tr.date, createdAt: tr.createdAt, amount: Number(tr.amount), description: tr.description ?? "", counterparty: tr.fromAccount?.name ?? null, referenceNo: tr.referenceNo ?? tr.transferNo ?? null, sourceId: tr.id, sourceLink: `/finance/transfers` });
+	}
+	for (const ex of expenses) {
+		raw.push({ id: `exp-${ex.id}`, type: "EXPENSE", direction: "OUT", date: ex.date, createdAt: ex.createdAt, amount: Number(ex.paidAmount), description: ex.description ?? "", counterparty: ex.vendorName ?? null, referenceNo: ex.referenceNo ?? ex.expenseNo ?? null, sourceId: ex.id, sourceLink: `/finance/expenses/${ex.id}` });
+	}
+	for (const sp of subcontractPayments) {
+		raw.push({ id: `sub-${sp.id}`, type: "SUBCONTRACT_PAYMENT", direction: "OUT", date: sp.date, createdAt: sp.createdAt, amount: Number(sp.amount), description: sp.description ?? "", counterparty: sp.contract?.name ?? null, referenceNo: sp.referenceNo ?? sp.paymentNo ?? null, sourceId: sp.id, sourceLink: sp.contract?.projectId ? `/projects/${sp.contract.projectId}/finance` : null });
+	}
+	for (const od of ownerDrawings) {
+		raw.push({ id: `own-${od.id}`, type: "OWNER_DRAWING", direction: "OUT", date: od.date, createdAt: od.createdAt, amount: Number(od.amount), description: od.description ?? "", counterparty: od.owner?.name ?? null, referenceNo: od.drawingNo ?? null, sourceId: od.id, sourceLink: `/finance/owner-drawings` });
+	}
+	for (const tr of transfersOut) {
+		raw.push({ id: `tout-${tr.id}`, type: "TRANSFER_OUT", direction: "OUT", date: tr.date, createdAt: tr.createdAt, amount: Number(tr.amount), description: tr.description ?? "", counterparty: tr.toAccount?.name ?? null, referenceNo: tr.referenceNo ?? tr.transferNo ?? null, sourceId: tr.id, sourceLink: `/finance/transfers` });
+	}
+
+	// Chronological ascending (date, then createdAt as tiebreaker)
+	raw.sort((a, b) => {
+		const d = a.date.getTime() - b.date.getTime();
+		if (d !== 0) return d;
+		return a.createdAt.getTime() - b.createdAt.getTime();
+	});
+
+	// Running balance over the FULL history
+	const ZERO = new Prisma.Decimal(0);
+	const openingBalance = account.openingBalance ?? ZERO;
+	let running = new Prisma.Decimal(openingBalance);
+	const full: BankLedgerEntry[] = raw.map((e) => {
+		running = e.direction === "IN" ? running.add(e.amount) : running.sub(e.amount);
+		const { createdAt, ...rest } = e;
+		return { ...rest, runningBalance: Number(running) };
+	});
+
+	// Reconciliation over the full set
+	const storedBalance = Number(account.balance);
+	const computedBalance = Number(running);
+	const delta = storedBalance - computedBalance;
+	const isBalanced = Math.abs(delta) <= 0.01;
+
+	// Period window slicing (carry correct period-opening balance)
+	const from = opts?.dateFrom;
+	const to = opts?.dateTo;
+	let periodOpening = Number(openingBalance);
+	if (from) {
+		for (const e of full) {
+			if (e.date.getTime() < from.getTime()) periodOpening = e.runningBalance;
+			else break;
+		}
+	}
+	let view = full.filter((e) => {
+		if (from && e.date.getTime() < from.getTime()) return false;
+		if (to && e.date.getTime() > to.getTime()) return false;
+		return true;
+	});
+
+	const truncated = view.length > BANK_LEDGER_MAX;
+	if (truncated) {
+		view = view.slice(view.length - BANK_LEDGER_MAX);
+	}
+
+	// Period totals (over the visible window)
+	let totalIn = 0;
+	let totalOut = 0;
+	let totalTransfersIn = 0;
+	let totalTransfersOut = 0;
+	let totalDepositsIn = 0;
+	let totalExpensesOut = 0;
+	for (const e of view) {
+		if (e.direction === "IN") {
+			totalIn += e.amount;
+			if (e.type === "TRANSFER_IN") totalTransfersIn += e.amount;
+			else totalDepositsIn += e.amount;
+		} else {
+			totalOut += e.amount;
+			if (e.type === "TRANSFER_OUT") totalTransfersOut += e.amount;
+			else totalExpensesOut += e.amount;
+		}
+	}
+	const closingBalance = view.length > 0 ? view[view.length - 1].runningBalance : periodOpening;
+
+	return {
+		account: {
+			id: account.id,
+			name: account.name,
+			accountType: account.accountType,
+			balance: storedBalance,
+			openingBalance: Number(openingBalance),
+			currency: account.currency,
+		},
+		entries: view,
+		periodOpeningBalance: periodOpening,
+		closingBalance,
+		totalCount: full.length,
+		truncated,
+		isFiltered: Boolean(from || to),
+		summary: {
+			totalIn,
+			totalOut,
+			netChange: totalIn - totalOut,
+			totalTransfersIn,
+			totalTransfersOut,
+			totalDepositsIn,
+			totalExpensesOut,
+			storedBalance,
+			computedBalance,
+			delta,
+			isBalanced,
+		},
+	};
+}
+
 /**
  * Create a new bank account
  */

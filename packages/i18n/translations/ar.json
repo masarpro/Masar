@@ -4435,6 +4435,45 @@
       "thankYouMessagePlaceholder": "شكراً لتعاملكم معنا"
     },
     "banks": {
+      "ledger": {
+        "title": "كشف الحساب",
+        "print": "طباعة",
+        "allTypes": "كل الأنواع",
+        "searchPlaceholder": "بحث في البيان أو المرجع…",
+        "noMovements": "لا توجد حركات في هذه الفترة",
+        "openingBalance": "الرصيد الافتتاحي",
+        "closingBalance": "الرصيد الختامي",
+        "viewSource": "عرض المستند",
+        "truncatedNote": "يُعرض أحدث 5000 حركة فقط — استخدم فلتر التاريخ لتضييق النطاق.",
+        "balanced": "الرصيد مطابق",
+        "unbalanced": "فرق في الرصيد: {amount}",
+        "totalIn": "إجمالي الوارد",
+        "totalOut": "إجمالي الصادر",
+        "transfersIn": "تحويلات واردة",
+        "transfersOut": "تحويلات صادرة",
+        "netChange": "صافي الحركة",
+        "columns": {
+          "date": "التاريخ",
+          "type": "النوع",
+          "description": "البيان",
+          "counterparty": "الطرف المقابل",
+          "reference": "المرجع",
+          "in": "وارد",
+          "out": "صادر",
+          "balance": "الرصيد"
+        },
+        "types": {
+          "PAYMENT": "مقبوضات",
+          "INVOICE_PAYMENT": "تحصيل فاتورة",
+          "PROJECT_PAYMENT": "دفعة مشروع",
+          "CAPITAL_CONTRIBUTION": "مساهمة رأس مال",
+          "TRANSFER_IN": "تحويل وارد",
+          "EXPENSE": "مصروف",
+          "SUBCONTRACT_PAYMENT": "دفعة مقاول باطن",
+          "OWNER_DRAWING": "سحب أرباح",
+          "TRANSFER_OUT": "تحويل صادر"
+        }
+      },
       "title": "الحسابات البنكية",
       "subtitle": "إدارة الحسابات البنكية والصندوق النقدي",
       "addBank": "إضافة بنك",
