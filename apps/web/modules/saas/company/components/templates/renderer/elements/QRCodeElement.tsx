@@ -30,12 +30,12 @@ export function QRCodeElement({
 		large: "w-40 h-40",
 	};
 
-	// Real ZATCA Phase 2 QR is dense (~V12-15, 65-77 modules/side). Sizes are 30%
-	// smaller than the previously-scannable set (192/256/288 → 134/179/202 px).
+	// Real ZATCA Phase 2 QR is dense (~V12-15, 65-77 modules/side). Sizes are ~37%
+	// smaller than the previously-scannable set (192/256/288 → 121/161/182 px).
 	const realQrSizeMap = {
-		small: "w-[134px] h-[134px]",
-		medium: "w-[179px] h-[179px]",
-		large: "w-[202px] h-[202px]",
+		small: "w-[121px] h-[121px]",
+		medium: "w-[161px] h-[161px]",
+		large: "w-[182px] h-[182px]",
 	};
 
 	// Check if we have a real QR code image from an issued invoice
@@ -49,8 +49,8 @@ export function QRCodeElement({
 					<img
 						src={realQrCode}
 						alt="QR Code"
-						className={`${realQrSizeMap[qrSize]} print:w-[123px] print:h-[123px]`}
-						style={{ minWidth: "134px", minHeight: "134px" }}
+						className={`${realQrSizeMap[qrSize]} print:w-[111px] print:h-[111px]`}
+						style={{ minWidth: "121px", minHeight: "121px" }}
 					/>
 				</div>
 			</div>
