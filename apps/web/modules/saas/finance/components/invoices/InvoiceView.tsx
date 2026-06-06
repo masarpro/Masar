@@ -150,7 +150,7 @@ export function InvoiceView({
 			toast.success(t("finance.invoices.issueSuccess"));
 			setIssueDialogOpen(false);
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "invoices"],
+				queryKey: orpc.finance.invoices.key(),
 			});
 		},
 		onError: (error: any) => {
@@ -169,7 +169,7 @@ export function InvoiceView({
 		onSuccess: (data) => {
 			toast.success(t("finance.invoices.duplicateSuccess"));
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "invoices"],
+				queryKey: orpc.finance.invoices.key(),
 			});
 			router.push(`${basePath}/${data.id}`);
 		},
@@ -196,7 +196,7 @@ export function InvoiceView({
 			setPaymentDialogOpen(false);
 			resetPaymentForm();
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "invoices"],
+				queryKey: orpc.finance.invoices.key(),
 			});
 		},
 		onError: (error: any) => {
@@ -217,7 +217,7 @@ export function InvoiceView({
 			toast.success(t("finance.invoices.paymentDeleteSuccess"));
 			setDeletePaymentId(null);
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "invoices"],
+				queryKey: orpc.finance.invoices.key(),
 			});
 		},
 		onError: (error: any) => {
@@ -237,7 +237,7 @@ export function InvoiceView({
 			toast.success(t("finance.invoices.deleteSuccess"));
 			setDeleteDialogOpen(false);
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "invoices"],
+				queryKey: orpc.finance.invoices.key(),
 			});
 			router.push(basePath);
 		},
@@ -259,7 +259,7 @@ export function InvoiceView({
 			toast.success(t("finance.invoices.noteUpdateSuccess"));
 			setNoteDialogOpen(false);
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "invoices"],
+				queryKey: orpc.finance.invoices.key(),
 			});
 		},
 		onError: (error: any) => {
@@ -710,8 +710,8 @@ function DetailsTabContent({
 				const firstErr = data.errors?.[0]?.message;
 				toast.error(firstErr || t("zatca.submission.retryError"));
 			}
-			queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
-			queryClient.invalidateQueries({ queryKey: ["zatca"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.zatca.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error?.message || t("zatca.submission.retryError"));
