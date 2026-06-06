@@ -16,18 +16,31 @@ interface QRCodeElementProps {
 	primaryColor?: string;
 }
 
-// Fixed, A4-appropriate ZATCA QR size. NOT user-configurable: the dense Phase 2
-// matrix (~V12, 65 modules/side) needs a guaranteed module size to stay
-// scannable, so the size is locked here regardless of any template setting.
-//  - screen: w-48 (192px) — clear on screen without dominating the page
-//  - print:  w-40 (160px ≈ 42mm on A4) — ~0.55mm/module, reliably scannable on
-//    paper by the ZATCA verifier and ordinary phone cameras
-const QR_SIZE_CLASS = "w-48 h-48 print:w-40 print:h-40";
-
 export function QRCodeElement({
+	settings,
 	data,
 	primaryColor = "#3b82f6",
 }: QRCodeElementProps) {
+	const { qrSize = "medium" } = settings;
+
+	// QR size mapping (placeholder preview only — small, decorative)
+	const sizeMap = {
+		small: "w-20 h-20",
+		medium: "w-32 h-32",
+		large: "w-40 h-40",
+	};
+
+	// Real ZATCA Phase 2 QR is dense (~V12-15, 65-77 modules/side). It must be
+	// displayed large enough that each module stays scannable (incl. the ZATCA
+	// verifier app). Sizes are 40% smaller than the original scannable set
+	// (192/256/288 → 115/154/173 px) to fit the page better while remaining
+	// readable.
+	const realQrSizeMap = {
+		small: "w-[115px] h-[115px]",
+		medium: "w-[154px] h-[154px]",
+		large: "w-[173px] h-[173px]",
+	};
+
 	// Check if we have a real QR code image from an issued invoice
 	const realQrCode = isInvoiceData(data) ? data.qrCode : null;
 
@@ -39,19 +52,19 @@ export function QRCodeElement({
 					<img
 						src={realQrCode}
 						alt="QR Code"
-						className={QR_SIZE_CLASS}
+						className={`${realQrSizeMap[qrSize]} print:w-[106px] print:h-[106px]`}
+						style={{ minWidth: "115px", minHeight: "115px" }}
 					/>
 				</div>
 			</div>
 		);
 	}
 
-	// Placeholder QR for template preview / drafts — same fixed footprint as the
-	// real QR so the layout matches what will print.
+	// Placeholder QR for template preview / drafts
 	return (
 		<div className="py-4 qr-signature-section">
 			<div
-				className={`${QR_SIZE_CLASS} border-2 rounded-lg flex items-center justify-center bg-white`}
+				className={`${sizeMap[qrSize]} border-2 rounded-lg flex items-center justify-center bg-white`}
 				style={{ borderColor: "#1a1a2e" }}
 			>
 				<svg
