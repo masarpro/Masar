@@ -342,24 +342,8 @@ export function PropertiesPanel({
 
 						{selectedElement.type === "qrCode" && (
 							<div className="space-y-4">
-								<div className="space-y-2">
-									<Label>{t("finance.templates.editor.settings.qrSize")}</Label>
-									<Select
-										value={(selectedElement.settings.size as string) ?? "medium"}
-										onValueChange={(value: any) =>
-											onUpdateElement(selectedElement.id, { size: value })
-										}
-									>
-										<SelectTrigger>
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="small">{t("common.small")}</SelectItem>
-											<SelectItem value="medium">{t("common.medium")}</SelectItem>
-											<SelectItem value="large">{t("common.large")}</SelectItem>
-										</SelectContent>
-									</Select>
-								</div>
+								{/* QR size is fixed (A4-appropriate, locked for ZATCA
+								    scannability) — not user-configurable. */}
 								<div className="flex items-center justify-between">
 									<Label>{t("finance.templates.editor.settings.showZatcaCompliance")}</Label>
 									<Switch

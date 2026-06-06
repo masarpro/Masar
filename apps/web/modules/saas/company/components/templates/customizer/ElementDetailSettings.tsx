@@ -309,34 +309,9 @@ export function ElementDetailSettings({
 			);
 
 		case "qrCode":
-			return (
-				<>
-					<div className="space-y-1.5">
-						<Label className="text-xs">
-							{t("finance.templates.editor.settings.qrSize")}
-						</Label>
-						<Select
-							value={(s.size as string) ?? "medium"}
-							onValueChange={(v: any) => onUpdate({ size: v })}
-						>
-							<SelectTrigger className="h-8 text-xs rounded-lg">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent className="rounded-xl">
-								<SelectItem value="small">
-									{t("common.small")}
-								</SelectItem>
-								<SelectItem value="medium">
-									{t("common.medium")}
-								</SelectItem>
-								<SelectItem value="large">
-									{t("common.large")}
-								</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-				</>
-			);
+			// QR size is fixed (A4-appropriate, locked for ZATCA scannability) —
+			// no user-configurable settings for this element.
+			return null;
 
 		case "footer":
 			return (
