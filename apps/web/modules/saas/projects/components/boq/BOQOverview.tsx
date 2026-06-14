@@ -20,6 +20,7 @@ import {
 	Plus,
 	TableProperties,
 	Copy,
+	Hammer,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
@@ -39,6 +40,7 @@ import { BulkEntryDialog } from "./bulk-entry-dialog";
 import { PricingModeDialog } from "./pricing-mode-dialog";
 import { CopyFromStudyDialog } from "./copy-from-study-dialog";
 import { CopyFromQuotationDialog } from "./copy-from-quotation-dialog";
+import { CopyFromExecutionDialog } from "./copy-from-execution-dialog";
 import { ImportExcelDialog } from "./import-excel-dialog";
 
 interface BOQOverviewProps {
@@ -76,6 +78,7 @@ export function BOQOverview({
 	} | null>(null);
 	const [showCopyStudyDialog, setShowCopyStudyDialog] = useState(false);
 	const [showCopyQuotationDialog, setShowCopyQuotationDialog] = useState(false);
+	const [showCopyExecutionDialog, setShowCopyExecutionDialog] = useState(false);
 	const [showImportExcelDialog, setShowImportExcelDialog] = useState(false);
 	const [editItem, setEditItem] = useState<any>(null);
 
@@ -195,6 +198,10 @@ export function BOQOverview({
 								<FileText className="h-4 w-4 me-2" />
 								{t("actions.copyFromQuotation")}
 							</Button>
+							<Button variant="outline" className="rounded-xl" onClick={() => setShowCopyExecutionDialog(true)}>
+								<Hammer className="h-4 w-4 me-2" />
+								{t("actions.copyFromExecution")}
+							</Button>
 						</div>
 					</CardContent>
 				</Card>
@@ -249,6 +256,15 @@ export function BOQOverview({
 						>
 							<FileText className="h-4 w-4 me-1.5" />
 							{t("actions.copyFromQuotation")}
+						</Button>
+						<Button
+							variant="outline"
+							size="sm"
+							className="rounded-xl"
+							onClick={() => setShowCopyExecutionDialog(true)}
+						>
+							<Hammer className="h-4 w-4 me-1.5" />
+							{t("actions.copyFromExecution")}
 						</Button>
 					</div>
 
@@ -332,6 +348,13 @@ export function BOQOverview({
 			<CopyFromQuotationDialog
 				open={showCopyQuotationDialog}
 				onOpenChange={setShowCopyQuotationDialog}
+				organizationId={organizationId}
+				projectId={projectId}
+			/>
+
+			<CopyFromExecutionDialog
+				open={showCopyExecutionDialog}
+				onOpenChange={setShowCopyExecutionDialog}
 				organizationId={organizationId}
 				projectId={projectId}
 			/>

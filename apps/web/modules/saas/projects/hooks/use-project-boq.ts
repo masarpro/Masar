@@ -89,6 +89,19 @@ export function useAvailableQuotations(
 	);
 }
 
+export function useExecutionMilestones(
+	organizationId: string,
+	projectId: string,
+	enabled = true,
+) {
+	return useQuery({
+		...orpc.projectBoq.getExecutionMilestones.queryOptions({
+			input: { organizationId, projectId },
+		}),
+		enabled,
+	});
+}
+
 // ═══ Mutations ═══
 
 function useInvalidateBOQ() {
@@ -192,6 +205,16 @@ export function useCopyFromQuotation() {
 		mutationFn: (
 			data: Parameters<typeof orpcClient.projectBoq.copyFromQuotation>[0],
 		) => orpcClient.projectBoq.copyFromQuotation(data),
+		onSuccess: invalidate,
+	});
+}
+
+export function useCopyFromExecution() {
+	const invalidate = useInvalidateBOQ();
+	return useMutation({
+		mutationFn: (
+			data: Parameters<typeof orpcClient.projectBoq.copyFromExecution>[0],
+		) => orpcClient.projectBoq.copyFromExecution(data),
 		onSuccess: invalidate,
 	});
 }

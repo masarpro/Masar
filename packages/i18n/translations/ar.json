@@ -7958,7 +7958,7 @@
     },
     "emptyState": {
       "title": "لا توجد بنود كميات لهذا المشروع",
-      "description": "يمكنك إضافة بنود يدوياً، استيرادها من Excel، أو نسخها من دراسة كميات أو عرض سعر"
+      "description": "يمكنك إضافة بنود يدوياً، استيرادها من Excel، أو نسخها من دراسة كميات أو عرض سعر أو قسم التنفيذ"
     },
     "actions": {
       "addItem": "إضافة بند",
@@ -7966,6 +7966,7 @@
       "importExcel": "استيراد Excel",
       "copyFromStudy": "نسخ من دراسة كميات",
       "copyFromQuotation": "نسخ من عرض سعر",
+      "copyFromExecution": "نسخ من قسم التنفيذ",
       "startPricing": "ابدأ التسعير",
       "deleteSelected": "حذف المحدد",
       "assignPhase": "تعيين مرحلة",
@@ -8088,6 +8089,14 @@
       "itemCount": "{count} بند",
       "client": "العميل"
     },
+    "copyExecution": {
+      "title": "نسخ من قسم التنفيذ",
+      "selectAll": "تحديد كل المراحل",
+      "activitiesSelected": "إجمالي الأنشطة المحددة: {count}",
+      "activitiesCount": "{count} نشاط",
+      "noMilestones": "لا توجد مراحل في قسم التنفيذ",
+      "copy": "نسخ ({count})"
+    },
     "toast": {
       "itemCreated": "تم إضافة البند بنجاح",
       "itemsCreated": "تم إضافة {count} بند بنجاح",
@@ -8098,6 +8107,7 @@
       "phaseAssigned": "تم تعيين المرحلة",
       "copiedFromStudy": "تم نسخ {count} بند من الدراسة",
       "copiedFromQuotation": "تم نسخ {count} بند من عرض السعر",
+      "copiedFromExecution": "تم نسخ {count} بند من قسم التنفيذ",
       "importedFromExcel": "تم استيراد {count} بند"
     },
     "confirm": {

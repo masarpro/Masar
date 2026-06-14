@@ -7958,7 +7958,7 @@
     },
     "emptyState": {
       "title": "No BOQ items for this project",
-      "description": "You can add items manually, import from Excel, or copy from a cost study or quotation"
+      "description": "You can add items manually, import from Excel, or copy from a cost study, quotation, or execution"
     },
     "actions": {
       "addItem": "Add Item",
@@ -7966,6 +7966,7 @@
       "importExcel": "Import Excel",
       "copyFromStudy": "Copy from Cost Study",
       "copyFromQuotation": "Copy from Quotation",
+      "copyFromExecution": "Copy from Execution",
       "startPricing": "Start Pricing",
       "deleteSelected": "Delete Selected",
       "assignPhase": "Assign Phase",
@@ -8088,6 +8089,14 @@
       "itemCount": "{count} items",
       "client": "Client"
     },
+    "copyExecution": {
+      "title": "Copy from Execution",
+      "selectAll": "Select all milestones",
+      "activitiesSelected": "Selected activities: {count}",
+      "activitiesCount": "{count} activities",
+      "noMilestones": "No milestones in execution",
+      "copy": "Copy ({count})"
+    },
     "toast": {
       "itemCreated": "Item added successfully",
       "itemsCreated": "{count} items added successfully",
@@ -8098,6 +8107,7 @@
       "phaseAssigned": "Phase assigned",
       "copiedFromStudy": "Copied {count} items from study",
       "copiedFromQuotation": "Copied {count} items from quotation",
+      "copiedFromExecution": "Copied {count} items from execution",
       "importedFromExcel": "Imported {count} items"
     },
     "confirm": {
