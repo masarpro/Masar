@@ -8158,6 +8158,18 @@
   "projectPayments": {
     "title": "الدفعات",
     "subtitle": "إدارة دفعات المشروع",
+    "copyFromExecution": "نسخ من مراحل التنفيذ",
+    "copyExecution": {
+      "title": "نسخ الدفعات من مراحل التنفيذ",
+      "taxInclusive": "المبالغ شاملة الضريبة (15%)",
+      "amount": "مبلغ الدفعة",
+      "totalPreview": "الإجمالي",
+      "noMilestones": "لا توجد مراحل تنفيذ لهذا المشروع",
+      "noContract": "الدفعات المجدولة تتطلب وجود عقد. الرجاء إنشاء عقد المشروع أولاً.",
+      "goToContract": "إنشاء العقد",
+      "copy": "نسخ ({count})",
+      "savedCount": "تمت إضافة {count} دفعة"
+    },
     "summary": "ملخص الدفعات",
     "summaryDesc": "إجمالي تقدم الدفعات حسب مراحل العقد",
     "totalRequired": "إجمالي المطلوب",

@@ -8158,6 +8158,18 @@
   "projectPayments": {
     "title": "Payments",
     "subtitle": "Manage project payments",
+    "copyFromExecution": "Copy from Execution",
+    "copyExecution": {
+      "title": "Copy payments from execution phases",
+      "taxInclusive": "Amounts include VAT (15%)",
+      "amount": "Payment amount",
+      "totalPreview": "Total",
+      "noMilestones": "No execution phases for this project",
+      "noContract": "Scheduled payments require a contract. Please create the project contract first.",
+      "goToContract": "Create Contract",
+      "copy": "Copy ({count})",
+      "savedCount": "{count} payment(s) added"
+    },
     "summary": "Payments Summary",
     "summaryDesc": "Overall payment progress based on contract terms",
     "totalRequired": "Total Required",

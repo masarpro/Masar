@@ -258,6 +258,50 @@ export async function setContractPaymentTerms(
 }
 
 /**
+ * Append new payment terms to a contract WITHOUT touching existing ones.
+ * Used by the "copy from execution milestones" flow on the payments page.
+ * Amounts must already be final (VAT computed by the caller).
+ */
+export async function appendContractPaymentTermsFromExecution(
+	contractId: string,
+	terms: Array<{
+		label: string;
+		amount: number;
+		dueDate?: Date | null;
+		milestoneId?: string | null;
+	}>,
+) {
+	if (terms.length === 0) {
+		return { createdCount: 0 };
+	}
+
+	return db.$transaction(async (tx) => {
+		const last = await tx.contractPaymentTerm.findFirst({
+			where: { contractId },
+			orderBy: { sortOrder: "desc" },
+			select: { sortOrder: true },
+		});
+		const baseSortOrder = (last?.sortOrder ?? -1) + 1;
+
+		const result = await tx.contractPaymentTerm.createMany({
+			data: terms.map((term, i) => ({
+				contractId,
+				type: "MILESTONE" as const,
+				label: term.label,
+				amount: term.amount,
+				dueDate: term.dueDate ?? null,
+				milestoneId: term.milestoneId ?? null,
+				sortOrder: baseSortOrder + i,
+				status: "PENDING" as const,
+				paidAmount: 0,
+			})),
+		});
+
+		return { createdCount: result.count };
+	});
+}
+
+/**
  * Get payment terms with progress (paid amount, remaining, etc.)
  * Uses two-step query to avoid nested include issues with PrismaPg adapter.
  */

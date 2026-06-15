@@ -5,12 +5,13 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { Button } from "@ui/components/button";
-import { Plus, Info } from "lucide-react";
+import { Plus, Info, Hammer } from "lucide-react";
 import { PaymentsSummaryCards } from "./PaymentsSummaryCards";
 import { PaymentProgressBar } from "./PaymentProgressBar";
 import { PaymentTermsSection } from "./PaymentTermsSection";
 import { FreePaymentsSection } from "./FreePaymentsSection";
 import { CreatePaymentDialog } from "./CreatePaymentDialog";
+import { CopyTermsFromExecutionDialog } from "./CopyTermsFromExecutionDialog";
 import { EmptyPaymentsState } from "./EmptyPaymentsState";
 
 interface ProjectPaymentsPageProps {
@@ -26,6 +27,7 @@ export function ProjectPaymentsPage({
 }: ProjectPaymentsPageProps) {
 	const t = useTranslations();
 	const [createOpen, setCreateOpen] = useState(false);
+	const [copyOpen, setCopyOpen] = useState(false);
 
 	const { data, isLoading } = useQuery(
 		orpc.projectPayments.getSummary.queryOptions({
@@ -65,14 +67,25 @@ export function ProjectPaymentsPage({
 						{t("projectPayments.subtitle")}
 					</p>
 				</div>
-				<Button
-					size="sm"
-					className="rounded-xl bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600"
-					onClick={() => setCreateOpen(true)}
-				>
-					<Plus className="ml-1.5 h-4 w-4" />
-					{t("projectPayments.newPayment")}
-				</Button>
+				<div className="flex items-center gap-2">
+					<Button
+						size="sm"
+						variant="outline"
+						className="rounded-xl"
+						onClick={() => setCopyOpen(true)}
+					>
+						<Hammer className="me-1.5 h-4 w-4" />
+						{t("projectPayments.copyFromExecution")}
+					</Button>
+					<Button
+						size="sm"
+						className="rounded-xl bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600"
+						onClick={() => setCreateOpen(true)}
+					>
+						<Plus className="me-1.5 h-4 w-4" />
+						{t("projectPayments.newPayment")}
+					</Button>
+				</div>
 			</div>
 
 			{/* Scenario 1: No contract */}
@@ -170,6 +183,15 @@ export function ProjectPaymentsPage({
 				organizationId={organizationId}
 				projectId={projectId}
 				terms={data?.terms ?? []}
+				hasContract={hasContract}
+			/>
+
+			{/* Copy Payment Terms from Execution Milestones */}
+			<CopyTermsFromExecutionDialog
+				open={copyOpen}
+				onOpenChange={setCopyOpen}
+				organizationId={organizationId}
+				projectId={projectId}
 				hasContract={hasContract}
 			/>
 		</div>
