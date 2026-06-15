@@ -8029,7 +8029,8 @@
       "phase": "المرحلة",
       "category": "الفئة",
       "notes": "ملاحظات",
-      "create": "إضافة البند"
+      "create": "إضافة البند",
+      "boundToPhase": "سيُربط هذا البند بمرحلة: {title}"
     },
     "bulkEntry": {
       "title": "إدخال بنود متعددة",
@@ -8097,6 +8098,35 @@
       "noMilestones": "لا توجد مراحل في قسم التنفيذ",
       "copy": "نسخ ({count})"
     },
+    "viewMode": {
+      "flat": "قائمة",
+      "byPhase": "بحسب المرحلة"
+    },
+    "phaseView": {
+      "unassigned": "بنود بدون مرحلة",
+      "addFromStudy": "إضافة من دراسة",
+      "addManual": "إضافة يدوي",
+      "itemsCount": "{count} بند",
+      "emptyPhase": "لا توجد بنود في هذه المرحلة بعد — استخدم الأزرار أعلاه لإضافتها",
+      "noPhases": "لا توجد مراحل تنفيذ ولا بنود — انسخ المراحل من قسم التنفيذ أولاً"
+    },
+    "addStudyToPhase": {
+      "title": "إضافة بنود دراسة كميات إلى مرحلة",
+      "selectStudyHint": "ابحث عن دراسة كميات...",
+      "backToStudies": "← العودة لاختيار دراسة",
+      "selectedCount": "{count} بند محدد",
+      "selectAllInSection": "تحديد الكل",
+      "unselectAllInSection": "إلغاء التحديد",
+      "addToPhase": "إضافة لـ {phase}",
+      "noItemsInStudy": "لا توجد بنود في هذه الدراسة",
+      "workDays": "يوم عمل",
+      "kind": {
+        "STRUCTURAL": "إنشائي",
+        "FINISHING": "تشطيبات",
+        "MEP": "MEP",
+        "LABOR": "عمالة"
+      }
+    },
     "toast": {
       "itemCreated": "تم إضافة البند بنجاح",
       "itemsCreated": "تم إضافة {count} بند بنجاح",
@@ -8108,6 +8138,7 @@
       "copiedFromStudy": "تم نسخ {count} بند من الدراسة",
       "copiedFromQuotation": "تم نسخ {count} بند من عرض السعر",
       "copiedFromExecution": "تم نسخ {count} بند من قسم التنفيذ",
+      "addedToPhase": "تم إضافة {count} بند إلى مرحلة {phase}",
       "importedFromExcel": "تم استيراد {count} بند"
     },
     "confirm": {

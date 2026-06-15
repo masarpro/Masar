@@ -8029,7 +8029,8 @@
       "phase": "Phase",
       "category": "Category",
       "notes": "Notes",
-      "create": "Add Item"
+      "create": "Add Item",
+      "boundToPhase": "Will be linked to phase: {title}"
     },
     "bulkEntry": {
       "title": "Add Multiple Items",
@@ -8097,6 +8098,35 @@
       "noMilestones": "No milestones in execution",
       "copy": "Copy ({count})"
     },
+    "viewMode": {
+      "flat": "List",
+      "byPhase": "By Phase"
+    },
+    "phaseView": {
+      "unassigned": "Unassigned items",
+      "addFromStudy": "Add from Study",
+      "addManual": "Add Manual",
+      "itemsCount": "{count} items",
+      "emptyPhase": "No items in this phase yet — use the buttons above to add them",
+      "noPhases": "No execution phases or items — copy phases from Execution first"
+    },
+    "addStudyToPhase": {
+      "title": "Add Study Items to Phase",
+      "selectStudyHint": "Search studies...",
+      "backToStudies": "← Back to study selection",
+      "selectedCount": "{count} items selected",
+      "selectAllInSection": "Select all",
+      "unselectAllInSection": "Unselect all",
+      "addToPhase": "Add to {phase}",
+      "noItemsInStudy": "No items in this study",
+      "workDays": "work days",
+      "kind": {
+        "STRUCTURAL": "Structural",
+        "FINISHING": "Finishing",
+        "MEP": "MEP",
+        "LABOR": "Labor"
+      }
+    },
     "toast": {
       "itemCreated": "Item added successfully",
       "itemsCreated": "{count} items added successfully",
@@ -8108,6 +8138,7 @@
       "copiedFromStudy": "Copied {count} items from study",
       "copiedFromQuotation": "Copied {count} items from quotation",
       "copiedFromExecution": "Copied {count} items from execution",
+      "addedToPhase": "Added {count} items to phase {phase}",
       "importedFromExcel": "Imported {count} items"
     },
     "confirm": {

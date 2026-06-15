@@ -28,6 +28,8 @@ interface CreateItemDialogProps {
 	onOpenChange: (open: boolean) => void;
 	organizationId: string;
 	projectId: string;
+	defaultPhaseId?: string | null;
+	defaultPhaseTitle?: string;
 }
 
 export function CreateItemDialog({
@@ -35,6 +37,8 @@ export function CreateItemDialog({
 	onOpenChange,
 	organizationId,
 	projectId,
+	defaultPhaseId,
+	defaultPhaseTitle,
 }: CreateItemDialogProps) {
 	const t = useTranslations("projectBoq");
 	const createMutation = useCreateBOQItem();
@@ -68,6 +72,7 @@ export function CreateItemDialog({
 				unitPrice: form.unitPrice ? Number(form.unitPrice) : null,
 				category: form.category || undefined,
 				notes: form.notes || undefined,
+				projectPhaseId: defaultPhaseId ?? null,
 			});
 			toast.success(t("toast.itemCreated"));
 			onOpenChange(false);
@@ -96,6 +101,11 @@ export function CreateItemDialog({
 			<DialogContent className="sm:max-w-2xl p-0 gap-0 rounded-2xl overflow-hidden">
 				<DialogHeader className="bg-white dark:bg-slate-900 border-b px-5 py-4">
 					<DialogTitle>{t("createDialog.title")}</DialogTitle>
+					{defaultPhaseId && defaultPhaseTitle && (
+						<p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+							{t("createDialog.boundToPhase", { title: defaultPhaseTitle })}
+						</p>
+					)}
 				</DialogHeader>
 
 				<form onSubmit={handleSubmit}>

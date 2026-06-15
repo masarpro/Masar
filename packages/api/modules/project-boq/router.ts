@@ -1,3 +1,4 @@
+import { addStudyItemsToPhase } from "./procedures/add-study-items-to-phase";
 import { assignPhase } from "./procedures/assign-phase";
 import { bulkCreate } from "./procedures/bulk-create";
 import { bulkDelete } from "./procedures/bulk-delete";
@@ -9,8 +10,10 @@ import { create } from "./procedures/create";
 import { deleteItem } from "./procedures/delete";
 import { getAvailableCostStudies } from "./procedures/get-available-cost-studies";
 import { getAvailableQuotations } from "./procedures/get-available-quotations";
+import { getBoqGroupedByPhase } from "./procedures/get-boq-grouped-by-phase";
 import { getByPhase } from "./procedures/get-by-phase";
 import { getExecutionMilestones } from "./procedures/get-execution-milestones";
+import { getStudyItemsDetail } from "./procedures/get-study-items-detail";
 import { getSummary } from "./procedures/get-summary";
 import { getUnpricedItems } from "./procedures/get-unpriced-items";
 import { importFromData } from "./procedures/import-from-data";
@@ -38,4 +41,7 @@ export const projectBoqRouter = {
 	getAvailableQuotations,
 	getAvailableCostStudies,
 	getExecutionMilestones,
+	getBoqGroupedByPhase,
+	getStudyItemsDetail,
+	addStudyItemsToPhase,
 };

@@ -21,6 +21,8 @@ import {
 	TableProperties,
 	Copy,
 	Hammer,
+	List,
+	Layers,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
@@ -42,6 +44,8 @@ import { CopyFromStudyDialog } from "./copy-from-study-dialog";
 import { CopyFromQuotationDialog } from "./copy-from-quotation-dialog";
 import { CopyFromExecutionDialog } from "./copy-from-execution-dialog";
 import { ImportExcelDialog } from "./import-excel-dialog";
+import { BOQByPhaseView } from "./boq-by-phase-view";
+import { AddStudyItemsToPhaseDialog } from "./add-study-items-to-phase-dialog";
 
 interface BOQOverviewProps {
 	organizationId: string;
@@ -81,6 +85,15 @@ export function BOQOverview({
 	const [showCopyExecutionDialog, setShowCopyExecutionDialog] = useState(false);
 	const [showImportExcelDialog, setShowImportExcelDialog] = useState(false);
 	const [editItem, setEditItem] = useState<any>(null);
+	const [viewMode, setViewMode] = useState<"flat" | "byPhase">("flat");
+	const [phaseAddStudy, setPhaseAddStudy] = useState<{
+		phaseId: string | null;
+		phaseTitle: string;
+	} | null>(null);
+	const [phaseAddManual, setPhaseAddManual] = useState<{
+		phaseId: string | null;
+		phaseTitle: string;
+	} | null>(null);
 
 	// Queries
 	const filters: any = { limit: 50, offset, sortBy, sortDirection };
@@ -266,7 +279,49 @@ export function BOQOverview({
 							<Hammer className="h-4 w-4 me-1.5" />
 							{t("actions.copyFromExecution")}
 						</Button>
+
+						<div className="ms-auto inline-flex rounded-xl border border-slate-200 dark:border-slate-700 p-0.5 bg-white dark:bg-slate-900">
+							<button
+								type="button"
+								onClick={() => setViewMode("flat")}
+								className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+									viewMode === "flat"
+										? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+										: "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+								}`}
+							>
+								<List className="h-3.5 w-3.5" />
+								{t("viewMode.flat")}
+							</button>
+							<button
+								type="button"
+								onClick={() => setViewMode("byPhase")}
+								className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+									viewMode === "byPhase"
+										? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+										: "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+								}`}
+							>
+								<Layers className="h-3.5 w-3.5" />
+								{t("viewMode.byPhase")}
+							</button>
+						</div>
 					</div>
+
+					{viewMode === "byPhase" ? (
+						<BOQByPhaseView
+							organizationId={organizationId}
+							projectId={projectId}
+							onAddFromStudy={(phaseId, phaseTitle) =>
+								setPhaseAddStudy({ phaseId, phaseTitle })
+							}
+							onAddManual={(phaseId, phaseTitle) =>
+								setPhaseAddManual({ phaseId, phaseTitle })
+							}
+							onEditItem={(item) => setEditItem(item)}
+						/>
+					) : (
+						<>
 
 					{/* Filters */}
 					<BOQFilters
@@ -313,6 +368,8 @@ export function BOQOverview({
 							onSortChange={handleSortChange}
 						/>
 					) : null}
+						</>
+					)}
 				</>
 			)}
 
@@ -323,6 +380,28 @@ export function BOQOverview({
 				organizationId={organizationId}
 				projectId={projectId}
 			/>
+
+			{phaseAddManual && (
+				<CreateItemDialog
+					open={!!phaseAddManual}
+					onOpenChange={(open) => !open && setPhaseAddManual(null)}
+					organizationId={organizationId}
+					projectId={projectId}
+					defaultPhaseId={phaseAddManual.phaseId}
+					defaultPhaseTitle={phaseAddManual.phaseTitle}
+				/>
+			)}
+
+			{phaseAddStudy && (
+				<AddStudyItemsToPhaseDialog
+					open={!!phaseAddStudy}
+					onOpenChange={(open) => !open && setPhaseAddStudy(null)}
+					organizationId={organizationId}
+					projectId={projectId}
+					targetPhaseId={phaseAddStudy.phaseId}
+					targetPhaseTitle={phaseAddStudy.phaseTitle}
+				/>
+			)}
 
 			<BulkEntryDialog
 				open={showBulkDialog}

@@ -102,6 +102,36 @@ export function useExecutionMilestones(
 	});
 }
 
+export function useBOQGroupedByPhase(
+	organizationId: string,
+	projectId: string,
+	enabled = true,
+) {
+	return useQuery({
+		...orpc.projectBoq.getBoqGroupedByPhase.queryOptions({
+			input: { organizationId, projectId },
+		}),
+		enabled,
+	});
+}
+
+export function useStudyItemsDetail(
+	organizationId: string,
+	projectId: string,
+	studyId: string | null,
+) {
+	return useQuery({
+		...orpc.projectBoq.getStudyItemsDetail.queryOptions({
+			input: {
+				organizationId,
+				projectId,
+				studyId: studyId ?? "",
+			},
+		}),
+		enabled: !!studyId,
+	});
+}
+
 // ═══ Mutations ═══
 
 function useInvalidateBOQ() {
@@ -215,6 +245,16 @@ export function useCopyFromExecution() {
 		mutationFn: (
 			data: Parameters<typeof orpcClient.projectBoq.copyFromExecution>[0],
 		) => orpcClient.projectBoq.copyFromExecution(data),
+		onSuccess: invalidate,
+	});
+}
+
+export function useAddStudyItemsToPhase() {
+	const invalidate = useInvalidateBOQ();
+	return useMutation({
+		mutationFn: (
+			data: Parameters<typeof orpcClient.projectBoq.addStudyItemsToPhase>[0],
+		) => orpcClient.projectBoq.addStudyItemsToPhase(data),
 		onSuccess: invalidate,
 	});
 }

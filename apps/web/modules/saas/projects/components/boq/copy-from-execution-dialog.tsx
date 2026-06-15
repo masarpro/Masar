@@ -187,9 +187,20 @@ export function CopyFromExecutionDialog({
 								const startStr = formatDate(milestone.plannedStart);
 								const endStr = formatDate(milestone.plannedEnd);
 								return (
-									<label
+									<div
 										key={milestone.id}
-										htmlFor={`ms-${milestone.id}`}
+										role="button"
+										tabIndex={disabled ? -1 : 0}
+										onClick={() => {
+											if (!disabled) toggleOne(milestone.id);
+										}}
+										onKeyDown={(e) => {
+											if (disabled) return;
+											if (e.key === " " || e.key === "Enter") {
+												e.preventDefault();
+												toggleOne(milestone.id);
+											}
+										}}
 										className={`block rounded-xl border bg-white dark:bg-slate-900 p-4 transition-colors ${
 											disabled
 												? "border-slate-200 dark:border-slate-700 opacity-60 cursor-not-allowed"
@@ -198,13 +209,10 @@ export function CopyFromExecutionDialog({
 									>
 										<div className="flex items-start gap-3">
 											<Checkbox
-												id={`ms-${milestone.id}`}
-												className="mt-0.5"
+												className="mt-0.5 pointer-events-none"
 												disabled={disabled}
 												checked={selected.has(milestone.id)}
-												onCheckedChange={() => {
-													if (!disabled) toggleOne(milestone.id);
-												}}
+												tabIndex={-1}
 											/>
 											<div className="min-w-0 flex-1">
 												<div className="flex items-center gap-2">
@@ -234,7 +242,7 @@ export function CopyFromExecutionDialog({
 												</div>
 											</div>
 										</div>
-									</label>
+									</div>
 								);
 							})
 						)}
