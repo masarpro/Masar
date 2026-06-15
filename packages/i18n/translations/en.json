@@ -1954,6 +1954,12 @@
     },
     "activity": {
       "title": "Activity",
+      "titleField": "Activity Title",
+      "description": "Description",
+      "plannedStart": "Planned Start",
+      "plannedEnd": "Planned End",
+      "statusLabel": "Status",
+      "progress": "Progress",
       "create": "Add Activity",
       "edit": "Edit Activity",
       "delete": "Delete Activity",
@@ -8031,6 +8037,9 @@
       "notes": "Notes",
       "create": "Add Item",
       "boundToPhase": "Will be linked to phase: {title}"
+    },
+    "editDialog": {
+      "title": "Edit Item"
     },
     "bulkEntry": {
       "title": "Add Multiple Items",

@@ -1954,6 +1954,12 @@
     },
     "activity": {
       "title": "النشاط",
+      "titleField": "عنوان النشاط",
+      "description": "الوصف",
+      "plannedStart": "بداية مخططة",
+      "plannedEnd": "نهاية مخططة",
+      "statusLabel": "الحالة",
+      "progress": "نسبة الإنجاز",
       "create": "إضافة نشاط",
       "edit": "تعديل النشاط",
       "delete": "حذف النشاط",
@@ -8031,6 +8037,9 @@
       "notes": "ملاحظات",
       "create": "إضافة البند",
       "boundToPhase": "سيُربط هذا البند بمرحلة: {title}"
+    },
+    "editDialog": {
+      "title": "تعديل بند"
     },
     "bulkEntry": {
       "title": "إدخال بنود متعددة",

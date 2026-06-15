@@ -7,10 +7,27 @@ import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import { Checkbox } from "@ui/components/checkbox";
 import { Input } from "@ui/components/input";
-import { CheckSquareIcon, PlusIcon, Loader2Icon } from "lucide-react";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@ui/components/alert-dialog";
+import {
+	CheckSquareIcon,
+	PlusIcon,
+	Loader2Icon,
+	PencilIcon,
+	Trash2Icon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { EditActivityDialog } from "./EditActivityDialog";
 
 interface MilestoneActivityChecklistProps {
 	projectId: string;
@@ -26,6 +43,8 @@ export function MilestoneActivityChecklist({
 	const { activeOrganization } = useActiveOrganization();
 	const organizationId = activeOrganization?.id;
 	const [newActivityTitle, setNewActivityTitle] = useState("");
+	const [editActivity, setEditActivity] = useState<any | null>(null);
+	const [deleteActivityId, setDeleteActivityId] = useState<string | null>(null);
 
 	const queryKey = [
 		"project-execution-activities",
@@ -85,6 +104,31 @@ export function MilestoneActivityChecklist({
 			queryClient.invalidateQueries({
 				queryKey: ["project-execution-dashboard", organizationId, projectId],
 			});
+		},
+		onError: (error: Error) => {
+			toast.error(error.message);
+		},
+	});
+
+	const deleteMutation = useMutation({
+		mutationFn: async (activityId: string) => {
+			if (!organizationId) throw new Error("No organization");
+			return apiClient.projectExecution.deleteActivity({
+				organizationId,
+				projectId,
+				activityId,
+			});
+		},
+		onSuccess: () => {
+			toast.success(t("execution.notifications.activityDeleted"));
+			queryClient.invalidateQueries({ queryKey });
+			queryClient.invalidateQueries({
+				queryKey: ["project-timeline", organizationId, projectId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["project-execution-dashboard", organizationId, projectId],
+			});
+			setDeleteActivityId(null);
 		},
 		onError: (error: Error) => {
 			toast.error(error.message);
@@ -164,6 +208,26 @@ export function MilestoneActivityChecklist({
 							>
 								{t(`execution.activity.status.${activity.status}`)}
 							</Badge>
+							<Button
+								type="button"
+								size="icon"
+								variant="ghost"
+								className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+								onClick={() => setEditActivity(activity)}
+								title={t("execution.activity.edit")}
+							>
+								<PencilIcon className="h-3.5 w-3.5" />
+							</Button>
+							<Button
+								type="button"
+								size="icon"
+								variant="ghost"
+								className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+								onClick={() => setDeleteActivityId(activity.id)}
+								title={t("execution.activity.delete")}
+							>
+								<Trash2Icon className="h-3.5 w-3.5" />
+							</Button>
 						</div>
 					))}
 				</div>
@@ -196,6 +260,45 @@ export function MilestoneActivityChecklist({
 					<PlusIcon className="h-4 w-4" />
 				</Button>
 			</form>
+
+			{editActivity && (
+				<EditActivityDialog
+					open={!!editActivity}
+					onOpenChange={(open) => !open && setEditActivity(null)}
+					projectId={projectId}
+					milestoneId={milestoneId}
+					activity={editActivity}
+				/>
+			)}
+
+			<AlertDialog
+				open={deleteActivityId !== null}
+				onOpenChange={(open: any) => !open && setDeleteActivityId(null)}
+			>
+				<AlertDialogContent className="rounded-2xl">
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							{t("execution.activity.delete")}
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							{t("execution.activity.confirmDelete")}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel className="rounded-xl">
+							{t("common.cancel")}
+						</AlertDialogCancel>
+						<AlertDialogAction
+							className="rounded-xl bg-red-600 hover:bg-red-700"
+							onClick={() =>
+								deleteActivityId && deleteMutation.mutate(deleteActivityId)
+							}
+						>
+							{t("execution.activity.delete")}
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 }

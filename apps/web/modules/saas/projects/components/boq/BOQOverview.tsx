@@ -381,6 +381,16 @@ export function BOQOverview({
 				projectId={projectId}
 			/>
 
+			{editItem && (
+				<CreateItemDialog
+					open={!!editItem}
+					onOpenChange={(open) => !open && setEditItem(null)}
+					organizationId={organizationId}
+					projectId={projectId}
+					editItem={editItem}
+				/>
+			)}
+
 			{phaseAddManual && (
 				<CreateItemDialog
 					open={!!phaseAddManual}

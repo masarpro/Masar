@@ -19,9 +19,12 @@ import {
 import { Textarea } from "@ui/components/textarea";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useCreateBOQItem } from "@saas/projects/hooks/use-project-boq";
+import {
+	useCreateBOQItem,
+	useUpdateBOQItem,
+} from "@saas/projects/hooks/use-project-boq";
 
 interface CreateItemDialogProps {
 	open: boolean;
@@ -30,7 +33,20 @@ interface CreateItemDialogProps {
 	projectId: string;
 	defaultPhaseId?: string | null;
 	defaultPhaseTitle?: string;
+	editItem?: any | null;
 }
+
+const DEFAULT_FORM = {
+	section: "GENERAL",
+	code: "",
+	description: "",
+	specifications: "",
+	unit: "",
+	quantity: "",
+	unitPrice: "",
+	category: "",
+	notes: "",
+};
 
 export function CreateItemDialog({
 	open,
@@ -39,54 +55,77 @@ export function CreateItemDialog({
 	projectId,
 	defaultPhaseId,
 	defaultPhaseTitle,
+	editItem,
 }: CreateItemDialogProps) {
 	const t = useTranslations("projectBoq");
 	const createMutation = useCreateBOQItem();
+	const updateMutation = useUpdateBOQItem();
+	const isEdit = !!editItem;
 
-	const [form, setForm] = useState({
-		section: "GENERAL",
-		code: "",
-		description: "",
-		specifications: "",
-		unit: "",
-		quantity: "",
-		unitPrice: "",
-		category: "",
-		notes: "",
-	});
+	const [form, setForm] = useState(DEFAULT_FORM);
+
+	useEffect(() => {
+		if (open) {
+			if (editItem) {
+				setForm({
+					section: editItem.section ?? "GENERAL",
+					code: editItem.code ?? "",
+					description: editItem.description ?? "",
+					specifications: editItem.specifications ?? "",
+					unit: editItem.unit ?? "",
+					quantity:
+						editItem.quantity != null ? String(editItem.quantity) : "",
+					unitPrice:
+						editItem.unitPrice != null ? String(editItem.unitPrice) : "",
+					category: editItem.category ?? "",
+					notes: editItem.notes ?? "",
+				});
+			} else {
+				setForm(DEFAULT_FORM);
+			}
+		}
+	}, [open, editItem]);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!form.description.trim() || !form.unit.trim()) return;
 
 		try {
-			await createMutation.mutateAsync({
-				organizationId,
-				projectId,
-				section: form.section as any,
-				code: form.code || undefined,
-				description: form.description,
-				specifications: form.specifications || undefined,
-				unit: form.unit,
-				quantity: Number(form.quantity) || 0,
-				unitPrice: form.unitPrice ? Number(form.unitPrice) : null,
-				category: form.category || undefined,
-				notes: form.notes || undefined,
-				projectPhaseId: defaultPhaseId ?? null,
-			});
-			toast.success(t("toast.itemCreated"));
+			if (isEdit && editItem) {
+				await updateMutation.mutateAsync({
+					organizationId,
+					projectId,
+					itemId: editItem.id,
+					section: form.section as any,
+					code: form.code || null,
+					description: form.description,
+					specifications: form.specifications || null,
+					unit: form.unit,
+					quantity: Number(form.quantity) || 0,
+					unitPrice: form.unitPrice ? Number(form.unitPrice) : null,
+					category: form.category || null,
+					notes: form.notes || null,
+				});
+				toast.success(t("toast.itemUpdated"));
+			} else {
+				await createMutation.mutateAsync({
+					organizationId,
+					projectId,
+					section: form.section as any,
+					code: form.code || undefined,
+					description: form.description,
+					specifications: form.specifications || undefined,
+					unit: form.unit,
+					quantity: Number(form.quantity) || 0,
+					unitPrice: form.unitPrice ? Number(form.unitPrice) : null,
+					category: form.category || undefined,
+					notes: form.notes || undefined,
+					projectPhaseId: defaultPhaseId ?? null,
+				});
+				toast.success(t("toast.itemCreated"));
+			}
 			onOpenChange(false);
-			setForm({
-				section: "GENERAL",
-				code: "",
-				description: "",
-				specifications: "",
-				unit: "",
-				quantity: "",
-				unitPrice: "",
-				category: "",
-				notes: "",
-			});
+			setForm(DEFAULT_FORM);
 		} catch {
 			// Error handled by mutation
 		}
@@ -96,12 +135,16 @@ export function CreateItemDialog({
 		setForm((prev) => ({ ...prev, [field]: value }));
 	};
 
+	const isPending = createMutation.isPending || updateMutation.isPending;
+
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-2xl p-0 gap-0 rounded-2xl overflow-hidden">
 				<DialogHeader className="bg-white dark:bg-slate-900 border-b px-5 py-4">
-					<DialogTitle>{t("createDialog.title")}</DialogTitle>
-					{defaultPhaseId && defaultPhaseTitle && (
+					<DialogTitle>
+						{isEdit ? t("editDialog.title") : t("createDialog.title")}
+					</DialogTitle>
+					{!isEdit && defaultPhaseId && defaultPhaseTitle && (
 						<p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
 							{t("createDialog.boundToPhase", { title: defaultPhaseTitle })}
 						</p>
@@ -231,10 +274,10 @@ export function CreateItemDialog({
 						<Button
 							type="submit"
 							className="rounded-xl"
-							disabled={createMutation.isPending || !form.description.trim() || !form.unit.trim()}
+							disabled={isPending || !form.description.trim() || !form.unit.trim()}
 						>
-							{createMutation.isPending && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
-							{t("createDialog.create")}
+							{isPending && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
+							{isEdit ? t("actions.save") : t("createDialog.create")}
 						</Button>
 					</div>
 				</form>
