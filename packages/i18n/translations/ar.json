@@ -8094,7 +8094,9 @@
       "title": "نسخ من قسم التنفيذ",
       "selectAll": "تحديد كل المراحل",
       "activitiesSelected": "إجمالي الأنشطة المحددة: {count}",
+      "rowsToCreate": "إجمالي البنود التي ستُنشأ: {count}",
       "activitiesCount": "{count} نشاط",
+      "willCreateOne": "بدون أنشطة — سيُنشأ بند واحد بعنوان المرحلة",
       "noMilestones": "لا توجد مراحل في قسم التنفيذ",
       "copy": "نسخ ({count})"
     },

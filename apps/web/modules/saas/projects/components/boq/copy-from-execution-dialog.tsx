@@ -56,36 +56,30 @@ export function CopyFromExecutionDialog({
 
 	useEffect(() => {
 		if (open) {
-			const withActivities = milestoneList
-				.filter((m: any) => m.activitiesCount > 0)
-				.map((m: any) => m.id);
-			setSelected(new Set(withActivities));
+			setSelected(new Set(milestoneList.map((m: any) => m.id)));
 		}
 	}, [open, milestoneList]);
 
-	const totalActivities = useMemo(
+	const totalRowsToCreate = useMemo(
 		() =>
 			milestoneList
 				.filter((m: any) => selected.has(m.id))
 				.reduce(
-					(sum: number, m: any) => sum + (m.activitiesCount ?? 0),
+					(sum: number, m: any) => sum + Math.max(1, m.activitiesCount ?? 0),
 					0,
 				),
 		[milestoneList, selected],
 	);
 
-	const allSelectable = milestoneList.filter(
-		(m: any) => m.activitiesCount > 0,
-	);
 	const allSelected =
-		allSelectable.length > 0 &&
-		allSelectable.every((m: any) => selected.has(m.id));
+		milestoneList.length > 0 &&
+		milestoneList.every((m: any) => selected.has(m.id));
 
 	const toggleAll = () => {
 		if (allSelected) {
 			setSelected(new Set());
 		} else {
-			setSelected(new Set(allSelectable.map((m: any) => m.id)));
+			setSelected(new Set(milestoneList.map((m: any) => m.id)));
 		}
 	};
 
@@ -105,7 +99,7 @@ export function CopyFromExecutionDialog({
 				organizationId,
 				projectId,
 				milestoneIds: Array.from(selected),
-				includeEmptyMilestones: false,
+				includeEmptyMilestones: true,
 			});
 			toast.success(
 				t("toast.copiedFromExecution", { count: result.copiedCount }),
@@ -136,20 +130,32 @@ export function CopyFromExecutionDialog({
 
 				<div className="p-5 space-y-4">
 					{/* Select all + summary */}
-					{!isLoading && allSelectable.length > 0 && (
-						<div className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 px-4 py-2.5">
-							<label className="flex items-center gap-2 cursor-pointer text-sm">
+					{!isLoading && milestoneList.length > 0 && (
+						<div
+							role="button"
+							tabIndex={0}
+							onClick={toggleAll}
+							onKeyDown={(e) => {
+								if (e.key === " " || e.key === "Enter") {
+									e.preventDefault();
+									toggleAll();
+								}
+							}}
+							className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 px-4 py-2.5 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/50"
+						>
+							<span className="flex items-center gap-2 text-sm">
 								<Checkbox
+									className="pointer-events-none"
 									checked={allSelected}
-									onCheckedChange={toggleAll}
+									tabIndex={-1}
 								/>
 								<span className="font-medium text-slate-700 dark:text-slate-200">
 									{t("copyExecution.selectAll")}
 								</span>
-							</label>
+							</span>
 							<span className="text-xs text-slate-500">
-								{t("copyExecution.activitiesSelected", {
-									count: totalActivities,
+								{t("copyExecution.rowsToCreate", {
+									count: totalRowsToCreate,
 								})}
 							</span>
 						</div>
@@ -183,34 +189,26 @@ export function CopyFromExecutionDialog({
 							</div>
 						) : (
 							milestoneList.map((milestone: any) => {
-								const disabled = milestone.activitiesCount === 0;
 								const startStr = formatDate(milestone.plannedStart);
 								const endStr = formatDate(milestone.plannedEnd);
+								const isEmpty = milestone.activitiesCount === 0;
 								return (
 									<div
 										key={milestone.id}
 										role="button"
-										tabIndex={disabled ? -1 : 0}
-										onClick={() => {
-											if (!disabled) toggleOne(milestone.id);
-										}}
+										tabIndex={0}
+										onClick={() => toggleOne(milestone.id)}
 										onKeyDown={(e) => {
-											if (disabled) return;
 											if (e.key === " " || e.key === "Enter") {
 												e.preventDefault();
 												toggleOne(milestone.id);
 											}
 										}}
-										className={`block rounded-xl border bg-white dark:bg-slate-900 p-4 transition-colors ${
-											disabled
-												? "border-slate-200 dark:border-slate-700 opacity-60 cursor-not-allowed"
-												: "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 cursor-pointer"
-										}`}
+										className="block rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition-colors hover:border-slate-300 dark:hover:border-slate-600 cursor-pointer"
 									>
 										<div className="flex items-start gap-3">
 											<Checkbox
 												className="mt-0.5 pointer-events-none"
-												disabled={disabled}
 												checked={selected.has(milestone.id)}
 												tabIndex={-1}
 											/>
@@ -227,12 +225,19 @@ export function CopyFromExecutionDialog({
 													</p>
 												)}
 												<div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 dark:text-slate-400">
-													<span className="flex items-center gap-1">
-														<Hammer className="h-3.5 w-3.5 text-amber-500" />
-														{t("copyExecution.activitiesCount", {
-															count: milestone.activitiesCount,
-														})}
-													</span>
+													{isEmpty ? (
+														<span className="flex items-center gap-1 text-slate-400">
+															<Hammer className="h-3.5 w-3.5" />
+															{t("copyExecution.willCreateOne")}
+														</span>
+													) : (
+														<span className="flex items-center gap-1">
+															<Hammer className="h-3.5 w-3.5 text-amber-500" />
+															{t("copyExecution.activitiesCount", {
+																count: milestone.activitiesCount,
+															})}
+														</span>
+													)}
 													{(startStr || endStr) && (
 														<span className="flex items-center gap-1">
 															<CalendarDays className="h-3.5 w-3.5 text-emerald-500" />
@@ -262,11 +267,7 @@ export function CopyFromExecutionDialog({
 					<Button
 						type="button"
 						className="rounded-xl h-10"
-						disabled={
-							selected.size === 0 ||
-							copyMutation.isPending ||
-							totalActivities === 0
-						}
+						disabled={selected.size === 0 || copyMutation.isPending}
 						onClick={handleCopy}
 					>
 						{copyMutation.isPending ? (
@@ -274,7 +275,7 @@ export function CopyFromExecutionDialog({
 						) : (
 							<Copy className="h-4 w-4 me-1.5" />
 						)}
-						{t("copyExecution.copy", { count: totalActivities })}
+						{t("copyExecution.copy", { count: totalRowsToCreate })}
 					</Button>
 				</div>
 			</DialogContent>

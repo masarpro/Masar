@@ -8094,7 +8094,9 @@
       "title": "Copy from Execution",
       "selectAll": "Select all milestones",
       "activitiesSelected": "Selected activities: {count}",
+      "rowsToCreate": "Items to create: {count}",
       "activitiesCount": "{count} activities",
+      "willCreateOne": "No activities — one item will be created from the milestone",
       "noMilestones": "No milestones in execution",
       "copy": "Copy ({count})"
     },
