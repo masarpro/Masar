@@ -21,7 +21,6 @@ import {
 	idString, optionalTrimmed, searchQuery,
 	positiveAmount, paginationLimit, paginationOffset,
 } from "../../../lib/validation-constants";
-import { findCategoryById, findSubcategoryById } from "@repo/utils";
 import { ensureCategoriesSeeded } from "../../../lib/categories/ensure-categories-seeded";
 
 // Enums
@@ -234,35 +233,39 @@ export const createExpenseProcedure = subscriptionProcedure
 			action: "payments",
 		});
 
-		// Validate new hierarchical category against the static list
-		const cat = findCategoryById(input.categoryId);
-		if (!cat) {
+		// Resolve the DB-backed category. Accepts either the OrgCategory id
+		// (cuid, sent by the DB-backed combobox) or the stable systemId
+		// (legacy/back-compat callers). Custom categories have no systemId.
+		await ensureCategoriesSeeded(input.organizationId, "EXPENSE");
+		const dbCategory = await db.orgCategory.findFirst({
+			where: {
+				organizationId: input.organizationId,
+				group: "EXPENSE",
+				OR: [{ id: input.categoryId }, { systemId: input.categoryId }],
+			},
+			select: { id: true, accountCode: true, isVatExempt: true },
+		});
+		if (!dbCategory) {
 			throw new ORPCError("BAD_REQUEST", {
 				message: "فئة المصروف غير صالحة",
 			});
 		}
+		let dbSubcategoryId: string | undefined;
 		if (input.subcategoryId) {
-			const sub = findSubcategoryById(input.categoryId, input.subcategoryId);
-			if (!sub) {
+			const dbSub = await db.orgSubcategory.findFirst({
+				where: {
+					categoryId: dbCategory.id,
+					organizationId: input.organizationId,
+					OR: [{ id: input.subcategoryId }, { systemId: input.subcategoryId }],
+				},
+				select: { id: true },
+			});
+			if (!dbSub) {
 				throw new ORPCError("BAD_REQUEST", {
 					message: "الفئة الفرعية غير صالحة",
 				});
 			}
-		}
-
-		// Ensure DB-backed categories are seeded, then resolve actual OrgCategory IDs
-		await ensureCategoriesSeeded(input.organizationId, "EXPENSE");
-		const dbCategory = await db.orgCategory.findFirst({
-			where: { organizationId: input.organizationId, systemId: input.categoryId, group: "EXPENSE" },
-			select: { id: true },
-		});
-		let dbSubcategoryId: string | undefined;
-		if (input.subcategoryId && dbCategory) {
-			const dbSub = await db.orgSubcategory.findFirst({
-				where: { categoryId: dbCategory.id, organizationId: input.organizationId, systemId: input.subcategoryId },
-				select: { id: true },
-			});
-			dbSubcategoryId = dbSub?.id ?? undefined;
+			dbSubcategoryId = dbSub.id;
 		}
 
 		let expense: Awaited<ReturnType<typeof createExpense>>;
@@ -272,7 +275,7 @@ export const createExpenseProcedure = subscriptionProcedure
 				createdById: context.user.id,
 				category: input.category ?? "MISC",
 				customCategory: input.customCategory,
-				categoryId: dbCategory?.id ?? undefined,
+				categoryId: dbCategory.id,
 				subcategoryId: dbSubcategoryId ?? undefined,
 				description: input.description,
 				amount: input.amount,
@@ -317,10 +320,12 @@ export const createExpenseProcedure = subscriptionProcedure
 				await onExpenseCompleted(db, {
 					id: expense.id,
 					organizationId: input.organizationId,
-					category: input.categoryId ?? input.category ?? "MISC",
+					category: input.category ?? "MISC",
+					accountCode: dbCategory.accountCode,
+					isVatExempt: dbCategory.isVatExempt,
 					amount: expense.amount,
 					date: expense.date,
-					description: input.description ?? input.categoryId,
+					description: input.description ?? expense.description ?? "",
 					sourceAccountId: input.sourceAccountId,
 					projectId: input.projectId,
 					sourceType: input.sourceType,
@@ -413,14 +418,22 @@ export const updateExpenseProcedure = subscriptionProcedure
 		if (inputCategoryId) {
 			await ensureCategoriesSeeded(organizationId, "EXPENSE");
 			const dbCat = await db.orgCategory.findFirst({
-				where: { organizationId, systemId: inputCategoryId, group: "EXPENSE" },
+				where: {
+					organizationId,
+					group: "EXPENSE",
+					OR: [{ id: inputCategoryId }, { systemId: inputCategoryId }],
+				},
 				select: { id: true },
 			});
 			if (dbCat) {
 				resolvedCategoryId = dbCat.id;
 				if (inputSubcategoryId) {
 					const dbSub = await db.orgSubcategory.findFirst({
-						where: { categoryId: dbCat.id, organizationId, systemId: inputSubcategoryId },
+						where: {
+							categoryId: dbCat.id,
+							organizationId,
+							OR: [{ id: inputSubcategoryId }, { systemId: inputSubcategoryId }],
+						},
 						select: { id: true },
 					});
 					resolvedSubcategoryId = dbSub?.id;
@@ -551,10 +564,19 @@ export const payExpenseProcedure = subscriptionProcedure
 		// Auto-Journal: generate accounting entry for expense payment
 		try {
 			const { onExpenseCompleted } = await import("../../../lib/accounting/auto-journal");
+			// Prefer the DB-backed category's GL account + VAT treatment (custom categories)
+			const payCategory = expense.categoryId
+				? await db.orgCategory.findUnique({
+						where: { id: expense.categoryId },
+						select: { accountCode: true, isVatExempt: true },
+					})
+				: null;
 			await onExpenseCompleted(db, {
 				id: expense.id,
 				organizationId: input.organizationId,
 				category: expense.category,
+				accountCode: payCategory?.accountCode,
+				isVatExempt: payCategory?.isVatExempt,
 				amount: expense.amount,
 				date: expense.date,
 				description: expense.description ?? expense.category,

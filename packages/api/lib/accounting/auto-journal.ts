@@ -244,14 +244,19 @@ export async function onExpenseCompleted(db: PrismaClient, expense: {
 	projectId?: string | null;
 	sourceType?: string | null;
 	userId?: string;
+	// DB-backed category overrides (preferred when present). Sourced from the
+	// expense's OrgCategory row so custom categories post to their own GL
+	// account and VAT treatment. Optional → existing callers behave identically.
+	accountCode?: string | null;
+	isVatExempt?: boolean;
 }) {
 	if (!(await ensureChartExists(db, expense.organizationId))) return;
 
 	// Skip payroll expenses — journal entry already created by onPayrollApproved
 	if (expense.sourceType === "FACILITY_PAYROLL") return;
 
-	const expenseCode = getAccountCodeForCategory(expense.category) ?? EXPENSE_CATEGORY_TO_ACCOUNT_CODE[expense.category] ?? "6900";
-	if (!getAccountCodeForCategory(expense.category) && !EXPENSE_CATEGORY_TO_ACCOUNT_CODE[expense.category]) {
+	const expenseCode = expense.accountCode ?? getAccountCodeForCategory(expense.category) ?? EXPENSE_CATEGORY_TO_ACCOUNT_CODE[expense.category] ?? "6900";
+	if (!expense.accountCode && !getAccountCodeForCategory(expense.category) && !EXPENSE_CATEGORY_TO_ACCOUNT_CODE[expense.category]) {
 		console.warn(`[Accounting] Expense ${expense.id} used fallback account 6900 for unknown category: ${expense.category}`);
 	}
 	const expenseAccId = await getAccountByCode(db, expense.organizationId, expenseCode);
@@ -270,7 +275,9 @@ export async function onExpenseCompleted(db: PrismaClient, expense: {
 
 	const lines: any[] = [];
 
-	if (isCategoryVatExempt(expense.category) || VAT_EXEMPT.includes(expense.category)) {
+	const vatExempt = expense.isVatExempt ?? (isCategoryVatExempt(expense.category) || VAT_EXEMPT.includes(expense.category));
+
+	if (vatExempt) {
 		// Full amount to expense account — no VAT split
 		lines.push(
 			{ accountId: expenseAccId, debit: expense.amount, credit: ZERO, projectId: expense.projectId },

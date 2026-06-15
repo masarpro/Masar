@@ -8,6 +8,7 @@ import {
 	Layout,
 	FileCheck,
 	UsersRound,
+	Tags,
 	type LucideIcon,
 } from "lucide-react";
 
@@ -72,6 +73,13 @@ export const SETTINGS_NAV_SECTIONS: SettingsNavSection[] = [
 		path: "owners",
 		labelKey: "settings.menu.organization.owners",
 		icon: UsersRound,
+		adminOnly: true,
+	},
+	{
+		id: "expense-categories",
+		path: "expense-categories",
+		labelKey: "settings.menu.organization.expenseCategories",
+		icon: Tags,
 		adminOnly: true,
 	},
 	{

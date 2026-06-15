@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useLocale } from "next-intl";
-import { Check, ChevronsUpDown, Search } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@ui/lib";
 import { Button } from "@ui/components/button";
 import {
@@ -18,9 +19,20 @@ import {
 	CommandItem,
 	CommandList,
 } from "@ui/components/command";
-import { EXPENSE_CATEGORIES, type ExpenseMainCategory } from "@repo/utils";
+import { orpc } from "@shared/lib/orpc-query-utils";
+
+// Shape we rely on from `categories.list` (subset of OrgCategory).
+interface CategoryOption {
+	id: string;
+	nameAr: string;
+	nameEn: string;
+	subcategories?: { nameAr: string; nameEn: string }[];
+}
 
 interface ExpenseCategoryComboboxProps {
+	/** Organization whose (DB-backed, editable) categories to list. */
+	organizationId: string;
+	/** Selected OrgCategory id (cuid). */
 	value: string;
 	onValueChange: (categoryId: string) => void;
 	disabled?: boolean;
@@ -28,6 +40,7 @@ interface ExpenseCategoryComboboxProps {
 }
 
 export function ExpenseCategoryCombobox({
+	organizationId,
 	value,
 	onValueChange,
 	disabled,
@@ -38,31 +51,34 @@ export function ExpenseCategoryCombobox({
 	const locale = useLocale();
 	const isAr = locale === "ar";
 
-	const getName = (cat: ExpenseMainCategory) =>
-		isAr ? cat.nameAr : cat.nameEn;
+	const { data: categories = [], isLoading } = useQuery(
+		orpc.categories.list.queryOptions({
+			input: { organizationId, group: "EXPENSE" },
+		}),
+	);
 
-	const getSecondaryName = (cat: ExpenseMainCategory) =>
+	const getName = (cat: CategoryOption) => (isAr ? cat.nameAr : cat.nameEn);
+	const getSecondaryName = (cat: CategoryOption) =>
 		isAr ? cat.nameEn : cat.nameAr;
 
 	const selected = value
-		? EXPENSE_CATEGORIES.find((c) => c.id === value)
+		? categories.find((c) => c.id === value)
 		: undefined;
 
 	const filtered = search.trim()
-		? EXPENSE_CATEGORIES.filter((c) => {
+		? categories.filter((c) => {
 				const q = search.toLowerCase().trim();
 				return (
 					c.nameAr.includes(q) ||
 					c.nameEn.toLowerCase().includes(q) ||
-					c.id.toLowerCase().includes(q) ||
-					c.subcategories.some(
+					(c.subcategories ?? []).some(
 						(s) =>
 							s.nameAr.includes(q) ||
 							s.nameEn.toLowerCase().includes(q),
 					)
 				);
 			})
-		: EXPENSE_CATEGORIES;
+		: categories;
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -71,7 +87,7 @@ export function ExpenseCategoryCombobox({
 					variant="outline"
 					role="combobox"
 					aria-expanded={open}
-					disabled={disabled}
+					disabled={disabled || isLoading}
 					className="w-full justify-between rounded-xl h-10 font-normal bg-card shadow-xs"
 				>
 					{selected ? (

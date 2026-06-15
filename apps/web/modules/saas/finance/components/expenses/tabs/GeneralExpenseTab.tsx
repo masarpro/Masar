@@ -484,6 +484,7 @@ export const GeneralExpenseTab = forwardRef<
 						{t("finance.expenses.category")} *
 					</Label>
 					<ExpenseCategoryCombobox
+						organizationId={organizationId}
 						value={formData.categoryId}
 						onValueChange={(id) =>
 							setFormData({
@@ -499,6 +500,7 @@ export const GeneralExpenseTab = forwardRef<
 						{t("finance.expenses.subcategory")}
 					</Label>
 					<ExpenseSubcategoryCombobox
+						organizationId={organizationId}
 						categoryId={formData.categoryId}
 						value={formData.subcategoryId}
 						onValueChange={(id) =>

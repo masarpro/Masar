@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useLocale } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@ui/lib";
 import { Button } from "@ui/components/button";
@@ -18,13 +19,21 @@ import {
 	CommandItem,
 	CommandList,
 } from "@ui/components/command";
-import {
-	findCategoryById,
-	type ExpenseSubcategory,
-} from "@repo/utils";
+import { orpc } from "@shared/lib/orpc-query-utils";
+
+// Shape we rely on from `categories.list` (subset of OrgSubcategory).
+interface SubcategoryOption {
+	id: string;
+	nameAr: string;
+	nameEn: string;
+}
 
 interface ExpenseSubcategoryComboboxProps {
+	/** Organization whose (DB-backed, editable) categories to list. */
+	organizationId: string;
+	/** Parent OrgCategory id (cuid). */
 	categoryId: string;
+	/** Selected OrgSubcategory id (cuid) or null. */
 	value: string | null;
 	onValueChange: (subcategoryId: string | null) => void;
 	disabled?: boolean;
@@ -32,6 +41,7 @@ interface ExpenseSubcategoryComboboxProps {
 }
 
 export function ExpenseSubcategoryCombobox({
+	organizationId,
 	categoryId,
 	value,
 	onValueChange,
@@ -43,10 +53,18 @@ export function ExpenseSubcategoryCombobox({
 	const locale = useLocale();
 	const isAr = locale === "ar";
 
-	const category = categoryId ? findCategoryById(categoryId) : undefined;
+	const { data: categories = [] } = useQuery(
+		orpc.categories.list.queryOptions({
+			input: { organizationId, group: "EXPENSE" },
+		}),
+	);
+
+	const category = categoryId
+		? categories.find((c) => c.id === categoryId)
+		: undefined;
 	const subcategories = category?.subcategories ?? [];
 
-	const getName = (sub: ExpenseSubcategory) =>
+	const getName = (sub: SubcategoryOption) =>
 		isAr ? sub.nameAr : sub.nameEn;
 
 	const selected = value
@@ -58,8 +76,7 @@ export function ExpenseSubcategoryCombobox({
 				const q = search.toLowerCase().trim();
 				return (
 					s.nameAr.includes(q) ||
-					s.nameEn.toLowerCase().includes(q) ||
-					s.id.toLowerCase().includes(q)
+					s.nameEn.toLowerCase().includes(q)
 				);
 			})
 		: subcategories;
