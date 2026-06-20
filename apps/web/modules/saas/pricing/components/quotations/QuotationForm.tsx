@@ -54,6 +54,8 @@ import {
 	Columns,
 	Eye,
 	Printer,
+	Download,
+	Loader2,
 	ArrowRight,
 	ArrowRightLeft,
 	Calendar,
@@ -77,6 +79,7 @@ import { StatusBadge } from "@saas/finance/components/shared/StatusBadge";
 import { AmountSummary } from "@saas/finance/components/shared/AmountSummary";
 import { calculateTotals } from "@saas/finance/lib/utils";
 import { TemplateRenderer } from "@saas/company/components/templates/renderer";
+import { exportToPDF, printDocument } from "@saas/shared/lib/pdf-export";
 import { useEnsureDefaultTemplate } from "@saas/shared/hooks/use-ensure-default-template";
 import { EditorPageSkeleton } from "@saas/shared/components/skeletons";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@ui/components/collapsible";
@@ -188,6 +191,7 @@ export function QuotationForm({
 	const [visibleColumns, setVisibleColumns] = useState<ColumnKey[]>(DEFAULT_VISIBLE_COLUMNS);
 	const [isInitialized, setIsInitialized] = useState(mode === "create" && !draftId);
 	const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+	const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
 	// Column visibility helpers
 	const columnLabels: Record<ColumnKey, string> = {
@@ -751,6 +755,94 @@ export function QuotationForm({
 
 	const isBusy = autosave.state.status === "saving" || isCommitting || isPublishing;
 
+	// ─── Preview / Print / PDF data (shared by the preview dialog AND the
+	//     always-mounted #quotation-print-area used by window.print + the
+	//     server-side PDF export — reuses the existing pdf-export system). ───
+	const previewDocNo =
+		mode === "edit" && existingQuotation ? existingQuotation.quotationNo : quotationNumber;
+
+	const previewData = {
+		quotationNo: previewDocNo,
+		createdAt: quotationDate,
+		validUntil: validUntilDate,
+		status: existingQuotation?.status || "DRAFT",
+		clientName,
+		clientCompany,
+		clientPhone,
+		clientEmail,
+		clientAddress,
+		clientTaxNumber,
+		items: items
+			.filter((item) => item.description.trim())
+			.map((item) => ({
+				description: item.description,
+				quantity: item.quantity,
+				unit: item.unit,
+				unitPrice: item.unitPrice,
+				totalPrice: item.quantity * item.unitPrice,
+			})),
+		subtotal: totals.subtotal,
+		discountPercent,
+		discountAmount: totals.discountAmount,
+		vatPercent,
+		vatAmount: totals.vatAmount,
+		totalAmount: totals.totalAmount,
+		paymentTerms: paymentTerms || orgSettings?.defaultPaymentTerms || undefined,
+		deliveryTerms: deliveryTerms || orgSettings?.defaultDeliveryTerms || undefined,
+		warrantyTerms: warrantyTerms || orgSettings?.defaultWarrantyTerms || undefined,
+		notes,
+		introduction: introduction || undefined,
+		termsAndConditions: termsAndConditions || undefined,
+		contentBlocks: contentBlocks
+			.filter((b) => b.title.trim() && b.content.trim())
+			.map((b) => ({ title: b.title, content: b.content, position: b.position })),
+	};
+
+	const previewTemplate = {
+		elements: (defaultTemplate?.content as { elements?: any[] })?.elements || [],
+		settings: (defaultTemplate?.settings as any) || {},
+	};
+
+	const previewOrg = {
+		name: orgSettings?.companyNameAr || undefined,
+		nameAr: orgSettings?.companyNameAr || undefined,
+		nameEn: orgSettings?.companyNameEn || undefined,
+		logo: orgSettings?.logo || undefined,
+		address: orgSettings?.address || undefined,
+		addressAr: orgSettings?.address || undefined,
+		addressEn: orgSettings?.addressEn || undefined,
+		phone: orgSettings?.phone || undefined,
+		email: orgSettings?.email || undefined,
+		website: orgSettings?.website || undefined,
+		taxNumber: orgSettings?.taxNumber || undefined,
+		commercialReg: orgSettings?.commercialReg || undefined,
+		bankName: orgSettings?.bankName || undefined,
+		bankNameEn: orgSettings?.bankNameEn || undefined,
+		accountName: orgSettings?.accountName || undefined,
+		iban: orgSettings?.iban || undefined,
+		accountNumber: orgSettings?.accountNumber || undefined,
+		swiftCode: orgSettings?.swiftCode || undefined,
+		headerText: orgSettings?.headerText || undefined,
+		footerText: orgSettings?.footerText || undefined,
+		thankYouMessage: orgSettings?.thankYouMessage || undefined,
+	};
+
+	const pdfFilename = `${previewDocNo}-${clientName || "quotation"}`;
+
+	const handlePrint = () => printDocument();
+
+	const handleDownloadPdf = async () => {
+		setIsGeneratingPdf(true);
+		try {
+			await exportToPDF(pdfFilename);
+		} catch (error) {
+			console.error("PDF generation failed:", error);
+			toast.error(t("common.error"));
+		} finally {
+			setIsGeneratingPdf(false);
+		}
+	};
+
 	// Loading state
 	if ((isEditDraft && isStartingEdit) || (!!workingDraftId && isLoadingDraft && !draft)) {
 		return <EditorPageSkeleton />;
@@ -800,12 +892,29 @@ export function QuotationForm({
 							<AutosaveIndicator state={autosave.state} onRetry={() => void autosave.forceSave()} mode="draft" className="hidden sm:inline-flex me-1" />
 							<Button
 								type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg"
+								title={t("finance.actions.preview")}
 								onClick={() => setShowPreviewDialog(true)}
 							>
 								<Eye className="h-4 w-4" />
 							</Button>
-							<Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setShowPreviewDialog(true)}>
+							<Button
+								type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg"
+								title={t("finance.actions.print")}
+								onClick={handlePrint}
+							>
 								<Printer className="h-4 w-4" />
+							</Button>
+							<Button
+								type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-lg"
+								title={t("finance.actions.downloadPdf")}
+								disabled={isGeneratingPdf}
+								onClick={handleDownloadPdf}
+							>
+								{isGeneratingPdf ? (
+									<Loader2 className="h-4 w-4 animate-spin" />
+								) : (
+									<Download className="h-4 w-4" />
+								)}
 							</Button>
 							<div className="w-px h-5 bg-border/50" />
 							<Button type="button" variant="outline" size="sm" disabled={isBusy} onClick={handleSaveClick} className="h-8 rounded-[10px] text-xs px-4">
@@ -1366,84 +1475,54 @@ export function QuotationForm({
 			<Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
 				<DialogContent className="max-w-4xl max-h-[90vh] overflow-auto p-0 rounded-2xl">
 					<DialogHeader className="p-4 border-b sticky top-0 bg-background z-10">
-						<DialogTitle className="flex items-center gap-2">
-							<Eye className="h-5 w-5" />
-							{t("finance.actions.preview")}
-						</DialogTitle>
+						<div className="flex flex-wrap items-center justify-between gap-2">
+							<DialogTitle className="flex items-center gap-2">
+								<Eye className="h-5 w-5" />
+								{t("finance.actions.preview")}
+							</DialogTitle>
+							<div className="flex flex-wrap items-center gap-2">
+								<Button type="button" variant="outline" size="sm" className="h-8 rounded-[10px] text-xs" onClick={handlePrint}>
+									<Printer className="h-3.5 w-3.5 me-1.5" />
+									{t("finance.actions.print")}
+								</Button>
+								<Button type="button" size="sm" className="h-8 rounded-[10px] text-xs" disabled={isGeneratingPdf} onClick={handleDownloadPdf}>
+									{isGeneratingPdf ? (
+										<Loader2 className="h-3.5 w-3.5 animate-spin me-1.5" />
+									) : (
+										<Download className="h-3.5 w-3.5 me-1.5" />
+									)}
+									{t("finance.actions.downloadPdf")}
+								</Button>
+							</div>
+						</div>
 					</DialogHeader>
 					<div className="bg-slate-100 dark:bg-slate-900 p-4 min-h-[60vh]">
 						<div className="bg-white dark:bg-card rounded-xl shadow-lg overflow-hidden">
 							<TemplateRenderer
-								data={{
-									quotationNo: mode === "edit" && existingQuotation ? existingQuotation.quotationNo : quotationNumber,
-									createdAt: quotationDate,
-									validUntil: validUntilDate,
-									status: existingQuotation?.status || "DRAFT",
-									clientName,
-									clientCompany,
-									clientPhone,
-									clientEmail,
-									clientAddress,
-									clientTaxNumber,
-									items: items
-										.filter((item) => item.description.trim())
-										.map((item) => ({
-											description: item.description,
-											quantity: item.quantity,
-											unit: item.unit,
-											unitPrice: item.unitPrice,
-											totalPrice: item.quantity * item.unitPrice,
-										})),
-									subtotal: totals.subtotal,
-									discountPercent,
-									discountAmount: totals.discountAmount,
-									vatPercent,
-									vatAmount: totals.vatAmount,
-									totalAmount: totals.totalAmount,
-									paymentTerms: paymentTerms || orgSettings?.defaultPaymentTerms || undefined,
-									deliveryTerms: deliveryTerms || orgSettings?.defaultDeliveryTerms || undefined,
-									warrantyTerms: warrantyTerms || orgSettings?.defaultWarrantyTerms || undefined,
-									notes,
-									introduction: introduction || undefined,
-									termsAndConditions: termsAndConditions || undefined,
-									contentBlocks: contentBlocks
-										.filter((b) => b.title.trim() && b.content.trim())
-										.map((b) => ({ title: b.title, content: b.content, position: b.position })),
-								}}
-								template={{
-									elements: (defaultTemplate?.content as { elements?: any[] })?.elements || [],
-									settings: (defaultTemplate?.settings as any) || {},
-								}}
+								data={previewData}
+								template={previewTemplate}
 								customElementData={customElementData}
-								organization={{
-									name: orgSettings?.companyNameAr || undefined,
-									nameAr: orgSettings?.companyNameAr || undefined,
-									nameEn: orgSettings?.companyNameEn || undefined,
-									logo: orgSettings?.logo || undefined,
-									address: orgSettings?.address || undefined,
-									addressAr: orgSettings?.address || undefined,
-									addressEn: orgSettings?.addressEn || undefined,
-									phone: orgSettings?.phone || undefined,
-									email: orgSettings?.email || undefined,
-									website: orgSettings?.website || undefined,
-									taxNumber: orgSettings?.taxNumber || undefined,
-									commercialReg: orgSettings?.commercialReg || undefined,
-									bankName: orgSettings?.bankName || undefined,
-									bankNameEn: orgSettings?.bankNameEn || undefined,
-									accountName: orgSettings?.accountName || undefined,
-									iban: orgSettings?.iban || undefined,
-									accountNumber: orgSettings?.accountNumber || undefined,
-									swiftCode: orgSettings?.swiftCode || undefined,
-									headerText: orgSettings?.headerText || undefined,
-									footerText: orgSettings?.footerText || undefined,
-									thankYouMessage: orgSettings?.thankYouMessage || undefined,
-								}}
+								organization={previewOrg}
 								documentType="quotation"
 							/>
 						</div>
 					</div>
 				</DialogContent>
 			</Dialog>
+
+			{/* Always-mounted print area — hidden on screen, revealed in print
+			    media (window.print) and by the server-side PDF export, which
+			    navigates to this page and finds #quotation-print-area. Reuses the
+			    existing pdf-export pipeline — no new PDF system. */}
+			<div id="quotation-print-area" className="hidden print:block" aria-hidden="true">
+				<TemplateRenderer
+					data={previewData}
+					template={previewTemplate}
+					customElementData={customElementData}
+					organization={previewOrg}
+					documentType="quotation"
+				/>
+			</div>
 
 			{/* New Client Dialog */}
 			<Dialog open={showNewClientDialog} onOpenChange={setShowNewClientDialog}>
