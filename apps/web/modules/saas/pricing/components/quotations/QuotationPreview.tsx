@@ -187,14 +187,14 @@ export function QuotationPreview({
 	return (
 		<div className="space-y-4">
 			{/* Actions Bar - Hide on print */}
-			<div className="flex items-center justify-between print:hidden">
+			<div className="flex flex-wrap items-center justify-between gap-2 print:hidden">
 				<Link href={`${basePath}/${quotationId}`}>
 					<Button variant="outline" className="rounded-xl">
 						<ArrowLeft className="h-4 w-4 me-2" />
 						{t("common.back")}
 					</Button>
 				</Link>
-				<div className="flex gap-2">
+				<div className="flex flex-wrap gap-2">
 					<Button variant="outline" onClick={handlePrint} className="rounded-xl">
 						<Printer className="h-4 w-4 me-2" />
 						{t("finance.actions.print")}

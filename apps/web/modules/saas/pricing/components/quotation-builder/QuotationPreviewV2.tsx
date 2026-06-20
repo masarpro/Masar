@@ -72,6 +72,12 @@ export function QuotationPreviewV2({
 		staleTime: STALE_TIMES.FINANCE_SETTINGS,
 	});
 
+	// PDF download state — MUST be declared before any early return so the
+	// hook order stays stable across renders (Rules of Hooks).
+	const [showFilenameDialog, setShowFilenameDialog] = useState(false);
+	const [pdfFilename, setPdfFilename] = useState("");
+	const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
 	const fmt = (n: number) =>
 		Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
@@ -116,11 +122,6 @@ export function QuotationPreviewV2({
 
 	const handlePrint = () => printDocument();
 
-	// PDF download state
-	const [showFilenameDialog, setShowFilenameDialog] = useState(false);
-	const [pdfFilename, setPdfFilename] = useState("");
-	const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-
 	const defaultFilename = `${q.quotationNo}-${q.clientName || "quotation"}`;
 
 	const handleDownloadPdf = async (filename: string) => {
@@ -162,14 +163,14 @@ export function QuotationPreviewV2({
 	return (
 		<div className="space-y-4" dir="rtl">
 			{/* Actions Bar */}
-			<div className="flex items-center justify-between print:hidden">
+			<div className="flex flex-wrap items-center justify-between gap-2 print:hidden">
 				<Link href={`${basePath}/${quotationId}`}>
 					<Button variant="outline" className="rounded-xl">
 						<ArrowLeft className="h-4 w-4 me-2" />
 						رجوع
 					</Button>
 				</Link>
-				<div className="flex items-center gap-3">
+				<div className="flex flex-wrap items-center gap-2">
 					{/* Format badge */}
 					<span className="text-xs text-muted-foreground border border-border rounded-lg px-2.5 py-1">
 						{FORMAT_LABELS[format] ?? format}
@@ -209,10 +210,10 @@ export function QuotationPreviewV2({
 
 				<CardContent className="p-0 print:p-0 relative z-20">
 					{/* PDF Header Section */}
-					<div data-pdf-header className="p-8 pb-4 print:p-6 print:pb-3 space-y-6">
+					<div data-pdf-header className="p-5 pb-4 sm:p-8 sm:pb-4 print:p-6 print:pb-3 space-y-6">
 						{/* Header with subtle gradient */}
 						<div className="rounded-xl bg-gradient-to-l from-primary/5 via-transparent to-transparent -mx-2 px-2 py-1">
-							<div className="flex justify-between items-start border-b border-border pb-6">
+							<div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start sm:gap-6 border-b border-border pb-6">
 								<div>
 									{org?.logo && (
 										// NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply
@@ -280,7 +281,7 @@ export function QuotationPreviewV2({
 					</div>
 
 					{/* PDF Body Section */}
-					<div data-pdf-body className="px-8 print:px-6 space-y-6">
+					<div data-pdf-body className="px-5 sm:px-8 print:px-6 space-y-6">
 
 					{/* ─── Introduction ─── */}
 					{q.introduction && (
@@ -439,7 +440,7 @@ export function QuotationPreviewV2({
 					</div>
 
 					{/* PDF Footer Section */}
-					<div data-pdf-footer className="px-8 pb-8 print:px-6 print:pb-6">
+					<div data-pdf-footer className="px-5 pb-8 sm:px-8 print:px-6 print:pb-6">
 						{org?.thankYouMessage && (
 							<div className="text-center text-sm text-muted-foreground border-t border-border pt-4">
 								{org.thankYouMessage}
