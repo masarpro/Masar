@@ -1,10 +1,20 @@
 "use client";
 
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import { exportToPDF } from "@saas/shared/lib/pdf-export";
 import { apiClient } from "@shared/lib/api-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
-import { AlertTriangleIcon, BarChart3Icon, ClipboardListIcon, GanttChartIcon, PlusIcon } from "lucide-react";
+import {
+	AlertTriangleIcon,
+	BarChart3Icon,
+	ClipboardListIcon,
+	DownloadIcon,
+	GanttChartIcon,
+	Loader2,
+	PlusIcon,
+	PrinterIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
@@ -44,6 +54,32 @@ export function ExecutionDashboard({ projectId }: ExecutionDashboardProps) {
 	const [isTemplateOpen, setIsTemplateOpen] = useState(false);
 	const [editingMilestone, setEditingMilestone] = useState<ExecutionMilestone | null>(null);
 	const [deletingMilestoneId, setDeletingMilestoneId] = useState<string | null>(null);
+	const [isGeneratingTablePdf, setIsGeneratingTablePdf] = useState(false);
+
+	const tablePrintPath = `/app/${organizationSlug}/projects/${projectId}/execution/print/table`;
+
+	const handlePrintTable = () => {
+		window.open(`${tablePrintPath}?autoprint=1`, "_blank", "noopener");
+	};
+
+	const handleDownloadTablePdf = async () => {
+		setIsGeneratingTablePdf(true);
+		try {
+			await exportToPDF(`milestones-${projectId}`, {
+				url: tablePrintPath,
+				format: "A4",
+				landscape: false,
+			});
+		} catch (err) {
+			toast.error(
+				err instanceof Error
+					? err.message
+					: t("execution.print.pdfFailed"),
+			);
+		} finally {
+			setIsGeneratingTablePdf(false);
+		}
+	};
 
 	const { milestones, dashboard, isLoading } = useExecutionData(projectId);
 	const {
@@ -206,6 +242,31 @@ export function ExecutionDashboard({ projectId }: ExecutionDashboardProps) {
 							{t("execution.dashboard.delayAnalysis")}
 						</Link>
 					</Button>
+					{view === "table" && (
+						<>
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={handlePrintTable}
+							>
+								<PrinterIcon className="h-4 w-4 me-1" />
+								{t("common.print")}
+							</Button>
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={handleDownloadTablePdf}
+								disabled={isGeneratingTablePdf}
+							>
+								{isGeneratingTablePdf ? (
+									<Loader2 className="h-4 w-4 me-1 animate-spin" />
+								) : (
+									<DownloadIcon className="h-4 w-4 me-1" />
+								)}
+								{t("execution.print.downloadPdf")}
+							</Button>
+						</>
+					)}
 					<Button size="sm" onClick={handleAddMilestone}>
 						<PlusIcon className="h-4 w-4 me-1" />
 						{t("timeline.addMilestone")}

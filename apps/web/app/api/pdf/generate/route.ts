@@ -4,9 +4,21 @@ import { getBaseUrl } from "@repo/utils";
 export const maxDuration = 30;
 export const dynamic = "force-dynamic";
 
+type PageFormat = "A4" | "A3";
+
 export async function POST(req: NextRequest) {
 	try {
-		const { url, filename = "document" } = await req.json();
+		const {
+			url,
+			filename = "document",
+			format = "A4",
+			landscape = false,
+		}: {
+			url?: string;
+			filename?: string;
+			format?: PageFormat;
+			landscape?: boolean;
+		} = await req.json();
 
 		if (!url || typeof url !== "string") {
 			return NextResponse.json(
@@ -14,6 +26,9 @@ export async function POST(req: NextRequest) {
 				{ status: 400 },
 			);
 		}
+
+		const pageFormat: PageFormat = format === "A3" ? "A3" : "A4";
+		const isLandscape = Boolean(landscape);
 
 		// Build full URL from path
 		const baseUrl = getBaseUrl();
@@ -78,9 +93,12 @@ export async function POST(req: NextRequest) {
 
 		// Wait for the content to render (React Query data loaded)
 		await page
-			.waitForSelector("#quotation-print-area, #invoice-print-area, [data-pdf-body]", {
-				timeout: 10000,
-			})
+			.waitForSelector(
+				"#quotation-print-area, #invoice-print-area, #execution-gantt-print-area, #execution-table-print-area, [data-pdf-body]",
+				{
+					timeout: 10000,
+				},
+			)
 			.catch(() => {
 				// Fallback: wait for any substantial content
 				return page.waitForSelector("table, main", { timeout: 5000 });
@@ -97,7 +115,9 @@ export async function POST(req: NextRequest) {
 		await page.evaluate(() => {
 			const printArea =
 				document.getElementById("invoice-print-area") ||
-				document.getElementById("quotation-print-area");
+				document.getElementById("quotation-print-area") ||
+				document.getElementById("execution-gantt-print-area") ||
+				document.getElementById("execution-table-print-area");
 
 			if (
 				printArea &&
@@ -114,9 +134,10 @@ export async function POST(req: NextRequest) {
 		await new Promise((r) => setTimeout(r, 100));
 
 		// Generate PDF — Chromium handles thead/tfoot repetition natively via
-		// table-header-group / table-footer-group. Margin 0 = full A4 usable.
+		// table-header-group / table-footer-group. Margin 0 = full sheet usable.
 		const pdfBuffer = await page.pdf({
-			format: "A4",
+			format: pageFormat,
+			landscape: isLandscape,
 			margin: { top: "0", right: "0", bottom: "0", left: "0" },
 			printBackground: true,
 			preferCSSPageSize: false,

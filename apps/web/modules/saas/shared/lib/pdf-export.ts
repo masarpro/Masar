@@ -1,19 +1,36 @@
 "use client";
 
+export type PdfExportOptions = {
+	url?: string;
+	format?: "A4" | "A3";
+	landscape?: boolean;
+};
+
 /**
- * Export the current page to PDF via server-side Puppeteer.
- * Sends the page URL to the server — Puppeteer opens it with full CSS/fonts/images.
+ * Export the current page (or `options.url`) to PDF via server-side Puppeteer.
+ * Defaults to A4 portrait — pass { format: "A3", landscape: true } for the
+ * execution Gantt print page.
  */
 export async function exportToPDF(
 	filename: string,
-	customUrl?: string,
+	optionsOrUrl?: string | PdfExportOptions,
 ): Promise<void> {
-	const url = customUrl || window.location.pathname;
+	const options: PdfExportOptions =
+		typeof optionsOrUrl === "string"
+			? { url: optionsOrUrl }
+			: (optionsOrUrl ?? {});
+
+	const url = options.url || window.location.pathname;
 
 	const response = await fetch("/api/pdf/generate", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ url, filename }),
+		body: JSON.stringify({
+			url,
+			filename,
+			format: options.format,
+			landscape: options.landscape,
+		}),
 		credentials: "include",
 	});
 
@@ -62,7 +79,9 @@ if (typeof window !== "undefined") {
 
 		const printArea =
 			document.getElementById("invoice-print-area") ||
-			document.getElementById("quotation-print-area");
+			document.getElementById("quotation-print-area") ||
+			document.getElementById("execution-gantt-print-area") ||
+			document.getElementById("execution-table-print-area");
 
 		if (
 			printArea &&

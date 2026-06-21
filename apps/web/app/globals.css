@@ -577,6 +577,25 @@ input[cmdk-input] {
 		margin: 0;
 	}
 
+	/* Named page sizes for execution reports.
+	   The print page sets `body[data-print-format="gantt"]` (or "table") via
+	   useEffect so window.print() picks up the correct paper size. Puppeteer
+	   uses the format/landscape options passed to /api/pdf/generate, not CSS. */
+	@page gantt-page {
+		size: A3 landscape;
+		margin: 8mm;
+	}
+	@page table-page {
+		size: A4 portrait;
+		margin: 10mm;
+	}
+	body[data-print-format="gantt"] {
+		page: gantt-page;
+	}
+	body[data-print-format="table"] {
+		page: table-page;
+	}
+
 	/* Hide everything visually, then selectively reveal print areas */
 	body * {
 		visibility: hidden;
@@ -585,7 +604,11 @@ input[cmdk-input] {
 	#invoice-print-area,
 	#invoice-print-area *,
 	#quotation-print-area,
-	#quotation-print-area * {
+	#quotation-print-area *,
+	#execution-gantt-print-area,
+	#execution-gantt-print-area *,
+	#execution-table-print-area,
+	#execution-table-print-area * {
 		visibility: visible;
 	}
 
@@ -595,6 +618,20 @@ input[cmdk-input] {
 		left: 0;
 		top: 0;
 		width: 210mm;
+	}
+
+	#execution-gantt-print-area {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+	}
+
+	#execution-table-print-area {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
 	}
 
 	/* White background to prevent dark mode bleed + force light color-scheme
@@ -613,7 +650,9 @@ input[cmdk-input] {
 	/* Allow natural pagination of print-area (V2's Card has min-h + overflow-hidden
 	   that break PDF pagination; these overrides ensure consistent behavior). */
 	body[data-printing] #quotation-print-area,
-	body[data-printing] #invoice-print-area {
+	body[data-printing] #invoice-print-area,
+	body[data-printing] #execution-gantt-print-area,
+	body[data-printing] #execution-table-print-area {
 		position: relative !important;
 		min-height: 0 !important;
 		max-height: none !important;
@@ -624,7 +663,7 @@ input[cmdk-input] {
 	   hide all OTHER body children completely (not just visibility:hidden)
 	   so body height = print-area height, not print-area + hidden siblings.
 	   This eliminates the phantom blank first page in generated PDFs. */
-	body[data-printing] > *:not(#invoice-print-area):not(#quotation-print-area) {
+	body[data-printing] > *:not(#invoice-print-area):not(#quotation-print-area):not(#execution-gantt-print-area):not(#execution-table-print-area) {
 		display: none !important;
 	}
 
@@ -695,8 +734,12 @@ input[cmdk-input] {
 	   print containers. */
 	#quotation-print-area,
 	#invoice-print-area,
+	#execution-gantt-print-area,
+	#execution-table-print-area,
 	#quotation-print-area *,
-	#invoice-print-area * {
+	#invoice-print-area *,
+	#execution-gantt-print-area *,
+	#execution-table-print-area * {
 		transform: none !important;
 		filter: none !important;
 		contain: none !important;
@@ -704,7 +747,9 @@ input[cmdk-input] {
 	}
 
 	#quotation-print-area,
-	#invoice-print-area {
+	#invoice-print-area,
+	#execution-gantt-print-area,
+	#execution-table-print-area {
 		overflow: visible !important;
 	}
 

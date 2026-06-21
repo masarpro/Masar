@@ -1,5 +1,6 @@
 "use client";
 
+import { exportToPDF } from "@saas/shared/lib/pdf-export";
 import { Button } from "@ui/components/button";
 import {
 	Select,
@@ -16,7 +17,10 @@ import {
 	ChevronUpIcon,
 	ClipboardListIcon,
 	CrosshairIcon,
+	DownloadIcon,
 	LayersIcon,
+	Loader2,
+	PrinterIcon,
 	SettingsIcon,
 	ZapIcon,
 	ZoomInIcon,
@@ -26,6 +30,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useGantt } from "../../hooks/use-gantt-context";
 import type { GanttZoomLevel } from "../../lib/gantt-types";
 
@@ -48,6 +53,32 @@ export function GanttToolbar({
 	const projectId = params.projectId as string;
 	const { state, dispatch } = useGantt();
 	const [showCriticalPath, setShowCriticalPath] = useState(true);
+	const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+	const printPath = `/app/${organizationSlug}/projects/${projectId}/execution/print/gantt`;
+
+	const handlePrint = () => {
+		window.open(`${printPath}?autoprint=1`, "_blank", "noopener");
+	};
+
+	const handleDownloadPdf = async () => {
+		setIsGeneratingPdf(true);
+		try {
+			await exportToPDF(`gantt-${projectId}`, {
+				url: printPath,
+				format: "A3",
+				landscape: true,
+			});
+		} catch (err) {
+			toast.error(
+				err instanceof Error
+					? err.message
+					: t("execution.print.pdfFailed"),
+			);
+		} finally {
+			setIsGeneratingPdf(false);
+		}
+	};
 
 	const currentZoomIdx = ZOOM_ORDER.indexOf(state.zoom);
 
@@ -197,6 +228,37 @@ export function GanttToolbar({
 					<BarChart3Icon className="h-3.5 w-3.5" />
 					{t("execution.advanced.toolbar.analysis")}
 				</Link>
+			</Button>
+
+			<div className="h-5 w-px bg-border" />
+
+			{/* Print */}
+			<Button
+				variant="ghost"
+				size="sm"
+				className="h-8 text-xs gap-1"
+				onClick={handlePrint}
+				title={t("common.print")}
+			>
+				<PrinterIcon className="h-3.5 w-3.5" />
+				{t("common.print")}
+			</Button>
+
+			{/* PDF */}
+			<Button
+				variant="ghost"
+				size="sm"
+				className="h-8 text-xs gap-1"
+				onClick={handleDownloadPdf}
+				disabled={isGeneratingPdf}
+				title={t("execution.print.downloadPdf")}
+			>
+				{isGeneratingPdf ? (
+					<Loader2 className="h-3.5 w-3.5 animate-spin" />
+				) : (
+					<DownloadIcon className="h-3.5 w-3.5" />
+				)}
+				{t("execution.print.downloadPdf")}
 			</Button>
 
 			<div className="h-5 w-px bg-border" />
