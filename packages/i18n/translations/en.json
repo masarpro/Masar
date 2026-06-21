@@ -5934,6 +5934,7 @@
     "currentPhase": "Current Phase",
     "progress": "Progress",
     "contractValue": "Contract Value",
+    "contractValueHint": "Incl. VAT and change orders",
     "daysRemaining": "Days Remaining",
     "deliveryDate": "Delivery Date",
     "latestUpdate": "Latest Update",
@@ -5950,7 +5951,13 @@
       "pending": "Pending",
       "days": "days",
       "planned": "Planned",
-      "actual": "Actual"
+      "actual": "Actual",
+      "tableTab": "Milestones Table",
+      "ganttTab": "Gantt Chart",
+      "printTable": "Print Table",
+      "printGantt": "Print Chart",
+      "tableTitle": "Milestones Table",
+      "ganttTitle": "Gantt Timeline"
     },
     "payments": {
       "contractValue": "Contract Value",
@@ -5973,7 +5980,16 @@
       },
       "paidAmount": "Paid amount",
       "period": "Period",
-      "status": "Status"
+      "status": "Status",
+      "stage": "Stage",
+      "currentStage": "Current",
+      "required": "Required",
+      "dueCurrentStage": "Due on current stage",
+      "stagesTitle": "Payment Stages",
+      "recordedTitle": "Recorded Payments",
+      "noPayments": "No recorded payments yet",
+      "paymentNo": "Payment No.",
+      "date": "Date"
     },
     "chat": {
       "title": "Chat",
@@ -8253,6 +8269,7 @@
     "savePayment": "Save Payment",
     "editPayment": "Edit Payment",
     "paymentCreated": "Payment created successfully",
+    "paymentSplitAcrossTerms": "Payment distributed across {count} stages",
     "paymentUpdated": "Payment updated successfully",
     "paymentDeleted": "Payment deleted successfully",
     "deleteError": "Failed to delete payment",

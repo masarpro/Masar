@@ -1,5 +1,9 @@
 "use client";
 
+import {
+	OwnerPaymentMilestonesGrid,
+	type OwnerPaymentTerm,
+} from "@saas/projects-owner/components/OwnerPaymentMilestonesGrid";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
@@ -7,7 +11,7 @@ import { Skeleton } from "@ui/components/skeleton";
 import {
 	Banknote,
 	CheckCircle,
-	Clock,
+	ListChecks,
 	TrendingUp,
 	Wallet,
 } from "lucide-react";
@@ -21,6 +25,13 @@ function formatCurrency(value: number): string {
 		minimumFractionDigits: 0,
 		maximumFractionDigits: 0,
 	}).format(value);
+}
+
+function formatDate(date: string | Date | null | undefined): string {
+	if (!date) return "-";
+	const d = typeof date === "string" ? new Date(date) : date;
+	if (Number.isNaN(d.getTime())) return "-";
+	return d.toLocaleDateString("ar-SA");
 }
 
 function getStatusBadge(status: string, t: (key: string) => string) {
@@ -60,6 +71,15 @@ function getStatusBadge(status: string, t: (key: string) => string) {
 	}
 }
 
+interface OwnerPaymentRow {
+	id: string;
+	paymentNo: string;
+	amount: number;
+	date: string | Date | null;
+	description: string | null;
+	termLabel: string | null;
+}
+
 export default function OwnerPortalPayments() {
 	const params = useParams();
 	const token = params.token as string;
@@ -79,12 +99,8 @@ export default function OwnerPortalPayments() {
 						<Skeleton key={i} className="h-24 rounded-2xl" />
 					))}
 				</div>
-				<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 space-y-4">
-					<Skeleton className="h-5 w-36" />
-					{Array.from({ length: 4 }).map((_, i) => (
-						<Skeleton key={i} className="h-12 w-full" />
-					))}
-				</div>
+				<Skeleton className="h-40 w-full rounded-2xl" />
+				<Skeleton className="h-48 w-full rounded-2xl" />
 			</div>
 		);
 	}
@@ -93,8 +109,27 @@ export default function OwnerPortalPayments() {
 		return null;
 	}
 
-	const { contractValue, paidAmount, remaining, claims } = data;
-	const paidPercentage = contractValue > 0 ? (paidAmount / contractValue) * 100 : 0;
+	const {
+		contractValue,
+		paidAmount,
+		remaining,
+		collectionPercent,
+		currentTermId,
+		dueOnCurrentStage,
+		terms,
+		payments,
+		claims,
+	} = data as {
+		contractValue: number;
+		paidAmount: number;
+		remaining: number;
+		collectionPercent: number;
+		currentTermId: string | null;
+		dueOnCurrentStage: number;
+		terms: OwnerPaymentTerm[];
+		payments: OwnerPaymentRow[];
+		claims: any[];
+	};
 
 	return (
 		<div className="space-y-6">
@@ -111,6 +146,9 @@ export default function OwnerPortalPayments() {
 							</p>
 							<p className="text-lg font-semibold text-indigo-700 dark:text-indigo-300">
 								{formatCurrency(contractValue)}
+							</p>
+							<p className="mt-0.5 text-[10px] text-indigo-500/70 dark:text-indigo-400/70">
+								{t("ownerPortal.contractValueHint")}
 							</p>
 						</div>
 					</div>
@@ -158,21 +196,101 @@ export default function OwnerPortalPayments() {
 								{t("ownerPortal.payments.paidPercentage")}
 							</p>
 							<p className="text-lg font-semibold text-sky-700 dark:text-sky-300">
-								{Math.round(paidPercentage)}%
+								{Math.round(collectionPercent)}%
 							</p>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			{/* Payment Claims Table */}
+			{/* Due on current stage */}
+			{dueOnCurrentStage > 0 && (
+				<div className="rounded-2xl border border-sky-200 bg-sky-50 p-5 dark:border-sky-900 dark:bg-sky-950/30">
+					<div className="flex flex-wrap items-center justify-between gap-2">
+						<h3 className="font-semibold text-sky-800 dark:text-sky-300">
+							{t("ownerPortal.payments.dueCurrentStage")}
+						</h3>
+						<p className="text-xl font-bold text-sky-800 dark:text-sky-300">
+							{formatCurrency(dueOnCurrentStage)}
+						</p>
+					</div>
+				</div>
+			)}
+
+			{/* Payment milestones / stages */}
+			{terms.length > 0 && (
+				<div className="space-y-4">
+					<h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+						{t("ownerPortal.payments.stagesTitle")}
+					</h3>
+					<OwnerPaymentMilestonesGrid
+						terms={terms}
+						currentTermId={currentTermId}
+					/>
+				</div>
+			)}
+
+			{/* Recorded payments */}
 			<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-				<h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-6">
+				<h3 className="mb-6 flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
+					<ListChecks className="h-5 w-5 text-slate-400" />
+					{t("ownerPortal.payments.recordedTitle")}
+				</h3>
+
+				{payments.length === 0 ? (
+					<p className="py-8 text-center text-slate-500">
+						{t("ownerPortal.payments.noPayments")}
+					</p>
+				) : (
+					<div className="overflow-x-auto">
+						<table className="w-full">
+							<thead>
+								<tr className="border-b border-slate-200 dark:border-slate-700">
+									<th className="pb-3 text-start text-sm font-medium text-slate-500">
+										{t("ownerPortal.payments.paymentNo")}
+									</th>
+									<th className="pb-3 text-start text-sm font-medium text-slate-500">
+										{t("ownerPortal.payments.stage")}
+									</th>
+									<th className="pb-3 text-start text-sm font-medium text-slate-500">
+										{t("ownerPortal.payments.amount")}
+									</th>
+									<th className="pb-3 text-start text-sm font-medium text-slate-500">
+										{t("ownerPortal.payments.date")}
+									</th>
+								</tr>
+							</thead>
+							<tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+								{payments.map((p) => (
+									<tr key={p.id}>
+										<td className="py-4 font-medium text-slate-900 dark:text-slate-100">
+											{p.paymentNo}
+										</td>
+										<td className="py-4 text-slate-600 dark:text-slate-400">
+											{p.termLabel || p.description || "-"}
+										</td>
+										<td className="py-4 font-medium text-green-700 dark:text-green-400">
+											{formatCurrency(Number(p.amount))}
+										</td>
+										<td className="py-4 text-slate-600 dark:text-slate-400">
+											{formatDate(p.date)}
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+				)}
+			</div>
+
+			{/* Claims / مستخلصات */}
+			<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+				<h3 className="mb-6 text-lg font-semibold text-slate-900 dark:text-slate-100">
 					{t("ownerPortal.payments.claimsTitle")}
 				</h3>
 
 				{claims.length === 0 ? (
-					<p className="text-center text-slate-500 py-8">
+					<p className="py-8 text-center text-slate-500">
 						{t("ownerPortal.payments.noClaims")}
 					</p>
 				) : (
@@ -207,20 +325,16 @@ export default function OwnerPortalPayments() {
 										</td>
 										<td className="py-4 text-slate-600 dark:text-slate-400">
 											{claim.periodStart && claim.periodEnd
-												? `${new Date(claim.periodStart).toLocaleDateString("ar-SA")} - ${new Date(claim.periodEnd).toLocaleDateString("ar-SA")}`
+												? `${formatDate(claim.periodStart)} - ${formatDate(claim.periodEnd)}`
 												: "-"}
 										</td>
 										<td className="py-4 font-medium text-slate-900 dark:text-slate-100">
 											{formatCurrency(Number(claim.amount))}
 										</td>
 										<td className="py-4 text-slate-600 dark:text-slate-400">
-											{claim.dueDate
-												? new Date(claim.dueDate).toLocaleDateString("ar-SA")
-												: "-"}
+											{formatDate(claim.dueDate)}
 										</td>
-										<td className="py-4">
-											{getStatusBadge(claim.status, t)}
-										</td>
+										<td className="py-4">{getStatusBadge(claim.status, t)}</td>
 									</tr>
 								))}
 							</tbody>

@@ -1,5 +1,7 @@
 import { db } from "../client";
 import { randomBytes, randomUUID } from "crypto";
+import { getProjectPaymentsSummary } from "./project-payments";
+import { getPaymentTermsWithProgress } from "./project-contract";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Owner Access Queries - وصول مالك المشروع
@@ -296,10 +298,74 @@ export async function getOwnerContextBySession(
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
+ * Compute the total contract value as the owner should see it:
+ * base contract value + approved/implemented change orders + VAT.
+ *
+ * Source of truth is the ProjectContract record (which carries VAT flags).
+ * When no contract exists, falls back to Project.contractValue (no VAT info).
+ *
+ * VAT rule:
+ *  - includesVat === true  → value already includes VAT → no extra VAT added
+ *  - includesVat === false → add VAT at vatPercent (defaults to 15% if unset)
+ */
+async function computeContractTotal(
+	organizationId: string,
+	projectId: string,
+): Promise<{ base: number; vatAmount: number; total: number }> {
+	const [contract, coAgg, project] = await Promise.all([
+		db.projectContract.findFirst({
+			where: { organizationId, projectId },
+			select: { value: true, includesVat: true, vatPercent: true },
+		}),
+		db.projectChangeOrder.aggregate({
+			where: {
+				organizationId,
+				projectId,
+				status: { in: ["APPROVED", "IMPLEMENTED"] },
+				costImpact: { not: null },
+			},
+			_sum: { costImpact: true },
+		}),
+		db.project.findFirst({
+			where: { id: projectId, organizationId },
+			select: { contractValue: true },
+		}),
+	]);
+
+	const coImpact = coAgg._sum.costImpact ? Number(coAgg._sum.costImpact) : 0;
+
+	// No contract record → fall back to the raw project contract value.
+	if (!contract) {
+		const base =
+			(project?.contractValue ? Number(project.contractValue) : 0) + coImpact;
+		return { base, vatAmount: 0, total: base };
+	}
+
+	const base = Number(contract.value) + coImpact;
+
+	// Value already includes VAT → don't add it again.
+	if (contract.includesVat) {
+		return { base, vatAmount: 0, total: base };
+	}
+
+	const vatPercent =
+		contract.vatPercent != null ? Number(contract.vatPercent) : 15;
+	const vatAmount = base * (vatPercent / 100);
+	return { base, vatAmount, total: base + vatAmount };
+}
+
+/**
  * Get owner summary (for portal home page)
  */
 export async function getOwnerSummary(organizationId: string, projectId: string) {
-	const [project, latestProgressUpdate, latestOfficialUpdate, upcomingClaim] = await Promise.all([
+	const [
+		project,
+		latestProgressUpdate,
+		latestOfficialUpdate,
+		upcomingClaim,
+		milestones,
+		contractTotal,
+	] = await Promise.all([
 		db.project.findFirst({
 			where: { id: projectId, organizationId },
 			select: {
@@ -353,10 +419,30 @@ export async function getOwnerSummary(organizationId: string, projectId: string)
 				status: true,
 			},
 		}),
+		// Execution milestones → progress mirrors the execution dashboard
+		db.projectMilestone.findMany({
+			where: { organizationId, projectId },
+			select: { progress: true },
+		}),
+		computeContractTotal(organizationId, projectId),
 	]);
 
+	// Overall progress = average of milestone progress (same formula as
+	// getExecutionDashboard). Fall back to the stored project.progress only
+	// when there are no execution milestones at all.
+	const milestoneProgress =
+		milestones.length > 0
+			? Math.round(
+					milestones.reduce((sum, m) => sum + Number(m.progress), 0) /
+						milestones.length,
+				)
+			: project?.progress != null
+				? Math.round(Number(project.progress))
+				: 0;
+
 	return {
-		project,
+		project: project ? { ...project, progress: milestoneProgress } : project,
+		contractValueWithVat: contractTotal.total,
 		currentPhase: latestProgressUpdate?.phaseLabel ?? null,
 		latestOfficialUpdate,
 		upcomingPayment: upcomingClaim,
@@ -367,108 +453,136 @@ export async function getOwnerSummary(organizationId: string, projectId: string)
  * Get owner schedule (milestones)
  */
 export async function getOwnerSchedule(organizationId: string, projectId: string) {
+	// Mirror the execution section: read the new milestone fields and order
+	// by orderIndex (NOT the legacy sortOrder/plannedDate/isCompleted fields).
 	const milestones = await db.projectMilestone.findMany({
 		where: { organizationId, projectId },
-		orderBy: { sortOrder: "asc" },
+		orderBy: { orderIndex: "asc" },
 		select: {
 			id: true,
 			title: true,
 			description: true,
-			plannedDate: true,
-			actualDate: true,
-			isCompleted: true,
-			sortOrder: true,
+			orderIndex: true,
+			plannedStart: true,
+			plannedEnd: true,
+			actualStart: true,
+			actualEnd: true,
+			status: true,
+			progress: true,
+			isCritical: true,
 		},
 	});
 
-	// If no milestones exist, generate default ones from project dates
+	// If no milestones exist, generate default phases from project dates
 	if (milestones.length === 0) {
 		const project = await db.project.findFirst({
 			where: { id: projectId, organizationId },
 			select: { startDate: true, endDate: true },
 		});
 
-		// Return default phases based on project dates
 		const defaultPhases = [
-			{ title: "بداية المشروع", sortOrder: 1 },
-			{ title: "الأساسات", sortOrder: 2 },
-			{ title: "الهيكل الخرساني", sortOrder: 3 },
-			{ title: "التشطيبات", sortOrder: 4 },
-			{ title: "التسليم", sortOrder: 5 },
+			"بداية المشروع",
+			"الأساسات",
+			"الهيكل الخرساني",
+			"التشطيبات",
+			"التسليم",
 		];
 
-		return defaultPhases.map((phase, index) => ({
+		return defaultPhases.map((title, index) => ({
 			id: `default-${index}`,
-			...phase,
+			title,
 			description: null,
-			plannedDate: project?.startDate ?? null,
-			actualDate: null,
-			isCompleted: false,
+			orderIndex: index,
+			plannedStart: project?.startDate ?? null,
+			plannedEnd: project?.endDate ?? null,
+			actualStart: null,
+			actualEnd: null,
+			status: "PLANNED" as const,
+			progress: 0,
+			isCritical: false,
 		}));
 	}
 
-	return milestones;
+	return milestones.map((m) => ({
+		...m,
+		progress: Number(m.progress),
+	}));
 }
 
 /**
  * Get owner payments (claims summary - no expenses)
  */
 export async function getOwnerPayments(organizationId: string, projectId: string) {
-	const [project, claims, claimStats] = await Promise.all([
-		db.project.findFirst({
-			where: { id: projectId, organizationId },
-			select: { contractValue: true },
-		}),
-		db.projectClaim.findMany({
-			where: {
-				organizationId,
-				projectId,
-				status: { in: ["SUBMITTED", "APPROVED", "PAID"] },
-			},
-			orderBy: { dueDate: "asc" },
-			select: {
-				id: true,
-				claimNo: true,
-				amount: true,
-				dueDate: true,
-				status: true,
-				periodStart: true,
-				periodEnd: true,
-			},
-		}),
-		db.projectClaim.aggregate({
-			where: { organizationId, projectId },
-			_sum: {
-				amount: true,
-			},
-		}),
-	]);
+	const [contractTotal, paymentsSummary, termsProgress, claims] =
+		await Promise.all([
+			computeContractTotal(organizationId, projectId),
+			getProjectPaymentsSummary(organizationId, projectId),
+			getPaymentTermsWithProgress(organizationId, projectId),
+			db.projectClaim.findMany({
+				where: {
+					organizationId,
+					projectId,
+					status: { in: ["SUBMITTED", "APPROVED", "PAID"] },
+				},
+				orderBy: { dueDate: "asc" },
+				select: {
+					id: true,
+					claimNo: true,
+					amount: true,
+					dueDate: true,
+					status: true,
+					periodStart: true,
+					periodEnd: true,
+				},
+			}),
+		]);
 
-	const paidClaims = await db.projectClaim.aggregate({
-		where: { organizationId, projectId, status: "PAID" },
-		_sum: { amount: true },
-	});
-
-	const contractValue = project?.contractValue ? Number(project.contractValue) : 0;
-	const totalClaims = claimStats._sum.amount ? Number(claimStats._sum.amount) : 0;
-	const paidAmount = paidClaims._sum.amount ? Number(paidClaims._sum.amount) : 0;
+	const contractValue = contractTotal.total;
+	const paidAmount = paymentsSummary.totalCollected;
 	const remaining = contractValue - paidAmount;
 
-	// Filter upcoming payments
-	const upcomingPayments = claims.filter(
-		(c) => c.status !== "PAID" && c.dueDate && new Date(c.dueDate) >= new Date()
-	);
+	// Current stage = first incomplete payment term
+	const currentTermId = termsProgress?.nextIncompleteTermId ?? null;
+	const currentTerm =
+		termsProgress?.terms.find((t) => t.id === currentTermId) ?? null;
+	const dueOnCurrentStage = currentTerm ? currentTerm.remainingAmount : 0;
 
 	return {
+		// Totals
 		contractValue,
-		totalClaims,
+		contractBase: contractTotal.base,
+		vatAmount: contractTotal.vatAmount,
 		paidAmount,
 		remaining,
-		claims: claims.map((c) => ({
-			...c,
-			amount: Number(c.amount),
+		collectionPercent:
+			contractValue > 0
+				? Math.round((paidAmount / contractValue) * 100)
+				: 0,
+		// Current stage (المرحلة الحالية)
+		currentTermId,
+		dueOnCurrentStage,
+		// Payment terms / stages (owner-safe fields only)
+		terms: (termsProgress?.terms ?? []).map((t) => ({
+			id: t.id,
+			type: t.type,
+			label: t.label,
+			amount: t.amount,
+			paidAmount: t.paidAmount,
+			remainingAmount: t.remainingAmount,
+			progressPercent: t.progressPercent,
+			isComplete: t.isComplete,
 		})),
-		upcomingPayments: upcomingPayments.map((c) => ({
+		// Every recorded payment (owner-safe fields only)
+		payments: paymentsSummary.allPayments.map((p) => ({
+			id: p.id,
+			paymentNo: p.paymentNo,
+			amount: p.amount,
+			date: p.date,
+			description: p.description ?? null,
+			termLabel: p.contractTerm?.label ?? null,
+		})),
+		// Claims / مستخلصات
+		claims: claims.map((c) => ({
 			...c,
 			amount: Number(c.amount),
 		})),

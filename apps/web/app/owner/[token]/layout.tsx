@@ -184,8 +184,8 @@ export default function OwnerPortalLayout({
 	return (
 		<div className="min-h-screen bg-slate-50 dark:bg-slate-950">
 			{/* Header */}
-			<header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-900/80">
-				<div className="mx-auto max-w-5xl px-4 py-4">
+			<header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-900/80 print:hidden">
+				<div className="mx-auto max-w-6xl px-4 py-3 sm:py-4">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
 							{summary?.organization?.logo ? (
@@ -202,19 +202,19 @@ export default function OwnerPortalLayout({
 									<Building2 className="h-5 w-5 text-primary" />
 								</div>
 							)}
-							<div>
-								<h1 className="font-semibold text-slate-900 dark:text-slate-100">
+							<div className="min-w-0">
+								<h1 className="truncate font-semibold text-slate-900 dark:text-slate-100">
 									{summary?.project?.name}
 								</h1>
-								<p className="text-xs text-slate-500">
+								<p className="truncate text-xs text-slate-500">
 									{summary?.organization?.name}
 								</p>
 							</div>
 						</div>
 					</div>
 
-					{/* Navigation */}
-					<nav className="mt-4 flex gap-1 overflow-x-auto pb-1">
+					{/* Desktop navigation */}
+					<nav className="mt-4 hidden gap-1 overflow-x-auto pb-1 md:flex">
 						{navItems.map((item) => (
 							<Link key={item.href} href={item.href}>
 								<Button
@@ -236,20 +236,38 @@ export default function OwnerPortalLayout({
 			</header>
 
 			{/* Main Content */}
-			<main className="mx-auto max-w-5xl px-4 py-6">
+			<main className="mx-auto max-w-6xl px-4 py-6 pb-24 md:pb-10">
 				<OwnerSessionContext.Provider value={sessionToken}>
 					{children}
 				</OwnerSessionContext.Provider>
 			</main>
 
 			{/* Footer */}
-			<footer className="border-t border-slate-200 bg-white py-6 dark:border-slate-800 dark:bg-slate-900">
-				<div className="mx-auto max-w-5xl px-4 text-center">
-					<p className="text-sm text-slate-500">
-						{t("ownerPortal.footer")}
-					</p>
+			<footer className="border-t border-slate-200 bg-white py-6 pb-24 md:pb-6 dark:border-slate-800 dark:bg-slate-900 print:hidden">
+				<div className="mx-auto max-w-6xl px-4 text-center">
+					<p className="text-sm text-slate-500">{t("ownerPortal.footer")}</p>
 				</div>
 			</footer>
+
+			{/* Mobile bottom navigation */}
+			<nav className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-900/95 md:hidden print:hidden pb-[env(safe-area-inset-bottom)]">
+				<div className="mx-auto flex max-w-6xl items-stretch justify-around">
+					{navItems.map((item) => (
+						<Link
+							key={item.href}
+							href={item.href}
+							className={`flex flex-1 flex-col items-center gap-1 py-2 text-[10px] font-medium transition-colors ${
+								item.active
+									? "text-primary"
+									: "text-slate-500 dark:text-slate-400"
+							}`}
+						>
+							<item.icon className="h-5 w-5" />
+							<span className="truncate px-0.5">{item.label}</span>
+						</Link>
+					))}
+				</div>
+			</nav>
 		</div>
 	);
 }

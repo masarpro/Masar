@@ -5934,6 +5934,7 @@
     "currentPhase": "المرحلة الحالية",
     "progress": "نسبة الإنجاز",
     "contractValue": "قيمة العقد",
+    "contractValueHint": "شامل الضريبة وأوامر التغيير",
     "daysRemaining": "الأيام المتبقية",
     "deliveryDate": "تاريخ التسليم",
     "latestUpdate": "آخر تحديث",
@@ -5950,7 +5951,13 @@
       "pending": "قيد الانتظار",
       "days": "يوم",
       "planned": "المخطط",
-      "actual": "الفعلي"
+      "actual": "الفعلي",
+      "tableTab": "جدول المراحل",
+      "ganttTab": "مخطط جانت",
+      "printTable": "طباعة الجدول",
+      "printGantt": "طباعة المخطط",
+      "tableTitle": "جدول المراحل",
+      "ganttTitle": "مخطط جانت الزمني"
     },
     "payments": {
       "contractValue": "قيمة العقد",
@@ -5973,7 +5980,16 @@
       },
       "paidAmount": "المبلغ المدفوع",
       "period": "الفترة",
-      "status": "الحالة"
+      "status": "الحالة",
+      "stage": "المرحلة",
+      "currentStage": "الحالية",
+      "required": "المطلوب",
+      "dueCurrentStage": "المستحق على المرحلة الحالية",
+      "stagesTitle": "مراحل الدفع",
+      "recordedTitle": "الدفعات المسجلة",
+      "noPayments": "لا توجد دفعات مسجلة بعد",
+      "paymentNo": "رقم الدفعة",
+      "date": "التاريخ"
     },
     "chat": {
       "title": "المحادثة",
@@ -8253,6 +8269,7 @@
     "savePayment": "حفظ الدفعة",
     "editPayment": "تعديل الدفعة",
     "paymentCreated": "تم إنشاء الدفعة بنجاح",
+    "paymentSplitAcrossTerms": "تم توزيع الدفعة على {count} مراحل",
     "paymentUpdated": "تم تحديث الدفعة بنجاح",
     "paymentDeleted": "تم حذف الدفعة بنجاح",
     "deleteError": "فشل حذف الدفعة",

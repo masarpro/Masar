@@ -1,26 +1,18 @@
 "use client";
 
+import { GanttPrintCanvas } from "@saas/projects-execution/components/print/GanttPrintCanvas";
+import {
+	OwnerMilestoneTable,
+	type OwnerMilestone,
+} from "@saas/projects-owner/components/OwnerMilestoneTable";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
-import { Badge } from "@ui/components/badge";
+import { Button } from "@ui/components/button";
 import { Skeleton } from "@ui/components/skeleton";
-import {
-	CheckCircle,
-	Circle,
-	Clock,
-	Calendar,
-	AlertTriangle,
-} from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
+import { BarChart3, Calendar, PrinterIcon, Table2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-
-function getDaysDelay(plannedDate: Date | null, actualDate: Date | null): number | null {
-	if (!plannedDate) return null;
-	const compareDate = actualDate ? new Date(actualDate) : new Date();
-	const planned = new Date(plannedDate);
-	const diff = compareDate.getTime() - planned.getTime();
-	return Math.ceil(diff / (1000 * 60 * 60 * 24));
-}
 
 export default function OwnerPortalSchedule() {
 	const params = useParams();
@@ -33,19 +25,15 @@ export default function OwnerPortalSchedule() {
 		}),
 	) as { data: any; isLoading: boolean };
 
+	const openPrint = (kind: "table" | "gantt") => {
+		window.open(`/owner/${token}/print/${kind}?autoprint=1`, "_blank");
+	};
+
 	if (isLoading) {
 		return (
 			<div className="space-y-6">
 				<Skeleton className="h-28 w-full rounded-2xl" />
-				<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 space-y-6">
-					<Skeleton className="h-5 w-36" />
-					{Array.from({ length: 4 }).map((_, i) => (
-						<div key={i} className="flex gap-4">
-							<Skeleton className="h-10 w-10 rounded-full shrink-0" />
-							<Skeleton className="h-20 w-full rounded-xl" />
-						</div>
-					))}
-				</div>
+				<Skeleton className="h-96 w-full rounded-2xl" />
 			</div>
 		);
 	}
@@ -54,16 +42,40 @@ export default function OwnerPortalSchedule() {
 		return null;
 	}
 
-	const { projectName, startDate, endDate, milestones } = data;
+	const { startDate, endDate, milestones } = data as {
+		startDate: string | null;
+		endDate: string | null;
+		milestones: OwnerMilestone[];
+	};
 
 	return (
 		<div className="space-y-6">
 			{/* Header */}
 			<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-				<h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
-					{t("ownerPortal.schedule.title")}
-				</h2>
-				<div className="flex flex-wrap gap-6 text-sm">
+				<div className="flex flex-wrap items-center justify-between gap-4">
+					<h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+						{t("ownerPortal.schedule.title")}
+					</h2>
+					<div className="flex flex-wrap items-center gap-2">
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => openPrint("table")}
+						>
+							<PrinterIcon className="h-4 w-4 me-2" />
+							{t("ownerPortal.schedule.printTable")}
+						</Button>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => openPrint("gantt")}
+						>
+							<PrinterIcon className="h-4 w-4 me-2" />
+							{t("ownerPortal.schedule.printGantt")}
+						</Button>
+					</div>
+				</div>
+				<div className="mt-4 flex flex-wrap gap-6 text-sm">
 					{startDate && (
 						<div className="flex items-center gap-2 text-slate-500">
 							<Calendar className="h-4 w-4" />
@@ -85,100 +97,44 @@ export default function OwnerPortalSchedule() {
 				</div>
 			</div>
 
-			{/* Milestones */}
-			<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-				<h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-6">
-					{t("ownerPortal.schedule.milestones")}
-				</h3>
+			{/* Tabs: table + gantt */}
+			<div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 dark:border-slate-800 dark:bg-slate-900">
+				<Tabs defaultValue="table">
+					<TabsList className="mb-4 w-full justify-start gap-4">
+						<TabsTrigger value="table">
+							<Table2 className="h-4 w-4 me-2" />
+							{t("ownerPortal.schedule.tableTab")}
+						</TabsTrigger>
+						<TabsTrigger value="gantt">
+							<BarChart3 className="h-4 w-4 me-2" />
+							{t("ownerPortal.schedule.ganttTab")}
+						</TabsTrigger>
+					</TabsList>
 
-				{milestones.length === 0 ? (
-					<p className="text-center text-slate-500 py-8">
-						{t("ownerPortal.schedule.noMilestones")}
-					</p>
-				) : (
-					<div className="relative">
-						{/* Timeline line */}
-						<div className="absolute start-5 top-0 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700" />
+					<TabsContent value="table">
+						<OwnerMilestoneTable milestones={milestones} />
+					</TabsContent>
 
-						<div className="space-y-6">
-							{milestones.map((milestone: any, index: number) => {
-								const daysDelay = getDaysDelay(milestone.plannedDate, milestone.actualDate);
-								const isDelayed = daysDelay !== null && daysDelay > 0 && !milestone.isCompleted;
-
-								return (
-									<div key={milestone.id} className="relative flex gap-4">
-										{/* Status icon */}
-										<div className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white dark:bg-slate-900">
-											{milestone.isCompleted ? (
-												<div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-													<CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-												</div>
-											) : isDelayed ? (
-												<div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
-													<AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-												</div>
-											) : (
-												<div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-													<Circle className="h-5 w-5 text-slate-400" />
-												</div>
-											)}
-										</div>
-
-										{/* Content */}
-										<div className="flex-1 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
-											<div className="flex items-start justify-between gap-2">
-												<div>
-													<h4 className="font-medium text-slate-900 dark:text-slate-100">
-														{milestone.title}
-													</h4>
-													{milestone.description && (
-														<p className="mt-1 text-sm text-slate-500">
-															{milestone.description}
-														</p>
-													)}
-												</div>
-												{milestone.isCompleted ? (
-													<Badge className="border-0 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-														{t("ownerPortal.schedule.completed")}
-													</Badge>
-												) : isDelayed ? (
-													<Badge className="border-0 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
-														{t("ownerPortal.schedule.delayed")} ({daysDelay} {t("ownerPortal.schedule.days")})
-													</Badge>
-												) : (
-													<Badge className="border-0 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400">
-														{t("ownerPortal.schedule.pending")}
-													</Badge>
-												)}
-											</div>
-
-											<div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-500">
-												{milestone.plannedDate && (
-													<div className="flex items-center gap-1">
-														<Clock className="h-3.5 w-3.5" />
-														<span>{t("ownerPortal.schedule.planned")}:</span>
-														<span>
-															{new Date(milestone.plannedDate).toLocaleDateString("ar-SA")}
-														</span>
-													</div>
-												)}
-												{milestone.actualDate && (
-													<div className="flex items-center gap-1">
-														<CheckCircle className="h-3.5 w-3.5 text-green-500" />
-														<span>{t("ownerPortal.schedule.actual")}:</span>
-														<span>
-															{new Date(milestone.actualDate).toLocaleDateString("ar-SA")}
-														</span>
-													</div>
-												)}
-											</div>
-										</div>
-									</div>
-								);
-							})}
+					<TabsContent value="gantt">
+						<div className="overflow-x-auto">
+							<div className="min-w-[640px]">
+								<GanttPrintCanvas
+									milestones={milestones.map((m) => ({
+										id: m.id,
+										title: m.title,
+										plannedStart: m.plannedStart,
+										plannedEnd: m.plannedEnd,
+										status: m.status,
+										progress: Number(m.progress) || 0,
+										isCritical: m.isCritical,
+									}))}
+									projectStart={startDate}
+									projectEnd={endDate}
+								/>
+							</div>
 						</div>
-					</div>
-				)}
+					</TabsContent>
+				</Tabs>
 			</div>
 		</div>
 	);

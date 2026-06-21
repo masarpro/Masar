@@ -85,7 +85,13 @@ export default function OwnerPortalSummary() {
 		);
 	}
 
-	const { project, currentPhase, latestOfficialUpdate, upcomingPayment } = data;
+	const {
+		project,
+		currentPhase,
+		latestOfficialUpdate,
+		upcomingPayment,
+		contractValueWithVat,
+	} = data;
 	const daysRemaining = calculateDaysRemaining(project.endDate);
 
 	return (
@@ -164,9 +170,14 @@ export default function OwnerPortalSummary() {
 								{t("ownerPortal.contractValue")}
 							</p>
 							<p className="text-lg font-semibold text-indigo-700 dark:text-indigo-300">
-								{project.contractValue
-									? formatCurrency(Number(project.contractValue))
-									: "-"}
+								{contractValueWithVat
+									? formatCurrency(Number(contractValueWithVat))
+									: project.contractValue
+										? formatCurrency(Number(project.contractValue))
+										: "-"}
+							</p>
+							<p className="mt-0.5 text-[10px] text-indigo-500/70 dark:text-indigo-400/70">
+								{t("ownerPortal.contractValueHint")}
 							</p>
 						</div>
 					</div>
