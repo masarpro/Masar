@@ -59,9 +59,6 @@ const ACCEPTED_IMAGE_TYPES = {
 	"image/webp": [".webp"],
 };
 
-const ATTACHMENTS_BUCKET =
-	process.env.NEXT_PUBLIC_S3_ATTACHMENTS_BUCKET || "attachments";
-
 type UploadState = "idle" | "uploading" | "uploaded" | "error";
 
 function formatFileSize(bytes: number): string {
@@ -112,15 +109,18 @@ export function PhotoUploadForm({
 
 			try {
 				// Step 1: Get signed upload URL
-				const { uploadUrl, storagePath } =
-					await getUploadUrlMutation.mutateAsync({
-						organizationId,
-						projectId,
-						ownerType: "PHOTO" as const,
-						fileName: file.name,
-						fileSize: file.size,
-						mimeType: file.type,
-					});
+				const uploadResponse = await getUploadUrlMutation.mutateAsync({
+					organizationId,
+					projectId,
+					ownerType: "PHOTO" as const,
+					fileName: file.name,
+					fileSize: file.size,
+					mimeType: file.type,
+				});
+				const uploadUrl = uploadResponse.uploadUrl as string;
+				const storagePath = uploadResponse.storagePath as string;
+				const proxyPath =
+					(uploadResponse as { proxyPath?: string }).proxyPath ?? null;
 
 				setUploadProgress(20);
 
@@ -159,9 +159,11 @@ export function PhotoUploadForm({
 
 				setUploadProgress(95);
 
-				// Step 3: Construct the photo URL using image-proxy (absolute URL for backend validation)
+				// Step 3: Construct the photo URL using image-proxy.
+				// Prefer the server-supplied proxyPath (knows the actual bucket name).
 				const origin = typeof window !== "undefined" ? window.location.origin : "";
-				const photoUrl = `${origin}/image-proxy/${ATTACHMENTS_BUCKET}/${storagePath}`;
+				const pathPart = proxyPath ?? `/image-proxy/attachments/${storagePath}`;
+				const photoUrl = `${origin}${pathPart}`;
 				setUploadedPhotoUrl(photoUrl);
 				setUploadProgress(100);
 				setUploadState("uploaded");

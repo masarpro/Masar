@@ -102,10 +102,17 @@ export const createUploadUrlProcedure = subscriptionProcedure
 			bucket: ATTACHMENTS_BUCKET,
 		});
 
+		// Build the canonical proxy path so the client doesn't need to know
+		// the bucket name. The server is authoritative about which bucket
+		// (S3_ATTACHMENTS_BUCKET) the file is actually uploaded to.
+		const proxyPath = `/image-proxy/${ATTACHMENTS_BUCKET}/${storagePath}`;
+
 		return {
 			uploadUrl: signedUrl,
 			uploadId,
 			storagePath,
+			proxyPath,
+			bucket: ATTACHMENTS_BUCKET,
 			expiresIn: 60, // 60 seconds
 		};
 	});

@@ -54,9 +54,6 @@ const ACCEPTED_IMAGE_TYPES = {
 	"image/webp": [".webp"],
 };
 
-const ATTACHMENTS_BUCKET =
-	process.env.NEXT_PUBLIC_S3_ATTACHMENTS_BUCKET || "attachments";
-
 type ItemStatus = "idle" | "uploading" | "uploaded" | "saved" | "error";
 
 interface QueueItem {
@@ -125,15 +122,18 @@ export function MultiPhotoUploadForm({
 		async (item: QueueItem) => {
 			updateItem(item.id, { status: "uploading", progress: 0, errorMessage: undefined });
 			try {
-				const { uploadUrl, storagePath } =
-					await getUploadUrlMutation.mutateAsync({
-						organizationId,
-						projectId,
-						ownerType: "PHOTO" as const,
-						fileName: item.file.name,
-						fileSize: item.file.size,
-						mimeType: item.file.type,
-					});
+				const uploadResponse = await getUploadUrlMutation.mutateAsync({
+					organizationId,
+					projectId,
+					ownerType: "PHOTO" as const,
+					fileName: item.file.name,
+					fileSize: item.file.size,
+					mimeType: item.file.type,
+				});
+				const uploadUrl = uploadResponse.uploadUrl as string;
+				const storagePath = uploadResponse.storagePath as string;
+				const proxyPath =
+					(uploadResponse as { proxyPath?: string }).proxyPath ?? null;
 
 				updateItem(item.id, { progress: 15 });
 
@@ -164,7 +164,10 @@ export function MultiPhotoUploadForm({
 
 				const origin =
 					typeof window !== "undefined" ? window.location.origin : "";
-				const uploadedUrl = `${origin}/image-proxy/${ATTACHMENTS_BUCKET}/${storagePath}`;
+				// Prefer server-supplied proxyPath (knows the actual bucket name).
+				// Fallback only used during the transition window for older servers.
+				const pathPart = proxyPath ?? `/image-proxy/attachments/${storagePath}`;
+				const uploadedUrl = `${origin}${pathPart}`;
 				updateItem(item.id, {
 					status: "uploaded",
 					uploadedUrl,
