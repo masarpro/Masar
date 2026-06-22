@@ -97,9 +97,12 @@ export const createUploadUrlProcedure = subscriptionProcedure
 		const extension = input.fileName.split(".").pop() || "";
 		const storagePath = `attachments/${input.organizationId}/${input.projectId || "general"}/${uploadId}.${extension}`;
 
-		// Get signed upload URL using storage provider
+		// Get signed upload URL using storage provider.
+		// Pass the contentType so the signed URL's Content-Type header matches
+		// the actual upload (otherwise some providers reject with 403/415).
 		const signedUrl = await getSignedUploadUrl(storagePath, {
 			bucket: ATTACHMENTS_BUCKET,
+			contentType: input.mimeType,
 		});
 
 		// Build the canonical proxy path so the client doesn't need to know
