@@ -89,9 +89,19 @@ export function CreatePaymentDialog({
 
 	const createMutation = useMutation({
 		...orpc.projectPayments.create.mutationOptions(),
-		onSuccess: () => {
-			toast.success(t("projectPayments.paymentCreated"));
-			queryClient.invalidateQueries({ queryKey: ["projectPayments"] });
+		onSuccess: (result) => {
+			if ((result?.splitCount ?? 1) > 1) {
+				toast.success(
+					t("projectPayments.paymentSplitAcrossTerms", {
+						count: result.splitCount,
+					}),
+				);
+			} else {
+				toast.success(t("projectPayments.paymentCreated"));
+			}
+			queryClient.invalidateQueries({ queryKey: orpc.projectPayments.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.projectFinance.key() });
 			resetForm();
 			onOpenChange(false);
 		},

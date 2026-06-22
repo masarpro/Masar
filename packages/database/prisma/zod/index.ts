@@ -169,7 +169,7 @@ export type QuoteScalarFieldEnum = z.infer<typeof QuoteScalarFieldEnumSchema>;
 
 // File: ProjectScalarFieldEnum.schema.ts
 
-export const ProjectScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'name', 'slug', 'projectNo', 'description', 'status', 'type', 'clientName', 'clientId', 'location', 'contractValue', 'progress', 'startDate', 'endDate', 'createdById', 'createdAt', 'updatedAt'])
+export const ProjectScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'name', 'slug', 'projectNo', 'description', 'status', 'type', 'clientName', 'clientId', 'location', 'contractValue', 'progress', 'startDate', 'endDate', 'createdById', 'createdAt', 'updatedAt', 'coverPhotoId'])
 
 export type ProjectScalarFieldEnum = z.infer<typeof ProjectScalarFieldEnumSchema>;
 
@@ -187,7 +187,7 @@ export type ProjectDailyReportScalarFieldEnum = z.infer<typeof ProjectDailyRepor
 
 // File: ProjectPhotoScalarFieldEnum.schema.ts
 
-export const ProjectPhotoScalarFieldEnumSchema = z.enum(['id', 'projectId', 'url', 'caption', 'category', 'takenAt', 'uploadedById', 'createdAt'])
+export const ProjectPhotoScalarFieldEnumSchema = z.enum(['id', 'projectId', 'url', 'caption', 'category', 'milestoneId', 'takenAt', 'uploadedById', 'createdAt'])
 
 export type ProjectPhotoScalarFieldEnum = z.infer<typeof ProjectPhotoScalarFieldEnumSchema>;
 
@@ -2322,6 +2322,7 @@ export const ProjectSchema = z.object({
   createdById: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
+  coverPhotoId: z.string().nullish(),
 });
 
 export type ProjectModel = z.infer<typeof ProjectSchema>;
@@ -2366,6 +2367,7 @@ export const ProjectPhotoSchema = z.object({
   url: z.string(),
   caption: z.string().nullish(),
   category: PhotoCategorySchema.default("PROGRESS"),
+  milestoneId: z.string().nullish(),
   takenAt: z.date(),
   uploadedById: z.string(),
   createdAt: z.date(),

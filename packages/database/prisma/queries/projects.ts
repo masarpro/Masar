@@ -45,6 +45,7 @@ export async function getOrganizationProjects(
 			where,
 			include: {
 				createdBy: { select: { id: true, name: true } },
+				coverPhoto: { select: { id: true, url: true, caption: true } },
 				photos: {
 					take: 1,
 					orderBy: { createdAt: "desc" },
@@ -70,6 +71,7 @@ export async function getProjectById(id: string, organizationId: string) {
 		where: { id, organizationId },
 		include: {
 			createdBy: { select: { id: true, name: true, email: true } },
+			coverPhoto: { select: { id: true, url: true, caption: true } },
 		},
 	});
 }

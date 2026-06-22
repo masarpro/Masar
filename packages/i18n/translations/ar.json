@@ -5923,8 +5923,14 @@
       "summary": "الملخص",
       "schedule": "الجدول الزمني",
       "payments": "الدفعات",
+      "photos": "الصور",
       "changeOrders": "أوامر التغيير",
       "chat": "المحادثة"
+    },
+    "photos": {
+      "title": "صور المشروع",
+      "subtitle": "{count} صورة مرفقة للمشروع",
+      "emptyHint": "لم يقم المقاول برفع أي صور للمشروع بعد"
     },
     "invalidLink": "رابط غير صالح",
     "invalidLinkDescription": "هذا الرابط غير صالح أو تم إلغاؤه.",
@@ -9059,6 +9065,7 @@
         "communication": "التواصل",
         "workspace": "الملفات",
         "quantities": "الكميات",
+        "photos": "الصور",
         "more": "المزيد"
       },
       "sections": {
@@ -9073,6 +9080,7 @@
         "subcontracts": "عقود الباطن",
         "handover": "محاضر الاستلام",
         "quantities": "الكميات والمواصفات",
+        "photos": "الصور",
         "timeline": "الجدول",
         "changes": "أوامر التغيير",
         "documents": "ملفات المشروع",
@@ -9083,6 +9091,42 @@
         "team": "فريق العمل",
         "contract": "العقد"
       }
+    },
+    "photos": {
+      "title": "صور المشروع",
+      "subtitle": "{count} صورة في المشروع",
+      "uploadButton": "رفع صور",
+      "uploadHint": "ارفع عدة صور دفعة واحدة وأسندها لمرحلة من مراحل التنفيذ",
+      "empty": "لا توجد صور بعد",
+      "emptyHint": "ابدأ برفع صور المشروع وربطها بمراحل التنفيذ",
+      "groupBy": {
+        "milestone": "حسب المرحلة",
+        "date": "حسب التاريخ",
+        "category": "حسب الفئة"
+      },
+      "filterByMilestone": "تصفية بالمرحلة",
+      "allMilestones": "كل المراحل",
+      "noMilestone": "بدون مرحلة",
+      "milestone": "المرحلة",
+      "selectMilestone": "اختر مرحلة",
+      "setAsCover": "تعيين كصورة عرض",
+      "removeCover": "إزالة من صورة العرض",
+      "currentCover": "صورة العرض",
+      "coverSet": "تم تعيين الصورة كصورة عرض",
+      "coverRemoved": "تمت إزالة صورة العرض",
+      "editPhoto": "تحرير الصورة",
+      "caption": "التعليق",
+      "captionPlaceholder": "اكتب وصفاً للصورة...",
+      "dragDropMany": "اسحب وأفلت الصور هنا أو انقر للاختيار (يمكن اختيار عدة صور)",
+      "queueTitle": "{count} صورة في القائمة",
+      "readyCount": "{ready} من {total} جاهزة",
+      "uploadedReady": "جاهزة للحفظ",
+      "saved": "تم الحفظ",
+      "saveCount": "حفظ {count} صورة",
+      "noPhotosToSave": "لا توجد صور جاهزة للحفظ",
+      "waitForUploads": "انتظر اكتمال الرفع أولاً",
+      "savedCount": "تم حفظ {count} صورة",
+      "someFailed": "فشل حفظ {count} صورة"
     },
     "commandCenter": {
       "quickActions": "إجراءات سريعة",

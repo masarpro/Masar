@@ -90,6 +90,7 @@ export async function getProjectPhotos(
 	projectId: string,
 	options?: {
 		category?: PhotoCategory;
+		milestoneId?: string | null; // null = أرفق الصور بدون مرحلة فقط
 		limit?: number;
 		offset?: number;
 	},
@@ -97,26 +98,38 @@ export async function getProjectPhotos(
 	const where: {
 		projectId: string;
 		category?: PhotoCategory;
+		milestoneId?: string | null;
 	} = { projectId };
 
 	if (options?.category) {
 		where.category = options.category;
 	}
 
-	const [photos, total] = await Promise.all([
+	if (options?.milestoneId === null) {
+		where.milestoneId = null;
+	} else if (options?.milestoneId) {
+		where.milestoneId = options.milestoneId;
+	}
+
+	const [photos, total, project] = await Promise.all([
 		db.projectPhoto.findMany({
 			where,
 			include: {
 				uploadedBy: { select: { id: true, name: true, image: true } },
+				milestone: { select: { id: true, title: true, status: true, orderIndex: true } },
 			},
 			orderBy: { createdAt: "desc" },
 			take: options?.limit ?? 50,
 			skip: options?.offset ?? 0,
 		}),
 		db.projectPhoto.count({ where }),
+		db.project.findUnique({
+			where: { id: projectId },
+			select: { coverPhotoId: true },
+		}),
 	]);
 
-	return { photos, total };
+	return { photos, total, coverPhotoId: project?.coverPhotoId ?? null };
 }
 
 /**
@@ -128,6 +141,7 @@ export async function createPhoto(data: {
 	url: string;
 	caption?: string;
 	category?: PhotoCategory;
+	milestoneId?: string;
 	takenAt?: Date;
 }) {
 	return db.projectPhoto.create({
@@ -137,11 +151,90 @@ export async function createPhoto(data: {
 			url: data.url,
 			caption: data.caption,
 			category: data.category ?? "PROGRESS",
+			milestoneId: data.milestoneId,
 			takenAt: data.takenAt ?? new Date(),
 		},
 		include: {
 			uploadedBy: { select: { id: true, name: true, image: true } },
+			milestone: { select: { id: true, title: true, status: true, orderIndex: true } },
 		},
+	});
+}
+
+/**
+ * Update photo metadata (caption / category / milestone link)
+ */
+export async function updatePhoto(
+	photoId: string,
+	projectId: string,
+	data: {
+		caption?: string | null;
+		category?: PhotoCategory;
+		milestoneId?: string | null;
+	},
+) {
+	const existing = await db.projectPhoto.findFirst({
+		where: { id: photoId, projectId },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("الصورة غير موجودة أو لا تنتمي لهذا المشروع");
+	}
+
+	// Validate milestone belongs to same project (if provided)
+	if (data.milestoneId) {
+		const milestone = await db.projectMilestone.findFirst({
+			where: { id: data.milestoneId, projectId },
+			select: { id: true },
+		});
+		if (!milestone) {
+			throw new Error("المرحلة غير موجودة أو لا تنتمي لهذا المشروع");
+		}
+	}
+
+	return db.projectPhoto.update({
+		where: { id: photoId },
+		data: {
+			caption: data.caption,
+			category: data.category,
+			milestoneId: data.milestoneId,
+		},
+		include: {
+			uploadedBy: { select: { id: true, name: true, image: true } },
+			milestone: { select: { id: true, title: true, status: true, orderIndex: true } },
+		},
+	});
+}
+
+/**
+ * Set a photo as the project's cover image
+ */
+export async function setProjectCoverPhoto(projectId: string, photoId: string) {
+	const photo = await db.projectPhoto.findFirst({
+		where: { id: photoId, projectId },
+		select: { id: true },
+	});
+
+	if (!photo) {
+		throw new Error("الصورة غير موجودة أو لا تنتمي لهذا المشروع");
+	}
+
+	return db.project.update({
+		where: { id: projectId },
+		data: { coverPhotoId: photoId },
+		select: { id: true, coverPhotoId: true },
+	});
+}
+
+/**
+ * Remove the project's cover image
+ */
+export async function unsetProjectCoverPhoto(projectId: string) {
+	return db.project.update({
+		where: { id: projectId },
+		data: { coverPhotoId: null },
+		select: { id: true, coverPhotoId: true },
 	});
 }
 

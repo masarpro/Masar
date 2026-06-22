@@ -34,7 +34,7 @@ export const createProjectPaymentProcedure = subscriptionProcedure
 			{ section: "finance", action: "payments" },
 		);
 
-		const payment = await createProjectPayment({
+		const { payments, primary, splitCount } = await createProjectPayment({
 			organizationId: input.organizationId,
 			projectId: input.projectId,
 			createdById: context.user.id,
@@ -48,67 +48,71 @@ export const createProjectPaymentProcedure = subscriptionProcedure
 			note: input.note,
 		});
 
-		logAuditEvent(input.organizationId, input.projectId, {
-			actorId: context.user.id,
-			action: "PROJECT_PAYMENT_CREATED",
-			entityType: "project_payment",
-			entityId: payment.id,
-			metadata: {
-				amount: input.amount,
-				contractTermId: input.contractTermId,
-				paymentNo: payment.paymentNo,
-			},
-		}).catch(() => {});
-
-		// Auto-Journal: generate accounting entry for project payment
-		try {
-			const { onProjectPaymentReceived } = await import("../../../lib/accounting/auto-journal");
-			await onProjectPaymentReceived(db, {
-				id: payment.id,
-				organizationId: input.organizationId,
-				amount: payment.amount,
-				date: input.date,
-				destinationAccountId: input.destinationAccountId ?? "",
-				projectId: input.projectId,
-				paymentNo: payment.paymentNo,
-				userId: context.user.id,
-			});
-		} catch (e) {
-			console.error("[AutoJournal] Failed to create ProjectPayment entry:", e);
-			orgAuditLog({
-				organizationId: input.organizationId,
+		// Each spillover allocation is its own payment row → log + journal +
+		// receipt voucher per row, consistent with edit/delete reversal.
+		for (const payment of payments) {
+			logAuditEvent(input.organizationId, input.projectId, {
 				actorId: context.user.id,
-				action: "JOURNAL_ENTRY_FAILED",
-				entityType: "journal_entry",
+				action: "PROJECT_PAYMENT_CREATED",
+				entityType: "project_payment",
 				entityId: payment.id,
-				metadata: { error: String(e), referenceType: "PROJECT_PAYMENT" },
-			});
-		}
-
-		// Auto-create receipt voucher from project payment
-		try {
-			const { generateAtomicNo } = await import("@repo/database");
-			const { numberToArabicWords } = await import("@repo/utils");
-			const voucherNo = await generateAtomicNo(input.organizationId, "RCV");
-			await db.receiptVoucher.create({
-				data: {
-					organizationId: input.organizationId,
-					voucherNo,
-					projectPaymentId: payment.id,
-					date: input.date,
-					amount: payment.amount,
-					amountInWords: numberToArabicWords(Number(payment.amount)),
-					receivedFrom: input.description || `دفعة مشروع ${payment.paymentNo}`,
-					paymentMethod: input.paymentMethod || "BANK_TRANSFER",
-					destinationAccountId: input.destinationAccountId || null,
-					projectId: input.projectId,
-					status: "ISSUED",
-					createdById: context.user.id,
+				metadata: {
+					amount: Number(payment.amount),
+					contractTermId: payment.contractTermId,
+					paymentNo: payment.paymentNo,
 				},
-			});
-		} catch (e) {
-			console.error("[ReceiptVoucher] Failed to create auto voucher from project payment:", e);
+			}).catch(() => {});
+
+			// Auto-Journal: generate accounting entry for project payment
+			try {
+				const { onProjectPaymentReceived } = await import("../../../lib/accounting/auto-journal");
+				await onProjectPaymentReceived(db, {
+					id: payment.id,
+					organizationId: input.organizationId,
+					amount: payment.amount,
+					date: input.date,
+					destinationAccountId: input.destinationAccountId ?? "",
+					projectId: input.projectId,
+					paymentNo: payment.paymentNo,
+					userId: context.user.id,
+				});
+			} catch (e) {
+				console.error("[AutoJournal] Failed to create ProjectPayment entry:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: payment.id,
+					metadata: { error: String(e), referenceType: "PROJECT_PAYMENT" },
+				});
+			}
+
+			// Auto-create receipt voucher from project payment
+			try {
+				const { generateAtomicNo } = await import("@repo/database");
+				const { numberToArabicWords } = await import("@repo/utils");
+				const voucherNo = await generateAtomicNo(input.organizationId, "RCV");
+				await db.receiptVoucher.create({
+					data: {
+						organizationId: input.organizationId,
+						voucherNo,
+						projectPaymentId: payment.id,
+						date: input.date,
+						amount: payment.amount,
+						amountInWords: numberToArabicWords(Number(payment.amount)),
+						receivedFrom: input.description || `دفعة مشروع ${payment.paymentNo}`,
+						paymentMethod: input.paymentMethod || "BANK_TRANSFER",
+						destinationAccountId: input.destinationAccountId || null,
+						projectId: input.projectId,
+						status: "ISSUED",
+						createdById: context.user.id,
+					},
+				});
+			} catch (e) {
+				console.error("[ReceiptVoucher] Failed to create auto voucher from project payment:", e);
+			}
 		}
 
-		return { ...payment, amount: Number(payment.amount) };
+		return { ...primary, amount: Number(primary.amount), splitCount };
 	});

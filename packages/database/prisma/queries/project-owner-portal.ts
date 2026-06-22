@@ -304,9 +304,13 @@ export async function getOwnerContextBySession(
  * Source of truth is the ProjectContract record (which carries VAT flags).
  * When no contract exists, falls back to Project.contractValue (no VAT info).
  *
- * VAT rule:
- *  - includesVat === true  → value already includes VAT → no extra VAT added
- *  - includesVat === false → add VAT at vatPercent (defaults to 15% if unset)
+ * VAT rule (the stored contract value is NET / pre-VAT):
+ *  - includesVat === true  → contract is subject to VAT → add VAT at vatPercent
+ *                            (defaults to 15%) on the base value only
+ *  - includesVat === false → not subject to VAT → no VAT added
+ *
+ * Change order cost impacts are already VAT-inclusive, so they are added on top
+ * of the VAT-inclusive contract value and never taxed again.
  */
 async function computeContractTotal(
 	organizationId: string,
@@ -334,24 +338,23 @@ async function computeContractTotal(
 
 	const coImpact = coAgg._sum.costImpact ? Number(coAgg._sum.costImpact) : 0;
 
-	// No contract record → fall back to the raw project contract value.
+	// No contract record → fall back to the raw project contract value
+	// (no VAT info available).
 	if (!contract) {
-		const base =
-			(project?.contractValue ? Number(project.contractValue) : 0) + coImpact;
-		return { base, vatAmount: 0, total: base };
+		const base = project?.contractValue ? Number(project.contractValue) : 0;
+		return { base, vatAmount: 0, total: base + coImpact };
 	}
 
-	const base = Number(contract.value) + coImpact;
-
-	// Value already includes VAT → don't add it again.
-	if (contract.includesVat) {
-		return { base, vatAmount: 0, total: base };
-	}
-
+	// Stored value is NET (pre-VAT). Add VAT only on the contract value when the
+	// contract is subject to it; change orders are already VAT-inclusive.
+	const netValue = Number(contract.value);
 	const vatPercent =
 		contract.vatPercent != null ? Number(contract.vatPercent) : 15;
-	const vatAmount = base * (vatPercent / 100);
-	return { base, vatAmount, total: base + vatAmount };
+	const vatAmount = contract.includesVat
+		? netValue * (vatPercent / 100)
+		: 0;
+	const valueWithVat = netValue + vatAmount;
+	return { base: netValue, vatAmount, total: valueWithVat + coImpact };
 }
 
 /**
@@ -378,6 +381,9 @@ export async function getOwnerSummary(organizationId: string, projectId: string)
 				contractValue: true,
 				startDate: true,
 				endDate: true,
+				coverPhoto: {
+					select: { id: true, url: true, caption: true },
+				},
 			},
 		}),
 		db.projectProgressUpdate.findFirst({
@@ -695,6 +701,42 @@ export async function getOwnerPortalOfficialUpdates(
 		orderBy: { createdAt: "desc" },
 		take: options?.limit ?? 10,
 	});
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Photos for owner portal - الصور (للقراءة فقط)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export async function getOwnerPortalPhotos(
+	organizationId: string,
+	projectId: string,
+	options?: { limit?: number },
+) {
+	// Verify project belongs to organization (defense in depth)
+	const project = await db.project.findFirst({
+		where: { id: projectId, organizationId },
+		select: { id: true, coverPhotoId: true },
+	});
+	if (!project) {
+		return { photos: [], coverPhotoId: null };
+	}
+
+	const photos = await db.projectPhoto.findMany({
+		where: { projectId },
+		select: {
+			id: true,
+			url: true,
+			caption: true,
+			category: true,
+			takenAt: true,
+			createdAt: true,
+			milestone: { select: { id: true, title: true, orderIndex: true } },
+		},
+		orderBy: { createdAt: "desc" },
+		take: options?.limit ?? 500,
+	});
+
+	return { photos, coverPhotoId: project.coverPhotoId };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

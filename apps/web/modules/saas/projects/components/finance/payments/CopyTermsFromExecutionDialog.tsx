@@ -128,7 +128,7 @@ export function CopyTermsFromExecutionDialog({
 					count: result.createdCount,
 				}),
 			);
-			queryClient.invalidateQueries({ queryKey: ["projectPayments"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectPayments.key() });
 			onOpenChange(false);
 		},
 		onError: (error: Error) => {

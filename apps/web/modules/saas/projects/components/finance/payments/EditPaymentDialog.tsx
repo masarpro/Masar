@@ -88,7 +88,9 @@ export function EditPaymentDialog({
 		...orpc.projectPayments.update.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("projectPayments.paymentUpdated"));
-			queryClient.invalidateQueries({ queryKey: ["projectPayments"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectPayments.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.projectFinance.key() });
 			onOpenChange(false);
 		},
 		onError: (error) => {

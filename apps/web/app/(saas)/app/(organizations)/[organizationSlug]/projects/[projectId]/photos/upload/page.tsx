@@ -1,16 +1,16 @@
 import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { MultiPhotoUploadForm } from "@saas/projects/components/photos/MultiPhotoUploadForm";
+import { FormPageSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { FormPageSkeleton } from "@saas/shared/components/skeletons";
 
 export async function generateMetadata() {
 	const t = await getTranslations();
 	return { title: t("projects.photos.uploadButton") };
 }
 
-export default async function UploadPage({
+export default async function PhotosUploadPage({
 	params,
 }: {
 	params: Promise<{ organizationSlug: string; projectId: string }>;
@@ -18,7 +18,7 @@ export default async function UploadPage({
 	const { organizationSlug, projectId } = await params;
 	return (
 		<Suspense fallback={<FormPageSkeleton />}>
-			<UploadPageContent
+			<PhotosUploadWrapper
 				organizationSlug={organizationSlug}
 				projectId={projectId}
 			/>
@@ -26,7 +26,7 @@ export default async function UploadPage({
 	);
 }
 
-async function UploadPageContent({
+async function PhotosUploadWrapper({
 	organizationSlug,
 	projectId,
 }: {
@@ -41,7 +41,6 @@ async function UploadPageContent({
 			organizationId={activeOrganization.id}
 			organizationSlug={organizationSlug}
 			projectId={projectId}
-			returnTo={`/app/${organizationSlug}/projects/${projectId}/execution`}
 		/>
 	);
 }

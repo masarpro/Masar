@@ -9,6 +9,7 @@ import {
 	Calendar,
 	CreditCard,
 	Home,
+	Image as ImageIcon,
 	MessageSquare,
 	AlertTriangle,
 	Clock,
@@ -91,6 +92,12 @@ export default function OwnerPortalLayout({
 			label: t("ownerPortal.tabs.payments"),
 			icon: CreditCard,
 			active: pathname === `${basePath}/payments`,
+		},
+		{
+			href: `${basePath}/photos`,
+			label: t("ownerPortal.tabs.photos"),
+			icon: ImageIcon,
+			active: pathname === `${basePath}/photos`,
 		},
 		{
 			href: `${basePath}/changes`,
@@ -189,7 +196,16 @@ export default function OwnerPortalLayout({
 				<div className="mx-auto max-w-6xl px-4 py-3 sm:py-4">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
-							{resolveImageSrc(summary?.organization?.logo) ? (
+							{summary?.project?.coverPhoto?.url ? (
+								<Image
+									src={resolveImageSrc(summary.project.coverPhoto.url) as string}
+									alt={summary.project.name}
+									width={48}
+									height={48}
+									className="h-12 w-12 rounded-xl object-cover ring-2 ring-primary/20"
+									unoptimized
+								/>
+							) : resolveImageSrc(summary?.organization?.logo) ? (
 								<Image
 									src={resolveImageSrc(summary.organization.logo) as string}
 									alt={summary.organization.name}

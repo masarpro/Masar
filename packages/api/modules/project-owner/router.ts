@@ -15,6 +15,7 @@ import { listOwnerMessagesProcedure } from "./procedures/list-owner-messages";
 import { sendOwnerMessageProcedure } from "./procedures/send-owner-message";
 import { listOfficialUpdatesProcedure } from "./procedures/list-official-updates";
 import { exchangeTokenProcedure } from "./procedures/exchange-token";
+import { listOwnerPhotosProcedure } from "./procedures/list-owner-photos";
 
 export const projectOwnerRouter = publicProcedure.router({
 	// Internal (authenticated) endpoints
@@ -33,5 +34,6 @@ export const projectOwnerRouter = publicProcedure.router({
 		listMessages: listOwnerMessagesProcedure,
 		sendMessage: sendOwnerMessageProcedure,
 		listUpdates: listOfficialUpdatesProcedure,
+		listPhotos: listOwnerPhotosProcedure,
 	}),
 });

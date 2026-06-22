@@ -359,8 +359,11 @@ export async function getPaymentTermsWithProgress(
 	}
 
 	const contractValue = Number(contract.value);
+	const vatPercent =
+		contract.vatPercent != null ? Number(contract.vatPercent) : 15;
+	// Contract value is NET (pre-VAT); add VAT when the contract is subject to it.
 	const totalWithVat = contract.includesVat
-		? contractValue * 1.15
+		? contractValue * (1 + vatPercent / 100)
 		: contractValue;
 
 	let totalPaidAll = 0;
@@ -447,6 +450,8 @@ export async function getContractSummary(
 			where: { organizationId, projectId },
 			select: {
 				value: true,
+				includesVat: true,
+				vatPercent: true,
 				retentionPercent: true,
 				retentionCap: true,
 			},
@@ -472,7 +477,16 @@ export async function getContractSummary(
 		};
 	}
 
-	const originalValue = Number(contract.value);
+	// The stored contract value is NET (pre-VAT). When the contract is subject
+	// to VAT (includesVat), the value the client sees must include VAT.
+	const netValue = Number(contract.value);
+	const vatPercent =
+		contract.vatPercent != null ? Number(contract.vatPercent) : 15;
+	const originalValue = contract.includesVat
+		? netValue * (1 + vatPercent / 100)
+		: netValue;
+	// Change order cost impacts are already VAT-inclusive → added on top of the
+	// VAT-inclusive contract value (never taxed again).
 	const coImpact = approvedCOImpact._sum.costImpact
 		? Number(approvedCOImpact._sum.costImpact)
 		: 0;

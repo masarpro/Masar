@@ -19,6 +19,7 @@ export interface ProjectHeaderProps {
 		location?: string | null;
 		startDate?: Date | string | null;
 		endDate?: Date | string | null;
+		coverPhoto?: { id: string; url: string; caption: string | null } | null;
 	};
 	organizationSlug: string;
 	organizationId: string;
@@ -52,9 +53,19 @@ export const ProjectHeader = memo(function ProjectHeader({
 						</Link>
 					</Button>
 
-					<div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-						<FolderKanban className="h-5 w-5 text-primary" />
-					</div>
+					{project.coverPhoto?.url ? (
+						<div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 ring-2 ring-primary/20">
+							<img
+								src={project.coverPhoto.url}
+								alt={project.name || ""}
+								className="size-full object-cover"
+							/>
+						</div>
+					) : (
+						<div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+							<FolderKanban className="h-5 w-5 text-primary" />
+						</div>
+					)}
 					<div className="min-w-0">
 						<h1 className="text-xl font-bold text-foreground truncate">
 							{project.name || t("projects.unnamed")}

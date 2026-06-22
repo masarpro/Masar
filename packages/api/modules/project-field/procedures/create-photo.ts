@@ -15,11 +15,12 @@ export const createPhotoProcedure = subscriptionProcedure
 			organizationId: z.string().trim().max(100),
 			projectId: z.string().trim().max(100),
 			url: z.string().trim().url("رابط الصورة غير صالح").max(2048),
-			caption: z.string().trim().max(100).optional(),
+			caption: z.string().trim().max(200).optional(),
 			category: z
 				.enum(["PROGRESS", "ISSUE", "EQUIPMENT", "MATERIAL", "SAFETY", "OTHER"])
 				.optional()
 				.default("PROGRESS"),
+			milestoneId: z.string().trim().max(100).optional(),
 			takenAt: z.coerce.date().optional(),
 		}),
 	)
@@ -43,6 +44,7 @@ export const createPhotoProcedure = subscriptionProcedure
 			url: input.url,
 			caption: input.caption,
 			category: input.category,
+			milestoneId: input.milestoneId,
 			takenAt: input.takenAt,
 		});
 

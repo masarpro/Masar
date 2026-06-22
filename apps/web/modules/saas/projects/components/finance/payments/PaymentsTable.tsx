@@ -95,7 +95,9 @@ export function PaymentsTable({
 		...orpc.projectPayments.delete.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("projectPayments.paymentDeleted"));
-			queryClient.invalidateQueries({ queryKey: ["projectPayments"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectPayments.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.projectFinance.key() });
 		},
 		onError: () => {
 			toast.error(t("projectPayments.deleteError"));

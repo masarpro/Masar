@@ -56,6 +56,7 @@ export default async function ProjectLayout({
 		location: project.location,
 		startDate: project.startDate,
 		endDate: project.endDate,
+		coverPhoto: (project as { coverPhoto?: { id: string; url: string; caption: string | null } | null }).coverPhoto ?? null,
 	};
 
 	const userName = session?.user?.name ?? "";

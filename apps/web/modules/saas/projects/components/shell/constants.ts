@@ -6,6 +6,7 @@ import {
 	MessageSquare,
 	MoreHorizontal,
 	Camera,
+	Image as ImageIcon,
 	AlertTriangle,
 	FileDiff,
 	FolderKanban,
@@ -99,6 +100,13 @@ export const PROJECT_NAV_SECTIONS: ProjectNavSection[] = [
 		labelKey: "projects.shell.sections.quantities",
 		icon: Calculator,
 		section: "quantities",
+	},
+	{
+		id: "photos",
+		path: "photos",
+		labelKey: "projects.shell.sections.photos",
+		icon: ImageIcon,
+		section: "photos",
 	},
 	{
 		id: "subcontracts",
@@ -341,6 +349,15 @@ export const NAV_GROUP_CONFIG: NavGroupConfig[] = [
 		showInMobileDock: true,
 	},
 	{
+		id: "photos",
+		labelKey: "projects.shell.navigation.photos",
+		icon: ImageIcon,
+		type: "direct",
+		sectionIds: ["photos"],
+		directSectionId: "photos",
+		showInMobileDock: true,
+	},
+	{
 		id: "workspace",
 		labelKey: "projects.shell.navigation.workspace",
 		icon: FolderKanban,
@@ -534,6 +551,17 @@ export const CONTEXT_ACTIONS: Record<string, ContextAction[]> = {
 	],
 	// Quantities page
 	quantities: [],
+	// Photos page
+	photos: [
+		{
+			id: "upload-photos",
+			label: "رفع صور",
+			labelEn: "Upload Photos",
+			icon: Camera,
+			href: "photos/upload",
+			variant: "primary",
+		},
+	],
 	// Handover page
 	handover: [
 		{

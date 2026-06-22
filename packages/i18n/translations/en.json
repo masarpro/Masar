@@ -5923,8 +5923,14 @@
       "summary": "Summary",
       "schedule": "Schedule",
       "payments": "Payments",
+      "photos": "Photos",
       "changeOrders": "Change Orders",
       "chat": "Chat"
+    },
+    "photos": {
+      "title": "Project Photos",
+      "subtitle": "{count} photo(s) shared for this project",
+      "emptyHint": "The contractor has not uploaded any photos for this project yet"
     },
     "invalidLink": "Invalid Link",
     "invalidLinkDescription": "This access link is invalid or has been revoked.",
@@ -9059,6 +9065,7 @@
         "communication": "Communication",
         "workspace": "Files",
         "quantities": "Quantities",
+        "photos": "Photos",
         "more": "More"
       },
       "sections": {
@@ -9073,6 +9080,7 @@
         "subcontracts": "Subcontracts",
         "handover": "Handover",
         "quantities": "Quantities & Specs",
+        "photos": "Photos",
         "timeline": "Timeline",
         "changes": "Change Orders",
         "documents": "Project Files",
@@ -9083,6 +9091,42 @@
         "team": "Team",
         "contract": "Contract"
       }
+    },
+    "photos": {
+      "title": "Project Photos",
+      "subtitle": "{count} photo(s) in this project",
+      "uploadButton": "Upload Photos",
+      "uploadHint": "Upload multiple photos at once and link them to an execution milestone",
+      "empty": "No photos yet",
+      "emptyHint": "Start uploading project photos and linking them to execution phases",
+      "groupBy": {
+        "milestone": "By Milestone",
+        "date": "By Date",
+        "category": "By Category"
+      },
+      "filterByMilestone": "Filter by milestone",
+      "allMilestones": "All milestones",
+      "noMilestone": "No milestone",
+      "milestone": "Milestone",
+      "selectMilestone": "Select milestone",
+      "setAsCover": "Set as cover",
+      "removeCover": "Remove cover",
+      "currentCover": "Cover photo",
+      "coverSet": "Photo set as project cover",
+      "coverRemoved": "Cover photo removed",
+      "editPhoto": "Edit photo",
+      "caption": "Caption",
+      "captionPlaceholder": "Add a caption...",
+      "dragDropMany": "Drag & drop photos here or click to select (multiple allowed)",
+      "queueTitle": "{count} photo(s) queued",
+      "readyCount": "{ready} of {total} ready",
+      "uploadedReady": "Ready to save",
+      "saved": "Saved",
+      "saveCount": "Save {count} photo(s)",
+      "noPhotosToSave": "No photos ready to save",
+      "waitForUploads": "Wait for uploads to finish",
+      "savedCount": "{count} photo(s) saved",
+      "someFailed": "{count} photo(s) failed"
     },
     "commandCenter": {
       "quickActions": "Quick Actions",

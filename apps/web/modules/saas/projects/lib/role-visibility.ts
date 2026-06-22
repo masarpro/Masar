@@ -14,6 +14,7 @@ export const ROLE_SECTION_VISIBILITY: Record<ProjectRole, string[]> = {
 		"finance/contract",
 		"finance/subcontracts",
 		"quantities",
+		"photos",
 		"changes",
 		"documents",
 		"chat",
@@ -29,6 +30,7 @@ export const ROLE_SECTION_VISIBILITY: Record<ProjectRole, string[]> = {
 		"finance",
 		"finance/subcontracts",
 		"quantities",
+		"photos",
 		"changes",
 		"documents",
 		"chat",
@@ -39,6 +41,7 @@ export const ROLE_SECTION_VISIBILITY: Record<ProjectRole, string[]> = {
 		"overview",
 		"execution",
 		"quantities",
+		"photos",
 		"documents",
 		"chat",
 		"updates",
@@ -53,9 +56,10 @@ export const ROLE_SECTION_VISIBILITY: Record<ProjectRole, string[]> = {
 		"finance/contract",
 		"finance/subcontracts",
 		"quantities",
+		"photos",
 		"documents",
 	],
-	VIEWER: ["overview", "documents", "updates"],
+	VIEWER: ["overview", "photos", "documents", "updates"],
 };
 
 /**

@@ -185,7 +185,7 @@ export function PaymentsClaimsTable({
 		onSuccess: () => {
 			toast.success(t("finance.notifications.statusUpdated"));
 			queryClient.invalidateQueries({
-				queryKey: ["projectFinance"],
+				queryKey: orpc.projectFinance.key(),
 			});
 		},
 		onError: () => {

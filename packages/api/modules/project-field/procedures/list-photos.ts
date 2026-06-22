@@ -17,7 +17,10 @@ export const listPhotosProcedure = protectedProcedure
 			category: z
 				.enum(["PROGRESS", "ISSUE", "EQUIPMENT", "MATERIAL", "SAFETY", "OTHER"])
 				.optional(),
-			limit: z.number().int().min(1).max(500).optional().default(50),
+			// "none" => only photos with no milestone assigned
+			// any string => filter by that milestone id
+			milestoneId: z.union([z.literal("none"), z.string().trim().max(100)]).optional(),
+			limit: z.number().int().min(1).max(500).optional().default(200),
 			offset: z.number().int().nonnegative().optional().default(0),
 		}),
 	)
@@ -30,8 +33,12 @@ export const listPhotosProcedure = protectedProcedure
 			{ section: "projects", action: "view" },
 		);
 
+		const milestoneFilter =
+			input.milestoneId === "none" ? null : input.milestoneId ?? undefined;
+
 		const result = await getProjectPhotos(input.projectId, {
 			category: input.category,
+			milestoneId: milestoneFilter,
 			limit: input.limit,
 			offset: input.offset,
 		});
