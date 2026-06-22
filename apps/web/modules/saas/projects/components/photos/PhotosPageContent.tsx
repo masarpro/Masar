@@ -31,16 +31,20 @@ import {
 } from "@ui/components/select";
 import {
 	Camera,
+	ChevronDown,
 	ChevronLeft,
 	ChevronRight,
+	ChevronUp,
 	Filter,
 	ImageIcon,
 	Loader2,
 	Pencil,
+	Play,
 	Plus,
 	Star,
 	StarOff,
 	Trash2,
+	Upload,
 	X,
 } from "lucide-react";
 import Link from "next/link";
@@ -51,12 +55,14 @@ import { toast } from "sonner";
 import Captions from "yet-another-react-lightbox/plugins/captions";
 import Counter from "yet-another-react-lightbox/plugins/counter";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
+import Video from "yet-another-react-lightbox/plugins/video";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/captions.css";
 import "yet-another-react-lightbox/plugins/counter.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import { useProjectRole } from "../../hooks/use-project-role";
+import { MultiPhotoUploadForm } from "./MultiPhotoUploadForm";
 
 const Lightbox = dynamic(() => import("yet-another-react-lightbox"), {
 	ssr: false,
@@ -86,6 +92,8 @@ interface PhotoItem {
 	url: string;
 	caption: string | null;
 	category: PhotoCategory;
+	mediaType?: "PHOTO" | "VIDEO";
+	mimeType?: string | null;
 	createdAt: string | Date;
 	milestone: { id: string; title: string; status: string; orderIndex: number } | null;
 }
@@ -138,6 +146,7 @@ export function PhotosPageContent({
 	const [lightboxIndex, setLightboxIndex] = useState(-1);
 	const [photoToDelete, setPhotoToDelete] = useState<PhotoItem | null>(null);
 	const [photoToEdit, setPhotoToEdit] = useState<PhotoItem | null>(null);
+	const [isUploadOpen, setIsUploadOpen] = useState(false);
 
 	const photosQuery = useQuery(
 		orpc.projectField.listPhotos.queryOptions({
@@ -263,13 +272,29 @@ export function PhotosPageContent({
 
 	const lightboxSlides = useMemo(
 		() =>
-			filteredPhotos.map((photo) => ({
-				src: photo.url,
-				title: photo.caption || undefined,
-				description: `${t(`projects.field.photoCategory.${photo.category}`)} — ${formatPhotoDate(photo.createdAt)}${
+			filteredPhotos.map((photo) => {
+				const description = `${t(`projects.field.photoCategory.${photo.category}`)} — ${formatPhotoDate(photo.createdAt)}${
 					photo.milestone ? ` — ${photo.milestone.title}` : ""
-				}`,
-			})),
+				}`;
+				if (photo.mediaType === "VIDEO") {
+					return {
+						type: "video" as const,
+						sources: [
+							{
+								src: photo.url,
+								type: photo.mimeType || "video/mp4",
+							},
+						],
+						title: photo.caption || undefined,
+						description,
+					};
+				}
+				return {
+					src: photo.url,
+					title: photo.caption || undefined,
+					description,
+				};
+			}),
 		[filteredPhotos, t],
 	);
 
@@ -302,14 +327,38 @@ export function PhotosPageContent({
 					</p>
 				</div>
 				{canEdit && (
-					<Button asChild className="rounded-xl">
-						<Link href={`${basePath}/photos/upload`}>
+					<Button
+						type="button"
+						onClick={() => setIsUploadOpen((v) => !v)}
+						className="rounded-xl"
+					>
+						{isUploadOpen ? (
+							<ChevronUp className="me-1.5 h-4 w-4" />
+						) : (
 							<Plus className="me-1.5 h-4 w-4" />
-							{t("projects.photos.uploadButton")}
-						</Link>
+						)}
+						{isUploadOpen
+							? t("projects.photos.closeUpload")
+							: t("projects.photos.uploadButton")}
 					</Button>
 				)}
 			</div>
+
+			{/* Inline upload (collapsible) */}
+			{canEdit && isUploadOpen && (
+				<div className="rounded-2xl border border-primary/20 bg-primary/[0.02] p-4 dark:bg-primary/[0.04]">
+					<MultiPhotoUploadForm
+						organizationId={organizationId}
+						organizationSlug={organizationSlug}
+						projectId={projectId}
+						embedded
+						onSaved={() => {
+							setIsUploadOpen(false);
+							queryClient.invalidateQueries({ queryKey: ["projectField"] });
+						}}
+					/>
+				</div>
+			)}
 
 			{/* Filters bar */}
 			{totalCount > 0 && (
@@ -514,12 +563,13 @@ export function PhotosPageContent({
 				open={lightboxIndex >= 0}
 				close={() => setLightboxIndex(-1)}
 				index={lightboxIndex}
-				slides={lightboxSlides}
-				plugins={[Zoom, Thumbnails, Captions, Counter]}
+				slides={lightboxSlides as never}
+				plugins={[Zoom, Thumbnails, Captions, Counter, Video]}
 				captions={{ descriptionTextAlign: "center" }}
 				zoom={{ maxZoomPixelRatio: 5 }}
 				thumbnails={{ position: "bottom", width: 80, height: 60 }}
 				counter={{ container: { style: { top: 0, bottom: "unset" } } }}
+				video={{ controls: true, playsInline: true, autoPlay: false }}
 				styles={{ container: { backgroundColor: "rgba(0,0,0,0.92)" } }}
 				carousel={{ finite: false }}
 				animation={{ fade: 300 }}
@@ -575,7 +625,22 @@ function PhotoCard({
 				onClick={onOpen}
 				className="absolute inset-0 size-full"
 			>
-				{!imgError ? (
+				{photo.mediaType === "VIDEO" ? (
+					<>
+						<video
+							src={imageSrc}
+							className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+							muted
+							playsInline
+							preload="metadata"
+						/>
+						<div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30">
+							<div className="rounded-full bg-white/90 p-2 shadow-lg transition-transform group-hover:scale-110">
+								<Play className="size-5 fill-current text-slate-800" />
+							</div>
+						</div>
+					</>
+				) : !imgError ? (
 					<img
 						src={imageSrc}
 						alt={photo.caption || ""}

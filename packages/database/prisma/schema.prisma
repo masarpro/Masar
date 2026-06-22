@@ -138,6 +138,12 @@ enum PhotoCategory {
   OTHER // أخرى
 }
 
+// نوع الوسيط (صورة أو فيديو)
+enum MediaType {
+  PHOTO
+  VIDEO
+}
+
 // حالة الطقس
 enum WeatherCondition {
   SUNNY // مشمس
@@ -2030,10 +2036,12 @@ model ProjectPhoto {
   projectId String  @map("project_id")
   project   Project @relation("ProjectPhotos", fields: [projectId], references: [id], onDelete: Cascade)
 
-  // معلومات الصورة
-  url      String // رابط الصورة
-  caption  String? // وصف الصورة
-  category PhotoCategory @default(PROGRESS)
+  // معلومات الصورة / الفيديو
+  url       String // رابط الوسيط
+  caption   String? // وصف
+  category  PhotoCategory @default(PROGRESS)
+  mediaType MediaType     @default(PHOTO) @map("media_type")
+  mimeType  String?       @map("mime_type") // image/jpeg, video/mp4, …
 
   // ربط بمرحلة التنفيذ (اختياري)
   milestoneId String?           @map("milestone_id")

@@ -187,7 +187,7 @@ export type ProjectDailyReportScalarFieldEnum = z.infer<typeof ProjectDailyRepor
 
 // File: ProjectPhotoScalarFieldEnum.schema.ts
 
-export const ProjectPhotoScalarFieldEnumSchema = z.enum(['id', 'projectId', 'url', 'caption', 'category', 'milestoneId', 'takenAt', 'uploadedById', 'createdAt'])
+export const ProjectPhotoScalarFieldEnumSchema = z.enum(['id', 'projectId', 'url', 'caption', 'category', 'mediaType', 'mimeType', 'milestoneId', 'takenAt', 'uploadedById', 'createdAt'])
 
 export type ProjectPhotoScalarFieldEnum = z.infer<typeof ProjectPhotoScalarFieldEnumSchema>;
 
@@ -976,6 +976,12 @@ export type WeatherCondition = z.infer<typeof WeatherConditionSchema>;
 export const PhotoCategorySchema = z.enum(['PROGRESS', 'ISSUE', 'EQUIPMENT', 'MATERIAL', 'SAFETY', 'OTHER'])
 
 export type PhotoCategory = z.infer<typeof PhotoCategorySchema>;
+
+// File: MediaType.schema.ts
+
+export const MediaTypeSchema = z.enum(['PHOTO', 'VIDEO'])
+
+export type MediaType = z.infer<typeof MediaTypeSchema>;
 
 // File: IssueSeverity.schema.ts
 
@@ -2367,6 +2373,8 @@ export const ProjectPhotoSchema = z.object({
   url: z.string(),
   caption: z.string().nullish(),
   category: PhotoCategorySchema.default("PROGRESS"),
+  mediaType: MediaTypeSchema.default("PHOTO"),
+  mimeType: z.string().nullish(),
   milestoneId: z.string().nullish(),
   takenAt: z.date(),
   uploadedById: z.string(),

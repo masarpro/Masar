@@ -9,6 +9,7 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	ImageIcon,
+	Play,
 	X,
 } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -18,6 +19,7 @@ import { useEffect, useMemo, useState } from "react";
 import Captions from "yet-another-react-lightbox/plugins/captions";
 import Counter from "yet-another-react-lightbox/plugins/counter";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
+import Video from "yet-another-react-lightbox/plugins/video";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/captions.css";
@@ -33,6 +35,8 @@ interface OwnerPhoto {
 	url: string;
 	caption: string | null;
 	category: string;
+	mediaType?: "PHOTO" | "VIDEO";
+	mimeType?: string | null;
 	takenAt: string | Date;
 	createdAt: string | Date;
 	milestone: { id: string; title: string; orderIndex: number } | null;
@@ -104,13 +108,26 @@ export default function OwnerPortalPhotos() {
 
 	const lightboxSlides = useMemo(
 		() =>
-			allPhotos.map((p) => ({
-				src: p.url,
-				title: p.caption || undefined,
-				description: `${t(`projects.field.photoCategory.${p.category}`)} — ${formatPhotoDate(p.createdAt)}${
+			allPhotos.map((p) => {
+				const description = `${t(`projects.field.photoCategory.${p.category}`)} — ${formatPhotoDate(p.createdAt)}${
 					p.milestone ? ` — ${p.milestone.title}` : ""
-				}`,
-			})),
+				}`;
+				if (p.mediaType === "VIDEO") {
+					return {
+						type: "video" as const,
+						sources: [
+							{ src: p.url, type: p.mimeType || "video/mp4" },
+						],
+						title: p.caption || undefined,
+						description,
+					};
+				}
+				return {
+					src: p.url,
+					title: p.caption || undefined,
+					description,
+				};
+			}),
 		[allPhotos, t],
 	);
 
@@ -190,11 +207,28 @@ export default function OwnerPortalPhotos() {
 										: "border-slate-200 hover:border-primary/40 dark:border-slate-800"
 								}`}
 							>
-								<img
-									src={photo.url}
-									alt={photo.caption || ""}
-									className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
-								/>
+								{photo.mediaType === "VIDEO" ? (
+									<>
+										<video
+											src={photo.url}
+											className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+											muted
+											playsInline
+											preload="metadata"
+										/>
+										<div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30">
+											<div className="rounded-full bg-white/90 p-2 shadow-lg transition-transform group-hover:scale-110">
+												<Play className="size-5 fill-current text-slate-800" />
+											</div>
+										</div>
+									</>
+								) : (
+									<img
+										src={photo.url}
+										alt={photo.caption || ""}
+										className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+									/>
+								)}
 								<div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 								<div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-1 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
 									<Badge
@@ -219,12 +253,13 @@ export default function OwnerPortalPhotos() {
 				open={lightboxIndex >= 0}
 				close={() => setLightboxIndex(-1)}
 				index={lightboxIndex}
-				slides={lightboxSlides}
-				plugins={[Zoom, Thumbnails, Captions, Counter]}
+				slides={lightboxSlides as never}
+				plugins={[Zoom, Thumbnails, Captions, Counter, Video]}
 				captions={{ descriptionTextAlign: "center" }}
 				zoom={{ maxZoomPixelRatio: 5 }}
 				thumbnails={{ position: "bottom", width: 80, height: 60 }}
 				counter={{ container: { style: { top: 0, bottom: "unset" } } }}
+				video={{ controls: true, playsInline: true, autoPlay: false }}
 				styles={{ container: { backgroundColor: "rgba(0,0,0,0.92)" } }}
 				carousel={{ finite: false }}
 				animation={{ fade: 300 }}

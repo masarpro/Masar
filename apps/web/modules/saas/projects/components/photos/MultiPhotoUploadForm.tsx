@@ -19,6 +19,7 @@ import {
 	CheckCircle,
 	ChevronRight,
 	Loader2,
+	Play,
 	Trash2,
 	Upload,
 	X,
@@ -47,12 +48,24 @@ const CATEGORY_OPTIONS: PhotoCategory[] = [
 	"OTHER",
 ];
 
-const MAX_FILE_SIZE = 25 * 1024 * 1024;
-const ACCEPTED_IMAGE_TYPES = {
+const MAX_PHOTO_SIZE = 25 * 1024 * 1024; // 25 MB
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100 MB
+const ACCEPTED_MEDIA_TYPES = {
 	"image/jpeg": [".jpg", ".jpeg"],
 	"image/png": [".png"],
 	"image/webp": [".webp"],
+	"video/mp4": [".mp4"],
+	"video/webm": [".webm"],
+	"video/quicktime": [".mov"],
 };
+
+function getMediaType(file: File): "PHOTO" | "VIDEO" {
+	return file.type.startsWith("video/") ? "VIDEO" : "PHOTO";
+}
+
+function getMaxSizeFor(file: File): number {
+	return getMediaType(file) === "VIDEO" ? MAX_VIDEO_SIZE : MAX_PHOTO_SIZE;
+}
 
 type ItemStatus = "idle" | "uploading" | "uploaded" | "saved" | "error";
 
@@ -64,6 +77,7 @@ interface QueueItem {
 	progress: number;
 	status: ItemStatus;
 	uploadedUrl?: string;
+	mediaType: "PHOTO" | "VIDEO";
 	errorMessage?: string;
 }
 
@@ -73,6 +87,10 @@ interface MultiPhotoUploadFormProps {
 	projectId: string;
 	/** Optional return path after successful submit (defaults to photos page). */
 	returnTo?: string;
+	/** When true, the form is embedded inline on a page (no header/cancel button). */
+	embedded?: boolean;
+	/** Called after a successful save when embedded. */
+	onSaved?: () => void;
 }
 
 function formatFileSize(bytes: number): string {
@@ -86,6 +104,8 @@ export function MultiPhotoUploadForm({
 	organizationSlug,
 	projectId,
 	returnTo,
+	embedded = false,
+	onSaved,
 }: MultiPhotoUploadFormProps) {
 	const t = useTranslations();
 	const router = useRouter();
@@ -190,10 +210,12 @@ export function MultiPhotoUploadForm({
 	const onDrop = useCallback(
 		(acceptedFiles: File[]) => {
 			for (const file of acceptedFiles) {
-				if (file.size > MAX_FILE_SIZE) {
+				const limit = getMaxSizeFor(file);
+				if (file.size > limit) {
 					toast.error(`${file.name}: ${t("projects.documents.fileTooLarge")}`);
 					continue;
 				}
+				const mediaType = getMediaType(file);
 				const id = `${reactId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 				const previewUrl = URL.createObjectURL(file);
 				const item: QueueItem = {
@@ -203,6 +225,7 @@ export function MultiPhotoUploadForm({
 					caption: "",
 					progress: 0,
 					status: "idle",
+					mediaType,
 				};
 				setItems((prev) => [...prev, item]);
 				// Kick off upload immediately
@@ -214,9 +237,9 @@ export function MultiPhotoUploadForm({
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		onDrop,
-		accept: ACCEPTED_IMAGE_TYPES,
+		accept: ACCEPTED_MEDIA_TYPES,
 		multiple: true,
-		maxSize: MAX_FILE_SIZE,
+		maxSize: MAX_VIDEO_SIZE,
 		disabled: submitting,
 		onDropRejected: (rejections) => {
 			const error = rejections[0]?.errors[0];
@@ -268,6 +291,8 @@ export function MultiPhotoUploadForm({
 					url: item.uploadedUrl!,
 					caption: item.caption.trim() || undefined,
 					category,
+					mediaType: item.mediaType,
+					mimeType: item.file.type,
 					milestoneId: milestoneId === "none" ? undefined : milestoneId,
 				});
 				updateItem(item.id, { status: "saved" });
@@ -290,7 +315,16 @@ export function MultiPhotoUploadForm({
 			);
 		}
 		if (failedCount === 0) {
-			router.push(returnTo ?? defaultReturnTo);
+			if (embedded) {
+				// Clear the queue and let the parent refresh the gallery
+				setItems((prev) => {
+					for (const it of prev) URL.revokeObjectURL(it.previewUrl);
+					return [];
+				});
+				onSaved?.();
+			} else {
+				router.push(returnTo ?? defaultReturnTo);
+			}
 		} else {
 			toast.error(t("projects.photos.someFailed", { count: failedCount }));
 		}
@@ -301,27 +335,29 @@ export function MultiPhotoUploadForm({
 
 	return (
 		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex items-center gap-4">
-				<Button
-					variant="ghost"
-					size="icon"
-					asChild
-					className="shrink-0 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
-				>
-					<Link href={returnTo ?? defaultReturnTo}>
-						<ChevronRight className="h-5 w-5" />
-					</Link>
-				</Button>
-				<div>
-					<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-						{t("projects.photos.uploadButton")}
-					</h1>
-					<p className="text-sm text-slate-500 dark:text-slate-400">
-						{t("projects.photos.uploadHint")}
-					</p>
+			{/* Header (hidden when embedded inline on the photos page) */}
+			{!embedded && (
+				<div className="flex items-center gap-4">
+					<Button
+						variant="ghost"
+						size="icon"
+						asChild
+						className="shrink-0 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+					>
+						<Link href={returnTo ?? defaultReturnTo}>
+							<ChevronRight className="h-5 w-5" />
+						</Link>
+					</Button>
+					<div>
+						<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+							{t("projects.photos.uploadButton")}
+						</h1>
+						<p className="text-sm text-slate-500 dark:text-slate-400">
+							{t("projects.photos.uploadHint")}
+						</p>
+					</div>
 				</div>
-			</div>
+			)}
 
 			<form onSubmit={handleSubmit} className="space-y-6">
 				{/* Batch settings: category + milestone */}
@@ -384,10 +420,10 @@ export function MultiPhotoUploadForm({
 							<p className="text-sm font-medium text-slate-700 dark:text-slate-300">
 								{isDragActive
 									? t("projects.documents.dropHere")
-									: t("projects.photos.dragDropMany")}
+									: t("projects.photos.dragDropMedia")}
 							</p>
 							<p className="mt-1 text-xs text-slate-500">
-								JPG, PNG, WebP — {t("projects.field.maxSize25MB")}
+								{t("projects.photos.acceptedTypes")}
 							</p>
 						</div>
 					</div>
@@ -414,11 +450,28 @@ export function MultiPhotoUploadForm({
 									className="flex gap-3 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900"
 								>
 									<div className="relative size-24 shrink-0 overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800">
-										<img
-											src={item.previewUrl}
-											alt=""
-											className="size-full object-cover"
-										/>
+										{item.mediaType === "VIDEO" ? (
+											<>
+												<video
+													src={item.previewUrl}
+													className="size-full object-cover"
+													muted
+													playsInline
+													preload="metadata"
+												/>
+												<div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30">
+													<div className="rounded-full bg-white/90 p-1.5">
+														<Play className="size-4 fill-current text-slate-800" />
+													</div>
+												</div>
+											</>
+										) : (
+											<img
+												src={item.previewUrl}
+												alt=""
+												className="size-full object-cover"
+											/>
+										)}
 										{item.status === "saved" && (
 											<div className="absolute inset-0 flex items-center justify-center bg-green-500/70">
 												<CheckCircle className="size-8 text-white" />
@@ -522,15 +575,17 @@ export function MultiPhotoUploadForm({
 
 				{/* Submit */}
 				<div className="flex justify-end gap-3">
-					<Button
-						type="button"
-						variant="outline"
-						onClick={() => router.push(returnTo ?? defaultReturnTo)}
-						className="rounded-xl"
-						disabled={submitting}
-					>
-						{t("common.cancel")}
-					</Button>
+					{!embedded && (
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => router.push(returnTo ?? defaultReturnTo)}
+							className="rounded-xl"
+							disabled={submitting}
+						>
+							{t("common.cancel")}
+						</Button>
+					)}
 					<Button
 						type="submit"
 						disabled={

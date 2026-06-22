@@ -14,12 +14,14 @@ export const createPhotoProcedure = subscriptionProcedure
 		z.object({
 			organizationId: z.string().trim().max(100),
 			projectId: z.string().trim().max(100),
-			url: z.string().trim().url("رابط الصورة غير صالح").max(2048),
+			url: z.string().trim().url("رابط الوسيط غير صالح").max(2048),
 			caption: z.string().trim().max(200).optional(),
 			category: z
 				.enum(["PROGRESS", "ISSUE", "EQUIPMENT", "MATERIAL", "SAFETY", "OTHER"])
 				.optional()
 				.default("PROGRESS"),
+			mediaType: z.enum(["PHOTO", "VIDEO"]).optional().default("PHOTO"),
+			mimeType: z.string().trim().max(200).optional(),
 			milestoneId: z.string().trim().max(100).optional(),
 			takenAt: z.coerce.date().optional(),
 		}),
@@ -37,13 +39,15 @@ export const createPhotoProcedure = subscriptionProcedure
 			{ section: "projects", action: "edit" },
 		);
 
-		// Create the photo
+		// Create the photo / video
 		const photo = await createPhoto({
 			projectId: input.projectId,
 			uploadedById: context.user.id,
 			url: input.url,
 			caption: input.caption,
 			category: input.category,
+			mediaType: input.mediaType,
+			mimeType: input.mimeType,
 			milestoneId: input.milestoneId,
 			takenAt: input.takenAt,
 		});

@@ -728,6 +728,8 @@ export async function getOwnerPortalPhotos(
 			url: true,
 			caption: true,
 			category: true,
+			mediaType: true,
+			mimeType: true,
 			takenAt: true,
 			createdAt: true,
 			milestone: { select: { id: true, title: true, orderIndex: true } },

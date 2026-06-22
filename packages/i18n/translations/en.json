@@ -9095,10 +9095,13 @@
     "photos": {
       "title": "Project Photos",
       "subtitle": "{count} photo(s) in this project",
-      "uploadButton": "Upload Photos",
-      "uploadHint": "Upload multiple photos at once and link them to an execution milestone",
-      "empty": "No photos yet",
-      "emptyHint": "Start uploading project photos and linking them to execution phases",
+      "uploadButton": "Upload Photos or Video",
+      "closeUpload": "Close upload panel",
+      "uploadHint": "Upload multiple photos and videos at once and link them to an execution milestone",
+      "dragDropMedia": "Drag & drop photos or videos here, or click to select",
+      "acceptedTypes": "JPG/PNG/WebP up to 25MB • MP4/WebM/MOV up to 100MB",
+      "empty": "No photos or videos yet",
+      "emptyHint": "Start uploading project media and linking them to execution phases",
       "groupBy": {
         "milestone": "By Milestone",
         "date": "By Date",

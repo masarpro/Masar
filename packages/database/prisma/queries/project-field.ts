@@ -5,6 +5,7 @@ import { db } from "../client";
 type IssueSeverity = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 type IssueStatus = "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
 type PhotoCategory = "PROGRESS" | "ISSUE" | "EQUIPMENT" | "MATERIAL" | "SAFETY" | "OTHER";
+type MediaType = "PHOTO" | "VIDEO";
 type WeatherCondition = "SUNNY" | "CLOUDY" | "RAINY" | "WINDY" | "DUSTY" | "HOT" | "COLD";
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -133,7 +134,7 @@ export async function getProjectPhotos(
 }
 
 /**
- * Create a new photo
+ * Create a new photo or video
  */
 export async function createPhoto(data: {
 	projectId: string;
@@ -141,6 +142,8 @@ export async function createPhoto(data: {
 	url: string;
 	caption?: string;
 	category?: PhotoCategory;
+	mediaType?: MediaType;
+	mimeType?: string;
 	milestoneId?: string;
 	takenAt?: Date;
 }) {
@@ -151,6 +154,8 @@ export async function createPhoto(data: {
 			url: data.url,
 			caption: data.caption,
 			category: data.category ?? "PROGRESS",
+			mediaType: data.mediaType ?? "PHOTO",
+			mimeType: data.mimeType,
 			milestoneId: data.milestoneId,
 			takenAt: data.takenAt ?? new Date(),
 		},

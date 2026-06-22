@@ -244,6 +244,9 @@ const EXTENSION_MIME_MAP: Record<string, string[]> = {
 	png: ["image/png"],
 	webp: ["image/webp"],
 	heic: ["image/heic"],
+	mp4: ["video/mp4"],
+	webm: ["video/webm"],
+	mov: ["video/quicktime"],
 };
 
 // Magic byte signatures for file type verification
@@ -266,7 +269,15 @@ const ALLOWED_MIME_TYPES: Record<AttachmentOwnerType, string[]> = {
 		"image/png",
 		"image/webp",
 	],
-	PHOTO: ["image/jpeg", "image/png", "image/webp", "image/heic"],
+	PHOTO: [
+		"image/jpeg",
+		"image/png",
+		"image/webp",
+		"image/heic",
+		"video/mp4",
+		"video/webm",
+		"video/quicktime",
+	],
 	EXPENSE: ["application/pdf", "image/jpeg", "image/png", "image/webp"],
 	ISSUE: ["image/jpeg", "image/png", "image/webp", "application/pdf"],
 	MESSAGE: ["image/jpeg", "image/png", "image/webp", "application/pdf"],
@@ -278,7 +289,7 @@ const ALLOWED_MIME_TYPES: Record<AttachmentOwnerType, string[]> = {
 // Max file sizes (in bytes)
 const MAX_FILE_SIZES: Record<AttachmentOwnerType, number> = {
 	DOCUMENT: 50 * 1024 * 1024, // 50MB
-	PHOTO: 20 * 1024 * 1024, // 20MB
+	PHOTO: 100 * 1024 * 1024, // 100MB (covers both photos up to 25MB and videos up to 100MB)
 	EXPENSE: 10 * 1024 * 1024, // 10MB
 	ISSUE: 20 * 1024 * 1024, // 20MB
 	MESSAGE: 10 * 1024 * 1024, // 10MB
