@@ -1,5 +1,6 @@
 "use client";
 
+import { resolveImageSrc } from "@saas/shared/lib/image-src";
 import { Building2 } from "lucide-react";
 import Image from "next/image";
 
@@ -48,9 +49,9 @@ export function OwnerPrintHeader({
 		<div className="mb-6 border-slate-300 border-b pb-4">
 			<div className="flex items-start justify-between gap-4">
 				<div className="flex items-center gap-3">
-					{orgLogo ? (
+					{resolveImageSrc(orgLogo) ? (
 						<Image
-							src={orgLogo}
+							src={resolveImageSrc(orgLogo) as string}
 							alt={orgName ?? ""}
 							width={48}
 							height={48}

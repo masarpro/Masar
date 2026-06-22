@@ -24,6 +24,7 @@ import {
 	getSessionFromCookie,
 	setSessionCookie,
 } from "@saas/projects-owner/hooks/use-owner-session";
+import { resolveImageSrc } from "@saas/shared/lib/image-src";
 
 export default function OwnerPortalLayout({
 	children,
@@ -188,9 +189,9 @@ export default function OwnerPortalLayout({
 				<div className="mx-auto max-w-6xl px-4 py-3 sm:py-4">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
-							{summary?.organization?.logo ? (
+							{resolveImageSrc(summary?.organization?.logo) ? (
 								<Image
-									src={summary.organization.logo}
+									src={resolveImageSrc(summary.organization.logo) as string}
 									alt={summary.organization.name}
 									width={40}
 									height={40}

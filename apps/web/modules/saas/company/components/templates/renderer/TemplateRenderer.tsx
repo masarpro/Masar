@@ -2,6 +2,7 @@
 
 import { Fragment, memo, useEffect, useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { resolveImageSrc } from "@saas/shared/lib/image-src";
 import { HeaderComponent } from "../components/HeaderComponent";
 import { DocumentMetaComponent } from "../components/DocumentMetaComponent";
 import { ClientInfoComponent } from "../components/ClientInfoComponent";
@@ -217,8 +218,8 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 	const vatPercent = settings.vatPercent || data.vatPercent || 15;
 	const logoSize = settings.logoSize ?? 64;
 	const logoBackground = false;
-	const headerImage = settings.headerImage;
-	const footerImage = settings.footerImage;
+	const headerImage = resolveImageSrc(settings.headerImage);
+	const footerImage = resolveImageSrc(settings.footerImage);
 	const showWatermark = settings.showWatermark;
 	const watermarkOpacity = settings.watermarkOpacity ?? 5;
 
@@ -271,7 +272,7 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 		name: organization?.name || organization?.nameAr || "",
 		nameAr: organization?.nameAr || organization?.name,
 		nameEn: organization?.nameEn,
-		logo: organization?.logo,
+		logo: resolveImageSrc(organization?.logo),
 		address: locale === "ar"
 			? organization?.addressAr || organization?.address
 			: organization?.addressEn || organization?.address,
@@ -573,7 +574,9 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 			}
 
 			case "image":
-				const imageUrl = (elementSettings as { imageUrl?: string }).imageUrl;
+				const imageUrl = resolveImageSrc(
+					(elementSettings as { imageUrl?: string }).imageUrl,
+				);
 				if (!imageUrl) {
 					return (
 						<div key={element.id} className="py-4 flex justify-center">
@@ -787,7 +790,7 @@ export const TemplateRenderer = memo(function TemplateRenderer({
 					data-watermark
 				>
 					<img
-						src={organization.logo}
+						src={resolveImageSrc(organization.logo)}
 						alt=""
 						className="w-64 h-64 object-contain"
 						style={{ opacity: watermarkOpacity / 100 }}

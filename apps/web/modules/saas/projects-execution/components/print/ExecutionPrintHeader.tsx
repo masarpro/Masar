@@ -1,6 +1,7 @@
 "use client";
 
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import { resolveImageSrc } from "@saas/shared/lib/image-src";
 import { apiClient } from "@shared/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -53,7 +54,7 @@ export function ExecutionPrintHeader({
 	}
 
 	const contractorName = activeOrganization?.name ?? "";
-	const logoUrl = activeOrganization?.logo ?? null;
+	const logoUrl = resolveImageSrc(activeOrganization?.logo);
 
 	return (
 		<header className="border-b-2 border-slate-800 pb-3 mb-4 print:pb-2 print:mb-3">

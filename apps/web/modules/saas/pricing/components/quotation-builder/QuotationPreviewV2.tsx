@@ -20,6 +20,7 @@ import Link from "next/link";
 import { useState, type ReactNode, useMemo } from "react";
 import { toast } from "sonner";
 import { exportToPDF, printDocument } from "@saas/shared/lib/pdf-export";
+import { resolveImageSrc } from "@saas/shared/lib/image-src";
 
 interface QuotationPreviewV2Props {
 	organizationId: string;
@@ -217,7 +218,7 @@ export function QuotationPreviewV2({
 								<div>
 									{org?.logo && (
 										// NOTE: <img> used intentionally — print/template context where next/Image optimization doesn't apply
-										<img src={org.logo} alt="" className="h-16 mb-3 object-contain" />
+										<img src={resolveImageSrc(org.logo)} alt="" className="h-16 mb-3 object-contain" />
 									)}
 									<p className="font-bold text-lg leading-relaxed">{org?.companyNameAr ?? ""}</p>
 									{org?.address && (

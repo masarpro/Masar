@@ -2,6 +2,7 @@
 
 import { Fragment, useMemo, useState } from "react";
 import { useVirtualRows } from "@saas/shared/hooks/use-virtual-rows";
+import { resolveImageSrc } from "@saas/shared/lib/image-src";
 import { Card, CardContent } from "@ui/components/card";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
@@ -149,7 +150,7 @@ export function BOQSummaryTable({
 			studyName,
 			floorLabel: selectedFloor !== "all" ? selectedFloorLabel : undefined,
 			organizationName: orgSettingsAny?.companyNameAr ?? undefined,
-			organizationLogo: orgSettingsAny?.logo ?? undefined,
+			organizationLogo: resolveImageSrc(orgSettingsAny?.logo),
 			organizationAddress: orgSettingsAny?.address ?? undefined,
 			organizationPhone: orgSettingsAny?.phone ?? undefined,
 			organizationEmail: orgSettingsAny?.email ?? undefined,
