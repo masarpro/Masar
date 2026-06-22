@@ -8916,6 +8916,12 @@
         "notes": "ملاحظات",
         "status": "الحالة"
       },
+      "projectInfo": {
+        "title": "بيانات المشروع",
+        "projectName": "اسم المشروع",
+        "clientName": "اسم العميل / الشركة",
+        "saved": "تم حفظ بيانات المشروع"
+      },
       "status": {
         "DRAFT": "مسودة",
         "ACTIVE": "نشط",

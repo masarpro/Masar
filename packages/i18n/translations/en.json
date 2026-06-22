@@ -8916,6 +8916,12 @@
         "notes": "Notes",
         "status": "Status"
       },
+      "projectInfo": {
+        "title": "Project Information",
+        "projectName": "Project Name",
+        "clientName": "Client / Company Name",
+        "saved": "Project info saved"
+      },
       "status": {
         "DRAFT": "Draft",
         "ACTIVE": "Active",

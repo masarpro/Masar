@@ -3,10 +3,12 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
+import { Input } from "@ui/components/input";
+import { Label } from "@ui/components/label";
 import { FileDiff, Loader2, Pencil, Save, X } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 import { toast } from "sonner";
 import { ContractSummaryBar } from "./contract/ContractSummaryBar";
@@ -31,6 +33,8 @@ export function ProjectContractView({
 	const queryClient = useQueryClient();
 	const contractRef = useRef<ContractFormRef>(null);
 	const [isEditing, setIsEditing] = useState(false);
+	const [projectName, setProjectName] = useState("");
+	const [projectClientName, setProjectClientName] = useState("");
 
 	const { data: contract, isLoading: contractLoading } = useQuery(
 		orpc.projectContract.get.queryOptions({
@@ -44,6 +48,19 @@ export function ProjectContractView({
 		}),
 	);
 
+	const { data: project, isLoading: projectLoading } = useQuery(
+		orpc.projects.getById.queryOptions({
+			input: { organizationId, id: projectId },
+		}),
+	);
+
+	useEffect(() => {
+		if (project) {
+			setProjectName(project.name ?? "");
+			setProjectClientName(project.clientName ?? "");
+		}
+	}, [project]);
+
 	const invalidateAll = () => {
 		queryClient.invalidateQueries({
 			queryKey: orpc.projectContract.get.queryOptions({
@@ -53,6 +70,11 @@ export function ProjectContractView({
 		queryClient.invalidateQueries({
 			queryKey: orpc.projectContract.getSummary.queryOptions({
 				input: { organizationId, projectId },
+			}).queryKey,
+		});
+		queryClient.invalidateQueries({
+			queryKey: orpc.projects.getById.queryOptions({
+				input: { organizationId, id: projectId },
 			}).queryKey,
 		});
 	};
@@ -79,11 +101,47 @@ export function ProjectContractView({
 		},
 	});
 
-	const isSaving = upsertMutation.isPending || setTermsMutation.isPending;
+	const updateProjectMutation = useMutation({
+		...orpc.projects.update.mutationOptions(),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: orpc.projects.getById.queryOptions({
+					input: { organizationId, id: projectId },
+				}).queryKey,
+			});
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		},
+	});
+
+	const isSaving =
+		upsertMutation.isPending ||
+		setTermsMutation.isPending ||
+		updateProjectMutation.isPending;
 
 	const handleSave = async () => {
 		const data = contractRef.current?.getFormData();
 		if (!data) return;
+
+		const trimmedName = projectName.trim();
+		if (!trimmedName) {
+			toast.error(t("projects.createProject.projectNameRequired"));
+			return;
+		}
+
+		const trimmedClientName = projectClientName.trim();
+		const nameChanged = project && trimmedName !== (project.name ?? "");
+		const clientNameChanged =
+			project && trimmedClientName !== (project.clientName ?? "");
+		if (nameChanged || clientNameChanged) {
+			updateProjectMutation.mutate({
+				organizationId,
+				id: projectId,
+				name: trimmedName,
+				clientName: trimmedClientName || undefined,
+			});
+		}
 
 		const VALID_STATUSES = ["DRAFT", "ACTIVE", "SUSPENDED", "CLOSED"];
 		const VALID_METHODS = [
@@ -176,7 +234,7 @@ export function ProjectContractView({
 		);
 	};
 
-	if (contractLoading || summaryLoading) {
+	if (contractLoading || summaryLoading || projectLoading) {
 		return <DetailPageSkeleton />;
 	}
 
@@ -211,7 +269,11 @@ export function ProjectContractView({
 					<div className="flex gap-2">
 						<Button
 							variant="outline"
-							onClick={() => setIsEditing(false)}
+							onClick={() => {
+								setProjectName(project?.name ?? "");
+								setProjectClientName(project?.clientName ?? "");
+								setIsEditing(false);
+							}}
 							disabled={isSaving}
 							className="rounded-xl border-slate-200 px-5 dark:border-slate-700"
 						>
@@ -246,6 +308,48 @@ export function ProjectContractView({
 				adjustedValue={Number(summary?.adjustedValue ?? 0)}
 				retentionAmount={Number(summary?.retentionAmount ?? 0)}
 			/>
+
+			{/* Project Info (editable when isEditing) */}
+			{isEditing ? (
+				<div className="overflow-hidden rounded-2xl border border-emerald-200/50 bg-emerald-50/50 dark:border-emerald-800/30 dark:bg-emerald-950/20">
+					<div className="border-b border-emerald-200/50 p-5 dark:border-emerald-800/30">
+						<h3 className="text-lg font-medium text-emerald-900 dark:text-emerald-100">
+							{t("projects.contract.projectInfo.title")}
+						</h3>
+					</div>
+					<div className="grid gap-4 p-5 sm:grid-cols-2">
+						<div className="space-y-2">
+							<Label htmlFor="project-name">
+								{t("projects.contract.projectInfo.projectName")}
+							</Label>
+							<Input
+								id="project-name"
+								value={projectName}
+								onChange={(e) => setProjectName(e.target.value)}
+								disabled={isSaving}
+							/>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="project-client-name">
+								{t("projects.contract.projectInfo.clientName")}
+							</Label>
+							<Input
+								id="project-client-name"
+								value={projectClientName}
+								onChange={(e) =>
+									setProjectClientName(e.target.value)
+								}
+								disabled={isSaving}
+							/>
+						</div>
+					</div>
+				</div>
+			) : (
+				<ProjectInfoReadOnly
+					projectName={project?.name ?? null}
+					clientName={project?.clientName ?? null}
+				/>
+			)}
 
 			{/* Contract Form (same as creation page) */}
 			{isEditing ? (
@@ -290,6 +394,37 @@ export function ProjectContractView({
 			) : (
 				<ContractReadOnlyView contract={contract} />
 			)}
+		</div>
+	);
+}
+
+// ─── Project Info (Read-Only) ────────────────────────────────
+function ProjectInfoReadOnly({
+	projectName,
+	clientName,
+}: {
+	projectName: string | null;
+	clientName: string | null;
+}) {
+	const t = useTranslations();
+
+	return (
+		<div className="overflow-hidden rounded-2xl border border-emerald-200/50 bg-emerald-50/50 dark:border-emerald-800/30 dark:bg-emerald-950/20">
+			<div className="border-b border-emerald-200/50 p-5 dark:border-emerald-800/30">
+				<h3 className="text-lg font-medium text-emerald-900 dark:text-emerald-100">
+					{t("projects.contract.projectInfo.title")}
+				</h3>
+			</div>
+			<div className="grid gap-4 p-5 sm:grid-cols-2">
+				<ReadOnlyField
+					label={t("projects.contract.projectInfo.projectName")}
+					value={projectName || "—"}
+				/>
+				<ReadOnlyField
+					label={t("projects.contract.projectInfo.clientName")}
+					value={clientName || "—"}
+				/>
+			</div>
 		</div>
 	);
 }
@@ -350,7 +485,7 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 					{contract.includesVat && (
 						<ReadOnlyField
 							label={t("projects.createProject.vatToggle")}
-							value={`${formatCurrency(Number(contract.value) * 1.15)} ${t("common.sar")}`}
+							value={`${formatCurrency(Number(contract.value) * (1 + (contract.vatPercent ?? 15) / 100))} ${t("common.sar")}`}
 						/>
 					)}
 					{contract.paymentMethod && (
