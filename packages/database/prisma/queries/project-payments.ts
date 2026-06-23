@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { db } from "../client";
 import { Prisma } from "../generated/client";
 import type { PaymentMethod } from "../generated/client";
@@ -252,8 +253,7 @@ async function allocateAndCreatePayments(
 	}
 
 	// Link the parts of a split payment so they read as one logical payment
-	const splitGroupId =
-		allocations.length > 1 ? crypto.randomUUID() : null;
+	const splitGroupId = allocations.length > 1 ? randomUUID() : null;
 
 	// Sequential payment numbers from a single base count (avoid collisions)
 	const baseCount = await tx.projectPayment.count({
