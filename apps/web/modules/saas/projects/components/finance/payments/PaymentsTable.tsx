@@ -43,6 +43,9 @@ interface Payment {
 	referenceNo?: string | null;
 	description?: string | null;
 	note?: string | null;
+	splitGroupId?: string | null;
+	splitGroupTotal?: number | null;
+	splitGroupCount?: number | null;
 	contractTerm?: { id: string; label: string | null; type: string } | null;
 	destinationAccount?: { id: string; name: string } | null;
 	createdBy?: { id: string; name: string } | null;
@@ -142,7 +145,19 @@ export function PaymentsTable({
 										{formatDate(payment.date)}
 									</TableCell>
 									<TableCell className="font-semibold text-sky-700 dark:text-sky-400">
-										{formatCurrency(payment.amount)}
+										<div className="flex flex-col gap-1">
+											<span>{formatCurrency(payment.amount)}</span>
+											{payment.splitGroupTotal != null && (
+												<Badge
+													variant="secondary"
+													className="w-fit gap-1 text-[10px] font-normal bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+												>
+													{t("projectPayments.splitPart", {
+														total: formatCurrency(payment.splitGroupTotal),
+													})}
+												</Badge>
+											)}
+										</div>
 									</TableCell>
 									<TableCell>
 										<Badge variant="secondary" className={methodColor}>

@@ -271,7 +271,7 @@ export type ContractPaymentTermScalarFieldEnum = z.infer<typeof ContractPaymentT
 
 // File: ProjectPaymentScalarFieldEnum.schema.ts
 
-export const ProjectPaymentScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'contractTermId', 'paymentNo', 'amount', 'date', 'paymentMethod', 'referenceNo', 'description', 'note', 'destinationAccountId', 'createdById', 'createdAt', 'updatedAt'])
+export const ProjectPaymentScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'contractTermId', 'splitGroupId', 'paymentNo', 'amount', 'date', 'paymentMethod', 'referenceNo', 'description', 'note', 'destinationAccountId', 'createdById', 'createdAt', 'updatedAt'])
 
 export type ProjectPaymentScalarFieldEnum = z.infer<typeof ProjectPaymentScalarFieldEnumSchema>;
 
@@ -2786,6 +2786,7 @@ export const ProjectPaymentSchema = z.object({
   organizationId: z.string(),
   projectId: z.string(),
   contractTermId: z.string().nullish(),
+  splitGroupId: z.string().nullish(),
   paymentNo: z.string(),
   amount: z.instanceof(Prisma.Decimal, {
   message: "Field 'amount' must be a Decimal. Location: ['Models', 'ProjectPayment']",

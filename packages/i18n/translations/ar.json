@@ -8276,6 +8276,8 @@
     "editPayment": "تعديل الدفعة",
     "paymentCreated": "تم إنشاء الدفعة بنجاح",
     "paymentSplitAcrossTerms": "تم توزيع الدفعة على {count} مراحل",
+    "splitPart": "نفس الدفعة · الإجمالي {total}",
+    "splitEditHint": "هذه دفعة مقسّمة على عدة مراحل؛ التعديل يعيد توزيع كامل المبلغ على المراحل.",
     "paymentUpdated": "تم تحديث الدفعة بنجاح",
     "paymentDeleted": "تم حذف الدفعة بنجاح",
     "deleteError": "فشل حذف الدفعة",

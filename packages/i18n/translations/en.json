@@ -8276,6 +8276,8 @@
     "editPayment": "Edit Payment",
     "paymentCreated": "Payment created successfully",
     "paymentSplitAcrossTerms": "Payment distributed across {count} stages",
+    "splitPart": "Same payment · Total {total}",
+    "splitEditHint": "This payment is split across stages; editing redistributes the full amount across the stages.",
     "paymentUpdated": "Payment updated successfully",
     "paymentDeleted": "Payment deleted successfully",
     "deleteError": "Failed to delete payment",

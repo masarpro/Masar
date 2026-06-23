@@ -29,6 +29,9 @@ interface Term {
 		referenceNo?: string | null;
 		description?: string | null;
 		note?: string | null;
+		splitGroupId?: string | null;
+		splitGroupTotal?: number | null;
+		splitGroupCount?: number | null;
 		destinationAccount?: { id: string; name: string } | null;
 		createdBy?: { id: string; name: string } | null;
 	}>;

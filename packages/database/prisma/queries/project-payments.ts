@@ -64,15 +64,34 @@ export async function getProjectPaymentsSummary(
 	// Free payments (not linked to any term)
 	const freePayments = payments.filter((p) => !p.contractTermId);
 
+	// Totals per split group (the parts of one payment distributed over stages)
+	const splitGroups = new Map<string, { total: number; count: number }>();
+	for (const p of payments) {
+		if (!p.splitGroupId) continue;
+		const g = splitGroups.get(p.splitGroupId) ?? { total: 0, count: 0 };
+		g.total += Number(p.amount);
+		g.count += 1;
+		splitGroups.set(p.splitGroupId, g);
+	}
+	const withSplit = <T extends { amount: unknown; splitGroupId: string | null }>(
+		p: T,
+	) => {
+		const g = p.splitGroupId ? splitGroups.get(p.splitGroupId) : null;
+		return {
+			...p,
+			amount: Number(p.amount),
+			splitGroupId: p.splitGroupId ?? null,
+			splitGroupTotal: g ? round2(g.total) : null,
+			splitGroupCount: g ? g.count : null,
+		};
+	};
+
 	const terms = contract?.paymentTerms.map((term) => ({
 		...term,
 		percent: term.percent ? Number(term.percent) : null,
 		amount: term.amount ? Number(term.amount) : null,
 		paidAmount: Number(term.paidAmount),
-		projectPayments: term.projectPayments.map((p) => ({
-			...p,
-			amount: Number(p.amount),
-		})),
+		projectPayments: term.projectPayments.map(withSplit),
 	})) ?? [];
 
 	return {
@@ -87,18 +106,9 @@ export async function getProjectPaymentsSummary(
 			? Math.round((totalCollected / contractValue) * 100)
 			: 0,
 		terms,
-		freePayments: freePayments.map((p) => ({
-			...p,
-			amount: Number(p.amount),
-		})),
-		termPayments: termPayments.map((p) => ({
-			...p,
-			amount: Number(p.amount),
-		})),
-		allPayments: payments.map((p) => ({
-			...p,
-			amount: Number(p.amount),
-		})),
+		freePayments: freePayments.map(withSplit),
+		termPayments: termPayments.map(withSplit),
+		allPayments: payments.map(withSplit),
 	};
 }
 
@@ -144,21 +154,13 @@ export async function listProjectPayments(
 	}));
 }
 
-/**
- * Create a project payment with term + bank updates in transaction.
- *
- * Spillover: when the payment is linked to a contract term that has a defined
- * amount, and the amount exceeds that term's remaining capacity, the excess
- * cascades forward into the following terms (by sortOrder). Each term that
- * receives an allocation gets its own ProjectPayment row so the per-term
- * payments list, edit/delete reversal, journals and receipt vouchers all stay
- * consistent. Any final remainder (payment larger than all remaining stages)
- * is attached to the last stage so no amount is lost.
- *
- * Returns the list of created rows (one per stage allocation), the primary
- * (first) row, and the split count.
- */
-export async function createProjectPayment(data: {
+const PAYMENT_INCLUDE_SHAPE = {
+	contractTerm: { select: { id: true, label: true, type: true } },
+	destinationAccount: { select: { id: true, name: true } },
+	createdBy: { select: { id: true, name: true } },
+} as const;
+
+type PaymentAllocationData = {
 	organizationId: string;
 	projectId: string;
 	createdById: string;
@@ -170,149 +172,279 @@ export async function createProjectPayment(data: {
 	description?: string | null;
 	destinationAccountId?: string | null;
 	note?: string | null;
-}) {
-	const includeShape = {
-		contractTerm: { select: { id: true, label: true, type: true } },
-		destinationAccount: { select: { id: true, name: true } },
-		createdBy: { select: { id: true, name: true } },
-	} as const;
+};
 
-	return db.$transaction(async (tx) => {
-		// Build the allocation plan (which term gets how much)
-		let allocations: Array<{ contractTermId: string | null; amount: number }> =
-			[];
+/**
+ * Build the spillover allocation plan + create one ProjectPayment row per stage
+ * allocation (updating each term + bank balance) inside an existing tx.
+ *
+ * Spillover: when the payment is linked to a contract term that has a defined
+ * amount, and the amount exceeds that term's remaining capacity, the excess
+ * cascades forward into the following terms (by sortOrder). Each term that
+ * receives an allocation gets its own ProjectPayment row. When more than one
+ * row is created they share a single `splitGroupId` so the UI can present them
+ * as a single logical payment and edit/delete can treat them as one unit. Any
+ * final remainder (payment larger than all remaining stages) is attached to the
+ * last stage so no amount is lost.
+ */
+async function allocateAndCreatePayments(
+	tx: Prisma.TransactionClient,
+	data: PaymentAllocationData,
+) {
+	// Build the allocation plan (which term gets how much)
+	let allocations: Array<{ contractTermId: string | null; amount: number }> = [];
 
-		if (data.contractTermId) {
-			const selected = await tx.contractPaymentTerm.findUnique({
-				where: { id: data.contractTermId },
-			});
-
-			// Only spill when the selected term has a capped amount
-			if (selected && selected.amount != null) {
-				const terms = await tx.contractPaymentTerm.findMany({
-					where: {
-						contractId: selected.contractId,
-						sortOrder: { gte: selected.sortOrder },
-					},
-					orderBy: { sortOrder: "asc" },
-				});
-
-				let remaining = round2(data.amount);
-				for (const term of terms) {
-					if (remaining <= 0) break;
-					// Uncapped term swallows the rest
-					if (term.amount == null) {
-						allocations.push({ contractTermId: term.id, amount: remaining });
-						remaining = 0;
-						break;
-					}
-					const capacity = round2(
-						Number(term.amount) - Number(term.paidAmount),
-					);
-					if (capacity <= 0) continue; // already full → skip
-					const take = round2(Math.min(remaining, capacity));
-					allocations.push({ contractTermId: term.id, amount: take });
-					remaining = round2(remaining - take);
-				}
-
-				// Final overflow → attach to the last stage (no amount lost)
-				if (remaining > 0) {
-					const lastTerm = terms[terms.length - 1];
-					const lastAlloc = allocations[allocations.length - 1];
-					if (lastAlloc && lastTerm && lastAlloc.contractTermId === lastTerm.id) {
-						lastAlloc.amount = round2(lastAlloc.amount + remaining);
-					} else if (lastTerm) {
-						allocations.push({
-							contractTermId: lastTerm.id,
-							amount: remaining,
-						});
-					} else {
-						allocations.push({
-							contractTermId: data.contractTermId,
-							amount: remaining,
-						});
-					}
-					remaining = 0;
-				}
-			}
-		}
-
-		// Fallback: free payment, uncapped selected term, or nothing allocated
-		if (allocations.length === 0) {
-			allocations = [
-				{ contractTermId: data.contractTermId ?? null, amount: data.amount },
-			];
-		}
-
-		// Sequential payment numbers from a single base count (avoid collisions)
-		const baseCount = await tx.projectPayment.count({
-			where: { projectId: data.projectId },
+	if (data.contractTermId) {
+		const selected = await tx.contractPaymentTerm.findUnique({
+			where: { id: data.contractTermId },
 		});
 
-		const created: Array<
-			Awaited<ReturnType<typeof tx.projectPayment.create>>
-		> = [];
-
-		for (let i = 0; i < allocations.length; i++) {
-			const alloc = allocations[i];
-			const paymentNo = `PAY-${String(baseCount + i + 1).padStart(4, "0")}`;
-
-			const payment = await tx.projectPayment.create({
-				data: {
-					organizationId: data.organizationId,
-					projectId: data.projectId,
-					createdById: data.createdById,
-					contractTermId: alloc.contractTermId,
-					paymentNo,
-					amount: alloc.amount,
-					date: data.date,
-					paymentMethod: data.paymentMethod,
-					referenceNo: data.referenceNo ?? null,
-					description: data.description ?? null,
-					destinationAccountId: data.destinationAccountId ?? null,
-					note: data.note ?? null,
+		// Only spill when the selected term has a capped amount
+		if (selected && selected.amount != null) {
+			const terms = await tx.contractPaymentTerm.findMany({
+				where: {
+					contractId: selected.contractId,
+					sortOrder: { gte: selected.sortOrder },
 				},
-				include: includeShape,
+				orderBy: { sortOrder: "asc" },
 			});
-			created.push(payment);
 
-			// Update term paidAmount and status if linked to a term
-			if (alloc.contractTermId) {
-				const term = await tx.contractPaymentTerm.findUnique({
-					where: { id: alloc.contractTermId },
-				});
-				if (term) {
-					const newPaid = round2(Number(term.paidAmount) + alloc.amount);
-					const termAmount = Number(term.amount ?? 0);
-					const newStatus =
-						termAmount > 0 && newPaid >= termAmount
-							? "FULLY_PAID"
-							: newPaid > 0
-								? "PARTIALLY_PAID"
-								: "PENDING";
-
-					await tx.contractPaymentTerm.update({
-						where: { id: alloc.contractTermId },
-						data: {
-							paidAmount: newPaid,
-							status: newStatus,
-						},
-					});
+			let remaining = round2(data.amount);
+			for (const term of terms) {
+				if (remaining <= 0) break;
+				// Uncapped term swallows the rest
+				if (term.amount == null) {
+					allocations.push({ contractTermId: term.id, amount: remaining });
+					remaining = 0;
+					break;
 				}
+				const capacity = round2(Number(term.amount) - Number(term.paidAmount));
+				if (capacity <= 0) continue; // already full → skip
+				const take = round2(Math.min(remaining, capacity));
+				allocations.push({ contractTermId: term.id, amount: take });
+				remaining = round2(remaining - take);
 			}
 
-			// Add to destination bank account balance if provided
-			if (data.destinationAccountId) {
-				await tx.organizationBank.update({
-					where: { id: data.destinationAccountId },
-					data: {
-						balance: { increment: alloc.amount },
-					},
+			// Final overflow → attach to the last stage (no amount lost)
+			if (remaining > 0) {
+				const lastTerm = terms[terms.length - 1];
+				const lastAlloc = allocations[allocations.length - 1];
+				if (lastAlloc && lastTerm && lastAlloc.contractTermId === lastTerm.id) {
+					lastAlloc.amount = round2(lastAlloc.amount + remaining);
+				} else if (lastTerm) {
+					allocations.push({ contractTermId: lastTerm.id, amount: remaining });
+				} else {
+					allocations.push({
+						contractTermId: data.contractTermId,
+						amount: remaining,
+					});
+				}
+				remaining = 0;
+			}
+		}
+	}
+
+	// Fallback: free payment, uncapped selected term, or nothing allocated
+	if (allocations.length === 0) {
+		allocations = [
+			{ contractTermId: data.contractTermId ?? null, amount: data.amount },
+		];
+	}
+
+	// Link the parts of a split payment so they read as one logical payment
+	const splitGroupId =
+		allocations.length > 1 ? crypto.randomUUID() : null;
+
+	// Sequential payment numbers from a single base count (avoid collisions)
+	const baseCount = await tx.projectPayment.count({
+		where: { projectId: data.projectId },
+	});
+
+	const created: Array<
+		Awaited<ReturnType<typeof tx.projectPayment.create>>
+	> = [];
+
+	for (let i = 0; i < allocations.length; i++) {
+		const alloc = allocations[i];
+		const paymentNo = `PAY-${String(baseCount + i + 1).padStart(4, "0")}`;
+
+		const payment = await tx.projectPayment.create({
+			data: {
+				organizationId: data.organizationId,
+				projectId: data.projectId,
+				createdById: data.createdById,
+				contractTermId: alloc.contractTermId,
+				splitGroupId,
+				paymentNo,
+				amount: alloc.amount,
+				date: data.date,
+				paymentMethod: data.paymentMethod,
+				referenceNo: data.referenceNo ?? null,
+				description: data.description ?? null,
+				destinationAccountId: data.destinationAccountId ?? null,
+				note: data.note ?? null,
+			},
+			include: PAYMENT_INCLUDE_SHAPE,
+		});
+		created.push(payment);
+
+		// Update term paidAmount and status if linked to a term
+		if (alloc.contractTermId) {
+			const term = await tx.contractPaymentTerm.findUnique({
+				where: { id: alloc.contractTermId },
+			});
+			if (term) {
+				const newPaid = round2(Number(term.paidAmount) + alloc.amount);
+				const termAmount = Number(term.amount ?? 0);
+				const newStatus =
+					termAmount > 0 && newPaid >= termAmount
+						? "FULLY_PAID"
+						: newPaid > 0
+							? "PARTIALLY_PAID"
+							: "PENDING";
+
+				await tx.contractPaymentTerm.update({
+					where: { id: alloc.contractTermId },
+					data: { paidAmount: newPaid, status: newStatus },
 				});
 			}
 		}
 
+		// Add to destination bank account balance if provided
+		if (data.destinationAccountId) {
+			await tx.organizationBank.update({
+				where: { id: data.destinationAccountId },
+				data: { balance: { increment: alloc.amount } },
+			});
+		}
+	}
+
+	return created;
+}
+
+/**
+ * Reverse a payment row's term paidAmount/status and bank balance inside a tx.
+ */
+async function reversePaymentEffects(
+	tx: Prisma.TransactionClient,
+	row: { amount: Prisma.Decimal; contractTermId: string | null; destinationAccountId: string | null },
+) {
+	const amount = Number(row.amount);
+
+	if (row.contractTermId) {
+		const term = await tx.contractPaymentTerm.findUnique({
+			where: { id: row.contractTermId },
+		});
+		if (term) {
+			const newPaid = Math.max(0, round2(Number(term.paidAmount) - amount));
+			const termAmount = Number(term.amount ?? 0);
+			const newStatus =
+				termAmount > 0 && newPaid >= termAmount
+					? "FULLY_PAID"
+					: newPaid > 0
+						? "PARTIALLY_PAID"
+						: "PENDING";
+			await tx.contractPaymentTerm.update({
+				where: { id: row.contractTermId },
+				data: { paidAmount: newPaid, status: newStatus },
+			});
+		}
+	}
+
+	if (row.destinationAccountId) {
+		await tx.organizationBank.update({
+			where: { id: row.destinationAccountId },
+			data: { balance: { decrement: amount } },
+		});
+	}
+}
+
+/**
+ * Create a project payment with term + bank updates in a transaction.
+ *
+ * Returns the list of created rows (one per stage allocation), the primary
+ * (first) row, and the split count.
+ */
+export async function createProjectPayment(data: PaymentAllocationData) {
+	return db.$transaction(async (tx) => {
+		const created = await allocateAndCreatePayments(tx, data);
 		return {
+			payments: created,
+			primary: created[0]!,
+			splitCount: created.length,
+		};
+	});
+}
+
+/**
+ * Replace a (possibly split) project payment with a freshly re-distributed one.
+ *
+ * Used when editing a payment that belongs to a split group: the whole group is
+ * reversed and deleted, then re-created from the same starting term with the new
+ * total amount and metadata. Returns the deleted row ids (for journal/voucher
+ * reversal by the caller) plus the newly created rows.
+ */
+export async function replaceProjectPaymentGroup(
+	id: string,
+	organizationId: string,
+	data: {
+		amount: number;
+		date: Date;
+		paymentMethod: PaymentMethod;
+		referenceNo?: string | null;
+		description?: string | null;
+		destinationAccountId?: string | null;
+		note?: string | null;
+		createdById: string;
+	},
+) {
+	return db.$transaction(async (tx) => {
+		const existing = await tx.projectPayment.findUnique({
+			where: { id, organizationId },
+		});
+		if (!existing) throw new Error("PAYMENT_NOT_FOUND");
+
+		const rows = await tx.projectPayment.findMany({
+			where: existing.splitGroupId
+				? { splitGroupId: existing.splitGroupId, organizationId }
+				: { id, organizationId },
+			include: { contractTerm: { select: { id: true, sortOrder: true } } },
+		});
+
+		// Re-distribute starting from the group's first stage (smallest sortOrder)
+		let startTermId: string | null = null;
+		let startSort = Number.POSITIVE_INFINITY;
+		for (const row of rows) {
+			if (
+				row.contractTermId &&
+				row.contractTerm &&
+				row.contractTerm.sortOrder < startSort
+			) {
+				startSort = row.contractTerm.sortOrder;
+				startTermId = row.contractTermId;
+			}
+			await reversePaymentEffects(tx, row);
+		}
+
+		const deletedIds = rows.map((r) => r.id);
+		await tx.projectPayment.deleteMany({ where: { id: { in: deletedIds } } });
+
+		const created = await allocateAndCreatePayments(tx, {
+			organizationId,
+			projectId: existing.projectId,
+			createdById: data.createdById,
+			contractTermId: startTermId,
+			amount: data.amount,
+			date: data.date,
+			paymentMethod: data.paymentMethod,
+			referenceNo: data.referenceNo,
+			description: data.description,
+			destinationAccountId: data.destinationAccountId,
+			note: data.note,
+		});
+
+		return {
+			deletedIds,
 			payments: created,
 			primary: created[0]!,
 			splitCount: created.length,
@@ -425,7 +557,11 @@ export async function updateProjectPayment(
 }
 
 /**
- * Delete a project payment (reverse term + bank in transaction)
+ * Delete a project payment (reverse term + bank in transaction).
+ *
+ * When the payment belongs to a split group, the whole group is reversed and
+ * deleted together so a split payment is treated as one unit. Returns the ids
+ * of every deleted row so the caller can reverse their journals/vouchers.
  */
 export async function deleteProjectPayment(
 	id: string,
@@ -437,42 +573,19 @@ export async function deleteProjectPayment(
 		});
 		if (!existing) throw new Error("PAYMENT_NOT_FOUND");
 
-		const amount = Number(existing.amount);
+		const rows = existing.splitGroupId
+			? await tx.projectPayment.findMany({
+					where: { splitGroupId: existing.splitGroupId, organizationId },
+				})
+			: [existing];
 
-		// Reverse term paidAmount
-		if (existing.contractTermId) {
-			const term = await tx.contractPaymentTerm.findUnique({
-				where: { id: existing.contractTermId },
-			});
-			if (term) {
-				const newPaid = Math.max(0, Number(term.paidAmount) - amount);
-				const termAmount = Number(term.amount ?? 0);
-				const newStatus =
-					termAmount > 0 && newPaid >= termAmount
-						? "FULLY_PAID"
-						: newPaid > 0
-							? "PARTIALLY_PAID"
-							: "PENDING";
-
-				await tx.contractPaymentTerm.update({
-					where: { id: existing.contractTermId },
-					data: {
-						paidAmount: newPaid,
-						status: newStatus,
-					},
-				});
-			}
+		for (const row of rows) {
+			await reversePaymentEffects(tx, row);
 		}
 
-		// Reverse bank balance
-		if (existing.destinationAccountId) {
-			await tx.organizationBank.update({
-				where: { id: existing.destinationAccountId },
-				data: { balance: { decrement: amount } },
-			});
-		}
+		const deletedIds = rows.map((r) => r.id);
+		await tx.projectPayment.deleteMany({ where: { id: { in: deletedIds } } });
 
-		await tx.projectPayment.delete({ where: { id } });
-		return { success: true };
+		return { success: true, deletedIds };
 	});
 }

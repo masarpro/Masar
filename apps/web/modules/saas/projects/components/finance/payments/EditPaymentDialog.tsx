@@ -33,6 +33,8 @@ interface Payment {
 	referenceNo?: string | null;
 	description?: string | null;
 	note?: string | null;
+	splitGroupId?: string | null;
+	splitGroupTotal?: number | null;
 	destinationAccount?: { id: string; name: string } | null;
 }
 
@@ -66,7 +68,11 @@ export function EditPaymentDialog({
 		? payment.date.split("T")[0]
 		: new Date(payment.date).toISOString().split("T")[0];
 
-	const [amount, setAmount] = useState(String(payment.amount));
+	// For a split payment the editable amount is the full payment total
+	const isSplit = payment.splitGroupTotal != null;
+	const [amount, setAmount] = useState(
+		String(payment.splitGroupTotal ?? payment.amount),
+	);
 	const [date, setDate] = useState(dateStr);
 	const [paymentMethod, setPaymentMethod] = useState(payment.paymentMethod);
 	const [referenceNo, setReferenceNo] = useState(payment.referenceNo ?? "");
@@ -130,6 +136,13 @@ export function EditPaymentDialog({
 				</DialogHeader>
 
 				<form onSubmit={handleSubmit} className="space-y-4">
+					{/* Split payment hint */}
+					{isSplit && (
+						<div className="rounded-xl border border-violet-200 bg-violet-50 p-3 text-xs text-violet-700 dark:border-violet-800 dark:bg-violet-950/30 dark:text-violet-300">
+							{t("projectPayments.splitEditHint")}
+						</div>
+					)}
+
 					{/* Amount */}
 					<div className="space-y-2">
 						<Label>{t("projectPayments.amount")} *</Label>

@@ -27,36 +27,45 @@ export const deleteProjectPaymentProcedure = subscriptionProcedure
 		);
 
 		try {
-			await deleteProjectPayment(input.paymentId, input.organizationId);
+			// Deleting any part of a split payment removes the whole group →
+			// reverse the journal + audit for every deleted row.
+			const { deletedIds } = await deleteProjectPayment(
+				input.paymentId,
+				input.organizationId,
+			);
 
-			// Auto-Journal: reverse accounting entry for deleted project payment
-			try {
-				const { reverseAutoJournalEntry } = await import("../../../lib/accounting/auto-journal");
-				await reverseAutoJournalEntry(db, {
-					organizationId: input.organizationId,
-					referenceType: "PROJECT_PAYMENT",
-					referenceId: input.paymentId,
-					userId: context.user.id,
-				});
-			} catch (e) {
-				console.error("[AutoJournal] Failed to reverse ProjectPayment entry:", e);
-				orgAuditLog({
-					organizationId: input.organizationId,
+			const { reverseAutoJournalEntry } = await import(
+				"../../../lib/accounting/auto-journal"
+			);
+			for (const deletedId of deletedIds) {
+				// Auto-Journal: reverse accounting entry for deleted project payment
+				try {
+					await reverseAutoJournalEntry(db, {
+						organizationId: input.organizationId,
+						referenceType: "PROJECT_PAYMENT",
+						referenceId: deletedId,
+						userId: context.user.id,
+					});
+				} catch (e) {
+					console.error("[AutoJournal] Failed to reverse ProjectPayment entry:", e);
+					orgAuditLog({
+						organizationId: input.organizationId,
+						actorId: context.user.id,
+						action: "JOURNAL_ENTRY_FAILED",
+						entityType: "journal_entry",
+						entityId: deletedId,
+						metadata: { error: String(e), referenceType: "PROJECT_PAYMENT" },
+					});
+				}
+
+				logAuditEvent(input.organizationId, input.projectId, {
 					actorId: context.user.id,
-					action: "JOURNAL_ENTRY_FAILED",
-					entityType: "journal_entry",
-					entityId: input.paymentId,
-					metadata: { error: String(e), referenceType: "PROJECT_PAYMENT" },
-				});
+					action: "PROJECT_PAYMENT_DELETED",
+					entityType: "project_payment",
+					entityId: deletedId,
+					metadata: {},
+				}).catch(() => {});
 			}
-
-			logAuditEvent(input.organizationId, input.projectId, {
-				actorId: context.user.id,
-				action: "PROJECT_PAYMENT_DELETED",
-				entityType: "project_payment",
-				entityId: input.paymentId,
-				metadata: {},
-			}).catch(() => {});
 
 			return { success: true };
 		} catch (error) {

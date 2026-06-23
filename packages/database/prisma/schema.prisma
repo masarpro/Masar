@@ -2611,6 +2611,9 @@ model ProjectPayment {
   contractTermId String?              @map("contract_term_id")
   contractTerm   ContractPaymentTerm? @relation("TermProjectPayments", fields: [contractTermId], references: [id], onDelete: SetNull)
 
+  // معرّف مجموعة التقسيم — يربط أجزاء الدفعة الواحدة عند توزيعها على عدة مراحل
+  splitGroupId String? @map("split_group_id")
+
   // الرقم التسلسلي
   paymentNo String @map("payment_no")
 
@@ -2644,6 +2647,7 @@ model ProjectPayment {
   @@index([organizationId])
   @@index([projectId])
   @@index([contractTermId])
+  @@index([splitGroupId])
   @@map("project_payments")
 }
 
