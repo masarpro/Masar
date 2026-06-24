@@ -15,6 +15,27 @@ function round2(value: number): number {
 }
 
 /**
+ * Retry a transaction that derives a unique paymentNo from the current max.
+ *
+ * Two concurrent creates can read the same max and generate the same number,
+ * tripping the @@unique([projectId, paymentNo]) constraint (P2002). Re-running
+ * re-reads the (now higher) max, so a couple of attempts resolves any race.
+ */
+async function withUniqueRetry<T>(fn: () => Promise<T>, attempts = 4): Promise<T> {
+	let lastError: unknown;
+	for (let i = 0; i < attempts; i++) {
+		try {
+			return await fn();
+		} catch (e) {
+			const code = (e as { code?: string })?.code;
+			if (code !== "P2002") throw e;
+			lastError = e;
+		}
+	}
+	throw lastError;
+}
+
+/**
  * Get project payments summary with contract + terms + totals
  */
 export async function getProjectPaymentsSummary(
@@ -261,10 +282,21 @@ async function allocateAndCreatePayments(
 	// Link the parts of a split payment so they read as one logical payment
 	const splitGroupId = allocations.length > 1 ? randomUUID() : null;
 
-	// Sequential payment numbers from a single base count (avoid collisions)
-	const baseCount = await tx.projectPayment.count({
+	// Sequential payment numbers derived from the HIGHEST existing paymentNo for
+	// this project — NOT the row count. Counting breaks after any deletion: the
+	// count drops below the max number, so the next payment reuses an existing
+	// number and violates @@unique([projectId, paymentNo]) → 500. Reading the max
+	// (and letting the caller retry on the rare concurrent collision) is safe.
+	const existing = await tx.projectPayment.findMany({
 		where: { projectId: data.projectId },
+		select: { paymentNo: true },
 	});
+	let baseCount = 0;
+	for (const p of existing) {
+		const match = p.paymentNo.match(/(\d+)\s*$/);
+		const n = match ? Number.parseInt(match[1], 10) : 0;
+		if (!Number.isNaN(n) && n > baseCount) baseCount = n;
+	}
 
 	const created: Array<
 		Awaited<ReturnType<typeof tx.projectPayment.create>>
@@ -372,14 +404,16 @@ async function reversePaymentEffects(
  * (first) row, and the split count.
  */
 export async function createProjectPayment(data: PaymentAllocationData) {
-	return db.$transaction(async (tx) => {
-		const created = await allocateAndCreatePayments(tx, data);
-		return {
-			payments: created,
-			primary: created[0]!,
-			splitCount: created.length,
-		};
-	});
+	return withUniqueRetry(() =>
+		db.$transaction(async (tx) => {
+			const created = await allocateAndCreatePayments(tx, data);
+			return {
+				payments: created,
+				primary: created[0]!,
+				splitCount: created.length,
+			};
+		}),
+	);
 }
 
 /**
@@ -404,7 +438,8 @@ export async function replaceProjectPaymentGroup(
 		createdById: string;
 	},
 ) {
-	return db.$transaction(async (tx) => {
+	return withUniqueRetry(() =>
+	  db.$transaction(async (tx) => {
 		const existing = await tx.projectPayment.findUnique({
 			where: { id, organizationId },
 		});
@@ -455,7 +490,8 @@ export async function replaceProjectPaymentGroup(
 			primary: created[0]!,
 			splitCount: created.length,
 		};
-	});
+	  }),
+	);
 }
 
 /**
