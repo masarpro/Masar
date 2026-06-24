@@ -1,7 +1,10 @@
 import { db } from "../client";
 import { randomBytes, randomUUID } from "crypto";
-import { getProjectPaymentsSummary } from "./project-payments";
-import { getPaymentTermsWithProgress } from "./project-contract";
+
+/** Round to 2 decimals (financial amounts are Decimal(15,2)). */
+function round2(value: number): number {
+	return Math.round((value + Number.EPSILON) * 100) / 100;
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Owner Access Queries - وصول مالك المشروع
@@ -519,11 +522,59 @@ export async function getOwnerSchedule(organizationId: string, projectId: string
  * Get owner payments (claims summary - no expenses)
  */
 export async function getOwnerPayments(organizationId: string, projectId: string) {
-	const [contractTotal, paymentsSummary, termsProgress, claims] =
+	// The platform records project receipts through TWO independent paths:
+	//   • ProjectPayment   — the dedicated project-payments module
+	//   • FinancePayment    — the general finance receipts module (orgPayments)
+	// Both can link to a contract payment term, and neither writes into the
+	// other's table. The owner portal must aggregate BOTH so that the totals,
+	// the per-stage progress, and the payments list all agree — otherwise
+	// stages read as unpaid while money was actually collected (the original bug).
+	const [contractTotal, contract, projectPayments, financePayments, claims] =
 		await Promise.all([
 			computeContractTotal(organizationId, projectId),
-			getProjectPaymentsSummary(organizationId, projectId),
-			getPaymentTermsWithProgress(organizationId, projectId),
+			db.projectContract.findFirst({
+				where: { organizationId, projectId },
+				select: {
+					id: true,
+					paymentTerms: {
+						orderBy: { sortOrder: "asc" },
+						select: {
+							id: true,
+							type: true,
+							label: true,
+							percent: true,
+							amount: true,
+							sortOrder: true,
+						},
+					},
+				},
+			}),
+			db.projectPayment.findMany({
+				where: { organizationId, projectId },
+				orderBy: { date: "desc" },
+				select: {
+					id: true,
+					paymentNo: true,
+					amount: true,
+					date: true,
+					description: true,
+					contractTermId: true,
+					contractTerm: { select: { label: true } },
+				},
+			}),
+			db.financePayment.findMany({
+				where: { organizationId, projectId, status: "COMPLETED" },
+				orderBy: { date: "desc" },
+				select: {
+					id: true,
+					paymentNo: true,
+					amount: true,
+					date: true,
+					description: true,
+					contractTermId: true,
+					contractTerm: { select: { label: true } },
+				},
+			}),
 			db.projectClaim.findMany({
 				where: {
 					organizationId,
@@ -543,14 +594,73 @@ export async function getOwnerPayments(organizationId: string, projectId: string
 			}),
 		]);
 
-	const contractValue = contractTotal.total;
-	const paidAmount = paymentsSummary.totalCollected;
-	const remaining = contractValue - paidAmount;
+	// Normalize every recorded receipt from both systems into one shape.
+	const allPayments = [...projectPayments, ...financePayments]
+		.map((p) => ({
+			id: p.id,
+			paymentNo: p.paymentNo,
+			amount: Number(p.amount),
+			date: p.date,
+			description: p.description ?? null,
+			contractTermId: p.contractTermId,
+			termLabel: p.contractTerm?.label ?? null,
+		}))
+		.sort((a, b) => {
+			const ta = a.date ? new Date(a.date).getTime() : 0;
+			const tb = b.date ? new Date(b.date).getTime() : 0;
+			return tb - ta;
+		});
 
-	// Current stage = first incomplete payment term
-	const currentTermId = termsProgress?.nextIncompleteTermId ?? null;
-	const currentTerm =
-		termsProgress?.terms.find((t) => t.id === currentTermId) ?? null;
+	const contractValue = contractTotal.total;
+	const paidAmount = round2(allPayments.reduce((sum, p) => sum + p.amount, 0));
+	const remaining = round2(contractValue - paidAmount);
+
+	// Sum of what's been collected against each contract term (both systems).
+	const paidByTerm = new Map<string, number>();
+	for (const p of allPayments) {
+		if (!p.contractTermId) continue;
+		paidByTerm.set(
+			p.contractTermId,
+			(paidByTerm.get(p.contractTermId) ?? 0) + p.amount,
+		);
+	}
+
+	// Base for percent-based stage amounts: contract value + VAT (change orders
+	// are billed separately), matching the internal payment-terms calculation.
+	const termBase = contractTotal.base + contractTotal.vatAmount;
+
+	let currentTermId: string | null = null;
+	const terms = (contract?.paymentTerms ?? []).map((term) => {
+		const amount = term.amount
+			? Number(term.amount)
+			: term.percent
+				? round2((termBase * Number(term.percent)) / 100)
+				: 0;
+		const paid = round2(paidByTerm.get(term.id) ?? 0);
+		const remainingAmount = Math.max(0, round2(amount - paid));
+		const progressPercent =
+			amount > 0 ? Math.min(100, (paid / amount) * 100) : 0;
+		// Treat a stage as complete once paid covers it (tolerate rounding).
+		const isComplete = amount > 0 && paid >= amount - 0.01;
+
+		// Current stage = first incomplete term in order.
+		if (!isComplete && !currentTermId) {
+			currentTermId = term.id;
+		}
+
+		return {
+			id: term.id,
+			type: term.type,
+			label: term.label,
+			amount,
+			paidAmount: paid,
+			remainingAmount,
+			progressPercent,
+			isComplete,
+		};
+	});
+
+	const currentTerm = terms.find((t) => t.id === currentTermId) ?? null;
 	const dueOnCurrentStage = currentTerm ? currentTerm.remainingAmount : 0;
 
 	return {
@@ -568,24 +678,15 @@ export async function getOwnerPayments(organizationId: string, projectId: string
 		currentTermId,
 		dueOnCurrentStage,
 		// Payment terms / stages (owner-safe fields only)
-		terms: (termsProgress?.terms ?? []).map((t) => ({
-			id: t.id,
-			type: t.type,
-			label: t.label,
-			amount: t.amount,
-			paidAmount: t.paidAmount,
-			remainingAmount: t.remainingAmount,
-			progressPercent: t.progressPercent,
-			isComplete: t.isComplete,
-		})),
+		terms,
 		// Every recorded payment (owner-safe fields only)
-		payments: paymentsSummary.allPayments.map((p) => ({
+		payments: allPayments.map((p) => ({
 			id: p.id,
 			paymentNo: p.paymentNo,
 			amount: p.amount,
 			date: p.date,
-			description: p.description ?? null,
-			termLabel: p.contractTerm?.label ?? null,
+			description: p.description,
+			termLabel: p.termLabel,
 		})),
 		// Claims / مستخلصات
 		claims: claims.map((c) => ({
@@ -734,7 +835,7 @@ export async function getOwnerPortalPhotos(
 			createdAt: true,
 			milestone: { select: { id: true, title: true, orderIndex: true } },
 		},
-		orderBy: { createdAt: "desc" },
+		orderBy: [{ takenAt: "desc" }, { createdAt: "desc" }],
 		take: options?.limit ?? 500,
 	});
 

@@ -132,7 +132,7 @@ export default function OwnerPortalPayments() {
 	};
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-6" dir="rtl">
 			{/* Summary Cards */}
 			<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
 				<div className="rounded-2xl bg-indigo-50 p-5 dark:bg-indigo-950/30">
@@ -161,7 +161,7 @@ export default function OwnerPortalPayments() {
 						</div>
 						<div>
 							<p className="text-xs text-green-600 dark:text-green-400">
-								{t("ownerPortal.payments.paidAmount")}
+								{t("ownerPortal.payments.totalPaid")}
 							</p>
 							<p className="text-lg font-semibold text-green-700 dark:text-green-300">
 								{formatCurrency(paidAmount)}
