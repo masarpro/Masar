@@ -119,7 +119,7 @@ export default function OwnerPortalLayout({
 	// Show expired token page
 	if (isTokenExpired) {
 		return (
-			<div className="flex min-h-screen items-center justify-center bg-slate-50 p-4 dark:bg-slate-950">
+			<div className="flex min-h-screen items-center justify-center bg-slate-50 p-4 dark:bg-slate-950" dir="rtl">
 				<div className="w-full max-w-md rounded-2xl border border-amber-200 bg-white p-8 text-center dark:border-amber-900 dark:bg-slate-900">
 					<div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
 						<Clock className="h-8 w-8 text-amber-600 dark:text-amber-400" />
@@ -138,7 +138,7 @@ export default function OwnerPortalLayout({
 	// Show error state (invalid/revoked)
 	if (error || (!isLoading && !summary)) {
 		return (
-			<div className="flex min-h-screen items-center justify-center bg-slate-50 p-4 dark:bg-slate-950">
+			<div className="flex min-h-screen items-center justify-center bg-slate-50 p-4 dark:bg-slate-950" dir="rtl">
 				<div className="w-full max-w-md rounded-2xl border border-red-200 bg-white p-8 text-center dark:border-red-900 dark:bg-slate-900">
 					<div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
 						<AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
@@ -157,7 +157,7 @@ export default function OwnerPortalLayout({
 	// Show loading state
 	if (isLoading) {
 		return (
-			<div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+			<div className="min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
 				<header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-900/80">
 					<div className="mx-auto max-w-5xl px-4 py-4">
 						<div className="flex items-center gap-3">
@@ -190,7 +190,7 @@ export default function OwnerPortalLayout({
 	}
 
 	return (
-		<div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+		<div className="min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
 			{/* Header */}
 			<header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-900/80 print:hidden">
 				<div className="mx-auto max-w-6xl px-4 py-3 sm:py-4">

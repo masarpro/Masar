@@ -175,7 +175,7 @@ export function GanttPrintCanvas({
 						<div
 							key={i}
 							className="absolute top-0 h-full border-e border-slate-300 text-[10px] px-1 text-slate-700 flex items-center font-semibold"
-							style={{ left: `${m.x}%`, width: `${m.w}%` }}
+							style={{ insetInlineStart: `${m.x}%`, width: `${m.w}%` }}
 						>
 							{m.label}
 						</div>
@@ -222,7 +222,7 @@ export function GanttPrintCanvas({
 								<div
 									key={i}
 									className="absolute top-0 bottom-0 border-e border-slate-100"
-									style={{ left: `${mo.x + mo.w}%`, width: 0 }}
+									style={{ insetInlineStart: `${mo.x + mo.w}%`, width: 0 }}
 								/>
 							))}
 
@@ -230,7 +230,7 @@ export function GanttPrintCanvas({
 							{todayPct >= 0 && (
 								<div
 									className="absolute top-0 bottom-0 w-px bg-red-500 z-10"
-									style={{ left: `${todayPct}%` }}
+									style={{ insetInlineStart: `${todayPct}%` }}
 								/>
 							)}
 
@@ -242,7 +242,7 @@ export function GanttPrintCanvas({
 										colors.bar,
 									)}
 									style={{
-										left: `${pos.left}%`,
+										insetInlineStart: `${pos.left}%`,
 										width: `${pos.width}%`,
 									}}
 								>

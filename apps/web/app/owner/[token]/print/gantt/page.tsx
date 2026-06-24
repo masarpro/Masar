@@ -79,7 +79,7 @@ export default function OwnerGanttPrintPage() {
 	}));
 
 	return (
-		<div className="min-h-screen bg-slate-50 py-6">
+		<div className="min-h-screen bg-slate-50 py-6" dir="rtl">
 			{/* Action bar — hidden when printing */}
 			<div className="mx-auto mb-4 flex max-w-[1600px] items-center justify-between px-4 print:hidden">
 				<h1 className="font-bold text-lg text-slate-700">
