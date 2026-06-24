@@ -195,13 +195,21 @@ async function allocateAndCreatePayments(
 	// Build the allocation plan (which term gets how much)
 	let allocations: Array<{ contractTermId: string | null; amount: number }> = [];
 
+	// The term id the fallback (non-split) allocation links to. Starts as the
+	// requested term but is nulled out when the id doesn't resolve to a real
+	// term (e.g. a UI sentinel like "free"), so an invalid id degrades to a free
+	// payment instead of crashing with a foreign-key violation.
+	let effectiveTermId: string | null = data.contractTermId ?? null;
+
 	if (data.contractTermId) {
 		const selected = await tx.contractPaymentTerm.findUnique({
 			where: { id: data.contractTermId },
 		});
 
-		// Only spill when the selected term has a capped amount
-		if (selected && selected.amount != null) {
+		if (!selected) {
+			effectiveTermId = null;
+		} else if (selected.amount != null) {
+			// Only spill when the selected term has a capped amount
 			const terms = await tx.contractPaymentTerm.findMany({
 				where: {
 					contractId: selected.contractId,
@@ -247,9 +255,7 @@ async function allocateAndCreatePayments(
 
 	// Fallback: free payment, uncapped selected term, or nothing allocated
 	if (allocations.length === 0) {
-		allocations = [
-			{ contractTermId: data.contractTermId ?? null, amount: data.amount },
-		];
+		allocations = [{ contractTermId: effectiveTermId, amount: data.amount }];
 	}
 
 	// Link the parts of a split payment so they read as one logical payment

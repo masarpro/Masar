@@ -132,7 +132,10 @@ export function CreatePaymentDialog({
 		createMutation.mutate({
 			organizationId,
 			projectId,
-			contractTermId: contractTermId || null,
+			// "free" is the sentinel for the "free payment" option — send null so
+			// the server doesn't treat it as a (non-existent) contract term id.
+			contractTermId:
+				contractTermId && contractTermId !== "free" ? contractTermId : null,
 			amount: parsedAmount,
 			date: new Date(date),
 			paymentMethod: paymentMethod as "CASH" | "BANK_TRANSFER" | "CHEQUE" | "CREDIT_CARD" | "OTHER",
