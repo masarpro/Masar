@@ -258,6 +258,65 @@ export async function setContractPaymentTerms(
 }
 
 /**
+ * Update a single contract payment term (label/type/amount/percent/dueDate).
+ *
+ * Scoped by organizationId + projectId via the parent contract so a caller can
+ * never reach another org's term. The stored `paidAmount` is NOT changed (it is
+ * derived from the actual payments) but the `status` is recomputed against the
+ * new amount so an amount edit keeps the FULLY/PARTIALLY/PENDING badge correct.
+ */
+export async function updateContractPaymentTerm(
+	organizationId: string,
+	projectId: string,
+	termId: string,
+	data: {
+		type: "ADVANCE" | "MILESTONE" | "MONTHLY" | "COMPLETION" | "CUSTOM";
+		label?: string | null;
+		percent?: number | null;
+		amount?: number | null;
+		dueDate?: Date | null;
+	},
+) {
+	return db.$transaction(async (tx) => {
+		const term = await tx.contractPaymentTerm.findFirst({
+			where: {
+				id: termId,
+				contract: { organizationId, projectId },
+			},
+		});
+		if (!term) throw new Error("TERM_NOT_FOUND");
+
+		const paidAmount = Number(term.paidAmount);
+		const newAmount = data.amount ?? null;
+		const status =
+			newAmount != null && newAmount > 0 && paidAmount >= newAmount
+				? "FULLY_PAID"
+				: paidAmount > 0
+					? "PARTIALLY_PAID"
+					: "PENDING";
+
+		const updated = await tx.contractPaymentTerm.update({
+			where: { id: termId },
+			data: {
+				type: data.type,
+				label: data.label ?? null,
+				percent: data.percent ?? null,
+				amount: newAmount,
+				dueDate: data.dueDate ?? null,
+				status,
+			},
+		});
+
+		return {
+			...updated,
+			percent: updated.percent ? Number(updated.percent) : null,
+			amount: updated.amount ? Number(updated.amount) : null,
+			paidAmount: Number(updated.paidAmount),
+		};
+	});
+}
+
+/**
  * Append new payment terms to a contract WITHOUT touching existing ones.
  * Used by the "copy from execution milestones" flow on the payments page.
  * Amounts must already be final (VAT computed by the caller).

@@ -160,6 +160,7 @@ export function ProjectPaymentsPage({
 					<PaymentTermsSection
 						organizationId={organizationId}
 						projectId={projectId}
+						contractValue={data?.contractValue ?? 0}
 						terms={data?.terms ?? []}
 					/>
 					{(data?.freePayments?.length ?? 0) > 0 && (

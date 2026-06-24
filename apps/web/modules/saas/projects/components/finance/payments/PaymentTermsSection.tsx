@@ -1,15 +1,24 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@ui/components/badge";
+import { Button } from "@ui/components/button";
 import { Progress } from "@ui/components/progress";
 import {
 	Collapsible,
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "@ui/components/collapsible";
-import { ChevronDown, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import {
+	ChevronDown,
+	CheckCircle2,
+	Clock,
+	AlertCircle,
+	Pencil,
+} from "lucide-react";
 import { PaymentsTable } from "./PaymentsTable";
+import { EditPaymentTermDialog } from "./EditPaymentTermDialog";
 
 interface Term {
 	id: string;
@@ -40,6 +49,7 @@ interface Term {
 interface PaymentTermsSectionProps {
 	organizationId: string;
 	projectId: string;
+	contractValue: number;
 	terms: Term[];
 }
 
@@ -67,9 +77,11 @@ const STATUS_COLOR_MAP: Record<string, string> = {
 export function PaymentTermsSection({
 	organizationId,
 	projectId,
+	contractValue,
 	terms,
 }: PaymentTermsSectionProps) {
 	const t = useTranslations();
+	const [editTerm, setEditTerm] = useState<Term | null>(null);
 
 	return (
 		<div className="space-y-3">
@@ -88,29 +100,40 @@ export function PaymentTermsSection({
 				return (
 					<Collapsible key={term.id}>
 						<div className="rounded-xl border border-slate-200/60 bg-white/80 shadow-sm dark:border-slate-700/50 dark:bg-slate-900/50">
-							<CollapsibleTrigger className="flex w-full items-center gap-3 p-4 text-right">
-								<ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition-transform [[data-state=open]>&]:rotate-180" />
-								<div className="flex flex-1 flex-wrap items-center gap-2">
-									<span className="font-medium text-slate-900 dark:text-slate-100">
-										{term.label ?? t(`projectPayments.termTypes.${term.type}`)}
-									</span>
-									<Badge variant="secondary" className="text-xs">
-										{t(`projectPayments.termTypes.${term.type}`)}
-									</Badge>
-									<Badge variant="secondary" className={statusColor}>
-										<StatusIcon className="ms-1 h-3 w-3" />
-										{t(`projectPayments.statuses.${statusKey}`)}
-									</Badge>
-								</div>
-								<div className="flex shrink-0 items-center gap-4 text-sm">
-									<span className="text-slate-500">
-										{formatCurrency(term.paidAmount)} / {formatCurrency(termAmount)}
-									</span>
-									<span className="font-mono font-semibold text-sky-600 dark:text-sky-400">
-										{paidPercent}%
-									</span>
-								</div>
-							</CollapsibleTrigger>
+							<div className="flex items-center">
+								<CollapsibleTrigger className="flex flex-1 items-center gap-3 p-4 text-right">
+									<ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition-transform [[data-state=open]>&]:rotate-180" />
+									<div className="flex flex-1 flex-wrap items-center gap-2">
+										<span className="font-medium text-slate-900 dark:text-slate-100">
+											{term.label ?? t(`projectPayments.termTypes.${term.type}`)}
+										</span>
+										<Badge variant="secondary" className="text-xs">
+											{t(`projectPayments.termTypes.${term.type}`)}
+										</Badge>
+										<Badge variant="secondary" className={statusColor}>
+											<StatusIcon className="ms-1 h-3 w-3" />
+											{t(`projectPayments.statuses.${statusKey}`)}
+										</Badge>
+									</div>
+									<div className="flex shrink-0 items-center gap-4 text-sm">
+										<span className="text-slate-500">
+											{formatCurrency(term.paidAmount)} / {formatCurrency(termAmount)}
+										</span>
+										<span className="font-mono font-semibold text-sky-600 dark:text-sky-400">
+											{paidPercent}%
+										</span>
+									</div>
+								</CollapsibleTrigger>
+								<Button
+									variant="ghost"
+									size="icon"
+									className="me-2 h-9 w-9 shrink-0 text-slate-400 hover:text-sky-600"
+									onClick={() => setEditTerm(term)}
+									aria-label={t("projectPayments.editTerm")}
+								>
+									<Pencil className="h-4 w-4" />
+								</Button>
+							</div>
 
 							<CollapsibleContent>
 								<div className="border-t border-slate-100 px-4 pb-4 pt-3 dark:border-slate-800">
@@ -129,6 +152,19 @@ export function PaymentTermsSection({
 					</Collapsible>
 				);
 			})}
+
+			{editTerm && (
+				<EditPaymentTermDialog
+					open={!!editTerm}
+					onOpenChange={(open) => {
+						if (!open) setEditTerm(null);
+					}}
+					organizationId={organizationId}
+					projectId={projectId}
+					contractValue={contractValue}
+					term={editTerm}
+				/>
+			)}
 		</div>
 	);
 }
