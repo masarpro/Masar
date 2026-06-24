@@ -8294,6 +8294,11 @@
     "termUpdated": "Stage updated successfully",
     "termUpdateError": "Failed to update stage",
     "termAmountOrPercentRequired": "Enter an amount or a percent",
+    "deleteTerm": "Delete Stage",
+    "termDeleted": "Stage deleted successfully",
+    "termDeleteError": "Failed to delete stage",
+    "deleteTermConfirmTitle": "Delete Stage",
+    "deleteTermConfirmDescription": "Are you sure you want to delete this stage? This action cannot be undone. A stage linked to recorded payments cannot be deleted.",
     "paymentMethods": {
       "BANK_TRANSFER": "Bank Transfer",
       "CASH": "Cash",

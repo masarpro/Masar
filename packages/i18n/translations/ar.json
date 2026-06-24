@@ -8294,6 +8294,11 @@
     "termUpdated": "تم تحديث المرحلة بنجاح",
     "termUpdateError": "فشل تحديث المرحلة",
     "termAmountOrPercentRequired": "أدخل المبلغ أو النسبة",
+    "deleteTerm": "حذف المرحلة",
+    "termDeleted": "تم حذف المرحلة بنجاح",
+    "termDeleteError": "فشل حذف المرحلة",
+    "deleteTermConfirmTitle": "حذف المرحلة",
+    "deleteTermConfirmDescription": "هل أنت متأكد من حذف هذه المرحلة؟ لا يمكن التراجع عن هذا الإجراء. لا يمكن حذف مرحلة مرتبطة بدفعات مسجلة.",
     "paymentMethods": {
       "BANK_TRANSFER": "تحويل بنكي",
       "CASH": "نقدي",

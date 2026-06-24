@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { orpc } from "@shared/lib/orpc-query-utils";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import { Progress } from "@ui/components/progress";
@@ -11,12 +13,24 @@ import {
 	CollapsibleTrigger,
 } from "@ui/components/collapsible";
 import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@ui/components/alert-dialog";
+import {
 	ChevronDown,
 	CheckCircle2,
 	Clock,
 	AlertCircle,
 	Pencil,
+	Trash2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { PaymentsTable } from "./PaymentsTable";
 import { EditPaymentTermDialog } from "./EditPaymentTermDialog";
 
@@ -81,7 +95,22 @@ export function PaymentTermsSection({
 	terms,
 }: PaymentTermsSectionProps) {
 	const t = useTranslations();
+	const queryClient = useQueryClient();
 	const [editTerm, setEditTerm] = useState<Term | null>(null);
+	const [deleteTermId, setDeleteTermId] = useState<string | null>(null);
+
+	const deleteMutation = useMutation({
+		...orpc.projectContract.deletePaymentTerm.mutationOptions(),
+		onSuccess: () => {
+			toast.success(t("projectPayments.termDeleted"));
+			queryClient.invalidateQueries({ queryKey: orpc.projectPayments.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.projectContract.key() });
+			setDeleteTermId(null);
+		},
+		onError: (error) => {
+			toast.error(error.message || t("projectPayments.termDeleteError"));
+		},
+	});
 
 	return (
 		<div className="space-y-3">
@@ -127,11 +156,20 @@ export function PaymentTermsSection({
 								<Button
 									variant="ghost"
 									size="icon"
-									className="me-2 h-9 w-9 shrink-0 text-slate-400 hover:text-sky-600"
+									className="h-9 w-9 shrink-0 text-slate-400 hover:text-sky-600"
 									onClick={() => setEditTerm(term)}
 									aria-label={t("projectPayments.editTerm")}
 								>
 									<Pencil className="h-4 w-4" />
+								</Button>
+								<Button
+									variant="ghost"
+									size="icon"
+									className="me-2 h-9 w-9 shrink-0 text-slate-400 hover:text-red-600"
+									onClick={() => setDeleteTermId(term.id)}
+									aria-label={t("projectPayments.deleteTerm")}
+								>
+									<Trash2 className="h-4 w-4" />
 								</Button>
 							</div>
 
@@ -165,6 +203,43 @@ export function PaymentTermsSection({
 					term={editTerm}
 				/>
 			)}
+
+			<AlertDialog
+				open={!!deleteTermId}
+				onOpenChange={(open: boolean) => {
+					if (!open) setDeleteTermId(null);
+				}}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							{t("projectPayments.deleteTermConfirmTitle")}
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							{t("projectPayments.deleteTermConfirmDescription")}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+						<AlertDialogAction
+							className="bg-red-600 hover:bg-red-700"
+							disabled={deleteMutation.isPending}
+							onClick={(e) => {
+								e.preventDefault();
+								if (deleteTermId) {
+									deleteMutation.mutate({
+										organizationId,
+										projectId,
+										termId: deleteTermId,
+									});
+								}
+							}}
+						>
+							{t("common.delete")}
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 }

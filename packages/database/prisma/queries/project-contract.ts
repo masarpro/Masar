@@ -317,6 +317,39 @@ export async function updateContractPaymentTerm(
 }
 
 /**
+ * Delete a single contract payment term.
+ *
+ * Scoped by organizationId + projectId via the parent contract. Refuses to
+ * delete a term that still has payments recorded against it (linked
+ * ProjectPayment rows) so recorded money is never silently orphaned — the
+ * caller must reassign or delete those payments first.
+ */
+export async function deleteContractPaymentTerm(
+	organizationId: string,
+	projectId: string,
+	termId: string,
+) {
+	return db.$transaction(async (tx) => {
+		const term = await tx.contractPaymentTerm.findFirst({
+			where: {
+				id: termId,
+				contract: { organizationId, projectId },
+			},
+			include: { _count: { select: { projectPayments: true } } },
+		});
+		if (!term) throw new Error("TERM_NOT_FOUND");
+
+		if (term._count.projectPayments > 0) {
+			throw new Error("TERM_HAS_PAYMENTS");
+		}
+
+		await tx.contractPaymentTerm.delete({ where: { id: termId } });
+
+		return { success: true };
+	});
+}
+
+/**
  * Append new payment terms to a contract WITHOUT touching existing ones.
  * Used by the "copy from execution milestones" flow on the payments page.
  * Amounts must already be final (VAT computed by the caller).
