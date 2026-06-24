@@ -24,6 +24,7 @@ import {
 	OwnerSessionContext,
 	getSessionFromCookie,
 	setSessionCookie,
+	clearSessionCookie,
 } from "@saas/projects-owner/hooks/use-owner-session";
 import { resolveImageSrc } from "@saas/shared/lib/image-src";
 
@@ -38,9 +39,11 @@ export default function OwnerPortalLayout({
 	const t = useTranslations();
 	const basePath = `/owner/${token}`;
 
-	// Session token state: try cookie first, then exchange
+	// Session token state: try this token's cookie first, then exchange.
+	// The cookie is scoped per URL token so a stale session from another link
+	// can never leak in and falsely render this (valid) link as invalid.
 	const [sessionToken, setSessionToken] = useState<string | null>(() =>
-		getSessionFromCookie(),
+		getSessionFromCookie(token),
 	);
 
 	// Exchange URL token for a session token on first visit
@@ -54,13 +57,13 @@ export default function OwnerPortalLayout({
 			{ token },
 			{
 				onSuccess: (data: any) => {
-					setSessionCookie(data.sessionToken, data.expiresAt);
+					setSessionCookie(token, data.sessionToken, data.expiresAt);
 					setSessionToken(data.sessionToken);
 				},
 			},
 		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [token]);
+	}, [token, sessionToken]);
 
 	// Use session token for API calls when available, fall back to URL token
 	const authInput = sessionToken
@@ -73,6 +76,17 @@ export default function OwnerPortalLayout({
 			input: authInput,
 		}),
 	) as { data: any; isLoading: boolean; error: any };
+
+	// If a session-based request fails (expired/revoked/mismatched session),
+	// drop the session and fall back to re-exchanging the still-valid URL token
+	// instead of showing an error. The exchange effect re-runs once cleared.
+	useEffect(() => {
+		if (error && sessionToken) {
+			clearSessionCookie(token);
+			setSessionToken(null);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [error, sessionToken, token]);
 
 	const navItems = [
 		{
