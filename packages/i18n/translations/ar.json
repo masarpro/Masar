@@ -5927,6 +5927,15 @@
       "changeOrders": "أوامر التغيير",
       "chat": "المحادثة"
     },
+    "summary": {
+      "stageOf": "المرحلة {current} من {total}",
+      "collected": "نسبة التحصيل",
+      "nextPaymentShort": "الدفعة القادمة",
+      "remainingShort": "المتبقي",
+      "photosCount": "{count} صورة",
+      "approvedCount": "أوامر تغيير معتمدة",
+      "noChangeOrders": "لا توجد أوامر تغيير"
+    },
     "photos": {
       "title": "صور المشروع",
       "subtitle": "{count} صورة مرفقة للمشروع",

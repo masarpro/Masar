@@ -243,7 +243,7 @@ export default function OwnerPortalPayments() {
 					</p>
 				) : (
 					<div className="overflow-x-auto">
-						<table className="w-full">
+						<table className="w-full min-w-[480px]">
 							<thead>
 								<tr className="border-b border-slate-200 dark:border-slate-700">
 									<th className="pb-3 text-start text-sm font-medium text-slate-500">
@@ -295,7 +295,7 @@ export default function OwnerPortalPayments() {
 					</p>
 				) : (
 					<div className="overflow-x-auto">
-						<table className="w-full">
+						<table className="w-full min-w-[480px]">
 							<thead>
 								<tr className="border-b border-slate-200 dark:border-slate-700">
 									<th className="pb-3 text-start text-sm font-medium text-slate-500">

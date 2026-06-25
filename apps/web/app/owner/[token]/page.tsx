@@ -1,18 +1,24 @@
 "use client";
 
+import {
+	OwnerSummarySectionCards,
+	type OwnerSummarySections,
+} from "@saas/projects-owner/components/OwnerSummarySectionCards";
+import { useOwnerSession } from "@saas/projects-owner/hooks/use-owner-session";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
+import { GlassStatCard } from "@ui/components/glass-stat-card";
 import { Progress } from "@ui/components/progress";
 import { Skeleton } from "@ui/components/skeleton";
 import {
 	Banknote,
-	Calendar,
 	Clock,
+	FileText,
 	MapPin,
 	TrendingUp,
 	User,
-	FileText,
+	Wallet,
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -62,25 +68,32 @@ function calculateDaysRemaining(endDate: Date | null): number | null {
 export default function OwnerPortalSummary() {
 	const params = useParams();
 	const token = params.token as string;
+	const sessionToken = useOwnerSession();
 	const t = useTranslations();
+
+	// Prefer the session token (matches the layout), fall back to the URL token.
+	const authInput = sessionToken ? { sessionToken } : { token };
 
 	const { data, isLoading } = useQuery(
 		orpc.projectOwner.portal.getSummary.queryOptions({
-			input: { token },
+			input: authInput,
 		}),
 	) as { data: any; isLoading: boolean };
 
 	if (isLoading || !data?.project) {
 		return (
-			<div className="space-y-6">
-				<Skeleton className="h-28 w-full rounded-2xl" />
-				<Skeleton className="h-20 w-full rounded-2xl" />
-				<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+			<div className="space-y-4 sm:space-y-6">
+				<Skeleton className="h-40 w-full rounded-2xl" />
+				<div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
 					{Array.from({ length: 4 }).map((_, i) => (
 						<Skeleton key={i} className="h-24 rounded-2xl" />
 					))}
 				</div>
-				<Skeleton className="h-40 w-full rounded-2xl" />
+				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+					{Array.from({ length: 5 }).map((_, i) => (
+						<Skeleton key={i} className="h-28 rounded-2xl" />
+					))}
+				</div>
 			</div>
 		);
 	}
@@ -89,33 +102,40 @@ export default function OwnerPortalSummary() {
 		project,
 		currentPhase,
 		latestOfficialUpdate,
-		upcomingPayment,
 		contractValueWithVat,
-	} = data;
+		sections,
+	} = data as {
+		project: any;
+		currentPhase: string | null;
+		latestOfficialUpdate: any;
+		contractValueWithVat: number;
+		sections: OwnerSummarySections;
+	};
 	const daysRemaining = calculateDaysRemaining(project.endDate);
+	const progress = Math.round(Number(project.progress));
 
 	return (
-		<div className="space-y-6">
-			{/* Project Info */}
-			<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-				<div className="flex flex-wrap items-start justify-between gap-4">
-					<div>
-						<div className="flex items-center gap-3 mb-2">
-							<h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+		<div className="space-y-4 sm:space-y-6">
+			{/* Hero header */}
+			<div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+				<div className="flex flex-wrap items-start justify-between gap-3">
+					<div className="min-w-0">
+						<div className="mb-2 flex flex-wrap items-center gap-3">
+							<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 sm:text-xl">
 								{project.name}
 							</h2>
 							{getStatusBadge(project.status, t)}
 						</div>
-						<div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
+						<div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-slate-500">
 							{project.clientName && (
 								<div className="flex items-center gap-1.5">
-									<User className="h-4 w-4" />
+									<User className="h-4 w-4 shrink-0" />
 									<span>{project.clientName}</span>
 								</div>
 							)}
 							{project.location && (
 								<div className="flex items-center gap-1.5">
-									<MapPin className="h-4 w-4" />
+									<MapPin className="h-4 w-4 shrink-0" />
 									<span>{project.location}</span>
 								</div>
 							)}
@@ -127,141 +147,88 @@ export default function OwnerPortalSummary() {
 						</Badge>
 					)}
 				</div>
-			</div>
 
-			{/* Progress Section */}
-			<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-				<div className="mb-4 flex items-center justify-between">
-					<h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-						{t("ownerPortal.progress")}
-					</h3>
-					<span className="text-2xl font-bold text-sky-600 dark:text-sky-400">
-						{Math.round(Number(project.progress))}%
-					</span>
-				</div>
-				<Progress value={Number(project.progress)} className="h-3" />
-			</div>
-
-			{/* KPI Cards */}
-			<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-				<div className="rounded-2xl bg-sky-50 p-5 dark:bg-sky-950/30">
-					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-sky-100 p-2.5 dark:bg-sky-900/50">
-							<TrendingUp className="h-5 w-5 text-sky-600 dark:text-sky-400" />
-						</div>
-						<div>
-							<p className="text-xs text-sky-600 dark:text-sky-400">
-								{t("ownerPortal.progress")}
-							</p>
-							<p className="text-xl font-semibold text-sky-700 dark:text-sky-300">
-								{Math.round(Number(project.progress))}%
-							</p>
-						</div>
+				{/* Overall progress */}
+				<div className="mt-5">
+					<div className="mb-2 flex items-center justify-between">
+						<span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+							{t("ownerPortal.progress")}
+						</span>
+						<span className="text-2xl font-bold text-sky-600 dark:text-sky-400">
+							{progress}%
+						</span>
 					</div>
-				</div>
-
-				<div className="rounded-2xl bg-indigo-50 p-5 dark:bg-indigo-950/30">
-					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-indigo-100 p-2.5 dark:bg-indigo-900/50">
-							<Banknote className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-						</div>
-						<div>
-							<p className="text-xs text-indigo-600 dark:text-indigo-400">
-								{t("ownerPortal.contractValue")}
-							</p>
-							<p className="text-lg font-semibold text-indigo-700 dark:text-indigo-300">
-								{contractValueWithVat
-									? formatCurrency(Number(contractValueWithVat))
-									: project.contractValue
-										? formatCurrency(Number(project.contractValue))
-										: "-"}
-							</p>
-							<p className="mt-0.5 text-[10px] text-indigo-500/70 dark:text-indigo-400/70">
-								{t("ownerPortal.contractValueHint")}
-							</p>
-						</div>
-					</div>
-				</div>
-
-				<div className="rounded-2xl bg-amber-50 p-5 dark:bg-amber-950/30">
-					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-amber-100 p-2.5 dark:bg-amber-900/50">
-							<Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-						</div>
-						<div>
-							<p className="text-xs text-amber-600 dark:text-amber-400">
-								{t("ownerPortal.daysRemaining")}
-							</p>
-							<p className="text-xl font-semibold text-amber-700 dark:text-amber-300">
-								{daysRemaining !== null ? daysRemaining : "-"}
-							</p>
-						</div>
-					</div>
-				</div>
-
-				<div className="rounded-2xl bg-slate-50 p-5 dark:bg-slate-900/50">
-					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-slate-100 p-2.5 dark:bg-slate-800">
-							<Calendar className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-						</div>
-						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">
-								{t("ownerPortal.deliveryDate")}
-							</p>
-							<p className="text-lg font-semibold text-slate-700 dark:text-slate-300">
-								{project.endDate
-									? new Date(project.endDate).toLocaleDateString("ar-SA")
-									: "-"}
-							</p>
-						</div>
-					</div>
+					<Progress value={progress} className="h-3" />
 				</div>
 			</div>
 
-			{/* Latest Official Update */}
+			{/* KPI row */}
+			<div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+				<GlassStatCard
+					colorScheme="blue"
+					icon={
+						<Banknote className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+					}
+					title={t("ownerPortal.contractValue")}
+					value={
+						contractValueWithVat
+							? formatCurrency(Number(contractValueWithVat))
+							: project.contractValue
+								? formatCurrency(Number(project.contractValue))
+								: "-"
+					}
+					subtitle={t("ownerPortal.contractValueHint")}
+				/>
+				<GlassStatCard
+					colorScheme="sky"
+					icon={
+						<TrendingUp className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+					}
+					title={t("ownerPortal.payments.paidPercentage")}
+					value={`${sections.payments.collectionPercent}%`}
+				/>
+				<GlassStatCard
+					colorScheme="amber"
+					icon={
+						<Wallet className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+					}
+					title={t("ownerPortal.payments.remaining")}
+					value={formatCurrency(sections.payments.remaining)}
+				/>
+				<GlassStatCard
+					colorScheme="slate"
+					icon={<Clock className="h-5 w-5 text-slate-500 dark:text-slate-400" />}
+					title={t("ownerPortal.daysRemaining")}
+					value={daysRemaining !== null ? daysRemaining : "-"}
+				/>
+			</div>
+
+			{/* Live section cards */}
+			<OwnerSummarySectionCards
+				sections={sections}
+				basePath={`/owner/${token}`}
+			/>
+
+			{/* Latest official update */}
 			{latestOfficialUpdate && (
-				<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-					<div className="mb-4 flex items-center justify-between">
+				<div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+					<div className="mb-4 flex items-center justify-between gap-2">
 						<h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
 							<FileText className="inline h-5 w-5 me-2 text-slate-400" />
 							{t("ownerPortal.latestUpdate")}
 						</h3>
-						<span className="text-xs text-slate-500">
-							{new Date(latestOfficialUpdate.createdAt).toLocaleDateString("ar-SA")}
+						<span className="shrink-0 text-xs text-slate-500">
+							{new Date(latestOfficialUpdate.createdAt).toLocaleDateString(
+								"ar-SA",
+							)}
 						</span>
 					</div>
-					<p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+					<p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300">
 						{latestOfficialUpdate.content}
 					</p>
 					<p className="mt-2 text-sm text-slate-500">
 						— {latestOfficialUpdate.sender.name}
 					</p>
-				</div>
-			)}
-
-			{/* Upcoming Payment */}
-			{upcomingPayment && (
-				<div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 dark:border-amber-900 dark:bg-amber-950/30">
-					<div className="flex items-center justify-between">
-						<div>
-							<h3 className="font-semibold text-amber-800 dark:text-amber-300">
-								{t("ownerPortal.nextPayment")}
-							</h3>
-							<p className="text-sm text-amber-600 dark:text-amber-400">
-								{t("ownerPortal.claimNo")} #{upcomingPayment.claimNo}
-							</p>
-						</div>
-						<div className="text-end">
-							<p className="text-xl font-bold text-amber-800 dark:text-amber-300">
-								{formatCurrency(Number(upcomingPayment.amount))}
-							</p>
-							{upcomingPayment.dueDate && (
-								<p className="text-sm text-amber-600 dark:text-amber-400">
-									{new Date(upcomingPayment.dueDate).toLocaleDateString("ar-SA")}
-								</p>
-							)}
-						</div>
-					</div>
 				</div>
 			)}
 		</div>

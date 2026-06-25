@@ -225,41 +225,31 @@ export default function OwnerChangeOrdersPage() {
 						</p>
 					</div>
 				) : (
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead className="w-20">#</TableHead>
-								<TableHead>{t("changeOrders.fields.title")}</TableHead>
-								<TableHead>{t("changeOrders.fields.category")}</TableHead>
-								<TableHead className="text-center">
-									{t("changeOrders.fields.costImpact")}
-								</TableHead>
-								<TableHead className="text-center">
-									{t("changeOrders.fields.timeImpact")}
-								</TableHead>
-								<TableHead>{t("changeOrders.fields.status")}</TableHead>
-								<TableHead className="w-10" />
-							</TableRow>
-						</TableHeader>
-						<TableBody>
+					<>
+						{/* Mobile: card list */}
+						<div className="divide-y divide-slate-100 dark:divide-slate-800 sm:hidden">
 							{changeOrders.map((co) => (
-								<TableRow key={co.id} className="group">
-									<TableCell className="font-mono text-sm text-slate-500">
-										CO-{co.coNo}
-									</TableCell>
-									<TableCell>
-										<Link
-											href={`${basePath}/changes/${co.id}`}
-											className="font-medium text-slate-900 hover:text-primary dark:text-slate-100"
-										>
-											{co.title}
-										</Link>
-									</TableCell>
-									<TableCell className="text-sm text-slate-600 dark:text-slate-400">
-										{t(`changeOrders.category.${co.category}`)}
-									</TableCell>
-									<TableCell className="text-center">
-										{co.costImpact ? (
+								<Link
+									key={co.id}
+									href={`${basePath}/changes/${co.id}`}
+									className="block p-4 active:bg-slate-50 dark:active:bg-slate-800/50"
+								>
+									<div className="flex items-start justify-between gap-2">
+										<div className="min-w-0">
+											<p className="font-mono text-xs text-slate-400">
+												CO-{co.coNo}
+											</p>
+											<p className="font-medium text-slate-900 dark:text-slate-100">
+												{co.title}
+											</p>
+											<p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+												{t(`changeOrders.category.${co.category}`)}
+											</p>
+										</div>
+										{getStatusBadge(co.status, t)}
+									</div>
+									<div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+										{co.costImpact && (
 											<span
 												className={
 													Number(co.costImpact) >= 0
@@ -270,40 +260,108 @@ export default function OwnerChangeOrdersPage() {
 												{Number(co.costImpact) > 0 ? "+" : ""}
 												{formatCurrency(co.costImpact)}
 											</span>
-										) : (
-											"-"
 										)}
-									</TableCell>
-									<TableCell className="text-center">
 										{co.timeImpactDays !== null &&
-										co.timeImpactDays !== undefined ? (
-											<span
-												className={
-													co.timeImpactDays >= 0
-														? "text-blue-600 dark:text-blue-400"
-														: "text-orange-600 dark:text-orange-400"
-												}
-											>
-												{co.timeImpactDays > 0 ? "+" : ""}
-												{co.timeImpactDays} {t("common.days")}
-											</span>
-										) : (
-											"-"
-										)}
-									</TableCell>
-									<TableCell>{getStatusBadge(co.status, t)}</TableCell>
-									<TableCell>
-										<Link
-											href={`${basePath}/changes/${co.id}`}
-											className="text-slate-400 transition-colors group-hover:text-primary"
-										>
-											<ChevronRight className="h-4 w-4" />
-										</Link>
-									</TableCell>
-								</TableRow>
+											co.timeImpactDays !== undefined && (
+												<span
+													className={
+														co.timeImpactDays >= 0
+															? "text-blue-600 dark:text-blue-400"
+															: "text-orange-600 dark:text-orange-400"
+													}
+												>
+													{co.timeImpactDays > 0 ? "+" : ""}
+													{co.timeImpactDays} {t("common.days")}
+												</span>
+											)}
+									</div>
+								</Link>
 							))}
-						</TableBody>
-					</Table>
+						</div>
+
+						{/* Desktop: table */}
+						<div className="hidden overflow-x-auto sm:block">
+							<Table>
+								<TableHeader>
+									<TableRow>
+										<TableHead className="w-20">#</TableHead>
+										<TableHead>{t("changeOrders.fields.title")}</TableHead>
+										<TableHead>{t("changeOrders.fields.category")}</TableHead>
+										<TableHead className="text-center">
+											{t("changeOrders.fields.costImpact")}
+										</TableHead>
+										<TableHead className="text-center">
+											{t("changeOrders.fields.timeImpact")}
+										</TableHead>
+										<TableHead>{t("changeOrders.fields.status")}</TableHead>
+										<TableHead className="w-10" />
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{changeOrders.map((co) => (
+										<TableRow key={co.id} className="group">
+											<TableCell className="font-mono text-sm text-slate-500">
+												CO-{co.coNo}
+											</TableCell>
+											<TableCell>
+												<Link
+													href={`${basePath}/changes/${co.id}`}
+													className="font-medium text-slate-900 hover:text-primary dark:text-slate-100"
+												>
+													{co.title}
+												</Link>
+											</TableCell>
+											<TableCell className="text-sm text-slate-600 dark:text-slate-400">
+												{t(`changeOrders.category.${co.category}`)}
+											</TableCell>
+											<TableCell className="text-center">
+												{co.costImpact ? (
+													<span
+														className={
+															Number(co.costImpact) >= 0
+																? "text-sky-600 dark:text-sky-400"
+																: "text-red-600 dark:text-red-400"
+														}
+													>
+														{Number(co.costImpact) > 0 ? "+" : ""}
+														{formatCurrency(co.costImpact)}
+													</span>
+												) : (
+													"-"
+												)}
+											</TableCell>
+											<TableCell className="text-center">
+												{co.timeImpactDays !== null &&
+												co.timeImpactDays !== undefined ? (
+													<span
+														className={
+															co.timeImpactDays >= 0
+																? "text-blue-600 dark:text-blue-400"
+																: "text-orange-600 dark:text-orange-400"
+														}
+													>
+														{co.timeImpactDays > 0 ? "+" : ""}
+														{co.timeImpactDays} {t("common.days")}
+													</span>
+												) : (
+													"-"
+												)}
+											</TableCell>
+											<TableCell>{getStatusBadge(co.status, t)}</TableCell>
+											<TableCell>
+												<Link
+													href={`${basePath}/changes/${co.id}`}
+													className="text-slate-400 transition-colors group-hover:text-primary"
+												>
+													<ChevronRight className="h-4 w-4" />
+												</Link>
+											</TableCell>
+										</TableRow>
+									))}
+								</TableBody>
+							</Table>
+						</div>
+					</>
 				)}
 			</Card>
 		</div>

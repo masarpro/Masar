@@ -371,6 +371,12 @@ export async function getOwnerSummary(organizationId: string, projectId: string)
 		upcomingClaim,
 		milestones,
 		contractTotal,
+		projectPaymentsAgg,
+		financePaymentsAgg,
+		changeOrdersAgg,
+		photosCount,
+		recentPhotos,
+		lastMessage,
 	] = await Promise.all([
 		db.project.findFirst({
 			where: { id: projectId, organizationId },
@@ -428,12 +434,59 @@ export async function getOwnerSummary(organizationId: string, projectId: string)
 				status: true,
 			},
 		}),
-		// Execution milestones → progress mirrors the execution dashboard
+		// Execution milestones → progress mirrors the execution dashboard.
+		// Ordered by orderIndex so the schedule snapshot can derive the
+		// current/next stage the same way the schedule page does.
 		db.projectMilestone.findMany({
 			where: { organizationId, projectId },
-			select: { progress: true },
+			orderBy: { orderIndex: "asc" },
+			select: {
+				id: true,
+				title: true,
+				status: true,
+				progress: true,
+				orderIndex: true,
+			},
 		}),
 		computeContractTotal(organizationId, projectId),
+		// Payments snapshot — aggregate BOTH receipt systems (see getOwnerPayments)
+		db.projectPayment.aggregate({
+			where: { organizationId, projectId },
+			_sum: { amount: true },
+		}),
+		db.financePayment.aggregate({
+			where: { organizationId, projectId, status: "COMPLETED" },
+			_sum: { amount: true },
+		}),
+		// Change orders snapshot — count + total cost impact (owner-visible only)
+		db.projectChangeOrder.aggregate({
+			where: {
+				organizationId,
+				projectId,
+				status: { in: ["APPROVED", "IMPLEMENTED"] },
+			},
+			_count: true,
+			_sum: { costImpact: true },
+		}),
+		// Photos snapshot — total count + a few recent thumbnails
+		db.projectPhoto.count({ where: { projectId } }),
+		db.projectPhoto.findMany({
+			where: { projectId },
+			orderBy: [{ takenAt: "desc" }, { createdAt: "desc" }],
+			take: 4,
+			select: { id: true, url: true, caption: true, mediaType: true },
+		}),
+		// Chat snapshot — latest message on the OWNER channel (any type)
+		db.projectMessage.findFirst({
+			where: { organizationId, projectId, channel: "OWNER" },
+			orderBy: { createdAt: "desc" },
+			select: {
+				content: true,
+				createdAt: true,
+				isUpdate: true,
+				sender: { select: { name: true } },
+			},
+		}),
 	]);
 
 	// Overall progress = average of milestone progress (same formula as
@@ -449,12 +502,84 @@ export async function getOwnerSummary(organizationId: string, projectId: string)
 				? Math.round(Number(project.progress))
 				: 0;
 
+	// ── Schedule snapshot ────────────────────────────────────────────────
+	const completedMilestones = milestones.filter(
+		(m) => m.status === "COMPLETED",
+	).length;
+	// Current stage = the one in progress, else the first not-yet-completed one.
+	const currentMilestone =
+		milestones.find((m) => m.status === "IN_PROGRESS") ??
+		milestones.find((m) => m.status !== "COMPLETED") ??
+		null;
+
+	// ── Payments snapshot ────────────────────────────────────────────────
+	const paidAmount = round2(
+		Number(projectPaymentsAgg._sum.amount ?? 0) +
+			Number(financePaymentsAgg._sum.amount ?? 0),
+	);
+	const contractValue = contractTotal.total;
+	const collectionPercent =
+		contractValue > 0 ? Math.round((paidAmount / contractValue) * 100) : 0;
+
+	const STARTS_WITH_OWNER = "[من المالك]";
+
 	return {
 		project: project ? { ...project, progress: milestoneProgress } : project,
 		contractValueWithVat: contractTotal.total,
 		currentPhase: latestProgressUpdate?.phaseLabel ?? null,
 		latestOfficialUpdate,
 		upcomingPayment: upcomingClaim,
+		sections: {
+			schedule: {
+				total: milestones.length,
+				completed: completedMilestones,
+				current: currentMilestone
+					? {
+							title: currentMilestone.title,
+							progress: Number(currentMilestone.progress),
+							status: currentMilestone.status,
+						}
+					: null,
+			},
+			payments: {
+				collectionPercent,
+				paidAmount,
+				remaining: round2(contractValue - paidAmount),
+				contractValue,
+				nextPayment: upcomingClaim
+					? {
+							claimNo: upcomingClaim.claimNo,
+							amount: Number(upcomingClaim.amount),
+							dueDate: upcomingClaim.dueDate,
+						}
+					: null,
+			},
+			photos: {
+				count: photosCount,
+				recent: recentPhotos.map((p) => ({
+					id: p.id,
+					url: p.url,
+					caption: p.caption,
+					mediaType: p.mediaType,
+				})),
+			},
+			changeOrders: {
+				count: changeOrdersAgg._count,
+				totalCostImpact: Number(changeOrdersAgg._sum.costImpact ?? 0),
+			},
+			chat: {
+				lastMessage: lastMessage
+					? {
+							content: lastMessage.content.startsWith(STARTS_WITH_OWNER)
+								? lastMessage.content.replace(`${STARTS_WITH_OWNER} `, "")
+								: lastMessage.content,
+							senderName: lastMessage.sender?.name ?? null,
+							createdAt: lastMessage.createdAt,
+							isOwner: lastMessage.content.startsWith(STARTS_WITH_OWNER),
+						}
+					: null,
+			},
+		},
 	};
 }
 

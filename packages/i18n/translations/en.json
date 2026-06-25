@@ -5927,6 +5927,15 @@
       "changeOrders": "Change Orders",
       "chat": "Chat"
     },
+    "summary": {
+      "stageOf": "Stage {current} of {total}",
+      "collected": "Collected",
+      "nextPaymentShort": "Next payment",
+      "remainingShort": "Remaining",
+      "photosCount": "{count} photo(s)",
+      "approvedCount": "Approved change orders",
+      "noChangeOrders": "No change orders"
+    },
     "photos": {
       "title": "Project Photos",
       "subtitle": "{count} photo(s) shared for this project",

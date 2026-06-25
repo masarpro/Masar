@@ -62,7 +62,7 @@ export default function OwnerPortalChat() {
 					<Skeleton className="h-5 w-32" />
 					<Skeleton className="h-8 w-20 rounded-xl" />
 				</div>
-				<div className="h-[400px] p-6 space-y-4">
+				<div className="h-[60vh] p-6 space-y-4 sm:h-[400px]">
 					{Array.from({ length: 5 }).map((_, i) => (
 						<div key={i} className={`flex gap-3 ${i % 2 === 0 ? "" : "flex-row-reverse"}`}>
 							<Skeleton className="h-9 w-9 rounded-full shrink-0" />
@@ -102,7 +102,7 @@ export default function OwnerPortalChat() {
 			</div>
 
 			{/* Messages Area */}
-			<div className="h-[400px] overflow-y-auto p-6 space-y-4">
+			<div className="h-[60vh] overflow-y-auto p-4 space-y-4 sm:h-[400px] sm:p-6">
 				{messages.length === 0 ? (
 					<div className="flex flex-col items-center justify-center h-full text-slate-500">
 						<MessageSquare className="h-12 w-12 mb-3 text-slate-300" />
