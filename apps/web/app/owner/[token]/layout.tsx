@@ -278,7 +278,14 @@ export default function OwnerPortalLayout({
 			{/* Footer */}
 			<footer className="border-t border-slate-200 bg-white py-6 pb-24 md:pb-6 dark:border-slate-800 dark:bg-slate-900 print:hidden">
 				<div className="mx-auto max-w-6xl px-4 text-center">
-					<p className="text-sm text-slate-500">{t("ownerPortal.footer")}</p>
+					<a
+						href="https://app-masar.com/ar"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="text-sm text-slate-500 transition-colors hover:text-primary"
+					>
+						{t("ownerPortal.footer")}
+					</a>
 				</div>
 			</footer>
 

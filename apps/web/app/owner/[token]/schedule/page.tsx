@@ -51,7 +51,7 @@ export default function OwnerPortalSchedule() {
 	};
 
 	return (
-		<div className="space-y-6" dir="rtl">
+		<div className="space-y-4 sm:space-y-6" dir="rtl">
 			{/* Header */}
 			<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
 				<div className="flex flex-wrap items-center justify-between gap-4">

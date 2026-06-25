@@ -5975,6 +5975,8 @@
       "ganttTitle": "Gantt Timeline"
     },
     "payments": {
+      "title": "Payments & Claims",
+      "subtitle": "Track project payments and financial stages",
       "contractValue": "Contract Value",
       "totalPaid": "Total Paid",
       "remaining": "Remaining",

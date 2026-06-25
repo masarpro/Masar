@@ -5,6 +5,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
 import { Card } from "@ui/components/card";
+import { GlassStatCard } from "@ui/components/glass-stat-card";
 import {
 	Table,
 	TableBody,
@@ -131,10 +132,10 @@ export default function OwnerChangeOrdersPage() {
 	}
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-4 sm:space-y-6" dir="rtl">
 			{/* Header */}
 			<div>
-				<h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+				<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 sm:text-xl">
 					{t("changeOrders.ownerPortal.title")}
 				</h2>
 				<p className="text-sm text-slate-500 dark:text-slate-400">
@@ -142,76 +143,44 @@ export default function OwnerChangeOrdersPage() {
 				</p>
 			</div>
 
-			{/* Stats Cards */}
-			<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-				<Card className="p-4">
-					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-slate-100 p-2.5 dark:bg-slate-800">
-							<FileTextIcon className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-						</div>
-						<div>
-							<p className="text-xs text-slate-500 dark:text-slate-400">
-								{t("changeOrders.stats.total")}
-							</p>
-							<p className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-								{stats.total}
-							</p>
-						</div>
-					</div>
-				</Card>
-
-				<Card className="p-4">
-					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-blue-100 p-2.5 dark:bg-blue-900/50">
-							<ClockIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-						</div>
-						<div>
-							<p className="text-xs text-blue-600 dark:text-blue-400">
-								{t("changeOrders.status.IMPLEMENTED")}
-							</p>
-							<p className="text-xl font-semibold text-blue-700 dark:text-blue-300">
-								{stats.implemented}
-							</p>
-						</div>
-					</div>
-				</Card>
-
-				<Card className="p-4">
-					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-sky-100 p-2.5 dark:bg-sky-900/50">
-							<DollarSignIcon className="h-5 w-5 text-sky-600 dark:text-sky-400" />
-						</div>
-						<div>
-							<p className="text-xs text-sky-600 dark:text-sky-400">
-								{t("changeOrders.stats.costImpact")}
-							</p>
-							<p className="text-lg font-semibold text-sky-700 dark:text-sky-300">
-								{formatCurrency(stats.totalCostImpact)}
-							</p>
-						</div>
-					</div>
-				</Card>
-
-				<Card className="p-4">
-					<div className="flex items-center gap-3">
-						<div className="rounded-xl bg-amber-100 p-2.5 dark:bg-amber-900/50">
-							{stats.totalTimeImpact >= 0 ? (
-								<TrendingUpIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-							) : (
-								<TrendingDownIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-							)}
-						</div>
-						<div>
-							<p className="text-xs text-amber-600 dark:text-amber-400">
-								{t("changeOrders.stats.timeImpact")}
-							</p>
-							<p className="text-xl font-semibold text-amber-700 dark:text-amber-300">
-								{stats.totalTimeImpact > 0 ? "+" : ""}
-								{stats.totalTimeImpact} {t("common.days")}
-							</p>
-						</div>
-					</div>
-				</Card>
+			{/* KPI row */}
+			<div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+				<GlassStatCard
+					colorScheme="slate"
+					icon={
+						<FileTextIcon className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+					}
+					title={t("changeOrders.stats.total")}
+					value={stats.total}
+				/>
+				<GlassStatCard
+					colorScheme="blue"
+					icon={
+						<ClockIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+					}
+					title={t("changeOrders.status.IMPLEMENTED")}
+					value={stats.implemented}
+				/>
+				<GlassStatCard
+					colorScheme="sky"
+					icon={
+						<DollarSignIcon className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+					}
+					title={t("changeOrders.stats.costImpact")}
+					value={formatCurrency(stats.totalCostImpact)}
+				/>
+				<GlassStatCard
+					colorScheme="amber"
+					icon={
+						stats.totalTimeImpact >= 0 ? (
+							<TrendingUpIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+						) : (
+							<TrendingDownIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+						)
+					}
+					title={t("changeOrders.stats.timeImpact")}
+					value={`${stats.totalTimeImpact > 0 ? "+" : ""}${stats.totalTimeImpact} ${t("common.days")}`}
+				/>
 			</div>
 
 			{/* Change Orders Table */}

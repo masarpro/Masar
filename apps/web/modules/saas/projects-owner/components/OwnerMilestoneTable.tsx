@@ -95,7 +95,59 @@ export function OwnerMilestoneTable({ milestones }: OwnerMilestoneTableProps) {
 	const sorted = [...milestones].sort((a, b) => a.orderIndex - b.orderIndex);
 
 	return (
-		<div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+		<>
+			{/* Mobile: card list */}
+			<div className="space-y-3 sm:hidden">
+				{sorted.map((m, i) => {
+					const sb = statusBadge[m.status] ?? statusBadge.PLANNED;
+					const progress = Math.max(0, Math.min(100, Number(m.progress) || 0));
+					const daysLeft = getDaysLeft(m.plannedEnd, m.status);
+					return (
+						<div
+							key={m.id}
+							className="rounded-xl border border-slate-200 p-4 dark:border-slate-800"
+						>
+							<div className="flex items-start justify-between gap-2">
+								<div className="flex min-w-0 items-baseline gap-1.5">
+									<span className="shrink-0 text-muted-foreground text-xs">
+										{i + 1}.
+									</span>
+									<span className="font-medium text-slate-900 dark:text-slate-100">
+										{m.title}
+									</span>
+								</div>
+								<Badge
+									variant="secondary"
+									className={cn("shrink-0 border-0", sb.className)}
+								>
+									{sb.label}
+								</Badge>
+							</div>
+
+							<div className="mt-3 flex items-center gap-2">
+								<Progress value={progress} className="h-2 flex-1" />
+								<span className="w-9 text-end text-muted-foreground text-xs">
+									{Math.round(progress)}%
+								</span>
+							</div>
+
+							<div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-500 text-xs dark:text-slate-400">
+								<span>
+									{formatDate(m.plannedStart)} — {formatDate(m.plannedEnd)}
+								</span>
+								{daysLeft !== "-" && (
+									<span>
+										{t("execution.table.daysLeft")}: {daysLeft}
+									</span>
+								)}
+							</div>
+						</div>
+					);
+				})}
+			</div>
+
+			{/* Desktop: table */}
+			<div className="hidden overflow-x-auto rounded-xl border border-slate-200 sm:block dark:border-slate-800">
 			<Table>
 				<TableHeader>
 					<TableRow>
@@ -152,6 +204,7 @@ export function OwnerMilestoneTable({ milestones }: OwnerMilestoneTableProps) {
 					})}
 				</TableBody>
 			</Table>
-		</div>
+			</div>
+		</>
 	);
 }

@@ -42,6 +42,22 @@ const colorSchemes = {
 		value: "text-amber-700 dark:text-amber-300",
 		subtitle: "text-amber-600/70 dark:text-amber-400/70",
 	},
+	green: {
+		card: "bg-green-50/80 dark:bg-green-950/30 border-green-100/50 dark:border-green-900/50",
+		iconBg: "bg-green-100 dark:bg-green-900/30",
+		iconText: "text-green-600 dark:text-green-400",
+		badge: "text-green-600 dark:text-green-400",
+		value: "text-green-700 dark:text-green-300",
+		subtitle: "text-green-600/70 dark:text-green-400/70",
+	},
+	violet: {
+		card: "bg-violet-50/80 dark:bg-violet-950/30 border-violet-100/50 dark:border-violet-900/50",
+		iconBg: "bg-violet-100 dark:bg-violet-900/30",
+		iconText: "text-violet-600 dark:text-violet-400",
+		badge: "text-violet-600 dark:text-violet-400",
+		value: "text-violet-700 dark:text-violet-300",
+		subtitle: "text-violet-600/70 dark:text-violet-400/70",
+	},
 	slate: {
 		card: "bg-white/70 dark:bg-slate-900/70 border-white/20 dark:border-slate-700/30",
 		iconBg: "bg-slate-100 dark:bg-slate-800/50",

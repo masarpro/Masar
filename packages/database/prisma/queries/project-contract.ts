@@ -153,10 +153,23 @@ export async function upsertProjectContract(data: {
 			},
 		});
 
-		// Sync Project.contractValue
+		// Sync canonical project fields from the contract. The contract is the
+		// place users edit the project timeline, but Project.startDate/endDate is
+		// what the rest of the app (and the owner portal schedule) reads — so they
+		// must mirror the contract. Only overwrite a date when the contract
+		// actually provides one, to avoid wiping existing project dates when the
+		// contract form leaves them blank.
+		const projectSync: {
+			contractValue: number;
+			startDate?: Date;
+			endDate?: Date;
+		} = { contractValue: data.value };
+		if (data.startDate != null) projectSync.startDate = data.startDate;
+		if (data.endDate != null) projectSync.endDate = data.endDate;
+
 		await tx.project.update({
 			where: { id: data.projectId },
-			data: { contractValue: data.value },
+			data: projectSync,
 		});
 
 		return {
