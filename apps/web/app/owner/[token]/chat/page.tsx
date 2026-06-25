@@ -1,5 +1,6 @@
 "use client";
 
+import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
@@ -27,6 +28,7 @@ export default function OwnerPortalChat() {
 	const { data, isLoading, refetch, isFetching } = useQuery(
 		orpc.projectOwner.portal.listMessages.queryOptions({
 			input: { token },
+			...OWNER_QUERY_FRESHNESS,
 		}),
 	) as { data: any; isLoading: boolean; refetch: () => void; isFetching: boolean };
 

@@ -5,6 +5,7 @@ import {
 	OwnerMilestoneTable,
 	type OwnerMilestone,
 } from "@saas/projects-owner/components/OwnerMilestoneTable";
+import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
@@ -22,6 +23,7 @@ export default function OwnerPortalSchedule() {
 	const { data, isLoading } = useQuery(
 		orpc.projectOwner.portal.getSchedule.queryOptions({
 			input: { token },
+			...OWNER_QUERY_FRESHNESS,
 		}),
 	) as { data: any; isLoading: boolean };
 
@@ -99,7 +101,7 @@ export default function OwnerPortalSchedule() {
 
 			{/* Tabs: table + gantt */}
 			<div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 dark:border-slate-800 dark:bg-slate-900">
-				<Tabs defaultValue="table">
+				<Tabs defaultValue="table" dir="rtl">
 					<TabsList className="mb-4 w-full justify-start gap-4">
 						<TabsTrigger value="table">
 							<Table2 className="h-4 w-4 me-2" />

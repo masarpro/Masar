@@ -5,6 +5,7 @@ import {
 	type OwnerSummarySections,
 } from "@saas/projects-owner/components/OwnerSummarySectionCards";
 import { useOwnerSession } from "@saas/projects-owner/hooks/use-owner-session";
+import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
@@ -77,6 +78,7 @@ export default function OwnerPortalSummary() {
 	const { data, isLoading } = useQuery(
 		orpc.projectOwner.portal.getSummary.queryOptions({
 			input: authInput,
+			...OWNER_QUERY_FRESHNESS,
 		}),
 	) as { data: any; isLoading: boolean };
 

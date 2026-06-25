@@ -26,6 +26,7 @@ import {
 	setSessionCookie,
 	clearSessionCookie,
 } from "@saas/projects-owner/hooks/use-owner-session";
+import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
 import { resolveImageSrc } from "@saas/shared/lib/image-src";
 
 export default function OwnerPortalLayout({
@@ -74,6 +75,7 @@ export default function OwnerPortalLayout({
 	const { data: summary, isLoading, error } = useQuery(
 		orpc.projectOwner.portal.getSummary.queryOptions({
 			input: authInput,
+			...OWNER_QUERY_FRESHNESS,
 		}),
 	) as { data: any; isLoading: boolean; error: any };
 

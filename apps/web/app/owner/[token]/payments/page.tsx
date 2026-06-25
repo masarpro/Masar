@@ -4,6 +4,7 @@ import {
 	OwnerPaymentMilestonesGrid,
 	type OwnerPaymentTerm,
 } from "@saas/projects-owner/components/OwnerPaymentMilestonesGrid";
+import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
@@ -88,6 +89,7 @@ export default function OwnerPortalPayments() {
 	const { data, isLoading } = useQuery(
 		orpc.projectOwner.portal.getPayments.queryOptions({
 			input: { token },
+			...OWNER_QUERY_FRESHNESS,
 		}),
 	) as { data: any; isLoading: boolean };
 

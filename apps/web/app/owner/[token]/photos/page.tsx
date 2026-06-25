@@ -1,6 +1,7 @@
 "use client";
 
 import { useOwnerSession } from "@saas/projects-owner/hooks/use-owner-session";
+import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
@@ -79,6 +80,7 @@ export default function OwnerPortalPhotos() {
 	const { data, isLoading } = useQuery(
 		orpc.projectOwner.portal.listPhotos.queryOptions({
 			input: authInput,
+			...OWNER_QUERY_FRESHNESS,
 		}),
 	) as { data: { photos: OwnerPhoto[]; coverPhotoId: string | null } | undefined; isLoading: boolean };
 

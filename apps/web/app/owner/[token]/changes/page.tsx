@@ -1,5 +1,6 @@
 "use client";
 
+import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
@@ -84,6 +85,7 @@ export default function OwnerChangeOrdersPage() {
 	const { data, isLoading } = useQuery(
 		orpc.projectChangeOrders.ownerList.queryOptions({
 			input: { token },
+			...OWNER_QUERY_FRESHNESS,
 		}),
 	) as { data: any; isLoading: boolean };
 
