@@ -27,7 +27,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useCallback, useId, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 
@@ -50,6 +50,13 @@ const CATEGORY_OPTIONS: PhotoCategory[] = [
 
 const MAX_PHOTO_SIZE = 25 * 1024 * 1024; // 25 MB
 const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100 MB
+
+// Cap how many uploads run at once. Each createUploadUrl call performs several
+// DB round-trips (session, access check, storage-usage aggregate) against a
+// small Postgres pool (max 5) over high-latency links. Firing every dropped
+// file in parallel exhausts the pool and makes unrelated requests (notifications,
+// chat, the saves themselves) fail with 500. A small cap keeps the burst bounded.
+const MAX_CONCURRENT_UPLOADS = 3;
 const ACCEPTED_MEDIA_TYPES = {
 	"image/jpeg": [".jpg", ".jpeg"],
 	"image/png": [".png"],
@@ -126,6 +133,10 @@ export function MultiPhotoUploadForm({
 	const [milestoneId, setMilestoneId] = useState<string>("none");
 	const [photoDate, setPhotoDate] = useState<string>(todayLocalDate());
 	const [submitting, setSubmitting] = useState(false);
+
+	// Bounded-concurrency upload queue (see MAX_CONCURRENT_UPLOADS).
+	const uploadQueueRef = useRef<QueueItem[]>([]);
+	const activeUploadsRef = useRef(0);
 
 	const getUploadUrlMutation = useMutation({
 		...orpc.attachments.createUploadUrl.mutationOptions(),
@@ -215,6 +226,32 @@ export function MultiPhotoUploadForm({
 		],
 	);
 
+	// Drain the upload queue while staying under MAX_CONCURRENT_UPLOADS. Each
+	// finished upload triggers another pump() so the queue keeps moving without
+	// ever exceeding the concurrency cap.
+	const pumpQueue = useCallback(() => {
+		while (
+			activeUploadsRef.current < MAX_CONCURRENT_UPLOADS &&
+			uploadQueueRef.current.length > 0
+		) {
+			const next = uploadQueueRef.current.shift();
+			if (!next) break;
+			activeUploadsRef.current += 1;
+			void uploadFile(next).finally(() => {
+				activeUploadsRef.current -= 1;
+				pumpQueue();
+			});
+		}
+	}, [uploadFile]);
+
+	const enqueueUpload = useCallback(
+		(item: QueueItem) => {
+			uploadQueueRef.current.push(item);
+			pumpQueue();
+		},
+		[pumpQueue],
+	);
+
 	const onDrop = useCallback(
 		(acceptedFiles: File[]) => {
 			for (const file of acceptedFiles) {
@@ -236,11 +273,12 @@ export function MultiPhotoUploadForm({
 					mediaType,
 				};
 				setItems((prev) => [...prev, item]);
-				// Kick off upload immediately
-				void uploadFile(item);
+				// Queue the upload instead of firing it immediately, so a large
+				// drop doesn't overwhelm the connection pool.
+				enqueueUpload(item);
 			}
 		},
-		[reactId, t, uploadFile],
+		[reactId, t, enqueueUpload],
 	);
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -269,7 +307,7 @@ export function MultiPhotoUploadForm({
 
 	const retryItem = (id: string) => {
 		const target = items.find((it) => it.id === id);
-		if (target) void uploadFile(target);
+		if (target) enqueueUpload(target);
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {

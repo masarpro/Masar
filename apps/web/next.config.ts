@@ -114,6 +114,11 @@ const nextConfig: NextConfig = {
 			`script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
 			"style-src 'self' 'unsafe-inline' https://unpkg.com",
 			`img-src 'self' https: data: blob: https://*.supabase.co ${supabaseStorage}`,
+			// Video/audio: blob: for local previews before upload, 'self' for the
+			// /image-proxy streaming route, and Supabase for any direct media URLs.
+			// Without this, media falls back to default-src 'self' and blob:
+			// previews are blocked ("Loading media from blob: violates CSP").
+			`media-src 'self' blob: data: https://*.supabase.co ${supabaseStorage}`,
 			`connect-src 'self' blob: https://*.supabase.co ${supabaseStorage}`,
 			`frame-src 'self' ${supabaseStorage} https://docs.google.com blob:`,
 			"font-src 'self' https://unpkg.com",
