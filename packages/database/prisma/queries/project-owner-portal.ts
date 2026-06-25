@@ -584,36 +584,50 @@ export async function getOwnerSummary(organizationId: string, projectId: string)
 }
 
 /**
- * Get owner schedule (milestones)
+ * Get owner schedule (milestones + project timeline dates).
+ *
+ * The project timeline shown to the owner (start/end dates) is sourced from the
+ * project CONTRACT — that is where the contractor edits the agreed timeline —
+ * falling back to the project's own dates when no contract dates are set.
  */
 export async function getOwnerSchedule(organizationId: string, projectId: string) {
-	// Mirror the execution section: read the new milestone fields and order
-	// by orderIndex (NOT the legacy sortOrder/plannedDate/isCompleted fields).
-	const milestones = await db.projectMilestone.findMany({
-		where: { organizationId, projectId },
-		orderBy: { orderIndex: "asc" },
-		select: {
-			id: true,
-			title: true,
-			description: true,
-			orderIndex: true,
-			plannedStart: true,
-			plannedEnd: true,
-			actualStart: true,
-			actualEnd: true,
-			status: true,
-			progress: true,
-			isCritical: true,
-		},
-	});
-
-	// If no milestones exist, generate default phases from project dates
-	if (milestones.length === 0) {
-		const project = await db.project.findFirst({
+	const [contract, project, milestones] = await Promise.all([
+		db.projectContract.findFirst({
+			where: { organizationId, projectId },
+			select: { startDate: true, endDate: true },
+		}),
+		db.project.findFirst({
 			where: { id: projectId, organizationId },
 			select: { startDate: true, endDate: true },
-		});
+		}),
+		// Mirror the execution section: read the new milestone fields and order
+		// by orderIndex (NOT the legacy sortOrder/plannedDate/isCompleted fields).
+		db.projectMilestone.findMany({
+			where: { organizationId, projectId },
+			orderBy: { orderIndex: "asc" },
+			select: {
+				id: true,
+				title: true,
+				description: true,
+				orderIndex: true,
+				plannedStart: true,
+				plannedEnd: true,
+				actualStart: true,
+				actualEnd: true,
+				status: true,
+				progress: true,
+				isCritical: true,
+			},
+		}),
+	]);
 
+	// Contract dates are the source of truth for the timeline; fall back to the
+	// project's own dates when the contract leaves them blank.
+	const startDate = contract?.startDate ?? project?.startDate ?? null;
+	const endDate = contract?.endDate ?? project?.endDate ?? null;
+
+	// If no milestones exist, generate default phases spanning the contract dates
+	if (milestones.length === 0) {
 		const defaultPhases = [
 			"بداية المشروع",
 			"الأساسات",
@@ -622,25 +636,33 @@ export async function getOwnerSchedule(organizationId: string, projectId: string
 			"التسليم",
 		];
 
-		return defaultPhases.map((title, index) => ({
-			id: `default-${index}`,
-			title,
-			description: null,
-			orderIndex: index,
-			plannedStart: project?.startDate ?? null,
-			plannedEnd: project?.endDate ?? null,
-			actualStart: null,
-			actualEnd: null,
-			status: "PLANNED" as const,
-			progress: 0,
-			isCritical: false,
-		}));
+		return {
+			startDate,
+			endDate,
+			milestones: defaultPhases.map((title, index) => ({
+				id: `default-${index}`,
+				title,
+				description: null,
+				orderIndex: index,
+				plannedStart: startDate,
+				plannedEnd: endDate,
+				actualStart: null,
+				actualEnd: null,
+				status: "PLANNED" as const,
+				progress: 0,
+				isCritical: false,
+			})),
+		};
 	}
 
-	return milestones.map((m) => ({
-		...m,
-		progress: Number(m.progress),
-	}));
+	return {
+		startDate,
+		endDate,
+		milestones: milestones.map((m) => ({
+			...m,
+			progress: Number(m.progress),
+		})),
+	};
 }
 
 /**

@@ -28,16 +28,16 @@ export const getOwnerScheduleProcedure = publicProcedure
 			throwOwnerTokenError(result.reason);
 		}
 
-		// Get schedule
-		const milestones = await getOwnerSchedule(
+		// Get schedule — timeline dates are sourced from the project contract.
+		const schedule = await getOwnerSchedule(
 			result.organizationId,
 			result.projectId,
 		);
 
 		return {
 			projectName: result.project.name,
-			startDate: result.project.startDate,
-			endDate: result.project.endDate,
-			milestones,
+			startDate: schedule.startDate,
+			endDate: schedule.endDate,
+			milestones: schedule.milestones,
 		};
 	});
