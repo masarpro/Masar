@@ -1,4 +1,6 @@
 import { addProgressUpdateProcedure } from "./procedures/add-progress-update";
+import { bulkDeletePhotosProcedure } from "./procedures/bulk-delete-photos";
+import { bulkUpdatePhotosProcedure } from "./procedures/bulk-update-photos";
 import { createDailyReportProcedure } from "./procedures/create-daily-report";
 import { createIssueProcedure } from "./procedures/create-issue";
 import { createPhotoProcedure } from "./procedures/create-photo";
@@ -25,6 +27,8 @@ export const projectFieldRouter = {
 	listPhotos: listPhotosProcedure,
 	updatePhoto: updatePhotoProcedure,
 	deletePhoto: deletePhotoProcedure,
+	bulkUpdatePhotos: bulkUpdatePhotosProcedure,
+	bulkDeletePhotos: bulkDeletePhotosProcedure,
 	setCoverPhoto: setCoverPhotoProcedure,
 	unsetCoverPhoto: unsetCoverPhotoProcedure,
 

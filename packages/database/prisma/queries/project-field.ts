@@ -119,7 +119,9 @@ export async function getProjectPhotos(
 				uploadedBy: { select: { id: true, name: true, image: true } },
 				milestone: { select: { id: true, title: true, status: true, orderIndex: true } },
 			},
-			orderBy: { createdAt: "desc" },
+			// Order by the photo's actual date (takenAt) so photos land in their
+			// chronological position regardless of when they were uploaded.
+			orderBy: [{ takenAt: "desc" }, { createdAt: "desc" }],
 			take: options?.limit ?? 50,
 			skip: options?.offset ?? 0,
 		}),
@@ -176,6 +178,7 @@ export async function updatePhoto(
 		caption?: string | null;
 		category?: PhotoCategory;
 		milestoneId?: string | null;
+		takenAt?: Date;
 	},
 ) {
 	const existing = await db.projectPhoto.findFirst({
@@ -204,6 +207,7 @@ export async function updatePhoto(
 			caption: data.caption,
 			category: data.category,
 			milestoneId: data.milestoneId,
+			takenAt: data.takenAt,
 		},
 		include: {
 			uploadedBy: { select: { id: true, name: true, image: true } },
@@ -261,6 +265,58 @@ export async function deletePhoto(photoId: string, projectId: string) {
 	});
 
 	return deleted;
+}
+
+/**
+ * Bulk-update metadata for several photos at once (must belong to project).
+ * Any field left undefined is unchanged; milestoneId === null detaches.
+ */
+export async function bulkUpdatePhotos(
+	photoIds: string[],
+	projectId: string,
+	data: {
+		category?: PhotoCategory;
+		milestoneId?: string | null;
+		takenAt?: Date;
+	},
+) {
+	if (photoIds.length === 0) {
+		return { count: 0 };
+	}
+
+	// Validate milestone belongs to same project (if attaching)
+	if (data.milestoneId) {
+		const milestone = await db.projectMilestone.findFirst({
+			where: { id: data.milestoneId, projectId },
+			select: { id: true },
+		});
+		if (!milestone) {
+			throw new Error("المرحلة غير موجودة أو لا تنتمي لهذا المشروع");
+		}
+	}
+
+	// Only photos that actually belong to this project are touched.
+	return db.projectPhoto.updateMany({
+		where: { id: { in: photoIds }, projectId },
+		data: {
+			category: data.category,
+			milestoneId: data.milestoneId,
+			takenAt: data.takenAt,
+		},
+	});
+}
+
+/**
+ * Bulk-delete several photos at once (must belong to project).
+ */
+export async function bulkDeletePhotos(photoIds: string[], projectId: string) {
+	if (photoIds.length === 0) {
+		return { count: 0 };
+	}
+
+	return db.projectPhoto.deleteMany({
+		where: { id: { in: photoIds }, projectId },
+	});
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

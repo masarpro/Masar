@@ -99,6 +99,13 @@ function formatFileSize(bytes: number): string {
 	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+/** Today's date as a local YYYY-MM-DD string for <input type="date">. */
+function todayLocalDate(): string {
+	const now = new Date();
+	const offsetMs = now.getTimezoneOffset() * 60 * 1000;
+	return new Date(now.getTime() - offsetMs).toISOString().split("T")[0];
+}
+
 export function MultiPhotoUploadForm({
 	organizationId,
 	organizationSlug,
@@ -117,6 +124,7 @@ export function MultiPhotoUploadForm({
 	const [items, setItems] = useState<QueueItem[]>([]);
 	const [category, setCategory] = useState<PhotoCategory>("PROGRESS");
 	const [milestoneId, setMilestoneId] = useState<string>("none");
+	const [photoDate, setPhotoDate] = useState<string>(todayLocalDate());
 	const [submitting, setSubmitting] = useState(false);
 
 	const getUploadUrlMutation = useMutation({
@@ -294,6 +302,7 @@ export function MultiPhotoUploadForm({
 					mediaType: item.mediaType,
 					mimeType: item.file.type,
 					milestoneId: milestoneId === "none" ? undefined : milestoneId,
+					takenAt: photoDate ? new Date(photoDate) : undefined,
 				});
 				updateItem(item.id, { status: "saved" });
 				savedCount++;
@@ -360,8 +369,18 @@ export function MultiPhotoUploadForm({
 			)}
 
 			<form onSubmit={handleSubmit} className="space-y-6">
-				{/* Batch settings: category + milestone */}
-				<div className="grid grid-cols-1 gap-4 rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:grid-cols-2">
+				{/* Batch settings: date + category + milestone */}
+				<div className="grid grid-cols-1 gap-4 rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:grid-cols-2 lg:grid-cols-3">
+					<div className="space-y-2">
+						<Label>{t("projects.photos.photoDate")}</Label>
+						<Input
+							type="date"
+							value={photoDate}
+							max={todayLocalDate()}
+							onChange={(e) => setPhotoDate(e.target.value)}
+							className="rounded-xl"
+						/>
+					</div>
 					<div className="space-y-2">
 						<Label>{t("projects.field.categoryLabel")}</Label>
 						<Select

@@ -1,27 +1,21 @@
 import { ORPCError } from "@orpc/server";
-import { updatePhoto } from "@repo/database";
+import { bulkUpdatePhotos } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
-export const updatePhotoProcedure = subscriptionProcedure
+export const bulkUpdatePhotosProcedure = subscriptionProcedure
 	.route({
 		method: "PATCH",
-		path: "/project-field/photos/{photoId}",
+		path: "/project-field/photos/bulk",
 		tags: ["Project Field"],
-		summary: "Update photo metadata (caption, category, milestone)",
+		summary: "Bulk update photo metadata (category, milestone, date)",
 	})
 	.input(
 		z.object({
 			organizationId: z.string().trim().max(100),
 			projectId: z.string().trim().max(100),
-			photoId: z.string().trim().max(100),
-			caption: z
-				.string()
-				.trim()
-				.max(200)
-				.optional()
-				.transform((v) => (v === undefined ? undefined : v === "" ? null : v)),
+			photoIds: z.array(z.string().trim().max(100)).min(1).max(500),
 			category: z
 				.enum(["PROGRESS", "ISSUE", "EQUIPMENT", "MATERIAL", "SAFETY", "OTHER"])
 				.optional(),
@@ -48,13 +42,12 @@ export const updatePhotoProcedure = subscriptionProcedure
 					: input.milestoneId;
 
 		try {
-			const photo = await updatePhoto(input.photoId, input.projectId, {
-				caption: input.caption,
+			const result = await bulkUpdatePhotos(input.photoIds, input.projectId, {
 				category: input.category,
 				milestoneId: milestoneValue,
 				takenAt: input.takenAt,
 			});
-			return photo;
+			return { success: true, count: result.count };
 		} catch (error) {
 			if (error instanceof Error) {
 				throw new ORPCError("BAD_REQUEST", { message: error.message });

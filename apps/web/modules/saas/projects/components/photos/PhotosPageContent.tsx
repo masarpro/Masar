@@ -31,6 +31,7 @@ import {
 } from "@ui/components/select";
 import {
 	Camera,
+	CheckSquare,
 	ChevronDown,
 	ChevronLeft,
 	ChevronRight,
@@ -41,6 +42,7 @@ import {
 	Pencil,
 	Play,
 	Plus,
+	Square,
 	Star,
 	StarOff,
 	Trash2,
@@ -95,6 +97,7 @@ interface PhotoItem {
 	mediaType?: "PHOTO" | "VIDEO";
 	mimeType?: string | null;
 	createdAt: string | Date;
+	takenAt: string | Date;
 	milestone: { id: string; title: string; status: string; orderIndex: number } | null;
 }
 
@@ -129,6 +132,17 @@ function formatPhotoDate(date: Date | string): string {
 	}).format(new Date(date));
 }
 
+/** Format a date as a local YYYY-MM-DD string for <input type="date">. */
+function toDateInputValue(date: Date | string): string {
+	const d = new Date(date);
+	const offsetMs = d.getTimezoneOffset() * 60 * 1000;
+	return new Date(d.getTime() - offsetMs).toISOString().split("T")[0];
+}
+
+function todayLocalDate(): string {
+	return toDateInputValue(new Date());
+}
+
 export function PhotosPageContent({
 	organizationId,
 	organizationSlug,
@@ -147,6 +161,10 @@ export function PhotosPageContent({
 	const [photoToDelete, setPhotoToDelete] = useState<PhotoItem | null>(null);
 	const [photoToEdit, setPhotoToEdit] = useState<PhotoItem | null>(null);
 	const [isUploadOpen, setIsUploadOpen] = useState(false);
+	const [selectMode, setSelectMode] = useState(false);
+	const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+	const [bulkEditOpen, setBulkEditOpen] = useState(false);
+	const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
 	const photosQuery = useQuery(
 		orpc.projectField.listPhotos.queryOptions({
@@ -200,6 +218,38 @@ export function PhotosPageContent({
 		},
 	});
 
+	const bulkDeleteMutation = useMutation({
+		...orpc.projectField.bulkDeletePhotos.mutationOptions(),
+		onSuccess: (res) => {
+			toast.success(t("projects.photos.bulkDeleted", { count: res.count }));
+			setBulkDeleteOpen(false);
+			setSelectedIds(new Set());
+			setSelectMode(false);
+			queryClient.invalidateQueries({ queryKey: ["projectField"] });
+			queryClient.invalidateQueries({ queryKey: ["projects"] });
+		},
+		onError: () => {
+			toast.error(t("projects.field.photoDeleteError"));
+		},
+	});
+
+	const toggleSelect = (id: string) => {
+		setSelectedIds((prev) => {
+			const next = new Set(prev);
+			if (next.has(id)) {
+				next.delete(id);
+			} else {
+				next.add(id);
+			}
+			return next;
+		});
+	};
+
+	const exitSelectMode = () => {
+		setSelectMode(false);
+		setSelectedIds(new Set());
+	};
+
 	const allPhotos = (photosQuery.data?.photos ?? []) as unknown as PhotoItem[];
 	const coverPhotoId = photosQuery.data?.coverPhotoId ?? null;
 	const milestones = milestonesQuery.data?.milestones ?? [];
@@ -218,37 +268,58 @@ export function PhotosPageContent({
 	const groupedPhotos = useMemo(() => {
 		const groups: Array<{ key: string; label: string; items: PhotoItem[] }> = [];
 
+		// أحدث صورة (تاريخاً ووقتاً) أولاً داخل كل مجموعة.
+		const sortByRecency = (a: PhotoItem, b: PhotoItem) => {
+			const ta = new Date(a.takenAt).getTime();
+			const tb = new Date(b.takenAt).getTime();
+			if (tb !== ta) return tb - ta;
+			return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+		};
+		// أحدث تاريخ صورة في المجموعة — لترتيب المجموعات (الأحدث بالأعلى).
+		const groupRecency = (items: PhotoItem[]) =>
+			items.reduce((max, p) => Math.max(max, new Date(p.takenAt).getTime()), 0);
+
 		if (groupBy === "milestone") {
 			const byMilestone: Record<string, PhotoItem[]> = {};
-			const orderByKey: Record<string, number> = {};
 			const titleByKey: Record<string, string> = {};
 
 			for (const photo of filteredPhotos) {
 				const key = photo.milestone?.id ?? "__none__";
 				if (!byMilestone[key]) {
 					byMilestone[key] = [];
-					orderByKey[key] = photo.milestone?.orderIndex ?? 9999;
 					titleByKey[key] =
 						photo.milestone?.title ?? t("projects.photos.noMilestone");
 				}
 				byMilestone[key].push(photo);
 			}
 
-			const keys = Object.keys(byMilestone).sort(
-				(a, b) => orderByKey[a] - orderByKey[b],
-			);
+			// مجموعة "بدون مرحلة" تنزل دائماً للأسفل، وباقي المراحل تُرتّب حسب
+			// أحدث صورة فيها → المراحل الأخيرة بالأعلى والأولى بالأسفل.
+			const keys = Object.keys(byMilestone).sort((a, b) => {
+				if (a === "__none__") return 1;
+				if (b === "__none__") return -1;
+				return groupRecency(byMilestone[b]) - groupRecency(byMilestone[a]);
+			});
 			for (const key of keys) {
-				groups.push({ key, label: titleByKey[key], items: byMilestone[key] });
+				groups.push({
+					key,
+					label: titleByKey[key],
+					items: byMilestone[key].sort(sortByRecency),
+				});
 			}
 		} else if (groupBy === "date") {
 			const byDate: Record<string, PhotoItem[]> = {};
 			for (const photo of filteredPhotos) {
-				const dateKey = new Date(photo.createdAt).toISOString().split("T")[0];
+				const dateKey = new Date(photo.takenAt).toISOString().split("T")[0];
 				if (!byDate[dateKey]) byDate[dateKey] = [];
 				byDate[dateKey].push(photo);
 			}
 			for (const key of Object.keys(byDate).sort((a, b) => b.localeCompare(a))) {
-				groups.push({ key, label: formatPhotoDate(key), items: byDate[key] });
+				groups.push({
+					key,
+					label: formatPhotoDate(key),
+					items: byDate[key].sort(sortByRecency),
+				});
 			}
 		} else {
 			const byCategory: Record<string, PhotoItem[]> = {};
@@ -257,12 +328,12 @@ export function PhotosPageContent({
 				byCategory[photo.category].push(photo);
 			}
 			for (const key of Object.keys(byCategory).sort(
-				(a, b) => byCategory[b].length - byCategory[a].length,
+				(a, b) => groupRecency(byCategory[b]) - groupRecency(byCategory[a]),
 			)) {
 				groups.push({
 					key,
 					label: t(`projects.field.photoCategory.${key}`),
-					items: byCategory[key],
+					items: byCategory[key].sort(sortByRecency),
 				});
 			}
 		}
@@ -273,7 +344,7 @@ export function PhotosPageContent({
 	const lightboxSlides = useMemo(
 		() =>
 			filteredPhotos.map((photo) => {
-				const description = `${t(`projects.field.photoCategory.${photo.category}`)} — ${formatPhotoDate(photo.createdAt)}${
+				const description = `${t(`projects.field.photoCategory.${photo.category}`)} — ${formatPhotoDate(photo.takenAt)}${
 					photo.milestone ? ` — ${photo.milestone.title}` : ""
 				}`;
 				if (photo.mediaType === "VIDEO") {
@@ -327,20 +398,37 @@ export function PhotosPageContent({
 					</p>
 				</div>
 				{canEdit && (
-					<Button
-						type="button"
-						onClick={() => setIsUploadOpen((v) => !v)}
-						className="rounded-xl"
-					>
-						{isUploadOpen ? (
-							<ChevronUp className="me-1.5 h-4 w-4" />
-						) : (
-							<Plus className="me-1.5 h-4 w-4" />
+					<div className="flex items-center gap-2">
+						{totalCount > 0 && (
+							<Button
+								type="button"
+								variant={selectMode ? "secondary" : "outline"}
+								onClick={() =>
+									selectMode ? exitSelectMode() : setSelectMode(true)
+								}
+								className="rounded-xl"
+							>
+								<CheckSquare className="me-1.5 h-4 w-4" />
+								{selectMode
+									? t("common.cancel")
+									: t("projects.photos.selectMode")}
+							</Button>
 						)}
-						{isUploadOpen
-							? t("projects.photos.closeUpload")
-							: t("projects.photos.uploadButton")}
-					</Button>
+						<Button
+							type="button"
+							onClick={() => setIsUploadOpen((v) => !v)}
+							className="rounded-xl"
+						>
+							{isUploadOpen ? (
+								<ChevronUp className="me-1.5 h-4 w-4" />
+							) : (
+								<Plus className="me-1.5 h-4 w-4" />
+							)}
+							{isUploadOpen
+								? t("projects.photos.closeUpload")
+								: t("projects.photos.uploadButton")}
+						</Button>
+					</div>
 				)}
 			</div>
 
@@ -446,6 +534,62 @@ export function PhotosPageContent({
 				</div>
 			)}
 
+			{/* Selection toolbar */}
+			{canEdit && selectMode && totalCount > 0 && (
+				<div className="sticky top-2 z-20 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-2.5 dark:bg-primary/10">
+					<div className="flex items-center gap-3">
+						<span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+							{t("projects.photos.selectedCount", {
+								count: selectedIds.size,
+							})}
+						</span>
+						<button
+							type="button"
+							onClick={() => {
+								const allSelected =
+									filteredPhotos.length > 0 &&
+									filteredPhotos.every((p) => selectedIds.has(p.id));
+								setSelectedIds(
+									allSelected
+										? new Set()
+										: new Set(filteredPhotos.map((p) => p.id)),
+								);
+							}}
+							className="text-xs font-medium text-primary hover:underline"
+						>
+							{filteredPhotos.length > 0 &&
+							filteredPhotos.every((p) => selectedIds.has(p.id))
+								? t("projects.photos.deselectAll")
+								: t("projects.photos.selectAll")}
+						</button>
+					</div>
+					<div className="flex items-center gap-2">
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							className="rounded-lg"
+							disabled={selectedIds.size === 0}
+							onClick={() => setBulkEditOpen(true)}
+						>
+							<Pencil className="me-1.5 h-3.5 w-3.5" />
+							{t("projects.photos.bulkEdit")}
+						</Button>
+						<Button
+							type="button"
+							variant="error"
+							size="sm"
+							className="rounded-lg"
+							disabled={selectedIds.size === 0}
+							onClick={() => setBulkDeleteOpen(true)}
+						>
+							<Trash2 className="me-1.5 h-3.5 w-3.5" />
+							{t("projects.photos.deleteSelected")}
+						</Button>
+					</div>
+				</div>
+			)}
+
 			{/* Content */}
 			{isLoading ? (
 				<div className="flex items-center justify-center py-16">
@@ -491,6 +635,9 @@ export function PhotosPageContent({
 										photo={photo}
 										isCover={photo.id === coverPhotoId}
 										canEdit={canEdit}
+										selectMode={selectMode}
+										selected={selectedIds.has(photo.id)}
+										onToggleSelect={() => toggleSelect(photo.id)}
 										onOpen={() => openLightbox(photo.id)}
 										onSetCover={() =>
 											setCoverMutation.mutate({
@@ -558,6 +705,58 @@ export function PhotosPageContent({
 				onClose={() => setPhotoToEdit(null)}
 			/>
 
+			{/* Bulk edit dialog */}
+			<BulkEditDialog
+				open={bulkEditOpen}
+				count={selectedIds.size}
+				milestones={milestones}
+				organizationId={organizationId}
+				projectId={projectId}
+				photoIds={[...selectedIds]}
+				onClose={() => setBulkEditOpen(false)}
+				onSaved={() => {
+					setBulkEditOpen(false);
+					exitSelectMode();
+				}}
+			/>
+
+			{/* Bulk delete dialog */}
+			<AlertDialog
+				open={bulkDeleteOpen}
+				onOpenChange={(open) => !open && setBulkDeleteOpen(false)}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							{t("projects.photos.deleteSelected")}
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							{t("projects.photos.deleteSelectedConfirm", {
+								count: selectedIds.size,
+							})}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+						<Button
+							variant="error"
+							onClick={() =>
+								bulkDeleteMutation.mutate({
+									organizationId,
+									projectId,
+									photoIds: [...selectedIds],
+								})
+							}
+							disabled={bulkDeleteMutation.isPending}
+						>
+							{bulkDeleteMutation.isPending
+								? t("common.saving")
+								: t("projects.photos.deleteSelected")}
+						</Button>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+
 			{/* Lightbox */}
 			<Lightbox
 				open={lightboxIndex >= 0}
@@ -590,6 +789,9 @@ interface PhotoCardProps {
 	photo: PhotoItem;
 	isCover: boolean;
 	canEdit: boolean;
+	selectMode: boolean;
+	selected: boolean;
+	onToggleSelect: () => void;
 	onOpen: () => void;
 	onSetCover: () => void;
 	onUnsetCover: () => void;
@@ -602,6 +804,9 @@ function PhotoCard({
 	photo,
 	isCover,
 	canEdit,
+	selectMode,
+	selected,
+	onToggleSelect,
 	onOpen,
 	onSetCover,
 	onUnsetCover,
@@ -615,14 +820,16 @@ function PhotoCard({
 	return (
 		<div
 			className={`group relative aspect-square overflow-hidden rounded-xl border bg-slate-50 transition-all hover:shadow-lg dark:bg-slate-800/50 ${
-				isCover
-					? "border-amber-400 ring-2 ring-amber-300 dark:border-amber-500"
-					: "border-slate-100 hover:border-primary/40 dark:border-slate-800"
+				selected
+					? "border-primary ring-2 ring-primary/60"
+					: isCover
+						? "border-amber-400 ring-2 ring-amber-300 dark:border-amber-500"
+						: "border-slate-100 hover:border-primary/40 dark:border-slate-800"
 			}`}
 		>
 			<button
 				type="button"
-				onClick={onOpen}
+				onClick={selectMode ? onToggleSelect : onOpen}
 				className="absolute inset-0 size-full"
 			>
 				{photo.mediaType === "VIDEO" ? (
@@ -653,6 +860,25 @@ function PhotoCard({
 					</div>
 				)}
 			</button>
+
+			{/* Selection checkbox */}
+			{selectMode && (
+				<button
+					type="button"
+					onClick={(e) => {
+						e.stopPropagation();
+						onToggleSelect();
+					}}
+					className="absolute end-1.5 top-1.5 z-10 flex size-7 items-center justify-center rounded-lg bg-white/90 text-slate-700 shadow-md dark:bg-slate-900/90 dark:text-slate-200"
+					aria-label={t("projects.photos.selectMode")}
+				>
+					{selected ? (
+						<CheckSquare className="size-5 text-primary" />
+					) : (
+						<Square className="size-5" />
+					)}
+				</button>
+			)}
 
 			{/* Cover badge */}
 			{isCover && (
@@ -693,7 +919,7 @@ function PhotoCard({
 			</div>
 
 			{/* Action buttons */}
-			{canEdit && (
+			{canEdit && !selectMode && (
 				<div className="absolute end-1.5 top-1.5 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
 					<button
 						type="button"
@@ -775,12 +1001,14 @@ function EditPhotoDialog({
 	const [caption, setCaption] = useState("");
 	const [category, setCategory] = useState<PhotoCategory>("PROGRESS");
 	const [milestoneId, setMilestoneId] = useState<string>("none");
+	const [takenAt, setTakenAt] = useState<string>("");
 
 	useEffect(() => {
 		if (photo) {
 			setCaption(photo.caption ?? "");
 			setCategory(photo.category);
 			setMilestoneId(photo.milestone?.id ?? "none");
+			setTakenAt(toDateInputValue(photo.takenAt));
 		}
 	}, [photo]);
 
@@ -805,6 +1033,7 @@ function EditPhotoDialog({
 			caption: caption.trim(),
 			category,
 			milestoneId: milestoneId === "none" ? "none" : milestoneId,
+			takenAt: takenAt ? new Date(takenAt) : undefined,
 		});
 	};
 
@@ -832,6 +1061,15 @@ function EditPhotoDialog({
 							onChange={(e) => setCaption(e.target.value)}
 							placeholder={t("projects.photos.captionPlaceholder")}
 							maxLength={200}
+						/>
+					</div>
+					<div className="space-y-2">
+						<Label>{t("projects.photos.photoDate")}</Label>
+						<Input
+							type="date"
+							value={takenAt}
+							max={todayLocalDate()}
+							onChange={(e) => setTakenAt(e.target.value)}
 						/>
 					</div>
 					<div className="space-y-2">
@@ -879,6 +1117,152 @@ function EditPhotoDialog({
 					</Button>
 					<Button onClick={handleSave} disabled={updateMutation.isPending}>
 						{updateMutation.isPending ? t("common.saving") : t("common.save")}
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
+// ─── Bulk Edit Dialog ──────────────────────────────────────
+
+interface BulkEditDialogProps {
+	open: boolean;
+	count: number;
+	milestones: Array<{ id: string; title: string }>;
+	organizationId: string;
+	projectId: string;
+	photoIds: string[];
+	onClose: () => void;
+	onSaved: () => void;
+}
+
+const KEEP = "__keep__";
+
+function BulkEditDialog({
+	open,
+	count,
+	milestones,
+	organizationId,
+	projectId,
+	photoIds,
+	onClose,
+	onSaved,
+}: BulkEditDialogProps) {
+	const t = useTranslations();
+	const queryClient = useQueryClient();
+	const [takenAt, setTakenAt] = useState<string>("");
+	const [category, setCategory] = useState<string>(KEEP);
+	const [milestoneId, setMilestoneId] = useState<string>(KEEP);
+
+	useEffect(() => {
+		if (open) {
+			setTakenAt("");
+			setCategory(KEEP);
+			setMilestoneId(KEEP);
+		}
+	}, [open]);
+
+	const bulkUpdateMutation = useMutation({
+		...orpc.projectField.bulkUpdatePhotos.mutationOptions(),
+		onSuccess: (res) => {
+			toast.success(t("projects.photos.bulkUpdated", { count: res.count }));
+			queryClient.invalidateQueries({ queryKey: ["projectField"] });
+			onSaved();
+		},
+		onError: () => {
+			toast.error(t("common.error"));
+		},
+	});
+
+	const hasChange =
+		!!takenAt || category !== KEEP || milestoneId !== KEEP;
+
+	const handleSave = () => {
+		if (photoIds.length === 0 || !hasChange) return;
+		bulkUpdateMutation.mutate({
+			organizationId,
+			projectId,
+			photoIds,
+			category:
+				category === KEEP ? undefined : (category as PhotoCategory),
+			milestoneId: milestoneId === KEEP ? undefined : milestoneId,
+			takenAt: takenAt ? new Date(takenAt) : undefined,
+		});
+	};
+
+	return (
+		<Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+			<DialogContent className="sm:max-w-md">
+				<DialogHeader>
+					<DialogTitle>
+						{t("projects.photos.bulkEditTitle", { count })}
+					</DialogTitle>
+				</DialogHeader>
+				<div className="space-y-4">
+					<p className="text-xs text-slate-500 dark:text-slate-400">
+						{t("projects.photos.bulkEditHint")}
+					</p>
+					<div className="space-y-2">
+						<Label>{t("projects.photos.photoDate")}</Label>
+						<Input
+							type="date"
+							value={takenAt}
+							max={todayLocalDate()}
+							onChange={(e) => setTakenAt(e.target.value)}
+						/>
+					</div>
+					<div className="space-y-2">
+						<Label>{t("projects.field.categoryLabel")}</Label>
+						<Select value={category} onValueChange={setCategory}>
+							<SelectTrigger>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value={KEEP}>
+									{t("projects.photos.keepUnchanged")}
+								</SelectItem>
+								{ALL_CATEGORIES.map((cat) => (
+									<SelectItem key={cat} value={cat}>
+										{t(`projects.field.photoCategory.${cat}`)}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+					<div className="space-y-2">
+						<Label>{t("projects.photos.milestone")}</Label>
+						<Select value={milestoneId} onValueChange={setMilestoneId}>
+							<SelectTrigger>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value={KEEP}>
+									{t("projects.photos.keepUnchanged")}
+								</SelectItem>
+								<SelectItem value="none">
+									{t("projects.photos.noMilestone")}
+								</SelectItem>
+								{milestones.map((m) => (
+									<SelectItem key={m.id} value={m.id}>
+										{m.title}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+				</div>
+				<DialogFooter>
+					<Button variant="outline" onClick={onClose}>
+						{t("common.cancel")}
+					</Button>
+					<Button
+						onClick={handleSave}
+						disabled={bulkUpdateMutation.isPending || !hasChange}
+					>
+						{bulkUpdateMutation.isPending
+							? t("common.saving")
+							: t("common.save")}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
