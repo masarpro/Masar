@@ -87,25 +87,38 @@ export default function OwnerPortalPhotos() {
 	const allPhotos = data?.photos ?? [];
 	const coverPhotoId = data?.coverPhotoId ?? null;
 
-	// Group by milestone, sorted by orderIndex (no milestone last)
+	// نفس ترتيب تبويب الصور في المشروع: تجميع حسب المرحلة، المجموعات مرتّبة
+	// حسب أحدث صورة فيها (الأحدث بالأعلى) و"بدون مرحلة" دائماً بالأسفل،
+	// والصور داخل كل مجموعة الأحدث أولاً (takenAt ثم createdAt).
 	const grouped = useMemo(() => {
+		const sortByRecency = (a: OwnerPhoto, b: OwnerPhoto) => {
+			const ta = new Date(a.takenAt).getTime();
+			const tb = new Date(b.takenAt).getTime();
+			if (tb !== ta) return tb - ta;
+			return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+		};
+		const groupRecency = (items: OwnerPhoto[]) =>
+			items.reduce((max, p) => Math.max(max, new Date(p.takenAt).getTime()), 0);
+
 		const byKey: Record<string, OwnerPhoto[]> = {};
 		const titleByKey: Record<string, string> = {};
-		const orderByKey: Record<string, number> = {};
 
 		for (const photo of allPhotos) {
 			const key = photo.milestone?.id ?? "__none__";
 			if (!byKey[key]) {
 				byKey[key] = [];
 				titleByKey[key] = photo.milestone?.title ?? t("projects.photos.noMilestone");
-				orderByKey[key] = photo.milestone?.orderIndex ?? 9999;
 			}
 			byKey[key].push(photo);
 		}
 
 		return Object.keys(byKey)
-			.sort((a, b) => orderByKey[a] - orderByKey[b])
-			.map((key) => ({ key, title: titleByKey[key], items: byKey[key] }));
+			.sort((a, b) => {
+				if (a === "__none__") return 1;
+				if (b === "__none__") return -1;
+				return groupRecency(byKey[b]) - groupRecency(byKey[a]);
+			})
+			.map((key) => ({ key, title: titleByKey[key], items: byKey[key].sort(sortByRecency) }));
 	}, [allPhotos, t]);
 
 	const lightboxSlides = useMemo(
