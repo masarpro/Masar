@@ -78,11 +78,17 @@ export function ProjectOverview({
 						projectStatus={projectData?.status}
 					/>
 					<FinanceBudgetCard
-						contractValue={financeSummary?.contractValue ?? 0}
+						contractValue={
+							financeSummary?.adjustedContractValueGross ??
+							financeSummary?.grossContractValue ??
+							financeSummary?.contractValue ??
+							0
+						}
 						actualExpenses={financeSummary?.actualExpenses ?? 0}
 						totalPayments={financeSummary?.totalPayments ?? 0}
 						remaining={financeSummary?.remaining ?? 0}
 						claimsPaid={financeSummary?.claimsPaid ?? 0}
+						expectedProfit={financeSummary?.expectedProfit ?? 0}
 					/>
 					<TimelineScheduleCard
 						projectProgress={projectData?.progress != null ? Number(projectData.progress) : undefined}

@@ -22,12 +22,28 @@ export async function getProjectFinanceSummary(
 	thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
 	// Run all queries in parallel
-	const [project, expensesTotal, paymentsTotal, claimsData, upcomingClaims, approvedCOImpact, subcontractPaymentsTotal] =
+	const [project, contract, costStudies, expensesTotal, paymentsTotal, claimsData, upcomingClaims, approvedCOImpact, subcontractPaymentsTotal] =
 		await Promise.all([
 			// Get project contract value
 			db.project.findFirst({
 				where: { id: projectId, organizationId },
 				select: { contractValue: true },
+			}),
+			// Get the project contract VAT details (to compute VAT-inclusive value)
+			db.projectContract.findFirst({
+				where: { organizationId, projectId },
+				select: { value: true, includesVat: true, vatPercent: true },
+			}),
+			// Get linked cost studies (دراسة الكميات والمواصفات) with their items
+			// to compute the quantities & specifications grand total
+			db.costStudy.findMany({
+				where: { projectId, organizationId },
+				include: {
+					structuralItems: { select: { totalCost: true } },
+					finishingItems: { select: { totalCost: true } },
+					mepItems: { select: { totalCost: true } },
+					laborItems: { select: { totalCost: true } },
+				},
 			}),
 			// Get total expenses from unified FinanceExpense (filtered by projectId)
 			db.financeExpense.aggregate({
@@ -125,6 +141,42 @@ export async function getProjectFinanceSummary(
 	const adjustedContractValue = contractValue + changeOrdersImpact;
 	const remaining = adjustedContractValue - actualExpenses;
 
+	// VAT-inclusive contract value (the value the client actually sees).
+	// The stored contract value is NET (pre-VAT); when the contract is subject to
+	// VAT we gross it up. Falls back to the project's contractValue when there is
+	// no contract record (no VAT info available).
+	let grossContractValue = contractValue;
+	if (contract) {
+		const netValue = Number(contract.value);
+		const vatPercent = contract.vatPercent != null ? Number(contract.vatPercent) : 15;
+		grossContractValue = contract.includesVat
+			? netValue * (1 + vatPercent / 100)
+			: netValue;
+	}
+	// Change order cost impacts are already VAT-inclusive → added on top.
+	const adjustedContractValueGross = grossContractValue + changeOrdersImpact;
+
+	// Quantities & specifications grand total (دراسة الكميات والمواصفات).
+	// Computed identically to the project quantities summary page so the two
+	// figures always reconcile.
+	let quantitiesTotal = 0;
+	for (const study of costStudies) {
+		const subtotal =
+			study.structuralItems.reduce((s, i) => s + Number(i.totalCost), 0) +
+			study.finishingItems.reduce((s, i) => s + Number(i.totalCost), 0) +
+			study.mepItems.reduce((s, i) => s + Number(i.totalCost), 0) +
+			study.laborItems.reduce((s, i) => s + Number(i.totalCost), 0);
+		const overhead = subtotal * (Number(study.overheadPercent) / 100);
+		const profit = subtotal * (Number(study.profitPercent) / 100);
+		const contingency = subtotal * (Number(study.contingencyPercent) / 100);
+		const beforeVat = subtotal + overhead + profit + contingency;
+		const vat = study.vatIncluded ? beforeVat * 0.15 : 0;
+		quantitiesTotal += beforeVat + vat;
+	}
+
+	// Expected profit = (contract incl. VAT + change orders) − quantities total
+	const expectedProfit = adjustedContractValueGross - quantitiesTotal;
+
 	const totalPayments = paymentsTotal._sum.amount
 		? Number(paymentsTotal._sum.amount)
 		: 0;
@@ -132,6 +184,10 @@ export async function getProjectFinanceSummary(
 	return {
 		contractValue,
 		adjustedContractValue,
+		grossContractValue,
+		adjustedContractValueGross,
+		quantitiesTotal,
+		expectedProfit,
 		changeOrdersImpact,
 		actualExpenses,
 		subcontractExpenses,

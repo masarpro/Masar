@@ -9,6 +9,7 @@ interface FinanceBudgetCardProps {
 	totalPayments: number;
 	remaining: number;
 	claimsPaid: number;
+	expectedProfit: number;
 }
 
 function formatNumber(value: number): string {
@@ -30,6 +31,7 @@ export function FinanceBudgetCard({
 	totalPayments,
 	remaining,
 	claimsPaid,
+	expectedProfit,
 }: FinanceBudgetCardProps) {
 	const t = useTranslations();
 
@@ -46,8 +48,8 @@ export function FinanceBudgetCard({
 	const retentionAmount = claimsPaid > 0 ? Math.round(claimsPaid * 0.1) : 0;
 	const retentionPct = claimsPaid > 0 ? 10 : 0;
 
-	// Simplified profit/cash calculations
-	const expectedProfit = remaining;
+	// Expected profit comes from the backend:
+	// (contract incl. VAT + change orders) − quantities & specifications total
 	const profitMargin =
 		contractValue > 0
 			? Math.round((expectedProfit / contractValue) * 100)
@@ -204,10 +206,11 @@ export function FinanceBudgetCard({
 							{t("projects.commandCenter.expectedProfit")}
 						</div>
 						<div
-							className="text-base font-bold leading-tight text-sky-700 dark:text-sky-400"
+							className={`text-base font-bold leading-tight ${expectedProfit >= 0 ? "text-sky-700 dark:text-sky-400" : "text-red-500"}`}
 							dir="ltr"
 							style={{ textAlign: "right" }}
 						>
+							{expectedProfit < 0 ? "-" : ""}
 							{formatNumber(expectedProfit)}
 						</div>
 						<div className="text-[10px] text-slate-400">
