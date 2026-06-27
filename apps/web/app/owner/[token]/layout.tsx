@@ -14,6 +14,7 @@ import {
 	AlertTriangle,
 	Clock,
 	FileDiff,
+	FolderClosed,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -114,6 +115,12 @@ export default function OwnerPortalLayout({
 			label: t("ownerPortal.tabs.photos"),
 			icon: ImageIcon,
 			active: pathname === `${basePath}/photos`,
+		},
+		{
+			href: `${basePath}/documents`,
+			label: t("ownerPortal.tabs.documents"),
+			icon: FolderClosed,
+			active: pathname === `${basePath}/documents`,
 		},
 		{
 			href: `${basePath}/changes`,

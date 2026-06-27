@@ -5924,8 +5924,20 @@
       "schedule": "Schedule",
       "payments": "Payments",
       "photos": "Photos",
+      "documents": "Files",
       "changeOrders": "Change Orders",
       "chat": "Chat"
+    },
+    "documents": {
+      "title": "Project Files",
+      "subtitle": "Browse the project's files and folders",
+      "searchPlaceholder": "Search for a file...",
+      "searchResults": "Search results",
+      "noSearchResults": "No matching results",
+      "uncategorized": "Uncategorized",
+      "filesCount": "{count} file(s)",
+      "empty": "No files",
+      "emptyHint": "The contractor has not uploaded any files yet"
     },
     "summary": {
       "stageOf": "Stage {current} of {total}",

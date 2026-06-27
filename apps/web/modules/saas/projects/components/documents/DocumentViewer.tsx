@@ -23,8 +23,8 @@ const Lightbox = dynamic(() => import("yet-another-react-lightbox"), {
 });
 
 interface DocumentViewerProps {
-	organizationId: string;
-	projectId: string;
+	organizationId?: string;
+	projectId?: string;
 	document: {
 		id: string;
 		title: string;
@@ -37,6 +37,11 @@ interface DocumentViewerProps {
 	};
 	open: boolean;
 	onClose: () => void;
+	/**
+	 * مُحلِّل رابط بديل (يُستخدم في بوابة المالك حيث لا تتوفر صلاحيات app).
+	 * عند تمريره، يُستخدم بدل projectDocuments.getDownloadUrl.
+	 */
+	resolveUrl?: (documentId: string) => Promise<string>;
 }
 
 const OFFICE_MIME_TYPES = [
@@ -61,6 +66,7 @@ export function DocumentViewer({
 	document: doc,
 	open,
 	onClose,
+	resolveUrl,
 }: DocumentViewerProps) {
 	const t = useTranslations("projects.documents");
 	const [fileUrl, setFileUrl] = useState<string | null>(null);
@@ -76,11 +82,19 @@ export function DocumentViewer({
 			return;
 		}
 
-		if (doc.storagePath) {
+		if (doc.storagePath || resolveUrl) {
 			setIsLoadingUrl(true);
-			downloadUrlMutation
-				.mutateAsync({ organizationId, projectId, documentId: doc.id })
-				.then((result) => setFileUrl(result.downloadUrl))
+			const promise = resolveUrl
+				? resolveUrl(doc.id)
+				: downloadUrlMutation
+						.mutateAsync({
+							organizationId: organizationId!,
+							projectId: projectId!,
+							documentId: doc.id,
+						})
+						.then((result) => result.downloadUrl);
+			promise
+				.then((url) => setFileUrl(url))
 				.catch(() => toast.error(t("downloadError")))
 				.finally(() => setIsLoadingUrl(false));
 		}

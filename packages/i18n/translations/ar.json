@@ -5924,8 +5924,20 @@
       "schedule": "الجدول الزمني",
       "payments": "الدفعات",
       "photos": "الصور",
+      "documents": "الملفات",
       "changeOrders": "أوامر التغيير",
       "chat": "المحادثة"
+    },
+    "documents": {
+      "title": "ملفات المشروع",
+      "subtitle": "تصفّح ملفات ومجلدات المشروع",
+      "searchPlaceholder": "ابحث عن ملف...",
+      "searchResults": "نتائج البحث",
+      "noSearchResults": "لا توجد نتائج مطابقة",
+      "uncategorized": "غير مصنّفة",
+      "filesCount": "{count} ملف",
+      "empty": "لا توجد ملفات",
+      "emptyHint": "لم يقم المقاول برفع أي ملفات بعد"
     },
     "summary": {
       "stageOf": "المرحلة {current} من {total}",

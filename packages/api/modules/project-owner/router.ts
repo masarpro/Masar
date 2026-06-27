@@ -16,6 +16,9 @@ import { sendOwnerMessageProcedure } from "./procedures/send-owner-message";
 import { listOfficialUpdatesProcedure } from "./procedures/list-official-updates";
 import { exchangeTokenProcedure } from "./procedures/exchange-token";
 import { listOwnerPhotosProcedure } from "./procedures/list-owner-photos";
+import { listOwnerFoldersProcedure } from "./procedures/list-owner-folders";
+import { listOwnerDocumentsProcedure } from "./procedures/list-owner-documents";
+import { getOwnerDocumentDownloadUrlProcedure } from "./procedures/get-owner-document-download-url";
 
 export const projectOwnerRouter = publicProcedure.router({
 	// Internal (authenticated) endpoints
@@ -35,5 +38,8 @@ export const projectOwnerRouter = publicProcedure.router({
 		sendMessage: sendOwnerMessageProcedure,
 		listUpdates: listOfficialUpdatesProcedure,
 		listPhotos: listOwnerPhotosProcedure,
+		listFolders: listOwnerFoldersProcedure,
+		listDocuments: listOwnerDocumentsProcedure,
+		getDocumentDownloadUrl: getOwnerDocumentDownloadUrlProcedure,
 	}),
 });
