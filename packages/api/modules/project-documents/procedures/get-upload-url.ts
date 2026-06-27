@@ -5,21 +5,30 @@ import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
 const DOCUMENTS_BUCKET = process.env.S3_ATTACHMENTS_BUCKET || "attachments";
-const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+const MAX_FILE_SIZE = 200 * 1024 * 1024; // 200MB — يدعم ملفات Revit/Max/CAD الكبيرة
 
-const ALLOWED_MIME_TYPES = [
-	"image/jpeg",
-	"image/png",
-	"image/webp",
-	"application/pdf",
-	// Office formats
-	"application/msword",
-	"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-	"application/vnd.ms-excel",
-	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-	"application/vnd.ms-powerpoint",
-	"application/vnd.openxmlformats-officedocument.presentationml.presentation",
-];
+// allowlist بالامتداد: ملفات CAD/3D ترسل MIME فارغ أو octet-stream،
+// فالاعتماد على الامتداد أوثق من الاعتماد على MIME.
+const ALLOWED_EXTENSIONS = new Set([
+	// صور
+	"jpg", "jpeg", "png", "webp", "gif", "bmp", "tif", "tiff", "svg", "heic",
+	// مستندات
+	"pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "csv", "rtf",
+	// مضغوطة
+	"zip", "rar", "7z",
+	// فيديو
+	"mp4", "mov", "avi", "mkv", "webm",
+	// تصميم هندسي/معماري
+	"dwg", "dxf", "dwf", // AutoCAD
+	"rvt", "rfa", "rte", // Revit
+	"skp", // SketchUp
+	"max", "3ds", // 3ds Max
+	"obj", "fbx", "stl", "dae", "blend", // 3D عام
+	"ls", "lsproj", // Lumion
+	"ifc", "nwd", "nwc", // BIM / Navisworks
+	"pln", "pla", // ArchiCAD
+	"ai", "psd", "indd", "eps", // Adobe
+]);
 
 export const getUploadUrlProcedure = subscriptionProcedure
 	.route({
@@ -52,20 +61,23 @@ export const getUploadUrlProcedure = subscriptionProcedure
 			});
 		}
 
-		// Validate mime type
-		if (!ALLOWED_MIME_TYPES.includes(input.mimeType)) {
+		// Validate by extension (أوثق من MIME لملفات CAD/3D)
+		const extension = (input.fileName.split(".").pop() || "").toLowerCase();
+		if (!extension || !ALLOWED_EXTENSIONS.has(extension)) {
 			throw new ORPCError("BAD_REQUEST", {
-				message: "نوع الملف غير مدعوم. الأنواع المسموحة: JPEG, PNG, WebP, PDF, Word, Excel, PowerPoint",
+				message: "نوع الملف غير مدعوم",
 			});
 		}
 
 		// Generate unique ID and storage path
 		const uploadId = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-		const extension = input.fileName.split(".").pop() || "";
 		const storagePath = `documents/${input.organizationId}/${input.projectId}/${uploadId}.${extension}`;
 
 		// Generate thumbnail path for images
-		const isImage = input.mimeType.startsWith("image/");
+		const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "gif", "bmp"];
+		const isImage =
+			input.mimeType.startsWith("image/") ||
+			IMAGE_EXTENSIONS.includes(extension);
 		const thumbnailPath = isImage
 			? `documents/${input.organizationId}/${input.projectId}/thumbnails/${uploadId}_thumb.webp`
 			: null;

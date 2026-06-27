@@ -277,9 +277,15 @@ export type ProjectPaymentScalarFieldEnum = z.infer<typeof ProjectPaymentScalarF
 
 // File: ProjectDocumentScalarFieldEnum.schema.ts
 
-export const ProjectDocumentScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'folder', 'title', 'description', 'fileUrl', 'version', 'fileName', 'fileSize', 'mimeType', 'storagePath', 'thumbnailPath', 'uploadType', 'createdById', 'createdAt', 'updatedAt'])
+export const ProjectDocumentScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'folder', 'folderId', 'title', 'description', 'fileUrl', 'version', 'fileName', 'fileSize', 'mimeType', 'storagePath', 'thumbnailPath', 'uploadType', 'createdById', 'createdAt', 'updatedAt'])
 
 export type ProjectDocumentScalarFieldEnum = z.infer<typeof ProjectDocumentScalarFieldEnumSchema>;
+
+// File: ProjectDocumentFolderScalarFieldEnum.schema.ts
+
+export const ProjectDocumentFolderScalarFieldEnumSchema = z.enum(['id', 'organizationId', 'projectId', 'name', 'color', 'sortOrder', 'createdById', 'createdAt', 'updatedAt'])
+
+export type ProjectDocumentFolderScalarFieldEnum = z.infer<typeof ProjectDocumentFolderScalarFieldEnumSchema>;
 
 // File: DocumentVersionScalarFieldEnum.schema.ts
 
@@ -1093,7 +1099,7 @@ export type ApproverStatus = z.infer<typeof ApproverStatusSchema>;
 
 // File: AuditAction.schema.ts
 
-export const AuditActionSchema = z.enum(['DOC_CREATED', 'DOC_DELETED', 'APPROVAL_REQUESTED', 'APPROVAL_DECIDED', 'MESSAGE_SENT', 'TOKEN_CREATED', 'TOKEN_REVOKED', 'CLAIM_STATUS_CHANGED', 'EXPENSE_CREATED', 'ATTACHMENT_CREATED', 'CO_CREATED', 'CO_SUBMITTED', 'CO_APPROVED', 'CO_REJECTED', 'CO_IMPLEMENTED', 'SUBCONTRACT_CREATED', 'SUBCONTRACT_UPDATED', 'SUBCONTRACT_DELETED', 'SUBCONTRACT_CO_CREATED', 'SUBCONTRACT_CO_UPDATED', 'SUBCONTRACT_CO_DELETED', 'SUBCONTRACT_PAYMENT_CREATED', 'SUBCONTRACT_ITEM_CREATED', 'SUBCONTRACT_ITEM_UPDATED', 'SUBCONTRACT_ITEM_DELETED', 'SUBCONTRACT_ITEMS_COPIED', 'SUBCONTRACT_CLAIM_CREATED', 'SUBCONTRACT_CLAIM_UPDATED', 'SUBCONTRACT_CLAIM_DELETED', 'SUBCONTRACT_CLAIM_STATUS_CHANGED', 'SUBCONTRACT_CLAIM_PAYMENT_ADDED', 'CONTRACT_CREATED', 'CONTRACT_UPDATED', 'PROJECT_PAYMENT_CREATED', 'PROJECT_PAYMENT_UPDATED', 'PROJECT_PAYMENT_DELETED'])
+export const AuditActionSchema = z.enum(['DOC_CREATED', 'DOC_DELETED', 'APPROVAL_REQUESTED', 'APPROVAL_DECIDED', 'MESSAGE_SENT', 'TOKEN_CREATED', 'TOKEN_REVOKED', 'CLAIM_STATUS_CHANGED', 'EXPENSE_CREATED', 'ATTACHMENT_CREATED', 'CO_CREATED', 'CO_SUBMITTED', 'CO_APPROVED', 'CO_REJECTED', 'CO_IMPLEMENTED', 'SUBCONTRACT_CREATED', 'SUBCONTRACT_UPDATED', 'SUBCONTRACT_DELETED', 'SUBCONTRACT_CO_CREATED', 'SUBCONTRACT_CO_UPDATED', 'SUBCONTRACT_CO_DELETED', 'SUBCONTRACT_PAYMENT_CREATED', 'SUBCONTRACT_ITEM_CREATED', 'SUBCONTRACT_ITEM_UPDATED', 'SUBCONTRACT_ITEM_DELETED', 'SUBCONTRACT_ITEMS_COPIED', 'SUBCONTRACT_CLAIM_CREATED', 'SUBCONTRACT_CLAIM_UPDATED', 'SUBCONTRACT_CLAIM_DELETED', 'SUBCONTRACT_CLAIM_STATUS_CHANGED', 'SUBCONTRACT_CLAIM_PAYMENT_ADDED', 'CONTRACT_CREATED', 'CONTRACT_UPDATED', 'PROJECT_PAYMENT_CREATED', 'PROJECT_PAYMENT_UPDATED', 'PROJECT_PAYMENT_DELETED', 'FOLDER_CREATED', 'FOLDER_RENAMED', 'FOLDER_DELETED'])
 
 export type AuditAction = z.infer<typeof AuditActionSchema>;
 
@@ -2811,7 +2817,8 @@ export const ProjectDocumentSchema = z.object({
   id: z.string(),
   organizationId: z.string(),
   projectId: z.string(),
-  folder: DocumentFolderSchema,
+  folder: DocumentFolderSchema.nullish(),
+  folderId: z.string().nullish(),
   title: z.string(),
   description: z.string().nullish(),
   fileUrl: z.string().nullish(),
@@ -2828,6 +2835,23 @@ export const ProjectDocumentSchema = z.object({
 });
 
 export type ProjectDocumentType = z.infer<typeof ProjectDocumentSchema>;
+
+
+// File: ProjectDocumentFolder.schema.ts
+
+export const ProjectDocumentFolderSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  projectId: z.string(),
+  name: z.string(),
+  color: z.string().nullish(),
+  sortOrder: z.number().int(),
+  createdById: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type ProjectDocumentFolderType = z.infer<typeof ProjectDocumentFolderSchema>;
 
 
 // File: DocumentVersion.schema.ts

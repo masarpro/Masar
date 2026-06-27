@@ -1,7 +1,7 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
@@ -27,14 +27,7 @@ interface CreateDocumentFormProps {
 	projectId: string;
 }
 
-const FOLDER_OPTIONS = [
-	{ value: "CONTRACT", labelKey: "folders.CONTRACT" },
-	{ value: "DRAWINGS", labelKey: "folders.DRAWINGS" },
-	{ value: "CLAIMS", labelKey: "folders.CLAIMS" },
-	{ value: "LETTERS", labelKey: "folders.LETTERS" },
-	{ value: "PHOTOS", labelKey: "folders.PHOTOS" },
-	{ value: "OTHER", labelKey: "folders.OTHER" },
-];
+const UNCATEGORIZED = "__uncategorized__";
 
 export function CreateDocumentForm({
 	organizationId,
@@ -47,8 +40,15 @@ export function CreateDocumentForm({
 	const queryClient = useQueryClient();
 	const basePath = `/app/${organizationSlug}/projects/${projectId}`;
 
+	const foldersQuery = useQuery(
+		orpc.projectDocuments.listFolders.queryOptions({
+			input: { organizationId, projectId },
+		}),
+	);
+	const folderOptions = foldersQuery.data?.folders ?? [];
+
 	const [formData, setFormData] = useState({
-		folder: "",
+		folder: UNCATEGORIZED,
 		title: "",
 		description: "",
 	});
@@ -80,7 +80,7 @@ export function CreateDocumentForm({
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (!formData.folder || !formData.title) {
+		if (!formData.title) {
 			toast.error(t("requiredFields"));
 			return;
 		}
@@ -93,7 +93,8 @@ export function CreateDocumentForm({
 		createMutation.mutate({
 			organizationId,
 			projectId,
-			folder: formData.folder as any,
+			folderId:
+				formData.folder === UNCATEGORIZED ? undefined : formData.folder,
 			title: formData.title,
 			description: formData.description || undefined,
 			uploadType: "FILE",
@@ -134,7 +135,7 @@ export function CreateDocumentForm({
 				<div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
 					<div className="grid gap-6 sm:grid-cols-2">
 						<div className="space-y-2">
-							<Label htmlFor="folder">{t("folder")} *</Label>
+							<Label htmlFor="folder">{t("folder")}</Label>
 							<Select
 								value={formData.folder}
 								onValueChange={(value: any) =>
@@ -145,9 +146,12 @@ export function CreateDocumentForm({
 									<SelectValue placeholder={t("selectFolder")} />
 								</SelectTrigger>
 								<SelectContent>
-									{FOLDER_OPTIONS.map((option) => (
-										<SelectItem key={option.value} value={option.value}>
-											{t(option.labelKey)}
+									<SelectItem value={UNCATEGORIZED}>
+										{t("uncategorized")}
+									</SelectItem>
+									{folderOptions.map((option) => (
+										<SelectItem key={option.id} value={option.id}>
+											{option.name}
 										</SelectItem>
 									))}
 								</SelectContent>

@@ -28,7 +28,7 @@ interface DocumentViewerProps {
 	document: {
 		id: string;
 		title: string;
-		folder: string;
+		folder?: string | null;
 		fileName?: string | null;
 		fileSize?: number | null;
 		mimeType?: string | null;

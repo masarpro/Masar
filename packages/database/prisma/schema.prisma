@@ -340,6 +340,10 @@ enum AuditAction {
   PROJECT_PAYMENT_CREATED // إنشاء دفعة مشروع
   PROJECT_PAYMENT_UPDATED // تعديل دفعة مشروع
   PROJECT_PAYMENT_DELETED // حذف دفعة مشروع
+  // مجلدات المستندات
+  FOLDER_CREATED // إنشاء مجلد
+  FOLDER_RENAMED // إعادة تسمية مجلد
+  FOLDER_DELETED // حذف مجلد
 }
 
 // قنوات الإشعار
@@ -1905,9 +1909,10 @@ model Project {
   contract             ProjectContract?
 
   // علاقات الوثائق والاعتمادات والمحادثات
-  documents ProjectDocument[]
-  auditLogs ProjectAuditLog[]
-  messages  ProjectMessage[]
+  documents       ProjectDocument[]
+  documentFolders ProjectDocumentFolder[]
+  auditLogs       ProjectAuditLog[]
+  messages        ProjectMessage[]
 
   // علاقات بوابة المالك
   ownerAccesses ProjectOwnerAccess[]
@@ -2662,7 +2667,11 @@ model ProjectDocument {
   projectId      String  @map("project_id")
   project        Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-  folder      DocumentFolder
+  // legacy: نظام المجلدات الثابت القديم — يُبقى مؤقتاً لأمان الهجرة (انظر folderId)
+  folder      DocumentFolder?
+  // نظام المجلدات الديناميكي الجديد — null = غير مصنّف
+  folderId    String?                @map("folder_id")
+  folderRef   ProjectDocumentFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
   title       String
   description String?        @db.Text
   fileUrl     String?        @map("file_url")
@@ -2688,8 +2697,32 @@ model ProjectDocument {
 
   @@index([organizationId, projectId, folder, createdAt])
   @@index([projectId, folder])
+  @@index([projectId, folderId])
   @@index([organizationId, projectId])
   @@map("project_documents")
+}
+
+// مجلد مستندات ديناميكي يديره المستخدم (نظام المجلدات الجديد)
+model ProjectDocumentFolder {
+  id             String  @id @default(cuid())
+  organizationId String  @map("organization_id")
+  projectId      String  @map("project_id")
+  project        Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  name      String
+  color     String? // لون الأيقونة (اختياري)
+  sortOrder Int     @default(0) @map("sort_order")
+
+  createdById String @map("created_by")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  documents ProjectDocument[]
+
+  @@unique([projectId, name])
+  @@index([organizationId, projectId])
+  @@map("project_document_folders")
 }
 
 // إصدارات المستندات

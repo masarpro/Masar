@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { DocumentsList } from "@saas/projects/components/DocumentsList";
+import { DocumentsExplorer } from "@saas/projects/components/documents/DocumentsExplorer";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
@@ -43,7 +43,7 @@ async function DocumentsPageContent({
 	}
 
 	return (
-		<DocumentsList
+		<DocumentsExplorer
 			organizationId={activeOrganization.id}
 			organizationSlug={organizationSlug}
 			projectId={projectId}

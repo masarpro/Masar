@@ -363,8 +363,12 @@ export function DocumentDetail({
 							<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
 								{document.title}
 							</h1>
-							<Badge className={`border-0 ${FOLDER_COLORS[document.folder]}`}>
-								{t(`folders.${document.folder}`)}
+							<Badge className="border-0 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+								{document.folderRef?.name
+									? document.folderRef.name
+									: document.folder
+										? t(`folders.${document.folder}`)
+										: t("uncategorized")}
 							</Badge>
 						</div>
 						{document.description && (

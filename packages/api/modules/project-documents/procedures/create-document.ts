@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import { createDocument, logAuditEvent, db } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -23,7 +24,10 @@ export const createDocumentProcedure = subscriptionProcedure
 		z.object({
 			organizationId: z.string().trim().max(100),
 			projectId: z.string().trim().max(100),
-			folder: DocumentFolderEnum,
+			// legacy: نظام المجلدات الثابت — اختياري الآن
+			folder: DocumentFolderEnum.optional(),
+			// المجلد الديناميكي الجديد — null/غياب = غير مصنّف
+			folderId: z.string().trim().max(100).optional(),
 			title: z.string().trim().min(1, "العنوان مطلوب").max(200),
 			description: z.string().trim().max(2000).optional(),
 			uploadType: z.enum(["FILE", "URL"]).default("FILE"),
@@ -50,12 +54,28 @@ export const createDocumentProcedure = subscriptionProcedure
 			{ section: "projects", action: "edit" },
 		);
 
+		// عزل متعدد المستأجرين: تأكد أن المجلد (إن وُجد) يخص هذه المنظمة والمشروع
+		if (input.folderId) {
+			const folder = await db.projectDocumentFolder.findFirst({
+				where: {
+					id: input.folderId,
+					organizationId: input.organizationId,
+					projectId: input.projectId,
+				},
+				select: { id: true },
+			});
+			if (!folder) {
+				throw new ORPCError("NOT_FOUND", { message: "المجلد غير موجود" });
+			}
+		}
+
 		// Create document
 		const document = await createDocument(
 			input.organizationId,
 			input.projectId,
 			{
 				folder: input.folder,
+				folderId: input.folderId,
 				title: input.title,
 				description: input.description,
 				fileUrl: input.fileUrl || null,

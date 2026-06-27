@@ -31,11 +31,10 @@ interface FileUploadZoneProps {
 	onRemove?: () => void;
 }
 
-const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+const MAX_FILE_SIZE = 200 * 1024 * 1024; // 200MB — يدعم ملفات Revit/Max/CAD الكبيرة
+// allowlist بالامتداد (ملفات CAD/3D ترسل MIME فارغ، فالاعتماد على الامتداد أوثق)
 const ACCEPTED_TYPES = {
-	"image/jpeg": [".jpg", ".jpeg"],
-	"image/png": [".png"],
-	"image/webp": [".webp"],
+	"image/*": [".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".tif", ".tiff", ".svg", ".heic"],
 	"application/pdf": [".pdf"],
 	"application/msword": [".doc"],
 	"application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
@@ -43,6 +42,15 @@ const ACCEPTED_TYPES = {
 	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
 	"application/vnd.ms-powerpoint": [".ppt"],
 	"application/vnd.openxmlformats-officedocument.presentationml.presentation": [".pptx"],
+	"text/plain": [".txt", ".csv", ".rtf"],
+	"application/zip": [".zip", ".rar", ".7z"],
+	"video/*": [".mp4", ".mov", ".avi", ".mkv", ".webm"],
+	// تصميم هندسي/معماري وثلاثي الأبعاد
+	"application/octet-stream": [
+		".dwg", ".dxf", ".dwf", ".rvt", ".rfa", ".rte", ".skp", ".max", ".3ds",
+		".obj", ".fbx", ".stl", ".dae", ".blend", ".ls", ".lsproj", ".ifc",
+		".nwd", ".nwc", ".pln", ".pla", ".ai", ".psd", ".indd", ".eps",
+	],
 };
 
 function formatFileSize(bytes: number): string {
@@ -86,13 +94,16 @@ export function FileUploadZone({
 			setUploadProgress(0);
 			setErrorMessage("");
 
+			// ملفات CAD/3D قد ترسل MIME فارغ — استخدم بديلاً
+			const mimeType = file.type || "application/octet-stream";
+
 			try {
 				// Step 1: Get signed upload URL
 				const uploadData = await getUploadUrlMutation.mutateAsync({
 					organizationId,
 					projectId,
 					fileName: file.name,
-					mimeType: file.type,
+					mimeType,
 					fileSize: file.size,
 				});
 
@@ -118,9 +129,9 @@ export function FileUploadZone({
 					xhr.addEventListener("error", () => reject(new Error("Network error")));
 					xhr.addEventListener("timeout", () => reject(new Error("Upload timeout")));
 
-					xhr.timeout = 60000; // 60 seconds
+					xhr.timeout = 10 * 60 * 1000; // 10 دقائق للملفات الكبيرة
 					xhr.open("PUT", uploadData.uploadUrl);
-					xhr.setRequestHeader("Content-Type", file.type);
+					if (file.type) xhr.setRequestHeader("Content-Type", file.type);
 					xhr.send(file);
 				});
 
@@ -149,7 +160,7 @@ export function FileUploadZone({
 				setUploadedFile({
 					name: file.name,
 					size: file.size,
-					mimeType: file.type,
+					mimeType,
 				});
 
 				onUploadComplete({
@@ -157,7 +168,7 @@ export function FileUploadZone({
 					thumbnailPath,
 					fileName: file.name,
 					fileSize: file.size,
-					mimeType: file.type,
+					mimeType,
 				});
 			} catch (error: any) {
 				setUploadState("error");

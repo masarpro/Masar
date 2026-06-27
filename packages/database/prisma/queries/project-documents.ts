@@ -18,6 +18,8 @@ export async function listDocuments(
 	projectId: string,
 	options?: {
 		folder?: DocumentFolder;
+		folderId?: string;
+		uncategorized?: boolean;
 		search?: string;
 		page?: number;
 		pageSize?: number;
@@ -31,10 +33,16 @@ export async function listDocuments(
 		organizationId: string;
 		projectId: string;
 		folder?: DocumentFolder;
+		folderId?: string | null;
 		title?: { contains: string; mode: "insensitive" };
 	} = { organizationId, projectId };
 
-	if (options?.folder) {
+	// نظام المجلدات الديناميكي الجديد له الأولوية على enum القديم
+	if (options?.uncategorized) {
+		where.folderId = null;
+	} else if (options?.folderId) {
+		where.folderId = options.folderId;
+	} else if (options?.folder) {
 		where.folder = options.folder;
 	}
 
@@ -47,6 +55,7 @@ export async function listDocuments(
 			where,
 			include: {
 				createdBy: { select: { id: true, name: true, image: true } },
+				folderRef: { select: { id: true, name: true, color: true } },
 				approvals: {
 					orderBy: { createdAt: "desc" },
 					take: 1,
@@ -81,6 +90,7 @@ export async function getDocument(
 		where: { id: documentId, organizationId, projectId },
 		include: {
 			createdBy: { select: { id: true, name: true, image: true } },
+			folderRef: { select: { id: true, name: true, color: true } },
 			approvals: {
 				include: {
 					requestedBy: { select: { id: true, name: true, image: true } },
@@ -103,7 +113,8 @@ export async function createDocument(
 	organizationId: string,
 	projectId: string,
 	data: {
-		folder: DocumentFolder;
+		folder?: DocumentFolder | null;
+		folderId?: string | null;
 		title: string;
 		description?: string;
 		fileUrl?: string | null;
@@ -120,7 +131,8 @@ export async function createDocument(
 		data: {
 			organizationId,
 			projectId,
-			folder: data.folder,
+			folder: data.folder ?? null,
+			folderId: data.folderId ?? null,
 			title: data.title,
 			description: data.description,
 			fileUrl: data.fileUrl,
@@ -134,8 +146,114 @@ export async function createDocument(
 		},
 		include: {
 			createdBy: { select: { id: true, name: true, image: true } },
+			folderRef: { select: { id: true, name: true, color: true } },
 		},
 	});
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Folder Queries - المجلدات الديناميكية
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * List dynamic folders for a project with document counts
+ */
+export async function listDocumentFolders(
+	organizationId: string,
+	projectId: string,
+) {
+	const [folders, uncategorizedCount] = await Promise.all([
+		db.projectDocumentFolder.findMany({
+			where: { organizationId, projectId },
+			include: { _count: { select: { documents: true } } },
+			orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+		}),
+		db.projectDocument.count({
+			where: { organizationId, projectId, folderId: null },
+		}),
+	]);
+
+	return {
+		folders: folders.map((f) => ({
+			id: f.id,
+			name: f.name,
+			color: f.color,
+			sortOrder: f.sortOrder,
+			documentCount: f._count.documents,
+			createdAt: f.createdAt,
+		})),
+		uncategorizedCount,
+	};
+}
+
+/**
+ * Get a single folder (scoped) with its document count
+ */
+export async function getDocumentFolder(
+	organizationId: string,
+	projectId: string,
+	folderId: string,
+) {
+	const folder = await db.projectDocumentFolder.findFirst({
+		where: { id: folderId, organizationId, projectId },
+		include: { _count: { select: { documents: true } } },
+	});
+	if (!folder) return null;
+	return {
+		id: folder.id,
+		name: folder.name,
+		color: folder.color,
+		sortOrder: folder.sortOrder,
+		documentCount: folder._count.documents,
+	};
+}
+
+/**
+ * Create a new dynamic folder
+ */
+export async function createDocumentFolder(
+	organizationId: string,
+	projectId: string,
+	data: { name: string; color?: string | null; createdById: string },
+) {
+	const maxOrder = await db.projectDocumentFolder.aggregate({
+		where: { organizationId, projectId },
+		_max: { sortOrder: true },
+	});
+
+	return db.projectDocumentFolder.create({
+		data: {
+			organizationId,
+			projectId,
+			name: data.name,
+			color: data.color ?? null,
+			sortOrder: (maxOrder._max.sortOrder ?? -1) + 1,
+			createdById: data.createdById,
+		},
+	});
+}
+
+/**
+ * Rename / recolor a folder
+ */
+export async function updateDocumentFolder(
+	folderId: string,
+	data: { name?: string; color?: string | null },
+) {
+	return db.projectDocumentFolder.update({
+		where: { id: folderId },
+		data: {
+			...(data.name !== undefined ? { name: data.name } : {}),
+			...(data.color !== undefined ? { color: data.color } : {}),
+		},
+	});
+}
+
+/**
+ * Delete a folder. Documents inside become uncategorized (folderId → null via SetNull).
+ */
+export async function deleteDocumentFolder(folderId: string) {
+	return db.projectDocumentFolder.delete({ where: { id: folderId } });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

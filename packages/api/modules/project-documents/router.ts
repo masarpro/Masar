@@ -11,6 +11,10 @@ import { listVersionsProcedure } from "./procedures/list-versions";
 import { uploadVersionProcedure } from "./procedures/upload-version";
 import { getVersionDownloadUrlProcedure } from "./procedures/get-version-download-url";
 import { revertToVersionProcedure } from "./procedures/revert-to-version";
+import { listFoldersProcedure } from "./procedures/list-folders";
+import { createFolderProcedure } from "./procedures/create-folder";
+import { renameFolderProcedure } from "./procedures/rename-folder";
+import { deleteFolderProcedure } from "./procedures/delete-folder";
 
 export const projectDocumentsRouter = {
 	list: listDocumentsProcedure,
@@ -19,6 +23,11 @@ export const projectDocumentsRouter = {
 	getUploadUrl: getUploadUrlProcedure,
 	getDownloadUrl: getDownloadUrlProcedure,
 	delete: deleteDocumentProcedure,
+	// المجلدات الديناميكية
+	listFolders: listFoldersProcedure,
+	createFolder: createFolderProcedure,
+	renameFolder: renameFolderProcedure,
+	deleteFolder: deleteFolderProcedure,
 	createApprovalRequest: createApprovalRequestProcedure,
 	actOnApproval: actOnApprovalProcedure,
 	getApproval: getApprovalProcedure,
