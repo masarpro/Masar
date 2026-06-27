@@ -246,11 +246,11 @@ export function DocumentsExplorer({
 			{!showFiles && (
 				<>
 					{foldersQuery.isLoading ? (
-						<div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+						<div className="flex flex-col gap-2">
 							{Array.from({ length: 6 }).map((_, i) => (
 								<div
 									key={i}
-									className="h-24 animate-pulse rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+									className="h-16 animate-pulse rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
 								/>
 							))}
 						</div>
@@ -261,17 +261,17 @@ export function DocumentsExplorer({
 							onUpload={() => setUploadOpen(true)}
 						/>
 					) : (
-						<div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+						<div className="flex flex-col gap-2">
 							{folders.map((f) => {
 								const c = folderColor(f.color);
 								return (
 									<div
 										key={f.id}
-										className="group relative flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-primary/40 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900"
+										className="group relative flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 transition-all hover:border-primary/40 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900"
 										onClick={() => setActive({ id: f.id, name: f.name })}
 									>
-										<span className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-xl", c.bg)}>
-											<Folder className={cn("h-6 w-6", c.icon)} />
+										<span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-lg", c.bg)}>
+											<Folder className={cn("h-5 w-5", c.icon)} />
 										</span>
 										<div className="min-w-0 flex-1">
 											<p className="truncate font-medium text-slate-900 dark:text-slate-100">
@@ -320,11 +320,11 @@ export function DocumentsExplorer({
 							{/* بطاقة "غير مصنّفة" */}
 							{uncategorizedCount > 0 && (
 								<div
-									className="group flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 transition-all hover:border-primary/40 dark:border-slate-700 dark:bg-slate-900/50"
+									className="group flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3 transition-all hover:border-primary/40 dark:border-slate-700 dark:bg-slate-900/50"
 									onClick={() => setActive({ id: null, name: t("uncategorized") })}
 								>
-									<span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-200 dark:bg-slate-800">
-										<FolderOpen className="h-6 w-6 text-slate-400" />
+									<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-200 dark:bg-slate-800">
+										<FolderOpen className="h-5 w-5 text-slate-400" />
 									</span>
 									<div className="min-w-0 flex-1">
 										<p className="truncate font-medium text-slate-700 dark:text-slate-300">
@@ -345,7 +345,7 @@ export function DocumentsExplorer({
 			{showFiles && (
 				<>
 					{documentsQuery.isLoading ? (
-						<div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+						<div className="flex flex-col gap-2">
 							{Array.from({ length: 8 }).map((_, i) => (
 								<div
 									key={i}
@@ -369,7 +369,7 @@ export function DocumentsExplorer({
 							)}
 						</div>
 					) : (
-						<div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+						<div className="flex flex-col gap-2">
 							{docs.map((doc: any) => {
 								const { icon: FileIcon, bg, color } = getFileTypeStyle(doc.fileName, doc.mimeType);
 								return (
