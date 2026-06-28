@@ -7,13 +7,27 @@ import { cache } from "react";
 export const getSession = cache(async () => {
 	const session = await auth.api.getSession({
 		headers: await headers(),
-		query: {
-			disableCookieCache: true,
-		},
 	});
 
 	return session;
 });
+
+/**
+ * Force a fresh session read that bypasses the signed cookie-cache snapshot.
+ *
+ * Use this ONLY right after a server action mutates the user record directly
+ * (onboarding completion, role/permission change, mustChangePassword) so the
+ * next render reflects the change immediately instead of waiting out the
+ * cookie-cache TTL. Not React-cached — each call re-validates against the DB.
+ */
+export const getFreshSession = async () => {
+	return auth.api.getSession({
+		headers: await headers(),
+		query: {
+			disableCookieCache: true,
+		},
+	});
+};
 
 export const getActiveOrganization = cache(async (slug: string) => {
 	try {

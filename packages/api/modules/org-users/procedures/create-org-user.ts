@@ -8,7 +8,10 @@ import {
 import { sendEmail } from "@repo/mail";
 import { getBaseUrl } from "@repo/utils";
 import { z } from "zod";
-import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	invalidateAccessCache,
+	verifyOrganizationAccess,
+} from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 
@@ -88,6 +91,9 @@ export const createOrgUser = subscriptionProcedure
 				invitedById: context.user.id,
 			},
 		});
+
+		// Drop any cached deny result for this fresh user key.
+		invalidateAccessCache(input.organizationId, user.id);
 
 		// إرسال بريد الدعوة
 		const baseUrl = getBaseUrl();

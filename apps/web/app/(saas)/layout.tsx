@@ -61,7 +61,9 @@ export default async function SaaSLayout({ children }: PropsWithChildren) {
 		console.error("[LAYOUT] Error prefetching data:", error);
 	}
 
-	console.log(`[PERF] (saas)/layout.tsx: ${Math.round(performance.now() - layoutStart)}ms`);
+	if (process.env.NODE_ENV === "development") {
+		console.log(`[PERF] (saas)/layout.tsx: ${Math.round(performance.now() - layoutStart)}ms`);
+	}
 
 	return (
 		<Document locale={locale}>

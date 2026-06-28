@@ -5,7 +5,10 @@ import {
 	type Permissions,
 } from "@repo/database";
 import { z } from "zod";
-import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	invalidateAccessCache,
+	verifyOrganizationAccess,
+} from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 
 export const updateRole = subscriptionProcedure
@@ -43,6 +46,10 @@ export const updateRole = subscriptionProcedure
 			description: input.description,
 			permissions: input.permissions as unknown as Permissions | undefined,
 		});
+
+		// A role-definition change affects every user assigned to it — drop the
+		// whole org's cached permissions so the change takes effect immediately.
+		invalidateAccessCache(input.organizationId);
 
 		return { role };
 	});

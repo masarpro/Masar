@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/server";
 import { db, getProjectById } from "@repo/database";
 import { hasPermission, type Permissions } from "@repo/database/prisma/permissions";
 import { logBusinessEvent } from "@repo/logs";
-import { getUserPermissions } from "./get-user-permissions";
+import { getCachedUserPermissions } from "./permission-cache";
 import { verifyOrganizationMembership } from "../../modules/organizations/lib/membership";
 
 export interface ProjectAccessResult {
@@ -52,8 +52,15 @@ export async function verifyProjectAccess(
 		action: string;
 	},
 ): Promise<ProjectAccessResult> {
+	// Steps 1-3 run in parallel — they are independent reads. Error precedence
+	// (membership → project → permission) is preserved by the checks below.
+	const [membership, project, permissions] = await Promise.all([
+		verifyOrganizationMembership(organizationId, userId),
+		getProjectById(projectId, organizationId),
+		getCachedUserPermissions(userId, organizationId),
+	]);
+
 	// Step 1: Verify organization membership
-	const membership = await verifyOrganizationMembership(organizationId, userId);
 	if (!membership) {
 		throw new ORPCError("FORBIDDEN", {
 			message: "ليس لديك عضوية في هذه المنظمة",
@@ -61,17 +68,13 @@ export async function verifyProjectAccess(
 	}
 
 	// Step 2: Verify project belongs to organization
-	const project = await getProjectById(projectId, organizationId);
 	if (!project) {
 		throw new ORPCError("NOT_FOUND", {
 			message: "المشروع غير موجود أو لا ينتمي لهذه المنظمة",
 		});
 	}
 
-	// Step 3: Get user permissions
-	const permissions = await getUserPermissions(userId, organizationId);
-
-	// Step 4: Check required permission if provided
+	// Step 3: Check required permission if provided
 	if (requiredPermission) {
 		if (!hasPermission(permissions, requiredPermission.section, requiredPermission.action)) {
 			logBusinessEvent({
@@ -130,18 +133,20 @@ export async function verifyOrganizationAccess(
 		role: string;
 	};
 }> {
+	// Steps 1-2 run in parallel — independent reads, both cached short-term.
+	const [membership, permissions] = await Promise.all([
+		verifyOrganizationMembership(organizationId, userId),
+		getCachedUserPermissions(userId, organizationId),
+	]);
+
 	// Step 1: Verify organization membership
-	const membership = await verifyOrganizationMembership(organizationId, userId);
 	if (!membership) {
 		throw new ORPCError("FORBIDDEN", {
 			message: "ليس لديك عضوية في هذه المنظمة",
 		});
 	}
 
-	// Step 2: Get user permissions
-	const permissions = await getUserPermissions(userId, organizationId);
-
-	// Step 3: Check required permission if provided
+	// Step 2: Check required permission if provided
 	if (requiredPermission) {
 		if (!hasPermission(permissions, requiredPermission.section, requiredPermission.action)) {
 			logBusinessEvent({

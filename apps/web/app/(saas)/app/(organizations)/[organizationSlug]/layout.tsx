@@ -79,7 +79,9 @@ export default async function OrganizationLayout({
 		redirect("/choose-plan");
 	}
 
-	console.log(`[PERF] [organizationSlug]/layout.tsx: ${Math.round(performance.now() - layoutStart)}ms`);
+	if (process.env.NODE_ENV === "development") {
+		console.log(`[PERF] [organizationSlug]/layout.tsx: ${Math.round(performance.now() - layoutStart)}ms`);
+	}
 
 	return (
 		<AssistantWrapper organizationName={organization.name}>

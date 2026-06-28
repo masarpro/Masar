@@ -97,7 +97,9 @@ export default async function Layout({ children }: PropsWithChildren) {
 		}
 	}
 
-	console.log(`[PERF] (saas)/app/layout.tsx: ${Math.round(performance.now() - layoutStart)}ms`);
+	if (process.env.NODE_ENV === "development") {
+		console.log(`[PERF] (saas)/app/layout.tsx: ${Math.round(performance.now() - layoutStart)}ms`);
+	}
 
 	return children;
 }

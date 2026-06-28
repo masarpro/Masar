@@ -64,6 +64,16 @@ export const auth = betterAuth({
 	session: {
 		expiresIn: config.auth.sessionCookieMaxAge,
 		freshAge: 60,
+		// Cookie cache: store a signed session snapshot in the cookie so
+		// `auth.api.getSession` reads from the cookie instead of hitting the DB
+		// on every request (server layouts + EVERY RPC call). 5-minute TTL — a
+		// disabled account (isActive=false) or a role/permission change may take
+		// up to 5 minutes to propagate unless the session cookie is refreshed
+		// explicitly (see auth hooks / onboarding-complete / role mutations).
+		cookieCache: {
+			enabled: true,
+			maxAge: 5 * 60,
+		},
 	},
 	account: {
 		accountLinking: {

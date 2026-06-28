@@ -84,7 +84,11 @@ export function useSidebarMenu(): {
 		return id;
 	}, [pathname]);
 
-	// Fetch study data for sidebar filtering (only when inside a study)
+	// Fetch study data for sidebar filtering (only when inside a study).
+	// studyType is immutable, so cache it for the whole session: this stops the
+	// sidebar from re-querying (and blocking) on every navigation between a
+	// study's sub-pages. Shares the cache key with the study detail page's own
+	// getById, so in the common flow it reads from cache with no extra round-trip.
 	const { data: studyData } = useQuery({
 		...orpc.pricing.studies.getById.queryOptions({
 			input: {
@@ -93,6 +97,8 @@ export function useSidebarMenu(): {
 			},
 		}),
 		enabled: !!studyId && !!activeOrganization?.id,
+		staleTime: Number.POSITIVE_INFINITY,
+		gcTime: 30 * 60 * 1000,
 	});
 
 	const studyType = studyId ? ((studyData as any)?.studyType ?? "FULL_PROJECT") : "FULL_PROJECT";

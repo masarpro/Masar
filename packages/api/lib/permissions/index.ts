@@ -6,3 +6,8 @@ export {
 	requirePermission,
 	type ProjectAccessResult,
 } from "./verify-project-access";
+export {
+	getCachedOrganizationMembership,
+	getCachedUserPermissions,
+	invalidateAccessCache,
+} from "./permission-cache";

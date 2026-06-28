@@ -1,7 +1,10 @@
 import { ORPCError } from "@orpc/server";
 import { updateOrgUser as updateOrgUserQuery } from "@repo/database";
 import { z } from "zod";
-import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	invalidateAccessCache,
+	verifyOrganizationAccess,
+} from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 
 export const updateOrgUser = subscriptionProcedure
@@ -39,6 +42,10 @@ export const updateOrgUser = subscriptionProcedure
 					customPermissions: input.customPermissions,
 				},
 			);
+
+			// Role / isActive / customPermissions change → drop this user's cached
+			// membership + permissions so it takes effect on the next request.
+			invalidateAccessCache(input.organizationId, input.id);
 
 			return { user };
 		} catch (error) {

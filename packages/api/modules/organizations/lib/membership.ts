@@ -1,4 +1,4 @@
-import { getOrganizationMembership } from "@repo/database";
+import { getCachedOrganizationMembership } from "../../../lib/permissions/permission-cache";
 
 /**
  * Verify that a user is a Member of an organization (Better Auth Member table).
@@ -18,7 +18,10 @@ export async function verifyOrganizationMembership(
 	organizationId: string,
 	userId: string,
 ) {
-	const membership = await getOrganizationMembership(organizationId, userId);
+	const membership = await getCachedOrganizationMembership(
+		organizationId,
+		userId,
+	);
 
 	if (!membership) {
 		return null;
