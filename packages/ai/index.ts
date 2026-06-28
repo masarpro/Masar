@@ -5,7 +5,7 @@ export const textModel = openai("gpt-4o-mini");
 export const imageModel = openai("dall-e-3");
 export const audioModel = openai("whisper-1");
 
-export const assistantModel = anthropic("claude-sonnet-4-20250514");
+export const assistantModel = anthropic("claude-sonnet-4-6");
 
 export * from "ai";
 export * from "./lib";
