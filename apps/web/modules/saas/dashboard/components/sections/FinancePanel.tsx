@@ -37,6 +37,16 @@ export function FinancePanel({
 		expenses: { label: t("dashboard.financial.expensesLabel"), color: "#ef4444" },
 	};
 
+	// Convert a "YYYY-MM" key into a localized short month label.
+	const formatMonth = useMemo(() => {
+		const fmt = new Intl.DateTimeFormat(locale, { month: "short" });
+		return (value: string) => {
+			const [year, month] = value.split("-").map(Number);
+			if (!year || !month) return value;
+			return fmt.format(new Date(year, month - 1, 1));
+		};
+	}, [locale]);
+
 	const chartData = useMemo(() => {
 		if (financialTrend && financialTrend.length > 0) {
 			return financialTrend;
@@ -46,13 +56,13 @@ export function FinancePanel({
 		for (let i = 5; i >= 0; i--) {
 			const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
 			months.push({
-				month: new Intl.DateTimeFormat(locale, { month: "short" }).format(d),
+				month: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
 				claims: 0,
 				expenses: 0,
 			});
 		}
 		return months;
-	}, [financialTrend, locale]);
+	}, [financialTrend]);
 
 	return (
 		<div className={`${glassCard} flex flex-col p-4 overflow-hidden`}>
@@ -132,9 +142,14 @@ export function FinancePanel({
 							axisLine={false}
 							fontSize={10}
 							tickMargin={6}
+							tickFormatter={formatMonth}
 						/>
 						<YAxis hide />
-						<ChartTooltip content={<ChartTooltipContent />} />
+						<ChartTooltip
+							content={
+								<ChartTooltipContent labelFormatter={(label) => formatMonth(String(label))} />
+							}
+						/>
 						<Area
 							type="natural"
 							dataKey="claims"

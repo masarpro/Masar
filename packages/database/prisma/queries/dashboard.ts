@@ -491,44 +491,91 @@ export async function getInvoiceTotals(organizationId: string) {
 /**
  * Get monthly financial trend for charts (last 6 months)
  */
+// Monthly cash-flow trend for the dashboard finance card.
+//
+// Derived from the POSTED general ledger (JournalEntryLine) on the cash/bank
+// accounts (1110 "النقدية والبنوك" + its children), exactly like the canonical
+// cash-flow report (queries/cash-flow.ts). Reading the ledger captures EVERY
+// real cash movement once — invoice/project/direct payments, vouchers, expenses,
+// subcontractor payments, payroll, capital & drawings — instead of only the
+// rarely-used project_expenses/project_claims tables (which left the card empty).
+//
+// `claims`   = cash inflows  (revenue line, blue)
+// `expenses` = cash outflows (red)
 export async function getMonthlyFinancialTrend(organizationId: string) {
-	const sixMonthsAgo = new Date();
-	sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+	// Window: first day of the month 5 months ago → now (6 calendar months).
+	const now = new Date();
+	const windowStart = new Date(now.getFullYear(), now.getMonth() - 5, 1, 0, 0, 0, 0);
 
-	// Aggregate by month at the database level instead of fetching all rows
-	const [expensesByMonth, claimsByMonth] = await Promise.all([
-		db.$queryRaw<Array<{ month: string; total: number }>>`
-			SELECT
-				TO_CHAR(date, 'YYYY-MM') as month,
-				SUM(amount)::double precision as total
-			FROM project_expenses
-			WHERE organization_id = ${organizationId}
-			AND date >= ${sixMonthsAgo}
-			GROUP BY TO_CHAR(date, 'YYYY-MM')
-		`,
-		db.$queryRaw<Array<{ month: string; total: number }>>`
-			SELECT
-				TO_CHAR(created_at, 'YYYY-MM') as month,
-				SUM(amount)::double precision as total
-			FROM project_claims
-			WHERE organization_id = ${organizationId}
-			AND created_at >= ${sixMonthsAgo}
-			AND status = 'PAID'
-			GROUP BY TO_CHAR(created_at, 'YYYY-MM')
-		`,
-	]);
-
-	// Merge results from both queries
+	// Pre-seed the last 6 months so the chart always renders an axis even when
+	// some months have no movement.
 	const monthlyData = new Map<string, { expenses: number; claims: number }>();
-
-	for (const row of expensesByMonth) {
-		monthlyData.set(row.month, { expenses: row.total ?? 0, claims: 0 });
+	for (let i = 5; i >= 0; i--) {
+		const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+		const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+		monthlyData.set(key, { expenses: 0, claims: 0 });
 	}
 
-	for (const row of claimsByMonth) {
-		const current = monthlyData.get(row.month) ?? { expenses: 0, claims: 0 };
-		current.claims = row.total ?? 0;
-		monthlyData.set(row.month, current);
+	// Resolve cash/bank chart accounts: 1110 parent + all its postable children.
+	const cashParent = await db.chartAccount.findUnique({
+		where: { organizationId_code: { organizationId, code: "1110" } },
+		select: { id: true },
+	});
+
+	if (!cashParent) {
+		// Accounting not initialised yet for this org.
+		return Array.from(monthlyData.entries())
+			.map(([month, data]) => ({ month, ...data }))
+			.sort((a, b) => a.month.localeCompare(b.month));
+	}
+
+	const cashAccounts = await db.chartAccount.findMany({
+		where: {
+			organizationId,
+			OR: [{ id: cashParent.id }, { parentId: cashParent.id }],
+		},
+		select: { id: true },
+	});
+	const cashIds = new Set(cashAccounts.map((a) => a.id));
+
+	// In-range POSTED lines, grouped per entry so each entry yields a single net
+	// cash movement (internal transfers between own cash accounts net to ~0).
+	const lines = await db.journalEntryLine.findMany({
+		where: {
+			account: { id: { in: [...cashIds] } },
+			journalEntry: {
+				organizationId,
+				status: "POSTED",
+				date: { gte: windowStart, lte: now },
+				referenceType: { not: "OPENING_BALANCE" },
+			},
+		},
+		select: {
+			journalEntryId: true,
+			debit: true,
+			credit: true,
+			journalEntry: { select: { date: true } },
+		},
+	});
+
+	const byEntry = new Map<string, { date: Date; cashDelta: number }>();
+	for (const line of lines) {
+		let g = byEntry.get(line.journalEntryId);
+		if (!g) {
+			g = { date: new Date(line.journalEntry.date), cashDelta: 0 };
+			byEntry.set(line.journalEntryId, g);
+		}
+		g.cashDelta += Number(line.debit) - Number(line.credit);
+	}
+
+	for (const g of byEntry.values()) {
+		// Skip net-zero internal transfers between own cash/bank accounts.
+		if (Math.abs(g.cashDelta) < 0.005) continue;
+		const key = `${g.date.getFullYear()}-${String(g.date.getMonth() + 1).padStart(2, "0")}`;
+		const bucket = monthlyData.get(key);
+		if (!bucket) continue;
+		if (g.cashDelta > 0) bucket.claims += g.cashDelta;
+		else bucket.expenses += -g.cashDelta;
 	}
 
 	return Array.from(monthlyData.entries())
