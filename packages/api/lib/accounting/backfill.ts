@@ -2,6 +2,7 @@
 // Used when accounting mode is enabled on existing data
 
 import { type PrismaClient, Prisma } from "@repo/database/prisma/generated/client";
+import { createOwnerDrawingAccount } from "@repo/database";
 import {
 	onInvoiceIssued,
 	onInvoicePaymentReceived,
@@ -14,6 +15,8 @@ import {
 	onProjectPaymentReceived,
 	onSubcontractClaimApproved,
 	onProjectClaimApproved,
+	onOwnerDrawing,
+	onCapitalContribution,
 } from "./auto-journal";
 
 export interface BackfillResult {
@@ -28,6 +31,8 @@ export interface BackfillResult {
 	projectPayments: number;
 	claimsApproved: number;
 	projectClaimsApproved: number;
+	ownerDrawings: number;
+	capitalContributions: number;
 	total: number;
 	errors: { type: string; id: string; error: string }[];
 }
@@ -39,7 +44,8 @@ export async function backfillJournalEntries(
 	const r: BackfillResult = {
 		invoices: 0, invoicePayments: 0, expenses: 0, transfers: 0,
 		subcontractPayments: 0, payroll: 0, orgPayments: 0, creditNotes: 0,
-		projectPayments: 0, claimsApproved: 0, projectClaimsApproved: 0, total: 0, errors: [],
+		projectPayments: 0, claimsApproved: 0, projectClaimsApproved: 0,
+		ownerDrawings: 0, capitalContributions: 0, total: 0, errors: [],
 	};
 
 	async function hasEntry(refType: string, refId: string): Promise<boolean> {
@@ -237,9 +243,75 @@ export async function backfillJournalEntries(
 		} catch (e: any) { r.errors.push({ type: "PROJECT_CLAIM_APPROVED", id: `PCLM-${pc.claimNo}`, error: e.message }); }
 	}
 
+	// --- 12. Owner Drawings (APPROVED) → DR 34xx / CR Bank ---
+	const drawings = await db.ownerDrawing.findMany({
+		where: { organizationId, status: "APPROVED" },
+		select: {
+			id: true, drawingNo: true, amount: true, date: true,
+			bankAccountId: true, projectId: true, createdById: true,
+			owner: { select: { id: true, name: true, nameEn: true, drawingsAccountId: true } },
+			project: { select: { name: true } },
+		},
+	});
+	for (const d of drawings) {
+		if (await hasEntry("OWNER_DRAWING", d.id)) continue;
+		try {
+			// Ensure the owner has a 34xx drawings sub-account (mirrors live flow)
+			let drawingsAccountId = d.owner.drawingsAccountId;
+			if (!drawingsAccountId) {
+				drawingsAccountId = await createOwnerDrawingAccount(
+					db, organizationId, d.owner.name, d.owner.nameEn ?? undefined,
+				);
+				if (drawingsAccountId) {
+					await db.organizationOwner.update({
+						where: { id: d.owner.id },
+						data: { drawingsAccountId },
+					});
+				}
+			}
+			if (!drawingsAccountId) {
+				r.errors.push({ type: "OWNER_DRAWING", id: d.drawingNo, error: "no drawings account" });
+				continue;
+			}
+			const jeId = await onOwnerDrawing(db, {
+				id: d.id, organizationId, drawingNo: d.drawingNo, amount: d.amount, date: d.date,
+				ownerName: d.owner.name, drawingsAccountId, bankAccountId: d.bankAccountId,
+				projectId: d.projectId, projectName: d.project?.name ?? null, userId: d.createdById,
+			});
+			if (jeId) {
+				await db.ownerDrawing.update({ where: { id: d.id }, data: { journalEntryId: jeId } });
+				r.ownerDrawings++;
+			}
+		} catch (e: any) { r.errors.push({ type: "OWNER_DRAWING", id: d.drawingNo, error: e.message }); }
+	}
+
+	// --- 13. Capital Contributions (ACTIVE) → DR Bank / CR 3100 ---
+	const contributions = await db.capitalContribution.findMany({
+		where: { organizationId, status: "ACTIVE" },
+		select: {
+			id: true, contributionNo: true, amount: true, date: true, type: true,
+			bankAccountId: true, createdById: true,
+			owner: { select: { name: true } },
+		},
+	});
+	for (const c of contributions) {
+		if (await hasEntry("CAPITAL_CONTRIBUTION", c.id)) continue;
+		try {
+			const jeId = await onCapitalContribution(db, {
+				id: c.id, organizationId, contributionNo: c.contributionNo, amount: c.amount, date: c.date,
+				ownerName: c.owner.name, type: c.type, bankAccountId: c.bankAccountId, userId: c.createdById,
+			});
+			if (jeId) {
+				await db.capitalContribution.update({ where: { id: c.id }, data: { journalEntryId: jeId } });
+				r.capitalContributions++;
+			}
+		} catch (e: any) { r.errors.push({ type: "CAPITAL_CONTRIBUTION", id: c.contributionNo, error: e.message }); }
+	}
+
 	r.total = r.invoices + r.invoicePayments + r.expenses + r.transfers +
 		r.subcontractPayments + r.payroll + r.orgPayments + r.creditNotes +
-		r.projectPayments + r.claimsApproved + r.projectClaimsApproved;
+		r.projectPayments + r.claimsApproved + r.projectClaimsApproved +
+		r.ownerDrawings + r.capitalContributions;
 
 	return r;
 }
