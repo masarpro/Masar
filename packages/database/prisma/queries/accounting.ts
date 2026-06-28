@@ -1150,7 +1150,19 @@ export async function getBalanceSheet(
 	const currentAssets = bsAccounts.filter((b) => b.type === "ASSET" && b.code.startsWith("11")).map(toRow).filter((r) => r.balance !== 0);
 	const fixedAssets = bsAccounts.filter((b) => b.type === "ASSET" && b.code.startsWith("12")).map(toRow).filter((r) => r.balance !== 0);
 	const liabilityRows = bsAccounts.filter((b) => b.type === "LIABILITY").map(toRow).filter((r) => r.balance !== 0);
-	const equityRows = bsAccounts.filter((b) => b.type === "EQUITY").map(toRow).filter((r) => r.balance !== 0);
+	// Equity is always presented credit-positive: contra-equity accounts
+	// (owner drawings 3410+, profit distributions 3500 — normalBalance DEBIT)
+	// must REDUCE equity, so we sign them credit−debit regardless of normalBalance.
+	// Using toRow() here would render them as positive debit balances and inflate
+	// equity (breaking the accounting equation), so they get a dedicated mapper.
+	const equityToRow = (b: typeof allBalances[0]): AccountBalanceRow => ({
+		accountId: b.accountId,
+		code: b.code,
+		nameAr: b.nameAr,
+		nameEn: b.nameEn,
+		balance: Number(b.totalCredit) - Number(b.totalDebit),
+	});
+	const equityRows = bsAccounts.filter((b) => b.type === "EQUITY").map(equityToRow).filter((r) => r.balance !== 0);
 
 	const totalCurrentAssets = currentAssets.reduce((s, r) => s + r.balance, 0);
 	const totalFixedAssets = fixedAssets.reduce((s, r) => s + r.balance, 0);
