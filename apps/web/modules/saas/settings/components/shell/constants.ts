@@ -3,7 +3,6 @@ import {
 	Users2,
 	CreditCard,
 	Link2,
-	TriangleAlert,
 	Bell,
 	Layout,
 	FileCheck,
@@ -80,13 +79,6 @@ export const SETTINGS_NAV_SECTIONS: SettingsNavSection[] = [
 		path: "expense-categories",
 		labelKey: "settings.menu.organization.expenseCategories",
 		icon: Tags,
-		adminOnly: true,
-	},
-	{
-		id: "danger-zone",
-		path: "danger-zone",
-		labelKey: "settings.menu.organization.dangerZone",
-		icon: TriangleAlert,
 		adminOnly: true,
 	},
 ];
