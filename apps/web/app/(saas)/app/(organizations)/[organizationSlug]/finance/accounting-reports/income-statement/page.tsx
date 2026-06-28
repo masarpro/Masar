@@ -1,6 +1,9 @@
 import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { IncomeStatementReport } from "@saas/finance/components/accounting-reports/IncomeStatementReport";
+// Income statement is sourced from the POSTED general ledger (single source of
+// truth) rather than the legacy source-table report, which mixed cash/accrual
+// bases and risked double-counting invoices against their payments.
+import { JournalIncomeStatementReport } from "@saas/finance/components/accounting/JournalIncomeStatementReport";
 import { FinanceShell } from "@saas/finance/components/shell";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
@@ -46,7 +49,7 @@ async function IncomeStatementPageContent({
 			organizationSlug={organizationSlug}
 			sectionKey="accounting-reports"
 		>
-			<IncomeStatementReport
+			<JournalIncomeStatementReport
 				organizationId={activeOrganization.id}
 				organizationSlug={organizationSlug}
 			/>

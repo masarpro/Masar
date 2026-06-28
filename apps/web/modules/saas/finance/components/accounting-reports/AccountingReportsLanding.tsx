@@ -9,7 +9,6 @@ import {
 	FileText,
 	TrendingUp,
 	Scale,
-	BarChart3,
 	BookOpen,
 	Target,
 	HeartPulse,
@@ -66,14 +65,9 @@ const BASIC_REPORTS: ReportItem[] = [
 
 const ACCOUNTING_REPORTS: ReportItem[] = [
 	{
-		id: "journal-income-statement",
-		icon: BarChart3,
-		color: "text-teal-600 dark:text-teal-400",
-		bgColor: "bg-teal-100 dark:bg-teal-900/30",
-		labelKey: "finance.accounting.incomeStatement.title",
-		descKey: "finance.accounting.incomeStatement.revenue",
-	},
-	{
+		// Single income statement, sourced from the POSTED ledger. The old
+		// "journal-income-statement" card was removed; this route now renders the
+		// same journal-based report.
 		id: "income-statement",
 		icon: TrendingUp,
 		color: "text-blue-600 dark:text-blue-400",
