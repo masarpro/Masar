@@ -76,7 +76,10 @@ export const updateClaimStatusProcedure = subscriptionProcedure
 					claimNo: existingClaim?.claimNo ?? 0,
 					clientName: project?.clientName ?? "",
 					netAmount: new Prisma.Decimal(Number(claim.amount)),
-					date: new Date(),
+					// Recognize the revenue in the claim's own billing period, not on
+					// the approval day — otherwise back-dated claims land in the wrong
+					// month and go missing from period-scoped accounting reports.
+					date: claim.periodEnd ?? claim.dueDate ?? claim.createdAt ?? new Date(),
 					projectId: input.projectId,
 					userId: context.user.id,
 				});

@@ -65,7 +65,10 @@ export const updateSubcontractClaimStatusProcedure = subscriptionProcedure
 						claimNo: claim.claimNo,
 						contractorName: contract?.name ?? "",
 						netAmount: claim.netAmount,
-						date: new Date(),
+						// Recognize the cost in the claim's own billing period, not on
+						// the approval day, so back-dated claims stay in the correct
+						// month and remain visible in period-scoped accounting reports.
+						date: claim.periodEnd ?? claim.createdAt ?? new Date(),
 						projectId: contract?.projectId ?? input.projectId,
 						userId: context.user.id,
 					});
