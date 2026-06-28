@@ -22,7 +22,7 @@ export async function getProjectFinanceSummary(
 	thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
 	// Run all queries in parallel
-	const [project, contract, costStudies, expensesTotal, paymentsTotal, claimsData, upcomingClaims, approvedCOImpact, subcontractPaymentsTotal] =
+	const [project, contract, costStudies, expensesTotal, paymentsTotal, claimsData, upcomingClaims, approvedCOImpact, subcontractPaymentsTotal, projectPaymentsTotal] =
 		await Promise.all([
 			// Get project contract value
 			db.project.findFirst({
@@ -90,6 +90,12 @@ export async function getProjectFinanceSummary(
 					contract: { projectId },
 					status: "COMPLETED",
 				},
+				_sum: { amount: true },
+			}),
+			// Get total project payments / المقبوضات (وحدة دفعات المشروع — جدول ProjectPayment)
+			// هذا هو مصدر الحقيقة لمقبوضات المشروع الذي تعرضه صفحة دفعات المشروع
+			db.projectPayment.aggregate({
+				where: { organizationId, projectId },
 				_sum: { amount: true },
 			}),
 		]);
@@ -177,9 +183,17 @@ export async function getProjectFinanceSummary(
 	// Expected profit = (contract incl. VAT + change orders) − quantities total
 	const expectedProfit = adjustedContractValueGross - quantitiesTotal;
 
-	const totalPayments = paymentsTotal._sum.amount
+	// Total received (المقبوضات) = unified FinancePayment + legacy ProjectPayment.
+	// Project receipts are recorded through the project-payments module (ProjectPayment),
+	// while general finance receipts use FinancePayment; sum both so the overview card
+	// matches the project payments page. The two come from distinct modules → no overlap.
+	const financePayments = paymentsTotal._sum.amount
 		? Number(paymentsTotal._sum.amount)
 		: 0;
+	const projectPayments = projectPaymentsTotal._sum.amount
+		? Number(projectPaymentsTotal._sum.amount)
+		: 0;
+	const totalPayments = financePayments + projectPayments;
 
 	return {
 		contractValue,
