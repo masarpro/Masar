@@ -76,6 +76,14 @@ function createMockDb() {
 			findFirst: vi.fn().mockResolvedValue(null),
 			delete: vi.fn().mockResolvedValue(undefined),
 		},
+		// Billing-document lookups for project payment revenue recognition.
+		// Default: project has no billing → payment is cash-basis revenue.
+		projectClaim: {
+			count: vi.fn().mockResolvedValue(0),
+		},
+		financeInvoice: {
+			count: vi.fn().mockResolvedValue(0),
+		},
 	} as any;
 }
 
@@ -672,9 +680,10 @@ describe("Auto-Journal Engine", () => {
 
 	// ─── 7b. Project Payment Received ───────────────────────────────────
 	describe("onProjectPaymentReceived", () => {
-		it("should create DR bank / CR receivables (1120)", async () => {
-			setupAccountLookup(db, { "1120": "acc-receivables" });
+		it("should create DR bank / CR revenue (4100) for an unbilled project", async () => {
+			setupAccountLookup(db, { "1120": "acc-receivables", "4100": "acc-revenue" });
 			setupBankLookup(db, "acc-bank");
+			// No claims/invoices → cash-basis revenue (counts default to 0)
 
 			await onProjectPaymentReceived(db, {
 				id: "projpay-1",
@@ -692,6 +701,29 @@ describe("Auto-Journal Engine", () => {
 			expect(entry.referenceNo).toBe("PP-001");
 
 			const lines = entry.lines;
+			expect(lines).toHaveLength(2);
+			expect(lines[0].accountId).toBe("acc-bank");
+			expect(lines[1].accountId).toBe("acc-revenue");
+			expectBalancedLines(lines);
+		});
+
+		it("should create DR bank / CR receivables (1120) when the project is billed via claims", async () => {
+			setupAccountLookup(db, { "1120": "acc-receivables", "4100": "acc-revenue" });
+			setupBankLookup(db, "acc-bank");
+			db.projectClaim.count.mockResolvedValue(1); // project has an approved claim
+
+			await onProjectPaymentReceived(db, {
+				id: "projpay-2",
+				organizationId: "org-1",
+				amount: D(100000),
+				date: new Date("2026-03-15"),
+				destinationAccountId: "bank-acc-1",
+				projectId: "proj-1",
+				paymentNo: "PP-002",
+				userId: "user-1",
+			});
+
+			const lines = getEntryData().lines;
 			expect(lines).toHaveLength(2);
 			expect(lines[0].accountId).toBe("acc-bank");
 			expect(lines[1].accountId).toBe("acc-receivables");

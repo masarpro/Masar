@@ -44,7 +44,7 @@
 //   #22 حذف مصروف شركة     → reverseAutoJournalEntry    → عكس
 //
 // المشاريع (Projects):
-//   #23 دفعة مشروع         → onProjectPaymentReceived   → DR بنك / CR 1120
+//   #23 دفعة مشروع         → onProjectPaymentReceived   → DR بنك / CR 4100 (نقدي) أو 1120 (إن وُجدت فوترة)
 //   #24 تعديل دفعة مشروع   → reverse+recreate           → عكس + إعادة
 //   #25 حذف دفعة مشروع     → reverseAutoJournalEntry    → عكس
 //   #26 اعتماد مستخلص      → onProjectClaimApproved     → DR 1120 / CR 4100
@@ -515,8 +515,40 @@ export async function onOrganizationPaymentReceived(db: PrismaClient, payment: {
 }
 
 // ========================================
-// 7b. Project Payment Received → DR: Bank / CR: Receivable
+// 7b. Project Payment Received → DR: Bank / CR: Revenue (cash basis) or Receivable
 // ========================================
+
+/**
+ * A project recognises revenue through billing documents when it has at least
+ * one approved/paid claim (مستخلص) or a non-draft, non-credit-note invoice.
+ *
+ * - Billed project  → a payment collects an existing receivable (revenue was
+ *   already recognised by the claim/invoice), so credit 1120.
+ * - Unbilled project → the project is run on a cash basis and the payment IS
+ *   the revenue, so credit 4100. Without this, project payments never reach any
+ *   revenue figure (they only reduced receivables).
+ */
+export async function projectHasBillingDocuments(
+	db: PrismaClient,
+	organizationId: string,
+	projectId: string,
+): Promise<boolean> {
+	const [claims, invoices] = await Promise.all([
+		db.projectClaim.count({
+			where: { organizationId, projectId, status: { in: ["APPROVED", "PAID"] } },
+		}),
+		db.financeInvoice.count({
+			where: {
+				organizationId,
+				projectId,
+				status: { notIn: ["DRAFT", "CANCELLED"] },
+				invoiceType: { not: "CREDIT_NOTE" },
+			},
+		}),
+	]);
+	return claims > 0 || invoices > 0;
+}
+
 export async function onProjectPaymentReceived(db: PrismaClient, payment: {
 	id: string;
 	organizationId: string;
@@ -532,8 +564,12 @@ export async function onProjectPaymentReceived(db: PrismaClient, payment: {
 	const bankAccId = payment.destinationAccountId
 		? await getBankChartAccountId(db, payment.organizationId, payment.destinationAccountId)
 		: await getAccountByCode(db, payment.organizationId, "1110");
-	const receivableId = await getAccountByCode(db, payment.organizationId, "1120");
-	if (!bankAccId || !receivableId) return;
+
+	// Credit revenue (4100) for cash-basis projects, otherwise collect the
+	// receivable (1120) so claim/invoice revenue isn't double-counted.
+	const hasBilling = await projectHasBillingDocuments(db, payment.organizationId, payment.projectId);
+	const creditAccId = await getAccountByCode(db, payment.organizationId, hasBilling ? "1120" : "4100");
+	if (!bankAccId || !creditAccId) return;
 
 	await createJournalEntry(db, {
 		organizationId: payment.organizationId,
@@ -546,7 +582,7 @@ export async function onProjectPaymentReceived(db: PrismaClient, payment: {
 		createdById: payment.userId,
 		lines: [
 			{ accountId: bankAccId, debit: payment.amount, credit: ZERO, projectId: payment.projectId },
-			{ accountId: receivableId, debit: ZERO, credit: payment.amount, projectId: payment.projectId },
+			{ accountId: creditAccId, debit: ZERO, credit: payment.amount, projectId: payment.projectId },
 		],
 	});
 }
