@@ -273,12 +273,6 @@ export function useSidebarMenu(): {
 										]
 									: []),
 								{
-									id: "finance-reports",
-									label: t("finance.shell.sections.reports"),
-									href: `${orgPrefix}/finance/reports`,
-									icon: BarChart3,
-								},
-								{
 									id: "finance-accounting-reports",
 									label: t("finance.shell.sections.accountingReports"),
 									href: `${orgPrefix}/finance/accounting-reports`,
