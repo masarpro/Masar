@@ -5797,6 +5797,7 @@
           "description": "To invite a new member, send them an invitation.",
           "email": "Email",
           "notifications": {
+            "emailInAnotherOrg": "This email is linked to an account in another organization and cannot be invited. Please use a different email to add this person as a member of your organization.",
             "error": {
               "description": "We were unable to invite the member. Please try again later.",
               "title": "Could not invite member"

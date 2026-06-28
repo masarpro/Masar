@@ -3,6 +3,7 @@ import { config } from "@repo/config";
 import {
 	createDefaultRoles,
 	db,
+	findMembershipInAnotherOrg,
 	getInvitationById,
 	getPurchasesByOrganizationId,
 	getPurchasesByUserId,
@@ -17,6 +18,7 @@ import { cancelSubscription } from "@repo/payments";
 import { getBaseUrl } from "@repo/utils";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { APIError } from "better-auth/api";
 import {
 	admin,
 	createAuthMiddleware,
@@ -185,6 +187,59 @@ export const auth = betterAuth({
 			}
 		}),
 		before: createAuthMiddleware(async (ctx) => {
+			// منع دعوة بريد يخص مستخدماً منتمياً لمنشأة أخرى (النظام أحادي المنشأة)
+			if (ctx.path.startsWith("/organization/invite-member")) {
+				const { email, organizationId } = ctx.body ?? {};
+				if (email) {
+					const found = await findMembershipInAnotherOrg(
+						email,
+						organizationId,
+					);
+					if (found) {
+						throw new APIError("BAD_REQUEST", {
+							code: "EMAIL_BELONGS_TO_ANOTHER_ORG",
+							message:
+								"هذا البريد الإلكتروني مرتبط بحساب في منشأة أخرى ولا يمكن دعوته. يُرجى استخدام بريد إلكتروني آخر لإضافة هذا الشخص كعضو في منشأتك.",
+						});
+					}
+				}
+			}
+
+			// حاجز أخير: منع قبول الدعوة إذا أصبح المستخدم عضواً في منشأة أخرى
+			// بين لحظة الإرسال ولحظة القبول
+			if (ctx.path.startsWith("/organization/accept-invitation")) {
+				const { invitationId } = ctx.body ?? {};
+				const userId = ctx.context.session?.session?.userId;
+				if (invitationId && userId) {
+					const invitation = await getInvitationById(invitationId);
+					if (invitation) {
+						// نفحص العضوية في منشآت غير المنشأة الداعية تحديداً
+						const member = await db.member.findFirst({
+							where: {
+								userId,
+								organizationId: { not: invitation.organizationId },
+							},
+							select: { id: true },
+						});
+						const user = await db.user.findUnique({
+							where: { id: userId },
+							select: { organizationId: true },
+						});
+						const belongsElsewhere =
+							!!member ||
+							(!!user?.organizationId &&
+								user.organizationId !== invitation.organizationId);
+						if (belongsElsewhere) {
+							throw new APIError("BAD_REQUEST", {
+								code: "EMAIL_BELONGS_TO_ANOTHER_ORG",
+								message:
+									"هذا البريد الإلكتروني مرتبط بحساب في منشأة أخرى ولا يمكن قبول الدعوة. يُرجى استخدام بريد إلكتروني آخر.",
+							});
+						}
+					}
+				}
+			}
+
 			// التحقق من حالة الحساب قبل تسجيل الدخول
 			if (
 				ctx.path.startsWith("/sign-in/email") ||

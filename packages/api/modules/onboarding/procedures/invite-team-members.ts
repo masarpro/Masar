@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { db } from "@repo/database";
+import { db, findMembershipInAnotherOrg } from "@repo/database";
 import { auth } from "@repo/auth";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
@@ -38,6 +38,21 @@ export const inviteTeamMembers = protectedProcedure
 
 		for (const invite of invitations) {
 			try {
+				// منع دعوة بريد يخص مستخدماً منتمياً لمنشأة أخرى
+				const belongsElsewhere = await findMembershipInAnotherOrg(
+					invite.email,
+					organizationId,
+				);
+				if (belongsElsewhere) {
+					results.push({
+						email: invite.email,
+						status: "failed",
+						error:
+							"هذا البريد الإلكتروني مرتبط بحساب في منشأة أخرى ولا يمكن دعوته.",
+					});
+					continue;
+				}
+
 				await auth.api.createInvitation({
 					body: {
 						organizationId,

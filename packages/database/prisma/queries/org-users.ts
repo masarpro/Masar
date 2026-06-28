@@ -1,5 +1,40 @@
 import { db } from "../client";
 
+// التحقق إن كان البريد يخص مستخدماً قائماً منتمياً لمنشأة غير المنشأة الداعية.
+// يُستخدم لمنع ربط بريد بأكثر من منشأة (النظام أحادي المنشأة عبر user.organizationId).
+// يفحص كلا المصدرين: جدول Member (يملؤه مسار BetterAuth) و user.organizationId (كلا المسارين).
+// المقارنة case-insensitive لأن البريد لا يُطبَّع lowercase عند التخزين.
+export async function findMembershipInAnotherOrg(
+	email: string,
+	excludeOrganizationId?: string,
+) {
+	const normalized = email.toLowerCase().trim();
+	const user = await db.user.findFirst({
+		where: { email: { equals: normalized, mode: "insensitive" } },
+		select: { id: true, organizationId: true },
+	});
+	if (!user) {
+		return null; // شخص جديد → اسمح
+	}
+
+	const member = await db.member.findFirst({
+		where: {
+			userId: user.id,
+			...(excludeOrganizationId
+				? { organizationId: { not: excludeOrganizationId } }
+				: {}),
+		},
+		select: { id: true },
+	});
+
+	const belongsElsewhere =
+		!!member ||
+		(!!user.organizationId &&
+			user.organizationId !== excludeOrganizationId);
+
+	return belongsElsewhere ? { userId: user.id } : null;
+}
+
 // جلب موظفي المنظمة
 export async function getOrganizationUsers(organizationId: string) {
 	return await db.user.findMany({

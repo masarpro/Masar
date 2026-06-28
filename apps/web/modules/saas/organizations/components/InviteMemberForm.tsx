@@ -66,11 +66,16 @@ export function InviteMemberForm({
 					"organizations.settings.members.inviteMember.notifications.success.title",
 				),
 			);
-		} catch {
+		} catch (error) {
+			const code = (error as { code?: string } | null)?.code;
 			toast.error(
-				t(
-					"organizations.settings.members.inviteMember.notifications.error.title",
-				),
+				code === "EMAIL_BELONGS_TO_ANOTHER_ORG"
+					? t(
+							"organizations.settings.members.inviteMember.notifications.emailInAnotherOrg",
+						)
+					: t(
+							"organizations.settings.members.inviteMember.notifications.error.title",
+						),
 			);
 		}
 	};
