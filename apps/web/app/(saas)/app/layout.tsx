@@ -2,6 +2,7 @@ import { config } from "@repo/config";
 import { createPurchasesHelper } from "@repo/payments/lib/helper";
 import { getOrganizationList, getSession } from "@saas/auth/lib/server";
 import { autoCreateOrganizationIfNeeded } from "@saas/organizations/lib/auto-create-organization";
+import * as Sentry from "@sentry/nextjs";
 import { cachedListPurchases } from "@shared/lib/cached-queries";
 import { attemptAsync } from "es-toolkit";
 import { redirect } from "next/navigation";
@@ -81,7 +82,10 @@ export default async function Layout({ children }: PropsWithChildren) {
 		const [error, data] = await attemptAsync(() => purchasesPromise!);
 
 		if (error) {
-			throw new Error("Failed to fetch purchases");
+			// فشل جلب المشتريات يجب ألا يُسقط الـ layout بأكمله (كان يسبب 500 على كل /app)
+			Sentry.captureException(error, {
+				tags: { location: "saas/app/layout:listPurchases" },
+			});
 		}
 
 		const purchases = (data as any)?.purchases ?? [];
