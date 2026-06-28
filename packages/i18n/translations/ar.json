@@ -4833,7 +4833,8 @@
       "errors": {
         "accountRequired": "الحساب المستلم مطلوب",
         "amountRequired": "المبلغ مطلوب",
-        "clientRequired": "العميل مطلوب"
+        "clientRequired": "العميل مطلوب",
+        "projectRequired": "يجب اختيار المشروع"
       }
     },
     "receiptVouchers": {

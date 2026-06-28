@@ -163,6 +163,9 @@ export function AddPaymentDialog({
 			if (!formData.clientId && !formData.clientName) {
 				throw new Error(t("finance.payments.errors.clientRequired"));
 			}
+			if (!formData.projectId) {
+				throw new Error(t("finance.payments.errors.projectRequired"));
+			}
 
 			return orpcClient.finance.orgPayments.create({
 				organizationId,
@@ -314,6 +317,43 @@ export function AddPaymentDialog({
 								)}
 								className="rounded-xl h-10"
 							/>
+						</div>
+					)}
+
+					{/* Project — required */}
+					{!defaultProjectId && (
+						<div className="space-y-1">
+							<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+								<FolderOpen className="h-3 w-3 inline me-1" />
+								{t("finance.payments.selectProject")} *
+							</Label>
+							<Select
+								value={formData.projectId || ""}
+								onValueChange={(value: any) =>
+									setFormData({
+										...formData,
+										projectId: value,
+									})
+								}
+							>
+								<SelectTrigger className="rounded-xl h-10">
+									<SelectValue
+										placeholder={t(
+											"finance.payments.selectProjectPlaceholder",
+										)}
+									/>
+								</SelectTrigger>
+								<SelectContent className="rounded-xl">
+									{projects.map((project: any) => (
+										<SelectItem
+											key={project.id}
+											value={project.id}
+										>
+											{project.name}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
 						</div>
 					)}
 
@@ -504,51 +544,8 @@ export function AddPaymentDialog({
 								</div>
 							</div>
 
-							{/* Project + Invoice link */}
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-								{!defaultProjectId && (
-									<div className="space-y-1">
-										<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
-											<FolderOpen className="h-3 w-3 inline me-1" />
-											{t("finance.payments.selectProject")}
-										</Label>
-										<Select
-											value={formData.projectId || "none"}
-											onValueChange={(value: any) =>
-												setFormData({
-													...formData,
-													projectId:
-														value === "none"
-															? ""
-															: value,
-												})
-											}
-										>
-											<SelectTrigger className="rounded-xl h-10">
-												<SelectValue
-													placeholder={t(
-														"finance.payments.selectProjectPlaceholder",
-													)}
-												/>
-											</SelectTrigger>
-											<SelectContent className="rounded-xl">
-												<SelectItem value="none">
-													{t(
-														"finance.payments.noProject",
-													)}
-												</SelectItem>
-												{projects.map((project: any) => (
-													<SelectItem
-														key={project.id}
-														value={project.id}
-													>
-														{project.name}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</div>
-								)}
+							{/* Invoice link */}
+							<div className="grid grid-cols-1 gap-2 sm:gap-3">
 								<div className="space-y-1">
 									<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 										{t("finance.payments.selectInvoice")}

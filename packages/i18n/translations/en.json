@@ -4811,7 +4811,8 @@
       "errors": {
         "accountRequired": "Destination account is required",
         "amountRequired": "Amount is required",
-        "clientRequired": "Client is required"
+        "clientRequired": "Client is required",
+        "projectRequired": "Project is required"
       }
     },
     "receiptVouchers": {
