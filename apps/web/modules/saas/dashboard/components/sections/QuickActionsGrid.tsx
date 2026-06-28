@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { AddExpenseDialog } from "@saas/finance/components/expenses/AddExpenseDialog";
+import { AddPaymentDialog } from "@saas/finance/components/payments/AddPaymentDialog";
 
 interface QuickActionsGridProps {
 	organizationSlug: string;
@@ -24,6 +25,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 	const { activeOrganization } = useActiveOrganization();
 	const organizationId = activeOrganization?.id ?? "";
 	const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
+	const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
 
 	const quickActions = [
 		{
@@ -43,11 +45,12 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			sectionLabel: t("dashboard.actions.payments"),
 			actionLabel: t("dashboard.actions.addPayment"),
 			browsePath: `/app/${organizationSlug}/finance/payments`,
-			createPath: `/app/${organizationSlug}/finance/payments/new`,
+			createPath: "",
 			iconColor: "text-emerald-500 dark:text-emerald-400",
 			bgColor: "bg-emerald-50/80 dark:bg-emerald-950/30",
 			hoverBg: "hover:bg-emerald-100 dark:hover:bg-emerald-900/50",
 			borderColor: "border-emerald-200/50 dark:border-emerald-800/50",
+			onCreateClick: () => setPaymentDialogOpen(true),
 		},
 		{
 			icon: FileText,
@@ -147,6 +150,13 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			<AddExpenseDialog
 				open={expenseDialogOpen}
 				onOpenChange={setExpenseDialogOpen}
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+			/>
+
+			<AddPaymentDialog
+				open={paymentDialogOpen}
+				onOpenChange={setPaymentDialogOpen}
 				organizationId={organizationId}
 				organizationSlug={organizationSlug}
 			/>

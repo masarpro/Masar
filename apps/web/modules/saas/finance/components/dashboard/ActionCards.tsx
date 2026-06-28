@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { AddExpenseDialog } from "@saas/finance/components/expenses/AddExpenseDialog";
+import { AddPaymentDialog } from "@saas/finance/components/payments/AddPaymentDialog";
 
 interface ActionCardsProps {
 	organizationSlug: string;
@@ -33,6 +34,7 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 	const { activeOrganization } = useActiveOrganization();
 	const organizationId = activeOrganization?.id ?? "";
 	const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
+	const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
 
 	// Main 3 sections with cards
 	const mainSections: MainSection[] = [
@@ -74,6 +76,7 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 				{mainSections.map((section) => {
 					const Icon = section.icon;
 					const isExpense = section.id === "expenses";
+						const isPayment = section.id === "payments";
 					return (
 						<div
 							key={section.id}
@@ -94,11 +97,15 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 								</span>
 							</Link>
 
-							{/* Create Section (Bottom) — expense opens dialog, others navigate */}
-							{isExpense ? (
+							{/* Create Section (Bottom) — expense/payment open dialogs, others navigate */}
+							{isExpense || isPayment ? (
 								<button
 									type="button"
-									onClick={() => setExpenseDialogOpen(true)}
+									onClick={() =>
+										isExpense
+											? setExpenseDialogOpen(true)
+											: setPaymentDialogOpen(true)
+									}
 									className="flex w-full items-center justify-center gap-2 p-3 bg-card/50 hover:bg-card/80 transition-colors"
 								>
 									<Plus className={`h-4 w-4 ${section.iconColor}`} />
@@ -125,6 +132,13 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 			<AddExpenseDialog
 				open={expenseDialogOpen}
 				onOpenChange={setExpenseDialogOpen}
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+			/>
+
+			<AddPaymentDialog
+				open={paymentDialogOpen}
+				onOpenChange={setPaymentDialogOpen}
 				organizationId={organizationId}
 				organizationSlug={organizationSlug}
 			/>

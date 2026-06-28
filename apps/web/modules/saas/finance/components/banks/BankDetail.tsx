@@ -42,6 +42,7 @@ import {
 import { Currency } from "../shared/Currency";
 import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 import { AddExpenseDialog } from "@saas/finance/components/expenses/AddExpenseDialog";
+import { AddPaymentDialog } from "@saas/finance/components/payments/AddPaymentDialog";
 import { BankLedger, type BankLedgerData } from "./BankLedger";
 
 interface BankDetailProps {
@@ -62,6 +63,7 @@ export function BankDetail({
 	const [isEditing, setIsEditing] = useState(false);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 	const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
+	const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
 	const [dateFrom, setDateFrom] = useState("");
 	const [dateTo, setDateTo] = useState("");
 
@@ -356,7 +358,7 @@ export function BankDetail({
 				<Button
 					variant="outline"
 					className="h-auto py-4 rounded-xl justify-start"
-					onClick={() => router.push(`/app/${organizationSlug}/finance/payments/new?destinationAccountId=${bankId}`)}
+					onClick={() => setPaymentDialogOpen(true)}
 				>
 					<TrendingUp className="h-5 w-5 me-3 text-green-500" />
 					<div className="text-start">
@@ -664,6 +666,14 @@ export function BankDetail({
 				organizationId={organizationId}
 				organizationSlug={organizationSlug}
 				initialSourceAccountId={bankId}
+			/>
+
+			<AddPaymentDialog
+				open={paymentDialogOpen}
+				onOpenChange={setPaymentDialogOpen}
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+				defaultDestinationAccountId={bankId}
 			/>
 		</div>
 	);

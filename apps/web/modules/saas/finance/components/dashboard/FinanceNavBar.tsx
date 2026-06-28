@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { cn } from "@ui/lib";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import { AddPaymentDialog } from "@saas/finance/components/payments/AddPaymentDialog";
 import {
 	Receipt,
 	FolderOpen,
@@ -36,6 +39,9 @@ export function FinanceNavBar({ organizationSlug }: FinanceNavBarProps) {
 	const t = useTranslations();
 	const pathname = usePathname();
 	const basePath = `/app/${organizationSlug}/finance`;
+	const { activeOrganization } = useActiveOrganization();
+	const organizationId = activeOrganization?.id ?? "";
+	const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
 
 	// Main 3 sections with cards
 	const mainSections: MainSection[] = [
@@ -141,16 +147,29 @@ export function FinanceNavBar({ organizationSlug }: FinanceNavBarProps) {
 								</span>
 							</Link>
 
-							{/* Create Section (Bottom) */}
-							<Link
-								href={section.createPath}
-								className="flex items-center justify-center gap-2 p-3 bg-white/50 dark:bg-slate-800/30 hover:bg-white/80 dark:hover:bg-slate-800/50 transition-colors"
-							>
-								<Plus className={`h-4 w-4 ${section.iconColor}`} />
-								<span className={`text-xs font-medium ${section.iconColor}`}>
-									{t(`finance.dashboard.nav.${section.id}New`)}
-								</span>
-							</Link>
+							{/* Create Section (Bottom) — payment opens dialog, others navigate */}
+							{section.id === "payments" ? (
+								<button
+									type="button"
+									onClick={() => setPaymentDialogOpen(true)}
+									className="flex w-full items-center justify-center gap-2 p-3 bg-white/50 dark:bg-slate-800/30 hover:bg-white/80 dark:hover:bg-slate-800/50 transition-colors"
+								>
+									<Plus className={`h-4 w-4 ${section.iconColor}`} />
+									<span className={`text-xs font-medium ${section.iconColor}`}>
+										{t(`finance.dashboard.nav.${section.id}New`)}
+									</span>
+								</button>
+							) : (
+								<Link
+									href={section.createPath}
+									className="flex items-center justify-center gap-2 p-3 bg-white/50 dark:bg-slate-800/30 hover:bg-white/80 dark:hover:bg-slate-800/50 transition-colors"
+								>
+									<Plus className={`h-4 w-4 ${section.iconColor}`} />
+									<span className={`text-xs font-medium ${section.iconColor}`}>
+										{t(`finance.dashboard.nav.${section.id}New`)}
+									</span>
+								</Link>
+							)}
 						</div>
 					);
 				})}
@@ -180,6 +199,13 @@ export function FinanceNavBar({ organizationSlug }: FinanceNavBarProps) {
 					})}
 				</div>
 			</div>
+
+			<AddPaymentDialog
+				open={paymentDialogOpen}
+				onOpenChange={setPaymentDialogOpen}
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+			/>
 		</div>
 	);
 }
