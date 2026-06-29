@@ -3,7 +3,7 @@
 import { db, orgAuditLog, generateAtomicNo } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
-import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { verifyProjectAccess } from "../../../lib/permissions";
 import { ORPCError } from "@orpc/server";
 import { Prisma } from "@repo/database/prisma/generated/client";
 import {
@@ -46,17 +46,11 @@ export const createHandoverProtocol = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+		// Per-project access (also validates project belongs to org)
+		await verifyProjectAccess(input.projectId, input.organizationId, context.user.id, {
 			section: "projects",
 			action: "edit",
 		});
-
-		// Validate project belongs to org
-		const project = await db.project.findFirst({
-			where: { id: input.projectId, organizationId: input.organizationId },
-			select: { id: true },
-		});
-		if (!project) throw new ORPCError("BAD_REQUEST", { message: "المشروع غير موجود" });
 
 		// ITEM_ACCEPTANCE requires subcontractContractId
 		if (input.type === "ITEM_ACCEPTANCE" && !input.subcontractContractId) {
@@ -151,16 +145,17 @@ export const updateHandoverProtocol = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+		const existing = await db.handoverProtocol.findFirst({
+			where: { id: input.id, organizationId: input.organizationId },
+			select: { id: true, status: true, type: true, date: true, projectId: true },
+		});
+		if (!existing) throw new ORPCError("NOT_FOUND", { message: "المحضر غير موجود" });
+
+		await verifyProjectAccess(existing.projectId, input.organizationId, context.user.id, {
 			section: "projects",
 			action: "edit",
 		});
 
-		const existing = await db.handoverProtocol.findFirst({
-			where: { id: input.id, organizationId: input.organizationId },
-			select: { id: true, status: true, type: true, date: true },
-		});
-		if (!existing) throw new ORPCError("NOT_FOUND", { message: "المحضر غير موجود" });
 		if (existing.status !== "DRAFT") {
 			throw new ORPCError("BAD_REQUEST", { message: "لا يمكن تعديل محضر بعد تقديمه" });
 		}
@@ -214,16 +209,17 @@ export const deleteHandoverProtocol = subscriptionProcedure
 	})
 	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+		const existing = await db.handoverProtocol.findFirst({
+			where: { id: input.id, organizationId: input.organizationId },
+			select: { id: true, status: true, protocolNo: true, projectId: true },
+		});
+		if (!existing) throw new ORPCError("NOT_FOUND", { message: "المحضر غير موجود" });
+
+		await verifyProjectAccess(existing.projectId, input.organizationId, context.user.id, {
 			section: "projects",
 			action: "edit",
 		});
 
-		const existing = await db.handoverProtocol.findFirst({
-			where: { id: input.id, organizationId: input.organizationId },
-			select: { id: true, status: true, protocolNo: true },
-		});
-		if (!existing) throw new ORPCError("NOT_FOUND", { message: "المحضر غير موجود" });
 		if (existing.status !== "DRAFT") {
 			throw new ORPCError("BAD_REQUEST", { message: "لا يمكن حذف محضر بعد تقديمه" });
 		}

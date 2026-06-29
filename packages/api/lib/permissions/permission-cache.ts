@@ -1,6 +1,6 @@
 import { getOrganizationMembership } from "@repo/database";
 import type { Permissions } from "@repo/database/prisma/permissions";
-import { getUserPermissions } from "./get-user-permissions";
+import { getUserPermissions, getUserProjectScope } from "./get-user-permissions";
 
 /**
  * Short-lived, process-local cache for the two DB queries that run on the
@@ -30,8 +30,11 @@ type Entry<T> = { value: T; expires: number };
 
 type Membership = Awaited<ReturnType<typeof getOrganizationMembership>>;
 
+type ProjectScope = Awaited<ReturnType<typeof getUserProjectScope>>;
+
 const membershipCache = new Map<string, Entry<Membership>>();
 const permissionsCache = new Map<string, Entry<Permissions>>();
+const projectScopeCache = new Map<string, Entry<ProjectScope>>();
 
 function cacheKey(organizationId: string, userId: string): string {
 	return `${organizationId}:${userId}`;
@@ -85,6 +88,20 @@ export async function getCachedUserPermissions(
 	return value;
 }
 
+export async function getCachedUserProjectScope(
+	userId: string,
+	organizationId: string,
+): Promise<ProjectScope> {
+	const key = cacheKey(organizationId, userId);
+	const hit = read(projectScopeCache, key);
+	if (hit) {
+		return hit.value;
+	}
+	const value = await getUserProjectScope(userId, organizationId);
+	write(projectScopeCache, key, value);
+	return value;
+}
+
 /**
  * Drop cached membership/permissions so a role/permission/isActive change takes
  * effect on the very next request instead of waiting out the TTL.
@@ -102,6 +119,7 @@ export function invalidateAccessCache(
 		const key = cacheKey(organizationId, userId);
 		membershipCache.delete(key);
 		permissionsCache.delete(key);
+		projectScopeCache.delete(key);
 		return;
 	}
 
@@ -114,6 +132,11 @@ export function invalidateAccessCache(
 	for (const key of permissionsCache.keys()) {
 		if (key.startsWith(prefix)) {
 			permissionsCache.delete(key);
+		}
+	}
+	for (const key of projectScopeCache.keys()) {
+		if (key.startsWith(prefix)) {
+			projectScopeCache.delete(key);
 		}
 	}
 }

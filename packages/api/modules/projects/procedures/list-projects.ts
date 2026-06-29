@@ -1,7 +1,14 @@
-import { getOrganizationProjects, getProjectStats } from "@repo/database";
+import {
+	getOrganizationProjects,
+	getProjectStats,
+	getProjectsForUser,
+} from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
-import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	getCachedUserProjectScope,
+	verifyOrganizationAccess,
+} from "../../../lib/permissions";
 import { idString, searchQuery, paginationLimit, paginationOffset } from "../../../lib/validation-constants";
 
 export const listProjects = protectedProcedure
@@ -28,12 +35,31 @@ export const listProjects = protectedProcedure
 			{ section: "projects", action: "view" },
 		);
 
+		// Per-member visibility: managerial roles / explicit grant see all
+		// projects; everyone else is restricted to their ProjectMember
+		// assignments. Filtering happens at the query level — unassigned project
+		// data is never returned to the client.
+		const scope = await getCachedUserProjectScope(
+			context.user.id,
+			input.organizationId,
+		);
+
+		let restrictToProjectIds: string[] | undefined;
+		if (!scope.allProjects) {
+			const assigned = await getProjectsForUser(
+				context.user.id,
+				input.organizationId,
+			);
+			restrictToProjectIds = assigned.map((p) => p.id);
+		}
+
 		const [result, stats] = await Promise.all([
 			getOrganizationProjects(input.organizationId, {
 				status: input.status,
 				query: input.query,
 				limit: input.limit,
 				offset: input.offset,
+				restrictToProjectIds,
 			}),
 			getProjectStats(input.organizationId),
 		]);

@@ -50,6 +50,15 @@ export default function proxy(req: NextRequest) {
 		return NextResponse.next();
 	}
 
+	// 3b. /invitation/* — accept-invitation page (locale from cookie, no locale prefix)
+	if (pathname.startsWith("/invitation")) {
+		if (!appConfig.ui.saas.enabled) {
+			return NextResponse.redirect(new URL("/", origin));
+		}
+
+		return NextResponse.next();
+	}
+
 	// 4. Pre-login SaaS paths (auth required)
 	if (AUTH_REQUIRED_PATHS.some((path) => pathname.startsWith(path))) {
 		const sessionCookie = getSessionCookie(req);

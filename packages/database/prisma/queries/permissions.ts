@@ -153,6 +153,56 @@ export async function getOrganizationUsersWithPermissions(
 }
 
 /**
+ * Role types that always see every project in the organization, regardless of
+ * ProjectMember assignment (managerial / org-wide roles).
+ */
+export const ALL_PROJECTS_ROLE_TYPES = [
+	"OWNER",
+	"PROJECT_MANAGER",
+	"ACCOUNTANT",
+] as const;
+
+/**
+ * Resolve a user's project-visibility scope within an organization.
+ *
+ * `{ allProjects: true }` when the user may see/act on every project:
+ *   - managerial organization role (see ALL_PROJECTS_ROLE_TYPES), OR
+ *   - the explicit `allProjectsAccess` grant (set at invite time / used to
+ *     grandfather pre-existing members).
+ *
+ * Otherwise `{ allProjects: false }` — caller must restrict to the user's
+ * ProjectMember assignments. Cross-tenant requests resolve to restricted.
+ *
+ * Single source of truth shared by the API authorization layer and server
+ * components (project layout guard).
+ */
+export async function getUserProjectScope(
+	userId: string,
+	organizationId: string,
+): Promise<{ allProjects: boolean }> {
+	const user = await db.user.findUnique({
+		where: { id: userId },
+		select: {
+			organizationId: true,
+			allProjectsAccess: true,
+			organizationRole: { select: { type: true } },
+		},
+	});
+
+	// Same org guard as getUserPermissions — never grant scope cross-tenant.
+	if (!user || user.organizationId !== organizationId) {
+		return { allProjects: false };
+	}
+
+	const roleType = user.organizationRole?.type;
+	const isManagerial =
+		!!roleType &&
+		(ALL_PROJECTS_ROLE_TYPES as readonly string[]).includes(roleType);
+
+	return { allProjects: isManagerial || user.allProjectsAccess === true };
+}
+
+/**
  * Get user IDs of organization admins (OWNER + PROJECT_MANAGER roles)
  * Replaces the old pattern of querying Member.role for "owner"/"admin"
  */

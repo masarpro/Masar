@@ -5,7 +5,7 @@
 import { db, orgAuditLog } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
-import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { verifyProjectAccess } from "../../../lib/permissions";
 import { ORPCError } from "@orpc/server";
 import { Prisma } from "@repo/database/prisma/generated/client";
 import { idString, MAX_ARRAY } from "../../../lib/validation-constants";
@@ -23,16 +23,16 @@ export const submitHandoverProtocol = subscriptionProcedure
 	})
 	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "projects",
-			action: "edit",
-		});
-
 		const protocol = await db.handoverProtocol.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
 			include: { _count: { select: { items: true } } },
 		});
 		if (!protocol) throw new ORPCError("NOT_FOUND", { message: "المحضر غير موجود" });
+
+		await verifyProjectAccess(protocol.projectId, input.organizationId, context.user.id, {
+			section: "projects",
+			action: "edit",
+		});
 		if (protocol.status !== "DRAFT") {
 			throw new ORPCError("BAD_REQUEST", { message: "يمكن تقديم المسودات فقط" });
 		}
@@ -81,15 +81,15 @@ export const signHandoverProtocol = subscriptionProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "projects",
-			action: "edit",
-		});
-
 		const protocol = await db.handoverProtocol.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
 		});
 		if (!protocol) throw new ORPCError("NOT_FOUND", { message: "المحضر غير موجود" });
+
+		await verifyProjectAccess(protocol.projectId, input.organizationId, context.user.id, {
+			section: "projects",
+			action: "edit",
+		});
 		if (!["PENDING_SIGNATURES", "PARTIALLY_SIGNED"].includes(protocol.status)) {
 			throw new ORPCError("BAD_REQUEST", { message: "المحضر ليس بحالة انتظار التوقيعات" });
 		}
@@ -182,15 +182,15 @@ export const completeHandoverProtocol = subscriptionProcedure
 	})
 	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "projects",
-			action: "edit",
-		});
-
 		const protocol = await db.handoverProtocol.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
 		});
 		if (!protocol) throw new ORPCError("NOT_FOUND", { message: "المحضر غير موجود" });
+
+		await verifyProjectAccess(protocol.projectId, input.organizationId, context.user.id, {
+			section: "projects",
+			action: "edit",
+		});
 		if (!["PENDING_SIGNATURES", "PARTIALLY_SIGNED"].includes(protocol.status)) {
 			throw new ORPCError("BAD_REQUEST", { message: "لا يمكن إكمال هذا المحضر" });
 		}

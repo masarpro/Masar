@@ -1,9 +1,13 @@
 // Handover Protocols — List & Get by ID
 
-import { db } from "@repo/database";
+import { db, getProjectsForUser } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
-import { verifyOrganizationAccess } from "../../../lib/permissions";
+import {
+	verifyOrganizationAccess,
+	verifyProjectAccess,
+	getCachedUserProjectScope,
+} from "../../../lib/permissions";
 import { ORPCError } from "@orpc/server";
 import { Prisma } from "@repo/database/prisma/generated/client";
 import {
@@ -39,13 +43,28 @@ export const listHandoverProtocols = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "projects",
-			action: "view",
-		});
+		if (input.projectId) {
+			await verifyProjectAccess(input.projectId, input.organizationId, context.user.id, {
+				section: "projects",
+				action: "view",
+			});
+		} else {
+			await verifyOrganizationAccess(input.organizationId, context.user.id, {
+				section: "projects",
+				action: "view",
+			});
+		}
 
 		const where: Prisma.HandoverProtocolWhereInput = { organizationId: input.organizationId };
-		if (input.projectId) where.projectId = input.projectId;
+		if (input.projectId) {
+			where.projectId = input.projectId;
+		} else {
+			const scope = await getCachedUserProjectScope(context.user.id, input.organizationId);
+			if (!scope.allProjects) {
+				const assigned = await getProjectsForUser(context.user.id, input.organizationId);
+				where.projectId = { in: assigned.map((p) => p.id) };
+			}
+		}
 		if (input.type) where.type = input.type;
 		if (input.status) where.status = input.status;
 		if (input.subcontractContractId) where.subcontractContractId = input.subcontractContractId;
@@ -93,11 +112,6 @@ export const getHandoverProtocol = protectedProcedure
 	})
 	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "projects",
-			action: "view",
-		});
-
 		const protocol = await db.handoverProtocol.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
 			include: {
@@ -111,6 +125,11 @@ export const getHandoverProtocol = protectedProcedure
 		if (!protocol) {
 			throw new ORPCError("NOT_FOUND", { message: "المحضر غير موجود" });
 		}
+
+		await verifyProjectAccess(protocol.projectId, input.organizationId, context.user.id, {
+			section: "projects",
+			action: "view",
+		});
 
 		return protocol;
 	});

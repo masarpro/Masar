@@ -19,7 +19,7 @@ export type PlanConfigScalarFieldEnum = z.infer<typeof PlanConfigScalarFieldEnum
 
 // File: UserScalarFieldEnum.schema.ts
 
-export const UserScalarFieldEnumSchema = z.enum(['id', 'name', 'email', 'emailVerified', 'image', 'createdAt', 'updatedAt', 'username', 'role', 'banned', 'banReason', 'banExpires', 'onboardingComplete', 'paymentsCustomerId', 'locale', 'displayUsername', 'twoFactorEnabled', 'accountType', 'isActive', 'mustChangePassword', 'lastLoginAt', 'organizationRoleId', 'customPermissions', 'createdById', 'organizationId'])
+export const UserScalarFieldEnumSchema = z.enum(['id', 'name', 'email', 'emailVerified', 'image', 'createdAt', 'updatedAt', 'username', 'role', 'banned', 'banReason', 'banExpires', 'onboardingComplete', 'paymentsCustomerId', 'locale', 'displayUsername', 'twoFactorEnabled', 'accountType', 'isActive', 'mustChangePassword', 'lastLoginAt', 'organizationRoleId', 'customPermissions', 'allProjectsAccess', 'createdById', 'organizationId'])
 
 export type UserScalarFieldEnum = z.infer<typeof UserScalarFieldEnumSchema>;
 
@@ -1545,6 +1545,7 @@ export const UserSchema = z.object({
   lastLoginAt: z.date().nullish(),
   organizationRoleId: z.string().nullish(),
   customPermissions: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").nullish(),
+  allProjectsAccess: z.boolean(),
   createdById: z.string().nullish(),
   organizationId: z.string().nullish(),
 });

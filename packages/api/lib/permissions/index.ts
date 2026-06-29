@@ -1,5 +1,10 @@
 // Permission utilities for Masar API
-export { getUserPermissions, getUserRoleType } from "./get-user-permissions";
+export {
+	getUserPermissions,
+	getUserRoleType,
+	getUserProjectScope,
+	ALL_PROJECTS_ROLE_TYPES,
+} from "./get-user-permissions";
 export {
 	verifyProjectAccess,
 	verifyOrganizationAccess,
@@ -9,5 +14,6 @@ export {
 export {
 	getCachedOrganizationMembership,
 	getCachedUserPermissions,
+	getCachedUserProjectScope,
 	invalidateAccessCache,
 } from "./permission-cache";

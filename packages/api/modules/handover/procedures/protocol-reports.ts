@@ -5,11 +5,12 @@
 
 import { db, orgAuditLog } from "@repo/database";
 import { z } from "zod";
+import { ORPCError } from "@orpc/server";
 import {
 	protectedProcedure,
 	subscriptionProcedure,
 } from "../../../orpc/procedures";
-import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { verifyOrganizationAccess, verifyProjectAccess } from "../../../lib/permissions";
 import { idString } from "../../../lib/validation-constants";
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -24,7 +25,15 @@ export const printHandoverProtocol = subscriptionProcedure
 	})
 	.input(z.object({ organizationId: idString(), id: idString() }))
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, {
+		const protocol = await db.handoverProtocol.findFirst({
+			where: { id: input.id, organizationId: input.organizationId },
+			select: { projectId: true },
+		});
+		if (!protocol) {
+			throw new ORPCError("NOT_FOUND", { message: "المحضر غير موجود" });
+		}
+
+		await verifyProjectAccess(protocol.projectId, input.organizationId, context.user.id, {
 			section: "projects",
 			action: "view",
 		});
@@ -58,10 +67,17 @@ export const getWarrantyStatus = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		await verifyOrganizationAccess(input.organizationId, context.user.id, {
-			section: "projects",
-			action: "view",
-		});
+		if (input.projectId) {
+			await verifyProjectAccess(input.projectId, input.organizationId, context.user.id, {
+				section: "projects",
+				action: "view",
+			});
+		} else {
+			await verifyOrganizationAccess(input.organizationId, context.user.id, {
+				section: "projects",
+				action: "view",
+			});
+		}
 
 		const where: any = {
 			organizationId: input.organizationId,

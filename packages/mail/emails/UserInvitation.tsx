@@ -27,9 +27,9 @@ export function UserInvitation({
 	return (
 		<Wrapper>
 			<Heading className="text-xl">
-				{t.markup("mail.userInvitation.headline", {
+				{t.rich("mail.userInvitation.headline", {
 					organizationName,
-					strong: (chunks) => `<strong>${chunks}</strong>`,
+					strong: (chunks) => <strong>{chunks}</strong>,
 				})}
 			</Heading>
 			<Text>

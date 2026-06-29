@@ -190,6 +190,13 @@ function mergePermissions(
 	return merged;
 }
 
+// Project-visibility scope lives in the database layer so the API authorization
+// path and server components (project layout guard) share one source of truth.
+export {
+	getUserProjectScope,
+	ALL_PROJECTS_ROLE_TYPES,
+} from "@repo/database";
+
 /**
  * Get user's organization role type (for display purposes)
  */

@@ -1,4 +1,4 @@
-import { getProjectById, getProjectMemberRole, getEffectivePermissions } from "@repo/database";
+import { getProjectById, getProjectMemberRole, getEffectivePermissions, getUserProjectScope } from "@repo/database";
 import { hasPermission } from "@repo/database/prisma/permissions";
 import { getActiveOrganization, getSession } from "@saas/auth/lib/server";
 import { ProjectShell } from "@saas/projects/components/shell";
@@ -24,15 +24,23 @@ export default async function ProjectLayout({
 	if (!session?.user) redirect("/auth/login");
 	if (!organization) redirect("/app");
 
-	// Stage 2: Project data + role + permissions all in parallel
+	// Stage 2: Project data + role + permissions + visibility scope in parallel
 	// Always fetch permissions (cheap indexed query) to avoid conditional Stage 3
-	const [project, projectMemberRole, permissions] = await Promise.all([
+	const [project, projectMemberRole, permissions, scope] = await Promise.all([
 		getProjectById(projectId, organization.id),
 		getProjectMemberRole(projectId, session.user.id),
 		getEffectivePermissions(session.user.id, organization.id),
+		getUserProjectScope(session.user.id, organization.id),
 	]);
 
 	if (!project) {
+		return notFound();
+	}
+
+	// Per-member visibility gate: non-managerial members without the
+	// allProjectsAccess grant may only enter projects they are assigned to.
+	// Treated as not-found to avoid leaking the existence of other projects.
+	if (!scope.allProjects && !projectMemberRole) {
 		return notFound();
 	}
 

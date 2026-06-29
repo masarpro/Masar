@@ -68,6 +68,7 @@ export async function createOrgUser(data: {
 	mustChangePassword?: boolean;
 	isActive?: boolean;
 	emailVerified?: boolean;
+	allProjectsAccess?: boolean;
 }) {
 	// Validate role belongs to the same organization
 	const role = await db.role.findUnique({
@@ -86,6 +87,7 @@ export async function createOrgUser(data: {
 			isActive: data.isActive ?? true,
 			mustChangePassword: data.mustChangePassword ?? true,
 			emailVerified: data.emailVerified ?? true,
+			allProjectsAccess: data.allProjectsAccess ?? false,
 			organizationId: data.organizationId,
 			organizationRoleId: data.organizationRoleId,
 			createdById: data.createdById,
@@ -105,6 +107,7 @@ export async function updateOrgUser(
 		organizationRoleId?: string;
 		isActive?: boolean;
 		customPermissions?: Record<string, unknown>;
+		allProjectsAccess?: boolean;
 	},
 ) {
 	// التحقق من أن المستخدم ينتمي للمنظمة
@@ -137,6 +140,7 @@ export async function updateOrgUser(
 			name: data.name,
 			organizationRoleId: data.organizationRoleId,
 			isActive: data.isActive,
+			allProjectsAccess: data.allProjectsAccess,
 			customPermissions: data.customPermissions
 				? (data.customPermissions as any)
 				: undefined,

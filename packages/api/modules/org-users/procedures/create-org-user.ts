@@ -9,11 +9,29 @@ import { sendEmail } from "@repo/mail";
 import { getBaseUrl } from "@repo/utils";
 import { z } from "zod";
 import {
+	ALL_PROJECTS_ROLE_TYPES,
 	invalidateAccessCache,
 	verifyOrganizationAccess,
 } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { subscriptionProcedure } from "../../../orpc/procedures";
+import type { ProjectRole } from "@repo/database/prisma/generated/client";
+
+/** Map an organization role type to the initial ProjectMember role. */
+function mapOrgRoleTypeToProjectRole(roleType?: string | null): ProjectRole {
+	switch (roleType) {
+		case "PROJECT_MANAGER":
+			return "MANAGER";
+		case "ENGINEER":
+			return "ENGINEER";
+		case "SUPERVISOR":
+			return "SUPERVISOR";
+		case "ACCOUNTANT":
+			return "ACCOUNTANT";
+		default:
+			return "VIEWER";
+	}
+}
 
 export const createOrgUser = subscriptionProcedure
 	.route({
@@ -29,6 +47,10 @@ export const createOrgUser = subscriptionProcedure
 			email: z.string().trim().email().max(254),
 			organizationRoleId: z.string().trim().max(100),
 			password: z.string().min(8).max(200).optional(),
+			// نطاق رؤية المشاريع. عند true يرى كل المشاريع؛ غير ذلك يُقيَّد بـ projectIds.
+			// الأدوار الإدارية ترى الكل بصرف النظر عن هذه القيمة.
+			allProjectsAccess: z.boolean().optional().default(false),
+			projectIds: z.array(z.string().trim().max(100)).max(500).optional().default([]),
 		}),
 	)
 	.handler(async ({ input, context }) => {
@@ -49,7 +71,7 @@ export const createOrgUser = subscriptionProcedure
 			});
 		}
 
-		// Get organization and role names for the email
+		// Get organization and role (name + type) for the email and project-role mapping
 		const [organization, role] = await Promise.all([
 			db.organization.findUnique({
 				where: { id: input.organizationId },
@@ -57,9 +79,16 @@ export const createOrgUser = subscriptionProcedure
 			}),
 			db.role.findUnique({
 				where: { id: input.organizationRoleId },
-				select: { name: true },
+				select: { name: true, type: true },
 			}),
 		]);
+
+		// Managerial roles always see every project — the explicit grant/assignment
+		// is only meaningful for project-scoped roles.
+		const isManagerialRole =
+			!!role?.type &&
+			(ALL_PROJECTS_ROLE_TYPES as readonly string[]).includes(role.type);
+		const allProjectsAccess = isManagerialRole || input.allProjectsAccess;
 
 		// إنشاء المستخدم بحالة غير مفعّلة (ينتظر قبول الدعوة)
 		const user = await createOrgUserQuery({
@@ -71,7 +100,29 @@ export const createOrgUser = subscriptionProcedure
 			mustChangePassword: true,
 			isActive: false,
 			emailVerified: false,
+			allProjectsAccess,
 		});
+
+		// Assign the member to specific projects when not all-access. Validate the
+		// projects belong to this org before linking (cross-tenant safety).
+		if (!allProjectsAccess && input.projectIds.length > 0) {
+			const validProjects = await db.project.findMany({
+				where: { id: { in: input.projectIds }, organizationId: input.organizationId },
+				select: { id: true },
+			});
+			if (validProjects.length > 0) {
+				const projectRole = mapOrgRoleTypeToProjectRole(role?.type);
+				await db.projectMember.createMany({
+					data: validProjects.map((p) => ({
+						projectId: p.id,
+						userId: user.id,
+						role: projectRole,
+						assignedById: context.user.id,
+					})),
+					skipDuplicates: true,
+				});
+			}
+		}
 
 		// توليد رمز الدعوة
 		const token = crypto.randomUUID();

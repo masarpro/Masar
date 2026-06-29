@@ -1,6 +1,5 @@
 import { isOrganizationAdmin } from "@repo/auth/lib/helper";
 import { getActiveOrganization, getSession } from "@saas/auth/lib/server";
-import { InviteMemberForm } from "@saas/organizations/components/InviteMemberForm";
 import { TeamManagementTabs } from "@saas/organizations/components/TeamManagementTabs";
 import { SettingsList } from "@saas/shared/components/SettingsList";
 import { notFound } from "next/navigation";
@@ -45,9 +44,6 @@ async function OrganizationSettingsContent({
 
 	return (
 		<SettingsList>
-			{userIsAdmin && (
-				<InviteMemberForm organizationId={organization.id} />
-			)}
 			<TeamManagementTabs
 				organizationId={organization.id}
 				isAdmin={userIsAdmin}

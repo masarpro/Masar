@@ -14,11 +14,13 @@ import {
 	TableRow,
 } from "@ui/components/table";
 import {
+	MailIcon,
 	ShieldCheckIcon,
 	ShieldOffIcon,
 	Trash2Icon,
 	UserPlusIcon,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
@@ -51,6 +53,10 @@ export function UsersListPage() {
 		orpc.orgUsers.delete.mutationOptions(),
 	);
 
+	const resendInvitationMutation = useMutation(
+		orpc.orgUsers.resendInvitation.mutationOptions(),
+	);
+
 	const users = usersData?.users ?? [];
 	const roles = rolesData?.roles ?? [];
 
@@ -65,6 +71,22 @@ export function UsersListPage() {
 			});
 		} catch {
 			// handled silently
+		}
+	};
+
+	const handleResendInvitation = async (userId: string) => {
+		try {
+			await resendInvitationMutation.mutateAsync({
+				id: userId,
+				organizationId,
+			});
+			toast.success("تم إعادة إرسال الدعوة");
+		} catch (e) {
+			toast.error(
+				e && typeof e === "object" && "message" in e
+					? (e.message as string)
+					: "تعذّر إعادة إرسال الدعوة",
+			);
 		}
 	};
 
@@ -155,6 +177,23 @@ export function UsersListPage() {
 									<TableCell>
 										{user.accountType !== "OWNER" && (
 											<div className="flex gap-2">
+												{!user.isActive && (
+													<Button
+														variant="ghost"
+														size="sm"
+														onClick={() =>
+															handleResendInvitation(
+																user.id,
+															)
+														}
+														disabled={
+															resendInvitationMutation.isPending
+														}
+														title="إعادة إرسال الدعوة"
+													>
+														<MailIcon className="size-4" />
+													</Button>
+												)}
 												<Button
 													variant="ghost"
 													size="sm"

@@ -1,8 +1,11 @@
 import { ORPCError } from "@orpc/server";
-import { db, getProjectById } from "@repo/database";
+import { db, getProjectById, isProjectMember } from "@repo/database";
 import { hasPermission, type Permissions } from "@repo/database/prisma/permissions";
 import { logBusinessEvent } from "@repo/logs";
-import { getCachedUserPermissions } from "./permission-cache";
+import {
+	getCachedUserPermissions,
+	getCachedUserProjectScope,
+} from "./permission-cache";
 import { verifyOrganizationMembership } from "../../modules/organizations/lib/membership";
 
 export interface ProjectAccessResult {
@@ -40,6 +43,8 @@ export interface ProjectAccessResult {
  * 2. Verifies project belongs to organization
  * 3. Gets user permissions
  * 4. Optionally checks a required permission
+ * 5. Enforces per-member project visibility — non-managerial roles without the
+ *    `allProjectsAccess` grant must have a ProjectMember row for this project
  *
  * @throws ORPCError FORBIDDEN if any check fails
  */
@@ -52,12 +57,13 @@ export async function verifyProjectAccess(
 		action: string;
 	},
 ): Promise<ProjectAccessResult> {
-	// Steps 1-3 run in parallel — they are independent reads. Error precedence
-	// (membership → project → permission) is preserved by the checks below.
-	const [membership, project, permissions] = await Promise.all([
+	// Steps 1-4 run in parallel — they are independent reads. Error precedence
+	// (membership → project → permission → assignment) is preserved below.
+	const [membership, project, permissions, scope] = await Promise.all([
 		verifyOrganizationMembership(organizationId, userId),
 		getProjectById(projectId, organizationId),
 		getCachedUserPermissions(userId, organizationId),
+		getCachedUserProjectScope(userId, organizationId),
 	]);
 
 	// Step 1: Verify organization membership
@@ -72,6 +78,25 @@ export async function verifyProjectAccess(
 		throw new ORPCError("NOT_FOUND", {
 			message: "المشروع غير موجود أو لا ينتمي لهذه المنظمة",
 		});
+	}
+
+	// Step 5 (pre-check before returning): per-member project visibility.
+	// Managerial roles / explicit grant see all projects; everyone else must be
+	// an assigned ProjectMember. Server-side gate — UI hiding is not enough.
+	if (!scope.allProjects) {
+		const assigned = await isProjectMember(projectId, userId);
+		if (!assigned) {
+			logBusinessEvent({
+				type: "permission.denied",
+				userId,
+				organizationId,
+				metadata: { projectId, reason: "not_project_member" },
+				severity: "warning",
+			});
+			throw new ORPCError("FORBIDDEN", {
+				message: "ليس لديك صلاحية الوصول إلى هذا المشروع",
+			});
+		}
 	}
 
 	// Step 3: Check required permission if provided

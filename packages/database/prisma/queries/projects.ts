@@ -16,17 +16,28 @@ export async function getOrganizationProjects(
 		query?: string;
 		limit?: number;
 		offset?: number;
+		/**
+		 * When provided, the result is limited to these project ids. Used to
+		 * enforce per-member project visibility for non-managerial roles. An
+		 * empty array intentionally returns zero projects.
+		 */
+		restrictToProjectIds?: string[];
 	},
 ) {
 	const where: {
 		organizationId: string;
 		status?: ProjectStatus;
+		id?: { in: string[] };
 		OR?: Array<{
 			name?: { contains: string; mode: "insensitive" };
 			clientName?: { contains: string; mode: "insensitive" };
 			location?: { contains: string; mode: "insensitive" };
 		}>;
 	} = { organizationId };
+
+	if (options?.restrictToProjectIds) {
+		where.id = { in: options.restrictToProjectIds };
+	}
 
 	if (options?.status) {
 		where.status = options.status;

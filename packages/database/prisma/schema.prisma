@@ -852,6 +852,10 @@ model User {
   // صلاحيات مخصصة تتجاوز الدور
   customPermissions Json?
 
+  // نطاق رؤية المشاريع: true = كل مشاريع المنشأة، false = مقيَّد بـ ProjectMember
+  // (الأدوار الإدارية ترى الكل بصرف النظر عن هذه القيمة)
+  allProjectsAccess Boolean @default(false) @map("all_projects_access")
+
   // من أنشأ هذا الحساب
   createdById  String?
   createdBy    User?   @relation("UserCreator", fields: [createdById], references: [id], onDelete: SetNull)
