@@ -59,13 +59,36 @@ export const acceptInvitation = publicProcedure
 			});
 		}
 
-		// تفعيل المستخدم وتحديث الاسم إذا مُقدّم
+		// تفعيل المستخدم وتحديث الاسم إذا مُقدّم.
+		// mustChangePassword = false: المستخدم عيّن كلمة مروره الآن عبر هذه الصفحة،
+		// فلا يجب أن يُطلب منه تغييرها مجدداً عند تسجيل الدخول التالي.
 		await db.user.update({
 			where: { id: user.id },
 			data: {
 				isActive: true,
 				emailVerified: true,
+				mustChangePassword: false,
 				...(input.name ? { name: input.name } : {}),
+			},
+		});
+
+		// إنشاء سجل عضوية BetterAuth (جدول Member) الذي يعتمد عليه
+		// listOrganizations / getFullOrganization / verifyOrganizationMembership.
+		// بدونه يعتقد BetterAuth أن المستخدم بلا منظمة → يُوجَّه لإنشاء منظمة جديدة.
+		// idempotent عبر upsert على القيد الفريد (organizationId, userId).
+		await db.member.upsert({
+			where: {
+				organizationId_userId: {
+					organizationId: invitation.organizationId,
+					userId: user.id,
+				},
+			},
+			update: {},
+			create: {
+				organizationId: invitation.organizationId,
+				userId: user.id,
+				role: "member",
+				createdAt: new Date(),
 			},
 		});
 

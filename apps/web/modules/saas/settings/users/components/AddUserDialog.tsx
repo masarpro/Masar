@@ -39,7 +39,6 @@ const ALL_PROJECTS_ROLE_TYPES = ["OWNER", "PROJECT_MANAGER", "ACCOUNTANT"];
 const formSchema = z.object({
 	name: z.string().min(1, "الاسم مطلوب"),
 	email: z.string().email("البريد الإلكتروني غير صالح"),
-	password: z.string().min(8, "كلمة المرور يجب أن تكون 8 أحرف على الأقل"),
 	organizationRoleId: z.string().min(1, "الدور مطلوب"),
 	projectScope: z.enum(["all", "specific"]),
 	projectIds: z.array(z.string()),
@@ -69,7 +68,6 @@ export function AddUserDialog({
 		defaultValues: {
 			name: "",
 			email: "",
-			password: "",
 			organizationRoleId: "",
 			projectScope: "all",
 			projectIds: [],
@@ -109,7 +107,6 @@ export function AddUserDialog({
 				organizationId,
 				name: values.name,
 				email: values.email,
-				password: values.password,
 				organizationRoleId: values.organizationRoleId,
 				allProjectsAccess,
 				projectIds: allProjectsAccess ? [] : values.projectIds,
@@ -193,25 +190,6 @@ export function AddUserDialog({
 													{...field}
 													autoComplete="email"
 													dir="ltr"
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name="password"
-									render={({ field }: any) => (
-										<FormItem>
-											<FormLabel>
-												كلمة المرور المؤقتة
-											</FormLabel>
-											<FormControl>
-												<Input
-													type="password"
-													{...field}
-													autoComplete="new-password"
 												/>
 											</FormControl>
 										</FormItem>
