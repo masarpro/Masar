@@ -1,6 +1,5 @@
 "use client";
 
-import { authClient } from "@repo/auth/client";
 import { getAdminPath } from "@saas/admin/lib/links";
 import { OrganizationLogo } from "@saas/organizations/components/OrganizationLogo";
 import { useConfirmationAlert } from "@saas/shared/components/ConfirmationAlertProvider";
@@ -164,10 +163,9 @@ export function OrganizationList() {
 	const deleteOrganization = async (id: string) => {
 		toast.promise(
 			async () => {
-				const { error } = await authClient.organization.delete({
+				await orpc.superAdmin.organizations.delete.call({
 					organizationId: id,
 				});
-				if (error) throw error;
 			},
 			{
 				loading: t("admin.organizations.deleteOrganization.deleting"),

@@ -119,6 +119,57 @@ export const suspend = adminProcedure
 		return org;
 	});
 
+export const deleteOrg = adminProcedure
+	.route({
+		method: "POST",
+		path: "/super-admin/organizations/delete",
+		tags: ["Super Admin"],
+		summary: "Delete an organization (super admin, force)",
+	})
+	.input(orgIdInput)
+	.handler(async ({ input, context }) => {
+		// BetterAuth's organization.delete refuses callers that are not owners of
+		// the target org, so a super admin cannot use it. Delete via Prisma with
+		// the schema-wide cascade instead. Two models (OwnerDrawing,
+		// CapitalContribution) reference OrganizationOwner with onDelete: Restrict,
+		// which would block the org→OrganizationOwner cascade — remove them first
+		// inside the same transaction.
+		const org = await db.organization.findUnique({
+			where: { id: input.organizationId },
+			select: { id: true, name: true },
+		});
+		if (!org) throw new ORPCError("NOT_FOUND");
+
+		try {
+			await db.$transaction(async (tx) => {
+				await tx.ownerDrawing.deleteMany({
+					where: { organizationId: input.organizationId },
+				});
+				await tx.capitalContribution.deleteMany({
+					where: { organizationId: input.organizationId },
+				});
+				await tx.organization.delete({
+					where: { id: input.organizationId },
+				});
+			});
+		} catch (_e) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "تعذّر حذف المنشأة — قد تحتوي على سجلات مرتبطة تمنع الحذف",
+			});
+		}
+
+		logSuperAdminAction({
+			adminId: context.user.id,
+			action: "DELETE_ORG",
+			targetType: "organization",
+			targetId: input.organizationId,
+			targetOrgId: input.organizationId,
+			details: { name: org.name },
+		});
+
+		return { success: true };
+	});
+
 export const activate = adminProcedure
 	.route({
 		method: "POST",
