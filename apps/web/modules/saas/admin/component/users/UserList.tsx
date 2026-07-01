@@ -111,21 +111,19 @@ export function UserList() {
 
 	const deleteUser = async (id: string) => {
 		toast.promise(
-			async () => {
-				const { error } = await authClient.admin.removeUser({
-					userId: id,
-				});
-
-				if (error) {
-					throw error;
-				}
-			},
+			orpc.admin.users.delete.call({ userId: id }),
 			{
 				loading: t("admin.users.deleteUser.deleting"),
 				success: () => {
+					queryClient.invalidateQueries({
+						queryKey: orpc.admin.users.list.key(),
+					});
 					return t("admin.users.deleteUser.deleted");
 				},
-				error: t("admin.users.deleteUser.notDeleted"),
+				error: (e) =>
+					e && typeof e === "object" && "message" in e
+						? (e.message as string)
+						: t("admin.users.deleteUser.notDeleted"),
 			},
 		);
 	};
