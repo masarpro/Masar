@@ -103,6 +103,28 @@ export const createOrgUser = subscriptionProcedure
 			allProjectsAccess,
 		});
 
+		// Create the BetterAuth Member link at creation time so the user belongs
+		// to the organization from the start. listOrganizations()/
+		// getFullOrganization()/verifyOrganizationMembership() all read the Member
+		// table; without this the invitee logs in with "no organization" and gets
+		// routed to create a brand-new org in their own name. accept-invitation
+		// upserts this too — idempotent via the unique (organizationId, userId).
+		await db.member.upsert({
+			where: {
+				organizationId_userId: {
+					organizationId: input.organizationId,
+					userId: user.id,
+				},
+			},
+			update: {},
+			create: {
+				organizationId: input.organizationId,
+				userId: user.id,
+				role: "member",
+				createdAt: new Date(),
+			},
+		});
+
 		// Assign the member to specific projects when not all-access. Validate the
 		// projects belong to this org before linking (cross-tenant safety).
 		if (!allProjectsAccess && input.projectIds.length > 0) {
