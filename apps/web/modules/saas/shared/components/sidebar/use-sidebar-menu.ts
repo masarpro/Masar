@@ -458,20 +458,24 @@ export function useSidebarMenu(): {
 		const checkers = { can, canAny };
 
 		return rawItems.flatMap((item) => {
+			// Groups live or die by their visible children: a group emptied of
+			// all children disappears, and one with any visible child stays
+			// (covers the partner edge case — finance-partners is governed by
+			// partnerAccessLevel, not finance permissions). This yields exactly
+			// the canAny() group matrix for the five system roles.
+			if (item.children) {
+				const children = item.children.filter((child) =>
+					isSidebarItemVisible(child.id, checkers, isOwner),
+				);
+				if (children.length === 0) {
+					return [];
+				}
+				return [{ ...item, children }];
+			}
 			if (!isSidebarItemVisible(item.id, checkers, isOwner)) {
 				return [];
 			}
-			if (!item.children) {
-				return [item];
-			}
-			const children = item.children.filter((child) =>
-				isSidebarItemVisible(child.id, checkers, isOwner),
-			);
-			// Drop groups emptied of all their visible children
-			if (children.length === 0) {
-				return [];
-			}
-			return [{ ...item, children }];
+			return [item];
 		});
 	}, [
 		t,
