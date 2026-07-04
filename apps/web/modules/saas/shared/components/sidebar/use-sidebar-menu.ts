@@ -2,6 +2,8 @@
 
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { useSession } from "@saas/auth/hooks/use-session";
+import { usePermission } from "@saas/permissions/hooks/use-permission";
+import { isSidebarItemVisible } from "@saas/permissions/lib/permission-map";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
@@ -63,6 +65,7 @@ export function useSidebarMenu(): {
 	const { user } = useSession();
 	const { activeOrganization, isOrganizationAdmin, partnerAccessLevel } =
 		useActiveOrganization();
+	const { can, canAny, isOwner, permissions } = usePermission();
 
 	const basePath = activeOrganization
 		? `/app/${activeOrganization.slug}`
@@ -127,7 +130,7 @@ export function useSidebarMenu(): {
 			? `${orgPrefix}/projects/${projectId}`
 			: null;
 
-		return [
+		const rawItems: SidebarMenuItem[] = [
 			{
 				id: "start",
 				label: t("app.menu.home"),
@@ -443,6 +446,33 @@ export function useSidebarMenu(): {
 					]
 				: []),
 		];
+
+		// RBAC-UI filtering: hide items the member has no permission for.
+		// Until permissions resolve (first unhydrated paint only), keep the
+		// unfiltered menu to avoid flashing an empty sidebar — pages are
+		// guarded server-side regardless.
+		if (!isOwner && !permissions) {
+			return rawItems;
+		}
+
+		const checkers = { can, canAny };
+
+		return rawItems.flatMap((item) => {
+			if (!isSidebarItemVisible(item.id, checkers, isOwner)) {
+				return [];
+			}
+			if (!item.children) {
+				return [item];
+			}
+			const children = item.children.filter((child) =>
+				isSidebarItemVisible(child.id, checkers, isOwner),
+			);
+			// Drop groups emptied of all their visible children
+			if (children.length === 0) {
+				return [];
+			}
+			return [{ ...item, children }];
+		});
 	}, [
 		t,
 		basePath,
@@ -454,6 +484,10 @@ export function useSidebarMenu(): {
 		projectId,
 		studyId,
 		studyEnabledStages,
+		can,
+		canAny,
+		isOwner,
+		permissions,
 	]);
 
 	const activeId = useMemo(() => {
