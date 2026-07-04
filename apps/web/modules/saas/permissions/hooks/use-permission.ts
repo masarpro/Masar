@@ -30,8 +30,12 @@ export function usePermission(): UsePermissionResult {
 
 	return useMemo(() => {
 		const can = (section: keyof Permissions, action: string): boolean => {
-			if (isOwner) return true;
-			if (!permissions) return false;
+			if (isOwner) {
+				return true;
+			}
+			if (!permissions) {
+				return false;
+			}
 			const sectionPerms = permissions[section] as unknown as
 				| Record<string, boolean>
 				| undefined;
@@ -39,12 +43,18 @@ export function usePermission(): UsePermissionResult {
 		};
 
 		const canAny = (section: keyof Permissions): boolean => {
-			if (isOwner) return true;
-			if (!permissions) return false;
+			if (isOwner) {
+				return true;
+			}
+			if (!permissions) {
+				return false;
+			}
 			const sectionPerms = permissions[section] as unknown as
 				| Record<string, boolean>
 				| undefined;
-			if (!sectionPerms) return false;
+			if (!sectionPerms) {
+				return false;
+			}
 			return Object.values(sectionPerms).some(Boolean);
 		};
 

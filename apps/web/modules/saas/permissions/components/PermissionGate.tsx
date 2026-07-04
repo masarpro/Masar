@@ -31,7 +31,8 @@ export function PermissionGate({
 		return null;
 	}
 
-	const allowed = isOwner || (action ? can(section, action) : canAny(section));
+	const allowed =
+		isOwner || (action ? can(section, action) : canAny(section));
 
 	if (!allowed) {
 		return <>{fallback ?? <AccessDenied />}</>;

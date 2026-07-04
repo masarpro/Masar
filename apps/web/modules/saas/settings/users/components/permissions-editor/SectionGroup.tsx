@@ -55,10 +55,13 @@ export function SectionGroup({
 			<div className="grid grid-cols-1 gap-x-6 gap-y-1 p-3 sm:grid-cols-2">
 				{actions.map((action) => {
 					const isCustomized =
-						(values[action] ?? false) !== (baseValues[action] ?? false);
+						(values[action] ?? false) !==
+						(baseValues[action] ?? false);
+					const switchId = `perm-${section}-${action}`;
 					return (
 						<label
 							key={action}
+							htmlFor={switchId}
 							className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-2 py-1.5 hover:bg-muted/50"
 						>
 							<span className="flex items-center gap-2 text-sm">
@@ -73,6 +76,7 @@ export function SectionGroup({
 								)}
 							</span>
 							<Switch
+								id={switchId}
 								checked={values[action] ?? false}
 								onCheckedChange={(checked) =>
 									onChange(action, checked === true)

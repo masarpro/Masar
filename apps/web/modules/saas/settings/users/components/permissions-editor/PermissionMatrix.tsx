@@ -1,8 +1,8 @@
 "use client";
 
 import type { Permissions } from "@repo/database/prisma/permissions";
-import { SectionGroup } from "./SectionGroup";
 import { SECTION_ORDER } from "./permission-labels";
+import { SectionGroup } from "./SectionGroup";
 
 /**
  * مصفوفة الصلاحيات الكاملة: 8 أقسام × إجراءاتها (49 صلاحية).
@@ -33,7 +33,9 @@ export function PermissionMatrix({
 					baseValues={
 						base[section] as unknown as Record<string, boolean>
 					}
-					onChange={(action, value) => onChange(section, action, value)}
+					onChange={(action, value) =>
+						onChange(section, action, value)
+					}
 				/>
 			))}
 		</div>

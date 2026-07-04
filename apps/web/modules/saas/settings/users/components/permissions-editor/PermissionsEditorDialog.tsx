@@ -6,6 +6,7 @@ import {
 	type Permissions,
 } from "@repo/database/prisma/permissions";
 import { orpc } from "@shared/lib/orpc-query-utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Alert, AlertTitle } from "@ui/components/alert";
 import { Badge } from "@ui/components/badge";
 import {
@@ -22,13 +23,12 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@ui/components/select";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InfoIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { PermissionMatrix } from "./PermissionMatrix";
-import { SaveBar } from "./SaveBar";
 import { SECTION_ORDER } from "./permission-labels";
+import { SaveBar } from "./SaveBar";
 
 interface EditableUser {
 	id: string;
@@ -84,9 +84,9 @@ function resolveRoleBase(role: RoleOption | undefined): Permissions {
 		const storedRaw = role.permissions as Record<string, unknown>;
 		for (const section of SECTION_ORDER) {
 			if (storedRaw[section]) {
-				(base[section] as unknown as Record<string, boolean>) = (
-					stored[section] as unknown as Record<string, boolean>
-				);
+				(base[section] as unknown as Record<string, boolean>) = stored[
+					section
+				] as unknown as Record<string, boolean>;
 			}
 		}
 	}
@@ -106,7 +106,10 @@ function diffPermissions(
 		>;
 		const baseSection = base[section] as unknown as Record<string, boolean>;
 		for (const action of Object.keys(matrixSection)) {
-			if ((matrixSection[action] ?? false) !== (baseSection[action] ?? false)) {
+			if (
+				(matrixSection[action] ?? false) !==
+				(baseSection[action] ?? false)
+			) {
 				diff[section] = diff[section] ?? {};
 				diff[section][action] = matrixSection[action] ?? false;
 			}
@@ -147,8 +150,7 @@ export function PermissionsEditorDialog({
 	const base = useMemo(() => resolveRoleBase(selectedRole), [selectedRole]);
 	const isOwnerRole = selectedRole?.type === "OWNER";
 
-	// إعادة التهيئة عند فتح المحرر أو تغيّر العضو
-	// biome-ignore lint/correctness/useExhaustiveDependencies: initialize on open/user change only
+	// إعادة التهيئة عند فتح المحرر أو تغيّر العضو (عمداً على open/user فقط)
 	useEffect(() => {
 		if (!open || !user) {
 			return;
@@ -249,7 +251,10 @@ export function PermissionsEditorDialog({
 
 				<div className="flex items-center gap-3">
 					<span className="shrink-0 font-medium text-sm">الدور:</span>
-					<Select value={selectedRoleId} onValueChange={handleRoleChange}>
+					<Select
+						value={selectedRoleId}
+						onValueChange={handleRoleChange}
+					>
 						<SelectTrigger className="w-56">
 							<SelectValue placeholder="اختر الدور" />
 						</SelectTrigger>
@@ -290,7 +295,10 @@ export function PermissionsEditorDialog({
 						);
 						setMatrix(
 							user.customPermissions
-								? mergeCustomFull(roleBase, user.customPermissions)
+								? mergeCustomFull(
+										roleBase,
+										user.customPermissions,
+									)
 								: roleBase,
 						);
 					}}

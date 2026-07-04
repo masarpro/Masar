@@ -1,12 +1,7 @@
 "use client";
 
 import { usePermission } from "@saas/permissions/hooks/use-permission";
-import {
-	Building2,
-	Calculator,
-	FolderKanban,
-	ReceiptIcon,
-} from "lucide-react";
+import { Building2, Calculator, FolderKanban, ReceiptIcon } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 

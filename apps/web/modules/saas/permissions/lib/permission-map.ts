@@ -32,8 +32,7 @@ export const SIDEBAR_PERMISSION_MAP: Record<
 	pricing: ({ canAny }) => canAny("pricing"),
 	// حالة حدّية: المحاسب يملك employees.view دون company.view —
 	// قسم employees منفصل عن قسم company في نموذج الصلاحيات
-	company: ({ canAny, can }) =>
-		canAny("company") || can("employees", "view"),
+	company: ({ canAny, can }) => canAny("company") || can("employees", "view"),
 
 	// ── أبناء المالية ──
 	"finance-dashboard": ({ can }) => can("finance", "view"),
@@ -148,7 +147,10 @@ export function findRouteRule(
 	let segment = "";
 	if (idx >= 0) {
 		segment =
-			pathname.slice(idx + marker.length + 1).split("/")[0]?.trim() ?? "";
+			pathname
+				.slice(idx + marker.length + 1)
+				.split("/")[0]
+				?.trim() ?? "";
 	}
 	return (
 		rules.find((rule) => rule.prefix === segment) ??

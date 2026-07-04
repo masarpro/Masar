@@ -44,7 +44,11 @@ export function SectionRouteGate({
 		return null;
 	}
 
-	const rule = findRouteRule(pathname, sectionRoot, SECTION_RULES[sectionRoot]);
+	const rule = findRouteRule(
+		pathname,
+		sectionRoot,
+		SECTION_RULES[sectionRoot],
+	);
 
 	if (rule?.public) {
 		return <>{children}</>;
