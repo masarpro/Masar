@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import { usePermission } from "@saas/permissions/hooks/use-permission";
 import { AddExpenseDialog } from "@saas/finance/components/expenses/AddExpenseDialog";
 import { AddPaymentDialog } from "@saas/finance/components/payments/AddPaymentDialog";
 
@@ -23,13 +24,25 @@ interface QuickActionsGridProps {
 export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 	const t = useTranslations();
 	const { activeOrganization } = useActiveOrganization();
+	const { can, isOwner } = usePermission();
 	const organizationId = activeOrganization?.id ?? "";
 	const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
 	const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
 
+	// Each quick action requires the same permission as its target section
+	const allowed = {
+		expenses: isOwner || can("finance", "view"),
+		payments: isOwner || can("finance", "payments"),
+		quotations: isOwner || can("pricing", "quotations"),
+		invoices: isOwner || can("finance", "invoices"),
+		studies: isOwner || can("pricing", "studies"),
+		leads: isOwner || can("pricing", "leads"),
+	};
+
 	const quickActions = [
 		{
 			icon: TrendingDown,
+			visible: allowed.expenses,
 			sectionLabel: t("dashboard.actions.expenses"),
 			actionLabel: t("dashboard.actions.addExpense"),
 			browsePath: `/app/${organizationSlug}/finance/expenses`,
@@ -42,6 +55,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 		},
 		{
 			icon: TrendingUp,
+			visible: allowed.payments,
 			sectionLabel: t("dashboard.actions.payments"),
 			actionLabel: t("dashboard.actions.addPayment"),
 			browsePath: `/app/${organizationSlug}/finance/payments`,
@@ -54,6 +68,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 		},
 		{
 			icon: FileText,
+			visible: allowed.quotations,
 			sectionLabel: t("dashboard.actions.quotations"),
 			actionLabel: t("dashboard.actions.newQuotation"),
 			browsePath: `/app/${organizationSlug}/pricing/quotations`,
@@ -65,6 +80,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 		},
 		{
 			icon: Receipt,
+			visible: allowed.invoices,
 			sectionLabel: t("dashboard.actions.invoices"),
 			actionLabel: t("dashboard.actions.createInvoice"),
 			browsePath: `/app/${organizationSlug}/finance/invoices`,
@@ -76,6 +92,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 		},
 		{
 			icon: Calculator,
+			visible: allowed.studies,
 			sectionLabel: t("dashboard.actions.quantityStudies"),
 			actionLabel: t("dashboard.actions.calculateQuantities"),
 			browsePath: `/app/${organizationSlug}/pricing/studies`,
@@ -87,6 +104,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 		},
 		{
 			icon: Users,
+			visible: allowed.leads,
 			sectionLabel: t("dashboard.actions.leads"),
 			actionLabel: t("dashboard.actions.newLead"),
 			browsePath: `/app/${organizationSlug}/pricing/leads`,
@@ -98,10 +116,16 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 		},
 	];
 
+	const visibleActions = quickActions.filter((action) => action.visible);
+
+	if (visibleActions.length === 0) {
+		return null;
+	}
+
 	return (
 		<>
 			<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-				{quickActions.map((action, i) => {
+				{visibleActions.map((action, i) => {
 					const Icon = action.icon;
 					return (
 						<div

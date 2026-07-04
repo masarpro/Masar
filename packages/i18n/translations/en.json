@@ -1790,6 +1790,7 @@
       "hide": "Hide",
       "greeting": "Hello {name}",
       "subtitle": "Here's your daily summary",
+      "sectionsIntro": "These sections are available to you based on your permissions — pick one to get started.",
       "pendingActions": "You have {count} actions that need attention",
       "allGood": "Everything looks good",
       "steps": {
