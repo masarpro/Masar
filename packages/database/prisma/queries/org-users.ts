@@ -1,4 +1,5 @@
 import { db } from "../client";
+import { Prisma } from "../generated/client";
 
 // التحقق إن كان البريد يخص مستخدماً قائماً منتمياً لمنشأة غير المنشأة الداعية.
 // يُستخدم لمنع ربط بريد بأكثر من منشأة (النظام أحادي المنشأة عبر user.organizationId).
@@ -107,6 +108,8 @@ export async function updateOrgUser(
 		organizationRoleId?: string;
 		isActive?: boolean;
 		customPermissions?: Record<string, unknown>;
+		/** امسح التخصيصات وارجع لصلاحيات الدور فقط */
+		resetCustomPermissions?: boolean;
 		allProjectsAccess?: boolean;
 	},
 ) {
@@ -141,9 +144,11 @@ export async function updateOrgUser(
 			organizationRoleId: data.organizationRoleId,
 			isActive: data.isActive,
 			allProjectsAccess: data.allProjectsAccess,
-			customPermissions: data.customPermissions
-				? (data.customPermissions as any)
-				: undefined,
+			customPermissions: data.resetCustomPermissions
+				? Prisma.DbNull
+				: data.customPermissions
+					? (data.customPermissions as any)
+					: undefined,
 		},
 		include: { organizationRole: true },
 	});
@@ -153,6 +158,21 @@ export async function updateOrgUser(
 	}
 
 	return updated;
+}
+
+// عدد المالكين الفعّالين في المنشأة (دور بنوع OWNER أو حساب مالك)
+// يُستخدم لحارس "آخر مالك" في تحديث المستخدمين
+export async function countActiveOrganizationOwners(organizationId: string) {
+	return db.user.count({
+		where: {
+			organizationId,
+			isActive: true,
+			OR: [
+				{ organizationRole: { type: "OWNER" } },
+				{ accountType: "OWNER" },
+			],
+		},
+	});
 }
 
 // تعطيل/تفعيل موظف

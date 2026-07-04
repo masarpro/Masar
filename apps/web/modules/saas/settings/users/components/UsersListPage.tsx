@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "@saas/auth/hooks/use-session";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Badge } from "@ui/components/badge";
@@ -14,6 +15,7 @@ import {
 	TableRow,
 } from "@ui/components/table";
 import {
+	KeyRoundIcon,
 	MailIcon,
 	ShieldCheckIcon,
 	ShieldOffIcon,
@@ -25,11 +27,14 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
 import { AddUserDialog } from "./AddUserDialog";
+import { PermissionsEditorDialog } from "./permissions-editor/PermissionsEditorDialog";
 
 export function UsersListPage() {
 	const { activeOrganization } = useActiveOrganization();
+	const { user: currentUser } = useSession();
 	const queryClient = useQueryClient();
 	const [showAddDialog, setShowAddDialog] = useState(false);
+	const [permissionsUser, setPermissionsUser] = useState<any>(null);
 
 	const organizationId = activeOrganization?.id ?? "";
 
@@ -177,6 +182,20 @@ export function UsersListPage() {
 									<TableCell>
 										{user.accountType !== "OWNER" && (
 											<div className="flex gap-2">
+												{user.id !== currentUser?.id && (
+													<Button
+														variant="ghost"
+														size="sm"
+														onClick={() =>
+															setPermissionsUser(
+																user,
+															)
+														}
+														title="تحرير الصلاحيات"
+													>
+														<KeyRoundIcon className="size-4" />
+													</Button>
+												)}
 												{!user.isActive && (
 													<Button
 														variant="ghost"
@@ -246,6 +265,16 @@ export function UsersListPage() {
 				open={showAddDialog}
 				onOpenChange={setShowAddDialog}
 				organizationId={organizationId}
+				roles={roles}
+			/>
+
+			<PermissionsEditorDialog
+				open={!!permissionsUser}
+				onOpenChange={(open) => {
+					if (!open) setPermissionsUser(null);
+				}}
+				organizationId={organizationId}
+				user={permissionsUser}
 				roles={roles}
 			/>
 		</div>

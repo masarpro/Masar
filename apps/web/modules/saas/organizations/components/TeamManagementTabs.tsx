@@ -6,7 +6,6 @@ import { SettingsItem } from "@saas/shared/components/SettingsItem";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 import { useState } from "react";
 import { OrganizationInvitationsList } from "./OrganizationInvitationsList";
-import { OrganizationMembersList } from "./OrganizationMembersList";
 
 export function TeamManagementTabs({
 	organizationId,
@@ -36,9 +35,13 @@ export function TeamManagementTabs({
 
 				<TabsContent value="members">
 					<div className="space-y-6">
-						<OrganizationMembersList
-							organizationId={organizationId}
-						/>
+						{/*
+						  OrganizationMembersList (قائمة BetterAuth) أُخفيت عمداً:
+						  كانت تعدّل Member.role المجمّد الذي لا يؤثر على الصلاحيات
+						  إطلاقاً — ما يوهم المستخدم أنه غيّر الصلاحيات. الجدول
+						  الحقيقي الوحيد هو "المستخدمين" (UsersListPage) المبني على
+						  orgUsers + Role/customPermissions.
+						*/}
 						<OrganizationInvitationsList
 							organizationId={organizationId}
 						/>
