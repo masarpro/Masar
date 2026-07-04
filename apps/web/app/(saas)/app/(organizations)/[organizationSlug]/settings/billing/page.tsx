@@ -4,7 +4,7 @@ import { getActiveOrganization } from "@saas/auth/lib/server";
 import { ActivePlan } from "@saas/payments/components/ActivePlan";
 import { ChangePlan } from "@saas/payments/components/ChangePlan";
 import { SettingsList } from "@saas/shared/components/SettingsList";
-import { orpcClient } from "@shared/lib/orpc-client";
+import { cachedListPurchases } from "@shared/lib/cached-queries";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { getServerQueryClient } from "@shared/lib/server";
 import { attemptAsync } from "es-toolkit";
@@ -41,9 +41,7 @@ async function BillingSettingsPageContent({ organizationSlug }: { organizationSl
 	}
 
 	const [error, purchasesData] = await attemptAsync(() =>
-		orpcClient.payments.listPurchases({
-			organizationId: organization.id,
-		}),
+		cachedListPurchases(organization.id),
 	);
 
 	if (error) {

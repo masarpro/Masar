@@ -4,7 +4,7 @@ import { getSession } from "@saas/auth/lib/server";
 import { ActivePlan } from "@saas/payments/components/ActivePlan";
 import { ChangePlan } from "@saas/payments/components/ChangePlan";
 import { SettingsList } from "@saas/shared/components/SettingsList";
-import { orpcClient } from "@shared/lib/orpc-client";
+import { cachedListPurchases } from "@shared/lib/cached-queries";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { getServerQueryClient } from "@shared/lib/server";
 import { attemptAsync } from "es-toolkit";
@@ -28,15 +28,13 @@ export default async function BillingSettingsPage() {
 
 async function BillingSettingsPageContent() {
 	const session = await getSession();
-	const [error, data] = await attemptAsync(() =>
-		orpcClient.payments.listPurchases({}),
-	);
+	const [error, data] = await attemptAsync(() => cachedListPurchases());
 
 	if (error) {
 		throw new Error("Failed to fetch purchases");
 	}
 
-	const purchases = (data as any)?.purchases ?? [];
+	const purchases = data?.purchases ?? [];
 
 	const queryClient = getServerQueryClient();
 
@@ -44,7 +42,7 @@ async function BillingSettingsPageContent() {
 		queryKey: orpc.payments.listPurchases.queryKey({
 			input: {},
 		}),
-		queryFn: () => purchases,
+		queryFn: () => ({ purchases }),
 	});
 
 	const { activePlan } = createPurchasesHelper(purchases);

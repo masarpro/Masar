@@ -8,6 +8,7 @@ import { AssistantWrapper } from "@saas/shared/components/ai-assistant/Assistant
 import {
 	cachedGetMemberRole,
 	cachedGetOrganizationSubscription,
+	cachedListPurchases,
 } from "@shared/lib/cached-queries";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { getServerQueryClient } from "@shared/lib/server";
@@ -47,13 +48,15 @@ export default async function OrganizationLayout({
 
 	if (config.users.enableBilling) {
 		prefetchPromises.push(
-			queryClient.prefetchQuery(
-				orpc.payments.listPurchases.queryOptions({
+			queryClient.prefetchQuery({
+				queryKey: orpc.payments.listPurchases.queryKey({
 					input: {
 						organizationId: organization.id,
 					},
 				}),
-			),
+				// Direct DB read (React-cached) — avoids a self-HTTP call to /api/rpc
+				queryFn: () => cachedListPurchases(organization.id),
+			}),
 		);
 	}
 

@@ -7,6 +7,7 @@ import { organizationListQueryKey } from "@saas/organizations/lib/api";
 import { ConfirmationAlertProvider } from "@saas/shared/components/ConfirmationAlertProvider";
 import { ConsentBanner } from "@shared/components/ConsentBanner";
 import { Document } from "@shared/components/Document";
+import { cachedListPurchases } from "@shared/lib/cached-queries";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { getServerQueryClient } from "@shared/lib/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
@@ -47,11 +48,13 @@ export default async function SaaSLayout({ children }: PropsWithChildren) {
 
 	if (config.users.enableBilling) {
 		prefetchPromises.push(
-			queryClient.prefetchQuery(
-				orpc.payments.listPurchases.queryOptions({
+			queryClient.prefetchQuery({
+				queryKey: orpc.payments.listPurchases.queryKey({
 					input: {},
 				}),
-			),
+				// Direct DB read (React-cached) — avoids a self-HTTP call to /api/rpc
+				queryFn: () => cachedListPurchases(),
+			}),
 		);
 	}
 

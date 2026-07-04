@@ -1,10 +1,8 @@
-import { orpcClient } from "@shared/lib/orpc-client";
+import { cachedListPurchases } from "@shared/lib/cached-queries";
 import { cache } from "react";
 
 export const getPurchases = cache(async (organizationId?: string) => {
-	const { purchases } = await orpcClient.payments.listPurchases({
-		organizationId,
-	});
+	const { purchases } = await cachedListPurchases(organizationId);
 
 	return purchases;
 });

@@ -14,6 +14,13 @@ const withNextIntl = nextIntlPlugin("./modules/i18n/request.ts");
 const nextConfig: NextConfig = {
 	serverExternalPackages: ["pg", "@prisma/client", "@prisma/adapter-pg", "pdfkit", "puppeteer-core", "@sparticuz/chromium"],
 	experimental: {
+		// Client router cache: reuse RSC payloads briefly so back/forward and
+		// repeat navigations don't re-run the full layout chain on the server.
+		// React Query (staleTime 5min) still governs data freshness client-side.
+		staleTimes: {
+			dynamic: 30,
+			static: 300,
+		},
 		optimizePackageImports: [
 			"lucide-react",
 			"recharts",
