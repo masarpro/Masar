@@ -326,7 +326,7 @@ export function BuildingStructureStep({
 			{/* Summary */}
 			{config.floors.length > 0 && (
 				<div className="rounded-xl bg-muted/40 border p-5">
-					<div className="grid grid-cols-3 gap-4 text-center">
+					<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
 						<div>
 							<div className="text-sm text-muted-foreground">
 								{tw("totalBuildingArea")}

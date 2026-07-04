@@ -90,7 +90,7 @@ export function ReceiptVouchersList({
 	return (
 		<div className="space-y-4">
 			{/* Header */}
-			<div className="flex items-center justify-between">
+			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
 					<h1 className="text-2xl font-bold">{t("finance.receiptVouchers.title")}</h1>
 				</div>

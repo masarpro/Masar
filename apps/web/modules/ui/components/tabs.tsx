@@ -10,13 +10,15 @@ const TabsList = ({
 	className,
 	...props
 }: React.ComponentProps<typeof TabsPrimitive.List>) => (
-	<TabsPrimitive.List
-		className={cn(
-			"inline-flex items-center justify-center border-b-2 text-card-foreground/80 text-sm",
-			className,
-		)}
-		{...props}
-	/>
+	<div className="min-w-0 max-w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+		<TabsPrimitive.List
+			className={cn(
+				"inline-flex items-center justify-center border-b-2 text-card-foreground/80 text-sm",
+				className,
+			)}
+			{...props}
+		/>
+	</div>
 );
 
 const TabsTrigger = ({

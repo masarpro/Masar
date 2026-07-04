@@ -339,7 +339,7 @@ export function SubcontractClaimDetailView({
 			</div>
 
 			{/* Signatures */}
-			<div className="mt-12 grid grid-cols-4 gap-4 text-center text-xs">
+			<div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-xs">
 				{[
 					t("print.projectEngineer"),
 					t("print.technicalOffice"),
@@ -731,7 +731,7 @@ export function SubcontractClaimDetailView({
 
 			{/* Payment Sheet */}
 			<Sheet open={paymentSheetOpen} onOpenChange={setPaymentSheetOpen}>
-				<SheetContent side="left" className="w-[400px] sm:w-[450px]">
+				<SheetContent side="left" className="w-full max-w-full sm:w-[450px] sm:max-w-[450px]">
 					<SheetHeader>
 						<SheetTitle>{t("payment.addPayment")}</SheetTitle>
 						<SheetDescription>

@@ -116,7 +116,7 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 
 			{/* Table */}
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-				<Table className="table-fixed w-full">
+				<Table className="table-fixed w-full min-w-[640px]">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
 							<TableHead className="text-end text-slate-500 dark:text-slate-400">{t("company.leaves.balances.employee")}</TableHead>

@@ -226,7 +226,7 @@ export function BeamInputRow({
 					</div>
 
 					{/* نتائج الكمرة */}
-					<div className="bg-muted/30 rounded-lg p-2 grid grid-cols-3 gap-3 text-xs">
+					<div className="bg-muted/30 rounded-lg p-2 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
 						<div>
 							<span className="text-muted-foreground">خرسانة: </span>
 							<span className="font-bold">

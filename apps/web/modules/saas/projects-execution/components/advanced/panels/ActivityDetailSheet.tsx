@@ -112,7 +112,7 @@ export function ActivityDetailSheet({ onClose }: ActivityDetailSheetProps) {
 
 	return (
 		<Sheet open={open} onOpenChange={(o: boolean) => !o && handleClose()}>
-			<SheetContent side="left" className="w-[400px] sm:w-[440px] overflow-y-auto">
+			<SheetContent side="left" className="w-full max-w-full sm:w-[440px] sm:max-w-[440px] overflow-y-auto">
 				<SheetHeader>
 					<SheetTitle className="flex items-center gap-2">
 						{selectedActivity?.title}

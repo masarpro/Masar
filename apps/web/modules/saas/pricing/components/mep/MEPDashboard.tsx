@@ -112,7 +112,7 @@ export function MEPDashboard({
 			)}
 
 			{/* Action buttons */}
-			<div className="flex items-center justify-between">
+			<div className="flex flex-wrap items-center justify-between gap-3">
 				<h2 className="text-lg font-semibold">
 					{t("dashboard.title")}
 				</h2>

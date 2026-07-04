@@ -56,7 +56,7 @@ export function RampForm({ data, onChange }: ElementFormProps<RampInput>) {
 				{t("fields.advancedSettings")}
 			</button>
 			{showAdvanced && (
-				<div className="grid grid-cols-3 gap-3">
+				<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.slabThickness")} (سم)</Label>
 						<Input type="number" value={data.thickness} onChange={(e: any) => set("thickness", parseFloat(e.target.value) || 20)} />

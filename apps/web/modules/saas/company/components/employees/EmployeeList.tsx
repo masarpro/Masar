@@ -204,7 +204,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 
 			{/* Search and Filter Bar */}
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-				<div className="flex flex-1 items-center gap-3">
+				<div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
 					<div className="relative max-w-md flex-1">
 						<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 						<Input
@@ -215,7 +215,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 						/>
 					</div>
 					<Select value={statusFilter} onValueChange={(v: any) => { setStatusFilter(v); setCurrentPage(1); }}>
-						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+						<SelectTrigger className="w-full sm:w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.employees.filterStatus")} />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -226,7 +226,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 						</SelectContent>
 					</Select>
 					<Select value={typeFilter} onValueChange={(v: any) => { setTypeFilter(v); setCurrentPage(1); }}>
-						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
+						<SelectTrigger className="w-full sm:w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
 							<SelectValue placeholder={t("company.employees.filterType")} />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -250,7 +250,7 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 
 			{/* Table - Glass Morphism */}
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-				<Table className="table-fixed w-full">
+				<Table className="table-fixed w-full min-w-[860px]">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
 							<TableHead className="w-10">

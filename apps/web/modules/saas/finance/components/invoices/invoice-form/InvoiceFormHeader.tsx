@@ -52,7 +52,7 @@ export function InvoiceFormHeader({
 
 	return (
 		<div className="sticky top-0 z-20 py-3 px-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50">
-			<div className="flex items-center justify-between gap-3 max-w-6xl mx-auto">
+			<div className="flex flex-wrap items-center justify-between gap-3 max-w-6xl mx-auto">
 				{/* Start: back + breadcrumb/title */}
 				<div className="flex items-center gap-3 min-w-0">
 					<Button type="button" variant="outline" size="icon" asChild className="h-9 w-9 shrink-0 rounded-xl border-border shadow-sm">

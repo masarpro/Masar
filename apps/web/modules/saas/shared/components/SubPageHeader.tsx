@@ -52,7 +52,7 @@ export function SubPageHeader({
 			className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50"
 			dir="rtl"
 		>
-			<div className="flex items-center gap-3">
+			<div className="flex min-w-0 items-center gap-3">
 				<Button
 					variant="ghost"
 					size="icon"
@@ -71,7 +71,7 @@ export function SubPageHeader({
 					</div>
 				)}
 
-				<nav className="flex items-center gap-2 text-sm">
+				<nav className="flex min-w-0 items-center gap-2 text-sm">
 					<Link
 						href={homeHref}
 						className="text-muted-foreground hover:text-foreground transition-colors"
@@ -90,16 +90,16 @@ export function SubPageHeader({
 								{sectionLabel}
 							</Link>
 							<ChevronLeft className="h-4 w-4 text-muted-foreground" />
-							<span className="font-medium text-foreground">{pageTitle}</span>
+							<span className="truncate font-medium text-foreground">{pageTitle}</span>
 						</>
 					) : (
-						<span className="font-medium text-foreground">{sectionLabel}</span>
+						<span className="truncate font-medium text-foreground">{sectionLabel}</span>
 					)}
 				</nav>
 			</div>
 
 			{actions && (
-				<div className="flex items-center gap-2">
+				<div className="flex flex-wrap items-center gap-2">
 					{actions}
 				</div>
 			)}

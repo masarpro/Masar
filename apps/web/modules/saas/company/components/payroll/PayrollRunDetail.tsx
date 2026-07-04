@@ -438,7 +438,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 						{items.length}
 					</Badge>
 				</div>
-				<Table className="table-fixed w-full">
+				<Table className="table-fixed w-full min-w-[1100px]">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
 							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[16%]">

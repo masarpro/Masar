@@ -72,7 +72,7 @@ export function SepticTankForm({ data, onChange }: ElementFormProps<SepticTankIn
 				{t("fields.advancedSettings")}
 			</button>
 			{showAdvanced && (
-				<div className="grid grid-cols-3 gap-3">
+				<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.wallThickness")} (سم)</Label>
 						<Input type="number" min={10} step={5} value={data.wallThickness} onChange={(e: any) => set("wallThickness", parseFloat(e.target.value) || 20)} />

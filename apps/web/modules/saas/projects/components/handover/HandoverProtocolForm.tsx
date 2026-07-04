@@ -268,7 +268,7 @@ export function HandoverProtocolForm({
 						<CardContent className="space-y-3">
 							{parties.map((_, index) => (
 								<div key={index} className="flex items-start gap-3">
-									<div className="grid flex-1 grid-cols-3 gap-2">
+									<div className="grid flex-1 grid-cols-1 sm:grid-cols-3 gap-2">
 										<Input
 											placeholder={t("handover.parties.name")}
 											value={form.watch(`parties.${index}.name`)}

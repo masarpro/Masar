@@ -205,7 +205,7 @@ export function AddPaymentDialog({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent
-				className="sm:max-w-2xl p-0 gap-0 rounded-none sm:rounded-2xl overflow-hidden h-[100dvh] sm:h-auto sm:max-h-[90vh] flex flex-col w-full"
+				className="sm:max-w-2xl p-0 gap-0 rounded-none sm:rounded-2xl overflow-hidden h-[100dvh] sm:h-auto max-h-none sm:max-h-[90vh] flex flex-col w-full max-w-full"
 				onPointerDownOutside={(e) => e.preventDefault()}
 				onInteractOutside={(e) => e.preventDefault()}
 			>

@@ -172,7 +172,7 @@ export function IsolatedCombinedFields({
 					<h5 className="text-sm font-medium text-purple-700">
 						{t("pricing.studies.structural.covers.label")}
 					</h5>
-					<div className="grid grid-cols-3 gap-3">
+					<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 						<div>
 							<Label className="text-xs">{t("pricing.studies.structural.covers.bottom")} (سم)</Label>
 							<Input
@@ -258,7 +258,7 @@ export function IsolatedCombinedFields({
 					</div>
 					{formData.foundationHasColumnDowels && (
 						<>
-							<div className="grid grid-cols-3 gap-3 max-w-lg">
+							<div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-lg">
 								<div>
 									<Label className="text-xs">{t("pricing.studies.structural.columnDowels.barsPerColumn")}</Label>
 									<Select

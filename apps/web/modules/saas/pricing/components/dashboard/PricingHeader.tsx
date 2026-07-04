@@ -28,12 +28,12 @@ export function PricingHeader({ userName }: PricingHeaderProps) {
 
 	return (
 		<div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-l from-primary/10 via-primary/5 to-transparent border border-border/50" dir="rtl">
-			<div className="flex items-center gap-3">
+			<div className="flex min-w-0 items-center gap-3">
 				<div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
 					<Calculator className="h-5 w-5 text-primary" />
 				</div>
-				<div>
-					<h1 className="text-xl font-bold text-foreground">
+				<div className="min-w-0">
+					<h1 className="truncate text-xl font-bold text-foreground">
 						{t("pricing.title")}
 					</h1>
 					<p className="text-sm text-muted-foreground">

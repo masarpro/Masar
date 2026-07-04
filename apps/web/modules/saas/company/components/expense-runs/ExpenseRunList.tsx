@@ -204,7 +204,7 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 
 			{/* Table - Glass Morphism */}
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
-				<Table className="table-fixed w-full">
+				<Table className="table-fixed w-full min-w-[760px]">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">
 							<TableHead className="text-end text-slate-500 dark:text-slate-400 w-[20%]">{t("company.expenseRuns.runNo")}</TableHead>
@@ -287,7 +287,7 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 			{/* Create Expense Run Dialog */}
 			{showCreateDialog && (
 				<Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-					<DialogContent className="sm:max-w-md p-0 gap-0 rounded-2xl overflow-hidden">
+					<DialogContent className="sm:max-w-md p-0 gap-0 rounded-2xl">
 						<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
 							<DialogTitle className="text-base font-semibold text-end">
 								{t("company.expenseRuns.createRun")}

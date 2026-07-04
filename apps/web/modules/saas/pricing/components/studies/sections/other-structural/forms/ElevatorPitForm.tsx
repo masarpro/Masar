@@ -80,7 +80,7 @@ export function ElevatorPitForm({ data, onChange }: ElementFormProps<ElevatorPit
 				{t("fields.advancedSettings")}
 			</button>
 			{showAdvanced && (
-				<div className="grid grid-cols-3 gap-3">
+				<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.wallThickness")} (سم)</Label>
 						<Input type="number" value={data.wallThickness} onChange={(e: any) => set("wallThickness", parseFloat(e.target.value) || 25)} />

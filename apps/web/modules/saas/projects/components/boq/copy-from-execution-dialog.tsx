@@ -121,14 +121,14 @@ export function CopyFromExecutionDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-2xl p-0 gap-0 rounded-2xl overflow-hidden">
+			<DialogContent className="sm:max-w-2xl p-0 gap-0 rounded-2xl overflow-hidden flex flex-col max-h-[90dvh]">
 				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
 					<DialogTitle className="text-base font-semibold">
 						{t("copyExecution.title")}
 					</DialogTitle>
 				</DialogHeader>
 
-				<div className="p-5 space-y-4">
+				<div className="p-5 space-y-4 overflow-y-auto min-h-0 flex-1">
 					{/* Select all + summary */}
 					{!isLoading && milestoneList.length > 0 && (
 						<div

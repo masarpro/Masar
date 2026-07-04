@@ -99,7 +99,7 @@ export function AddEmployeeDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-4xl p-0 gap-0 rounded-2xl overflow-hidden">
+			<DialogContent className="sm:max-w-4xl p-0 gap-0 rounded-2xl">
 				{/* Header */}
 				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
 					<DialogTitle className="text-base font-semibold text-end">
@@ -110,7 +110,7 @@ export function AddEmployeeDialog({
 				<form onSubmit={handleSubmit}>
 					<div className="p-5 space-y-4">
 						{/* Row 1: Name, Type, Join Date */}
-						<div className="grid grid-cols-3 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("company.employees.name")} *
@@ -157,7 +157,7 @@ export function AddEmployeeDialog({
 						</div>
 
 						{/* Row 2: Phone, Email, National ID */}
-						<div className="grid grid-cols-3 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("company.employees.phone")}
@@ -192,7 +192,7 @@ export function AddEmployeeDialog({
 						</div>
 
 						{/* Row 3: Salary Type, Base Salary, Housing Allowance */}
-						<div className="grid grid-cols-3 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("company.employees.salaryType")}
@@ -241,7 +241,7 @@ export function AddEmployeeDialog({
 						</div>
 
 						{/* Row 4: Transport, Other Allowances, GOSI */}
-						<div className="grid grid-cols-3 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("company.employees.transportAllowance")}

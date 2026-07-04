@@ -76,7 +76,7 @@ export function DomeForm({ data, onChange }: ElementFormProps<DomeInput>) {
 			)}
 
 			{data.hasSupportColumns && (
-				<div className="grid grid-cols-3 gap-3">
+				<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.supportColumnCount")}</Label>
 						<Input type="number" min={1} value={data.supportColumnCount ?? 4} onChange={(e: any) => set("supportColumnCount", parseInt(e.target.value) || 4)} />

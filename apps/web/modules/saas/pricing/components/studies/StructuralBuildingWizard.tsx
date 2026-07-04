@@ -360,7 +360,7 @@ export function StructuralBuildingWizard({
 				{enabledFloors.length > 0 && (
 					<div>
 						<Label className="text-base font-semibold mb-3 block">تفاصيل الأدوار المختارة:</Label>
-						<div className="border rounded-lg overflow-hidden">
+						<div className="border rounded-lg overflow-hidden overflow-x-auto">
 							<table className="w-full text-sm">
 								<thead className="bg-muted/50">
 									<tr>

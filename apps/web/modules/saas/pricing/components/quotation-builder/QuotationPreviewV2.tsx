@@ -633,7 +633,7 @@ function PerSqmView({
 
 			{/* Section breakdown table (if items exist and showSectionSubtotal) */}
 			{showSectionSubtotal && items.length > 1 && (
-				<div className="rounded-lg border border-border overflow-hidden page-break-inside-avoid">
+				<div className="rounded-lg border border-border overflow-hidden overflow-x-auto page-break-inside-avoid">
 					<table className="w-full text-sm">
 						<thead>
 							<tr className="border-b bg-muted/40 text-muted-foreground">
@@ -718,7 +718,7 @@ function DetailedBoqTable({
 	const useSections = grouping === "BY_SECTION" && effectiveSectionBreaks.length > 0;
 
 	return (
-		<div className="rounded-lg border border-border overflow-hidden">
+		<div className="rounded-lg border border-border overflow-hidden overflow-x-auto">
 			<table className="w-full text-sm">
 				<thead>
 					<tr className="border-b bg-muted/40 text-muted-foreground">

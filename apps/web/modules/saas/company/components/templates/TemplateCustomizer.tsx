@@ -488,9 +488,9 @@ export function TemplateCustomizer({
 			</div>
 
 			{/* ── Main Area: Settings + Preview ────────────────────────────── */}
-			<div className="flex flex-1 overflow-hidden">
+			<div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
 				{/* ── Settings Panel (Right in RTL) ────────────────────────── */}
-				<div className="w-[380px] shrink-0 border-s bg-muted/30 overflow-y-auto p-4 space-y-5">
+				<div className="w-full lg:w-[380px] lg:shrink-0 max-h-[45vh] lg:max-h-none border-s bg-muted/30 overflow-y-auto p-4 space-y-5">
 					{/* ─ Colors ─────────────────────────────────────────────── */}
 					<SettingsSection
 						icon={<PaletteIcon className="h-4 w-4" />}

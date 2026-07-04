@@ -69,7 +69,7 @@ export function PaymentVouchersList({
 	return (
 		<div className="space-y-4">
 			{/* Header */}
-			<div className="flex items-center justify-between">
+			<div className="flex flex-wrap items-center justify-between gap-3">
 				<h1 className="text-2xl font-bold">{t("finance.paymentVouchers.title")}</h1>
 				<Button onClick={() => router.push(`${basePath}/new`)}>
 					<Plus className="me-2 h-4 w-4" />

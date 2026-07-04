@@ -96,7 +96,7 @@ export function CalendarSettingsDialog({
 						<Label>
 							{t("execution.advanced.calendar.workDays")}
 						</Label>
-						<div className="grid grid-cols-4 gap-2">
+						<div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
 							{DAYS.map((day) => (
 								<label
 									key={day}

@@ -390,7 +390,7 @@ export function WaterproofingItemDialog({
 					{/* Area calculation row */}
 					<div className="space-y-1">
 						<Label className="text-sm">{t("areaCalc")}</Label>
-						<div className="grid grid-cols-3 gap-2">
+						<div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
 							<div>
 								<Label className="text-xs text-muted-foreground">{t("area")} (م²)</Label>
 								<Input

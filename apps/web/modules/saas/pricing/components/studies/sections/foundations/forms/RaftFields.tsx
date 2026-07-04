@@ -95,7 +95,7 @@ export function RaftFields({
 				{/* الأغطية */}
 				<div className="space-y-3">
 					<h5 className="text-sm font-medium text-purple-700">{t("pricing.studies.structural.raft.covers")}</h5>
-					<div className="grid grid-cols-3 gap-3">
+					<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 						<div>
 							<Label className="text-xs">{t("pricing.studies.structural.raft.coverBottom")} (سم)</Label>
 							<Input type="number" value={formData.coverBottom * 100}
@@ -208,7 +208,7 @@ export function RaftFields({
 						</Label>
 					</div>
 					{formData.hasChairBars && (
-						<div className="grid grid-cols-3 gap-3 max-w-lg">
+						<div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-lg">
 							<div>
 								<Label className="text-xs">{t("pricing.studies.structural.raft.chairDiameter")} (مم)</Label>
 								<Select value={String(formData.chairBarsDiameter)}

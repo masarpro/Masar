@@ -389,7 +389,7 @@ export function StructuralSpecs({
 	return (
 		<Card dir="rtl">
 			<CardHeader className="pb-3">
-				<div className="flex items-center justify-between">
+				<div className="flex flex-wrap items-center justify-between gap-3">
 					<div className="flex items-center gap-2">
 						<Settings2 className="h-5 w-5 text-amber-600" />
 						<CardTitle className="text-base">مواصفات المواد الانشائية</CardTitle>

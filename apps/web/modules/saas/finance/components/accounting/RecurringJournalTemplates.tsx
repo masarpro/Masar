@@ -76,7 +76,7 @@ export function RecurringJournalTemplates({
 	return (
 		<div className="space-y-4">
 			{/* Header */}
-			<div className="flex items-center justify-between">
+			<div className="flex flex-wrap items-center justify-between gap-3">
 				<h3 className="text-lg font-bold">{t("finance.accounting.recurring.title")}</h3>
 				<Button
 					size="sm"

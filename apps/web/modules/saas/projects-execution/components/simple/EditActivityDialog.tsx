@@ -158,13 +158,13 @@ export function EditActivityDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-xl p-0 gap-0 rounded-2xl overflow-hidden">
+			<DialogContent className="sm:max-w-xl p-0 gap-0 rounded-2xl overflow-hidden flex flex-col max-h-[90dvh]">
 				<DialogHeader className="bg-white dark:bg-slate-900 border-b px-5 py-4">
 					<DialogTitle>{t("execution.activity.edit")}</DialogTitle>
 				</DialogHeader>
 
-				<form onSubmit={handleSubmit}>
-					<div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+				<form onSubmit={handleSubmit} className="flex flex-col min-h-0 flex-1">
+					<div className="p-5 space-y-4 overflow-y-auto min-h-0 flex-1">
 						<div className="space-y-1.5">
 							<Label>{t("execution.activity.titleField")}</Label>
 							<Input

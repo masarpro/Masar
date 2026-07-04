@@ -166,7 +166,7 @@ export function CopyTermsFromExecutionDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-2xl p-0 gap-0 rounded-2xl overflow-hidden">
+			<DialogContent className="sm:max-w-2xl p-0 gap-0 rounded-2xl overflow-hidden flex flex-col max-h-[90dvh]">
 				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
 					<DialogTitle className="text-base font-semibold">
 						{t("projectPayments.copyExecution.title")}
@@ -201,7 +201,7 @@ export function CopyTermsFromExecutionDialog({
 					</div>
 				) : (
 					<>
-						<div className="p-5 space-y-4">
+						<div className="p-5 space-y-4 overflow-y-auto min-h-0 flex-1">
 							{/* Tax-inclusive toggle */}
 							<div className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 px-4 py-3">
 								<label

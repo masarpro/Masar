@@ -103,7 +103,7 @@ export function AddAssetDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-4xl p-0 gap-0 rounded-2xl overflow-hidden">
+			<DialogContent className="sm:max-w-4xl p-0 gap-0 rounded-2xl">
 				{/* Header */}
 				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
 					<DialogTitle className="text-base font-semibold text-end">
@@ -114,7 +114,7 @@ export function AddAssetDialog({
 				<form onSubmit={handleSubmit}>
 					<div className="p-5 space-y-4">
 						{/* Row 1: Name, Category, Type */}
-						<div className="grid grid-cols-3 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("company.assets.name")} *
@@ -169,7 +169,7 @@ export function AddAssetDialog({
 						</div>
 
 						{/* Row 2: Brand, Model, Serial Number */}
-						<div className="grid grid-cols-3 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("company.assets.brand")}
@@ -203,7 +203,7 @@ export function AddAssetDialog({
 						</div>
 
 						{/* Row 3: Year, Purchase Price, Monthly Rent */}
-						<div className="grid grid-cols-3 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("company.assets.year")}
@@ -246,7 +246,7 @@ export function AddAssetDialog({
 						</div>
 
 						{/* Row 4: Current Value, Purchase Date, Warranty Expiry */}
-						<div className="grid grid-cols-3 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="space-y-1">
 								<Label className="text-xs font-medium text-slate-500 dark:text-slate-400">
 									{t("company.assets.currentValue")}

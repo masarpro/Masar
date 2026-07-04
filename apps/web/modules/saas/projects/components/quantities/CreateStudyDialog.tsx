@@ -144,7 +144,7 @@ export function CreateStudyDialog({
 				onOpenChange(val);
 			}}
 		>
-			<DialogContent className="sm:max-w-2xl p-0 gap-0 rounded-2xl overflow-hidden">
+			<DialogContent className="sm:max-w-2xl p-0 gap-0 rounded-2xl overflow-hidden flex flex-col max-h-[90dvh]">
 				{/* Header */}
 				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
 					<DialogTitle className="text-base font-semibold">
@@ -153,8 +153,8 @@ export function CreateStudyDialog({
 				</DialogHeader>
 
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)}>
-						<div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+					<form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col min-h-0 flex-1">
+						<div className="p-5 space-y-4 overflow-y-auto min-h-0 flex-1">
 							{/* Study Name */}
 							<FormField
 								control={form.control}
@@ -252,7 +252,7 @@ export function CreateStudyDialog({
 							</div>
 
 							{/* Land Area, Building Area, Number of Floors */}
-							<div className="grid grid-cols-3 gap-3">
+							<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 								<FormField
 									control={form.control}
 									name="landArea"

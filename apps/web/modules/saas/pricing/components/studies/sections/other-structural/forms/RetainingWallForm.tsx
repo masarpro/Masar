@@ -50,7 +50,7 @@ export function RetainingWallForm({ data, onChange }: ElementFormProps<Retaining
 				{t("fields.advancedSettings")}
 			</button>
 			{showAdvanced && (
-				<div className="grid grid-cols-3 gap-3">
+				<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 					<div>
 						<Label>{t("fields.stemThickness")} (سم)</Label>
 						<Input type="number" value={data.stemThickness} onChange={(e: any) => set("stemThickness", parseFloat(e.target.value) || 25)} />

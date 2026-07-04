@@ -62,7 +62,7 @@ export function AccountingPeriodsPage({ organizationId, organizationSlug }: Prop
 	return (
 		<div className="space-y-4">
 			{/* Year selector + Generate */}
-			<div className="flex items-center justify-between">
+			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
 					{[currentYear - 1, currentYear, currentYear + 1].map((y) => (
 						<Button key={y} variant={year === y ? "primary" : "ghost"} size="sm" className="rounded-lg" onClick={() => setYear(y)}>

@@ -391,7 +391,7 @@ export function ImportExcelDialog({
 				onOpenChange(o);
 			}}
 		>
-			<DialogContent className="sm:max-w-3xl p-0 gap-0 rounded-2xl overflow-hidden">
+			<DialogContent className="sm:max-w-3xl p-0 gap-0 rounded-2xl overflow-hidden flex flex-col max-h-[90dvh]">
 				<DialogHeader className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-5 py-4">
 					<DialogTitle className="text-base font-semibold">
 						{t("importExcel.title")}
@@ -433,7 +433,7 @@ export function ImportExcelDialog({
 					</div>
 				</div>
 
-				<div className="p-5 min-h-[300px]">
+				<div className="p-5 min-h-0 overflow-y-auto flex-1">
 					{/* Step 1: Upload */}
 					{step === 1 && (
 						<div className="space-y-4">
@@ -517,7 +517,7 @@ export function ImportExcelDialog({
 							</div>
 
 							{/* Mapping table */}
-							<div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+							<div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden overflow-x-auto">
 								<table className="w-full text-sm">
 									<thead>
 										<tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">

@@ -297,7 +297,7 @@ export function ProjectPaymentForm({
 								</div>
 							</div>
 						</div>
-						<div className="grid grid-cols-3 gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 							<div className="rounded-xl bg-white/60 p-3 dark:bg-slate-900/30">
 								<p className="text-xs text-slate-500">
 									{t("projectPayments.required")}

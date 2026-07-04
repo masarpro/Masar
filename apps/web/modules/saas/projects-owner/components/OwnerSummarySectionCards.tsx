@@ -209,7 +209,7 @@ export function OwnerSummarySectionCards({
 						<p className="text-sm text-slate-500 dark:text-slate-400">
 							{t("ownerPortal.summary.photosCount", { count: photos.count })}
 						</p>
-						<div className="grid grid-cols-4 gap-1.5">
+						<div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
 							{photos.recent.map((photo) => {
 								const src = resolveImageSrc(photo.url);
 								return (
