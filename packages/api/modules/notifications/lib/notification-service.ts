@@ -13,6 +13,7 @@ import {
 } from "@repo/database";
 import type { NotificationType, NotificationChannel, ProjectRole } from "@repo/database/prisma/generated/client";
 import { sendNotificationEmails } from "./notification-email";
+import { filterRecipientsByPermission } from "./notification-permissions";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Notification Type → Preference Field Mapping
@@ -181,6 +182,19 @@ export async function sendNotification(
 		return { count: 0 };
 	}
 
+	// RBAC filter: recipients must hold the permission required by this
+	// notification type (e.g. finance notifications never reach a field
+	// supervisor). Runs on the same cached source as API authorization.
+	recipients = await filterRecipientsByPermission(
+		payload.organizationId,
+		recipients,
+		payload.type,
+	);
+
+	if (recipients.length === 0) {
+		return { count: 0 };
+	}
+
 	// Filter by notification preferences
 	recipients = await filterRecipientsByPreferences(
 		payload.organizationId,
@@ -237,6 +251,16 @@ export async function sendNotificationToUser(
 	userId: string,
 	data: Omit<NotificationPayload, "organizationId" | "recipientIds">,
 ): Promise<void> {
+	// RBAC filter — same rule as multi-recipient notifications
+	const permitted = await filterRecipientsByPermission(
+		organizationId,
+		[userId],
+		data.type,
+	);
+	if (permitted.length === 0) {
+		return;
+	}
+
 	// Check user preferences
 	const allowedChannels = await getUserAllowedChannels(
 		organizationId,
