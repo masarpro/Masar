@@ -2320,6 +2320,13 @@
       }
     }
   },
+  "permissions": {
+    "accessDenied": {
+      "title": "You do not have permission to access this section",
+      "description": "Contact the organization owner or manager to grant you the required permission.",
+      "backHome": "Back to home"
+    }
+  },
   "featureGate": {
     "title": "This feature requires a subscription",
     "upgradeCta": "Upgrade to Pro — 199 SAR/month",

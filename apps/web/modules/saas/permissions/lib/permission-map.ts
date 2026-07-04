@@ -73,6 +73,90 @@ export const SIDEBAR_PERMISSION_MAP: Record<
 };
 
 /**
+ * Route-level permission rules for org sections (Stage 3 — page guards).
+ * `prefix` is the first path segment under the section root
+ * (e.g. "invoices" in /app/{slug}/finance/invoices/...).
+ * `public: true` marks routes governed by another system (skipped here).
+ * The empty prefix "" is the section root page.
+ */
+export interface RoutePermissionRule {
+	prefix: string;
+	section?: keyof Permissions;
+	action?: string;
+	public?: boolean;
+}
+
+export const FINANCE_ROUTE_PERMISSIONS: RoutePermissionRule[] = [
+	{ prefix: "", section: "finance", action: "view" },
+	{ prefix: "expenses", section: "finance", action: "view" },
+	{ prefix: "clients", section: "finance", action: "view" },
+	{ prefix: "banks", section: "finance", action: "view" },
+	{ prefix: "documents", section: "finance", action: "view" },
+	{ prefix: "statements", section: "finance", action: "view" },
+	{ prefix: "accounting-dashboard", section: "finance", action: "view" },
+	{ prefix: "invoices", section: "finance", action: "invoices" },
+	{ prefix: "payments", section: "finance", action: "payments" },
+	{ prefix: "payment-vouchers", section: "finance", action: "payments" },
+	{ prefix: "receipt-vouchers", section: "finance", action: "payments" },
+	{ prefix: "capital-contributions", section: "finance", action: "payments" },
+	{ prefix: "owner-drawings", section: "finance", action: "payments" },
+	{ prefix: "accounting-reports", section: "finance", action: "reports" },
+	{ prefix: "reports", section: "finance", action: "reports" },
+	{ prefix: "chart-of-accounts", section: "finance", action: "settings" },
+	{ prefix: "journal-entries", section: "finance", action: "settings" },
+	{ prefix: "opening-balances", section: "finance", action: "settings" },
+	{ prefix: "accounting-periods", section: "finance", action: "settings" },
+	{ prefix: "year-end-closing", section: "finance", action: "settings" },
+	{ prefix: "settings", section: "finance", action: "settings" },
+	// محكومة بنظام partnerAccessLevel المنفصل — لا تُقيَّد هنا
+	{ prefix: "partners", public: true },
+];
+
+export const COMPANY_ROUTE_PERMISSIONS: RoutePermissionRule[] = [
+	{ prefix: "", section: "company", action: "view" },
+	{ prefix: "templates", section: "company", action: "view" },
+	{ prefix: "employees", section: "employees", action: "view" },
+	{ prefix: "hr", section: "employees", action: "view" },
+	{ prefix: "leaves", section: "employees", action: "view" },
+	{ prefix: "payroll", section: "employees", action: "payroll" },
+	{ prefix: "expenses", section: "company", action: "expenses" },
+	{ prefix: "expense-runs", section: "company", action: "expenses" },
+	{ prefix: "assets", section: "company", action: "assets" },
+	{ prefix: "reports", section: "company", action: "reports" },
+];
+
+export const PRICING_ROUTE_PERMISSIONS: RoutePermissionRule[] = [
+	{ prefix: "", section: "pricing", action: "view" },
+	{ prefix: "studies", section: "pricing", action: "studies" },
+	{ prefix: "quick", section: "pricing", action: "studies" },
+	{ prefix: "quotations", section: "pricing", action: "quotations" },
+	{ prefix: "leads", section: "pricing", action: "leads" },
+];
+
+/**
+ * Find the rule matching a pathname under a section root.
+ * Unknown sub-routes fall back to the section root rule ("") so a newly
+ * added page is view-gated by default rather than left open.
+ */
+export function findRouteRule(
+	pathname: string,
+	sectionRoot: string,
+	rules: RoutePermissionRule[],
+): RoutePermissionRule | undefined {
+	const marker = `/${sectionRoot}`;
+	const idx = pathname.indexOf(`${marker}/`);
+	let segment = "";
+	if (idx >= 0) {
+		segment =
+			pathname.slice(idx + marker.length + 1).split("/")[0]?.trim() ?? "";
+	}
+	return (
+		rules.find((rule) => rule.prefix === segment) ??
+		rules.find((rule) => rule.prefix === "")
+	);
+}
+
+/**
  * Resolve visibility of a sidebar item for the current member.
  * OWNER sees everything; items without a predicate are always visible.
  */
