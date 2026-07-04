@@ -1,5 +1,9 @@
 import "server-only";
 import {
+	getCachedUserPermissions,
+	getUserRoleType,
+} from "@repo/api/lib/permissions";
+import {
 	db,
 	getPurchasesByOrganizationId,
 	getPurchasesByUserId,
@@ -42,6 +46,32 @@ export const cachedGetOrganizationSubscription = cache(
 			where: { id: organizationId },
 			select: { status: true, plan: true, trialEndsAt: true },
 		});
+	},
+);
+
+/**
+ * Request-level cached read of the current user's effective permissions —
+ * same shape as the `permissions.getMine` procedure so layouts can prefetch
+ * it into the React Query cache without a self-HTTP round-trip.
+ * Cross-tenant safety comes from getUserPermissions' org guard (deny-all).
+ */
+export const cachedGetMyPermissions = cache(
+	async (organizationId: string) => {
+		const session = await getSession();
+		if (!session) {
+			return { permissions: null, roleType: null, isOwner: false };
+		}
+
+		const [permissions, roleType] = await Promise.all([
+			getCachedUserPermissions(session.user.id, organizationId),
+			getUserRoleType(session.user.id, organizationId),
+		]);
+
+		return {
+			permissions,
+			roleType,
+			isOwner: roleType === "OWNER",
+		};
 	},
 );
 

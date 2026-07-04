@@ -12,6 +12,7 @@ import { notificationsRouter } from "../modules/notifications/router";
 import { orgUsersRouter } from "../modules/org-users/router";
 import { organizationsRouter } from "../modules/organizations/router";
 import { paymentsRouter } from "../modules/payments/router";
+import { permissionsRouter } from "../modules/permissions/router";
 import { projectChatRouter } from "../modules/project-chat/router";
 import { projectDocumentsRouter } from "../modules/project-documents/router";
 import { projectFieldRouter } from "../modules/project-field/router";
@@ -56,6 +57,8 @@ export const router = publicProcedure.router({
 	ai: aiRouter,
 	roles: rolesRouter,
 	orgUsers: orgUsersRouter,
+	// Effective permissions of the current member (UX layer — hides UI only)
+	permissions: permissionsRouter,
 	// Pricing Module - التسعير (unified pre-contract: studies + quotations)
 	pricing: pricingRouter,
 	projects: projectsRouter,
