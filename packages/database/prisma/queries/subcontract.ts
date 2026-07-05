@@ -430,9 +430,11 @@ export async function setSubcontractPaymentTerms(
  */
 export async function getSubcontractPaymentTermsProgress(
 	contractId: string,
+	organizationId: string,
+	projectId: string,
 ) {
 	const contract = await db.subcontractContract.findFirst({
-		where: { id: contractId },
+		where: { id: contractId, organizationId, projectId },
 		include: {
 			paymentTerms: { orderBy: { sortOrder: "asc" } },
 		},
@@ -830,14 +832,17 @@ export async function createSubcontractPayment(data: {
 			},
 		});
 
-		// Deduct from source bank account if provided
+		// Deduct from source bank account if provided — guard against overdrawing
 		if (data.sourceAccountId) {
-			await tx.organizationBank.update({
-				where: { id: data.sourceAccountId },
+			const bankDec = await tx.organizationBank.updateMany({
+				where: { id: data.sourceAccountId, balance: { gte: data.amount } },
 				data: {
 					balance: { decrement: data.amount },
 				},
 			});
+			if (bankDec.count === 0) {
+				throw new Error("الرصيد غير كافي في الحساب المصدر");
+			}
 		}
 
 		return payment;

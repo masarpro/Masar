@@ -193,17 +193,23 @@ export async function getEmployeeSummary(organizationId: string) {
 // EMPLOYEE ASSIGNMENT QUERIES - توزيع الموظفين على المشاريع
 // ═══════════════════════════════════════════════════════════════════════════
 
-export async function getEmployeeAssignments(employeeId: string) {
+export async function getEmployeeAssignments(
+	employeeId: string,
+	organizationId: string,
+) {
 	return db.employeeProjectAssignment.findMany({
-		where: { employeeId },
+		where: { employeeId, employee: { organizationId } },
 		include: { project: { select: { id: true, name: true, slug: true, status: true } } },
 		orderBy: { createdAt: "desc" },
 	});
 }
 
-export async function getProjectEmployeeAssignments(projectId: string) {
+export async function getProjectEmployeeAssignments(
+	projectId: string,
+	organizationId: string,
+) {
 	return db.employeeProjectAssignment.findMany({
-		where: { projectId, isActive: true },
+		where: { projectId, isActive: true, project: { organizationId } },
 		include: {
 			employee: {
 				select: {
@@ -217,13 +223,31 @@ export async function getProjectEmployeeAssignments(projectId: string) {
 	});
 }
 
-export async function createEmployeeAssignment(data: {
-	employeeId: string;
-	projectId: string;
-	percentage: number;
-	startDate: Date;
-	notes?: string;
-}) {
+export async function createEmployeeAssignment(
+	organizationId: string,
+	data: {
+		employeeId: string;
+		projectId: string;
+		percentage: number;
+		startDate: Date;
+		notes?: string;
+	},
+) {
+	// Tenant isolation: verify both employee and project belong to the organization
+	const [employee, project] = await Promise.all([
+		db.employee.findFirst({
+			where: { id: data.employeeId, organizationId },
+			select: { id: true },
+		}),
+		db.project.findFirst({
+			where: { id: data.projectId, organizationId },
+			select: { id: true },
+		}),
+	]);
+	if (!employee || !project) {
+		throw new Error("EMPLOYEE_OR_PROJECT_NOT_FOUND");
+	}
+
 	// Validate total percentage ≤ 100%
 	const existing = await db.employeeProjectAssignment.findMany({
 		where: { employeeId: data.employeeId, isActive: true },
@@ -248,8 +272,17 @@ export async function createEmployeeAssignment(data: {
 
 export async function updateEmployeeAssignment(
 	id: string,
+	organizationId: string,
 	data: { percentage?: number; startDate?: Date; endDate?: Date | null; isActive?: boolean; notes?: string | null },
 ) {
+	// Tenant isolation: ensure the assignment belongs to the organization
+	const owned = await db.employeeProjectAssignment.findFirst({
+		where: { id, employee: { organizationId } },
+		select: { id: true },
+	});
+	if (!owned) {
+		throw new Error("Assignment not found");
+	}
 	if (data.percentage !== undefined) {
 		const assignment = await db.employeeProjectAssignment.findUnique({ where: { id }, select: { employeeId: true, percentage: true } });
 		if (assignment) {
@@ -267,7 +300,18 @@ export async function updateEmployeeAssignment(
 	return db.employeeProjectAssignment.update({ where: { id }, data });
 }
 
-export async function removeEmployeeAssignment(id: string) {
+export async function removeEmployeeAssignment(
+	id: string,
+	organizationId: string,
+) {
+	// Tenant isolation: ensure the assignment belongs to the organization
+	const owned = await db.employeeProjectAssignment.findFirst({
+		where: { id, employee: { organizationId } },
+		select: { id: true },
+	});
+	if (!owned) {
+		throw new Error("Assignment not found");
+	}
 	return db.employeeProjectAssignment.delete({ where: { id } });
 }
 
@@ -476,9 +520,13 @@ export async function getUpcomingCompanyPayments(organizationId: string, daysAhe
 
 export async function getExpensePayments(
 	expenseId: string,
+	organizationId: string,
 	options?: { isPaid?: boolean; limit?: number; offset?: number },
 ) {
-	const where: Record<string, unknown> = { expenseId };
+	const where: Record<string, unknown> = {
+		expenseId,
+		expense: { organizationId },
+	};
 	if (options?.isPaid !== undefined) where.isPaid = options.isPaid;
 
 	return db.companyExpensePayment.findMany({
@@ -490,18 +538,29 @@ export async function getExpensePayments(
 	});
 }
 
-export async function createExpensePayment(data: {
-	expenseId: string;
-	periodStart: Date;
-	periodEnd: Date;
-	amount: number;
-	dueDate: Date;
-	isPaid?: boolean;
-	paidAt?: Date;
-	bankAccountId?: string;
-	referenceNo?: string;
-	notes?: string;
-}) {
+export async function createExpensePayment(
+	organizationId: string,
+	data: {
+		expenseId: string;
+		periodStart: Date;
+		periodEnd: Date;
+		amount: number;
+		dueDate: Date;
+		isPaid?: boolean;
+		paidAt?: Date;
+		bankAccountId?: string;
+		referenceNo?: string;
+		notes?: string;
+	},
+) {
+	// Verify the parent expense belongs to the organization (tenant isolation)
+	const expense = await db.companyExpense.findFirst({
+		where: { id: data.expenseId, organizationId },
+		select: { id: true },
+	});
+	if (!expense) {
+		throw new Error("EXPENSE_NOT_FOUND");
+	}
 	return db.companyExpensePayment.create({ data });
 }
 
@@ -536,9 +595,9 @@ export async function markExpensePaymentPaid(
 		createdById: string;
 	},
 ) {
-	// Get the payment with its expense details
-	const payment = await db.companyExpensePayment.findUnique({
-		where: { id },
+	// Get the payment with its expense details (scoped to organization)
+	const payment = await db.companyExpensePayment.findFirst({
+		where: { id, expense: { organizationId: data.organizationId } },
 		include: {
 			expense: { select: { id: true, name: true, category: true, vendor: true } },
 		},
@@ -578,13 +637,16 @@ export async function markExpensePaymentPaid(
 			},
 		});
 
-		// Deduct from bank balance
-		await tx.organizationBank.update({
-			where: { id: data.bankAccountId },
+		// Deduct from bank balance — guard against overdrawing under concurrency
+		const bankDec = await tx.organizationBank.updateMany({
+			where: { id: data.bankAccountId, balance: { gte: Number(payment.amount) } },
 			data: {
 				balance: { decrement: Number(payment.amount) },
 			},
 		});
+		if (bankDec.count === 0) {
+			throw new Error("الرصيد غير كافي في الحساب المصدر");
+		}
 
 		// Mark the company payment as paid and link it
 		return tx.companyExpensePayment.update({
@@ -602,6 +664,7 @@ export async function markExpensePaymentPaid(
 
 export async function updateExpensePayment(
 	id: string,
+	organizationId: string,
 	data: {
 		amount?: number;
 		dueDate?: Date;
@@ -612,16 +675,36 @@ export async function updateExpensePayment(
 		notes?: string | null;
 	},
 ) {
+	// Tenant isolation: ensure the payment belongs to the organization
+	const owned = await db.companyExpensePayment.findFirst({
+		where: { id, expense: { organizationId } },
+		select: { id: true },
+	});
+	if (!owned) {
+		throw new Error("Payment not found");
+	}
 	return db.companyExpensePayment.update({ where: { id }, data });
 }
 
-export async function deleteExpensePayment(id: string) {
+export async function deleteExpensePayment(id: string, organizationId: string) {
+	// Tenant isolation: ensure the payment belongs to the organization
+	const owned = await db.companyExpensePayment.findFirst({
+		where: { id, expense: { organizationId } },
+		select: { id: true },
+	});
+	if (!owned) {
+		throw new Error("Payment not found");
+	}
 	return db.companyExpensePayment.delete({ where: { id } });
 }
 
-export async function generateMonthlyPayments(expenseId: string, monthsAhead = 3) {
-	const expense = await db.companyExpense.findUnique({
-		where: { id: expenseId },
+export async function generateMonthlyPayments(
+	expenseId: string,
+	organizationId: string,
+	monthsAhead = 3,
+) {
+	const expense = await db.companyExpense.findFirst({
+		where: { id: expenseId, organizationId },
 		select: { id: true, amount: true, recurrence: true, startDate: true, endDate: true },
 	});
 
@@ -686,9 +769,12 @@ export async function generateMonthlyPayments(expenseId: string, monthsAhead = 3
 // EXPENSE ALLOCATION QUERIES - توزيع المصروفات على المشاريع
 // ═══════════════════════════════════════════════════════════════════════════
 
-export async function getExpenseAllocations(expenseId: string) {
+export async function getExpenseAllocations(
+	expenseId: string,
+	organizationId: string,
+) {
 	return db.companyExpenseAllocation.findMany({
-		where: { expenseId },
+		where: { expenseId, expense: { organizationId } },
 		include: { project: { select: { id: true, name: true, slug: true } } },
 		orderBy: { percentage: "desc" },
 	});
@@ -696,12 +782,22 @@ export async function getExpenseAllocations(expenseId: string) {
 
 export async function setExpenseAllocations(
 	expenseId: string,
+	organizationId: string,
 	allocations: Array<{ projectId: string; percentage: number; notes?: string }>,
 ) {
 	// Validate total ≤ 100%
 	const total = allocations.reduce((sum, a) => sum + a.percentage, 0);
 	if (total > 100) {
 		throw new Error(`Total allocation percentage cannot exceed 100% (got ${total}%)`);
+	}
+
+	// Tenant isolation: verify the parent expense belongs to the organization
+	const expense = await db.companyExpense.findFirst({
+		where: { id: expenseId, organizationId },
+		select: { id: true },
+	});
+	if (!expense) {
+		throw new Error("EXPENSE_NOT_FOUND");
 	}
 
 	return db.$transaction(async (tx) => {
@@ -727,9 +823,12 @@ export async function setExpenseAllocations(
 	});
 }
 
-export async function getProjectAllocatedExpenses(projectId: string) {
+export async function getProjectAllocatedExpenses(
+	projectId: string,
+	organizationId: string,
+) {
 	const allocations = await db.companyExpenseAllocation.findMany({
-		where: { projectId },
+		where: { projectId, expense: { organizationId } },
 		include: {
 			expense: {
 				select: { id: true, name: true, category: true, amount: true, recurrence: true, isActive: true },

@@ -634,6 +634,9 @@ export async function getVATReport(
 				amount: true,
 				category: true,
 				categoryId: true,
+				// Resolve the real VAT-exempt flag from the org category (categoryId
+				// is a cuid, so comparing it to systemId strings never matched).
+				categoryRef: { select: { isVatExempt: true } },
 			},
 		}),
 		// Subcontract payments with VAT-inclusive contracts
@@ -712,9 +715,11 @@ export async function getVATReport(
 	let expenseCount = 0;
 
 	for (const exp of expenses) {
-		// New hierarchical categories that are VAT-exempt
-		const NEW_VAT_EXEMPT_CATEGORIES = ["ADMIN_SALARIES", "GOVERNMENT_LICENSES", "INSURANCE_GUARANTEES", "FINANCIAL_EXPENSES"];
-		const isExempt = (exp.categoryId ? NEW_VAT_EXEMPT_CATEGORIES.includes(exp.categoryId) : false) || VAT_EXEMPT_EXPENSE_CATEGORIES.includes(exp.category);
+		// Prefer the org category's authoritative isVatExempt flag; fall back to
+		// the legacy enum category list for rows without a linked OrgCategory.
+		const isExempt =
+			exp.categoryRef?.isVatExempt ??
+			VAT_EXEMPT_EXPENSE_CATEGORIES.includes(exp.category);
 		if (isExempt) continue;
 
 		const amount = new Prisma.Decimal(Number(exp.amount));

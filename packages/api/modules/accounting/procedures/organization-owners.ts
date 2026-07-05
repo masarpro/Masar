@@ -474,7 +474,7 @@ export const getTotalOwnershipProcedure = protectedProcedure
 // 7. ENSURE OWNER DRAWINGS SYSTEM
 // ═══════════════════════════════════════════════════════════════════════════
 
-export const ensureOwnerDrawingsSystemProcedure = protectedProcedure
+export const ensureOwnerDrawingsSystemProcedure = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/accounting/owners/ensure-drawings-system",

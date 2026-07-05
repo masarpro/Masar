@@ -684,6 +684,14 @@ export const printPaymentVoucher = subscriptionProcedure
 			action: "view",
 		});
 
+		const owned = await db.paymentVoucher.findFirst({
+			where: { id: input.id, organizationId: input.organizationId },
+			select: { id: true },
+		});
+		if (!owned) {
+			throw new ORPCError("NOT_FOUND", { message: "سند الصرف غير موجود" });
+		}
+
 		return db.paymentVoucher.update({
 			where: { id: input.id },
 			data: {

@@ -83,7 +83,7 @@ export async function backfillJournalEntries(
 		try {
 			await onCreditNoteIssued(db, {
 				id: cn.id, organizationId, number: cn.invoiceNo, issueDate: cn.issueDate,
-				clientName: cn.clientName || "", totalAmount: cn.totalAmount, vatAmount: cn.vatAmount, projectId: cn.projectId,
+				clientName: cn.clientName || "", totalAmount: cn.totalAmount.abs(), vatAmount: cn.vatAmount.abs(), projectId: cn.projectId,
 			});
 			r.creditNotes++;
 		} catch (e: any) { r.errors.push({ type: "CREDIT_NOTE", id: cn.invoiceNo, error: e.message }); }

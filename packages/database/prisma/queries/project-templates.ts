@@ -381,7 +381,12 @@ export async function removeTemplateItem(
 		throw new Error("Template not found");
 	}
 
-	return db.projectTemplateItem.delete({
-		where: { id: itemId },
+	// Bind the item to the verified template (prevents deleting another org's item)
+	const deleted = await db.projectTemplateItem.deleteMany({
+		where: { id: itemId, templateId },
 	});
+	if (deleted.count === 0) {
+		throw new Error("Template item not found");
+	}
+	return { success: true };
 }

@@ -30,12 +30,18 @@ export const deleteProjectProcedure = subscriptionProcedure
 		// Check for financial data before allowing hard delete
 		const [
 			expenseCount,
+			projectExpenseCount,
 			claimCount,
 			subcontractCount,
 			invoiceCount,
 			paymentCount,
 		] = await Promise.all([
 			db.financeExpense.count({
+				where: { organizationId: input.organizationId, projectId: input.id },
+			}),
+			// Field expenses (project-finance) cascade-delete with the project and
+			// leave orphaned journal entries — guard against them too.
+			db.projectExpense.count({
 				where: { organizationId: input.organizationId, projectId: input.id },
 			}),
 			db.projectClaim.count({
@@ -53,7 +59,12 @@ export const deleteProjectProcedure = subscriptionProcedure
 		]);
 
 		const totalRecords =
-			expenseCount + claimCount + subcontractCount + invoiceCount + paymentCount;
+			expenseCount +
+			projectExpenseCount +
+			claimCount +
+			subcontractCount +
+			invoiceCount +
+			paymentCount;
 
 		if (totalRecords > 0) {
 			throw new ORPCError("BAD_REQUEST", {
@@ -63,6 +74,7 @@ export const deleteProjectProcedure = subscriptionProcedure
 					hasFinancialData: true,
 					counts: {
 						expenses: expenseCount,
+						projectExpenses: projectExpenseCount,
 						claims: claimCount,
 						subcontracts: subcontractCount,
 						invoices: invoiceCount,

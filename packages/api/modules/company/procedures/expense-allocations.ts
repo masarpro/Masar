@@ -36,7 +36,7 @@ export const listExpenseAllocations = protectedProcedure
 			action: "view",
 		});
 
-		return getExpenseAllocations(input.expenseId);
+		return getExpenseAllocations(input.expenseId, input.organizationId);
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -68,7 +68,11 @@ export const setExpenseAllocationsProcedure = subscriptionProcedure
 			action: "expenses",
 		});
 
-		return setExpenseAllocations(input.expenseId, input.allocations);
+		return setExpenseAllocations(
+			input.expenseId,
+			input.organizationId,
+			input.allocations,
+		);
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -93,5 +97,5 @@ export const getProjectAllocatedExpensesProcedure = protectedProcedure
 			action: "view",
 		});
 
-		return getProjectAllocatedExpenses(input.projectId);
+		return getProjectAllocatedExpenses(input.projectId, input.organizationId);
 	});

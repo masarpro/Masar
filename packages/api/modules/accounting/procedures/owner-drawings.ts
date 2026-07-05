@@ -542,14 +542,19 @@ export const createDrawingProcedure = subscriptionProcedure
 				},
 			});
 
-			// Decrement bank balance atomically
+			// Decrement bank balance atomically — guard against overdrawing
 			if (input.bankAccountId) {
-				await tx.organizationBank.update({
-					where: { id: input.bankAccountId },
+				const bankDec = await tx.organizationBank.updateMany({
+					where: { id: input.bankAccountId, balance: { gte: input.amount } },
 					data: {
 						balance: { decrement: input.amount },
 					},
 				});
+				if (bankDec.count === 0) {
+					throw new ORPCError("BAD_REQUEST", {
+						message: "الرصيد غير كافي في الحساب المصدر",
+					});
+				}
 			}
 
 			return created;
