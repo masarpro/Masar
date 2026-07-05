@@ -1,8 +1,11 @@
 "use client";
 
-import { apiClient } from "@shared/lib/api-client";
+import { getEventIcon } from "@saas/notifications/lib/notification-icons";
+import { getNotificationHref } from "@saas/notifications/lib/notification-links";
+import { formatRelativeTime } from "@shared/lib/formatters";
+import { orpc } from "@shared/lib/orpc-query-utils";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import {
 	DropdownMenu,
@@ -16,60 +19,88 @@ import { cn } from "@ui/lib";
 import { BellIcon, CheckCheckIcon, Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { formatRelativeTime } from "@shared/lib/formatters";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 interface NotificationBellProps {
 	organizationId: string;
+	organizationSlug: string;
 }
 
-export function NotificationBell({ organizationId }: NotificationBellProps) {
+interface NotificationItem {
+	id: string;
+	type: string;
+	title: string;
+	body?: string | null;
+	projectId?: string | null;
+	entityType?: string | null;
+	entityId?: string | null;
+	readAt?: string | Date | null;
+	createdAt: string | Date;
+}
+
+export function NotificationBell({
+	organizationId,
+	organizationSlug,
+}: NotificationBellProps) {
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 
+	const notificationsPageHref = `/app/${organizationSlug}/notifications`;
+
 	// Query for unread count (refresh every 30 seconds via polling)
-	const { data: countData } = useQuery({
-		queryKey: ["notifications", "unreadCount", organizationId],
-		queryFn: () =>
-			apiClient.notifications.unreadCount({
-				organizationId,
-			}),
-		refetchInterval: 30000,
-		staleTime: STALE_TIMES.NOTIFICATIONS,
-	});
+	const { data: countData } = useQuery(
+		orpc.notifications.unreadCount.queryOptions({
+			input: { organizationId },
+			refetchInterval: 30000,
+			staleTime: STALE_TIMES.NOTIFICATIONS,
+		}),
+	);
 
 	// Query for recent notifications
-	const { data: notificationsData, isLoading } = useQuery({
-		queryKey: ["notifications", "list", organizationId],
-		queryFn: () =>
-			apiClient.notifications.list({
-				organizationId,
-				pageSize: 5,
-			}),
-		staleTime: STALE_TIMES.NOTIFICATIONS,
-	});
+	const { data: notificationsData, isLoading } = useQuery(
+		orpc.notifications.list.queryOptions({
+			input: { organizationId, pageSize: 5 },
+			staleTime: STALE_TIMES.NOTIFICATIONS,
+		}),
+	);
+
+	const invalidateNotifications = () => {
+		queryClient.invalidateQueries({
+			queryKey: orpc.notifications.key(),
+		});
+	};
 
 	// Mark all as read mutation
-	const markAllReadMutation = useMutation({
-		mutationFn: () =>
-			apiClient.notifications.markRead({
+	const markAllReadMutation = useMutation(
+		orpc.notifications.markRead.mutationOptions({
+			onSuccess: () => {
+				invalidateNotifications();
+				toast.success(t("notifications.markAllReadSuccess"));
+			},
+		}),
+	);
+
+	// Fire-and-forget single mark-read on item click
+	const markReadMutation = useMutation(
+		orpc.notifications.markRead.mutationOptions({
+			onSuccess: () => {
+				invalidateNotifications();
+			},
+		}),
+	);
+
+	const handleItemClick = (notification: NotificationItem) => {
+		if (!notification.readAt) {
+			markReadMutation.mutate({
 				organizationId,
-				markAll: true,
-			}),
-		onSuccess: () => {
-			queryClient.invalidateQueries({
-				queryKey: ["notifications", "unreadCount", organizationId],
+				notificationIds: [notification.id],
 			});
-			queryClient.invalidateQueries({
-				queryKey: ["notifications", "list", organizationId],
-			});
-			toast.success(t("notifications.markAllReadSuccess"));
-		},
-	});
+		}
+	};
 
 	const unreadCount = countData?.count ?? 0;
-	const notifications = notificationsData?.items ?? [];
+	const notifications = (notificationsData?.items ??
+		[]) as NotificationItem[];
 	const hasUnread = unreadCount > 0;
 
 	return (
@@ -91,13 +122,20 @@ export function NotificationBell({ organizationId }: NotificationBellProps) {
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-80">
 				<div className="flex items-center justify-between px-2">
-					<DropdownMenuLabel>{t("notifications.title")}</DropdownMenuLabel>
+					<DropdownMenuLabel>
+						{t("notifications.title")}
+					</DropdownMenuLabel>
 					{hasUnread && (
 						<Button
 							variant="ghost"
 							size="sm"
 							className="h-7 text-xs"
-							onClick={() => markAllReadMutation.mutate()}
+							onClick={() => {
+								markAllReadMutation.mutate({
+									organizationId,
+									markAll: true,
+								});
+							}}
 							disabled={markAllReadMutation.isPending}
 						>
 							<CheckCheckIcon className="me-1 size-3" />
@@ -117,29 +155,54 @@ export function NotificationBell({ organizationId }: NotificationBellProps) {
 					</div>
 				) : (
 					<>
-						{notifications.map((notification: any) => (
-							<DropdownMenuItem
-								key={notification.id}
-								className={cn(
-									"flex cursor-pointer flex-col items-start gap-1 px-3 py-2",
-									!notification.readAt && "bg-muted/50",
-								)}
-							>
-								<div className="font-medium">{notification.title}</div>
-								{notification.body && (
-									<div className="text-xs text-muted-foreground line-clamp-2">
-										{notification.body}
-									</div>
-								)}
-								<div className="text-[10px] text-muted-foreground">
-									{formatRelativeTime(notification.createdAt)}
-								</div>
-							</DropdownMenuItem>
-						))}
+						{notifications.map((notification) => {
+							const EventIcon = getEventIcon(notification.type);
+							const href =
+								getNotificationHref(
+									notification,
+									organizationSlug,
+								) ?? notificationsPageHref;
+
+							return (
+								<DropdownMenuItem
+									key={notification.id}
+									asChild
+									className={cn(
+										"cursor-pointer px-3 py-2",
+										!notification.readAt && "bg-muted/50",
+									)}
+								>
+									<Link
+										href={href}
+										onClick={() =>
+											handleItemClick(notification)
+										}
+										className="flex items-start gap-2.5"
+									>
+										<EventIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+										<span className="flex min-w-0 flex-1 flex-col items-start gap-1">
+											<span className="font-medium">
+												{notification.title}
+											</span>
+											{notification.body && (
+												<span className="line-clamp-2 text-xs text-muted-foreground">
+													{notification.body}
+												</span>
+											)}
+											<span className="text-[10px] text-muted-foreground">
+												{formatRelativeTime(
+													notification.createdAt,
+												)}
+											</span>
+										</span>
+									</Link>
+								</DropdownMenuItem>
+							);
+						})}
 						<DropdownMenuSeparator />
 						<DropdownMenuItem asChild>
 							<Link
-								href={`/app/notifications`}
+								href={notificationsPageHref}
 								className="flex w-full justify-center text-sm font-medium text-primary"
 							>
 								{t("notifications.viewAll")}

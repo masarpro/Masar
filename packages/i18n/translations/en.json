@@ -5627,7 +5627,299 @@
     "markAsRead": "Mark as Read",
     "markReadError": "Failed to update notification",
     "empty": "No new notifications",
-    "viewAll": "View all notifications"
+    "viewAll": "View all notifications",
+    "loadMore": "Load more",
+    "loadError": "Failed to load notifications",
+    "loadErrorDescription": "An error occurred while loading notifications. Please try again.",
+    "retry": "Retry",
+    "filterAll": "All",
+    "filterEmpty": "No matching results",
+    "filterEmptyDescription": "No notifications match the current filter",
+    "clearFilter": "Clear filter",
+    "days": {
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+    "modules": {
+      "finance": "Finance",
+      "projects": "Projects",
+      "documents": "Documents",
+      "hr": "HR",
+      "pricing": "Pricing",
+      "chat": "Chat",
+      "org": "Organization",
+      "system": "System"
+    },
+    "events": {
+      "finance": {
+        "invoiceIssued": {
+          "title": "Invoice issued",
+          "description": "When a new invoice is issued"
+        },
+        "invoicePaymentReceived": {
+          "title": "Invoice payment received",
+          "description": "When a payment is collected on an invoice"
+        },
+        "creditNoteIssued": {
+          "title": "Credit note issued",
+          "description": "When a credit note is issued on an invoice"
+        },
+        "expenseCreated": {
+          "title": "New expense",
+          "description": "When a new expense is recorded"
+        },
+        "paymentReceived": {
+          "title": "Payment received",
+          "description": "When a direct payment is recorded"
+        },
+        "receiptVoucherIssued": {
+          "title": "Receipt voucher",
+          "description": "When a new receipt voucher is issued"
+        },
+        "paymentVoucherSubmitted": {
+          "title": "Payment voucher pending",
+          "description": "When a payment voucher is submitted for approval"
+        },
+        "paymentVoucherApproved": {
+          "title": "Payment voucher approved",
+          "description": "When a payment voucher you submitted is approved"
+        },
+        "paymentVoucherRejected": {
+          "title": "Payment voucher rejected",
+          "description": "When a payment voucher you submitted is rejected"
+        },
+        "transferCompleted": {
+          "title": "Account transfer",
+          "description": "When a transfer between accounts is completed"
+        },
+        "quotationCreated": {
+          "title": "New quotation",
+          "description": "When a new quotation is created"
+        },
+        "quotationStatusChanged": {
+          "title": "Quotation update",
+          "description": "When a quotation status changes"
+        },
+        "clientCreated": {
+          "title": "New client",
+          "description": "When a new client is added"
+        },
+        "zatcaCleared": {
+          "title": "ZATCA invoice cleared",
+          "description": "When an invoice is accepted by the ZATCA platform"
+        },
+        "zatcaRejected": {
+          "title": "ZATCA invoice rejected",
+          "description": "When an invoice is rejected by the ZATCA platform"
+        },
+        "ownerDrawingCreated": {
+          "title": "Owner drawing request",
+          "description": "When an owner drawing request is submitted"
+        },
+        "ownerDrawingDecided": {
+          "title": "Owner drawing decision",
+          "description": "When an owner drawing request is decided"
+        },
+        "capitalContributionAdded": {
+          "title": "Capital contribution",
+          "description": "When a new capital contribution is recorded"
+        }
+      },
+      "projects": {
+        "projectCreated": {
+          "title": "New project",
+          "description": "When a new project is created"
+        },
+        "expenseCreated": {
+          "title": "Project expense",
+          "description": "When an expense is recorded on a project"
+        },
+        "claimCreated": {
+          "title": "New claim",
+          "description": "When a new project claim is created"
+        },
+        "claimStatusChanged": {
+          "title": "Claim update",
+          "description": "When a claim status changes"
+        },
+        "paymentReceived": {
+          "title": "Project payment",
+          "description": "When a payment is received on a project"
+        },
+        "subcontractCreated": {
+          "title": "New subcontract",
+          "description": "When a subcontractor contract is created"
+        },
+        "subcontractPaymentCreated": {
+          "title": "Subcontractor payment",
+          "description": "When a payment to a subcontractor is recorded"
+        },
+        "subcontractClaimCreated": {
+          "title": "Subcontractor claim",
+          "description": "When a claim from a subcontractor is recorded"
+        },
+        "subcontractClaimStatusChanged": {
+          "title": "Subcontractor claim update",
+          "description": "When a subcontractor claim status changes"
+        },
+        "subcontractChangeOrderCreated": {
+          "title": "Subcontract change order",
+          "description": "When a change order is created on a subcontract"
+        },
+        "changeOrderCreated": {
+          "title": "New change order",
+          "description": "When a new change order is created"
+        },
+        "changeOrderSubmitted": {
+          "title": "Change order pending",
+          "description": "When a change order is submitted for decision"
+        },
+        "changeOrderDecided": {
+          "title": "Change order decision",
+          "description": "When a change order is approved or rejected"
+        },
+        "changeOrderImplemented": {
+          "title": "Change order implemented",
+          "description": "When a change order goes into effect"
+        },
+        "dailyReportCreated": {
+          "title": "Daily report",
+          "description": "When a new daily report is added"
+        },
+        "issueCreated": {
+          "title": "New issue",
+          "description": "When an issue is reported on the project"
+        },
+        "issueCritical": {
+          "title": "Critical issue",
+          "description": "When a critical issue requiring immediate action is reported"
+        },
+        "progressUpdated": {
+          "title": "Progress update",
+          "description": "When project progress is updated"
+        },
+        "photoUploaded": {
+          "title": "Site photos",
+          "description": "When new photos are uploaded from the site"
+        },
+        "handoverSubmitted": {
+          "title": "Handover ready to sign",
+          "description": "When a handover protocol is ready for signatures"
+        },
+        "handoverSigned": {
+          "title": "Handover signed",
+          "description": "When a party signs a handover protocol"
+        },
+        "handoverCompleted": {
+          "title": "Handover completed",
+          "description": "When a handover protocol is fully signed"
+        },
+        "teamMemberAdded": {
+          "title": "Added to project team",
+          "description": "When you are added to a project team"
+        },
+        "teamMemberRemoved": {
+          "title": "Removed from project team",
+          "description": "When you are removed from a project team"
+        }
+      },
+      "documents": {
+        "documentUploaded": {
+          "title": "New document",
+          "description": "When a new document is uploaded to the project"
+        },
+        "versionUploaded": {
+          "title": "New document version",
+          "description": "When a new version of a document is uploaded"
+        },
+        "approvalRequested": {
+          "title": "Approval request",
+          "description": "When your approval is requested on a document"
+        },
+        "approvalDecided": {
+          "title": "Approval decision",
+          "description": "When an approval request you submitted is decided"
+        },
+        "fileUploaded": {
+          "title": "New file",
+          "description": "When a new attachment file is uploaded"
+        }
+      },
+      "hr": {
+        "payrollApproved": {
+          "title": "Payroll approved",
+          "description": "When a payroll run is approved"
+        },
+        "leaveRequestSubmitted": {
+          "title": "New leave request",
+          "description": "When an employee submits a leave request"
+        },
+        "leaveRequestDecided": {
+          "title": "Leave request decision",
+          "description": "When your leave request is decided"
+        },
+        "companyExpenseCreated": {
+          "title": "Company expense",
+          "description": "When a new company expense is recorded"
+        },
+        "employeeAdded": {
+          "title": "New employee",
+          "description": "When a new employee is added"
+        }
+      },
+      "pricing": {
+        "studyCreated": {
+          "title": "New pricing study",
+          "description": "When a new pricing study is created"
+        },
+        "quantitiesApproved": {
+          "title": "Quantities approved",
+          "description": "When the quantities stage of a study is approved"
+        },
+        "specsApproved": {
+          "title": "Specifications approved",
+          "description": "When the specifications stage of a study is approved"
+        },
+        "costingApproved": {
+          "title": "Cost pricing approved",
+          "description": "When the cost pricing stage is approved"
+        },
+        "pricingApproved": {
+          "title": "Final pricing approved",
+          "description": "When the final pricing of a study is approved"
+        }
+      },
+      "chat": {
+        "messageReceived": {
+          "title": "New message",
+          "description": "When a message is received in a project chat"
+        },
+        "ownerMessageReceived": {
+          "title": "Owner message",
+          "description": "When a message is received from the project owner"
+        }
+      },
+      "org": {
+        "userAdded": {
+          "title": "New user",
+          "description": "When a new user is added to the organization"
+        },
+        "userRoleChanged": {
+          "title": "Role changed",
+          "description": "When your role in the organization changes"
+        },
+        "userDeactivated": {
+          "title": "User deactivated",
+          "description": "When a user account is deactivated"
+        }
+      },
+      "system": {
+        "announcement": {
+          "title": "System announcements",
+          "description": "When a system announcement or alert is published"
+        }
+      }
+    }
   },
   "pagination": {
     "navigation": "Page navigation",
@@ -10084,65 +10376,22 @@
     "notifications": {
       "title": "Notification Preferences",
       "description": "Control which notifications you receive and how they are delivered",
-      "notificationType": "Notification Type",
+      "notificationType": "Notification",
       "inApp": "In-App",
       "email": "Email",
       "muteAll": "Mute All",
       "mutedWarning": "All notifications are currently muted. You will not receive any notifications.",
       "resetDefaults": "Reset to Defaults",
+      "resetConfirm": "Reset all notification preferences to their defaults?",
       "updateSuccess": "Notification preferences updated",
       "emailDigest": "Email Digest",
       "emailDigestDescription": "Receive a weekly email summary of activity",
-      "types": {
-        "approvalRequested": {
-          "title": "Approval Requests",
-          "description": "When approval is requested on a document or decision"
-        },
-        "approvalDecided": {
-          "title": "Approval Decisions",
-          "description": "When an approval request is approved or rejected"
-        },
-        "documentCreated": {
-          "title": "New Documents",
-          "description": "When a new document is added to the project"
-        },
-        "dailyReportCreated": {
-          "title": "Daily Reports",
-          "description": "When a new daily report is submitted"
-        },
-        "issueCreated": {
-          "title": "New Issues",
-          "description": "When a new issue is reported in the project"
-        },
-        "issueCritical": {
-          "title": "Critical Issues",
-          "description": "When a critical issue requiring immediate attention is reported"
-        },
-        "expenseCreated": {
-          "title": "New Expenses",
-          "description": "When a new expense is recorded in the project"
-        },
-        "claimCreated": {
-          "title": "New Claims",
-          "description": "When a new claim is created"
-        },
-        "claimStatusChanged": {
-          "title": "Claim Updates",
-          "description": "When a claim status changes"
-        },
-        "changeOrderCreated": {
-          "title": "Change Orders",
-          "description": "When a new change order is created"
-        },
-        "ownerMessage": {
-          "title": "Owner Messages",
-          "description": "When a message is received from or to the project owner"
-        },
-        "teamMemberAdded": {
-          "title": "Team Changes",
-          "description": "When you are added or removed from a project team"
-        }
-      }
+      "searchPlaceholder": "Search notifications...",
+      "searchEmpty": "No notifications match your search",
+      "enabledCount": "Enabled {enabled}/{total}",
+      "groupToggleAria": "Toggle all {module} notifications",
+      "loadError": "Failed to load notification preferences",
+      "retry": "Retry"
     },
     "digests": {
       "title": "Email Digests",

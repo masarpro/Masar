@@ -1,76 +1,100 @@
 "use client";
 
+import type { NotificationModuleKey } from "@repo/database/prisma/notification-registry";
+import { groupNotificationsByDay } from "@saas/notifications/lib/group-by-day";
+import { getEventIcon } from "@saas/notifications/lib/notification-icons";
+import { getNotificationHref } from "@saas/notifications/lib/notification-links";
+import { useVisibleNotificationGroups } from "@saas/notifications/lib/use-visible-notification-groups";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { orpc } from "@shared/lib/orpc-query-utils";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	useInfiniteQuery,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
+import { EmptyState } from "@ui/components/empty-state";
 import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@ui/components/select";
+import {
+	AlertCircle,
 	Bell,
-	CheckCircle,
-	FileText,
-	MessageSquare,
-	Shield,
 	CheckCheck,
+	CheckCircle,
 	Filter,
+	FilterX,
+	Loader2,
 } from "lucide-react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 interface NotificationsListProps {
 	organizationId: string;
 	organizationSlug: string;
 }
 
-function getNotificationIcon(type: string) {
-	switch (type) {
-		case "APPROVAL_REQUESTED":
-		case "APPROVAL_DECIDED":
-			return <Shield className="h-5 w-5 text-amber-500" />;
-		case "OWNER_MESSAGE":
-			return <MessageSquare className="h-5 w-5 text-blue-500" />;
-		case "DOCUMENT_CREATED":
-			return <FileText className="h-5 w-5 text-purple-500" />;
-		default:
-			return <Bell className="h-5 w-5 text-slate-500" />;
-	}
+interface NotificationItem {
+	id: string;
+	type: string;
+	title: string;
+	body?: string | null;
+	projectId?: string | null;
+	entityType?: string | null;
+	entityId?: string | null;
+	readAt?: string | Date | null;
+	createdAt: string | Date;
 }
 
-function getNotificationLink(
-	notification: { projectId?: string | null; entityType?: string | null; entityId?: string | null },
-	organizationSlug: string,
-) {
-	if (!notification.projectId) return null;
-
-	const basePath = `/app/${organizationSlug}/projects/${notification.projectId}`;
-
-	switch (notification.entityType) {
-		case "approval":
-		case "document":
-			return `${basePath}/documents/${notification.entityId || ""}`;
-		case "message":
-			return `${basePath}/chat`;
-		default:
-			return basePath;
-	}
-}
+const PAGE_SIZE = 20;
+const ALL_MODULES = "all";
 
 export function NotificationsList({
 	organizationId,
 	organizationSlug,
 }: NotificationsListProps) {
 	const t = useTranslations();
+	const locale = useLocale();
 	const queryClient = useQueryClient();
 	const [unreadOnly, setUnreadOnly] = useState(false);
+	const [moduleFilter, setModuleFilter] = useState<string>(ALL_MODULES);
 
-	const { data, isLoading } = useQuery(
-		orpc.notifications.list.queryOptions({
-			input: {
+	const { groups: visibleGroups } = useVisibleNotificationGroups();
+
+	const moduleInput =
+		moduleFilter === ALL_MODULES
+			? undefined
+			: (moduleFilter as NotificationModuleKey);
+
+	const {
+		data,
+		isLoading,
+		isError,
+		refetch,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useInfiniteQuery(
+		orpc.notifications.list.infiniteOptions({
+			input: (pageParam: number) => ({
 				organizationId,
 				unreadOnly,
-			},
+				module: moduleInput,
+				page: pageParam,
+				pageSize: PAGE_SIZE,
+			}),
+			initialPageParam: 1,
+			getNextPageParam: (lastPage) =>
+				lastPage.page < lastPage.totalPages
+					? lastPage.page + 1
+					: undefined,
 		}),
 	);
 
@@ -78,10 +102,10 @@ export function NotificationsList({
 		orpc.notifications.markRead.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: [["notifications", "list"]],
+					queryKey: orpc.notifications.key(),
 				});
 			},
-			onError: (error: any) => {
+			onError: (error: Error) => {
 				toast.error(error.message || t("notifications.markReadError"));
 			},
 		}),
@@ -101,6 +125,31 @@ export function NotificationsList({
 		});
 	};
 
+	const items = (data?.pages.flatMap((page) => page.items) ??
+		[]) as NotificationItem[];
+	const total = data?.pages[0]?.total ?? 0;
+	const unreadCount = data?.pages[0]?.unreadCount ?? 0;
+	const dayGroups = groupNotificationsByDay(items);
+	const hasActiveFilter = unreadOnly || moduleFilter !== ALL_MODULES;
+
+	const clearFilters = () => {
+		setUnreadOnly(false);
+		setModuleFilter(ALL_MODULES);
+	};
+
+	const formatDayHeading = (dayKey: string) => {
+		if (dayKey === "today") {
+			return t("notifications.days.today");
+		}
+		if (dayKey === "yesterday") {
+			return t("notifications.days.yesterday");
+		}
+		return new Date(dayKey).toLocaleDateString(
+			locale === "ar" ? "ar-SA" : "en-US",
+			{ weekday: "long", day: "numeric", month: "long", year: "numeric" },
+		);
+	};
+
 	return (
 		<div className="space-y-6">
 			{/* Header */}
@@ -113,17 +162,39 @@ export function NotificationsList({
 						{t("notifications.description")}
 					</p>
 				</div>
-				<div className="flex gap-3">
+				<div className="flex flex-wrap items-center gap-3">
+					<Select
+						value={moduleFilter}
+						onValueChange={setModuleFilter}
+					>
+						<SelectTrigger className="w-44 rounded-xl">
+							<SelectValue
+								placeholder={t("notifications.filterAll")}
+							/>
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value={ALL_MODULES}>
+								{t("notifications.filterAll")}
+							</SelectItem>
+							{visibleGroups.map((group) => (
+								<SelectItem key={group.key} value={group.key}>
+									{t(`notifications.modules.${group.key}`)}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
 					<Button
 						variant="outline"
 						size="sm"
 						onClick={() => setUnreadOnly(!unreadOnly)}
 						className={`rounded-xl ${unreadOnly ? "bg-primary/10" : ""}`}
 					>
-						<Filter className="h-4 w-4 me-2" />
-						{unreadOnly ? t("notifications.showAll") : t("notifications.showUnread")}
+						<Filter className="me-2 h-4 w-4" />
+						{unreadOnly
+							? t("notifications.showAll")
+							: t("notifications.showUnread")}
 					</Button>
-					{data?.unreadCount && data.unreadCount > 0 && (
+					{unreadCount > 0 && (
 						<Button
 							variant="outline"
 							size="sm"
@@ -131,7 +202,7 @@ export function NotificationsList({
 							disabled={markReadMutation.isPending}
 							className="rounded-xl"
 						>
-							<CheckCheck className="h-4 w-4 me-2" />
+							<CheckCheck className="me-2 h-4 w-4" />
 							{t("notifications.markAllRead")}
 						</Button>
 					)}
@@ -142,86 +213,163 @@ export function NotificationsList({
 			{data && (
 				<div className="flex gap-4">
 					<Badge className="border-0 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-						{t("notifications.total")}: {data.total}
+						{t("notifications.total")}: {total}
 					</Badge>
-					{data.unreadCount > 0 && (
+					{unreadCount > 0 && (
 						<Badge className="border-0 bg-primary/10 text-primary">
-							{t("notifications.unread")}: {data.unreadCount}
+							{t("notifications.unread")}: {unreadCount}
 						</Badge>
 					)}
 				</div>
 			)}
 
-			{/* Notifications List */}
-			{isLoading ? <ListTableSkeleton /> : !data?.items?.length ? (
-				<div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 py-16 dark:border-slate-800 dark:bg-slate-900/50">
-					<div className="mb-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
-						<Bell className="h-12 w-12 text-slate-400" />
-					</div>
-					<p className="mb-2 text-lg font-medium text-slate-700 dark:text-slate-300">
-						{t("notifications.noNotifications")}
-					</p>
-					<p className="text-sm text-slate-500">
-						{t("notifications.noNotificationsDescription")}
-					</p>
-				</div>
+			{/* States */}
+			{isLoading ? (
+				<ListTableSkeleton />
+			) : isError ? (
+				<EmptyState
+					icon={<AlertCircle className="h-10 w-10" />}
+					title={t("notifications.loadError")}
+					description={t("notifications.loadErrorDescription")}
+					action={{
+						label: t("notifications.retry"),
+						onClick: () => refetch(),
+					}}
+				/>
+			) : items.length === 0 ? (
+				hasActiveFilter ? (
+					<EmptyState
+						icon={<FilterX className="h-10 w-10" />}
+						title={t("notifications.filterEmpty")}
+						description={t("notifications.filterEmptyDescription")}
+						action={{
+							label: t("notifications.clearFilter"),
+							onClick: clearFilters,
+						}}
+					/>
+				) : (
+					<EmptyState
+						icon={<Bell className="h-10 w-10" />}
+						title={t("notifications.noNotifications")}
+						description={t(
+							"notifications.noNotificationsDescription",
+						)}
+					/>
+				)
 			) : (
-				<div className="space-y-3">
-					{data.items.map((notification: any) => {
-						const link = getNotificationLink(notification, organizationSlug);
-						const isUnread = !notification.readAt;
+				<div className="space-y-6">
+					{dayGroups.map((dayGroup) => (
+						<div key={dayGroup.dayKey} className="space-y-3">
+							<h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400">
+								{formatDayHeading(dayGroup.dayKey)}
+							</h2>
+							{dayGroup.items.map((notification) => {
+								const link = getNotificationHref(
+									notification,
+									organizationSlug,
+								);
+								const isUnread = !notification.readAt;
+								const EventIcon = getEventIcon(
+									notification.type,
+								);
 
-						const content = (
-							<div
-								className={`group flex gap-4 rounded-2xl border p-4 transition-colors ${
-									isUnread
-										? "border-primary/30 bg-primary/5 dark:border-primary/20 dark:bg-primary/10"
-										: "border-slate-200 bg-white hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/50"
-								}`}
-							>
-								<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
-									{getNotificationIcon(notification.type)}
-								</div>
-								<div className="flex-1 min-w-0">
-									<div className="flex items-start justify-between gap-2">
-										<h3 className={`font-medium ${isUnread ? "text-slate-900 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}>
-											{notification.title}
-										</h3>
-										<span className="shrink-0 text-xs text-slate-400">
-											{new Date(notification.createdAt).toLocaleDateString("ar-SA")}
-										</span>
+								const content = (
+									// biome-ignore lint/correctness/useJsxKeyInIterable: key is set on the Link/div wrapper below
+									<div
+										className={`group flex gap-4 rounded-2xl border p-4 transition-colors ${
+											isUnread
+												? "border-primary/30 bg-primary/5 dark:border-primary/20 dark:bg-primary/10"
+												: "border-slate-200 bg-white hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/50"
+										}`}
+									>
+										<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
+											<EventIcon className="h-5 w-5 text-slate-500" />
+										</div>
+										<div className="min-w-0 flex-1">
+											<div className="flex items-start justify-between gap-2">
+												<h3
+													className={`font-medium ${isUnread ? "text-slate-900 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}
+												>
+													{notification.title}
+												</h3>
+												<span className="shrink-0 text-xs text-slate-400">
+													{new Date(
+														notification.createdAt,
+													).toLocaleTimeString(
+														locale === "ar"
+															? "ar-SA"
+															: "en-US",
+														{
+															hour: "2-digit",
+															minute: "2-digit",
+														},
+													)}
+												</span>
+											</div>
+											{notification.body && (
+												<p className="mt-1 line-clamp-2 text-sm text-slate-500">
+													{notification.body}
+												</p>
+											)}
+											{isUnread && (
+												<Button
+													variant="ghost"
+													size="sm"
+													onClick={(
+														e: React.MouseEvent,
+													) => {
+														e.preventDefault();
+														handleMarkRead(
+															notification.id,
+														);
+													}}
+													className="mt-2 h-auto p-0 text-xs text-primary hover:text-primary/80"
+												>
+													<CheckCircle className="me-1 h-3 w-3" />
+													{t(
+														"notifications.markAsRead",
+													)}
+												</Button>
+											)}
+										</div>
 									</div>
-									{notification.body && (
-										<p className="mt-1 text-sm text-slate-500 line-clamp-2">
-											{notification.body}
-										</p>
-									)}
-									{isUnread && (
-										<Button
-											variant="ghost"
-											size="sm"
-											onClick={(e: any) => {
-												e.preventDefault();
-												handleMarkRead(notification.id);
-											}}
-											className="mt-2 h-auto p-0 text-xs text-primary hover:text-primary/80"
-										>
-											<CheckCircle className="h-3 w-3 me-1" />
-											{t("notifications.markAsRead")}
-										</Button>
-									)}
-								</div>
-							</div>
-						);
+								);
 
-						return link ? (
-							<Link key={notification.id} href={link}>
-								{content}
-							</Link>
-						) : (
-							<div key={notification.id}>{content}</div>
-						);
-					})}
+								return link ? (
+									<Link
+										key={notification.id}
+										href={link}
+										onClick={() => {
+											if (isUnread) {
+												handleMarkRead(notification.id);
+											}
+										}}
+										className="block"
+									>
+										{content}
+									</Link>
+								) : (
+									<div key={notification.id}>{content}</div>
+								);
+							})}
+						</div>
+					))}
+
+					{hasNextPage && (
+						<div className="flex justify-center">
+							<Button
+								variant="outline"
+								onClick={() => fetchNextPage()}
+								disabled={isFetchingNextPage}
+								className="rounded-xl"
+							>
+								{isFetchingNextPage ? (
+									<Loader2 className="me-2 h-4 w-4 animate-spin" />
+								) : null}
+								{t("notifications.loadMore")}
+							</Button>
+						</div>
+					)}
 				</div>
 			)}
 		</div>

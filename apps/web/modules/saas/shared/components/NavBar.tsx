@@ -153,7 +153,10 @@ export function NavBar() {
 						)}
 					>
 						{activeOrganization && (
-							<NotificationBell organizationId={activeOrganization.id} />
+							<NotificationBell
+								organizationId={activeOrganization.id}
+								organizationSlug={activeOrganization.slug}
+							/>
 						)}
 						<UserMenu />
 					</div>
@@ -215,7 +218,10 @@ export function NavBar() {
 				>
 					<div className="mb-2 flex items-center justify-between">
 						{activeOrganization && (
-							<NotificationBell organizationId={activeOrganization.id} />
+							<NotificationBell
+								organizationId={activeOrganization.id}
+								organizationSlug={activeOrganization.slug}
+							/>
 						)}
 					</div>
 					<UserMenu showUserName />

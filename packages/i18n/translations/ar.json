@@ -5627,7 +5627,299 @@
     "markAsRead": "قراءة",
     "markReadError": "فشل تحديث الإشعار",
     "empty": "لا توجد إشعارات جديدة",
-    "viewAll": "عرض جميع الإشعارات"
+    "viewAll": "عرض جميع الإشعارات",
+    "loadMore": "تحميل المزيد",
+    "loadError": "تعذر تحميل الإشعارات",
+    "loadErrorDescription": "حدث خطأ أثناء تحميل الإشعارات. حاول مرة أخرى.",
+    "retry": "إعادة المحاولة",
+    "filterAll": "الكل",
+    "filterEmpty": "لا توجد نتائج مطابقة",
+    "filterEmptyDescription": "لا توجد إشعارات مطابقة للفلتر الحالي",
+    "clearFilter": "مسح الفلتر",
+    "days": {
+      "today": "اليوم",
+      "yesterday": "أمس"
+    },
+    "modules": {
+      "finance": "المالية",
+      "projects": "المشاريع",
+      "documents": "المستندات",
+      "hr": "الموارد البشرية",
+      "pricing": "التسعير",
+      "chat": "المحادثات",
+      "org": "المنشأة",
+      "system": "النظام"
+    },
+    "events": {
+      "finance": {
+        "invoiceIssued": {
+          "title": "فاتورة صادرة",
+          "description": "عند إصدار فاتورة جديدة"
+        },
+        "invoicePaymentReceived": {
+          "title": "تحصيل فاتورة",
+          "description": "عند استلام دفعة على فاتورة"
+        },
+        "creditNoteIssued": {
+          "title": "إشعار دائن",
+          "description": "عند إصدار إشعار دائن على فاتورة"
+        },
+        "expenseCreated": {
+          "title": "مصروف جديد",
+          "description": "عند تسجيل مصروف جديد"
+        },
+        "paymentReceived": {
+          "title": "مقبوض جديد",
+          "description": "عند تسجيل مقبوض مباشر"
+        },
+        "receiptVoucherIssued": {
+          "title": "سند قبض",
+          "description": "عند إصدار سند قبض جديد"
+        },
+        "paymentVoucherSubmitted": {
+          "title": "سند صرف للاعتماد",
+          "description": "عند تقديم سند صرف بانتظار الاعتماد"
+        },
+        "paymentVoucherApproved": {
+          "title": "اعتماد سند صرف",
+          "description": "عند اعتماد سند صرف قدّمته"
+        },
+        "paymentVoucherRejected": {
+          "title": "رفض سند صرف",
+          "description": "عند رفض سند صرف قدّمته"
+        },
+        "transferCompleted": {
+          "title": "تحويل بين الحسابات",
+          "description": "عند إتمام تحويل بين الحسابات"
+        },
+        "quotationCreated": {
+          "title": "عرض سعر جديد",
+          "description": "عند إنشاء عرض سعر جديد"
+        },
+        "quotationStatusChanged": {
+          "title": "تحديث عرض سعر",
+          "description": "عند تغيير حالة عرض سعر"
+        },
+        "clientCreated": {
+          "title": "عميل جديد",
+          "description": "عند إضافة عميل جديد"
+        },
+        "zatcaCleared": {
+          "title": "قبول فاتورة ZATCA",
+          "description": "عند قبول فاتورة في منصة فاتورة (ZATCA)"
+        },
+        "zatcaRejected": {
+          "title": "رفض فاتورة ZATCA",
+          "description": "عند رفض فاتورة في منصة فاتورة (ZATCA)"
+        },
+        "ownerDrawingCreated": {
+          "title": "طلب سحب أرباح",
+          "description": "عند تقديم طلب سحب أرباح"
+        },
+        "ownerDrawingDecided": {
+          "title": "قرار سحب أرباح",
+          "description": "عند البت في طلب سحب أرباح"
+        },
+        "capitalContributionAdded": {
+          "title": "مساهمة رأس مال",
+          "description": "عند تسجيل مساهمة رأس مال جديدة"
+        }
+      },
+      "projects": {
+        "projectCreated": {
+          "title": "مشروع جديد",
+          "description": "عند إنشاء مشروع جديد"
+        },
+        "expenseCreated": {
+          "title": "مصروف مشروع",
+          "description": "عند تسجيل مصروف على مشروع"
+        },
+        "claimCreated": {
+          "title": "مستخلص جديد",
+          "description": "عند إنشاء مستخلص جديد للمشروع"
+        },
+        "claimStatusChanged": {
+          "title": "تحديث مستخلص",
+          "description": "عند تغيير حالة مستخلص"
+        },
+        "paymentReceived": {
+          "title": "دفعة مشروع",
+          "description": "عند استلام دفعة على مشروع"
+        },
+        "subcontractCreated": {
+          "title": "عقد باطن جديد",
+          "description": "عند إنشاء عقد مقاول باطن"
+        },
+        "subcontractPaymentCreated": {
+          "title": "دفعة مقاول باطن",
+          "description": "عند تسجيل دفعة لمقاول باطن"
+        },
+        "subcontractClaimCreated": {
+          "title": "مستخلص مقاول باطن",
+          "description": "عند تسجيل مستخلص من مقاول باطن"
+        },
+        "subcontractClaimStatusChanged": {
+          "title": "تحديث مستخلص باطن",
+          "description": "عند تغيير حالة مستخلص مقاول باطن"
+        },
+        "subcontractChangeOrderCreated": {
+          "title": "أمر تغيير عقد باطن",
+          "description": "عند إنشاء أمر تغيير على عقد باطن"
+        },
+        "changeOrderCreated": {
+          "title": "أمر تغيير جديد",
+          "description": "عند إنشاء أمر تغيير جديد"
+        },
+        "changeOrderSubmitted": {
+          "title": "أمر تغيير للاعتماد",
+          "description": "عند تقديم أمر تغيير بانتظار القرار"
+        },
+        "changeOrderDecided": {
+          "title": "قرار أمر تغيير",
+          "description": "عند اعتماد أو رفض أمر تغيير"
+        },
+        "changeOrderImplemented": {
+          "title": "تنفيذ أمر تغيير",
+          "description": "عند دخول أمر تغيير حيز التنفيذ"
+        },
+        "dailyReportCreated": {
+          "title": "تقرير يومي",
+          "description": "عند إضافة تقرير يومي جديد"
+        },
+        "issueCreated": {
+          "title": "مشكلة جديدة",
+          "description": "عند تسجيل مشكلة في المشروع"
+        },
+        "issueCritical": {
+          "title": "مشكلة حرجة",
+          "description": "عند تسجيل مشكلة حرجة تتطلب تدخلاً فورياً"
+        },
+        "progressUpdated": {
+          "title": "تحديث التقدم",
+          "description": "عند تحديث نسبة إنجاز المشروع"
+        },
+        "photoUploaded": {
+          "title": "صور الموقع",
+          "description": "عند رفع صور جديدة من الموقع"
+        },
+        "handoverSubmitted": {
+          "title": "محضر استلام للتوقيع",
+          "description": "عند جاهزية محضر استلام للتوقيعات"
+        },
+        "handoverSigned": {
+          "title": "توقيع محضر استلام",
+          "description": "عند توقيع طرف على محضر استلام"
+        },
+        "handoverCompleted": {
+          "title": "اكتمال محضر استلام",
+          "description": "عند اكتمال توقيعات محضر استلام"
+        },
+        "teamMemberAdded": {
+          "title": "إضافة لفريق مشروع",
+          "description": "عند إضافتك لفريق مشروع"
+        },
+        "teamMemberRemoved": {
+          "title": "إزالة من فريق مشروع",
+          "description": "عند إزالتك من فريق مشروع"
+        }
+      },
+      "documents": {
+        "documentUploaded": {
+          "title": "مستند جديد",
+          "description": "عند رفع مستند جديد للمشروع"
+        },
+        "versionUploaded": {
+          "title": "إصدار مستند جديد",
+          "description": "عند رفع إصدار جديد لمستند"
+        },
+        "approvalRequested": {
+          "title": "طلب اعتماد",
+          "description": "عند طلب اعتمادك على مستند"
+        },
+        "approvalDecided": {
+          "title": "قرار اعتماد",
+          "description": "عند البت في طلب اعتماد قدّمته"
+        },
+        "fileUploaded": {
+          "title": "ملف جديد",
+          "description": "عند رفع ملف مرفق جديد"
+        }
+      },
+      "hr": {
+        "payrollApproved": {
+          "title": "اعتماد مسير رواتب",
+          "description": "عند اعتماد مسير رواتب"
+        },
+        "leaveRequestSubmitted": {
+          "title": "طلب إجازة جديد",
+          "description": "عند تقديم موظف طلب إجازة"
+        },
+        "leaveRequestDecided": {
+          "title": "قرار طلب إجازة",
+          "description": "عند البت في طلب إجازتك"
+        },
+        "companyExpenseCreated": {
+          "title": "مصروف شركة",
+          "description": "عند تسجيل مصروف شركة جديد"
+        },
+        "employeeAdded": {
+          "title": "موظف جديد",
+          "description": "عند إضافة موظف جديد"
+        }
+      },
+      "pricing": {
+        "studyCreated": {
+          "title": "دراسة تسعير جديدة",
+          "description": "عند إنشاء دراسة تسعير جديدة"
+        },
+        "quantitiesApproved": {
+          "title": "اعتماد الكميات",
+          "description": "عند اعتماد مرحلة الكميات في دراسة"
+        },
+        "specsApproved": {
+          "title": "اعتماد المواصفات",
+          "description": "عند اعتماد مرحلة المواصفات في دراسة"
+        },
+        "costingApproved": {
+          "title": "اعتماد تسعير التكلفة",
+          "description": "عند اعتماد مرحلة تسعير التكلفة"
+        },
+        "pricingApproved": {
+          "title": "اعتماد التسعير النهائي",
+          "description": "عند اعتماد التسعير النهائي للدراسة"
+        }
+      },
+      "chat": {
+        "messageReceived": {
+          "title": "رسالة جديدة",
+          "description": "عند استلام رسالة في محادثة مشروع"
+        },
+        "ownerMessageReceived": {
+          "title": "رسالة من المالك",
+          "description": "عند استلام رسالة من مالك المشروع"
+        }
+      },
+      "org": {
+        "userAdded": {
+          "title": "مستخدم جديد",
+          "description": "عند إضافة مستخدم جديد للمنشأة"
+        },
+        "userRoleChanged": {
+          "title": "تغيير الدور",
+          "description": "عند تغيير دورك في المنشأة"
+        },
+        "userDeactivated": {
+          "title": "تعطيل مستخدم",
+          "description": "عند تعطيل حساب مستخدم"
+        }
+      },
+      "system": {
+        "announcement": {
+          "title": "إعلانات النظام",
+          "description": "عند صدور إعلان أو تنبيه من النظام"
+        }
+      }
+    }
   },
   "pagination": {
     "navigation": "التنقل بين الصفحات",
@@ -10084,65 +10376,22 @@
     "notifications": {
       "title": "تفضيلات الإشعارات",
       "description": "تحكم في أنواع الإشعارات التي تصلك وطريقة استلامها",
-      "notificationType": "نوع الإشعار",
+      "notificationType": "الإشعار",
       "inApp": "داخل التطبيق",
-      "email": "البريد الإلكتروني",
+      "email": "بريد إلكتروني",
       "muteAll": "كتم الكل",
       "mutedWarning": "جميع الإشعارات مكتومة حالياً. لن تتلقى أي إشعارات.",
       "resetDefaults": "إعادة للافتراضي",
+      "resetConfirm": "هل تريد إعادة جميع تفضيلات الإشعارات إلى الوضع الافتراضي؟",
       "updateSuccess": "تم تحديث تفضيلات الإشعارات",
       "emailDigest": "ملخص بريدي",
       "emailDigestDescription": "استقبل ملخصاً أسبوعياً بالبريد الإلكتروني",
-      "types": {
-        "approvalRequested": {
-          "title": "طلبات الاعتماد",
-          "description": "عند طلب اعتماد على مستند أو قرار"
-        },
-        "approvalDecided": {
-          "title": "قرارات الاعتماد",
-          "description": "عند الموافقة أو الرفض على طلب اعتماد"
-        },
-        "documentCreated": {
-          "title": "مستندات جديدة",
-          "description": "عند إضافة مستند جديد للمشروع"
-        },
-        "dailyReportCreated": {
-          "title": "التقارير اليومية",
-          "description": "عند إضافة تقرير يومي جديد"
-        },
-        "issueCreated": {
-          "title": "مشاكل جديدة",
-          "description": "عند تسجيل مشكلة جديدة في المشروع"
-        },
-        "issueCritical": {
-          "title": "مشاكل حرجة",
-          "description": "عند تسجيل مشكلة حرجة تتطلب تدخل فوري"
-        },
-        "expenseCreated": {
-          "title": "مصروفات جديدة",
-          "description": "عند تسجيل مصروف جديد في المشروع"
-        },
-        "claimCreated": {
-          "title": "مستخلصات جديدة",
-          "description": "عند إنشاء مستخلص جديد"
-        },
-        "claimStatusChanged": {
-          "title": "تحديث المستخلصات",
-          "description": "عند تغيير حالة مستخلص"
-        },
-        "changeOrderCreated": {
-          "title": "أوامر التغيير",
-          "description": "عند إنشاء أمر تغيير جديد"
-        },
-        "ownerMessage": {
-          "title": "رسائل المالك",
-          "description": "عند استلام رسالة من أو إلى مالك المشروع"
-        },
-        "teamMemberAdded": {
-          "title": "تغييرات الفريق",
-          "description": "عند إضافتك أو إزالتك من فريق مشروع"
-        }
-      }
+      "searchPlaceholder": "ابحث في الإشعارات...",
+      "searchEmpty": "لا توجد إشعارات مطابقة لبحثك",
+      "enabledCount": "مفعّل {enabled}/{total}",
+      "groupToggleAria": "تفعيل كل إشعارات {module}",
+      "loadError": "تعذر تحميل تفضيلات الإشعارات",
+      "retry": "إعادة المحاولة"
     },
     "digests": {
       "title": "الملخصات البريدية",

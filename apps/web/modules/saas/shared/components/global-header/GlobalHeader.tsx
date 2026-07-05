@@ -116,7 +116,10 @@ export const GlobalHeader = React.memo(function GlobalHeader() {
 				<ColorModeToggle />
 
 				{activeOrganization?.id && (
-					<NotificationBell organizationId={activeOrganization.id} />
+					<NotificationBell
+						organizationId={activeOrganization.id}
+						organizationSlug={activeOrganization.slug}
+					/>
 				)}
 
 				{/* User avatar + dropdown */}
