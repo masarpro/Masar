@@ -2,7 +2,6 @@ import { listNotifications } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
-import { getExcludedNotificationTypes } from "../lib/notification-permissions";
 
 export const listNotificationsProcedure = protectedProcedure
 	.route({
@@ -20,10 +19,8 @@ export const listNotificationsProcedure = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		const { permissions } = await verifyOrganizationAccess(
-			input.organizationId,
-			context.user.id,
-		);
+		// التفويض يتم لحظة إنشاء الإشعار (فلترة الكتابة) — لا فلترة عند القراءة
+		await verifyOrganizationAccess(input.organizationId, context.user.id);
 
 		const result = await listNotifications(
 			input.organizationId,
@@ -32,8 +29,6 @@ export const listNotificationsProcedure = protectedProcedure
 				unreadOnly: input.unreadOnly,
 				page: input.page,
 				pageSize: input.pageSize,
-				// دفاع في العمق: يخفي الإشعارات المخزّنة قبل تصفية RBAC عند الإنشاء
-				excludeTypes: getExcludedNotificationTypes(permissions),
 			},
 		);
 

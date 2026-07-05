@@ -2,7 +2,11 @@ import { createIssue, getProjectById } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import { notifyIssueCreated } from "../../notifications/lib/notification-service";
+import {
+	getOrganizationAdmins,
+	getProjectManagers,
+	notifyIssueCreated,
+} from "../../notifications/lib/notification-service";
 
 export const createIssueProcedure = subscriptionProcedure
 	.route({
@@ -48,9 +52,13 @@ export const createIssueProcedure = subscriptionProcedure
 		// Send notification for HIGH/CRITICAL issues (fire and forget)
 		if (input.severity === "HIGH" || input.severity === "CRITICAL") {
 			getProjectById(input.projectId, input.organizationId)
-				.then((project) => {
+				.then(async (project) => {
 					if (project) {
-						notifyIssueCreated({
+						const [managers, admins] = await Promise.all([
+							getProjectManagers(input.projectId),
+							getOrganizationAdmins(input.organizationId),
+						]);
+						await notifyIssueCreated({
 							organizationId: input.organizationId,
 							projectId: input.projectId,
 							projectName: project.name,
@@ -58,14 +66,12 @@ export const createIssueProcedure = subscriptionProcedure
 							issueTitle: input.title,
 							severity: input.severity,
 							creatorId: context.user.id,
-							managerIds: [], // Will be populated by notifyProjectManagers internally
-						}).catch(() => {
-							// Silently ignore notification errors
+							managerIds: [...new Set([...managers, ...admins])],
 						});
 					}
 				})
 				.catch(() => {
-					// Silently ignore errors
+					// Silently ignore notification errors
 				});
 		}
 

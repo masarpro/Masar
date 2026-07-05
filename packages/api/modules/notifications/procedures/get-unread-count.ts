@@ -1,9 +1,7 @@
 import { getUnreadNotificationCount } from "@repo/database";
 import { z } from "zod";
-import { getCachedUserPermissions } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
-import { getExcludedNotificationTypes } from "../lib/notification-permissions";
 import { ORPCError } from "@orpc/server";
 
 export const getUnreadCountProcedure = protectedProcedure
@@ -31,18 +29,10 @@ export const getUnreadCountProcedure = protectedProcedure
 			});
 		}
 
-		const permissions = await getCachedUserPermissions(
-			context.user.id,
-			input.organizationId,
-		);
-
+		// التفويض يتم لحظة إنشاء الإشعار — العدّاد يطابق القائمة بدون فلترة قراءة
 		const count = await getUnreadNotificationCount(
 			input.organizationId,
 			context.user.id,
-			{
-				// نفس تصفية القراءة في list-notifications كي يتطابق العدّاد
-				excludeTypes: getExcludedNotificationTypes(permissions),
-			},
 		);
 
 		return { count };

@@ -1,14 +1,19 @@
 /**
- * RBAC filtering for notifications (Stage 5 — RBAC-UI).
+ * RBAC filtering for notifications.
  *
  * Central map: NotificationType → required permission. A recipient without
- * the permission never receives the notification (filter at creation), and
- * a reader without it never sees stored ones (filter at fetch — defense in
- * depth for notifications created before this change).
+ * the permission never receives the notification — the filter runs once, at
+ * creation time. Authorization is decided at the moment of the event; stored
+ * notifications are never re-filtered on read.
+ *
+ * OWNER always passes: the organization owner receives every notification
+ * regardless of the stored role JSON (roles created before a permission
+ * section existed would otherwise silently black out the owner).
  *
  * `null` = general/personal notification, delivered to everyone targeted
  * (e.g. decisions sent back to the requester, team add/remove, SYSTEM).
  */
+import { db } from "@repo/database";
 import type { NotificationType } from "@repo/database/prisma/generated/client";
 import {
 	hasPermission,
@@ -64,8 +69,14 @@ export async function filterRecipientsByPermission(
 		return userIds;
 	}
 
+	// OWNER bypass — one batch query, not per-user
+	const ownerIds = await getOwnerUserIds(organizationId, userIds);
+
 	const checks = await Promise.all(
 		userIds.map(async (userId) => {
+			if (ownerIds.has(userId)) {
+				return userId;
+			}
 			const permissions = await getCachedUserPermissions(
 				userId,
 				organizationId,
@@ -80,23 +91,24 @@ export async function filterRecipientsByPermission(
 }
 
 /**
- * Notification types the given permissions may NOT see — used as a
- * defensive read-time filter (covers notifications stored before RBAC
- * filtering existed).
+ * Which of the given users hold the OWNER role type in this organization.
+ * Same source of truth as authorization: User.organizationRoleId → Role.type,
+ * cross-tenant guarded by matching both the user's and the role's org.
  */
-export function getExcludedNotificationTypes(
-	permissions: Permissions,
-): NotificationType[] {
-	return (
-		Object.entries(NOTIFICATION_TYPE_PERMISSIONS) as [
-			NotificationType,
-			RequiredNotificationPermission | null,
-		][]
-	)
-		.filter(
-			([, required]) =>
-				required &&
-				!hasPermission(permissions, required.section, required.action),
-		)
-		.map(([type]) => type);
+export async function getOwnerUserIds(
+	organizationId: string,
+	userIds: string[],
+): Promise<Set<string>> {
+	if (userIds.length === 0) {
+		return new Set();
+	}
+	const owners = await db.user.findMany({
+		where: {
+			id: { in: userIds },
+			organizationId,
+			organizationRole: { type: "OWNER", organizationId },
+		},
+		select: { id: true },
+	});
+	return new Set(owners.map((u) => u.id));
 }

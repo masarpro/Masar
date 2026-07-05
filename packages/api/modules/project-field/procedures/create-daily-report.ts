@@ -2,7 +2,11 @@ import { createDailyReport, getProjectById } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import { notifyDailyReportCreated } from "../../notifications/lib/notification-service";
+import {
+	getOrganizationAdmins,
+	getProjectManagers,
+	notifyDailyReportCreated,
+} from "../../notifications/lib/notification-service";
 
 export const createDailyReportProcedure = subscriptionProcedure
 	.route({
@@ -47,27 +51,27 @@ export const createDailyReportProcedure = subscriptionProcedure
 			weather: input.weather,
 		});
 
-		// Send notification to project managers (fire and forget)
+		// Send notification to project managers + org admins (fire and forget)
 		getProjectById(input.projectId, input.organizationId)
-			.then((project) => {
+			.then(async (project) => {
 				if (project) {
-					// Notify project managers - for now, we'll use org admins
-					// In a full implementation, we'd get project team managers
-					notifyDailyReportCreated({
+					const [managers, admins] = await Promise.all([
+						getProjectManagers(input.projectId),
+						getOrganizationAdmins(input.organizationId),
+					]);
+					await notifyDailyReportCreated({
 						organizationId: input.organizationId,
 						projectId: input.projectId,
 						projectName: project.name,
 						reportId: report.id,
 						reportDate: input.reportDate.toLocaleDateString("ar-SA"),
 						creatorId: context.user.id,
-						managerIds: [], // Will be populated by notifyProjectManagers internally
-					}).catch(() => {
-						// Silently ignore notification errors
+						managerIds: [...new Set([...managers, ...admins])],
 					});
 				}
 			})
 			.catch(() => {
-				// Silently ignore errors
+				// Silently ignore notification errors
 			});
 
 		return report;

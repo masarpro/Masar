@@ -120,8 +120,6 @@ export async function listNotifications(
 		channel?: NotificationChannel;
 		page?: number;
 		pageSize?: number;
-		/** RBAC read-filter: hide stored notifications the reader may not see */
-		excludeTypes?: NotificationType[];
 	},
 ) {
 	const page = options?.page ?? 1;
@@ -139,18 +137,11 @@ export async function listNotifications(
 		where.readAt = null;
 	}
 
-	if (options?.excludeTypes && options.excludeTypes.length > 0) {
-		where.type = { notIn: options.excludeTypes };
-	}
-
 	const unreadWhere: Prisma.NotificationWhereInput = {
 		organizationId,
 		userId,
 		readAt: null,
 		channel: "IN_APP",
-		...(options?.excludeTypes && options.excludeTypes.length > 0
-			? { type: { notIn: options.excludeTypes } }
-			: {}),
 	};
 
 	const [notifications, total, unreadCount] = await Promise.all([
@@ -221,10 +212,6 @@ export async function markAllNotificationsRead(
 export async function getUnreadNotificationCount(
 	organizationId: string,
 	userId: string,
-	options?: {
-		/** RBAC read-filter: hide stored notifications the reader may not see */
-		excludeTypes?: NotificationType[];
-	},
 ) {
 	return db.notification.count({
 		where: {
@@ -232,9 +219,6 @@ export async function getUnreadNotificationCount(
 			userId,
 			readAt: null,
 			channel: "IN_APP",
-			...(options?.excludeTypes && options.excludeTypes.length > 0
-				? { type: { notIn: options.excludeTypes } }
-				: {}),
 		},
 	});
 }
