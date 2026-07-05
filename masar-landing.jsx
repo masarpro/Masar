@@ -12,14 +12,15 @@ function useCounter(end, duration = 2200) {
   }, []);
   useEffect(() => {
     if (!started) return;
-    let t0;
+    let t0, animId;
     const step = (ts) => {
       if (!t0) t0 = ts;
       const p = Math.min((ts - t0) / duration, 1);
       setCount(Math.floor((1 - Math.pow(1 - p, 4)) * end));
-      if (p < 1) requestAnimationFrame(step);
+      if (p < 1) animId = requestAnimationFrame(step);
     };
-    requestAnimationFrame(step);
+    animId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animId);
   }, [started, end, duration]);
   return { count, ref };
 }
@@ -62,16 +63,25 @@ function ParticleField() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    let w, h, particles, animId;
+    let w, h, animId;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const colors = ["16,185,129", "59,130,246", "139,92,246", "6,182,212"];
-    const resize = () => { w = canvas.width = canvas.offsetWidth; h = canvas.height = canvas.offsetHeight; };
+    const resize = () => {
+      w = canvas.offsetWidth; h = canvas.offsetHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (particles) particles.forEach((p) => { p.x = Math.min(p.x, w); p.y = Math.min(p.y, h); });
+    };
+    let particles;
     resize(); window.addEventListener("resize", resize);
-    particles = Array.from({ length: 70 }, () => ({
+    const count = window.innerWidth < 768 ? 28 : 70;
+    particles = Array.from({ length: count }, () => ({
       x: Math.random() * w, y: Math.random() * h,
       vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
       r: Math.random() * 2 + 0.5, c: colors[Math.floor(Math.random() * colors.length)],
       o: Math.random() * 0.5 + 0.15,
     }));
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
       particles.forEach((p, i) => {
@@ -89,7 +99,7 @@ function ParticleField() {
           }
         }
       });
-      animId = requestAnimationFrame(draw);
+      if (!reducedMotion) animId = requestAnimationFrame(draw);
     };
     draw();
     return () => { cancelAnimationFrame(animId); window.removeEventListener("resize", resize); };
@@ -97,22 +107,21 @@ function ParticleField() {
   return <canvas ref={canvasRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }} />;
 }
 
-function GlowCard({ children, color = "#10B981", delay = 0, active, onClick, style = {} }) {
+function GlowCard({ children, color = "#10B981", delay = 0, active, onClick, wide = false }) {
   const { ref, visible } = useReveal(0.1);
   return (
-    <div ref={ref} onClick={onClick} className="glow-card-wrap" style={{
+    <div ref={ref} onClick={onClick} className={`glow-card-wrap${wide ? " feat-wide" : ""}`} style={{
       position: "relative", borderRadius: 28, padding: 2, cursor: onClick ? "pointer" : "default",
       background: active
         ? `linear-gradient(135deg, ${color}90, ${color}20, ${color}70)`
         : "linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))",
       opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(30px)",
       transition: `all 0.7s cubic-bezier(0.16,1,0.3,1) ${delay}s`,
-      ...style,
     }}>
       <div style={{
         borderRadius: 26, padding: 36, height: "100%",
         background: active ? `linear-gradient(160deg, ${color}14, rgba(10,10,18,0.96))` : "rgba(10,10,18,0.92)",
-        backdropFilter: "blur(40px)", transition: "all 0.5s ease",
+        transition: "all 0.5s ease",
       }}>
         {children}
       </div>
@@ -135,6 +144,34 @@ function RevealBlock({ children, delay = 0 }) {
   );
 }
 
+function StatCard({ stat, delay }) {
+  const { count, ref } = useCounter(stat.value, 2200);
+  return (
+    <RevealBlock delay={delay}>
+      <div ref={ref} style={{
+        textAlign: "center", padding: 32, position: "relative", borderRadius: 24,
+        background: `linear-gradient(160deg, ${stat.color}06, transparent)`,
+        border: `1px solid ${stat.color}10`,
+      }}>
+        <div style={{
+          position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)",
+          width: 100, height: 100, borderRadius: "50%",
+          background: `radial-gradient(circle, ${stat.color}10, transparent 70%)`,
+          filter: "blur(25px)", pointerEvents: "none",
+        }} />
+        <div style={{ fontSize: 18, marginBottom: 12 }}>{stat.icon}</div>
+        <div style={{
+          fontSize: 52, fontWeight: 900, marginBottom: 8,
+          fontFamily: "'Space Grotesk', 'DM Sans', sans-serif",
+          background: `linear-gradient(135deg, ${stat.color}, ${stat.color}BB)`,
+          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+        }}>{count}{stat.suffix}</div>
+        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, fontWeight: 500 }}>{stat.label}</p>
+      </div>
+    </RevealBlock>
+  );
+}
+
 function FAQItem({ q, a, isOpen, onToggle, isAr }) {
   return (
     <div style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", overflow: "hidden" }}>
@@ -154,7 +191,7 @@ function FAQItem({ q, a, isOpen, onToggle, isAr }) {
         }}>+</span>
       </button>
       <div style={{
-        maxHeight: isOpen ? 200 : 0, overflow: "hidden",
+        maxHeight: isOpen ? 400 : 0, overflow: "hidden",
         transition: "max-height 0.4s cubic-bezier(0.16,1,0.3,1)",
       }}>
         <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, lineHeight: 1.8, paddingBottom: 24 }}>{a}</p>
@@ -177,9 +214,16 @@ export default function MasarLanding() {
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", fn);
+    fn();
+    window.addEventListener("scroll", fn, { passive: true });
     return () => window.removeEventListener("scroll", fn);
   }, []);
+
+  // Lock background scroll while the mobile menu is open (iOS scrolls through otherwise)
+  useEffect(() => {
+    document.body.style.overflow = mobileMenu ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileMenu]);
 
   useEffect(() => {
     const iv = setInterval(() => setActiveFeature(p => (p + 1) % 6), 5000);
@@ -331,13 +375,11 @@ export default function MasarLanding() {
         }
 
         /* ═══ BUTTONS ═══ */
+        /* Shine sweeps via transform (GPU-composited) — animating "left" forced
+           main-thread layout every frame and made the button flicker on mobile. */
         @keyframes btnShine {
-          0% { left: -100%; }
-          100% { left: 200%; }
-        }
-        @keyframes btnPulseGlow {
-          0%, 100% { box-shadow: 0 0 20px rgba(16,185,129,0.2), 0 0 60px rgba(16,185,129,0.05); }
-          50% { box-shadow: 0 0 30px rgba(16,185,129,0.35), 0 0 80px rgba(16,185,129,0.1); }
+          0%, 55% { transform: translateX(-180%) skewX(-20deg); }
+          100% { transform: translateX(320%) skewX(-20deg); }
         }
         @keyframes btnRainbow {
           0% { background-position: 0% 50%; }
@@ -350,67 +392,69 @@ export default function MasarLanding() {
           font-size: 17px; font-weight: 700; cursor: pointer;
           text-decoration: none; overflow: hidden;
           font-family: inherit; z-index: 1;
-          transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+          -webkit-tap-highlight-color: transparent;
+          transform: translateZ(0);
+          -webkit-backface-visibility: hidden; backface-visibility: hidden;
+          transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.4s ease;
         }
+        .btn-premium:active { transform: scale(0.97); }
         .btn-premium-primary {
           background: linear-gradient(135deg, #10B981, #059669, #06B6D4);
           background-size: 200% 200%;
-          animation: btnRainbow 4s ease infinite, btnPulseGlow 3s ease-in-out infinite;
+          animation: btnRainbow 8s linear infinite;
           color: white;
           border: 1px solid rgba(255,255,255,0.1);
+          box-shadow: 0 0 24px rgba(16,185,129,0.25), 0 0 60px rgba(16,185,129,0.08);
         }
         .btn-premium-primary::before {
-          content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-          transform: skewX(-20deg);
-          animation: btnShine 4s ease-in-out infinite;
-        }
-        .btn-premium-primary::after {
-          content: ''; position: absolute; inset: -2px; border-radius: 22px; z-index: -1;
-          background: linear-gradient(135deg, #10B981, #06B6D4, #3B82F6, #8B5CF6);
-          background-size: 300% 300%;
-          animation: btnRainbow 3s ease infinite;
-          filter: blur(8px); opacity: 0.4;
-        }
-        .btn-premium-primary:hover {
-          transform: translateY(-4px) scale(1.02);
-          box-shadow: 0 24px 80px rgba(16,185,129,0.4), 0 0 120px rgba(6,182,212,0.15);
+          content: ''; position: absolute; top: 0; left: 0; width: 60%; height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+          transform: translateX(-180%) skewX(-20deg);
+          animation: btnShine 5s ease-in-out infinite;
+          pointer-events: none;
         }
 
         .btn-premium-ghost {
           background: rgba(255,255,255,0.03);
           color: white;
           border: 1px solid rgba(255,255,255,0.1);
+          -webkit-backdrop-filter: blur(20px);
           backdrop-filter: blur(20px);
         }
         .btn-premium-ghost::before {
           content: ''; position: absolute; inset: 0; border-radius: 20px;
           background: linear-gradient(135deg, rgba(16,185,129,0.05), rgba(59,130,246,0.05), rgba(139,92,246,0.03));
-          opacity: 0; transition: opacity 0.4s;
-        }
-        .btn-premium-ghost:hover::before { opacity: 1; }
-        .btn-premium-ghost:hover {
-          transform: translateY(-4px);
-          border-color: rgba(16,185,129,0.25);
-          box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(16,185,129,0.08);
+          opacity: 0; transition: opacity 0.4s; pointer-events: none;
         }
 
         .btn-nav-signup {
           background: linear-gradient(135deg, #10B981, #059669);
           color: white; padding: 10px 24px; border-radius: 14px;
           text-decoration: none; font-weight: 700; font-size: 14px;
-          transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+          transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1);
           position: relative; overflow: hidden;
           border: 1px solid rgba(255,255,255,0.1);
+          box-shadow: 0 4px 18px rgba(16,185,129,0.18);
+          -webkit-tap-highlight-color: transparent;
         }
-        .btn-nav-signup::after {
-          content: ''; position: absolute; inset: -1px; border-radius: 15px; z-index: -1;
-          background: linear-gradient(135deg, #10B981, #06B6D4);
-          filter: blur(6px); opacity: 0.3;
-        }
-        .btn-nav-signup:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 30px rgba(16,185,129,0.3);
+
+        /* Hover effects only on devices with a real pointer — on touch screens
+           :hover sticks after tap and leaves buttons frozen mid-animation. */
+        @media (hover: hover) and (pointer: fine) {
+          .btn-premium-primary:hover {
+            transform: translateY(-3px) translateZ(0);
+            box-shadow: 0 16px 48px rgba(16,185,129,0.35), 0 0 90px rgba(6,182,212,0.12);
+          }
+          .btn-premium-ghost:hover::before { opacity: 1; }
+          .btn-premium-ghost:hover {
+            transform: translateY(-3px);
+            border-color: rgba(16,185,129,0.25);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(16,185,129,0.08);
+          }
+          .btn-nav-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(16,185,129,0.3);
+          }
         }
 
         /* ═══ NAV ═══ */
@@ -437,33 +481,38 @@ export default function MasarLanding() {
           transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
           position: relative; overflow: hidden;
         }
-        .pain-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 24px 48px rgba(0,0,0,0.3);
-        }
-
         .step-card {
           position: relative; border-radius: 24px; padding: 2px;
           transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
         }
-        .step-card:hover { transform: translateY(-8px); }
 
         .price-card {
           border-radius: 28px; padding: 44px 36px;
           transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
           position: relative; overflow: hidden;
         }
-        .price-card:hover { transform: translateY(-6px); }
+
+        @media (hover: hover) and (pointer: fine) {
+          .pain-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 24px 48px rgba(0,0,0,0.3);
+          }
+          .step-card:hover { transform: translateY(-8px); }
+          .price-card:hover { transform: translateY(-6px); }
+        }
 
         @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.95); } }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
         .mobile-overlay {
           position: fixed; inset: 0; z-index: 999;
-          background: rgba(5,5,8,0.96); backdrop-filter: blur(30px);
+          background: rgba(5,5,8,0.96);
+          -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px);
           display: flex; flex-direction: column;
           align-items: center; justify-content: center; gap: 20px;
           animation: slideDown 0.3s ease;
+          overflow-y: auto;
+          padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
         }
         .mobile-overlay a {
           color: white; text-decoration: none;
@@ -473,11 +522,16 @@ export default function MasarLanding() {
         }
         .mobile-overlay a:hover { background: rgba(255,255,255,0.06); }
 
+        /* iOS Safari: 100vh includes the URL bar and causes a jump — prefer svh */
+        .hero-section { min-height: 100vh; min-height: 100svh; }
+        section[id] { scroll-margin-top: 84px; }
+
         @media (max-width: 768px) {
           .hide-m { display: none !important; }
           .hero-h1 { font-size: 34px !important; }
           .hero-sub { font-size: 17px !important; }
           .sec-title { font-size: 28px !important; }
+          .cta-h2 { font-size: 34px !important; }
           .feat-grid { grid-template-columns: 1fr !important; }
           .pain-grid { grid-template-columns: 1fr !important; }
           .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
@@ -487,8 +541,25 @@ export default function MasarLanding() {
           .btn-premium { justify-content: center !important; }
           .nav-d { display: none !important; }
           .burger { display: block !important; }
+          /* Large blurred orbs are extremely expensive on mobile GPUs */
+          .orb { filter: blur(70px); }
+          .orb-1 { width: 420px; height: 420px; }
+          .orb-2 { width: 340px; height: 340px; }
+          .orb-3, .orb-4 { display: none; }
         }
-        @media (min-width: 769px) { .burger { display: none !important; } }
+        @media (min-width: 769px) {
+          .burger { display: none !important; }
+          .feat-wide { grid-column: span 2; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+          html { scroll-behavior: auto; }
+        }
       `}</style>
 
       {/* ══════════ NAVBAR ══════════ */}
@@ -496,6 +567,7 @@ export default function MasarLanding() {
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
         background: scrolled ? "rgba(5,5,8,0.8)" : "transparent",
         backdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none",
         borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
         transition: "all 0.5s ease", padding: "0 24px",
       }}>
@@ -527,8 +599,9 @@ export default function MasarLanding() {
             }}>{isAr ? "EN" : "عربي"}</button>
             <a href="/auth/login" className="nav-link hide-m" style={{ color: "rgba(255,255,255,0.7)" }}>{t.navLogin}</a>
             <a href="/auth/signup" className="btn-nav-signup hide-m">{t.navSignup}</a>
-            <button className="burger" onClick={() => setMobileMenu(true)} style={{
+            <button className="burger" aria-label={isAr ? "فتح القائمة" : "Open menu"} onClick={() => setMobileMenu(true)} style={{
               background: "none", border: "none", color: "white", fontSize: 26, cursor: "pointer",
+              padding: "8px 10px",
             }}>☰</button>
           </div>
         </div>
@@ -536,9 +609,10 @@ export default function MasarLanding() {
 
       {mobileMenu && (
         <div className="mobile-overlay">
-          <button onClick={() => setMobileMenu(false)} style={{
-            position: "absolute", top: 20, [isAr ? "left" : "right"]: 24,
+          <button aria-label={isAr ? "إغلاق القائمة" : "Close menu"} onClick={() => setMobileMenu(false)} style={{
+            position: "absolute", top: "max(20px, env(safe-area-inset-top))", [isAr ? "left" : "right"]: 24,
             background: "none", border: "none", color: "white", fontSize: 32, cursor: "pointer",
+            padding: "4px 10px",
           }}>✕</button>
           {[["#features", t.navFeatures], ["#how", t.navHow], ["#pricing", t.navPricing], ["#faq", t.navFaq]].map(([h, l]) => (
             <a key={h} href={h} onClick={() => setMobileMenu(false)}>{l}</a>
@@ -550,8 +624,8 @@ export default function MasarLanding() {
       )}
 
       {/* ══════════ HERO ══════════ */}
-      <section style={{
-        minHeight: "100vh", position: "relative", overflow: "hidden",
+      <section className="hero-section" style={{
+        position: "relative", overflow: "hidden",
         display: "flex", alignItems: "center", padding: "140px 24px 100px",
       }}>
         <MeshBackground />
@@ -719,7 +793,7 @@ export default function MasarLanding() {
           <div className="feat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
             {features.map((f, i) => (
               <GlowCard key={i} color={f.color} delay={i * 0.08} active={activeFeature === i} onClick={() => setActiveFeature(i)}
-                style={{ gridColumn: f.span === "wide" && typeof window !== "undefined" && window.innerWidth > 768 ? "span 2" : "span 1" }}
+                wide={f.span === "wide"}
               >
                 <div style={{
                   width: 54, height: 54, borderRadius: 16,
@@ -745,33 +819,9 @@ export default function MasarLanding() {
       }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
-            {stats.map((s, i) => {
-              const { count, ref } = useCounter(s.value, 2200);
-              return (
-                <RevealBlock key={i} delay={i * 0.1}>
-                  <div ref={ref} style={{
-                    textAlign: "center", padding: 32, position: "relative", borderRadius: 24,
-                    background: `linear-gradient(160deg, ${s.color}06, transparent)`,
-                    border: `1px solid ${s.color}10`,
-                  }}>
-                    <div style={{
-                      position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)",
-                      width: 100, height: 100, borderRadius: "50%",
-                      background: `radial-gradient(circle, ${s.color}10, transparent 70%)`,
-                      filter: "blur(25px)",
-                    }} />
-                    <div style={{ fontSize: 18, marginBottom: 12 }}>{s.icon}</div>
-                    <div style={{
-                      fontSize: 52, fontWeight: 900, marginBottom: 8,
-                      fontFamily: "'Space Grotesk', 'DM Sans', sans-serif",
-                      background: `linear-gradient(135deg, ${s.color}, ${s.color}BB)`,
-                      WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-                    }}>{count}{s.suffix}</div>
-                    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, fontWeight: 500 }}>{s.label}</p>
-                  </div>
-                </RevealBlock>
-              );
-            })}
+            {stats.map((s, i) => (
+              <StatCard key={i} stat={s} delay={i * 0.1} />
+            ))}
           </div>
         </div>
       </section>
@@ -800,7 +850,7 @@ export default function MasarLanding() {
                 }}>
                   <div style={{
                     borderRadius: 22, padding: "40px 32px", height: "100%",
-                    background: "rgba(5,5,8,0.85)", backdropFilter: "blur(20px)", textAlign: "center",
+                    background: "rgba(5,5,8,0.85)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", textAlign: "center",
                   }}>
                     {i < 2 && <div className="hide-m" style={{
                       position: "absolute", top: "50%", [isAr ? "left" : "right"]: -12,
@@ -902,7 +952,7 @@ export default function MasarLanding() {
             background: "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,182,212,0.1), rgba(255,255,255,0.03))",
           }}>
             <div style={{
-              borderRadius: 26, padding: "48px 40", background: "rgba(5,5,8,0.95)", backdropFilter: "blur(20px)",
+              borderRadius: 26, padding: "48px 40px", background: "rgba(5,5,8,0.95)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
               display: "flex", alignItems: "center", gap: 32, flexWrap: "wrap", justifyContent: "center",
             }}>
               <div style={{
@@ -964,7 +1014,7 @@ export default function MasarLanding() {
 
         <div style={{ maxWidth: 700, margin: "0 auto", position: "relative", zIndex: 2 }}>
           <RevealBlock>
-            <h2 style={{ fontSize: 52, fontWeight: 900, lineHeight: 1.15, marginBottom: 24, letterSpacing: isAr ? 0 : "-1.5px" }}>{t.ctaTitle}</h2>
+            <h2 className="cta-h2" style={{ fontSize: 52, fontWeight: 900, lineHeight: 1.15, marginBottom: 24, letterSpacing: isAr ? 0 : "-1.5px" }}>{t.ctaTitle}</h2>
           </RevealBlock>
           <RevealBlock delay={0.1}>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 18, lineHeight: 1.8, marginBottom: 48 }}>{t.ctaSub}</p>
