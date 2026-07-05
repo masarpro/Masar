@@ -3,7 +3,7 @@ import { getActiveOrganization } from "@saas/auth/lib/server";
 import { LookaheadView } from "@saas/projects-execution/components/lookahead/LookaheadView";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { LookaheadSkeleton } from "@saas/shared/components/skeletons";
 
 export async function generateMetadata() {
 	const t = await getTranslations();
@@ -21,7 +21,7 @@ export default async function LookaheadPage({
 	const { organizationSlug, projectId } = await params;
 
 	return (
-		<Suspense fallback={<ListTableSkeleton />}>
+		<Suspense fallback={<LookaheadSkeleton />}>
 			<LookaheadPageContent organizationSlug={organizationSlug} projectId={projectId} />
 		</Suspense>
 	);

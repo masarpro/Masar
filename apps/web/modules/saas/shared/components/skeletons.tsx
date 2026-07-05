@@ -421,6 +421,214 @@ export function StudyOverviewSkeleton() {
 }
 
 /**
+ * Skeleton for the project BOQ overview (title + 2 stat cards + table).
+ * Used by: projects/[projectId]/quantities loading.tsx, page dynamic fallback,
+ * and BOQOverview's own isLoading branch — keep all three identical.
+ */
+export function BOQOverviewSkeleton() {
+	return (
+		<div className="space-y-6">
+			<Skeleton className="h-8 w-48" />
+			<div className="grid grid-cols-2 gap-4">
+				<Skeleton className="h-24 rounded-xl" />
+				<Skeleton className="h-24 rounded-xl" />
+			</div>
+			<Skeleton className="h-64 rounded-xl" />
+		</div>
+	);
+}
+
+/**
+ * Skeleton for the project execution dashboard (health strip + milestone rows).
+ */
+export function ExecutionDashboardSkeleton() {
+	return (
+		<div className="space-y-6">
+			<div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+				{Array.from({ length: 4 }).map((_, i) => (
+					<div key={i} className="rounded-xl border border-border p-4">
+						<Skeleton className="h-12 w-full" />
+					</div>
+				))}
+			</div>
+			<div className="space-y-3">
+				{Array.from({ length: 3 }).map((_, i) => (
+					<Skeleton key={i} className="h-24 w-full rounded-lg" />
+				))}
+			</div>
+		</div>
+	);
+}
+
+/**
+ * Skeleton for the execution lookahead view (header + summary cards + week rows).
+ */
+export function LookaheadSkeleton() {
+	return (
+		<div className="space-y-6">
+			<div className="flex flex-wrap items-center justify-between gap-4">
+				<div className="space-y-2">
+					<Skeleton className="h-6 w-40" />
+					<Skeleton className="h-4 w-56" />
+				</div>
+				<div className="flex items-center gap-2">
+					<Skeleton className="h-9 w-[120px] rounded-lg" />
+					<Skeleton className="h-9 w-32 rounded-lg" />
+				</div>
+			</div>
+			<div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+				{Array.from({ length: 4 }).map((_, i) => (
+					<div key={i} className="rounded-xl border border-border p-4">
+						<Skeleton className="h-12 w-full" />
+					</div>
+				))}
+			</div>
+			<div className="space-y-4">
+				{Array.from({ length: 3 }).map((_, i) => (
+					<Skeleton key={i} className="h-32 w-full rounded-lg" />
+				))}
+			</div>
+		</div>
+	);
+}
+
+/**
+ * Skeleton for the admin revenue page (3 stat cards + chart).
+ */
+export function AdminRevenueSkeleton() {
+	return (
+		<div className="space-y-6">
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+				{Array.from({ length: 3 }).map((_, i) => (
+					<Skeleton key={i} className="h-28 rounded-lg" />
+				))}
+			</div>
+			<Skeleton className="h-80 rounded-lg" />
+		</div>
+	);
+}
+
+/**
+ * Skeleton for the notifications page (header + notification rows).
+ */
+export function NotificationsListSkeleton({
+	withHeader = true,
+}: { withHeader?: boolean } = {}) {
+	return (
+		<div className="space-y-6">
+			{withHeader && (
+				<div className="flex items-center justify-between">
+					<Skeleton className="h-8 w-36" />
+					<Skeleton className="h-9 w-28 rounded-lg" />
+				</div>
+			)}
+			<div className="space-y-3">
+				{Array.from({ length: 8 }).map((_, i) => (
+					<div
+						key={i}
+						className="flex items-start gap-3 rounded-xl border border-border p-4"
+					>
+						<Skeleton className="h-10 w-10 rounded-full" />
+						<div className="flex-1 space-y-2">
+							<Skeleton className="h-4 w-full max-w-md" />
+							<Skeleton className="h-3 w-32" />
+						</div>
+						<Skeleton className="h-2 w-2 rounded-full" />
+					</div>
+				))}
+			</div>
+		</div>
+	);
+}
+
+/**
+ * Skeleton for the documents explorer (header + search + folder rows).
+ */
+export function DocumentsExplorerSkeleton() {
+	return (
+		<div className="space-y-6">
+			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+				<div className="space-y-2">
+					<Skeleton className="h-8 w-48" />
+					<Skeleton className="h-4 w-64" />
+				</div>
+				<div className="flex items-center gap-2">
+					<Skeleton className="h-10 w-32 rounded-xl" />
+					<Skeleton className="h-10 w-32 rounded-xl" />
+				</div>
+			</div>
+			<Skeleton className="h-10 w-full rounded-xl" />
+			<div className="flex flex-col gap-2">
+				{Array.from({ length: 6 }).map((_, i) => (
+					<Skeleton key={i} className="h-16 w-full rounded-xl" />
+				))}
+			</div>
+		</div>
+	);
+}
+
+/**
+ * Skeleton for the execution analysis page (header + tab bar + chart area).
+ */
+export function AnalysisSkeleton() {
+	return (
+		<div className="space-y-6">
+			<div className="flex flex-wrap items-center justify-between gap-4">
+				<div className="space-y-2">
+					<Skeleton className="h-6 w-40" />
+					<Skeleton className="h-4 w-56" />
+				</div>
+				<Skeleton className="h-9 w-32 rounded-lg" />
+			</div>
+			<Skeleton className="h-10 w-72 rounded-lg" />
+			<Skeleton className="h-[400px] w-full rounded-lg" />
+		</div>
+	);
+}
+
+/**
+ * Skeleton for the project profitability report (title + 3 KPI cards + chart).
+ */
+export function ProfitabilityReportSkeleton() {
+	return (
+		<div className="space-y-6 p-6">
+			<Skeleton className="h-8 w-48" />
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+				<Skeleton className="h-32 rounded-2xl" />
+				<Skeleton className="h-32 rounded-2xl" />
+				<Skeleton className="h-32 rounded-2xl" />
+			</div>
+			<Skeleton className="h-64 rounded-2xl" />
+		</div>
+	);
+}
+
+/**
+ * Skeleton for photo-gallery pages (project photos).
+ * Pass withHeader={false} inside components whose real header is already
+ * rendered, so only the grid area shows the skeleton.
+ */
+export function PhotoGridSkeleton({
+	withHeader = true,
+}: { withHeader?: boolean } = {}) {
+	return (
+		<div className="space-y-6">
+			{withHeader && (
+				<div className="flex items-center justify-between">
+					<Skeleton className="h-8 w-48" />
+					<Skeleton className="h-9 w-32 rounded-lg" />
+				</div>
+			)}
+			<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+				{Array.from({ length: 8 }).map((_, i) => (
+					<Skeleton key={i} className="aspect-square rounded-xl" />
+				))}
+			</div>
+		</div>
+	);
+}
+
+/**
  * Minimal skeleton for lightweight sub-pages (chat, timeline).
  */
 export function MinimalSkeleton() {

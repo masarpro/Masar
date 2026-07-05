@@ -708,7 +708,9 @@ export async function getAccountBalance(
 ): Promise<Prisma.Decimal> {
 	const where: any = {
 		accountId,
-		journalEntry: { status: "POSTED" },
+		// REVERSED entries were posted and stay in balances; their POSTED
+		// reversal entry is what cancels them out.
+		journalEntry: { status: { in: ["POSTED", "REVERSED"] } },
 	};
 
 	if (asOfDate) {
@@ -793,7 +795,7 @@ export async function getTrialBalance(
 		FROM "journal_entry_lines" jel
 		INNER JOIN "journal_entries" je ON je."id" = jel."journal_entry_id"
 		WHERE je."organization_id" = ${organizationId}
-			AND je."status" = 'POSTED'
+			AND je."status" IN ('POSTED', 'REVERSED')
 			AND je."date" <= ${asOfDate}
 			${dateFrom ? Prisma.sql`AND je."date" >= ${dateFrom}` : Prisma.empty}
 		GROUP BY jel."account_id"
@@ -949,7 +951,7 @@ export async function getJournalIncomeStatement(
 		FROM "chart_accounts" a
 		LEFT JOIN "journal_entry_lines" jel ON jel."account_id" = a."id"
 		LEFT JOIN "journal_entries" je ON je."id" = jel."journal_entry_id"
-			AND je."status" = 'POSTED'
+			AND je."status" IN ('POSTED', 'REVERSED')
 			AND je."date" >= ${options.dateFrom}
 			AND je."date" <= ${options.dateTo}
 		WHERE a."organization_id" = ${organizationId}
@@ -1095,7 +1097,7 @@ export async function getBalanceSheet(
 		FROM "chart_accounts" a
 		LEFT JOIN "journal_entry_lines" jel ON jel."account_id" = a."id"
 		LEFT JOIN "journal_entries" je ON je."id" = jel."journal_entry_id"
-			AND je."status" = 'POSTED'
+			AND je."status" IN ('POSTED', 'REVERSED')
 			AND je."date" <= ${date}
 		WHERE a."organization_id" = ${organizationId}
 			AND a."is_postable" = true
@@ -1118,7 +1120,7 @@ export async function getBalanceSheet(
 		FROM "chart_accounts" a
 		INNER JOIN "journal_entry_lines" jel ON jel."account_id" = a."id"
 		INNER JOIN "journal_entries" je ON je."id" = jel."journal_entry_id"
-			AND je."status" = 'POSTED'
+			AND je."status" IN ('POSTED', 'REVERSED')
 			AND je."date" >= ${fiscalYearStart}
 			AND je."date" <= ${date}
 		WHERE a."organization_id" = ${organizationId}
@@ -1306,7 +1308,7 @@ export async function closePeriod(
 			INNER JOIN "journal_entries" je ON je."id" = jel."journal_entry_id"
 			WHERE a."organization_id" = ${period.organizationId}
 				AND a."type" = 'REVENUE' AND a."is_postable" = true
-				AND je."status" = 'POSTED'
+				AND je."status" IN ('POSTED', 'REVERSED')
 				AND je."date" >= ${period.startDate} AND je."date" <= ${period.endDate}
 			GROUP BY a."id"
 			HAVING COALESCE(SUM(jel."credit"), 0) - COALESCE(SUM(jel."debit"), 0) != 0
@@ -1321,7 +1323,7 @@ export async function closePeriod(
 			INNER JOIN "journal_entries" je ON je."id" = jel."journal_entry_id"
 			WHERE a."organization_id" = ${period.organizationId}
 				AND a."type" = 'EXPENSE' AND a."is_postable" = true
-				AND je."status" = 'POSTED'
+				AND je."status" IN ('POSTED', 'REVERSED')
 				AND je."date" >= ${period.startDate} AND je."date" <= ${period.endDate}
 			GROUP BY a."id"
 			HAVING COALESCE(SUM(jel."debit"), 0) - COALESCE(SUM(jel."credit"), 0) != 0
@@ -1543,7 +1545,7 @@ export async function getAccountLedger(
 		const openingAgg = await db.journalEntryLine.aggregate({
 			where: {
 				accountId,
-				journalEntry: { organizationId, status: "POSTED", date: { lt: dateFrom } },
+				journalEntry: { organizationId, status: { in: ["POSTED", "REVERSED"] }, date: { lt: dateFrom } },
 			},
 			_sum: { debit: true, credit: true },
 		});
@@ -1561,7 +1563,7 @@ export async function getAccountLedger(
 		accountId,
 		journalEntry: {
 			organizationId,
-			status: "POSTED" as const,
+			status: { in: ["POSTED" as const, "REVERSED" as const] },
 			...(Object.keys(dateFilter).length > 0 ? { date: dateFilter } : {}),
 		},
 	};
@@ -1853,7 +1855,7 @@ export async function getCostCenterByProject(
 	const lineWhere: any = {
 		journalEntry: {
 			organizationId,
-			status: "POSTED",
+			status: { in: ["POSTED", "REVERSED"] },
 			...(Object.keys(dateFilter).length > 0 ? { date: dateFilter } : {}),
 		},
 	};
@@ -1971,7 +1973,7 @@ export async function getAccountingDashboard(
 		// Total Assets
 		db.journalEntryLine.aggregate({
 			where: {
-				journalEntry: { organizationId, status: "POSTED" },
+				journalEntry: { organizationId, status: { in: ["POSTED", "REVERSED"] } },
 				account: { type: "ASSET", organizationId },
 			},
 			_sum: { debit: true, credit: true },
@@ -1979,7 +1981,7 @@ export async function getAccountingDashboard(
 		// Total Liabilities
 		db.journalEntryLine.aggregate({
 			where: {
-				journalEntry: { organizationId, status: "POSTED" },
+				journalEntry: { organizationId, status: { in: ["POSTED", "REVERSED"] } },
 				account: { type: "LIABILITY", organizationId },
 			},
 			_sum: { debit: true, credit: true },
@@ -1987,7 +1989,7 @@ export async function getAccountingDashboard(
 		// Revenue this month
 		db.journalEntryLine.aggregate({
 			where: {
-				journalEntry: { organizationId, status: "POSTED", date: { gte: monthStart, lte: monthEnd } },
+				journalEntry: { organizationId, status: { in: ["POSTED", "REVERSED"] }, date: { gte: monthStart, lte: monthEnd } },
 				account: { type: "REVENUE", organizationId },
 			},
 			_sum: { debit: true, credit: true },
@@ -1995,7 +1997,7 @@ export async function getAccountingDashboard(
 		// Expenses this month
 		db.journalEntryLine.aggregate({
 			where: {
-				journalEntry: { organizationId, status: "POSTED", date: { gte: monthStart, lte: monthEnd } },
+				journalEntry: { organizationId, status: { in: ["POSTED", "REVERSED"] }, date: { gte: monthStart, lte: monthEnd } },
 				account: { type: "EXPENSE", organizationId },
 			},
 			_sum: { debit: true, credit: true },
@@ -2003,7 +2005,7 @@ export async function getAccountingDashboard(
 		// Accounts Receivable (1120)
 		db.journalEntryLine.aggregate({
 			where: {
-				journalEntry: { organizationId, status: "POSTED" },
+				journalEntry: { organizationId, status: { in: ["POSTED", "REVERSED"] } },
 				account: { organizationId, code: "1120" },
 			},
 			_sum: { debit: true, credit: true },
@@ -2011,7 +2013,7 @@ export async function getAccountingDashboard(
 		// Accounts Payable (2110 + 2120)
 		db.journalEntryLine.aggregate({
 			where: {
-				journalEntry: { organizationId, status: "POSTED" },
+				journalEntry: { organizationId, status: { in: ["POSTED", "REVERSED"] } },
 				account: { organizationId, code: { in: ["2110", "2120"] } },
 			},
 			_sum: { debit: true, credit: true },
@@ -2208,7 +2210,7 @@ export async function getBankJournalLines(
 			accountId: chartAccountId,
 			journalEntry: {
 				organizationId,
-				status: "POSTED",
+				status: { in: ["POSTED", "REVERSED"] },
 				...(Object.keys(dateFilter).length > 0 ? { date: dateFilter } : {}),
 			},
 		},

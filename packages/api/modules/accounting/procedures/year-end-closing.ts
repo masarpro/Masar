@@ -71,7 +71,7 @@ export const previewYearEndProcedure = protectedProcedure
 			FROM "chart_accounts" a
 			LEFT JOIN "journal_entry_lines" jel ON jel."account_id" = a."id"
 			LEFT JOIN "journal_entries" je ON je."id" = jel."journal_entry_id"
-				AND je."status" = 'POSTED'
+				AND je."status" IN ('POSTED', 'REVERSED')
 				AND je."date" >= ${dateFrom}
 				AND je."date" <= ${dateTo}
 			WHERE a."organization_id" = ${organizationId}
@@ -161,7 +161,7 @@ export const previewYearEndProcedure = protectedProcedure
 					COALESCE(SUM(jel."credit"), 0)::text as "totalCredit"
 				FROM "journal_entry_lines" jel
 				JOIN "journal_entries" je ON je."id" = jel."journal_entry_id"
-					AND je."status" = 'POSTED'
+					AND je."status" IN ('POSTED', 'REVERSED')
 					AND je."date" >= ${dateFrom}
 					AND je."date" <= ${dateTo}
 				WHERE jel."account_id" IN (${Prisma.join(drawingsAccounts.map((a) => a.id))})
@@ -377,7 +377,7 @@ export const executeYearEndProcedure = subscriptionProcedure
 				FROM "chart_accounts" a
 				LEFT JOIN "journal_entry_lines" jel ON jel."account_id" = a."id"
 				LEFT JOIN "journal_entries" je ON je."id" = jel."journal_entry_id"
-					AND je."status" = 'POSTED'
+					AND je."status" IN ('POSTED', 'REVERSED')
 					AND je."date" >= ${dateFrom}
 					AND je."date" <= ${dateTo}
 				WHERE a."organization_id" = ${organizationId}
@@ -511,7 +511,7 @@ export const executeYearEndProcedure = subscriptionProcedure
 						COALESCE(SUM(jel."credit"), 0)::text as "totalCredit"
 					FROM "journal_entry_lines" jel
 					JOIN "journal_entries" je ON je."id" = jel."journal_entry_id"
-						AND je."status" = 'POSTED'
+						AND je."status" IN ('POSTED', 'REVERSED')
 						AND je."date" >= ${dateFrom}
 						AND je."date" <= ${dateTo}
 					WHERE jel."account_id" IN (${Prisma.join(drawingsAccounts.map((a) => a.id))})

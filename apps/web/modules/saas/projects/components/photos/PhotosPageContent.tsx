@@ -38,7 +38,6 @@ import {
 	ChevronUp,
 	Filter,
 	ImageIcon,
-	Loader2,
 	Pencil,
 	Play,
 	Plus,
@@ -51,6 +50,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { PhotoGridSkeleton } from "@saas/shared/components/skeletons";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -592,9 +592,7 @@ export function PhotosPageContent({
 
 			{/* Content */}
 			{isLoading ? (
-				<div className="flex items-center justify-center py-16">
-					<Loader2 className="h-6 w-6 animate-spin text-slate-400" />
-				</div>
+				<PhotoGridSkeleton withHeader={false} />
 			) : totalCount === 0 ? (
 				<div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 py-16 dark:border-slate-700 dark:bg-slate-900/50">
 					<div className="mb-4 rounded-2xl bg-slate-100 p-5 dark:bg-slate-800">

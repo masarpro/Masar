@@ -5,6 +5,7 @@ import { z } from "zod";
 import { toNum, convertCostingItemDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import { dedupeCostingItems, summarizeCostingItems } from "../lib/costing-aggregation";
 
 function calculateItemTotals(data: {
 	quantity: number;
@@ -70,132 +71,149 @@ export const costingGenerateItems = subscriptionProcedure
 			{ section: "pricing", action: "studies" },
 		);
 
-		// Check if items already exist (idempotent)
-		const existingCount = await db.costingItem.count({
-			where: { costStudyId: input.studyId },
+		return db.$transaction(async (tx) => {
+			// قفل صف الدراسة لمنع التوليد المتزامن — طلبان متوازيان كانا يريان
+			// كلاهما count == 0 فيُدرج كل منهما مجموعة كاملة (تضاعف تكلفة المواد)
+			await tx.$queryRawUnsafe(
+				"SELECT id FROM cost_studies WHERE id = $1 FOR UPDATE",
+				input.studyId,
+			);
+
+			const study = await tx.costStudy.findFirst({
+				where: { id: input.studyId, organizationId: input.organizationId },
+				select: { id: true },
+			});
+			if (!study) {
+				throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.NOT_FOUND });
+			}
+
+			// Check if items already exist (idempotent)
+			const existingCount = await tx.costingItem.count({
+				where: { costStudyId: input.studyId },
+			});
+
+			if (existingCount > 0) {
+				return { generated: 0, existing: existingCount, message: "البنود موجودة مسبقاً" };
+			}
+
+			// Fetch all source items
+			const [structuralItems, finishingItems, mepItems, laborItems, manualItems] =
+				await Promise.all([
+					tx.structuralItem.findMany({
+						where: { costStudyId: input.studyId },
+						orderBy: { sortOrder: "asc" },
+					}),
+					tx.finishingItem.findMany({
+						where: { costStudyId: input.studyId, isEnabled: true },
+						orderBy: { sortOrder: "asc" },
+					}),
+					tx.mEPItem.findMany({
+						where: { costStudyId: input.studyId, isEnabled: true },
+						orderBy: { sortOrder: "asc" },
+					}),
+					tx.laborItem.findMany({
+						where: { costStudyId: input.studyId },
+					}),
+					tx.manualItem.findMany({
+						where: { costStudyId: input.studyId, organizationId: input.organizationId },
+						orderBy: { sortOrder: "asc" },
+					}),
+				]);
+
+			let sortOrder = 0;
+			const items: Array<{
+				costStudyId: string;
+				organizationId: string;
+				section: string;
+				sourceItemId: string;
+				sourceItemType: string;
+				description: string;
+				unit: string;
+				quantity: number;
+				sortOrder: number;
+			}> = [];
+
+			// Structural items
+			for (const item of structuralItems) {
+				items.push({
+					costStudyId: input.studyId,
+					organizationId: input.organizationId,
+					section: "STRUCTURAL",
+					sourceItemId: item.id,
+					sourceItemType: "StructuralItem",
+					description: `${item.category} — ${item.name}`,
+					unit: item.unit,
+					quantity: Number(item.quantity),
+					sortOrder: sortOrder++,
+				});
+			}
+
+			// Finishing items (aggregated materials from specs)
+			for (const item of finishingItems) {
+				items.push({
+					costStudyId: input.studyId,
+					organizationId: input.organizationId,
+					section: "FINISHING",
+					sourceItemId: item.id,
+					sourceItemType: "FinishingItem",
+					description: `${item.category} — ${item.name}`,
+					unit: item.unit,
+					quantity: Number(item.area ?? item.quantity ?? 0),
+					sortOrder: sortOrder++,
+				});
+			}
+
+			// MEP items
+			for (const item of mepItems) {
+				items.push({
+					costStudyId: input.studyId,
+					organizationId: input.organizationId,
+					section: "MEP",
+					sourceItemId: item.id,
+					sourceItemType: "MEPItem",
+					description: `${item.category} — ${item.name}`,
+					unit: item.unit,
+					quantity: Number(item.quantity),
+					sortOrder: sortOrder++,
+				});
+			}
+
+			// Labor items
+			for (const item of laborItems) {
+				items.push({
+					costStudyId: input.studyId,
+					organizationId: input.organizationId,
+					section: "LABOR",
+					sourceItemId: item.id,
+					sourceItemType: "LaborItem",
+					description: `${item.laborType} — ${item.name}`,
+					unit: "يوم عمل",
+					quantity: item.quantity * item.durationDays,
+					sortOrder: sortOrder++,
+				});
+			}
+
+			// Manual items
+			for (const item of manualItems) {
+				items.push({
+					costStudyId: input.studyId,
+					organizationId: input.organizationId,
+					section: "MANUAL",
+					sourceItemId: item.id,
+					sourceItemType: "ManualItem",
+					description: item.description,
+					unit: item.unit,
+					quantity: Number(item.quantity),
+					sortOrder: sortOrder++,
+				});
+			}
+
+			if (items.length > 0) {
+				await tx.costingItem.createMany({ data: items });
+			}
+
+			return { generated: items.length, existing: 0 };
 		});
-
-		if (existingCount > 0) {
-			return { generated: 0, existing: existingCount, message: "البنود موجودة مسبقاً" };
-		}
-
-		// Fetch all source items
-		const [structuralItems, finishingItems, mepItems, laborItems, manualItems] =
-			await Promise.all([
-				db.structuralItem.findMany({
-					where: { costStudyId: input.studyId },
-					orderBy: { sortOrder: "asc" },
-				}),
-				db.finishingItem.findMany({
-					where: { costStudyId: input.studyId, isEnabled: true },
-					orderBy: { sortOrder: "asc" },
-				}),
-				db.mEPItem.findMany({
-					where: { costStudyId: input.studyId, isEnabled: true },
-					orderBy: { sortOrder: "asc" },
-				}),
-				db.laborItem.findMany({
-					where: { costStudyId: input.studyId },
-				}),
-				db.manualItem.findMany({
-					where: { costStudyId: input.studyId, organizationId: input.organizationId },
-					orderBy: { sortOrder: "asc" },
-				}),
-			]);
-
-		let sortOrder = 0;
-		const items: Array<{
-			costStudyId: string;
-			organizationId: string;
-			section: string;
-			sourceItemId: string;
-			sourceItemType: string;
-			description: string;
-			unit: string;
-			quantity: number;
-			sortOrder: number;
-		}> = [];
-
-		// Structural items
-		for (const item of structuralItems) {
-			items.push({
-				costStudyId: input.studyId,
-				organizationId: input.organizationId,
-				section: "STRUCTURAL",
-				sourceItemId: item.id,
-				sourceItemType: "StructuralItem",
-				description: `${item.category} — ${item.name}`,
-				unit: item.unit,
-				quantity: Number(item.quantity),
-				sortOrder: sortOrder++,
-			});
-		}
-
-		// Finishing items (aggregated materials from specs)
-		for (const item of finishingItems) {
-			items.push({
-				costStudyId: input.studyId,
-				organizationId: input.organizationId,
-				section: "FINISHING",
-				sourceItemId: item.id,
-				sourceItemType: "FinishingItem",
-				description: `${item.category} — ${item.name}`,
-				unit: item.unit,
-				quantity: Number(item.area ?? item.quantity ?? 0),
-				sortOrder: sortOrder++,
-			});
-		}
-
-		// MEP items
-		for (const item of mepItems) {
-			items.push({
-				costStudyId: input.studyId,
-				organizationId: input.organizationId,
-				section: "MEP",
-				sourceItemId: item.id,
-				sourceItemType: "MEPItem",
-				description: `${item.category} — ${item.name}`,
-				unit: item.unit,
-				quantity: Number(item.quantity),
-				sortOrder: sortOrder++,
-			});
-		}
-
-		// Labor items
-		for (const item of laborItems) {
-			items.push({
-				costStudyId: input.studyId,
-				organizationId: input.organizationId,
-				section: "LABOR",
-				sourceItemId: item.id,
-				sourceItemType: "LaborItem",
-				description: `${item.laborType} — ${item.name}`,
-				unit: "يوم عمل",
-				quantity: item.quantity * item.durationDays,
-				sortOrder: sortOrder++,
-			});
-		}
-
-		// Manual items
-		for (const item of manualItems) {
-			items.push({
-				costStudyId: input.studyId,
-				organizationId: input.organizationId,
-				section: "MANUAL",
-				sourceItemId: item.id,
-				sourceItemType: "ManualItem",
-				description: item.description,
-				unit: item.unit,
-				quantity: Number(item.quantity),
-				sortOrder: sortOrder++,
-			});
-		}
-
-		if (items.length > 0) {
-			await db.costingItem.createMany({ data: items });
-		}
-
-		return { generated: items.length, existing: 0 };
 	});
 
 // ═══════════════════════════════════════════════════════════════
@@ -516,47 +534,10 @@ export const costingGetSummary = protectedProcedure
 			select: { overheadPercent: true },
 		});
 
-		// Group by section
-		const sectionMap = new Map<string, { materialTotal: number; laborTotal: number; storageTotal: number; otherTotal: number; total: number; itemCount: number }>();
-
-		for (const item of items) {
-			const s = item.section;
-			const current = sectionMap.get(s) || { materialTotal: 0, laborTotal: 0, storageTotal: 0, otherTotal: 0, total: 0, itemCount: 0 };
-			current.materialTotal += toNum(item.materialTotal);
-			current.laborTotal += toNum(item.laborTotal);
-			current.storageTotal += toNum(item.storageTotal);
-			current.otherTotal += toNum(item.otherCosts);
-			current.total += toNum(item.totalCost);
-			current.itemCount += 1;
-			sectionMap.set(s, current);
-		}
-
-		const sections = Array.from(sectionMap.entries()).map(([section, data]) => ({
-			section,
-			...data,
-		}));
-
-		const grandMaterial = sections.reduce((s, sec) => s + sec.materialTotal, 0);
-		const grandLabor = sections.reduce((s, sec) => s + sec.laborTotal, 0);
-		const grandStorage = sections.reduce((s, sec) => s + sec.storageTotal, 0);
-		const grandOther = sections.reduce((s, sec) => s + sec.otherTotal, 0);
-		const grandTotal = sections.reduce((s, sec) => s + sec.total, 0);
+		// إزالة الصفوف المكررة (توليد متزامن تاريخي) قبل التجميع —
+		// كانت تُضاعف تكلفة المواد دون المصنعيات (lump sum على صف واحد)
+		const uniqueItems = dedupeCostingItems(items);
 
 		const overheadPercent = toNum(study?.overheadPercent) || 5;
-		const overheadAmount = grandTotal * (overheadPercent / 100);
-		const costWithOverhead = grandTotal + overheadAmount;
-
-		return {
-			sections,
-			grandTotal: {
-				material: grandMaterial,
-				labor: grandLabor,
-				storage: grandStorage,
-				other: grandOther,
-				total: grandTotal,
-			},
-			overheadPercent,
-			overheadAmount,
-			costWithOverhead,
-		};
+		return summarizeCostingItems(uniqueItems, overheadPercent);
 	});

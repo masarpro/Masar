@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { config } from "@repo/config";
 import {
 	getSession,
@@ -21,11 +20,8 @@ export async function generateMetadata() {
 }
 
 export default async function OnboardingPage() {
-	return (
-		<Suspense fallback={null}>
-			<OnboardingPageContent />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <OnboardingPageContent />;
 }
 
 async function OnboardingPageContent() {

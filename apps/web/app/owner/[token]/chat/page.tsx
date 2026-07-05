@@ -1,11 +1,11 @@
 "use client";
 
+import { OwnerChatSkeleton } from "@saas/projects-owner/components/skeletons";
 import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Textarea } from "@ui/components/textarea";
-import { Skeleton } from "@ui/components/skeleton";
 import {
 	MessageSquare,
 	RefreshCw,
@@ -58,25 +58,7 @@ export default function OwnerPortalChat() {
 	};
 
 	if (isLoading) {
-		return (
-			<div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
-				<div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 px-6 py-4">
-					<Skeleton className="h-5 w-32" />
-					<Skeleton className="h-8 w-20 rounded-xl" />
-				</div>
-				<div className="h-[60vh] p-6 space-y-4 sm:h-[400px]">
-					{Array.from({ length: 5 }).map((_, i) => (
-						<div key={i} className={`flex gap-3 ${i % 2 === 0 ? "" : "flex-row-reverse"}`}>
-							<Skeleton className="h-9 w-9 rounded-full shrink-0" />
-							<Skeleton className={`h-16 rounded-2xl ${i % 2 === 0 ? "w-3/5" : "w-2/5"}`} />
-						</div>
-					))}
-				</div>
-				<div className="border-t border-slate-200 dark:border-slate-700 p-4">
-					<Skeleton className="h-[60px] w-full rounded-xl" />
-				</div>
-			</div>
-		);
+		return <OwnerChatSkeleton />;
 	}
 
 	const messages = data?.items || [];

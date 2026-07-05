@@ -71,6 +71,14 @@ export const getAgedReceivablesProcedure = protectedProcedure
 				over90: Number(result.totals.over90),
 				total: Number(result.totals.total),
 			},
+			// مستخلصات معتمدة غير مفوترة — قسم منفصل عن إجماليات المفوتر
+			uninvoicedClaims: {
+				items: result.uninvoicedClaims.items.map((c) => ({
+					...c,
+					amount: Number(c.amount),
+				})),
+				total: Number(result.uninvoicedClaims.total),
+			},
 			generatedAt: result.generatedAt,
 		};
 	});

@@ -1,5 +1,5 @@
-import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { AnalysisSkeleton } from "@saas/shared/components/skeletons";
 
 export default function Loading() {
-	return <DashboardSkeleton />;
+	return <AnalysisSkeleton />;
 }

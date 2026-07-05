@@ -5,11 +5,11 @@ import {
 	OwnerMilestoneTable,
 	type OwnerMilestone,
 } from "@saas/projects-owner/components/OwnerMilestoneTable";
+import { OwnerScheduleSkeleton } from "@saas/projects-owner/components/skeletons";
 import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
-import { Skeleton } from "@ui/components/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/components/tabs";
 import { BarChart3, Calendar, PrinterIcon, Table2 } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -31,17 +31,8 @@ export default function OwnerPortalSchedule() {
 		window.open(`/owner/${token}/print/${kind}?autoprint=1`, "_blank");
 	};
 
-	if (isLoading) {
-		return (
-			<div className="space-y-6">
-				<Skeleton className="h-28 w-full rounded-2xl" />
-				<Skeleton className="h-96 w-full rounded-2xl" />
-			</div>
-		);
-	}
-
-	if (!data) {
-		return null;
+	if (isLoading || !data) {
+		return <OwnerScheduleSkeleton />;
 	}
 
 	const { startDate, endDate, milestones } = data as {

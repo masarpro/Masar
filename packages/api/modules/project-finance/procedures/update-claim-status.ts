@@ -127,6 +127,24 @@ export const updateClaimStatusProcedure = subscriptionProcedure
 			}
 		}
 
+		// Approval/rejection can flip the project between cash-basis and billed —
+		// re-align existing payment entries so revenue is neither double-counted
+		// (payment on 4100 + claim accrual) nor lost (payment on 1120 with no accrual).
+		if (input.status === "APPROVED" || input.status === "REJECTED") {
+			try {
+				const { reconcileProjectPaymentEntries } = await import(
+					"../../../lib/accounting/reconcile-project-payments"
+				);
+				await reconcileProjectPaymentEntries(db, {
+					organizationId: input.organizationId,
+					projectId: input.projectId,
+					userId: context.user.id,
+				});
+			} catch (e) {
+				console.error("[AutoJournal] Failed to reconcile project payment entries after claim status change:", e);
+			}
+		}
+
 		// Notify claim creator about status change
 		if (existingClaim) {
 			const project = await getProjectById(input.projectId, input.organizationId);

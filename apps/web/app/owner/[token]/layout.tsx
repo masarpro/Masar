@@ -177,41 +177,9 @@ export default function OwnerPortalLayout({
 		);
 	}
 
-	// Show loading state
-	if (isLoading) {
-		return (
-			<div className="min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
-				<header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-900/80">
-					<div className="mx-auto max-w-5xl px-4 py-4">
-						<div className="flex items-center gap-3">
-							<Skeleton className="h-10 w-10 rounded-xl" />
-							<div className="space-y-1.5">
-								<Skeleton className="h-4 w-32" />
-								<Skeleton className="h-3 w-24" />
-							</div>
-						</div>
-						<div className="mt-4 flex gap-2">
-							{Array.from({ length: 5 }).map((_, i) => (
-								<Skeleton key={i} className="h-8 w-20 rounded-xl" />
-							))}
-						</div>
-					</div>
-				</header>
-				<main className="mx-auto max-w-5xl px-4 py-6">
-					<div className="space-y-6">
-						<Skeleton className="h-40 w-full rounded-2xl" />
-						<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-							{Array.from({ length: 4 }).map((_, i) => (
-								<Skeleton key={i} className="h-24 rounded-2xl" />
-							))}
-						</div>
-						<Skeleton className="h-48 w-full rounded-2xl" />
-					</div>
-				</main>
-			</div>
-		);
-	}
-
+	// While the summary loads, the shell (header, nav, footer) renders
+	// immediately with small skeletons in the header only; each page shows
+	// its own matching content skeleton — one loading layer per route.
 	return (
 		<div className="min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
 			{/* Header */}
@@ -219,7 +187,15 @@ export default function OwnerPortalLayout({
 				<div className="mx-auto max-w-6xl px-4 py-3 sm:py-4">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
-							{summary?.project?.coverPhoto?.url ? (
+							{isLoading ? (
+								<>
+									<Skeleton className="h-10 w-10 rounded-xl" />
+									<div className="min-w-0 space-y-1.5">
+										<Skeleton className="h-4 w-32" />
+										<Skeleton className="h-3 w-24" />
+									</div>
+								</>
+							) : summary?.project?.coverPhoto?.url ? (
 								<Image
 									src={resolveImageSrc(summary.project.coverPhoto.url) as string}
 									alt={summary.project.name}
@@ -242,14 +218,16 @@ export default function OwnerPortalLayout({
 									<Building2 className="h-5 w-5 text-primary" />
 								</div>
 							)}
-							<div className="min-w-0">
-								<h1 className="truncate font-semibold text-slate-900 dark:text-slate-100">
-									{summary?.project?.name}
-								</h1>
-								<p className="truncate text-xs text-slate-500">
-									{summary?.organization?.name}
-								</p>
-							</div>
+							{!isLoading && (
+								<div className="min-w-0">
+									<h1 className="truncate font-semibold text-slate-900 dark:text-slate-100">
+										{summary?.project?.name}
+									</h1>
+									<p className="truncate text-xs text-slate-500">
+										{summary?.organization?.name}
+									</p>
+								</div>
+							)}
 						</div>
 					</div>
 

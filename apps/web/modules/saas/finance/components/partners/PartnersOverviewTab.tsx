@@ -58,6 +58,16 @@ export function PartnersOverviewTab({
 	const partners = (data?.partners ?? []) as any[];
 	const totals = data?.totals;
 
+	// الأرباح المحتجزة (حساب 3200) — لعرض حصة كل شريك منها
+	const { data: rawCompanySummary } = useQuery({
+		...orpc.accounting.ownerDrawings.companySummary.queryOptions({
+			input: { organizationId },
+		}),
+		enabled: canViewProfits,
+	});
+	const retainedEarnings =
+		Number((rawCompanySummary as any)?.retainedEarnings ?? 0) || 0;
+
 	if (isLoading) return <ListTableSkeleton rows={5} cols={6} />;
 
 	if (level === "none") {
@@ -201,6 +211,11 @@ export function PartnersOverviewTab({
 										{t("finance.partners.shareOfProfit")}
 									</TableHead>
 								)}
+								{canViewProfits && (
+									<TableHead className="text-end hidden md:table-cell">
+										{t("finance.partners.retainedEarningsShare")}
+									</TableHead>
+								)}
 								{canViewNetBalance && (
 									<TableHead className="text-end">
 										{t("finance.partners.netBalance")}
@@ -234,6 +249,16 @@ export function PartnersOverviewTab({
 									{canViewProfits && (
 										<TableCell className="text-end tabular-nums hidden md:table-cell">
 											<Currency amount={p.shareOfProfit ?? 0} />
+										</TableCell>
+									)}
+									{canViewProfits && (
+										<TableCell className="text-end tabular-nums hidden md:table-cell">
+											<Currency
+												amount={
+													retainedEarnings *
+													((Number(p.ownershipPercent) || 0) / 100)
+												}
+											/>
 										</TableCell>
 									)}
 									{canViewNetBalance && (

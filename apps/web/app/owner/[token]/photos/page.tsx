@@ -5,7 +5,7 @@ import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness"
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
-import { Skeleton } from "@ui/components/skeleton";
+import { OwnerPhotosSkeleton } from "@saas/projects-owner/components/skeletons";
 import {
 	ChevronLeft,
 	ChevronRight,
@@ -155,16 +155,7 @@ export default function OwnerPortalPhotos() {
 	}, [lightboxIndex]);
 
 	if (isLoading) {
-		return (
-			<div className="space-y-6">
-				<Skeleton className="h-8 w-48 rounded-xl" />
-				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-					{Array.from({ length: 8 }).map((_, i) => (
-						<Skeleton key={i} className="aspect-square rounded-xl" />
-					))}
-				</div>
-			</div>
-		);
+		return <OwnerPhotosSkeleton />;
 	}
 
 	if (allPhotos.length === 0) {

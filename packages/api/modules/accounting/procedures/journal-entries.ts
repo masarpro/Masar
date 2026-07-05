@@ -18,6 +18,7 @@ import { db } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { allocateByPercentages } from "../lib/expense-allocation";
 import {
 	MAX_NAME, MAX_DESC, MAX_ID, MAX_ARRAY,
 	idString, searchQuery, financialAmount,
@@ -741,11 +742,120 @@ export const getCostCenterReportProcedure = protectedProcedure
 			action: "view",
 		});
 
-		return getCostCenterByProject(db, input.organizationId, {
-			dateFrom: input.dateFrom ? new Date(input.dateFrom) : undefined,
-			dateTo: input.dateTo ? new Date(input.dateTo) : undefined,
+		const dateFrom = input.dateFrom ? new Date(input.dateFrom) : undefined;
+		const dateTo = input.dateTo ? new Date(input.dateTo) : undefined;
+
+		const result = await getCostCenterByProject(db, input.organizationId, {
+			dateFrom,
+			dateTo,
 			projectId: input.projectId,
 		});
+
+		// توزيع مصروفات الشركة على مراكز التكلفة (قراءة فقط — وفق نسب
+		// CompanyExpenseAllocation المخزنة، على أساس الدفعات المسددة في الفترة)
+		const paidPayments = await db.companyExpensePayment.findMany({
+			where: {
+				isPaid: true,
+				expense: {
+					organizationId: input.organizationId,
+					allocations: { some: {} },
+				},
+				...(dateFrom || dateTo
+					? {
+							paidAt: {
+								...(dateFrom ? { gte: dateFrom } : {}),
+								...(dateTo ? { lte: dateTo } : {}),
+							},
+						}
+					: {}),
+			},
+			select: {
+				amount: true,
+				expense: {
+					select: {
+						allocations: {
+							select: { projectId: true, percentage: true },
+						},
+					},
+				},
+			},
+		});
+
+		const allocatedByProject = new Map<string, number>();
+		for (const payment of paidPayments) {
+			const parts = allocateByPercentages(
+				Number(payment.amount),
+				payment.expense.allocations.map((a) => ({
+					key: a.projectId,
+					percentage: Number(a.percentage),
+				})),
+			);
+			for (const part of parts) {
+				allocatedByProject.set(
+					part.key,
+					Math.round(
+						((allocatedByProject.get(part.key) ?? 0) + part.amount) * 100,
+					) / 100,
+				);
+			}
+		}
+
+		if (input.projectId) {
+			// عند فلترة مشروع واحد لا نعرض حصص باقي المشاريع
+			for (const key of [...allocatedByProject.keys()]) {
+				if (key !== input.projectId) allocatedByProject.delete(key);
+			}
+		}
+
+		const knownProjectIds = new Set(
+			result.projects.map((p) => p.projectId).filter(Boolean) as string[],
+		);
+		const missingProjectIds = [...allocatedByProject.keys()].filter(
+			(id) => !knownProjectIds.has(id),
+		);
+		const missingProjects = missingProjectIds.length
+			? await db.project.findMany({
+					where: {
+						id: { in: missingProjectIds },
+						organizationId: input.organizationId,
+					},
+					select: { id: true, name: true },
+				})
+			: [];
+		const missingNameMap = new Map(missingProjects.map((p) => [p.id, p.name]));
+
+		const projects = [
+			...result.projects.map((p) => ({
+				...p,
+				allocatedCompanyExpenses: p.projectId
+					? (allocatedByProject.get(p.projectId) ?? 0)
+					: 0,
+			})),
+			// مشاريع لها حصة موزعة دون أي قيود GL في الفترة
+			...missingProjectIds.map((id) => ({
+				projectId: id,
+				projectName: missingNameMap.get(id) ?? "غير معروف",
+				accounts: [],
+				totalRevenue: 0,
+				totalExpenses: 0,
+				netProfit: 0,
+				profitMargin: 0,
+				allocatedCompanyExpenses: allocatedByProject.get(id) ?? 0,
+			})),
+		];
+
+		const totalAllocatedCompanyExpenses =
+			Math.round(
+				projects.reduce((s, p) => s + p.allocatedCompanyExpenses, 0) * 100,
+			) / 100;
+
+		return {
+			projects,
+			totals: {
+				...result.totals,
+				totalAllocatedCompanyExpenses,
+			},
+		};
 	});
 
 // ========== Accounting Dashboard ==========

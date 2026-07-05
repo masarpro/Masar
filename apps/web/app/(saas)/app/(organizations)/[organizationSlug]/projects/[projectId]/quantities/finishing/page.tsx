@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
-import { Skeleton } from "@ui/components/skeleton";
 import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -12,12 +11,7 @@ const FinishingItemsView = dynamic(
 			default: m.FinishingItemsView,
 		})),
 	{
-		loading: () => (
-			<div className="space-y-6">
-				<Skeleton className="h-8 w-48" />
-				<Skeleton className="h-48 w-full rounded-xl" />
-			</div>
-		),
+		loading: () => <ListTableSkeleton rows={8} cols={7} />,
 	},
 );
 

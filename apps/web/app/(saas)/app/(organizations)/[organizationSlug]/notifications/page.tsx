@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { NotificationsList } from "@saas/projects/components/NotificationsList";
+import { NotificationsListSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -20,7 +21,7 @@ export default async function NotificationsPage({
 	const { organizationSlug } = await params;
 
 	return (
-		<Suspense fallback={null}>
+		<Suspense fallback={<NotificationsListSkeleton />}>
 			<NotificationsPageContent organizationSlug={organizationSlug} />
 		</Suspense>
 	);

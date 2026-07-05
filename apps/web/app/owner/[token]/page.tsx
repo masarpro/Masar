@@ -4,6 +4,7 @@ import {
 	OwnerSummarySectionCards,
 	type OwnerSummarySections,
 } from "@saas/projects-owner/components/OwnerSummarySectionCards";
+import { OwnerSummarySkeleton } from "@saas/projects-owner/components/skeletons";
 import { useOwnerSession } from "@saas/projects-owner/hooks/use-owner-session";
 import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
 import { orpc } from "@shared/lib/orpc-query-utils";
@@ -11,7 +12,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
 import { GlassStatCard } from "@ui/components/glass-stat-card";
 import { Progress } from "@ui/components/progress";
-import { Skeleton } from "@ui/components/skeleton";
 import {
 	Banknote,
 	Clock,
@@ -83,21 +83,7 @@ export default function OwnerPortalSummary() {
 	) as { data: any; isLoading: boolean };
 
 	if (isLoading || !data?.project) {
-		return (
-			<div className="space-y-4 sm:space-y-6">
-				<Skeleton className="h-40 w-full rounded-2xl" />
-				<div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-					{Array.from({ length: 4 }).map((_, i) => (
-						<Skeleton key={i} className="h-24 rounded-2xl" />
-					))}
-				</div>
-				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-					{Array.from({ length: 5 }).map((_, i) => (
-						<Skeleton key={i} className="h-28 rounded-2xl" />
-					))}
-				</div>
-			</div>
-		);
+		return <OwnerSummarySkeleton />;
 	}
 
 	const {
