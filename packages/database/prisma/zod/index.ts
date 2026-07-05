@@ -331,7 +331,7 @@ export type NotificationScalarFieldEnum = z.infer<typeof NotificationScalarField
 
 // File: NotificationPreferenceScalarFieldEnum.schema.ts
 
-export const NotificationPreferenceScalarFieldEnumSchema = z.enum(['id', 'userId', 'organizationId', 'approvalRequested', 'approvalDecided', 'documentCreated', 'dailyReportCreated', 'issueCreated', 'issueCritical', 'expenseCreated', 'claimCreated', 'claimStatusChanged', 'changeOrderCreated', 'ownerMessage', 'teamMemberAdded', 'emailDigest', 'muteAll', 'createdAt', 'updatedAt'])
+export const NotificationPreferenceScalarFieldEnumSchema = z.enum(['id', 'userId', 'organizationId', 'approvalRequested', 'approvalDecided', 'documentCreated', 'dailyReportCreated', 'issueCreated', 'issueCritical', 'expenseCreated', 'claimCreated', 'claimStatusChanged', 'changeOrderCreated', 'ownerMessage', 'teamMemberAdded', 'eventPrefs', 'emailDigest', 'muteAll', 'createdAt', 'updatedAt'])
 
 export type NotificationPreferenceScalarFieldEnum = z.infer<typeof NotificationPreferenceScalarFieldEnumSchema>;
 
@@ -1109,12 +1109,6 @@ export const MessageChannelSchema = z.enum(['TEAM', 'OWNER'])
 
 export type MessageChannel = z.infer<typeof MessageChannelSchema>;
 
-// File: NotificationType.schema.ts
-
-export const NotificationTypeSchema = z.enum(['APPROVAL_REQUESTED', 'APPROVAL_DECIDED', 'DOCUMENT_CREATED', 'DAILY_REPORT_CREATED', 'ISSUE_CREATED', 'ISSUE_CRITICAL', 'EXPENSE_CREATED', 'CLAIM_CREATED', 'CLAIM_STATUS_CHANGED', 'CHANGE_ORDER_CREATED', 'CHANGE_ORDER_APPROVED', 'CHANGE_ORDER_REJECTED', 'OWNER_MESSAGE', 'TEAM_MEMBER_ADDED', 'TEAM_MEMBER_REMOVED', 'SYSTEM'])
-
-export type NotificationType = z.infer<typeof NotificationTypeSchema>;
-
 // File: NotificationChannel.schema.ts
 
 export const NotificationChannelSchema = z.enum(['IN_APP', 'EMAIL'])
@@ -1498,6 +1492,12 @@ export type ZatcaIntegrationStatus = z.infer<typeof ZatcaIntegrationStatusSchema
 export const CategoryGroupSchema = z.enum(['EXPENSE'])
 
 export type CategoryGroup = z.infer<typeof CategoryGroupSchema>;
+
+// File: NotificationType.schema.ts
+
+export const NotificationTypeSchema = z.enum(['APPROVAL_REQUESTED', 'APPROVAL_DECIDED', 'DOCUMENT_CREATED', 'DAILY_REPORT_CREATED', 'ISSUE_CREATED', 'ISSUE_CRITICAL', 'EXPENSE_CREATED', 'CLAIM_CREATED', 'CLAIM_STATUS_CHANGED', 'CHANGE_ORDER_CREATED', 'CHANGE_ORDER_APPROVED', 'CHANGE_ORDER_REJECTED', 'OWNER_MESSAGE', 'TEAM_MEMBER_ADDED', 'TEAM_MEMBER_REMOVED', 'SYSTEM'])
+
+export type NotificationType = z.infer<typeof NotificationTypeSchema>;
 
 // File: PlanConfig.schema.ts
 
@@ -2960,7 +2960,7 @@ export const NotificationSchema = z.object({
   id: z.string(),
   organizationId: z.string(),
   userId: z.string(),
-  type: NotificationTypeSchema,
+  type: z.string(),
   title: z.string(),
   body: z.string().nullish(),
   projectId: z.string().nullish(),
@@ -2995,6 +2995,7 @@ export const NotificationPreferenceSchema = z.object({
   changeOrderCreated: z.array(NotificationChannelSchema),
   ownerMessage: z.array(NotificationChannelSchema),
   teamMemberAdded: z.array(NotificationChannelSchema),
+  eventPrefs: z.unknown().refine((val) => { const getDepth = (obj: unknown, depth: number = 0): number => { if (depth > 10) return depth; if (obj === null || typeof obj !== 'object') return depth; const values = Object.values(obj as Record<string, unknown>); if (values.length === 0) return depth; return Math.max(...values.map(v => getDepth(v, depth + 1))); }; return getDepth(val) <= 10; }, "JSON nesting depth exceeds maximum of 10").default("{}"),
   emailDigest: z.boolean(),
   muteAll: z.boolean(),
   createdAt: z.date(),

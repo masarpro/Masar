@@ -2859,9 +2859,11 @@ model Notification {
   userId         String @map("user_id")
   user           User   @relation("NotificationRecipient", fields: [userId], references: [id], onDelete: Cascade)
 
-  type  NotificationType
+  // مفتاح حدث من سجل الإشعارات (notification-registry.ts) — كان NotificationType enum؛
+  // القيم القديمة (APPROVAL_REQUESTED...) تبقى صالحة كنصوص legacy
+  type  String
   title String
-  body  String?          @db.Text
+  body  String? @db.Text
 
   projectId  String? @map("project_id")
   entityType String? @map("entity_type")
@@ -2903,6 +2905,11 @@ model NotificationPreference {
   changeOrderCreated NotificationChannel[] @default([IN_APP])
   ownerMessage       NotificationChannel[] @default([IN_APP])
   teamMemberAdded    NotificationChannel[] @default([IN_APP])
+
+  // تفضيلات الأحداث الجديدة — overrides متفرقة فوق افتراضيات السجل:
+  // { "finance.invoicePaid": ["IN_APP","EMAIL"], "projects.*": [] }
+  // الأعمدة الـ12 أعلاه deprecated — تُحذف في تنظيف لاحق
+  eventPrefs Json @default("{}") @map("event_prefs")
 
   // إعدادات عامة
   emailDigest Boolean @default(false) @map("email_digest")
