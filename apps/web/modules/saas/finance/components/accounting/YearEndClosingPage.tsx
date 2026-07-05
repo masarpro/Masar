@@ -15,6 +15,7 @@ import {
 	TableRow,
 } from "@ui/components/table";
 import { Badge } from "@ui/components/badge";
+import { Input } from "@ui/components/input";
 import {
 	Select,
 	SelectContent,
@@ -65,6 +66,9 @@ export function YearEndClosingPage({
 	const [showExecuteDialog, setShowExecuteDialog] = useState(false);
 	const [showReverseDialog, setShowReverseDialog] = useState(false);
 	const [reverseYear, setReverseYear] = useState<number | null>(null);
+	// تأكيد مكتوب (نمط GitHub): يجب كتابة رقم السنة لتفعيل زر الإقفال
+	const [executeConfirmText, setExecuteConfirmText] = useState("");
+	const executeConfirmed = executeConfirmText.trim() === String(selectedYear);
 
 	// Years range: current year - 5 to current year
 	const years = Array.from({ length: 6 }, (_, i) => currentYear - 5 + i).reverse();
@@ -493,7 +497,13 @@ export function YearEndClosingPage({
 			</Card>
 
 			{/* Execute Confirmation Dialog */}
-			<AlertDialog open={showExecuteDialog} onOpenChange={setShowExecuteDialog}>
+			<AlertDialog
+				open={showExecuteDialog}
+				onOpenChange={(open) => {
+					setShowExecuteDialog(open);
+					if (!open) setExecuteConfirmText("");
+				}}
+			>
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>{t("executeDialogTitle")}</AlertDialogTitle>
@@ -501,6 +511,19 @@ export function YearEndClosingPage({
 							{t("executeDialogDescription", { year: selectedYear })}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
+					<div className="space-y-2">
+						<p className="text-sm text-slate-600 dark:text-slate-400">
+							{t("typeYearToConfirm", { year: selectedYear })}
+						</p>
+						<Input
+							value={executeConfirmText}
+							onChange={(e) => setExecuteConfirmText(e.target.value)}
+							placeholder={String(selectedYear)}
+							dir="ltr"
+							className="rounded-xl tabular-nums"
+							autoComplete="off"
+						/>
+					</div>
 					<AlertDialogFooter className="flex gap-2">
 						<AlertDialogCancel className="rounded-xl">
 							{tCommon("common.cancel")}
@@ -513,7 +536,7 @@ export function YearEndClosingPage({
 									fiscalYear: selectedYear,
 								})
 							}
-							disabled={executeMutation.isPending}
+							disabled={executeMutation.isPending || !executeConfirmed}
 						>
 							{executeMutation.isPending ? (
 								<Loader2 className="h-4 w-4 me-1 animate-spin" />
