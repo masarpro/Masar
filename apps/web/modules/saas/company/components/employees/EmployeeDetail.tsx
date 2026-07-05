@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
+import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 import { Button } from "@ui/components/button";
 import { Badge } from "@ui/components/badge";
 import { Input } from "@ui/components/input";
@@ -94,15 +95,7 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 	});
 
 	if (isLoading) {
-		return (
-			<div className="space-y-6">
-				{[...Array(3)].map((_, i) => (
-					<div key={i} className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-6">
-						<div className="h-24 animate-pulse rounded bg-muted" />
-					</div>
-				))}
-			</div>
-		);
+		return <DetailPageSkeleton />;
 	}
 
 	if (!employee) return null;

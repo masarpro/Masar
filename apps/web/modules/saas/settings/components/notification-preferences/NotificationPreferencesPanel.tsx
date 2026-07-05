@@ -7,6 +7,7 @@ import {
 } from "@repo/database/prisma/notification-registry";
 import { getModuleIcon } from "@saas/notifications/lib/notification-icons";
 import { useVisibleNotificationGroups } from "@saas/notifications/lib/use-visible-notification-groups";
+import { NotificationPreferencesSkeleton } from "@saas/shared/components/skeletons";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -18,7 +19,6 @@ import {
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
-import { Skeleton } from "@ui/components/skeleton";
 import { Switch } from "@ui/components/switch";
 import {
 	AlertCircle,
@@ -203,17 +203,7 @@ export function NotificationPreferencesPanel({
 		: openModules;
 
 	if (isLoading || groupsLoading) {
-		return (
-			<div className="space-y-4">
-				<div className="flex items-center justify-between">
-					<Skeleton className="h-10 w-64" />
-					<Skeleton className="h-9 w-48" />
-				</div>
-				{[...Array(4)].map((_, i) => (
-					<Skeleton key={i} className="h-16 w-full rounded-2xl" />
-				))}
-			</div>
-		);
+		return <NotificationPreferencesSkeleton />;
 	}
 
 	if (isError || !prefs) {

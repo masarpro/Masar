@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import {
 	Table,
 	TableBody,
@@ -45,18 +46,7 @@ export function CompanyReports({ organizationId }: CompanyReportsProps) {
 		new Intl.NumberFormat("en-SA").format(amount) + ` ${t("common.sar")}`;
 
 	if (isLoading) {
-		return (
-			<div className="space-y-6">
-				{[...Array(3)].map((_, i) => (
-					<div
-						key={i}
-						className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-6"
-					>
-						<div className="h-32 animate-pulse rounded bg-muted" />
-					</div>
-				))}
-			</div>
-		);
+		return <DashboardSkeleton />;
 	}
 
 	if (!dashboard) return null;

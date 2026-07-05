@@ -1,5 +1,5 @@
-import { FormPageSkeleton } from "@saas/shared/components/skeletons";
+import { NotificationPreferencesSkeleton } from "@saas/shared/components/skeletons";
 
 export default function Loading() {
-	return <FormPageSkeleton fields={8} />;
+	return <NotificationPreferencesSkeleton />;
 }
