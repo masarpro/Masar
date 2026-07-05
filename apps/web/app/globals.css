@@ -399,42 +399,22 @@ input[cmdk-input] {
 	background-clip: text; animation: shimmerText 4s linear infinite;
 }
 
-/* Premium Button Effects */
-@keyframes btnShine { 0% { left: -100%; } 100% { left: 200%; } }
-@keyframes btnPulseGlow {
-	0%, 100% { box-shadow: 0 0 20px rgba(14,165,233,0.2), 0 0 60px rgba(14,165,233,0.05); }
-	50% { box-shadow: 0 0 30px rgba(14,165,233,0.35), 0 0 80px rgba(14,165,233,0.1); }
-}
-@keyframes btnRainbow { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
-
+/* Premium Button — static design (no ambient animations: they caused
+   constant repaints and made the CTA flicker, especially on mobile Chrome) */
 .btn-premium {
 	position: relative; display: inline-flex; align-items: center; gap: 12px;
 	padding: 20px 44px; border: none; border-radius: 20px;
 	font-size: 17px; font-weight: 700; cursor: pointer;
 	text-decoration: none; overflow: hidden;
 	font-family: inherit; z-index: 1;
-	transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+	-webkit-tap-highlight-color: transparent;
+	transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.4s ease;
 }
+.btn-premium:active { transform: scale(0.97); }
 .btn-premium-primary {
-	background: linear-gradient(135deg, #0ea5e9, #0284c7, #06B6D4);
-	background-size: 200% 200%;
-	animation: btnRainbow 4s ease infinite, btnPulseGlow 3s ease-in-out infinite;
-	color: white; border: 1px solid rgba(255,255,255,0.1);
-}
-.btn-premium-primary::before {
-	content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
-	background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-	transform: skewX(-20deg); animation: btnShine 4s ease-in-out infinite;
-}
-.btn-premium-primary::after {
-	content: ''; position: absolute; inset: -2px; border-radius: 22px; z-index: -1;
-	background: linear-gradient(135deg, #0ea5e9, #06B6D4, #3B82F6, #8B5CF6);
-	background-size: 300% 300%; animation: btnRainbow 3s ease infinite;
-	filter: blur(8px); opacity: 0.4;
-}
-.btn-premium-primary:hover {
-	transform: translateY(-4px) scale(1.02);
-	box-shadow: 0 24px 80px rgba(14,165,233,0.4), 0 0 120px rgba(6,182,212,0.15);
+	background: linear-gradient(135deg, #0ea5e9, #0284c7);
+	color: white; border: 1px solid rgba(255,255,255,0.12);
+	box-shadow: 0 8px 28px rgba(14,165,233,0.25);
 }
 
 /* Ghost button — theme aware */
@@ -442,18 +422,27 @@ input[cmdk-input] {
 	background: var(--lp-ghost-bg);
 	color: var(--lp-ghost-color);
 	border: 1px solid var(--lp-ghost-border);
+	-webkit-backdrop-filter: blur(20px);
 	backdrop-filter: blur(20px);
 }
 .btn-premium-ghost::before {
 	content: ''; position: absolute; inset: 0; border-radius: 20px;
 	background: linear-gradient(135deg, rgba(14,165,233,0.05), rgba(59,130,246,0.05), rgba(139,92,246,0.03));
-	opacity: 0; transition: opacity 0.4s;
+	opacity: 0; transition: opacity 0.4s; pointer-events: none;
 }
-.btn-premium-ghost:hover::before { opacity: 1; }
-.btn-premium-ghost:hover {
-	transform: translateY(-4px);
-	border-color: rgba(14,165,233,0.25);
-	box-shadow: var(--lp-ghost-hover-shadow);
+
+/* Hover only on real pointers — on touch screens :hover sticks after tap */
+@media (hover: hover) and (pointer: fine) {
+	.btn-premium-primary:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 16px 48px rgba(14,165,233,0.35);
+	}
+	.btn-premium-ghost:hover::before { opacity: 1; }
+	.btn-premium-ghost:hover {
+		transform: translateY(-3px);
+		border-color: rgba(14,165,233,0.25);
+		box-shadow: var(--lp-ghost-hover-shadow);
+	}
 }
 
 /* Landing Pulse Animation */
@@ -529,16 +518,6 @@ input[cmdk-input] {
 		justify-content: center;
 		padding: 16px 32px;
 		font-size: 15px;
-	}
-	.btn-premium-primary {
-		animation: btnRainbow 4s ease infinite;
-	}
-	.btn-premium-primary::before {
-		animation: none;
-	}
-	.btn-premium-primary::after {
-		animation: none;
-		display: none;
 	}
 }
 
