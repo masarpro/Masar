@@ -3,8 +3,8 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { QuotationPreview } from "@saas/pricing/components/quotations/QuotationPreview";
+import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
 import { QuotationPreviewV2 } from "./QuotationPreviewV2";
-import { Loader2 } from "lucide-react";
 
 interface QuotationPreviewSwitchProps {
 	organizationId: string;
@@ -24,11 +24,7 @@ export function QuotationPreviewSwitch({
 	);
 
 	if (isLoading) {
-		return (
-			<div className="flex justify-center py-20">
-				<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-			</div>
-		);
+		return <PreviewPageSkeleton />;
 	}
 
 	// If quotation has a displayConfig (created from study), use V2 preview

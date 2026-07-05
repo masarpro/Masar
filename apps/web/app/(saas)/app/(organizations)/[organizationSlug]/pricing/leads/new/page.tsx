@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { CreateLeadPage } from "@saas/pricing/components/leads/CreateLeadPage";
 import { PricingShell } from "@saas/pricing/components/shell";
@@ -24,11 +23,8 @@ export default async function CreateLeadPageRoute({
 }) {
 	const { organizationSlug } = await params;
 
-	return (
-		<Suspense fallback={null}>
-			<CreateLeadPageContent organizationSlug={organizationSlug} />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <CreateLeadPageContent organizationSlug={organizationSlug} />;
 }
 
 async function CreateLeadPageContent({ organizationSlug }: { organizationSlug: string }) {

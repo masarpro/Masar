@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { LeadsListPage } from "@saas/pricing/components/leads/LeadsListPage";
@@ -26,11 +25,8 @@ export default async function LeadsPage({
 }) {
 	const { organizationSlug } = await params;
 
-	return (
-		<Suspense fallback={null}>
-			<LeadsPageContent organizationSlug={organizationSlug} />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <LeadsPageContent organizationSlug={organizationSlug} />;
 }
 
 async function LeadsPageContent({ organizationSlug }: { organizationSlug: string }) {

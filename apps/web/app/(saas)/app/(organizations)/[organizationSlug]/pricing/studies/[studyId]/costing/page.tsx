@@ -4,6 +4,7 @@ import { PricingShell } from "@saas/pricing/components/shell";
 import { StudyPageShell } from "@saas/pricing/components/studies/StudyPageShell";
 import { CostingPageContentV2 } from "@saas/pricing/components/costing-v2/CostingPageContentV2";
 import { redirectIfUnified } from "@saas/pricing/lib/guards/redirect-if-unified";
+import { StudyOverviewSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -22,7 +23,7 @@ export default async function CostingPage({
 	const { organizationSlug, studyId } = await params;
 
 	return (
-		<Suspense fallback={null}>
+		<Suspense fallback={<StudyOverviewSkeleton />}>
 			<CostingPageContent organizationSlug={organizationSlug} studyId={studyId} />
 		</Suspense>
 	);

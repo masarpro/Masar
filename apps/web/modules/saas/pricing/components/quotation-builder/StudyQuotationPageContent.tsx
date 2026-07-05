@@ -1,12 +1,13 @@
 "use client";
 
+import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
 import { Badge } from "@ui/components/badge";
-import { FileText, Loader2, Lock, Plus } from "lucide-react";
+import { FileText, Lock } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -70,7 +71,9 @@ export function StudyQuotationPageContent({
 	const fmt = (n: number) =>
 		Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
-	if (stagesLoading) return null;
+	if (stagesLoading) {
+		return <StudyEditorSkeleton />;
+	}
 
 	if (!isPricingApproved) {
 		return (

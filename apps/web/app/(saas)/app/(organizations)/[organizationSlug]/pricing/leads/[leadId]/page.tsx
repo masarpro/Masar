@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { LeadDetailPage } from "@saas/pricing/components/leads/LeadDetailPage";
 import { PricingShell } from "@saas/pricing/components/shell";
@@ -24,11 +23,8 @@ export default async function LeadDetailPageRoute({
 }) {
 	const { organizationSlug, leadId } = await params;
 
-	return (
-		<Suspense fallback={null}>
-			<LeadDetailPageContent organizationSlug={organizationSlug} leadId={leadId} />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <LeadDetailPageContent organizationSlug={organizationSlug} leadId={leadId} />;
 }
 
 async function LeadDetailPageContent({ organizationSlug, leadId }: { organizationSlug: string; leadId: string }) {
