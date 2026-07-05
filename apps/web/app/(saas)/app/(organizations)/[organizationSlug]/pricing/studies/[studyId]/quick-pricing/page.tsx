@@ -3,6 +3,7 @@ import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { StudyPageShell } from "@saas/pricing/components/studies/StudyPageShell";
 import { QuickPricingPageContent } from "@saas/pricing/components/pricing-v2/QuickPricingPageContent";
+import { StudyOverviewSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 
 export default async function QuickPricingPage({
@@ -13,7 +14,7 @@ export default async function QuickPricingPage({
 	const { organizationSlug, studyId } = await params;
 
 	return (
-		<Suspense fallback={null}>
+		<Suspense fallback={<StudyOverviewSkeleton />}>
 			<QuickPricingPageContentWrapper organizationSlug={organizationSlug} studyId={studyId} />
 		</Suspense>
 	);

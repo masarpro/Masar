@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { CreateStudyPage } from "@saas/pricing/components/studies/CreateStudyPage";
@@ -19,11 +18,8 @@ export default async function NewStudyPage({
 }) {
 	const { organizationSlug } = await params;
 
-	return (
-		<Suspense fallback={null}>
-			<NewStudyPageContent organizationSlug={organizationSlug} />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <NewStudyPageContent organizationSlug={organizationSlug} />;
 }
 
 async function NewStudyPageContent({ organizationSlug }: { organizationSlug: string }) {

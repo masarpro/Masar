@@ -638,3 +638,104 @@ export function MinimalSkeleton() {
 		</div>
 	);
 }
+
+/**
+ * Skeleton for the members settings page (invite form + members table).
+ * Used by: settings/members loading.tsx and the roles/users redirect
+ * stubs that land on members — keep all three identical.
+ */
+export function MembersSettingsSkeleton() {
+	return (
+		<div className="space-y-6">
+			{/* Invite form */}
+			<div className="rounded-xl border border-border p-6 space-y-4">
+				<Skeleton className="h-5 w-36" />
+				<div className="flex gap-3">
+					<Skeleton className="h-10 flex-1 rounded-lg" />
+					<Skeleton className="h-10 w-28 rounded-lg" />
+					<Skeleton className="h-10 w-28 rounded-lg" />
+				</div>
+			</div>
+			{/* Members table */}
+			<div className="rounded-xl border border-border p-6 space-y-4">
+				<Skeleton className="h-5 w-28" />
+				<div className="flex gap-2">
+					<Skeleton className="h-9 w-20 rounded-lg" />
+					<Skeleton className="h-9 w-24 rounded-lg" />
+				</div>
+				{Array.from({ length: 5 }).map((_, i) => (
+					<div key={i} className="flex items-center justify-between py-3">
+						<div className="flex items-center gap-3">
+							<Skeleton className="h-9 w-9 rounded-full" />
+							<div className="space-y-1">
+								<Skeleton className="h-4 w-32" />
+								<Skeleton className="h-3 w-40" />
+							</div>
+						</div>
+						<div className="flex items-center gap-2">
+							<Skeleton className="h-6 w-16 rounded-full" />
+							<Skeleton className="h-8 w-8 rounded" />
+						</div>
+					</div>
+				))}
+			</div>
+		</div>
+	);
+}
+
+/**
+ * Skeleton for the notification preferences panel (grouped full-width rows
+ * with a trailing switch). Used by: settings/notifications loading.tsx and
+ * NotificationPreferencesPanel's isLoading branch — keep both identical.
+ */
+export function NotificationPreferencesSkeleton() {
+	return (
+		<div className="space-y-6">
+			{/* Header: title + mute-all switch */}
+			<div className="flex items-center justify-between">
+				<Skeleton className="h-10 w-64" />
+				<Skeleton className="h-9 w-48" />
+			</div>
+			{/* Grouped event rows */}
+			{Array.from({ length: 3 }).map((_, group) => (
+				<div key={group} className="space-y-3">
+					<Skeleton className="h-5 w-40" />
+					{Array.from({ length: 4 }).map((_, row) => (
+						<div key={row} className="flex items-center gap-3">
+							<Skeleton className="h-12 flex-1 rounded-2xl" />
+							<Skeleton className="h-6 w-11 rounded-full" />
+						</div>
+					))}
+				</div>
+			))}
+		</div>
+	);
+}
+
+/**
+ * Skeleton for the integrations settings page (provider status rows).
+ * Used by: settings/integrations loading.tsx and IntegrationsSettingsForm's
+ * isLoading branch — keep both identical.
+ */
+export function IntegrationsSkeleton() {
+	return (
+		<div className="space-y-6">
+			<div className="rounded-xl border border-border p-6 space-y-4">
+				<Skeleton className="h-5 w-36" />
+				<Skeleton className="h-4 w-full max-w-md" />
+				{Array.from({ length: 3 }).map((_, i) => (
+					<div key={i} className="flex items-center justify-between py-3">
+						<div className="flex items-center gap-3">
+							<Skeleton className="h-10 w-10 rounded-lg" />
+							<div className="space-y-1">
+								<Skeleton className="h-4 w-28" />
+								<Skeleton className="h-3 w-40" />
+							</div>
+						</div>
+						<Skeleton className="h-9 w-20 rounded-lg" />
+					</div>
+				))}
+			</div>
+		</div>
+	);
+}

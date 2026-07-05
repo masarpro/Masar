@@ -1,8 +1,9 @@
 "use client";
 
+import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@ui/components/button";
 
@@ -41,7 +42,7 @@ export function SpecificationsPageContentV2({
 	const skipQuantitiesCheck = studyType === "QUICK_PRICING" || studyType === "CUSTOM_ITEMS";
 
 	if (stagesLoading) {
-		return null;
+		return <StudyEditorSkeleton />;
 	}
 
 	if (!skipQuantitiesCheck && !isQuantitiesApproved) {

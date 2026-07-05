@@ -46,7 +46,7 @@ import {
 } from "../../lib/default-templates";
 import { TemplateThumbnail } from "./TemplateThumbnail";
 import type { OrganizationData } from "./renderer/TemplateRenderer";
-import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { CardGridSkeleton } from "@saas/shared/components/skeletons";
 
 interface TemplatesListProps {
 	organizationId: string;
@@ -228,7 +228,7 @@ export function TemplatesList({
 					</h2>
 				</div>
 
-				{isLoading ? <ListTableSkeleton /> : customTemplates.length === 0 ? (
+				{isLoading ? <CardGridSkeleton /> : customTemplates.length === 0 ? (
 					<Card className="rounded-2xl border-dashed">
 						<CardContent className="p-8 text-center">
 							<FileText className="h-10 w-10 mx-auto text-slate-300 dark:text-slate-600 mb-3" />

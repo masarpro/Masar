@@ -1,14 +1,13 @@
-import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { notFound } from "next/navigation";
-import { Skeleton } from "@ui/components/skeleton";
+import { EditorPageSkeleton } from "@saas/shared/components/skeletons";
 import dynamic from "next/dynamic";
 const TemplateCustomizer = dynamic(
 	() =>
 		import("@saas/company/components/templates/TemplateCustomizer").then((m) => ({
 			default: m.TemplateCustomizer,
 		})),
-	{ loading: () => <Skeleton className="h-96 w-full" /> },
+	{ loading: () => <EditorPageSkeleton /> },
 );
 import { getTranslations } from "next-intl/server";
 
@@ -27,13 +26,12 @@ export default async function SettingsEditTemplatePage({
 }) {
 	const { organizationSlug, templateId } = await params;
 
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
 	return (
-		<Suspense fallback={null}>
-			<SettingsEditTemplatePageContent
-				organizationSlug={organizationSlug}
-				templateId={templateId}
-			/>
-		</Suspense>
+		<SettingsEditTemplatePageContent
+			organizationSlug={organizationSlug}
+			templateId={templateId}
+		/>
 	);
 }
 

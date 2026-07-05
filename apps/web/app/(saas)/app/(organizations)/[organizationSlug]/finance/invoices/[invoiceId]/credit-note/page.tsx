@@ -1,10 +1,9 @@
 import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { FinanceShell } from "@saas/finance/components/shell";
-import { FormPageSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { CreditNoteForm } from "./CreditNoteForm";
+import { CreditNoteForm, CreditNoteSkeleton } from "./CreditNoteForm";
 
 export async function generateMetadata({
 	params,
@@ -26,7 +25,7 @@ export default async function CreditNotePage({
 	const { organizationSlug, invoiceId } = await params;
 
 	return (
-		<Suspense fallback={<FormPageSkeleton />}>
+		<Suspense fallback={<CreditNoteSkeleton />}>
 			<CreditNoteContent
 				organizationSlug={organizationSlug}
 				invoiceId={invoiceId}

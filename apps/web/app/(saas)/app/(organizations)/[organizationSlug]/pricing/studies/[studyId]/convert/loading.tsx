@@ -1,5 +1,5 @@
-import { FormPageSkeleton } from "@saas/shared/components/skeletons";
+import { StudyOverviewSkeleton } from "@saas/shared/components/skeletons";
 
 export default function Loading() {
-	return <FormPageSkeleton />;
+	return <StudyOverviewSkeleton />;
 }

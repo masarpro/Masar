@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { TemplatePreview } from "@saas/company/components/templates/TemplatePreview";
 import { notFound } from "next/navigation";
@@ -19,13 +18,12 @@ export default async function SettingsTemplatePreviewPage({
 }) {
 	const { organizationSlug, templateId } = await params;
 
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
 	return (
-		<Suspense fallback={null}>
-			<SettingsTemplatePreviewPageContent
-				organizationSlug={organizationSlug}
-				templateId={templateId}
-			/>
-		</Suspense>
+		<SettingsTemplatePreviewPageContent
+			organizationSlug={organizationSlug}
+			templateId={templateId}
+		/>
 	);
 }
 

@@ -1,15 +1,14 @@
 import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { FinanceShell } from "@saas/finance/components/shell";
-import { FormPageSkeleton } from "@saas/shared/components/skeletons";
-import { Skeleton } from "@ui/components/skeleton";
+import { EditorPageSkeleton } from "@saas/shared/components/skeletons";
 import dynamic from "next/dynamic";
 const CreateInvoiceForm = dynamic(
 	() =>
 		import("@saas/finance/components/invoices/CreateInvoiceForm").then((m) => ({
 			default: m.CreateInvoiceForm,
 		})),
-	{ loading: () => <Skeleton className="h-96 w-full" /> },
+	{ loading: () => <EditorPageSkeleton /> },
 );
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -34,7 +33,7 @@ export default async function CreateInvoicePage({
 	const { organizationSlug } = await params;
 
 	return (
-		<Suspense fallback={<FormPageSkeleton />}>
+		<Suspense fallback={<EditorPageSkeleton />}>
 			<CreateInvoiceContent organizationSlug={organizationSlug} />
 		</Suspense>
 	);

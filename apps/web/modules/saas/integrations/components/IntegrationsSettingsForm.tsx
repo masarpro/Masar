@@ -2,6 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { SettingsItem } from "@saas/shared/components/SettingsItem";
+import { IntegrationsSkeleton } from "@saas/shared/components/skeletons";
 import { useRouter } from "@shared/hooks/router";
 import { apiClient } from "@shared/lib/api-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -90,7 +91,7 @@ export function IntegrationsSettingsForm() {
 	});
 
 	if (isLoading) {
-		return <div className="animate-pulse h-48 bg-muted rounded-xl" />;
+		return <IntegrationsSkeleton />;
 	}
 
 	const providersStatus = data?.providersStatus || {

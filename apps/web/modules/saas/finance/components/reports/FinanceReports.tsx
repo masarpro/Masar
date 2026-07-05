@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Currency } from "../shared/Currency";
-import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { Skeleton } from "@ui/components/skeleton";
 
 interface FinanceReportsProps {
 	organizationId: string;
@@ -271,7 +271,7 @@ export function FinanceReports({
 						</CardHeader>
 						<CardContent>
 							{isLoadingRevenue ? (
-								<DashboardSkeleton />
+								<Skeleton className="h-64 w-full rounded-lg" />
 							) : !revenueByPeriod || revenueByPeriod.length === 0 ? (
 								<div className="text-center py-10 text-slate-500">
 									{t("finance.reports.noData")}
@@ -317,7 +317,7 @@ export function FinanceReports({
 						</CardHeader>
 						<CardContent>
 							{isLoadingProject ? (
-								<DashboardSkeleton />
+								<Skeleton className="h-64 w-full rounded-lg" />
 							) : !revenueByProject || revenueByProject.length === 0 ? (
 								<div className="text-center py-10 text-slate-500">
 									{t("finance.reports.noData")}
@@ -367,7 +367,7 @@ export function FinanceReports({
 						</CardHeader>
 						<CardContent>
 							{isLoadingClient ? (
-								<DashboardSkeleton />
+								<Skeleton className="h-64 w-full rounded-lg" />
 							) : !revenueByClient || revenueByClient.length === 0 ? (
 								<div className="text-center py-10 text-slate-500">
 									{t("finance.reports.noData")}
@@ -423,7 +423,7 @@ export function FinanceReports({
 							</CardHeader>
 							<CardContent>
 								{isLoadingQuotationStats ? (
-									<DashboardSkeleton />
+									<Skeleton className="h-64 w-full rounded-lg" />
 								) : !quotationStats || quotationStats.length === 0 ? (
 									<div className="text-center py-10 text-slate-500">
 										{t("finance.reports.noData")}
@@ -466,7 +466,7 @@ export function FinanceReports({
 							</CardHeader>
 							<CardContent>
 								{isLoadingInvoiceStats ? (
-									<DashboardSkeleton />
+									<Skeleton className="h-64 w-full rounded-lg" />
 								) : !invoiceStats || invoiceStats.length === 0 ? (
 									<div className="text-center py-10 text-slate-500">
 										{t("finance.reports.noData")}
