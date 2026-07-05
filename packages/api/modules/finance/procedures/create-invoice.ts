@@ -693,6 +693,11 @@ export const deleteInvoiceProcedure = subscriptionProcedure
 			action: "invoices",
 		});
 
+		const invoiceToDelete = await db.financeInvoice.findFirst({
+			where: { id: input.id, organizationId: input.organizationId },
+			select: { projectId: true },
+		});
+
 		await deleteInvoice(input.id, input.organizationId);
 
 		orgAuditLog({
@@ -722,6 +727,23 @@ export const deleteInvoiceProcedure = subscriptionProcedure
 				entityId: input.id,
 				metadata: { error: String(e), referenceType: "INVOICE" },
 			});
+		}
+
+		// Deleting the project's last invoice can flip it back to cash basis —
+		// payment entries crediting 1120 would leave a receivable nobody billed.
+		if (invoiceToDelete?.projectId) {
+			try {
+				const { reconcileProjectPaymentEntries } = await import(
+					"../../../lib/accounting/reconcile-project-payments"
+				);
+				await reconcileProjectPaymentEntries(db, {
+					organizationId: input.organizationId,
+					projectId: invoiceToDelete.projectId,
+					userId: context.user.id,
+				});
+			} catch (e) {
+				console.error("[AutoJournal] Failed to reconcile project payment entries after invoice delete:", e);
+			}
 		}
 
 		return { success: true };
@@ -909,6 +931,24 @@ export const issueInvoiceProcedure = subscriptionProcedure
 				entityId: issuedInvoice.id,
 				metadata: { error: String(e), referenceType: "INVOICE" },
 			});
+		}
+
+		// First invoice on a project flips it from cash-basis to billed — flip
+		// earlier payment entries from revenue (4100) to receivable (1120) so the
+		// invoice accrual doesn't double-count the same revenue.
+		if (issuedInvoice.projectId) {
+			try {
+				const { reconcileProjectPaymentEntries } = await import(
+					"../../../lib/accounting/reconcile-project-payments"
+				);
+				await reconcileProjectPaymentEntries(db, {
+					organizationId: input.organizationId,
+					projectId: issuedInvoice.projectId,
+					userId: context.user.id,
+				});
+			} catch (e) {
+				console.error("[AutoJournal] Failed to reconcile project payment entries after invoice issue:", e);
+			}
 		}
 
 		await notifyEvent({

@@ -19,5 +19,5 @@ export const backfillJournalEntriesProcedure = subscriptionProcedure
 		});
 
 		const { backfillJournalEntries } = await import("../../../lib/accounting/backfill");
-		return backfillJournalEntries(db, input.organizationId);
+		return backfillJournalEntries(db, input.organizationId, context.user.id);
 	});

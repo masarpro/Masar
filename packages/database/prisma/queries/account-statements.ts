@@ -72,7 +72,7 @@ async function getAccountLedgerWithProject(
 			where: {
 				accountId,
 				...(projectId ? { projectId } : {}),
-				journalEntry: { organizationId, status: "POSTED", date: { lt: dateFrom } },
+				journalEntry: { organizationId, status: { in: ["POSTED", "REVERSED"] }, date: { lt: dateFrom } },
 			},
 			_sum: { debit: true, credit: true },
 		});
@@ -91,7 +91,7 @@ async function getAccountLedgerWithProject(
 		...(projectId ? { projectId } : {}),
 		journalEntry: {
 			organizationId,
-			status: "POSTED" as const,
+			status: { in: ["POSTED" as const, "REVERSED" as const] },
 			...(Object.keys(dateFilter).length > 0 ? { date: dateFilter } : {}),
 		},
 	};
@@ -309,7 +309,7 @@ export async function getProjectStatementData(
 			projectId,
 			journalEntry: {
 				organizationId,
-				status: "POSTED",
+				status: { in: ["POSTED", "REVERSED"] },
 				...(Object.keys(dateFilter).length > 0 ? { date: dateFilter } : {}),
 			},
 		},

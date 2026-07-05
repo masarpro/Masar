@@ -545,7 +545,7 @@ export async function getMonthlyFinancialTrend(organizationId: string) {
 			account: { id: { in: [...cashIds] } },
 			journalEntry: {
 				organizationId,
-				status: "POSTED",
+				status: { in: ["POSTED", "REVERSED"] },
 				date: { gte: windowStart, lte: now },
 				referenceType: { not: "OPENING_BALANCE" },
 			},

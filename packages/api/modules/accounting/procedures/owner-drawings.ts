@@ -997,7 +997,7 @@ export const getCompanySummaryProcedure = protectedProcedure
 			const lines = await db.journalEntryLine.aggregate({
 				where: {
 					accountId: retainedAccount.id,
-					journalEntry: { status: "POSTED" },
+					journalEntry: { status: { in: ["POSTED", "REVERSED"] } },
 				},
 				_sum: { debit: true, credit: true },
 			});
