@@ -82,7 +82,8 @@ describe("notification event registry", () => {
 			const section = empty[event.permission.section];
 			expect(section, `${event.key}: section ${event.permission.section}`).toBeDefined();
 			expect(
-				event.permission.action in (section as Record<string, boolean>),
+				event.permission.action in
+					(section as unknown as Record<string, boolean>),
 				`${event.key}: action ${event.permission.section}.${event.permission.action}`,
 			).toBe(true);
 		}
