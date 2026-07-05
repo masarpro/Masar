@@ -164,6 +164,8 @@ export async function listNotifications(
 		channel?: NotificationChannel;
 		page?: number;
 		pageSize?: number;
+		/** فلترة بمفاتيح أحداث محددة (فلتر الوحدة في الواجهة) */
+		types?: string[];
 	},
 ) {
 	const page = options?.page ?? 1;
@@ -179,6 +181,10 @@ export async function listNotifications(
 
 	if (options?.unreadOnly) {
 		where.readAt = null;
+	}
+
+	if (options?.types && options.types.length > 0) {
+		where.type = { in: options.types };
 	}
 
 	const unreadWhere: Prisma.NotificationWhereInput = {

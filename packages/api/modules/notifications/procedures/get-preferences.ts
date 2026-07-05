@@ -1,26 +1,18 @@
-import { db } from "@repo/database";
+import {
+	NOTIFICATION_REGISTRY,
+	db,
+	resolveEventChannels,
+	type NotificationEventChannel,
+} from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
 
-// Default preferences when no record exists
-const DEFAULT_PREFERENCES = {
-	approvalRequested: ["IN_APP", "EMAIL"] as const,
-	approvalDecided: ["IN_APP"] as const,
-	documentCreated: ["IN_APP"] as const,
-	dailyReportCreated: ["IN_APP"] as const,
-	issueCreated: ["IN_APP"] as const,
-	issueCritical: ["IN_APP", "EMAIL"] as const,
-	expenseCreated: ["IN_APP"] as const,
-	claimCreated: ["IN_APP"] as const,
-	claimStatusChanged: ["IN_APP"] as const,
-	changeOrderCreated: ["IN_APP"] as const,
-	ownerMessage: ["IN_APP"] as const,
-	teamMemberAdded: ["IN_APP"] as const,
-	emailDigest: false,
-	muteAll: false,
-};
-
+/**
+ * تفضيلات الإشعارات — العقد الجديد المبني على السجل.
+ * يعيد خريطة قنوات مدموجة بالكامل (افتراضيات السجل + overrides المستخدم)
+ * لكل حدث في السجل — الواجهة لا تحسب افتراضيات أبداً.
+ */
 export const getNotificationPreferencesProcedure = protectedProcedure
 	.route({
 		method: "GET",
@@ -43,14 +35,22 @@ export const getNotificationPreferencesProcedure = protectedProcedure
 					organizationId: input.organizationId,
 				},
 			},
+			select: { muteAll: true, emailDigest: true, eventPrefs: true },
 		});
 
-		if (!prefs) {
-			return {
-				...DEFAULT_PREFERENCES,
-				id: null,
-			};
+		const eventPrefs = (prefs?.eventPrefs ?? null) as Record<
+			string,
+			NotificationEventChannel[]
+		> | null;
+
+		const events: Record<string, NotificationEventChannel[]> = {};
+		for (const def of NOTIFICATION_REGISTRY) {
+			events[def.key] = resolveEventChannels(def, eventPrefs);
 		}
 
-		return prefs;
+		return {
+			muteAll: prefs?.muteAll ?? false,
+			emailDigest: prefs?.emailDigest ?? false,
+			events,
+		};
 	});
