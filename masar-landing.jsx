@@ -375,17 +375,6 @@ export default function MasarLanding() {
         }
 
         /* ═══ BUTTONS ═══ */
-        /* Shine sweeps via transform (GPU-composited) — animating "left" forced
-           main-thread layout every frame and made the button flicker on mobile. */
-        @keyframes btnShine {
-          0%, 55% { transform: translateX(-180%) skewX(-20deg); }
-          100% { transform: translateX(320%) skewX(-20deg); }
-        }
-        @keyframes btnRainbow {
-          0% { background-position: 0% 50%; }
-          100% { background-position: 200% 50%; }
-        }
-
         .btn-premium {
           position: relative; display: inline-flex; align-items: center; gap: 12px;
           padding: 20px 44px; border: none; border-radius: 20px;
@@ -399,19 +388,10 @@ export default function MasarLanding() {
         }
         .btn-premium:active { transform: scale(0.97); }
         .btn-premium-primary {
-          background: linear-gradient(135deg, #10B981, #059669, #06B6D4);
-          background-size: 200% 200%;
-          animation: btnRainbow 8s linear infinite;
+          background: linear-gradient(135deg, #10B981, #059669);
           color: white;
-          border: 1px solid rgba(255,255,255,0.1);
-          box-shadow: 0 0 24px rgba(16,185,129,0.25), 0 0 60px rgba(16,185,129,0.08);
-        }
-        .btn-premium-primary::before {
-          content: ''; position: absolute; top: 0; left: 0; width: 60%; height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
-          transform: translateX(-180%) skewX(-20deg);
-          animation: btnShine 5s ease-in-out infinite;
-          pointer-events: none;
+          border: 1px solid rgba(255,255,255,0.12);
+          box-shadow: 0 8px 28px rgba(16,185,129,0.25);
         }
 
         .btn-premium-ghost {
