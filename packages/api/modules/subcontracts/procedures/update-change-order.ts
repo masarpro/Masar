@@ -1,4 +1,5 @@
 import { updateSubcontractChangeOrder, logAuditEvent } from "@repo/database";
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -38,7 +39,32 @@ export const updateSubcontractChangeOrderProcedure = subscriptionProcedure
 		const { organizationId, projectId, contractId, changeOrderId, ...data } =
 			input;
 
-		const co = await updateSubcontractChangeOrder(changeOrderId, data);
+		let co: Awaited<ReturnType<typeof updateSubcontractChangeOrder>>;
+		try {
+			co = await updateSubcontractChangeOrder(
+				changeOrderId,
+				contractId,
+				organizationId,
+				data,
+			);
+		} catch (error) {
+			if (error instanceof Error) {
+				if (error.message === "CHANGE_ORDER_NOT_FOUND") {
+					throw new ORPCError("NOT_FOUND", {
+						message: "أمر التغيير غير موجود",
+					});
+				}
+				if (error.message.startsWith("CEILING_BELOW_COMMITTED:")) {
+					const [, newCeiling, committed] = error.message.split(":");
+					const fmt = (v?: string) =>
+						new Intl.NumberFormat("en-US").format(Number(v ?? 0));
+					throw new ORPCError("BAD_REQUEST", {
+						message: `لا يمكن تخفيض قيمة العقد المعدّلة إلى ${fmt(newCeiling)} ريال — الالتزامات القائمة (مستخلصات معتمدة أو دفعات) تبلغ ${fmt(committed)} ريال`,
+					});
+				}
+			}
+			throw error;
+		}
 
 		logAuditEvent(organizationId, projectId, {
 			actorId: context.user.id,
