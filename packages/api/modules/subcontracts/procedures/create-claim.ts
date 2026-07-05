@@ -1,4 +1,4 @@
-import { createSubcontractClaim, getSubcontractById, logAuditEvent } from "@repo/database";
+import { createSubcontractClaim, db, getSubcontractById, logAuditEvent } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -7,6 +7,7 @@ import {
 	MAX_NAME, MAX_DESC, MAX_ID, MAX_FINANCIAL, MAX_QUANTITY, MAX_UNIT_PRICE, MAX_ARRAY,
 	idString, nullishTrimmed, coerceFinancialAmount, quantity, unitPrice,
 } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const createSubcontractClaimProcedure = subscriptionProcedure
 	.route({
@@ -94,6 +95,23 @@ export const createSubcontractClaimProcedure = subscriptionProcedure
 					grossAmount: Number(claim.grossAmount),
 				},
 			}).catch(() => {});
+
+			const project = await db.project.findFirst({
+				where: { id: input.projectId, organizationId: input.organizationId },
+				select: { name: true },
+			});
+			await notifyEvent({
+				event: "projects.subcontractClaimCreated",
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				projectId: input.projectId,
+				entity: { type: "subcontractClaim", id: claim.id },
+				data: {
+					projectName: project?.name,
+					subcontractorName: contract.name,
+					amount: `${new Intl.NumberFormat("en-US").format(Number(claim.netAmount))} ر.س`,
+				},
+			});
 
 			return {
 				...claim,

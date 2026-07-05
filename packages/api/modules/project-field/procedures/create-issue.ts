@@ -2,11 +2,7 @@ import { createIssue, getProjectById } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import {
-	getOrganizationAdmins,
-	getProjectManagers,
-	notifyIssueCreated,
-} from "../../notifications/lib/notification-service";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const createIssueProcedure = subscriptionProcedure
 	.route({
@@ -49,31 +45,22 @@ export const createIssueProcedure = subscriptionProcedure
 			assigneeId: input.assigneeId,
 		});
 
-		// Send notification for HIGH/CRITICAL issues (fire and forget)
-		if (input.severity === "HIGH" || input.severity === "CRITICAL") {
-			getProjectById(input.projectId, input.organizationId)
-				.then(async (project) => {
-					if (project) {
-						const [managers, admins] = await Promise.all([
-							getProjectManagers(input.projectId),
-							getOrganizationAdmins(input.organizationId),
-						]);
-						await notifyIssueCreated({
-							organizationId: input.organizationId,
-							projectId: input.projectId,
-							projectName: project.name,
-							issueId: issue.id,
-							issueTitle: input.title,
-							severity: input.severity,
-							creatorId: context.user.id,
-							managerIds: [...new Set([...managers, ...admins])],
-						});
-					}
-				})
-				.catch(() => {
-					// Silently ignore notification errors
-				});
-		}
+		// إشعار — الحرجة/العالية لها حدث مستقل بقنوات أقوى
+		const project = await getProjectById(input.projectId, input.organizationId);
+		await notifyEvent({
+			event:
+				input.severity === "HIGH" || input.severity === "CRITICAL"
+					? "projects.issueCritical"
+					: "projects.issueCreated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: input.projectId,
+			entity: { type: "issue", id: issue.id },
+			data: {
+				projectName: project?.name,
+				issueTitle: input.title,
+			},
+		});
 
 		return issue;
 	});

@@ -5,6 +5,7 @@ import { hasPermission } from "@repo/database/prisma/permissions";
 import { z } from "zod";
 import { verifyOrganizationAccess, requirePermission } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES & CONSTANTS
@@ -38,6 +39,14 @@ const STAGE_APPROVE_PERMISSION: Record<StageName, string> = {
 	costing: "approveCosting",
 	pricing: "editSellingPrice",
 	quotation: "generateQuotation",
+};
+
+// Stage → notification event key (quotation has no registered event)
+const STAGE_APPROVED_EVENT: Partial<Record<StageName, string>> = {
+	quantities: "pricing.quantitiesApproved",
+	specs: "pricing.specsApproved",
+	costing: "pricing.costingApproved",
+	pricing: "pricing.pricingApproved",
 };
 
 // Map old stage names → new StudyStage.stage values
@@ -232,6 +241,17 @@ export const approveStage = subscriptionProcedure
 					});
 				}
 			}
+		}
+
+		const approvedEvent = STAGE_APPROVED_EVENT[input.stage];
+		if (approvedEvent) {
+			await notifyEvent({
+				event: approvedEvent,
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				entity: { type: "study", id: input.studyId },
+				data: { studyName: study.name ?? undefined },
+			});
 		}
 
 		return {

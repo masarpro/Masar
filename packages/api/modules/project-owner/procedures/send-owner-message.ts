@@ -1,8 +1,8 @@
-import { sendOwnerPortalMessage, createNotifications } from "@repo/database";
+import { sendOwnerPortalMessage } from "@repo/database";
 import { z } from "zod";
 import { publicProcedure } from "../../../orpc/procedures";
-import { db } from "@repo/database";
 import { enforceRateLimit, RATE_LIMITS } from "../../../lib/rate-limit";
+import { notifyEvent } from "../../notifications/lib/notify";
 import { resolveOwnerContext, throwOwnerTokenError } from "../helpers";
 
 export const sendOwnerMessageProcedure = publicProcedure
@@ -42,29 +42,17 @@ export const sendOwnerMessageProcedure = publicProcedure
 			},
 		);
 
-		// Notify team members about the message
-		const teamMembers = await db.member.findMany({
-			where: {
-				organizationId: result.organizationId,
+		// Notify project manager + org admins about the message
+		await notifyEvent({
+			event: "chat.ownerMessageReceived",
+			organizationId: result.organizationId,
+			projectId: result.projectId,
+			entity: { type: "message", id: message.id },
+			data: {
+				projectName: result.project.name,
+				preview: input.content.slice(0, 80),
 			},
-			select: { userId: true },
-			take: 20,
 		});
-
-		if (teamMembers.length > 0) {
-			await createNotifications(
-				result.organizationId,
-				teamMembers.map((m) => m.userId),
-				{
-					type: "OWNER_MESSAGE",
-					title: "رسالة من مالك المشروع",
-					body: `رسالة جديدة في مشروع: ${result.project.name}`,
-					projectId: result.projectId,
-					entityType: "message",
-					entityId: message.id,
-				},
-			);
-		}
 
 		return message;
 	});

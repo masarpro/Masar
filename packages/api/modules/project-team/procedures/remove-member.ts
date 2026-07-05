@@ -1,8 +1,9 @@
 import { ORPCError } from "@orpc/server";
-import { removeProjectMember } from "@repo/database";
+import { getProjectById, removeProjectMember } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const removeMember = subscriptionProcedure
 	.route({
@@ -29,6 +30,20 @@ export const removeMember = subscriptionProcedure
 
 		try {
 			await removeProjectMember(input.projectId, input.userId);
+
+			// إشعار العضو المُزال
+			const project = await getProjectById(input.projectId, input.organizationId);
+			await notifyEvent({
+				event: "projects.teamMemberRemoved",
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				projectId: input.projectId,
+				entity: { type: "project", id: input.projectId },
+				recipients: [input.userId],
+				data: {
+					projectName: project?.name,
+				},
+			});
 
 			return {
 				success: true,

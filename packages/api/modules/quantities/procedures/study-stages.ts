@@ -5,6 +5,7 @@ import { hasPermission, type Permissions } from "@repo/database/prisma/permissio
 import { z } from "zod";
 import { verifyOrganizationAccess, requirePermission } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES & CONSTANTS
@@ -46,6 +47,14 @@ const STAGE_APPROVE_PERMISSION: Partial<Record<StageType, string>> = {
 	COSTING: "approveCosting",
 	PRICING: "editSellingPrice",
 	QUOTATION: "generateQuotation",
+};
+
+// Stage → notification event key (QUOTATION/CONVERSION have no registered event)
+const STAGE_APPROVED_EVENT: Partial<Record<StageType, string>> = {
+	QUANTITIES: "pricing.quantitiesApproved",
+	SPECIFICATIONS: "pricing.specsApproved",
+	COSTING: "pricing.costingApproved",
+	PRICING: "pricing.pricingApproved",
 };
 
 // Map new StudyStage names → old CostStudy field names
@@ -171,6 +180,7 @@ export const approveStudyStage = subscriptionProcedure
 			},
 			select: {
 				id: true,
+				name: true,
 				entryPoint: true,
 				stages: {
 					orderBy: { sortOrder: "asc" },
@@ -242,6 +252,17 @@ export const approveStudyStage = subscriptionProcedure
 			await db.costStudy.update({
 				where: { id: input.studyId },
 				data: syncData,
+			});
+		}
+
+		const approvedEvent = STAGE_APPROVED_EVENT[input.stage];
+		if (approvedEvent) {
+			await notifyEvent({
+				event: approvedEvent,
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				entity: { type: "study", id: input.studyId },
+				data: { studyName: study.name ?? undefined },
 			});
 		}
 

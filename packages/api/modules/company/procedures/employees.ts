@@ -27,11 +27,25 @@ import {
 	MAX_PHONE,
 	MAX_EMAIL,
 } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 const employeeTypeEnum = z.enum([
 	"PROJECT_MANAGER", "SITE_ENGINEER", "SUPERVISOR", "ACCOUNTANT",
 	"ADMIN", "DRIVER", "TECHNICIAN", "LABORER", "SECURITY", "OTHER",
 ]);
+
+const EMPLOYEE_TYPE_LABELS: Record<string, string> = {
+	PROJECT_MANAGER: "مدير مشروع",
+	SITE_ENGINEER: "مهندس موقع",
+	SUPERVISOR: "مشرف",
+	ACCOUNTANT: "محاسب",
+	ADMIN: "إداري",
+	DRIVER: "سائق",
+	TECHNICIAN: "فني",
+	LABORER: "عامل",
+	SECURITY: "حارس أمن",
+	OTHER: "أخرى",
+};
 const salaryTypeEnum = z.enum(["MONTHLY", "DAILY"]);
 const employeeStatusEnum = z.enum(["ACTIVE", "ON_LEAVE", "TERMINATED"]);
 
@@ -135,11 +149,24 @@ export const createEmployeeProcedure = subscriptionProcedure
 
 		const employeeNo = await generateEmployeeNo(input.organizationId);
 
-		return createEmployee({
+		const employee = await createEmployee({
 			...input,
 			employeeNo,
 			email: input.email || undefined,
 		});
+
+		await notifyEvent({
+			event: "hr.employeeAdded",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "employee", id: employee.id },
+			data: {
+				employeeName: input.name,
+				jobTitle: EMPLOYEE_TYPE_LABELS[input.type] ?? input.type,
+			},
+		});
+
+		return employee;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════

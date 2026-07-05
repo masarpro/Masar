@@ -14,6 +14,7 @@ import {
 	idString, optionalTrimmed, searchQuery,
 	positiveAmount, paginationLimit, paginationOffset,
 } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 // Enums
 const financeTransactionStatusEnum = z.enum([
@@ -167,6 +168,25 @@ export const createTransferProcedure = subscriptionProcedure
 				metadata: { error: String(e), referenceType: "TRANSFER" },
 			});
 		}
+
+		const transferAccounts = await db.organizationBank.findMany({
+			where: {
+				id: { in: [input.fromAccountId, input.toAccountId] },
+				organizationId: input.organizationId,
+			},
+			select: { id: true, name: true },
+		});
+		await notifyEvent({
+			event: "finance.transferCompleted",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "transfer", id: transfer.id },
+			data: {
+				amount: `${new Intl.NumberFormat("en-US").format(Number(transfer.amount))} ر.س`,
+				fromAccount: transferAccounts.find((a) => a.id === input.fromAccountId)?.name,
+				toAccount: transferAccounts.find((a) => a.id === input.toAccountId)?.name,
+			},
+		});
 
 		return transfer;
 	});

@@ -9,6 +9,7 @@ import { verifyProjectAccess } from "../../../lib/permissions";
 import { ORPCError } from "@orpc/server";
 import { Prisma } from "@repo/database/prisma/generated/client";
 import { idString, MAX_ARRAY } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
 import type { HandoverParty } from "./shared";
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -25,7 +26,10 @@ export const submitHandoverProtocol = subscriptionProcedure
 	.handler(async ({ input, context }) => {
 		const protocol = await db.handoverProtocol.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
-			include: { _count: { select: { items: true } } },
+			include: {
+				_count: { select: { items: true } },
+				project: { select: { name: true } },
+			},
 		});
 		if (!protocol) throw new ORPCError("NOT_FOUND", { message: "المحضر غير موجود" });
 
@@ -60,6 +64,19 @@ export const submitHandoverProtocol = subscriptionProcedure
 			metadata: { protocolNo: protocol.protocolNo },
 		});
 
+		// إشعار مديري المشروع + مسؤولي المنظمة
+		await notifyEvent({
+			event: "projects.handoverSubmitted",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: protocol.projectId,
+			entity: { type: "handover", id: protocol.id },
+			data: {
+				projectName: protocol.project?.name,
+				protocolTitle: protocol.title,
+			},
+		});
+
 		return updated;
 	});
 
@@ -83,6 +100,7 @@ export const signHandoverProtocol = subscriptionProcedure
 	.handler(async ({ input, context }) => {
 		const protocol = await db.handoverProtocol.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
+			include: { project: { select: { name: true } } },
 		});
 		if (!protocol) throw new ORPCError("NOT_FOUND", { message: "المحضر غير موجود" });
 
@@ -167,6 +185,33 @@ export const signHandoverProtocol = subscriptionProcedure
 			metadata: { partyIndex: input.partyIndex, newStatus, protocolNo: protocol.protocolNo },
 		});
 
+		// إشعار بالتوقيع + إشعار الاكتمال إذا اكتملت التوقيعات
+		await notifyEvent({
+			event: "projects.handoverSigned",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: protocol.projectId,
+			entity: { type: "handover", id: protocol.id },
+			data: {
+				projectName: protocol.project?.name,
+				protocolTitle: protocol.title,
+				signerName: parties[input.partyIndex].name,
+			},
+		});
+		if (allSigned) {
+			await notifyEvent({
+				event: "projects.handoverCompleted",
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				projectId: protocol.projectId,
+				entity: { type: "handover", id: protocol.id },
+				data: {
+					projectName: protocol.project?.name,
+					protocolTitle: protocol.title,
+				},
+			});
+		}
+
 		return updated;
 	});
 
@@ -184,6 +229,7 @@ export const completeHandoverProtocol = subscriptionProcedure
 	.handler(async ({ input, context }) => {
 		const protocol = await db.handoverProtocol.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
+			include: { project: { select: { name: true } } },
 		});
 		if (!protocol) throw new ORPCError("NOT_FOUND", { message: "المحضر غير موجود" });
 
@@ -247,6 +293,19 @@ export const completeHandoverProtocol = subscriptionProcedure
 			entityType: "handover_protocol",
 			entityId: input.id,
 			metadata: { protocolNo: protocol.protocolNo },
+		});
+
+		// إشعار مديري المشروع + مسؤولي المنظمة بالاكتمال
+		await notifyEvent({
+			event: "projects.handoverCompleted",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: protocol.projectId,
+			entity: { type: "handover", id: protocol.id },
+			data: {
+				projectName: protocol.project?.name,
+				protocolTitle: protocol.title,
+			},
 		});
 
 		return updated;

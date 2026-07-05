@@ -3,6 +3,7 @@ import { toggleUserActive as toggleUserActiveQuery } from "@repo/database";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const toggleUserActive = subscriptionProcedure
 	.route({
@@ -29,6 +30,16 @@ export const toggleUserActive = subscriptionProcedure
 				input.id,
 				input.organizationId,
 			);
+
+			if (!user.isActive) {
+				await notifyEvent({
+					event: "org.userDeactivated",
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					entity: { type: "user", id: user.id },
+					data: { userName: user.name },
+				});
+			}
 
 			return { user };
 		} catch (error) {

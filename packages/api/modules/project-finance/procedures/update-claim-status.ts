@@ -3,8 +3,16 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import { notifyClaimStatusChanged } from "../../notifications/lib/notification-service";
+import { notifyEvent } from "../../notifications/lib/notify";
 import { idString } from "../../../lib/validation-constants";
+
+const CLAIM_STATUS_LABELS: Record<string, string> = {
+	DRAFT: "مسودة",
+	SUBMITTED: "مقدم",
+	APPROVED: "معتمد",
+	PAID: "مدفوع",
+	REJECTED: "مرفوض",
+};
 
 export const updateClaimStatusProcedure = subscriptionProcedure
 	.route({
@@ -119,28 +127,24 @@ export const updateClaimStatusProcedure = subscriptionProcedure
 			}
 		}
 
-		// Notify claim creator about status change (fire and forget)
-		if (existingClaim && existingClaim.createdById !== context.user.id) {
-			getProjectById(input.projectId, input.organizationId)
-				.then((project) => {
-					if (project) {
-						notifyClaimStatusChanged({
-							organizationId: input.organizationId,
-							projectId: input.projectId,
-							projectName: project.name,
-							claimId: input.claimId,
-							claimNo: existingClaim.claimNo,
-							newStatus: input.status,
-							actorId: context.user.id,
-							creatorId: existingClaim.createdById,
-						}).catch(() => {
-							// Silently ignore notification errors
-						});
-					}
-				})
-				.catch(() => {
-					// Silently ignore errors
-				});
+		// Notify claim creator about status change
+		if (existingClaim) {
+			const project = await getProjectById(input.projectId, input.organizationId);
+			await notifyEvent({
+				event: "projects.claimStatusChanged",
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				projectId: input.projectId,
+				entity: { type: "claim", id: input.claimId },
+				recipients: existingClaim.createdById
+					? [existingClaim.createdById]
+					: [],
+				data: {
+					projectName: project?.name,
+					claimNo: existingClaim.claimNo,
+					status: CLAIM_STATUS_LABELS[input.status] ?? input.status,
+				},
+			});
 		}
 
 		return {

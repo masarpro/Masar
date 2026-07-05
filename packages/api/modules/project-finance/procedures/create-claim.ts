@@ -3,11 +3,7 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import {
-	notifyClaimCreated,
-	getProjectAccountants,
-	getProjectManagers,
-} from "../../notifications/lib/notification-service";
+import { notifyEvent } from "../../notifications/lib/notify";
 import { idString, positiveAmount, MAX_DESC } from "../../../lib/validation-constants";
 
 export const createClaim = subscriptionProcedure
@@ -37,8 +33,9 @@ export const createClaim = subscriptionProcedure
 			{ section: "finance", action: "payments" },
 		);
 
+		let claim: Awaited<ReturnType<typeof createProjectClaim>>;
 		try {
-			const claim = await createProjectClaim({
+			claim = await createProjectClaim({
 				organizationId: input.organizationId,
 				projectId: input.projectId,
 				createdById: context.user.id,
@@ -48,41 +45,6 @@ export const createClaim = subscriptionProcedure
 				dueDate: input.dueDate,
 				note: input.note,
 			});
-
-			// Notify accountants and managers about new claim (fire and forget)
-			getProjectById(input.projectId, input.organizationId)
-				.then(async (project) => {
-					if (project) {
-						const [accountantIds, managerIds] = await Promise.all([
-							getProjectAccountants(input.projectId),
-							getProjectManagers(input.projectId),
-						]);
-						const recipientIds = [...new Set([...accountantIds, ...managerIds])];
-
-						if (recipientIds.length > 0) {
-							notifyClaimCreated({
-								organizationId: input.organizationId,
-								projectId: input.projectId,
-								projectName: project.name,
-								claimId: claim.id,
-								claimNo: claim.claimNo,
-								amount: input.amount.toLocaleString("en-US"),
-								creatorId: context.user.id,
-								recipientIds,
-							}).catch(() => {
-								// Silently ignore notification errors
-							});
-						}
-					}
-				})
-				.catch(() => {
-					// Silently ignore errors
-				});
-
-			return {
-				...claim,
-				amount: Number(claim.amount),
-			};
 		} catch (error) {
 			if (error instanceof Error) {
 				if (error.message === "CLAIMS_EXCEED_CONTRACT_VALUE") {
@@ -93,4 +55,23 @@ export const createClaim = subscriptionProcedure
 			}
 			throw error;
 		}
+
+		const project = await getProjectById(input.projectId, input.organizationId);
+		await notifyEvent({
+			event: "projects.claimCreated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: input.projectId,
+			entity: { type: "claim", id: claim.id },
+			data: {
+				projectName: project?.name,
+				claimNo: claim.claimNo,
+				amount: `${new Intl.NumberFormat("en-US").format(Number(claim.amount))} ر.س`,
+			},
+		});
+
+		return {
+			...claim,
+			amount: Number(claim.amount),
+		};
 	});

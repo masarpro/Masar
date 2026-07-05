@@ -1,8 +1,9 @@
-import { createProjectPayment } from "@repo/database";
+import { createProjectPayment, db } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { emitProjectPaymentCreated } from "../lib/payment-side-effects";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const createProjectPaymentProcedure = subscriptionProcedure
 	.route({
@@ -59,6 +60,22 @@ export const createProjectPaymentProcedure = subscriptionProcedure
 			destinationAccountId: input.destinationAccountId,
 			description: input.description,
 			userId: context.user.id,
+		});
+
+		const project = await db.project.findFirst({
+			where: { id: input.projectId, organizationId: input.organizationId },
+			select: { name: true },
+		});
+		await notifyEvent({
+			event: "projects.paymentReceived",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: input.projectId,
+			entity: { type: "projectPayment", id: primary.id },
+			data: {
+				projectName: project?.name,
+				amount: `${new Intl.NumberFormat("en-US").format(Number(input.amount))} ر.س`,
+			},
 		});
 
 		return { ...primary, amount: Number(primary.amount), splitCount };

@@ -22,6 +22,7 @@ import {
 	positiveAmount, paginationLimit, paginationOffset,
 } from "../../../lib/validation-constants";
 import { ensureCategoriesSeeded } from "../../../lib/categories/ensure-categories-seeded";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 // Enums
 const orgExpenseCategoryEnum = z.enum([
@@ -243,7 +244,7 @@ export const createExpenseProcedure = subscriptionProcedure
 				group: "EXPENSE",
 				OR: [{ id: input.categoryId }, { systemId: input.categoryId }],
 			},
-			select: { id: true, accountCode: true, isVatExempt: true },
+			select: { id: true, accountCode: true, isVatExempt: true, nameAr: true },
 		});
 		if (!dbCategory) {
 			throw new ORPCError("BAD_REQUEST", {
@@ -371,6 +372,17 @@ export const createExpenseProcedure = subscriptionProcedure
 				console.error("[PaymentVoucher] Failed to create auto voucher from expense:", e);
 			}
 		}
+
+		await notifyEvent({
+			event: "finance.expenseCreated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "expense", id: expense.id },
+			data: {
+				amount: `${new Intl.NumberFormat("en-US").format(Number(expense.amount))} ر.س`,
+				category: dbCategory.nameAr,
+			},
+		});
 
 		return expense;
 	});

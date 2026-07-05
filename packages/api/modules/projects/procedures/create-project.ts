@@ -4,6 +4,7 @@ import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
+import { notifyEvent } from "../../notifications/lib/notify";
 import {
 	idString,
 	trimmedString,
@@ -150,6 +151,14 @@ export const createProjectProcedure = subscriptionProcedure
 			entityType: "project",
 			entityId: project.id,
 			metadata: { name: input.name },
+		});
+
+		await notifyEvent({
+			event: "projects.projectCreated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "project", id: project.id },
+			data: { projectName: input.name },
 		});
 
 		return {

@@ -22,6 +22,7 @@ import {
 	paginationOffset,
 	MAX_DESC,
 } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 const payrollRunStatusEnum = z.enum([
 	"DRAFT",
@@ -234,6 +235,17 @@ export const approvePayrollRunProcedure = subscriptionProcedure
 				metadata: { error: String(e), referenceType: "PAYROLL" },
 			});
 		}
+
+		await notifyEvent({
+			event: "hr.payrollApproved",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "payrollRun", id: input.id },
+			data: {
+				period: `${payrollRun.month}/${payrollRun.year}`,
+				amount: `${new Intl.NumberFormat("en-US").format(Number(payrollRun.totalNetSalary))} ر.س`,
+			},
+		});
 
 		return payrollRun;
 	});

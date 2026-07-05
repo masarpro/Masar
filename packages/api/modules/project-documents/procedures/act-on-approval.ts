@@ -1,13 +1,14 @@
 import { ORPCError } from "@orpc/server";
 import {
 	actOnApproval,
-	createNotification,
+	getProjectById,
 	logAuditEvent,
 	getApproval,
 } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const actOnApprovalProcedure = subscriptionProcedure
 	.route({
@@ -87,15 +88,20 @@ export const actOnApprovalProcedure = subscriptionProcedure
 			},
 		});
 
-		// Notify the requester about the decision
-		const decisionText = input.decision === "APPROVED" ? "اعتماد" : "رفض";
-		await createNotification(input.organizationId, approval.requestedById, {
-			type: "APPROVAL_DECIDED",
-			title: `قرار اعتماد: ${decisionText}`,
-			body: `تم ${decisionText} طلب الاعتماد على وثيقة: ${approval.document.title}`,
+		// إشعار صاحب الطلب بالقرار
+		const project = await getProjectById(input.projectId, input.organizationId);
+		await notifyEvent({
+			event: "documents.approvalDecided",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
 			projectId: input.projectId,
-			entityType: "approval",
-			entityId: input.approvalId,
+			entity: { type: "approval", id: input.approvalId },
+			recipients: [approval.requestedById],
+			data: {
+				projectName: project?.name,
+				documentTitle: approval.document.title,
+				decision: input.decision === "APPROVED" ? "تمت الموافقة" : "تم الرفض",
+			},
 		});
 
 		return updatedApproval;

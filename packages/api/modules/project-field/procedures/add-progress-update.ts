@@ -1,7 +1,8 @@
-import { addProgressUpdate } from "@repo/database";
+import { addProgressUpdate, getProjectById } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const addProgressUpdateProcedure = subscriptionProcedure
 	.route({
@@ -35,6 +36,20 @@ export const addProgressUpdateProcedure = subscriptionProcedure
 			progress: input.progress,
 			phaseLabel: input.phaseLabel,
 			note: input.note,
+		});
+
+		// إشعار مديري المشروع + مسؤولي المنظمة
+		const project = await getProjectById(input.projectId, input.organizationId);
+		await notifyEvent({
+			event: "projects.progressUpdated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: input.projectId,
+			entity: { type: "progressUpdate", id: update.id },
+			data: {
+				projectName: project?.name,
+				progress: input.progress,
+			},
 		});
 
 		return update;

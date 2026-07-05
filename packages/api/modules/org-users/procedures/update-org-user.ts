@@ -1,11 +1,12 @@
 import { ORPCError } from "@orpc/server";
-import { updateOrgUser as updateOrgUserQuery } from "@repo/database";
+import { db, updateOrgUser as updateOrgUserQuery } from "@repo/database";
 import { z } from "zod";
 import {
 	invalidateAccessCache,
 	verifyOrganizationAccess,
 } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
+import { notifyEvent } from "../../notifications/lib/notify";
 import { assertOrgUserUpdateAllowed } from "../lib/update-guards";
 
 export const updateOrgUser = subscriptionProcedure
@@ -44,6 +45,16 @@ export const updateOrgUser = subscriptionProcedure
 			customPermissions: input.customPermissions,
 		});
 
+		// الدور السابق — لإطلاق إشعار تغيير الدور فقط عند تغيّره فعلياً
+		const previousRoleId = input.organizationRoleId
+			? (
+					await db.user.findFirst({
+						where: { id: input.id, organizationId: input.organizationId },
+						select: { organizationRoleId: true },
+					})
+				)?.organizationRoleId
+			: undefined;
+
 		try {
 			const user = await updateOrgUserQuery(
 				input.id,
@@ -60,6 +71,24 @@ export const updateOrgUser = subscriptionProcedure
 			// Role / isActive / customPermissions change → drop this user's cached
 			// membership + permissions so it takes effect on the next request.
 			invalidateAccessCache(input.organizationId, input.id);
+
+			if (
+				input.organizationRoleId &&
+				previousRoleId !== input.organizationRoleId
+			) {
+				const newRole = await db.role.findUnique({
+					where: { id: input.organizationRoleId },
+					select: { name: true },
+				});
+				await notifyEvent({
+					event: "org.userRoleChanged",
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					entity: { type: "user", id: input.id },
+					recipients: [input.id],
+					data: { roleName: newRole?.name },
+				});
+			}
 
 			return { user };
 		} catch (error) {

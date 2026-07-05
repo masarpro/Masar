@@ -1,4 +1,4 @@
-import { createSubcontractChangeOrder, getSubcontractById, logAuditEvent } from "@repo/database";
+import { createSubcontractChangeOrder, db, getSubcontractById, logAuditEvent } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
@@ -7,6 +7,7 @@ import {
 	MAX_DESC, MAX_ID, MAX_URL,
 	idString, nullishTrimmed, signedAmount,
 } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const createSubcontractChangeOrderProcedure = subscriptionProcedure
 	.route({
@@ -64,6 +65,23 @@ export const createSubcontractChangeOrderProcedure = subscriptionProcedure
 			entityId: co.id,
 			metadata: { contractId: input.contractId, amount: input.amount },
 		}).catch(() => {});
+
+		const project = await db.project.findFirst({
+			where: { id: input.projectId, organizationId: input.organizationId },
+			select: { name: true },
+		});
+		await notifyEvent({
+			event: "projects.subcontractChangeOrderCreated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: input.projectId,
+			entity: { type: "subcontractChangeOrder", id: co.id },
+			data: {
+				projectName: project?.name,
+				subcontractorName: contract.name,
+				amount: `${new Intl.NumberFormat("en-US").format(Number(co.amount))} ر.س`,
+			},
+		});
 
 		return { ...co, amount: Number(co.amount) };
 	});

@@ -1,7 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import {
 	createApprovalRequest,
-	createNotifications,
+	getProjectById,
 	logAuditEvent,
 	getDocument,
 	db,
@@ -9,6 +9,7 @@ import {
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const createApprovalRequestProcedure = subscriptionProcedure
 	.route({
@@ -104,14 +105,19 @@ export const createApprovalRequestProcedure = subscriptionProcedure
 			},
 		});
 
-		// Create notifications for approvers
-		await createNotifications(input.organizationId, validApproverIds, {
-			type: "APPROVAL_REQUESTED",
-			title: "طلب اعتماد جديد",
-			body: `تم طلب اعتمادك على وثيقة: ${document.title}`,
+		// إشعار المعتمدين المحددين
+		const project = await getProjectById(input.projectId, input.organizationId);
+		await notifyEvent({
+			event: "documents.approvalRequested",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
 			projectId: input.projectId,
-			entityType: "approval",
-			entityId: approval.id,
+			entity: { type: "approval", id: approval.id },
+			recipients: validApproverIds,
+			data: {
+				projectName: project?.name,
+				documentTitle: document.title,
+			},
 		});
 
 		return approval;

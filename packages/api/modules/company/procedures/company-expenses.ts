@@ -26,12 +26,28 @@ import {
 	MAX_DESC,
 	MAX_CODE,
 } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 const expenseCategoryEnum = z.enum([
 	"RENT", "UTILITIES", "COMMUNICATIONS", "INSURANCE", "LICENSES",
 	"SUBSCRIPTIONS", "MAINTENANCE", "BANK_FEES", "MARKETING",
 	"TRANSPORT", "HOSPITALITY", "OTHER",
 ]);
+
+const COMPANY_EXPENSE_CATEGORY_LABELS: Record<string, string> = {
+	RENT: "إيجارات",
+	UTILITIES: "خدمات (كهرباء/ماء)",
+	COMMUNICATIONS: "اتصالات",
+	INSURANCE: "تأمين",
+	LICENSES: "تراخيص",
+	SUBSCRIPTIONS: "اشتراكات",
+	MAINTENANCE: "صيانة",
+	BANK_FEES: "رسوم بنكية",
+	MARKETING: "تسويق",
+	TRANSPORT: "نقل ومواصلات",
+	HOSPITALITY: "ضيافة",
+	OTHER: "أخرى",
+};
 const recurrenceTypeEnum = z.enum(["MONTHLY", "QUARTERLY", "SEMI_ANNUAL", "ANNUAL", "ONE_TIME"]);
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -130,7 +146,20 @@ export const createCompanyExpenseProcedure = subscriptionProcedure
 			action: "expenses",
 		});
 
-		return createCompanyExpense(input);
+		const companyExpense = await createCompanyExpense(input);
+
+		await notifyEvent({
+			event: "hr.companyExpenseCreated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "companyExpense", id: companyExpense.id },
+			data: {
+				amount: `${new Intl.NumberFormat("en-US").format(Number(input.amount))} ر.س`,
+				category: COMPANY_EXPENSE_CATEGORY_LABELS[input.category] ?? input.category,
+			},
+		});
+
+		return companyExpense;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════

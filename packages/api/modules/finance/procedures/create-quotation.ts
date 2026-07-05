@@ -18,6 +18,16 @@ import {
 	idString, optionalTrimmed,
 	percentage, quantity, unitPrice,
 } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
+
+const QUOTATION_STATUS_LABELS: Record<string, string> = {
+	DRAFT: "مسودة",
+	SENT: "مُرسل",
+	VIEWED: "تمت المشاهدة",
+	ACCEPTED: "مقبول",
+	REJECTED: "مرفوض",
+	EXPIRED: "منتهي الصلاحية",
+};
 
 const quotationItemSchema = z.object({
 	description: z.string().trim().min(1, "وصف البند مطلوب").max(MAX_DESC),
@@ -100,6 +110,18 @@ export const createQuotationProcedure = subscriptionProcedure
 			entityType: "quotation",
 			entityId: quotation.id,
 			metadata: { clientName: input.clientName, totalAmount: Number(quotation.totalAmount) },
+		});
+
+		await notifyEvent({
+			event: "finance.quotationCreated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "quotation", id: quotation.id },
+			data: {
+				quotationNo: quotation.quotationNo,
+				clientName: input.clientName,
+				amount: `${new Intl.NumberFormat("en-US").format(Number(quotation.totalAmount))} ر.س`,
+			},
 		});
 
 		return {
@@ -312,6 +334,17 @@ export const updateQuotationStatusProcedure = subscriptionProcedure
 			entityType: "quotation",
 			entityId: input.id,
 			metadata: { newStatus: input.status },
+		});
+
+		await notifyEvent({
+			event: "finance.quotationStatusChanged",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "quotation", id: input.id },
+			data: {
+				quotationNo: quotation.quotationNo,
+				status: QUOTATION_STATUS_LABELS[input.status] ?? input.status,
+			},
 		});
 
 		return quotation;

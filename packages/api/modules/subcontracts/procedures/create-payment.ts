@@ -7,6 +7,7 @@ import {
 	MAX_DESC, MAX_CODE,
 	idString, nullishTrimmed, positiveAmount,
 } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const createSubcontractPaymentProcedure = subscriptionProcedure
 	.route({
@@ -132,6 +133,23 @@ export const createSubcontractPaymentProcedure = subscriptionProcedure
 		} catch (e) {
 			console.error("[PaymentVoucher] Failed to create auto voucher from subcontract payment:", e);
 		}
+
+		const project = await db.project.findFirst({
+			where: { id: input.projectId, organizationId: input.organizationId },
+			select: { name: true },
+		});
+		await notifyEvent({
+			event: "projects.subcontractPaymentCreated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: input.projectId,
+			entity: { type: "subcontractPayment", id: payment.id },
+			data: {
+				projectName: project?.name,
+				subcontractorName: contract.name,
+				amount: `${new Intl.NumberFormat("en-US").format(Number(payment.amount))} ر.س`,
+			},
+		});
 
 		return { ...payment, amount: Number(payment.amount) };
 	});

@@ -4,6 +4,18 @@ import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
 import { MAX_DESC, idString, optionalTrimmed } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
+
+const SUBCONTRACT_CLAIM_STATUS_LABELS: Record<string, string> = {
+	DRAFT: "مسودة",
+	SUBMITTED: "مقدم",
+	UNDER_REVIEW: "قيد المراجعة",
+	APPROVED: "معتمد",
+	PARTIALLY_PAID: "مدفوع جزئياً",
+	PAID: "مدفوع",
+	REJECTED: "مرفوض",
+	CANCELLED: "ملغي",
+};
 
 export const updateSubcontractClaimStatusProcedure = subscriptionProcedure
 	.route({
@@ -107,6 +119,32 @@ export const updateSubcontractClaimStatusProcedure = subscriptionProcedure
 					});
 				}
 			}
+
+			const claimMeta = await db.subcontractClaim.findUnique({
+				where: { id: input.claimId },
+				select: {
+					createdById: true,
+					contract: {
+						select: {
+							name: true,
+							project: { select: { name: true } },
+						},
+					},
+				},
+			});
+			await notifyEvent({
+				event: "projects.subcontractClaimStatusChanged",
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				projectId: input.projectId,
+				entity: { type: "subcontractClaim", id: input.claimId },
+				recipients: claimMeta?.createdById ? [claimMeta.createdById] : [],
+				data: {
+					projectName: claimMeta?.contract?.project?.name,
+					subcontractorName: claimMeta?.contract?.name,
+					status: SUBCONTRACT_CLAIM_STATUS_LABELS[input.status] ?? input.status,
+				},
+			});
 
 			return {
 				...claim,

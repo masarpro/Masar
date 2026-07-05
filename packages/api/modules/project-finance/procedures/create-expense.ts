@@ -2,8 +2,17 @@ import { createProjectExpense, getProjectById } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import { notifyExpenseCreated, getProjectAccountants } from "../../notifications/lib/notification-service";
+import { notifyEvent } from "../../notifications/lib/notify";
 import { idString, positiveAmount, optionalTrimmed, MAX_NAME, MAX_DESC, MAX_URL } from "../../../lib/validation-constants";
+
+const EXPENSE_CATEGORY_LABELS: Record<string, string> = {
+	MATERIALS: "مواد",
+	LABOR: "عمالة",
+	EQUIPMENT: "معدات",
+	SUBCONTRACTOR: "مقاول باطن",
+	TRANSPORT: "نقل",
+	MISC: "متنوعة",
+};
 
 export const createExpense = subscriptionProcedure
 	.route({
@@ -54,30 +63,19 @@ export const createExpense = subscriptionProcedure
 			subcontractContractId: input.subcontractContractId,
 		});
 
-		// Notify project accountants (fire and forget)
-		getProjectById(input.projectId, input.organizationId)
-			.then(async (project) => {
-				if (project) {
-					const accountantIds = await getProjectAccountants(input.projectId);
-					if (accountantIds.length > 0) {
-						notifyExpenseCreated({
-							organizationId: input.organizationId,
-							projectId: input.projectId,
-							projectName: project.name,
-							expenseId: expense.id,
-							amount: input.amount.toLocaleString("en-US"),
-							category: input.category,
-							creatorId: context.user.id,
-							accountantIds,
-						}).catch(() => {
-							// Silently ignore notification errors
-						});
-					}
-				}
-			})
-			.catch(() => {
-				// Silently ignore errors
-			});
+		const project = await getProjectById(input.projectId, input.organizationId);
+		await notifyEvent({
+			event: "projects.expenseCreated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: input.projectId,
+			entity: { type: "expense", id: expense.id },
+			data: {
+				projectName: project?.name,
+				amount: `${new Intl.NumberFormat("en-US").format(Number(expense.amount))} ر.س`,
+				category: EXPENSE_CATEGORY_LABELS[input.category] ?? input.category,
+			},
+		});
 
 		return {
 			...expense,

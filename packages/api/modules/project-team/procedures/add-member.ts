@@ -3,7 +3,15 @@ import { addProjectMember, getProjectById } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import { notifyTeamMemberAdded } from "../../notifications/lib/notification-service";
+import { notifyEvent } from "../../notifications/lib/notify";
+
+const ROLE_LABELS: Record<string, string> = {
+	MANAGER: "مدير المشروع",
+	ENGINEER: "مهندس",
+	SUPERVISOR: "مشرف ميداني",
+	ACCOUNTANT: "محاسب المشروع",
+	VIEWER: "مشاهد",
+};
 
 export const addMember = subscriptionProcedure
 	.route({
@@ -38,25 +46,20 @@ export const addMember = subscriptionProcedure
 				assignedById: context.user.id,
 			});
 
-			// Notify the added user (fire and forget)
-			getProjectById(input.projectId, input.organizationId)
-				.then((project) => {
-					if (project) {
-						notifyTeamMemberAdded({
-							organizationId: input.organizationId,
-							projectId: input.projectId,
-							projectName: project.name,
-							addedUserId: input.userId,
-							role: input.role,
-							addedById: context.user.id,
-						}).catch(() => {
-							// Silently ignore notification errors
-						});
-					}
-				})
-				.catch(() => {
-					// Silently ignore errors
-				});
+			// إشعار العضو المُضاف
+			const project = await getProjectById(input.projectId, input.organizationId);
+			await notifyEvent({
+				event: "projects.teamMemberAdded",
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				projectId: input.projectId,
+				entity: { type: "project", id: input.projectId },
+				recipients: [input.userId],
+				data: {
+					projectName: project?.name,
+					role: ROLE_LABELS[input.role] ?? input.role,
+				},
+			});
 
 			return { member };
 		} catch (error) {

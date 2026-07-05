@@ -31,6 +31,10 @@ import {
 	onOwnerDrawing,
 	onOwnerDrawingCancelled,
 } from "../../../lib/accounting/auto-journal";
+import { notifyEvent } from "../../notifications/lib/notify";
+
+const formatAmount = (x: unknown) =>
+	`${new Intl.NumberFormat("en-US").format(Number(x))} ر.س`;
 
 // ═══ Shared enums ═══
 const drawingStatusEnum = z.enum(["APPROVED", "CANCELLED"]);
@@ -627,6 +631,17 @@ export const createDrawingProcedure = subscriptionProcedure
 			});
 		}
 
+		await notifyEvent({
+			event: "finance.ownerDrawingCreated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "ownerDrawing", id: drawing.id },
+			data: {
+				amount: formatAmount(drawing.amount),
+				ownerName: owner.name,
+			},
+		});
+
 		return {
 			...drawing,
 			amount: Number(drawing.amount),
@@ -671,6 +686,7 @@ export const cancelDrawingProcedure = subscriptionProcedure
 				amount: true,
 				bankAccountId: true,
 				journalEntryId: true,
+				createdById: true,
 			},
 		});
 
@@ -743,6 +759,20 @@ export const cancelDrawingProcedure = subscriptionProcedure
 				amount: Number(drawing.amount),
 			},
 		});
+
+		if (drawing.createdById) {
+			await notifyEvent({
+				event: "finance.ownerDrawingDecided",
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				entity: { type: "ownerDrawing", id: input.id },
+				recipients: [drawing.createdById],
+				data: {
+					decision: "تم إلغاء",
+					amount: formatAmount(drawing.amount),
+				},
+			});
+		}
 
 		return { success: true };
 	});

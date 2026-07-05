@@ -5,13 +5,13 @@ import {
 	rejectChangeOrder,
 	markImplemented,
 	getChangeOrder,
-	createNotification,
+	getProjectById,
 	logAuditEvent,
-	getOrganizationAdminUserIds,
 } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 /**
  * Submit a change order for approval (DRAFT -> SUBMITTED)
@@ -58,21 +58,19 @@ export const submitChangeOrderProcedure = subscriptionProcedure
 				},
 			});
 
-			// Notify org admins/managers about new submission
-			const adminUserIds = await getOrganizationAdminUserIds(input.organizationId);
-
-			for (const adminUserId of adminUserIds) {
-				if (adminUserId !== context.user.id) {
-					await createNotification(input.organizationId, adminUserId, {
-						type: "APPROVAL_REQUESTED",
-						title: "طلب اعتماد أمر تغيير",
-						body: `تم تقديم أمر تغيير جديد: ${changeOrder.title}`,
-						projectId: input.projectId,
-						entityType: "change_order",
-						entityId: changeOrder.id,
-					});
-				}
-			}
+			// إشعار مسؤولي المنظمة بالتقديم (الجمهور يُحل من السجل)
+			const project = await getProjectById(input.projectId, input.organizationId);
+			await notifyEvent({
+				event: "projects.changeOrderSubmitted",
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				projectId: input.projectId,
+				entity: { type: "changeOrder", id: changeOrder.id },
+				data: {
+					projectName: project?.name,
+					coNo: changeOrder.coNo,
+				},
+			});
 
 			return changeOrder;
 		} catch (error) {
@@ -149,14 +147,20 @@ export const approveChangeOrderProcedure = subscriptionProcedure
 				},
 			});
 
-			// Notify the requester
-			await createNotification(input.organizationId, existing.requestedById, {
-				type: "APPROVAL_DECIDED",
-				title: "تم اعتماد أمر التغيير",
-				body: `تم اعتماد أمر التغيير: ${changeOrder.title}`,
+			// إشعار صاحب الطلب بالقرار
+			const project = await getProjectById(input.projectId, input.organizationId);
+			await notifyEvent({
+				event: "projects.changeOrderDecided",
+				organizationId: input.organizationId,
+				actorId: context.user.id,
 				projectId: input.projectId,
-				entityType: "change_order",
-				entityId: changeOrder.id,
+				entity: { type: "changeOrder", id: changeOrder.id },
+				recipients: [existing.requestedById],
+				data: {
+					projectName: project?.name,
+					coNo: changeOrder.coNo,
+					decision: "تمت الموافقة على",
+				},
 			});
 
 			return changeOrder;
@@ -233,14 +237,20 @@ export const rejectChangeOrderProcedure = subscriptionProcedure
 				},
 			});
 
-			// Notify the requester
-			await createNotification(input.organizationId, existing.requestedById, {
-				type: "APPROVAL_DECIDED",
-				title: "تم رفض أمر التغيير",
-				body: `تم رفض أمر التغيير: ${changeOrder.title}`,
+			// إشعار صاحب الطلب بالقرار
+			const project = await getProjectById(input.projectId, input.organizationId);
+			await notifyEvent({
+				event: "projects.changeOrderDecided",
+				organizationId: input.organizationId,
+				actorId: context.user.id,
 				projectId: input.projectId,
-				entityType: "change_order",
-				entityId: changeOrder.id,
+				entity: { type: "changeOrder", id: changeOrder.id },
+				recipients: [existing.requestedById],
+				data: {
+					projectName: project?.name,
+					coNo: changeOrder.coNo,
+					decision: "تم رفض",
+				},
 			});
 
 			return changeOrder;
@@ -302,6 +312,20 @@ export const markImplementedProcedure = subscriptionProcedure
 					title: changeOrder.title,
 					costImpact: changeOrder.costImpact?.toString(),
 					timeImpactDays: changeOrder.timeImpactDays,
+				},
+			});
+
+			// إشعار مديري المشروع + مسؤولي المنظمة بالتنفيذ
+			const project = await getProjectById(input.projectId, input.organizationId);
+			await notifyEvent({
+				event: "projects.changeOrderImplemented",
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				projectId: input.projectId,
+				entity: { type: "changeOrder", id: changeOrder.id },
+				data: {
+					projectName: project?.name,
+					coNo: changeOrder.coNo,
 				},
 			});
 

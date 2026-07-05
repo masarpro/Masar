@@ -8,6 +8,7 @@ import {
 	MAX_NAME, MAX_DESC, MAX_CODE, MAX_PHONE, MAX_ADDRESS,
 	idString, optionalTrimmed,
 } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 // نوع العميل
 const clientTypeEnum = z.enum(["INDIVIDUAL", "COMMERCIAL"]);
@@ -103,6 +104,16 @@ export const createClientProcedure = subscriptionProcedure
 			taxNumber: input.taxNumber,
 			crNumber: input.crNumber,
 			notes: input.notes,
+		});
+
+		await notifyEvent({
+			event: "finance.clientCreated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "client", id: client.id },
+			data: {
+				clientName: input.name,
+			},
 		});
 
 		return client;

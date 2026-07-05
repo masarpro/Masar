@@ -15,6 +15,7 @@ import {
 	idString, optionalTrimmed, nullishTrimmed, searchQuery,
 	positiveAmount, paginationLimit, paginationOffset,
 } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 // ═══ Shared enums ═══
 const paymentMethodEnum = z.enum([
@@ -355,7 +356,7 @@ export const submitPaymentVoucher = subscriptionProcedure
 
 		const voucher = await db.paymentVoucher.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
-			select: { id: true, status: true, voucherNo: true },
+			select: { id: true, status: true, voucherNo: true, amount: true },
 		});
 
 		if (!voucher) {
@@ -379,6 +380,17 @@ export const submitPaymentVoucher = subscriptionProcedure
 			entityType: "payment_voucher",
 			entityId: input.id,
 			metadata: { voucherNo: voucher.voucherNo },
+		});
+
+		await notifyEvent({
+			event: "finance.paymentVoucherSubmitted",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "paymentVoucher", id: voucher.id },
+			data: {
+				voucherNo: voucher.voucherNo,
+				amount: `${new Intl.NumberFormat("en-US").format(Number(voucher.amount))} ر.س`,
+			},
 		});
 
 		return updated;
@@ -482,6 +494,18 @@ export const approvePaymentVoucher = subscriptionProcedure
 			},
 		});
 
+		await notifyEvent({
+			event: "finance.paymentVoucherApproved",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "paymentVoucher", id: voucher.id },
+			recipients: voucher.preparedById ? [voucher.preparedById] : [],
+			data: {
+				voucherNo: voucher.voucherNo,
+				amount: `${new Intl.NumberFormat("en-US").format(Number(voucher.amount))} ر.س`,
+			},
+		});
+
 		return updated;
 	});
 
@@ -510,7 +534,7 @@ export const rejectPaymentVoucher = subscriptionProcedure
 
 		const voucher = await db.paymentVoucher.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
-			select: { id: true, status: true, voucherNo: true },
+			select: { id: true, status: true, voucherNo: true, preparedById: true },
 		});
 
 		if (!voucher) {
@@ -539,6 +563,18 @@ export const rejectPaymentVoucher = subscriptionProcedure
 			entityType: "payment_voucher",
 			entityId: input.id,
 			metadata: { voucherNo: voucher.voucherNo, rejectionReason: input.rejectionReason },
+		});
+
+		await notifyEvent({
+			event: "finance.paymentVoucherRejected",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "paymentVoucher", id: voucher.id },
+			recipients: voucher.preparedById ? [voucher.preparedById] : [],
+			data: {
+				voucherNo: voucher.voucherNo,
+				reason: input.rejectionReason,
+			},
 		});
 
 		return updated;

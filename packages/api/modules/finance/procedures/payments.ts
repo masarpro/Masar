@@ -15,6 +15,7 @@ import {
 	idString, optionalTrimmed, searchQuery,
 	positiveAmount, paginationLimit, paginationOffset,
 } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 // Enums
 const paymentMethodEnum = z.enum([
@@ -214,6 +215,17 @@ export const createOrgPaymentProcedure = subscriptionProcedure
 		} catch (e) {
 			console.error("[ReceiptVoucher] Failed to create auto voucher from payment:", e);
 		}
+
+		await notifyEvent({
+			event: "finance.paymentReceived",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "payment", id: payment.id },
+			data: {
+				amount: `${new Intl.NumberFormat("en-US").format(Number(payment.amount))} ر.س`,
+				source: input.clientName,
+			},
+		});
 
 		return payment;
 	});

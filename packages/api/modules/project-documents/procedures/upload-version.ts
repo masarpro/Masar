@@ -1,8 +1,9 @@
 import { ORPCError } from "@orpc/server";
-import { db, logAuditEvent } from "@repo/database";
+import { db, getProjectById, logAuditEvent } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const uploadVersionProcedure = subscriptionProcedure
 	.route({
@@ -38,7 +39,7 @@ export const uploadVersionProcedure = subscriptionProcedure
 				organizationId: input.organizationId,
 				projectId: input.projectId,
 			},
-			select: { id: true, version: true, uploadType: true },
+			select: { id: true, version: true, uploadType: true, title: true },
 		});
 
 		if (!document) {
@@ -91,6 +92,20 @@ export const uploadVersionProcedure = subscriptionProcedure
 				documentId: input.documentId,
 				versionNumber: newVersionNumber,
 				changeNotes: input.changeNotes,
+			},
+		});
+
+		// إشعار مديري ومهندسي المشروع + مسؤولي المنظمة
+		const project = await getProjectById(input.projectId, input.organizationId);
+		await notifyEvent({
+			event: "documents.versionUploaded",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: input.projectId,
+			entity: { type: "document", id: input.documentId },
+			data: {
+				projectName: project?.name,
+				documentTitle: document.title,
 			},
 		});
 

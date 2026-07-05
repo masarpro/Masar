@@ -25,6 +25,7 @@ import { generateZatcaQR, generateZatcaQRImage } from "../../../lib/zatca";
 import { processInvoiceForZatca } from "../../../lib/zatca/phase2/zatca-service";
 import { db } from "@repo/database/prisma/client";
 import crypto from "crypto";
+import { notifyEvent } from "../../notifications/lib/notify";
 import {
 	MAX_NAME, MAX_DESC, MAX_CODE, MAX_PHONE, MAX_ADDRESS, MAX_ARRAY,
 	idString, optionalTrimmed,
@@ -593,6 +594,21 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 			console.error("[ReceiptVoucher] Failed to create auto voucher from invoice payment:", e);
 		}
 
+		const invoiceForNotify = await db.financeInvoice.findUnique({
+			where: { id: input.id },
+			select: { invoiceNo: true },
+		});
+		await notifyEvent({
+			event: "finance.invoicePaymentReceived",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "invoice", id: input.id },
+			data: {
+				invoiceNo: invoiceForNotify?.invoiceNo,
+				amount: `${new Intl.NumberFormat("en-US").format(Number(payment.amount))} ر.س`,
+			},
+		});
+
 		return {
 			...payment,
 			amount: Number(payment.amount),
@@ -895,6 +911,18 @@ export const issueInvoiceProcedure = subscriptionProcedure
 			});
 		}
 
+		await notifyEvent({
+			event: "finance.invoiceIssued",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "invoice", id: issuedInvoice.id },
+			data: {
+				invoiceNo: issuedInvoice.invoiceNo,
+				clientName: issuedInvoice.clientName ?? undefined,
+				amount: `${new Intl.NumberFormat("en-US").format(Number(issuedInvoice.totalAmount))} ر.س`,
+			},
+		});
+
 		return {
 			...issuedInvoice,
 			subtotal: Number(issuedInvoice.subtotal),
@@ -1106,6 +1134,17 @@ export const createCreditNoteProcedure = subscriptionProcedure
 				metadata: { error: String(e), referenceType: "CREDIT_NOTE" },
 			});
 		}
+
+		await notifyEvent({
+			event: "finance.creditNoteIssued",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "invoice", id: creditNote.id },
+			data: {
+				invoiceNo: original.invoiceNo,
+				amount: `${new Intl.NumberFormat("en-US").format(Number(creditNote.totalAmount))} ر.س`,
+			},
+		});
 
 		return {
 			...creditNote,

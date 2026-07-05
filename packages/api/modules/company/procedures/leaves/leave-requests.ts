@@ -15,6 +15,7 @@ import {
 	MAX_DESC,
 	MAX_CODE,
 } from "../../../../lib/validation-constants";
+import { notifyEvent } from "../../../notifications/lib/notify";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LIST LEAVE REQUESTS
@@ -164,7 +165,7 @@ export const createLeaveRequestProcedure = subscriptionProcedure
 			});
 		}
 
-		return db.leaveRequest.create({
+		const created = await db.leaveRequest.create({
 			data: {
 				organizationId: input.organizationId,
 				employeeId: input.employeeId,
@@ -180,6 +181,21 @@ export const createLeaveRequestProcedure = subscriptionProcedure
 				leaveType: { select: { id: true, name: true } },
 			},
 		});
+
+		await notifyEvent({
+			event: "hr.leaveRequestSubmitted",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "leaveRequest", id: created.id },
+			data: {
+				employeeName: employee.name,
+				leaveType: leaveType.name,
+				startDate: start.toLocaleDateString("ar-SA"),
+				endDate: end.toLocaleDateString("ar-SA"),
+			},
+		});
+
+		return created;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -219,7 +235,7 @@ export const approveLeaveRequestProcedure = subscriptionProcedure
 		}
 
 		// Update request and balance in transaction
-		return db.$transaction(async (tx) => {
+		const approvedRequest = await db.$transaction(async (tx) => {
 			const updated = await tx.leaveRequest.update({
 				where: { id: input.id },
 				data: {
@@ -259,6 +275,27 @@ export const approveLeaveRequestProcedure = subscriptionProcedure
 
 			return updated;
 		});
+
+		const approvedEmployee = await db.employee.findUnique({
+			where: { id: request.employeeId },
+			select: { linkedUserId: true },
+		});
+		await notifyEvent({
+			event: "hr.leaveRequestDecided",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "leaveRequest", id: input.id },
+			recipients: approvedEmployee?.linkedUserId
+				? [approvedEmployee.linkedUserId]
+				: [],
+			data: {
+				decision: "تمت الموافقة على",
+				startDate: request.startDate.toLocaleDateString("ar-SA"),
+				endDate: request.endDate.toLocaleDateString("ar-SA"),
+			},
+		});
+
+		return approvedRequest;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -298,7 +335,7 @@ export const rejectLeaveRequestProcedure = subscriptionProcedure
 			});
 		}
 
-		return db.leaveRequest.update({
+		const rejectedRequest = await db.leaveRequest.update({
 			where: { id: input.id },
 			data: {
 				status: "REJECTED",
@@ -311,6 +348,27 @@ export const rejectLeaveRequestProcedure = subscriptionProcedure
 				leaveType: { select: { id: true, name: true } },
 			},
 		});
+
+		const rejectedEmployee = await db.employee.findUnique({
+			where: { id: request.employeeId },
+			select: { linkedUserId: true },
+		});
+		await notifyEvent({
+			event: "hr.leaveRequestDecided",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "leaveRequest", id: input.id },
+			recipients: rejectedEmployee?.linkedUserId
+				? [rejectedEmployee.linkedUserId]
+				: [],
+			data: {
+				decision: "تم رفض",
+				startDate: request.startDate.toLocaleDateString("ar-SA"),
+				endDate: request.endDate.toLocaleDateString("ar-SA"),
+			},
+		});
+
+		return rejectedRequest;
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════

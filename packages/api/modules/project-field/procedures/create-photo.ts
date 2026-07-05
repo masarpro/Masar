@@ -1,7 +1,8 @@
-import { createPhoto } from "@repo/database";
+import { createPhoto, getProjectById } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const createPhotoProcedure = subscriptionProcedure
 	.route({
@@ -50,6 +51,19 @@ export const createPhotoProcedure = subscriptionProcedure
 			mimeType: input.mimeType,
 			milestoneId: input.milestoneId,
 			takenAt: input.takenAt,
+		});
+
+		// إشعار مديري المشروع + مسؤولي المنظمة (dedupe لكل دقيقة يمنع الضجيج عند الرفع المتعدد)
+		const project = await getProjectById(input.projectId, input.organizationId);
+		await notifyEvent({
+			event: "projects.photoUploaded",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: input.projectId,
+			entity: { type: "photo", id: photo.id },
+			data: {
+				projectName: project?.name,
+			},
 		});
 
 		return photo;

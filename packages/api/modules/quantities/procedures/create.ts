@@ -3,6 +3,7 @@ import { z } from "zod";
 import { convertStudyDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 // ═══════════════════════════════════════════════════════════════
 // ENTRY POINT → STAGE STATUS MAPPING
@@ -176,6 +177,14 @@ export const create = subscriptionProcedure
 			where: { organizationId: input.organizationId, firstQuantityAdded: false },
 			data: { firstQuantityAdded: true },
 		}).catch(() => {});
+
+		await notifyEvent({
+			event: "pricing.studyCreated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "study", id: result.id },
+			data: { studyName: result.name ?? undefined },
+		});
 
 		return convertStudyDecimals(result);
 	});

@@ -7,6 +7,7 @@ import {
 	MAX_DESC,
 	idString, nullishTrimmed, positiveAmount,
 } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const addSubcontractClaimPaymentProcedure = subscriptionProcedure
 	.route({
@@ -90,6 +91,30 @@ export const addSubcontractClaimPaymentProcedure = subscriptionProcedure
 					metadata: { error: String(e), referenceType: "SUBCONTRACT_PAYMENT" },
 				});
 			}
+
+			const paymentMeta = await db.subcontractClaim.findUnique({
+				where: { id: input.claimId },
+				select: {
+					contract: {
+						select: {
+							name: true,
+							project: { select: { name: true } },
+						},
+					},
+				},
+			});
+			await notifyEvent({
+				event: "projects.subcontractPaymentCreated",
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				projectId: input.projectId,
+				entity: { type: "subcontractPayment", id: payment.id },
+				data: {
+					projectName: paymentMeta?.contract?.project?.name,
+					subcontractorName: paymentMeta?.contract?.name,
+					amount: `${new Intl.NumberFormat("en-US").format(Number(payment.amount))} ر.س`,
+				},
+			});
 
 			return payment;
 		} catch (error) {

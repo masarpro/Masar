@@ -1,6 +1,5 @@
 import {
 	sendMessage,
-	createNotifications,
 	logAuditEvent,
 	linkAttachmentsToOwner,
 	db,
@@ -8,6 +7,7 @@ import {
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 const MessageChannelEnum = z.enum(["TEAM", "OWNER"]);
 
@@ -89,20 +89,19 @@ export const sendMessageProcedure = subscriptionProcedure
 					take: 20, // Limit notifications
 				});
 
-				if (teamMembers.length > 0) {
-					await createNotifications(
-						input.organizationId,
-						teamMembers.map((m) => m.userId),
-						{
-							type: "OWNER_MESSAGE",
-							title: "تحديث رسمي جديد",
-							body: `تحديث رسمي في مشروع: ${project.name}`,
-							projectId: input.projectId,
-							entityType: "message",
-							entityId: message.id,
-						},
-					);
-				}
+				await notifyEvent({
+					event: "chat.messageReceived",
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					projectId: input.projectId,
+					entity: { type: "message", id: message.id },
+					recipients: teamMembers.map((m) => m.userId),
+					data: {
+						projectName: project.name,
+						senderName: context.user.name,
+						preview: input.content.slice(0, 80),
+					},
+				});
 			}
 		}
 

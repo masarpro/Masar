@@ -12,6 +12,7 @@ import {
 	subscriptionProcedure,
 } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { notifyEvent } from "../../notifications/lib/notify";
 import { ORPCError } from "@orpc/server";
 import {
 	idString,
@@ -307,6 +308,17 @@ export const createContributionProcedure = subscriptionProcedure
 				ownerId: input.ownerId,
 				ownerName: owner.name,
 				hasJournalEntry: !!journalEntryId,
+			},
+		});
+
+		await notifyEvent({
+			event: "finance.capitalContributionAdded",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "capitalContribution", id: contribution.id },
+			data: {
+				amount: `${new Intl.NumberFormat("en-US").format(Number(contribution.amount))} ر.س`,
+				ownerName: owner.name,
 			},
 		});
 

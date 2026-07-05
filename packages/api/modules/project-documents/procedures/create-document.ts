@@ -1,8 +1,9 @@
 import { ORPCError } from "@orpc/server";
-import { createDocument, logAuditEvent, db } from "@repo/database";
+import { createDocument, getProjectById, logAuditEvent, db } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 const DocumentFolderEnum = z.enum([
 	"CONTRACT",
@@ -112,6 +113,20 @@ export const createDocumentProcedure = subscriptionProcedure
 			entityType: "document",
 			entityId: document.id,
 			metadata: { title: document.title, folder: document.folder },
+		});
+
+		// إشعار مديري ومهندسي المشروع + مسؤولي المنظمة
+		const project = await getProjectById(input.projectId, input.organizationId);
+		await notifyEvent({
+			event: "documents.documentUploaded",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: input.projectId,
+			entity: { type: "document", id: document.id },
+			data: {
+				projectName: project?.name,
+				documentTitle: document.title,
+			},
 		});
 
 		return document;

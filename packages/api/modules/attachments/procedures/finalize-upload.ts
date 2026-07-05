@@ -3,12 +3,13 @@
  * Phase 6: Production Hardening - Attachments
  */
 
-import { createAttachment, auditLog, validateAttachment, validateFileName, validateFileHeader } from "@repo/database";
+import { createAttachment, auditLog, getProjectById, validateAttachment, validateFileName, validateFileHeader } from "@repo/database";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { rateLimitChecker, RATE_LIMITS } from "../../../lib/rate-limit";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 const AttachmentOwnerTypeEnum = z.enum([
 	"DOCUMENT",
@@ -103,6 +104,20 @@ export const finalizeUploadProcedure = subscriptionProcedure
 					ownerId: input.ownerId,
 					fileName: input.fileName,
 					fileSize: input.fileSize,
+				},
+			});
+
+			// إشعار مديري المشروع + مسؤولي المنظمة (فقط للمرفقات المرتبطة بمشروع)
+			const project = await getProjectById(input.projectId, input.organizationId);
+			await notifyEvent({
+				event: "documents.fileUploaded",
+				organizationId: input.organizationId,
+				actorId: user.id,
+				projectId: input.projectId,
+				entity: { type: "attachment", id: attachment.id },
+				data: {
+					projectName: project?.name,
+					fileName: input.fileName,
 				},
 			});
 		}

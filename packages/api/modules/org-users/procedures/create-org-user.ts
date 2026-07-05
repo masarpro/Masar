@@ -15,6 +15,7 @@ import {
 } from "../../../lib/permissions";
 import { enforceFeatureAccess } from "../../../lib/feature-gate";
 import { subscriptionProcedure } from "../../../orpc/procedures";
+import { notifyEvent } from "../../notifications/lib/notify";
 import type { ProjectRole } from "@repo/database/prisma/generated/client";
 
 /** Map an organization role type to the initial ProjectMember role. */
@@ -181,6 +182,14 @@ export const createOrgUser = subscriptionProcedure
 				inviterName: context.user.name ?? "مدير المنظمة",
 				roleName: role?.name ?? "عضو",
 			},
+		});
+
+		await notifyEvent({
+			event: "org.userAdded",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "user", id: user.id },
+			data: { userName: input.name, roleName: role?.name },
 		});
 
 		return { user };

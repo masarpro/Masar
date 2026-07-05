@@ -15,6 +15,7 @@ import {
 	idString, optionalTrimmed, nullishTrimmed, searchQuery,
 	positiveAmount, paginationLimit, paginationOffset,
 } from "../../../lib/validation-constants";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 // ═══ Shared enums ═══
 const paymentMethodEnum = z.enum([
@@ -402,6 +403,17 @@ export const issueReceiptVoucher = subscriptionProcedure
 			entityType: "receipt_voucher",
 			entityId: input.id,
 			metadata: { voucherNo: voucher.voucherNo, isManual },
+		});
+
+		await notifyEvent({
+			event: "finance.receiptVoucherIssued",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			entity: { type: "receiptVoucher", id: voucher.id },
+			data: {
+				voucherNo: voucher.voucherNo,
+				amount: `${new Intl.NumberFormat("en-US").format(Number(voucher.amount))} ر.س`,
+			},
 		});
 
 		return updated;

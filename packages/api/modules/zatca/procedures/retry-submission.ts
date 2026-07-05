@@ -15,6 +15,7 @@ import {
 } from "../../../lib/zatca/phase2";
 import type { ZatcaInvoiceData } from "../../../lib/zatca/phase2";
 import { generateZatcaQRImage } from "../../../lib/zatca";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const retrySubmission = subscriptionProcedure
 	.route({
@@ -267,6 +268,24 @@ export const retrySubmission = subscriptionProcedure
 				status: newStatus,
 			},
 		});
+
+		if (newStatus === "CLEARED") {
+			await notifyEvent({
+				event: "finance.zatcaCleared",
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				entity: { type: "invoice", id: invoice.id },
+				data: { invoiceNo: invoice.invoiceNo },
+			});
+		} else if (newStatus === "REJECTED") {
+			await notifyEvent({
+				event: "finance.zatcaRejected",
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				entity: { type: "invoice", id: invoice.id },
+				data: { invoiceNo: invoice.invoiceNo },
+			});
+		}
 
 		return {
 			success: zatcaResult.success,

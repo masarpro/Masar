@@ -2,10 +2,7 @@ import { createChangeOrder, logAuditEvent, getProjectById, getProjectContract, d
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import {
-	notifyChangeOrderCreated,
-	getProjectManagers,
-} from "../../notifications/lib/notification-service";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const createChangeOrderProcedure = subscriptionProcedure
 	.route({
@@ -87,30 +84,20 @@ export const createChangeOrderProcedure = subscriptionProcedure
 			},
 		});
 
-		// Notify project managers (fire and forget)
-		getProjectById(input.projectId, input.organizationId)
-			.then(async (project) => {
-				if (project) {
-					const managerIds = await getProjectManagers(input.projectId);
-					if (managerIds.length > 0) {
-						notifyChangeOrderCreated({
-							organizationId: input.organizationId,
-							projectId: input.projectId,
-							projectName: project.name,
-							changeOrderId: changeOrder.id,
-							coNo: changeOrder.coNo,
-							title: changeOrder.title,
-							creatorId: context.user.id,
-							managerIds,
-						}).catch(() => {
-							// Silently ignore notification errors
-						});
-					}
-				}
-			})
-			.catch(() => {
-				// Silently ignore errors
-			});
+		// إشعار مديري المشروع + مسؤولي المنظمة (الجمهور يُحل من السجل)
+		const project = await getProjectById(input.projectId, input.organizationId);
+		await notifyEvent({
+			event: "projects.changeOrderCreated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: input.projectId,
+			entity: { type: "changeOrder", id: changeOrder.id },
+			data: {
+				projectName: project?.name,
+				coNo: changeOrder.coNo,
+				title: changeOrder.title,
+			},
+		});
 
 		return changeOrder;
 	});

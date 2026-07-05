@@ -2,11 +2,7 @@ import { createDailyReport, getProjectById } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
-import {
-	getOrganizationAdmins,
-	getProjectManagers,
-	notifyDailyReportCreated,
-} from "../../notifications/lib/notification-service";
+import { notifyEvent } from "../../notifications/lib/notify";
 
 export const createDailyReportProcedure = subscriptionProcedure
 	.route({
@@ -51,28 +47,19 @@ export const createDailyReportProcedure = subscriptionProcedure
 			weather: input.weather,
 		});
 
-		// Send notification to project managers + org admins (fire and forget)
-		getProjectById(input.projectId, input.organizationId)
-			.then(async (project) => {
-				if (project) {
-					const [managers, admins] = await Promise.all([
-						getProjectManagers(input.projectId),
-						getOrganizationAdmins(input.organizationId),
-					]);
-					await notifyDailyReportCreated({
-						organizationId: input.organizationId,
-						projectId: input.projectId,
-						projectName: project.name,
-						reportId: report.id,
-						reportDate: input.reportDate.toLocaleDateString("ar-SA"),
-						creatorId: context.user.id,
-						managerIds: [...new Set([...managers, ...admins])],
-					});
-				}
-			})
-			.catch(() => {
-				// Silently ignore notification errors
-			});
+		// إشعار مديري المشروع + مسؤولي المنظمة (الجمهور يُحل من السجل)
+		const project = await getProjectById(input.projectId, input.organizationId);
+		await notifyEvent({
+			event: "projects.dailyReportCreated",
+			organizationId: input.organizationId,
+			actorId: context.user.id,
+			projectId: input.projectId,
+			entity: { type: "dailyReport", id: report.id },
+			data: {
+				projectName: project?.name,
+				reportDate: input.reportDate.toLocaleDateString("ar-SA"),
+			},
+		});
 
 		return report;
 	});
