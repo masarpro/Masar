@@ -20,7 +20,7 @@ import {
 import z from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import {
-	getUserPermissions,
+	getCachedUserPermissions,
 	getUserRoleType,
 } from "../../../lib/permissions";
 import { verifyOrganizationMembership } from "../../organizations/lib/membership";
@@ -139,8 +139,9 @@ export const addMessageToChat = subscriptionProcedure
 		}
 
 		// pipeline كامل لمحادثة منظمة
+		// حل الصلاحيات مرة واحدة لكل طلب (cache خادمي — نفس مصدر route المساعد العائم)
 		const [permissions, roleType, projectFromDb] = await Promise.all([
-			getUserPermissions(user.id, organizationId),
+			getCachedUserPermissions(user.id, organizationId),
 			getUserRoleType(user.id, organizationId),
 			projectId
 				? db.project.findFirst({

@@ -1,6 +1,16 @@
 import { tool } from "ai";
 import { z } from "zod";
 import {
+  createEmptyPermissions,
+  type Permissions,
+} from "@repo/database/prisma/permissions";
+import {
+  AI_NAVIGATION_DENIED_MESSAGE,
+  isNavigationAllowed,
+  isToolAuthorized,
+  permissionDeniedResult,
+} from "../lib/tool-permissions";
+import {
   db,
   getOrganizationProjects,
   getProjectById,
@@ -34,6 +44,8 @@ export interface ToolContext {
   userId: string;
   organizationSlug: string;
   locale: string;
+  /** صلاحيات المستخدم — حارس التنفيذ (الطبقة 2) يرفض بدونها */
+  permissions?: Permissions;
 }
 
 function toNum(val: unknown): number {
@@ -46,6 +58,8 @@ function toNum(val: unknown): number {
 }
 
 export function getAssistantTools(ctx: ToolContext) {
+  // غياب الصلاحيات في السياق = رفض كل أداة غير عامة (fail-closed)
+  const perms = ctx.permissions ?? createEmptyPermissions();
   return {
     // ===========================
     // Tool 1: queryProjects
@@ -62,6 +76,9 @@ export function getAssistantTools(ctx: ToolContext) {
         search: z.string().optional(),
       }),
       execute: async ({ action, projectId, status, search }) => {
+        if (!isToolAuthorized(perms, "queryProjects", { action })) {
+          return permissionDeniedResult();
+        }
         try {
           if (action === "list") {
             const result = await getOrganizationProjects(ctx.organizationId, {
@@ -154,6 +171,10 @@ export function getAssistantTools(ctx: ToolContext) {
         dateTo,
         limit,
       }) => {
+        // حارس per-action: أداة واحدة تغطي صلاحيات مالية متعددة
+        if (!isToolAuthorized(perms, "queryFinance", { action })) {
+          return permissionDeniedResult();
+        }
         const take = limit ?? 20;
         try {
           if (action === "invoices") {
@@ -312,6 +333,9 @@ export function getAssistantTools(ctx: ToolContext) {
         severity,
         limit,
       }) => {
+        if (!isToolAuthorized(perms, "queryExecution", { action })) {
+          return permissionDeniedResult();
+        }
         const take = limit ?? 10;
         try {
           // Verify project ownership
@@ -440,6 +464,9 @@ export function getAssistantTools(ctx: ToolContext) {
           .optional(),
       }),
       execute: async ({ projectId, filter }) => {
+        if (!isToolAuthorized(perms, "queryTimeline")) {
+          return permissionDeniedResult();
+        }
         try {
           const project = await db.project.findFirst({
             where: { id: projectId, organizationId: ctx.organizationId },
@@ -517,6 +544,8 @@ export function getAssistantTools(ctx: ToolContext) {
           if (!projectId) return { url: null, message: "يرجى تحديد المشروع أولاً" };
           return { url: `${base}/projects/${projectId}${sub}`, label: destination };
         };
+
+        const resolve = (): { url: string | null; label?: string; message?: string } => {
 
         // Accounting & Reports (must be before general finance patterns)
         if (/لوحة.*محاسب|accounting.*dashboard/.test(d))
@@ -623,6 +652,14 @@ export function getAssistantTools(ctx: ToolContext) {
           return { url: base, label: "لوحة التحكم" };
 
         return { url: base, label: "الصفحة الرئيسية" };
+        };
+
+        // تصفية الوجهات: لا نولّد روابط لأقسام لا يملكها المستخدم
+        const result = resolve();
+        if (result.url && !isNavigationAllowed(perms, result.url)) {
+          return { url: null, message: AI_NAVIGATION_DENIED_MESSAGE };
+        }
+        return result;
       },
     }),
 
@@ -644,6 +681,10 @@ export function getAssistantTools(ctx: ToolContext) {
         limit: z.number().min(1).max(50).optional(),
       }),
       execute: async ({ action, status, limit }) => {
+        // حارس per-action: employees/payroll → قسم الموظفين، assets/expenses → المنشأة
+        if (!isToolAuthorized(perms, "queryCompany", { action })) {
+          return permissionDeniedResult();
+        }
         const take = limit ?? 20;
         try {
           if (action === "employees") {

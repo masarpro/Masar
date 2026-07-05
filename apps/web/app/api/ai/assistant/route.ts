@@ -12,7 +12,7 @@ import {
 import "@repo/ai/tools/modules";
 import { db, orgAuditLog, ROLE_NAMES_AR } from "@repo/database";
 import {
-	getUserPermissions,
+	getCachedUserPermissions,
 	getUserRoleType,
 } from "@repo/api/lib/permissions";
 import { rateLimitChecker } from "@repo/api/lib/rate-limit";
@@ -104,8 +104,10 @@ export async function POST(request: Request) {
 		}
 
 		// جلب الصلاحيات والمشروع بالتوازي
+		// حل الصلاحيات مرة واحدة لكل طلب (cache خادمي 30 ثانية —
+		// يُبطَل عبر invalidateAccessCache عند تغيير الدور/الصلاحيات)
 		const [permissions, roleType, projectFromDb] = await Promise.all([
-			getUserPermissions(session.user.id, organization.id),
+			getCachedUserPermissions(session.user.id, organization.id),
 			getUserRoleType(session.user.id, organization.id),
 			context.projectId
 				? db.project.findFirst({

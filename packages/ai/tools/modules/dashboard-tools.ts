@@ -5,6 +5,11 @@ import {
   getFinanceDashboardStats,
   getOrganizationBalancesSummary,
 } from "@repo/database";
+import {
+  createEmptyPermissions,
+  hasPermission,
+} from "@repo/database/prisma/permissions";
+import { permissionDeniedResult } from "../../lib/tool-permissions";
 
 function toNum(val: unknown): number {
   if (val == null) return 0;
@@ -28,15 +33,28 @@ registerTool({
   parameters: z.object({}),
   execute: async (_params, context) => {
     try {
+      // تركيب مصفّى بالصلاحيات: المشاريع مع projects.view،
+      // الجزء المالي (قيمة العقود/المصروفات) مع finance.view فقط
+      const perms = context.permissions ?? createEmptyPermissions();
+      const canProjects = hasPermission(perms, "projects", "view");
+      const canFinance = hasPermission(perms, "finance", "view");
+      if (!canProjects && !canFinance) {
+        return permissionDeniedResult();
+      }
+
       const stats = await getDashboardStats(context.organizationId);
-      return {
-        projects: stats.projects,
-        financials: {
+      const result: Record<string, unknown> = {};
+      if (canProjects) {
+        result.projects = stats.projects;
+        result.milestones = stats.milestones;
+      }
+      if (canFinance) {
+        result.financials = {
           totalContractValue: toNum(stats.financials.totalContractValue),
           totalExpenses: toNum(stats.financials.totalExpenses),
-        },
-        milestones: stats.milestones,
-      };
+        };
+      }
+      return result;
     } catch (e) {
       return {
         error: `فشل جلب ملخص لوحة التحكم: ${(e as Error).message}`,

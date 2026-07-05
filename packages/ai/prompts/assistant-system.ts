@@ -1,3 +1,5 @@
+import type { Permissions } from "@repo/database/prisma/permissions";
+import { isModulePromptAllowed } from "../lib/tool-permissions";
 import {
   getCompanyKnowledge,
   getExecutionKnowledge,
@@ -36,10 +38,17 @@ export interface AssistantContext {
   contextData?: Record<string, unknown>;
 }
 
-export function buildSystemPrompt(context: AssistantContext): string {
+export function buildSystemPrompt(
+  context: AssistantContext,
+  permissions?: Permissions,
+): string {
   const identity = buildIdentity(context);
 
-  const relevantModules = getRelevantModules(context.currentSection);
+  // الوحدات المعرفية الحساسة (finance/accounting/company) تُحقن فقط
+  // لمن يملك صلاحياتها — بدون permissions (استدعاء قديم) لا نُغيّر السلوك
+  const relevantModules = getRelevantModules(context.currentSection).filter(
+    (mod) => !permissions || isModulePromptAllowed(permissions, mod),
+  );
   const knowledge = relevantModules
     .map((mod) =>
       getModuleKnowledge(mod, context.locale, context.organizationSlug),
