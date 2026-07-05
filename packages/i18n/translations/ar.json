@@ -4320,6 +4320,7 @@
       "noOutstandingPayables": "لا توجد مستحقات لمقاولي الباطن",
       "agingDistribution": "توزيع التقادم",
       "uninvoicedClaims": "مستحقات غير مفوترة (مستخلصات معتمدة)",
+      "allocatedCompanyExpenses": "مصروفات شركة موزَّعة",
       "uninvoicedClaimsHint": "مستخلصات مشاريع معتمدة لم تصدر لها فواتير بعد — غير مدمجة في إجماليات الذمم أعلاه",
       "approvedOn": "تاريخ الاعتماد",
       "sar": "ريال",
