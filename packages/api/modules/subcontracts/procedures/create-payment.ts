@@ -53,19 +53,39 @@ export const createSubcontractPaymentProcedure = subscriptionProcedure
 			});
 		}
 
-		const payment = await createSubcontractPayment({
-			organizationId: input.organizationId,
-			contractId: input.contractId,
-			createdById: context.user.id,
-			termId: input.termId,
-			amount: input.amount,
-			date: input.date,
-			sourceAccountId: input.sourceAccountId,
-			paymentMethod: input.paymentMethod,
-			referenceNo: input.referenceNo,
-			description: input.description,
-			notes: input.notes,
-		});
+		let payment: Awaited<ReturnType<typeof createSubcontractPayment>>;
+		try {
+			payment = await createSubcontractPayment({
+				organizationId: input.organizationId,
+				contractId: input.contractId,
+				createdById: context.user.id,
+				termId: input.termId,
+				amount: input.amount,
+				date: input.date,
+				sourceAccountId: input.sourceAccountId,
+				paymentMethod: input.paymentMethod,
+				referenceNo: input.referenceNo,
+				description: input.description,
+				notes: input.notes,
+			});
+		} catch (error) {
+			if (error instanceof Error) {
+				if (error.message === "CONTRACT_NOT_FOUND") {
+					throw new ORPCError("NOT_FOUND", {
+						message: "عقد الباطن غير موجود",
+					});
+				}
+				if (error.message.startsWith("PAYMENT_EXCEEDS_CONTRACT:")) {
+					const [, ceiling, paid, available] = error.message.split(":");
+					const fmt = (v?: string) =>
+						new Intl.NumberFormat("en-US").format(Number(v ?? 0));
+					throw new ORPCError("BAD_REQUEST", {
+						message: `مبلغ الدفعة يتجاوز المتبقي من قيمة العقد — قيمة العقد المعدّلة: ${fmt(ceiling)} ريال، المدفوع: ${fmt(paid)} ريال، المتاح: ${fmt(available)} ريال`,
+					});
+				}
+			}
+			throw error;
+		}
 
 		logAuditEvent(input.organizationId, input.projectId, {
 			actorId: context.user.id,

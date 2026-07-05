@@ -197,6 +197,17 @@ export const updateProjectPaymentProcedure = subscriptionProcedure
 			if (error instanceof Error && error.message === "PAYMENT_NOT_FOUND") {
 				throw new ORPCError("NOT_FOUND", { message: "الدفعة غير موجودة" });
 			}
+			if (
+				error instanceof Error &&
+				error.message.startsWith("PAYMENT_EXCEEDS_CONTRACT:")
+			) {
+				const [, ceiling, collected, available] = error.message.split(":");
+				const fmt = (v?: string) =>
+					new Intl.NumberFormat("en-US").format(Number(v ?? 0));
+				throw new ORPCError("BAD_REQUEST", {
+					message: `مبلغ الدفعة يتجاوز المتبقي من قيمة العقد — قيمة العقد المعدّلة: ${fmt(ceiling)} ريال، المحصّل: ${fmt(collected)} ريال، المتاح: ${fmt(available)} ريال`,
+				});
+			}
 			throw error;
 		}
 	});

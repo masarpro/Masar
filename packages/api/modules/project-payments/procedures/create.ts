@@ -1,4 +1,5 @@
 import { createProjectPayment, db } from "@repo/database";
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -36,19 +37,36 @@ export const createProjectPaymentProcedure = subscriptionProcedure
 			{ section: "finance", action: "payments" },
 		);
 
-		const { payments, primary, splitCount } = await createProjectPayment({
-			organizationId: input.organizationId,
-			projectId: input.projectId,
-			createdById: context.user.id,
-			contractTermId: input.contractTermId,
-			amount: input.amount,
-			date: input.date,
-			paymentMethod: input.paymentMethod,
-			referenceNo: input.referenceNo,
-			description: input.description,
-			destinationAccountId: input.destinationAccountId,
-			note: input.note,
-		});
+		let result: Awaited<ReturnType<typeof createProjectPayment>>;
+		try {
+			result = await createProjectPayment({
+				organizationId: input.organizationId,
+				projectId: input.projectId,
+				createdById: context.user.id,
+				contractTermId: input.contractTermId,
+				amount: input.amount,
+				date: input.date,
+				paymentMethod: input.paymentMethod,
+				referenceNo: input.referenceNo,
+				description: input.description,
+				destinationAccountId: input.destinationAccountId,
+				note: input.note,
+			});
+		} catch (error) {
+			if (
+				error instanceof Error &&
+				error.message.startsWith("PAYMENT_EXCEEDS_CONTRACT:")
+			) {
+				const [, ceiling, collected, available] = error.message.split(":");
+				const fmt = (v?: string) =>
+					new Intl.NumberFormat("en-US").format(Number(v ?? 0));
+				throw new ORPCError("BAD_REQUEST", {
+					message: `مبلغ الدفعة يتجاوز المتبقي من قيمة العقد — قيمة العقد المعدّلة: ${fmt(ceiling)} ريال، المحصّل: ${fmt(collected)} ريال، المتاح: ${fmt(available)} ريال`,
+				});
+			}
+			throw error;
+		}
+		const { payments, primary, splitCount } = result;
 
 		// Each spillover allocation is its own payment row → log + journal +
 		// receipt voucher per row, consistent with edit/delete reversal.

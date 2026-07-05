@@ -804,7 +804,21 @@ export async function addSubcontractClaimPayment(data: {
 	description?: string | null;
 }) {
 	return db.$transaction(async (tx) => {
-		// 1. Get claim
+		// 0. Resolve the contract id, then lock the contract row — the same row
+		// every claim/payment/change-order writer locks, so validation + write
+		// below are serialized against all concurrent financial mutations.
+		const claimRef = await tx.subcontractClaim.findUnique({
+			where: { id: data.claimId, organizationId: data.organizationId },
+			select: { contractId: true },
+		});
+		if (!claimRef) throw new Error("CLAIM_NOT_FOUND");
+
+		await tx.$queryRawUnsafe(
+			`SELECT id FROM subcontract_contracts WHERE id = $1 FOR UPDATE`,
+			claimRef.contractId,
+		);
+
+		// 1. Re-read the claim inside the lock (paidAmount is stable now)
 		const claim = await tx.subcontractClaim.findUnique({
 			where: { id: data.claimId, organizationId: data.organizationId },
 			select: {
@@ -818,10 +832,15 @@ export async function addSubcontractClaimPayment(data: {
 			throw new Error("CLAIM_NOT_PAYABLE");
 		}
 
-		// 2. Validate amount
-		const maxPayable = Number(claim.netAmount) - Number(claim.paidAmount);
-		if (data.amount > maxPayable + 0.01) {
-			throw new Error(`AMOUNT_EXCEEDS_OUTSTANDING:${maxPayable}`);
+		// 2. Validate amount (Decimal math; 0.01 tolerance absorbs UI rounding)
+		const netAmount = new Prisma.Decimal(claim.netAmount);
+		const paidAmount = new Prisma.Decimal(claim.paidAmount);
+		const newPaidTotal = paidAmount.add(data.amount);
+		if (newPaidTotal.sub(netAmount).gt("0.01")) {
+			const maxPayable = netAmount.sub(paidAmount);
+			throw new Error(
+				`AMOUNT_EXCEEDS_OUTSTANDING:${netAmount.toFixed(2)}:${paidAmount.toFixed(2)}:${maxPayable.toFixed(2)}`,
+			);
 		}
 
 		// 3. Generate payment number
@@ -847,15 +866,14 @@ export async function addSubcontractClaimPayment(data: {
 		});
 
 		// 5. Update claim paidAmount and status
-		const newPaidAmount = Number(claim.paidAmount) + data.amount;
-		const newStatus = newPaidAmount >= Number(claim.netAmount) - 0.01
+		const newStatus = newPaidTotal.gte(netAmount.sub("0.01"))
 			? "PAID"
 			: "PARTIALLY_PAID";
 
 		await tx.subcontractClaim.update({
 			where: { id: data.claimId },
 			data: {
-				paidAmount: newPaidAmount,
+				paidAmount: newPaidTotal,
 				status: newStatus as SubcontractClaimStatus,
 			},
 		});

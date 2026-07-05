@@ -48,15 +48,32 @@ export const createSubcontractChangeOrderProcedure = subscriptionProcedure
 			});
 		}
 
-		const co = await createSubcontractChangeOrder({
-			contractId: input.contractId,
-			createdById: context.user.id,
-			description: input.description,
-			amount: input.amount,
-			status: input.status,
-			approvedDate: input.approvedDate,
-			attachmentUrl: input.attachmentUrl,
-		});
+		let co: Awaited<ReturnType<typeof createSubcontractChangeOrder>>;
+		try {
+			co = await createSubcontractChangeOrder({
+				contractId: input.contractId,
+				organizationId: input.organizationId,
+				createdById: context.user.id,
+				description: input.description,
+				amount: input.amount,
+				status: input.status,
+				approvedDate: input.approvedDate,
+				attachmentUrl: input.attachmentUrl,
+			});
+		} catch (error) {
+			if (
+				error instanceof Error &&
+				error.message.startsWith("CEILING_BELOW_COMMITTED:")
+			) {
+				const [, newCeiling, committed] = error.message.split(":");
+				const fmt = (v?: string) =>
+					new Intl.NumberFormat("en-US").format(Number(v ?? 0));
+				throw new ORPCError("BAD_REQUEST", {
+					message: `لا يمكن تخفيض قيمة العقد المعدّلة إلى ${fmt(newCeiling)} ريال — الالتزامات القائمة (مستخلصات معتمدة أو دفعات) تبلغ ${fmt(committed)} ريال`,
+				});
+			}
+			throw error;
+		}
 
 		logAuditEvent(input.organizationId, input.projectId, {
 			actorId: context.user.id,
