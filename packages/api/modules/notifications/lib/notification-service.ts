@@ -8,10 +8,9 @@ import {
 	createNotification,
 	generateDedupeKey,
 	db,
-	getOrganizationAdminUserIds,
 	type CreateNotificationInput,
 } from "@repo/database";
-import type { NotificationType, NotificationChannel, ProjectRole } from "@repo/database/prisma/generated/client";
+import type { NotificationType, NotificationChannel } from "@repo/database/prisma/generated/client";
 import { sendNotificationEmails } from "./notification-email";
 import { filterRecipientsByPermission } from "./notification-permissions";
 
@@ -661,48 +660,13 @@ export async function notifyTeamMemberRemoved(params: {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Helper Functions for Notification Targeting
+// Notification Targeting — moved to audience.ts (re-exported for call sites)
 // ═══════════════════════════════════════════════════════════════════════════
 
-/**
- * Get project members by role(s) for notification targeting
- */
-export async function getProjectMembersByRole(
-	projectId: string,
-	roles: ProjectRole[],
-): Promise<string[]> {
-	const members = await db.projectMember.findMany({
-		where: {
-			projectId,
-			role: { in: roles },
-		},
-		select: { userId: true },
-	});
-	return members.map((m) => m.userId);
-}
-
-/**
- * Get project managers (MANAGER role)
- */
-export async function getProjectManagers(projectId: string): Promise<string[]> {
-	return getProjectMembersByRole(projectId, ["MANAGER"]);
-}
-
-/**
- * Get project accountants (ACCOUNTANT role)
- */
-export async function getProjectAccountants(
-	projectId: string,
-): Promise<string[]> {
-	return getProjectMembersByRole(projectId, ["ACCOUNTANT"]);
-}
-
-/**
- * Get organization admins for notifications
- * Uses the new RBAC system (Role model) instead of Member.role
- */
-export async function getOrganizationAdmins(
-	organizationId: string,
-): Promise<string[]> {
-	return getOrganizationAdminUserIds(organizationId);
-}
+export {
+	getMembersWithPermission,
+	getOrganizationAdmins,
+	getProjectAccountants,
+	getProjectManagers,
+	getProjectMembersByRole,
+} from "./audience";

@@ -25,7 +25,9 @@ type BusinessEventType =
 	| "org.member_added"
 	| "org.member_removed"
 	| "project.created"
-	| "project.deleted";
+	| "project.deleted"
+	// Notification events
+	| "notification.failed";
 
 type BusinessEventData = {
 	type: BusinessEventType;

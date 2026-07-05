@@ -96,6 +96,50 @@ export async function createNotification(
 }
 
 /**
+ * Batch-create notification rows (the notifyEvent pipeline).
+ * Each row carries its own per-user dedupeKey; unique-constraint conflicts
+ * are silently skipped so double-fired events never duplicate or throw.
+ */
+export interface NotificationRowInput {
+	organizationId: string;
+	userId: string;
+	/** registry event key ("finance.invoiceIssued") or legacy enum value */
+	type: string;
+	title: string;
+	body?: string;
+	projectId?: string;
+	entityType?: string;
+	entityId?: string;
+	channel: NotificationChannel;
+	dedupeKey?: string;
+	metadata?: Record<string, unknown>;
+}
+
+export async function createNotificationRows(rows: NotificationRowInput[]) {
+	if (rows.length === 0) {
+		return { count: 0 };
+	}
+	return db.notification.createMany({
+		data: rows.map((r) => ({
+			organizationId: r.organizationId,
+			userId: r.userId,
+			type: r.type,
+			title: r.title,
+			body: r.body,
+			projectId: r.projectId,
+			entityType: r.entityType,
+			entityId: r.entityId,
+			channel: r.channel,
+			// EMAIL rows queue as PENDING and are drained by the notifications-email cron
+			deliveryStatus: r.channel === "EMAIL" ? "PENDING" : "SENT",
+			dedupeKey: r.dedupeKey,
+			metadata: r.metadata as Prisma.InputJsonValue,
+		})),
+		skipDuplicates: true,
+	});
+}
+
+/**
  * Create notification with email channel
  */
 export async function createEmailNotification(
