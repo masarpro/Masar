@@ -47,7 +47,7 @@ export const listExpensePayments = protectedProcedure
 			action: "view",
 		});
 
-		return getExpensePayments(input.expenseId, {
+		return getExpensePayments(input.expenseId, input.organizationId, {
 			isPaid: input.isPaid,
 			limit: input.limit,
 			offset: input.offset,
@@ -86,7 +86,7 @@ export const createExpensePaymentProcedure = subscriptionProcedure
 		});
 
 		const { organizationId, ...data } = input;
-		return createExpensePayment(data);
+		return createExpensePayment(organizationId, data);
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -226,13 +226,16 @@ export const updateExpensePaymentProcedure = subscriptionProcedure
 		});
 
 		// Check if payment was already paid (has linked FinanceExpense with journal entry)
-		const existingPayment = await db.companyExpensePayment.findUnique({
-			where: { id: input.id },
+		const existingPayment = await db.companyExpensePayment.findFirst({
+			where: {
+				id: input.id,
+				expense: { organizationId: input.organizationId },
+			},
 			select: { isPaid: true, financeExpenseId: true, amount: true },
 		});
 
 		const { organizationId, id, ...data } = input;
-		const result = await updateExpensePayment(id, data);
+		const result = await updateExpensePayment(id, organizationId, data);
 
 		// If payment was paid and amount changed → reverse old journal + create new one
 		if (existingPayment?.isPaid && existingPayment.financeExpenseId && input.amount !== undefined) {
@@ -247,10 +250,23 @@ export const updateExpensePaymentProcedure = subscriptionProcedure
 						referenceId: existingPayment.financeExpenseId,
 						userId: context.user.id,
 					});
-					// Update linked FinanceExpense amount
+					// Update linked FinanceExpense amount + paidAmount, and adjust the
+					// bank balance by the delta (the old amount was already deducted).
+					const linked = await db.financeExpense.findUnique({
+						where: { id: existingPayment.financeExpenseId },
+						select: { sourceAccountId: true },
+					});
+					const delta = input.amount - Number(existingPayment.amount);
+					if (linked?.sourceAccountId && delta !== 0) {
+						// delta > 0 → deduct more; delta < 0 → refund
+						await db.organizationBank.update({
+							where: { id: linked.sourceAccountId },
+							data: { balance: { decrement: delta } },
+						});
+					}
 					await db.financeExpense.update({
 						where: { id: existingPayment.financeExpenseId },
-						data: { amount: input.amount },
+						data: { amount: input.amount, paidAmount: input.amount },
 					});
 					// Re-create journal entry with new amount
 					const expense = await db.financeExpense.findUnique({
@@ -311,12 +327,15 @@ export const deleteExpensePaymentProcedure = subscriptionProcedure
 		});
 
 		// Check if this payment has a linked FinanceExpense (created when marked as paid)
-		const payment = await db.companyExpensePayment.findUnique({
-			where: { id: input.id },
+		const payment = await db.companyExpensePayment.findFirst({
+			where: {
+				id: input.id,
+				expense: { organizationId: input.organizationId },
+			},
 			select: { financeExpenseId: true },
 		});
 
-		const result = await deleteExpensePayment(input.id);
+		const result = await deleteExpensePayment(input.id, input.organizationId);
 
 		// Auto-Journal: reverse accounting entry for the linked FinanceExpense
 		if (payment?.financeExpenseId) {
@@ -340,11 +359,30 @@ export const deleteExpensePaymentProcedure = subscriptionProcedure
 				});
 			}
 
-			// Delete the orphaned FinanceExpense
+			// Restore the bank balance that markPaid deducted, then delete the
+			// orphaned FinanceExpense — atomically. Previously the balance was never
+			// returned, permanently understating the bank by the payment amount.
 			try {
-				await db.financeExpense.delete({ where: { id: payment.financeExpenseId } });
-			} catch {
-				// Silently ignore — may already be deleted via cascade
+				await db.$transaction(async (tx) => {
+					const fx = await tx.financeExpense.findUnique({
+						where: { id: payment.financeExpenseId as string },
+						select: { sourceAccountId: true, paidAmount: true, amount: true },
+					});
+					if (fx?.sourceAccountId) {
+						const restore = Number(fx.paidAmount ?? fx.amount);
+						if (restore > 0) {
+							await tx.organizationBank.update({
+								where: { id: fx.sourceAccountId },
+								data: { balance: { increment: restore } },
+							});
+						}
+					}
+					await tx.financeExpense.delete({
+						where: { id: payment.financeExpenseId as string },
+					});
+				});
+			} catch (e) {
+				console.error("[ExpensePayment] Failed to restore balance / delete expense:", e);
 			}
 		}
 
@@ -374,5 +412,9 @@ export const generateMonthlyPaymentsProcedure = subscriptionProcedure
 			action: "expenses",
 		});
 
-		return generateMonthlyPayments(input.expenseId, input.monthsAhead);
+		return generateMonthlyPayments(
+			input.expenseId,
+			input.organizationId,
+			input.monthsAhead,
+		);
 	});

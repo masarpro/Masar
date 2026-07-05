@@ -523,6 +523,14 @@ export const printReceiptVoucher = subscriptionProcedure
 			action: "view",
 		});
 
+		const owned = await db.receiptVoucher.findFirst({
+			where: { id: input.id, organizationId: input.organizationId },
+			select: { id: true },
+		});
+		if (!owned) {
+			throw new ORPCError("NOT_FOUND", { message: "سند القبض غير موجود" });
+		}
+
 		return db.receiptVoucher.update({
 			where: { id: input.id },
 			data: {

@@ -38,7 +38,7 @@ export const listEmployeeAssignments = protectedProcedure
 			action: "view",
 		});
 
-		return getEmployeeAssignments(input.employeeId);
+		return getEmployeeAssignments(input.employeeId, input.organizationId);
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -63,7 +63,7 @@ export const listProjectAssignments = protectedProcedure
 			action: "view",
 		});
 
-		return getProjectEmployeeAssignments(input.projectId);
+		return getProjectEmployeeAssignments(input.projectId, input.organizationId);
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -92,7 +92,7 @@ export const createAssignmentProcedure = subscriptionProcedure
 			action: "edit",
 		});
 
-		return createEmployeeAssignment({
+		return createEmployeeAssignment(input.organizationId, {
 			employeeId: input.employeeId,
 			projectId: input.projectId,
 			percentage: input.percentage,
@@ -129,7 +129,7 @@ export const updateAssignmentProcedure = subscriptionProcedure
 		});
 
 		const { organizationId, id, ...data } = input;
-		return updateEmployeeAssignment(id, data);
+		return updateEmployeeAssignment(id, organizationId, data);
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -154,5 +154,5 @@ export const removeAssignmentProcedure = subscriptionProcedure
 			action: "edit",
 		});
 
-		return removeEmployeeAssignment(input.id);
+		return removeEmployeeAssignment(input.id, input.organizationId);
 	});

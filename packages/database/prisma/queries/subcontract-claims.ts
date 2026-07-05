@@ -716,10 +716,22 @@ export async function updateSubcontractClaimStatus(
 			updateData.rejectionReason = null;
 		}
 
-		return tx.subcontractClaim.update({
-			where: { id },
+		// Optimistic status guard: only transition if the row is STILL in the
+		// status we validated against. Under a concurrent double-approval, the
+		// second transaction (which read a stale SUBMITTED before the contract
+		// lock) finds status already changed → count 0 → rejected, preventing a
+		// duplicate approval and its duplicate SCL-JE journal entry.
+		const updated = await tx.subcontractClaim.updateMany({
+			where: { id, status: claim.status },
 			data: updateData,
 		});
+		if (updated.count === 0) {
+			throw new Error(`INVALID_TRANSITION:${claim.status}:${newStatus}`);
+		}
+
+		const finalClaim = await tx.subcontractClaim.findUnique({ where: { id } });
+		if (!finalClaim) throw new Error("CLAIM_NOT_FOUND");
+		return finalClaim;
 	});
 }
 
@@ -878,14 +890,17 @@ export async function addSubcontractClaimPayment(data: {
 			},
 		});
 
-		// 6. Deduct from bank account if specified
+		// 6. Deduct from bank account if specified — guard against overdrawing
 		if (data.sourceAccountId) {
-			await tx.organizationBank.update({
-				where: { id: data.sourceAccountId },
+			const bankDec = await tx.organizationBank.updateMany({
+				where: { id: data.sourceAccountId, balance: { gte: data.amount } },
 				data: {
 					balance: { decrement: data.amount },
 				},
 			});
+			if (bankDec.count === 0) {
+				throw new Error("الرصيد غير كافي في الحساب المصدر");
+			}
 		}
 
 		return { ...payment, amount: Number(payment.amount) };

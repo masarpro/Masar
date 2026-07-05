@@ -29,6 +29,8 @@ export const getSubcontractPaymentTermsProgressProcedure = protectedProcedure
 
 		const result = await getSubcontractPaymentTermsProgress(
 			input.contractId,
+			input.organizationId,
+			input.projectId,
 		);
 
 		if (!result) {

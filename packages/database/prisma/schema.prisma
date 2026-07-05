@@ -1814,7 +1814,7 @@ model Quote {
   costStudyId String    @map("cost_study_id")
   costStudy   CostStudy @relation(fields: [costStudyId], references: [id], onDelete: Cascade)
 
-  quoteNumber String @unique @map("quote_number")
+  quoteNumber String @map("quote_number")
   quoteType   String @map("quote_type")
 
   clientName    String  @map("client_name")
@@ -1850,6 +1850,7 @@ model Quote {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([costStudyId])
+  @@unique([costStudyId, quoteNumber])
   @@map("quotes")
 }
 
@@ -2374,7 +2375,7 @@ model SubcontractPayment {
   status        FinanceTransactionStatus @default(COMPLETED)
 
   // رقم سند الصرف (اختياري — يُولّد عند الطباعة)
-  voucherNo String? @unique @map("voucher_no")
+  voucherNo String? @map("voucher_no")
 
   // حساب المصدر (الحساب البنكي الذي تم الصرف منه)
   sourceAccountId String?           @map("source_account_id")
@@ -2392,6 +2393,9 @@ model SubcontractPayment {
   @@index([organizationId, contractId])
   @@index([contractId, termId])
   @@index([contractId, createdAt])
+  @@unique([contractId, paymentNo])
+  @@unique([organizationId, voucherNo])
+  @@index([sourceAccountId])
   @@map("subcontract_payments")
 }
 
@@ -2475,6 +2479,7 @@ model SubcontractClaim {
   @@index([contractId])
   @@index([organizationId])
   @@index([organizationId, contractId, status])
+  @@unique([contractId, claimNo])
   @@map("subcontract_claims")
 }
 
@@ -3400,7 +3405,7 @@ model OrganizationFinanceSettings {
   thankYouMessage String? @map("thank_you_message") // رسالة الشكر
 
   // إعدادات الضريبة والعملة
-  defaultVatPercent Decimal @default(15) @map("default_vat_percent") // نسبة الضريبة الافتراضية
+  defaultVatPercent Decimal @default(15) @map("default_vat_percent") @db.Decimal(5, 2) // نسبة الضريبة الافتراضية
   defaultCurrency   String  @default("SAR") @map("default_currency") // العملة الافتراضية
 
   // الشروط الافتراضية
@@ -3981,7 +3986,7 @@ model Quotation {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // الرقم التسلسلي (QT-2024-0001)
-  quotationNo String @unique @map("quotation_no")
+  quotationNo String @map("quotation_no")
 
   // ربط اختياري بالعميل المحفوظ
   clientId String? @map("client_id")
@@ -4066,6 +4071,7 @@ model Quotation {
   @@index([costStudyId])
   @@index([organizationId, isDraft])
   @@index([sourceQuotationId])
+  @@unique([organizationId, quotationNo])
   @@map("quotations")
 }
 
@@ -4170,7 +4176,7 @@ model FinanceInvoice {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // الرقم التسلسلي (INV-2024-0001)
-  invoiceNo String @unique @map("invoice_no")
+  invoiceNo String @map("invoice_no")
 
   // نوع الفاتورة
   invoiceType InvoiceType @default(STANDARD) @map("invoice_type")
@@ -4282,6 +4288,8 @@ model FinanceInvoice {
   @@index([organizationId, zatcaSubmissionStatus])
   @@index([organizationId, isDraft])
   @@index([sourceInvoiceId])
+  @@unique([organizationId, invoiceNo])
+  @@index([organizationId, issueDate])
   @@map("finance_invoices")
 }
 
@@ -4335,6 +4343,7 @@ model FinanceInvoicePayment {
   receiptVoucher ReceiptVoucher?
 
   @@index([invoiceId])
+  @@index([sourceAccountId])
   @@map("finance_invoice_payments")
 }
 
@@ -4348,7 +4357,7 @@ model OpenDocument {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // الرقم التسلسلي
-  documentNo String @unique @map("document_no")
+  documentNo String @map("document_no")
 
   // النوع
   documentType OpenDocumentType @default(OTHER) @map("document_type")
@@ -4381,6 +4390,7 @@ model OpenDocument {
   @@index([organizationId])
   @@index([organizationId, documentType])
   @@index([organizationId, projectId])
+  @@unique([organizationId, documentNo])
   @@map("open_documents")
 }
 
@@ -4508,7 +4518,7 @@ model FinanceExpense {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // الرقم التسلسلي (EXP-2024-0001)
-  expenseNo String @unique @map("expense_no")
+  expenseNo String @map("expense_no")
 
   // الفئة
   category       OrgExpenseCategory
@@ -4561,7 +4571,7 @@ model FinanceExpense {
   notes String? @db.Text
 
   // رقم سند الصرف (اختياري — يُولّد عند الطباعة)
-  voucherNo String? @unique @map("voucher_no")
+  voucherNo String? @map("voucher_no")
 
   // من أنشأ
   createdById String @map("created_by")
@@ -4586,6 +4596,8 @@ model FinanceExpense {
   @@index([organizationId, sourceType])
   @@index([organizationId, status, dueDate])
   @@index([organizationId, status, date])
+  @@unique([organizationId, expenseNo])
+  @@unique([organizationId, voucherNo])
   @@map("finance_expenses")
 }
 
@@ -4596,7 +4608,7 @@ model FinancePayment {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // الرقم التسلسلي (RCV-2024-0001)
-  paymentNo String @unique @map("payment_no")
+  paymentNo String @map("payment_no")
 
   // المبلغ والتاريخ
   amount Decimal  @db.Decimal(15, 2)
@@ -4650,6 +4662,7 @@ model FinancePayment {
   @@index([organizationId, destinationAccountId])
   @@index([contractTermId])
   @@index([organizationId, status, date])
+  @@unique([organizationId, paymentNo])
   @@map("finance_payments")
 }
 
@@ -4660,7 +4673,7 @@ model FinanceTransfer {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // الرقم التسلسلي (TRF-2024-0001)
-  transferNo String @unique @map("transfer_no")
+  transferNo String @map("transfer_no")
 
   // المبلغ والتاريخ
   amount Decimal  @db.Decimal(15, 2)
@@ -4690,6 +4703,7 @@ model FinanceTransfer {
   @@index([organizationId, date])
   @@index([organizationId, fromAccountId])
   @@index([organizationId, toAccountId])
+  @@unique([organizationId, transferNo])
   @@map("finance_transfers")
 }
 
@@ -5316,8 +5330,8 @@ model Lead {
   // تفاصيل المشروع المتوقع
   projectType     ProjectType?
   projectLocation String?
-  estimatedArea   Decimal? // المساحة التقديرية م²
-  estimatedValue  Decimal? // القيمة التقديرية SAR
+  estimatedArea   Decimal? @db.Decimal(15, 4) // المساحة التقديرية م²
+  estimatedValue  Decimal? @db.Decimal(15, 2) // القيمة التقديرية SAR
 
   // إدارة الفرصة
   status            LeadStatus   @default(NEW)

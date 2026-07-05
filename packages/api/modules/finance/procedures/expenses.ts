@@ -573,8 +573,12 @@ export const payExpenseProcedure = subscriptionProcedure
 			metadata: { amount: input.amount, sourceAccountId: input.sourceAccountId, newStatus: expense.status },
 		});
 
-		// Auto-Journal: generate accounting entry for expense payment
-		try {
+		// Auto-Journal: generate accounting entry ONLY when the expense is fully
+		// paid (COMPLETED). Posting on a partial payment would record a journal
+		// for the full expense amount while the bank was only debited the partial
+		// amount — breaking the ledger/bank reconciliation. The completing payment
+		// posts the full EXP-JE, matching the cumulative bank decrements.
+		if (expense.status === "COMPLETED") try {
 			const { onExpenseCompleted } = await import("../../../lib/accounting/auto-journal");
 			// Prefer the DB-backed category's GL account + VAT treatment (custom categories)
 			const payCategory = expense.categoryId

@@ -143,8 +143,8 @@ export const createInvoiceProcedure = subscriptionProcedure
 
 		// If created from a quotation, update its status to CONVERTED
 		if (input.quotationId) {
-			await db.quotation.update({
-				where: { id: input.quotationId },
+			await db.quotation.updateMany({
+				where: { id: input.quotationId, organizationId: input.organizationId },
 				data: { status: "CONVERTED" },
 			}).catch((e) => {
 				console.error("[createInvoice] Failed to update quotation status:", e);
@@ -363,7 +363,7 @@ export const updateInvoiceStatusProcedure = subscriptionProcedure
 
 		const currentInvoice = await db.financeInvoice.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
-			select: { status: true },
+			select: { status: true, invoiceType: true },
 		});
 		if (!currentInvoice) throw new Error("الفاتورة غير موجودة");
 
@@ -372,11 +372,63 @@ export const updateInvoiceStatusProcedure = subscriptionProcedure
 			throw new Error(`لا يمكن تغيير حالة الفاتورة من ${currentInvoice.status} إلى ${input.status}`);
 		}
 
+		// Credit notes must not be cancelled through the generic status path:
+		// they carry their own reversal + paidAmount side-effects on the original
+		// invoice, which this path does not handle. Block to avoid double-crediting.
+		if (
+			input.status === "CANCELLED" &&
+			currentInvoice.invoiceType === "CREDIT_NOTE"
+		) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "لا يمكن إلغاء إشعار دائن من هذا المسار",
+			});
+		}
+
 		const invoice = await updateInvoiceStatus(
 			input.id,
 			input.organizationId,
 			input.status,
 		);
+
+		// Cancelling an issued invoice must reverse its posted journal entries,
+		// otherwise revenue + VAT + receivable linger in the ledger forever.
+		if (input.status === "CANCELLED") {
+			try {
+				const { reverseAutoJournalEntry } = await import(
+					"../../../lib/accounting/auto-journal"
+				);
+				// Reverse the main invoice entry (INV-JE)
+				await reverseAutoJournalEntry(db, {
+					organizationId: input.organizationId,
+					referenceType: "INVOICE",
+					referenceId: input.id,
+					userId: context.user.id,
+				});
+				// Reverse any collection entries (RCV-JE) for this invoice's payments
+				const payments = await db.financeInvoicePayment.findMany({
+					where: { invoiceId: input.id },
+					select: { id: true },
+				});
+				for (const p of payments) {
+					await reverseAutoJournalEntry(db, {
+						organizationId: input.organizationId,
+						referenceType: "INVOICE_PAYMENT",
+						referenceId: p.id,
+						userId: context.user.id,
+					});
+				}
+			} catch (e) {
+				console.error("[AutoJournal] Failed to reverse cancelled invoice:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: input.id,
+					metadata: { error: String(e), referenceType: "INVOICE_CANCEL" },
+				});
+			}
+		}
 
 		orgAuditLog({
 			organizationId: input.organizationId,
@@ -1152,14 +1204,17 @@ export const createCreditNoteProcedure = subscriptionProcedure
 		// Auto-Journal: generate accounting entry for credit note
 		try {
 			const { onCreditNoteIssued } = await import("../../../lib/accounting/auto-journal");
+			// Credit note amounts are stored negated; the hook expects positive
+			// magnitudes (DR revenue / CR receivable). Pass absolute values so the
+			// entry balances and posts in the correct direction.
 			await onCreditNoteIssued(db, {
 				id: creditNote.id,
 				organizationId: input.organizationId,
 				number: creditNote.invoiceNo,
 				issueDate: creditNote.issueDate,
 				clientName: creditNote.clientName,
-				totalAmount: creditNote.totalAmount,
-				vatAmount: creditNote.vatAmount,
+				totalAmount: creditNote.totalAmount.abs(),
+				vatAmount: creditNote.vatAmount.abs(),
 				projectId: creditNote.projectId,
 				userId: context.user.id,
 			});
