@@ -239,13 +239,13 @@ describe("File size validation", () => {
 		expect(r.valid).toBe(false);
 	});
 
-	it("PHOTO: accepts 20MB", () => {
-		const r = validateAttachment("PHOTO", "image/jpeg", 20 * 1024 * 1024);
+	it("PHOTO: accepts 100MB (raised for video support)", () => {
+		const r = validateAttachment("PHOTO", "image/jpeg", 100 * 1024 * 1024);
 		expect(r.valid).toBe(true);
 	});
 
-	it("PHOTO: rejects 21MB", () => {
-		const r = validateAttachment("PHOTO", "image/jpeg", 21 * 1024 * 1024);
+	it("PHOTO: rejects 101MB", () => {
+		const r = validateAttachment("PHOTO", "image/jpeg", 101 * 1024 * 1024);
 		expect(r.valid).toBe(false);
 	});
 
