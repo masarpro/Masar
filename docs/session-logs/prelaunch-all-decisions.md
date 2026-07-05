@@ -34,3 +34,25 @@
 - **القرار:** لا عمل مطلوب. ⚠️ يتبقى على المالك ضبط `TURNSTILE_SECRET_KEY` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY` في Vercel (بدون site key لن يعمل نموذج التواصل في الإنتاج لأن الزر يبقى معطلاً). | الثقة: عالي
 - ملاحظة خارج النطاق (توثيق فقط): endpoints العامة تقرأ IP من `x-forwarded-for` مباشرة بينما يوجد helper أفضل `getClientIp` يفضّل `x-real-ip` (`rate-limit.ts:360`) — توحيدها تحسين مستقبلي.
 
+### المرحلة 1 (race condition المطالبات): محلولة مسبقاً ⏭️ + ثغرات مجاورة موثّقة
+- **مطالبات المشروع:** `packages/database/prisma/queries/project-finance.ts` — `createProjectClaim` (487-571) و`updateClaimStatus` (577-684) و`updateProjectClaim` (809-892): كلها داخل `db.$transaction` مع قفل `SELECT ... FOR UPDATE` على `project_contracts` وإعادة تحقق من السقف (قيمة العقد + أوامر التغيير المعتمدة) داخل الـtransaction، مع خطأ `CLAIMS_EXCEED_CONTRACT_VALUE` يُترجم لرسالة عربية في الـprocedures.
+- **مطالبات الباطن:** `packages/database/prisma/queries/subcontract-claims.ts` — `createSubcontractClaim` (146+, قفل سطر 171-174) و`updateSubcontractClaimStatus` (629+, قفل 676-679): قفل `subcontract_contracts FOR UPDATE` + تحقق كميات لكل بند (`QTY_EXCEEDS_REMAINING`).
+- **القرار:** لا عمل — البندان الأساسيان محصّنان. | الثقة: عالي
+- **مواضع مماثلة موثّقة فقط (لا توسّع، حسب نص المهمة):**
+  - `subcontract-claims.ts:806` — `addSubcontractClaimPayment`: transaction بلا قفل قبل قراءة `paidAmount` → دفعتان متزامنتان قد تتجاوزان المستحق.
+  - `subcontract.ts:610` — `createSubcontractPayment`: بلا قفل وبلا سقف مقابل قيمة العقد.
+  - `subcontract.ts:533,567` — أوامر تغيير الباطن: بلا قفل/تحقق، واعتمادها يغيّر السقف الفعلي دون تسلسل مع المطالبات.
+  - `project-payments.ts:406` — `createProjectPayment`: بلا قفل.
+
+### المرحلة 5 (تضاعف تكلفة المواد) — التشخيص الكامل قبل الإصلاح
+**السطح المتأثر:** `CostingSummaryTab.tsx` (ملخص تسعير التكلفة) يقرأ `pricing.studies.costing.getSummary`.
+**السبب الجذري (بالدليل):** صفوف `CostingItem` مكررة في قاعدة البيانات، مصدرها `costingGenerateItems` (`packages/api/modules/quantities/procedures/costing.ts:53-199`):
+1. النمط `count` ثم `createMany` **غير ذري وبلا قفل** (سطر 74-80 ثم 195)، ولا يوجد unique constraint على `(costStudyId, sourceItemType, sourceItemId)` في الـschema (`schema.prisma:5504-5551`).
+2. التوليد يُستدعى تلقائياً من **5 مواضع** قد تتزامن عند أول فتح لصفحة التسعير: `CostingPageContentV2.tsx:68-72`، `FinishingCostingTab.tsx:166-175`، `StructuralCostingTab.tsx:99-111`، `MEPCostingTab.tsx:69`، `pipeline/CostingPageContent.tsx:60` — طلبان متزامنان يريان كلاهما `count == 0` فيُدرج كل منهما مجموعة كاملة.
+3. **لماذا المواد تتضاعف والمصنعيات لا:** `materialTotal` مخزّن على كل صف فجمعه (`costing.ts:525`) يتضاعف مع التكرار؛ بينما مصنعيات الإنشائي lump sum على **الصف الأول فقط** (`costingSetSectionLabor`, costing.ts:412-481) والصفوف المكررة تحمل `laborTotal = 0` — يطابق تماماً 18,134.49 → 36,268.98 مع مصنعيات صحيحة.
+**الإصلاح المقرر (بأقل تغيير، بلا schema):**
+1. جعل التوليد ذرياً: `$transaction` + قفل `SELECT id FROM cost_studies WHERE id = $1 FOR UPDATE` (نفس نمط المطالبات) + إعادة العدّ داخل الـtransaction + تحقق أن الدراسة تتبع المنظمة.
+2. دفاع في القراءة: إزالة التكرار في `costingGetSummary` حسب `(sourceItemType, sourceItemId)` مع إبقاء الأحدث تعديلاً — يصحّح العرض للبيانات المكررة تاريخياً دون حذف بيانات.
+3. إصلاح ثانوي في نفس السطح: `CostingSummaryTab.tsx:80-81` يقرأ `grandTotal?.materialTotal/laborTotal` بينما الـAPI يعيد `grandTotal.material/labor` → صف الإجمالي يعرض صفراً.
+**بدائل مرفوضة:** unique constraint (تعديل schema ممنوع)؛ حذف تلقائي للصفوف المكررة من DB (خطر فقدان تعديلات المستخدم على أحد التكرارات — العرض الموحّد أأمن). | الثقة: عالي
+
