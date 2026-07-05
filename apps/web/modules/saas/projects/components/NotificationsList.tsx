@@ -5,7 +5,7 @@ import { groupNotificationsByDay } from "@saas/notifications/lib/group-by-day";
 import { getEventIcon } from "@saas/notifications/lib/notification-icons";
 import { getNotificationHref } from "@saas/notifications/lib/notification-links";
 import { useVisibleNotificationGroups } from "@saas/notifications/lib/use-visible-notification-groups";
-import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { NotificationsListSkeleton } from "@saas/shared/components/skeletons";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import {
 	useInfiniteQuery,
@@ -225,7 +225,7 @@ export function NotificationsList({
 
 			{/* States */}
 			{isLoading ? (
-				<ListTableSkeleton />
+				<NotificationsListSkeleton withHeader={false} />
 			) : isError ? (
 				<EmptyState
 					icon={<AlertCircle className="h-10 w-10" />}

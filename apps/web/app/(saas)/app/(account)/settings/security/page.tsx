@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { config } from "@repo/config";
 import { userAccountQueryKey, userPasskeyQueryKey } from "@saas/auth/lib/api";
 import {
@@ -26,11 +25,8 @@ export async function generateMetadata() {
 }
 
 export default async function AccountSettingsPage() {
-	return (
-		<Suspense fallback={null}>
-			<AccountSecurityPageContent />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <AccountSecurityPageContent />;
 }
 
 async function AccountSecurityPageContent() {

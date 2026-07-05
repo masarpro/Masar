@@ -1,5 +1,6 @@
 "use client";
 
+import { AdminRevenueSkeleton } from "@saas/shared/components/skeletons";
 import dynamic from "next/dynamic";
 
 const AdminRevenue = dynamic(
@@ -8,9 +9,7 @@ const AdminRevenue = dynamic(
 			default: m.AdminRevenue,
 		})),
 	{
-		loading: () => (
-			<div className="h-96 animate-pulse rounded-lg bg-muted" />
-		),
+		loading: () => <AdminRevenueSkeleton />,
 		ssr: false,
 	},
 );

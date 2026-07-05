@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { auth } from "@repo/auth";
 import { OrganizationForm } from "@saas/admin/component/organizations/OrganizationForm";
 import { getAdminPath } from "@saas/admin/lib/links";
@@ -21,11 +20,8 @@ export default async function OrganizationFormPage({
 	const { id } = await params;
 	const { backTo } = await searchParams;
 
-	return (
-		<Suspense fallback={null}>
-			<OrganizationFormPageContent id={id} backTo={backTo} />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <OrganizationFormPageContent id={id} backTo={backTo} />;
 }
 
 async function OrganizationFormPageContent({

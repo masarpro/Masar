@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { config } from "@repo/config";
 import { getSession } from "@saas/auth/lib/server";
 import { ChangeEmailForm } from "@saas/settings/components/ChangeEmailForm";
@@ -18,11 +17,9 @@ export async function generateMetadata() {
 }
 
 export default async function AccountSettingsPage() {
-	return (
-		<Suspense fallback={null}>
-			<AccountSettingsPageContent />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await,
+	// avoiding a blank frame between skeleton and content.
+	return <AccountSettingsPageContent />;
 }
 
 async function AccountSettingsPageContent() {
