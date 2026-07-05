@@ -459,7 +459,66 @@ export const updateExpenseProcedure = subscriptionProcedure
 			...(resolvedSubcategoryId !== undefined ? { subcategoryId: resolvedSubcategoryId } : {}),
 		};
 
+		// Snapshot journal-affecting fields before the update so we can tell if the
+		// posted entry needs rebuilding (category/date/project drive GL account,
+		// period and cost-center — a stale entry silently diverges from the ledger).
+		const before = await db.financeExpense.findFirst({
+			where: { id, organizationId },
+			select: { status: true, category: true, categoryId: true, date: true, projectId: true },
+		});
+
 		const expense = await updateExpense(id, organizationId, data);
+
+		// If the expense is already posted and a journal-affecting field changed,
+		// reverse the old entry and recreate it with the new values.
+		if (before?.status === "COMPLETED") {
+			const journalFieldsChanged =
+				(data.category !== undefined && data.category !== before.category) ||
+				(resolvedCategoryId !== undefined && resolvedCategoryId !== before.categoryId) ||
+				(data.date !== undefined && data.date.getTime() !== before.date.getTime()) ||
+				(rest.projectId !== undefined && rest.projectId !== before.projectId);
+			if (journalFieldsChanged) {
+				try {
+					const { reverseAutoJournalEntry, onExpenseCompleted } = await import("../../../lib/accounting/auto-journal");
+					await reverseAutoJournalEntry(db, {
+						organizationId,
+						referenceType: "EXPENSE",
+						referenceId: id,
+						userId: context.user.id,
+					});
+					const payCategory = expense.categoryId
+						? await db.orgCategory.findUnique({
+								where: { id: expense.categoryId },
+								select: { accountCode: true, isVatExempt: true },
+							})
+						: null;
+					await onExpenseCompleted(db, {
+						id: expense.id,
+						organizationId,
+						category: expense.category,
+						accountCode: payCategory?.accountCode,
+						isVatExempt: payCategory?.isVatExempt,
+						amount: expense.amount,
+						date: expense.date,
+						description: expense.description ?? expense.category,
+						sourceAccountId: expense.sourceAccountId,
+						projectId: expense.projectId,
+						sourceType: expense.sourceType,
+						userId: context.user.id,
+					});
+				} catch (e) {
+					console.error("[AutoJournal] Failed to rebuild entry for updated expense:", e);
+					orgAuditLog({
+						organizationId,
+						actorId: context.user.id,
+						action: "JOURNAL_ENTRY_FAILED",
+						entityType: "journal_entry",
+						entityId: id,
+						metadata: { error: String(e), referenceType: "EXPENSE" },
+					});
+				}
+			}
+		}
 
 		orgAuditLog({
 			organizationId,

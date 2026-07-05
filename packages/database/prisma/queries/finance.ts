@@ -1719,11 +1719,11 @@ export async function createCreditNote(data: {
 		throw new Error("لا يمكن إنشاء إشعار دائن لفاتورة مسودة أو ملغية");
 	}
 
-	// Bug #9 fix: validate credit note amount doesn't exceed original invoice remaining
-	const itemTotals = data.items.reduce(
-		(sum, item) => sum.add(D(item.quantity).times(D(item.unitPrice))),
-		ZERO,
-	);
+	// Bug #9 fix: validate credit note amount doesn't exceed original invoice
+	// remaining. Compare like-for-like: the credit note's FULL total (after
+	// discount + VAT) against the original's VAT-inclusive total — not the raw
+	// pre-VAT item sum, which previously let a credit note slip past the ceiling.
+	const totals = calculateInvoiceTotals(data.items, original.discountPercent, original.vatPercent);
 	const existingCreditNotes = await db.financeInvoice.aggregate({
 		where: {
 			relatedInvoiceId: data.originalInvoiceId,
@@ -1734,12 +1734,11 @@ export async function createCreditNote(data: {
 	});
 	// Credit note totalAmounts are negative, so abs() to get the credited total
 	const totalAlreadyCredited = D(existingCreditNotes._sum.totalAmount ?? 0).abs();
-	if (totalAlreadyCredited.add(itemTotals).greaterThan(D(original.totalAmount))) {
+	if (totalAlreadyCredited.add(totals.totalAmount).greaterThan(D(original.totalAmount))) {
 		throw new Error("مبلغ الإشعار الدائن يتجاوز المبلغ المتبقي من الفاتورة الأصلية");
 	}
 
 	const invoiceNo = await generateInvoiceNumber(data.organizationId);
-	const totals = calculateInvoiceTotals(data.items, original.discountPercent, original.vatPercent);
 
 	// Negate amounts for credit note (ZATCA: credit notes are reversals)
 	const negSubtotal = totals.subtotal.neg();
