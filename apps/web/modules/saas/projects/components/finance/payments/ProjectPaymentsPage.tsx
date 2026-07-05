@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { Button } from "@ui/components/button";
 import { Plus, Info, Hammer } from "lucide-react";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { PaymentsSummaryCards } from "./PaymentsSummaryCards";
 import { PaymentProgressBar } from "./PaymentProgressBar";
 import { PaymentTermsSection } from "./PaymentTermsSection";
@@ -36,19 +37,7 @@ export function ProjectPaymentsPage({
 	);
 
 	if (isLoading) {
-		return (
-			<div className="w-full max-w-full space-y-6">
-				<div className="h-10 w-48 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />
-				<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-					{Array.from({ length: 4 }).map((_, i) => (
-						<div
-							key={i}
-							className="h-28 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800"
-						/>
-					))}
-				</div>
-			</div>
-		);
+		return <DashboardSkeleton />;
 	}
 
 	const hasContract = data?.hasContract ?? false;

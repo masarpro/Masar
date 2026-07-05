@@ -19,7 +19,7 @@ import {
 	ArrowDownRight,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { ProfitabilityReportSkeleton } from "@saas/shared/components/skeletons";
 
 interface ProfitabilityReportProps {
 	organizationId: string;
@@ -54,7 +54,7 @@ export function ProfitabilityReport({
 	);
 
 	if (isLoading) {
-		return <DashboardSkeleton />;
+		return <ProfitabilityReportSkeleton />;
 	}
 
 	if (!data) {

@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PhotosPageContent } from "@saas/projects/components/photos/PhotosPageContent";
-import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { PhotoGridSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -17,7 +17,7 @@ export default async function PhotosPage({
 }) {
 	const { organizationSlug, projectId } = await params;
 	return (
-		<Suspense fallback={<DashboardSkeleton />}>
+		<Suspense fallback={<PhotoGridSkeleton />}>
 			<PhotosPageWrapper
 				organizationSlug={organizationSlug}
 				projectId={projectId}

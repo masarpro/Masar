@@ -4,7 +4,7 @@ import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { FinanceView } from "@saas/projects/components/finance/FinanceView";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 
 export async function generateMetadata() {
 	const t = await getTranslations();
@@ -22,7 +22,7 @@ export default async function FinancePage({
 	const { organizationSlug, projectId } = await params;
 
 	return (
-		<Suspense fallback={<ListTableSkeleton rows={8} cols={5} />}>
+		<Suspense fallback={<DashboardSkeleton />}>
 			<FinancePageContent organizationSlug={organizationSlug} projectId={projectId} />
 		</Suspense>
 	);

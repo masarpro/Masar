@@ -1,6 +1,7 @@
 "use client";
 
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import { ExecutionDashboardSkeleton } from "@saas/shared/components/skeletons";
 import { exportToPDF } from "@saas/shared/lib/pdf-export";
 import { apiClient } from "@shared/lib/api-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -175,18 +176,9 @@ export function ExecutionDashboard({ projectId }: ExecutionDashboardProps) {
 		});
 	};
 
-	// Loading skeleton
+	// Loading skeleton — must match the route loading.tsx / Suspense fallback
 	if (isLoading) {
-		return (
-			<div className="space-y-6">
-				<HealthStatStrip health={null} isLoading />
-				<div className="space-y-3">
-					{[...Array(3)].map((_, i) => (
-						<div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
-					))}
-				</div>
-			</div>
-		);
+		return <ExecutionDashboardSkeleton />;
 	}
 
 	// Delayed milestones warning
