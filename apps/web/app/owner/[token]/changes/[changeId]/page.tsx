@@ -1,11 +1,11 @@
 "use client";
 
+import { OwnerChangeDetailSkeleton } from "@saas/projects-owner/components/skeletons";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import { Card } from "@ui/components/card";
-import { Skeleton } from "@ui/components/skeleton";
 import {
 	ArrowLeft,
 	Banknote,
@@ -70,17 +70,7 @@ export default function OwnerChangeOrderDetailPage() {
 	) as { data: any; isLoading: boolean };
 
 	if (isLoading) {
-		return (
-			<div className="space-y-6">
-				<Skeleton className="h-4 w-32" />
-				<Skeleton className="h-40 w-full rounded-xl" />
-				<div className="grid gap-4 sm:grid-cols-2">
-					<Skeleton className="h-24 rounded-xl" />
-					<Skeleton className="h-24 rounded-xl" />
-				</div>
-				<Skeleton className="h-32 w-full rounded-xl" />
-			</div>
-		);
+		return <OwnerChangeDetailSkeleton />;
 	}
 
 	if (!changeOrder) {

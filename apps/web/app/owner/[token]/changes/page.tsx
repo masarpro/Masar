@@ -1,5 +1,6 @@
 "use client";
 
+import { OwnerChangesSkeleton } from "@saas/projects-owner/components/skeletons";
 import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
@@ -14,7 +15,6 @@ import {
 	TableHeader,
 	TableRow,
 } from "@ui/components/table";
-import { Skeleton } from "@ui/components/skeleton";
 import {
 	FileTextIcon,
 	TrendingUpIcon,
@@ -111,24 +111,7 @@ export default function OwnerChangeOrdersPage() {
 	};
 
 	if (isLoading) {
-		return (
-			<div className="space-y-6">
-				<div>
-					<Skeleton className="h-7 w-48" />
-					<Skeleton className="mt-1 h-4 w-64" />
-				</div>
-				<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-					{Array.from({ length: 4 }).map((_, i) => (
-						<Skeleton key={i} className="h-20 rounded-xl" />
-					))}
-				</div>
-				<div className="rounded-xl border border-border p-4 space-y-3">
-					{Array.from({ length: 5 }).map((_, i) => (
-						<Skeleton key={i} className="h-12 w-full" />
-					))}
-				</div>
-			</div>
-		);
+		return <OwnerChangesSkeleton />;
 	}
 
 	return (

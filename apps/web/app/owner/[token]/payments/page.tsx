@@ -4,12 +4,12 @@ import {
 	OwnerPaymentMilestonesGrid,
 	type OwnerPaymentTerm,
 } from "@saas/projects-owner/components/OwnerPaymentMilestonesGrid";
+import { OwnerPaymentsSkeleton } from "@saas/projects-owner/components/skeletons";
 import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
 import { GlassStatCard } from "@ui/components/glass-stat-card";
-import { Skeleton } from "@ui/components/skeleton";
 import {
 	Banknote,
 	CheckCircle,
@@ -94,22 +94,8 @@ export default function OwnerPortalPayments() {
 		}),
 	) as { data: any; isLoading: boolean };
 
-	if (isLoading) {
-		return (
-			<div className="space-y-6">
-				<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-					{Array.from({ length: 4 }).map((_, i) => (
-						<Skeleton key={i} className="h-24 rounded-2xl" />
-					))}
-				</div>
-				<Skeleton className="h-40 w-full rounded-2xl" />
-				<Skeleton className="h-48 w-full rounded-2xl" />
-			</div>
-		);
-	}
-
-	if (!data) {
-		return null;
+	if (isLoading || !data) {
+		return <OwnerPaymentsSkeleton />;
 	}
 
 	const {
