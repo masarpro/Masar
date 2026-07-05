@@ -4297,6 +4297,9 @@
       "noOutstandingReceivables": "No outstanding receivables",
       "noOutstandingPayables": "No outstanding payables",
       "agingDistribution": "Aging Distribution",
+      "uninvoicedClaims": "Uninvoiced Receivables (Approved Claims)",
+      "uninvoicedClaimsHint": "Approved project claims not yet invoiced — shown separately, not merged into the receivables totals above",
+      "approvedOn": "Approved On",
       "sar": "SAR",
       "aging": {
         "current": "Current (Not Due)",

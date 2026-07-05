@@ -74,6 +74,20 @@ export function AgedReceivablesReport({
 	if (!data) return null;
 
 	const { rows, totals } = data;
+	const uninvoicedClaims = (data as any).uninvoicedClaims as
+		| {
+				items: Array<{
+					id: string;
+					claimNo: number;
+					projectName: string;
+					clientName: string | null;
+					amount: number;
+					dueDate: string | null;
+					approvedAt: string | null;
+				}>;
+				total: number;
+		  }
+		| undefined;
 
 	// KPI calculations
 	const overdueClients = rows.filter((r: any) => r.over90 > 0).length;
@@ -454,6 +468,86 @@ export function AgedReceivablesReport({
 					</Card>
 				)}
 			</div>
+
+			{/* مستخلصات معتمدة غير مفوترة — قسم منفصل عن الذمم المفوترة */}
+			{uninvoicedClaims && uninvoicedClaims.items.length > 0 && (
+				<Card className="rounded-2xl">
+					<CardHeader>
+						<CardTitle className="text-sm">
+							{t("finance.accountingReports.uninvoicedClaims")}
+						</CardTitle>
+						<p className="text-xs text-slate-500 dark:text-slate-400">
+							{t("finance.accountingReports.uninvoicedClaimsHint")}
+						</p>
+					</CardHeader>
+					<CardContent>
+						<div className="overflow-x-auto">
+							<Table>
+								<TableHeader>
+									<TableRow>
+										<TableHead className="text-start">
+											{t("finance.accountingReports.project")}
+										</TableHead>
+										<TableHead className="text-start">
+											{t("finance.accountingReports.client")}
+										</TableHead>
+										<TableHead className="text-start">
+											{t("finance.accountingReports.claim")}
+										</TableHead>
+										<TableHead className="text-start">
+											{t("finance.accountingReports.approvedOn")}
+										</TableHead>
+										<TableHead className="text-start">
+											{t("finance.accountingReports.dueDate")}
+										</TableHead>
+										<TableHead className="text-end">
+											{t("finance.accountingReports.aging.total")}
+										</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{uninvoicedClaims.items.map((claim) => (
+										<TableRow key={claim.id}>
+											<TableCell className="font-medium">
+												{claim.projectName}
+											</TableCell>
+											<TableCell className="text-slate-500">
+												{claim.clientName ?? "—"}
+											</TableCell>
+											<TableCell>#{claim.claimNo}</TableCell>
+											<TableCell className="text-sm text-slate-500">
+												{claim.approvedAt
+													? new Date(
+															claim.approvedAt,
+														).toLocaleDateString("en-SA")
+													: "—"}
+											</TableCell>
+											<TableCell className="text-sm text-slate-500">
+												{claim.dueDate
+													? new Date(
+															claim.dueDate,
+														).toLocaleDateString("en-SA")
+													: "—"}
+											</TableCell>
+											<TableCell className="text-end font-medium">
+												<Currency amount={claim.amount} />
+											</TableCell>
+										</TableRow>
+									))}
+									<TableRow className="border-t-2 font-bold bg-slate-50 dark:bg-slate-900">
+										<TableCell colSpan={5}>
+											{t("finance.accountingReports.aging.total")}
+										</TableCell>
+										<TableCell className="text-end">
+											<Currency amount={uninvoicedClaims.total} />
+										</TableCell>
+									</TableRow>
+								</TableBody>
+							</Table>
+						</div>
+					</CardContent>
+				</Card>
+			)}
 		</div>
 	);
 }
