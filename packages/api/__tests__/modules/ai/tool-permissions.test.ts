@@ -1,8 +1,14 @@
 import { describe, it, expect } from "vitest";
 import {
-	isToolAllowed,
+	isToolAuthorized,
 	filterToolsByPermission,
+	getAuthorizedToolNames,
 	getPermissionSummaryForPrompt,
+	isNavigationAllowed,
+	isModulePromptAllowed,
+	withPermissionGuard,
+	permissionDeniedResult,
+	AI_PERMISSION_DENIED_CODE,
 	TOOL_PERMISSION_MAP,
 } from "@repo/ai/lib/tool-permissions";
 import {
@@ -12,224 +18,465 @@ import {
 } from "@repo/database/prisma/permissions";
 
 /**
- * AI Tool Permission Tests
+ * RBAC-AI — اختبارات صلاحيات أدوات المساعد الذكي
  *
- * Tests the permission-based tool filtering for the AI assistant.
- * Uses the real permission system — no mocks needed.
+ * تستخدم نظام الصلاحيات الحقيقي (DEFAULT_ROLE_PERMISSIONS) بلا mocks.
  */
 
-// Helper to create permissions with specific grants
+const OWNER = DEFAULT_ROLE_PERMISSIONS.OWNER;
+const PM = DEFAULT_ROLE_PERMISSIONS.PROJECT_MANAGER;
+const ACCOUNTANT = DEFAULT_ROLE_PERMISSIONS.ACCOUNTANT;
+const ENGINEER = DEFAULT_ROLE_PERMISSIONS.ENGINEER;
+const SUPERVISOR = DEFAULT_ROLE_PERMISSIONS.SUPERVISOR;
+
 function permissionsWith(
-	overrides: Partial<Record<keyof Permissions, Partial<Permissions[keyof Permissions]>>>,
+	overrides: Partial<
+		Record<keyof Permissions, Partial<Permissions[keyof Permissions]>>
+	>,
 ): Permissions {
 	const base = createEmptyPermissions();
 	for (const section of Object.keys(overrides) as (keyof Permissions)[]) {
 		if (overrides[section]) {
-			(base as any)[section] = { ...(base as any)[section], ...overrides[section] };
+			(base as any)[section] = {
+				...(base as any)[section],
+				...overrides[section],
+			};
 		}
 	}
 	return base;
 }
 
-// Dummy tool definitions for filterToolsByPermission tests
-const ALL_TOOLS: Record<string, { description: string }> = {
-	navigateTo: { description: "Navigate" },
-	getMyPermissions: { description: "Get permissions" },
-	queryProjects: { description: "Query projects" },
-	queryFinance: { description: "Query finance" },
-	queryVouchers: { description: "Query vouchers" },
-	queryLeads: { description: "Query leads" },
-	getProjectDetails: { description: "Get project details" },
-	getProjectFinanceSummary: { description: "Get project finance" },
-	queryAccounting: { description: "Query accounting" },
-	getAccountingReports: { description: "Accounting reports" },
-	queryCompany: { description: "Query company" },
-	queryCostStudies: { description: "Cost studies" },
-};
-
-describe("AI Tool Permissions", () => {
-	describe("Permission Filtering", () => {
-		it("should allow tools with null permission (always allowed)", () => {
-			const emptyPerms = createEmptyPermissions();
-			expect(isToolAllowed("navigateTo", emptyPerms)).toBe(true);
-			expect(isToolAllowed("getMyPermissions", emptyPerms)).toBe(true);
-		});
-
-		it("should allow tools not in permission map (default allow for unknown tools)", () => {
-			const emptyPerms = createEmptyPermissions();
-			expect(isToolAllowed("unknownFutureTool", emptyPerms)).toBe(true);
-		});
-
-		it("should block tools when user lacks required permission", () => {
-			const emptyPerms = createEmptyPermissions();
-			expect(isToolAllowed("queryProjects", emptyPerms)).toBe(false);
-			expect(isToolAllowed("queryFinance", emptyPerms)).toBe(false);
-			expect(isToolAllowed("queryLeads", emptyPerms)).toBe(false);
-		});
-
-		it("should allow tools when user has required permission", () => {
-			const perms = permissionsWith({
-				projects: { view: true },
-				finance: { view: true },
-			});
-			expect(isToolAllowed("queryProjects", perms)).toBe(true);
-			expect(isToolAllowed("queryFinance", perms)).toBe(true);
-		});
-
-		it("should filter tool set based on user permissions", () => {
-			const viewerPerms = permissionsWith({
-				projects: { view: true },
-			});
-			const filtered = filterToolsByPermission(ALL_TOOLS, viewerPerms);
-
-			// Always-allowed tools should be present
-			expect(filtered["navigateTo"]).toBeDefined();
-			expect(filtered["getMyPermissions"]).toBeDefined();
-
-			// Project tools should be present
-			expect(filtered["queryProjects"]).toBeDefined();
-			expect(filtered["getProjectDetails"]).toBeDefined();
-
-			// Finance tools should be filtered out
-			expect(filtered["queryFinance"]).toBeUndefined();
-			expect(filtered["queryVouchers"]).toBeUndefined();
-		});
-
-		it("should distinguish between view and sub-permissions in finance", () => {
-			// User has finance.view but not finance.payments
-			const perms = permissionsWith({
-				finance: { view: true, payments: false },
-			});
-			expect(isToolAllowed("queryFinance", perms)).toBe(true);
-			expect(isToolAllowed("queryVouchers", perms)).toBe(false);
-		});
-
-		it("should check correct section for cross-module tools", () => {
-			// querySubcontracts requires projects.viewFinance, not finance.view
-			const perms = permissionsWith({
-				finance: { view: true },
-				projects: { viewFinance: false },
-			});
-			expect(isToolAllowed("querySubcontracts", perms)).toBe(false);
-
-			const perms2 = permissionsWith({
-				projects: { viewFinance: true },
-			});
-			expect(isToolAllowed("querySubcontracts", perms2)).toBe(true);
-		});
+describe("RBAC-AI: isToolAuthorized", () => {
+	it("always-allowed tools (null requirement) pass even with empty permissions", () => {
+		const empty = createEmptyPermissions();
+		expect(isToolAuthorized(empty, "navigateTo")).toBe(true);
+		expect(isToolAuthorized(empty, "getMyPermissions")).toBe(true);
 	});
 
-	describe("Role-Based Access", () => {
-		it("OWNER should have access to all mapped tools", () => {
-			const ownerPerms = DEFAULT_ROLE_PERMISSIONS["OWNER"];
-			for (const [toolName, requirement] of Object.entries(TOOL_PERMISSION_MAP)) {
-				expect(isToolAllowed(toolName, ownerPerms)).toBe(true);
-			}
-		});
-
-		it("empty permissions should only access null-requirement tools", () => {
-			const emptyPerms = createEmptyPermissions();
-			const allowed: string[] = [];
-			const blocked: string[] = [];
-
-			for (const [toolName, requirement] of Object.entries(TOOL_PERMISSION_MAP)) {
-				if (isToolAllowed(toolName, emptyPerms)) {
-					allowed.push(toolName);
-				} else {
-					blocked.push(toolName);
-				}
-			}
-
-			// Only null-requirement tools should be allowed
-			for (const toolName of allowed) {
-				expect(TOOL_PERMISSION_MAP[toolName]).toBeNull();
-			}
-			// All non-null requirement tools should be blocked
-			expect(blocked.length).toBeGreaterThan(0);
-		});
-
-		it("finance-only user should access finance tools but not project tools", () => {
-			const accountantPerms = permissionsWith({
-				finance: { view: true, invoices: true, payments: true, reports: true, quotations: true },
-			});
-			// Finance tools — allowed
-			expect(isToolAllowed("queryFinance", accountantPerms)).toBe(true);
-			expect(isToolAllowed("queryAccounting", accountantPerms)).toBe(true);
-			expect(isToolAllowed("getAccountingReports", accountantPerms)).toBe(true);
-			expect(isToolAllowed("queryVouchers", accountantPerms)).toBe(true);
-
-			// Project tools — blocked
-			expect(isToolAllowed("queryProjects", accountantPerms)).toBe(false);
-			expect(isToolAllowed("getProjectActivities", accountantPerms)).toBe(false);
-		});
-
-		it("project viewer should access project tools but not finance", () => {
-			const viewerPerms = permissionsWith({
-				projects: { view: true },
-			});
-			expect(isToolAllowed("queryProjects", viewerPerms)).toBe(true);
-			expect(isToolAllowed("getProjectActivities", viewerPerms)).toBe(true);
-			expect(isToolAllowed("queryFinance", viewerPerms)).toBe(false);
-		});
+	it("unknown tools are denied by default (fail-closed)", () => {
+		expect(isToolAuthorized(OWNER, "unknownFutureTool")).toBe(false);
 	});
 
-	describe("Permission Summary for Prompt", () => {
-		it("should return Arabic summary for user with access", () => {
-			const perms = permissionsWith({
-				projects: { view: true },
-				finance: { view: true },
-			});
-			const summary = getPermissionSummaryForPrompt(perms);
-			expect(summary).toContain("يمكنك الاستعلام عن");
-			expect(summary).toContain("المشاريع");
-			expect(summary).toContain("المالية");
-		});
-
-		it("should return no-access message for empty permissions", () => {
-			const emptyPerms = createEmptyPermissions();
-			const summary = getPermissionSummaryForPrompt(emptyPerms);
-			expect(summary).toContain("ليس لديك صلاحيات");
-		});
-
-		it("should include all relevant sections for OWNER", () => {
-			const ownerPerms = DEFAULT_ROLE_PERMISSIONS["OWNER"];
-			const summary = getPermissionSummaryForPrompt(ownerPerms);
-			expect(summary).toContain("المشاريع");
-			expect(summary).toContain("المالية");
-			expect(summary).toContain("الكميات");
-		});
+	it("denies tools when user lacks the required permission", () => {
+		const empty = createEmptyPermissions();
+		expect(isToolAuthorized(empty, "queryProjects")).toBe(false);
+		expect(isToolAuthorized(empty, "queryFinance")).toBe(false);
+		expect(isToolAuthorized(empty, "queryLeads")).toBe(false);
 	});
 
-	describe("TOOL_PERMISSION_MAP Integrity", () => {
-		it("should have navigateTo and getMyPermissions as null (always allowed)", () => {
-			expect(TOOL_PERMISSION_MAP["navigateTo"]).toBeNull();
-			expect(TOOL_PERMISSION_MAP["getMyPermissions"]).toBeNull();
+	it("OWNER is authorized for every mapped tool", () => {
+		for (const toolName of Object.keys(TOOL_PERMISSION_MAP)) {
+			expect(isToolAuthorized(OWNER, toolName), toolName).toBe(true);
+		}
+	});
+});
+
+describe("RBAC-AI: multi-action tools (per-action guards)", () => {
+	it("SUPERVISOR is denied queryFinance entirely, including banks", () => {
+		expect(isToolAuthorized(SUPERVISOR, "queryFinance")).toBe(false);
+		expect(
+			isToolAuthorized(SUPERVISOR, "queryFinance", { action: "banks" }),
+		).toBe(false);
+	});
+
+	it("PROJECT_MANAGER passes queryFinance for banks/summary but is denied invoices/payments", () => {
+		// PM: finance.view=true, invoices=false, payments=false
+		expect(isToolAuthorized(PM, "queryFinance")).toBe(true);
+		expect(isToolAuthorized(PM, "queryFinance", { action: "banks" })).toBe(
+			true,
+		);
+		expect(isToolAuthorized(PM, "queryFinance", { action: "summary" })).toBe(
+			true,
+		);
+		expect(isToolAuthorized(PM, "queryFinance", { action: "expenses" })).toBe(
+			true,
+		);
+		expect(isToolAuthorized(PM, "queryFinance", { action: "invoices" })).toBe(
+			false,
+		);
+		expect(isToolAuthorized(PM, "queryFinance", { action: "payments" })).toBe(
+			false,
+		);
+	});
+
+	it("ACCOUNTANT passes queryFinance for all actions", () => {
+		for (const action of [
+			"invoices",
+			"payments",
+			"expenses",
+			"summary",
+			"banks",
+		]) {
+			expect(isToolAuthorized(ACCOUNTANT, "queryFinance", { action })).toBe(
+				true,
+			);
+		}
+	});
+
+	it("queryFinance denies unknown actions (fail-closed)", () => {
+		expect(
+			isToolAuthorized(OWNER, "queryFinance", { action: "hack" }),
+		).toBe(false);
+	});
+
+	it("queryCompany routes actions to employees/company sections", () => {
+		// ACCOUNTANT: employees.view=true, employees.payroll=true, company.*=true
+		expect(
+			isToolAuthorized(ACCOUNTANT, "queryCompany", { action: "payroll" }),
+		).toBe(true);
+		expect(
+			isToolAuthorized(ACCOUNTANT, "queryCompany", { action: "employees" }),
+		).toBe(true);
+
+		// PM: employees.view=true لكن payroll=false، company.expenses=false
+		expect(
+			isToolAuthorized(PM, "queryCompany", { action: "employees" }),
+		).toBe(true);
+		expect(isToolAuthorized(PM, "queryCompany", { action: "payroll" })).toBe(
+			false,
+		);
+		expect(isToolAuthorized(PM, "queryCompany", { action: "expenses" })).toBe(
+			false,
+		);
+		expect(isToolAuthorized(PM, "queryCompany", { action: "assets" })).toBe(
+			true,
+		);
+
+		// ENGINEER/SUPERVISOR: لا company ولا employees
+		expect(isToolAuthorized(ENGINEER, "queryCompany")).toBe(false);
+		expect(isToolAuthorized(SUPERVISOR, "queryCompany")).toBe(false);
+	});
+
+	it("same tool, same user: one action allowed and another denied", () => {
+		const perms = permissionsWith({
+			finance: { view: true, invoices: false },
 		});
+		expect(isToolAuthorized(perms, "queryFinance", { action: "banks" })).toBe(
+			true,
+		);
+		expect(
+			isToolAuthorized(perms, "queryFinance", { action: "invoices" }),
+		).toBe(false);
+	});
+});
 
-		it("should have valid section references for all mapped tools", () => {
-			const validSections: (keyof Permissions)[] = [
-				"projects", "quantities", "pricing", "finance",
-				"employees", "company", "settings", "reports",
-			];
+describe("RBAC-AI: role-based access per tool category", () => {
+	it("ENGINEER: project tools allowed, project-finance tools denied (viewFinance)", () => {
+		expect(isToolAuthorized(ENGINEER, "getProjectDetails")).toBe(true);
+		expect(isToolAuthorized(ENGINEER, "queryProjects")).toBe(true);
+		expect(isToolAuthorized(ENGINEER, "getProjectActivities")).toBe(true);
+		expect(isToolAuthorized(ENGINEER, "getProjectFinanceSummary")).toBe(false);
+		expect(isToolAuthorized(ENGINEER, "querySubcontracts")).toBe(false);
+		expect(isToolAuthorized(ENGINEER, "queryClaims")).toBe(false);
+		expect(isToolAuthorized(ENGINEER, "queryProjectBOQ")).toBe(false);
+	});
 
-			for (const [toolName, requirement] of Object.entries(TOOL_PERMISSION_MAP)) {
-				if (requirement !== null) {
-					const [section] = requirement;
-					expect(validSections).toContain(section);
-				}
+	it("PROJECT_MANAGER: accounting reports allowed, ledger/journal denied (finance.settings)", () => {
+		expect(isToolAuthorized(PM, "getAccountingReports")).toBe(true);
+		expect(isToolAuthorized(PM, "getAccountLedger")).toBe(false);
+		expect(isToolAuthorized(PM, "queryAccounting")).toBe(false);
+	});
+
+	it("ACCOUNTANT: full accounting access", () => {
+		expect(isToolAuthorized(ACCOUNTANT, "queryAccounting")).toBe(true);
+		expect(isToolAuthorized(ACCOUNTANT, "getAccountLedger")).toBe(true);
+		expect(isToolAuthorized(ACCOUNTANT, "getAccountingReports")).toBe(true);
+	});
+
+	it("SUPERVISOR: no finance/company/hr tools at all", () => {
+		for (const tool of [
+			"queryFinance",
+			"getFinanceDashboard",
+			"queryInvoices",
+			"queryVouchers",
+			"queryAccounting",
+			"getAccountLedger",
+			"getAccountingReports",
+			"queryZatcaStatus",
+			"queryEmployees",
+			"queryPayroll",
+			"queryAssets",
+			"queryCompany",
+			"getProjectFinanceSummary",
+			"querySubcontracts",
+		]) {
+			expect(isToolAuthorized(SUPERVISOR, tool), tool).toBe(false);
+		}
+	});
+
+	it("quotations follow pricing.quotations; studies follow pricing.studies", () => {
+		// ENGINEER: pricing.studies=true, pricing.quotations=false
+		expect(isToolAuthorized(ENGINEER, "queryCostStudies")).toBe(true);
+		expect(isToolAuthorized(ENGINEER, "queryQuotations")).toBe(false);
+		// ACCOUNTANT: pricing.studies=false, pricing.quotations=true
+		expect(isToolAuthorized(ACCOUNTANT, "queryCostStudies")).toBe(false);
+		expect(isToolAuthorized(ACCOUNTANT, "queryQuotations")).toBe(true);
+	});
+
+	it("granting finance.view to a supervisor unlocks finance summary tools (RBAC-UI integration)", () => {
+		const upgraded = {
+			...SUPERVISOR,
+			finance: { ...SUPERVISOR.finance, view: true },
+		};
+		expect(isToolAuthorized(upgraded, "queryFinance", { action: "banks" })).toBe(
+			true,
+		);
+		expect(isToolAuthorized(upgraded, "getFinanceDashboard")).toBe(true);
+		// دون أن يفتح ما لم يُمنح
+		expect(
+			isToolAuthorized(upgraded, "queryFinance", { action: "invoices" }),
+		).toBe(false);
+	});
+});
+
+describe("RBAC-AI: getAuthorizedToolNames (Layer 1)", () => {
+	it("SUPERVISOR list contains no finance/company tool", () => {
+		const names = getAuthorizedToolNames(SUPERVISOR);
+		const forbidden = [
+			"queryFinance",
+			"getFinanceDashboard",
+			"queryInvoices",
+			"queryVouchers",
+			"queryAccounting",
+			"getAccountLedger",
+			"getAccountingReports",
+			"queryZatcaStatus",
+			"queryEmployees",
+			"queryPayroll",
+			"queryAssets",
+			"queryCompany",
+			"getProjectFinanceSummary",
+			"querySubcontracts",
+			"getSubcontractDetails",
+			"queryClaims",
+			"queryChangeOrders",
+			"queryProjectBOQ",
+			"queryCostStudies",
+			"queryQuotations",
+			"queryLeads",
+		];
+		for (const tool of forbidden) {
+			expect(names, tool).not.toContain(tool);
+		}
+		expect(names).toContain("queryProjects");
+		expect(names).toContain("navigateTo");
+		expect(names).toContain("getMyPermissions");
+		expect(names).toContain("getDashboardSummary");
+	});
+
+	it("OWNER list contains every mapped tool", () => {
+		expect(getAuthorizedToolNames(OWNER).sort()).toEqual(
+			Object.keys(TOOL_PERMISSION_MAP).sort(),
+		);
+	});
+
+	it("filterToolsByPermission drops unmapped tools (fail-closed)", () => {
+		const tools = {
+			queryProjects: { d: 1 },
+			someBrandNewTool: { d: 2 },
+		};
+		const filtered = filterToolsByPermission(tools, OWNER);
+		expect(filtered.queryProjects).toBeDefined();
+		expect(filtered.someBrandNewTool).toBeUndefined();
+	});
+});
+
+describe("RBAC-AI: withPermissionGuard (Layer 2)", () => {
+	it("returns a structured denial result, not an exception", async () => {
+		let executed = false;
+		const guarded = withPermissionGuard(
+			"queryFinance",
+			SUPERVISOR,
+			async () => {
+				executed = true;
+				return { data: "secret" };
+			},
+		);
+		const result = await guarded({ action: "banks" });
+		expect(executed).toBe(false);
+		expect(result).toEqual(permissionDeniedResult());
+		expect((result as any).error).toBe(AI_PERMISSION_DENIED_CODE);
+	});
+
+	it("executes normally when authorized", async () => {
+		const guarded = withPermissionGuard(
+			"queryFinance",
+			ACCOUNTANT,
+			async () => ({ data: "ok" }),
+		);
+		expect(await guarded({ action: "banks" })).toEqual({ data: "ok" });
+	});
+
+	it("missing permissions context = deny (fail-closed)", async () => {
+		const guarded = withPermissionGuard("queryProjects", undefined, async () => ({
+			data: "x",
+		}));
+		expect(await guarded({})).toEqual(permissionDeniedResult());
+	});
+
+	it("blocks the actual action from input even if the tool passed Layer 1", async () => {
+		// PM يملك الأداة (finance.view) لكن action=invoices مرفوض تنفيذياً
+		const guarded = withPermissionGuard("queryFinance", PM, async () => ({
+			invoices: [],
+		}));
+		expect(await guarded({ action: "invoices" })).toEqual(
+			permissionDeniedResult(),
+		);
+	});
+
+	it("explicit requiredPermission overrides the central map", async () => {
+		const guarded = withPermissionGuard(
+			"someCustomTool",
+			SUPERVISOR,
+			async () => ({ ok: true }),
+			{ section: "projects", action: "view" },
+		);
+		expect(await guarded({})).toEqual({ ok: true });
+	});
+});
+
+describe("RBAC-AI: navigateTo destination filtering", () => {
+	const base = "/app/my-org";
+
+	it("dashboard and notifications are always allowed", () => {
+		const empty = createEmptyPermissions();
+		expect(isNavigationAllowed(empty, base)).toBe(true);
+		expect(isNavigationAllowed(empty, `${base}/notifications`)).toBe(true);
+	});
+
+	it("finance destinations follow the sidebar rules", () => {
+		expect(isNavigationAllowed(SUPERVISOR, `${base}/finance/invoices`)).toBe(
+			false,
+		);
+		expect(isNavigationAllowed(PM, `${base}/finance/invoices`)).toBe(false);
+		expect(isNavigationAllowed(PM, `${base}/finance/invoices/new`)).toBe(false);
+		expect(isNavigationAllowed(ACCOUNTANT, `${base}/finance/invoices`)).toBe(
+			true,
+		);
+		expect(isNavigationAllowed(PM, `${base}/finance/banks`)).toBe(true);
+		expect(
+			isNavigationAllowed(PM, `${base}/finance/accounting-reports`),
+		).toBe(true);
+		expect(
+			isNavigationAllowed(PM, `${base}/finance/journal-entries`),
+		).toBe(false);
+		expect(
+			isNavigationAllowed(ACCOUNTANT, `${base}/finance/journal-entries`),
+		).toBe(true);
+		expect(isNavigationAllowed(ENGINEER, `${base}/finance/banks`)).toBe(false);
+	});
+
+	it("company/pricing destinations follow employees/company/pricing permissions", () => {
+		expect(isNavigationAllowed(PM, `${base}/company/employees`)).toBe(true);
+		expect(isNavigationAllowed(PM, `${base}/company/payroll`)).toBe(false);
+		expect(isNavigationAllowed(ACCOUNTANT, `${base}/company/payroll`)).toBe(
+			true,
+		);
+		expect(isNavigationAllowed(SUPERVISOR, `${base}/company/employees`)).toBe(
+			false,
+		);
+		expect(isNavigationAllowed(ENGINEER, `${base}/pricing/studies`)).toBe(true);
+		expect(isNavigationAllowed(ENGINEER, `${base}/pricing/quotations`)).toBe(
+			false,
+		);
+	});
+
+	it("project finance sub-pages require projects.viewFinance", () => {
+		expect(
+			isNavigationAllowed(
+				ENGINEER,
+				`${base}/projects/p1/finance/subcontracts`,
+			),
+		).toBe(false);
+		expect(
+			isNavigationAllowed(PM, `${base}/projects/p1/finance/subcontracts`),
+		).toBe(true);
+		expect(isNavigationAllowed(ENGINEER, `${base}/projects/p1/execution`)).toBe(
+			true,
+		);
+	});
+
+	it("unknown finance sub-route falls back to the section root rule", () => {
+		expect(
+			isNavigationAllowed(SUPERVISOR, `${base}/finance/some-new-page`),
+		).toBe(false);
+		expect(
+			isNavigationAllowed(ACCOUNTANT, `${base}/finance/some-new-page`),
+		).toBe(true);
+	});
+});
+
+describe("RBAC-AI: sensitive module prompt gating", () => {
+	it("finance/accounting/company knowledge is hidden without permissions", () => {
+		expect(isModulePromptAllowed(SUPERVISOR, "finance")).toBe(false);
+		expect(isModulePromptAllowed(SUPERVISOR, "accounting")).toBe(false);
+		expect(isModulePromptAllowed(SUPERVISOR, "company")).toBe(false);
+		expect(isModulePromptAllowed(ENGINEER, "finance")).toBe(false);
+	});
+
+	it("finance/accounting knowledge is injected for finance roles", () => {
+		expect(isModulePromptAllowed(ACCOUNTANT, "finance")).toBe(true);
+		expect(isModulePromptAllowed(ACCOUNTANT, "accounting")).toBe(true);
+		expect(isModulePromptAllowed(PM, "finance")).toBe(true);
+		expect(isModulePromptAllowed(PM, "accounting")).toBe(true);
+	});
+
+	it("non-sensitive modules are always injected", () => {
+		expect(isModulePromptAllowed(SUPERVISOR, "projects")).toBe(true);
+		expect(isModulePromptAllowed(SUPERVISOR, "execution")).toBe(true);
+	});
+});
+
+describe("RBAC-AI: prompt permission summary (Layer 3 — UX)", () => {
+	it("lists available sections in Arabic", () => {
+		const summary = getPermissionSummaryForPrompt(PM);
+		expect(summary).toContain("يمكنك الاستعلام عن");
+		expect(summary).toContain("المشاريع");
+		expect(summary).toContain("التقارير المحاسبية");
+		expect(summary).not.toContain("الفواتير");
+	});
+
+	it("returns a no-access message for empty permissions", () => {
+		expect(getPermissionSummaryForPrompt(createEmptyPermissions())).toContain(
+			"ليس لديك صلاحيات",
+		);
+	});
+});
+
+describe("RBAC-AI: TOOL_PERMISSION_MAP integrity", () => {
+	it("only navigateTo and getMyPermissions are unconditionally allowed", () => {
+		const nullTools = Object.entries(TOOL_PERMISSION_MAP)
+			.filter(([, req]) => req === null)
+			.map(([name]) => name)
+			.sort();
+		expect(nullTools).toEqual(["getMyPermissions", "navigateTo"]);
+	});
+
+	it("static rules reference valid permission sections", () => {
+		const validSections = Object.keys(createEmptyPermissions());
+		for (const [toolName, requirement] of Object.entries(
+			TOOL_PERMISSION_MAP,
+		)) {
+			if (requirement && typeof requirement === "object") {
+				expect(validSections, toolName).toContain(requirement.section);
 			}
-		});
+		}
+	});
 
-		it("should cover all known tool categories", () => {
-			const map = TOOL_PERMISSION_MAP;
-			// Legacy tools
-			expect(map["queryProjects"]).toBeDefined();
-			expect(map["queryFinance"]).toBeDefined();
-			expect(map["queryCompany"]).toBeDefined();
-			// Registry tools
-			expect(map["getProjectDetails"]).toBeDefined();
-			expect(map["queryAccounting"]).toBeDefined();
-			expect(map["getDashboardSummary"]).toBeDefined();
-		});
+	it("static rules reference valid actions within their section", () => {
+		const empty = createEmptyPermissions() as unknown as Record<
+			string,
+			Record<string, boolean>
+		>;
+		for (const [toolName, requirement] of Object.entries(
+			TOOL_PERMISSION_MAP,
+		)) {
+			if (requirement && typeof requirement === "object") {
+				expect(
+					Object.keys(empty[requirement.section] ?? {}),
+					`${toolName}: ${requirement.section}.${requirement.action}`,
+				).toContain(requirement.action);
+			}
+		}
 	});
 });

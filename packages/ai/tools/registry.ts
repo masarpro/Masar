@@ -1,6 +1,10 @@
 import { tool } from "ai";
 import type { z } from "zod";
 import type { Permissions } from "@repo/database";
+import {
+  type PermissionRequirement,
+  withPermissionGuard,
+} from "../lib/tool-permissions";
 
 export interface AIToolRegistration {
   /** اسم الأداة */
@@ -13,6 +17,12 @@ export interface AIToolRegistration {
   parameters: z.ZodType<any>;
   /** الدالة المنفّذة */
   execute: (params: any, context: ToolContext) => Promise<any>;
+  /**
+   * متطلب صلاحية اختياري يتجاوز الخريطة المركزية (TOOL_PERMISSION_MAP).
+   * إن لم يُحدَّد، تُستخدم الخريطة المركزية — وأداة غير موجودة فيها
+   * تُرفض افتراضياً (fail-closed).
+   */
+  requiredPermission?: PermissionRequirement;
 }
 
 export interface ToolContext {
@@ -58,19 +68,14 @@ export function getAISDKTools(
     tools[reg.name] = tool({
       description: reg.description,
       inputSchema: reg.parameters as z.ZodObject<any>,
-      execute: async (params: any) => {
-        // Defense-in-depth: فحص الصلاحية داخل execute كطبقة حماية ثانية
-        if (context.permissions) {
-          const { isToolAllowed } = await import("../lib/tool-permissions");
-          if (!isToolAllowed(reg.name, context.permissions)) {
-            return {
-              error:
-                "ليس لديك صلاحية للوصول لهذه البيانات. تواصل مع مالك المنظمة لطلب الصلاحية المطلوبة.",
-            };
-          }
-        }
-        return reg.execute(params, context);
-      },
+      // الطبقة 2 (دفاع في العمق): حارس تنفيذ مركزي — غياب الصلاحيات
+      // في السياق يعني رفض كل أداة غير عامة (fail-closed)
+      execute: withPermissionGuard(
+        reg.name,
+        context.permissions,
+        (params: any) => reg.execute(params, context),
+        reg.requiredPermission,
+      ),
     });
   }
   return tools;
