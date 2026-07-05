@@ -9,7 +9,7 @@ import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { toast } from "sonner";
 import { calculateTotals } from "../../../lib/utils";
-import { FormPageSkeleton } from "@saas/shared/components/skeletons";
+import { EditorPageSkeleton } from "@saas/shared/components/skeletons";
 import { useAutosave } from "@saas/shared/hooks/use-autosave";
 import { AutosaveConflictDialog } from "@saas/shared/components/AutosaveConflictDialog";
 import type { Client } from "../../shared/ClientSelector";
@@ -776,7 +776,7 @@ export function CreateInvoiceForm({
 
 	// Loading state
 	if ((isEditDraft && isStartingEdit) || (!!workingDraftId && isLoadingDraft && !draft)) {
-		return <FormPageSkeleton />;
+		return <EditorPageSkeleton />;
 	}
 
 	return (

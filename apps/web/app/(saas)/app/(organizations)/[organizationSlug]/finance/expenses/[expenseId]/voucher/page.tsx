@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PaymentVoucher } from "@saas/finance/components/payments/PaymentVoucher";
 import { FinanceShell } from "@saas/finance/components/shell";
-import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -18,7 +18,7 @@ export default async function ExpenseVoucherRoute({
 }) {
   const { organizationSlug, expenseId } = await params;
   return (
-    <Suspense fallback={<DashboardSkeleton />}>
+    <Suspense fallback={<PreviewPageSkeleton />}>
       <PageContent organizationSlug={organizationSlug} expenseId={expenseId} />
     </Suspense>
   );
