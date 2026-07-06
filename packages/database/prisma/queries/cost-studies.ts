@@ -39,7 +39,11 @@ export async function getOrganizationCostStudies(
 		];
 	}
 
-	const [costStudies, total] = await Promise.all([
+	// Stats aggregate across ALL matching studies (ignoring the status filter
+	// and pagination) so status counts and total value stay accurate.
+	const { status: _statusFilter, ...statsWhere } = where;
+
+	const [costStudies, total, statusGroups] = await Promise.all([
 		db.costStudy.findMany({
 			where,
 			include: {
@@ -60,9 +64,28 @@ export async function getOrganizationCostStudies(
 			skip: options?.offset ?? 0,
 		}),
 		db.costStudy.count({ where }),
+		db.costStudy.groupBy({
+			by: ["status"],
+			where: statsWhere,
+			_count: { _all: true },
+			_sum: { totalCost: true },
+		}),
 	]);
 
-	return { costStudies, total };
+	const byStatus: Record<string, number> = {};
+	let totalCount = 0;
+	let totalValue = 0;
+	for (const group of statusGroups) {
+		byStatus[group.status] = group._count._all;
+		totalCount += group._count._all;
+		totalValue += Number(group._sum.totalCost ?? 0);
+	}
+
+	return {
+		costStudies,
+		total,
+		stats: { totalCount, totalValue, byStatus },
+	};
 }
 
 /**

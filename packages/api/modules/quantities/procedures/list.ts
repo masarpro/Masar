@@ -42,5 +42,6 @@ export const list = protectedProcedure
 				convertStudyDecimals(study),
 			),
 			total: result.total,
+			stats: result.stats,
 		};
 	});

@@ -47,12 +47,13 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 	const costStudies = (data as any)?.costStudies ?? [];
 	const basePath = `/app/${activeOrganization?.slug}/pricing/studies`;
 
-	// Calculate statistics
+	// Statistics aggregated server-side across ALL studies (not just this page)
+	const byStatus: Record<string, number> = (data as any)?.stats?.byStatus ?? {};
 	const stats = {
-		total: costStudies.length,
-		inProgress: costStudies.filter((s: any) => s.status === "in_progress").length,
-		completed: costStudies.filter((s: any) => s.status === "completed" || s.status === "approved").length,
-		totalValue: costStudies.reduce((sum: any, s: any) => sum + s.totalCost, 0),
+		total: (data as any)?.stats?.totalCount ?? 0,
+		inProgress: byStatus.in_progress ?? 0,
+		completed: (byStatus.completed ?? 0) + (byStatus.approved ?? 0),
+		totalValue: (data as any)?.stats?.totalValue ?? 0,
 	};
 
 	if (isLoading) {
