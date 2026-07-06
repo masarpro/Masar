@@ -97,7 +97,7 @@ export function LaborItemsView({
 	const isLoading = breakdownLoading || studiesLoading || milestonesLoading;
 
 	if (isLoading) {
-		return <ListTableSkeleton rows={8} cols={7} />;
+		return <ListTableSkeleton rows={8} cols={6} />;
 	}
 
 	// Build study name map

@@ -29,6 +29,7 @@ export interface BackfillResult {
 	orgPayments: number;
 	creditNotes: number;
 	projectPayments: number;
+	projectPaymentsRepaired: number;
 	claimsApproved: number;
 	projectClaimsApproved: number;
 	ownerDrawings: number;
@@ -40,11 +41,12 @@ export interface BackfillResult {
 export async function backfillJournalEntries(
 	db: PrismaClient,
 	organizationId: string,
+	userId?: string,
 ): Promise<BackfillResult> {
 	const r: BackfillResult = {
 		invoices: 0, invoicePayments: 0, expenses: 0, transfers: 0,
 		subcontractPayments: 0, payroll: 0, orgPayments: 0, creditNotes: 0,
-		projectPayments: 0, claimsApproved: 0, projectClaimsApproved: 0,
+		projectPayments: 0, projectPaymentsRepaired: 0, claimsApproved: 0, projectClaimsApproved: 0,
 		ownerDrawings: 0, capitalContributions: 0, total: 0, errors: [],
 	};
 
@@ -81,7 +83,7 @@ export async function backfillJournalEntries(
 		try {
 			await onCreditNoteIssued(db, {
 				id: cn.id, organizationId, number: cn.invoiceNo, issueDate: cn.issueDate,
-				clientName: cn.clientName || "", totalAmount: cn.totalAmount, vatAmount: cn.vatAmount, projectId: cn.projectId,
+				clientName: cn.clientName || "", totalAmount: cn.totalAmount.abs(), vatAmount: cn.vatAmount.abs(), projectId: cn.projectId,
 			});
 			r.creditNotes++;
 		} catch (e: any) { r.errors.push({ type: "CREDIT_NOTE", id: cn.invoiceNo, error: e.message }); }
@@ -243,6 +245,20 @@ export async function backfillJournalEntries(
 		} catch (e: any) { r.errors.push({ type: "PROJECT_CLAIM_APPROVED", id: `PCLM-${pc.claimNo}`, error: e.message }); }
 	}
 
+	// --- 11b. Repair project payment entries credited to the wrong side ---
+	// Payments journaled before the cash-basis fix always credited 1120 even on
+	// never-billed projects; re-align every entry with the current billing state.
+	if (userId) {
+		try {
+			const { reconcileProjectPaymentEntries } = await import("./reconcile-project-payments");
+			const rec = await reconcileProjectPaymentEntries(db, { organizationId, userId });
+			r.projectPaymentsRepaired = rec.repaired;
+			for (const err of rec.errors) {
+				r.errors.push({ type: "PROJECT_PAYMENT_REPAIR", id: err.paymentNo, error: err.error });
+			}
+		} catch (e: any) { r.errors.push({ type: "PROJECT_PAYMENT_REPAIR", id: "*", error: e.message }); }
+	}
+
 	// --- 12. Owner Drawings (APPROVED) → DR 34xx / CR Bank ---
 	const drawings = await db.ownerDrawing.findMany({
 		where: { organizationId, status: "APPROVED" },
@@ -310,8 +326,8 @@ export async function backfillJournalEntries(
 
 	r.total = r.invoices + r.invoicePayments + r.expenses + r.transfers +
 		r.subcontractPayments + r.payroll + r.orgPayments + r.creditNotes +
-		r.projectPayments + r.claimsApproved + r.projectClaimsApproved +
-		r.ownerDrawings + r.capitalContributions;
+		r.projectPayments + r.projectPaymentsRepaired + r.claimsApproved +
+		r.projectClaimsApproved + r.ownerDrawings + r.capitalContributions;
 
 	return r;
 }

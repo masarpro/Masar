@@ -716,10 +716,22 @@ export async function updateSubcontractClaimStatus(
 			updateData.rejectionReason = null;
 		}
 
-		return tx.subcontractClaim.update({
-			where: { id },
+		// Optimistic status guard: only transition if the row is STILL in the
+		// status we validated against. Under a concurrent double-approval, the
+		// second transaction (which read a stale SUBMITTED before the contract
+		// lock) finds status already changed → count 0 → rejected, preventing a
+		// duplicate approval and its duplicate SCL-JE journal entry.
+		const updated = await tx.subcontractClaim.updateMany({
+			where: { id, status: claim.status },
 			data: updateData,
 		});
+		if (updated.count === 0) {
+			throw new Error(`INVALID_TRANSITION:${claim.status}:${newStatus}`);
+		}
+
+		const finalClaim = await tx.subcontractClaim.findUnique({ where: { id } });
+		if (!finalClaim) throw new Error("CLAIM_NOT_FOUND");
+		return finalClaim;
 	});
 }
 
@@ -804,7 +816,21 @@ export async function addSubcontractClaimPayment(data: {
 	description?: string | null;
 }) {
 	return db.$transaction(async (tx) => {
-		// 1. Get claim
+		// 0. Resolve the contract id, then lock the contract row — the same row
+		// every claim/payment/change-order writer locks, so validation + write
+		// below are serialized against all concurrent financial mutations.
+		const claimRef = await tx.subcontractClaim.findUnique({
+			where: { id: data.claimId, organizationId: data.organizationId },
+			select: { contractId: true },
+		});
+		if (!claimRef) throw new Error("CLAIM_NOT_FOUND");
+
+		await tx.$queryRawUnsafe(
+			`SELECT id FROM subcontract_contracts WHERE id = $1 FOR UPDATE`,
+			claimRef.contractId,
+		);
+
+		// 1. Re-read the claim inside the lock (paidAmount is stable now)
 		const claim = await tx.subcontractClaim.findUnique({
 			where: { id: data.claimId, organizationId: data.organizationId },
 			select: {
@@ -818,10 +844,15 @@ export async function addSubcontractClaimPayment(data: {
 			throw new Error("CLAIM_NOT_PAYABLE");
 		}
 
-		// 2. Validate amount
-		const maxPayable = Number(claim.netAmount) - Number(claim.paidAmount);
-		if (data.amount > maxPayable + 0.01) {
-			throw new Error(`AMOUNT_EXCEEDS_OUTSTANDING:${maxPayable}`);
+		// 2. Validate amount (Decimal math; 0.01 tolerance absorbs UI rounding)
+		const netAmount = new Prisma.Decimal(claim.netAmount);
+		const paidAmount = new Prisma.Decimal(claim.paidAmount);
+		const newPaidTotal = paidAmount.add(data.amount);
+		if (newPaidTotal.sub(netAmount).gt("0.01")) {
+			const maxPayable = netAmount.sub(paidAmount);
+			throw new Error(
+				`AMOUNT_EXCEEDS_OUTSTANDING:${netAmount.toFixed(2)}:${paidAmount.toFixed(2)}:${maxPayable.toFixed(2)}`,
+			);
 		}
 
 		// 3. Generate payment number
@@ -847,27 +878,29 @@ export async function addSubcontractClaimPayment(data: {
 		});
 
 		// 5. Update claim paidAmount and status
-		const newPaidAmount = Number(claim.paidAmount) + data.amount;
-		const newStatus = newPaidAmount >= Number(claim.netAmount) - 0.01
+		const newStatus = newPaidTotal.gte(netAmount.sub("0.01"))
 			? "PAID"
 			: "PARTIALLY_PAID";
 
 		await tx.subcontractClaim.update({
 			where: { id: data.claimId },
 			data: {
-				paidAmount: newPaidAmount,
+				paidAmount: newPaidTotal,
 				status: newStatus as SubcontractClaimStatus,
 			},
 		});
 
-		// 6. Deduct from bank account if specified
+		// 6. Deduct from bank account if specified — guard against overdrawing
 		if (data.sourceAccountId) {
-			await tx.organizationBank.update({
-				where: { id: data.sourceAccountId },
+			const bankDec = await tx.organizationBank.updateMany({
+				where: { id: data.sourceAccountId, balance: { gte: data.amount } },
 				data: {
 					balance: { decrement: data.amount },
 				},
 			});
+			if (bankDec.count === 0) {
+				throw new Error("الرصيد غير كافي في الحساب المصدر");
+			}
 		}
 
 		return { ...payment, amount: Number(payment.amount) };

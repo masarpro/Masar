@@ -121,10 +121,14 @@ export const updateLeaveTypeProcedure = subscriptionProcedure
 		});
 
 		const { organizationId, id, ...data } = input;
-		return db.leaveType.update({
-			where: { id },
+		const updated = await db.leaveType.updateMany({
+			where: { id, organizationId },
 			data,
 		});
+		if (updated.count === 0) {
+			throw new ORPCError("NOT_FOUND", { message: "نوع الإجازة غير موجود" });
+		}
+		return db.leaveType.findUnique({ where: { id } });
 	});
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -160,7 +164,12 @@ export const deleteLeaveTypeProcedure = subscriptionProcedure
 			});
 		}
 
-		await db.leaveType.delete({ where: { id: input.id } });
+		const deleted = await db.leaveType.deleteMany({
+			where: { id: input.id, organizationId: input.organizationId },
+		});
+		if (deleted.count === 0) {
+			throw new ORPCError("NOT_FOUND", { message: "نوع الإجازة غير موجود" });
+		}
 		return { success: true };
 	});
 

@@ -44,6 +44,21 @@ export interface AgedReceivablesRow {
 	}[];
 }
 
+/**
+ * مستخلص معتمد غير مفوتر — يُعرض قسماً منفصلاً عن الذمم المفوترة
+ * (لا يوجد ربط مستخلص↔فاتورة في الـschema، فلا يُدمج في الإجماليات)
+ */
+export interface UninvoicedClaimRow {
+	id: string;
+	claimNo: number;
+	projectId: string;
+	projectName: string;
+	clientName: string | null;
+	amount: Prisma.Decimal;
+	dueDate: Date | null;
+	approvedAt: Date | null;
+}
+
 export interface AgedReceivablesResult {
 	rows: AgedReceivablesRow[];
 	totals: {
@@ -52,6 +67,10 @@ export interface AgedReceivablesResult {
 		days31to60: Prisma.Decimal;
 		days61to90: Prisma.Decimal;
 		over90: Prisma.Decimal;
+		total: Prisma.Decimal;
+	};
+	uninvoicedClaims: {
+		items: UninvoicedClaimRow[];
 		total: Prisma.Decimal;
 	};
 	generatedAt: Date;
@@ -375,9 +394,47 @@ export async function getAgedReceivables(
 	// Sort by total descending
 	rows.sort((a, b) => Number(b.total) - Number(a.total));
 
+	// مستخلصات معتمدة غير مفوترة (APPROVED وليست PAID) — قسم منفصل
+	const approvedClaims = await db.projectClaim.findMany({
+		where: {
+			organizationId,
+			status: "APPROVED",
+			...(options?.projectId ? { projectId: options.projectId } : {}),
+		},
+		select: {
+			id: true,
+			claimNo: true,
+			projectId: true,
+			amount: true,
+			dueDate: true,
+			approvedAt: true,
+			project: { select: { name: true, clientName: true } },
+		},
+		orderBy: [{ dueDate: "asc" }, { approvedAt: "asc" }],
+	});
+
+	const uninvoicedItems: UninvoicedClaimRow[] = approvedClaims.map((c) => ({
+		id: c.id,
+		claimNo: c.claimNo,
+		projectId: c.projectId,
+		projectName: c.project?.name ?? "—",
+		clientName: c.project?.clientName ?? null,
+		amount: c.amount,
+		dueDate: c.dueDate,
+		approvedAt: c.approvedAt,
+	}));
+	const uninvoicedTotal = uninvoicedItems.reduce(
+		(sum, c) => sum.add(c.amount),
+		ZERO,
+	);
+
 	return {
 		rows,
 		totals,
+		uninvoicedClaims: {
+			items: uninvoicedItems,
+			total: uninvoicedTotal,
+		},
 		generatedAt: new Date(),
 	};
 }
@@ -577,6 +634,9 @@ export async function getVATReport(
 				amount: true,
 				category: true,
 				categoryId: true,
+				// Resolve the real VAT-exempt flag from the org category (categoryId
+				// is a cuid, so comparing it to systemId strings never matched).
+				categoryRef: { select: { isVatExempt: true } },
 			},
 		}),
 		// Subcontract payments with VAT-inclusive contracts
@@ -655,9 +715,11 @@ export async function getVATReport(
 	let expenseCount = 0;
 
 	for (const exp of expenses) {
-		// New hierarchical categories that are VAT-exempt
-		const NEW_VAT_EXEMPT_CATEGORIES = ["ADMIN_SALARIES", "GOVERNMENT_LICENSES", "INSURANCE_GUARANTEES", "FINANCIAL_EXPENSES"];
-		const isExempt = (exp.categoryId ? NEW_VAT_EXEMPT_CATEGORIES.includes(exp.categoryId) : false) || VAT_EXEMPT_EXPENSE_CATEGORIES.includes(exp.category);
+		// Prefer the org category's authoritative isVatExempt flag; fall back to
+		// the legacy enum category list for rows without a linked OrgCategory.
+		const isExempt =
+			exp.categoryRef?.isVatExempt ??
+			VAT_EXEMPT_EXPENSE_CATEGORIES.includes(exp.category);
 		if (isExempt) continue;
 
 		const amount = new Prisma.Decimal(Number(exp.amount));

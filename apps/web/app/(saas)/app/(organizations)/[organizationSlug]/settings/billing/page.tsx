@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { createPurchasesHelper } from "@repo/payments/lib/helper";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { ActivePlan } from "@saas/payments/components/ActivePlan";
@@ -26,11 +25,8 @@ export default async function BillingSettingsPage({
 }) {
 	const { organizationSlug } = await params;
 
-	return (
-		<Suspense fallback={null}>
-			<BillingSettingsPageContent organizationSlug={organizationSlug} />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <BillingSettingsPageContent organizationSlug={organizationSlug} />;
 }
 
 async function BillingSettingsPageContent({ organizationSlug }: { organizationSlug: string }) {

@@ -27,7 +27,10 @@ type BusinessEventType =
 	| "project.created"
 	| "project.deleted"
 	// Notification events
-	| "notification.failed";
+	| "notification.failed"
+	// Payments webhook events
+	| "payments.webhook_misconfigured"
+	| "payments.webhook_rejected";
 
 type BusinessEventData = {
 	type: BusinessEventType;

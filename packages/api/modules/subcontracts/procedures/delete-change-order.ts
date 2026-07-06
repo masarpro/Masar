@@ -1,4 +1,5 @@
 import { deleteSubcontractChangeOrder, logAuditEvent } from "@repo/database";
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -27,7 +28,30 @@ export const deleteSubcontractChangeOrderProcedure = subscriptionProcedure
 			{ section: "finance", action: "payments" },
 		);
 
-		await deleteSubcontractChangeOrder(input.changeOrderId);
+		try {
+			await deleteSubcontractChangeOrder(
+				input.changeOrderId,
+				input.contractId,
+				input.organizationId,
+			);
+		} catch (error) {
+			if (error instanceof Error) {
+				if (error.message === "CHANGE_ORDER_NOT_FOUND") {
+					throw new ORPCError("NOT_FOUND", {
+						message: "أمر التغيير غير موجود",
+					});
+				}
+				if (error.message.startsWith("CEILING_BELOW_COMMITTED:")) {
+					const [, newCeiling, committed] = error.message.split(":");
+					const fmt = (v?: string) =>
+						new Intl.NumberFormat("en-US").format(Number(v ?? 0));
+					throw new ORPCError("BAD_REQUEST", {
+						message: `لا يمكن حذف أمر التغيير — تخفيض قيمة العقد المعدّلة إلى ${fmt(newCeiling)} ريال يقل عن الالتزامات القائمة البالغة ${fmt(committed)} ريال`,
+					});
+				}
+			}
+			throw error;
+		}
 
 		logAuditEvent(input.organizationId, input.projectId, {
 			actorId: context.user.id,

@@ -1,6 +1,73 @@
 import type { PaymentMethod, PaymentTermType } from "../generated/client";
+import { Prisma } from "../generated/client";
 import { db } from "../client";
 import { generateAtomicNo } from "./sequences";
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Contract lock + ceiling helpers
+//
+// Every financial mutation on a subcontract (claims, claim payments, direct
+// payments, change orders) locks the SAME subcontract_contracts row, so the
+// read-validate-write sequences below are serialized against each other.
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function lockSubcontractContract(
+	tx: Prisma.TransactionClient,
+	contractId: string,
+) {
+	await tx.$queryRawUnsafe(
+		`SELECT id FROM subcontract_contracts WHERE id = $1 FOR UPDATE`,
+		contractId,
+	);
+}
+
+/** Sum of APPROVED change orders (the only status that adjusts the ceiling) */
+async function getApprovedChangeOrderSum(
+	tx: Prisma.TransactionClient,
+	contractId: string,
+): Promise<Prisma.Decimal> {
+	const coAgg = await tx.subcontractChangeOrder.aggregate({
+		where: { contractId, status: "APPROVED" },
+		_sum: { amount: true },
+	});
+	return new Prisma.Decimal(coAgg._sum.amount ?? 0);
+}
+
+/**
+ * Floor guard: the adjusted contract value (value + approved COs) must not be
+ * lowered below what is already committed — approved claims (grossAmount of
+ * APPROVED/PARTIALLY_PAID/PAID) or COMPLETED payments, whichever is higher.
+ * Called only when an operation REDUCES the ceiling, so raising a too-low
+ * legacy ceiling back toward correctness is never blocked.
+ */
+async function assertCeilingAboveCommitted(
+	tx: Prisma.TransactionClient,
+	contractId: string,
+	newCeiling: Prisma.Decimal,
+) {
+	const [claimsAgg, paymentsAgg] = await Promise.all([
+		tx.subcontractClaim.aggregate({
+			where: {
+				contractId,
+				status: { in: ["APPROVED", "PARTIALLY_PAID", "PAID"] },
+			},
+			_sum: { grossAmount: true },
+		}),
+		tx.subcontractPayment.aggregate({
+			where: { contractId, status: "COMPLETED" },
+			_sum: { amount: true },
+		}),
+	]);
+	const claimsGross = new Prisma.Decimal(claimsAgg._sum.grossAmount ?? 0);
+	const paymentsTotal = new Prisma.Decimal(paymentsAgg._sum.amount ?? 0);
+	const floor = claimsGross.gte(paymentsTotal) ? claimsGross : paymentsTotal;
+
+	if (floor.sub(newCeiling).gt("0.01")) {
+		throw new Error(
+			`CEILING_BELOW_COMMITTED:${newCeiling.toFixed(2)}:${floor.toFixed(2)}`,
+		);
+	}
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Subcontract Contract Queries - إدارة مقاولي الباطن
@@ -363,9 +430,11 @@ export async function setSubcontractPaymentTerms(
  */
 export async function getSubcontractPaymentTermsProgress(
 	contractId: string,
+	organizationId: string,
+	projectId: string,
 ) {
 	const contract = await db.subcontractContract.findFirst({
-		where: { id: contractId },
+		where: { id: contractId, organizationId, projectId },
 		include: {
 			paymentTerms: { orderBy: { sortOrder: "asc" } },
 		},
@@ -532,6 +601,7 @@ export async function getSubcontractPaymentTermsProgress(
  */
 export async function createSubcontractChangeOrder(data: {
 	contractId: string;
+	organizationId: string;
 	createdById: string;
 	description: string;
 	amount: number;
@@ -539,25 +609,46 @@ export async function createSubcontractChangeOrder(data: {
 	approvedDate?: Date | null;
 	attachmentUrl?: string | null;
 }) {
-	// Get next order number
-	const count = await db.subcontractChangeOrder.count({
-		where: { contractId: data.contractId },
-	});
+	return db.$transaction(async (tx) => {
+		await lockSubcontractContract(tx, data.contractId);
 
-	return db.subcontractChangeOrder.create({
-		data: {
-			contractId: data.contractId,
-			createdById: data.createdById,
-			orderNo: count + 1,
-			description: data.description,
-			amount: data.amount,
-			status: data.status ?? "DRAFT",
-			approvedDate: data.approvedDate ?? null,
-			attachmentUrl: data.attachmentUrl ?? null,
-		},
-		include: {
-			createdBy: { select: { id: true, name: true } },
-		},
+		const contract = await tx.subcontractContract.findUnique({
+			where: { id: data.contractId, organizationId: data.organizationId },
+			select: { value: true },
+		});
+		if (!contract) throw new Error("CONTRACT_NOT_FOUND");
+
+		// Creating directly as APPROVED with a negative amount lowers the
+		// ceiling → keep it above committed claims/payments
+		if ((data.status ?? "DRAFT") === "APPROVED" && data.amount < 0) {
+			const coSum = await getApprovedChangeOrderSum(tx, data.contractId);
+			const newCeiling = new Prisma.Decimal(contract.value)
+				.add(coSum)
+				.add(data.amount);
+			await assertCeilingAboveCommitted(tx, data.contractId, newCeiling);
+		}
+
+		// Next order number — counted inside the lock so concurrent creates
+		// can't produce duplicate orderNo
+		const count = await tx.subcontractChangeOrder.count({
+			where: { contractId: data.contractId },
+		});
+
+		return tx.subcontractChangeOrder.create({
+			data: {
+				contractId: data.contractId,
+				createdById: data.createdById,
+				orderNo: count + 1,
+				description: data.description,
+				amount: data.amount,
+				status: data.status ?? "DRAFT",
+				approvedDate: data.approvedDate ?? null,
+				attachmentUrl: data.attachmentUrl ?? null,
+			},
+			include: {
+				createdBy: { select: { id: true, name: true } },
+			},
+		});
 	});
 }
 
@@ -566,6 +657,8 @@ export async function createSubcontractChangeOrder(data: {
  */
 export async function updateSubcontractChangeOrder(
 	id: string,
+	contractId: string,
+	organizationId: string,
 	data: Partial<{
 		description: string;
 		amount: number;
@@ -574,21 +667,85 @@ export async function updateSubcontractChangeOrder(
 		attachmentUrl: string | null;
 	}>,
 ) {
-	return db.subcontractChangeOrder.update({
-		where: { id },
-		data,
-		include: {
-			createdBy: { select: { id: true, name: true } },
-		},
+	return db.$transaction(async (tx) => {
+		await lockSubcontractContract(tx, contractId);
+
+		// Ownership: the change order must belong to this contract AND the
+		// contract to this organization (was previously updated by bare id)
+		const co = await tx.subcontractChangeOrder.findFirst({
+			where: { id, contractId, contract: { organizationId } },
+			select: { status: true, amount: true },
+		});
+		if (!co) throw new Error("CHANGE_ORDER_NOT_FOUND");
+
+		const newStatus = data.status ?? co.status;
+		const oldContribution =
+			co.status === "APPROVED" ? new Prisma.Decimal(co.amount) : new Prisma.Decimal(0);
+		const newContribution =
+			newStatus === "APPROVED"
+				? new Prisma.Decimal(data.amount ?? co.amount)
+				: new Prisma.Decimal(0);
+		const delta = newContribution.sub(oldContribution);
+
+		// Only a ceiling REDUCTION (un-approve, lower an approved amount,
+		// approve a negative order) needs the committed-floor guard
+		if (delta.lt(0)) {
+			const contract = await tx.subcontractContract.findUnique({
+				where: { id: contractId },
+				select: { value: true },
+			});
+			if (!contract) throw new Error("CONTRACT_NOT_FOUND");
+			const coSum = await getApprovedChangeOrderSum(tx, contractId);
+			const newCeiling = new Prisma.Decimal(contract.value)
+				.add(coSum)
+				.add(delta);
+			await assertCeilingAboveCommitted(tx, contractId, newCeiling);
+		}
+
+		return tx.subcontractChangeOrder.update({
+			where: { id },
+			data,
+			include: {
+				createdBy: { select: { id: true, name: true } },
+			},
+		});
 	});
 }
 
 /**
  * Delete a change order
  */
-export async function deleteSubcontractChangeOrder(id: string) {
-	await db.subcontractChangeOrder.delete({ where: { id } });
-	return { success: true };
+export async function deleteSubcontractChangeOrder(
+	id: string,
+	contractId: string,
+	organizationId: string,
+) {
+	return db.$transaction(async (tx) => {
+		await lockSubcontractContract(tx, contractId);
+
+		const co = await tx.subcontractChangeOrder.findFirst({
+			where: { id, contractId, contract: { organizationId } },
+			select: { status: true, amount: true },
+		});
+		if (!co) throw new Error("CHANGE_ORDER_NOT_FOUND");
+
+		// Deleting an approved positive order lowers the ceiling → floor guard
+		if (co.status === "APPROVED" && new Prisma.Decimal(co.amount).gt(0)) {
+			const contract = await tx.subcontractContract.findUnique({
+				where: { id: contractId },
+				select: { value: true },
+			});
+			if (!contract) throw new Error("CONTRACT_NOT_FOUND");
+			const coSum = await getApprovedChangeOrderSum(tx, contractId);
+			const newCeiling = new Prisma.Decimal(contract.value)
+				.add(coSum)
+				.sub(co.amount);
+			await assertCeilingAboveCommitted(tx, contractId, newCeiling);
+		}
+
+		await tx.subcontractChangeOrder.delete({ where: { id } });
+		return { success: true };
+	});
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -623,6 +780,35 @@ export async function createSubcontractPayment(data: {
 	const paymentNo = await generateSubcontractPaymentNo(data.organizationId);
 
 	return db.$transaction(async (tx) => {
+		// Lock the contract row — serializes direct payments with claim
+		// payments and change-order mutations (all lock the same row)
+		await lockSubcontractContract(tx, data.contractId);
+
+		const contract = await tx.subcontractContract.findUnique({
+			where: { id: data.contractId, organizationId: data.organizationId },
+			select: { value: true },
+		});
+		if (!contract) throw new Error("CONTRACT_NOT_FOUND");
+
+		// Ceiling = contract value + approved change orders. Direct payments and
+		// claim payments live in the same table, so one aggregate covers both.
+		// Contracts without a set value (ceiling <= 0) skip the check.
+		const coSum = await getApprovedChangeOrderSum(tx, data.contractId);
+		const ceiling = new Prisma.Decimal(contract.value).add(coSum);
+		if (ceiling.gt(0)) {
+			const paymentsAgg = await tx.subcontractPayment.aggregate({
+				where: { contractId: data.contractId, status: "COMPLETED" },
+				_sum: { amount: true },
+			});
+			const paidTotal = new Prisma.Decimal(paymentsAgg._sum.amount ?? 0);
+			if (paidTotal.add(data.amount).sub(ceiling).gt("0.01")) {
+				const available = ceiling.sub(paidTotal);
+				throw new Error(
+					`PAYMENT_EXCEEDS_CONTRACT:${ceiling.toFixed(2)}:${paidTotal.toFixed(2)}:${available.toFixed(2)}`,
+				);
+			}
+		}
+
 		const payment = await tx.subcontractPayment.create({
 			data: {
 				organizationId: data.organizationId,
@@ -646,14 +832,17 @@ export async function createSubcontractPayment(data: {
 			},
 		});
 
-		// Deduct from source bank account if provided
+		// Deduct from source bank account if provided — guard against overdrawing
 		if (data.sourceAccountId) {
-			await tx.organizationBank.update({
-				where: { id: data.sourceAccountId },
+			const bankDec = await tx.organizationBank.updateMany({
+				where: { id: data.sourceAccountId, balance: { gte: data.amount } },
 				data: {
 					balance: { decrement: data.amount },
 				},
 			});
+			if (bankDec.count === 0) {
+				throw new Error("الرصيد غير كافي في الحساب المصدر");
+			}
 		}
 
 		return payment;

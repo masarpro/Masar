@@ -36,6 +36,78 @@ async function withUniqueRetry<T>(fn: () => Promise<T>, attempts = 4): Promise<T
 }
 
 /**
+ * Lock the project contract row (FOR UPDATE) — the same row createProjectClaim
+ * locks — so payment read-validate-write sequences are serialized against
+ * concurrent payments and claims. Projects without a contract lock nothing,
+ * which is fine: no contract → no ceiling to protect.
+ */
+async function lockProjectContract(
+	tx: Prisma.TransactionClient,
+	projectId: string,
+) {
+	await tx.$queryRawUnsafe(
+		`SELECT id FROM project_contracts WHERE project_id = $1 FOR UPDATE`,
+		projectId,
+	);
+}
+
+/**
+ * Ceiling guard (call after lockProjectContract): total collected payments +
+ * the new amount must not exceed contract value + approved/implemented change
+ * orders — the same ceiling createProjectClaim enforces. No contract or a
+ * non-positive adjusted value → no ceiling (free payments stay allowed).
+ *
+ * `excludeAmount` subtracts amounts being replaced (edit/replace flows) from
+ * the current total before checking.
+ */
+async function assertProjectPaymentCeiling(
+	tx: Prisma.TransactionClient,
+	organizationId: string,
+	projectId: string,
+	newAmount: number,
+	excludeAmount = 0,
+) {
+	const [contract, approvedCOImpact] = await Promise.all([
+		tx.projectContract.findFirst({
+			where: { organizationId, projectId },
+			select: { value: true },
+		}),
+		tx.projectChangeOrder.aggregate({
+			where: {
+				organizationId,
+				projectId,
+				status: { in: ["APPROVED", "IMPLEMENTED"] },
+				costImpact: { not: null },
+			},
+			_sum: { costImpact: true },
+		}),
+	]);
+
+	if (!contract) return;
+	const adjustedValue =
+		Number(contract.value) +
+		(approvedCOImpact._sum.costImpact
+			? Number(approvedCOImpact._sum.costImpact)
+			: 0);
+	if (adjustedValue <= 0) return;
+
+	const paymentsAgg = await tx.projectPayment.aggregate({
+		where: { organizationId, projectId },
+		_sum: { amount: true },
+	});
+	const currentTotal = round2(
+		Number(paymentsAgg._sum.amount ?? 0) - excludeAmount,
+	);
+
+	if (currentTotal + newAmount > adjustedValue + 0.01) {
+		const available = round2(adjustedValue - currentTotal);
+		throw new Error(
+			`PAYMENT_EXCEEDS_CONTRACT:${round2(adjustedValue).toFixed(2)}:${currentTotal.toFixed(2)}:${available.toFixed(2)}`,
+		);
+	}
+}
+
+/**
  * Get project payments summary with contract + terms + totals
  */
 export async function getProjectPaymentsSummary(
@@ -406,6 +478,13 @@ async function reversePaymentEffects(
 export async function createProjectPayment(data: PaymentAllocationData) {
 	return withUniqueRetry(() =>
 		db.$transaction(async (tx) => {
+			await lockProjectContract(tx, data.projectId);
+			await assertProjectPaymentCeiling(
+				tx,
+				data.organizationId,
+				data.projectId,
+				data.amount,
+			);
 			const created = await allocateAndCreatePayments(tx, data);
 			return {
 				payments: created,
@@ -445,6 +524,9 @@ export async function replaceProjectPaymentGroup(
 		});
 		if (!existing) throw new Error("PAYMENT_NOT_FOUND");
 
+		// Lock before reading the group rows so the totals below are stable
+		await lockProjectContract(tx, existing.projectId);
+
 		const rows = await tx.projectPayment.findMany({
 			where: existing.splitGroupId
 				? { splitGroupId: existing.splitGroupId, organizationId }
@@ -466,6 +548,16 @@ export async function replaceProjectPaymentGroup(
 			}
 			await reversePaymentEffects(tx, row);
 		}
+
+		// The old group's total is being replaced by the new amount — exclude it
+		const groupTotal = rows.reduce((sum, r) => sum + Number(r.amount), 0);
+		await assertProjectPaymentCeiling(
+			tx,
+			organizationId,
+			existing.projectId,
+			data.amount,
+			groupTotal,
+		);
 
 		const deletedIds = rows.map((r) => r.id);
 		await tx.projectPayment.deleteMany({ where: { id: { in: deletedIds } } });
@@ -511,7 +603,15 @@ export async function updateProjectPayment(
 	},
 ) {
 	return db.$transaction(async (tx) => {
-		const existing = await tx.projectPayment.findUnique({
+		let existing = await tx.projectPayment.findUnique({
+			where: { id, organizationId },
+		});
+		if (!existing) throw new Error("PAYMENT_NOT_FOUND");
+
+		// Lock the contract row, then re-read the payment inside the lock so
+		// the amounts used for the ceiling check are stable
+		await lockProjectContract(tx, existing.projectId);
+		existing = await tx.projectPayment.findUnique({
 			where: { id, organizationId },
 		});
 		if (!existing) throw new Error("PAYMENT_NOT_FOUND");
@@ -519,6 +619,17 @@ export async function updateProjectPayment(
 		const oldAmount = Number(existing.amount);
 		const newAmount = data.amount ?? oldAmount;
 		const amountDiff = newAmount - oldAmount;
+
+		// Increasing the amount consumes ceiling — validate the delta
+		if (amountDiff > 0) {
+			await assertProjectPaymentCeiling(
+				tx,
+				organizationId,
+				existing.projectId,
+				newAmount,
+				oldAmount,
+			);
+		}
 
 		const payment = await tx.projectPayment.update({
 			where: { id },
@@ -626,6 +737,18 @@ export async function deleteProjectPayment(
 		}
 
 		const deletedIds = rows.map((r) => r.id);
+
+		// Cancel any auto-created receipt vouchers BEFORE the SetNull link is
+		// severed, so they don't linger ISSUED documenting deleted money.
+		await tx.receiptVoucher.updateMany({
+			where: {
+				projectPaymentId: { in: deletedIds },
+				organizationId,
+				status: { not: "CANCELLED" },
+			},
+			data: { status: "CANCELLED" },
+		});
+
 		await tx.projectPayment.deleteMany({ where: { id: { in: deletedIds } } });
 
 		return { success: true, deletedIds };

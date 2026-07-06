@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { config } from "@repo/config";
 import { getOrganizationList, getSession } from "@saas/auth/lib/server";
 import { PageHeader } from "@saas/shared/components/PageHeader";
@@ -7,11 +6,8 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
 export default async function AppStartPage() {
-	return (
-		<Suspense fallback={null}>
-			<AppStartPageContent />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <AppStartPageContent />;
 }
 
 async function AppStartPageContent() {

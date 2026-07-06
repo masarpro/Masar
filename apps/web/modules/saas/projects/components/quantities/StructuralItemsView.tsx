@@ -97,7 +97,7 @@ export function StructuralItemsView({
 	const isLoading = breakdownLoading || studiesLoading || milestonesLoading;
 
 	if (isLoading) {
-		return <ListTableSkeleton rows={8} cols={8} />;
+		return <ListTableSkeleton rows={8} cols={7} />;
 	}
 
 	// Build study name map

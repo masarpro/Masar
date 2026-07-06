@@ -3,6 +3,7 @@
 import { Button } from "@ui/components/button";
 import { Card, CardContent } from "@ui/components/card";
 import { Skeleton } from "@ui/components/skeleton";
+import { BOQOverviewSkeleton } from "@saas/shared/components/skeletons";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -161,18 +162,9 @@ export function BOQOverview({
 		setOffset(0);
 	};
 
-	// Loading state
+	// Loading state — must match the route loading.tsx / dynamic fallback
 	if (summaryLoading) {
-		return (
-			<div className="space-y-6">
-				<Skeleton className="h-8 w-48" />
-				<div className="grid grid-cols-2 gap-4">
-					<Skeleton className="h-24 rounded-xl" />
-					<Skeleton className="h-24 rounded-xl" />
-				</div>
-				<Skeleton className="h-64 rounded-xl" />
-			</div>
-		);
+		return <BOQOverviewSkeleton />;
 	}
 
 	// Empty state

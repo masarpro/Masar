@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { CashFlowReport } from "@saas/finance/components/reports/CashFlowReport";
 import { FinanceShell } from "@saas/finance/components/shell";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -25,7 +26,7 @@ export default async function CashFlowPage({
 	const { organizationSlug } = await params;
 
 	return (
-		<Suspense fallback={null}>
+		<Suspense fallback={<DashboardSkeleton />}>
 			<CashFlowContent organizationSlug={organizationSlug} />
 		</Suspense>
 	);

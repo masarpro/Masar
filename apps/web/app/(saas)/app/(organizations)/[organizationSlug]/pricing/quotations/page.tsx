@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { QuotationsList } from "@saas/pricing/components/quotations/QuotationsList";
@@ -26,11 +25,8 @@ export default async function QuotationsPage({
 }) {
 	const { organizationSlug } = await params;
 
-	return (
-		<Suspense fallback={null}>
-			<QuotationsPageContent organizationSlug={organizationSlug} />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <QuotationsPageContent organizationSlug={organizationSlug} />;
 }
 
 async function QuotationsPageContent({ organizationSlug }: { organizationSlug: string }) {

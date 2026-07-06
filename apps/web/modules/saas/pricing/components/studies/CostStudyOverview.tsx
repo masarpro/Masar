@@ -1,5 +1,6 @@
 "use client";
 
+import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
@@ -76,7 +77,8 @@ export function CostStudyOverview({
 	);
 
 	if (!study) {
-		return null;
+		// Study still loading — keep the shell chrome and show the editor skeleton.
+		return <StudyEditorSkeleton />;
 	}
 
 	const activeStage = (activeStageData as any)?.activeStage;
@@ -110,7 +112,8 @@ export function CostStudyOverview({
 	}, [study, activeStagePath, router, organizationSlug, studyId]);
 
 	if (activeStagePath) {
-		return null;
+		// Redirecting to the active stage — show the editor skeleton instead of a blank flash.
+		return <StudyEditorSkeleton />;
 	}
 
 	return (

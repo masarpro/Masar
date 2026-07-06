@@ -77,8 +77,9 @@ export function CostingSummaryTab({
 
 	// Derived calculations
 	const sections = useMemo(() => (summary as any)?.sections ?? [], [summary]);
-	const grandMaterial = (summary as any)?.grandTotal?.materialTotal ?? 0;
-	const grandLabor = (summary as any)?.grandTotal?.laborTotal ?? 0;
+	// الـAPI يعيد grandTotal بمفاتيح material/labor (وليس materialTotal/laborTotal)
+	const grandMaterial = (summary as any)?.grandTotal?.material ?? 0;
+	const grandLabor = (summary as any)?.grandTotal?.labor ?? 0;
 
 	// Extract STRUCTURAL section to match المواد and المصنعيات tabs exactly
 	const structuralSection = useMemo(

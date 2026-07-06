@@ -1,10 +1,11 @@
 import { z } from "zod";
 import { db, findMembershipInAnotherOrg } from "@repo/database";
 import { auth } from "@repo/auth";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
+import { enforceFeatureAccess } from "../../../lib/feature-gate";
 
-export const inviteTeamMembers = protectedProcedure
+export const inviteTeamMembers = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/onboarding/invite-team",
@@ -27,6 +28,14 @@ export const inviteTeamMembers = protectedProcedure
 	)
 	.handler(async ({ input, context }) => {
 		await verifyOrganizationAccess(input.organizationId, context.user.id);
+
+		// Enforce the same member-invite plan gate as the canonical invite path,
+		// otherwise free-plan users could bypass the limit via onboarding.
+		await enforceFeatureAccess(
+			input.organizationId,
+			"members.invite",
+			context.user,
+		);
 
 		const { organizationId, invitations } = input;
 

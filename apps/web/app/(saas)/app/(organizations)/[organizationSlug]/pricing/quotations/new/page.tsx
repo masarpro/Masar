@@ -1,14 +1,14 @@
 import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { PricingShell } from "@saas/pricing/components/shell";
-import { Skeleton } from "@ui/components/skeleton";
+import { EditorPageSkeleton } from "@saas/shared/components/skeletons";
 import dynamic from "next/dynamic";
 const QuotationForm = dynamic(
 	() =>
 		import("@saas/pricing/components/quotations/QuotationForm").then((m) => ({
 			default: m.QuotationForm,
 		})),
-	{ loading: () => <Skeleton className="h-96 w-full" /> },
+	{ loading: () => <EditorPageSkeleton /> },
 );
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -32,11 +32,8 @@ export default async function CreateQuotationPage({
 }) {
 	const { organizationSlug } = await params;
 
-	return (
-		<Suspense fallback={null}>
-			<CreateQuotationPageContent organizationSlug={organizationSlug} />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <CreateQuotationPageContent organizationSlug={organizationSlug} />;
 }
 
 async function CreateQuotationPageContent({
@@ -56,7 +53,7 @@ async function CreateQuotationPageContent({
 			sectionKey="quotations"
 			pageTitle={t("pricing.quotations.create")}
 		>
-			<Suspense fallback={<Skeleton className="h-96 w-full" />}>
+			<Suspense fallback={<EditorPageSkeleton />}>
 				<QuotationForm
 					organizationId={activeOrganization.id}
 					organizationSlug={organizationSlug}

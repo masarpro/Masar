@@ -4,6 +4,7 @@ import { PricingShell } from "@saas/pricing/components/shell";
 import { StudyPageShell } from "@saas/pricing/components/studies/StudyPageShell";
 import { StudyQuotationPageContent } from "@saas/pricing/components/quotation-builder/StudyQuotationPageContent";
 import { redirectIfUnified } from "@saas/pricing/lib/guards/redirect-if-unified";
+import { StudyOverviewSkeleton } from "@saas/shared/components/skeletons";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata() {
@@ -20,7 +21,7 @@ export default async function QuotationPage({
 	const { organizationSlug, studyId } = await params;
 
 	return (
-		<Suspense fallback={null}>
+		<Suspense fallback={<StudyOverviewSkeleton />}>
 			<QuotationPageContent organizationSlug={organizationSlug} studyId={studyId} />
 		</Suspense>
 	);

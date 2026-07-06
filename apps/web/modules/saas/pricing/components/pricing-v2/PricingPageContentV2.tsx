@@ -1,5 +1,6 @@
 "use client";
 
+import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
@@ -342,7 +343,9 @@ export function PricingPageContentV2({
 
 	// ─── Loading & guard ──────────────────────────────────────────
 
-	if (stagesLoading) return null;
+	if (stagesLoading) {
+		return <StudyEditorSkeleton />;
+	}
 
 	if (!skipCostingCheck && !isCostingApproved) {
 		return (

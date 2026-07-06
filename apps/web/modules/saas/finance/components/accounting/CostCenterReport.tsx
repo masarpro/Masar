@@ -56,7 +56,18 @@ export function CostCenterReport({ organizationId }: Props) {
 	if (isLoading) return <DashboardSkeleton />;
 
 	const projects = data?.projects ?? [];
-	const totals = data?.totals ?? { totalRevenue: 0, totalExpenses: 0, netProfit: 0 };
+	const totals = (data?.totals ?? {
+		totalRevenue: 0,
+		totalExpenses: 0,
+		netProfit: 0,
+		totalAllocatedCompanyExpenses: 0,
+	}) as {
+		totalRevenue: number;
+		totalExpenses: number;
+		netProfit: number;
+		totalAllocatedCompanyExpenses?: number;
+	};
+	const totalAllocated = totals.totalAllocatedCompanyExpenses ?? 0;
 
 	return (
 		<div className="space-y-4">
@@ -115,6 +126,7 @@ export function CostCenterReport({ organizationId }: Props) {
 									<TableHead>{t("finance.accountingReports.costCenter")}</TableHead>
 									<TableHead className="text-end">{t("finance.accounting.incomeStatement.revenue")}</TableHead>
 									<TableHead className="text-end">{t("finance.accounting.expenses")}</TableHead>
+									<TableHead className="text-end">{t("finance.accountingReports.allocatedCompanyExpenses")}</TableHead>
 									<TableHead className="text-end">{t("finance.accounting.incomeStatement.netProfit")}</TableHead>
 									<TableHead className="text-end">{t("finance.accounting.incomeStatement.netProfitMargin")}</TableHead>
 								</TableRow>
@@ -140,6 +152,11 @@ export function CostCenterReport({ organizationId }: Props) {
 												<TableCell>{project.projectName}</TableCell>
 												<TableCell className="text-end text-green-600">{formatAccounting(project.totalRevenue)}</TableCell>
 												<TableCell className="text-end text-red-600">{formatAccounting(project.totalExpenses)}</TableCell>
+												<TableCell className="text-end text-orange-600">
+													{project.allocatedCompanyExpenses
+														? formatAccounting(project.allocatedCompanyExpenses)
+														: "—"}
+												</TableCell>
 												<TableCell className="text-end font-bold">{formatAccounting(project.netProfit)}</TableCell>
 												<TableCell className={`text-end ${marginColor}`}>
 													{project.profitMargin.toFixed(1)}%
@@ -159,6 +176,7 @@ export function CostCenterReport({ organizationId }: Props) {
 													<TableCell className="text-end text-sm">{acc.type === "EXPENSE" ? formatAccounting(acc.amount) : "—"}</TableCell>
 													<TableCell />
 													<TableCell />
+													<TableCell />
 												</TableRow>
 											))}
 										</>
@@ -170,6 +188,9 @@ export function CostCenterReport({ organizationId }: Props) {
 									<TableCell>{t("finance.accounting.aging.total")}</TableCell>
 									<TableCell className="text-end text-green-700">{formatAccounting(totals.totalRevenue)}</TableCell>
 									<TableCell className="text-end text-red-700">{formatAccounting(totals.totalExpenses)}</TableCell>
+									<TableCell className="text-end text-orange-700">
+										{totalAllocated ? formatAccounting(totalAllocated) : "—"}
+									</TableCell>
 									<TableCell className="text-end">{formatAccounting(totals.netProfit)}</TableCell>
 									<TableCell className="text-end">
 										{totals.totalRevenue > 0 ? ((totals.netProfit / totals.totalRevenue) * 100).toFixed(1) : "0.0"}%

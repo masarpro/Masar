@@ -622,10 +622,23 @@ export async function deleteBankAccount(id: string, organizationId: string) {
 		include: {
 			_count: {
 				select: {
+					// ALL money-movement relations — a bank with any of these must
+					// not be deleted, otherwise its BankReconciliation rows cascade
+					// away and linked payments lose their bank reference (SetNull).
 					expensesFrom: true,
 					paymentsTo: true,
 					transfersFrom: true,
 					transfersTo: true,
+					subcontractPayments: true,
+					projectPaymentsTo: true,
+					companyExpensePayments: true,
+					invoicePayments: true,
+					reconciliations: true,
+					receiptVouchersTo: true,
+					paymentVouchersFrom: true,
+					payrollRuns: true,
+					ownerDrawings: true,
+					capitalContributionsReceived: true,
 				},
 			},
 		},
@@ -635,11 +648,22 @@ export async function deleteBankAccount(id: string, organizationId: string) {
 		throw new Error("Bank account not found");
 	}
 
+	const c = existing._count;
 	const totalTransactions =
-		existing._count.expensesFrom +
-		existing._count.paymentsTo +
-		existing._count.transfersFrom +
-		existing._count.transfersTo;
+		c.expensesFrom +
+		c.paymentsTo +
+		c.transfersFrom +
+		c.transfersTo +
+		c.subcontractPayments +
+		c.projectPaymentsTo +
+		c.companyExpensePayments +
+		c.invoicePayments +
+		c.reconciliations +
+		c.receiptVouchersTo +
+		c.paymentVouchersFrom +
+		c.payrollRuns +
+		c.ownerDrawings +
+		c.capitalContributionsReceived;
 
 	if (totalTransactions > 0) {
 		throw new Error("Cannot delete account with existing transactions");

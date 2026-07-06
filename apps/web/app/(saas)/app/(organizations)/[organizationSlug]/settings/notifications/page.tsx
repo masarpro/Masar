@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { getTranslations } from "next-intl/server";
 import { NotificationPreferencesPanel } from "@saas/settings/components/notification-preferences/NotificationPreferencesPanel";
@@ -18,11 +17,8 @@ export default async function NotificationSettingsPage({
 }) {
 	const { organizationSlug } = await params;
 
-	return (
-		<Suspense fallback={null}>
-			<NotificationSettingsPageContent organizationSlug={organizationSlug} />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <NotificationSettingsPageContent organizationSlug={organizationSlug} />;
 }
 
 async function NotificationSettingsPageContent({

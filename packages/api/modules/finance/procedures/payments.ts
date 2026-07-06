@@ -214,6 +214,14 @@ export const createOrgPaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[ReceiptVoucher] Failed to create auto voucher from payment:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "voucher",
+				entityId: payment.id,
+				metadata: { error: String(e), type: "RECEIPT_VOUCHER_AUTO_CREATE" },
+			});
 		}
 
 		await notifyEvent({

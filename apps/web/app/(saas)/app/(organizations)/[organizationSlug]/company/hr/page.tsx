@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { HRManagementPage } from "@saas/company/components/hr/HRManagementPage";
@@ -16,7 +17,7 @@ export default async function HRPage({
 }) {
 	const { organizationSlug } = await params;
 	return (
-		<Suspense fallback={null}>
+		<Suspense fallback={<DashboardSkeleton />}>
 			<HRPageContent organizationSlug={organizationSlug} />
 		</Suspense>
 	);

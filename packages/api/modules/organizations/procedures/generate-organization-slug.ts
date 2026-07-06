@@ -3,7 +3,7 @@ import { getOrganizationBySlug } from "@repo/database";
 import slugify from "@sindresorhus/slugify";
 import { nanoid } from "nanoid";
 import { z } from "zod";
-import { enforceRateLimit, createIpRateLimitKey, RATE_LIMITS } from "../../../lib/rate-limit";
+import { enforceRateLimit, createIpRateLimitKey, getClientIp, RATE_LIMITS } from "../../../lib/rate-limit";
 import { publicProcedure } from "../../../orpc/procedures";
 
 export const generateOrganizationSlug = publicProcedure
@@ -20,7 +20,7 @@ export const generateOrganizationSlug = publicProcedure
 		}),
 	)
 	.handler(async ({ input: { name }, context: { headers } }) => {
-		const ip = headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+		const ip = getClientIp(headers);
 		await enforceRateLimit(createIpRateLimitKey(ip, "generateOrganizationSlug"), RATE_LIMITS.READ);
 		const baseSlug = slugify(name, {
 			lowercase: true,

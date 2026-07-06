@@ -1,5 +1,5 @@
-import { FormPageSkeleton } from "@saas/shared/components/skeletons";
+import { CreditNoteSkeleton } from "./CreditNoteForm";
 
 export default function Loading() {
-	return <FormPageSkeleton />;
+	return <CreditNoteSkeleton />;
 }

@@ -131,7 +131,7 @@ export async function getCashFlowReport(
 			...projectLineFilter,
 			journalEntry: {
 				organizationId,
-				status: "POSTED",
+				status: { in: ["POSTED", "REVERSED"] },
 				OR: [
 					{ date: { lt: dateFrom } },
 					{ referenceType: "OPENING_BALANCE" },
@@ -149,7 +149,7 @@ export async function getCashFlowReport(
 		where: {
 			journalEntry: {
 				organizationId,
-				status: "POSTED",
+				status: { in: ["POSTED", "REVERSED"] },
 				date: { gte: dateFrom, lte: dateTo },
 			},
 		},

@@ -20,7 +20,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 
 interface MaterialsListViewProps {
 	organizationId: string;
@@ -64,7 +64,7 @@ export function MaterialsListView({
 	);
 
 	if (isLoading) {
-		return <DashboardSkeleton />;
+		return <ListTableSkeleton rows={8} cols={7} />;
 	}
 
 	const groups = data?.groups ?? [];

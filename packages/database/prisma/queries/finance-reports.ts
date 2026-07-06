@@ -182,31 +182,36 @@ export async function getOutstandingInvoices(
 }
 
 /**
+ * Group payments into sorted monthly revenue buckets.
+ * Pure function — exported for unit tests (pins getRevenueByPeriod output).
+ */
+export function groupPaymentsByMonth(
+	payments: Array<{ amount: unknown; paymentDate: Date }>,
+): Array<{ month: string; revenue: number }> {
+	const revenueByMonth: Record<string, number> = {};
+
+	for (const payment of payments) {
+		const monthKey = `${payment.paymentDate.getFullYear()}-${String(payment.paymentDate.getMonth() + 1).padStart(2, "0")}`;
+		revenueByMonth[monthKey] = (revenueByMonth[monthKey] ?? 0) + Number(payment.amount);
+	}
+
+	const sortedMonths = Object.keys(revenueByMonth).sort();
+
+	return sortedMonths.map((month) => ({
+		month,
+		revenue: revenueByMonth[month],
+	}));
+}
+
+/**
  * Get revenue by period (month)
+ * Revenue = collected invoice payments grouped by payment month (cash basis).
  */
 export async function getRevenueByPeriod(
 	organizationId: string,
 	startDate: Date,
 	endDate: Date,
 ) {
-	// Get all paid invoices in the period
-	const invoices = await db.financeInvoice.findMany({
-		where: {
-			organizationId,
-			status: "PAID",
-			issueDate: {
-				gte: startDate,
-				lte: endDate,
-			},
-		},
-		select: {
-			totalAmount: true,
-			paidAmount: true,
-			issueDate: true,
-		},
-	});
-
-	// Get payments in the period
 	const payments = await db.financeInvoicePayment.findMany({
 		where: {
 			invoice: { organizationId },
@@ -221,21 +226,7 @@ export async function getRevenueByPeriod(
 		},
 	});
 
-	// Group by month
-	const revenueByMonth: Record<string, number> = {};
-
-	for (const payment of payments) {
-		const monthKey = `${payment.paymentDate.getFullYear()}-${String(payment.paymentDate.getMonth() + 1).padStart(2, "0")}`;
-		revenueByMonth[monthKey] = (revenueByMonth[monthKey] ?? 0) + Number(payment.amount);
-	}
-
-	// Sort by month
-	const sortedMonths = Object.keys(revenueByMonth).sort();
-
-	return sortedMonths.map((month) => ({
-		month,
-		revenue: revenueByMonth[month],
-	}));
+	return groupPaymentsByMonth(payments);
 }
 
 /**

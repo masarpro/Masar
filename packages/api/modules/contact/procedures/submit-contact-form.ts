@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/client";
 import { config } from "@repo/config";
 import { logger } from "@repo/logs";
 import { sendEmail } from "@repo/mail";
-import { enforceRateLimit, createIpRateLimitKey, RATE_LIMITS } from "../../../lib/rate-limit";
+import { enforceRateLimit, createIpRateLimitKey, getClientIp, RATE_LIMITS } from "../../../lib/rate-limit";
 import { verifyTurnstileToken } from "../../../lib/turnstile";
 import { localeMiddleware } from "../../../orpc/middleware/locale-middleware";
 import { publicProcedure } from "../../../orpc/procedures";
@@ -19,7 +19,7 @@ export const submitContactForm = publicProcedure
 	.use(localeMiddleware)
 	.handler(
 		async ({ input: { email, name, message, turnstileToken }, context: { locale, headers } }) => {
-			const ip = headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+			const ip = getClientIp(headers);
 			await enforceRateLimit(createIpRateLimitKey(ip, "submitContactForm"), RATE_LIMITS.PUBLIC_FORM);
 			await verifyTurnstileToken(turnstileToken, ip);
 			try {

@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/client";
 import { logger } from "@repo/logs";
 import { sendEmail } from "@repo/mail";
 import { z } from "zod";
-import { enforceRateLimit, createIpRateLimitKey, RATE_LIMITS } from "../../../lib/rate-limit";
+import { enforceRateLimit, createIpRateLimitKey, getClientIp, RATE_LIMITS } from "../../../lib/rate-limit";
 import { verifyTurnstileToken } from "../../../lib/turnstile";
 import { localeMiddleware } from "../../../orpc/middleware/locale-middleware";
 import { publicProcedure } from "../../../orpc/procedures";
@@ -22,7 +22,7 @@ export const subscribeToNewsletter = publicProcedure
 	)
 	.use(localeMiddleware)
 	.handler(async ({ input, context: { locale, headers } }) => {
-		const ip = headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+		const ip = getClientIp(headers);
 		await enforceRateLimit(createIpRateLimitKey(ip, "subscribeToNewsletter"), RATE_LIMITS.PUBLIC_FORM);
 		const { email, turnstileToken } = input;
 		await verifyTurnstileToken(turnstileToken, ip);

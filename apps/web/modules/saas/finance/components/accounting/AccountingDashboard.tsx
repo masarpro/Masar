@@ -24,6 +24,7 @@ import {
 	CalendarCheck,
 } from "lucide-react";
 import { formatAccounting } from "./formatters";
+import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import Link from "next/link";
 
 interface AccountingDashboardProps {
@@ -64,7 +65,9 @@ export function AccountingDashboard({
 		},
 	});
 
-	if (isLoading || !data) return null;
+	if (isLoading || !data) {
+		return <DashboardSkeleton />;
+	}
 
 	return (
 		<div className="space-y-4">

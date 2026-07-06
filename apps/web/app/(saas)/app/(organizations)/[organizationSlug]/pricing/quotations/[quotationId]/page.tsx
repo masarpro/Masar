@@ -1,14 +1,13 @@
-import { Suspense } from "react";
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import { QuotationStudyBanner } from "@saas/pricing/components/quotation-builder/QuotationStudyBanner";
-import { Skeleton } from "@ui/components/skeleton";
+import { EditorPageSkeleton } from "@saas/shared/components/skeletons";
 import dynamic from "next/dynamic";
 const QuotationForm = dynamic(
 	() =>
 		import("@saas/pricing/components/quotations/QuotationForm").then((m) => ({
 			default: m.QuotationForm,
 		})),
-	{ loading: () => <Skeleton className="h-96 w-full" /> },
+	{ loading: () => <EditorPageSkeleton /> },
 );
 import { PricingShell } from "@saas/pricing/components/shell";
 import { notFound } from "next/navigation";
@@ -33,11 +32,8 @@ export default async function EditQuotationPage({
 }) {
 	const { organizationSlug, quotationId } = await params;
 
-	return (
-		<Suspense fallback={null}>
-			<EditQuotationPageContent organizationSlug={organizationSlug} quotationId={quotationId} />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <EditQuotationPageContent organizationSlug={organizationSlug} quotationId={quotationId} />;
 }
 
 async function EditQuotationPageContent({ organizationSlug, quotationId }: { organizationSlug: string; quotationId: string }) {

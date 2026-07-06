@@ -291,8 +291,10 @@ async function computeOverdrawContext(
 			_sum: { amount: true },
 		});
 		capitalContributionsTotal = Number(contributions._sum?.amount ?? 0);
-	} catch {
-		// Table may not exist yet — ignore
+	} catch (e) {
+		// Defaulting to 0 is conservative here (it only shrinks the available
+		// amount), but log so a real DB failure isn't completely invisible.
+		console.error("[OwnerDrawings] Failed to load capital contributions:", e);
 	}
 
 	const availableForOwner =
@@ -542,14 +544,19 @@ export const createDrawingProcedure = subscriptionProcedure
 				},
 			});
 
-			// Decrement bank balance atomically
+			// Decrement bank balance atomically — guard against overdrawing
 			if (input.bankAccountId) {
-				await tx.organizationBank.update({
-					where: { id: input.bankAccountId },
+				const bankDec = await tx.organizationBank.updateMany({
+					where: { id: input.bankAccountId, balance: { gte: input.amount } },
 					data: {
 						balance: { decrement: input.amount },
 					},
 				});
+				if (bankDec.count === 0) {
+					throw new ORPCError("BAD_REQUEST", {
+						message: "الرصيد غير كافي في الحساب المصدر",
+					});
+				}
 			}
 
 			return created;
@@ -997,7 +1004,7 @@ export const getCompanySummaryProcedure = protectedProcedure
 			const lines = await db.journalEntryLine.aggregate({
 				where: {
 					accountId: retainedAccount.id,
-					journalEntry: { status: "POSTED" },
+					journalEntry: { status: { in: ["POSTED", "REVERSED"] } },
 				},
 				_sum: { debit: true, credit: true },
 			});

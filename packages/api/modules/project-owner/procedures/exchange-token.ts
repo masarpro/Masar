@@ -4,7 +4,7 @@ import {
 } from "@repo/database";
 import { z } from "zod";
 import { publicProcedure } from "../../../orpc/procedures";
-import { rateLimitToken, enforceRateLimit, createIpRateLimitKey, RATE_LIMITS } from "../../../lib/rate-limit";
+import { rateLimitToken, enforceRateLimit, createIpRateLimitKey, getClientIp, RATE_LIMITS } from "../../../lib/rate-limit";
 import { throwOwnerTokenError } from "../helpers";
 
 export const exchangeTokenProcedure = publicProcedure
@@ -21,7 +21,7 @@ export const exchangeTokenProcedure = publicProcedure
 	)
 	.handler(async ({ input, context }) => {
 		// IP-based rate limit (5/min) — prevents brute-force across different tokens
-		const ip = context.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+		const ip = getClientIp(context.headers);
 		await enforceRateLimit(createIpRateLimitKey(ip, "exchangeToken"), RATE_LIMITS.OWNER_EXCHANGE);
 
 		// Per-token rate limit (30/min) — defense in depth

@@ -143,8 +143,8 @@ export const createInvoiceProcedure = subscriptionProcedure
 
 		// If created from a quotation, update its status to CONVERTED
 		if (input.quotationId) {
-			await db.quotation.update({
-				where: { id: input.quotationId },
+			await db.quotation.updateMany({
+				where: { id: input.quotationId, organizationId: input.organizationId },
 				data: { status: "CONVERTED" },
 			}).catch((e) => {
 				console.error("[createInvoice] Failed to update quotation status:", e);
@@ -363,7 +363,7 @@ export const updateInvoiceStatusProcedure = subscriptionProcedure
 
 		const currentInvoice = await db.financeInvoice.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
-			select: { status: true },
+			select: { status: true, invoiceType: true },
 		});
 		if (!currentInvoice) throw new Error("الفاتورة غير موجودة");
 
@@ -372,11 +372,63 @@ export const updateInvoiceStatusProcedure = subscriptionProcedure
 			throw new Error(`لا يمكن تغيير حالة الفاتورة من ${currentInvoice.status} إلى ${input.status}`);
 		}
 
+		// Credit notes must not be cancelled through the generic status path:
+		// they carry their own reversal + paidAmount side-effects on the original
+		// invoice, which this path does not handle. Block to avoid double-crediting.
+		if (
+			input.status === "CANCELLED" &&
+			currentInvoice.invoiceType === "CREDIT_NOTE"
+		) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "لا يمكن إلغاء إشعار دائن من هذا المسار",
+			});
+		}
+
 		const invoice = await updateInvoiceStatus(
 			input.id,
 			input.organizationId,
 			input.status,
 		);
+
+		// Cancelling an issued invoice must reverse its posted journal entries,
+		// otherwise revenue + VAT + receivable linger in the ledger forever.
+		if (input.status === "CANCELLED") {
+			try {
+				const { reverseAutoJournalEntry } = await import(
+					"../../../lib/accounting/auto-journal"
+				);
+				// Reverse the main invoice entry (INV-JE)
+				await reverseAutoJournalEntry(db, {
+					organizationId: input.organizationId,
+					referenceType: "INVOICE",
+					referenceId: input.id,
+					userId: context.user.id,
+				});
+				// Reverse any collection entries (RCV-JE) for this invoice's payments
+				const payments = await db.financeInvoicePayment.findMany({
+					where: { invoiceId: input.id },
+					select: { id: true },
+				});
+				for (const p of payments) {
+					await reverseAutoJournalEntry(db, {
+						organizationId: input.organizationId,
+						referenceType: "INVOICE_PAYMENT",
+						referenceId: p.id,
+						userId: context.user.id,
+					});
+				}
+			} catch (e) {
+				console.error("[AutoJournal] Failed to reverse cancelled invoice:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: input.id,
+					metadata: { error: String(e), referenceType: "INVOICE_CANCEL" },
+				});
+			}
+		}
 
 		orgAuditLog({
 			organizationId: input.organizationId,
@@ -592,6 +644,14 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[ReceiptVoucher] Failed to create auto voucher from invoice payment:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "voucher",
+				entityId: input.id,
+				metadata: { error: String(e), type: "RECEIPT_VOUCHER_AUTO_CREATE" },
+			});
 		}
 
 		const invoiceForNotify = await db.financeInvoice.findUnique({
@@ -633,6 +693,18 @@ export const deleteInvoicePaymentProcedure = subscriptionProcedure
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
 			action: "payments",
+		});
+
+		// Cancel the auto-created receipt voucher first — once the payment is
+		// deleted its SetNull link is severed and the voucher would linger ISSUED,
+		// documenting money that no longer exists.
+		await db.receiptVoucher.updateMany({
+			where: {
+				invoicePaymentId: input.paymentId,
+				organizationId: input.organizationId,
+				status: { not: "CANCELLED" },
+			},
+			data: { status: "CANCELLED" },
 		});
 
 		await deleteInvoicePayment(
@@ -693,6 +765,11 @@ export const deleteInvoiceProcedure = subscriptionProcedure
 			action: "invoices",
 		});
 
+		const invoiceToDelete = await db.financeInvoice.findFirst({
+			where: { id: input.id, organizationId: input.organizationId },
+			select: { projectId: true },
+		});
+
 		await deleteInvoice(input.id, input.organizationId);
 
 		orgAuditLog({
@@ -722,6 +799,23 @@ export const deleteInvoiceProcedure = subscriptionProcedure
 				entityId: input.id,
 				metadata: { error: String(e), referenceType: "INVOICE" },
 			});
+		}
+
+		// Deleting the project's last invoice can flip it back to cash basis —
+		// payment entries crediting 1120 would leave a receivable nobody billed.
+		if (invoiceToDelete?.projectId) {
+			try {
+				const { reconcileProjectPaymentEntries } = await import(
+					"../../../lib/accounting/reconcile-project-payments"
+				);
+				await reconcileProjectPaymentEntries(db, {
+					organizationId: input.organizationId,
+					projectId: invoiceToDelete.projectId,
+					userId: context.user.id,
+				});
+			} catch (e) {
+				console.error("[AutoJournal] Failed to reconcile project payment entries after invoice delete:", e);
+			}
 		}
 
 		return { success: true };
@@ -909,6 +1003,24 @@ export const issueInvoiceProcedure = subscriptionProcedure
 				entityId: issuedInvoice.id,
 				metadata: { error: String(e), referenceType: "INVOICE" },
 			});
+		}
+
+		// First invoice on a project flips it from cash-basis to billed — flip
+		// earlier payment entries from revenue (4100) to receivable (1120) so the
+		// invoice accrual doesn't double-count the same revenue.
+		if (issuedInvoice.projectId) {
+			try {
+				const { reconcileProjectPaymentEntries } = await import(
+					"../../../lib/accounting/reconcile-project-payments"
+				);
+				await reconcileProjectPaymentEntries(db, {
+					organizationId: input.organizationId,
+					projectId: issuedInvoice.projectId,
+					userId: context.user.id,
+				});
+			} catch (e) {
+				console.error("[AutoJournal] Failed to reconcile project payment entries after invoice issue:", e);
+			}
 		}
 
 		await notifyEvent({
@@ -1112,14 +1224,17 @@ export const createCreditNoteProcedure = subscriptionProcedure
 		// Auto-Journal: generate accounting entry for credit note
 		try {
 			const { onCreditNoteIssued } = await import("../../../lib/accounting/auto-journal");
+			// Credit note amounts are stored negated; the hook expects positive
+			// magnitudes (DR revenue / CR receivable). Pass absolute values so the
+			// entry balances and posts in the correct direction.
 			await onCreditNoteIssued(db, {
 				id: creditNote.id,
 				organizationId: input.organizationId,
 				number: creditNote.invoiceNo,
 				issueDate: creditNote.issueDate,
 				clientName: creditNote.clientName,
-				totalAmount: creditNote.totalAmount,
-				vatAmount: creditNote.vatAmount,
+				totalAmount: creditNote.totalAmount.abs(),
+				vatAmount: creditNote.vatAmount.abs(),
 				projectId: creditNote.projectId,
 				userId: context.user.id,
 			});

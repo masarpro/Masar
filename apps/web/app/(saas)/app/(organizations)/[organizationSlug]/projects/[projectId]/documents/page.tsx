@@ -3,7 +3,7 @@ import { getActiveOrganization } from "@saas/auth/lib/server";
 import { DocumentsExplorer } from "@saas/projects/components/documents/DocumentsExplorer";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { DocumentsExplorerSkeleton } from "@saas/shared/components/skeletons";
 
 export async function generateMetadata() {
 	const t = await getTranslations();
@@ -21,7 +21,7 @@ export default async function DocumentsPage({
 	const { organizationSlug, projectId } = await params;
 
 	return (
-		<Suspense fallback={<ListTableSkeleton />}>
+		<Suspense fallback={<DocumentsExplorerSkeleton />}>
 			<DocumentsPageContent organizationSlug={organizationSlug} projectId={projectId} />
 		</Suspense>
 	);

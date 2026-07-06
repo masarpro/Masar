@@ -33,6 +33,23 @@ interface CreditNoteFormProps {
 	invoiceId: string;
 }
 
+/**
+ * Shared skeleton for the credit-note page — used by the form's isLoading
+ * branch, the page Suspense fallback, and loading.tsx (keep identical).
+ */
+export function CreditNoteSkeleton() {
+	return (
+		<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-slate-100/40 to-slate-50 dark:from-slate-950 dark:via-slate-900/40 dark:to-slate-950">
+			<div className="mx-auto max-w-4xl space-y-6 py-8">
+				<Skeleton className="h-8 w-48" />
+				<Skeleton className="h-32 w-full rounded-xl" />
+				<Skeleton className="h-48 w-full rounded-xl" />
+				<Skeleton className="h-24 w-full rounded-xl" />
+			</div>
+		</div>
+	);
+}
+
 interface InvoiceItem {
 	id: string;
 	description: string;
@@ -164,16 +181,7 @@ export function CreditNoteForm({
 	};
 
 	if (isLoading) {
-		return (
-			<div className="-mx-4 -mt-2 px-4 pt-0 pb-24 sm:-mx-6 sm:px-6 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-slate-100/40 to-slate-50 dark:from-slate-950 dark:via-slate-900/40 dark:to-slate-950">
-				<div className="mx-auto max-w-4xl space-y-6 py-8">
-					<Skeleton className="h-8 w-48" />
-					<Skeleton className="h-32 w-full rounded-xl" />
-					<Skeleton className="h-48 w-full rounded-xl" />
-					<Skeleton className="h-24 w-full rounded-xl" />
-				</div>
-			</div>
-		);
+		return <CreditNoteSkeleton />;
 	}
 
 	if (!invoice) {

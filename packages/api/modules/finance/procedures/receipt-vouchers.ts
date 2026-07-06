@@ -365,9 +365,22 @@ export const issueReceiptVoucher = subscriptionProcedure
 			data: { status: "ISSUED" },
 		});
 
-		// Generate accounting entry ONLY for manual (standalone) vouchers
+		// Generate accounting entry ONLY for manual (standalone) vouchers.
+		// Auto vouchers are created already-ISSUED and never reach this handler,
+		// so moving the balance here can't double-count their source payment.
 		const isManual = !voucher.paymentId && !voucher.invoicePaymentId && !voucher.projectPaymentId;
 		if (isManual) {
+			// Money received in → increase the destination bank balance so the
+			// operational balance matches the GL entry onReceiptVoucherIssued posts.
+			if (voucher.destinationAccountId) {
+				await db.organizationBank.updateMany({
+					where: {
+						id: voucher.destinationAccountId,
+						organizationId: input.organizationId,
+					},
+					data: { balance: { increment: Number(voucher.amount) } },
+				});
+			}
 			try {
 				const { onReceiptVoucherIssued } = await import(
 					"../../../lib/accounting/auto-journal"
@@ -444,7 +457,7 @@ export const cancelReceiptVoucher = subscriptionProcedure
 
 		const voucher = await db.receiptVoucher.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
-			select: { id: true, status: true, paymentId: true, invoicePaymentId: true, projectPaymentId: true, voucherNo: true },
+			select: { id: true, status: true, paymentId: true, invoicePaymentId: true, projectPaymentId: true, voucherNo: true, destinationAccountId: true, amount: true },
 		});
 
 		if (!voucher) {
@@ -466,6 +479,16 @@ export const cancelReceiptVoucher = subscriptionProcedure
 		// Reverse accounting entry if voucher was ISSUED and is manual
 		const isManual = !voucher.paymentId && !voucher.invoicePaymentId && !voucher.projectPaymentId;
 		if (voucher.status === "ISSUED" && isManual) {
+			// Reverse the balance increment applied at issue time.
+			if (voucher.destinationAccountId) {
+				await db.organizationBank.updateMany({
+					where: {
+						id: voucher.destinationAccountId,
+						organizationId: input.organizationId,
+					},
+					data: { balance: { decrement: Number(voucher.amount) } },
+				});
+			}
 			try {
 				const { reverseAutoJournalEntry } = await import(
 					"../../../lib/accounting/auto-journal"
@@ -522,6 +545,14 @@ export const printReceiptVoucher = subscriptionProcedure
 			section: "finance",
 			action: "view",
 		});
+
+		const owned = await db.receiptVoucher.findFirst({
+			where: { id: input.id, organizationId: input.organizationId },
+			select: { id: true },
+		});
+		if (!owned) {
+			throw new ORPCError("NOT_FOUND", { message: "سند القبض غير موجود" });
+		}
 
 		return db.receiptVoucher.update({
 			where: { id: input.id },

@@ -294,13 +294,16 @@ export const deleteBankAccountProcedure = subscriptionProcedure
 
 		// Deactivate linked chart account before deletion (if exists)
 		try {
-			const bank = await db.organizationBank.findUnique({
-				where: { id: input.id },
+			const bank = await db.organizationBank.findFirst({
+				where: { id: input.id, organizationId: input.organizationId },
 				select: { chartAccountId: true },
 			});
 			if (bank?.chartAccountId) {
-				await db.chartAccount.update({
-					where: { id: bank.chartAccountId },
+				await db.chartAccount.updateMany({
+					where: {
+						id: bank.chartAccountId,
+						organizationId: input.organizationId,
+					},
 					data: { isActive: false },
 				});
 			}

@@ -155,6 +155,12 @@ export const updateProjectPaymentProcedure = subscriptionProcedure
 			// Auto-Journal: reverse old entry and create new one with updated data
 			try {
 				const { reverseAutoJournalEntry, onProjectPaymentReceived } = await import("../../../lib/accounting/auto-journal");
+				const { isPeriodClosed } = await import("@repo/database");
+				// Guard: if the new date lands in a closed period the re-create would
+				// silently skip, leaving the payment REVERSED with no active entry.
+				if (await isPeriodClosed(db, input.organizationId, payment.date)) {
+					throw new Error("لا يمكن تعديل دفعة إلى تاريخ في فترة محاسبية مغلقة");
+				}
 				await reverseAutoJournalEntry(db, {
 					organizationId: input.organizationId,
 					referenceType: "PROJECT_PAYMENT",
@@ -196,6 +202,17 @@ export const updateProjectPaymentProcedure = subscriptionProcedure
 			if (error instanceof ORPCError) throw error;
 			if (error instanceof Error && error.message === "PAYMENT_NOT_FOUND") {
 				throw new ORPCError("NOT_FOUND", { message: "الدفعة غير موجودة" });
+			}
+			if (
+				error instanceof Error &&
+				error.message.startsWith("PAYMENT_EXCEEDS_CONTRACT:")
+			) {
+				const [, ceiling, collected, available] = error.message.split(":");
+				const fmt = (v?: string) =>
+					new Intl.NumberFormat("en-US").format(Number(v ?? 0));
+				throw new ORPCError("BAD_REQUEST", {
+					message: `مبلغ الدفعة يتجاوز المتبقي من قيمة العقد — قيمة العقد المعدّلة: ${fmt(ceiling)} ريال، المحصّل: ${fmt(collected)} ريال، المتاح: ${fmt(available)} ريال`,
+				});
 			}
 			throw error;
 		}

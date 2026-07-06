@@ -4,7 +4,6 @@ import { TeamManagementTabs } from "@saas/organizations/components/TeamManagemen
 import { SettingsList } from "@saas/shared/components/SettingsList";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { Suspense } from "react";
 
 export async function generateMetadata() {
 	const t = await getTranslations();
@@ -21,11 +20,8 @@ export default async function OrganizationSettingsPage({
 }) {
 	const { organizationSlug } = await params;
 
-	return (
-		<Suspense fallback={null}>
-			<OrganizationSettingsContent organizationSlug={organizationSlug} />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <OrganizationSettingsContent organizationSlug={organizationSlug} />;
 }
 
 async function OrganizationSettingsContent({

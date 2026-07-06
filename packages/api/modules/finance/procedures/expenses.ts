@@ -370,6 +370,14 @@ export const createExpenseProcedure = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[PaymentVoucher] Failed to create auto voucher from expense:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "voucher",
+					entityId: expense.id,
+					metadata: { error: String(e), type: "PAYMENT_VOUCHER_AUTO_CREATE" },
+				});
 			}
 		}
 
@@ -459,7 +467,66 @@ export const updateExpenseProcedure = subscriptionProcedure
 			...(resolvedSubcategoryId !== undefined ? { subcategoryId: resolvedSubcategoryId } : {}),
 		};
 
+		// Snapshot journal-affecting fields before the update so we can tell if the
+		// posted entry needs rebuilding (category/date/project drive GL account,
+		// period and cost-center — a stale entry silently diverges from the ledger).
+		const before = await db.financeExpense.findFirst({
+			where: { id, organizationId },
+			select: { status: true, category: true, categoryId: true, date: true, projectId: true },
+		});
+
 		const expense = await updateExpense(id, organizationId, data);
+
+		// If the expense is already posted and a journal-affecting field changed,
+		// reverse the old entry and recreate it with the new values.
+		if (before?.status === "COMPLETED") {
+			const journalFieldsChanged =
+				(data.category !== undefined && data.category !== before.category) ||
+				(resolvedCategoryId !== undefined && resolvedCategoryId !== before.categoryId) ||
+				(data.date !== undefined && data.date.getTime() !== before.date.getTime()) ||
+				(rest.projectId !== undefined && rest.projectId !== before.projectId);
+			if (journalFieldsChanged) {
+				try {
+					const { reverseAutoJournalEntry, onExpenseCompleted } = await import("../../../lib/accounting/auto-journal");
+					await reverseAutoJournalEntry(db, {
+						organizationId,
+						referenceType: "EXPENSE",
+						referenceId: id,
+						userId: context.user.id,
+					});
+					const payCategory = expense.categoryId
+						? await db.orgCategory.findUnique({
+								where: { id: expense.categoryId },
+								select: { accountCode: true, isVatExempt: true },
+							})
+						: null;
+					await onExpenseCompleted(db, {
+						id: expense.id,
+						organizationId,
+						category: expense.category,
+						accountCode: payCategory?.accountCode,
+						isVatExempt: payCategory?.isVatExempt,
+						amount: expense.amount,
+						date: expense.date,
+						description: expense.description ?? expense.category,
+						sourceAccountId: expense.sourceAccountId,
+						projectId: expense.projectId,
+						sourceType: expense.sourceType,
+						userId: context.user.id,
+					});
+				} catch (e) {
+					console.error("[AutoJournal] Failed to rebuild entry for updated expense:", e);
+					orgAuditLog({
+						organizationId,
+						actorId: context.user.id,
+						action: "JOURNAL_ENTRY_FAILED",
+						entityType: "journal_entry",
+						entityId: id,
+						metadata: { error: String(e), referenceType: "EXPENSE" },
+					});
+				}
+			}
+		}
 
 		orgAuditLog({
 			organizationId,
@@ -573,8 +640,12 @@ export const payExpenseProcedure = subscriptionProcedure
 			metadata: { amount: input.amount, sourceAccountId: input.sourceAccountId, newStatus: expense.status },
 		});
 
-		// Auto-Journal: generate accounting entry for expense payment
-		try {
+		// Auto-Journal: generate accounting entry ONLY when the expense is fully
+		// paid (COMPLETED). Posting on a partial payment would record a journal
+		// for the full expense amount while the bank was only debited the partial
+		// amount — breaking the ledger/bank reconciliation. The completing payment
+		// posts the full EXP-JE, matching the cumulative bank decrements.
+		if (expense.status === "COMPLETED") try {
 			const { onExpenseCompleted } = await import("../../../lib/accounting/auto-journal");
 			// Prefer the DB-backed category's GL account + VAT treatment (custom categories)
 			const payCategory = expense.categoryId
@@ -635,6 +706,14 @@ export const payExpenseProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[PaymentVoucher] Failed to create auto voucher from expense payment:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "voucher",
+				entityId: input.id ?? input.organizationId,
+				metadata: { error: String(e), type: "PAYMENT_VOUCHER_AUTO_CREATE" },
+			});
 		}
 
 		return expense;

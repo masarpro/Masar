@@ -3,7 +3,7 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@ui/components/card";
-import { Skeleton } from "@ui/components/skeleton";
+import { AdminRevenueSkeleton } from "@saas/shared/components/skeletons";
 import { DollarSignIcon, TrendingUpIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
@@ -35,16 +35,7 @@ export function AdminRevenue() {
 	);
 
 	if (isLoading) {
-		return (
-			<div className="space-y-6">
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-					{Array.from({ length: 3 }).map((_, i) => (
-						<Skeleton key={i} className="h-28 rounded-lg" />
-					))}
-				</div>
-				<Skeleton className="h-80 rounded-lg" />
-			</div>
-		);
+		return <AdminRevenueSkeleton />;
 	}
 
 	return (

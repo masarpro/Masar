@@ -10,7 +10,6 @@ import {
 	Users,
 	Wrench,
 	Calculator,
-	Loader2,
 	Save,
 	ArrowLeft,
 } from "lucide-react";
@@ -24,6 +23,7 @@ import { MEPCostingTab } from "./MEPCostingTab";
 import { LaborOverviewTab } from "./LaborOverviewTab";
 import { CostingSummaryTab } from "./CostingSummaryTab";
 import { usePageContextStore } from "@saas/ai/hooks/use-page-context";
+import { StudyEditorSkeleton } from "@saas/shared/components/skeletons";
 
 interface CostingPageContentV2Props {
 	organizationId: string;
@@ -92,11 +92,7 @@ export function CostingPageContentV2({
 	}, [study, studyType, activeTab, isSpecsApproved, updateAiContext]);
 
 	if (stagesLoading) {
-		return (
-			<div className="flex justify-center py-12">
-				<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-			</div>
-		);
+		return <StudyEditorSkeleton />;
 	}
 
 	if (!skipSpecsCheck && !isSpecsApproved) {

@@ -3,7 +3,7 @@ import { getActiveOrganization } from "@saas/auth/lib/server";
 import { AnalysisPage } from "@saas/projects-execution/components/analysis/AnalysisPage";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { AnalysisSkeleton } from "@saas/shared/components/skeletons";
 
 export async function generateMetadata() {
 	const t = await getTranslations();
@@ -21,7 +21,7 @@ export default async function ExecutionAnalysisPage({
 	const { organizationSlug, projectId } = await params;
 
 	return (
-		<Suspense fallback={<DashboardSkeleton />}>
+		<Suspense fallback={<AnalysisSkeleton />}>
 			<ExecutionAnalysisPageContent organizationSlug={organizationSlug} projectId={projectId} />
 		</Suspense>
 	);

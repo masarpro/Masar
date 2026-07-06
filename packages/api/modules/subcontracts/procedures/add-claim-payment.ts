@@ -128,9 +128,11 @@ export const addSubcontractClaimPaymentProcedure = subscriptionProcedure
 					});
 				}
 				if (error.message.startsWith("AMOUNT_EXCEEDS_OUTSTANDING:")) {
-					const max = error.message.split(":")[1];
+					const [, net, paid, available] = error.message.split(":");
+					const fmt = (v?: string) =>
+						new Intl.NumberFormat("en-US").format(Number(v ?? 0));
 					throw new ORPCError("BAD_REQUEST", {
-						message: `مبلغ الدفعة يتجاوز المتبقي (${max} ريال)`,
+						message: `مبلغ الدفعة يتجاوز المتبقي من المستخلص — المستحق: ${fmt(net)} ريال، المدفوع: ${fmt(paid)} ريال، المتاح: ${fmt(available)} ريال`,
 					});
 				}
 			}

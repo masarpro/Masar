@@ -1306,30 +1306,54 @@ export async function addInvoicePayment(
 		sourceAccountId?: string;
 	},
 ) {
-	const invoice = await db.financeInvoice.findFirst({
-		where: { id: invoiceId, organizationId },
-		select: { id: true, totalAmount: true, paidAmount: true },
-	});
+	const PAYABLE_STATUSES = [
+		"ISSUED",
+		"SENT",
+		"VIEWED",
+		"PARTIALLY_PAID",
+		"OVERDUE",
+	];
 
-	if (!invoice) {
-		throw new Error("Invoice not found");
-	}
-
-	const newPaidAmount = Number(invoice.paidAmount) + data.amount;
-	const totalAmount = Number(invoice.totalAmount);
-
-	// Determine new status
-	let newStatus: FinanceInvoiceStatus;
-	if (newPaidAmount >= totalAmount) {
-		newStatus = "PAID";
-	} else if (newPaidAmount > 0) {
-		newStatus = "PARTIALLY_PAID";
-	} else {
-		newStatus = "ISSUED";
-	}
-
-	// Create payment, update invoice, and increment bank balance in transaction
+	// Serialize concurrent payments on the same invoice: lock the row, then read
+	// the fresh paidAmount INSIDE the transaction so two simultaneous payments
+	// can't both read a stale value and lose one of them (or over-pay).
 	return db.$transaction(async (tx) => {
+		await tx.$queryRaw`SELECT id FROM finance_invoices WHERE id = ${invoiceId} AND organization_id = ${organizationId} FOR UPDATE`;
+
+		const invoice = await tx.financeInvoice.findFirst({
+			where: { id: invoiceId, organizationId },
+			select: { id: true, status: true, totalAmount: true, paidAmount: true },
+		});
+		if (!invoice) {
+			throw new Error("Invoice not found");
+		}
+
+		// Guard: only payable invoices accept payments (not DRAFT/CANCELLED/PAID/credit notes)
+		if (!PAYABLE_STATUSES.includes(invoice.status)) {
+			throw new Error(
+				`لا يمكن تسجيل دفعة على فاتورة بحالة ${invoice.status}`,
+			);
+		}
+
+		const total = new Prisma.Decimal(invoice.totalAmount);
+		const currentPaid = new Prisma.Decimal(invoice.paidAmount);
+		const payAmount = new Prisma.Decimal(data.amount);
+		const remaining = total.sub(currentPaid);
+
+		// Guard: no over-payment beyond the remaining balance (1 halala tolerance)
+		if (payAmount.greaterThan(remaining.add(new Prisma.Decimal("0.01")))) {
+			throw new Error(
+				`مبلغ الدفعة يتجاوز المبلغ المتبقي (${remaining.toFixed(2)})`,
+			);
+		}
+
+		const newPaid = currentPaid.add(payAmount);
+		const newStatus: FinanceInvoiceStatus = newPaid.greaterThanOrEqualTo(total)
+			? "PAID"
+			: newPaid.greaterThan(0)
+				? "PARTIALLY_PAID"
+				: "ISSUED";
+
 		const payment = await tx.financeInvoicePayment.create({
 			data: {
 				invoiceId,
@@ -1346,7 +1370,7 @@ export async function addInvoicePayment(
 		await tx.financeInvoice.update({
 			where: { id: invoiceId },
 			data: {
-				paidAmount: newPaidAmount,
+				paidAmount: newPaid,
 				status: newStatus,
 			},
 		});
@@ -1695,11 +1719,11 @@ export async function createCreditNote(data: {
 		throw new Error("لا يمكن إنشاء إشعار دائن لفاتورة مسودة أو ملغية");
 	}
 
-	// Bug #9 fix: validate credit note amount doesn't exceed original invoice remaining
-	const itemTotals = data.items.reduce(
-		(sum, item) => sum.add(D(item.quantity).times(D(item.unitPrice))),
-		ZERO,
-	);
+	// Bug #9 fix: validate credit note amount doesn't exceed original invoice
+	// remaining. Compare like-for-like: the credit note's FULL total (after
+	// discount + VAT) against the original's VAT-inclusive total — not the raw
+	// pre-VAT item sum, which previously let a credit note slip past the ceiling.
+	const totals = calculateInvoiceTotals(data.items, original.discountPercent, original.vatPercent);
 	const existingCreditNotes = await db.financeInvoice.aggregate({
 		where: {
 			relatedInvoiceId: data.originalInvoiceId,
@@ -1710,12 +1734,11 @@ export async function createCreditNote(data: {
 	});
 	// Credit note totalAmounts are negative, so abs() to get the credited total
 	const totalAlreadyCredited = D(existingCreditNotes._sum.totalAmount ?? 0).abs();
-	if (totalAlreadyCredited.add(itemTotals).greaterThan(D(original.totalAmount))) {
+	if (totalAlreadyCredited.add(totals.totalAmount).greaterThan(D(original.totalAmount))) {
 		throw new Error("مبلغ الإشعار الدائن يتجاوز المبلغ المتبقي من الفاتورة الأصلية");
 	}
 
 	const invoiceNo = await generateInvoiceNumber(data.organizationId);
-	const totals = calculateInvoiceTotals(data.items, original.discountPercent, original.vatPercent);
 
 	// Negate amounts for credit note (ZATCA: credit notes are reversals)
 	const negSubtotal = totals.subtotal.neg();

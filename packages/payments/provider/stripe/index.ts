@@ -4,7 +4,7 @@ import {
 	getPurchaseBySubscriptionId,
 	updatePurchase,
 } from "@repo/database";
-import { logger } from "@repo/logs";
+import { logBusinessEvent, logger } from "@repo/logs";
 import Stripe from "stripe";
 import { setCustomerIdToEntity } from "../../src/lib/customer";
 import type {
@@ -140,19 +140,48 @@ export const webhookHandler: WebhookHandler = async (req) => {
 		});
 	}
 
+	// Fail-closed: بدون secret لا يمكن التحقق من مصدر الطلب — نرفض كل الـwebhooks
+	const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+	if (!webhookSecret) {
+		logBusinessEvent({
+			type: "payments.webhook_misconfigured",
+			severity: "error",
+			metadata: { provider: "stripe", reason: "missing STRIPE_WEBHOOK_SECRET" },
+		});
+		return new Response("Webhook not configured.", {
+			status: 500,
+		});
+	}
+
+	const signature = req.headers.get("stripe-signature");
+	if (!signature) {
+		logBusinessEvent({
+			type: "payments.webhook_rejected",
+			severity: "warning",
+			metadata: { provider: "stripe", reason: "missing signature header" },
+		});
+		return new Response("Unauthorized.", {
+			status: 401,
+		});
+	}
+
 	let event: Stripe.Event | undefined;
 
 	try {
 		event = await stripeClient.webhooks.constructEventAsync(
 			await req.text(),
-			req.headers.get("stripe-signature") as string,
-			process.env.STRIPE_WEBHOOK_SECRET as string,
+			signature,
+			webhookSecret,
 		);
 	} catch (e) {
 		logger.error(e);
-
-		return new Response("Invalid request.", {
-			status: 400,
+		logBusinessEvent({
+			type: "payments.webhook_rejected",
+			severity: "error",
+			metadata: { provider: "stripe", reason: "signature verification failed" },
+		});
+		return new Response("Unauthorized.", {
+			status: 401,
 		});
 	}
 

@@ -1,6 +1,6 @@
 import { db } from "../client";
 import type { PayrollRunStatus } from "../generated/client";
-import { generateExpenseNumber } from "./org-finance";
+import { generateAtomicNoBatch } from "./sequences";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PAYROLL RUN QUERIES - استعلامات دورات الرواتب
@@ -249,10 +249,20 @@ export async function approvePayrollRun(
 		throw new Error("Cannot approve empty payroll run. Populate first.");
 	}
 
+	// Reserve all expense numbers in ONE round-trip before opening the
+	// transaction — avoids a separate sequence connection per employee (which
+	// risked exhausting the pool and timing out the interactive transaction).
+	const expenseNos = await generateAtomicNoBatch(
+		data.organizationId,
+		"EXP",
+		run.items.length,
+	);
+
 	return db.$transaction(async (tx) => {
 		// Create a PENDING FinanceExpense for each employee
-		for (const item of run.items) {
-			const expenseNo = await generateExpenseNumber(data.organizationId);
+		for (let i = 0; i < run.items.length; i++) {
+			const item = run.items[i];
+			const expenseNo = expenseNos[i];
 
 			const expense = await tx.financeExpense.create({
 				data: {

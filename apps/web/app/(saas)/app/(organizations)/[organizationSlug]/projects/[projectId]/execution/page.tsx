@@ -5,7 +5,7 @@ import { FieldTimeline } from "@saas/projects/components/field/FieldTimeline";
 import { ExecutionDashboard } from "@saas/projects-execution/components";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { ExecutionDashboardSkeleton } from "@saas/shared/components/skeletons";
 
 export async function generateMetadata() {
 	const t = await getTranslations();
@@ -23,7 +23,7 @@ export default async function ExecutionPage({
 	const { organizationSlug, projectId } = await params;
 
 	return (
-		<Suspense fallback={<ListTableSkeleton rows={6} cols={4} />}>
+		<Suspense fallback={<ExecutionDashboardSkeleton />}>
 			<ExecutionPageContent organizationSlug={organizationSlug} projectId={projectId} />
 		</Suspense>
 	);

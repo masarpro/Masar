@@ -1,4 +1,5 @@
 import { db } from "@repo/database";
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../../lib/permissions";
 import {
@@ -79,6 +80,23 @@ export const adjustLeaveBalanceProcedure = subscriptionProcedure
 		});
 
 		const year = input.year ?? new Date().getFullYear();
+
+		// Tenant isolation: ensure employee + leave type belong to the organization
+		const [ownedEmployee, ownedLeaveType] = await Promise.all([
+			db.employee.findFirst({
+				where: { id: input.employeeId, organizationId: input.organizationId },
+				select: { id: true },
+			}),
+			db.leaveType.findFirst({
+				where: { id: input.leaveTypeId, organizationId: input.organizationId },
+				select: { id: true },
+			}),
+		]);
+		if (!ownedEmployee || !ownedLeaveType) {
+			throw new ORPCError("NOT_FOUND", {
+				message: "الموظف أو نوع الإجازة غير موجود",
+			});
+		}
 
 		// Count used days from approved requests
 		const usedResult = await db.leaveRequest.aggregate({

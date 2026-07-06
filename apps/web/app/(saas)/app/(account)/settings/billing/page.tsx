@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { createPurchasesHelper } from "@repo/payments/lib/helper";
 import { getSession } from "@saas/auth/lib/server";
 import { ActivePlan } from "@saas/payments/components/ActivePlan";
@@ -19,11 +18,8 @@ export async function generateMetadata() {
 }
 
 export default async function BillingSettingsPage() {
-	return (
-		<Suspense fallback={null}>
-			<BillingSettingsPageContent />
-		</Suspense>
-	);
+	// No inner Suspense: the route loading.tsx skeleton covers the await.
+	return <BillingSettingsPageContent />;
 }
 
 async function BillingSettingsPageContent() {
