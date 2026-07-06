@@ -695,6 +695,18 @@ export const deleteInvoicePaymentProcedure = subscriptionProcedure
 			action: "payments",
 		});
 
+		// Cancel the auto-created receipt voucher first — once the payment is
+		// deleted its SetNull link is severed and the voucher would linger ISSUED,
+		// documenting money that no longer exists.
+		await db.receiptVoucher.updateMany({
+			where: {
+				invoicePaymentId: input.paymentId,
+				organizationId: input.organizationId,
+				status: { not: "CANCELLED" },
+			},
+			data: { status: "CANCELLED" },
+		});
+
 		await deleteInvoicePayment(
 			input.paymentId,
 			input.invoiceId,

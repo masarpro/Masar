@@ -438,6 +438,27 @@ export const approvePaymentVoucher = subscriptionProcedure
 			});
 		}
 
+		// Money out for manual vouchers → deduct the source bank balance (guarded)
+		// BEFORE issuing, so an insufficient balance blocks approval cleanly and
+		// the voucher stays PENDING_APPROVAL. Auto vouchers skip this (their source
+		// expense/payment already moved the balance).
+		const isManual = !voucher.expenseId && !voucher.subcontractPaymentId;
+		if (isManual && voucher.sourceAccountId) {
+			const dec = await db.organizationBank.updateMany({
+				where: {
+					id: voucher.sourceAccountId,
+					organizationId: input.organizationId,
+					balance: { gte: Number(voucher.amount) },
+				},
+				data: { balance: { decrement: Number(voucher.amount) } },
+			});
+			if (dec.count === 0) {
+				throw new ORPCError("BAD_REQUEST", {
+					message: "الرصيد غير كافي في الحساب المصدر",
+				});
+			}
+		}
+
 		const updated = await db.paymentVoucher.update({
 			where: { id: input.id },
 			data: {
@@ -448,7 +469,6 @@ export const approvePaymentVoucher = subscriptionProcedure
 		});
 
 		// Generate accounting entry ONLY for manual (standalone) vouchers
-		const isManual = !voucher.expenseId && !voucher.subcontractPaymentId;
 		if (isManual) {
 			try {
 				const { onPaymentVoucherApproved } = await import(
@@ -605,7 +625,7 @@ export const cancelPaymentVoucher = subscriptionProcedure
 
 		const voucher = await db.paymentVoucher.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
-			select: { id: true, status: true, expenseId: true, subcontractPaymentId: true, voucherNo: true },
+			select: { id: true, status: true, expenseId: true, subcontractPaymentId: true, voucherNo: true, sourceAccountId: true, amount: true },
 		});
 
 		if (!voucher) {
@@ -627,6 +647,16 @@ export const cancelPaymentVoucher = subscriptionProcedure
 		// Reverse accounting entry if voucher was ISSUED and is manual
 		const isManual = !voucher.expenseId && !voucher.subcontractPaymentId;
 		if (voucher.status === "ISSUED" && isManual) {
+			// Refund the balance decrement applied at approval time.
+			if (voucher.sourceAccountId) {
+				await db.organizationBank.updateMany({
+					where: {
+						id: voucher.sourceAccountId,
+						organizationId: input.organizationId,
+					},
+					data: { balance: { increment: Number(voucher.amount) } },
+				});
+			}
 			try {
 				const { reverseAutoJournalEntry } = await import(
 					"../../../lib/accounting/auto-journal"
