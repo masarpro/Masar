@@ -67,7 +67,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import { type PrismaClient, Prisma } from "@repo/database/prisma/generated/client";
-import { createJournalEntry, reverseJournalEntry, seedChartOfAccounts, createBankChartAccount, EXPENSE_CATEGORY_TO_ACCOUNT_CODE, isPeriodClosed } from "@repo/database";
+import { createJournalEntry, reverseJournalEntry, seedChartOfAccounts, createBankChartAccount, EXPENSE_CATEGORY_TO_ACCOUNT_CODE, isPeriodClosed, orgAuditLog } from "@repo/database";
 import { getAccountCodeForCategory, isCategoryVatExempt } from "@repo/utils";
 
 const ZERO = new Prisma.Decimal(0);
@@ -97,8 +97,15 @@ async function ensureChartExists(db: PrismaClient, organizationId: string): Prom
 		await seedChartOfAccounts(db, organizationId);
 		chartExistsCache.set(organizationId, { exists: true, timestamp: Date.now() });
 		return true;
-	} catch {
-		// Do not cache failure — allow retry on next financial operation
+	} catch (error) {
+		// Do not cache failure — allow retry on next financial operation.
+		// Record the failure so the missing journal entry leaves a trace (audit
+		// requires a real actor — attribute to the org owner).
+		console.error(`[AutoJournal] seedChartOfAccounts failed for org ${organizationId}:`, error);
+		const owner = await db.member.findFirst({ where: { organizationId, role: "owner" }, select: { userId: true } }).catch(() => null);
+		if (owner) {
+			await orgAuditLog({ organizationId, actorId: owner.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "chart_of_accounts", entityId: organizationId, metadata: { reason: "seed_chart_of_accounts_failed", error: String(error) } });
+		}
 		return false;
 	}
 }
@@ -459,6 +466,16 @@ export async function onPayrollApproved(db: PrismaClient, payroll: {
 
 	if (!salaryAccId || !bankAccId) return;
 
+	// Missing 2170 while GOSI > 0 would build an unbalanced entry (debit includes
+	// GOSI, credit doesn't) — record the failure and skip instead
+	if (!gosiAccId && payroll.totalGosi.greaterThan(0)) {
+		console.error(`[AutoJournal] Payroll ${payroll.id}: GOSI account 2170 missing — entry skipped`);
+		if (payroll.userId) {
+			await orgAuditLog({ organizationId: payroll.organizationId, actorId: payroll.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: payroll.id, metadata: { referenceType: "PAYROLL", reason: "missing_gosi_account_2170", month: payroll.month, year: payroll.year } });
+		}
+		return;
+	}
+
 	const lines: any[] = [
 		{ accountId: salaryAccId, debit: payroll.totalNet.add(payroll.totalGosi), credit: ZERO, description: `رواتب ${payroll.month}/${payroll.year} | Salaries ${payroll.month}/${payroll.year}` },
 		{ accountId: bankAccId, debit: ZERO, credit: payroll.totalNet, description: `صرف رواتب ${payroll.month}/${payroll.year} | Salary disbursement ${payroll.month}/${payroll.year}` },
@@ -468,9 +485,14 @@ export async function onPayrollApproved(db: PrismaClient, payroll: {
 		lines.push({ accountId: gosiAccId, debit: ZERO, credit: payroll.totalGosi, description: `تأمينات اجتماعية ${payroll.month}/${payroll.year} | GOSI ${payroll.month}/${payroll.year}` });
 	}
 
+	// Entry date = actual approval date (approvePayrollRun sets approvedAt before
+	// this hook runs); fall back to the legacy month-end date for old/backfilled
+	// runs that never had approvedAt
+	const run = await db.payrollRun.findUnique({ where: { id: payroll.id }, select: { approvedAt: true } });
+
 	await createJournalEntry(db, {
 		organizationId: payroll.organizationId,
-		date: new Date(payroll.year, payroll.month - 1, 28),
+		date: run?.approvedAt ?? new Date(payroll.year, payroll.month - 1, 28),
 		description: `مسير رواتب ${payroll.month}/${payroll.year} | Payroll ${payroll.month}/${payroll.year}`,
 		referenceType: "PAYROLL",
 		referenceId: payroll.id,

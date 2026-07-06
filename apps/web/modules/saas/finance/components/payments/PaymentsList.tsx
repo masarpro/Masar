@@ -98,10 +98,7 @@ export function PaymentsList({
 	);
 
 	const payments = data?.payments ?? [];
-	const totalPayments = payments.reduce(
-		(acc: any, p: any) => acc + Number(p.amount),
-		0,
-	);
+	const totalPayments = Number(data?.totalAmount ?? 0);
 
 	// Delete mutation
 	const deleteMutation = useMutation({

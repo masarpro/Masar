@@ -546,6 +546,16 @@ export async function updateStructuralItem(
 		sortOrder: number;
 	}>,
 ) {
+	// Verify the item belongs to this study
+	const existing = await db.structuralItem.findFirst({
+		where: { id, costStudyId },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("Structural item not found");
+	}
+
 	const item = await db.structuralItem.update({
 		where: { id },
 		data: data as object,
@@ -558,9 +568,13 @@ export async function updateStructuralItem(
 }
 
 export async function deleteStructuralItem(id: string, costStudyId: string) {
-	await db.structuralItem.delete({
-		where: { id },
+	const { count } = await db.structuralItem.deleteMany({
+		where: { id, costStudyId },
 	});
+
+	if (count === 0) {
+		throw new Error("Structural item not found");
+	}
 
 	// Recalculate parent totals
 	await recalculateCostStudyTotals(costStudyId);
@@ -760,6 +774,16 @@ export async function updateFinishingItem(
 		scope: string;
 	}>,
 ) {
+	// Verify the item belongs to this study
+	const existing = await db.finishingItem.findFirst({
+		where: { id, costStudyId },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("Finishing item not found");
+	}
+
 	const item = await db.finishingItem.update({
 		where: { id },
 		data: data as object,
@@ -771,9 +795,13 @@ export async function updateFinishingItem(
 }
 
 export async function deleteFinishingItem(id: string, costStudyId: string) {
-	await db.finishingItem.delete({
-		where: { id },
+	const { count } = await db.finishingItem.deleteMany({
+		where: { id, costStudyId },
 	});
+
+	if (count === 0) {
+		throw new Error("Finishing item not found");
+	}
 
 	await recalculateCostStudyTotals(costStudyId);
 }
@@ -784,8 +812,8 @@ export async function reorderFinishingItems(
 ) {
 	await db.$transaction(
 		items.map((item) =>
-			db.finishingItem.update({
-				where: { id: item.id },
+			db.finishingItem.updateMany({
+				where: { id: item.id, costStudyId },
 				data: { sortOrder: item.sortOrder },
 			}),
 		),
@@ -853,8 +881,8 @@ export async function batchUpdateFinishingItems(
 
 	await db.$transaction(
 		updates.map((update) =>
-			db.finishingItem.update({
-				where: { id: update.id },
+			db.finishingItem.updateMany({
+				where: { id: update.id, costStudyId },
 				data: {
 					area: update.area,
 					quantity: update.quantity,
@@ -1088,6 +1116,16 @@ export async function updateMEPItem(
 			? "manual"
 			: data.dataSource;
 
+	// Verify the item belongs to this study
+	const existing = await db.mEPItem.findFirst({
+		where: { id, costStudyId },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("MEP item not found");
+	}
+
 	const item = await db.mEPItem.update({
 		where: { id },
 		data: {
@@ -1105,6 +1143,16 @@ export async function updateMEPItem(
 }
 
 export async function deleteMEPItem(id: string, costStudyId: string) {
+	// Verify the item belongs to this study
+	const existing = await db.mEPItem.findFirst({
+		where: { id, costStudyId },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("MEP item not found");
+	}
+
 	const item = await db.mEPItem.delete({
 		where: { id },
 	});
@@ -1118,6 +1166,16 @@ export async function toggleMEPItemEnabled(
 	costStudyId: string,
 	isEnabled: boolean,
 ) {
+	// Verify the item belongs to this study
+	const existing = await db.mEPItem.findFirst({
+		where: { id, costStudyId },
+		select: { id: true },
+	});
+
+	if (!existing) {
+		throw new Error("MEP item not found");
+	}
+
 	const item = await db.mEPItem.update({
 		where: { id },
 		data: { isEnabled },
@@ -1175,9 +1233,13 @@ export async function createLaborItem(data: {
 }
 
 export async function deleteLaborItem(id: string, costStudyId: string) {
-	await db.laborItem.delete({
-		where: { id },
+	const { count } = await db.laborItem.deleteMany({
+		where: { id, costStudyId },
 	});
+
+	if (count === 0) {
+		throw new Error("Labor item not found");
+	}
 
 	await recalculateCostStudyTotals(costStudyId);
 }
@@ -1447,8 +1509,8 @@ export async function batchUpdateFinishingItemSpecs(
 
 	await db.$transaction(
 		items.map((item) =>
-			db.finishingItem.update({
-				where: { id: item.id },
+			db.finishingItem.updateMany({
+				where: { id: item.id, costStudyId },
 				data: {
 					specData: item.specData as object,
 					qualityLevel: item.qualityLevel,

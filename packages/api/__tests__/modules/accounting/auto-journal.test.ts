@@ -28,12 +28,14 @@ const {
 	mockIsPeriodClosed,
 	mockSeedChartOfAccounts,
 	mockCreateBankChartAccount,
+	mockOrgAuditLog,
 } = vi.hoisted(() => ({
 	mockCreateJournalEntry: vi.fn().mockResolvedValue({ id: "je-1", entryNo: "INV-JE-2026-0001" }),
 	mockReverseJournalEntry: vi.fn().mockResolvedValue({ id: "je-rev-1" }),
 	mockIsPeriodClosed: vi.fn().mockResolvedValue(false),
 	mockSeedChartOfAccounts: vi.fn().mockResolvedValue(undefined),
 	mockCreateBankChartAccount: vi.fn().mockResolvedValue("acc-new-bank"),
+	mockOrgAuditLog: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("@repo/database", async (importOriginal) => {
@@ -45,6 +47,7 @@ vi.mock("@repo/database", async (importOriginal) => {
 		isPeriodClosed: mockIsPeriodClosed,
 		seedChartOfAccounts: mockSeedChartOfAccounts,
 		createBankChartAccount: mockCreateBankChartAccount,
+		orgAuditLog: mockOrgAuditLog,
 	};
 });
 
@@ -75,6 +78,12 @@ function createMockDb() {
 		journalEntry: {
 			findFirst: vi.fn().mockResolvedValue(null),
 			delete: vi.fn().mockResolvedValue(undefined),
+		},
+		member: {
+			findFirst: vi.fn().mockResolvedValue(null),
+		},
+		payrollRun: {
+			findUnique: vi.fn().mockResolvedValue(null),
 		},
 		// Billing-document lookups for project payment revenue recognition.
 		// Default: project has no billing → payment is cash-basis revenue.
@@ -650,6 +659,74 @@ describe("Auto-Journal Engine", () => {
 			const lines = getEntryLines();
 			expect(lines).toHaveLength(2); // no GOSI line
 			expectBalancedLines(lines);
+		});
+
+		it("should skip and audit-log when 2170 is missing but GOSI > 0 (would be unbalanced)", async () => {
+			setupAccountLookup(db, {
+				"6100": "acc-salaries",
+				"1110": "acc-cash",
+				// no 2170
+			});
+
+			await onPayrollApproved(db, {
+				id: "payroll-3",
+				organizationId: "org-1",
+				month: 5,
+				year: 2026,
+				totalNet: D(40000),
+				totalGosi: D(4000),
+				sourceAccountId: null,
+				userId: "user-1",
+			});
+
+			expect(mockCreateJournalEntry).not.toHaveBeenCalled();
+			expect(mockOrgAuditLog).toHaveBeenCalledWith(
+				expect.objectContaining({
+					action: "JOURNAL_ENTRY_FAILED",
+					entityId: "payroll-3",
+					metadata: expect.objectContaining({ reason: "missing_gosi_account_2170" }),
+				}),
+			);
+		});
+
+		it("should date the entry at the actual approval date, falling back to day 28", async () => {
+			setupAccountLookup(db, {
+				"6100": "acc-salaries",
+				"2170": "acc-gosi",
+				"1110": "acc-cash",
+			});
+			const approvedAt = new Date("2026-06-03T10:00:00Z");
+			db.payrollRun.findUnique.mockResolvedValue({ approvedAt });
+
+			await onPayrollApproved(db, {
+				id: "payroll-4",
+				organizationId: "org-1",
+				month: 5,
+				year: 2026,
+				totalNet: D(30000),
+				totalGosi: D(3000),
+				sourceAccountId: null,
+				userId: "user-1",
+			});
+
+			expect(getEntryData().date).toEqual(approvedAt);
+
+			// Fallback: no approvedAt (e.g. backfilled runs) → legacy day-28 date
+			mockCreateJournalEntry.mockClear();
+			db.payrollRun.findUnique.mockResolvedValue(null);
+
+			await onPayrollApproved(db, {
+				id: "payroll-5",
+				organizationId: "org-1",
+				month: 5,
+				year: 2026,
+				totalNet: D(30000),
+				totalGosi: D(3000),
+				sourceAccountId: null,
+				userId: "user-1",
+			});
+
+			expect(getEntryData().date).toEqual(new Date(2026, 4, 28));
 		});
 	});
 
