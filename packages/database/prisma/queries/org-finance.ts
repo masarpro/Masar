@@ -1323,8 +1323,14 @@ export async function getOrganizationPayments(
 	}
 
 	// ── Query both tables in parallel ──
-	const [financePayments, projectPayments, financeTotal, projectTotal] =
-		await Promise.all([
+	const [
+		financePayments,
+		projectPayments,
+		financeTotal,
+		projectTotal,
+		financeSum,
+		projectSum,
+	] = await Promise.all([
 			db.financePayment.findMany({
 				where: financeWhere,
 				include: {
@@ -1361,6 +1367,16 @@ export async function getOrganizationPayments(
 			includeProjectPayments
 				? db.projectPayment.count({ where: projectWhere })
 				: Promise.resolve(0),
+			db.financePayment.aggregate({
+				where: financeWhere,
+				_sum: { amount: true },
+			}),
+			includeProjectPayments
+				? db.projectPayment.aggregate({
+						where: projectWhere,
+						_sum: { amount: true },
+					})
+				: Promise.resolve(null),
 		]);
 
 	// ── Normalize FinancePayment records ──
@@ -1416,8 +1432,11 @@ export async function getOrganizationPayments(
 
 	const payments = merged.slice(offset, offset + limit);
 	const total = financeTotal + projectTotal;
+	const totalAmount =
+		Number(financeSum._sum.amount ?? 0) +
+		Number(projectSum?._sum.amount ?? 0);
 
-	return { payments, total };
+	return { payments, total, totalAmount };
 }
 
 /**
