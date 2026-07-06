@@ -7,6 +7,7 @@ import {
 	db,
 } from "@repo/database";
 import { z } from "zod";
+import { ORPCError } from "@orpc/server";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import {
@@ -123,17 +124,28 @@ export const createTransferProcedure = subscriptionProcedure
 			action: "payments",
 		});
 
-		const transfer = await createTransfer({
-			organizationId: input.organizationId,
-			createdById: context.user.id,
-			amount: input.amount,
-			date: input.date,
-			fromAccountId: input.fromAccountId,
-			toAccountId: input.toAccountId,
-			description: input.description,
-			notes: input.notes,
-			referenceNo: input.referenceNo,
-		});
+		let transfer: Awaited<ReturnType<typeof createTransfer>>;
+		try {
+			transfer = await createTransfer({
+				organizationId: input.organizationId,
+				createdById: context.user.id,
+				amount: input.amount,
+				date: input.date,
+				fromAccountId: input.fromAccountId,
+				toAccountId: input.toAccountId,
+				description: input.description,
+				notes: input.notes,
+				referenceNo: input.referenceNo,
+			});
+		} catch (e) {
+			// Surface validation errors (e.g. insufficient balance) to the client as
+			// a proper 400 instead of an opaque 500 that hides the Arabic message.
+			const msg = e instanceof Error ? e.message : "فشل إنشاء التحويل";
+			if (msg.includes("الرصيد غير كافي") || msg.includes("insufficient")) {
+				throw new ORPCError("BAD_REQUEST", { message: msg });
+			}
+			throw e;
+		}
 
 		orgAuditLog({
 			organizationId: input.organizationId,

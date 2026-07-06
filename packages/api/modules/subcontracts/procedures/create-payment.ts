@@ -152,6 +152,14 @@ export const createSubcontractPaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[PaymentVoucher] Failed to create auto voucher from subcontract payment:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "voucher",
+				entityId: input.projectId,
+				metadata: { error: String(e), type: "PAYMENT_VOUCHER_AUTO_CREATE" },
+			});
 		}
 
 		const project = await db.project.findFirst({

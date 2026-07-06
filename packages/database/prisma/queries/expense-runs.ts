@@ -1,6 +1,6 @@
 import { db } from "../client";
 import type { ExpenseRunStatus, CompanyExpenseCategory } from "../generated/client";
-import { generateExpenseNumber } from "./org-finance";
+import { generateAtomicNoBatch } from "./sequences";
 import { mapCompanyToOrgCategory } from "./company";
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -237,10 +237,18 @@ export async function postExpenseRun(
 		throw new Error("Cannot post empty expense run. Populate first.");
 	}
 
+	// Reserve all expense numbers up front in a single round-trip (see payroll).
+	const expenseNos = await generateAtomicNoBatch(
+		data.organizationId,
+		"EXP",
+		run.items.length,
+	);
+
 	return db.$transaction(async (tx) => {
 		// Create a PENDING FinanceExpense for each item
-		for (const item of run.items) {
-			const expenseNo = await generateExpenseNumber(data.organizationId);
+		for (let i = 0; i < run.items.length; i++) {
+			const item = run.items[i];
+			const expenseNo = expenseNos[i];
 			const orgCategory = mapCompanyToOrgCategory(
 				item.companyExpense.category as CompanyExpenseCategory,
 			);

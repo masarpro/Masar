@@ -9,8 +9,10 @@ import type { Prisma, OrgAuditAction } from "../generated/client";
 
 /**
  * Log a single organization-level audit event.
- * This is fire-and-forget — the returned promise resolves immediately
- * and errors are swallowed to avoid blocking business operations.
+ * Never throws (errors are swallowed + logged). Returns a Promise so critical
+ * callers (e.g. JOURNAL_ENTRY_FAILED) can `await` it to guarantee the row is
+ * written before a serverless function freezes — non-critical callers may still
+ * fire-and-forget by not awaiting.
  */
 export function orgAuditLog(params: {
 	organizationId: string;
@@ -20,8 +22,8 @@ export function orgAuditLog(params: {
 	entityId: string;
 	metadata?: Record<string, unknown>;
 	ipAddress?: string;
-}): void {
-	db.organizationAuditLog
+}): Promise<void> {
+	return db.organizationAuditLog
 		.create({
 			data: {
 				organizationId: params.organizationId,
@@ -33,6 +35,7 @@ export function orgAuditLog(params: {
 				ipAddress: params.ipAddress ?? null,
 			},
 		})
+		.then(() => undefined)
 		.catch((error) => {
 			console.error("[ORG_AUDIT] Failed to log audit event:", {
 				action: params.action,

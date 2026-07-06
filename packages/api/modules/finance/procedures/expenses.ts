@@ -370,6 +370,14 @@ export const createExpenseProcedure = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[PaymentVoucher] Failed to create auto voucher from expense:", e);
+				orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "voucher",
+					entityId: expense.id,
+					metadata: { error: String(e), type: "PAYMENT_VOUCHER_AUTO_CREATE" },
+				});
 			}
 		}
 
@@ -698,6 +706,14 @@ export const payExpenseProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[PaymentVoucher] Failed to create auto voucher from expense payment:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "voucher",
+				entityId: input.id ?? input.organizationId,
+				metadata: { error: String(e), type: "PAYMENT_VOUCHER_AUTO_CREATE" },
+			});
 		}
 
 		return expense;
