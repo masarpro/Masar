@@ -94,7 +94,7 @@ export function YearEndClosingPage({
 		onSuccess: () => {
 			toast.success(t("executeSuccess"));
 			setShowExecuteDialog(false);
-			queryClient.invalidateQueries({ queryKey: ["accounting"] });
+			queryClient.invalidateQueries({ queryKey: orpc.accounting.key() });
 			previewQuery.refetch();
 			historyQuery.refetch();
 		},
@@ -110,7 +110,7 @@ export function YearEndClosingPage({
 			toast.success(t("reverseSuccess"));
 			setShowReverseDialog(false);
 			setReverseYear(null);
-			queryClient.invalidateQueries({ queryKey: ["accounting"] });
+			queryClient.invalidateQueries({ queryKey: orpc.accounting.key() });
 			historyQuery.refetch();
 		},
 		onError: (error: Error) => {

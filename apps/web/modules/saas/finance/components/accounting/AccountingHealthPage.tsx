@@ -36,7 +36,7 @@ export function AccountingHealthPage({
 	const backfillMutation = useMutation({
 		...orpc.accounting.backfill.mutationOptions(),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["accounting"] });
+			queryClient.invalidateQueries({ queryKey: orpc.accounting.key() });
 		},
 	});
 

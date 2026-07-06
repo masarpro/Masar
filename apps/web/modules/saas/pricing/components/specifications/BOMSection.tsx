@@ -38,7 +38,7 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 		orpc.pricing.studies.specifications.generateBOM.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: ["pricing", "studies", "specifications"],
+					queryKey: orpc.pricing.studies.specifications.key(),
 				});
 			},
 		}),

@@ -66,7 +66,7 @@ export function FieldTimeline({
 		onSuccess: () => {
 			toast.success(t("projects.field.photoDeleted"));
 			setPhotoToDelete(null);
-			queryClient.invalidateQueries({ queryKey: ["projectField"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
 		},
 		onError: () => {
 			toast.error(t("projects.field.photoDeleteError"));

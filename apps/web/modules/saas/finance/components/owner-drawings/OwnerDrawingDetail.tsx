@@ -61,7 +61,7 @@ export function OwnerDrawingDetail({
 	const drawing = rawDrawing as any;
 
 	const invalidate = () => {
-		queryClient.invalidateQueries({ queryKey: ["accounting", "ownerDrawings"] });
+		queryClient.invalidateQueries({ queryKey: orpc.accounting.ownerDrawings.key() });
 	};
 
 	const cancelMutation = useMutation({

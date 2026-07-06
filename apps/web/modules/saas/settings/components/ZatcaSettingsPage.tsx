@@ -106,7 +106,7 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 			toast.success(t("onboarding.success"));
 			setOnboardingOpen(false);
 			setOtp("");
-			queryClient.invalidateQueries({ queryKey: ["zatca"] });
+			queryClient.invalidateQueries({ queryKey: orpc.zatca.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("onboarding.error"));
@@ -123,7 +123,7 @@ export function ZatcaSettingsPage({ organizationId, organizationSlug }: ZatcaSet
 		onSuccess: () => {
 			toast.success(t("device.revoke"));
 			setRevokeDeviceId(null);
-			queryClient.invalidateQueries({ queryKey: ["zatca"] });
+			queryClient.invalidateQueries({ queryKey: orpc.zatca.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message);

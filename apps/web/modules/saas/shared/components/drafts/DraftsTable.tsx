@@ -45,7 +45,7 @@ export function DraftsTable({ kind, organizationId, organizationSlug }: DraftsTa
 	const listOptions = isInvoice
 		? orpc.finance.invoices.drafts.list.queryOptions({ input: { organizationId } })
 		: orpc.pricing.quotations.drafts.list.queryOptions({ input: { organizationId } });
-	const queryKey = isInvoice ? ["finance", "invoiceDrafts"] : ["pricing", "quotationDrafts"];
+	const queryKey = isInvoice ? orpc.finance.invoices.drafts.key() : orpc.pricing.quotations.drafts.key();
 	const editBasePath = isInvoice
 		? `/app/${organizationSlug}/finance/invoices/drafts`
 		: `/app/${organizationSlug}/pricing/quotations/drafts`;

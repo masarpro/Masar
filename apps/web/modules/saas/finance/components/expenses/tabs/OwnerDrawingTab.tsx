@@ -188,7 +188,7 @@ export const OwnerDrawingTab = forwardRef<
 		onSuccess: () => {
 			toast.success(t("finance.expenses.ownerDrawingPayment.createSuccess"));
 			queryClient.invalidateQueries({
-				queryKey: ["accounting", "ownerDrawings"],
+				queryKey: orpc.accounting.ownerDrawings.key(),
 			});
 			queryClient.invalidateQueries({
 				queryKey: orpc.finance.banks.key(),

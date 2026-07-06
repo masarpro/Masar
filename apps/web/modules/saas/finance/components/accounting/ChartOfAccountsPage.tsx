@@ -55,7 +55,7 @@ export function ChartOfAccountsPage({ organizationId, organizationSlug }: ChartO
 	const seedMutation = useMutation({
 		...orpc.accounting.accounts.seed.mutationOptions(),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["accounting"] });
+			queryClient.invalidateQueries({ queryKey: orpc.accounting.key() });
 		},
 	});
 

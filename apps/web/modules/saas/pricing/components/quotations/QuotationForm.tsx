@@ -645,7 +645,7 @@ export function QuotationForm({
 			}
 		},
 		onSaved: () => {
-			queryClient.invalidateQueries({ queryKey: ["pricing", "quotationDrafts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.pricing.quotations.drafts.key() });
 		},
 		onConflict: () => setShowConflictDialog(true),
 	});
@@ -659,8 +659,8 @@ export function QuotationForm({
 			return null;
 		}
 		const result = await orpcClient.pricing.quotations.drafts.commit({ organizationId, id: did });
-		queryClient.invalidateQueries({ queryKey: ["finance", "quotations"] });
-		queryClient.invalidateQueries({ queryKey: ["pricing", "quotationDrafts"] });
+		queryClient.invalidateQueries({ queryKey: orpc.pricing.quotations.key() });
+		queryClient.invalidateQueries({ queryKey: orpc.pricing.quotations.drafts.key() });
 		return result.id;
 	};
 
@@ -698,7 +698,7 @@ export function QuotationForm({
 				return;
 			}
 			await orpcClient.pricing.quotations.updateStatus({ organizationId, id, status: "SENT" });
-			queryClient.invalidateQueries({ queryKey: ["finance", "quotations"] });
+			queryClient.invalidateQueries({ queryKey: orpc.pricing.quotations.key() });
 			toast.success(t("pricing.quotations.status.sentSuccess"));
 			router.push(`${basePath}/${id}`);
 		} catch (e: any) {
@@ -716,7 +716,7 @@ export function QuotationForm({
 		}
 		try {
 			await orpcClient.pricing.quotations.drafts.delete({ organizationId, id: did });
-			queryClient.invalidateQueries({ queryKey: ["pricing", "quotationDrafts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.pricing.quotations.drafts.key() });
 			toast.success(t("drafts.discardSuccess"));
 			router.push(sourceQuotationId ? `${basePath}/${sourceQuotationId}` : basePath);
 		} catch (e: any) {

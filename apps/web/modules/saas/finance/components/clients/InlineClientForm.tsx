@@ -1,5 +1,6 @@
 "use client";
 
+import { orpc } from "@shared/lib/orpc-query-utils";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -111,7 +112,7 @@ export function InlineClientForm({
 		},
 		onSuccess: async (newClient) => {
 			toast.success(t("finance.clients.createSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "clients"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.clients.key() });
 
 			// تجميع العنوان للإرسال
 			const addressParts = [streetAddress1, city, region].filter(Boolean);

@@ -51,7 +51,7 @@ export function ProjectTemplates({
 				setShowCreateForm(false);
 				setNewTemplateName("");
 				setNewTemplateDescription("");
-				queryClient.invalidateQueries({ queryKey: ["projectTemplates"] });
+				queryClient.invalidateQueries({ queryKey: orpc.projectTemplates.key() });
 			},
 			onError: () => {
 				toast.error(t("projects.templates.createError"));

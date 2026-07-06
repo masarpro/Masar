@@ -39,7 +39,7 @@ export function CreateClaimForm({
 		...orpc.projectFinance.createClaim.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("finance.notifications.claimCreated"));
-			queryClient.invalidateQueries({ queryKey: ["projectFinance"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectFinance.key() });
 			router.push(basePath);
 		},
 		onError: () => {

@@ -79,7 +79,7 @@ export function FirstProjectStep({
 				city: values.city || undefined,
 			});
 
-			queryClient.invalidateQueries({ queryKey: ["projects"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projects.key() });
 			onProjectCreated(project.id, project.slug);
 			onNext();
 		} catch {

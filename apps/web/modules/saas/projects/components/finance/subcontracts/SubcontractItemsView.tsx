@@ -101,7 +101,7 @@ export function SubcontractItemsView({
 		...orpc.subcontracts.createItem.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("notifications.created"));
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 			setSheetOpen(false);
 			setEditItem(null);
 		},
@@ -115,7 +115,7 @@ export function SubcontractItemsView({
 		...orpc.subcontracts.updateItem.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("notifications.updated"));
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 			setSheetOpen(false);
 			setEditItem(null);
 		},
@@ -129,7 +129,7 @@ export function SubcontractItemsView({
 		...orpc.subcontracts.deleteItem.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("notifications.deleted"));
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 			setDeleteItemId(null);
 		},
 		onError: (error) => {

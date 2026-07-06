@@ -111,8 +111,8 @@ export function PaymentsList({
 		onSuccess: () => {
 			toast.success(t("finance.payments.deleteSuccess"));
 			setDeletePaymentId(null);
-			queryClient.invalidateQueries({ queryKey: ["finance", "orgPayments"] });
-			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.orgPayments.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.payments.deleteError"));

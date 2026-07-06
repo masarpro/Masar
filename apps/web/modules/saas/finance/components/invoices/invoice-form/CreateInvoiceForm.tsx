@@ -454,7 +454,7 @@ export function CreateInvoiceForm({
 			}
 		},
 		onSaved: () => {
-			queryClient.invalidateQueries({ queryKey: ["finance", "invoiceDrafts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.drafts.key() });
 		},
 		onConflict: () => {
 			setShowConflictDialog(true);
@@ -499,7 +499,7 @@ export function CreateInvoiceForm({
 			toast.success(t("finance.invoices.paymentAddSuccess"));
 			setPaymentDialogOpen(false);
 			resetPaymentForm();
-			queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.invoices.paymentAddError"));
@@ -517,7 +517,7 @@ export function CreateInvoiceForm({
 		onSuccess: () => {
 			toast.success(t("finance.invoices.paymentDeleteSuccess"));
 			setDeletePaymentId(null);
-			queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.invoices.paymentDeleteError"));
@@ -533,7 +533,7 @@ export function CreateInvoiceForm({
 			});
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.invoices.statusUpdateError"));
@@ -549,7 +549,7 @@ export function CreateInvoiceForm({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.invoices.convertToTaxSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.invoices.convertToTaxError"));
@@ -677,8 +677,8 @@ export function CreateInvoiceForm({
 			return null;
 		}
 		const result = await orpcClient.finance.invoices.drafts.commit({ organizationId, id: did });
-		queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
-		queryClient.invalidateQueries({ queryKey: ["finance", "invoiceDrafts"] });
+		queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.key() });
+		queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.drafts.key() });
 		return result.id;
 	};
 
@@ -753,7 +753,7 @@ export function CreateInvoiceForm({
 		}
 		try {
 			await orpcClient.finance.invoices.drafts.delete({ organizationId, id: did });
-			queryClient.invalidateQueries({ queryKey: ["finance", "invoiceDrafts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.drafts.key() });
 			toast.success(t("drafts.discardSuccess"));
 			router.push(sourceInvoiceId ? `${basePath}/${sourceInvoiceId}` : basePath);
 		} catch (e: any) {

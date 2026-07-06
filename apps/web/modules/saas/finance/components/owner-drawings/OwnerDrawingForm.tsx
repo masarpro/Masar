@@ -149,7 +149,7 @@ export function OwnerDrawingForm({
 			});
 		},
 		onSuccess: (drawing: any) => {
-			queryClient.invalidateQueries({ queryKey: ["accounting", "ownerDrawings"] });
+			queryClient.invalidateQueries({ queryKey: orpc.accounting.ownerDrawings.key() });
 			toast.success(t("finance.ownerDrawings.created"));
 			router.push(`${basePath}/${drawing.id}`);
 		},

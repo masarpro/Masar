@@ -126,7 +126,7 @@ export function ReceiptVoucherForm({
 					toast.error(t("common.error"));
 				}
 			}
-			queryClient.invalidateQueries({ queryKey: ["finance", "receipts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.receipts.key() });
 			toast.success(t("finance.receiptVouchers.actions.create"));
 			router.push(`${basePath}/${voucher.id}`);
 		},

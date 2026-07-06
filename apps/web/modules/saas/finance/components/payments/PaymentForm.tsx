@@ -135,8 +135,8 @@ export function PaymentForm({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.payments.createSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "orgPayments"] });
-			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.orgPayments.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
 			router.push(redirectPath || `/app/${organizationSlug}/finance/payments`);
 		},
 		onError: (error: any) => {

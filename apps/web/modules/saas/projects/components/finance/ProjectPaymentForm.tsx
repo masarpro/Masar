@@ -167,7 +167,7 @@ export function ProjectPaymentForm({
 		onSuccess: () => {
 			toast.success(t("projectPayments.createSuccess"));
 			queryClient.invalidateQueries({
-				queryKey: ["finance"],
+				queryKey: orpc.finance.key(),
 			});
 			queryClient.invalidateQueries({
 				queryKey:

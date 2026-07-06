@@ -129,7 +129,7 @@ export function BankDetail({
 		onSuccess: () => {
 			toast.success(t("finance.banks.updateSuccess"));
 			setIsEditing(false);
-			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.banks.updateError"));
@@ -146,7 +146,7 @@ export function BankDetail({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.banks.deleteSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
 			router.push(`/app/${organizationSlug}/finance/banks`);
 		},
 		onError: (error: any) => {
@@ -164,7 +164,7 @@ export function BankDetail({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.banks.setDefaultSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.banks.setDefaultError"));

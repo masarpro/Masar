@@ -94,7 +94,7 @@ export function CapitalContributionForm({
 			});
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["accounting", "capitalContributions"] });
+			queryClient.invalidateQueries({ queryKey: orpc.accounting.capitalContributions.key() });
 			toast.success(t("finance.capitalContributions.created"));
 			router.push(basePath);
 		},

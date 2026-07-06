@@ -113,8 +113,8 @@ export function PayExpenseDialog({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.expenses.paySuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "expenses"] });
-			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.expenses.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
 			onOpenChange(false);
 		},
 		onError: (error: any) => {

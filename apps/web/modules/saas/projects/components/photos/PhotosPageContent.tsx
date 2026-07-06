@@ -187,7 +187,7 @@ export function PhotosPageContent({
 		onSuccess: () => {
 			toast.success(t("projects.field.photoDeleted"));
 			setPhotoToDelete(null);
-			queryClient.invalidateQueries({ queryKey: ["projectField"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
 		},
 		onError: () => {
 			toast.error(t("projects.field.photoDeleteError"));
@@ -198,8 +198,8 @@ export function PhotosPageContent({
 		...orpc.projectField.setCoverPhoto.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("projects.photos.coverSet"));
-			queryClient.invalidateQueries({ queryKey: ["projectField"] });
-			queryClient.invalidateQueries({ queryKey: ["projects"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.projects.key() });
 		},
 		onError: () => {
 			toast.error(t("common.error"));
@@ -210,8 +210,8 @@ export function PhotosPageContent({
 		...orpc.projectField.unsetCoverPhoto.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("projects.photos.coverRemoved"));
-			queryClient.invalidateQueries({ queryKey: ["projectField"] });
-			queryClient.invalidateQueries({ queryKey: ["projects"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.projects.key() });
 		},
 		onError: () => {
 			toast.error(t("common.error"));
@@ -225,8 +225,8 @@ export function PhotosPageContent({
 			setBulkDeleteOpen(false);
 			setSelectedIds(new Set());
 			setSelectMode(false);
-			queryClient.invalidateQueries({ queryKey: ["projectField"] });
-			queryClient.invalidateQueries({ queryKey: ["projects"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.projects.key() });
 		},
 		onError: () => {
 			toast.error(t("projects.field.photoDeleteError"));
@@ -442,7 +442,7 @@ export function PhotosPageContent({
 						embedded
 						onSaved={() => {
 							setIsUploadOpen(false);
-							queryClient.invalidateQueries({ queryKey: ["projectField"] });
+							queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
 						}}
 					/>
 				</div>
@@ -1014,7 +1014,7 @@ function EditPhotoDialog({
 		...orpc.projectField.updatePhoto.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("common.saved"));
-			queryClient.invalidateQueries({ queryKey: ["projectField"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
 			onClose();
 		},
 		onError: () => {
@@ -1165,7 +1165,7 @@ function BulkEditDialog({
 		...orpc.projectField.bulkUpdatePhotos.mutationOptions(),
 		onSuccess: (res) => {
 			toast.success(t("projects.photos.bulkUpdated", { count: res.count }));
-			queryClient.invalidateQueries({ queryKey: ["projectField"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
 			onSaved();
 		},
 		onError: () => {

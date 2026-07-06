@@ -166,7 +166,7 @@ export function SubcontractDetailView({
 		...orpc.subcontracts.update.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("subcontracts.notifications.updated"));
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 			setShowEditDialog(false);
 		},
 		onError: (error) => {
@@ -178,7 +178,7 @@ export function SubcontractDetailView({
 		...orpc.subcontracts.delete.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("subcontracts.notifications.deleted"));
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 			router.push(basePath);
 		},
 		onError: () => {
@@ -190,7 +190,7 @@ export function SubcontractDetailView({
 		...orpc.subcontracts.createChangeOrder.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("subcontracts.notifications.coCreated"));
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 			setShowCODialog(false);
 			resetCOForm();
 		},
@@ -203,7 +203,7 @@ export function SubcontractDetailView({
 		...orpc.subcontracts.updateChangeOrder.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("subcontracts.notifications.coUpdated"));
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 			setEditCO(null);
 			setShowCODialog(false);
 			resetCOForm();
@@ -214,7 +214,7 @@ export function SubcontractDetailView({
 		...orpc.subcontracts.deleteChangeOrder.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("subcontracts.notifications.coDeleted"));
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 		},
 	});
 
@@ -222,9 +222,9 @@ export function SubcontractDetailView({
 		...orpc.subcontracts.createPayment.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("subcontracts.notifications.paymentCreated"));
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
-			queryClient.invalidateQueries({ queryKey: ["finance"] });
-			queryClient.invalidateQueries({ queryKey: ["projectFinance"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.projectFinance.key() });
 		},
 		onError: (error) => {
 			toast.error(error.message || t("subcontracts.notifications.paymentCreateError"));
@@ -235,9 +235,9 @@ export function SubcontractDetailView({
 		...orpc.subcontracts.addClaimPayment.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("subcontracts.notifications.paymentCreated"));
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
-			queryClient.invalidateQueries({ queryKey: ["finance"] });
-			queryClient.invalidateQueries({ queryKey: ["projectFinance"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.projectFinance.key() });
 		},
 		onError: (error) => {
 			toast.error(error.message || t("subcontracts.notifications.paymentCreateError"));

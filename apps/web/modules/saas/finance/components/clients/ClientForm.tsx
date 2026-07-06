@@ -223,7 +223,7 @@ export function ClientForm({
 		},
 		onSuccess: async (newClient) => {
 			toast.success(t("finance.clients.createSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "clients"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.clients.key() });
 			router.push(`/app/${organizationSlug}/finance/clients/${newClient.id}`);
 		},
 		onError: (error: any) => {
@@ -272,7 +272,7 @@ export function ClientForm({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.clients.updateSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "clients"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.clients.key() });
 			router.push(`/app/${organizationSlug}/finance/clients/${clientId}`);
 		},
 		onError: (error: any) => {

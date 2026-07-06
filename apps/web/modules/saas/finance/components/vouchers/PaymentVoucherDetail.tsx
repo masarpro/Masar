@@ -61,7 +61,7 @@ export function PaymentVoucherDetail({
 	);
 	const voucher = rawVoucher as any;
 
-	const invalidate = () => queryClient.invalidateQueries({ queryKey: ["finance", "disbursements"] });
+	const invalidate = () => queryClient.invalidateQueries({ queryKey: orpc.finance.disbursements.key() });
 
 	const submitMutation = useMutation({
 		mutationFn: () => orpcClient.finance.disbursements.submit({ organizationId, id: voucherId }),

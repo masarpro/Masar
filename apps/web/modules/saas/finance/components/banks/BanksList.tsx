@@ -145,7 +145,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 			setQuickDialogOpen(false);
 			resetQuickForm();
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "banks"],
+				queryKey: orpc.finance.banks.key(),
 			});
 		},
 		onError: (error: any) => {
@@ -165,7 +165,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 			toast.success(t("finance.banks.deleteSuccess"));
 			setDeleteAccountId(null);
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "banks"],
+				queryKey: orpc.finance.banks.key(),
 			});
 		},
 		onError: (error: any) => {
@@ -184,7 +184,7 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 		onSuccess: () => {
 			toast.success(t("finance.banks.setDefaultSuccess"));
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "banks"],
+				queryKey: orpc.finance.banks.key(),
 			});
 		},
 		onError: (error: any) => {

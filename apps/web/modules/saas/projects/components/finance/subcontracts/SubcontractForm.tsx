@@ -149,7 +149,7 @@ export function SubcontractForm({
 				}
 			}
 			toast.success(t("subcontracts.notifications.created"));
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 			router.push(
 				`/app/${organizationSlug}/projects/${projectId}/finance/subcontracts/${data.id}`,
 			);

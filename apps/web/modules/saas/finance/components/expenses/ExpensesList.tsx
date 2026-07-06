@@ -158,8 +158,8 @@ export function ExpensesList({
 		onSuccess: () => {
 			toast.success(t("finance.expenses.deleteSuccess"));
 			setDeleteExpenseId(null);
-			queryClient.invalidateQueries({ queryKey: ["finance", "expenses"] });
-			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.expenses.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.expenses.deleteError"));

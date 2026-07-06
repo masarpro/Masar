@@ -114,7 +114,7 @@ export function HandoverProtocolForm({
 					toast.success(t("handover.actions.submit"));
 				} catch { toast.error(t("common.error")); }
 			}
-			queryClient.invalidateQueries({ queryKey: ["handover"] });
+			queryClient.invalidateQueries({ queryKey: orpc.handover.key() });
 			toast.success(t("handover.actions.create"));
 			router.push(`${basePath}/${protocol.id}`);
 		},

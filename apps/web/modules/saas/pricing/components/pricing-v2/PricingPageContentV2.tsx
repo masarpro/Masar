@@ -247,7 +247,7 @@ export function PricingPageContentV2({
 			onSuccess: () => {
 				toast.success("تم حفظ إعدادات الهامش");
 				queryClient.invalidateQueries({
-					queryKey: ["pricing", "studies", "markup"],
+					queryKey: orpc.pricing.studies.markup.key(),
 				});
 			},
 			onError: () => {
@@ -261,7 +261,7 @@ export function PricingPageContentV2({
 			onSuccess: () => {
 				toast.success("تم حفظ هوامش الأقسام");
 				queryClient.invalidateQueries({
-					queryKey: ["pricing", "studies", "markup"],
+					queryKey: orpc.pricing.studies.markup.key(),
 				});
 			},
 			onError: () => {
@@ -275,7 +275,7 @@ export function PricingPageContentV2({
 			onSuccess: () => {
 				toast.success("تم اعتماد مرحلة التسعير");
 				queryClient.invalidateQueries({
-					queryKey: ["pricing", "studies", "studyStages"],
+					queryKey: orpc.pricing.studies.studyStages.key(),
 				});
 			},
 		}),

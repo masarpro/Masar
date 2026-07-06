@@ -78,7 +78,7 @@ export function JournalEntriesPage({
 	const bulkPostMutation = useMutation(
 		orpc.accounting.journal.bulkPost.mutationOptions({
 			onSuccess: (result: any) => {
-				queryClient.invalidateQueries({ queryKey: ["orpc", "accounting"] });
+				queryClient.invalidateQueries({ queryKey: orpc.accounting.key() });
 				setSelectedIds(new Set());
 				if (result.errors.length === 0) {
 					toast.success(t("finance.accounting.messages.bulkPostSuccess", { count: result.posted }));
@@ -93,7 +93,7 @@ export function JournalEntriesPage({
 	const postAllMutation = useMutation(
 		orpc.accounting.journal.postAllDrafts.mutationOptions({
 			onSuccess: (result: any) => {
-				queryClient.invalidateQueries({ queryKey: ["orpc", "accounting"] });
+				queryClient.invalidateQueries({ queryKey: orpc.accounting.key() });
 				setSelectedIds(new Set());
 				if (result.posted === 0) {
 					toast.info(t("finance.accounting.messages.noDraftsToPost"));

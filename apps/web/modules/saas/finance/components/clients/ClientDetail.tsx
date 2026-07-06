@@ -81,7 +81,7 @@ export function ClientDetail({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.clients.deleteSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "clients"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.clients.key() });
 			router.push(`/app/${organizationSlug}/finance/clients`);
 		},
 		onError: (error: any) => {
@@ -100,7 +100,7 @@ export function ClientDetail({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.clients.statusUpdateSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "clients"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.clients.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.clients.statusUpdateError"));

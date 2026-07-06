@@ -38,17 +38,17 @@ export function AccountingPeriodsPage({ organizationId, organizationSlug }: Prop
 
 	const generateMutation = useMutation({
 		...orpc.accounting.periods.generate.mutationOptions(),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["accounting"] }),
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: orpc.accounting.key() }),
 	});
 
 	const closeMutation = useMutation({
 		...orpc.accounting.periods.close.mutationOptions(),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["accounting"] }),
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: orpc.accounting.key() }),
 	});
 
 	const reopenMutation = useMutation({
 		...orpc.accounting.periods.reopen.mutationOptions(),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["accounting"] }),
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: orpc.accounting.key() }),
 	});
 
 	if (isLoading) return <DashboardSkeleton />;

@@ -134,7 +134,7 @@ export function ClaimsTable({
 		...orpc.projectFinance.updateClaimStatus.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("finance.notifications.statusUpdated"));
-			queryClient.invalidateQueries({ queryKey: ["projectFinance"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectFinance.key() });
 			onRefresh();
 		},
 		onError: () => {

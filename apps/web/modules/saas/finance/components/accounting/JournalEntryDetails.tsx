@@ -43,18 +43,18 @@ export function JournalEntryDetails({
 
 	const postMutation = useMutation({
 		...orpc.accounting.journal.post.mutationOptions(),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["accounting"] }),
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: orpc.accounting.key() }),
 	});
 
 	const reverseMutation = useMutation({
 		...orpc.accounting.journal.reverse.mutationOptions(),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["accounting"] }),
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: orpc.accounting.key() }),
 	});
 
 	const deleteMutation = useMutation({
 		...orpc.accounting.journal.delete.mutationOptions(),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["accounting"] });
+			queryClient.invalidateQueries({ queryKey: orpc.accounting.key() });
 			router.push(`/app/${organizationSlug}/finance/journal-entries`);
 		},
 	});

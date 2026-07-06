@@ -29,6 +29,7 @@ import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { organizationListQueryKey } from "@saas/organizations/lib/api";
 import { CONTRACTOR_CLASSES, SAUDI_CITIES } from "../../lib/wizard-steps";
 
 const companyInfoSchema = z.object({
@@ -144,7 +145,10 @@ export function CompanyInfoStep({
 				logo: logoUrl || undefined,
 			});
 
-			queryClient.invalidateQueries({ queryKey: ["organizations"] });
+			queryClient.invalidateQueries({ queryKey: organizationListQueryKey });
+			queryClient.invalidateQueries({
+				queryKey: ["user", "activeOrganization"],
+			});
 			onCompanyUpdate(values.name, logoUrl ?? undefined);
 			onNext();
 		} catch {

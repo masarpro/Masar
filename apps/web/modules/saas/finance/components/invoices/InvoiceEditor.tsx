@@ -216,7 +216,7 @@ export function InvoiceEditor({
 		onSuccess: () => {
 			toast.success(t("finance.invoices.updateSuccess"));
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "invoices"],
+				queryKey: orpc.finance.invoices.key(),
 			});
 		},
 		onError: (error: any) => {
@@ -244,7 +244,7 @@ export function InvoiceEditor({
 		onSuccess: () => {
 			toast.success(t("finance.invoices.itemsUpdateSuccess"));
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "invoices"],
+				queryKey: orpc.finance.invoices.key(),
 			});
 		},
 		onError: (error: any) => {
@@ -264,7 +264,7 @@ export function InvoiceEditor({
 		onSuccess: (_, status) => {
 			toast.success(t(`finance.invoices.status.${status.toLowerCase()}Success`));
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "invoices"],
+				queryKey: orpc.finance.invoices.key(),
 			});
 		},
 		onError: (error: any) => {
@@ -283,7 +283,7 @@ export function InvoiceEditor({
 		onSuccess: () => {
 			toast.success(t("finance.invoices.convertToTaxSuccess"));
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "invoices"],
+				queryKey: orpc.finance.invoices.key(),
 			});
 		},
 		onError: (error: any) => {
@@ -309,7 +309,7 @@ export function InvoiceEditor({
 			setPaymentDialogOpen(false);
 			resetPaymentForm();
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "invoices"],
+				queryKey: orpc.finance.invoices.key(),
 			});
 		},
 		onError: (error: any) => {
@@ -330,7 +330,7 @@ export function InvoiceEditor({
 			toast.success(t("finance.invoices.paymentDeleteSuccess"));
 			setDeletePaymentId(null);
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "invoices"],
+				queryKey: orpc.finance.invoices.key(),
 			});
 		},
 		onError: (error: any) => {

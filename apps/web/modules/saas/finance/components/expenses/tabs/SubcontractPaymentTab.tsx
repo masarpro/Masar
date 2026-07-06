@@ -163,7 +163,7 @@ export const SubcontractPaymentTab = forwardRef<
 		},
 		onSuccess: () => {
 			toast.success(t("finance.expenses.subcontractPayment.createSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 			queryClient.invalidateQueries({
 				queryKey: orpc.finance.banks.key(),
 			});

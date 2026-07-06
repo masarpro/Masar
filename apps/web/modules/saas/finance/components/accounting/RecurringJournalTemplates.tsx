@@ -39,7 +39,7 @@ export function RecurringJournalTemplates({
 	const generateMutation = useMutation(
 		orpc.accounting.recurring.generate.mutationOptions({
 			onSuccess: (result: any) => {
-				queryClient.invalidateQueries({ queryKey: ["orpc", "accounting"] });
+				queryClient.invalidateQueries({ queryKey: orpc.accounting.key() });
 				if (result.generated === 0) {
 					toast.info(t("finance.accounting.recurring.noTemplatesDue"));
 				} else {
@@ -53,7 +53,7 @@ export function RecurringJournalTemplates({
 	const toggleMutation = useMutation(
 		orpc.accounting.recurring.update.mutationOptions({
 			onSuccess: () => {
-				queryClient.invalidateQueries({ queryKey: ["orpc", "accounting"] });
+				queryClient.invalidateQueries({ queryKey: orpc.accounting.key() });
 			},
 		}),
 	);
@@ -61,7 +61,7 @@ export function RecurringJournalTemplates({
 	const deleteMutation = useMutation(
 		orpc.accounting.recurring.delete.mutationOptions({
 			onSuccess: () => {
-				queryClient.invalidateQueries({ queryKey: ["orpc", "accounting"] });
+				queryClient.invalidateQueries({ queryKey: orpc.accounting.key() });
 				toast.success(t("common.deleted"));
 			},
 		}),

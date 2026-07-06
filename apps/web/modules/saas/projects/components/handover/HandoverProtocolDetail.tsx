@@ -82,7 +82,7 @@ export function HandoverProtocolDetail({
 	);
 	const protocol = rawProtocol as any;
 
-	const invalidate = () => queryClient.invalidateQueries({ queryKey: ["handover"] });
+	const invalidate = () => queryClient.invalidateQueries({ queryKey: orpc.handover.key() });
 
 	const submitMutation = useMutation({
 		mutationFn: () => orpcClient.handover.submit({ organizationId, id: protocolId }),

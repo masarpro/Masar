@@ -110,7 +110,7 @@ export function PaymentVoucherForm({
 					toast.error(t("common.error"));
 				}
 			}
-			queryClient.invalidateQueries({ queryKey: ["finance", "disbursements"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.disbursements.key() });
 			toast.success(t("finance.paymentVouchers.actions.create"));
 			router.push(`${basePath}/${voucher.id}`);
 		},

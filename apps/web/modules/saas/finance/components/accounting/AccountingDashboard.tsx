@@ -61,7 +61,7 @@ export function AccountingDashboard({
 	const backfillMutation = useMutation({
 		...orpc.accounting.backfill.mutationOptions(),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["accounting"] });
+			queryClient.invalidateQueries({ queryKey: orpc.accounting.key() });
 		},
 	});
 

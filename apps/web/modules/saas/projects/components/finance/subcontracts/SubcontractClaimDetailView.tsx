@@ -151,7 +151,7 @@ export function SubcontractClaimDetailView({
 		...orpc.subcontracts.updateClaimStatus.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("actions.submit") + " ✓");
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 			setStatusAction(null);
 		},
 		onError: (error) => {
@@ -164,7 +164,7 @@ export function SubcontractClaimDetailView({
 		...orpc.subcontracts.deleteClaim.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("actions.delete") + " ✓");
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 			router.push(`${basePath}/claims`);
 		},
 		onError: (error) => {
@@ -177,7 +177,7 @@ export function SubcontractClaimDetailView({
 		...orpc.subcontracts.addClaimPayment.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("payment.addPayment") + " ✓");
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 			setPaymentSheetOpen(false);
 			resetPaymentForm();
 		},

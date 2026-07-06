@@ -157,7 +157,7 @@ function CodeRow({
 		onSuccess: () => {
 			toast.success(t("admin.activationCodes.deactivated"));
 			queryClient.invalidateQueries({
-				queryKey: ["superAdmin", "activationCodes"],
+				queryKey: orpc.superAdmin.activationCodes.key(),
 			});
 		},
 		onError: () => {
@@ -284,7 +284,7 @@ function CreateCodeDialog({
 			navigator.clipboard.writeText(data.code);
 			toast.success(t("admin.activationCodes.copied"));
 			queryClient.invalidateQueries({
-				queryKey: ["superAdmin", "activationCodes"],
+				queryKey: orpc.superAdmin.activationCodes.key(),
 			});
 			onOpenChange(false);
 			// Reset form

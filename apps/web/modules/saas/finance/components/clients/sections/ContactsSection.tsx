@@ -1,5 +1,6 @@
 "use client";
 
+import { orpc } from "@shared/lib/orpc-query-utils";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -96,7 +97,7 @@ export function ContactsSection({
 		onSuccess: (newContact) => {
 			if (newContact) {
 				toast.success(t("finance.clients.contacts.createSuccess"));
-				queryClient.invalidateQueries({ queryKey: ["finance", "clients"] });
+				queryClient.invalidateQueries({ queryKey: orpc.finance.clients.key() });
 			}
 		},
 		onError: (error: any) => {
@@ -123,7 +124,7 @@ export function ContactsSection({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.clients.contacts.updateSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "clients"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.clients.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.clients.contacts.updateError"));
@@ -142,7 +143,7 @@ export function ContactsSection({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.clients.contacts.deleteSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "clients"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.clients.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.clients.contacts.deleteError"));
@@ -223,7 +224,7 @@ export function ContactsSection({
 					contactId: contacts[index].id!,
 				})
 				.then(() => {
-					queryClient.invalidateQueries({ queryKey: ["finance", "clients"] });
+					queryClient.invalidateQueries({ queryKey: orpc.finance.clients.key() });
 				})
 				.catch((error: any) => {
 					toast.error(error.message);

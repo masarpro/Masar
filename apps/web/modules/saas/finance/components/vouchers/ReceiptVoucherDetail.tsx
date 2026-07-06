@@ -77,7 +77,7 @@ export function ReceiptVoucherDetail({
 		mutationFn: () =>
 			orpcClient.finance.receipts.issue({ organizationId, id: voucherId }),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["finance", "receipts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.receipts.key() });
 			toast.success(t("finance.receiptVouchers.actions.issue"));
 			setShowIssueDialog(false);
 		},
@@ -92,7 +92,7 @@ export function ReceiptVoucherDetail({
 				cancelReason,
 			}),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["finance", "receipts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.receipts.key() });
 			toast.success(t("finance.receiptVouchers.actions.cancel"));
 			setShowCancelDialog(false);
 			setCancelReason("");
@@ -104,7 +104,7 @@ export function ReceiptVoucherDetail({
 		mutationFn: () =>
 			orpcClient.finance.receipts.print({ organizationId, id: voucherId }),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["finance", "receipts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.receipts.key() });
 			window.print();
 		},
 	});

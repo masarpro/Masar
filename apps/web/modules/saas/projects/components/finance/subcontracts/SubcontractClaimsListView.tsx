@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatDate, formatSAR } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import {
 	AlertDialog,
@@ -116,7 +117,7 @@ export function SubcontractClaimsListView({
 		...orpc.subcontracts.deleteClaim.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("actions.delete") + " ✓");
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 			setDeleteClaimId(null);
 		},
 		onError: (error) => {

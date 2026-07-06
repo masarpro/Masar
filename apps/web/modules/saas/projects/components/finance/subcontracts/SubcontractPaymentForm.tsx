@@ -124,8 +124,8 @@ export function SubcontractPaymentForm({
 		...orpc.subcontracts.createPayment.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("subcontracts.notifications.paymentCreated"));
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
-			queryClient.invalidateQueries({ queryKey: ["finance"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.key() });
 			router.push(redirectPath);
 		},
 		onError: (error) => {

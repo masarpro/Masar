@@ -84,13 +84,13 @@ export function SpecQuickTemplateBar({
 					: ` — ${floors.find((f) => `floor:${f.id}` === scope)?.name ?? ""}`;
 				toast.success(`تم تطبيق قالب المواصفات — ${data.updated} بند${scopeLabel}`);
 				queryClient.invalidateQueries({
-					queryKey: ["pricing", "studies", "specifications"],
+					queryKey: orpc.pricing.studies.specifications.key(),
 				});
 				queryClient.invalidateQueries({
-					queryKey: ["pricing", "studies", "getFinishingItems"],
+					queryKey: orpc.pricing.studies.getFinishingItems.key(),
 				});
 				queryClient.invalidateQueries({
-					queryKey: ["pricing", "studies", "finishingItem"],
+					queryKey: orpc.pricing.studies.finishingItem.key(),
 				});
 			},
 			onError: () => {

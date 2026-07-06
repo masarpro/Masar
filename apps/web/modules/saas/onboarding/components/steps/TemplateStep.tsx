@@ -91,7 +91,7 @@ export function TemplateStep({
 			}
 
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "templates"],
+				queryKey: orpc.company.templates.key(),
 			});
 			onNext();
 		} catch {

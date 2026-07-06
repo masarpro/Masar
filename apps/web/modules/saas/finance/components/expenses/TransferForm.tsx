@@ -88,8 +88,8 @@ export function TransferForm({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.transfers.createSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "transfers"] });
-			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.transfers.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
 			router.push(`/app/${organizationSlug}/finance/banks`);
 		},
 		onError: (error: any) => {

@@ -60,7 +60,7 @@ export function CreateExpenseForm({
 		...orpc.projectFinance.createExpense.mutationOptions(),
 		onSuccess: () => {
 			toast.success(t("finance.notifications.expenseCreated"));
-			queryClient.invalidateQueries({ queryKey: ["projectFinance"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectFinance.key() });
 			router.push(`${basePath}/expenses`);
 		},
 		onError: () => {

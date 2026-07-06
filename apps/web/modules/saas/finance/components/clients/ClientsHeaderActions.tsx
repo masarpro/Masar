@@ -1,5 +1,6 @@
 "use client";
 
+import { orpc } from "@shared/lib/orpc-query-utils";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -88,7 +89,7 @@ export function ClientsHeaderActions({
 			setQuickDialogOpen(false);
 			resetQuickForm();
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "clients"],
+				queryKey: orpc.finance.clients.key(),
 			});
 		},
 		onError: (error: any) => {

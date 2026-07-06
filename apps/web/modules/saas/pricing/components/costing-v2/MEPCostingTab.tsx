@@ -69,7 +69,7 @@ export function MEPCostingTab({
 		orpc.pricing.studies.costing.generate.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: ["pricing", "studies", "costing"],
+					queryKey: orpc.pricing.studies.costing.key(),
 				});
 			},
 			onError: (e: any) => toast.error(e.message || "حدث خطأ في توليد البنود"),
@@ -81,7 +81,7 @@ export function MEPCostingTab({
 		orpc.pricing.studies.costing.bulkUpdate.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: ["pricing", "studies", "costing"],
+					queryKey: orpc.pricing.studies.costing.key(),
 				});
 			},
 		}),
@@ -92,7 +92,7 @@ export function MEPCostingTab({
 		orpc.pricing.studies.costing.setSectionLabor.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: ["pricing", "studies", "costing"],
+					queryKey: orpc.pricing.studies.costing.key(),
 				});
 			},
 		}),

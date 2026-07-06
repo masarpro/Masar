@@ -49,8 +49,8 @@ export function ProgressUpdateForm({
 			});
 
 			toast.success(t("projects.field.progressUpdated"));
-			queryClient.invalidateQueries({ queryKey: ["projectField"] });
-			queryClient.invalidateQueries({ queryKey: ["projects"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
+			queryClient.invalidateQueries({ queryKey: orpc.projects.key() });
 			setNote("");
 			setPhaseLabel("");
 			onSuccess?.();

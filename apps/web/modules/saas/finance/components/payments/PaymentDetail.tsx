@@ -115,7 +115,7 @@ export function PaymentDetail({
 		onSuccess: () => {
 			toast.success(t("finance.payments.updateSuccess"));
 			setIsEditing(false);
-			queryClient.invalidateQueries({ queryKey: ["finance", "orgPayments"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.orgPayments.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.payments.updateError"));

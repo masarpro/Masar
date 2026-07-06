@@ -84,7 +84,7 @@ export function DailyReportForm({
 			});
 
 			toast.success(t("projects.field.reportCreated"));
-			queryClient.invalidateQueries({ queryKey: ["projectField"] });
+			queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
 			router.push(`${basePath}/execution`);
 		} catch {
 			toast.error(t("projects.field.reportCreateError"));

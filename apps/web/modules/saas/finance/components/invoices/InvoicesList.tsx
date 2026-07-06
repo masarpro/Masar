@@ -166,7 +166,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 		onSuccess: () => {
 			toast.success(t("finance.invoices.deleteSuccess"));
 			setDeleteInvoiceId(null);
-			queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.invoices.deleteError"));
@@ -180,7 +180,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 		onSuccess: () => {
 			toast.success(t("finance.invoices.issueSuccess"));
 			setIssueInvoiceId(null);
-			queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.key() });
 		},
 		onError: (error: any) => {
 			toast.error(error.message || t("finance.invoices.issueError"));
@@ -193,7 +193,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 		},
 		onSuccess: (data) => {
 			toast.success(t("finance.invoices.duplicateSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.key() });
 			router.push(`${basePath}/${data.id}`);
 		},
 		onError: (error: any) => {
@@ -543,7 +543,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 														orpcClient.finance.invoices.issue({ organizationId, id: inv.id }),
 													),
 												);
-												queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+												queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.key() });
 												clearSelection();
 												setBulkConfirm(null);
 												toast.success(t("finance.invoices.bulkActionSuccess"));
@@ -570,7 +570,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 														orpcClient.finance.invoices.delete({ organizationId, id: inv.id }),
 													),
 												);
-												queryClient.invalidateQueries({ queryKey: ["finance", "invoices"] });
+												queryClient.invalidateQueries({ queryKey: orpc.finance.invoices.key() });
 												clearSelection();
 												setBulkConfirm(null);
 												toast.success(t("finance.invoices.bulkActionSuccess"));

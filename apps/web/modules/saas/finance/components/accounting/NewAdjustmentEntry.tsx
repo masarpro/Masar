@@ -53,7 +53,7 @@ export function NewAdjustmentEntry({ organizationId, organizationSlug }: Props) 
 	const mutation = useMutation({
 		...orpc.accounting.journal.createAdjustment.mutationOptions(),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["accounting"] });
+			queryClient.invalidateQueries({ queryKey: orpc.accounting.key() });
 			router.push(`/app/${organizationSlug}/finance/journal-entries`);
 		},
 	});

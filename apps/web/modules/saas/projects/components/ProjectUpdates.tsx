@@ -63,7 +63,7 @@ export function ProjectUpdates({
 				setNextSteps("");
 				setBlockers("");
 				// Invalidate queries
-				queryClient.invalidateQueries({ queryKey: ["projectUpdates"] });
+				queryClient.invalidateQueries({ queryKey: orpc.projectUpdates.key() });
 			},
 			onError: () => {
 				toast.error(t("projects.updates.toastError"));

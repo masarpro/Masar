@@ -87,7 +87,7 @@ export function ProjectInsights({
 		orpc.projectInsights.acknowledge.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: ["projectInsights", "get"],
+					queryKey: orpc.projectInsights.get.key(),
 				});
 				toast.success(t("projects.insights.toastAcknowledged"));
 			},

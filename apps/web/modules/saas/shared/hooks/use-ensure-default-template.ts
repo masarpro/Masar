@@ -1,5 +1,6 @@
 "use client";
 
+import { orpc } from "@shared/lib/orpc-query-utils";
 import { useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpcClient } from "@shared/lib/orpc-client";
@@ -21,7 +22,7 @@ export function useEnsureDefaultTemplate(
 			orpcClient.company.templates.seed({ organizationId }),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: ["orpc", "company", "templates"],
+				queryKey: orpc.company.templates.key(),
 			});
 		},
 	});

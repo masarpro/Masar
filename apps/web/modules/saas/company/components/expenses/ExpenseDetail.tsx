@@ -85,7 +85,7 @@ export function ExpenseDetail({ organizationId, organizationSlug, expenseId }: E
 		onSuccess: () => {
 			toast.success(t("company.expenses.paymentMarkedPaid"));
 			queryClient.invalidateQueries({ queryKey });
-			queryClient.invalidateQueries({ queryKey: ["finance"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.key() });
 			setMarkPaidPaymentId(null);
 			setSelectedBankAccountId("");
 		},

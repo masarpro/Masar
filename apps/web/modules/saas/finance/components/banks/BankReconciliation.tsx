@@ -71,7 +71,7 @@ export function BankReconciliation({
 	const saveMutation = useMutation(
 		orpc.finance.banks.reconciliation.create.mutationOptions({
 			onSuccess: () => {
-				queryClient.invalidateQueries({ queryKey: ["orpc", "finance"] });
+				queryClient.invalidateQueries({ queryKey: orpc.finance.key() });
 				toast.success(t("finance.accounting.reconciliation.saved"));
 			},
 			onError: (err: any) => toast.error(err.message),

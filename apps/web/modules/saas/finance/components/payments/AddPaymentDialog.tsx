@@ -185,9 +185,9 @@ export function AddPaymentDialog({
 		onSuccess: () => {
 			toast.success(t("finance.payments.createSuccess"));
 			queryClient.invalidateQueries({
-				queryKey: ["finance", "orgPayments"],
+				queryKey: orpc.finance.orgPayments.key(),
 			});
-			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
 			queryClient.invalidateQueries({
 				queryKey: orpc.projectFinance.key(),
 			});

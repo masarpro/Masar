@@ -1,5 +1,6 @@
 "use client";
 
+import { orpc } from "@shared/lib/orpc-query-utils";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -73,7 +74,7 @@ export function BankForm({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.banks.createSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
 			router.push(`/app/${organizationSlug}/finance/banks`);
 		},
 		onError: (error: any) => {
@@ -98,7 +99,7 @@ export function BankForm({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.banks.updateSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["finance", "banks"] });
+			queryClient.invalidateQueries({ queryKey: orpc.finance.banks.key() });
 			router.push(`/app/${organizationSlug}/finance/banks`);
 		},
 		onError: (error: any) => {

@@ -136,7 +136,7 @@ export function SubcontractClaimForm({
 	const createMutation = useMutation({
 		...orpc.subcontracts.createClaim.mutationOptions(),
 		onSuccess: (data) => {
-			queryClient.invalidateQueries({ queryKey: ["subcontracts"] });
+			queryClient.invalidateQueries({ queryKey: orpc.subcontracts.key() });
 			toast.success(t("actions.saveDraft") + " ✓");
 			router.push(`${basePath}/claims/${data.id}`);
 		},

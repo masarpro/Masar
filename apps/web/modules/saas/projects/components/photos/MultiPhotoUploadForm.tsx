@@ -354,7 +354,7 @@ export function MultiPhotoUploadForm({
 		}
 
 		setSubmitting(false);
-		queryClient.invalidateQueries({ queryKey: ["projectField"] });
+		queryClient.invalidateQueries({ queryKey: orpc.projectField.key() });
 
 		if (savedCount > 0) {
 			toast.success(

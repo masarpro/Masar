@@ -273,7 +273,7 @@ export function TemplateCustomizer({
 		},
 		onSuccess: (data) => {
 			toast.success(t("finance.templates.createSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["orpc", "company", "templates"] });
+			queryClient.invalidateQueries({ queryKey: orpc.company.templates.key() });
 			router.push(`${basePath}/templates/${data.id}`);
 		},
 		onError: (error: Error) => {
@@ -293,7 +293,7 @@ export function TemplateCustomizer({
 		},
 		onSuccess: () => {
 			toast.success(t("finance.templates.updateSuccess"));
-			queryClient.invalidateQueries({ queryKey: ["orpc", "company", "templates"] });
+			queryClient.invalidateQueries({ queryKey: orpc.company.templates.key() });
 		},
 		onError: (error: Error) => {
 			toast.error(error.message || t("finance.templates.updateError"));

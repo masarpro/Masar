@@ -89,7 +89,7 @@ export function QuotationDataForm({
 			onSuccess: (data: any) => {
 				toast.success("تم إنشاء عرض السعر بنجاح");
 				queryClient.invalidateQueries({
-					queryKey: ["pricing"],
+					queryKey: orpc.pricing.key(),
 				});
 				router.push(
 					`/app/${organizationSlug}/pricing/quotations/${data.quotationId}`,

@@ -59,7 +59,7 @@ export function OpeningBalancesPage({
 	const saveMutation = useMutation(
 		orpc.accounting.openingBalances.save.mutationOptions({
 			onSuccess: () => {
-				queryClient.invalidateQueries({ queryKey: ["orpc", "accounting"] });
+				queryClient.invalidateQueries({ queryKey: orpc.accounting.key() });
 				toast.success(t("finance.accounting.openingBalances.saveSuccess"));
 			},
 			onError: (err: any) => toast.error(err.message),

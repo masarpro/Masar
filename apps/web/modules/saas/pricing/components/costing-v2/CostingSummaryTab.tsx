@@ -66,7 +66,7 @@ export function CostingSummaryTab({
 			onSuccess: () => {
 				toast.success("تم اعتماد مرحلة تسعير التكلفة");
 				queryClient.invalidateQueries({
-					queryKey: ["pricing", "studies", "studyStages"],
+					queryKey: orpc.pricing.studies.studyStages.key(),
 				});
 			},
 			onError: () => {
