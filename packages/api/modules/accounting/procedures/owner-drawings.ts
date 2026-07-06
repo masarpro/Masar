@@ -291,8 +291,10 @@ async function computeOverdrawContext(
 			_sum: { amount: true },
 		});
 		capitalContributionsTotal = Number(contributions._sum?.amount ?? 0);
-	} catch {
-		// Table may not exist yet — ignore
+	} catch (e) {
+		// Defaulting to 0 is conservative here (it only shrinks the available
+		// amount), but log so a real DB failure isn't completely invisible.
+		console.error("[OwnerDrawings] Failed to load capital contributions:", e);
 	}
 
 	const availableForOwner =

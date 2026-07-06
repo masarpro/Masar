@@ -155,6 +155,12 @@ export const updateProjectPaymentProcedure = subscriptionProcedure
 			// Auto-Journal: reverse old entry and create new one with updated data
 			try {
 				const { reverseAutoJournalEntry, onProjectPaymentReceived } = await import("../../../lib/accounting/auto-journal");
+				const { isPeriodClosed } = await import("@repo/database");
+				// Guard: if the new date lands in a closed period the re-create would
+				// silently skip, leaving the payment REVERSED with no active entry.
+				if (await isPeriodClosed(db, input.organizationId, payment.date)) {
+					throw new Error("لا يمكن تعديل دفعة إلى تاريخ في فترة محاسبية مغلقة");
+				}
 				await reverseAutoJournalEntry(db, {
 					organizationId: input.organizationId,
 					referenceType: "PROJECT_PAYMENT",

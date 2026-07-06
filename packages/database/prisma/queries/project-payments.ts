@@ -737,6 +737,18 @@ export async function deleteProjectPayment(
 		}
 
 		const deletedIds = rows.map((r) => r.id);
+
+		// Cancel any auto-created receipt vouchers BEFORE the SetNull link is
+		// severed, so they don't linger ISSUED documenting deleted money.
+		await tx.receiptVoucher.updateMany({
+			where: {
+				projectPaymentId: { in: deletedIds },
+				organizationId,
+				status: { not: "CANCELLED" },
+			},
+			data: { status: "CANCELLED" },
+		});
+
 		await tx.projectPayment.deleteMany({ where: { id: { in: deletedIds } } });
 
 		return { success: true, deletedIds };

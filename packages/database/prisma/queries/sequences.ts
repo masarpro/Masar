@@ -40,6 +40,49 @@ export async function nextSequenceValue(
 }
 
 /**
+ * Atomically reserve a contiguous block of `count` sequence values in ONE
+ * statement. Returns the FIRST reserved value; the block is
+ * [start, start + count - 1]. Used to number many rows (payroll, recurring
+ * expense runs) without a separate sequence round-trip per row.
+ */
+export async function reserveSequenceBlock(
+	organizationId: string,
+	sequenceKey: string,
+	count: number,
+): Promise<number> {
+	if (count <= 0) return 0;
+	const result: Array<{ current_value: number }> = await db.$queryRawUnsafe(
+		`INSERT INTO organization_sequences (id, organization_id, sequence_key, current_value, updated_at)
+       VALUES (gen_random_uuid(), $1, $2, $3, NOW())
+       ON CONFLICT (organization_id, sequence_key)
+       DO UPDATE SET current_value = organization_sequences.current_value + $3,
+                     updated_at = NOW()
+       RETURNING current_value`,
+		organizationId,
+		sequenceKey,
+		count,
+	);
+	// RETURNING gives the LAST value in the reserved block; derive the first.
+	return Number(result[0].current_value) - count + 1;
+}
+
+/**
+ * Reserve `count` formatted atomic document numbers in a single round-trip.
+ */
+export async function generateAtomicNoBatch(
+	organizationId: string,
+	prefix: string,
+	count: number,
+): Promise<string[]> {
+	if (count <= 0) return [];
+	const year = new Date().getFullYear();
+	const start = await reserveSequenceBlock(organizationId, `${prefix}-${year}`, count);
+	return Array.from({ length: count }, (_, i) =>
+		formatSequenceNo(prefix, year, start + i),
+	);
+}
+
+/**
  * Resync a sequence counter to match the actual max value in a table.
  *
  * Reads the highest existing number from the target column, then sets

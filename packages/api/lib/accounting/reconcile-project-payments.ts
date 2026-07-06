@@ -69,6 +69,24 @@ export async function reconcileProjectPaymentEntries(
 
 	const billingByProject = new Map<string, boolean>();
 
+	// Fetch all POSTED PROJECT_PAYMENT entries for these payments in ONE query
+	// instead of one findFirst per payment (this runs on every invoice issue).
+	const entries = await db.journalEntry.findMany({
+		where: {
+			organizationId: opts.organizationId,
+			referenceType: "PROJECT_PAYMENT",
+			referenceId: { in: payments.map((p) => p.id) },
+			status: "POSTED",
+		},
+		select: {
+			referenceId: true,
+			lines: { where: { credit: { gt: 0 } }, select: { accountId: true } },
+		},
+	});
+	const entryByPaymentId = new Map(
+		entries.map((e) => [e.referenceId as string, e]),
+	);
+
 	for (const payment of payments) {
 		let hasBilling = billingByProject.get(payment.projectId);
 		if (hasBilling === undefined) {
@@ -78,18 +96,7 @@ export async function reconcileProjectPaymentEntries(
 		const expectedId = hasBilling ? receivable.id : revenue.id;
 		const wrongId = hasBilling ? revenue.id : receivable.id;
 
-		const entry = await db.journalEntry.findFirst({
-			where: {
-				organizationId: opts.organizationId,
-				referenceType: "PROJECT_PAYMENT",
-				referenceId: payment.id,
-				status: "POSTED",
-			},
-			select: {
-				id: true,
-				lines: { where: { credit: { gt: 0 } }, select: { accountId: true } },
-			},
-		});
+		const entry = entryByPaymentId.get(payment.id);
 		if (!entry) continue;
 		result.checked++;
 

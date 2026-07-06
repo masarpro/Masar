@@ -191,7 +191,8 @@ export const previewYearEndProcedure = protectedProcedure
 
 		const totalDrawings = drawingsAccountBalances.reduce((s, a) => s + a.balance, 0);
 
-		// Step 6: Get capital contributions per owner
+		// Step 6: Get capital contributions per owner. Do NOT swallow failures here —
+		// a silent empty result would distribute year-end profit on wrong shares.
 		const contributionsGrouped = await db.capitalContribution.groupBy({
 			by: ["ownerId"],
 			where: {
@@ -199,7 +200,7 @@ export const previewYearEndProcedure = protectedProcedure
 				status: "ACTIVE",
 			},
 			_sum: { amount: true },
-		}).catch(() => [] as Array<{ ownerId: string; _sum: { amount: any } }>);
+		});
 
 		const contributionsPerOwner: Record<string, number> = {};
 		for (const g of contributionsGrouped) {

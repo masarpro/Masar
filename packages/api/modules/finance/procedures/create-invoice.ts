@@ -644,6 +644,14 @@ export const addInvoicePaymentProcedure = subscriptionProcedure
 			});
 		} catch (e) {
 			console.error("[ReceiptVoucher] Failed to create auto voucher from invoice payment:", e);
+			orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "voucher",
+				entityId: input.id,
+				metadata: { error: String(e), type: "RECEIPT_VOUCHER_AUTO_CREATE" },
+			});
 		}
 
 		const invoiceForNotify = await db.financeInvoice.findUnique({
@@ -685,6 +693,18 @@ export const deleteInvoicePaymentProcedure = subscriptionProcedure
 		await verifyOrganizationAccess(input.organizationId, context.user.id, {
 			section: "finance",
 			action: "payments",
+		});
+
+		// Cancel the auto-created receipt voucher first — once the payment is
+		// deleted its SetNull link is severed and the voucher would linger ISSUED,
+		// documenting money that no longer exists.
+		await db.receiptVoucher.updateMany({
+			where: {
+				invoicePaymentId: input.paymentId,
+				organizationId: input.organizationId,
+				status: { not: "CANCELLED" },
+			},
+			data: { status: "CANCELLED" },
 		});
 
 		await deleteInvoicePayment(
