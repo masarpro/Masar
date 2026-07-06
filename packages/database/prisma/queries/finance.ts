@@ -628,27 +628,21 @@ export async function createQuotation(data: {
 }) {
 	const quotationNo = await generateQuotationNumber(data.organizationId);
 
-	// Calculate totals
-	let subtotal = 0;
-	const itemsData = data.items.map((item, index) => {
-		const totalPrice = item.quantity * item.unitPrice;
-		subtotal += totalPrice;
-		return {
-			description: item.description,
-			quantity: item.quantity,
-			unit: item.unit,
-			unitPrice: item.unitPrice,
-			totalPrice,
-			sortOrder: index,
-		};
-	});
-
+	// Calculate totals via the single source of truth (Decimal-safe)
 	const discountPercent = data.discountPercent ?? 0;
-	const discountAmount = (subtotal * discountPercent) / 100;
-	const afterDiscount = subtotal - discountAmount;
 	const vatPercent = data.vatPercent ?? 15;
-	const vatAmount = (afterDiscount * vatPercent) / 100;
-	const totalAmount = afterDiscount + vatAmount;
+	const totals = calculateInvoiceTotals(data.items, discountPercent, vatPercent);
+
+	const itemsData = data.items.map((item, index) => ({
+		description: item.description,
+		quantity: item.quantity,
+		unit: item.unit,
+		unitPrice: item.unitPrice,
+		totalPrice: totals.itemTotals[index],
+		sortOrder: index,
+	}));
+
+	const { subtotal, discountAmount, vatAmount, totalAmount } = totals;
 
 	return db.quotation.create({
 		data: {
@@ -768,38 +762,32 @@ export async function updateQuotationItems(
 	// Delete existing items and create new ones
 	await db.quotationItem.deleteMany({ where: { quotationId: id } });
 
-	let subtotal = 0;
-	const itemsData = items.map((item, index) => {
-		const totalPrice = item.quantity * item.unitPrice;
-		subtotal += totalPrice;
-		return {
-			quotationId: id,
-			description: item.description,
-			quantity: item.quantity,
-			unit: item.unit,
-			unitPrice: item.unitPrice,
-			totalPrice,
-			sortOrder: index,
-		};
-	});
+	// Recalculate totals via the single source of truth (Decimal-safe)
+	const totals = calculateInvoiceTotals(
+		items,
+		Number(existing.discountPercent),
+		Number(existing.vatPercent),
+	);
+
+	const itemsData = items.map((item, index) => ({
+		quotationId: id,
+		description: item.description,
+		quantity: item.quantity,
+		unit: item.unit,
+		unitPrice: item.unitPrice,
+		totalPrice: totals.itemTotals[index],
+		sortOrder: index,
+	}));
 
 	await db.quotationItem.createMany({ data: itemsData });
-
-	// Recalculate totals
-	const discountPercent = Number(existing.discountPercent);
-	const discountAmount = (subtotal * discountPercent) / 100;
-	const afterDiscount = subtotal - discountAmount;
-	const vatPercent = Number(existing.vatPercent);
-	const vatAmount = (afterDiscount * vatPercent) / 100;
-	const totalAmount = afterDiscount + vatAmount;
 
 	return db.quotation.update({
 		where: { id },
 		data: {
-			subtotal,
-			discountAmount,
-			vatAmount,
-			totalAmount,
+			subtotal: totals.subtotal,
+			discountAmount: totals.discountAmount,
+			vatAmount: totals.vatAmount,
+			totalAmount: totals.totalAmount,
 		},
 		include: { items: { orderBy: { sortOrder: "asc" } } },
 	});

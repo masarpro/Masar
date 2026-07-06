@@ -148,7 +148,20 @@ export function isOverdue(dueDate: Date | string): boolean {
 }
 
 /**
- * Calculate totals from items
+ * Round half-up to 2 decimal places, immune to binary float artifacts
+ * (e.g. 33.335 → 33.34, matching Decimal.ROUND_HALF_UP on the server).
+ */
+function roundHalfUp2(value: number): number {
+	return Number(`${Math.round(Number(`${value}e2`))}e-2`);
+}
+
+/**
+ * Live-preview mirror of the server's `calculateInvoiceTotals`
+ * (packages/database/prisma/queries/finance.ts — the single source of truth).
+ * The server never trusts client totals; this exists only so the form preview
+ * matches what the server will persist. Any change to the server formula
+ * (per-item ROUND_HALF_UP, discount before VAT, VAT on post-discount amount)
+ * must be reflected here.
  */
 export function calculateTotals(
 	items: Array<{ quantity: number; unitPrice: number }>,
@@ -156,12 +169,12 @@ export function calculateTotals(
 	vatPercent = 15,
 ) {
 	const subtotal = items.reduce(
-		(sum, item) => sum + item.quantity * item.unitPrice,
+		(sum, item) => sum + roundHalfUp2(item.quantity * item.unitPrice),
 		0,
 	);
-	const discountAmount = (subtotal * discountPercent) / 100;
+	const discountAmount = roundHalfUp2((subtotal * discountPercent) / 100);
 	const afterDiscount = subtotal - discountAmount;
-	const vatAmount = (afterDiscount * vatPercent) / 100;
+	const vatAmount = roundHalfUp2((afterDiscount * vatPercent) / 100);
 	const totalAmount = afterDiscount + vatAmount;
 
 	return {
