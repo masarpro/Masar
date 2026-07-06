@@ -2594,7 +2594,10 @@
         "bankBalance": "رصيد البنك",
         "netProfit": "صافي الربح",
         "cashFlow": "التدفق النقدي",
-        "last7Days": "آخر ٧ أيام"
+        "last7Days": "آخر ٧ أيام",
+        "last8Weeks": "آخر ٨ أسابيع",
+        "cashFlowUnavailable": "تعذر تحميل بيانات التدفق النقدي",
+        "cashFlowEmpty": "لا توجد حركات نقدية في هذه الفترة"
       },
       "nav": {
         "quotations": "عروض الأسعار",

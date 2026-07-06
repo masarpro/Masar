@@ -66,7 +66,7 @@ export function FinanceDashboard({
 			/>
 
 			{/* 3. Cash Flow Chart */}
-			<CashFlowCard />
+			<CashFlowCard organizationId={organizationId} />
 
 			{/* 4. Quick Action Cards (Invoices, Expenses, Payments) */}
 			<ActionCards organizationSlug={orgSlug} />
@@ -85,6 +85,7 @@ export function FinanceDashboard({
 					/>
 				</div>
 				<DeadlinesCard
+					organizationId={organizationId}
 					organizationSlug={orgSlug}
 				/>
 			</div>

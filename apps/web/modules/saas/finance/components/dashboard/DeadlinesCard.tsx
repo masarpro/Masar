@@ -1,46 +1,44 @@
 "use client";
 
+import { orpc } from "@shared/lib/orpc-query-utils";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@ui/components/skeleton";
 import { Clock } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-interface UpcomingDeadline {
-	id: string;
-	type: "invoice";
-	documentNo: string;
-	clientName: string;
-	dueDate: string | Date;
-}
-
 interface DeadlinesCardProps {
-	upcomingDeadlines?: UpcomingDeadline[];
+	organizationId: string;
 	organizationSlug: string;
 }
 
 export function DeadlinesCard({
-	upcomingDeadlines = [],
+	organizationId,
 	organizationSlug,
 }: DeadlinesCardProps) {
 	const t = useTranslations();
 	const basePath = `/app/${organizationSlug}/finance`;
 
-	// Mock upcoming deadlines if none provided
-	// TODO: Connect to real API
-	const mockUpcomingDeadlines: UpcomingDeadline[] = upcomingDeadlines.length
-		? upcomingDeadlines
-		: [
-				{
-					id: "2",
-					type: "invoice",
-					documentNo: "INV-2024-015",
-					clientName: "مؤسسة البناء",
-					dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-				},
-			];
+	const { data, isLoading, isError } = useQuery(
+		orpc.finance.outstanding.queryOptions({
+			input: { organizationId, limit: 20 },
+		}),
+	);
 
-	const hasUpcoming = mockUpcomingDeadlines.length > 0;
+	if (isLoading) {
+		return <Skeleton className="h-40 w-full rounded-2xl" />;
+	}
 
-	if (!hasUpcoming) {
+	// Upcoming = unpaid invoices whose due date hasn't passed yet
+	const now = Date.now();
+	const upcomingDeadlines = (data ?? [])
+		.filter(
+			(invoice) =>
+				invoice.dueDate && new Date(invoice.dueDate).getTime() >= now,
+		)
+		.slice(0, 3);
+
+	if (isError || upcomingDeadlines.length === 0) {
 		return null;
 	}
 
@@ -52,30 +50,30 @@ export function DeadlinesCard({
 					{t("finance.dashboard.alerts.upcomingDeadlines")}
 				</h3>
 				<span className="ms-auto text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50 px-2 py-0.5 rounded-full">
-					{mockUpcomingDeadlines.length}
+					{upcomingDeadlines.length}
 				</span>
 			</div>
 
 			<div className="space-y-2">
-				{mockUpcomingDeadlines.slice(0, 3).map((deadline) => {
-					const path = `${basePath}/invoices/${deadline.id}`;
+				{upcomingDeadlines.map((invoice) => {
+					const path = `${basePath}/invoices/${invoice.id}`;
 					const daysUntil = Math.ceil(
-						(new Date(deadline.dueDate).getTime() - Date.now()) /
+						(new Date(invoice.dueDate as string | Date).getTime() - now) /
 							(1000 * 60 * 60 * 24),
 					);
 
 					return (
 						<Link
-							key={`${deadline.type}-${deadline.id}`}
+							key={`invoice-${invoice.id}`}
 							href={path}
 							className="flex items-center justify-between p-3 rounded-xl bg-white/60 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 transition-colors border border-amber-100/50 dark:border-amber-900/30"
 						>
 							<div>
 								<p className="font-medium text-sm text-slate-900 dark:text-slate-100">
-									{deadline.documentNo}
+									{invoice.invoiceNo}
 								</p>
 								<p className="text-xs text-slate-600 dark:text-slate-400">
-									{deadline.clientName}
+									{invoice.client?.name ?? "-"}
 								</p>
 							</div>
 							<div className="text-end">
@@ -83,7 +81,7 @@ export function DeadlinesCard({
 									{daysUntil} {t("common.days")}
 								</p>
 								<p className="text-xs text-slate-500">
-									{t(`finance.dashboard.types.${deadline.type}`)}
+									{t("finance.dashboard.types.invoice")}
 								</p>
 							</div>
 						</Link>
