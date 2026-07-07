@@ -427,9 +427,9 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 																	</DropdownMenuItem>
 																)}
 
-																{/* Print — always */}
+																{/* Print — يفتح المعاينة ويُطلق الطباعة فوراً */}
 																<DropdownMenuItem asChild>
-																	<Link href={`${basePath}/${invoice.id}/preview`}>
+																	<Link href={`${basePath}/${invoice.id}/preview?print=1`}>
 																		<Printer className="h-4 w-4 me-2" />
 																		{t("finance.actions.print")}
 																	</Link>

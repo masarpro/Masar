@@ -59,7 +59,9 @@ import {
 	StickyNote,
 	RefreshCw,
 	AlertTriangle,
+	Loader2,
 } from "lucide-react";
+import { exportToPDF, printDocument } from "@saas/shared/lib/pdf-export";
 import { StatusBadge } from "../shared/StatusBadge";
 import { JournalEntryLink } from "../shared/JournalEntryLink";
 import { Currency } from "../shared/Currency";
@@ -105,6 +107,7 @@ export function InvoiceView({
 
 	// ─── State ────────────────────────────────────────────────────────────
 	const [issueDialogOpen, setIssueDialogOpen] = useState(false);
+	const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 	const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
 	const [deletePaymentId, setDeletePaymentId] = useState<string | null>(null);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -395,23 +398,41 @@ export function InvoiceView({
 						</Link>
 					)}
 
-					{/* Print */}
+					{/* Print — ينفَّذ مباشرة (المستند معروض في هذه الصفحة) */}
 					<button
 						type="button"
-						onClick={() => router.push(`${basePath}/${invoiceId}/preview`)}
+						onClick={() => printDocument()}
 						className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:text-primary-foreground hover:shadow-md hover:shadow-primary/20 hover:scale-105"
 					>
 						<Printer className="h-4 w-4" />
 						<span className="hidden sm:inline">{t("finance.actions.print")}</span>
 					</button>
 
-					{/* PDF */}
+					{/* PDF — يُولَّد خادمياً من رابط المعاينة دون مغادرة الصفحة */}
 					<button
 						type="button"
-						onClick={() => router.push(`${basePath}/${invoiceId}/preview`)}
-						className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:text-primary-foreground hover:shadow-md hover:shadow-primary/20 hover:scale-105"
+						disabled={isGeneratingPdf}
+						onClick={async () => {
+							setIsGeneratingPdf(true);
+							try {
+								await exportToPDF(
+									`${invoice.invoiceNo}-${invoice.clientName || "invoice"}`,
+									{ url: `${basePath}/${invoiceId}/preview` },
+								);
+							} catch (error) {
+								console.error("PDF generation failed:", error);
+								toast.error(t("common.error"));
+							} finally {
+								setIsGeneratingPdf(false);
+							}
+						}}
+						className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:text-primary-foreground hover:shadow-md hover:shadow-primary/20 hover:scale-105 disabled:opacity-50"
 					>
-						<FileDown className="h-4 w-4" />
+						{isGeneratingPdf ? (
+							<Loader2 className="h-4 w-4 animate-spin" />
+						) : (
+							<FileDown className="h-4 w-4" />
+						)}
 						<span className="hidden sm:inline">{t("finance.actions.downloadPdf")}</span>
 					</button>
 
@@ -641,7 +662,10 @@ function InvoiceTabContent({
 	const isDraftInvoice = invoice.status === "DRAFT";
 
 	return (
-		<div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] max-w-[210mm] mx-auto relative overflow-hidden print:shadow-none print:rounded-none print:border-none print:max-w-none print:bg-white">
+		<div
+			id="invoice-print-area"
+			className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] max-w-[210mm] mx-auto relative overflow-hidden print:shadow-none print:rounded-none print:border-none print:max-w-none print:bg-white"
+		>
 			{/* على الجوال: تصغير صفحة A4 لتطابق عرض الشاشة بدل قصّها */}
 			<ScaleToFit contentWidth={794}>
 				<div className="min-h-[297mm] print:text-black">
