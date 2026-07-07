@@ -65,7 +65,7 @@ export function ClientStatementReport({
 					</Button>
 					<h2 className="text-lg font-bold">{t("finance.accounting.statement.clientStatement")}</h2>
 				</div>
-				<div className="flex items-center gap-2">
+				<div className="flex flex-wrap items-center gap-2">
 					<Input
 						type="date"
 						value={dateFrom}

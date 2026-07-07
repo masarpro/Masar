@@ -94,7 +94,7 @@ export const SubcontractClaimsSection = React.memo(function SubcontractClaimsSec
 
 			{/* Summary badges */}
 			{summary && (
-				<div className="grid grid-cols-3 gap-3 border-b border-emerald-100/50 p-4 dark:border-emerald-800/20">
+				<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 border-b border-emerald-100/50 p-4 dark:border-emerald-800/20">
 					<div className="rounded-lg bg-slate-50 p-3 text-center dark:bg-slate-800/50">
 						<p className="text-lg font-bold text-slate-800 dark:text-slate-200">
 							{formatSAR(summary.totalClaimed)}

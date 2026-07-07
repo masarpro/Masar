@@ -115,7 +115,7 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 			</div>
 
 			{/* Table */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden">
+			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-x-auto">
 				<Table className="table-fixed w-full min-w-[640px]">
 					<TableHeader>
 						<TableRow className="border-white/10 dark:border-slate-700/30 hover:bg-transparent">

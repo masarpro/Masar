@@ -112,7 +112,7 @@ export function ProjectInsights({
 	return (
 		<div className="space-y-6">
 			{/* Stats Cards */}
-			<div className="grid grid-cols-3 gap-4">
+			<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 				<div className="rounded-2xl bg-red-50 p-5 dark:bg-red-950/30">
 					<div className="flex items-center gap-3">
 						<div className="rounded-xl bg-red-100 p-2.5 dark:bg-red-900/50">

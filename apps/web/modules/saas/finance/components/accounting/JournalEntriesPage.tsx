@@ -134,14 +134,14 @@ export function JournalEntriesPage({
 		<div className="space-y-4">
 			{/* Filters + Actions */}
 			<div className="flex flex-wrap items-center justify-between gap-3">
-				<div className="flex items-center gap-2">
+				<div className="flex flex-wrap items-center gap-2">
 					<div className="relative">
 						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
 						<Input
 							placeholder={t("finance.accounting.search")}
 							value={search}
 							onChange={(e: any) => setSearch(e.target.value)}
-							className="ps-9 rounded-xl w-64"
+							className="ps-9 rounded-xl w-full sm:w-64"
 						/>
 					</div>
 					<select
@@ -164,7 +164,7 @@ export function JournalEntriesPage({
 						{t("finance.accounting.advancedFilters")}
 					</Button>
 				</div>
-				<div className="flex gap-2">
+				<div className="flex flex-wrap gap-2">
 					{entries.length > 0 && (
 						<Button variant="outline" size="sm" className="rounded-xl" onClick={() => exportJournalEntriesToExcel(entries, {
 									sheetName: t("finance.accounting.excel.sheetJournalEntries"),

@@ -45,7 +45,7 @@ export function PreviewDialog({ open, onOpenChange }: PreviewDialogProps) {
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-w-4xl max-h-[90vh] overflow-auto p-0 rounded-2xl">
+			<DialogContent className="max-w-[min(56rem,calc(100%-2rem))] max-h-[90vh] overflow-auto p-0 rounded-2xl">
 				<DialogHeader className="p-4 border-b sticky top-0 bg-background z-10">
 					<DialogTitle className="flex items-center gap-2">
 						<Eye className="h-5 w-5" />

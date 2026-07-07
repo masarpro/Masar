@@ -77,8 +77,8 @@ export const SubcontractHeader = React.memo(function SubcontractHeader({
 						</Button>
 					</Link>
 					<div>
-						<div className="flex items-center gap-2">
-							<h1 className="text-xl font-bold text-slate-800 dark:text-slate-200">
+						<div className="flex min-w-0 items-center gap-2">
+							<h1 className="truncate text-xl font-bold text-slate-800 dark:text-slate-200">
 								{contract.name}
 							</h1>
 							<Badge className={`border-0 text-xs ${statusStyle.bg} ${statusStyle.text}`}>

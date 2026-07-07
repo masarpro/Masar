@@ -155,7 +155,7 @@ export const ContractDetailsSection = React.memo(
 							/>
 						</div>
 						{includesVat && numericContractValue > 0 && (
-							<div className="mt-3 grid grid-cols-3 gap-3">
+							<div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
 								<div className="rounded-lg bg-sky-50 p-3 dark:bg-sky-950/30">
 									<p className="text-xs text-slate-500">
 										{t(

@@ -199,7 +199,7 @@ export function ProjectStatementView({
 					<Card className="print:shadow-none print:border">
 						<CardHeader><CardTitle className="flex items-center gap-2"><DollarSign className="h-5 w-5" />{t("accountStatement.projectSummary.netCash")}</CardTitle></CardHeader>
 						<CardContent>
-							<div className="grid grid-cols-3 gap-4">
+							<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 								<div>
 									<div className="text-sm text-muted-foreground">{t("accountStatement.projectSummary.cashIn")}</div>
 									<div className="mt-1 text-xl font-bold text-green-600"><Currency amount={data.cashFlow.totalIn} /></div>

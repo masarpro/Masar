@@ -278,7 +278,7 @@ export const SubcontractPaymentTab = forwardRef<
 			{/* Contract summary */}
 			{selectedContract && (
 				<div className="rounded-xl border border-violet-200/60 bg-violet-50/40 dark:border-violet-800/30 dark:bg-violet-950/20 px-3 sm:px-4 py-2.5">
-					<div className="grid grid-cols-3 gap-2 sm:gap-3 text-center text-xs">
+					<div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 text-center text-xs">
 						<div>
 							<p className="text-violet-500">
 								{t("finance.expenses.subcontractPayment.contractValue")}

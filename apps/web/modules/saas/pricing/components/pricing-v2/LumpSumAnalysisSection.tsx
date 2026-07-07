@@ -164,7 +164,7 @@ export function LumpSumAnalysisSection({
 						<p className="text-sm text-muted-foreground font-medium">
 							{t("lumpSum.contractValue")}
 						</p>
-						<p className="text-2xl font-bold text-primary" dir="ltr">
+						<p className="text-2xl font-bold text-primary break-words" dir="ltr">
 							{formatNum(contractValue)} ر.س
 						</p>
 					</div>
@@ -189,7 +189,7 @@ export function LumpSumAnalysisSection({
 							)}
 							<p
 								className={cn(
-									"text-2xl font-bold",
+									"text-2xl font-bold break-words",
 									isProfit
 										? "text-emerald-700 dark:text-emerald-300"
 										: "text-red-700 dark:text-red-300",
@@ -217,7 +217,7 @@ export function LumpSumAnalysisSection({
 						<p className="text-sm text-muted-foreground font-medium">
 							{t("lumpSum.calculatedCost")}
 						</p>
-						<p className="text-2xl font-bold text-foreground" dir="ltr">
+						<p className="text-2xl font-bold text-foreground break-words" dir="ltr">
 							{formatNum(totalCost)} ر.س
 						</p>
 					</div>

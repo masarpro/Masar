@@ -33,7 +33,7 @@ export function PricingBalanceCards({
 				<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 					{t("pricing.dashboard.overview.studiesValue")}
 				</p>
-				<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+				<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 break-words tabular-nums">
 					<Currency amount={studiesValue} />
 				</p>
 			</div>
@@ -48,7 +48,7 @@ export function PricingBalanceCards({
 				<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 					{t("pricing.dashboard.overview.activeQuotations")}
 				</p>
-				<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+				<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 break-words tabular-nums">
 					<Currency amount={activeQuotationsValue} />
 				</p>
 			</div>
@@ -63,7 +63,7 @@ export function PricingBalanceCards({
 				<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 					{t("pricing.dashboard.overview.leadsPipeline")}
 				</p>
-				<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+				<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 break-words tabular-nums">
 					<Currency amount={leadsOpenValue} />
 				</p>
 			</div>

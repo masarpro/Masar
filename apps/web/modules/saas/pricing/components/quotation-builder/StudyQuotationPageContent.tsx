@@ -172,7 +172,7 @@ export function StudyQuotationPageContent({
 					{/* Per-SQM extra fields */}
 					{format === "PER_SQM" && (
 						<div className="rounded-lg border border-border p-4 space-y-3">
-							<div className="grid grid-cols-3 gap-4">
+							<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 								<div className="space-y-1">
 									<Label className="text-xs">المساحة الإجمالية (م²)</Label>
 									<div className="h-10 flex items-center px-3 bg-muted rounded-lg text-sm" dir="ltr">

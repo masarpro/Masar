@@ -67,12 +67,12 @@ export function SummaryStatsCards({
 					className={card.borderColor}
 				>
 					<CardContent className="p-4">
-						<div className="flex items-start justify-between">
-							<div className="space-y-1">
+						<div className="flex items-start justify-between gap-2">
+							<div className="min-w-0 flex-1 space-y-1">
 								<p className="text-sm text-muted-foreground font-medium">
 									{card.title}
 								</p>
-								<p className={`text-2xl font-bold ${card.color}`}>
+								<p className={`text-2xl font-bold break-words tabular-nums ${card.color}`}>
 									{card.value} <span className="text-base font-normal">{card.unit}</span>
 								</p>
 								{'subValue' in card && card.subValue && (
