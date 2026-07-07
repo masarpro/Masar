@@ -1,5 +1,6 @@
 "use client";
 
+import type { Permissions } from "@repo/database/prisma/permissions";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { usePermission } from "@saas/permissions/hooks/use-permission";
 import { HomeDashboardSkeleton } from "@saas/shared/components/skeletons";
@@ -30,24 +31,40 @@ const FinancePanel = dynamic(
 	},
 );
 
-export function Dashboard() {
+export function Dashboard({
+	organizationId: organizationIdProp,
+	organizationSlug: organizationSlugProp,
+	initialPermissions,
+}: {
+	organizationId?: string;
+	organizationSlug?: string;
+	initialPermissions?: {
+		permissions: Permissions | null;
+		roleType: string | null;
+		isOwner: boolean;
+	};
+} = {}) {
 	const t = useTranslations();
 	const { activeOrganization } = useActiveOrganization();
-	const organizationSlug = activeOrganization?.slug ?? "";
-	const organizationId = activeOrganization?.id ?? "";
+	// Server props take precedence: during SSR the providers above the org
+	// layout's HydrationBoundary haven't resolved yet, so context values are
+	// empty on the server — props keep the first paint correct.
+	const organizationSlug = organizationSlugProp ?? activeOrganization?.slug ?? "";
+	const organizationId = organizationIdProp ?? activeOrganization?.id ?? "";
 
 	// Widget permissions (RBAC-UI): each dashboard widget requires the same
 	// permission as its sidebar entry. Queries for hidden widgets are skipped
 	// entirely — no forbidden RPCs, no 403 noise.
 	const {
-		can,
-		canAny,
-		isOwner,
-		permissions,
+		isOwner: ctxIsOwner,
+		permissions: ctxPermissions,
 		isLoading: permsLoading,
 	} = usePermission();
-	const showFinance = isOwner || can("finance", "view");
-	const showProjects = isOwner || canAny("projects");
+	const permissions = ctxPermissions ?? initialPermissions?.permissions ?? null;
+	const isOwner = ctxIsOwner || (initialPermissions?.isOwner ?? false);
+	const showFinance = isOwner || (permissions?.finance?.view ?? false);
+	const showProjects =
+		isOwner || Object.values(permissions?.projects ?? {}).some(Boolean);
 
 	const { data: dashboardData, isLoading: statsLoading } = useQuery({
 		...orpc.dashboard.getAll.queryOptions({

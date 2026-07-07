@@ -54,7 +54,8 @@ async function OrganizationPageContent({
 	// Server-prefetch the three dashboard queries with the SAME permission
 	// gating and inputs the client Dashboard uses, so it paints with data on
 	// first load instead of a full-page skeleton → content swap.
-	const { permissions, isOwner } = await cachedGetMyPermissions(organizationId);
+	const myPermissions = await cachedGetMyPermissions(organizationId);
+	const { permissions, isOwner } = myPermissions;
 	const showFinance = isOwner || (permissions?.finance?.view ?? false);
 	const showProjects =
 		isOwner ||
@@ -95,7 +96,11 @@ async function OrganizationPageContent({
 
 	return (
 		<HydrationBoundary state={dehydrate(queryClient)}>
-			<OrganizationStart />
+			<OrganizationStart
+				organizationId={organizationId}
+				organizationSlug={organizationSlug}
+				initialPermissions={myPermissions}
+			/>
 		</HydrationBoundary>
 	);
 }
