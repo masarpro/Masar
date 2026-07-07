@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+# tsc/next build on this codebase need >4GB heap — default OOMs locally
+export NODE_OPTIONS="--max-old-space-size=12288"
+
 echo "🔍 Running type-check before push..."
 pnpm --filter @repo/web type-check
 if [ $? -ne 0 ]; then
@@ -13,7 +16,9 @@ fi
 echo "✅ Type-check passed — نجح فحص الأنواع"
 echo ""
 echo "🏗️  Running full build (catches Next.js-specific errors Vercel will hit)..."
-pnpm --filter @repo/web build
+# dotenv wrapper is REQUIRED: a bare filtered build has no DATABASE_URL and
+# dies collecting page data (api/cron routes). turbo reuses the build cache.
+pnpm exec dotenv -c -- pnpm exec turbo build --filter=@repo/web
 if [ $? -ne 0 ]; then
 	echo ""
 	echo "❌ Build failed — فشل البناء"
