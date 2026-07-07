@@ -2,7 +2,7 @@ import { getActiveOrganization, getSession } from "@saas/auth/lib/server";
 import { PricingDashboard } from "@saas/pricing/components/dashboard/PricingDashboard";
 import { PricingShell } from "@saas/pricing/components/shell";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
-import { orpc } from "@shared/lib/orpc-query-utils";
+import { orpcServer } from "@shared/lib/orpc-server";
 import { getServerQueryClient } from "@shared/lib/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { notFound } from "next/navigation";
@@ -53,7 +53,7 @@ async function PricingPageContent({
 	// data immediately instead of showing a skeleton after hydration.
 	const queryClient = getServerQueryClient();
 	await queryClient.prefetchQuery(
-		orpc.pricing.dashboard.queryOptions({
+		orpcServer.pricing.dashboard.queryOptions({
 			input: { organizationId: activeOrganization.id },
 		}),
 	);

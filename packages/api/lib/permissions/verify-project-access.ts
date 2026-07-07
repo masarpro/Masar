@@ -1,8 +1,9 @@
 import { ORPCError } from "@orpc/server";
-import { db, getProjectById, isProjectMember } from "@repo/database";
+import { isProjectMember } from "@repo/database";
 import { hasPermission, type Permissions } from "@repo/database/prisma/permissions";
 import { logBusinessEvent } from "@repo/logs";
 import {
+	getCachedProjectForAccess,
 	getCachedUserPermissions,
 	getCachedUserProjectScope,
 } from "./permission-cache";
@@ -61,7 +62,7 @@ export async function verifyProjectAccess(
 	// (membership → project → permission → assignment) is preserved below.
 	const [membership, project, permissions, scope] = await Promise.all([
 		verifyOrganizationMembership(organizationId, userId),
-		getProjectById(projectId, organizationId),
+		getCachedProjectForAccess(projectId, organizationId),
 		getCachedUserPermissions(userId, organizationId),
 		getCachedUserProjectScope(userId, organizationId),
 	]);

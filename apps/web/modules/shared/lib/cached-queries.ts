@@ -1,7 +1,7 @@
 import "server-only";
 import {
 	getCachedUserPermissions,
-	getUserRoleType,
+	getCachedUserRoleType,
 } from "@repo/api/lib/permissions";
 import {
 	db,
@@ -64,7 +64,7 @@ export const cachedGetMyPermissions = cache(
 
 		const [permissions, roleType] = await Promise.all([
 			getCachedUserPermissions(session.user.id, organizationId),
-			getUserRoleType(session.user.id, organizationId),
+			getCachedUserRoleType(session.user.id, organizationId),
 		]);
 
 		return {

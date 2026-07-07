@@ -1,6 +1,6 @@
 import { z } from "zod";
 import {
-	getUserRoleType,
+	getCachedUserRoleType,
 	verifyOrganizationAccess,
 } from "../../../lib/permissions";
 import { protectedProcedure } from "../../../orpc/procedures";
@@ -32,7 +32,10 @@ export const getMine = protectedProcedure
 			context.user.id,
 		);
 
-		const roleType = await getUserRoleType(context.user.id, organizationId);
+		const roleType = await getCachedUserRoleType(
+			context.user.id,
+			organizationId,
+		);
 
 		return {
 			permissions,

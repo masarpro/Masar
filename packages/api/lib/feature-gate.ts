@@ -1,5 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@repo/database";
+import { invalidateSubscriptionCache } from "../orpc/middleware/subscription-middleware";
 
 export type FeatureKey =
 	| "projects.create"
@@ -76,6 +77,7 @@ export async function checkFeatureAccess(
 			where: { id: organizationId },
 			data: { status: "ACTIVE", plan: "FREE" },
 		});
+		invalidateSubscriptionCache(organizationId);
 		effectivePlan = "FREE";
 	}
 

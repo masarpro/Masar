@@ -2,7 +2,7 @@ import { getActiveOrganization, getSession } from "@saas/auth/lib/server";
 import { PageContextProvider } from "@saas/ai/components/PageContextProvider";
 import { ProjectsList } from "@saas/projects/components/ProjectsList";
 import { CardGridSkeleton } from "@saas/shared/components/skeletons";
-import { orpc } from "@shared/lib/orpc-query-utils";
+import { orpcServer } from "@shared/lib/orpc-server";
 import { getServerQueryClient } from "@shared/lib/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { notFound, redirect } from "next/navigation";
@@ -57,7 +57,7 @@ async function ProjectsPageContent({
 	// "all" → undefined, empty search → undefined) for the cache key to match.
 	const queryClient = getServerQueryClient();
 	await queryClient.prefetchQuery(
-		orpc.projects.list.queryOptions({
+		orpcServer.projects.list.queryOptions({
 			input: {
 				organizationId: activeOrganization.id,
 				status: undefined,

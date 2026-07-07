@@ -71,18 +71,22 @@ export function Dashboard() {
 		enabled: !!organizationId && showProjects,
 	});
 
-	if (
-		!organizationId ||
-		(permsLoading && !permissions && !isOwner) ||
-		statsLoading ||
-		finLoading ||
-		projLoading
-	) {
+	// Only the permission layer gates the whole page (the layout can't be known
+	// without it). Data queries gate their own section below, so a slow query
+	// no longer blanks the entire dashboard behind one skeleton.
+	if (!organizationId || (permsLoading && !permissions && !isOwner)) {
 		return <HomeDashboardSkeleton />;
 	}
 
 	const stats = dashboardData?.stats ?? null;
 	const projects = projectsData?.projects ?? [];
+
+	const sectionSkeleton = (
+		<div className="h-[300px] animate-pulse rounded-lg bg-muted" />
+	);
+	const cardSkeleton = (
+		<div className="h-[220px] animate-pulse rounded-lg bg-muted" />
+	);
 
 	return (
 		<div className="flex flex-col gap-5 p-4 pt-2 md:p-6 md:pt-3 lg:p-8 lg:pt-4 overflow-hidden">
@@ -98,20 +102,26 @@ export function Dashboard() {
 						showFinance && showProjects ? "lg:grid-cols-2" : ""
 					}`}
 				>
-					{showFinance && (
-						<FinancePanel
-							bankBalance={orgFinance?.balances?.totalBankBalance ?? 0}
-							cashBalance={orgFinance?.balances?.totalCashBalance ?? 0}
-							financialTrend={dashboardData?.financialTrend ?? []}
-							organizationSlug={organizationSlug}
-						/>
-					)}
-					{showProjects && (
-						<ActiveProjectsSection
-							projects={projects}
-							organizationSlug={organizationSlug}
-						/>
-					)}
+					{showFinance &&
+						(finLoading || statsLoading ? (
+							sectionSkeleton
+						) : (
+							<FinancePanel
+								bankBalance={orgFinance?.balances?.totalBankBalance ?? 0}
+								cashBalance={orgFinance?.balances?.totalCashBalance ?? 0}
+								financialTrend={dashboardData?.financialTrend ?? []}
+								organizationSlug={organizationSlug}
+							/>
+						))}
+					{showProjects &&
+						(projLoading ? (
+							sectionSkeleton
+						) : (
+							<ActiveProjectsSection
+								projects={projects}
+								organizationSlug={organizationSlug}
+							/>
+						))}
 				</div>
 			)}
 
@@ -122,15 +132,18 @@ export function Dashboard() {
 
 			{/* Row 3: Operational + Recent Docs + (Alerts + DidYouKnow stacked) */}
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-				{showProjects && (
-					<OperationalSection
-						activeProjects={stats?.projects?.active ?? 0}
-						completedProjects={stats?.projects?.completed ?? 0}
-						onHoldProjects={stats?.projects?.onHold ?? 0}
-						openIssues={stats?.milestones?.overdue ?? 0}
-						leadsPipeline={dashboardData?.leadsPipeline ?? {}}
-					/>
-				)}
+				{showProjects &&
+					(statsLoading ? (
+						cardSkeleton
+					) : (
+						<OperationalSection
+							activeProjects={stats?.projects?.active ?? 0}
+							completedProjects={stats?.projects?.completed ?? 0}
+							onHoldProjects={stats?.projects?.onHold ?? 0}
+							openIssues={stats?.milestones?.overdue ?? 0}
+							leadsPipeline={dashboardData?.leadsPipeline ?? {}}
+						/>
+					))}
 				{showProjects && (
 					<RecentDocumentsCard
 						organizationId={organizationId}
@@ -138,27 +151,30 @@ export function Dashboard() {
 					/>
 				)}
 				<div className="flex flex-col gap-3 lg:h-full">
-					{(showFinance || showProjects) && (
-						<AlertsSection
-							overdueInvoices={
-								showFinance ? (dashboardData?.overdue?.invoices ?? []) : []
-							}
-							overdueMilestones={
-								showProjects
-									? (dashboardData?.overdue?.milestones ?? [])
-									: []
-							}
-							pendingSubcontractClaims={
-								showFinance
-									? (dashboardData?.pendingSubcontractClaims ?? 0)
-									: 0
-							}
-							upcomingPayments={
-								showFinance ? (dashboardData?.upcoming ?? []) : []
-							}
-							organizationSlug={organizationSlug}
-						/>
-					)}
+					{(showFinance || showProjects) &&
+						(statsLoading ? (
+							cardSkeleton
+						) : (
+							<AlertsSection
+								overdueInvoices={
+									showFinance ? (dashboardData?.overdue?.invoices ?? []) : []
+								}
+								overdueMilestones={
+									showProjects
+										? (dashboardData?.overdue?.milestones ?? [])
+										: []
+								}
+								pendingSubcontractClaims={
+									showFinance
+										? (dashboardData?.pendingSubcontractClaims ?? 0)
+										: 0
+								}
+								upcomingPayments={
+									showFinance ? (dashboardData?.upcoming ?? []) : []
+								}
+								organizationSlug={organizationSlug}
+							/>
+						))}
 					<DidYouKnowCard organizationSlug={organizationSlug} />
 				</div>
 			</div>

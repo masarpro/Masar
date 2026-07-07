@@ -1,6 +1,10 @@
 import { getActiveOrganization } from "@saas/auth/lib/server";
 import OrganizationStart from "@saas/organizations/components/OrganizationStart";
 import { HomeDashboardSkeleton } from "@saas/shared/components/skeletons";
+import { cachedGetMyPermissions } from "@shared/lib/cached-queries";
+import { orpcServer } from "@shared/lib/orpc-server";
+import { getServerQueryClient } from "@shared/lib/server";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
@@ -45,5 +49,53 @@ async function OrganizationPageContent({
 		return notFound();
 	}
 
-	return <OrganizationStart />;
+	const organizationId = activeOrganization.id;
+
+	// Server-prefetch the three dashboard queries with the SAME permission
+	// gating and inputs the client Dashboard uses, so it paints with data on
+	// first load instead of a full-page skeleton → content swap.
+	const { permissions, isOwner } = await cachedGetMyPermissions(organizationId);
+	const showFinance = isOwner || (permissions?.finance?.view ?? false);
+	const showProjects =
+		isOwner ||
+		Object.values(permissions?.projects ?? {}).some(Boolean);
+
+	const queryClient = getServerQueryClient();
+	const prefetches: Promise<void>[] = [];
+
+	if (showFinance || showProjects) {
+		prefetches.push(
+			queryClient.prefetchQuery(
+				orpcServer.dashboard.getAll.queryOptions({
+					input: { organizationId, activitiesLimit: 5, upcomingLimit: 5 },
+				}),
+			),
+		);
+	}
+	if (showFinance) {
+		prefetches.push(
+			queryClient.prefetchQuery(
+				orpcServer.finance.orgDashboard.queryOptions({
+					input: { organizationId },
+				}),
+			),
+		);
+	}
+	if (showProjects) {
+		prefetches.push(
+			queryClient.prefetchQuery(
+				orpcServer.projects.list.queryOptions({
+					input: { organizationId, status: "ACTIVE" as const },
+				}),
+			),
+		);
+	}
+
+	await Promise.all(prefetches);
+
+	return (
+		<HydrationBoundary state={dehydrate(queryClient)}>
+			<OrganizationStart />
+		</HydrationBoundary>
+	);
 }

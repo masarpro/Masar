@@ -1,5 +1,6 @@
 import { ORPCError } from "@orpc/client";
 import { db } from "@repo/database";
+import { invalidateSubscriptionCache } from "../../../orpc/middleware/subscription-middleware";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { rateLimitChecker, RATE_LIMITS } from "../../../lib/rate-limit";
 import { codeInput } from "../schema";
@@ -182,6 +183,10 @@ export const activate = protectedProcedure
 				where: { id: code.id },
 				data: { usedCount: { increment: 1 } },
 			});
+
+			// Safe inside the tx: invalidation only drops a cache entry, so a
+			// rollback merely causes one extra read on the next write RPC.
+			invalidateSubscriptionCache(orgId);
 
 			// Record usage
 			await tx.activationCodeUsage.create({

@@ -13,6 +13,7 @@ import { getPlanLimits } from "@repo/payments/stripe-products";
 // TODO(post-beta): Implement super-admin RBAC levels (viewer / editor / owner)
 // Currently all super-admin actions require user.role === "admin" via adminProcedure.
 // When adding more admins, introduce granular permissions for destructive actions.
+import { invalidateSubscriptionCache } from "../../../orpc/middleware/subscription-middleware";
 import { adminProcedure } from "../../../orpc/procedures";
 import {
 	activateOrgInput,
@@ -75,6 +76,7 @@ export const changePlan = adminProcedure
 				maxStorage: limits.maxStorageGB,
 			},
 		});
+		invalidateSubscriptionCache(input.organizationId);
 
 		logSuperAdminAction({
 			adminId: context.user.id,
@@ -106,6 +108,7 @@ export const suspend = adminProcedure
 				status: "SUSPENDED",
 			},
 		});
+		invalidateSubscriptionCache(input.organizationId);
 
 		logSuperAdminAction({
 			adminId: context.user.id,
@@ -185,6 +188,7 @@ export const activate = adminProcedure
 				status: "ACTIVE",
 			},
 		});
+		invalidateSubscriptionCache(input.organizationId);
 
 		logSuperAdminAction({
 			adminId: context.user.id,
@@ -216,6 +220,7 @@ export const setFreeOverride = adminProcedure
 				overrideAt: new Date(),
 			},
 		});
+		invalidateSubscriptionCache(input.organizationId);
 
 		logSuperAdminAction({
 			adminId: context.user.id,

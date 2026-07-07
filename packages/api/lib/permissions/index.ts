@@ -15,5 +15,6 @@ export {
 	getCachedOrganizationMembership,
 	getCachedUserPermissions,
 	getCachedUserProjectScope,
+	getCachedUserRoleType,
 	invalidateAccessCache,
 } from "./permission-cache";

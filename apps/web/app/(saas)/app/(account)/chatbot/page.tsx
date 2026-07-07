@@ -1,7 +1,7 @@
 import { AiChat } from "@saas/ai/components/AiChat";
 import { PageHeader } from "@saas/shared/components/PageHeader";
-import { orpcClient } from "@shared/lib/orpc-client";
 import { orpc } from "@shared/lib/orpc-query-utils";
+import { orpcServer, orpcServerClient } from "@shared/lib/orpc-server";
 import { getServerQueryClient } from "@shared/lib/server";
 
 export const dynamic = 'force-dynamic';
@@ -10,7 +10,7 @@ export default async function AiDemoPage() {
 	const queryClient = getServerQueryClient();
 
 	const chats = await (async () => {
-		const { chats } = await orpcClient.ai.chats.list();
+		const { chats } = await orpcServerClient.ai.chats.list();
 
 		return chats;
 	})();
@@ -24,7 +24,7 @@ export default async function AiDemoPage() {
 
 	if (chats.length > 0) {
 		await queryClient.prefetchQuery(
-			orpc.ai.chats.find.queryOptions({
+			orpcServer.ai.chats.find.queryOptions({
 				input: {
 					id: chats[0].id,
 				},

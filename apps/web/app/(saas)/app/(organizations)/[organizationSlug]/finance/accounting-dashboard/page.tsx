@@ -3,7 +3,7 @@ import { getActiveOrganization } from "@saas/auth/lib/server";
 import { AccountingDashboard } from "@saas/finance/components/accounting/AccountingDashboard";
 import { FinanceShell } from "@saas/finance/components/shell";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
-import { orpc } from "@shared/lib/orpc-query-utils";
+import { orpcServer } from "@shared/lib/orpc-server";
 import { getServerQueryClient } from "@shared/lib/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { notFound } from "next/navigation";
@@ -39,13 +39,13 @@ async function PageContent({ organizationSlug }: { organizationSlug: string }) {
   const queryClient = getServerQueryClient();
   await Promise.all([
     queryClient.prefetchQuery(
-      orpc.accounting.dashboard.queryOptions({ input: { organizationId } }),
+      orpcServer.accounting.dashboard.queryOptions({ input: { organizationId } }),
     ),
     queryClient.prefetchQuery(
-      orpc.accounting.health.check.queryOptions({ input: { organizationId } }),
+      orpcServer.accounting.health.check.queryOptions({ input: { organizationId } }),
     ),
     queryClient.prefetchQuery(
-      orpc.accounting.ownerDrawings.companySummary.queryOptions({
+      orpcServer.accounting.ownerDrawings.companySummary.queryOptions({
         input: { organizationId },
       }),
     ),

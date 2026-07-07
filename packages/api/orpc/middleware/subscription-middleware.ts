@@ -10,15 +10,38 @@ import { logBusinessEvent } from "@repo/logs";
  * - Super admins (user.role === "admin")
  * - Organizations with isFreeOverride === true
  */
-export async function checkSubscription(context: {
-	user: { id: string; role?: string | null };
-	session: { activeOrganizationId?: string | null };
-}) {
-	// Super admins bypass all checks
-	if (context.user.role === "admin") return;
 
-	const orgId = context.session.activeOrganizationId;
-	if (!orgId) return;
+type OrgSubscription = {
+	status: string;
+	plan: string;
+	isFreeOverride: boolean;
+	trialEndsAt: Date | null;
+} | null;
+
+// Process-local 30s cache: this query ran on EVERY write RPC (~20-30ms
+// Dubai↔Mumbai each). Same tradeoffs as lib/permissions/permission-cache.ts —
+// per-instance only, so cross-instance changes (e.g. Stripe webhooks) converge
+// within one TTL; in-process plan changes call invalidateSubscriptionCache.
+const SUBSCRIPTION_TTL_MS = 30_000;
+const MAX_ENTRIES = 5_000;
+const subscriptionCache = new Map<
+	string,
+	{ value: OrgSubscription; expires: number }
+>();
+
+export function invalidateSubscriptionCache(organizationId?: string): void {
+	if (organizationId) {
+		subscriptionCache.delete(organizationId);
+		return;
+	}
+	subscriptionCache.clear();
+}
+
+async function getOrgSubscription(orgId: string): Promise<OrgSubscription> {
+	const hit = subscriptionCache.get(orgId);
+	if (hit && hit.expires > Date.now()) {
+		return hit.value;
+	}
 
 	const org = await db.organization.findUnique({
 		where: { id: orgId },
@@ -29,6 +52,29 @@ export async function checkSubscription(context: {
 			trialEndsAt: true,
 		},
 	});
+
+	if (subscriptionCache.size >= MAX_ENTRIES) {
+		subscriptionCache.clear();
+	}
+	subscriptionCache.set(orgId, {
+		value: org,
+		expires: Date.now() + SUBSCRIPTION_TTL_MS,
+	});
+
+	return org;
+}
+
+export async function checkSubscription(context: {
+	user: { id: string; role?: string | null };
+	session: { activeOrganizationId?: string | null };
+}) {
+	// Super admins bypass all checks
+	if (context.user.role === "admin") return;
+
+	const orgId = context.session.activeOrganizationId;
+	if (!orgId) return;
+
+	const org = await getOrgSubscription(orgId);
 
 	if (!org) return;
 
@@ -52,6 +98,7 @@ export async function checkSubscription(context: {
 			where: { id: orgId },
 			data: { status: "ACTIVE", plan: "FREE" },
 		});
+		invalidateSubscriptionCache(orgId);
 		logBusinessEvent({
 			type: "subscription.expired",
 			userId: context.user.id,

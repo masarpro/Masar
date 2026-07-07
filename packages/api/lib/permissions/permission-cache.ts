@@ -1,6 +1,10 @@
-import { getOrganizationMembership } from "@repo/database";
+import { db, getOrganizationMembership } from "@repo/database";
 import type { Permissions } from "@repo/database/prisma/permissions";
-import { getUserPermissions, getUserProjectScope } from "./get-user-permissions";
+import {
+	getUserPermissions,
+	getUserProjectScope,
+	getUserRoleType,
+} from "./get-user-permissions";
 
 /**
  * Short-lived, process-local cache for the two DB queries that run on the
@@ -35,6 +39,16 @@ type ProjectScope = Awaited<ReturnType<typeof getUserProjectScope>>;
 const membershipCache = new Map<string, Entry<Membership>>();
 const permissionsCache = new Map<string, Entry<Permissions>>();
 const projectScopeCache = new Map<string, Entry<ProjectScope>>();
+const roleTypeCache = new Map<string, Entry<string | null>>();
+
+type ProjectAccessRow = {
+	id: string;
+	name: string;
+	slug: string;
+	organizationId: string;
+} | null;
+
+const projectRowCache = new Map<string, Entry<ProjectAccessRow>>();
 
 function cacheKey(organizationId: string, userId: string): string {
 	return `${organizationId}:${userId}`;
@@ -88,6 +102,20 @@ export async function getCachedUserPermissions(
 	return value;
 }
 
+export async function getCachedUserRoleType(
+	userId: string,
+	organizationId: string,
+): Promise<string | null> {
+	const key = cacheKey(organizationId, userId);
+	const hit = read(roleTypeCache, key);
+	if (hit) {
+		return hit.value;
+	}
+	const value = await getUserRoleType(userId, organizationId);
+	write(roleTypeCache, key, value);
+	return value;
+}
+
 export async function getCachedUserProjectScope(
 	userId: string,
 	organizationId: string,
@@ -99,6 +127,31 @@ export async function getCachedUserProjectScope(
 	}
 	const value = await getUserProjectScope(userId, organizationId);
 	write(projectScopeCache, key, value);
+	return value;
+}
+
+/**
+ * Minimal, org-scoped project lookup for verifyProjectAccess. Replaces the
+ * uncached getProjectById (which also joined createdBy + coverPhoto) on the
+ * hot path of every project-scoped RPC. Staleness tradeoffs: a renamed
+ * project shows the old name in audit metadata for ≤TTL; a deleted project
+ * passes the existence check for ≤TTL but every handler query is still
+ * scoped by projectId+organizationId and just returns empty.
+ */
+export async function getCachedProjectForAccess(
+	projectId: string,
+	organizationId: string,
+): Promise<ProjectAccessRow> {
+	const key = `${organizationId}:${projectId}`;
+	const hit = read(projectRowCache, key);
+	if (hit) {
+		return hit.value;
+	}
+	const value = await db.project.findFirst({
+		where: { id: projectId, organizationId },
+		select: { id: true, name: true, slug: true, organizationId: true },
+	});
+	write(projectRowCache, key, value);
 	return value;
 }
 
@@ -120,6 +173,7 @@ export function invalidateAccessCache(
 		membershipCache.delete(key);
 		permissionsCache.delete(key);
 		projectScopeCache.delete(key);
+		roleTypeCache.delete(key);
 		return;
 	}
 
@@ -137,6 +191,11 @@ export function invalidateAccessCache(
 	for (const key of projectScopeCache.keys()) {
 		if (key.startsWith(prefix)) {
 			projectScopeCache.delete(key);
+		}
+	}
+	for (const key of roleTypeCache.keys()) {
+		if (key.startsWith(prefix)) {
+			roleTypeCache.delete(key);
 		}
 	}
 }

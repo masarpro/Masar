@@ -12,8 +12,15 @@ import { memo, useState } from "react";
 import { useSidebar } from "./sidebar-context";
 import type { SidebarMenuChild, SidebarMenuItem } from "./use-sidebar-menu";
 
-/** Top-level items that benefit from eager prefetch */
+/** Top-level items that benefit from eager FULL prefetch. Everything else
+ * falls back to Next's default (partial prefetch to the nearest loading.tsx
+ * on viewport) instead of prefetch={false}, which forced a fully cold
+ * navigation on every non-whitelisted link. */
 const PREFETCH_IDS = new Set(["start", "projects", "finance", "company", "pricing", "orgSettings", "accountSettings"]);
+
+/** true → eager full prefetch; undefined → Next default (partial on viewport) */
+const prefetchMode = (id: string): true | undefined =>
+	PREFETCH_IDS.has(id) ? true : undefined;
 
 interface SidebarNavProps {
 	items: SidebarMenuItem[];
@@ -119,7 +126,7 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 									<Link
 										href={item.href}
 										onClick={closeMobile}
-										prefetch={PREFETCH_IDS.has(item.id)}
+										prefetch={prefetchMode(item.id)}
 										className="flex flex-1 min-w-0 items-center gap-3"
 									>
 										<item.icon
@@ -204,7 +211,7 @@ export function SidebarNav({ items, activeId, collapsed }: SidebarNavProps) {
 						key={item.id}
 						href={href}
 						onClick={closeMobile}
-						prefetch={PREFETCH_IDS.has(item.id)}
+						prefetch={prefetchMode(item.id)}
 						className={navItemClasses(isActive, false, collapsed)}
 						aria-label={collapsed ? item.label : undefined}
 					>

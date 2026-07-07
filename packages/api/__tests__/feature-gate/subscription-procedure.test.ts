@@ -18,7 +18,10 @@ vi.mock("@repo/database", () => ({
 }));
 
 import { db } from "@repo/database";
-import { checkSubscription } from "../../orpc/middleware/subscription-middleware";
+import {
+	checkSubscription,
+	invalidateSubscriptionCache,
+} from "../../orpc/middleware/subscription-middleware";
 
 const mockOrgFind = db.organization.findUnique as ReturnType<typeof vi.fn>;
 const mockOrgUpdate = db.organization.update as ReturnType<typeof vi.fn>;
@@ -60,6 +63,9 @@ function mockOrg(overrides: {
 
 beforeEach(() => {
 	vi.clearAllMocks();
+	// checkSubscription caches the org row for 30s per process — clear between
+	// tests so each case's mocked org value is actually read.
+	invalidateSubscriptionCache();
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
