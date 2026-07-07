@@ -38,8 +38,8 @@ export const createSubcontractProcedure = subscriptionProcedure
 			scopeOfWork: nullishTrimmed(MAX_LONG_TEXT),
 			notes: nullishTrimmed(MAX_DESC),
 			includesVat: z.boolean().optional(),
-			vatPercent: percentage().nullish(),
-			retentionPercent: percentage().nullish(),
+			vatPercent: percentage().nullish().transform((v) => v ?? undefined),
+			retentionPercent: percentage().nullish().transform((v) => v ?? undefined),
 			paymentMethod: z
 				.enum(["CASH", "BANK_TRANSFER", "CHEQUE", "CREDIT_CARD", "OTHER"])
 				.nullish(),
@@ -93,7 +93,7 @@ export const createSubcontractProcedure = subscriptionProcedure
 			entityType: "subcontract",
 			entityId: contract.id,
 			metadata: { name: input.name, value: input.value },
-		}).catch(() => {});
+		}).catch((e) => console.error("[Subcontracts] audit log failed:", e));
 
 		const project = await db.project.findFirst({
 			where: { id: input.projectId, organizationId: input.organizationId },

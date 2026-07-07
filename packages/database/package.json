@@ -4,6 +4,7 @@
 		"@prisma/adapter-pg": "^7.1.0",
 		"@prisma/client": "7.1.0",
 		"@repo/config": "workspace:*",
+		"@repo/utils": "workspace:*",
 		"@sindresorhus/slugify": "^2.2.1",
 		"@types/pg": "^8.18.0",
 		"nanoid": "^5.1.5",

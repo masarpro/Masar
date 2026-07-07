@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import {
 	getPayrollRuns,
 	getPayrollRunById,
@@ -88,7 +89,7 @@ export const getPayrollRun = protectedProcedure
 
 		const run = await getPayrollRunById(input.id, input.organizationId);
 		if (!run) {
-			throw new Error("Payroll run not found");
+			throw new ORPCError("NOT_FOUND", { message: "مسير الرواتب غير موجود" });
 		}
 		return run;
 	});
@@ -128,7 +129,7 @@ export const createPayrollRunProcedure = subscriptionProcedure
 		} catch (err: any) {
 			// Unique constraint violation (duplicate month/year)
 			if (err?.code === "P2002") {
-				throw new Error(`دورة رواتب لشهر ${input.month}/${input.year} موجودة بالفعل`);
+				throw new ORPCError("CONFLICT", { message: `دورة رواتب لشهر ${input.month}/${input.year} موجودة بالفعل` });
 			}
 			throw err;
 		}
@@ -197,12 +198,23 @@ export const approvePayrollRunProcedure = subscriptionProcedure
 			resolvedBankId = defaultBank?.id;
 		}
 
-		// Store the bank account on the payroll run
+		// Store the bank account on the payroll run — a lost write here makes the
+		// stored record disagree with the journal entry, so log it loudly.
 		if (resolvedBankId) {
 			await db.payrollRun.update({
 				where: { id: input.id },
 				data: { sourceAccountId: resolvedBankId },
-			}).catch(() => {});
+			}).catch(async (e) => {
+				console.error("[Payroll] Failed to store sourceAccountId on run:", e);
+				await orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "payroll_run",
+					entityId: input.id,
+					metadata: { type: "PAYROLL_BANK_LINK_FAILED", error: String(e), sourceAccountId: resolvedBankId },
+				});
+			});
 		}
 
 		// Auto-Journal: generate accounting entry for payroll approval

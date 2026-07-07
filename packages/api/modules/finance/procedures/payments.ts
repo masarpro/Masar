@@ -271,7 +271,71 @@ export const updateOrgPaymentProcedure = subscriptionProcedure
 
 		const { organizationId, id, ...data } = input;
 
+		// Snapshot journal-relevant fields BEFORE the update: changing date or
+		// projectId must rebuild the ORG_PAYMENT entry, otherwise the ledger
+		// keeps the old period/cost-center forever.
+		const before = await db.financePayment.findFirst({
+			where: { id, organizationId },
+			select: { date: true, projectId: true },
+		});
+
 		const payment = await updatePayment(id, organizationId, data);
+
+		const journalFieldsChanged =
+			!!before &&
+			((input.date !== undefined &&
+				new Date(input.date).getTime() !== before.date.getTime()) ||
+				(input.projectId !== undefined &&
+					input.projectId !== before.projectId));
+
+		if (journalFieldsChanged) {
+			try {
+				const { reverseAutoJournalEntry, onOrganizationPaymentReceived } =
+					await import("../../../lib/accounting/auto-journal");
+				await reverseAutoJournalEntry(db, {
+					organizationId,
+					referenceType: "ORG_PAYMENT",
+					referenceId: id,
+					userId: context.user.id,
+				});
+				const fresh = await db.financePayment.findFirst({
+					where: { id, organizationId },
+					select: {
+						id: true,
+						amount: true,
+						date: true,
+						description: true,
+						destinationAccountId: true,
+						projectId: true,
+					},
+				});
+				if (fresh?.destinationAccountId) {
+					await onOrganizationPaymentReceived(db, {
+						id: fresh.id,
+						organizationId,
+						amount: fresh.amount,
+						date: fresh.date,
+						description: fresh.description ?? "مقبوضات",
+						destinationAccountId: fresh.destinationAccountId,
+						projectId: fresh.projectId,
+						userId: context.user.id,
+					});
+				}
+			} catch (e) {
+				console.error(
+					"[AutoJournal] Failed to rebuild entry for updated payment:",
+					e,
+				);
+				await orgAuditLog({
+					organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: id,
+					metadata: { error: String(e), referenceType: "ORG_PAYMENT" },
+				});
+			}
+		}
 
 		orgAuditLog({
 			organizationId,

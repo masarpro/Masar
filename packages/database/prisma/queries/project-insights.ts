@@ -155,26 +155,55 @@ export async function getProjectInsights(
 	// Compute current alerts
 	const computedAlerts = await computeProjectAlerts(organizationId, projectId);
 
-	// Upsert alerts (create if not exists based on dedupeKey)
-	for (const alert of computedAlerts) {
-		await db.projectAlert.upsert({
-			where: { dedupeKey: alert.dedupeKey },
-			create: {
-				organizationId,
-				projectId,
-				type: alert.type,
-				severity: alert.severity,
-				title: alert.title,
-				description: alert.description,
-				dedupeKey: alert.dedupeKey,
+	// Upsert alerts (create if not exists based on dedupeKey).
+	// This runs on EVERY read, so prefetch the existing rows in one query and
+	// only upsert alerts that are new or whose written fields (title,
+	// description, severity — exactly what the update block sets) actually
+	// changed. Steady-state polls now cost 1 query instead of one per alert.
+	if (computedAlerts.length > 0) {
+		const existingAlerts = await db.projectAlert.findMany({
+			where: {
+				dedupeKey: { in: computedAlerts.map((a) => a.dedupeKey) },
 			},
-			update: {
-				// Update title/description if rule logic changed
-				title: alert.title,
-				description: alert.description,
-				severity: alert.severity,
+			select: {
+				dedupeKey: true,
+				title: true,
+				description: true,
+				severity: true,
 			},
 		});
+		const existingByKey = new Map(
+			existingAlerts.map((a) => [a.dedupeKey, a]),
+		);
+
+		for (const alert of computedAlerts) {
+			const existing = existingByKey.get(alert.dedupeKey);
+			const unchanged =
+				existing &&
+				existing.title === alert.title &&
+				existing.description === alert.description &&
+				existing.severity === alert.severity;
+			if (unchanged) continue;
+
+			await db.projectAlert.upsert({
+				where: { dedupeKey: alert.dedupeKey },
+				create: {
+					organizationId,
+					projectId,
+					type: alert.type,
+					severity: alert.severity,
+					title: alert.title,
+					description: alert.description,
+					dedupeKey: alert.dedupeKey,
+				},
+				update: {
+					// Update title/description if rule logic changed
+					title: alert.title,
+					description: alert.description,
+					severity: alert.severity,
+				},
+			});
+		}
 	}
 
 	// Get all active (unacknowledged) alerts for the project

@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import {
 	createBankAccount,
 	createBankChartAccount,
@@ -84,7 +85,7 @@ export const getBankAccount = protectedProcedure
 		const account = await getBankAccountById(input.id, input.organizationId);
 
 		if (!account) {
-			throw new Error("Bank account not found");
+			throw new ORPCError("NOT_FOUND", { message: "الحساب البنكي غير موجود" });
 		}
 
 		return account;

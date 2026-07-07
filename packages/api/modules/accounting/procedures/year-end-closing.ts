@@ -1,6 +1,7 @@
 // Year-End Closing — إقفال نهاية السنة المالية
 // Preview + Execute + History + Reverse
 
+import { ORPCError } from "@orpc/server";
 import {
 	createJournalEntry,
 	getJournalIncomeStatement,
@@ -344,7 +345,9 @@ export const executeYearEndProcedure = subscriptionProcedure
 			},
 		});
 		if (existing && existing.status !== "REVERSED") {
-			throw new Error("تم إقفال هذه السنة المالية مسبقاً — لا يمكن إقفالها مرة أخرى");
+			throw new ORPCError("BAD_REQUEST", {
+				message: "تم إقفال هذه السنة المالية مسبقاً — لا يمكن إقفالها مرة أخرى",
+			});
 		}
 
 		// Step 2: Get income statement for the year
@@ -399,41 +402,41 @@ export const executeYearEndProcedure = subscriptionProcedure
 			}> = [];
 
 			for (const acct of accountBalances) {
-				const debit = Number(acct.totalDebit);
-				const credit = Number(acct.totalCredit);
+				const debit = new Prisma.Decimal(acct.totalDebit);
+				const credit = new Prisma.Decimal(acct.totalCredit);
 
 				if (acct.type === "REVENUE") {
 					// Revenue accounts have credit balance — debit them to zero out
-					const balance = credit - debit;
-					if (balance > 0) {
+					const balance = credit.sub(debit).toDecimalPlaces(2);
+					if (balance.greaterThan(0)) {
 						closingLines.push({
 							accountId: acct.accountId,
-							debit: new Prisma.Decimal(balance.toFixed(2)),
+							debit: balance,
 							credit: ZERO,
 							description: `إقفال حساب إيرادات ${acct.code}`,
 						});
-					} else if (balance < 0) {
+					} else if (balance.lessThan(0)) {
 						closingLines.push({
 							accountId: acct.accountId,
 							debit: ZERO,
-							credit: new Prisma.Decimal(Math.abs(balance).toFixed(2)),
+							credit: balance.abs(),
 							description: `إقفال حساب إيرادات ${acct.code}`,
 						});
 					}
 				} else if (acct.type === "EXPENSE") {
 					// Expense accounts have debit balance — credit them to zero out
-					const balance = debit - credit;
-					if (balance > 0) {
+					const balance = debit.sub(credit).toDecimalPlaces(2);
+					if (balance.greaterThan(0)) {
 						closingLines.push({
 							accountId: acct.accountId,
 							debit: ZERO,
-							credit: new Prisma.Decimal(balance.toFixed(2)),
+							credit: balance,
 							description: `إقفال حساب مصروفات ${acct.code}`,
 						});
-					} else if (balance < 0) {
+					} else if (balance.lessThan(0)) {
 						closingLines.push({
 							accountId: acct.accountId,
-							debit: new Prisma.Decimal(Math.abs(balance).toFixed(2)),
+							debit: balance.abs(),
 							credit: ZERO,
 							description: `إقفال حساب مصروفات ${acct.code}`,
 						});
@@ -446,23 +449,35 @@ export const executeYearEndProcedure = subscriptionProcedure
 				where: { organizationId, code: "3200", isActive: true },
 			});
 			if (!retainedEarningsAccount) {
-				throw new Error("حساب الأرباح المبقاة (3200) غير موجود — يرجى إنشاء دليل الحسابات أولاً");
+				throw new ORPCError("NOT_FOUND", {
+					message: "حساب الأرباح المبقاة (3200) غير موجود — يرجى إنشاء دليل الحسابات أولاً",
+				});
 			}
 
-			// Net difference goes to 3200 (Retained Earnings)
-			if (netProfit > 0) {
+			// Net difference goes to 3200 (Retained Earnings).
+			// Derived from the SUM of the rounded closing lines themselves
+			// (line debits = revenue, line credits = expenses) so the entry
+			// always balances exactly.
+			const netProfitDecimal = closingLines
+				.reduce(
+					(sum, line) => sum.add(line.debit).sub(line.credit),
+					ZERO,
+				)
+				.toDecimalPlaces(2);
+
+			if (netProfitDecimal.greaterThan(0)) {
 				// Net profit — credit retained earnings
 				closingLines.push({
 					accountId: retainedEarningsAccount.id,
 					debit: ZERO,
-					credit: new Prisma.Decimal(netProfit.toFixed(2)),
+					credit: netProfitDecimal,
 					description: `صافي ربح السنة المالية ${fiscalYear} → أرباح مبقاة`,
 				});
-			} else if (netProfit < 0) {
+			} else if (netProfitDecimal.lessThan(0)) {
 				// Net loss — debit retained earnings
 				closingLines.push({
 					accountId: retainedEarningsAccount.id,
-					debit: new Prisma.Decimal(Math.abs(netProfit).toFixed(2)),
+					debit: netProfitDecimal.abs(),
 					credit: ZERO,
 					description: `صافي خسارة السنة المالية ${fiscalYear} → أرباح مبقاة`,
 				});
@@ -496,7 +511,7 @@ export const executeYearEndProcedure = subscriptionProcedure
 			});
 
 			let drawingsClosingEntry: { id: string } | null = null;
-			let totalDrawingsAmount = 0;
+			let totalDrawingsAmount = ZERO;
 
 			if (drawingsAccounts.length > 0) {
 				const drawingsBalanceRows = await tx.$queryRaw<
@@ -528,16 +543,20 @@ export const executeYearEndProcedure = subscriptionProcedure
 				}> = [];
 
 				for (const row of drawingsBalanceRows) {
-					const balance = Number(row.totalDebit) - Number(row.totalCredit);
-					if (balance > 0) {
+					// Decimal end-to-end: the 3200 balancing line is accumulated from
+					// the SAME rounded per-line values so the entry balances exactly.
+					const balance = new Prisma.Decimal(row.totalDebit)
+						.sub(new Prisma.Decimal(row.totalCredit))
+						.toDecimalPlaces(2);
+					if (balance.greaterThan(0)) {
 						// Drawings accounts have debit balance — credit to zero out
 						drawingsLines.push({
 							accountId: row.accountId,
 							debit: ZERO,
-							credit: new Prisma.Decimal(balance.toFixed(2)),
+							credit: balance,
 							description: `إقفال حساب سحوبات شريك`,
 						});
-						totalDrawingsAmount += balance;
+						totalDrawingsAmount = totalDrawingsAmount.add(balance);
 					}
 				}
 
@@ -545,7 +564,7 @@ export const executeYearEndProcedure = subscriptionProcedure
 					// DR 3200 by total drawings
 					drawingsLines.push({
 						accountId: retainedEarningsAccount.id,
-						debit: new Prisma.Decimal(totalDrawingsAmount.toFixed(2)),
+						debit: totalDrawingsAmount,
 						credit: ZERO,
 						description: `إقفال سحوبات الشركاء → أرباح مبقاة ${fiscalYear}`,
 					});
@@ -614,10 +633,10 @@ export const executeYearEndProcedure = subscriptionProcedure
 					totalRevenue: new Prisma.Decimal(totalRevenue.toFixed(2)),
 					totalExpenses: new Prisma.Decimal(totalExpenses.toFixed(2)),
 					netProfit: new Prisma.Decimal(netProfit.toFixed(2)),
-					totalDrawings: new Prisma.Decimal(totalDrawingsAmount.toFixed(2)),
+					totalDrawings: totalDrawingsAmount,
 					retainedEarningsTransfer: new Prisma.Decimal(
-						(netProfit - totalDrawingsAmount).toFixed(2),
-					),
+						netProfit.toFixed(2),
+					).sub(totalDrawingsAmount),
 					closingJournalEntryId: closingEntry?.id ?? null,
 					drawingsClosingEntryId: drawingsClosingEntry?.id ?? null,
 					distributionDetails,
@@ -739,10 +758,14 @@ export const reverseYearEndProcedure = subscriptionProcedure
 		});
 
 		if (!closing) {
-			throw new Error("لا يوجد إقفال لهذه السنة المالية");
+			throw new ORPCError("NOT_FOUND", {
+				message: "لا يوجد إقفال لهذه السنة المالية",
+			});
 		}
 		if (closing.status === "REVERSED") {
-			throw new Error("تم عكس إقفال هذه السنة المالية مسبقاً");
+			throw new ORPCError("BAD_REQUEST", {
+				message: "تم عكس إقفال هذه السنة المالية مسبقاً",
+			});
 		}
 
 		// Reverse both journal entries if they exist

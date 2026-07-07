@@ -46,7 +46,7 @@ export const deleteSubcontractItemProcedure = subscriptionProcedure
 			entityType: "subcontract_item",
 			entityId: input.itemId,
 			metadata: { contractId: input.contractId },
-		}).catch(() => {});
+		}).catch((e) => console.error("[Subcontracts] audit log failed:", e));
 
 		return { success: true };
 	});

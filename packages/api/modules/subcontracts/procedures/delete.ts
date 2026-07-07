@@ -38,7 +38,7 @@ export const deleteSubcontractProcedure = subscriptionProcedure
 			entityType: "subcontract",
 			entityId: input.contractId,
 			metadata: {},
-		}).catch(() => {});
+		}).catch((e) => console.error("[Subcontracts] audit log failed:", e));
 
 		return { success: true, message: "تم حذف عقد الباطن بنجاح" };
 	});

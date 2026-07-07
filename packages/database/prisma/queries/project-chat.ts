@@ -184,23 +184,40 @@ export async function getUnreadChatCount(
 		where: { organizationId, projectId, userId },
 	});
 
+	// Each channel has its OWN lastReadAt cutoff, so a single count/groupBy
+	// can't express "createdAt > <that channel's cutoff>" per channel. Instead
+	// of one count query per channel on every poll, fetch the (few) messages
+	// newer than the OLDEST cutoff in ONE query and apply each channel's own
+	// cutoff in JS (3 round-trips per poll → 2).
 	const channels: MessageChannel[] = ["TEAM", "OWNER"];
+	const cutoffs = new Map<MessageChannel, Date>(
+		channels.map((channel) => [
+			channel,
+			lastReads.find((lr) => lr.channel === channel)?.lastReadAt ??
+				new Date(0),
+		]),
+	);
+	const minCutoff = new Date(
+		Math.min(...[...cutoffs.values()].map((d) => d.getTime())),
+	);
+
+	const recentMessages = await db.projectMessage.findMany({
+		where: {
+			organizationId,
+			projectId,
+			channel: { in: channels },
+			createdAt: { gt: minCutoff },
+			senderId: { not: userId },
+		},
+		select: { channel: true, createdAt: true },
+	});
+
 	let totalUnread = 0;
-
-	for (const channel of channels) {
-		const lastRead = lastReads.find((lr) => lr.channel === channel);
-		const lastReadAt = lastRead?.lastReadAt ?? new Date(0);
-
-		const count = await db.projectMessage.count({
-			where: {
-				organizationId,
-				projectId,
-				channel,
-				createdAt: { gt: lastReadAt },
-				senderId: { not: userId },
-			},
-		});
-		totalUnread += count;
+	for (const message of recentMessages) {
+		const cutoff = cutoffs.get(message.channel);
+		if (cutoff && message.createdAt > cutoff) {
+			totalUnread++;
+		}
 	}
 
 	return totalUnread;

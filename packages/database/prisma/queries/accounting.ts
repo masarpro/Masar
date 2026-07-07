@@ -1,6 +1,7 @@
 // Accounting Module — Chart of Accounts + Journal Entries
 // Uses ChartAccount (not Account, which is Better Auth's OAuth model)
 
+import { createId } from "@paralleldrive/cuid2";
 import { type PrismaClient, Prisma, type ChartAccountType, type NormalBalance } from "../generated/client";
 import { nextSequenceValue, formatSequenceNo } from "./sequences";
 
@@ -167,38 +168,37 @@ export async function seedChartOfAccounts(
 		return { created: 0, skipped: existingCount };
 	}
 
-	// Phase A: Create all accounts without parentId
+	// Phases A+B merged: pre-generate ids in JS so parentId can be resolved
+	// up-front, then batch-insert. Batching by level (roots first) guarantees
+	// every parent row exists before any child row references it via the
+	// self-referential FK — no reliance on within-statement FK semantics.
+	// 48 creates + ~40 parent updates → one createMany per level (3 total).
 	const accountMap = new Map<string, string>(); // code → id
-
 	for (const acc of DEFAULT_CHART_OF_ACCOUNTS) {
-		const created = await db.chartAccount.create({
-			data: {
-				organizationId,
-				code: acc.code,
-				nameAr: acc.nameAr,
-				nameEn: acc.nameEn,
-				type: acc.type,
-				normalBalance: acc.normalBalance,
-				level: acc.level,
-				isSystem: acc.isSystem,
-				isPostable: acc.isPostable,
-			},
-		});
-		accountMap.set(acc.code, created.id);
+		accountMap.set(acc.code, createId());
 	}
 
-	// Phase B: Link parents
-	for (const acc of DEFAULT_CHART_OF_ACCOUNTS) {
-		if (acc.parentCode) {
-			const parentId = accountMap.get(acc.parentCode);
-			const accountId = accountMap.get(acc.code);
-			if (parentId && accountId) {
-				await db.chartAccount.update({
-					where: { id: accountId },
-					data: { parentId },
-				});
-			}
-		}
+	const toRow = (acc: DefaultAccount): Prisma.ChartAccountCreateManyInput => ({
+		id: accountMap.get(acc.code) as string,
+		organizationId,
+		code: acc.code,
+		nameAr: acc.nameAr,
+		nameEn: acc.nameEn,
+		type: acc.type,
+		normalBalance: acc.normalBalance,
+		level: acc.level,
+		parentId: acc.parentCode ? (accountMap.get(acc.parentCode) ?? null) : null,
+		isSystem: acc.isSystem,
+		isPostable: acc.isPostable,
+	});
+
+	const levels = [...new Set(DEFAULT_CHART_OF_ACCOUNTS.map((a) => a.level))].sort(
+		(a, b) => a - b,
+	);
+	for (const level of levels) {
+		await db.chartAccount.createMany({
+			data: DEFAULT_CHART_OF_ACCOUNTS.filter((a) => a.level === level).map(toRow),
+		});
 	}
 
 	// Phase C: Create sub-accounts for existing bank accounts under 1110
@@ -209,28 +209,39 @@ export async function seedChartOfAccounts(
 
 	const cashParentId = accountMap.get("1110");
 	if (cashParentId && bankAccounts.length > 0) {
-		for (let i = 0; i < bankAccounts.length; i++) {
-			const bankCode = `11${(i + 1).toString().padStart(2, "0")}`;
-			const bankChartAccount = await db.chartAccount.create({
-				data: {
-					organizationId,
-					code: bankCode,
-					nameAr: bankAccounts[i].name,
-					nameEn: bankAccounts[i].name,
-					type: "ASSET",
-					normalBalance: "DEBIT",
-					level: 4,
-					parentId: cashParentId,
-					isSystem: false,
-					isPostable: true,
-				},
-			});
+		// One createMany for all bank chart accounts (ids pre-generated so the
+		// banks can be linked back in one statement below).
+		const bankChartAccountIds = bankAccounts.map(() => createId());
+		await db.chartAccount.createMany({
+			data: bankAccounts.map((bank, i) => ({
+				id: bankChartAccountIds[i],
+				organizationId,
+				code: `11${(i + 1).toString().padStart(2, "0")}`,
+				nameAr: bank.name,
+				nameEn: bank.name,
+				type: "ASSET" as ChartAccountType,
+				normalBalance: "DEBIT" as NormalBalance,
+				level: 4,
+				parentId: cashParentId,
+				isSystem: false,
+				isPostable: true,
+			})),
+		});
 
-			await db.organizationBank.update({
-				where: { id: bankAccounts[i].id },
-				data: { chartAccountId: bankChartAccount.id },
-			});
-		}
+		// Link banks → chart accounts in ONE batched UPDATE (VALUES join).
+		// Names verified in schema.prisma: @@map("organization_banks"),
+		// columns: id, @map("chart_account_id"), @map("updated_at").
+		const linkParams: string[] = [];
+		const linkValuesSql = bankAccounts
+			.map((bank, i) => {
+				linkParams.push(bank.id, bankChartAccountIds[i]);
+				return `($${linkParams.length - 1}::text, $${linkParams.length}::text)`;
+			})
+			.join(", ");
+		await db.$executeRawUnsafe(
+			`UPDATE organization_banks AS b SET chart_account_id = v.caid, updated_at = NOW() FROM (VALUES ${linkValuesSql}) AS v(id, caid) WHERE b.id = v.id`,
+			...linkParams,
+		);
 	}
 
 	return { created: DEFAULT_CHART_OF_ACCOUNTS.length + bankAccounts.length, skipped: 0 };
@@ -252,42 +263,56 @@ export async function createBankChartAccount(
 	});
 	if (!cashParent) return null;
 
-	// Find next available code under 1110
-	const lastChild = await db.chartAccount.findFirst({
-		where: { organizationId, parentId: cashParent.id },
-		orderBy: { code: "desc" },
-		select: { code: true },
-	});
+	// Retry on P2002: two banks created concurrently can compute the same next
+	// code under 1110 — the @@unique([organizationId, code]) constraint rejects
+	// the loser, so re-read the max and try again instead of surfacing a 500.
+	const MAX_ATTEMPTS = 3;
+	for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+		// Find next available code under 1110
+		const lastChild = await db.chartAccount.findFirst({
+			where: { organizationId, parentId: cashParent.id },
+			orderBy: { code: "desc" },
+			select: { code: true },
+		});
 
-	let nextCode: string;
-	if (lastChild) {
-		const lastNum = parseInt(lastChild.code, 10);
-		nextCode = (lastNum + 1).toString().padStart(4, "0");
-	} else {
-		nextCode = "1101";
+		let nextCode: string;
+		if (lastChild) {
+			const lastNum = parseInt(lastChild.code, 10);
+			nextCode = (lastNum + 1).toString().padStart(4, "0");
+		} else {
+			nextCode = "1101";
+		}
+
+		try {
+			const newAccount = await db.chartAccount.create({
+				data: {
+					organizationId,
+					code: nextCode,
+					nameAr: bankName,
+					nameEn: bankName,
+					type: "ASSET",
+					normalBalance: "DEBIT",
+					level: 4,
+					parentId: cashParent.id,
+					isSystem: false,
+					isPostable: true,
+				},
+			});
+
+			await db.organizationBank.update({
+				where: { id: bankId },
+				data: { chartAccountId: newAccount.id },
+			});
+
+			return newAccount.id;
+		} catch (e) {
+			const isUniqueViolation =
+				e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002";
+			if (!isUniqueViolation || attempt === MAX_ATTEMPTS) throw e;
+		}
 	}
 
-	const newAccount = await db.chartAccount.create({
-		data: {
-			organizationId,
-			code: nextCode,
-			nameAr: bankName,
-			nameEn: bankName,
-			type: "ASSET",
-			normalBalance: "DEBIT",
-			level: 4,
-			parentId: cashParent.id,
-			isSystem: false,
-			isPostable: true,
-		},
-	});
-
-	await db.organizationBank.update({
-		where: { id: bankId },
-		data: { chartAccountId: newAccount.id },
-	});
-
-	return newAccount.id;
+	return null;
 }
 
 // ========================================
@@ -738,8 +763,9 @@ export async function getAccountBalance(
 		_sum: { debit: true, credit: true },
 	});
 
-	const totalDebit = new Prisma.Decimal(Number(result._sum?.debit ?? 0));
-	const totalCredit = new Prisma.Decimal(Number(result._sum?.credit ?? 0));
+	// Aggregate sums are already Decimal — never round-trip through Number()
+	const totalDebit = new Prisma.Decimal(result._sum?.debit ?? 0);
+	const totalCredit = new Prisma.Decimal(result._sum?.credit ?? 0);
 
 	return totalDebit.sub(totalCredit);
 }
@@ -1770,71 +1796,86 @@ export async function saveOpeningBalances(
 	createdById: string,
 	entryDate?: Date,
 ): Promise<{ entryId: string }> {
-	// Filter out zero lines
-	const nonZeroLines = lines.filter((l) => l.debit > 0 || l.credit > 0);
-	if (nonZeroLines.length === 0) throw new Error("يجب إدخال رصيد واحد على الأقل");
+	// Filter out zero lines, working in Decimal end-to-end: float sums here can
+	// drift by fractions of a halala and fail createJournalEntry's exact
+	// Decimal balance check. Round each line to 2dp and derive the balancing
+	// line from those same rounded values.
+	const decimalLines = lines
+		.map((l) => ({
+			accountId: l.accountId,
+			debit: new Prisma.Decimal(l.debit).toDecimalPlaces(2),
+			credit: new Prisma.Decimal(l.credit).toDecimalPlaces(2),
+		}))
+		.filter((l) => l.debit.greaterThan(0) || l.credit.greaterThan(0));
+	if (decimalLines.length === 0) throw new Error("يجب إدخال رصيد واحد على الأقل");
 
-	const totalDebit = nonZeroLines.reduce((sum, l) => sum + l.debit, 0);
-	const totalCredit = nonZeroLines.reduce((sum, l) => sum + l.credit, 0);
+	const totalDebit = decimalLines.reduce((sum, l) => sum.add(l.debit), ZERO);
+	const totalCredit = decimalLines.reduce((sum, l) => sum.add(l.credit), ZERO);
 
 	// Calculate the balancing amount for Retained Earnings (3200)
-	const difference = totalDebit - totalCredit;
+	const difference = totalDebit.sub(totalCredit);
 	const retainedEarningsAccount = await db.chartAccount.findFirst({
 		where: { organizationId, code: "3200" },
 	});
 	if (!retainedEarningsAccount) throw new Error("حساب الأرباح المبقاة (3200) غير موجود");
 
-	// Build final lines including balancing entry
-	const finalLines: Array<{ accountId: string; debit: number; credit: number; description?: string }> = nonZeroLines.map((l) => ({
-		accountId: l.accountId,
-		debit: l.debit,
-		credit: l.credit,
-	}));
+	const finalLines: Array<{ accountId: string; debit: Prisma.Decimal; credit: Prisma.Decimal; description?: string }> =
+		decimalLines.map((l) => ({
+			accountId: l.accountId,
+			debit: l.debit,
+			credit: l.credit,
+		}));
 
-	if (Math.abs(difference) > 0.001) {
+	if (!difference.isZero()) {
 		finalLines.push({
 			accountId: retainedEarningsAccount.id,
-			debit: difference < 0 ? Math.abs(difference) : 0,
-			credit: difference > 0 ? difference : 0,
+			debit: difference.isNegative() ? difference.abs() : ZERO,
+			credit: difference.greaterThan(0) ? difference : ZERO,
 			description: "رصيد موازنة — أرباح مبقاة",
 		});
 	}
 
-	// Find the existing opening balance entry (do NOT delete yet — creating the
-	// replacement can fail if the period is closed or the lines don't balance;
-	// deleting first would then lose the balances permanently).
-	const existing = await db.journalEntry.findFirst({
-		where: { organizationId, referenceType: "OPENING_BALANCE" },
-		select: { id: true },
-	});
-
-	// Create the new entry FIRST
 	const date = entryDate ?? new Date(new Date().getFullYear(), 0, 1); // Jan 1 of current year
-	const entry = await createJournalEntry(db, {
-		organizationId,
-		date,
-		description: "أرصدة افتتاحية",
-		referenceType: "OPENING_BALANCE",
-		isAutoGenerated: true, // auto-POSTED
-		lines: finalLines.map((l) => ({
-			accountId: l.accountId,
-			debit: new Prisma.Decimal(l.debit),
-			credit: new Prisma.Decimal(l.credit),
-			description: l.description,
-		})),
-		createdById,
+
+	// Create the replacement and delete the previous entry ATOMICALLY: doing
+	// them as separate writes risks either losing the balances (delete-first)
+	// or double-counting them (create-first, delete fails). createJournalEntry
+	// joins this transaction via existingTx.
+	return db.$transaction(async (tx) => {
+		const existing = await tx.journalEntry.findFirst({
+			where: { organizationId, referenceType: "OPENING_BALANCE" },
+			select: { id: true },
+		});
+
+		const entry = await createJournalEntry(
+			db,
+			{
+				organizationId,
+				date,
+				description: "أرصدة افتتاحية",
+				referenceType: "OPENING_BALANCE",
+				isAutoGenerated: true, // auto-POSTED
+				lines: finalLines.map((l) => ({
+					accountId: l.accountId,
+					debit: l.debit,
+					credit: l.credit,
+					description: l.description,
+				})),
+				createdById,
+			},
+			tx,
+		);
+
+		if (!entry) {
+			throw new Error("لا يمكن حفظ الأرصدة الافتتاحية — الفترة المحاسبية مغلقة");
+		}
+
+		if (existing && existing.id !== entry.id) {
+			await tx.journalEntry.delete({ where: { id: existing.id } });
+		}
+
+		return { entryId: entry.id };
 	});
-
-	if (!entry) {
-		throw new Error("لا يمكن حفظ الأرصدة الافتتاحية — الفترة المحاسبية مغلقة");
-	}
-
-	// New entry is safely persisted — now remove the previous one
-	if (existing && existing.id !== entry.id) {
-		await db.journalEntry.delete({ where: { id: existing.id } });
-	}
-
-	return { entryId: entry.id };
 }
 
 // ========================================

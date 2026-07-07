@@ -72,7 +72,7 @@ export const createSubcontractItemProcedure = subscriptionProcedure
 			entityType: "subcontract_item",
 			entityId: item.id,
 			metadata: { contractId: input.contractId, description: input.description },
-		}).catch(() => {});
+		}).catch((e) => console.error("[Subcontracts] audit log failed:", e));
 
 		return {
 			...item,

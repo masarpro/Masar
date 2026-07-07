@@ -3,6 +3,7 @@ import {
 	replaceProjectPaymentGroup,
 	logAuditEvent,
 	orgAuditLog,
+	isPeriodClosed,
 	db,
 } from "@repo/database";
 import { ORPCError } from "@orpc/server";
@@ -50,6 +51,18 @@ export const updateProjectPaymentProcedure = subscriptionProcedure
 			});
 			if (!target) {
 				throw new ORPCError("NOT_FOUND", { message: "الدفعة غير موجودة" });
+			}
+
+			// Guard BEFORE any write: the journal entry is reversed and re-created
+			// at the payment's effective date — if that date lands in a closed
+			// period the re-create silently returns null, leaving the payment row
+			// updated while its ledger entry is gone (or stale). Reject up front.
+			const effectiveDate = input.date ?? target.date;
+			if (await isPeriodClosed(db, input.organizationId, effectiveDate)) {
+				throw new ORPCError("BAD_REQUEST", {
+					message:
+						"لا يمكن تعديل دفعة تقع في فترة محاسبية مغلقة أو نقلها إلى فترة مغلقة",
+				});
 			}
 
 			if (target.splitGroupId) {
@@ -153,14 +166,9 @@ export const updateProjectPaymentProcedure = subscriptionProcedure
 			);
 
 			// Auto-Journal: reverse old entry and create new one with updated data
+			// (closed-period guard already enforced above, before any write)
 			try {
 				const { reverseAutoJournalEntry, onProjectPaymentReceived } = await import("../../../lib/accounting/auto-journal");
-				const { isPeriodClosed } = await import("@repo/database");
-				// Guard: if the new date lands in a closed period the re-create would
-				// silently skip, leaving the payment REVERSED with no active entry.
-				if (await isPeriodClosed(db, input.organizationId, payment.date)) {
-					throw new Error("لا يمكن تعديل دفعة إلى تاريخ في فترة محاسبية مغلقة");
-				}
 				await reverseAutoJournalEntry(db, {
 					organizationId: input.organizationId,
 					referenceType: "PROJECT_PAYMENT",

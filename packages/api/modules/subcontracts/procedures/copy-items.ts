@@ -43,7 +43,7 @@ export const copySubcontractItemsProcedure = subscriptionProcedure
 				sourceContractId: input.sourceContractId,
 				count: items.length,
 			},
-		}).catch(() => {});
+		}).catch((e) => console.error("[Subcontracts] audit log failed:", e));
 
 		return { count: items.length };
 	});

@@ -1383,44 +1383,50 @@ export async function deleteInvoicePayment(
 	invoiceId: string,
 	organizationId: string,
 ) {
-	const invoice = await db.financeInvoice.findFirst({
-		where: { id: invoiceId, organizationId },
-		select: { id: true, totalAmount: true, paidAmount: true },
-	});
-
-	if (!invoice) {
-		throw new Error("Invoice not found");
-	}
-
-	const payment = await db.financeInvoicePayment.findFirst({
-		where: { id: paymentId, invoiceId },
-		select: { id: true, amount: true, sourceAccountId: true },
-	});
-
-	if (!payment) {
-		throw new Error("Payment not found");
-	}
-
-	const newPaidAmount = Number(invoice.paidAmount) - Number(payment.amount);
-	const totalAmount = Number(invoice.totalAmount);
-
-	// Determine new status
-	let newStatus: FinanceInvoiceStatus;
-	if (newPaidAmount >= totalAmount) {
-		newStatus = "PAID";
-	} else if (newPaidAmount > 0) {
-		newStatus = "PARTIALLY_PAID";
-	} else {
-		newStatus = "ISSUED";
-	}
-
+	// Serialize with concurrent payments on the same invoice: lock the row,
+	// then read the fresh paidAmount INSIDE the transaction (same pattern as
+	// addInvoicePayment) so a concurrent add/delete can't race on a stale value.
 	return db.$transaction(async (tx) => {
+		await tx.$queryRaw`SELECT id FROM finance_invoices WHERE id = ${invoiceId} AND organization_id = ${organizationId} FOR UPDATE`;
+
+		const invoice = await tx.financeInvoice.findFirst({
+			where: { id: invoiceId, organizationId },
+			select: { id: true, totalAmount: true, paidAmount: true },
+		});
+
+		if (!invoice) {
+			throw new Error("Invoice not found");
+		}
+
+		const payment = await tx.financeInvoicePayment.findFirst({
+			where: { id: paymentId, invoiceId },
+			select: { id: true, amount: true, sourceAccountId: true },
+		});
+
+		if (!payment) {
+			throw new Error("Payment not found");
+		}
+
+		const total = new Prisma.Decimal(invoice.totalAmount);
+		const newPaid = Prisma.Decimal.max(
+			new Prisma.Decimal(invoice.paidAmount).sub(
+				new Prisma.Decimal(payment.amount),
+			),
+			new Prisma.Decimal(0),
+		);
+
+		const newStatus: FinanceInvoiceStatus = newPaid.greaterThanOrEqualTo(total)
+			? "PAID"
+			: newPaid.greaterThan(0)
+				? "PARTIALLY_PAID"
+				: "ISSUED";
+
 		await tx.financeInvoicePayment.delete({ where: { id: paymentId } });
 
 		await tx.financeInvoice.update({
 			where: { id: invoiceId },
 			data: {
-				paidAmount: newPaidAmount,
+				paidAmount: newPaid,
 				status: newStatus,
 			},
 		});
@@ -1787,10 +1793,15 @@ export async function createCreditNote(data: {
 		});
 
 		// Bug #8 fix: update original invoice — credit note reduces outstanding amount
-		const creditAmount = Number(totals.totalAmount); // positive value
-		const newPaid = Number(original.paidAmount) + creditAmount;
-		const total = Number(original.totalAmount);
-		const newStatus = newPaid >= total ? "PAID" as const : newPaid > 0 ? "PARTIALLY_PAID" as const : undefined;
+		// Decimal math throughout: float rounding here can flip the >= comparison.
+		const creditAmount = totals.totalAmount; // positive Decimal
+		const newPaid = new Prisma.Decimal(original.paidAmount).add(creditAmount);
+		const total = new Prisma.Decimal(original.totalAmount);
+		const newStatus = newPaid.greaterThanOrEqualTo(total)
+			? ("PAID" as const)
+			: newPaid.greaterThan(0)
+				? ("PARTIALLY_PAID" as const)
+				: undefined;
 
 		await tx.financeInvoice.update({
 			where: { id: data.originalInvoiceId },

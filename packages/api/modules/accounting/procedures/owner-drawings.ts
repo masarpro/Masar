@@ -202,6 +202,7 @@ async function computeOverdrawContext(
 	amount: number,
 	bankAccountId: string | undefined,
 	projectId: string | undefined,
+	actorId: string,
 ) {
 	// Fetch owner
 	const owner = await db.organizationOwner.findFirst({
@@ -295,6 +296,14 @@ async function computeOverdrawContext(
 		// Defaulting to 0 is conservative here (it only shrinks the available
 		// amount), but log so a real DB failure isn't completely invisible.
 		console.error("[OwnerDrawings] Failed to load capital contributions:", e);
+		await orgAuditLog({
+			organizationId,
+			actorId,
+			action: "JOURNAL_ENTRY_FAILED",
+			entityType: "owner_drawing",
+			entityId: ownerId,
+			metadata: { type: "CAPITAL_CONTRIBUTIONS_READ_FAILED", error: String(e) },
+		});
 	}
 
 	const availableForOwner =
@@ -469,6 +478,7 @@ export const createDrawingProcedure = subscriptionProcedure
 			input.amount,
 			input.bankAccountId,
 			input.projectId,
+			context.user.id,
 		);
 
 		// Step 6: If overdraw detected and not acknowledged → throw for confirmation
@@ -815,6 +825,7 @@ export const checkOverdrawProcedure = protectedProcedure
 			input.amount,
 			input.bankAccountId,
 			input.projectId,
+			context.user.id,
 		);
 
 		return {

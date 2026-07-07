@@ -8,6 +8,7 @@ import {
 	orgAuditLog,
 	db,
 } from "@repo/database";
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
@@ -243,69 +244,92 @@ export const updateExpensePaymentProcedure = subscriptionProcedure
 		});
 
 		const { organizationId, id, ...data } = input;
-		const result = await updateExpensePayment(id, organizationId, data);
 
-		// If payment was paid and amount changed → reverse old journal + create new one
-		if (existingPayment?.isPaid && existingPayment.financeExpenseId && input.amount !== undefined) {
-			const amountChanged = Number(existingPayment.amount) !== input.amount;
-			if (amountChanged) {
-				try {
-					const { reverseAutoJournalEntry, onExpenseCompleted } = await import("../../../lib/accounting/auto-journal");
-					// Reverse old entry
-					await reverseAutoJournalEntry(db, {
-						organizationId: input.organizationId,
-						referenceType: "EXPENSE",
-						referenceId: existingPayment.financeExpenseId,
-						userId: context.user.id,
-					});
-					// Update linked FinanceExpense amount + paidAmount, and adjust the
-					// bank balance by the delta (the old amount was already deducted).
-					const linked = await db.financeExpense.findUnique({
-						where: { id: existingPayment.financeExpenseId },
-						select: { sourceAccountId: true },
-					});
-					const delta = input.amount - Number(existingPayment.amount);
-					if (linked?.sourceAccountId && delta !== 0) {
-						// delta > 0 → deduct more; delta < 0 → refund
-						await db.organizationBank.update({
-							where: { id: linked.sourceAccountId },
+		const amountChanged =
+			existingPayment?.isPaid === true &&
+			!!existingPayment.financeExpenseId &&
+			input.amount !== undefined &&
+			Number(existingPayment.amount) !== input.amount;
+
+		// Financial state changes atomically: payment row + bank delta + linked
+		// FinanceExpense amount/paidAmount all commit or roll back together.
+		const result = await db.$transaction(async (tx) => {
+			const updated = await updateExpensePayment(id, organizationId, data, tx);
+
+			if (amountChanged && existingPayment?.financeExpenseId) {
+				const linked = await tx.financeExpense.findUnique({
+					where: { id: existingPayment.financeExpenseId },
+					select: { sourceAccountId: true },
+				});
+				const delta = (input.amount as number) - Number(existingPayment.amount);
+				if (linked?.sourceAccountId && delta !== 0) {
+					if (delta > 0) {
+						// Deduct more — guard against driving the balance negative
+						const dec = await tx.organizationBank.updateMany({
+							where: { id: linked.sourceAccountId, balance: { gte: delta } },
 							data: { balance: { decrement: delta } },
 						});
-					}
-					await db.financeExpense.update({
-						where: { id: existingPayment.financeExpenseId },
-						data: { amount: input.amount, paidAmount: input.amount },
-					});
-					// Re-create journal entry with new amount
-					const expense = await db.financeExpense.findUnique({
-						where: { id: existingPayment.financeExpenseId },
-						select: { id: true, category: true, amount: true, date: true, description: true, sourceAccountId: true, projectId: true, sourceType: true },
-					});
-					if (expense) {
-						await onExpenseCompleted(db, {
-							id: expense.id,
-							organizationId: input.organizationId,
-							category: expense.category,
-							amount: expense.amount,
-							date: expense.date,
-							description: expense.description ?? expense.category,
-							sourceAccountId: expense.sourceAccountId,
-							projectId: expense.projectId,
-							sourceType: expense.sourceType,
-							userId: context.user.id,
+						if (dec.count === 0) {
+							throw new ORPCError("BAD_REQUEST", {
+								message: "الرصيد غير كافي في الحساب المصدر",
+							});
+						}
+					} else {
+						await tx.organizationBank.update({
+							where: { id: linked.sourceAccountId },
+							data: { balance: { increment: Math.abs(delta) } },
 						});
 					}
-				} catch (e) {
-					console.error("[AutoJournal] Failed to adjust entry for updated company expense payment:", e);
-					orgAuditLog({
+				}
+				await tx.financeExpense.update({
+					where: { id: existingPayment.financeExpenseId },
+					data: { amount: input.amount, paidAmount: input.amount },
+				});
+			}
+
+			return updated;
+		});
+
+		// Journal adjustments run after the financial transaction (platform
+		// convention: journal failures never break the original operation —
+		// they are audit-logged as JOURNAL_ENTRY_FAILED).
+		if (amountChanged && existingPayment?.financeExpenseId) {
+			try {
+				const { reverseAutoJournalEntry, onExpenseCompleted } = await import("../../../lib/accounting/auto-journal");
+				await reverseAutoJournalEntry(db, {
+					organizationId: input.organizationId,
+					referenceType: "EXPENSE",
+					referenceId: existingPayment.financeExpenseId,
+					userId: context.user.id,
+				});
+				const expense = await db.financeExpense.findUnique({
+					where: { id: existingPayment.financeExpenseId },
+					select: { id: true, category: true, amount: true, date: true, description: true, sourceAccountId: true, projectId: true, sourceType: true },
+				});
+				if (expense) {
+					await onExpenseCompleted(db, {
+						id: expense.id,
 						organizationId: input.organizationId,
-						actorId: context.user.id,
-						action: "JOURNAL_ENTRY_FAILED",
-						entityType: "journal_entry",
-						entityId: existingPayment.financeExpenseId || input.id,
-						metadata: { error: String(e), referenceType: "EXPENSE" },
+						category: expense.category,
+						amount: expense.amount,
+						date: expense.date,
+						description: expense.description ?? expense.category,
+						sourceAccountId: expense.sourceAccountId,
+						projectId: expense.projectId,
+						sourceType: expense.sourceType,
+						userId: context.user.id,
 					});
 				}
+			} catch (e) {
+				console.error("[AutoJournal] Failed to adjust entry for updated company expense payment:", e);
+				await orgAuditLog({
+					organizationId: input.organizationId,
+					actorId: context.user.id,
+					action: "JOURNAL_ENTRY_FAILED",
+					entityType: "journal_entry",
+					entityId: existingPayment.financeExpenseId || input.id,
+					metadata: { error: String(e), referenceType: "EXPENSE" },
+				});
 			}
 		}
 
@@ -343,9 +367,42 @@ export const deleteExpensePaymentProcedure = subscriptionProcedure
 			select: { financeExpenseId: true },
 		});
 
-		const result = await deleteExpensePayment(input.id, input.organizationId);
+		// Financial state changes atomically: the payment row, the bank-balance
+		// restore, and the orphaned FinanceExpense all commit or roll back
+		// together. If any step fails the whole delete is rejected — no more
+		// silently-lost bank balance.
+		const result = await db.$transaction(async (tx) => {
+			const deleted = await deleteExpensePayment(
+				input.id,
+				input.organizationId,
+				tx,
+			);
 
-		// Auto-Journal: reverse accounting entry for the linked FinanceExpense
+			if (payment?.financeExpenseId) {
+				const fx = await tx.financeExpense.findUnique({
+					where: { id: payment.financeExpenseId },
+					select: { sourceAccountId: true, paidAmount: true, amount: true },
+				});
+				if (fx?.sourceAccountId) {
+					const restore = Number(fx.paidAmount ?? fx.amount);
+					if (restore > 0) {
+						await tx.organizationBank.update({
+							where: { id: fx.sourceAccountId },
+							data: { balance: { increment: restore } },
+						});
+					}
+				}
+				// deleteMany: idempotent if the expense was already removed elsewhere
+				await tx.financeExpense.deleteMany({
+					where: { id: payment.financeExpenseId },
+				});
+			}
+
+			return deleted;
+		});
+
+		// Journal reversal runs after the financial transaction (platform
+		// convention: journal failures never break the original operation).
 		if (payment?.financeExpenseId) {
 			try {
 				const { reverseAutoJournalEntry } = await import("../../../lib/accounting/auto-journal");
@@ -357,7 +414,7 @@ export const deleteExpensePaymentProcedure = subscriptionProcedure
 				});
 			} catch (e) {
 				console.error("[AutoJournal] Failed to reverse entry for deleted company expense payment:", e);
-				orgAuditLog({
+				await orgAuditLog({
 					organizationId: input.organizationId,
 					actorId: context.user.id,
 					action: "JOURNAL_ENTRY_FAILED",
@@ -365,32 +422,6 @@ export const deleteExpensePaymentProcedure = subscriptionProcedure
 					entityId: payment.financeExpenseId || input.id,
 					metadata: { error: String(e), referenceType: "EXPENSE" },
 				});
-			}
-
-			// Restore the bank balance that markPaid deducted, then delete the
-			// orphaned FinanceExpense — atomically. Previously the balance was never
-			// returned, permanently understating the bank by the payment amount.
-			try {
-				await db.$transaction(async (tx) => {
-					const fx = await tx.financeExpense.findUnique({
-						where: { id: payment.financeExpenseId as string },
-						select: { sourceAccountId: true, paidAmount: true, amount: true },
-					});
-					if (fx?.sourceAccountId) {
-						const restore = Number(fx.paidAmount ?? fx.amount);
-						if (restore > 0) {
-							await tx.organizationBank.update({
-								where: { id: fx.sourceAccountId },
-								data: { balance: { increment: restore } },
-							});
-						}
-					}
-					await tx.financeExpense.delete({
-						where: { id: payment.financeExpenseId as string },
-					});
-				});
-			} catch (e) {
-				console.error("[ExpensePayment] Failed to restore balance / delete expense:", e);
 			}
 		}
 

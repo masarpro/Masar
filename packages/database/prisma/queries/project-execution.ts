@@ -325,15 +325,23 @@ export async function bulkUpdateProgress(
 	const milestoneIds = new Set<string>();
 
 	await db.$transaction(async (tx) => {
+		// Prefetch all target activities in ONE query instead of one findFirst
+		// per update (2N round-trips → N+1). The org/project filter keeps the
+		// same tenant-scoping validation as the previous per-item findFirst.
+		const existingActivities = await tx.projectActivity.findMany({
+			where: {
+				id: { in: updates.map((u) => u.activityId) },
+				organizationId,
+				projectId,
+			},
+			select: { id: true, milestoneId: true, status: true },
+		});
+		const existingById = new Map(
+			existingActivities.map((a) => [a.id, a]),
+		);
+
 		for (const update of updates) {
-			const existing = await tx.projectActivity.findFirst({
-				where: {
-					id: update.activityId,
-					organizationId,
-					projectId,
-				},
-				select: { milestoneId: true, status: true },
-			});
+			const existing = existingById.get(update.activityId);
 
 			if (!existing) continue;
 

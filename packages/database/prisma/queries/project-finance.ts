@@ -1,3 +1,4 @@
+import { VAT_RATE } from "@repo/utils";
 import { db } from "../client";
 import {
 	Prisma,
@@ -176,7 +177,7 @@ export async function getProjectFinanceSummary(
 		const profit = subtotal * (Number(study.profitPercent) / 100);
 		const contingency = subtotal * (Number(study.contingencyPercent) / 100);
 		const beforeVat = subtotal + overhead + profit + contingency;
-		const vat = study.vatIncluded ? beforeVat * 0.15 : 0;
+		const vat = study.vatIncluded ? beforeVat * VAT_RATE : 0;
 		quantitiesTotal += beforeVat + vat;
 	}
 
@@ -673,9 +674,21 @@ export async function updateClaimStatus(
 			updateData.paidAt = null;
 		}
 
-		return tx.projectClaim.update({
-			where: { id },
+		// Optimistic status guard: only transition if the row still holds the
+		// status we validated above. A concurrent approver that already moved
+		// the claim matches zero rows here instead of re-approving it.
+		const updated = await tx.projectClaim.updateMany({
+			where: { id, status: existing.status },
 			data: updateData,
+		});
+		if (updated.count === 0) {
+			throw new Error(
+				`لا يمكن تغيير حالة المستخلص من ${existing.status} إلى ${newStatus}`,
+			);
+		}
+
+		return tx.projectClaim.findFirstOrThrow({
+			where: { id },
 			include: {
 				createdBy: { select: { id: true, name: true } },
 			},

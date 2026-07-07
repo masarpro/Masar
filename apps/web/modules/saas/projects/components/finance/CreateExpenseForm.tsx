@@ -2,6 +2,7 @@
 
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
@@ -121,9 +122,18 @@ export function CreateExpenseForm({
 					</Link>
 				</Button>
 				<div>
-					<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-						{t("finance.expenses.new")}
-					</h1>
+					<div className="flex items-center gap-2">
+						<h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+							{t("finance.expenses.new")}
+						</h1>
+						<Badge
+							status="warning"
+							className="shrink-0 cursor-help"
+							title={t("finance.expenses.nonAccountingTooltip")}
+						>
+							{t("finance.expenses.nonAccountingBadge")}
+						</Badge>
+					</div>
 					<p className="text-sm text-slate-500 dark:text-slate-400">
 						{t("finance.expenses.newSubtitle")}
 					</p>

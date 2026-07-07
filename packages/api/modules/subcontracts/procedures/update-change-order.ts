@@ -72,7 +72,7 @@ export const updateSubcontractChangeOrderProcedure = subscriptionProcedure
 			entityType: "subcontract_change_order",
 			entityId: changeOrderId,
 			metadata: { contractId },
-		}).catch(() => {});
+		}).catch((e) => console.error("[Subcontracts] audit log failed:", e));
 
 		return { ...co, amount: Number(co.amount) };
 	});

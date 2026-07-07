@@ -59,7 +59,7 @@ export const addSubcontractClaimPaymentProcedure = subscriptionProcedure
 					claimId: input.claimId,
 					amount: input.amount,
 				},
-			}).catch(() => {});
+			}).catch((e) => console.error("[Subcontracts] audit log failed:", e));
 
 			// Auto-Journal: generate accounting entry for subcontract claim payment
 			try {

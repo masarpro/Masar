@@ -1,3 +1,4 @@
+import { VAT_RATE } from "@repo/utils";
 import { db } from "../client";
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -482,7 +483,7 @@ export async function recalculateCostStudyTotals(id: string) {
 		const profit = subtotal * (Number(study.profitPercent) / 100);
 		const contingency = subtotal * (Number(study.contingencyPercent) / 100);
 		const beforeVat = subtotal + overhead + profit + contingency;
-		const vat = study.vatIncluded ? beforeVat * 0.15 : 0;
+		const vat = study.vatIncluded ? beforeVat * VAT_RATE : 0;
 		const totalCost = beforeVat + vat;
 
 		await tx.costStudy.update({

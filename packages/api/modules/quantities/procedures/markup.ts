@@ -3,6 +3,7 @@ import { STUDY_ERRORS } from "../lib/error-messages";
 import { db } from "@repo/database";
 import { z } from "zod";
 import { toNum } from "../../../lib/decimal-helpers";
+import { VAT_RATE } from "@repo/utils";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
 
@@ -314,7 +315,7 @@ export const markupGetProfitAnalysis = protectedProcedure
 			sellingPriceBeforeVat = totalCost + overheadAmount + profitAmount + contingencyAmount;
 		}
 
-		const vatAmount = study.vatIncluded ? sellingPriceBeforeVat * 0.15 : 0;
+		const vatAmount = study.vatIncluded ? sellingPriceBeforeVat * VAT_RATE : 0;
 		const grandTotal = sellingPriceBeforeVat + vatAmount;
 
 		const buildingArea = toNum(study.buildingArea);

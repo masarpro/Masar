@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2";
 import { db } from "../client";
 import type { ExpenseRunStatus, CompanyExpenseCategory } from "../generated/client";
 import { generateAtomicNoBatch } from "./sequences";
@@ -245,39 +246,50 @@ export async function postExpenseRun(
 	);
 
 	return db.$transaction(async (tx) => {
-		// Create a PENDING FinanceExpense for each item
-		for (let i = 0; i < run.items.length; i++) {
-			const item = run.items[i];
-			const expenseNo = expenseNos[i];
-			const orgCategory = mapCompanyToOrgCategory(
-				item.companyExpense.category as CompanyExpenseCategory,
-			);
+		// Pre-generate expense ids in JS so all expenses can be batch-created
+		// AND linked back to their run items without a per-item round-trip
+		// (2N queries → 2 queries; matters at ~25ms/query latency).
+		const expenseIds = run.items.map(() => createId());
 
-			const expense = await tx.financeExpense.create({
-				data: {
-					organizationId: data.organizationId,
-					createdById: data.postedById,
-					expenseNo,
-					category: orgCategory,
-					description: `${item.name} - ${run.month}/${run.year}`,
-					amount: Number(item.amount),
-					date: new Date(run.year, run.month - 1, 28),
-					status: "PENDING",
-					sourceType: "FACILITY_RECURRING",
-					sourceId: item.id,
-					paidAmount: 0,
-					dueDate: new Date(run.year, run.month - 1, 28),
-					paymentMethod: "BANK_TRANSFER",
-					vendorName: item.vendor,
-					notes: `دورة مصروفات ${run.runNo} - ${item.name}`,
-				},
-			});
+		// Create a PENDING FinanceExpense for each item — one createMany
+		await tx.financeExpense.createMany({
+			data: run.items.map((item, i) => ({
+				id: expenseIds[i],
+				organizationId: data.organizationId,
+				createdById: data.postedById,
+				expenseNo: expenseNos[i],
+				category: mapCompanyToOrgCategory(
+					item.companyExpense.category as CompanyExpenseCategory,
+				),
+				description: `${item.name} - ${run.month}/${run.year}`,
+				amount: Number(item.amount),
+				date: new Date(run.year, run.month - 1, 28),
+				status: "PENDING",
+				sourceType: "FACILITY_RECURRING",
+				sourceId: item.id,
+				paidAmount: 0,
+				dueDate: new Date(run.year, run.month - 1, 28),
+				paymentMethod: "BANK_TRANSFER",
+				vendorName: item.vendor,
+				notes: `دورة مصروفات ${run.runNo} - ${item.name}`,
+			})),
+		});
 
-			await tx.companyExpenseRunItem.update({
-				where: { id: item.id },
-				data: { financeExpenseId: expense.id },
-			});
-		}
+		// Link items → expenses in ONE batched UPDATE (VALUES join) instead of
+		// N updates. Names verified in schema.prisma:
+		// @@map("company_expense_run_items"), columns: id,
+		// @map("finance_expense_id"), @map("updated_at").
+		const linkParams: string[] = [];
+		const linkValuesSql = run.items
+			.map((item, i) => {
+				linkParams.push(item.id, expenseIds[i]);
+				return `($${linkParams.length - 1}::text, $${linkParams.length}::text)`;
+			})
+			.join(", ");
+		await tx.$executeRawUnsafe(
+			`UPDATE company_expense_run_items AS p SET finance_expense_id = v.eid, updated_at = NOW() FROM (VALUES ${linkValuesSql}) AS v(id, eid) WHERE p.id = v.id`,
+			...linkParams,
+		);
 
 		// Update run status
 		return tx.companyExpenseRun.update({

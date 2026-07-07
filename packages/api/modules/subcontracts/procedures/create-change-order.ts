@@ -81,7 +81,7 @@ export const createSubcontractChangeOrderProcedure = subscriptionProcedure
 			entityType: "subcontract_change_order",
 			entityId: co.id,
 			metadata: { contractId: input.contractId, amount: input.amount },
-		}).catch(() => {});
+		}).catch((e) => console.error("[Subcontracts] audit log failed:", e));
 
 		const project = await db.project.findFirst({
 			where: { id: input.projectId, organizationId: input.organizationId },

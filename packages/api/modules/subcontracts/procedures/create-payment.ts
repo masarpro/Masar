@@ -97,7 +97,7 @@ export const createSubcontractPaymentProcedure = subscriptionProcedure
 				amount: input.amount,
 				termId: input.termId,
 			},
-		}).catch(() => {});
+		}).catch((e) => console.error("[Subcontracts] audit log failed:", e));
 
 		// Auto-Journal: generate accounting entry for subcontract payment
 		try {

@@ -26,13 +26,13 @@ export const update = subscriptionProcedure
 			buildingArea: z.number().positive().optional(),
 			numberOfFloors: z.number().int().positive().optional(),
 			hasBasement: z.boolean().optional(),
-			finishingLevel: z.string().trim().max(100).optional(),
+			finishingLevel: z.string().max(100).optional().transform((v) => v?.trim()),
 			overheadPercent: z.number().min(0).max(100).optional(),
 			profitPercent: z.number().min(0).max(100).optional(),
 			contingencyPercent: z.number().min(0).max(100).optional(),
 			vatIncluded: z.boolean().optional(),
-			status: z.string().trim().max(100).optional(),
-			notes: z.string().trim().max(2000).optional(),
+			status: z.string().max(100).optional().transform((v) => v?.trim()),
+			notes: z.string().max(2000).optional().transform((v) => v?.trim()),
 		}),
 	)
 	.handler(async ({ input, context }) => {

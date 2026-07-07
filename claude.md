@@ -153,7 +153,6 @@ H:\Masar\supastarter-nextjs-3/
 │   │   │   └── ...                    # 37 more modules
 │   │   ├── lib/
 │   │   │   ├── accounting/auto-journal.ts  # قيود تلقائية (922 سطر، 17 hook + reverseAutoJournalEntry)
-│   │   │   ├── accounting/adjustment-templates.ts # (87 سطر)
 │   │   │   ├── accounting/backfill.ts  # (245 سطر)
 │   │   │   ├── messaging/providers/   # email, sms, whatsapp, noop
 │   │   │   ├── permissions/, categories/, zatca/phase2/
@@ -1009,7 +1008,7 @@ mutation.mutate({ input: { organizationId } }); // هذا خطأ!
 - `packages/database/prisma/queries/accounting.ts` (**2,295 سطر** — القلب)
 - `packages/api/modules/accounting/` (12 procedure file: journal-entries 768 سطر، owner-drawings 1,204 سطر، year-end-closing 790 سطر، capital-contributions 485، organization-owners 497، chart-of-accounts 356، partners-finance 452، account-statements، backfill، …)
 - `packages/api/lib/accounting/auto-journal.ts` (**922 سطر**)
-- `packages/api/lib/accounting/adjustment-templates.ts` (87 سطر) + `backfill.ts` (245 سطر)
+- `packages/api/lib/accounting/backfill.ts` (245 سطر)
 - `packages/utils/lib/number-to-arabic-words.ts`
 
 **Frontend:**

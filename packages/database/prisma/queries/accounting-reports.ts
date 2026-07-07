@@ -1,6 +1,7 @@
 // Accounting Reports — queries over existing data
 // No schema changes required — reads from FinanceInvoice, FinanceExpense, SubcontractClaim, etc.
 
+import { VAT_DIVISOR_STR } from "@repo/utils";
 import { type PrismaClient, Prisma } from "../generated/client";
 
 // ========== Shared Types ==========
@@ -724,7 +725,7 @@ export async function getVATReport(
 
 		const amount = new Prisma.Decimal(Number(exp.amount));
 		// Reverse-calculate VAT from inclusive amount: taxable = amount / 1.15
-		const taxable = amount.div(new Prisma.Decimal("1.15")).toDecimalPlaces(2);
+		const taxable = amount.div(new Prisma.Decimal(VAT_DIVISOR_STR)).toDecimalPlaces(2);
 		const vat = amount.sub(taxable);
 
 		expenseTaxable = expenseTaxable.add(taxable);
@@ -739,7 +740,7 @@ export async function getVATReport(
 
 	for (const payment of subPayments) {
 		const amount = new Prisma.Decimal(Number(payment.amount));
-		const taxable = amount.div(new Prisma.Decimal("1.15")).toDecimalPlaces(2);
+		const taxable = amount.div(new Prisma.Decimal(VAT_DIVISOR_STR)).toDecimalPlaces(2);
 		const vat = amount.sub(taxable);
 
 		subTaxable = subTaxable.add(taxable);

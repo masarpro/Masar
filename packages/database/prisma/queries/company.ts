@@ -9,6 +9,7 @@ import type {
 	SalaryType,
 	EmployeeStatus,
 	OrgExpenseCategory,
+	Prisma,
 } from "../generated/client";
 import { generateExpenseNumber } from "./org-finance";
 
@@ -674,28 +675,35 @@ export async function updateExpensePayment(
 		referenceNo?: string | null;
 		notes?: string | null;
 	},
+	tx?: Prisma.TransactionClient,
 ) {
+	const client = tx ?? db;
 	// Tenant isolation: ensure the payment belongs to the organization
-	const owned = await db.companyExpensePayment.findFirst({
+	const owned = await client.companyExpensePayment.findFirst({
 		where: { id, expense: { organizationId } },
 		select: { id: true },
 	});
 	if (!owned) {
 		throw new Error("Payment not found");
 	}
-	return db.companyExpensePayment.update({ where: { id }, data });
+	return client.companyExpensePayment.update({ where: { id }, data });
 }
 
-export async function deleteExpensePayment(id: string, organizationId: string) {
+export async function deleteExpensePayment(
+	id: string,
+	organizationId: string,
+	tx?: Prisma.TransactionClient,
+) {
+	const client = tx ?? db;
 	// Tenant isolation: ensure the payment belongs to the organization
-	const owned = await db.companyExpensePayment.findFirst({
+	const owned = await client.companyExpensePayment.findFirst({
 		where: { id, expense: { organizationId } },
 		select: { id: true },
 	});
 	if (!owned) {
 		throw new Error("Payment not found");
 	}
-	return db.companyExpensePayment.delete({ where: { id } });
+	return client.companyExpensePayment.delete({ where: { id } });
 }
 
 export async function generateMonthlyPayments(

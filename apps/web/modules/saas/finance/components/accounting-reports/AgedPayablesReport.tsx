@@ -23,14 +23,15 @@ import {
 } from "lucide-react";
 import { Currency } from "../shared/Currency";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
-import {
-	PieChart,
-	Pie,
-	Cell,
-	ResponsiveContainer,
-	Tooltip,
-	Legend,
-} from "recharts";
+import { Skeleton } from "@ui/components/skeleton";
+import dynamic from "next/dynamic";
+
+// تحميل recharts ديناميكياً — يُبقيها خارج حزمة التقرير الرئيسية
+const ChartSkeleton = () => <Skeleton className="h-[280px] w-full rounded-lg" />;
+const AgingPieChart = dynamic(
+	() => import("./AgingPieChart").then((m) => ({ default: m.AgingPieChart })),
+	{ loading: ChartSkeleton, ssr: false },
+);
 
 interface AgedPayablesReportProps {
 	organizationId: string;
@@ -404,36 +405,7 @@ export function AgedPayablesReport({
 							</CardTitle>
 						</CardHeader>
 						<CardContent>
-							<ResponsiveContainer width="100%" height={280}>
-								<PieChart>
-									<Pie
-										data={pieData}
-										cx="50%"
-										cy="50%"
-										innerRadius={60}
-										outerRadius={100}
-										dataKey="value"
-										nameKey="name"
-										paddingAngle={2}
-									>
-										{pieData.map((entry, index) => (
-											<Cell
-												key={`cell-${index}`}
-												fill={entry.color}
-											/>
-										))}
-									</Pie>
-									<Tooltip
-										formatter={(value: number) =>
-											new Intl.NumberFormat("en-US", {
-												style: "currency",
-												currency: "SAR",
-											}).format(value)
-										}
-									/>
-									<Legend />
-								</PieChart>
-							</ResponsiveContainer>
+							<AgingPieChart data={pieData} />
 						</CardContent>
 					</Card>
 				)}

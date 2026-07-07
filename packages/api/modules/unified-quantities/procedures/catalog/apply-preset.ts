@@ -34,42 +34,42 @@ export const applyPreset = subscriptionProcedure
 			where: { costStudyId: input.costStudyId, organizationId: input.organizationId },
 			_max: { sortOrder: true },
 		});
-		let nextSort = (maxSort._max.sortOrder ?? -10) + 10;
+		const baseSort = (maxSort._max.sortOrder ?? -10) + 10;
 
-		const created: Awaited<ReturnType<typeof db.quantityItem.create>>[] = [];
-		const skipped: string[] = [];
+		const skipped: string[] = preset.itemKeys.filter((key) => !byKey.has(key));
+		const entries = preset.itemKeys
+			.map((key) => byKey.get(key))
+			.filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
 
-		for (const itemKey of preset.itemKeys) {
-			const entry = byKey.get(itemKey);
-			if (!entry) {
-				skipped.push(itemKey);
-				continue;
-			}
-			const item = await db.quantityItem.create({
-				data: {
-					costStudyId: input.costStudyId,
-					organizationId: input.organizationId,
-					domain: entry.domain,
-					categoryKey: entry.categoryKey,
-					catalogItemKey: entry.itemKey,
-					displayName: entry.nameAr,
-					sortOrder: nextSort,
-					isEnabled: true,
-					calculationMethod: entry.defaultCalculationMethod,
-					unit: entry.unit,
-					wastagePercent: entry.defaultWastagePercent,
-					materialUnitPrice: entry.defaultMaterialUnitPrice,
-					laborUnitPrice: entry.defaultLaborUnitPrice,
-					markupMethod: "percentage",
-					hasCustomMarkup: false,
-					computedQuantity: 0,
-					effectiveQuantity: 0,
-					createdById: context.user.id,
-				},
-			});
-			created.push(item);
-			nextSort += 10;
-		}
+		// دفعة واحدة بدل create لكل بند (N round-trips → 1) — الاستجابة تحتاج
+		// البنود المنشأة نفسها، لذلك createManyAndReturn بدل createMany.
+		const created =
+			entries.length > 0
+				? await db.quantityItem.createManyAndReturn({
+						data: entries.map((entry, i) => ({
+							costStudyId: input.costStudyId,
+							organizationId: input.organizationId,
+							domain: entry.domain,
+							categoryKey: entry.categoryKey,
+							catalogItemKey: entry.itemKey,
+							displayName: entry.nameAr,
+							sortOrder: baseSort + i * 10,
+							isEnabled: true,
+							calculationMethod: entry.defaultCalculationMethod,
+							unit: entry.unit,
+							wastagePercent: entry.defaultWastagePercent,
+							materialUnitPrice: entry.defaultMaterialUnitPrice,
+							laborUnitPrice: entry.defaultLaborUnitPrice,
+							markupMethod: "percentage",
+							hasCustomMarkup: false,
+							computedQuantity: 0,
+							effectiveQuantity: 0,
+							createdById: context.user.id,
+						})),
+					})
+				: [];
+		// ترتيب الإرجاع من createManyAndReturn غير مضمون — ثبّته حسب sortOrder
+		created.sort((a, b) => a.sortOrder - b.sortOrder);
 
 		const totals = await aggregateStudyTotals(input.costStudyId, input.organizationId);
 

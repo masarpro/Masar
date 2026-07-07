@@ -17,37 +17,23 @@ import {
 } from "lucide-react";
 import { Currency } from "../shared/Currency";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
-import {
-	BarChart,
-	Bar,
-	XAxis,
-	YAxis,
-	CartesianGrid,
-	Tooltip,
-	Legend,
-	ResponsiveContainer,
-	PieChart,
-	Pie,
-	Cell,
-} from "recharts";
+import { Skeleton } from "@ui/components/skeleton";
+import dynamic from "next/dynamic";
+
+// تحميل recharts ديناميكياً — يُبقيها خارج حزمة التقرير الرئيسية
+const ChartSkeleton = () => <Skeleton className="h-[300px] w-full rounded-lg" />;
+const ExpenseBreakdownPieChart = dynamic(
+	() =>
+		import("./ExpenseBreakdownPieChart").then((m) => ({
+			default: m.ExpenseBreakdownPieChart,
+		})),
+	{ loading: ChartSkeleton, ssr: false },
+);
 
 interface IncomeStatementReportProps {
 	organizationId: string;
 	organizationSlug: string;
 }
-
-const EXPENSE_COLORS = [
-	"#3b82f6",
-	"#ef4444",
-	"#f97316",
-	"#eab308",
-	"#22c55e",
-	"#8b5cf6",
-	"#ec4899",
-	"#06b6d4",
-	"#84cc16",
-	"#f43f5e",
-];
 
 type PeriodType = "month" | "quarter" | "year" | "custom";
 
@@ -328,49 +314,7 @@ export function IncomeStatementReport({
 									</CardTitle>
 								</CardHeader>
 								<CardContent>
-									<ResponsiveContainer
-										width="100%"
-										height={300}
-									>
-										<PieChart>
-											<Pie
-												data={expensePieData}
-												cx="50%"
-												cy="50%"
-												innerRadius={60}
-												outerRadius={100}
-												dataKey="value"
-												nameKey="name"
-												paddingAngle={2}
-											>
-												{expensePieData.map(
-													(_, index) => (
-														<Cell
-															key={`cell-${index}`}
-															fill={
-																EXPENSE_COLORS[
-																	index %
-																		EXPENSE_COLORS.length
-																]
-															}
-														/>
-													),
-												)}
-											</Pie>
-											<Tooltip
-												formatter={(value: number) =>
-													new Intl.NumberFormat(
-														"en-US",
-														{
-															style: "currency",
-															currency: "SAR",
-														},
-													).format(value)
-												}
-											/>
-											<Legend />
-										</PieChart>
-									</ResponsiveContainer>
+									<ExpenseBreakdownPieChart data={expensePieData} />
 								</CardContent>
 							</Card>
 

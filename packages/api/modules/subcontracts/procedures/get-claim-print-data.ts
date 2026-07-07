@@ -67,7 +67,7 @@ export const markSubcontractClaimAsPrintedProcedure = subscriptionProcedure
 			entityType: "subcontract_claim",
 			entityId: input.claimId,
 			metadata: { action: "printed" },
-		}).catch(() => {});
+		}).catch((e) => console.error("[Subcontracts] audit log failed:", e));
 
 		return { success: true };
 	});

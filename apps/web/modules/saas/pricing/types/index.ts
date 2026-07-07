@@ -11,8 +11,5 @@ export * from './slabs';
 // الأعمدة
 export * from './columns';
 
-// الكمرات والميدات
-export * from './beams';
-
 // البلوك والجدران
 export * from './blocks';

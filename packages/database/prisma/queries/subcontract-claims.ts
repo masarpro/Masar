@@ -855,11 +855,18 @@ export async function addSubcontractClaimPayment(data: {
 			);
 		}
 
-		// 3. Generate payment number
-		const paymentCount = await tx.subcontractPayment.count({
+		// 3. Generate payment number from MAX existing + 1 (never count+1: after a
+		// payment deletion, count regresses and reuses a number → P2002 under
+		// @@unique([contractId, paymentNo]). MAX of surviving rows can't collide.
+		const lastPayment = await tx.subcontractPayment.findFirst({
 			where: { contractId: claim.contractId },
+			orderBy: { paymentNo: "desc" },
+			select: { paymentNo: true },
 		});
-		const paymentNo = `PAY-${String(paymentCount + 1).padStart(4, "0")}`;
+		const lastNum = lastPayment
+			? Number.parseInt(lastPayment.paymentNo.replace(/^PAY-/, ""), 10)
+			: 0;
+		const paymentNo = `PAY-${String((Number.isNaN(lastNum) ? 0 : lastNum) + 1).padStart(4, "0")}`;
 
 		// 4. Create payment
 		const payment = await tx.subcontractPayment.create({

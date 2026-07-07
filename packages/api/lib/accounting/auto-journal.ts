@@ -68,7 +68,7 @@
 
 import { type PrismaClient, Prisma } from "@repo/database/prisma/generated/client";
 import { createJournalEntry, reverseJournalEntry, seedChartOfAccounts, createBankChartAccount, EXPENSE_CATEGORY_TO_ACCOUNT_CODE, isPeriodClosed, orgAuditLog } from "@repo/database";
-import { getAccountCodeForCategory, isCategoryVatExempt } from "@repo/utils";
+import { getAccountCodeForCategory, isCategoryVatExempt, VAT_DIVISOR_STR } from "@repo/utils";
 
 const ZERO = new Prisma.Decimal(0);
 
@@ -175,7 +175,14 @@ export async function onInvoiceIssued(db: PrismaClient, invoice: {
 	const revenueId = await getAccountByCode(db, invoice.organizationId, "4100");
 	const vatPayableId = await getAccountByCode(db, invoice.organizationId, "2130");
 
-	if (!receivableId || !revenueId || !vatPayableId) return;
+	if (!receivableId || !revenueId || !vatPayableId) {
+		const missing = [!receivableId && "1120", !revenueId && "4100", !vatPayableId && "2130"].filter(Boolean) as string[];
+		console.error(`[AutoJournal] onInvoiceIssued: missing account(s) [${missing.join(", ")}] — entry skipped for invoice ${invoice.id}`);
+		if (invoice.userId) {
+			await orgAuditLog({ organizationId: invoice.organizationId, actorId: invoice.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: invoice.id, metadata: { reason: "missing_accounts", hook: "onInvoiceIssued", missing } });
+		}
+		return;
+	}
 
 	const netAmount = invoice.totalAmount.sub(invoice.vatAmount);
 	const lines: any[] = [
@@ -219,7 +226,14 @@ export async function onInvoicePaymentReceived(db: PrismaClient, payment: {
 
 	const bankAccId = await getBankChartAccountId(db, payment.organizationId, payment.sourceAccountId);
 	const receivableId = await getAccountByCode(db, payment.organizationId, "1120");
-	if (!bankAccId || !receivableId) return;
+	if (!bankAccId || !receivableId) {
+		const missing = [!bankAccId && "bank", !receivableId && "1120"].filter(Boolean) as string[];
+		console.error(`[AutoJournal] onInvoicePaymentReceived: missing account(s) [${missing.join(", ")}] — entry skipped for payment ${payment.paymentId}`);
+		if (payment.userId) {
+			await orgAuditLog({ organizationId: payment.organizationId, actorId: payment.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: payment.paymentId, metadata: { reason: "missing_accounts", hook: "onInvoicePaymentReceived", missing } });
+		}
+		return;
+	}
 
 	await createJournalEntry(db, {
 		organizationId: payment.organizationId,
@@ -275,7 +289,14 @@ export async function onExpenseCompleted(db: PrismaClient, expense: {
 		bankAccId = await getAccountByCode(db, expense.organizationId, "1110");
 	}
 
-	if (!expenseAccId || !bankAccId) return;
+	if (!expenseAccId || !bankAccId) {
+		const missing = [!expenseAccId && expenseCode, !bankAccId && (expense.sourceAccountId ? "bank" : "1110")].filter(Boolean) as string[];
+		console.error(`[AutoJournal] onExpenseCompleted: missing account(s) [${missing.join(", ")}] — entry skipped for expense ${expense.id}`);
+		if (expense.userId) {
+			await orgAuditLog({ organizationId: expense.organizationId, actorId: expense.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: expense.id, metadata: { reason: "missing_accounts", hook: "onExpenseCompleted", missing } });
+		}
+		return;
+	}
 
 	// VAT-exempt categories (no input VAT to recover)
 	const VAT_EXEMPT = ["SALARIES", "SALARY", "GOVERNMENT_FEES", "BANK_FEES", "FINES", "INSURANCE"];
@@ -292,7 +313,7 @@ export async function onExpenseCompleted(db: PrismaClient, expense: {
 		);
 	} else {
 		// Split: net expense + input VAT (Saudi 15%) — use Prisma.Decimal for consistency with reports
-		const netAmount = expense.amount.div(new Prisma.Decimal("1.15")).toDecimalPlaces(2);
+		const netAmount = expense.amount.div(new Prisma.Decimal(VAT_DIVISOR_STR)).toDecimalPlaces(2);
 		const vatAmount = expense.amount.sub(netAmount);
 
 		lines.push(
@@ -345,7 +366,14 @@ export async function onTransferCompleted(db: PrismaClient, transfer: {
 
 	const fromAccId = await getBankChartAccountId(db, transfer.organizationId, transfer.fromAccountId);
 	const toAccId = await getBankChartAccountId(db, transfer.organizationId, transfer.toAccountId);
-	if (!fromAccId || !toAccId) return;
+	if (!fromAccId || !toAccId) {
+		const missing = [!fromAccId && "bank:from", !toAccId && "bank:to"].filter(Boolean) as string[];
+		console.error(`[AutoJournal] onTransferCompleted: missing account(s) [${missing.join(", ")}] — entry skipped for transfer ${transfer.id}`);
+		if (transfer.userId) {
+			await orgAuditLog({ organizationId: transfer.organizationId, actorId: transfer.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: transfer.id, metadata: { reason: "missing_accounts", hook: "onTransferCompleted", missing } });
+		}
+		return;
+	}
 
 	await createJournalEntry(db, {
 		organizationId: transfer.organizationId,
@@ -383,7 +411,14 @@ export async function onSubcontractPayment(db: PrismaClient, payment: {
 	const debitCode = payment.claimId ? "2120" : "5200";
 	const debitAccId = await getAccountByCode(db, payment.organizationId, debitCode);
 	const bankAccId = await getBankChartAccountId(db, payment.organizationId, payment.sourceAccountId);
-	if (!debitAccId || !bankAccId) return;
+	if (!debitAccId || !bankAccId) {
+		const missing = [!debitAccId && debitCode, !bankAccId && "bank"].filter(Boolean) as string[];
+		console.error(`[AutoJournal] onSubcontractPayment: missing account(s) [${missing.join(", ")}] — entry skipped for payment ${payment.id}`);
+		if (payment.userId) {
+			await orgAuditLog({ organizationId: payment.organizationId, actorId: payment.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: payment.id, metadata: { reason: "missing_accounts", hook: "onSubcontractPayment", missing } });
+		}
+		return;
+	}
 
 	await createJournalEntry(db, {
 		organizationId: payment.organizationId,
@@ -422,7 +457,14 @@ export async function onSubcontractClaimApproved(db: PrismaClient, claim: {
 
 	const subCostAccId = await getAccountByCode(db, claim.organizationId, "5200");
 	const subPayableAccId = await getAccountByCode(db, claim.organizationId, "2120");
-	if (!subCostAccId || !subPayableAccId) return;
+	if (!subCostAccId || !subPayableAccId) {
+		const missing = [!subCostAccId && "5200", !subPayableAccId && "2120"].filter(Boolean) as string[];
+		console.error(`[AutoJournal] onSubcontractClaimApproved: missing account(s) [${missing.join(", ")}] — entry skipped for claim ${claim.id}`);
+		if (claim.userId) {
+			await orgAuditLog({ organizationId: claim.organizationId, actorId: claim.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: claim.id, metadata: { reason: "missing_accounts", hook: "onSubcontractClaimApproved", missing } });
+		}
+		return;
+	}
 
 	await createJournalEntry(db, {
 		organizationId: claim.organizationId,
@@ -519,7 +561,14 @@ export async function onOrganizationPaymentReceived(db: PrismaClient, payment: {
 
 	const bankAccId = await getBankChartAccountId(db, payment.organizationId, payment.destinationAccountId);
 	const revenueAccId = await getAccountByCode(db, payment.organizationId, "4300");
-	if (!bankAccId || !revenueAccId) return;
+	if (!bankAccId || !revenueAccId) {
+		const missing = [!bankAccId && "bank", !revenueAccId && "4300"].filter(Boolean) as string[];
+		console.error(`[AutoJournal] onOrganizationPaymentReceived: missing account(s) [${missing.join(", ")}] — entry skipped for payment ${payment.id}`);
+		if (payment.userId) {
+			await orgAuditLog({ organizationId: payment.organizationId, actorId: payment.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: payment.id, metadata: { reason: "missing_accounts", hook: "onOrganizationPaymentReceived", missing } });
+		}
+		return;
+	}
 
 	await createJournalEntry(db, {
 		organizationId: payment.organizationId,
@@ -591,7 +640,14 @@ export async function onProjectPaymentReceived(db: PrismaClient, payment: {
 	// receivable (1120) so claim/invoice revenue isn't double-counted.
 	const hasBilling = await projectHasBillingDocuments(db, payment.organizationId, payment.projectId);
 	const creditAccId = await getAccountByCode(db, payment.organizationId, hasBilling ? "1120" : "4100");
-	if (!bankAccId || !creditAccId) return;
+	if (!bankAccId || !creditAccId) {
+		const missing = [!bankAccId && "bank", !creditAccId && (hasBilling ? "1120" : "4100")].filter(Boolean) as string[];
+		console.error(`[AutoJournal] onProjectPaymentReceived: missing account(s) [${missing.join(", ")}] — entry skipped for payment ${payment.id}`);
+		if (payment.userId) {
+			await orgAuditLog({ organizationId: payment.organizationId, actorId: payment.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: payment.id, metadata: { reason: "missing_accounts", hook: "onProjectPaymentReceived", missing } });
+		}
+		return;
+	}
 
 	await createJournalEntry(db, {
 		organizationId: payment.organizationId,
@@ -626,7 +682,14 @@ export async function onProjectClaimApproved(db: PrismaClient, claim: {
 
 	const receivableId = await getAccountByCode(db, claim.organizationId, "1120");
 	const revenueId = await getAccountByCode(db, claim.organizationId, "4100");
-	if (!receivableId || !revenueId) return;
+	if (!receivableId || !revenueId) {
+		const missing = [!receivableId && "1120", !revenueId && "4100"].filter(Boolean) as string[];
+		console.error(`[AutoJournal] onProjectClaimApproved: missing account(s) [${missing.join(", ")}] — entry skipped for claim ${claim.id}`);
+		if (claim.userId) {
+			await orgAuditLog({ organizationId: claim.organizationId, actorId: claim.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: claim.id, metadata: { reason: "missing_accounts", hook: "onProjectClaimApproved", missing } });
+		}
+		return;
+	}
 
 	await createJournalEntry(db, {
 		organizationId: claim.organizationId,
@@ -663,7 +726,14 @@ export async function onCreditNoteIssued(db: PrismaClient, creditNote: {
 	const receivableId = await getAccountByCode(db, creditNote.organizationId, "1120");
 	const revenueId = await getAccountByCode(db, creditNote.organizationId, "4100");
 	const vatPayableId = await getAccountByCode(db, creditNote.organizationId, "2130");
-	if (!receivableId || !revenueId || !vatPayableId) return;
+	if (!receivableId || !revenueId || !vatPayableId) {
+		const missing = [!receivableId && "1120", !revenueId && "4100", !vatPayableId && "2130"].filter(Boolean) as string[];
+		console.error(`[AutoJournal] onCreditNoteIssued: missing account(s) [${missing.join(", ")}] — entry skipped for credit note ${creditNote.id}`);
+		if (creditNote.userId) {
+			await orgAuditLog({ organizationId: creditNote.organizationId, actorId: creditNote.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: creditNote.id, metadata: { reason: "missing_accounts", hook: "onCreditNoteIssued", missing } });
+		}
+		return;
+	}
 
 	const netAmount = creditNote.totalAmount.sub(creditNote.vatAmount);
 	const lines: any[] = [
@@ -744,7 +814,14 @@ export async function onReceiptVoucherIssued(db: PrismaClient, voucher: {
 		: await getAccountByCode(db, voucher.organizationId, "1110");
 	// Credit: Other Revenue (4300)
 	const revenueId = await getAccountByCode(db, voucher.organizationId, "4300");
-	if (!bankAccId || !revenueId) return;
+	if (!bankAccId || !revenueId) {
+		const missing = [!bankAccId && (voucher.destinationAccountId ? "bank" : "1110"), !revenueId && "4300"].filter(Boolean) as string[];
+		console.error(`[AutoJournal] onReceiptVoucherIssued: missing account(s) [${missing.join(", ")}] — entry skipped for voucher ${voucher.id}`);
+		if (voucher.userId) {
+			await orgAuditLog({ organizationId: voucher.organizationId, actorId: voucher.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: voucher.id, metadata: { reason: "missing_accounts", hook: "onReceiptVoucherIssued", missing } });
+		}
+		return;
+	}
 
 	await createJournalEntry(db, {
 		organizationId: voucher.organizationId,
@@ -790,7 +867,14 @@ export async function onPaymentVoucherApproved(db: PrismaClient, voucher: {
 	else if (voucher.payeeType === "EMPLOYEE") expenseCode = "6100";
 
 	const expenseAccId = await getAccountByCode(db, voucher.organizationId, expenseCode);
-	if (!bankAccId || !expenseAccId) return;
+	if (!bankAccId || !expenseAccId) {
+		const missing = [!bankAccId && (voucher.sourceAccountId ? "bank" : "1110"), !expenseAccId && expenseCode].filter(Boolean) as string[];
+		console.error(`[AutoJournal] onPaymentVoucherApproved: missing account(s) [${missing.join(", ")}] — entry skipped for voucher ${voucher.id}`);
+		if (voucher.userId) {
+			await orgAuditLog({ organizationId: voucher.organizationId, actorId: voucher.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: voucher.id, metadata: { reason: "missing_accounts", hook: "onPaymentVoucherApproved", missing } });
+		}
+		return;
+	}
 
 	await createJournalEntry(db, {
 		organizationId: voucher.organizationId,
@@ -832,7 +916,14 @@ export async function onOwnerDrawing(db: PrismaClient, drawing: {
 			? await getBankChartAccountId(db, drawing.organizationId, drawing.bankAccountId)
 			: await getAccountByCode(db, drawing.organizationId, "1110");
 
-		if (!bankAccId) return null;
+		if (!bankAccId) {
+			const missing = [drawing.bankAccountId ? "bank" : "1110"];
+			console.error(`[AutoJournal] onOwnerDrawing: missing account(s) [${missing.join(", ")}] — entry skipped for drawing ${drawing.id}`);
+			if (drawing.userId) {
+				await orgAuditLog({ organizationId: drawing.organizationId, actorId: drawing.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: drawing.id, metadata: { reason: "missing_accounts", hook: "onOwnerDrawing", missing } });
+			}
+			return null;
+		}
 
 		// Build description
 		const desc = drawing.projectId && drawing.projectName
@@ -916,7 +1007,14 @@ export async function onCapitalContribution(db: PrismaClient, data: {
 		// Credit: Capital account (3100 — رأس المال)
 		const capitalAccId = await getAccountByCode(db, data.organizationId, "3100");
 
-		if (!bankAccId || !capitalAccId) return null;
+		if (!bankAccId || !capitalAccId) {
+			const missing = [!bankAccId && (data.bankAccountId ? "bank" : "1110"), !capitalAccId && "3100"].filter(Boolean) as string[];
+			console.error(`[AutoJournal] onCapitalContribution: missing account(s) [${missing.join(", ")}] — entry skipped for contribution ${data.id}`);
+			if (data.userId) {
+				await orgAuditLog({ organizationId: data.organizationId, actorId: data.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: data.id, metadata: { reason: "missing_accounts", hook: "onCapitalContribution", missing } });
+			}
+			return null;
+		}
 
 		const desc = `مساهمة رأس مال — ${data.ownerName} — ${data.contributionNo} | Capital contribution — ${data.ownerName} — ${data.contributionNo}`;
 
@@ -968,7 +1066,14 @@ export async function onFinalHandoverCompleted(db: PrismaClient, handover: {
 
 	const retentionAccId = await getAccountByCode(db, handover.organizationId, "2150"); // محتجزات
 	const receivableId = await getAccountByCode(db, handover.organizationId, "1120");   // عملاء
-	if (!retentionAccId || !receivableId) return;
+	if (!retentionAccId || !receivableId) {
+		const missing = [!retentionAccId && "2150", !receivableId && "1120"].filter(Boolean) as string[];
+		console.error(`[AutoJournal] onFinalHandoverCompleted: missing account(s) [${missing.join(", ")}] — entry skipped for handover ${handover.id}`);
+		if (handover.userId) {
+			await orgAuditLog({ organizationId: handover.organizationId, actorId: handover.userId, action: "JOURNAL_ENTRY_FAILED", entityType: "journal_entry", entityId: handover.id, metadata: { reason: "missing_accounts", hook: "onFinalHandoverCompleted", missing } });
+		}
+		return;
+	}
 
 	await createJournalEntry(db, {
 		organizationId: handover.organizationId,

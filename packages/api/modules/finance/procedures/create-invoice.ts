@@ -365,11 +365,11 @@ export const updateInvoiceStatusProcedure = subscriptionProcedure
 			where: { id: input.id, organizationId: input.organizationId },
 			select: { status: true, invoiceType: true },
 		});
-		if (!currentInvoice) throw new Error("الفاتورة غير موجودة");
+		if (!currentInvoice) throw new ORPCError("NOT_FOUND", { message: "الفاتورة غير موجودة" });
 
 		const allowed = ALLOWED_TRANSITIONS[currentInvoice.status] ?? [];
 		if (!allowed.includes(input.status)) {
-			throw new Error(`لا يمكن تغيير حالة الفاتورة من ${currentInvoice.status} إلى ${input.status}`);
+			throw new ORPCError("BAD_REQUEST", { message: `لا يمكن تغيير حالة الفاتورة من ${currentInvoice.status} إلى ${input.status}` });
 		}
 
 		// Credit notes must not be cancelled through the generic status path:

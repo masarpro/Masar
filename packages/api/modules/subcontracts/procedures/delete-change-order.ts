@@ -59,7 +59,7 @@ export const deleteSubcontractChangeOrderProcedure = subscriptionProcedure
 			entityType: "subcontract_change_order",
 			entityId: input.changeOrderId,
 			metadata: { contractId: input.contractId },
-		}).catch(() => {});
+		}).catch((e) => console.error("[Subcontracts] audit log failed:", e));
 
 		return { success: true };
 	});

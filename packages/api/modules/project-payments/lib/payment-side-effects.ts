@@ -47,7 +47,7 @@ export async function emitProjectPaymentCreated(
 				contractTermId: payment.contractTermId,
 				paymentNo: payment.paymentNo,
 			},
-		}).catch(() => {});
+		}).catch((e) => console.error("[ProjectPayments] audit log failed:", e));
 
 		// Auto-Journal: generate accounting entry for project payment
 		try {
@@ -101,6 +101,14 @@ export async function emitProjectPaymentCreated(
 				"[ReceiptVoucher] Failed to create auto voucher from project payment:",
 				e,
 			);
+			await orgAuditLog({
+				organizationId: ctx.organizationId,
+				actorId: ctx.userId,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "voucher",
+				entityId: payment.id,
+				metadata: { error: String(e), type: "RECEIPT_VOUCHER_AUTO_CREATE" },
+			});
 		}
 	}
 }

@@ -61,7 +61,7 @@ export const updateSubcontractClaimStatusProcedure = subscriptionProcedure
 				entityType: "subcontract_claim",
 				entityId: input.claimId,
 				metadata: { newStatus: input.status },
-			}).catch(() => {});
+			}).catch((e) => console.error("[Subcontracts] audit log failed:", e));
 
 			// Auto-Journal: create accrual entry when claim is approved
 			if (input.status === "APPROVED") {

@@ -94,7 +94,7 @@ export const createSubcontractClaimProcedure = subscriptionProcedure
 					claimNo: claim.claimNo,
 					grossAmount: Number(claim.grossAmount),
 				},
-			}).catch(() => {});
+			}).catch((e) => console.error("[Subcontracts] audit log failed:", e));
 
 			const project = await db.project.findFirst({
 				where: { id: input.projectId, organizationId: input.organizationId },

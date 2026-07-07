@@ -1,4 +1,4 @@
-import { createChangeOrder, logAuditEvent, getProjectById, getProjectContract, db } from "@repo/database";
+import { createChangeOrder, logAuditEvent, getProjectById, getProjectContract, orgAuditLog, db } from "@repo/database";
 import { z } from "zod";
 import { subscriptionProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
@@ -59,17 +59,30 @@ export const createChangeOrderProcedure = subscriptionProcedure
 			},
 		);
 
-		// Auto-link CO to project contract if exists (fire and forget)
-		getProjectContract(input.organizationId, input.projectId)
-			.then(async (contract) => {
-				if (contract) {
-					await db.projectChangeOrder.update({
-						where: { id: changeOrder.id },
-						data: { contractId: contract.id },
-					});
-				}
-			})
-			.catch(() => {});
+		// Auto-link CO to project contract if exists — non-fatal, but a lost link
+		// silently detaches costImpact from the contract, so it must leave a trace.
+		try {
+			const contract = await getProjectContract(
+				input.organizationId,
+				input.projectId,
+			);
+			if (contract) {
+				await db.projectChangeOrder.update({
+					where: { id: changeOrder.id },
+					data: { contractId: contract.id },
+				});
+			}
+		} catch (e) {
+			console.error("[ChangeOrders] Failed to link CO to contract:", e);
+			await orgAuditLog({
+				organizationId: input.organizationId,
+				actorId: context.user.id,
+				action: "JOURNAL_ENTRY_FAILED",
+				entityType: "change_order",
+				entityId: changeOrder.id,
+				metadata: { type: "CHANGE_ORDER_CONTRACT_LINK_FAILED", error: String(e) },
+			});
+		}
 
 		// Log audit event
 		await logAuditEvent(input.organizationId, input.projectId, {

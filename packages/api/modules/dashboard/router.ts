@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { protectedProcedure } from "../../orpc/procedures";
 import { verifyOrganizationMembership } from "../organizations/lib/membership";
@@ -35,7 +36,7 @@ const getStats = protectedProcedure
 			context.user.id,
 		);
 		if (!membership) {
-			throw new Error("Unauthorized");
+			throw new ORPCError("FORBIDDEN", { message: "Unauthorized" });
 		}
 
 		return getDashboardStats(input.organizationId);
@@ -52,7 +53,7 @@ const getProjectDistribution = protectedProcedure
 			context.user.id,
 		);
 		if (!membership) {
-			throw new Error("Unauthorized");
+			throw new ORPCError("FORBIDDEN", { message: "Unauthorized" });
 		}
 
 		return getProjectStatusDistribution(input.organizationId);
@@ -69,7 +70,7 @@ const getTypeDistribution = protectedProcedure
 			context.user.id,
 		);
 		if (!membership) {
-			throw new Error("Unauthorized");
+			throw new ORPCError("FORBIDDEN", { message: "Unauthorized" });
 		}
 
 		return getProjectTypeDistribution(input.organizationId);
@@ -86,7 +87,7 @@ const getFinancialSummary = protectedProcedure
 			context.user.id,
 		);
 		if (!membership) {
-			throw new Error("Unauthorized");
+			throw new ORPCError("FORBIDDEN", { message: "Unauthorized" });
 		}
 
 		return getFinancialSummaryByProject(input.organizationId);
@@ -107,7 +108,7 @@ const getUpcoming = protectedProcedure
 			context.user.id,
 		);
 		if (!membership) {
-			throw new Error("Unauthorized");
+			throw new ORPCError("FORBIDDEN", { message: "Unauthorized" });
 		}
 
 		return getUpcomingMilestones(input.organizationId, input.limit);
@@ -128,7 +129,7 @@ const getOverdue = protectedProcedure
 			context.user.id,
 		);
 		if (!membership) {
-			throw new Error("Unauthorized");
+			throw new ORPCError("FORBIDDEN", { message: "Unauthorized" });
 		}
 
 		return getOverdueMilestones(input.organizationId, input.limit);
@@ -149,7 +150,7 @@ const getActivities = protectedProcedure
 			context.user.id,
 		);
 		if (!membership) {
-			throw new Error("Unauthorized");
+			throw new ORPCError("FORBIDDEN", { message: "Unauthorized" });
 		}
 
 		return getRecentActivities(input.organizationId, input.limit);
@@ -166,7 +167,7 @@ const getFinancialTrend = protectedProcedure
 			context.user.id,
 		);
 		if (!membership) {
-			throw new Error("Unauthorized");
+			throw new ORPCError("FORBIDDEN", { message: "Unauthorized" });
 		}
 
 		return getMonthlyFinancialTrend(input.organizationId);
@@ -188,7 +189,7 @@ const getAll = protectedProcedure
 			context.user.id,
 		);
 		if (!membership) {
-			throw new Error("Unauthorized");
+			throw new ORPCError("FORBIDDEN", { message: "Unauthorized" });
 		}
 
 		const [

@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import {
 	seedChartOfAccounts,
 	getChartOfAccounts,
@@ -76,7 +77,7 @@ export const getAccountByIdProcedure = protectedProcedure
 
 		const account = await getChartAccountById(db, input.id, input.organizationId);
 		if (!account) {
-			throw new Error("Account not found");
+			throw new ORPCError("NOT_FOUND", { message: "الحساب غير موجود" });
 		}
 
 		const balance = await getAccountBalance(db, input.id);
@@ -121,7 +122,9 @@ export const createAccountProcedure = subscriptionProcedure
 			const parent = await db.chartAccount.findFirst({
 				where: { id: input.parentId, organizationId: input.organizationId },
 			});
-			if (!parent) throw new Error("Parent account not found");
+			if (!parent) {
+				throw new ORPCError("NOT_FOUND", { message: "الحساب الأب غير موجود" });
+			}
 		}
 
 		// Check code uniqueness
@@ -133,7 +136,9 @@ export const createAccountProcedure = subscriptionProcedure
 				},
 			},
 		});
-		if (existing) throw new Error("Account code already exists");
+		if (existing) {
+			throw new ORPCError("CONFLICT", { message: "رمز الحساب مستخدم بالفعل" });
+		}
 
 		return db.chartAccount.create({
 			data: {
@@ -180,7 +185,9 @@ export const updateAccountProcedure = subscriptionProcedure
 		const account = await db.chartAccount.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
 		});
-		if (!account) throw new Error("Account not found");
+		if (!account) {
+			throw new ORPCError("NOT_FOUND", { message: "الحساب غير موجود" });
+		}
 
 		return db.chartAccount.update({
 			where: { id: input.id },
@@ -212,8 +219,14 @@ export const deactivateAccountProcedure = subscriptionProcedure
 		const account = await db.chartAccount.findFirst({
 			where: { id: input.id, organizationId: input.organizationId },
 		});
-		if (!account) throw new Error("Account not found");
-		if (account.isSystem) throw new Error("System accounts cannot be deactivated");
+		if (!account) {
+			throw new ORPCError("NOT_FOUND", { message: "الحساب غير موجود" });
+		}
+		if (account.isSystem) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "لا يمكن إلغاء تفعيل حسابات النظام",
+			});
+		}
 
 		// Check no posted entries
 		const postedLines = await db.journalEntryLine.count({
@@ -223,7 +236,9 @@ export const deactivateAccountProcedure = subscriptionProcedure
 			},
 		});
 		if (postedLines > 0) {
-			throw new Error("Cannot deactivate account with posted journal entries");
+			throw new ORPCError("BAD_REQUEST", {
+				message: "لا يمكن إلغاء تفعيل حساب مرتبط بقيود مرحّلة",
+			});
 		}
 
 		return db.chartAccount.update({
