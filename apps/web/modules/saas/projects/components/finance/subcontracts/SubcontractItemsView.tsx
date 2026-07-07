@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatSAR } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import {
 	AlertDialog,
@@ -47,15 +48,6 @@ interface SubcontractItemsViewProps {
 	organizationSlug: string;
 	projectId: string;
 	subcontractId: string;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 function formatNumber(value: number, decimals = 2): string {
@@ -203,7 +195,7 @@ export function SubcontractItemsView({
 					<h1 className="text-2xl font-bold">{t("title")}</h1>
 					{contract && (
 						<p className="text-muted-foreground mt-1">
-							{contract.name} — {t("contractTotal")}: {formatCurrency(Number(contract.value))}
+							{contract.name} — {t("contractTotal")}: {formatSAR(Number(contract.value))}
 						</p>
 					)}
 				</div>
@@ -268,7 +260,7 @@ export function SubcontractItemsView({
 										{formatNumber(item.unitPrice)}
 									</TableCell>
 									<TableCell className="text-center font-medium tabular-nums" dir="ltr">
-										{formatCurrency(item.totalAmount)}
+										{formatSAR(item.totalAmount)}
 									</TableCell>
 									<TableCell className="text-center tabular-nums" dir="ltr">
 										{formatNumber(item.totalCumulativeQty, 3)}
@@ -315,7 +307,7 @@ export function SubcontractItemsView({
 									{t("contractTotal")}
 								</TableCell>
 								<TableCell className="text-center tabular-nums" dir="ltr">
-									{formatCurrency(totalContractAmount)}
+									{formatSAR(totalContractAmount)}
 								</TableCell>
 								<TableCell colSpan={3} />
 							</TableRow>

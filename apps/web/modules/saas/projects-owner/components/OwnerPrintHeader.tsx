@@ -1,6 +1,7 @@
 "use client";
 
 import { resolveImageSrc } from "@saas/shared/lib/image-src";
+import { formatDate } from "@shared/lib/formatters";
 import { Building2 } from "lucide-react";
 import Image from "next/image";
 
@@ -12,17 +13,6 @@ interface OwnerPrintHeaderProps {
 	orgLogo?: string | null;
 	startDate?: Date | string | null;
 	endDate?: Date | string | null;
-}
-
-function formatDate(date: Date | string | null | undefined): string {
-	if (!date) return "-";
-	const d = typeof date === "string" ? new Date(date) : date;
-	if (Number.isNaN(d.getTime())) return "-";
-	return d.toLocaleDateString("ar-SA", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	});
 }
 
 /**

@@ -1,5 +1,6 @@
 "use client";
 
+import { formatSAR } from "@shared/lib/formatters";
 import { Banknote, FileDiff, TrendingUp, Shield } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -8,15 +9,6 @@ interface ContractSummaryBarProps {
 	approvedCOImpact: number;
 	adjustedValue: number;
 	retentionAmount: number;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 export function ContractSummaryBar({
@@ -98,10 +90,10 @@ export function ContractSummaryBar({
 							<p className={`text-xs ${card.labelColor}`}>{card.title}</p>
 							<p
 								className={`truncate text-lg font-semibold ${card.textColor}`}
-								title={formatCurrency(card.value)}
+								title={formatSAR(card.value)}
 							>
 								{"prefix" in card && card.prefix}
-								{formatCurrency(card.value)}
+								{formatSAR(card.value)}
 							</p>
 						</div>
 					</div>

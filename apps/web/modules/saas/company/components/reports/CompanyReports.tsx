@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
+import { formatCurrencySuffixed } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import {
@@ -43,7 +44,7 @@ export function CompanyReports({ organizationId }: CompanyReportsProps) {
 	);
 
 	const formatCurrency = (amount: number) =>
-		new Intl.NumberFormat("en-SA").format(amount) + ` ${t("common.sar")}`;
+		formatCurrencySuffixed(amount, t("common.sar"), 0);
 
 	if (isLoading) {
 		return <DashboardSkeleton />;

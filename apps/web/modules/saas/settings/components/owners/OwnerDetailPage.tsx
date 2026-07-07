@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
+import { formatSARPrecise } from "@shared/lib/formatters";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
@@ -136,15 +137,6 @@ interface DrawingItem {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-SA", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	}).format(value);
-}
 
 function InfoRow({
 	label,
@@ -473,7 +465,7 @@ export function OwnerDetailPage({
 						) : (
 							<>
 								<div className="mt-1 text-2xl font-bold text-blue-600 dark:text-blue-400 tabular-nums">
-									{formatCurrency(
+									{formatSARPrecise(
 										capitalData?.totalContributions ?? 0,
 									)}
 								</div>
@@ -499,14 +491,14 @@ export function OwnerDetailPage({
 						) : (
 							<>
 								<div className="mt-1 text-2xl font-bold text-green-600 dark:text-green-400 tabular-nums">
-									{formatCurrency(
+									{formatSARPrecise(
 										ownerSummary?.expectedShareOfProfit ??
 											0,
 									)}
 								</div>
 								<p className="text-xs text-muted-foreground mt-0.5">
 									{t("dashboard.fromNetProfit", {
-										amount: formatCurrency(
+										amount: formatSARPrecise(
 											ownerSummary?.currentYearProfit ??
 												0,
 										),
@@ -529,7 +521,7 @@ export function OwnerDetailPage({
 						) : (
 							<>
 								<div className="mt-1 text-2xl font-bold text-red-600 dark:text-red-400 tabular-nums">
-									{formatCurrency(
+									{formatSARPrecise(
 										ownerSummary?.totalDrawings ?? 0,
 									)}
 								</div>
@@ -567,7 +559,7 @@ export function OwnerDetailPage({
 											: "text-emerald-600 dark:text-emerald-400"
 									}`}
 								>
-									{formatCurrency(
+									{formatSARPrecise(
 										ownerSummary?.balance ?? 0,
 									)}
 								</div>
@@ -626,13 +618,13 @@ export function OwnerDetailPage({
 							<CardContent className="space-y-2 text-sm">
 								<InfoRow
 									label={t("dashboard.currentYearProfit")}
-									value={formatCurrency(
+									value={formatSARPrecise(
 										ownerSummary.currentYearProfit,
 									)}
 								/>
 								<InfoRow
 									label={`× ${owner.name} (${Number(owner.ownershipPercent).toFixed(2)}%)`}
-									value={formatCurrency(
+									value={formatSARPrecise(
 										ownerSummary.expectedShareOfProfit,
 									)}
 								/>
@@ -642,7 +634,7 @@ export function OwnerDetailPage({
 										label={t(
 											"dashboard.capitalContributed",
 										)}
-										value={formatCurrency(
+										value={formatSARPrecise(
 											capitalData?.totalContributions ??
 												0,
 										)}
@@ -652,7 +644,7 @@ export function OwnerDetailPage({
 									label={`- ${t("dashboard.totalDrawingsYTD")}`}
 									value={
 										<span className="text-red-600">
-											{formatCurrency(
+											{formatSARPrecise(
 												ownerSummary.totalDrawings,
 											)}
 										</span>
@@ -671,7 +663,7 @@ export function OwnerDetailPage({
 														: "text-green-600"
 												}`}
 											>
-												{formatCurrency(
+												{formatSARPrecise(
 													ownerSummary.balance,
 												)}
 											</span>
@@ -727,7 +719,7 @@ export function OwnerDetailPage({
 												formatter={(
 													value: number,
 												) => [
-													formatCurrency(value),
+													formatSARPrecise(value),
 													t(
 														"dashboard.totalDrawingsYTD",
 													),
@@ -780,7 +772,7 @@ export function OwnerDetailPage({
 													{p.projectName}
 												</TableCell>
 												<TableCell className="text-end font-medium tabular-nums">
-													{formatCurrency(p.total)}
+													{formatSARPrecise(p.total)}
 												</TableCell>
 												<TableCell className="text-end tabular-nums">
 													{p.count}
@@ -921,7 +913,7 @@ export function OwnerDetailPage({
 															)}
 														</TableCell>
 														<TableCell className="text-end font-medium tabular-nums">
-															{formatCurrency(
+															{formatSARPrecise(
 																Number(
 																	c.amount,
 																),
@@ -973,7 +965,7 @@ export function OwnerDetailPage({
 													{tCommon("total")}
 												</TableCell>
 												<TableCell className="text-end tabular-nums">
-													{formatCurrency(
+													{formatSARPrecise(
 														capitalData.totalContributions,
 													)}
 												</TableCell>
@@ -1071,7 +1063,7 @@ export function OwnerDetailPage({
 														)}
 													</TableCell>
 													<TableCell className="text-end font-medium tabular-nums">
-														{formatCurrency(
+														{formatSARPrecise(
 															Number(d.amount),
 														)}
 													</TableCell>

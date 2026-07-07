@@ -24,6 +24,7 @@ import {
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { formatNumber } from "@shared/lib/formatters";
 import { LeadPriorityIndicator } from "./LeadPriorityIndicator";
 import { LeadStatusBadge } from "./LeadStatusBadge";
 
@@ -56,13 +57,6 @@ function getStatusProgress(status: string): string {
 		WON: "100%",
 	};
 	return map[status] ?? "0%";
-}
-
-function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat("en-SA", {
-		style: "decimal",
-		maximumFractionDigits: 0,
-	}).format(amount);
 }
 
 const STATUS_LABELS = ["جديد", "دراسة", "عرض", "تفاوض", "عقد"];
@@ -118,7 +112,7 @@ export function LeadHeader({ lead, organizationSlug, onChangeStatus, onDelete, o
 							{lead.estimatedValue && (
 								<span className="flex items-center gap-1 text-primary font-medium">
 									<Banknote className="h-3 w-3" />
-									{formatCurrency(Number(lead.estimatedValue))} ر.س
+									{formatNumber(Number(lead.estimatedValue), 0)} ر.س
 								</span>
 							)}
 							{lead.assignedTo && (

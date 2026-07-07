@@ -1,5 +1,6 @@
 "use client";
 
+import { formatSAR } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
@@ -23,15 +24,6 @@ interface RetentionCardProps {
 	projectId: string;
 	data: RetentionData | null;
 	retentionAmount: number;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 export function RetentionCard({
@@ -149,7 +141,7 @@ export function RetentionCard({
 							{t("projects.contract.retention.amount")}
 						</p>
 						<p className="text-lg font-semibold text-amber-700 dark:text-amber-300">
-							{formatCurrency(retentionAmount)}
+							{formatSAR(retentionAmount)}
 						</p>
 					</div>
 				)}

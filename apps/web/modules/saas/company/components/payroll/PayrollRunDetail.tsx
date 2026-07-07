@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatCurrencySuffixed } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
@@ -96,9 +97,8 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 		}),
 	);
 
-	const formatCurrency = (amount: number | string) => {
-		return new Intl.NumberFormat("en-US", { minimumFractionDigits: 2 }).format(Number(amount)) + ` ${t("common.sar")}`;
-	};
+	const formatCurrency = (amount: number | string) =>
+		formatCurrencySuffixed(Number(amount), t("common.sar"), 2);
 
 	const getRunNo = (r: { year: number; month: number }) =>
 		`PAY-${r.year}-${String(r.month).padStart(2, "0")}`;

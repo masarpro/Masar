@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatSAR } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
@@ -43,15 +44,6 @@ interface SubcontractClaimFormProps {
 	organizationSlug: string;
 	projectId: string;
 	subcontractId: string;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 function formatNumber(value: number, decimals = 2): string {
@@ -617,7 +609,7 @@ export function SubcontractClaimForm({
 									<div className="flex justify-between">
 										<span>{t("grossAmount")}:</span>
 										<span className="font-bold tabular-nums" dir="ltr">
-											{formatCurrency(financialSummary.grossAmount)}
+											{formatSAR(financialSummary.grossAmount)}
 										</span>
 									</div>
 									<div className="flex justify-between text-muted-foreground">
@@ -625,7 +617,7 @@ export function SubcontractClaimForm({
 											(-) {t("retentionDeduction")} ({financialSummary.retentionPercent}%):
 										</span>
 										<span className="tabular-nums" dir="ltr">
-											{formatCurrency(financialSummary.retentionDeduction)}
+											{formatSAR(financialSummary.retentionDeduction)}
 										</span>
 									</div>
 									{financialSummary.advancePercent > 0 && (
@@ -634,20 +626,20 @@ export function SubcontractClaimForm({
 												(-) {t("advanceDeduction")} ({financialSummary.advancePercent}%):
 											</span>
 											<span className="tabular-nums" dir="ltr">
-												{formatCurrency(financialSummary.advanceDeduction)}
+												{formatSAR(financialSummary.advanceDeduction)}
 											</span>
 										</div>
 									)}
 									{financialSummary.penaltyDed > 0 && (
 										<div className="flex justify-between text-sm">
 											<span>(-) {t("penaltyAmount")}:</span>
-											<span className="font-medium text-red-600">{formatCurrency(financialSummary.penaltyDed)}</span>
+											<span className="font-medium text-red-600">{formatSAR(financialSummary.penaltyDed)}</span>
 										</div>
 									)}
 									{financialSummary.otherDed > 0 && (
 										<div className="flex justify-between text-sm">
 											<span>(-) {t("otherDeductions")}:</span>
-											<span className="font-medium text-red-600">{formatCurrency(financialSummary.otherDed)}</span>
+											<span className="font-medium text-red-600">{formatSAR(financialSummary.otherDed)}</span>
 										</div>
 									)}
 									<div className="flex justify-between text-muted-foreground">
@@ -655,13 +647,13 @@ export function SubcontractClaimForm({
 											(+) {t("vatAmount")} ({financialSummary.vatPercent}%):
 										</span>
 										<span className="tabular-nums" dir="ltr">
-											{formatCurrency(financialSummary.vatAmount)}
+											{formatSAR(financialSummary.vatAmount)}
 										</span>
 									</div>
 									<div className="border-t pt-3 flex justify-between text-base font-bold">
 										<span>{t("netAmount")}:</span>
 										<span className="tabular-nums" dir="ltr">
-											{formatCurrency(financialSummary.netAmount)}
+											{formatSAR(financialSummary.netAmount)}
 										</span>
 									</div>
 								</div>

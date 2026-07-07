@@ -23,18 +23,12 @@ import {
 } from "@ui/components/select";
 import { Skeleton } from "@ui/components/skeleton";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { formatNumber } from "@shared/lib/formatters";
 
 interface Props {
 	organizationId: string;
 	organizationSlug: string;
 	projectId: string;
-}
-
-function formatCurrency(value: number): string {
-	return value.toLocaleString("en-US", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	});
 }
 
 export function FinishingItemsView({
@@ -211,11 +205,11 @@ export function FinishingItemsView({
 									</TableCell>
 									<TableCell className="text-end text-slate-600 dark:text-slate-400">
 										{item.materialPrice != null
-											? formatCurrency(item.materialPrice)
+											? formatNumber(item.materialPrice, 2)
 											: "-"}
 									</TableCell>
 									<TableCell className="text-end font-medium text-slate-900 dark:text-slate-100">
-										{formatCurrency(item.totalCost)}
+										{formatNumber(item.totalCost, 2)}
 									</TableCell>
 									<TableCell
 										className="max-w-[200px] truncate text-slate-500 dark:text-slate-400"
@@ -265,7 +259,7 @@ export function FinishingItemsView({
 									{t("projectQuantities.table.grandTotal")}
 								</TableCell>
 								<TableCell className="text-end text-slate-900 dark:text-slate-100">
-									{formatCurrency(grandTotal)}
+									{formatNumber(grandTotal, 2)}
 								</TableCell>
 								<TableCell />
 								<TableCell />

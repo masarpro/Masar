@@ -9,18 +9,10 @@ import {
 	Users,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { formatNumber } from "@shared/lib/formatters";
 
 interface LeadStatsCardsProps {
 	organizationId: string;
-}
-
-function formatCurrency(amount: number): string {
-	return (
-		new Intl.NumberFormat("en-SA", {
-			style: "decimal",
-			maximumFractionDigits: 0,
-		}).format(amount) + " ر.س"
-	);
 }
 
 export function LeadStatsCards({ organizationId }: LeadStatsCardsProps) {
@@ -64,7 +56,7 @@ export function LeadStatsCards({ organizationId }: LeadStatsCardsProps) {
 		},
 		{
 			label: t("pricing.leads.stats.estimatedValue"),
-			value: formatCurrency(stats.openEstimatedValue),
+			value: `${formatNumber(stats.openEstimatedValue, 0)} ر.س`,
 			icon: Banknote,
 			iconBg: "bg-indigo-50 dark:bg-indigo-900/30",
 			iconColor: "text-indigo-600 dark:text-indigo-400",

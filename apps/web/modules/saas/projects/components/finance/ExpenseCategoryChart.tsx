@@ -1,5 +1,6 @@
 "use client";
 
+import { formatSAR } from "@shared/lib/formatters";
 import { ChartContainer, ChartTooltip } from "@ui/components/chart";
 import type { ChartConfig } from "@ui/components/chart";
 import { useTranslations } from "next-intl";
@@ -25,15 +26,6 @@ const CATEGORY_COLORS: Record<string, string> = {
 	TRANSPORT: "#f97316",
 	MISC: "#64748b",
 };
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
-}
 
 export function ExpenseCategoryChart({
 	data,
@@ -88,7 +80,7 @@ export function ExpenseCategoryChart({
 										{t(`finance.category.${item.name}`)}
 									</p>
 									<p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-										{formatCurrency(Number(item.value))}
+										{formatSAR(Number(item.value))}
 									</p>
 									<p className="text-xs text-slate-400">{percentage}%</p>
 								</div>
@@ -127,7 +119,7 @@ export function ExpenseCategoryChart({
 						dominantBaseline="middle"
 						className="fill-slate-700 text-sm font-semibold dark:fill-slate-300"
 					>
-						{formatCurrency(totalAmount)}
+						{formatSAR(totalAmount)}
 					</text>
 				</PieChart>
 			</ChartContainer>

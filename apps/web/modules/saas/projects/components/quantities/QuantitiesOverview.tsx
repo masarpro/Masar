@@ -38,6 +38,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { formatNumber } from "@shared/lib/formatters";
 import { LinkStudyDialog } from "./LinkStudyDialog";
 import { CreateStudyDialog } from "./CreateStudyDialog";
 
@@ -45,13 +46,6 @@ interface QuantitiesOverviewProps {
 	organizationId: string;
 	organizationSlug: string;
 	projectId: string;
-}
-
-function formatCurrency(value: number): string {
-	return value.toLocaleString("en-US", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	});
 }
 
 export function QuantitiesOverview({
@@ -231,7 +225,7 @@ export function QuantitiesOverview({
 										{card.label}
 									</p>
 									<p className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">
-										{formatCurrency(Number(card.value))}
+										{formatNumber(Number(card.value), 2)}
 									</p>
 								</div>
 							</div>
@@ -253,7 +247,7 @@ export function QuantitiesOverview({
 							</p>
 						</div>
 						<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-							{formatCurrency(grandTotal)}
+							{formatNumber(grandTotal, 2)}
 						</p>
 					</div>
 				</CardContent>
@@ -306,7 +300,7 @@ export function QuantitiesOverview({
 									).toLocaleString("en-US")}
 								</TableCell>
 								<TableCell className="font-medium text-slate-900 dark:text-slate-100">
-									{formatCurrency(Number(study.totalCost ?? 0))}
+									{formatNumber(Number(study.totalCost ?? 0), 2)}
 								</TableCell>
 								<TableCell>
 									<DropdownMenu>

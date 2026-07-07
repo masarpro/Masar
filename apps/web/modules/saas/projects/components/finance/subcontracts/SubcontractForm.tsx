@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatSAR } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
@@ -56,15 +57,6 @@ interface PaymentTerm {
 	type: (typeof TERM_TYPES)[number];
 	label: string;
 	percent: string;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 export function SubcontractForm({
@@ -585,7 +577,7 @@ export function SubcontractForm({
 										/>
 									</div>
 									<div className="min-w-[80px] text-end text-sm font-medium text-slate-600 dark:text-slate-400">
-										{formatCurrency(
+										{formatSAR(
 											(totalWithVat *
 												(Number.parseFloat(term.percent) || 0)) /
 												100,
@@ -608,7 +600,7 @@ export function SubcontractForm({
 									{t("subcontracts.form.termsTotal")}
 								</span>
 								<span className="font-semibold text-violet-600 dark:text-violet-400">
-									{formatCurrency(termsTotal)}
+									{formatSAR(termsTotal)}
 								</span>
 							</div>
 						</div>
@@ -650,7 +642,7 @@ export function SubcontractForm({
 							{t("subcontracts.form.total")}:
 						</span>
 						<span className="font-bold text-orange-600">
-							{formatCurrency(totalWithVat)}
+							{formatSAR(totalWithVat)}
 						</span>
 						{retentionAmount > 0 && (
 							<>
@@ -659,7 +651,7 @@ export function SubcontractForm({
 									{t("subcontracts.form.retention")}:
 								</span>
 								<span className="font-medium text-amber-600">
-									{formatCurrency(retentionAmount)}
+									{formatSAR(retentionAmount)}
 								</span>
 							</>
 						)}

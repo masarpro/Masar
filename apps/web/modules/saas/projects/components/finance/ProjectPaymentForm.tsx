@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatNumber } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { Button } from "@ui/components/button";
@@ -44,13 +45,6 @@ const PAYMENT_METHODS = [
 	"CREDIT_CARD",
 	"OTHER",
 ] as const;
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	}).format(value);
-}
 
 export function ProjectPaymentForm({
 	organizationId,
@@ -257,7 +251,7 @@ export function ProjectPaymentForm({
 													</span>
 												)}
 												<span className="font-mono text-xs text-slate-400">
-													({formatCurrency(Number(term.remainingAmount))} {t("common.sar")} {t("projectPayments.remaining")})
+													({formatNumber(Number(term.remainingAmount))} {t("common.sar")} {t("projectPayments.remaining")})
 												</span>
 											</div>
 										</SelectItem>
@@ -303,7 +297,7 @@ export function ProjectPaymentForm({
 									{t("projectPayments.required")}
 								</p>
 								<p className="font-mono text-sm font-semibold text-slate-800 dark:text-slate-200">
-									{formatCurrency(Number(selectedTerm.amount))}{" "}
+									{formatNumber(Number(selectedTerm.amount))}{" "}
 									{t("common.sar")}
 								</p>
 							</div>
@@ -312,7 +306,7 @@ export function ProjectPaymentForm({
 									{t("projectPayments.alreadyPaid")}
 								</p>
 								<p className="font-mono text-sm font-semibold text-sky-700 dark:text-sky-300">
-									{formatCurrency(
+									{formatNumber(
 										Number(selectedTerm.paidAmount),
 									)}{" "}
 									{t("common.sar")}
@@ -323,7 +317,7 @@ export function ProjectPaymentForm({
 									{t("projectPayments.remaining")}
 								</p>
 								<p className="font-mono text-sm font-bold text-blue-700 dark:text-blue-300">
-									{formatCurrency(
+									{formatNumber(
 										Number(selectedTerm.remainingAmount),
 									)}{" "}
 									{t("common.sar")}
@@ -518,7 +512,7 @@ export function ProjectPaymentForm({
 										)}
 									</p>
 									<p className="font-mono font-semibold text-green-600">
-										{formatCurrency(
+										{formatNumber(
 											Number(
 												selectedAccount.balance,
 											),
@@ -528,7 +522,7 @@ export function ProjectPaymentForm({
 									{formData.amount && (
 										<p className="flex items-center gap-1 text-xs text-slate-500">
 											<ArrowRight className="h-3 w-3" />
-											{formatCurrency(
+											{formatNumber(
 												Number(
 													selectedAccount.balance,
 												) +

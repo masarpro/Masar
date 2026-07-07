@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { formatSAR } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
@@ -49,15 +50,6 @@ const PAYMENT_METHOD_VALUES = [
 	"CREDIT_CARD",
 	"OTHER",
 ] as const;
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
-}
 
 export function CreatePaymentDialog({
 	open,
@@ -172,7 +164,7 @@ export function CreatePaymentDialog({
 												{term.amount != null && (
 													<span className="text-xs text-slate-500">
 														{" "}
-														({formatCurrency(term.paidAmount)} / {formatCurrency(term.amount)})
+														({formatSAR(term.paidAmount)} / {formatSAR(term.amount)})
 													</span>
 												)}
 											</SelectItem>

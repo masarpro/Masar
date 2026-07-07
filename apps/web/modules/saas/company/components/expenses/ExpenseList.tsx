@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatCurrencySuffixed } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
@@ -114,7 +115,7 @@ export function ExpenseList({ organizationId, organizationSlug }: ExpenseListPro
 	const selectedExpenses = expenses.filter((e: any) => selectedIds.has(e.id));
 
 	const formatCurrency = (amount: number | string) =>
-		new Intl.NumberFormat("en-US").format(Number(amount)) + " " + t("common.sar");
+		formatCurrencySuffixed(Number(amount), t("common.sar"), 0);
 
 	const getStatusBadge = (active: boolean) => {
 		if (active) {

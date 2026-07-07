@@ -2,6 +2,7 @@
 
 import { OwnerChangesSkeleton } from "@saas/projects-owner/components/skeletons";
 import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
+import { formatSARArabic } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
@@ -48,18 +49,6 @@ interface OwnerChangeOrder {
 	timeImpactDays?: number | null;
 	decisionAt?: string | null;
 	implementedAt?: string | null;
-}
-
-function formatCurrency(value: number | string | null | undefined): string {
-	if (value === null || value === undefined) return "-";
-	const num = typeof value === "string" ? Number.parseFloat(value) : value;
-	if (Number.isNaN(num)) return "-";
-	return new Intl.NumberFormat("ar-SA", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(num);
 }
 
 function getStatusBadge(status: ChangeOrderStatus, t: (key: string) => string) {
@@ -150,7 +139,7 @@ export default function OwnerChangeOrdersPage() {
 						<DollarSignIcon className="h-5 w-5 text-sky-600 dark:text-sky-400" />
 					}
 					title={t("changeOrders.stats.costImpact")}
-					value={formatCurrency(stats.totalCostImpact)}
+					value={formatSARArabic(stats.totalCostImpact)}
 				/>
 				<GlassStatCard
 					colorScheme="amber"
@@ -212,7 +201,7 @@ export default function OwnerChangeOrdersPage() {
 												}
 											>
 												{Number(co.costImpact) > 0 ? "+" : ""}
-												{formatCurrency(co.costImpact)}
+												{formatSARArabic(co.costImpact)}
 											</span>
 										)}
 										{co.timeImpactDays !== null &&
@@ -278,7 +267,7 @@ export default function OwnerChangeOrdersPage() {
 														}
 													>
 														{Number(co.costImpact) > 0 ? "+" : ""}
-														{formatCurrency(co.costImpact)}
+														{formatSARArabic(co.costImpact)}
 													</span>
 												) : (
 													"-"

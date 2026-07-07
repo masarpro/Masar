@@ -45,6 +45,121 @@ export function formatCurrency(
 }
 
 /**
+ * Whole-riyal currency — "SAR 1,234" (en-US digits, no fraction digits).
+ * App-wide default for dashboards, tables and summary cards.
+ */
+export function formatSAR(value: number | string | null | undefined): string {
+	if (value === null || value === undefined) {
+		return "-";
+	}
+
+	const num = typeof value === "string" ? parseFloat(value) : value;
+
+	if (isNaN(num)) {
+		return "-";
+	}
+
+	return new Intl.NumberFormat("en-US", {
+		style: "currency",
+		currency: "SAR",
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0,
+	}).format(num);
+}
+
+/**
+ * Riyal currency with halalas — "SAR 1,234.50" (en-US digits, 2 fraction digits).
+ */
+export function formatSARPrecise(value: number | string | null | undefined): string {
+	if (value === null || value === undefined) {
+		return "-";
+	}
+
+	const num = typeof value === "string" ? parseFloat(value) : value;
+
+	if (isNaN(num)) {
+		return "-";
+	}
+
+	return new Intl.NumberFormat("en-US", {
+		style: "currency",
+		currency: "SAR",
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	}).format(num);
+}
+
+/**
+ * Arabic-locale riyal currency (Arabic-Indic digits) — owner portal / public pages.
+ */
+export function formatSARArabic(value: number | string | null | undefined): string {
+	if (value === null || value === undefined) {
+		return "-";
+	}
+
+	const num = typeof value === "string" ? parseFloat(value) : value;
+
+	if (isNaN(num)) {
+		return "-";
+	}
+
+	return new Intl.NumberFormat("ar-SA", {
+		style: "currency",
+		currency: "SAR",
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0,
+	}).format(num);
+}
+
+/**
+ * Number + translated currency suffix, e.g. formatCurrencySuffixed(v, t("common.sar")).
+ * Keeps the suffix under i18n control while centralizing the number formatting.
+ */
+export function formatCurrencySuffixed(
+	value: number | string | null | undefined,
+	suffix: string,
+	decimals = 0,
+): string {
+	if (value === null || value === undefined) {
+		return "-";
+	}
+
+	const num = typeof value === "string" ? parseFloat(value) : value;
+
+	if (isNaN(num)) {
+		return "-";
+	}
+
+	const formatted = new Intl.NumberFormat("en-US", {
+		minimumFractionDigits: decimals,
+		maximumFractionDigits: decimals,
+	}).format(num);
+
+	return `${formatted} ${suffix}`;
+}
+
+/**
+ * Locale-default numeric date — mirrors `date.toLocaleDateString(locale)` exactly
+ * (for ar-SA this is the Umm al-Qura calendar with Arabic-Indic digits).
+ */
+export function formatDateNumeric(
+	date: Date | string | null | undefined,
+	locale: SupportedLocale = "ar-SA",
+): string {
+	if (!date) {
+		return "-";
+	}
+
+	const dateObj = typeof date === "string" ? new Date(date) : date;
+
+	if (isNaN(dateObj.getTime())) {
+		return "-";
+	}
+
+	return dateObj.toLocaleDateString(locale);
+}
+
+/**
  * Format a number as compact currency (e.g., 1.5M SAR)
  * @param value - The numeric value to format
  * @param currency - The currency code (default: "SAR")

@@ -6,6 +6,7 @@ import {
 } from "@saas/projects-owner/components/OwnerPaymentMilestonesGrid";
 import { OwnerPaymentsSkeleton } from "@saas/projects-owner/components/skeletons";
 import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
+import { formatDateNumeric, formatSARArabic } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
@@ -19,22 +20,6 @@ import {
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("ar-SA", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
-}
-
-function formatDate(date: string | Date | null | undefined): string {
-	if (!date) return "-";
-	const d = typeof date === "string" ? new Date(date) : date;
-	if (Number.isNaN(d.getTime())) return "-";
-	return d.toLocaleDateString("ar-SA");
-}
 
 function getStatusBadge(status: string, t: (key: string) => string) {
 	switch (status) {
@@ -140,7 +125,7 @@ export default function OwnerPortalPayments() {
 						<Banknote className="h-5 w-5 text-blue-600 dark:text-blue-400" />
 					}
 					title={t("ownerPortal.payments.contractValue")}
-					value={formatCurrency(contractValue)}
+					value={formatSARArabic(contractValue)}
 					subtitle={t("ownerPortal.contractValueHint")}
 				/>
 				<GlassStatCard
@@ -149,7 +134,7 @@ export default function OwnerPortalPayments() {
 						<CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
 					}
 					title={t("ownerPortal.payments.totalPaid")}
-					value={formatCurrency(paidAmount)}
+					value={formatSARArabic(paidAmount)}
 				/>
 				<GlassStatCard
 					colorScheme="amber"
@@ -157,7 +142,7 @@ export default function OwnerPortalPayments() {
 						<Wallet className="h-5 w-5 text-amber-600 dark:text-amber-400" />
 					}
 					title={t("ownerPortal.payments.remaining")}
-					value={formatCurrency(remaining)}
+					value={formatSARArabic(remaining)}
 				/>
 				<GlassStatCard
 					colorScheme="sky"
@@ -177,7 +162,7 @@ export default function OwnerPortalPayments() {
 							{t("ownerPortal.payments.dueCurrentStage")}
 						</h3>
 						<p className="text-xl font-bold text-sky-800 dark:text-sky-300">
-							{formatCurrency(dueOnCurrentStage)}
+							{formatSARArabic(dueOnCurrentStage)}
 						</p>
 					</div>
 				</div>
@@ -226,11 +211,11 @@ export default function OwnerPortalPayments() {
 											</p>
 										</div>
 										<p className="shrink-0 font-semibold text-green-700 dark:text-green-400">
-											{formatCurrency(Number(p.amount))}
+											{formatSARArabic(Number(p.amount))}
 										</p>
 									</div>
 									<p className="mt-2 text-xs text-slate-400">
-										{formatDate(p.date)}
+										{formatDateNumeric(p.date)}
 									</p>
 								</div>
 							))}
@@ -265,10 +250,10 @@ export default function OwnerPortalPayments() {
 												{p.termLabel || p.description || "-"}
 											</td>
 											<td className="py-4 font-medium text-green-700 dark:text-green-400">
-												{formatCurrency(Number(p.amount))}
+												{formatSARArabic(Number(p.amount))}
 											</td>
 											<td className="py-4 text-slate-600 dark:text-slate-400">
-												{formatDate(p.date)}
+												{formatDateNumeric(p.date)}
 											</td>
 										</tr>
 									))}
@@ -306,16 +291,16 @@ export default function OwnerPortalPayments() {
 									</div>
 									<div className="mt-2 flex items-center justify-between gap-2">
 										<p className="font-semibold text-slate-900 dark:text-slate-100">
-											{formatCurrency(Number(claim.amount))}
+											{formatSARArabic(Number(claim.amount))}
 										</p>
 										<p className="text-xs text-slate-400">
-											{formatDate(claim.dueDate)}
+											{formatDateNumeric(claim.dueDate)}
 										</p>
 									</div>
 									{claim.periodStart && claim.periodEnd && (
 										<p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-											{formatDate(claim.periodStart)} -{" "}
-											{formatDate(claim.periodEnd)}
+											{formatDateNumeric(claim.periodStart)} -{" "}
+											{formatDateNumeric(claim.periodEnd)}
 										</p>
 									)}
 								</div>
@@ -354,14 +339,14 @@ export default function OwnerPortalPayments() {
 										</td>
 										<td className="py-4 text-slate-600 dark:text-slate-400">
 											{claim.periodStart && claim.periodEnd
-												? `${formatDate(claim.periodStart)} - ${formatDate(claim.periodEnd)}`
+												? `${formatDateNumeric(claim.periodStart)} - ${formatDateNumeric(claim.periodEnd)}`
 												: "-"}
 										</td>
 										<td className="py-4 font-medium text-slate-900 dark:text-slate-100">
-											{formatCurrency(Number(claim.amount))}
+											{formatSARArabic(Number(claim.amount))}
 										</td>
 										<td className="py-4 text-slate-600 dark:text-slate-400">
-											{formatDate(claim.dueDate)}
+											{formatDateNumeric(claim.dueDate)}
 										</td>
 										<td className="py-4">{getStatusBadge(claim.status, t)}</td>
 									</tr>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatDate, formatSAR } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import {
 	AlertDialog,
@@ -71,28 +72,11 @@ interface SubcontractClaimDetailViewProps {
 	claimId: string;
 }
 
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
-}
-
 function formatNumber(value: number, decimals = 2): string {
 	return new Intl.NumberFormat("en-US", {
 		minimumFractionDigits: 0,
 		maximumFractionDigits: decimals,
 	}).format(value);
-}
-
-function formatDate(date: string | Date): string {
-	return new Intl.DateTimeFormat("ar-SA", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	}).format(new Date(date));
 }
 
 const statusColors: Record<string, string> = {
@@ -285,12 +269,12 @@ export function SubcontractClaimDetailView({
 							<td className="border border-black p-1 text-center font-semibold">{formatNumber(item.thisQty)}</td>
 							<td className="border border-black p-1 text-center">{formatNumber(item.cumulativeQty)}</td>
 							<td className="border border-black p-1 text-center">{item.completionPercent?.toFixed(1)}%</td>
-							<td className="border border-black p-1 text-center">{formatCurrency(item.thisAmount)}</td>
+							<td className="border border-black p-1 text-center">{formatSAR(item.thisAmount)}</td>
 						</tr>
 					))}
 					<tr className="bg-gray-100 font-bold">
 						<td colSpan={9} className="border border-black p-1.5 text-start">{t("grossAmount")}</td>
-						<td className="border border-black p-1.5 text-center">{formatCurrency(claim.grossAmount)}</td>
+						<td className="border border-black p-1.5 text-center">{formatSAR(claim.grossAmount)}</td>
 					</tr>
 				</tbody>
 			</table>
@@ -300,35 +284,35 @@ export function SubcontractClaimDetailView({
 				<tbody>
 					<tr>
 						<td className="border border-black p-2">{t("retentionDeduction")}</td>
-						<td className="border border-black p-2 text-center w-40">{formatCurrency(claim.retentionAmount)}</td>
+						<td className="border border-black p-2 text-center w-40">{formatSAR(claim.retentionAmount)}</td>
 					</tr>
 					{claim.advanceDeduction > 0 && (
 						<tr>
 							<td className="border border-black p-2">{t("advanceDeduction")}</td>
-							<td className="border border-black p-2 text-center">{formatCurrency(claim.advanceDeduction)}</td>
+							<td className="border border-black p-2 text-center">{formatSAR(claim.advanceDeduction)}</td>
 						</tr>
 					)}
 					{(claim.penaltyAmount ?? 0) > 0 && (
 						<tr>
 							<td className="border border-black p-2">{t("penaltyAmount")}</td>
-							<td className="border border-black p-2 text-center">{formatCurrency(claim.penaltyAmount)}</td>
+							<td className="border border-black p-2 text-center">{formatSAR(claim.penaltyAmount)}</td>
 						</tr>
 					)}
 					{(claim.otherDeductions ?? 0) > 0 && (
 						<tr>
 							<td className="border border-black p-2">{t("otherDeductions")}{claim.otherDeductionsNote ? ` (${claim.otherDeductionsNote})` : ""}</td>
-							<td className="border border-black p-2 text-center">{formatCurrency(claim.otherDeductions)}</td>
+							<td className="border border-black p-2 text-center">{formatSAR(claim.otherDeductions)}</td>
 						</tr>
 					)}
 					{claim.vatAmount > 0 && (
 						<tr>
 							<td className="border border-black p-2">{t("vatAmount")}</td>
-							<td className="border border-black p-2 text-center">{formatCurrency(claim.vatAmount)}</td>
+							<td className="border border-black p-2 text-center">{formatSAR(claim.vatAmount)}</td>
 						</tr>
 					)}
 					<tr className="bg-gray-100 font-bold text-base">
 						<td className="border border-black p-2">{t("netAmount")}</td>
-						<td className="border border-black p-2 text-center">{formatCurrency(claim.netAmount)}</td>
+						<td className="border border-black p-2 text-center">{formatSAR(claim.netAmount)}</td>
 					</tr>
 				</tbody>
 			</table>
@@ -398,7 +382,7 @@ export function SubcontractClaimDetailView({
 							<span>
 								{claim.contract.name} | {t("contractValue")}:{" "}
 								<span className="tabular-nums" dir="ltr">
-									{formatCurrency(claim.contract.value)}
+									{formatSAR(claim.contract.value)}
 								</span>
 							</span>
 						)}
@@ -590,20 +574,20 @@ export function SubcontractClaimDetailView({
 					<div className="flex justify-between">
 						<span>{t("grossAmount")}:</span>
 						<span className="font-bold tabular-nums" dir="ltr">
-							{formatCurrency(claim.grossAmount)}
+							{formatSAR(claim.grossAmount)}
 						</span>
 					</div>
 					<div className="flex justify-between text-muted-foreground">
 						<span>(-) {t("retentionDeduction")}:</span>
 						<span className="tabular-nums" dir="ltr">
-							{formatCurrency(claim.retentionAmount)}
+							{formatSAR(claim.retentionAmount)}
 						</span>
 					</div>
 					{claim.advanceDeduction > 0 && (
 						<div className="flex justify-between text-muted-foreground">
 							<span>(-) {t("advanceDeduction")}:</span>
 							<span className="tabular-nums" dir="ltr">
-								{formatCurrency(claim.advanceDeduction)}
+								{formatSAR(claim.advanceDeduction)}
 							</span>
 						</div>
 					)}
@@ -611,7 +595,7 @@ export function SubcontractClaimDetailView({
 						<div className="flex justify-between text-muted-foreground">
 							<span>(-) {t("penaltyAmount")}:</span>
 							<span className="tabular-nums" dir="ltr">
-								{formatCurrency(claim.penaltyAmount)}
+								{formatSAR(claim.penaltyAmount)}
 							</span>
 						</div>
 					)}
@@ -619,21 +603,21 @@ export function SubcontractClaimDetailView({
 						<div className="flex justify-between text-muted-foreground">
 							<span>(-) {t("otherDeductions")}{claim.otherDeductionsNote ? ` (${claim.otherDeductionsNote})` : ""}:</span>
 							<span className="tabular-nums" dir="ltr">
-								{formatCurrency(claim.otherDeductions)}
+								{formatSAR(claim.otherDeductions)}
 							</span>
 						</div>
 					)}
 					<div className="flex justify-between text-muted-foreground">
 						<span>(+) {t("vatAmount")}:</span>
 						<span className="tabular-nums" dir="ltr">
-							{formatCurrency(claim.vatAmount)}
+							{formatSAR(claim.vatAmount)}
 						</span>
 					</div>
 					<div className="border-t pt-3" />
 					<div className="flex justify-between text-base font-bold">
 						<span>{t("netAmount")}:</span>
 						<span className="tabular-nums" dir="ltr">
-							{formatCurrency(claim.netAmount)}
+							{formatSAR(claim.netAmount)}
 						</span>
 					</div>
 					<div className="pt-2 text-sm text-slate-600 dark:text-slate-400">
@@ -643,7 +627,7 @@ export function SubcontractClaimDetailView({
 					<div className="flex justify-between">
 						<span>{t("paidAmount")}:</span>
 						<span className="tabular-nums text-green-600 font-medium" dir="ltr">
-							{formatCurrency(claim.paidAmount)}
+							{formatSAR(claim.paidAmount)}
 						</span>
 					</div>
 					<div className="flex justify-between">
@@ -654,7 +638,7 @@ export function SubcontractClaimDetailView({
 							}`}
 							dir="ltr"
 						>
-							{formatCurrency(outstanding)}
+							{formatSAR(outstanding)}
 						</span>
 					</div>
 					{outstanding <= 0 && claim.paidAmount > 0 && (
@@ -694,7 +678,7 @@ export function SubcontractClaimDetailView({
 											className="text-center tabular-nums font-medium"
 											dir="ltr"
 										>
-											{formatCurrency(payment.amount)}
+											{formatSAR(payment.amount)}
 										</TableCell>
 										<TableCell className="text-center text-sm">
 											{payment.paymentMethod}
@@ -712,7 +696,7 @@ export function SubcontractClaimDetailView({
 										className="text-center tabular-nums"
 										dir="ltr"
 									>
-										{formatCurrency(claim.paidAmount)}
+										{formatSAR(claim.paidAmount)}
 									</TableCell>
 									<TableCell colSpan={2}>
 										{outstanding <= 0 && (
@@ -736,7 +720,7 @@ export function SubcontractClaimDetailView({
 						<SheetTitle>{t("payment.addPayment")}</SheetTitle>
 						<SheetDescription>
 							{t("payment.maxAllowed", {
-								amount: formatCurrency(outstanding),
+								amount: formatSAR(outstanding),
 							})}
 						</SheetDescription>
 					</SheetHeader>

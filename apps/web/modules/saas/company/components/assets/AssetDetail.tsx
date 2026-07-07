@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatCurrencySuffixed } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
@@ -100,7 +101,7 @@ export function AssetDetail({ organizationId, organizationSlug, assetId }: Asset
 
 	const formatCurrency = (amount: number | string | null | undefined | unknown) => {
 		if (!amount) return "-";
-		return new Intl.NumberFormat("en-US").format(Number(amount)) + ` ${t("common.sar")}`;
+		return formatCurrencySuffixed(Number(amount), t("common.sar"), 0);
 	};
 
 	const getStatusStyle = (status: string) => {

@@ -1,5 +1,6 @@
 "use client";
 
+import { formatNumber } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
@@ -27,13 +28,6 @@ interface PaymentMilestonesGridProps {
 	organizationId: string;
 	organizationSlug: string;
 	projectId: string;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	}).format(value);
 }
 
 export function PaymentMilestonesGrid({
@@ -220,10 +214,10 @@ function MilestoneCard({
 				{/* Amount */}
 				<div className="mb-2 flex items-center justify-between text-xs">
 					<span className="font-mono text-slate-600 dark:text-slate-400">
-						{formatCurrency(Number(term.paidAmount))}
+						{formatNumber(Number(term.paidAmount))}
 					</span>
 					<span className="font-mono text-slate-500">
-						/ {formatCurrency(Number(term.amount))} {t("common.sar")}
+						/ {formatNumber(Number(term.amount))} {t("common.sar")}
 					</span>
 				</div>
 
@@ -260,7 +254,7 @@ function MilestoneCard({
 												{payment.paymentNo}
 											</span>
 											<span className="font-mono font-medium text-sky-700 dark:text-sky-300">
-												{formatCurrency(
+												{formatNumber(
 													Number(payment.amount),
 												)}{" "}
 												{t("common.sar")}

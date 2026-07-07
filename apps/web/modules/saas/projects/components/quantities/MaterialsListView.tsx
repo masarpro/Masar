@@ -21,6 +21,7 @@ import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { formatNumber as formatNum2 } from "@shared/lib/formatters";
 
 interface MaterialsListViewProps {
 	organizationId: string;
@@ -37,13 +38,6 @@ const SECTION_LABELS: Record<string, string> = {
 
 function formatNumber(value: number): string {
 	return value.toLocaleString("en-US");
-}
-
-function formatCurrency(value: number): string {
-	return value.toLocaleString("en-US", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	});
 }
 
 export function MaterialsListView({
@@ -123,7 +117,7 @@ export function MaterialsListView({
 							{t("materials.summary.grandTotal")}
 						</p>
 						<p className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">
-							{formatCurrency(grandTotal)}
+							{formatNum2(grandTotal, 2)}
 						</p>
 					</CardContent>
 				</Card>
@@ -163,7 +157,7 @@ export function MaterialsListView({
 									</h2>
 								</div>
 								<span className="text-sm font-medium text-slate-600 dark:text-slate-400">
-									{formatCurrency(group.total)}
+									{formatNum2(group.total, 2)}
 								</span>
 							</button>
 						</CollapsibleTrigger>
@@ -202,10 +196,10 @@ export function MaterialsListView({
 													{item.unit}
 												</TableCell>
 												<TableCell className="text-end text-slate-600 dark:text-slate-400">
-													{formatCurrency(item.unitPrice)}
+													{formatNum2(item.unitPrice, 2)}
 												</TableCell>
 												<TableCell className="text-end font-medium text-slate-900 dark:text-slate-100">
-													{formatCurrency(item.totalCost)}
+													{formatNum2(item.totalCost, 2)}
 												</TableCell>
 											</TableRow>
 										))}
@@ -226,7 +220,7 @@ export function MaterialsListView({
 								{t("materials.summary.grandTotal")}
 							</p>
 							<p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-								{formatCurrency(grandTotal)}
+								{formatNum2(grandTotal, 2)}
 							</p>
 						</div>
 					</CardContent>

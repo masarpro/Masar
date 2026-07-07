@@ -1,5 +1,6 @@
 "use client";
 
+import { formatSAR } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
@@ -50,15 +51,6 @@ interface ClaimsTableProps {
 	projectId: string;
 	claims: Claim[];
 	onRefresh: () => void;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 function getStatusBadge(
@@ -226,7 +218,7 @@ export function ClaimsTable({
 								)}
 							</TableCell>
 							<TableCell className="font-semibold">
-								{formatCurrency(claim.amount)}
+								{formatSAR(claim.amount)}
 							</TableCell>
 							<TableCell>
 								{claim.dueDate

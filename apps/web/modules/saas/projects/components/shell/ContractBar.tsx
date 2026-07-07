@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useProjectRole } from "../../hooks/use-project-role";
+import { formatSAR } from "@shared/lib/formatters";
 
 interface ContractBarProps {
 	organizationId: string;
@@ -23,15 +24,6 @@ const STATUS_COLORS: Record<string, string> = {
 	SUSPENDED: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300",
 	CLOSED: "bg-muted text-muted-foreground",
 };
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
-}
 
 function getProgressColor(percent: number, isOverdue: boolean): string {
 	if (isOverdue) return "rgb(220, 38, 38)"; // red-600
@@ -128,7 +120,7 @@ function ContractBarInner({
 								{t("projects.contractBar.contractValue")}:
 							</span>
 							<span className="font-semibold">
-								{formatCurrency(Number(summary?.originalValue ?? 0))}
+								{formatSAR(Number(summary?.originalValue ?? 0))}
 							</span>
 							{Number(summary?.adjustedValue ?? 0) !== Number(summary?.originalValue ?? 0) && (
 								<>
@@ -137,7 +129,7 @@ function ContractBarInner({
 										{t("projects.contractBar.adjustedValue")}:
 									</span>
 									<span className="font-semibold text-sky-600 dark:text-sky-400">
-										{formatCurrency(Number(summary?.adjustedValue ?? 0))}
+										{formatSAR(Number(summary?.adjustedValue ?? 0))}
 									</span>
 								</>
 							)}
@@ -205,7 +197,7 @@ function ContractBarInner({
 							{t(`projects.contract.status.${contract.status}`)}
 						</Badge>
 						<span className="text-sm font-semibold truncate">
-							{formatCurrency(Number(summary?.originalValue ?? 0))}
+							{formatSAR(Number(summary?.originalValue ?? 0))}
 						</span>
 					</div>
 					<div className="flex items-center gap-2 text-xs shrink-0">

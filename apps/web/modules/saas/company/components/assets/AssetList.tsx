@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { formatCurrencySuffixed } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
@@ -71,7 +72,7 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 
 	const formatCurrency = (amount: number | string | null | undefined) => {
 		if (!amount) return "-";
-		return new Intl.NumberFormat("en-US").format(Number(amount)) + ` ${t("common.sar")}`;
+		return formatCurrencySuffixed(Number(amount), t("common.sar"), 0);
 	};
 
 	const getStatusBadge = (status: string) => {

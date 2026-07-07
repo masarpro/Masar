@@ -2,6 +2,7 @@
 
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { apiClient } from "@shared/lib/api-client";
+import { formatSAR } from "@shared/lib/formatters";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Card } from "@ui/components/card";
@@ -83,18 +84,6 @@ interface ChangeOrdersStats {
 
 interface ChangeOrdersBoardProps {
 	projectId: string;
-}
-
-function formatCurrency(value: number | string | null | undefined): string {
-	if (value === null || value === undefined) return "-";
-	const num = typeof value === "string" ? Number.parseFloat(value) : value;
-	if (Number.isNaN(num)) return "-";
-	return new Intl.NumberFormat("en-SA", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(num);
 }
 
 function getStatusBadge(status: ChangeOrderStatus, t: (key: string) => string) {
@@ -258,7 +247,7 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 									{t("changeOrders.stats.costImpact")}
 								</p>
 								<p className="text-lg font-semibold text-sky-700 dark:text-sky-300">
-									{formatCurrency(stats.totalCostImpact)}
+									{formatSAR(stats.totalCostImpact)}
 								</p>
 							</div>
 						</div>
@@ -396,7 +385,7 @@ export function ChangeOrdersBoard({ projectId }: ChangeOrdersBoardProps) {
 												}
 											>
 												{Number(co.costImpact) > 0 ? "+" : ""}
-												{formatCurrency(co.costImpact)}
+												{formatSAR(co.costImpact)}
 											</span>
 										) : (
 											"-"

@@ -1,6 +1,7 @@
 "use client";
 
 import { OwnerChangeDetailSkeleton } from "@saas/projects-owner/components/skeletons";
+import { formatSARArabic } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
@@ -28,18 +29,6 @@ type ChangeOrderCategory =
 	| "MATERIAL_CHANGE"
 	| "REGULATORY"
 	| "OTHER";
-
-function formatCurrency(value: number | string | null | undefined): string {
-	if (value === null || value === undefined) return "-";
-	const num = typeof value === "string" ? Number.parseFloat(value) : value;
-	if (Number.isNaN(num)) return "-";
-	return new Intl.NumberFormat("ar-SA", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(num);
-}
 
 function getStatusBadge(status: ChangeOrderStatus, t: (key: string) => string) {
 	const colors: Record<ChangeOrderStatus, string> = {
@@ -152,7 +141,7 @@ export default function OwnerChangeOrderDetailPage() {
 									}`}
 								>
 									{Number(changeOrder.costImpact) > 0 ? "+" : ""}
-									{formatCurrency(Number(changeOrder.costImpact))}
+									{formatSARArabic(Number(changeOrder.costImpact))}
 								</p>
 							) : (
 								<p className="text-lg text-slate-400">

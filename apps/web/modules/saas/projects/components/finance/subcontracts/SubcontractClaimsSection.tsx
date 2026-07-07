@@ -4,20 +4,11 @@ import React from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
+import { formatSAR } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import { ClipboardCheck, Plus, Printer, Eye, Loader2 } from "lucide-react";
-
-// Same pattern as subcontract-shared.ts
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
-}
 
 const CLAIM_STATUS_STYLES: Record<string, { bg: string; text: string }> = {
 	DRAFT: { bg: "bg-slate-100", text: "text-slate-700" },
@@ -106,16 +97,16 @@ export const SubcontractClaimsSection = React.memo(function SubcontractClaimsSec
 				<div className="grid grid-cols-3 gap-3 border-b border-emerald-100/50 p-4 dark:border-emerald-800/20">
 					<div className="rounded-lg bg-slate-50 p-3 text-center dark:bg-slate-800/50">
 						<p className="text-lg font-bold text-slate-800 dark:text-slate-200">
-							{formatCurrency(summary.totalClaimed)}
+							{formatSAR(summary.totalClaimed)}
 						</p>
 						<p className="text-xs text-slate-500">{t("claims.totalClaimed")}</p>
 					</div>
 					<div className="rounded-lg bg-slate-50 p-3 text-center dark:bg-slate-800/50">
-						<p className="text-lg font-bold text-green-600">{formatCurrency(summary.totalPaid)}</p>
+						<p className="text-lg font-bold text-green-600">{formatSAR(summary.totalPaid)}</p>
 						<p className="text-xs text-slate-500">{t("claims.totalPaid")}</p>
 					</div>
 					<div className="rounded-lg bg-slate-50 p-3 text-center dark:bg-slate-800/50">
-						<p className="text-lg font-bold text-orange-600">{formatCurrency(summary.totalOutstanding)}</p>
+						<p className="text-lg font-bold text-orange-600">{formatSAR(summary.totalOutstanding)}</p>
 						<p className="text-xs text-slate-500">{t("claims.totalOutstanding")}</p>
 					</div>
 				</div>
@@ -154,8 +145,8 @@ export const SubcontractClaimsSection = React.memo(function SubcontractClaimsSec
 											{claim.title}
 										</p>
 										<div className="mt-1 flex items-center gap-3 text-xs text-slate-500">
-											<span>{t("claims.grossAmount")}: {formatCurrency(claim.grossAmount)}</span>
-											<span>{t("claims.netAmount")}: {formatCurrency(claim.netAmount)}</span>
+											<span>{t("claims.grossAmount")}: {formatSAR(claim.grossAmount)}</span>
+											<span>{t("claims.netAmount")}: {formatSAR(claim.netAmount)}</span>
 										</div>
 									</div>
 									<div className="flex items-center gap-1.5 ms-3">

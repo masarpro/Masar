@@ -24,21 +24,13 @@ import {
 	Calculator,
 	PackageOpen,
 } from "lucide-react";
+import { formatSAR } from "@shared/lib/formatters";
 
 interface LinkStudyDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	organizationId: string;
 	projectId: string;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 export function LinkStudyDialog({
@@ -204,7 +196,7 @@ export function LinkStudyDialog({
 										{study.totalCost != null && (
 											<span className="flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
 												<Calculator className="h-3.5 w-3.5" />
-												{formatCurrency(
+												{formatSAR(
 													Number(study.totalCost),
 												)}
 											</span>

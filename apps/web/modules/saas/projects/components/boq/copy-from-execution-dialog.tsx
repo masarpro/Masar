@@ -24,6 +24,7 @@ import {
 	useExecutionMilestones,
 	useCopyFromExecution,
 } from "@saas/projects/hooks/use-project-boq";
+import { formatDateNumeric } from "@shared/lib/formatters";
 
 interface CopyFromExecutionDialogProps {
 	open: boolean;
@@ -110,14 +111,8 @@ export function CopyFromExecutionDialog({
 		}
 	};
 
-	const formatDate = (d: string | Date | null) => {
-		if (!d) return null;
-		try {
-			return new Date(d).toLocaleDateString("ar-SA");
-		} catch {
-			return null;
-		}
-	};
+	const formatDate = (d: string | Date | null) =>
+		d ? formatDateNumeric(d) : null;
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>

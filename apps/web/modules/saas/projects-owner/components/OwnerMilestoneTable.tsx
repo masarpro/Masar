@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDate } from "@shared/lib/formatters";
 import { Badge } from "@ui/components/badge";
 import { Progress } from "@ui/components/progress";
 import {
@@ -31,16 +32,11 @@ interface OwnerMilestoneTableProps {
 	milestones: OwnerMilestone[];
 }
 
-function formatDate(date: Date | string | null | undefined): string {
-	if (!date) return "-";
-	const d = typeof date === "string" ? new Date(date) : date;
-	if (Number.isNaN(d.getTime())) return "-";
-	return d.toLocaleDateString("ar-SA", {
-		year: "numeric",
-		month: "short",
-		day: "numeric",
-	});
-}
+const DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+	year: "numeric",
+	month: "short",
+	day: "numeric",
+};
 
 function getDaysLeft(
 	plannedEnd: Date | string | null | undefined,
@@ -133,7 +129,8 @@ export function OwnerMilestoneTable({ milestones }: OwnerMilestoneTableProps) {
 
 							<div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-500 text-xs dark:text-slate-400">
 								<span>
-									{formatDate(m.plannedStart)} — {formatDate(m.plannedEnd)}
+									{formatDate(m.plannedStart, "ar-SA", DATE_OPTIONS)} —{" "}
+									{formatDate(m.plannedEnd, "ar-SA", DATE_OPTIONS)}
 								</span>
 								{daysLeft !== "-" && (
 									<span>
@@ -191,10 +188,10 @@ export function OwnerMilestoneTable({ milestones }: OwnerMilestoneTableProps) {
 									</div>
 								</TableCell>
 								<TableCell className="text-sm">
-									{formatDate(m.plannedStart)}
+									{formatDate(m.plannedStart, "ar-SA", DATE_OPTIONS)}
 								</TableCell>
 								<TableCell className="text-sm">
-									{formatDate(m.plannedEnd)}
+									{formatDate(m.plannedEnd, "ar-SA", DATE_OPTIONS)}
 								</TableCell>
 								<TableCell className="text-center text-sm">
 									{getDaysLeft(m.plannedEnd, m.status)}

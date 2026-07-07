@@ -1,5 +1,6 @@
 "use client";
 
+import { formatSAR } from "@shared/lib/formatters";
 import { Banknote, Receipt, TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -11,15 +12,6 @@ interface FinanceSummaryProps {
 	claimsPaid: number;
 	adjustedContractValue?: number;
 	changeOrdersImpact?: number;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 export function FinanceSummary({
@@ -105,9 +97,9 @@ export function FinanceSummary({
 							<p className={`truncate text-xs ${card.labelColor}`}>{card.title}</p>
 							<p
 								className={`truncate text-base font-semibold sm:text-lg ${card.textColor}`}
-								title={formatCurrency(card.value)}
+								title={formatSAR(card.value)}
 							>
-								{formatCurrency(card.value)}
+								{formatSAR(card.value)}
 							</p>
 							{card.title === t("finance.summary.contractValue") &&
 								adjustedContractValue !== undefined &&
@@ -115,7 +107,7 @@ export function FinanceSummary({
 								changeOrdersImpact !== 0 && (
 									<p className="mt-0.5 truncate text-xs text-sky-600 dark:text-sky-400">
 										{t("projects.contract.summary.adjustedValue")}:{" "}
-										{formatCurrency(adjustedContractValue)}
+										{formatSAR(adjustedContractValue)}
 									</p>
 								)}
 						</div>

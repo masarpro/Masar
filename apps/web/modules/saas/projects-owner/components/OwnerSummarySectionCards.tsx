@@ -1,6 +1,7 @@
 "use client";
 
 import { resolveImageSrc } from "@saas/shared/lib/image-src";
+import { formatDateNumeric, formatSARArabic } from "@shared/lib/formatters";
 import { Progress } from "@ui/components/progress";
 import {
 	Calendar,
@@ -55,21 +56,6 @@ export interface OwnerSummarySections {
 			isOwner: boolean;
 		} | null;
 	};
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("ar-SA", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
-}
-
-function formatDate(date: string | Date): string {
-	const d = typeof date === "string" ? new Date(date) : date;
-	if (Number.isNaN(d.getTime())) return "";
-	return d.toLocaleDateString("ar-SA");
 }
 
 /** A clickable section card with a colored icon, title and a live snapshot body. */
@@ -181,14 +167,14 @@ export function OwnerSummarySectionCards({
 						<p className="text-xs text-slate-500 dark:text-slate-400">
 							{t("ownerPortal.summary.nextPaymentShort")}:{" "}
 							<span className="font-medium text-amber-600 dark:text-amber-400">
-								{formatCurrency(payments.nextPayment.amount)}
+								{formatSARArabic(payments.nextPayment.amount)}
 							</span>
 						</p>
 					) : (
 						<p className="text-xs text-slate-500 dark:text-slate-400">
 							{t("ownerPortal.summary.remainingShort")}:{" "}
 							<span className="font-medium text-slate-700 dark:text-slate-300">
-								{formatCurrency(payments.remaining)}
+								{formatSARArabic(payments.remaining)}
 							</span>
 						</p>
 					)}
@@ -264,7 +250,7 @@ export function OwnerSummarySectionCards({
 						{changeOrders.totalCostImpact !== 0 && (
 							<p className="text-xs font-medium text-amber-600 dark:text-amber-400">
 								{changeOrders.totalCostImpact > 0 ? "+" : ""}
-								{formatCurrency(changeOrders.totalCostImpact)}
+								{formatSARArabic(changeOrders.totalCostImpact)}
 							</p>
 						)}
 					</div>
@@ -295,7 +281,7 @@ export function OwnerSummarySectionCards({
 								? t("ownerPortal.chat.owner")
 								: (chat.lastMessage.senderName ?? "")}
 							{" • "}
-							{formatDate(chat.lastMessage.createdAt)}
+							{formatDateNumeric(chat.lastMessage.createdAt)}
 						</p>
 					</div>
 				) : (

@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
+import { formatCurrencySuffixed } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import {
@@ -59,13 +60,8 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 
 	if (!data) return null;
 
-	const formatCurrency = (amount: number) => {
-		return new Intl.NumberFormat("en-SA", {
-			style: "decimal",
-			minimumFractionDigits: 0,
-			maximumFractionDigits: 0,
-		}).format(amount) + ` ${t("common.sar")}`;
-	};
+	const formatCurrency = (amount: number) =>
+		formatCurrencySuffixed(amount, t("common.sar"), 0);
 
 	return (
 		<div className="space-y-6">

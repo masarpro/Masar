@@ -1,5 +1,6 @@
 "use client";
 
+import { formatSAR } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Progress } from "@ui/components/progress";
@@ -14,15 +15,6 @@ import { useTranslations } from "next-intl";
 interface PaymentsSummaryDashboardProps {
 	organizationId: string;
 	projectId: string;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 export function PaymentsSummaryDashboard({
@@ -132,9 +124,9 @@ export function PaymentsSummaryDashboard({
 								</p>
 								<p
 									className={`truncate text-base font-semibold sm:text-lg ${card.textColor}`}
-									title={formatCurrency(card.value)}
+									title={formatSAR(card.value)}
 								>
-									{formatCurrency(card.value)}
+									{formatSAR(card.value)}
 								</p>
 							</div>
 						</div>
@@ -160,11 +152,11 @@ export function PaymentsSummaryDashboard({
 					<div className="mt-2 flex items-center justify-between text-xs text-slate-500">
 						<span>
 							{t("projectPayments.totalPaid")}:{" "}
-							{formatCurrency(totalCollected)}
+							{formatSAR(totalCollected)}
 						</span>
 						<span>
 							{t("projectPayments.totalRemaining")}:{" "}
-							{formatCurrency(outstanding)}
+							{formatSAR(outstanding)}
 						</span>
 					</div>
 				</div>

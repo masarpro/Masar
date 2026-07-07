@@ -4,13 +4,7 @@ import { Card, CardContent } from "@ui/components/card";
 import { AlertTriangle, Calculator, HardHat, Hammer, PaintBucket, Zap, Package } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@ui/components/button";
-
-function formatCurrency(value: number): string {
-	return value.toLocaleString("en-US", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	});
-}
+import { formatNumber } from "@shared/lib/formatters";
 
 const sectionIcons: Record<string, any> = {
 	STRUCTURAL: HardHat,
@@ -71,7 +65,7 @@ export function BOQSummaryCards({ summary, onStartPricing }: BOQSummaryCardsProp
 						<div>
 							<p className="text-sm text-emerald-600 dark:text-emerald-400">{t("summary.grandTotal")}</p>
 							<p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">
-								{formatCurrency(summary.grandTotal)} <span className="text-sm font-normal">{tCommon("sar")}</span>
+								{formatNumber(summary.grandTotal, 2)} <span className="text-sm font-normal">{tCommon("sar")}</span>
 							</p>
 						</div>
 					</CardContent>
@@ -95,7 +89,7 @@ export function BOQSummaryCards({ summary, onStartPricing }: BOQSummaryCardsProp
 									</span>
 								</div>
 								<p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-									{formatCurrency(data.total)} <span className="text-xs font-normal text-slate-400">{tCommon("sar")}</span>
+									{formatNumber(data.total, 2)} <span className="text-xs font-normal text-slate-400">{tCommon("sar")}</span>
 								</p>
 								<p className="text-xs text-slate-400">{data.count} {t("summary.totalItems").toLowerCase()}</p>
 							</CardContent>

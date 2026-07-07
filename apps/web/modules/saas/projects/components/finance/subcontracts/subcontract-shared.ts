@@ -1,11 +1,4 @@
-export function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
-}
+export { formatSAR as formatCurrency } from "@shared/lib/formatters";
 
 export const STATUS_STYLES: Record<string, { bg: string; text: string }> = {
 	DRAFT: { bg: "bg-slate-100 dark:bg-slate-800", text: "text-slate-600 dark:text-slate-400" },

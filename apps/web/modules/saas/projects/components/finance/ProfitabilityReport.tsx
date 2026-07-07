@@ -1,5 +1,6 @@
 "use client";
 
+import { formatSAR } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
@@ -25,15 +26,6 @@ interface ProfitabilityReportProps {
 	organizationId: string;
 	organizationSlug: string;
 	projectId: string;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 function formatPercent(value: number): string {
@@ -84,7 +76,7 @@ export function ProfitabilityReport({
 									{t("finance.profitability.revenue")}
 								</p>
 								<p className="truncate text-lg font-semibold text-green-700 dark:text-green-300">
-									{formatCurrency(revenue.totalContractValue)}
+									{formatSAR(revenue.totalContractValue)}
 								</p>
 							</div>
 						</div>
@@ -103,7 +95,7 @@ export function ProfitabilityReport({
 									{t("finance.profitability.totalCosts")}
 								</p>
 								<p className="truncate text-lg font-semibold text-red-700 dark:text-red-300">
-									{formatCurrency(costs.totalCosts)}
+									{formatSAR(costs.totalCosts)}
 								</p>
 							</div>
 						</div>
@@ -152,7 +144,7 @@ export function ProfitabilityReport({
 											: "text-orange-700 dark:text-orange-300"
 									}`}
 								>
-									{formatCurrency(profitability.grossProfit)}
+									{formatSAR(profitability.grossProfit)}
 								</p>
 								<p
 									className={`text-xs ${
@@ -186,7 +178,7 @@ export function ProfitabilityReport({
 									{t("finance.profitability.baseContractValue")}
 								</TableCell>
 								<TableCell className="text-end">
-									{formatCurrency(revenue.baseContractValue)}
+									{formatSAR(revenue.baseContractValue)}
 								</TableCell>
 							</TableRow>
 							{revenue.changeOrders.length > 0 && (
@@ -195,7 +187,7 @@ export function ProfitabilityReport({
 										{t("finance.profitability.changeOrders")} ({revenue.changeOrders.length})
 									</TableCell>
 									<TableCell className="text-end">
-										{formatCurrency(revenue.changeOrdersTotal)}
+										{formatSAR(revenue.changeOrdersTotal)}
 									</TableCell>
 								</TableRow>
 							)}
@@ -204,7 +196,7 @@ export function ProfitabilityReport({
 									{t("finance.profitability.totalContractValue")}
 								</TableCell>
 								<TableCell className="text-end">
-									{formatCurrency(revenue.totalContractValue)}
+									{formatSAR(revenue.totalContractValue)}
 								</TableCell>
 							</TableRow>
 							<TableRow>
@@ -212,7 +204,7 @@ export function ProfitabilityReport({
 									{t("finance.profitability.invoicedTotal")} ({revenue.invoiceCount})
 								</TableCell>
 								<TableCell className="text-end">
-									{formatCurrency(revenue.invoicedTotal)}
+									{formatSAR(revenue.invoicedTotal)}
 								</TableCell>
 							</TableRow>
 							<TableRow>
@@ -220,7 +212,7 @@ export function ProfitabilityReport({
 									{t("finance.profitability.collectedTotal")} ({revenue.paymentCount})
 								</TableCell>
 								<TableCell className="text-end">
-									{formatCurrency(revenue.collectedTotal)}
+									{formatSAR(revenue.collectedTotal)}
 								</TableCell>
 							</TableRow>
 							<TableRow>
@@ -228,7 +220,7 @@ export function ProfitabilityReport({
 									{t("finance.profitability.outstandingAmount")}
 								</TableCell>
 								<TableCell className="text-end text-amber-600">
-									{formatCurrency(revenue.outstandingAmount)}
+									{formatSAR(revenue.outstandingAmount)}
 								</TableCell>
 							</TableRow>
 						</TableBody>
@@ -273,7 +265,7 @@ export function ProfitabilityReport({
 									{t("finance.profitability.directExpenses")} ({costs.directExpenses.count})
 								</TableCell>
 								<TableCell className="text-end">
-									{formatCurrency(costs.directExpenses.total)}
+									{formatSAR(costs.directExpenses.total)}
 								</TableCell>
 							</TableRow>
 
@@ -284,7 +276,7 @@ export function ProfitabilityReport({
 										{t(`finance.category.${cat.category}` as any) ?? cat.category} ({cat.count})
 									</TableCell>
 									<TableCell className="text-end text-sm">
-										{formatCurrency(cat.total)}
+										{formatSAR(cat.total)}
 									</TableCell>
 								</TableRow>
 							))}
@@ -295,7 +287,7 @@ export function ProfitabilityReport({
 									{t("finance.profitability.subcontractCosts")} ({costs.subcontracts.contracts.length})
 								</TableCell>
 								<TableCell className="text-end">
-									{formatCurrency(costs.subcontracts.totalPaid)}
+									{formatSAR(costs.subcontracts.totalPaid)}
 								</TableCell>
 							</TableRow>
 
@@ -306,7 +298,7 @@ export function ProfitabilityReport({
 										{sc.name} ({sc.contractNo})
 									</TableCell>
 									<TableCell className="text-end text-sm">
-										{formatCurrency(sc.value)}
+										{formatSAR(sc.value)}
 									</TableCell>
 								</TableRow>
 							))}
@@ -317,7 +309,7 @@ export function ProfitabilityReport({
 									{t("finance.profitability.laborCosts")}
 								</TableCell>
 								<TableCell className="text-end">
-									{formatCurrency(costs.laborCosts)}
+									{formatSAR(costs.laborCosts)}
 								</TableCell>
 							</TableRow>
 
@@ -327,7 +319,7 @@ export function ProfitabilityReport({
 									{t("finance.profitability.distributedExpenses")}
 								</TableCell>
 								<TableCell className="text-end">
-									{formatCurrency(costs.distributedExpenses)}
+									{formatSAR(costs.distributedExpenses)}
 								</TableCell>
 							</TableRow>
 
@@ -337,7 +329,7 @@ export function ProfitabilityReport({
 									{t("finance.profitability.totalCosts")}
 								</TableCell>
 								<TableCell className="text-end">
-									{formatCurrency(costs.totalCosts)}
+									{formatSAR(costs.totalCosts)}
 								</TableCell>
 							</TableRow>
 						</TableBody>
@@ -365,7 +357,7 @@ export function ProfitabilityReport({
 										isProfitable ? "text-green-600" : "text-red-600"
 									}`}
 								>
-									{formatCurrency(profitability.grossProfit)}
+									{formatSAR(profitability.grossProfit)}
 								</TableCell>
 							</TableRow>
 							<TableRow>
@@ -391,7 +383,7 @@ export function ProfitabilityReport({
 											: "text-red-600"
 									}`}
 								>
-									{formatCurrency(profitability.realizedProfit)}
+									{formatSAR(profitability.realizedProfit)}
 								</TableCell>
 							</TableRow>
 						</TableBody>
@@ -423,7 +415,7 @@ export function ProfitabilityReport({
 										{t("finance.profitability.retentionAmount")}
 									</TableCell>
 									<TableCell className="text-end">
-										{formatCurrency(retention.retentionAmount)}
+										{formatSAR(retention.retentionAmount)}
 									</TableCell>
 								</TableRow>
 								{retention.retentionCap > 0 && (
@@ -432,7 +424,7 @@ export function ProfitabilityReport({
 											{t("finance.profitability.retentionCap")}
 										</TableCell>
 										<TableCell className="text-end">
-											{formatCurrency(retention.retentionCap)}
+											{formatSAR(retention.retentionCap)}
 										</TableCell>
 									</TableRow>
 								)}

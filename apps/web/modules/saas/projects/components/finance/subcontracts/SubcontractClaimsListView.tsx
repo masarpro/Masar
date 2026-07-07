@@ -49,22 +49,6 @@ interface SubcontractClaimsListViewProps {
 	subcontractId: string;
 }
 
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
-}
-
-function formatDate(date: string | Date): string {
-	return new Intl.DateTimeFormat("ar-SA", {
-		year: "numeric",
-		month: "short",
-	}).format(new Date(date));
-}
-
 const statusColors: Record<string, string> = {
 	DRAFT: "bg-gray-100 text-gray-700 border-gray-200",
 	SUBMITTED: "bg-blue-50 text-blue-700 border-blue-200",
@@ -175,7 +159,7 @@ export function SubcontractClaimsListView({
 										{t("summary.totalClaimed")}
 									</p>
 									<p className="text-xl font-bold tabular-nums" dir="ltr">
-										{formatCurrency(totalClaimed)}
+										{formatSAR(totalClaimed)}
 									</p>
 								</div>
 							</div>
@@ -192,7 +176,7 @@ export function SubcontractClaimsListView({
 										{t("summary.totalPaid")}
 									</p>
 									<p className="text-xl font-bold tabular-nums" dir="ltr">
-										{formatCurrency(totalPaid)}
+										{formatSAR(totalPaid)}
 									</p>
 								</div>
 							</div>
@@ -209,7 +193,7 @@ export function SubcontractClaimsListView({
 										{t("summary.totalOutstanding")}
 									</p>
 									<p className="text-xl font-bold tabular-nums" dir="ltr">
-										{formatCurrency(totalOutstanding)}
+										{formatSAR(totalOutstanding)}
 									</p>
 								</div>
 							</div>
@@ -266,13 +250,13 @@ export function SubcontractClaimsListView({
 										)}
 									</TableCell>
 									<TableCell className="text-center text-sm text-muted-foreground">
-										{formatDate(claim.periodStart)}
+										{formatDate(claim.periodStart, "ar-SA", { year: "numeric", month: "short", day: undefined })}
 									</TableCell>
 									<TableCell className="text-center tabular-nums" dir="ltr">
-										{formatCurrency(claim.grossAmount)}
+										{formatSAR(claim.grossAmount)}
 									</TableCell>
 									<TableCell className="text-center tabular-nums font-medium" dir="ltr">
-										{formatCurrency(claim.netAmount)}
+										{formatSAR(claim.netAmount)}
 									</TableCell>
 									<TableCell className="text-center">
 										<Badge

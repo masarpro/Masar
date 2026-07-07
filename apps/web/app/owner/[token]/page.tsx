@@ -7,6 +7,7 @@ import {
 import { OwnerSummarySkeleton } from "@saas/projects-owner/components/skeletons";
 import { useOwnerSession } from "@saas/projects-owner/hooks/use-owner-session";
 import { OWNER_QUERY_FRESHNESS } from "@saas/projects-owner/lib/query-freshness";
+import { formatSARArabic } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
@@ -23,15 +24,6 @@ import {
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("ar-SA", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
-}
 
 function getStatusBadge(status: string, t: (key: string) => string) {
 	switch (status) {
@@ -160,9 +152,9 @@ export default function OwnerPortalSummary() {
 					title={t("ownerPortal.contractValue")}
 					value={
 						contractValueWithVat
-							? formatCurrency(Number(contractValueWithVat))
+							? formatSARArabic(Number(contractValueWithVat))
 							: project.contractValue
-								? formatCurrency(Number(project.contractValue))
+								? formatSARArabic(Number(project.contractValue))
 								: "-"
 					}
 					subtitle={t("ownerPortal.contractValueHint")}
@@ -181,7 +173,7 @@ export default function OwnerPortalSummary() {
 						<Wallet className="h-5 w-5 text-amber-600 dark:text-amber-400" />
 					}
 					title={t("ownerPortal.payments.remaining")}
-					value={formatCurrency(sections.payments.remaining)}
+					value={formatSARArabic(sections.payments.remaining)}
 				/>
 				<GlassStatCard
 					colorScheme="slate"

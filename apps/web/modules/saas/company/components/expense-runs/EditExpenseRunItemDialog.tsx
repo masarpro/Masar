@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { formatCurrencySuffixed } from "@shared/lib/formatters";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -81,9 +82,8 @@ export function EditExpenseRunItemDialog({
 
 	if (!item) return null;
 
-	const formatCurrency = (amount: number | string) => {
-		return new Intl.NumberFormat("en-SA", { minimumFractionDigits: 2 }).format(Number(amount)) + ` ${t("common.sar")}`;
-	};
+	const formatCurrency = (amount: number | string) =>
+		formatCurrencySuffixed(Number(amount), t("common.sar"), 2);
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>

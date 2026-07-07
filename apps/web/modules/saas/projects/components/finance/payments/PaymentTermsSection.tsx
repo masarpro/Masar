@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatSAR } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
@@ -65,15 +66,6 @@ interface PaymentTermsSectionProps {
 	projectId: string;
 	contractValue: number;
 	terms: Term[];
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 const STATUS_ICON_MAP: Record<string, typeof CheckCircle2> = {
@@ -146,7 +138,7 @@ export function PaymentTermsSection({
 									</div>
 									<div className="flex shrink-0 items-center gap-4 text-sm">
 										<span className="text-slate-500">
-											{formatCurrency(term.paidAmount)} / {formatCurrency(termAmount)}
+											{formatSAR(term.paidAmount)} / {formatSAR(termAmount)}
 										</span>
 										<span className="font-mono font-semibold text-sky-600 dark:text-sky-400">
 											{paidPercent}%

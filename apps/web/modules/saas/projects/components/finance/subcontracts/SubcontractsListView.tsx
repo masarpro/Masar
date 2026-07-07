@@ -1,5 +1,6 @@
 "use client";
 
+import { formatSAR } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@ui/components/badge";
@@ -35,15 +36,6 @@ interface SubcontractsListViewProps {
 	organizationId: string;
 	organizationSlug: string;
 	projectId: string;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 const STATUS_STYLES: Record<
@@ -179,7 +171,7 @@ export function SubcontractsListView({
 									{t("subcontracts.summary.totalValue")}
 								</p>
 								<p className="truncate text-sm font-semibold text-orange-700 dark:text-orange-300">
-									{formatCurrency(summary.totalValue)}
+									{formatSAR(summary.totalValue)}
 								</p>
 							</div>
 						</div>
@@ -194,7 +186,7 @@ export function SubcontractsListView({
 									{t("subcontracts.summary.changeOrders")}
 								</p>
 								<p className="truncate text-sm font-semibold text-amber-700 dark:text-amber-300">
-									{formatCurrency(summary.coImpact)}
+									{formatSAR(summary.coImpact)}
 								</p>
 							</div>
 						</div>
@@ -209,7 +201,7 @@ export function SubcontractsListView({
 									{t("subcontracts.summary.totalPaid")}
 								</p>
 								<p className="truncate text-sm font-semibold text-red-700 dark:text-red-300">
-									{formatCurrency(summary.totalPaid)}
+									{formatSAR(summary.totalPaid)}
 								</p>
 							</div>
 						</div>
@@ -224,7 +216,7 @@ export function SubcontractsListView({
 									{t("subcontracts.summary.remaining")}
 								</p>
 								<p className="truncate text-sm font-semibold text-sky-700 dark:text-sky-300">
-									{formatCurrency(summary.remaining)}
+									{formatSAR(summary.remaining)}
 								</p>
 							</div>
 						</div>
@@ -461,7 +453,7 @@ export function SubcontractsListView({
 										<div className="min-w-0 flex-1">
 											<div className="mb-1 flex items-baseline justify-between">
 												<span className="text-sm font-bold text-orange-600 dark:text-orange-400">
-													{formatCurrency(contract.adjustedValue)}
+													{formatSAR(contract.adjustedValue)}
 												</span>
 												<span className="text-[10px] font-medium text-slate-500">
 													{progress.toFixed(0)}%
@@ -475,10 +467,10 @@ export function SubcontractsListView({
 											</div>
 											<div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
 												<span>
-													{t("subcontracts.card.paid")}: {formatCurrency(contract.totalPaid)}
+													{t("subcontracts.card.paid")}: {formatSAR(contract.totalPaid)}
 												</span>
 												<span>
-													{t("subcontracts.summary.remaining")}: {formatCurrency(contract.remaining)}
+													{t("subcontracts.summary.remaining")}: {formatSAR(contract.remaining)}
 												</span>
 											</div>
 										</div>

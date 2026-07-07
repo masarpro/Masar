@@ -26,21 +26,13 @@ import {
 	useAvailableQuotations,
 	useCopyFromQuotation,
 } from "@saas/projects/hooks/use-project-boq";
+import { formatSAR } from "@shared/lib/formatters";
 
 interface CopyFromQuotationDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	organizationId: string;
 	projectId: string;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 export function CopyFromQuotationDialog({
@@ -190,7 +182,7 @@ export function CopyFromQuotationDialog({
 										)}
 										{quotation.total != null && (
 											<span className="font-medium text-emerald-600 dark:text-emerald-400">
-												{formatCurrency(Number(quotation.total))}
+												{formatSAR(Number(quotation.total))}
 											</span>
 										)}
 									</div>

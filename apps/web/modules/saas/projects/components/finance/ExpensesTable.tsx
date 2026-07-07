@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { formatSAR } from "@shared/lib/formatters";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import { EmptyState } from "@ui/components/empty-state";
@@ -56,15 +57,6 @@ interface ExpensesTableProps {
 	onCategoryChange: (category: string | undefined) => void;
 	searchQuery: string;
 	onSearchChange: (query: string) => void;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 function getCategoryBadge(
@@ -245,7 +237,7 @@ export function ExpensesTable({
 											)}
 										</TableCell>
 										<TableCell className="font-semibold">
-											{formatCurrency(expense.amount)}
+											{formatSAR(expense.amount)}
 										</TableCell>
 										<TableCell className="text-slate-600 dark:text-slate-400">
 											{expense.vendorName || "-"}

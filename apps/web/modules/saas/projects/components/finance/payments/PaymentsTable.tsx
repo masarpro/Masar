@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatDate, formatSARPrecise } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
@@ -56,23 +57,6 @@ interface PaymentsTableProps {
 	projectId: string;
 	payments: Payment[];
 	showTermColumn?: boolean;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	}).format(value);
-}
-
-function formatDate(date: string | Date): string {
-	return new Intl.DateTimeFormat("ar-SA", {
-		year: "numeric",
-		month: "short",
-		day: "numeric",
-	}).format(new Date(date));
 }
 
 const PAYMENT_METHOD_COLORS: Record<string, string> = {
@@ -142,18 +126,22 @@ export function PaymentsTable({
 										{payment.paymentNo}
 									</TableCell>
 									<TableCell className="text-sm">
-										{formatDate(payment.date)}
+										{formatDate(payment.date, "ar-SA", {
+											year: "numeric",
+											month: "short",
+											day: "numeric",
+										})}
 									</TableCell>
 									<TableCell className="font-semibold text-sky-700 dark:text-sky-400">
 										<div className="flex flex-col gap-1">
-											<span>{formatCurrency(payment.amount)}</span>
+											<span>{formatSARPrecise(payment.amount)}</span>
 											{payment.splitGroupTotal != null && (
 												<Badge
 													variant="secondary"
 													className="w-fit gap-1 text-[10px] font-normal bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
 												>
 													{t("projectPayments.splitPart", {
-														total: formatCurrency(payment.splitGroupTotal),
+														total: formatSARPrecise(payment.splitGroupTotal),
 													})}
 												</Badge>
 											)}

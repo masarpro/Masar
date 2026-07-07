@@ -33,18 +33,10 @@ import { useTranslations } from "next-intl";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
 import { CardGridSkeleton } from "@saas/shared/components/skeletons";
+import { formatSAR } from "@shared/lib/formatters";
 interface ProjectsListProps {
 	organizationId: string;
 	userName?: string;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 function getStatusBadge(status: string, t: (key: string) => string) {
@@ -192,7 +184,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 						{t("projects.stats.totalValue")}
 					</p>
 					<p className="text-xl font-bold text-indigo-700 dark:text-indigo-300">
-						{formatCurrency(stats.totalValue)}
+						{formatSAR(stats.totalValue)}
 					</p>
 				</div>
 			</div>
@@ -327,7 +319,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 												<div className="flex items-center gap-1.5">
 													<Banknote className="h-3.5 w-3.5 text-slate-400" />
 													<span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-														{formatCurrency(project.contractValue)}
+														{formatSAR(project.contractValue)}
 													</span>
 												</div>
 											) : (

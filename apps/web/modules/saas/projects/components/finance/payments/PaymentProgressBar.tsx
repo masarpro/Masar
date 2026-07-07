@@ -1,5 +1,6 @@
 "use client";
 
+import { formatSAR } from "@shared/lib/formatters";
 import { useTranslations } from "next-intl";
 import { Progress } from "@ui/components/progress";
 
@@ -7,15 +8,6 @@ interface PaymentProgressBarProps {
 	collectionPercent: number;
 	totalCollected: number;
 	remaining: number;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 export function PaymentProgressBar({
@@ -41,10 +33,10 @@ export function PaymentProgressBar({
 			/>
 			<div className="mt-2 flex items-center justify-between text-xs text-slate-500">
 				<span>
-					{t("projectPayments.totalPaid")}: {formatCurrency(totalCollected)}
+					{t("projectPayments.totalPaid")}: {formatSAR(totalCollected)}
 				</span>
 				<span>
-					{t("projectPayments.totalRemaining")}: {formatCurrency(remaining)}
+					{t("projectPayments.totalRemaining")}: {formatSAR(remaining)}
 				</span>
 			</div>
 		</div>

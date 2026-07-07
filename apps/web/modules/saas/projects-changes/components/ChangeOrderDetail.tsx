@@ -2,6 +2,7 @@
 
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { apiClient } from "@shared/lib/api-client";
+import { formatSAR } from "@shared/lib/formatters";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Card } from "@ui/components/card";
@@ -58,18 +59,6 @@ type ChangeOrderCategory =
 interface ChangeOrderDetailProps {
 	projectId: string;
 	changeOrderId: string;
-}
-
-function formatCurrency(value: string | number | null | undefined): string {
-	if (value === null || value === undefined) return "-";
-	const num = typeof value === "number" ? value : Number.parseFloat(value);
-	if (Number.isNaN(num)) return "-";
-	return new Intl.NumberFormat("en-SA", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(num);
 }
 
 function getStatusBadge(status: ChangeOrderStatus, t: (key: string) => string) {
@@ -366,7 +355,7 @@ export function ChangeOrderDetail({
 							>
 								{co.costImpact
 									? (Number(co.costImpact) > 0 ? "+" : "") +
-										formatCurrency(co.costImpact)
+										formatSAR(co.costImpact)
 									: "-"}
 							</p>
 						</div>

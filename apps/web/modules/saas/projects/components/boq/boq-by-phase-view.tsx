@@ -35,6 +35,7 @@ import {
 	useBOQGroupedByPhase,
 	useDeleteBOQItem,
 } from "@saas/projects/hooks/use-project-boq";
+import { formatSAR } from "@shared/lib/formatters";
 
 interface BOQByPhaseViewProps {
 	organizationId: string;
@@ -42,14 +43,6 @@ interface BOQByPhaseViewProps {
 	onAddFromStudy: (phaseId: string | null, phaseTitle: string) => void;
 	onAddManual: (phaseId: string | null, phaseTitle: string) => void;
 	onEditItem: (item: any) => void;
-}
-
-function formatCurrency(v: number) {
-	return new Intl.NumberFormat("en-SA", {
-		style: "currency",
-		currency: "SAR",
-		maximumFractionDigits: 0,
-	}).format(v);
 }
 
 function formatNumber(v: number | null | undefined) {
@@ -239,7 +232,7 @@ function PhaseCard({
 						</span>
 						{total > 0 && (
 							<span className="rounded-lg bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 text-emerald-700 dark:text-emerald-300">
-								{formatCurrency(total)}
+								{formatSAR(total)}
 							</span>
 						)}
 					</div>
@@ -336,7 +329,7 @@ function PhaseCard({
 											</td>
 											<td className="py-2 px-3 text-end font-mono text-xs font-semibold">
 												{item.totalPrice != null
-													? formatCurrency(item.totalPrice)
+													? formatSAR(item.totalPrice)
 													: "—"}
 											</td>
 											<td className="py-2 px-3">

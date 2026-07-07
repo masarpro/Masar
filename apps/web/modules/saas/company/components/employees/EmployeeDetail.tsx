@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatCurrencySuffixed } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
@@ -101,7 +102,7 @@ export function EmployeeDetail({ organizationId, organizationSlug, employeeId }:
 	if (!employee) return null;
 
 	const formatCurrency = (amount: number | string) =>
-		new Intl.NumberFormat("en-US").format(Number(amount)) + " " + t("common.sar");
+		formatCurrencySuffixed(Number(amount), t("common.sar"), 0);
 
 	const totalSalary = Number(employee.baseSalary) + Number(employee.housingAllowance) +
 		Number(employee.transportAllowance) + Number(employee.otherAllowances);

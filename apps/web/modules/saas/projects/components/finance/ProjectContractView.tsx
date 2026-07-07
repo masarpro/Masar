@@ -1,5 +1,6 @@
 "use client";
 
+import { formatNumber } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
@@ -468,7 +469,7 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 						label={t("projects.createProject.contractValue")}
 						value={
 							Number(contract.value) > 0
-								? `${formatCurrency(Number(contract.value))} ${t("common.sar")}`
+								? `${formatNumber(Number(contract.value))} ${t("common.sar")}`
 								: "—"
 						}
 					/>
@@ -485,7 +486,7 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 					{contract.includesVat && (
 						<ReadOnlyField
 							label={t("projects.createProject.vatToggle")}
-							value={`${formatCurrency(Number(contract.value) * (1 + (contract.vatPercent ?? 15) / 100))} ${t("common.sar")}`}
+							value={`${formatNumber(Number(contract.value) * (1 + (contract.vatPercent ?? 15) / 100))} ${t("common.sar")}`}
 						/>
 					)}
 					{contract.paymentMethod && (
@@ -575,7 +576,7 @@ function ContractReadOnlyView({ contract }: { contract: any }) {
 										)}
 										{term.amount != null && (
 											<span className="font-mono text-sm text-slate-600 dark:text-slate-400">
-												{formatCurrency(Number(term.amount))}{" "}
+												{formatNumber(Number(term.amount))}{" "}
 												{t("common.sar")}
 											</span>
 										)}
@@ -666,9 +667,3 @@ function ReadOnlyField({
 	);
 }
 
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	}).format(value);
-}

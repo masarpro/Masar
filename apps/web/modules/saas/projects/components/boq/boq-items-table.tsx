@@ -19,13 +19,7 @@ import {
 } from "@ui/components/table";
 import { ChevronLeft, ChevronRight, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-
-function formatCurrency(value: number): string {
-	return value.toLocaleString("en-US", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	});
-}
+import { formatNumber } from "@shared/lib/formatters";
 
 const sourceBadgeColors: Record<string, string> = {
 	MANUAL: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
@@ -193,14 +187,14 @@ export function BOQItemsTable({
 										</TableCell>
 										<TableCell className="text-end text-sm">
 											{item.unitPrice != null ? (
-												formatCurrency(item.unitPrice)
+												formatNumber(item.unitPrice, 2)
 											) : (
 												<span className="text-amber-500 text-xs">{t("table.noPrice")}</span>
 											)}
 										</TableCell>
 										<TableCell className="text-end text-sm font-medium">
 											{item.totalPrice != null ? (
-												formatCurrency(item.totalPrice)
+												formatNumber(item.totalPrice, 2)
 											) : (
 												<span className="text-slate-300">—</span>
 											)}
@@ -251,7 +245,7 @@ export function BOQItemsTable({
 				{items.length > 0 && (
 					<div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/50">
 						<div className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-							{t("table.total")}: {formatCurrency(visibleTotal)} {tCommon("sar")}
+							{t("table.total")}: {formatNumber(visibleTotal, 2)} {tCommon("sar")}
 						</div>
 						<div className="flex items-center gap-2 text-sm text-slate-500">
 							<span>{currentPage} / {totalPages}</span>

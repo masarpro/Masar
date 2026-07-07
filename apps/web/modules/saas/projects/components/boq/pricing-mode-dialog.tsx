@@ -24,13 +24,7 @@ import {
 	useProjectBOQUnpriced,
 	useBulkUpdatePrices,
 } from "@saas/projects/hooks/use-project-boq";
-
-function formatCurrency(value: number): string {
-	return value.toLocaleString("en-US", {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	});
-}
+import { formatNumber } from "@shared/lib/formatters";
 
 interface PricingModeDialogProps {
 	open: boolean;
@@ -157,7 +151,7 @@ export function PricingModeDialog({
 												/>
 											</TableCell>
 											<TableCell className="text-end text-sm font-medium">
-												{priceVal > 0 ? formatCurrency(lineTotal) : "—"}
+												{priceVal > 0 ? formatNumber(lineTotal, 2) : "—"}
 											</TableCell>
 										</TableRow>
 									);
@@ -175,7 +169,7 @@ export function PricingModeDialog({
 					<div className="text-sm">
 						<span className="text-slate-500">{t("pricing.totalAfterPricing")}:</span>{" "}
 						<span className="font-semibold text-slate-900 dark:text-slate-100">
-							{formatCurrency(totalAfterPricing)} {tCommon("sar")}
+							{formatNumber(totalAfterPricing, 2)} {tCommon("sar")}
 						</span>
 					</div>
 					<div className="flex gap-3">

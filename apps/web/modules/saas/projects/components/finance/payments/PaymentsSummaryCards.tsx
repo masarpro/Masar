@@ -1,5 +1,6 @@
 "use client";
 
+import { formatSAR } from "@shared/lib/formatters";
 import { useTranslations } from "next-intl";
 import {
 	Banknote,
@@ -13,15 +14,6 @@ interface PaymentsSummaryCardsProps {
 	totalCollected: number;
 	remaining: number;
 	retentionAmount: number;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 export function PaymentsSummaryCards({
@@ -96,9 +88,9 @@ export function PaymentsSummaryCards({
 							</p>
 							<p
 								className={`truncate text-base font-semibold sm:text-lg ${card.textColor}`}
-								title={formatCurrency(card.value)}
+								title={formatSAR(card.value)}
 							>
-								{formatCurrency(card.value)}
+								{formatSAR(card.value)}
 							</p>
 						</div>
 					</div>

@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatSARPrecise } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
@@ -41,15 +42,6 @@ const PAYMENT_METHODS = [
 	"CREDIT_CARD",
 	"OTHER",
 ] as const;
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	}).format(value);
-}
 
 export function SubcontractPaymentForm({
 	organizationId,
@@ -213,7 +205,7 @@ export function SubcontractPaymentForm({
 										<SelectItem key={tt.id} value={tt.id}>
 											{tt.label || tt.type} -{" "}
 											{t("subcontracts.payment.remaining")}:{" "}
-											{formatCurrency(tt.remainingAmount)}
+											{formatSARPrecise(tt.remainingAmount)}
 										</SelectItem>
 									))}
 							</SelectContent>
@@ -228,7 +220,7 @@ export function SubcontractPaymentForm({
 											{t("subcontracts.payment.required")}
 										</p>
 										<p className="font-semibold text-blue-700 dark:text-blue-300">
-											{formatCurrency(selectedTerm.amount)}
+											{formatSARPrecise(selectedTerm.amount)}
 										</p>
 									</div>
 									<div>
@@ -236,7 +228,7 @@ export function SubcontractPaymentForm({
 											{t("subcontracts.payment.alreadyPaid")}
 										</p>
 										<p className="font-semibold text-sky-700 dark:text-sky-300">
-											{formatCurrency(
+											{formatSARPrecise(
 												selectedTerm.paidAmount,
 											)}
 										</p>
@@ -248,7 +240,7 @@ export function SubcontractPaymentForm({
 											)}
 										</p>
 										<p className="font-semibold text-amber-700 dark:text-amber-300">
-											{formatCurrency(
+											{formatSARPrecise(
 												selectedTerm.remainingAmount,
 											)}
 										</p>
@@ -368,7 +360,7 @@ export function SubcontractPaymentForm({
 										{t("subcontracts.payment.currentBalance")}
 									</p>
 									<p className="font-semibold text-orange-700 dark:text-orange-300">
-										{formatCurrency(
+										{formatSARPrecise(
 											Number(selectedAccount.balance),
 										)}
 									</p>
@@ -376,7 +368,7 @@ export function SubcontractPaymentForm({
 										<div className="mt-1 flex items-center justify-end gap-1 text-xs">
 											<ArrowRight className="h-3 w-3 text-slate-400" />
 											<span className="text-red-500">
-												{formatCurrency(
+												{formatSARPrecise(
 													Number(
 														selectedAccount.balance,
 													) - numericAmount,

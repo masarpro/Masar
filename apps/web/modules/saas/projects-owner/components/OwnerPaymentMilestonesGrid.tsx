@@ -1,5 +1,6 @@
 "use client";
 
+import { formatSARArabic } from "@shared/lib/formatters";
 import { Progress } from "@ui/components/progress";
 import { cn } from "@ui/lib";
 import { CheckCircle2 } from "lucide-react";
@@ -19,15 +20,6 @@ export interface OwnerPaymentTerm {
 interface OwnerPaymentMilestonesGridProps {
 	terms: OwnerPaymentTerm[];
 	currentTermId: string | null;
-}
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("ar-SA", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value);
 }
 
 export function OwnerPaymentMilestonesGrid({
@@ -89,7 +81,7 @@ export function OwnerPaymentMilestonesGrid({
 									{t("ownerPortal.payments.required")}
 								</p>
 								<p className="font-semibold text-slate-700 dark:text-slate-300">
-									{formatCurrency(term.amount)}
+									{formatSARArabic(term.amount)}
 								</p>
 							</div>
 							<div>
@@ -97,7 +89,7 @@ export function OwnerPaymentMilestonesGrid({
 									{t("ownerPortal.payments.paidAmount")}
 								</p>
 								<p className="font-semibold text-green-700 dark:text-green-400">
-									{formatCurrency(term.paidAmount)}
+									{formatSARArabic(term.paidAmount)}
 								</p>
 							</div>
 							<div>
@@ -105,7 +97,7 @@ export function OwnerPaymentMilestonesGrid({
 									{t("ownerPortal.payments.remaining")}
 								</p>
 								<p className="font-semibold text-amber-700 dark:text-amber-400">
-									{formatCurrency(term.remainingAmount)}
+									{formatSARArabic(term.remainingAmount)}
 								</p>
 							</div>
 						</div>

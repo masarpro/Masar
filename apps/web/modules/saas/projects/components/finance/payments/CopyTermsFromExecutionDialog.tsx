@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { formatCurrency, formatDateNumeric } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Button } from "@ui/components/button";
 import { Checkbox } from "@ui/components/checkbox";
@@ -44,15 +45,6 @@ interface Milestone {
 }
 
 const VAT_RATE = 0.15;
-
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "SAR",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 2,
-	}).format(value);
-}
 
 export function CopyTermsFromExecutionDialog({
 	open,
@@ -155,14 +147,10 @@ export function CopyTermsFromExecutionDialog({
 		});
 	};
 
-	const formatDate = (d: string | Date | null) => {
-		if (!d) return null;
-		try {
-			return new Date(d).toLocaleDateString("ar-SA");
-		} catch {
-			return null;
-		}
-	};
+	// Preserve the original null fallback: callers rely on null for
+	// `startStr ?? "—"` and the `(startStr || endStr)` visibility guard.
+	const formatDate = (d: string | Date | null) =>
+		d ? formatDateNumeric(d) : null;
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -308,7 +296,7 @@ export function CopyTermsFromExecutionDialog({
 									{t("projectPayments.copyExecution.totalPreview")}:{" "}
 								</span>
 								<span className="font-semibold text-sky-600 dark:text-sky-400">
-									{formatCurrency(grandTotal)}
+									{formatCurrency(grandTotal, "SAR", "en-US")}
 								</span>
 							</div>
 							<div className="flex items-center gap-2">
