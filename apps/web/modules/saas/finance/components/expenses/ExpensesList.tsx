@@ -342,7 +342,7 @@ export function ExpensesList({
 							setCategoryFilter(value === "all" ? undefined : value)
 						}
 					>
-						<SelectTrigger className="w-48 rounded-xl">
+						<SelectTrigger className="w-full sm:w-48 rounded-xl">
 							<SelectValue placeholder={t("finance.expenses.filterByCategory")} />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -360,7 +360,7 @@ export function ExpensesList({
 							setSourceTypeFilter(value === "all" ? undefined : value)
 						}
 					>
-						<SelectTrigger className="w-48 rounded-xl">
+						<SelectTrigger className="w-full sm:w-48 rounded-xl">
 							<SelectValue placeholder={t("finance.expenses.filterBySource")} />
 						</SelectTrigger>
 						<SelectContent className="rounded-xl">
@@ -384,7 +384,7 @@ export function ExpensesList({
 								setProjectFilter(value === "all" ? undefined : value)
 							}
 						>
-							<SelectTrigger className="w-48 rounded-xl">
+							<SelectTrigger className="w-full sm:w-48 rounded-xl">
 								<SelectValue placeholder={t("finance.expenses.filterByProject")} />
 							</SelectTrigger>
 							<SelectContent className="rounded-xl">

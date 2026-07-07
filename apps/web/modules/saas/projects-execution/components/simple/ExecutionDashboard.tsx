@@ -191,13 +191,13 @@ export function ExecutionDashboard({ projectId }: ExecutionDashboardProps) {
 			{/* Health KPI Strip */}
 			<HealthStatStrip health={dashboard} />
 
-			{/* Header: View toggle + Add button */}
-			<div className="flex items-center justify-between gap-4">
+			{/* Header: View toggle + Add button — يلتف على الجوال بدل فرض تمرير أفقي */}
+			<div className="flex flex-wrap items-center justify-between gap-2">
 				<ExecutionViewToggle
 					view={view as ViewMode}
 					onViewChange={setView}
 				/>
-				<div className="flex items-center gap-2">
+				<div className="flex flex-wrap items-center gap-2">
 					<Button
 						variant="outline"
 						size="sm"

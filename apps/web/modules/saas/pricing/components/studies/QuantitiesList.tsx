@@ -100,13 +100,13 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 					</div>
 				</div>
 
-				<div className="group relative rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 p-5 transition-all duration-200 hover:bg-indigo-100 dark:hover:bg-indigo-900/30">
-					<div className="flex items-center justify-between">
-						<div>
+				<div className="group relative rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 p-5 transition-all duration-200 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 overflow-hidden">
+					<div className="flex items-center justify-between gap-2">
+						<div className="min-w-0 flex-1">
 							<p className="text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">{t("pricing.studies.stats.totalValue")}</p>
-							<p className="text-2xl font-semibold mt-2 text-indigo-700 dark:text-indigo-300">{formatCurrency(stats.totalValue)}</p>
+							<p className="text-lg sm:text-2xl font-semibold mt-2 text-indigo-700 dark:text-indigo-300 break-words leading-snug">{formatCurrency(stats.totalValue)}</p>
 						</div>
-						<div className="p-3 rounded-2xl bg-indigo-200/50 dark:bg-indigo-800/30">
+						<div className="p-3 rounded-2xl bg-indigo-200/50 dark:bg-indigo-800/30 shrink-0 max-sm:hidden">
 							<TrendingUp className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
 						</div>
 					</div>

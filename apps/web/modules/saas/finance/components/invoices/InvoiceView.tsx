@@ -64,6 +64,7 @@ import { StatusBadge } from "../shared/StatusBadge";
 import { JournalEntryLink } from "../shared/JournalEntryLink";
 import { Currency } from "../shared/Currency";
 import { formatDate, formatDateTime } from "../../lib/utils";
+import { ScaleToFit } from "@saas/company/components/templates/renderer/ScaleToFit";
 import { InvoiceDocument } from "./InvoiceDocument";
 import Link from "next/link";
 import { PreviewPageSkeleton } from "@saas/shared/components/skeletons";
@@ -641,16 +642,19 @@ function InvoiceTabContent({
 
 	return (
 		<div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] max-w-[210mm] mx-auto relative overflow-hidden print:shadow-none print:rounded-none print:border-none print:max-w-none print:bg-white">
-			<div className="min-h-[297mm] print:text-black">
-				<InvoiceDocument
-					invoice={invoice}
-					options={{
-						showWatermark: isDraftInvoice,
-						printMode: false,
-						showPayments: true,
-					}}
-				/>
-			</div>
+			{/* على الجوال: تصغير صفحة A4 لتطابق عرض الشاشة بدل قصّها */}
+			<ScaleToFit contentWidth={794}>
+				<div className="min-h-[297mm] print:text-black">
+					<InvoiceDocument
+						invoice={invoice}
+						options={{
+							showWatermark: isDraftInvoice,
+							printMode: false,
+							showPayments: true,
+						}}
+					/>
+				</div>
+			</ScaleToFit>
 		</div>
 	);
 }
