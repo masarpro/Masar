@@ -64,46 +64,48 @@ const UNITS = [
 	{ value: "مقطوع", label: "مقطوع" },
 ];
 
+// NOTE: `value` strings are persisted in ManualItem.notes — do NOT translate them.
+// `labelKey` is only for display.
 const STRUCTURAL_CATEGORIES = [
-	{ value: "أساسات", label: "أساسات" },
-	{ value: "أعمدة", label: "أعمدة" },
-	{ value: "كمرات", label: "كمرات" },
-	{ value: "بلاطات", label: "بلاطات" },
-	{ value: "جدران", label: "جدران خرسانية" },
-	{ value: "سلالم", label: "سلالم" },
-	{ value: "رقاب أعمدة", label: "رقاب أعمدة" },
-	{ value: "ميدات", label: "ميدات" },
-	{ value: "أخرى", label: "أخرى" },
+	{ value: "أساسات", labelKey: "pricing.pipeline.emptyTable.categories.structural.foundations" },
+	{ value: "أعمدة", labelKey: "pricing.pipeline.emptyTable.categories.structural.columns" },
+	{ value: "كمرات", labelKey: "pricing.pipeline.emptyTable.categories.structural.beams" },
+	{ value: "بلاطات", labelKey: "pricing.pipeline.emptyTable.categories.structural.slabs" },
+	{ value: "جدران", labelKey: "pricing.pipeline.emptyTable.categories.structural.concreteWalls" },
+	{ value: "سلالم", labelKey: "pricing.pipeline.emptyTable.categories.structural.stairs" },
+	{ value: "رقاب أعمدة", labelKey: "pricing.pipeline.emptyTable.categories.structural.neckColumns" },
+	{ value: "ميدات", labelKey: "pricing.pipeline.emptyTable.categories.structural.groundBeams" },
+	{ value: "أخرى", labelKey: "pricing.pipeline.emptyTable.categories.structural.other" },
 ];
 
 const FINISHING_CATEGORIES = [
-	{ value: "أرضيات", label: "أرضيات" },
-	{ value: "جدران", label: "جدران" },
-	{ value: "أسقف", label: "أسقف" },
-	{ value: "دهانات", label: "دهانات" },
-	{ value: "أبواب", label: "أبواب" },
-	{ value: "نوافذ", label: "نوافذ" },
-	{ value: "مطابخ", label: "مطابخ" },
-	{ value: "حمامات", label: "حمامات" },
-	{ value: "واجهات", label: "واجهات" },
-	{ value: "أخرى", label: "أخرى" },
+	{ value: "أرضيات", labelKey: "pricing.pipeline.emptyTable.categories.finishing.flooring" },
+	{ value: "جدران", labelKey: "pricing.pipeline.emptyTable.categories.finishing.walls" },
+	{ value: "أسقف", labelKey: "pricing.pipeline.emptyTable.categories.finishing.ceilings" },
+	{ value: "دهانات", labelKey: "pricing.pipeline.emptyTable.categories.finishing.painting" },
+	{ value: "أبواب", labelKey: "pricing.pipeline.emptyTable.categories.finishing.doors" },
+	{ value: "نوافذ", labelKey: "pricing.pipeline.emptyTable.categories.finishing.windows" },
+	{ value: "مطابخ", labelKey: "pricing.pipeline.emptyTable.categories.finishing.kitchens" },
+	{ value: "حمامات", labelKey: "pricing.pipeline.emptyTable.categories.finishing.bathrooms" },
+	{ value: "واجهات", labelKey: "pricing.pipeline.emptyTable.categories.finishing.facades" },
+	{ value: "أخرى", labelKey: "pricing.pipeline.emptyTable.categories.finishing.other" },
 ];
 
 const MEP_CATEGORIES = [
-	{ value: "كهرباء", label: "كهرباء" },
-	{ value: "سباكة", label: "سباكة" },
-	{ value: "تكييف", label: "تكييف" },
-	{ value: "إطفاء حريق", label: "إطفاء حريق" },
-	{ value: "مصاعد", label: "مصاعد" },
-	{ value: "أنظمة ذكية", label: "أنظمة ذكية" },
-	{ value: "أخرى", label: "أخرى" },
+	{ value: "كهرباء", labelKey: "pricing.pipeline.emptyTable.categories.mep.electrical" },
+	{ value: "سباكة", labelKey: "pricing.pipeline.emptyTable.categories.mep.plumbing" },
+	{ value: "تكييف", labelKey: "pricing.pipeline.emptyTable.categories.mep.hvac" },
+	{ value: "إطفاء حريق", labelKey: "pricing.pipeline.emptyTable.categories.mep.firefighting" },
+	{ value: "مصاعد", labelKey: "pricing.pipeline.emptyTable.categories.mep.elevators" },
+	{ value: "أنظمة ذكية", labelKey: "pricing.pipeline.emptyTable.categories.mep.smartSystems" },
+	{ value: "أخرى", labelKey: "pricing.pipeline.emptyTable.categories.mep.other" },
 ];
 
 const SCOPE_OPTIONS = [
-	{ value: "per_floor", label: "لكل طابق" },
-	{ value: "whole_building", label: "المبنى كاملاً" },
-	{ value: "external", label: "خارجي" },
-	{ value: "roof", label: "سطح" },
+	{ value: "per_floor", labelKey: "pricing.pipeline.emptyTable.scopeOptions.per_floor" },
+	{ value: "whole_building", labelKey: "pricing.pipeline.emptyTable.scopeOptions.whole_building" },
+	{ value: "external", labelKey: "pricing.pipeline.emptyTable.scopeOptions.external" },
+	{ value: "roof", labelKey: "pricing.pipeline.emptyTable.scopeOptions.roof" },
 ];
 
 function getCategoriesForSection(sectionType: SectionType) {
@@ -210,7 +212,8 @@ export function EmptySectionTable({
 				setNewItem({ ...DEFAULT_ROW });
 				setShowNewRow(false);
 			},
-			onError: (e: any) => toast.error(e.message || "حدث خطأ"),
+			onError: (e: any) =>
+				toast.error(e.message || t("pricing.pipeline.emptyTable.errorOccurred")),
 		}),
 	);
 
@@ -221,7 +224,8 @@ export function EmptySectionTable({
 				invalidate();
 				setEditingId(null);
 			},
-			onError: (e: any) => toast.error(e.message || "حدث خطأ"),
+			onError: (e: any) =>
+				toast.error(e.message || t("pricing.pipeline.emptyTable.errorOccurred")),
 		}),
 	);
 
@@ -231,7 +235,8 @@ export function EmptySectionTable({
 				toast.success(t("pricing.pipeline.emptyTable.itemDeleted"));
 				invalidate();
 			},
-			onError: (e: any) => toast.error(e.message || "حدث خطأ"),
+			onError: (e: any) =>
+				toast.error(e.message || t("pricing.pipeline.emptyTable.errorOccurred")),
 		}),
 	);
 
@@ -290,7 +295,7 @@ export function EmptySectionTable({
 				<SelectItem value="none">—</SelectItem>
 				{categories.map((c) => (
 					<SelectItem key={c.value} value={c.value}>
-						{c.label}
+						{t(c.labelKey)}
 					</SelectItem>
 				))}
 			</SelectContent>
@@ -399,6 +404,7 @@ export function EmptySectionTable({
 											setEditingRow,
 											renderCategorySelect,
 											renderUnitSelect,
+											t,
 										)}
 										<td className="px-3 py-1.5">
 											<div className="flex items-center justify-center gap-1">
@@ -433,7 +439,7 @@ export function EmptySectionTable({
 									<td className="px-3 py-2.5 text-muted-foreground">
 										{idx + 1}
 									</td>
-									{renderDisplayCells(sectionType, item, extras)}
+									{renderDisplayCells(sectionType, item, extras, t)}
 									<td className="px-3 py-2.5">
 										<div className="flex items-center justify-center gap-1">
 											<Button
@@ -471,6 +477,7 @@ export function EmptySectionTable({
 									setNewItem,
 									renderCategorySelect,
 									renderUnitSelect,
+									t,
 								)}
 								<td className="px-3 py-1.5">
 									<div className="flex items-center justify-center gap-1">
@@ -575,16 +582,28 @@ function renderDisplayCells(
 	sectionType: SectionType,
 	item: Record<string, unknown>,
 	extras: ExtraFields,
+	t: ReturnType<typeof useTranslations>,
 ) {
 	const desc = item.description as string;
 	const unit = item.unit as string;
 	const qty = Number(item.quantity);
 
+	// Stored category values are legacy Arabic strings — translate for display,
+	// falling back to the raw stored value if unknown.
+	const categoryMatch = extras.category
+		? getCategoriesForSection(sectionType).find(
+				(c) => c.value === extras.category,
+			)
+		: undefined;
+	const categoryLabel = categoryMatch
+		? t(categoryMatch.labelKey)
+		: extras.category || "—";
+
 	switch (sectionType) {
 		case "structural":
 			return (
 				<>
-					<td className="px-3 py-2.5 text-muted-foreground">{extras.category || "—"}</td>
+					<td className="px-3 py-2.5 text-muted-foreground">{categoryLabel}</td>
 					<td className="px-3 py-2.5 font-medium">{desc}</td>
 					<td className="px-3 py-2.5 text-muted-foreground">{unit}</td>
 					<td className="px-3 py-2.5 tabular-nums" dir="ltr">{qty}</td>
@@ -593,24 +612,28 @@ function renderDisplayCells(
 					<td className="px-3 py-2.5 text-muted-foreground text-xs">{extras.userNotes || "—"}</td>
 				</>
 			);
-		case "finishing":
+		case "finishing": {
+			const scopeMatch = extras.scope
+				? SCOPE_OPTIONS.find((s) => s.value === extras.scope)
+				: undefined;
 			return (
 				<>
-					<td className="px-3 py-2.5 text-muted-foreground">{extras.category || "—"}</td>
+					<td className="px-3 py-2.5 text-muted-foreground">{categoryLabel}</td>
 					<td className="px-3 py-2.5 text-muted-foreground">{extras.subCategory || "—"}</td>
 					<td className="px-3 py-2.5 text-muted-foreground">{extras.floor || "—"}</td>
 					<td className="px-3 py-2.5 text-muted-foreground">
-						{extras.scope ? SCOPE_OPTIONS.find((s) => s.value === extras.scope)?.label || extras.scope : "—"}
+						{extras.scope ? (scopeMatch ? t(scopeMatch.labelKey) : extras.scope) : "—"}
 					</td>
 					<td className="px-3 py-2.5 tabular-nums" dir="ltr">{qty}</td>
 					<td className="px-3 py-2.5 text-muted-foreground">{unit}</td>
 					<td className="px-3 py-2.5 tabular-nums" dir="ltr">{extras.wastagePercent ?? 0}%</td>
 				</>
 			);
+		}
 		case "mep":
 			return (
 				<>
-					<td className="px-3 py-2.5 text-muted-foreground">{extras.category || "—"}</td>
+					<td className="px-3 py-2.5 text-muted-foreground">{categoryLabel}</td>
 					<td className="px-3 py-2.5 text-muted-foreground">{extras.subCategory || "—"}</td>
 					<td className="px-3 py-2.5 font-medium">{extras.itemType || desc}</td>
 					<td className="px-3 py-2.5 tabular-nums" dir="ltr">{qty}</td>
@@ -630,6 +653,7 @@ function renderEditCells(
 	setRow: (r: RowState) => void,
 	renderCategorySelect: (value: string | undefined, onChange: (v: string) => void) => React.ReactNode,
 	renderUnitSelect: (value: string, onChange: (v: string) => void) => React.ReactNode,
+	t: ReturnType<typeof useTranslations>,
 ) {
 	const updateExtras = (patch: Partial<ExtraFields>) =>
 		setRow({ ...row, extras: { ...row.extras, ...patch } });
@@ -643,7 +667,7 @@ function renderEditCells(
 					</td>
 					<td className="px-3 py-1.5">
 						<Input
-							placeholder="وصف البند..."
+							placeholder={t("pricing.pipeline.emptyTable.descriptionPlaceholder")}
 							value={row.description}
 							onChange={(e: any) => setRow({ ...row, description: e.target.value })}
 							className="h-8"
@@ -689,7 +713,7 @@ function renderEditCells(
 					</td>
 					<td className="px-3 py-1.5">
 						<Input
-							placeholder="ملاحظات..."
+							placeholder={t("pricing.pipeline.emptyTable.notesPlaceholder")}
 							value={row.extras.userNotes ?? ""}
 							onChange={(e: any) => updateExtras({ userNotes: e.target.value })}
 							className="h-8"
@@ -705,7 +729,7 @@ function renderEditCells(
 					</td>
 					<td className="px-3 py-1.5">
 						<Input
-							placeholder="فئة فرعية..."
+							placeholder={t("pricing.pipeline.emptyTable.subCategoryPlaceholder")}
 							value={row.extras.subCategory ?? ""}
 							onChange={(e: any) => updateExtras({ subCategory: e.target.value })}
 							className="h-8"
@@ -713,7 +737,7 @@ function renderEditCells(
 					</td>
 					<td className="px-3 py-1.5">
 						<Input
-							placeholder="الطابق..."
+							placeholder={t("pricing.pipeline.emptyTable.floorPlaceholder")}
 							value={row.extras.floor ?? ""}
 							onChange={(e: any) => updateExtras({ floor: e.target.value })}
 							className="h-8"
@@ -731,7 +755,7 @@ function renderEditCells(
 								<SelectItem value="none">—</SelectItem>
 								{SCOPE_OPTIONS.map((s) => (
 									<SelectItem key={s.value} value={s.value}>
-										{s.label}
+										{t(s.labelKey)}
 									</SelectItem>
 								))}
 							</SelectContent>
@@ -772,7 +796,7 @@ function renderEditCells(
 					</td>
 					<td className="px-3 py-1.5">
 						<Input
-							placeholder="فئة فرعية..."
+							placeholder={t("pricing.pipeline.emptyTable.subCategoryPlaceholder")}
 							value={row.extras.subCategory ?? ""}
 							onChange={(e: any) => updateExtras({ subCategory: e.target.value })}
 							className="h-8"
@@ -780,7 +804,7 @@ function renderEditCells(
 					</td>
 					<td className="px-3 py-1.5">
 						<Input
-							placeholder="نوع البند..."
+							placeholder={t("pricing.pipeline.emptyTable.itemTypePlaceholder")}
 							value={row.extras.itemType ?? row.description}
 							onChange={(e: any) => {
 								updateExtras({ itemType: e.target.value });

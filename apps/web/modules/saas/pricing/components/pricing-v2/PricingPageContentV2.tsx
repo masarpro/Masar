@@ -19,6 +19,7 @@ import {
 	Ruler,
 	TrendingUp,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -33,14 +34,6 @@ interface PricingPageContentV2Props {
 
 type MarkupMethod = "uniform" | "per_section" | "manual_price" | "per_sqm";
 
-const SECTION_LABELS: Record<string, string> = {
-	STRUCTURAL: "إنشائي",
-	FINISHING: "تشطيبات",
-	MEP: "كهروميكانيكية",
-	LABOR: "عمالة عامة",
-	MANUAL: "بنود يدوية",
-};
-
 const formatNum = (n: number) =>
 	Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
@@ -49,7 +42,16 @@ export function PricingPageContentV2({
 	organizationSlug,
 	studyId,
 }: PricingPageContentV2Props) {
+	const t = useTranslations("pricing.pricingV2");
 	const queryClient = useQueryClient();
+
+	const sectionLabels: Record<string, string> = {
+		STRUCTURAL: t("sections.structural"),
+		FINISHING: t("sections.finishing"),
+		MEP: t("sections.mep"),
+		LABOR: t("sections.labor"),
+		MANUAL: t("sections.manual"),
+	};
 
 	// ─── Queries ──────────────────────────────────────────────────
 
@@ -245,13 +247,13 @@ export function PricingPageContentV2({
 	const uniformMutation = useMutation(
 		orpc.pricing.studies.markup.setUniform.mutationOptions({
 			onSuccess: () => {
-				toast.success("تم حفظ إعدادات الهامش");
+				toast.success(t("toasts.markupSettingsSaved"));
 				queryClient.invalidateQueries({
 					queryKey: orpc.pricing.studies.markup.key(),
 				});
 			},
 			onError: () => {
-				toast.error("حدث خطأ أثناء الحفظ");
+				toast.error(t("toasts.saveError"));
 			},
 		}),
 	);
@@ -259,13 +261,13 @@ export function PricingPageContentV2({
 	const sectionMutation = useMutation(
 		orpc.pricing.studies.markup.setSectionMarkups.mutationOptions({
 			onSuccess: () => {
-				toast.success("تم حفظ هوامش الأقسام");
+				toast.success(t("toasts.sectionMarkupsSaved"));
 				queryClient.invalidateQueries({
 					queryKey: orpc.pricing.studies.markup.key(),
 				});
 			},
 			onError: () => {
-				toast.error("حدث خطأ أثناء الحفظ");
+				toast.error(t("toasts.saveError"));
 			},
 		}),
 	);
@@ -273,7 +275,7 @@ export function PricingPageContentV2({
 	const approveMutation = useMutation(
 		orpc.pricing.studies.studyStages.approve.mutationOptions({
 			onSuccess: () => {
-				toast.success("تم اعتماد مرحلة التسعير");
+				toast.success(t("toasts.pricingStageApproved"));
 				queryClient.invalidateQueries({
 					queryKey: orpc.pricing.studies.studyStages.key(),
 				});
@@ -311,7 +313,7 @@ export function PricingPageContentV2({
 
 	const handleSaveManualPrice = () => {
 		if (!manualPriceNum || manualPriceNum <= 0) {
-			toast.error("يرجى إدخال سعر بيع صحيح");
+			toast.error(t("toasts.enterValidSellingPrice"));
 			return;
 		}
 		const effectiveMarkup = manualMarkupPct;
@@ -327,7 +329,7 @@ export function PricingPageContentV2({
 
 	const handleSavePerSqm = () => {
 		if (!sqmPriceNum || sqmPriceNum <= 0) {
-			toast.error("يرجى إدخال سعر المتر المربع");
+			toast.error(t("toasts.enterSqmPrice"));
 			return;
 		}
 		const effectiveMarkup = sqmMarkupPct;
@@ -356,15 +358,15 @@ export function PricingPageContentV2({
 				<div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 mb-4">
 					<Lock className="h-10 w-10 text-amber-500" />
 				</div>
-				<h3 className="text-lg font-semibold mb-2">مرحلة التسعير مقفلة</h3>
+				<h3 className="text-lg font-semibold mb-2">{t("locked.title")}</h3>
 				<p className="text-muted-foreground mb-4 max-w-md">
-					يجب اعتماد مرحلة تسعير التكلفة أولاً قبل البدء في التسعير
+					{t("locked.description")}
 				</p>
 				<Button asChild variant="outline" className="rounded-xl">
 					<Link
 						href={`/app/${organizationSlug}/pricing/studies/${studyId}/costing`}
 					>
-						الرجوع لتسعير التكلفة
+						{t("locked.backToCosting")}
 					</Link>
 				</Button>
 			</div>
@@ -381,27 +383,27 @@ export function PricingPageContentV2({
 	}[] = [
 		{
 			key: "uniform",
-			label: "نسبة موحدة",
+			label: t("methods.uniform.label"),
 			icon: <Percent className="h-4 w-4" />,
-			desc: "مصاريف عامة + ربح + احتياطي",
+			desc: t("methods.uniform.desc"),
 		},
 		{
 			key: "per_section",
-			label: "نسبة لكل قسم",
+			label: t("methods.perSection.label"),
 			icon: <TrendingUp className="h-4 w-4" />,
-			desc: "هامش مختلف حسب القسم",
+			desc: t("methods.perSection.desc"),
 		},
 		{
 			key: "manual_price",
-			label: "سعر بيع يدوي",
+			label: t("methods.manualPrice.label"),
 			icon: <DollarSign className="h-4 w-4" />,
-			desc: "أدخل سعر البيع المطلوب",
+			desc: t("methods.manualPrice.desc"),
 		},
 		{
 			key: "per_sqm",
-			label: "سعر المتر المربع",
+			label: t("methods.perSqm.label"),
 			icon: <Ruler className="h-4 w-4" />,
-			desc: "حدد سعر بيع المتر",
+			desc: t("methods.perSqm.desc"),
 		},
 	];
 
@@ -414,7 +416,7 @@ export function PricingPageContentV2({
 				<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
 					<div className="space-y-1">
 						<p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-							التكلفة المباشرة
+							{t("hero.directCost")}
 						</p>
 						<p className="text-3xl font-bold text-blue-700 dark:text-blue-300" dir="ltr">
 							{profitData ? `${formatNum(totalCost)} ر.س` : "—"}
@@ -424,7 +426,7 @@ export function PricingPageContentV2({
 						{buildingArea > 0 && (
 							<div className="text-center px-4 py-2 rounded-xl bg-blue-100/50 dark:bg-blue-900/30">
 								<p className="text-xs text-muted-foreground mb-1">
-									تكلفة المتر المسطح
+									{t("hero.costPerSqm")}
 								</p>
 								<p className="text-lg font-bold text-blue-700 dark:text-blue-300" dir="ltr">
 									{formatNum(costPerSqm)} ر.س/م²
@@ -434,7 +436,7 @@ export function PricingPageContentV2({
 						{buildingArea > 0 && (
 							<div className="text-center px-4 py-2 rounded-xl bg-blue-100/50 dark:bg-blue-900/30">
 								<p className="text-xs text-muted-foreground mb-1">
-									مساحة البناء
+									{t("hero.buildingArea")}
 								</p>
 								<p className="text-lg font-bold" dir="ltr">
 									{formatNum(buildingArea)} م²
@@ -447,7 +449,9 @@ export function PricingPageContentV2({
 
 			{/* ═══ Markup method selector ═══ */}
 			<div className="rounded-xl border border-border bg-card p-4">
-				<Label className="text-sm font-medium mb-3 block">طريقة تطبيق الهامش</Label>
+				<Label className="text-sm font-medium mb-3 block">
+					{t("methods.title")}
+				</Label>
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
 					{methodOptions.map((opt) => (
 						<button
@@ -490,10 +494,10 @@ export function PricingPageContentV2({
 				<div className="rounded-xl border border-border bg-card p-4 space-y-4">
 					<div className="flex items-center gap-2 mb-2">
 						<Percent className="h-4 w-4 text-primary" />
-						<h4 className="font-semibold text-sm">نسبة موحدة على إجمالي التكلفة</h4>
+						<h4 className="font-semibold text-sm">{t("uniform.title")}</h4>
 					</div>
 					<div className="max-w-xs space-y-1">
-						<Label className="text-xs">هامش الربح (%)</Label>
+						<Label className="text-xs">{t("common.profitMarginPct")}</Label>
 						<Input
 							type="number"
 							className="h-9 rounded-lg"
@@ -506,20 +510,26 @@ export function PricingPageContentV2({
 					{/* Live preview */}
 					<div className="rounded-lg bg-muted/30 p-3 grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
 						<div>
-							<span className="text-muted-foreground text-xs">إجمالي الهامش</span>
+							<span className="text-muted-foreground text-xs">
+								{t("uniform.totalMarkup")}
+							</span>
 							<p className="font-semibold" dir="ltr">
 								{formatNum(overhead + profit + contingency)}%
 							</p>
 						</div>
 						<div>
-							<span className="text-muted-foreground text-xs">سعر البيع التقديري</span>
+							<span className="text-muted-foreground text-xs">
+								{t("uniform.estimatedSellingPrice")}
+							</span>
 							<p className="font-semibold" dir="ltr">
 								{formatNum(totalCost * uniformMarkupFactor)} ر.س
 							</p>
 						</div>
 						{buildingArea > 0 && (
 							<div>
-								<span className="text-muted-foreground text-xs">سعر المتر التقديري</span>
+								<span className="text-muted-foreground text-xs">
+									{t("uniform.estimatedSqmPrice")}
+								</span>
 								<p className="font-semibold" dir="ltr">
 									{formatNum((totalCost * uniformMarkupFactor) / buildingArea)} ر.س/م²
 								</p>
@@ -534,19 +544,23 @@ export function PricingPageContentV2({
 				<div className="rounded-xl border border-border bg-card overflow-hidden">
 					<div className="flex items-center gap-2 p-4 pb-2">
 						<TrendingUp className="h-4 w-4 text-primary" />
-						<h4 className="font-semibold text-sm">هامش مخصص لكل قسم</h4>
+						<h4 className="font-semibold text-sm">{t("perSection.title")}</h4>
 					</div>
 					<div className="overflow-x-auto">
 						<table className="w-full text-sm">
 							<thead>
 								<tr className="border-b bg-muted/30 text-muted-foreground">
-									<th className="px-4 py-3 text-right font-medium">القسم</th>
-									<th className="px-4 py-3 text-center font-medium">التكلفة</th>
-									<th className="px-4 py-3 text-center font-medium">
-										نسبة الهامش (%)
+									<th className="px-4 py-3 text-right font-medium">
+										{t("table.section")}
 									</th>
 									<th className="px-4 py-3 text-center font-medium">
-										سعر البيع
+										{t("table.cost")}
+									</th>
+									<th className="px-4 py-3 text-center font-medium">
+										{t("perSection.markupPct")}
+									</th>
+									<th className="px-4 py-3 text-center font-medium">
+										{t("table.sellingPrice")}
 									</th>
 								</tr>
 							</thead>
@@ -563,7 +577,7 @@ export function PricingPageContentV2({
 											className="border-b last:border-0 hover:bg-muted/20"
 										>
 											<td className="px-4 py-3 font-medium">
-												{SECTION_LABELS[sec.section] ?? sec.section}
+												{sectionLabels[sec.section] ?? sec.section}
 											</td>
 											<td className="px-4 py-3 text-center" dir="ltr">
 												{formatNum(sec.cost)}
@@ -608,7 +622,7 @@ export function PricingPageContentV2({
 							{sectionMutation.isPending && (
 								<Loader2 className="h-4 w-4 animate-spin" />
 							)}
-							حفظ الهوامش
+							{t("perSection.save")}
 						</Button>
 					</div>
 				</div>
@@ -619,12 +633,12 @@ export function PricingPageContentV2({
 				<div className="rounded-xl border border-border bg-card p-4 space-y-4">
 					<div className="flex items-center gap-2 mb-2">
 						<DollarSign className="h-4 w-4 text-primary" />
-						<h4 className="font-semibold text-sm">
-							أدخل سعر البيع المطلوب (قبل الضريبة)
-						</h4>
+						<h4 className="font-semibold text-sm">{t("manualPrice.title")}</h4>
 					</div>
 					<div className="max-w-sm space-y-1">
-						<Label className="text-xs">سعر البيع الإجمالي (ر.س)</Label>
+						<Label className="text-xs">
+							{t("manualPrice.totalSellingPriceLabel")}
+						</Label>
 						<Input
 							type="number"
 							className="h-10 rounded-lg text-lg"
@@ -638,20 +652,24 @@ export function PricingPageContentV2({
 					{manualPriceNum > 0 && totalCost > 0 && (
 						<div className="rounded-lg bg-muted/30 p-4 space-y-3 text-sm">
 							<div className="flex items-center justify-between">
-								<span className="text-muted-foreground">إجمالي التكلفة</span>
+								<span className="text-muted-foreground">
+									{t("common.totalCost")}
+								</span>
 								<span className="font-medium" dir="ltr">
 									{formatNum(totalCost)} ر.س
 								</span>
 							</div>
 							<div className="flex items-center justify-between">
-								<span className="text-muted-foreground">سعر البيع المطلوب</span>
+								<span className="text-muted-foreground">
+									{t("manualPrice.requestedSellingPrice")}
+								</span>
 								<span className="font-semibold text-primary" dir="ltr">
 									{formatNum(manualPriceNum)} ر.س
 								</span>
 							</div>
 							<div className="border-t border-border pt-2 flex items-center justify-between">
 								<span className="text-muted-foreground">
-									نسبة الهامش المحسوبة
+									{t("common.calculatedMarkupPct")}
 								</span>
 								<span
 									className={cn(
@@ -665,13 +683,13 @@ export function PricingPageContentV2({
 							</div>
 							<div className="flex items-center justify-between">
 								<span className="text-muted-foreground">
-									مصاريف عامة تقديرية (25%)
+									{t("manualPrice.estimatedOverhead")}
 								</span>
 								<span dir="ltr">{formatNum(manualOverhead)} ر.س</span>
 							</div>
 							<div className="flex items-center justify-between">
 								<span className="text-muted-foreground">
-									صافي الربح التقديري
+									{t("manualPrice.estimatedNetProfit")}
 								</span>
 								<span
 									className={cn(
@@ -686,7 +704,7 @@ export function PricingPageContentV2({
 							{buildingArea > 0 && (
 								<div className="flex items-center justify-between">
 									<span className="text-muted-foreground">
-										سعر المتر المربع
+										{t("manualPrice.pricePerSqm")}
 									</span>
 									<span className="font-medium" dir="ltr">
 										{formatNum(manualPriceNum / buildingArea)} ر.س/م²
@@ -706,7 +724,7 @@ export function PricingPageContentV2({
 							{uniformMutation.isPending && (
 								<Loader2 className="h-4 w-4 animate-spin" />
 							)}
-							حفظ السعر
+							{t("common.savePrice")}
 						</Button>
 					</div>
 				</div>
@@ -717,13 +735,12 @@ export function PricingPageContentV2({
 				<div className="rounded-xl border border-border bg-card p-4 space-y-4">
 					<div className="flex items-center gap-2 mb-2">
 						<Ruler className="h-4 w-4 text-primary" />
-						<h4 className="font-semibold text-sm">تسعير حسب المتر المربع</h4>
+						<h4 className="font-semibold text-sm">{t("perSqm.title")}</h4>
 					</div>
 
 					{buildingArea <= 0 && (
 						<div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3 text-sm text-amber-700 dark:text-amber-400">
-							لم يتم تحديد مساحة البناء في بيانات الدراسة. يرجى إضافة المساحة
-							أولاً.
+							{t("perSqm.noAreaWarning")}
 						</div>
 					)}
 
@@ -731,13 +748,13 @@ export function PricingPageContentV2({
 						<>
 							<div className="flex items-center gap-4 text-sm text-muted-foreground">
 								<span>
-									مساحة البناء:{" "}
+									{t("perSqm.buildingArea")}{" "}
 									<strong className="text-foreground">
 										{formatNum(buildingArea)} م²
 									</strong>
 								</span>
 								<span>
-									تكلفة المتر الحالية:{" "}
+									{t("perSqm.currentCostPerSqm")}{" "}
 									<strong className="text-foreground">
 										{formatNum(costPerSqm)} ر.س/م²
 									</strong>
@@ -745,9 +762,7 @@ export function PricingPageContentV2({
 							</div>
 
 							<div className="max-w-sm space-y-1">
-								<Label className="text-xs">
-									سعر بيع المتر المربع (ر.س/م²)
-								</Label>
+								<Label className="text-xs">{t("perSqm.priceLabel")}</Label>
 								<Input
 									type="number"
 									className="h-10 rounded-lg text-lg"
@@ -762,7 +777,7 @@ export function PricingPageContentV2({
 								<div className="rounded-lg bg-muted/30 p-4 space-y-3 text-sm">
 									<div className="flex items-center justify-between">
 										<span className="text-muted-foreground">
-											سعر البيع الإجمالي المحسوب
+											{t("perSqm.calculatedTotalSellingPrice")}
 										</span>
 										<span className="font-semibold text-primary text-lg" dir="ltr">
 											{formatNum(sqmTotalPrice)} ر.س
@@ -770,7 +785,7 @@ export function PricingPageContentV2({
 									</div>
 									<div className="flex items-center justify-between">
 										<span className="text-muted-foreground">
-											نسبة الهامش المحسوبة
+											{t("common.calculatedMarkupPct")}
 										</span>
 										<span
 											className={cn(
@@ -786,7 +801,7 @@ export function PricingPageContentV2({
 									</div>
 									<div className="flex items-center justify-between">
 										<span className="text-muted-foreground">
-											الربح لكل متر
+											{t("perSqm.profitPerMeter")}
 										</span>
 										<span
 											className={cn(
@@ -813,7 +828,7 @@ export function PricingPageContentV2({
 									{uniformMutation.isPending && (
 										<Loader2 className="h-4 w-4 animate-spin" />
 									)}
-									حفظ السعر
+									{t("common.savePrice")}
 								</Button>
 							</div>
 						</>
@@ -823,10 +838,10 @@ export function PricingPageContentV2({
 
 			{/* ═══ Additional expenses ═══ */}
 			<div className="rounded-xl border border-border bg-card p-4 space-y-4">
-				<h4 className="font-semibold text-sm">المصاريف الإضافية</h4>
+				<h4 className="font-semibold text-sm">{t("expenses.title")}</h4>
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 					<div className="space-y-1">
-						<Label className="text-xs">المصاريف الإدارية (%)</Label>
+						<Label className="text-xs">{t("expenses.adminPct")}</Label>
 						<Input
 							type="number"
 							className="h-9 rounded-lg"
@@ -840,7 +855,7 @@ export function PricingPageContentV2({
 						</p>
 					</div>
 					<div className="space-y-1">
-						<Label className="text-xs">الاحتياط (%)</Label>
+						<Label className="text-xs">{t("expenses.contingencyPct")}</Label>
 						<Input
 							type="number"
 							className="h-9 rounded-lg"
@@ -854,7 +869,7 @@ export function PricingPageContentV2({
 						</p>
 					</div>
 					<div className="space-y-1">
-						<Label className="text-xs">ضريبة القيمة المضافة</Label>
+						<Label className="text-xs">{t("expenses.vat")}</Label>
 						<label className="flex items-center gap-2 h-9 cursor-pointer">
 							<input
 								type="checkbox"
@@ -862,7 +877,7 @@ export function PricingPageContentV2({
 								onChange={(e: any) => setVatIncluded(e.target.checked)}
 								className="rounded"
 							/>
-							<span className="text-sm">تشمل (15%)</span>
+							<span className="text-sm">{t("expenses.vatIncluded")}</span>
 						</label>
 					</div>
 				</div>
@@ -876,7 +891,7 @@ export function PricingPageContentV2({
 						{uniformMutation.isPending && (
 							<Loader2 className="h-4 w-4 animate-spin" />
 						)}
-						حفظ الإعدادات
+						{t("expenses.save")}
 					</Button>
 				</div>
 			</div>
@@ -892,7 +907,7 @@ export function PricingPageContentV2({
 						<div className="flex items-center gap-2">
 							<Calculator className="h-4 w-4 text-primary" />
 							<h4 className="font-semibold text-sm">
-								تعديل أسعار البنود ({filteredItems.length} بند)
+								{t("itemsTable.title", { count: filteredItems.length })}
 							</h4>
 						</div>
 						<ChevronDown
@@ -913,25 +928,25 @@ export function PricingPageContentV2({
 												#
 											</th>
 											<th className="px-4 py-3 text-right font-medium">
-												البند
+												{t("itemsTable.item")}
 											</th>
 											<th className="px-4 py-3 text-center font-medium">
-												القسم
+												{t("table.section")}
 											</th>
 											<th className="px-4 py-3 text-center font-medium">
-												الوحدة
+												{t("table.unit")}
 											</th>
 											<th className="px-4 py-3 text-center font-medium">
-												الكمية
+												{t("table.quantity")}
 											</th>
 											<th className="px-4 py-3 text-center font-medium">
-												التكلفة
+												{t("table.cost")}
 											</th>
 											<th className="px-4 py-3 text-center font-medium">
-												سعر البيع المحسوب
+												{t("itemsTable.calculatedSellingPrice")}
 											</th>
 											<th className="px-4 py-3 text-center font-medium">
-												تعديل السعر
+												{t("itemsTable.priceOverride")}
 											</th>
 										</tr>
 									</thead>
@@ -951,7 +966,7 @@ export function PricingPageContentV2({
 													{item.description}
 												</td>
 												<td className="px-4 py-2.5 text-center text-xs text-muted-foreground">
-													{SECTION_LABELS[item.section] ?? item.section}
+													{sectionLabels[item.section] ?? item.section}
 												</td>
 												<td className="px-4 py-2.5 text-center text-xs">
 													{item.unit}
@@ -1018,12 +1033,11 @@ export function PricingPageContentV2({
 							{Object.keys(itemPriceOverrides).length > 0 && (
 								<div className="p-3 border-t border-border flex items-center justify-between">
 									<span className="text-xs text-muted-foreground">
-										{
-											Object.values(itemPriceOverrides).filter(
+										{t("itemsTable.overriddenCount", {
+											count: Object.values(itemPriceOverrides).filter(
 												(v) => v !== "",
-											).length
-										}{" "}
-										بند معدّل يدوياً
+											).length,
+										})}
 									</span>
 									<Button
 										variant="ghost"
@@ -1031,7 +1045,7 @@ export function PricingPageContentV2({
 										className="text-xs"
 										onClick={() => setItemPriceOverrides({})}
 									>
-										إعادة تعيين الكل
+										{t("itemsTable.resetAll")}
 									</Button>
 								</div>
 							)}
@@ -1078,13 +1092,13 @@ export function PricingPageContentV2({
 					) : (
 						<CheckCircle2 className="h-4 w-4" />
 					)}
-					اعتماد التسعير
+					{t("actions.approvePricing")}
 				</Button>
 				<Button asChild variant="outline" className="gap-2 rounded-xl">
 					<Link
 						href={`/app/${organizationSlug}/pricing/studies/${studyId}/quotation`}
 					>
-						عرض السعر
+						{t("actions.quotation")}
 						<ChevronLeft className="h-4 w-4" />
 					</Link>
 				</Button>

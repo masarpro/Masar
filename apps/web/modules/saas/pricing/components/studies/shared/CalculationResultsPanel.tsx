@@ -28,6 +28,7 @@ import {
 	CollapsibleTrigger,
 } from "@ui/components/collapsible";
 import { Button } from "@ui/components/button";
+import { useTranslations } from "next-intl";
 import { formatNumber } from "../../../lib/utils";
 
 interface CuttingDetail {
@@ -77,7 +78,7 @@ interface CalculationResultsPanelProps {
 function getCuttingEfficiency(wastePercentage: number) {
 	if (wastePercentage <= 5) {
 		return {
-			label: "ممتاز",
+			labelKey: "efficiencyExcellent",
 			color: "bg-green-500",
 			textColor: "text-green-600",
 			bgColor: "bg-green-50 dark:bg-green-950",
@@ -87,7 +88,7 @@ function getCuttingEfficiency(wastePercentage: number) {
 	}
 	if (wastePercentage <= 10) {
 		return {
-			label: "جيد",
+			labelKey: "efficiencyGood",
 			color: "bg-yellow-500",
 			textColor: "text-yellow-600",
 			bgColor: "bg-yellow-50 dark:bg-yellow-950",
@@ -96,7 +97,7 @@ function getCuttingEfficiency(wastePercentage: number) {
 		};
 	}
 	return {
-		label: "مرتفع",
+		labelKey: "efficiencyHigh",
 		color: "bg-red-500",
 		textColor: "text-red-600",
 		bgColor: "bg-red-50 dark:bg-red-950",
@@ -115,8 +116,11 @@ export function CalculationResultsPanel({
 	showCutsPerStock = false,
 	className,
 }: CalculationResultsPanelProps) {
+	const t = useTranslations("pricing.studies.resultsPanel");
+	const tCalc = useTranslations("pricing.studies.calculations");
 	const efficiency = getCuttingEfficiency(totals.wastePercentage);
 	const EfficiencyIcon = efficiency.icon;
+	const efficiencyLabel = t(efficiency.labelKey as Parameters<typeof t>[0]);
 	const tons = totals.grossWeight / 1000;
 
 	return (
@@ -130,7 +134,7 @@ export function CalculationResultsPanel({
 							<Box className="h-4 w-4 text-white" />
 						</div>
 						<span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-							حجم الخرسانة
+							{tCalc("concreteVolume")}
 						</span>
 					</div>
 					<p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
@@ -146,7 +150,7 @@ export function CalculationResultsPanel({
 							<Scale className="h-4 w-4 text-white" />
 						</div>
 						<span className="text-sm font-medium text-red-700 dark:text-red-300">
-							وزن الحديد
+							{tCalc("rebarWeight")}
 						</span>
 					</div>
 					<p className="text-2xl font-bold text-red-900 dark:text-red-100">
@@ -165,15 +169,15 @@ export function CalculationResultsPanel({
 							<EfficiencyIcon className="h-4 w-4 text-white" />
 						</div>
 						<span className={`text-sm font-medium ${efficiency.textColor}`}>
-							كفاءة القص
+							{t("cuttingEfficiency")}
 						</span>
 					</div>
 					<p className={`text-2xl font-bold ${efficiency.textColor}`}>
 						{totals.wastePercentage.toFixed(1)}%
-						<span className="text-sm font-normal mr-1">هالك</span>
+						<span className="text-sm font-normal mr-1">{t("wasteSuffix")}</span>
 					</p>
 					<p className={`text-xs ${efficiency.textColor} mt-1`}>
-						{efficiency.label}
+						{efficiencyLabel}
 					</p>
 				</div>
 			</div>
@@ -188,7 +192,7 @@ export function CalculationResultsPanel({
 					>
 						<span className="flex items-center gap-2">
 							<Scissors className="h-4 w-4" />
-							<span className="font-medium">تفاصيل القص والتوزيع</span>
+							<span className="font-medium">{t("cuttingDetailsTitle")}</span>
 						</span>
 						<ChevronDown
 							className={`h-4 w-4 transition-transform duration-200 ${
@@ -204,7 +208,7 @@ export function CalculationResultsPanel({
 						<div className="bg-background rounded-lg p-3 text-center border">
 							<div className="flex items-center justify-center gap-1 mb-1">
 								<TrendingDown className="h-3 w-3 text-green-600" />
-								<span className="text-xs text-muted-foreground">وزن صافي</span>
+								<span className="text-xs text-muted-foreground">{t("netWeight")}</span>
 							</div>
 							<p className="text-lg font-bold text-green-600">
 								{formatNumber(totals.netWeight)}
@@ -214,7 +218,7 @@ export function CalculationResultsPanel({
 						<div className="bg-background rounded-lg p-3 text-center border">
 							<div className="flex items-center justify-center gap-1 mb-1">
 								<TrendingUp className="h-3 w-3 text-blue-600" />
-								<span className="text-xs text-muted-foreground">وزن إجمالي</span>
+								<span className="text-xs text-muted-foreground">{t("grossWeight")}</span>
 							</div>
 							<p className="text-lg font-bold text-blue-600">
 								{formatNumber(totals.grossWeight)}
@@ -224,12 +228,12 @@ export function CalculationResultsPanel({
 						<div className="bg-background rounded-lg p-3 text-center border">
 							<div className="flex items-center justify-center gap-1 mb-1">
 								<div className={`w-2 h-2 rounded-full ${efficiency.color}`} />
-								<span className="text-xs text-muted-foreground">الهالك</span>
+								<span className="text-xs text-muted-foreground">{t("waste")}</span>
 							</div>
 							<p className={`text-lg font-bold ${efficiency.textColor}`}>
 								{totals.wastePercentage.toFixed(1)}%
 							</p>
-							<p className="text-xs text-muted-foreground">{efficiency.label}</p>
+							<p className="text-xs text-muted-foreground">{efficiencyLabel}</p>
 						</div>
 					</div>
 
@@ -239,7 +243,7 @@ export function CalculationResultsPanel({
 							<div className="bg-muted/50 px-3 py-2 border-b">
 								<h6 className="font-medium text-sm flex items-center gap-2">
 									<Scissors className="h-4 w-4" />
-									جدول تفاصيل الحديد
+									{t("steelDetailsTable")}
 								</h6>
 							</div>
 							<div className="overflow-x-auto">
@@ -247,30 +251,30 @@ export function CalculationResultsPanel({
 									<TableHeader>
 										<TableRow className="bg-muted/30">
 											<TableHead className="text-right text-xs font-semibold whitespace-nowrap">
-												الوصف
+												{t("description")}
 											</TableHead>
 											<TableHead className="text-center text-xs font-semibold whitespace-nowrap">
-												القطر
+												{t("diameter")}
 											</TableHead>
 											<TableHead className="text-center text-xs font-semibold whitespace-nowrap">
-												طول السيخ
+												{t("barLength")}
 											</TableHead>
 											<TableHead className="text-center text-xs font-semibold whitespace-nowrap">
-												العدد
+												{t("count")}
 											</TableHead>
 											{showCutsPerStock && (
 												<TableHead className="text-center text-xs font-semibold whitespace-nowrap">
-													قص/سيخ
+													{t("cutsPerStock")}
 												</TableHead>
 											)}
 											<TableHead className="text-center text-xs font-semibold whitespace-nowrap">
-												الأسياخ
+												{t("bars")}
 											</TableHead>
 											<TableHead className="text-center text-xs font-semibold whitespace-nowrap">
-												الوزن
+												{t("weight")}
 											</TableHead>
 											<TableHead className="text-center text-xs font-semibold whitespace-nowrap">
-												الهالك
+												{t("waste")}
 											</TableHead>
 										</TableRow>
 									</TableHeader>
@@ -302,7 +306,7 @@ export function CalculationResultsPanel({
 														{detail.stocksNeeded}
 														{detail.stockBarsPerUnit && detail.stockBarsPerUnit > 1 && (
 															<span className="text-orange-600 text-[10px] block">
-																({detail.stockBarsPerUnit} لكل سيخ)
+																{t("perBar", { count: detail.stockBarsPerUnit })}
 															</span>
 														)}
 													</TableCell>
@@ -337,7 +341,7 @@ export function CalculationResultsPanel({
 						<div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mt-2 mb-2">
 							<p className="text-xs text-amber-700 dark:text-amber-300 flex items-center gap-1">
 								<AlertTriangle className="h-3 w-3 flex-shrink-0" />
-								يتضمن أسياخاً تتجاوز 12م — تم احتساب الوصلات (40d) تلقائياً حسب SBC 304
+								{t("spliceNotice")}
 							</p>
 						</div>
 					)}
@@ -347,7 +351,7 @@ export function CalculationResultsPanel({
 						<div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
 							<h6 className="font-medium text-sm mb-3 flex items-center gap-2 text-blue-800 dark:text-blue-200">
 								<Package className="h-4 w-4" />
-								الأسياخ المطلوبة من المصنع
+								{t("stocksFromFactory")}
 							</h6>
 							<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
 								{totals.stocksNeeded.map((stock, idx) => (
@@ -359,7 +363,7 @@ export function CalculationResultsPanel({
 											{stock.count}
 										</p>
 										<p className="text-xs text-muted-foreground">
-											سيخ {stock.diameter} مم × {stock.length}م
+											{t("stockBarSpec", { diameter: stock.diameter, length: stock.length })}
 										</p>
 									</div>
 								))}
@@ -372,7 +376,7 @@ export function CalculationResultsPanel({
 						<div className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950 dark:to-amber-950 rounded-lg p-4 border border-yellow-200 dark:border-yellow-800">
 							<h6 className="font-medium text-sm mb-3 flex items-center gap-2 text-yellow-800 dark:text-yellow-200">
 								<Lightbulb className="h-4 w-4" />
-								اقتراحات استخدام الفضلات
+								{t("wasteSuggestions")}
 							</h6>
 							<div className="space-y-2">
 								{waste.map((w, idx) => (
@@ -385,7 +389,7 @@ export function CalculationResultsPanel({
 												{w.diameter} مم
 											</span>
 											<span className="text-xs">
-												{w.length.toFixed(2)}م × {w.count} قطعة
+												{t("wastePieceSpec", { length: w.length.toFixed(2), count: w.count })}
 											</span>
 										</div>
 										<span className="text-xs text-muted-foreground">

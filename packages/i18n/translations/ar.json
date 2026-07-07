@@ -4596,6 +4596,8 @@
       "title": "المصروفات",
       "subtitle": "إدارة مصروفات المؤسسة",
       "newSubtitle": "تسجيل مصروف جديد للمشروع",
+      "nonAccountingBadge": "غير محاسبي",
+      "nonAccountingTooltip": "مصروف ميداني معلوماتي — لا يحرّك رصيد البنك ولا يُنشئ قيداً محاسبياً",
       "description": "الوصف",
       "new": "إضافة مصروف",
       "create": "إضافة مصروف",
@@ -6621,7 +6623,95 @@
         "noItems": "لا توجد بنود — أضف بنوداً يدوياً",
         "itemAdded": "تم إضافة البند",
         "itemUpdated": "تم تحديث البند",
-        "itemDeleted": "تم حذف البند"
+        "itemDeleted": "تم حذف البند",
+        "errorOccurred": "حدث خطأ",
+        "descriptionPlaceholder": "وصف البند...",
+        "notesPlaceholder": "ملاحظات...",
+        "subCategoryPlaceholder": "فئة فرعية...",
+        "floorPlaceholder": "الطابق...",
+        "itemTypePlaceholder": "نوع البند...",
+        "categories": {
+          "structural": {
+            "foundations": "أساسات",
+            "columns": "أعمدة",
+            "beams": "كمرات",
+            "slabs": "بلاطات",
+            "concreteWalls": "جدران خرسانية",
+            "stairs": "سلالم",
+            "neckColumns": "رقاب أعمدة",
+            "groundBeams": "ميدات",
+            "other": "أخرى"
+          },
+          "finishing": {
+            "flooring": "أرضيات",
+            "walls": "جدران",
+            "ceilings": "أسقف",
+            "painting": "دهانات",
+            "doors": "أبواب",
+            "windows": "نوافذ",
+            "kitchens": "مطابخ",
+            "bathrooms": "حمامات",
+            "facades": "واجهات",
+            "other": "أخرى"
+          },
+          "mep": {
+            "electrical": "كهرباء",
+            "plumbing": "سباكة",
+            "hvac": "تكييف",
+            "firefighting": "إطفاء حريق",
+            "elevators": "مصاعد",
+            "smartSystems": "أنظمة ذكية",
+            "other": "أخرى"
+          }
+        },
+        "scopeOptions": {
+          "per_floor": "لكل طابق",
+          "whole_building": "المبنى كاملاً",
+          "external": "خارجي",
+          "roof": "سطح"
+        }
+      },
+      "structuralSpecs": {
+        "title": "مواصفات المواد الانشائية",
+        "subtitle": "اختيارات تلقائية بحسب نوع العنصر — يمكنك تعديلها",
+        "structuralElement": "العنصر الإنشائي",
+        "concreteType": "نوع الخرسانة",
+        "steelBrand": "العلامة التجارية للحديد",
+        "selectBrand": "اختر العلامة التجارية",
+        "hasIsolatedSteel": "هل يوجد حديد معزول (إيبوكسي) بالأساسات؟",
+        "element": "العنصر",
+        "steelQuantityKg": "كمية الحديد (كجم)",
+        "noQuantitiesYet": "لم يتم إدخال بيانات الكميات بعد — ستظهر الكميات تلقائياً بعد إدخالها",
+        "blockSpecsTitle": "مواصفات البلوك",
+        "wallCategory": "تصنيف الجدار",
+        "blockType": "نوع البلوك",
+        "thickness": "السماكة",
+        "itemsCount": "({count} عنصر)",
+        "noBlockData": "لم يتم إدخال بيانات البلوك في مرحلة الكميات",
+        "isolated": {
+          "foundations": "القواعد",
+          "groundBeam": "الميدة",
+          "necks": "الرقاب"
+        },
+        "elements": {
+          "plainConcrete": "صبة النظافة / خرسانة عادية",
+          "foundations": "القواعد والأساسات",
+          "columns": "الأعمدة",
+          "beams": "الكمرات",
+          "slabs": "البلاطات",
+          "stairs": "السلالم"
+        },
+        "brands": {
+          "sabic": "سابك (SABIC)",
+          "rajhi": "حديد الراجحي (Al-Rajhi Steel)",
+          "yamamah": "حديد اليمامة (Yamamah Steel)",
+          "hadeed": "حديد (HADEED / ArcelorMittal)",
+          "riyadh": "حديد الرياض (Riyadh Steel)",
+          "jizan": "حديد جازان (Jizan Steel)",
+          "ittefaq": "حديد الاتفاق (Al-Ittefaq Steel)",
+          "tuwairqi": "حديد الطويرقي (Al-Tuwairqi)",
+          "other": "أخرى"
+        }
       }
     },
     "quotations": {
@@ -7397,6 +7487,108 @@
           "derivedParapetHeight": "ارتفاع بلوك الدروة المحسوب",
           "totalBuildingHeight": "ارتفاع المبنى الكلي",
           "levelsMode": "مناسيب"
+        },
+        "sections": {
+          "common": {
+            "concrete": "خرسانة",
+            "steel": "حديد",
+            "itemsCount": "{count} عنصر",
+            "description": "الوصف",
+            "barLength": "طول السيخ",
+            "stocksNeeded": "أسياخ مطلوبة",
+            "weight": "الوزن",
+            "barUnit": "سيخ"
+          },
+          "stairs": {
+            "autoTitle": "حساب السلالم تلقائيا من إعدادات المبنى",
+            "autoButton": "حساب السلالم من إعدادات المبنى",
+            "stairsCount": "{count} سلم",
+            "saveCount": "حفظ {count} سلم",
+            "requiredStairs": "السلالم المطلوبة",
+            "unifiedDimensions": "أبعاد موحدة لجميع السلالم",
+            "landingLength": "طول البسطة",
+            "riserHeight": "ارتفاع القائمة",
+            "treadDepth": "عمق النائمة",
+            "risersCount": "عدد القوائم",
+            "risers": "القوائم",
+            "steps": "الدرجات",
+            "stair": "السلم",
+            "stairDimensions": "أبعاد السلم",
+            "flightLength": "طول الجزء المائل",
+            "flightLengthShort": "طول المائل",
+            "totalHeight": "الارتفاع الكلي",
+            "resultsPerStair": "نتائج الحساب لكل سلم",
+            "mainRebar": "الحديد الرئيسي (الطولي)",
+            "secondaryRebar": "الحديد الثانوي (التوزيع)",
+            "toasts": {
+              "created": "تم إنشاء {count} سلم بنجاح",
+              "saveError": "حدث خطأ أثناء حفظ السلالم"
+            }
+          },
+          "columns": {
+            "floorsCount": "{count} أدوار",
+            "plusNecks": "+ رقاب",
+            "addNeckColumns": "إضافة رقاب الأعمدة",
+            "neckHint": "(الجزء المدفون تحت الأرض)",
+            "repeatedFloorsCount": "عدد الأدوار المتكررة",
+            "repeatedHint": "أضف الأعمدة مرة واحدة وسيتم تطبيقها على {count} أدوار",
+            "columnsTemplate": "قالب الأعمدة (يُطبق على كل دور)",
+            "repeatedDetail": "تفصيل الأدوار المتكررة",
+            "repeatedFloor": "الدور المتكرر {number}",
+            "floorTotal": "إجمالي الدور {number}",
+            "repeatedTotal": "إجمالي {count} أدوار متكررة",
+            "allFloorsTotal": "إجمالي جميع الأدوار",
+            "includesRepeated": "(يشمل {count} أدوار متكررة)",
+            "includesNecks": "(يشمل رقاب الأعمدة)"
+          },
+          "blocks": {
+            "selectCategory": "اختر التصنيف",
+            "selectCategoryPrompt": "يرجى اختيار تصنيف الجدار للمتابعة",
+            "floor": "الدور",
+            "derivedHint": "(محسوب)",
+            "grossArea": "المساحة الإجمالية",
+            "netArea": "المساحة الصافية",
+            "openingsTitle": "الفتحات (الأبواب والنوافذ)",
+            "door": "باب",
+            "window": "نافذة",
+            "addLintels": "إضافة أعتاب خرسانية فوق الفتحات",
+            "noOpenings": "لا توجد فتحات - أضف أبواب أو نوافذ إن وجدت",
+            "cementBags": "أكياس الأسمنت",
+            "bagUnit": "كيس",
+            "quantitiesDetails": "تفاصيل الكميات",
+            "blockDetails": "تفاصيل البلوك",
+            "netBlocks": "البلوك الصافي",
+            "totalBlocks": "إجمالي البلوك",
+            "mortarDetails": "تفاصيل المونة",
+            "mortarVolume": "حجم المونة",
+            "sandVolume": "حجم الرمل",
+            "lintelsDetails": "تفاصيل الأعتاب",
+            "lintelsCount": "عدد الأعتاب",
+            "lintelUnit": "عتب",
+            "totalLength": "الطول الكلي",
+            "openingsSummary": "ملخص الفتحات",
+            "openingsArea": "مساحة الفتحات"
+          },
+          "slabs": {
+            "slabDimensions": "أبعاد السقف",
+            "slabReinforcement": "تسليح السقف",
+            "bottomMesh": "الشبكة السفلية (الفرش)",
+            "topMesh": "الشبكة العلوية (الغطاء) - للسحب السالب",
+            "solidSlabBeams": "كمرات السقف الصلب",
+            "beamsCount": "{count} كمرة",
+            "beamsHint": "أضف الكمرات الحاملة للسقف الصلب — يتم حساب خرسانة وحديد الكمرات منفصلاً ثم إضافتها لإجمالي السقف",
+            "addBeam": "إضافة كمرة",
+            "beamsTotal": "إجمالي كمرات السقف",
+            "steelGross": "حديد (إجمالي)",
+            "beamCuttingDetails": "تفاصيل قص حديد الكمرات",
+            "factoryBarsForBeams": "أسياخ المصنع المطلوبة للكمرات",
+            "showFormwork": "إظهار حساب الشدات",
+            "combinedTotal": "الإجمالي الكلي (البلاطة + الكمرات)",
+            "slabConcrete": "خرسانة البلاطة",
+            "beamsConcrete": "خرسانة الكمرات",
+            "slabSteel": "حديد البلاطة",
+            "beamsSteel": "حديد الكمرات"
+          }
         }
       },
       "finishing": {
@@ -8098,6 +8290,144 @@
         "finishing": "التشطيبات",
         "mep": "الكهروميكانيك",
         "pricing": "التسعير"
+      },
+      "boq": {
+        "itemsCount": "{count} عنصر",
+        "concrete": "خرسانة",
+        "steel": "حديد",
+        "blocks": "بلوك",
+        "concreteM3": "خرسانة (م³)",
+        "steelKg": "حديد (كجم)",
+        "description": "الوصف",
+        "unit": "الوحدة",
+        "material": "المادة",
+        "weight": "الوزن",
+        "weightTon": "الوزن (طن)",
+        "formwork": "الطوبار",
+        "totalBlocks": "إجمالي البلوك",
+        "totalFormwork": "إجمالي الطوبار",
+        "cuttingDetails": "تفاصيل القص",
+        "cuttingDetailsUnavailable": "تفاصيل القص غير متوفرة - يرجى تحديث العنصر",
+        "pieceLength": "طول القطعة",
+        "pieceLengthM": "طول القطعة (م)",
+        "factoryBars": "أسياخ المصنع",
+        "wastePercent": "الهالك %",
+        "requiredFromFactory": "المطلوب من المصنع",
+        "barUnit": "سيخ",
+        "diameterMm": "القطر (مم)",
+        "stockLengthM": "طول السيخ (م)",
+        "barsCount": "عدد الأسياخ",
+        "factoryOrderTitle": "طلبية المصنع — حديد التسليح",
+        "cuttingWorkshopTitle": "تفاصيل التفصيل — ورشة القص",
+        "noFactoryData": "لا توجد بيانات لطلبية المصنع",
+        "noCuttingData": "لا توجد تفاصيل تفصيل",
+        "addItemsWithRebarFirst": "أضف عناصر إنشائية مع بيانات التسليح أولاً",
+        "cutOperationsCount": "{count} عملية قص",
+        "factoryBarsCount": "{count} سيخ مصنع",
+        "export": "تصدير",
+        "print": {
+          "reportTitle": "تقرير الكميات",
+          "study": "الدراسة",
+          "date": "التاريخ",
+          "floor": "الدور",
+          "sectionTotal": "إجمالي القسم",
+          "footer": "تم إعداد هذا التقرير بواسطة منصة مسار — app-masar.com"
+        }
+      },
+      "import": {
+        "title": "استيراد بنود",
+        "stepMethod": "اختيار الطريقة",
+        "stepData": "إدخال البيانات",
+        "stepReview": "مراجعة واستيراد",
+        "pasteFromExcel": "لصق من Excel",
+        "pasteFromExcelDesc": "انسخ البنود من جدول Excel والصقها هنا مباشرة",
+        "manualEntry": "إدخال يدوي",
+        "manualEntryDesc": "أدخل البنود واحدًا تلو الآخر",
+        "pasteLabel": "الصق البيانات من Excel",
+        "pastePlaceholder": "الصق البيانات هنا...",
+        "expectedColumns": "الأعمدة المتوقعة: الوصف، الوحدة، الكمية، القسم (اختياري)",
+        "description": "الوصف",
+        "unit": "الوحدة",
+        "quantity": "الكمية",
+        "section": "القسم",
+        "descriptionPlaceholder": "وصف البند",
+        "itemsCount": "{count} بند",
+        "noItemsToImport": "لا توجد بنود للاستيراد",
+        "importing": "جاري الاستيراد...",
+        "importButton": "استيراد",
+        "success": "تم استيراد {count} بند بنجاح",
+        "error": "حدث خطأ أثناء الاستيراد"
+      },
+      "buildingWizard": {
+        "title": "معالج إعداد المبنى الإنشائي",
+        "skip": "تخطي",
+        "savedSuccess": "تم حفظ إعداد المبنى بنجاح",
+        "floorHasItems": "هذا الدور له {count} بنود — ستظل البنود موجودة لكن بدون دور مرتبط",
+        "chooseFloors": "اختر الأدوار:",
+        "upperFloor": "دور علوي",
+        "repeatedFloor": "متكرر",
+        "heightMode": "وضع الارتفاع:",
+        "manualHeight": "ارتفاع يدوي",
+        "levelsFromDrawings": "مناسيب من المخططات",
+        "selectedFloorsDetails": "تفاصيل الأدوار المختارة:",
+        "floor": "الدور",
+        "levelM": "المنسوب (م)",
+        "heightCalculated": "الارتفاع (محسوب)",
+        "heightM": "الارتفاع (م)",
+        "slabAreaM2": "مساحة السقف (م²)",
+        "repetition": "التكرار",
+        "parapet": "الدروة",
+        "hasParapet": "هل يوجد دروة سطح؟",
+        "parapetHeightCm": "ارتفاع الدروة (سم)",
+        "buildingProperties": "خصائص المبنى",
+        "foundationZone": "منطقة الأساسات",
+        "excavationDepthM": "عمق الحفر (م)",
+        "streetLevelM": "منسوب الشارع (م)",
+        "buildingElevationCm": "ارتفاع المبنى عن الشارع (سم)",
+        "plainConcreteThicknessCm": "سمك الخرسانة العادية (سم)",
+        "foundationDepthCm": "عمق القاعدة (سم)",
+        "beamDepthCm": "عمق الميدة (سم)",
+        "defaultDimensions": "أبعاد افتراضية",
+        "defaultSlabThicknessCm": "سمك السقف الافتراضي (سم)",
+        "defaultBeamDepthCm": "عمق الكمرة الافتراضي (سم)",
+        "levelsSettings": "إعدادات المناسيب",
+        "levelsIncludeFinish": "المناسيب تشمل التشطيب",
+        "finishThicknessCm": "سمك التشطيب (سم)",
+        "invertedBeamDepthCm": "عمق الكمرة المقلوبة (سم)",
+        "roofWaterproofingCm": "سمك عزل السطح (سم)",
+        "heightsSummary": "ملخص الارتفاعات المحسوبة",
+        "neckHeight": "ارتفاع الرقبة:",
+        "parapetBlock": "بلوك الدروة:",
+        "buildingHeight": "ارتفاع المبنى:",
+        "excavationToRoof": "من الحفر للسطح:",
+        "floorCount": "عدد الأدوار:",
+        "totalAreaLabel": "إجمالي المساحة:",
+        "saveAndStart": "حفظ وبدء العمل"
+      },
+      "resultsPanel": {
+        "efficiencyExcellent": "ممتاز",
+        "efficiencyGood": "جيد",
+        "efficiencyHigh": "مرتفع",
+        "cuttingEfficiency": "كفاءة القص",
+        "wasteSuffix": "هالك",
+        "cuttingDetailsTitle": "تفاصيل القص والتوزيع",
+        "netWeight": "وزن صافي",
+        "grossWeight": "وزن إجمالي",
+        "waste": "الهالك",
+        "steelDetailsTable": "جدول تفاصيل الحديد",
+        "description": "الوصف",
+        "diameter": "القطر",
+        "barLength": "طول السيخ",
+        "count": "العدد",
+        "cutsPerStock": "قص/سيخ",
+        "bars": "الأسياخ",
+        "weight": "الوزن",
+        "perBar": "({count} لكل سيخ)",
+        "spliceNotice": "يتضمن أسياخاً تتجاوز 12م — تم احتساب الوصلات (40d) تلقائياً حسب SBC 304",
+        "stocksFromFactory": "الأسياخ المطلوبة من المصنع",
+        "stockBarSpec": "سيخ {diameter} مم × {length}م",
+        "wasteSuggestions": "اقتراحات استخدام الفضلات",
+        "wastePieceSpec": "{length}م × {count} قطعة"
       }
     },
     "leads": {
@@ -8321,7 +8651,428 @@
     "recommended": "موصى به",
     "trialPeriod": "{count} يوم تجربة مجانية",
     "year": "{count, plural, one {سنوياً} other {كل # سنوات}}",
-    "yearly": "سنوي"
+    "yearly": "سنوي",
+    "costingV2": {
+      "common": {
+        "save": "حفظ",
+        "saveError": "حدث خطأ أثناء الحفظ",
+        "pricesSaved": "تم حفظ الأسعار بنجاح",
+        "savePrices": "حفظ الأسعار",
+        "loadingItems": "جاري تحميل البنود...",
+        "item": "البند",
+        "quantity": "الكمية",
+        "unit": "الوحدة",
+        "type": "النوع",
+        "price": "السعر",
+        "total": "الإجمالي",
+        "materialPrice": "سعر المادة",
+        "laborCost": "المصنعية",
+        "storagePercent": "التشوين%",
+        "storage": "التشوين",
+        "detailed": "تفصيلي",
+        "lumpSum": "مقطوعية",
+        "itemsCount": "{count} بند",
+        "sar": "ر.س",
+        "riyal": "ريال",
+        "sarPerSqm": "ر.س/م²",
+        "sarPerUnit": "ر.س/{unit}",
+        "totalAmount": "المبلغ الإجمالي",
+        "pricingMode": "نوع التسعير",
+        "cardsView": "بطاقات",
+        "quickEntryView": "إدخال سريع",
+        "unsavedChanges": "لديك تغييرات غير محفوظة — سيتم الحفظ تلقائياً أو اضغط \"حفظ الأسعار\""
+      },
+      "labor": {
+        "modes": {
+          "perSqm": "بالمتر المسطح",
+          "perCbmTon": "بالمتر المكعب+الطن",
+          "lumpSum": "بالمقطوعية",
+          "salary": "بالراتب الشهري"
+        },
+        "sections": {
+          "structural": "إنشائي",
+          "finishing": "تشطيبات",
+          "mep": "كهروميكانيكية",
+          "labor": "عمالة عامة",
+          "manual": "بنود يدوية"
+        },
+        "defaults": {
+          "fence": "السور",
+          "parapet": "الدروة",
+          "decorations": "ديكورات خرسانية",
+          "concretePouring": "مصنعية صب الخرسانة",
+          "steelWork": "مصنعية الحديد (قص وتشكيل وتركيب)",
+          "carpentry": "النجارة / الشدات"
+        },
+        "laborSaved": "تم حفظ بيانات المصنعيات بنجاح",
+        "enterLaborData": "يرجى إدخال بيانات المصنعيات",
+        "mezzanineRoofLabel": "سقف دور الميزانين",
+        "floorRoofLabel": "سقف الدور ال{floor}",
+        "extraFloorLabel": "دور إضافي {number}",
+        "typePerUnit": "وحدة",
+        "typeSalary": "راتب",
+        "calcMethodLabel": "طريقة حساب مصنعيات الإنشائي",
+        "perSqmTitle": "مصنعيات عظم بالمتر المسطح",
+        "addFloor": "إضافة دور",
+        "areaQuantity": "المساحة / الكمية",
+        "noSlabs": "لا توجد أسقف مضافة في قسم الكميات. أضف أسقف لتظهر الأدوار تلقائياً، أو أضف دور يدوياً.",
+        "autoBadge": "تلقائي",
+        "perCbmTitle": "مصنعيات بالمتر المكعب والطن",
+        "lumpSumTitle": "مصنعيات عظم بالمقطوعية",
+        "lumpSumAmountLabel": "مبلغ المقطوعية الشامل لجميع أعمال المصنعيات الإنشائية",
+        "salaryTitle": "عمالة الإنشائي بالراتب الشهري",
+        "addWorker": "إضافة عامل",
+        "noWorkers": "لم تتم إضافة أي عمالة بعد",
+        "craft": "الحرفة",
+        "count": "العدد",
+        "salary": "الراتب",
+        "months": "الأشهر",
+        "rowTotal": "إجمالي",
+        "craftPlaceholder": "مثال: نجار",
+        "salariesTotal": "إجمالي الرواتب:",
+        "insurance": "+ تأمين:",
+        "housing": "+ سكن:",
+        "grandTotalEquals": "= الإجمالي:",
+        "structuralLaborTotal": "إجمالي مصنعيات الإنشائي",
+        "costPerSqm": "تكلفة المتر المربع",
+        "saveLabor": "حفظ المصنعيات",
+        "otherSectionsTitle": "مصنعيات الأقسام الأخرى (للاطلاع)",
+        "method": "الطريقة",
+        "structuralLaborShort": "مصنعيات إنشائي",
+        "otherSectionsShort": "مصنعيات أقسام أخرى",
+        "totalLabor": "إجمالي العمالة"
+      },
+      "finishing": {
+        "generatedSuccess": "تم توليد {count} بند تشطيبات للتسعير",
+        "itemsExist": "البنود موجودة مسبقاً",
+        "generateError": "حدث خطأ أثناء توليد البنود",
+        "generating": "جاري توليد بنود التشطيبات...",
+        "noItems": "لا توجد بنود تشطيبات — يمكنك توليدها تلقائياً",
+        "generateButton": "توليد بنود التسعير",
+        "itemTotal": "إجمالي البند",
+        "grandTotal": "إجمالي التشطيبات"
+      },
+      "mep": {
+        "sections": {
+          "electrical": "أعمال الكهرباء",
+          "plumbing": "أعمال السباكة",
+          "hvac": "أعمال التكييف",
+          "fireFighting": "أعمال الإطفاء"
+        },
+        "generateError": "حدث خطأ في توليد البنود",
+        "lumpSumSaved": "تم حفظ المقطوعية بنجاح",
+        "noCostingItems": "لا توجد بنود تسعير لهذا القسم",
+        "noItems": "لا توجد بنود كهروميكانيكية",
+        "detailedMode": "تفصيلي (بند بند)",
+        "lumpSumMode": "مقطوعية شاملة",
+        "subcontractorLabel": "{section} — مقاول باطن",
+        "riyalInclusive": "ريال (شامل مواد ومصنعية وتشوين)",
+        "contains": "يحتوي: {items}",
+        "emptySection": "لا توجد بنود في هذا القسم",
+        "sectionTotal": "إجمالي {section}:",
+        "grandTotal": "إجمالي الأعمال الكهروميكانيكية"
+      }
+    },
+    "pricingV2": {
+      "sections": {
+        "structural": "إنشائي",
+        "finishing": "تشطيبات",
+        "mep": "كهروميكانيكية",
+        "labor": "عمالة عامة",
+        "manual": "بنود يدوية"
+      },
+      "common": {
+        "totalCost": "إجمالي التكلفة",
+        "profitMarginPct": "هامش الربح (%)",
+        "calculatedMarkupPct": "نسبة الهامش المحسوبة",
+        "savePrice": "حفظ السعر"
+      },
+      "toasts": {
+        "markupSettingsSaved": "تم حفظ إعدادات الهامش",
+        "saveError": "حدث خطأ أثناء الحفظ",
+        "sectionMarkupsSaved": "تم حفظ هوامش الأقسام",
+        "pricingStageApproved": "تم اعتماد مرحلة التسعير",
+        "approveError": "حدث خطأ أثناء الاعتماد",
+        "enterValidSellingPrice": "يرجى إدخال سعر بيع صحيح",
+        "enterSqmPrice": "يرجى إدخال سعر المتر المربع",
+        "addAtLeastOneItem": "يرجى إضافة بند واحد على الأقل",
+        "itemsSaved": "تم حفظ {count} بند بنجاح"
+      },
+      "locked": {
+        "title": "مرحلة التسعير مقفلة",
+        "description": "يجب اعتماد مرحلة تسعير التكلفة أولاً قبل البدء في التسعير",
+        "backToCosting": "الرجوع لتسعير التكلفة"
+      },
+      "methods": {
+        "title": "طريقة تطبيق الهامش",
+        "uniform": {
+          "label": "نسبة موحدة",
+          "desc": "مصاريف عامة + ربح + احتياطي"
+        },
+        "perSection": {
+          "label": "نسبة لكل قسم",
+          "desc": "هامش مختلف حسب القسم"
+        },
+        "manualPrice": {
+          "label": "سعر بيع يدوي",
+          "desc": "أدخل سعر البيع المطلوب"
+        },
+        "perSqm": {
+          "label": "سعر المتر المربع",
+          "desc": "حدد سعر بيع المتر"
+        }
+      },
+      "hero": {
+        "directCost": "التكلفة المباشرة",
+        "costPerSqm": "تكلفة المتر المسطح",
+        "buildingArea": "مساحة البناء"
+      },
+      "uniform": {
+        "title": "نسبة موحدة على إجمالي التكلفة",
+        "totalMarkup": "إجمالي الهامش",
+        "estimatedSellingPrice": "سعر البيع التقديري",
+        "estimatedSqmPrice": "سعر المتر التقديري"
+      },
+      "perSection": {
+        "title": "هامش مخصص لكل قسم",
+        "markupPct": "نسبة الهامش (%)",
+        "save": "حفظ الهوامش"
+      },
+      "manualPrice": {
+        "title": "أدخل سعر البيع المطلوب (قبل الضريبة)",
+        "totalSellingPriceLabel": "سعر البيع الإجمالي (ر.س)",
+        "requestedSellingPrice": "سعر البيع المطلوب",
+        "estimatedOverhead": "مصاريف عامة تقديرية (25%)",
+        "estimatedNetProfit": "صافي الربح التقديري",
+        "pricePerSqm": "سعر المتر المربع"
+      },
+      "perSqm": {
+        "title": "تسعير حسب المتر المربع",
+        "noAreaWarning": "لم يتم تحديد مساحة البناء في بيانات الدراسة. يرجى إضافة المساحة أولاً.",
+        "buildingArea": "مساحة البناء:",
+        "currentCostPerSqm": "تكلفة المتر الحالية:",
+        "priceLabel": "سعر بيع المتر المربع (ر.س/م²)",
+        "calculatedTotalSellingPrice": "سعر البيع الإجمالي المحسوب",
+        "profitPerMeter": "الربح لكل متر"
+      },
+      "expenses": {
+        "title": "المصاريف الإضافية",
+        "adminPct": "المصاريف الإدارية (%)",
+        "contingencyPct": "الاحتياط (%)",
+        "vat": "ضريبة القيمة المضافة",
+        "vatIncluded": "تشمل (15%)",
+        "save": "حفظ الإعدادات"
+      },
+      "itemsTable": {
+        "title": "تعديل أسعار البنود ({count} بند)",
+        "item": "البند",
+        "calculatedSellingPrice": "سعر البيع المحسوب",
+        "priceOverride": "تعديل السعر",
+        "overriddenCount": "{count} بند معدّل يدوياً",
+        "resetAll": "إعادة تعيين الكل"
+      },
+      "table": {
+        "section": "القسم",
+        "cost": "التكلفة",
+        "sellingPrice": "سعر البيع",
+        "unit": "الوحدة",
+        "quantity": "الكمية",
+        "description": "الوصف",
+        "unitPrice": "سعر الوحدة",
+        "total": "الإجمالي",
+        "delete": "حذف"
+      },
+      "actions": {
+        "approvePricing": "اعتماد التسعير",
+        "quotation": "عرض السعر"
+      },
+      "lumpSum": {
+        "title": "تحليل المقطوعية",
+        "contractValue": "قيمة العقد",
+        "difference": "الفرق",
+        "profit": "ربح",
+        "loss": "خسارة",
+        "calculatedCost": "التكلفة المحسوبة",
+        "costPctOfContract": "نسبة التكلفة من قيمة العقد",
+        "profitPct": "نسبة الربح",
+        "safetyMargin": "هامش الأمان",
+        "profitPerSqm": "الربح لكل متر مربع",
+        "costPctOfContractShort": "نسبة التكلفة من العقد",
+        "recommendation": "التوصية",
+        "sectionComparisonTitle": "مقارنة التكلفة حسب القسم",
+        "sectionComparisonDesc": "توزيع قيمة العقد بنسبة حصة كل قسم من إجمالي التكلفة",
+        "contractShare": "الحصة من العقد",
+        "contractAllocated": "المخصص من العقد",
+        "margin": "الهامش",
+        "recommendations": {
+          "excellent": {
+            "label": "ممتاز",
+            "description": "هامش ربح ممتاز — يُنصح بالمضي قدمًا في المشروع"
+          },
+          "good": {
+            "label": "جيد",
+            "description": "هامش ربح جيد — مقبول للتنفيذ"
+          },
+          "acceptable": {
+            "label": "مقبول",
+            "description": "هامش ربح منخفض — يُنصح بمراجعة التكاليف وتقليلها"
+          },
+          "weak": {
+            "label": "ضعيف",
+            "description": "هامش ربح ضعيف جدًا — يجب إعادة النظر في التكاليف أو قيمة العقد"
+          },
+          "loss": {
+            "label": "خسارة",
+            "description": "المشروع سيحقق خسارة — لا يُنصح بالتنفيذ بهذه القيم"
+          }
+        }
+      },
+      "quick": {
+        "title": "تسعير سريع",
+        "subtitle": "أدخل البنود والأسعار مباشرة لإنشاء عرض سعر سريع",
+        "itemDescriptionPlaceholder": "وصف البند...",
+        "addItem": "إضافة بند",
+        "summaryTitle": "ملخص التسعير",
+        "itemsCount": "عدد البنود",
+        "profitMarginWithPct": "هامش الربح ({pct}%)",
+        "vat15": "ضريبة القيمة المضافة (15%)",
+        "grandTotal": "الإجمالي النهائي",
+        "addVat15": "إضافة ضريبة القيمة المضافة (15%)",
+        "saveItems": "حفظ البنود",
+        "createQuotation": "إنشاء عرض سعر",
+        "approve": "اعتماد"
+      }
+    },
+    "quotationBuilder": {
+      "currency": "ر.س",
+      "currencyPerSqm": "ر.س/م²",
+      "notFound": "عرض السعر غير موجود",
+      "actions": {
+        "back": "رجوع",
+        "print": "طباعة",
+        "exportPdf": "تصدير PDF",
+        "cancel": "إلغاء",
+        "download": "تحميل",
+        "issueQuotation": "إصدار عرض السعر",
+        "quotationData": "بيانات العرض"
+      },
+      "formats": {
+        "detailedBoq": "تفصيلي (BOQ)",
+        "perSqm": "بالمتر المربع",
+        "lumpSum": "مقطوعية",
+        "custom": "مخصص"
+      },
+      "sectionLabels": {
+        "structural": "إنشائي",
+        "finishing": "تشطيبات",
+        "mep": "كهروميكانيكية",
+        "labor": "عمالة عامة",
+        "manual": "بنود يدوية",
+        "other": "بنود أخرى"
+      },
+      "preview": {
+        "draftWatermark": "مسودة",
+        "title": "عرض سعر"
+      },
+      "sections": {
+        "clientInfo": "بيانات العميل",
+        "generalTerms": "الشروط والأحكام العامة",
+        "terms": "الشروط والأحكام",
+        "termsShort": "الشروط",
+        "amounts": "المبالغ",
+        "structuralWorks": "الأعمال الإنشائية",
+        "finishingWorks": "أعمال التشطيبات",
+        "mepWorks": "الأعمال الكهروميكانيكية",
+        "manualItems": "البنود اليدوية",
+        "materialDetails": "تفاصيل المواد"
+      },
+      "fields": {
+        "number": "رقم",
+        "date": "التاريخ",
+        "validUntil": "صالح حتى",
+        "days": "يوم",
+        "client": "العميل",
+        "clientName": "اسم العميل",
+        "company": "الشركة",
+        "phone": "الهاتف",
+        "email": "البريد الإلكتروني",
+        "taxNumber": "الرقم الضريبي",
+        "totalArea": "المساحة الإجمالية",
+        "pricePerSqm": "سعر المتر المربع",
+        "paymentTerms": "شروط الدفع",
+        "deliveryTerms": "مدة التنفيذ",
+        "warranty": "الضمان",
+        "warrantyTerms": "شروط الضمان",
+        "notes": "ملاحظات",
+        "filename": "اسم الملف"
+      },
+      "placeholders": {
+        "clientName": "أحمد محمد",
+        "company": "شركة البناء الحديث",
+        "paymentTerms": "50% مقدم — 50% عند الانتهاء",
+        "deliveryTerms": "6 أشهر من تاريخ التعاقد",
+        "warrantyTerms": "سنة واحدة على الأعمال",
+        "notes": "ملاحظات إضافية..."
+      },
+      "discount": {
+        "none": "بدون",
+        "percent": "نسبة %",
+        "amount": "مبلغ"
+      },
+      "totals": {
+        "subtotal": "المجموع الفرعي",
+        "discount": "الخصم",
+        "afterDiscount": "بعد الخصم",
+        "vat": "ضريبة القيمة المضافة ({percent}%)",
+        "vatLabel": "ضريبة القيمة المضافة",
+        "beforeVat": "الإجمالي قبل الضريبة",
+        "grandTotal": "الإجمالي النهائي",
+        "total": "الإجمالي",
+        "sectionSubtotal": "المجموع الفرعي لكل قسم",
+        "pricePerSqmCost": "تكلفة المتر المربع",
+        "amountInWords": "({words} ريال سعودي)"
+      },
+      "lumpSum": {
+        "scopeOfWork": "نطاق العمل",
+        "defaultDescription": "بناء وتشطيب حسب المواصفات المرفقة",
+        "amount": "المبلغ المقطوع",
+        "inclusionNote": "* يشمل المبلغ المذكور أعلاه جميع التكاليف من مواد وعمالة ومعدات ومصاريف إدارية"
+      },
+      "table": {
+        "itemNumber": "رقم البند",
+        "description": "الوصف",
+        "specifications": "المواصفات",
+        "quantity": "الكمية",
+        "unit": "الوحدة",
+        "unitPrice": "سعر الوحدة",
+        "total": "الإجمالي",
+        "section": "القسم",
+        "area": "المساحة",
+        "pricePerSqmShort": "سعر م²",
+        "sectionTotal": "مجموع {section}"
+      },
+      "grouping": {
+        "bySection": "بحسب القسم",
+        "byFloor": "بحسب الدور",
+        "byItem": "بحسب البند",
+        "flat": "بدون تجميع"
+      },
+      "customizer": {
+        "title": "تخصيص عرض السعر",
+        "columns": "الأعمدة",
+        "sections": "الأقسام",
+        "grouping": "التجميع",
+        "totals": "المجاميع",
+        "livePreview": "معاينة فورية",
+        "noItems": "لا توجد بنود"
+      },
+      "toasts": {
+        "pdfError": "حدث خطأ أثناء إنشاء PDF",
+        "createSuccess": "تم إنشاء عرض السعر بنجاح",
+        "createError": "حدث خطأ أثناء إنشاء عرض السعر",
+        "clientNameRequired": "يرجى إدخال اسم العميل"
+      }
+    }
   },
   "projectBoq": {
     "title": "جدول الكميات",

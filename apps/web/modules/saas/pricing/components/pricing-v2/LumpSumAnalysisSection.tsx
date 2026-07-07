@@ -11,6 +11,7 @@ import {
 	CheckCircle2,
 	XCircle,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
 // ─── Types ───────────────────────────────────────────────────────
@@ -25,14 +26,6 @@ interface LumpSumAnalysisSectionProps {
 
 // ─── Constants ───────────────────────────────────────────────────
 
-const SECTION_LABELS: Record<string, string> = {
-	STRUCTURAL: "إنشائي",
-	FINISHING: "تشطيبات",
-	MEP: "كهروميكانيكية",
-	LABOR: "عمالة عامة",
-	MANUAL: "بنود يدوية",
-};
-
 const formatNum = (n: number) =>
 	Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
@@ -41,8 +34,8 @@ const formatNum = (n: number) =>
 function getRecommendation(profitPct: number) {
 	if (profitPct > 20) {
 		return {
-			label: "ممتاز",
-			description: "هامش ربح ممتاز — يُنصح بالمضي قدمًا في المشروع",
+			labelKey: "lumpSum.recommendations.excellent.label" as const,
+			descriptionKey: "lumpSum.recommendations.excellent.description" as const,
 			color: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
 			borderColor: "border-emerald-200 dark:border-emerald-800",
 			bgColor: "bg-emerald-50/50 dark:bg-emerald-950/20",
@@ -51,8 +44,8 @@ function getRecommendation(profitPct: number) {
 	}
 	if (profitPct > 10) {
 		return {
-			label: "جيد",
-			description: "هامش ربح جيد — مقبول للتنفيذ",
+			labelKey: "lumpSum.recommendations.good.label" as const,
+			descriptionKey: "lumpSum.recommendations.good.description" as const,
 			color: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
 			borderColor: "border-blue-200 dark:border-blue-800",
 			bgColor: "bg-blue-50/50 dark:bg-blue-950/20",
@@ -61,8 +54,8 @@ function getRecommendation(profitPct: number) {
 	}
 	if (profitPct > 5) {
 		return {
-			label: "مقبول",
-			description: "هامش ربح منخفض — يُنصح بمراجعة التكاليف وتقليلها",
+			labelKey: "lumpSum.recommendations.acceptable.label" as const,
+			descriptionKey: "lumpSum.recommendations.acceptable.description" as const,
 			color: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
 			borderColor: "border-amber-200 dark:border-amber-800",
 			bgColor: "bg-amber-50/50 dark:bg-amber-950/20",
@@ -71,8 +64,8 @@ function getRecommendation(profitPct: number) {
 	}
 	if (profitPct > 0) {
 		return {
-			label: "ضعيف",
-			description: "هامش ربح ضعيف جدًا — يجب إعادة النظر في التكاليف أو قيمة العقد",
+			labelKey: "lumpSum.recommendations.weak.label" as const,
+			descriptionKey: "lumpSum.recommendations.weak.description" as const,
 			color: "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300",
 			borderColor: "border-orange-200 dark:border-orange-800",
 			bgColor: "bg-orange-50/50 dark:bg-orange-950/20",
@@ -80,8 +73,8 @@ function getRecommendation(profitPct: number) {
 		};
 	}
 	return {
-		label: "خسارة",
-		description: "المشروع سيحقق خسارة — لا يُنصح بالتنفيذ بهذه القيم",
+		labelKey: "lumpSum.recommendations.loss.label" as const,
+		descriptionKey: "lumpSum.recommendations.loss.description" as const,
 		color: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
 		borderColor: "border-red-200 dark:border-red-800",
 		bgColor: "bg-red-50/50 dark:bg-red-950/20",
@@ -98,6 +91,16 @@ export function LumpSumAnalysisSection({
 	totalCost,
 	buildingArea,
 }: LumpSumAnalysisSectionProps) {
+	const t = useTranslations("pricing.pricingV2");
+
+	const sectionLabels: Record<string, string> = {
+		STRUCTURAL: t("sections.structural"),
+		FINISHING: t("sections.finishing"),
+		MEP: t("sections.mep"),
+		LABOR: t("sections.labor"),
+		MANUAL: t("sections.manual"),
+	};
+
 	// ─── Fetch costing items ─────────────────────────────────────
 	const { data: costingItems } = useQuery(
 		orpc.pricing.studies.costing.getItems.queryOptions({
@@ -136,7 +139,6 @@ export function LumpSumAnalysisSection({
 			const margin = allocated - cost;
 			return {
 				section,
-				label: SECTION_LABELS[section] ?? section,
 				cost,
 				allocated,
 				margin,
@@ -154,12 +156,14 @@ export function LumpSumAnalysisSection({
 		<div className="space-y-6" dir="rtl">
 			{/* ═══ 1. Hero Comparison Card ═══ */}
 			<div className="rounded-2xl border-2 border-primary/20 bg-gradient-to-bl from-primary/10 via-primary/5 to-background p-6 space-y-5">
-				<h3 className="text-lg font-bold">تحليل المقطوعية</h3>
+				<h3 className="text-lg font-bold">{t("lumpSum.title")}</h3>
 
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
 					{/* Contract value */}
 					<div className="rounded-xl border border-border bg-card p-4 text-center space-y-1">
-						<p className="text-sm text-muted-foreground font-medium">قيمة العقد</p>
+						<p className="text-sm text-muted-foreground font-medium">
+							{t("lumpSum.contractValue")}
+						</p>
 						<p className="text-2xl font-bold text-primary" dir="ltr">
 							{formatNum(contractValue)} ر.س
 						</p>
@@ -174,7 +178,9 @@ export function LumpSumAnalysisSection({
 								: "border-red-300 dark:border-red-700 bg-red-50/60 dark:bg-red-950/30",
 						)}
 					>
-						<p className="text-sm font-medium text-muted-foreground">الفرق</p>
+						<p className="text-sm font-medium text-muted-foreground">
+							{t("lumpSum.difference")}
+						</p>
 						<div className="flex items-center justify-center gap-2">
 							{isProfit ? (
 								<TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
@@ -201,13 +207,16 @@ export function LumpSumAnalysisSection({
 									: "text-red-600 dark:text-red-400",
 							)}
 						>
-							{isProfit ? "ربح" : "خسارة"} ({formatNum(Math.abs(profitPct))}%)
+							{isProfit ? t("lumpSum.profit") : t("lumpSum.loss")} (
+							{formatNum(Math.abs(profitPct))}%)
 						</p>
 					</div>
 
 					{/* Calculated cost */}
 					<div className="rounded-xl border border-border bg-card p-4 text-center space-y-1">
-						<p className="text-sm text-muted-foreground font-medium">التكلفة المحسوبة</p>
+						<p className="text-sm text-muted-foreground font-medium">
+							{t("lumpSum.calculatedCost")}
+						</p>
 						<p className="text-2xl font-bold text-foreground" dir="ltr">
 							{formatNum(totalCost)} ر.س
 						</p>
@@ -217,7 +226,7 @@ export function LumpSumAnalysisSection({
 				{/* Animated progress bar */}
 				<div className="space-y-2">
 					<div className="flex items-center justify-between text-xs text-muted-foreground">
-						<span>نسبة التكلفة من قيمة العقد</span>
+						<span>{t("lumpSum.costPctOfContract")}</span>
 						<span dir="ltr" className="font-medium">{formatNum(costAsPercentOfContract)}%</span>
 					</div>
 					<div className="h-3 w-full rounded-full bg-muted/40 overflow-hidden">
@@ -246,7 +255,9 @@ export function LumpSumAnalysisSection({
 						) : (
 							<TrendingDown className="h-4 w-4 text-red-600" />
 						)}
-						<span className="text-xs text-muted-foreground font-medium">نسبة الربح</span>
+						<span className="text-xs text-muted-foreground font-medium">
+							{t("lumpSum.profitPct")}
+						</span>
 					</div>
 					<p
 						className={cn(
@@ -263,7 +274,9 @@ export function LumpSumAnalysisSection({
 				<div className="rounded-xl border border-border bg-card p-4 space-y-2">
 					<div className="flex items-center gap-2">
 						<Shield className="h-4 w-4 text-blue-600" />
-						<span className="text-xs text-muted-foreground font-medium">هامش الأمان</span>
+						<span className="text-xs text-muted-foreground font-medium">
+							{t("lumpSum.safetyMargin")}
+						</span>
 					</div>
 					<p className="text-xl font-bold text-blue-600" dir="ltr">
 						{formatNum(safetyMarginPct)}%
@@ -279,7 +292,9 @@ export function LumpSumAnalysisSection({
 							) : (
 								<TrendingDown className="h-4 w-4 text-red-600" />
 							)}
-							<span className="text-xs text-muted-foreground font-medium">الربح لكل متر مربع</span>
+							<span className="text-xs text-muted-foreground font-medium">
+								{t("lumpSum.profitPerSqm")}
+							</span>
 						</div>
 						<p
 							className={cn(
@@ -301,7 +316,9 @@ export function LumpSumAnalysisSection({
 						) : (
 							<AlertTriangle className="h-4 w-4 text-amber-600" />
 						)}
-						<span className="text-xs text-muted-foreground font-medium">نسبة التكلفة من العقد</span>
+						<span className="text-xs text-muted-foreground font-medium">
+							{t("lumpSum.costPctOfContractShort")}
+						</span>
 					</div>
 					<p
 						className={cn(
@@ -330,19 +347,19 @@ export function LumpSumAnalysisSection({
 				<div className="flex items-center gap-3">
 					<RecommendationIcon className="h-5 w-5" />
 					<div className="flex items-center gap-2">
-						<h4 className="font-semibold">التوصية</h4>
+						<h4 className="font-semibold">{t("lumpSum.recommendation")}</h4>
 						<span
 							className={cn(
 								"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold",
 								recommendation.color,
 							)}
 						>
-							{recommendation.label}
+							{t(recommendation.labelKey)}
 						</span>
 					</div>
 				</div>
 				<p className="text-sm text-muted-foreground leading-relaxed">
-					{recommendation.description}
+					{t(recommendation.descriptionKey)}
 				</p>
 			</div>
 
@@ -350,20 +367,32 @@ export function LumpSumAnalysisSection({
 			{sectionBreakdown.length > 0 && (
 				<div className="rounded-xl border border-border bg-card overflow-hidden">
 					<div className="p-4 pb-2">
-						<h4 className="font-semibold text-sm">مقارنة التكلفة حسب القسم</h4>
+						<h4 className="font-semibold text-sm">
+							{t("lumpSum.sectionComparisonTitle")}
+						</h4>
 						<p className="text-xs text-muted-foreground mt-1">
-							توزيع قيمة العقد بنسبة حصة كل قسم من إجمالي التكلفة
+							{t("lumpSum.sectionComparisonDesc")}
 						</p>
 					</div>
 					<div className="overflow-x-auto">
 						<table className="w-full text-sm">
 							<thead>
 								<tr className="border-b bg-muted/30 text-muted-foreground">
-									<th className="px-4 py-3 text-right font-medium">القسم</th>
-									<th className="px-4 py-3 text-center font-medium">التكلفة</th>
-									<th className="px-4 py-3 text-center font-medium">الحصة من العقد</th>
-									<th className="px-4 py-3 text-center font-medium">المخصص من العقد</th>
-									<th className="px-4 py-3 text-center font-medium">الهامش</th>
+									<th className="px-4 py-3 text-right font-medium">
+										{t("table.section")}
+									</th>
+									<th className="px-4 py-3 text-center font-medium">
+										{t("table.cost")}
+									</th>
+									<th className="px-4 py-3 text-center font-medium">
+										{t("lumpSum.contractShare")}
+									</th>
+									<th className="px-4 py-3 text-center font-medium">
+										{t("lumpSum.contractAllocated")}
+									</th>
+									<th className="px-4 py-3 text-center font-medium">
+										{t("lumpSum.margin")}
+									</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -372,7 +401,9 @@ export function LumpSumAnalysisSection({
 										key={row.section}
 										className="border-b last:border-0 hover:bg-muted/20"
 									>
-										<td className="px-4 py-3 font-medium">{row.label}</td>
+										<td className="px-4 py-3 font-medium">
+											{sectionLabels[row.section] ?? row.section}
+										</td>
 										<td className="px-4 py-3 text-center" dir="ltr">
 											{formatNum(row.cost)} ر.س
 										</td>
@@ -399,7 +430,7 @@ export function LumpSumAnalysisSection({
 							</tbody>
 							<tfoot>
 								<tr className="border-t-2 border-border bg-muted/20 font-semibold">
-									<td className="px-4 py-3">الإجمالي</td>
+									<td className="px-4 py-3">{t("table.total")}</td>
 									<td className="px-4 py-3 text-center" dir="ltr">
 										{formatNum(
 											sectionBreakdown.reduce((s, r) => s + r.cost, 0),

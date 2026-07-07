@@ -7,6 +7,7 @@ import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
 import { cn } from "@ui/lib";
 import { Loader2, Save } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { formatNum } from "@saas/pricing/lib/utils";
@@ -30,17 +31,20 @@ interface ItemPrices {
 }
 
 const MEP_SECTIONS = [
-	{ key: "ELECTRICAL", label: "أعمال الكهرباء" },
-	{ key: "PLUMBING", label: "أعمال السباكة" },
-	{ key: "HVAC", label: "أعمال التكييف" },
-	{ key: "FIRE_FIGHTING", label: "أعمال الإطفاء" },
+	{ key: "ELECTRICAL", labelKey: "mep.sections.electrical" },
+	{ key: "PLUMBING", labelKey: "mep.sections.plumbing" },
+	{ key: "HVAC", labelKey: "mep.sections.hvac" },
+	{ key: "FIRE_FIGHTING", labelKey: "mep.sections.fireFighting" },
 ] as const;
 
 export function MEPCostingTab({
 	organizationId,
 	studyId,
 }: MEPCostingTabProps) {
+	const t = useTranslations("pricing.costingV2");
 	const queryClient = useQueryClient();
+	const sectionLabel = (section: (typeof MEP_SECTIONS)[number]) =>
+		t(section.labelKey as Parameters<typeof t>[0]);
 	const [sectionConfigs, setSectionConfigs] = useState<
 		Record<string, SectionConfig>
 	>({});
@@ -72,7 +76,7 @@ export function MEPCostingTab({
 					queryKey: orpc.pricing.studies.costing.key(),
 				});
 			},
-			onError: (e: any) => toast.error(e.message || "حدث خطأ في توليد البنود"),
+			onError: (e: any) => toast.error(e.message || t("mep.generateError")),
 		}),
 	);
 
@@ -249,7 +253,7 @@ export function MEPCostingTab({
 						? Number(config.lumpSumAmount)
 						: 0,
 				});
-				toast.success("تم حفظ المقطوعية بنجاح");
+				toast.success(t("mep.lumpSumSaved"));
 			} else {
 				// Detailed mode: bulk update all items in this section
 				const sectionItems = grouped[sectionKey] ?? [];
@@ -277,7 +281,7 @@ export function MEPCostingTab({
 				}
 
 				if (items.length === 0) {
-					toast.error("لا توجد بنود تسعير لهذا القسم");
+					toast.error(t("mep.noCostingItems"));
 					return;
 				}
 
@@ -286,10 +290,10 @@ export function MEPCostingTab({
 					studyId,
 					items,
 				});
-				toast.success("تم حفظ الأسعار بنجاح");
+				toast.success(t("common.pricesSaved"));
 			}
 		} catch {
-			toast.error("حدث خطأ أثناء الحفظ");
+			toast.error(t("common.saveError"));
 		} finally {
 			setSavingSections((prev) => ({ ...prev, [sectionKey]: false }));
 		}
@@ -308,7 +312,7 @@ export function MEPCostingTab({
 		return (
 			<div className="rounded-xl border border-border bg-card p-8 text-center">
 				<p className="text-muted-foreground">
-					لا توجد بنود كهروميكانيكية
+					{t("mep.noItems")}
 				</p>
 			</div>
 		);
@@ -338,17 +342,17 @@ export function MEPCostingTab({
 						{/* Section header */}
 						<div className="px-4 py-3 bg-muted/30 border-b border-border">
 							<div className="flex items-center justify-between">
-								<h4 className="font-medium">{section.label}</h4>
+								<h4 className="font-medium">{sectionLabel(section)}</h4>
 								<div className="flex items-center gap-3">
 									<span className="text-xs text-muted-foreground">
-										{sectionItems.length} بند
+										{t("common.itemsCount", { count: sectionItems.length })}
 									</span>
 									{sectionTotal > 0 && (
 										<span
 											className="text-sm font-semibold text-primary"
 											dir="ltr"
 										>
-											{formatNum(sectionTotal)} ر.س
+											{formatNum(sectionTotal)} {t("common.sar")}
 										</span>
 									)}
 								</div>
@@ -367,7 +371,7 @@ export function MEPCostingTab({
 											: "border-border hover:border-muted-foreground/30",
 									)}
 								>
-									تفصيلي (بند بند)
+									{t("mep.detailedMode")}
 								</button>
 								<button
 									type="button"
@@ -381,7 +385,7 @@ export function MEPCostingTab({
 											: "border-border hover:border-muted-foreground/30",
 									)}
 								>
-									مقطوعية شاملة
+									{t("mep.lumpSumMode")}
 								</button>
 							</div>
 						</div>
@@ -391,7 +395,7 @@ export function MEPCostingTab({
 							<div className="p-4 space-y-3">
 								<div className="rounded-lg border border-dashed border-primary/30 bg-primary/5 p-4">
 									<Label className="text-sm font-medium mb-2 block">
-										{section.label} — مقاول باطن
+										{t("mep.subcontractorLabel", { section: sectionLabel(section) })}
 									</Label>
 									<div className="flex items-center gap-3">
 										<Input
@@ -407,13 +411,14 @@ export function MEPCostingTab({
 											}
 										/>
 										<span className="text-sm text-muted-foreground">
-											ريال (شامل مواد ومصنعية وتشوين)
+											{t("mep.riyalInclusive")}
 										</span>
 									</div>
 									{sectionItems.length > 0 && (
 										<p className="text-xs text-muted-foreground mt-2">
-											يحتوي:{" "}
-											{sectionItems.map((i: any) => i.name).join("، ")}
+											{t("mep.contains", {
+												items: sectionItems.map((i: any) => i.name).join("، "),
+											})}
 										</p>
 									)}
 								</div>
@@ -427,25 +432,25 @@ export function MEPCostingTab({
 									<thead>
 										<tr className="border-b bg-muted/20 text-muted-foreground">
 											<th className="px-3 py-2.5 text-right font-medium">
-												البند
+												{t("common.item")}
 											</th>
 											<th className="px-3 py-2.5 text-center font-medium">
-												الكمية
+												{t("common.quantity")}
 											</th>
 											<th className="px-3 py-2.5 text-center font-medium">
-												الوحدة
+												{t("common.unit")}
 											</th>
 											<th className="px-3 py-2.5 text-center font-medium">
-												سعر المادة
+												{t("common.materialPrice")}
 											</th>
 											<th className="px-3 py-2.5 text-center font-medium">
-												المصنعية
+												{t("common.laborCost")}
 											</th>
 											<th className="px-3 py-2.5 text-center font-medium">
-												التشوين%
+												{t("common.storagePercent")}
 											</th>
 											<th className="px-3 py-2.5 text-center font-medium">
-												الإجمالي
+												{t("common.total")}
 											</th>
 										</tr>
 									</thead>
@@ -580,7 +585,7 @@ export function MEPCostingTab({
 						{config.mode === "detailed" &&
 							sectionItems.length === 0 && (
 								<div className="p-6 text-center text-muted-foreground text-sm">
-									لا توجد بنود في هذا القسم
+									{t("mep.emptySection")}
 								</div>
 							)}
 
@@ -588,14 +593,14 @@ export function MEPCostingTab({
 						<div className="px-4 py-3 bg-muted/10 border-t border-border flex items-center justify-between">
 							<div className="flex items-center gap-2 text-sm">
 								<span className="text-muted-foreground">
-									إجمالي {section.label}:
+									{t("mep.sectionTotal", { section: sectionLabel(section) })}
 								</span>
 								<span
 									className="font-bold text-primary"
 									dir="ltr"
 								>
 									{sectionTotal > 0
-										? formatNum(sectionTotal) + " ر.س"
+										? `${formatNum(sectionTotal)} ${t("common.sar")}`
 										: "—"}
 								</span>
 							</div>
@@ -610,7 +615,7 @@ export function MEPCostingTab({
 								) : (
 									<Save className="h-3.5 w-3.5" />
 								)}
-								حفظ
+								{t("common.save")}
 							</Button>
 						</div>
 					</div>
@@ -621,14 +626,14 @@ export function MEPCostingTab({
 			<div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4">
 				<div className="flex items-center justify-between">
 					<span className="font-semibold">
-						إجمالي الأعمال الكهروميكانيكية
+						{t("mep.grandTotal")}
 					</span>
 					<span
 						className="text-xl font-bold text-primary"
 						dir="ltr"
 					>
 						{grandTotal > 0
-							? formatNum(grandTotal) + " ر.س"
+							? `${formatNum(grandTotal)} ${t("common.sar")}`
 							: "—"}
 					</span>
 				</div>
@@ -643,10 +648,10 @@ export function MEPCostingTab({
 								className="flex items-center justify-between text-sm"
 							>
 								<span className="text-muted-foreground">
-									{section.label}
+									{sectionLabel(section)}
 								</span>
 								<span dir="ltr">
-									{formatNum(total)} ر.س
+									{formatNum(total)} {t("common.sar")}
 								</span>
 							</div>
 						);

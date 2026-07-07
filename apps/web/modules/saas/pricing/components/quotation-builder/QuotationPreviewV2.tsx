@@ -17,6 +17,7 @@ import {
 } from "@ui/components/dialog";
 import { ArrowLeft, Download, Loader2, Printer } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useState, type ReactNode, useMemo } from "react";
 import { toast } from "sonner";
 import { exportToPDF, printDocument } from "@saas/shared/lib/pdf-export";
@@ -28,20 +29,22 @@ interface QuotationPreviewV2Props {
 	quotationId: string;
 }
 
-const FORMAT_LABELS: Record<string, string> = {
-	DETAILED_BOQ: "تفصيلي (BOQ)",
-	PER_SQM: "بالمتر المربع",
-	LUMP_SUM: "مقطوعية",
-	CUSTOM: "مخصص",
+const FORMAT_LABEL_KEYS: Record<string, string> = {
+	DETAILED_BOQ: "formats.detailedBoq",
+	PER_SQM: "formats.perSqm",
+	LUMP_SUM: "formats.lumpSum",
+	CUSTOM: "formats.custom",
 };
 
-const SECTION_LABELS: Record<string, string> = {
-	STRUCTURAL: "إنشائي",
-	FINISHING: "تشطيبات",
-	MEP: "كهروميكانيكية",
-	LABOR: "عمالة عامة",
-	MANUAL: "بنود يدوية",
+const SECTION_LABEL_KEYS: Record<string, string> = {
+	STRUCTURAL: "sectionLabels.structural",
+	FINISHING: "sectionLabels.finishing",
+	MEP: "sectionLabels.mep",
+	LABOR: "sectionLabels.labor",
+	MANUAL: "sectionLabels.manual",
 };
+
+type Translator = ReturnType<typeof useTranslations>;
 
 // ────────────────────────────────────────────────────────────────
 // Section break definition stored in displayConfig.sectionBreaks
@@ -58,6 +61,7 @@ export function QuotationPreviewV2({
 	organizationSlug,
 	quotationId,
 }: QuotationPreviewV2Props) {
+	const t = useTranslations("pricing.quotationBuilder");
 	const basePath = `/app/${organizationSlug}/pricing/quotations`;
 
 	const { data: quotation, isLoading: isLoadingQuotation } = useQuery(
@@ -96,11 +100,11 @@ export function QuotationPreviewV2({
 	if (!quotation) {
 		return (
 			<div className="text-center py-20">
-				<p className="text-muted-foreground">عرض السعر غير موجود</p>
+				<p className="text-muted-foreground">{t("notFound")}</p>
 				<Link href={basePath}>
 					<Button variant="outline" className="mt-4 rounded-xl">
 						<ArrowLeft className="h-4 w-4 me-2" />
-						رجوع
+						{t("actions.back")}
 					</Button>
 				</Link>
 			</div>
@@ -131,7 +135,7 @@ export function QuotationPreviewV2({
 			await exportToPDF(filename || defaultFilename);
 		} catch (error) {
 			console.error("PDF generation failed:", error);
-			toast.error("حدث خطأ أثناء إنشاء PDF");
+			toast.error(t("toasts.pdfError"));
 		} finally {
 			setIsGeneratingPdf(false);
 			setShowFilenameDialog(false);
@@ -168,17 +172,17 @@ export function QuotationPreviewV2({
 				<Link href={`${basePath}/${quotationId}`}>
 					<Button variant="outline" className="rounded-xl">
 						<ArrowLeft className="h-4 w-4 me-2" />
-						رجوع
+						{t("actions.back")}
 					</Button>
 				</Link>
 				<div className="flex flex-wrap items-center gap-2">
 					{/* Format badge */}
 					<span className="text-xs text-muted-foreground border border-border rounded-lg px-2.5 py-1">
-						{FORMAT_LABELS[format] ?? format}
+						{FORMAT_LABEL_KEYS[format] ? t(FORMAT_LABEL_KEYS[format]) : format}
 					</span>
 					<Button variant="outline" onClick={handlePrint} className="rounded-xl">
 						<Printer className="h-4 w-4 me-2" />
-						طباعة
+						{t("actions.print")}
 					</Button>
 					<Button
 						className="rounded-xl"
@@ -193,7 +197,7 @@ export function QuotationPreviewV2({
 						) : (
 							<Download className="h-4 w-4 me-2" />
 						)}
-						تصدير PDF
+						{t("actions.exportPdf")}
 					</Button>
 				</div>
 			</div>
@@ -204,7 +208,7 @@ export function QuotationPreviewV2({
 				{isDraft && (
 					<div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center overflow-hidden print:flex">
 						<span className="text-[120px] font-black text-muted-foreground/[0.06] -rotate-45 select-none whitespace-nowrap tracking-widest">
-							مسودة
+							{t("preview.draftWatermark")}
 						</span>
 					</div>
 				)}
@@ -229,21 +233,21 @@ export function QuotationPreviewV2({
 									)}
 								</div>
 								<div className="text-left space-y-1.5">
-									<h2 className="text-2xl font-bold text-primary tracking-tight">عرض سعر</h2>
+									<h2 className="text-2xl font-bold text-primary tracking-tight">{t("preview.title")}</h2>
 									<p className="text-xs text-muted-foreground uppercase tracking-wide">QUOTATION</p>
 									<div className="space-y-1 mt-3">
 										<p className="text-sm">
-											<span className="text-muted-foreground">رقم:</span>{" "}
+											<span className="text-muted-foreground">{t("fields.number")}:</span>{" "}
 											<span className="font-semibold">{q.quotationNo}</span>
 										</p>
 										<p className="text-sm">
-											<span className="text-muted-foreground">التاريخ:</span>{" "}
+											<span className="text-muted-foreground">{t("fields.date")}:</span>{" "}
 											<span className="font-medium">
 												{new Date(q.createdAt).toLocaleDateString("ar-SA")}
 											</span>
 										</p>
 										<p className="text-sm">
-											<span className="text-muted-foreground">صالح حتى:</span>{" "}
+											<span className="text-muted-foreground">{t("fields.validUntil")}:</span>{" "}
 											<span className="font-medium">
 												{new Date(q.validUntil).toLocaleDateString("ar-SA")}
 											</span>
@@ -255,26 +259,26 @@ export function QuotationPreviewV2({
 
 						{/* Client info */}
 						<div className="rounded-lg bg-muted/30 border border-border/50 p-4 space-y-1.5">
-							<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">بيانات العميل</p>
+							<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t("sections.clientInfo")}</p>
 							<p className="text-sm">
-								<span className="text-muted-foreground">العميل:</span>{" "}
+								<span className="text-muted-foreground">{t("fields.client")}:</span>{" "}
 								<span className="font-semibold">{q.clientName}</span>
 							</p>
 							{q.clientCompany && (
 								<p className="text-sm">
-									<span className="text-muted-foreground">الشركة:</span>{" "}
+									<span className="text-muted-foreground">{t("fields.company")}:</span>{" "}
 									{q.clientCompany}
 								</p>
 							)}
 							{q.clientPhone && (
 								<p className="text-sm">
-									<span className="text-muted-foreground">الهاتف:</span>{" "}
+									<span className="text-muted-foreground">{t("fields.phone")}:</span>{" "}
 									<span dir="ltr">{q.clientPhone}</span>
 								</p>
 							)}
 							{q.clientTaxNumber && (
 								<p className="text-sm">
-									<span className="text-muted-foreground">الرقم الضريبي:</span>{" "}
+									<span className="text-muted-foreground">{t("fields.taxNumber")}:</span>{" "}
 									<span dir="ltr">{q.clientTaxNumber}</span>
 								</p>
 							)}
@@ -345,12 +349,12 @@ export function QuotationPreviewV2({
 					{format !== "PER_SQM" && format !== "LUMP_SUM" && showPricePerSqm && totalArea > 0 && (
 						<div className="rounded-lg bg-muted/30 border border-border/50 p-4 space-y-1.5 text-sm">
 							<div className="flex justify-between">
-								<span className="text-muted-foreground">المساحة الإجمالية</span>
+								<span className="text-muted-foreground">{t("fields.totalArea")}</span>
 								<span dir="ltr">{fmt(totalArea)} م²</span>
 							</div>
 							<div className="flex justify-between">
-								<span className="text-muted-foreground">سعر المتر المربع</span>
-								<span dir="ltr" className="font-medium">{fmt(pricePerSqm)} ر.س/م²</span>
+								<span className="text-muted-foreground">{t("fields.pricePerSqm")}</span>
+								<span dir="ltr" className="font-medium">{fmt(pricePerSqm)} {t("currencyPerSqm")}</span>
 							</div>
 						</div>
 					)}
@@ -359,43 +363,43 @@ export function QuotationPreviewV2({
 					<div className="space-y-2 text-sm border-t-2 border-primary/20 pt-4">
 						{showSubtotal && (
 							<div className="flex justify-between">
-								<span className="text-muted-foreground">المجموع الفرعي</span>
-								<span dir="ltr">{fmt(subtotal)} ر.س</span>
+								<span className="text-muted-foreground">{t("totals.subtotal")}</span>
+								<span dir="ltr">{fmt(subtotal)} {t("currency")}</span>
 							</div>
 						)}
 						{showDiscount && discountAmount > 0 && (
 							<div className="flex justify-between">
 								<span className="text-muted-foreground">
-									الخصم {discountPercent > 0 ? `(${fmt(discountPercent)}%)` : ""}
+									{t("totals.discount")} {discountPercent > 0 ? `(${fmt(discountPercent)}%)` : ""}
 								</span>
-								<span className="text-red-500" dir="ltr">-{fmt(discountAmount)} ر.س</span>
+								<span className="text-red-500" dir="ltr">-{fmt(discountAmount)} {t("currency")}</span>
 							</div>
 						)}
 						{showDiscount && discountAmount > 0 && (
 							<div className="flex justify-between">
-								<span className="text-muted-foreground">بعد الخصم</span>
-								<span dir="ltr">{fmt(afterDiscount)} ر.س</span>
+								<span className="text-muted-foreground">{t("totals.afterDiscount")}</span>
+								<span dir="ltr">{fmt(afterDiscount)} {t("currency")}</span>
 							</div>
 						)}
 						{showVAT && (
 							<div className="flex justify-between">
 								<span className="text-muted-foreground">
-									ضريبة القيمة المضافة ({vatPercent}%)
+									{t("totals.vat", { percent: vatPercent })}
 								</span>
-								<span dir="ltr">{fmt(vatAmount)} ر.س</span>
+								<span dir="ltr">{fmt(vatAmount)} {t("currency")}</span>
 							</div>
 						)}
 						{showGrandTotal && (
 							<div className="flex justify-between border-t-2 border-primary/20 pt-3 mt-3">
-								<span className="font-bold text-base">الإجمالي النهائي</span>
+								<span className="font-bold text-base">{t("totals.grandTotal")}</span>
 								<span className="font-bold text-xl text-primary" dir="ltr">
-									{fmt(totalAmount)} ر.س
+									{fmt(totalAmount)} {t("currency")}
 								</span>
 							</div>
 						)}
 						{showGrandTotal && (
 							<div className="text-center text-muted-foreground text-xs mt-1.5">
-								({numberToArabicWords(totalAmount)} ريال سعودي)
+								{t("totals.amountInWords", { words: numberToArabicWords(totalAmount) })}
 							</div>
 						)}
 					</div>
@@ -414,7 +418,7 @@ export function QuotationPreviewV2({
 					{/* ─── Terms & Conditions ─── */}
 					{q.termsAndConditions && (
 						<div className="border-t border-border pt-4 space-y-2.5 text-sm page-break-inside-avoid">
-							<h4 className="font-semibold text-sm">الشروط والأحكام العامة</h4>
+							<h4 className="font-semibold text-sm">{t("sections.generalTerms")}</h4>
 							<p className="text-muted-foreground whitespace-pre-line">{q.termsAndConditions}</p>
 						</div>
 					)}
@@ -422,18 +426,18 @@ export function QuotationPreviewV2({
 					{/* Terms */}
 					{(q.paymentTerms || q.deliveryTerms || q.warrantyTerms || q.notes) && (
 						<div className="border-t border-border pt-4 space-y-2.5 text-sm page-break-inside-avoid">
-							<h4 className="font-semibold text-sm">الشروط والأحكام</h4>
+							<h4 className="font-semibold text-sm">{t("sections.terms")}</h4>
 							{q.paymentTerms && (
-								<p><span className="text-muted-foreground">شروط الدفع:</span> {q.paymentTerms}</p>
+								<p><span className="text-muted-foreground">{t("fields.paymentTerms")}:</span> {q.paymentTerms}</p>
 							)}
 							{q.deliveryTerms && (
-								<p><span className="text-muted-foreground">مدة التنفيذ:</span> {q.deliveryTerms}</p>
+								<p><span className="text-muted-foreground">{t("fields.deliveryTerms")}:</span> {q.deliveryTerms}</p>
 							)}
 							{q.warrantyTerms && (
-								<p><span className="text-muted-foreground">الضمان:</span> {q.warrantyTerms}</p>
+								<p><span className="text-muted-foreground">{t("fields.warranty")}:</span> {q.warrantyTerms}</p>
 							)}
 							{q.notes && (
-								<p><span className="text-muted-foreground">ملاحظات:</span> {q.notes}</p>
+								<p><span className="text-muted-foreground">{t("fields.notes")}:</span> {q.notes}</p>
 							)}
 						</div>
 					)}
@@ -508,14 +512,14 @@ export function QuotationPreviewV2({
 			<Dialog open={showFilenameDialog} onOpenChange={setShowFilenameDialog}>
 				<DialogContent className="sm:max-w-md rounded-2xl">
 					<DialogHeader>
-						<DialogTitle>تصدير PDF</DialogTitle>
+						<DialogTitle>{t("actions.exportPdf")}</DialogTitle>
 						<DialogDescription className="sr-only">
-							تصدير PDF
+							{t("actions.exportPdf")}
 						</DialogDescription>
 					</DialogHeader>
 					<div className="space-y-3">
 						<div>
-							<Label>اسم الملف</Label>
+							<Label>{t("fields.filename")}</Label>
 							<div className="flex items-center gap-2 mt-1.5">
 								<Input
 									value={pdfFilename}
@@ -530,7 +534,7 @@ export function QuotationPreviewV2({
 					</div>
 					<DialogFooter>
 						<Button variant="ghost" onClick={() => setShowFilenameDialog(false)} className="rounded-xl">
-							إلغاء
+							{t("actions.cancel")}
 						</Button>
 						<Button
 							onClick={() => handleDownloadPdf(pdfFilename)}
@@ -542,7 +546,7 @@ export function QuotationPreviewV2({
 							) : (
 								<Download className="h-4 w-4 me-2" />
 							)}
-							تحميل
+							{t("actions.download")}
 						</Button>
 					</DialogFooter>
 				</DialogContent>
@@ -564,19 +568,20 @@ function LumpSumView({
 	lumpSumAmount: number;
 	fmt: (n: number) => string;
 }) {
+	const t = useTranslations("pricing.quotationBuilder");
 	return (
 		<div className="space-y-4 page-break-inside-avoid">
 			{/* Description card */}
 			<div className="rounded-xl border-2 border-primary/20 bg-primary/[0.02] p-6 space-y-4">
-				<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">نطاق العمل</p>
+				<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("lumpSum.scopeOfWork")}</p>
 				<p className="text-sm leading-relaxed">
-					{lumpSumDescription || "بناء وتشطيب حسب المواصفات المرفقة"}
+					{lumpSumDescription || t("lumpSum.defaultDescription")}
 				</p>
 				<div className="border-t border-primary/10 pt-4 mt-4">
 					<div className="flex justify-between items-center">
-						<span className="font-semibold text-base">المبلغ المقطوع</span>
+						<span className="font-semibold text-base">{t("lumpSum.amount")}</span>
 						<span className="text-2xl font-bold text-primary" dir="ltr">
-							{fmt(lumpSumAmount)} ر.س
+							{fmt(lumpSumAmount)} {t("currency")}
 						</span>
 					</div>
 				</div>
@@ -584,7 +589,7 @@ function LumpSumView({
 
 			{/* Scope summary */}
 			<div className="rounded-lg bg-muted/20 border border-border/50 p-4 text-xs text-muted-foreground">
-				<p>* يشمل المبلغ المذكور أعلاه جميع التكاليف من مواد وعمالة ومعدات ومصاريف إدارية</p>
+				<p>{t("lumpSum.inclusionNote")}</p>
 			</div>
 		</div>
 	);
@@ -611,22 +616,23 @@ function PerSqmView({
 	fmt: (n: number) => string;
 	colCount: number;
 }) {
+	const t = useTranslations("pricing.quotationBuilder");
 	return (
 		<div className="space-y-4">
 			{/* Prominent per-sqm display */}
 			<div className="rounded-xl border-2 border-primary/20 bg-primary/[0.02] p-6 page-break-inside-avoid">
 				<div className="grid grid-cols-3 gap-6 text-center">
 					<div className="space-y-1">
-						<p className="text-xs text-muted-foreground">المساحة الإجمالية</p>
+						<p className="text-xs text-muted-foreground">{t("fields.totalArea")}</p>
 						<p className="text-xl font-bold" dir="ltr">{fmt(totalArea)} م²</p>
 					</div>
 					<div className="space-y-1 border-x border-primary/10 px-4">
-						<p className="text-xs text-muted-foreground">سعر المتر المربع</p>
-						<p className="text-xl font-bold text-primary" dir="ltr">{fmt(pricePerSqm)} ر.س/م²</p>
+						<p className="text-xs text-muted-foreground">{t("fields.pricePerSqm")}</p>
+						<p className="text-xl font-bold text-primary" dir="ltr">{fmt(pricePerSqm)} {t("currencyPerSqm")}</p>
 					</div>
 					<div className="space-y-1">
-						<p className="text-xs text-muted-foreground">الإجمالي</p>
-						<p className="text-xl font-bold" dir="ltr">{fmt(subtotal)} ر.س</p>
+						<p className="text-xs text-muted-foreground">{t("totals.total")}</p>
+						<p className="text-xl font-bold" dir="ltr">{fmt(subtotal)} {t("currency")}</p>
 					</div>
 				</div>
 			</div>
@@ -637,10 +643,10 @@ function PerSqmView({
 					<table className="w-full text-sm">
 						<thead>
 							<tr className="border-b bg-muted/40 text-muted-foreground">
-								<th className="px-3 py-2.5 text-right font-medium">القسم</th>
-								<th className="px-3 py-2.5 text-center font-medium">المساحة</th>
-								<th className="px-3 py-2.5 text-center font-medium">سعر م²</th>
-								<th className="px-3 py-2.5 text-center font-medium">الإجمالي</th>
+								<th className="px-3 py-2.5 text-right font-medium">{t("table.section")}</th>
+								<th className="px-3 py-2.5 text-center font-medium">{t("table.area")}</th>
+								<th className="px-3 py-2.5 text-center font-medium">{t("table.pricePerSqmShort")}</th>
+								<th className="px-3 py-2.5 text-center font-medium">{t("table.total")}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -648,16 +654,16 @@ function PerSqmView({
 								<tr key={item.id} className="border-b last:border-0">
 									<td className="px-3 py-2 font-medium">{item.description}</td>
 									<td className="px-3 py-2 text-center" dir="ltr">{fmt(Number(item.quantity))} م²</td>
-									<td className="px-3 py-2 text-center" dir="ltr">{fmt(Number(item.unitPrice))} ر.س</td>
-									<td className="px-3 py-2 text-center font-medium" dir="ltr">{fmt(Number(item.totalPrice))} ر.س</td>
+									<td className="px-3 py-2 text-center" dir="ltr">{fmt(Number(item.unitPrice))} {t("currency")}</td>
+									<td className="px-3 py-2 text-center font-medium" dir="ltr">{fmt(Number(item.totalPrice))} {t("currency")}</td>
 								</tr>
 							))}
 						</tbody>
 						<tfoot>
 							<tr className="bg-muted/30 border-t-2 border-primary/20">
-								<td className="px-3 py-2.5 font-bold" colSpan={3}>الإجمالي</td>
+								<td className="px-3 py-2.5 font-bold" colSpan={3}>{t("table.total")}</td>
 								<td className="px-3 py-2.5 text-center font-bold text-primary" dir="ltr">
-									{fmt(subtotal)} ر.س
+									{fmt(subtotal)} {t("currency")}
 								</td>
 							</tr>
 						</tfoot>
@@ -708,11 +714,12 @@ function DetailedBoqTable({
 	colCount: number;
 	fmt: (n: number) => string;
 }) {
+	const t = useTranslations("pricing.quotationBuilder");
 	// Auto-detect sections from item descriptions if no sectionBreaks provided but grouping is BY_SECTION
 	const autoSections = useMemo(() => {
 		if (grouping !== "BY_SECTION" || sectionBreaks.length > 0) return [];
-		return detectSectionsFromItems(items);
-	}, [grouping, sectionBreaks.length, items]);
+		return detectSectionsFromItems(items, t);
+	}, [grouping, sectionBreaks.length, items, t]);
 
 	const effectiveSectionBreaks = sectionBreaks.length > 0 ? sectionBreaks : autoSections;
 	const useSections = grouping === "BY_SECTION" && effectiveSectionBreaks.length > 0;
@@ -723,12 +730,12 @@ function DetailedBoqTable({
 				<thead>
 					<tr className="border-b bg-muted/40 text-muted-foreground">
 						{showItemNumber && <th className="px-3 py-2.5 text-right font-medium w-10">#</th>}
-						{showDescription && <th className="px-3 py-2.5 text-right font-medium">الوصف</th>}
-						{showSpecifications && <th className="px-3 py-2.5 text-center font-medium">المواصفات</th>}
-						{showQuantity && <th className="px-3 py-2.5 text-center font-medium">الكمية</th>}
-						{showUnit && <th className="px-3 py-2.5 text-center font-medium">الوحدة</th>}
-						{showUnitPrice && <th className="px-3 py-2.5 text-center font-medium">سعر الوحدة</th>}
-						{showItemTotal && <th className="px-3 py-2.5 text-center font-medium">الإجمالي</th>}
+						{showDescription && <th className="px-3 py-2.5 text-right font-medium">{t("table.description")}</th>}
+						{showSpecifications && <th className="px-3 py-2.5 text-center font-medium">{t("table.specifications")}</th>}
+						{showQuantity && <th className="px-3 py-2.5 text-center font-medium">{t("table.quantity")}</th>}
+						{showUnit && <th className="px-3 py-2.5 text-center font-medium">{t("table.unit")}</th>}
+						{showUnitPrice && <th className="px-3 py-2.5 text-center font-medium">{t("table.unitPrice")}</th>}
+						{showItemTotal && <th className="px-3 py-2.5 text-center font-medium">{t("table.total")}</th>}
 					</tr>
 				</thead>
 				<tbody>
@@ -746,6 +753,7 @@ function DetailedBoqTable({
 							showSectionSubtotal,
 							colCount,
 							fmt,
+							t,
 						)
 						: renderFlatRows(
 							items,
@@ -804,6 +812,7 @@ function renderGroupedRows(
 	showSectionSubtotal: boolean,
 	colCount: number,
 	fmt: (n: number) => string,
+	t: Translator,
 ) {
 	const rows: ReactNode[] = [];
 	let globalIdx = 0;
@@ -817,7 +826,9 @@ function renderGroupedRows(
 		const startIdx = prevEnd;
 		const endIdx = sec.afterIndex;
 		const sectionItems = items.slice(startIdx, endIdx);
-		const sectionLabel = sec.label || SECTION_LABELS[sec.section] || sec.section;
+		const sectionLabel =
+			sec.label ||
+			(SECTION_LABEL_KEYS[sec.section] ? t(SECTION_LABEL_KEYS[sec.section]) : sec.section);
 
 		// Compute actual subtotal from items (fallback to sec.subtotal)
 		const actualSubtotal = sectionItems.reduce((sum, item) => sum + Number(item.totalPrice), 0);
@@ -854,11 +865,11 @@ function renderGroupedRows(
 			rows.push(
 				<tr key={`section-subtotal-${secIdx}`} className="bg-muted/30 border-b-2 border-border">
 					<td colSpan={colCount - (showItemTotal ? 1 : 0)} className="px-3 py-2 text-end font-semibold text-sm">
-						مجموع {sectionLabel}
+						{t("table.sectionTotal", { section: sectionLabel })}
 					</td>
 					{showItemTotal && (
 						<td className="px-3 py-2 text-center font-bold text-sm" dir="ltr">
-							{fmt(sectionSubtotal)} ر.س
+							{fmt(sectionSubtotal)} {t("currency")}
 						</td>
 					)}
 				</tr>
@@ -875,7 +886,7 @@ function renderGroupedRows(
 			rows.push(
 				<tr key="section-header-other" className="bg-primary/[0.04] border-b">
 					<td colSpan={colCount} className="px-3 py-2.5">
-						<span className="font-bold text-sm text-primary">بنود أخرى</span>
+						<span className="font-bold text-sm text-primary">{t("sectionLabels.other")}</span>
 					</td>
 				</tr>
 			);
@@ -905,13 +916,14 @@ function renderGroupedRows(
 
 function detectSectionsFromItems(
 	items: Array<{ id: string; description: string; totalPrice: number }>,
+	t: Translator,
 ): SectionBreak[] {
 	// Heuristic: look for known section keywords in consecutive item descriptions
 	const sectionKeywords: Array<{ section: string; label: string; keywords: string[] }> = [
-		{ section: "STRUCTURAL", label: SECTION_LABELS.STRUCTURAL, keywords: ["خرسان", "حديد", "أساس", "عمود", "قاعد", "ميد", "سقف", "بلاط", "خرسان", "إنشائي"] },
-		{ section: "FINISHING", label: SECTION_LABELS.FINISHING, keywords: ["بلاط", "سيراميك", "دهان", "جبس", "أبواب", "نوافذ", "رخام", "تشطيب", "عزل"] },
-		{ section: "MEP", label: SECTION_LABELS.MEP, keywords: ["كهرب", "صحي", "سباك", "تكييف", "تمديد", "تأسيس كهرب", "تأسيس صحي"] },
-		{ section: "LABOR", label: SECTION_LABELS.LABOR, keywords: ["عمال", "مشرف", "حارس"] },
+		{ section: "STRUCTURAL", label: t(SECTION_LABEL_KEYS.STRUCTURAL), keywords: ["خرسان", "حديد", "أساس", "عمود", "قاعد", "ميد", "سقف", "بلاط", "خرسان", "إنشائي"] },
+		{ section: "FINISHING", label: t(SECTION_LABEL_KEYS.FINISHING), keywords: ["بلاط", "سيراميك", "دهان", "جبس", "أبواب", "نوافذ", "رخام", "تشطيب", "عزل"] },
+		{ section: "MEP", label: t(SECTION_LABEL_KEYS.MEP), keywords: ["كهرب", "صحي", "سباك", "تكييف", "تمديد", "تأسيس كهرب", "تأسيس صحي"] },
+		{ section: "LABOR", label: t(SECTION_LABEL_KEYS.LABOR), keywords: ["عمال", "مشرف", "حارس"] },
 	];
 
 	if (items.length < 3) return [];

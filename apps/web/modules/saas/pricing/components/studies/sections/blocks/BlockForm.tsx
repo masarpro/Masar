@@ -322,7 +322,7 @@ export function BlockForm({
 				{/* البيانات الاساسية */}
 				<div className="grid grid-cols-2 md:grid-cols-5 gap-4">
 					<div>
-						<Label>تصنيف الجدار <span className="text-destructive">*</span></Label>
+						<Label>{t("pricing.studies.structural.wallCategory.label")} <span className="text-destructive">*</span></Label>
 						<Select
 							value={formData.wallCategory || undefined}
 							onValueChange={(v: string) => {
@@ -337,7 +337,7 @@ export function BlockForm({
 							}}
 						>
 							<SelectTrigger className={!formData.wallCategory ? "border-destructive ring-destructive/30 ring-2" : ""}>
-								<SelectValue placeholder="اختر التصنيف" />
+								<SelectValue placeholder={t("pricing.studies.structural.sections.blocks.selectCategory")} />
 							</SelectTrigger>
 							<SelectContent>
 								{filteredCategories.map(([key, value]) => (
@@ -351,7 +351,7 @@ export function BlockForm({
 
 					{isFloorScoped && (
 						<div>
-							<Label>الدور</Label>
+							<Label>{t("pricing.studies.structural.sections.blocks.floor")}</Label>
 							<div className="mt-1">
 								<Badge variant="secondary" className="text-sm px-3 py-1.5">
 									{floorLabel}
@@ -363,7 +363,7 @@ export function BlockForm({
 					<div>
 						<Label>{t("pricing.studies.structural.itemName")}</Label>
 						<Input
-							placeholder="اختر التصنيف"
+							placeholder={t("pricing.studies.structural.sections.blocks.selectCategory")}
 							value={formData.name}
 							onChange={(e: any) => setFormData({ ...formData, name: e.target.value })}
 							className="font-bold"
@@ -392,7 +392,7 @@ export function BlockForm({
 					</div>
 
 					<div>
-						<Label>نوع البلوك</Label>
+						<Label>{t("pricing.studies.structural.blockType.label")}</Label>
 						<Select
 							value={formData.blockType}
 							onValueChange={(v: keyof typeof BLOCK_TYPES) =>
@@ -417,7 +417,7 @@ export function BlockForm({
 				{!canProceed && (
 					<div className="text-center py-6 text-muted-foreground border-2 border-dashed rounded-lg">
 						<p className="text-sm font-medium">
-							يرجى اختيار تصنيف الجدار للمتابعة
+							{t("pricing.studies.structural.sections.blocks.selectCategoryPrompt")}
 						</p>
 					</div>
 				)}
@@ -441,7 +441,7 @@ export function BlockForm({
 						<Label>
 							{t("pricing.studies.structural.height")} ({t("pricing.studies.units.m")})
 							{derivedBlockHeight != null && (
-								<span className="text-xs text-green-600 mr-1">(محسوب)</span>
+								<span className="text-xs text-green-600 mr-1">{t("pricing.studies.structural.sections.blocks.derivedHint")}</span>
 							)}
 						</Label>
 						<Input
@@ -455,7 +455,7 @@ export function BlockForm({
 						/>
 					</div>
 					<div className="bg-muted/50 rounded p-2 flex flex-col justify-center">
-						<span className="text-xs text-muted-foreground">المساحة الإجمالية</span>
+						<span className="text-xs text-muted-foreground">{t("pricing.studies.structural.sections.blocks.grossArea")}</span>
 						<span className="font-bold">
 							{formatNumber(formData.length * formData.height)} م²
 						</span>
@@ -465,7 +465,7 @@ export function BlockForm({
 				{/* الفتحات */}
 				<div className="border rounded-lg p-4 bg-amber-50/30">
 					<div className="flex items-center justify-between mb-3">
-						<h5 className="font-medium">الفتحات (الأبواب والنوافذ)</h5>
+						<h5 className="font-medium">{t("pricing.studies.structural.sections.blocks.openingsTitle")}</h5>
 						<div className="flex gap-2">
 							<Button
 								variant="outline"
@@ -473,7 +473,7 @@ export function BlockForm({
 								onClick={() => addOpening("door")}
 							>
 								<Plus className="h-3 w-3 ml-1" />
-								باب
+								{t("pricing.studies.structural.sections.blocks.door")}
 							</Button>
 							<Button
 								variant="outline"
@@ -481,7 +481,7 @@ export function BlockForm({
 								onClick={() => addOpening("window")}
 							>
 								<Plus className="h-3 w-3 ml-1" />
-								نافذة
+								{t("pricing.studies.structural.sections.blocks.window")}
 							</Button>
 						</div>
 					</div>
@@ -493,10 +493,10 @@ export function BlockForm({
 									className="flex items-center gap-3 bg-background rounded p-2"
 								>
 									<Badge variant={opening.type === "door" ? "default" : "secondary"}>
-										{opening.type === "door" ? "باب" : "نافذة"}
+										{opening.type === "door" ? t("pricing.studies.structural.sections.blocks.door") : t("pricing.studies.structural.sections.blocks.window")}
 									</Badge>
 									<div className="flex items-center gap-2">
-										<span className="text-xs text-muted-foreground">العرض:</span>
+										<span className="text-xs text-muted-foreground">{t("pricing.studies.structural.width")}:</span>
 										<Input
 											type="number"
 											step="0.1"
@@ -508,7 +508,7 @@ export function BlockForm({
 										/>
 									</div>
 									<div className="flex items-center gap-2">
-										<span className="text-xs text-muted-foreground">الارتفاع:</span>
+										<span className="text-xs text-muted-foreground">{t("pricing.studies.structural.height")}:</span>
 										<Input
 											type="number"
 											step="0.1"
@@ -520,7 +520,7 @@ export function BlockForm({
 										/>
 									</div>
 									<div className="flex items-center gap-2">
-										<span className="text-xs text-muted-foreground">العدد:</span>
+										<span className="text-xs text-muted-foreground">{t("pricing.studies.structural.quantity")}:</span>
 										<Input
 											type="number"
 											min={1}
@@ -555,13 +555,13 @@ export function BlockForm({
 									className="rounded"
 								/>
 								<Label htmlFor={`hasLintel-${isFloorScoped ? floorLabel : "general"}`} className="text-sm">
-									إضافة أعتاب خرسانية فوق الفتحات
+									{t("pricing.studies.structural.sections.blocks.addLintels")}
 								</Label>
 							</div>
 						</div>
 					) : (
 						<p className="text-sm text-muted-foreground text-center py-4">
-							لا توجد فتحات - أضف أبواب أو نوافذ إن وجدت
+							{t("pricing.studies.structural.sections.blocks.noOpenings")}
 						</p>
 					)}
 				</div>
@@ -575,7 +575,7 @@ export function BlockForm({
 						</div>
 						<div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
 							<div>
-								<span className="text-muted-foreground">المساحة الصافية:</span>
+								<span className="text-muted-foreground">{t("pricing.studies.structural.sections.blocks.netArea")}:</span>
 								<p className="font-bold text-lg">
 									{formatNumber(calculations.netArea)} {t("pricing.studies.units.m2")}
 								</p>
@@ -585,13 +585,13 @@ export function BlockForm({
 									{t("pricing.studies.structural.quantity")}:
 								</span>
 								<p className="font-bold text-lg">
-									{calculations.blocks.totalCount} بلوكة
+									{calculations.blocks.totalCount}{" "}{t("pricing.studies.structural.otherStructural.results.blockUnit")}
 								</p>
 							</div>
 							<div>
-								<span className="text-muted-foreground">أكياس الأسمنت:</span>
+								<span className="text-muted-foreground">{t("pricing.studies.structural.sections.blocks.cementBags")}:</span>
 								<p className="font-bold text-lg">
-									{calculations.mortar.cementBags} كيس
+									{calculations.mortar.cementBags}{" "}{t("pricing.studies.structural.sections.blocks.bagUnit")}
 								</p>
 							</div>
 						</div>
@@ -609,7 +609,7 @@ export function BlockForm({
 								>
 									<span className="flex items-center gap-2">
 										<Layers className="h-4 w-4" />
-										تفاصيل الكميات
+										{t("pricing.studies.structural.sections.blocks.quantitiesDetails")}
 									</span>
 									<ChevronDown
 										className={`h-4 w-4 transition-transform ${
@@ -623,38 +623,38 @@ export function BlockForm({
 								<div className="bg-background rounded p-3">
 									<h6 className="font-medium text-sm mb-2 flex items-center gap-2">
 										<Package className="h-4 w-4" />
-										تفاصيل البلوك
+										{t("pricing.studies.structural.sections.blocks.blockDetails")}
 									</h6>
 									<div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
 										<div>
-											<span className="text-muted-foreground">البلوك الصافي:</span>
-											<p className="font-medium">{calculations.blocks.count} بلوكة</p>
+											<span className="text-muted-foreground">{t("pricing.studies.structural.sections.blocks.netBlocks")}:</span>
+											<p className="font-medium">{calculations.blocks.count}{" "}{t("pricing.studies.structural.otherStructural.results.blockUnit")}</p>
 										</div>
 										<div>
-											<span className="text-muted-foreground">هالك ({calculations.blocks.wastePercentage}%):</span>
-											<p className="font-medium">{calculations.blocks.wasteCount} بلوكة</p>
+											<span className="text-muted-foreground">{t("pricing.studies.structural.wastage")} ({calculations.blocks.wastePercentage}%):</span>
+											<p className="font-medium">{calculations.blocks.wasteCount}{" "}{t("pricing.studies.structural.otherStructural.results.blockUnit")}</p>
 										</div>
 										<div>
-											<span className="text-muted-foreground">إجمالي البلوك:</span>
-											<p className="font-medium">{calculations.blocks.totalCount} بلوكة</p>
+											<span className="text-muted-foreground">{t("pricing.studies.structural.sections.blocks.totalBlocks")}:</span>
+											<p className="font-medium">{calculations.blocks.totalCount}{" "}{t("pricing.studies.structural.otherStructural.results.blockUnit")}</p>
 										</div>
 									</div>
 								</div>
 
 								{/* تفاصيل المونة */}
 								<div className="bg-background rounded p-3">
-									<h6 className="font-medium text-sm mb-2">تفاصيل المونة</h6>
+									<h6 className="font-medium text-sm mb-2">{t("pricing.studies.structural.sections.blocks.mortarDetails")}</h6>
 									<div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
 										<div>
-											<span className="text-muted-foreground">حجم المونة:</span>
+											<span className="text-muted-foreground">{t("pricing.studies.structural.sections.blocks.mortarVolume")}:</span>
 											<p className="font-medium">{formatNumber(calculations.mortar.volume)} م³</p>
 										</div>
 										<div>
-											<span className="text-muted-foreground">أكياس الأسمنت:</span>
-											<p className="font-medium">{calculations.mortar.cementBags} كيس</p>
+											<span className="text-muted-foreground">{t("pricing.studies.structural.sections.blocks.cementBags")}:</span>
+											<p className="font-medium">{calculations.mortar.cementBags}{" "}{t("pricing.studies.structural.sections.blocks.bagUnit")}</p>
 										</div>
 										<div>
-											<span className="text-muted-foreground">حجم الرمل:</span>
+											<span className="text-muted-foreground">{t("pricing.studies.structural.sections.blocks.sandVolume")}:</span>
 											<p className="font-medium">{formatNumber(calculations.mortar.sandVolume)} م³</p>
 										</div>
 									</div>
@@ -663,22 +663,22 @@ export function BlockForm({
 								{/* تفاصيل الاعتاب */}
 								{calculations.lintels && (
 									<div className="bg-background rounded p-3">
-										<h6 className="font-medium text-sm mb-2">تفاصيل الأعتاب</h6>
+										<h6 className="font-medium text-sm mb-2">{t("pricing.studies.structural.sections.blocks.lintelsDetails")}</h6>
 										<div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
 											<div>
-												<span className="text-muted-foreground">عدد الأعتاب:</span>
-												<p className="font-medium">{calculations.lintels.count} عتب</p>
+												<span className="text-muted-foreground">{t("pricing.studies.structural.sections.blocks.lintelsCount")}:</span>
+												<p className="font-medium">{calculations.lintels.count}{" "}{t("pricing.studies.structural.sections.blocks.lintelUnit")}</p>
 											</div>
 											<div>
-												<span className="text-muted-foreground">الطول الكلي:</span>
+												<span className="text-muted-foreground">{t("pricing.studies.structural.sections.blocks.totalLength")}:</span>
 												<p className="font-medium">{formatNumber(calculations.lintels.totalLength)} م</p>
 											</div>
 											<div>
-												<span className="text-muted-foreground">حجم الخرسانة:</span>
+												<span className="text-muted-foreground">{t("pricing.studies.structural.concreteVolume")}:</span>
 												<p className="font-medium">{formatNumber(calculations.lintels.concreteVolume)} م³</p>
 											</div>
 											<div>
-												<span className="text-muted-foreground">وزن الحديد:</span>
+												<span className="text-muted-foreground">{t("pricing.studies.structural.steelWeight")}:</span>
 												<p className="font-medium">{formatNumber(calculations.lintels.rebarWeight)} كجم</p>
 											</div>
 										</div>
@@ -688,16 +688,16 @@ export function BlockForm({
 								{/* ملخص الفتحات */}
 								{calculations.openingsArea > 0 && (
 									<div className="bg-blue-50 rounded p-3">
-										<h6 className="font-medium text-sm mb-2">ملخص الفتحات</h6>
+										<h6 className="font-medium text-sm mb-2">{t("pricing.studies.structural.sections.blocks.openingsSummary")}</h6>
 										<div className="flex flex-wrap gap-2">
 											<Badge variant="outline" className="bg-white">
-												المساحة الإجمالية: {formatNumber(calculations.grossArea)} م²
+												{t("pricing.studies.structural.sections.blocks.grossArea")}: {formatNumber(calculations.grossArea)} م²
 											</Badge>
 											<Badge variant="outline" className="bg-white">
-												مساحة الفتحات: {formatNumber(calculations.openingsArea)} م²
+												{t("pricing.studies.structural.sections.blocks.openingsArea")}: {formatNumber(calculations.openingsArea)} م²
 											</Badge>
 											<Badge variant="outline" className="bg-white">
-												المساحة الصافية: {formatNumber(calculations.netArea)} م²
+												{t("pricing.studies.structural.sections.blocks.netArea")}: {formatNumber(calculations.netArea)} م²
 											</Badge>
 										</div>
 									</div>

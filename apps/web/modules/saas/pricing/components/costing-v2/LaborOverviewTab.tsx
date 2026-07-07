@@ -15,6 +15,7 @@ import {
 	Trash2,
 	Users,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { formatNum } from "@saas/pricing/lib/utils";
@@ -40,31 +41,19 @@ interface SalaryWorker { id: string; craft: string; count: string; salary: strin
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════
 
-const LABOR_MODES: { value: LaborMode; label: string }[] = [
-	{ value: "per_sqm", label: "بالمتر المسطح" },
-	{ value: "per_cbm_ton", label: "بالمتر المكعب+الطن" },
-	{ value: "lump_sum", label: "بالمقطوعية" },
-	{ value: "salary", label: "بالراتب الشهري" },
+const LABOR_MODES: { value: LaborMode; labelKey: string }[] = [
+	{ value: "per_sqm", labelKey: "labor.modes.perSqm" },
+	{ value: "per_cbm_ton", labelKey: "labor.modes.perCbmTon" },
+	{ value: "lump_sum", labelKey: "labor.modes.lumpSum" },
+	{ value: "salary", labelKey: "labor.modes.salary" },
 ];
 
-const DEFAULT_EXTRAS: ExtraRow[] = [
-	{ id: "fence", label: "السور", quantity: "", unit: "م.ط", pricePerUnit: "" },
-	{ id: "parapet", label: "الدروة", quantity: "", unit: "م.ط", pricePerUnit: "" },
-	{ id: "decorations", label: "ديكورات خرسانية", quantity: "", unit: "م.ط", pricePerUnit: "" },
-];
-
-const DEFAULT_CBM: CbmTonRow[] = [
-	{ id: "concrete", label: "مصنعية صب الخرسانة", quantity: "", unit: "م³", pricePerUnit: "" },
-	{ id: "steel", label: "مصنعية الحديد (قص وتشكيل وتركيب)", quantity: "", unit: "طن", pricePerUnit: "" },
-	{ id: "carpentry", label: "النجارة / الشدات", quantity: "", unit: "م²", pricePerUnit: "" },
-];
-
-const SECTION_LABELS: Record<string, string> = {
-	STRUCTURAL: "إنشائي",
-	FINISHING: "تشطيبات",
-	MEP: "كهروميكانيكية",
-	LABOR: "عمالة عامة",
-	MANUAL: "بنود يدوية",
+const SECTION_LABEL_KEYS: Record<string, string> = {
+	STRUCTURAL: "labor.sections.structural",
+	FINISHING: "labor.sections.finishing",
+	MEP: "labor.sections.mep",
+	LABOR: "labor.sections.labor",
+	MANUAL: "labor.sections.manual",
 };
 
 let idCounter = 0;
@@ -81,13 +70,22 @@ export function LaborOverviewTab({
 	studyId,
 	buildingArea,
 }: LaborOverviewTabProps) {
+	const t = useTranslations("pricing.costingV2");
 	const queryClient = useQueryClient();
 
 	// ─── Labor input state ───
 	const [laborMode, setLaborMode] = useState<LaborMode>("per_sqm");
 	const [floorRows, setFloorRows] = useState<FloorRow[]>([]);
-	const [extraRows, setExtraRows] = useState<ExtraRow[]>(DEFAULT_EXTRAS);
-	const [cbmRows, setCbmRows] = useState<CbmTonRow[]>(DEFAULT_CBM);
+	const [extraRows, setExtraRows] = useState<ExtraRow[]>(() => [
+		{ id: "fence", label: t("labor.defaults.fence"), quantity: "", unit: "م.ط", pricePerUnit: "" },
+		{ id: "parapet", label: t("labor.defaults.parapet"), quantity: "", unit: "م.ط", pricePerUnit: "" },
+		{ id: "decorations", label: t("labor.defaults.decorations"), quantity: "", unit: "م.ط", pricePerUnit: "" },
+	]);
+	const [cbmRows, setCbmRows] = useState<CbmTonRow[]>(() => [
+		{ id: "concrete", label: t("labor.defaults.concretePouring"), quantity: "", unit: "م³", pricePerUnit: "" },
+		{ id: "steel", label: t("labor.defaults.steelWork"), quantity: "", unit: "طن", pricePerUnit: "" },
+		{ id: "carpentry", label: t("labor.defaults.carpentry"), quantity: "", unit: "م²", pricePerUnit: "" },
+	]);
 	const [lumpSumAmount, setLumpSumAmount] = useState("");
 	const [salaryWorkers, setSalaryWorkers] = useState<SalaryWorker[]>([]);
 	const [salaryInsurance, setSalaryInsurance] = useState("");
@@ -128,19 +126,19 @@ export function LaborOverviewTab({
 					queryKey: [["pricing", "studies", "laborBreakdown"]],
 				});
 			},
-			onError: (e: any) => toast.error(e.message || "حدث خطأ أثناء الحفظ"),
+			onError: (e: any) => toast.error(e.message || t("common.saveError")),
 		}),
 	);
 
 	const setSectionLaborMutation = useMutation(
 		orpc.pricing.studies.costing.setSectionLabor.mutationOptions({
 			onSuccess: () => {
-				toast.success("تم حفظ بيانات المصنعيات بنجاح");
+				toast.success(t("labor.laborSaved"));
 				queryClient.invalidateQueries({
 					queryKey: [["pricing", "studies", "costing"]],
 				});
 			},
-			onError: (e: any) => toast.error(e.message || "حدث خطأ أثناء الحفظ"),
+			onError: (e: any) => toast.error(e.message || t("common.saveError")),
 		}),
 	);
 
@@ -174,7 +172,7 @@ export function LaborOverviewTab({
 
 		const rows: FloorRow[] = [];
 		for (const [floor, totalArea] of floorMap) {
-			const label = floor === "ميزانين" ? "سقف دور الميزانين" : `سقف الدور ال${floor}`;
+			const label = floor === "ميزانين" ? t("labor.mezzanineRoofLabel") : t("labor.floorRoofLabel", { floor });
 			rows.push({
 				id: `slab_${floor}`,
 				label,
@@ -185,7 +183,7 @@ export function LaborOverviewTab({
 			});
 		}
 		return rows;
-	}, [structuralItems]);
+	}, [structuralItems, t]);
 
 	// ─── Initialize from saved data ───
 	useEffect(() => {
@@ -283,7 +281,7 @@ export function LaborOverviewTab({
 	const addFloorRow = () => {
 		setFloorRows((prev) => [
 			...prev,
-			{ id: nextId("floor"), label: `دور إضافي ${prev.length - 1}`, area: "", pricePerSqm: "" },
+			{ id: nextId("floor"), label: t("labor.extraFloorLabel", { number: prev.length - 1 }), area: "", pricePerSqm: "" },
 		]);
 	};
 
@@ -340,6 +338,8 @@ export function LaborOverviewTab({
 		laborMode === "lump_sum" ? lumpSumTotal :
 		salaryTotals.grandTotal;
 
+	const activeMode = LABOR_MODES.find((m) => m.value === laborMode);
+
 	// ─── Read-only: existing section labor data ───
 	const grouped = useMemo(() => {
 		return ((costingItems as any) ?? []).reduce(
@@ -394,7 +394,9 @@ export function LaborOverviewTab({
 			if (laborItems.length > 0) {
 				totals.push({
 					section,
-					label: SECTION_LABELS[section] ?? section,
+					label: SECTION_LABEL_KEYS[section]
+						? t(SECTION_LABEL_KEYS[section] as Parameters<typeof t>[0])
+						: section,
 					laborTotal: sectionLaborTotal,
 					items: laborItems,
 				});
@@ -403,7 +405,7 @@ export function LaborOverviewTab({
 		}
 
 		return { sectionTotals: totals, grandLaborTotal: grand };
-	}, [grouped]);
+	}, [grouped, t]);
 
 	const toggleSection = (section: string) => {
 		setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
@@ -413,10 +415,10 @@ export function LaborOverviewTab({
 		switch (type) {
 			case "PER_SQM": return "م²";
 			case "PER_CBM": return "م³";
-			case "PER_UNIT": return "وحدة";
+			case "PER_UNIT": return t("labor.typePerUnit");
 			case "PER_LM": return "م.ط";
-			case "LUMP_SUM": return "مقطوعية";
-			case "SALARY": return "راتب";
+			case "LUMP_SUM": return t("common.lumpSum");
+			case "SALARY": return t("labor.typeSalary");
 			default: return "—";
 		}
 	};
@@ -424,7 +426,7 @@ export function LaborOverviewTab({
 	// ─── Save handler ───
 	const handleSave = () => {
 		if (activeTotal <= 0) {
-			toast.error("يرجى إدخال بيانات المصنعيات");
+			toast.error(t("labor.enterLaborData"));
 			return;
 		}
 
@@ -482,7 +484,7 @@ export function LaborOverviewTab({
 			{/* ─── Labor mode selector ─── */}
 			<div className="rounded-xl border border-border bg-card p-4">
 				<Label className="text-sm font-medium mb-3 block">
-					طريقة حساب مصنعيات الإنشائي
+					{t("labor.calcMethodLabel")}
 				</Label>
 				<div className="flex gap-2 flex-wrap">
 					{LABOR_MODES.map((mode) => (
@@ -497,7 +499,7 @@ export function LaborOverviewTab({
 									: "border-border hover:border-muted-foreground/30",
 							)}
 						>
-							{mode.label}
+							{t(mode.labelKey as Parameters<typeof t>[0])}
 						</button>
 					))}
 				</div>
@@ -507,7 +509,7 @@ export function LaborOverviewTab({
 			{laborMode === "per_sqm" && (
 				<div className="rounded-xl border border-border bg-card overflow-hidden">
 					<div className="px-4 py-3 bg-muted/30 border-b border-border flex items-center justify-between">
-						<h4 className="font-medium">مصنعيات عظم بالمتر المسطح</h4>
+						<h4 className="font-medium">{t("labor.perSqmTitle")}</h4>
 						<Button
 							variant="ghost"
 							size="sm"
@@ -515,7 +517,7 @@ export function LaborOverviewTab({
 							onClick={addFloorRow}
 						>
 							<Plus className="h-3.5 w-3.5" />
-							إضافة دور
+							{t("labor.addFloor")}
 						</Button>
 					</div>
 
@@ -523,10 +525,10 @@ export function LaborOverviewTab({
 						<table className="w-full text-sm">
 							<thead>
 								<tr className="border-b bg-muted/20 text-muted-foreground">
-									<th className="px-3 py-2.5 text-right font-medium">البند</th>
-									<th className="px-3 py-2.5 text-center font-medium">المساحة / الكمية</th>
-									<th className="px-3 py-2.5 text-center font-medium">السعر</th>
-									<th className="px-3 py-2.5 text-center font-medium">الإجمالي</th>
+									<th className="px-3 py-2.5 text-right font-medium">{t("common.item")}</th>
+									<th className="px-3 py-2.5 text-center font-medium">{t("labor.areaQuantity")}</th>
+									<th className="px-3 py-2.5 text-center font-medium">{t("common.price")}</th>
+									<th className="px-3 py-2.5 text-center font-medium">{t("common.total")}</th>
 									<th className="px-3 py-2.5 w-10" />
 								</tr>
 							</thead>
@@ -535,7 +537,7 @@ export function LaborOverviewTab({
 								{floorRows.length === 0 && (
 									<tr>
 										<td colSpan={5} className="px-3 py-6 text-center text-muted-foreground text-sm">
-											لا توجد أسقف مضافة في قسم الكميات. أضف أسقف لتظهر الأدوار تلقائياً، أو أضف دور يدوياً.
+											{t("labor.noSlabs")}
 										</td>
 									</tr>
 								)}
@@ -564,7 +566,7 @@ export function LaborOverviewTab({
 															value={row.area}
 															readOnly
 														/>
-														<span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">تلقائي</span>
+														<span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{t("labor.autoBadge")}</span>
 													</div>
 												) : (
 													<Input
@@ -582,7 +584,7 @@ export function LaborOverviewTab({
 													type="number"
 													className="h-8 w-24 mx-auto text-center rounded-lg"
 													dir="ltr"
-													placeholder="ر.س/م²"
+													placeholder={t("common.sarPerSqm")}
 													value={row.pricePerSqm}
 													onChange={(e: any) => updateFloorRow(row.id, "pricePerSqm", e.target.value)}
 												/>
@@ -644,7 +646,7 @@ export function LaborOverviewTab({
 													type="number"
 													className="h-8 w-24 mx-auto text-center rounded-lg"
 													dir="ltr"
-													placeholder="ر.س"
+													placeholder={t("common.sar")}
 													value={row.pricePerUnit}
 													onChange={(e: any) => updateExtraRow(row.id, "pricePerUnit", e.target.value)}
 												/>
@@ -662,9 +664,9 @@ export function LaborOverviewTab({
 
 					<div className="border-t border-border bg-muted/10 px-4 py-3">
 						<div className="flex items-center justify-between text-sm font-medium">
-							<span>الإجمالي</span>
+							<span>{t("common.total")}</span>
 							<span className="font-bold text-primary" dir="ltr">
-								{perSqmTotal > 0 ? `${formatNum(perSqmTotal)} ر.س` : "—"}
+								{perSqmTotal > 0 ? `${formatNum(perSqmTotal)} ${t("common.sar")}` : "—"}
 							</span>
 						</div>
 					</div>
@@ -675,18 +677,18 @@ export function LaborOverviewTab({
 			{laborMode === "per_cbm_ton" && (
 				<div className="rounded-xl border border-border bg-card overflow-hidden">
 					<div className="px-4 py-3 bg-muted/30 border-b border-border">
-						<h4 className="font-medium">مصنعيات بالمتر المكعب والطن</h4>
+						<h4 className="font-medium">{t("labor.perCbmTitle")}</h4>
 					</div>
 
 					<div className="overflow-x-auto">
 						<table className="w-full text-sm">
 							<thead>
 								<tr className="border-b bg-muted/20 text-muted-foreground">
-									<th className="px-3 py-2.5 text-right font-medium">البند</th>
-									<th className="px-3 py-2.5 text-center font-medium">الكمية</th>
-									<th className="px-3 py-2.5 text-center font-medium">الوحدة</th>
-									<th className="px-3 py-2.5 text-center font-medium">السعر</th>
-									<th className="px-3 py-2.5 text-center font-medium">الإجمالي</th>
+									<th className="px-3 py-2.5 text-right font-medium">{t("common.item")}</th>
+									<th className="px-3 py-2.5 text-center font-medium">{t("common.quantity")}</th>
+									<th className="px-3 py-2.5 text-center font-medium">{t("common.unit")}</th>
+									<th className="px-3 py-2.5 text-center font-medium">{t("common.price")}</th>
+									<th className="px-3 py-2.5 text-center font-medium">{t("common.total")}</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -711,7 +713,7 @@ export function LaborOverviewTab({
 													type="number"
 													className="h-8 w-24 mx-auto text-center rounded-lg"
 													dir="ltr"
-													placeholder="ر.س"
+													placeholder={t("common.sar")}
 													value={row.pricePerUnit}
 													onChange={(e: any) => updateCbmRow(row.id, "pricePerUnit", e.target.value)}
 												/>
@@ -728,9 +730,9 @@ export function LaborOverviewTab({
 
 					<div className="border-t border-border bg-muted/10 px-4 py-3">
 						<div className="flex items-center justify-between text-sm font-medium">
-							<span>الإجمالي</span>
+							<span>{t("common.total")}</span>
 							<span className="font-bold text-primary" dir="ltr">
-								{perCbmTonTotal > 0 ? `${formatNum(perCbmTonTotal)} ر.س` : "—"}
+								{perCbmTonTotal > 0 ? `${formatNum(perCbmTonTotal)} ${t("common.sar")}` : "—"}
 							</span>
 						</div>
 					</div>
@@ -740,10 +742,10 @@ export function LaborOverviewTab({
 			{/* ─── Lump sum mode ─── */}
 			{laborMode === "lump_sum" && (
 				<div className="rounded-xl border border-border bg-card p-4 space-y-3">
-					<h4 className="font-medium">مصنعيات عظم بالمقطوعية</h4>
+					<h4 className="font-medium">{t("labor.lumpSumTitle")}</h4>
 					<div className="rounded-lg border border-dashed border-primary/30 bg-primary/5 p-4">
 						<Label className="text-sm font-medium mb-2 block">
-							مبلغ المقطوعية الشامل لجميع أعمال المصنعيات الإنشائية
+							{t("labor.lumpSumAmountLabel")}
 						</Label>
 						<div className="flex items-center gap-3">
 							<Input
@@ -754,17 +756,17 @@ export function LaborOverviewTab({
 								value={lumpSumAmount}
 								onChange={(e: any) => setLumpSumAmount(e.target.value)}
 							/>
-							<span className="text-sm text-muted-foreground">ريال</span>
+							<span className="text-sm text-muted-foreground">{t("common.riyal")}</span>
 						</div>
 						{lumpSumTotal > 0 && (
 							<div className="mt-3 text-sm">
-								<span className="text-muted-foreground">الإجمالي: </span>
+								<span className="text-muted-foreground">{t("common.total")}: </span>
 								<span className="font-bold text-primary" dir="ltr">
-									{formatNum(lumpSumTotal)} ر.س
+									{formatNum(lumpSumTotal)} {t("common.sar")}
 								</span>
 								{buildingArea > 0 && (
 									<span className="text-muted-foreground ml-3" dir="ltr">
-										({formatNum(lumpSumTotal / buildingArea)} ر.س/م²)
+										({formatNum(lumpSumTotal / buildingArea)} {t("common.sarPerSqm")})
 									</span>
 								)}
 							</div>
@@ -777,7 +779,7 @@ export function LaborOverviewTab({
 			{laborMode === "salary" && (
 				<div className="rounded-xl border border-border bg-card overflow-hidden">
 					<div className="px-4 py-3 bg-muted/30 border-b border-border flex items-center justify-between">
-						<h4 className="font-medium">عمالة الإنشائي بالراتب الشهري</h4>
+						<h4 className="font-medium">{t("labor.salaryTitle")}</h4>
 						<Button
 							variant="ghost"
 							size="sm"
@@ -785,14 +787,14 @@ export function LaborOverviewTab({
 							className="gap-1 text-xs"
 						>
 							<Plus className="h-3.5 w-3.5" />
-							إضافة عامل
+							{t("labor.addWorker")}
 						</Button>
 					</div>
 
 					{salaryWorkers.length === 0 ? (
 						<div className="p-8 text-center">
 							<p className="text-muted-foreground text-sm mb-3">
-								لم تتم إضافة أي عمالة بعد
+								{t("labor.noWorkers")}
 							</p>
 							<Button
 								variant="outline"
@@ -800,7 +802,7 @@ export function LaborOverviewTab({
 								className="gap-1.5 rounded-lg"
 							>
 								<Plus className="h-4 w-4" />
-								إضافة عامل
+								{t("labor.addWorker")}
 							</Button>
 						</div>
 					) : (
@@ -809,11 +811,11 @@ export function LaborOverviewTab({
 								<table className="w-full text-sm">
 									<thead>
 										<tr className="border-b bg-muted/20 text-muted-foreground">
-											<th className="px-3 py-2.5 text-right font-medium">الحرفة</th>
-											<th className="px-3 py-2.5 text-center font-medium">العدد</th>
-											<th className="px-3 py-2.5 text-center font-medium">الراتب</th>
-											<th className="px-3 py-2.5 text-center font-medium">الأشهر</th>
-											<th className="px-3 py-2.5 text-center font-medium">إجمالي</th>
+											<th className="px-3 py-2.5 text-right font-medium">{t("labor.craft")}</th>
+											<th className="px-3 py-2.5 text-center font-medium">{t("labor.count")}</th>
+											<th className="px-3 py-2.5 text-center font-medium">{t("labor.salary")}</th>
+											<th className="px-3 py-2.5 text-center font-medium">{t("labor.months")}</th>
+											<th className="px-3 py-2.5 text-center font-medium">{t("labor.rowTotal")}</th>
 											<th className="px-3 py-2.5 w-10" />
 										</tr>
 									</thead>
@@ -829,7 +831,7 @@ export function LaborOverviewTab({
 													<td className="px-3 py-2">
 														<Input
 															className="h-8 w-32 rounded-lg text-sm"
-															placeholder="مثال: نجار"
+															placeholder={t("labor.craftPlaceholder")}
 															value={w.craft}
 															onChange={(e: any) => updateWorker(w.id, "craft", e.target.value)}
 														/>
@@ -885,13 +887,13 @@ export function LaborOverviewTab({
 
 							<div className="border-t border-border bg-muted/10 px-4 py-3 space-y-2">
 								<div className="flex items-center gap-4 text-sm">
-									<span className="text-muted-foreground w-28">إجمالي الرواتب:</span>
+									<span className="text-muted-foreground w-28">{t("labor.salariesTotal")}</span>
 									<span className="font-medium" dir="ltr">
-										{salaryTotals.workersTotal > 0 ? `${formatNum(salaryTotals.workersTotal)} ر.س` : "—"}
+										{salaryTotals.workersTotal > 0 ? `${formatNum(salaryTotals.workersTotal)} ${t("common.sar")}` : "—"}
 									</span>
 								</div>
 								<div className="flex items-center gap-4 text-sm">
-									<span className="text-muted-foreground w-28">+ تأمين:</span>
+									<span className="text-muted-foreground w-28">{t("labor.insurance")}</span>
 									<div className="flex items-center gap-2">
 										<Input
 											type="number"
@@ -901,11 +903,11 @@ export function LaborOverviewTab({
 											value={salaryInsurance}
 											onChange={(e: any) => setSalaryInsurance(e.target.value)}
 										/>
-										<span className="text-xs text-muted-foreground">ر.س</span>
+										<span className="text-xs text-muted-foreground">{t("common.sar")}</span>
 									</div>
 								</div>
 								<div className="flex items-center gap-4 text-sm">
-									<span className="text-muted-foreground w-28">+ سكن:</span>
+									<span className="text-muted-foreground w-28">{t("labor.housing")}</span>
 									<div className="flex items-center gap-2">
 										<Input
 											type="number"
@@ -915,13 +917,13 @@ export function LaborOverviewTab({
 											value={salaryHousing}
 											onChange={(e: any) => setSalaryHousing(e.target.value)}
 										/>
-										<span className="text-xs text-muted-foreground">ر.س</span>
+										<span className="text-xs text-muted-foreground">{t("common.sar")}</span>
 									</div>
 								</div>
 								<div className="flex items-center gap-4 text-sm border-t border-border pt-2">
-									<span className="font-medium w-28">= الإجمالي:</span>
+									<span className="font-medium w-28">{t("labor.grandTotalEquals")}</span>
 									<span className="font-bold text-primary" dir="ltr">
-										{salaryTotals.grandTotal > 0 ? `${formatNum(salaryTotals.grandTotal)} ر.س` : "—"}
+										{salaryTotals.grandTotal > 0 ? `${formatNum(salaryTotals.grandTotal)} ${t("common.sar")}` : "—"}
 									</span>
 								</div>
 							</div>
@@ -934,20 +936,20 @@ export function LaborOverviewTab({
 			<div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4">
 				<div className="flex items-center justify-between">
 					<span className="font-semibold">
-						إجمالي مصنعيات الإنشائي
+						{t("labor.structuralLaborTotal")}
 						<span className="text-xs font-normal text-muted-foreground ml-2">
-							({LABOR_MODES.find((m) => m.value === laborMode)?.label})
+							({activeMode ? t(activeMode.labelKey as Parameters<typeof t>[0]) : ""})
 						</span>
 					</span>
 					<span className="text-lg font-bold text-primary" dir="ltr">
-						{activeTotal > 0 ? `${formatNum(activeTotal)} ر.س` : "—"}
+						{activeTotal > 0 ? `${formatNum(activeTotal)} ${t("common.sar")}` : "—"}
 					</span>
 				</div>
 				{buildingArea > 0 && activeTotal > 0 && (
 					<div className="flex items-center justify-between mt-1">
-						<span className="text-sm text-muted-foreground">تكلفة المتر المربع</span>
+						<span className="text-sm text-muted-foreground">{t("labor.costPerSqm")}</span>
 						<span className="text-sm font-medium" dir="ltr">
-							{formatNum(activeTotal / buildingArea)} ر.س/م²
+							{formatNum(activeTotal / buildingArea)} {t("common.sarPerSqm")}
 						</span>
 					</div>
 				)}
@@ -964,7 +966,7 @@ export function LaborOverviewTab({
 					) : (
 						<Save className="h-4 w-4" />
 					)}
-					حفظ المصنعيات
+					{t("labor.saveLabor")}
 				</Button>
 			</div>
 
@@ -975,7 +977,7 @@ export function LaborOverviewTab({
 			{sectionTotals.length > 0 && (
 				<div className="space-y-3 pt-4 border-t border-border">
 					<h4 className="text-sm font-medium text-muted-foreground">
-						مصنعيات الأقسام الأخرى (للاطلاع)
+						{t("labor.otherSectionsTitle")}
 					</h4>
 
 					{sectionTotals.map(({ section, label, laborTotal, items }) => {
@@ -996,11 +998,11 @@ export function LaborOverviewTab({
 										)}
 										<span className="font-medium">{label}</span>
 										<span className="text-xs text-muted-foreground">
-											({items.length} بند)
+											({t("common.itemsCount", { count: items.length })})
 										</span>
 									</div>
 									<span className="font-medium" dir="ltr">
-										{formatNum(laborTotal)} ر.س
+										{formatNum(laborTotal)} {t("common.sar")}
 									</span>
 								</button>
 
@@ -1009,11 +1011,11 @@ export function LaborOverviewTab({
 										<table className="w-full text-sm">
 											<thead>
 												<tr className="border-b bg-muted/20 text-muted-foreground">
-													<th className="px-3 py-2 text-right font-medium">البند</th>
-													<th className="px-3 py-2 text-center font-medium">الطريقة</th>
-													<th className="px-3 py-2 text-center font-medium">السعر</th>
-													<th className="px-3 py-2 text-center font-medium">الكمية</th>
-													<th className="px-3 py-2 text-center font-medium">الإجمالي</th>
+													<th className="px-3 py-2 text-right font-medium">{t("common.item")}</th>
+													<th className="px-3 py-2 text-center font-medium">{t("labor.method")}</th>
+													<th className="px-3 py-2 text-center font-medium">{t("common.price")}</th>
+													<th className="px-3 py-2 text-center font-medium">{t("common.quantity")}</th>
+													<th className="px-3 py-2 text-center font-medium">{t("common.total")}</th>
 												</tr>
 											</thead>
 											<tbody>
@@ -1048,20 +1050,20 @@ export function LaborOverviewTab({
 			<div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4 space-y-2">
 				{activeTotal > 0 && (
 					<div className="flex items-center justify-between text-sm">
-						<span className="text-muted-foreground">مصنعيات إنشائي</span>
-						<span dir="ltr">{formatNum(activeTotal)} ر.س</span>
+						<span className="text-muted-foreground">{t("labor.structuralLaborShort")}</span>
+						<span dir="ltr">{formatNum(activeTotal)} {t("common.sar")}</span>
 					</div>
 				)}
 				{grandLaborTotal > 0 && (
 					<div className="flex items-center justify-between text-sm">
-						<span className="text-muted-foreground">مصنعيات أقسام أخرى</span>
-						<span dir="ltr">{formatNum(grandLaborTotal)} ر.س</span>
+						<span className="text-muted-foreground">{t("labor.otherSectionsShort")}</span>
+						<span dir="ltr">{formatNum(grandLaborTotal)} {t("common.sar")}</span>
 					</div>
 				)}
 				<div className="flex items-center justify-between border-t border-primary/20 pt-2">
-					<span className="font-semibold">إجمالي العمالة</span>
+					<span className="font-semibold">{t("labor.totalLabor")}</span>
 					<span className="text-lg font-bold text-primary" dir="ltr">
-						{formatNum(activeTotal + grandLaborTotal)} ر.س
+						{formatNum(activeTotal + grandLaborTotal)} {t("common.sar")}
 					</span>
 				</div>
 			</div>

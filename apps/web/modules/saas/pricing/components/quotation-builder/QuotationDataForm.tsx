@@ -7,6 +7,7 @@ import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
 import { cn } from "@ui/lib";
 import { Loader2, Send } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -38,6 +39,7 @@ export function QuotationDataForm({
 	lumpSumDescription,
 	onBack,
 }: QuotationDataFormProps) {
+	const t = useTranslations("pricing.quotationBuilder");
 	const router = useRouter();
 	const queryClient = useQueryClient();
 
@@ -87,7 +89,7 @@ export function QuotationDataForm({
 	const createMutation = useMutation(
 		orpc.pricing.studies.createStudyQuotation.mutationOptions({
 			onSuccess: (data: any) => {
-				toast.success("تم إنشاء عرض السعر بنجاح");
+				toast.success(t("toasts.createSuccess"));
 				queryClient.invalidateQueries({
 					queryKey: orpc.pricing.key(),
 				});
@@ -96,14 +98,14 @@ export function QuotationDataForm({
 				);
 			},
 			onError: () => {
-				toast.error("حدث خطأ أثناء إنشاء عرض السعر");
+				toast.error(t("toasts.createError"));
 			},
 		}),
 	);
 
 	const handleSubmit = () => {
 		if (!clientName.trim()) {
-			toast.error("يرجى إدخال اسم العميل");
+			toast.error(t("toasts.clientNameRequired"));
 			return;
 		}
 
@@ -139,28 +141,28 @@ export function QuotationDataForm({
 		<div className="space-y-5">
 			{/* Client data */}
 			<div className="rounded-xl border border-border bg-card p-5 space-y-4">
-				<h4 className="font-semibold text-sm">بيانات العميل</h4>
+				<h4 className="font-semibold text-sm">{t("sections.clientInfo")}</h4>
 				<div className="grid grid-cols-2 gap-4">
 					<div className="space-y-1">
-						<Label className="text-xs">اسم العميل *</Label>
+						<Label className="text-xs">{t("fields.clientName")} *</Label>
 						<Input
 							value={clientName}
 							onChange={(e: any) => setClientName(e.target.value)}
-							placeholder="أحمد محمد"
+							placeholder={t("placeholders.clientName")}
 							className="rounded-lg"
 						/>
 					</div>
 					<div className="space-y-1">
-						<Label className="text-xs">الشركة</Label>
+						<Label className="text-xs">{t("fields.company")}</Label>
 						<Input
 							value={clientCompany}
 							onChange={(e: any) => setClientCompany(e.target.value)}
-							placeholder="شركة البناء الحديث"
+							placeholder={t("placeholders.company")}
 							className="rounded-lg"
 						/>
 					</div>
 					<div className="space-y-1">
-						<Label className="text-xs">الهاتف</Label>
+						<Label className="text-xs">{t("fields.phone")}</Label>
 						<Input
 							value={clientPhone}
 							onChange={(e: any) => setClientPhone(e.target.value)}
@@ -170,7 +172,7 @@ export function QuotationDataForm({
 						/>
 					</div>
 					<div className="space-y-1">
-						<Label className="text-xs">البريد الإلكتروني</Label>
+						<Label className="text-xs">{t("fields.email")}</Label>
 						<Input
 							value={clientEmail}
 							onChange={(e: any) => setClientEmail(e.target.value)}
@@ -180,7 +182,7 @@ export function QuotationDataForm({
 						/>
 					</div>
 					<div className="space-y-1">
-						<Label className="text-xs">الرقم الضريبي</Label>
+						<Label className="text-xs">{t("fields.taxNumber")}</Label>
 						<Input
 							value={clientTaxNumber}
 							onChange={(e: any) => setClientTaxNumber(e.target.value)}
@@ -190,7 +192,7 @@ export function QuotationDataForm({
 						/>
 					</div>
 					<div className="space-y-1">
-						<Label className="text-xs">صالح حتى</Label>
+						<Label className="text-xs">{t("fields.validUntil")}</Label>
 						<div className="flex items-center gap-2">
 							<Input
 								type="number"
@@ -199,7 +201,7 @@ export function QuotationDataForm({
 								className="h-10 w-20 rounded-lg"
 								dir="ltr"
 							/>
-							<span className="text-sm text-muted-foreground">يوم</span>
+							<span className="text-sm text-muted-foreground">{t("fields.days")}</span>
 						</div>
 					</div>
 				</div>
@@ -207,16 +209,16 @@ export function QuotationDataForm({
 
 			{/* Amounts */}
 			<div className="rounded-xl border border-border bg-card p-5 space-y-4">
-				<h4 className="font-semibold text-sm">المبالغ</h4>
+				<h4 className="font-semibold text-sm">{t("sections.amounts")}</h4>
 				<div className="space-y-3">
 					<div className="flex items-center justify-between text-sm">
-						<span className="text-muted-foreground">المجموع الفرعي</span>
-						<span className="font-medium" dir="ltr">{fmt(subtotal)} ر.س</span>
+						<span className="text-muted-foreground">{t("totals.subtotal")}</span>
+						<span className="font-medium" dir="ltr">{fmt(subtotal)} {t("currency")}</span>
 					</div>
 
 					{/* Discount */}
 					<div className="space-y-2">
-						<Label className="text-xs">الخصم</Label>
+						<Label className="text-xs">{t("totals.discount")}</Label>
 						<div className="flex gap-2">
 							{(["none", "percent", "amount"] as const).map((dt) => (
 								<button
@@ -233,7 +235,7 @@ export function QuotationDataForm({
 											: "border-border hover:border-muted-foreground/30",
 									)}
 								>
-									{dt === "none" ? "بدون" : dt === "percent" ? "نسبة %" : "مبلغ"}
+									{dt === "none" ? t("discount.none") : dt === "percent" ? t("discount.percent") : t("discount.amount")}
 								</button>
 							))}
 							{discountType !== "none" && (
@@ -243,7 +245,7 @@ export function QuotationDataForm({
 									onChange={(e: any) => setDiscountValue(e.target.value)}
 									className="h-8 w-24 rounded-lg"
 									dir="ltr"
-									placeholder={discountType === "percent" ? "%" : "ر.س"}
+									placeholder={discountType === "percent" ? "%" : t("currency")}
 								/>
 							)}
 						</div>
@@ -251,22 +253,22 @@ export function QuotationDataForm({
 
 					{discountAmount > 0 && (
 						<div className="flex items-center justify-between text-sm">
-							<span className="text-muted-foreground">الخصم</span>
-							<span className="text-red-500" dir="ltr">-{fmt(discountAmount)} ر.س</span>
+							<span className="text-muted-foreground">{t("totals.discount")}</span>
+							<span className="text-red-500" dir="ltr">-{fmt(discountAmount)} {t("currency")}</span>
 						</div>
 					)}
 					<div className="flex items-center justify-between text-sm">
-						<span className="text-muted-foreground">بعد الخصم</span>
-						<span dir="ltr">{fmt(afterDiscount)} ر.س</span>
+						<span className="text-muted-foreground">{t("totals.afterDiscount")}</span>
+						<span dir="ltr">{fmt(afterDiscount)} {t("currency")}</span>
 					</div>
 					<div className="flex items-center justify-between text-sm">
-						<span className="text-muted-foreground">ضريبة القيمة المضافة (15%)</span>
-						<span dir="ltr">{fmt(vatAmount)} ر.س</span>
+						<span className="text-muted-foreground">{t("totals.vat", { percent: 15 })}</span>
+						<span dir="ltr">{fmt(vatAmount)} {t("currency")}</span>
 					</div>
 					<div className="flex items-center justify-between text-sm border-t border-border pt-2">
-						<span className="font-semibold">الإجمالي النهائي</span>
+						<span className="font-semibold">{t("totals.grandTotal")}</span>
 						<span className="text-lg font-bold text-primary" dir="ltr">
-							{fmt(totalAmount)} ر.س
+							{fmt(totalAmount)} {t("currency")}
 						</span>
 					</div>
 				</div>
@@ -274,41 +276,41 @@ export function QuotationDataForm({
 
 			{/* Terms */}
 			<div className="rounded-xl border border-border bg-card p-5 space-y-4">
-				<h4 className="font-semibold text-sm">الشروط</h4>
+				<h4 className="font-semibold text-sm">{t("sections.termsShort")}</h4>
 				<div className="grid grid-cols-2 gap-4">
 					<div className="space-y-1">
-						<Label className="text-xs">شروط الدفع</Label>
+						<Label className="text-xs">{t("fields.paymentTerms")}</Label>
 						<Input
 							value={paymentTerms}
 							onChange={(e: any) => setPaymentTerms(e.target.value)}
-							placeholder="50% مقدم — 50% عند الانتهاء"
+							placeholder={t("placeholders.paymentTerms")}
 							className="rounded-lg"
 						/>
 					</div>
 					<div className="space-y-1">
-						<Label className="text-xs">مدة التنفيذ</Label>
+						<Label className="text-xs">{t("fields.deliveryTerms")}</Label>
 						<Input
 							value={deliveryTerms}
 							onChange={(e: any) => setDeliveryTerms(e.target.value)}
-							placeholder="6 أشهر من تاريخ التعاقد"
+							placeholder={t("placeholders.deliveryTerms")}
 							className="rounded-lg"
 						/>
 					</div>
 					<div className="space-y-1">
-						<Label className="text-xs">شروط الضمان</Label>
+						<Label className="text-xs">{t("fields.warrantyTerms")}</Label>
 						<Input
 							value={warrantyTerms}
 							onChange={(e: any) => setWarrantyTerms(e.target.value)}
-							placeholder="سنة واحدة على الأعمال"
+							placeholder={t("placeholders.warrantyTerms")}
 							className="rounded-lg"
 						/>
 					</div>
 					<div className="space-y-1">
-						<Label className="text-xs">ملاحظات</Label>
+						<Label className="text-xs">{t("fields.notes")}</Label>
 						<Input
 							value={notes}
 							onChange={(e: any) => setNotes(e.target.value)}
-							placeholder="ملاحظات إضافية..."
+							placeholder={t("placeholders.notes")}
 							className="rounded-lg"
 						/>
 					</div>
@@ -318,7 +320,7 @@ export function QuotationDataForm({
 			{/* Actions */}
 			<div className="flex gap-3 justify-between">
 				<Button variant="outline" onClick={onBack} className="rounded-xl">
-					← رجوع
+					← {t("actions.back")}
 				</Button>
 				<Button
 					onClick={handleSubmit}
@@ -330,7 +332,7 @@ export function QuotationDataForm({
 					) : (
 						<Send className="h-4 w-4" />
 					)}
-					إصدار عرض السعر
+					{t("actions.issueQuotation")}
 				</Button>
 			</div>
 		</div>

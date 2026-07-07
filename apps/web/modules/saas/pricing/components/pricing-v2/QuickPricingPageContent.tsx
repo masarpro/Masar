@@ -21,6 +21,7 @@ import {
 	Trash2,
 	Zap,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -73,6 +74,7 @@ export function QuickPricingPageContent({
 	organizationSlug,
 	studyId,
 }: QuickPricingPageContentProps) {
+	const t = useTranslations("pricing.pricingV2");
 	const router = useRouter();
 	const queryClient = useQueryClient();
 
@@ -159,14 +161,14 @@ export function QuickPricingPageContent({
 	// ─── Mutations ────────────────────────────────────────────────
 	const saveMutation = useMutation(
 		orpc.pricing.studies.manualItem.create.mutationOptions({
-			onError: (e: any) => toast.error(e.message || "حدث خطأ أثناء الحفظ"),
+			onError: (e: any) => toast.error(e.message || t("toasts.saveError")),
 		}),
 	);
 
 	const approveMutation = useMutation(
 		orpc.pricing.studies.stages.approve.mutationOptions({
 			onSuccess: () => {
-				toast.success("تم اعتماد مرحلة التسعير");
+				toast.success(t("toasts.pricingStageApproved"));
 				queryClient.invalidateQueries({
 					queryKey: [["pricing", "studies", "stages"]],
 				});
@@ -175,7 +177,7 @@ export function QuickPricingPageContent({
 				});
 			},
 			onError: (error: any) => {
-				toast.error(error.message || "حدث خطأ أثناء الاعتماد");
+				toast.error(error.message || t("toasts.approveError"));
 			},
 		}),
 	);
@@ -189,7 +191,7 @@ export function QuickPricingPageContent({
 		);
 
 		if (validItems.length === 0) {
-			toast.error("يرجى إضافة بند واحد على الأقل");
+			toast.error(t("toasts.addAtLeastOneItem"));
 			return;
 		}
 
@@ -208,7 +210,7 @@ export function QuickPricingPageContent({
 				});
 			}
 
-			toast.success(`تم حفظ ${validItems.length} بند بنجاح`);
+			toast.success(t("toasts.itemsSaved", { count: validItems.length }));
 			queryClient.invalidateQueries({
 				queryKey: [["pricing", "studies", "manualItem"]],
 			});
@@ -244,9 +246,9 @@ export function QuickPricingPageContent({
 						<Zap className="h-5 w-5 text-amber-600 dark:text-amber-400" />
 					</div>
 					<div>
-						<h2 className="text-xl font-bold">تسعير سريع</h2>
+						<h2 className="text-xl font-bold">{t("quick.title")}</h2>
 						<p className="text-sm text-muted-foreground">
-							أدخل البنود والأسعار مباشرة لإنشاء عرض سعر سريع
+							{t("quick.subtitle")}
 						</p>
 					</div>
 				</div>
@@ -262,22 +264,22 @@ export function QuickPricingPageContent({
 									#
 								</th>
 								<th className="px-3 py-3 text-right font-medium min-w-[220px]">
-									الوصف
+									{t("table.description")}
 								</th>
 								<th className="px-3 py-3 text-right font-medium w-28">
-									الوحدة
+									{t("table.unit")}
 								</th>
 								<th className="px-3 py-3 text-center font-medium w-28">
-									الكمية
+									{t("table.quantity")}
 								</th>
 								<th className="px-3 py-3 text-center font-medium w-32">
-									سعر الوحدة
+									{t("table.unitPrice")}
 								</th>
 								<th className="px-3 py-3 text-center font-medium w-32">
-									الإجمالي
+									{t("table.total")}
 								</th>
 								<th className="px-3 py-3 text-center font-medium w-14">
-									حذف
+									{t("table.delete")}
 								</th>
 							</tr>
 						</thead>
@@ -304,7 +306,7 @@ export function QuickPricingPageContent({
 										</td>
 										<td className="px-3 py-1.5">
 											<Input
-												placeholder="وصف البند..."
+												placeholder={t("quick.itemDescriptionPlaceholder")}
 												value={item.description}
 												onChange={(e: any) =>
 													handleItemChange(
@@ -400,7 +402,7 @@ export function QuickPricingPageContent({
 							<tr className="border-t-2 border-border bg-muted/30 font-semibold">
 								<td className="px-3 py-3" colSpan={5}>
 									<span className="text-muted-foreground text-xs font-medium">
-										الإجمالي
+										{t("table.total")}
 									</span>
 								</td>
 								<td className="px-3 py-3 text-center text-primary text-base" dir="ltr">
@@ -421,7 +423,7 @@ export function QuickPricingPageContent({
 						className="gap-1.5 rounded-lg"
 					>
 						<Plus className="h-3.5 w-3.5" />
-						إضافة بند
+						{t("quick.addItem")}
 					</Button>
 				</div>
 			</div>
@@ -430,7 +432,7 @@ export function QuickPricingPageContent({
 			<div className="rounded-xl border border-border bg-card p-5 space-y-4">
 				<div className="flex items-center gap-2 mb-1">
 					<Calculator className="h-4 w-4 text-primary" />
-					<h3 className="font-semibold text-sm">ملخص التسعير</h3>
+					<h3 className="font-semibold text-sm">{t("quick.summaryTitle")}</h3>
 				</div>
 
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -438,7 +440,7 @@ export function QuickPricingPageContent({
 					<div className="space-y-3">
 						<div className="flex items-center justify-between text-sm">
 							<span className="text-muted-foreground">
-								عدد البنود
+								{t("quick.itemsCount")}
 							</span>
 							<span className="font-medium">
 								{filledItems.length}
@@ -447,7 +449,7 @@ export function QuickPricingPageContent({
 
 						<div className="flex items-center justify-between text-sm">
 							<span className="text-muted-foreground">
-								إجمالي التكلفة
+								{t("common.totalCost")}
 							</span>
 							<span className="font-medium" dir="ltr">
 								{formatNum(subtotal)} ر.س
@@ -456,7 +458,7 @@ export function QuickPricingPageContent({
 
 						<div className="flex items-center justify-between text-sm">
 							<span className="text-muted-foreground">
-								هامش الربح ({profitMarginNum}%)
+								{t("quick.profitMarginWithPct", { pct: profitMarginNum })}
 							</span>
 							<span className="font-medium text-emerald-600" dir="ltr">
 								+{formatNum(profitAmount)} ر.س
@@ -466,7 +468,7 @@ export function QuickPricingPageContent({
 						{vatEnabled && (
 							<div className="flex items-center justify-between text-sm">
 								<span className="text-muted-foreground">
-									ضريبة القيمة المضافة (15%)
+									{t("quick.vat15")}
 								</span>
 								<span className="font-medium" dir="ltr">
 									+{formatNum(vatAmount)} ر.س
@@ -476,7 +478,7 @@ export function QuickPricingPageContent({
 
 						<div className="border-t border-border pt-3 flex items-center justify-between">
 							<span className="font-semibold">
-								الإجمالي النهائي
+								{t("quick.grandTotal")}
 							</span>
 							<span className="font-bold text-lg text-primary" dir="ltr">
 								{formatNum(grandTotal)} ر.س
@@ -488,7 +490,7 @@ export function QuickPricingPageContent({
 					<div className="space-y-4 sm:border-r sm:pr-4">
 						<div className="space-y-1.5">
 							<label className="text-xs font-medium text-muted-foreground">
-								هامش الربح (%)
+								{t("common.profitMarginPct")}
 							</label>
 							<Input
 								type="number"
@@ -512,9 +514,7 @@ export function QuickPricingPageContent({
 									}
 									className="rounded"
 								/>
-								<span className="text-sm">
-									إضافة ضريبة القيمة المضافة (15%)
-								</span>
+								<span className="text-sm">{t("quick.addVat15")}</span>
 							</label>
 						</div>
 					</div>
@@ -534,7 +534,7 @@ export function QuickPricingPageContent({
 					) : (
 						<Save className="h-4 w-4" />
 					)}
-					حفظ البنود
+					{t("quick.saveItems")}
 				</Button>
 
 				<Button
@@ -544,7 +544,7 @@ export function QuickPricingPageContent({
 					className="gap-2 rounded-xl"
 				>
 					<FileText className="h-4 w-4" />
-					إنشاء عرض سعر
+					{t("quick.createQuotation")}
 				</Button>
 
 				<Button
@@ -557,7 +557,7 @@ export function QuickPricingPageContent({
 					) : (
 						<Zap className="h-4 w-4" />
 					)}
-					اعتماد
+					{t("quick.approve")}
 				</Button>
 			</div>
 		</div>

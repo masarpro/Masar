@@ -62,17 +62,18 @@ const DEFAULT_STEEL_GRADE = "60";
 // العلامات التجارية للحديد
 // ═══════════════════════════════════════════════════════════════
 
-const STEEL_BRANDS = [
-	{ value: "sabic", label: "سابك (SABIC)" },
-	{ value: "rajhi", label: "حديد الراجحي (Al-Rajhi Steel)" },
-	{ value: "yamamah", label: "حديد اليمامة (Yamamah Steel)" },
-	{ value: "hadeed", label: "حديد (HADEED / ArcelorMittal)" },
-	{ value: "riyadh", label: "حديد الرياض (Riyadh Steel)" },
-	{ value: "jizan", label: "حديد جازان (Jizan Steel)" },
-	{ value: "ittefaq", label: "حديد الاتفاق (Al-Ittefaq Steel)" },
-	{ value: "tuwairqi", label: "حديد الطويرقي (Al-Tuwairqi)" },
-	{ value: "other", label: "أخرى" },
-];
+// value = المفتاح المحفوظ في المواصفات — لا يتغيّر؛ الاسم المعروض من الترجمة
+const STEEL_BRAND_VALUES = [
+	"sabic",
+	"rajhi",
+	"yamamah",
+	"hadeed",
+	"riyadh",
+	"jizan",
+	"ittefaq",
+	"tuwairqi",
+	"other",
+] as const;
 
 // ═══════════════════════════════════════════════════════════════
 // تعريف العناصر الإنشائية مع الاختيارات التلقائية
@@ -80,19 +81,19 @@ const STEEL_BRANDS = [
 
 interface ElementRow {
 	id: string;
-	label: string;
 	icon: string;
 	defaultConcrete: string;
 	hasConcrete: boolean;
 }
 
+// id = مفتاح العنصر المحفوظ — الاسم المعروض من الترجمة (elements.{id})
 const ELEMENT_ROWS: ElementRow[] = [
-	{ id: "plainConcrete", label: "صبة النظافة / خرسانة عادية", icon: "🧱", defaultConcrete: "C15", hasConcrete: true },
-	{ id: "foundations", label: "القواعد والأساسات", icon: "🏗️", defaultConcrete: "C30", hasConcrete: true },
-	{ id: "columns", label: "الأعمدة", icon: "🏛️", defaultConcrete: "C35", hasConcrete: true },
-	{ id: "beams", label: "الكمرات", icon: "📏", defaultConcrete: "C30", hasConcrete: true },
-	{ id: "slabs", label: "البلاطات", icon: "⬛", defaultConcrete: "C30", hasConcrete: true },
-	{ id: "stairs", label: "السلالم", icon: "🪜", defaultConcrete: "C30", hasConcrete: true },
+	{ id: "plainConcrete", icon: "🧱", defaultConcrete: "C15", hasConcrete: true },
+	{ id: "foundations", icon: "🏗️", defaultConcrete: "C30", hasConcrete: true },
+	{ id: "columns", icon: "🏛️", defaultConcrete: "C35", hasConcrete: true },
+	{ id: "beams", icon: "📏", defaultConcrete: "C30", hasConcrete: true },
+	{ id: "slabs", icon: "⬛", defaultConcrete: "C30", hasConcrete: true },
+	{ id: "stairs", icon: "🪜", defaultConcrete: "C30", hasConcrete: true },
 ];
 
 function getDefaultElements(): Record<string, ElementSpec> {
@@ -232,7 +233,7 @@ export function StructuralSpecs({
 					queryKey: [["pricing", "studies", "structuralSpecs"]],
 				});
 			},
-			onError: (e: any) => toast.error(e.message || "حدث خطأ"),
+			onError: (e: any) => toast.error(e.message || t("pricing.studies.messages.error")),
 		}),
 	);
 
@@ -392,7 +393,7 @@ export function StructuralSpecs({
 				<div className="flex flex-wrap items-center justify-between gap-3">
 					<div className="flex items-center gap-2">
 						<Settings2 className="h-5 w-5 text-amber-600" />
-						<CardTitle className="text-base">مواصفات المواد الانشائية</CardTitle>
+						<CardTitle className="text-base">{t("pricing.pipeline.structuralSpecs.title")}</CardTitle>
 					</div>
 					<Button
 						size="sm"
@@ -409,7 +410,7 @@ export function StructuralSpecs({
 					</Button>
 				</div>
 				<p className="text-sm text-muted-foreground">
-					اختيارات تلقائية بحسب نوع العنصر — يمكنك تعديلها
+					{t("pricing.pipeline.structuralSpecs.subtitle")}
 				</p>
 			</CardHeader>
 			<CardContent className="space-y-6">
@@ -418,8 +419,8 @@ export function StructuralSpecs({
 					<table className="w-full">
 						<thead>
 							<tr className="bg-muted/50 text-sm">
-								<th className="text-right py-2.5 px-4 font-medium">العنصر الإنشائي</th>
-								<th className="text-center py-2.5 px-4 font-medium">نوع الخرسانة</th>
+								<th className="text-right py-2.5 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.structuralElement")}</th>
+								<th className="text-center py-2.5 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.concreteType")}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -431,7 +432,7 @@ export function StructuralSpecs({
 									<td className="py-2.5 px-4">
 										<div className="flex items-center gap-2">
 											<span className="text-lg">{row.icon}</span>
-											<span className="font-medium text-sm">{row.label}</span>
+											<span className="font-medium text-sm">{t(`pricing.pipeline.structuralSpecs.elements.${row.id}`)}</span>
 										</div>
 									</td>
 									<td className="py-2 px-4">
@@ -465,23 +466,23 @@ export function StructuralSpecs({
 				<div className="border rounded-lg p-4 space-y-4">
 					<div className="flex items-center gap-2">
 						<Shield className="h-4 w-4 text-blue-600" />
-						<h3 className="font-medium text-sm">نوع الحديد</h3>
+						<h3 className="font-medium text-sm">{t("pricing.pipeline.specsSteelGrade")}</h3>
 					</div>
 
 					{/* العلامة التجارية */}
 					<div className="space-y-2">
-						<Label className="text-sm">العلامة التجارية للحديد</Label>
+						<Label className="text-sm">{t("pricing.pipeline.structuralSpecs.steelBrand")}</Label>
 						<Select
 							value={specs.steelBrand || undefined}
 							onValueChange={handleSteelBrandChange}
 						>
 							<SelectTrigger className="w-72 h-9">
-								<SelectValue placeholder="اختر العلامة التجارية" />
+								<SelectValue placeholder={t("pricing.pipeline.structuralSpecs.selectBrand")} />
 							</SelectTrigger>
 							<SelectContent>
-								{STEEL_BRANDS.map((brand) => (
-									<SelectItem key={brand.value} value={brand.value}>
-										{brand.label}
+								{STEEL_BRAND_VALUES.map((brand) => (
+									<SelectItem key={brand} value={brand}>
+										{t(`pricing.pipeline.structuralSpecs.brands.${brand}`)}
 									</SelectItem>
 								))}
 							</SelectContent>
@@ -497,7 +498,7 @@ export function StructuralSpecs({
 								onCheckedChange={handleIsolatedSteelChange}
 							/>
 							<Label htmlFor="isolated-steel" className="text-sm cursor-pointer">
-								هل يوجد حديد معزول (إيبوكسي) بالأساسات؟
+								{t("pricing.pipeline.structuralSpecs.hasIsolatedSteel")}
 							</Label>
 						</div>
 
@@ -506,31 +507,31 @@ export function StructuralSpecs({
 								<table className="w-full text-sm">
 									<thead>
 										<tr className="bg-blue-100/50">
-											<th className="text-right py-2 px-4 font-medium">العنصر</th>
-											<th className="text-center py-2 px-4 font-medium">كمية الحديد (كجم)</th>
+											<th className="text-right py-2 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.element")}</th>
+											<th className="text-center py-2 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.steelQuantityKg")}</th>
 										</tr>
 									</thead>
 									<tbody>
 										<tr className="border-t">
-											<td className="py-2 px-4">القواعد</td>
+											<td className="py-2 px-4">{t("pricing.pipeline.structuralSpecs.isolated.foundations")}</td>
 											<td className="py-2 px-4 text-center font-medium">
 												{formatNumber(isolatedSteelQuantities.foundations)}
 											</td>
 										</tr>
 										<tr className="border-t bg-muted/10">
-											<td className="py-2 px-4">الميدة</td>
+											<td className="py-2 px-4">{t("pricing.pipeline.structuralSpecs.isolated.groundBeam")}</td>
 											<td className="py-2 px-4 text-center font-medium">
 												{formatNumber(isolatedSteelQuantities.groundBeam)}
 											</td>
 										</tr>
 										<tr className="border-t">
-											<td className="py-2 px-4">الرقاب</td>
+											<td className="py-2 px-4">{t("pricing.pipeline.structuralSpecs.isolated.necks")}</td>
 											<td className="py-2 px-4 text-center font-medium">
 												{formatNumber(isolatedSteelQuantities.necks)}
 											</td>
 										</tr>
 										<tr className="border-t bg-blue-100/30 font-bold">
-											<td className="py-2 px-4">الإجمالي</td>
+											<td className="py-2 px-4">{t("pricing.pipeline.costingTotal")}</td>
 											<td className="py-2 px-4 text-center">
 												{formatNumber(
 													isolatedSteelQuantities.foundations +
@@ -546,7 +547,7 @@ export function StructuralSpecs({
 
 						{specs.hasIsolatedSteel && !isolatedSteelQuantities && (
 							<p className="text-sm text-muted-foreground bg-muted/30 rounded p-3">
-								لم يتم إدخال بيانات الكميات بعد — ستظهر الكميات تلقائياً بعد إدخالها
+								{t("pricing.pipeline.structuralSpecs.noQuantitiesYet")}
 							</p>
 						)}
 					</div>
@@ -556,7 +557,7 @@ export function StructuralSpecs({
 				<div className="border rounded-lg p-4 space-y-4">
 					<div className="flex items-center gap-2">
 						<Package className="h-4 w-4 text-orange-600" />
-						<h3 className="font-medium text-sm">مواصفات البلوك</h3>
+						<h3 className="font-medium text-sm">{t("pricing.pipeline.structuralSpecs.blockSpecsTitle")}</h3>
 					</div>
 
 					{blockData.length > 0 ? (
@@ -564,9 +565,9 @@ export function StructuralSpecs({
 							<table className="w-full text-sm">
 								<thead>
 									<tr className="bg-muted/50">
-										<th className="text-right py-2.5 px-4 font-medium">تصنيف الجدار</th>
-										<th className="text-center py-2.5 px-4 font-medium">نوع البلوك</th>
-										<th className="text-center py-2.5 px-4 font-medium">السماكة</th>
+										<th className="text-right py-2.5 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.wallCategory")}</th>
+										<th className="text-center py-2.5 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.blockType")}</th>
+										<th className="text-center py-2.5 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.thickness")}</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -582,7 +583,7 @@ export function StructuralSpecs({
 														{block.categoryInfo?.nameAr || block.category}
 													</span>
 													<span className="text-xs text-muted-foreground">
-														({block.count} عنصر)
+														{t("pricing.pipeline.structuralSpecs.itemsCount", { count: block.count })}
 													</span>
 												</div>
 											</td>
@@ -615,7 +616,7 @@ export function StructuralSpecs({
 						</div>
 					) : (
 						<p className="text-sm text-muted-foreground bg-muted/30 rounded p-3 text-center">
-							لم يتم إدخال بيانات البلوك في مرحلة الكميات
+							{t("pricing.pipeline.structuralSpecs.noBlockData")}
 						</p>
 					)}
 				</div>

@@ -6,6 +6,7 @@ import { Button } from "@ui/components/button";
 import { Label } from "@ui/components/label";
 import { cn } from "@ui/lib";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export interface DisplayConfig {
 	grouping: "BY_SECTION" | "BY_FLOOR" | "BY_ITEM" | "FLAT";
@@ -39,10 +40,10 @@ interface QuotationCustomizerProps {
 }
 
 const GROUPING_OPTIONS = [
-	{ value: "BY_SECTION" as const, label: "بحسب القسم" },
-	{ value: "BY_FLOOR" as const, label: "بحسب الدور" },
-	{ value: "BY_ITEM" as const, label: "بحسب البند" },
-	{ value: "FLAT" as const, label: "بدون تجميع" },
+	{ value: "BY_SECTION" as const, labelKey: "grouping.bySection" },
+	{ value: "BY_FLOOR" as const, labelKey: "grouping.byFloor" },
+	{ value: "BY_ITEM" as const, labelKey: "grouping.byItem" },
+	{ value: "FLAT" as const, labelKey: "grouping.flat" },
 ];
 
 export function QuotationCustomizer({
@@ -53,6 +54,7 @@ export function QuotationCustomizer({
 	onBack,
 	onNext,
 }: QuotationCustomizerProps) {
+	const t = useTranslations("pricing.quotationBuilder");
 	// Fetch sample costing items for preview
 	const { data: costingItems, isLoading } = useQuery(
 		orpc.pricing.studies.costing.getItems.queryOptions({
@@ -75,20 +77,20 @@ export function QuotationCustomizer({
 
 	return (
 		<div className="rounded-xl border border-border bg-card p-5 space-y-5">
-			<h3 className="font-semibold text-base">تخصيص عرض السعر</h3>
+			<h3 className="font-semibold text-base">{t("customizer.title")}</h3>
 
 			{/* Columns */}
 			<div className="space-y-2">
-				<Label className="text-sm font-medium">الأعمدة</Label>
+				<Label className="text-sm font-medium">{t("customizer.columns")}</Label>
 				<div className="flex flex-wrap gap-2">
 					{([
-						["showItemNumber", "رقم البند"],
-						["showDescription", "الوصف"],
-						["showSpecifications", "المواصفات"],
-						["showQuantity", "الكمية"],
-						["showUnit", "الوحدة"],
-						["showUnitPrice", "سعر الوحدة"],
-						["showItemTotal", "الإجمالي"],
+						["showItemNumber", t("table.itemNumber")],
+						["showDescription", t("table.description")],
+						["showSpecifications", t("table.specifications")],
+						["showQuantity", t("table.quantity")],
+						["showUnit", t("table.unit")],
+						["showUnitPrice", t("table.unitPrice")],
+						["showItemTotal", t("table.total")],
 					] as const).map(([key, label]) => (
 						<CheckboxPill
 							key={key}
@@ -102,14 +104,14 @@ export function QuotationCustomizer({
 
 			{/* Sections */}
 			<div className="space-y-2">
-				<Label className="text-sm font-medium">الأقسام</Label>
+				<Label className="text-sm font-medium">{t("customizer.sections")}</Label>
 				<div className="flex flex-wrap gap-2">
 					{([
-						["showStructural", "الأعمال الإنشائية"],
-						["showFinishing", "أعمال التشطيبات"],
-						["showMEP", "الأعمال الكهروميكانيكية"],
-						["showManualItems", "البنود اليدوية"],
-						["showMaterialDetails", "تفاصيل المواد"],
+						["showStructural", t("sections.structuralWorks")],
+						["showFinishing", t("sections.finishingWorks")],
+						["showMEP", t("sections.mepWorks")],
+						["showManualItems", t("sections.manualItems")],
+						["showMaterialDetails", t("sections.materialDetails")],
 					] as const).map(([key, label]) => (
 						<CheckboxPill
 							key={key}
@@ -123,7 +125,7 @@ export function QuotationCustomizer({
 
 			{/* Grouping */}
 			<div className="space-y-2">
-				<Label className="text-sm font-medium">التجميع</Label>
+				<Label className="text-sm font-medium">{t("customizer.grouping")}</Label>
 				<div className="flex gap-2 flex-wrap">
 					{GROUPING_OPTIONS.map((opt) => (
 						<button
@@ -137,7 +139,7 @@ export function QuotationCustomizer({
 									: "border-border hover:border-muted-foreground/30",
 							)}
 						>
-							{opt.label}
+							{t(opt.labelKey)}
 						</button>
 					))}
 				</div>
@@ -145,15 +147,15 @@ export function QuotationCustomizer({
 
 			{/* Totals */}
 			<div className="space-y-2">
-				<Label className="text-sm font-medium">المجاميع</Label>
+				<Label className="text-sm font-medium">{t("customizer.totals")}</Label>
 				<div className="flex flex-wrap gap-2">
 					{([
-						["showSectionSubtotal", "المجموع الفرعي لكل قسم"],
-						["showSubtotal", "الإجمالي قبل الضريبة"],
-						["showVAT", "ضريبة القيمة المضافة"],
-						["showGrandTotal", "الإجمالي النهائي"],
-						["showDiscount", "الخصم"],
-						["showPricePerSqm", "تكلفة المتر المربع"],
+						["showSectionSubtotal", t("totals.sectionSubtotal")],
+						["showSubtotal", t("totals.beforeVat")],
+						["showVAT", t("totals.vatLabel")],
+						["showGrandTotal", t("totals.grandTotal")],
+						["showDiscount", t("totals.discount")],
+						["showPricePerSqm", t("totals.pricePerSqmCost")],
 					] as const).map(([key, label]) => (
 						<CheckboxPill
 							key={key}
@@ -167,7 +169,7 @@ export function QuotationCustomizer({
 
 			{/* Mini preview */}
 			<div className="space-y-2">
-				<Label className="text-sm font-medium">معاينة فورية</Label>
+				<Label className="text-sm font-medium">{t("customizer.livePreview")}</Label>
 				<div className="rounded-lg border border-border overflow-hidden">
 					{isLoading ? (
 						<div className="flex justify-center py-6">
@@ -179,12 +181,12 @@ export function QuotationCustomizer({
 								<thead>
 									<tr className="border-b bg-muted/30 text-muted-foreground">
 										{config.showItemNumber && <th className="px-2 py-2 text-right font-medium">#</th>}
-										{config.showDescription && <th className="px-2 py-2 text-right font-medium">الوصف</th>}
-										{config.showSpecifications && <th className="px-2 py-2 text-center font-medium">المواصفات</th>}
-										{config.showQuantity && <th className="px-2 py-2 text-center font-medium">الكمية</th>}
-										{config.showUnit && <th className="px-2 py-2 text-center font-medium">الوحدة</th>}
-										{config.showUnitPrice && <th className="px-2 py-2 text-center font-medium">سعر الوحدة</th>}
-										{config.showItemTotal && <th className="px-2 py-2 text-center font-medium">الإجمالي</th>}
+										{config.showDescription && <th className="px-2 py-2 text-right font-medium">{t("table.description")}</th>}
+										{config.showSpecifications && <th className="px-2 py-2 text-center font-medium">{t("table.specifications")}</th>}
+										{config.showQuantity && <th className="px-2 py-2 text-center font-medium">{t("table.quantity")}</th>}
+										{config.showUnit && <th className="px-2 py-2 text-center font-medium">{t("table.unit")}</th>}
+										{config.showUnitPrice && <th className="px-2 py-2 text-center font-medium">{t("table.unitPrice")}</th>}
+										{config.showItemTotal && <th className="px-2 py-2 text-center font-medium">{t("table.total")}</th>}
 									</tr>
 								</thead>
 								<tbody>
@@ -202,7 +204,7 @@ export function QuotationCustomizer({
 									{sampleItems.length === 0 && (
 										<tr>
 											<td colSpan={7} className="text-center py-4 text-muted-foreground">
-												لا توجد بنود
+												{t("customizer.noItems")}
 											</td>
 										</tr>
 									)}
@@ -216,10 +218,10 @@ export function QuotationCustomizer({
 			{/* Actions */}
 			<div className="flex gap-3 justify-between">
 				<Button variant="outline" onClick={onBack} className="rounded-xl">
-					← رجوع
+					← {t("actions.back")}
 				</Button>
 				<Button onClick={onNext} className="rounded-xl">
-					بيانات العرض →
+					{t("actions.quotationData")} →
 				</Button>
 			</div>
 		</div>

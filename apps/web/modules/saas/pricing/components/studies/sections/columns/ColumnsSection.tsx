@@ -196,7 +196,7 @@ export function ColumnsSection({
 										variant="default"
 										className="bg-purple-600 text-xs"
 									>
-										{repeatedCount} أدوار
+										{t("pricing.studies.structural.sections.columns.floorsCount", { count: repeatedCount })}
 									</Badge>
 								)}
 								{floor.id === "ground" && neckEnabled && (
@@ -204,12 +204,12 @@ export function ColumnsSection({
 										variant="secondary"
 										className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
 									>
-										+ رقاب
+										{t("pricing.studies.structural.sections.columns.plusNecks")}
 									</Badge>
 								)}
 								{hasItems && (
 									<Badge variant="secondary" className="text-xs">
-										{floorItems.length} عنصر
+										{t("pricing.studies.structural.sections.common.itemsCount", { count: floorItems.length })}
 									</Badge>
 								)}
 							</div>
@@ -217,7 +217,7 @@ export function ColumnsSection({
 								<div className="hidden sm:flex items-center gap-3 text-xs text-muted-foreground">
 									{displayConcrete > 0 && (
 										<span>
-											خرسانة:{" "}
+											{t("pricing.studies.structural.sections.common.concrete")}:{" "}
 											<span className="font-semibold text-blue-600">
 												{formatNumber(displayConcrete)} م³
 											</span>
@@ -225,7 +225,7 @@ export function ColumnsSection({
 									)}
 									{displaySteel > 0 && (
 										<span>
-											حديد:{" "}
+											{t("pricing.studies.structural.sections.common.steel")}:{" "}
 											<span className="font-semibold text-orange-600">
 												{formatNumber(displaySteel)} كجم
 											</span>
@@ -281,10 +281,10 @@ export function ColumnsSection({
 												>
 													<Plus className="h-5 w-5 ml-2" />
 													<span className="font-semibold">
-														إضافة رقاب الأعمدة
+														{t("pricing.studies.structural.sections.columns.addNeckColumns")}
 													</span>
 													<span className="text-xs mr-2 text-amber-600/70 dark:text-amber-500/70">
-														(الجزء المدفون تحت الأرض)
+														{t("pricing.studies.structural.sections.columns.neckHint")}
 													</span>
 												</Button>
 											)
@@ -297,7 +297,7 @@ export function ColumnsSection({
 										<div className="flex items-center gap-3 bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200/50 rounded-lg p-3">
 											<Layers className="h-5 w-5 text-purple-600" />
 											<Label className="font-medium text-sm">
-												عدد الأدوار المتكررة:
+												{t("pricing.studies.structural.sections.columns.repeatedFloorsCount")}:
 											</Label>
 											<Input
 												type="number"
@@ -314,8 +314,7 @@ export function ColumnsSection({
 												className="w-20 h-8 text-center font-bold"
 											/>
 											<span className="text-xs text-muted-foreground">
-												أضف الأعمدة مرة واحدة وسيتم تطبيقها على{" "}
-												{repeatedCount} أدوار
+												{t("pricing.studies.structural.sections.columns.repeatedHint", { count: repeatedCount })}
 											</span>
 										</div>
 
@@ -324,7 +323,7 @@ export function ColumnsSection({
 											<div className="flex items-center gap-2 mb-3">
 												<Copy className="h-4 w-4 text-purple-600" />
 												<h5 className="font-medium text-sm">
-													قالب الأعمدة (يُطبق على كل دور)
+													{t("pricing.studies.structural.sections.columns.columnsTemplate")}
 												</h5>
 											</div>
 											<FloorColumnsPanel
@@ -356,7 +355,7 @@ export function ColumnsSection({
 												<div className="flex items-center gap-2">
 													<Building2 className="h-4 w-4 text-purple-600" />
 													<h5 className="font-medium text-sm">
-														تفصيل الأدوار المتكررة
+														{t("pricing.studies.structural.sections.columns.repeatedDetail")}
 													</h5>
 												</div>
 												{Array.from(
@@ -391,24 +390,24 @@ export function ColumnsSection({
 																			<ChevronLeft className="h-3 w-3 text-muted-foreground" />
 																		)}
 																		<span className="font-medium">
-																			الدور المتكرر {floorNum}
+																			{t("pricing.studies.structural.sections.columns.repeatedFloor", { number: floorNum })}
 																		</span>
 																		<Badge
 																			variant="outline"
 																			className="text-xs"
 																		>
-																			{floorItems.length} عنصر
+																			{t("pricing.studies.structural.sections.common.itemsCount", { count: floorItems.length })}
 																		</Badge>
 																	</div>
 																	<div className="flex items-center gap-3 text-xs text-muted-foreground">
 																		<span>
-																			خرسانة:{" "}
+																			{t("pricing.studies.structural.sections.common.concrete")}:{" "}
 																			<span className="font-semibold text-blue-600">
 																				{formatNumber(perFloorConcrete)} م³
 																			</span>
 																		</span>
 																		<span>
-																			حديد:{" "}
+																			{t("pricing.studies.structural.sections.common.steel")}:{" "}
 																			<span className="font-semibold text-orange-600">
 																				{formatNumber(perFloorSteel)} كجم
 																			</span>
@@ -480,15 +479,13 @@ export function ColumnsSection({
 																		</Table>
 																		<div className="bg-muted/30 rounded p-2 mt-2 flex gap-4 text-xs">
 																			<span>
-																				إجمالي الدور {floorNum}:{" "}
+																				{t("pricing.studies.structural.sections.columns.floorTotal", { number: floorNum })}:{" "}
 																			</span>
 																			<span className="font-bold text-blue-600">
-																				{formatNumber(perFloorConcrete)} م³
-																				خرسانة
+																				{formatNumber(perFloorConcrete)} م³ {t("pricing.studies.structural.sections.common.concrete")}
 																			</span>
 																			<span className="font-bold text-orange-600">
-																				{formatNumber(perFloorSteel)} كجم
-																				حديد
+																				{formatNumber(perFloorSteel)} كجم {t("pricing.studies.structural.sections.common.steel")}
 																			</span>
 																		</div>
 																	</div>
@@ -503,17 +500,17 @@ export function ColumnsSection({
 													<div className="flex items-center justify-between">
 														<span className="font-semibold text-sm flex items-center gap-2">
 															<Layers className="h-4 w-4 text-purple-600" />
-															إجمالي {repeatedCount} أدوار متكررة
+															{t("pricing.studies.structural.sections.columns.repeatedTotal", { count: repeatedCount })}
 														</span>
 														<div className="flex gap-4 text-sm">
 															<span>
-																خرسانة:{" "}
+																{t("pricing.studies.structural.sections.common.concrete")}:{" "}
 																<span className="font-bold text-blue-600">
 																	{formatNumber(repeatedConcrete)} م³
 																</span>
 															</span>
 															<span>
-																حديد:{" "}
+																{t("pricing.studies.structural.sections.common.steel")}:{" "}
 																<span className="font-bold text-orange-600">
 																	{formatNumber(repeatedSteel)} كجم
 																</span>
@@ -561,15 +558,15 @@ export function ColumnsSection({
 				<div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
 					<div className="flex items-center gap-2 mb-2">
 						<Building2 className="h-5 w-5 text-primary" />
-						<h4 className="font-semibold">إجمالي جميع الأدوار</h4>
+						<h4 className="font-semibold">{t("pricing.studies.structural.sections.columns.allFloorsTotal")}</h4>
 						{repeatedCount > 1 && repeatedTemplateItems.length > 0 && (
 							<span className="text-xs text-muted-foreground">
-								(يشمل {repeatedCount} أدوار متكررة)
+								{t("pricing.studies.structural.sections.columns.includesRepeated", { count: repeatedCount })}
 							</span>
 						)}
 						{neckEnabled && groundColumns.length > 0 && (
 							<span className="text-xs text-muted-foreground">
-								(يشمل رقاب الأعمدة)
+								{t("pricing.studies.structural.sections.columns.includesNecks")}
 							</span>
 						)}
 					</div>

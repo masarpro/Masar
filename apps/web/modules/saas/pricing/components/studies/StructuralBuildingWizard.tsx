@@ -22,6 +22,7 @@ import {
 	Ruler,
 	Settings2,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import type {
 	StructuralBuildingConfig,
@@ -62,6 +63,7 @@ export function StructuralBuildingWizard({
 	onSkip,
 	isSaving = false,
 }: StructuralBuildingWizardProps) {
+	const t = useTranslations("pricing.studies.buildingWizard");
 	const [config, setConfig] = useState<StructuralBuildingConfig>(() => {
 		if (initialConfig && initialConfig.floors.length > 0) {
 			return { ...initialConfig };
@@ -115,9 +117,7 @@ export function StructuralBuildingWizard({
 				if (willDisable) {
 					const count = existingItemCounts[existing.id] || 0;
 					if (count > 0) {
-						toast.warning(
-							`هذا الدور له ${count} بنود — ستظل البنود موجودة لكن بدون دور مرتبط`,
-						);
+						toast.warning(t("floorHasItems", { count }));
 					}
 				}
 				return {
@@ -174,9 +174,7 @@ export function StructuralBuildingWizard({
 			const lastUpper = uppers[uppers.length - 1];
 			const count = existingItemCounts[lastUpper.id] || 0;
 			if (count > 0) {
-				toast.warning(
-					`هذا الدور له ${count} بنود — ستظل البنود موجودة لكن بدون دور مرتبط`,
-				);
+				toast.warning(t("floorHasItems", { count }));
 			}
 			return {
 				...prev,
@@ -225,8 +223,8 @@ export function StructuralBuildingWizard({
 
 	const handleSave = useCallback(async () => {
 		await onSave({ ...config, isComplete: true });
-		toast.success("تم حفظ إعداد المبنى بنجاح");
-	}, [config, onSave]);
+		toast.success(t("savedSuccess"));
+	}, [config, onSave, t]);
 
 	// ─── Render ───
 
@@ -236,18 +234,18 @@ export function StructuralBuildingWizard({
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
 						<Building2 className="h-6 w-6 text-primary" />
-						<CardTitle className="text-lg">معالج إعداد المبنى الإنشائي</CardTitle>
+						<CardTitle className="text-lg">{t("title")}</CardTitle>
 					</div>
 					<Button variant="ghost" size="sm" onClick={onSkip}>
 						<SkipForward className="h-4 w-4 ml-1" />
-						تخطي
+						{t("skip")}
 					</Button>
 				</div>
 			</CardHeader>
 			<CardContent className="space-y-6">
 				{/* ── Floor type toggles ── */}
 				<div>
-					<Label className="text-base font-semibold mb-3 block">اختر الأدوار:</Label>
+					<Label className="text-base font-semibold mb-3 block">{t("chooseFloors")}</Label>
 					<div className="flex flex-wrap gap-2">
 						{STRUCTURAL_FLOOR_DEFINITIONS.map((def) => {
 							if (def.type === "upper") {
@@ -260,7 +258,7 @@ export function StructuralBuildingWizard({
 											className="gap-1"
 										>
 											<Plus className="h-3 w-3" />
-											{def.icon} دور علوي
+											{def.icon} {t("upperFloor")}
 											{upperFloorCount > 0 && (
 												<Badge variant="secondary" className="mr-1 text-xs">
 													{upperFloorCount}
@@ -290,7 +288,7 @@ export function StructuralBuildingWizard({
 											onClick={() => toggleFloorType("repeated")}
 											className="gap-1"
 										>
-											{def.icon} متكرر
+											{def.icon} {t("repeatedFloor")}
 										</Button>
 										{isEnabled && (
 											<div className="flex items-center gap-1">
@@ -333,7 +331,7 @@ export function StructuralBuildingWizard({
 
 				{/* ── Height mode toggle ── */}
 				<div>
-					<Label className="text-base font-semibold mb-3 block">وضع الارتفاع:</Label>
+					<Label className="text-base font-semibold mb-3 block">{t("heightMode")}</Label>
 					<div className="flex gap-2">
 						<Button
 							variant={heightInputMode === "manual" ? "primary" : "outline"}
@@ -342,7 +340,7 @@ export function StructuralBuildingWizard({
 							className="gap-1"
 						>
 							<Ruler className="h-4 w-4" />
-							ارتفاع يدوي
+							{t("manualHeight")}
 						</Button>
 						<Button
 							variant={heightInputMode === "levels" ? "primary" : "outline"}
@@ -351,7 +349,7 @@ export function StructuralBuildingWizard({
 							className="gap-1"
 						>
 							<Ruler className="h-4 w-4" />
-							مناسيب من المخططات
+							{t("levelsFromDrawings")}
 						</Button>
 					</div>
 				</div>
@@ -359,23 +357,23 @@ export function StructuralBuildingWizard({
 				{/* ── Floor details table ── */}
 				{enabledFloors.length > 0 && (
 					<div>
-						<Label className="text-base font-semibold mb-3 block">تفاصيل الأدوار المختارة:</Label>
+						<Label className="text-base font-semibold mb-3 block">{t("selectedFloorsDetails")}</Label>
 						<div className="border rounded-lg overflow-hidden overflow-x-auto">
 							<table className="w-full text-sm">
 								<thead className="bg-muted/50">
 									<tr>
-										<th className="text-right p-2 font-medium">الدور</th>
+										<th className="text-right p-2 font-medium">{t("floor")}</th>
 										{heightInputMode === "levels" ? (
 											<>
-												<th className="text-right p-2 font-medium">المنسوب (م)</th>
-												<th className="text-right p-2 font-medium">الارتفاع (محسوب)</th>
+												<th className="text-right p-2 font-medium">{t("levelM")}</th>
+												<th className="text-right p-2 font-medium">{t("heightCalculated")}</th>
 											</>
 										) : (
-											<th className="text-right p-2 font-medium">الارتفاع (م)</th>
+											<th className="text-right p-2 font-medium">{t("heightM")}</th>
 										)}
-										<th className="text-right p-2 font-medium">مساحة السقف (م²)</th>
+										<th className="text-right p-2 font-medium">{t("slabAreaM2")}</th>
 										{enabledFloors.some((f) => f.isRepeated) && (
-											<th className="text-right p-2 font-medium">التكرار</th>
+											<th className="text-right p-2 font-medium">{t("repetition")}</th>
 										)}
 									</tr>
 								</thead>
@@ -453,7 +451,7 @@ export function StructuralBuildingWizard({
 											<td className="p-2">
 												<span className="flex items-center gap-2">
 													<span>🧱</span>
-													<span className="font-medium">الدروة</span>
+													<span className="font-medium">{t("parapet")}</span>
 												</span>
 											</td>
 											<td className="p-2">
@@ -500,10 +498,10 @@ export function StructuralBuildingWizard({
 								updateHeightProperties({ hasParapet: checked })
 							}
 						/>
-						<Label className="text-sm font-medium">هل يوجد دروة سطح؟</Label>
+						<Label className="text-sm font-medium">{t("hasParapet")}</Label>
 						{heightProps.hasParapet && (
 							<div className="flex items-center gap-2 mr-4">
-								<Label className="text-xs text-muted-foreground">ارتفاع الدروة (سم):</Label>
+								<Label className="text-xs text-muted-foreground">{t("parapetHeightCm")}:</Label>
 								<Input
 									type="number"
 									step="10"
@@ -525,7 +523,7 @@ export function StructuralBuildingWizard({
 						<Button variant="outline" className="w-full justify-between" size="sm">
 							<span className="flex items-center gap-2">
 								<Settings2 className="h-4 w-4" />
-								خصائص المبنى
+								{t("buildingProperties")}
 							</span>
 							<ChevronDown className={`h-4 w-4 transition-transform ${propertiesOpen ? "rotate-180" : ""}`} />
 						</Button>
@@ -534,10 +532,10 @@ export function StructuralBuildingWizard({
 						<div className="border rounded-lg p-4 space-y-4 bg-muted/20">
 							{/* Foundation zone */}
 							<div>
-								<h5 className="text-sm font-semibold mb-3">منطقة الأساسات</h5>
+								<h5 className="text-sm font-semibold mb-3">{t("foundationZone")}</h5>
 								<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 									<div>
-										<Label className="text-xs">عمق الحفر (م)</Label>
+										<Label className="text-xs">{t("excavationDepthM")}</Label>
 										<Input
 											type="number"
 											step="0.1"
@@ -550,7 +548,7 @@ export function StructuralBuildingWizard({
 										/>
 									</div>
 									<div>
-										<Label className="text-xs">منسوب الشارع (م)</Label>
+										<Label className="text-xs">{t("streetLevelM")}</Label>
 										<Input
 											type="number"
 											step="0.1"
@@ -562,7 +560,7 @@ export function StructuralBuildingWizard({
 										/>
 									</div>
 									<div>
-										<Label className="text-xs">ارتفاع المبنى عن الشارع (سم)</Label>
+										<Label className="text-xs">{t("buildingElevationCm")}</Label>
 										<Input
 											type="number"
 											step="5"
@@ -575,7 +573,7 @@ export function StructuralBuildingWizard({
 										/>
 									</div>
 									<div>
-										<Label className="text-xs">سمك الخرسانة العادية (سم)</Label>
+										<Label className="text-xs">{t("plainConcreteThicknessCm")}</Label>
 										<Input
 											type="number"
 											step="5"
@@ -588,7 +586,7 @@ export function StructuralBuildingWizard({
 										/>
 									</div>
 									<div>
-										<Label className="text-xs">عمق القاعدة (سم)</Label>
+										<Label className="text-xs">{t("foundationDepthCm")}</Label>
 										<Input
 											type="number"
 											step="5"
@@ -601,7 +599,7 @@ export function StructuralBuildingWizard({
 										/>
 									</div>
 									<div>
-										<Label className="text-xs">عمق الميدة (سم)</Label>
+										<Label className="text-xs">{t("beamDepthCm")}</Label>
 										<Input
 											type="number"
 											step="5"
@@ -618,10 +616,10 @@ export function StructuralBuildingWizard({
 
 							{/* Slab/beam defaults */}
 							<div>
-								<h5 className="text-sm font-semibold mb-3">أبعاد افتراضية</h5>
+								<h5 className="text-sm font-semibold mb-3">{t("defaultDimensions")}</h5>
 								<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 									<div>
-										<Label className="text-xs">سمك السقف الافتراضي (سم)</Label>
+										<Label className="text-xs">{t("defaultSlabThicknessCm")}</Label>
 										<Input
 											type="number"
 											step="5"
@@ -634,7 +632,7 @@ export function StructuralBuildingWizard({
 										/>
 									</div>
 									<div>
-										<Label className="text-xs">عمق الكمرة الافتراضي (سم)</Label>
+										<Label className="text-xs">{t("defaultBeamDepthCm")}</Label>
 										<Input
 											type="number"
 											step="5"
@@ -652,7 +650,7 @@ export function StructuralBuildingWizard({
 							{/* Finish/levels settings */}
 							{heightInputMode === "levels" && (
 								<div>
-									<h5 className="text-sm font-semibold mb-3">إعدادات المناسيب</h5>
+									<h5 className="text-sm font-semibold mb-3">{t("levelsSettings")}</h5>
 									<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 										<div className="flex items-center gap-2 col-span-2">
 											<Switch
@@ -661,10 +659,10 @@ export function StructuralBuildingWizard({
 													updateHeightProperties({ includeFinishInLevels: checked })
 												}
 											/>
-											<Label className="text-xs">المناسيب تشمل التشطيب</Label>
+											<Label className="text-xs">{t("levelsIncludeFinish")}</Label>
 										</div>
 										<div>
-											<Label className="text-xs">سمك التشطيب (سم)</Label>
+											<Label className="text-xs">{t("finishThicknessCm")}</Label>
 											<Input
 												type="number"
 												step="1"
@@ -683,10 +681,10 @@ export function StructuralBuildingWizard({
 							{/* Parapet settings */}
 							{heightProps.hasParapet && (
 								<div>
-									<h5 className="text-sm font-semibold mb-3">الدروة</h5>
+									<h5 className="text-sm font-semibold mb-3">{t("parapet")}</h5>
 									<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 										<div>
-											<Label className="text-xs">ارتفاع الدروة (سم)</Label>
+											<Label className="text-xs">{t("parapetHeightCm")}</Label>
 											<Input
 												type="number"
 												step="10"
@@ -699,7 +697,7 @@ export function StructuralBuildingWizard({
 											/>
 										</div>
 										<div>
-											<Label className="text-xs">عمق الكمرة المقلوبة (سم)</Label>
+											<Label className="text-xs">{t("invertedBeamDepthCm")}</Label>
 											<Input
 												type="number"
 												step="5"
@@ -712,7 +710,7 @@ export function StructuralBuildingWizard({
 											/>
 										</div>
 										<div>
-											<Label className="text-xs">سمك عزل السطح (سم)</Label>
+											<Label className="text-xs">{t("roofWaterproofingCm")}</Label>
 											<Input
 												type="number"
 												step="5"
@@ -736,27 +734,27 @@ export function StructuralBuildingWizard({
 					<div className="bg-green-50/50 dark:bg-green-950/20 border border-green-200/50 rounded-lg p-4 space-y-2">
 						<h5 className="text-sm font-semibold flex items-center gap-2">
 							<Ruler className="h-4 w-4 text-green-600" />
-							ملخص الارتفاعات المحسوبة
+							{t("heightsSummary")}
 						</h5>
 						<div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
 							{derivation.neckHeight != null && (
 								<div>
-									<span className="text-xs text-muted-foreground">ارتفاع الرقبة:</span>
+									<span className="text-xs text-muted-foreground">{t("neckHeight")}</span>
 									<p className="font-bold">{formatNumber(derivation.neckHeight)} سم</p>
 								</div>
 							)}
 							{derivation.parapet && (
 								<div>
-									<span className="text-xs text-muted-foreground">بلوك الدروة:</span>
+									<span className="text-xs text-muted-foreground">{t("parapetBlock")}</span>
 									<p className="font-bold">{formatNumber(derivation.parapet.blockHeight)} سم</p>
 								</div>
 							)}
 							<div>
-								<span className="text-xs text-muted-foreground">ارتفاع المبنى:</span>
+								<span className="text-xs text-muted-foreground">{t("buildingHeight")}</span>
 								<p className="font-bold">{formatNumber(derivation.summary.totalBuildingHeight)} م</p>
 							</div>
 							<div>
-								<span className="text-xs text-muted-foreground">من الحفر للسطح:</span>
+								<span className="text-xs text-muted-foreground">{t("excavationToRoof")}</span>
 								<p className="font-bold">{formatNumber(derivation.summary.excavationToRoof)} م</p>
 							</div>
 						</div>
@@ -768,12 +766,12 @@ export function StructuralBuildingWizard({
 					<div className="bg-muted/50 rounded-lg p-3 flex items-center justify-between">
 						<div className="flex items-center gap-4 text-sm">
 							<span>
-								<span className="text-muted-foreground">عدد الأدوار:</span>{" "}
+								<span className="text-muted-foreground">{t("floorCount")}</span>{" "}
 								<span className="font-bold">{enabledFloors.length}</span>
 							</span>
 							<span className="text-muted-foreground/50">|</span>
 							<span>
-								<span className="text-muted-foreground">إجمالي المساحة:</span>{" "}
+								<span className="text-muted-foreground">{t("totalAreaLabel")}</span>{" "}
 								<span className="font-bold">{formatNumber(totalArea)} م²</span>
 							</span>
 						</div>
@@ -784,7 +782,7 @@ export function StructuralBuildingWizard({
 				<div className="flex justify-end">
 					<Button onClick={handleSave} disabled={isSaving}>
 						<Save className="h-4 w-4 ml-2" />
-						حفظ وبدء العمل
+						{t("saveAndStart")}
 					</Button>
 				</div>
 			</CardContent>

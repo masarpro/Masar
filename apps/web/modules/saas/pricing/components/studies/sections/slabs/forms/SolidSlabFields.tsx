@@ -82,25 +82,25 @@ export function SolidSlabFields({
 		<>
 			{/* الأبعاد */}
 			<DimensionsCard
-				title="أبعاد السقف"
+				title={t("pricing.studies.structural.sections.slabs.slabDimensions")}
 				dimensions={[
 					{
 						key: "length",
-						label: "الطول",
+						label: t("pricing.studies.structural.length"),
 						value: formData.length,
 						unit: "م",
 						step: 0.1,
 					},
 					{
 						key: "width",
-						label: "العرض",
+						label: t("pricing.studies.structural.width"),
 						value: formData.width,
 						unit: "م",
 						step: 0.1,
 					},
 					{
 						key: "thickness",
-						label: "السماكة",
+						label: t("pricing.studies.structural.thickness"),
 						value: formData.thickness,
 						unit: "سم",
 						step: 1,
@@ -116,13 +116,13 @@ export function SolidSlabFields({
 			<div className="border-t pt-4 space-y-4">
 				<h4 className="font-medium flex items-center gap-2">
 					<span className="w-2 h-2 rounded-full bg-primary" />
-					تسليح السقف
+					{t("pricing.studies.structural.sections.slabs.slabReinforcement")}
 				</h4>
 
 				{/* الشبكة السفلية */}
 				<div className="space-y-3">
 					<h5 className="text-sm font-medium text-blue-700">
-						الشبكة السفلية (الفرش)
+						{t("pricing.studies.structural.sections.slabs.bottomMesh")}
 					</h5>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 						<RebarMeshInput
@@ -197,7 +197,7 @@ export function SolidSlabFields({
 							htmlFor="hasTopMesh-solid"
 							className="text-sm font-medium text-green-700 cursor-pointer"
 						>
-							الشبكة العلوية (الغطاء) - للسحب السالب
+							{t("pricing.studies.structural.sections.slabs.topMesh")}
 						</Label>
 					</div>
 					{formData.hasTopMesh && (
@@ -260,21 +260,20 @@ export function SolidSlabFields({
 				<div className="flex items-center justify-between">
 					<h4 className="font-medium flex items-center gap-2">
 						<span className="text-lg">📏</span>
-						كمرات السقف الصلب
+						{t("pricing.studies.structural.sections.slabs.solidSlabBeams")}
 						{slabBeams.length > 0 && (
 							<Badge
 								variant="secondary"
 								className="text-xs"
 							>
-								{slabBeams.length} كمرة
+								{t("pricing.studies.structural.sections.slabs.beamsCount", { count: slabBeams.length })}
 							</Badge>
 						)}
 					</h4>
 				</div>
 
 				<p className="text-xs text-muted-foreground">
-					أضف الكمرات الحاملة للسقف الصلب — يتم حساب خرسانة
-					وحديد الكمرات منفصلاً ثم إضافتها لإجمالي السقف
+					{t("pricing.studies.structural.sections.slabs.beamsHint")}
 				</p>
 
 				{/* قائمة الكمرات */}
@@ -308,7 +307,7 @@ export function SolidSlabFields({
 					onClick={addBeam}
 				>
 					<Plus className="h-4 w-4 ml-2" />
-					<span className="font-semibold">إضافة كمرة</span>
+					<span className="font-semibold">{t("pricing.studies.structural.sections.slabs.addBeam")}</span>
 				</Button>
 
 				{/* ملخص الكمرات */}
@@ -318,13 +317,13 @@ export function SolidSlabFields({
 							<div className="flex items-center gap-2 mb-2">
 								<span className="text-sm">📏</span>
 								<h5 className="font-semibold text-sm">
-									إجمالي كمرات السقف
+									{t("pricing.studies.structural.sections.slabs.beamsTotal")}
 								</h5>
 							</div>
 							<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
 								<div>
 									<span className="text-muted-foreground">
-										خرسانة:
+										{t("pricing.studies.structural.sections.common.concrete")}:
 									</span>
 									<span className="font-bold mr-1 text-blue-600">
 										{formatNumber(
@@ -335,7 +334,7 @@ export function SolidSlabFields({
 								</div>
 								<div>
 									<span className="text-muted-foreground">
-										حديد (إجمالي):
+										{t("pricing.studies.structural.sections.slabs.steelGross")}:
 									</span>
 									<span className="font-bold mr-1 text-orange-600">
 										{formatNumber(
@@ -346,7 +345,7 @@ export function SolidSlabFields({
 								</div>
 								<div>
 									<span className="text-muted-foreground">
-										هالك:
+										{t("pricing.studies.structural.wastage")}:
 									</span>
 									<span className="font-bold mr-1 text-red-500">
 										{formatNumber(
@@ -374,7 +373,7 @@ export function SolidSlabFields({
 								) : (
 									<ChevronLeft className="h-3 w-3" />
 								)}
-								تفاصيل قص حديد الكمرات
+								{t("pricing.studies.structural.sections.slabs.beamCuttingDetails")}
 							</Button>
 
 							{showBeamCutting && (
@@ -383,25 +382,25 @@ export function SolidSlabFields({
 										<TableHeader>
 											<TableRow>
 												<TableHead className="text-right text-xs">
-													الوصف
+													{t("pricing.studies.structural.sections.common.description")}
 												</TableHead>
 												<TableHead className="text-right text-xs">
-													∅ القطر
+													∅ {t("pricing.studies.structural.diameter")}
 												</TableHead>
 												<TableHead className="text-right text-xs">
-													طول السيخ
+													{t("pricing.studies.structural.sections.common.barLength")}
 												</TableHead>
 												<TableHead className="text-right text-xs">
-													العدد
+													{t("pricing.studies.structural.quantity")}
 												</TableHead>
 												<TableHead className="text-right text-xs">
-													أسياخ مطلوبة
+													{t("pricing.studies.structural.sections.common.stocksNeeded")}
 												</TableHead>
 												<TableHead className="text-right text-xs">
-													الهالك
+													{t("pricing.studies.structural.wastage")}
 												</TableHead>
 												<TableHead className="text-right text-xs">
-													الوزن
+													{t("pricing.studies.structural.sections.common.weight")}
 												</TableHead>
 											</TableRow>
 										</TableHeader>
@@ -441,7 +440,7 @@ export function SolidSlabFields({
 									{/* الأسياخ المطلوبة من المصنع */}
 									<div className="bg-muted/30 p-3 border-t">
 										<h6 className="text-xs font-semibold mb-2">
-											أسياخ المصنع المطلوبة للكمرات:
+											{t("pricing.studies.structural.sections.slabs.factoryBarsForBeams")}:
 										</h6>
 										<div className="flex flex-wrap gap-3">
 											{beamsCalcs.stocksNeeded.map(
@@ -452,7 +451,7 @@ export function SolidSlabFields({
 														className="text-xs"
 													>
 														∅{s.diameter}مم: {s.count}{" "}
-														سيخ × {s.length}م
+														{t("pricing.studies.structural.sections.common.barUnit")} × {s.length}م
 													</Badge>
 												),
 											)}
@@ -518,7 +517,7 @@ export function SolidSlabFields({
 								htmlFor="showFormwork-solid"
 								className="text-sm font-medium cursor-pointer"
 							>
-								إظهار حساب الشدات
+								{t("pricing.studies.structural.sections.slabs.showFormwork")}
 							</Label>
 						</div>
 						{showFormwork && calculations.formworkArea > 0 && (
@@ -562,12 +561,12 @@ export function SolidSlabFields({
 							<div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
 								<h5 className="font-semibold text-sm mb-3 flex items-center gap-2">
 									<Calculator className="h-4 w-4 text-primary" />
-									الإجمالي الكلي (البلاطة + الكمرات)
+									{t("pricing.studies.structural.sections.slabs.combinedTotal")}
 								</h5>
 								<div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
 									<div>
 										<span className="text-muted-foreground text-xs">
-											خرسانة البلاطة:
+											{t("pricing.studies.structural.sections.slabs.slabConcrete")}:
 										</span>
 										<p className="font-bold">
 											{formatNumber(
@@ -578,7 +577,7 @@ export function SolidSlabFields({
 									</div>
 									<div>
 										<span className="text-muted-foreground text-xs">
-											خرسانة الكمرات:
+											{t("pricing.studies.structural.sections.slabs.beamsConcrete")}:
 										</span>
 										<p className="font-bold text-indigo-600">
 											{formatNumber(
@@ -589,7 +588,7 @@ export function SolidSlabFields({
 									</div>
 									<div>
 										<span className="text-muted-foreground text-xs">
-											حديد البلاطة:
+											{t("pricing.studies.structural.sections.slabs.slabSteel")}:
 										</span>
 										<p className="font-bold">
 											{formatNumber(
@@ -600,7 +599,7 @@ export function SolidSlabFields({
 									</div>
 									<div>
 										<span className="text-muted-foreground text-xs">
-											حديد الكمرات:
+											{t("pricing.studies.structural.sections.slabs.beamsSteel")}:
 										</span>
 										<p className="font-bold text-indigo-600">
 											{formatNumber(
@@ -613,7 +612,7 @@ export function SolidSlabFields({
 								<div className="border-t mt-3 pt-3 grid grid-cols-2 gap-4">
 									<div>
 										<span className="text-muted-foreground text-xs">
-											إجمالي الخرسانة:
+											{t("pricing.studies.summary.totalConcrete")}:
 										</span>
 										<p className="font-bold text-lg">
 											{formatNumber(
@@ -624,7 +623,7 @@ export function SolidSlabFields({
 									</div>
 									<div>
 										<span className="text-muted-foreground text-xs">
-											إجمالي الحديد:
+											{t("pricing.studies.structural.totalSteel")}:
 										</span>
 										<p className="font-bold text-lg">
 											{formatNumber(

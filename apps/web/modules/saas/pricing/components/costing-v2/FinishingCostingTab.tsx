@@ -18,6 +18,7 @@ import {
 	Sparkles,
 	Table2,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { formatNum } from "@saas/pricing/lib/utils";
@@ -94,6 +95,7 @@ export function FinishingCostingTab({
 	organizationId,
 	studyId,
 }: FinishingCostingTabProps) {
+	const t = useTranslations("pricing.costingV2");
 	const queryClient = useQueryClient();
 
 	// ─── View & UI state ───
@@ -124,15 +126,15 @@ export function FinishingCostingTab({
 		orpc.pricing.studies.costing.generate.mutationOptions({
 			onSuccess: (data: any) => {
 				if (data.generated > 0) {
-					toast.success(`تم توليد ${data.generated} بند تشطيبات للتسعير`);
+					toast.success(t("finishing.generatedSuccess", { count: data.generated }));
 				} else {
-					toast.info(data.message || "البنود موجودة مسبقاً");
+					toast.info(data.message || t("finishing.itemsExist"));
 				}
 				queryClient.invalidateQueries({
 					queryKey: [["pricing", "studies", "costing"]],
 				});
 			},
-			onError: (e: any) => toast.error(e.message || "حدث خطأ أثناء توليد البنود"),
+			onError: (e: any) => toast.error(e.message || t("finishing.generateError")),
 		}),
 	);
 
@@ -140,13 +142,13 @@ export function FinishingCostingTab({
 	const bulkUpdateMutation = useMutation(
 		orpc.pricing.studies.costing.bulkUpdate.mutationOptions({
 			onSuccess: () => {
-				toast.success("تم حفظ الأسعار بنجاح");
+				toast.success(t("common.pricesSaved"));
 				setIsDirty(false);
 				queryClient.invalidateQueries({
 					queryKey: [["pricing", "studies", "costing"]],
 				});
 			},
-			onError: (e: any) => toast.error(e.message || "حدث خطأ أثناء الحفظ"),
+			onError: (e: any) => toast.error(e.message || t("common.saveError")),
 		}),
 	);
 
@@ -158,7 +160,7 @@ export function FinishingCostingTab({
 					queryKey: [["pricing", "studies", "costing"]],
 				});
 			},
-			onError: (e: any) => toast.error(e.message || "حدث خطأ أثناء الحفظ"),
+			onError: (e: any) => toast.error(e.message || t("common.saveError")),
 		}),
 	);
 
@@ -332,8 +334,8 @@ export function FinishingCostingTab({
 				<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
 				<span className="text-sm text-muted-foreground">
 					{generateMutation.isPending
-						? "جاري توليد بنود التشطيبات..."
-						: "جاري تحميل البنود..."}
+						? t("finishing.generating")
+						: t("common.loadingItems")}
 				</span>
 			</div>
 		);
@@ -343,7 +345,7 @@ export function FinishingCostingTab({
 		return (
 			<div className="rounded-xl border border-border bg-card p-8 text-center space-y-4">
 				<p className="text-muted-foreground">
-					لا توجد بنود تشطيبات — يمكنك توليدها تلقائياً
+					{t("finishing.noItems")}
 				</p>
 				<Button
 					onClick={() =>
@@ -353,7 +355,7 @@ export function FinishingCostingTab({
 					className="gap-2"
 				>
 					<Sparkles className="h-4 w-4" />
-					توليد بنود التسعير
+					{t("finishing.generateButton")}
 				</Button>
 			</div>
 		);
@@ -379,7 +381,7 @@ export function FinishingCostingTab({
 						)}
 					>
 						<LayoutGrid className="h-3.5 w-3.5" />
-						بطاقات
+						{t("common.cardsView")}
 					</button>
 					<button
 						type="button"
@@ -392,7 +394,7 @@ export function FinishingCostingTab({
 						)}
 					>
 						<Table2 className="h-3.5 w-3.5" />
-						إدخال سريع
+						{t("common.quickEntryView")}
 					</button>
 				</div>
 
@@ -411,7 +413,7 @@ export function FinishingCostingTab({
 					) : (
 						<Save className="h-4 w-4" />
 					)}
-					حفظ الأسعار
+					{t("common.savePrices")}
 				</Button>
 			</div>
 
@@ -426,28 +428,28 @@ export function FinishingCostingTab({
 										#
 									</th>
 									<th className="px-3 py-2.5 text-right font-medium min-w-[200px]">
-										البند
+										{t("common.item")}
 									</th>
 									<th className="px-3 py-2.5 text-center font-medium w-20">
-										الكمية
+										{t("common.quantity")}
 									</th>
 									<th className="px-3 py-2.5 text-center font-medium w-16">
-										الوحدة
+										{t("common.unit")}
 									</th>
 									<th className="px-3 py-2.5 text-center font-medium w-16">
-										النوع
+										{t("common.type")}
 									</th>
 									<th className="px-3 py-2.5 text-center font-medium w-24">
-										سعر المادة
+										{t("common.materialPrice")}
 									</th>
 									<th className="px-3 py-2.5 text-center font-medium w-24">
-										المصنعية
+										{t("common.laborCost")}
 									</th>
 									<th className="px-3 py-2.5 text-center font-medium w-20">
-										التشوين%
+										{t("common.storagePercent")}
 									</th>
 									<th className="px-3 py-2.5 text-center font-medium w-28">
-										الإجمالي
+										{t("common.total")}
 									</th>
 								</tr>
 							</thead>
@@ -509,7 +511,7 @@ export function FinishingCostingTab({
 															: "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-700 dark:text-blue-400",
 													)}
 												>
-													{isLumpSum ? "مقطوعية" : "تفصيلي"}
+													{isLumpSum ? t("common.lumpSum") : t("common.detailed")}
 												</button>
 											</td>
 											{isLumpSum ? (
@@ -522,7 +524,7 @@ export function FinishingCostingTab({
 															type="number"
 															className="h-8 w-32 mx-auto text-center rounded-lg"
 															dir="ltr"
-															placeholder="المبلغ الإجمالي"
+															placeholder={t("common.totalAmount")}
 															value={ls.lumpSumTotal}
 															onChange={(e: any) =>
 																updateField(
@@ -591,7 +593,7 @@ export function FinishingCostingTab({
 												dir="ltr"
 											>
 												{rowTotal > 0
-													? formatNum(rowTotal) + " ر.س"
+													? `${formatNum(rowTotal)} ${t("common.sar")}`
 													: "—"}
 											</td>
 										</tr>
@@ -657,7 +659,7 @@ export function FinishingCostingTab({
 										</span>
 										{isLumpSum && (
 											<span className="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-700 dark:bg-amber-900/20 dark:border-amber-700 dark:text-amber-400">
-												مقطوعية
+												{t("common.lumpSum")}
 											</span>
 										)}
 									</div>
@@ -666,7 +668,7 @@ export function FinishingCostingTab({
 										dir="ltr"
 									>
 										{itemTotal > 0
-											? formatNum(itemTotal) + " ر.س"
+											? `${formatNum(itemTotal)} ${t("common.sar")}`
 											: "—"}
 									</span>
 								</button>
@@ -676,7 +678,7 @@ export function FinishingCostingTab({
 										{/* Pricing mode toggle */}
 										<div className="px-4 py-3 flex items-center gap-3 bg-muted/10">
 											<span className="text-xs text-muted-foreground">
-												نوع التسعير:
+												{t("common.pricingMode")}:
 											</span>
 											<div className="flex gap-1 rounded-md border border-border p-0.5">
 												<button
@@ -695,7 +697,7 @@ export function FinishingCostingTab({
 															: "text-muted-foreground hover:text-foreground",
 													)}
 												>
-													تفصيلي
+													{t("common.detailed")}
 												</button>
 												<button
 													type="button"
@@ -713,7 +715,7 @@ export function FinishingCostingTab({
 															: "text-muted-foreground hover:text-foreground",
 													)}
 												>
-													مقطوعية
+													{t("common.lumpSum")}
 												</button>
 											</div>
 										</div>
@@ -723,7 +725,7 @@ export function FinishingCostingTab({
 											<div className="px-4 py-4 space-y-3">
 												<div className="flex items-center gap-4">
 													<span className="text-sm text-muted-foreground w-28">
-														المبلغ الإجمالي:
+														{t("common.totalAmount")}:
 													</span>
 													<Input
 														type="number"
@@ -740,7 +742,7 @@ export function FinishingCostingTab({
 														}
 													/>
 													<span className="text-xs text-muted-foreground">
-														ر.س
+														{t("common.sar")}
 													</span>
 												</div>
 											</div>
@@ -750,7 +752,7 @@ export function FinishingCostingTab({
 												{/* Material cost */}
 												<div className="flex items-center gap-4 text-sm">
 													<span className="text-muted-foreground w-28">
-														سعر المادة:
+														{t("common.materialPrice")}:
 													</span>
 													<div className="flex items-center gap-2">
 														<Input
@@ -770,7 +772,7 @@ export function FinishingCostingTab({
 															}
 														/>
 														<span className="text-xs text-muted-foreground">
-															ر.س/{item.unit}
+															{t("common.sarPerUnit", { unit: item.unit })}
 														</span>
 														{materialTotal > 0 && (
 															<span
@@ -781,7 +783,7 @@ export function FinishingCostingTab({
 																{formatNum(
 																	materialTotal,
 																)}{" "}
-																ر.س
+																{t("common.sar")}
 															</span>
 														)}
 													</div>
@@ -790,7 +792,7 @@ export function FinishingCostingTab({
 												{/* Labor cost */}
 												<div className="flex items-center gap-4 text-sm">
 													<span className="text-muted-foreground w-28">
-														المصنعية:
+														{t("common.laborCost")}:
 													</span>
 													<div className="flex items-center gap-2">
 														<Input
@@ -808,7 +810,7 @@ export function FinishingCostingTab({
 															}
 														/>
 														<span className="text-xs text-muted-foreground">
-															ر.س/{item.unit}
+															{t("common.sarPerUnit", { unit: item.unit })}
 														</span>
 														{laborTotal > 0 && (
 															<span
@@ -819,7 +821,7 @@ export function FinishingCostingTab({
 																{formatNum(
 																	laborTotal,
 																)}{" "}
-																ر.س
+																{t("common.sar")}
 															</span>
 														)}
 													</div>
@@ -828,7 +830,7 @@ export function FinishingCostingTab({
 												{/* Storage cost */}
 												<div className="flex items-center gap-4 text-sm">
 													<span className="text-muted-foreground w-28">
-														التشوين:
+														{t("common.storage")}:
 													</span>
 													<div className="flex items-center gap-2">
 														<Input
@@ -859,7 +861,7 @@ export function FinishingCostingTab({
 																{formatNum(
 																	storageTotal,
 																)}{" "}
-																ر.س
+																{t("common.sar")}
 															</span>
 														)}
 													</div>
@@ -868,15 +870,14 @@ export function FinishingCostingTab({
 												{/* Item total */}
 												<div className="flex items-center gap-4 text-sm border-t border-border pt-3">
 													<span className="font-medium w-28">
-														إجمالي البند:
+														{t("finishing.itemTotal")}:
 													</span>
 													<span
 														className="font-bold text-primary"
 														dir="ltr"
 													>
 														{itemTotal > 0
-															? formatNum(itemTotal) +
-																" ر.س"
+															? `${formatNum(itemTotal)} ${t("common.sar")}`
 															: "—"}
 													</span>
 												</div>
@@ -894,25 +895,24 @@ export function FinishingCostingTab({
 			<div className="rounded-xl border-2 border-primary/30 bg-primary/5 px-5 py-4 flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<span className="font-bold text-base">
-						إجمالي التشطيبات
+						{t("finishing.grandTotal")}
 					</span>
 					<span className="text-xs text-muted-foreground">
-						({items.length} بند)
+						({t("common.itemsCount", { count: items.length })})
 					</span>
 				</div>
 				<span
 					className="text-lg font-bold text-primary tabular-nums"
 					dir="ltr"
 				>
-					{grandTotal > 0 ? formatNum(grandTotal) + " ر.س" : "—"}
+					{grandTotal > 0 ? `${formatNum(grandTotal)} ${t("common.sar")}` : "—"}
 				</span>
 			</div>
 
 			{/* ─── Dirty indicator ─── */}
 			{isDirty && (
 				<p className="text-xs text-muted-foreground text-center">
-					لديك تغييرات غير محفوظة — سيتم الحفظ تلقائياً أو اضغط "حفظ
-					الأسعار"
+					{t("common.unsavedChanges")}
 				</p>
 			)}
 		</div>

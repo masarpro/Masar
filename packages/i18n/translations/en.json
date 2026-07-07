@@ -4574,6 +4574,8 @@
       "title": "Expenses",
       "subtitle": "Manage organization expenses",
       "newSubtitle": "Record a new project expense",
+      "nonAccountingBadge": "Non-accounting",
+      "nonAccountingTooltip": "Informational field expense — does not affect bank balance or create a journal entry",
       "description": "Description",
       "new": "Add Expense",
       "create": "Add Expense",
@@ -6621,7 +6623,95 @@
         "noItems": "No items — add items manually",
         "itemAdded": "Item added",
         "itemUpdated": "Item updated",
-        "itemDeleted": "Item deleted"
+        "itemDeleted": "Item deleted",
+        "errorOccurred": "An error occurred",
+        "descriptionPlaceholder": "Item description...",
+        "notesPlaceholder": "Notes...",
+        "subCategoryPlaceholder": "Subcategory...",
+        "floorPlaceholder": "Floor...",
+        "itemTypePlaceholder": "Item type...",
+        "categories": {
+          "structural": {
+            "foundations": "Foundations",
+            "columns": "Columns",
+            "beams": "Beams",
+            "slabs": "Slabs",
+            "concreteWalls": "Concrete Walls",
+            "stairs": "Stairs",
+            "neckColumns": "Neck Columns",
+            "groundBeams": "Ground Beams",
+            "other": "Other"
+          },
+          "finishing": {
+            "flooring": "Flooring",
+            "walls": "Walls",
+            "ceilings": "Ceilings",
+            "painting": "Painting",
+            "doors": "Doors",
+            "windows": "Windows",
+            "kitchens": "Kitchens",
+            "bathrooms": "Bathrooms",
+            "facades": "Facades",
+            "other": "Other"
+          },
+          "mep": {
+            "electrical": "Electrical",
+            "plumbing": "Plumbing",
+            "hvac": "HVAC",
+            "firefighting": "Firefighting",
+            "elevators": "Elevators",
+            "smartSystems": "Smart Systems",
+            "other": "Other"
+          }
+        },
+        "scopeOptions": {
+          "per_floor": "Per Floor",
+          "whole_building": "Whole Building",
+          "external": "External",
+          "roof": "Roof"
+        }
+      },
+      "structuralSpecs": {
+        "title": "Structural Material Specifications",
+        "subtitle": "Automatic selections based on element type — you can modify them",
+        "structuralElement": "Structural Element",
+        "concreteType": "Concrete Grade",
+        "steelBrand": "Rebar Brand",
+        "selectBrand": "Select brand",
+        "hasIsolatedSteel": "Is epoxy-coated rebar used in the foundations?",
+        "element": "Element",
+        "steelQuantityKg": "Rebar Quantity (kg)",
+        "noQuantitiesYet": "Quantity data has not been entered yet — quantities will appear automatically once entered",
+        "blockSpecsTitle": "Block Specifications",
+        "wallCategory": "Wall Category",
+        "blockType": "Block Type",
+        "thickness": "Thickness",
+        "itemsCount": "({count} items)",
+        "noBlockData": "No block data was entered in the quantities stage",
+        "isolated": {
+          "foundations": "Footings",
+          "groundBeam": "Ground Beams",
+          "necks": "Column Necks"
+        },
+        "elements": {
+          "plainConcrete": "Blinding / Plain Concrete",
+          "foundations": "Footings & Foundations",
+          "columns": "Columns",
+          "beams": "Beams",
+          "slabs": "Slabs",
+          "stairs": "Stairs"
+        },
+        "brands": {
+          "sabic": "SABIC",
+          "rajhi": "Al-Rajhi Steel",
+          "yamamah": "Yamamah Steel",
+          "hadeed": "HADEED / ArcelorMittal",
+          "riyadh": "Riyadh Steel",
+          "jizan": "Jizan Steel",
+          "ittefaq": "Al-Ittefaq Steel",
+          "tuwairqi": "Al-Tuwairqi",
+          "other": "Other"
+        }
       }
     },
     "quotations": {
@@ -7397,6 +7487,108 @@
           "boundary": "Boundary Wall",
           "retaining": "Retaining Wall",
           "parapet": "Roof Parapet"
+        },
+        "sections": {
+          "common": {
+            "concrete": "Concrete",
+            "steel": "Steel",
+            "itemsCount": "{count} items",
+            "description": "Description",
+            "barLength": "Bar length",
+            "stocksNeeded": "Stock bars required",
+            "weight": "Weight",
+            "barUnit": "bars"
+          },
+          "stairs": {
+            "autoTitle": "Calculate staircases automatically from building configuration",
+            "autoButton": "Calculate staircases from building configuration",
+            "stairsCount": "{count} staircases",
+            "saveCount": "Save {count} staircases",
+            "requiredStairs": "Required staircases",
+            "unifiedDimensions": "Unified dimensions for all staircases",
+            "landingLength": "Landing length",
+            "riserHeight": "Riser height",
+            "treadDepth": "Tread depth",
+            "risersCount": "Number of risers",
+            "risers": "Risers",
+            "steps": "Steps",
+            "stair": "Staircase",
+            "stairDimensions": "Staircase dimensions",
+            "flightLength": "Flight (inclined) length",
+            "flightLengthShort": "Flight length",
+            "totalHeight": "Total height",
+            "resultsPerStair": "Calculation results per staircase",
+            "mainRebar": "Main reinforcement (longitudinal)",
+            "secondaryRebar": "Secondary reinforcement (distribution)",
+            "toasts": {
+              "created": "{count} staircases created successfully",
+              "saveError": "An error occurred while saving the staircases"
+            }
+          },
+          "columns": {
+            "floorsCount": "{count} floors",
+            "plusNecks": "+ Necks",
+            "addNeckColumns": "Add column necks",
+            "neckHint": "(the buried portion below grade)",
+            "repeatedFloorsCount": "Number of repeated floors",
+            "repeatedHint": "Add the columns once and they will be applied to {count} floors",
+            "columnsTemplate": "Column template (applied to each floor)",
+            "repeatedDetail": "Repeated floors breakdown",
+            "repeatedFloor": "Repeated floor {number}",
+            "floorTotal": "Floor {number} total",
+            "repeatedTotal": "Total for {count} repeated floors",
+            "allFloorsTotal": "Total for all floors",
+            "includesRepeated": "(includes {count} repeated floors)",
+            "includesNecks": "(includes column necks)"
+          },
+          "blocks": {
+            "selectCategory": "Select classification",
+            "selectCategoryPrompt": "Please select a wall classification to continue",
+            "floor": "Floor",
+            "derivedHint": "(derived)",
+            "grossArea": "Gross area",
+            "netArea": "Net area",
+            "openingsTitle": "Openings (doors and windows)",
+            "door": "Door",
+            "window": "Window",
+            "addLintels": "Add concrete lintels above openings",
+            "noOpenings": "No openings — add doors or windows if any",
+            "cementBags": "Cement bags",
+            "bagUnit": "bags",
+            "quantitiesDetails": "Quantity details",
+            "blockDetails": "Block details",
+            "netBlocks": "Net blocks",
+            "totalBlocks": "Total blocks",
+            "mortarDetails": "Mortar details",
+            "mortarVolume": "Mortar volume",
+            "sandVolume": "Sand volume",
+            "lintelsDetails": "Lintel details",
+            "lintelsCount": "Number of lintels",
+            "lintelUnit": "lintels",
+            "totalLength": "Total length",
+            "openingsSummary": "Openings summary",
+            "openingsArea": "Openings area"
+          },
+          "slabs": {
+            "slabDimensions": "Slab dimensions",
+            "slabReinforcement": "Slab reinforcement",
+            "bottomMesh": "Bottom mesh (main reinforcement)",
+            "topMesh": "Top mesh (cover) — for negative moment",
+            "solidSlabBeams": "Solid slab beams",
+            "beamsCount": "{count} beams",
+            "beamsHint": "Add the supporting beams for the solid slab — beam concrete and steel are calculated separately, then added to the slab totals",
+            "addBeam": "Add beam",
+            "beamsTotal": "Slab beams total",
+            "steelGross": "Steel (gross)",
+            "beamCuttingDetails": "Beam rebar cutting details",
+            "factoryBarsForBeams": "Factory stock bars required for beams",
+            "showFormwork": "Show formwork calculation",
+            "combinedTotal": "Grand total (slab + beams)",
+            "slabConcrete": "Slab concrete",
+            "beamsConcrete": "Beams concrete",
+            "slabSteel": "Slab steel",
+            "beamsSteel": "Beams steel"
+          }
         }
       },
       "finishing": {
@@ -8098,6 +8290,144 @@
         "finishing": "Finishing",
         "mep": "MEP",
         "pricing": "Pricing"
+      },
+      "boq": {
+        "itemsCount": "{count} items",
+        "concrete": "Concrete",
+        "steel": "Steel",
+        "blocks": "Blocks",
+        "concreteM3": "Concrete (m³)",
+        "steelKg": "Steel (kg)",
+        "description": "Description",
+        "unit": "Unit",
+        "material": "Material",
+        "weight": "Weight",
+        "weightTon": "Weight (ton)",
+        "formwork": "Formwork",
+        "totalBlocks": "Total Blocks",
+        "totalFormwork": "Total Formwork",
+        "cuttingDetails": "Cutting Details",
+        "cuttingDetailsUnavailable": "Cutting details unavailable — please update the item",
+        "pieceLength": "Cut Length",
+        "pieceLengthM": "Cut Length (m)",
+        "factoryBars": "Stock Bars",
+        "wastePercent": "Waste %",
+        "requiredFromFactory": "Required from factory",
+        "barUnit": "bars",
+        "diameterMm": "Diameter (mm)",
+        "stockLengthM": "Bar Length (m)",
+        "barsCount": "Number of Bars",
+        "factoryOrderTitle": "Factory Order — Reinforcement Steel",
+        "cuttingWorkshopTitle": "Cutting Details — Cutting Workshop",
+        "noFactoryData": "No factory order data",
+        "noCuttingData": "No cutting details",
+        "addItemsWithRebarFirst": "Add structural items with reinforcement data first",
+        "cutOperationsCount": "{count} cutting operations",
+        "factoryBarsCount": "{count} stock bars",
+        "export": "Export",
+        "print": {
+          "reportTitle": "Quantities Report",
+          "study": "Study",
+          "date": "Date",
+          "floor": "Floor",
+          "sectionTotal": "Section Total",
+          "footer": "This report was generated by Masar Platform — app-masar.com"
+        }
+      },
+      "import": {
+        "title": "Import Items",
+        "stepMethod": "Choose Method",
+        "stepData": "Enter Data",
+        "stepReview": "Review & Import",
+        "pasteFromExcel": "Paste from Excel",
+        "pasteFromExcelDesc": "Copy items from an Excel sheet and paste them here directly",
+        "manualEntry": "Manual Entry",
+        "manualEntryDesc": "Enter items one by one",
+        "pasteLabel": "Paste data from Excel",
+        "pastePlaceholder": "Paste data here...",
+        "expectedColumns": "Expected columns: Description, Unit, Quantity, Section (optional)",
+        "description": "Description",
+        "unit": "Unit",
+        "quantity": "Quantity",
+        "section": "Section",
+        "descriptionPlaceholder": "Item description",
+        "itemsCount": "{count} items",
+        "noItemsToImport": "No items to import",
+        "importing": "Importing...",
+        "importButton": "Import",
+        "success": "Successfully imported {count} items",
+        "error": "An error occurred during import"
+      },
+      "buildingWizard": {
+        "title": "Structural Building Setup Wizard",
+        "skip": "Skip",
+        "savedSuccess": "Building configuration saved successfully",
+        "floorHasItems": "This floor has {count} items — they will remain but without an associated floor",
+        "chooseFloors": "Select floors:",
+        "upperFloor": "Upper Floor",
+        "repeatedFloor": "Typical Floor",
+        "heightMode": "Height input mode:",
+        "manualHeight": "Manual Heights",
+        "levelsFromDrawings": "Levels from Drawings",
+        "selectedFloorsDetails": "Selected floor details:",
+        "floor": "Floor",
+        "levelM": "Level (m)",
+        "heightCalculated": "Height (calculated)",
+        "heightM": "Height (m)",
+        "slabAreaM2": "Slab Area (m²)",
+        "repetition": "Repetition",
+        "parapet": "Parapet",
+        "hasParapet": "Roof parapet?",
+        "parapetHeightCm": "Parapet height (cm)",
+        "buildingProperties": "Building Properties",
+        "foundationZone": "Foundation Zone",
+        "excavationDepthM": "Excavation depth (m)",
+        "streetLevelM": "Street level (m)",
+        "buildingElevationCm": "Building elevation above street (cm)",
+        "plainConcreteThicknessCm": "Blinding concrete thickness (cm)",
+        "foundationDepthCm": "Footing depth (cm)",
+        "beamDepthCm": "Ground beam depth (cm)",
+        "defaultDimensions": "Default Dimensions",
+        "defaultSlabThicknessCm": "Default slab thickness (cm)",
+        "defaultBeamDepthCm": "Default beam depth (cm)",
+        "levelsSettings": "Level Settings",
+        "levelsIncludeFinish": "Levels include finishes",
+        "finishThicknessCm": "Finish thickness (cm)",
+        "invertedBeamDepthCm": "Upstand beam depth (cm)",
+        "roofWaterproofingCm": "Roof waterproofing thickness (cm)",
+        "heightsSummary": "Derived Heights Summary",
+        "neckHeight": "Neck column height:",
+        "parapetBlock": "Parapet blockwork:",
+        "buildingHeight": "Building height:",
+        "excavationToRoof": "Excavation to roof:",
+        "floorCount": "Number of floors:",
+        "totalAreaLabel": "Total area:",
+        "saveAndStart": "Save & Start"
+      },
+      "resultsPanel": {
+        "efficiencyExcellent": "Excellent",
+        "efficiencyGood": "Good",
+        "efficiencyHigh": "High",
+        "cuttingEfficiency": "Cutting Efficiency",
+        "wasteSuffix": "waste",
+        "cuttingDetailsTitle": "Cutting & Distribution Details",
+        "netWeight": "Net Weight",
+        "grossWeight": "Gross Weight",
+        "waste": "Waste",
+        "steelDetailsTable": "Rebar Details Table",
+        "description": "Description",
+        "diameter": "Diameter",
+        "barLength": "Bar Length",
+        "count": "Count",
+        "cutsPerStock": "Cuts/Bar",
+        "bars": "Stock Bars",
+        "weight": "Weight",
+        "perBar": "({count} per bar)",
+        "spliceNotice": "Includes bars exceeding 12 m — lap splices (40d) calculated automatically per SBC 304",
+        "stocksFromFactory": "Stock Bars Required from Factory",
+        "stockBarSpec": "Bar Ø{diameter} mm × {length} m",
+        "wasteSuggestions": "Offcut Utilization Suggestions",
+        "wastePieceSpec": "{length} m × {count} pcs"
       }
     },
     "leads": {
@@ -8321,7 +8651,428 @@
     "recommended": "Recommended",
     "trialPeriod": "{count}-day free trial",
     "year": "{count, plural, one {per year} other {per # years}}",
-    "yearly": "Yearly"
+    "yearly": "Yearly",
+    "costingV2": {
+      "common": {
+        "save": "Save",
+        "saveError": "An error occurred while saving",
+        "pricesSaved": "Prices saved successfully",
+        "savePrices": "Save Prices",
+        "loadingItems": "Loading items...",
+        "item": "Item",
+        "quantity": "Quantity",
+        "unit": "Unit",
+        "type": "Type",
+        "price": "Price",
+        "total": "Total",
+        "materialPrice": "Material Price",
+        "laborCost": "Labor",
+        "storagePercent": "Storage %",
+        "storage": "Storage",
+        "detailed": "Detailed",
+        "lumpSum": "Lump Sum",
+        "itemsCount": "{count} items",
+        "sar": "SAR",
+        "riyal": "SAR",
+        "sarPerSqm": "SAR/m²",
+        "sarPerUnit": "SAR/{unit}",
+        "totalAmount": "Total Amount",
+        "pricingMode": "Pricing Mode",
+        "cardsView": "Cards",
+        "quickEntryView": "Quick Entry",
+        "unsavedChanges": "You have unsaved changes — they will be saved automatically, or click \"Save Prices\""
+      },
+      "labor": {
+        "modes": {
+          "perSqm": "Per Square Meter",
+          "perCbmTon": "Per Cubic Meter + Ton",
+          "lumpSum": "Lump Sum",
+          "salary": "Monthly Salary"
+        },
+        "sections": {
+          "structural": "Structural",
+          "finishing": "Finishing",
+          "mep": "MEP",
+          "labor": "General Labor",
+          "manual": "Manual Items"
+        },
+        "defaults": {
+          "fence": "Boundary Wall",
+          "parapet": "Parapet",
+          "decorations": "Concrete Decorative Elements",
+          "concretePouring": "Concrete Pouring Labor",
+          "steelWork": "Rebar Labor (Cutting, Bending & Fixing)",
+          "carpentry": "Carpentry / Formwork"
+        },
+        "laborSaved": "Labor data saved successfully",
+        "enterLaborData": "Please enter labor data",
+        "mezzanineRoofLabel": "Mezzanine Floor Slab",
+        "floorRoofLabel": "{floor} Floor Slab",
+        "extraFloorLabel": "Additional Floor {number}",
+        "typePerUnit": "Unit",
+        "typeSalary": "Salary",
+        "calcMethodLabel": "Structural Labor Calculation Method",
+        "perSqmTitle": "Structural Shell Labor per Square Meter",
+        "addFloor": "Add Floor",
+        "areaQuantity": "Area / Quantity",
+        "noSlabs": "No slabs added in the quantities section. Add slabs for floors to appear automatically, or add a floor manually.",
+        "autoBadge": "Auto",
+        "perCbmTitle": "Labor per Cubic Meter and Ton",
+        "lumpSumTitle": "Structural Shell Labor — Lump Sum",
+        "lumpSumAmountLabel": "Lump sum amount covering all structural labor works",
+        "salaryTitle": "Structural Labor by Monthly Salary",
+        "addWorker": "Add Worker",
+        "noWorkers": "No workers added yet",
+        "craft": "Trade",
+        "count": "Count",
+        "salary": "Salary",
+        "months": "Months",
+        "rowTotal": "Total",
+        "craftPlaceholder": "e.g. Carpenter",
+        "salariesTotal": "Total salaries:",
+        "insurance": "+ Insurance:",
+        "housing": "+ Housing:",
+        "grandTotalEquals": "= Total:",
+        "structuralLaborTotal": "Total Structural Labor",
+        "costPerSqm": "Cost per Square Meter",
+        "saveLabor": "Save Labor Costs",
+        "otherSectionsTitle": "Other Sections Labor (read-only)",
+        "method": "Method",
+        "structuralLaborShort": "Structural labor",
+        "otherSectionsShort": "Other sections labor",
+        "totalLabor": "Total Labor"
+      },
+      "finishing": {
+        "generatedSuccess": "Generated {count} finishing items for costing",
+        "itemsExist": "Items already exist",
+        "generateError": "An error occurred while generating items",
+        "generating": "Generating finishing items...",
+        "noItems": "No finishing items — you can generate them automatically",
+        "generateButton": "Generate Costing Items",
+        "itemTotal": "Item Total",
+        "grandTotal": "Total Finishing"
+      },
+      "mep": {
+        "sections": {
+          "electrical": "Electrical Works",
+          "plumbing": "Plumbing Works",
+          "hvac": "HVAC Works",
+          "fireFighting": "Fire Fighting Works"
+        },
+        "generateError": "An error occurred while generating items",
+        "lumpSumSaved": "Lump sum saved successfully",
+        "noCostingItems": "No costing items for this section",
+        "noItems": "No MEP items",
+        "detailedMode": "Detailed (item by item)",
+        "lumpSumMode": "Comprehensive Lump Sum",
+        "subcontractorLabel": "{section} — Subcontractor",
+        "riyalInclusive": "SAR (including materials, labor & storage)",
+        "contains": "Contains: {items}",
+        "emptySection": "No items in this section",
+        "sectionTotal": "Total {section}:",
+        "grandTotal": "Total MEP Works"
+      }
+    },
+    "pricingV2": {
+      "sections": {
+        "structural": "Structural",
+        "finishing": "Finishing",
+        "mep": "MEP",
+        "labor": "General Labor",
+        "manual": "Manual Items"
+      },
+      "common": {
+        "totalCost": "Total Cost",
+        "profitMarginPct": "Profit Margin (%)",
+        "calculatedMarkupPct": "Calculated Markup Percentage",
+        "savePrice": "Save Price"
+      },
+      "toasts": {
+        "markupSettingsSaved": "Markup settings saved",
+        "saveError": "An error occurred while saving",
+        "sectionMarkupsSaved": "Section markups saved",
+        "pricingStageApproved": "Pricing stage approved",
+        "approveError": "An error occurred during approval",
+        "enterValidSellingPrice": "Please enter a valid selling price",
+        "enterSqmPrice": "Please enter a price per square meter",
+        "addAtLeastOneItem": "Please add at least one item",
+        "itemsSaved": "{count} items saved successfully"
+      },
+      "locked": {
+        "title": "Pricing Stage Locked",
+        "description": "The cost pricing stage must be approved before starting pricing",
+        "backToCosting": "Back to Cost Pricing"
+      },
+      "methods": {
+        "title": "Markup Application Method",
+        "uniform": {
+          "label": "Uniform Percentage",
+          "desc": "Overhead + profit + contingency"
+        },
+        "perSection": {
+          "label": "Percentage per Section",
+          "desc": "Different markup per section"
+        },
+        "manualPrice": {
+          "label": "Manual Selling Price",
+          "desc": "Enter the desired selling price"
+        },
+        "perSqm": {
+          "label": "Price per Square Meter",
+          "desc": "Set the selling price per meter"
+        }
+      },
+      "hero": {
+        "directCost": "Direct Cost",
+        "costPerSqm": "Cost per Square Meter",
+        "buildingArea": "Building Area"
+      },
+      "uniform": {
+        "title": "Uniform percentage on total cost",
+        "totalMarkup": "Total Markup",
+        "estimatedSellingPrice": "Estimated Selling Price",
+        "estimatedSqmPrice": "Estimated Price per Meter"
+      },
+      "perSection": {
+        "title": "Custom markup per section",
+        "markupPct": "Markup (%)",
+        "save": "Save Markups"
+      },
+      "manualPrice": {
+        "title": "Enter the desired selling price (before VAT)",
+        "totalSellingPriceLabel": "Total Selling Price (SAR)",
+        "requestedSellingPrice": "Desired Selling Price",
+        "estimatedOverhead": "Estimated Overhead (25%)",
+        "estimatedNetProfit": "Estimated Net Profit",
+        "pricePerSqm": "Price per Square Meter"
+      },
+      "perSqm": {
+        "title": "Pricing by square meter",
+        "noAreaWarning": "The building area is not set in the study data. Please add the area first.",
+        "buildingArea": "Building Area:",
+        "currentCostPerSqm": "Current Cost per Meter:",
+        "priceLabel": "Selling Price per Square Meter (SAR/m²)",
+        "calculatedTotalSellingPrice": "Calculated Total Selling Price",
+        "profitPerMeter": "Profit per Meter"
+      },
+      "expenses": {
+        "title": "Additional Expenses",
+        "adminPct": "Administrative Expenses (%)",
+        "contingencyPct": "Contingency (%)",
+        "vat": "Value Added Tax",
+        "vatIncluded": "Included (15%)",
+        "save": "Save Settings"
+      },
+      "itemsTable": {
+        "title": "Adjust Item Prices ({count} items)",
+        "item": "Item",
+        "calculatedSellingPrice": "Calculated Selling Price",
+        "priceOverride": "Adjust Price",
+        "overriddenCount": "{count} manually adjusted items",
+        "resetAll": "Reset All"
+      },
+      "table": {
+        "section": "Section",
+        "cost": "Cost",
+        "sellingPrice": "Selling Price",
+        "unit": "Unit",
+        "quantity": "Quantity",
+        "description": "Description",
+        "unitPrice": "Unit Price",
+        "total": "Total",
+        "delete": "Delete"
+      },
+      "actions": {
+        "approvePricing": "Approve Pricing",
+        "quotation": "Quotation"
+      },
+      "lumpSum": {
+        "title": "Lump Sum Analysis",
+        "contractValue": "Contract Value",
+        "difference": "Difference",
+        "profit": "Profit",
+        "loss": "Loss",
+        "calculatedCost": "Calculated Cost",
+        "costPctOfContract": "Cost as a Percentage of Contract Value",
+        "profitPct": "Profit Percentage",
+        "safetyMargin": "Safety Margin",
+        "profitPerSqm": "Profit per Square Meter",
+        "costPctOfContractShort": "Cost as % of Contract",
+        "recommendation": "Recommendation",
+        "sectionComparisonTitle": "Cost Comparison by Section",
+        "sectionComparisonDesc": "Contract value allocated according to each section's share of total cost",
+        "contractShare": "Share of Contract",
+        "contractAllocated": "Allocated from Contract",
+        "margin": "Margin",
+        "recommendations": {
+          "excellent": {
+            "label": "Excellent",
+            "description": "Excellent profit margin — proceeding with the project is recommended"
+          },
+          "good": {
+            "label": "Good",
+            "description": "Good profit margin — acceptable for execution"
+          },
+          "acceptable": {
+            "label": "Acceptable",
+            "description": "Low profit margin — reviewing and reducing costs is recommended"
+          },
+          "weak": {
+            "label": "Weak",
+            "description": "Very weak profit margin — costs or the contract value must be reconsidered"
+          },
+          "loss": {
+            "label": "Loss",
+            "description": "The project will incur a loss — execution at these values is not recommended"
+          }
+        }
+      },
+      "quick": {
+        "title": "Quick Pricing",
+        "subtitle": "Enter items and prices directly to create a quick quotation",
+        "itemDescriptionPlaceholder": "Item description...",
+        "addItem": "Add Item",
+        "summaryTitle": "Pricing Summary",
+        "itemsCount": "Number of Items",
+        "profitMarginWithPct": "Profit Margin ({pct}%)",
+        "vat15": "Value Added Tax (15%)",
+        "grandTotal": "Grand Total",
+        "addVat15": "Add Value Added Tax (15%)",
+        "saveItems": "Save Items",
+        "createQuotation": "Create Quotation",
+        "approve": "Approve"
+      }
+    },
+    "quotationBuilder": {
+      "currency": "SAR",
+      "currencyPerSqm": "SAR/m²",
+      "notFound": "Quotation not found",
+      "actions": {
+        "back": "Back",
+        "print": "Print",
+        "exportPdf": "Export PDF",
+        "cancel": "Cancel",
+        "download": "Download",
+        "issueQuotation": "Issue Quotation",
+        "quotationData": "Quotation Details"
+      },
+      "formats": {
+        "detailedBoq": "Detailed (BOQ)",
+        "perSqm": "Per Square Meter",
+        "lumpSum": "Lump Sum",
+        "custom": "Custom"
+      },
+      "sectionLabels": {
+        "structural": "Structural",
+        "finishing": "Finishing",
+        "mep": "MEP",
+        "labor": "General Labor",
+        "manual": "Manual Items",
+        "other": "Other Items"
+      },
+      "preview": {
+        "draftWatermark": "DRAFT",
+        "title": "Quotation"
+      },
+      "sections": {
+        "clientInfo": "Client Information",
+        "generalTerms": "General Terms & Conditions",
+        "terms": "Terms & Conditions",
+        "termsShort": "Terms",
+        "amounts": "Amounts",
+        "structuralWorks": "Structural Works",
+        "finishingWorks": "Finishing Works",
+        "mepWorks": "MEP Works",
+        "manualItems": "Manual Items",
+        "materialDetails": "Material Details"
+      },
+      "fields": {
+        "number": "No.",
+        "date": "Date",
+        "validUntil": "Valid Until",
+        "days": "days",
+        "client": "Client",
+        "clientName": "Client Name",
+        "company": "Company",
+        "phone": "Phone",
+        "email": "Email",
+        "taxNumber": "VAT Number",
+        "totalArea": "Total Area",
+        "pricePerSqm": "Price per Square Meter",
+        "paymentTerms": "Payment Terms",
+        "deliveryTerms": "Execution Period",
+        "warranty": "Warranty",
+        "warrantyTerms": "Warranty Terms",
+        "notes": "Notes",
+        "filename": "File Name"
+      },
+      "placeholders": {
+        "clientName": "Ahmed Mohammed",
+        "company": "Modern Construction Co.",
+        "paymentTerms": "50% advance — 50% upon completion",
+        "deliveryTerms": "6 months from contract date",
+        "warrantyTerms": "One year on works",
+        "notes": "Additional notes..."
+      },
+      "discount": {
+        "none": "None",
+        "percent": "Percentage %",
+        "amount": "Amount"
+      },
+      "totals": {
+        "subtotal": "Subtotal",
+        "discount": "Discount",
+        "afterDiscount": "After Discount",
+        "vat": "VAT ({percent}%)",
+        "vatLabel": "VAT",
+        "beforeVat": "Total Before VAT",
+        "grandTotal": "Grand Total",
+        "total": "Total",
+        "sectionSubtotal": "Subtotal per Section",
+        "pricePerSqmCost": "Cost per Square Meter",
+        "amountInWords": "({words} Saudi Riyals)"
+      },
+      "lumpSum": {
+        "scopeOfWork": "Scope of Work",
+        "defaultDescription": "Construction and finishing as per the attached specifications",
+        "amount": "Lump Sum Amount",
+        "inclusionNote": "* The above amount includes all costs of materials, labor, equipment, and overheads"
+      },
+      "table": {
+        "itemNumber": "Item No.",
+        "description": "Description",
+        "specifications": "Specifications",
+        "quantity": "Quantity",
+        "unit": "Unit",
+        "unitPrice": "Unit Price",
+        "total": "Total",
+        "section": "Section",
+        "area": "Area",
+        "pricePerSqmShort": "Price/m²",
+        "sectionTotal": "{section} Subtotal"
+      },
+      "grouping": {
+        "bySection": "By Section",
+        "byFloor": "By Floor",
+        "byItem": "By Item",
+        "flat": "No Grouping"
+      },
+      "customizer": {
+        "title": "Customize Quotation",
+        "columns": "Columns",
+        "sections": "Sections",
+        "grouping": "Grouping",
+        "totals": "Totals",
+        "livePreview": "Live Preview",
+        "noItems": "No items"
+      },
+      "toasts": {
+        "pdfError": "An error occurred while generating the PDF",
+        "createSuccess": "Quotation created successfully",
+        "createError": "An error occurred while creating the quotation",
+        "clientNameRequired": "Please enter the client name"
+      }
+    }
   },
   "projectBoq": {
     "title": "Bill of Quantities",

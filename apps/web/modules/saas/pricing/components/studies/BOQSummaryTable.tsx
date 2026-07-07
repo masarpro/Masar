@@ -95,7 +95,7 @@ export function BOQSummaryTable({
 	studyName,
 	enabledFloors,
 }: BOQSummaryTableProps) {
-	const t = useTranslations();
+	const t = useTranslations("pricing.studies");
 	const [activeTab, setActiveTab] = useState<TabKey>("summary");
 	const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
 	const [expandedCutting, setExpandedCutting] = useState<Set<string>>(new Set());
@@ -154,15 +154,16 @@ export function BOQSummaryTable({
 			organizationAddress: orgSettingsAny?.address ?? undefined,
 			organizationPhone: orgSettingsAny?.phone ?? undefined,
 			organizationEmail: orgSettingsAny?.email ?? undefined,
+			t,
 		});
 	};
 
 	if (items.length === 0) return null;
 
 	const tabs: { key: TabKey; label: string; icon: React.ElementType }[] = [
-		{ key: "summary", label: "ملخص الكميات", icon: ClipboardList },
-		{ key: "factory", label: "طلبية المصنع", icon: Factory },
-		{ key: "cutting", label: "تفاصيل التفصيل", icon: Scissors },
+		{ key: "summary", label: t("structural.boq.summaryTab"), icon: ClipboardList },
+		{ key: "factory", label: t("structural.boq.factoryTab"), icon: Factory },
+		{ key: "cutting", label: t("structural.boq.cuttingTab"), icon: Scissors },
 	];
 
 	return (
@@ -171,7 +172,7 @@ export function BOQSummaryTable({
 			<div className="flex items-center justify-between">
 				<h3 className="text-lg font-bold flex items-center gap-2">
 					<ClipboardList className="h-5 w-5 text-primary" />
-					جدول الكميات الإجمالي
+					{t("structural.boq.title")}
 				</h3>
 				<BOQExportDropdown
 					onExcelExport={() => {
@@ -193,7 +194,7 @@ export function BOQSummaryTable({
 			{/* Floor Filter */}
 			{floorOptions.length > 2 && (
 				<div className="flex items-center gap-3 print:hidden">
-					<span className="text-sm font-medium text-muted-foreground">تصفية حسب الدور:</span>
+					<span className="text-sm font-medium text-muted-foreground">{t("structural.boq.floorFilter")}:</span>
 					<Select value={selectedFloor} onValueChange={setSelectedFloor}>
 						<SelectTrigger className="w-[220px]">
 							<SelectValue />
@@ -334,6 +335,7 @@ function FloorMaterialView({
 	toggleSection: (key: string) => void;
 	enabledFloors?: Array<{ id: string; label: string; icon?: string; sortOrder: number }>;
 }) {
+	const t = useTranslations("pricing.studies");
 	// Flatten all items from summary sections with their category label
 	const allItemRows: MaterialItemRow[] = [];
 	for (const section of summary.sections) {
@@ -366,13 +368,13 @@ function FloorMaterialView({
 			{/* Concrete Section */}
 			{concreteRows.length > 0 && (
 				<MaterialSectionCard
-					title="الخرسانة"
+					title={t("structural.boq.concreteSection")}
 					icon={Box}
 					iconColor="text-blue-600"
 					borderColor="border-l-blue-500"
 					items={concreteRows}
 					valueAccessor={(item) => item.concreteVolume}
-					valueLabel="الحجم (م³)"
+					valueLabel={t("structural.boq.volume")}
 					unit="م³"
 					total={totalConcrete}
 					isExpanded={expandedSections.has("mat-concrete")}
@@ -383,13 +385,13 @@ function FloorMaterialView({
 			{/* Steel Section */}
 			{steelRows.length > 0 && (
 				<MaterialSectionCard
-					title="حديد التسليح"
+					title={t("structural.boq.steelSection")}
 					icon={Columns3}
 					iconColor="text-orange-600"
 					borderColor="border-l-orange-500"
 					items={steelRows}
 					valueAccessor={(item) => item.steelWeight}
-					valueLabel="الوزن (كجم)"
+					valueLabel={t("structural.boq.weight")}
 					unit="كجم"
 					total={totalSteel}
 					isExpanded={expandedSections.has("mat-steel")}
@@ -400,14 +402,14 @@ function FloorMaterialView({
 			{/* Blocks Section */}
 			{blockRows.length > 0 && (
 				<MaterialSectionCard
-					title="البلوك"
+					title={t("structural.boq.blockSection")}
 					icon={Grid3X3}
 					iconColor="text-emerald-600"
 					borderColor="border-l-emerald-500"
 					items={blockRows}
 					valueAccessor={(item) => item.quantity}
-					valueLabel="العدد"
-					unit="بلوكة"
+					valueLabel={t("structural.quantity")}
+					unit={t("structural.otherStructural.results.blockUnit")}
 					total={totalBlocks}
 					isExpanded={expandedSections.has("mat-blocks")}
 					onToggle={() => toggleSection("mat-blocks")}
@@ -458,6 +460,7 @@ function MaterialSectionCard({
 	isExpanded: boolean;
 	onToggle: () => void;
 }) {
+	const t = useTranslations("pricing.studies");
 	return (
 		<Card className={`border-r-4 ${borderColor} overflow-hidden`}>
 			<Collapsible open={isExpanded} onOpenChange={onToggle}>
@@ -475,7 +478,7 @@ function MaterialSectionCard({
 							<Icon className={`h-5 w-5 ${iconColor}`} />
 							<span className="font-semibold">{title}</span>
 							<Badge variant="secondary" className="text-xs">
-								{items.length} عنصر
+								{t("boq.itemsCount", { count: items.length })}
 							</Badge>
 						</div>
 						<span className={`text-sm font-medium ${iconColor}`}>
@@ -489,9 +492,9 @@ function MaterialSectionCard({
 							<Table>
 								<TableHeader>
 									<TableRow className="bg-muted/30">
-										<TableHead className="text-right text-xs">العنصر</TableHead>
-										<TableHead className="text-right text-xs">التصنيف</TableHead>
-										<TableHead className="text-right text-xs">الكمية</TableHead>
+										<TableHead className="text-right text-xs">{t("structural.boq.element")}</TableHead>
+										<TableHead className="text-right text-xs">{t("structural.boq.category")}</TableHead>
+										<TableHead className="text-right text-xs">{t("structural.boq.quantity")}</TableHead>
 										<TableHead className="text-right text-xs">{valueLabel}</TableHead>
 									</TableRow>
 								</TableHeader>
@@ -508,7 +511,7 @@ function MaterialSectionCard({
 									))}
 									{/* Subtotal */}
 									<TableRow className="bg-muted/50 font-bold border-t-2">
-										<TableCell colSpan={3}>الإجمالي</TableCell>
+										<TableCell colSpan={3}>{t("structural.boq.subtotal")}</TableCell>
 										<TableCell className={iconColor}>
 											{formatNumber(total)} {unit}
 										</TableCell>
@@ -536,6 +539,7 @@ function SharedItemsCard({
 	isExpanded: boolean;
 	onToggle: () => void;
 }) {
+	const t = useTranslations("pricing.studies");
 	const totalConcrete = items.reduce((s, d) => s + d.item.concreteVolume, 0);
 	const totalSteel = items.reduce((s, d) => s + d.item.steelWeight, 0);
 
@@ -554,9 +558,9 @@ function SharedItemsCard({
 								<ChevronLeft className="h-4 w-4 text-muted-foreground" />
 							)}
 							<Layers className="h-5 w-5 text-slate-500" />
-							<span className="font-semibold">عناصر مشتركة</span>
+							<span className="font-semibold">{t("structural.boq.sharedItems")}</span>
 							<Badge variant="secondary" className="text-xs">
-								{items.length} عنصر
+								{t("boq.itemsCount", { count: items.length })}
 							</Badge>
 						</div>
 						<div className="flex items-center gap-4 text-sm">
@@ -576,17 +580,17 @@ function SharedItemsCard({
 				<CollapsibleContent>
 					<div className="px-4 pb-4 border-t">
 						<p className="text-xs text-muted-foreground mt-2 mb-3">
-							عناصر لا تنتمي لدور محدد (مثل الكمرات)
+							{t("structural.boq.sharedItemsDesc")}
 						</p>
 						<div className="border rounded-lg overflow-hidden">
 							<Table>
 								<TableHeader>
 									<TableRow className="bg-muted/30">
-										<TableHead className="text-right text-xs">العنصر</TableHead>
-										<TableHead className="text-right text-xs">التصنيف</TableHead>
-										<TableHead className="text-right text-xs">الكمية</TableHead>
-										<TableHead className="text-right text-xs">خرسانة (م³)</TableHead>
-										<TableHead className="text-right text-xs">حديد (كجم)</TableHead>
+										<TableHead className="text-right text-xs">{t("structural.boq.element")}</TableHead>
+										<TableHead className="text-right text-xs">{t("structural.boq.category")}</TableHead>
+										<TableHead className="text-right text-xs">{t("structural.boq.quantity")}</TableHead>
+										<TableHead className="text-right text-xs">{t("boq.concreteM3")}</TableHead>
+										<TableHead className="text-right text-xs">{t("boq.steelKg")}</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
@@ -641,6 +645,7 @@ function SectionCard({
 	expandedCutting: Set<string>;
 	toggleCutting: (key: string) => void;
 }) {
+	const t = useTranslations("pricing.studies");
 	const borderColor = SECTION_COLORS[section.category] || "border-l-gray-400";
 
 	return (
@@ -660,11 +665,12 @@ function SectionCard({
 							<span className="text-lg">{section.icon}</span>
 							<span className="font-semibold">{section.label}</span>
 							<Badge variant="secondary" className="text-xs">
-								{section.subGroups.reduce(
-									(s, g) => s + g.items.length,
-									0,
-								)}{" "}
-								عنصر
+								{t("boq.itemsCount", {
+									count: section.subGroups.reduce(
+										(s, g) => s + g.items.length,
+										0,
+									),
+								})}
 							</Badge>
 						</div>
 						<div className="flex items-center gap-4 text-sm">
@@ -680,7 +686,7 @@ function SectionCard({
 							)}
 							{section.totalBlocks > 0 && (
 								<span className="text-emerald-600 font-medium">
-									{formatNumber(section.totalBlocks)} بلوكة
+									{formatNumber(section.totalBlocks)} {t("structural.otherStructural.results.blockUnit")}
 								</span>
 							)}
 						</div>
@@ -723,6 +729,7 @@ function SubGroupView({
 	expandedCutting: Set<string>;
 	toggleCutting: (key: string) => void;
 }) {
+	const t = useTranslations("pricing.studies");
 	return (
 		<div className="space-y-2 pt-2">
 			{showGroupHeader && (
@@ -732,13 +739,13 @@ function SubGroupView({
 					</h5>
 					<div className="flex gap-3 text-xs text-muted-foreground">
 						{group.concrete > 0 && (
-							<span>خرسانة: {formatNumber(group.concrete)} م³</span>
+							<span>{t("boq.concrete")}: {formatNumber(group.concrete)} م³</span>
 						)}
 						{group.rebar > 0 && (
-							<span>حديد: {formatNumber(group.rebar)} كجم</span>
+							<span>{t("boq.steel")}: {formatNumber(group.rebar)} كجم</span>
 						)}
 						{group.blocks > 0 && (
-							<span>بلوك: {formatNumber(group.blocks)}</span>
+							<span>{t("boq.blocks")}: {formatNumber(group.blocks)}</span>
 						)}
 					</div>
 				</div>
@@ -749,12 +756,12 @@ function SubGroupView({
 				<Table>
 					<TableHeader>
 						<TableRow className="bg-muted/30">
-							<TableHead className="text-right text-xs">العنصر</TableHead>
-							<TableHead className="text-right text-xs">الكمية</TableHead>
-							<TableHead className="text-right text-xs">خرسانة (م³)</TableHead>
-							<TableHead className="text-right text-xs">حديد (كجم)</TableHead>
+							<TableHead className="text-right text-xs">{t("structural.boq.element")}</TableHead>
+							<TableHead className="text-right text-xs">{t("structural.boq.quantity")}</TableHead>
+							<TableHead className="text-right text-xs">{t("boq.concreteM3")}</TableHead>
+							<TableHead className="text-right text-xs">{t("boq.steelKg")}</TableHead>
 							{category === "blocks" && (
-								<TableHead className="text-right text-xs">بلوك</TableHead>
+								<TableHead className="text-right text-xs">{t("boq.blocks")}</TableHead>
 							)}
 							<TableHead className="text-right text-xs w-8"></TableHead>
 						</TableRow>
@@ -791,12 +798,12 @@ function SubGroupView({
 													type="button"
 													onClick={() => toggleCutting(cutKey)}
 													className="p-1 rounded hover:bg-muted transition-colors"
-													title="تفاصيل القص"
+													title={t("boq.cuttingDetails")}
 												>
 													<Scissors className="h-3.5 w-3.5 text-muted-foreground" />
 												</button>
 											) : category !== "plainConcrete" && category !== "blocks" ? (
-												<span title="تفاصيل القص غير متوفرة - يرجى تحديث العنصر">
+												<span title={t("boq.cuttingDetailsUnavailable")}>
 													<AlertCircle className="h-3.5 w-3.5 text-amber-400" />
 												</span>
 											) : null}
@@ -843,24 +850,25 @@ function CuttingDetailsInline({
 		stocksNeeded: Array<{ diameter: number; count: number; length: number }>;
 	};
 }) {
+	const t = useTranslations("pricing.studies");
 	return (
 		<div className="bg-muted/20 p-3 space-y-2">
 			<h6 className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
 				<Scissors className="h-3 w-3" />
-				تفاصيل القص
+				{t("boq.cuttingDetails")}
 			</h6>
 
 			<div className="overflow-x-auto">
 				<table className="w-full text-xs">
 					<thead>
 						<tr className="border-b text-muted-foreground">
-							<th className="text-right py-1 px-2">الوصف</th>
-							<th className="text-right py-1 px-2">القطر</th>
-							<th className="text-right py-1 px-2">طول القطعة</th>
-							<th className="text-right py-1 px-2">العدد</th>
-							<th className="text-right py-1 px-2">أسياخ مصنع</th>
-							<th className="text-right py-1 px-2">الهالك %</th>
-							<th className="text-right py-1 px-2">الوزن</th>
+							<th className="text-right py-1 px-2">{t("boq.description")}</th>
+							<th className="text-right py-1 px-2">{t("structural.diameter")}</th>
+							<th className="text-right py-1 px-2">{t("boq.pieceLength")}</th>
+							<th className="text-right py-1 px-2">{t("structural.quantity")}</th>
+							<th className="text-right py-1 px-2">{t("boq.factoryBars")}</th>
+							<th className="text-right py-1 px-2">{t("boq.wastePercent")}</th>
+							<th className="text-right py-1 px-2">{t("boq.weight")}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -894,10 +902,10 @@ function CuttingDetailsInline({
 			{/* Stocks needed summary */}
 			{totals.stocksNeeded.length > 0 && (
 				<div className="flex gap-2 flex-wrap pt-1">
-					<span className="text-xs text-muted-foreground">المطلوب من المصنع:</span>
+					<span className="text-xs text-muted-foreground">{t("boq.requiredFromFactory")}:</span>
 					{totals.stocksNeeded.map((s, i) => (
 						<Badge key={i} variant="outline" className="text-xs">
-							Ø{s.diameter} × {s.count} سيخ
+							Ø{s.diameter} × {s.count} {t("boq.barUnit")}
 						</Badge>
 					))}
 				</div>
@@ -915,9 +923,10 @@ function GrandTotalCards({
 }: {
 	totals: { concrete: number; rebar: number; blocks: number; formwork: number };
 }) {
+	const t = useTranslations("pricing.studies");
 	const cards = [
 		{
-			title: "إجمالي الخرسانة",
+			title: t("totalConcrete"),
 			icon: Box,
 			value: totals.concrete > 0 ? formatNumber(totals.concrete) : "—",
 			unit: "م³",
@@ -926,7 +935,7 @@ function GrandTotalCards({
 			borderColor: "border-blue-200 dark:border-blue-800",
 		},
 		{
-			title: "إجمالي الحديد",
+			title: t("structural.totalSteel"),
 			icon: Columns3,
 			value: totals.rebar > 0 ? formatNumber(totals.rebar / 1000, 2) : "—",
 			unit: "طن",
@@ -939,16 +948,16 @@ function GrandTotalCards({
 			borderColor: "border-orange-200 dark:border-orange-800",
 		},
 		{
-			title: "إجمالي البلوك",
+			title: t("boq.totalBlocks"),
 			icon: Grid3X3,
 			value: totals.blocks > 0 ? formatNumber(totals.blocks) : "—",
-			unit: "بلوكة",
+			unit: t("structural.otherStructural.results.blockUnit"),
 			color: "text-emerald-600",
 			bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
 			borderColor: "border-emerald-200 dark:border-emerald-800",
 		},
 		{
-			title: "إجمالي الطوبار",
+			title: t("boq.totalFormwork"),
 			icon: Ruler,
 			value: totals.formwork > 0 ? formatNumber(totals.formwork) : "—",
 			unit: "م²",
@@ -962,7 +971,7 @@ function GrandTotalCards({
 		<div className="border-t-2 border-dashed pt-4 mt-4">
 			<h4 className="text-sm font-bold text-muted-foreground mb-3 flex items-center gap-2">
 				<span className="w-6 h-0.5 bg-primary inline-block" />
-				الإجمالي العام
+				{t("structural.boq.grandTotal")}
 				<span className="w-6 h-0.5 bg-primary inline-block" />
 			</h4>
 			<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -1009,6 +1018,7 @@ function FactoryOrderTab({
 	studyName?: string;
 	onPrint: () => void;
 }) {
+	const t = useTranslations("pricing.studies");
 	const totalBars = factoryOrder.reduce((s, e) => s + e.count, 0);
 	const totalWeight = factoryOrder.reduce((s, e) => s + e.weight, 0);
 
@@ -1016,8 +1026,8 @@ function FactoryOrderTab({
 		return (
 			<Card className="p-8 text-center text-muted-foreground">
 				<Factory className="h-12 w-12 mx-auto mb-3 opacity-30" />
-				<p>لا توجد بيانات لطلبية المصنع</p>
-				<p className="text-xs mt-1">أضف عناصر إنشائية مع بيانات التسليح أولاً</p>
+				<p>{t("boq.noFactoryData")}</p>
+				<p className="text-xs mt-1">{t("boq.addItemsWithRebarFirst")}</p>
 			</Card>
 		);
 	}
@@ -1027,12 +1037,12 @@ function FactoryOrderTab({
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<Factory className="h-5 w-5 text-primary" />
-					<h4 className="font-semibold">طلبية المصنع - حديد التسليح</h4>
+					<h4 className="font-semibold">{t("boq.factoryOrderTitle")}</h4>
 				</div>
 				<BOQExportDropdown
 					onExcelExport={() => exportFactoryOrder(factoryOrder, studyName)}
 					onPrint={onPrint}
-					label="تصدير"
+					label={t("boq.export")}
 				/>
 			</div>
 
@@ -1041,11 +1051,11 @@ function FactoryOrderTab({
 					<Table>
 						<TableHeader>
 							<TableRow className="bg-muted/30">
-								<TableHead className="text-right">القطر (مم)</TableHead>
-								<TableHead className="text-right">طول السيخ (م)</TableHead>
-								<TableHead className="text-right">عدد الأسياخ</TableHead>
-								<TableHead className="text-right">الوزن (كجم)</TableHead>
-								<TableHead className="text-right">الوزن (طن)</TableHead>
+								<TableHead className="text-right">{t("boq.diameterMm")}</TableHead>
+								<TableHead className="text-right">{t("boq.stockLengthM")}</TableHead>
+								<TableHead className="text-right">{t("boq.barsCount")}</TableHead>
+								<TableHead className="text-right">{t("structural.boq.weight")}</TableHead>
+								<TableHead className="text-right">{t("boq.weightTon")}</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -1069,7 +1079,7 @@ function FactoryOrderTab({
 
 							{/* Total row */}
 							<TableRow className="bg-muted/50 font-bold border-t-2">
-								<TableCell>الإجمالي</TableCell>
+								<TableCell>{t("structural.boq.subtotal")}</TableCell>
 								<TableCell></TableCell>
 								<TableCell>{totalBars}</TableCell>
 								<TableCell>{formatNumber(totalWeight)}</TableCell>
@@ -1098,12 +1108,13 @@ function CuttingWorkshopTab({
 	studyName?: string;
 	onPrint: () => void;
 }) {
+	const t = useTranslations("pricing.studies");
 	if (cuttingDetails.length === 0) {
 		return (
 			<Card className="p-8 text-center text-muted-foreground">
 				<Scissors className="h-12 w-12 mx-auto mb-3 opacity-30" />
-				<p>لا توجد تفاصيل تفصيل</p>
-				<p className="text-xs mt-1">أضف عناصر إنشائية مع بيانات التسليح أولاً</p>
+				<p>{t("boq.noCuttingData")}</p>
+				<p className="text-xs mt-1">{t("boq.addItemsWithRebarFirst")}</p>
 			</Card>
 		);
 	}
@@ -1123,12 +1134,12 @@ function CuttingWorkshopTab({
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<Scissors className="h-5 w-5 text-primary" />
-					<h4 className="font-semibold">تفاصيل التفصيل - ورشة القص</h4>
+					<h4 className="font-semibold">{t("boq.cuttingWorkshopTitle")}</h4>
 				</div>
 				<BOQExportDropdown
 					onExcelExport={() => exportCuttingDetails(cuttingDetails, studyName)}
 					onPrint={onPrint}
-					label="تصدير"
+					label={t("boq.export")}
 				/>
 			</div>
 
@@ -1145,11 +1156,11 @@ function CuttingWorkshopTab({
 									Ø{diameter} مم
 								</Badge>
 								<span className="text-xs text-muted-foreground">
-									{group.length} عملية قص
+									{t("boq.cutOperationsCount", { count: group.length })}
 								</span>
 							</div>
 							<div className="flex items-center gap-3 text-xs text-muted-foreground">
-								<span>{groupStocks} سيخ مصنع</span>
+								<span>{t("boq.factoryBarsCount", { count: groupStocks })}</span>
 								<span className="font-medium text-orange-600">
 									{formatNumber(groupWeight)} كجم
 								</span>
@@ -1168,6 +1179,7 @@ function CuttingWorkshopTab({
 // ─────────────────────────────────────────────────────────────
 
 function CuttingDiameterTable({ group }: { group: CuttingDetailRow[] }) {
+	const t = useTranslations("pricing.studies");
 	const { containerRef, virtualItems, paddingTop, paddingBottom, isVirtualized } =
 		useVirtualRows({ count: group.length, rowHeight: 40, threshold: 50 });
 
@@ -1180,13 +1192,13 @@ function CuttingDiameterTable({ group }: { group: CuttingDetailRow[] }) {
 			<table className="w-full caption-bottom text-sm">
 				<TableHeader className={isVirtualized ? "sticky top-0 z-10 bg-background" : ""}>
 					<TableRow>
-						<TableHead className="text-right text-xs">العنصر</TableHead>
-						<TableHead className="text-right text-xs">الوصف</TableHead>
-						<TableHead className="text-right text-xs">طول القطعة (م)</TableHead>
-						<TableHead className="text-right text-xs">العدد</TableHead>
-						<TableHead className="text-right text-xs">أسياخ المصنع</TableHead>
-						<TableHead className="text-right text-xs">الهالك %</TableHead>
-						<TableHead className="text-right text-xs">الوزن (كجم)</TableHead>
+						<TableHead className="text-right text-xs">{t("structural.boq.element")}</TableHead>
+						<TableHead className="text-right text-xs">{t("boq.description")}</TableHead>
+						<TableHead className="text-right text-xs">{t("boq.pieceLengthM")}</TableHead>
+						<TableHead className="text-right text-xs">{t("structural.quantity")}</TableHead>
+						<TableHead className="text-right text-xs">{t("boq.factoryBars")}</TableHead>
+						<TableHead className="text-right text-xs">{t("boq.wastePercent")}</TableHead>
+						<TableHead className="text-right text-xs">{t("structural.boq.weight")}</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>

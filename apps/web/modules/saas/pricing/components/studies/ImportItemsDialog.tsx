@@ -29,6 +29,7 @@ import {
 	PenLine,
 	Trash2,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -74,6 +75,8 @@ export function ImportItemsDialog({
 	studyId,
 	onImported,
 }: ImportItemsDialogProps) {
+	const t = useTranslations("pricing.studies.import");
+	const tCommon = useTranslations("common");
 	const [open, setOpen] = useState(false);
 	const [step, setStep] = useState<Step>(1);
 	const [mode, setMode] = useState<ImportMode>("paste");
@@ -83,8 +86,7 @@ export function ImportItemsDialog({
 
 	const importMutation = useMutation(
 		orpc.pricing.studies.manualItem.create.mutationOptions({
-			onError: (e: any) =>
-				toast.error(e.message || "حدث خطأ أثناء الاستيراد"),
+			onError: (e: any) => toast.error(e.message || t("error")),
 		}),
 	);
 
@@ -174,14 +176,12 @@ export function ImportItemsDialog({
 				});
 			}
 
-			toast.success(
-				`تم استيراد ${finalItems.length} بند بنجاح`,
-			);
+			toast.success(t("success", { count: finalItems.length }));
 			onImported?.();
 			setOpen(false);
 			handleReset();
 		} catch {
-			toast.error("حدث خطأ أثناء الاستيراد");
+			toast.error(t("error"));
 		} finally {
 			setIsImporting(false);
 		}
@@ -189,7 +189,7 @@ export function ImportItemsDialog({
 
 	const finalItems = getFinalItems();
 
-	const stepLabels = ["اختيار الطريقة", "إدخال البيانات", "مراجعة واستيراد"];
+	const stepLabels = [t("stepMethod"), t("stepData"), t("stepReview")];
 
 	return (
 		<Dialog
@@ -202,13 +202,13 @@ export function ImportItemsDialog({
 			<DialogTrigger asChild>
 				<Button variant="outline" className="gap-2">
 					<FileDown className="h-4 w-4" />
-					استيراد بنود
+					{t("title")}
 				</Button>
 			</DialogTrigger>
 
 			<DialogContent className="max-w-2xl" dir="rtl">
 				<DialogHeader>
-					<DialogTitle>استيراد بنود</DialogTitle>
+					<DialogTitle>{t("title")}</DialogTitle>
 				</DialogHeader>
 
 				{/* Step indicator */}
@@ -276,10 +276,9 @@ export function ImportItemsDialog({
 						>
 							<ClipboardPaste className="h-10 w-10 text-primary" />
 							<div className="text-center">
-								<p className="font-semibold">لصق من Excel</p>
+								<p className="font-semibold">{t("pasteFromExcel")}</p>
 								<p className="text-xs text-muted-foreground mt-1">
-									انسخ البنود من جدول Excel والصقها هنا
-									مباشرة
+									{t("pasteFromExcelDesc")}
 								</p>
 							</div>
 						</button>
@@ -296,9 +295,9 @@ export function ImportItemsDialog({
 						>
 							<PenLine className="h-10 w-10 text-primary" />
 							<div className="text-center">
-								<p className="font-semibold">إدخال يدوي</p>
+								<p className="font-semibold">{t("manualEntry")}</p>
 								<p className="text-xs text-muted-foreground mt-1">
-									أدخل البنود واحدًا تلو الآخر
+									{t("manualEntryDesc")}
 								</p>
 							</div>
 						</button>
@@ -308,17 +307,16 @@ export function ImportItemsDialog({
 				{/* Step 2: Data Entry */}
 				{step === 2 && mode === "paste" && (
 					<div className="space-y-3 py-2">
-						<Label>الصق البيانات من Excel</Label>
+						<Label>{t("pasteLabel")}</Label>
 						<textarea
 							value={pastedText}
 							onChange={(e: any) => setPastedText(e.target.value)}
-							placeholder="الصق البيانات هنا..."
+							placeholder={t("pastePlaceholder")}
 							className="flex min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 							dir="rtl"
 						/>
 						<p className="text-xs text-muted-foreground">
-							الأعمدة المتوقعة: الوصف، الوحدة، الكمية، القسم
-							(اختياري)
+							{t("expectedColumns")}
 						</p>
 					</div>
 				)}
@@ -330,16 +328,16 @@ export function ImportItemsDialog({
 								<thead>
 									<tr className="border-b bg-muted/50">
 										<th className="px-2 py-2 text-right font-medium">
-											الوصف
+											{t("description")}
 										</th>
 										<th className="px-2 py-2 text-right font-medium w-28">
-											الوحدة
+											{t("unit")}
 										</th>
 										<th className="px-2 py-2 text-right font-medium w-24">
-											الكمية
+											{t("quantity")}
 										</th>
 										<th className="px-2 py-2 text-right font-medium w-28">
-											القسم
+											{t("section")}
 										</th>
 										<th className="px-2 py-2 w-10" />
 									</tr>
@@ -357,7 +355,7 @@ export function ImportItemsDialog({
 															e.target.value,
 														)
 													}
-													placeholder="وصف البند"
+													placeholder={t("descriptionPlaceholder")}
 													className="h-8"
 												/>
 											</td>
@@ -419,7 +417,7 @@ export function ImportItemsDialog({
 															e.target.value,
 														)
 													}
-													placeholder="اختياري"
+													placeholder={tCommon("optional")}
 													className="h-8"
 												/>
 											</td>
@@ -451,7 +449,7 @@ export function ImportItemsDialog({
 					<div className="space-y-3 py-2">
 						<div className="flex items-center gap-2">
 							<Badge variant="secondary">
-								{finalItems.length} بند
+								{t("itemsCount", { count: finalItems.length })}
 							</Badge>
 						</div>
 
@@ -463,16 +461,16 @@ export function ImportItemsDialog({
 											#
 										</th>
 										<th className="px-2 py-2 text-right font-medium">
-											الوصف
+											{t("description")}
 										</th>
 										<th className="px-2 py-2 text-right font-medium w-20">
-											الوحدة
+											{t("unit")}
 										</th>
 										<th className="px-2 py-2 text-right font-medium w-24">
-											الكمية
+											{t("quantity")}
 										</th>
 										<th className="px-2 py-2 text-right font-medium w-28">
-											القسم
+											{t("section")}
 										</th>
 									</tr>
 								</thead>
@@ -507,7 +505,7 @@ export function ImportItemsDialog({
 												colSpan={5}
 												className="py-8 text-center text-muted-foreground"
 											>
-												لا توجد بنود للاستيراد
+												{t("noItemsToImport")}
 											</td>
 										</tr>
 									)}
@@ -524,7 +522,7 @@ export function ImportItemsDialog({
 							variant="outline"
 							onClick={() => setStep((s) => (s - 1) as Step)}
 						>
-							السابق
+							{tCommon("previous")}
 						</Button>
 					)}
 
@@ -545,7 +543,7 @@ export function ImportItemsDialog({
 										)))
 							}
 						>
-							التالي
+							{tCommon("next")}
 						</Button>
 					)}
 
@@ -560,10 +558,10 @@ export function ImportItemsDialog({
 							{isImporting ? (
 								<>
 									<Loader2 className="h-4 w-4 animate-spin" />
-									جاري الاستيراد...
+									{t("importing")}
 								</>
 							) : (
-								"استيراد"
+								t("importButton")
 							)}
 						</Button>
 					)}

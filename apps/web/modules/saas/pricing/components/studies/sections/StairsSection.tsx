@@ -245,7 +245,7 @@ export function StairsSection({
 	const autoCreateMutation = useMutation(
 		orpc.pricing.studies.structuralItem.create.mutationOptions({
 			onSuccess: () => {},
-			onError: () => toast.error("حدث خطأ"),
+			onError: () => toast.error(t("pricing.studies.messages.error")),
 		})
 	);
 
@@ -372,11 +372,11 @@ export function StairsSection({
 				};
 				await (autoCreateMutation.mutateAsync as (data: StructuralItemCreateInput) => Promise<unknown>)(itemData);
 			}
-			toast.success(`تم إنشاء ${autoCalculations.length} سلم بنجاح`);
+			toast.success(t("pricing.studies.structural.sections.stairs.toasts.created", { count: autoCalculations.length }));
 			setShowAutoForm(false);
 			onSave();
 		} catch (e) {
-			toast.error("حدث خطأ أثناء حفظ السلالم");
+			toast.error(t("pricing.studies.structural.sections.stairs.toasts.saveError"));
 		}
 		setIsAutoSaving(false);
 	};
@@ -471,15 +471,15 @@ export function StairsSection({
 							<div className="flex items-center justify-between mb-2">
 								<div className="flex items-center gap-2">
 									<Building2 className="h-5 w-5 text-emerald-600" />
-									<h4 className="font-medium">حساب السلالم تلقائيا من إعدادات المبنى</h4>
-									<Badge variant="secondary" className="text-xs">{stairConnections.length} سلم</Badge>
+									<h4 className="font-medium">{t("pricing.studies.structural.sections.stairs.autoTitle")}</h4>
+									<Badge variant="secondary" className="text-xs">{t("pricing.studies.structural.sections.stairs.stairsCount", { count: stairConnections.length })}</Badge>
 								</div>
 								<Button variant="ghost" size="icon" onClick={() => setShowAutoForm(false)}><X className="h-4 w-4" /></Button>
 							</div>
 
 							{/* Stair connections preview */}
 							<div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/50 rounded-lg p-3">
-								<h5 className="text-sm font-medium mb-2">السلالم المطلوبة:</h5>
+								<h5 className="text-sm font-medium mb-2">{t("pricing.studies.structural.sections.stairs.requiredStairs")}:</h5>
 								<div className="flex flex-wrap gap-2">
 									{stairConnections.map(conn => (
 										<Badge key={conn.id} variant="outline" className="text-xs">
@@ -491,7 +491,7 @@ export function StairsSection({
 
 							{/* Unified form inputs (same for all stairs) */}
 							<div className="border rounded-lg p-4 bg-slate-50/30 dark:bg-slate-900/30">
-								<h5 className="font-medium mb-3">أبعاد موحدة لجميع السلالم</h5>
+								<h5 className="font-medium mb-3">{t("pricing.studies.structural.sections.stairs.unifiedDimensions")}</h5>
 								<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 									<div>
 										<Label>{t("pricing.studies.structural.width")} ({t("pricing.studies.units.m")})</Label>
@@ -499,7 +499,7 @@ export function StairsSection({
 											onChange={(e: any) => setAutoFormData({ ...autoFormData, width: +e.target.value })} />
 									</div>
 									<div>
-										<Label>طول البسطة ({t("pricing.studies.units.m")})</Label>
+										<Label>{t("pricing.studies.structural.sections.stairs.landingLength")} ({t("pricing.studies.units.m")})</Label>
 										<Input type="number" step="0.1" min={0} value={autoFormData.landingLength}
 											onChange={(e: any) => setAutoFormData({ ...autoFormData, landingLength: +e.target.value })} />
 									</div>
@@ -515,7 +515,7 @@ export function StairsSection({
 										</Select>
 									</div>
 									<div>
-										<Label>ارتفاع القائمة ({t("pricing.studies.units.cm")})</Label>
+										<Label>{t("pricing.studies.structural.sections.stairs.riserHeight")} ({t("pricing.studies.units.cm")})</Label>
 										<Select value={autoFormData.riserHeight.toString()} onValueChange={(v: any) => setAutoFormData({ ...autoFormData, riserHeight: +v })}>
 											<SelectTrigger><SelectValue /></SelectTrigger>
 											<SelectContent>
@@ -526,7 +526,7 @@ export function StairsSection({
 										</Select>
 									</div>
 									<div>
-										<Label>عمق النائمة ({t("pricing.studies.units.cm")})</Label>
+										<Label>{t("pricing.studies.structural.sections.stairs.treadDepth")} ({t("pricing.studies.units.cm")})</Label>
 										<Select value={autoFormData.treadDepth.toString()} onValueChange={(v: any) => setAutoFormData({ ...autoFormData, treadDepth: +v })}>
 											<SelectTrigger><SelectValue /></SelectTrigger>
 											<SelectContent>
@@ -541,12 +541,12 @@ export function StairsSection({
 
 							{/* Reinforcement */}
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<RebarMeshInput title="الحديد الرئيسي (الطولي)" diameter={autoFormData.mainBarDiameter}
+								<RebarMeshInput title={t("pricing.studies.structural.sections.stairs.mainRebar")} diameter={autoFormData.mainBarDiameter}
 									onDiameterChange={d => setAutoFormData({ ...autoFormData, mainBarDiameter: d })}
 									barsPerMeter={autoFormData.mainBarsPerMeter}
 									onBarsPerMeterChange={n => setAutoFormData({ ...autoFormData, mainBarsPerMeter: n })}
 									colorScheme="blue" availableDiameters={[10, 12, 14, 16, 18, 20]} />
-								<RebarMeshInput title="الحديد الثانوي (التوزيع)" diameter={autoFormData.secondaryBarDiameter}
+								<RebarMeshInput title={t("pricing.studies.structural.sections.stairs.secondaryRebar")} diameter={autoFormData.secondaryBarDiameter}
 									onDiameterChange={d => setAutoFormData({ ...autoFormData, secondaryBarDiameter: d })}
 									barsPerMeter={autoFormData.secondaryBarsPerMeter}
 									onBarsPerMeterChange={n => setAutoFormData({ ...autoFormData, secondaryBarsPerMeter: n })}
@@ -558,18 +558,18 @@ export function StairsSection({
 								<div className="bg-muted/50 rounded-lg p-4 space-y-3">
 									<div className="flex items-center gap-2">
 										<Calculator className="h-5 w-5 text-primary" />
-										<h4 className="font-medium">نتائج الحساب لكل سلم</h4>
+										<h4 className="font-medium">{t("pricing.studies.structural.sections.stairs.resultsPerStair")}</h4>
 									</div>
 									<div className="border rounded-lg overflow-hidden">
 										<Table>
 											<TableHeader>
 												<TableRow>
-													<TableHead className="text-right">السلم</TableHead>
-													<TableHead className="text-right">الارتفاع</TableHead>
-													<TableHead className="text-right">القوائم</TableHead>
-													<TableHead className="text-right">طول المائل</TableHead>
-													<TableHead className="text-right">خرسانة</TableHead>
-													<TableHead className="text-right">حديد</TableHead>
+													<TableHead className="text-right">{t("pricing.studies.structural.sections.stairs.stair")}</TableHead>
+													<TableHead className="text-right">{t("pricing.studies.structural.height")}</TableHead>
+													<TableHead className="text-right">{t("pricing.studies.structural.sections.stairs.risers")}</TableHead>
+													<TableHead className="text-right">{t("pricing.studies.structural.sections.stairs.flightLengthShort")}</TableHead>
+													<TableHead className="text-right">{t("pricing.studies.structural.sections.common.concrete")}</TableHead>
+													<TableHead className="text-right">{t("pricing.studies.structural.sections.common.steel")}</TableHead>
 												</TableRow>
 											</TableHeader>
 											<TableBody>
@@ -586,7 +586,7 @@ export function StairsSection({
 												{/* Totals row */}
 												{autoTotals && (
 													<TableRow className="bg-muted/30 font-bold">
-														<TableCell colSpan={4}>إجمالي</TableCell>
+														<TableCell colSpan={4}>{t("pricing.studies.total")}</TableCell>
 														<TableCell>{formatNumber(autoTotals.totalConcrete)} م&#179;</TableCell>
 														<TableCell>{formatNumber(autoTotals.totalSteel)} كجم</TableCell>
 													</TableRow>
@@ -605,7 +605,7 @@ export function StairsSection({
 								<Button onClick={handleAutoSave} disabled={isAutoSaving || !autoCalculations || autoCalculations.length === 0}
 									className="bg-emerald-600 hover:bg-emerald-700">
 									<Save className="h-4 w-4 ml-2" />
-									حفظ {autoCalculations?.length || 0} سلم
+									{t("pricing.studies.structural.sections.stairs.saveCount", { count: autoCalculations?.length || 0 })}
 								</Button>
 							</div>
 						</CardContent>
@@ -615,8 +615,8 @@ export function StairsSection({
 						className="w-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-2 border-dashed border-emerald-400/40 hover:bg-emerald-500/20 hover:border-emerald-400/60 transition-all"
 						onClick={() => setShowAutoForm(true)}>
 						<Building2 className="h-5 w-5 ml-2" />
-						<span className="font-semibold">حساب السلالم من إعدادات المبنى</span>
-						<Badge variant="secondary" className="mr-2 text-xs">{stairConnections.length} سلم</Badge>
+						<span className="font-semibold">{t("pricing.studies.structural.sections.stairs.autoButton")}</span>
+						<Badge variant="secondary" className="mr-2 text-xs">{t("pricing.studies.structural.sections.stairs.stairsCount", { count: stairConnections.length })}</Badge>
 					</Button>
 				)
 			)}
@@ -648,7 +648,7 @@ export function StairsSection({
 
 						{/* أبعاد السلم */}
 						<div className="border rounded-lg p-4 bg-slate-50/30 dark:bg-slate-900/30">
-							<h5 className="font-medium mb-3">أبعاد السلم</h5>
+							<h5 className="font-medium mb-3">{t("pricing.studies.structural.sections.stairs.stairDimensions")}</h5>
 							<div className="grid grid-cols-2 md:grid-cols-5 gap-4">
 								<div>
 									<Label>{t("pricing.studies.structural.width")} ({t("pricing.studies.units.m")})</Label>
@@ -663,7 +663,7 @@ export function StairsSection({
 									/>
 								</div>
 								<div>
-									<Label>طول الجزء المائل ({t("pricing.studies.units.m")})</Label>
+									<Label>{t("pricing.studies.structural.sections.stairs.flightLength")} ({t("pricing.studies.units.m")})</Label>
 									<Input
 										type="number"
 										step="0.1"
@@ -675,7 +675,7 @@ export function StairsSection({
 									/>
 								</div>
 								<div>
-									<Label>طول البسطة ({t("pricing.studies.units.m")})</Label>
+									<Label>{t("pricing.studies.structural.sections.stairs.landingLength")} ({t("pricing.studies.units.m")})</Label>
 									<Input
 										type="number"
 										step="0.1"
@@ -707,7 +707,7 @@ export function StairsSection({
 									</Select>
 								</div>
 								<div className="bg-muted/50 rounded p-2 flex flex-col justify-center">
-									<span className="text-xs text-muted-foreground">المساحة</span>
+									<span className="text-xs text-muted-foreground">{t("pricing.studies.area")}</span>
 									<span className="font-bold">
 										{formatNumber(
 											formData.flightLength * formData.width +
@@ -720,10 +720,10 @@ export function StairsSection({
 
 						{/* الدرجات */}
 						<div className="border rounded-lg p-4 bg-amber-50/30 dark:bg-amber-900/20">
-							<h5 className="font-medium mb-3">الدرجات</h5>
+							<h5 className="font-medium mb-3">{t("pricing.studies.structural.sections.stairs.steps")}</h5>
 							<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 								<div>
-									<Label>عدد القوائم</Label>
+									<Label>{t("pricing.studies.structural.sections.stairs.risersCount")}</Label>
 									<Input
 										type="number"
 										min={1}
@@ -734,7 +734,7 @@ export function StairsSection({
 									/>
 								</div>
 								<div>
-									<Label>ارتفاع القائمة ({t("pricing.studies.units.cm")})</Label>
+									<Label>{t("pricing.studies.structural.sections.stairs.riserHeight")} ({t("pricing.studies.units.cm")})</Label>
 									<Select
 										value={formData.riserHeight.toString()}
 										onValueChange={(v: any) =>
@@ -754,7 +754,7 @@ export function StairsSection({
 									</Select>
 								</div>
 								<div>
-									<Label>عمق النائمة ({t("pricing.studies.units.cm")})</Label>
+									<Label>{t("pricing.studies.structural.sections.stairs.treadDepth")} ({t("pricing.studies.units.cm")})</Label>
 									<Select
 										value={formData.treadDepth.toString()}
 										onValueChange={(v: any) =>
@@ -774,7 +774,7 @@ export function StairsSection({
 									</Select>
 								</div>
 								<div className="bg-muted/50 rounded p-2 flex flex-col justify-center">
-									<span className="text-xs text-muted-foreground">الارتفاع الكلي</span>
+									<span className="text-xs text-muted-foreground">{t("pricing.studies.structural.sections.stairs.totalHeight")}</span>
 									<span className="font-bold">
 										{formatNumber((formData.risersCount * formData.riserHeight) / 100)} م
 									</span>
@@ -785,7 +785,7 @@ export function StairsSection({
 						{/* التسليح */}
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<RebarMeshInput
-								title="الحديد الرئيسي (الطولي)"
+								title={t("pricing.studies.structural.sections.stairs.mainRebar")}
 								diameter={formData.mainBarDiameter}
 								onDiameterChange={(d) =>
 									setFormData({ ...formData, mainBarDiameter: d })
@@ -798,7 +798,7 @@ export function StairsSection({
 								availableDiameters={[10, 12, 14, 16, 18, 20]}
 							/>
 							<RebarMeshInput
-								title="الحديد الثانوي (التوزيع)"
+								title={t("pricing.studies.structural.sections.stairs.secondaryRebar")}
 								diameter={formData.secondaryBarDiameter}
 								onDiameterChange={(d) =>
 									setFormData({ ...formData, secondaryBarDiameter: d })

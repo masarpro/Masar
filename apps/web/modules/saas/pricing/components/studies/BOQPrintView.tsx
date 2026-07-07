@@ -11,7 +11,17 @@ interface BOQPrintViewProps {
 	organizationAddress?: string;
 	organizationPhone?: string;
 	organizationEmail?: string;
+	/**
+	 * next-intl translator from the calling component, scoped to the
+	 * `pricing.studies` namespace: `useTranslations("pricing.studies")`.
+	 */
+	t: Translator;
 }
+
+type Translator = (
+	key: string,
+	values?: Record<string, string | number>,
+) => string;
 
 /**
  * Builds a full HTML document and prints it via a hidden iframe.
@@ -88,12 +98,13 @@ function buildPrintHTML(props: BOQPrintViewProps): string {
 		organizationAddress,
 		organizationPhone,
 		organizationEmail,
+		t,
 	} = props;
 
 	const tabTitles: Record<string, string> = {
-		summary: "ملخص الكميات",
-		factory: "طلبية المصنع — حديد التسليح",
-		cutting: "تفاصيل التفصيل",
+		summary: t("structural.boq.summaryTab"),
+		factory: t("boq.factoryOrderTitle"),
+		cutting: t("structural.boq.cuttingTab"),
 	};
 	const tabTitle = tabTitles[activeTab];
 	const today = new Date().toLocaleDateString("ar-SA", {
@@ -104,10 +115,10 @@ function buildPrintHTML(props: BOQPrintViewProps): string {
 
 	const tableHTML =
 		activeTab === "summary"
-			? buildSummaryHTML(summary)
+			? buildSummaryHTML(summary, t)
 			: activeTab === "factory"
-				? buildFactoryHTML(summary.factoryOrder)
-				: buildCuttingHTML(summary.allCuttingDetails);
+				? buildFactoryHTML(summary.factoryOrder, t)
+				: buildCuttingHTML(summary.allCuttingDetails, t);
 
 	return `<!DOCTYPE html>
 <html dir="rtl" lang="ar">
@@ -226,11 +237,11 @@ function buildPrintHTML(props: BOQPrintViewProps): string {
 
   <!-- Report Title -->
   <div class="report-title">
-    <h1>تقرير الكميات — ${esc(tabTitle)}</h1>
+    <h1>${esc(t("boq.print.reportTitle"))} — ${esc(tabTitle)}</h1>
     <div class="meta">
-      الدراسة: ${esc(studyName) || "—"}
-      &nbsp;|&nbsp; التاريخ: ${today}
-      ${floorLabel ? `&nbsp;|&nbsp; الدور: ${esc(floorLabel)}` : ""}
+      ${esc(t("boq.print.study"))}: ${esc(studyName) || "—"}
+      &nbsp;|&nbsp; ${esc(t("boq.print.date"))}: ${today}
+      ${floorLabel ? `&nbsp;|&nbsp; ${esc(t("boq.print.floor"))}: ${esc(floorLabel)}` : ""}
     </div>
   </div>
 
@@ -239,7 +250,7 @@ function buildPrintHTML(props: BOQPrintViewProps): string {
 
   <!-- Footer -->
   <div class="footer">
-    تم إعداد هذا التقرير بواسطة منصة مسار — app-masar.com
+    ${esc(t("boq.print.footer"))}
   </div>
 </body>
 </html>`;
@@ -249,7 +260,7 @@ function buildPrintHTML(props: BOQPrintViewProps): string {
 // Summary HTML
 // ─────────────────────────────────────────────────────────────
 
-function buildSummaryHTML(summary: BOQSummary): string {
+function buildSummaryHTML(summary: BOQSummary, t: Translator): string {
 	let html = "";
 
 	for (const section of summary.sections) {
@@ -265,11 +276,11 @@ function buildSummaryHTML(summary: BOQSummary): string {
 
 			html += `<table>
         <thead><tr>
-          <th>العنصر</th>
-          <th>الكمية</th>
-          <th>خرسانة (م³)</th>
-          <th>حديد (كجم)</th>
-          ${hasBlocks ? "<th>بلوك</th>" : ""}
+          <th>${esc(t("structural.boq.element"))}</th>
+          <th>${esc(t("structural.boq.quantity"))}</th>
+          <th>${esc(t("boq.concreteM3"))}</th>
+          <th>${esc(t("boq.steelKg"))}</th>
+          ${hasBlocks ? `<th>${esc(t("boq.blocks"))}</th>` : ""}
         </tr></thead>
         <tbody>`;
 
@@ -288,13 +299,13 @@ function buildSummaryHTML(summary: BOQSummary): string {
 			// Section subtotals
 			const parts: string[] = [];
 			if (section.totalConcrete > 0)
-				parts.push(`خرسانة ${fmt(section.totalConcrete)} م³`);
+				parts.push(`${esc(t("boq.concrete"))} ${fmt(section.totalConcrete)} م³`);
 			if (section.totalRebar > 0)
-				parts.push(`حديد ${fmt(section.totalRebar)} كجم`);
+				parts.push(`${esc(t("boq.steel"))} ${fmt(section.totalRebar)} كجم`);
 			if (section.totalBlocks > 0)
-				parts.push(`بلوك ${fmt(section.totalBlocks)}`);
+				parts.push(`${esc(t("boq.blocks"))} ${fmt(section.totalBlocks)}`);
 			if (parts.length > 0) {
-				html += `<div class="section-totals">إجمالي القسم: ${parts.join(" | ")}</div>`;
+				html += `<div class="section-totals">${esc(t("boq.print.sectionTotal"))}: ${parts.join(" | ")}</div>`;
 			}
 		}
 
@@ -303,39 +314,39 @@ function buildSummaryHTML(summary: BOQSummary): string {
 
 	// Grand totals
 	html += `<div class="section" style="border-top: 2px solid #9ca3af; padding-top: 12px;">`;
-	html += `<div class="section-title">الإجمالي العام</div>`;
+	html += `<div class="section-title">${esc(t("structural.boq.grandTotal"))}</div>`;
 	html += `<table>
     <thead><tr>
-      <th>المادة</th>
-      <th>الكمية</th>
-      <th>الوحدة</th>
+      <th>${esc(t("boq.material"))}</th>
+      <th>${esc(t("structural.boq.quantity"))}</th>
+      <th>${esc(t("boq.unit"))}</th>
     </tr></thead>
     <tbody>`;
 
 	if (summary.grandTotals.concrete > 0) {
 		html += `<tr>
-      <td style="font-weight:700">الخرسانة</td>
+      <td style="font-weight:700">${esc(t("structural.boq.concreteSection"))}</td>
       <td class="number">${fmt(summary.grandTotals.concrete)}</td>
       <td>م³</td>
     </tr>`;
 	}
 	if (summary.grandTotals.rebar > 0) {
 		html += `<tr>
-      <td style="font-weight:700">حديد التسليح</td>
+      <td style="font-weight:700">${esc(t("structural.boq.steelSection"))}</td>
       <td class="number">${fmt(summary.grandTotals.rebar)}</td>
       <td>كجم (${fmt(summary.grandTotals.rebar / 1000, 2)} طن)</td>
     </tr>`;
 	}
 	if (summary.grandTotals.blocks > 0) {
 		html += `<tr>
-      <td style="font-weight:700">البلوك</td>
+      <td style="font-weight:700">${esc(t("structural.boq.blockSection"))}</td>
       <td class="number">${fmt(summary.grandTotals.blocks)}</td>
-      <td>بلوكة</td>
+      <td>${esc(t("structural.otherStructural.results.blockUnit"))}</td>
     </tr>`;
 	}
 	if (summary.grandTotals.formwork > 0) {
 		html += `<tr>
-      <td style="font-weight:700">الطوبار</td>
+      <td style="font-weight:700">${esc(t("boq.formwork"))}</td>
       <td class="number">${fmt(summary.grandTotals.formwork)}</td>
       <td>م²</td>
     </tr>`;
@@ -350,18 +361,21 @@ function buildSummaryHTML(summary: BOQSummary): string {
 // Factory Order HTML
 // ─────────────────────────────────────────────────────────────
 
-function buildFactoryHTML(factoryOrder: FactoryOrderEntry[]): string {
+function buildFactoryHTML(
+	factoryOrder: FactoryOrderEntry[],
+	t: Translator,
+): string {
 	const totalBars = factoryOrder.reduce((s, e) => s + e.count, 0);
 	const totalWeight = factoryOrder.reduce((s, e) => s + e.weight, 0);
 
 	let html = `<div class="section">
     <table>
       <thead><tr>
-        <th>القطر (مم)</th>
-        <th>طول السيخ (م)</th>
-        <th>عدد الأسياخ</th>
-        <th>الوزن (كجم)</th>
-        <th>الوزن (طن)</th>
+        <th>${esc(t("boq.diameterMm"))}</th>
+        <th>${esc(t("boq.stockLengthM"))}</th>
+        <th>${esc(t("boq.barsCount"))}</th>
+        <th>${esc(t("structural.boq.weight"))}</th>
+        <th>${esc(t("boq.weightTon"))}</th>
       </tr></thead>
       <tbody>`;
 
@@ -376,7 +390,7 @@ function buildFactoryHTML(factoryOrder: FactoryOrderEntry[]): string {
 	}
 
 	html += `<tr class="totals-row">
-      <td>الإجمالي</td>
+      <td>${esc(t("structural.boq.subtotal"))}</td>
       <td></td>
       <td>${totalBars}</td>
       <td class="number">${fmt(totalWeight)}</td>
@@ -391,7 +405,10 @@ function buildFactoryHTML(factoryOrder: FactoryOrderEntry[]): string {
 // Cutting Details HTML
 // ─────────────────────────────────────────────────────────────
 
-function buildCuttingHTML(cuttingDetails: CuttingDetailRow[]): string {
+function buildCuttingHTML(
+	cuttingDetails: CuttingDetailRow[],
+	t: Translator,
+): string {
 	const diameterGroups = new Map<number, CuttingDetailRow[]>();
 	for (const d of cuttingDetails) {
 		const list = diameterGroups.get(d.diameter) || [];
@@ -411,16 +428,16 @@ function buildCuttingHTML(cuttingDetails: CuttingDetailRow[]): string {
 		const groupStocks = group.reduce((s, d) => s + d.stocksNeeded, 0);
 
 		html += `<div class="section">`;
-		html += `<div class="section-title">Ø${diameter} مم — ${group.length} عملية قص — ${groupStocks} سيخ مصنع — ${fmt(groupWeight)} كجم</div>`;
+		html += `<div class="section-title">Ø${diameter} مم — ${esc(t("boq.cutOperationsCount", { count: group.length }))} — ${esc(t("boq.factoryBarsCount", { count: groupStocks }))} — ${fmt(groupWeight)} كجم</div>`;
 		html += `<table>
       <thead><tr>
-        <th>العنصر</th>
-        <th>الوصف</th>
-        <th>طول القطعة (م)</th>
-        <th>العدد</th>
-        <th>أسياخ المصنع</th>
-        <th>الهالك %</th>
-        <th>الوزن (كجم)</th>
+        <th>${esc(t("structural.boq.element"))}</th>
+        <th>${esc(t("boq.description"))}</th>
+        <th>${esc(t("boq.pieceLengthM"))}</th>
+        <th>${esc(t("structural.quantity"))}</th>
+        <th>${esc(t("boq.factoryBars"))}</th>
+        <th>${esc(t("boq.wastePercent"))}</th>
+        <th>${esc(t("structural.boq.weight"))}</th>
       </tr></thead>
       <tbody>`;
 
