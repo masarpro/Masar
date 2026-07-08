@@ -106,7 +106,7 @@ export function Dashboard({
 	);
 
 	return (
-		<div className="flex flex-col gap-5 p-4 pt-2 md:p-6 md:pt-3 lg:p-8 lg:pt-4 overflow-hidden">
+		<div className="flex flex-col gap-3 sm:gap-5 p-3 pt-2 sm:p-4 md:p-6 md:pt-3 lg:p-8 lg:pt-4 overflow-hidden">
 			{/* Row 0: welcome fallback when both main panels are hidden */}
 			{!showFinance && !showProjects && (
 				<WelcomeSection organizationSlug={organizationSlug} />
@@ -115,7 +115,7 @@ export function Dashboard({
 			{/* Row 1: Finance (right/start) + Projects (left/end) — swapped for RTL */}
 			{(showFinance || showProjects) && (
 				<div
-					className={`grid grid-cols-1 gap-6 ${
+					className={`grid grid-cols-1 gap-3 sm:gap-6 ${
 						showFinance && showProjects ? "lg:grid-cols-2" : ""
 					}`}
 				>
@@ -142,13 +142,15 @@ export function Dashboard({
 				</div>
 			)}
 
-			{/* Row 2: Quick Actions (self-filtering by permissions) */}
-			<QuickActionsGrid organizationSlug={organizationSlug} />
+			{/* Row 2: Quick Actions — على الجوال تتصدّر اللوحة كمُشغّل تطبيق */}
+			<div className="order-first sm:order-none">
+				<QuickActionsGrid organizationSlug={organizationSlug} />
+			</div>
 
-			<hr className="border-border/50" />
+			<hr className="hidden border-border/50 sm:block" />
 
 			{/* Row 3: Operational + Recent Docs + (Alerts + DidYouKnow stacked) */}
-			<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+			<div className="grid grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-3">
 				{showProjects &&
 					(statsLoading ? (
 						cardSkeleton

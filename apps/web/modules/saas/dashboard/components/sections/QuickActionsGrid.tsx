@@ -132,7 +132,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 						<Link
 							key={i}
 							href={action.browsePath}
-							className={`flex min-h-[72px] flex-col items-center justify-center gap-1.5 rounded-xl border ${action.borderColor} ${action.bgColor} p-2 transition-colors ${action.hoverBg}`}
+							className={`flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-xl border ${action.borderColor} ${action.bgColor} p-2 transition-colors ${action.hoverBg}`}
 						>
 							<div className={`rounded-lg bg-card/60 p-1.5 ${action.iconColor}`}>
 								<Icon className="h-4 w-4" />

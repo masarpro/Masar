@@ -120,7 +120,7 @@ export function FinancePanel({
 					</Link>
 				</div>
 
-				<ChartContainer config={chartConfig} className="w-full flex-1 min-h-[100px] aspect-auto">
+				<ChartContainer config={chartConfig} className="w-full flex-1 min-h-[100px] max-h-44 sm:max-h-none aspect-auto">
 					<AreaChart
 						data={chartData}
 						margin={{ top: 4, right: 4, left: 4, bottom: 0 }}

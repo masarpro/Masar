@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 
 const glassCard =
@@ -147,20 +148,10 @@ export function ActiveProjectsSection({
 
 							{/* Project photo */}
 							<div className="relative h-10 w-10 shrink-0 ms-2 rounded-lg overflow-hidden bg-muted/30">
-								{project.photos?.[0]?.url ? (
-									<Image
-										src={project.photos[0].url}
-										alt={project.name || ""}
-										fill
-										className="object-cover"
-										sizes="40px"
-										unoptimized
-									/>
-								) : (
-									<div className="h-full w-full bg-gradient-to-br from-blue-500/20 to-sky-500/20 flex items-center justify-center">
-										<FolderOpen className="h-4 w-4 text-blue-400/60" />
-									</div>
-								)}
+								<ProjectThumb
+									src={project.photos?.[0]?.url ?? null}
+									alt={project.name || ""}
+								/>
 							</div>
 
 							{/* Info */}
@@ -181,20 +172,21 @@ export function ActiveProjectsSection({
 									/>
 								</div>
 
-								<div className="flex items-center gap-3 mt-1">
-									<span className="text-xs text-muted-foreground truncate">
+								{/* سطر بيانات واحد لا يلتف: العميل يُقتطع والقيمة والأيام لا تنكسر */}
+								<div className="flex min-w-0 items-center gap-2 sm:gap-3 mt-1">
+									<span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
 										{project.clientName || t("dashboard.noClient")}
 									</span>
-									<div className="flex items-center gap-1">
+									<div className="flex shrink-0 items-center gap-1">
 										<Banknote className="h-3 w-3 text-emerald-500" />
-										<span className="text-xs font-bold text-foreground">
+										<span className="whitespace-nowrap text-xs font-bold text-foreground tabular-nums">
 											<Currency amount={contractValue} />
 										</span>
 									</div>
 									{days !== null && (
-										<div className="flex items-center gap-1">
+										<div className="flex shrink-0 items-center gap-1">
 											<Calendar className="h-3 w-3 text-blue-500" />
-											<span className="text-[11px] text-muted-foreground">
+											<span className="whitespace-nowrap text-[11px] text-muted-foreground">
 												{days > 0
 													? `${days} ${t("dashboard.alerts.daysRemaining")}`
 													: t("dashboard.projectEnded")}
@@ -220,5 +212,33 @@ export function ActiveProjectsSection({
 				</Link>
 			)}
 		</div>
+	);
+}
+
+/**
+ * صورة المشروع المصغرة مع بديل أنيق عند فشل التحميل
+ * (الروابط الموقّعة تنتهي صلاحيتها فتظهر أيقونة مكسورة بدون هذا).
+ */
+function ProjectThumb({ src, alt }: { src: string | null; alt: string }) {
+	const [failed, setFailed] = useState(false);
+
+	if (!src || failed) {
+		return (
+			<div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-500/20 to-sky-500/20">
+				<FolderOpen className="h-4 w-4 text-blue-400/60" />
+			</div>
+		);
+	}
+
+	return (
+		<Image
+			src={src}
+			alt={alt}
+			fill
+			className="object-cover"
+			sizes="40px"
+			unoptimized
+			onError={() => setFailed(true)}
+		/>
 	);
 }
