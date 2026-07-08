@@ -22,6 +22,7 @@ import { CostStudyCard } from "./CostStudyCard";
 import { CreateCostStudyDialog } from "./CreateCostStudyForm";
 import { formatCurrency } from "../../lib/utils";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
 
 interface QuantitiesListProps {
 	organizationId: string;
@@ -62,8 +63,44 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 
 	return (
 		<div className="space-y-6">
-			{/* Statistics Cards - Modern 2026 Flat Design */}
-			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+			{/* الجوال: شريط إحصائيات مضغوط */}
+			<CompactStatGrid
+				className="sm:hidden"
+				items={[
+					{
+						label: t("pricing.studies.stats.total"),
+						value: stats.total,
+						icon: FileStack,
+					},
+					{
+						label: t("pricing.studies.stats.inProgress"),
+						value: stats.inProgress,
+						icon: Clock,
+						iconClassName: "text-amber-600 dark:text-amber-400",
+						iconBgClassName: "bg-amber-100 dark:bg-amber-900/30",
+						valueClassName: "text-amber-700 dark:text-amber-300",
+					},
+					{
+						label: t("pricing.studies.stats.completed"),
+						value: stats.completed,
+						icon: CheckCircle2,
+						iconClassName: "text-sky-600 dark:text-sky-400",
+						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+						valueClassName: "text-sky-700 dark:text-sky-300",
+					},
+					{
+						label: t("pricing.studies.stats.totalValue"),
+						value: formatCurrency(stats.totalValue),
+						icon: TrendingUp,
+						iconClassName: "text-indigo-600 dark:text-indigo-400",
+						iconBgClassName: "bg-indigo-100 dark:bg-indigo-900/30",
+						valueClassName: "text-indigo-700 dark:text-indigo-300",
+					},
+				]}
+			/>
+
+			{/* Statistics Cards - Modern 2026 Flat Design (الديسكتوب كما هو) */}
+			<div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
 				<div className="group relative rounded-2xl bg-slate-50 dark:bg-slate-900/50 p-5 transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800/50">
 					<div className="flex items-center justify-between">
 						<div>
@@ -115,6 +152,26 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 
 			{/* Filter Tabs + Search */}
 			<div className="space-y-4">
+				{/* الجوال: بحث + زر إنشاء مضغوط في صف واحد */}
+				<div className="flex items-center gap-2 sm:hidden">
+					<div className="relative min-w-0 flex-1">
+						<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+						<Input
+							placeholder={t("pricing.studies.searchPlaceholder")}
+							value={searchTerm}
+							onChange={(e: any) => setSearchTerm(e.target.value)}
+							className="pe-10 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-700"
+						/>
+					</div>
+					<Button
+						size="icon"
+						aria-label={t("pricing.studies.newStudy")}
+						onClick={() => setShowCreateDialog(true)}
+						className="h-10 w-10 shrink-0 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
+					>
+						<Plus className="h-5 w-5" />
+					</Button>
+				</div>
 				<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 					{/* Status filter pills */}
 					<div className="flex items-center gap-2 flex-wrap">
@@ -145,15 +202,15 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 							</button>
 						))}
 					</div>
-					<div className="flex items-center gap-2 shrink-0">
+					<div className="hidden sm:flex items-center gap-2 shrink-0">
 						<Button onClick={() => setShowCreateDialog(true)} className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors">
 							<Plus className="ml-2 h-4 w-4" />
 							{t("pricing.studies.newStudy")}
 						</Button>
 					</div>
 				</div>
-				{/* Search */}
-				<div className="relative max-w-md">
+				{/* Search (الديسكتوب كما هو) */}
+				<div className="relative max-w-md hidden sm:block">
 					<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 					<Input
 						placeholder={t("pricing.studies.searchPlaceholder")}

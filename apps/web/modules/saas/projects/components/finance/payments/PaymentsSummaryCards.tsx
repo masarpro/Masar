@@ -68,26 +68,26 @@ export function PaymentsSummaryCards({
 	];
 
 	return (
-		<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+		<div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-4">
 			{cards.map((card) => (
 				<div
 					key={card.title}
-					className={`flex min-w-0 rounded-2xl border border-slate-200/60 shadow-lg shadow-black/5 ${card.bgColor} p-4 dark:border-slate-700/50`}
+					className={`flex min-w-0 rounded-xl sm:rounded-2xl border border-slate-200/60 shadow-sm sm:shadow-lg shadow-black/5 ${card.bgColor} p-2.5 sm:p-4 dark:border-slate-700/50`}
 				>
-					<div className="flex min-w-0 items-center gap-3">
+					<div className="flex min-w-0 items-center gap-2 sm:gap-3">
 						<div
-							className={`shrink-0 rounded-xl ${card.iconBg} p-2.5`}
+							className={`shrink-0 rounded-lg sm:rounded-xl ${card.iconBg} p-1.5 sm:p-2.5`}
 						>
 							<card.icon
-								className={`h-5 w-5 shrink-0 ${card.iconColor}`}
+								className={`h-4 w-4 sm:h-5 sm:w-5 shrink-0 ${card.iconColor}`}
 							/>
 						</div>
 						<div className="min-w-0 flex-1 overflow-hidden">
-							<p className={`truncate text-xs ${card.labelColor}`}>
+							<p className={`truncate text-[11px] sm:text-xs ${card.labelColor}`}>
 								{card.title}
 							</p>
 							<p
-								className={`truncate text-base font-semibold sm:text-lg ${card.textColor}`}
+								className={`truncate text-sm font-bold tabular-nums sm:text-lg sm:font-semibold ${card.textColor}`}
 								title={formatSAR(card.value)}
 							>
 								{formatSAR(card.value)}

@@ -65,10 +65,10 @@ export function OperationalSection({
 					const Icon = stat.icon;
 					return (
 						<div key={i} className={`rounded-lg ${stat.bgColor} p-2.5 flex items-center gap-2`}>
-							<Icon className={`h-4 w-4 ${stat.color}`} />
-							<div>
-								<p className="text-xs text-muted-foreground">{stat.label}</p>
-								<p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
+							<Icon className={`h-4 w-4 shrink-0 ${stat.color}`} />
+							<div className="min-w-0">
+								<p className="truncate text-[11px] sm:text-xs text-muted-foreground">{stat.label}</p>
+								<p className={`text-base sm:text-xl font-bold tabular-nums ${stat.color}`}>{stat.value}</p>
 							</div>
 						</div>
 					);

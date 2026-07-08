@@ -14,6 +14,7 @@ import {
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
 
 interface ProjectInsightsProps {
 	organizationId: string;
@@ -110,9 +111,40 @@ export function ProjectInsights({
 	}
 
 	return (
-		<div className="space-y-6">
-			{/* Stats Cards */}
-			<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+		<div className="space-y-4 sm:space-y-6">
+			{/* الجوال: شريط إحصائيات مضغوط */}
+			<CompactStatGrid
+				className="sm:hidden"
+				items={[
+					{
+						label: t("projects.insights.critical"),
+						value: data?.stats.critical || 0,
+						icon: AlertCircle,
+						iconClassName: "text-red-600 dark:text-red-400",
+						iconBgClassName: "bg-red-100 dark:bg-red-900/50",
+						valueClassName: "text-red-700 dark:text-red-300",
+					},
+					{
+						label: t("projects.insights.warnings"),
+						value: data?.stats.warnings || 0,
+						icon: AlertTriangle,
+						iconClassName: "text-amber-600 dark:text-amber-400",
+						iconBgClassName: "bg-amber-100 dark:bg-amber-900/50",
+						valueClassName: "text-amber-700 dark:text-amber-300",
+					},
+					{
+						label: t("projects.insights.info"),
+						value: data?.stats.info || 0,
+						icon: Info,
+						iconClassName: "text-blue-600 dark:text-blue-400",
+						iconBgClassName: "bg-blue-100 dark:bg-blue-900/50",
+						valueClassName: "text-blue-700 dark:text-blue-300",
+					},
+				]}
+			/>
+
+			{/* Stats Cards (الديسكتوب كما هو) */}
+			<div className="hidden sm:grid sm:grid-cols-3 gap-4">
 				<div className="rounded-2xl bg-red-50 p-5 dark:bg-red-950/30">
 					<div className="flex items-center gap-3">
 						<div className="rounded-xl bg-red-100 p-2.5 dark:bg-red-900/50">

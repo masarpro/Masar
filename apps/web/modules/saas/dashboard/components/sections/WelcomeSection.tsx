@@ -50,25 +50,25 @@ export function WelcomeSection({
 	].filter((section) => section.visible);
 
 	return (
-		<div className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 p-6">
-			<h2 className="font-semibold text-lg">
+		<div className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 p-4 sm:p-6">
+			<h2 className="font-semibold text-base sm:text-lg">
 				{t("dashboard.welcome.title")}
 			</h2>
 			<p className="mt-1 text-muted-foreground text-sm">
 				{t("dashboard.welcome.sectionsIntro")}
 			</p>
 			{sections.length > 0 && (
-				<div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
+				<div className="mt-4 sm:mt-5 grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-4">
 					{sections.map((section) => {
 						const Icon = section.icon;
 						return (
 							<Link
 								key={section.id}
 								href={section.href}
-								className="flex flex-col items-center gap-2 rounded-xl border border-border/50 bg-card/60 p-4 transition-colors hover:bg-muted/60"
+								className="flex flex-col items-center gap-2 rounded-xl border border-border/50 bg-card/60 p-3 sm:p-4 transition-colors hover:bg-muted/60"
 							>
-								<Icon className="size-6 text-primary" />
-								<span className="text-center font-medium text-sm">
+								<Icon className="size-5 sm:size-6 text-primary" />
+								<span className="text-center font-medium text-xs sm:text-sm">
 									{section.label}
 								</span>
 							</Link>

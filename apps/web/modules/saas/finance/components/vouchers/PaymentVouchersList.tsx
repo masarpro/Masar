@@ -19,6 +19,7 @@ import { Search, Plus, FileMinus, Eye, Clock } from "lucide-react";
 import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 
 interface PaymentVouchersListProps {
 	organizationId: string;
@@ -79,33 +80,33 @@ export function PaymentVouchersList({
 
 			{/* Summary Cards */}
 			{summaryData && (
-				<div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+				<div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-4">
 					<Card>
-						<CardContent className="pt-4">
-							<div className="text-sm text-muted-foreground">
+						<CardContent className="pt-3 sm:pt-4">
+							<div className="text-xs sm:text-sm text-muted-foreground">
 								{t("finance.paymentVouchers.summary.totalIssued")}
 							</div>
-							<div className="mt-1 text-2xl font-bold">
+							<div className="mt-1 text-base sm:text-2xl font-bold">
 								<Currency amount={summaryData.totalAmount} />
 							</div>
 						</CardContent>
 					</Card>
 					<Card>
-						<CardContent className="pt-4">
-							<div className="text-sm text-muted-foreground">
+						<CardContent className="pt-3 sm:pt-4">
+							<div className="text-xs sm:text-sm text-muted-foreground">
 								{t("finance.paymentVouchers.summary.count")}
 							</div>
-							<div className="mt-1 text-2xl font-bold">{summaryData.count}</div>
+							<div className="mt-1 text-base sm:text-2xl font-bold">{summaryData.count}</div>
 						</CardContent>
 					</Card>
 					{summaryData.pendingApproval.count > 0 && (
 						<Card className="border-amber-200 bg-amber-50">
-							<CardContent className="pt-4">
-								<div className="flex items-center gap-2 text-sm text-amber-700">
+							<CardContent className="pt-3 sm:pt-4">
+								<div className="flex items-center gap-2 text-xs sm:text-sm text-amber-700">
 									<Clock className="h-4 w-4" />
 									{t("finance.paymentVouchers.summary.pendingApproval")}
 								</div>
-								<div className="mt-1 text-2xl font-bold text-amber-700">
+								<div className="mt-1 text-base sm:text-2xl font-bold text-amber-700">
 									{summaryData.pendingApproval.count}
 								</div>
 								<div className="text-xs text-amber-600">
@@ -117,8 +118,35 @@ export function PaymentVouchersList({
 				</div>
 			)}
 
-			{/* Filters */}
-			<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+			{/* الجوال: بحث + ورقة فلاتر في صف واحد */}
+			<div className="flex items-center gap-2 sm:hidden">
+				<div className="relative min-w-0 flex-1">
+					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+					<Input
+						placeholder={t("common.search")}
+						value={searchQuery}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+						className="ps-9"
+					/>
+				</div>
+				<MobileFilterSheet activeCount={statusFilter !== "all" ? 1 : 0}>
+					<Select value={statusFilter} onValueChange={setStatusFilter}>
+						<SelectTrigger className="w-full rounded-xl">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="all">{t("common.all")}</SelectItem>
+							<SelectItem value="DRAFT">{t("finance.paymentVouchers.statuses.DRAFT")}</SelectItem>
+							<SelectItem value="PENDING_APPROVAL">{t("finance.paymentVouchers.statuses.PENDING_APPROVAL")}</SelectItem>
+							<SelectItem value="ISSUED">{t("finance.paymentVouchers.statuses.ISSUED")}</SelectItem>
+							<SelectItem value="CANCELLED">{t("finance.paymentVouchers.statuses.CANCELLED")}</SelectItem>
+						</SelectContent>
+					</Select>
+				</MobileFilterSheet>
+			</div>
+
+			{/* Filters (الديسكتوب كما هو) */}
+			<div className="hidden flex-col gap-3 sm:flex sm:flex-row sm:items-center">
 				<div className="relative flex-1">
 					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input

@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { GlassStatCard } from "@ui/components/glass-stat-card";
+import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
 import { Currency } from "../shared/Currency";
 
 interface FinanceStats {
@@ -29,7 +30,40 @@ export function StatsCards({ stats }: StatsCardsProps) {
 	const t = useTranslations();
 
 	return (
-		<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+		<>
+			{/* الجوال: شريط إحصائيات مضغوط */}
+			<CompactStatGrid
+				className="sm:hidden"
+				items={[
+					{
+						label: t("finance.stats.invoices"),
+						value: stats?.invoices.total ?? 0,
+						icon: Receipt,
+						iconClassName: "text-sky-600 dark:text-sky-400",
+						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+						valueClassName: "text-sky-700 dark:text-sky-300",
+					},
+					{
+						label: t("finance.stats.outstanding"),
+						value: <Currency amount={stats?.invoices.outstandingValue ?? 0} />,
+						icon: Clock,
+						iconClassName: "text-amber-600 dark:text-amber-400",
+						iconBgClassName: "bg-amber-100 dark:bg-amber-900/30",
+						valueClassName: "text-amber-700 dark:text-amber-300",
+					},
+					{
+						label: t("finance.stats.clients"),
+						value: stats?.clients.total ?? 0,
+						icon: Users,
+						iconClassName: "text-sky-600 dark:text-sky-400",
+						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+						valueClassName: "text-sky-700 dark:text-sky-300",
+					},
+				]}
+			/>
+
+			{/* الديسكتوب كما هو */}
+			<div className="hidden sm:grid sm:grid-cols-3 gap-3">
 			<GlassStatCard
 				colorScheme="sky"
 				icon={<Receipt className="h-4 w-4 text-sky-600 dark:text-sky-400" />}
@@ -51,6 +85,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
 				value={stats?.clients.total ?? 0}
 				subtitle={t("finance.stats.activeClients")}
 			/>
-		</div>
+			</div>
+		</>
 	);
 }

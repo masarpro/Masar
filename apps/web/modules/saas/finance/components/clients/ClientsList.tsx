@@ -52,6 +52,7 @@ import {
 	Eye,
 } from "lucide-react";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 
 interface ClientsListProps {
 	organizationId: string;
@@ -129,7 +130,47 @@ export function ClientsList({
 			{/* Filters */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-4">
-					<div className="flex flex-col sm:flex-row gap-4">
+					{/* الجوال: بحث + ورقة فلاتر في صف واحد */}
+					<div className="flex items-center gap-2 sm:hidden">
+						<div className="relative min-w-0 flex-1">
+							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+							<Input
+								placeholder={t("finance.clients.searchPlaceholder")}
+								value={searchQuery}
+								onChange={(e: any) => setSearchQuery(e.target.value)}
+								className="ps-10 rounded-xl"
+							/>
+						</div>
+						<MobileFilterSheet activeCount={showActiveOnly !== undefined ? 1 : 0}>
+							<Button
+								variant={showActiveOnly === undefined ? "primary" : "outline"}
+								size="sm"
+								onClick={() => setShowActiveOnly(undefined)}
+								className="w-full justify-start rounded-xl"
+							>
+								{t("common.all")}
+							</Button>
+							<Button
+								variant={showActiveOnly === true ? "primary" : "outline"}
+								size="sm"
+								onClick={() => setShowActiveOnly(true)}
+								className="w-full justify-start rounded-xl"
+							>
+								{t("finance.clients.active")}
+							</Button>
+							<Button
+								variant={showActiveOnly === false ? "primary" : "outline"}
+								size="sm"
+								onClick={() => setShowActiveOnly(false)}
+								className="w-full justify-start rounded-xl"
+							>
+								{t("finance.clients.inactive")}
+							</Button>
+						</MobileFilterSheet>
+					</div>
+
+					{/* الديسكتوب كما هو */}
+					<div className="hidden flex-col sm:flex sm:flex-row gap-4">
 						<div className="flex-1 relative">
 							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
 							<Input

@@ -71,6 +71,8 @@ import { Currency } from "../shared/Currency";
 import { PayExpenseDialog } from "./PayExpenseDialog";
 import { AddExpenseDialog } from "./AddExpenseDialog";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 import { findCategoryById, EXPENSE_CATEGORIES as ALL_CATEGORIES } from "@repo/utils";
 import { usePartnerAccess } from "@saas/organizations/hooks/use-partner-access";
 
@@ -246,9 +248,48 @@ export function ExpensesList({
 
 	return (
 		<div className="space-y-6">
-			{/* Summary Cards */}
+			{/* الجوال: شريط إحصائيات مضغوط */}
+			<CompactStatGrid
+				className="sm:hidden"
+				items={[
+					{
+						label: t("finance.expenses.totalExpenses"),
+						value: <Currency amount={grandTotal} />,
+						icon: TrendingDown,
+						iconClassName: "text-red-600 dark:text-red-400",
+						iconBgClassName: "bg-red-100 dark:bg-red-900/50",
+					},
+					{
+						label: t("finance.expenses.directExpenses"),
+						value: <Currency amount={expensesTotal} />,
+						icon: TrendingDown,
+						iconClassName: "text-orange-600 dark:text-orange-400",
+						iconBgClassName: "bg-orange-100 dark:bg-orange-900/50",
+					},
+					{
+						label: t("finance.expenses.subcontractPayments"),
+						value: <Currency amount={subcontractTotal} />,
+						icon: Hammer,
+						iconClassName: "text-sky-600 dark:text-sky-400",
+						iconBgClassName: "bg-sky-100 dark:bg-sky-900/50",
+					},
+					...(canAccessPartners
+						? [
+								{
+									label: t("finance.expenses.ownerDrawingsTotal"),
+									value: <Currency amount={ownerDrawingsTotal} />,
+									icon: UserIcon,
+									iconClassName: "text-purple-600 dark:text-purple-400",
+									iconBgClassName: "bg-purple-100 dark:bg-purple-900/50",
+								},
+							]
+						: []),
+				]}
+			/>
+
+			{/* Summary Cards (الديسكتوب كما هو) */}
 			<div
-				className={`grid grid-cols-1 gap-4 ${
+				className={`hidden gap-4 sm:grid ${
 					canAccessPartners ? "sm:grid-cols-4" : "sm:grid-cols-3"
 				}`}
 			>
@@ -324,8 +365,100 @@ export function ExpensesList({
 				)}
 			</div>
 
-			{/* Filters & Actions */}
-			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+			{/* الجوال: بحث + ورقة فلاتر + زر إضافة مضغوط في صف واحد */}
+			<div className="flex items-center gap-2 sm:hidden">
+				<div className="relative min-w-0 flex-1">
+					<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+					<Input
+						placeholder={t("finance.expenses.searchPlaceholder")}
+						value={searchQuery}
+						onChange={(e: any) => setSearchQuery(e.target.value)}
+						className="ps-10 rounded-xl"
+					/>
+				</div>
+				<MobileFilterSheet
+					activeCount={
+						(categoryFilter ? 1 : 0) +
+						(sourceTypeFilter ? 1 : 0) +
+						(!projectId && projectFilter ? 1 : 0)
+					}
+				>
+					<Select
+						value={categoryFilter || "all"}
+						onValueChange={(value: any) =>
+							setCategoryFilter(value === "all" ? undefined : value)
+						}
+					>
+						<SelectTrigger className="w-full rounded-xl">
+							<SelectValue placeholder={t("finance.expenses.filterByCategory")} />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="all">{t("common.all")}</SelectItem>
+							{ALL_CATEGORIES.map((cat) => (
+								<SelectItem key={cat.id} value={cat.id}>
+									{locale === "ar" ? cat.nameAr : cat.nameEn}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					<Select
+						value={sourceTypeFilter || "all"}
+						onValueChange={(value: any) =>
+							setSourceTypeFilter(value === "all" ? undefined : value)
+						}
+					>
+						<SelectTrigger className="w-full rounded-xl">
+							<SelectValue placeholder={t("finance.expenses.filterBySource")} />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="all">{t("common.all")}</SelectItem>
+							<SelectItem value="MANUAL">{t("finance.expenses.sourceTypes.manual")}</SelectItem>
+							<SelectItem value="FACILITY_PAYROLL">{t("finance.expenses.sourceTypes.facility_payroll")}</SelectItem>
+							<SelectItem value="FACILITY_RECURRING">{t("finance.expenses.sourceTypes.facility_recurring")}</SelectItem>
+							<SelectItem value="FACILITY_ASSET">{t("finance.expenses.sourceTypes.facility_asset")}</SelectItem>
+							<SelectItem value="PROJECT">{t("finance.expenses.sourceTypes.project")}</SelectItem>
+							{canAccessPartners && (
+								<SelectItem value="OWNER_DRAWING">
+									{t("finance.expenses.filterOwnerDrawingsOnly")}
+								</SelectItem>
+							)}
+						</SelectContent>
+					</Select>
+					{!projectId && (
+						<Select
+							value={projectFilter || "all"}
+							onValueChange={(value: any) =>
+								setProjectFilter(value === "all" ? undefined : value)
+							}
+						>
+							<SelectTrigger className="w-full rounded-xl">
+								<SelectValue placeholder={t("finance.expenses.filterByProject")} />
+							</SelectTrigger>
+							<SelectContent className="rounded-xl">
+								<SelectItem value="all">{t("finance.expenses.allProjects")}</SelectItem>
+								{projects.map((project: any) => (
+									<SelectItem key={project.id} value={project.id}>
+										{project.name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					)}
+				</MobileFilterSheet>
+				{!hideAddButton && (
+					<Button
+						size="icon"
+						aria-label={t("finance.expenses.new")}
+						className="h-10 w-10 shrink-0 rounded-xl"
+						onClick={() => setShowAddDialog(true)}
+					>
+						<Plus className="h-5 w-5" />
+					</Button>
+				)}
+			</div>
+
+			{/* Filters & Actions (الديسكتوب كما هو) */}
+			<div className="hidden flex-col gap-3 sm:flex sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
 					<div className="relative flex-1 max-w-xs">
 						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />

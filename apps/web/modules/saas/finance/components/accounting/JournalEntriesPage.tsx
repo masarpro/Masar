@@ -18,6 +18,7 @@ import {
 } from "@ui/components/table";
 import { Plus, Search, Zap, FileEdit, CheckSquare, Send, Filter, X, Download } from "lucide-react";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 import { formatAccounting } from "./formatters";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -132,8 +133,57 @@ export function JournalEntriesPage({
 
 	return (
 		<div className="space-y-4">
-			{/* Filters + Actions */}
-			<div className="flex flex-wrap items-center justify-between gap-3">
+			{/* الجوال: بحث + ورقة فلاتر + زر إضافة مضغوط في صف واحد */}
+			<div className="flex items-center gap-2 sm:hidden">
+				<div className="relative min-w-0 flex-1">
+					<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+					<Input
+						placeholder={t("finance.accounting.search")}
+						value={search}
+						onChange={(e: any) => setSearch(e.target.value)}
+						className="ps-9 rounded-xl"
+					/>
+				</div>
+				<MobileFilterSheet
+					activeCount={
+						[status, dateFrom, dateTo, amountFrom, amountTo, accountId, referenceType].filter(
+							Boolean,
+						).length
+					}
+				>
+					<select
+						value={status}
+						onChange={(e) => setStatus(e.target.value)}
+						className="h-9 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent px-3 text-sm"
+					>
+						<option value="">{t("finance.accounting.draft")} / {t("finance.accounting.posted")} / {t("finance.accounting.reversed")}</option>
+						<option value="DRAFT">{t("finance.accounting.draft")}</option>
+						<option value="POSTED">{t("finance.accounting.posted")}</option>
+						<option value="REVERSED">{t("finance.accounting.reversed")}</option>
+					</select>
+					<Button
+						variant={showFilters ? "secondary" : "outline"}
+						size="sm"
+						className="w-full rounded-xl"
+						onClick={() => setShowFilters((v) => !v)}
+					>
+						<Filter className="h-4 w-4 me-1" />
+						{t("finance.accounting.advancedFilters")}
+					</Button>
+				</MobileFilterSheet>
+				<Link href={`${basePath}/new-adjustment`}>
+					<Button
+						size="icon"
+						aria-label={t("finance.accounting.newEntry")}
+						className="h-10 w-10 shrink-0 rounded-xl"
+					>
+						<Plus className="h-5 w-5" />
+					</Button>
+				</Link>
+			</div>
+
+			{/* Filters + Actions (الديسكتوب كما هو) */}
+			<div className="hidden flex-wrap items-center justify-between gap-3 sm:flex">
 				<div className="flex flex-wrap items-center gap-2">
 					<div className="relative">
 						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />

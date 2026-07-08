@@ -274,7 +274,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 					</h3>
 				</div>
 				<div className="p-5">
-					<div className="flex items-start justify-between">
+					<div className="flex flex-wrap items-start justify-between gap-y-3">
 						<div className="space-y-3">
 							<div>
 								<h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
@@ -305,7 +305,7 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 						</div>
 
 						{/* Action Buttons */}
-						<div className="flex items-center gap-2">
+						<div className="flex flex-wrap items-center gap-2">
 							{run.status === "DRAFT" && (
 								<>
 									<Button
@@ -356,60 +356,60 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 				</div>
 			</div>
 
-			{/* Summary Cards */}
-			<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
-					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-							<Banknote className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+			{/* Summary Cards — مضغوطة على الجوال */}
+			<div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
+				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-3 sm:p-4">
+					<div className="flex items-center justify-between mb-2 sm:mb-3">
+						<div className="p-1.5 sm:p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+							<Banknote className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
 						</div>
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 						{t("company.payroll.totalBaseSalary")}
 					</p>
-					<p className="text-lg font-bold text-blue-700 dark:text-blue-300">
+					<p className="truncate text-base sm:text-lg font-bold text-blue-700 dark:text-blue-300">
 						{formatCurrency(totalBaseSalary)}
 					</p>
 				</div>
 
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
-					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-							<Wallet className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-3 sm:p-4">
+					<div className="flex items-center justify-between mb-2 sm:mb-3">
+						<div className="p-1.5 sm:p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
+							<Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-sky-600 dark:text-sky-400" />
 						</div>
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 						{t("company.payroll.totalAllowances")}
 					</p>
-					<p className="text-lg font-bold text-sky-700 dark:text-sky-300">
+					<p className="truncate text-base sm:text-lg font-bold text-sky-700 dark:text-sky-300">
 						{formatCurrency(totalAllowances)}
 					</p>
 				</div>
 
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
-					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30">
-							<ShieldMinus className="h-5 w-5 text-red-600 dark:text-red-400" />
+				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-3 sm:p-4">
+					<div className="flex items-center justify-between mb-2 sm:mb-3">
+						<div className="p-1.5 sm:p-2 rounded-lg bg-red-100 dark:bg-red-900/30">
+							<ShieldMinus className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 dark:text-red-400" />
 						</div>
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 						{t("company.payroll.totalDeductions")}
 					</p>
-					<p className="text-lg font-bold text-red-700 dark:text-red-300">
+					<p className="truncate text-base sm:text-lg font-bold text-red-700 dark:text-red-300">
 						{formatCurrency(totalDeductions)}
 					</p>
 				</div>
 
-				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
-					<div className="flex items-center justify-between mb-3">
-						<div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
-							<Users className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-3 sm:p-4">
+					<div className="flex items-center justify-between mb-2 sm:mb-3">
+						<div className="p-1.5 sm:p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
+							<Users className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600 dark:text-indigo-400" />
 						</div>
 					</div>
-					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+					<p className="text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 						{t("company.payroll.netTotal")}
 					</p>
-					<p className="text-lg font-bold text-indigo-700 dark:text-indigo-300">
+					<p className="truncate text-base sm:text-lg font-bold text-indigo-700 dark:text-indigo-300">
 						{formatCurrency(netTotal)}
 					</p>
 				</div>

@@ -35,6 +35,7 @@ import { Textarea } from "@ui/components/textarea";
 import { Plus, Check, X, Ban, ClipboardList } from "lucide-react";
 import { toast } from "sonner";
 import { Pagination } from "@saas/shared/components/Pagination";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 
 interface LeaveRequestListProps {
 	organizationId: string;
@@ -165,8 +166,34 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 
 	return (
 		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+			{/* الجوال: ورقة فلاتر + زر إنشاء مضغوط في صف واحد */}
+			<div className="flex items-center justify-between gap-2 sm:hidden">
+				<MobileFilterSheet activeCount={statusFilter !== "all" ? 1 : 0}>
+					<Select value={statusFilter} onValueChange={(v: any) => { setStatusFilter(v); setCurrentPage(1); }}>
+						<SelectTrigger className="w-full rounded-xl">
+							<SelectValue placeholder={t("company.leaves.filterStatus")} />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="all">{t("company.common.all")}</SelectItem>
+							<SelectItem value="PENDING">{t("company.leaves.statusPending")}</SelectItem>
+							<SelectItem value="APPROVED">{t("company.leaves.statusApproved")}</SelectItem>
+							<SelectItem value="REJECTED">{t("company.leaves.statusRejected")}</SelectItem>
+							<SelectItem value="CANCELLED">{t("company.leaves.statusCancelled")}</SelectItem>
+						</SelectContent>
+					</Select>
+				</MobileFilterSheet>
+				<Button
+					size="icon"
+					aria-label={t("company.leaves.requests.create")}
+					onClick={() => setShowCreateDialog(true)}
+					className="h-10 w-10 shrink-0 rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+				>
+					<Plus className="h-5 w-5" />
+				</Button>
+			</div>
+
+			{/* Header (الديسكتوب كما هو) */}
+			<div className="hidden gap-4 sm:flex sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
 					<Select value={statusFilter} onValueChange={(v: any) => { setStatusFilter(v); setCurrentPage(1); }}>
 						<SelectTrigger className="w-[160px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">

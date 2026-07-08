@@ -28,38 +28,38 @@ export const SubcontractFinanceSummary = React.memo(function SubcontractFinanceS
 	const t = useTranslations();
 
 	return (
-		<div className="p-5">
+		<div className="p-3 sm:p-5">
 			{/* Value Cards */}
-			<div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-				<div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800/50">
-					<p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
+			<div className="mb-4 grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-4">
+				<div className="min-w-0 rounded-xl bg-slate-50 p-2.5 sm:p-3 dark:bg-slate-800/50">
+					<p className="truncate text-[10px] font-medium uppercase tracking-wide text-slate-500">
 						{t("subcontracts.detail.originalValue")}
 					</p>
-					<p className="mt-1 text-lg font-bold text-slate-800 dark:text-slate-200">
+					<p className="mt-1 truncate text-sm sm:text-lg font-bold tabular-nums text-slate-800 dark:text-slate-200">
 						{formatCurrency(contractValue)}
 					</p>
 				</div>
-				<div className="rounded-xl bg-amber-50 p-3 dark:bg-amber-950/20">
-					<p className="text-[10px] font-medium uppercase tracking-wide text-amber-600 dark:text-amber-400">
+				<div className="min-w-0 rounded-xl bg-amber-50 p-2.5 sm:p-3 dark:bg-amber-950/20">
+					<p className="truncate text-[10px] font-medium uppercase tracking-wide text-amber-600 dark:text-amber-400">
 						{t("subcontracts.detail.changeOrders")}
 					</p>
-					<p className={`mt-1 text-lg font-bold ${coImpact >= 0 ? "text-amber-700 dark:text-amber-300" : "text-red-600"}`}>
+					<p className={`mt-1 truncate text-sm sm:text-lg font-bold tabular-nums ${coImpact >= 0 ? "text-amber-700 dark:text-amber-300" : "text-red-600"}`}>
 						{coImpact >= 0 ? "+" : ""}{formatCurrency(coImpact)}
 					</p>
 				</div>
-				<div className="rounded-xl bg-sky-50 p-3 dark:bg-sky-950/20">
-					<p className="text-[10px] font-medium uppercase tracking-wide text-sky-600 dark:text-sky-400">
+				<div className="min-w-0 rounded-xl bg-sky-50 p-2.5 sm:p-3 dark:bg-sky-950/20">
+					<p className="truncate text-[10px] font-medium uppercase tracking-wide text-sky-600 dark:text-sky-400">
 						{t("subcontracts.detail.totalPaid")}
 					</p>
-					<p className="mt-1 text-lg font-bold text-sky-700 dark:text-sky-300">
+					<p className="mt-1 truncate text-sm sm:text-lg font-bold tabular-nums text-sky-700 dark:text-sky-300">
 						{formatCurrency(totalPaid)}
 					</p>
 				</div>
-				<div className={`rounded-xl p-3 ${isOverBudget ? "bg-red-50 dark:bg-red-950/20" : "rounded-xl bg-blue-50 dark:bg-blue-950/20"}`}>
-					<p className={`text-[10px] font-medium uppercase tracking-wide ${isOverBudget ? "text-red-600 dark:text-red-400" : "text-blue-600 dark:text-blue-400"}`}>
+				<div className={`min-w-0 rounded-xl p-2.5 sm:p-3 ${isOverBudget ? "bg-red-50 dark:bg-red-950/20" : "rounded-xl bg-blue-50 dark:bg-blue-950/20"}`}>
+					<p className={`truncate text-[10px] font-medium uppercase tracking-wide ${isOverBudget ? "text-red-600 dark:text-red-400" : "text-blue-600 dark:text-blue-400"}`}>
 						{t("subcontracts.detail.remaining")}
 					</p>
-					<p className={`mt-1 text-lg font-bold ${isOverBudget ? "text-red-700 dark:text-red-300" : "text-blue-700 dark:text-blue-300"}`}>
+					<p className={`mt-1 truncate text-sm sm:text-lg font-bold tabular-nums ${isOverBudget ? "text-red-700 dark:text-red-300" : "text-blue-700 dark:text-blue-300"}`}>
 						{formatCurrency(remaining)}
 					</p>
 				</div>

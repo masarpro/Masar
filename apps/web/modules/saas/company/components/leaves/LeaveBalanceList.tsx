@@ -33,6 +33,7 @@ import {
 import { Label } from "@ui/components/label";
 import { Pencil, Wallet } from "lucide-react";
 import { toast } from "sonner";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 
 interface LeaveBalanceListProps {
 	organizationId: string;
@@ -91,8 +92,32 @@ export function LeaveBalanceList({ organizationId, organizationSlug }: LeaveBala
 
 	return (
 		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+			{/* الجوال: ورقة فلاتر + زر تعديل مضغوط في صف واحد */}
+			<div className="flex items-center justify-between gap-2 sm:hidden">
+				<MobileFilterSheet activeCount={year !== currentYear ? 1 : 0}>
+					<Select value={String(year)} onValueChange={(v: any) => setYear(Number(v))}>
+						<SelectTrigger className="w-full rounded-xl">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							{yearOptions.map((y) => (
+								<SelectItem key={y} value={String(y)}>{y}</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</MobileFilterSheet>
+				<Button
+					size="icon"
+					aria-label={t("company.leaves.balances.adjust")}
+					onClick={() => setShowAdjustDialog(true)}
+					className="h-10 w-10 shrink-0 rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+				>
+					<Pencil className="h-4 w-4" />
+				</Button>
+			</div>
+
+			{/* Header (الديسكتوب كما هو) */}
+			<div className="hidden gap-4 sm:flex sm:items-center sm:justify-between">
 				<div className="flex items-center gap-3">
 					<Select value={String(year)} onValueChange={(v: any) => setYear(Number(v))}>
 						<SelectTrigger className="w-[140px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">

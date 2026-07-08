@@ -33,6 +33,8 @@ import {
 } from "@ui/components/dialog";
 import { Plus, CalendarRange, Banknote, FileText, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
+import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 import { Currency } from "../../../finance/components/shared/Currency";
 
 interface PayrollRunListProps {
@@ -113,8 +115,39 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 
 	return (
 		<div className="space-y-6">
-			{/* Summary Cards - Glass Morphism */}
-			<div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+			{/* الجوال: شريط إحصائيات مضغوط */}
+			<CompactStatGrid
+				className="sm:hidden"
+				items={[
+					{
+						label: t("company.payroll.totalRuns"),
+						value: runs.length,
+						icon: FileText,
+						iconClassName: "text-blue-600 dark:text-blue-400",
+						iconBgClassName: "bg-blue-100 dark:bg-blue-900/30",
+					},
+					{
+						label: t("company.payroll.currentMonthStatus"),
+						value: currentMonthRun
+							? getStatusBadge(currentMonthRun.status)
+							: t("company.payroll.noRuns"),
+						icon: CalendarRange,
+						iconClassName: "text-sky-600 dark:text-sky-400",
+						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+					},
+					{
+						label: t("company.payroll.totalSalaries"),
+						value: <Currency amount={Number(latestRun?.totalNetSalary ?? 0)} />,
+						icon: Banknote,
+						iconClassName: "text-indigo-600 dark:text-indigo-400",
+						iconBgClassName: "bg-indigo-100 dark:bg-indigo-900/30",
+						valueClassName: "text-indigo-700 dark:text-indigo-300",
+					},
+				]}
+			/>
+
+			{/* Summary Cards - Glass Morphism (الديسكتوب كما هو) */}
+			<div className="hidden sm:grid sm:grid-cols-2 gap-4 lg:grid-cols-3">
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 					<div className="flex items-center justify-between mb-3">
 						<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
@@ -166,8 +199,35 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 				</div>
 			</div>
 
-			{/* Filter Bar */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+			{/* الجوال: ورقة فلاتر + زر إنشاء مضغوط في صف واحد */}
+			<div className="flex items-center justify-between gap-2 sm:hidden">
+				<MobileFilterSheet activeCount={statusFilter !== "all" ? 1 : 0}>
+					<Select value={statusFilter} onValueChange={setStatusFilter}>
+						<SelectTrigger className="w-full rounded-xl">
+							<SelectValue placeholder={t("company.payroll.status")} />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="all">{t("company.common.all")}</SelectItem>
+							{PAYROLL_STATUSES.map((status) => (
+								<SelectItem key={status} value={status}>
+									{t(`company.payroll.${status.toLowerCase()}`)}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</MobileFilterSheet>
+				<Button
+					size="icon"
+					aria-label={t("company.payroll.createRun")}
+					onClick={() => setShowCreateDialog(true)}
+					className="h-10 w-10 shrink-0 rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+				>
+					<Plus className="h-5 w-5" />
+				</Button>
+			</div>
+
+			{/* Filter Bar (الديسكتوب كما هو) */}
+			<div className="hidden gap-4 sm:flex sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
 						<SelectTrigger className="w-[160px] rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">

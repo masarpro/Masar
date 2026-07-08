@@ -135,13 +135,13 @@ export function MEPDashboard({
 			</div>
 
 			{/* Category Cards Overview */}
-			<div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+			<div className="grid gap-2 sm:gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
 				{categoryData.map((cat) => {
 					const IconComp =
 						MEP_ICON_MAP[cat.config.icon] ?? Settings;
 					return (
 						<Card key={cat.id} className="overflow-hidden">
-							<CardContent className="p-3">
+							<CardContent className="p-2.5 sm:p-3">
 								<div className="flex items-center gap-2 mb-2">
 									<div
 										className="flex items-center justify-center h-7 w-7 rounded-lg shrink-0"

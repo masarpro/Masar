@@ -66,7 +66,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 	return (
 		<div className="space-y-6">
 			{/* Statistics Cards - Glass Morphism */}
-			<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+			<div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
 				<GlassStatCard
 					colorScheme="blue"
 					icon={<Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
@@ -168,7 +168,7 @@ export function CompanyDashboard({ organizationId }: CompanyDashboardProps) {
 				<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">
 					{t("company.dashboard.assetOverview")}
 				</h3>
-				<div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+				<div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-4">
 					<div className="text-center p-3 rounded-xl bg-sky-50/80 dark:bg-sky-900/20 border border-sky-100/50 dark:border-sky-800/30">
 						<div className="mx-auto mb-2 w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center">
 							<CheckCircle2 className="h-4 w-4 text-sky-600 dark:text-sky-400" />

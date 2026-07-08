@@ -24,6 +24,7 @@ import {
 	CalendarCheck,
 } from "lucide-react";
 import { formatAccounting } from "./formatters";
+import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
 import { DashboardSkeleton } from "@saas/shared/components/skeletons";
 import Link from "next/link";
 
@@ -71,8 +72,46 @@ export function AccountingDashboard({
 
 	return (
 		<div className="space-y-4">
-			{/* Primary KPI Cards — For the Contractor */}
-			<div className="grid gap-3 sm:grid-cols-4">
+			{/* الجوال: شريط إحصائيات مضغوط (المؤشرات الرئيسية) */}
+			<CompactStatGrid
+				className="sm:hidden"
+				items={[
+					{
+						label: t("finance.accounting.totalAssets"),
+						value: formatAccounting(data.totalAssets),
+						icon: DollarSign,
+						iconClassName: "text-blue-600",
+						iconBgClassName: "bg-blue-100 dark:bg-blue-900/30",
+					},
+					{
+						label: t("finance.accounting.totalLiabilities"),
+						value: formatAccounting(data.totalLiabilities),
+						icon: CreditCard,
+						iconClassName: "text-red-600",
+						iconBgClassName: "bg-red-100 dark:bg-red-900/30",
+					},
+					{
+						label: t("finance.accounting.incomeStatement.netProfit"),
+						value: formatAccounting(data.netProfitThisMonth),
+						icon: TrendingUp,
+						iconClassName: "text-green-600",
+						iconBgClassName: "bg-green-100 dark:bg-green-900/30",
+						valueClassName:
+							data.netProfitThisMonth >= 0 ? "text-green-600" : "text-red-600",
+					},
+					{
+						label: t("finance.accounting.dashboard.draftEntries"),
+						value: data.draftEntriesCount,
+						icon: ClipboardList,
+						iconClassName: "text-amber-600",
+						iconBgClassName: "bg-amber-100 dark:bg-amber-900/30",
+						valueClassName: "text-amber-600",
+					},
+				]}
+			/>
+
+			{/* Primary KPI Cards — For the Contractor (الديسكتوب كما هو) */}
+			<div className="hidden gap-3 sm:grid sm:grid-cols-4">
 				<Card className="rounded-2xl">
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
@@ -138,8 +177,47 @@ export function AccountingDashboard({
 				</Card>
 			</div>
 
-			{/* Secondary KPI Cards — Revenue, Expenses, Receivable, Payable */}
-			<div className="grid gap-3 sm:grid-cols-4">
+			{/* الجوال: شريط إحصائيات مضغوط (المؤشرات الثانوية) */}
+			<CompactStatGrid
+				className="sm:hidden"
+				items={[
+					{
+						label: t("finance.accounting.dashboard.totalRevenue"),
+						value: formatAccounting(data.totalRevenue),
+						icon: TrendingUp,
+						iconClassName: "text-green-600",
+						iconBgClassName: "bg-green-100 dark:bg-green-900/30",
+						valueClassName: "text-green-600",
+					},
+					{
+						label: t("finance.accounting.dashboard.totalExpenses"),
+						value: formatAccounting(data.totalExpenses),
+						icon: TrendingDown,
+						iconClassName: "text-red-600",
+						iconBgClassName: "bg-red-100 dark:bg-red-900/30",
+						valueClassName: "text-red-600",
+					},
+					{
+						label: t("finance.accounting.dashboard.accountsReceivable"),
+						value: formatAccounting(data.accountsReceivable),
+						icon: Users,
+						iconClassName: "text-blue-600",
+						iconBgClassName: "bg-blue-100 dark:bg-blue-900/30",
+						valueClassName: "text-blue-600",
+					},
+					{
+						label: t("finance.accounting.dashboard.accountsPayable"),
+						value: formatAccounting(data.accountsPayable),
+						icon: Building2,
+						iconClassName: "text-amber-600",
+						iconBgClassName: "bg-amber-100 dark:bg-amber-900/30",
+						valueClassName: "text-amber-600",
+					},
+				]}
+			/>
+
+			{/* Secondary KPI Cards — Revenue, Expenses, Receivable, Payable (الديسكتوب كما هو) */}
+			<div className="hidden gap-3 sm:grid sm:grid-cols-4">
 				<Card className="rounded-2xl">
 					<CardContent className="p-4">
 						<div className="flex items-center justify-between">
@@ -207,7 +285,25 @@ export function AccountingDashboard({
 
 			{/* Owner Drawings YTD */}
 			{drawingsSummaryQuery.data && (
-				<div className="grid gap-3 sm:grid-cols-3">
+				<>
+					{/* الجوال: شريط مضغوط */}
+					<CompactStatGrid
+						className="sm:hidden"
+						items={[
+							{
+								label: t("finance.accounting.dashboard.ownerDrawingsYtd"),
+								value: formatAccounting(
+									drawingsSummaryQuery.data.totalDrawingsThisYear,
+								),
+								icon: UserMinus,
+								iconClassName: "text-red-600",
+								iconBgClassName: "bg-red-100 dark:bg-red-900/30",
+								valueClassName: "text-red-600",
+							},
+						]}
+					/>
+					{/* الديسكتوب كما هو */}
+					<div className="hidden gap-3 sm:grid sm:grid-cols-3">
 					<Card className="rounded-2xl">
 						<CardContent className="p-4">
 							<div className="flex items-center justify-between">
@@ -223,7 +319,8 @@ export function AccountingDashboard({
 							</div>
 						</CardContent>
 					</Card>
-				</div>
+					</div>
+				</>
 			)}
 
 			{/* Health Status */}

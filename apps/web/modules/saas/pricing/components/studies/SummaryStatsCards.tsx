@@ -60,27 +60,27 @@ export function SummaryStatsCards({
 	];
 
 	return (
-		<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+		<div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
 			{cards.map((card, index) => (
 				<Card
 					key={index}
 					className={card.borderColor}
 				>
-					<CardContent className="p-4">
+					<CardContent className="p-3 sm:p-4">
 						<div className="flex items-start justify-between gap-2">
 							<div className="min-w-0 flex-1 space-y-1">
-								<p className="text-sm text-muted-foreground font-medium">
+								<p className="text-xs sm:text-sm text-muted-foreground font-medium">
 									{card.title}
 								</p>
-								<p className={`text-2xl font-bold break-words tabular-nums ${card.color}`}>
-									{card.value} <span className="text-base font-normal">{card.unit}</span>
+								<p className={`text-lg sm:text-2xl font-bold break-words tabular-nums ${card.color}`}>
+									{card.value} <span className="text-sm sm:text-base font-normal">{card.unit}</span>
 								</p>
 								{'subValue' in card && card.subValue && (
-									<p className="text-xs text-muted-foreground">{card.subValue}</p>
+									<p className="text-[10px] sm:text-xs text-muted-foreground">{card.subValue}</p>
 								)}
 							</div>
-							<div className={`p-2.5 rounded-lg ${card.bgColor}`}>
-								<card.icon className={`h-5 w-5 ${card.color}`} />
+							<div className={`p-1.5 sm:p-2.5 rounded-lg ${card.bgColor}`}>
+								<card.icon className={`h-4 w-4 sm:h-5 sm:w-5 ${card.color}`} />
 							</div>
 						</div>
 					</CardContent>

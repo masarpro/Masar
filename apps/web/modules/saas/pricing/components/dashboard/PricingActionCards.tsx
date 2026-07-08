@@ -70,7 +70,53 @@ export function PricingActionCards({ organizationSlug, organizationId }: ActionC
 
 	return (
 		<>
-			<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+			{/* الجوال: صفوف مضغوطة (أيقونة + عنوان + زر إنشاء) */}
+			<div className="space-y-2 sm:hidden">
+				{mainSections.map((section) => {
+					const Icon = section.icon;
+					return (
+						<div
+							key={section.id}
+							className={`flex items-center gap-3 rounded-xl border ${section.borderColor} ${section.bgColor} p-2.5`}
+						>
+							<Link
+								href={section.browsePath}
+								className="flex min-w-0 flex-1 items-center gap-2.5"
+							>
+								<div
+									className={`shrink-0 rounded-lg bg-card/60 p-1.5 ${section.iconColor}`}
+								>
+									<Icon className="h-4 w-4" />
+								</div>
+								<span className="truncate text-sm font-medium text-foreground/80">
+									{t(`pricing.dashboard.nav.${section.id}`)}
+								</span>
+							</Link>
+							{section.createAction === "link" ? (
+								<Link
+									href={section.createPath!}
+									aria-label={t(`pricing.dashboard.nav.${section.id}New`)}
+									className={`shrink-0 rounded-lg bg-card/60 p-2 ${section.iconColor} ${section.hoverBg} transition-colors`}
+								>
+									<Plus className="h-4 w-4" />
+								</Link>
+							) : (
+								<button
+									type="button"
+									onClick={() => setShowCreateDialog(true)}
+									aria-label={t(`pricing.dashboard.nav.${section.id}New`)}
+									className={`shrink-0 rounded-lg bg-card/60 p-2 ${section.iconColor} ${section.hoverBg} transition-colors`}
+								>
+									<Plus className="h-4 w-4" />
+								</button>
+							)}
+						</div>
+					);
+				})}
+			</div>
+
+			{/* الديسكتوب كما هو */}
+			<div className="hidden sm:grid sm:grid-cols-3 gap-4">
 				{mainSections.map((section) => {
 					const Icon = section.icon;
 					return (

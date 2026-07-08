@@ -145,17 +145,17 @@ export function PaymentsList({
 	return (
 		<div className="space-y-6">
 			{/* Summary Card */}
-			<Card className="rounded-2xl">
-				<CardContent className="p-4">
-					<div className="flex items-center gap-3">
-						<div className="p-2 bg-green-100 dark:bg-green-900/50 rounded-xl">
-							<TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+			<Card className="rounded-xl sm:rounded-2xl">
+				<CardContent className="p-2.5 sm:p-4">
+					<div className="flex items-center gap-2 sm:gap-3">
+						<div className="p-1.5 sm:p-2 bg-green-100 dark:bg-green-900/50 rounded-lg sm:rounded-xl">
+							<TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400" />
 						</div>
 						<div>
-							<p className="text-sm text-slate-500 dark:text-slate-400">
+							<p className="text-[11px] sm:text-sm text-slate-500 dark:text-slate-400">
 								{t("finance.payments.totalPayments")}
 							</p>
-							<p className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+							<p className="text-base sm:text-xl font-semibold text-slate-900 dark:text-slate-100">
 								<Currency amount={totalPayments} />
 							</p>
 						</div>

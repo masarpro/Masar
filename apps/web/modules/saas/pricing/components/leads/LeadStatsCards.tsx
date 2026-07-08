@@ -65,18 +65,18 @@ export function LeadStatsCards({ organizationId }: LeadStatsCardsProps) {
 	];
 
 	return (
-		<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+		<div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
 			{cards.map((card) => (
 				<div
 					key={card.label}
-					className="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50 p-5 transition-all duration-200 hover:shadow-xl"
+					className="rounded-xl sm:rounded-2xl border border-slate-200/60 bg-white shadow-sm sm:shadow-lg shadow-black/5 dark:border-slate-700/50 dark:bg-slate-900/50 p-3 sm:p-5 transition-all duration-200 hover:shadow-xl"
 				>
 					<div className="flex items-center justify-between gap-2">
 						<div className="min-w-0 flex-1">
-							<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+							<p className="text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">
 								{card.label}
 							</p>
-							<p className={`${card.smallValue ? "text-2xl" : "text-3xl"} font-semibold mt-2 text-foreground break-words tabular-nums`}>
+							<p className={`${card.smallValue ? "text-base sm:text-2xl" : "text-lg sm:text-3xl"} font-semibold mt-1 sm:mt-2 text-foreground break-words tabular-nums`}>
 								{card.value}
 							</p>
 						</div>

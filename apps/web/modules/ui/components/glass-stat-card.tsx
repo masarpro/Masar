@@ -110,13 +110,18 @@ export function GlassStatCard({
 	return (
 		<div
 			className={cn(
-				"backdrop-blur-xl border rounded-2xl shadow-lg shadow-black/5 p-4",
+				"backdrop-blur-xl border rounded-2xl shadow-lg shadow-black/5 min-w-0 p-3 sm:p-4",
 				colors.card,
 				className,
 			)}
 		>
-			<div className="flex items-center justify-between mb-3">
-				<div className={cn("p-2 rounded-lg", colors.iconBg)}>
+			<div className="flex items-center justify-between mb-2 sm:mb-3">
+				<div
+					className={cn(
+						"p-1.5 sm:p-2 rounded-lg max-sm:[&_svg]:h-4 max-sm:[&_svg]:w-4",
+						colors.iconBg,
+					)}
+				>
 					{icon}
 				</div>
 				{badge && (
@@ -125,12 +130,21 @@ export function GlassStatCard({
 					</span>
 				)}
 			</div>
-			<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+			<p className="truncate text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
 				{title}
 			</p>
-			<p className={cn("text-xl font-bold", colors.value)}>{value}</p>
+			<p
+				className={cn(
+					"truncate tabular-nums text-lg sm:text-xl font-bold",
+					colors.value,
+				)}
+			>
+				{value}
+			</p>
 			{subtitle && (
-				<p className={cn("text-xs mt-1", colors.subtitle)}>{subtitle}</p>
+				<p className={cn("truncate text-xs mt-1", colors.subtitle)}>
+					{subtitle}
+				</p>
 			)}
 		</div>
 	);

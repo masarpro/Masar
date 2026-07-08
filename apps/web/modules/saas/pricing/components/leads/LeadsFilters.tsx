@@ -12,6 +12,7 @@ import {
 import { cn } from "@ui/lib";
 import { RotateCcw, Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 
 interface LeadsFiltersProps {
 	search: string;
@@ -100,8 +101,62 @@ export function LeadsFilters({
 				})}
 			</nav>
 
-			{/* Search and Secondary Filters */}
-			<div className="flex items-center gap-2 flex-wrap">
+			{/* الجوال: بحث + ورقة فلاتر في صف واحد */}
+			<div className="flex items-center gap-2 sm:hidden">
+				<div className="relative min-w-0 flex-1">
+					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Input
+						placeholder={t("pricing.leads.searchPlaceholder")}
+						value={search}
+						onChange={(e: any) => onSearchChange(e.target.value)}
+						className="pe-10 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-700"
+					/>
+				</div>
+				<MobileFilterSheet
+					activeCount={[source, priority].filter(Boolean).length}
+				>
+					<Select value={source || "all"} onValueChange={(v: any) => onSourceChange(v === "all" ? "" : v)}>
+						<SelectTrigger className="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
+							<SelectValue placeholder={t("pricing.leads.allSources")} />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="all">{t("pricing.leads.allSources")}</SelectItem>
+							{SOURCES.map((s) => (
+								<SelectItem key={s} value={s}>
+									{t(`pricing.leads.source.${s}`)}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					<Select value={priority || "all"} onValueChange={(v: any) => onPriorityChange(v === "all" ? "" : v)}>
+						<SelectTrigger className="w-full bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-xl">
+							<SelectValue placeholder={t("pricing.leads.allPriorities")} />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="all">{t("pricing.leads.allPriorities")}</SelectItem>
+							{PRIORITIES.map((p) => (
+								<SelectItem key={p} value={p}>
+									{t(`pricing.leads.priority.${p}`)}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					{hasActiveFilters && (
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={onReset}
+							className="w-full gap-1.5 rounded-xl text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+						>
+							<X className="h-3 w-3" />
+							{t("pricing.leads.resetFilters")}
+						</Button>
+					)}
+				</MobileFilterSheet>
+			</div>
+
+			{/* Search and Secondary Filters (الديسكتوب كما هو) */}
+			<div className="hidden sm:flex items-center gap-2 flex-wrap">
 				<div className="relative flex-1 min-w-[200px] max-w-md">
 					<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 					<Input

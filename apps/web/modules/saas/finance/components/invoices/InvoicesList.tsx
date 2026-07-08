@@ -62,6 +62,7 @@ import { Currency } from "../shared/Currency";
 import { StatusBadge } from "../shared/StatusBadge";
 import { Pagination } from "@saas/shared/components/Pagination";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 import { BulkActionsBar } from "../../../../ui/components/bulk-actions-bar";
 import { exportTableToCsv } from "../../../../../lib/export-table";
 
@@ -271,7 +272,41 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 
 				{/* ─── Search and Filter ───────────────────────────────── */}
 				<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] px-5 py-3.5">
-					<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+					{/* الجوال: بحث + ورقة فلاتر في صف واحد */}
+					<div className="flex items-center gap-2 sm:hidden">
+						<div className="relative min-w-0 flex-1">
+							<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+							<Input
+								placeholder={t("finance.invoices.searchPlaceholder")}
+								value={searchTerm}
+								onChange={(e: any) => {
+									setSearchTerm(e.target.value);
+									setCurrentPage(1);
+								}}
+								className="pe-10 rounded-xl h-9 border-slate-200/80 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background"
+							/>
+						</div>
+						<MobileFilterSheet activeCount={statusFilter !== "all" ? 1 : 0}>
+							<Select value={statusFilter} onValueChange={handleStatusChange}>
+								<SelectTrigger className="w-full rounded-xl">
+									<SelectValue placeholder={t("finance.invoices.allStatuses")} />
+								</SelectTrigger>
+								<SelectContent className="rounded-xl">
+									<SelectItem value="all">{t("finance.invoices.allStatuses")}</SelectItem>
+									<SelectItem value="DRAFT">{t("finance.invoices.status.draft")}</SelectItem>
+									<SelectItem value="ISSUED">{t("finance.invoices.status.issued")}</SelectItem>
+									<SelectItem value="SENT">{t("finance.invoices.status.sent")}</SelectItem>
+									<SelectItem value="PARTIALLY_PAID">{t("finance.invoices.status.partially_paid")}</SelectItem>
+									<SelectItem value="PAID">{t("finance.invoices.status.paid")}</SelectItem>
+									<SelectItem value="OVERDUE">{t("finance.invoices.status.overdue")}</SelectItem>
+									<SelectItem value="CANCELLED">{t("finance.invoices.status.cancelled")}</SelectItem>
+								</SelectContent>
+							</Select>
+						</MobileFilterSheet>
+					</div>
+
+					{/* الديسكتوب كما هو */}
+					<div className="hidden flex-col gap-3 sm:flex sm:flex-row sm:items-center">
 						<div className="relative flex-1 min-w-[200px]">
 							<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 							<Input

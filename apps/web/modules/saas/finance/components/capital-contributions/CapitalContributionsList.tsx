@@ -19,6 +19,7 @@ import { Search, Plus, Landmark, Eye, TrendingUp } from "lucide-react";
 import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 
 interface CapitalContributionsListProps {
 	organizationId: string;
@@ -77,40 +78,74 @@ export function CapitalContributionsList({
 			{/* Header */}
 			<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 				<h1 className="text-2xl font-bold">{t("finance.capitalContributions.title")}</h1>
-				<Button onClick={() => router.push(`${basePath}/new`)} className="w-full sm:w-auto">
+				<Button onClick={() => router.push(`${basePath}/new`)} className="hidden w-full sm:inline-flex sm:w-auto">
 					<Plus className="me-2 h-4 w-4" />
 					{t("finance.capitalContributions.new")}
 				</Button>
 			</div>
 
 			{/* Summary Cards */}
-			<div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
+			<div className="grid grid-cols-2 gap-2 sm:grid-cols-1 sm:gap-3 md:grid-cols-2 md:gap-4">
 				<Card className="border-green-200">
-					<CardContent className="pt-4">
-						<div className="flex items-center gap-2 text-sm text-muted-foreground">
+					<CardContent className="pt-3 sm:pt-4">
+						<div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
 							<TrendingUp className="h-4 w-4 text-green-500 shrink-0" />
 							<span className="truncate">{t("finance.capitalContributions.summary.totalContributions")}</span>
 						</div>
-						<div className="mt-1 text-2xl font-bold text-green-600 tabular-nums">
+						<div className="mt-1 text-base sm:text-2xl font-bold text-green-600 tabular-nums">
 							<Currency amount={totalAmount} />
 						</div>
 					</CardContent>
 				</Card>
 				<Card>
-					<CardContent className="pt-4">
-						<div className="flex items-center gap-2 text-sm text-muted-foreground">
+					<CardContent className="pt-3 sm:pt-4">
+						<div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
 							<Landmark className="h-4 w-4 shrink-0" />
 							<span className="truncate">{t("finance.capitalContributions.summary.totalCount")}</span>
 						</div>
-						<div className="mt-1 text-2xl font-bold tabular-nums">
+						<div className="mt-1 text-base sm:text-2xl font-bold tabular-nums">
 							{total}
 						</div>
 					</CardContent>
 				</Card>
 			</div>
 
-			{/* Filters */}
-			<div className="flex flex-col gap-2 md:flex-row md:items-center">
+			{/* الجوال: بحث + ورقة فلاتر + زر إضافة مضغوط في صف واحد */}
+			<div className="flex items-center gap-2 sm:hidden">
+				<div className="relative min-w-0 flex-1">
+					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+					<Input
+						placeholder={t("common.search")}
+						value={searchQuery}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+						className="ps-9"
+					/>
+				</div>
+				<MobileFilterSheet activeCount={ownerFilter !== "all" ? 1 : 0}>
+					<Select value={ownerFilter} onValueChange={setOwnerFilter}>
+						<SelectTrigger className="w-full rounded-xl">
+							<SelectValue placeholder={t("finance.capitalContributions.allOwners")} />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="all">{t("finance.capitalContributions.allOwners")}</SelectItem>
+							{Array.isArray(owners) && owners.map((owner: any) => (
+								<SelectItem key={owner.id} value={owner.id}>{owner.name}</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</MobileFilterSheet>
+				<Button
+					size="icon"
+					aria-label={t("finance.capitalContributions.new")}
+					className="h-10 w-10 shrink-0 rounded-xl"
+					onClick={() => router.push(`${basePath}/new`)}
+				>
+					<Plus className="h-5 w-5" />
+				</Button>
+			</div>
+
+			{/* Filters (الديسكتوب كما هو) */}
+			<div className="hidden flex-col gap-2 sm:flex md:flex-row md:items-center">
 				<div className="relative flex-1">
 					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input

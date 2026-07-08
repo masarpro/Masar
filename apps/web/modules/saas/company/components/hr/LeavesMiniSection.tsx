@@ -16,6 +16,7 @@ import {
 import { LeaveRequestList } from "@saas/company/components/leaves/LeaveRequestList";
 import { LeaveBalanceList } from "@saas/company/components/leaves/LeaveBalanceList";
 import { LeaveTypeList } from "@saas/company/components/leaves/LeaveTypeList";
+import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
 
 interface LeavesMiniSectionProps {
 	organizationId: string;
@@ -42,8 +43,36 @@ export function LeavesMiniSection({ organizationId, organizationSlug }: LeavesMi
 
 	return (
 		<div className="space-y-6">
-			{/* Summary Cards */}
-			<div className="grid grid-cols-3 gap-4">
+			{/* الجوال: شريط إحصائيات مضغوط */}
+			<CompactStatGrid
+				className="sm:hidden"
+				items={[
+					{
+						label: t("company.leaves.dashboard.onLeaveToday"),
+						value: isLoading ? "..." : data?.onLeaveToday?.length ?? 0,
+						icon: Users,
+						iconClassName: "text-sky-600 dark:text-sky-400",
+						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+					},
+					{
+						label: t("company.leaves.dashboard.pendingRequests"),
+						value: isLoading ? "..." : data?.pendingRequests ?? 0,
+						icon: Clock,
+						iconClassName: "text-amber-600 dark:text-amber-400",
+						iconBgClassName: "bg-amber-100 dark:bg-amber-900/30",
+					},
+					{
+						label: t("company.leaves.dashboard.lowBalances"),
+						value: isLoading ? "..." : data?.lowBalances?.length ?? 0,
+						icon: AlertTriangle,
+						iconClassName: "text-red-600 dark:text-red-400",
+						iconBgClassName: "bg-red-100 dark:bg-red-900/30",
+					},
+				]}
+			/>
+
+			{/* Summary Cards (الديسكتوب كما هو) */}
+			<div className="hidden sm:grid sm:grid-cols-3 gap-4">
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 					<div className="flex items-center justify-between mb-3">
 						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">

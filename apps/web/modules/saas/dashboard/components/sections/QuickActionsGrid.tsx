@@ -124,7 +124,29 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 
 	return (
 		<>
-			<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+			{/* الجوال: شبكة مضغوطة — أيقونة + عنوان صغير لكل قسم */}
+			<div className="grid grid-cols-3 gap-2 sm:hidden">
+				{visibleActions.map((action, i) => {
+					const Icon = action.icon;
+					return (
+						<Link
+							key={i}
+							href={action.browsePath}
+							className={`flex min-h-[72px] flex-col items-center justify-center gap-1.5 rounded-xl border ${action.borderColor} ${action.bgColor} p-2 transition-colors ${action.hoverBg}`}
+						>
+							<div className={`rounded-lg bg-card/60 p-1.5 ${action.iconColor}`}>
+								<Icon className="h-4 w-4" />
+							</div>
+							<span className="line-clamp-1 text-center text-[11px] font-medium text-foreground/80">
+								{action.sectionLabel}
+							</span>
+						</Link>
+					);
+				})}
+			</div>
+
+			{/* الديسكتوب كما هو */}
+			<div className="hidden gap-4 sm:grid sm:grid-cols-3 lg:grid-cols-6">
 				{visibleActions.map((action, i) => {
 					const Icon = action.icon;
 					return (

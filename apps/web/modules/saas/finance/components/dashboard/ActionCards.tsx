@@ -72,7 +72,59 @@ export function ActionCards({ organizationSlug }: ActionCardsProps) {
 
 	return (
 		<>
-			<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+			{/* الجوال: صفوف مضغوطة (أيقونة + عنوان) */}
+			<div className="flex flex-col gap-2 sm:hidden">
+				{mainSections.map((section) => {
+					const Icon = section.icon;
+					const isExpense = section.id === "expenses";
+					const isPayment = section.id === "payments";
+					return (
+						<div
+							key={section.id}
+							className={`flex h-14 items-center gap-3 rounded-2xl border ${section.borderColor} ${section.bgColor} px-3`}
+						>
+							<Link
+								href={section.browsePath}
+								className="flex min-w-0 flex-1 items-center gap-3"
+							>
+								<div
+									className={`shrink-0 rounded-lg bg-card/60 p-2 ${section.iconColor}`}
+								>
+									<Icon className="h-5 w-5" />
+								</div>
+								<span className="truncate text-sm font-medium text-foreground/80">
+									{t(`finance.dashboard.nav.${section.id}`)}
+								</span>
+							</Link>
+							{isExpense || isPayment ? (
+								<button
+									type="button"
+									aria-label={t(`finance.dashboard.nav.${section.id}New`)}
+									onClick={() =>
+										isExpense
+											? setExpenseDialogOpen(true)
+											: setPaymentDialogOpen(true)
+									}
+									className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-card/60 ${section.iconColor}`}
+								>
+									<Plus className="h-4 w-4" />
+								</button>
+							) : (
+								<Link
+									href={section.createPath}
+									aria-label={t(`finance.dashboard.nav.${section.id}New`)}
+									className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-card/60 ${section.iconColor}`}
+								>
+									<Plus className="h-4 w-4" />
+								</Link>
+							)}
+						</div>
+					);
+				})}
+			</div>
+
+			{/* الديسكتوب كما هو */}
+			<div className="hidden sm:grid sm:grid-cols-3 gap-4">
 				{mainSections.map((section) => {
 					const Icon = section.icon;
 					const isExpense = section.id === "expenses";

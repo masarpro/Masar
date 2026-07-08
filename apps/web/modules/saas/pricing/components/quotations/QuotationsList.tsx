@@ -54,6 +54,7 @@ import { formatDate } from "@saas/finance/lib/utils";
 import { Currency } from "@saas/finance/components/shared/Currency";
 import { StatusBadge } from "@saas/finance/components/shared/StatusBadge";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 
 interface QuotationsListProps {
 	organizationId: string;
@@ -89,8 +90,54 @@ export function QuotationsList({ organizationId, organizationSlug }: QuotationsL
 
 	return (
 		<div className="space-y-6">
-			{/* Search and Filter Bar */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+			{/* الجوال: بحث + ورقة فلاتر + زر المسودات مضغوط في صف واحد */}
+			<div className="flex items-center gap-2 sm:hidden">
+				<div className="relative min-w-0 flex-1">
+					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+					<Input
+						placeholder={t("pricing.quotations.searchPlaceholder")}
+						value={searchTerm}
+						onChange={(e: any) => setSearchTerm(e.target.value)}
+						className="pe-10 bg-muted/50 border-border rounded-xl"
+					/>
+				</div>
+				<MobileFilterSheet activeCount={statusFilter !== "all" ? 1 : 0}>
+					<Select value={statusFilter} onValueChange={setStatusFilter}>
+						<SelectTrigger className="w-full bg-muted/50 border-border rounded-xl">
+							<SelectValue placeholder={t("pricing.quotations.allStatuses")} />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="all">{t("pricing.quotations.allStatuses")}</SelectItem>
+							<SelectItem value="DRAFT">{t("pricing.quotations.status.draft")}</SelectItem>
+							<SelectItem value="SENT">{t("pricing.quotations.status.sent")}</SelectItem>
+							<SelectItem value="VIEWED">{t("pricing.quotations.status.viewed")}</SelectItem>
+							<SelectItem value="ACCEPTED">{t("pricing.quotations.status.accepted")}</SelectItem>
+							<SelectItem value="REJECTED">{t("pricing.quotations.status.rejected")}</SelectItem>
+							<SelectItem value="EXPIRED">{t("pricing.quotations.status.expired")}</SelectItem>
+							<SelectItem value="CONVERTED">{t("pricing.quotations.status.converted")}</SelectItem>
+						</SelectContent>
+					</Select>
+				</MobileFilterSheet>
+				<Button
+					asChild
+					variant="outline"
+					size="icon"
+					aria-label={t("drafts.button")}
+					className="relative h-10 w-10 shrink-0 rounded-xl"
+				>
+					<Link href={`/app/${organizationSlug}/pricing/quotations/drafts`}>
+						<FileText className="h-4 w-4" />
+						{draftCount > 0 && (
+							<span className="absolute -top-1 -end-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold text-white">
+								{draftCount}
+							</span>
+						)}
+					</Link>
+				</Button>
+			</div>
+
+			{/* Search and Filter Bar (الديسكتوب كما هو) */}
+			<div className="hidden gap-4 sm:flex sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
 					<div className="relative flex-1 max-w-md">
 						<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

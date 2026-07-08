@@ -28,6 +28,7 @@ import { Search, Plus, FileCheck, Eye } from "lucide-react";
 import { formatDate } from "@shared/lib/formatters";
 import { Currency } from "../shared/Currency";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 
 interface ReceiptVouchersListProps {
 	organizationId: string;
@@ -102,30 +103,56 @@ export function ReceiptVouchersList({
 
 			{/* Summary Cards */}
 			{summaryData && (
-				<div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+				<div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-4">
 					<Card>
-						<CardContent className="pt-4">
-							<div className="text-sm text-muted-foreground">
+						<CardContent className="pt-3 sm:pt-4">
+							<div className="text-xs sm:text-sm text-muted-foreground">
 								{t("finance.receiptVouchers.summary.totalIssued")}
 							</div>
-							<div className="mt-1 text-2xl font-bold">
+							<div className="mt-1 text-base sm:text-2xl font-bold">
 								<Currency amount={summaryData.totalAmount} />
 							</div>
 						</CardContent>
 					</Card>
 					<Card>
-						<CardContent className="pt-4">
-							<div className="text-sm text-muted-foreground">
+						<CardContent className="pt-3 sm:pt-4">
+							<div className="text-xs sm:text-sm text-muted-foreground">
 								{t("finance.receiptVouchers.summary.count")}
 							</div>
-							<div className="mt-1 text-2xl font-bold">{summaryData.count}</div>
+							<div className="mt-1 text-base sm:text-2xl font-bold">{summaryData.count}</div>
 						</CardContent>
 					</Card>
 				</div>
 			)}
 
-			{/* Filters */}
-			<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+			{/* الجوال: بحث + ورقة فلاتر في صف واحد */}
+			<div className="flex items-center gap-2 sm:hidden">
+				<div className="relative min-w-0 flex-1">
+					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+					<Input
+						placeholder={t("common.search")}
+						value={searchQuery}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+						className="ps-9"
+					/>
+				</div>
+				<MobileFilterSheet activeCount={statusFilter !== "all" ? 1 : 0}>
+					<Select value={statusFilter} onValueChange={setStatusFilter}>
+						<SelectTrigger className="w-full rounded-xl">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="all">{t("common.all")}</SelectItem>
+							<SelectItem value="DRAFT">{t("finance.receiptVouchers.statuses.DRAFT")}</SelectItem>
+							<SelectItem value="ISSUED">{t("finance.receiptVouchers.statuses.ISSUED")}</SelectItem>
+							<SelectItem value="CANCELLED">{t("finance.receiptVouchers.statuses.CANCELLED")}</SelectItem>
+						</SelectContent>
+					</Select>
+				</MobileFilterSheet>
+			</div>
+
+			{/* Filters (الديسكتوب كما هو) */}
+			<div className="hidden flex-col gap-3 sm:flex sm:flex-row sm:items-center">
 				<div className="relative flex-1">
 					<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input

@@ -6,6 +6,7 @@ import {
 	TrendingUp,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
 import { Currency } from "../shared/Currency";
 
 interface BalanceCardsProps {
@@ -18,7 +19,37 @@ export function BalanceCards({ cashBalance, bankBalance, netProfit }: BalanceCar
 	const t = useTranslations();
 
 	return (
-		<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+		<>
+			{/* الجوال: شريط إحصائيات مضغوط */}
+			<CompactStatGrid
+				className="sm:hidden"
+				items={[
+					{
+						label: t("finance.dashboard.overview.cashBalance"),
+						value: <Currency amount={cashBalance} />,
+						icon: Wallet,
+						iconClassName: "text-sky-600 dark:text-sky-400",
+						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+					},
+					{
+						label: t("finance.dashboard.overview.bankBalance"),
+						value: <Currency amount={bankBalance} />,
+						icon: Landmark,
+						iconClassName: "text-blue-600 dark:text-blue-400",
+						iconBgClassName: "bg-blue-100 dark:bg-blue-900/30",
+					},
+					{
+						label: t("finance.dashboard.overview.netProfit"),
+						value: <Currency amount={netProfit} />,
+						icon: TrendingUp,
+						iconClassName: "text-violet-600 dark:text-violet-400",
+						iconBgClassName: "bg-violet-100 dark:bg-violet-900/30",
+					},
+				]}
+			/>
+
+			{/* الديسكتوب كما هو */}
+			<div className="hidden sm:grid sm:grid-cols-3 gap-4">
 			{/* Cash Balance */}
 			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 				<div className="flex items-center justify-between mb-3">
@@ -63,6 +94,7 @@ export function BalanceCards({ cashBalance, bankBalance, netProfit }: BalanceCar
 					<Currency amount={netProfit} />
 				</p>
 			</div>
-		</div>
+			</div>
+		</>
 	);
 }

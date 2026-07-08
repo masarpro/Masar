@@ -69,6 +69,8 @@ import {
 } from "lucide-react";
 import { Currency } from "../shared/Currency";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 
 interface BanksListProps {
 	organizationId: string;
@@ -203,8 +205,36 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 
 	return (
 		<div className="space-y-6">
-			{/* Summary Cards */}
-			<div className="grid gap-4 md:grid-cols-3">
+			{/* الجوال: شريط إحصائيات مضغوط */}
+			<CompactStatGrid
+				className="sm:hidden"
+				items={[
+					{
+						label: t("finance.banks.totalBankBalance"),
+						value: <Currency amount={summaryData?.totalBankBalance ?? 0} />,
+						icon: Building,
+						iconClassName: "text-blue-600 dark:text-blue-400",
+						iconBgClassName: "bg-blue-100 dark:bg-blue-900/50",
+					},
+					{
+						label: t("finance.banks.totalCashBalance"),
+						value: <Currency amount={summaryData?.totalCashBalance ?? 0} />,
+						icon: Wallet,
+						iconClassName: "text-green-600 dark:text-green-400",
+						iconBgClassName: "bg-green-100 dark:bg-green-900/50",
+					},
+					{
+						label: t("finance.banks.totalBalance"),
+						value: <Currency amount={summaryData?.totalBalance ?? 0} />,
+						icon: Banknote,
+						iconClassName: "text-primary",
+						iconBgClassName: "bg-primary/10",
+					},
+				]}
+			/>
+
+			{/* Summary Cards (الديسكتوب كما هو) */}
+			<div className="hidden gap-4 sm:grid md:grid-cols-3">
 				<Card className="rounded-2xl">
 					<CardContent className="p-4">
 						<div className="flex items-center gap-3">
@@ -261,7 +291,49 @@ export function BanksList({ organizationId, organizationSlug }: BanksListProps) 
 			{/* Filters */}
 			<Card className="rounded-2xl">
 				<CardContent className="p-4">
-					<div className="flex flex-col sm:flex-row gap-4">
+					{/* الجوال: بحث + ورقة فلاتر في صف واحد */}
+					<div className="flex items-center gap-2 sm:hidden">
+						<div className="relative min-w-0 flex-1">
+							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+							<Input
+								placeholder={t("finance.banks.searchPlaceholder")}
+								value={searchQuery}
+								onChange={(e: any) => setSearchQuery(e.target.value)}
+								className="ps-10 rounded-xl"
+							/>
+						</div>
+						<MobileFilterSheet activeCount={accountTypeFilter !== undefined ? 1 : 0}>
+							<Button
+								variant={accountTypeFilter === undefined ? "primary" : "outline"}
+								size="sm"
+								onClick={() => setAccountTypeFilter(undefined)}
+								className="w-full justify-start rounded-xl"
+							>
+								{t("common.all")}
+							</Button>
+							<Button
+								variant={accountTypeFilter === "BANK" ? "primary" : "outline"}
+								size="sm"
+								onClick={() => setAccountTypeFilter("BANK")}
+								className="w-full justify-start rounded-xl"
+							>
+								<Building className="h-4 w-4 me-2" />
+								{t("finance.banks.types.bank")}
+							</Button>
+							<Button
+								variant={accountTypeFilter === "CASH_BOX" ? "primary" : "outline"}
+								size="sm"
+								onClick={() => setAccountTypeFilter("CASH_BOX")}
+								className="w-full justify-start rounded-xl"
+							>
+								<Wallet className="h-4 w-4 me-2" />
+								{t("finance.banks.types.cashBox")}
+							</Button>
+						</MobileFilterSheet>
+					</div>
+
+					{/* الديسكتوب كما هو */}
+					<div className="hidden flex-col sm:flex sm:flex-row gap-4">
 						<div className="flex-1 relative">
 							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
 							<Input

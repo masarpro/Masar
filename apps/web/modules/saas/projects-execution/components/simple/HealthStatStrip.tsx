@@ -21,10 +21,10 @@ export function HealthStatStrip({ health, isLoading }: HealthStatStripProps) {
 
 	if (isLoading) {
 		return (
-			<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+			<div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
 				{[...Array(4)].map((_, i) => (
 					<Card key={i} className="animate-pulse">
-						<CardContent className="p-4">
+						<CardContent className="p-2.5 sm:p-4">
 							<div className="h-12 bg-muted rounded" />
 						</CardContent>
 					</Card>
@@ -74,20 +74,20 @@ export function HealthStatStrip({ health, isLoading }: HealthStatStripProps) {
 	];
 
 	return (
-		<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+		<div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
 			{stats.map((stat) => (
 				<Card
 					key={stat.label}
 					className={`${stat.bgColor} border-0 backdrop-blur-sm ${stat.highlight ? "ring-2 ring-red-200 dark:ring-red-800" : ""}`}
 				>
-					<CardContent className="p-4">
-						<div className="flex items-center gap-2 mb-1">
-							<stat.icon className={`h-4 w-4 ${stat.color}`} />
-							<span className="text-xs text-muted-foreground">
+					<CardContent className="p-2.5 sm:p-4">
+						<div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+							<stat.icon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 ${stat.color}`} />
+							<span className="truncate text-[11px] sm:text-xs text-muted-foreground">
 								{stat.label}
 							</span>
 						</div>
-						<p className={`text-2xl font-bold ${stat.color}`}>
+						<p className={`text-base sm:text-2xl font-bold tabular-nums ${stat.color}`}>
 							{stat.value}
 						</p>
 						{stat.showProgress && (

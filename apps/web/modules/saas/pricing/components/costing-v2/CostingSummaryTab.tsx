@@ -107,37 +107,37 @@ export function CostingSummaryTab({
 	return (
 		<div className="space-y-4" dir="rtl">
 			{/* ─── 3 Summary Cards: Materials | Labor | Total ─── */}
-			<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+			<div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
 				{/* Materials card */}
-				<div className="rounded-xl border border-border bg-card p-4">
-					<div className="flex items-center gap-2 mb-2">
+				<div className="rounded-xl border border-border bg-card p-3 sm:p-4">
+					<div className="flex items-center gap-2 mb-1 sm:mb-2">
 						<Package className="h-4 w-4 text-blue-500" />
-						<span className="text-sm font-medium">المواد</span>
+						<span className="text-xs sm:text-sm font-medium">المواد</span>
 					</div>
-					<p className="text-xl font-bold" dir="ltr">
-						{formatNum(structuralMaterial)} <span className="text-sm font-normal text-muted-foreground">ر.س</span>
+					<p className="text-base sm:text-xl font-bold" dir="ltr">
+						{formatNum(structuralMaterial)} <span className="text-xs sm:text-sm font-normal text-muted-foreground">ر.س</span>
 					</p>
 				</div>
 
 				{/* Labor card */}
-				<div className="rounded-xl border border-border bg-card p-4">
-					<div className="flex items-center gap-2 mb-2">
+				<div className="rounded-xl border border-border bg-card p-3 sm:p-4">
+					<div className="flex items-center gap-2 mb-1 sm:mb-2">
 						<HardHat className="h-4 w-4 text-amber-500" />
-						<span className="text-sm font-medium">المصنعيات</span>
+						<span className="text-xs sm:text-sm font-medium">المصنعيات</span>
 					</div>
-					<p className="text-xl font-bold" dir="ltr">
-						{formatNum(structuralLabor)} <span className="text-sm font-normal text-muted-foreground">ر.س</span>
+					<p className="text-base sm:text-xl font-bold" dir="ltr">
+						{formatNum(structuralLabor)} <span className="text-xs sm:text-sm font-normal text-muted-foreground">ر.س</span>
 					</p>
 				</div>
 
 				{/* Grand total card */}
-				<div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4">
-					<div className="flex items-center gap-2 mb-2">
+				<div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-3 sm:p-4">
+					<div className="flex items-center gap-2 mb-1 sm:mb-2">
 						<Wallet className="h-4 w-4 text-primary" />
-						<span className="text-sm font-medium">التكلفة الإجمالية</span>
+						<span className="text-xs sm:text-sm font-medium">التكلفة الإجمالية</span>
 					</div>
-					<p className="text-xl font-bold text-primary" dir="ltr">
-						{formatNum(structuralMaterial + structuralLabor)} <span className="text-sm font-normal">ر.س</span>
+					<p className="text-base sm:text-xl font-bold text-primary" dir="ltr">
+						{formatNum(structuralMaterial + structuralLabor)} <span className="text-xs sm:text-sm font-normal">ر.س</span>
 					</p>
 				</div>
 			</div>
@@ -291,7 +291,7 @@ export function CostingSummaryTab({
 					)
 				}
 				disabled={approveMutation.isPending || (structuralMaterial + structuralLabor) === 0}
-				className="w-full gap-2 py-6 text-base rounded-xl"
+				className="w-full gap-2 py-4 sm:py-6 text-sm sm:text-base rounded-xl"
 				size="lg"
 			>
 				{approveMutation.isPending ? (

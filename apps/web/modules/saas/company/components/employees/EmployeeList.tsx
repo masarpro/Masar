@@ -29,6 +29,8 @@ import { Checkbox } from "@ui/components/checkbox";
 import { Plus, Search, UserX, Users, Banknote, Clock, Shield, Download } from "lucide-react";
 import { toast } from "sonner";
 import { Pagination } from "@saas/shared/components/Pagination";
+import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 import { AddEmployeeDialog } from "./AddEmployeeDialog";
 import { BulkActionsBar } from "../../../../ui/components/bulk-actions-bar";
 import { exportTableToCsv } from "../../../../../lib/export-table";
@@ -144,7 +146,46 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 		<div className="space-y-6">
 			{/* Summary Cards - Glass Morphism */}
 			{summary && (
-				<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+				<>
+					{/* الجوال: شريط إحصائيات مضغوط */}
+					<CompactStatGrid
+						className="sm:hidden"
+						items={[
+							{
+								label: t("company.employees.active"),
+								value: summary.totalActive,
+								icon: Users,
+								iconClassName: "text-sky-600 dark:text-sky-400",
+								iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+							},
+							{
+								label: t("company.employees.onLeave"),
+								value: summary.totalOnLeave,
+								icon: Clock,
+								iconClassName: "text-amber-600 dark:text-amber-400",
+								iconBgClassName: "bg-amber-100 dark:bg-amber-900/30",
+							},
+							{
+								label: t("company.employees.totalSalaries"),
+								value: formatCurrency(summary.totalMonthlySalaries),
+								icon: Banknote,
+								iconClassName: "text-blue-600 dark:text-blue-400",
+								iconBgClassName: "bg-blue-100 dark:bg-blue-900/30",
+								valueClassName: "text-blue-700 dark:text-blue-300",
+							},
+							{
+								label: t("company.employees.totalGosi"),
+								value: formatCurrency(summary.totalMonthlyGosi),
+								icon: Shield,
+								iconClassName: "text-indigo-600 dark:text-indigo-400",
+								iconBgClassName: "bg-indigo-100 dark:bg-indigo-900/30",
+								valueClassName: "text-indigo-700 dark:text-indigo-300",
+							},
+						]}
+					/>
+
+					{/* الديسكتوب كما هو */}
+					<div className="hidden sm:grid sm:grid-cols-2 gap-4 lg:grid-cols-4">
 					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 						<div className="flex items-center justify-between mb-3">
 							<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
@@ -200,11 +241,59 @@ export function EmployeeList({ organizationId, organizationSlug }: EmployeeListP
 							{formatCurrency(summary.totalMonthlyGosi)}
 						</p>
 					</div>
-				</div>
+					</div>
+				</>
 			)}
 
-			{/* Search and Filter Bar */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+			{/* الجوال: بحث + ورقة فلاتر + زر إضافة مضغوط في صف واحد */}
+			<div className="flex items-center gap-2 sm:hidden">
+				<div className="relative min-w-0 flex-1">
+					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Input
+						placeholder={t("company.employees.searchPlaceholder")}
+						value={search}
+						onChange={(e: any) => { setSearch(e.target.value); setCurrentPage(1); }}
+						className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pe-10 focus:ring-1 focus:ring-primary/30"
+					/>
+				</div>
+				<MobileFilterSheet activeCount={(statusFilter !== "all" ? 1 : 0) + (typeFilter !== "all" ? 1 : 0)}>
+					<Select value={statusFilter} onValueChange={(v: any) => { setStatusFilter(v); setCurrentPage(1); }}>
+						<SelectTrigger className="w-full rounded-xl">
+							<SelectValue placeholder={t("company.employees.filterStatus")} />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="all">{t("company.common.all")}</SelectItem>
+							<SelectItem value="ACTIVE">{t("company.employees.statusActive")}</SelectItem>
+							<SelectItem value="ON_LEAVE">{t("company.employees.statusOnLeave")}</SelectItem>
+							<SelectItem value="TERMINATED">{t("company.employees.statusTerminated")}</SelectItem>
+						</SelectContent>
+					</Select>
+					<Select value={typeFilter} onValueChange={(v: any) => { setTypeFilter(v); setCurrentPage(1); }}>
+						<SelectTrigger className="w-full rounded-xl">
+							<SelectValue placeholder={t("company.employees.filterType")} />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="all">{t("company.common.all")}</SelectItem>
+							{EMPLOYEE_TYPES.map((type) => (
+								<SelectItem key={type} value={type}>
+									{t(`company.employees.types.${type}`)}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</MobileFilterSheet>
+				<Button
+					size="icon"
+					aria-label={t("company.employees.addEmployee")}
+					onClick={() => setShowAddDialog(true)}
+					className="h-10 w-10 shrink-0 rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+				>
+					<Plus className="h-5 w-5" />
+				</Button>
+			</div>
+
+			{/* Search and Filter Bar (الديسكتوب كما هو) */}
+			<div className="hidden gap-4 sm:flex sm:items-center sm:justify-between">
 				<div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
 					<div className="relative max-w-md flex-1">
 						<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />

@@ -26,6 +26,8 @@ import {
 } from "@ui/components/table";
 import { Plus, Search, Package, CheckCircle2, Banknote, Wrench } from "lucide-react";
 import { Pagination } from "@saas/shared/components/Pagination";
+import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 import { AddAssetDialog } from "./AddAssetDialog";
 
 interface AssetListProps {
@@ -93,7 +95,46 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 		<div className="space-y-6">
 			{/* Summary Cards - Glass Morphism */}
 			{summary && (
-				<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+				<>
+					{/* الجوال: شريط إحصائيات مضغوط */}
+					<CompactStatGrid
+						className="sm:hidden"
+						items={[
+							{
+								label: t("company.assets.available"),
+								value: summary.available,
+								icon: CheckCircle2,
+								iconClassName: "text-sky-600 dark:text-sky-400",
+								iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+							},
+							{
+								label: t("company.assets.inUse"),
+								value: summary.inUse,
+								icon: Package,
+								iconClassName: "text-blue-600 dark:text-blue-400",
+								iconBgClassName: "bg-blue-100 dark:bg-blue-900/30",
+							},
+							{
+								label: t("company.assets.totalValue"),
+								value: formatCurrency(summary.totalValue),
+								icon: Banknote,
+								iconClassName: "text-indigo-600 dark:text-indigo-400",
+								iconBgClassName: "bg-indigo-100 dark:bg-indigo-900/30",
+								valueClassName: "text-indigo-700 dark:text-indigo-300",
+							},
+							{
+								label: t("company.assets.monthlyRent"),
+								value: formatCurrency(summary.totalMonthlyRent),
+								icon: Wrench,
+								iconClassName: "text-orange-600 dark:text-orange-400",
+								iconBgClassName: "bg-orange-100 dark:bg-orange-900/30",
+								valueClassName: "text-orange-700 dark:text-orange-300",
+							},
+						]}
+					/>
+
+					{/* الديسكتوب كما هو */}
+					<div className="hidden sm:grid sm:grid-cols-2 gap-4 lg:grid-cols-4">
 					<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 						<div className="flex items-center justify-between mb-3">
 							<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
@@ -149,11 +190,61 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 							{formatCurrency(summary.totalMonthlyRent)}
 						</p>
 					</div>
-				</div>
+					</div>
+				</>
 			)}
 
-			{/* Search and Filter Bar */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+			{/* الجوال: بحث + ورقة فلاتر + زر إضافة مضغوط في صف واحد */}
+			<div className="flex items-center gap-2 sm:hidden">
+				<div className="relative min-w-0 flex-1">
+					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Input
+						placeholder={t("company.assets.searchPlaceholder")}
+						value={search}
+						onChange={(e: any) => { setSearch(e.target.value); setCurrentPage(1); }}
+						className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pe-10 focus:ring-1 focus:ring-primary/30"
+					/>
+				</div>
+				<MobileFilterSheet activeCount={(categoryFilter !== "all" ? 1 : 0) + (statusFilter !== "all" ? 1 : 0)}>
+					<Select value={categoryFilter} onValueChange={(v: any) => { setCategoryFilter(v); setCurrentPage(1); }}>
+						<SelectTrigger className="w-full rounded-xl">
+							<SelectValue placeholder={t("company.assets.filterCategory")} />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="all">{t("company.common.all")}</SelectItem>
+							{ASSET_CATEGORIES.map((cat) => (
+								<SelectItem key={cat} value={cat}>
+									{t(`company.assets.categories.${cat}`)}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					<Select value={statusFilter} onValueChange={(v: any) => { setStatusFilter(v); setCurrentPage(1); }}>
+						<SelectTrigger className="w-full rounded-xl">
+							<SelectValue placeholder={t("company.assets.filterStatus")} />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="all">{t("company.common.all")}</SelectItem>
+							{ASSET_STATUSES.map((s) => (
+								<SelectItem key={s} value={s}>
+									{t(`company.assets.statuses.${s}`)}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</MobileFilterSheet>
+				<Button
+					size="icon"
+					aria-label={t("company.assets.addAsset")}
+					onClick={() => setShowAddDialog(true)}
+					className="h-10 w-10 shrink-0 rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+				>
+					<Plus className="h-5 w-5" />
+				</Button>
+			</div>
+
+			{/* Search and Filter Bar (الديسكتوب كما هو) */}
+			<div className="hidden gap-4 sm:flex sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
 					<div className="relative max-w-md flex-1">
 						<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
