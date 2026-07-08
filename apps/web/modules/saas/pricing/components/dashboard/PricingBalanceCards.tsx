@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Currency } from "@saas/finance/components/shared/Currency";
+import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
 
 interface PricingBalanceCardsProps {
 	studiesValue: number;
@@ -22,51 +23,82 @@ export function PricingBalanceCards({
 	const t = useTranslations();
 
 	return (
-		<div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
-			{/* Total Studies Value */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-3 sm:p-4">
-				<div className="flex items-center justify-between mb-2 sm:mb-3">
-					<div className="p-1.5 sm:p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-						<Calculator className="h-4 w-4 sm:h-5 sm:w-5 text-sky-600 dark:text-sky-400" />
-					</div>
-				</div>
-				<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-					{t("pricing.dashboard.overview.studiesValue")}
-				</p>
-				<p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-slate-100 break-words tabular-nums">
-					<Currency amount={studiesValue} />
-				</p>
-			</div>
+		<>
+			{/* الجوال: صفوف مدمجة (الثالثة تمتد بعرض كامل تلقائياً) */}
+			<CompactStatGrid
+				className="sm:hidden"
+				items={[
+					{
+						label: t("pricing.dashboard.overview.studiesValue"),
+						value: <Currency amount={studiesValue} />,
+						icon: Calculator,
+						iconClassName: "text-sky-600 dark:text-sky-400",
+						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+					},
+					{
+						label: t("pricing.dashboard.overview.activeQuotations"),
+						value: <Currency amount={activeQuotationsValue} />,
+						icon: FileText,
+						iconClassName: "text-blue-600 dark:text-blue-400",
+						iconBgClassName: "bg-blue-100 dark:bg-blue-900/30",
+					},
+					{
+						label: t("pricing.dashboard.overview.leadsPipeline"),
+						value: <Currency amount={leadsOpenValue} />,
+						icon: Users,
+						iconClassName: "text-violet-600 dark:text-violet-400",
+						iconBgClassName: "bg-violet-100 dark:bg-violet-900/30",
+					},
+				]}
+			/>
 
-			{/* Active Quotations */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-3 sm:p-4">
-				<div className="flex items-center justify-between mb-2 sm:mb-3">
-					<div className="p-1.5 sm:p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-						<FileText className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
+			{/* الديسكتوب كما هو */}
+			<div className="hidden sm:grid sm:grid-cols-3 gap-4">
+				{/* Total Studies Value */}
+				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+					<div className="flex items-center justify-between mb-3">
+						<div className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/30">
+							<Calculator className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+						</div>
 					</div>
+					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+						{t("pricing.dashboard.overview.studiesValue")}
+					</p>
+					<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 break-words tabular-nums">
+						<Currency amount={studiesValue} />
+					</p>
 				</div>
-				<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-					{t("pricing.dashboard.overview.activeQuotations")}
-				</p>
-				<p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-slate-100 break-words tabular-nums">
-					<Currency amount={activeQuotationsValue} />
-				</p>
-			</div>
 
-			{/* Leads Pipeline */}
-			<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-3 sm:p-4">
-				<div className="flex items-center justify-between mb-2 sm:mb-3">
-					<div className="p-1.5 sm:p-2 rounded-lg bg-violet-100 dark:bg-violet-900/30">
-						<Users className="h-4 w-4 sm:h-5 sm:w-5 text-violet-600 dark:text-violet-400" />
+				{/* Active Quotations */}
+				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+					<div className="flex items-center justify-between mb-3">
+						<div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+							<FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+						</div>
 					</div>
+					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+						{t("pricing.dashboard.overview.activeQuotations")}
+					</p>
+					<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 break-words tabular-nums">
+						<Currency amount={activeQuotationsValue} />
+					</p>
 				</div>
-				<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-					{t("pricing.dashboard.overview.leadsPipeline")}
-				</p>
-				<p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-slate-100 break-words tabular-nums">
-					<Currency amount={leadsOpenValue} />
-				</p>
+
+				{/* Leads Pipeline */}
+				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
+					<div className="flex items-center justify-between mb-3">
+						<div className="p-2 rounded-lg bg-violet-100 dark:bg-violet-900/30">
+							<Users className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+						</div>
+					</div>
+					<p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+						{t("pricing.dashboard.overview.leadsPipeline")}
+					</p>
+					<p className="text-2xl font-bold text-slate-900 dark:text-slate-100 break-words tabular-nums">
+						<Currency amount={leadsOpenValue} />
+					</p>
+				</div>
 			</div>
-		</div>
+		</>
 	);
 }

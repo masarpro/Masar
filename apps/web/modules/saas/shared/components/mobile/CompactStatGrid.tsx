@@ -32,12 +32,17 @@ interface CompactStatGridProps {
  * — لا يغيّر عرض الكمبيوتر إطلاقاً.
  */
 export function CompactStatGrid({ items, className }: CompactStatGridProps) {
+	const isOdd = items.length % 2 === 1;
 	return (
 		<div className={cn("grid grid-cols-2 gap-2", className)}>
-			{items.map((item) => (
+			{items.map((item, index) => (
 				<div
 					key={item.label}
-					className="flex items-center gap-2.5 rounded-xl border border-slate-200/60 bg-white/80 px-3 py-2.5 backdrop-blur-sm dark:border-slate-700/40 dark:bg-slate-900/70"
+					className={cn(
+						"flex items-center gap-2.5 rounded-xl border border-slate-200/60 bg-white/80 px-3 py-2.5 backdrop-blur-sm dark:border-slate-700/40 dark:bg-slate-900/70",
+						// عدد فردي: العنصر الأخير يمتد بعرض كامل بدل بطاقة يتيمة مشوهة
+						isOdd && index === items.length - 1 && "col-span-2",
+					)}
 				>
 					<div
 						className={cn(
