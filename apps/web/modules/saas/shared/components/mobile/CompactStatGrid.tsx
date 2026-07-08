@@ -59,7 +59,7 @@ export function CompactStatGrid({ items, className }: CompactStatGridProps) {
 						/>
 					</div>
 					<div className="min-w-0 flex-1">
-						<p className="truncate text-[11px] font-medium text-slate-500 dark:text-slate-400">
+						<p className="truncate text-xs font-medium text-slate-500 dark:text-slate-400">
 							{item.label}
 						</p>
 						<p

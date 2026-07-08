@@ -104,7 +104,7 @@ export function ActiveProjectsSection({
 					<div className="p-1.5 rounded-lg bg-blue-500/10">
 						<FolderOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
 					</div>
-					<h2 className="text-base font-bold text-foreground">
+					<h2 className="text-sm sm:text-base font-bold text-foreground">
 						{t("dashboard.activeProjects")}
 					</h2>
 					<span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full">
@@ -186,7 +186,7 @@ export function ActiveProjectsSection({
 									{days !== null && (
 										<div className="flex shrink-0 items-center gap-1">
 											<Calendar className="h-3 w-3 text-blue-500" />
-											<span className="whitespace-nowrap text-[11px] text-muted-foreground">
+											<span className="whitespace-nowrap text-xs text-muted-foreground">
 												{days > 0
 													? `${days} ${t("dashboard.alerts.daysRemaining")}`
 													: t("dashboard.projectEnded")}

@@ -137,7 +137,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 							<div className={`rounded-lg bg-card/60 p-1.5 ${action.iconColor}`}>
 								<Icon className="h-4 w-4" />
 							</div>
-							<span className="line-clamp-1 text-center text-[11px] font-medium text-foreground/80">
+							<span className="line-clamp-1 text-center text-xs font-medium text-foreground/80">
 								{action.sectionLabel}
 							</span>
 						</Link>

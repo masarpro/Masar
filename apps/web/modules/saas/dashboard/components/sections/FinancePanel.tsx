@@ -81,7 +81,7 @@ export function FinancePanel({
 							{t("dashboard.kpi.bankBalance")}
 						</span>
 					</div>
-					<p className="text-lg font-bold text-slate-900 dark:text-slate-100">
+					<p className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 tabular-nums">
 						<Currency amount={Number(bankBalance ?? 0)} />
 					</p>
 				</Link>
@@ -99,7 +99,7 @@ export function FinancePanel({
 							{t("dashboard.kpi.cashBalance")}
 						</span>
 					</div>
-					<p className="text-lg font-bold text-slate-900 dark:text-slate-100">
+					<p className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 tabular-nums">
 						<Currency amount={Number(cashBalance ?? 0)} />
 					</p>
 				</Link>
@@ -108,7 +108,7 @@ export function FinancePanel({
 			{/* Cash Flow Chart — matches finance page style */}
 			<div className="flex-1 flex flex-col min-h-0">
 				<div className="flex items-center justify-between mb-1.5 shrink-0">
-					<span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+					<span className="text-sm font-bold text-slate-700 dark:text-slate-300">
 						{t("dashboard.financePanel.cashFlowTitle")}
 					</span>
 					<Link
