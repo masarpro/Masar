@@ -104,6 +104,7 @@ export interface RetainingWallInput {
 	stemThickness: number;       // سم
 	baseWidth: number;
 	baseThickness: number;       // سم
+	embedmentDepth?: number;     // م — عمق التأسيس تحت سطح الأرض (افتراضي: نظافة + قاعدة + 0.3م)
 	quantity: number;
 }
 
@@ -255,6 +256,7 @@ export interface ComponentBreakdown {
 	concreteVolume: number;
 	steelWeight: number;
 	formworkArea: number;
+	grcWeight?: number;          // كجم — وزن عناصر GRC/GRP (منفصل عن حديد التسليح)
 }
 
 export interface OtherStructuralResult {
@@ -271,12 +273,14 @@ export interface OtherStructuralResult {
 	excavationVolume: number;
 	blockCount: number;
 	mortarVolume: number;
+	grcWeight: number;           // كجم — وزن GRC/GRP
 
 	// الإجماليات (× الكمية)
 	totalConcreteRC: number;
 	totalConcretePlain: number;
 	totalSteelWeight: number;
 	totalFormwork: number;
+	totalGrcWeight: number;      // كجم
 
 	// التفصيل
 	breakdown: ComponentBreakdown[];

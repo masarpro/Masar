@@ -20,6 +20,7 @@ export function ElementResultCard({ result }: ElementResultCardProps) {
 		{ label: t("results.concreteRC"), value: result.concreteVolumeRC, unit: "م³", icon: "🏗", show: result.concreteVolumeRC > 0 },
 		{ label: t("results.concretePlain"), value: result.concreteVolumePlain, unit: "م³", icon: "🧱", show: result.concreteVolumePlain > 0 },
 		{ label: t("results.steel"), value: result.steelWeight, unit: "كجم", icon: "⚙️", show: result.steelWeight > 0 },
+		{ label: t("results.grcWeight"), value: result.grcWeight, unit: "كجم", icon: "🏛️", show: result.grcWeight > 0 },
 		{ label: t("results.formwork"), value: result.formworkArea, unit: "م²", icon: "📐", show: result.formworkArea > 0 },
 		{ label: t("results.waterproofing"), value: result.waterproofingArea, unit: "م²", icon: "💧", show: result.waterproofingArea > 0 },
 		{ label: t("results.excavation"), value: result.excavationVolume, unit: "م³", icon: "⛏️", show: result.excavationVolume > 0 },

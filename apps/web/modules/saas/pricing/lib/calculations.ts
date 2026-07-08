@@ -103,9 +103,8 @@ export function calculateFoundation(data: FoundationCalcInput): FoundationResult
 
 	const totalRebarWeight = mainRebarWeight + secondaryRebarWeight;
 
-	// مساحة الشدات (الجوانب + القاعدة)
-	const formworkArea =
-		(2 * (length + width) * depth + length * width) * quantity;
+	// مساحة الشدات — جوانب فقط (القاعدة تُصب على صبة النظافة بلا شدة قاع)
+	const formworkArea = 2 * (length + width) * depth * quantity;
 
 	// التكلفة
 	const concretePrice = STRUCTURAL_PRICES.concrete[concreteType] || 310;
@@ -373,6 +372,11 @@ export interface SlabResult {
 	totalCost: number;
 }
 
+/**
+ * @deprecated غير مستخدمة في الواجهة — استخدم دوال البلاطات المحسّنة في
+ * structural-calculations.ts (calculateSolidSlab/calculateRibbedSlab/…).
+ * صيغة الهوردي هنا فيها ازدواج جزئي لطبقة الـtopping وصيغة بلوك غير موثوقة.
+ */
 export function calculateSlab(data: SlabCalcInput): SlabResult {
 	const {
 		length,
@@ -646,7 +650,8 @@ export function calculateStairs(data: StairsInput): StairsResult {
 	const concretePrice = STRUCTURAL_PRICES.concrete[concreteType] || 310;
 	const concreteCost = concreteVolume * concretePrice;
 	const rebarCost = rebarWeight * STRUCTURAL_PRICES.steelPerKg;
-	const formworkCost = formworkArea * STRUCTURAL_PRICES.formwork * STAIRS_FORMWORK_MULTIPLIER;
+	// المعامل 1.5 مطبق في formworkArea أعلاه — لا يُضرب هنا مرة ثانية
+	const formworkCost = formworkArea * STRUCTURAL_PRICES.formwork;
 	const laborCost = concreteVolume * STRUCTURAL_LABOR_PRICES.stairs;
 	const totalCost = concreteCost + rebarCost + formworkCost + laborCost;
 

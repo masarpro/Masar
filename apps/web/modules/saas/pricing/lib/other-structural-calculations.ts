@@ -59,6 +59,7 @@ function buildResult(
 	const concreteVolumeRC = r2(breakdown.reduce((s, b) => s + b.concreteVolume, 0));
 	const steelWeight = r2(breakdown.reduce((s, b) => s + b.steelWeight, 0));
 	const formworkArea = r2(breakdown.reduce((s, b) => s + b.formworkArea, 0));
+	const grcWeight = r2(breakdown.reduce((s, b) => s + (b.grcWeight ?? 0), 0));
 	const concreteVolumePlain = r2(extras.concreteVolumePlain ?? 0);
 
 	return {
@@ -73,10 +74,12 @@ function buildResult(
 		excavationVolume: r2(extras.excavationVolume ?? 0),
 		blockCount: extras.blockCount ?? 0,
 		mortarVolume: r2(extras.mortarVolume ?? 0),
+		grcWeight,
 		totalConcreteRC: r2(concreteVolumeRC * quantity),
 		totalConcretePlain: r2(concreteVolumePlain * quantity),
 		totalSteelWeight: r2(steelWeight * quantity),
 		totalFormwork: r2(formworkArea * quantity),
+		totalGrcWeight: r2(grcWeight * quantity),
 		breakdown,
 	};
 }
@@ -528,10 +531,13 @@ function calculateRetainingWall(input: RetainingWallInput): OtherStructuralResul
 	// صبة نظافة
 	const leanConcrete = baseWidth * input.length * LEAN_CONCRETE_THICKNESS;
 
-	// الحفر
+	// الحفر — بعمق التأسيس فقط (وليس الارتفاع الكلي للجدار الظاهر فوق الأرض)
+	const embedmentDepth = input.embedmentDepth && input.embedmentDepth > 0
+		? input.embedmentDepth
+		: LEAN_CONCRETE_THICKNESS + baseThickM + 0.3;
 	const excWidth = baseWidth + 1.0;
 	const excLength = input.length + 1.0;
-	const excavation = excWidth * excLength * input.height;
+	const excavation = excWidth * excLength * embedmentDepth;
 
 	return buildResult(input.elementType, input.name, input.quantity, breakdown, {
 		concreteVolumePlain: leanConcrete,
@@ -824,7 +830,8 @@ function calculateConcreteDecor(input: ConcreteDecorInput): OtherStructuralResul
 			component: item.description ?? item.type,
 			componentEn: item.type,
 			concreteVolume: 0,
-			steelWeight: r2(weight / 1000), // تحويل لأن الباقي بالكجم وهذا وزن GRC
+			steelWeight: 0,
+			grcWeight: r2(weight), // كجم — وزن GRC منفصل عن حديد التسليح
 			formworkArea: r2(area),
 		});
 	}

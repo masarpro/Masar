@@ -242,6 +242,7 @@ export function OtherStructuralSection({
 											<div className="text-xs text-muted-foreground">
 												{el.result.concreteVolumeRC > 0 && `RC: ${formatNumber(el.result.totalConcreteRC)} م³`}
 												{el.result.steelWeight > 0 && ` | حديد: ${formatNumber(el.result.totalSteelWeight)} كجم`}
+												{el.result.grcWeight > 0 && ` | ${t("results.grcWeight")}: ${formatNumber(el.result.totalGrcWeight)} كجم`}
 											</div>
 										)}
 									</div>

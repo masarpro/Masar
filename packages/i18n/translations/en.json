@@ -7411,6 +7411,7 @@
             "concreteRC": "RC Concrete",
             "concretePlain": "Plain Concrete",
             "steel": "Steel",
+            "grcWeight": "GRC Weight",
             "formwork": "Formwork",
             "waterproofing": "Waterproofing",
             "excavation": "Excavation",

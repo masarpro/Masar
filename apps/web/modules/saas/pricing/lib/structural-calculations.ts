@@ -54,6 +54,7 @@ import type {
 } from '../types/blocks';
 
 const STRIP_MESH_THRESHOLD = 0.8;
+const RAFT_EDGE_BEAM_STEEL_RATIO = 120; // كجم/م³ — تقدير حديد كمرات تسميك حواف اللبشة (أسياخ + كانات)
 
 // ─────────────────────────────────────────────────────────────────────────────
 // دوال مساعدة عامة
@@ -310,6 +311,25 @@ function calcRaftRebar(
 }
 
 /**
+ * حساب حديد القاعدة مع اختيار المسار تلقائياً:
+ * سيخ ≤ طول المصنع → مسار القص العادي، وإلا → مسار الوصلات (calcRaftRebar)
+ * يمنع الهالك السالب في القواعد المشتركة الأطول من طول السيخ
+ */
+function calcFoundationRebarAuto(
+	direction: string,
+	diameter: number,
+	barLength: number,
+	barCount: number,
+	quantity: number,
+): FoundationRebarCalculation {
+	const stockLength = STOCK_LENGTHS[diameter] || 12;
+	if (barLength <= stockLength) {
+		return calcFoundationRebar(direction, diameter, barLength, barCount, quantity);
+	}
+	return calcRaftRebar(direction, diameter, barLength, barCount * quantity, '40d');
+}
+
+/**
  * حساب القاعدة المعزولة
  */
 export function calculateIsolatedFoundation(
@@ -345,12 +365,10 @@ export function calculateIsolatedFoundation(
 	const leanConcreteVolume = hasLeanConcrete
 		? (length + 0.2) * (width + 0.2) * leanConcreteThickness * quantity
 		: 0;
-	const plainConcreteVolume = hasLeanConcrete
-		? leanConcreteVolume
-		: (length + 0.2) * (width + 0.2) * 0.1 * quantity;
+	const plainConcreteVolume = hasLeanConcrete ? leanConcreteVolume : 0;
 
-	// مساحة الشدات
-	const formworkArea = (2 * (length + width) * height + length * width) * quantity;
+	// مساحة الشدات — جوانب فقط (القاعدة تُصب على صبة النظافة بلا شدة قاع)
+	const formworkArea = 2 * (length + width) * height * quantity;
 
 	// حسابات الحديد
 	const rebarDetails: FoundationRebarCalculation[] = [];
@@ -359,21 +377,21 @@ export function calculateIsolatedFoundation(
 	const shortBarLength = calcFoundationBarLength(width, effectiveCoverSide, effectiveHookLength);
 	const shortBarCount = calcFoundationBarCount(length, bottomShort.barsPerMeter, effectiveCoverSide);
 	rebarDetails.push(
-		calcFoundationRebar('فرش قصير', bottomShort.diameter, shortBarLength, shortBarCount, quantity)
+		calcFoundationRebarAuto('فرش قصير', bottomShort.diameter, shortBarLength, shortBarCount, quantity)
 	);
 
 	// فرش طويل (سفلي)
 	const longBarLength = calcFoundationBarLength(length, effectiveCoverSide, effectiveHookLength);
 	const longBarCount = calcFoundationBarCount(width, bottomLong.barsPerMeter, effectiveCoverSide);
 	rebarDetails.push(
-		calcFoundationRebar('فرش طويل', bottomLong.diameter, longBarLength, longBarCount, quantity)
+		calcFoundationRebarAuto('فرش طويل', bottomLong.diameter, longBarLength, longBarCount, quantity)
 	);
 
 	// غطاء قصير (علوي) — uses topShort's own barsPerMeter
 	if (topShort) {
 		const topShortBarCount = calcFoundationBarCount(length, topShort.barsPerMeter, effectiveCoverSide);
 		rebarDetails.push(
-			calcFoundationRebar('غطاء قصير', topShort.diameter, shortBarLength, topShortBarCount, quantity)
+			calcFoundationRebarAuto('غطاء قصير', topShort.diameter, shortBarLength, topShortBarCount, quantity)
 		);
 	}
 
@@ -381,7 +399,7 @@ export function calculateIsolatedFoundation(
 	if (topLong) {
 		const topLongBarCount = calcFoundationBarCount(width, topLong.barsPerMeter, effectiveCoverSide);
 		rebarDetails.push(
-			calcFoundationRebar('غطاء طويل', topLong.diameter, longBarLength, topLongBarCount, quantity)
+			calcFoundationRebarAuto('غطاء طويل', topLong.diameter, longBarLength, topLongBarCount, quantity)
 		);
 	}
 
@@ -791,9 +809,10 @@ export function calculateStripFoundation(
 	const wasteWeight = rebarDetails.reduce((s, r) => s + r.wasteWeight, 0);
 	const wastePercentage = grossWeight > 0 ? (wasteWeight / grossWeight) * 100 : 0;
 
-	// تجميع الأسياخ
+	// تجميع الأسياخ (تجاهل الصفوف التقديرية ذات قطر 0)
 	const stocksMap = new Map<number, { diameter: number; count: number; length: number }>();
 	rebarDetails.forEach((r) => {
+		if (r.diameter <= 0) return;
 		const existing = stocksMap.get(r.diameter);
 		if (existing) {
 			existing.count += r.stocksNeeded;
@@ -949,14 +968,18 @@ export function calculateRaftFoundation(
 	// خرسانة النظافة
 	const leanConcreteVolume = hasLeanConcrete ? area * leanConcreteThickness : 0;
 
-	// تسميك الحواف (edge beams along perimeter)
+	// تسميك الحواف (edge beams along perimeter) — خصم تداخل الزوايا الأربع
 	const perimeter = 2 * (length + width);
-	const edgeBeamConcreteVolume = hasEdgeBeams ? perimeter * edgeBeamWidth * edgeBeamDepth : 0;
+	const edgeBeamConcreteVolume = hasEdgeBeams
+		? (perimeter - 4 * edgeBeamWidth) * edgeBeamWidth * edgeBeamDepth
+		: 0;
 
 	const totalConcreteVolume = concreteVolume + edgeBeamConcreteVolume;
 	const plainConcreteVolume = leanConcreteVolume;
 
-	const formworkArea = 2 * (length + width) * thickness;
+	// شدات: محيط اللبشة × سماكتها + جوانب كمرات التسميك (وجهان)
+	const formworkArea = 2 * (length + width) * thickness
+		+ (hasEdgeBeams ? 2 * perimeter * edgeBeamDepth : 0);
 
 	// حسابات الحديد
 	const rebarDetails: FoundationRebarCalculation[] = [];
@@ -992,6 +1015,27 @@ export function calculateRaftFoundation(
 		const topYResult = calcRaftRebar('علوي اتجاه Y', topY.diameter, topYBarLength, topYBarCount, lapSpliceMethod, customLapLength);
 		rebarDetails.push(topYResult);
 		raftRebarResults.push(topYResult);
+	}
+
+	// حديد تسميك الحواف — تقدير بنسبة تسليح (كمرة طرفية: أسياخ رئيسية + كانات)
+	if (hasEdgeBeams && edgeBeamConcreteVolume > 0) {
+		const edgeBeamSteel = edgeBeamConcreteVolume * RAFT_EDGE_BEAM_STEEL_RATIO;
+		rebarDetails.push({
+			direction: 'تسميك الحواف (تقديري)',
+			diameter: 0,
+			barLength: 0,
+			barCount: 0,
+			totalBars: 0,
+			stockLength: 0,
+			cutsPerStock: 0,
+			stocksNeeded: 0,
+			wastePerStock: 0,
+			totalWaste: 0,
+			wastePercentage: 0,
+			netWeight: Number(edgeBeamSteel.toFixed(2)),
+			grossWeight: Number(edgeBeamSteel.toFixed(2)),
+			wasteWeight: 0,
+		});
 	}
 
 	// كراسي حديد (chair bars / spacers)
@@ -1050,9 +1094,10 @@ export function calculateRaftFoundation(
 	const wasteWeight = rebarDetails.reduce((s, r) => s + r.wasteWeight, 0);
 	const wastePercentage = grossWeight > 0 ? (wasteWeight / grossWeight) * 100 : 0;
 
-	// تجميع الأسياخ
+	// تجميع الأسياخ (تجاهل الصفوف التقديرية ذات قطر 0)
 	const stocksMap = new Map<number, { diameter: number; count: number; length: number }>();
 	rebarDetails.forEach((r) => {
+		if (r.diameter <= 0) return;
 		const existing = stocksMap.get(r.diameter);
 		if (existing) {
 			existing.count += r.stocksNeeded;
