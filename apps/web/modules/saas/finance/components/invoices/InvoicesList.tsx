@@ -71,17 +71,6 @@ interface InvoicesListProps {
 	organizationSlug: string;
 }
 
-const STATUS_TABS = [
-	{ key: "all", filterValue: "all" },
-	{ key: "overdue", filterValue: "OVERDUE" },
-	{ key: "draft", filterValue: "DRAFT" },
-	{ key: "issued", filterValue: "ISSUED" },
-	{ key: "sent", filterValue: "SENT" },
-	{ key: "partially_paid", filterValue: "PARTIALLY_PAID" },
-	{ key: "paid", filterValue: "PAID" },
-	{ key: "credit_note", filterValue: "CREDIT_NOTE" },
-] as const;
-
 const PAGE_SIZE = 20;
 
 export function InvoicesList({ organizationId, organizationSlug }: InvoicesListProps) {
@@ -250,30 +239,9 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 					</div>
 				</div>
 
-				{/* ─── Status Tabs ─────────────────────────────────────── */}
-				<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] px-4 py-3">
-					<div className="flex items-center gap-2 flex-wrap">
-						{STATUS_TABS.map((tab) => (
-							<button
-								key={tab.key}
-								type="button"
-								onClick={() => handleStatusChange(tab.filterValue)}
-								className={`px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all ${
-									statusFilter === tab.filterValue
-										? "bg-primary text-primary-foreground shadow-[0_2px_8px_hsl(var(--primary)/0.3)]"
-										: "bg-slate-100/80 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-700/50"
-								}`}
-							>
-								{t(`finance.invoices.statusTabs.${tab.key}`)}
-							</button>
-						))}
-					</div>
-				</div>
-
-				{/* ─── Search and Filter ───────────────────────────────── */}
-				<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] px-5 py-3.5">
-					{/* الجوال: بحث + ورقة فلاتر في صف واحد */}
-					<div className="flex items-center gap-2 sm:hidden">
+				{/* ─── Search + Filter (زر فلترة واحد للجوال والكمبيوتر) ── */}
+				<div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-white/80 dark:border-slate-800/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_30px_rgba(0,0,0,0.04)] px-4 py-3 sm:px-5 sm:py-3.5">
+					<div className="flex items-center gap-2">
 						<div className="relative min-w-0 flex-1">
 							<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 							<Input
@@ -292,48 +260,17 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 									<SelectValue placeholder={t("finance.invoices.allStatuses")} />
 								</SelectTrigger>
 								<SelectContent className="rounded-xl">
-									<SelectItem value="all">{t("finance.invoices.allStatuses")}</SelectItem>
-									<SelectItem value="DRAFT">{t("finance.invoices.status.draft")}</SelectItem>
-									<SelectItem value="ISSUED">{t("finance.invoices.status.issued")}</SelectItem>
-									<SelectItem value="SENT">{t("finance.invoices.status.sent")}</SelectItem>
-									<SelectItem value="PARTIALLY_PAID">{t("finance.invoices.status.partially_paid")}</SelectItem>
-									<SelectItem value="PAID">{t("finance.invoices.status.paid")}</SelectItem>
-									<SelectItem value="OVERDUE">{t("finance.invoices.status.overdue")}</SelectItem>
-									<SelectItem value="CANCELLED">{t("finance.invoices.status.cancelled")}</SelectItem>
+									<SelectItem value="all">{t("finance.invoices.statusTabs.all")}</SelectItem>
+									<SelectItem value="OVERDUE">{t("finance.invoices.statusTabs.overdue")}</SelectItem>
+									<SelectItem value="DRAFT">{t("finance.invoices.statusTabs.draft")}</SelectItem>
+									<SelectItem value="ISSUED">{t("finance.invoices.statusTabs.issued")}</SelectItem>
+									<SelectItem value="SENT">{t("finance.invoices.statusTabs.sent")}</SelectItem>
+									<SelectItem value="PARTIALLY_PAID">{t("finance.invoices.statusTabs.partially_paid")}</SelectItem>
+									<SelectItem value="PAID">{t("finance.invoices.statusTabs.paid")}</SelectItem>
+									<SelectItem value="CREDIT_NOTE">{t("finance.invoices.statusTabs.credit_note")}</SelectItem>
 								</SelectContent>
 							</Select>
 						</MobileFilterSheet>
-					</div>
-
-					{/* الديسكتوب كما هو */}
-					<div className="hidden flex-col gap-3 sm:flex sm:flex-row sm:items-center">
-						<div className="relative flex-1 min-w-[200px]">
-							<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-							<Input
-								placeholder={t("finance.invoices.searchPlaceholder")}
-								value={searchTerm}
-								onChange={(e: any) => {
-									setSearchTerm(e.target.value);
-									setCurrentPage(1);
-								}}
-								className="pe-10 rounded-xl h-9 border-slate-200/80 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 focus:bg-background"
-							/>
-						</div>
-						<Select value={statusFilter} onValueChange={handleStatusChange}>
-							<SelectTrigger className="w-[160px] rounded-xl h-9 border-slate-200/80 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30">
-								<SelectValue placeholder={t("finance.invoices.allStatuses")} />
-							</SelectTrigger>
-							<SelectContent className="rounded-xl">
-								<SelectItem value="all">{t("finance.invoices.allStatuses")}</SelectItem>
-								<SelectItem value="DRAFT">{t("finance.invoices.status.draft")}</SelectItem>
-								<SelectItem value="ISSUED">{t("finance.invoices.status.issued")}</SelectItem>
-								<SelectItem value="SENT">{t("finance.invoices.status.sent")}</SelectItem>
-								<SelectItem value="PARTIALLY_PAID">{t("finance.invoices.status.partially_paid")}</SelectItem>
-								<SelectItem value="PAID">{t("finance.invoices.status.paid")}</SelectItem>
-								<SelectItem value="OVERDUE">{t("finance.invoices.status.overdue")}</SelectItem>
-								<SelectItem value="CANCELLED">{t("finance.invoices.status.cancelled")}</SelectItem>
-							</SelectContent>
-						</Select>
 					</div>
 				</div>
 
