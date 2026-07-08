@@ -125,22 +125,47 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 	return (
 		<>
 			{/* الجوال: شبكة مضغوطة — أيقونة + عنوان صغير لكل قسم */}
-			<div className="grid grid-cols-3 gap-2 sm:hidden">
+			{/* الجوال: صف كامل العرض لكل إجراء — نفس نمط صفوف المالية */}
+			<div className="flex flex-col gap-2 sm:hidden">
 				{visibleActions.map((action, i) => {
 					const Icon = action.icon;
 					return (
-						<Link
+						<div
 							key={i}
-							href={action.browsePath}
-							className={`flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-xl border ${action.borderColor} ${action.bgColor} p-2 transition-colors ${action.hoverBg}`}
+							className={`flex h-14 items-center gap-3 rounded-2xl border ${action.borderColor} ${action.bgColor} px-3 transition-colors ${action.hoverBg}`}
 						>
-							<div className={`rounded-lg bg-card/60 p-1.5 ${action.iconColor}`}>
-								<Icon className="h-4 w-4" />
-							</div>
-							<span className="line-clamp-1 text-center text-xs font-medium text-foreground/80">
-								{action.sectionLabel}
-							</span>
-						</Link>
+							<Link
+								href={action.browsePath}
+								className="flex min-w-0 flex-1 items-center gap-3"
+							>
+								<div
+									className={`shrink-0 rounded-lg bg-card/60 p-2 ${action.iconColor}`}
+								>
+									<Icon className="h-5 w-5" />
+								</div>
+								<span className="truncate text-sm font-medium text-foreground/80">
+									{action.sectionLabel}
+								</span>
+							</Link>
+							{action.onCreateClick ? (
+								<button
+									type="button"
+									aria-label={action.actionLabel}
+									onClick={action.onCreateClick}
+									className={`shrink-0 rounded-lg bg-card/60 p-2 ${action.iconColor}`}
+								>
+									<Plus className="h-5 w-5" />
+								</button>
+							) : action.createPath ? (
+								<Link
+									href={action.createPath}
+									aria-label={action.actionLabel}
+									className={`shrink-0 rounded-lg bg-card/60 p-2 ${action.iconColor}`}
+								>
+									<Plus className="h-5 w-5" />
+								</Link>
+							) : null}
+						</div>
 					);
 				})}
 			</div>

@@ -142,10 +142,8 @@ export function Dashboard({
 				</div>
 			)}
 
-			{/* Row 2: Quick Actions — على الجوال تتصدّر اللوحة كمُشغّل تطبيق */}
-			<div className="order-first sm:order-none">
-				<QuickActionsGrid organizationSlug={organizationSlug} />
-			</div>
+			{/* Row 2: Quick Actions — على الجوال تظهر أسفل المشاريع النشطة كصفوف */}
+			<QuickActionsGrid organizationSlug={organizationSlug} />
 
 			<hr className="hidden border-border/50 sm:block" />
 
