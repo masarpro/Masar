@@ -26,6 +26,7 @@ import { ar } from "date-fns/locale";
 import { Hammer, Plus, Receipt, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 import { AddExpenseDialog } from "./AddExpenseDialog";
 
 interface Expense {
@@ -137,9 +138,51 @@ export function ExpensesTable({
 	return (
 		<>
 			<div className="space-y-4">
-				{/* Filters & Actions */}
-				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-					<div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
+				{/* الجوال: بحث + ورقة فلاتر + زر إضافة مضغوط في صف واحد */}
+				<div className="flex items-center gap-2 sm:hidden">
+					<div className="relative min-w-0 flex-1">
+						<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+						<Input
+							placeholder={t("finance.expenses.searchPlaceholder")}
+							value={searchQuery}
+							onChange={(e: any) => onSearchChange(e.target.value)}
+							className="ps-10 rounded-xl"
+						/>
+					</div>
+					<MobileFilterSheet activeCount={selectedCategory ? 1 : 0}>
+						<Select
+							value={selectedCategory || "all"}
+							onValueChange={(value: any) =>
+								onCategoryChange(value === "all" ? undefined : value)
+							}
+						>
+							<SelectTrigger className="w-full rounded-xl">
+								<SelectValue
+									placeholder={t("finance.expenses.filterByCategory")}
+								/>
+							</SelectTrigger>
+							<SelectContent>
+								{categories.map((cat) => (
+									<SelectItem key={cat.value} value={cat.value}>
+										{cat.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</MobileFilterSheet>
+					<Button
+						size="icon"
+						aria-label={t("finance.expenses.new")}
+						className="h-10 w-10 shrink-0 rounded-xl"
+						onClick={() => setShowAddDialog(true)}
+					>
+						<Plus className="h-5 w-5" />
+					</Button>
+				</div>
+
+				{/* Filters & Actions (الديسكتوب كما هو) */}
+				<div className="hidden gap-3 sm:flex sm:items-center sm:justify-between">
+					<div className="flex flex-1 items-center gap-3">
 						<div className="relative flex-1 max-w-xs">
 							<Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
 							<Input

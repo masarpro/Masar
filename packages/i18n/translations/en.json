@@ -891,7 +891,10 @@
     "notFound": "Not found",
     "print": "Print",
     "saved": "Saved",
-    "total": "Total"
+    "total": "Total",
+    "filter": "Filter",
+    "filters": "Filters",
+    "apply": "Apply"
   },
   "autosave": {
     "saving": "Saving...",

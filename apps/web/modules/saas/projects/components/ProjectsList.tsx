@@ -33,6 +33,8 @@ import { useTranslations } from "next-intl";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { UpgradeGate } from "@saas/shared/components/UpgradeGate";
 import { CardGridSkeleton } from "@saas/shared/components/skeletons";
+import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
+import { MobileFilterSheet } from "@saas/shared/components/mobile/MobileFilterSheet";
 import { formatSAR } from "@shared/lib/formatters";
 interface ProjectsListProps {
 	organizationId: string;
@@ -113,9 +115,47 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 	}
 
 	return (
-		<div className="space-y-6" dir="rtl">
-			{/* Statistics Cards - Glass Morphism */}
-			<div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+		<div className="space-y-4 sm:space-y-6" dir="rtl">
+			{/* الجوال: شريط إحصائيات مضغوط */}
+			<CompactStatGrid
+				className="sm:hidden"
+				items={[
+					{
+						label: t("projects.stats.total"),
+						value: stats.total,
+						icon: FolderKanban,
+					},
+					{
+						label: t("projects.stats.active"),
+						value: stats.active,
+						icon: Clock,
+						iconClassName: "text-sky-600 dark:text-sky-400",
+						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+						hint:
+							stats.total > 0
+								? `${Math.round((stats.active / stats.total) * 100)}%`
+								: undefined,
+					},
+					{
+						label: t("projects.stats.completed"),
+						value: stats.completed,
+						icon: CheckCircle2,
+						iconClassName: "text-sky-600 dark:text-sky-400",
+						iconBgClassName: "bg-sky-100 dark:bg-sky-900/30",
+					},
+					{
+						label: t("projects.stats.totalValue"),
+						value: formatSAR(stats.totalValue),
+						icon: Banknote,
+						iconClassName: "text-indigo-600 dark:text-indigo-400",
+						iconBgClassName: "bg-indigo-100 dark:bg-indigo-900/30",
+						valueClassName: "text-indigo-700 dark:text-indigo-300",
+					},
+				]}
+			/>
+
+			{/* Statistics Cards - Glass Morphism (الديسكتوب كما هو) */}
+			<div className="hidden sm:grid sm:grid-cols-2 gap-4 lg:grid-cols-4">
 				{/* Total Projects */}
 				<div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 p-4">
 					<div className="flex items-center justify-between mb-3">
@@ -189,8 +229,55 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 				</div>
 			</div>
 
-			{/* Search and Filter Bar */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+			{/* الجوال: بحث + ورقة فلاتر + زر إضافة مضغوط في صف واحد */}
+			<div className="flex items-center gap-2 sm:hidden">
+				<div className="relative min-w-0 flex-1">
+					<Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Input
+						placeholder={t("projects.searchPlaceholder")}
+						value={searchTerm}
+						onChange={(e: any) => setSearchTerm(e.target.value)}
+						className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pe-10 focus:ring-1 focus:ring-primary/30"
+					/>
+				</div>
+				<MobileFilterSheet activeCount={statusFilter !== "all" ? 1 : 0}>
+					<Select value={statusFilter} onValueChange={setStatusFilter}>
+						<SelectTrigger className="w-full rounded-xl">
+							<SelectValue placeholder={t("projects.allStatuses")} />
+						</SelectTrigger>
+						<SelectContent className="rounded-xl">
+							<SelectItem value="all">{t("projects.allStatuses")}</SelectItem>
+							<SelectItem value="ACTIVE">
+								{t("projects.status.ACTIVE")}
+							</SelectItem>
+							<SelectItem value="ON_HOLD">
+								{t("projects.status.ON_HOLD")}
+							</SelectItem>
+							<SelectItem value="COMPLETED">
+								{t("projects.status.COMPLETED")}
+							</SelectItem>
+							<SelectItem value="ARCHIVED">
+								{t("projects.status.ARCHIVED")}
+							</SelectItem>
+						</SelectContent>
+					</Select>
+				</MobileFilterSheet>
+				<UpgradeGate feature="projects.create">
+					<Button
+						asChild
+						size="icon"
+						aria-label={t("projects.newProject")}
+						className="h-10 w-10 shrink-0 rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+					>
+						<Link href={`${basePath}/new`}>
+							<Plus className="h-5 w-5" />
+						</Link>
+					</Button>
+				</UpgradeGate>
+			</div>
+
+			{/* Search and Filter Bar (الديسكتوب كما هو) */}
+			<div className="hidden gap-4 sm:flex sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
 					<div className="relative max-w-md flex-1">
 						<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -237,7 +324,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 
 			{/* Grid of Projects - Glass Morphism Cards */}
 			{projects.length > 0 ? (
-				<div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+				<div className="grid gap-3 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 					{projects.map((project: any, index: any) => {
 						const coverPhoto =
 							(project as any).coverPhoto?.url ??
@@ -253,22 +340,13 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 								style={{ animationDelay: `${index * 50}ms` }}
 							>
 								<div className={`group relative h-full backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${project.status === "ARCHIVED" ? "opacity-60" : ""}`}>
-									{/* Cover Image / Gradient */}
-									<div className="relative aspect-[16/9] overflow-hidden">
-										{coverPhoto ? (
-											<Image
-												src={coverPhoto}
-												alt={project.name || ""}
-												fill
-												sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-												className="object-cover transition-transform duration-500 group-hover:scale-110"
-												unoptimized
-											/>
-										) : (
-											<div
-												className={`h-full w-full bg-gradient-to-br ${coverGradients[gradientIndex]} opacity-80`}
-											/>
-										)}
+									{/* Cover Image / Gradient — شريط قصير على الجوال */}
+									<div className="relative h-28 overflow-hidden sm:h-auto sm:aspect-[16/9]">
+										<ProjectCover
+											src={coverPhoto}
+											alt={project.name || ""}
+											gradientClass={coverGradients[gradientIndex]}
+										/>
 										{/* Overlay gradient */}
 										<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 										{/* Project name on overlay */}
@@ -283,7 +361,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 									</div>
 
 									{/* Card Content */}
-									<div className="p-4 space-y-3">
+									<div className="p-3 sm:p-4 space-y-2.5 sm:space-y-3">
 										{/* Client & Location */}
 										<div className="space-y-1.5">
 											{project.clientName && (
@@ -354,5 +432,41 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 				</EmptyState>
 			)}
 		</div>
+	);
+}
+
+/**
+ * غلاف بطاقة المشروع مع تدرّج بديل أنيق عند فشل تحميل الصورة
+ * (الروابط الموقّعة تنتهي صلاحيتها فتظهر أيقونة صورة مكسورة بدون هذا).
+ */
+function ProjectCover({
+	src,
+	alt,
+	gradientClass,
+}: {
+	src: string | null;
+	alt: string;
+	gradientClass: string;
+}) {
+	const [failed, setFailed] = useState(false);
+
+	if (!src || failed) {
+		return (
+			<div
+				className={`h-full w-full bg-gradient-to-br ${gradientClass} opacity-80`}
+			/>
+		);
+	}
+
+	return (
+		<Image
+			src={src}
+			alt={alt}
+			fill
+			sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+			className="object-cover transition-transform duration-500 group-hover:scale-110"
+			unoptimized
+			onError={() => setFailed(true)}
+		/>
 	);
 }
