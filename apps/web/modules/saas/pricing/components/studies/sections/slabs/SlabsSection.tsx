@@ -212,28 +212,28 @@ export function SlabsSection({
 										<Table>
 											<TableHeader>
 												<TableRow>
-													<TableHead className="text-right">
+													<TableHead className="text-start">
 														{t(
 															"pricing.studies.structural.itemName",
 														)}
 													</TableHead>
-													<TableHead className="text-right">
+													<TableHead className="text-start">
 														النوع
 													</TableHead>
-													<TableHead className="text-right">
+													<TableHead className="text-start">
 														{t(
 															"pricing.studies.structural.quantity",
 														)}
 													</TableHead>
-													<TableHead className="text-right">
+													<TableHead className="text-start">
 														{t("pricing.studies.area")}
 													</TableHead>
-													<TableHead className="text-right">
+													<TableHead className="text-start">
 														{t(
 															"pricing.studies.structural.concreteVolume",
 														)}
 													</TableHead>
-													<TableHead className="text-right">
+													<TableHead className="text-start">
 														{t(
 															"pricing.studies.structural.steelWeight",
 														)}
@@ -250,7 +250,7 @@ export function SlabsSection({
 																0 && (
 																<Badge
 																	variant="secondary"
-																	className="text-xs mr-2"
+																	className="text-xs ms-2"
 																>
 																	+{" "}
 																	{
@@ -370,7 +370,7 @@ export function SlabsSection({
 											setAddingForFloor(floor.label)
 										}
 									>
-										<Plus className="h-5 w-5 ml-2" />
+										<Plus className="h-5 w-5 me-2" />
 										<span className="font-semibold">
 											{t(
 												"pricing.studies.structural.addItem",

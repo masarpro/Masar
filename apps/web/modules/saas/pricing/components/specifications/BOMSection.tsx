@@ -119,7 +119,7 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 					<div className="p-2 rounded-lg bg-primary/10">
 						<Package className="h-5 w-5 text-primary" />
 					</div>
-					<div className="text-right">
+					<div className="text-start">
 						<h3 className="font-semibold">جدول المواد المُجمّع (BOM)</h3>
 						<p className="text-xs text-muted-foreground">
 							{hasEntries
@@ -222,7 +222,7 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 												<table className="w-full text-sm">
 													<thead>
 														<tr className="border-b text-muted-foreground">
-															<th className="px-3 py-2 text-right font-medium">
+															<th className="px-3 py-2 text-start font-medium">
 																المادة
 															</th>
 															<th className="px-3 py-2 text-center font-medium">
@@ -248,7 +248,7 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 																<td className="px-3 py-2 font-medium">
 																	{entry.materialName}
 																	{entry.materialNameEn && (
-																		<span className="text-xs text-muted-foreground mr-2">
+																		<span className="text-xs text-muted-foreground ms-2">
 																			({entry.materialNameEn})
 																		</span>
 																	)}
@@ -289,12 +289,12 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 								<table className="w-full text-sm">
 									<thead>
 										<tr className="border-b bg-muted/30 text-muted-foreground">
-											<th className="px-3 py-2.5 text-right font-medium">#</th>
-											<th className="px-3 py-2.5 text-right font-medium">المادة</th>
+											<th className="px-3 py-2.5 text-start font-medium">#</th>
+											<th className="px-3 py-2.5 text-start font-medium">المادة</th>
 											<th className="px-3 py-2.5 text-center font-medium">الوحدة</th>
 											<th className="px-3 py-2.5 text-center font-medium">إجمالي الكمية</th>
 											<th className="px-3 py-2.5 text-center font-medium">الكمية الفعلية</th>
-											<th className="px-3 py-2.5 text-right font-medium">مستخدمة في</th>
+											<th className="px-3 py-2.5 text-start font-medium">مستخدمة في</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -309,7 +309,7 @@ export function BOMSection({ organizationId, studyId }: BOMSectionProps) {
 												<td className="px-3 py-2 font-medium">
 													{mat.materialName}
 													{mat.materialNameEn && (
-														<span className="text-xs text-muted-foreground mr-2">
+														<span className="text-xs text-muted-foreground ms-2">
 															({mat.materialNameEn})
 														</span>
 													)}

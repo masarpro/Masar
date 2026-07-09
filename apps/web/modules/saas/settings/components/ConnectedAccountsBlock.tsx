@@ -64,7 +64,7 @@ export function ConnectedAccountsBlock() {
 											)
 										}
 									>
-										<LinkIcon className="mr-1.5 size-4" />
+										<LinkIcon className="ms-1.5 size-4" />
 										<span>
 											{t(
 												"settings.account.security.connectedAccounts.connect",

@@ -279,11 +279,11 @@ export function ColumnsSection({
 													className="w-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border-2 border-dashed border-amber-400/40 hover:bg-amber-500/20 hover:border-amber-400/60 transition-all"
 													onClick={() => setNeckEnabled(true)}
 												>
-													<Plus className="h-5 w-5 ml-2" />
+													<Plus className="h-5 w-5 me-2" />
 													<span className="font-semibold">
 														{t("pricing.studies.structural.sections.columns.addNeckColumns")}
 													</span>
-													<span className="text-xs mr-2 text-amber-600/70 dark:text-amber-500/70">
+													<span className="text-xs ms-2 text-amber-600/70 dark:text-amber-500/70">
 														{t("pricing.studies.structural.sections.columns.neckHint")}
 													</span>
 												</Button>
@@ -419,27 +419,27 @@ export function ColumnsSection({
 																		<Table>
 																			<TableHeader>
 																				<TableRow>
-																					<TableHead className="text-right text-xs">
+																					<TableHead className="text-start text-xs">
 																						{t(
 																							"pricing.studies.structural.itemName",
 																						)}
 																					</TableHead>
-																					<TableHead className="text-right text-xs">
+																					<TableHead className="text-start text-xs">
 																						{t(
 																							"pricing.studies.structural.quantity",
 																						)}
 																					</TableHead>
-																					<TableHead className="text-right text-xs">
+																					<TableHead className="text-start text-xs">
 																						{t(
 																							"pricing.studies.form.dimensions",
 																						)}
 																					</TableHead>
-																					<TableHead className="text-right text-xs">
+																					<TableHead className="text-start text-xs">
 																						{t(
 																							"pricing.studies.structural.concreteVolume",
 																						)}
 																					</TableHead>
-																					<TableHead className="text-right text-xs">
+																					<TableHead className="text-start text-xs">
 																						{t(
 																							"pricing.studies.structural.steelWeight",
 																						)}

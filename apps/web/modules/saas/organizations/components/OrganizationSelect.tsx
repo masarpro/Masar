@@ -38,7 +38,7 @@ export function OrganzationSelect({ className }: { className?: string }) {
 	return (
 		<div className={className}>
 			<DropdownMenu>
-				<DropdownMenuTrigger className="flex w-full items-center justify-between gap-2 rounded-md border p-2 text-left outline-none focus-visible:bg-primary/10 focus-visible:ring-none">
+				<DropdownMenuTrigger className="flex w-full items-center justify-between gap-2 rounded-md border p-2 text-end outline-none focus-visible:bg-primary/10 focus-visible:ring-none">
 					<div className="flex flex-1 items-center justify-start gap-2 text-sm overflow-hidden">
 						{activeOrganization ? (
 							<>
@@ -96,7 +96,7 @@ export function OrganzationSelect({ className }: { className?: string }) {
 								</DropdownMenuLabel>
 								<DropdownMenuRadioItem
 									value={user.id}
-									className="flex cursor-pointer items-center justify-center gap-2 pl-3"
+									className="flex cursor-pointer items-center justify-center gap-2 pe-3"
 								>
 									<div className="flex flex-1 items-center justify-start gap-2">
 										<UserAvatar
@@ -127,7 +127,7 @@ export function OrganzationSelect({ className }: { className?: string }) {
 							<DropdownMenuRadioItem
 								key={organization.slug}
 								value={organization.slug}
-								className="flex cursor-pointer items-center justify-center gap-2 pl-3"
+								className="flex cursor-pointer items-center justify-center gap-2 pe-3"
 							>
 								<div className="flex flex-1 items-center justify-start gap-2">
 									<OrganizationLogo
@@ -148,7 +148,7 @@ export function OrganzationSelect({ className }: { className?: string }) {
 								className="text-primary! cursor-pointer text-sm"
 							>
 								<Link href="/new-organization">
-									<PlusIcon className="mr-2 size-6 rounded-md bg-primary/20 p-1" />
+									<PlusIcon className="ms-2 size-6 rounded-md bg-primary/20 p-1" />
 									{t(
 										"organizations.organizationSelect.createNewOrganization",
 									)}

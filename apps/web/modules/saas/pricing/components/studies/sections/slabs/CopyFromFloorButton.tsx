@@ -111,7 +111,7 @@ export function CopyFromFloorButton({
 					disabled={isCopying}
 					className="h-8 text-xs"
 				>
-					<Copy className="h-3 w-3 ml-1" />
+					<Copy className="h-3 w-3 me-1" />
 					نسخ
 				</Button>
 			)}

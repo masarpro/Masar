@@ -189,7 +189,7 @@ export function CompanyInfoSettings() {
 								}
 								placeholder={t("finance.settings.companyNameEnPlaceholder")}
 								dir="ltr"
-								className="text-left"
+								className="text-start"
 							/>
 						</div>
 					</div>
@@ -203,7 +203,7 @@ export function CompanyInfoSettings() {
 								}
 								placeholder={t("finance.settings.taxNumberPlaceholder")}
 								dir="ltr"
-								className="font-mono text-left"
+								className="font-mono text-start"
 							/>
 						</div>
 						<div className="space-y-1.5">
@@ -215,7 +215,7 @@ export function CompanyInfoSettings() {
 								}
 								placeholder={t("finance.settings.commercialRegPlaceholder")}
 								dir="ltr"
-								className="font-mono text-left"
+								className="font-mono text-start"
 							/>
 						</div>
 					</div>
@@ -242,7 +242,7 @@ export function CompanyInfoSettings() {
 								}
 								placeholder={t("finance.settings.buildingNumberPlaceholder")}
 								dir="ltr"
-								className="text-left"
+								className="text-start"
 							/>
 						</div>
 						<div className="space-y-1.5">
@@ -267,7 +267,7 @@ export function CompanyInfoSettings() {
 								}
 								placeholder={t("finance.settings.secondaryNumberPlaceholder")}
 								dir="ltr"
-								className="text-left"
+								className="text-start"
 							/>
 						</div>
 						<div className="space-y-1.5">
@@ -279,7 +279,7 @@ export function CompanyInfoSettings() {
 								}
 								placeholder={t("finance.settings.postalCodePlaceholder")}
 								dir="ltr"
-								className="text-left"
+								className="text-start"
 							/>
 						</div>
 					</div>
@@ -329,7 +329,7 @@ export function CompanyInfoSettings() {
 								}
 								placeholder={t("finance.settings.phonePlaceholder")}
 								dir="ltr"
-								className="text-left"
+								className="text-start"
 							/>
 						</div>
 						<div className="space-y-1.5">
@@ -342,7 +342,7 @@ export function CompanyInfoSettings() {
 								}
 								placeholder={t("finance.settings.emailPlaceholder")}
 								dir="ltr"
-								className="text-left"
+								className="text-start"
 							/>
 						</div>
 					</div>
@@ -355,7 +355,7 @@ export function CompanyInfoSettings() {
 							}
 							placeholder={t("finance.settings.websitePlaceholder")}
 							dir="ltr"
-							className="text-left"
+							className="text-start"
 						/>
 					</div>
 				</div>

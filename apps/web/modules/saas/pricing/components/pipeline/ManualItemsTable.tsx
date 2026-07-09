@@ -213,12 +213,12 @@ export function ManualItemsTable({
 				<table className="w-full text-sm">
 					<thead>
 						<tr className="border-b bg-muted/50">
-							<th className="px-3 py-2.5 text-right font-medium w-10">#</th>
-							<th className="px-3 py-2.5 text-right font-medium min-w-[200px]">الوصف</th>
-							<th className="px-3 py-2.5 text-right font-medium w-24">الوحدة</th>
-							<th className="px-3 py-2.5 text-right font-medium w-24">الكمية</th>
-							<th className="px-3 py-2.5 text-right font-medium w-28">القسم</th>
-							<th className="px-3 py-2.5 text-right font-medium min-w-[120px]">ملاحظات</th>
+							<th className="px-3 py-2.5 text-start font-medium w-10">#</th>
+							<th className="px-3 py-2.5 text-start font-medium min-w-[200px]">الوصف</th>
+							<th className="px-3 py-2.5 text-start font-medium w-24">الوحدة</th>
+							<th className="px-3 py-2.5 text-start font-medium w-24">الكمية</th>
+							<th className="px-3 py-2.5 text-start font-medium w-28">القسم</th>
+							<th className="px-3 py-2.5 text-start font-medium min-w-[120px]">ملاحظات</th>
 							<th className="px-3 py-2.5 text-center font-medium w-20">إجراءات</th>
 						</tr>
 					</thead>

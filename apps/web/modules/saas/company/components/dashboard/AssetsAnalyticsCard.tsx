@@ -2,6 +2,10 @@
 
 import { useTranslations } from "next-intl";
 import { PieChart, Pie, Cell } from "recharts";
+import {
+	CHART_PALETTE,
+	CHART_SEMANTIC,
+} from "@saas/shared/lib/chart-colors";
 import { ChartContainer } from "@ui/components/chart";
 import { Package } from "lucide-react";
 
@@ -19,10 +23,10 @@ interface AssetsAnalyticsCardProps {
 }
 
 const COLORS = {
-	available: "#0ea5e9",
-	inUse: "#3b82f6",
-	maintenance: "#f97316",
-	retired: "#64748b",
+	available: CHART_PALETTE[0], // sky
+	inUse: CHART_SEMANTIC.primary,
+	maintenance: CHART_PALETTE[2], // amber
+	retired: CHART_SEMANTIC.neutral,
 };
 
 export function AssetsAnalyticsCard({

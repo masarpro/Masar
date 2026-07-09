@@ -122,7 +122,7 @@ export function PaymentTermsSection({
 					<Collapsible key={term.id}>
 						<div className="rounded-xl border border-slate-200/60 bg-white/80 shadow-sm dark:border-slate-700/50 dark:bg-slate-900/50">
 							<div className="flex items-center">
-								<CollapsibleTrigger className="flex flex-1 items-center gap-3 p-4 text-right">
+								<CollapsibleTrigger className="flex flex-1 items-center gap-3 p-4 text-start">
 									<ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition-transform [[data-state=open]>&]:rotate-180" />
 									<div className="flex flex-1 flex-wrap items-center gap-2">
 										<span className="font-medium text-slate-900 dark:text-slate-100">

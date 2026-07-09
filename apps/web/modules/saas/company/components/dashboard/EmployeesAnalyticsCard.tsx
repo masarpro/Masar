@@ -2,6 +2,10 @@
 
 import { useTranslations } from "next-intl";
 import { PieChart, Pie, Cell } from "recharts";
+import {
+	CHART_PALETTE,
+	CHART_SEMANTIC,
+} from "@saas/shared/lib/chart-colors";
 import { ChartContainer } from "@ui/components/chart";
 import { Users } from "lucide-react";
 
@@ -18,9 +22,9 @@ interface EmployeesAnalyticsCardProps {
 }
 
 const COLORS = {
-	active: "#0ea5e9",
-	onLeave: "#f59e0b",
-	terminated: "#64748b",
+	active: CHART_PALETTE[0], // sky
+	onLeave: CHART_PALETTE[2], // amber
+	terminated: CHART_SEMANTIC.neutral,
 };
 
 export function EmployeesAnalyticsCard({

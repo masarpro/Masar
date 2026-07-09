@@ -201,7 +201,7 @@ export function CostingSummaryTab({
 				<Table>
 					<TableHeader>
 						<TableRow className="bg-muted/20">
-							<TableHead className="text-right font-medium">
+							<TableHead className="text-start font-medium">
 								القسم
 							</TableHead>
 							<TableHead className="text-center font-medium">

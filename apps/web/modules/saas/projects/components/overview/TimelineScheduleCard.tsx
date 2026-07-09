@@ -1,6 +1,10 @@
 "use client";
 
 import {
+	CHART_PALETTE,
+	CHART_SEMANTIC,
+} from "@saas/shared/lib/chart-colors";
+import {
 	type ChartConfig,
 	ChartContainer,
 	ChartTooltip,
@@ -28,8 +32,8 @@ const S_CURVE_DATA = [
 
 function useChartConfig(t: ReturnType<typeof useTranslations>): ChartConfig {
 	return {
-		planned: { label: t("projects.commandCenter.plannedProgress"), color: "#3b82f6" },
-		actual: { label: t("projects.commandCenter.actualProgress"), color: "#0ea5e9" },
+		planned: { label: t("projects.commandCenter.plannedProgress"), color: CHART_SEMANTIC.primary },
+		actual: { label: t("projects.commandCenter.actualProgress"), color: CHART_PALETTE[0] },
 	};
 }
 
@@ -169,7 +173,7 @@ export function TimelineScheduleCard({
 						<Line
 							type="monotone"
 							dataKey="planned"
-							stroke="#3b82f6"
+							stroke={CHART_SEMANTIC.primary}
 							strokeWidth={2}
 							strokeDasharray="5 4"
 							dot={false}
@@ -179,7 +183,7 @@ export function TimelineScheduleCard({
 						<Line
 							type="monotone"
 							dataKey="actual"
-							stroke="#0ea5e9"
+							stroke={CHART_PALETTE[0]}
 							strokeWidth={2.5}
 							dot={false}
 							activeDot={{ r: 4, strokeWidth: 2 }}
@@ -219,7 +223,7 @@ export function TimelineScheduleCard({
 						<span className="min-w-0 truncate text-[10px] text-slate-400">
 							{formatDate(startDate)}
 						</span>
-						<span className="min-w-0 truncate text-right text-[10px] text-slate-400">
+						<span className="min-w-0 truncate text-start text-[10px] text-slate-400">
 							{formatDate(endDate)}
 						</span>
 					</div>

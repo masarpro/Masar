@@ -424,10 +424,10 @@ export function FinishingCostingTab({
 						<table className="w-full text-sm">
 							<thead>
 								<tr className="border-b bg-muted/30 text-muted-foreground">
-									<th className="px-3 py-2.5 text-right font-medium w-8">
+									<th className="px-3 py-2.5 text-start font-medium w-8">
 										#
 									</th>
-									<th className="px-3 py-2.5 text-right font-medium min-w-[200px]">
+									<th className="px-3 py-2.5 text-start font-medium min-w-[200px]">
 										{t("common.item")}
 									</th>
 									<th className="px-3 py-2.5 text-center font-medium w-20">
@@ -776,7 +776,7 @@ export function FinishingCostingTab({
 														</span>
 														{materialTotal > 0 && (
 															<span
-																className="text-sm font-medium ml-2"
+																className="text-sm font-medium ms-2"
 																dir="ltr"
 															>
 																={" "}
@@ -814,7 +814,7 @@ export function FinishingCostingTab({
 														</span>
 														{laborTotal > 0 && (
 															<span
-																className="text-sm font-medium ml-2"
+																className="text-sm font-medium ms-2"
 																dir="ltr"
 															>
 																={" "}
@@ -854,7 +854,7 @@ export function FinishingCostingTab({
 														</span>
 														{storageTotal > 0 && (
 															<span
-																className="text-sm font-medium ml-2"
+																className="text-sm font-medium ms-2"
 																dir="ltr"
 															>
 																={" "}

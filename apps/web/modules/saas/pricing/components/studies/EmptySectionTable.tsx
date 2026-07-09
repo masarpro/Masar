@@ -344,12 +344,12 @@ export function EmptySectionTable({
 				<table className="w-full text-sm">
 					<thead>
 						<tr className="border-b bg-muted/50">
-							<th className="px-3 py-2.5 text-right font-medium w-10">#</th>
+							<th className="px-3 py-2.5 text-start font-medium w-10">#</th>
 							{columns.map((col) => (
 								<th
 									key={col.key}
 									className={cn(
-										"px-3 py-2.5 text-right font-medium",
+										"px-3 py-2.5 text-start font-medium",
 										col.width,
 									)}
 								>

@@ -54,7 +54,7 @@ export function ActivePlan({
 									key={key}
 									className="flex items-center justify-start"
 								>
-									<CheckIcon className="mr-2 size-4 text-primary" />
+									<CheckIcon className="ms-2 size-4 text-primary" />
 									<span>{feature}</span>
 								</li>
 							))}

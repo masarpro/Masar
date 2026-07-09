@@ -125,7 +125,7 @@ export function ForgotPasswordForm() {
 
 			<div className="mt-6 text-center text-sm">
 				<Link href="/auth/login">
-					<ArrowLeftIcon className="mr-1 inline size-4 align-middle" />
+					<ArrowLeftIcon className="ms-1 inline size-4 align-middle rtl-flip" />
 					{t("auth.forgotPassword.backToSignin")}
 				</Link>
 			</div>

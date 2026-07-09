@@ -84,7 +84,7 @@ export function CopyFromFloorButton({
 			</Select>
 			{selectedSource && (
 				<Button size="sm" variant="outline" onClick={handleCopy} disabled={isCopying} className="h-8 text-xs">
-					<Copy className="h-3 w-3 ml-1" /> نسخ
+					<Copy className="h-3 w-3 me-1" /> نسخ
 				</Button>
 			)}
 		</div>

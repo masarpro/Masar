@@ -193,7 +193,7 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 				</div>
 				<div className="hidden sm:block shrink-0">
 					<Button onClick={() => setShowCreateDialog(true)} className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors">
-						<Plus className="ml-2 h-4 w-4" />
+						<Plus className="me-2 h-4 w-4" />
 						{t("pricing.studies.newStudy")}
 					</Button>
 				</div>
@@ -227,7 +227,7 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 						{t("pricing.studies.emptyDescription")}
 					</p>
 					<Button onClick={() => setShowCreateDialog(true)} className="mt-5 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200">
-							<Plus className="ml-2 h-4 w-4" />
+							<Plus className="me-2 h-4 w-4" />
 							{t("pricing.studies.newStudy")}
 					</Button>
 				</div>

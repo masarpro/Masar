@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { Currency } from "@saas/finance/components/shared/Currency";
+import { CHART_SEMANTIC } from "@saas/shared/lib/chart-colors";
 import {
 	type ChartConfig,
 	ChartContainer,
@@ -33,8 +34,8 @@ export function FinancePanel({
 	const locale = useLocale();
 
 	const chartConfig: ChartConfig = {
-		claims: { label: t("dashboard.financial.revenueLabel"), color: "#0ea5e9" },
-		expenses: { label: t("dashboard.financial.expensesLabel"), color: "#ef4444" },
+		claims: { label: t("dashboard.financial.revenueLabel"), color: CHART_SEMANTIC.primary },
+		expenses: { label: t("dashboard.financial.expensesLabel"), color: CHART_SEMANTIC.negative },
 	};
 
 	// Convert a "YYYY-MM" key into a localized short month label.
@@ -127,12 +128,12 @@ export function FinancePanel({
 					>
 						<defs>
 							<linearGradient id="fpIncGrad" x1="0" y1="0" x2="0" y2="1">
-								<stop offset="0%" stopColor="#0ea5e9" stopOpacity={0.4} />
-								<stop offset="100%" stopColor="#0ea5e9" stopOpacity={0} />
+								<stop offset="0%" stopColor={CHART_SEMANTIC.primary} stopOpacity={0.4} />
+								<stop offset="100%" stopColor={CHART_SEMANTIC.primary} stopOpacity={0} />
 							</linearGradient>
 							<linearGradient id="fpExpGrad" x1="0" y1="0" x2="0" y2="1">
-								<stop offset="0%" stopColor="#ef4444" stopOpacity={0.15} />
-								<stop offset="100%" stopColor="#ef4444" stopOpacity={0} />
+								<stop offset="0%" stopColor={CHART_SEMANTIC.negative} stopOpacity={0.15} />
+								<stop offset="100%" stopColor={CHART_SEMANTIC.negative} stopOpacity={0} />
 							</linearGradient>
 						</defs>
 						<CartesianGrid vertical={false} />
@@ -153,7 +154,7 @@ export function FinancePanel({
 						<Area
 							type="natural"
 							dataKey="claims"
-							stroke="#0ea5e9"
+							stroke={CHART_SEMANTIC.primary}
 							fill="url(#fpIncGrad)"
 							strokeWidth={2}
 							dot={false}
@@ -161,7 +162,7 @@ export function FinancePanel({
 						<Area
 							type="natural"
 							dataKey="expenses"
-							stroke="#ef4444"
+							stroke={CHART_SEMANTIC.negative}
 							fill="url(#fpExpGrad)"
 							strokeWidth={1.5}
 							dot={false}

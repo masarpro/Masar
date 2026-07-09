@@ -113,7 +113,7 @@ export function EditStudyConfigDialog({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="rounded-2xl sm:max-w-lg" dir="rtl">
-				<DialogHeader className="text-right">
+				<DialogHeader className="text-start">
 					<DialogTitle className="text-xl font-bold">
 						{t("pricing.studies.create.editConfig")}
 					</DialogTitle>
@@ -134,7 +134,7 @@ export function EditStudyConfigDialog({
 								type="button"
 								onClick={() => setSelectedType(goal.value)}
 								className={cn(
-									"w-full flex items-center gap-3 rounded-xl border-2 p-3 text-right transition-all",
+									"w-full flex items-center gap-3 rounded-xl border-2 p-3 text-start transition-all",
 									isSelected
 										? "border-primary bg-primary/5"
 										: "border-border hover:border-primary/30",

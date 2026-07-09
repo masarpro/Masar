@@ -229,7 +229,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 									)}
 								</Link>
 							</Button>
-							<Button asChild size="sm" className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.45)] transition-all">
+							<Button asChild size="sm" className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-primary-glow hover:shadow-primary-glow-lg transition-all">
 								<Link href={`${basePath}/new`}>
 									<Plus className="h-3.5 w-3.5 me-1.5" />
 									{t("finance.invoices.create")}
@@ -569,7 +569,7 @@ export function InvoicesList({ organizationId, organizationSlug }: InvoicesListP
 						title={t("finance.invoices.empty")}
 						description={t("finance.invoices.emptyDescription")}
 					>
-						<Button asChild className="rounded-[10px] h-9 px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.45)] transition-all">
+						<Button asChild className="rounded-[10px] h-9 px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-primary-glow hover:shadow-primary-glow-lg transition-all">
 							<Link href={`${basePath}/new`}>
 								<Plus className="ms-2 h-4 w-4" />
 								{t("finance.invoices.create")}

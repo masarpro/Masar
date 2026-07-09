@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
 import { Card } from "@ui/components/card";
 import { Badge } from "@ui/components/badge";
+import { statusToneClasses } from "@ui/components/status-chip";
 import { Input } from "@ui/components/input";
 import {
 	Select,
@@ -87,19 +88,8 @@ interface ChangeOrdersBoardProps {
 }
 
 function getStatusBadge(status: ChangeOrderStatus, t: (key: string) => string) {
-	const colors: Record<ChangeOrderStatus, string> = {
-		DRAFT: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-		SUBMITTED:
-			"bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-		APPROVED:
-			"bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
-		REJECTED: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-		IMPLEMENTED:
-			"bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-	};
-
 	return (
-		<Badge className={`border-0 ${colors[status]}`}>
+		<Badge className={`border-0 ${statusToneClasses(status)}`}>
 			{t(`changeOrders.status.${status}`)}
 		</Badge>
 	);

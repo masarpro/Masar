@@ -78,7 +78,7 @@ export function MEPItemRow({
 			</div>
 
 			{/* Quantity */}
-			<span className="text-left tabular-nums" dir="ltr">
+			<span className="text-start tabular-nums" dir="ltr">
 				{formatNumber(item.quantity, 1)}
 			</span>
 

@@ -94,7 +94,7 @@ export function RetentionCard({
 					disabled={isPending || !data}
 					size="sm"
 				>
-					<Save className="mr-2 h-4 w-4" />
+					<Save className="ms-2 h-4 w-4" />
 					{t("projects.contract.save")}
 				</Button>
 			</CardHeader>

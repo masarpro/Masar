@@ -38,7 +38,7 @@ export function TimelineHealthBadge({
 					variant="default"
 					className={`bg-green-500 hover:bg-green-600 ${sizeClasses[size]}`}
 				>
-					{showIcon && <CheckCircleIcon className={`${iconSize[size]} mr-1`} />}
+					{showIcon && <CheckCircleIcon className={`${iconSize[size]} ms-1`} />}
 					{t("timeline.health.onTrack")}
 				</Badge>
 			);
@@ -49,7 +49,7 @@ export function TimelineHealthBadge({
 					className={`bg-orange-500 hover:bg-orange-600 ${sizeClasses[size]}`}
 				>
 					{showIcon && (
-						<AlertTriangleIcon className={`${iconSize[size]} mr-1`} />
+						<AlertTriangleIcon className={`${iconSize[size]} ms-1`} />
 					)}
 					{t("timeline.health.atRisk")}
 				</Badge>
@@ -60,14 +60,14 @@ export function TimelineHealthBadge({
 					variant="default"
 					className={`bg-red-500 hover:bg-red-600 ${sizeClasses[size]}`}
 				>
-					{showIcon && <XCircleIcon className={`${iconSize[size]} mr-1`} />}
+					{showIcon && <XCircleIcon className={`${iconSize[size]} ms-1`} />}
 					{t("timeline.health.delayed")}
 				</Badge>
 			);
 		default:
 			return (
 				<Badge variant="secondary" className={sizeClasses[size]}>
-					{showIcon && <ClockIcon className={`${iconSize[size]} mr-1`} />}
+					{showIcon && <ClockIcon className={`${iconSize[size]} ms-1`} />}
 					{t("timeline.health.planned")}
 				</Badge>
 			);

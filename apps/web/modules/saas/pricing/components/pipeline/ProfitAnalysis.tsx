@@ -93,7 +93,7 @@ export function ProfitAnalysis({
 						<tbody>
 							<tr className="border-b">
 								<td className="px-3 py-2 text-muted-foreground">{t("pricing.pipeline.totalCostLabel")}</td>
-								<td className="px-3 py-2 tabular-nums text-left font-medium" dir="ltr">
+								<td className="px-3 py-2 tabular-nums text-start font-medium" dir="ltr">
 									{formatAmount(totalCost)} ر.س
 								</td>
 							</tr>
@@ -101,34 +101,34 @@ export function ProfitAnalysis({
 								<>
 									<tr className="border-b">
 										<td className="px-3 py-2 text-muted-foreground">{t("pricing.pipeline.overheadLabel")}</td>
-										<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+										<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 											+ {formatAmount(overheadAmount)} ر.س
 										</td>
 									</tr>
 									<tr className="border-b">
 										<td className="px-3 py-2 text-muted-foreground">{t("pricing.pipeline.profitLabel")}</td>
-										<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+										<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 											+ {formatAmount(profitAmount)} ر.س
 										</td>
 									</tr>
 									{contingencyAmount > 0 && (
 										<tr className="border-b">
 											<td className="px-3 py-2 text-muted-foreground">{t("pricing.pipeline.contingencyLabel")}</td>
-											<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+											<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 												+ {formatAmount(contingencyAmount)} ر.س
 											</td>
 										</tr>
 									)}
 									<tr className="border-b bg-muted/30">
 										<td className="px-3 py-2 font-medium">{t("pricing.pipeline.sellingPriceBeforeVat")}</td>
-										<td className="px-3 py-2 tabular-nums text-left font-medium" dir="ltr">
+										<td className="px-3 py-2 tabular-nums text-start font-medium" dir="ltr">
 											{formatAmount(sellingPriceBeforeVat)} ر.س
 										</td>
 									</tr>
 									{vatAmount > 0 && (
 										<tr className="border-b">
 											<td className="px-3 py-2 text-muted-foreground">{t("pricing.pipeline.vatLabel")} (15%)</td>
-											<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+											<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 												+ {formatAmount(vatAmount)} ر.س
 											</td>
 										</tr>
@@ -137,7 +137,7 @@ export function ProfitAnalysis({
 							)}
 							<tr className="border-t-2 bg-primary/5">
 								<td className="px-3 py-2 font-semibold">{t("pricing.pipeline.grandTotalLabel")}</td>
-								<td className="px-3 py-2 tabular-nums text-left font-bold text-primary text-base" dir="ltr">
+								<td className="px-3 py-2 tabular-nums text-start font-bold text-primary text-base" dir="ltr">
 									{formatAmount(grandTotal)} ر.س
 								</td>
 							</tr>

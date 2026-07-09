@@ -152,7 +152,7 @@ export function SubcontractsListView({
 						size="sm"
 						className="rounded-xl bg-orange-600 text-white hover:bg-orange-700 dark:bg-orange-700 dark:hover:bg-orange-600"
 					>
-						<Plus className="ml-1.5 h-4 w-4" />
+						<Plus className="me-1.5 h-4 w-4" />
 						{t("subcontracts.newContract")}
 					</Button>
 				</Link>
@@ -230,12 +230,12 @@ export function SubcontractsListView({
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
 						{/* Search */}
 						<div className="relative flex-1">
-							<Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+							<Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 							<Input
 								value={searchQuery}
 								onChange={(e: any) => setSearchQuery(e.target.value)}
 								placeholder={t("subcontracts.list.searchPlaceholder")}
-								className="rounded-xl pr-10"
+								className="rounded-xl ps-10"
 							/>
 						</div>
 
@@ -339,7 +339,7 @@ export function SubcontractsListView({
 								onClick={clearFilters}
 								className="h-8 rounded-lg px-2 text-xs text-slate-500"
 							>
-								<X className="ml-1 h-3 w-3" />
+								<X className="me-1 h-3 w-3" />
 								{t("common.clear")}
 							</Button>
 						)}

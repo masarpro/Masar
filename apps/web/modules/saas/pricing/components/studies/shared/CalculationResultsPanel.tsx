@@ -139,7 +139,7 @@ export function CalculationResultsPanel({
 					</div>
 					<p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
 						{formatNumber(concreteVolume)}
-						<span className="text-sm font-normal mr-1">م³</span>
+						<span className="text-sm font-normal ms-1">م³</span>
 					</p>
 				</div>
 
@@ -155,7 +155,7 @@ export function CalculationResultsPanel({
 					</div>
 					<p className="text-2xl font-bold text-red-900 dark:text-red-100">
 						{formatNumber(totals.grossWeight)}
-						<span className="text-sm font-normal mr-1">كجم</span>
+						<span className="text-sm font-normal ms-1">كجم</span>
 					</p>
 					<p className="text-xs text-red-600 dark:text-red-400 mt-1">
 						({tons.toFixed(3)} طن)
@@ -174,7 +174,7 @@ export function CalculationResultsPanel({
 					</div>
 					<p className={`text-2xl font-bold ${efficiency.textColor}`}>
 						{totals.wastePercentage.toFixed(1)}%
-						<span className="text-sm font-normal mr-1">{t("wasteSuffix")}</span>
+						<span className="text-sm font-normal ms-1">{t("wasteSuffix")}</span>
 					</p>
 					<p className={`text-xs ${efficiency.textColor} mt-1`}>
 						{efficiencyLabel}
@@ -250,7 +250,7 @@ export function CalculationResultsPanel({
 								<Table>
 									<TableHeader>
 										<TableRow className="bg-muted/30">
-											<TableHead className="text-right text-xs font-semibold whitespace-nowrap">
+											<TableHead className="text-start text-xs font-semibold whitespace-nowrap">
 												{t("description")}
 											</TableHead>
 											<TableHead className="text-center text-xs font-semibold whitespace-nowrap">

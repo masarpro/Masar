@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
-import { Badge } from "@ui/components/badge";
+import { StatusChip } from "@ui/components/status-chip";
 import { Card, CardContent } from "@ui/components/card";
 import {
 	Table,
@@ -34,12 +34,6 @@ interface ReceiptVouchersListProps {
 	organizationId: string;
 	organizationSlug: string;
 }
-
-const STATUS_COLORS: Record<string, string> = {
-	DRAFT: "bg-gray-100 text-gray-700",
-	ISSUED: "bg-green-100 text-green-700",
-	CANCELLED: "bg-red-100 text-red-700",
-};
 
 const PAYMENT_METHOD_KEYS: Record<string, string> = {
 	CASH: "finance.payments.methods.CASH",
@@ -226,9 +220,9 @@ export function ReceiptVouchersList({
 										{t(PAYMENT_METHOD_KEYS[voucher.paymentMethod] ?? "finance.payments.methods.OTHER")}
 									</TableCell>
 									<TableCell>
-										<Badge className={STATUS_COLORS[voucher.status] ?? ""}>
+										<StatusChip status={voucher.status}>
 											{t(`finance.receiptVouchers.statuses.${voucher.status}`)}
-										</Badge>
+										</StatusChip>
 									</TableCell>
 									<TableCell>
 										<Button variant="ghost" size="icon">

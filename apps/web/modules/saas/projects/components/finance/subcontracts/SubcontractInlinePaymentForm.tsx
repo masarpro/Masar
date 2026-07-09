@@ -133,11 +133,11 @@ export const SubcontractInlinePaymentForm = React.memo(function SubcontractInlin
 								value={payAmount}
 								onChange={(e: any) => setPayAmount(e.target.value)}
 								placeholder="0.00"
-								className="rounded-lg pl-12"
+								className="rounded-lg ps-12"
 								dir="ltr"
 								required
 							/>
-							<span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-500">
+							<span className="absolute end-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-500">
 								{t("common.sar")}
 							</span>
 						</div>

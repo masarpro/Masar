@@ -198,7 +198,7 @@ export function InviteTeamStep({
 						onClick={addRow}
 						className="w-full"
 					>
-						<Plus className="mr-1 h-4 w-4" />
+						<Plus className="ms-1 h-4 w-4" />
 						{t("onboarding.wizard.inviteTeam.addAnother")}
 					</Button>
 				)}

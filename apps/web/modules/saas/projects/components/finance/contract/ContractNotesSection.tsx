@@ -82,9 +82,9 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 										)
 									}
 									placeholder="10"
-									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pl-6 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
+									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pe-6 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
 								/>
-								<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
 									%
 								</span>
 							</div>
@@ -122,9 +122,9 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 										)
 									}
 									placeholder="0.00"
-									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pl-12 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
+									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pe-12 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
 								/>
-								<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
 									{t("common.sar")}
 								</span>
 							</div>
@@ -179,9 +179,9 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 										)
 									}
 									placeholder="5"
-									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pl-6 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
+									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pe-6 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
 								/>
-								<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
 									%
 								</span>
 							</div>
@@ -263,9 +263,9 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 										)
 									}
 									placeholder="0.5"
-									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pl-6 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
+									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pe-6 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
 								/>
-								<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
 									%
 								</span>
 							</div>
@@ -291,9 +291,9 @@ export const ContractNotesSection = React.memo(function ContractNotesSection({
 										)
 									}
 									placeholder="10"
-									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pl-6 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
+									className="h-9 rounded-lg border-amber-200/60 bg-amber-50/30 pe-6 text-sm dark:border-amber-800/40 dark:bg-slate-800/50"
 								/>
-								<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
 									%
 								</span>
 							</div>

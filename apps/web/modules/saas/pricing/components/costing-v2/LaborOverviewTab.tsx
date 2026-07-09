@@ -525,7 +525,7 @@ export function LaborOverviewTab({
 						<table className="w-full text-sm">
 							<thead>
 								<tr className="border-b bg-muted/20 text-muted-foreground">
-									<th className="px-3 py-2.5 text-right font-medium">{t("common.item")}</th>
+									<th className="px-3 py-2.5 text-start font-medium">{t("common.item")}</th>
 									<th className="px-3 py-2.5 text-center font-medium">{t("labor.areaQuantity")}</th>
 									<th className="px-3 py-2.5 text-center font-medium">{t("common.price")}</th>
 									<th className="px-3 py-2.5 text-center font-medium">{t("common.total")}</th>
@@ -684,7 +684,7 @@ export function LaborOverviewTab({
 						<table className="w-full text-sm">
 							<thead>
 								<tr className="border-b bg-muted/20 text-muted-foreground">
-									<th className="px-3 py-2.5 text-right font-medium">{t("common.item")}</th>
+									<th className="px-3 py-2.5 text-start font-medium">{t("common.item")}</th>
 									<th className="px-3 py-2.5 text-center font-medium">{t("common.quantity")}</th>
 									<th className="px-3 py-2.5 text-center font-medium">{t("common.unit")}</th>
 									<th className="px-3 py-2.5 text-center font-medium">{t("common.price")}</th>
@@ -765,7 +765,7 @@ export function LaborOverviewTab({
 									{formatNum(lumpSumTotal)} {t("common.sar")}
 								</span>
 								{buildingArea > 0 && (
-									<span className="text-muted-foreground ml-3" dir="ltr">
+									<span className="text-muted-foreground ms-3" dir="ltr">
 										({formatNum(lumpSumTotal / buildingArea)} {t("common.sarPerSqm")})
 									</span>
 								)}
@@ -811,7 +811,7 @@ export function LaborOverviewTab({
 								<table className="w-full text-sm">
 									<thead>
 										<tr className="border-b bg-muted/20 text-muted-foreground">
-											<th className="px-3 py-2.5 text-right font-medium">{t("labor.craft")}</th>
+											<th className="px-3 py-2.5 text-start font-medium">{t("labor.craft")}</th>
 											<th className="px-3 py-2.5 text-center font-medium">{t("labor.count")}</th>
 											<th className="px-3 py-2.5 text-center font-medium">{t("labor.salary")}</th>
 											<th className="px-3 py-2.5 text-center font-medium">{t("labor.months")}</th>
@@ -937,7 +937,7 @@ export function LaborOverviewTab({
 				<div className="flex items-center justify-between">
 					<span className="font-semibold">
 						{t("labor.structuralLaborTotal")}
-						<span className="text-xs font-normal text-muted-foreground ml-2">
+						<span className="text-xs font-normal text-muted-foreground me-2">
 							({activeMode ? t(activeMode.labelKey as Parameters<typeof t>[0]) : ""})
 						</span>
 					</span>
@@ -1011,7 +1011,7 @@ export function LaborOverviewTab({
 										<table className="w-full text-sm">
 											<thead>
 												<tr className="border-b bg-muted/20 text-muted-foreground">
-													<th className="px-3 py-2 text-right font-medium">{t("common.item")}</th>
+													<th className="px-3 py-2 text-start font-medium">{t("common.item")}</th>
 													<th className="px-3 py-2 text-center font-medium">{t("labor.method")}</th>
 													<th className="px-3 py-2 text-center font-medium">{t("common.price")}</th>
 													<th className="px-3 py-2 text-center font-medium">{t("common.quantity")}</th>

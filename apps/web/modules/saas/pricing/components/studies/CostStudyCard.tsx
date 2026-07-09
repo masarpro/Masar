@@ -209,12 +209,12 @@ export function CostStudyCard({
 							<DropdownMenuContent align="end" className="rounded-xl w-40">
 								<DropdownMenuItem asChild className="rounded-lg">
 									<Link href={`${basePath}/${study.id}`}>
-										<Pencil className="ml-2 h-4 w-4" />
+										<Pencil className="me-2 h-4 w-4" />
 										{t("common.edit")}
 									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem onClick={handleDuplicate} className="rounded-lg">
-									<Copy className="ml-2 h-4 w-4" />
+									<Copy className="me-2 h-4 w-4" />
 									{t("common.duplicate")}
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
@@ -222,7 +222,7 @@ export function CostStudyCard({
 									className="text-red-600 dark:text-red-400 rounded-lg focus:text-red-600 dark:focus:text-red-400"
 									onClick={() => setShowDeleteDialog(true)}
 								>
-									<Trash2 className="ml-2 h-4 w-4" />
+									<Trash2 className="me-2 h-4 w-4" />
 									{t("common.delete")}
 								</DropdownMenuItem>
 							</DropdownMenuContent>

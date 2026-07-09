@@ -191,7 +191,7 @@ export const SubcontractPaymentSection = React.memo(function SubcontractPaymentS
 							className="rounded-xl bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600"
 							onClick={() => setShowPaymentForm(!showPaymentForm)}
 						>
-							<Plus className="ml-1.5 h-4 w-4" />
+							<Plus className="me-1.5 h-4 w-4" />
 							{t("subcontracts.detail.addPayment")}
 						</Button>
 					</div>

@@ -116,7 +116,7 @@ export function NeckColumnsSection({
 						className="text-muted-foreground hover:text-destructive"
 						onClick={onDisable}
 					>
-						<X className="h-4 w-4 ml-1" />
+						<X className="h-4 w-4 me-1" />
 						إزالة
 					</Button>
 				</div>
@@ -167,12 +167,12 @@ export function NeckColumnsSection({
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead className="text-right">رقبة العمود</TableHead>
-								<TableHead className="text-right">العدد</TableHead>
-								<TableHead className="text-right">الأبعاد</TableHead>
-								<TableHead className="text-right">التسليح</TableHead>
-								<TableHead className="text-right">الخرسانة</TableHead>
-								<TableHead className="text-right">الحديد</TableHead>
+								<TableHead className="text-start">رقبة العمود</TableHead>
+								<TableHead className="text-start">العدد</TableHead>
+								<TableHead className="text-start">الأبعاد</TableHead>
+								<TableHead className="text-start">التسليح</TableHead>
+								<TableHead className="text-start">الخرسانة</TableHead>
+								<TableHead className="text-start">الحديد</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -227,25 +227,25 @@ export function NeckColumnsSection({
 									<Table>
 										<TableHeader>
 											<TableRow>
-												<TableHead className="text-right text-xs">
+												<TableHead className="text-start text-xs">
 													الوصف
 												</TableHead>
-												<TableHead className="text-right text-xs">
+												<TableHead className="text-start text-xs">
 													∅ القطر
 												</TableHead>
-												<TableHead className="text-right text-xs">
+												<TableHead className="text-start text-xs">
 													طول السيخ
 												</TableHead>
-												<TableHead className="text-right text-xs">
+												<TableHead className="text-start text-xs">
 													العدد
 												</TableHead>
-												<TableHead className="text-right text-xs">
+												<TableHead className="text-start text-xs">
 													أسياخ مطلوبة
 												</TableHead>
-												<TableHead className="text-right text-xs">
+												<TableHead className="text-start text-xs">
 													الهالك
 												</TableHead>
-												<TableHead className="text-right text-xs">
+												<TableHead className="text-start text-xs">
 													الوزن
 												</TableHead>
 											</TableRow>
@@ -291,7 +291,7 @@ export function NeckColumnsSection({
 							<span className="text-muted-foreground">
 								إجمالي خرسانة الرقاب:
 							</span>
-							<span className="font-bold mr-1">
+							<span className="font-bold ms-1">
 								{formatNumber(totalConcrete)} م³
 							</span>
 						</div>
@@ -299,7 +299,7 @@ export function NeckColumnsSection({
 							<span className="text-muted-foreground">
 								إجمالي حديد الرقاب:
 							</span>
-							<span className="font-bold mr-1">
+							<span className="font-bold ms-1">
 								{formatNumber(totalSteel)} كجم
 							</span>
 						</div>

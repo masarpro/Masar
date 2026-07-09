@@ -325,7 +325,7 @@ export function ExecutionPhasesCard({
 										/>
 									</div>
 									<span
-										className="w-7 shrink-0 text-left text-[11px] font-semibold text-slate-500 dark:text-slate-400"
+										className="w-7 shrink-0 text-start text-[11px] font-semibold text-slate-500 dark:text-slate-400"
 										dir="ltr"
 									>
 										{Math.round(Number(milestone.progress))}%

@@ -254,7 +254,7 @@ export function ProjectContractView({
 							className="rounded-xl border-purple-200 px-5 text-purple-600 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-400 dark:hover:bg-purple-900/30"
 						>
 							<Link href={`${basePath}/changes`}>
-								<FileDiff className="ml-2 h-4 w-4" />
+								<FileDiff className="me-2 h-4 w-4" />
 								{t("changeOrders.title")}
 							</Link>
 						</Button>
@@ -262,7 +262,7 @@ export function ProjectContractView({
 							onClick={() => setIsEditing(true)}
 							className="rounded-xl bg-sky-600 px-6 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600"
 						>
-							<Pencil className="ml-2 h-4 w-4" />
+							<Pencil className="me-2 h-4 w-4" />
 							{t("projects.contract.editContract")}
 						</Button>
 					</div>
@@ -278,7 +278,7 @@ export function ProjectContractView({
 							disabled={isSaving}
 							className="rounded-xl border-slate-200 px-5 dark:border-slate-700"
 						>
-							<X className="ml-2 h-4 w-4" />
+							<X className="me-2 h-4 w-4" />
 							{t("projects.contract.cancelEdit")}
 						</Button>
 						<Button
@@ -288,12 +288,12 @@ export function ProjectContractView({
 						>
 							{isSaving ? (
 								<>
-									<Loader2 className="ml-2 h-4 w-4 animate-spin" />
+									<Loader2 className="me-2 h-4 w-4 animate-spin" />
 									{t("projects.contract.saving")}
 								</>
 							) : (
 								<>
-									<Save className="ml-2 h-4 w-4" />
+									<Save className="me-2 h-4 w-4" />
 									{t("projects.contract.saveChanges")}
 								</>
 							)}

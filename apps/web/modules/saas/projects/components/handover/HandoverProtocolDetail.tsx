@@ -8,6 +8,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { Button } from "@ui/components/button";
 import { Badge } from "@ui/components/badge";
+import { StatusChip, statusToneClasses } from "@ui/components/status-chip";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
 import {
 	Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -39,14 +40,6 @@ const TYPE_COLORS: Record<string, string> = {
 	PRELIMINARY: "bg-purple-100 text-purple-700",
 	FINAL: "bg-green-100 text-green-700",
 	DELIVERY: "bg-orange-100 text-orange-700",
-};
-
-const STATUS_COLORS: Record<string, string> = {
-	DRAFT: "bg-gray-100 text-gray-700",
-	PENDING_SIGNATURES: "bg-amber-100 text-amber-700",
-	PARTIALLY_SIGNED: "bg-orange-100 text-orange-700",
-	COMPLETED: "bg-green-100 text-green-700",
-	ARCHIVED: "bg-gray-200 text-gray-600",
 };
 
 const QUALITY_COLORS: Record<string, string> = {
@@ -278,7 +271,7 @@ export function HandoverProtocolDetail({
 						<div className="flex items-center gap-2">
 							<h1 className="text-2xl font-bold font-mono">{protocol.protocolNo}</h1>
 							<Badge className={TYPE_COLORS[protocol.type] ?? ""}>{t(`handover.types.${protocol.type}`)}</Badge>
-							<Badge className={STATUS_COLORS[protocol.status] ?? ""}>{t(`handover.statuses.${protocol.status}`)}</Badge>
+							<StatusChip status={protocol.status}>{t(`handover.statuses.${protocol.status}`)}</StatusChip>
 						</div>
 						<p className="text-sm text-muted-foreground">{protocol.title}</p>
 					</div>
@@ -382,11 +375,11 @@ export function HandoverProtocolDetail({
 										<TableCell>{party.organization || "-"}</TableCell>
 										<TableCell>
 											{party.signed ? (
-												<Badge className="bg-green-100 text-green-700">
+												<Badge className={statusToneClasses("SIGNED")}>
 													{t("handover.parties.signed")} — {party.signedAt ? formatDate(party.signedAt) : ""}
 												</Badge>
 											) : (
-												<Badge className="bg-gray-100 text-gray-700">{t("handover.parties.notSigned")}</Badge>
+												<Badge className={statusToneClasses("neutral")}>{t("handover.parties.notSigned")}</Badge>
 											)}
 										</TableCell>
 										<TableCell>

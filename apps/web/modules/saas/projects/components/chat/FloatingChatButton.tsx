@@ -46,7 +46,7 @@ export function FloatingChatButton({
 				<button
 					onClick={() => setIsOpen(true)}
 					className={cn(
-						"fixed left-4 bottom-24 z-[9999] md:bottom-6",
+						"fixed end-4 bottom-24 z-[9999] md:bottom-6",
 						"flex items-center justify-center",
 						"h-14 w-14 rounded-full",
 						"bg-primary text-primary-foreground",
@@ -56,7 +56,7 @@ export function FloatingChatButton({
 				>
 					<MessageSquare className="h-6 w-6" />
 					{unreadCount > 0 && (
-						<span className="absolute -top-1 -left-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+						<span className="absolute -top-1 -end-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
 							{unreadCount > 99 ? "99+" : unreadCount}
 						</span>
 					)}

@@ -78,12 +78,12 @@ export function PaymentsClaimsFilters({
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
 				{/* Search */}
 				<div className="relative flex-1">
-					<Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+					<Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 					<Input
 						value={searchInput}
 						onChange={(e: any) => setSearchInput(e.target.value)}
 						placeholder={t("paymentsHub.searchPlaceholder")}
-						className="rounded-xl pr-10"
+						className="rounded-xl ps-10"
 					/>
 				</div>
 
@@ -217,7 +217,7 @@ export function PaymentsClaimsFilters({
 						onClick={clearFilters}
 						className="h-8 rounded-lg px-2 text-xs text-slate-500"
 					>
-						<X className="ml-1 h-3 w-3" />
+						<X className="me-1 h-3 w-3" />
 						{t("common.clear")}
 					</Button>
 				)}

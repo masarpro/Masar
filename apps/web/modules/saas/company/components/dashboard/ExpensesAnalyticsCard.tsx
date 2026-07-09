@@ -2,6 +2,10 @@
 
 import { useTranslations } from "next-intl";
 import { PieChart, Pie, Cell } from "recharts";
+import {
+	CHART_PALETTE,
+	CHART_SEMANTIC,
+} from "@saas/shared/lib/chart-colors";
 import { ChartContainer } from "@ui/components/chart";
 import { Receipt } from "lucide-react";
 
@@ -15,19 +19,23 @@ interface ExpensesAnalyticsCardProps {
 	formatCurrency: (amount: number) => string;
 }
 
+// 40%-lighter palette variant so 12 categories stay distinguishable
+// while sourcing every color from the platform chart tokens.
+const light = (color: string) => `color-mix(in srgb, ${color} 60%, white)`;
+
 const CATEGORY_COLORS: Record<string, string> = {
-	RENT: "#3b82f6",
-	UTILITIES: "#f59e0b",
-	COMMUNICATIONS: "#8b5cf6",
-	INSURANCE: "#ef4444",
-	LICENSES: "#06b6d4",
-	SUBSCRIPTIONS: "#ec4899",
-	MAINTENANCE: "#f97316",
-	BANK_FEES: "#64748b",
-	MARKETING: "#0ea5e9",
-	TRANSPORT: "#38bdf8",
-	HOSPITALITY: "#a855f7",
-	OTHER: "#94a3b8",
+	RENT: CHART_PALETTE[0], // sky
+	UTILITIES: CHART_PALETTE[2], // amber
+	COMMUNICATIONS: CHART_PALETTE[1], // violet
+	INSURANCE: CHART_PALETTE[3], // red
+	LICENSES: CHART_PALETTE[4], // cyan
+	SUBSCRIPTIONS: light(CHART_PALETTE[3]),
+	MAINTENANCE: light(CHART_PALETTE[2]),
+	BANK_FEES: light(CHART_SEMANTIC.neutral),
+	MARKETING: light(CHART_PALETTE[0]),
+	TRANSPORT: light(CHART_PALETTE[4]),
+	HOSPITALITY: light(CHART_PALETTE[1]),
+	OTHER: CHART_SEMANTIC.neutral,
 };
 
 export function ExpensesAnalyticsCard({
@@ -42,7 +50,7 @@ export function ExpensesAnalyticsCard({
 		.map(([category, amount]) => ({
 			name: category,
 			value: amount,
-			color: CATEGORY_COLORS[category] ?? "#94a3b8",
+			color: CATEGORY_COLORS[category] ?? CHART_SEMANTIC.neutral,
 		}));
 
 	const isEmpty = chartData.length === 0;

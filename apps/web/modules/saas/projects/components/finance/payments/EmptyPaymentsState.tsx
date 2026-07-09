@@ -31,7 +31,7 @@ export function EmptyPaymentsState({
 			{showContractLink && (
 				<Button asChild variant="outline" size="sm" className="rounded-xl">
 					<Link href={`${basePath}/finance/contract`}>
-						<FileText className="ml-1.5 h-4 w-4" />
+						<FileText className="me-1.5 h-4 w-4" />
 						{t("projectPayments.goToContract")}
 					</Link>
 				</Button>

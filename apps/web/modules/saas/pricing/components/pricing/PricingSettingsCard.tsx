@@ -143,10 +143,10 @@ export function PricingSettingsCard({
 								onChange={(e: any) =>
 									handleOverheadChange(e.target.value)
 								}
-								className="h-9 text-sm pl-7"
+								className="h-9 text-sm ps-7"
 								dir="ltr"
 							/>
-							<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+							<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
 								%
 							</span>
 						</div>
@@ -166,10 +166,10 @@ export function PricingSettingsCard({
 								onChange={(e: any) =>
 									handleProfitChange(e.target.value)
 								}
-								className="h-9 text-sm pl-7"
+								className="h-9 text-sm ps-7"
 								dir="ltr"
 							/>
-							<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+							<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
 								%
 							</span>
 						</div>
@@ -189,10 +189,10 @@ export function PricingSettingsCard({
 								onChange={(e: any) =>
 									handleContingencyChange(e.target.value)
 								}
-								className="h-9 text-sm pl-7"
+								className="h-9 text-sm ps-7"
 								dir="ltr"
 							/>
-							<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+							<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
 								%
 							</span>
 						</div>

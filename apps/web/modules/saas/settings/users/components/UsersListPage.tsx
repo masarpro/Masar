@@ -119,7 +119,7 @@ export function UsersListPage() {
 				<h2 className="font-bold text-lg">المستخدمين</h2>
 				<UpgradeGate feature="members.invite">
 					<Button onClick={() => setShowAddDialog(true)} size="sm">
-						<UserPlusIcon className="ml-2 size-4" />
+						<UserPlusIcon className="me-2 size-4" />
 						إضافة مستخدم
 					</Button>
 				</UpgradeGate>
@@ -138,19 +138,19 @@ export function UsersListPage() {
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
 									الاسم
 								</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
 									البريد الإلكتروني
 								</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
 									الدور
 								</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
 									الحالة
 								</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
 									إجراءات
 								</TableHead>
 							</TableRow>

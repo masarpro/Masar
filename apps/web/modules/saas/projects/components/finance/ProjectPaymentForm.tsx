@@ -359,11 +359,11 @@ export function ProjectPaymentForm({
 										})
 									}
 									placeholder="0.00"
-									className="rounded-xl pl-12"
+									className="rounded-xl ps-12"
 									dir="ltr"
 									required
 								/>
-								<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500">
+								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500">
 									{t("common.sar")}
 								</span>
 							</div>
@@ -505,7 +505,7 @@ export function ProjectPaymentForm({
 										)}
 									</div>
 								</div>
-								<div className="text-left">
+								<div className="text-end">
 									<p className="text-sm text-slate-500">
 										{t(
 											"finance.banks.currentBalance",
@@ -636,12 +636,12 @@ export function ProjectPaymentForm({
 				>
 					{createMutation.isPending ? (
 						<>
-							<Loader2 className="ml-2 h-4 w-4 animate-spin" />
+							<Loader2 className="me-2 h-4 w-4 animate-spin" />
 							{t("common.saving")}
 						</>
 					) : (
 						<>
-							<Save className="ml-2 h-4 w-4" />
+							<Save className="me-2 h-4 w-4" />
 							{t("projectPayments.createPayment")}
 						</>
 					)}

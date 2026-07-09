@@ -171,14 +171,14 @@ export function TwoFactorBlock() {
 						</p>
 					</div>
 					<Button variant="secondary" onClick={verifyPassword}>
-						<XIcon className="mr-1.5 size-4" />
+						<XIcon className="ms-1.5 size-4" />
 						{t("settings.account.security.twoFactor.disable")}
 					</Button>
 				</div>
 			) : (
 				<div className="flex justify-start">
 					<Button variant="secondary" onClick={verifyPassword}>
-						<TabletSmartphoneIcon className="mr-1.5 size-4" />
+						<TabletSmartphoneIcon className="ms-1.5 size-4" />
 						{t("settings.account.security.twoFactor.enable")}
 					</Button>
 				</div>
@@ -230,7 +230,7 @@ export function TwoFactorBlock() {
 									}
 								>
 									{t("common.actions.continue")}
-									<ArrowRightIcon className="ml-1.5 size-4" />
+									<ArrowRightIcon className="me-1.5 size-4 rtl-flip" />
 								</Button>
 							</div>
 						</form>
@@ -277,7 +277,7 @@ export function TwoFactorBlock() {
 									className="w-full"
 									loading={verifyTwoFactorMutation.isPending}
 								>
-									<CheckIcon className="mr-1.5 size-4" />
+									<CheckIcon className="ms-1.5 size-4" />
 									{t("common.actions.verify")}
 								</Button>
 							</div>

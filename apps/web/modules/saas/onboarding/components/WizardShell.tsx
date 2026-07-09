@@ -49,7 +49,7 @@ export function WizardShell({
 				<footer className="border-t bg-background/80 px-6 py-4 backdrop-blur-sm">
 					<div className="mx-auto flex max-w-2xl justify-start">
 						<Button variant="ghost" onClick={onPrevious}>
-							<ChevronRight className="ml-1 h-4 w-4 rotate-180" />
+							<ChevronRight className="me-1 h-4 w-4 rotate-180" />
 							{t("onboarding.wizard.nav.previous")}
 						</Button>
 					</div>

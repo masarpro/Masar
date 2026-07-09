@@ -1,5 +1,9 @@
 "use client";
 
+import {
+	CHART_PALETTE,
+	CHART_SEMANTIC,
+} from "@saas/shared/lib/chart-colors";
 import { formatSAR } from "@shared/lib/formatters";
 import { ChartContainer, ChartTooltip } from "@ui/components/chart";
 import type { ChartConfig } from "@ui/components/chart";
@@ -19,12 +23,12 @@ interface ExpenseCategoryChartProps {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-	MATERIALS: "#3b82f6",
-	LABOR: "#f59e0b",
-	EQUIPMENT: "#a855f7",
-	SUBCONTRACTOR: "#0ea5e9",
-	TRANSPORT: "#f97316",
-	MISC: "#64748b",
+	MATERIALS: CHART_PALETTE[0], // sky
+	LABOR: CHART_PALETTE[2], // amber
+	EQUIPMENT: CHART_PALETTE[1], // violet
+	SUBCONTRACTOR: CHART_PALETTE[4], // cyan
+	TRANSPORT: CHART_PALETTE[3], // red
+	MISC: CHART_SEMANTIC.neutral,
 };
 
 export function ExpenseCategoryChart({
@@ -50,7 +54,7 @@ export function ExpenseCategoryChart({
 	for (const item of data) {
 		chartConfig[item.category] = {
 			label: t(`finance.category.${item.category}`),
-			color: CATEGORY_COLORS[item.category] || "#64748b",
+			color: CATEGORY_COLORS[item.category] || CHART_SEMANTIC.neutral,
 		};
 	}
 
@@ -102,7 +106,7 @@ export function ExpenseCategoryChart({
 						{data.map((entry) => (
 							<Cell
 								key={entry.category}
-								fill={CATEGORY_COLORS[entry.category] || "#64748b"}
+								fill={CATEGORY_COLORS[entry.category] || CHART_SEMANTIC.neutral}
 								opacity={
 									selectedCategory && selectedCategory !== entry.category
 										? 0.3
@@ -149,7 +153,7 @@ export function ExpenseCategoryChart({
 									<div
 										className="h-2.5 w-2.5 rounded-full"
 										style={{
-											backgroundColor: CATEGORY_COLORS[item.category] || "#64748b",
+											backgroundColor: CATEGORY_COLORS[item.category] || CHART_SEMANTIC.neutral,
 										}}
 									/>
 									<span className="text-slate-600 dark:text-slate-400">

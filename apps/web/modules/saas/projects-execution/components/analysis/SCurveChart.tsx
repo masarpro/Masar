@@ -1,5 +1,6 @@
 "use client";
 
+import { CHART_SEMANTIC } from "@saas/shared/lib/chart-colors";
 import { useTranslations } from "next-intl";
 import {
 	Area,
@@ -60,8 +61,8 @@ export function SCurveChart({ data }: SCurveChartProps) {
 						type="monotone"
 						dataKey="planned"
 						name={t("execution.analysis.sCurve.planned")}
-						stroke="#94a3b8"
-						fill="#94a3b8"
+						stroke={CHART_SEMANTIC.neutral}
+						fill={CHART_SEMANTIC.neutral}
 						fillOpacity={0.1}
 						strokeWidth={2}
 						strokeDasharray="8 4"
@@ -70,8 +71,8 @@ export function SCurveChart({ data }: SCurveChartProps) {
 						type="monotone"
 						dataKey="actual"
 						name={t("execution.analysis.sCurve.actual")}
-						stroke="#0ea5e9"
-						fill="#0ea5e9"
+						stroke={CHART_SEMANTIC.primary}
+						fill={CHART_SEMANTIC.primary}
 						fillOpacity={0.15}
 						strokeWidth={2}
 					/>

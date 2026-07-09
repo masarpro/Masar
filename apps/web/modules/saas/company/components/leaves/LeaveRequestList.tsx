@@ -32,6 +32,7 @@ import {
 } from "@ui/components/dialog";
 import { Label } from "@ui/components/label";
 import { Textarea } from "@ui/components/textarea";
+import { EmptyState } from "@ui/components/empty-state";
 import { Plus, Check, X, Ban, ClipboardList } from "lucide-react";
 import { toast } from "sonner";
 import { Pagination } from "@saas/shared/components/Pagination";
@@ -318,15 +319,11 @@ export function LeaveRequestList({ organizationId, organizationSlug }: LeaveRequ
 							))
 						) : (
 							<TableRow>
-								<TableCell colSpan={7} className="text-center py-16">
-									<div className="flex flex-col items-center">
-										<div className="mb-4 rounded-2xl bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-xl p-5">
-											<ClipboardList className="h-10 w-10 text-slate-400 dark:text-slate-500" />
-										</div>
-										<p className="text-sm text-slate-500 dark:text-slate-400">
-											{t("company.leaves.requests.noRequests")}
-										</p>
-									</div>
+								<TableCell colSpan={7}>
+									<EmptyState
+										icon={<ClipboardList className="h-10 w-10" />}
+										description={t("company.leaves.requests.noRequests")}
+									/>
 								</TableCell>
 							</TableRow>
 						)}

@@ -250,7 +250,7 @@ export function PricingEditor({
 						{t("pricing.studies.quotes.title")}
 					</CardTitle>
 					<Button>
-						<Plus className="ml-2 h-4 w-4" />
+						<Plus className="me-2 h-4 w-4" />
 						{t("pricing.studies.quotes.create")}
 					</Button>
 				</CardHeader>

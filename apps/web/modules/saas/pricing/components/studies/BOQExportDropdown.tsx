@@ -24,22 +24,22 @@ export function BOQExportDropdown({
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button variant="outline" size="sm" className="print:hidden">
-					<FileDown className="h-4 w-4 ml-2" />
+					<FileDown className="h-4 w-4 me-2" />
 					{label}
-					<ChevronDown className="h-3 w-3 mr-1 opacity-50" />
+					<ChevronDown className="h-3 w-3 ms-1 opacity-50" />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="min-w-[160px]">
 				<DropdownMenuItem onClick={onPrint}>
-					<FileDown className="h-4 w-4 ml-2" />
+					<FileDown className="h-4 w-4 me-2" />
 					تحميل PDF
 				</DropdownMenuItem>
 				<DropdownMenuItem onClick={onPrint}>
-					<Printer className="h-4 w-4 ml-2" />
+					<Printer className="h-4 w-4 me-2" />
 					طباعة
 				</DropdownMenuItem>
 				<DropdownMenuItem onClick={onExcelExport}>
-					<FileSpreadsheet className="h-4 w-4 ml-2" />
+					<FileSpreadsheet className="h-4 w-4 me-2" />
 					تصدير Excel
 				</DropdownMenuItem>
 			</DropdownMenuContent>

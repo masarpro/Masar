@@ -106,14 +106,14 @@ export function PaymentsTable({
 				<Table>
 					<TableHeader>
 						<TableRow className="bg-slate-50/80 dark:bg-slate-800/50">
-							<TableHead className="text-right">{t("projectPayments.paymentNo")}</TableHead>
-							<TableHead className="text-right">{t("projectPayments.date")}</TableHead>
-							<TableHead className="text-right">{t("projectPayments.amount")}</TableHead>
-							<TableHead className="text-right">{t("projectPayments.method")}</TableHead>
+							<TableHead className="text-start">{t("projectPayments.paymentNo")}</TableHead>
+							<TableHead className="text-start">{t("projectPayments.date")}</TableHead>
+							<TableHead className="text-start">{t("projectPayments.amount")}</TableHead>
+							<TableHead className="text-start">{t("projectPayments.method")}</TableHead>
 							{showTermColumn && (
-								<TableHead className="text-right">{t("projectPayments.term")}</TableHead>
+								<TableHead className="text-start">{t("projectPayments.term")}</TableHead>
 							)}
-							<TableHead className="text-right">{t("projectPayments.description")}</TableHead>
+							<TableHead className="text-start">{t("projectPayments.description")}</TableHead>
 							<TableHead className="w-10" />
 						</TableRow>
 					</TableHeader>
@@ -169,14 +169,14 @@ export function PaymentsTable({
 											</DropdownMenuTrigger>
 											<DropdownMenuContent align="end">
 												<DropdownMenuItem onClick={() => setEditPayment(payment)}>
-													<Pencil className="ml-2 h-4 w-4" />
+													<Pencil className="me-2 h-4 w-4" />
 													{t("common.edit")}
 												</DropdownMenuItem>
 												<DropdownMenuItem
 													className="text-red-600 dark:text-red-400"
 													onClick={() => setDeletePaymentId(payment.id)}
 												>
-													<Trash2 className="ml-2 h-4 w-4" />
+													<Trash2 className="me-2 h-4 w-4" />
 													{t("common.delete")}
 												</DropdownMenuItem>
 											</DropdownMenuContent>

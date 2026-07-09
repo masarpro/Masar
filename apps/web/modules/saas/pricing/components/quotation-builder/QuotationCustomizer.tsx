@@ -180,8 +180,8 @@ export function QuotationCustomizer({
 							<table className="w-full text-xs">
 								<thead>
 									<tr className="border-b bg-muted/30 text-muted-foreground">
-										{config.showItemNumber && <th className="px-2 py-2 text-right font-medium">#</th>}
-										{config.showDescription && <th className="px-2 py-2 text-right font-medium">{t("table.description")}</th>}
+										{config.showItemNumber && <th className="px-2 py-2 text-start font-medium">#</th>}
+										{config.showDescription && <th className="px-2 py-2 text-start font-medium">{t("table.description")}</th>}
 										{config.showSpecifications && <th className="px-2 py-2 text-center font-medium">{t("table.specifications")}</th>}
 										{config.showQuantity && <th className="px-2 py-2 text-center font-medium">{t("table.quantity")}</th>}
 										{config.showUnit && <th className="px-2 py-2 text-center font-medium">{t("table.unit")}</th>}

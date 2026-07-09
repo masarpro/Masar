@@ -97,7 +97,7 @@ export function OrganizationInvitationModal({
 					disabled={!!submitting}
 					loading={submitting === "reject"}
 				>
-					<XIcon className="mr-1.5 size-4" />
+					<XIcon className="ms-1.5 size-4" />
 					{t("organizations.invitationModal.decline")}
 				</Button>
 				<Button
@@ -106,7 +106,7 @@ export function OrganizationInvitationModal({
 					disabled={!!submitting}
 					loading={submitting === "accept"}
 				>
-					<CheckIcon className="mr-1.5 size-4" />
+					<CheckIcon className="ms-1.5 size-4" />
 					{t("organizations.invitationModal.accept")}
 				</Button>
 			</div>

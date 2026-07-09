@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { CHART_SEMANTIC } from "@saas/shared/lib/chart-colors";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { formatSARPrecise } from "@shared/lib/formatters";
@@ -727,7 +728,7 @@ export function OwnerDetailPage({
 											/>
 											<Bar
 												dataKey="amount"
-												fill="#ef4444"
+												fill={CHART_SEMANTIC.negative}
 												radius={[4, 4, 0, 0]}
 											/>
 										</BarChart>

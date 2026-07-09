@@ -243,7 +243,7 @@ function FinishingPricingRow({
 			</div>
 
 			{/* Quantity */}
-			<span className="text-left tabular-nums text-xs text-muted-foreground" dir="ltr">
+			<span className="text-start tabular-nums text-xs text-muted-foreground" dir="ltr">
 				{formatNumber(displayQty, 1)}
 			</span>
 
@@ -293,7 +293,7 @@ function FinishingPricingRow({
 			/>
 
 			{/* Total */}
-			<span className="text-left font-semibold tabular-nums text-sm" dir="ltr">
+			<span className="text-start font-semibold tabular-nums text-sm" dir="ltr">
 				{formatCurrency(item.totalCost)}
 			</span>
 		</div>

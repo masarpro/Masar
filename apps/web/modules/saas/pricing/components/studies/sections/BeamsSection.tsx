@@ -208,19 +208,19 @@ export function BeamsSection({
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
 									{t("pricing.studies.structural.itemName")}
 								</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
 									{t("pricing.studies.structural.quantity")}
 								</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
 									{t("pricing.studies.form.dimensions")}
 								</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
 									{t("pricing.studies.structural.concreteVolume")}
 								</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
 									{t("pricing.studies.structural.steelWeight")}
 								</TableHead>
 								<TableHead className="w-12"></TableHead>
@@ -232,7 +232,7 @@ export function BeamsSection({
 									<TableCell className="font-medium">
 										{item.name}
 										{item.subCategory === "groundBeam" && (
-											<Badge variant="outline" className="mr-2 text-xs">ميدة</Badge>
+											<Badge variant="outline" className="ms-2 text-xs">ميدة</Badge>
 										)}
 									</TableCell>
 									<TableCell>{item.quantity}</TableCell>
@@ -428,7 +428,7 @@ export function BeamsSection({
 									createMutation.isPending || updateMutation.isPending || !formData.name || !calculations
 								}
 							>
-								<Save className="h-4 w-4 ml-2" />
+								<Save className="h-4 w-4 me-2" />
 								{editingItemId ? t("pricing.studies.structural.updateItem") : t("pricing.studies.structural.saveItem")}
 							</Button>
 						</div>
@@ -440,7 +440,7 @@ export function BeamsSection({
 					className="w-full bg-primary/10 text-primary border-2 border-dashed border-primary/40 hover:bg-primary/20 hover:border-primary/60 transition-all"
 					onClick={() => setIsAdding(true)}
 				>
-					<Plus className="h-5 w-5 ml-2" />
+					<Plus className="h-5 w-5 me-2" />
 					<span className="font-semibold">{t("pricing.studies.structural.addItem")}</span>
 				</Button>
 			)}

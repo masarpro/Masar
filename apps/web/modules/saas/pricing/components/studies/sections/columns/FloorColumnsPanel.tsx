@@ -250,20 +250,20 @@ export function FloorColumnsPanel({
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
 									{t("pricing.studies.structural.itemName")}
 								</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
 									{t("pricing.studies.structural.quantity")}
 								</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
 									{t("pricing.studies.form.dimensions")}
 								</TableHead>
-								<TableHead className="text-right">التسليح</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">التسليح</TableHead>
+								<TableHead className="text-start">
 									{t("pricing.studies.structural.concreteVolume")}
 								</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
 									{t("pricing.studies.structural.steelWeight")}
 								</TableHead>
 								<TableHead className="w-12"></TableHead>
@@ -546,7 +546,7 @@ export function FloorColumnsPanel({
 									!calculations
 								}
 							>
-								<Save className="h-4 w-4 ml-2" />
+								<Save className="h-4 w-4 me-2" />
 								{editingItemId
 									? t("pricing.studies.structural.updateItem")
 									: t("pricing.studies.structural.saveItem")}
@@ -560,7 +560,7 @@ export function FloorColumnsPanel({
 					className="w-full bg-primary/10 text-primary border-2 border-dashed border-primary/40 hover:bg-primary/20 hover:border-primary/60 transition-all"
 					onClick={handleStartAdding}
 				>
-					<Plus className="h-5 w-5 ml-2" />
+					<Plus className="h-5 w-5 me-2" />
 					<span className="font-semibold">إضافة عمود</span>
 				</Button>
 			)}
@@ -571,13 +571,13 @@ export function FloorColumnsPanel({
 					<div className="grid grid-cols-2 gap-4 text-sm">
 						<div>
 							<span className="text-muted-foreground">خرسانة:</span>
-							<span className="font-bold mr-1">
+							<span className="font-bold ms-1">
 								{formatNumber(floorConcrete)} {t("pricing.studies.units.m3")}
 							</span>
 						</div>
 						<div>
 							<span className="text-muted-foreground">حديد:</span>
-							<span className="font-bold mr-1">
+							<span className="font-bold ms-1">
 								{formatNumber(floorSteel)} {t("pricing.studies.units.kg")}
 							</span>
 						</div>

@@ -48,7 +48,7 @@ async function OrganizationFormPageContent({
 				<div className="mb-2 flex justify-start">
 					<Button variant="link" size="sm" asChild className="px-0">
 						<Link href={backTo ?? getAdminPath("/organizations")}>
-							<ArrowLeftIcon className="mr-1.5 size-4" />
+							<ArrowLeftIcon className="ms-1.5 size-4 rtl-flip" />
 							{t("admin.organizations.backToList")}
 						</Link>
 					</Button>

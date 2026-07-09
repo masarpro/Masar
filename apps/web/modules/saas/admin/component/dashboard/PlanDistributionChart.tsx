@@ -1,10 +1,11 @@
 "use client";
 
+import { CHART_SEMANTIC } from "@saas/shared/lib/chart-colors";
 import { Card } from "@ui/components/card";
 import { useTranslations } from "next-intl";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
-const COLORS = ["#94a3b8", "#3b82f6"];
+const COLORS = [CHART_SEMANTIC.neutral, CHART_SEMANTIC.primary];
 
 export function PlanDistributionChart({
 	data,

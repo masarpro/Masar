@@ -141,7 +141,7 @@ export function TemplateStep({
 									)}
 								>
 									{isSelected && (
-										<div className="absolute top-3 left-3">
+										<div className="absolute top-3 end-3">
 											<CheckCircle className="h-5 w-5 text-primary" />
 										</div>
 									)}

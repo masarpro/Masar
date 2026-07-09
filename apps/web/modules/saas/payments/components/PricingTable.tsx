@@ -195,7 +195,7 @@ export function PricingTable({
 															key={key}
 															className="flex items-center justify-start"
 														>
-															<CheckIcon className="mr-2 size-4 text-primary" />
+															<CheckIcon className="ms-2 size-4 text-primary" />
 															<span>
 																{feature}
 															</span>
@@ -209,7 +209,7 @@ export function PricingTable({
 											"trialPeriodDays" in price &&
 											price.trialPeriodDays && (
 												<div className="mt-4 flex items-center justify-start font-medium text-primary text-sm opacity-80">
-													<BadgePercentIcon className="mr-2 size-4" />
+													<BadgePercentIcon className="ms-2 size-4" />
 													{t("pricing.trialPeriod", {
 														days: price.trialPeriodDays,
 													})}
@@ -269,7 +269,7 @@ export function PricingTable({
 												asChild
 											>
 												<LocaleLink href="/contact">
-													<PhoneIcon className="mr-2 size-4" />
+													<PhoneIcon className="ms-2 size-4" />
 													{t("pricing.contactSales")}
 												</LocaleLink>
 											</Button>
@@ -292,7 +292,7 @@ export function PricingTable({
 												{userId || organizationId
 													? t("pricing.choosePlan")
 													: t("pricing.getStarted")}
-												<ArrowRightIcon className="ml-2 size-4" />
+												<ArrowRightIcon className="me-2 size-4 rtl-flip" />
 											</Button>
 										)}
 									</div>

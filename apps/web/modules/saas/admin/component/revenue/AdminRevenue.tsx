@@ -79,7 +79,7 @@ export function AdminRevenue() {
 						/>
 						<Bar
 							dataKey="amount"
-							fill="hsl(var(--primary))"
+							fill="var(--primary)"
 							radius={[4, 4, 0, 0]}
 						/>
 					</BarChart>

@@ -365,7 +365,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 									className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 pe-12"
 									dir="ltr"
 								/>
-								<span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">م²</span>
+								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">م²</span>
 							</div>
 						</div>
 						<div>
@@ -386,7 +386,7 @@ export function CreateLeadForm({ organizationId, organizationSlug, members }: Cr
 									className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 pe-12"
 									dir="ltr"
 								/>
-								<span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">ر.س</span>
+								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">ر.س</span>
 							</div>
 						</div>
 					</div>

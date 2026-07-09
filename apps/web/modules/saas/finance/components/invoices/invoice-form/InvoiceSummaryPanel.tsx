@@ -65,7 +65,7 @@ export function InvoiceSummaryPanel({
 					</div>
 				)}
 				{/* Gradient Total Bar */}
-				<div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-primary via-primary/90 to-primary/80 flex items-center justify-between shadow-[0_4px_20px_hsl(var(--primary)/0.3)]">
+				<div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-primary via-primary/90 to-primary/80 flex items-center justify-between shadow-primary-glow">
 					<div>
 						<div className="text-[11px] text-primary-foreground/70 font-medium tracking-wide">{t("finance.summary.total")}</div>
 					</div>

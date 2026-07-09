@@ -22,10 +22,10 @@ export function BlockItemsTable({ items, onEdit, onDelete, isDeletePending }: Bl
 			<Table>
 				<TableHeader>
 					<TableRow>
-						<TableHead className="text-right">{t("pricing.studies.structural.itemName")}</TableHead>
-						<TableHead className="text-right">{t("pricing.studies.area")}</TableHead>
-						<TableHead className="text-right">{t("pricing.studies.structural.thickness")}</TableHead>
-						<TableHead className="text-right">{t("pricing.studies.structural.quantity")}</TableHead>
+						<TableHead className="text-start">{t("pricing.studies.structural.itemName")}</TableHead>
+						<TableHead className="text-start">{t("pricing.studies.area")}</TableHead>
+						<TableHead className="text-start">{t("pricing.studies.structural.thickness")}</TableHead>
+						<TableHead className="text-start">{t("pricing.studies.structural.quantity")}</TableHead>
 						<TableHead className="w-12"></TableHead>
 					</TableRow>
 				</TableHeader>

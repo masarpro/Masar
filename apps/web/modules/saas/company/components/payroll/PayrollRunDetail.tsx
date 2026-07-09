@@ -10,6 +10,7 @@ import { orpcClient } from "@shared/lib/orpc-client";
 import { DetailPageSkeleton } from "@saas/shared/components/skeletons";
 import { Button } from "@ui/components/button";
 import { Badge } from "@ui/components/badge";
+import { statusToneClasses } from "@ui/components/status-chip";
 import {
 	Select,
 	SelectContent,
@@ -58,19 +59,6 @@ interface PayrollRunDetailProps {
 	runId: string;
 }
 
-const STATUS_STYLES: Record<string, string> = {
-	DRAFT: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
-	APPROVED: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400",
-	PAID: "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400",
-	CANCELLED: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400",
-};
-
-const FINANCE_STATUS_STYLES: Record<string, string> = {
-	PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400",
-	COMPLETED: "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400",
-	CANCELLED: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400",
-};
-
 export function PayrollRunDetail({ organizationId, organizationSlug, runId }: PayrollRunDetailProps) {
 	const t = useTranslations();
 	const router = useRouter();
@@ -104,19 +92,17 @@ export function PayrollRunDetail({ organizationId, organizationSlug, runId }: Pa
 		`PAY-${r.year}-${String(r.month).padStart(2, "0")}`;
 
 	const getStatusBadge = (status: string) => {
-		const style = STATUS_STYLES[status] ?? STATUS_STYLES.DRAFT;
 		const labelKey = status.toLowerCase() as "draft" | "approved" | "paid" | "cancelled";
 		return (
-			<Badge className={`border-0 text-[10px] px-2 py-0.5 ${style}`}>
+			<Badge className={`border-0 text-[10px] px-2 py-0.5 ${statusToneClasses(status)}`}>
 				{t(`company.payroll.${labelKey}`)}
 			</Badge>
 		);
 	};
 
 	const getFinanceStatusBadge = (status: string) => {
-		const style = FINANCE_STATUS_STYLES[status] ?? FINANCE_STATUS_STYLES.PENDING;
 		return (
-			<Badge className={`border-0 text-[10px] px-1.5 py-0.5 ${style}`}>
+			<Badge className={`border-0 text-[10px] px-1.5 py-0.5 ${statusToneClasses(status)}`}>
 				{t(`company.payroll.financeStatus_${status.toLowerCase()}`)}
 			</Badge>
 		);

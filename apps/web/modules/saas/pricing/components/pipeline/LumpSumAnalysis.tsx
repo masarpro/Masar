@@ -82,19 +82,19 @@ export function LumpSumAnalysis({
 						<tbody>
 							<tr className="border-b bg-blue-50/50">
 								<td className="px-3 py-2 font-medium">{t("pricing.pipeline.lumpSumContractValue")}</td>
-								<td className="px-3 py-2 tabular-nums text-left font-bold text-blue-700" dir="ltr">
+								<td className="px-3 py-2 tabular-nums text-start font-bold text-blue-700" dir="ltr">
 									{formatAmount(contractValue)} ر.س
 								</td>
 							</tr>
 							<tr className="border-b">
 								<td className="px-3 py-2 text-muted-foreground">{t("pricing.pipeline.totalCostLabel")}</td>
-								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+								<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 									{formatAmount(totalCost)} ر.س
 								</td>
 							</tr>
 							<tr className="border-b">
 								<td className="px-3 py-2 text-muted-foreground">{t("pricing.pipeline.overheadLabel")}</td>
-								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+								<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 									+ {formatAmount(overheadAmount)} ر.س
 								</td>
 							</tr>
@@ -104,7 +104,7 @@ export function LumpSumAnalysis({
 							)}>
 								<td className="px-3 py-2 font-semibold">{t("pricing.pipeline.lumpSumExpectedProfit")}</td>
 								<td className={cn(
-									"px-3 py-2 tabular-nums text-left font-bold text-base",
+									"px-3 py-2 tabular-nums text-start font-bold text-base",
 									isPositive ? "text-emerald-700" : "text-red-700",
 								)} dir="ltr">
 									{formatAmount(expectedProfit)} ر.س

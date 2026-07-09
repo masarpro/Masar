@@ -92,7 +92,7 @@ export function MarkupMethodSelector({
 								disabled={method.disabled}
 								onClick={() => handleMethodChange(method.value)}
 								className={cn(
-									"w-full flex items-start gap-3 rounded-lg border p-3 text-right transition-colors",
+									"w-full flex items-start gap-3 rounded-lg border p-3 text-start transition-colors",
 									isActive
 										? "border-primary bg-primary/5"
 										: "border-border hover:bg-accent/50",

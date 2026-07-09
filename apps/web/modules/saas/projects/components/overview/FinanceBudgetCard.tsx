@@ -240,7 +240,7 @@ export function FinanceBudgetCard({
 
 				{/* Next Payment */}
 				<div className="relative mt-auto overflow-hidden rounded-xl border border-sky-200 bg-gradient-to-bl from-sky-50 to-sky-50/50 p-3.5 dark:border-sky-800/30 dark:from-sky-950/30 dark:to-sky-950/10">
-					<div className="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-sky-500/10" />
+					<div className="absolute -start-4 -top-4 h-16 w-16 rounded-full bg-sky-500/10" />
 					<div className="relative flex items-center justify-between">
 						<div className="flex items-center gap-1.5">
 							<CreditCard className="h-3.5 w-3.5 text-sky-700 dark:text-sky-400" />

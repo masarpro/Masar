@@ -378,7 +378,7 @@ export function LumpSumAnalysisSection({
 						<table className="w-full text-sm">
 							<thead>
 								<tr className="border-b bg-muted/30 text-muted-foreground">
-									<th className="px-4 py-3 text-right font-medium">
+									<th className="px-4 py-3 text-start font-medium">
 										{t("table.section")}
 									</th>
 									<th className="px-4 py-3 text-center font-medium">

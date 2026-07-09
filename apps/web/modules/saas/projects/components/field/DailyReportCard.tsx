@@ -67,7 +67,7 @@ export function DailyReportCard({ report }: DailyReportCardProps) {
 						{formatDate(reportDate)}
 					</h3>
 				</div>
-				<div className="text-right text-sm text-slate-500">
+				<div className="text-start text-sm text-slate-500">
 					<span>{createdBy?.name}</span>
 				</div>
 			</div>

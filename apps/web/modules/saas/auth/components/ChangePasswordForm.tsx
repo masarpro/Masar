@@ -126,7 +126,7 @@ export function ChangePasswordForm() {
 														? "text"
 														: "password"
 												}
-												className="pl-10"
+												className="pe-10"
 												{...field}
 												autoComplete="current-password"
 											/>
@@ -137,7 +137,7 @@ export function ChangePasswordForm() {
 														!showCurrentPassword,
 													)
 												}
-												className="absolute inset-y-0 left-0 flex items-center pl-4 text-primary text-xl"
+												className="absolute inset-y-0 end-0 flex items-center pe-4 text-primary text-xl"
 											>
 												{showCurrentPassword ? (
 													<EyeOffIcon className="size-4" />
@@ -165,7 +165,7 @@ export function ChangePasswordForm() {
 														? "text"
 														: "password"
 												}
-												className="pl-10"
+												className="pe-10"
 												{...field}
 												autoComplete="new-password"
 											/>
@@ -176,7 +176,7 @@ export function ChangePasswordForm() {
 														!showNewPassword,
 													)
 												}
-												className="absolute inset-y-0 left-0 flex items-center pl-4 text-primary text-xl"
+												className="absolute inset-y-0 end-0 flex items-center pe-4 text-primary text-xl"
 											>
 												{showNewPassword ? (
 													<EyeOffIcon className="size-4" />

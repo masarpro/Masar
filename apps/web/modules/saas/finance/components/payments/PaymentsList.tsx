@@ -9,6 +9,7 @@ import { orpcClient } from "@shared/lib/orpc-client";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Badge } from "@ui/components/badge";
+import { statusToneClasses } from "@ui/components/status-chip";
 import { Card, CardContent } from "@ui/components/card";
 import {
 	Table,
@@ -133,14 +134,7 @@ export function PaymentsList({
 		return colors[method] || "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
 	};
 
-	const getStatusColor = (status: string) => {
-		const colors: Record<string, string> = {
-			COMPLETED: "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400",
-			PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400",
-			CANCELLED: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400",
-		};
-		return colors[status] || "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
-	};
+	const getStatusColor = (status: string) => statusToneClasses(status);
 
 	return (
 		<div className="space-y-6">

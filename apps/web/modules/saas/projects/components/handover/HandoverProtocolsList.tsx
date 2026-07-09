@@ -8,6 +8,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Badge } from "@ui/components/badge";
+import { StatusChip } from "@ui/components/status-chip";
 import { Card, CardContent } from "@ui/components/card";
 import {
 	Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -30,14 +31,6 @@ const TYPE_COLORS: Record<string, string> = {
 	PRELIMINARY: "bg-purple-100 text-purple-700",
 	FINAL: "bg-green-100 text-green-700",
 	DELIVERY: "bg-orange-100 text-orange-700",
-};
-
-const STATUS_COLORS: Record<string, string> = {
-	DRAFT: "bg-gray-100 text-gray-700",
-	PENDING_SIGNATURES: "bg-amber-100 text-amber-700",
-	PARTIALLY_SIGNED: "bg-orange-100 text-orange-700",
-	COMPLETED: "bg-green-100 text-green-700",
-	ARCHIVED: "bg-gray-200 text-gray-600",
 };
 
 export function HandoverProtocolsList({
@@ -161,9 +154,9 @@ export function HandoverProtocolsList({
 									<TableCell>{formatDate(p.date)}</TableCell>
 									<TableCell>{p._count?.items ?? 0}</TableCell>
 									<TableCell>
-										<Badge className={STATUS_COLORS[p.status] ?? ""}>
+										<StatusChip status={p.status}>
 											{t(`handover.statuses.${p.status}`)}
-										</Badge>
+										</StatusChip>
 									</TableCell>
 									<TableCell>
 										<Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>

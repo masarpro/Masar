@@ -46,7 +46,8 @@ export default async function FinanceLayout({
 			pageNameAr="المالية والمحاسبة"
 			pageDescription="صفحات النظام المالي: الفواتير، المصروفات، البنوك، المحاسبة، التقارير، سندات القبض والصرف"
 		>
-			<div className="px-4 md:px-6 lg:px-8 py-6">
+			{/* Padding is owned by FinanceShell (same model as pricing) — do not add it here too. */}
+			<div>
 				<AccountingSeedCheck />
 				<SectionRouteGate sectionRoot="finance">
 					{children}

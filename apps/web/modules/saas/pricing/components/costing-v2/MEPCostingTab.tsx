@@ -431,7 +431,7 @@ export function MEPCostingTab({
 								<table className="w-full text-sm">
 									<thead>
 										<tr className="border-b bg-muted/20 text-muted-foreground">
-											<th className="px-3 py-2.5 text-right font-medium">
+											<th className="px-3 py-2.5 text-start font-medium">
 												{t("common.item")}
 											</th>
 											<th className="px-3 py-2.5 text-center font-medium">

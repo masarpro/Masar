@@ -8,7 +8,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
-import { Badge } from "@ui/components/badge";
+import { StatusChip } from "@ui/components/status-chip";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
 import {
 	AlertDialog,
@@ -44,12 +44,6 @@ interface ReceiptVoucherDetailProps {
 	organizationSlug: string;
 	voucherId: string;
 }
-
-const STATUS_COLORS: Record<string, string> = {
-	DRAFT: "bg-gray-100 text-gray-700",
-	ISSUED: "bg-green-100 text-green-700",
-	CANCELLED: "bg-red-100 text-red-700",
-};
 
 export function ReceiptVoucherDetail({
 	organizationId,
@@ -196,9 +190,9 @@ export function ReceiptVoucherDetail({
 							<h1 className="text-2xl font-bold font-mono">
 								{voucher.voucherNo}
 							</h1>
-							<Badge className={STATUS_COLORS[voucher.status] ?? ""}>
+							<StatusChip status={voucher.status}>
 								{t(`finance.receiptVouchers.statuses.${voucher.status}`)}
-							</Badge>
+							</StatusChip>
 						</div>
 						<p className="text-sm text-muted-foreground">
 							{isManual

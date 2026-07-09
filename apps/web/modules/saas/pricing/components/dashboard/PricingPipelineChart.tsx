@@ -21,7 +21,7 @@ interface PricingPipelineChartProps {
 const chartConfig: ChartConfig = {
 	value: {
 		label: "العدد",
-		color: "hsl(var(--primary))",
+		color: "var(--primary)",
 	},
 };
 
@@ -32,22 +32,22 @@ export function PricingPipelineChart({ pipeline }: PricingPipelineChartProps) {
 		{
 			stage: t("pricing.dashboard.pipeline.studies"),
 			value: pipeline.studies,
-			fill: "#0ea5e9",
+			fill: "var(--chart-1)",
 		},
 		{
 			stage: t("pricing.dashboard.pipeline.quotationsSent"),
 			value: pipeline.quotationsSent,
-			fill: "#6366f1",
+			fill: "var(--chart-5)",
 		},
 		{
 			stage: t("pricing.dashboard.pipeline.leadsWon"),
 			value: pipeline.leadsWon,
-			fill: "#8b5cf6",
+			fill: "var(--chart-2)",
 		},
 		{
 			stage: t("pricing.dashboard.pipeline.contracted"),
 			value: pipeline.contracted,
-			fill: "#10b981",
+			fill: "var(--success)",
 		},
 	];
 

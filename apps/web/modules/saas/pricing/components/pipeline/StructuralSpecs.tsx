@@ -419,7 +419,7 @@ export function StructuralSpecs({
 					<table className="w-full">
 						<thead>
 							<tr className="bg-muted/50 text-sm">
-								<th className="text-right py-2.5 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.structuralElement")}</th>
+								<th className="text-start py-2.5 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.structuralElement")}</th>
 								<th className="text-center py-2.5 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.concreteType")}</th>
 							</tr>
 						</thead>
@@ -507,7 +507,7 @@ export function StructuralSpecs({
 								<table className="w-full text-sm">
 									<thead>
 										<tr className="bg-blue-100/50">
-											<th className="text-right py-2 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.element")}</th>
+											<th className="text-start py-2 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.element")}</th>
 											<th className="text-center py-2 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.steelQuantityKg")}</th>
 										</tr>
 									</thead>
@@ -565,7 +565,7 @@ export function StructuralSpecs({
 							<table className="w-full text-sm">
 								<thead>
 									<tr className="bg-muted/50">
-										<th className="text-right py-2.5 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.wallCategory")}</th>
+										<th className="text-start py-2.5 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.wallCategory")}</th>
 										<th className="text-center py-2.5 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.blockType")}</th>
 										<th className="text-center py-2.5 px-4 font-medium">{t("pricing.pipeline.structuralSpecs.thickness")}</th>
 									</tr>

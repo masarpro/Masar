@@ -150,7 +150,7 @@ export function StudyQuotationPageContent({
 									<FileText className="h-4 w-4 text-muted-foreground" />
 									<div>
 										<span className="text-sm font-medium">{q.quoteNumber}</span>
-										<span className="text-xs text-muted-foreground mr-2">
+										<span className="text-xs text-muted-foreground ms-2">
 											— {q.clientName}
 										</span>
 									</div>

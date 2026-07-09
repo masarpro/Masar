@@ -224,12 +224,12 @@ function StructuralPricingRow({
 			</div>
 
 			{/* Concrete Volume */}
-			<span className="text-left tabular-nums text-xs text-muted-foreground" dir="ltr">
+			<span className="text-start tabular-nums text-xs text-muted-foreground" dir="ltr">
 				{item.concreteVolume > 0 ? formatNumber(item.concreteVolume, 2) : "-"}
 			</span>
 
 			{/* Steel Weight */}
-			<span className="text-left tabular-nums text-xs text-muted-foreground" dir="ltr">
+			<span className="text-start tabular-nums text-xs text-muted-foreground" dir="ltr">
 				{item.steelWeight > 0 ? formatNumber(item.steelWeight, 0) : "-"}
 			</span>
 
@@ -260,7 +260,7 @@ function StructuralPricingRow({
 			/>
 
 			{/* Total */}
-			<span className="text-left font-semibold tabular-nums text-sm" dir="ltr">
+			<span className="text-start font-semibold tabular-nums text-sm" dir="ltr">
 				{formatCurrency(item.totalCost)}
 			</span>
 		</div>

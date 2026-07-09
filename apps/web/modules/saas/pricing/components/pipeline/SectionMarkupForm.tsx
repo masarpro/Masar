@@ -134,10 +134,10 @@ export function SectionMarkupForm({
 					<table className="w-full text-sm">
 						<thead>
 							<tr className="border-b bg-muted/50 text-muted-foreground">
-								<th className="px-3 py-2 text-right font-medium">{t("pricing.pipeline.costingSection")}</th>
-								<th className="px-3 py-2 text-left font-medium">{t("pricing.pipeline.sectionCost")}</th>
+								<th className="px-3 py-2 text-start font-medium">{t("pricing.pipeline.costingSection")}</th>
+								<th className="px-3 py-2 text-end font-medium">{t("pricing.pipeline.sectionCost")}</th>
 								<th className="px-3 py-2 text-center font-medium w-28">{t("pricing.pipeline.markupPercentHeader")}</th>
-								<th className="px-3 py-2 text-left font-medium">{t("pricing.pipeline.sectionTotal")}</th>
+								<th className="px-3 py-2 text-end font-medium">{t("pricing.pipeline.sectionTotal")}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -149,7 +149,7 @@ export function SectionMarkupForm({
 									<td className="px-3 py-2 font-medium">
 										{SECTION_LABELS[row.section] || row.section}
 									</td>
-									<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+									<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 										{formatAmount(row.cost)} ر.س
 									</td>
 									<td className="px-3 py-1 text-center">
@@ -167,13 +167,13 @@ export function SectionMarkupForm({
 												min={0}
 												max={200}
 												step={0.5}
-												className="h-8 text-sm text-center w-full pl-7"
+												className="h-8 text-sm text-center w-full ps-7"
 												dir="ltr"
 											/>
-											<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
+											<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
 										</div>
 									</td>
-									<td className="px-3 py-2 tabular-nums text-left font-medium" dir="ltr">
+									<td className="px-3 py-2 tabular-nums text-start font-medium" dir="ltr">
 										{formatAmount(row.total)} ر.س
 									</td>
 								</tr>
@@ -182,11 +182,11 @@ export function SectionMarkupForm({
 							{/* Grand total row */}
 							<tr className="border-t-2 bg-muted/30 font-semibold">
 								<td className="px-3 py-2">{t("pricing.pipeline.costingGrandTotal")}</td>
-								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+								<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 									{formatAmount(grandCost)} ر.س
 								</td>
 								<td className="px-3 py-2" />
-								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+								<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 									{formatAmount(grandTotal)} ر.س
 								</td>
 							</tr>

@@ -234,12 +234,12 @@ function MilestoneCard({
 									size="sm"
 									className="h-7 rounded-lg px-2 text-[11px] text-slate-500 hover:text-slate-700"
 								>
-									<FileText className="ml-1 h-3 w-3" />
+									<FileText className="me-1 h-3 w-3" />
 									{t("projectPayments.paymentsCount", {
 										count: term.payments.length,
 									})}
 									<ChevronDown
-										className={`mr-1 h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
+										className={`ms-1 h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
 									/>
 								</Button>
 							</CollapsibleTrigger>
@@ -283,7 +283,7 @@ function MilestoneCard({
 							<Link
 								href={`${basePath}/finance/payments/new?termId=${term.id}`}
 							>
-								<Plus className="ml-0.5 h-3 w-3" />
+								<Plus className="me-0.5 h-3 w-3" />
 								+
 							</Link>
 						</Button>

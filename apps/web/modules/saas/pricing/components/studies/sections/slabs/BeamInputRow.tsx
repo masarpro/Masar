@@ -255,7 +255,7 @@ export function BeamInputRow({
 							className="text-destructive hover:text-destructive text-xs"
 							onClick={onRemove}
 						>
-							<Trash2 className="h-3.5 w-3.5 ml-1" />
+							<Trash2 className="h-3.5 w-3.5 me-1" />
 							حذف الكمرة
 						</Button>
 					</div>

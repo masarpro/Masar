@@ -180,7 +180,7 @@ export function OrganizationMembersList({
 													)
 												}
 											>
-												<TrashIcon className="mr-2 size-4" />
+												<TrashIcon className="ms-2 size-4" />
 												{t(
 													"organizations.settings.members.removeMember",
 												)}
@@ -195,7 +195,7 @@ export function OrganizationMembersList({
 													)
 												}
 											>
-												<LogOutIcon className="mr-2 size-4" />
+												<LogOutIcon className="ms-2 size-4" />
 												{t(
 													"organizations.settings.members.leaveOrganization",
 												)}

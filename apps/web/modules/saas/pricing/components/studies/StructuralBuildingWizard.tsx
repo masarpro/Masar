@@ -237,7 +237,7 @@ export function StructuralBuildingWizard({
 						<CardTitle className="text-lg">{t("title")}</CardTitle>
 					</div>
 					<Button variant="ghost" size="sm" onClick={onSkip}>
-						<SkipForward className="h-4 w-4 ml-1" />
+						<SkipForward className="h-4 w-4 me-1" />
 						{t("skip")}
 					</Button>
 				</div>
@@ -260,7 +260,7 @@ export function StructuralBuildingWizard({
 											<Plus className="h-3 w-3" />
 											{def.icon} {t("upperFloor")}
 											{upperFloorCount > 0 && (
-												<Badge variant="secondary" className="mr-1 text-xs">
+												<Badge variant="secondary" className="ms-1 text-xs">
 													{upperFloorCount}
 												</Badge>
 											)}
@@ -362,18 +362,18 @@ export function StructuralBuildingWizard({
 							<table className="w-full text-sm">
 								<thead className="bg-muted/50">
 									<tr>
-										<th className="text-right p-2 font-medium">{t("floor")}</th>
+										<th className="text-start p-2 font-medium">{t("floor")}</th>
 										{heightInputMode === "levels" ? (
 											<>
-												<th className="text-right p-2 font-medium">{t("levelM")}</th>
-												<th className="text-right p-2 font-medium">{t("heightCalculated")}</th>
+												<th className="text-start p-2 font-medium">{t("levelM")}</th>
+												<th className="text-start p-2 font-medium">{t("heightCalculated")}</th>
 											</>
 										) : (
-											<th className="text-right p-2 font-medium">{t("heightM")}</th>
+											<th className="text-start p-2 font-medium">{t("heightM")}</th>
 										)}
-										<th className="text-right p-2 font-medium">{t("slabAreaM2")}</th>
+										<th className="text-start p-2 font-medium">{t("slabAreaM2")}</th>
 										{enabledFloors.some((f) => f.isRepeated) && (
-											<th className="text-right p-2 font-medium">{t("repetition")}</th>
+											<th className="text-start p-2 font-medium">{t("repetition")}</th>
 										)}
 									</tr>
 								</thead>
@@ -500,7 +500,7 @@ export function StructuralBuildingWizard({
 						/>
 						<Label className="text-sm font-medium">{t("hasParapet")}</Label>
 						{heightProps.hasParapet && (
-							<div className="flex items-center gap-2 mr-4">
+							<div className="flex items-center gap-2 ms-4">
 								<Label className="text-xs text-muted-foreground">{t("parapetHeightCm")}:</Label>
 								<Input
 									type="number"
@@ -781,7 +781,7 @@ export function StructuralBuildingWizard({
 				{/* ── Actions ── */}
 				<div className="flex justify-end">
 					<Button onClick={handleSave} disabled={isSaving}>
-						<Save className="h-4 w-4 ml-2" />
+						<Save className="h-4 w-4 me-2" />
 						{t("saveAndStart")}
 					</Button>
 				</div>

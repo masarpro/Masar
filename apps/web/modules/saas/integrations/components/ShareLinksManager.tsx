@@ -166,7 +166,7 @@ export function ShareLinksManager({ projectId }: ShareLinksManagerProps) {
 				<Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
 					<DialogTrigger asChild>
 						<Button size="sm">
-							<PlusIcon className="h-4 w-4 mr-2" />
+							<PlusIcon className="h-4 w-4 ms-2" />
 							{t("shares.create")}
 						</Button>
 					</DialogTrigger>
@@ -255,7 +255,7 @@ export function ShareLinksManager({ projectId }: ShareLinksManagerProps) {
 							<TableHead>{t("shares.type")}</TableHead>
 							<TableHead>{t("shares.createdAt")}</TableHead>
 							<TableHead>{t("shares.expires")}</TableHead>
-							<TableHead className="text-right">{t("shares.actions")}</TableHead>
+							<TableHead className="text-start">{t("shares.actions")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -281,7 +281,7 @@ export function ShareLinksManager({ projectId }: ShareLinksManagerProps) {
 										<Badge variant="outline">{t("shares.neverExpires")}</Badge>
 									)}
 								</TableCell>
-								<TableCell className="text-right">
+								<TableCell className="text-start">
 									<div className="flex items-center justify-end gap-2">
 										<Button
 											variant="ghost"

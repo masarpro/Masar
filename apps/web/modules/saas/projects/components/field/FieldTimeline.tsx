@@ -328,7 +328,7 @@ function TimelineItem({
 									t("projects.field.noPhase")}
 							</p>
 						</div>
-						<div className="text-right text-sm text-slate-500">
+						<div className="text-start text-sm text-slate-500">
 							{formatDate(item.createdAt)}
 						</div>
 					</div>

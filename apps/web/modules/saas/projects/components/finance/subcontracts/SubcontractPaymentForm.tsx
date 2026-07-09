@@ -274,11 +274,11 @@ export function SubcontractPaymentForm({
 									value={amount}
 									onChange={(e: any) => setAmount(e.target.value)}
 									placeholder="0.00"
-									className="rounded-xl pl-12"
+									className="rounded-xl ps-12"
 									dir="ltr"
 									required
 								/>
-								<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500">
+								<span className="absolute end-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500">
 									{t("common.sar")}
 								</span>
 							</div>

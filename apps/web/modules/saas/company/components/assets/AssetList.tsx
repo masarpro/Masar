@@ -24,6 +24,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@ui/components/table";
+import { EmptyState } from "@ui/components/empty-state";
 import { Plus, Search, Package, CheckCircle2, Banknote, Wrench } from "lucide-react";
 import { Pagination } from "@saas/shared/components/Pagination";
 import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
@@ -247,7 +248,7 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 			<div className="hidden gap-4 sm:flex sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-3">
 					<div className="relative max-w-md flex-1">
-						<Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+						<Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 						<Input
 							placeholder={t("company.assets.searchPlaceholder")}
 							value={search}
@@ -352,15 +353,11 @@ export function AssetList({ organizationId, organizationSlug }: AssetListProps) 
 							))
 						) : (
 							<TableRow>
-								<TableCell colSpan={6} className="text-center py-16">
-									<div className="flex flex-col items-center">
-										<div className="mb-4 rounded-2xl bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-xl p-5">
-											<Package className="h-10 w-10 text-slate-400 dark:text-slate-500" />
-										</div>
-										<p className="text-sm text-slate-500 dark:text-slate-400">
-											{t("company.assets.noAssets")}
-										</p>
-									</div>
+								<TableCell colSpan={6}>
+									<EmptyState
+										icon={<Package className="h-10 w-10" />}
+										description={t("company.assets.noAssets")}
+									/>
 								</TableCell>
 							</TableRow>
 						)}

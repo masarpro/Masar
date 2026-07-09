@@ -1,6 +1,10 @@
 "use client";
 
 import {
+	CHART_PALETTE,
+	CHART_SEMANTIC,
+} from "@saas/shared/lib/chart-colors";
+import {
 	type ChartConfig,
 	ChartContainer,
 	ChartTooltip,
@@ -28,11 +32,11 @@ const mockTimelineData = [
 const chartConfig: ChartConfig = {
 	planned: {
 		label: "Planned",
-		color: "#3b82f6",
+		color: CHART_SEMANTIC.primary,
 	},
 	actual: {
 		label: "Actual",
-		color: "#0ea5e9",
+		color: CHART_PALETTE[0],
 	},
 };
 
@@ -58,13 +62,19 @@ export function ProjectTimelineChart({
 				</div>
 				<div className="flex items-center gap-3">
 					<div className="flex items-center gap-1.5">
-						<div className="h-2.5 w-2.5 rounded-full bg-blue-500" />
+						<div
+							className="h-2.5 w-2.5 rounded-full"
+							style={{ backgroundColor: CHART_SEMANTIC.primary }}
+						/>
 						<span className="text-[10px] text-slate-500 dark:text-slate-400">
 							{t("projects.commandCenter.plannedProgress")}
 						</span>
 					</div>
 					<div className="flex items-center gap-1.5">
-						<div className="h-2.5 w-2.5 rounded-full bg-sky-500" />
+						<div
+							className="h-2.5 w-2.5 rounded-full"
+							style={{ backgroundColor: CHART_PALETTE[0] }}
+						/>
 						<span className="text-[10px] text-slate-500 dark:text-slate-400">
 							{t("projects.commandCenter.actualProgress")}
 						</span>
@@ -81,12 +91,12 @@ export function ProjectTimelineChart({
 					>
 						<defs>
 							<linearGradient id="plannedGradient" x1="0" y1="0" x2="0" y2="1">
-								<stop offset="0%" stopColor="#3b82f6" stopOpacity={0.3} />
-								<stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
+								<stop offset="0%" stopColor={CHART_SEMANTIC.primary} stopOpacity={0.3} />
+								<stop offset="100%" stopColor={CHART_SEMANTIC.primary} stopOpacity={0} />
 							</linearGradient>
 							<linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
-								<stop offset="0%" stopColor="#0ea5e9" stopOpacity={0.3} />
-								<stop offset="100%" stopColor="#0ea5e9" stopOpacity={0} />
+								<stop offset="0%" stopColor={CHART_PALETTE[0]} stopOpacity={0.3} />
+								<stop offset="100%" stopColor={CHART_PALETTE[0]} stopOpacity={0} />
 							</linearGradient>
 						</defs>
 						<CartesianGrid vertical={false} strokeDasharray="3 3" />
@@ -117,7 +127,7 @@ export function ProjectTimelineChart({
 							dataKey="planned"
 							type="monotone"
 							fill="url(#plannedGradient)"
-							stroke="#3b82f6"
+							stroke={CHART_SEMANTIC.primary}
 							strokeWidth={2}
 							strokeDasharray="5 3"
 							connectNulls
@@ -126,7 +136,7 @@ export function ProjectTimelineChart({
 							dataKey="actual"
 							type="monotone"
 							fill="url(#actualGradient)"
-							stroke="#0ea5e9"
+							stroke={CHART_PALETTE[0]}
 							strokeWidth={2}
 							connectNulls
 						/>

@@ -8,6 +8,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Badge } from "@ui/components/badge";
+import { StatusChip } from "@ui/components/status-chip";
 import { Card, CardContent } from "@ui/components/card";
 import {
 	Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -25,11 +26,6 @@ interface OwnerDrawingsListProps {
 	organizationId: string;
 	organizationSlug: string;
 }
-
-const STATUS_COLORS: Record<string, string> = {
-	APPROVED: "bg-green-100 text-green-700",
-	CANCELLED: "bg-red-100 text-red-700",
-};
 
 const TYPE_COLORS: Record<string, string> = {
 	COMPANY_LEVEL: "border-blue-300 text-blue-700 bg-blue-50",
@@ -271,9 +267,9 @@ export function OwnerDrawingsList({
 									</TableCell>
 									<TableCell className="hidden lg:table-cell">{d.project?.name ?? "-"}</TableCell>
 									<TableCell className="hidden md:table-cell">
-										<Badge className={STATUS_COLORS[d.status] ?? ""}>
+										<StatusChip status={d.status}>
 											{t(`finance.ownerDrawings.statuses.${d.status}`)}
-										</Badge>
+										</StatusChip>
 									</TableCell>
 									<TableCell>
 										<Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>

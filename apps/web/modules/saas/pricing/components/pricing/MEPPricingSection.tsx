@@ -253,7 +253,7 @@ function MEPPricingRow({
 			<span className="truncate text-sm">{item.name}</span>
 
 			{/* Quantity */}
-			<span className="text-left tabular-nums text-xs text-muted-foreground" dir="ltr">
+			<span className="text-start tabular-nums text-xs text-muted-foreground" dir="ltr">
 				{formatNumber(item.quantity, 1)}
 			</span>
 
@@ -304,7 +304,7 @@ function MEPPricingRow({
 			/>
 
 			{/* Total */}
-			<span className="text-left font-semibold tabular-nums text-sm" dir="ltr">
+			<span className="text-start font-semibold tabular-nums text-sm" dir="ltr">
 				{formatCurrency(item.isEnabled ? item.totalCost : 0)}
 			</span>
 		</div>

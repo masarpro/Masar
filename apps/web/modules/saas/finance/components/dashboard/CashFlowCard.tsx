@@ -60,7 +60,7 @@ export function CashFlowCard({ organizationId }: CashFlowCardProps) {
 	const chartConfig: ChartConfig = {
 		amount: {
 			label: t("finance.dashboard.overview.cashFlow"),
-			color: "hsl(var(--primary))",
+			color: "var(--primary)",
 		},
 	};
 

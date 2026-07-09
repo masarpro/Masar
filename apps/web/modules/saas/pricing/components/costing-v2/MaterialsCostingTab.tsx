@@ -535,7 +535,7 @@ export function MaterialsCostingTab({
 				<Table>
 					<TableHeader>
 						<TableRow className="bg-muted/20">
-							<TableHead className="text-right font-medium">المادة</TableHead>
+							<TableHead className="text-start font-medium">المادة</TableHead>
 							<TableHead className="text-center font-medium">الكمية</TableHead>
 							<TableHead className="text-center font-medium">الوحدة</TableHead>
 							<TableHead className="text-center font-medium">السعر</TableHead>

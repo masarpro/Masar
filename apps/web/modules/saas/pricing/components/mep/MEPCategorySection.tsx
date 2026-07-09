@@ -87,10 +87,10 @@ export function MEPCategorySection({
 					<div className={showPricing ? "grid grid-cols-[32px_1fr_80px_60px_90px_90px_32px] sm:grid-cols-[32px_1fr_80px_60px_90px_90px_80px_32px] items-center gap-2 px-3 text-xs text-muted-foreground font-medium" : "grid grid-cols-[32px_1fr_80px_60px_80px_32px] sm:grid-cols-[32px_1fr_80px_60px_80px_32px] items-center gap-2 px-3 text-xs text-muted-foreground font-medium"}>
 						<span />
 						<span>{t("table.item")}</span>
-						<span className="text-left">{t("table.quantity")}</span>
+						<span className="text-end">{t("table.quantity")}</span>
 						<span>{t("table.unit")}</span>
-						{showPricing && <span className="text-left">{t("table.unitPrice")}</span>}
-						{showPricing && <span className="text-left">{t("table.total")}</span>}
+						{showPricing && <span className="text-end">{t("table.unitPrice")}</span>}
+						{showPricing && <span className="text-end">{t("table.total")}</span>}
 						{showPricing && <span className="hidden sm:block text-center">
 							{t("table.formula")}
 						</span>}

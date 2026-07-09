@@ -327,16 +327,16 @@ export function ImportItemsDialog({
 							<table className="w-full text-sm">
 								<thead>
 									<tr className="border-b bg-muted/50">
-										<th className="px-2 py-2 text-right font-medium">
+										<th className="px-2 py-2 text-start font-medium">
 											{t("description")}
 										</th>
-										<th className="px-2 py-2 text-right font-medium w-28">
+										<th className="px-2 py-2 text-start font-medium w-28">
 											{t("unit")}
 										</th>
-										<th className="px-2 py-2 text-right font-medium w-24">
+										<th className="px-2 py-2 text-start font-medium w-24">
 											{t("quantity")}
 										</th>
-										<th className="px-2 py-2 text-right font-medium w-28">
+										<th className="px-2 py-2 text-start font-medium w-28">
 											{t("section")}
 										</th>
 										<th className="px-2 py-2 w-10" />
@@ -457,19 +457,19 @@ export function ImportItemsDialog({
 							<table className="w-full text-sm">
 								<thead className="sticky top-0 bg-background">
 									<tr className="border-b bg-muted/50">
-										<th className="px-2 py-2 text-right font-medium w-10">
+										<th className="px-2 py-2 text-start font-medium w-10">
 											#
 										</th>
-										<th className="px-2 py-2 text-right font-medium">
+										<th className="px-2 py-2 text-start font-medium">
 											{t("description")}
 										</th>
-										<th className="px-2 py-2 text-right font-medium w-20">
+										<th className="px-2 py-2 text-start font-medium w-20">
 											{t("unit")}
 										</th>
-										<th className="px-2 py-2 text-right font-medium w-24">
+										<th className="px-2 py-2 text-start font-medium w-24">
 											{t("quantity")}
 										</th>
-										<th className="px-2 py-2 text-right font-medium w-28">
+										<th className="px-2 py-2 text-start font-medium w-28">
 											{t("section")}
 										</th>
 									</tr>

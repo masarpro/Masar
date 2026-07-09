@@ -111,7 +111,7 @@ export function CostingTable({
 						)}>
 							<h3 className="font-semibold text-sm">
 								{SECTION_LABELS[section] || section}
-								<span className="text-muted-foreground font-normal mr-2">
+								<span className="text-muted-foreground font-normal ms-2">
 									({sectionItems.length} بند)
 								</span>
 							</h3>
@@ -125,8 +125,8 @@ export function CostingTable({
 							<table className="w-full text-xs">
 								<thead>
 									<tr className="border-b bg-muted/30 text-muted-foreground">
-										<th className="px-2 py-2 text-right font-medium w-8">#</th>
-										<th className="px-2 py-2 text-right font-medium min-w-[180px]">{t("pricing.pipeline.costingItem")}</th>
+										<th className="px-2 py-2 text-start font-medium w-8">#</th>
+										<th className="px-2 py-2 text-start font-medium min-w-[180px]">{t("pricing.pipeline.costingItem")}</th>
 										<th className="px-2 py-2 text-center font-medium w-16">{t("pricing.pipeline.costingQty")}</th>
 										<th className="px-2 py-2 text-center font-medium w-14">{t("pricing.pipeline.costingUnit")}</th>
 										<th className="px-2 py-2 text-center font-medium w-24">{t("pricing.pipeline.costingMatPrice")}</th>

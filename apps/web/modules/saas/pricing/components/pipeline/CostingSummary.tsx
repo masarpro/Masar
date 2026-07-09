@@ -59,11 +59,11 @@ export function CostingSummary({
 					<table className="w-full text-sm">
 						<thead>
 							<tr className="border-b bg-muted/50 text-muted-foreground">
-								<th className="px-3 py-2 text-right font-medium">{t("pricing.pipeline.costingSection")}</th>
-								<th className="px-3 py-2 text-left font-medium">{t("pricing.pipeline.costingMaterial")}</th>
-								<th className="px-3 py-2 text-left font-medium">{t("pricing.pipeline.costingLabor")}</th>
-								<th className="px-3 py-2 text-left font-medium">{t("pricing.pipeline.costingStorage")}</th>
-								<th className="px-3 py-2 text-left font-medium">{t("pricing.pipeline.costingTotal")}</th>
+								<th className="px-3 py-2 text-start font-medium">{t("pricing.pipeline.costingSection")}</th>
+								<th className="px-3 py-2 text-end font-medium">{t("pricing.pipeline.costingMaterial")}</th>
+								<th className="px-3 py-2 text-end font-medium">{t("pricing.pipeline.costingLabor")}</th>
+								<th className="px-3 py-2 text-end font-medium">{t("pricing.pipeline.costingStorage")}</th>
+								<th className="px-3 py-2 text-end font-medium">{t("pricing.pipeline.costingTotal")}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -72,16 +72,16 @@ export function CostingSummary({
 									<td className="px-3 py-2 font-medium">
 										{SECTION_LABELS[sec.section] || sec.section}
 									</td>
-									<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+									<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 										{formatAmount(sec.materialTotal)}
 									</td>
-									<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+									<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 										{formatAmount(sec.laborTotal)}
 									</td>
-									<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+									<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 										{formatAmount(sec.storageTotal)}
 									</td>
-									<td className="px-3 py-2 tabular-nums text-left font-medium" dir="ltr">
+									<td className="px-3 py-2 tabular-nums text-start font-medium" dir="ltr">
 										{formatAmount(sec.total)}
 									</td>
 								</tr>
@@ -90,16 +90,16 @@ export function CostingSummary({
 							{/* Grand total row */}
 							<tr className="border-t-2 bg-muted/30 font-semibold">
 								<td className="px-3 py-2">{t("pricing.pipeline.costingGrandTotal")}</td>
-								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+								<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 									{formatAmount(d.grandTotal.material)}
 								</td>
-								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+								<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 									{formatAmount(d.grandTotal.labor)}
 								</td>
-								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+								<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 									{formatAmount(d.grandTotal.storage)}
 								</td>
-								<td className="px-3 py-2 tabular-nums text-left" dir="ltr">
+								<td className="px-3 py-2 tabular-nums text-start" dir="ltr">
 									{formatAmount(d.grandTotal.total)}
 								</td>
 							</tr>

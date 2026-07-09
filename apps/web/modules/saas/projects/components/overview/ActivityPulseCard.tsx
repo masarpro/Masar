@@ -1,5 +1,6 @@
 "use client";
 
+import { chartColor } from "@saas/shared/lib/chart-colors";
 import {
 	type ChartConfig,
 	ChartContainer,
@@ -30,15 +31,15 @@ const totalInteractions = mockActivityData.reduce(
 const chartConfig: ChartConfig = {
 	reports: {
 		label: "Reports",
-		color: "#3b82f6",
+		color: chartColor(0),
 	},
 	photos: {
 		label: "Photos",
-		color: "#8b5cf6",
+		color: chartColor(1),
 	},
 	issues: {
 		label: "Issues",
-		color: "#f59e0b",
+		color: chartColor(2),
 	},
 };
 
@@ -80,19 +81,19 @@ export function ActivityPulseCard() {
 					<Bar
 						dataKey="reports"
 						stackId="a"
-						fill="#3b82f6"
+						fill={chartColor(0)}
 						radius={[0, 0, 0, 0]}
 					/>
 					<Bar
 						dataKey="photos"
 						stackId="a"
-						fill="#8b5cf6"
+						fill={chartColor(1)}
 						radius={[0, 0, 0, 0]}
 					/>
 					<Bar
 						dataKey="issues"
 						stackId="a"
-						fill="#f59e0b"
+						fill={chartColor(2)}
 						radius={[2, 2, 0, 0]}
 					/>
 				</BarChart>
@@ -101,19 +102,28 @@ export function ActivityPulseCard() {
 			{/* Legend */}
 			<div className="flex items-center justify-center gap-4 mt-2">
 				<div className="flex items-center gap-1.5">
-					<div className="h-2 w-2 rounded-full bg-blue-500" />
+					<div
+						className="h-2 w-2 rounded-full"
+						style={{ backgroundColor: chartColor(0) }}
+					/>
 					<span className="text-[10px] text-slate-500 dark:text-slate-400">
 						{t("projects.commandCenter.reports")}
 					</span>
 				</div>
 				<div className="flex items-center gap-1.5">
-					<div className="h-2 w-2 rounded-full bg-violet-500" />
+					<div
+						className="h-2 w-2 rounded-full"
+						style={{ backgroundColor: chartColor(1) }}
+					/>
 					<span className="text-[10px] text-slate-500 dark:text-slate-400">
 						{t("projects.commandCenter.photos")}
 					</span>
 				</div>
 				<div className="flex items-center gap-1.5">
-					<div className="h-2 w-2 rounded-full bg-amber-500" />
+					<div
+						className="h-2 w-2 rounded-full"
+						style={{ backgroundColor: chartColor(2) }}
+					/>
 					<span className="text-[10px] text-slate-500 dark:text-slate-400">
 						{t("projects.commandCenter.issues")}
 					</span>

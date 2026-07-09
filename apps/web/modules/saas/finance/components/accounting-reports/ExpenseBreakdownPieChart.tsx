@@ -1,5 +1,6 @@
 "use client";
 
+import { CHART_PALETTE } from "@saas/shared/lib/chart-colors";
 import {
 	PieChart,
 	Pie,
@@ -9,17 +10,13 @@ import {
 	Legend,
 } from "recharts";
 
+// 10 slices: the 5 platform palette colors followed by 40%-lighter
+// variants so adjacent slices never repeat the exact same color.
 const EXPENSE_COLORS = [
-	"#3b82f6",
-	"#ef4444",
-	"#f97316",
-	"#eab308",
-	"#22c55e",
-	"#8b5cf6",
-	"#ec4899",
-	"#06b6d4",
-	"#84cc16",
-	"#f43f5e",
+	...CHART_PALETTE,
+	...CHART_PALETTE.map(
+		(color) => `color-mix(in srgb, ${color} 60%, white)`,
+	),
 ];
 
 interface ExpenseBreakdownPieChartProps {

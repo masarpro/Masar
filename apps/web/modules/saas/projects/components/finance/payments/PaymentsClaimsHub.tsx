@@ -41,7 +41,7 @@ export function PaymentsClaimsHub({
 						className="rounded-xl bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600"
 					>
 						<Link href={`${basePath}/finance/payments/new`}>
-							<Plus className="ml-1.5 h-4 w-4" />
+							<Plus className="me-1.5 h-4 w-4" />
 							{t("paymentsHub.newPayment")}
 						</Link>
 					</Button>
@@ -52,7 +52,7 @@ export function PaymentsClaimsHub({
 						className="rounded-xl border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-800 dark:text-amber-400 dark:hover:bg-amber-950/20"
 					>
 						<Link href={`${basePath}/finance/claims/new`}>
-							<Plus className="ml-1.5 h-4 w-4" />
+							<Plus className="me-1.5 h-4 w-4" />
 							{t("paymentsHub.newClaim")}
 						</Link>
 					</Button>

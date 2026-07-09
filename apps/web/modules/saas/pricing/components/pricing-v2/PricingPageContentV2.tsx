@@ -459,7 +459,7 @@ export function PricingPageContentV2({
 							type="button"
 							onClick={() => setMethod(opt.key)}
 							className={cn(
-								"flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-sm transition-all text-right",
+								"flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-sm transition-all text-start",
 								method === opt.key
 									? "border-primary bg-primary/5 shadow-sm"
 									: "border-border hover:border-muted-foreground/30",
@@ -550,7 +550,7 @@ export function PricingPageContentV2({
 						<table className="w-full text-sm">
 							<thead>
 								<tr className="border-b bg-muted/30 text-muted-foreground">
-									<th className="px-4 py-3 text-right font-medium">
+									<th className="px-4 py-3 text-start font-medium">
 										{t("table.section")}
 									</th>
 									<th className="px-4 py-3 text-center font-medium">
@@ -924,10 +924,10 @@ export function PricingPageContentV2({
 								<table className="w-full text-sm">
 									<thead>
 										<tr className="border-b bg-muted/30 text-muted-foreground">
-											<th className="px-4 py-3 text-right font-medium w-8">
+											<th className="px-4 py-3 text-start font-medium w-8">
 												#
 											</th>
-											<th className="px-4 py-3 text-right font-medium">
+											<th className="px-4 py-3 text-start font-medium">
 												{t("itemsTable.item")}
 											</th>
 											<th className="px-4 py-3 text-center font-medium">

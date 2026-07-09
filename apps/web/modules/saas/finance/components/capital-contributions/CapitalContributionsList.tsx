@@ -8,6 +8,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Badge } from "@ui/components/badge";
+import { StatusChip } from "@ui/components/status-chip";
 import { Card, CardContent } from "@ui/components/card";
 import {
 	Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -25,11 +26,6 @@ interface CapitalContributionsListProps {
 	organizationId: string;
 	organizationSlug: string;
 }
-
-const STATUS_COLORS: Record<string, string> = {
-	ACTIVE: "bg-green-100 text-green-700",
-	CANCELLED: "bg-red-100 text-red-700",
-};
 
 const TYPE_COLORS: Record<string, string> = {
 	INITIAL: "border-blue-300 text-blue-700 bg-blue-50",
@@ -214,9 +210,9 @@ export function CapitalContributionsList({
 										</Badge>
 									</TableCell>
 									<TableCell className="hidden md:table-cell">
-										<Badge className={STATUS_COLORS[c.status] ?? ""}>
+										<StatusChip status={c.status}>
 											{t(`finance.capitalContributions.statuses.${c.status}`)}
-										</Badge>
+										</StatusChip>
 									</TableCell>
 									<TableCell>
 										<Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>

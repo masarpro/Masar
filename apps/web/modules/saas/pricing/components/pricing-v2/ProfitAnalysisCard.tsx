@@ -64,8 +64,8 @@ export function ProfitAnalysisCard({ data }: ProfitAnalysisCardProps) {
 			<Table>
 				<TableHeader>
 					<TableRow className="bg-muted/30">
-						<TableHead className="text-right font-medium">البيان</TableHead>
-						<TableHead className="text-left font-medium w-[180px]">المبلغ</TableHead>
+						<TableHead className="text-start font-medium">البيان</TableHead>
+						<TableHead className="text-end font-medium w-[180px]">المبلغ</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
@@ -75,7 +75,7 @@ export function ProfitAnalysisCard({ data }: ProfitAnalysisCardProps) {
 							className={row.isSeparator ? "border-t-2 border-primary/20 font-medium" : ""}
 						>
 							<TableCell className="py-3">{row.label}</TableCell>
-							<TableCell className="py-3 text-left" dir="ltr">
+							<TableCell className="py-3 text-start" dir="ltr">
 								{fmt(row.value)} ر.س
 							</TableCell>
 						</TableRow>
@@ -86,7 +86,7 @@ export function ProfitAnalysisCard({ data }: ProfitAnalysisCardProps) {
 						<TableCell className="py-4 text-base font-bold">
 							الإجمالي النهائي
 						</TableCell>
-						<TableCell className="py-4 text-left text-xl font-bold" dir="ltr">
+						<TableCell className="py-4 text-start text-xl font-bold" dir="ltr">
 							{fmt(data.grandTotal)} ر.س
 						</TableCell>
 					</TableRow>

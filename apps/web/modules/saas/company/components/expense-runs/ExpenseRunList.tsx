@@ -31,6 +31,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@ui/components/dialog";
+import { EmptyState } from "@ui/components/empty-state";
 import { Plus, CalendarRange, Receipt, FileText, Loader2, Send, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
@@ -328,15 +329,11 @@ export function ExpenseRunList({ organizationId, organizationSlug }: ExpenseRunL
 							))
 						) : (
 							<TableRow>
-								<TableCell colSpan={6} className="text-center py-16">
-									<div className="flex flex-col items-center">
-										<div className="mb-4 rounded-2xl bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-xl p-5">
-											<FileText className="h-10 w-10 text-slate-400 dark:text-slate-500" />
-										</div>
-										<p className="text-sm text-slate-500 dark:text-slate-400">
-											{t("company.expenseRuns.noRuns")}
-										</p>
-									</div>
+								<TableCell colSpan={6}>
+									<EmptyState
+										icon={<FileText className="h-10 w-10" />}
+										description={t("company.expenseRuns.noRuns")}
+									/>
 								</TableCell>
 							</TableRow>
 						)}

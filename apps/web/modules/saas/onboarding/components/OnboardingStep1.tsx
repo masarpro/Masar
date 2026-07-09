@@ -106,7 +106,7 @@ export function OnboardingStep1({ onCompleted }: { onCompleted: () => void }) {
 
 					<Button type="submit" loading={form.formState.isSubmitting}>
 						{t("onboarding.continue")}
-						<ArrowRightIcon className="ml-2 size-4" />
+						<ArrowRightIcon className="me-2 size-4 rtl-flip" />
 					</Button>
 				</form>
 			</Form>

@@ -228,7 +228,7 @@ export function UserList() {
 											})
 										}
 									>
-										<SquareUserRoundIcon className="mr-2 size-4" />
+										<SquareUserRoundIcon className="ms-2 size-4" />
 										{t("admin.users.impersonate")}
 									</DropdownMenuItem>
 
@@ -240,7 +240,7 @@ export function UserList() {
 												)
 											}
 										>
-											<Repeat1Icon className="mr-2 size-4" />
+											<Repeat1Icon className="ms-2 size-4" />
 											{t(
 												"admin.users.resendVerificationMail.title",
 											)}
@@ -253,7 +253,7 @@ export function UserList() {
 												assignAdminRole(row.original.id)
 											}
 										>
-											<ShieldCheckIcon className="mr-2 size-4" />
+											<ShieldCheckIcon className="ms-2 size-4" />
 											{t("admin.users.assignAdminRole")}
 										</DropdownMenuItem>
 									) : (
@@ -262,7 +262,7 @@ export function UserList() {
 												removeAdminRole(row.original.id)
 											}
 										>
-											<ShieldXIcon className="mr-2 size-4" />
+											<ShieldXIcon className="ms-2 size-4" />
 											{t("admin.users.removeAdminRole")}
 										</DropdownMenuItem>
 									)}
@@ -286,7 +286,7 @@ export function UserList() {
 										}
 									>
 										<span className="flex items-center text-destructive hover:text-destructive">
-											<TrashIcon className="mr-2 size-4" />
+											<TrashIcon className="ms-2 size-4" />
 											{t("admin.users.delete")}
 										</span>
 									</DropdownMenuItem>

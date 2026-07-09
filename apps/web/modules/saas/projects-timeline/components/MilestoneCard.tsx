@@ -154,7 +154,7 @@ export function MilestoneCard({
 							onClick={onStart}
 							disabled={isLoading}
 						>
-							<PlayIcon className="h-4 w-4 mr-1" />
+							<PlayIcon className="h-4 w-4 ms-1" />
 							{t("timeline.actions.start")}
 						</Button>
 					)}
@@ -166,7 +166,7 @@ export function MilestoneCard({
 							onClick={onComplete}
 							disabled={isLoading}
 						>
-							<CheckIcon className="h-4 w-4 mr-1" />
+							<CheckIcon className="h-4 w-4 ms-1" />
 							{t("timeline.actions.complete")}
 						</Button>
 					)}
@@ -180,7 +180,7 @@ export function MilestoneCard({
 						<DropdownMenuContent align="end">
 							{onEdit && (
 								<DropdownMenuItem onClick={onEdit}>
-									<EditIcon className="h-4 w-4 mr-2" />
+									<EditIcon className="h-4 w-4 ms-2" />
 									{t("timeline.actions.edit")}
 								</DropdownMenuItem>
 							)}
@@ -199,7 +199,7 @@ export function MilestoneCard({
 										}
 									}}
 								>
-									<CalendarIcon className="h-4 w-4 mr-2" />
+									<CalendarIcon className="h-4 w-4 ms-2" />
 									{t("timeline.actions.updateProgress")}
 								</DropdownMenuItem>
 							)}
@@ -210,7 +210,7 @@ export function MilestoneCard({
 										onClick={onDelete}
 										className="text-destructive"
 									>
-										<TrashIcon className="h-4 w-4 mr-2" />
+										<TrashIcon className="h-4 w-4 ms-2" />
 										{t("timeline.actions.delete")}
 									</DropdownMenuItem>
 								</>

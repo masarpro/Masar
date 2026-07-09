@@ -193,7 +193,7 @@ export function BlocksSection({
 								className="w-full bg-primary/10 text-primary border-2 border-dashed border-primary/40 hover:bg-primary/20 hover:border-primary/60 transition-all"
 								onClick={() => setAddingForSection("general")}
 							>
-								<Plus className="h-5 w-5 ml-2" />
+								<Plus className="h-5 w-5 me-2" />
 								<span className="font-semibold">{t("pricing.studies.structural.addItem")}</span>
 							</Button>
 						)}
@@ -282,7 +282,7 @@ export function BlocksSection({
 											className="w-full bg-primary/10 text-primary border-2 border-dashed border-primary/40 hover:bg-primary/20 hover:border-primary/60 transition-all"
 											onClick={() => setAddingForSection(floor.label)}
 										>
-											<Plus className="h-5 w-5 ml-2" />
+											<Plus className="h-5 w-5 me-2" />
 											<span className="font-semibold">{t("pricing.studies.structural.addItem")}</span>
 										</Button>
 										{/* Copy from floor */}

@@ -921,7 +921,7 @@ export function QuotationForm({
 								<Save className="h-3.5 w-3.5 me-1.5" />
 								{isCommitting ? t("common.saving") : t("common.save")}
 							</Button>
-							<Button type="button" size="sm" disabled={isBusy} onClick={handleSendClick} className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] transition-all">
+							<Button type="button" size="sm" disabled={isBusy} onClick={handleSendClick} className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-primary-glow transition-all">
 								<Send className="h-3.5 w-3.5 me-1.5" />
 								{isPublishing ? t("common.saving") : t("pricing.quotations.actions.send")}
 							</Button>
@@ -1427,7 +1427,7 @@ export function QuotationForm({
 								totalAmount={totals.totalAmount}
 							/>
 							{/* Gradient Total Bar */}
-							<div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-primary via-primary/90 to-primary/80 flex items-center justify-between shadow-[0_4px_20px_hsl(var(--primary)/0.3)]">
+							<div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-primary via-primary/90 to-primary/80 flex items-center justify-between shadow-primary-glow">
 								<div>
 									<div className="text-[11px] text-primary-foreground/70 font-medium tracking-wide">{t("finance.summary.total")}</div>
 								</div>

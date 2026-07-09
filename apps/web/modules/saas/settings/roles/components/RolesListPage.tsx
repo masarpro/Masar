@@ -72,7 +72,7 @@ export function RolesListPage() {
 					</p>
 				</div>
 				<Button size="sm">
-					<PlusIcon className="ml-2 size-4" />
+					<PlusIcon className="me-2 size-4" />
 					دور مخصص
 				</Button>
 			</div>
@@ -126,7 +126,7 @@ export function RolesListPage() {
 												e.stopPropagation();
 											}}
 										>
-											<SettingsIcon className="ml-1 size-4" />
+											<SettingsIcon className="me-1 size-4" />
 											الصلاحيات
 										</Button>
 										{!role.isSystem && (

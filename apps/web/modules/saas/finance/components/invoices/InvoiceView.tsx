@@ -376,7 +376,7 @@ export function InvoiceView({
 								</span>
 							)}
 							{isDraft && (
-								<Button size="sm" onClick={() => setIssueDialogOpen(true)} className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-[0_4px_15px_hsl(var(--primary)/0.35)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.45)] transition-all">
+								<Button size="sm" onClick={() => setIssueDialogOpen(true)} className="h-8 rounded-[10px] text-xs px-5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 shadow-primary-glow hover:shadow-primary-glow-lg transition-all">
 									<FileCheck className="h-3.5 w-3.5 me-1.5" />
 									{t("finance.invoices.issueInvoice")}
 								</Button>

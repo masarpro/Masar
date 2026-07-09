@@ -10,6 +10,7 @@ import { Button } from "@ui/components/button";
 import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
 import { Badge } from "@ui/components/badge";
+import { statusToneClasses } from "@ui/components/status-chip";
 import {
 	Select,
 	SelectContent,
@@ -43,13 +44,6 @@ interface PayrollRunListProps {
 }
 
 const PAYROLL_STATUSES = ["DRAFT", "APPROVED", "PAID", "CANCELLED"] as const;
-
-const STATUS_STYLES: Record<string, string> = {
-	DRAFT: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
-	APPROVED: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400",
-	PAID: "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400",
-	CANCELLED: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400",
-};
 
 export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunListProps) {
 	const t = useTranslations();
@@ -101,10 +95,9 @@ export function PayrollRunList({ organizationId, organizationSlug }: PayrollRunL
 	});
 
 	const getStatusBadge = (status: string) => {
-		const style = STATUS_STYLES[status] ?? STATUS_STYLES.DRAFT;
 		const labelKey = status.toLowerCase() as "draft" | "approved" | "paid" | "cancelled";
 		return (
-			<Badge className={`border-0 text-[10px] px-2 py-0.5 ${style}`}>
+			<Badge className={`border-0 text-[10px] px-2 py-0.5 ${statusToneClasses(status)}`}>
 				{t(`company.payroll.${labelKey}`)}
 			</Badge>
 		);

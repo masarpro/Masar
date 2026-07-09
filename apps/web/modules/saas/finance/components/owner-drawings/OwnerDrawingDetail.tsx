@@ -8,6 +8,7 @@ import { orpc } from "@shared/lib/orpc-query-utils";
 import { orpcClient } from "@shared/lib/orpc-client";
 import { Button } from "@ui/components/button";
 import { Badge } from "@ui/components/badge";
+import { StatusChip } from "@ui/components/status-chip";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
 import { Textarea } from "@ui/components/textarea";
 import {
@@ -28,11 +29,6 @@ interface OwnerDrawingDetailProps {
 	organizationSlug: string;
 	drawingId: string;
 }
-
-const STATUS_COLORS: Record<string, string> = {
-	APPROVED: "bg-green-100 text-green-700",
-	CANCELLED: "bg-red-100 text-red-700",
-};
 
 const TYPE_COLORS: Record<string, string> = {
 	COMPANY_LEVEL: "border-blue-300 text-blue-700 bg-blue-50",
@@ -185,9 +181,9 @@ export function OwnerDrawingDetail({
 					<div>
 						<div className="flex items-center gap-2">
 							<h1 className="text-2xl font-bold font-mono">{drawing.drawingNo}</h1>
-							<Badge className={STATUS_COLORS[drawing.status] ?? ""}>
+							<StatusChip status={drawing.status}>
 								{t(`finance.ownerDrawings.statuses.${drawing.status}`)}
-							</Badge>
+							</StatusChip>
 							<Badge variant="outline" className={TYPE_COLORS[drawing.type] ?? ""}>
 								{t(`finance.ownerDrawings.types.${drawing.type}`)}
 							</Badge>

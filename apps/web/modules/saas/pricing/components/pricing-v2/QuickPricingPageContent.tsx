@@ -260,13 +260,13 @@ export function QuickPricingPageContent({
 					<table className="w-full text-sm">
 						<thead>
 							<tr className="border-b bg-muted/50">
-								<th className="px-3 py-3 text-right font-medium w-10">
+								<th className="px-3 py-3 text-start font-medium w-10">
 									#
 								</th>
-								<th className="px-3 py-3 text-right font-medium min-w-[220px]">
+								<th className="px-3 py-3 text-start font-medium min-w-[220px]">
 									{t("table.description")}
 								</th>
-								<th className="px-3 py-3 text-right font-medium w-28">
+								<th className="px-3 py-3 text-start font-medium w-28">
 									{t("table.unit")}
 								</th>
 								<th className="px-3 py-3 text-center font-medium w-28">
@@ -487,7 +487,7 @@ export function QuickPricingPageContent({
 					</div>
 
 					{/* Right column — inputs */}
-					<div className="space-y-4 sm:border-r sm:pr-4">
+					<div className="space-y-4 sm:border-r sm:ps-4">
 						<div className="space-y-1.5">
 							<label className="text-xs font-medium text-muted-foreground">
 								{t("common.profitMarginPct")}

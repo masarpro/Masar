@@ -492,10 +492,10 @@ function MaterialSectionCard({
 							<Table>
 								<TableHeader>
 									<TableRow className="bg-muted/30">
-										<TableHead className="text-right text-xs">{t("structural.boq.element")}</TableHead>
-										<TableHead className="text-right text-xs">{t("structural.boq.category")}</TableHead>
-										<TableHead className="text-right text-xs">{t("structural.boq.quantity")}</TableHead>
-										<TableHead className="text-right text-xs">{valueLabel}</TableHead>
+										<TableHead className="text-start text-xs">{t("structural.boq.element")}</TableHead>
+										<TableHead className="text-start text-xs">{t("structural.boq.category")}</TableHead>
+										<TableHead className="text-start text-xs">{t("structural.boq.quantity")}</TableHead>
+										<TableHead className="text-start text-xs">{valueLabel}</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
@@ -586,11 +586,11 @@ function SharedItemsCard({
 							<Table>
 								<TableHeader>
 									<TableRow className="bg-muted/30">
-										<TableHead className="text-right text-xs">{t("structural.boq.element")}</TableHead>
-										<TableHead className="text-right text-xs">{t("structural.boq.category")}</TableHead>
-										<TableHead className="text-right text-xs">{t("structural.boq.quantity")}</TableHead>
-										<TableHead className="text-right text-xs">{t("boq.concreteM3")}</TableHead>
-										<TableHead className="text-right text-xs">{t("boq.steelKg")}</TableHead>
+										<TableHead className="text-start text-xs">{t("structural.boq.element")}</TableHead>
+										<TableHead className="text-start text-xs">{t("structural.boq.category")}</TableHead>
+										<TableHead className="text-start text-xs">{t("structural.boq.quantity")}</TableHead>
+										<TableHead className="text-start text-xs">{t("boq.concreteM3")}</TableHead>
+										<TableHead className="text-start text-xs">{t("boq.steelKg")}</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
@@ -756,14 +756,14 @@ function SubGroupView({
 				<Table>
 					<TableHeader>
 						<TableRow className="bg-muted/30">
-							<TableHead className="text-right text-xs">{t("structural.boq.element")}</TableHead>
-							<TableHead className="text-right text-xs">{t("structural.boq.quantity")}</TableHead>
-							<TableHead className="text-right text-xs">{t("boq.concreteM3")}</TableHead>
-							<TableHead className="text-right text-xs">{t("boq.steelKg")}</TableHead>
+							<TableHead className="text-start text-xs">{t("structural.boq.element")}</TableHead>
+							<TableHead className="text-start text-xs">{t("structural.boq.quantity")}</TableHead>
+							<TableHead className="text-start text-xs">{t("boq.concreteM3")}</TableHead>
+							<TableHead className="text-start text-xs">{t("boq.steelKg")}</TableHead>
 							{category === "blocks" && (
-								<TableHead className="text-right text-xs">{t("boq.blocks")}</TableHead>
+								<TableHead className="text-start text-xs">{t("boq.blocks")}</TableHead>
 							)}
-							<TableHead className="text-right text-xs w-8"></TableHead>
+							<TableHead className="text-start text-xs w-8"></TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -862,13 +862,13 @@ function CuttingDetailsInline({
 				<table className="w-full text-xs">
 					<thead>
 						<tr className="border-b text-muted-foreground">
-							<th className="text-right py-1 px-2">{t("boq.description")}</th>
-							<th className="text-right py-1 px-2">{t("structural.diameter")}</th>
-							<th className="text-right py-1 px-2">{t("boq.pieceLength")}</th>
-							<th className="text-right py-1 px-2">{t("structural.quantity")}</th>
-							<th className="text-right py-1 px-2">{t("boq.factoryBars")}</th>
-							<th className="text-right py-1 px-2">{t("boq.wastePercent")}</th>
-							<th className="text-right py-1 px-2">{t("boq.weight")}</th>
+							<th className="text-start py-1 px-2">{t("boq.description")}</th>
+							<th className="text-start py-1 px-2">{t("structural.diameter")}</th>
+							<th className="text-start py-1 px-2">{t("boq.pieceLength")}</th>
+							<th className="text-start py-1 px-2">{t("structural.quantity")}</th>
+							<th className="text-start py-1 px-2">{t("boq.factoryBars")}</th>
+							<th className="text-start py-1 px-2">{t("boq.wastePercent")}</th>
+							<th className="text-start py-1 px-2">{t("boq.weight")}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -1051,11 +1051,11 @@ function FactoryOrderTab({
 					<Table>
 						<TableHeader>
 							<TableRow className="bg-muted/30">
-								<TableHead className="text-right">{t("boq.diameterMm")}</TableHead>
-								<TableHead className="text-right">{t("boq.stockLengthM")}</TableHead>
-								<TableHead className="text-right">{t("boq.barsCount")}</TableHead>
-								<TableHead className="text-right">{t("structural.boq.weight")}</TableHead>
-								<TableHead className="text-right">{t("boq.weightTon")}</TableHead>
+								<TableHead className="text-start">{t("boq.diameterMm")}</TableHead>
+								<TableHead className="text-start">{t("boq.stockLengthM")}</TableHead>
+								<TableHead className="text-start">{t("boq.barsCount")}</TableHead>
+								<TableHead className="text-start">{t("structural.boq.weight")}</TableHead>
+								<TableHead className="text-start">{t("boq.weightTon")}</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -1192,13 +1192,13 @@ function CuttingDiameterTable({ group }: { group: CuttingDetailRow[] }) {
 			<table className="w-full caption-bottom text-sm">
 				<TableHeader className={isVirtualized ? "sticky top-0 z-10 bg-background" : ""}>
 					<TableRow>
-						<TableHead className="text-right text-xs">{t("structural.boq.element")}</TableHead>
-						<TableHead className="text-right text-xs">{t("boq.description")}</TableHead>
-						<TableHead className="text-right text-xs">{t("boq.pieceLengthM")}</TableHead>
-						<TableHead className="text-right text-xs">{t("structural.quantity")}</TableHead>
-						<TableHead className="text-right text-xs">{t("boq.factoryBars")}</TableHead>
-						<TableHead className="text-right text-xs">{t("boq.wastePercent")}</TableHead>
-						<TableHead className="text-right text-xs">{t("structural.boq.weight")}</TableHead>
+						<TableHead className="text-start text-xs">{t("structural.boq.element")}</TableHead>
+						<TableHead className="text-start text-xs">{t("boq.description")}</TableHead>
+						<TableHead className="text-start text-xs">{t("boq.pieceLengthM")}</TableHead>
+						<TableHead className="text-start text-xs">{t("structural.quantity")}</TableHead>
+						<TableHead className="text-start text-xs">{t("boq.factoryBars")}</TableHead>
+						<TableHead className="text-start text-xs">{t("boq.wastePercent")}</TableHead>
+						<TableHead className="text-start text-xs">{t("structural.boq.weight")}</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>

@@ -1,5 +1,6 @@
 "use client";
 
+import { statusToneClasses } from "@ui/components/status-chip";
 import { cn } from "@ui/lib";
 import {
 	Calculator,
@@ -179,8 +180,8 @@ export function StudySidebar({
 								"flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all group",
 								active && "bg-primary text-primary-foreground font-medium",
 								!active && skipped && "text-muted-foreground/40",
-								!active && !skipped && status === "APPROVED" && "text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30",
-								!active && !skipped && status === "DRAFT" && "text-foreground hover:bg-blue-50 dark:hover:bg-blue-950/30",
+								!active && !skipped && status === "APPROVED" && "text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/30",
+								!active && !skipped && status === "DRAFT" && "text-foreground hover:bg-muted/50",
 								!active && !skipped && status === "IN_REVIEW" && "text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30",
 								!active && !skipped && status === "NOT_STARTED" && "text-muted-foreground hover:bg-muted/50",
 							)}
@@ -191,9 +192,9 @@ export function StudySidebar({
 									"flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold",
 									active && "bg-primary-foreground/20 text-primary-foreground",
 									!active && skipped && "bg-muted/50 text-muted-foreground/40",
-									!active && !skipped && status === "APPROVED" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400",
-									!active && !skipped && status === "DRAFT" && "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400",
-									!active && !skipped && status === "IN_REVIEW" && "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400",
+									!active && !skipped && status === "APPROVED" && statusToneClasses("APPROVED"),
+									!active && !skipped && status === "DRAFT" && statusToneClasses("DRAFT"),
+									!active && !skipped && status === "IN_REVIEW" && statusToneClasses("warning"),
 									!active && !skipped && status === "NOT_STARTED" && "bg-muted text-muted-foreground",
 								)}
 							>

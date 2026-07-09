@@ -232,7 +232,7 @@ export function QuotationPreviewV2({
 										<p className="text-sm text-muted-foreground">{org.phone}</p>
 									)}
 								</div>
-								<div className="text-left space-y-1.5">
+								<div className="text-end space-y-1.5">
 									<h2 className="text-2xl font-bold text-primary tracking-tight">{t("preview.title")}</h2>
 									<p className="text-xs text-muted-foreground uppercase tracking-wide">QUOTATION</p>
 									<div className="space-y-1 mt-3">
@@ -643,7 +643,7 @@ function PerSqmView({
 					<table className="w-full text-sm">
 						<thead>
 							<tr className="border-b bg-muted/40 text-muted-foreground">
-								<th className="px-3 py-2.5 text-right font-medium">{t("table.section")}</th>
+								<th className="px-3 py-2.5 text-start font-medium">{t("table.section")}</th>
 								<th className="px-3 py-2.5 text-center font-medium">{t("table.area")}</th>
 								<th className="px-3 py-2.5 text-center font-medium">{t("table.pricePerSqmShort")}</th>
 								<th className="px-3 py-2.5 text-center font-medium">{t("table.total")}</th>
@@ -729,8 +729,8 @@ function DetailedBoqTable({
 			<table className="w-full text-sm">
 				<thead>
 					<tr className="border-b bg-muted/40 text-muted-foreground">
-						{showItemNumber && <th className="px-3 py-2.5 text-right font-medium w-10">#</th>}
-						{showDescription && <th className="px-3 py-2.5 text-right font-medium">{t("table.description")}</th>}
+						{showItemNumber && <th className="px-3 py-2.5 text-start font-medium w-10">#</th>}
+						{showDescription && <th className="px-3 py-2.5 text-start font-medium">{t("table.description")}</th>}
 						{showSpecifications && <th className="px-3 py-2.5 text-center font-medium">{t("table.specifications")}</th>}
 						{showQuantity && <th className="px-3 py-2.5 text-center font-medium">{t("table.quantity")}</th>}
 						{showUnit && <th className="px-3 py-2.5 text-center font-medium">{t("table.unit")}</th>}

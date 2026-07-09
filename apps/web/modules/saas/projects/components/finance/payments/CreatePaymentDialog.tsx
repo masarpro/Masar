@@ -281,9 +281,9 @@ export function CreatePaymentDialog({
 							className="bg-sky-600 hover:bg-sky-700"
 						>
 							{createMutation.isPending ? (
-								<Loader2 className="ml-1.5 h-4 w-4 animate-spin" />
+								<Loader2 className="me-1.5 h-4 w-4 animate-spin" />
 							) : (
-								<Save className="ml-1.5 h-4 w-4" />
+								<Save className="me-1.5 h-4 w-4" />
 							)}
 							{t("projectPayments.savePayment")}
 						</Button>

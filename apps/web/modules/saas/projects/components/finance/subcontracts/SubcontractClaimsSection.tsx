@@ -7,19 +7,9 @@ import { useQuery } from "@tanstack/react-query";
 import { formatSAR } from "@shared/lib/formatters";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { Badge } from "@ui/components/badge";
+import { statusToneClasses } from "@ui/components/status-chip";
 import { Button } from "@ui/components/button";
 import { ClipboardCheck, Plus, Printer, Eye, Loader2 } from "lucide-react";
-
-const CLAIM_STATUS_STYLES: Record<string, { bg: string; text: string }> = {
-	DRAFT: { bg: "bg-slate-100", text: "text-slate-700" },
-	SUBMITTED: { bg: "bg-blue-100", text: "text-blue-700" },
-	UNDER_REVIEW: { bg: "bg-amber-100", text: "text-amber-700" },
-	APPROVED: { bg: "bg-green-100", text: "text-green-700" },
-	REJECTED: { bg: "bg-red-100", text: "text-red-700" },
-	PARTIALLY_PAID: { bg: "bg-cyan-100", text: "text-cyan-700" },
-	PAID: { bg: "bg-emerald-100", text: "text-emerald-800" },
-	CANCELLED: { bg: "bg-gray-100", text: "text-gray-500" },
-};
 
 const CLAIM_TYPE_STYLES: Record<string, { bg: string; text: string }> = {
 	INTERIM: { bg: "bg-sky-50", text: "text-sky-700" },
@@ -124,7 +114,6 @@ export const SubcontractClaimsSection = React.memo(function SubcontractClaimsSec
 				) : (
 					<div className="space-y-2">
 						{claims.map((claim: any) => {
-							const statusStyle = CLAIM_STATUS_STYLES[claim.status] ?? CLAIM_STATUS_STYLES.DRAFT;
 							const typeStyle = CLAIM_TYPE_STYLES[claim.claimType] ?? CLAIM_TYPE_STYLES.INTERIM;
 							return (
 								<div
@@ -137,7 +126,7 @@ export const SubcontractClaimsSection = React.memo(function SubcontractClaimsSec
 											<Badge className={`border-0 text-[10px] ${typeStyle.bg} ${typeStyle.text}`}>
 												{t(`claims.types.${claim.claimType}`)}
 											</Badge>
-											<Badge className={`border-0 text-[10px] ${statusStyle.bg} ${statusStyle.text}`}>
+											<Badge className={`border-0 text-[10px] ${statusToneClasses(claim.status)}`}>
 												{t(`claims.statuses.${claim.status}`)}
 											</Badge>
 										</div>

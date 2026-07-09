@@ -53,14 +53,14 @@ function getTypeBadge(
 	if (type === "payment") {
 		return (
 			<Badge className="border-0 bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">
-				<Banknote className="ml-1 h-3 w-3" />
+				<Banknote className="me-1 h-3 w-3" />
 				{t("paymentsHub.typePayment")}
 			</Badge>
 		);
 	}
 	return (
 		<Badge className="border-0 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-			<Receipt className="ml-1 h-3 w-3" />
+			<Receipt className="me-1 h-3 w-3" />
 			{t("paymentsHub.typeClaim")}
 		</Badge>
 	);

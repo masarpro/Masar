@@ -13,6 +13,7 @@ import {
 	SelectValue,
 } from "@ui/components/select";
 import { Badge } from "@ui/components/badge";
+import { statusToneClasses } from "@ui/components/status-chip";
 import { Progress } from "@ui/components/progress";
 import {
 	Plus,
@@ -44,27 +45,12 @@ interface ProjectsListProps {
 function getStatusBadge(status: string, t: (key: string) => string) {
 	switch (status) {
 		case "ACTIVE":
-			return (
-				<Badge className="bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 border-0 text-[10px] px-2 py-0.5">
-					{t("projects.status.ACTIVE")}
-				</Badge>
-			);
 		case "ON_HOLD":
-			return (
-				<Badge className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-0 text-[10px] px-2 py-0.5">
-					{t("projects.status.ON_HOLD")}
-				</Badge>
-			);
 		case "COMPLETED":
-			return (
-				<Badge className="bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400 border-0 text-[10px] px-2 py-0.5">
-					{t("projects.status.COMPLETED")}
-				</Badge>
-			);
 		case "ARCHIVED":
 			return (
-				<Badge className="bg-slate-200 text-slate-500 dark:bg-slate-800/60 dark:text-slate-500 border-0 text-[10px] px-2 py-0.5">
-					{t("projects.status.ARCHIVED")}
+				<Badge className={`${statusToneClasses(status)} border-0 text-[10px] px-2 py-0.5`}>
+					{t(`projects.status.${status}`)}
 				</Badge>
 			);
 		default:
@@ -285,7 +271,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 							placeholder={t("projects.searchPlaceholder")}
 							value={searchTerm}
 							onChange={(e: any) => setSearchTerm(e.target.value)}
-							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl pr-10 focus:ring-1 focus:ring-primary/30"
+							className="rounded-xl border-white/20 dark:border-slate-700/30 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl ps-10 focus:ring-1 focus:ring-primary/30"
 						/>
 					</div>
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -315,7 +301,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 						className="rounded-xl bg-slate-900 text-white transition-colors hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
 					>
 						<Link href={`${basePath}/new`}>
-							<Plus className="ml-2 h-4 w-4" />
+							<Plus className="me-2 h-4 w-4" />
 							{t("projects.newProject")}
 						</Link>
 					</Button>
@@ -425,7 +411,7 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 						className="rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
 					>
 						<Link href={`${basePath}/new`}>
-							<Plus className="ml-2 h-4 w-4" />
+							<Plus className="me-2 h-4 w-4" />
 							{t("projects.newProject")}
 						</Link>
 					</Button>

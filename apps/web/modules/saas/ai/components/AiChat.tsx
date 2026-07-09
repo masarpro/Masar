@@ -240,7 +240,7 @@ export function AiChat({ organizationId }: { organizationId?: string }) {
 								variant="link"
 								onClick={() => setChatId(chat.id)}
 								className={cn(
-									"block h-auto w-full py-2 text-left text-foreground hover:no-underline",
+									"block h-auto w-full py-2 text-end text-foreground hover:no-underline",
 									chat.id === chatId &&
 										"bg-primary/10 font-bold text-primary",
 								)}
@@ -318,7 +318,7 @@ export function AiChat({ organizationId }: { organizationId?: string }) {
 						onChange={(e: any) => setInput(e.target.value)}
 						disabled={!hasChat}
 						placeholder="Chat with your AI..."
-						className="min-h-8 rounded-none border-none bg-transparent focus:outline-hidden focus-visible:ring-0 shadow-none p-6 pr-14"
+						className="min-h-8 rounded-none border-none bg-transparent focus:outline-hidden focus-visible:ring-0 shadow-none p-6 ps-14"
 						onKeyDown={(e: any) => {
 							if (e.key === "Enter" && !e.shiftKey) {
 								e.preventDefault();
@@ -331,7 +331,7 @@ export function AiChat({ organizationId }: { organizationId?: string }) {
 						type="submit"
 						size="icon"
 						variant="secondary"
-						className="absolute right-3 bottom-3"
+						className="absolute start-3 bottom-3"
 						disabled={!hasChat}
 					>
 						<SendIcon className="size-4" />

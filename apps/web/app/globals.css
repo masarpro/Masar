@@ -29,7 +29,7 @@ body {
 	letter-spacing: -0.02em;
 }
 
-/* RTL Support - IBM Plex Sans Arabic */
+/* RTL Support - Cairo (loaded as --font-arabic-sans in Document.tsx) */
 [dir="rtl"] body {
 	font-family: var(--font-arabic-sans), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 	letter-spacing: 0;
@@ -534,6 +534,15 @@ input[cmdk-input] {
 	opacity: 0;
 }
 
+/* Primary CTA glow shadows — tokens are hex, so hsl(var(--primary)/x) is invalid;
+   these utilities are the one sanctioned way to get the primary-tinted glow. */
+@utility shadow-primary-glow {
+	box-shadow: 0 4px 15px color-mix(in srgb, var(--primary) 35%, transparent);
+}
+@utility shadow-primary-glow-lg {
+	box-shadow: 0 6px 20px color-mix(in srgb, var(--primary) 45%, transparent);
+}
+
 /* Assistant scrollbar */
 .assistant-messages::-webkit-scrollbar {
 	width: 4px;
@@ -542,11 +551,11 @@ input[cmdk-input] {
 	background: transparent;
 }
 .assistant-messages::-webkit-scrollbar-thumb {
-	background: hsl(var(--muted-foreground) / 0.2);
+	background: color-mix(in srgb, var(--muted-foreground) 20%, transparent);
 	border-radius: 4px;
 }
 .assistant-messages::-webkit-scrollbar-thumb:hover {
-	background: hsl(var(--muted-foreground) / 0.3);
+	background: color-mix(in srgb, var(--muted-foreground) 30%, transparent);
 }
 
 /* Print Styles for Financial Templates */

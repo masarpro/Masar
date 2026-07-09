@@ -173,7 +173,7 @@ export function OrganizationInvitationsList({
 											revokeInvitation(row.original.id)
 										}
 									>
-										<MailXIcon className="mr-2 size-4" />
+										<MailXIcon className="ms-2 size-4" />
 										{t(
 											"organizations.settings.members.invitations.revoke",
 										)}

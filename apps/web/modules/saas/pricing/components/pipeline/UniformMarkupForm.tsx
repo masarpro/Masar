@@ -132,10 +132,10 @@ export function UniformMarkupForm({
 								min={0}
 								max={100}
 								step={0.5}
-								className="text-sm pl-8"
+								className="text-sm ps-8"
 								dir="ltr"
 							/>
-							<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
+							<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
 						</div>
 					</div>
 
@@ -153,10 +153,10 @@ export function UniformMarkupForm({
 								min={0}
 								max={100}
 								step={0.5}
-								className="text-sm pl-8"
+								className="text-sm ps-8"
 								dir="ltr"
 							/>
-							<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
+							<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
 						</div>
 					</div>
 
@@ -174,10 +174,10 @@ export function UniformMarkupForm({
 								min={0}
 								max={100}
 								step={0.5}
-								className="text-sm pl-8"
+								className="text-sm ps-8"
 								dir="ltr"
 							/>
-							<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
+							<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
 						</div>
 					</div>
 				</div>

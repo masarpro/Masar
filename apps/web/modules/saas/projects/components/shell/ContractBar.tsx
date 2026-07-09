@@ -3,6 +3,7 @@
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { Badge } from "@ui/components/badge";
+import { statusToneClasses } from "@ui/components/status-chip";
 import { useQuery } from "@tanstack/react-query";
 import { differenceInDays } from "date-fns";
 import { FileSignature } from "lucide-react";
@@ -18,18 +19,11 @@ interface ContractBarProps {
 	contractHref: string;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-	DRAFT: "bg-muted text-muted-foreground",
-	ACTIVE: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
-	SUSPENDED: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300",
-	CLOSED: "bg-muted text-muted-foreground",
-};
-
 function getProgressColor(percent: number, isOverdue: boolean): string {
 	if (isOverdue) return "rgb(220, 38, 38)"; // red-600
 	if (percent >= 90) return "rgb(239, 68, 68)"; // red-500
 	if (percent >= 70) return "rgb(245, 158, 11)"; // amber-500
-	return "hsl(var(--primary))";
+	return "var(--primary)";
 }
 
 function ContractBarInner({
@@ -98,7 +92,7 @@ function ContractBarInner({
 		: 0;
 	const barColor = hasDates ? getProgressColor(progressPercent, isOverdue) : "";
 
-	const statusColor = STATUS_COLORS[contract.status] ?? STATUS_COLORS.DRAFT;
+	const statusColor = statusToneClasses(contract.status);
 
 	return (
 		<Link

@@ -67,7 +67,7 @@ export function StructuralBuildingConfigBar({
 				)}
 			</div>
 			<Button variant="ghost" size="sm" onClick={onEdit} className="shrink-0">
-				<Pencil className="h-3 w-3 ml-1" />
+				<Pencil className="h-3 w-3 me-1" />
 				تعديل
 			</Button>
 		</div>

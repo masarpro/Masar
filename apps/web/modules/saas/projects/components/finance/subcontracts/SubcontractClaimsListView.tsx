@@ -17,6 +17,7 @@ import {
 	AlertDialogTitle,
 } from "@ui/components/alert-dialog";
 import { Badge } from "@ui/components/badge";
+import { statusToneClasses } from "@ui/components/status-chip";
 import { Button } from "@ui/components/button";
 import {
 	Table,
@@ -48,17 +49,6 @@ interface SubcontractClaimsListViewProps {
 	projectId: string;
 	subcontractId: string;
 }
-
-const statusColors: Record<string, string> = {
-	DRAFT: "bg-gray-100 text-gray-700 border-gray-200",
-	SUBMITTED: "bg-blue-50 text-blue-700 border-blue-200",
-	UNDER_REVIEW: "bg-orange-50 text-orange-700 border-orange-200",
-	APPROVED: "bg-sky-50 text-sky-700 border-sky-200",
-	PARTIALLY_PAID: "bg-yellow-50 text-yellow-700 border-yellow-200",
-	PAID: "bg-green-100 text-green-800 border-green-300",
-	REJECTED: "bg-red-50 text-red-700 border-red-200",
-	CANCELLED: "bg-gray-50 text-gray-500 border-gray-200",
-};
 
 export function SubcontractClaimsListView({
 	organizationId,
@@ -261,7 +251,7 @@ export function SubcontractClaimsListView({
 									<TableCell className="text-center">
 										<Badge
 											variant="outline"
-											className={`text-xs ${statusColors[claim.status] ?? ""}`}
+											className={`text-xs ${statusToneClasses(claim.status)}`}
 										>
 											{t(`statuses.${claim.status}`)}
 										</Badge>

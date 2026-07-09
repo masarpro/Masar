@@ -1,7 +1,6 @@
 "use client";
 
-import type { BadgeProps } from "@ui/components/badge";
-import { Badge } from "@ui/components/badge";
+import { StatusChip, type StatusTone } from "@ui/components/status-chip";
 import { useTranslations } from "next-intl";
 
 export function SubscriptionStatusBadge({
@@ -23,16 +22,20 @@ export function SubscriptionStatusBadge({
 		unpaid: t("settings.billing.activePlan.status.unpaid"),
 	};
 
-	const badgeColors: Record<string, BadgeProps["status"]> = {
+	const badgeTones: Record<string, StatusTone> = {
 		active: "success",
-		canceled: "error",
-		expired: "error",
+		canceled: "danger",
+		expired: "danger",
 		incomplete: "warning",
 		past_due: "warning",
 		paused: "warning",
 		trialing: "info",
-		unpaid: "error",
+		unpaid: "danger",
 	};
 
-	return <Badge status={badgeColors[status]}>{badgeLabels[status]}</Badge>;
+	return (
+		<StatusChip tone={badgeTones[status] ?? "neutral"}>
+			{badgeLabels[status]}
+		</StatusChip>
+	);
 }

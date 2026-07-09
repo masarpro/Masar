@@ -371,7 +371,7 @@ export const ContractFormSections = forwardRef<
 			{contractValue > 0 && (
 				<div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95">
 					<div className="mx-auto flex max-w-3xl items-center gap-1 overflow-x-auto px-4 py-3">
-						<Calculator className="ml-2 h-4 w-4 shrink-0 text-slate-400" />
+						<Calculator className="me-2 h-4 w-4 shrink-0 text-slate-400" />
 						<span className="shrink-0 text-xs font-medium text-slate-500">
 							{t("projects.createProject.summaryStrip")}:
 						</span>

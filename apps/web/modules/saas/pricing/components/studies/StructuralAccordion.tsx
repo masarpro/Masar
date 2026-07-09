@@ -229,7 +229,7 @@ export function StructuralAccordion({
 						)}
 					>
 						<AccordionTrigger className="hover:no-underline py-4">
-							<div className="flex items-center justify-between w-full ml-4">
+							<div className="flex items-center justify-between w-full me-4">
 								<div className="flex items-center gap-3">
 									<span className="text-2xl">
 										{section.icon}
@@ -286,7 +286,7 @@ export function StructuralAccordion({
 											variant="default"
 											className="bg-green-600"
 										>
-											<Check className="h-3 w-3 ml-1" />
+											<Check className="h-3 w-3 me-1" />
 											{t(
 												"pricing.studies.messages.saved",
 											)}
@@ -296,7 +296,7 @@ export function StructuralAccordion({
 											variant="outline"
 											className="text-muted-foreground"
 										>
-											<AlertCircle className="h-3 w-3 ml-1" />
+											<AlertCircle className="h-3 w-3 me-1" />
 											{t(
 												"pricing.studies.structural.noItems",
 											)}

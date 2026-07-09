@@ -240,14 +240,14 @@ export function PlainConcreteSection({
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead className="text-right">{t("pricing.studies.structural.itemName")}</TableHead>
-								<TableHead className="text-right">النوع</TableHead>
-								<TableHead className="text-right">{t("pricing.studies.structural.quantity")}</TableHead>
-								<TableHead className="text-right">الطول</TableHead>
-								<TableHead className="text-right">العرض</TableHead>
-								<TableHead className="text-right">المساحة</TableHead>
-								<TableHead className="text-right">السماكة</TableHead>
-								<TableHead className="text-right">{t("pricing.studies.structural.concreteVolume")}</TableHead>
+								<TableHead className="text-start">{t("pricing.studies.structural.itemName")}</TableHead>
+								<TableHead className="text-start">النوع</TableHead>
+								<TableHead className="text-start">{t("pricing.studies.structural.quantity")}</TableHead>
+								<TableHead className="text-start">الطول</TableHead>
+								<TableHead className="text-start">العرض</TableHead>
+								<TableHead className="text-start">المساحة</TableHead>
+								<TableHead className="text-start">السماكة</TableHead>
+								<TableHead className="text-start">{t("pricing.studies.structural.concreteVolume")}</TableHead>
 								<TableHead className="w-12"></TableHead>
 							</TableRow>
 						</TableHeader>
@@ -474,7 +474,7 @@ export function PlainConcreteSection({
 								onClick={handleSubmit}
 								disabled={createMutation.isPending || updateMutation.isPending || !formData.name || !calculations}
 							>
-								<Save className="h-4 w-4 ml-2" />
+								<Save className="h-4 w-4 me-2" />
 								{editingItemId ? t("pricing.studies.structural.updateItem") : t("pricing.studies.structural.saveItem")}
 							</Button>
 						</div>
@@ -486,7 +486,7 @@ export function PlainConcreteSection({
 					variant="outline"
 					onClick={handleStartAdding}
 				>
-					<Plus className="h-5 w-5 ml-2" />
+					<Plus className="h-5 w-5 me-2" />
 					<span className="font-semibold">{t("pricing.studies.structural.addItem")}</span>
 				</Button>
 			)}

@@ -441,7 +441,7 @@ export function BlockForm({
 						<Label>
 							{t("pricing.studies.structural.height")} ({t("pricing.studies.units.m")})
 							{derivedBlockHeight != null && (
-								<span className="text-xs text-green-600 mr-1">{t("pricing.studies.structural.sections.blocks.derivedHint")}</span>
+								<span className="text-xs text-green-600 ms-1">{t("pricing.studies.structural.sections.blocks.derivedHint")}</span>
 							)}
 						</Label>
 						<Input
@@ -472,7 +472,7 @@ export function BlockForm({
 								size="sm"
 								onClick={() => addOpening("door")}
 							>
-								<Plus className="h-3 w-3 ml-1" />
+								<Plus className="h-3 w-3 me-1" />
 								{t("pricing.studies.structural.sections.blocks.door")}
 							</Button>
 							<Button
@@ -480,7 +480,7 @@ export function BlockForm({
 								size="sm"
 								onClick={() => addOpening("window")}
 							>
-								<Plus className="h-3 w-3 ml-1" />
+								<Plus className="h-3 w-3 me-1" />
 								{t("pricing.studies.structural.sections.blocks.window")}
 							</Button>
 						</div>
@@ -717,7 +717,7 @@ export function BlockForm({
 						onClick={handleSubmit}
 						disabled={createMutation.isPending || updateMutation.isPending || !formData.name || !formData.wallCategory || (needsFloor && !formData.floor) || !calculations}
 					>
-						<Save className="h-4 w-4 ml-2" />
+						<Save className="h-4 w-4 me-2" />
 						{editingItemId ? t("pricing.studies.structural.updateItem") : t("pricing.studies.structural.saveItem")}
 					</Button>
 				</div>

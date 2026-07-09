@@ -196,7 +196,7 @@ export function CreateStudyPage({
 									type="button"
 									onClick={() => setSelectedGoal(goal.value)}
 									className={cn(
-										"w-full flex items-center gap-3 rounded-xl border-2 p-3 text-right transition-all",
+										"w-full flex items-center gap-3 rounded-xl border-2 p-3 text-start transition-all",
 										isSelected
 											? "border-primary bg-primary/5"
 											: "border-border hover:border-primary/30",

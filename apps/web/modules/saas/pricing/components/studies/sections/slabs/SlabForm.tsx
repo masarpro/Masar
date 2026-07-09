@@ -821,7 +821,7 @@ export function SlabForm({
 							!calculations
 						}
 					>
-						<Save className="h-4 w-4 ml-2" />
+						<Save className="h-4 w-4 me-2" />
 						{editingItem
 							? t("pricing.studies.structural.updateItem")
 							: t("pricing.studies.structural.saveItem")}

@@ -70,7 +70,7 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 						onClick={onAddTerm}
 						className="rounded-lg border-violet-200 text-violet-700 hover:bg-violet-100 dark:border-violet-800 dark:text-violet-300 dark:hover:bg-violet-900/30"
 					>
-						<Plus className="ml-1 h-4 w-4" />
+						<Plus className="me-1 h-4 w-4" />
 						{t("projects.createProject.addPaymentTerm")}
 					</Button>
 				</div>
@@ -152,9 +152,9 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 											e.target.value,
 										)
 									}
-									className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 pl-6 text-xs dark:border-violet-800/40 dark:bg-slate-800/50"
+									className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 pe-6 text-xs dark:border-violet-800/40 dark:bg-slate-800/50"
 								/>
-								<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
 									%
 								</span>
 							</div>
@@ -177,9 +177,9 @@ export const PaymentTermsEditor = React.memo(function PaymentTermsEditor({
 											e.target.value,
 										)
 									}
-									className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 pl-12 font-mono text-xs dark:border-violet-800/40 dark:bg-slate-800/50"
+									className="h-9 rounded-lg border-violet-200/60 bg-violet-50/50 pe-12 font-mono text-xs dark:border-violet-800/40 dark:bg-slate-800/50"
 								/>
-								<span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+								<span className="absolute end-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
 									{t("common.sar")}
 								</span>
 							</div>

@@ -306,7 +306,7 @@ export function SolidSlabFields({
 					className="w-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-2 border-dashed border-indigo-400/40 hover:bg-indigo-500/20 hover:border-indigo-400/60 transition-all"
 					onClick={addBeam}
 				>
-					<Plus className="h-4 w-4 ml-2" />
+					<Plus className="h-4 w-4 me-2" />
 					<span className="font-semibold">{t("pricing.studies.structural.sections.slabs.addBeam")}</span>
 				</Button>
 
@@ -325,7 +325,7 @@ export function SolidSlabFields({
 									<span className="text-muted-foreground">
 										{t("pricing.studies.structural.sections.common.concrete")}:
 									</span>
-									<span className="font-bold mr-1 text-blue-600">
+									<span className="font-bold ms-1 text-blue-600">
 										{formatNumber(
 											beamsCalcs.totalConcrete,
 										)}{" "}
@@ -336,7 +336,7 @@ export function SolidSlabFields({
 									<span className="text-muted-foreground">
 										{t("pricing.studies.structural.sections.slabs.steelGross")}:
 									</span>
-									<span className="font-bold mr-1 text-orange-600">
+									<span className="font-bold ms-1 text-orange-600">
 										{formatNumber(
 											beamsCalcs.totalGrossWeight,
 										)}{" "}
@@ -347,7 +347,7 @@ export function SolidSlabFields({
 									<span className="text-muted-foreground">
 										{t("pricing.studies.structural.wastage")}:
 									</span>
-									<span className="font-bold mr-1 text-red-500">
+									<span className="font-bold ms-1 text-red-500">
 										{formatNumber(
 											beamsCalcs.wastePercentage,
 											1,
@@ -381,25 +381,25 @@ export function SolidSlabFields({
 									<Table>
 										<TableHeader>
 											<TableRow>
-												<TableHead className="text-right text-xs">
+												<TableHead className="text-start text-xs">
 													{t("pricing.studies.structural.sections.common.description")}
 												</TableHead>
-												<TableHead className="text-right text-xs">
+												<TableHead className="text-start text-xs">
 													∅ {t("pricing.studies.structural.diameter")}
 												</TableHead>
-												<TableHead className="text-right text-xs">
+												<TableHead className="text-start text-xs">
 													{t("pricing.studies.structural.sections.common.barLength")}
 												</TableHead>
-												<TableHead className="text-right text-xs">
+												<TableHead className="text-start text-xs">
 													{t("pricing.studies.structural.quantity")}
 												</TableHead>
-												<TableHead className="text-right text-xs">
+												<TableHead className="text-start text-xs">
 													{t("pricing.studies.structural.sections.common.stocksNeeded")}
 												</TableHead>
-												<TableHead className="text-right text-xs">
+												<TableHead className="text-start text-xs">
 													{t("pricing.studies.structural.wastage")}
 												</TableHead>
-												<TableHead className="text-right text-xs">
+												<TableHead className="text-start text-xs">
 													{t("pricing.studies.structural.sections.common.weight")}
 												</TableHead>
 											</TableRow>

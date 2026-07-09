@@ -394,10 +394,10 @@ export function StairsSection({
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead className="text-right">{t("pricing.studies.structural.itemName")}</TableHead>
-								<TableHead className="text-right">{t("pricing.studies.area")}</TableHead>
-								<TableHead className="text-right">{t("pricing.studies.structural.concreteVolume")}</TableHead>
-								<TableHead className="text-right">{t("pricing.studies.structural.steelWeight")}</TableHead>
+								<TableHead className="text-start">{t("pricing.studies.structural.itemName")}</TableHead>
+								<TableHead className="text-start">{t("pricing.studies.area")}</TableHead>
+								<TableHead className="text-start">{t("pricing.studies.structural.concreteVolume")}</TableHead>
+								<TableHead className="text-start">{t("pricing.studies.structural.steelWeight")}</TableHead>
 								<TableHead className="w-12"></TableHead>
 							</TableRow>
 						</TableHeader>
@@ -564,12 +564,12 @@ export function StairsSection({
 										<Table>
 											<TableHeader>
 												<TableRow>
-													<TableHead className="text-right">{t("pricing.studies.structural.sections.stairs.stair")}</TableHead>
-													<TableHead className="text-right">{t("pricing.studies.structural.height")}</TableHead>
-													<TableHead className="text-right">{t("pricing.studies.structural.sections.stairs.risers")}</TableHead>
-													<TableHead className="text-right">{t("pricing.studies.structural.sections.stairs.flightLengthShort")}</TableHead>
-													<TableHead className="text-right">{t("pricing.studies.structural.sections.common.concrete")}</TableHead>
-													<TableHead className="text-right">{t("pricing.studies.structural.sections.common.steel")}</TableHead>
+													<TableHead className="text-start">{t("pricing.studies.structural.sections.stairs.stair")}</TableHead>
+													<TableHead className="text-start">{t("pricing.studies.structural.height")}</TableHead>
+													<TableHead className="text-start">{t("pricing.studies.structural.sections.stairs.risers")}</TableHead>
+													<TableHead className="text-start">{t("pricing.studies.structural.sections.stairs.flightLengthShort")}</TableHead>
+													<TableHead className="text-start">{t("pricing.studies.structural.sections.common.concrete")}</TableHead>
+													<TableHead className="text-start">{t("pricing.studies.structural.sections.common.steel")}</TableHead>
 												</TableRow>
 											</TableHeader>
 											<TableBody>
@@ -604,7 +604,7 @@ export function StairsSection({
 								</Button>
 								<Button onClick={handleAutoSave} disabled={isAutoSaving || !autoCalculations || autoCalculations.length === 0}
 									className="bg-emerald-600 hover:bg-emerald-700">
-									<Save className="h-4 w-4 ml-2" />
+									<Save className="h-4 w-4 me-2" />
 									{t("pricing.studies.structural.sections.stairs.saveCount", { count: autoCalculations?.length || 0 })}
 								</Button>
 							</div>
@@ -614,9 +614,9 @@ export function StairsSection({
 					<Button variant="outline"
 						className="w-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-2 border-dashed border-emerald-400/40 hover:bg-emerald-500/20 hover:border-emerald-400/60 transition-all"
 						onClick={() => setShowAutoForm(true)}>
-						<Building2 className="h-5 w-5 ml-2" />
+						<Building2 className="h-5 w-5 me-2" />
 						<span className="font-semibold">{t("pricing.studies.structural.sections.stairs.autoButton")}</span>
-						<Badge variant="secondary" className="mr-2 text-xs">{t("pricing.studies.structural.sections.stairs.stairsCount", { count: stairConnections.length })}</Badge>
+						<Badge variant="secondary" className="ms-2 text-xs">{t("pricing.studies.structural.sections.stairs.stairsCount", { count: stairConnections.length })}</Badge>
 					</Button>
 				)
 			)}
@@ -848,7 +848,7 @@ export function StairsSection({
 								onClick={handleSubmit}
 								disabled={createMutation.isPending || updateMutation.isPending || !formData.name || !calculations}
 							>
-								<Save className="h-4 w-4 ml-2" />
+								<Save className="h-4 w-4 me-2" />
 								{editingItemId ? t("pricing.studies.structural.updateItem") : t("pricing.studies.structural.saveItem")}
 							</Button>
 						</div>
@@ -860,7 +860,7 @@ export function StairsSection({
 					className="w-full bg-primary/10 text-primary border-2 border-dashed border-primary/40 hover:bg-primary/20 hover:border-primary/60 transition-all"
 					onClick={() => setIsAdding(true)}
 				>
-					<Plus className="h-5 w-5 ml-2" />
+					<Plus className="h-5 w-5 me-2" />
 					<span className="font-semibold">{t("pricing.studies.structural.addItem")}</span>
 				</Button>
 			)}
