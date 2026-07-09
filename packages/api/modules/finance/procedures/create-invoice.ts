@@ -384,6 +384,18 @@ export const updateInvoiceStatusProcedure = subscriptionProcedure
 			});
 		}
 
+		// Credit notes must not be cancelled through the generic status path:
+		// they carry their own reversal + paidAmount side-effects on the original
+		// invoice, which this path does not handle. Block to avoid double-crediting.
+		if (
+			input.status === "CANCELLED" &&
+			currentInvoice.invoiceType === "CREDIT_NOTE"
+		) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "لا يمكن إلغاء إشعار دائن من هذا المسار",
+			});
+		}
+
 		const invoice = await updateInvoiceStatus(
 			input.id,
 			input.organizationId,
