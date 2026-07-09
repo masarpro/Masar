@@ -98,18 +98,26 @@ export function CostStudyOverview({
 		entryPoint,
 	});
 
-	// Redirect directly to the active stage page
+	// Always land on the quantities page first when this study has a quantities
+	// stage; only fall back to the active stage for study types without it
+	// (e.g. quick pricing → pricing).
+	const quantitiesEnabled = (
+		enabledStageTypes as unknown as string[]
+	).includes("QUANTITIES");
+	const landingStagePath = quantitiesEnabled ? "quantities" : activeStagePath;
+
+	// Redirect directly to the landing stage page
 	const router = useRouter();
 
 	useEffect(() => {
-		if (study && activeStagePath) {
+		if (study && landingStagePath) {
 			router.replace(
-				`/app/${organizationSlug}/pricing/studies/${studyId}/${activeStagePath}`,
+				`/app/${organizationSlug}/pricing/studies/${studyId}/${landingStagePath}`,
 			);
 		}
-	}, [study, activeStagePath, router, organizationSlug, studyId]);
+	}, [study, landingStagePath, router, organizationSlug, studyId]);
 
-	if (activeStagePath) {
+	if (landingStagePath) {
 		return null;
 	}
 

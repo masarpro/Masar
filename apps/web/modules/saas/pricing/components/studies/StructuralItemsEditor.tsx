@@ -2,8 +2,10 @@
 
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
+import { Building2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { createDefaultConfig } from "../../types/structural-building-config";
 
 import { SummaryStatsCards } from "./SummaryStatsCards";
 import { StructuralAccordion } from "./StructuralAccordion";
@@ -101,10 +103,15 @@ export function StructuralItemsEditor({
 			}, 0),
 	};
 
-	// Wizard display logic (same pattern as FinishingItemsEditor)
+	// Wizard display logic:
+	// - Auto-show ONLY on first creation (no saved building config AND no items yet).
+	// - After the user saves or skips, a config is persisted so it never
+	//   auto-reappears — it can only be reopened via the edit button below.
 	const shouldShowWizard =
 		showWizard === true ||
-		(showWizard === null && !isConfigComplete && !buildingConfig?.floors?.length);
+		(showWizard === null &&
+			!buildingConfig &&
+			structuralItems.length === 0);
 
 	if (shouldShowWizard) {
 		return (
@@ -116,7 +123,14 @@ export function StructuralItemsEditor({
 						await saveBuildingConfig(config);
 						setShowWizard(false);
 					}}
-					onSkip={() => setShowWizard(false)}
+					onSkip={async () => {
+						// Persist a dismissal marker (incomplete config) so the
+						// wizard does not reappear on every subsequent open.
+						if (!buildingConfig) {
+							await saveBuildingConfig(createDefaultConfig());
+						}
+						setShowWizard(false);
+					}}
 					isSaving={isSaving}
 				/>
 			</div>
@@ -128,13 +142,28 @@ export function StructuralItemsEditor({
 			{/* Summary Stats */}
 			<SummaryStatsCards structural={structuralStats} />
 
-			{/* Building Config Bar */}
-			{isConfigComplete && enabledFloors.length > 0 && (
+			{/* Building Config Bar (complete) or a persistent setup prompt
+			    (skipped/incomplete) so the building can always be edited later */}
+			{isConfigComplete && enabledFloors.length > 0 ? (
 				<StructuralBuildingConfigBar
 					floors={enabledFloors}
 					onEdit={() => setShowWizard(true)}
 					buildingConfig={buildingConfig}
 				/>
+			) : (
+				<button
+					type="button"
+					onClick={() => setShowWizard(true)}
+					className="flex w-full items-center gap-3 rounded-lg border border-dashed bg-muted/20 px-4 py-2.5 text-start transition-colors hover:bg-muted/40"
+				>
+					<Building2 className="h-4 w-4 shrink-0 text-muted-foreground" />
+					<span className="flex-1 text-sm text-muted-foreground">
+						لم يتم إعداد بيانات المبنى الإنشائي
+					</span>
+					<span className="text-sm font-medium text-primary">
+						إعداد المبنى
+					</span>
+				</button>
 			)}
 
 			{/* Structural Items Accordion */}
