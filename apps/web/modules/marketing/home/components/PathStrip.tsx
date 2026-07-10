@@ -43,33 +43,6 @@ export function PathStrip() {
 					</defs>
 					<path className="lp-line-bg" d={PATH_D} />
 					<path className="lp-line" d={PATH_D} />
-					{showComet ? (
-						<circle
-							className="lp-comet-dot"
-							r="8"
-							opacity="0"
-							fill="url(#lpCometGrad)"
-							aria-hidden="true"
-						>
-							<animateMotion
-								dur="7s"
-								begin="3.3s"
-								repeatCount="indefinite"
-								calcMode="linear"
-								keyPoints="0;1;1"
-								keyTimes="0;0.6;1"
-								path={PATH_D}
-							/>
-							<animate
-								attributeName="opacity"
-								values="0;1;1;0;0"
-								keyTimes="0;0.06;0.6;0.66;1"
-								dur="7s"
-								begin="3.3s"
-								repeatCount="indefinite"
-							/>
-						</circle>
-					) : null}
 					{STATIONS.map((st) => (
 						<a
 							key={st.key}
@@ -111,6 +84,34 @@ export function PathStrip() {
 							) : null}
 						</a>
 					))}
+					{/* Comet rendered last so it paints above the line and station nodes */}
+					{showComet ? (
+						<circle
+							className="lp-comet-dot"
+							r="8"
+							opacity="0"
+							fill="url(#lpCometGrad)"
+							aria-hidden="true"
+						>
+							<animateMotion
+								dur="7s"
+								begin="3.3s"
+								repeatCount="indefinite"
+								calcMode="linear"
+								keyPoints="0;1;1"
+								keyTimes="0;0.6;1"
+								path={PATH_D}
+							/>
+							<animate
+								attributeName="opacity"
+								values="0;1;1;0;0"
+								keyTimes="0;0.06;0.6;0.66;1"
+								dur="7s"
+								begin="3.3s"
+								repeatCount="indefinite"
+							/>
+						</circle>
+					) : null}
 				</svg>
 			</div>
 		</div>

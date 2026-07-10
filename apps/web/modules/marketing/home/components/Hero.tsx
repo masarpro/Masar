@@ -184,89 +184,79 @@ export function Hero() {
 						</p>
 					</div>
 
-					{/* CTA Buttons */}
+					{/* CTA buttons (start side) + trust column beside them */}
 					<div className="animate-fade-in-delay-3">
-						<div className="flex flex-col sm:flex-row gap-4 flex-wrap items-center justify-center">
-							<Link
-								href="/auth/signup"
-								className="btn-premium btn-premium-primary"
-							>
-								{t("hero.cta")}
-								<span className="text-xl rtl-flip">→</span>
-							</Link>
-							<a
-								href="#features"
-								className="btn-premium btn-premium-ghost"
-							>
-								{t("hero.secondary")}
-								<span className="text-base opacity-50">↓</span>
-							</a>
-						</div>
-					</div>
-
-					{/* Tagline */}
-					<div className="animate-fade-in-delay-3 mt-6 mb-6">
-						<p
-							className="text-sm italic"
-							style={{ color: "var(--lp-text-subtle)" }}
-						>
-							"{t("hero.tagline")}"
-						</p>
-					</div>
-
-					{/* ZATCA trust chip */}
-					<div className="animate-fade-in-delay-3 mb-6">
-						<span className="lp-zatca-chip">
-							<span className="lp-zatca-dot" aria-hidden="true" />
-							{t("hero.zatcaChip")}
-						</span>
-					</div>
-
-					{/* Social Proof */}
-					<div className="animate-fade-in-delay-4 mt-0">
-						<div className="flex items-center justify-center gap-4">
-							<div className="flex">
-								{["#0ea5e9", "#3B82F6", "#F59E0B", "#8B5CF6"].map(
-									(color, i) => (
-										<div
-											key={color}
-											className="w-10 h-10 rounded-full flex items-center justify-center text-sm text-white font-bold"
-											style={{
-												background: `linear-gradient(135deg, ${color}, ${color}99)`,
-												border: `3px solid var(--lp-avatar-ring)`,
-												marginInlineStart:
-													i > 0 ? -10 : 0,
-												boxShadow: `0 0 12px ${color}33`,
-											}}
-										>
-											{["م", "ع", "خ", "ف"][i]}
-										</div>
-									),
-								)}
-							</div>
-							<div>
-								<div className="flex justify-center gap-0.5 mb-1">
-									{[1, 2, 3, 4, 5].map((i) => (
-										<span
-											key={i}
-											className="text-[#F59E0B] text-sm"
-											style={{
-												textShadow:
-													"0 0 8px rgba(245,158,11,0.4)",
-											}}
-										>
-											★
-										</span>
-									))}
-								</div>
-								<p
-									className="text-[13px] font-medium"
-									style={{
-										color: "var(--lp-text-subtle)",
-									}}
+						<div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
+							<div className="flex flex-col sm:flex-row items-center gap-4">
+								<Link
+									href="/auth/signup"
+									className="btn-premium btn-premium-primary"
 								>
-									{t("hero.proof")}
-								</p>
+									{t("hero.cta")}
+									<span className="text-xl rtl-flip">→</span>
+								</Link>
+								<a
+									href="#features"
+									className="btn-premium btn-premium-ghost"
+								>
+									{t("hero.secondary")}
+									<span className="text-base opacity-50">↓</span>
+								</a>
+							</div>
+
+							<div className="flex flex-col items-center lg:items-start gap-3">
+								{/* ZATCA trust chip */}
+								<span className="lp-zatca-chip">
+									<span className="lp-zatca-dot" aria-hidden="true" />
+									{t("hero.zatcaChip")}
+								</span>
+
+								{/* Social Proof */}
+								<div className="flex items-center gap-4">
+									<div className="flex">
+										{["#0ea5e9", "#3B82F6", "#F59E0B", "#8B5CF6"].map(
+											(color, i) => (
+												<div
+													key={color}
+													className="w-10 h-10 rounded-full flex items-center justify-center text-sm text-white font-bold"
+													style={{
+														background: `linear-gradient(135deg, ${color}, ${color}99)`,
+														border: `3px solid var(--lp-avatar-ring)`,
+														marginInlineStart:
+															i > 0 ? -10 : 0,
+														boxShadow: `0 0 12px ${color}33`,
+													}}
+												>
+													{["م", "ع", "خ", "ف"][i]}
+												</div>
+											),
+										)}
+									</div>
+									<div className="text-start">
+										<div className="flex gap-0.5 mb-1">
+											{[1, 2, 3, 4, 5].map((i) => (
+												<span
+													key={i}
+													className="text-[#F59E0B] text-sm"
+													style={{
+														textShadow:
+															"0 0 8px rgba(245,158,11,0.4)",
+													}}
+												>
+													★
+												</span>
+											))}
+										</div>
+										<p
+											className="text-[13px] font-medium"
+											style={{
+												color: "var(--lp-text-subtle)",
+											}}
+										>
+											{t("hero.proof")}
+										</p>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
