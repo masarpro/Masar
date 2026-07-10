@@ -113,7 +113,7 @@ export function Hero() {
 
 	return (
 		<section
-			className="relative min-h-screen overflow-hidden flex items-center pt-36 pb-12 px-6"
+			className="relative min-h-screen overflow-hidden flex items-center pt-44 pb-12 px-6"
 			style={{ background: "var(--lp-bg)" }}
 		>
 			{/* Light mode animated background */}
@@ -132,7 +132,7 @@ export function Hero() {
 			/>
 
 			<div className="relative z-10 max-w-[1200px] mx-auto w-full">
-				<div className="max-w-[780px] ms-auto me-0 rtl:ms-0 rtl:me-auto">
+				<div className="max-w-[780px] mx-auto text-center">
 					{/* Badge */}
 					<div className="animate-fade-in mb-9">
 						<div
@@ -177,7 +177,7 @@ export function Hero() {
 					{/* Description */}
 					<div className="animate-fade-in-delay-2">
 						<p
-							className="text-[clamp(0.85rem,1.8vw,1.15rem)] leading-[1.8] mb-12 max-w-2xl"
+							className="text-[clamp(0.85rem,1.8vw,1.15rem)] leading-[1.8] mb-12 max-w-2xl mx-auto"
 							style={{ color: "var(--lp-text-muted)" }}
 						>
 							{t("hero.description")}
@@ -186,7 +186,7 @@ export function Hero() {
 
 					{/* CTA Buttons */}
 					<div className="animate-fade-in-delay-3">
-						<div className="flex flex-col sm:flex-row gap-4 flex-wrap">
+						<div className="flex flex-col sm:flex-row gap-4 flex-wrap items-center justify-center">
 							<Link
 								href="/auth/signup"
 								className="btn-premium btn-premium-primary"
@@ -224,7 +224,7 @@ export function Hero() {
 
 					{/* Social Proof */}
 					<div className="animate-fade-in-delay-4 mt-0">
-						<div className="flex items-center gap-4">
+						<div className="flex items-center justify-center gap-4">
 							<div className="flex">
 								{["#0ea5e9", "#3B82F6", "#F59E0B", "#8B5CF6"].map(
 									(color, i) => (
@@ -245,7 +245,7 @@ export function Hero() {
 								)}
 							</div>
 							<div>
-								<div className="flex gap-0.5 mb-1">
+								<div className="flex justify-center gap-0.5 mb-1">
 									{[1, 2, 3, 4, 5].map((i) => (
 										<span
 											key={i}
