@@ -26,7 +26,7 @@ const features: FeatureConfig[] = [
 	{ icon: LayoutDashboard, color: "#0ea5e9", subCount: 3 },
 	{ icon: HardHat, color: "#3B82F6", subCount: 3 },
 	{ icon: Receipt, color: "#F59E0B", subCount: 3 },
-	{ icon: Calculator, color: "#0ea5e9", isNew: true, subCount: 3 },
+	{ icon: Calculator, color: "#0ea5e9", isNew: true, subCount: 4 },
 	{ icon: FileSignature, color: "#8B5CF6", subCount: 3 },
 	{ icon: UserCheck, color: "#EF4444", subCount: 3 },
 	{ icon: ShieldCheck, color: "#06B6D4", subCount: 2 },
@@ -169,6 +169,16 @@ export function Features() {
 											strokeWidth={1.8}
 										/>
 									</div>
+
+									{/* Kicker */}
+									<p
+										className="text-[12px] font-semibold tracking-wide mb-1"
+										style={{ color: "#0ea5e9" }}
+									>
+										{t(
+											`features.items.${key}.kicker`,
+										)}
+									</p>
 
 									{/* Title */}
 									<h3

@@ -596,6 +596,45 @@ input[cmdk-input] {
 	stroke-width: 4.5;
 	filter: drop-shadow(0 0 7px rgba(14,165,233,0.4));
 }
+/* ZATCA trust chip — pulsing dot like the reference design */
+.lp-zatca-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	background: var(--lp-card-bg);
+	border: 1px solid var(--lp-card-border);
+	border-radius: 100px;
+	padding: 7px 16px;
+	font-size: 12.5px;
+	font-weight: 600;
+	color: #0ea5e9;
+	box-shadow: 0 6px 16px -10px rgba(14,165,233,0.4);
+}
+.lp-zatca-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #0ea5e9;
+	flex: none;
+	position: relative;
+}
+@keyframes lpPing {
+	0% { transform: scale(0.5); opacity: 0.8; }
+	80%, 100% { transform: scale(1.6); opacity: 0; }
+}
+.lp-zatca-dot::after {
+	content: "";
+	position: absolute;
+	inset: -4px;
+	border-radius: 50%;
+	border: 1.5px solid #0ea5e9;
+	opacity: 0;
+	animation: lpPing 2.2s cubic-bezier(0.22,1,0.36,1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+	.lp-zatca-dot::after { animation: none; }
+}
+
 /* comet lives inside the SVG (animateMotion) so it scales with the path */
 .lp-comet-dot {
 	filter: drop-shadow(0 0 6px rgba(14,165,233,0.55));

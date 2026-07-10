@@ -214,6 +214,14 @@ export function Hero() {
 						</p>
 					</div>
 
+					{/* ZATCA trust chip */}
+					<div className="animate-fade-in-delay-3 mb-6">
+						<span className="lp-zatca-chip">
+							<span className="lp-zatca-dot" aria-hidden="true" />
+							{t("hero.zatcaChip")}
+						</span>
+					</div>
+
 					{/* Social Proof */}
 					<div className="animate-fade-in-delay-4 mt-0">
 						<div className="flex items-center gap-4">

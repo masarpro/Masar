@@ -281,7 +281,7 @@ export function AiFeatureSection() {
 				{/* CTA */}
 				<div className="text-center mt-14">
 					<Link
-						href="/app"
+						href="/auth/signup"
 						className="inline-flex items-center gap-2 text-[15px] font-semibold transition-all hover:gap-3"
 						style={{ color: "#3B82F6" }}
 					>

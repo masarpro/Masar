@@ -2297,30 +2297,31 @@
   "faq": {
     "description": "Do you have any questions? We have got you covered.",
     "title": "Frequently asked questions",
+    "heading": "Questions every contractor asks",
     "items": {
       "1": {
         "question": "Do I need technical experience?",
-        "answer": "No. Masar is designed to be easy for anyone."
+        "answer": "No. If you can use WhatsApp, you can use Masar. The system has a simple Arabic-first interface, and the AI assistant answers any question inside the platform."
       },
       "2": {
         "question": "Does it fully support Arabic?",
-        "answer": "Yes, built in Arabic from the ground up — interface, reports, and invoices."
+        "answer": "Yes — Masar is built in Arabic from the first line, not translated. Every screen, report, invoice, and quotation comes out in professional Arabic, right to left."
       },
       "3": {
         "question": "Are invoices ZATCA compliant?",
-        "answer": "Yes, compliant with Phase 1 e-invoicing requirements."
+        "answer": "Yes — compliant with Phase 2 (integration), not just Phase 1. Your invoices are signed electronically and linked directly with the authority, with 15% VAT calculated automatically."
       },
       "4": {
         "question": "How many projects can I add?",
-        "answer": "On the Professional plan, unlimited."
+        "answer": "The free plan gives you one project to try the system. All paid plans include unlimited projects."
       },
       "5": {
         "question": "Can the owner track the project?",
-        "answer": "Yes, the Owner Portal gives them direct access to updates and reports."
+        "answer": "Yes, through the Owner Portal: send them a secure link — no account needed — where they see progress, payments, and updates, and can message you directly."
       },
       "6": {
         "question": "Is my data secure?",
-        "answer": "Each company's data is fully isolated with encryption and multi-level permissions."
+        "answer": "Your data is encrypted and fully isolated from other companies, with continuous backups and granular permissions you control — each user sees only what you allow."
       }
     }
   },
@@ -2338,13 +2339,14 @@
   },
   "features": {
     "title": "Everything you need in one place",
-    "description": "Tools designed for Saudi contractor workflows",
-    "label": "Features",
+    "description": "Tools designed for Saudi contractor workflows — with data flowing between stages automatically.",
+    "label": "Features · Journey stations",
     "learnMore": "Learn more",
     "newBadge": "New",
     "items": {
       "1": {
-        "title": "Comprehensive Dashboard",
+        "kicker": "Comprehensive Dashboard",
+        "title": "All your projects at a glance",
         "description": "Project status, budget, and timeline — all at a glance. Monitor every project in real-time with smart alerts.",
         "sub": {
           "1": "Real-time project status updates",
@@ -2353,7 +2355,8 @@
         }
       },
       "2": {
-        "title": "Field Execution",
+        "kicker": "Field Execution",
+        "title": "The whole site in your pocket",
         "description": "Daily reports, photos, issues, and progress — directly from site. Record everything in the field with ease.",
         "sub": {
           "1": "Daily reports with photos and notes",
@@ -2362,8 +2365,9 @@
         }
       },
       "3": {
-        "title": "Finance & Invoicing",
-        "description": "Expenses, claims, payments, and invoices — connected automatically. ZATCA-compliant e-invoicing built in.",
+        "kicker": "Finance & Invoicing",
+        "title": "E-invoices that book their own journal entries",
+        "description": "Expenses, claims, payments, and invoices — connected automatically. ZATCA Phase 2 e-invoicing built in.",
         "sub": {
           "1": "ZATCA-compliant e-invoicing",
           "2": "Expense and claims management",
@@ -2371,16 +2375,19 @@
         }
       },
       "4": {
-        "title": "Pricing & Quantity Surveying",
+        "kicker": "Pricing & Quantity Surveying",
+        "title": "Price it right before you sign",
         "description": "Professional BOQs and accurate project pricing. From drawings to quotation — everything in one place.",
         "sub": {
-          "1": "Detailed bills of quantities",
-          "2": "Auto-pricing from price database",
-          "3": "Export PDF quotations"
+          "1": "Automatic concrete and rebar takeoff",
+          "2": "Detailed bills of quantities",
+          "3": "Auto-pricing from price database",
+          "4": "Export PDF quotations"
         }
       },
       "5": {
-        "title": "Contractors & Contracts",
+        "kicker": "Contractors & Contracts",
+        "title": "Every contract documented, every change approved",
         "description": "Subcontracts, change orders, and payment terms — organized and tracked. Monitor subcontractor performance easily.",
         "sub": {
           "1": "Subcontract and line item management",
@@ -2389,7 +2396,8 @@
         }
       },
       "6": {
-        "title": "Owner Portal",
+        "kicker": "Owner Portal",
+        "title": "The owner follows along — you relax",
         "description": "Owners access project updates directly — no manual reports needed. Secure link without account required.",
         "sub": {
           "1": "Direct access link for owners",
@@ -2398,8 +2406,9 @@
         }
       },
       "7": {
-        "title": "Smart Permissions",
-        "description": "Each user sees only what's relevant — manager, engineer, accountant, supervisor. Multi-level security built in.",
+        "kicker": "Smart Permissions",
+        "title": "Each user sees only what concerns them",
+        "description": "Custom roles per function — manager, engineer, accountant, supervisor — with project-level permissions. Multi-level security built in.",
         "sub": {
           "1": "Custom roles per job function",
           "2": "Project-level permissions"
@@ -5415,6 +5424,7 @@
     "secondary": "Explore Features",
     "tagline": "Because everything needs to stay on track",
     "proof": "Saudi contractors already using Masar",
+    "zatcaChip": "Certified e-invoicing — ZATCA Phase 2",
     "dashboardAlt": "Masar dashboard — active projects, cash check, and one-click quick actions in a single screen",
     "stations": {
       "aria": "Project stages in Masar: pricing, contract, execution, invoicing, handover",
@@ -5590,6 +5600,11 @@
       },
       "cta": "Contact Us"
     }
+  },
+  "landingZatca": {
+    "title": "E-Invoicing",
+    "description": "Invoices compliant with ZATCA (Zakat, Tax and Customs Authority) requirements — Phase 2 (integration).",
+    "badge": "ZATCA — Phase 2"
   },
   "mail": {
     "common": {

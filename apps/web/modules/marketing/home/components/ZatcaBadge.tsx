@@ -45,13 +45,13 @@ export function ZatcaBadge() {
 							className="text-[21px] font-bold mb-2"
 							style={{ color: "var(--lp-text)" }}
 						>
-							{t("zatca.title")}
+							{t("landingZatca.title")}
 						</h3>
 						<p
 							className="text-sm leading-[1.75]"
 							style={{ color: "var(--lp-text-subtle)" }}
 						>
-							{t("zatca.description")}
+							{t("landingZatca.description")}
 						</p>
 					</div>
 
@@ -65,7 +65,7 @@ export function ZatcaBadge() {
 							boxShadow: "0 0 20px rgba(14,165,233,0.06)",
 						}}
 					>
-						{t("zatca.badge")}
+						{t("landingZatca.badge")}
 					</div>
 				</div>
 			</div>

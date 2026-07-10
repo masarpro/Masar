@@ -102,7 +102,7 @@ export function FaqSection({ className }: { className?: string }) {
 						className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3]"
 						style={{ color: "var(--lp-text)" }}
 					>
-						{t("faq.title")}
+						{t("faq.heading")}
 					</h2>
 				</div>
 
