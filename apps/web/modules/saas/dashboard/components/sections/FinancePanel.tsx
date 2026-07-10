@@ -1,21 +1,26 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import { Currency } from "@saas/finance/components/shared/Currency";
-import { CHART_SEMANTIC } from "@saas/shared/lib/chart-colors";
-import {
-	type ChartConfig,
-	ChartContainer,
-	ChartTooltip,
-	ChartTooltipContent,
-} from "@ui/components/chart";
 import { Banknote, Building2, ChevronLeft } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useLocale, useTranslations } from "next-intl";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { useTranslations } from "next-intl";
 
 const glassCard =
 	"backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5";
+
+// The chart (and with it the whole recharts library) loads as its own chunk
+// AFTER the panel frame + balances have painted — recharts stays out of the
+// org-home initial bundle (same pattern as PricingPipelineChart). The loading
+// placeholder reserves the chart's exact box, so it fades in with zero layout
+// shift; recharts needs the browser to measure its container anyway, so there
+// is no SSR value lost.
+const FinancePanelChart = dynamic(() => import("./FinancePanelChart"), {
+	ssr: false,
+	loading: () => (
+		<div className="w-full flex-1 min-h-[100px] max-h-44 sm:max-h-none" />
+	),
+});
 
 interface FinancePanelProps {
 	bankBalance: number;
@@ -31,46 +36,6 @@ export function FinancePanel({
 	organizationSlug,
 }: FinancePanelProps) {
 	const t = useTranslations();
-	const locale = useLocale();
-
-	// Recharts' ResponsiveContainer needs to measure its parent in the browser,
-	// so the chart itself can only render after mount. Everything else (frame +
-	// balance cards) renders on the server. Reserving the chart's exact box below
-	// means the chart fades into place with zero layout shift.
-	const [mounted, setMounted] = useState(false);
-	useEffect(() => setMounted(true), []);
-
-	const chartConfig: ChartConfig = {
-		claims: { label: t("dashboard.financial.revenueLabel"), color: CHART_SEMANTIC.primary },
-		expenses: { label: t("dashboard.financial.expensesLabel"), color: CHART_SEMANTIC.negative },
-	};
-
-	// Convert a "YYYY-MM" key into a localized short month label.
-	const formatMonth = useMemo(() => {
-		const fmt = new Intl.DateTimeFormat(locale, { month: "short" });
-		return (value: string) => {
-			const [year, month] = value.split("-").map(Number);
-			if (!year || !month) return value;
-			return fmt.format(new Date(year, month - 1, 1));
-		};
-	}, [locale]);
-
-	const chartData = useMemo(() => {
-		if (financialTrend && financialTrend.length > 0) {
-			return financialTrend;
-		}
-		const months = [];
-		const now = new Date();
-		for (let i = 5; i >= 0; i--) {
-			const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-			months.push({
-				month: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
-				claims: 0,
-				expenses: 0,
-			});
-		}
-		return months;
-	}, [financialTrend]);
 
 	return (
 		<div className={`${glassCard} flex flex-col p-4 overflow-hidden`}>
@@ -128,60 +93,7 @@ export function FinancePanel({
 					</Link>
 				</div>
 
-				{mounted ? (
-					<ChartContainer config={chartConfig} className="w-full flex-1 min-h-[100px] max-h-44 sm:max-h-none aspect-auto">
-						<AreaChart
-							data={chartData}
-							margin={{ top: 4, right: 4, left: 4, bottom: 0 }}
-						>
-							<defs>
-								<linearGradient id="fpIncGrad" x1="0" y1="0" x2="0" y2="1">
-									<stop offset="0%" stopColor={CHART_SEMANTIC.primary} stopOpacity={0.4} />
-									<stop offset="100%" stopColor={CHART_SEMANTIC.primary} stopOpacity={0} />
-								</linearGradient>
-								<linearGradient id="fpExpGrad" x1="0" y1="0" x2="0" y2="1">
-									<stop offset="0%" stopColor={CHART_SEMANTIC.negative} stopOpacity={0.15} />
-									<stop offset="100%" stopColor={CHART_SEMANTIC.negative} stopOpacity={0} />
-								</linearGradient>
-							</defs>
-							<CartesianGrid vertical={false} />
-							<XAxis
-								dataKey="month"
-								tickLine={false}
-								axisLine={false}
-								fontSize={10}
-								tickMargin={6}
-								tickFormatter={formatMonth}
-							/>
-							<YAxis hide />
-							<ChartTooltip
-								content={
-									<ChartTooltipContent labelFormatter={(label) => formatMonth(String(label))} />
-								}
-							/>
-							<Area
-								type="natural"
-								dataKey="claims"
-								stroke={CHART_SEMANTIC.primary}
-								fill="url(#fpIncGrad)"
-								strokeWidth={2}
-								dot={false}
-							/>
-							<Area
-								type="natural"
-								dataKey="expenses"
-								stroke={CHART_SEMANTIC.negative}
-								fill="url(#fpExpGrad)"
-								strokeWidth={1.5}
-								dot={false}
-							/>
-						</AreaChart>
-					</ChartContainer>
-				) : (
-					// Same-size reservation as ChartContainer above → chart fades in
-					// with no layout shift on the server→client handoff.
-					<div className="w-full flex-1 min-h-[100px] max-h-44 sm:max-h-none" />
-				)}
+				<FinancePanelChart financialTrend={financialTrend} />
 			</div>
 		</div>
 	);

@@ -322,8 +322,13 @@ export function ProjectsList({ organizationId, userName }: ProjectsListProps) {
 							<Link
 								key={project.id}
 								href={`${basePath}/${project.id}`}
-								className="animate-in fade-in slide-in-from-bottom-4 duration-500"
-								style={{ animationDelay: `${index * 50}ms` }}
+								className="animate-in fade-in slide-in-from-bottom-4 duration-300"
+								style={{
+									// Cap the stagger: an unbounded index*50ms reveal ran
+									// for seconds with many projects and read as slow
+									// loading even though the data was already hydrated.
+									animationDelay: `${Math.min(index, 6) * 40}ms`,
+								}}
 							>
 								<div className={`group relative h-full backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/20 dark:border-slate-700/30 rounded-2xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${project.status === "ARCHIVED" ? "opacity-60" : ""}`}>
 									{/* Cover Image / Gradient — شريط قصير على الجوال */}

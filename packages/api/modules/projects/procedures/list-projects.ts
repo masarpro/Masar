@@ -28,21 +28,19 @@ export const listProjects = protectedProcedure
 		}),
 	)
 	.handler(async ({ input, context }) => {
-		// Verify membership and permission
-		await verifyOrganizationAccess(
-			input.organizationId,
-			context.user.id,
-			{ section: "projects", action: "view" },
-		);
-
 		// Per-member visibility: managerial roles / explicit grant see all
 		// projects; everyone else is restricted to their ProjectMember
 		// assignments. Filtering happens at the query level — unassigned project
 		// data is never returned to the client.
-		const scope = await getCachedUserProjectScope(
-			context.user.id,
-			input.organizationId,
-		);
+		// Runs in parallel with the access check: the scope read is org+user
+		// scoped and its result is only used after the check has passed.
+		const [, scope] = await Promise.all([
+			verifyOrganizationAccess(input.organizationId, context.user.id, {
+				section: "projects",
+				action: "view",
+			}),
+			getCachedUserProjectScope(context.user.id, input.organizationId),
+		]);
 
 		let restrictToProjectIds: string[] | undefined;
 		if (!scope.allProjects) {

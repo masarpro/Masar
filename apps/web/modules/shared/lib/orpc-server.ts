@@ -1,6 +1,7 @@
 import "server-only";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { createApiServerClient } from "@repo/api/orpc/server-client";
+import { getSession } from "@saas/auth/lib/server";
 import { headers } from "next/headers";
 
 /**
@@ -14,6 +15,11 @@ import { headers } from "next/headers";
  */
 export const orpcServerClient = createApiServerClient(async () => ({
 	headers: await headers(),
+	// In-process SSR call: skips the per-call Redis rate limiter and reuses the
+	// React-cached session (one cookie verification per request instead of one
+	// per prefetched procedure). Cannot be set from an HTTP request.
+	isInternal: true,
+	resolvedSession: await getSession(),
 }));
 
 export const orpcServer = createTanstackQueryUtils(orpcServerClient);

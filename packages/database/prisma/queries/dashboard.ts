@@ -21,7 +21,7 @@ export async function getDashboardStats(organizationId: string) {
 			where: { organizationId },
 			_count: { id: true },
 		}),
-		// Financial aggregations
+		// Financial aggregations (PAID + APPROVED claims merged into one groupBy)
 		Promise.all([
 			db.project.aggregate({
 				where: { organizationId },
@@ -31,12 +31,9 @@ export async function getDashboardStats(organizationId: string) {
 				where: { organizationId },
 				_sum: { amount: true },
 			}),
-			db.projectClaim.aggregate({
-				where: { organizationId, status: "PAID" },
-				_sum: { amount: true },
-			}),
-			db.projectClaim.aggregate({
-				where: { organizationId, status: "APPROVED" },
+			db.projectClaim.groupBy({
+				by: ["status"],
+				where: { organizationId, status: { in: ["PAID", "APPROVED"] } },
 				_sum: { amount: true },
 			}),
 		]),
@@ -47,13 +44,16 @@ export async function getDashboardStats(organizationId: string) {
 			_count: { id: true },
 			_sum: { costImpact: true, timeImpactDays: true },
 		}),
-		// Milestone stats
+		// Milestone stats: one groupBy covers completed + pending; overdue needs
+		// its own count because of the plannedEnd predicate.
 		Promise.all([
-			db.projectMilestone.count({
-				where: { organizationId, status: "COMPLETED" },
-			}),
-			db.projectMilestone.count({
-				where: { organizationId, status: { in: ["PLANNED", "IN_PROGRESS"] } },
+			db.projectMilestone.groupBy({
+				by: ["status"],
+				where: {
+					organizationId,
+					status: { in: ["COMPLETED", "PLANNED", "IN_PROGRESS"] },
+				},
+				_count: { id: true },
 			}),
 			db.projectMilestone.count({
 				where: {
@@ -80,7 +80,11 @@ export async function getDashboardStats(organizationId: string) {
 	}
 
 	// Process financial stats
-	const [contractValue, expenses, paidClaims, pendingClaims] = financialStats;
+	const [contractValue, expenses, claimStats] = financialStats;
+	const paidClaimsSum = claimStats.find((c) => c.status === "PAID")?._sum
+		.amount;
+	const pendingClaimsSum = claimStats.find((c) => c.status === "APPROVED")
+		?._sum.amount;
 	const financials = {
 		totalContractValue: contractValue._sum.contractValue
 			? Number(contractValue._sum.contractValue)
@@ -88,12 +92,8 @@ export async function getDashboardStats(organizationId: string) {
 		totalExpenses: expenses._sum.amount
 			? Number(expenses._sum.amount)
 			: 0,
-		totalPaidClaims: paidClaims._sum.amount
-			? Number(paidClaims._sum.amount)
-			: 0,
-		pendingClaimsValue: pendingClaims._sum.amount
-			? Number(pendingClaims._sum.amount)
-			: 0,
+		totalPaidClaims: paidClaimsSum ? Number(paidClaimsSum) : 0,
+		pendingClaimsValue: pendingClaimsSum ? Number(pendingClaimsSum) : 0,
 	};
 
 	// Process change order stats
@@ -117,7 +117,17 @@ export async function getDashboardStats(organizationId: string) {
 	}
 
 	// Process milestone stats
-	const [completedMilestones, pendingMilestones, overdueMilestones] = milestoneStats;
+	const [milestoneCounts, overdueMilestones] = milestoneStats;
+	let completedMilestones = 0;
+	let pendingMilestones = 0;
+	for (const stat of milestoneCounts) {
+		if (stat.status === "COMPLETED") {
+			completedMilestones = stat._count.id;
+		} else {
+			// PLANNED + IN_PROGRESS
+			pendingMilestones += stat._count.id;
+		}
+	}
 	const milestones = {
 		completed: completedMilestones,
 		pending: pendingMilestones,
@@ -460,28 +470,20 @@ export async function getPendingSubcontractClaimsCount(
  * Get invoice totals (invoiced, collected, outstanding)
  */
 export async function getInvoiceTotals(organizationId: string) {
-	const [invoiced, collected] = await Promise.all([
-		db.financeInvoice.aggregate({
-			where: {
-				organizationId,
-				status: { notIn: ["DRAFT", "CANCELLED"] },
-			},
-			_sum: { totalAmount: true },
-		}),
-		db.financeInvoice.aggregate({
-			where: {
-				organizationId,
-				status: { notIn: ["DRAFT", "CANCELLED"] },
-			},
-			_sum: { paidAmount: true },
-		}),
-	]);
+	// One aggregate for both sums — the WHERE was identical in both.
+	const totals = await db.financeInvoice.aggregate({
+		where: {
+			organizationId,
+			status: { notIn: ["DRAFT", "CANCELLED"] },
+		},
+		_sum: { totalAmount: true, paidAmount: true },
+	});
 
-	const totalInvoiced = invoiced._sum.totalAmount
-		? Number(invoiced._sum.totalAmount)
+	const totalInvoiced = totals._sum.totalAmount
+		? Number(totals._sum.totalAmount)
 		: 0;
-	const totalCollected = collected._sum.paidAmount
-		? Number(collected._sum.paidAmount)
+	const totalCollected = totals._sum.paidAmount
+		? Number(totals._sum.paidAmount)
 		: 0;
 	const totalOutstanding = totalInvoiced - totalCollected;
 
@@ -516,33 +518,24 @@ export async function getMonthlyFinancialTrend(organizationId: string) {
 		monthlyData.set(key, { expenses: 0, claims: 0 });
 	}
 
-	// Resolve cash/bank chart accounts: 1110 parent + all its postable children.
-	const cashParent = await db.chartAccount.findUnique({
-		where: { organizationId_code: { organizationId, code: "1110" } },
-		select: { id: true },
-	});
-
-	if (!cashParent) {
-		// Accounting not initialised yet for this org.
-		return Array.from(monthlyData.entries())
-			.map(([month, data]) => ({ month, ...data }))
-			.sort((a, b) => a.month.localeCompare(b.month));
-	}
-
-	const cashAccounts = await db.chartAccount.findMany({
-		where: {
-			organizationId,
-			OR: [{ id: cashParent.id }, { parentId: cashParent.id }],
-		},
-		select: { id: true },
-	});
-	const cashIds = new Set(cashAccounts.map((a) => a.id));
-
-	// In-range POSTED lines, grouped per entry so each entry yields a single net
-	// cash movement (internal transfers between own cash accounts net to ~0).
+	// In-range POSTED lines on the cash/bank accounts (1110 + its children),
+	// grouped per entry so each entry yields a single net cash movement
+	// (internal transfers between own cash accounts net to ~0).
+	//
+	// The account filter is expressed as a relation predicate so the previous
+	// 3-step serial chain (find 1110 → find children → find lines) collapses to
+	// ONE round-trip — that chain sat on the critical path of every homepage
+	// load at cross-region latency per step. An org without accounting simply
+	// matches no rows (same result as the old early-return).
 	const lines = await db.journalEntryLine.findMany({
 		where: {
-			account: { id: { in: [...cashIds] } },
+			account: {
+				organizationId,
+				OR: [
+					{ code: "1110" },
+					{ parent: { organizationId, code: "1110" } },
+				],
+			},
 			journalEntry: {
 				organizationId,
 				status: { in: ["POSTED", "REVERSED"] },

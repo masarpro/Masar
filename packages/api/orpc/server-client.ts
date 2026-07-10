@@ -1,4 +1,5 @@
 import { createRouterClient } from "@orpc/server";
+import type { auth } from "@repo/auth";
 import { router } from "./router";
 
 /**
@@ -14,5 +15,11 @@ import { router } from "./router";
  * of framework imports (Next.js supplies `headers()` from apps/web).
  */
 export const createApiServerClient = (
-	context: () => Promise<{ headers: Headers }>,
+	context: () => Promise<{
+		headers: Headers;
+		/** Marks the call as server-originated — skips the per-call rate limiter. */
+		isInternal?: boolean;
+		/** Request-deduped session so each prefetch skips cookie re-verification. */
+		resolvedSession?: Awaited<ReturnType<typeof auth.api.getSession>>;
+	}>,
 ) => createRouterClient(router, { context });

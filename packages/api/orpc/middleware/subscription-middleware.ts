@@ -28,13 +28,18 @@ const subscriptionCache = new Map<
 	string,
 	{ value: OrgSubscription; expires: number }
 >();
+// Single-flight: parallel write RPCs from one page all missing the cache at
+// once must share a single DB query instead of stampeding.
+const subscriptionInflight = new Map<string, Promise<OrgSubscription>>();
 
 export function invalidateSubscriptionCache(organizationId?: string): void {
 	if (organizationId) {
 		subscriptionCache.delete(organizationId);
+		subscriptionInflight.delete(organizationId);
 		return;
 	}
 	subscriptionCache.clear();
+	subscriptionInflight.clear();
 }
 
 async function getOrgSubscription(orgId: string): Promise<OrgSubscription> {
@@ -43,25 +48,37 @@ async function getOrgSubscription(orgId: string): Promise<OrgSubscription> {
 		return hit.value;
 	}
 
-	const org = await db.organization.findUnique({
-		where: { id: orgId },
-		select: {
-			status: true,
-			plan: true,
-			isFreeOverride: true,
-			trialEndsAt: true,
-		},
-	});
-
-	if (subscriptionCache.size >= MAX_ENTRIES) {
-		subscriptionCache.clear();
+	const pending = subscriptionInflight.get(orgId);
+	if (pending) {
+		return pending;
 	}
-	subscriptionCache.set(orgId, {
-		value: org,
-		expires: Date.now() + SUBSCRIPTION_TTL_MS,
-	});
 
-	return org;
+	const promise = db.organization
+		.findUnique({
+			where: { id: orgId },
+			select: {
+				status: true,
+				plan: true,
+				isFreeOverride: true,
+				trialEndsAt: true,
+			},
+		})
+		.then((org) => {
+			if (subscriptionCache.size >= MAX_ENTRIES) {
+				subscriptionCache.clear();
+			}
+			subscriptionCache.set(orgId, {
+				value: org,
+				expires: Date.now() + SUBSCRIPTION_TTL_MS,
+			});
+			return org;
+		})
+		.finally(() => {
+			subscriptionInflight.delete(orgId);
+		});
+
+	subscriptionInflight.set(orgId, promise);
+	return promise;
 }
 
 export async function checkSubscription(context: {

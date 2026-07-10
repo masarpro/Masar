@@ -90,6 +90,29 @@ async function OrganizationPageContent({
 				}),
 			),
 		);
+		// RecentDocumentsCard renders under showProjects and fires these three
+		// queries client-side; prefetching them here (inputs MUST match the
+		// card's exactly) turns three cold client round-trips into hydrated
+		// data at first paint. prefetchQuery swallows errors, so a member
+		// without finance/pricing view simply falls back to the client query —
+		// same behavior as before.
+		prefetches.push(
+			queryClient.prefetchQuery(
+				orpcServer.finance.invoices.list.queryOptions({
+					input: { organizationId, limit: 3 },
+				}),
+			),
+			queryClient.prefetchQuery(
+				orpcServer.pricing.quotations.list.queryOptions({
+					input: { organizationId },
+				}),
+			),
+			queryClient.prefetchQuery(
+				orpcServer.pricing.studies.list.queryOptions({
+					input: { organizationId },
+				}),
+			),
+		);
 	}
 
 	await Promise.all(prefetches);

@@ -47,11 +47,13 @@ const prismaClientSingleton = () => {
 		// cap is cheap and cuts the wave count. 10 keeps a single warm instance's
 		// fan-out largely un-queued without risking the pooler's client budget.
 		max: 10,
-		// Keep idle connections short-lived: behind Supabase's pgbouncer (and the
-		// Dubai↔Mumbai network) idle TCP connections get dropped server-side. A long
-		// idle timeout means we reuse a connection the server already killed →
-		// "Connection terminated unexpectedly" errors. Recycle quickly instead.
-		idleTimeoutMillis: 10000,
+		// Idle timeout balances two failure modes: too long → reuse of a socket
+		// pgbouncer already killed ("Connection terminated unexpectedly"); too
+		// short → every navigation pause > timeout pays a fresh TCP+TLS+startup
+		// handshake on the next click (SaaS navigation is bursty). 30s keeps
+		// connections warm across a browsing session; the keepAlive + maxUses +
+		// transient-retry machinery below already guards against stale sockets.
+		idleTimeoutMillis: 30000,
 		connectionTimeoutMillis: 10000,
 		// Enable TCP keepalive so dead/half-open connections are detected proactively
 		// instead of surfacing as a failed query mid-request.

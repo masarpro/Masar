@@ -41,6 +41,16 @@ const permissionsCache = new Map<string, Entry<Permissions>>();
 const projectScopeCache = new Map<string, Entry<ProjectScope>>();
 const roleTypeCache = new Map<string, Entry<string | null>>();
 
+// In-flight promise maps (single-flight): a page prefetching several RPCs in
+// parallel had every call miss the cache simultaneously and stampede the DB
+// with identical queries. Sharing the pending promise collapses N concurrent
+// misses into 1 query.
+const membershipInflight = new Map<string, Promise<Membership>>();
+const permissionsInflight = new Map<string, Promise<Permissions>>();
+const projectScopeInflight = new Map<string, Promise<ProjectScope>>();
+const roleTypeInflight = new Map<string, Promise<string | null>>();
+const projectRowInflight = new Map<string, Promise<ProjectAccessRow>>();
+
 type ProjectAccessRow = {
 	id: string;
 	name: string;
@@ -74,18 +84,40 @@ function write<T>(cache: Map<string, Entry<T>>, key: string, value: T): void {
 	cache.set(key, { value, expires: Date.now() + TTL_MS });
 }
 
+function withSingleFlight<T>(
+	cache: Map<string, Entry<T>>,
+	inflight: Map<string, Promise<T>>,
+	key: string,
+	load: () => Promise<T>,
+): Promise<T> {
+	const hit = read(cache, key);
+	if (hit) {
+		return Promise.resolve(hit.value);
+	}
+	const pending = inflight.get(key);
+	if (pending) {
+		return pending;
+	}
+	const promise = load()
+		.then((value) => {
+			write(cache, key, value);
+			return value;
+		})
+		.finally(() => {
+			inflight.delete(key);
+		});
+	inflight.set(key, promise);
+	return promise;
+}
+
 export async function getCachedOrganizationMembership(
 	organizationId: string,
 	userId: string,
 ): Promise<Membership> {
 	const key = cacheKey(organizationId, userId);
-	const hit = read(membershipCache, key);
-	if (hit) {
-		return hit.value;
-	}
-	const value = await getOrganizationMembership(organizationId, userId);
-	write(membershipCache, key, value);
-	return value;
+	return withSingleFlight(membershipCache, membershipInflight, key, () =>
+		getOrganizationMembership(organizationId, userId),
+	);
 }
 
 export async function getCachedUserPermissions(
@@ -93,13 +125,9 @@ export async function getCachedUserPermissions(
 	organizationId: string,
 ): Promise<Permissions> {
 	const key = cacheKey(organizationId, userId);
-	const hit = read(permissionsCache, key);
-	if (hit) {
-		return hit.value;
-	}
-	const value = await getUserPermissions(userId, organizationId);
-	write(permissionsCache, key, value);
-	return value;
+	return withSingleFlight(permissionsCache, permissionsInflight, key, () =>
+		getUserPermissions(userId, organizationId),
+	);
 }
 
 export async function getCachedUserRoleType(
@@ -107,13 +135,9 @@ export async function getCachedUserRoleType(
 	organizationId: string,
 ): Promise<string | null> {
 	const key = cacheKey(organizationId, userId);
-	const hit = read(roleTypeCache, key);
-	if (hit) {
-		return hit.value;
-	}
-	const value = await getUserRoleType(userId, organizationId);
-	write(roleTypeCache, key, value);
-	return value;
+	return withSingleFlight(roleTypeCache, roleTypeInflight, key, () =>
+		getUserRoleType(userId, organizationId),
+	);
 }
 
 export async function getCachedUserProjectScope(
@@ -121,13 +145,9 @@ export async function getCachedUserProjectScope(
 	organizationId: string,
 ): Promise<ProjectScope> {
 	const key = cacheKey(organizationId, userId);
-	const hit = read(projectScopeCache, key);
-	if (hit) {
-		return hit.value;
-	}
-	const value = await getUserProjectScope(userId, organizationId);
-	write(projectScopeCache, key, value);
-	return value;
+	return withSingleFlight(projectScopeCache, projectScopeInflight, key, () =>
+		getUserProjectScope(userId, organizationId),
+	);
 }
 
 /**
@@ -143,16 +163,12 @@ export async function getCachedProjectForAccess(
 	organizationId: string,
 ): Promise<ProjectAccessRow> {
 	const key = `${organizationId}:${projectId}`;
-	const hit = read(projectRowCache, key);
-	if (hit) {
-		return hit.value;
-	}
-	const value = await db.project.findFirst({
-		where: { id: projectId, organizationId },
-		select: { id: true, name: true, slug: true, organizationId: true },
-	});
-	write(projectRowCache, key, value);
-	return value;
+	return withSingleFlight(projectRowCache, projectRowInflight, key, () =>
+		db.project.findFirst({
+			where: { id: projectId, organizationId },
+			select: { id: true, name: true, slug: true, organizationId: true },
+		}),
+	);
 }
 
 /**
@@ -174,6 +190,10 @@ export function invalidateAccessCache(
 		permissionsCache.delete(key);
 		projectScopeCache.delete(key);
 		roleTypeCache.delete(key);
+		membershipInflight.delete(key);
+		permissionsInflight.delete(key);
+		projectScopeInflight.delete(key);
+		roleTypeInflight.delete(key);
 		return;
 	}
 
