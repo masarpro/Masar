@@ -38,6 +38,7 @@ interface Project {
 	endDate: Date | string | null;
 	clientName: string | null;
 	photos?: { url: string }[];
+	coverPhoto?: { url: string } | null;
 }
 
 interface ActiveProjectsSectionProps {
@@ -149,7 +150,11 @@ export function ActiveProjectsSection({
 							{/* Project photo */}
 							<div className="relative h-10 w-10 shrink-0 ms-2 rounded-lg overflow-hidden bg-muted/30">
 								<ProjectThumb
-									src={project.photos?.[0]?.url ?? null}
+									src={
+										project.coverPhoto?.url ??
+										project.photos?.[0]?.url ??
+										null
+									}
 									alt={project.name || ""}
 								/>
 							</div>

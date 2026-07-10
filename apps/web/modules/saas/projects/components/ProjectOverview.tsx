@@ -1,6 +1,5 @@
 "use client";
 
-import { ProjectOverviewSkeleton } from "@saas/shared/components/skeletons";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -62,10 +61,10 @@ export function ProjectOverview({
 		}),
 	);
 
-	if (summaryLoading) {
-		return <ProjectOverviewSkeleton />;
-	}
-
+	// Do NOT gate the whole page on the finance summary: it runs a heavy
+	// aggregation and every other card's query used to wait for it (a 2-round
+	// waterfall). Each card renders immediately with its own loading state;
+	// only the finance card shows a local skeleton while its data arrives.
 	return (
 		<div className="space-y-6">
 			{/* Three Overview Cards: Execution, Finance, Timeline */}
@@ -77,6 +76,9 @@ export function ProjectOverview({
 						projectProgress={projectData?.progress != null ? Number(projectData.progress) : undefined}
 						projectStatus={projectData?.status}
 					/>
+					{summaryLoading ? (
+						<div className="h-full min-h-[220px] animate-pulse rounded-2xl border border-border/50 bg-muted/30" />
+					) : (
 					<FinanceBudgetCard
 						contractValue={
 							financeSummary?.adjustedContractValueGross ??
@@ -90,6 +92,7 @@ export function ProjectOverview({
 						claimsPaid={financeSummary?.claimsPaid ?? 0}
 						expectedProfit={financeSummary?.expectedProfit ?? 0}
 					/>
+					)}
 					<TimelineScheduleCard
 						projectProgress={projectData?.progress != null ? Number(projectData.progress) : undefined}
 						startDate={projectData?.startDate}

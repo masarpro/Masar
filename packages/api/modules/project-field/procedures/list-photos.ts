@@ -1,6 +1,7 @@
 import { getProjectPhotos } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
+import { normalizePhotoUrl } from "../../../lib/media/photo-url";
 import { verifyProjectAccess } from "../../../lib/permissions";
 
 export const listPhotosProcedure = protectedProcedure
@@ -43,5 +44,11 @@ export const listPhotosProcedure = protectedProcedure
 			offset: input.offset,
 		});
 
-		return result;
+		return {
+			...result,
+			photos: result.photos.map((photo) => ({
+				...photo,
+				url: normalizePhotoUrl(photo.url) ?? photo.url,
+			})),
+		};
 	});

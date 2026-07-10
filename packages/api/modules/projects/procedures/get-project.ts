@@ -3,6 +3,7 @@ import { getProjectById } from "@repo/database";
 import { z } from "zod";
 import { protectedProcedure } from "../../../orpc/procedures";
 import { verifyProjectAccess } from "../../../lib/permissions";
+import { normalizePhotoRecord } from "../../../lib/media/photo-url";
 import { idString } from "../../../lib/validation-constants";
 
 export const getProject = protectedProcedure
@@ -42,5 +43,6 @@ export const getProject = protectedProcedure
 				? Number(project.contractValue)
 				: null,
 			progress: Number(project.progress),
+			coverPhoto: normalizePhotoRecord(project.coverPhoto),
 		};
 	});

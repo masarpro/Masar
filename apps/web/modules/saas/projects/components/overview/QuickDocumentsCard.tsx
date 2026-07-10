@@ -19,9 +19,10 @@ export function QuickDocumentsCard({
 }: QuickDocumentsCardProps) {
 	const t = useTranslations();
 
+	// Only the 2 most recent documents are shown — don't pull a full page.
 	const { data: documentsData } = useQuery(
 		orpc.projectDocuments.list.queryOptions({
-			input: { organizationId, projectId },
+			input: { organizationId, projectId, pageSize: 2 },
 		}),
 	);
 

@@ -9,6 +9,7 @@ import {
 	getCachedUserProjectScope,
 	verifyOrganizationAccess,
 } from "../../../lib/permissions";
+import { normalizePhotoRecord } from "../../../lib/media/photo-url";
 import { idString, searchQuery, paginationLimit, paginationOffset } from "../../../lib/validation-constants";
 
 export const listProjects = protectedProcedure
@@ -71,8 +72,12 @@ export const listProjects = protectedProcedure
 					: null,
 				progress: Number(project.progress),
 				memberCount: (project as any)._count?.members ?? 0,
-				photos: (project as any).photos ?? [],
-				coverPhoto: (project as any).coverPhoto ?? null,
+				photos: ((project as any).photos ?? [])
+					.map((photo: { url: string }) => normalizePhotoRecord(photo))
+					.filter(Boolean),
+				coverPhoto: normalizePhotoRecord(
+					(project as any).coverPhoto ?? null,
+				),
 			})),
 			total: result.total,
 			stats,

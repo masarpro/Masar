@@ -33,10 +33,15 @@ export function ExecutionPhasesCard({
 		}),
 	);
 
-	// Fetch timeline health summary
+	// Health summary is only a fallback for projects with zero milestones —
+	// when milestones exist every figure is derived from them, so skip the
+	// extra round-trip in the common case.
 	const { data: healthData } = useQuery(
 		orpc.projectTimeline.getHealth.queryOptions({
 			input: { organizationId, projectId },
+			enabled:
+				milestonesData !== undefined &&
+				(milestonesData?.milestones ?? []).length === 0,
 		}),
 	);
 
@@ -260,7 +265,7 @@ export function ExecutionPhasesCard({
 							<span className="h-2 w-2 shrink-0 rounded-sm bg-sky-500" />
 							{t("projects.commandCenter.completedLabel")}
 							<span
-								className="mr-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
+								className="ms-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
 								dir="ltr"
 							>
 								{completedPct}%
@@ -270,7 +275,7 @@ export function ExecutionPhasesCard({
 							<span className="h-2 w-2 shrink-0 rounded-sm bg-blue-500" />
 							{t("projects.commandCenter.inProgressLabel")}
 							<span
-								className="mr-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
+								className="ms-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
 								dir="ltr"
 							>
 								{inProgressPct}%
@@ -280,7 +285,7 @@ export function ExecutionPhasesCard({
 							<span className="h-2 w-2 shrink-0 rounded-sm bg-slate-200 dark:bg-slate-600" />
 							{t("projects.commandCenter.notStartedLabel")}
 							<span
-								className="mr-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
+								className="ms-auto text-[13px] font-bold text-slate-800 dark:text-slate-200"
 								dir="ltr"
 							>
 								{notStartedPct}%
@@ -291,7 +296,7 @@ export function ExecutionPhasesCard({
 							<span className="h-2 w-2 shrink-0 rounded-full bg-violet-500" />
 							{t("projects.commandCenter.completedLabel")}:{" "}
 							{completedCount}/{totalMilestones}
-							<span className="mr-auto text-[13px] text-slate-400">
+							<span className="ms-auto text-[13px] text-slate-400">
 								{t("projects.commandCenter.phasesLabel")}
 							</span>
 						</div>

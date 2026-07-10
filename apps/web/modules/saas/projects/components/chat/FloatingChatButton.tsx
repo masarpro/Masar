@@ -32,6 +32,9 @@ export function FloatingChatButton({
 			input: { organizationId, projectId },
 		}),
 		refetchInterval: 30000,
+		// Don't keep polling while the tab is hidden — this runs on every
+		// project sub-page and was a steady source of background load.
+		refetchIntervalInBackground: false,
 		enabled: canChat,
 	});
 

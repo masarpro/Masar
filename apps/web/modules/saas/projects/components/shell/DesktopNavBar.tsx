@@ -35,7 +35,10 @@ export function DesktopNavBar({
 	return (
 		<nav
 			className={cn(
-				"hidden md:flex items-center gap-1 px-2 py-1.5 rounded-2xl",
+				// overflow-x-auto: on narrow tablets the section list is wider
+				// than the bar — without it items get clipped with no way to
+				// reach them.
+				"hidden md:flex items-center gap-1 px-2 py-1.5 rounded-2xl overflow-x-auto scrollbar-hide",
 				GLASS_CLASSES.bar,
 			)}
 			dir="rtl"

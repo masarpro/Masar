@@ -503,6 +503,15 @@ input[cmdk-input] {
 	transition: all 0.5s ease;
 }
 
+/* Hide scrollbars while keeping scrollability (used by nav shells) */
+.scrollbar-hide {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+	display: none;
+}
+
 /* NavBar Button Overrides for Landing Page */
 .lp-nav-buttons button {
 	color: var(--lp-nav-btn-text);
