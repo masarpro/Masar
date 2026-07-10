@@ -1,20 +1,16 @@
 "use client";
 
 import type { Permissions } from "@repo/database/prisma/permissions";
-import { HomeDashboardSkeleton } from "@saas/shared/components/skeletons";
-import dynamic from "next/dynamic";
+import { Dashboard } from "@saas/dashboard/components";
 
-// SSR enabled: with the page server-prefetching the dashboard queries and
-// passing organization/permissions as props, the server renders real content
-// at first paint instead of a skeleton until the JS chunk hydrates.
+// Static import (not next/dynamic): the Dashboard is the homepage's main
+// content and is always needed, and the page already server-prefetches its
+// queries + SSRs it. A dynamic() wrapper added a client-side lazy boundary
+// whose `loading` skeleton flashed OVER the already-SSR'd content during chunk
+// hydration (real content → skeleton → content = the "flutter"). Bundling it
+// statically into this homepage-only client chunk removes that flash without
+// changing the total JS the homepage loads.
 // (Chart-heavy FinancePanel inside Dashboard keeps its own ssr:false split.)
-const Dashboard = dynamic(
-	() =>
-		import("@saas/dashboard/components").then((m) => ({
-			default: m.Dashboard,
-		})),
-	{ loading: () => <HomeDashboardSkeleton /> },
-);
 
 export interface InitialPermissions {
 	permissions: Permissions | null;

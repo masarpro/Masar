@@ -72,7 +72,11 @@ export const AppSidebar = React.memo(function AppSidebar({ headerExtra }: AppSid
 			<aside
 				className={cn(
 					"fixed top-0 z-[60] h-full start-0",
-					!ready && "opacity-0",
+					// Desktop (xl+) shows immediately: `collapsed` is cookie-seeded so
+					// the width is already correct on the server render — nothing to
+					// hide. Only the mobile overlay stays hidden until the client
+					// confirms the viewport (server can't detect mobile).
+					!ready && "max-xl:opacity-0",
 					"flex flex-col",
 					"bg-background border-e border-border shadow-xl",
 					ready && "transition-[width,opacity,transform] duration-300 ease-out",

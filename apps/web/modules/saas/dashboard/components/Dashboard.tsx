@@ -8,28 +8,23 @@ import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import dynamic from "next/dynamic";
 
 import { ActiveProjectsSection } from "./sections/ActiveProjectsSection";
 import { QuickActionsGrid } from "./sections/QuickActionsGrid";
 import { AlertsSection } from "./sections/AlertsSection";
 import { OperationalSection } from "./sections/OperationalSection";
 import { DidYouKnowCard } from "./sections/DidYouKnowCard";
+import { FinancePanel } from "./sections/FinancePanel";
 import { RecentDocumentsCard } from "./sections/RecentDocumentsCard";
 import { WelcomeSection } from "./sections/WelcomeSection";
 
-const FinancePanel = dynamic(
-	() =>
-		import("./sections/FinancePanel").then((m) => ({
-			default: m.FinancePanel,
-		})),
-	{
-		loading: () => (
-			<div className="h-[300px] animate-pulse rounded-lg bg-muted" />
-		),
-		ssr: false,
-	},
-);
+// FinancePanel is imported statically (not next/dynamic with ssr:false). Its
+// data is server-prefetched, so the panel frame + real bank/cash balances now
+// render on the server at first paint instead of a grey pulse box that popped
+// in on the client. The Recharts chart inside it is the only part that needs
+// the browser to measure its container — FinancePanel gates JUST that chart
+// behind a mount check, drawing it into an already-reserved, same-height slot
+// so nothing shifts.
 
 export function Dashboard({
 	organizationId: organizationIdProp,

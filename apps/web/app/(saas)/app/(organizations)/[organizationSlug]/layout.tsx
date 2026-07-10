@@ -11,9 +11,11 @@ import {
 	cachedGetOrganizationSubscription,
 	cachedListPurchases,
 } from "@shared/lib/cached-queries";
+import { SIDEBAR_COLLAPSED_COOKIE } from "@saas/shared/components/sidebar/sidebar-context";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { getServerQueryClient } from "@shared/lib/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import type { PropsWithChildren } from "react";
 
@@ -28,11 +30,16 @@ export default async function OrganizationLayout({
 	const layoutStart = performance.now();
 	const { organizationSlug } = await params;
 
-	// Fetch organization and session in parallel (both are independent)
-	const [organization, session] = await Promise.all([
+	// Fetch organization + session + sidebar-collapse cookie in parallel. The
+	// cookie lets the sidebar render at the correct width on the server's first
+	// paint (no client-side snap/fade). Defaults to expanded when unset.
+	const [organization, session, cookieStore] = await Promise.all([
 		getActiveOrganization(organizationSlug),
 		getSession(),
+		cookies(),
 	]);
+	const sidebarCollapsed =
+		cookieStore.get(SIDEBAR_COLLAPSED_COOKIE)?.value === "1";
 
 	if (!organization) {
 		return notFound();
@@ -109,7 +116,7 @@ export default async function OrganizationLayout({
 		// would never reach the client on pages without their own boundary.
 		<HydrationBoundary state={dehydrate(queryClient)}>
 			<AssistantWrapper organizationName={organization.name}>
-				<AppWrapper>
+				<AppWrapper defaultSidebarCollapsed={sidebarCollapsed}>
 					<SubscriptionGuard
 						orgStatus={orgSubscription?.status ?? "ACTIVE"}
 						orgPlan={orgSubscription?.plan ?? null}

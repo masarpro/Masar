@@ -38,7 +38,15 @@ const prismaClientSingleton = () => {
 
 	const pool = new Pool({
 		connectionString: process.env.DATABASE_URL,
-		max: 5,
+		// The org homepage alone fans out ~15 queries in one render (dashboard.getAll
+		// runs 10 in parallel, plus finance.orgDashboard, projects.list, and the
+		// layout chain). At max:5 those queued in 3 waves, each wave paying the full
+		// Dubai↔Mumbai round-trip (~20-30ms) — a self-inflicted serialization.
+		// Supabase's transaction pooler (port 6543) multiplexes these onto a small
+		// set of real Postgres connections, so a higher per-instance client-socket
+		// cap is cheap and cuts the wave count. 10 keeps a single warm instance's
+		// fan-out largely un-queued without risking the pooler's client budget.
+		max: 10,
 		// Keep idle connections short-lived: behind Supabase's pgbouncer (and the
 		// Dubai↔Mumbai network) idle TCP connections get dropped server-side. A long
 		// idle timeout means we reuse a connection the server already killed →

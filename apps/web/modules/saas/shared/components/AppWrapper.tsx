@@ -10,7 +10,10 @@ import {
 import { SkipNavTarget } from "@ui/components/skip-nav";
 import type { PropsWithChildren } from "react";
 
-export function AppWrapper({ children }: PropsWithChildren) {
+export function AppWrapper({
+	children,
+	defaultSidebarCollapsed = false,
+}: PropsWithChildren<{ defaultSidebarCollapsed?: boolean }>) {
 	const headerExtra =
 		config.organizations.enable &&
 		!config.organizations.hideOrganization ? (
@@ -18,7 +21,7 @@ export function AppWrapper({ children }: PropsWithChildren) {
 		) : undefined;
 
 	return (
-		<SidebarProvider>
+		<SidebarProvider defaultCollapsed={defaultSidebarCollapsed}>
 			<div className="flex h-screen">
 				<AppSidebar headerExtra={headerExtra} />
 				<SidebarInset>

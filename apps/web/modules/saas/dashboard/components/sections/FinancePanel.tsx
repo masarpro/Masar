@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Currency } from "@saas/finance/components/shared/Currency";
 import { CHART_SEMANTIC } from "@saas/shared/lib/chart-colors";
 import {
@@ -32,6 +32,13 @@ export function FinancePanel({
 }: FinancePanelProps) {
 	const t = useTranslations();
 	const locale = useLocale();
+
+	// Recharts' ResponsiveContainer needs to measure its parent in the browser,
+	// so the chart itself can only render after mount. Everything else (frame +
+	// balance cards) renders on the server. Reserving the chart's exact box below
+	// means the chart fades into place with zero layout shift.
+	const [mounted, setMounted] = useState(false);
+	useEffect(() => setMounted(true), []);
 
 	const chartConfig: ChartConfig = {
 		claims: { label: t("dashboard.financial.revenueLabel"), color: CHART_SEMANTIC.primary },
@@ -121,54 +128,60 @@ export function FinancePanel({
 					</Link>
 				</div>
 
-				<ChartContainer config={chartConfig} className="w-full flex-1 min-h-[100px] max-h-44 sm:max-h-none aspect-auto">
-					<AreaChart
-						data={chartData}
-						margin={{ top: 4, right: 4, left: 4, bottom: 0 }}
-					>
-						<defs>
-							<linearGradient id="fpIncGrad" x1="0" y1="0" x2="0" y2="1">
-								<stop offset="0%" stopColor={CHART_SEMANTIC.primary} stopOpacity={0.4} />
-								<stop offset="100%" stopColor={CHART_SEMANTIC.primary} stopOpacity={0} />
-							</linearGradient>
-							<linearGradient id="fpExpGrad" x1="0" y1="0" x2="0" y2="1">
-								<stop offset="0%" stopColor={CHART_SEMANTIC.negative} stopOpacity={0.15} />
-								<stop offset="100%" stopColor={CHART_SEMANTIC.negative} stopOpacity={0} />
-							</linearGradient>
-						</defs>
-						<CartesianGrid vertical={false} />
-						<XAxis
-							dataKey="month"
-							tickLine={false}
-							axisLine={false}
-							fontSize={10}
-							tickMargin={6}
-							tickFormatter={formatMonth}
-						/>
-						<YAxis hide />
-						<ChartTooltip
-							content={
-								<ChartTooltipContent labelFormatter={(label) => formatMonth(String(label))} />
-							}
-						/>
-						<Area
-							type="natural"
-							dataKey="claims"
-							stroke={CHART_SEMANTIC.primary}
-							fill="url(#fpIncGrad)"
-							strokeWidth={2}
-							dot={false}
-						/>
-						<Area
-							type="natural"
-							dataKey="expenses"
-							stroke={CHART_SEMANTIC.negative}
-							fill="url(#fpExpGrad)"
-							strokeWidth={1.5}
-							dot={false}
-						/>
-					</AreaChart>
-				</ChartContainer>
+				{mounted ? (
+					<ChartContainer config={chartConfig} className="w-full flex-1 min-h-[100px] max-h-44 sm:max-h-none aspect-auto">
+						<AreaChart
+							data={chartData}
+							margin={{ top: 4, right: 4, left: 4, bottom: 0 }}
+						>
+							<defs>
+								<linearGradient id="fpIncGrad" x1="0" y1="0" x2="0" y2="1">
+									<stop offset="0%" stopColor={CHART_SEMANTIC.primary} stopOpacity={0.4} />
+									<stop offset="100%" stopColor={CHART_SEMANTIC.primary} stopOpacity={0} />
+								</linearGradient>
+								<linearGradient id="fpExpGrad" x1="0" y1="0" x2="0" y2="1">
+									<stop offset="0%" stopColor={CHART_SEMANTIC.negative} stopOpacity={0.15} />
+									<stop offset="100%" stopColor={CHART_SEMANTIC.negative} stopOpacity={0} />
+								</linearGradient>
+							</defs>
+							<CartesianGrid vertical={false} />
+							<XAxis
+								dataKey="month"
+								tickLine={false}
+								axisLine={false}
+								fontSize={10}
+								tickMargin={6}
+								tickFormatter={formatMonth}
+							/>
+							<YAxis hide />
+							<ChartTooltip
+								content={
+									<ChartTooltipContent labelFormatter={(label) => formatMonth(String(label))} />
+								}
+							/>
+							<Area
+								type="natural"
+								dataKey="claims"
+								stroke={CHART_SEMANTIC.primary}
+								fill="url(#fpIncGrad)"
+								strokeWidth={2}
+								dot={false}
+							/>
+							<Area
+								type="natural"
+								dataKey="expenses"
+								stroke={CHART_SEMANTIC.negative}
+								fill="url(#fpExpGrad)"
+								strokeWidth={1.5}
+								dot={false}
+							/>
+						</AreaChart>
+					</ChartContainer>
+				) : (
+					// Same-size reservation as ChartContainer above → chart fades in
+					// with no layout shift on the server→client handoff.
+					<div className="w-full flex-1 min-h-[100px] max-h-44 sm:max-h-none" />
+				)}
 			</div>
 		</div>
 	);
