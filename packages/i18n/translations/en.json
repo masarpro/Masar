@@ -5408,7 +5408,6 @@
   },
   "hero": {
     "badge": "🇸🇦 Built for the Saudi Market",
-    "titleBrand": "Masar",
     "titleDesc": "Complete Construction Management System",
     "subtitle": "From quantity takeoff to project handover — in one system",
     "description": "Organize pricing, contracts, execution, and finance — your entire team in one system, no fragmentation.",
@@ -5417,13 +5416,6 @@
     "tagline": "Because everything needs to stay on track",
     "proof": "Saudi contractors already using Masar",
     "dashboardAlt": "Masar dashboard — active projects, cash check, and one-click quick actions in a single screen",
-    "announcement": {
-      "label": "Announcement",
-      "chip": "New",
-      "text": "Fully redesigned dashboard — one-click quick actions and a live cash check",
-      "cta": "Start Free",
-      "close": "Dismiss announcement"
-    },
     "stations": {
       "aria": "Project stages in Masar: pricing, contract, execution, invoicing, handover",
       "pricing": "Pricing",

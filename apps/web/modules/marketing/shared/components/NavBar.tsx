@@ -1,7 +1,6 @@
 "use client";
 
 import { LocaleLink, useLocalePathname } from "@i18n/routing";
-import { AnnouncementBar } from "@marketing/home/components/AnnouncementBar";
 import { config } from "@repo/config";
 import { useSession } from "@saas/auth/hooks/use-session";
 import { ColorModeToggle } from "@shared/components/ColorModeToggle";
@@ -113,7 +112,6 @@ export function NavBar() {
 			}
 			data-test="navigation"
 		>
-			{isHomePage && <AnnouncementBar />}
 			<div className="container">
 				<div
 					className={cn(

@@ -17,9 +17,13 @@ const STATIONS = [
 export function PathStrip() {
 	const t = useTranslations();
 	const [entered, setEntered] = useState(false);
+	const [showComet, setShowComet] = useState(false);
 
 	useEffect(() => {
 		const id = requestAnimationFrame(() => setEntered(true));
+		if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+			setShowComet(true);
+		}
 		return () => cancelAnimationFrame(id);
 	}, []);
 
@@ -30,8 +34,42 @@ export function PathStrip() {
 		>
 			<div className="lp-path-ltr">
 				<svg className="lp-path-svg" viewBox="0 0 900 130">
+					<defs>
+						<radialGradient id="lpCometGrad" cx="35%" cy="35%" r="65%">
+							<stop offset="0%" stopColor="#bae6fd" />
+							<stop offset="62%" stopColor="#0ea5e9" />
+							<stop offset="100%" stopColor="#0284c7" />
+						</radialGradient>
+					</defs>
 					<path className="lp-line-bg" d={PATH_D} />
 					<path className="lp-line" d={PATH_D} />
+					{showComet ? (
+						<circle
+							className="lp-comet-dot"
+							r="8"
+							opacity="0"
+							fill="url(#lpCometGrad)"
+							aria-hidden="true"
+						>
+							<animateMotion
+								dur="7s"
+								begin="3.3s"
+								repeatCount="indefinite"
+								calcMode="linear"
+								keyPoints="0;1;1"
+								keyTimes="0;0.6;1"
+								path={PATH_D}
+							/>
+							<animate
+								attributeName="opacity"
+								values="0;1;1;0;0"
+								keyTimes="0;0.06;0.6;0.66;1"
+								dur="7s"
+								begin="3.3s"
+								repeatCount="indefinite"
+							/>
+						</circle>
+					) : null}
 					{STATIONS.map((st) => (
 						<a
 							key={st.key}
@@ -74,7 +112,6 @@ export function PathStrip() {
 						</a>
 					))}
 				</svg>
-				<span className="lp-comet" aria-hidden="true" />
 			</div>
 		</div>
 	);
