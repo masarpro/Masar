@@ -5415,7 +5415,38 @@
     "cta": "Start Free",
     "secondary": "Explore Features",
     "tagline": "Because everything needs to stay on track",
-    "proof": "Saudi contractors already using Masar"
+    "proof": "Saudi contractors already using Masar",
+    "dashboardAlt": "Masar dashboard — active projects, cash check, and one-click quick actions in a single screen",
+    "announcement": {
+      "label": "Announcement",
+      "chip": "New",
+      "text": "Fully redesigned dashboard — one-click quick actions and a live cash check",
+      "cta": "Start Free",
+      "close": "Dismiss announcement"
+    },
+    "stations": {
+      "aria": "Project stages in Masar: pricing, contract, execution, invoicing, handover",
+      "pricing": "Pricing",
+      "contract": "Contract",
+      "execution": "Execution",
+      "invoicing": "Invoicing",
+      "handover": "Handover"
+    }
+  },
+  "ticker": {
+    "aria": "Masar platform modules",
+    "items": {
+      "accounting": "Full accounting with auto journal entries",
+      "boq": "BOQ quantity tables",
+      "zatca": "ZATCA e-invoicing — Phase 2",
+      "subcontracts": "Subcontracts & progress claims",
+      "fieldReports": "Daily reports with photos",
+      "ownerPortal": "Owner portal",
+      "aiAssistant": "AI assistant in Arabic",
+      "payroll": "Payroll & employees",
+      "handover": "Handover protocols",
+      "permissions": "Granular role permissions"
+    }
   },
   "howItWorks": {
     "title": "Three steps to get started",

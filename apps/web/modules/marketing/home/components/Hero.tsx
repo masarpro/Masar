@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
+import { DashboardPreview } from "./DashboardPreview";
+import { PathStrip } from "./PathStrip";
 
 function MeshBackground() {
 	return (
@@ -167,6 +169,11 @@ export function Hero() {
 						</p>
 					</div>
 
+					{/* Journey path — clickable stations */}
+					<div className="animate-fade-in-delay-2 mb-6">
+						<PathStrip />
+					</div>
+
 					{/* Description */}
 					<div className="animate-fade-in-delay-2">
 						<p
@@ -255,6 +262,11 @@ export function Hero() {
 							</div>
 						</div>
 					</div>
+				</div>
+
+				{/* Dashboard preview — real app screenshot in a browser frame */}
+				<div className="animate-fade-in-delay-4 mt-16 md:mt-20">
+					<DashboardPreview />
 				</div>
 			</div>
 		</section>

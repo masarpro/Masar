@@ -522,6 +522,291 @@ input[cmdk-input] {
 }
 
 /* ═══════════════════════════════════════════════
+   Landing — Announcement Bar
+   ═══════════════════════════════════════════════ */
+@keyframes lpAnnShift {
+	to { background-position: -200% 0; }
+}
+.lp-announce {
+	position: relative;
+	background: linear-gradient(90deg, #0284c7, #0ea5e9, #06b6d4, #0284c7);
+	background-size: 200% 100%;
+	animation: lpAnnShift 9s linear infinite;
+	color: #fff;
+	font-size: 13px;
+	font-weight: 600;
+	text-align: center;
+	padding: 8px 48px;
+}
+.lp-announce-in {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+.lp-announce-chip {
+	background: rgba(255,255,255,0.2);
+	border: 1px solid rgba(255,255,255,0.4);
+	border-radius: 100px;
+	padding: 1px 11px;
+	font-size: 11px;
+	font-weight: 800;
+	white-space: nowrap;
+}
+.lp-announce-link {
+	font-weight: 700;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	white-space: nowrap;
+	color: #fff;
+}
+.lp-announce-link:hover { opacity: 0.85; }
+.lp-announce-x {
+	position: absolute;
+	inset-inline-end: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 24px;
+	height: 24px;
+	border-radius: 8px;
+	border: none;
+	cursor: pointer;
+	background: rgba(255,255,255,0.16);
+	color: #fff;
+	font-size: 12px;
+	line-height: 1;
+	display: grid;
+	place-items: center;
+	transition: background 0.2s;
+}
+.lp-announce-x:hover { background: rgba(255,255,255,0.32); }
+@media (max-width: 640px) {
+	.lp-announce { font-size: 12px; padding-block: 7px; }
+}
+
+/* ═══════════════════════════════════════════════
+   Landing — Hero Path Strip (signature journey line)
+   ═══════════════════════════════════════════════ */
+.lp-path-strip { position: relative; max-width: 720px; }
+.lp-path-ltr { direction: ltr; position: relative; }
+.lp-path-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.lp-station-label {
+	font-family: inherit;
+	font-weight: 700;
+	font-size: 15px;
+	fill: var(--lp-text);
+}
+.lp-station-sub {
+	font-size: 10.5px;
+	fill: var(--lp-text-subtle);
+	letter-spacing: 0.05em;
+}
+@keyframes lpAnts { to { stroke-dashoffset: -11; } }
+.lp-line-bg {
+	stroke: var(--lp-text-faint);
+	stroke-width: 3;
+	fill: none;
+	stroke-dasharray: 2 9;
+	stroke-linecap: round;
+	animation: lpAnts 1.5s linear infinite;
+}
+@keyframes lpDraw { to { stroke-dashoffset: 0; } }
+.lp-line {
+	stroke: #0ea5e9;
+	stroke-width: 3.5;
+	fill: none;
+	stroke-linecap: round;
+	stroke-dasharray: 1200;
+	stroke-dashoffset: 1200;
+	filter: drop-shadow(0 0 6px rgba(14,165,233,0.4));
+}
+.lp-entered .lp-line { animation: lpDraw 2.6s cubic-bezier(0.22,1,0.36,1) 0.4s forwards; }
+@keyframes lpPop { to { opacity: 1; transform: scale(1); } }
+.lp-node {
+	fill: var(--lp-card-bg-solid);
+	stroke: var(--lp-text-faint);
+	stroke-width: 2.5;
+	opacity: 0;
+	transform: scale(0.3);
+	transform-origin: center;
+	transform-box: fill-box;
+}
+.lp-node.lit { stroke: #0ea5e9; }
+.lp-entered .lp-node {
+	animation: lpPop 0.5s cubic-bezier(0.34,1.56,0.64,1) var(--pd, 0.6s) forwards;
+}
+@keyframes lpHalo {
+	0%, 100% { opacity: 0; transform: scale(1); }
+	2% { opacity: 0.6; transform: scale(1.05); }
+	10% { opacity: 0; transform: scale(2.5); }
+}
+.lp-halo {
+	fill: none;
+	stroke: #0ea5e9;
+	stroke-width: 2;
+	opacity: 0;
+	transform-origin: center;
+	transform-box: fill-box;
+}
+.lp-entered .lp-halo { animation: lpHalo 7s linear var(--hd, 3.3s) infinite; }
+.lp-st-link { cursor: pointer; outline: none; }
+.lp-st-link .lp-station-label,
+.lp-st-link .lp-node { transition: all 0.25s cubic-bezier(0.22,1,0.36,1); }
+.lp-st-link:hover .lp-station-label,
+.lp-st-link:focus .lp-station-label { fill: #0ea5e9; }
+.lp-st-link:hover .lp-node,
+.lp-st-link:focus .lp-node {
+	stroke-width: 4.5;
+	filter: drop-shadow(0 0 7px rgba(14,165,233,0.4));
+}
+@keyframes lpTravel {
+	0% { offset-distance: 0%; opacity: 0; }
+	6% { opacity: 1; }
+	60% { offset-distance: 100%; opacity: 1; }
+	66%, 100% { offset-distance: 100%; opacity: 0; }
+}
+.lp-comet {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: radial-gradient(circle at 35% 35%, #bae6fd, #0ea5e9 62%);
+	box-shadow: 0 0 16px 4px rgba(14,165,233,0.4);
+	offset-path: path("M880 55 C 760 20, 700 90, 570 60 S 340 25, 240 62 S 80 95, 20 50");
+	offset-rotate: 0deg;
+	opacity: 0;
+}
+.lp-entered .lp-comet {
+	animation: lpTravel 7s cubic-bezier(0.22,1,0.36,1) 3.3s infinite;
+}
+.lp-comet::after {
+	content: "";
+	position: absolute;
+	inset: -8px;
+	border-radius: 50%;
+	background: radial-gradient(circle, rgba(14,165,233,0.4), transparent 70%);
+	filter: blur(1px);
+}
+/* keep SVG labels legible when the viewBox shrinks on phones */
+@media (max-width: 640px) {
+	.lp-station-label { font-size: 24px; }
+	.lp-station-sub { font-size: 17px; }
+	.lp-node { r: 15px; stroke-width: 4; }
+	.lp-line, .lp-line-bg { stroke-width: 5; }
+	.lp-comet { width: 11px; height: 11px; }
+}
+@media (max-width: 420px) {
+	.lp-station-label { font-size: 30px; }
+	.lp-station-sub { font-size: 21px; }
+	.lp-node { r: 18px; }
+}
+
+/* ═══════════════════════════════════════════════
+   Landing — Dashboard Preview (browser frame)
+   ═══════════════════════════════════════════════ */
+.lp-shot {
+	max-width: 1020px;
+	margin-inline: auto;
+	border-radius: 18px;
+	overflow: hidden;
+	border: 1px solid var(--lp-card-border);
+	background: var(--lp-card-bg-solid);
+	box-shadow:
+		0 50px 100px -40px rgba(2,20,40,0.4),
+		0 0 0 8px rgba(14,165,233,0.05);
+	transition: transform 0.6s cubic-bezier(0.22,1,0.36,1), box-shadow 0.6s;
+}
+@media (hover: hover) and (pointer: fine) {
+	.lp-shot:hover {
+		transform: translateY(-6px);
+		box-shadow:
+			0 60px 110px -40px rgba(2,20,40,0.5),
+			0 0 0 8px rgba(14,165,233,0.08);
+	}
+}
+.lp-shot-bar {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	direction: ltr;
+	padding: 11px 16px;
+	background: var(--lp-card-bg);
+	border-bottom: 1px solid var(--lp-card-border);
+}
+.lp-shot-bar i {
+	width: 11px;
+	height: 11px;
+	border-radius: 50%;
+	background: var(--lp-text-faint);
+}
+.lp-shot-bar i:nth-child(1) { background: #f87171; }
+.lp-shot-bar i:nth-child(2) { background: #fbbf24; }
+.lp-shot-bar i:nth-child(3) { background: #34d399; }
+.lp-shot-bar span {
+	margin-inline: auto;
+	font-size: 11.5px;
+	color: var(--lp-text-subtle);
+	background: var(--lp-card-bg-solid);
+	border: 1px solid var(--lp-card-border);
+	border-radius: 100px;
+	padding: 3px 18px;
+	direction: ltr;
+}
+.lp-shot-img { display: block; width: 100%; height: auto; }
+
+/* ═══════════════════════════════════════════════
+   Landing — Modules Ticker (marquee)
+   ═══════════════════════════════════════════════ */
+.lp-ticker {
+	border-block: 1px solid var(--lp-card-border);
+	background: var(--lp-bg-alt);
+	overflow: hidden;
+	padding: 15px 0;
+	position: relative;
+	mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+	-webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+}
+@keyframes lpTick { to { transform: translateX(-50%); } }
+.lp-ticker-track {
+	display: flex;
+	gap: 12px;
+	width: max-content;
+	direction: ltr;
+	animation: lpTick 42s linear infinite;
+}
+.lp-ticker:hover .lp-ticker-track { animation-play-state: paused; }
+.lp-tk {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	white-space: nowrap;
+	direction: rtl;
+	font-size: 13.5px;
+	font-weight: 600;
+	color: var(--lp-text-muted);
+	border: 1px solid var(--lp-card-border);
+	background: var(--lp-card-bg);
+	border-radius: 100px;
+	padding: 7px 16px;
+	transition: color 0.3s, border-color 0.3s;
+}
+.lp-tk:hover { color: #0ea5e9; border-color: rgba(14,165,233,0.4); }
+html[lang="en"] .lp-tk { direction: ltr; }
+
+/* Landing motion — respect reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+	.lp-announce,
+	.lp-line-bg,
+	.lp-ticker-track { animation: none !important; }
+	.lp-line { stroke-dashoffset: 0 !important; animation: none !important; }
+	.lp-node { opacity: 1 !important; transform: none !important; animation: none !important; }
+	.lp-halo, .lp-comet { display: none; }
+}
+
+/* ═══════════════════════════════════════════════
    AI Assistant Styles
    ═══════════════════════════════════════════════ */
 @keyframes fadeInUp {
