@@ -121,7 +121,10 @@
       "Bash(mv:*)",
       "Bash(mv calculators:*)",
       "Bash(python -c \":*)",
-      "Bash(npx husky:*)"
+      "Bash(npx husky:*)",
+      "Bash(npx vitest *)",
+      "Bash(git commit --no-verify -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }
