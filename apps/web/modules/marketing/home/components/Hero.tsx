@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DashboardPreview } from "./DashboardPreview";
+import { ParticleDots } from "./ParticleDots";
 import { PathStrip } from "./PathStrip";
 
 export function Hero() {
@@ -15,13 +16,14 @@ export function Hero() {
 			className="mas-hero mas-entered pt-40 pb-16 px-6 md:pt-44 md:pb-24"
 			id="top"
 		>
-			{/* drifting aurora blobs */}
+			{/* drifting aurora blobs + animated dots */}
 			<div
 				className="absolute inset-0 overflow-hidden pointer-events-none"
 				aria-hidden="true"
 			>
 				<span className="mas-blob mas-blob-1" />
 				<span className="mas-blob mas-blob-2" />
+				<ParticleDots variant="light" />
 			</div>
 
 			<div className="relative z-10 max-w-[1180px] mx-auto w-full">

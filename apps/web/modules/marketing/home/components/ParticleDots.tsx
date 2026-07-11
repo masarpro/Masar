@@ -2,11 +2,22 @@
 
 import { useEffect, useRef } from "react";
 
+const PALETTES = {
+	/* bright sky blues for navy/dark sections */
+	dark: ["56,189,248", "96,165,250", "125,211,252", "14,165,233"],
+	/* deeper blues that stay visible on the light paper background */
+	light: ["14,165,233", "59,130,246", "2,132,199", "6,182,212"],
+} as const;
+
 /**
  * Animated drifting-dots background (the classic landing effect) —
- * canvas particles with faint connecting lines, tuned for navy sections.
+ * canvas particles with faint connecting lines.
  */
-export function ParticleDots() {
+export function ParticleDots({
+	variant = "dark",
+}: {
+	variant?: keyof typeof PALETTES;
+}) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 
 	useEffect(() => {
@@ -25,7 +36,7 @@ export function ParticleDots() {
 		let w: number;
 		let h: number;
 		let animId: number;
-		const colors = ["56,189,248", "96,165,250", "125,211,252", "14,165,233"];
+		const colors = [...PALETTES[variant]];
 
 		const resize = () => {
 			w = canvas.width = canvas.offsetWidth;
@@ -81,7 +92,7 @@ export function ParticleDots() {
 			cancelAnimationFrame(animId);
 			window.removeEventListener("resize", resize);
 		};
-	}, []);
+	}, [variant]);
 
 	return (
 		<canvas

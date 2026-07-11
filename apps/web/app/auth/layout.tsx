@@ -39,7 +39,6 @@ export default async function AuthLayout({ children }: PropsWithChildren) {
 								<div className="landing-orb landing-orb-3" />
 								<div className="landing-orb landing-orb-4" />
 								<div className="landing-noise" />
-								<div className="landing-grid" />
 								<div className="landing-glow-line" />
 							</div>
 							<AuthParticleField />

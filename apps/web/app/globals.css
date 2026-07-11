@@ -958,20 +958,11 @@ html[lang="en"] .lp-tk { direction: ltr; }
 	}
 }
 
-/* ── hero: blueprint grid + breathing glow ── */
+/* ── hero: drifting dots + breathing glow ── */
 .mas-hero {
 	position: relative;
 	overflow: hidden;
 	background-color: var(--mas-bg);
-	background-image: linear-gradient(var(--mas-grid-line) 1px, transparent 1px),
-		linear-gradient(90deg, var(--mas-grid-line) 1px, transparent 1px);
-	background-size: 44px 44px;
-	animation: masGridPan 80s linear infinite;
-}
-@keyframes masGridPan {
-	to {
-		background-position: -88px -44px, -44px -88px;
-	}
 }
 .mas-hero::before {
 	content: "";

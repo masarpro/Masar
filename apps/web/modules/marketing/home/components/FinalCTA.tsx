@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { ParticleDots } from "./ParticleDots";
 
 export function FinalCTA() {
 	const t = useTranslations();
@@ -11,17 +12,17 @@ export function FinalCTA() {
 			className="mas-on-dark relative overflow-hidden py-28 md:py-36 px-6 text-center"
 			style={{ background: "var(--mas-navy-3)" }}
 		>
-			{/* blueprint grid + rising glow */}
+			{/* rising glow + animated dots */}
 			<div
 				className="absolute inset-0 pointer-events-none"
 				aria-hidden="true"
 				style={{
 					background:
-						"radial-gradient(circle at 50% 130%, rgba(14,165,233,0.35), transparent 55%), linear-gradient(var(--mas-navy-line) 1px, transparent 1px), linear-gradient(90deg, var(--mas-navy-line) 1px, transparent 1px)",
-					backgroundSize: "auto, 44px 44px, 44px 44px",
+						"radial-gradient(circle at 50% 130%, rgba(14,165,233,0.35), transparent 55%)",
 					opacity: 0.7,
 				}}
 			/>
+			<ParticleDots />
 
 			<div className="mas-rv relative z-[1] max-w-[700px] mx-auto">
 				<span className="mas-dim">{t("hero.tagline")}</span>
