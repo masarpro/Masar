@@ -10,6 +10,7 @@ export const assistantModel = anthropic("claude-sonnet-4-6");
 export * from "ai";
 export * from "./lib";
 export * from "./prompts/assistant-system";
+export * from "./prompts/public-assistant";
 export * from "./tools/assistant-tools";
 
 // Module Registry

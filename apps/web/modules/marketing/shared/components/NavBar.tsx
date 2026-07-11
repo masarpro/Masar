@@ -66,7 +66,7 @@ export function NavBar() {
 		},
 		{
 			label: t("common.menu.faq"),
-			href: "/#faq",
+			href: "/faq",
 		},
 		// {
 		// 	label: t("common.menu.blog"),
@@ -84,10 +84,6 @@ export function NavBar() {
 					},
 				]
 			: []),
-		{
-			label: t("common.menu.docs"),
-			href: "/docs",
-		},
 	];
 
 	const isMenuItemActive = (href: string) => localePathname.startsWith(href);

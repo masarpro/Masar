@@ -1,4 +1,288 @@
 {
+  "footer": {
+    "tagline": "The construction project management platform for contractors — everything in one place.",
+    "product": "Product",
+    "support": "Support & Help",
+    "legal": "Legal",
+    "features": "Features",
+    "privacy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "rights": "All rights reserved",
+    "whatsapp": "WhatsApp"
+  },
+  "faqPage": {
+    "title": "FAQ",
+    "heading": "Everything you want to know about Masar",
+    "description": "We've gathered answers to the questions contractors ask most about Masar — from pricing and e-invoicing to quantity takeoff and project management.",
+    "searchPlaceholder": "Search questions... e.g. ZATCA, pricing, quantities",
+    "resultsCount": "{count} questions",
+    "noResults": "No matching results",
+    "noResultsHint": "Try different keywords, ask the Masar AI assistant, or contact us directly",
+    "allCategories": "All",
+    "viewAll": "View all questions",
+    "categories": {
+      "general": "About Masar",
+      "plans": "Pricing & Plans",
+      "projects": "Project Management",
+      "finance": "Invoicing & Accounting",
+      "quantities": "Estimation & Quantities",
+      "subcontractors": "Subcontractors",
+      "hr": "Employees & Payroll",
+      "assistant": "AI Assistant",
+      "security": "Security & Data"
+    },
+    "contact": {
+      "title": "Didn't find what you're looking for?",
+      "description": "Our team is ready to answer any question — reach out directly or ask the Masar AI assistant.",
+      "whatsapp": "Chat on WhatsApp",
+      "contactUs": "Send us a message"
+    },
+    "items": {
+      "g1": {
+        "question": "What is Masar and who is it for?",
+        "answer": "Masar is an all-in-one cloud platform for managing construction projects, built specifically for small and medium contractors and engineering offices in Saudi Arabia. It brings everything into one place: project management, e-invoicing, expense tracking, estimation and quantity takeoff, subcontractors, employees and payroll, an owner portal, and an AI assistant — replacing Excel and scattered systems."
+      },
+      "g2": {
+        "question": "Do I need technical experience to use Masar?",
+        "answer": "No. If you can use WhatsApp, you can use Masar. The system has a simple Arabic-first interface, and the AI assistant answers any question inside the platform."
+      },
+      "g3": {
+        "question": "Does Masar fully support Arabic?",
+        "answer": "Yes — Masar is built in Arabic from the first line, not translated. Every screen, report, invoice, and quotation comes out in professional Arabic, right to left. You can also switch to English with one click."
+      },
+      "g4": {
+        "question": "Do I need to download or install anything?",
+        "answer": "No. Masar is a cloud platform that runs directly in your browser — on desktop, mobile, or tablet. No installation and no manual updates; every improvement reaches you automatically."
+      },
+      "g5": {
+        "question": "Is there a mobile app?",
+        "answer": "The platform is fully responsive and works smoothly in your mobile browser — you can log expenses, upload site photos, and track your projects from anywhere. A dedicated mobile app for field supervisors is on the roadmap."
+      },
+      "g6": {
+        "question": "How do I get started with Masar?",
+        "answer": "Sign up for a free account with no credit card, create your organization, and add your first project within minutes. The free plan gives you a full project to try everything, and you can upgrade whenever you need."
+      },
+      "g7": {
+        "question": "What makes Masar different from Excel and generic accounting software?",
+        "answer": "Masar is built specifically for contractors: it answers \"How much did I earn? How much do I have? Who owes me?\" with numbers updated in real time. Instead of scattered Excel files, every financial transaction automatically flows into project accounts and journal entries, and the quantity engine understands footings, columns, and slabs — things generic software simply doesn't offer."
+      },
+      "g8": {
+        "question": "Can Masar be used outside Saudi Arabia?",
+        "answer": "Masar is built first for the Saudi market: ZATCA e-invoicing, 15% VAT, and the Saudi Riyal. But any Arab contractor can use it and benefit from the project management, estimation, and quantity takeoff features."
+      },
+      "p1": {
+        "question": "How much does Masar cost?",
+        "answer": "Free plan: 0 SAR forever. Monthly plan: 199 SAR/month. Yearly plan: 1,999 SAR/year (≈166 SAR/month — save 389 SAR). For large companies there is a custom enterprise plan with a 24,499 SAR setup plus a monthly subscription based on user count."
+      },
+      "p2": {
+        "question": "What does the free plan include?",
+        "answer": "One full project, two users, and 10 AI assistant conversations — free forever with no credit card. Perfect for trying the system on a real project before upgrading."
+      },
+      "p3": {
+        "question": "Can I cancel my subscription anytime?",
+        "answer": "Yes, you can cancel from subscription settings at any time with no commitment. Your subscription stays active until the end of the paid period, then your account automatically moves to the free plan."
+      },
+      "p4": {
+        "question": "Can I upgrade or downgrade my plan?",
+        "answer": "Yes, anytime. When upgrading you move to the new plan immediately and the difference is prorated automatically; when downgrading, the change takes effect from the next billing cycle."
+      },
+      "p5": {
+        "question": "What payment methods are available?",
+        "answer": "Secure online payment with credit cards (Visa and Mastercard). For enterprise customers we also offer bank transfer and direct invoicing."
+      },
+      "p6": {
+        "question": "What happens to my data if I cancel?",
+        "answer": "Your data stays safe and is never deleted. Your account moves to the free plan with its limits, and you can re-subscribe anytime and find everything exactly as you left it. You can also export your data and reports at any time."
+      },
+      "p7": {
+        "question": "Is there a trial period?",
+        "answer": "The free plan itself is an unlimited trial — a full project with all the core features, no time limit and no credit card. Take your time and upgrade when you're ready."
+      },
+      "pr1": {
+        "question": "How do I create a project and track its progress?",
+        "answer": "Create the project in a few simple steps: name, client, contract value. Then track everything from a single page: completion percentage, activities and milestones, payments and expenses, net profit, and site photos — updated in real time."
+      },
+      "pr2": {
+        "question": "Can my team work with me on the same project?",
+        "answer": "Yes. Invite your team members with ready-made roles: manager, accountant, engineer, field supervisor, or viewer — each person sees only what their permissions allow. The engineer enters quantities, the accountant manages invoices, and the supervisor submits daily reports."
+      },
+      "pr3": {
+        "question": "Does Masar support daily reports and site photos?",
+        "answer": "Yes. The field supervisor submits a daily report with completed work, labor, and equipment, along with site photos and documented issues — all saved in the project record, archived by date."
+      },
+      "pr4": {
+        "question": "What is the owner portal and how does it work?",
+        "answer": "You send the project owner a secure link — no account needed — where they see project progress, photos, payments, and updates, and can message you through a dedicated channel. You fully control what they see, and you can revoke the link anytime."
+      },
+      "pr5": {
+        "question": "Can I manage change orders and progress claims?",
+        "answer": "Yes. Change orders document any modification to the scope of work with value and status (pending, approved, rejected) and automatically reflect on the contract value. Progress claims follow a full approval cycle and connect directly to accounting."
+      },
+      "pr6": {
+        "question": "Is there a project bill of quantities (BOQ)?",
+        "answer": "Yes, every project has its own BOQ: add items manually or in bulk, import from Excel, or copy directly from an approved cost study or quotation — with filtering, sorting, and bulk operations."
+      },
+      "pr7": {
+        "question": "Is there in-project chat?",
+        "answer": "Yes, every project has two chat channels: one for the internal team and one for communicating with the owner — keeping all project discussion documented in one place instead of scattered across WhatsApp."
+      },
+      "pr8": {
+        "question": "Does Masar support handover protocols?",
+        "answer": "Yes, 4 types of protocols: item acceptance, preliminary, final, and delivery — with a full signature cycle and warranty tracking. On final handover, retention is released with an automatic journal entry."
+      },
+      "f1": {
+        "question": "Are invoices compliant with ZATCA?",
+        "answer": "Yes — compliant with Phase 2 (integration), not just Phase 1. Your invoices are cryptographically signed and linked directly with the authority, with QR codes and automatic 15% VAT calculation."
+      },
+      "f2": {
+        "question": "How do I track expenses per project?",
+        "answer": "Log any expense in seconds and link it to the project and category (materials, labor, equipment, transport...) with a photo of the receipt. Masar shows each project's expenses in detail and aggregate, and deducts them automatically from project profitability."
+      },
+      "f3": {
+        "question": "Is there a full accounting system?",
+        "answer": "Yes, integrated accounting that works automatically in the background: a construction-ready chart of accounts, automatic journal entries for every transaction (invoice, expense, payment, payroll...), trial balance, income statement, balance sheet, cost centers, bank reconciliation, and year-end closing."
+      },
+      "f4": {
+        "question": "Do I need an accountant to use Masar?",
+        "answer": "No. Journal entries are created automatically with every transaction — you just record the invoice or expense. And if you have an accountant, they'll find all the advanced tools: manual entries, general ledger, account statements, and audit-ready reports."
+      },
+      "f5": {
+        "question": "Does Masar support receipt and payment vouchers?",
+        "answer": "Yes, full receipt and payment vouchers with automatic numbering and an approval cycle, professional Arabic printing with the amount written in words — and every voucher automatically reflects on accounting and bank accounts."
+      },
+      "f6": {
+        "question": "Does Masar answer \"How much did I earn on my project?\"",
+        "answer": "Yes, that's the core of Masar. Every project has a real-time profitability report: contract value, collections, expenses broken down by category, subcontractor payments, and net profit — without gathering numbers from scattered files."
+      },
+      "f7": {
+        "question": "Does it support multiple bank accounts and transfers?",
+        "answer": "Yes, add all your bank accounts and cash boxes, record transfers between them, and track each account's balance in real time. Bank reconciliation lets you match your bank statement against your records."
+      },
+      "f8": {
+        "question": "Can I export reports and invoices?",
+        "answer": "Yes, Excel and PDF export for all reports, invoices, quotations, and bills of quantities, with professional A4 print templates carrying your brand (logo, colors, stamp) — available on paid plans."
+      },
+      "q1": {
+        "question": "How does Masar calculate structural quantities?",
+        "answer": "You enter element dimensions (footings, columns, slabs, blockwork...) and Masar instantly calculates concrete volume, detailed rebar weight, formwork area, and block count — using engineering formulas based on the Saudi Building Code (SBC) with ready defaults you can adjust."
+      },
+      "q2": {
+        "question": "What types of cost studies does Masar offer?",
+        "answer": "Three types: full study (from quantity takeoff to final price), cost pricing (manual tables without calculation engines), and quick pricing (straight to the selling price). Pick what fits your time and required precision."
+      },
+      "q3": {
+        "question": "Which structural sections does the calculation engine support?",
+        "answer": "8 sections: blinding concrete, footings (isolated, combined, strip, raft), ground beams, columns and necks, slabs (solid, hordi, flat slab), block walls, stairs, and other elements such as tanks, septic pits, and elevator pits."
+      },
+      "q4": {
+        "question": "Does Masar handle finishing and MEP quantities?",
+        "answer": "Yes. The finishing engine automatically derives plastering, paint, tiling, and ceiling quantities from building data and room types, and the MEP engine derives electrical, plumbing, and HVAC points per room profiles — and you can adjust any item manually."
+      },
+      "q5": {
+        "question": "How do I add profit margin to a study?",
+        "answer": "4 methods: a uniform percentage across the whole study, a different percentage per section (structural/finishing/MEP), a manual selling price per item, or a price per square meter. You see the impact of each method on total profit instantly."
+      },
+      "q6": {
+        "question": "Can I convert a study into a quotation and then a project?",
+        "answer": "Yes — with one click an approved study becomes a professional branded quotation ready to send, and when you win the job you convert the quotation into an actual project with its items and value — no re-entry."
+      },
+      "q7": {
+        "question": "Can I export the bill of quantities?",
+        "answer": "Yes, Excel and PDF export of the full BOQ, with per-floor summaries, a factory-ready rebar order by diameter and length, and bar-cutting details to minimize waste."
+      },
+      "s1": {
+        "question": "How do I manage subcontractor contracts?",
+        "answer": "Create a contract for each subcontractor with its items, payment terms, and conditions, and track it from signing to closure. Masar shows each subcontractor's position: contract value, executed, paid, and remaining — per project."
+      },
+      "s2": {
+        "question": "How do I record subcontractor payments and claims?",
+        "answer": "Record subcontractor claims and approve them through an approval cycle, then record payments linked to the contract and project. Every payment automatically reflects on accounting and project cost."
+      },
+      "s3": {
+        "question": "Does Masar track retention?",
+        "answer": "Yes, the retention percentage is automatically deducted from subcontractor claims and accumulated in a dedicated account, then released with an automatic journal entry upon final handover — so it's never lost or forgotten."
+      },
+      "s4": {
+        "question": "Does it support change orders on subcontracts?",
+        "answer": "Yes, document any change to a subcontractor's scope with its value (addition or deduction) and approval cycle, automatically reflected on the contract value and the subcontractor's financial position."
+      },
+      "h1": {
+        "question": "Is there an employee and payroll system?",
+        "answer": "Yes, a complete record for every employee (details, salary, documents), and a monthly payroll run with deductions and allowances approved in one click — with automatic journal entries for salaries and social insurance."
+      },
+      "h2": {
+        "question": "Does it support leave requests, assets, and custody?",
+        "answer": "Yes, leave requests of all types with an approval cycle, plus a register of company assets and equipment (vehicles, machinery, devices) with employee custody assignment and condition tracking."
+      },
+      "h3": {
+        "question": "Can I assign employees to projects?",
+        "answer": "Yes, assign employees to projects for specific periods, so you know who works where, and charge labor cost to the right project in profitability reports."
+      },
+      "h4": {
+        "question": "How do I manage general and recurring company expenses?",
+        "answer": "Record general administrative expenses (rent, subscriptions, utilities) with ready categories, and enable recurring expenses to be logged automatically every month — kept separate from project expenses so your picture stays clear."
+      },
+      "a1": {
+        "question": "What does the AI assistant do inside Masar?",
+        "answer": "It answers from your own data: \"How much did I spend on the villa project this month?\", \"Which claims are overdue?\", \"What's the bank balance?\" — it summarizes positions and guides you to the right screen. Like an employee who knows all your numbers and is available 24/7."
+      },
+      "a2": {
+        "question": "Does the AI assistant only see my company's data?",
+        "answer": "Yes, the assistant reads only your organization's data and within the permissions of the user asking — a field supervisor, for example, can't ask about payroll without permission. Your data is not used to train AI models."
+      },
+      "a3": {
+        "question": "How many AI conversations are included?",
+        "answer": "The free plan includes 10 conversations to try the assistant, and all paid plans include unlimited conversations."
+      },
+      "sec1": {
+        "question": "Is my data safe in Masar?",
+        "answer": "Your data is encrypted in transit and at rest, completely isolated from other companies' data, with continuous backups and fine-grained permissions you control yourself — every user sees only what you allow."
+      },
+      "sec2": {
+        "question": "How do I control my team's permissions?",
+        "answer": "Ready-made roles (manager, accountant, engineer, supervisor, viewer) with fine-grained per-section permissions: who sees finances, who edits quantities, who can delete — you decide in detail."
+      },
+      "sec3": {
+        "question": "Is there two-factor authentication?",
+        "answer": "Yes, sign-in supports two-factor authentication (2FA), passkeys, and Google sign-in — securing your account to the highest standards."
+      },
+      "sec4": {
+        "question": "Where is Masar's data hosted?",
+        "answer": "On trusted global cloud infrastructure with enterprise-grade security standards, full encryption, continuous backups, and round-the-clock monitoring."
+      },
+      "sec5": {
+        "question": "Can I export my data from Masar?",
+        "answer": "Yes, your data is yours. You can export reports, invoices, bills of quantities, and account statements in Excel and PDF formats at any time."
+      },
+      "sec6": {
+        "question": "Is there an audit log?",
+        "answer": "Yes, every sensitive operation (create, edit, delete, approve) is recorded in an audit log showing who did what and when — full transparency within your organization."
+      }
+    }
+  },
+  "marketingAssistant": {
+    "title": "Masar Assistant",
+    "subtitle": "Ask anything about the platform",
+    "buttonLabel": "Ask Masar Assistant",
+    "placeholder": "Type your question about Masar...",
+    "send": "Send",
+    "welcomeTitle": "Hi! I'm the Masar assistant",
+    "welcomeDescription": "Ask me about features, pricing, e-invoicing, quantity takeoff, or anything about the platform.",
+    "suggestions": {
+      "1": "What is Masar and what does it offer contractors?",
+      "2": "How much does a subscription cost?",
+      "3": "Are invoices ZATCA-compliant?",
+      "4": "How does Masar calculate rebar and concrete quantities?"
+    },
+    "thinking": "Typing...",
+    "error": "Something went wrong, try again",
+    "rateLimited": "You've temporarily hit the limit — try again in a minute",
+    "close": "Close",
+    "newChat": "New chat",
+    "disclaimer": "Automated assistant, may make mistakes — contact us to confirm",
+    "charLimit": "Maximum 1000 characters",
+    "signupCta": "Start for free"
+  },
   "admin": {
     "menu": {
       "dashboard": "Dashboard",

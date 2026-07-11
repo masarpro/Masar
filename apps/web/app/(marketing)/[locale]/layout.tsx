@@ -1,5 +1,6 @@
 import "../fumadocs.css";
 import { Footer } from "@marketing/shared/components/Footer";
+import { MarketingAssistant } from "@marketing/shared/components/MarketingAssistant";
 import { NavBar } from "@marketing/shared/components/NavBar";
 import { config } from "@repo/config";
 import { SessionProvider } from "@saas/auth/components/SessionProvider";
@@ -51,6 +52,7 @@ export default async function MarketingLayout({
 							<NavBar />
 							<main className="min-h-screen">{children}</main>
 							<Footer />
+							<MarketingAssistant />
 							<ConsentBanner />
 						</SessionProvider>
 					</NextIntlClientProvider>

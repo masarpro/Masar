@@ -1,7 +1,9 @@
 "use client";
 
+import { LocaleLink } from "@i18n/routing";
 import { cn } from "@ui/lib";
-import { useTranslations } from "next-intl";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
 const faqKeys = ["1", "2", "3", "4", "5", "6"] as const;
@@ -20,6 +22,7 @@ function FAQItem({
 	return (
 		<div style={{ borderBottom: "1px solid var(--lp-faq-divider)" }}>
 			<button
+				type="button"
 				onClick={onToggle}
 				className="w-full flex items-center justify-between py-6 bg-transparent border-none cursor-pointer text-start gap-4"
 			>
@@ -35,14 +38,9 @@ function FAQItem({
 						background: isOpen
 							? "linear-gradient(135deg, #0ea5e9, #06B6D4)"
 							: "var(--lp-card-bg)",
-						color: isOpen
-							? "white"
-							: "var(--lp-text-subtle)",
-						transform: isOpen
-							? "rotate(45deg)"
-							: "rotate(0deg)",
-						transitionTimingFunction:
-							"cubic-bezier(0.16,1,0.3,1)",
+						color: isOpen ? "white" : "var(--lp-text-subtle)",
+						transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
+						transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)",
 					}}
 				>
 					+
@@ -52,8 +50,7 @@ function FAQItem({
 				className="overflow-hidden transition-[max-height] duration-[400ms]"
 				style={{
 					maxHeight: isOpen ? 200 : 0,
-					transitionTimingFunction:
-						"cubic-bezier(0.16,1,0.3,1)",
+					transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)",
 				}}
 			>
 				<p
@@ -69,7 +66,9 @@ function FAQItem({
 
 export function FaqSection({ className }: { className?: string }) {
 	const t = useTranslations();
+	const locale = useLocale();
 	const [openFaq, setOpenFaq] = useState<number | null>(null);
+	const ArrowIcon = locale === "ar" ? ArrowLeft : ArrowRight;
 
 	return (
 		<section
@@ -125,6 +124,22 @@ export function FaqSection({ className }: { className?: string }) {
 							}
 						/>
 					))}
+				</div>
+
+				{/* رابط صفحة الأسئلة الكاملة */}
+				<div className="mt-8 text-center">
+					<LocaleLink
+						href="/faq"
+						className="inline-flex items-center gap-2 rounded-2xl px-6 py-3 font-bold text-sm text-white transition-all duration-300 hover:-translate-y-0.5"
+						style={{
+							background:
+								"linear-gradient(135deg, #0ea5e9, #06B6D4)",
+							boxShadow: "0 8px 24px rgba(14,165,233,0.25)",
+						}}
+					>
+						{t("faqPage.viewAll")}
+						<ArrowIcon className="size-4" />
+					</LocaleLink>
 				</div>
 			</div>
 		</section>
