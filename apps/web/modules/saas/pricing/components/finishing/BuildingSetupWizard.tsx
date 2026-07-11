@@ -630,18 +630,22 @@ function getCategoryName(key: string): string {
 	return NAMES[key] ?? key;
 }
 
+// subCategory ضروري في المفتاح — بدونه يتصادم بلاط الحمام مع سبلاش المطبخ
+// (نفس category + floor) ويكتب أحدهما فوق الآخر (يطابق merge-quantities.ts)
 function buildMatchKey(d: {
 	categoryKey: string;
+	subCategory?: string;
 	floorId?: string;
 	scope: string;
 }): string {
-	return `${mapCategoryKey(d.categoryKey)}__${d.floorId ?? ""}__${d.scope}`;
+	return `${mapCategoryKey(d.categoryKey)}__${d.subCategory ?? ""}__${d.floorId ?? ""}__${d.scope}`;
 }
 
 function buildSavedMatchKey(s: {
 	category: string;
+	subCategory?: string | null;
 	floorId?: string | null;
 	scope?: string | null;
 }): string {
-	return `${s.category}__${s.floorId ?? ""}__${s.scope ?? ""}`;
+	return `${s.category}__${s.subCategory ?? ""}__${s.floorId ?? ""}__${s.scope ?? ""}`;
 }

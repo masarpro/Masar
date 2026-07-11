@@ -36,7 +36,7 @@ const laborBreakdownSchema = z.object({
 		pricePerUnit: z.string().trim().max(200),
 	})).optional(),
 	// Lump sum
-	lumpSumAmount: z.number().optional(),
+	lumpSumAmount: z.number().nonnegative().max(999999999.99).optional(),
 	// Salary
 	salaryWorkers: z.array(z.object({
 		id: z.string().trim().max(100),
@@ -45,17 +45,17 @@ const laborBreakdownSchema = z.object({
 		salary: z.string().trim().max(200),
 		months: z.string().trim().max(200),
 	})).optional(),
-	salaryInsurance: z.number().optional(),
-	salaryHousing: z.number().optional(),
+	salaryInsurance: z.number().nonnegative().max(999999999.99).optional(),
+	salaryHousing: z.number().nonnegative().max(999999999.99).optional(),
 	// Material prices (shared with structural tab)
-	concretePrice: z.number().optional(),
-	steelPrice: z.number().optional(),
-	storagePercent: z.number().optional(),
+	concretePrice: z.number().nonnegative().max(999999999.99).optional(),
+	steelPrice: z.number().nonnegative().max(999999999.99).optional(),
+	storagePercent: z.number().min(0).max(100).optional(),
 	// Per-grade concrete prices: { "C15": 250, "C30": 350, "C35": 400 }
 	concretePrices: z.record(z.string().trim().max(100), z.number().nonnegative().max(999999999.99)).optional(),
-	steelPriceD6: z.number().optional(),
-	steelPriceD8: z.number().optional(),
-	steelPriceMain: z.number().optional(),
+	steelPriceD6: z.number().nonnegative().max(999999999.99).optional(),
+	steelPriceD8: z.number().nonnegative().max(999999999.99).optional(),
+	steelPriceMain: z.number().nonnegative().max(999999999.99).optional(),
 });
 
 // ═══════════════════════════════════════════════════════════════

@@ -33,7 +33,8 @@ export const finishingItemSchema = z.object({
 	totalCost: z.number().nonnegative().default(0),
 	dataSource: z.string().trim().max(100).optional(),
 	sourceItemId: z.string().trim().max(100).optional(),
-	sourceFormula: z.string().trim().max(100).optional(),
+	// معادلات المحرك الوصفية تتجاوز 100 حرف بسهولة (كانت max(100) تُفشل الدفعة كاملة)
+	sourceFormula: z.string().trim().max(500).optional(),
 	isEnabled: z.boolean().default(true),
 	sortOrder: z.number().nonnegative().default(0),
 	groupKey: z.string().trim().max(100).optional(),
@@ -85,7 +86,7 @@ export const finishingItemCreateBatch = subscriptionProcedure
 		z.object({
 			organizationId: z.string().trim().max(100),
 			costStudyId: z.string().trim().max(100),
-			items: z.array(finishingItemSchema),
+			items: z.array(finishingItemSchema).max(1000),
 		}),
 	)
 	.handler(async ({ input, context }) => {

@@ -265,11 +265,11 @@ export function CostingSummaryTab({
 						</TableRow>
 					</TableBody>
 				</Table>
-				{/* Total cost highlight */}
+				{/* Total cost highlight — إجمالي كل الأقسام (يطابق صف الإجمالي أعلاه) */}
 				<div className="px-4 py-4 border-t border-border bg-muted/20 text-center">
 					<span className="text-sm text-muted-foreground">التكلفة الإجمالية: </span>
 					<span className="text-2xl font-bold text-primary" dir="ltr">
-						{formatNum(structuralMaterial + structuralLabor)} ر.س
+						{formatNum(grandMaterial + grandLabor)} ر.س
 					</span>
 				</div>
 			</div>
@@ -290,7 +290,8 @@ export function CostingSummaryTab({
 						},
 					)
 				}
-				disabled={approveMutation.isPending || (structuralMaterial + structuralLabor) === 0}
+				/* البوابة على إجمالي كل الأقسام — الاقتصار على الإنشائي كان يقفل اعتماد دراسات التشطيبات/MEP فقط */
+				disabled={approveMutation.isPending || (grandMaterial + grandLabor) === 0}
 				className="w-full gap-2 py-4 sm:py-6 text-sm sm:text-base rounded-xl"
 				size="lg"
 			>

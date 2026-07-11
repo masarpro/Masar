@@ -110,7 +110,10 @@ export function deriveHeights(
 			columnHeight = Math.max(0, floorToFloor * 100 - slabThickness - visibleBeam);
 			blockHeight = Math.max(0, floorToFloor * 100 - visibleBeam);
 
-			totalAboveGround += floorToFloor;
+			// الدور المتكرر يضيف ارتفاعه × عدد التكرارات لإجمالي المبنى
+			const repeatMultiplier =
+				floor.isRepeated && floor.repeatCount > 1 ? floor.repeatCount : 1;
+			totalAboveGround += floorToFloor * repeatMultiplier;
 		}
 
 		floors[floor.id] = {

@@ -32,6 +32,14 @@ export async function loadStudy(costStudyId: string, organizationId: string) {
 	if (!study) {
 		throw new ORPCError("NOT_FOUND", { message: "الدراسة غير موجودة" });
 	}
+	// حصر المحرك: دراسات النظام الأساسي (لها workScopes) لا تُدار عبر
+	// unified-quantities — المحركان يكتبان نفس CostStudy بحسابات متنافرة
+	// (العلم NEXT_PUBLIC_FEATURE_UNIFIED_QUANTITIES واجهة فقط والراوتران حيّان دائماً)
+	if (Array.isArray(study.workScopes) && study.workScopes.length > 0) {
+		throw new ORPCError("CONFLICT", {
+			message: "هذه الدراسة تُدار عبر نظام الكميات الأساسي وليس النظام الموحّد",
+		});
+	}
 	return study;
 }
 

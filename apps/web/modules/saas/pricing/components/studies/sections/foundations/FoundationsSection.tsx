@@ -463,6 +463,8 @@ export function FoundationsSection({
 					columnDowelDiameter: formData.columnDowelDiameter,
 					columnDowelDevLength: formData.columnDowelDevLength,
 				}),
+				// تُقرأ في boq-aggregator لإجمالي الشدّات (كانت لا تُحفظ فيظهر صفراً)
+				formworkArea: calculations.formworkArea,
 			},
 			concreteVolume: calculations.concreteVolume,
 			concreteType: specs?.concreteType || "C30",

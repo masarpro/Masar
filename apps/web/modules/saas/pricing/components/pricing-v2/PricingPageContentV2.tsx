@@ -156,8 +156,9 @@ export function PricingPageContentV2({
 	const contingency = contingencyPct
 		? Number(contingencyPct)
 		: (ms?.uniformSettings?.contingencyPercent ?? 2);
-	const isVat =
-		vatIncluded || (ms?.uniformSettings?.vatIncluded ?? true);
+	// الحالة تُزرع من الخادم في useEffect — استخدامها مباشرة يسمح بإلغاء التفعيل
+	// (الصيغة القديمة `vatIncluded || server` كانت قفلاً أحادي الاتجاه)
+	const isVat = vatIncluded;
 
 	// Manual price calculations
 	const manualPriceNum = manualPrice ? Number(manualPrice) : 0;
@@ -873,7 +874,7 @@ export function PricingPageContentV2({
 						<label className="flex items-center gap-2 h-9 cursor-pointer">
 							<input
 								type="checkbox"
-								checked={vatIncluded || isVat}
+								checked={vatIncluded}
 								onChange={(e: any) => setVatIncluded(e.target.checked)}
 								className="rounded"
 							/>

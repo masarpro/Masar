@@ -21,16 +21,17 @@ function weightPerMeter(diameter: number): number {
 // ─────────────────────────────────────────────────────────────
 
 describe("calcCutting — bars longer than stock", () => {
-	it("computes correct stocksNeeded for 20.15m bar from 12m stock (Ø12)", () => {
-		// Slab with length=20.2 → barLength ≈ 20.15m after cover/extension
+	it("computes correct stocksNeeded for 20.55m bar from 12m stock (Ø12)", () => {
+		// الرئيسي (اتجاه X) يمتد بالعرض — كما في المحرك calculateSolidSlab
+		// width=20.2 → barLength = 20.2 − 2×0.025 + 0.4 = 20.55m
 		// lapLength = 12 * 40 / 1000 = 0.48m
 		// effectiveStockLength = 12 - 0.48 = 11.52m
-		// barsPerPiece = ceil((20.15 - 0.48) / 11.52) = ceil(1.707) = 2
-		// For 70 pieces → 140 stock bars
+		// barsPerPiece = ceil((20.55 - 0.48) / 11.52) = ceil(1.742) = 2
+		// coverage: 2×12 − 0.48 = 23.52 ≥ 20.55 ✓
 		const result = recalculateSlabCutting(
 			{
-				length: 20.2,
-				width: 5,
+				length: 5,
+				width: 20.2,
 				bottomMainDiameter: 12,
 				bottomMainBarsPerMeter: 5,
 				cover: 0.025,

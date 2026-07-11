@@ -147,6 +147,10 @@ interface EnabledFloor {
 	sortOrder: number;
 }
 
+// مجموعة "غير مصنّف" — عناصر دورها المحفوظ لا يطابق أي دور مفعّل ولا مفتاح دور معروف
+// (Audit F17: بعد إعادة تسمية/حذف دور تختفي عناصره من كل فلاتر الأدوار)
+export const UNASSIGNED_FLOOR_GROUP = "unassigned";
+
 /**
  * Determines which floor group a structural item belongs to.
  * Returns "foundations", a floor id, or "shared".
@@ -162,7 +166,7 @@ interface EnabledFloor {
  * Post-beta: replace with normalized matching or exact IDs.
  * Ref: Audit v5 #56
  */
-export function getItemFloorGroup(
+function resolveItemFloorGroup(
 	item: StructuralItem,
 	enabledFloors?: EnabledFloor[],
 ): string {
@@ -253,6 +257,27 @@ export function getItemFloorGroup(
 }
 
 /**
+ * المجموعة النهائية لعنصر إنشائي بعد التطبيع:
+ * إذا كانت المجموعة المُستنتَجة لا تطابق أي دور مفعّل ولا مجموعة ثابتة معروفة
+ * (foundations/shared/مفاتيح الأدوار الثابتة) تُرجَع UNASSIGNED_FLOOR_GROUP
+ * حتى لا تختفي العناصر اليتيمة من عروض الأدوار (Audit F17).
+ */
+export function getItemFloorGroup(
+	item: StructuralItem,
+	enabledFloors?: EnabledFloor[],
+): string {
+	const group = resolveItemFloorGroup(item, enabledFloors);
+	if (group === "foundations" || group === "shared") return group;
+	if (enabledFloors && enabledFloors.length > 0) {
+		return enabledFloors.some((f) => f.id === group)
+			? group
+			: UNASSIGNED_FLOOR_GROUP;
+	}
+	// بدون قائمة أدوار مفعّلة: تُقبل مفاتيح الأدوار الثابتة المعروفة فقط
+	return FLOOR_LABELS[group] ? group : UNASSIGNED_FLOOR_GROUP;
+}
+
+/**
  * Builds the list of floor filter options based on actual items present.
  */
 export function buildFloorFilterOptions(
@@ -301,6 +326,16 @@ export function buildFloorFilterOptions(
 					sortOrder: idx + 1,
 				});
 			}
+		});
+	}
+
+	// خيار "غير مصنّف" — يظهر فقط عند وجود عناصر لا تنتمي لأي دور معروف (Audit F17)
+	if (presentGroups.has(UNASSIGNED_FLOOR_GROUP)) {
+		options.push({
+			value: UNASSIGNED_FLOOR_GROUP,
+			label: "غير مصنّف",
+			icon: "❓",
+			sortOrder: Number.MAX_SAFE_INTEGER,
 		});
 	}
 

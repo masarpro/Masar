@@ -37,7 +37,8 @@ interface SavedMEPItem {
  * 2. بند في المشتق فقط → إضافة كجديد
  * 3. بند في المحفوظ فقط (manual) → إبقاء كبند يدوي
  *
- * مفتاح المطابقة: category + subCategory + itemType + floorId + roomId
+ * مفتاح المطابقة: category + subCategory + itemType + floorId + roomId + name
+ * (الاسم مضاف لتفادي تصادم البنود المشتقة بنفس itemType — مثل تغذية بارد/ساخن ppr_20mm)
  */
 export function mergeMEPQuantities(
 	derived: MEPDerivedItem[],
@@ -47,10 +48,10 @@ export function mergeMEPQuantities(
 	const matchedSavedIds = new Set<string>();
 
 	for (const d of derived) {
-		const matchKey = `${d.category}|${d.subCategory}|${d.itemType}|${d.floorId}|${d.roomId}`;
+		const matchKey = `${d.category}|${d.subCategory}|${d.itemType}|${d.floorId}|${d.roomId}|${d.name}`;
 
 		const savedMatch = saved.find((s) => {
-			const sKey = `${s.category}|${s.subCategory}|${s.itemType}|${s.floorId}|${s.roomId}`;
+			const sKey = `${s.category}|${s.subCategory}|${s.itemType}|${s.floorId}|${s.roomId}|${s.name}`;
 			return sKey === matchKey && !matchedSavedIds.has(s.id);
 		});
 
@@ -67,13 +68,23 @@ export function mergeMEPQuantities(
 				isSaved: true,
 				isManualOverride,
 				isEnabled: savedMatch.isEnabled,
+				// حقول العرض: نُبقي ما حفظه المستخدم إن وُجد
+				name: savedMatch.name || d.name,
+				unit: savedMatch.unit || d.unit,
+				qualityLevel: (savedMatch.qualityLevel ??
+					d.qualityLevel) as MEPDerivedItem["qualityLevel"],
 				savedQuantity: Number(savedMatch.quantity),
 				derivedQuantity: d.quantity,
 				quantity: Number(savedMatch.quantity), // استخدم المحفوظ
+				// فحص null صريح حتى يُحترم السعر صفر المُدخل يدوياً
 				materialPrice:
-					Number(savedMatch.materialPrice) || d.materialPrice,
+					savedMatch.materialPrice != null
+						? Number(savedMatch.materialPrice)
+						: d.materialPrice,
 				laborPrice:
-					Number(savedMatch.laborPrice) || d.laborPrice,
+					savedMatch.laborPrice != null
+						? Number(savedMatch.laborPrice)
+						: d.laborPrice,
 				totalCost: Number(savedMatch.totalCost),
 				materialCost: Number(savedMatch.materialCost),
 				laborCost: Number(savedMatch.laborCost),

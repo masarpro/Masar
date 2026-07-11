@@ -337,8 +337,14 @@ export function StairsSection({
 	const handleAutoSave = async () => {
 		if (!autoCalculations) return;
 		setIsAutoSaving(true);
+		// تخطّي السلالم المحفوظة مسبقاً (بالاسم) حتى لا تتكرر عند إعادة المحاولة بعد فشل جزئي
+		const existingNames = new Set(items.map((i) => i.name));
+		const pendingCalcs = autoCalculations.filter(
+			(c) => !existingNames.has(c.connection.label),
+		);
+		let createdCount = 0;
 		try {
-			for (const calc of autoCalculations) {
+			for (const calc of pendingCalcs) {
 				const itemData = {
 					costStudyId: studyId,
 					organizationId,
@@ -371,12 +377,16 @@ export function StairsSection({
 					totalCost: calc.calculations.totalCost,
 				};
 				await (autoCreateMutation.mutateAsync as (data: StructuralItemCreateInput) => Promise<unknown>)(itemData);
+				createdCount++;
 			}
-			toast.success(t("pricing.studies.structural.sections.stairs.toasts.created", { count: autoCalculations.length }));
+			toast.success(t("pricing.studies.structural.sections.stairs.toasts.created", { count: createdCount }));
 			setShowAutoForm(false);
 			onSave();
 		} catch (e) {
 			toast.error(t("pricing.studies.structural.sections.stairs.toasts.saveError"));
+			// تحديث القائمة حتى تظهر السلالم المحفوظة قبل الفشل —
+			// إعادة المحاولة ستتخطاها (بالاسم) ولن تُنشئها مرة أخرى
+			if (createdCount > 0) onSave();
 		}
 		setIsAutoSaving(false);
 	};

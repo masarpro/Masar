@@ -261,20 +261,22 @@ function calcRaftRebar(
 	// Bar exceeds stock length — lap splice needed
 	const lapLength = calcLapLength(diameter, lapSpliceMethod, customLapLength);
 	const usablePerStock = stockLength - lapLength;
-	const piecesPerBar = Math.ceil(barLength / usablePerStock);
+	// n قطع مع (n−1) وصلة تغطي n×stock − (n−1)×lap
+	let piecesPerBar = Math.max(2, Math.ceil((barLength - lapLength) / usablePerStock));
+	if (piecesPerBar * stockLength - (piecesPerBar - 1) * lapLength < barLength) {
+		piecesPerBar += 1;
+	}
 	const splicesPerBar = piecesPerBar - 1;
 
 	// Waste: total stock purchased minus structural requirement minus overlap material
 	const totalStocksPerBar = piecesPerBar;
 	const totalStocks = barCount * totalStocksPerBar;
 
-	// The last piece is shorter
-	const usableLengthFromFirstPieces = (piecesPerBar - 1) * usablePerStock;
-	const lastPieceLength = barLength - usableLengthFromFirstPieces + lapLength;
-
-	// Total material purchased
-	const grossLengthPerBar = (piecesPerBar - 1) * stockLength + lastPieceLength;
-	const wastePerBar = grossLengthPerBar - barLength;
+	// آخر قطعة: القطعة الأولى تغطي stock كاملاً وكل قطعة تالية تفقد lap واحدة
+	// (الصيغة القديمة عاملت الأولى كأنها stock−lap فأطالت الأخيرة بوصلة زائدة)
+	const coverageFromFirstPieces =
+		(piecesPerBar - 1) * stockLength - (piecesPerBar - 2) * lapLength;
+	const lastPieceLength = barLength - coverageFromFirstPieces + lapLength;
 
 	const netLength = barCount * barLength;
 	const grossLength = totalStocks * stockLength;
@@ -440,24 +442,29 @@ export function calculateIsolatedFoundation(
 	const wasteMap = new Map<string, any>();
 	rebarDetails.forEach((r) => {
 		if (r.wastePerStock >= 0.3) {
+			// للصفوف الموصولة (cutsPerStock=1) الفضلة تحدث مرة لكل قضيب مجمّع
+			const wasteCount =
+				r.cutsPerStock === 1 && r.totalBars ? r.totalBars : r.stocksNeeded;
 			const key = `${r.diameter}-${r.wastePerStock.toFixed(2)}`;
 			const existing = wasteMap.get(key);
 			if (existing) {
-				existing.count += r.stocksNeeded;
+				existing.count += wasteCount;
 			} else {
 				wasteMap.set(key, {
 					diameter: r.diameter,
 					length: r.wastePerStock,
-					count: r.stocksNeeded,
+					count: wasteCount,
 					suggestedUse: suggestWasteUse(r.wastePerStock),
 				});
 			}
 		}
 	});
 
-	// التكاليف
+	// التكاليف — صبة النظافة بسعر C20 (كما في الشريطية واللبشة)
 	const concretePrice = STRUCTURAL_PRICES.concrete[concreteType] || 310;
-	const concreteCost = concreteVolume * concretePrice;
+	const leanConcretePrice = STRUCTURAL_PRICES.concrete['C20'] || 250;
+	const concreteCost =
+		concreteVolume * concretePrice + leanConcreteVolume * leanConcretePrice;
 	const rebarCost = grossWeight * STRUCTURAL_PRICES.steelPerKg;
 	const formworkCost = formworkArea * STRUCTURAL_PRICES.formwork;
 	const laborCost = concreteVolume * STRUCTURAL_LABOR_PRICES.foundations;
@@ -832,7 +839,8 @@ export function calculateStripFoundation(
 			waste.push({
 				diameter: r.diameter,
 				length: r.wastePerStock,
-				count: r.stocksNeeded,
+				// للصفوف الموصولة الفضلة تحدث مرة لكل قضيب مجمّع لا لكل سيخ
+				count: r.cutsPerStock === 1 && r.totalBars ? r.totalBars : r.stocksNeeded,
 				suggestedUse: suggestWasteUse(r.wastePerStock),
 			});
 		}
@@ -1117,7 +1125,8 @@ export function calculateRaftFoundation(
 			waste.push({
 				diameter: r.diameter,
 				length: r.wastePerStock,
-				count: r.stocksNeeded,
+				// للصفوف الموصولة الفضلة تحدث مرة لكل قضيب مجمّع لا لكل سيخ
+				count: r.cutsPerStock === 1 && r.totalBars ? r.totalBars : r.stocksNeeded,
 				suggestedUse: suggestWasteUse(r.wastePerStock),
 			});
 		}
@@ -1316,10 +1325,18 @@ export function calculateWall(wall: Wall): WallCalculation {
 	// حساب المونة
 	const mortarCalc = calculateMortar(netArea);
 
-	// حساب الأعتاب
+	// حساب الأعتاب — تُضرب في كمية الجدار (كالمساحات والفتحات أعلاه)
 	let lintelsCalc = null;
 	if (options?.hasLintel && openings.length > 0) {
-		lintelsCalc = calculateLintels(openings, options.lintelHeight, block.thickness);
+		const single = calculateLintels(openings, options.lintelHeight, block.thickness);
+		if (single) {
+			lintelsCalc = {
+				count: single.count * quantity,
+				totalLength: Number((single.totalLength * quantity).toFixed(2)),
+				concreteVolume: Number((single.concreteVolume * quantity).toFixed(3)),
+				rebarWeight: Number((single.rebarWeight * quantity).toFixed(2)),
+			};
+		}
 	}
 
 	return {
@@ -1518,9 +1535,9 @@ export function calculateRebarLayer(
 		// NORMAL PATH — bar fits in one stock bar
 		const cutsPerStock = Math.floor(stockLength / barLength) || 1;
 		const stocksNeeded = Math.ceil(barCount / cutsPerStock);
-		const wastePerStock = stockLength - cutsPerStock * barLength;
-		const totalWaste = stocksNeeded * wastePerStock;
 		const grossLen = stocksNeeded * stockLength;
+		// الهالك الحقيقي = المشترى − المستخدم (يشمل بقية السيخ الأخير غير مكتمل القصّات)
+		const totalWaste = grossLen - totalLength;
 		const wastePercentage = grossLen > 0 ? (totalWaste / grossLen) * 100 : 0;
 		const grossWt = grossLen * weightPerMeter;
 
@@ -1543,7 +1560,15 @@ export function calculateRebarLayer(
 	// SPLICE PATH — barLength > stockLength, needs lap splices
 	const lapLength = (diameter * SLAB_DEFAULTS.lapLengthFactor) / 1000;
 	const effectiveStockLength = stockLength - lapLength;
-	const stockBarsPerUnit = Math.ceil(barLength / effectiveStockLength);
+	// n أسياخ مع (n−1) وصلة تغطي n×stock − (n−1)×lap — الصيغة القديمة
+	// ceil(barLength/effective) كانت تطلب سيخاً زائداً كاملاً في الحالات الحدية
+	let stockBarsPerUnit = Math.max(
+		2,
+		Math.ceil((barLength - lapLength) / effectiveStockLength),
+	);
+	if (stockBarsPerUnit * stockLength - (stockBarsPerUnit - 1) * lapLength < barLength) {
+		stockBarsPerUnit += 1;
+	}
 	const splicesPerBar = stockBarsPerUnit - 1;
 	const totalStockBars = stockBarsPerUnit * barCount;
 	const totalGrossLength = totalStockBars * stockLength;
@@ -1761,9 +1786,12 @@ export function calculateRibbedSlab(slab: RibbedSlab): EnhancedSlabResult {
 	const concreteVolume = ribVolume + toppingVolume;
 
 	// عدد البلوكات
-	const blockWidthM = system.block.width / 100; // 40سم = 0.4م — بُعد البلوكة في اتجاه العصب
+	// بُعد 40سم (width) يملأ الفجوة بين الأعصاب (52−12=40)،
+	// وبُعد 20سم (length) هو المتراص على طول العصب — القسمة عليه
+	// (القسمة على 0.40 كانت تنقص العدد ~50%: سقف 6×5م = 135 بدل 270)
+	const blockLengthM = system.block.length / 100; // 20سم = 0.2م
 	const blockGaps = ribsCount - 1;
-	const blocksPerGap = Math.floor(dimensions.length / blockWidthM);
+	const blocksPerGap = Math.floor(dimensions.length / blockLengthM);
 	const totalBlocks = blockGaps * blocksPerGap;
 	const blocksCount = Math.ceil(totalBlocks * (1 + SLAB_DEFAULTS.blockWaste));
 
@@ -2538,10 +2566,43 @@ function calcCuttingDetails(
 	description: string,
 ): CuttingDetailResult {
 	const stockLength = STOCK_LENGTHS[diameter] || 12;
-	const cutsPerStock = Math.floor(stockLength / barLength) || 1;
-	const stocksNeeded = Math.ceil(barCount / cutsPerStock);
-	const wastePerStock = stockLength - cutsPerStock * barLength;
-	const totalWaste = stocksNeeded * wastePerStock;
+
+	let stocksNeeded: number;
+	let wastePerStock: number;
+	let totalWaste: number;
+
+	if (barLength > stockLength) {
+		// سيخ أطول من طول المخزون — وصلات تراكب 40d (SBC 304)
+		// (المسار القديم كان يعطي هالكاً سالباً بلا وصلات للعناصر > 12م)
+		const lapLength = (diameter * 40) / 1000;
+		const effectiveStockLength = stockLength - lapLength;
+
+		let barsPerPiece = Math.ceil((barLength - lapLength) / effectiveStockLength);
+		if (barsPerPiece < 2) barsPerPiece = 2;
+
+		// تحقق: n أسياخ مع (n-1) وصلة يجب أن تغطي الطول المطلوب
+		const lapJoints = barsPerPiece - 1;
+		const availableLength = barsPerPiece * stockLength - lapJoints * lapLength;
+		if (availableLength < barLength) {
+			barsPerPiece += 1;
+		}
+
+		stocksNeeded = barsPerPiece * barCount;
+
+		// الهالك لكل قضيب مجمّع
+		const actualLapJoints = barsPerPiece - 1;
+		const usedPerPiece = barLength + actualLapJoints * lapLength;
+		const boughtPerPiece = barsPerPiece * stockLength;
+		wastePerStock = boughtPerPiece - usedPerPiece;
+		totalWaste = wastePerStock * barCount;
+	} else {
+		const cutsPerStock = Math.floor(stockLength / barLength) || 1;
+		stocksNeeded = Math.ceil(barCount / cutsPerStock);
+		wastePerStock = stockLength - cutsPerStock * barLength;
+		// الهالك الحقيقي = المشترى − المستخدم (يشمل بقية السيخ الأخير)
+		totalWaste = stocksNeeded * stockLength - barCount * barLength;
+	}
+
 	const totalLength = barCount * barLength;
 	const grossLength = stocksNeeded * stockLength;
 	const wastePercentage =

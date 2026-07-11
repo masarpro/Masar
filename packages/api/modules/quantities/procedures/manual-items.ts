@@ -235,10 +235,16 @@ export const manualItemReorder = subscriptionProcedure
 			{ section: "pricing", action: "studies" },
 		);
 
+		// updateMany مع نطاق الدراسة والمنظمة يمنع الكتابة عبر المستأجرين
+		// (update بمعرّف خام كان يقبل معرّفات منظمات أخرى ويرمي P2025 خام)
 		await db.$transaction(
 			input.itemIds.map((id, index) =>
-				db.manualItem.update({
-					where: { id },
+				db.manualItem.updateMany({
+					where: {
+						id,
+						costStudyId: input.studyId,
+						organizationId: input.organizationId,
+					},
 					data: { sortOrder: index },
 				}),
 			),

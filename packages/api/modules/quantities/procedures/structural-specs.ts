@@ -159,7 +159,7 @@ export const setStructuralSpecs = subscriptionProcedure
 				id: input.studyId,
 				organizationId: input.organizationId,
 			},
-			select: { id: true },
+			select: { id: true, structuralSpecs: true },
 		});
 
 		if (!study) {
@@ -168,10 +168,17 @@ export const setStructuralSpecs = subscriptionProcedure
 			});
 		}
 
+		// دمج على مستوى المفاتيح العليا بدل الاستبدال الكامل — استبدال JSONB
+		// كاملاً كان يجعل حفظ المعالج يمسح مواصفات العناصر المحفوظة من صفحة
+		// المواصفات والعكس (آخر كتابة تفوز على كل شيء)
+		const existingSpecs =
+			(study.structuralSpecs as Record<string, unknown> | null) ?? {};
+		const mergedSpecs = { ...existingSpecs, ...input.specs };
+
 		await db.costStudy.update({
 			where: { id: input.studyId },
 			data: {
-				structuralSpecs: input.specs,
+				structuralSpecs: mergedSpecs,
 			},
 		});
 

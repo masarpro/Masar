@@ -597,10 +597,14 @@ export function SlabForm({
 	const handleSubmit = async () => {
 		if (!formData.name || !formData.slabType || !calculations) return;
 
+		// القيم المخزنة شاملة للكمية (كما في القواعد/الأعمدة) — المجمّع يجمع
+		// بلا ضرب، وتفاصيل التقطيع تعيد الحساب من الأبعاد المفردة × quantity
+		const qty = Math.max(1, formData.quantity || 1);
 		const totalConcreteVolume =
-			calculations.concreteVolume + (beamsCalcs?.totalConcrete || 0);
+			(calculations.concreteVolume + (beamsCalcs?.totalConcrete || 0)) * qty;
 		const totalSteelWeight =
-			calculations.totals.grossWeight + (beamsCalcs?.totalGrossWeight || 0);
+			(calculations.totals.grossWeight + (beamsCalcs?.totalGrossWeight || 0)) *
+			qty;
 
 		const itemData = {
 			costStudyId: studyId,
@@ -651,6 +655,8 @@ export function SlabForm({
 				...(formData.slabType === "banded_beam" && bandedBeamTemplates.length > 0 && {
 					bandedBeamTemplates: JSON.stringify(bandedBeamTemplates),
 				}),
+				// تُقرأ في boq-aggregator لإجمالي الشدّات (كانت لا تُحفظ فيظهر صفراً)
+				formworkArea: (calculations.formworkArea || 0) * qty,
 			},
 			concreteVolume: totalConcreteVolume,
 			concreteType: specs?.concreteType || "C30",
@@ -660,25 +666,25 @@ export function SlabForm({
 					? totalSteelWeight / totalConcreteVolume
 					: 0,
 			materialCost:
-				calculations.costs.concrete +
-				calculations.costs.rebar +
-				(calculations.costs.blocks || 0) +
-				(beamsCalcs
-					? beamsCalcs.details.reduce(
-							(s, c) => s + c.calc.concreteCost + c.calc.rebarCost,
-							0,
-						)
-					: 0),
+				(calculations.costs.concrete +
+					calculations.costs.rebar +
+					(calculations.costs.blocks || 0) +
+					(beamsCalcs
+						? beamsCalcs.details.reduce(
+								(s, c) => s + c.calc.concreteCost + c.calc.rebarCost,
+								0,
+							)
+						: 0)) * qty,
 			laborCost:
-				calculations.costs.labor +
-				(beamsCalcs
-					? beamsCalcs.details.reduce((s, c) => s + c.calc.laborCost, 0)
-					: 0),
+				(calculations.costs.labor +
+					(beamsCalcs
+						? beamsCalcs.details.reduce((s, c) => s + c.calc.laborCost, 0)
+						: 0)) * qty,
 			totalCost:
-				calculations.costs.total +
-				(beamsCalcs
-					? beamsCalcs.details.reduce((s, c) => s + c.calc.totalCost, 0)
-					: 0),
+				(calculations.costs.total +
+					(beamsCalcs
+						? beamsCalcs.details.reduce((s, c) => s + c.calc.totalCost, 0)
+						: 0)) * qty,
 		};
 
 		if (editingItem) {

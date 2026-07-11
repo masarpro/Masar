@@ -51,7 +51,10 @@ export function ConvertToQuotationButton({
 				}),
 			]);
 
-			const costingItems = (costingResult as any)?.items ?? [];
+			// costing.getItems يعيد مصفوفة مباشرة (وليس { items })
+			const costingItems = Array.isArray(costingResult)
+				? (costingResult as any[])
+				: [];
 			const markup = markupResult as any;
 			const method = markup?.method ?? "uniform";
 
@@ -63,10 +66,10 @@ export function ConvertToQuotationButton({
 				}
 			}
 
-			const overheadPct = markup?.uniformSettings?.overheadPercent ?? 5;
-			const profitPct = markup?.uniformSettings?.profitPercent ?? 15;
+			const overheadPct = markup?.uniformSettings?.overheadPercent ?? 0;
+			const profitPct = markup?.uniformSettings?.profitPercent ?? 0;
 			const contingencyPct =
-				markup?.uniformSettings?.contingencyPercent ?? 2;
+				markup?.uniformSettings?.contingencyPercent ?? 0;
 
 			// Calculate selling price per item
 			const items = costingItems.map((item: any) => {
@@ -75,8 +78,9 @@ export function ConvertToQuotationButton({
 				let sellingPrice: number;
 
 				if (method === "per_section") {
+					// يطابق markupGetProfitAnalysis: هامش القسم + overhead (بدون contingency)
 					const markupPct = sectionMarkupMap[item.section] ?? 0;
-					sellingPrice = totalCost * (1 + markupPct / 100);
+					sellingPrice = totalCost * (1 + (markupPct + overheadPct) / 100);
 				} else {
 					// uniform
 					sellingPrice =

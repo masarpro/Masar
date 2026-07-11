@@ -782,8 +782,12 @@ function calculateMinaret(input: MinaretInput): OtherStructuralResult {
 		const balconyProj = input.balconyProjection / 100;
 		const balconyThick = 0.15; // 15 سم
 		// بروز دائري/مربع حول الجذع
-		const balconyOuterPerimeter = shaftOuterPerimeter + 2 * Math.PI * balconyProj; // تقريبي
-		const balconyArea = balconyOuterPerimeter * balconyProj / 2; // تقريبي
+		const balconyOuterPerimeter = shaftOuterPerimeter + 2 * Math.PI * balconyProj;
+		// مساحة الحلقة = متوسط المحيطين × البروز = P×p + πp²
+		// (الصيغة القديمة P_outer×p/2 كانت تنقص ~35%: جذع D=2م ببروز 0.8م
+		// تعطي 4.52م² بينما الدقيقة π(1.8²−1²)=7.04م²)
+		const balconyArea =
+			((shaftOuterPerimeter + balconyOuterPerimeter) / 2) * balconyProj;
 		const balconyVol = input.balconyCount * balconyArea * balconyThick;
 		const balconyFormwork = input.balconyCount * (balconyArea + balconyOuterPerimeter * balconyThick);
 		breakdown.push({

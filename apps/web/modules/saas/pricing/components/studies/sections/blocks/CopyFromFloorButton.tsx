@@ -44,28 +44,36 @@ export function CopyFromFloorButton({
 		if (!selectedSource) return;
 		setIsCopying(true);
 		const sourceItems = getFloorItems(selectedSource, floors[0]?.label === selectedSource);
-		for (const item of sourceItems) {
-			const newName = item.name.replace(selectedSource, currentFloor);
-			await (createMutation.mutateAsync as (data: StructuralItemCreateInput) => Promise<unknown>)({
-				costStudyId: studyId,
-				organizationId,
-				category: "blocks",
-				subCategory: String(item.dimensions?.wallCategory || ""),
-				name: newName,
-				quantity: item.quantity,
-				unit: "piece",
-				dimensions: { ...item.dimensions, floor: currentFloor },
-				concreteVolume: item.dimensions?.concreteVolume || 0,
-				steelWeight: item.dimensions?.steelWeight || 0,
-				materialCost: 0,
-				laborCost: 0,
-				totalCost: item.totalCost,
-			});
+		let copiedCount = 0;
+		try {
+			for (const item of sourceItems) {
+				const newName = item.name.replace(selectedSource, currentFloor);
+				await (createMutation.mutateAsync as (data: StructuralItemCreateInput) => Promise<unknown>)({
+					costStudyId: studyId,
+					organizationId,
+					category: "blocks",
+					subCategory: String(item.dimensions?.wallCategory || ""),
+					name: newName,
+					quantity: item.quantity,
+					unit: "piece",
+					dimensions: { ...item.dimensions, floor: currentFloor },
+					concreteVolume: item.dimensions?.concreteVolume || 0,
+					steelWeight: item.dimensions?.steelWeight || 0,
+					materialCost: 0,
+					laborCost: 0,
+					totalCost: item.totalCost,
+				});
+				copiedCount++;
+			}
+			setSelectedSource("");
+			toast.success(`تم نسخ ${sourceItems.length} عنصر`);
+		} catch {
+			toast.error(`فشل النسخ — تم نسخ ${copiedCount} من ${sourceItems.length} عنصر`);
+		} finally {
+			setIsCopying(false);
+			// تحديث القائمة حتى يظهر ما نُسخ فعلاً (حتى عند النسخ الجزئي)
+			onSave();
 		}
-		setIsCopying(false);
-		setSelectedSource("");
-		toast.success(`تم نسخ ${sourceItems.length} عنصر`);
-		onSave();
 	};
 
 	return (

@@ -23,12 +23,18 @@ export const quoteCreate = subscriptionProcedure
 			clientPhone: z.string().trim().max(100).optional(),
 			clientEmail: z.string().trim().max(100).optional(),
 			clientAddress: z.string().trim().max(100).optional(),
-			subtotal: z.number().nonnegative(),
-			overheadAmount: z.number().nonnegative().default(0),
-			profitAmount: z.number().nonnegative().default(0),
-			vatAmount: z.number().nonnegative().default(0),
-			totalAmount: z.number().nonnegative(),
-			validUntil: z.string().transform((str) => new Date(str)),
+			subtotal: z.number().nonnegative().max(999999999.99),
+			overheadAmount: z.number().nonnegative().max(999999999.99).default(0),
+			profitAmount: z.number().nonnegative().max(999999999.99).default(0),
+			vatAmount: z.number().nonnegative().max(999999999.99).default(0),
+			totalAmount: z.number().nonnegative().max(999999999.99),
+			// فحص الصيغة قبل التحويل — نص عشوائي كان يمر كـ Invalid Date ويرمي 500 من Prisma
+			validUntil: z
+				.string()
+				.refine((str) => !Number.isNaN(Date.parse(str)), {
+					message: "تاريخ صلاحية غير صالح",
+				})
+				.transform((str) => new Date(str)),
 			paymentTerms: z.string().trim().max(100).optional(),
 			deliveryTerms: z.string().trim().max(100).optional(),
 			showUnitPrices: z.boolean().default(true),

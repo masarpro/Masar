@@ -337,17 +337,30 @@ export function QuantitiesDashboard({
 		[config],
 	);
 
-	// Debounced save
-	const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
-		null,
+	// Debounced save — مؤقت لكل بند على حدة: مؤقت واحد مشترك كان يُلغي
+	// حفظ بنود الـcascade المتتالية فلا يصل للخادم إلا آخر بند
+	const saveTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+		new Map(),
 	);
+
+	useEffect(() => {
+		const timers = saveTimersRef.current;
+		return () => {
+			for (const timer of timers.values()) {
+				clearTimeout(timer);
+			}
+			timers.clear();
+		};
+	}, []);
 
 	const debouncedSave = useCallback(
 		(item: MergedQuantityItem) => {
-			if (saveTimerRef.current) {
-				clearTimeout(saveTimerRef.current);
+			const existingTimer = saveTimersRef.current.get(item.key);
+			if (existingTimer) {
+				clearTimeout(existingTimer);
 			}
-			saveTimerRef.current = setTimeout(() => {
+			const timer = setTimeout(() => {
+				saveTimersRef.current.delete(item.key);
 				if (item.isSaved && item.savedId) {
 					(updateMutation as any).mutate(
 						{
@@ -427,6 +440,7 @@ export function QuantitiesDashboard({
 					);
 				}
 			}, 1000);
+			saveTimersRef.current.set(item.key, timer);
 		},
 		[organizationId, studyId, saveMutation, updateMutation, t, tryExtractKnowledge],
 	);
@@ -856,17 +870,20 @@ function FinishingAggregatedSummary({ items }: { items: MergedQuantityItem[] }) 
 
 	if (enabledItems.length === 0) return null;
 
-	// Aggregate by category+unit across all floors
+	// التجميع بفئة قاعدة البيانات (بدون لاحقة الدور) + subCategory + الوحدة —
+	// categoryKey كان يحمل لاحقة الدور فتظهر "أرضيات" مرة لكل دور بدل الجمع
 	const aggregated = new Map<string, { name: string; quantity: number; unit: string }>();
 	for (const item of enabledItems) {
-		const key = `${item.categoryKey}_${item.unit}`;
+		const key = `${item.category}_${item.subCategory ?? ""}_${item.unit}`;
 		if (!aggregated.has(key)) {
 			aggregated.set(key, { name: item.name, quantity: 0, unit: item.unit });
 		}
 		aggregated.get(key)!.quantity += item.quantity;
 	}
 
-	const rows = Array.from(aggregated.values()).sort((a, b) => a.name.localeCompare(b.name, "ar"));
+	const rows = Array.from(aggregated.entries())
+		.map(([aggKey, row]) => ({ aggKey, ...row }))
+		.sort((a, b) => a.name.localeCompare(b.name, "ar"));
 
 	return (
 		<div className="rounded-lg border bg-card overflow-hidden">
@@ -875,7 +892,7 @@ function FinishingAggregatedSummary({ items }: { items: MergedQuantityItem[] }) 
 			</div>
 			<div className="divide-y">
 				{rows.map((row) => (
-					<div key={`${row.name}_${row.unit}`} className="grid grid-cols-[1fr_120px_60px] gap-2 px-4 py-2 text-sm items-center">
+					<div key={row.aggKey} className="grid grid-cols-[1fr_120px_60px] gap-2 px-4 py-2 text-sm items-center">
 						<span className="font-medium">{row.name}</span>
 						<span className="text-center font-semibold tabular-nums" dir="ltr">
 							{formatNumber(row.quantity, 1)}

@@ -311,14 +311,18 @@ export const ROOM_MEP_PROFILES: Record<RoomType, RoomMEPProfile> = {
 
 /**
  * Helper: عدد الأشخاص المقدر من عدد غرف النوم
+ * (repeatCount = عدد تكرار الطابق للطوابق المتكررة)
  */
 export function estimateOccupants(
-	floors: Array<{ rooms: Array<{ type: string }> }>,
+	floors: Array<{ rooms: Array<{ type: string }>; repeatCount?: number }>,
 ): number {
 	let bedrooms = 0;
 	for (const floor of floors) {
+		const mult = floor.repeatCount ?? 1;
 		for (const room of floor.rooms) {
-			if (room.type === "bedroom" || room.type === "maid_room") bedrooms++;
+			if (room.type === "bedroom" || room.type === "maid_room") {
+				bedrooms += mult;
+			}
 		}
 	}
 	return Math.max(bedrooms * 2, 4);

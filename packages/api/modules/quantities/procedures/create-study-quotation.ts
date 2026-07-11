@@ -5,6 +5,7 @@ import { z } from "zod";
 import { toNum } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { subscriptionProcedure } from "../../../orpc/procedures";
+import { dedupeCostingItems } from "../lib/costing-aggregation";
 
 const displayConfigSchema = z.object({
 	grouping: z.enum(["BY_SECTION", "BY_FLOOR", "BY_ITEM", "FLAT"]),
@@ -54,7 +55,7 @@ export const createStudyQuotation = subscriptionProcedure
 			}),
 			validDays: z.number().int().positive().default(30),
 			discountType: z.enum(["none", "percent", "amount"]).default("none"),
-			discountValue: z.number().optional(),
+			discountValue: z.number().min(0).max(999999999.99).optional(),
 			paymentTerms: z.string().trim().max(100).optional(),
 			deliveryTerms: z.string().trim().max(100).optional(),
 			warrantyTerms: z.string().trim().max(100).optional(),
@@ -90,9 +91,11 @@ export const createStudyQuotation = subscriptionProcedure
 		const contingencyPct = toNum(study.contingencyPercent);
 
 		// Generate quotation items based on format
+		// dedupe يحمي من صفوف CostingItem التاريخية المكررة (نفس البند المصدري)
+		const costingItems = dedupeCostingItems(study.costingItems);
 		const quotationItems = generateItems(
 			input.format,
-			study.costingItems.map((item) => ({
+			costingItems.map((item) => ({
 				id: item.id,
 				section: item.section,
 				description: item.description,
@@ -123,12 +126,13 @@ export const createStudyQuotation = subscriptionProcedure
 			discountPercent = input.discountValue;
 			discountAmount = subtotal * (discountPercent / 100);
 		} else if (input.discountType === "amount" && input.discountValue) {
-			discountAmount = input.discountValue;
+			// لا يمكن أن يتجاوز الخصم الإجمالي
+			discountAmount = Math.min(input.discountValue, subtotal);
 			discountPercent = subtotal > 0 ? (discountAmount / subtotal) * 100 : 0;
 		}
 
 		const afterDiscount = subtotal - discountAmount;
-		const vatPercent = 15;
+		const vatPercent = study.vatIncluded ? 15 : 0;
 		const vatAmount = afterDiscount * (vatPercent / 100);
 		const totalAmount = afterDiscount + vatAmount;
 
@@ -254,12 +258,31 @@ function generateItems(
 	items: CostingItemData[],
 	opts: GenerateOptions,
 ): Array<{ description: string; quantity: number; unit: string; unitPrice: number; totalPrice: number }> {
+	// وضع الهوامش: per_section عند وجود هوامش أقسام — يطابق markupGetProfitAnalysis
+	// (في per_section: contingency لا يدخل والهامش لكل قسم + overhead مرة واحدة)
+	const perSection = opts.sectionMarkupsMap.size > 0;
+	const effectiveContingencyPct = perSection ? 0 : opts.contingencyPct;
+
 	// Calculate total selling price
 	const totalCost = items.reduce((s, i) => s + i.totalCost, 0);
 	const overheadAmount = totalCost * (opts.overheadPct / 100);
-	const contingencyAmount = totalCost * (opts.contingencyPct / 100);
-	const profitAmount = totalCost * (opts.defaultMarkup / 100);
-	const sellingPrice = totalCost + overheadAmount + contingencyAmount + profitAmount;
+	let sellingPrice: number;
+	if (perSection) {
+		let totalWithMarkup = 0;
+		const sectionTotals = new Map<string, number>();
+		for (const item of items) {
+			sectionTotals.set(item.section, (sectionTotals.get(item.section) ?? 0) + item.totalCost);
+		}
+		for (const [section, cost] of sectionTotals) {
+			const markup = opts.sectionMarkupsMap.get(section) ?? 0;
+			totalWithMarkup += cost * (1 + markup / 100);
+		}
+		sellingPrice = totalWithMarkup + overheadAmount;
+	} else {
+		const contingencyAmount = totalCost * (opts.contingencyPct / 100);
+		const profitAmount = totalCost * (opts.defaultMarkup / 100);
+		sellingPrice = totalCost + overheadAmount + contingencyAmount + profitAmount;
+	}
 
 	switch (format) {
 		case "LUMP_SUM": {
@@ -293,8 +316,8 @@ function generateItems(
 				};
 
 				for (const [section, cost] of sectionTotals) {
-					const markup = opts.sectionMarkupsMap.get(section) ?? opts.defaultMarkup;
-					const sectionSelling = cost * (1 + (opts.overheadPct + opts.contingencyPct + markup) / 100);
+					const markup = opts.sectionMarkupsMap.get(section) ?? (perSection ? 0 : opts.defaultMarkup);
+					const sectionSelling = cost * (1 + (opts.overheadPct + effectiveContingencyPct + markup) / 100);
 					const sectionPricePerSqm = sectionSelling / area;
 					result.push({
 						description: sectionLabels[section] ?? section,
@@ -330,8 +353,8 @@ function generateItems(
 			});
 
 			return filtered.map((item) => {
-				const markup = opts.sectionMarkupsMap.get(item.section) ?? opts.defaultMarkup;
-				const itemSelling = item.totalCost * (1 + (opts.overheadPct + opts.contingencyPct + markup) / 100);
+				const markup = opts.sectionMarkupsMap.get(item.section) ?? (perSection ? 0 : opts.defaultMarkup);
+				const itemSelling = item.totalCost * (1 + (opts.overheadPct + effectiveContingencyPct + markup) / 100);
 				const unitPrice = item.quantity > 0 ? itemSelling / item.quantity : itemSelling;
 				return {
 					description: item.description,

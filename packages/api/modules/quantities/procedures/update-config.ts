@@ -1,10 +1,13 @@
+import { ORPCError } from "@orpc/server";
+import { STUDY_ERRORS } from "../lib/error-messages";
 import { db } from "@repo/database";
 import { z } from "zod";
 import { convertStudyDecimals } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
-import { protectedProcedure } from "../../../orpc/procedures";
+import { subscriptionProcedure } from "../../../orpc/procedures";
 
-export const updateConfig = protectedProcedure
+// كتابة → subscriptionProcedure (كانت protectedProcedure بالخطأ)
+export const updateConfig = subscriptionProcedure
 	.route({
 		method: "POST",
 		path: "/quantities/{id}/config",
@@ -43,6 +46,14 @@ export const updateConfig = protectedProcedure
 		}
 		if (input.workScopes !== undefined) {
 			data.workScopes = input.workScopes;
+		}
+
+		const existing = await db.costStudy.findFirst({
+			where: { id: input.studyId, organizationId: input.organizationId },
+			select: { id: true },
+		});
+		if (!existing) {
+			throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.NOT_FOUND });
 		}
 
 		const updated = await db.costStudy.update({

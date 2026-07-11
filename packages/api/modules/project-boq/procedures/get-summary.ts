@@ -29,28 +29,39 @@ export const getSummary = protectedProcedure
 			organizationId: input.organizationId,
 		};
 
-		const [totalCount, pricedCount, sectionTotals, sourceTotals, grandTotal] =
-			await Promise.all([
-				db.projectBOQItem.count({ where: baseWhere }),
-				db.projectBOQItem.count({
-					where: { ...baseWhere, unitPrice: { not: null } },
-				}),
-				db.projectBOQItem.groupBy({
-					by: ["section"],
-					where: { ...baseWhere, unitPrice: { not: null } },
-					_sum: { totalPrice: true },
-					_count: true,
-				}),
-				db.projectBOQItem.groupBy({
-					by: ["sourceType"],
-					where: baseWhere,
-					_count: true,
-				}),
-				db.projectBOQItem.aggregate({
-					where: { ...baseWhere, unitPrice: { not: null } },
-					_sum: { totalPrice: true },
-				}),
-			]);
+		const [
+			totalCount,
+			pricedCount,
+			sectionCounts,
+			sectionTotals,
+			sourceTotals,
+			grandTotal,
+		] = await Promise.all([
+			db.projectBOQItem.count({ where: baseWhere }),
+			db.projectBOQItem.count({
+				where: { ...baseWhere, unitPrice: { not: null } },
+			}),
+			// العدّ لكل البنود — فلترة السعر كانت تجعل count=0 لجداول غير مسعّرة
+			db.projectBOQItem.groupBy({
+				by: ["section"],
+				where: baseWhere,
+				_count: true,
+			}),
+			db.projectBOQItem.groupBy({
+				by: ["section"],
+				where: { ...baseWhere, unitPrice: { not: null } },
+				_sum: { totalPrice: true },
+			}),
+			db.projectBOQItem.groupBy({
+				by: ["sourceType"],
+				where: baseWhere,
+				_count: true,
+			}),
+			db.projectBOQItem.aggregate({
+				where: { ...baseWhere, unitPrice: { not: null } },
+				_sum: { totalPrice: true },
+			}),
+		]);
 
 		const sectionMap: Record<string, { count: number; total: number }> = {
 			STRUCTURAL: { count: 0, total: 0 },
@@ -59,11 +70,13 @@ export const getSummary = protectedProcedure
 			LABOR: { count: 0, total: 0 },
 			GENERAL: { count: 0, total: 0 },
 		};
+		for (const s of sectionCounts) {
+			sectionMap[s.section] = { count: s._count, total: 0 };
+		}
 		for (const s of sectionTotals) {
-			sectionMap[s.section] = {
-				count: s._count,
-				total: Number(s._sum.totalPrice ?? 0),
-			};
+			const entry = sectionMap[s.section] ?? { count: 0, total: 0 };
+			entry.total = Number(s._sum.totalPrice ?? 0);
+			sectionMap[s.section] = entry;
 		}
 
 		const sourceMap: Record<string, number> = {

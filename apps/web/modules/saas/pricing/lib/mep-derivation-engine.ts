@@ -54,7 +54,8 @@ function floorMultiplier(floor: SmartFloorConfig): number {
 }
 
 function getTotalBuildingArea(config: SmartBuildingConfig): number {
-	return config.floors.reduce(
+	// نستثني السطح (ROOF) — ليس مساحة مأهولة
+	return habitableFloors(config).reduce(
 		(sum, f) => sum + f.area * floorMultiplier(f),
 		0,
 	);
@@ -73,7 +74,11 @@ function countAllRoomsByType(
 }
 
 function totalFloorCount(config: SmartBuildingConfig): number {
-	return config.floors.reduce((sum, f) => sum + floorMultiplier(f), 0);
+	// نستثني السطح (ROOF) — لا يُحتسب طابقاً
+	return habitableFloors(config).reduce(
+		(sum, f) => sum + floorMultiplier(f),
+		0,
+	);
 }
 
 function makeItem(
@@ -142,6 +147,7 @@ function deriveElectricalLighting(
 
 	for (const floor of config.floors) {
 		if (floor.floorType === "ROOF") continue;
+		const mult = floorMultiplier(floor); // مضاعف الطوابق المكررة
 
 		for (const room of getFloorRooms(floor)) {
 			const profile = ROOM_MEP_PROFILES[room.type as RoomType];
@@ -166,7 +172,7 @@ function deriveElectricalLighting(
 					roomName: room.name || room.type,
 					scope: "per_room",
 					groupKey: "electrical_lighting",
-					quantity: spotCount,
+					quantity: spotCount * mult,
 					unit: "نقطة",
 					materialPrice: spotPrice.materialPrice,
 					laborPrice: spotPrice.laborPrice,
@@ -204,7 +210,7 @@ function deriveElectricalLighting(
 						roomName: room.name || room.type,
 						scope: "per_room",
 						groupKey: "electrical_lighting",
-						quantity: 1,
+						quantity: mult,
 						unit: "نقطة",
 						materialPrice: chandelierPrice.materialPrice,
 						laborPrice: chandelierPrice.laborPrice,
@@ -238,6 +244,7 @@ function deriveElectricalOutlets(
 
 	for (const floor of config.floors) {
 		if (floor.floorType === "ROOF") continue;
+		const mult = floorMultiplier(floor); // مضاعف الطوابق المكررة
 
 		for (const room of getFloorRooms(floor)) {
 			const profile = ROOM_MEP_PROFILES[room.type as RoomType];
@@ -260,7 +267,7 @@ function deriveElectricalOutlets(
 						roomName: roomLabel,
 						scope: "per_room",
 						groupKey: "electrical_power",
-						quantity: profile.outlets13A,
+						quantity: profile.outlets13A * mult,
 						unit: "نقطة",
 						materialPrice: p.materialPrice,
 						laborPrice: p.laborPrice,
@@ -294,7 +301,7 @@ function deriveElectricalOutlets(
 						roomName: roomLabel,
 						scope: "per_room",
 						groupKey: "electrical_power",
-						quantity: profile.outlets20A_AC,
+						quantity: profile.outlets20A_AC * mult,
 						unit: "نقطة",
 						materialPrice: p.materialPrice,
 						laborPrice: p.laborPrice,
@@ -325,7 +332,7 @@ function deriveElectricalOutlets(
 						roomName: roomLabel,
 						scope: "per_room",
 						groupKey: "electrical_power",
-						quantity: profile.outlets20A_heater,
+						quantity: profile.outlets20A_heater * mult,
 						unit: "نقطة",
 						materialPrice: p.materialPrice,
 						laborPrice: p.laborPrice,
@@ -352,7 +359,7 @@ function deriveElectricalOutlets(
 						roomName: roomLabel,
 						scope: "per_room",
 						groupKey: "electrical_power",
-						quantity: profile.outlets32A_oven,
+						quantity: profile.outlets32A_oven * mult,
 						unit: "نقطة",
 						materialPrice: p.materialPrice,
 						laborPrice: p.laborPrice,
@@ -379,7 +386,7 @@ function deriveElectricalOutlets(
 						roomName: roomLabel,
 						scope: "per_room",
 						groupKey: "electrical_power",
-						quantity: profile.outlets20A_washer,
+						quantity: profile.outlets20A_washer * mult,
 						unit: "نقطة",
 						materialPrice: p.materialPrice,
 						laborPrice: p.laborPrice,
@@ -408,9 +415,14 @@ function deriveElectricalCablesAndPanels(
 
 	for (const floor of config.floors) {
 		if (floor.floorType === "ROOF") continue;
+		const mult = floorMultiplier(floor); // مضاعف الطوابق المكررة
 
 		const rooms = getFloorRooms(floor);
-		if (rooms.length === 0) continue;
+		if (rooms.length === 0) {
+			// طابق بلا غرف: نتقدم في العدّاد حتى تبقى ارتفاعات التغذية صحيحة
+			floorIndex += mult;
+			continue;
+		}
 
 		// تجميع نقاط الطابق
 		let lightingPoints = 0;
@@ -453,7 +465,7 @@ function deriveElectricalCablesAndPanels(
 					roomName: null,
 					scope: "per_floor",
 					groupKey: "electrical_cables",
-					quantity: Math.ceil(wire15Length),
+					quantity: Math.ceil(wire15Length) * mult,
 					unit: "م.ط",
 					materialPrice: p.materialPrice,
 					laborPrice: p.laborPrice,
@@ -489,7 +501,7 @@ function deriveElectricalCablesAndPanels(
 					roomName: null,
 					scope: "per_floor",
 					groupKey: "electrical_cables",
-					quantity: Math.ceil(wire25Length),
+					quantity: Math.ceil(wire25Length) * mult,
 					unit: "م.ط",
 					materialPrice: p.materialPrice,
 					laborPrice: p.laborPrice,
@@ -521,7 +533,7 @@ function deriveElectricalCablesAndPanels(
 					roomName: null,
 					scope: "per_floor",
 					groupKey: "electrical_cables",
-					quantity: Math.ceil(wire4Length),
+					quantity: Math.ceil(wire4Length) * mult,
 					unit: "م.ط",
 					materialPrice: p.materialPrice,
 					laborPrice: p.laborPrice,
@@ -553,7 +565,7 @@ function deriveElectricalCablesAndPanels(
 					roomName: null,
 					scope: "per_floor",
 					groupKey: "electrical_cables",
-					quantity: Math.ceil(wire6Length),
+					quantity: Math.ceil(wire6Length) * mult,
 					unit: "م.ط",
 					materialPrice: p.materialPrice,
 					laborPrice: p.laborPrice,
@@ -610,7 +622,7 @@ function deriveElectricalCablesAndPanels(
 				roomName: null,
 				scope: "per_floor",
 				groupKey: "electrical_panels",
-				quantity: 1,
+				quantity: mult,
 				unit: "عدد",
 				materialPrice: panelPrice.materialPrice,
 				laborPrice: panelPrice.laborPrice,
@@ -671,7 +683,7 @@ function deriveElectricalCablesAndPanels(
 				roomName: null,
 				scope: "per_floor",
 				groupKey: "electrical_cables",
-				quantity: Math.ceil(cableDistance),
+				quantity: Math.ceil(cableDistance) * mult,
 				unit: "م.ط",
 				materialPrice: cablePrice.materialPrice,
 				laborPrice: cablePrice.laborPrice,
@@ -690,7 +702,7 @@ function deriveElectricalCablesAndPanels(
 			}),
 		);
 
-		floorIndex++;
+		floorIndex += mult;
 	}
 
 	// ─── لوحة رئيسية للمبنى ───
@@ -779,6 +791,7 @@ function deriveEmergencyLighting(
 	if (projectType === "RESIDENTIAL" && numFloors < 3) return items;
 
 	for (const floor of floors) {
+		const mult = floorMultiplier(floor); // مضاعف الطوابق المكررة
 		// إنارة طوارئ: 1 لكل 100 م² (حد أدنى 2 لكل طابق)
 		const emergencyCount = Math.max(2, Math.ceil(floor.area / 100));
 		const ep = getMEPDefaultPrice("ELECTRICAL", "emergency_light");
@@ -795,7 +808,7 @@ function deriveEmergencyLighting(
 				roomName: null,
 				scope: "per_floor",
 				groupKey: "electrical_emergency",
-				quantity: emergencyCount,
+				quantity: emergencyCount * mult,
 				unit: "نقطة",
 				materialPrice: ep.materialPrice,
 				laborPrice: ep.laborPrice,
@@ -826,7 +839,7 @@ function deriveEmergencyLighting(
 				roomName: null,
 				scope: "per_floor",
 				groupKey: "electrical_emergency",
-				quantity: 2,
+				quantity: 2 * mult,
 				unit: "نقطة",
 				materialPrice: exitPrice.materialPrice,
 				laborPrice: exitPrice.laborPrice,
@@ -852,6 +865,7 @@ function derivePlumbingFixtures(
 
 	for (const floor of config.floors) {
 		if (floor.floorType === "ROOF") continue;
+		const mult = floorMultiplier(floor); // مضاعف الطوابق المكررة
 
 		for (const room of getFloorRooms(floor)) {
 			const profile = ROOM_MEP_PROFILES[room.type as RoomType];
@@ -875,7 +889,7 @@ function derivePlumbingFixtures(
 						roomName: roomLabel,
 						scope: "per_room",
 						groupKey: "plumbing_fixtures",
-						quantity: fixtures.washbasin,
+						quantity: fixtures.washbasin * mult,
 						unit: "عدد",
 						materialPrice: p.materialPrice,
 						laborPrice: p.laborPrice,
@@ -902,7 +916,7 @@ function derivePlumbingFixtures(
 						roomName: roomLabel,
 						scope: "per_room",
 						groupKey: "plumbing_fixtures",
-						quantity: fixtures.wc,
+						quantity: fixtures.wc * mult,
 						unit: "عدد",
 						materialPrice: p.materialPrice,
 						laborPrice: p.laborPrice,
@@ -929,7 +943,7 @@ function derivePlumbingFixtures(
 						roomName: roomLabel,
 						scope: "per_room",
 						groupKey: "plumbing_fixtures",
-						quantity: fixtures.shower,
+						quantity: fixtures.shower * mult,
 						unit: "عدد",
 						materialPrice: p.materialPrice,
 						laborPrice: p.laborPrice,
@@ -956,7 +970,7 @@ function derivePlumbingFixtures(
 						roomName: roomLabel,
 						scope: "per_room",
 						groupKey: "plumbing_fixtures",
-						quantity: fixtures.kitchenSink,
+						quantity: fixtures.kitchenSink * mult,
 						unit: "عدد",
 						materialPrice: p.materialPrice,
 						laborPrice: p.laborPrice,
@@ -983,7 +997,7 @@ function derivePlumbingFixtures(
 						roomName: roomLabel,
 						scope: "per_room",
 						groupKey: "plumbing_fixtures",
-						quantity: 1,
+						quantity: mult,
 						unit: "عدد",
 						materialPrice: p.materialPrice,
 						laborPrice: p.laborPrice,
@@ -1259,6 +1273,7 @@ function deriveTanksAndPumps(config: SmartBuildingConfig): MEPDerivedItem[] {
 		.filter((f) => f.floorType !== "ROOF")
 		.map((f) => ({
 			rooms: getFloorRooms(f).map((r) => ({ type: r.type })),
+			repeatCount: floorMultiplier(f),
 		}));
 	const occupants = estimateOccupants(floorsForOccupants);
 	const numFloors = totalFloorCount(config);
@@ -1507,6 +1522,7 @@ function deriveACUnits(config: SmartBuildingConfig): MEPDerivedItem[] {
 
 	for (const floor of config.floors) {
 		if (floor.floorType === "ROOF") continue;
+		const mult = floorMultiplier(floor); // مضاعف الطوابق المكررة
 
 		for (const room of getFloorRooms(floor)) {
 			const profile = ROOM_MEP_PROFILES[room.type as RoomType];
@@ -1542,7 +1558,7 @@ function deriveACUnits(config: SmartBuildingConfig): MEPDerivedItem[] {
 					roomName: roomLabel,
 					scope: "per_room",
 					groupKey: "hvac_ac",
-					quantity: 1,
+					quantity: mult,
 					unit: "وحدة",
 					materialPrice: p.materialPrice,
 					laborPrice: p.laborPrice,
@@ -1578,6 +1594,7 @@ function deriveRefrigerantPipes(
 
 	for (const floor of config.floors) {
 		if (floor.floorType === "ROOF") continue;
+		const mult = floorMultiplier(floor); // مضاعف الطوابق المكررة
 
 		for (const room of getFloorRooms(floor)) {
 			const profile = ROOM_MEP_PROFILES[room.type as RoomType];
@@ -1608,7 +1625,7 @@ function deriveRefrigerantPipes(
 					roomName: roomLabel,
 					scope: "per_room",
 					groupKey: "hvac_pipes",
-					quantity: Math.ceil(pipeLength),
+					quantity: Math.ceil(pipeLength) * mult,
 					unit: "م.ط",
 					materialPrice: p.materialPrice,
 					laborPrice: p.laborPrice,
@@ -1643,7 +1660,7 @@ function deriveRefrigerantPipes(
 					roomName: roomLabel,
 					scope: "per_room",
 					groupKey: "hvac_pipes",
-					quantity: Math.ceil(pipeLength * 0.8), // 80% من طول النحاس
+					quantity: Math.ceil(pipeLength * 0.8) * mult, // 80% من طول النحاس
 					unit: "م.ط",
 					materialPrice: cp.materialPrice,
 					laborPrice: cp.laborPrice,
@@ -1655,7 +1672,7 @@ function deriveRefrigerantPipes(
 			);
 		}
 
-		floorIndex++;
+		floorIndex += mult;
 	}
 
 	return items;
@@ -1668,6 +1685,7 @@ function deriveVentilation(config: SmartBuildingConfig): MEPDerivedItem[] {
 
 	for (const floor of config.floors) {
 		if (floor.floorType === "ROOF") continue;
+		const mult = floorMultiplier(floor); // مضاعف الطوابق المكررة
 
 		for (const room of getFloorRooms(floor)) {
 			const profile = ROOM_MEP_PROFILES[room.type as RoomType];
@@ -1689,7 +1707,7 @@ function deriveVentilation(config: SmartBuildingConfig): MEPDerivedItem[] {
 						roomName: roomLabel,
 						scope: "per_room",
 						groupKey: "hvac_ventilation",
-						quantity: 1,
+						quantity: mult,
 						unit: "عدد",
 						materialPrice: p.materialPrice,
 						laborPrice: p.laborPrice,
@@ -1714,7 +1732,7 @@ function deriveVentilation(config: SmartBuildingConfig): MEPDerivedItem[] {
 						roomName: roomLabel,
 						scope: "per_room",
 						groupKey: "hvac_ventilation",
-						quantity: 1,
+						quantity: mult,
 						unit: "عدد",
 						materialPrice: p.materialPrice,
 						laborPrice: p.laborPrice,
@@ -1775,6 +1793,7 @@ function deriveFirefighting(
 		if (numFloors > 3) {
 			// كاشفات دخان بسيطة
 			for (const floor of floors) {
+				const mult = floorMultiplier(floor); // مضاعف الطوابق المكررة
 				const detectorCount = Math.max(
 					2,
 					Math.ceil(floor.area / 70),
@@ -1795,7 +1814,7 @@ function deriveFirefighting(
 						roomName: null,
 						scope: "per_floor",
 						groupKey: "fire_alarm",
-						quantity: detectorCount,
+						quantity: detectorCount * mult,
 						unit: "عدد",
 						materialPrice: sd.materialPrice,
 						laborPrice: sd.laborPrice,
@@ -1850,6 +1869,7 @@ function deriveFirefighting(
 	const sprinklerCoverage = projectType === "INDUSTRIAL" ? 9 : 12;
 
 	for (const floor of floors) {
+		const mult = floorMultiplier(floor); // مضاعف الطوابق المكررة
 		// كاشفات دخان
 		const smokeCount = Math.max(2, Math.ceil(floor.area / 70));
 		const sd = getMEPDefaultPrice("FIREFIGHTING", "smoke_detector");
@@ -1865,7 +1885,7 @@ function deriveFirefighting(
 				roomName: null,
 				scope: "per_floor",
 				groupKey: "fire_alarm",
-				quantity: smokeCount,
+				quantity: smokeCount * mult,
 				unit: "عدد",
 				materialPrice: sd.materialPrice,
 				laborPrice: sd.laborPrice,
@@ -1892,7 +1912,7 @@ function deriveFirefighting(
 					roomName: null,
 					scope: "per_floor",
 					groupKey: "fire_alarm",
-					quantity: kitchens.length,
+					quantity: kitchens.length * mult,
 					unit: "عدد",
 					materialPrice: hd.materialPrice,
 					laborPrice: hd.laborPrice,
@@ -1918,7 +1938,7 @@ function deriveFirefighting(
 				roomName: null,
 				scope: "per_floor",
 				groupKey: "fire_alarm",
-				quantity: 2,
+				quantity: 2 * mult,
 				unit: "عدد",
 				materialPrice: mcp.materialPrice,
 				laborPrice: mcp.laborPrice,
@@ -1942,7 +1962,7 @@ function deriveFirefighting(
 				roomName: null,
 				scope: "per_floor",
 				groupKey: "fire_alarm",
-				quantity: 2,
+				quantity: 2 * mult,
 				unit: "عدد",
 				materialPrice: hs.materialPrice,
 				laborPrice: hs.laborPrice,
@@ -1968,7 +1988,7 @@ function deriveFirefighting(
 				roomName: null,
 				scope: "per_floor",
 				groupKey: "fire_sprinklers",
-				quantity: sprinklerCount,
+				quantity: sprinklerCount * mult,
 				unit: "عدد",
 				materialPrice: sp.materialPrice,
 				laborPrice: sp.laborPrice,
@@ -2133,6 +2153,7 @@ function deriveLowCurrent(
 	// ─── نقاط شبكة ───
 	for (const floor of config.floors) {
 		if (floor.floorType === "ROOF") continue;
+		const mult = floorMultiplier(floor); // مضاعف الطوابق المكررة
 
 		for (const room of getFloorRooms(floor)) {
 			const profile = ROOM_MEP_PROFILES[room.type as RoomType];
@@ -2153,7 +2174,7 @@ function deriveLowCurrent(
 					roomName: roomLabel,
 					scope: "per_room",
 					groupKey: "low_current_network",
-					quantity: profile.networkPoints,
+					quantity: profile.networkPoints * mult,
 					unit: "نقطة",
 					materialPrice: p.materialPrice,
 					laborPrice: p.laborPrice,
@@ -2252,8 +2273,8 @@ function deriveLowCurrent(
 		}),
 	);
 
-	// وحدات داخلية: واحدة لكل طابق (سكني) أو أكثر
-	const indoorCount = habitableFloors(config).length;
+	// وحدات داخلية: واحدة لكل طابق (سكني) أو أكثر — مع احتساب الطوابق المكررة
+	const indoorCount = totalFloorCount(config);
 	const intercomIndoor = getMEPDefaultPrice(
 		"LOW_CURRENT",
 		"intercom_indoor",

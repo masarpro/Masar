@@ -214,46 +214,51 @@ export const approveStudyStage = subscriptionProcedure
 			});
 		}
 
-		// Approve current stage
-		await db.studyStage.update({
-			where: { id: currentStageRecord.id },
-			data: {
-				status: "APPROVED",
-				approvedById: context.user.id,
-				approvedAt: new Date(),
-			},
-		});
+		// الاعتماد + ترقية المرحلة التالية + مزامنة حقول CostStudy القديمة
+		// في transaction واحدة — فشل جزئي كان يترك StudyStage والحقول القديمة
+		// متعارضين (كل واجهة تقرأ مصدراً مختلفاً)
+		await db.$transaction(async (tx) => {
+			// Approve current stage
+			await tx.studyStage.update({
+				where: { id: currentStageRecord.id },
+				data: {
+					status: "APPROVED",
+					approvedById: context.user.id,
+					approvedAt: new Date(),
+				},
+			});
 
-		// Set next stage to DRAFT if currently NOT_STARTED
-		if (stageIndex < STAGE_ORDER.length - 1) {
-			const nextStageKey = STAGE_ORDER[stageIndex + 1];
-			const nextStageRecord = study.stages.find((s) => s.stage === nextStageKey);
-			if (nextStageRecord && nextStageRecord.status === "NOT_STARTED") {
-				await db.studyStage.update({
-					where: { id: nextStageRecord.id },
-					data: { status: "DRAFT" },
-				});
-			}
-		}
-
-		// Sync to CostStudy legacy fields
-		const costStudyField = STAGE_TO_COST_STUDY_FIELD[input.stage];
-		if (costStudyField) {
-			const syncData: Record<string, string> = { [costStudyField]: "APPROVED" };
+			// Set next stage to DRAFT if currently NOT_STARTED
 			if (stageIndex < STAGE_ORDER.length - 1) {
-				const nextField = STAGE_TO_COST_STUDY_FIELD[STAGE_ORDER[stageIndex + 1]];
-				if (nextField) {
-					const nextStageRecord = study.stages.find((s) => s.stage === STAGE_ORDER[stageIndex + 1]);
-					if (nextStageRecord && nextStageRecord.status === "NOT_STARTED") {
-						syncData[nextField] = "DRAFT";
-					}
+				const nextStageKey = STAGE_ORDER[stageIndex + 1];
+				const nextStageRecord = study.stages.find((s) => s.stage === nextStageKey);
+				if (nextStageRecord && nextStageRecord.status === "NOT_STARTED") {
+					await tx.studyStage.update({
+						where: { id: nextStageRecord.id },
+						data: { status: "DRAFT" },
+					});
 				}
 			}
-			await db.costStudy.update({
-				where: { id: input.studyId },
-				data: syncData,
-			});
-		}
+
+			// Sync to CostStudy legacy fields
+			const costStudyField = STAGE_TO_COST_STUDY_FIELD[input.stage];
+			if (costStudyField) {
+				const syncData: Record<string, string> = { [costStudyField]: "APPROVED" };
+				if (stageIndex < STAGE_ORDER.length - 1) {
+					const nextField = STAGE_TO_COST_STUDY_FIELD[STAGE_ORDER[stageIndex + 1]];
+					if (nextField) {
+						const nextStageRecord = study.stages.find((s) => s.stage === STAGE_ORDER[stageIndex + 1]);
+						if (nextStageRecord && nextStageRecord.status === "NOT_STARTED") {
+							syncData[nextField] = "DRAFT";
+						}
+					}
+				}
+				await tx.costStudy.update({
+					where: { id: input.studyId },
+					data: syncData,
+				});
+			}
+		});
 
 		const approvedEvent = STAGE_APPROVED_EVENT[input.stage];
 		if (approvedEvent) {

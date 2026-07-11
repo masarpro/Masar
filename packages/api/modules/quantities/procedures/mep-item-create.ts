@@ -23,7 +23,7 @@ const mepItemSchema = z.object({
 	calculationMethod: z.string().trim().max(100).default("manual"),
 	calculationData: z.record(z.string(), z.unknown()).optional(),
 	dataSource: z.string().trim().max(100).default("manual"),
-	sourceFormula: z.string().trim().max(100).nullable().optional(),
+	sourceFormula: z.string().trim().max(500).nullable().optional(),
 	groupKey: z.string().trim().max(100).nullable().optional(),
 	specifications: z.string().trim().max(100).nullable().optional(),
 	specData: z.record(z.string(), z.unknown()).optional(),
@@ -81,7 +81,7 @@ export const mepItemCreateBatch = subscriptionProcedure
 		z.object({
 			organizationId: z.string().trim().max(100),
 			costStudyId: z.string().trim().max(100),
-			items: z.array(mepItemSchema),
+			items: z.array(mepItemSchema).max(1000),
 		}),
 	)
 	.handler(async ({ input, context }) => {

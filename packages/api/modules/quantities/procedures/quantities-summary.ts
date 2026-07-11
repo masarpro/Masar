@@ -24,6 +24,15 @@ export const quantitiesSummary = protectedProcedure
 			{ section: "pricing", action: "view" },
 		);
 
+		// التحقق أن الدراسة تخص المنظمة — كانت العدادات تُقرأ بمعرّف خام
+		const study = await db.costStudy.findFirst({
+			where: { id: input.studyId, organizationId: input.organizationId },
+			select: { id: true },
+		});
+		if (!study) {
+			throw new ORPCError("NOT_FOUND", { message: "الدراسة غير موجودة" });
+		}
+
 		const [structuralCount, finishingCount, mepCount, manualCount] =
 			await Promise.all([
 				db.structuralItem.count({

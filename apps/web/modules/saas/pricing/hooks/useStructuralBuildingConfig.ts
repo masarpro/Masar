@@ -70,19 +70,15 @@ export function useStructuralBuildingConfig({
 
 	const saveBuildingConfig = useCallback(
 		async (config: StructuralBuildingConfig) => {
-			// Merge into existing specs so we don't overwrite other fields
-			const existingSpecs = (specsData as Record<string, any>) || {};
-			const merged = {
-				...existingSpecs,
-				buildingConfig: config,
-			};
+			// نرسل buildingConfig فقط — الخادم يدمج على مستوى المفاتيح العليا،
+			// وإرسال الكاش الكامل كان يسابق حفظ صفحة المواصفات (آخر كتابة تمسح الأخرى)
 			await saveMutation.mutateAsync({
 				organizationId,
 				studyId,
-				specs: merged,
+				specs: { buildingConfig: config },
 			});
 		},
-		[specsData, saveMutation, organizationId, studyId],
+		[saveMutation, organizationId, studyId],
 	);
 
 	return {

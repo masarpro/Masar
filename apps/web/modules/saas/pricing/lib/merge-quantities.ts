@@ -254,6 +254,7 @@ export function mergeQuantities(
 				effectiveQuantity: calcEffective(
 					savedQty,
 					savedItem.wastagePercent ?? d.wastagePercent,
+					savedItem.unit ?? d.unit,
 				),
 				dataSource:
 					(savedItem.dataSource as DataSourceType) ?? d.dataSource,
@@ -328,7 +329,7 @@ export function mergeQuantities(
 			quantity: savedQty,
 			unit: item.unit ?? "m2",
 			wastagePercent: item.wastagePercent ?? 0,
-			effectiveQuantity: calcEffective(savedQty, item.wastagePercent ?? 0),
+			effectiveQuantity: calcEffective(savedQty, item.wastagePercent ?? 0, item.unit),
 			dataSource: (item.dataSource as DataSourceType) ?? "manual",
 			sourceDescription: "إدخال يدوي",
 			sourceFormula: item.sourceFormula ?? undefined,
@@ -350,7 +351,11 @@ function getQuantityFromSaved(item: SavedFinishingItem): number {
 	return 0;
 }
 
-function calcEffective(qty: number, wastage: number): number {
+/** وحدات العدّ لا يُطبق عليها هالك (المحرك يتعمد ذلك — درجان يبقيان 2 لا 2.1) */
+const COUNT_UNITS = new Set(["piece", "عدد", "طقم", "وحدة", "lump_sum", "مقطوعية"]);
+
+function calcEffective(qty: number, wastage: number, unit?: string | null): number {
+	if (unit && COUNT_UNITS.has(unit)) return qty;
 	return Math.round(qty * (1 + wastage / 100) * 100) / 100;
 }
 

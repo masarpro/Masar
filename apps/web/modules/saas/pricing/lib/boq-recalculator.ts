@@ -82,7 +82,9 @@ function calcCutting(
 		const cutsPerStock = Math.floor(stockLength / barLength) || 1;
 		stocksNeeded = Math.ceil(barCount / cutsPerStock);
 		wastePerStock = stockLength - cutsPerStock * barLength;
-		totalWaste = stocksNeeded * wastePerStock;
+		// الهالك الحقيقي = المشترى − المستخدم (يشمل بقية السيخ الأخير
+		// غير مكتمل القصّات — الصيغة القديمة كانت تعرض 0% لهالك حقيقي 37%)
+		totalWaste = stocksNeeded * stockLength - barCount * barLength;
 	}
 
 	const netLength = barCount * barLength;
@@ -156,10 +158,15 @@ export function recalculateColumnCutting(
 		return { cuttingDetails: [], totals: { netWeight: 0, grossWeight: 0, wastePercentage: 0, stocksNeeded: [] }, hasRebarParams: false };
 	}
 
-	const barLength = height + 0.6; // lap/anchorage
+	// يطابق المحرك (calculateColumnRebar): امتداد 0.8م، ودعم الأعمدة الدائرية
+	const barLength = height + 0.8;
 	const widthM = width / 100;
 	const depthM = depth / 100;
-	const stirrupPerimeter = 2 * (widthM + depthM - 0.08) + 0.3;
+	const isCircular = !!dims.shape && (dims.diameter || 0) > 0;
+	const diameterM = (dims.diameter || 0) / 100;
+	const stirrupPerimeter = isCircular
+		? Math.PI * (diameterM - 0.08) + 0.3
+		: 2 * (widthM + depthM - 0.08) + 0.3;
 	const stirrupsCount = Math.ceil((height * 1000) / stirrupSpacing) + 1;
 
 	const details = [
@@ -221,44 +228,91 @@ export function recalculateFoundationCutting(
 			return { cuttingDetails: [], totals: { netWeight: 0, grossWeight: 0, wastePercentage: 0, stocksNeeded: [] }, hasRebarParams: false };
 		}
 
+		// عدد الأسياخ يطابق المحرك: ceil((البعد − 2×غطاء) × أسياخ/م) + 1
+		const coverSide = dims.foundationCoverSide ?? cover;
+		const barCountOf = (dimension: number, barsPerMeter: number) =>
+			Math.ceil((dimension - 2 * coverSide) * barsPerMeter) + 1;
+
 		// Bottom short direction
-		const bottomShortBarLength = width - 2 * cover + 2 * hookLength;
-		const bottomShortCount = Math.ceil(length * (dims.bottomShortBarsPerMeter || 5));
+		const bottomShortBarLength = width - 2 * coverSide + 2 * hookLength;
+		const bottomShortCount = barCountOf(length, dims.bottomShortBarsPerMeter || 5);
 		details.push(calcCutting(itemName, "فرش سفلي - قصير", dims.bottomShortDiameter, bottomShortBarLength, bottomShortCount * quantity));
 
 		// Bottom long direction
-		const bottomLongBarLength = length - 2 * cover + 2 * hookLength;
-		const bottomLongCount = Math.ceil(width * (dims.bottomLongBarsPerMeter || 5));
+		const bottomLongBarLength = length - 2 * coverSide + 2 * hookLength;
+		const bottomLongCount = barCountOf(width, dims.bottomLongBarsPerMeter || 5);
 		details.push(calcCutting(itemName, "فرش سفلي - طويل", dims.bottomLongDiameter || dims.bottomShortDiameter, bottomLongBarLength, bottomLongCount * quantity));
 
 		// Top short
 		if (dims.hasTopShort) {
-			const topShortBarLength = width - 2 * cover + 2 * hookLength;
-			const topShortCount = Math.ceil(length * (dims.topShortBarsPerMeter || 4));
+			const topShortBarLength = width - 2 * coverSide + 2 * hookLength;
+			const topShortCount = barCountOf(length, dims.topShortBarsPerMeter || 4);
 			details.push(calcCutting(itemName, "غطاء علوي - قصير", dims.topShortDiameter || 12, topShortBarLength, topShortCount * quantity));
 		}
 
 		// Top long
 		if (dims.hasTopLong) {
-			const topLongBarLength = length - 2 * cover + 2 * hookLength;
-			const topLongCount = Math.ceil(width * (dims.topLongBarsPerMeter || 4));
+			const topLongBarLength = length - 2 * coverSide + 2 * hookLength;
+			const topLongCount = barCountOf(width, dims.topLongBarsPerMeter || 4);
 			details.push(calcCutting(itemName, "غطاء علوي - طويل", dims.topLongDiameter || 12, topLongBarLength, topLongCount * quantity));
 		}
 	} else if (subCategory === "strip") {
-		if (!dims.bottomMainCount) {
-			return { cuttingDetails: [], totals: { netWeight: 0, grossWeight: 0, wastePercentage: 0, stocksNeeded: [] }, hasRebarParams: false };
-		}
+		// يطابق المحرك (calculateStripFoundation): وضعان حسب العرض
+		// (عتبة 0.8م)، أطوال بغطاء وخطاف، وكل الطبقات × quantity
 		const segmentLength = dims.segmentLength || dims.length || 10;
-		const barLength = segmentLength + 0.6;
+		const width = dims.width || 0.6;
+		const height = dims.height || 0.6;
+		const coverSide = dims.stripCoverSide ?? cover;
+		const coverBottom = dims.stripCoverBottom ?? cover;
+		const coverTop = dims.stripCoverTop ?? cover;
+		const isMeshMode = width > 0.8;
 
-		details.push(calcCutting(itemName, "حديد طولي رئيسي", dims.bottomMainDiameter || 16, barLength, (dims.bottomMainCount || 6)));
+		if (!isMeshMode) {
+			if (!dims.bottomMainCount) {
+				return { cuttingDetails: [], totals: { netWeight: 0, grossWeight: 0, wastePercentage: 0, stocksNeeded: [] }, hasRebarParams: false };
+			}
+			const longBarLength = segmentLength - 2 * coverSide + 2 * hookLength;
 
-		if (dims.hasStirrup && dims.stirrupDiameter) {
-			const widthM = (dims.width || 0.6);
-			const heightM = (dims.height || 0.6);
-			const stirrupPerimeter = 2 * (widthM + heightM - 0.08) + 0.3;
-			const stirrupsCount = Math.ceil((segmentLength * 1000) / (dims.stirrupSpacing || 200)) + 1;
-			details.push(calcCutting(itemName, "كانات", dims.stirrupDiameter, stirrupPerimeter, stirrupsCount));
+			details.push(calcCutting(itemName, "طولي سفلي رئيسي", dims.bottomMainDiameter || 16, longBarLength, (dims.bottomMainCount || 6) * quantity));
+
+			if (dims.hasBottomSecondary && dims.bottomSecondaryCount) {
+				details.push(calcCutting(itemName, "طولي سفلي ثانوي", dims.bottomSecondaryDiameter || 12, longBarLength, dims.bottomSecondaryCount * quantity));
+			}
+
+			if (dims.hasTopMain && dims.topMainCount) {
+				details.push(calcCutting(itemName, "طولي علوي", dims.topMainDiameter || 12, longBarLength, dims.topMainCount * quantity));
+			}
+
+			if (dims.hasStirrup && dims.stirrupDiameter) {
+				const stirrupPerimeter =
+					2 * ((width - 2 * coverSide) + (height - coverBottom - coverTop)) +
+					2 * hookLength;
+				const stirrupsCount = Math.ceil((segmentLength * 1000) / (dims.stirrupSpacing || 200)) + 1;
+				details.push(calcCutting(itemName, "كانات", dims.stirrupDiameter, stirrupPerimeter, stirrupsCount * quantity));
+			}
+		} else {
+			// وضع الشبكة — يطابق نمط اللبشة
+			if (!dims.stripBottomMeshXDiameter) {
+				return { cuttingDetails: [], totals: { netWeight: 0, grossWeight: 0, wastePercentage: 0, stocksNeeded: [] }, hasRebarParams: false };
+			}
+			const meshCountOf = (dimension: number, barsPerMeter: number) =>
+				Math.ceil((dimension - 2 * coverSide) * barsPerMeter) + 1;
+
+			const bxBarLength = width - 2 * coverSide + 2 * hookLength;
+			const bxCount = meshCountOf(segmentLength, dims.stripBottomMeshXBarsPerMeter || 5) * quantity;
+			details.push(calcCutting(itemName, "سفلي اتجاه X", dims.stripBottomMeshXDiameter, bxBarLength, bxCount));
+
+			const byBarLength = segmentLength - 2 * coverSide + 2 * hookLength;
+			const byCount = meshCountOf(width, dims.stripBottomMeshYBarsPerMeter || 5) * quantity;
+			details.push(calcCutting(itemName, "سفلي اتجاه Y", dims.stripBottomMeshYDiameter || dims.stripBottomMeshXDiameter, byBarLength, byCount));
+
+			if (dims.stripHasTopMesh) {
+				const txCount = meshCountOf(segmentLength, dims.stripTopMeshXBarsPerMeter || 4) * quantity;
+				details.push(calcCutting(itemName, "علوي اتجاه X", dims.stripTopMeshXDiameter || 12, bxBarLength, txCount));
+
+				const tyCount = meshCountOf(width, dims.stripTopMeshYBarsPerMeter || 4) * quantity;
+				details.push(calcCutting(itemName, "علوي اتجاه Y", dims.stripTopMeshYDiameter || 12, byBarLength, tyCount));
+			}
 		}
 	} else if (subCategory === "raft") {
 		if (!dims.bottomXDiameter) {
@@ -266,27 +320,29 @@ export function recalculateFoundationCutting(
 		}
 		const length = dims.length || 0;
 		const width = dims.width || 0;
-		const thickness = dims.thickness || 0.6;
+		const coverSide = dims.coverSide ?? cover;
 
-		// Bottom X bars
-		const bxBarLength = length - 2 * cover;
-		const bxCount = Math.ceil(width * (dims.bottomXBarsPerMeter || 5));
-		details.push(calcCutting(itemName, "شبكة سفلية - X", dims.bottomXDiameter, bxBarLength, bxCount));
+		// يطابق المحرك: أسياخ X بعرض اللبشة موزعة على الطول (+خطافات +1 سيخ)
+		const meshCountOf = (dimension: number, barsPerMeter: number) =>
+			Math.ceil((dimension - 2 * coverSide) * barsPerMeter) + 1;
 
-		// Bottom Y bars
-		const byBarLength = width - 2 * cover;
-		const byCount = Math.ceil(length * (dims.bottomYBarsPerMeter || 5));
-		details.push(calcCutting(itemName, "شبكة سفلية - Y", dims.bottomYDiameter || dims.bottomXDiameter, byBarLength, byCount));
+		// Bottom X bars (تمتد بالعرض)
+		const bxBarLength = width - 2 * coverSide + 2 * hookLength;
+		const bxCount = meshCountOf(length, dims.bottomXBarsPerMeter || 5);
+		details.push(calcCutting(itemName, "سفلي اتجاه X", dims.bottomXDiameter, bxBarLength, bxCount));
+
+		// Bottom Y bars (تمتد بالطول)
+		const byBarLength = length - 2 * coverSide + 2 * hookLength;
+		const byCount = meshCountOf(width, dims.bottomYBarsPerMeter || 5);
+		details.push(calcCutting(itemName, "سفلي اتجاه Y", dims.bottomYDiameter || dims.bottomXDiameter, byBarLength, byCount));
 
 		// Top mesh
 		if (dims.hasTopMesh) {
-			const txBarLength = length - 2 * cover;
-			const txCount = Math.ceil(width * (dims.topXBarsPerMeter || 4));
-			details.push(calcCutting(itemName, "شبكة علوية - X", dims.topXDiameter || 12, txBarLength, txCount));
+			const txCount = meshCountOf(length, dims.topXBarsPerMeter || 4);
+			details.push(calcCutting(itemName, "علوي اتجاه X", dims.topXDiameter || 12, bxBarLength, txCount));
 
-			const tyBarLength = width - 2 * cover;
-			const tyCount = Math.ceil(length * (dims.topYBarsPerMeter || 4));
-			details.push(calcCutting(itemName, "شبكة علوية - Y", dims.topYDiameter || 12, tyBarLength, tyCount));
+			const tyCount = meshCountOf(width, dims.topYBarsPerMeter || 4);
+			details.push(calcCutting(itemName, "علوي اتجاه Y", dims.topYDiameter || 12, byBarLength, tyCount));
 		}
 	} else {
 		return { cuttingDetails: [], totals: { netWeight: 0, grossWeight: 0, wastePercentage: 0, stocksNeeded: [] }, hasRebarParams: false };
@@ -312,16 +368,39 @@ export function recalculateStairsCutting(
 		return { cuttingDetails: [], totals: { netWeight: 0, grossWeight: 0, wastePercentage: 0, stocksNeeded: [] }, hasRebarParams: false };
 	}
 
-	const totalLength = flightLength + landingLength;
-	const mainBarLength = totalLength + 0.5;
-	const mainBarsCount = Math.ceil(width * mainBarsPerMeter) + 1;
+	// يطابق المحرك (calculateStaircaseRebar): 4 طبقات بأطوال تماسك 40d
+	// وخطافات 12d وامتداد علوي 25% من البحر — النسخة القديمة (طبقتان
+	// بإضافات 0.5/0.3) كانت تُنقص حديد السلالم ~47% في طلبية المصنع
+	const secDiameter = secondaryDiameter || 10;
+	const secBarsPerMeter = secondaryBarsPerMeter || 5;
+	const roundUpTo5cm = (v: number) => Math.ceil(v * 20) / 20;
 
-	const secondaryBarLength = width + 0.3;
-	const secondaryBarsCount = Math.ceil(totalLength * (secondaryBarsPerMeter || 5)) + 1;
+	const totalLength = flightLength + landingLength;
+	const mainBarsCount = Math.ceil(width * mainBarsPerMeter) + 1;
+	const secondaryBarsCount = Math.ceil(totalLength * secBarsPerMeter) + 1;
+
+	const mainDevLength = 40 * (mainDiameter / 1000);
+	const mainHookLength = 12 * (mainDiameter / 1000);
+	const secDevLength = 40 * (secDiameter / 1000);
+	const secHookLength = 12 * (secDiameter / 1000);
+	const topExtension = 0.25 * flightLength;
+	const secBarSpacing = Math.round(1000 / secBarsPerMeter);
+
+	// Layer 1: سفلي رئيسي (طولي)
+	const bottomMainBarLength = roundUpTo5cm(totalLength + 2 * mainDevLength + 2 * mainHookLength);
+	// Layer 2: سفلي ثانوي (عرضي)
+	const bottomSecBarLength = roundUpTo5cm(width + 2 * secDevLength + 2 * secHookLength);
+	// Layer 3: علوي رئيسي (مساند)
+	const topMainPieceLength = roundUpTo5cm(topExtension + mainDevLength + mainHookLength);
+	const topMainCount = mainBarsCount * 2;
+	// Layer 4: علوي ثانوي (توزيع مساند)
+	const topSecCount = 2 * (Math.ceil((topExtension * 1000) / secBarSpacing) + 1);
 
 	const details = [
-		calcCutting(itemName, "حديد رئيسي (طولي)", mainDiameter, mainBarLength, mainBarsCount * quantity),
-		calcCutting(itemName, "حديد ثانوي (عرضي)", secondaryDiameter || 10, secondaryBarLength, secondaryBarsCount * quantity),
+		calcCutting(itemName, "حديد سفلي رئيسي (طولي)", mainDiameter, bottomMainBarLength, mainBarsCount * quantity),
+		calcCutting(itemName, "حديد سفلي ثانوي (عرضي)", secDiameter, bottomSecBarLength, secondaryBarsCount * quantity),
+		calcCutting(itemName, "حديد علوي رئيسي (مساند)", mainDiameter, topMainPieceLength, topMainCount * quantity),
+		calcCutting(itemName, "حديد علوي ثانوي (توزيع مساند)", secDiameter, bottomSecBarLength, topSecCount * quantity),
 	];
 
 	return aggregateResult(itemName, details);
@@ -343,45 +422,47 @@ export function recalculateSlabCutting(
 	}
 
 	const details: CuttingDetailRow[] = [];
-	const area = length * width * quantity;
 
-	// Bottom main bars (long direction)
-	const bmBarLength = length - 2 * cover + 0.2;
-	const bmCount = Math.ceil(width * bottomMainBarsPerMeter) * quantity;
+	// يطابق المحرك (calculateSolidSlab): الرئيسي = اتجاه X يمتد بالعرض
+	// وموزع على الطول، إضافة خطافات 0.4م، والعدد بخصم الغطاء + سيخ
+	const meshCountOf = (dimension: number, barsPerMeter: number) =>
+		Math.ceil((dimension - 2 * cover) * barsPerMeter) + 1;
+
+	// Bottom main bars (اتجاه X — تمتد بالعرض)
+	const bmBarLength = width - 2 * cover + 0.4;
+	const bmCount = meshCountOf(length, bottomMainBarsPerMeter) * quantity;
 	details.push(calcCutting(itemName, "شبكة سفلية - رئيسي", bottomMainDiameter, bmBarLength, bmCount));
 
-	// Bottom secondary bars (short direction)
+	// Bottom secondary bars (اتجاه Y — تمتد بالطول)
 	const bsDiameter = dims.bottomSecondaryDiameter || 10;
 	const bsBarsPerMeter = dims.bottomSecondaryBarsPerMeter || 5;
-	const bsBarLength = width - 2 * cover + 0.2;
-	const bsCount = Math.ceil(length * bsBarsPerMeter) * quantity;
+	const bsBarLength = length - 2 * cover + 0.4;
+	const bsCount = meshCountOf(width, bsBarsPerMeter) * quantity;
 	details.push(calcCutting(itemName, "شبكة سفلية - ثانوي", bsDiameter, bsBarLength, bsCount));
 
 	// Top mesh
 	if (dims.hasTopMesh) {
 		const tmDiameter = dims.topMainDiameter || 10;
 		const tmBarsPerMeter = dims.topMainBarsPerMeter || 5;
-		const tmBarLength = length - 2 * cover + 0.2;
-		const tmCount = Math.ceil(width * tmBarsPerMeter) * quantity;
-		details.push(calcCutting(itemName, "شبكة علوية - رئيسي", tmDiameter, tmBarLength, tmCount));
+		const tmCount = meshCountOf(length, tmBarsPerMeter) * quantity;
+		details.push(calcCutting(itemName, "شبكة علوية - رئيسي", tmDiameter, bmBarLength, tmCount));
 
 		const tsDiameter = dims.topSecondaryDiameter || 8;
 		const tsBarsPerMeter = dims.topSecondaryBarsPerMeter || 4;
-		const tsBarLength = width - 2 * cover + 0.2;
-		const tsCount = Math.ceil(length * tsBarsPerMeter) * quantity;
-		details.push(calcCutting(itemName, "شبكة علوية - ثانوي", tsDiameter, tsBarLength, tsCount));
+		const tsCount = meshCountOf(width, tsBarsPerMeter) * quantity;
+		details.push(calcCutting(itemName, "شبكة علوية - ثانوي", tsDiameter, bsBarLength, tsCount));
 	}
 
-	// Ribbed slab ribs
+	// Ribbed slab ribs — يطابق المحرك: عدد الأعصاب floor+1 وامتداد 0.8م
 	if (dims.ribBarDiameter && dims.ribBottomBars) {
 		const ribSpacing = (dims.ribSpacing || 52) / 100; // cm to m
-		const ribCount = Math.floor(width / ribSpacing);
+		const ribCount = Math.floor(width / ribSpacing + 1e-9) + 1;
 		const ribLength = length;
 
-		details.push(calcCutting(itemName, "أعصاب - حديد سفلي", dims.ribBarDiameter, ribLength + 0.3, (dims.ribBottomBars || 2) * ribCount * quantity));
+		details.push(calcCutting(itemName, "أعصاب - حديد سفلي", dims.ribBarDiameter, ribLength + 0.8, (dims.ribBottomBars || 2) * ribCount * quantity));
 
 		if (dims.ribTopBars && dims.ribTopBarDiameter) {
-			details.push(calcCutting(itemName, "أعصاب - حديد علوي", dims.ribTopBarDiameter, ribLength + 0.3, (dims.ribTopBars || 2) * ribCount * quantity));
+			details.push(calcCutting(itemName, "أعصاب - حديد علوي", dims.ribTopBarDiameter, ribLength + 0.8, (dims.ribTopBars || 2) * ribCount * quantity));
 		}
 
 		if (dims.hasRibStirrup && dims.ribStirrupDiameter) {

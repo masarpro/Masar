@@ -16,12 +16,20 @@ import {
 } from "@ui/components/table";
 import {
 	X,
+	Save,
 	ChevronDown,
 	ChevronLeft,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useMutation } from "@tanstack/react-query";
+import { orpc } from "@shared/lib/orpc-query-utils";
+import { toast } from "sonner";
 import { calculateColumnRebar } from "../../../../lib/structural-calculations";
 import { formatNumber } from "../../../../lib/utils";
+import type {
+	StructuralItemCreateInput,
+	StructuralItemDeleteInput,
+} from "../../../../types/structural-mutation";
 import { NECK_HEIGHT_PRESETS } from "./types";
 import type { NeckColumnsSectionProps } from "./types";
 
@@ -31,9 +39,29 @@ export function NeckColumnsSection({
 	onNeckHeightChange,
 	onDisable,
 	specs,
+	studyId,
+	organizationId,
+	floorId,
+	savedNeckItems,
+	onSaved,
 }: NeckColumnsSectionProps) {
 	const t = useTranslations();
 	const [showCuttingDetails, setShowCuttingDetails] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
+
+	const createMutation = useMutation(
+		orpc.pricing.studies.structuralItem.create.mutationOptions({
+			onSuccess: () => {},
+			onError: () => {},
+		}),
+	);
+
+	const deleteMutation = useMutation(
+		orpc.pricing.studies.structuralItem.delete.mutationOptions({
+			onSuccess: () => {},
+			onError: () => {},
+		}),
+	);
 
 	const neckCalcs = useMemo(() => {
 		return groundColumns.map((col) => {
@@ -85,6 +113,103 @@ export function NeckColumnsSection({
 		0,
 	);
 
+	// هل العناصر المحفوظة مطابقة للحساب الحالي؟ (عدد + خرسانة + حديد)
+	const savedConcrete = savedNeckItems.reduce(
+		(s, i) => s + i.concreteVolume,
+		0,
+	);
+	const savedSteel = savedNeckItems.reduce((s, i) => s + i.steelWeight, 0);
+	const isSaved =
+		savedNeckItems.length === neckCalcs.length &&
+		Math.abs(savedConcrete - totalConcrete) < 0.01 &&
+		Math.abs(savedSteel - totalSteel) < 0.01;
+
+	// حفظ الرقاب كعناصر StructuralItem فعلية حتى تصل إلى BOQ والتسعير —
+	// يستبدل العناصر المحفوظة سابقاً بالحساب الحالي
+	const handleSaveNecks = async () => {
+		if (isSaving || neckCalcs.length === 0) return;
+		setIsSaving(true);
+		let createdCount = 0;
+		try {
+			for (const item of savedNeckItems) {
+				await (deleteMutation.mutateAsync as (
+					data: StructuralItemDeleteInput,
+				) => Promise<unknown>)({
+					id: item.id,
+					organizationId,
+					costStudyId: studyId,
+				});
+			}
+			for (const neck of neckCalcs) {
+				await (createMutation.mutateAsync as (
+					data: StructuralItemCreateInput,
+				) => Promise<unknown>)({
+					costStudyId: studyId,
+					organizationId,
+					category: "columns",
+					subCategory: `${floorId}_neck`,
+					name: `رقبة ${neck.name}`,
+					quantity: neck.quantity,
+					unit: "m3",
+					dimensions: {
+						width: neck.width,
+						depth: neck.depth,
+						height: neckHeight,
+						mainBarsCount: neck.mainBarsCount,
+						mainBarDiameter: neck.mainBarDiameter,
+						stirrupDiameter: neck.stirrupDiameter,
+						stirrupSpacing: neck.stirrupSpacing,
+						shape: neck.isCircular ? 1 : 0,
+						diameter: neck.diameter,
+					},
+					concreteVolume: neck.calc.concreteVolume,
+					concreteType: specs?.concreteType || "C35",
+					steelWeight: neck.calc.totals.grossWeight,
+					steelRatio:
+						neck.calc.concreteVolume > 0
+							? neck.calc.totals.grossWeight / neck.calc.concreteVolume
+							: 0,
+					materialCost: neck.calc.concreteCost + neck.calc.rebarCost,
+					laborCost: neck.calc.laborCost,
+					totalCost: neck.calc.totalCost,
+				});
+				createdCount++;
+			}
+			toast.success(`تم حفظ ${createdCount} رقبة في الكميات`);
+		} catch {
+			toast.error(
+				`خطأ في حفظ الرقاب — تم حفظ ${createdCount} من ${neckCalcs.length}`,
+			);
+		} finally {
+			setIsSaving(false);
+			// تحديث القائمة حتى يظهر ما حُفظ فعلاً (حتى عند الحفظ الجزئي)
+			onSaved();
+		}
+	};
+
+	// إزالة القسم: حذف العناصر المحفوظة أولاً حتى لا تبقى في BOQ
+	const handleDisable = async () => {
+		if (isSaving) return;
+		setIsSaving(true);
+		try {
+			for (const item of savedNeckItems) {
+				await (deleteMutation.mutateAsync as (
+					data: StructuralItemDeleteInput,
+				) => Promise<unknown>)({
+					id: item.id,
+					organizationId,
+					costStudyId: studyId,
+				});
+			}
+		} catch {
+			toast.error("خطأ في حذف الرقاب المحفوظة");
+		} finally {
+			setIsSaving(false);
+			onSaved();
+			onDisable();
+		}
+	};
+
 	if (groundColumns.length === 0) {
 		return (
 			<div className="rounded-xl border-2 border-dashed border-amber-300/50 bg-amber-50/30 dark:bg-amber-950/10 p-6 text-center">
@@ -114,7 +239,8 @@ export function NeckColumnsSection({
 						variant="ghost"
 						size="sm"
 						className="text-muted-foreground hover:text-destructive"
-						onClick={onDisable}
+						onClick={handleDisable}
+						disabled={isSaving}
 					>
 						<X className="h-4 w-4 me-1" />
 						إزالة
@@ -305,6 +431,25 @@ export function NeckColumnsSection({
 						</div>
 					</div>
 				</div>
+
+				{/* حفظ الرقاب كعناصر فعلية — بدون الحفظ لا تدخل في BOQ والتسعير */}
+				<Button
+					className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+					onClick={handleSaveNecks}
+					disabled={isSaving || neckCalcs.length === 0 || isSaved}
+				>
+					<Save className="h-4 w-4 me-2" />
+					{isSaved
+						? "الرقاب محفوظة في الكميات"
+						: savedNeckItems.length > 0
+							? "تحديث الرقاب المحفوظة"
+							: "حفظ الرقاب في الكميات"}
+				</Button>
+				{!isSaved && (
+					<p className="text-xs text-amber-700 dark:text-amber-400 text-center">
+						الرقاب لا تدخل في جدول الكميات والتسعير قبل الحفظ
+					</p>
+				)}
 			</CardContent>
 		</Card>
 	);

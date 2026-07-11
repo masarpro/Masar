@@ -48,6 +48,7 @@ export function FloorColumnsPanel({
 	onUpdate,
 	allItemsCount,
 	derivedColumnHeight,
+	repeatCount,
 }: FloorColumnsPanelProps) {
 	const t = useTranslations();
 	const [isAdding, setIsAdding] = useState(false);
@@ -145,13 +146,18 @@ export function FloorColumnsPanel({
 	const handleSubmit = async () => {
 		if (!formData.name || !calculations) return;
 
+		// الدور المتكرر: القيم المخزنة شاملة لكل التكرارات (كمية + خرسانة + حديد + تكاليف)
+		// حتى تصل إلى BOQ والتسعير كاملة — الأبعاد تبقى للعمود الواحد،
+		// وperFloorQuantity/repeatCount تسمحان باستعادة قيم الدور الواحد عند التحرير
+		const repeat = Math.max(1, repeatCount ?? 1);
+
 		const itemData = {
 			costStudyId: studyId,
 			organizationId,
 			category: "columns",
 			subCategory: floor.id,
 			name: formData.name,
-			quantity: formData.quantity,
+			quantity: formData.quantity * repeat,
 			unit: "m3",
 			dimensions: {
 				width: formData.width,
@@ -163,17 +169,19 @@ export function FloorColumnsPanel({
 				stirrupSpacing: formData.stirrupSpacing,
 				shape: formData.shape === "circular" ? 1 : 0,
 				diameter: formData.diameter,
+				perFloorQuantity: formData.quantity,
+				repeatCount: repeat,
 			},
-			concreteVolume: calculations.concreteVolume,
+			concreteVolume: calculations.concreteVolume * repeat,
 			concreteType: specs?.concreteType || "C35",
-			steelWeight: calculations.totals.grossWeight,
+			steelWeight: calculations.totals.grossWeight * repeat,
 			steelRatio:
 				calculations.concreteVolume > 0
 					? calculations.totals.grossWeight / calculations.concreteVolume
 					: 0,
-			materialCost: calculations.concreteCost + calculations.rebarCost,
-			laborCost: calculations.laborCost,
-			totalCost: calculations.totalCost,
+			materialCost: (calculations.concreteCost + calculations.rebarCost) * repeat,
+			laborCost: calculations.laborCost * repeat,
+			totalCost: calculations.totalCost * repeat,
 		};
 
 		if (editingItemId) {
@@ -208,7 +216,13 @@ export function FloorColumnsPanel({
 		setIsAdding(true);
 		setFormData({
 			name: item.name,
-			quantity: item.quantity,
+			// استعادة كمية الدور الواحد (الكمية المخزنة شاملة للتكرارات)
+			quantity:
+				item.dimensions?.perFloorQuantity ||
+				Math.max(
+					1,
+					Math.round(item.quantity / (item.dimensions?.repeatCount || 1)),
+				),
 			shape: item.dimensions?.shape ? "circular" : "rectangular",
 			width: item.dimensions?.width || 30,
 			depth: item.dimensions?.depth || 30,
@@ -226,7 +240,13 @@ export function FloorColumnsPanel({
 		setIsAdding(true);
 		setFormData({
 			name: `${item.name} - نسخة`,
-			quantity: item.quantity,
+			// استعادة كمية الدور الواحد (الكمية المخزنة شاملة للتكرارات)
+			quantity:
+				item.dimensions?.perFloorQuantity ||
+				Math.max(
+					1,
+					Math.round(item.quantity / (item.dimensions?.repeatCount || 1)),
+				),
 			shape: item.dimensions?.shape ? "circular" : "rectangular",
 			width: item.dimensions?.width || 30,
 			depth: item.dimensions?.depth || 30,

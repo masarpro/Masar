@@ -410,10 +410,14 @@ export const assignStage = subscriptionProcedure
 			});
 		}
 
-		await db.costStudy.update({
-			where: { id: input.studyId },
+		// updateMany مع organizationId يمنع الكتابة على دراسات منظمات أخرى
+		const result = await db.costStudy.updateMany({
+			where: { id: input.studyId, organizationId: input.organizationId },
 			data: { [assigneeField]: input.userId },
 		});
+		if (result.count === 0) {
+			throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.NOT_FOUND });
+		}
 
 		return { success: true };
 	});

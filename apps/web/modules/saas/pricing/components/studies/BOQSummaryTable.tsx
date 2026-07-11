@@ -121,6 +121,27 @@ export function BOQSummaryTable({
 
 	const summary = useMemo(() => aggregateBOQ(filteredItems), [filteredItems]);
 
+	// وزن الحديد المخزّن لعناصر لا تنتج صفوف تقطيع (فئة غير مدعومة في المُعيد
+	// الحسابي مثل otherStructural أو بيانات تسليح ناقصة) — يُعرض كتحذير في
+	// تبويبي طلبية المصنع والتقطيع لأن مجاميعهما تستثنيه (Audit F14)
+	const excludedSteelWeight = useMemo(() => {
+		let total = 0;
+		for (const section of summary.sections) {
+			for (const group of section.subGroups) {
+				for (const detail of group.items) {
+					if (
+						detail.item.steelWeight > 0 &&
+						(!detail.recalc.hasRebarParams ||
+							detail.recalc.cuttingDetails.length === 0)
+					) {
+						total += detail.item.steelWeight;
+					}
+				}
+			}
+		}
+		return total;
+	}, [summary]);
+
 	const selectedFloorLabel = floorOptions.find((o) => o.value === selectedFloor)?.label;
 
 	const toggleSection = (key: string) => {
@@ -246,6 +267,7 @@ export function BOQSummaryTable({
 					factoryOrder={summary.factoryOrder}
 					studyName={studyName}
 					onPrint={handlePrint}
+					excludedSteelWeight={excludedSteelWeight}
 				/>
 			)}
 
@@ -254,6 +276,7 @@ export function BOQSummaryTable({
 					cuttingDetails={summary.allCuttingDetails}
 					studyName={studyName}
 					onPrint={handlePrint}
+					excludedSteelWeight={excludedSteelWeight}
 				/>
 			)}
 
@@ -346,22 +369,24 @@ function FloorMaterialView({
 		}
 	}
 
-	// Split into floor-specific and shared
-	const floorRows = allItemRows.filter(
-		(d) => getItemFloorGroup(d.item, enabledFloors) !== "shared",
-	);
+	// العناصر المشتركة بين الأدوار (سلالم، كمرات، عناصر أخرى)
 	const sharedRows = allItemRows.filter(
 		(d) => getItemFloorGroup(d.item, enabledFloors) === "shared",
 	);
 
-	// Material groups from floor-specific items
-	const concreteRows = floorRows.filter((d) => d.item.concreteVolume > 0);
-	const steelRows = floorRows.filter((d) => d.item.steelWeight > 0);
-	const blockRows = floorRows.filter((d) => d.item.category === "blocks");
+	// بطاقات المواد تشمل العناصر المشتركة أيضاً حتى تتطابق مع بطاقات الإجمالي الكلي
+	// المبنية على filterItemsByFloor التي تُدخل العناصر المشتركة (Audit F5)
+	const concreteRows = allItemRows.filter((d) => d.item.concreteVolume > 0);
+	const steelRows = allItemRows.filter((d) => d.item.steelWeight > 0);
+	const blockRows = allItemRows.filter((d) => d.item.category === "blocks");
 
 	const totalConcrete = concreteRows.reduce((s, d) => s + d.item.concreteVolume, 0);
 	const totalSteel = steelRows.reduce((s, d) => s + d.item.steelWeight, 0);
 	const totalBlocks = blockRows.reduce((s, d) => s + d.item.quantity, 0);
+
+	// مساهمة العناصر المشتركة — تُعرض في ملاحظة توضيحية تحت البطاقات
+	const sharedConcrete = sharedRows.reduce((s, d) => s + d.item.concreteVolume, 0);
+	const sharedSteel = sharedRows.reduce((s, d) => s + d.item.steelWeight, 0);
 
 	return (
 		<div className="space-y-4">
@@ -414,6 +439,13 @@ function FloorMaterialView({
 					isExpanded={expandedSections.has("mat-blocks")}
 					onToggle={() => toggleSection("mat-blocks")}
 				/>
+			)}
+
+			{/* ملاحظة: مجاميع بطاقات المواد أعلاه تشمل العناصر المشتركة بين الأدوار (Audit F5) */}
+			{sharedRows.length > 0 && (
+				<p className="text-xs text-muted-foreground">
+					يشمل عناصر مشتركة بين الأدوار ({formatNumber(sharedConcrete)} م³ خرسانة، {formatNumber(sharedSteel)} كجم حديد)
+				</p>
 			)}
 
 			{/* Shared Items Section */}
@@ -1013,10 +1045,12 @@ function FactoryOrderTab({
 	factoryOrder,
 	studyName,
 	onPrint,
+	excludedSteelWeight,
 }: {
 	factoryOrder: FactoryOrderEntry[];
 	studyName?: string;
 	onPrint: () => void;
+	excludedSteelWeight: number;
 }) {
 	const t = useTranslations("pricing.studies");
 	const totalBars = factoryOrder.reduce((s, e) => s + e.count, 0);
@@ -1028,6 +1062,11 @@ function FactoryOrderTab({
 				<Factory className="h-12 w-12 mx-auto mb-3 opacity-30" />
 				<p>{t("boq.noFactoryData")}</p>
 				<p className="text-xs mt-1">{t("boq.addItemsWithRebarFirst")}</p>
+				{excludedSteelWeight > 0 && (
+					<p className="text-xs mt-2">
+						⚠ يستثني حديد العناصر غير المدعومة في التقطيع ({formatNumber(excludedSteelWeight)} كجم)
+					</p>
+				)}
 			</Card>
 		);
 	}
@@ -1045,6 +1084,13 @@ function FactoryOrderTab({
 					label={t("boq.export")}
 				/>
 			</div>
+
+			{/* تحذير: حديد مخزّن لعناصر لا يدعمها المُعيد الحسابي (Audit F14) */}
+			{excludedSteelWeight > 0 && (
+				<p className="text-xs text-muted-foreground">
+					⚠ يستثني حديد العناصر غير المدعومة في التقطيع ({formatNumber(excludedSteelWeight)} كجم)
+				</p>
+			)}
 
 			<Card>
 				<div className="overflow-x-auto">
@@ -1103,10 +1149,12 @@ function CuttingWorkshopTab({
 	cuttingDetails,
 	studyName,
 	onPrint,
+	excludedSteelWeight,
 }: {
 	cuttingDetails: CuttingDetailRow[];
 	studyName?: string;
 	onPrint: () => void;
+	excludedSteelWeight: number;
 }) {
 	const t = useTranslations("pricing.studies");
 	if (cuttingDetails.length === 0) {
@@ -1115,6 +1163,11 @@ function CuttingWorkshopTab({
 				<Scissors className="h-12 w-12 mx-auto mb-3 opacity-30" />
 				<p>{t("boq.noCuttingData")}</p>
 				<p className="text-xs mt-1">{t("boq.addItemsWithRebarFirst")}</p>
+				{excludedSteelWeight > 0 && (
+					<p className="text-xs mt-2">
+						⚠ يستثني حديد العناصر غير المدعومة في التقطيع ({formatNumber(excludedSteelWeight)} كجم)
+					</p>
+				)}
 			</Card>
 		);
 	}
@@ -1142,6 +1195,13 @@ function CuttingWorkshopTab({
 					label={t("boq.export")}
 				/>
 			</div>
+
+			{/* تحذير: حديد مخزّن لعناصر لا يدعمها المُعيد الحسابي (Audit F14) */}
+			{excludedSteelWeight > 0 && (
+				<p className="text-xs text-muted-foreground">
+					⚠ يستثني حديد العناصر غير المدعومة في التقطيع ({formatNumber(excludedSteelWeight)} كجم)
+				</p>
+			)}
 
 			{sortedDiameters.map((diameter) => {
 				const group = diameterGroups.get(diameter)!;

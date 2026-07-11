@@ -299,12 +299,17 @@ export async function duplicateCostStudy(
 				customerName: original.customerName,
 				customerId: original.customerId,
 				projectType: original.projectType,
+				// بدون نسخ studyType/workScopes كانت النسخة تفقد نوعها ونطاقاتها
+				// (وتُصنَّف unified تلقائياً عند تفعيل العلم)
+				studyType: original.studyType,
+				workScopes: original.workScopes,
 				landArea: original.landArea,
 				buildingArea: original.buildingArea,
 				numberOfFloors: original.numberOfFloors,
 				hasBasement: original.hasBasement,
 				finishingLevel: original.finishingLevel,
 				buildingConfig: original.buildingConfig ?? undefined,
+				structuralSpecs: original.structuralSpecs ?? undefined,
 				overheadPercent: original.overheadPercent,
 				profitPercent: original.profitPercent,
 				contingencyPercent: original.contingencyPercent,
@@ -1122,11 +1127,29 @@ export async function updateMEPItem(
 		sortOrder?: number;
 	},
 ) {
-	// حساب التكاليف
-	const quantity = data.quantity ?? 0;
-	const materialPrice = data.materialPrice ?? 0;
-	const laborPrice = data.laborPrice ?? 0;
-	const wastagePercent = data.wastagePercent ?? 10;
+	// Verify the item belongs to this study + جلب القيم المخزنة للدمج
+	const existing = await db.mEPItem.findFirst({
+		where: { id, costStudyId },
+		select: {
+			id: true,
+			quantity: true,
+			materialPrice: true,
+			laborPrice: true,
+			wastagePercent: true,
+			dataSource: true,
+		},
+	});
+
+	if (!existing) {
+		throw new Error("MEP item not found");
+	}
+
+	// حساب التكاليف — دمج مع القيم المخزنة: الحوار يرسل حقولاً جزئية،
+	// والافتراضات الصفرية كانت تصفّر totalCost عند كل تعديل
+	const quantity = data.quantity ?? Number(existing.quantity);
+	const materialPrice = data.materialPrice ?? Number(existing.materialPrice);
+	const laborPrice = data.laborPrice ?? Number(existing.laborPrice);
+	const wastagePercent = data.wastagePercent ?? Number(existing.wastagePercent);
 	const wastageMultiplier = 1 + wastagePercent / 100;
 
 	const materialCost = quantity * materialPrice * wastageMultiplier;
@@ -1134,21 +1157,15 @@ export async function updateMEPItem(
 	const unitPrice = materialPrice + laborPrice;
 	const totalCost = materialCost + laborCost;
 
-	// إذا عدّل المستخدم بند auto → يتحول لـ manual
+	// إذا عدّل المستخدم كمية بند auto → يتحول لـ manual كي لا تمسحه
+	// إعادة الاشتقاق (يُقرأ من الصف المخزن — العميل لا يرسل dataSource)
 	const dataSource =
-		data.dataSource === "auto" && data.quantity !== undefined
+		data.dataSource ??
+		(existing.dataSource === "auto" &&
+		data.quantity !== undefined &&
+		data.quantity !== Number(existing.quantity)
 			? "manual"
-			: data.dataSource;
-
-	// Verify the item belongs to this study
-	const existing = await db.mEPItem.findFirst({
-		where: { id, costStudyId },
-		select: { id: true },
-	});
-
-	if (!existing) {
-		throw new Error("MEP item not found");
-	}
+			: undefined);
 
 	const item = await db.mEPItem.update({
 		where: { id },

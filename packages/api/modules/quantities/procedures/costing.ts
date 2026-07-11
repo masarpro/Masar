@@ -38,8 +38,10 @@ function calculateItemTotals(data: {
 			break;
 	}
 
+	// نسبة التخزين على المواد فقط — تبويب المواد في الواجهة يعرضها كذلك،
+	// وإدراج المصنعيات هنا كان يجعل الملخص أكبر من مجموع التبويبين
 	const storageTotal =
-		(materialTotal + laborTotal) * ((data.storageCostPercent ?? 0) / 100) +
+		materialTotal * ((data.storageCostPercent ?? 0) / 100) +
 		(data.storageCostFixed ?? 0);
 
 	const totalCost = materialTotal + laborTotal + storageTotal + (data.otherCosts ?? 0);
@@ -87,14 +89,28 @@ export const costingGenerateItems = subscriptionProcedure
 				throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.NOT_FOUND });
 			}
 
-			// Check if items already exist (idempotent)
-			const existingCount = await tx.costingItem.count({
+			// البنود الموجودة مسبقاً تُزامَن (كانت تُترك كما هي فتبقى الكميات
+			// قديمة بعد تعديل مرحلة الكميات — عرض السعر يتسعّر بكميات بائتة)
+			const existingRows = await tx.costingItem.findMany({
 				where: { costStudyId: input.studyId },
+				select: {
+					id: true,
+					sourceItemId: true,
+					sourceItemType: true,
+					quantity: true,
+					updatedAt: true,
+					materialUnitCost: true,
+					laborType: true,
+					laborUnitCost: true,
+					laborQuantity: true,
+					laborWorkers: true,
+					laborSalary: true,
+					laborMonths: true,
+					storageCostPercent: true,
+					storageCostFixed: true,
+					otherCosts: true,
+				},
 			});
-
-			if (existingCount > 0) {
-				return { generated: 0, existing: existingCount, message: "البنود موجودة مسبقاً" };
-			}
 
 			// Fetch all source items
 			const [structuralItems, finishingItems, mepItems, laborItems, manualItems] =
@@ -208,11 +224,107 @@ export const costingGenerateItems = subscriptionProcedure
 				});
 			}
 
-			if (items.length > 0) {
-				await tx.costingItem.createMany({ data: items });
+			if (existingRows.length === 0) {
+				// توليد أولي
+				if (items.length > 0) {
+					await tx.costingItem.createMany({ data: items });
+				}
+				return { generated: items.length, existing: 0 };
 			}
 
-			return { generated: items.length, existing: 0 };
+			// ─── مزامنة: تحديث الكميات المتغيرة، إدراج الجديد، حذف اليتيم ───
+			// أسعار المستخدم (مواد/مصنعيات/تخزين) لا تُمس — الكمية فقط تُحدَّث
+			const existingBySource = new Map<string, (typeof existingRows)[number]>();
+			for (const row of existingRows) {
+				if (!row.sourceItemId) continue; // البنود اليدوية المضافة مباشرة لا تُزامَن
+				const key = `${row.sourceItemType ?? ""}:${row.sourceItemId}`;
+				const prev = existingBySource.get(key);
+				// عند وجود تكرارات تاريخية نزامن الأحدث فقط
+				if (!prev || row.updatedAt > prev.updatedAt) {
+					existingBySource.set(key, row);
+				}
+			}
+
+			let created = 0;
+			let updated = 0;
+			const seenKeys = new Set<string>();
+			const toCreate: typeof items = [];
+
+			for (const item of items) {
+				const key = `${item.sourceItemType}:${item.sourceItemId}`;
+				seenKeys.add(key);
+				const existing = existingBySource.get(key);
+				if (!existing) {
+					toCreate.push(item);
+					created++;
+				} else if (Math.abs(Number(existing.quantity) - item.quantity) > 0.001) {
+					// إعادة حساب الإجماليات بالكمية الجديدة مع أسعار المستخدم المخزنة
+					const totals = calculateItemTotals({
+						quantity: item.quantity,
+						materialUnitCost:
+							existing.materialUnitCost != null
+								? Number(existing.materialUnitCost)
+								: null,
+						laborType: existing.laborType,
+						laborUnitCost:
+							existing.laborUnitCost != null
+								? Number(existing.laborUnitCost)
+								: null,
+						laborQuantity:
+							existing.laborQuantity != null
+								? Number(existing.laborQuantity)
+								: null,
+						laborWorkers: existing.laborWorkers,
+						laborSalary:
+							existing.laborSalary != null ? Number(existing.laborSalary) : null,
+						laborMonths: existing.laborMonths,
+						storageCostPercent:
+							existing.storageCostPercent != null
+								? Number(existing.storageCostPercent)
+								: null,
+						storageCostFixed:
+							existing.storageCostFixed != null
+								? Number(existing.storageCostFixed)
+								: null,
+						otherCosts:
+							existing.otherCosts != null ? Number(existing.otherCosts) : null,
+					});
+					await tx.costingItem.update({
+						where: { id: existing.id },
+						data: {
+							quantity: item.quantity,
+							description: item.description,
+							unit: item.unit,
+							materialTotal: totals.materialTotal,
+							laborTotal: totals.laborTotal,
+							storageTotal: totals.storageTotal,
+							totalCost: totals.totalCost,
+						},
+					});
+					updated++;
+				}
+			}
+
+			// حذف: صفوف auto اليتيمة (بندها المصدري حُذف من مرحلة الكميات)
+			// + الصفوف المكررة التاريخية لنفس البند المصدري (علة تضاعف المواد ×2)
+			const orphanIds = existingRows
+				.filter((row) => {
+					if (!row.sourceItemId) return false;
+					const key = `${row.sourceItemType ?? ""}:${row.sourceItemId}`;
+					if (!seenKeys.has(key)) return true; // يتيم
+					return existingBySource.get(key)?.id !== row.id; // نسخة مكررة أقدم
+				})
+				.map((row) => row.id);
+			if (orphanIds.length > 0) {
+				await tx.costingItem.deleteMany({ where: { id: { in: orphanIds } } });
+			}
+
+			return {
+				generated: created,
+				existing: existingRows.length,
+				updated,
+				removed: orphanIds.length,
+			};
 		});
 	});
 
@@ -255,7 +367,11 @@ export const costingGetItems = protectedProcedure
 			orderBy: [{ section: "asc" }, { sortOrder: "asc" }],
 		});
 
-		return items.map((item) => convertCostingItemDecimals(item));
+		// dedupe مع الحفاظ على ترتيب العرض — يحمي من صفوف مكررة تاريخية لنفس البند المصدري
+		const winners = new Set(dedupeCostingItems(items));
+		return items
+			.filter((item) => winners.has(item))
+			.map((item) => convertCostingItemDecimals(item));
 	});
 
 // ═══════════════════════════════════════════════════════════════
@@ -403,14 +519,16 @@ export const costingBulkUpdate = subscriptionProcedure
 
 				const totals = calculateItemTotals(merged);
 
+				// تخزين القيم المدموجة نفسها التي حُسبت منها الإجماليات —
+				// تخزين null الخام كان يجعل totalCost لا يطابق أعمدة الوحدة
 				return db.costingItem.update({
 					where: { id: update.id },
 					data: {
-						materialUnitCost: update.materialUnitCost,
-						laborType: update.laborType,
-						laborUnitCost: update.laborUnitCost,
-						laborQuantity: update.laborQuantity,
-						storageCostPercent: update.storageCostPercent,
+						materialUnitCost: merged.materialUnitCost,
+						laborType: merged.laborType,
+						laborUnitCost: merged.laborUnitCost,
+						laborQuantity: merged.laborQuantity,
+						storageCostPercent: merged.storageCostPercent,
 						materialTotal: totals.materialTotal,
 						laborTotal: totals.laborTotal,
 						storageTotal: totals.storageTotal,

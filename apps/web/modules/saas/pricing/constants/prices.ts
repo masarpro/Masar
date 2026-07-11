@@ -208,7 +208,7 @@ export const STRUCTURAL_LABOR_PRICES = {
 	foundations: 180, // SAR per m³
 	columns: 220, // SAR per m³
 	beams: 200, // SAR per m³
-	slabs: 150, // SAR per m³
+	slabs: 150, // SAR per m² — كل دوال الأسقف تضرب في المساحة الصافية (netArea)
 	blocks: 35, // SAR per m²
 	stairs: 250, // SAR per m³
 	neckColumns: 200, // SAR per m³

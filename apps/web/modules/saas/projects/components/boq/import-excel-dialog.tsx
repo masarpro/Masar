@@ -279,6 +279,21 @@ export function ImportExcelDialog({
 			return;
 		}
 
+		// تطبيع الأرقام العربية قبل التحويل — Number("١٢٥") و"12٫5" و"1,200"
+		// كلها NaN وكانت تُسقط الصفوف بصمت (شائعة في ملفات المقاولين المحلية)
+		const parseLocalizedNumber = (str: string): number => {
+			if (!str) return Number.NaN;
+			const normalized = str
+				// أرقام عربية-هندية ٠-٩ وفارسية ۰-۹ → لاتينية
+				.replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+				.replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
+				// فاصلة عشرية عربية ٫ → نقطة، وفاصل آلاف ٬ و , → إزالة
+				.replace(/٫/g, ".")
+				.replace(/[٬,]/g, "")
+				.trim();
+			return Number(normalized);
+		};
+
 		const items: ParsedItem[] = [];
 		let skipped = 0;
 
@@ -299,7 +314,7 @@ export function ImportExcelDialog({
 				continue;
 			}
 
-			const quantity = Number(quantityStr);
+			const quantity = parseLocalizedNumber(quantityStr);
 			if (Number.isNaN(quantity) || quantity < 0) {
 				skipped++;
 				continue;
@@ -307,7 +322,7 @@ export function ImportExcelDialog({
 
 			const unitPriceStr = getValue("unitPrice");
 			const unitPrice = unitPriceStr
-				? Number(unitPriceStr)
+				? parseLocalizedNumber(unitPriceStr)
 				: null;
 
 			const item: ParsedItem = {

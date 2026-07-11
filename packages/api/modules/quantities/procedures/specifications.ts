@@ -99,6 +99,15 @@ export const updateItemSpec = subscriptionProcedure
 			{ section: "pricing", action: "studies" },
 		);
 
+		// التحقق أن الدراسة تخص المنظمة — كان studyId/itemId يُقبلان خامَين
+		const study = await db.costStudy.findFirst({
+			where: { id: input.studyId, organizationId: input.organizationId },
+			select: { id: true },
+		});
+		if (!study) {
+			throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.NOT_FOUND });
+		}
+
 		switch (input.itemType) {
 			case "finishing": {
 				const item = await db.finishingItem.findFirst({
@@ -127,9 +136,15 @@ export const updateItemSpec = subscriptionProcedure
 					where: { id: input.itemId, costStudyId: input.studyId },
 				});
 				if (!item) throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.ITEM_NOT_FOUND });
+				// دمج بدل الاستبدال — الاستبدال الكامل كان يمحو بيانات الأبعاد
+				// والتسليح التي تعتمد عليها إعادة حساب BOQ
+				const mergedDimensions = {
+					...((item.dimensions as Record<string, unknown> | null) ?? {}),
+					...input.specData,
+				};
 				await db.structuralItem.update({
 					where: { id: input.itemId },
-					data: { dimensions: input.specData as Record<string, unknown> as any },
+					data: { dimensions: mergedDimensions as any },
 				});
 				break;
 			}

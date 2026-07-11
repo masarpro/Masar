@@ -3,6 +3,7 @@ import { STUDY_ERRORS } from "../lib/error-messages";
 import { db } from "@repo/database";
 import { z } from "zod";
 import { toNum } from "../../../lib/decimal-helpers";
+import { dedupeCostingItems } from "../lib/costing-aggregation";
 import { VAT_RATE } from "@repo/utils";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
 import { protectedProcedure, subscriptionProcedure } from "../../../orpc/procedures";
@@ -109,6 +110,14 @@ export const markupSetUniform = subscriptionProcedure
 			{ section: "pricing", action: "studies" },
 		);
 
+		const study = await db.costStudy.findFirst({
+			where: { id: input.studyId, organizationId: input.organizationId },
+			select: { id: true },
+		});
+		if (!study) {
+			throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.NOT_FOUND });
+		}
+
 		// Remove any section markups when switching to uniform
 		await db.sectionMarkup.deleteMany({
 			where: {
@@ -170,6 +179,14 @@ export const markupSetSectionMarkups = subscriptionProcedure
 			context.user.id,
 			{ section: "pricing", action: "studies" },
 		);
+
+		const study = await db.costStudy.findFirst({
+			where: { id: input.studyId, organizationId: input.organizationId },
+			select: { id: true },
+		});
+		if (!study) {
+			throw new ORPCError("NOT_FOUND", { message: STUDY_ERRORS.NOT_FOUND });
+		}
 
 		// Upsert each section markup
 		await db.$transaction(
@@ -253,12 +270,15 @@ export const markupGetProfitAnalysis = protectedProcedure
 		}
 
 		// Get costing items grouped by section
-		const items = await db.costingItem.findMany({
-			where: {
-				costStudyId: input.studyId,
-				organizationId: input.organizationId,
-			},
-		});
+		// dedupe يحمي من صفوف CostingItem التاريخية المكررة (نفس البند المصدري)
+		const items = dedupeCostingItems(
+			await db.costingItem.findMany({
+				where: {
+					costStudyId: input.studyId,
+					organizationId: input.organizationId,
+				},
+			}),
+		);
 
 		// Calculate section totals
 		const sectionTotals = new Map<string, number>();

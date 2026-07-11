@@ -45,6 +45,8 @@ export interface FloorColumnsPanelProps {
 	onUpdate: () => void;
 	allItemsCount: number;
 	derivedColumnHeight?: number | null;
+	/** عدد تكرارات الدور (من معالج التهيئة) — القيم المخزنة تُضرب فيه */
+	repeatCount?: number;
 }
 
 export interface NeckColumnsSectionProps {
@@ -53,6 +55,13 @@ export interface NeckColumnsSectionProps {
 	onNeckHeightChange: (h: number) => void;
 	onDisable: () => void;
 	specs?: { concreteType: string; steelGrade: string };
+	studyId: string;
+	organizationId: string;
+	/** معرّف الدور الحامل للرقاب — يُستخدم في subCategory بصيغة `${floorId}_neck` */
+	floorId: string;
+	/** عناصر الرقاب المحفوظة في قاعدة البيانات */
+	savedNeckItems: ItemType[];
+	onSaved: () => void;
 }
 
 export interface CopyFromFloorButtonProps {
@@ -64,6 +73,10 @@ export interface CopyFromFloorButtonProps {
 	organizationId: string;
 	specs?: { concreteType: string; steelGrade: string };
 	onCopied: () => void;
+	/** ارتفاع أعمدة الدور الهدف بالمتر (من اشتقاق المناسيب) — لإعادة الحساب بدل نسخ ارتفاع المصدر */
+	targetHeight?: number | null;
+	/** عدد تكرارات الدور الهدف — القيم المخزنة تُضرب فيه */
+	targetRepeatCount?: number;
 }
 
 // ═══════════════════════════════════════════════════════════════

@@ -51,8 +51,10 @@ function getRoofArea(config: SmartBuildingConfig): number {
 }
 
 function getTotalExternalWallHeight(config: SmartBuildingConfig): number {
+	// استثناء البدروم — جدرانه تحت الأرض فلا تدخل في مساحات الواجهات
+	// (لياسة/دهان/حجر/عزل حراري خارجي)
 	return config.floors
-		.filter((f) => f.floorType !== "ROOF")
+		.filter((f) => f.floorType !== "ROOF" && f.floorType !== "BASEMENT")
 		.reduce(
 			(sum, f) => sum + f.height * (f.isRepeated ? f.repeatCount : 1),
 			0,
@@ -136,9 +138,28 @@ function calcInternalPlaster(
 		const internalOpenings = getFloorOpenings(floor, { isExternal: false });
 		const internalOpeningsArea = sumOpeningsArea(internalOpenings);
 
+		// فتحات الحمامات — الفتحات المرتبطة بغرفة حمام عبر roomId
+		// باب الحمام موجود ضمن الفتحات الداخلية، فنخصمه من جدران الحمامات
+		// حتى لا يُخصم مرتين من اللياسة (وحتى لا يُحسب سيراميك على فتحة الباب)
+		const bathroomRoomIds = new Set(
+			rooms
+				.filter((r) => TILED_WALL_ROOMS.includes(r.type))
+				.map((r) => r.id),
+		);
+		const bathroomOpeningsArea = sumOpeningsArea(
+			internalOpenings.filter(
+				(o) => o.roomId !== undefined && bathroomRoomIds.has(o.roomId),
+			),
+		);
+		// صافي جدران الحمامات = الإجمالي - فتحاتها (إن لم تُربط فتحات = لا تغيير)
+		const netBathroomWallArea = Math.max(
+			0,
+			bathroomWallArea - bathroomOpeningsArea,
+		);
+
 		const netWallArea = Math.max(
 			0,
-			totalWallArea - internalOpeningsArea - bathroomWallArea,
+			totalWallArea - internalOpeningsArea - netBathroomWallArea,
 		);
 		const totalArea = netWallArea + totalCeilingArea;
 
@@ -146,7 +167,7 @@ function calcInternalPlaster(
 			wallArea: round2(netWallArea),
 			ceilingArea: round2(totalCeilingArea),
 			totalArea: round2(totalArea),
-			bathroomWallArea: round2(bathroomWallArea),
+			bathroomWallArea: round2(netBathroomWallArea),
 			internalOpeningsArea: round2(internalOpeningsArea),
 			dataSource: "auto_building",
 			breakdown: {
@@ -157,10 +178,11 @@ function calcInternalPlaster(
 						wallArea: round2((r.length + r.width) * 2 * floor.height),
 						floorArea: round2(r.length * r.width),
 					})),
-					bathroom_wall_area: round2(bathroomWallArea),
+					bathroom_wall_area: round2(netBathroomWallArea),
+					bathroom_openings_area: round2(bathroomOpeningsArea),
 					internal_openings_area: round2(internalOpeningsArea),
 				},
-				formula: `مجموع جدران الغرف (${rooms.length} غرفة) × ارتفاع ${floor.height}م - فتحات داخلية (${round2(internalOpeningsArea)} م²) - جدران حمامات (${round2(bathroomWallArea)} م²) + أسقف (${round2(totalCeilingArea)} م²)`,
+				formula: `مجموع جدران الغرف (${rooms.length} غرفة) × ارتفاع ${floor.height}م - فتحات داخلية (${round2(internalOpeningsArea)} م²) - جدران حمامات صافية (${round2(netBathroomWallArea)} م²) + أسقف (${round2(totalCeilingArea)} م²)`,
 			},
 		};
 	}
@@ -311,8 +333,10 @@ function deriveInsulation(
 	for (const floor of habitableFloors(config)) {
 		const bathrooms = getFloorRoomsByType(floor, "bathroom");
 		if (bathrooms.length === 0) continue;
+		// مُضاعف تكرار الدور — الدور المكرر يُحتسب بعدد تكراراته
+		const multiplier = floor.isRepeated ? floor.repeatCount : 1;
 		const qty = round2(
-			bathrooms.reduce((s, r) => s + r.length * r.width, 0),
+			bathrooms.reduce((s, r) => s + r.length * r.width, 0) * multiplier,
 		);
 		if (qty <= 0) continue;
 		out.push({
@@ -432,20 +456,24 @@ function derivePlastering(
 	for (const floor of habitableFloors(config)) {
 		const p = plasterCache.get(floor.id);
 		if (!p || p.totalArea <= 0) continue;
+		// مُضاعف تكرار الدور — الدور المكرر يُحتسب بعدد تكراراته
+		const multiplier = floor.isRepeated ? floor.repeatCount : 1;
+		const qty = round2(p.totalArea * multiplier);
 		out.push({
 			categoryKey: `internal_plaster_${floor.id}`,
 			floorId: floor.id,
 			floorName: floor.name,
 			scope: "per_floor",
-			quantity: p.totalArea,
+			quantity: qty,
 			unit: "m2",
 			wastagePercent: wastage,
-			effectiveQuantity: makeEffective(p.totalArea, wastage),
+			effectiveQuantity: makeEffective(qty, wastage),
 			dataSource: p.dataSource,
 			sourceDescription:
-				p.dataSource === "estimated"
+				(p.dataSource === "estimated"
 					? `تقديري من مساحة ${floor.name} (${floor.area} م²): جدران ${p.wallArea} + سقف ${p.ceilingArea} = ${p.totalArea} م²`
-					: `${floor.name}: جدران ${p.wallArea} + سقف ${p.ceilingArea} - فتحات ${p.internalOpeningsArea} - حمامات ${p.bathroomWallArea} = ${p.totalArea} م²`,
+					: `${floor.name}: جدران ${p.wallArea} + سقف ${p.ceilingArea} - فتحات ${p.internalOpeningsArea} - حمامات ${p.bathroomWallArea} = ${p.totalArea} م²`) +
+				(multiplier > 1 ? ` × ${multiplier} تكرار = ${qty} م²` : ""),
 			isEnabled: true,
 			...g,
 			calculationBreakdown: p.breakdown,
@@ -509,7 +537,9 @@ function derivePainting(
 		// but includes ceiling). The spec says paint = plaster - bathroom walls.
 		// Since plaster total = (walls - openings - bathroom_walls) + ceiling,
 		// paint is the same as plaster total.
-		const qty = p.totalArea;
+		// مُضاعف تكرار الدور — بنفس مُضاعف اللياسة الداخلية
+		const multiplier = floor.isRepeated ? floor.repeatCount : 1;
+		const qty = round2(p.totalArea * multiplier);
 		const wastage = 10;
 
 		out.push({
@@ -636,6 +666,13 @@ function deriveFlooring(
 
 		if (qty <= 0) continue;
 
+		// مُضاعف تكرار الدور — الدور المكرر يُحتسب بعدد تكراراته
+		const multiplier = floor.isRepeated ? floor.repeatCount : 1;
+		if (multiplier > 1) {
+			qty = round2(qty * multiplier);
+			desc = `${desc} × ${multiplier} تكرار = ${qty} م²`;
+		}
+
 		out.push({
 			categoryKey: `flooring_${floor.id}`,
 			floorId: floor.id,
@@ -667,21 +704,25 @@ function deriveWallCladding(
 	const wastage = 12;
 
 	for (const floor of habitableFloors(config)) {
+		// مُضاعف تكرار الدور — الدور المكرر يُحتسب بعدد تكراراته
+		const multiplier = floor.isRepeated ? floor.repeatCount : 1;
+
 		// 9a. Bathroom wall tiles
 		const p = plasterCache.get(floor.id);
 		if (p && p.bathroomWallArea > 0) {
+			const qty = round2(p.bathroomWallArea * multiplier);
 			out.push({
 				categoryKey: `wall_tiles_bathroom_${floor.id}`,
 				subCategory: "WT_FULL",
 				floorId: floor.id,
 				floorName: floor.name,
 				scope: "per_floor",
-				quantity: p.bathroomWallArea,
+				quantity: qty,
 				unit: "m2",
 				wastagePercent: wastage,
-				effectiveQuantity: makeEffective(p.bathroomWallArea, wastage),
+				effectiveQuantity: makeEffective(qty, wastage),
 				dataSource: "auto_linked",
-				sourceDescription: `جدران حمامات ${floor.name} (مستثناة من اللياسة): ${p.bathroomWallArea} م²`,
+				sourceDescription: `جدران حمامات ${floor.name} (مستثناة من اللياسة): ${qty} م²`,
 				sourceItemKey: `internal_plaster_${floor.id}`,
 				isEnabled: true,
 				...g,
@@ -705,7 +746,7 @@ function deriveWallCladding(
 				splashRooms.reduce(
 					(s, r) => s + (r.length + r.width) * 2 * DEFAULT_SPLASH_BACK_HEIGHT,
 					0,
-				),
+				) * multiplier,
 			);
 			if (qty > 0) {
 				out.push({
@@ -788,6 +829,13 @@ function deriveFalseCeiling(
 		}
 
 		if (qty <= 0) continue;
+
+		// مُضاعف تكرار الدور — الدور المكرر يُحتسب بعدد تكراراته
+		const multiplier = floor.isRepeated ? floor.repeatCount : 1;
+		if (multiplier > 1) {
+			qty = round2(qty * multiplier);
+			desc = `${desc} × ${multiplier} تكرار = ${qty} م²`;
+		}
 
 		out.push({
 			categoryKey: `false_ceiling_${floor.id}`,
@@ -1149,7 +1197,9 @@ function deriveFacade(
 			dataSource: "auto_linked",
 			sourceDescription: `= لياسة خارجية: ${extPlaster.quantity} م²`,
 			sourceItemKey: "external_plaster",
-			isEnabled: true,
+			// معطّل افتراضياً — حتى لا تُحتسب نفس المساحة دهاناً وحجراً معاً
+			// (المستخدم يفعّله عند الحاجة، كما في facade_decor)
+			isEnabled: false,
 			...g,
 			calculationBreakdown: {
 				type: "derived",

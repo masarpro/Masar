@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from "react";
 import { Button } from "@ui/components/button";
-import { Input } from "@ui/components/input";
 import { Label } from "@ui/components/label";
 import { Badge } from "@ui/components/badge";
 import {
@@ -22,7 +21,6 @@ import {
 	Layers,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { calculateColumnRebar } from "../../../../lib/structural-calculations";
 import { formatNumber } from "../../../../lib/utils";
 import { useHeightDerivation } from "../../../../hooks/useHeightDerivation";
 import { FloorColumnsPanel } from "./FloorColumnsPanel";
@@ -58,11 +56,21 @@ export function ColumnsSection({
 		: DEFAULT_FLOORS;
 	const t = useTranslations();
 	const [expandedFloors, setExpandedFloors] = useState<string[]>(["ground"]);
-	const [repeatedCount, setRepeatedCount] = useState(3);
+	// عدد تكرارات الدور المتكرر — يُقرأ من معالج التهيئة (وليس حالة محلية)
+	// حتى تتطابق القيم المخزنة مع BOQ والتسعير
+	const repeatedCount = Math.max(
+		1,
+		buildingFloors?.find((f) => f.enabled && f.isRepeated)?.repeatCount ??
+			buildingConfig?.floors.find((f) => f.enabled && f.isRepeated)
+				?.repeatCount ??
+			1,
+	);
 	const [expandedRepeatedFloors, setExpandedRepeatedFloors] = useState<
 		number[]
 	>([]);
-	const [neckEnabled, setNeckEnabled] = useState(false);
+	const [neckEnabledOverride, setNeckEnabledOverride] = useState<
+		boolean | null
+	>(null);
 	const derivedNeck = getNeckHeight();
 	const [neckHeight, setNeckHeight] = useState(() => {
 		if (derivedNeck != null && derivedNeck > 0) return derivedNeck / 100; // cm → m
@@ -85,11 +93,18 @@ export function ColumnsSection({
 		);
 	};
 
-	// فلترة عناصر الرقاب القديمة (الرقاب الآن محسوبة تلقائياً)
+	// عناصر الأعمدة (بدون الرقاب) — الرقاب تُدار كعناصر منفصلة subCategory = `${floorId}_neck`
 	const activeItems = useMemo(
 		() => items.filter((i) => !i.subCategory?.endsWith("_neck")),
 		[items],
 	);
+
+	// عناصر الرقاب المحفوظة — وجودها يعني أن قسم الرقاب مفعّل
+	const neckItems = useMemo(
+		() => items.filter((i) => i.subCategory?.endsWith("_neck")),
+		[items],
+	);
+	const neckEnabled = neckEnabledOverride ?? neckItems.length > 0;
 
 	// العناصر حسب الدور
 	const getFloorItems = (floorId: string) => {
@@ -107,50 +122,32 @@ export function ColumnsSection({
 	};
 
 	const groundColumns = getFloorItems("ground");
-	const repeatedTemplateItems = getFloorItems("repeated");
+	const repeatedFloorId = FLOORS.find((f) => f.isRepeated)?.id ?? "repeated";
+	const repeatedTemplateItems = getFloorItems(repeatedFloorId);
 
-	// حساب إجمالي الرقاب
-	const neckTotals = useMemo(() => {
-		if (!neckEnabled || groundColumns.length === 0)
-			return { concrete: 0, steel: 0 };
-		let concrete = 0;
-		let steel = 0;
-		groundColumns.forEach((col) => {
-			const calc = calculateColumnRebar({
-				quantity: col.quantity,
-				width: col.dimensions?.width || 30,
-				depth: col.dimensions?.depth || 30,
-				height: neckHeight,
-				mainBarsCount: col.dimensions?.mainBarsCount || 8,
-				mainBarDiameter: col.dimensions?.mainBarDiameter || 16,
-				stirrupDiameter: col.dimensions?.stirrupDiameter || 8,
-				stirrupSpacing: col.dimensions?.stirrupSpacing || 150,
-				concreteType: specs?.concreteType || "C35",
-			});
-			concrete += calc.concreteVolume;
-			steel += calc.totals.grossWeight;
-		});
-		return { concrete, steel };
-	}, [neckEnabled, groundColumns, neckHeight, specs]);
-
-	// حساب الإجمالي الحقيقي
-	const nonRepeatedActive = activeItems.filter(
-		(i) => i.subCategory !== "repeated",
+	// إجمالي الرقاب من العناصر المحفوظة (تصل الآن إلى BOQ والتسعير)
+	const neckTotals = useMemo(
+		() => ({
+			concrete: neckItems.reduce((s, i) => s + i.concreteVolume, 0),
+			steel: neckItems.reduce((s, i) => s + i.steelWeight, 0),
+		}),
+		[neckItems],
 	);
-	const repeatedConcrete =
-		repeatedTemplateItems.reduce((s, i) => s + i.concreteVolume, 0) *
-		repeatedCount;
-	const repeatedSteel =
-		repeatedTemplateItems.reduce((s, i) => s + i.steelWeight, 0) *
-		repeatedCount;
+
+	// الإجمالي الحقيقي — القيم المخزنة شاملة للتكرارات، فالجمع مباشر بلا ضرب
+	const repeatedConcrete = repeatedTemplateItems.reduce(
+		(s, i) => s + i.concreteVolume,
+		0,
+	);
+	const repeatedSteel = repeatedTemplateItems.reduce(
+		(s, i) => s + i.steelWeight,
+		0,
+	);
 	const grandTotalConcrete =
-		nonRepeatedActive.reduce((s, i) => s + i.concreteVolume, 0) +
-		repeatedConcrete +
+		activeItems.reduce((s, i) => s + i.concreteVolume, 0) +
 		neckTotals.concrete;
 	const grandTotalSteel =
-		nonRepeatedActive.reduce((s, i) => s + i.steelWeight, 0) +
-		repeatedSteel +
-		neckTotals.steel;
+		activeItems.reduce((s, i) => s + i.steelWeight, 0) + neckTotals.steel;
 
 	return (
 		<div className="space-y-3">
@@ -160,13 +157,15 @@ export function ColumnsSection({
 				const isExpanded = expandedFloors.includes(floor.id);
 				const hasItems = floorItems.length > 0;
 
-				const displayConcrete = floor.isRepeated
-					? floorItems.reduce((s, i) => s + i.concreteVolume, 0) *
-						repeatedCount
-					: floorItems.reduce((s, i) => s + i.concreteVolume, 0);
-				const displaySteel = floor.isRepeated
-					? floorItems.reduce((s, i) => s + i.steelWeight, 0) * repeatedCount
-					: floorItems.reduce((s, i) => s + i.steelWeight, 0);
+				// القيم المخزنة شاملة للتكرارات — لا ضرب إضافي في العرض
+				const displayConcrete = floorItems.reduce(
+					(s, i) => s + i.concreteVolume,
+					0,
+				);
+				const displaySteel = floorItems.reduce(
+					(s, i) => s + i.steelWeight,
+					0,
+				);
 
 				return (
 					<div
@@ -261,6 +260,13 @@ export function ColumnsSection({
 											organizationId={organizationId}
 											specs={specs}
 											onCopied={onSave}
+											targetHeight={
+												getColumnHeight(floor.id) != null &&
+												(getColumnHeight(floor.id) as number) > 0
+													? (getColumnHeight(floor.id) as number) / 100
+													: null
+											}
+											targetRepeatCount={1}
 										/>
 
 										{/* قسم الرقاب */}
@@ -269,15 +275,20 @@ export function ColumnsSection({
 												groundColumns={groundColumns}
 												neckHeight={neckHeight}
 												onNeckHeightChange={setNeckHeight}
-												onDisable={() => setNeckEnabled(false)}
+												onDisable={() => setNeckEnabledOverride(false)}
 												specs={specs}
+												studyId={studyId}
+												organizationId={organizationId}
+												floorId={floor.id}
+												savedNeckItems={neckItems}
+												onSaved={onSave}
 											/>
 										) : (
 											floorItems.length > 0 && (
 												<Button
 													variant="outline"
 													className="w-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border-2 border-dashed border-amber-400/40 hover:bg-amber-500/20 hover:border-amber-400/60 transition-all"
-													onClick={() => setNeckEnabled(true)}
+													onClick={() => setNeckEnabledOverride(true)}
 												>
 													<Plus className="h-5 w-5 me-2" />
 													<span className="font-semibold">
@@ -293,26 +304,18 @@ export function ColumnsSection({
 								) : floor.isRepeated ? (
 									/* ═══ الدور المتكرر: خاص ═══ */
 									<div className="space-y-4">
-										{/* إعداد عدد الأدوار */}
+										{/* عدد الأدوار المتكررة — قراءة فقط (من معالج التهيئة) */}
 										<div className="flex items-center gap-3 bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200/50 rounded-lg p-3">
 											<Layers className="h-5 w-5 text-purple-600" />
 											<Label className="font-medium text-sm">
 												{t("pricing.studies.structural.sections.columns.repeatedFloorsCount")}:
 											</Label>
-											<Input
-												type="number"
-												min={1}
-												max={50}
-												value={repeatedCount}
-												onChange={(
-													e: React.ChangeEvent<HTMLInputElement>,
-												) =>
-													setRepeatedCount(
-														Math.max(1, parseInt(e.target.value) || 1),
-													)
-												}
-												className="w-20 h-8 text-center font-bold"
-											/>
+											<Badge
+												variant="default"
+												className="bg-purple-600 text-sm font-bold"
+											>
+												× {repeatedCount}
+											</Badge>
 											<span className="text-xs text-muted-foreground">
 												{t("pricing.studies.structural.sections.columns.repeatedHint", { count: repeatedCount })}
 											</span>
@@ -336,6 +339,7 @@ export function ColumnsSection({
 												onUpdate={onUpdate}
 												allItemsCount={activeItems.length}
 												derivedColumnHeight={getColumnHeight(floor.id)}
+												repeatCount={repeatedCount}
 											/>
 											<CopyFromFloorButton
 												currentFloorId={floor.id}
@@ -346,6 +350,13 @@ export function ColumnsSection({
 												organizationId={organizationId}
 												specs={specs}
 												onCopied={onSave}
+												targetHeight={
+													getColumnHeight(floor.id) != null &&
+													(getColumnHeight(floor.id) as number) > 0
+														? (getColumnHeight(floor.id) as number) / 100
+														: null
+												}
+												targetRepeatCount={repeatedCount}
 											/>
 										</div>
 
@@ -364,12 +375,19 @@ export function ColumnsSection({
 														const floorNum = i + 1;
 														const isOpen =
 															expandedRepeatedFloors.includes(i);
+														// القيم المخزنة شاملة للتكرارات — القسمة على repeatCount تعطي قيمة الدور الواحد
 														const perFloorConcrete = floorItems.reduce(
-															(s, item) => s + item.concreteVolume,
+															(s, item) =>
+																s +
+																item.concreteVolume /
+																	(item.dimensions?.repeatCount || 1),
 															0,
 														);
 														const perFloorSteel = floorItems.reduce(
-															(s, item) => s + item.steelWeight,
+															(s, item) =>
+																s +
+																item.steelWeight /
+																	(item.dimensions?.repeatCount || 1),
 															0,
 														);
 
@@ -455,7 +473,9 @@ export function ColumnsSection({
 																							{item.name}
 																						</TableCell>
 																						<TableCell className="text-sm">
-																							{item.quantity}
+																							{item.dimensions
+																								?.perFloorQuantity ||
+																								item.quantity}
 																						</TableCell>
 																						<TableCell className="text-sm">
 																							{item.dimensions?.width || 0}×
@@ -465,12 +485,18 @@ export function ColumnsSection({
 																						</TableCell>
 																						<TableCell className="text-sm">
 																							{formatNumber(
-																								item.concreteVolume,
+																								item.concreteVolume /
+																									(item.dimensions
+																										?.repeatCount || 1),
 																							)}{" "}
 																							م³
 																						</TableCell>
 																						<TableCell className="text-sm">
-																							{formatNumber(item.steelWeight)}{" "}
+																							{formatNumber(
+																								item.steelWeight /
+																									(item.dimensions
+																										?.repeatCount || 1),
+																							)}{" "}
 																							كجم
 																						</TableCell>
 																					</TableRow>
@@ -544,6 +570,13 @@ export function ColumnsSection({
 											organizationId={organizationId}
 											specs={specs}
 											onCopied={onSave}
+											targetHeight={
+												getColumnHeight(floor.id) != null &&
+												(getColumnHeight(floor.id) as number) > 0
+													? (getColumnHeight(floor.id) as number) / 100
+													: null
+											}
+											targetRepeatCount={1}
 										/>
 									</div>
 								)}
@@ -564,7 +597,7 @@ export function ColumnsSection({
 								{t("pricing.studies.structural.sections.columns.includesRepeated", { count: repeatedCount })}
 							</span>
 						)}
-						{neckEnabled && groundColumns.length > 0 && (
+						{neckItems.length > 0 && (
 							<span className="text-xs text-muted-foreground">
 								{t("pricing.studies.structural.sections.columns.includesNecks")}
 							</span>

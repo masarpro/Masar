@@ -48,6 +48,21 @@ export const copyFromQuotation = subscriptionProcedure
 			});
 		}
 
+		// منع النسخ المكرر — نقرة ثانية كانت تضاعف كل البنود بصمت
+		// (نفس حارس copy-from-cost-study)
+		const existingCount = await db.projectBOQItem.count({
+			where: {
+				projectId: input.projectId,
+				organizationId: input.organizationId,
+				quotationId: input.quotationId,
+			},
+		});
+		if (existingCount > 0) {
+			throw new ORPCError("CONFLICT", {
+				message: "تم نسخ بنود هذا العرض مسبقاً إلى جدول الكميات",
+			});
+		}
+
 		// Get last sortOrder
 		const lastItem = await db.projectBOQItem.findFirst({
 			where: {

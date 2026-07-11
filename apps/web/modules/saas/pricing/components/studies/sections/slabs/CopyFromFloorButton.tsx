@@ -30,7 +30,7 @@ export function CopyFromFloorButton({
 	const createMutation = useMutation(
 		orpc.pricing.studies.structuralItem.create.mutationOptions({
 			onSuccess: () => {},
-			onError: () => toast.error("خطأ في النسخ"),
+			onError: () => {},
 		}),
 	);
 
@@ -49,37 +49,47 @@ export function CopyFromFloorButton({
 			selectedSource,
 			floors[0]?.label === selectedSource,
 		);
-		for (const item of sourceItems) {
-			const newName =
-				item.name.replace(selectedSource, currentFloor) ||
-				`سقف الدور ال${currentFloor}`;
-			await (createMutation.mutateAsync as (data: StructuralItemCreateInput) => Promise<unknown>)({
-				costStudyId: studyId,
-				organizationId,
-				category: "slabs",
-				subCategory: item.subCategory || "solid",
-				name: newName,
-				quantity: item.quantity,
-				unit: "m2",
-				dimensions: { ...item.dimensions, floor: currentFloor },
-				concreteVolume: item.concreteVolume,
-				concreteType: specs?.concreteType || "C30",
-				steelWeight: item.steelWeight,
-				steelRatio:
-					item.concreteVolume > 0
-						? item.steelWeight / item.concreteVolume
-						: 0,
-				materialCost: 0,
-				laborCost: 0,
-				totalCost: item.totalCost,
-			});
+		let copiedCount = 0;
+		try {
+			for (const item of sourceItems) {
+				const newName =
+					item.name.replace(selectedSource, currentFloor) ||
+					`سقف الدور ال${currentFloor}`;
+				await (createMutation.mutateAsync as (data: StructuralItemCreateInput) => Promise<unknown>)({
+					costStudyId: studyId,
+					organizationId,
+					category: "slabs",
+					subCategory: item.subCategory || "solid",
+					name: newName,
+					quantity: item.quantity,
+					unit: "m2",
+					dimensions: { ...item.dimensions, floor: currentFloor },
+					concreteVolume: item.concreteVolume,
+					concreteType: specs?.concreteType || "C30",
+					steelWeight: item.steelWeight,
+					steelRatio:
+						item.concreteVolume > 0
+							? item.steelWeight / item.concreteVolume
+							: 0,
+					materialCost: 0,
+					laborCost: 0,
+					totalCost: item.totalCost,
+				});
+				copiedCount++;
+			}
+			setSelectedSource("");
+			toast.success(
+				`تم نسخ ${sourceItems.length} عنصر من ${selectedSource} إلى ${currentFloor}`,
+			);
+		} catch {
+			toast.error(
+				`فشل النسخ — تم نسخ ${copiedCount} من ${sourceItems.length} عنصر`,
+			);
+		} finally {
+			setIsCopying(false);
+			// تحديث القائمة حتى يظهر ما نُسخ فعلاً (حتى عند النسخ الجزئي)
+			onCopied();
 		}
-		setIsCopying(false);
-		setSelectedSource("");
-		toast.success(
-			`تم نسخ ${sourceItems.length} عنصر من ${selectedSource} إلى ${currentFloor}`,
-		);
-		onCopied();
 	};
 
 	return (

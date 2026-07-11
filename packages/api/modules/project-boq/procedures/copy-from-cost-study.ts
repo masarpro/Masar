@@ -100,12 +100,17 @@ export const copyFromCostStudy = subscriptionProcedure
 
 		// FinishingItem → BOQItem
 		for (const item of study.finishingItems) {
-			const quantity = item.quantity
+			let quantity = item.quantity
 				? Number(item.quantity)
 				: item.area
 					? Number(item.area)
 					: 0;
 			const totalCost = Number(item.totalCost);
+			// بند بتكلفة موجبة بلا كمية: كمية 1 مقطوعية كي لا يسقط سعره
+			// من الإجماليات (unitPrice=null كان يستثنيه من get-summary)
+			if (quantity <= 0 && totalCost > 0) {
+				quantity = 1;
+			}
 			const unitPrice = quantity > 0 ? totalCost / quantity : 0;
 
 			if (!input.includeUnpriced && totalCost === 0) continue;
