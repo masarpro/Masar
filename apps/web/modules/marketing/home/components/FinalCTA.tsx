@@ -8,81 +8,47 @@ export function FinalCTA() {
 
 	return (
 		<section
-			className="relative overflow-hidden py-40 px-6 text-center"
-			style={{
-				background:
-					"linear-gradient(180deg, var(--lp-bg), var(--lp-bg-section), var(--lp-bg))",
-			}}
+			className="mas-on-dark relative overflow-hidden py-28 md:py-36 px-6 text-center"
+			style={{ background: "var(--mas-navy-3)" }}
 		>
-			{/* Decorative gradient orbs */}
+			{/* blueprint grid + rising glow */}
 			<div
-				className="absolute pointer-events-none"
+				className="absolute inset-0 pointer-events-none"
+				aria-hidden="true"
 				style={{
-					top: "40%",
-					left: "30%",
-					width: 500,
-					height: 500,
-					borderRadius: "50%",
 					background:
-						"radial-gradient(circle, rgba(14,165,233,0.12), transparent 60%)",
-					filter: "blur(100px)",
-					opacity: "var(--lp-effects-opacity)",
-				}}
-			/>
-			<div
-				className="absolute pointer-events-none"
-				style={{
-					top: "50%",
-					left: "60%",
-					width: 400,
-					height: 400,
-					borderRadius: "50%",
-					background:
-						"radial-gradient(circle, rgba(6,182,212,0.08), transparent 60%)",
-					filter: "blur(80px)",
-					opacity: "var(--lp-effects-opacity)",
-				}}
-			/>
-			<div
-				className="absolute pointer-events-none"
-				style={{
-					top: "45%",
-					left: "45%",
-					transform: "translate(-50%,-50%)",
-					width: 250,
-					height: 250,
-					borderRadius: "50%",
-					background:
-						"radial-gradient(circle, rgba(59,130,246,0.1), transparent 60%)",
-					filter: "blur(50px)",
-					animation: "landingPulse 4s infinite",
-					opacity: "var(--lp-effects-opacity)",
+						"radial-gradient(circle at 50% 130%, rgba(14,165,233,0.35), transparent 55%), linear-gradient(var(--mas-navy-line) 1px, transparent 1px), linear-gradient(90deg, var(--mas-navy-line) 1px, transparent 1px)",
+					backgroundSize: "auto, 44px 44px, 44px 44px",
+					opacity: 0.7,
 				}}
 			/>
 
-			<div className="max-w-[700px] mx-auto relative z-[2]">
+			<div className="mas-rv relative z-[1] max-w-[700px] mx-auto">
+				<span className="mas-dim">{t("hero.tagline")}</span>
 				<h2
-					className="text-4xl sm:text-5xl lg:text-[52px] font-black leading-[1.15] mb-6"
-					style={{ color: "var(--lp-text)" }}
+					className="text-[clamp(1.9rem,4vw,2.9rem)] font-black leading-[1.3] mt-5 mb-4"
+					style={{ color: "var(--mas-paper-on-dark)" }}
 				>
 					{t("finalCta.title")}
 				</h2>
 				<p
-					className="text-lg leading-[1.8] mb-12"
-					style={{ color: "var(--lp-text-subtle)" }}
+					className="text-[clamp(1rem,1.8vw,1.15rem)] leading-[1.8] mb-9"
+					style={{ color: "rgba(234,243,251,0.65)" }}
 				>
 					{t("finalCta.description")}
 				</p>
 				<Link
 					href="/auth/signup"
-					className="btn-premium btn-premium-primary !py-[22px] !px-[60px] !text-[19px] !rounded-[22px]"
+					className="mas-btn mas-btn-primary !text-[17px] !px-10 !py-4"
 				>
 					{t("finalCta.cta")}
-					<span className="text-[22px] rtl-flip">→</span>
+					<span className="rtl-flip" aria-hidden="true">
+						→
+					</span>
 				</Link>
 				<p
-					className="text-[13px] mt-6"
-					style={{ color: "var(--lp-text-faint)" }}
+					className="text-[13px] mt-5"
+					style={{ color: "rgba(234,243,251,0.42)" }}
 				>
 					{t("finalCta.note")}
 				</p>

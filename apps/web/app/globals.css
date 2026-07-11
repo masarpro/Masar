@@ -162,8 +162,8 @@ input[cmdk-input] {
 		--lp-ghost-color: var(--foreground);
 		--lp-ghost-hover-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 0 40px rgba(14,165,233,0.06);
 		/* NavBar */
-		--lp-nav-scrolled-bg: rgba(242,241,237,0.85);
-		--lp-nav-scrolled-border: rgba(0,0,0,0.06);
+		--lp-nav-scrolled-bg: rgba(245,248,252,0.85);
+		--lp-nav-scrolled-border: rgba(14,42,68,0.08);
 		--lp-nav-link: rgba(28,30,30,0.55);
 		--lp-nav-link-hover: #0ea5e9;
 		--lp-nav-link-hover-bg: rgba(14,165,233,0.05);
@@ -175,11 +175,11 @@ input[cmdk-input] {
 		--lp-nav-login-hover: var(--foreground);
 		--lp-nav-signup-border: rgba(14,165,233,0.2);
 		--lp-nav-signup-shadow: 0 0 24px rgba(14,165,233,0.15);
-		/* Footer */
-		--lp-footer-bg: var(--background);
-		--lp-footer-border: rgba(0,0,0,0.06);
-		--lp-footer-brand: rgba(28,30,30,0.5);
-		--lp-footer-text: rgba(28,30,30,0.25);
+		/* Footer — navy in both themes so it flows from the final CTA */
+		--lp-footer-bg: #050f1c;
+		--lp-footer-border: rgba(158,199,232,0.1);
+		--lp-footer-brand: rgba(234,243,251,0.8);
+		--lp-footer-text: rgba(234,243,251,0.55);
 	}
 
 	.dark {
@@ -214,8 +214,8 @@ input[cmdk-input] {
 		--lp-ghost-color: #ffffff;
 		--lp-ghost-hover-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(14,165,233,0.08);
 		/* NavBar */
-		--lp-nav-scrolled-bg: rgba(5,5,8,0.8);
-		--lp-nav-scrolled-border: rgba(255,255,255,0.06);
+		--lp-nav-scrolled-bg: rgba(7,12,20,0.82);
+		--lp-nav-scrolled-border: rgba(158,199,232,0.12);
 		--lp-nav-link: rgba(255,255,255,0.55);
 		--lp-nav-link-hover: #0ea5e9;
 		--lp-nav-link-hover-bg: rgba(14,165,233,0.05);
@@ -227,11 +227,11 @@ input[cmdk-input] {
 		--lp-nav-login-hover: #ffffff;
 		--lp-nav-signup-border: rgba(255,255,255,0.1);
 		--lp-nav-signup-shadow: 0 0 24px rgba(14,165,233,0.25);
-		/* Footer */
-		--lp-footer-bg: #050508;
-		--lp-footer-border: rgba(255,255,255,0.04);
-		--lp-footer-brand: rgba(255,255,255,0.35);
-		--lp-footer-text: rgba(255,255,255,0.18);
+		/* Footer — navy in both themes so it flows from the final CTA */
+		--lp-footer-bg: #050f1c;
+		--lp-footer-border: rgba(158,199,232,0.1);
+		--lp-footer-brand: rgba(234,243,251,0.8);
+		--lp-footer-text: rgba(234,243,251,0.55);
 	}
 }
 
@@ -533,23 +533,23 @@ input[cmdk-input] {
 /* ═══════════════════════════════════════════════
    Landing — Hero Path Strip (signature journey line)
    ═══════════════════════════════════════════════ */
-.lp-path-strip { position: relative; max-width: 720px; }
+.lp-path-strip { position: relative; max-width: 720px; width: 100%; }
 .lp-path-ltr { direction: ltr; position: relative; }
 .lp-path-svg { width: 100%; height: auto; display: block; overflow: visible; }
 .lp-station-label {
 	font-family: inherit;
 	font-weight: 700;
 	font-size: 15px;
-	fill: var(--lp-text);
+	fill: var(--mas-ink, var(--lp-text));
 }
 .lp-station-sub {
 	font-size: 10.5px;
-	fill: var(--lp-text-subtle);
+	fill: var(--mas-subtle, var(--lp-text-subtle));
 	letter-spacing: 0.05em;
 }
 @keyframes lpAnts { to { stroke-dashoffset: -11; } }
 .lp-line-bg {
-	stroke: var(--lp-text-faint);
+	stroke: var(--mas-line, var(--lp-text-faint));
 	stroke-width: 3;
 	fill: none;
 	stroke-dasharray: 2 9;
@@ -569,8 +569,8 @@ input[cmdk-input] {
 .lp-entered .lp-line { animation: lpDraw 2.6s cubic-bezier(0.22,1,0.36,1) 0.4s forwards; }
 @keyframes lpPop { to { opacity: 1; transform: scale(1); } }
 .lp-node {
-	fill: var(--lp-card-bg-solid);
-	stroke: var(--lp-text-faint);
+	fill: var(--mas-surface, var(--lp-card-bg-solid));
+	stroke: var(--mas-line, var(--lp-text-faint));
 	stroke-width: 2.5;
 	opacity: 0;
 	transform: scale(0.3);
@@ -767,6 +767,1534 @@ html[lang="en"] .lp-tk { direction: ltr; }
 	.lp-line { stroke-dashoffset: 0 !important; animation: none !important; }
 	.lp-node { opacity: 1 !important; transform: none !important; animation: none !important; }
 	.lp-halo, .lp-comet-dot { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MAS — Landing redesign 2026 · "Engineering paper" design system
+   Flat, generous whitespace, blueprint-grid signature.
+   Self-contained: --mas- tokens + .mas- classes only.
+   (Legacy --lp- vars and .landing- classes stay for auth + ChoosePlan pages.)
+   ═══════════════════════════════════════════════════════════════ */
+@layer base {
+	:root {
+		/* engineering paper (light) */
+		--mas-bg: #f5f8fc;
+		--mas-bg-2: #eaf1f8;
+		--mas-surface: #ffffff;
+		--mas-ink: #0e2a44;
+		--mas-muted: #54708c;
+		--mas-subtle: rgba(14, 42, 68, 0.45);
+		--mas-line: #d9e5f0;
+		--mas-grid-line: rgba(14, 165, 233, 0.07);
+		/* brand */
+		--mas-blue: #0ea5e9;
+		--mas-blue-deep: #0284c7;
+		--mas-blue-press: #075985;
+		--mas-blue-soft: #e3f2fd;
+		--mas-glow: rgba(14, 165, 233, 0.3);
+		/* navy sections (fixed across themes) */
+		--mas-navy: #0a1f35;
+		--mas-navy-2: #08192b;
+		--mas-navy-3: #050f1c;
+		--mas-navy-line: rgba(158, 199, 232, 0.14);
+		--mas-paper-on-dark: #eaf3fb;
+		/* pastel data tiles (from the app UI) */
+		--mas-red: #e5484d;
+		--mas-red-bg: #fdecec;
+		--mas-green: #18a058;
+		--mas-green-bg: #e6f6ee;
+		--mas-yellow: #d9a514;
+		--mas-yellow-bg: #fff8e1;
+		--mas-blue-bg: #e8f3fe;
+		/* motion + type */
+		--mas-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+		--mas-ease: cubic-bezier(0.22, 1, 0.36, 1);
+		--mas-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+
+	.dark {
+		--mas-bg: #070c14;
+		--mas-bg-2: #0b1220;
+		--mas-surface: #0e1626;
+		--mas-ink: #eaf3fb;
+		--mas-muted: #8ca3b8;
+		--mas-subtle: rgba(234, 243, 251, 0.45);
+		--mas-line: rgba(158, 199, 232, 0.15);
+		--mas-grid-line: rgba(30, 155, 240, 0.06);
+		--mas-blue-deep: #38a8ee;
+		--mas-blue-press: #0e4e7e;
+		--mas-blue-soft: rgba(14, 165, 233, 0.14);
+		--mas-glow: rgba(14, 165, 233, 0.4);
+		--mas-red-bg: rgba(229, 72, 77, 0.16);
+		--mas-green-bg: rgba(24, 160, 88, 0.16);
+		--mas-yellow-bg: rgba(217, 165, 20, 0.16);
+		--mas-blue-bg: rgba(14, 165, 233, 0.16);
+	}
+}
+
+/* ── scroll progress ── */
+.mas-progress {
+	position: fixed;
+	top: 0;
+	inset-inline-start: 0;
+	height: 3px;
+	width: 0;
+	z-index: 60;
+	background: linear-gradient(90deg, var(--mas-blue-deep), var(--mas-blue));
+	box-shadow: 0 0 10px var(--mas-glow);
+}
+
+/* ── dimension eyebrow: ⊢— label —⊣ ── */
+.mas-dim {
+	display: inline-flex;
+	align-items: center;
+	gap: 14px;
+	font-family: var(--mas-mono);
+	font-size: 13px;
+	letter-spacing: 0.08em;
+	color: var(--mas-muted);
+	white-space: nowrap;
+}
+.mas-dim::before,
+.mas-dim::after {
+	content: "";
+	height: 1px;
+	width: clamp(22px, 4vw, 38px);
+	background: currentColor;
+}
+.mas-dim::before {
+	box-shadow: 3px -4px 0 -0.5px currentColor, 3px 4px 0 -0.5px currentColor;
+}
+.mas-dim::after {
+	box-shadow: -3px -4px 0 -0.5px currentColor, -3px 4px 0 -0.5px currentColor;
+}
+.mas-dim b {
+	color: var(--mas-blue);
+	font-weight: 500;
+}
+.mas-on-dark .mas-dim {
+	color: rgba(234, 243, 251, 0.55);
+}
+
+/* ── buttons: flat + hard press shadow + sheen ── */
+.mas-btn {
+	position: relative;
+	overflow: hidden;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	font-weight: 700;
+	font-size: 16px;
+	padding: 14px 30px;
+	border-radius: 12px;
+	border: 1.5px solid transparent;
+	cursor: pointer;
+	min-height: 50px;
+	white-space: nowrap;
+	text-decoration: none;
+	-webkit-tap-highlight-color: transparent;
+	transition: transform 0.2s var(--mas-ease), box-shadow 0.2s var(--mas-ease),
+		background 0.2s, color 0.2s, border-color 0.2s;
+}
+.mas-btn:focus-visible {
+	outline: 3px solid var(--mas-blue);
+	outline-offset: 3px;
+}
+.mas-btn-primary {
+	background: linear-gradient(180deg, #38bdf8, #0284c7);
+	color: #fff;
+	box-shadow: 0 4px 0 var(--mas-blue-press), 0 14px 28px -12px var(--mas-glow),
+		inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.mas-btn-primary:active {
+	transform: translateY(2px);
+	box-shadow: 0 1px 0 var(--mas-blue-press),
+		inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.mas-btn-primary::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 46%;
+	inset-inline-start: -60%;
+	background: linear-gradient(
+		105deg,
+		transparent,
+		rgba(255, 255, 255, 0.5),
+		transparent
+	);
+	transform: skewX(-18deg);
+	transition: inset-inline-start 0.7s var(--mas-ease);
+}
+.mas-btn-ghost {
+	border-color: var(--mas-blue-deep);
+	color: var(--mas-blue-deep);
+	background: transparent;
+}
+.mas-on-dark .mas-btn-ghost {
+	border-color: rgba(234, 243, 251, 0.4);
+	color: var(--mas-paper-on-dark);
+}
+@media (hover: hover) and (pointer: fine) {
+	.mas-btn-primary:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 6px 0 var(--mas-blue-press),
+			0 20px 34px -12px var(--mas-glow),
+			inset 0 1px 0 rgba(255, 255, 255, 0.35);
+	}
+	.mas-btn-primary:hover::after {
+		inset-inline-start: 120%;
+	}
+	.mas-btn-ghost:hover {
+		background: var(--mas-blue-deep);
+		color: #fff;
+		transform: translateY(-2px);
+	}
+	.mas-on-dark .mas-btn-ghost:hover {
+		background: var(--mas-paper-on-dark);
+		color: var(--mas-navy);
+	}
+}
+
+/* ── hero: blueprint grid + breathing glow ── */
+.mas-hero {
+	position: relative;
+	overflow: hidden;
+	background-color: var(--mas-bg);
+	background-image: linear-gradient(var(--mas-grid-line) 1px, transparent 1px),
+		linear-gradient(90deg, var(--mas-grid-line) 1px, transparent 1px);
+	background-size: 44px 44px;
+	animation: masGridPan 80s linear infinite;
+}
+@keyframes masGridPan {
+	to {
+		background-position: -88px -44px, -44px -88px;
+	}
+}
+.mas-hero::before {
+	content: "";
+	position: absolute;
+	width: min(880px, 120vw);
+	aspect-ratio: 1;
+	border-radius: 50%;
+	top: -46%;
+	inset-inline-start: 50%;
+	transform: translateX(-50%);
+	background: radial-gradient(circle, var(--mas-glow), transparent 62%);
+	animation: masBreathe 9s ease-in-out infinite;
+	pointer-events: none;
+	opacity: 0.55;
+}
+@keyframes masBreathe {
+	0%,
+	100% {
+		opacity: 0.4;
+		scale: 1;
+	}
+	50% {
+		opacity: 0.7;
+		scale: 1.1;
+	}
+}
+.mas-hero::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg, transparent 40%, var(--mas-bg) 96%);
+	pointer-events: none;
+}
+
+/* soft drifting aurora blobs behind the hero */
+.mas-blob {
+	position: absolute;
+	border-radius: 50%;
+	filter: blur(80px);
+	pointer-events: none;
+}
+.mas-blob-1 {
+	width: 480px;
+	height: 480px;
+	background: #7cc4f8;
+	top: -170px;
+	inset-inline-start: -130px;
+	opacity: 0.28;
+	animation: masDrift1 26s ease-in-out infinite alternate;
+}
+.mas-blob-2 {
+	width: 400px;
+	height: 400px;
+	background: #0ea5e9;
+	bottom: -160px;
+	inset-inline-end: -110px;
+	opacity: 0.16;
+	animation: masDrift2 33s ease-in-out infinite alternate;
+}
+@keyframes masDrift1 {
+	to {
+		transform: translate(90px, 70px) scale(1.15);
+	}
+}
+@keyframes masDrift2 {
+	to {
+		transform: translate(-80px, -55px) scale(1.1);
+	}
+}
+.dark .mas-blob-1 {
+	opacity: 0.12;
+}
+.dark .mas-blob-2 {
+	opacity: 0.1;
+}
+
+/* hero staged entrance */
+.mas-stage {
+	opacity: 0;
+	transform: translateY(26px);
+	filter: blur(6px);
+}
+.mas-entered .mas-stage {
+	animation: masEnter 0.9s var(--mas-ease) forwards;
+	animation-delay: calc(var(--i) * 0.11s);
+}
+@keyframes masEnter {
+	to {
+		opacity: 1;
+		transform: none;
+		filter: blur(0);
+	}
+}
+
+/* highlighted word in the hero title — hand-drawn underline */
+.mas-path-word {
+	color: var(--mas-blue-deep);
+	position: relative;
+	display: inline-block;
+	white-space: nowrap;
+}
+.mas-path-word svg {
+	position: absolute;
+	inset-inline: 0;
+	bottom: -6px;
+	width: 100%;
+	height: 12px;
+	overflow: visible;
+}
+.mas-path-word path {
+	stroke: var(--mas-blue);
+	stroke-width: 5;
+	fill: none;
+	stroke-linecap: round;
+	opacity: 0.45;
+	stroke-dasharray: 300;
+	stroke-dashoffset: 300;
+}
+.mas-entered .mas-path-word path {
+	animation: masDraw 0.9s var(--mas-ease) 1.1s forwards;
+}
+@keyframes masDraw {
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+/* ── scroll reveal ── */
+.mas-rv {
+	opacity: 0;
+	transform: translateY(26px);
+	transition: opacity 0.75s var(--mas-ease), transform 0.75s var(--mas-ease);
+	transition-delay: var(--d, 0s);
+}
+.mas-rv.vis {
+	opacity: 1;
+	transform: none;
+}
+
+/* ── section head ── */
+.mas-sec-head h2 {
+	font-size: clamp(1.7rem, 2.4vw + 0.8rem, 2.5rem);
+	font-weight: 800;
+	line-height: 1.35;
+	color: var(--mas-ink);
+	margin: 14px 0 12px;
+	text-wrap: balance;
+}
+.mas-sec-head p {
+	color: var(--mas-muted);
+	font-size: clamp(1.02rem, 0.5vw + 0.9rem, 1.15rem);
+	text-wrap: pretty;
+}
+.mas-on-dark .mas-sec-head h2,
+.mas-on-dark h2 {
+	color: var(--mas-paper-on-dark);
+}
+.mas-on-dark .mas-sec-head p {
+	color: rgba(234, 243, 251, 0.7);
+}
+
+/* ── navy sections (AI / stats / final CTA) ── */
+.mas-navy-sec {
+	background: var(--mas-navy);
+	position: relative;
+	overflow: hidden;
+}
+.mas-navy-sec::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(
+			circle at 84% 12%,
+			rgba(14, 165, 233, 0.2),
+			transparent 46%
+		),
+		linear-gradient(var(--mas-navy-line) 1px, transparent 1px),
+		linear-gradient(90deg, var(--mas-navy-line) 1px, transparent 1px);
+	background-size: auto, 44px 44px, 44px 44px;
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+/* ── feature stations: dashed spine + numbered nodes ── */
+.mas-stations {
+	position: relative;
+}
+.mas-stations::before {
+	content: "";
+	position: absolute;
+	top: 10px;
+	bottom: 10px;
+	inset-inline-start: 29px;
+	width: 3px;
+	border-inline-start: 3px dashed var(--mas-line);
+}
+.mas-station {
+	position: relative;
+	padding-inline-start: 88px;
+	padding-block: clamp(30px, 4.5vw, 44px);
+	scroll-margin-top: 96px;
+	opacity: 0;
+	transform: translateY(28px);
+	transition: opacity 0.7s var(--mas-ease), transform 0.7s var(--mas-ease);
+}
+.mas-station.vis {
+	opacity: 1;
+	transform: none;
+}
+.mas-station-node {
+	position: absolute;
+	inset-inline-start: 12px;
+	top: 48px;
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	background: var(--mas-surface);
+	border: 3px solid var(--mas-line);
+	display: grid;
+	place-items: center;
+	font-family: var(--mas-mono);
+	font-size: 13.5px;
+	color: var(--mas-muted);
+	transition: all 0.5s var(--mas-ease);
+}
+.mas-station.vis .mas-station-node {
+	border-color: var(--mas-blue);
+	color: var(--mas-blue-deep);
+	box-shadow: 0 0 0 7px var(--mas-blue-soft), 0 0 22px -2px var(--mas-glow);
+	transform: scale(1.05);
+}
+.mas-station-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: clamp(28px, 4vw, 48px);
+	align-items: center;
+}
+.mas-station h3 {
+	font-size: clamp(1.25rem, 0.8vw + 1rem, 1.5rem);
+	font-weight: 800;
+	color: var(--mas-ink);
+	margin-bottom: 6px;
+	line-height: 1.4;
+}
+.mas-kicker {
+	font-family: var(--mas-mono);
+	font-size: 13px;
+	color: var(--mas-blue-deep);
+	letter-spacing: 0.06em;
+	font-weight: 500;
+}
+.mas-station > .mas-station-grid p,
+.mas-station-copy p {
+	color: var(--mas-muted);
+	margin: 10px 0 18px;
+	line-height: 1.8;
+}
+.mas-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 9px;
+}
+.mas-tags span {
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--mas-ink);
+	background: var(--mas-surface);
+	border: 1px solid var(--mas-line);
+	border-radius: 100px;
+	padding: 5px 14px;
+	white-space: nowrap;
+	transition: all 0.3s var(--mas-ease);
+}
+@media (hover: hover) {
+	.mas-tags span:hover {
+		border-color: var(--mas-blue);
+		color: var(--mas-blue-deep);
+		transform: translateY(-2px);
+	}
+}
+.mas-station-visual {
+	background: var(--mas-surface);
+	border: 1px solid var(--mas-line);
+	border-radius: 16px;
+	padding: clamp(18px, 2.5vw, 24px);
+	box-shadow: 0 14px 34px -20px rgba(14, 42, 68, 0.3);
+	min-height: 170px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 12px;
+	transition: transform 0.5s var(--mas-ease), box-shadow 0.5s;
+}
+@media (hover: hover) {
+	.mas-station-visual:hover {
+		transform: translateY(-5px);
+		box-shadow: 0 22px 44px -20px rgba(14, 42, 68, 0.35);
+	}
+}
+@media (max-width: 860px) {
+	.mas-station-grid {
+		grid-template-columns: 1fr;
+	}
+	.mas-station {
+		padding-inline-start: 60px;
+	}
+	.mas-stations::before {
+		inset-inline-start: 22px;
+	}
+	.mas-station-node {
+		inset-inline-start: 6px;
+		width: 34px;
+		height: 34px;
+		top: 44px;
+	}
+}
+@media (max-width: 420px) {
+	.mas-station {
+		padding-inline-start: 50px;
+	}
+	.mas-stations::before {
+		inset-inline-start: 16px;
+	}
+	.mas-station-node {
+		inset-inline-start: 1px;
+		width: 32px;
+		height: 32px;
+	}
+}
+
+/* ── mini-visual atoms (inside station cards) ── */
+.mas-mini-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 10px;
+	font-size: 13.5px;
+	color: var(--mas-ink);
+	padding: 9px 4px;
+	border-bottom: 1px dashed var(--mas-line);
+}
+.mas-mini-row:last-child {
+	border-bottom: none;
+}
+.mas-num {
+	font-family: var(--mas-mono);
+	font-weight: 500;
+	direction: ltr;
+	white-space: nowrap;
+}
+.mas-num.pos {
+	color: var(--mas-green);
+}
+.mas-mini-label {
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+	font-size: 12.5px;
+	color: var(--mas-muted);
+}
+.mas-mini-label b {
+	color: var(--mas-ink);
+	font-family: var(--mas-mono);
+	white-space: nowrap;
+	direction: ltr;
+}
+.mas-bar-wrap {
+	height: 9px;
+	background: var(--mas-bg-2);
+	border-radius: 100px;
+	overflow: hidden;
+}
+.mas-bar {
+	display: block;
+	height: 100%;
+	border-radius: 100px;
+	width: 0;
+	background: linear-gradient(90deg, var(--mas-blue-deep), #38bdf8);
+	box-shadow: 0 0 10px var(--mas-glow);
+	transition: width 1.4s var(--mas-ease) 0.35s;
+}
+.vis .mas-bar {
+	width: var(--w);
+}
+.mas-badge-line {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 13.5px;
+	color: var(--mas-ink);
+}
+.mas-badge-line .ok {
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	flex: none;
+	background: linear-gradient(135deg, #38bdf8, var(--mas-blue-deep));
+	color: #fff;
+	display: grid;
+	place-items: center;
+	font-size: 11px;
+}
+.mas-fin3 {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 9px;
+}
+.mas-fc {
+	background: var(--mas-bg);
+	border: 1px solid var(--mas-line);
+	border-radius: 12px;
+	padding: 10px 8px;
+	text-align: center;
+}
+.mas-fc span {
+	font-size: 11px;
+	color: var(--mas-muted);
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.mas-fc b {
+	font-family: var(--mas-mono);
+	font-size: 14px;
+	font-weight: 500;
+	direction: ltr;
+	display: block;
+	margin-top: 3px;
+}
+.mas-fc b i {
+	font-style: normal;
+	font-family: inherit;
+	font-size: 10px;
+	color: var(--mas-muted);
+}
+.mas-c-blue {
+	color: var(--mas-blue-deep);
+}
+.mas-c-red {
+	color: var(--mas-red);
+}
+.mas-c-green {
+	color: var(--mas-green);
+}
+/* study approval flow */
+.mas-flow {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 4px;
+	padding: 2px 2px 0;
+}
+.mas-fstep {
+	display: grid;
+	justify-items: center;
+	gap: 3px;
+	font-size: 10.5px;
+	font-weight: 700;
+	color: var(--mas-ink);
+	text-align: center;
+}
+.mas-fstep i {
+	width: 30px;
+	height: 30px;
+	border-radius: 10px;
+	display: grid;
+	place-items: center;
+	font-style: normal;
+	font-size: 12px;
+	font-weight: 800;
+	background: var(--mas-bg-2);
+	color: var(--mas-muted);
+}
+.mas-fstep em {
+	font-style: normal;
+	font-size: 9.5px;
+	font-weight: 600;
+	color: var(--mas-muted);
+}
+.mas-fstep.done i {
+	background: var(--mas-green-bg);
+	color: var(--mas-green);
+}
+.mas-fstep.done em {
+	color: var(--mas-green);
+}
+.mas-fstep.act i {
+	background: var(--mas-blue);
+	color: #fff;
+	box-shadow: 0 0 0 4px var(--mas-blue-bg);
+}
+.mas-fstep.act em {
+	color: var(--mas-blue-deep);
+}
+.mas-fstep.wip i {
+	background: var(--mas-blue-bg);
+	color: var(--mas-blue-deep);
+}
+.mas-fline {
+	height: 2px;
+	background: var(--mas-line);
+	flex: 1;
+	margin-top: 14px;
+	min-width: 10px;
+	border-radius: 2px;
+}
+/* project header + status chips */
+.mas-proj-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+}
+.mas-pj-t {
+	font-weight: 700;
+	font-size: 15px;
+	color: var(--mas-ink);
+}
+.mas-chip-live {
+	background: var(--mas-green-bg);
+	color: var(--mas-green);
+	font-size: 11px;
+	font-weight: 700;
+	border-radius: 100px;
+	padding: 3px 12px;
+}
+.mas-chip-draft {
+	background: var(--mas-bg-2);
+	color: var(--mas-muted);
+	font-size: 11px;
+	font-weight: 700;
+	border: 1px solid var(--mas-line);
+	border-radius: 100px;
+	padding: 2px 11px;
+}
+.mas-chip-red {
+	background: var(--mas-red);
+	color: #fff;
+	font-size: 11px;
+	font-weight: 700;
+	border-radius: 8px;
+	padding: 4px 12px;
+	box-shadow: 0 5px 12px -6px rgba(229, 72, 77, 0.55);
+	white-space: nowrap;
+}
+/* completion ring + phase bars */
+.mas-ringrow {
+	display: flex;
+	gap: 18px;
+	align-items: center;
+}
+.mas-ring {
+	width: 86px;
+	height: 86px;
+	border-radius: 50%;
+	flex: none;
+	position: relative;
+	background: conic-gradient(
+		var(--mas-blue) calc(var(--p) * 1%),
+		var(--mas-bg-2) 0
+	);
+	display: grid;
+	place-items: center;
+}
+.mas-ring::before {
+	content: "";
+	position: absolute;
+	inset: 9px;
+	border-radius: 50%;
+	background: var(--mas-surface);
+}
+.mas-ring-in {
+	position: relative;
+	display: grid;
+	place-items: center;
+	text-align: center;
+	line-height: 1.2;
+}
+.mas-ring-in b {
+	font-family: var(--mas-mono);
+	font-size: 16px;
+	color: var(--mas-blue-deep);
+}
+.mas-ring-in span {
+	font-size: 10px;
+	color: var(--mas-muted);
+}
+.mas-phases {
+	flex: 1;
+	display: grid;
+	gap: 8px;
+	min-width: 0;
+}
+.mas-ph {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	gap: 8px;
+	align-items: center;
+	font-size: 11.5px;
+}
+.mas-ph > span {
+	color: var(--mas-muted);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 120px;
+}
+.mas-ph b {
+	font-family: var(--mas-mono);
+	font-size: 11px;
+	color: var(--mas-ink);
+	direction: ltr;
+}
+.mas-pb {
+	height: 6px;
+	background: var(--mas-bg-2);
+	border-radius: 100px;
+	overflow: hidden;
+}
+.mas-pb i {
+	display: block;
+	height: 100%;
+	border-radius: 100px;
+	background: var(--mas-blue);
+	width: 0;
+	transition: width 1.2s var(--mas-ease) 0.4s;
+}
+.vis .mas-pb i {
+	width: var(--w);
+}
+/* quad status tiles (dashboard tower) */
+.mas-quad {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 10px;
+}
+.mas-q {
+	border-radius: 12px;
+	padding: 12px 10px;
+	text-align: center;
+}
+.mas-q b {
+	font-family: var(--mas-mono);
+	font-size: 20px;
+	display: block;
+	direction: ltr;
+}
+.mas-q span {
+	font-size: 11px;
+	font-weight: 600;
+}
+.mas-q.blue {
+	background: var(--mas-blue-bg);
+	color: var(--mas-blue);
+}
+.mas-q.green {
+	background: var(--mas-green-bg);
+	color: var(--mas-green);
+}
+.mas-q.yellow {
+	background: var(--mas-yellow-bg);
+	color: var(--mas-yellow);
+}
+.mas-q.red {
+	background: var(--mas-red-bg);
+	color: var(--mas-red);
+}
+@media (max-width: 420px) {
+	.mas-quad {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+/* tower — dashboard hero card above the stations */
+.mas-tower {
+	display: grid;
+	grid-template-columns: 1.1fr 0.9fr;
+	gap: clamp(24px, 4vw, 44px);
+	align-items: center;
+	background: var(--mas-surface);
+	border: 1px solid var(--mas-line);
+	border-radius: 20px;
+	padding: clamp(24px, 4vw, 40px);
+	position: relative;
+	overflow: hidden;
+	box-shadow: 0 18px 40px -24px rgba(14, 42, 68, 0.3);
+}
+.mas-tower::before {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	top: 0;
+	height: 4px;
+	background: linear-gradient(90deg, var(--mas-blue-deep), #38bdf8);
+}
+@media (max-width: 860px) {
+	.mas-tower {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ── roles strip ── */
+.mas-roles {
+	background: var(--mas-bg-2);
+	border-block: 1px solid var(--mas-line);
+}
+.mas-role-chips {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+.mas-role-chips span {
+	background: var(--mas-surface);
+	border: 1px solid var(--mas-line);
+	border-radius: 12px;
+	padding: 9px 18px;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--mas-ink);
+	white-space: nowrap;
+	transition: all 0.3s var(--mas-ease);
+}
+@media (hover: hover) {
+	.mas-role-chips span:hover {
+		border-color: var(--mas-blue);
+		transform: translateY(-3px);
+		box-shadow: 0 10px 20px -12px var(--mas-glow);
+	}
+}
+.mas-role-chips b {
+	color: var(--mas-blue-deep);
+	font-family: var(--mas-mono);
+	font-weight: 500;
+	margin-inline-end: 6px;
+}
+
+/* ── steps (single bordered grid) ── */
+.mas-steps-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	border: 1px solid var(--mas-line);
+	border-radius: 18px;
+	overflow: hidden;
+	background: var(--mas-surface);
+}
+.mas-step {
+	padding: clamp(28px, 4vw, 40px) 30px;
+	border-inline-start: 1px solid var(--mas-line);
+	transition: background 0.3s;
+}
+.mas-step:hover {
+	background: var(--mas-blue-soft);
+}
+.mas-step:first-child {
+	border-inline-start: none;
+}
+@media (max-width: 820px) {
+	.mas-steps-grid {
+		grid-template-columns: 1fr;
+	}
+	.mas-step {
+		border-inline-start: none;
+		border-top: 1px solid var(--mas-line);
+	}
+	.mas-step:first-child {
+		border-top: none;
+	}
+}
+.mas-step .n {
+	font-family: var(--mas-mono);
+	font-size: 12.5px;
+	color: var(--mas-blue-deep);
+	font-weight: 500;
+	display: inline-block;
+	margin-bottom: 14px;
+	border: 1px solid var(--mas-blue);
+	border-radius: 100px;
+	padding: 2px 12px;
+	direction: ltr;
+}
+.mas-step h3 {
+	font-size: 19px;
+	font-weight: 700;
+	color: var(--mas-ink);
+	margin-bottom: 8px;
+}
+.mas-step p {
+	color: var(--mas-muted);
+	font-size: 14.5px;
+	line-height: 1.75;
+}
+
+/* ── stats (navy band, mono counters) ── */
+.mas-stat b {
+	font-family: var(--mas-mono);
+	font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+	font-weight: 500;
+	color: var(--mas-paper-on-dark);
+	display: block;
+	direction: ltr;
+}
+.mas-stat b i {
+	color: var(--mas-blue);
+	font-style: normal;
+	text-shadow: 0 0 18px var(--mas-glow);
+}
+.mas-stat span {
+	color: rgba(234, 243, 251, 0.55);
+	font-size: 14px;
+}
+
+/* ── pricing ── */
+.mas-plan {
+	background: var(--mas-surface);
+	border: 1px solid var(--mas-line);
+	border-radius: 18px;
+	padding: clamp(28px, 3vw, 36px) clamp(22px, 3vw, 30px);
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	transition: transform 0.35s var(--mas-ease), box-shadow 0.35s;
+}
+@media (hover: hover) {
+	.mas-plan:hover {
+		transform: translateY(-6px);
+		box-shadow: 0 22px 46px -22px rgba(14, 42, 68, 0.35);
+	}
+}
+.mas-plan.hot {
+	border: 2px solid var(--mas-blue);
+	box-shadow: 0 24px 50px -22px var(--mas-glow);
+}
+.mas-plan .mas-flag {
+	position: absolute;
+	top: -14px;
+	inset-inline-start: 24px;
+	background: linear-gradient(135deg, #38bdf8, var(--mas-blue-deep));
+	color: #fff;
+	font-size: 12.5px;
+	font-weight: 700;
+	border-radius: 100px;
+	padding: 4px 16px;
+	box-shadow: 0 6px 14px -6px var(--mas-glow);
+	white-space: nowrap;
+	max-width: calc(100% - 48px);
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.mas-plan h3 {
+	font-size: 19px;
+	font-weight: 800;
+	color: var(--mas-ink);
+}
+.mas-plan .for {
+	color: var(--mas-muted);
+	font-size: 14px;
+	margin: 4px 0 20px;
+}
+.mas-price {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	margin-bottom: 4px;
+	flex-wrap: wrap;
+}
+.mas-price b {
+	font-family: var(--mas-mono);
+	font-size: 36px;
+	font-weight: 500;
+	color: var(--mas-ink);
+	unicode-bidi: plaintext;
+}
+.mas-price span {
+	color: var(--mas-muted);
+	font-size: 13.5px;
+	white-space: nowrap;
+}
+.mas-save {
+	font-size: 13px;
+	color: var(--mas-blue-deep);
+	font-weight: 600;
+	margin-bottom: 14px;
+}
+.mas-plan ul {
+	list-style: none;
+	margin: 18px 0 26px;
+	padding: 0;
+	display: grid;
+	gap: 11px;
+	flex: 1;
+	align-content: start;
+}
+.mas-plan li {
+	display: flex;
+	gap: 10px;
+	font-size: 14.5px;
+	color: var(--mas-ink);
+	align-items: flex-start;
+	line-height: 1.6;
+}
+.mas-plan li::before {
+	content: "✓";
+	color: var(--mas-blue);
+	font-weight: 700;
+	flex: none;
+	margin-top: 1px;
+}
+.mas-ent {
+	margin-top: 26px;
+	background: var(--mas-navy);
+	border-radius: 18px;
+	color: var(--mas-paper-on-dark);
+	padding: clamp(26px, 3.5vw, 34px) clamp(24px, 4vw, 38px);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 26px;
+	flex-wrap: wrap;
+}
+.mas-ent h3 {
+	font-size: 19px;
+	font-weight: 800;
+	margin-bottom: 6px;
+}
+.mas-ent p {
+	color: rgba(234, 243, 251, 0.66);
+	font-size: 14px;
+	max-width: 560px;
+	line-height: 1.8;
+}
+
+/* ── ZATCA trust band ── */
+.mas-zatca-band {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 14px;
+	flex-wrap: wrap;
+	border: 1.5px dashed var(--mas-line);
+	border-radius: 16px;
+	padding: 18px 22px;
+	color: var(--mas-muted);
+	font-size: 14px;
+	text-align: center;
+}
+.mas-zatca-band .seal {
+	width: 44px;
+	height: 44px;
+	border-radius: 12px;
+	background: var(--mas-blue-soft);
+	display: grid;
+	place-items: center;
+	font-size: 20px;
+	flex: none;
+}
+.mas-zatca-band b {
+	color: var(--mas-ink);
+}
+
+/* ── FAQ ── */
+.mas-faq-item {
+	background: var(--mas-surface);
+	border: 1px solid var(--mas-line);
+	border-radius: 16px;
+	overflow: hidden;
+	transition: border-color 0.3s, box-shadow 0.3s;
+}
+.mas-faq-item.open {
+	border-color: var(--mas-blue);
+	box-shadow: 0 14px 30px -22px var(--mas-glow);
+}
+.mas-faq-plus {
+	width: 28px;
+	height: 28px;
+	border-radius: 9px;
+	flex: none;
+	border: 1.5px solid var(--mas-line);
+	display: grid;
+	place-items: center;
+	font-family: var(--mas-mono);
+	color: var(--mas-blue-deep);
+	transition: transform 0.35s var(--mas-spring), background 0.3s,
+		border-color 0.3s;
+}
+.mas-faq-item.open .mas-faq-plus {
+	transform: rotate(45deg);
+	background: var(--mas-blue-soft);
+	border-color: var(--mas-blue);
+}
+
+/* ── chat card (AI section) ── */
+.mas-chat {
+	background: var(--mas-bg);
+	border-radius: 18px;
+	overflow: hidden;
+	box-shadow: 0 40px 80px -28px rgba(0, 0, 0, 0.55),
+		0 0 0 1px rgba(158, 199, 232, 0.14);
+}
+@media (hover: hover) and (pointer: fine) {
+	.mas-chat {
+		transform: perspective(1200px) rotateY(-3deg) rotateX(1.5deg);
+		transition: transform 0.6s var(--mas-ease);
+	}
+	[dir="rtl"] .mas-chat {
+		transform: perspective(1200px) rotateY(3deg) rotateX(1.5deg);
+	}
+	.mas-chat:hover,
+	[dir="rtl"] .mas-chat:hover {
+		transform: perspective(1200px) rotateY(0) rotateX(0);
+	}
+}
+.mas-chat-top {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 14px 18px;
+	border-bottom: 1px solid var(--mas-line);
+	background: var(--mas-surface);
+}
+.mas-chat-status {
+	font-size: 12px;
+	color: var(--mas-green);
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+.mas-chat-status::before {
+	content: "";
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--mas-green);
+	animation: masPingS 2s infinite;
+}
+@keyframes masPingS {
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 rgba(24, 160, 88, 0.5);
+	}
+	50% {
+		box-shadow: 0 0 0 5px rgba(24, 160, 88, 0);
+	}
+}
+.mas-msg {
+	max-width: 88%;
+	padding: 12px 16px;
+	border-radius: 15px;
+	font-size: 13.5px;
+	line-height: 1.7;
+	opacity: 0;
+	transform: translateY(14px) scale(0.97);
+	transition: opacity 0.55s var(--mas-ease), transform 0.55s var(--mas-spring);
+}
+.mas-chat.play .mas-msg {
+	opacity: 1;
+	transform: none;
+}
+.mas-msg.user {
+	background: linear-gradient(135deg, #38bdf8, var(--mas-blue-deep));
+	color: #fff;
+	justify-self: start;
+	border-start-start-radius: 5px;
+	box-shadow: 0 8px 18px -8px var(--mas-glow);
+}
+.mas-msg.bot {
+	background: var(--mas-surface);
+	border: 1px solid var(--mas-line);
+	color: var(--mas-ink);
+	justify-self: end;
+	border-start-end-radius: 5px;
+}
+.mas-msg.bot table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 8px 0;
+	font-size: 12.5px;
+}
+.mas-msg.bot td {
+	padding: 5px 0;
+	border-bottom: 1px dashed var(--mas-line);
+}
+.mas-msg.bot td:last-child {
+	text-align: end;
+	font-family: var(--mas-mono);
+	font-weight: 500;
+	direction: ltr;
+}
+.mas-msg.bot tr:last-child td {
+	border-bottom: none;
+	font-weight: 700;
+}
+.mas-msg.bot .good {
+	color: var(--mas-green);
+	font-weight: 600;
+	font-size: 12.5px;
+	display: block;
+	margin-top: 6px;
+}
+.mas-msg.typing {
+	display: flex;
+	gap: 5px;
+	padding: 16px 20px;
+	justify-self: end;
+	background: var(--mas-surface);
+	border: 1px solid var(--mas-line);
+}
+.mas-msg.typing i {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--mas-muted);
+	animation: masBlink 1.2s infinite;
+}
+.mas-msg.typing i:nth-child(2) {
+	animation-delay: 0.2s;
+}
+.mas-msg.typing i:nth-child(3) {
+	animation-delay: 0.4s;
+}
+@keyframes masBlink {
+	0%,
+	80%,
+	100% {
+		opacity: 0.25;
+	}
+	40% {
+		opacity: 1;
+	}
+}
+.mas-ai-points li {
+	display: flex;
+	gap: 14px;
+	align-items: flex-start;
+	color: rgba(234, 243, 251, 0.82);
+	line-height: 1.7;
+}
+.mas-ai-points .tick {
+	width: 26px;
+	height: 26px;
+	border-radius: 7px;
+	flex: none;
+	margin-top: 3px;
+	background: rgba(14, 165, 233, 0.16);
+	color: #5fbcf9;
+	display: grid;
+	place-items: center;
+	font-size: 12px;
+	font-weight: 700;
+}
+.mas-ai-points b {
+	color: var(--mas-paper-on-dark);
+}
+
+/* ── modules ticker (flat chips) ── */
+.mas-ticker {
+	border-block: 1px solid var(--mas-line);
+	background: var(--mas-bg-2);
+	overflow: hidden;
+	padding: 16px 0;
+	mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+	-webkit-mask-image: linear-gradient(
+		90deg,
+		transparent,
+		black 8%,
+		black 92%,
+		transparent
+	);
+}
+@keyframes masTick {
+	to {
+		transform: translateX(-50%);
+	}
+}
+.mas-ticker-track {
+	display: flex;
+	gap: 12px;
+	width: max-content;
+	direction: ltr;
+	animation: masTick 42s linear infinite;
+}
+.mas-ticker:hover .mas-ticker-track {
+	animation-play-state: paused;
+}
+.mas-tk {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	white-space: nowrap;
+	direction: rtl;
+	font-size: 13.5px;
+	font-weight: 600;
+	color: var(--mas-muted);
+	border: 1px solid var(--mas-line);
+	background: var(--mas-surface);
+	border-radius: 100px;
+	padding: 7px 16px;
+	transition: color 0.3s, border-color 0.3s;
+}
+.mas-tk:hover {
+	color: var(--mas-blue);
+	border-color: rgba(14, 165, 233, 0.4);
+}
+html[lang="en"] .mas-tk {
+	direction: ltr;
+}
+
+/* ── browser-frame screenshot ── */
+.mas-shot {
+	max-width: 1020px;
+	margin-inline: auto;
+	border-radius: 18px;
+	overflow: hidden;
+	border: 1px solid var(--mas-line);
+	background: var(--mas-surface);
+	box-shadow: 0 50px 100px -40px rgba(2, 20, 40, 0.4),
+		0 0 0 8px rgba(14, 165, 233, 0.05);
+	transition: transform 0.6s var(--mas-ease), box-shadow 0.6s;
+}
+@media (hover: hover) and (pointer: fine) {
+	.mas-shot:hover {
+		transform: translateY(-6px);
+		box-shadow: 0 60px 110px -40px rgba(2, 20, 40, 0.5),
+			0 0 0 8px rgba(14, 165, 233, 0.08);
+	}
+}
+.mas-shot-bar {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	direction: ltr;
+	padding: 11px 16px;
+	background: var(--mas-bg-2);
+	border-bottom: 1px solid var(--mas-line);
+}
+.mas-shot-bar i {
+	width: 11px;
+	height: 11px;
+	border-radius: 50%;
+}
+.mas-shot-bar i:nth-child(1) {
+	background: #f87171;
+}
+.mas-shot-bar i:nth-child(2) {
+	background: #fbbf24;
+}
+.mas-shot-bar i:nth-child(3) {
+	background: #34d399;
+}
+.mas-shot-bar span {
+	margin-inline: auto;
+	font-family: var(--mas-mono);
+	font-size: 11.5px;
+	color: var(--mas-subtle);
+	background: var(--mas-surface);
+	border: 1px solid var(--mas-line);
+	border-radius: 100px;
+	padding: 3px 18px;
+	direction: ltr;
+}
+
+/* ── zatca chip (hero) ── */
+.mas-zatca-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	background: var(--mas-surface);
+	border: 1px solid var(--mas-line);
+	border-radius: 100px;
+	padding: 7px 16px;
+	font-size: 12.5px;
+	font-weight: 600;
+	color: var(--mas-blue-deep);
+	box-shadow: 0 6px 16px -10px var(--mas-glow);
+}
+.mas-zatca-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--mas-blue);
+	flex: none;
+	position: relative;
+}
+.mas-zatca-dot::after {
+	content: "";
+	position: absolute;
+	inset: -4px;
+	border-radius: 50%;
+	border: 1.5px solid var(--mas-blue);
+	opacity: 0;
+	animation: lpPing 2.2s var(--mas-ease) infinite;
+}
+
+/* ── reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+	.mas-hero,
+	.mas-hero::before,
+	.mas-blob,
+	.mas-ticker-track,
+	.mas-zatca-dot::after {
+		animation: none !important;
+	}
+	.mas-stage,
+	.mas-rv,
+	.mas-station,
+	.mas-msg {
+		opacity: 1 !important;
+		transform: none !important;
+		filter: none !important;
+		animation: none !important;
+	}
+	.mas-path-word path {
+		stroke-dashoffset: 0 !important;
+		animation: none !important;
+	}
+	.mas-bar,
+	.vis .mas-bar {
+		width: var(--w);
+		transition: none;
+	}
+	.vis .mas-pb i {
+		width: var(--w);
+		transition: none;
+	}
 }
 
 /* ═══════════════════════════════════════════════

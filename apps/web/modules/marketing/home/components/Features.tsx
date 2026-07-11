@@ -1,264 +1,402 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
-import {
-	LayoutDashboard,
-	HardHat,
-	Receipt,
-	Calculator,
-	FileSignature,
-	UserCheck,
-	ShieldCheck,
-	Check,
-	ArrowLeft,
-	type LucideIcon,
-} from "lucide-react";
 
-interface FeatureConfig {
-	icon: LucideIcon;
-	color: string;
+/**
+ * Feature "stations" — the journey line from the hero continues here:
+ * a dashed spine with numbered nodes, each station pairing copy with a
+ * hand-crafted mini mockup of the real product screen.
+ *
+ * Station order follows the project journey (and the hero path strip):
+ * pricing → contracts → execution → finance → owner portal.
+ * The dashboard feature sits above them all as the "watchtower" card.
+ */
+
+function StationCopy({
+	itemKey,
+	tagCount,
+	isNew,
+}: {
+	itemKey: string;
+	tagCount: number;
 	isNew?: boolean;
-	subCount: number;
+}) {
+	const t = useTranslations();
+	return (
+		<div className="mas-station-copy">
+			<span className="mas-kicker">
+				{t(`features.items.${itemKey}.kicker`)}
+				{isNew && (
+					<span
+						className="not-italic rounded-full px-2.5 py-0.5 text-[11px] font-bold ms-2"
+						style={{
+							background: "var(--mas-yellow-bg)",
+							color: "var(--mas-yellow)",
+						}}
+					>
+						{t("features.newBadge")}
+					</span>
+				)}
+			</span>
+			<h3 className="mt-1">{t(`features.items.${itemKey}.title`)}</h3>
+			<p>{t(`features.items.${itemKey}.description`)}</p>
+			<div className="mas-tags">
+				{Array.from({ length: tagCount }, (_, i) => (
+					<span key={`${itemKey}-${i + 1}`}>
+						{t(`features.items.${itemKey}.sub.${i + 1}`)}
+					</span>
+				))}
+			</div>
+		</div>
+	);
 }
-
-const features: FeatureConfig[] = [
-	{ icon: LayoutDashboard, color: "#0ea5e9", subCount: 3 },
-	{ icon: HardHat, color: "#3B82F6", subCount: 3 },
-	{ icon: Receipt, color: "#F59E0B", subCount: 3 },
-	{ icon: Calculator, color: "#0ea5e9", isNew: true, subCount: 4 },
-	{ icon: FileSignature, color: "#8B5CF6", subCount: 3 },
-	{ icon: UserCheck, color: "#EF4444", subCount: 3 },
-	{ icon: ShieldCheck, color: "#06B6D4", subCount: 2 },
-];
-
-const featureKeys = ["1", "2", "3", "4", "5", "6", "7"] as const;
 
 export function Features() {
 	const t = useTranslations();
-	const [activeFeature, setActiveFeature] = useState(0);
-
-	useEffect(() => {
-		const iv = setInterval(
-			() => setActiveFeature((p) => (p + 1) % 7),
-			5000,
-		);
-		return () => clearInterval(iv);
-	}, []);
+	const v = useTranslations("landingVisuals");
 
 	return (
 		<section
 			id="features"
-			className="scroll-my-20 relative py-28 px-6"
-			style={{
-				background:
-					"linear-gradient(180deg, var(--lp-bg) 0%, var(--lp-bg-section) 50%, var(--lp-bg) 100%)",
-			}}
+			className="scroll-mt-16 py-24 md:py-32 px-6"
+			style={{ background: "var(--mas-bg)" }}
 		>
-			{/* Background glow */}
-			<div
-				className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[1000px] h-[600px] rounded-[50%] pointer-events-none"
-				style={{
-					background:
-						"conic-gradient(from 0deg, rgba(14,165,233,0.04), rgba(59,130,246,0.04), rgba(139,92,246,0.03), rgba(14,165,233,0.04))",
-					filter: "blur(120px)",
-					opacity: "var(--lp-effects-opacity)",
-				}}
-			/>
-
-			<div className="max-w-[1200px] mx-auto relative z-[2]">
+			<div className="max-w-[1180px] mx-auto">
 				{/* Header */}
-				<div className="text-center mb-[72px]">
-					<div
-						className="landing-section-label"
-						style={{
-							background:
-								"linear-gradient(135deg, rgba(14,165,233,0.06), rgba(6,182,212,0.04))",
-							border: "1px solid rgba(14,165,233,0.12)",
-							color: "#0ea5e9",
-						}}
-					>
-						<span
-							className="landing-dot"
-							style={{
-								background:
-									"linear-gradient(135deg, #0ea5e9, #06B6D4)",
-							}}
-						/>
-						{t("features.label")}
-					</div>
-					<h2
-						className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3] max-w-[550px] mx-auto"
-						style={{ color: "var(--lp-text)" }}
-					>
-						{t("features.title")}
-					</h2>
-					<p
-						className="text-[17px] mt-4 max-w-[480px] mx-auto"
-						style={{ color: "var(--lp-text-subtle)" }}
-					>
-						{t("features.description")}
-					</p>
+				<div className="mas-sec-head mas-rv max-w-[660px] mx-auto text-center mb-12 md:mb-16">
+					<span className="mas-dim">{t("features.label")}</span>
+					<h2>{t("features.title")}</h2>
+					<p>{t("features.description")}</p>
 				</div>
 
-				{/* Feature Grid */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-5">
-					{featureKeys.map((key, i) => {
-						const f = features[i];
-						const isActive = activeFeature === i;
-						const isTopRow = i < 3;
-						const Icon = f.icon;
+				{/* Watchtower — the dashboard above all stations */}
+				<div className="mas-tower mas-rv mb-10 md:mb-14">
+					<div>
+						<span className="mas-kicker">
+							{t("features.items.1.kicker")}
+						</span>
+						<h3
+							className="text-[clamp(1.25rem,0.8vw+1rem,1.5rem)] font-extrabold mt-1 mb-2"
+							style={{ color: "var(--mas-ink)" }}
+						>
+							{t("features.items.1.title")}
+						</h3>
+						<p
+							className="mb-4 leading-[1.8]"
+							style={{ color: "var(--mas-muted)" }}
+						>
+							{t("features.items.1.description")}
+						</p>
+						<div className="mas-tags">
+							{([1, 2, 3] as const).map((i) => (
+								<span key={i}>
+									{t(`features.items.1.sub.${i}`)}
+								</span>
+							))}
+						</div>
+					</div>
+					<div aria-hidden="true">
+						<div className="mas-quad mb-3.5">
+							<div className="mas-q blue">
+								<b>2</b>
+								<span>{v("tower.active")}</span>
+							</div>
+							<div className="mas-q green">
+								<b>5</b>
+								<span>{v("tower.done")}</span>
+							</div>
+							<div className="mas-q yellow">
+								<b>0</b>
+								<span>{v("tower.pending")}</span>
+							</div>
+							<div className="mas-q red">
+								<b>0</b>
+								<span>{v("tower.issues")}</span>
+							</div>
+						</div>
+						<div className="mas-mini-label mb-1.5">
+							<span>{v("tower.overall")}</span>
+							<b>74%</b>
+						</div>
+						<div className="mas-bar-wrap">
+							<span
+								className="mas-bar"
+								style={{ "--w": "74%" } as React.CSSProperties}
+							/>
+						</div>
+					</div>
+				</div>
 
-						return (
+				{/* Stations */}
+				<div className="mas-stations">
+					{/* 01 — Pricing & quantities */}
+					<article className="mas-station" id="st-1">
+						<span className="mas-station-node">01</span>
+						<div className="mas-station-grid">
+							<StationCopy itemKey="4" tagCount={4} isNew />
 							<div
-								key={key}
-								onClick={() => setActiveFeature(i)}
-								className={`landing-glow-card cursor-pointer transition-transform duration-300 hover:-translate-y-1 ${
-									isTopRow
-										? "lg:col-span-4"
-										: "lg:col-span-3"
-								}`}
-								style={{
-									background:
-										f.isNew && !isActive
-											? "linear-gradient(135deg, rgba(14,165,233,0.25), rgba(6,182,212,0.15), rgba(14,165,233,0.25))"
-											: isActive
-												? `linear-gradient(135deg, ${f.color}90, ${f.color}20, ${f.color}70)`
-												: "linear-gradient(135deg, var(--lp-card-border), transparent)",
-									boxShadow: f.isNew
-										? "0 0 30px rgba(14,165,233,0.12)"
-										: undefined,
-								}}
+								className="mas-station-visual"
+								aria-hidden="true"
 							>
-								<div
-									className="landing-glow-card-inner relative"
-									style={{
-										background: isActive
-											? `linear-gradient(160deg, ${f.color}14, var(--lp-glow-card-bg))`
-											: undefined,
-									}}
-								>
-									{/* New Badge */}
-									{f.isNew && (
-										<span
-											className="absolute top-4 end-4 text-[11px] font-bold px-3 py-1 rounded-full z-10"
-											style={{
-												background:
-													"linear-gradient(135deg, #0ea5e9, #06B6D4)",
-												color: "#ffffff",
-												boxShadow:
-													"0 0 20px rgba(14,165,233,0.3)",
-											}}
-										>
-											{t("features.newBadge")}
-										</span>
-									)}
-
-									{/* Icon */}
-									<div
-										className="w-[48px] h-[48px] rounded-xl flex items-center justify-center mb-5"
-										style={{
-											background:
-												"rgba(14,165,233,0.10)",
-											border: "1px solid rgba(14,165,233,0.15)",
-										}}
-									>
-										<Icon
-											size={28}
-											color="#0ea5e9"
-											strokeWidth={1.8}
-										/>
-									</div>
-
-									{/* Kicker */}
-									<p
-										className="text-[12px] font-semibold tracking-wide mb-1"
-										style={{ color: "#0ea5e9" }}
-									>
-										{t(
-											`features.items.${key}.kicker`,
-										)}
-									</p>
-
-									{/* Title */}
-									<h3
-										className="text-[19px] font-bold mb-2.5"
-										style={{
-											color: "var(--lp-text)",
-										}}
-									>
-										{t(
-											`features.items.${key}.title`,
-										)}
-									</h3>
-
-									{/* Description */}
-									<p
-										className="text-sm leading-[1.75] mb-4"
-										style={{
-											color: "var(--lp-text-muted)",
-										}}
-									>
-										{t(
-											`features.items.${key}.description`,
-										)}
-									</p>
-
-									{/* Sub-bullets */}
-									<div className="space-y-1.5 mb-4">
-										{Array.from(
-											{ length: f.subCount },
-											(_, si) => (
-												<div
-													key={si}
-													className="flex items-start gap-2"
-												>
-													<Check
-														size={16}
-														color="#0ea5e9"
-														className="mt-0.5 shrink-0"
-													/>
-													<span
-														className="text-[13px] leading-[1.6]"
-														style={{
-															color: "var(--lp-text-muted)",
-														}}
-													>
-														{t(
-															`features.items.${key}.sub.${si + 1}`,
-														)}
-													</span>
-												</div>
-											),
-										)}
-									</div>
-
-									{/* Learn More */}
-									<span
-										className="inline-flex items-center gap-1.5 text-[13px] font-semibold group cursor-pointer"
-										style={{ color: "#0ea5e9" }}
-									>
-										{t("features.learnMore")}
-										<ArrowLeft
-											size={14}
-											className="rtl-flip transition-transform group-hover:-translate-x-1"
-										/>
+								<div className="mas-proj-head">
+									<span className="mas-pj-t">
+										{v("pricing.project")}
+									</span>
+									<span className="mas-chip-draft">
+										{v("pricing.draft")}
 									</span>
 								</div>
-
-								{/* Glow effect when active */}
-								{isActive && (
-									<div
-										className="absolute -inset-[2px] rounded-[30px] -z-10"
-										style={{
-											background: `radial-gradient(circle at 50% 0%, ${f.color}35, transparent 55%)`,
-											filter: "blur(40px)",
-										}}
-									/>
-								)}
+								<div className="mas-flow">
+									<div className="mas-fstep done">
+										<i>✓</i>
+										<span>{v("pricing.steps.qty")}</span>
+										<em>{v("pricing.approved")}</em>
+									</div>
+									<span className="mas-fline" />
+									<div className="mas-fstep done">
+										<i>✓</i>
+										<span>{v("pricing.steps.specs")}</span>
+										<em>{v("pricing.approved")}</em>
+									</div>
+									<span className="mas-fline" />
+									<div className="mas-fstep done">
+										<i>✓</i>
+										<span>{v("pricing.steps.cost")}</span>
+										<em>{v("pricing.approved")}</em>
+									</div>
+									<span className="mas-fline" />
+									<div className="mas-fstep act">
+										<i>$</i>
+										<span>{v("pricing.steps.price")}</span>
+										<em>{v("pricing.wip")}</em>
+									</div>
+								</div>
+								<div className="mas-fin3">
+									<div className="mas-fc">
+										<span>{v("pricing.concrete")}</span>
+										<b className="mas-c-blue">
+											1,551.58{" "}
+											<i>{v("pricing.concreteUnit")}</i>
+										</b>
+									</div>
+									<div className="mas-fc">
+										<span>{v("pricing.steel")}</span>
+										<b className="mas-c-red">
+											137.39{" "}
+											<i>{v("pricing.steelUnit")}</i>
+										</b>
+									</div>
+									<div className="mas-fc">
+										<span>{v("pricing.block")}</span>
+										<b className="mas-c-green">
+											115,500{" "}
+											<i>{v("pricing.blockUnit")}</i>
+										</b>
+									</div>
+								</div>
+								<div className="mas-badge-line">
+									<span className="mas-chip-red">
+										{v("pricing.convert")}
+									</span>
+									<span
+										className="text-[12px]"
+										style={{ color: "var(--mas-muted)" }}
+									>
+										{v("pricing.convertHint")}
+									</span>
+								</div>
 							</div>
-						);
-					})}
+						</div>
+					</article>
+
+					{/* 02 — Contracts & subcontractors */}
+					<article className="mas-station" id="st-2">
+						<span className="mas-station-node">02</span>
+						<div className="mas-station-grid">
+							<StationCopy itemKey="5" tagCount={3} />
+							<div
+								className="mas-station-visual"
+								aria-hidden="true"
+							>
+								<div className="mas-badge-line">
+									<span className="ok">✓</span>{" "}
+									{v("contracts.l1")}
+								</div>
+								<div className="mas-badge-line">
+									<span className="ok">✓</span>{" "}
+									{v("contracts.l2")}
+								</div>
+								<div className="mas-badge-line">
+									<span className="ok">✓</span>{" "}
+									{v("contracts.l3")}
+								</div>
+							</div>
+						</div>
+					</article>
+
+					{/* 03 — Field execution */}
+					<article className="mas-station" id="st-3">
+						<span className="mas-station-node">03</span>
+						<div className="mas-station-grid">
+							<StationCopy itemKey="2" tagCount={3} />
+							<div
+								className="mas-station-visual"
+								aria-hidden="true"
+							>
+								<div className="mas-ringrow">
+									<div
+										className="mas-ring"
+										style={
+											{ "--p": 15 } as React.CSSProperties
+										}
+									>
+										<span className="mas-ring-in">
+											<b>15%</b>
+											<span>
+												{v("execution.progress")}
+											</span>
+										</span>
+									</div>
+									<div className="mas-phases">
+										{(
+											[
+												["p1", "100%"],
+												["p2", "100%"],
+												["p3", "0%"],
+												["p4", "0%"],
+											] as const
+										).map(([key, w]) => (
+											<div className="mas-ph" key={key}>
+												<span>
+													{v(
+														`execution.phases.${key}`,
+													)}
+												</span>
+												<span className="mas-pb">
+													<i
+														style={
+															{
+																"--w": w,
+															} as React.CSSProperties
+														}
+													/>
+												</span>
+												<b>{w}</b>
+											</div>
+										))}
+									</div>
+								</div>
+								<div className="mas-mini-label">
+									<span>{v("execution.milestones")}</span>
+									<b>2/13</b>
+								</div>
+								<div className="mas-badge-line">
+									<span className="ok">✓</span>{" "}
+									{v("execution.report")}
+								</div>
+							</div>
+						</div>
+					</article>
+
+					{/* 04 — Finance & invoicing */}
+					<article className="mas-station" id="st-4">
+						<span className="mas-station-node">04</span>
+						<div className="mas-station-grid">
+							<StationCopy itemKey="3" tagCount={3} />
+							<div
+								className="mas-station-visual"
+								aria-hidden="true"
+							>
+								<div className="mas-mini-label">
+									<span>{v("finance.header")}</span>
+									<b>{v("finance.contract")}</b>
+								</div>
+								<div className="mas-fin3">
+									<div className="mas-fc">
+										<span>{v("finance.received")}</span>
+										<b className="mas-c-blue">685,000</b>
+									</div>
+									<div className="mas-fc">
+										<span>{v("finance.spent")}</span>
+										<b className="mas-c-red">245,000</b>
+									</div>
+									<div className="mas-fc">
+										<span>{v("finance.profit")}</span>
+										<b className="mas-c-green">2,342,921</b>
+									</div>
+								</div>
+								<div className="mas-mini-label">
+									<span>{v("finance.budget")}</span>
+									<b>29%</b>
+								</div>
+								<div className="mas-bar-wrap">
+									<span
+										className="mas-bar"
+										style={
+											{
+												"--w": "29%",
+											} as React.CSSProperties
+										}
+									/>
+								</div>
+								<div className="mas-badge-line">
+									<span className="ok">✓</span>{" "}
+									{v("finance.invoice")}
+								</div>
+							</div>
+						</div>
+					</article>
+
+					{/* 05 — Owner portal */}
+					<article className="mas-station" id="st-5">
+						<span className="mas-station-node">05</span>
+						<div className="mas-station-grid">
+							<StationCopy itemKey="6" tagCount={3} />
+							<div
+								className="mas-station-visual"
+								aria-hidden="true"
+							>
+								<div className="mas-proj-head">
+									<span className="mas-pj-t">
+										{v("owner.project")}
+									</span>
+									<span className="mas-chip-live">
+										{v("owner.live")}
+									</span>
+								</div>
+								<div className="mas-mini-row">
+									<span>{v("owner.contract")}</span>
+									<span className="mas-num">
+										2,109,043 SAR
+									</span>
+								</div>
+								<div className="mas-mini-row">
+									<span>{v("owner.adjusted")}</span>
+									<span className="mas-num pos">
+										2,342,921 SAR
+									</span>
+								</div>
+								<div className="mas-mini-label">
+									<span>{v("owner.days")}</span>
+									<b>16%</b>
+								</div>
+								<div className="mas-bar-wrap">
+									<span
+										className="mas-bar"
+										style={
+											{
+												"--w": "16%",
+											} as React.CSSProperties
+										}
+									/>
+								</div>
+								<div className="mas-badge-line">
+									<span className="ok">✓</span>{" "}
+									{v("owner.payment")}
+								</div>
+							</div>
+						</div>
+					</article>
 				</div>
 			</div>
 		</section>

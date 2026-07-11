@@ -2,268 +2,180 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef } from "react";
 import { DashboardPreview } from "./DashboardPreview";
 import { PathStrip } from "./PathStrip";
-
-function MeshBackground() {
-	return (
-		<div className="absolute inset-0 overflow-hidden pointer-events-none">
-			<div className="landing-orb landing-orb-1" />
-			<div className="landing-orb landing-orb-2" />
-			<div className="landing-orb landing-orb-3" />
-			<div className="landing-orb landing-orb-4" />
-			<div className="landing-noise" />
-			<div className="landing-grid" />
-			<div className="landing-glow-line" />
-		</div>
-	);
-}
-
-function ParticleField() {
-	const canvasRef = useRef<HTMLCanvasElement>(null);
-
-	useEffect(() => {
-		const canvas = canvasRef.current;
-		if (!canvas) return;
-		// Heavy O(n²) effect — skip on phones and for reduced-motion users
-		if (
-			window.matchMedia(
-				"(max-width: 767px), (prefers-reduced-motion: reduce)",
-			).matches
-		) {
-			return;
-		}
-		const ctx = canvas.getContext("2d");
-		if (!ctx) return;
-
-		let w: number;
-		let h: number;
-		let animId: number;
-		const colors = [
-			"14,165,233",
-			"59,130,246",
-			"139,92,246",
-			"6,182,212",
-		];
-
-		const resize = () => {
-			w = canvas.width = canvas.offsetWidth;
-			h = canvas.height = canvas.offsetHeight;
-		};
-		resize();
-		window.addEventListener("resize", resize);
-
-		const particles = Array.from({ length: 70 }, () => ({
-			x: Math.random() * (w || 800),
-			y: Math.random() * (h || 600),
-			vx: (Math.random() - 0.5) * 0.4,
-			vy: (Math.random() - 0.5) * 0.4,
-			r: Math.random() * 2 + 0.5,
-			c: colors[Math.floor(Math.random() * colors.length)],
-			o: Math.random() * 0.5 + 0.15,
-		}));
-
-		const draw = () => {
-			ctx.clearRect(0, 0, w, h);
-			for (let i = 0; i < particles.length; i++) {
-				const p = particles[i];
-				p.x += p.vx;
-				p.y += p.vy;
-				if (p.x < 0 || p.x > w) p.vx *= -1;
-				if (p.y < 0 || p.y > h) p.vy *= -1;
-				ctx.beginPath();
-				ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-				ctx.fillStyle = `rgba(${p.c},${p.o})`;
-				ctx.fill();
-				for (let j = i + 1; j < particles.length; j++) {
-					const dx = p.x - particles[j].x;
-					const dy = p.y - particles[j].y;
-					const dist = Math.sqrt(dx * dx + dy * dy);
-					if (dist < 100) {
-						ctx.beginPath();
-						ctx.moveTo(p.x, p.y);
-						ctx.lineTo(particles[j].x, particles[j].y);
-						ctx.strokeStyle = `rgba(${p.c},${0.05 * (1 - dist / 100)})`;
-						ctx.stroke();
-					}
-				}
-			}
-			animId = requestAnimationFrame(draw);
-		};
-		draw();
-
-		return () => {
-			cancelAnimationFrame(animId);
-			window.removeEventListener("resize", resize);
-		};
-	}, []);
-
-	return (
-		<canvas
-			ref={canvasRef}
-			className="absolute inset-0 w-full h-full pointer-events-none"
-			style={{ opacity: "var(--lp-effects-opacity)" }}
-		/>
-	);
-}
 
 export function Hero() {
 	const t = useTranslations();
 
+	// "mas-entered" is static: the staged entrance is pure CSS, so it plays
+	// on first paint without waiting for hydration (better LCP, no blank hero).
 	return (
 		<section
-			className="relative min-h-screen overflow-hidden flex items-center pt-44 pb-12 px-6"
-			style={{ background: "var(--lp-bg)" }}
+			className="mas-hero mas-entered pt-40 pb-16 px-6 md:pt-44 md:pb-24"
+			id="top"
 		>
-			{/* Light mode animated background */}
-			<div className="landing-light-bg">
-				<div className="landing-light-blob" />
-			</div>
-			<MeshBackground />
-			<ParticleField />
-			{/* Radial vignette */}
+			{/* drifting aurora blobs */}
 			<div
-				className="absolute inset-0 pointer-events-none"
-				style={{
-					background:
-						"radial-gradient(ellipse at center, transparent 40%, var(--lp-bg) 80%)",
-				}}
-			/>
+				className="absolute inset-0 overflow-hidden pointer-events-none"
+				aria-hidden="true"
+			>
+				<span className="mas-blob mas-blob-1" />
+				<span className="mas-blob mas-blob-2" />
+			</div>
 
-			<div className="relative z-10 max-w-[1200px] mx-auto w-full">
-				<div className="max-w-[780px] mx-auto text-center">
-					{/* Badge */}
-					<div className="animate-fade-in mb-9">
-						<div
-							className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full"
-							style={{
-								background:
-									"linear-gradient(135deg, rgba(14,165,233,0.08), rgba(6,182,212,0.06))",
-								border: "1px solid rgba(14,165,233,0.15)",
-							}}
-						>
-							<span className="text-[#0ea5e9] text-sm font-semibold">
-								{t("hero.badge")}
-							</span>
-						</div>
+			<div className="relative z-10 max-w-[1180px] mx-auto w-full">
+				<div className="max-w-[800px] mx-auto text-center">
+					{/* dimension eyebrow */}
+					<div
+						className="mas-stage"
+						style={{ "--i": 0 } as React.CSSProperties}
+					>
+						<span className="mas-dim">{t("hero.badge")}</span>
 					</div>
 
 					{/* Title */}
-					<div className="animate-fade-in-delay-1">
-						<h1
-							className="text-[clamp(1.6rem,4.5vw,3.2rem)] font-black leading-[1.25] mb-4"
-							style={{ color: "var(--lp-text)" }}
-						>
-							{t("hero.titleDesc")}
-						</h1>
-					</div>
+					<h1
+						className="mas-stage text-[clamp(1.9rem,4.6vw+0.6rem,3.6rem)] font-black leading-[1.3] mt-7 text-balance"
+						style={
+							{
+								"--i": 1,
+								color: "var(--mas-ink)",
+							} as React.CSSProperties
+						}
+					>
+						{t("hero.titleA")}{" "}
+						<span className="mas-path-word">
+							{t("hero.titleB")}
+							<svg
+								viewBox="0 0 90 14"
+								preserveAspectRatio="none"
+								aria-hidden="true"
+							>
+								<path d="M4 10 C 28 3, 60 12, 86 5" />
+							</svg>
+						</span>
+					</h1>
 
-					{/* Subtitle — sky blue */}
-					<div className="animate-fade-in-delay-1">
-						<p
-							className="text-[clamp(1rem,2.8vw,1.75rem)] font-semibold leading-[1.4] mb-4"
-							style={{ color: "#0ea5e9" }}
-						>
-							{t("hero.subtitle")}
-						</p>
-					</div>
+					{/* Blue subline */}
+					<p
+						className="mas-stage text-[clamp(1.05rem,2.4vw,1.4rem)] font-bold mt-6"
+						style={
+							{
+								"--i": 2,
+								color: "var(--mas-blue-deep)",
+							} as React.CSSProperties
+						}
+					>
+						{t("hero.subtitle")}
+					</p>
 
-					{/* Journey path — clickable stations */}
-					<div className="animate-fade-in-delay-2 mb-6">
+					{/* Signature journey path */}
+					<div
+						className="mas-stage mt-8 md:mt-10 flex justify-center"
+						style={{ "--i": 3 } as React.CSSProperties}
+					>
 						<PathStrip />
 					</div>
 
-					{/* Description */}
-					<div className="animate-fade-in-delay-2">
-						<p
-							className="text-[clamp(0.85rem,1.8vw,1.15rem)] leading-[1.8] mb-12 max-w-2xl mx-auto"
-							style={{ color: "var(--lp-text-muted)" }}
+					{/* Lead */}
+					<p
+						className="mas-stage text-[clamp(0.95rem,1.6vw,1.15rem)] leading-[1.9] mt-8 max-w-[620px] mx-auto"
+						style={
+							{
+								"--i": 4,
+								color: "var(--mas-muted)",
+							} as React.CSSProperties
+						}
+					>
+						{t.rich("hero.lead", {
+							b: (chunks) => (
+								<b
+									className="font-semibold"
+									style={{ color: "var(--mas-ink)" }}
+								>
+									{chunks}
+								</b>
+							),
+						})}
+					</p>
+
+					{/* CTAs */}
+					<div
+						className="mas-stage flex flex-col sm:flex-row items-center justify-center gap-4 mt-10"
+						style={{ "--i": 5 } as React.CSSProperties}
+					>
+						<Link
+							href="/auth/signup"
+							className="mas-btn mas-btn-primary"
 						>
-							{t("hero.description")}
-						</p>
+							{t("hero.cta")}
+							<span className="rtl-flip" aria-hidden="true">
+								→
+							</span>
+						</Link>
+						<a href="#features" className="mas-btn mas-btn-ghost">
+							{t("hero.secondary")}
+							<span className="opacity-60" aria-hidden="true">
+								↓
+							</span>
+						</a>
 					</div>
 
-					{/* CTA buttons (start side) + trust column beside them */}
-					<div className="animate-fade-in-delay-3">
-						<div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
-							<div className="flex flex-col sm:flex-row items-center gap-4">
-								<Link
-									href="/auth/signup"
-									className="btn-premium btn-premium-primary"
-								>
-									{t("hero.cta")}
-									<span className="text-xl rtl-flip">→</span>
-								</Link>
-								<a
-									href="#features"
-									className="btn-premium btn-premium-ghost"
-								>
-									{t("hero.secondary")}
-									<span className="text-base opacity-50">↓</span>
-								</a>
-							</div>
-
-							<div className="flex flex-col items-center lg:items-start gap-3">
-								{/* ZATCA trust chip */}
-								<span className="lp-zatca-chip">
-									<span className="lp-zatca-dot" aria-hidden="true" />
-									{t("hero.zatcaChip")}
-								</span>
-
-								{/* Social Proof */}
-								<div className="flex items-center gap-4">
-									<div className="flex">
-										{["#0ea5e9", "#3B82F6", "#F59E0B", "#8B5CF6"].map(
-											(color, i) => (
-												<div
-													key={color}
-													className="w-10 h-10 rounded-full flex items-center justify-center text-sm text-white font-bold"
-													style={{
-														background: `linear-gradient(135deg, ${color}, ${color}99)`,
-														border: `3px solid var(--lp-avatar-ring)`,
-														marginInlineStart:
-															i > 0 ? -10 : 0,
-														boxShadow: `0 0 12px ${color}33`,
-													}}
-												>
-													{["م", "ع", "خ", "ف"][i]}
-												</div>
-											),
-										)}
-									</div>
-									<div className="text-start">
-										<div className="flex gap-0.5 mb-1">
-											{[1, 2, 3, 4, 5].map((i) => (
-												<span
-													key={i}
-													className="text-[#F59E0B] text-sm"
-													style={{
-														textShadow:
-															"0 0 8px rgba(245,158,11,0.4)",
-													}}
-												>
-													★
-												</span>
-											))}
-										</div>
-										<p
-											className="text-[13px] font-medium"
-											style={{
-												color: "var(--lp-text-subtle)",
-											}}
-										>
-											{t("hero.proof")}
-										</p>
-									</div>
-								</div>
-							</div>
+					{/* Trust row */}
+					<div
+						className="mas-stage mt-9 flex flex-col items-center gap-4"
+						style={{ "--i": 6 } as React.CSSProperties}
+					>
+						<span className="mas-zatca-chip">
+							<span
+								className="mas-zatca-dot"
+								aria-hidden="true"
+							/>
+							{t("hero.zatcaChip")}
+						</span>
+						<div className="flex items-center gap-3 flex-wrap justify-center">
+							<span className="flex" aria-hidden="true">
+								{[
+									"#0284c7",
+									"#0ea5e9",
+									"#0a4e86",
+									"#38bdf8",
+								].map((color, i) => (
+									<i
+										key={color}
+										className="w-8 h-8 rounded-full grid place-items-center not-italic text-[12px] text-white font-bold"
+										style={{
+											background: color,
+											border: "2px solid var(--mas-bg)",
+											marginInlineStart: i > 0 ? -9 : 0,
+										}}
+									>
+										{["م", "ع", "خ", "ف"][i]}
+									</i>
+								))}
+							</span>
+							<span
+								className="text-[#f5a623] text-[13px] tracking-[2px]"
+								aria-hidden="true"
+							>
+								★★★★★
+							</span>
+							<span
+								className="text-[13px]"
+								style={{ color: "var(--mas-muted)" }}
+							>
+								{t("hero.proof")}
+							</span>
 						</div>
 					</div>
 				</div>
 
-				{/* Dashboard preview — real app screenshot in a browser frame */}
-				<div className="animate-fade-in-delay-4 mt-16 md:mt-20">
+				{/* Dashboard screenshot in a browser frame */}
+				<div
+					className="mas-stage mt-16 md:mt-20"
+					style={{ "--i": 7 } as React.CSSProperties}
+				>
 					<DashboardPreview />
 				</div>
 			</div>

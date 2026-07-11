@@ -1,11 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { TurnstileInstance } from "@marsidev/react-turnstile";
 import {
 	type ContactFormValues,
 	contactFormSchema,
 } from "@repo/api/modules/contact/types";
-import type { TurnstileInstance } from "@marsidev/react-turnstile";
 import { TurnstileWidget } from "@shared/components/TurnstileWidget";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useMutation } from "@tanstack/react-query";
@@ -36,9 +36,7 @@ export function ContactForm() {
 	);
 
 	const form = useForm<Omit<ContactFormValues, "turnstileToken">>({
-		resolver: zodResolver(
-			contactFormSchema.omit({ turnstileToken: true }),
-		),
+		resolver: zodResolver(contactFormSchema.omit({ turnstileToken: true })),
 		defaultValues: {
 			name: "",
 			email: "",

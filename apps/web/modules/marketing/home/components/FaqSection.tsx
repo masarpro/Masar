@@ -20,42 +20,32 @@ function FAQItem({
 	onToggle: () => void;
 }) {
 	return (
-		<div style={{ borderBottom: "1px solid var(--lp-faq-divider)" }}>
+		<div className={cn("mas-faq-item", isOpen && "open")}>
 			<button
 				type="button"
 				onClick={onToggle}
-				className="w-full flex items-center justify-between py-6 bg-transparent border-none cursor-pointer text-start gap-4"
+				className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-transparent border-none cursor-pointer text-start"
 			>
 				<span
-					className="text-[17px] font-semibold flex-1"
-					style={{ color: "var(--lp-text)" }}
+					className="text-[16px] font-bold flex-1"
+					style={{ color: "var(--mas-ink)" }}
 				>
 					{question}
 				</span>
-				<span
-					className="w-8 h-8 rounded-[10px] flex items-center justify-center text-lg shrink-0 transition-all duration-[400ms]"
-					style={{
-						background: isOpen
-							? "linear-gradient(135deg, #0ea5e9, #06B6D4)"
-							: "var(--lp-card-bg)",
-						color: isOpen ? "white" : "var(--lp-text-subtle)",
-						transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
-						transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)",
-					}}
-				>
+				<span className="mas-faq-plus" aria-hidden="true">
 					+
 				</span>
 			</button>
 			<div
 				className="overflow-hidden transition-[max-height] duration-[400ms]"
 				style={{
-					maxHeight: isOpen ? 200 : 0,
-					transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)",
+					maxHeight: isOpen ? 300 : 0,
+					transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)",
 				}}
 			>
 				<p
-					className="text-[15px] leading-[1.8] pb-6"
-					style={{ color: "var(--lp-text-muted)" }}
+					className="text-[14.5px] leading-[1.9] px-6 pb-6"
+					style={{ color: "var(--mas-muted)" }}
 				>
 					{answer}
 				</p>
@@ -72,47 +62,22 @@ export function FaqSection({ className }: { className?: string }) {
 
 	return (
 		<section
-			className={cn("scroll-mt-20 py-28 px-6", className)}
+			className={cn("scroll-mt-20 py-24 md:py-32 px-6", className)}
 			id="faq"
-			style={{ background: "var(--lp-bg)" }}
+			style={{
+				background: "var(--mas-bg-2)",
+				borderTop: "1px solid var(--mas-line)",
+			}}
 		>
-			<div className="max-w-[700px] mx-auto">
+			<div className="max-w-[760px] mx-auto">
 				{/* Header */}
-				<div className="text-center mb-16">
-					<div
-						className="landing-section-label"
-						style={{
-							background:
-								"linear-gradient(135deg, rgba(139,92,246,0.06), rgba(59,130,246,0.04))",
-							border: "1px solid rgba(139,92,246,0.12)",
-							color: "#8B5CF6",
-						}}
-					>
-						<span
-							className="landing-dot"
-							style={{
-								background:
-									"linear-gradient(135deg, #8B5CF6, #3B82F6)",
-							}}
-						/>
-						{t("faq.title")}
-					</div>
-					<h2
-						className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold leading-[1.3]"
-						style={{ color: "var(--lp-text)" }}
-					>
-						{t("faq.heading")}
-					</h2>
+				<div className="mas-sec-head mas-rv text-center mb-12 md:mb-14">
+					<span className="mas-dim">{t("faq.title")}</span>
+					<h2>{t("faq.heading")}</h2>
 				</div>
 
-				{/* FAQ Items */}
-				<div
-					className="rounded-3xl px-6 sm:px-9 py-2"
-					style={{
-						background: "var(--lp-faq-card-bg)",
-						border: "1px solid var(--lp-faq-card-border)",
-					}}
-				>
+				{/* Items */}
+				<div className="mas-rv grid gap-3">
 					{faqKeys.map((key, i) => (
 						<FAQItem
 							key={key}
@@ -126,16 +91,11 @@ export function FaqSection({ className }: { className?: string }) {
 					))}
 				</div>
 
-				{/* رابط صفحة الأسئلة الكاملة */}
-				<div className="mt-8 text-center">
+				{/* Full FAQ page link */}
+				<div className="mas-rv mt-10 text-center">
 					<LocaleLink
 						href="/faq"
-						className="inline-flex items-center gap-2 rounded-2xl px-6 py-3 font-bold text-sm text-white transition-all duration-300 hover:-translate-y-0.5"
-						style={{
-							background:
-								"linear-gradient(135deg, #0ea5e9, #06B6D4)",
-							boxShadow: "0 8px 24px rgba(14,165,233,0.25)",
-						}}
+						className="mas-btn mas-btn-ghost !min-h-[46px] !py-2.5 !px-6 !text-[14px]"
 					>
 						{t("faqPage.viewAll")}
 						<ArrowIcon className="size-4" />

@@ -19,13 +19,13 @@ export function ModulesTicker() {
 	const t = useTranslations();
 
 	return (
-		<div className="lp-ticker" aria-label={t("ticker.aria")}>
-			<div className="lp-ticker-track">
+		<div className="mas-ticker" aria-label={t("ticker.aria")}>
+			<div className="mas-ticker-track">
 				{[0, 1].map((dup) =>
 					ITEMS.map((item) => (
 						<span
 							key={`${dup}-${item.key}`}
-							className="lp-tk"
+							className="mas-tk"
 							aria-hidden={dup === 1}
 						>
 							<span aria-hidden="true">{item.icon}</span>

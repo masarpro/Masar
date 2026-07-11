@@ -7,8 +7,8 @@ export function DashboardPreview() {
 	const t = useTranslations();
 
 	return (
-		<div className="lp-shot animate-fade-in-delay-4">
-			<div className="lp-shot-bar" aria-hidden="true">
+		<div className="mas-shot">
+			<div className="mas-shot-bar" aria-hidden="true">
 				<i />
 				<i />
 				<i />
@@ -20,7 +20,7 @@ export function DashboardPreview() {
 				width={1586}
 				height={992}
 				priority
-				className="lp-shot-img"
+				className="block w-full h-auto"
 				sizes="(max-width: 1080px) 100vw, 1020px"
 			/>
 		</div>

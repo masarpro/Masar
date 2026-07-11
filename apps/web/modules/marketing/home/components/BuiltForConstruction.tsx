@@ -1,16 +1,16 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import {
 	Calculator,
+	Check,
+	CheckCircle,
 	FileSignature,
 	HardHat,
-	Receipt,
-	CheckCircle,
-	Check,
-	X,
 	type LucideIcon,
+	Receipt,
+	X,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface Stage {
 	num: string;
@@ -115,8 +115,7 @@ export function BuiltForConstruction() {
 									<div
 										className="w-14 h-14 rounded-full flex items-center justify-center mb-3 transition-shadow duration-300 group-hover:shadow-[0_0_24px_rgba(14,165,233,0.3)]"
 										style={{
-											background:
-												"rgba(14,165,233,0.10)",
+											background: "rgba(14,165,233,0.10)",
 											border: "2px solid rgba(14,165,233,0.25)",
 										}}
 									>
@@ -211,8 +210,7 @@ export function BuiltForConstruction() {
 									<div
 										className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
 										style={{
-											background:
-												"rgba(14,165,233,0.10)",
+											background: "rgba(14,165,233,0.10)",
 											border: "2px solid rgba(14,165,233,0.25)",
 										}}
 									>
@@ -244,8 +242,7 @@ export function BuiltForConstruction() {
 						style={{
 							background:
 								"linear-gradient(135deg, rgba(14,165,233,0.25), rgba(6,182,212,0.12), rgba(14,165,233,0.25))",
-							boxShadow:
-								"0 0 30px rgba(14,165,233,0.08)",
+							boxShadow: "0 0 30px rgba(14,165,233,0.08)",
 						}}
 					>
 						<div className="landing-glow-card-inner">

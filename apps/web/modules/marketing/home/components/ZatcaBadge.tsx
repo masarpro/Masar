@@ -7,67 +7,21 @@ export function ZatcaBadge() {
 
 	return (
 		<section
-			className="py-20 px-6"
-			style={{
-				background:
-					"linear-gradient(180deg, var(--lp-bg), var(--lp-bg-section))",
-			}}
+			className="px-6 pb-24 md:pb-28"
+			style={{ background: "var(--mas-bg)" }}
 		>
-			<div
-				className="max-w-[800px] mx-auto relative rounded-[28px] p-[2px] overflow-hidden"
-				style={{
-					background: "var(--lp-zatca-outer)",
-				}}
-			>
-				<div
-					className="rounded-[26px] p-10 sm:p-12 flex items-center gap-8 flex-wrap justify-center"
-					style={{
-						background: "var(--lp-zatca-inner)",
-						backdropFilter: "blur(20px)",
-					}}
-				>
-					{/* Icon */}
-					<div
-						className="w-[72px] h-[72px] rounded-[20px] flex items-center justify-center text-4xl shrink-0"
-						style={{
-							background:
-								"linear-gradient(135deg, rgba(14,165,233,0.1), rgba(6,182,212,0.06))",
-							border: "1px solid rgba(14,165,233,0.15)",
-							boxShadow: "0 0 30px rgba(14,165,233,0.08)",
-						}}
-					>
-						🏛️
-					</div>
-
-					{/* Text */}
-					<div className="flex-1 min-w-[220px]">
-						<h3
-							className="text-[21px] font-bold mb-2"
-							style={{ color: "var(--lp-text)" }}
-						>
-							{t("landingZatca.title")}
-						</h3>
-						<p
-							className="text-sm leading-[1.75]"
-							style={{ color: "var(--lp-text-subtle)" }}
-						>
-							{t("landingZatca.description")}
-						</p>
-					</div>
-
-					{/* Badge */}
-					<div
-						className="shrink-0 rounded-[14px] px-6 py-3 text-[#0ea5e9] font-bold text-[13px]"
-						style={{
-							background:
-								"linear-gradient(135deg, rgba(14,165,233,0.1), rgba(6,182,212,0.06))",
-							border: "1px solid rgba(14,165,233,0.2)",
-							boxShadow: "0 0 20px rgba(14,165,233,0.06)",
-						}}
-					>
-						{t("landingZatca.badge")}
-					</div>
-				</div>
+			<div className="mas-zatca-band mas-rv max-w-[860px] mx-auto">
+				<span className="seal" aria-hidden="true">
+					🏛️
+				</span>
+				<span>
+					<b>{t("landingZatca.title")}:</b>{" "}
+					{t("landingZatca.description")}
+				</span>
+				<span className="mas-zatca-chip shrink-0">
+					<span className="mas-zatca-dot" aria-hidden="true" />
+					{t("landingZatca.badge")}
+				</span>
 			</div>
 		</section>
 	);
