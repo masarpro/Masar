@@ -548,7 +548,15 @@
       "2": "Riyadh Villas project expenses for March:\nMaterials: 45,000 SAR\nLabor: 32,000 SAR\nEquipment: 18,000 SAR\n\nTotal: 95,000 SAR — 12% under planned budget ✅",
       "3": "Which projects are behind schedule?"
     },
-    "cta": "Try the AI Assistant for free"
+    "cta": "Try the AI Assistant for free",
+    "chatTable": {
+      "intro": "Riyadh Villas project expenses — June:",
+      "materials": "Materials",
+      "labor": "Labor",
+      "equipment": "Equipment",
+      "total": "Total",
+      "under": "12% under planned budget"
+    }
   },
   "app": {
     "menu": {
@@ -4866,6 +4874,28 @@
         "nameRequired": "Account name is required"
       }
     },
+    "listControls": {
+      "allTime": "All time",
+      "thisMonth": "This month",
+      "lastMonth": "Last month",
+      "thisQuarter": "This quarter",
+      "thisYear": "This year",
+      "custom": "Custom range",
+      "from": "From date",
+      "to": "To date",
+      "filterByStatus": "Filter by status",
+      "allStatuses": "All statuses",
+      "filterByAccount": "Filter by account",
+      "allAccounts": "All accounts",
+      "filterByMethod": "Filter by payment method",
+      "allMethods": "All methods",
+      "clearFilters": "Clear filters",
+      "removeFilter": "Remove filter",
+      "exportCsv": "Export CSV",
+      "resultsCount": "{count} records",
+      "filteredTotal": "Results total",
+      "noFilterResults": "No results match the current filters"
+    },
     "expenses": {
       "title": "Expenses",
       "subtitle": "Manage organization expenses",
@@ -5094,6 +5124,9 @@
       "status": "Status",
       "notes": "Notes",
       "totalPayments": "Total Payments",
+      "paymentsCount": "Payments Count",
+      "monthTotal": "This Month's Receipts",
+      "completedTotal": "Completed Receipts",
       "noPayments": "No payments",
       "noSearchResults": "No search results",
       "searchPlaceholder": "Search payments...",
@@ -5717,7 +5750,10 @@
       "execution": "Execution",
       "invoicing": "Invoicing",
       "handover": "Handover"
-    }
+    },
+    "titleA": "Your entire project runs",
+    "titleB": "on one path",
+    "lead": "Quantities & pricing, contracts, execution, invoicing, and accounting — in one system. And at any moment you know: <b>How much did I earn? How much cash do I have? Who owes me?</b>"
   },
   "ticker": {
     "aria": "Masar platform modules",
@@ -12483,6 +12519,78 @@
       "estimatedCalculation": "Estimated calculation",
       "minThicknessWarning": "Entered thickness ({entered} cm) is below SBC 304 recommended minimum ({recommended} cm)",
       "noTopMeshWarning": "Top mesh recommended to resist negative moments at columns"
+    }
+  },
+  "landingRoles": {
+    "title": "Smart permissions — everyone sees only what concerns them",
+    "description": "Custom roles for every job with project-level permissions — the accountant doesn't see drawings, and the supervisor doesn't see profits.",
+    "roles": {
+      "manager": "Manager",
+      "engineer": "Engineer",
+      "accountant": "Accountant",
+      "supervisor": "Supervisor"
+    }
+  },
+  "landingVisuals": {
+    "tower": {
+      "active": "Active projects",
+      "done": "Completed",
+      "pending": "On hold",
+      "issues": "Open issues",
+      "overall": "Overall project completion"
+    },
+    "pricing": {
+      "project": "Princess Haya Mosque",
+      "draft": "Draft",
+      "steps": {
+        "qty": "Quantities",
+        "specs": "Specs",
+        "cost": "Cost pricing",
+        "price": "Pricing"
+      },
+      "approved": "Approved",
+      "wip": "In progress",
+      "concrete": "Total concrete",
+      "concreteUnit": "m³",
+      "steel": "Total steel",
+      "steelUnit": "ton",
+      "block": "Total blocks",
+      "blockUnit": "blocks",
+      "convert": "Convert to quotation",
+      "convertHint": "From study to quotation — one click"
+    },
+    "contracts": {
+      "l1": "Electrical works contract — approved",
+      "l2": "Change order #04 — awaiting owner signature",
+      "l3": "June claim — paid SAR 80,000"
+    },
+    "execution": {
+      "progress": "Progress",
+      "phases": {
+        "p1": "Lean concrete",
+        "p2": "Foundations",
+        "p3": "Ground beams",
+        "p4": "GF columns"
+      },
+      "milestones": "Milestones completed",
+      "report": "Today's report uploaded — 12 site photos"
+    },
+    "finance": {
+      "header": "Finance & budget",
+      "contract": "Contract value 2.3M",
+      "received": "Received",
+      "spent": "Actual spend",
+      "profit": "Expected net profit",
+      "budget": "Budget used",
+      "invoice": "Invoice INV-2026-0044 — accepted by ZATCA"
+    },
+    "owner": {
+      "project": "Al Narjis Villa",
+      "live": "Active",
+      "contract": "Contract value",
+      "adjusted": "Adjusted — after change orders",
+      "days": "209 days left of 249",
+      "payment": "2nd payment received · new message from owner"
     }
   }
 }
