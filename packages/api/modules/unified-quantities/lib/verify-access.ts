@@ -32,10 +32,19 @@ export async function loadStudy(costStudyId: string, organizationId: string) {
 	if (!study) {
 		throw new ORPCError("NOT_FOUND", { message: "الدراسة غير موجودة" });
 	}
-	// حصر المحرك: دراسات النظام الأساسي (لها workScopes) لا تُدار عبر
-	// unified-quantities — المحركان يكتبان نفس CostStudy بحسابات متنافرة
-	// (العلم NEXT_PUBLIC_FEATURE_UNIFIED_QUANTITIES واجهة فقط والراوتران حيّان دائماً)
-	if (Array.isArray(study.workScopes) && study.workScopes.length > 0) {
+	// حصر المحرك: يطابق قاعدة الواجهة في unified-flag.ts حرفياً —
+	// الدراسة موحّدة عندما يكون العلم مفعّلاً و(لا نطاقات أو تشمل FINISHING/MEP).
+	// غير ذلك تُدار عبر النظام الأساسي ولا يجوز الكتابة عليها من هنا
+	// (المحركان يكتبان نفس CostStudy بحسابات متنافرة)
+	const flagEnabled =
+		process.env.NEXT_PUBLIC_FEATURE_UNIFIED_QUANTITIES === "1";
+	const scopes = Array.isArray(study.workScopes) ? study.workScopes : [];
+	const isUnified =
+		flagEnabled &&
+		(scopes.length === 0 ||
+			scopes.includes("FINISHING") ||
+			scopes.includes("MEP"));
+	if (!isUnified) {
 		throw new ORPCError("CONFLICT", {
 			message: "هذه الدراسة تُدار عبر نظام الكميات الأساسي وليس النظام الموحّد",
 		});
