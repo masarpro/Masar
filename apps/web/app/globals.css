@@ -1144,13 +1144,10 @@ html[lang="en"] .lp-tk { direction: ltr; }
 	position: absolute;
 	inset: 0;
 	background: radial-gradient(
-			circle at 84% 12%,
-			rgba(14, 165, 233, 0.2),
-			transparent 46%
-		),
-		linear-gradient(var(--mas-navy-line) 1px, transparent 1px),
-		linear-gradient(90deg, var(--mas-navy-line) 1px, transparent 1px);
-	background-size: auto, 44px 44px, 44px 44px;
+		circle at 84% 12%,
+		rgba(14, 165, 233, 0.2),
+		transparent 46%
+	);
 	opacity: 0.5;
 	pointer-events: none;
 }
@@ -2021,13 +2018,23 @@ html[lang="en"] .lp-tk { direction: ltr; }
 	border-radius: 15px;
 	font-size: 13.5px;
 	line-height: 1.7;
-	opacity: 0;
-	transform: translateY(14px) scale(0.97);
-	transition: opacity 0.55s var(--mas-ease), transform 0.55s var(--mas-spring);
+	/* visible by default so the conversation never disappears if the
+	   scroll observer misses (tall card on short viewports) */
+	opacity: 1;
 }
 .mas-chat.play .mas-msg {
-	opacity: 1;
-	transform: none;
+	animation: masMsgIn 0.55s var(--mas-ease) both;
+	animation-delay: var(--msg-d, 0s);
+}
+@keyframes masMsgIn {
+	from {
+		opacity: 0;
+		transform: translateY(14px) scale(0.97);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
 }
 .mas-msg.user {
 	background: linear-gradient(135deg, #38bdf8, var(--mas-blue-deep));

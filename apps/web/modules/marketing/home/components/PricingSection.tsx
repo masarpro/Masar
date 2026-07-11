@@ -55,8 +55,7 @@ export function PricingSection() {
 				{/* Header */}
 				<div className="mas-sec-head mas-rv max-w-[660px] mx-auto text-center mb-14 md:mb-16">
 					<span className="mas-dim">{t("landingPricing.label")}</span>
-					<h2>{t("landingPricing.title")}</h2>
-					<p>{t("landingPricing.subtitle")}</p>
+					<p className="mt-4">{t("landingPricing.subtitle")}</p>
 				</div>
 
 				{/* Plans */}

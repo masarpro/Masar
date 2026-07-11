@@ -8,7 +8,6 @@ import { LandingFx } from "@marketing/home/components/LandingFx";
 import { ModulesTicker } from "@marketing/home/components/ModulesTicker";
 import { PricingSection } from "@marketing/home/components/PricingSection";
 import { RolesStrip } from "@marketing/home/components/RolesStrip";
-import { StatsSection } from "@marketing/home/components/StatsSection";
 import { ZatcaBadge } from "@marketing/home/components/ZatcaBadge";
 import { setRequestLocale } from "next-intl/server";
 
@@ -31,7 +30,6 @@ export default async function Home({
 			<Features />
 			<RolesStrip />
 			<HowItWorks />
-			<StatsSection />
 			<PricingSection />
 			<ZatcaBadge />
 			<FaqSection />

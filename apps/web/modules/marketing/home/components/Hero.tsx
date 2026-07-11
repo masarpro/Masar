@@ -72,37 +72,15 @@ export function Hero() {
 
 					{/* Signature journey path */}
 					<div
-						className="mas-stage mt-8 md:mt-10 flex justify-center"
+						className="mas-stage mt-10 md:mt-14 flex justify-center"
 						style={{ "--i": 3 } as React.CSSProperties}
 					>
 						<PathStrip />
 					</div>
 
-					{/* Lead */}
-					<p
-						className="mas-stage text-[clamp(0.95rem,1.6vw,1.15rem)] leading-[1.9] mt-8 max-w-[620px] mx-auto"
-						style={
-							{
-								"--i": 4,
-								color: "var(--mas-muted)",
-							} as React.CSSProperties
-						}
-					>
-						{t.rich("hero.lead", {
-							b: (chunks) => (
-								<b
-									className="font-semibold"
-									style={{ color: "var(--mas-ink)" }}
-								>
-									{chunks}
-								</b>
-							),
-						})}
-					</p>
-
 					{/* CTAs */}
 					<div
-						className="mas-stage flex flex-col sm:flex-row items-center justify-center gap-4 mt-10"
+						className="mas-stage flex flex-col sm:flex-row items-center justify-center gap-4 mt-12 md:mt-14"
 						style={{ "--i": 5 } as React.CSSProperties}
 					>
 						<Link
@@ -124,7 +102,7 @@ export function Hero() {
 
 					{/* Trust row */}
 					<div
-						className="mas-stage mt-9 flex flex-col items-center gap-4"
+						className="mas-stage mt-11 flex flex-col items-center gap-4"
 						style={{ "--i": 6 } as React.CSSProperties}
 					>
 						<span className="mas-zatca-chip">
@@ -173,7 +151,7 @@ export function Hero() {
 
 				{/* Dashboard screenshot in a browser frame */}
 				<div
-					className="mas-stage mt-16 md:mt-20"
+					className="mas-stage mt-20 md:mt-24"
 					style={{ "--i": 7 } as React.CSSProperties}
 				>
 					<DashboardPreview />

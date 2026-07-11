@@ -4,6 +4,7 @@ import { Bot } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { ParticleDots } from "./ParticleDots";
 
 export function AiFeatureSection() {
 	const t = useTranslations("aiFeature");
@@ -22,7 +23,7 @@ export function AiFeatureSection() {
 					obs.disconnect();
 				}
 			},
-			{ threshold: 0.35 },
+			{ threshold: 0.15 },
 		);
 		obs.observe(el);
 		return () => obs.disconnect();
@@ -33,6 +34,8 @@ export function AiFeatureSection() {
 			id="ai"
 			className="mas-navy-sec mas-on-dark scroll-mt-16 py-24 md:py-32 px-6"
 		>
+			{/* animated drifting dots background */}
+			<ParticleDots />
 			<div className="relative z-[1] max-w-[1180px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 				{/* Copy */}
 				<div className="mas-rv">
@@ -106,13 +109,13 @@ export function AiFeatureSection() {
 					<div className="grid gap-3.5 p-5">
 						<div
 							className="mas-msg user"
-							style={{ transitionDelay: "0.15s" }}
+							style={{ "--msg-d": "0.15s" } as React.CSSProperties}
 						>
 							{t("chat.1")}
 						</div>
 						<div
 							className="mas-msg bot"
-							style={{ transitionDelay: "0.8s" }}
+							style={{ "--msg-d": "0.8s" } as React.CSSProperties}
 						>
 							{t("chatTable.intro")}
 							<table>
@@ -141,13 +144,13 @@ export function AiFeatureSection() {
 						</div>
 						<div
 							className="mas-msg user"
-							style={{ transitionDelay: "1.6s" }}
+							style={{ "--msg-d": "1.6s" } as React.CSSProperties}
 						>
 							{t("chat.3")}
 						</div>
 						<div
 							className="mas-msg typing"
-							style={{ transitionDelay: "2.2s" }}
+							style={{ "--msg-d": "2.2s" } as React.CSSProperties}
 							aria-hidden="true"
 						>
 							<i />

@@ -5752,8 +5752,7 @@
       "handover": "Handover"
     },
     "titleA": "Your entire project runs",
-    "titleB": "on one path",
-    "lead": "Quantities & pricing, contracts, execution, invoicing, and accounting — in one system. And at any moment you know: <b>How much did I earn? How much cash do I have? Who owes me?</b>"
+    "titleB": "on one path"
   },
   "ticker": {
     "aria": "Masar platform modules",
@@ -5852,7 +5851,6 @@
     "loading": "Verifying invitation..."
   },
   "landingPricing": {
-    "title": "Clear pricing, no surprises",
     "label": "Pricing",
     "subtitle": "Choose the plan that fits your company size",
     "badges": {
@@ -12540,7 +12538,7 @@
       "overall": "Overall project completion"
     },
     "pricing": {
-      "project": "Princess Haya Mosque",
+      "project": "Yasmin Villa",
       "draft": "Draft",
       "steps": {
         "qty": "Quantities",
