@@ -55,7 +55,8 @@
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage",
 		"zatca:test-sandbox": "tsx lib/zatca/phase2/sandbox-test.ts",
-		"seed:catalog": "dotenv -c -e ../../.env -- tsx modules/unified-quantities/scripts/seed-catalog.ts"
+		"seed:catalog": "dotenv -c -e ../../.env -- tsx modules/unified-quantities/scripts/seed-catalog.ts",
+		"migrate:legacy": "dotenv -c -e ../../.env -- tsx modules/unified-quantities/scripts/migrate-all-legacy.ts"
 	},
 	"version": "0.0.0"
 }
