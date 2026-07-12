@@ -49,3 +49,5 @@ nul
 # ZATCA QR PNG artifacts (sensitive production data — local debugging only)
 scripts/zatca/_qr-*.png
 scripts/zatca/test-*.png
+
+.claude/
