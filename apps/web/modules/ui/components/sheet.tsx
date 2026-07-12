@@ -30,8 +30,9 @@ const SheetOverlay = ({
 	/>
 );
 
+// Botly-derived: single Botly shadow on floating panels
 const sheetVariants = cva(
-	"fixed z-50 max-h-dvh gap-4 overflow-y-auto bg-background p-6 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out",
+	"fixed z-50 max-h-dvh gap-4 overflow-y-auto bg-background p-6 shadow-[0px_8px_32px_12px_rgba(0,0,0,0.06)] transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out",
 	{
 		variants: {
 			side: {

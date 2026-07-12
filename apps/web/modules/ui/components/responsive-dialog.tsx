@@ -42,7 +42,7 @@ export function ResponsiveDialog({
 			<Sheet open={open} onOpenChange={onOpenChange}>
 				<SheetContent
 					side="bottom"
-					className="max-h-[90vh] overflow-y-auto rounded-t-2xl"
+					className="max-h-[90vh] overflow-y-auto rounded-t-[20px]"
 				>
 					{(title || description) && (
 						<SheetHeader className="text-start">
