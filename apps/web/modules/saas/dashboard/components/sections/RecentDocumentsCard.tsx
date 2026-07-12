@@ -1,12 +1,10 @@
 "use client";
 
+import { Currency } from "@saas/finance/components/shared/Currency";
 import { orpc } from "@shared/lib/orpc-query-utils";
 import { useQuery } from "@tanstack/react-query";
-import {
-	Calculator,
-	FileText,
-	Receipt,
-} from "lucide-react";
+import { StatusChip } from "@ui/components/status-chip";
+import { Calculator, FileText, Receipt } from "lucide-react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -24,6 +22,11 @@ interface RecentDoc {
 	icon: typeof Receipt;
 	iconColor: string;
 	bgColor: string;
+	/** حالة المستند — تُعرض فقط إن توفرت من الـ API ولها ترجمة */
+	status?: string;
+	statusLabelKey?: string;
+	/** المبلغ — يُعرض فقط إن توفر من الـ API */
+	amount?: number;
 }
 
 export function RecentDocumentsCard({
@@ -31,6 +34,7 @@ export function RecentDocumentsCard({
 	organizationSlug,
 }: RecentDocumentsCardProps) {
 	const t = useTranslations("dashboard");
+	const tAll = useTranslations();
 	const locale = useLocale();
 
 	const { data: invoicesData } = useQuery({
@@ -57,7 +61,13 @@ export function RecentDocumentsCard({
 	const basePath = `/app/${organizationSlug}`;
 	const recentDocs: RecentDoc[] = [];
 
+	const toAmount = (v: unknown): number | undefined => {
+		const n = Number(v);
+		return Number.isFinite(n) && n > 0 ? n : undefined;
+	};
+
 	for (const inv of (invoicesData?.invoices ?? []).slice(0, 3)) {
+		const status = (inv as any).status as string | undefined;
 		recentDocs.push({
 			id: inv.id,
 			type: "invoice",
@@ -67,10 +77,16 @@ export function RecentDocumentsCard({
 			icon: Receipt,
 			iconColor: "text-sky-600 dark:text-sky-400",
 			bgColor: "bg-sky-50 dark:bg-sky-950/20",
+			status,
+			statusLabelKey: status
+				? `finance.invoices.status.${status.toLowerCase()}`
+				: undefined,
+			amount: toAmount((inv as any).totalAmount),
 		});
 	}
 
 	for (const q of (quotationsData?.quotations ?? []).slice(0, 3)) {
+		const status = (q as any).status as string | undefined;
 		recentDocs.push({
 			id: q.id,
 			type: "quotation",
@@ -80,10 +96,16 @@ export function RecentDocumentsCard({
 			icon: FileText,
 			iconColor: "text-blue-600 dark:text-blue-400",
 			bgColor: "bg-blue-50 dark:bg-blue-950/20",
+			status,
+			statusLabelKey: status
+				? `pricing.quotations.status.${status.toLowerCase()}`
+				: undefined,
+			amount: toAmount((q as any).totalAmount),
 		});
 	}
 
 	for (const s of (studiesData?.costStudies ?? []).slice(0, 3)) {
+		const status = (s as any).status as string | undefined;
 		recentDocs.push({
 			id: s.id,
 			type: "study",
@@ -93,10 +115,17 @@ export function RecentDocumentsCard({
 			icon: Calculator,
 			iconColor: "text-violet-600 dark:text-violet-400",
 			bgColor: "bg-violet-50 dark:bg-violet-950/20",
+			status,
+			statusLabelKey: status
+				? `pricing.studies.status.${status.toLowerCase()}`
+				: undefined,
 		});
 	}
 
-	recentDocs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+	recentDocs.sort(
+		(a, b) =>
+			new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+	);
 	const visibleDocs = recentDocs.slice(0, 4);
 
 	if (visibleDocs.length === 0) {
@@ -122,19 +151,47 @@ export function RecentDocumentsCard({
 						day: "numeric",
 						month: "short",
 					}).format(new Date(doc.createdAt));
+					// الحالة تُعرض فقط عند وجود ترجمة معتمدة لها — لا مفاتيح خام
+					const statusLabel =
+						doc.statusLabelKey && tAll.has(doc.statusLabelKey)
+							? tAll(
+									doc.statusLabelKey as Parameters<
+										typeof tAll
+									>[0],
+								)
+							: null;
 					return (
 						<Link
 							key={doc.id}
 							href={doc.href}
-							className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/60 dark:hover:bg-slate-800/40 transition-colors"
+							className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/60 dark:hover:bg-slate-800/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
 						>
-							<div className={`p-1.5 rounded-lg ${doc.bgColor} shrink-0`}>
-								<Icon className={`h-3.5 w-3.5 ${doc.iconColor}`} />
+							<div
+								className={`p-1.5 rounded-lg ${doc.bgColor} shrink-0`}
+							>
+								<Icon
+									className={`h-3.5 w-3.5 ${doc.iconColor}`}
+								/>
 							</div>
-							<p className="flex-1 min-w-0 text-sm font-medium text-foreground truncate">
-								{doc.name}
-							</p>
-							<span className="text-xs text-muted-foreground shrink-0">
+							<div className="flex-1 min-w-0">
+								<p className="text-sm font-medium text-foreground truncate">
+									{doc.name}
+								</p>
+								{doc.amount !== undefined && (
+									<p className="text-xs text-foreground/70 tabular-nums">
+										<Currency amount={doc.amount} />
+									</p>
+								)}
+							</div>
+							{statusLabel && doc.status && (
+								<StatusChip
+									status={doc.status}
+									className="shrink-0"
+								>
+									{statusLabel}
+								</StatusChip>
+							)}
+							<span className="text-xs text-foreground/70 shrink-0">
 								{dateStr}
 							</span>
 						</Link>

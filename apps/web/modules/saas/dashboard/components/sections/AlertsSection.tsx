@@ -4,15 +4,13 @@ import { Currency } from "@saas/finance/components/shared/Currency";
 import {
 	AlertTriangle,
 	CheckCircle2,
+	ChevronLeft,
 	Clock,
 	FileWarning,
 	Flag,
 } from "lucide-react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
-
-const glassCard =
-	"backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5";
+import { useLocale, useTranslations } from "next-intl";
 
 interface OverdueInvoice {
 	id: string;
@@ -41,6 +39,67 @@ interface AlertsSectionProps {
 	organizationSlug: string;
 }
 
+type Severity = "danger" | "warning" | "info";
+
+interface AlertItem {
+	id: string;
+	severity: Severity;
+	title: string;
+	description: string;
+	date: Date | null;
+	amount?: number;
+	href: string;
+	icon: React.ComponentType<{ className?: string }>;
+}
+
+const SEVERITY_ORDER: Record<Severity, number> = {
+	danger: 0,
+	warning: 1,
+	info: 2,
+};
+
+const SEVERITY_STYLES: Record<
+	Severity,
+	{ icon: string; iconBg: string; label: string }
+> = {
+	danger: {
+		icon: "text-red-600 dark:text-red-400",
+		iconBg: "bg-red-100 dark:bg-red-950/40",
+		label: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300",
+	},
+	warning: {
+		icon: "text-orange-600 dark:text-orange-400",
+		iconBg: "bg-orange-100 dark:bg-orange-950/40",
+		label: "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300",
+	},
+	info: {
+		icon: "text-blue-600 dark:text-blue-400",
+		iconBg: "bg-blue-100 dark:bg-blue-950/40",
+		label: "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
+	},
+};
+
+function toDate(d: Date | string | null | undefined): Date | null {
+	if (!d) return null;
+	const date = new Date(d);
+	return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function diffDays(date: Date): number {
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+	const d = new Date(date);
+	d.setHours(0, 0, 0, 0);
+	return Math.round((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+const MAX_VISIBLE = 5;
+
+/**
+ * قسم «يحتاج انتباهك» — تنبيهات تفصيلية قابلة للإجراء مرتبة حسب الخطورة:
+ * أحمر (متأخر) ← برتقالي (متابعة قريباً) ← أزرق (معلوماتي).
+ * تُعرض فقط البيانات المتوفرة فعلياً من الـ API — لا بيانات مُخترعة.
+ */
 export function AlertsSection({
 	overdueInvoices,
 	overdueMilestones,
@@ -49,108 +108,199 @@ export function AlertsSection({
 	organizationSlug,
 }: AlertsSectionProps) {
 	const t = useTranslations();
+	const locale = useLocale();
 
-	const hasAlerts =
-		overdueInvoices.length > 0 ||
-		overdueMilestones.length > 0 ||
-		pendingSubcontractClaims > 0 ||
-		upcomingPayments.length > 0;
+	const dateFmt = new Intl.DateTimeFormat(locale, {
+		day: "numeric",
+		month: "short",
+	});
 
-	// "All good" state
-	if (!hasAlerts) {
+	const items: AlertItem[] = [];
+
+	// فواتير متأخرة — أحمر، مع المبلغ المتبقي وتاريخ الاستحقاق
+	for (const inv of overdueInvoices) {
+		const remaining = Number(inv.totalAmount) - Number(inv.paidAmount);
+		const due = toDate(inv.dueDate);
+		const overdueDays = due ? Math.abs(Math.min(diffDays(due), 0)) : null;
+		items.push({
+			id: `inv-${inv.id}`,
+			severity: "danger",
+			title: `${t("dashboard.alerts.overdueInvoiceItem")} #${inv.invoiceNo}`,
+			description: [
+				inv.clientName,
+				overdueDays
+					? t("dashboard.alerts.overdueBy", { days: overdueDays })
+					: null,
+			]
+				.filter(Boolean)
+				.join(" — "),
+			date: due,
+			amount: remaining > 0 ? remaining : undefined,
+			href: `/app/${organizationSlug}/finance/invoices/${inv.id}`,
+			icon: FileWarning,
+		});
+	}
+
+	// مراحل متأخرة — أحمر، باسم المشروع
+	for (const m of overdueMilestones) {
+		const planned = toDate(m.plannedEnd);
+		const overdueDays = planned
+			? Math.abs(Math.min(diffDays(planned), 0))
+			: null;
+		items.push({
+			id: `ms-${m.id}`,
+			severity: "danger",
+			title: m.title,
+			description: [
+				t("dashboard.alerts.inProject", { project: m.project.name }),
+				overdueDays
+					? t("dashboard.alerts.overdueBy", { days: overdueDays })
+					: null,
+			]
+				.filter(Boolean)
+				.join(" — "),
+			date: planned,
+			href: `/app/${organizationSlug}/projects/${m.project.id}`,
+			icon: AlertTriangle,
+		});
+	}
+
+	// مطالبات باطن معلّقة — برتقالي (العدد فقط متوفر من الـ API)
+	if (pendingSubcontractClaims > 0) {
+		items.push({
+			id: "claims",
+			severity: "warning",
+			title: t("dashboard.alerts.pendingClaimsCount", {
+				count: pendingSubcontractClaims,
+			}),
+			description: t("dashboard.alerts.claimsDesc"),
+			date: null,
+			href: `/app/${organizationSlug}/projects`,
+			icon: Flag,
+		});
+	}
+
+	// دفعات/مراحل مستحقة قريباً — أزرق معلوماتي
+	for (const m of upcomingPayments) {
+		const planned = toDate(m.plannedEnd);
+		const inDays = planned ? Math.max(diffDays(planned), 0) : null;
+		items.push({
+			id: `up-${m.id}`,
+			severity: "info",
+			title: m.title,
+			description: [
+				t("dashboard.alerts.inProject", { project: m.project.name }),
+				inDays !== null
+					? inDays === 0
+						? t("dashboard.alerts.dueToday")
+						: t("dashboard.alerts.dueInDays", { days: inDays })
+					: null,
+			]
+				.filter(Boolean)
+				.join(" — "),
+			date: planned,
+			href: `/app/${organizationSlug}/projects/${m.project.id}`,
+			icon: Clock,
+		});
+	}
+
+	// ترتيب: الخطورة أولاً ثم الأقدم استحقاقاً
+	items.sort((a, b) => {
+		const sev = SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity];
+		if (sev !== 0) return sev;
+		const at = a.date?.getTime() ?? Number.POSITIVE_INFINITY;
+		const bt = b.date?.getTime() ?? Number.POSITIVE_INFINITY;
+		return at - bt;
+	});
+
+	// Empty state إيجابية — لا يُعرض القسم فارغاً
+	if (items.length === 0) {
 		return (
-			<div
-				className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/30 dark:border-emerald-800/20 shadow-lg shadow-black/5 flex flex-col items-center justify-center p-2.5 text-center flex-1"
-			>
-				<CheckCircle2 className="h-7 w-7 text-emerald-500 mb-1" />
+			<div className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/40 dark:border-emerald-800/30 shadow-lg shadow-black/5 flex items-center justify-center gap-3 p-4 text-center">
+				<CheckCircle2 className="h-6 w-6 shrink-0 text-emerald-600 dark:text-emerald-400" />
 				<p className="text-sm font-semibold text-foreground">
-					{t("dashboard.welcome.allGood")}
-				</p>
-				<p className="text-[11px] text-muted-foreground mt-0.5">
-					{t("dashboard.alerts.needsAttention")}
+					{t("dashboard.alerts.empty")}
 				</p>
 			</div>
 		);
 	}
 
-	const sumOverdueInvoices = overdueInvoices.reduce(
-		(sum, inv) => sum + (Number(inv.totalAmount) - Number(inv.paidAmount)),
-		0,
-	);
-
-	const alerts = [
-		overdueInvoices.length > 0 && {
-			title: t("dashboard.alerts.overdueInvoices"),
-			count: overdueInvoices.length,
-			amount: sumOverdueInvoices,
-			icon: FileWarning,
-			color: "text-red-600 dark:text-red-400",
-			bgColor: "bg-red-50 dark:bg-red-950/20",
-			href: `/app/${organizationSlug}/finance/invoices?status=OVERDUE`,
-		},
-		overdueMilestones.length > 0 && {
-			title: t("dashboard.alerts.overdueMilestones"),
-			count: overdueMilestones.length,
-			icon: AlertTriangle,
-			color: "text-amber-600 dark:text-amber-400",
-			bgColor: "bg-amber-50 dark:bg-amber-950/20",
-			href: `/app/${organizationSlug}/projects`,
-		},
-		pendingSubcontractClaims > 0 && {
-			title: t("dashboard.alerts.pendingClaims"),
-			count: pendingSubcontractClaims,
-			icon: Flag,
-			color: "text-orange-600 dark:text-orange-400",
-			bgColor: "bg-orange-50 dark:bg-orange-950/20",
-			href: `/app/${organizationSlug}/projects`,
-		},
-		upcomingPayments.length > 0 && {
-			title: t("dashboard.alerts.upcomingPayments"),
-			count: upcomingPayments.length,
-			icon: Clock,
-			color: "text-blue-600 dark:text-blue-400",
-			bgColor: "bg-blue-50 dark:bg-blue-950/20",
-			href: `/app/${organizationSlug}/projects`,
-		},
-	].filter(Boolean) as Array<{
-		title: string;
-		count: number;
-		amount?: number;
-		icon: React.ComponentType<{ className?: string }>;
-		color: string;
-		bgColor: string;
-		href: string;
-	}>;
-
-	const visibleAlerts = alerts.slice(0, 2);
+	const visibleItems = items.slice(0, MAX_VISIBLE);
+	const hiddenCount = items.length - visibleItems.length;
 
 	return (
-		<div className="rounded-2xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-200/30 dark:border-amber-800/20 shadow-lg shadow-black/5 flex flex-col p-2.5 flex-1">
-			<h3 className="text-xs font-bold text-foreground mb-1.5">
-				{t("dashboard.alerts.needsAttention")}
-			</h3>
-			<div className="flex-1 space-y-1">
-				{visibleAlerts.map((alert, i) => {
-					const Icon = alert.icon;
+		<section
+			aria-label={t("dashboard.alerts.needsAttention")}
+			className="backdrop-blur-xl bg-card/80 border border-border/50 rounded-2xl shadow-lg shadow-black/5 flex flex-col p-3 sm:p-4"
+		>
+			<div className="flex items-center gap-2 mb-2">
+				<div className="p-1.5 rounded-lg bg-amber-500/10">
+					<AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+				</div>
+				<h2 className="text-sm sm:text-base font-bold text-foreground">
+					{t("dashboard.alerts.needsAttention")}
+				</h2>
+				<span className="text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full tabular-nums">
+					{items.length}
+				</span>
+			</div>
+
+			<ul className="flex flex-col divide-y divide-border/40">
+				{visibleItems.map((item) => {
+					const Icon = item.icon;
+					const styles = SEVERITY_STYLES[item.severity];
 					return (
-						<Link
-							key={i}
-							href={alert.href}
-							className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-muted/50 transition-colors"
-						>
-							<div className={`p-1 rounded-md ${alert.bgColor} shrink-0`}>
-								<Icon className={`h-3.5 w-3.5 ${alert.color}`} />
-							</div>
-							<p className="flex-1 min-w-0 text-xs font-medium text-foreground truncate">
-								{alert.title}
-							</p>
-							<span className={`text-lg font-bold ${alert.color} shrink-0`}>
-								{alert.count}
-							</span>
-						</Link>
+						<li key={item.id}>
+							<Link
+								href={item.href}
+								className="group flex items-center gap-3 py-2 px-1 rounded-lg hover:bg-muted/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+							>
+								<div
+									className={`p-1.5 rounded-lg ${styles.iconBg} shrink-0`}
+								>
+									<Icon
+										className={`h-4 w-4 ${styles.icon}`}
+									/>
+								</div>
+								<div className="min-w-0 flex-1">
+									<p className="text-sm font-semibold text-foreground truncate">
+										{item.title}
+									</p>
+									{item.description && (
+										<p className="text-xs text-foreground/70 truncate">
+											{item.description}
+										</p>
+									)}
+								</div>
+								{item.amount !== undefined && (
+									<span className="hidden sm:inline-flex shrink-0 text-sm font-bold text-foreground tabular-nums">
+										<Currency amount={item.amount} />
+									</span>
+								)}
+								{item.date && (
+									<span
+										className={`hidden md:inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${styles.label}`}
+									>
+										{t("dashboard.alerts.dueOn", {
+											date: dateFmt.format(item.date),
+										})}
+									</span>
+								)}
+								<span className="flex shrink-0 items-center gap-0.5 text-xs font-medium text-primary">
+									{t("dashboard.alerts.viewAction")}
+									<ChevronLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
+								</span>
+							</Link>
+						</li>
 					);
 				})}
-			</div>
-		</div>
+			</ul>
+
+			{hiddenCount > 0 && (
+				<p className="mt-1.5 pt-1.5 border-t border-border/40 text-center text-xs text-foreground/70">
+					{t("dashboard.alerts.moreAlerts", { count: hiddenCount })}
+				</p>
+			)}
+		</section>
 	);
 }

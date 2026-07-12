@@ -4,17 +4,20 @@ import type { Permissions } from "@repo/database/prisma/permissions";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
 import { usePermission } from "@saas/permissions/hooks/use-permission";
 import { HomeDashboardSkeleton } from "@saas/shared/components/skeletons";
-import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { orpc } from "@shared/lib/orpc-query-utils";
+import { STALE_TIMES } from "@shared/lib/query-stale-times";
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@ui/components/button";
+import { AlertCircle, RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { ActiveProjectsSection } from "./sections/ActiveProjectsSection";
-import { QuickActionsGrid } from "./sections/QuickActionsGrid";
 import { AlertsSection } from "./sections/AlertsSection";
-import { OperationalSection } from "./sections/OperationalSection";
+import { DashboardHeader } from "./sections/DashboardHeader";
 import { DidYouKnowCard } from "./sections/DidYouKnowCard";
 import { FinancePanel } from "./sections/FinancePanel";
+import { OperationalSection } from "./sections/OperationalSection";
+import { QuickActionsGrid } from "./sections/QuickActionsGrid";
 import { RecentDocumentsCard } from "./sections/RecentDocumentsCard";
 import { WelcomeSection } from "./sections/WelcomeSection";
 
@@ -44,7 +47,8 @@ export function Dashboard({
 	// Server props take precedence: during SSR the providers above the org
 	// layout's HydrationBoundary haven't resolved yet, so context values are
 	// empty on the server — props keep the first paint correct.
-	const organizationSlug = organizationSlugProp ?? activeOrganization?.slug ?? "";
+	const organizationSlug =
+		organizationSlugProp ?? activeOrganization?.slug ?? "";
 	const organizationId = organizationIdProp ?? activeOrganization?.id ?? "";
 
 	// Widget permissions (RBAC-UI): each dashboard widget requires the same
@@ -55,13 +59,20 @@ export function Dashboard({
 		permissions: ctxPermissions,
 		isLoading: permsLoading,
 	} = usePermission();
-	const permissions = ctxPermissions ?? initialPermissions?.permissions ?? null;
+	const permissions =
+		ctxPermissions ?? initialPermissions?.permissions ?? null;
 	const isOwner = ctxIsOwner || (initialPermissions?.isOwner ?? false);
 	const showFinance = isOwner || (permissions?.finance?.view ?? false);
 	const showProjects =
 		isOwner || Object.values(permissions?.projects ?? {}).some(Boolean);
 
-	const { data: dashboardData, isLoading: statsLoading } = useQuery({
+	const {
+		data: dashboardData,
+		isLoading: statsLoading,
+		isError: statsError,
+		refetch: refetchStats,
+		dataUpdatedAt,
+	} = useQuery({
 		...orpc.dashboard.getAll.queryOptions({
 			input: { organizationId, activitiesLimit: 5, upcomingLimit: 5 },
 		}),
@@ -69,14 +80,24 @@ export function Dashboard({
 		staleTime: STALE_TIMES.DASHBOARD_STATS,
 	});
 
-	const { data: orgFinance, isLoading: finLoading } = useQuery({
+	const {
+		data: orgFinance,
+		isLoading: finLoading,
+		isError: finError,
+		refetch: refetchFinance,
+	} = useQuery({
 		...orpc.finance.orgDashboard.queryOptions({
 			input: { organizationId },
 		}),
 		enabled: !!organizationId && showFinance,
 	});
 
-	const { data: projectsData, isLoading: projLoading } = useQuery({
+	const {
+		data: projectsData,
+		isLoading: projLoading,
+		isError: projError,
+		refetch: refetchProjects,
+	} = useQuery({
 		...orpc.projects.list.queryOptions({
 			input: { organizationId, status: "ACTIVE" as const },
 		}),
@@ -100,9 +121,29 @@ export function Dashboard({
 		<div className="h-[220px] animate-pulse rounded-lg bg-muted" />
 	);
 
+	// حالة خطأ لكل قسم مع زر إعادة المحاولة — بنفس أبعاد الـ skeleton
+	// لمنع اهتزاز التصميم عند التبديل بين الحالات.
+	const sectionError = (retry: () => void, heightClass = "h-[300px]") => (
+		<div
+			className={`${heightClass} flex flex-col items-center justify-center gap-2 rounded-lg border border-border/50 bg-card/60 p-4 text-center`}
+		>
+			<AlertCircle className="h-6 w-6 text-red-500" />
+			<p className="text-sm font-medium text-foreground">
+				{t("dashboard.error.title")}
+			</p>
+			<Button variant="outline" size="sm" onClick={retry}>
+				<RefreshCw className="h-3.5 w-3.5 me-1.5" />
+				{t("dashboard.error.retry")}
+			</Button>
+		</div>
+	);
+
 	return (
 		<div className="flex flex-col gap-3 sm:gap-5 p-3 pt-2 sm:p-4 md:p-6 md:pt-3 lg:p-8 lg:pt-4 overflow-hidden">
-			{/* Row 0: welcome fallback when both main panels are hidden */}
+			{/* Row 0: رأس اللوحة — ترحيب + آخر تحديث */}
+			<DashboardHeader lastUpdatedAt={dataUpdatedAt} />
+
+			{/* welcome fallback when both main panels are hidden */}
 			{!showFinance && !showProjects && (
 				<WelcomeSection organizationSlug={organizationSlug} />
 			)}
@@ -115,18 +156,31 @@ export function Dashboard({
 					}`}
 				>
 					{showFinance &&
-						(finLoading || statsLoading ? (
+						(finError || statsError ? (
+							sectionError(() => {
+								if (finError) refetchFinance();
+								if (statsError) refetchStats();
+							})
+						) : finLoading || statsLoading ? (
 							sectionSkeleton
 						) : (
 							<FinancePanel
-								bankBalance={orgFinance?.balances?.totalBankBalance ?? 0}
-								cashBalance={orgFinance?.balances?.totalCashBalance ?? 0}
-								financialTrend={dashboardData?.financialTrend ?? []}
+								bankBalance={
+									orgFinance?.balances?.totalBankBalance ?? 0
+								}
+								cashBalance={
+									orgFinance?.balances?.totalCashBalance ?? 0
+								}
+								financialTrend={
+									dashboardData?.financialTrend ?? []
+								}
 								organizationSlug={organizationSlug}
 							/>
 						))}
 					{showProjects &&
-						(projLoading ? (
+						(projError ? (
+							sectionError(() => refetchProjects())
+						) : projLoading ? (
 							sectionSkeleton
 						) : (
 							<ActiveProjectsSection
@@ -137,15 +191,45 @@ export function Dashboard({
 				</div>
 			)}
 
-			{/* Row 2: Quick Actions — على الجوال تظهر أسفل المشاريع النشطة كصفوف */}
+			{/* Row 2: «يحتاج انتباهك» — أولوية عالية مباشرة بعد الملخص المالي والمشاريع */}
+			{(showFinance || showProjects) &&
+				(statsLoading ? (
+					<div className="h-[76px] animate-pulse rounded-2xl bg-muted" />
+				) : statsError ? null : (
+					<AlertsSection
+						overdueInvoices={
+							showFinance
+								? (dashboardData?.overdue?.invoices ?? [])
+								: []
+						}
+						overdueMilestones={
+							showProjects
+								? (dashboardData?.overdue?.milestones ?? [])
+								: []
+						}
+						pendingSubcontractClaims={
+							showFinance
+								? (dashboardData?.pendingSubcontractClaims ?? 0)
+								: 0
+						}
+						upcomingPayments={
+							showFinance ? (dashboardData?.upcoming ?? []) : []
+						}
+						organizationSlug={organizationSlug}
+					/>
+				))}
+
+			{/* Row 3: Quick Actions — على الجوال تظهر أسفل المشاريع النشطة كصفوف */}
 			<QuickActionsGrid organizationSlug={organizationSlug} />
 
 			<hr className="hidden border-border/50 sm:block" />
 
-			{/* Row 3: Operational + Recent Docs + (Alerts + DidYouKnow stacked) */}
+			{/* Row 4: Operational + Recent Docs + DidYouKnow */}
 			<div className="grid grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-3">
 				{showProjects &&
-					(statsLoading ? (
+					(statsError ? (
+						sectionError(() => refetchStats(), "h-[220px]")
+					) : statsLoading ? (
 						cardSkeleton
 					) : (
 						<OperationalSection
@@ -154,6 +238,7 @@ export function Dashboard({
 							onHoldProjects={stats?.projects?.onHold ?? 0}
 							openIssues={stats?.milestones?.overdue ?? 0}
 							leadsPipeline={dashboardData?.leadsPipeline ?? {}}
+							organizationSlug={organizationSlug}
 						/>
 					))}
 				{showProjects && (
@@ -162,33 +247,7 @@ export function Dashboard({
 						organizationSlug={organizationSlug}
 					/>
 				)}
-				<div className="flex flex-col gap-3 lg:h-full">
-					{(showFinance || showProjects) &&
-						(statsLoading ? (
-							cardSkeleton
-						) : (
-							<AlertsSection
-								overdueInvoices={
-									showFinance ? (dashboardData?.overdue?.invoices ?? []) : []
-								}
-								overdueMilestones={
-									showProjects
-										? (dashboardData?.overdue?.milestones ?? [])
-										: []
-								}
-								pendingSubcontractClaims={
-									showFinance
-										? (dashboardData?.pendingSubcontractClaims ?? 0)
-										: 0
-								}
-								upcomingPayments={
-									showFinance ? (dashboardData?.upcoming ?? []) : []
-								}
-								organizationSlug={organizationSlug}
-							/>
-						))}
-					<DidYouKnowCard organizationSlug={organizationSlug} />
-				</div>
+				<DidYouKnowCard organizationSlug={organizationSlug} />
 			</div>
 		</div>
 	);

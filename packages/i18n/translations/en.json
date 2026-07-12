@@ -611,6 +611,7 @@
       "unknown": "General"
     },
     "shortcut": "Ctrl+K",
+    "hint": "Ask Masar about your projects",
     "expand": "Expand",
     "collapse": "Collapse",
     "copy": "Copy",
@@ -1908,7 +1909,19 @@
       "pendingClaims": "Pending Claims",
       "upcomingPayments": "Upcoming Payments",
       "daysOverdue": "days overdue",
-      "daysRemaining": "days remaining"
+      "daysRemaining": "days remaining",
+      "empty": "Everything is under control — no urgent actions right now",
+      "dueOn": "Due: {date}",
+      "remaining": "Remaining",
+      "inProject": "Project: {project}",
+      "claimsDesc": "Subcontractor claims awaiting review and approval",
+      "overdueInvoiceItem": "Overdue invoice",
+      "overdueBy": "{days} days overdue",
+      "dueInDays": "Due in {days} days",
+      "dueToday": "Due today",
+      "viewAction": "View",
+      "pendingClaimsCount": "{count} subcontractor claims awaiting approval",
+      "moreAlerts": "+{count} more alerts"
     },
     "financial": {
       "title": "Financial Overview",
@@ -1941,7 +1954,9 @@
       "goToFinance": "Finance",
       "income": "Income",
       "expenses": "Expenses",
-      "net": "Net"
+      "net": "Net",
+      "netTitle": "Net cash flow over the last 6 months",
+      "empty": "No cash movements in the last 6 months"
     },
     "expenseBreakdown": {
       "title": "Company Expenses",
@@ -2019,6 +2034,21 @@
     "financePanel": {
       "cashFlowTitle": "Cash Flow"
     },
+    "header": {
+      "greeting": "Welcome — here are today's highlights for your business",
+      "lastUpdated": "Last updated: {time}"
+    },
+    "projectCard": {
+      "inProgress": "In progress",
+      "onHold": "On hold",
+      "delayed": "{days} days behind",
+      "progressLabel": "Progress",
+      "lastUpdate": "Updated: {date}"
+    },
+    "error": {
+      "title": "Couldn't load this section's data",
+      "retry": "Retry"
+    },
     "didYouKnow": {
       "title": "Did you know?",
       "tryIt": "Try it now",
@@ -2056,7 +2086,7 @@
       }
     },
     "recentDocs": {
-      "title": "Recent Documents",
+      "title": "Recent Activity",
       "invoice": "Invoice",
       "quotation": "Quotation",
       "study": "Cost Study",
