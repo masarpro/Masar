@@ -1,6 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import { STUDY_ERRORS } from "../lib/error-messages";
 import { db, generateQuotationNumber } from "@repo/database";
+import { VAT_PERCENT } from "@repo/utils";
 import { z } from "zod";
 import { toNum } from "../../../lib/decimal-helpers";
 import { verifyOrganizationAccess } from "../../../lib/permissions";
@@ -132,7 +133,7 @@ export const createStudyQuotation = subscriptionProcedure
 		}
 
 		const afterDiscount = subtotal - discountAmount;
-		const vatPercent = study.vatIncluded ? 15 : 0;
+		const vatPercent = study.vatIncluded ? VAT_PERCENT : 0;
 		const vatAmount = afterDiscount * (vatPercent / 100);
 		const totalAmount = afterDiscount + vatAmount;
 

@@ -18,6 +18,7 @@ import {
 	HardHat,
 	Wallet,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { toast } from "sonner";
 import { formatNum } from "@saas/pricing/lib/utils";
@@ -51,6 +52,7 @@ export function CostingSummaryTab({
 	studyId,
 	buildingArea,
 }: CostingSummaryTabProps) {
+	const t = useTranslations("pricing.costingV2");
 	const queryClient = useQueryClient();
 
 	// Fetch costing summary
@@ -80,6 +82,11 @@ export function CostingSummaryTab({
 	// الـAPI يعيد grandTotal بمفاتيح material/labor (وليس materialTotal/laborTotal)
 	const grandMaterial = (summary as any)?.grandTotal?.material ?? 0;
 	const grandLabor = (summary as any)?.grandTotal?.labor ?? 0;
+	// التشوين والمصاريف الأخرى جزء من التكلفة — إغفالها كان يجعل البطاقات
+	// وصف الإجمالي أقل من مجموع عمود "الإجمالي" لكل قسم
+	const grandStorage = (summary as any)?.grandTotal?.storage ?? 0;
+	const grandOther = (summary as any)?.grandTotal?.other ?? 0;
+	const grandTotalAll = (summary as any)?.grandTotal?.total ?? 0;
 
 	// Extract STRUCTURAL section to match المواد and المصنعيات tabs exactly
 	const structuralSection = useMemo(
@@ -130,14 +137,14 @@ export function CostingSummaryTab({
 					</p>
 				</div>
 
-				{/* Grand total card */}
+				{/* Grand total card — يشمل التشوين والمصاريف الأخرى (sec.total) */}
 				<div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-3 sm:p-4">
 					<div className="flex items-center gap-2 mb-1 sm:mb-2">
 						<Wallet className="h-4 w-4 text-primary" />
 						<span className="text-xs sm:text-sm font-medium">التكلفة الإجمالية</span>
 					</div>
 					<p className="text-base sm:text-xl font-bold text-primary" dir="ltr">
-						{formatNum(structuralMaterial + structuralLabor)} <span className="text-xs sm:text-sm font-normal">ر.س</span>
+						{formatNum(structuralSection?.total ?? 0)} <span className="text-xs sm:text-sm font-normal">ر.س</span>
 					</p>
 				</div>
 			</div>
@@ -250,7 +257,20 @@ export function CostingSummaryTab({
 								</TableCell>
 							</TableRow>
 						))}
-						{/* Grand total row */}
+						{/* سطر التشوين والمصاريف الأخرى — يفسّر الفارق بين مواد+مصنعيات والإجمالي */}
+						{grandStorage + grandOther > 0 && (
+							<TableRow className="text-muted-foreground hover:bg-muted/20">
+								<TableCell className="font-medium">
+									{t("summary.storageAndOther")}
+								</TableCell>
+								<TableCell className="text-center">—</TableCell>
+								<TableCell className="text-center">—</TableCell>
+								<TableCell className="text-center" dir="ltr">
+									{formatNum(grandStorage + grandOther)}
+								</TableCell>
+							</TableRow>
+						)}
+						{/* Grand total row — الإجمالي يشمل التشوين والمصاريف الأخرى */}
 						<TableRow className="bg-primary/10 font-bold border-t-2 border-primary/20">
 							<TableCell className="text-base">الإجمالي</TableCell>
 							<TableCell className="text-center text-base" dir="ltr">
@@ -260,16 +280,16 @@ export function CostingSummaryTab({
 								{formatNum(grandLabor)}
 							</TableCell>
 							<TableCell className="text-center text-base" dir="ltr">
-								{formatNum(grandMaterial + grandLabor)}
+								{formatNum(grandTotalAll)}
 							</TableCell>
 						</TableRow>
 					</TableBody>
 				</Table>
-				{/* Total cost highlight — إجمالي كل الأقسام (يطابق صف الإجمالي أعلاه) */}
+				{/* Total cost highlight — إجمالي كل الأقسام شاملاً التشوين والمصاريف الأخرى */}
 				<div className="px-4 py-4 border-t border-border bg-muted/20 text-center">
 					<span className="text-sm text-muted-foreground">التكلفة الإجمالية: </span>
 					<span className="text-2xl font-bold text-primary" dir="ltr">
-						{formatNum(grandMaterial + grandLabor)} ر.س
+						{formatNum(grandTotalAll)} ر.س
 					</span>
 				</div>
 			</div>
@@ -290,8 +310,8 @@ export function CostingSummaryTab({
 						},
 					)
 				}
-				/* البوابة على إجمالي كل الأقسام — الاقتصار على الإنشائي كان يقفل اعتماد دراسات التشطيبات/MEP فقط */
-				disabled={approveMutation.isPending || (grandMaterial + grandLabor) === 0}
+				/* البوابة على إجمالي كل الأقسام (شاملاً التشوين/الأخرى) — الاقتصار على الإنشائي كان يقفل اعتماد دراسات التشطيبات/MEP فقط */
+				disabled={approveMutation.isPending || grandTotalAll === 0}
 				className="w-full gap-2 py-4 sm:py-6 text-sm sm:text-base rounded-xl"
 				size="lg"
 			>

@@ -164,8 +164,14 @@ export function PricingPageContentV2({
 	const manualPriceNum = manualPrice ? Number(manualPrice) : 0;
 	const manualMarkupPct =
 		totalCost > 0 ? ((manualPriceNum - totalCost) / totalCost) * 100 : 0;
-	const manualOverhead = totalCost > 0 ? manualPriceNum * 0.05 : 0;
-	const manualProfit = manualPriceNum - totalCost - manualOverhead;
+	// التفكيك المعروض يطابق ما يُحفظ في handleSaveManualPrice:
+	// 25% مصاريف عامة / 65% ربح / 10% احتياطي من الهامش الفعلي
+	const manualMarkupAmount =
+		totalCost > 0 ? Math.max(manualPriceNum - totalCost, 0) : 0;
+	const manualOverhead = manualMarkupAmount * 0.25;
+	const manualContingency = manualMarkupAmount * 0.1;
+	const manualProfit =
+		manualPriceNum - totalCost - manualOverhead - manualContingency;
 
 	// Per sqm calculations
 	const sqmPriceNum = pricePerSqmInput ? Number(pricePerSqmInput) : 0;
@@ -191,7 +197,9 @@ export function PricingPageContentV2({
 				const pct = sectionMarkups[item.section]
 					? Number(sectionMarkups[item.section])
 					: (sec?.markupPercent ?? 0);
-				calculatedPrice = cost * (1 + pct / 100);
+				// المصاريف العامة تُضاف لكل بند — يطابق تحليل الربحية على الخادم
+				// (overhead مرة واحدة على الإجمالي) وعرض السعر الفعلي (overhead لكل بند)
+				calculatedPrice = cost * (1 + (pct + overhead) / 100);
 			} else if (method === "manual_price" && totalCost > 0) {
 				calculatedPrice = cost * (manualPriceNum / totalCost);
 			} else if (method === "per_sqm" && totalCost > 0) {
@@ -219,6 +227,7 @@ export function PricingPageContentV2({
 		uniformMarkupFactor,
 		profitData,
 		sectionMarkups,
+		overhead,
 		manualPriceNum,
 		sqmTotalPrice,
 		totalCost,
@@ -687,6 +696,12 @@ export function PricingPageContentV2({
 									{t("manualPrice.estimatedOverhead")}
 								</span>
 								<span dir="ltr">{formatNum(manualOverhead)} ر.س</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-muted-foreground">
+									{t("manualPrice.estimatedContingency")}
+								</span>
+								<span dir="ltr">{formatNum(manualContingency)} ر.س</span>
 							</div>
 							<div className="flex items-center justify-between">
 								<span className="text-muted-foreground">

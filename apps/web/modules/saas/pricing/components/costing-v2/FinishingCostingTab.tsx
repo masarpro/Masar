@@ -82,9 +82,9 @@ function calcItemTotal(
 ): number {
 	const materialTotal = materialUnitCost * quantity;
 	const laborTotal = laborUnitCost * quantity;
-	const subtotal = materialTotal + laborTotal;
-	const storageTotal = subtotal * (storagePct / 100);
-	return subtotal + storageTotal;
+	// التشوين على المواد فقط — يطابق حساب الخادم (calculateItemTotals في costing.ts)
+	const storageTotal = materialTotal * (storagePct / 100);
+	return materialTotal + laborTotal + storageTotal;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -624,8 +624,8 @@ export function FinishingCostingTab({
 						const laborTotal =
 							toNum(ls.laborUnitCost) * Number(item.quantity);
 						const storagePct = toNum(ls.storageCostPercent);
-						const storageTotal =
-							(materialTotal + laborTotal) * (storagePct / 100);
+						// التشوين على المواد فقط — يطابق حساب الخادم وcalcItemTotal
+						const storageTotal = materialTotal * (storagePct / 100);
 						const itemTotal = isLumpSum
 							? toNum(ls.lumpSumTotal)
 							: materialTotal + laborTotal + storageTotal;
