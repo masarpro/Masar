@@ -1,17 +1,22 @@
 "use client";
 
 import { Currency } from "@saas/finance/components/shared/Currency";
-import { Button } from "@ui/components/button";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 /**
- * Botly hero card (Figma: Unlock pro insights + Dashboard/Light 120:11546):
- * pastel-gradient card, bold title, Botly primary button (48px / 12px
- * radius, Figma 43:12), and an inner surface strip of large stats.
- * Gradient derived from Botly Brand tints — the Figma gradient variable
- * serializes empty via MCP (documented).
+ * LITERAL clone of Botly "Unlock pro insights" (Figma 45:4531) — every
+ * value below is read from get_design_context, RTL-mirrored:
+ * - card: rounded-[32px], gradient 235.49deg rgb(214,220,209) 57.3% →
+ *   rgb(255,221,180) 81.6% → rgb(199,180,255) 105.6%
+ * - content block: inset 48px, title SF 64/64 bold → (Arabic-scaled),
+ *   gap 24px, button #1d1d1d px-24 py-12 rounded-12 gap-12 16/24 semibold
+ * - stats strip: inset 12px, glass (blur 24, white 69%→100%, border
+ *   white/70), rounded-24, px-36 py-24, gap-24; cells: label 18/24
+ *   semibold, value 56/64 bold tracking -0.84 (clamped for real data)
+ * The card keeps its light art in dark mode — exactly as Botly's dark
+ * dashboard (120:11549) does.
  */
 export function BotlyHero({
 	organizationSlug,
@@ -53,36 +58,45 @@ export function BotlyHero({
 	}
 
 	return (
-		<div className="relative flex h-full min-h-0 flex-col justify-between gap-4 overflow-hidden rounded-3xl bg-gradient-to-bl from-chart-1/25 via-chart-3/15 to-chart-2/20 p-5 sm:p-6 dark:from-chart-1/10 dark:via-transparent dark:to-chart-2/10">
-			<div className="flex min-h-0 flex-col items-start gap-4">
-				<h2 className="max-w-xl text-2xl font-bold leading-snug text-foreground xl:text-3xl">
+		<div
+			className="relative h-full min-h-[320px] overflow-hidden rounded-[32px]"
+			style={{
+				backgroundImage:
+					"linear-gradient(235.49deg, rgb(214, 220, 209) 57.337%, rgb(255, 221, 180) 81.642%, rgb(199, 180, 255) 105.59%)",
+			}}
+		>
+			{/* Content — Figma: absolute 48px inset, gap 24 */}
+			<div className="absolute start-6 top-6 flex flex-col items-start gap-5 xl:start-12 xl:top-10 xl:gap-6">
+				<h2 className="max-w-[22rem] text-2xl font-bold leading-tight text-[#1d1d1d] xl:text-4xl xl:leading-[1.2]">
 					{t("dashboard.welcome.greeting", { name: orgName })}
 				</h2>
-				<Button asChild variant="primary" size="lg">
-					<Link href={`/app/${organizationSlug}/finance`}>
-						{t("dashboard.cashFlow.goToFinance")}
-						<ChevronLeft className="rtl-flip" />
-					</Link>
-				</Button>
+				{/* Botly Button 45:4490: #1d1d1d, px-24 py-12, rounded-12, gap-12, 16/24 semibold */}
+				<Link
+					href={`/app/${organizationSlug}/finance`}
+					className="flex items-center justify-center gap-3 rounded-[12px] bg-[#1d1d1d] px-6 py-3 text-[16px] font-semibold leading-6 text-white transition-opacity hover:opacity-90"
+				>
+					{t("dashboard.cashFlow.goToFinance")}
+					<ChevronLeft className="size-6 rtl-flip" />
+				</Link>
 			</div>
 
+			{/* Stats strip — Figma 45:4463: 12px inset, glass, rounded-24, px-36 py-24 */}
 			{stats.length > 0 && (
-				<div
-					className="grid shrink-0 gap-3 rounded-2xl bg-card p-4 sm:p-5"
-					style={{
-						gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
-					}}
-				>
-					{stats.map((s) => (
-						<div key={s.label} className="min-w-0">
-							<p className="truncate text-xs text-muted-foreground sm:text-sm">
-								{s.label}
-							</p>
-							<p className="mt-0.5 truncate text-xl font-bold tabular-nums text-card-foreground xl:text-3xl">
-								{s.value}
-							</p>
-						</div>
-					))}
+				<div className="absolute inset-x-3 bottom-3">
+					<div
+						className="flex w-full gap-4 rounded-[24px] border border-[rgba(255,255,255,0.7)] bg-gradient-to-b from-[rgba(255,255,255,0.69)] to-white px-6 py-4 backdrop-blur-[24px] xl:gap-6 xl:px-9 xl:py-6"
+					>
+						{stats.map((s) => (
+							<div key={s.label} className="flex min-w-0 flex-1 flex-col gap-1 xl:gap-2">
+								<p className="truncate text-sm font-semibold leading-6 text-[#1d1d1d] xl:text-[18px]">
+									{s.label}
+								</p>
+								<p className="truncate text-2xl font-bold tabular-nums leading-none tracking-[-0.84px] text-[#1d1d1d] xl:text-5xl xl:leading-[1.1]">
+									{s.value}
+								</p>
+							</div>
+						))}
+					</div>
 				</div>
 			)}
 		</div>
