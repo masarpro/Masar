@@ -1,7 +1,7 @@
 // ════════════════════════════════════════════════════════════════
 // Unified Quantities — oRPC Router
-// 20 procedure: catalog (3) + items (6) + context (6) + pricing (4)
-//             + settings (1)
+// 21 procedure: catalog (3) + items (6) + context (6) + pricing (4)
+//             + settings (1) + migration (1)
 // ════════════════════════════════════════════════════════════════
 
 // Catalog
@@ -33,6 +33,9 @@ import { bulkUpdatePricing } from "./procedures/pricing/bulk-update-pricing";
 
 // Settings
 import { updateStudySettings } from "./procedures/settings/update-study-settings";
+
+// Migration (جسر الدراسات القديمة)
+import { migrateLegacyStudy } from "./procedures/migrate-legacy-study";
 
 export const unifiedQuantitiesRouter = {
 	// Catalog (3)
@@ -68,4 +71,7 @@ export const unifiedQuantitiesRouter = {
 
 	// Settings (1)
 	updateStudySettings,
+
+	// Migration (1)
+	migrateLegacyStudy,
 };

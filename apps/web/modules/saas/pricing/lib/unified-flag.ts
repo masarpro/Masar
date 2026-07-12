@@ -26,7 +26,17 @@ export const UNIFIED_QUANTITIES_FLAG_ENABLED =
 
 interface StudyShape {
 	workScopes?: string[] | null;
+	studyType?: string | null;
 }
+
+// Pricing-only study types never pass through the Quantities stage, so they
+// must never be classified as unified — otherwise their /pricing and
+// /quotation pages would redirect to a quantities workspace they don't have.
+const PRICING_ONLY_STUDY_TYPES = new Set([
+	"QUICK_PRICING",
+	"CUSTOM_ITEMS",
+	"LUMP_SUM_ANALYSIS",
+]);
 
 /**
  * Returns true when the given study should use the unified workspace.
@@ -34,6 +44,9 @@ interface StudyShape {
  */
 export function isUnifiedStudy(study: StudyShape | null | undefined): boolean {
 	if (!UNIFIED_QUANTITIES_FLAG_ENABLED) return false;
+	if (study?.studyType && PRICING_ONLY_STUDY_TYPES.has(study.studyType)) {
+		return false;
+	}
 	const scopes = study?.workScopes ?? [];
 	if (scopes.length === 0) {
 		// legacy / unset: opt-in to unified by default when the flag is on

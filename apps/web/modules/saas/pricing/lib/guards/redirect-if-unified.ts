@@ -24,10 +24,16 @@ export async function redirectIfUnified(
 ) {
 	const study = await db.costStudy.findFirst({
 		where: { id: studyId, organizationId },
-		select: { workScopes: true },
+		select: { workScopes: true, studyType: true },
 	});
 
-	if (study && isUnifiedStudy({ workScopes: study.workScopes })) {
+	if (
+		study &&
+		isUnifiedStudy({
+			workScopes: study.workScopes,
+			studyType: study.studyType,
+		})
+	) {
 		redirect(
 			`/app/${organizationSlug}/pricing/studies/${studyId}/quantities`,
 		);

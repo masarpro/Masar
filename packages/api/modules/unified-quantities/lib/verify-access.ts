@@ -33,20 +33,61 @@ export async function loadStudy(costStudyId: string, organizationId: string) {
 		throw new ORPCError("NOT_FOUND", { message: "الدراسة غير موجودة" });
 	}
 	// حصر المحرك: يطابق قاعدة الواجهة في unified-flag.ts حرفياً —
-	// الدراسة موحّدة عندما يكون العلم مفعّلاً و(لا نطاقات أو تشمل FINISHING/MEP).
+	// الدراسة موحّدة عندما يكون العلم مفعّلاً و(لا نطاقات أو تشمل FINISHING/MEP)
+	// وليست من أنواع التسعير فقط (QUICK_PRICING وأخواتها لا تمر بمرحلة الكميات).
 	// غير ذلك تُدار عبر النظام الأساسي ولا يجوز الكتابة عليها من هنا
 	// (المحركان يكتبان نفس CostStudy بحسابات متنافرة)
 	const flagEnabled =
 		process.env.NEXT_PUBLIC_FEATURE_UNIFIED_QUANTITIES === "1";
+	const pricingOnlyType = [
+		"QUICK_PRICING",
+		"CUSTOM_ITEMS",
+		"LUMP_SUM_ANALYSIS",
+	].includes(study.studyType);
 	const scopes = Array.isArray(study.workScopes) ? study.workScopes : [];
 	const isUnified =
 		flagEnabled &&
+		!pricingOnlyType &&
 		(scopes.length === 0 ||
 			scopes.includes("FINISHING") ||
 			scopes.includes("MEP"));
 	if (!isUnified) {
 		throw new ORPCError("CONFLICT", {
 			message: "هذه الدراسة تُدار عبر نظام الكميات الأساسي وليس النظام الموحّد",
+		});
+	}
+	return study;
+}
+
+/**
+ * نسخة خاصة بترحيل الدراسات القديمة (migrate-legacy-study):
+ * تتحقق من الوجود + ملكية المنظمة + أن نطاقات الدراسة تسمح بالتشطيبات/MEP،
+ * لكنها **تتعمّد تجاوز فحص علم NEXT_PUBLIC_FEATURE_UNIFIED_QUANTITIES**
+ * الموجود في loadStudy — الترحيل يجب أن يعمل قبل تفعيل العلم،
+ * وإلا لظهرت الدراسات القديمة فارغة لحظة التفعيل.
+ */
+export async function loadStudyForMigration(
+	costStudyId: string,
+	organizationId: string,
+) {
+	const study = await db.costStudy.findFirst({
+		where: { id: costStudyId, organizationId },
+	});
+	if (!study) {
+		throw new ORPCError("NOT_FOUND", { message: "الدراسة غير موجودة" });
+	}
+	const scopes = Array.isArray(study.workScopes) ? study.workScopes : [];
+	const scopeAllows =
+		!["QUICK_PRICING", "CUSTOM_ITEMS", "LUMP_SUM_ANALYSIS"].includes(
+			study.studyType,
+		) &&
+		(scopes.length === 0 ||
+			scopes.includes("FINISHING") ||
+			scopes.includes("MEP"));
+	if (!scopeAllows) {
+		throw new ORPCError("CONFLICT", {
+			message:
+				"هذه الدراسة لا تشمل نطاق تشطيبات أو كهروميكانيكا — لا يوجد ما يُرحَّل",
 		});
 	}
 	return study;
