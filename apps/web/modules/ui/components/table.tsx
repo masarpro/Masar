@@ -13,11 +13,13 @@ const Table = ({
 	</div>
 );
 
+/* Botly table (Figma 71:4147 title + 71:4085 row): 2px Stroke row borders,
+   header labels 14px medium in Text secondary, no header bg, no zebra. */
 const TableHeader = ({
 	className,
 	...props
 }: React.HTMLAttributes<HTMLTableSectionElement>) => (
-	<thead className={cn("[&_tr]:border-b", className)} {...props} />
+	<thead className={cn("[&_tr]:border-b-2", className)} {...props} />
 );
 
 const TableBody = ({
@@ -46,7 +48,7 @@ const TableRow = ({
 }: React.HTMLAttributes<HTMLTableRowElement>) => (
 	<tr
 		className={cn(
-			"border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+			"border-b-2 transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
 			className,
 		)}
 		{...props}
@@ -59,7 +61,7 @@ const TableHead = ({
 }: React.ThHTMLAttributes<HTMLTableCellElement>) => (
 	<th
 		className={cn(
-			"h-12 px-4 text-start align-middle font-medium text-foreground/60 [&:has([role=checkbox])]:pe-0",
+			"h-12 px-4 text-start align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pe-0",
 			className,
 		)}
 		{...props}
@@ -84,7 +86,7 @@ const TableCaption = ({
 	...props
 }: React.HTMLAttributes<HTMLTableCaptionElement>) => (
 	<caption
-		className={cn("mt-4 text-foreground/60 text-sm", className)}
+		className={cn("mt-4 text-muted-foreground text-sm", className)}
 		{...props}
 	/>
 );
