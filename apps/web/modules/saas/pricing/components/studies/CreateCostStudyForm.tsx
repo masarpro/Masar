@@ -22,59 +22,19 @@ import {
 	SelectValue,
 } from "@ui/components/select";
 import { cn } from "@ui/lib";
-import {
-	ArrowLeft,
-	ArrowRight,
-	Building2,
-	ClipboardList,
-	Loader2,
-	Zap,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-
-// ═══════════════════════════════════════════════════════════════
-// TYPES & CONSTANTS
-// ═══════════════════════════════════════════════════════════════
-
-type StudyGoal = "full_study" | "cost_pricing" | "quick_pricing";
-
-type NewStudyType = "FULL_STUDY" | "COST_PRICING" | "QUICK_PRICING";
-
-const GOAL_TO_STUDY_TYPE: Record<StudyGoal, NewStudyType> = {
-	full_study: "FULL_STUDY",
-	cost_pricing: "COST_PRICING",
-	quick_pricing: "QUICK_PRICING",
-};
-
-const GOAL_TO_START_PAGE: Record<StudyGoal, string> = {
-	full_study: "quantities",
-	cost_pricing: "quantities",
-	quick_pricing: "pricing",
-};
-
-const GOALS = [
-	{ value: "full_study" as const, icon: Building2, goalKey: "full_study", showScope: true },
-	{ value: "cost_pricing" as const, icon: ClipboardList, goalKey: "cost_pricing", showScope: true },
-	{ value: "quick_pricing" as const, icon: Zap, goalKey: "quick_pricing", showScope: false },
-] as const;
-
-const SCOPE_ITEMS = [
-	{ key: "STRUCTURAL" as const, stateKey: "structural" as const, icon: "🏗️" },
-	{ key: "FINISHING" as const, stateKey: "finishing" as const, icon: "🎨" },
-	{ key: "MEP" as const, stateKey: "mep" as const, icon: "⚡" },
-	{ key: "CUSTOM" as const, stateKey: "custom" as const, icon: "📝" },
-] as const;
-
-const PROJECT_TYPES = [
-	{ value: "residential", label: "سكني", color: "bg-sky-500" },
-	{ value: "commercial", label: "تجاري", color: "bg-violet-500" },
-	{ value: "industrial", label: "صناعي", color: "bg-orange-500" },
-	{ value: "warehouse", label: "مستودع", color: "bg-slate-500" },
-	{ value: "mixed", label: "مختلط", color: "bg-teal-500" },
-];
+import {
+	GOALS,
+	GOAL_TO_START_PAGE,
+	GOAL_TO_STUDY_TYPE,
+	PROJECT_TYPES,
+	SCOPE_ITEMS,
+	type StudyGoal,
+} from "../../lib/study-create-config";
 
 // ═══════════════════════════════════════════════════════════════
 // COMPONENT
@@ -109,17 +69,16 @@ export function CreateCostStudyDialog({
 		name: "",
 		customerName: "",
 		projectType: "residential",
-		contractValue: "",
 	});
 
-	const selectedGoalConfig = GOALS.find((g) => g.value === selectedGoal);
+	const selectedGoalConfig = GOALS.find((g) => g.goal === selectedGoal);
 	const showScope = selectedGoalConfig?.showScope ?? false;
 
 	const resetWizard = useCallback(() => {
 		setStep(1);
 		setSelectedGoal(null);
 		setScope({ structural: true, finishing: true, mep: true, custom: false });
-		setFormData({ name: "", customerName: "", projectType: "residential", contractValue: "" });
+		setFormData({ name: "", customerName: "", projectType: "residential" });
 	}, []);
 
 	const handleOpenChange = useCallback((isOpen: boolean) => {
@@ -155,10 +114,9 @@ export function CreateCostStudyDialog({
 
 		const workScopes: string[] = [];
 		if (showScope) {
-			if (scope.structural) workScopes.push("STRUCTURAL");
-			if (scope.finishing) workScopes.push("FINISHING");
-			if (scope.mep) workScopes.push("MEP");
-			if (scope.custom) workScopes.push("CUSTOM");
+			for (const item of SCOPE_ITEMS) {
+				if (scope[item.stateKey]) workScopes.push(item.key);
+			}
 		}
 
 		(createMutation as any).mutate({
@@ -168,12 +126,6 @@ export function CreateCostStudyDialog({
 			projectType: formData.projectType,
 			studyType,
 			workScopes,
-			landArea: 1,
-			buildingArea: 1,
-			numberOfFloors: 1,
-			hasBasement: false,
-			finishingLevel: "medium",
-			...(formData.contractValue ? { contractValue: Number(formData.contractValue) } : {}),
 		});
 	};
 
@@ -218,13 +170,13 @@ export function CreateCostStudyDialog({
 							<div className="space-y-3">
 								{GOALS.map((goal) => {
 									const Icon = goal.icon;
-									const isSelected = selectedGoal === goal.value;
+									const isSelected = selectedGoal === goal.goal;
 
 									return (
 										<button
-											key={goal.value}
+											key={goal.goal}
 											type="button"
-											onClick={() => setSelectedGoal(goal.value)}
+											onClick={() => setSelectedGoal(goal.goal)}
 											className={cn(
 												"w-full flex items-center gap-3 rounded-xl border-2 p-3 text-start transition-all",
 												isSelected
@@ -278,7 +230,7 @@ export function CreateCostStudyDialog({
 												/>
 												<span className="text-sm">{item.icon}</span>
 												<span className="text-sm font-medium">
-													{t(`pricing.studies.create.scopes.${item.key}`)}
+													{t(item.labelKey)}
 												</span>
 											</label>
 										))}
@@ -301,7 +253,7 @@ export function CreateCostStudyDialog({
 									onChange={(e: any) =>
 										setFormData({ ...formData, name: e.target.value })
 									}
-									placeholder="مثال: فيلا الرياض - حي النرجس"
+									placeholder={t("pricing.studies.form.nameExamplePlaceholder")}
 									className="rounded-xl"
 									autoFocus
 								/>
@@ -310,7 +262,7 @@ export function CreateCostStudyDialog({
 							<div className="space-y-2">
 								<Label htmlFor="customerName">
 									{t("pricing.studies.form.customerName")}{" "}
-									<span className="text-muted-foreground text-xs">(اختياري)</span>
+									<span className="text-muted-foreground text-xs">({t("common.optional")})</span>
 								</Label>
 								<Input
 									id="customerName"
@@ -339,7 +291,7 @@ export function CreateCostStudyDialog({
 											<SelectItem key={type.value} value={type.value} className="rounded-lg">
 												<div className="flex items-center gap-2">
 													<div className={`w-2 h-2 rounded-full ${type.color}`} />
-													{type.label}
+													{t(type.labelKey)}
 												</div>
 											</SelectItem>
 										))}
@@ -360,10 +312,10 @@ export function CreateCostStudyDialog({
 								{createMutation.isPending ? (
 									<>
 										<Loader2 className="h-4 w-4 animate-spin" />
-										جاري الإنشاء...
+										{t("common.creating")}
 									</>
 								) : (
-									"إنشاء الدراسة"
+									t("pricing.studies.form.submit")
 								)}
 							</Button>
 						) : (
@@ -373,7 +325,7 @@ export function CreateCostStudyDialog({
 								disabled={!selectedGoal}
 								className="rounded-xl px-8 gap-2"
 							>
-								التالي
+								{t("common.next")}
 								<ArrowLeft className="h-4 w-4" />
 							</Button>
 						)}
@@ -386,7 +338,7 @@ export function CreateCostStudyDialog({
 								className="rounded-xl px-6 gap-2"
 							>
 								<ArrowRight className="h-4 w-4" />
-								السابق
+								{t("common.previous")}
 							</Button>
 						) : (
 							<Button

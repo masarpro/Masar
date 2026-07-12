@@ -13,25 +13,15 @@ import {
 	DialogTitle,
 } from "@ui/components/dialog";
 import { cn } from "@ui/lib";
-import { Building2, ClipboardList, Loader2, Zap } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-
-type NewStudyType = "FULL_STUDY" | "COST_PRICING" | "QUICK_PRICING";
-
-const GOALS = [
-	{ value: "FULL_STUDY" as const, icon: Building2, goalKey: "full_study", showScope: true },
-	{ value: "COST_PRICING" as const, icon: ClipboardList, goalKey: "cost_pricing", showScope: true },
-	{ value: "QUICK_PRICING" as const, icon: Zap, goalKey: "quick_pricing", showScope: false },
-] as const;
-
-const SCOPE_ITEMS = [
-	{ key: "STRUCTURAL" as const, icon: "🏗️" },
-	{ key: "FINISHING" as const, icon: "🎨" },
-	{ key: "MEP" as const, icon: "⚡" },
-	{ key: "CUSTOM" as const, icon: "📝" },
-] as const;
+import {
+	GOALS,
+	SCOPE_ITEMS,
+	type NewStudyType,
+} from "../../lib/study-create-config";
 
 interface EditStudyConfigDialogProps {
 	open: boolean;
@@ -76,7 +66,7 @@ export function EditStudyConfigDialog({
 		}
 	}, [open, currentStudyType, currentWorkScopes]);
 
-	const selectedGoal = GOALS.find((g) => g.value === selectedType);
+	const selectedGoal = GOALS.find((g) => g.studyType === selectedType);
 	const showScope = selectedGoal?.showScope ?? false;
 
 	const updateMutation = useMutation(
@@ -84,7 +74,7 @@ export function EditStudyConfigDialog({
 			onSuccess: () => {
 				toast.success(t("common.saved"));
 				queryClient.invalidateQueries({
-					queryKey: [["pricing", "studies"]],
+					queryKey: orpc.pricing.studies.key(),
 				});
 				onOpenChange(false);
 			},
@@ -126,13 +116,13 @@ export function EditStudyConfigDialog({
 				<div className="space-y-3 py-2">
 					{GOALS.map((goal) => {
 						const Icon = goal.icon;
-						const isSelected = selectedType === goal.value;
+						const isSelected = selectedType === goal.studyType;
 
 						return (
 							<button
-								key={goal.value}
+								key={goal.studyType}
 								type="button"
-								onClick={() => setSelectedType(goal.value)}
+								onClick={() => setSelectedType(goal.studyType)}
 								className={cn(
 									"w-full flex items-center gap-3 rounded-xl border-2 p-3 text-start transition-all",
 									isSelected
@@ -186,7 +176,7 @@ export function EditStudyConfigDialog({
 									/>
 									<span className="text-sm">{item.icon}</span>
 									<span className="text-sm font-medium">
-										{t(`pricing.studies.create.scopes.${item.key}`)}
+										{t(item.labelKey)}
 									</span>
 								</label>
 							))}

@@ -96,7 +96,7 @@ export function QuickActionsGrid({ organizationSlug }: QuickActionsGridProps) {
 			sectionLabel: t("dashboard.actions.quantityStudies"),
 			actionLabel: t("dashboard.actions.calculateQuantities"),
 			browsePath: `/app/${organizationSlug}/pricing/studies`,
-			createPath: `/app/${organizationSlug}/pricing/studies/new`,
+			createPath: `/app/${organizationSlug}/pricing/studies?new=1`,
 			iconColor: "text-violet-500 dark:text-violet-400",
 			bgColor: "bg-violet-50/80 dark:bg-violet-950/30",
 			hoverBg: "hover:bg-violet-100 dark:hover:bg-violet-900/50",

@@ -13,7 +13,7 @@ import {
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { getStudyScopeSubtitle } from "../../lib/study-scope-subtitle";
-import { formatDate } from "../../lib/utils";
+import { formatDate } from "@shared/lib/formatters";
 
 interface StudyHeaderCardProps {
 	study: {
@@ -30,6 +30,16 @@ interface StudyHeaderCardProps {
 		workScopes?: string[] | null;
 		createdAt: Date | string;
 		updatedAt: Date | string;
+		/** JSONB — BuildingWizard config lives at structuralSpecs.buildingConfig */
+		structuralSpecs?: {
+			buildingConfig?: {
+				floors?: Array<{
+					enabled?: boolean;
+					slabArea?: number;
+					repeatCount?: number;
+				}>;
+			} | null;
+		} | null;
 	};
 	organizationSlug: string;
 	onEdit?: () => void;
@@ -56,11 +66,46 @@ export function StudyHeaderCard({
 	};
 
 	const getStatusLabel = (status: string) => {
-		const statusKey = status.replace("_", "");
-		return t(`pricing.studies.status.${statusKey}`) || status;
+		// المفاتيح في pricing.studies.status.* تطابق القيم الخام
+		// (draft / in_progress / completed / approved) — لا تُشوّه المفتاح
+		return t(`pricing.studies.status.${status}`) || status;
 	};
 
 	const studiesListUrl = `/app/${organizationSlug}/pricing/studies`;
+
+	// Real building data comes from the BuildingWizard config (structuralSpecs).
+	// The scalar landArea/buildingArea/numberOfFloors columns default to the
+	// placeholder value 1 at creation — never display those fake values.
+	const configFloors = (study.structuralSpecs?.buildingConfig?.floors ?? []).filter(
+		(f) => f.enabled !== false,
+	);
+	const configBuildingArea = Math.round(
+		configFloors.reduce(
+			(sum, f) =>
+				sum + (Number(f.slabArea) || 0) * (Number(f.repeatCount) || 1),
+			0,
+		) * 10,
+	) / 10;
+	const configFloorsCount = configFloors.reduce(
+		(sum, f) => sum + (Number(f.repeatCount) || 1),
+		0,
+	);
+	const hasRealLegacyData =
+		Number(study.buildingArea) > 1 ||
+		Number(study.landArea) > 1 ||
+		Number(study.numberOfFloors) > 1;
+	const displayArea =
+		configBuildingArea > 0
+			? configBuildingArea
+			: hasRealLegacyData
+				? Number(study.landArea)
+				: null;
+	const displayFloors =
+		configFloorsCount > 0
+			? configFloorsCount
+			: hasRealLegacyData
+				? Number(study.numberOfFloors)
+				: null;
 
 	return (
 		<Card className="bg-gradient-to-l from-primary/10 via-primary/5 to-background border-primary/20">
@@ -92,24 +137,31 @@ export function StudyHeaderCard({
 						</div>
 					</div>
 
-					{/* Row 3: Project details */}
+					{/* Project details */}
 					<div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
 						<span className="flex items-center gap-1">
 							<Building2 className="h-3.5 w-3.5" />
 							{t(`pricing.studies.projectTypes.${study.projectType}`)}
 						</span>
-						<span className="flex items-center gap-1">
-							<MapPin className="h-3.5 w-3.5" />
-							{study.landArea} {t("pricing.studies.units.m2")}
-						</span>
-						<span className="flex items-center gap-1">
-							<Layers className="h-3.5 w-3.5" />
-							{study.numberOfFloors} {t("pricing.studies.floors")}
-							{study.hasBasement &&
-								" + " + t("pricing.studies.form.hasBasement")}
-						</span>
+						{displayArea !== null && (
+							<span className="flex items-center gap-1">
+								<MapPin className="h-3.5 w-3.5" />
+								{displayArea} {t("pricing.studies.units.m2")}
+							</span>
+						)}
+						{displayFloors !== null && (
+							<span className="flex items-center gap-1">
+								<Layers className="h-3.5 w-3.5" />
+								{displayFloors} {t("pricing.studies.floors")}
+								{study.hasBasement &&
+									" + " + t("pricing.studies.form.hasBasement")}
+							</span>
+						)}
 						<span className="flex items-center gap-1">
 							<Calendar className="h-3.5 w-3.5" />
+							<span className="text-muted-foreground/70">
+								{t("pricing.studies.lastUpdated")}:
+							</span>
 							{formatDate(study.updatedAt)}
 						</span>
 					</div>

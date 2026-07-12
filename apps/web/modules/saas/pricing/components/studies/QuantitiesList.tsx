@@ -21,12 +21,13 @@ import {
 	CheckCircle2,
 	FileStack,
 } from "lucide-react";
-import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
-import { CostStudyCard } from "./CostStudyCard";
+import { CostStudyCard, type CostStudyListItem } from "./CostStudyCard";
 import { CreateCostStudyDialog } from "./CreateCostStudyForm";
-import { formatCurrency } from "../../lib/utils";
+import { formatSAR } from "@shared/lib/formatters";
 import { ListTableSkeleton } from "@saas/shared/components/skeletons";
 import { CompactStatGrid } from "@saas/shared/components/mobile/CompactStatGrid";
 
@@ -34,12 +35,35 @@ interface QuantitiesListProps {
 	organizationId: string;
 }
 
+interface StudiesListResponse {
+	costStudies: CostStudyListItem[];
+	total: number;
+	stats: {
+		totalCount: number;
+		totalValue: number;
+		byStatus: Record<string, number>;
+	};
+}
+
 export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 	const t = useTranslations();
 	const { activeOrganization } = useActiveOrganization();
+	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
 	const [searchTerm, setSearchTerm] = useState("");
 	const [statusFilter, setStatusFilter] = useState<string>("all");
 	const [showCreateDialog, setShowCreateDialog] = useState(false);
+
+	// Auto-open the create dialog when arriving via /pricing/studies?new=1
+	// (dashboard quick action), then clean the param from the URL.
+	const hasNewParam = searchParams.get("new") !== null;
+	useEffect(() => {
+		if (hasNewParam) {
+			setShowCreateDialog(true);
+			router.replace(pathname, { scroll: false });
+		}
+	}, [hasNewParam, pathname, router]);
 
 	const { data, isLoading, refetch } = useQuery(
 		orpc.pricing.studies.list.queryOptions({
@@ -51,16 +75,17 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 		}),
 	);
 
-	const costStudies = (data as any)?.costStudies ?? [];
+	const listData = data as StudiesListResponse | undefined;
+	const costStudies = listData?.costStudies ?? [];
 	const basePath = `/app/${activeOrganization?.slug}/pricing/studies`;
 
 	// Statistics aggregated server-side across ALL studies (not just this page)
-	const byStatus: Record<string, number> = (data as any)?.stats?.byStatus ?? {};
+	const byStatus: Record<string, number> = listData?.stats?.byStatus ?? {};
 	const stats = {
-		total: (data as any)?.stats?.totalCount ?? 0,
+		total: listData?.stats?.totalCount ?? 0,
 		inProgress: byStatus.in_progress ?? 0,
-		completed: (byStatus.completed ?? 0) + (byStatus.approved ?? 0),
-		totalValue: (data as any)?.stats?.totalValue ?? 0,
+		completed: byStatus.completed ?? 0,
+		totalValue: listData?.stats?.totalValue ?? 0,
 	};
 
 	if (isLoading) {
@@ -96,7 +121,7 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 					},
 					{
 						label: t("pricing.studies.stats.totalValue"),
-						value: formatCurrency(stats.totalValue),
+						value: formatSAR(stats.totalValue),
 						icon: TrendingUp,
 						iconClassName: "text-indigo-600 dark:text-indigo-400",
 						iconBgClassName: "bg-indigo-100 dark:bg-indigo-900/30",
@@ -147,7 +172,7 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 					<div className="flex items-center justify-between gap-2">
 						<div className="min-w-0 flex-1">
 							<p className="text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">{t("pricing.studies.stats.totalValue")}</p>
-							<p className="text-lg sm:text-2xl font-semibold mt-2 text-indigo-700 dark:text-indigo-300 break-words leading-snug">{formatCurrency(stats.totalValue)}</p>
+							<p className="text-lg sm:text-2xl font-semibold mt-2 text-indigo-700 dark:text-indigo-300 break-words leading-snug">{formatSAR(stats.totalValue)}</p>
 						</div>
 						<div className="p-3 rounded-2xl bg-indigo-200/50 dark:bg-indigo-800/30 shrink-0 max-sm:hidden">
 							<TrendingUp className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
@@ -175,9 +200,8 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 						<SelectContent className="rounded-xl">
 							<SelectItem value="all">{t("pricing.studies.allStatuses")}</SelectItem>
 							<SelectItem value="draft">{t("pricing.studies.status.draft")}</SelectItem>
-							<SelectItem value="in_progress">{t("pricing.studies.status.inProgress")}</SelectItem>
+							<SelectItem value="in_progress">{t("pricing.studies.status.in_progress")}</SelectItem>
 							<SelectItem value="completed">{t("pricing.studies.status.completed")}</SelectItem>
-							<SelectItem value="approved">{t("pricing.studies.status.approved")}</SelectItem>
 						</SelectContent>
 					</Select>
 				</MobileFilterSheet>
@@ -202,7 +226,7 @@ export function QuantitiesList({ organizationId }: QuantitiesListProps) {
 			{/* Grid of cost studies */}
 			{costStudies.length > 0 ? (
 				<div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{costStudies.map((study: any, index: any) => (
+					{costStudies.map((study, index) => (
 						<div
 							key={study.id}
 							className="animate-in fade-in slide-in-from-bottom-4 duration-500"

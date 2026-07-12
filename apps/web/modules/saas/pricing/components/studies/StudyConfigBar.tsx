@@ -5,6 +5,7 @@ import { Button } from "@ui/components/button";
 import { cn } from "@ui/lib";
 import { Pencil } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { SCOPE_ICONS } from "../../lib/study-create-config";
 
 const STUDY_TYPE_COLORS: Record<string, string> = {
 	FULL_STUDY: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
@@ -24,12 +25,6 @@ const STUDY_TYPE_LABEL_KEY: Record<string, string> = {
 	LUMP_SUM_ANALYSIS: "pricing.studies.studyTypes.lumpSumAnalysis",
 };
 
-const SCOPE_ICONS: Record<string, string> = {
-	STRUCTURAL: "🏗️",
-	FINISHING: "🎨",
-	MEP: "⚡",
-	CUSTOM: "📝",
-};
 
 interface StudyConfigBarProps {
 	studyType: string;

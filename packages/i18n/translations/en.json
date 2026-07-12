@@ -7326,6 +7326,7 @@
       "convertToQuotation": "Convert to Quotation",
       "convertToQuotationError": "Error preparing quotation data",
       "quotationPrefilled": "Quotation data prefilled from study",
+      "stagesProgress": "{approved} of {total} stages approved",
       "status": {
         "draft": "Draft",
         "in_progress": "In Progress",
@@ -7363,6 +7364,7 @@
         "studyType": "Study Type",
         "contractValue": "Contract Value",
         "contractValuePlaceholder": "Enter contract value",
+        "nameExamplePlaceholder": "e.g., Riyadh Villa - Al Narjis District",
         "quantityMethod": "How do you want to start?",
         "smartCalc": "Smart Calculation",
         "smartCalcDesc": "Enter building info and we'll calculate quantities automatically",
@@ -7661,6 +7663,7 @@
             "retainingWallType": "Retaining Wall Type",
             "stemThickness": "Stem Thickness",
             "baseWidth": "Base Width",
+            "embedmentDepth": "Embedment Depth",
             "boundaryWallType": "Wall Type",
             "hasRCColumns": "RC Columns",
             "hasFoundation": "Strip Foundation",
@@ -7787,6 +7790,7 @@
             "excavation": "Excavation",
             "blocks": "Blocks",
             "blockUnit": "block",
+            "mortar": "Mortar",
             "component": "Component",
             "showBreakdown": "Show Breakdown",
             "totalWithQty": "Total ({qty} units)"
@@ -7797,6 +7801,7 @@
             "cancel": "Cancel"
           },
           "messages": {
+            "missingDims": "Enter the required dimensions (positive values within limits) before saving",
             "saved": "Saved successfully",
             "saveError": "Error while saving"
           }
@@ -9056,6 +9061,9 @@
         "quickEntryView": "Quick Entry",
         "unsavedChanges": "You have unsaved changes — they will be saved automatically, or click \"Save Prices\""
       },
+      "summary": {
+        "storageAndOther": "Storage & Other Costs"
+      },
       "labor": {
         "modes": {
           "perSqm": "Per Square Meter",
@@ -9216,7 +9224,8 @@
         "title": "Enter the desired selling price (before VAT)",
         "totalSellingPriceLabel": "Total Selling Price (SAR)",
         "requestedSellingPrice": "Desired Selling Price",
-        "estimatedOverhead": "Estimated Overhead (25%)",
+        "estimatedOverhead": "Estimated Overhead (25% of markup)",
+        "estimatedContingency": "Estimated Contingency (10% of markup)",
         "estimatedNetProfit": "Estimated Net Profit",
         "pricePerSqm": "Price per Square Meter"
       },

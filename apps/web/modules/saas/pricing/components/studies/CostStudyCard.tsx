@@ -1,8 +1,10 @@
 "use client";
 
 import { orpc } from "@shared/lib/orpc-query-utils";
+import { formatDateShort, formatSAR } from "@shared/lib/formatters";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@ui/components/button";
+import { StatusChip } from "@ui/components/status-chip";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -21,14 +23,12 @@ import {
 	AlertDialogTitle,
 } from "@ui/components/alert-dialog";
 import {
-	Building2,
 	Copy,
 	Hammer,
 	MoreVertical,
 	PaintBucket,
 	Pencil,
 	Trash2,
-	Layers,
 	Calendar,
 	Boxes,
 	UserSearch,
@@ -38,64 +38,68 @@ import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { formatCurrency } from "../../lib/utils";
 import { useActiveOrganization } from "@saas/organizations/hooks/use-active-organization";
+import {
+	SCOPE_ICONS,
+	getProjectTypeColor,
+} from "../../lib/study-create-config";
+
+/** Shape of a study row returned by orpc.pricing.studies.list */
+export interface CostStudyListItem {
+	id: string;
+	name: string | null;
+	customerName: string | null;
+	projectType: string;
+	studyType: string;
+	/** Derived server-side from stage fields: draft | in_progress | completed */
+	status: string;
+	workScopes?: string[] | null;
+	totalCost: number | string;
+	createdAt: Date | string;
+	quantitiesStatus?: string | null;
+	specsStatus?: string | null;
+	costingStatus?: string | null;
+	pricingStatus?: string | null;
+	quotationStatus?: string | null;
+	lead?: { id: string; name: string; status: string } | null;
+	_count: {
+		structuralItems: number;
+		finishingItems: number;
+		mepItems: number;
+		laborItems: number;
+		quotes: number;
+	};
+}
 
 interface CostStudyCardProps {
-	study: {
-		id: string;
-		name: string | null;
-		customerName: string | null;
-		projectType: string;
-		buildingArea: number;
-		numberOfFloors: number;
-		finishingLevel: string;
-		status: string;
-		totalCost: number;
-		createdAt: Date;
-		lead?: { id: string; name: string; status: string } | null;
-		_count: {
-			structuralItems: number;
-			finishingItems: number;
-			mepItems: number;
-			laborItems: number;
-			quotes: number;
-		};
-	};
+	study: CostStudyListItem;
 	basePath: string;
 	onDelete?: () => void;
 	onDuplicate?: () => void;
 }
 
-const STATUS_CONFIG: Record<string, { bg: string; text: string; dot: string }> = {
-	draft: {
-		bg: "bg-slate-100 dark:bg-slate-800",
-		text: "text-slate-600 dark:text-slate-400",
-		dot: "bg-slate-400",
-	},
-	in_progress: {
-		bg: "bg-amber-50 dark:bg-amber-950/50",
-		text: "text-amber-700 dark:text-amber-400",
-		dot: "bg-amber-500",
-	},
-	completed: {
-		bg: "bg-sky-50 dark:bg-sky-950/50",
-		text: "text-sky-700 dark:text-sky-400",
-		dot: "bg-sky-500",
-	},
-	approved: {
-		bg: "bg-indigo-50 dark:bg-indigo-950/50",
-		text: "text-indigo-700 dark:text-indigo-400",
-		dot: "bg-indigo-500",
-	},
-};
-
-const PROJECT_TYPE_COLORS: Record<string, { accent: string; bg: string }> = {
-	residential: { accent: "bg-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
-	commercial: { accent: "bg-violet-500", bg: "bg-violet-50 dark:bg-violet-950/30" },
-	industrial: { accent: "bg-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
-	mixed: { accent: "bg-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
-};
+/**
+ * Stage scalar fields that count towards progress, per study type
+ * (mirrors useStudyConfig enabledStages — pipeline is 4 stages).
+ */
+function getEnabledStageStatuses(
+	study: CostStudyListItem,
+): Array<string | null | undefined> {
+	switch (study.studyType) {
+		case "QUICK_PRICING":
+		case "CUSTOM_ITEMS":
+			return [study.pricingStatus];
+		case "LUMP_SUM_ANALYSIS":
+			return [study.costingStatus, study.pricingStatus];
+		default:
+			return [
+				study.quantitiesStatus,
+				study.specsStatus,
+				study.costingStatus,
+				study.pricingStatus,
+			];
+	}
+}
 
 export function CostStudyCard({
 	study,
@@ -154,19 +158,29 @@ export function CostStudyCard({
 		study._count.mepItems +
 		study._count.laborItems;
 
-	const statusConfig = STATUS_CONFIG[study.status] || STATUS_CONFIG.draft;
-	const projectColors = PROJECT_TYPE_COLORS[study.projectType] || PROJECT_TYPE_COLORS.residential;
+	const accentColor = getProjectTypeColor(study.projectType);
+	const workScopes = study.workScopes ?? [];
 
-	const createdDate = new Date(study.createdAt).toLocaleDateString("ar-SA", {
-		month: "short",
-		day: "numeric",
-	});
+	// Stage progress: approved stages out of the stages enabled for this
+	// study type — only when the list payload includes the stage scalars.
+	const hasStageFields = study.pricingStatus !== undefined;
+	const enabledStageStatuses = hasStageFields
+		? getEnabledStageStatuses(study)
+		: [];
+	const approvedStages = enabledStageStatuses.filter(
+		(s) => s === "APPROVED",
+	).length;
+	const totalStages = enabledStageStatuses.length;
+
+	const leadHref = activeOrganization
+		? `/app/${activeOrganization.slug}/pricing/leads/${study.lead?.id}`
+		: null;
 
 	return (
 		<>
 			<div className="group relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-sm">
 				{/* Top accent line */}
-				<div className={`h-1 w-full ${projectColors.accent}`} />
+				<div className={`h-1 w-full ${accentColor}`} />
 
 				{/* Card Header */}
 				<div className="p-4 pb-3">
@@ -185,9 +199,9 @@ export function CostStudyCard({
 									{study.customerName}
 								</p>
 							)}
-							{study.lead && (
+							{study.lead && leadHref && (
 								<Link
-									href={basePath.replace("/pricing/studies", "/pricing/leads/") + study.lead.id}
+									href={leadHref}
 									className="mt-1 inline-flex items-center gap-1 rounded-md border border-border bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
 									onClick={(e) => e.stopPropagation()}
 								>
@@ -229,27 +243,43 @@ export function CostStudyCard({
 						</DropdownMenu>
 					</div>
 
-					{/* Status Badge */}
-					<div className="mt-3">
-						<span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}>
-							<span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot}`} />
+					{/* Status + work scope chips */}
+					<div className="mt-3 flex items-center gap-1.5 flex-wrap">
+						<StatusChip status={study.status.toUpperCase()}>
 							{t(`pricing.studies.status.${study.status}`)}
-						</span>
+						</StatusChip>
+						{workScopes.map((scope) => (
+							<span
+								key={scope}
+								className="inline-flex items-center gap-1 rounded-md border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 text-[10px] font-medium text-slate-500 dark:text-slate-400"
+							>
+								<span>{SCOPE_ICONS[scope] ?? ""}</span>
+								{t(`pricing.studies.create.scopes.${scope}`)}
+							</span>
+						))}
 					</div>
-				</div>
 
-				{/* Card Details */}
-				<div className="px-4 pb-3">
-					<div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
-						<div className="flex items-center gap-1.5">
-							<Building2 className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-							<span>{study.buildingArea} م²</span>
+					{/* Stage progress */}
+					{hasStageFields && totalStages > 0 && (
+						<div className="mt-3">
+							<div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-1">
+								<span>
+									{t("pricing.studies.stagesProgress", {
+										approved: approvedStages,
+										total: totalStages,
+									})}
+								</span>
+							</div>
+							<div className="h-1 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+								<div
+									className="h-full rounded-full bg-primary transition-all"
+									style={{
+										width: `${totalStages > 0 ? (approvedStages / totalStages) * 100 : 0}%`,
+									}}
+								/>
+							</div>
 						</div>
-						<div className="flex items-center gap-1.5">
-							<Layers className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-							<span>{study.numberOfFloors} {t("pricing.studies.floors")}</span>
-						</div>
-					</div>
+					)}
 				</div>
 
 				{/* Per-section item counts */}
@@ -283,11 +313,11 @@ export function CostStudyCard({
 							<span>·</span>
 							<div className="flex items-center gap-1">
 								<Calendar className="h-3.5 w-3.5" />
-								<span>{createdDate}</span>
+								<span>{formatDateShort(study.createdAt)}</span>
 							</div>
 						</div>
 						<span className="text-base font-semibold text-slate-900 dark:text-slate-100">
-							{formatCurrency(study.totalCost)}
+							{formatSAR(study.totalCost)}
 						</span>
 					</div>
 				</div>

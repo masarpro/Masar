@@ -7331,6 +7331,7 @@
       "convertToQuotation": "تحويل إلى عرض سعر",
       "convertToQuotationError": "حدث خطأ أثناء تحضير بيانات عرض السعر",
       "quotationPrefilled": "تم تعبئة بيانات عرض السعر من الدراسة",
+      "stagesProgress": "{approved} من {total} مراحل معتمدة",
       "status": {
         "draft": "مسودة",
         "in_progress": "قيد التنفيذ",
@@ -7368,6 +7369,7 @@
         "studyType": "نوع الدراسة",
         "contractValue": "قيمة العقد",
         "contractValuePlaceholder": "أدخل قيمة العقد",
+        "nameExamplePlaceholder": "مثال: فيلا الرياض - حي النرجس",
         "quantityMethod": "كيف تريد البدء؟",
         "smartCalc": "حساب ذكي",
         "smartCalcDesc": "أدخل معلومات المبنى وسنحسب لك الكميات تلقائياً",
@@ -7692,6 +7694,7 @@
             "retainingWallType": "نوع الجدار الاستنادي",
             "stemThickness": "سمك الجذع",
             "baseWidth": "عرض القاعدة",
+            "embedmentDepth": "عمق التأسيس",
             "boundaryWallType": "نوع السور",
             "hasRCColumns": "أعمدة خرسانية",
             "hasFoundation": "قاعدة شريطية",
@@ -7818,6 +7821,7 @@
             "excavation": "حفر",
             "blocks": "بلوك",
             "blockUnit": "بلوكة",
+            "mortar": "مونة",
             "component": "المكون",
             "showBreakdown": "عرض التفصيل",
             "totalWithQty": "الإجمالي ({qty} وحدة)"
@@ -7828,6 +7832,7 @@
             "cancel": "إلغاء"
           },
           "messages": {
+            "missingDims": "أكمل الأبعاد المطلوبة (قيم أكبر من صفر وداخل الحدود) قبل الحفظ",
             "saved": "تم الحفظ بنجاح",
             "saveError": "حدث خطأ أثناء الحفظ"
           }
@@ -9061,6 +9066,9 @@
         "quickEntryView": "إدخال سريع",
         "unsavedChanges": "لديك تغييرات غير محفوظة — سيتم الحفظ تلقائياً أو اضغط \"حفظ الأسعار\""
       },
+      "summary": {
+        "storageAndOther": "تشوين ومصاريف أخرى"
+      },
       "labor": {
         "modes": {
           "perSqm": "بالمتر المسطح",
@@ -9221,7 +9229,8 @@
         "title": "أدخل سعر البيع المطلوب (قبل الضريبة)",
         "totalSellingPriceLabel": "سعر البيع الإجمالي (ر.س)",
         "requestedSellingPrice": "سعر البيع المطلوب",
-        "estimatedOverhead": "مصاريف عامة تقديرية (25%)",
+        "estimatedOverhead": "مصاريف عامة تقديرية (25% من الهامش)",
+        "estimatedContingency": "احتياطي تقديري (10% من الهامش)",
         "estimatedNetProfit": "صافي الربح التقديري",
         "pricePerSqm": "سعر المتر المربع"
       },
